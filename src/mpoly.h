@@ -28,18 +28,20 @@ extern "C" {
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
 slong mpoly_divide_threads(slong n, double la, double lb);
 
-#ifdef _MSC_VER
-# define DECLSPEC_IMPORT __declspec(dllimport)
-#else
-# define DECLSPEC_IMPORT
-#endif
+#ifndef __GMP_H__
+# ifdef _MSC_VER
+#  define DECLSPEC_IMPORT __declspec(dllimport)
+# else
+#  define DECLSPEC_IMPORT
+# endif
 DECLSPEC_IMPORT ulong __gmpn_add_n(nn_ptr, nn_srcptr, nn_srcptr, long int);
 DECLSPEC_IMPORT ulong __gmpn_sub_n(nn_ptr, nn_srcptr, nn_srcptr, long int);
 DECLSPEC_IMPORT ulong __gmpn_addmul_1(nn_ptr, nn_srcptr, long int, ulong);
 DECLSPEC_IMPORT ulong __gmpn_submul_1(nn_ptr, nn_srcptr, long int, ulong);
 DECLSPEC_IMPORT ulong __gmpn_rshift(nn_ptr, nn_srcptr, long int, unsigned int);
 DECLSPEC_IMPORT ulong __gmpn_mul_1(nn_ptr, nn_srcptr, long int, ulong);
-#undef DECLSPEC_IMPORT
+# undef DECLSPEC_IMPORT
+#endif
 
 /* context *******************************************************************/
 
@@ -49,7 +51,7 @@ void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);
 
 void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx);
 
-void mpoly_ctx_clear(mpoly_ctx_t FLINT_UNUSED(mctx));
+void mpoly_ctx_clear(mpoly_ctx_t mctx);
 
 /*
     number of words used by an exponent vector packed into "bits" bits:
@@ -841,7 +843,7 @@ void mpoly_gen_fields_ui(ulong * exp, slong var, const mpoly_ctx_t mctx);
 
 void mpoly_gen_fields_fmpz(fmpz * exp, slong var, const mpoly_ctx_t mctx);
 
-flint_bitcnt_t mpoly_gen_bits_required(slong FLINT_UNUSED(var), const mpoly_ctx_t FLINT_UNUSED(mctx));
+flint_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx);
 
 /* return the index in the fields where the generator of index v is stored */
 FLINT_FORCE_INLINE slong mpoly_gen_index(slong v, const mpoly_ctx_t mctx)
@@ -889,7 +891,7 @@ flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
 flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                        const mpoly_ctx_t mctx);
 
-flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong FLINT_UNUSED(v), ulong e, const mpoly_ctx_t FLINT_UNUSED(mctx));
+flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong v, ulong e, const mpoly_ctx_t mctx);
 
 int mpoly_is_poly(const ulong * Aexps, slong Alen, flint_bitcnt_t Abits, slong var, const mpoly_ctx_t mctx);
 
@@ -1111,19 +1113,19 @@ slong mpoly_gcd_info_get_brown_upper_limit(const mpoly_gcd_info_t Iv,
                                                        slong var, slong bound);
 
 void mpoly_gcd_info_measure_hensel(mpoly_gcd_info_t Iv,
-                         slong Alength, slong Blength, const mpoly_ctx_t FLINT_UNUSED(mctx));
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 void mpoly_gcd_info_measure_brown(mpoly_gcd_info_t Iv,
-                         slong Alength, slong Blength, const mpoly_ctx_t FLINT_UNUSED(mctx));
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 void mpoly_gcd_info_measure_bma(mpoly_gcd_info_t Iv,
-                         slong Alength, slong Blength, const mpoly_ctx_t FLINT_UNUSED(mctx));
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t Iv,
-                         slong FLINT_UNUSED(Alength), slong FLINT_UNUSED(Blength), const mpoly_ctx_t FLINT_UNUSED(mctx));
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 void mpoly_gcd_info_measure_zippel2(mpoly_gcd_info_t Iv,
-                         slong FLINT_UNUSED(Alength), slong FLINT_UNUSED(Blength), const mpoly_ctx_t FLINT_UNUSED(mctx));
+                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
                                     const ulong * Aexps, flint_bitcnt_t Abits,
@@ -1261,7 +1263,7 @@ int mpoly_parse_parse(mpoly_parse_t E, void * res, const char * s, slong len);
    Note this doesn't currently mask the relevant bits.
 */
 void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
-        slong l1, slong len1, slong k, slong FLINT_UNUSED(num), slong bits);
+        slong l1, slong len1, slong k, slong num, slong bits);
 
 #ifdef __cplusplus
 }

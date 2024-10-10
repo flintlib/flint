@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 typedef struct
 {
     gr_ptr coeffs;
@@ -223,6 +225,8 @@ WARN_UNUSED_RESULT int gr_mpoly_mul_si(gr_mpoly_t A, const gr_mpoly_t B, slong c
 WARN_UNUSED_RESULT int gr_mpoly_mul_ui(gr_mpoly_t A, const gr_mpoly_t B, ulong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpz(gr_mpoly_t A, const gr_mpoly_t B, const fmpz_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpq(gr_mpoly_t A, const gr_mpoly_t B, const fmpq_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

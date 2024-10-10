@@ -151,7 +151,7 @@ const double d_log_inverses[] = {
     0.02127659574468085106383, /* 1/47 */
 };
 
-double
+static double
 mag_d_bad_log(double x)
 {
     double t, u, v, t1, t2, t3;

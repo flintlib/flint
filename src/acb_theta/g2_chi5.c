@@ -16,7 +16,7 @@ void
 acb_theta_g2_chi5(acb_t res, acb_srcptr th, slong prec)
 {
     slong g = 2;
-    slong n = 1 << (2 * g);
+    ulong n = UWORD(1) << (2 * g);
     ulong ab;
     acb_t t;
 

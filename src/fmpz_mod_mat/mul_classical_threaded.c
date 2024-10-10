@@ -82,7 +82,7 @@ typedef struct
     const fmpz_mod_ctx_struct * ctx;
 } fmpz_mod_mat_transpose_arg_t;
 
-void
+static void
 _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
 {
     fmpz_mod_mat_transpose_arg_t arg = *((fmpz_mod_mat_transpose_arg_t *) arg_ptr);
@@ -239,7 +239,7 @@ _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D, const fmpz_mod_ma
                                     m, k, n, op, threads, num_threads, ctx);
 }
 
-void
+static void
 fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
             const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op, const fmpz_mod_ctx_t ctx)
 {

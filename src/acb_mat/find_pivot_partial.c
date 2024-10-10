@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "acb_mat.h"
 
-int
+static int
 acb_cmpabs_approx(const acb_t x, const acb_t y)
 {
     const arf_struct *xm, *ym;

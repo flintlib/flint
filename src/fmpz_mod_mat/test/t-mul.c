@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
 TEST_FUNCTION_START(fmpz_mod_mat_mul, state)
@@ -109,7 +110,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_mul, state)
 
     /* Test aliasing with windows */
     {
-        fmpz_mod_mat_t A, B, A_window;
+        fmpz_mod_mat_t A_window;
         fmpz_mod_ctx_t ctx;
 
         fmpz_mod_ctx_init_ui(ctx, 3);

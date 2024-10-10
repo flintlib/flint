@@ -16,7 +16,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
+static slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                               fmpz ** polyq, ulong ** expq, slong * allocq,
                          const fmpz * poly2, const ulong * exp2, slong len2,
                          const fmpz * poly3, const ulong * exp3, slong len3,
@@ -370,7 +370,7 @@ exp_overflow:
 }
 
 
-slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
+static slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                                fmpz ** polyq, ulong ** expq, slong * allocq,
                            const fmpz * poly2, const ulong * exp2, slong len2,
                            const fmpz * poly3, const ulong * exp3, slong len3,

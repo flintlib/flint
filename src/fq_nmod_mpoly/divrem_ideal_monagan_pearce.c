@@ -19,7 +19,7 @@
    passed and an array of quotient polynomials is returned. These are not in
    low level format.
 */
-int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
+static int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
     fq_nmod_mpoly_struct ** Q,
     fq_nmod_mpoly_t R,
     const ulong * poly2, const ulong * exp2, slong len2,

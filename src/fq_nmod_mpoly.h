@@ -27,8 +27,10 @@
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 /* Internal type definitions *************************************************/
 
@@ -161,8 +163,8 @@ bad_fq_nmod_embed_struct * bad_fq_nmod_mpoly_embed_chooser_init(
 void bad_fq_nmod_mpoly_embed_chooser_clear(
     bad_fq_nmod_mpoly_embed_chooser_t embc,
     fq_nmod_mpoly_ctx_t ectx,
-    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx),
-    flint_rand_t FLINT_UNUSED(randstate));
+    const fq_nmod_mpoly_ctx_t ctx,
+    flint_rand_t randstate);
 
 bad_fq_nmod_embed_struct * bad_fq_nmod_mpoly_embed_chooser_next(
     bad_fq_nmod_mpoly_embed_chooser_t embc,
@@ -201,7 +203,7 @@ ordering_t fq_nmod_mpoly_ctx_ord(const fq_nmod_mpoly_ctx_t ctx)
 /*  Memory management ********************************************************/
 
 FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_init(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+void fq_nmod_mpoly_init(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -212,7 +214,7 @@ void fq_nmod_mpoly_init(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSE
 }
 
 FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_clear(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+void fq_nmod_mpoly_clear(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     if (A->coeffs_alloc > 0)
         flint_free(A->coeffs);
@@ -265,7 +267,7 @@ void _fq_nmod_mpoly_fit_length(
 
 FQ_NMOD_MPOLY_INLINE
 void _fq_nmod_mpoly_set_length(fq_nmod_mpoly_t A, slong newlen,
-                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(fq_nmod_ctx_degree(ctx->fqctx)*newlen <= A->coeffs_alloc);
     FLINT_ASSERT(mpoly_words_per_exp(A->bits, ctx->minfo)*newlen <= A->exps_alloc);
@@ -274,7 +276,7 @@ void _fq_nmod_mpoly_set_length(fq_nmod_mpoly_t A, slong newlen,
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_truncate(fq_nmod_mpoly_t A, slong newlen,
-                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     if (A->length > newlen)
     {
@@ -313,7 +315,7 @@ int fq_nmod_mpoly_equal(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_t B,
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_swap(fq_nmod_mpoly_t A, fq_nmod_mpoly_t B,
-                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_SWAP(fq_nmod_mpoly_struct, *A, *B);
 }
@@ -323,7 +325,7 @@ void fq_nmod_mpoly_swap(fq_nmod_mpoly_t A, fq_nmod_mpoly_t B,
 
 FQ_NMOD_MPOLY_INLINE
 ulong * fq_nmod_mpoly_get_nonzero_n_fq(const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length == 1);
     FLINT_ASSERT(mpoly_monomial_is_zero(A->exps,
@@ -365,7 +367,7 @@ void fq_nmod_mpoly_one(fq_nmod_mpoly_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
-int fq_nmod_mpoly_is_zero(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+int fq_nmod_mpoly_is_zero(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
    return A->length == 0;
 }
@@ -426,7 +428,7 @@ void fq_nmod_mpoly_get_coeff_vars_ui(fq_nmod_mpoly_t C,
                                   slong length, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE ulong * _fq_nmod_mpoly_leadcoeff(
-                        const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                        const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
@@ -461,7 +463,7 @@ int fq_nmod_mpoly_is_canonical(const fq_nmod_mpoly_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
-slong fq_nmod_mpoly_length(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+slong fq_nmod_mpoly_length(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     return A->length;
 }
@@ -889,7 +891,7 @@ void fq_nmod_mpoly_ctx_change_modulus(fq_nmod_mpoly_ctx_t ctx,
 /* Univariates ***************************************************************/
 
 void fq_nmod_mpoly_univar_init(fq_nmod_mpoly_univar_t A,
-                                                const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+                                                const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_univar_clear(fq_nmod_mpoly_univar_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -905,7 +907,7 @@ void fq_nmod_mpoly_univar_assert_canonical(fq_nmod_mpoly_univar_t A,
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_univar_zero(fq_nmod_mpoly_univar_t A,
-                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     A->length = 0;
 }
@@ -924,21 +926,21 @@ void fq_nmod_mpoly_from_univar(fq_nmod_mpoly_t A,
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_univar_swap(fq_nmod_mpoly_univar_t A,
-                       fq_nmod_mpoly_univar_t B, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                       fq_nmod_mpoly_univar_t B, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_SWAP(fq_nmod_mpoly_univar_struct, *A, *B);
 }
 
-int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A,
-                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_nmod_mpoly_ctx_t ctx)
 {
     return A->length;
 }
 
-slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_univar_get_term_coeff(fq_nmod_mpoly_t c,
@@ -980,14 +982,14 @@ int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t poly,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, flint_bitcnt_t bits,
-                                                const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+                                                const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyu_clear(fq_nmod_mpolyu_t A,
                                                const fq_nmod_mpoly_ctx_t uctx);
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpolyu_swap(fq_nmod_mpolyu_t A, fq_nmod_mpolyu_t B,
-                                               const fq_nmod_mpoly_ctx_t FLINT_UNUSED(uctx))
+                                               const fq_nmod_mpoly_ctx_t uctx)
 {
     fq_nmod_mpolyu_struct t = *B;
     *B = *A;
@@ -1079,20 +1081,20 @@ FQ_NMOD_MPOLY_INLINE ulong * fq_nmod_mpolyu_leadcoeff(
 /* mpolyn ********************************************************************/
 
 void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, flint_bitcnt_t bits,
-                                                const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+                                                const fq_nmod_mpoly_ctx_t ctx);
 
-void fq_nmod_mpolyn_clear(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_mpolyn_clear(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyn_swap(fq_nmod_mpolyn_t A, fq_nmod_mpolyn_t B);
 
 int fq_nmod_mpolyn_is_canonical(const fq_nmod_mpolyn_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
-void fq_nmod_mpolyn_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_mpolyn_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
 
-int fq_nmod_mpolyn_is_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+int fq_nmod_mpolyn_is_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyn_print_pretty(const fq_nmod_mpolyn_t A,
                              const char ** x_in, const fq_nmod_mpoly_ctx_t ctx);
@@ -1119,7 +1121,7 @@ FQ_NMOD_MPOLY_INLINE ulong * fq_nmod_mpolyn_leadcoeff(
 }
 
 FQ_NMOD_MPOLY_INLINE n_poly_struct * fq_nmod_mpolyn_leadcoeff_poly(
-                       const fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                       const fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
@@ -1138,7 +1140,7 @@ void fq_nmod_mpoly_from_mpolyn_perm_inflate(fq_nmod_mpoly_t A,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
 void fq_nmod_mpolyun_init(fq_nmod_mpolyun_t A,
-                           flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+                           flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyun_clear(fq_nmod_mpolyun_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -1198,9 +1200,9 @@ void fq_nmod_mpolyn_content_poly(fq_nmod_poly_t g,
 void fq_nmod_mpolyun_content_poly(fq_nmod_poly_t g,
                            fq_nmod_mpolyun_t B, const fq_nmod_mpoly_ctx_t ctx);
 
-slong fq_nmod_mpolyn_lastdeg(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+slong fq_nmod_mpolyn_lastdeg(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
 
-slong fq_nmod_mpolyun_lastdeg(fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+slong fq_nmod_mpolyun_lastdeg(fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyun_set(
     fq_nmod_mpolyun_t A,
@@ -1512,6 +1514,8 @@ void fq_nmod_mpoly_geobucket_sub(fq_nmod_mpoly_geobucket_t B,
 ******************************************************************************/
 
 void fq_nmod_mpoly_remainder_strongtest(const fq_nmod_mpoly_t r, const fq_nmod_mpoly_t g, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

@@ -10,13 +10,15 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
+
 TEST_FUNCTION_START(fmpz_mat_mul_classical, state)
 {
     fmpz_mat_t A, B, C, D;
-    slong i;
+    slong ix;
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         slong m, n, k;
         slong i, j, h;

@@ -32,7 +32,7 @@ __nmod_poly_factor1(nmod_poly_factor_t res, const nmod_poly_t f, int algorithm)
         nmod_poly_factor_berlekamp(res, f);
 }
 
-ulong
+static ulong
 __nmod_poly_factor(nmod_poly_factor_t result,
                                     const nmod_poly_t input, int algorithm)
 {
@@ -83,7 +83,7 @@ __nmod_poly_factor(nmod_poly_factor_t result,
     return leading_coeff;
 }
 
-ulong
+static ulong
 __nmod_poly_factor_deflation(nmod_poly_factor_t result,
     const nmod_poly_t input, int algorithm)
 {

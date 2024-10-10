@@ -109,6 +109,7 @@ void fmpz_mod_mpoly_factor_print_pretty(
     }
 }
 
+#if 0
 void fmpz_mod_mpolyu_print_pretty(
     const fmpz_mod_mpolyu_t poly,
     const char ** x,
@@ -126,6 +127,7 @@ void fmpz_mod_mpolyu_print_pretty(
         flint_printf(")*X^%wd",poly->exps[i]);
     }
 }
+#endif
 
 void fmpz_mod_bpoly_print_pretty(
     const fmpz_mod_bpoly_t A,

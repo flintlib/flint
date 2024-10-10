@@ -115,7 +115,7 @@ arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n,
     mag_init(t);
     mag_init(err);
 
-    K = FLINT_MIN(K, n + 1);
+    K = FLINT_MIN((ulong) K, n + 1);
 
     if (res != NULL && res_prime != NULL)
         m = n_sqrt(2 * K);
@@ -129,7 +129,7 @@ arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n,
     _arb_vec_set_powers(xpow, v, m + 1, prec);
 
     /* truncating */
-    if (K < n + 1)
+    if ((ulong) K < n + 1)
     {
         arb_get_mag(u, v);
         mag_mul_ui(t, u, n - K);
@@ -146,7 +146,7 @@ arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n,
         sum_rs_inner(s, xpow, m, n, K, 0, prec);
         arb_add_ui(res, s, 1, prec);
 
-        if (K < n + 1)
+        if ((ulong) K < n + 1)
         {
             mag_set(err, u);
             mag_bin_uiui(t, n, K);
@@ -159,7 +159,7 @@ arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n,
 
     if (res_prime != NULL)
     {
-        K = FLINT_MIN(K, n);
+        K = FLINT_MIN((ulong) K, n);
         sum_rs_inner(s, xpow, m, n, K, 1, prec);
         arb_add_ui(res_prime, s, 1, prec);
         arb_mul_ui(res_prime, res_prime, n, prec);
@@ -167,7 +167,7 @@ arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n,
         arb_mul_2exp_si(res_prime, res_prime, -1);
 
         /* truncating */
-        if (K < n)
+        if ((ulong) K < n)
         {
             mag_set(err, u);
             mag_bin_uiui(t, n, K + 1);

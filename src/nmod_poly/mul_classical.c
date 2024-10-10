@@ -61,7 +61,7 @@ _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
         {
             for (i = 0; i < len1; i++)
             {
-                ulong c = poly1[i];
+                c = poly1[i];
 
                 for (j = 0; j < len2; j++)
                     res[i + j] += c * poly2[j];

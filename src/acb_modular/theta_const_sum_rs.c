@@ -12,6 +12,12 @@
 #include "acb.h"
 #include "acb_modular.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static const int square_best_m[] = {
   2, 3, 4, 8, 12, 16, 32, 48, 80, 96,
   112, 144, 240, 288, 336, 480, 560, 576, 720, 1008,

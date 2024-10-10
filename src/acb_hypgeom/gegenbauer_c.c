@@ -28,7 +28,7 @@ use_recurrence(const acb_t n, const acb_t m, slong prec)
     return 1;
 }
 
-void
+static void
 acb_hypgeom_gegenbauer_c_ui_recurrence(acb_t res, ulong n, const acb_t m,
     const acb_t z, slong prec)
 {

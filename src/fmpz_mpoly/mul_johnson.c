@@ -20,7 +20,7 @@
    version of the function assumes the exponent vectors all fit in a
    single word. Assumes input polys are nonzero.
 */
-slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
+static slong _fmpz_mpoly_mul_johnson1(fmpz ** poly1, ulong ** exp1, slong * alloc,
               const fmpz * poly2, const ulong * exp2, slong len2,
               const fmpz * poly3, const ulong * exp3, slong len3, ulong maskhi)
 {

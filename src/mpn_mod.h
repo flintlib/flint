@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /* Single limbs are already dealt with well by nmod, and excluding them
    allows avoiding various special cases. */
 #define MPN_MOD_MIN_LIMBS 2
@@ -65,7 +67,9 @@ mpn_mod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
 
 /* Basic operations and arithmetic */
 
+#ifndef GR_H
 int gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n);
+#endif
 int _gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs);
 void gr_ctx_init_mpn_mod_randtest(gr_ctx_t ctx, flint_rand_t state);
 
@@ -85,7 +89,7 @@ mpn_mod_init(nn_ptr x, gr_ctx_t ctx)
 }
 
 MPN_MOD_INLINE void
-mpn_mod_clear(nn_ptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
+mpn_mod_clear(nn_ptr x, gr_ctx_t ctx)
 {
 }
 
@@ -187,7 +191,7 @@ int mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx);
 /* Vector functions */
 
 int _mpn_mod_vec_zero(nn_ptr res, slong len, gr_ctx_t ctx);
-int _mpn_mod_vec_clear(nn_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx));
+int _mpn_mod_vec_clear(nn_ptr res, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_set(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);
 void _mpn_mod_vec_swap(nn_ptr vec1, nn_ptr vec2, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_neg(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);
@@ -230,6 +234,8 @@ int _mpn_mod_poly_div(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB
 
 int _mpn_mod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx);
 int _mpn_mod_poly_xgcd(slong * lenG, nn_ptr G, nn_ptr S, nn_ptr T, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

@@ -32,7 +32,7 @@ acb_hypgeom_rising_ui_jet(acb_ptr res, const acb_t x, ulong n, slong len, slong 
     }
     else
     {
-        if (n <= 20 || (n <= 200 && prec > 400 * n && acb_bits(x) >= prec / 4))
+        if (n <= 20 || (n <= 200 && (ulong) prec > 400 * n && acb_bits(x) >= prec / 4))
         {
             acb_hypgeom_rising_ui_jet_powsum(res, x, n, len, prec);
         }

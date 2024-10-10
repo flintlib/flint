@@ -107,27 +107,26 @@ FLINT_DLL extern gr_static_method_table _ca_methods;
 void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
-    gr_ctx_ptr given_ctx = ctx;
 
     for (iter = 0; iter < iters; iter++)
     {
-        gr_ctx_t my_ctx;
-        gr_ctx_ptr ctx;
+        gr_ctx_t ctx2;
+        gr_ctx_ptr ctxptr;
         gr_mat_t A, LU, LU2;
         slong m, n, d, r, rank, rank_lower_bound, rank_upper_bound;
         slong * P, * P2;
         int status;
 
-        if (given_ctx == NULL)
+        if (ctx == NULL)
         {
-            gr_ctx_init_random(my_ctx, state);
-            ctx = my_ctx;
+            gr_ctx_init_random(ctx2, state);
+            ctxptr = ctx2;
         }
         else
-            ctx = given_ctx;
+            ctxptr = ctx;
 
         /* Hack: ca can have too much blowup */
-        if (((gr_ctx_struct *) ctx)->methods == _ca_methods)
+        if (((gr_ctx_struct *) ctxptr)->methods == _ca_methods)
         {
             m = n_randint(state, FLINT_MIN(maxn, 4) + 1);
             n = n_randint(state, FLINT_MIN(maxn, 4) + 1);
@@ -138,9 +137,9 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
             n = n_randint(state, maxn + 1);
         }
 
-        gr_mat_init(A, m, n, ctx);
-        gr_mat_init(LU, m, n, ctx);
-        gr_mat_init(LU2, m, n, ctx);
+        gr_mat_init(A, m, n, ctxptr);
+        gr_mat_init(LU, m, n, ctxptr);
+        gr_mat_init(LU2, m, n, ctxptr);
 
         P = flint_malloc(sizeof(slong) * m);
         P2 = flint_malloc(sizeof(slong) * m);
@@ -148,10 +147,10 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
         /* Generate matrix with known bounds on rank */
         if (n_randint(state, 2))
         {
-            GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
+            GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctxptr));
 
             if (lu_impl != ((gr_method_mat_lu_op) gr_mat_lu_classical) &&
-                GR_SUCCESS == gr_mat_lu_classical(&rank_lower_bound, P2, LU2, A, 0, ctx))
+                GR_SUCCESS == gr_mat_lu_classical(&rank_lower_bound, P2, LU2, A, 0, ctxptr))
             {
                 rank_upper_bound = rank_lower_bound;
             }
@@ -164,14 +163,14 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
         else
         {
             r = n_randint(state, FLINT_MIN(m, n) + 1);
-            _gr_mat_randrank(A, state, r, 5, ctx);
+            _gr_mat_randrank(A, state, r, 5, ctxptr);
             if (n_randint(state, 2))
             {
                 d = n_randint(state, 2*m*n + 1);
-                GR_MUST_SUCCEED(gr_mat_randops(A, state, d, ctx));
+                GR_MUST_SUCCEED(gr_mat_randops(A, state, d, ctxptr));
             }
 
-            if (gr_ctx_is_finite_characteristic(ctx) == T_FALSE)
+            if (gr_ctx_is_finite_characteristic(ctxptr) == T_FALSE)
                 rank_lower_bound = rank_upper_bound = r;
             else
             {
@@ -180,25 +179,25 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
             }
         }
 
-        status = lu_impl(&rank, P, LU, A, 0, ctx);
+        status = lu_impl(&rank, P, LU, A, 0, ctxptr);
 
         if (status == GR_SUCCESS)
         {
             /* Check shape of solution */
-            check(P, LU, A, rank, ctx);
+            check(P, LU, A, rank, ctxptr);
 
             /* Check rank */
             if (rank < rank_lower_bound || rank > rank_upper_bound)
             {
                 flint_printf("FAIL\n");
-                gr_ctx_println(ctx);
+                gr_ctx_println(ctxptr);
                 flint_printf("wrong rank!\n");
                 flint_printf("rank = %wd\n", rank);
                 flint_printf("rank bounds = [%wd, %wd]\n", rank_lower_bound, rank_upper_bound);
                 flint_printf("\n\nA:");
-                gr_mat_print(A, ctx);
+                gr_mat_print(A, ctxptr);
                 flint_printf("\n\nLU:");
-                gr_mat_print(LU, ctx);
+                gr_mat_print(LU, ctxptr);
                 flint_abort();
             }
         }
@@ -208,7 +207,7 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
         /* ----------------------------------------------------- */
         if (m == n)
         {
-            status = lu_impl(&rank, P, LU, A, 1, ctx);
+            status = lu_impl(&rank, P, LU, A, 1, ctxptr);
 
             if (status == GR_SUCCESS)
             {
@@ -222,29 +221,29 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
                 if (!ok)
                 {
                     flint_printf("FAIL\n");
-                    gr_ctx_println(ctx);
+                    gr_ctx_println(ctxptr);
                     flint_printf("rank check\n");
                     flint_printf("rank = %wd\n", rank);
                     flint_printf("rank bounds = [%wd, %wd]\n", rank_lower_bound, rank_upper_bound);
                     flint_printf("\n\nA:\n");
-                    gr_mat_print(A, ctx);
+                    gr_mat_print(A, ctxptr);
                     flint_printf("\n\nLU:\n");
-                    gr_mat_print(LU, ctx);
+                    gr_mat_print(LU, ctxptr);
                     flint_abort();
                 }
 
                 if (rank != 0)
-                    check(P, LU, A, rank, ctx);
+                    check(P, LU, A, rank, ctxptr);
             }
         }
 
-        gr_mat_clear(A, ctx);
-        gr_mat_clear(LU, ctx);
-        gr_mat_clear(LU2, ctx);
+        gr_mat_clear(A, ctxptr);
+        gr_mat_clear(LU, ctxptr);
+        gr_mat_clear(LU2, ctxptr);
         flint_free(P);
         flint_free(P2);
 
-        if (given_ctx == NULL)
-            gr_ctx_clear(ctx);
+        if (ctx == NULL)
+            gr_ctx_clear(ctxptr);
     }
 }

@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "acb_hypgeom.h"
 
-void
+static void
 arb_bound_exp_neg(mag_t b, const arb_t x)
 {
     arb_t t;
@@ -27,8 +27,8 @@ arb_bound_exp_neg(mag_t b, const arb_t x)
 
 /* Implements DLMF 9.7.17. We assume |zeta| >= 1/2 and |arg(z)| <= 2 pi/3 here,
    ignoring the smaller points which must be dealt with separately. */
-void
-acb_hypgeom_airy_bound_9_7_17(mag_t bound, const acb_t z, const acb_t zeta)
+static void
+acb_hypgeom_airy_bound_9_7_17(mag_t bound, const acb_t FLINT_UNUSED(z), const acb_t zeta)
 {
     mag_t D, t, u, v, zeta_lower, half;
 
@@ -70,7 +70,7 @@ acb_hypgeom_airy_bound_9_7_17(mag_t bound, const acb_t z, const acb_t zeta)
     mag_clear(zeta_lower);
 }
 
-void
+static void
 acb_hypgeom_airy_bound_arg_le_2pi3(mag_t A, mag_t B, const acb_t z, slong wp)
 {
     acb_t zeta, z1;
@@ -119,7 +119,7 @@ acb_hypgeom_airy_bound_arg_le_2pi3(mag_t A, mag_t B, const acb_t z, slong wp)
 
 /* near the negative half line, use
    |Ai(-z)|, |Bi(-z)| <= |Ai(z exp(pi i/3))| + |Ai(z exp(-pi i/3))| */
-void
+static void
 acb_hypgeom_airy_bound_arg_ge_2pi3(mag_t A, mag_t B, const acb_t z, slong wp)
 {
     acb_t zeta, z1, z2;

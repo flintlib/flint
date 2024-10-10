@@ -18,7 +18,7 @@
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
+static int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
                 fq_nmod_poly_struct * const * C, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
@@ -118,7 +118,7 @@ cleanup_degrees:
     return success;
 }
 
-int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
+static int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
                 fq_nmod_poly_struct * const * C, const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);

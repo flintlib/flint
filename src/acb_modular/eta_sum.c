@@ -60,7 +60,7 @@ _acb_modular_mul(acb_t z, acb_t tmp1, acb_t tmp2, const acb_t x, const acb_t y, 
     }
 }
 
-void
+static void
 _acb_modular_eta_sum_basecase(acb_t eta, const acb_t q, double log2q_approx, slong N, slong prec)
 {
     slong e, e1, e2, k, k1, k2, num, term_prec;
@@ -151,7 +151,7 @@ _acb_modular_eta_sum_basecase(acb_t eta, const acb_t q, double log2q_approx, slo
     acb_clear(tmp2);
 }
 
-void
+static void
 _acb_modular_eta_sum_rs(acb_t eta, const acb_t q, double log2q_approx, slong N, slong prec)
 {
     slong * tab;

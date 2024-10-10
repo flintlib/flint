@@ -15,6 +15,12 @@
 #include "arb.h"
 #include "arb_mat.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define LOG2_OVER_E 0.25499459743395350926
 
 slong

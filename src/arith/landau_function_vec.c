@@ -25,7 +25,8 @@ void arith_landau_function_vec(fmpz * res, slong len)
     ulong p, pmax;
     ulong pk, pkhi;
     fmpz_t a;
-    ulong k, n;
+    slong k;
+    ulong n;
 
     if (len < 1)
         return;

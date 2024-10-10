@@ -936,7 +936,7 @@ cleanup:
 
 
 /***  ess(A) and ess(B) depend on only one variable v_in_both ****************/
-int _do_univar(
+static int _do_univar(
     nmod_mpoly_t G,
     nmod_mpoly_t Abar,
     nmod_mpoly_t Bbar,

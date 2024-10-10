@@ -12,7 +12,7 @@
 #include "ca_vec.h"
 #include "ca_mat.h"
 
-truth_t
+static truth_t
 ca_mat_diagonalization_precomp(ca_mat_t D, ca_mat_t P, const ca_mat_t A, const ca_vec_t eigenvalues, const ulong * am, ca_ctx_t ctx)
 {
     int success;
@@ -46,13 +46,13 @@ ca_mat_diagonalization_precomp(ca_mat_t D, ca_mat_t P, const ca_mat_t A, const c
 
         nullity = ca_mat_ncols(b);
 
-        if (nullity != am[i])
+        if ((ulong) nullity != am[i])
         {
             result = T_FALSE;
             break;
         }
 
-        for (j = 0; j < am[i]; j++)
+        for (j = 0; (ulong) j < am[i]; j++)
         {
             ca_set(ca_mat_entry(D, added + j, added + j), ca_vec_entry(eigenvalues, i), ctx);
 

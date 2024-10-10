@@ -657,8 +657,8 @@ turing_search_near(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb, const fmpz_t n)
     zz_node_ptr u, v;
     slong i;
     slong zn; /* target number of sign changes */
-    slong sb; /* the number of padding blocks required by Turing's method */
-    slong cgb; /* the number of consecutive good blocks */
+    ulong sb; /* the number of padding blocks required by Turing's method */
+    ulong cgb; /* the number of consecutive good blocks */
     const slong loopcount = 4;
     fmpz_t k;
 
@@ -717,19 +717,19 @@ turing_search_near(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb, const fmpz_t n)
     cgb = 0;
     while (1)
     {
-        zz_node_ptr pu;
-        pu = extend_to_prev_good_gram_node(u);
-        zn = count_gram_intervals(pu, u);
-        for (i = 0; i < loopcount && count_sign_changes(pu, u) < zn; i++)
+        zz_node_ptr pu_new;
+        pu_new = extend_to_prev_good_gram_node(u);
+        zn = count_gram_intervals(pu_new, u);
+        for (i = 0; i < loopcount && count_sign_changes(pu_new, u) < zn; i++)
         {
-            intercalate(pu, u);
+            intercalate(pu_new, u);
         }
-        if (count_sign_changes(pu, u) >= zn)
+        if (count_sign_changes(pu_new, u) >= zn)
         {
             cgb++;
             if (cgb == sb)
             {
-                u = pu;
+                u = pu_new;
                 break;
             }
         }
@@ -737,7 +737,7 @@ turing_search_near(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb, const fmpz_t n)
         {
             cgb = 0;
         }
-        u = pu;
+        u = pu_new;
     }
 
     *pu = u;
@@ -766,8 +766,8 @@ turing_search_far(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb,
 {
     slong i;
     slong zn; /* target number of sign changes */
-    slong sb; /* the number of padding blocks required by Turing's method */
-    slong cgb; /* the number of consecutive good blocks */
+    ulong sb; /* the number of padding blocks required by Turing's method */
+    ulong cgb; /* the number of consecutive good blocks */
     const slong loopcount = 4;
 
     /*
@@ -812,19 +812,19 @@ turing_search_far(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb,
     cgb = initial_cgb;
     while (1)
     {
-        zz_node_ptr pu;
-        pu = extend_to_prev_good_gram_node(u);
-        zn = count_gram_intervals(pu, u);
-        for (i = 0; i < loopcount && count_sign_changes(pu, u) < zn; i++)
+        zz_node_ptr pu_new;
+        pu_new = extend_to_prev_good_gram_node(u);
+        zn = count_gram_intervals(pu_new, u);
+        for (i = 0; i < loopcount && count_sign_changes(pu_new, u) < zn; i++)
         {
-            intercalate(pu, u);
+            intercalate(pu_new, u);
         }
-        if (count_sign_changes(pu, u) >= zn)
+        if (count_sign_changes(pu_new, u) >= zn)
         {
             cgb++;
             if (cgb == sb*2)
             {
-                u = pu;
+                u = pu_new;
                 break;
             }
         }
@@ -832,7 +832,7 @@ turing_search_far(zz_node_ptr *pu, zz_node_ptr *pv, slong *psb,
         {
             cgb = 0;
         }
-        u = pu;
+        u = pu_new;
     }
 
     *pu = u;
@@ -1070,7 +1070,7 @@ _isolate_hardy_z_zeros(arf_interval_ptr res, const fmpz_t n, slong len)
 }
 
 /* Isolate len zeros, starting from the nth zero. */
-void
+static void
 acb_dirichlet_isolate_hardy_z_zeros(arf_interval_ptr res, const fmpz_t n, slong len)
 {
     if (len <= 0)

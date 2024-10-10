@@ -12,6 +12,12 @@
 #include "acb.h"
 #include "acb_hypgeom.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 slong
 acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p,
                          acb_srcptr b, slong q, const acb_t z,
@@ -62,7 +68,7 @@ acb_hypgeom_u_asymp_determine_region(const mag_t r,
 }
 
 /* computes the factors that are independent of n (all are upper bounds) */
-void
+static void
 acb_hypgeom_u_asymp_bound_factors(int * R, mag_t alpha,
     mag_t nu, mag_t sigma, mag_t rho, mag_t zinv,
     const acb_t a, const acb_t b, const acb_t z)

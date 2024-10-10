@@ -31,14 +31,11 @@ extern "C" {
 
 /* Randomisation *************************************************************/
 
-ulong n_randlimb(flint_rand_t state);
 ulong n_urandint(flint_rand_t state, ulong limit);
 ulong n_randbits(flint_rand_t state, unsigned int bits);
 ulong n_randprime(flint_rand_t state, ulong bits, int proved);
 
 ulong n_randtest_bits(flint_rand_t state, int bits);
-ulong n_randtest(flint_rand_t state);
-ulong n_randtest_not_zero(flint_rand_t state);
 ulong n_randtest_prime(flint_rand_t state, int proved);
 
 /* Basic arithmetic **********************************************************/
@@ -78,14 +75,16 @@ ulong n_flog(ulong n, ulong b);
 ulong n_clog(ulong n, ulong b);
 ulong n_clog_2exp(ulong n, ulong b);
 
-#ifdef _MSC_VER
-# define DECLSPEC_IMPORT __declspec(dllimport)
-#else
-# define DECLSPEC_IMPORT
-#endif
+#ifndef __GMP_H__
+# ifdef _MSC_VER
+#  define DECLSPEC_IMPORT __declspec(dllimport)
+# else
+#  define DECLSPEC_IMPORT
+# endif
 DECLSPEC_IMPORT ulong __gmpn_gcd_11(ulong, ulong);
 DECLSPEC_IMPORT ulong __gmpn_gcd_1(nn_srcptr, long int, ulong);
-#undef DECLSPEC_IMPORT
+# undef DECLSPEC_IMPORT
+#endif
 
 ULONG_EXTRAS_INLINE
 ulong n_gcd(ulong x, ulong y)
@@ -359,9 +358,9 @@ ulong n_euler_phi(ulong n);
 
 FLINT_DLL extern const unsigned int flint_primes_small[];
 
-extern FLINT_TLS_PREFIX ulong * _flint_primes[FLINT_BITS];
-extern FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
-extern FLINT_TLS_PREFIX slong _flint_primes_used;
+FLINT_TLS_PREFIX extern ulong * _flint_primes[FLINT_BITS];
+FLINT_TLS_PREFIX extern double * _flint_prime_inverses[FLINT_BITS];
+FLINT_TLS_PREFIX extern slong _flint_primes_used;
 
 void n_primes_init(n_primes_t iter);
 void n_primes_clear(n_primes_t iter);
@@ -400,7 +399,7 @@ void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n);
 ulong n_prime_pi(ulong n);
 void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
 
-ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
+ulong n_nextprime(ulong n, int proved);
 
 /* Factorisation *************************************************************/
 

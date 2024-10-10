@@ -23,7 +23,7 @@ which == 5 -- 1-1/z
 
 */
 
-void
+static void
 _acb_hypgeom_2f1_transform_limit(acb_t res, const acb_poly_t a, const acb_poly_t b,
     const acb_poly_t c, const acb_poly_t z, int which, slong prec)
 {
@@ -224,7 +224,7 @@ acb_hypgeom_2f1_transform_limit(acb_t res, const acb_t a, const acb_t b,
     acb_clear(t);
 }
 
-void
+static void
 acb_hypgeom_2f1_transform_nolimit(acb_t res, const acb_t a, const acb_t b,
     const acb_t c, const acb_t z, int regularized, int which, slong prec)
 {

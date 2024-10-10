@@ -201,7 +201,7 @@ arb_hypgeom_legendre_p_ui_zero(arb_t res, arb_t res2, ulong n,
     arb_init(u);
     arb_init(v);
 
-    K = FLINT_MIN(K, n / 2 + 1);
+    K = FLINT_MIN((ulong) K, n / 2 + 1);
 
     if (res2 != NULL)
         m = n_sqrt(2 * K);

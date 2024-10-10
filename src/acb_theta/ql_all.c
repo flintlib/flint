@@ -19,7 +19,7 @@ static void
 acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 {
-    slong n = 1 << g;
+    ulong n = UWORD(1) << g;
     acb_ptr v;
     ulong a, b;
 
@@ -302,7 +302,7 @@ void
 acb_theta_ql_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n2 = 1 << (2 * g);
+    ulong n2 = UWORD(1) << (2 * g);
     acb_mat_t tau0;
     acb_ptr new_z, aux;
     acb_t c;

@@ -12,7 +12,7 @@
 #include "acb.h"
 
 /* branch cuts are on (+/-i)*[1,inf] */
-int
+static int
 acb_atan_on_branch_cut(const acb_t z)
 {
     arb_t unit;

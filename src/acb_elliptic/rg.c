@@ -12,9 +12,9 @@
 #include "acb.h"
 #include "acb_elliptic.h"
 
-void
+static void
 _acb_elliptic_rg(acb_t res, const acb_t x, const acb_t y, const acb_t z,
-                    int flags, slong prec)
+                    int FLINT_UNUSED(flags), slong prec)
 {
     acb_t a, b, c, t;
     slong wp;

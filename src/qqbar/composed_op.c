@@ -196,7 +196,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
 #include "profiler.h"
 #endif
 
-void
+static void
 qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 {
     slong i, prec, found;

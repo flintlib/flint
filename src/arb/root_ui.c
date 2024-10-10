@@ -22,7 +22,7 @@ arb_root_arf(arb_t z, const arf_t x, ulong k, slong prec)
         mag_zero(arb_radref(z));
 }
 
-void
+static void
 arb_root_ui_algebraic(arb_t res, const arb_t x, ulong k, slong prec)
 {
     mag_t r, msubr, m1k, t;
@@ -72,7 +72,7 @@ arb_root_ui_algebraic(arb_t res, const arb_t x, ulong k, slong prec)
     mag_clear(t);
 }
 
-void
+static void
 arb_root_ui_exp(arb_t res, const arb_t x, ulong k, slong prec)
 {
     arb_log(res, x, prec + 4);

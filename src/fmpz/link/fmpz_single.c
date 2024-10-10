@@ -61,7 +61,7 @@ static slong flint_page_size;
 static slong flint_mpz_structs_per_block;
 static slong flint_page_mask;
 
-slong flint_get_page_size(void)
+static slong flint_get_page_size(void)
 {
 #if defined(__unix__)
     return sysconf(_SC_PAGESIZE);

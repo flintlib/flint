@@ -49,7 +49,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
     unity_zp_copy(g_powers[1], g);
 
     /* sets g_powers[i] = g^2 * g_powers[i - 1] */
-    for (i = 2; i <= pow2k; i++)
+    for (i = 2; (ulong) i <= pow2k; i++)
     {
         unity_zp_init(g_powers[i], f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
         unity_zp_mul(g_powers[i], g_powers[i - 1], temp);
@@ -111,7 +111,7 @@ unity_zp_pow_2k_fmpz(unity_zp f, const unity_zp g, const fmpz_t pow)
 
     }
 
-    for (i = 0; i <= pow2k; i++)
+    for (i = 0; (ulong) i <= pow2k; i++)
         unity_zp_clear(g_powers[i]);
     flint_free(g_powers);
 

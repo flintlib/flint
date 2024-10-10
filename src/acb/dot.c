@@ -176,7 +176,7 @@ _arb_dot_output(arb_t res, nn_ptr sum, slong sn, int negative,
         xn = ARF_SIZE(xm); \
         xnegative = ARF_SGNBIT(xm); \
         shift = s_sum_exp - xexp; \
-        if (shift >= s_sn * FLINT_BITS) \
+        if (shift >= (ulong) s_sn * FLINT_BITS) \
         { \
             s_serr++; \
         } \
@@ -736,7 +736,7 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
                     exp = xexp + yexp;
                     shift = sum_exp - exp;
 
-                    if (shift >= sn * FLINT_BITS)
+                    if (shift >= (ulong) sn * FLINT_BITS)
                     {
                         /* We may yet need the top limbs for bounds. */
                         ARF_GET_TOP_LIMB(xtop, xm);

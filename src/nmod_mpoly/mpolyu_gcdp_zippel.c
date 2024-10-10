@@ -17,7 +17,7 @@
 #include "nmod_mpoly.h"
 
 /* store in each coefficient the evaluation of the corresponding monomial */
-void nmod_mpoly_evalsk(nmod_mpoly_t A, nmod_mpoly_t B,
+static void nmod_mpoly_evalsk(nmod_mpoly_t A, nmod_mpoly_t B,
            slong entries, slong * offs, ulong * masks, ulong * powers,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -45,7 +45,7 @@ void nmod_mpoly_evalsk(nmod_mpoly_t A, nmod_mpoly_t B,
     A->length = B->length;
 }
 
-void nmod_mpolyu_evalsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
+static void nmod_mpolyu_evalsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
               slong entries, slong * offs, ulong * masks, ulong * powers,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -62,7 +62,7 @@ void nmod_mpolyu_evalsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
 }
 
 /* multiply the coefficients of A pointwise by those of B */
-void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
+static void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -87,7 +87,7 @@ void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
     return 0 if the leading coeff of A vanishes
     else return 1
 */
-int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
+static int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
                                   nmod_mpolyu_t SK, const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -129,8 +129,7 @@ int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
 
     for x
 */
-int nmod_vandsolve(ulong * x, ulong * a, ulong * b,
-                                                           slong n, nmod_t mod)
+static int nmod_vandsolve(ulong * x, ulong * a, ulong * b, slong n, nmod_t mod)
 {
     int success = 0;
     slong i, j;
@@ -662,7 +661,7 @@ static int nmod_mpolyu_gcdp_zippel_univar_no_cofactors(
 }
 
 
-int nmod_mpolyu_gcdp_zippel_bivar(
+static int nmod_mpolyu_gcdp_zippel_bivar(
     nmod_mpolyu_t G,
     nmod_mpolyu_t Abar,
     nmod_mpolyu_t Bbar,

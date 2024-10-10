@@ -15,7 +15,7 @@
 
 #define RADIUS_DIGITS 3
 
-char *
+static char *
 _arb_condense_digits(char * s, slong n)
 {
     slong i, j, run, out;
@@ -77,7 +77,7 @@ _arb_condense_digits(char * s, slong n)
 
 /* Format (digits=d, exponent=e) as floating-point or fixed-point.
    Reallocates the input and mutates the exponent. */
-void
+static void
 _arb_digits_as_float_str(char ** d, fmpz_t e, slong minfix, slong maxfix)
 {
     slong i, n, alloc, dotpos;
@@ -291,7 +291,7 @@ _arb_digits_round_inplace(char * s, flint_bitcnt_t * shift, fmpz_t error, slong 
     }
 }
 
-void
+static void
 arb_get_str_parts(int * negative, char **mid_digits, fmpz_t mid_exp,
                                   char **rad_digits, fmpz_t rad_exp,
                                   const arb_t x, slong n, int more)

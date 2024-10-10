@@ -17,7 +17,13 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-static int
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
+int
 _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong i, j;
@@ -84,7 +90,7 @@ _permpiv_copy(slong * perm, slong * prm, slong * pivots, slong * piv, slong n)
     }
 }
 
-int
+static int
 _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
                          const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t D)
 {

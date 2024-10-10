@@ -12,7 +12,7 @@
 #include "mpoly.h"
 #include "gr_mpoly.h"
 
-slong _gr_mpoly_sub(
+static slong _gr_mpoly_sub(
     slong * Alen,
     gr_ptr Acoeffs, ulong * Aexps,
     gr_srcptr Bcoeffs, const ulong * Bexps, slong Blen,
@@ -84,7 +84,8 @@ int gr_mpoly_sub(
     const gr_mpoly_t C,
     const mpoly_ctx_t mctx, gr_ctx_t cctx)
 {
-    slong Abits, N;
+    slong N;
+    flint_bitcnt_t Abits;
     ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
     int freeBexps = 0, freeCexps = 0;

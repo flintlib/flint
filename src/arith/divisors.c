@@ -44,8 +44,8 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 };
 
 
-void
-_arith_divisors(fmpz *res, slong size, fmpz_factor_t factors)
+static void
+_arith_divisors(fmpz *res, slong FLINT_UNUSED(size), fmpz_factor_t factors)
 {
     slong i;
     slong *exp = flint_malloc(sizeof(slong) * factors->num);
@@ -99,7 +99,7 @@ _arith_divisors(fmpz *res, slong size, fmpz_factor_t factors)
 }
 
 
-void
+static void
 _arith_divisors_tiny(fmpz_poly_t res, slong n)
 {
     slong size;

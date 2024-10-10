@@ -14,7 +14,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void
+static void
 _fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2,
                    const fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign)
 {

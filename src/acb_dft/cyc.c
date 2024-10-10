@@ -110,6 +110,7 @@ acb_dft_cyc(acb_ptr w, acb_srcptr v, slong len, slong prec)
     acb_dft_cyc_clear(cyc);
 }
 
+#if 0
 void
 acb_dft_inverse_cyc(acb_ptr w, acb_srcptr v, slong len, slong prec)
 {
@@ -119,3 +120,4 @@ acb_dft_inverse_cyc(acb_ptr w, acb_srcptr v, slong len, slong prec)
     acb_dft_cyc(w, w, len, prec);
     acb_vec_swap_ri(w, len);
 }
+#endif

@@ -17,7 +17,7 @@
 int
 unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 {
-    slong i;
+    ulong i;
 
     if (f->p != g->p)
         return 0;

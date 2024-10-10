@@ -26,7 +26,7 @@ static ulong hash_func(calcium_func_code func, ca_srcptr args, slong nargs, ca_c
 }
 
 void
-ca_ext_init_qqbar(ca_ext_t res, const qqbar_t x, ca_ctx_t ctx)
+ca_ext_init_qqbar(ca_ext_t res, const qqbar_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_t t;
 

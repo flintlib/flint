@@ -26,10 +26,13 @@
 
 #include "fq_zech_types.h"
 
-/* Data types and context ****************************************************/
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+FLINT_HEADER_START
+
+/* Data types and context ****************************************************/
 
 void fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
 int _fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
@@ -92,7 +95,7 @@ fq_zech_init2(fq_zech_t rop, const fq_zech_ctx_t ctx)
 }
 
 FQ_ZECH_INLINE void
-fq_zech_clear(fq_zech_t FLINT_UNUSED(rop), const fq_zech_ctx_t FLINT_UNUSED(ctx))
+fq_zech_clear(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
 }
 
@@ -171,7 +174,7 @@ void fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_t state,
 /* Comparison ****************************************************************/
 
 FQ_ZECH_INLINE int
-fq_zech_equal(const fq_zech_t op1, const fq_zech_t op2, const fq_zech_ctx_t FLINT_UNUSED(ctx))
+fq_zech_equal(const fq_zech_t op1, const fq_zech_t op2, const fq_zech_ctx_t ctx)
 {
     return op1->value == op2->value;
 }
@@ -183,7 +186,7 @@ fq_zech_is_zero(const fq_zech_t op, const fq_zech_ctx_t ctx)
 }
 
 FQ_ZECH_INLINE int
-fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx))
+fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     return op->value == 0;
 }
@@ -191,7 +194,7 @@ fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 /* Assignments and conversions ***********************************************/
 
 FQ_ZECH_INLINE void
-fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx))
+fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     rop->value = op->value;
 }
@@ -202,7 +205,7 @@ void fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx);
 void fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE void
-fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t FLINT_UNUSED(ctx))
+fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t ctx)
 {
     slong temp;
     temp = op2->value;
@@ -217,13 +220,13 @@ fq_zech_zero(fq_zech_t rop, const fq_zech_ctx_t ctx)
 }
 
 FQ_ZECH_INLINE void
-fq_zech_one(fq_zech_t rop, const fq_zech_ctx_t FLINT_UNUSED(ctx))
+fq_zech_one(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     rop->value = 0;
 }
 
 FQ_ZECH_INLINE void
-fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t FLINT_UNUSED(ctx))
+fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
     rop->value = 1;
 }
@@ -248,14 +251,14 @@ void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,
 /* Output ********************************************************************/
 
 #ifdef FLINT_HAVE_FILE
-int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx));
+int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx);
 int fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx);
 #endif
 
 void fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx);
 void fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
-char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx));
+char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx);
 char * fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 
@@ -284,6 +287,8 @@ void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
 void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
 
 void fq_zech_ctx_order(fmpz_t, const fq_zech_ctx_t);
+
+FLINT_HEADER_END
 
 #ifdef T
 #undef T

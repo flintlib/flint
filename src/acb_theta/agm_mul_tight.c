@@ -127,7 +127,7 @@ acb_theta_agm_mul_tight_gen(acb_ptr res, acb_srcptr a0, acb_srcptr a,
    of real & imaginary parts */
 static void
 acb_theta_agm_mul_tight_g1(acb_ptr res, acb_srcptr a0, acb_srcptr a,
-    arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+    arb_srcptr FLINT_UNUSED(d0), arb_srcptr d, slong FLINT_UNUSED(g), slong prec)
 {
     acb_t t;
     acb_ptr aux;

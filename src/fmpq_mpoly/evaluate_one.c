@@ -246,7 +246,6 @@ int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
 
     if (A == B)
     {
-        int success;
         fmpq_mpoly_t T;
         fmpq_mpoly_init(T, ctx);
         success = fmpq_mpoly_evaluate_one_fmpq(T, B, var, val, ctx);

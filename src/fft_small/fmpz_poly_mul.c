@@ -183,7 +183,7 @@ static void _mod(
 }
 
 
-void fmpz_neg_ui_array(fmpz_t out, const ulong * in, slong in_len)
+static void fmpz_neg_ui_array(fmpz_t out, const ulong * in, slong in_len)
 {
     slong size = in_len;
     FLINT_ASSERT(in_len > 0);

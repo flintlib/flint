@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-int fq_nmod_mpolyn_gcd_brown_smprime_bivar(
+static int fq_nmod_mpolyn_gcd_brown_smprime_bivar(
     fq_nmod_mpolyn_t G,
     fq_nmod_mpolyn_t Abar,
     fq_nmod_mpolyn_t Bbar,
@@ -521,7 +521,7 @@ cleanup:
 }
 
 
-int fq_nmod_mpolyn_gcd_brown_lgprime_bivar(
+static int fq_nmod_mpolyn_gcd_brown_lgprime_bivar(
     fq_nmod_mpolyn_t G,
     fq_nmod_mpolyn_t Abar,
     fq_nmod_mpolyn_t Bbar,

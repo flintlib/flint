@@ -263,7 +263,7 @@ static void _dot(
 }
 
 
-void _fmpz_mat_mul_truncate_sqrt2(
+static void _fmpz_mat_mul_truncate_sqrt2(
     fmpz_mat_t C,
     const fmpz_mat_t A, slong Abits,
     const fmpz_mat_t B, slong Bbits,

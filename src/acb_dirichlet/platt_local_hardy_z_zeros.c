@@ -829,7 +829,8 @@ create_initial_double_superblock(zz_node_ptr *pu, zz_node_ptr *pv,
         slong *pbound, const platt_ctx_t ctx, const fmpz_t n, slong prec)
 {
     zz_node_ptr p, q, u, v;
-    slong i, k, bound, zn;
+    slong i, bound, zn;
+    ulong k;
     slong good_block_count;
     slong result = 1;
 
@@ -1075,7 +1076,7 @@ finish:
     return zeros_count;
 }
 
-
+#if 0
 slong
 _acb_dirichlet_platt_isolate_local_hardy_z_zeros(
         arf_interval_ptr res, const fmpz_t n, slong len,
@@ -1091,7 +1092,7 @@ _acb_dirichlet_platt_isolate_local_hardy_z_zeros(
     platt_ctx_clear(ctx);
     return zeros_count;
 }
-
+#endif
 
 static void
 _refine_local_hardy_z_zero_illinois(arb_t res,
@@ -1440,7 +1441,7 @@ finish:
     return p;
 }
 
-
+#if 0
 /* Returns the number of zeros found. */
 slong
 acb_dirichlet_platt_isolate_local_hardy_z_zeros(
@@ -1468,7 +1469,7 @@ acb_dirichlet_platt_isolate_local_hardy_z_zeros(
     }
     return 0;
 }
-
+#endif
 
 /* Returns the number of zeros found. */
 slong

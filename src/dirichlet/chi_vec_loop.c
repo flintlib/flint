@@ -49,7 +49,7 @@ dirichlet_chi_vec_loop_order(ulong * v, const dirichlet_group_t G, const dirichl
         for (k = G->num - 1; k >= j; k--)
             t = nmod_add(t, expo[k], o);
 
-        if (x->n < nv)
+        if (x->n < (ulong) nv)
             v[x->n] = t;
     }
 

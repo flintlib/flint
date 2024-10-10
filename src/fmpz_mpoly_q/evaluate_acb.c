@@ -15,7 +15,7 @@
 #include "gr.h"
 #include "gr_generic.h"
 
-void
+static void
 fmpz_mpoly_evaluate_acb(acb_t res, const fmpz_mpoly_t pol, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx)
 {
     gr_ctx_t CC;

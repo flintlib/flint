@@ -25,10 +25,12 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /* Factoring  ****************************************************************/
 
 void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac,
-                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+                                                     const fmpz_mod_ctx_t ctx);
 
 typedef struct
 {
@@ -57,7 +59,7 @@ void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
 
 FMPZ_MOD_POLY_FACTOR_INLINE
 void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_t a,
-                            fmpz_mod_poly_factor_t b, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+                            fmpz_mod_poly_factor_t b, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_poly_factor_struct t = *a;
     *a = *b;
@@ -79,7 +81,7 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
                    const fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp,
-                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+                                                     const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f,
                                                      const fmpz_mod_ctx_t ctx);
@@ -169,6 +171,8 @@ int fmpz_mod_poly_roots_factored_with_length_limit(fmpz_mod_poly_factor_t x0,
 
 void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z,
                 fmpz_mod_poly_factor_t fac, slong i, const fmpz_mod_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

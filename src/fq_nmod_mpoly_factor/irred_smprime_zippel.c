@@ -1016,7 +1016,7 @@ static int fq_nmod_mpoly_from_zipp(
 }
 
 /* bit counts of all degrees should be < FLINT_BITS/3 */
-int fq_nmod_mpoly_hlift_zippel(
+static int fq_nmod_mpoly_hlift_zippel(
     slong m,
     fq_nmod_mpoly_struct * B,
     slong r,

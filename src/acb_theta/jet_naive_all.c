@@ -22,7 +22,7 @@ static void
 worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len,
     const acb_t cofactor, const slong * coords, slong ord, slong g, slong prec, slong fullprec)
 {
-    slong n = 1 << g;
+    ulong n = UWORD(1) << g;
     slong nb = acb_theta_jet_nb(ord, g);
     slong * tups;
     slong a0, a1;

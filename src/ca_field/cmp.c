@@ -13,6 +13,12 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static int
 _fmpz_poly_compare_abslex(const fmpz * a, const fmpz * b, slong len)
 {
@@ -105,7 +111,7 @@ _fmpz_mpoly_cmp2(const fmpz_mpoly_t x, const fmpz_mpoly_t y, fmpz_mpoly_ctx_t ct
     return 0;
 }
 
-int
+static int
 _fmpz_mpoly_q_cmp(const fmpz_mpoly_q_t x, const fmpz_mpoly_q_t y, fmpz_mpoly_ctx_t ctx)
 {
     int c;
@@ -168,7 +174,7 @@ ca_depth(const ca_t x, ca_ctx_t ctx)
 }
 
 static slong
-ca_ext_depth(const ca_ext_t x, ca_ctx_t ctx)
+ca_ext_depth(const ca_ext_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     return CA_EXT_DEPTH(x);
 }

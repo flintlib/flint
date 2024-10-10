@@ -42,7 +42,7 @@
 
     [Coh1996] Cohen, Henri : A course in computational algebraic number theory, Springer, 1996
  */
-void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, slong m)
+static void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, slong m)
 {
     slong j;
     fmpz_t b, f2, lc, s, t;

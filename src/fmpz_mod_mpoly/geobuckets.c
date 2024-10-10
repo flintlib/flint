@@ -97,7 +97,7 @@ void fmpz_mod_mpoly_geobucket_set(
 }
 
 /* internal function for fixing overflows */
-void _fmpz_mod_mpoly_geobucket_fix(
+static void _fmpz_mod_mpoly_geobucket_fix(
     fmpz_mod_mpoly_geobucket_t B,
     slong i,
     const fmpz_mod_mpoly_ctx_t ctx)

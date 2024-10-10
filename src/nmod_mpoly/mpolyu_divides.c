@@ -15,7 +15,7 @@
 #include "nmod_mpoly.h"
 
 /* A = D - B*C */
-slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,
+static slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,
                  const ulong * Dcoeff, const ulong * Dexp, slong Dlen,
                  const ulong * Bcoeff, const ulong * Bexp, slong Blen,
                  const ulong * Ccoeff, const ulong * Cexp, slong Clen,
@@ -174,7 +174,7 @@ slong _nmod_mpoly_mulsub1(nmod_mpoly_t A,
 }
 
 /* A = D - B*C */
-void _nmod_mpoly_mulsub(nmod_mpoly_t A,
+static void _nmod_mpoly_mulsub(nmod_mpoly_t A,
                  const ulong * Dcoeff, const ulong * Dexp, slong Dlen,
                  const ulong * Bcoeff, const ulong * Bexp, slong Blen,
                  const ulong * Ccoeff, const ulong * Cexp, slong Clen,

@@ -23,7 +23,7 @@
  */
 char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
 {
-    int i, j;
+    size_t i, j;
     char * str;
     char * numstr;
     char * denstr;

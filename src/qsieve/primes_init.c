@@ -104,7 +104,7 @@ ulong qsieve_primes_init(qs_t qs_inf)
     prime_t * factor_base;
 
     /* determine which index in the tuning table n corresponds to */
-    for (i = 1; i < QS_TUNE_SIZE; i++)
+    for (i = 1; (ulong) i < QS_TUNE_SIZE; i++)
     {
         if (qsieve_tune[i][0] > qs_inf->bits)
             break;

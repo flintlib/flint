@@ -19,6 +19,12 @@
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
 {
     slong i;
@@ -281,7 +287,7 @@ void fq_nmod_poly_product_roots(fq_nmod_poly_t P, fq_nmod_struct * r,
 
     for x
 */
-int fq_nmod_vandsolve(ulong * X, ulong * A, fq_nmod_struct * b,
+static int fq_nmod_vandsolve(ulong * X, ulong * A, fq_nmod_struct * b,
                                             slong n, const fq_nmod_ctx_t fqctx)
 {
     slong d = fq_nmod_ctx_degree(fqctx);
@@ -846,7 +852,7 @@ finished:
 
 
 /* setform copies the exponents and zeros the coefficients */
-void fq_nmod_mpoly_setform_mpolyn(
+static void fq_nmod_mpoly_setform_mpolyn(
     fq_nmod_mpoly_t A,
     fq_nmod_mpolyn_t B,
     const fq_nmod_mpoly_ctx_t ctx)
@@ -867,7 +873,7 @@ void fq_nmod_mpoly_setform_mpolyn(
     A->length = B->length;
 }
 
-void fq_nmod_mpolyu_setform_mpolyun(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t B,
+static void fq_nmod_mpolyu_setform_mpolyun(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t B,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -942,7 +948,7 @@ int fq_nmod_mpolyu_gcdp_zippel_univar_no_cofactors(
 }
 
 
-int fq_nmod_mpolyu_gcdp_zippel_bivar(
+static int fq_nmod_mpolyu_gcdp_zippel_bivar(
     fq_nmod_mpolyu_t G,
     fq_nmod_mpolyu_t Abar,
     fq_nmod_mpolyu_t Bbar,

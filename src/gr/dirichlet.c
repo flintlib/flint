@@ -12,6 +12,13 @@
 #include "fmpz.h"
 #include "dirichlet.h"
 #include "gr.h"
+#include "gr_generic.h"
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 #define DIRICHLET_CTX(ctx) ((dirichlet_group_struct *) (GR_CTX_DATA_AS_PTR(ctx)))
 
@@ -41,14 +48,14 @@ _gr_dirichlet_init(dirichlet_char_t res, gr_ctx_t ctx)
 }
 
 int
-_gr_dirichlet_clear(dirichlet_char_t res, gr_ctx_t ctx)
+_gr_dirichlet_clear(dirichlet_char_t res, gr_ctx_t FLINT_UNUSED(ctx))
 {
     dirichlet_char_clear(res);
     return GR_SUCCESS;
 }
 
 void
-_gr_dirichlet_swap(dirichlet_char_t x, dirichlet_char_t y, gr_ctx_t ctx)
+_gr_dirichlet_swap(dirichlet_char_t x, dirichlet_char_t y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     dirichlet_char_struct t = *x;
     *x = *y;
@@ -144,7 +151,7 @@ _gr_dirichlet_pow_ui(dirichlet_char_t res, const dirichlet_char_t x, ulong exp, 
 void
 _dirichlet_char_pow_fmpz(dirichlet_char_t c, const dirichlet_group_t G, const dirichlet_char_t a, const fmpz_t n)
 {
-    ulong k;
+    slong k;
     ulong nred;
 
     for (k = 0; k < G->num ; k++)

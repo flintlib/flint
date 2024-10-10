@@ -15,6 +15,12 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     fmpz_mpoly_ctx_t mctx;
@@ -66,7 +72,7 @@ _gr_fmpz_mpoly_q_swap(fmpz_mpoly_q_t poly1, fmpz_mpoly_q_t poly2, gr_ctx_t ctx)
 }
 
 void
-_gr_fmpz_mpoly_q_set_shallow(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t poly, gr_ctx_t ctx)
+_gr_fmpz_mpoly_q_set_shallow(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t poly, gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *poly;
 }
@@ -93,7 +99,7 @@ _gr_fmpz_mpoly_q_randtest_small(fmpz_mpoly_q_t res, flint_rand_t state, gr_ctx_t
 }
 
 slong
-_gr_fmpz_mpoly_q_length(const fmpz_mpoly_q_t x, gr_ctx_t ctx)
+_gr_fmpz_mpoly_q_length(const fmpz_mpoly_q_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_mpoly_q_numref(x)->length + fmpz_mpoly_q_denref(x)->length;
 }

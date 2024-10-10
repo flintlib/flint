@@ -11,7 +11,7 @@
 
 #include "acb_dft.h"
 
-static int use_dft(slong len, slong prec)
+static int use_dft(slong len, slong FLINT_UNUSED(prec))
 {
     slong l2 = len;
     while (l2 >= 16) l2 >>= 1;

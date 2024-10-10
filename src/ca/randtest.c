@@ -53,7 +53,7 @@ ca_randtest_rational(ca_t res, flint_rand_t state, slong bits, ca_ctx_t ctx)
     fmpq_clear(t);
 }
 
-void
+static void
 ca_randtest_qqbar(ca_t res, flint_rand_t state, slong deg, slong bits, ca_ctx_t ctx)
 {
     qqbar_t q;

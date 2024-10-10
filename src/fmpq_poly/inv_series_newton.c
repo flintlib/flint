@@ -105,25 +105,25 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
 
         FLINT_NEWTON_INIT(FMPQ_POLY_INV_NEWTON_CUTOFF, n)
 
-        FLINT_NEWTON_BASECASE(n)
-        _fmpq_poly_inv_series_basecase_rev(Qinv, Qinvden, W, Wden, Q, Qden, Qlen, n);
+        FLINT_NEWTON_BASECASE(nx)
+        _fmpq_poly_inv_series_basecase_rev(Qinv, Qinvden, W, Wden, Q, Qden, Qlen, nx);
         FLINT_NEWTON_END_BASECASE
 
-        FLINT_NEWTON_LOOP(m, n)
+        FLINT_NEWTON_LOOP(mx, nx)
 
-        Qnlen = FLINT_MIN(Qlen, n);
-        Wlen = FLINT_MIN(Qnlen + m - 1, n);
-        W2len = Wlen - m;
+        Qnlen = FLINT_MIN(Qlen, nx);
+        Wlen = FLINT_MIN(Qnlen + mx - 1, nx);
+        W2len = Wlen - mx;
 
-        MULLOW(W, Q, Qnlen, Qinv, m, Wlen);
+        MULLOW(W, Q, Qnlen, Qinv, mx, Wlen);
         fmpz_mul(Wden, Qden, Qinvden);
 
-        MULLOW(Qinv + m, Qinv, m, W + m, W2len, n - m);
+        MULLOW(Qinv + mx, Qinv, mx, W + mx, W2len, nx - mx);
         fmpz_mul(Qinvden, Qinvden, Wden);
 
-        _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, m, Wden);
-        _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
-        _fmpq_poly_canonicalise(Qinv, Qinvden, n);
+        _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, mx, Wden);
+        _fmpz_vec_neg(Qinv + mx, Qinv + mx, nx - mx);
+        _fmpq_poly_canonicalise(Qinv, Qinvden, nx);
 
         FLINT_NEWTON_END_LOOP
 

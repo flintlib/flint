@@ -62,7 +62,7 @@ static inline slong rj_fdiv(slong x, slong y)
         return x / y;
 }
 
-void
+static void
 acb_elliptic_rj_taylor_sum(acb_t res, const acb_t E2, const acb_t E3,
                 const acb_t E4, const acb_t E5, slong nterms, slong prec)
 {
@@ -219,7 +219,7 @@ acb_elliptic_rj_taylor_sum(acb_t res, const acb_t E2, const acb_t E3,
 
 void
 acb_elliptic_rj_carlson(acb_t res, const acb_t x, const acb_t y,
-            const acb_t z, const acb_t p, int flags, slong prec)
+            const acb_t z, const acb_t p, int FLINT_UNUSED(flags), slong prec)
 {
     acb_t xx, yy, zz, pp, sx, sy, sz, sp, t, d, delta, S;
     acb_t A, AA, X, Y, Z, P, E2, E3, E4, E5;
@@ -608,7 +608,7 @@ RJ_integrand(acb_ptr res, const acb_t t, void * param, slong order, slong prec)
 
 void
 acb_elliptic_rj_integration(acb_t res, const acb_t x, const acb_t y,
-            const acb_t z, const acb_t p, int flags, slong prec)
+            const acb_t z, const acb_t p, int FLINT_UNUSED(flags), slong prec)
 {
     acb_t a, b, N, I, J;
     arb_t A;

@@ -32,7 +32,7 @@ arb_hypgeom_rising_ui_rec(arb_t res, const arb_t x, ulong n, slong prec)
         return;
     }
 
-    if ((prec < 512 && n <= 20) || (n <= FLINT_MIN(80, 6000 / prec)))
+    if ((prec < 512 && n <= 20) || (n <= (ulong) FLINT_MIN(80, 6000 / prec)))
     {
         arb_hypgeom_rising_ui_forward(res, x, n, prec);
     }

@@ -110,7 +110,8 @@ _arb_hypgeom_rising_coeffs_fmpz(fmpz * c, ulong k, slong l)
 void
 arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
 {
-    slong i, k, l, m0, climbs, climbs_max, wp;
+    slong i, k, l, climbs, climbs_max, wp;
+    ulong m0;
     arb_ptr xpow;
     arb_t t, u;
     nn_ptr c;
@@ -154,7 +155,7 @@ arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
     arb_init(t);
     arb_init(u);
 
-    for (k = 0; k < n; k += m)
+    for (k = 0; (ulong) k < n; k += m)
     {
         l = FLINT_MIN(m, n - k);
         climbs = FLINT_BIT_COUNT(k + l - 1) * l;

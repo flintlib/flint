@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
-slong _fq_zech_mpoly_sub(fq_zech_struct * coeff1,       ulong * exp1,
+static slong _fq_zech_mpoly_sub(fq_zech_struct * coeff1,       ulong * exp1,
                          fq_zech_struct * coeff2, const ulong * exp2, slong len2,
                          fq_zech_struct * coeff3, const ulong * exp3, slong len3,
                    slong N, const ulong * cmpmask, const fq_zech_ctx_t fqctx)

@@ -15,7 +15,8 @@
 void
 acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
 {
-    slong i, j, density;
+    slong i, j;
+    ulong density;
 
     density = n_randint(state, 100);
 

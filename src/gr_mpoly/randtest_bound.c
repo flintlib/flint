@@ -11,6 +11,15 @@
 
 #include "gr_mpoly.h"
 
+/* FIXME: Should this function be used somewhere? */
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "gr_mpoly_randtest_bound is currently unused/untested/undocumented!"
+#endif
+
 int gr_mpoly_randtest_bound(gr_mpoly_t A, flint_rand_t state,
                  slong length, ulong exp_bound, const mpoly_ctx_t mctx, gr_ctx_t cctx)
 {

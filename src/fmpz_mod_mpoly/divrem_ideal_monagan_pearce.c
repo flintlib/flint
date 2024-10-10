@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
-int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
+static int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
     fmpz_mod_mpoly_struct ** Q,
     fmpz_mod_mpoly_t R,
     const fmpz * Acoeffs, const ulong * Aexps, slong Alen,

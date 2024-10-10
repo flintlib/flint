@@ -73,7 +73,7 @@ mag_fast_set(mag_t x, const mag_t y)
     MAG_MAN(x) = MAG_MAN(y);
 }
 
-void
+static void
 _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec)
 {
     int want_sin, want_cos;

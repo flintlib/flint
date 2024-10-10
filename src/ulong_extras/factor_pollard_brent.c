@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 
-ulong
+static ulong
 n_sqr_and_add_a(ulong y, ulong a, ulong n, ulong ninv,
               ulong normbits)
 {

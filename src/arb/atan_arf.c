@@ -15,7 +15,7 @@
 #define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
 
 /* atan(x) = x + eps, |eps| < x^3*/
-void
+static void
 arb_atan_eps(arb_t z, const arf_t x, slong prec)
 {
     fmpz_t mag;
@@ -28,7 +28,7 @@ arb_atan_eps(arb_t z, const arf_t x, slong prec)
 }
 
 /* atan(x) = pi/2 - eps, eps < 1/x <= 2^(1-mag) */
-void
+static void
 arb_atan_inf_eps(arb_t z, const arf_t x, slong prec)
 {
     fmpz_t mag;

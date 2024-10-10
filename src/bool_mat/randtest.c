@@ -28,7 +28,7 @@ void
 bool_mat_randtest_diagonal(bool_mat_t mat, flint_rand_t state)
 {
     slong n, i;
-    slong density;
+    ulong density;
 
     n = FLINT_MIN(bool_mat_nrows(mat), bool_mat_ncols(mat));
 
@@ -42,7 +42,7 @@ void
 bool_mat_randtest_nilpotent(bool_mat_t mat, flint_rand_t state)
 {
     slong n, i, j;
-    slong density;
+    ulong density;
 
     if (!bool_mat_is_square(mat))
     {

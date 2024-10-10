@@ -221,19 +221,19 @@ TEST_FUNCTION_START(fmpz_factor_refine, state)
          */
         if (g->sign)
         {
-            slong i, j;
+            slong ix, jx;
             fmpz_t x;
             fmpz_init(x);
-            for (i = 0; i < f->num; i++)
+            for (ix = 0; ix < f->num; ix++)
             {
-                if (f->exp[i] != WORD(0))
+                if (f->exp[ix] != WORD(0))
                 {
-                    fmpz_abs(x, f->p+i);
-                    for (j = 0; j < g->num; j++)
+                    fmpz_abs(x, f->p + ix);
+                    for (jx = 0; jx < g->num; jx++)
                     {
-                        while (fmpz_divisible(x, g->p+j))
+                        while (fmpz_divisible(x, g->p + jx))
                         {
-                            fmpz_divexact(x, x, g->p+j);
+                            fmpz_divexact(x, x, g->p + jx);
                         }
                     }
                     if (!fmpz_is_one(x))

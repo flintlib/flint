@@ -14,7 +14,7 @@
 
 /* assumes no aliasing */
 /* (+/- iz)^(-1/2-v) * z^v * exp(+/- iz) */
-void
+static void
 acb_hypgeom_bessel_j_asymp_prefactors_fallback(acb_t Ap, acb_t Am, acb_t C,
     const acb_t nu, const acb_t z, slong prec)
 {
@@ -57,7 +57,7 @@ acb_hypgeom_bessel_j_asymp_prefactors_fallback(acb_t Ap, acb_t Am, acb_t C,
     acb_clear(v);
 }
 
-void
+static void
 acb_hypgeom_bessel_j_asymp_prefactors(acb_t Ap, acb_t Am, acb_t C,
     const acb_t nu, const acb_t z, slong prec)
 {

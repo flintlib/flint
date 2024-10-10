@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 #define MAX_FACTORS 15
 
 /* should this dlog pointer be in the prime or the global group? */
@@ -168,6 +170,8 @@ void dirichlet_chi_vec(ulong *v, const dirichlet_group_t G, const dirichlet_char
 void dirichlet_chi_vec_loop_order(ulong *v, const dirichlet_group_t G, const dirichlet_char_t chi, ulong order, slong nv);
 void dirichlet_chi_vec_primeloop_order(ulong *v, const dirichlet_group_t G, const dirichlet_char_t chi, ulong order, slong nv);
 void dirichlet_chi_vec_order(ulong *v, const dirichlet_group_t G, const dirichlet_char_t chi, ulong order, slong nv);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

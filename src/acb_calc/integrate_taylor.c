@@ -139,12 +139,12 @@ acb_calc_integrate_taylor(acb_t res,
 
                 /* Tail bound: D / (N + 1) * T^N */
                 {
-                    mag_t TT;
-                    mag_init(TT);
-                    arf_get_mag(TT, T);
-                    mag_pow_ui(TT, TT, N);
-                    arf_set_mag(T, TT);
-                    mag_clear(TT);
+                    mag_t TTm;
+                    mag_init(TTm);
+                    arf_get_mag(TTm, T);
+                    mag_pow_ui(TTm, TTm, N);
+                    arf_set_mag(T, TTm);
+                    mag_clear(TTm);
                 }
                 arf_mul(D, D, T, bp, ARF_RND_UP);
                 arf_div_ui(err, D, N + 1, bp, ARF_RND_UP);

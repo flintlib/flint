@@ -29,7 +29,7 @@
     If ignore[j] is nonzero, then out[j] need not be calculated, probably
     because we shouldn't calculate it in dense form.
 */
-void fq_nmod_mpoly_evals(
+static void fq_nmod_mpoly_evals(
     slong * Atdeg,  /* total degree of deflated A, or -1 for overflow */
     n_fq_poly_struct * out,
     const int * ignore,
@@ -134,7 +134,7 @@ void fq_nmod_mpoly_evals(
     flint_free(t);
 }
 
-void fq_nmod_mpoly_evals_lgprime(
+static void fq_nmod_mpoly_evals_lgprime(
     slong * Atdeg,  /* total degree of deflated A, or -1 for overflow */
     n_fq_poly_struct * out,
     const int * ignore,
@@ -241,7 +241,7 @@ void fq_nmod_mpoly_evals_lgprime(
 }
 
 
-void mpoly_gcd_info_set_estimates_fq_nmod_mpoly(
+static void mpoly_gcd_info_set_estimates_fq_nmod_mpoly(
     mpoly_gcd_info_t I,
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_t B,
@@ -361,7 +361,7 @@ cleanup:
 }
 
 
-void mpoly_gcd_info_set_estimates_fq_nmod_mpoly_lgprime(
+static void mpoly_gcd_info_set_estimates_fq_nmod_mpoly_lgprime(
     mpoly_gcd_info_t I,
     const fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_t B,

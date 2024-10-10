@@ -12,7 +12,7 @@
 #include "acb.h"
 
 /* r - |m| */
-void
+static void
 arb_get_mag_reverse(mag_t res, const arb_t x)
 {
     mag_t t;
@@ -24,7 +24,7 @@ arb_get_mag_reverse(mag_t res, const arb_t x)
 
 /* upper bound for re(rsqrt(x+yi)) / |rsqrt(x+yi)|,
    given upper bound for x, lower bound for y */
-void
+static void
 mag_rsqrt_re_quadrant1_upper(mag_t res, const mag_t x, const mag_t y)
 {
     if (mag_is_zero(x))
@@ -55,9 +55,10 @@ mag_rsqrt_re_quadrant1_upper(mag_t res, const mag_t x, const mag_t y)
     mag_sqrt(res, res);
 }
 
+#if 0
 /* lower bound for re(rsqrt(x+yi)) / |rsqrt(x+yi)|,
    given lower bound for x, upper bound for y */
-void
+static void
 mag_rsqrt_re_quadrant1_lower(mag_t res, const mag_t x, const mag_t y)
 {
     if (mag_is_zero(x))
@@ -87,10 +88,11 @@ mag_rsqrt_re_quadrant1_lower(mag_t res, const mag_t x, const mag_t y)
 
     mag_sqrt_lower(res, res);
 }
+#endif
 
 /* upper bound for re(rsqrt(-x+yi)) / |rsqrt(x+yi)|,
    given lower bound for -x, upper bound for y */
-void
+static void
 mag_rsqrt_re_quadrant2_upper(mag_t res, const mag_t x, const mag_t y)
 {
     if (mag_is_zero(x))
@@ -128,7 +130,7 @@ mag_rsqrt_re_quadrant2_upper(mag_t res, const mag_t x, const mag_t y)
 
 /* lower bound for re(rsqrt(-x+yi)) / |rsqrt(x+yi)|,
    given upper bound for -x, lower bound for y */
-void
+static void
 mag_rsqrt_re_quadrant2_lower(mag_t res, const mag_t x, const mag_t y)
 {
     if (mag_is_zero(x))
@@ -164,7 +166,7 @@ mag_rsqrt_re_quadrant2_lower(mag_t res, const mag_t x, const mag_t y)
     mag_sqrt_lower(res, res);
 }
 
-void
+static void
 acb_rsqrt_wide(acb_t res, const acb_t z, slong prec)
 {
     mag_t ax, ay, bx, by, cx, cy, dx, dy, am, bm;
@@ -328,7 +330,7 @@ acb_rsqrt_wide(acb_t res, const acb_t z, slong prec)
     mag_clear(one);
 }
 
-void
+static void
 acb_rsqrt_precise(acb_t y, const acb_t x, slong prec)
 {
 #define a acb_realref(x)

@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 void gr_poly_init(gr_poly_t poly, gr_ctx_t ctx);
 void gr_poly_init2(gr_poly_t poly, slong len, gr_ctx_t ctx);
 void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx);
@@ -41,13 +43,13 @@ gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
     return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
 }
 
-GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t FLINT_UNUSED(ctx))
+GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 {
     return poly->length;
 }
 
 GR_POLY_INLINE void
-gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t FLINT_UNUSED(ctx))
+gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 {
     FLINT_SWAP(gr_poly_struct, *poly1, *poly2);
 }
@@ -292,7 +294,6 @@ WARN_UNUSED_RESULT int _gr_poly_taylor_shift_convolution(gr_ptr res, gr_srcptr p
 WARN_UNUSED_RESULT int gr_poly_taylor_shift_convolution(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_taylor_shift_generic(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
 GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_taylor_shift(gr_ptr res, gr_srcptr f, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, POLY_TAYLOR_SHIFT)(res, f, len, c, ctx); }
-WARN_UNUSED_RESULT int _gr_poly_taylor_shift(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_taylor_shift(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_compose_horner(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
@@ -455,6 +456,8 @@ void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, fli
 void _gr_poly_test_div_series(gr_method_poly_binary_trunc_op div_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_gcd(gr_method_poly_gcd_op gcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

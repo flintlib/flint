@@ -13,6 +13,12 @@
 #include "fmpz_vec.h"
 #include "arb.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* When splitting [a,b) into [a,m), [m,b), we need the power x^(m-a).
    This function computes all the exponents (m-a) that can appear when
    doing binary splitting with the top-level interval [0,n),
@@ -194,13 +200,13 @@ exp_bsplit_struct;
 
 typedef exp_bsplit_struct exp_bsplit_t[1];
 
-static void exp_bsplit_init(exp_bsplit_t x, void * args)
+static void exp_bsplit_init(exp_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_init(x->T);
     fmpz_init(x->Q);
 }
 
-static void exp_bsplit_clear(exp_bsplit_t x, void * args)
+static void exp_bsplit_clear(exp_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_clear(x->T);
     fmpz_clear(x->Q);

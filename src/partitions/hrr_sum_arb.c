@@ -23,6 +23,12 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define VERBOSE 0
 
 #define DOUBLE_CUTOFF 40
@@ -94,7 +100,7 @@ bound_primes(ulong k)
 {
     int i;
 
-    for (i = 0; i < sizeof(primorial_tab) / sizeof(ulong); i++)
+    for (i = 0; (size_t) i < sizeof(primorial_tab) / sizeof(ulong); i++)
         if (k <= primorial_tab[i])
             return i;
 
@@ -274,7 +280,7 @@ worker(slong i, work_t * work)
 }
 
 void
-partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubles)
+partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int FLINT_UNUSED(use_doubles))
 {
     arb_t C, t, exp1;
     fmpz_t n24;

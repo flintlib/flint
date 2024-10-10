@@ -24,6 +24,12 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
 static const char * default_var = "a";
@@ -38,7 +44,7 @@ _gr_fq_zech_ctx_clear(gr_ctx_t ctx)
 }
 
 int
-_gr_fq_zech_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+_gr_fq_zech_ctx_write(gr_stream_t out, gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write(out, "Finite field (fq_zech)");
     return GR_SUCCESS;
@@ -72,7 +78,7 @@ _gr_fq_zech_clear(fq_zech_t x, const gr_ctx_t ctx)
 }
 
 void
-_gr_fq_zech_swap(fq_zech_t x, fq_zech_t y, const gr_ctx_t ctx)
+_gr_fq_zech_swap(fq_zech_t x, fq_zech_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fq_zech_t t;
     *t = *x;
@@ -81,7 +87,7 @@ _gr_fq_zech_swap(fq_zech_t x, fq_zech_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_fq_zech_set_shallow(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
+_gr_fq_zech_set_shallow(fq_zech_t res, const fq_zech_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -379,7 +385,7 @@ _gr_fq_zech_vec_init(fq_zech_struct * vec, slong len, gr_ctx_t ctx)
 }
 
 void
-_gr_fq_zech_vec_clear(fq_zech_struct * vec, slong len, gr_ctx_t ctx)
+_gr_fq_zech_vec_clear(fq_zech_struct * FLINT_UNUSED(vec), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
@@ -393,7 +399,7 @@ _gr_fq_zech_vec_swap(fq_zech_struct * vec1, fq_zech_struct * vec2, slong len, gr
 }
 
 int
-_gr_fq_zech_vec_set(fq_zech_struct * res, const fq_zech_struct * vec, slong len, gr_ctx_t ctx)
+_gr_fq_zech_vec_set(fq_zech_struct * res, const fq_zech_struct * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
@@ -476,7 +482,7 @@ _gr_fq_zech_poly_mullow(fq_zech_struct * res,
 /* todo: implement generically */
 
 int
-_gr_fq_zech_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_zech_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_fq_zech_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_zech_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;

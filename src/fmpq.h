@@ -78,8 +78,8 @@ void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
 void flint_mpq_clear_readonly(mpq_t z);
 
 void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
-void fmpq_clear_readonly(fmpq_t f);
 #endif
+void fmpq_clear_readonly(fmpq_t f);
 
 /* conversions ***************************************************************/
 

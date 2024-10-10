@@ -54,7 +54,7 @@ bs_num_terms(slong mag, slong prec)
    together with absolute error err. With an initial inversion
    if xmag > 0.
 */
-void
+static void
 arb_atan_bb_reduce(fmpz_t res, mag_t err, const arf_t x, slong xmag, slong r, slong prec)
 {
     int inexact;
@@ -191,7 +191,7 @@ worker(slong iter, work_t * work)
         *Qexp += r;
 
         /* T = T / Q  (+1 fixed-point ulp error). */
-        if (*Qexp >= wp)
+        if ((slong) *Qexp >= wp)
         {
             fmpz_tdiv_q_2exp(P, P, *Qexp - wp);
             fmpz_tdiv_q(P, P, Q);
@@ -256,37 +256,37 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
     /* approximate by x - x^3 / 3 or pi/2 - 1/x + (1/3)/x^3 */
     if (mag < -prec / 4 - 2 || (mag-1) > prec / 5 + 3)
     {
-        arb_t t;
-        arb_init(t);
-        arb_set_arf(t, x);
+        arb_t ta;
+        arb_init(ta);
+        arb_set_arf(ta, x);
 
         if (mag < 0)
         {
-            arb_mul(t, t, t, prec);
-            arb_mul_arf(t, t, x, prec);
-            arb_div_ui(t, t, 3, prec);
-            arb_sub_arf(t, t, x, prec);
-            arb_neg(z, t);
+            arb_mul(ta, ta, ta, prec);
+            arb_mul_arf(ta, ta, x, prec);
+            arb_div_ui(ta, ta, 3, prec);
+            arb_sub_arf(ta, ta, x, prec);
+            arb_neg(z, ta);
             /* error is bounded by x^5 */
             mag_add_ui_2exp_si(arb_radref(z), arb_radref(z), 1, 5 * mag);
         }
         else
         {
-            arb_ui_div(t, 1, t, prec);
-            arb_mul(z, t, t, prec);
-            arb_mul(z, z, t, prec);
+            arb_ui_div(ta, 1, ta, prec);
+            arb_mul(z, ta, ta, prec);
+            arb_mul(z, z, ta, prec);
             arb_div_ui(z, z, 3, prec);
-            arb_sub(z, t, z, prec);
+            arb_sub(z, ta, z, prec);
 
-            arb_const_pi(t, prec + 2);
-            arb_mul_2exp_si(t, t, -1);
+            arb_const_pi(ta, prec + 2);
+            arb_mul_2exp_si(ta, ta, -1);
 
-            arb_sub(z, t, z, prec);
+            arb_sub(z, ta, z, prec);
             /* error is bounded by 1/x^5, and 1/x <= 2^(1-mag) */
             mag_add_ui_2exp_si(arb_radref(z), arb_radref(z), 1, 5 * (1-mag));
         }
 
-        arb_clear(t);
+        arb_clear(ta);
         return;
     }
 
@@ -339,7 +339,7 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
                     *Qexp += r;
 
                     /* T = T / Q  (+1 fixed-point ulp error). */
-                    if (*Qexp >= wp)
+                    if ((slong) *Qexp >= wp)
                     {
                         fmpz_tdiv_q_2exp(P, P, *Qexp - wp);
                         fmpz_tdiv_q(P, P, Q);

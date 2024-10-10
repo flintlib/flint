@@ -15,7 +15,7 @@
 
 void
 _nf_elem_add_lf(nf_elem_t a, const nf_elem_t b,
-                const nf_elem_t c, const nf_t nf, int can)
+                const nf_elem_t c, const nf_t FLINT_UNUSED(nf), int can)
 {
     const fmpz *const p = LNF_ELEM_NUMREF(b);
     const fmpz *const q = LNF_ELEM_DENREF(b);
@@ -83,7 +83,7 @@ _nf_elem_add_lf(nf_elem_t a, const nf_elem_t b,
 
 void
 _nf_elem_add_qf(nf_elem_t a, const nf_elem_t b,
-                const nf_elem_t c, const nf_t nf, int can)
+                const nf_elem_t c, const nf_t FLINT_UNUSED(nf), int can)
 {
     fmpz_t d;
 

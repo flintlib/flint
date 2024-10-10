@@ -15,7 +15,7 @@
 #include "flint-mparam.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_scalar_addmul_nmod_fullword(nn_ptr res, nn_srcptr vec,
+static void _nmod_vec_scalar_addmul_nmod_fullword(nn_ptr res, nn_srcptr vec,
 				             slong len, ulong c, nmod_t mod)
 {
     slong i;
@@ -70,7 +70,7 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
         _nmod_vec_scalar_addmul_nmod_generic(res, vec, len, c, mod);
 }
 
-void _nmod_vec_scalar_mul_nmod_fullword(nn_ptr res, nn_srcptr vec,
+static void _nmod_vec_scalar_mul_nmod_fullword(nn_ptr res, nn_srcptr vec,
                                slong len, ulong c, nmod_t mod)
 {
     slong i;

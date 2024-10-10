@@ -16,6 +16,14 @@
 #include "gr.h"
 #include "gr_mat.h"
 
+/* FIXME: Should these functions be static or not? */
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* todo: for matrix "ring", verify that element domain is a ring */
 
 /* todo: recycle storage? */
@@ -133,7 +141,7 @@ matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 }
 
 void
-matrix_set_shallow(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+matrix_set_shallow(gr_mat_t res, const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *mat;
 }

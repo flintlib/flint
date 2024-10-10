@@ -17,8 +17,10 @@
 #include "templates.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 /* Memory management  ********************************************************/
 
@@ -30,14 +32,14 @@ void TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) 
 
 FQ_MAT_TEMPLATES_INLINE slong
 TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat,
-                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     return mat->r;
 }
 
 FQ_MAT_TEMPLATES_INLINE slong
 TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
-                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     return mat->c;
 }
@@ -53,7 +55,7 @@ void TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
                            const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
-                      const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
+                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_swap_entrywise)(TEMPLATE(T, mat_t) mat1,
 		         TEMPLATE(T, mat_t) mat2, const TEMPLATE(T, ctx_t) ctx);
@@ -75,14 +77,14 @@ int TEMPLATE(T, mat_is_one)(const TEMPLATE(T, mat_t) mat,
 
 FQ_MAT_TEMPLATES_INLINE int
 TEMPLATE(T, mat_is_empty)(const TEMPLATE(T, mat_t) mat,
-                          const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                          const TEMPLATE(T, ctx_t) ctx)
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
 FQ_MAT_TEMPLATES_INLINE int
 TEMPLATE(T, mat_is_square)(const TEMPLATE(T, mat_t) mat,
-                           const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     return (mat->r == mat->c);
 }
@@ -131,10 +133,10 @@ void TEMPLATE(T, mat_set_fmpz_mod_mat) (TEMPLATE(T, mat_t) mat1,
 void TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
                              const TEMPLATE(T, mat_t) mat,
                              slong r1, slong c1, slong r2, slong c2,
-                             const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
+                             const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window,
-                              const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
+                              const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_concat_horizontal)(TEMPLATE(T, mat_t) res,
                            const TEMPLATE(T, mat_t) mat1,  const TEMPLATE(T, mat_t) mat2,
@@ -343,6 +345,8 @@ void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
  * void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
  *                   const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
  */
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

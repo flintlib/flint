@@ -13,7 +13,7 @@
 #include "gr_mpoly.h"
 
 void
-gr_mpoly_fit_bits(gr_mpoly_t A, flint_bitcnt_t bits, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+gr_mpoly_fit_bits(gr_mpoly_t A, flint_bitcnt_t bits, const mpoly_ctx_t mctx, gr_ctx_t FLINT_UNUSED(cctx))
 {
     if (A->bits < bits)
     {

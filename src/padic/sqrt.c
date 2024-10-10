@@ -176,7 +176,7 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, slong N)
     return 1;
 }
 
-int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
+static int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 {
     if (fmpz_equal_ui(p, 2))
     {

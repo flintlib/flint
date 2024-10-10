@@ -25,7 +25,7 @@
 void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
 int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr);
 
-const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
+static const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
 {
     slong i;
     ulong head = expr->data[0];
@@ -74,7 +74,7 @@ int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr)
     return (len > 1 && s[len - 1] == '_');
 }
 
-int _fexpr_is_symbol_with_internal_underscore(const fexpr_t expr)
+static int _fexpr_is_symbol_with_internal_underscore(const fexpr_t expr)
 {
     const char *s;
     char tmp[FEXPR_SMALL_SYMBOL_LEN + 1];
@@ -676,7 +676,7 @@ fexpr_power_base_is_safe(const fexpr_t base)
     }
 }
 
-void
+static void
 _fexpr_write_latex_pow(calcium_stream_t out, const fexpr_t base, const fexpr_t expo, ulong flags)
 {
     if (fexpr_is_any_builtin_call(base) && fexpr_nargs(base) == 1)
@@ -1395,7 +1395,7 @@ fexpr_write_latex_residue(calcium_stream_t out, const fexpr_t expr, ulong flags)
         calcium_write(out, "\\right]");
 }
 
-void
+static void
 _fexpr_write_latex_derivative(calcium_stream_t out, const fexpr_t f, const fexpr_t subscript, const fexpr_t order, ulong flags)
 {
     if (fexpr_equal_ui(order, 1))
@@ -1912,7 +1912,6 @@ fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
 
     if (fexpr_is_builtin_call(expr, FEXPR_Logic) && nargs == 1)
     {
-        fexpr_t arg;
         fexpr_view_arg(arg, expr, 0);
         fexpr_write_latex(out, arg, flags | FEXPR_LATEX_LOGIC);
         return;
@@ -1921,7 +1920,6 @@ fexpr_write_latex_logic(calcium_stream_t out, const fexpr_t expr, ulong flags)
     /* todo: move this */
     if (fexpr_is_builtin_call(expr, FEXPR_CongruentMod) && nargs == 3)
     {
-        fexpr_t arg;
         fexpr_view_arg(arg, expr, 0);
         fexpr_write_latex(out, arg, flags);
         calcium_write(out, " \\equiv ");
@@ -2070,7 +2068,7 @@ fexpr_write_latex_simple(calcium_stream_t out, const fexpr_t expr, ulong flags)
     calcium_write(out, b);
 }
 
-void
+static void
 _fexpr_write_latex_simple2(calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     slong i;
@@ -2506,13 +2504,13 @@ fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
 
     if (fexpr_is_builtin_call(expr, FEXPR_Matrix) && nargs == 3)
     {
-        fexpr_t for1, for2, f1, f2, i, a, b, j, c, d;
+        fexpr_t for1, for2, f1, f2, ifx, a, b, jfx, c, d;
 
         fexpr_view_arg(for1, expr, 1);
         fexpr_view_arg(for2, expr, 2);
 
-        if (fexpr_view_call3(f1, i, a, b, for1) &&
-            fexpr_view_call3(f2, j, c, d, for2) &&
+        if (fexpr_view_call3(f1, ifx, a, b, for1) &&
+            fexpr_view_call3(f2, jfx, c, d, for2) &&
             fexpr_is_builtin_symbol(f1, FEXPR_For) &&
             fexpr_is_builtin_symbol(f2, FEXPR_For))
         {
@@ -2554,41 +2552,41 @@ fexpr_write_latex_matrix(calcium_stream_t out, const fexpr_t expr, ulong flags)
 
             calcium_write(out, "\\displaystyle{\\begin{pmatrix} ");
 
-            fexpr_replace2(x, arg, i, a, j, c);
+            fexpr_replace2(x, arg, ifx, a, jfx, c);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " & ");
 
-            fexpr_replace2(x, arg, i, a, j, c1);
+            fexpr_replace2(x, arg, ifx, a, jfx, c1);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " & \\cdots & ");
 
-            fexpr_replace2(x, arg, i, a, j, d);
+            fexpr_replace2(x, arg, ifx, a, jfx, d);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " \\\\ ");
 
-            fexpr_replace2(x, arg, i, a1, j, c);
+            fexpr_replace2(x, arg, ifx, a1, jfx, c);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " & ");
 
-            fexpr_replace2(x, arg, i, a1, j, c1);
+            fexpr_replace2(x, arg, ifx, a1, jfx, c1);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " & \\cdots & ");
 
-            fexpr_replace2(x, arg, i, a1, j, d);
+            fexpr_replace2(x, arg, ifx, a1, jfx, d);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " \\\\ ");
 
             calcium_write(out, "\\vdots & \\vdots & \\ddots & \\vdots \\\\ ");
 
-            fexpr_replace2(x, arg, i, b, j, c);
+            fexpr_replace2(x, arg, ifx, b, jfx, c);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " & ");
 
-            fexpr_replace2(x, arg, i, b, j, c1);
+            fexpr_replace2(x, arg, ifx, b, jfx, c1);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " & \\cdots & ");
 
-            fexpr_replace2(x, arg, i, b, j, d);
+            fexpr_replace2(x, arg, ifx, b, jfx, d);
             fexpr_write_latex(out, x, flags);
             calcium_write(out, " \\end{pmatrix}}");
 
@@ -2732,7 +2730,7 @@ fexpr_write_latex_decimal(calcium_stream_t out, const fexpr_t expr, ulong flags)
 }
 
 /* Write (x) */
-void
+static void
 _fexpr_write_latex_call1(calcium_stream_t out, const fexpr_t x, ulong flags)
 {
     if (fexpr_is_atom(x))
@@ -3506,8 +3504,6 @@ fexpr_write_latex_alg_structure(calcium_stream_t out, const fexpr_t expr, ulong 
 
     if (nargs >= 1)
     {
-        slong i;
-
         fexpr_view_next(arg);
 
         if (fexpr_is_builtin_call(arg, FEXPR_Tuple))

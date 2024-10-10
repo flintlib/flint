@@ -16,7 +16,7 @@
 #include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
-void fmpz_mod_mpolyn_interp_lift_sm_polyu1n(
+static void fmpz_mod_mpolyn_interp_lift_sm_polyu1n(
     fmpz_mod_mpolyn_t F,
     fmpz_mod_polyun_t A,
     const fmpz_mod_mpoly_ctx_t ctx)
@@ -51,7 +51,7 @@ void fmpz_mod_mpolyn_interp_lift_sm_polyu1n(
     F->length = Fi;
 }
 
-int fmpz_mod_mpolyn_interp_crt_sm_polyu1n(
+static int fmpz_mod_mpolyn_interp_crt_sm_polyu1n(
     slong * lastdeg,
     fmpz_mod_mpolyn_t F,
     fmpz_mod_mpolyn_t T,
@@ -252,7 +252,7 @@ static double interp_cost(
                      numABgamma + totnumci + (degxAB*degyAB)*(degxAB*degyAB)));
 }
 
-int fmpz_mod_mpoly_gcd_get_use_new(
+static int fmpz_mod_mpoly_gcd_get_use_new(
     slong rGdeg,
     slong Adeg,
     slong Bdeg,

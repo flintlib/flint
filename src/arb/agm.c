@@ -11,6 +11,12 @@
 
 #include "arb.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* Use series expansion of the elliptic integral
    pi/(4K(z^2)) = 1/2 - z^2/8 - 5z^4/128 - 11z^6/512 - 469z^8/32768 + O(z^10)
    to avoid computing the last couple of AGM iterations.
@@ -93,7 +99,7 @@ mag_agm(mag_t res, const mag_t x, const mag_t y)
     }
 }
 
-void
+static void
 mag_agm_lower(mag_t res, const mag_t x, const mag_t y)
 {
     if (mag_is_zero(x) || mag_is_zero(y))

@@ -66,16 +66,16 @@ static const double Btab[] = {
     -0.62578331900739100617,
 };
 
-void
+static void
 _arb_const_log_pi(arb_t t, slong prec)
 {
     arb_const_pi(t, prec + 2);
     arb_log(t, t, prec);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_const_log_pi, _arb_const_log_pi)
+_ARB_DEF_CACHED_CONSTANT(static, static, arb_const_log_pi, _arb_const_log_pi)
 
-int
+static int
 acb_hypgeom_lgamma_taylor(acb_t res, const acb_t z, slong prec)
 {
     double x, y, acc;

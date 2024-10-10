@@ -33,7 +33,7 @@ factor_until(ulong * n, ulong nlim, const ulong * p, ulong pmax, ulong * fp, int
 }
 
 ulong
-dlog_vec_pindex_factorgcd(ulong * v, ulong nv, ulong p, nmod_t mod, ulong a, ulong na, ulong loga, ulong logm1, nmod_t order, int maxtry)
+dlog_vec_pindex_factorgcd(ulong * v, ulong nv, ulong p, nmod_t mod, ulong a, ulong FLINT_UNUSED(na), ulong loga, ulong logm1, nmod_t order, int maxtry)
 {
     int nm = 0;
     ulong pm, logm, pmax;

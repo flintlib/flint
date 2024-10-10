@@ -16,7 +16,7 @@
 typedef void (*vec_f) (ulong *v, ulong nv, ulong a, ulong va, const nmod_t mod, ulong na, const nmod_t order);
 
 void
-dlog_vec_trivial(ulong *v, ulong nv, ulong a, ulong va, const nmod_t mod, ulong na, const nmod_t order)
+dlog_vec_trivial(ulong *v, ulong nv, ulong a, ulong FLINT_UNUSED(va), const nmod_t mod, ulong na, const nmod_t FLINT_UNUSED(order))
 {
     ulong k;
     dlog_precomp_t pre;

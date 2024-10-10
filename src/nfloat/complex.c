@@ -163,7 +163,6 @@ nfloat_complex_set_other(nfloat_complex_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr
 
         default:
             {
-                int status;
                 acf_t t;
 
                 gr_ctx_t acf_ctx;
@@ -1642,7 +1641,7 @@ _nfloat_complex_vec_init(nfloat_complex_ptr res, slong len, gr_ctx_t ctx)
 }
 
 void
-_nfloat_complex_vec_clear(nfloat_complex_ptr res, slong len, gr_ctx_t ctx)
+_nfloat_complex_vec_clear(nfloat_complex_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return;
 }

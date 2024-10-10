@@ -694,7 +694,7 @@ cleanup:
 
 
 
-int nmod_mpolyn_gcd_brown_lgprime_bivar(
+static int nmod_mpolyn_gcd_brown_lgprime_bivar(
     nmod_mpolyn_t G,
     nmod_mpolyn_t Abar,
     nmod_mpolyn_t Bbar,

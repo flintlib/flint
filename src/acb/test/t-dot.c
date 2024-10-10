@@ -12,7 +12,11 @@
 #include "test_helpers.h"
 #include "acb.h"
 
+/* Defined in t-approx_dot.c and t-dot.c */
+#ifndef acb_dot_gauss_dot_cutoff
+# define acb_dot_gauss_dot_cutoff acb_dot_gauss_dot_cutoff
 FLINT_DLL extern slong acb_dot_gauss_dot_cutoff;
+#endif
 
 TEST_FUNCTION_START(acb_dot, state)
 {

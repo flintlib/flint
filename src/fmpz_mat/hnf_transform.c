@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void
+static void
 _fmpz_mat_hnf_transform_naive(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
 {
     slong i, j, m, n;

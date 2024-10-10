@@ -102,6 +102,7 @@ acb_dirichlet_gauss_sum(acb_t res, const dirichlet_group_t G, const dirichlet_ch
     }
 }
 
+#if 0
 void
 acb_dirichlet_gauss_sum_ui(acb_t res, const dirichlet_group_t G, ulong a, slong prec)
 {
@@ -111,3 +112,4 @@ acb_dirichlet_gauss_sum_ui(acb_t res, const dirichlet_group_t G, ulong a, slong 
     acb_dirichlet_gauss_sum(res, G, chi, prec);
     dirichlet_char_clear(chi);
 }
+#endif

@@ -120,17 +120,13 @@ typedef const ulong * nn_srcptr;
 # define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 # define FLINT_UNLIKELY(x) __builtin_expect((x),0)
 # define FLINT_LIKELY(x) __builtin_expect((x),1)
-# define FLINT_PUSH_OPTIONS _Pragma("GCC push_options")
-# define FLINT_POP_OPTIONS _Pragma("GCC pop_options")
-# define FLINT_OPTIMIZE_NESTED_3(part) _Pragma(#part)
-# define FLINT_OPTIMIZE_NESTED_2(part) FLINT_OPTIMIZE_NESTED_3(GCC optimize part)
-# define FLINT_OPTIMIZE_NESTED_1(part) FLINT_OPTIMIZE_NESTED_2(#part)
-# define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
 # define FLINT_CONSTANT_P __builtin_constant_p
 # define FLINT_UNREACHABLE __builtin_unreachable()
 # define FLINT_RETURNS_NONNULL __attribute__((returns_nonnull))
 # define FLINT_MALLOC __attribute__((malloc))
 # define FLINT_DEPRECATED __attribute__((deprecated))
+# define FLINT_HEADER_START _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"")
+# define FLINT_HEADER_END _Pragma("GCC diagnostic pop")
 #else
 # define __attribute__(x)
 # if defined(_MSC_VER)
@@ -147,13 +143,12 @@ typedef const ulong * nn_srcptr;
 # define FLINT_CONST
 # define FLINT_UNLIKELY(x) (x)
 # define FLINT_LIKELY(x) (x)
-# define FLINT_PUSH_OPTIONS
-# define FLINT_POP_OPTIONS
-# define FLINT_OPTIMIZE(x)
 # define FLINT_CONSTANT_P(x) 0
 # define FLINT_RETURNS_NONNULL
 # define FLINT_MALLOC
 # define FLINT_DEPRECATED
+# define FLINT_HEADER_START
+# define FLINT_HEADER_END
 #endif
 
 #if defined(__cplusplus)

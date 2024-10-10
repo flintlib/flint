@@ -12,6 +12,12 @@
 #include "arb.h"
 #include "double_extras.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* Helper functions to compute W_{-1}(x) on (-1/e,0) in double precision --
    just to get a good starting value for the multiprecision code, and
    not optimized for accuracy. Has underflow problems very close to 0.
@@ -109,7 +115,7 @@ d_lambertw_branch1(double x)
     For the -1 branch:
         |W'(x)| <= 2 / sqrt(1+e*x) + 2/|x|.
 */
-void
+static void
 arb_lambertw_bound_prime(mag_t w, const arb_t x, int branch, slong prec)
 {
     arb_t t;
@@ -158,7 +164,7 @@ arb_lambertw_bound_prime(mag_t w, const arb_t x, int branch, slong prec)
 
 /* Given an approximation w for W(x), compute a rigorous error bound.
    The precomputed value ew = e^w is optional. */
-void
+static void
 arb_lambertw_bound_error(mag_t res, const arb_t x, const arf_t w,
         const arb_t ew, int branch, slong prec)
 {
@@ -279,8 +285,8 @@ arb_lambertw_halley_step(arb_t res, const arb_t x, const arf_t w,
 
 /* Double precision approximation good for x >= 2^1000, or
    roughly |x| <= 2^(1000-60) for the -1 branch. */
-slong
-arb_lambertw_initial_asymp1(arf_t res, const arf_t x, int branch, slong prec)
+static slong
+arb_lambertw_initial_asymp1(arf_t res, const arf_t x, int branch, slong FLINT_UNUSED(prec))
 {
     fmpz_t e;
     double l, ll, h, t2, t3, t4;
@@ -324,8 +330,8 @@ _arf_log(arf_t res, const arf_t x, slong prec)
     arb_clear(t);
 }
 
-slong
-arb_lambertw_initial_asymp2(arf_t res, const arf_t x, int branch, slong prec)
+static slong
+arb_lambertw_initial_asymp2(arf_t res, const arf_t x, int branch, slong FLINT_UNUSED(prec))
 {
     arf_t l, ll;
     slong wp, acc;
@@ -366,7 +372,7 @@ in bits, clamped between 0 and a reasonable value related to
 the bit length of the exponent of x; thus the return value plus 2
 can be used as a precision.
 */
-slong
+static slong
 arb_lambertw_initial(arf_t res, const arf_t x, int branch, slong prec)
 {
     if (arf_cmp_d(x, -ONE_OVER_E + 0.001) >= 0)

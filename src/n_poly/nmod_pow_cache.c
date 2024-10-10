@@ -101,7 +101,7 @@ ulong nmod_pow_cache_mulpow_ui(
     ulong e,
     n_poly_t pos,
     n_poly_t bin,
-    n_poly_t neg,
+    n_poly_t FLINT_UNUSED(neg),
     nmod_t ctx)
 {
     slong i;
@@ -117,7 +117,7 @@ ulong nmod_pow_cache_mulpow_ui(
     {
         n_poly_fit_length(pos, e + 1);
         i = pos->length;
-        while (i <= e)
+        while ((ulong) i <= e)
         {
             pos->coeffs[i] = nmod_mul(b, pos->coeffs[i - 1], ctx);
             pos->length = ++i;
@@ -160,7 +160,7 @@ ulong nmod_pow_cache_mulpow_neg_ui(
         n_poly_fit_length(neg, e + 1);
 
         i = neg->length;
-        while (i <= e)
+        while ((ulong) i <= e)
         {
             neg->coeffs[i] = nmod_mul(neg->coeffs[1],
                                              neg->coeffs[i - 1], ctx);

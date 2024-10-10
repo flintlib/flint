@@ -14,7 +14,7 @@
 #include "acb_hypgeom.h"
 
 static void
-bsplit(acb_ptr res, const acb_t x, ulong a, ulong b, slong trunc, slong prec)
+bsplit(acb_ptr res, const acb_t x, ulong a, ulong b, ulong trunc, slong prec)
 {
     trunc = FLINT_MIN(trunc, b - a + 1);
 
@@ -50,7 +50,7 @@ bsplit(acb_ptr res, const acb_t x, ulong a, ulong b, slong trunc, slong prec)
         bsplit(R, x, m, b, trunc, prec);
 
         _acb_poly_mullow(res, L, len1, R, len2,
-            FLINT_MIN(trunc, len1 + len2 - 1), prec);
+            FLINT_MIN(trunc, (ulong) (len1 + len2 - 1)), prec);
 
         _acb_vec_clear(L, len1 + len2);
     }
@@ -62,13 +62,13 @@ acb_hypgeom_rising_ui_jet_bs(acb_ptr res, const acb_t x, ulong n, slong len, slo
     if (len == 0)
         return;
 
-    if (len > n + 1)
+    if ((ulong) len > n + 1)
     {
         _acb_vec_zero(res + n + 1, len - n - 1);
         len = n + 1;
     }
 
-    if (len == n + 1)
+    if ((ulong) len == n + 1)
     {
         acb_one(res + n);
         len = n;

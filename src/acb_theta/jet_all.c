@@ -100,7 +100,7 @@ void
 acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n2 = 1 << (2 * g);
+    ulong n2 = UWORD(1) << (2 * g);
     slong nb = acb_theta_jet_nb(ord, g);
     fmpz_mat_t mat, gamma;
     acb_mat_t w, c, cinv, N;

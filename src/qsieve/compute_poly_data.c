@@ -50,8 +50,8 @@
 int qsieve_init_A(qs_t qs_inf)
 {
     slong i, j;
-    slong s, low, high, span, m, h;
-    ulong bits, num_factors, rem, mid;
+    slong s, low, high, m, h, mid;
+    ulong bits, num_factors, rem, span;
     ulong factor_bound[40];
     ulong * A_ind;
     ulong * curr_subset, * first_subset;
@@ -267,7 +267,7 @@ int qsieve_init_A(qs_t qs_inf)
             if (found_j) break; /* success */
 
             /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
-            h = (4*(m + h + 1)/3 >= span) ? h + 1 : 1;
+            h = ((ulong) 4 * (m + h + 1) / 3 >= span) ? h + 1 : 1;
             m = curr_subset[s - h - 1] + 1;
 
             for (j = 0; j < h; j++)
@@ -413,7 +413,7 @@ int qsieve_next_A(qs_t qs_inf)
 
     if (s <= 3)
     {
-        if (curr_subset[0] != span - s + 1)
+        if (curr_subset[0] != (ulong) (span - s + 1))
         {
             h = (m >= span - h) ? h + 1 : 1;
             m = curr_subset[s - h] + 1;
@@ -438,7 +438,7 @@ int qsieve_next_A(qs_t qs_inf)
 
         while (1)
         {
-            if (4*(curr_subset[0] + s + diff)/3 + 1 >= span) /* have run out of A's */
+            if (4 * (curr_subset[0] + s + diff) / 3 + 1 >= (ulong) span) /* have run out of A's */
             {
                 ret = 0;
                 goto next_A_cleanup;

@@ -23,7 +23,8 @@
 void
 arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong len, slong prec)
 {
-    slong i, j, k, l, m0, xmlen, tlen, ulen, climbs, climbs_max, wp;
+    slong i, j, k, l, xmlen, tlen, ulen, climbs, climbs_max, wp;
+    ulong m0;
     arb_ptr tmp, xpow;
     arb_ptr t, u;
     nn_ptr c;
@@ -32,13 +33,13 @@ arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong
     if (len == 0)
         return;
 
-    if (len > n + 1)
+    if ((ulong) len > n + 1)
     {
         _arb_vec_zero(res + n + 1, len - n - 1);
         len = n + 1;
     }
 
-    if (len == n + 1)
+    if ((ulong) len == n + 1)
     {
         arb_one(res + n);
         len = n;
@@ -82,7 +83,7 @@ arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong
     c = TMP_ALLOC(sizeof(ulong) * climbs_max * m);
 
     /* length of (x+t)^m */
-    xmlen = FLINT_MIN(len, m + 1);
+    xmlen = FLINT_MIN((ulong) len, m + 1);
 
     tmp = _arb_vec_init(2 * len + (m + 1) * xmlen);
     t = tmp;
@@ -94,7 +95,7 @@ arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong
     tlen = 1;
 
     /* First derivatives */
-    for (i = 1; i <= m; i++)
+    for (i = 1; (ulong) i <= m; i++)
         arb_mul_ui(xpow + (m + 1) + i, xpow + i - 1, i, wp);
 
     /* Higher derivatives if we need them */
@@ -105,7 +106,7 @@ arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong
         fmpz_one(f + 0);
         fmpz_one(f + 1);
 
-        for (i = 2; i <= m; i++)
+        for (i = 2; (ulong) i <= m; i++)
         {
             for (j = FLINT_MIN(xmlen - 1, i + 1); j >= 1; j--)
                 fmpz_add(f + j, f + j, f + j - 1);
@@ -117,7 +118,7 @@ arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong
         _fmpz_vec_clear(f, len);
     }
 
-    for (k = 0; k < n; k += m)
+    for (k = 0; (ulong) k < n; k += m)
     {
         l = FLINT_MIN(m, n - k);
         climbs = FLINT_BIT_COUNT(k + l - 1) * l;

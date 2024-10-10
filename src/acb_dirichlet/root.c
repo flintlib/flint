@@ -60,13 +60,13 @@ acb_dirichlet_root(acb_t z, const acb_dirichlet_roots_t t, ulong k, slong prec)
         else
         {
             ulong r;
-            fmpq_t t;
-            fmpq_init(t);
+            fmpq_t tq;
+            fmpq_init(tq);
             r = n_gcd(n, 2 * k); /* no overflow since since k <= n / 2 */
-            fmpz_set_ui(fmpq_numref(t), (2 * k) / r);
-            fmpz_set_ui(fmpq_denref(t), n / r);
-            arb_sin_cos_pi_fmpq(acb_imagref(z), acb_realref(z), t, prec);
-            fmpq_clear(t);
+            fmpz_set_ui(fmpq_numref(tq), (2 * k) / r);
+            fmpz_set_ui(fmpq_denref(tq), n / r);
+            arb_sin_cos_pi_fmpq(acb_imagref(z), acb_realref(z), tq, prec);
+            fmpq_clear(tq);
         }
     }
     else if (t->depth == 1)

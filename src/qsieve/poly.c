@@ -53,10 +53,10 @@ ulong qsieve_poly_init(qs_t qs_inf)
 
    A_inv2B = qs_inf->A_inv2B;
 
-   for (i = 0; i < s; i++)
+   for (i = 0; (ulong) i < s; i++)
       A_inv2B[i] = flint_malloc(num_primes * sizeof(ulong));
 
-   for (i = 0; i < s; i++)
+   for (i = 0; (ulong) i < s; i++)
    {
        fmpz_init(qs_inf->A_divp[i]);
        fmpz_init(qs_inf->B_terms[i]);

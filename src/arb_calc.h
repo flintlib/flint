@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-extern FLINT_TLS_PREFIX int arb_calc_verbose;
+FLINT_TLS_PREFIX extern int arb_calc_verbose;
 
 typedef int (*arb_calc_func_t)(arb_ptr out,
     const arb_t inp, void * param, slong order, slong prec);

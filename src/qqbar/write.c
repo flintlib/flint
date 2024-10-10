@@ -12,6 +12,17 @@
 #include "calcium.h"
 #include "qqbar.h"
 
+/* FIXME: Should this function be used somewhere? */
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "qqbar_writen is currently unused/untested/undocumented!"
+# pragma message "qqbar_writend is currently unused/untested/undocumented!"
+# pragma message "qqbar_get_str_nd is currently unused/untested/undocumented!"
+#endif
+
 /* Todo: document, unify and generalize. This is currently only
    used for the Python interface, but other wrappers will want
    good printing code too. */

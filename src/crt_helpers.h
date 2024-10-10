@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 #if defined(__AVX2__)
 
 FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
@@ -99,7 +101,7 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
 # error crt_helpers.h requires AVX2 or Neon instructions
 #endif
 
-FLINT_FORCE_INLINE void multi_add_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[]))
+FLINT_FORCE_INLINE void multi_add_0(ulong z[], const ulong a[])
 {
 }
 
@@ -157,7 +159,7 @@ FLINT_FORCE_INLINE void multi_add_8(ulong z[], const ulong a[])
                                  a[7],a[6],a[5],a[4],a[3],a[2],a[1],a[0]);
 }
 
-FLINT_FORCE_INLINE void multi_sub_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[]))
+FLINT_FORCE_INLINE void multi_sub_0(ulong z[], const ulong a[])
 {
 }
 
@@ -215,7 +217,7 @@ FLINT_FORCE_INLINE void multi_sub_8(ulong z[], const ulong a[])
                                  a[7],a[6],a[5],a[4],a[3],a[2],a[1],a[0]);
 }
 
-FLINT_FORCE_INLINE void multi_rsub_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[]))
+FLINT_FORCE_INLINE void multi_rsub_0(ulong z[], const ulong a[])
 {
 }
 
@@ -348,12 +350,12 @@ FLINT_FORCE_INLINE void _madd(ulong* hi, ulong* lo, ulong y, ulong x)
 #endif
 
 /* NOTE: Define these manually to avoid compiler warnings or errors */
-FLINT_FORCE_INLINE void CAT3(_big_mul, 1, 0)(ulong r[], ulong FLINT_UNUSED(t[]), ulong FLINT_UNUSED(C[]), ulong FLINT_UNUSED(y))
+FLINT_FORCE_INLINE void CAT3(_big_mul, 1, 0)(ulong r[], ulong t[], ulong C[], ulong y)
 {
     r[0] = 0;
 }
 
-FLINT_FORCE_INLINE void CAT3(_big_addmul, 1, 0)(ulong FLINT_UNUSED(r[]), ulong FLINT_UNUSED(t[]), ulong FLINT_UNUSED(C[]), ulong FLINT_UNUSED(y))
+FLINT_FORCE_INLINE void CAT3(_big_addmul, 1, 0)(ulong r[], ulong t[], ulong C[], ulong y)
 {
 }
 
@@ -457,6 +459,8 @@ DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
 DEFINE_IT(7, 6)
 #undef DEFINE_IT
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

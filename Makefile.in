@@ -80,6 +80,7 @@ GC_LIB_PATH:=@GC_LIB_PATH@
 NTL_LIB_PATH:=@NTL_LIB_PATH@
 
 CFLAGS:=@CFLAGS@
+CFLAGS_INLINE:=$(filter-out -Wmissing-declarations -Wmissing-prototypes,$(CFLAGS))
 TESTCFLAGS:=@TESTCFLAGS@
 CPPFLAGS:=-I$(ABS_SRC_DIR) -I$(SRC_DIR) @CPPFLAGS@ -DBUILDING_FLINT
 CPPFLAGS2:=-L$(ABS_FLINT_DIR) $(CPPFLAGS)
@@ -592,6 +593,10 @@ define xxx_OBJS_rule
 $(BUILD_DIR)/$(1)/%.o: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+
+$(BUILD_DIR)/$(1)/inlines.o: $(ABS_SRC_DIR)/$(1)/inlines.c | $(BUILD_DIR)/$(1)
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	@$(CC) $(CFLAGS_INLINE) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(IS_OUT_OF_TREE),1)
@@ -618,6 +623,10 @@ define xxx_LOBJS_rule
 $(BUILD_DIR)/$(1)/%.lo: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(PIC_FLAG) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+
+$(BUILD_DIR)/$(1)/inlines.lo: $(ABS_SRC_DIR)/$(1)/inlines.c | $(BUILD_DIR)/$(1)
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	@$(CC) $(PIC_FLAG) $(CFLAGS_INLINE) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(IS_OUT_OF_TREE),1)

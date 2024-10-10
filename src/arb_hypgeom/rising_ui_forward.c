@@ -12,6 +12,12 @@
 #include "arb.h"
 #include "arb_hypgeom.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 int
 _arf_increment_fast(arf_t x, slong prec)
 {

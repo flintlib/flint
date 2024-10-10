@@ -16,9 +16,9 @@
 
 TEST_FUNCTION_START(fmpz_set_str, state)
 {
-    int i;
+    slong ix;
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz_t a, c;
         mpz_t b;
@@ -76,7 +76,7 @@ TEST_FUNCTION_START(fmpz_set_str, state)
     }
 
     /* test binary splitting code */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 10 * flint_test_multiplier(); ix++)
     {
         fmpz_t a, c;
         mpz_t b;

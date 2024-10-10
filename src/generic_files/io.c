@@ -97,7 +97,7 @@ static int __acb_is_pm1(const void * ip)
 
 static int __ulong_is_zero(const void * ip)
 {
-    return *((ulong *) ip) == 0;
+    return *((const ulong *) ip) == 0;
 }
 
 /* is_neg */

@@ -20,7 +20,7 @@ void
 _unity_zp_jacobi_sum_pq_general(unity_zp f, const nn_ptr table,
         ulong p, ulong q, ulong k, ulong a, ulong b)
 {
-    int i, j;
+    ulong i, j;
     ulong size, pow, pow_dec;
 
     unity_zp_set_zero(f);

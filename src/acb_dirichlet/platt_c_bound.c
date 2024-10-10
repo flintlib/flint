@@ -199,7 +199,7 @@ acb_dirichlet_platt_c_precomp_clear(acb_dirichlet_platt_c_precomp_t pre)
 void
 acb_dirichlet_platt_c_bound_precomp(arb_t res,
         const acb_dirichlet_platt_c_precomp_t pre, slong sigma, const arb_t t0,
-        const arb_t h, slong k, slong prec)
+        const arb_t FLINT_UNUSED(h), slong FLINT_UNUSED(k), slong prec)
 {
     /* requires sigma + 1/2 <= t0 */
     arb_t lhs;

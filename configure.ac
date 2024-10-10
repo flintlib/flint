@@ -231,6 +231,32 @@ yes|no)
 esac],
 enable_coverage="no")
 
+# NOTE: Maintainer-level only. Does not optimize, and turns on a lot of
+# warnings, all of which are turned to errors. Defaults debugging to no.
+AC_ARG_ENABLE(sanity-check,[],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-sanity-check. Need yes or no.])
+    ;;
+esac
+if test "$enableval" = "yes" && test "$cflags_set" = "yes";
+then
+    AC_MSG_ERROR([Cannot enable sanity check and push other CFLAGS at the same time.])
+elif test "$enableval" = "yes" && test "$testcflags_set" = "yes";
+then
+    AC_MSG_ERROR([Cannot enable sanity check and push other TESTCFLAGS at the same time.])
+fi],
+enable_sanity_check="no")
+
+# NOTE: -Wdeclaration-after-statement and -Wcast-qual is not in here. We also
+# remove -Wcast-function-type for GR.
+sanity_check_CFLAGS="-Werror -Wall -Wextra -Wno-cast-function-type -Wcast-align -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wpointer-arith -Wredundant-decls -Wshadow -pedantic -std=c11 -O0"
+
+# We take CFLAGS but ignore -Wsign-compare, -Wmissing-declarations and -Wmissing-prototypes.
+sanity_check_TESTCFLAGS="-Werror -Wall -Wextra -Wno-cast-function-type -Wno-sign-compare -Wcast-align -Wnested-externs -Wpointer-arith -Wredundant-decls -Wshadow -pedantic -std=c11 -O0"
+
 AC_ARG_ENABLE(debug,
 [AS_HELP_STRING([--enable-debug],[Compile FLINT with debug information [default=yes]])],
 [case $enableval in
@@ -244,7 +270,12 @@ yes|no)
     AC_MSG_ERROR([Bad value $enableval for --enable-debug. Need yes or no.])
     ;;
 esac],
-enable_debug="yes")
+if test "$enable_sanity_check" = "no";
+then
+    enable_debug="yes"
+else
+    enable_debug="no"
+fi)
 
 AC_ARG_ENABLE(dependency-tracking,
 [AS_HELP_STRING([--enable-dependency-tracking],[Enable GCC automated dependency tracking [default=yes]])],
@@ -322,18 +353,6 @@ yes|no)
     ;;
 esac],
 enable_mpfr_check="yes")
-
-# NOTE: Maintainer level only. Avoids any sort of optimization to speed up
-# builds.
-AC_ARG_ENABLE(fast-build,[],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-fast-build. Need yes or no.])
-    ;;
-esac],
-enable_fast_build="no")
 
 ################################################################################
 # packages
@@ -534,11 +553,7 @@ fi
 # architecture specifics
 ################################################################################
 
-if test "$enable_fast_build" = "no";
-then
-    gcc_cflags="-O3 "
-fi
-gcc_cflags="$gcc_cflags-pedantic -std=c11"
+gcc_cflags="-O3 -pedantic -std=c11"
 gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
 
 dnl We only try to provide specifics for those systems that currently supports
@@ -1240,7 +1255,31 @@ then
     [AC_MSG_ERROR([$CC does not support the flag -mavx512f needed for AVX512 instructions])])
 fi
 
-if test "$cflags_set" = "no";
+if test "$enable_sanity_check" = "yes";
+then
+    for flag in $sanity_check_CFLAGS;
+    do
+        AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"],
+            [AC_MSG_ERROR([$CC does not support $flag needed for sanity check.])])
+    done
+    found_single="no"
+    for flag in $gcc_cflags_arch;
+    do
+        if test "$found_single" = "yes";
+        then
+            found_single="no"
+            break
+        else
+            AX_CHECK_COMPILE_FLAG([$flag],
+                                  [save_CFLAGS="$flag $save_CFLAGS"
+                                   sanity_check_TESTCFLAGS="$flag $sanity_check_TESTCFLAGS"
+                                   found_single="yes"],
+                                  [unset flint_cv_have_fft_small_x86_i
+                                   unset flint_cv_have_fft_small_arm_i])
+        fi
+    done
+    CFLAGS="$save_CFLAGS"
+elif test "$cflags_set" = "no";
 then
     for flag in $gcc_cflags $gcc_warnings;
     do
@@ -1272,10 +1311,8 @@ then
             fi
         done
     done
-    if test "$enable_fast_build" = no;
-    then
-        AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
-    fi
+
+    AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
     if test "$unroll_loops" = "yes";
     then
         AC_SUBST(UNROLL_LOOPS,1)
@@ -1292,7 +1329,12 @@ fi
 
 if test "$testcflags_set" = "no";
 then
-    TESTCFLAGS="$CFLAGS"
+    if test "$enable_sanity_check" = "no";
+    then
+        TESTCFLAGS="$CFLAGS"
+    else
+        TESTCFLAGS="$sanity_check_TESTCFLAGS"
+    fi
 else
     TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
 fi

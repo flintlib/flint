@@ -62,7 +62,7 @@ acb_dirichlet_l_vec_hurwitz(acb_ptr res, const acb_t s,
     acb_dirichlet_dft_index(res, zeta, G, prec);
 
     {
-        slong k;
+        ulong k;
         for (k = 0; k < G->phi_q; k++)
             acb_conj(res + k, res + k);
     }

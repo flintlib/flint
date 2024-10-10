@@ -22,8 +22,10 @@
 #include "fmpz_mpoly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 /*****************************************************************************/
 
@@ -36,7 +38,7 @@ void tuple_next(fmpz * alpha, slong n);
 /*****************************************************************************/
 
 FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_init(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mpoly_factor_init(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
 {
     *f->constant = 1;
     *f->constant_den = 1;
@@ -60,13 +62,13 @@ void fmpz_mpoly_factor_clear(fmpz_mpoly_factor_t f,
 
 FMPZ_MPOLY_FACTOR_INLINE
 slong fmpz_mpoly_factor_length(const fmpz_mpoly_factor_t f,
-                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
     return f->num;
 }
 
-void fmpz_mpoly_factor_get_constant_fmpz(fmpz_t c, const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
-void fmpz_mpoly_factor_get_constant_fmpq(fmpq_t c, const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mpoly_factor_get_constant_fmpz(fmpz_t c, const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_factor_get_constant_fmpq(fmpq_t c, const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpoly_factor_get_base(fmpz_mpoly_t p, const fmpz_mpoly_factor_t f,
@@ -84,7 +86,7 @@ void fmpz_mpoly_factor_swap_base(fmpz_mpoly_t p, fmpz_mpoly_factor_t f,
     fmpz_mpoly_swap(p, f->poly + i, ctx);
 }
 
-slong fmpz_mpoly_factor_get_exp_si(fmpz_mpoly_factor_t f, slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+slong fmpz_mpoly_factor_get_exp_si(fmpz_mpoly_factor_t f, slong i, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_factor_set(fmpz_mpoly_factor_t f,
                       const fmpz_mpoly_factor_t g, const fmpz_mpoly_ctx_t ctx);
@@ -106,16 +108,16 @@ int fmpz_mpoly_factor(fmpz_mpoly_factor_t f,
 
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpoly_factor_swap(fmpz_mpoly_factor_t f, fmpz_mpoly_factor_t g,
-                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
    fmpz_mpoly_factor_struct t = *f;
    *f = *g;
    *g = t;
 }
 
-void fmpz_mpoly_factor_set_fmpz(fmpz_mpoly_factor_t f, const fmpz_t a, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
-void fmpz_mpoly_factor_zero(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
-void fmpz_mpoly_factor_one(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mpoly_factor_set_fmpz(fmpz_mpoly_factor_t f, const fmpz_t a, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_factor_zero(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_factor_one(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_factor_sort(fmpz_mpoly_factor_t f,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -153,7 +155,7 @@ void fmpz_mpoly_interp_reduce_p(nmod_mpoly_t Ap,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 int fmpz_mpoly_interp_mcrt_p(flint_bitcnt_t * coeffbits,
-                fmpz_mpoly_t H, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx), const fmpz_t m,
+                fmpz_mpoly_t H, const fmpz_mpoly_ctx_t ctx, const fmpz_t m,
                             const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctxp);
 
 void fmpz_mpoly_interp_reduce_p_mpolyn(nmod_mpolyn_t E,
@@ -180,7 +182,7 @@ typedef struct
 typedef fmpz_mpolyv_struct fmpz_mpolyv_t[1];
 
 FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpolyv_init(fmpz_mpolyv_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mpolyv_init(fmpz_mpolyv_t A, const fmpz_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -189,7 +191,7 @@ void fmpz_mpolyv_init(fmpz_mpolyv_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpolyv_swap(fmpz_mpolyv_t A, fmpz_mpolyv_t B,
-                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                    const fmpz_mpoly_ctx_t ctx)
 {
    fmpz_mpolyv_struct t = *A;
    *A = *B;
@@ -467,7 +469,7 @@ int fmpz_mpoly_factor_lcc_wang(fmpz_mpoly_struct * lc_divs,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 int fmpz_mpoly_factor_irred_zassenhaus(fmpz_mpolyv_t fac,
-       const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx, zassenhaus_prune_t FLINT_UNUSED(Z));
+       const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx, zassenhaus_prune_t Z);
 
 int fmpz_mpoly_factor_irred_wang(fmpz_mpolyv_t fac,
                       const fmpz_mpoly_t A, const fmpz_mpoly_factor_t lcAfac,
@@ -535,6 +537,8 @@ void fmpz_mpoly_compression_do(fmpz_mpoly_t L,
 void fmpz_mpoly_compression_undo(fmpz_mpoly_t A, flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t Actx, fmpz_mpoly_t L, const fmpz_mpoly_ctx_t Lctx,
                                                         mpoly_compression_t M);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

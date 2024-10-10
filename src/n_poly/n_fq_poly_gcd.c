@@ -13,7 +13,7 @@
 #include "fq_nmod_poly.h"
 #include "n_poly.h"
 
-slong _n_fq_poly_gcd_euclidean_inplace_(
+static slong _n_fq_poly_gcd_euclidean_inplace_(
     ulong * A, slong Alen,
     ulong * B, slong Blen,
     const fq_nmod_ctx_t ctx,

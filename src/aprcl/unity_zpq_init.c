@@ -16,7 +16,7 @@
 void
 unity_zpq_init(unity_zpq f, ulong q, ulong p, const fmpz_t n)
 {
-    slong i;
+    ulong i;
 
     f->p = p;
     f->q = q;

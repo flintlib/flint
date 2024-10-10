@@ -14,6 +14,12 @@
 #include "arb_hypgeom.h"
 #include "acb_dft.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static void
 _acb_dot_arb(acb_t res, const acb_t initial, int subtract,
              acb_srcptr x, slong xstep, arb_srcptr y, slong ystep,

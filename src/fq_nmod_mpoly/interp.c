@@ -1226,7 +1226,7 @@ int nmod_mpolyn_interp_mcrt_lg_mpoly(
     Update H so that it does not change mod m, and is now A mod p
     It is asserted that the monomials in H and A match
 */
-int nmod_mpolyn_CRT_fq_nmod_mpoly(
+static int nmod_mpolyn_CRT_fq_nmod_mpoly(
     slong * lastdeg,
     nmod_mpolyn_t H,
     const nmod_mpoly_ctx_t ctx,
@@ -2864,7 +2864,7 @@ int fq_nmod_mpolyn_interp_crt_lg_mpolyn(
 /*****************************************************************************/
 
 /* evaluate A at lastvar = alpha */
-void fq_nmod_mpolyn_interp_reduce_sm_mpoly(
+static void fq_nmod_mpolyn_interp_reduce_sm_mpoly(
     fq_nmod_mpoly_t B,
     fq_nmod_mpolyn_t A,
     fq_nmod_t alpha,
@@ -2969,7 +2969,7 @@ void fq_nmod_mpolyun_interp_lift_sm_mpolyu(
 /*
     F = F + modulus*(A - F(alpha))
 */
-int fq_nmod_mpolyn_interp_crt_sm_mpoly(
+static int fq_nmod_mpolyn_interp_crt_sm_mpoly(
     slong * lastdeg,
     fq_nmod_mpolyn_t F,
     fq_nmod_mpolyn_t T,
@@ -3312,7 +3312,7 @@ void fq_nmod_mpolyun_interp_lift_lg_mpolyu(
 
     no assumptions about matching monomials
 */
-int fq_nmod_mpolyn_interp_crt_lg_mpoly(
+static int fq_nmod_mpolyn_interp_crt_lg_mpoly(
     slong * lastdeg,
     fq_nmod_mpolyn_t F,
     fq_nmod_mpolyn_t T,
@@ -3573,7 +3573,7 @@ int fq_nmod_mpolyun_interp_crt_lg_mpolyu(
     Update H so that it does not change mod m, and is now A mod p
     It is asserted that the monomials in H and A match
 */
-int fq_nmod_mpolyn_interp_mcrt_lg_mpoly(
+static int fq_nmod_mpolyn_interp_mcrt_lg_mpoly(
     slong * lastdeg,
     fq_nmod_mpolyn_t H,
     const fq_nmod_mpoly_ctx_t ctx,

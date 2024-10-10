@@ -14,6 +14,13 @@
 #include "arb.h"
 #include "acb.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "arb_sin_cos_fmpz_div_2exp_bsplit only needs a symbol for test"
+#endif
+
 slong _arb_compute_bs_exponents(slong * tab, slong n);
 slong _arb_get_exp_pos(const slong * tab, slong step);
 
@@ -91,13 +98,13 @@ cos_bsplit_struct;
 
 typedef cos_bsplit_struct cos_bsplit_t[1];
 
-static void cos_bsplit_init(cos_bsplit_t x, void * args)
+static void cos_bsplit_init(cos_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_init(x->T);
     fmpz_init(x->Q);
 }
 
-static void cos_bsplit_clear(cos_bsplit_t x, void * args)
+static void cos_bsplit_clear(cos_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_clear(x->T);
     fmpz_clear(x->Q);
@@ -188,7 +195,7 @@ bsplit2(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
 }
 
 /* todo: also allow computing cos, using the same table... */
-void
+static void
 _arb_sin_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     const fmpz_t x, flint_bitcnt_t r, slong N)
 {
@@ -282,7 +289,7 @@ arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos, const fmpz_t x, flint_b
     fmpz_init(T);
     fmpz_init(Q);
 
-    if (r > prec)
+    if (r > (ulong) prec)
         flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     /* Binary splitting (+1 fixed-point ulp truncation error). */
@@ -295,7 +302,7 @@ arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos, const fmpz_t x, flint_b
     Qexp[0] += r;
 
     /* T = T / Q  (+1 fixed-point ulp error). */
-    if (Qexp[0] >= prec)
+    if (Qexp[0] >= (ulong) prec)
         fmpz_tdiv_q_2exp(T, T, Qexp[0] - prec);
     else
         fmpz_mul_2exp(T, T, prec - Qexp[0]);
@@ -362,7 +369,7 @@ pbasecase(acb_t res, slong a, slong b, pwork_t * work)
 }
 
 static void
-pmerge(acb_t res, acb_t a, acb_t b, pwork_t * work)
+pmerge(acb_t res, acb_t FLINT_UNUSED(a), acb_t b, pwork_t * work)
 {
     arb_t tmp1;
     arb_ptr zsin, zcos, wsin, wcos;
@@ -390,7 +397,7 @@ pmerge(acb_t res, acb_t a, acb_t b, pwork_t * work)
     arb_clear(tmp1);
 }
 
-void
+static void
 _acb_vec_prod_bsplit_threaded(acb_t res, acb_ptr vec, slong len, slong prec)
 {
     pwork_t work;

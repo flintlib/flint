@@ -19,6 +19,12 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void
 best_rational_fast(slong * p, ulong * q, double x, slong N)
 {

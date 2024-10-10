@@ -22,6 +22,13 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "_arb_log_precompute_reductions is currently unused/untested/undocumented!"
+#endif
+
 #define TERMINATOR -32768
 
 void
