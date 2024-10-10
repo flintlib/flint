@@ -11,16 +11,14 @@ Building FLINT requires:
 * GMP, at least version 6.2.1 (https://gmplib.org/)
 * MPFR, at least version 4.1.0 (https://mpfr.org/)
 * Either of the following build systems:
-
   * GNU Make together with GNU Autotools (Recommended)
-  * CMake (Recommended only for Windows users)
+  * CMake (Only supported for Windows users)
 
-On a typical Linux or Unix-like system where Autotools is available (see below
-for instructions using CMake), FLINT can be built and installed as follows:
+If building from a release on a typical Linux or Unix-like system (see below for
+instructions using CMake), FLINT can be configured, built and installed as follows:
 
 .. code-block:: bash
 
-    ./bootstrap.sh
     ./configure
     make -j N
     make install
@@ -28,6 +26,17 @@ for instructions using CMake), FLINT can be built and installed as follows:
 where ``N`` is the number of jobs number allowed to run parallel. Typically, the
 fastest way to build is to let ``N`` be the number of threads your CPU plus one,
 which can be obtained in Bash through ``$(expr $(nproc) + 1)``.
+
+If building from scratch, that is, without a ``configure`` script, then ``configure``
+needs to be generated first. For this GNU Autotools needs to be installed in
+order to run
+
+.. code-block:: bash
+
+    ./bootstrap.sh
+
+After this is done, ``configure`` should be generated and user can proceed with
+configuring, building and installing FLINT.
 
 By default, FLINT only builds a shared library, but a static library can be
 built by pushing ``--enable-static`` to ``configure``.
