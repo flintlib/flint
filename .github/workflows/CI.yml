@@ -21,7 +21,7 @@ jobs:
   ubuntu-codecoverage:
     name: Ubuntu GCC, Code Coverage (x10)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CC: "gcc"
@@ -98,7 +98,7 @@ jobs:
   gcc-build-regression-check:
     name: GCC build regression check (no tests)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CC: "gcc"
@@ -138,7 +138,7 @@ jobs:
   ubuntu-gcc-assert:
     name: Ubuntu GCC with NTL (assert, x2)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CC: "gcc"
@@ -192,7 +192,7 @@ jobs:
   macos-m1:
     name: macOS-M1, Clang (x3)
 
-    runs-on: macos-latest
+    runs-on: macos-14
 
     env:
       FLINT_TEST_MULTIPLIER: "3"
@@ -209,6 +209,8 @@ jobs:
       - name: "Setup"
         run: |
           brew install make
+          brew install gmp
+          brew install mpfr
           brew install autoconf
           brew install libtool
           brew install automake
@@ -246,7 +248,7 @@ jobs:
   macos-x86:
     name: macOS-x86 Clang with BLAS (x2)
 
-    runs-on: macos-13
+    runs-on: macos-12
 
     env:
       FLINT_TEST_MULTIPLIER: "2"
@@ -263,6 +265,8 @@ jobs:
       - name: "Setup"
         run: |
           brew install make
+          brew install gmp
+          brew install mpfr
           brew install autoconf
           brew install libtool
           brew install automake
@@ -561,9 +565,9 @@ jobs:
   # nemo
   ##############################################################################
   nemo:
-    name: Nemo.jl
+    name: Nemo.jl (temporary branch)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       LOCAL: ${{ github.workspace }}/local
