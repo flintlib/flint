@@ -18,13 +18,13 @@
 #define FEXPR_INLINE static inline
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "mpoly_types.h"
 #include "arf_types.h"
 #include "gr_types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* FIXME: We need calcium_stream in ca_types.h, but this header includes qqbar.h
    which conditionally defines functions using fexpr_t if and only if FEXPR_H is

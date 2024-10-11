@@ -18,14 +18,14 @@
 #define QQBAR_INLINE static inline
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "fmpz_types.h"
 #include "fmpq_types.h"
 #include "mpoly_types.h"
 #include "acb.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct
 {
