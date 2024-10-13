@@ -69,7 +69,7 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
         {
             for (i = 0; i < len1; i++)
             {
-                ulong c = poly1[i];
+                c = poly1[i];
 
                 for (j = 0; j < FLINT_MIN(len2, n - i); j++)
                     res[i + j] += c * poly2[j];

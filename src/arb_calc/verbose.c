@@ -11,4 +11,4 @@
 
 #include "arb_calc.h"
 
-int FLINT_TLS_PREFIX arb_calc_verbose = 0;
+FLINT_TLS_PREFIX int arb_calc_verbose = 0;

@@ -30,6 +30,7 @@ acb_mat_bits(const acb_mat_t A)
     return b;
 }
 
+#if 0
 int acb_mat_is_lagom(const acb_mat_t A)
 {
     slong i, j, M, N;
@@ -49,6 +50,7 @@ int acb_mat_is_lagom(const acb_mat_t A)
 
     return 1;
 }
+#endif
 
 void
 acb_mat_mul(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong prec)

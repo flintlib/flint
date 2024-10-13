@@ -117,7 +117,6 @@ gr_generic_chebyshev_t_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx)
     {
         /* we only need one value, so break out final iteration */
         gr_ptr t, u;
-        fmpz_t n1;
 
         GR_TMP_INIT2(t, u, ctx);
         fmpz_init(n1);

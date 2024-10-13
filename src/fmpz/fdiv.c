@@ -190,7 +190,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 }
 
 /* these functions were adapted from similar functions in an old version of GMP */
-void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
+static void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
                           mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
 {
     slong size1 = a->_mp_size, size2 = d->_mp_size;
@@ -267,7 +267,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     TMP_END;
 }
 
-void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
+static void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
                           mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
 {
     slong size1 = a->_mp_size;

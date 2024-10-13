@@ -23,8 +23,10 @@
 #include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 #define FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF 10
 
@@ -36,27 +38,27 @@ fmpz * fmpz_mod_mat_entry(const fmpz_mod_mat_t mat, slong i, slong j)
     return fmpz_mat_entry(mat, i, j);
 }
 
-void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
-void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j, const fmpz_mod_ctx_t ctx);
 
 /* Memory management  ********************************************************/
 
-void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_init(fmpz_mod_mat_t mat, slong rows, slong cols, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_mat_clear(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_clear(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
 
 /* Basic manipulation  ********************************************************/
 
 FMPZ_MOD_MAT_INLINE
-slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+slong fmpz_mod_mat_nrows(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
     return fmpz_mat_nrows(mat);
 }
 
 FMPZ_MOD_MAT_INLINE
-slong fmpz_mod_mat_ncols(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+slong fmpz_mod_mat_ncols(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
     return fmpz_mat_ncols(mat);
 }
@@ -71,39 +73,39 @@ void fmpz_mod_mat_one(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 }
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_zero(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mod_mat_zero(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_zero(mat);
 }
 
 FMPZ_MOD_MAT_INLINE
-int fmpz_mod_mat_is_empty(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+int fmpz_mod_mat_is_empty(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
     return fmpz_mat_is_empty(mat);
 }
 
 FMPZ_MOD_MAT_INLINE
-int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
     return fmpz_mat_is_square(mat);
 }
 
-void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx);
 
 /* Conversions */
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_set_nmod_mat_unsigned(A, B);
 }
 
 void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_MAT_INLINE void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
@@ -129,14 +131,14 @@ void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, flint_rand_t state, slong count, c
 
 /* Windows and concatenation */
 
-void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat, slong r1, slong c1, slong r2, slong c2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat, slong r1, slong c1, slong r2, slong c2, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window, const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res,
                                     const fmpz_mod_mat_t mat1,
-                                    const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+                                    const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_concat_horizontal(res, mat1, mat2);
 }
@@ -144,7 +146,7 @@ void fmpz_mod_mat_concat_horizontal(fmpz_mod_mat_t res,
 FMPZ_MOD_MAT_INLINE
 void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
                                   const fmpz_mod_mat_t mat1,
-                                  const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+                                  const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_concat_vertical(res, mat1, mat2);
 }
@@ -152,23 +154,23 @@ void fmpz_mod_mat_concat_vertical(fmpz_mod_mat_t res,
 /* Input/output */
 
 #ifdef FLINT_HAVE_FILE
-int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
-int fmpz_mod_mat_fprint_pretty(FILE * file, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_mat_fprint_pretty(FILE * file, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
 #endif
 
-int fmpz_mod_mat_print(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
-void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+int fmpz_mod_mat_print(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
 
 /* Comparison */
 
-int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
-int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
-int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
 
 /* Transpose */
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_transpose(B, A);
 }
@@ -262,28 +264,30 @@ void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d, const fmpz_mod
 /* Permutations ************************************************************/
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_swap_rows(fmpz_mod_mat_t mat, slong * perm, slong r, slong s, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mod_mat_swap_rows(fmpz_mod_mat_t mat, slong * perm, slong r, slong s, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_swap_rows(mat, perm, r, s);
 }
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_invert_rows(fmpz_mod_mat_t mat, slong * perm, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mod_mat_invert_rows(fmpz_mod_mat_t mat, slong * perm, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_invert_rows(mat, perm);
 }
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_swap_cols(fmpz_mod_mat_t mat, slong * perm, slong r, slong s, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mod_mat_swap_cols(fmpz_mod_mat_t mat, slong * perm, slong r, slong s, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_swap_cols(mat, perm, r, s);
 }
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_invert_cols(mat, perm);
 }
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

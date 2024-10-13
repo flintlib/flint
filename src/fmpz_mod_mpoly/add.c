@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
-slong _fmpz_mod_mpoly_add(
+static slong _fmpz_mod_mpoly_add(
     fmpz * Acoeffs, ulong * Aexps,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
     const fmpz * Ccoeffs, const ulong * Cexps, slong Clen,

@@ -90,7 +90,7 @@ acb_theta_jet_ql_all_red(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong o
 
     /* Collect values around midpoint */
     _acb_vec_unit_roots(zetas, b, b, hprec);
-    for (k = 0; k < n_pow(b, g); k++)
+    for (k = 0; (ulong) k < n_pow(b, g); k++)
     {
         kmod = k;
         for (j = g - 1; j >= 0; j--)
@@ -108,7 +108,7 @@ acb_theta_jet_ql_all_red(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong o
     /* Make finite differences */
     for (k = 0; k < n2; k++)
     {
-        for (j = 0; j < n_pow(b, g); j++)
+        for (j = 0; (ulong) j < n_pow(b, g); j++)
         {
             acb_set(&val[j], &all_val[j * n2 + k]);
         }

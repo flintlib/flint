@@ -23,7 +23,7 @@ ulong qqbar_try_as_cyclotomic(qqbar_t zeta, fmpq_poly_t poly, const qqbar_t x);
 
 /* todo: Re, Im, Abs, Sgn ... */
 
-void
+static void
 ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t ctx)
 {
     switch (CA_EXT_HEAD(ext))

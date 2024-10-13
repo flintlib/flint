@@ -26,7 +26,7 @@ _acb_hypgeom_li(acb_t res, const acb_t z, slong prec)
     }
 }
 
-void
+static void
 _acb_hypgeom_const_li2_eval(arb_t s, slong prec)
 {
     acb_t t;
@@ -37,7 +37,7 @@ _acb_hypgeom_const_li2_eval(arb_t s, slong prec)
     acb_clear(t);
 }
 
-ARB_DEF_CACHED_CONSTANT(_acb_hypgeom_const_li2, _acb_hypgeom_const_li2_eval)
+_ARB_DEF_CACHED_CONSTANT(static, static, _acb_hypgeom_const_li2, _acb_hypgeom_const_li2_eval)
 
 static void
 _acb_hypgeom_li_offset(acb_t res, const acb_t z, slong prec)

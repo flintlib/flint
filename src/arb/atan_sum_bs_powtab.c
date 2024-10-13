@@ -88,13 +88,13 @@ atan_bsplit_struct;
 
 typedef atan_bsplit_struct atan_bsplit_t[1];
 
-static void atan_bsplit_init(atan_bsplit_t x, void * args)
+static void atan_bsplit_init(atan_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_init(x->T);
     fmpz_init(x->Q);
 }
 
-static void atan_bsplit_clear(atan_bsplit_t x, void * args)
+static void atan_bsplit_clear(atan_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_clear(x->T);
     fmpz_clear(x->Q);

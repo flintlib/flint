@@ -10,8 +10,9 @@
 */
 
 #include "thread_pool.h"
+#include "thread_support.h"
 
-slong flint_thread_pool_num_available(thread_pool_t T)
+static slong flint_thread_pool_num_available(thread_pool_t T)
 {
     slong i, num = 0;
     thread_pool_entry_struct * D;

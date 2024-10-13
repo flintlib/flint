@@ -14,7 +14,8 @@
 void
 dirichlet_chi_vec(ulong *v, const dirichlet_group_t G, const dirichlet_char_t chi, slong nv)
 {
-    if (2 * nv > G->phi_q)
+    /* nv > 0 */
+    if (2 * (ulong) nv > G->phi_q)
         dirichlet_chi_vec_loop(v, G, chi, nv);
     else
         dirichlet_chi_vec_primeloop(v, G, chi, nv);
@@ -23,7 +24,7 @@ dirichlet_chi_vec(ulong *v, const dirichlet_group_t G, const dirichlet_char_t ch
 void
 dirichlet_chi_vec_order(ulong *v, const dirichlet_group_t G, const dirichlet_char_t chi, ulong order, slong nv)
 {
-    if (2 * nv > G->phi_q)
+    if (2 * (ulong) nv > G->phi_q)
         dirichlet_chi_vec_loop_order(v, G, chi, order, nv);
     else
         dirichlet_chi_vec_primeloop_order(v, G, chi, order, nv);

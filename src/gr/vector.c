@@ -17,6 +17,14 @@
 #include "gr_poly.h"
 #include "gr_special.h"
 
+/* FIXME: Should these functions be static or not? */
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define ENTRY_CTX(ctx) (VECTOR_CTX(ctx)->base_ring)
 
 int

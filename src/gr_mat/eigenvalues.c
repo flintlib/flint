@@ -13,7 +13,7 @@
 #include "gr_poly.h"
 
 int
-gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx)
+gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     int status;
     gr_poly_t cp;
@@ -26,7 +26,7 @@ gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags
 }
 
 int
-gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx)
+gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     int status;
     gr_poly_t cp;

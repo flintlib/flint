@@ -11,7 +11,7 @@
 
 #include "ca_poly.h"
 
-void
+static void
 _ca_poly_roots_quadratic(ca_t r1, ca_t r2, const ca_t a, const ca_t b, const ca_t c, ca_ctx_t ctx)
 {
     ca_t d, t;
@@ -40,7 +40,7 @@ _ca_poly_roots_quadratic(ca_t r1, ca_t r2, const ca_t a, const ca_t b, const ca_
 
 /* exp(2 pi i * (1 / 3)) */
 /* todo: make this faster to construct */
-void
+static void
 ca_omega(ca_t res, ca_ctx_t ctx)
 {
     ca_pi_i(res, ctx);
@@ -51,7 +51,7 @@ ca_omega(ca_t res, ca_ctx_t ctx)
 
 /* Solves a cubic equation using the cubic formula.
    Assumes (does not check) that a is invertible. */
-int
+static int
 _ca_poly_roots_cubic(ca_t r1, ca_t r2, ca_t r3, const ca_t a, const ca_t b, const ca_t c, const ca_t d, ca_ctx_t ctx)
 {
     ca_t D0, D1, C, w1, w2, t;

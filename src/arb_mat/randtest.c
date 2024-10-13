@@ -22,14 +22,14 @@ arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
     if (n_randint(state, 2))
         for (i = 0; i < arb_mat_nrows(mat); i++)
             for (j = 0; j < arb_mat_ncols(mat); j++)
-                if (n_randint(state, 100) < density)
+                if ((slong) n_randint(state, 100) < density)
                     arb_randtest(arb_mat_entry(mat, i, j), state, prec, mag_bits);
                 else
                     arb_zero(arb_mat_entry(mat, i, j));
     else
         for (i = 0; i < arb_mat_nrows(mat); i++)
             for (j = 0; j < arb_mat_ncols(mat); j++)
-                if (n_randint(state, 100) < density)
+                if ((slong) n_randint(state, 100) < density)
                     arb_randtest_precise(arb_mat_entry(mat, i, j), state, prec, mag_bits);
                 else
                     arb_zero(arb_mat_entry(mat, i, j));

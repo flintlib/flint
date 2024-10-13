@@ -53,7 +53,6 @@ fmpzi_pow_ui(fmpzi_t res, const fmpzi_t x, ulong exp)
 
     if (res == x)
     {
-        fmpzi_t tmp;
         fmpzi_init(tmp);
         fmpzi_pow_ui(tmp, x, exp);
         fmpzi_swap(tmp, res);

@@ -20,6 +20,12 @@
 #include "gr_generic.h"
 #include "nfloat.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     slong prec;
@@ -55,19 +61,19 @@ _gr_arf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 }
 
 void
-_gr_arf_init(arf_t x, const gr_ctx_t ctx)
+_gr_arf_init(arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_init(x);
 }
 
 void
-_gr_arf_clear(arf_t x, const gr_ctx_t ctx)
+_gr_arf_clear(arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_clear(x);
 }
 
 void
-_gr_arf_swap(arf_t x, arf_t y, const gr_ctx_t ctx)
+_gr_arf_swap(arf_t x, arf_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_t t;
     *t = *x;
@@ -76,7 +82,7 @@ _gr_arf_swap(arf_t x, arf_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_arf_set_shallow(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_set_shallow(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -98,14 +104,14 @@ _gr_arf_write(gr_stream_t out, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_zero(arf_t x, const gr_ctx_t ctx)
+_gr_arf_zero(arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_zero(x);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_one(arf_t x, const gr_ctx_t ctx)
+_gr_arf_one(arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_one(x);
     return GR_SUCCESS;
@@ -140,7 +146,7 @@ _gr_arf_set_fmpq(arf_t res, const fmpq_t v, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_set_d(arf_t res, double x, const gr_ctx_t ctx)
+_gr_arf_set_d(arf_t res, double x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_set_d(res, x);
     return GR_SUCCESS;
@@ -148,7 +154,7 @@ _gr_arf_set_d(arf_t res, double x, const gr_ctx_t ctx)
 
 /* todo: set_round? */
 int
-_gr_arf_set(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_set(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_set(res, x);
     return GR_SUCCESS;
@@ -227,7 +233,7 @@ _gr_arf_set_other(arf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!arf_is_int(x))
         return GR_DOMAIN;
@@ -241,7 +247,7 @@ _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {    fmpz_t t;
 
     if (!arf_is_int(x))
@@ -258,7 +264,7 @@ _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_t t;
 
@@ -284,7 +290,7 @@ _gr_arf_get_d(double * res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_get_fmpq(fmpq_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_get_fmpq(fmpq_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!arf_is_finite(x))
         return GR_DOMAIN;
@@ -298,25 +304,25 @@ _gr_arf_get_fmpq(fmpq_t res, const arf_t x, const gr_ctx_t ctx)
 
 
 truth_t
-_gr_arf_is_zero(const arf_t x, const gr_ctx_t ctx)
+_gr_arf_is_zero(const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return arf_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_arf_is_one(const arf_t x, const gr_ctx_t ctx)
+_gr_arf_is_one(const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return arf_is_one(x) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_arf_is_neg_one(const arf_t x, const gr_ctx_t ctx)
+_gr_arf_is_neg_one(const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
      return arf_equal_si(x, -1) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t ctx)
+_gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (arf_is_nan(x) || arf_is_nan(y))
         return T_UNKNOWN;
@@ -326,7 +332,7 @@ _gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t ctx)
 
 /* todo: neg_round? */
 int
-_gr_arf_neg(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_neg(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_neg(res, x);
     return GR_SUCCESS;
@@ -431,7 +437,7 @@ _gr_arf_submul(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_mul_two(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_mul_two(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_mul_2exp_si(res, x, 1);
     return GR_SUCCESS;
@@ -445,28 +451,28 @@ _gr_arf_sqr(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_mul_2exp_si(arf_t res, const arf_t x, slong y, const gr_ctx_t ctx)
+_gr_arf_mul_2exp_si(arf_t res, const arf_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_mul_2exp_si(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_mul_2exp_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_arf_mul_2exp_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_mul_2exp_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_set_fmpz_2exp_fmpz(arf_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_arf_set_fmpz_2exp_fmpz(arf_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_set_fmpz_2exp(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!arf_is_finite(x))
         return GR_DOMAIN;
@@ -519,42 +525,42 @@ _gr_arf_sqrt(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_pos_inf(arf_t res, const gr_ctx_t ctx)
+_gr_arf_pos_inf(arf_t res, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_pos_inf(res);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_neg_inf(arf_t res, const gr_ctx_t ctx)
+_gr_arf_neg_inf(arf_t res, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_neg_inf(res);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_nan(arf_t res, const gr_ctx_t ctx)
+_gr_arf_nan(arf_t res, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_nan(res);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_abs(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_abs(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_abs(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_conj(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_conj(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_set(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_im(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_im(arf_t res, const arf_t FLINT_UNUSED(x), const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_zero(res);
     return GR_SUCCESS;
@@ -562,7 +568,7 @@ _gr_arf_im(arf_t res, const arf_t x, const gr_ctx_t ctx)
 
 /* todo: sign of nan? */
 int
-_gr_arf_sgn(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_sgn(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_set_si(res, arf_sgn(x));
     return GR_SUCCESS;
@@ -576,21 +582,21 @@ _gr_arf_rsqrt(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_floor(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_floor(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_floor(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_ceil(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_ceil(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arf_ceil(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_trunc(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_trunc(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (arf_is_int(x) || arf_is_special(x))
     {
@@ -609,7 +615,7 @@ _gr_arf_trunc(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_nint(arf_t res, const arf_t x, const gr_ctx_t ctx)
+_gr_arf_nint(arf_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (arf_is_int(x) || arf_is_special(x))
     {
@@ -629,14 +635,14 @@ _gr_arf_nint(arf_t res, const arf_t x, const gr_ctx_t ctx)
 
 /* todo: handling nan */
 int
-_gr_arf_cmp(int * res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
+_gr_arf_cmp(int * res, const arf_t x, const arf_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = arf_cmp(x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_arf_cmpabs(int * res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
+_gr_arf_cmpabs(int * res, const arf_t x, const arf_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = arf_cmpabs(x, y);
     return GR_SUCCESS;
@@ -1135,7 +1141,7 @@ _gr_arf_poly_mullow(arf_ptr res,
 
 /* todo: real-only roots in arb */
 int
-_gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;

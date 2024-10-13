@@ -23,7 +23,7 @@
 #endif
 
 /* Check if z crosses a branch cut. */
-int
+static int
 acb_lambertw_branch_crossing(const acb_t z, const acb_t ez1, const fmpz_t k)
 {
     if (arb_contains_zero(acb_imagref(z)) && !arb_is_nonnegative(acb_imagref(z)))
@@ -45,7 +45,7 @@ acb_lambertw_branch_crossing(const acb_t z, const acb_t ez1, const fmpz_t k)
 }
 
 /* todo: remove radii */
-void
+static void
 acb_lambertw_halley_step(acb_t res, acb_t ew, const acb_t z, const acb_t w, slong prec)
 {
     acb_t t, u, v;
@@ -77,7 +77,7 @@ acb_lambertw_halley_step(acb_t res, acb_t ew, const acb_t z, const acb_t w, slon
 }
 
 /* assumes no aliasing of w and p */
-void
+static void
 acb_lambertw_branchpoint_series(acb_t w, const acb_t t, int bound, slong prec)
 {
     slong i;
@@ -109,7 +109,7 @@ acb_lambertw_branchpoint_series(acb_t w, const acb_t t, int bound, slong prec)
     }
 }
 
-void
+static void
 acb_lambertw_principal_d(acb_t res, const acb_t z)
 {
     double za, zb, wa, wb, ewa, ewb, t, u, q, r;
@@ -169,7 +169,7 @@ acb_lambertw_principal_d(acb_t res, const acb_t z)
     acb_set_d_d(res, wa, wb);
 }
 
-void
+static void
 acb_lambertw_initial_asymp(acb_t w, const acb_t z, const fmpz_t k, slong prec)
 {
     acb_t L1, L2, t;
@@ -204,7 +204,7 @@ acb_lambertw_initial_asymp(acb_t w, const acb_t z, const fmpz_t k, slong prec)
 }
 
 /* assumes no aliasing */
-slong
+static slong
 acb_lambertw_initial(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, slong prec)
 {
     /* Handle z very close to 0 on the principal branch. */
@@ -255,8 +255,8 @@ acb_lambertw_initial(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, 
 }
 
 /* note: z should be exact here */
-void acb_lambertw_main(acb_t res, const acb_t z,
-                const acb_t ez1, const fmpz_t k, int flags, slong prec)
+static void acb_lambertw_main(acb_t res, const acb_t z,
+                const acb_t ez1, const fmpz_t k, int FLINT_UNUSED(flags), slong prec)
 {
     acb_t w, t, oldw, ew;
     mag_t err;
@@ -306,7 +306,7 @@ void acb_lambertw_main(acb_t res, const acb_t z,
        during the Halley iteration. */
     have_ew = 0;
 
-    for (i = 0; i < 5 + FLINT_BIT_COUNT(prec + extraprec); i++)
+    for (i = 0; i < 5 + (slong) FLINT_BIT_COUNT(prec + extraprec); i++)
     {
         /* todo: should we restart? */
         if (!acb_is_finite(w))
@@ -353,13 +353,12 @@ void acb_lambertw_main(acb_t res, const acb_t z,
     if (acb_lambertw_check_branch(w, k, wp))
     {
         acb_t u, r, eu1;
-        mag_t err, rad;
+        mag_t rad;
 
         acb_init(u);
         acb_init(r);
         acb_init(eu1);
 
-        mag_init(err);
         mag_init(rad);
 
         if (have_ew)
@@ -397,7 +396,6 @@ void acb_lambertw_main(acb_t res, const acb_t z,
         acb_clear(u);
         acb_clear(r);
         acb_clear(eu1);
-        mag_clear(err);
         mag_clear(rad);
     }
     else
@@ -412,7 +410,7 @@ void acb_lambertw_main(acb_t res, const acb_t z,
     mag_clear(err);
 }
 
-void
+static void
 acb_lambertw_cleared_cut(acb_t res, const acb_t z, const fmpz_t k, int flags, slong prec)
 {
     acb_t ez1;
@@ -456,9 +454,9 @@ acb_lambertw_cleared_cut(acb_t res, const acb_t z, const fmpz_t k, int flags, sl
 }
 
 /* Extremely close to the branch point at -1/e, use the series expansion directly. */
-int
+static int
 acb_lambertw_try_near_branch_point(acb_t res, const acb_t z,
-    const acb_t ez1, const fmpz_t k, int flags, slong prec)
+    const acb_t ez1, const fmpz_t k, int FLINT_UNUSED(flags), slong prec)
 {
     if (fmpz_is_zero(k) || (fmpz_is_one(k) && arb_is_negative(acb_imagref(z)))
                         || (fmpz_equal_si(k, -1) && arb_is_nonnegative(acb_imagref(z))))
@@ -482,7 +480,7 @@ acb_lambertw_try_near_branch_point(acb_t res, const acb_t z,
     return 0;
 }
 
-void
+static void
 acb_lambertw_cleared_cut_fix_small(acb_t res, const acb_t z,
     const acb_t ez1, const fmpz_t k, int flags, slong prec)
 {
@@ -530,7 +528,7 @@ acb_lambertw_cleared_cut_fix_small(acb_t res, const acb_t z,
     arf_clear(eps);
 }
 
-void
+static void
 _acb_lambertw(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, int flags, slong prec)
 {
     slong goal, ebits, ebits2, ls, lt;
@@ -569,7 +567,7 @@ _acb_lambertw(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, int fla
 
     /* ebits ~= log2(|log(z) + 2 pi i k|) */
     /* ebits2 ~= log2(log(log(z))) */
-    ebits = FLINT_MAX(ebits, fmpz_bits(k));
+    ebits = FLINT_MAX(ebits, (slong) fmpz_bits(k));
     ebits = FLINT_MAX(ebits, 1) - 1;
     ebits2 = FLINT_BIT_COUNT(ebits);
     ebits2 = FLINT_MAX(ebits2, 1) - 1;
@@ -655,7 +653,7 @@ _acb_lambertw(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, int fla
     }
 }
 
-void
+static void
 acb_lambertw_middle(acb_t res, const acb_t z, slong prec)
 {
     fmpz_t k;
@@ -741,7 +739,7 @@ acb_lambertw_middle(acb_t res, const acb_t z, slong prec)
     fmpz_clear(k);
 }
 
-void
+static void
 acb_lambertw_left(acb_t res, const acb_t z, const fmpz_t k, slong prec)
 {
     if (acb_contains_zero(z) && !(fmpz_equal_si(k, -1) && acb_is_real(z)))

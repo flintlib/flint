@@ -22,7 +22,7 @@
 /*  scalar_addmul  */
 /*******************/
 
-void
+static void
 _nmod_mat_scalar_addmul_ui_generic(nmod_mat_t C, const nmod_mat_t A,
                                           const nmod_mat_t B, const ulong c)
 {
@@ -38,7 +38,7 @@ _nmod_mat_scalar_addmul_ui_generic(nmod_mat_t C, const nmod_mat_t A,
     }
 }
 
-void
+static void
 _nmod_mat_scalar_addmul_ui_precomp(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
                                     const ulong c, const ulong c_pr)
 {
@@ -78,7 +78,7 @@ nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
 /*  scalar_mul  */
 /****************/
 
-void
+static void
 _nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c)
 {
     for (slong i = 0; i < A->r; i++)
@@ -86,7 +86,7 @@ _nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c)
             nmod_mat_entry(B, i, j) = nmod_mul(nmod_mat_entry(A, i, j), c, A->mod);
 }
 
-void
+static void
 _nmod_mat_scalar_mul_precomp(nmod_mat_t B, const nmod_mat_t A, ulong c, ulong c_pr)
 {
     for (slong i = 0; i < A->r; i++)

@@ -19,9 +19,15 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define D_ABS(x) ((x) < 0.0 ? (-(x)) : (x))
 
-int
+static int
 acb_hypgeom_pfq_choose_n_double(slong * nn,
     const double * are, const double * aim, slong p,
     const double * bre, const double * bim, slong q,

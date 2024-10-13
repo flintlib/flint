@@ -11,6 +11,12 @@
 
 #include "arb.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* We do Newton iteration in floating-point arithmetic with some
    guard bits. With GUARD_BITS = 32 the result is certainly accurate
    to more than GUARD_BITS / 2 extra bits. With a detailed error
@@ -30,7 +36,7 @@
 #define WANT_NEWTON(prec, xbits, ybits) 0
 #endif
 
-void
+static void
 _arf_inv_newton(arf_t res, const arf_t x, slong prec)
 {
     slong wp = prec + GUARD_BITS;
@@ -72,7 +78,7 @@ _arf_inv_newton(arf_t res, const arf_t x, slong prec)
 }
 
 /* Karp-Markstein */
-void
+static void
 _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec)
 {
     arf_t xn, yn, t;

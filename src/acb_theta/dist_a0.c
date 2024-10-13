@@ -19,7 +19,7 @@ void
 acb_theta_dist_a0(arb_ptr d, acb_srcptr z, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n = 1 << g;
+    ulong n = UWORD(1) << g;
     arb_mat_t Yinv, C;
     arb_ptr v, w;
     ulong a;

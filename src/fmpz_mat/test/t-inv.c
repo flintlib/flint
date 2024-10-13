@@ -22,7 +22,6 @@ TEST_FUNCTION_START(fmpz_mat_inv, state)
 
     {
         fmpz_t d;
-        fmpz_mat_t A, B, C;
 
         fmpz_mat_init(A, 1, 1);
         fmpz_one(fmpz_mat_entry(A, 0, 0));

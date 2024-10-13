@@ -18,6 +18,12 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 int
 _gr_acb_poly_taylor_shift(acb_ptr res, acb_srcptr poly, slong n, const acb_t c, gr_ctx_t ctx)
 {

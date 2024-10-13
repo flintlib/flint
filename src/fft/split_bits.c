@@ -28,7 +28,7 @@ typedef struct
 }
 split_limbs_arg_t;
 
-void
+static void
 _split_limbs_worker(void * arg_ptr)
 {
     split_limbs_arg_t arg = *((split_limbs_arg_t *) arg_ptr);
@@ -144,7 +144,7 @@ typedef struct
 }
 split_bits_arg_t;
 
-void
+static void
 _split_bits_worker(void * arg_ptr)
 {
     split_bits_arg_t arg = *((split_bits_arg_t *) arg_ptr);

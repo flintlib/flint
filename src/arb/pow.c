@@ -15,7 +15,7 @@
 
 typedef enum {POSITIVE = 0, NEGATIVE_EVEN, NEGATIVE_ODD} sign_type;
 
-void
+static void
 _arb_pow_exp(arb_t z, const arb_t x, sign_type negx, const arb_t y, slong prec)
 {
     arb_t t;

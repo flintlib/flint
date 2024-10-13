@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-slong _nmod_mpoly_mul_johnson1(
+static slong _nmod_mpoly_mul_johnson1(
     nmod_mpoly_t A,
     const ulong * coeff2, const ulong * exp2, slong len2,
     const ulong * coeff3, const ulong * exp3, slong len3,

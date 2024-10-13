@@ -41,7 +41,7 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
 {
     ulong c, n, cbc;
 
-    len = FLINT_MIN(len, b - a + 1);
+    len = FLINT_MIN(len, (slong) (b - a + 1));
 
     /* (c+x)^n has coefficients bounded by max(c,n)^n */
     n = b - a;
@@ -59,7 +59,7 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
             v[1] = 1;
 
             /* multiply by ((a+i) + x) */
-            for (i = 1; i < n; i++)
+            for (i = 1; i < (slong) n; i++)
             {
                 if (i + 1 < len)
                     v[i + 1] = 1;
@@ -74,7 +74,7 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
             v[1] = a;
 
             /* multiply by (1 + (a+i) x) */
-            for (i = 1; i < n; i++)
+            for (i = 1; i < (slong) n; i++)
             {
                 if (i + 1 < len)
                     v[i + 1] = v[i] * (a + i);
@@ -96,8 +96,8 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
         slong len1, len2;
         slong m = a + (b - a) / 2;
 
-        len1 = FLINT_MIN(m - a + 1, len);
-        len2 = FLINT_MIN(b - m + 1, len);
+        len1 = FLINT_MIN((slong) (m - a + 1), len);
+        len2 = FLINT_MIN((slong) (b - m + 1), len);
 
         L = _fmpz_vec_init(len1 + len2);
         R = L + len1;
@@ -196,14 +196,14 @@ arith_stirling_number_1u_vec(fmpz * res, ulong n, slong klen)
     if (klen <= 0)
         return;
 
-    len = FLINT_MIN(klen - 1, n - 1);
+    len = FLINT_MIN(klen - 1, (slong) n - 1);
 
     if (n >= 1 && len >= 1)
         stirling_1u_ogf_bsplit(res + 1, 1, n, len, 1, 0);
 
     fmpz_set_ui(res + 0, n == 0);
     for (k = n; k < klen; k++)
-        fmpz_set_ui(res + k, n == k);
+        fmpz_set_ui(res + k, (slong) n == k);
 }
 
 void

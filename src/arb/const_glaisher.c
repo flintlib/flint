@@ -12,7 +12,7 @@
 #include "arb.h"
 #include "acb_poly.h"
 
-void
+static void
 arb_const_glaisher_eval(arb_t y, slong prec)
 {
     acb_struct z[2];

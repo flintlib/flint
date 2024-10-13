@@ -24,13 +24,13 @@ acb_hypgeom_rising_ui_jet_powsum(acb_ptr res, const acb_t x, ulong n, slong len,
     if (len == 0)
         return;
 
-    if (len > n + 1)
+    if ((ulong) len > n + 1)
     {
         _acb_vec_zero(res + n + 1, len - n - 1);
         len = n + 1;
     }
 
-    if (len == n + 1)
+    if ((ulong) len == n + 1)
     {
         acb_one(res + n);
         len = n;
@@ -72,7 +72,7 @@ acb_hypgeom_rising_ui_jet_powsum(acb_ptr res, const acb_t x, ulong n, slong len,
         c[1] = 1;
         c[(n + 1) + 0] = 1;
 
-        for (i = 2; i <= n; i++)
+        for (i = 2; (ulong) i <= n; i++)
         {
             for (j = FLINT_MIN(len - 1, i); j >= 0; j--)
             {
@@ -118,7 +118,7 @@ acb_hypgeom_rising_ui_jet_powsum(acb_ptr res, const acb_t x, ulong n, slong len,
         fmpz_one(c + 1);
         fmpz_one(c + (n + 1) + 0);
 
-        for (i = 2; i <= n; i++)
+        for (i = 2; (ulong) i <= n; i++)
         {
             for (j = FLINT_MIN(len - 1, i); j >= 0; j--)
             {

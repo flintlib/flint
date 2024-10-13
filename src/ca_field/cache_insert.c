@@ -12,7 +12,13 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t ctx)
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
+ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     ulong xhash;
     ca_field_ptr K;
@@ -42,8 +48,8 @@ ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x
     flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 }
 
-ulong
-_ca_field_hash(ca_ext_struct ** ext, slong len, ca_ctx_t ctx)
+static ulong
+_ca_field_hash(ca_ext_struct ** ext, slong len, ca_ctx_t FLINT_UNUSED(ctx))
 {
     ulong s;
     slong i;
@@ -55,13 +61,13 @@ _ca_field_hash(ca_ext_struct ** ext, slong len, ca_ctx_t ctx)
     return s;
 }
 
-ulong
+static ulong
 ca_field_hash(const ca_field_t K, ca_ctx_t ctx)
 {
     return _ca_field_hash(K->ext, K->length, ctx);
 }
 
-static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len, ca_ctx_t ctx)
+static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len, ca_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
@@ -75,7 +81,7 @@ static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len
     return 1;
 }
 
-void
+static void
 ca_field_init_set_ext(ca_field_t K, ca_ext_struct ** ext, slong len, ca_ctx_t ctx)
 {
     if (len == 0)

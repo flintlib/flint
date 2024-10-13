@@ -14,6 +14,12 @@
 #include "ca_field.h"
 #include "ca_vec.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void
 ca_conj_shallow(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
@@ -66,7 +72,7 @@ ca_set_ext(ca_t res, ca_ext_srcptr ext, ca_ctx_t ctx)
     }
 }
 
-void
+static void
 ca_conj_ext(ca_t res, ca_ext_ptr ext, ca_ctx_t ctx)
 {
     slong p;
@@ -220,7 +226,7 @@ ca_conj_ext(ca_t res, ca_ext_ptr ext, ca_ctx_t ctx)
 }
 
 /* Complex conjugate assuming that the generator is pure imaginary. */
-void nf_elem_conj_imag(nf_elem_t a, const nf_elem_t b, const nf_t nf)
+static void nf_elem_conj_imag(nf_elem_t a, const nf_elem_t b, const nf_t nf)
 {
     nf_elem_set(a, b, nf);
 

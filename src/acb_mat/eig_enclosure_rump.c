@@ -50,7 +50,7 @@ acb_approx_sub(acb_t res, const acb_t x, const acb_t y, slong prec)
 }
 
 /* todo: separate out */
-void
+static void
 acb_mat_bound_max_norm(mag_t res, const acb_mat_t A)
 {
     mag_t t;
@@ -150,7 +150,7 @@ acb_approx_mag(mag_t res, const acb_t x)
 
 /* Extract k largest rows to freeze */
 static void
-partition_X_sorted(slong * u, slong * v, const acb_mat_t X, slong prec)
+partition_X_sorted(slong * u, slong * v, const acb_mat_t X, slong FLINT_UNUSED(prec))
 {
     slong i, j, n, k, c;
     slong * row_idx;
@@ -204,7 +204,7 @@ partition_X_sorted(slong * u, slong * v, const acb_mat_t X, slong prec)
 }
 
 static void
-partition_X_trivial(slong * u, slong * v, const acb_mat_t X, slong prec)
+partition_X_trivial(slong * u, slong * v, const acb_mat_t X, slong FLINT_UNUSED(prec))
 {
     slong n, k, i;
 

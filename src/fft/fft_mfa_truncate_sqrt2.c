@@ -169,7 +169,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
       fft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1);
       for (j = 0; j < n2; j++)
       {
-         mp_size_t s = n_revbin(j, depth);
+         s = n_revbin(j, depth);
          if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
       }
    }
@@ -199,7 +199,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
       fft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
       for (j = 0; j < n2; j++)
       {
-         mp_size_t s = n_revbin(j, depth);
+         s = n_revbin(j, depth);
          if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
       }
    }
@@ -238,7 +238,7 @@ typedef struct
 }
 fft_outer_arg_t;
 
-void
+static void
 _fft_outer1_worker(void * arg_ptr)
 {
     fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);
@@ -322,7 +322,7 @@ _fft_outer1_worker(void * arg_ptr)
     }
 }
 
-void
+static void
 _fft_outer2_worker(void * arg_ptr)
 {
     fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);

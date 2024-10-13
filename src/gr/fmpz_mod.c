@@ -21,6 +21,13 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
+#include "gr_generic.h"
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 typedef struct
 {
@@ -70,19 +77,19 @@ _gr_fmpz_mod_ctx_is_field(gr_ctx_t ctx)
 }
 
 void
-_gr_fmpz_mod_init(fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_init(fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_init(x);
 }
 
 void
-_gr_fmpz_mod_clear(fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_clear(fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_clear(x);
 }
 
 void
-_gr_fmpz_mod_swap(fmpz_t x, fmpz_t y, const gr_ctx_t ctx)
+_gr_fmpz_mod_swap(fmpz_t x, fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_t t;
     *t = *x;
@@ -91,7 +98,7 @@ _gr_fmpz_mod_swap(fmpz_t x, fmpz_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_fmpz_mod_set_shallow(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_set_shallow(fmpz_t res, const fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -104,14 +111,14 @@ _gr_fmpz_mod_randtest(fmpz_t res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpz_mod_write(gr_stream_t out, const fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_write(gr_stream_t out, const fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write_fmpz(out, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpz_mod_zero(fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_zero(fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_zero(x);
     return GR_SUCCESS;
@@ -142,7 +149,7 @@ _gr_fmpz_mod_set_ui(fmpz_t res, ulong v, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpz_mod_get_fmpz(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_get_fmpz(fmpz_t res, const fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_set(res, x);
     return GR_SUCCESS;
@@ -185,7 +192,7 @@ _gr_fmpz_mod_set_fmpz(fmpz_t res, const fmpz_t v, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_fmpz_mod_is_zero(const fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_is_zero(const fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_is_zero(x) ? T_TRUE : T_FALSE;
 }
@@ -209,13 +216,13 @@ _gr_fmpz_mod_is_neg_one(const fmpz_t x, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_fmpz_mod_equal(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_fmpz_mod_equal(const fmpz_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
 int
-_gr_fmpz_mod_set(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+_gr_fmpz_mod_set(fmpz_t res, const fmpz_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_set(res, x);
     return GR_SUCCESS;
@@ -584,7 +591,7 @@ static const int tuning_bit_steps[TUNE_TAB_SIZE] = { 32, 45, 64, 91, 128, 181, 2
 static const short inv_series_cutoff_tab[TUNE_TAB_SIZE] = {21, 14, 40, 39, 48, 60, 89, 72, 72, 54, 48, 39, 32, 24, 24, 20, 17, 18, 16, 15, 13, 12, 14, };
 static const short div_series_cutoff_tab[TUNE_TAB_SIZE] = {23, 21, 52, 50, 66, 101, 106, 97, 106, 72, 60, 50, 44, 35, 38, 30, 26, 22, 20, 18, 16, 14, 22, };
 
-static const slong find_cutoff(const short * tab, slong b)
+static slong find_cutoff(const short * tab, slong b)
 {
     slong i;
 
@@ -647,7 +654,7 @@ int _gr_fmpz_mod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_sr
 /* todo: implement generically */
 
 int
-_gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;

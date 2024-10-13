@@ -21,9 +21,11 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /*  Memory management ********************************************************/
 
-void TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
+void TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_init2)(TEMPLATE(T, poly_t) poly, slong alloc,
                         const TEMPLATE(T, ctx_t) ctx);
@@ -56,21 +58,21 @@ void _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len,
 
 FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_length)(const TEMPLATE(T, poly_t) poly,
-                         const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                         const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length;
 }
 
 FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_degree)(const TEMPLATE(T, poly_t) poly,
-                         const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                         const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length - 1;
 }
 
 FQ_POLY_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, poly_lead)(const TEMPLATE(T, poly_t) poly,
-                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                       const TEMPLATE(T, ctx_t) ctx)
 {
     return poly->length > 0 ? poly->coeffs + (poly->length - 1) : NULL;
 }
@@ -111,7 +113,7 @@ void TEMPLATE(T, poly_set_nmod_poly)(TEMPLATE(T, poly_t) rop,
                                                const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_swap)(TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
-                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
+                       const TEMPLATE(T, ctx_t) ctx);
 
 void _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len, const TEMPLATE(T, ctx_t) ctx);
 void TEMPLATE(T, poly_zero)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
@@ -173,7 +175,7 @@ int TEMPLATE(T, poly_equal_trunc)(const TEMPLATE(T, poly_t) poly1,
 
 FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
-                          const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
+                          const TEMPLATE(T, ctx_t) ctx)
 {
     return (poly->length == 0);
 }
@@ -731,7 +733,7 @@ void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q,
 void _TEMPLATE(T, poly_div_newton_n_preinv) (
     TEMPLATE(T, struct) *Q,
     const TEMPLATE(T, struct) *A, slong lenA,
-    const TEMPLATE(T, struct)* FLINT_UNUSED(B), slong lenB,
+    const TEMPLATE(T, struct)* B, slong lenB,
     const TEMPLATE(T, struct)* Binv, slong lenBinv,
     const TEMPLATE(T, ctx_t) ctx);
 
@@ -1040,6 +1042,8 @@ void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
 
 void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
                       const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

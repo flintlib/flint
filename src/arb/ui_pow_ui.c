@@ -22,7 +22,7 @@ arb_si_pow_ui(arb_t res, slong b, ulong e, slong prec)
         arb_neg(res, res);
 }
 
-void
+static void
 arb_set_round_ui(arb_t res, ulong lo, slong prec)
 {
     if (lo == 0)
@@ -42,7 +42,7 @@ arb_set_round_ui(arb_t res, ulong lo, slong prec)
     }
 }
 
-void
+static void
 arb_set_round_uiui(arb_t res, ulong hi, ulong lo, slong prec)
 {
     if (hi == 0 && lo == 0)
@@ -89,7 +89,6 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         }
         else
         {
-            ulong hi, lo;
             umul_ppmm(hi, lo, a, a);
             arb_set_round_uiui(res, hi, lo, prec);
         }
@@ -121,7 +120,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
 
     umul_ppmm(hi, lo, awidth, exp);
     if (hi == 0)
-        prec = FLINT_MIN(prec, lo);
+        prec = FLINT_MIN((ulong) prec, lo);
 
     wp = prec + 2 * FLINT_BIT_COUNT(exp) + 4;
     wp_limbs = (wp + FLINT_BITS - 1) / FLINT_BITS;
@@ -241,8 +240,6 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         /* note: we must have yn == 1 here if wp_limbs == 1 */
         if (wp_limbs == 1)
         {
-            ulong hi, lo;
-
             /* y = y^2: mantissa */
             umul_ppmm(hi, lo, yman[0], yman[0]);
             if (!(hi >> (FLINT_BITS - 1)))

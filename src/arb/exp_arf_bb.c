@@ -54,7 +54,8 @@ work_t;
 static void
 worker(slong iter, work_t * work)
 {
-    slong mag, wp, N;
+    slong mag, N;
+    ulong wp;
     flint_bitcnt_t Qexp[1];
     fmpz_t T, Q;
 
@@ -131,7 +132,7 @@ pmerge(arb_t res, const arb_t a, const arb_t b, pwork_t * work)
     arb_mul(res, a, b, work->prec);
 }
 
-void
+static void
 _arb_vec_prod_bsplit_threaded(arb_t res, arb_srcptr vec, slong len, slong prec)
 {
     pwork_t work;
@@ -151,9 +152,10 @@ _arb_vec_prod_bsplit_threaded(arb_t res, arb_srcptr vec, slong len, slong prec)
 void
 arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
 {
-    slong k, bits, r, mag, q, wp, N;
-    slong argred_bits, start_bits;
+    slong k, r, mag, q, N;
     slong num_threads;
+    ulong wp;
+    flint_bitcnt_t bits, argred_bits, start_bits;
     flint_bitcnt_t Qexp[1];
     int inexact;
     fmpz_t t, u, T, Q;
@@ -196,7 +198,7 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
 
     /* Argument reduction: exp(x) -> exp(x/2^q). This improves efficiency
        of the first iteration in the bit-burst algorithm. */
-    q = FLINT_MAX(0, mag + argred_bits);
+    q = FLINT_MAX(0, (slong) (mag + argred_bits));
 
     /* Determine working precision. */
     wp = prec + 10 + 2 * q + 2 * FLINT_BIT_COUNT(prec);

@@ -53,7 +53,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
     unity_zp_copy(g_powers[1], g);
 
     /* sets g_powers[i] = g^2 * g_powers[i - 1] */
-    for (i = 2; i <= n_pow(2, k - 1); i++)
+    for (i = 2; (ulong) i <= n_pow(2, k - 1); i++)
     {
         unity_zp_init(g_powers[i], f->p, f->exp, fmpz_mod_ctx_modulus(f->ctx));
         unity_zp_mul_inplace(g_powers[i], g_powers[i - 1], temp, t);
@@ -83,7 +83,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
                 j++;
 
             /* f = f^(2^(i - j + 1)) */
-            for (h = 0; h < i - j + 1; h++)
+            for (h = 0; (slong) h < i - j + 1; h++)
             {
                 unity_zp_sqr_inplace(temp, f, t);
                 unity_zp_swap(temp, f);
@@ -93,7 +93,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
                 value = binary number (e_i, ... , e_j) in decimal base
             */
             value = 0;
-            for (h = 0; h < i - j + 1; h++)
+            for (h = 0; (slong) h < i - j + 1; h++)
                 value += fmpz_tstbit(pow, j + h) << h;
 
             /* f = f * g^value */
@@ -109,7 +109,7 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
         fmpz_clear(t[i]);
     flint_free(t);
 
-    for (i = 0; i <= n_pow(2, k - 1); i++)
+    for (i = 0; (ulong) i <= n_pow(2, k - 1); i++)
         unity_zp_clear(g_powers[i]);
     flint_free(g_powers);
 

@@ -14,7 +14,7 @@
 #include "gr_poly.h"
 
 /* todo: public vec function */
-void
+static void
 _gr_vec_reverse_shallow(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 {
     gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW);

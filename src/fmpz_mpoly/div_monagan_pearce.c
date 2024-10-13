@@ -30,7 +30,7 @@
    exponent at the head. Quotient poly is written in order.
    [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf
 */
-slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
+static slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
                 slong * allocq, const fmpz * poly2, const ulong * exp2,
             slong len2, const fmpz * poly3, const ulong * exp3, slong len3,
                                                       slong bits, ulong maskhi)

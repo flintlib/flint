@@ -183,7 +183,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
     }
     else
     {
-        slong zn, alloc;
+        slong alloc;
         nn_srcptr xptr, yptr;
         nn_ptr tmp;
         ARF_MUL_TMP_DECL

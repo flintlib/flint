@@ -22,7 +22,7 @@ acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec)
     acb_init(s);
     acb_init(t);
 
-    for (ab = 0; ab < (1 << (2 * g)); ab++)
+    for (ab = 0; ab < (UWORD(1) << (2 * g)); ab++)
     {
         if (acb_theta_char_is_even(ab, g))
         {

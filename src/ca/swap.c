@@ -12,7 +12,7 @@
 #include "ca.h"
 
 void
-ca_swap(ca_t x, ca_t y, ca_ctx_t ctx)
+ca_swap(ca_t x, ca_t y, ca_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(ca_struct, *x, *y);
 }

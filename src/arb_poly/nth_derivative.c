@@ -26,7 +26,7 @@ arb_poly_nth_derivative(arb_poly_t res, const arb_poly_t poly, ulong n, slong pr
 {
     const slong len = poly->length;
 
-    if (len <= n)
+    if ((ulong) len <= n)
     {
         arb_poly_zero(res);
     }

@@ -43,14 +43,14 @@ ulong pp1_primorial[9] =
 #define num_primorials 9
 #endif
 
-void pp1_set(nn_ptr x1, nn_ptr y1,
+static void pp1_set(nn_ptr x1, nn_ptr y1,
               nn_srcptr x2, nn_srcptr y2, slong nn)
 {
     flint_mpn_copyi(x1, x2, nn);
     flint_mpn_copyi(y1, y2, nn);
 }
 
-void pp1_set_ui(nn_ptr x, slong nn, ulong norm, ulong c)
+static void pp1_set_ui(nn_ptr x, slong nn, ulong norm, ulong c)
 {
     mpn_zero(x, nn);
     x[0] = (c << norm);
@@ -58,7 +58,7 @@ void pp1_set_ui(nn_ptr x, slong nn, ulong norm, ulong c)
         x[1] = (c >> (FLINT_BITS - norm));
 }
 
-void pp1_2k(nn_ptr x, nn_ptr y, slong nn, nn_srcptr n,
+static void pp1_2k(nn_ptr x, nn_ptr y, slong nn, nn_srcptr n,
             nn_srcptr ninv, nn_srcptr x0, ulong norm)
 {
     pp1_mulmod(y, y, x, nn, n, ninv, norm);
@@ -70,7 +70,7 @@ void pp1_2k(nn_ptr x, nn_ptr y, slong nn, nn_srcptr n,
         mpn_add_n(x, x, n, nn);
 }
 
-void pp1_2kp1(nn_ptr x, nn_ptr y, slong nn, nn_srcptr n,
+static void pp1_2kp1(nn_ptr x, nn_ptr y, slong nn, nn_srcptr n,
               nn_srcptr ninv, nn_srcptr x0, ulong norm)
 {
     pp1_mulmod(x, x, y, nn, n, ninv, norm);
@@ -82,7 +82,7 @@ void pp1_2kp1(nn_ptr x, nn_ptr y, slong nn, nn_srcptr n,
         mpn_add_n(y, y, n, nn);
 }
 
-void pp1_pow_ui(nn_ptr x, nn_ptr y, slong nn,
+static void pp1_pow_ui(nn_ptr x, nn_ptr y, slong nn,
                 ulong exp, nn_srcptr n, nn_srcptr ninv, ulong norm)
 {
     ulong t[30];
@@ -111,7 +111,7 @@ void pp1_pow_ui(nn_ptr x, nn_ptr y, slong nn,
         flint_free(x0);
 }
 
-slong pp1_factor(nn_ptr factor, nn_srcptr n,
+static slong pp1_factor(nn_ptr factor, nn_srcptr n,
                      nn_srcptr x, slong nn, ulong norm)
 {
     slong ret = 0, xn = nn;
@@ -147,7 +147,7 @@ cleanup:
     return ret;
 }
 
-slong pp1_find_power(nn_ptr factor, nn_ptr x, nn_ptr y, slong nn,
+static slong pp1_find_power(nn_ptr factor, nn_ptr x, nn_ptr y, slong nn,
                           ulong p, nn_srcptr n, nn_srcptr ninv, ulong norm)
 {
     slong ret;

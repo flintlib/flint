@@ -166,7 +166,7 @@ void fmpz_mod_bpoly_set(
         fmpz_mod_poly_set(A->coeffs + i, B->coeffs + i, ctx);
 }
 
-void _fmpz_mod_poly_taylor_shift_horner(
+static void _fmpz_mod_poly_taylor_shift_horner(
     fmpz * a,
     const fmpz_t c,
     slong n,

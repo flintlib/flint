@@ -11,7 +11,7 @@
 
 #include "acb_dft.h"
 
-void
+static void
 acb_dft_convol_dft_precomp(acb_ptr w, acb_srcptr f, acb_srcptr g, const acb_dft_pre_t pre, slong prec)
 {
     acb_ptr fp, gp;

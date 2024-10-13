@@ -12,7 +12,7 @@
 #include "fmpz_vec.h"
 #include "nf_elem.h"
 
-void _nf_elem_mul_gaussian(fmpz * anum, fmpz * aden,
+static void _nf_elem_mul_gaussian(fmpz * anum, fmpz * aden,
         const fmpz * bnum, const fmpz * bden,
         const fmpz * cnum, const fmpz * cden)
 {

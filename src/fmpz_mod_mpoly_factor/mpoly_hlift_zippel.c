@@ -158,6 +158,7 @@ static void fmpz_mod_mpolyu_fit_length(
     }
 }
 
+#if 0
 void fmpz_mod_mpolyu_one(fmpz_mod_mpolyu_t A, const fmpz_mod_mpoly_ctx_t uctx)
 {
     fmpz_mod_mpolyu_fit_length(A, WORD(1), uctx);
@@ -165,7 +166,9 @@ void fmpz_mod_mpolyu_one(fmpz_mod_mpolyu_t A, const fmpz_mod_mpoly_ctx_t uctx)
     fmpz_mod_mpoly_one(A->coeffs + 0, uctx);
     A->length = WORD(1);
 }
+#endif
 
+#if 0
 void fmpz_mod_mpolyu_repack_bits_inplace(
     fmpz_mod_mpolyu_t A,
     flint_bitcnt_t bits,
@@ -181,10 +184,11 @@ void fmpz_mod_mpolyu_repack_bits_inplace(
     for (i = 0; i < A->alloc; i++)
         fmpz_mod_mpoly_repack_bits_inplace(A->coeffs + i, bits, ctx);
 }
+#endif
 
 
 /* if the coefficient doesn't exist, a new one is created (and set to zero) */
-fmpz_mod_mpoly_struct * _fmpz_mod_mpolyu_get_coeff(
+static fmpz_mod_mpoly_struct * _fmpz_mod_mpolyu_get_coeff(
     fmpz_mod_mpolyu_t A,
     ulong pow,
     const fmpz_mod_mpoly_ctx_t uctx)

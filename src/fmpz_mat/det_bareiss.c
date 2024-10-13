@@ -13,7 +13,7 @@
 #include "fmpz_mat.h"
 #include "perm.h"
 
-void
+static void
 _fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
 {
     slong *perm, n = fmpz_mat_nrows(tmp);

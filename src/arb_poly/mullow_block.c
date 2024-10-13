@@ -19,7 +19,7 @@
 # include <math.h>
 #endif
 
-void
+static void
 _arb_poly_get_scale(fmpz_t scale, arb_srcptr x, slong xlen,
                                   arb_srcptr y, slong ylen)
 {

@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "gr_mpoly.h"
 
-int _gr_mpoly_mul_johnson(
+static int _gr_mpoly_mul_johnson(
     slong * res_len,
     gr_ptr * coeff1, ulong ** exp1, slong * alloc, slong * exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,

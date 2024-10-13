@@ -18,8 +18,7 @@
 void
 unity_zpq_mul(unity_zpq f, const unity_zpq g, const unity_zpq h)
 {
-    slong i, j, k;
-    ulong p, q;
+    ulong i, j, k, p, q;
     fmpz_mod_poly_t temp;
 
     FLINT_ASSERT(fmpz_equal(fmpz_mod_ctx_modulus(f->ctx),

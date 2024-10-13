@@ -21,6 +21,12 @@
 # include <string.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define SERIES_ERR_EXACT WORD_MAX
 #define SERIES_ERR_MAX WORD_MAX / 4
 
@@ -82,27 +88,27 @@ gr_poly_sub_series(gr_poly_t res, const gr_poly_t poly1,
 }
 
 void
-gr_series_init(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_init(gr_series_t res, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     gr_poly_init(&res->poly, cctx);
     res->error = SERIES_ERR_EXACT;
 }
 
 void
-gr_series_clear(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_clear(gr_series_t res, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     gr_poly_clear(&res->poly, cctx);
 }
 
 int
-gr_series_zero(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_zero(gr_series_t res, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     res->error = SERIES_ERR_EXACT;
     return gr_poly_zero(&res->poly, cctx);
 }
 
 void
-gr_series_swap(gr_series_t x, gr_series_t y, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_swap(gr_series_t x, gr_series_t y, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t FLINT_UNUSED(cctx))
 {
     gr_series_t tmp;
     *tmp = *x;
@@ -111,7 +117,7 @@ gr_series_swap(gr_series_t x, gr_series_t y, gr_series_ctx_t sctx, gr_ctx_t cctx
 }
 
 int
-gr_series_randtest(gr_series_t res, flint_rand_t state, slong len, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_randtest(gr_series_t res, flint_rand_t state, slong len, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     int status = gr_poly_randtest(&res->poly, state, len, cctx);
 
@@ -127,7 +133,7 @@ gr_series_randtest(gr_series_t res, flint_rand_t state, slong len, gr_series_ctx
 }
 
 int
-gr_series_write(gr_stream_t out, const gr_series_t x, const char * var, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_write(gr_stream_t out, const gr_series_t x, const char * var, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     gr_poly_write(out, &x->poly, var, cctx);
 
@@ -327,7 +333,7 @@ gr_series_set_fmpq(gr_series_t res, const fmpq_t c, gr_series_ctx_t sctx, gr_ctx
 
 
 truth_t
-gr_series_is_zero(const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_is_zero(const gr_series_t x, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     truth_t is_zero;
 
@@ -344,7 +350,7 @@ gr_series_is_zero(const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
 
 /* todo: recursive version */
 int
-gr_series_make_exact(gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_make_exact(gr_series_t x, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t FLINT_UNUSED(cctx))
 {
     x->error = SERIES_ERR_EXACT;
     return GR_SUCCESS;
@@ -369,7 +375,7 @@ _gr_poly_equal2(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx
 }
 
 truth_t
-gr_series_is_one(const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_is_one(const gr_series_t x, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     truth_t is_zero, is_one;
     slong xlen = x->poly.length;
@@ -404,7 +410,7 @@ gr_series_is_one(const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
 
 
 truth_t
-gr_series_equal(const gr_series_t x, const gr_series_t y, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_equal(const gr_series_t x, const gr_series_t y, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     truth_t equal;
     slong len, xlen, ylen, xerr, yerr, err;
@@ -557,7 +563,7 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
 }
 
 truth_t
-gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t cctx)
 {
     if (i >= x->error)
         return T_UNKNOWN;
@@ -1812,7 +1818,7 @@ _gr_gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
 }
 
 static int _gr_gr_series_set(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_set(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
-static void _gr_gr_series_set_shallow(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { *res = *x; }
+static void _gr_gr_series_set_shallow(gr_series_t res, const gr_series_t x, gr_ctx_t FLINT_UNUSED(ctx)) { *res = *x; }
 static int _gr_gr_series_set_si(gr_series_t res, slong c, gr_ctx_t ctx) { return gr_series_set_si(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_set_ui(gr_series_t res, ulong c, gr_ctx_t ctx) { return gr_series_set_ui(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_set_fmpz(gr_series_t res, const fmpz_t c, gr_ctx_t ctx) { return gr_series_set_fmpz(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -1871,9 +1877,9 @@ static int _gr_gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, c
 static int _gr_gr_series_polylog(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_polylog(res, s, z, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_hurwitz_zeta(res, s, z, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 
-static int _gr_gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_dirichlet_l(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
-static int _gr_gr_series_dirichlet_hardy_theta(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_dirichlet_hardy_theta(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
-static int _gr_gr_series_dirichlet_hardy_z(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t z, gr_ctx_t ctx) { return gr_series_dirichlet_hardy_z(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t FLINT_UNUSED(z), gr_ctx_t ctx) { return gr_series_dirichlet_l(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_dirichlet_hardy_theta(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t FLINT_UNUSED(z), gr_ctx_t ctx) { return gr_series_dirichlet_hardy_theta(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_dirichlet_hardy_z(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t s, const gr_series_t FLINT_UNUSED(z), gr_ctx_t ctx) { return gr_series_dirichlet_hardy_z(res, G, chi, s, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 
 static int _gr_gr_series_jacobi_theta(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t res4, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_jacobi_theta(res1, res2, res3, res4, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_jacobi_theta_1(gr_series_t res, const gr_series_t x, const gr_series_t tau, gr_ctx_t ctx) { return gr_series_jacobi_theta_1(res, x, tau, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }

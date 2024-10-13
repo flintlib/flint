@@ -25,6 +25,14 @@
 # include <string.h>
 #endif
 
+/* FIXME: Should these functions be static or not? */
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static const char * default_var = "x";
 
 void
@@ -105,7 +113,7 @@ polynomial_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 }
 
 void
-polynomial_set_shallow(gr_poly_t res, const gr_poly_t x, const gr_ctx_t ctx)
+polynomial_set_shallow(gr_poly_t res, const gr_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }

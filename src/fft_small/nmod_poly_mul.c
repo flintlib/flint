@@ -359,7 +359,7 @@ static void extra_func(void* varg)
     sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
 }
 
-void s1worker_func(void* varg)
+static void s1worker_func(void* varg)
 {
     s1worker_struct* X = (s1worker_struct*) varg;
     ulong i, m;
@@ -432,7 +432,7 @@ typedef struct {
         nmod_t mod);
 } s2worker_struct;
 
-void s2worker_func(void* varg)
+static void s2worker_func(void* varg)
 {
     s2worker_struct* X = (s2worker_struct*) varg;
 
@@ -641,7 +641,7 @@ static void _nmod_poly_mul_mod_xpnm1_naive(
 }
 #endif
 
-void _nmod_poly_mul_mod_xpnm1(
+static void _nmod_poly_mul_mod_xpnm1(
     ulong* z, ulong ztrunc,
     const ulong* a, ulong an,
     const ulong* b, ulong bn,
@@ -787,7 +787,7 @@ typedef struct {
     nmod_t mod;
 } s1pworker_struct;
 
-void s1pworker_func(void* varg)
+static void s1pworker_func(void* varg)
 {
     s1pworker_struct* X = (s1pworker_struct*) varg;
     ulong i, m;
@@ -1003,7 +1003,7 @@ int _nmod_poly_mul_mid_precomp(
     return 1;
 }
 
-void _nmod_poly_mul_mod_xpnm1_precomp(
+static void _nmod_poly_mul_mod_xpnm1_precomp(
     ulong* z, ulong ztrunc,
     const ulong* a, ulong an,
     mul_precomp_struct* M,
@@ -1089,7 +1089,7 @@ void _nmod_poly_mul_mod_xpnm1_precomp(
 
 
 /* z -= a mod x^N-1, write coeffs [0,ztrunc) */
-void _nmod_poly_sub_mod_xpNm1(
+static void _nmod_poly_sub_mod_xpNm1(
     ulong* z, ulong ztrunc,
     const ulong* a, ulong an,
     ulong N, nmod_t mod)
@@ -1311,7 +1311,7 @@ requires k <= l < 3k < h <= 4k
 */
 
 
-void _nmod_poly_mul_mid_unbalanced(
+static void _nmod_poly_mul_mid_unbalanced(
     ulong* z, slong zl, slong zh,
     const ulong* a, slong an,
     const ulong* b, slong bn,

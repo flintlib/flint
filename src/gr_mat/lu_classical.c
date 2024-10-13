@@ -13,7 +13,7 @@
 #include "gr_mat.h"
 
 static void
-_gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+_gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (r != s)
     {

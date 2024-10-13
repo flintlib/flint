@@ -17,7 +17,7 @@
 #include "perm.h"
 
 int
-check_rref_form(slong * perm, TEMPLATE(T, mat_t) A, slong rank,
+check_rref_form(slong * FLINT_UNUSED(perm), TEMPLATE(T, mat_t) A, slong rank,
                 const TEMPLATE(T, ctx_t) ctx)
 {
     slong i, j, k, prev_pivot;

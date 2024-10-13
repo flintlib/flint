@@ -93,7 +93,7 @@ fmpz_mpoly_vec_autoreduction_groebner(fmpz_mpoly_vec_t G, const fmpz_mpoly_vec_t
     {
         fmpz_t scale;
         fmpz_mpoly_struct ** Q, ** B;
-        slong i, j, alloc;
+        slong alloc;
 
         alloc = G->length - 1;
 

@@ -12,8 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "gr_poly.h"
-
-FLINT_DLL extern gr_static_method_table _ca_methods;
+#include "util_test.h"
 
 int
 test_exp_series(flint_rand_t state)

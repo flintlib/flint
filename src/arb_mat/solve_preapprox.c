@@ -16,7 +16,7 @@
  * Helper function to compute a lower bound of 1 - inf_norm(I - A*B).
  * Returns zero when this lower bound is zero.
  */
-int _mag_err_complement(mag_t m,
+static int _mag_err_complement(mag_t m,
     const arb_mat_t A, const arb_mat_t B, slong prec)
 {
     slong n;

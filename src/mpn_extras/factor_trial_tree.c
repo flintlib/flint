@@ -31,7 +31,7 @@ void _tree_mutex_init(void)
 }
 #endif
 
-void _cleanup_trial_tree(void)
+static void _cleanup_trial_tree(void)
 {
     slong i;
 
@@ -41,8 +41,7 @@ void _cleanup_trial_tree(void)
     _factor_trial_tree_initialised = 0;
 }
 
-void
-_factor_trial_tree_init(void)
+static void _factor_trial_tree_init(void)
 {
     slong i, j, k, m, n;
     const mp_limb_t * primes;

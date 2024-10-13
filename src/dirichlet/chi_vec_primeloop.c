@@ -18,7 +18,7 @@ dirichlet_chi_vec_evenpart(ulong *v, const dirichlet_group_t G, const dirichlet_
     if (G->neven >= 1 && chi->log[0])
     {
         ulong x, c3 = G->PHI[0] / mult;
-        for (x = 3; x < nv; x += 4)
+        for (x = 3; x < (ulong) nv; x += 4)
             v[x] = c3;
     }
     if (G->neven == 2 && chi->log[1])
@@ -34,10 +34,10 @@ dirichlet_chi_vec_evenpart(ulong *v, const dirichlet_group_t G, const dirichlet_
         for (x = g; x > 1;)
         {
 
-            for (xp = x; xp < nv; xp += pe.n)
+            for (xp = x; xp < (ulong) nv; xp += pe.n)
                 v[xp] = nmod_add(v[xp], vx, o);
 
-            for (xp = pe.n - x; xp < nv; xp += pe.n)
+            for (xp = pe.n - x; xp < (ulong) nv; xp += pe.n)
                 v[xp] = nmod_add(v[xp], vx, o);
 
             x = nmod_mul(x, g, pe);

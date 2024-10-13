@@ -35,7 +35,7 @@ __TEMPLATE(T, poly_factor1) (TEMPLATE(T, poly_factor_t) res,
         TEMPLATE(T, poly_factor_berlekamp) (res, f, ctx);
 }
 
-void
+static void
 __TEMPLATE(T, poly_factor) (TEMPLATE(T, poly_factor_t) result,
                             TEMPLATE(T, t) leading_coeff,
                             const TEMPLATE(T, poly_t) input,
@@ -94,7 +94,7 @@ __TEMPLATE(T, poly_factor) (TEMPLATE(T, poly_factor_t) result,
     return;
 }
 
-void
+static void
 __TEMPLATE(T, poly_factor_deflation) (TEMPLATE(T, poly_factor_t) result,
                                       TEMPLATE(T, t) leading_coeff,
                                       const TEMPLATE(T, poly_t) input,

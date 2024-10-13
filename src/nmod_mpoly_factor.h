@@ -21,9 +21,10 @@
 #include "nmod_mpoly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
+FLINT_HEADER_START
 
 void nmod_mpoly_get_bpoly(n_bpoly_t A, const nmod_mpoly_t B,
                            slong var0, slong var1, const nmod_mpoly_ctx_t ctx);
@@ -53,7 +54,7 @@ void nmod_mat_init_nullspace_tr(nmod_mat_t X, nmod_mat_t tmp);
 /*****************************************************************************/
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpoly_factor_init(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+void nmod_mpoly_factor_init(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
 {
 	f->constant = 1;
     f->poly  = NULL;
@@ -76,14 +77,14 @@ void nmod_mpoly_factor_clear(nmod_mpoly_factor_t f,
 
 NMOD_MPOLY_FACTOR_INLINE
 slong nmod_mpoly_factor_length(const nmod_mpoly_factor_t f,
-                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                    const nmod_mpoly_ctx_t ctx)
 {
     return f->num;
 }
 
 NMOD_MPOLY_FACTOR_INLINE
 ulong nmod_mpoly_factor_get_constant_ui(const nmod_mpoly_factor_t f,
-                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                    const nmod_mpoly_ctx_t ctx)
 {
     return f->constant;
 }
@@ -104,7 +105,7 @@ void nmod_mpoly_factor_swap_base(nmod_mpoly_t p, nmod_mpoly_factor_t f,
     nmod_mpoly_swap(p, f->poly + i, ctx);
 }
 
-slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f, slong i, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
+slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f, slong i, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_factor_append_ui(nmod_mpoly_factor_t f,
                     const nmod_mpoly_t A, ulong e, const nmod_mpoly_ctx_t ctx);
@@ -158,7 +159,7 @@ int nmod_mpoly_factor_fix_units(nmod_mpoly_factor_t f,
 
 NMOD_MPOLY_FACTOR_INLINE
 void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g,
-                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                    const nmod_mpoly_ctx_t ctx)
 {
    nmod_mpoly_factor_struct t = *f;
    *f = *g;
@@ -166,7 +167,7 @@ void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g,
 }
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpoly_factor_one(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+void nmod_mpoly_factor_one(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
 {
 	f->constant = 1;
 	f->num = 0;
@@ -222,7 +223,7 @@ typedef struct
 typedef nmod_mpolyv_struct nmod_mpolyv_t[1];
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t ctx)
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -231,7 +232,7 @@ void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 
 NMOD_MPOLY_FACTOR_INLINE
 void nmod_mpolyv_swap(nmod_mpolyv_t A, nmod_mpolyv_t B,
-                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                    const nmod_mpoly_ctx_t ctx)
 {
    nmod_mpolyv_struct t = *A;
    *A = *B;
@@ -455,6 +456,8 @@ int n_polyu2n_add_zip_must_match(n_polyun_t Z, const n_bpoly_t A,
 
 int n_polyun_zip_solve(nmod_mpoly_t A, n_polyun_t Z, n_polyun_t H,
                                      n_polyun_t M, const nmod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

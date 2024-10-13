@@ -53,7 +53,7 @@ void TEMPLATE(T, poly_factor_concat)(TEMPLATE(T, poly_factor_t) res,
                                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_factor_pow)(TEMPLATE(T, poly_factor_t) fac, slong exp,
-                                  const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
+                                  const TEMPLATE(T, ctx_t) ctx);
 
 int _TEMPLATE(T, poly_is_squarefree)(const TEMPLATE(T, struct) * f, slong len,
                                  const TEMPLATE(T, ctx_t) ctx);

@@ -28,7 +28,7 @@ typedef struct
 }
 _worker_arg;
 
-void
+static void
 _acb_zeta_powsum_evaluator(void * arg_ptr)
 {
     _worker_arg arg = *((_worker_arg *) arg_ptr);

@@ -310,7 +310,7 @@ fexpr_is_builtin_symbol(const fexpr_t expr, slong i)
 {
     ulong head;
     head = expr->data[0];
-    return (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL) && (((head >> 8) & 0xff) == 0) && (FEXPR_BUILTIN_ID(head) == i);
+    return (FEXPR_TYPE(head) == FEXPR_TYPE_SMALL_SYMBOL) && (((head >> 8) & 0xff) == 0) && (FEXPR_BUILTIN_ID(head) == (ulong) i);
 }
 
 /* todo: document, test */

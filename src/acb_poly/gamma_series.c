@@ -12,6 +12,12 @@
 #include "arb_poly.h"
 #include "acb_poly.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void acb_gamma_stirling_bound(mag_ptr err, const acb_t x, slong k0, slong knum, slong n);
 
 void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
@@ -73,7 +79,7 @@ bsplit(acb_ptr Q, acb_ptr T, const acb_t z, slong a, slong b, slong num, slong p
     }
 }
 
-void
+static void
 _acb_poly_log_cpx_series(acb_ptr res, const acb_t c, slong num, slong prec)
 {
     slong i;

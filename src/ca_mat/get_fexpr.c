@@ -15,6 +15,13 @@
 #include "ca_ext.h"
 #include "ca_mat.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "ca_mat_get_fexpr is currently unused/untested/undocumented!"
+#endif
+
 void _ca_default_variables(fexpr_ptr ext_vars, slong num_ext);
 
 void _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,

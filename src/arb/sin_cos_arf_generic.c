@@ -19,6 +19,13 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "arb_sin_cos_taylor_sum_rs only needs a symbol for test"
+#endif
+
 /* Computes sin(x) or cos(x) using Taylor series truncated at x^N exclusive.
    Computes error bound automatically. Does not allow aliasing of s and x.  */
 void

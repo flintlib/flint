@@ -14,18 +14,13 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-/*
-    For documentation, see fmpz_poly/mul_karatsuba.c
- */
+/* For documentation, see fmpz_poly/mul_karatsuba.c */
+void revbin1(fmpz * out, const fmpz * in, slong len, slong bits);
+void revbin2(fmpz * out, const fmpz * in, slong len, slong bits);
+void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
 
-extern void revbin1(fmpz * out, const fmpz * in, slong len, slong bits);
-
-extern void revbin2(fmpz * out, const fmpz * in, slong len, slong bits);
-
-extern void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
-
-void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
-                                   fmpz * temp, slong bits)
+static void
+_fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev, fmpz * temp, slong bits)
 {
     slong len = (WORD(1) << bits);
     slong m = len / 2;

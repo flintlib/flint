@@ -12,7 +12,7 @@
 #include "dlog.h"
 
 void
-dlog_precomp_small_init(dlog_precomp_t pre, ulong a, ulong mod, ulong n, ulong num)
+dlog_precomp_small_init(dlog_precomp_t pre, ulong a, ulong mod, ulong n, ulong FLINT_UNUSED(num))
 {
     if (n <= 3)
     {

@@ -16,8 +16,7 @@
 ulong
 dlog_1modpe_1modp(ulong b1, ulong p, ulong e, ulong inv1p, nmod_t pe)
 {
-    int f;
-    ulong x, xf, pf, pf1;
+    ulong f, x, xf, pf, pf1;
     pf1 = 1;
     pf = p;
     x = 0;

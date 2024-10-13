@@ -12,7 +12,7 @@
 #include "arb.h"
 #include "arb_mat.h"
 
-slong
+static slong
 arb_mat_gauss_partial(arb_mat_t A, slong prec)
 {
     arb_t e;
@@ -59,7 +59,7 @@ arb_mat_gauss_partial(arb_mat_t A, slong prec)
     return rank * sign;
 }
 
-void
+static void
 arb_vec_get_arf_2norm_squared_bound(arf_t s, arb_srcptr vec, slong len, slong prec)
 {
     slong i;
@@ -77,7 +77,7 @@ arb_vec_get_arf_2norm_squared_bound(arf_t s, arb_srcptr vec, slong len, slong pr
     arf_clear(t);
 }
 
-void
+static void
 arb_mat_det_lu_inplace(arb_t det, arb_mat_t A, slong prec)
 {
     slong i, n, sign, rank;

@@ -13,6 +13,12 @@
 #include "thread_support.h"
 #include "gr_vec.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     gr_method_vec_reduce_op f;

@@ -16,7 +16,7 @@
 
 static int
 acb_theta_ql_a0_naive_gen(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
-    arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
+    arb_srcptr d, const acb_mat_t tau, slong FLINT_UNUSED(guard), slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -72,7 +72,7 @@ acb_theta_ql_a0_naive_gen(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
    relatively more expensive */
 static int
 acb_theta_ql_a0_naive_g1(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
-    arb_srcptr d, const acb_mat_t tau, slong guard, slong prec)
+    arb_srcptr d, const acb_mat_t tau, slong FLINT_UNUSED(guard), slong prec)
 {
     int hast = !acb_is_zero(t);
     int hasz = !acb_is_zero(z);

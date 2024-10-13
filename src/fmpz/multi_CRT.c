@@ -377,17 +377,17 @@ int fmpz_multi_CRT_precompute(
 
     for (i = r, j = 0; j < 2*r - 4; i++, j += 2)
     {
-        slong s, minp;
+        slong sx, minp;
         const fmpz * mind;
 
         minp = j;
         mind = v + j;
-        for (s = j + 1; s < i; s++)
+        for (sx = j + 1; sx < i; sx++)
         {
-            if (fmpz_cmp(v + s, mind) < 0)
+            if (fmpz_cmp(v + sx, mind) < 0)
             {
-                mind = v + s;
-                minp = s;
+                mind = v + sx;
+                minp = sx;
             }
         }
         fmpz_swap(v + j, v + minp);
@@ -395,12 +395,12 @@ int fmpz_multi_CRT_precompute(
 
         minp = j + 1;
         mind = v + j + 1;
-        for (s = j + 2; s < i; s++)
+        for (sx = j + 2; sx < i; sx++)
         {
-            if (fmpz_cmp(v + s, mind) < 0)
+            if (fmpz_cmp(v + sx, mind) < 0)
             {
-                mind = v + s;
-                minp = s;
+                mind = v + sx;
+                minp = sx;
             }
         }
         fmpz_swap(v + j + 1, v + minp);

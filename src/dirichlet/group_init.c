@@ -31,7 +31,7 @@ primitive_root_p_and_p2(ulong p)
     return n_primitive_root_prime(p);
 }
 
-void
+static void
 dirichlet_prime_group_init(dirichlet_prime_group_struct * P, ulong p, int e)
 {
     P->p = p;

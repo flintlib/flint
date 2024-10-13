@@ -148,7 +148,9 @@ TEST_FUNCTION_START(arb_pos_times_posinf, state)
 
                 for(k = 0; test_values_arb[k].value != NULL; ++k)
                 {
-                    value_type vw = test_values_arb[k].type, expected = addition[vw][multiplication[vt][vu]];
+                    value_type vw = test_values_arb[k].type;
+
+                    expected = addition[vw][multiplication[vt][vu]];
                     arb_set_str(w, test_values_arb[k].value, prec);
 
                     arb_addmul(w, t, u, prec);

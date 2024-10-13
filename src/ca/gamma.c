@@ -11,6 +11,7 @@
 
 #include "ca.h"
 
+#if 0
 void
 ca_gamma_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
@@ -23,8 +24,9 @@ ca_gamma_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
         _ca_function_fx(res, CA_Gamma, x, ctx);
     }
 }
+#endif
 
-void
+static void
 _ca_gamma_verbatim(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     ca_t y, tmp;
@@ -39,7 +41,7 @@ _ca_gamma_verbatim(ca_t res, const ca_t x, ca_ctx_t ctx)
     ca_clear(tmp, ctx);
 }
 
-truth_t
+static truth_t
 ca_re_is_positive(const ca_t x, ca_ctx_t ctx)
 {
     ca_t t, u;

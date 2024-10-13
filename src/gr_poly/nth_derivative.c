@@ -46,7 +46,7 @@ gr_poly_nth_derivative(gr_poly_t res, const gr_poly_t poly, ulong n, gr_ctx_t ct
     int status;
     const slong len = poly->length;
 
-    if (len <= n)
+    if ((ulong) len <= n)
     {
         status = gr_poly_zero(res, ctx);
     }

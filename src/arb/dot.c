@@ -16,6 +16,12 @@
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void mpfr_mulhigh_n(nn_ptr rp, nn_srcptr np, nn_srcptr mp, slong n);
 void mpfr_sqrhigh_n(nn_ptr rp, nn_srcptr np, slong n);
 
@@ -622,7 +628,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
 
             shift = sum_exp - xexp;
 
-            if (shift >= sn * FLINT_BITS)
+            if (shift >= (ulong) sn * FLINT_BITS)
             {
                 serr++;
             }
@@ -669,7 +675,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
             exp = xexp + yexp;
             shift = sum_exp - exp;
 
-            if (shift >= sn * FLINT_BITS)
+            if (shift >= (ulong) sn * FLINT_BITS)
             {
                 /* We may yet need the top limbs for bounds. */
                 ARF_GET_TOP_LIMB(xtop, xm);

@@ -27,6 +27,7 @@
  *
  *****************************************************************************/
 
+#if 0
 /*
     Display a relation for debugging purposes
 */
@@ -47,11 +48,13 @@ void qsieve_display_relation(qs_t qs_inf, relation_t a)
     fmpz_print(a.Y);
     flint_printf("\n");
 }
+#endif
 
+#if 0
 /*
     Check a relation is valid (debugging)
 */
-int qsieve_is_relation(qs_t qs_inf, relation_t a)
+static int qsieve_is_relation(qs_t qs_inf, relation_t a)
 {
     slong i;
     fmpz_t temp, temp2;
@@ -92,6 +95,7 @@ int qsieve_is_relation(qs_t qs_inf, relation_t a)
 
     return 1;
 }
+#endif
 
 /*
     Write partial or full relation to file
@@ -642,7 +646,7 @@ int qsieve_process_relation(qs_t qs_inf)
     flint_printf("Sorting relations\n");
 #endif
 
-    if (rlist_length < qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels)
+    if (rlist_length < qs_inf->num_primes + (slong) qs_inf->ks_primes + qs_inf->extra_rels)
     {
        qs_inf->edges -= 100;
        done = 0;

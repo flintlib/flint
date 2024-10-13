@@ -35,7 +35,7 @@ ca_mat_adjugate_cofactor(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx)
 
     if (n == 2)
     {
-        ca_t t, u;
+        ca_t u;
         ca_init(t, ctx);
         ca_init(u, ctx);
         ca_mul(t, ca_mat_entry(A, 0, 0), ca_mat_entry(A, 1, 1), ctx);

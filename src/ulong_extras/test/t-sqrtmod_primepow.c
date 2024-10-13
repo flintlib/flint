@@ -14,9 +14,10 @@
 
 TEST_FUNCTION_START(n_sqrtmod_primepow, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod a power of 2 */
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++) /* Test random squares mod a power of 2 */
     {
         ulong a, b, p, pow, pow2, pinv;
         slong exp, num, i;
@@ -67,7 +68,7 @@ TEST_FUNCTION_START(n_sqrtmod_primepow, state)
         flint_free(sqrt);
     }
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod other prime powers */
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++) /* Test random squares mod other prime powers */
     {
         ulong a, b, p, pow, pow2, pinv;
         slong exp, maxexp, num, i;
@@ -123,7 +124,7 @@ TEST_FUNCTION_START(n_sqrtmod_primepow, state)
         flint_free(sqrt);
     }
 
-    for (i = 0; i < 500 * flint_test_multiplier(); i++) /* Test random nonsquares */
+    for (ix = 0; ix < 500 * flint_test_multiplier(); ix++) /* Test random nonsquares */
     {
         ulong a, b, p, pow, pinv;
         slong exp, maxexp;

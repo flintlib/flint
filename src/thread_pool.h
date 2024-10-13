@@ -87,7 +87,7 @@ void thread_pool_clear(thread_pool_t T);
 
 void _thread_pool_distribute_work_2(slong start, slong stop,
                                     slong * Astart, slong * Astop, slong Alen,
-                                    slong * Bstart, slong * Bstop, slong FLINT_UNUSED(Blen));
+                                    slong * Bstart, slong * Bstop, slong Blen);
 
 ulong _thread_pool_find_work_2(ulong a, ulong alpha,
                                       ulong b, ulong beta, ulong yn, ulong yd);

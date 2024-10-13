@@ -16,7 +16,7 @@
 
 /* todo: other algorithms; specializations */
 
-int
+static int
 gr_rising_ui_forward(gr_ptr res, gr_srcptr x, ulong n, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -172,11 +172,11 @@ gr_generic_bin_uiui(gr_ptr res, ulong n, ulong k, gr_ctx_t ctx)
 
         if (status != GR_SUCCESS)
         {
-            fmpz_t t;
-            fmpz_init(t);
-            fmpz_bin_uiui(t, n, k);
-            status = gr_set_fmpz(res, t, ctx);
-            fmpz_clear(t);
+            fmpz_t tf;
+            fmpz_init(tf);
+            fmpz_bin_uiui(tf, n, k);
+            status = gr_set_fmpz(res, tf, ctx);
+            fmpz_clear(tf);
         }
     }
 
@@ -248,7 +248,7 @@ gr_generic_bin_ui_vec(gr_ptr res, ulong n, slong len, gr_ctx_t ctx)
     if (len == 1)
         return gr_one(res, ctx);
 
-    m = FLINT_MIN(len - 1, n / 2) + 1;
+    m = FLINT_MIN(len - 1, (slong) (n / 2)) + 1;
 
     finite_char = gr_ctx_is_finite_characteristic(ctx);
 
@@ -309,11 +309,11 @@ gr_generic_bin_ui_vec(gr_ptr res, ulong n, slong len, gr_ctx_t ctx)
     /* todo: vec reverse */
     if (m < len)
     {
-        for (i = m; i <= FLINT_MIN(n, len - 1); i++)
+        for (i = m; i <= FLINT_MIN((slong) n, len - 1); i++)
             status |= gr_set(GR_ENTRY(res, i, sz), GR_ENTRY(res, n - i, sz), ctx);
     }
 
-    if (len - 1 > n)
+    if ((ulong) len - 1 > n)
         status |= _gr_vec_zero(GR_ENTRY(res, n + 1, sz), len - 1 - n, ctx);
 
     return status;

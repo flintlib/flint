@@ -24,6 +24,12 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define FQ_CTX(ring_ctx) ((fq_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
 static const char * default_var = "a";
@@ -36,7 +42,7 @@ _gr_fq_ctx_clear(gr_ctx_t ctx)
 }
 
 int
-_gr_fq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+_gr_fq_ctx_write(gr_stream_t out, gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write(out, "Finite field (fq)");
     return GR_SUCCESS;
@@ -70,7 +76,7 @@ _gr_fq_clear(fq_t x, const gr_ctx_t ctx)
 }
 
 void
-_gr_fq_swap(fq_t x, fq_t y, const gr_ctx_t ctx)
+_gr_fq_swap(fq_t x, fq_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fq_t t;
     *t = *x;
@@ -79,7 +85,7 @@ _gr_fq_swap(fq_t x, fq_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_fq_set_shallow(fq_t res, const fq_t x, const gr_ctx_t ctx)
+_gr_fq_set_shallow(fq_t res, const fq_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -625,7 +631,7 @@ _gr_fq_poly_mullow(fq_struct * res,
 /* todo: implement generically */
 
 int
-_gr_fq_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_fq_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;

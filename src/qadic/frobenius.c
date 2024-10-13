@@ -194,7 +194,7 @@ _fmpz_mod_poly_compose_smod_horner(fmpz *rop,
     Does not support aliasing.
  */
 
-void
+static void
 _fmpz_mod_poly_compose_smod(fmpz *rop,
                            const fmpz *op1, slong len1,
                            const fmpz *op2, slong len2,

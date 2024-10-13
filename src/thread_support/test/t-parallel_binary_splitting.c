@@ -27,13 +27,13 @@ typedef struct
 product_args_t;
 
 static void
-product_init(product_res_t * x, product_args_t * args)
+product_init(product_res_t * x, product_args_t * FLINT_UNUSED(args))
 {
     fmpz_init(&x->r);
 }
 
 static void
-product_clear(product_res_t * x, product_args_t * args)
+product_clear(product_res_t * x, product_args_t * FLINT_UNUSED(args))
 {
     fmpz_clear(&x->r);
 }

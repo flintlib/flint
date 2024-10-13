@@ -45,7 +45,6 @@ _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n)
         }
         else
         {
-            slong i;
             fmpz_t d, one;
             *one = 1;
 

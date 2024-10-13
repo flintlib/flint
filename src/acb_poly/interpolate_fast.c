@@ -60,7 +60,7 @@ _acb_poly_interpolate_fast_precomp(acb_ptr poly,
     for (i = 0; i < len; i++)
         acb_mul(poly + i, weights + i, ys + i, prec);
 
-    for (i = 0; i < FLINT_CLOG2(len); i++)
+    for (i = 0; i < (slong) FLINT_CLOG2(len); i++)
     {
         pow = (WORD(1) << i);
         pa = tree[i];

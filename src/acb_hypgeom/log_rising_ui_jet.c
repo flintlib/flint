@@ -26,7 +26,8 @@ _acb_log_rising_correct_branch(acb_t res,
     acb_t f;
     arb_t pi, u, v;
     fmpz_t pi_mult;
-    slong i, argprec;
+    slong argprec;
+    ulong i;
 
     acb_init(f);
 
@@ -86,7 +87,7 @@ _acb_log_rising_correct_branch(acb_t res,
     fmpz_clear(pi_mult);
 }
 
-void
+static void
 acb_hypgeom_log_rising_ui_jet_fallback(acb_ptr res, const acb_t z, slong r, slong len, slong prec)
 {
     acb_t t;
@@ -113,7 +114,8 @@ void
 acb_hypgeom_log_rising_ui_jet(acb_ptr res, const acb_t z, ulong r, slong len, slong prec)
 {
     double za, zb, sa, sb, ta, tb, ma, mb, zak;
-    slong k, correction;
+    slong correction;
+    ulong k;
     int neg;
 
     if (r == 0 || len == 0)
@@ -142,7 +144,7 @@ acb_hypgeom_log_rising_ui_jet(acb_ptr res, const acb_t z, ulong r, slong len, sl
         if (arb_is_positive(acb_realref(z)))
         {
             acb_hypgeom_rising_ui_jet(res, z, r, len, prec);
-            _acb_poly_log_series(res, res, FLINT_MIN(len, r + 1), len, prec);
+            _acb_poly_log_series(res, res, FLINT_MIN((ulong) len, r + 1), len, prec);
         }
         else if (arb_contains_int(acb_realref(z)))
         {
@@ -164,8 +166,8 @@ acb_hypgeom_log_rising_ui_jet(acb_ptr res, const acb_t z, ulong r, slong len, sl
             arb_mul(t, u, t, prec);
 
             acb_hypgeom_rising_ui_jet(res, z, r, len, prec);
-            _acb_vec_neg(res, res, FLINT_MIN(len, r + 1));
-            _acb_poly_log_series(res, res, FLINT_MIN(len, r + 1), len, prec);
+            _acb_vec_neg(res, res, FLINT_MIN((ulong) len, r + 1));
+            _acb_poly_log_series(res, res, FLINT_MIN((ulong) len, r + 1), len, prec);
 
             arb_swap(acb_imagref(res), t);
 
@@ -262,8 +264,8 @@ acb_hypgeom_log_rising_ui_jet(acb_ptr res, const acb_t z, ulong r, slong len, sl
     {
         acb_hypgeom_rising_ui_jet(res, z, r, len, prec);
         if (neg)
-            _acb_vec_neg(res, res, FLINT_MIN(len, r + 1));
-        _acb_poly_log_series(res, res, FLINT_MIN(len, r + 1), len, prec);
+            _acb_vec_neg(res, res, FLINT_MIN((ulong) len, r + 1));
+        _acb_poly_log_series(res, res, FLINT_MIN((ulong) len, r + 1), len, prec);
     }
 
     if (zb < 0.0)

@@ -45,7 +45,7 @@ fexpr_get_fmpz(fmpz_t c, const fexpr_t x)
         if (nlimbs == 1 && x->data[1] <= COEFF_MAX)
         {
             _fmpz_demote(c);
-            *c = negative ? (-(slong) x->data[1]) : x->data[1];
+            *c = negative ? -x->data[1] : x->data[1];
         }
         else
         {

@@ -27,7 +27,7 @@ void n_fq_poly_product_roots_n_fq(
     const ulong * monomials,
     slong mlength,
     const fq_nmod_ctx_t ctx,
-    n_poly_stack_t St)
+    n_poly_stack_t FLINT_UNUSED(St))
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong i;

@@ -15,8 +15,7 @@
 ulong
 dlog_power(const dlog_power_t t, ulong b)
 {
-    int k;
-    ulong x, pk[30]; /* 3^30*2+1, 2^30*3+1 are primes */
+    ulong k, x, pk[30]; /* 3^30*2+1, 2^30*3+1 are primes */
 
     pk[0] = 1;
 

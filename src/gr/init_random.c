@@ -39,7 +39,7 @@ _gr_random_base_ring(flint_rand_t state)
     return _gr_some_base_rings + n_randint(state, sizeof(_gr_some_base_rings) / sizeof(gr_ctx_struct));
 }
 
-void
+static void
 gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
 {
     gr_ctx_struct * base_ring = _gr_random_base_ring(state);
@@ -75,7 +75,7 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
     }
 }
 
-void
+static void
 gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t t;
@@ -101,7 +101,7 @@ gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
     }
 }
 
-void
+static void
 gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t t;
@@ -126,7 +126,7 @@ gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
     fmpz_clear(t);
 }
 
-void
+static void
 gr_ctx_init_random_ring_number_field(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_poly_t g;
@@ -149,7 +149,7 @@ gr_ctx_init_random_ring_number_field(gr_ctx_t ctx, flint_rand_t state)
     fmpq_poly_clear(f);
 }
 
-void
+static void
 gr_ctx_init_random_ring_real_complex_ball(gr_ctx_t ctx, flint_rand_t state)
 {
     if (n_randint(state, 2))
@@ -158,7 +158,7 @@ gr_ctx_init_random_ring_real_complex_ball(gr_ctx_t ctx, flint_rand_t state)
         gr_ctx_init_complex_acb(ctx, 2 + n_randint(state, 200));
 }
 
-void
+static void
 gr_ctx_init_random_ring_real_complex_exact(gr_ctx_t ctx, flint_rand_t state)
 {
     switch (n_randint(state, 4))

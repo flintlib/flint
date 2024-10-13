@@ -18,7 +18,7 @@
 
 static void
 worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len,
-    const acb_t cofactor, const slong * coords, slong ord, slong g, slong prec, slong fullprec)
+    const acb_t cofactor, const slong * coords, slong FLINT_UNUSED(ord), slong g, slong prec, slong fullprec)
 {
     slong n = 1 << g;
     acb_ptr v3, aux, sums_1, sums_2, diffs;

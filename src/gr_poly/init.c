@@ -11,7 +11,7 @@
 
 #include "gr_poly.h"
 
-void gr_poly_init(gr_poly_t poly, gr_ctx_t ctx)
+void gr_poly_init(gr_poly_t poly, gr_ctx_t FLINT_UNUSED(ctx))
 {
     poly->coeffs = NULL;
     poly->length = 0;

@@ -106,7 +106,7 @@ void mpoly_univar_init2(mpoly_univar_t A, slong len, mpoly_void_ring_t R)
     A = prem(A, -B)
     C is used for working space
 */
-void mpoly_univar_prem(
+static void mpoly_univar_prem(
     mpoly_univar_t A,
     const mpoly_univar_t B,
     mpoly_univar_t C,
@@ -758,7 +758,7 @@ done:
 
 
 
-void mpoly_univar_derivative(
+static void mpoly_univar_derivative(
     mpoly_univar_t A,
     const mpoly_univar_t B,
     mpoly_void_ring_t R)

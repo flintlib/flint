@@ -16,7 +16,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
+static slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
@@ -353,7 +353,7 @@ exp_overflow:
 }
 
 
-slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
+static slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
   fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
                   ulong ** expr, slong * allocr, const fmpz * poly2,
    const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,

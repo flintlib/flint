@@ -12,7 +12,7 @@
 #include "arf.h"
 #include "hypgeom.h"
 
-slong
+static slong
 hypgeom_root_bound(const mag_t z, int r)
 {
     if (r == 0)
@@ -48,7 +48,7 @@ z^n *
 -----------------------    * ((K+m)! / K!)^(1-r)
 (K-B)! (K-A+m)! (K-2B+m)!
 */
-void
+static void
 hypgeom_term_bound(mag_t Tn, const mag_t TK, slong K, slong A, slong B, int r, const mag_t z, slong n)
 {
     mag_t t, u, num;

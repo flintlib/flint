@@ -14,7 +14,7 @@
 void
 dirichlet_char_first_primitive(dirichlet_char_t x, const dirichlet_group_t G)
 {
-    ulong k;
+    slong k;
     if (G->q % 4 == 2)
     {
         flint_throw(FLINT_ERROR, "Exception (dirichlet_char_first_primitive). No primitive element mod %wu.\n",G->q);

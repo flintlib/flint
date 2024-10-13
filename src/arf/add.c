@@ -11,7 +11,7 @@
 
 #include "arf.h"
 
-int
+static int
 arf_add_special(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
 {
     if (arf_is_zero(x))

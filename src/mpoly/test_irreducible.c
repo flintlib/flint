@@ -409,7 +409,7 @@ again:
 #endif
 
 /* is A intersect B empty? */
-int point2d_set_disjoint(
+static int point2d_set_disjoint(
     const point2d_set_t A,
     const point2d_set_t B)
 {
@@ -544,11 +544,11 @@ static int convex_hull_is_indecomposable(
 
     if (nV == 3)
     {
-        ulong g = FLINT_ABS(V[2].x - V[0].x);
-        g = n_gcd(g, FLINT_ABS(V[2].y - V[0].y));
-        g = n_gcd(g, FLINT_ABS(V[1].x - V[0].x));
-        g = n_gcd(g, FLINT_ABS(V[1].y - V[0].y));
-        return g == 1;
+        ulong h = FLINT_ABS(V[2].x - V[0].x);
+        h = n_gcd(h, FLINT_ABS(V[2].y - V[0].y));
+        h = n_gcd(h, FLINT_ABS(V[1].x - V[0].x));
+        h = n_gcd(h, FLINT_ABS(V[1].y - V[0].y));
+        return h == 1;
     }
 
     /*

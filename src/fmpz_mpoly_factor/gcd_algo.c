@@ -27,7 +27,7 @@
     If ignore[j] is nonzero, then out[j] need not be calculated, probably
     because we shouldn't calculate it in dense form.
 */
-void fmpz_mpoly_evals(
+static void fmpz_mpoly_evals(
     nmod_poly_struct * out,
     const int * ignore,
     const fmpz_mpoly_t A,
@@ -156,7 +156,7 @@ void fmpz_mpoly_evals(
         slong * LUToffset, * LUTvar;
         ulong * LUTvalue, * LUTvalueinv;
         ulong * vieval;
-        ulong t, xpoweval, xinvpoweval;
+        ulong xpoweval, xinvpoweval;
 
         LUToffset   = (slong *) flint_malloc(N*FLINT_BITS*sizeof(slong));
         LUTmask     = (ulong *) flint_malloc(N*FLINT_BITS*sizeof(ulong));
@@ -234,7 +234,7 @@ void fmpz_mpoly_evals(
 }
 
 
-void _set_estimates(
+static void _set_estimates(
     mpoly_gcd_info_t I,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,

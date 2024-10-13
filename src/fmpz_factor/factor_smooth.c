@@ -36,7 +36,7 @@ static slong ecm_tuning[][3] =
     {100, 470000, 430}
 };
 
-int _is_prime(const fmpz_t n, int proved)
+static int _is_prime(const fmpz_t n, int proved)
 {
     if (proved)
         return fmpz_is_prime(n);
@@ -44,7 +44,7 @@ int _is_prime(const fmpz_t n, int proved)
     	return fmpz_is_probabprime(n);
 }
 
-void remove_found_factors(fmpz_factor_t factor, fmpz_t n, fmpz_t f)
+static void remove_found_factors(fmpz_factor_t factor, fmpz_t n, fmpz_t f)
 {
     slong i;
     fmpz_factor_t fac;
@@ -70,7 +70,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     mpz_ptr xsrc;
     nn_ptr xd;
     slong xsize;
-    slong found;
+    int found;
     slong trial_stop;
     slong * idx;
     slong i, b, bits2, istride;
@@ -215,7 +215,6 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
             }
             else if (bits >= 16) /* trial factored already up to 15 bits */
             {
-                int found;
                 flint_rand_t state;
 
                 fmpz_init(f);

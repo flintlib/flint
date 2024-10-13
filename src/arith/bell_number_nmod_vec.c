@@ -21,10 +21,10 @@ arith_bell_number_nmod_vec(nn_ptr b, slong len, nmod_t mod)
     }
     else
     {
-        if (mod.n >= len && arith_bell_number_nmod_vec_series(b, len, mod))
+        if (mod.n >= (ulong) len && arith_bell_number_nmod_vec_series(b, len, mod))
             return;
 
-        if (len < 500 + NMOD_BITS(mod) * NMOD_BITS(mod))
+        if ((ulong) len < 500 + NMOD_BITS(mod) * NMOD_BITS(mod))
             arith_bell_number_nmod_vec_recursive(b, len, mod);
         else
             arith_bell_number_nmod_vec_ogf(b, len, mod);

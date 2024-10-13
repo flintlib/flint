@@ -229,7 +229,7 @@ slong _padic_log_bound(slong v, slong N, const fmpz_t p);
 void _padic_log(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N);
 void _padic_log_rectangular(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N);
 void _padic_log_satoh(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N);
-void _padic_log_balanced(fmpz_t z, const fmpz_t y, slong FLINT_UNUSED(v), const fmpz_t p, slong N);
+void _padic_log_balanced(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N);
 
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);

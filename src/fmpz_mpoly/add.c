@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_add1(
+static slong _fmpz_mpoly_add1(
     fmpz * Acoeffs, ulong * Aexps,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
     const fmpz * Ccoeffs, const ulong * Cexps, slong Clen,
@@ -130,7 +130,7 @@ slong _fmpz_mpoly_add(
     return k;
 }
 
-void fmpz_mpoly_add_inplace(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+static void fmpz_mpoly_add_inplace(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, s, new_len, N;

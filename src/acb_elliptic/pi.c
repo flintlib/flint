@@ -16,7 +16,7 @@
 /* Evaluation on -pi/2 <= re(z) <= pi/2, no aliasing. */
 /* s*(RF(x,y,1) + n*s^2*RJ(x,y,1,p)/3), x = c^2, y=1-m*s^2, p=1-n*s^2 */
 /* complete: c = 0, s = 1 */
-void
+static void
 acb_elliptic_pi_reduced(acb_t r, const acb_t n,
     const acb_t z, const acb_t m, int times_pi, slong prec)
 {

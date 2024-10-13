@@ -14,7 +14,7 @@
 
 #define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
 
-ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)
+static ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)
 {
     ulong n[2];
     ulong sqrt[2];

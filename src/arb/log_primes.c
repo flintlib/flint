@@ -20,6 +20,12 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define HAVE_64_BIT (FLINT_BITS == 64)
 
 /* one coefficient doesn't fit in 64 bits */
@@ -473,7 +479,7 @@ arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 FLINT_TLS_PREFIX arb_struct _arb_log_p_cache[ARB_LOG_PRIME_CACHE_NUM];
 FLINT_TLS_PREFIX slong _arb_log_p_cache_prec = 0;
 
-void _arb_log_p_cleanup(void)
+static void _arb_log_p_cleanup(void)
 {
     slong i;
     for (i = 0; i < ARB_LOG_PRIME_CACHE_NUM; i++)
@@ -654,7 +660,7 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
     for (i = ln; i < n; i++)
     {
-        double best = 100, t;
+        double best = 100, td;
         slong xa, xb, ya, yb;
         slong best_j = 0;
 
@@ -666,11 +672,11 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
             ya = small_gaussian_primes[2 * j];
             yb = small_gaussian_primes[2 * j + 1];
 
-            t = (xb*ya - xa*yb) / (double) (xa*ya + xb*yb);
+            td = (xb*ya - xa*yb) / (double) (xa*ya + xb*yb);
 
-            if (fabs(t) < best)
+            if (fabs(td) < best)
             {
-                best = fabs(t);
+                best = fabs(td);
                 best_j = j;
             }
         }
@@ -694,7 +700,7 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 FLINT_TLS_PREFIX arb_struct _arb_atan_gauss_p_cache[ARB_ATAN_GAUSS_PRIME_CACHE_NUM];
 FLINT_TLS_PREFIX slong _arb_atan_gauss_p_cache_prec = 0;
 
-void _arb_atan_gauss_p_cleanup(void)
+static void _arb_atan_gauss_p_cleanup(void)
 {
     slong i;
     for (i = 0; i < ARB_ATAN_GAUSS_PRIME_CACHE_NUM; i++)

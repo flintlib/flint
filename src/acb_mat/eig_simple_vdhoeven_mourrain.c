@@ -13,7 +13,7 @@
 #include "acb_mat.h"
 
 /* todo: move out */
-void
+static void
 acb_mat_inf_norm(arb_t res, const acb_mat_t A, slong prec)
 {
     slong i, j, m, n;
@@ -125,7 +125,7 @@ diagonal_certify(arb_t epsilon, arb_t eta1, arb_t eta2, const acb_mat_t D, const
 int
 acb_mat_eig_simple_vdhoeven_mourrain(acb_ptr E,
     acb_mat_t L, acb_mat_t R, const acb_mat_t A,
-    acb_srcptr E_approx, const acb_mat_t R_approx, slong prec)
+    acb_srcptr FLINT_UNUSED(E_approx), const acb_mat_t R_approx, slong prec)
 {
     acb_mat_t D, T, AT;
     int result;

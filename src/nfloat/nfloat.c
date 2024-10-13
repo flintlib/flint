@@ -76,7 +76,7 @@ _nfloat_vec_init(nfloat_ptr res, slong len, gr_ctx_t ctx)
 }
 
 void
-_nfloat_vec_clear(nfloat_ptr res, slong len, gr_ctx_t ctx)
+_nfloat_vec_clear(nfloat_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
@@ -204,7 +204,7 @@ nfloat_nan(nfloat_ptr res, gr_ctx_t ctx)
 }
 
 int
-_nfloat_underflow(nfloat_ptr res, int sgnbit, gr_ctx_t ctx)
+_nfloat_underflow(nfloat_ptr res, int FLINT_UNUSED(sgnbit), gr_ctx_t ctx)
 {
     if (!(NFLOAT_CTX_FLAGS(ctx) & NFLOAT_ALLOW_UNDERFLOW))
         return GR_UNABLE;
@@ -639,7 +639,7 @@ nfloat_sgn(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 }
 
 int
-nfloat_im(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
+nfloat_im(nfloat_ptr res, nfloat_srcptr FLINT_UNUSED(x), gr_ctx_t ctx)
 {
     return nfloat_zero(res, ctx);
 }
@@ -1743,7 +1743,7 @@ nfloat_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _nfloat_vec_aors_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtract, slong len, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -1802,7 +1802,7 @@ _nfloat_vec_aors_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtrac
     return status;
 }
 
-int
+static int
 _nfloat_vec_aors_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtract, slong len, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -1861,7 +1861,7 @@ _nfloat_vec_aors_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtrac
     return status;
 }
 
-int
+static int
 _nfloat_vec_aors_3(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtract, slong len, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -1920,7 +1920,7 @@ _nfloat_vec_aors_3(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtrac
     return status;
 }
 
-int
+static int
 _nfloat_vec_aors_4(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtract, slong len, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -2186,7 +2186,7 @@ nfloat_sqr(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _nfloat_vec_mul_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -2282,7 +2282,7 @@ _nfloat_vec_mul_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, g
     return status;
 }
 
-int
+static int
 _nfloat_vec_mul_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -2427,7 +2427,7 @@ _nfloat_vec_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
     return status;
 }
 
-int
+static int
 _nfloat_vec_mul_scalar_1(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -2487,7 +2487,7 @@ _nfloat_vec_mul_scalar_1(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcp
     return status;
 }
 
-int
+static int
 _nfloat_vec_mul_scalar_2(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -2624,7 +2624,7 @@ nfloat_submul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 }
 
 /* No infs or nans allowed by context; y != 0 */
-int
+static int
 _nfloat_vec_aorsmul_scalar_1(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
 {
     slong yexp, rexp, texp;
@@ -2692,7 +2692,7 @@ _nfloat_vec_aorsmul_scalar_1(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_
 }
 
 /* No infs or nans allowed by context; y != 0 */
-int
+static int
 _nfloat_vec_aorsmul_scalar_2(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
 {
     slong yexp, rexp, texp;
@@ -2764,7 +2764,7 @@ _nfloat_vec_aorsmul_scalar_2(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_
 }
 
 /* No infs or nans allowed by context; y != 0 */
-int
+static int
 _nfloat_vec_aorsmul_scalar_3(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
 {
     slong yexp, rexp, texp;
@@ -2819,7 +2819,7 @@ _nfloat_vec_aorsmul_scalar_3(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_
     return status;
 }
 
-int
+static int
 _nfloat_vec_aorsmul_scalar_4(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
 {
     slong yexp, rexp, texp;
@@ -2874,7 +2874,7 @@ _nfloat_vec_aorsmul_scalar_4(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_
     return status;
 }
 
-int
+static int
 _nfloat_vec_aorsmul_scalar_n(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, slong nlimbs, gr_ctx_t ctx)
 {
     slong yexp, rexp, texp;

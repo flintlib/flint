@@ -240,7 +240,7 @@ not_exact_division:
 }
 
 
-int _fmpz_mod_mpoly_divides_monagan_pearce(
+static int _fmpz_mod_mpoly_divides_monagan_pearce(
     fmpz_mod_mpoly_t Q,
     const fmpz * Acoeffs, const ulong * Aexps, slong Alen,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,

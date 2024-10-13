@@ -17,10 +17,11 @@
 
 TEST_FUNCTION_START(fmpz_vec_get_set_fft, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
      /* convert back and forth and compare */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz * a, * b;
         flint_bitcnt_t bits;
@@ -66,7 +67,7 @@ TEST_FUNCTION_START(fmpz_vec_get_set_fft, state)
     }
 
      /* convert back and forth unsigned and compare */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz * a, * b;
         flint_bitcnt_t bits;

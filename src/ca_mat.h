@@ -43,7 +43,7 @@ void ca_mat_init(ca_mat_t mat, slong r, slong c, ca_ctx_t ctx);
 void ca_mat_clear(ca_mat_t mat, ca_ctx_t ctx);
 
 CA_MAT_INLINE void
-ca_mat_swap(ca_mat_t mat1, ca_mat_t mat2, ca_ctx_t ctx)
+ca_mat_swap(ca_mat_t mat1, ca_mat_t mat2, ca_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(ca_mat_struct, *mat1, *mat2);
 }
@@ -53,7 +53,7 @@ ca_mat_swap(ca_mat_t mat1, ca_mat_t mat2, ca_ctx_t ctx)
 void ca_mat_window_init(ca_mat_t window, const ca_mat_t mat, slong r1, slong c1, slong r2, slong c2, ca_ctx_t ctx);
 
 CA_MAT_INLINE void
-ca_mat_window_clear(ca_mat_t window, ca_ctx_t ctx)
+ca_mat_window_clear(ca_mat_t window, ca_ctx_t FLINT_UNUSED(ctx))
 {
     flint_free(window->rows);
 }

@@ -10,11 +10,17 @@
 */
 
 #include "fmpz.h"
-//#include "fmpq.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "gr.h"
 #include "gr_mat.h"
+#include "gr_generic.h"
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 #define NMOD8_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD8_CTX(ring_ctx) (*NMOD8_CTX_REF(ring_ctx))
@@ -39,18 +45,18 @@ nmod8_ctx_is_field(const gr_ctx_t ctx)
 }
 
 void
-nmod8_init(nmod8_t x, const gr_ctx_t ctx)
+nmod8_init(nmod8_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     x[0] = 0;
 }
 
 void
-nmod8_clear(nmod8_t x, const gr_ctx_t ctx)
+nmod8_clear(nmod8_t FLINT_UNUSED(x), const gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 void
-nmod8_swap(nmod8_t x, nmod8_t y, const gr_ctx_t ctx)
+nmod8_swap(nmod8_t x, nmod8_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     nmod8_t t;
     *t = *x;
@@ -59,7 +65,7 @@ nmod8_swap(nmod8_t x, nmod8_t y, const gr_ctx_t ctx)
 }
 
 void
-nmod8_set_shallow(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
+nmod8_set_shallow(nmod8_t res, const nmod8_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -72,14 +78,14 @@ nmod8_randtest(nmod8_t res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 int
-nmod8_write(gr_stream_t out, const nmod8_t x, const gr_ctx_t ctx)
+nmod8_write(gr_stream_t out, const nmod8_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 
 int
-nmod8_zero(nmod8_t x, const gr_ctx_t ctx)
+nmod8_zero(nmod8_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     x[0] = 0;
     return GR_SUCCESS;
@@ -124,7 +130,7 @@ nmod8_set_fmpz(nmod8_t res, const fmpz_t v, const gr_ctx_t ctx)
 }
 
 truth_t
-nmod8_is_zero(const nmod8_t x, const gr_ctx_t ctx)
+nmod8_is_zero(const nmod8_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x[0] == 0) ? T_TRUE : T_FALSE;
 }
@@ -142,13 +148,13 @@ nmod8_is_neg_one(const nmod8_t x, const gr_ctx_t ctx)
 }
 
 truth_t
-nmod8_equal(const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
+nmod8_equal(const nmod8_t x, const nmod8_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x[0] == y[0]) ? T_TRUE : T_FALSE;
 }
 
 int
-nmod8_set(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
+nmod8_set(nmod8_t res, const nmod8_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     res[0] = x[0];
     return GR_SUCCESS;
@@ -330,7 +336,7 @@ nmod8_div_nonunique(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_
 }
 
 void
-_nmod8_vec_init(nmod8_struct * res, slong len, gr_ctx_t ctx)
+_nmod8_vec_init(nmod8_struct * res, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
@@ -339,12 +345,12 @@ _nmod8_vec_init(nmod8_struct * res, slong len, gr_ctx_t ctx)
 }
 
 void
-_nmod8_vec_clear(nmod8_struct * res, slong len, gr_ctx_t ctx)
+_nmod8_vec_clear(nmod8_struct * FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 int
-_nmod8_vec_set(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t ctx)
+_nmod8_vec_set(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 

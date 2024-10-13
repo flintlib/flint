@@ -31,7 +31,7 @@ slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
 }
 
 
-void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
+static void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
                           nn_srcptr A, nn_srcptr B, slong lenA, ulong invL, nmod_t mod)
 {
     if (lenA == 1)
@@ -54,7 +54,7 @@ void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
     }
 }
 
-void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
+static void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
                           nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                           ulong invL, nmod_t mod)
 {
@@ -118,7 +118,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
     }
 }
 
-void
+static void
 _nmod_poly_divrem_basecase_preinv1_1(nn_ptr Q, nn_ptr R, nn_ptr W,
                              nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                              ulong invL,
@@ -152,7 +152,7 @@ _nmod_poly_divrem_basecase_preinv1_1(nn_ptr Q, nn_ptr R, nn_ptr W,
         _nmod_vec_reduce(R, R1, lenB - 1, mod);
 }
 
-void
+static void
 _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R, nn_ptr W,
                              nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                              ulong invL,
@@ -202,7 +202,7 @@ _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R, nn_ptr W,
         R[iR] = n_ll_mod_preinv(R2[2*iR+1], R2[2*iR], mod.n, mod.ninv);
 }
 
-void
+static void
 _nmod_poly_divrem_basecase_preinv1_3(nn_ptr Q, nn_ptr R, nn_ptr W,
                                      nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                                      ulong invL,

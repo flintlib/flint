@@ -52,12 +52,12 @@ void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,
     {
         if (f == a || f == b)
         {
-            fmpz_t t;
-            fmpz_init(t);
-            fmpz_mul(t, a, b);
-            fmpz_submul(t, c, d);
-            fmpz_swap(t, f);
-            fmpz_clear(t);
+            fmpz_t tmp;
+            fmpz_init(tmp);
+            fmpz_mul(tmp, a, b);
+            fmpz_submul(tmp, c, d);
+            fmpz_swap(tmp, f);
+            fmpz_clear(tmp);
         }
         else
         {

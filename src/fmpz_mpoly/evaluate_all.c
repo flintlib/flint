@@ -28,7 +28,7 @@ int _fmpz_pow_ui_is_not_feasible(flint_bitcnt_t bbits, ulong e)
     return bbits > 1 && e >= limit/bbits;
 }
 
-int _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
+static int _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
                                 fmpz * const * val, const fmpz_mpoly_ctx_t ctx)
 {
     int success = 1;
@@ -119,7 +119,7 @@ cleanup_degrees:
     return success;
 }
 
-int _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
+static int _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
                                fmpz * const * vals, const fmpz_mpoly_ctx_t ctx)
 {
     int success = 1;

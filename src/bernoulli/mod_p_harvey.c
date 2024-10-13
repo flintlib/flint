@@ -61,6 +61,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ulong_extras.h"
 #include "bernoulli.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "_bernoulli_mod_p_harvey_powg only needs a symbol for test"
+# pragma message "_bernoulli_mod_p_harvey_pow2 only needs a symbol for test"
+# pragma message "_bernoulli_n_muldivrem_precomp only needs a symbol for test"
+#endif
+
 #define DEBUG 0
 #define TIMING 1
 
@@ -117,7 +126,7 @@ bernoulli_sum_powg(ulong p, ulong pinv, ulong k, ulong g)
     g_to_km1_to_j = g_to_km1;
     sum = 0;
 
-    for (j = 1; j <= (p - 1) / 2; j++)
+    for (j = 1; (ulong) j <= (p - 1) / 2; j++)
     {
         g_to_jm1 = _bernoulli_n_muldivrem_precomp(&q, g_to_jm1, g, p, g_pinv);
         h = n_submod(q, half_gm1, p);
@@ -187,7 +196,7 @@ expander_expand(nn_ptr res, expander_t * this, ulong s, ulong n)
     if (s == 1)
     {
         /* already have 1/p; just copy it */
-        for (i = 1; i <= n; i++)
+        for (i = 1; (ulong) i <= n; i++)
             res[i] = this->pinv[this->max_words - n + i];
     }
     else
@@ -229,7 +238,7 @@ expander_expand(nn_ptr res, expander_t * this, ulong s, ulong n)
 #error Number of bits in a ulong must be divisible by TABLE_LG_SIZE
 #endif
 
-ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
+static ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
 {
     slong i, m;
     ulong g_to_km1, two_to_km1, B_to_km1, s_jump;
@@ -294,7 +303,7 @@ ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
     /* loop over outer sum */
     for (i = 0; i < m; i++)
     {
-        ulong s, x, y;
+        ulong s, y;
         slong nn;
 
         /* s keeps track of g^i*2^j mod p */
@@ -333,7 +342,6 @@ ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
             /* loop over whole words */
             for (; bits >= FLINT_BITS; bits -= FLINT_BITS, next--)
             {
-                ulong y;
 #if NUM_TABLES != 8 && NUM_TABLES != 4
                 nn_ptr target;
 #else
@@ -518,7 +526,7 @@ static ulong PrepRedc(ulong n)
    (See bernsum_pow2() for code comments; we only add comments here where
    something is different from bernsum_pow2())
 */
-ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
+static ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
 {
     ulong pinv2 = PrepRedc(p);
     ulong F = (UWORD(1) << (FLINT_BITS/2)) % p;
@@ -582,7 +590,7 @@ ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
 
     for (i = 0; i < m; i++)
     {
-        ulong s, x, y;
+        ulong s, y;
         slong nn, bits, words;
         nn_ptr next;
 
@@ -829,7 +837,7 @@ ulong _bernoulli_mod_p_harvey_pow2(ulong p, ulong pinv, ulong k)
       2 <= k <= p-3, k even
       pinv = PrepMulMod(p)
 */
-ulong _bernoulli_mod_p_harvey(ulong p, ulong pinv, ulong k)
+static ulong _bernoulli_mod_p_harvey(ulong p, ulong pinv, ulong k)
 {
     if (n_powmod2_preinv(2, k, p, pinv) != 1)
     {

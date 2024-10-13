@@ -14,7 +14,7 @@
 #include "nmod_mpoly.h"
 
 /* setform copies the exponents and zeros the coefficients */
-void nmod_mpoly_setform(nmod_mpoly_t A, nmod_mpoly_t B,
+static void nmod_mpoly_setform(nmod_mpoly_t A, nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     flint_bitcnt_t bits = B->bits;
@@ -40,7 +40,7 @@ void nmod_mpolyu_setform(nmod_mpolyu_t A, nmod_mpolyu_t B,
     A->length = B->length;
 }
 
-void nmod_mpoly_setform_mpolyn(nmod_mpoly_t A, nmod_mpolyn_t B,
+static void nmod_mpoly_setform_mpolyn(nmod_mpoly_t A, nmod_mpolyn_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i;

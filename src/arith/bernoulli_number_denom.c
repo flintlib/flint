@@ -38,8 +38,7 @@ static const __u32 __bernoulli_denom_small[] =
 
 void arith_bernoulli_number_denom(fmpz_t den, ulong n)
 {
-    slong i;
-    ulong p;
+    ulong i, p;
     const ulong * primes;
 
     if (n % 2 == 1)

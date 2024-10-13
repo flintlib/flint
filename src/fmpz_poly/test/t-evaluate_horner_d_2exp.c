@@ -18,9 +18,9 @@
 
 TEST_FUNCTION_START(fmpz_poly_evaluate_horner_d_2exp, state)
 {
-    int i;
+    slong ix;
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz_poly_t f;
         double x, y, z, t;
@@ -52,7 +52,7 @@ TEST_FUNCTION_START(fmpz_poly_evaluate_horner_d_2exp, state)
         fmpz_poly_clear(f);
     }
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz_poly_t f;
         double x, y;

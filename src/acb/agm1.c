@@ -99,7 +99,7 @@ acb_agm_close_taylor(acb_t res, acb_t z, acb_t z2,
 }
 
 static void
-acb_agm1_around_zero(acb_t res, const acb_t z, slong prec)
+acb_agm1_around_zero(acb_t res, const acb_t z, slong FLINT_UNUSED(prec))
 {
     mag_t a, b;
     mag_init(a);
@@ -113,7 +113,7 @@ acb_agm1_around_zero(acb_t res, const acb_t z, slong prec)
     mag_clear(b);
 }
 
-void
+static void
 acb_agm1_basecase(acb_t res, const acb_t z, slong prec)
 {
     acb_t a, b, t, u;
@@ -207,7 +207,7 @@ acb_agm1_basecase(acb_t res, const acb_t z, slong prec)
     Computes (M(z), M'(z)) using a finite difference.
     Assumes z exact, |arg(z)| <= 3 pi / 4.
 */
-void
+static void
 acb_agm1_deriv_diff(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
 {
     mag_t err, t, C;
@@ -341,7 +341,7 @@ This is assuming that the circle at z with radius |eps| + r
 does not cross the negative half axis, which we check.
 */
 
-void
+static void
 acb_agm1_deriv_right(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
 {
     if (acb_is_exact(z))
@@ -496,7 +496,7 @@ acb_agm1(acb_t res, const acb_t z, slong prec)
     }
 }
 
-void
+static void
 acb_agm1_deriv(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
 {
     /*

@@ -11,18 +11,20 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 TEST_FUNCTION_START(padic_poly_inv_series, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
     padic_ctx_t ctx;
     fmpz_t p;
     slong N;
 
     /* Check aliasing */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         padic_poly_t a, b, c;
         slong n;
@@ -77,7 +79,7 @@ TEST_FUNCTION_START(padic_poly_inv_series, state)
         and we will have a b = 1 mod p^{N-|v|}.  Thus, require
         that N - |v| > 0.
      */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         padic_poly_t a, b, c;
         slong n, N2;

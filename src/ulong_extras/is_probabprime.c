@@ -161,7 +161,7 @@ n_is_probabprime_fermat(ulong n, ulong i)
         return n_powmod2_ui_preinv(i, n - 1, n, n_preinvert_limb(n)) == UWORD(1);
 }
 
-n_pair_t
+static n_pair_t
 fchain_precomp(ulong m, ulong n, double npre)
 {
     n_pair_t current = {0, 0}, old;
@@ -200,7 +200,7 @@ fchain_precomp(ulong m, ulong n, double npre)
     return current;
 }
 
-n_pair_t
+static n_pair_t
 fchain2_preinv(ulong m, ulong n, ulong ninv)
 {
     n_pair_t current = {0, 0}, old;
@@ -273,7 +273,7 @@ n_is_probabprime_fibonacci(ulong n)
     }
 }
 
-n_pair_t
+static n_pair_t
 lchain_precomp(ulong m, ulong a, ulong n, double npre)
 {
     n_pair_t current = {0, 0}, old;
@@ -310,7 +310,7 @@ lchain_precomp(ulong m, ulong a, ulong n, double npre)
     return current;
 }
 
-n_pair_t
+static n_pair_t
 lchain2_preinv(ulong m, ulong a, ulong n, ulong ninv)
 {
     n_pair_t current = {0, 0}, old;

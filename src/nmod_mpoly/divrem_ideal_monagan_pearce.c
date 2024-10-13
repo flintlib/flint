@@ -18,7 +18,7 @@
    passed and an array of quotient polynomials is returned. These are not in
    low level format.
 */
-int _nmod_mpoly_divrem_ideal_monagan_pearce1(
+static int _nmod_mpoly_divrem_ideal_monagan_pearce1(
     nmod_mpoly_struct ** Q,
     nmod_mpoly_t R,
     const ulong * Acoeffs, const ulong * Aexps, slong Alen,
@@ -247,7 +247,7 @@ exp_overflow:
    passed and an array of quotient polynomials is returned. These are not in
    low level format.
 */
-int _nmod_mpoly_divrem_ideal_monagan_pearce(
+static int _nmod_mpoly_divrem_ideal_monagan_pearce(
     nmod_mpoly_struct ** Q,
     nmod_mpoly_t R,
     const ulong * Acoeffs, const ulong * Aexps, slong Alen,

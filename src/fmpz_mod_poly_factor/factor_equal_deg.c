@@ -48,7 +48,7 @@ static void _queue_vec_fit_length(queue_struct ** Q, slong * Qalloc,
 }
 
 /* given g|f, update Q and res with g and f/g */
-void _add_split(
+static void _add_split(
     fmpz_mod_poly_factor_t res,
     queue_struct ** Q_, slong * Qlen_, slong * Qalloc_,
     fmpz_mod_poly_t f,

@@ -287,7 +287,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
       pinv = factor_base[j].pinv;
       modp = n_mod2_preinv(i, prime, pinv);
 
-      if (modp == soln1[j] || modp == soln2[j])
+      if (modp == (ulong) soln1[j] || modp == (ulong) soln2[j])
       {
          fmpz_set_ui(p, prime);
          exp = fmpz_remove(res, res, p);
@@ -323,7 +323,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 
          if (soln2[j] != 0) /* not a prime dividing A */
          {
-            if (modp == soln1[j] || modp == soln2[j])
+            if (modp == (ulong) soln1[j] || modp == (ulong) soln2[j])
             {
                fmpz_set_ui(p, prime);
                exp = fmpz_remove(res, res, p);
@@ -367,7 +367,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 
          for (k = 0; k < qs_inf->s; k++) /* Commit any outstanding A factors */
          {
-            if (A_ind[k] >= j) /* check it is beyond where loop above ended */
+            if (A_ind[k] >= (ulong) j) /* check it is beyond where loop above ended */
             {
                factor[num_factors].ind = A_ind[k];
                factor[num_factors++].exp = 1;
@@ -407,11 +407,11 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
                  FB prime; skip values not coprime with multiplier, as this
                  will lead to factors of kn, not n
               */
-              if (prime < 60*factor_base[qs_inf->num_primes - 1].p && n_gcd(prime, qs_inf->k) == 1)
+              if (prime < (ulong) 60 * factor_base[qs_inf->num_primes - 1].p && n_gcd(prime, qs_inf->k) == 1)
               {
                   for (k = 0; k < qs_inf->s; k++)  /* commit any outstanding A factors */
                   {
-                      if (A_ind[k] >= j) /* check beyond where loop above ended */
+                      if (A_ind[k] >= (ulong) j) /* check beyond where loop above ended */
                       {
                           factor[num_factors].ind = A_ind[k];
                           factor[num_factors++].exp = 1;
@@ -463,7 +463,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
     unsigned char bits = qs_inf->sieve_bits;
     slong rels = 0;
 
-    while (j < qs_inf->sieve_size / sizeof(ulong))
+    while (j < (slong) (qs_inf->sieve_size / sizeof(ulong)))
     {
         /* scan 4 or 8 bytes at once for sieve entries over threshold */
 #if FLINT64
@@ -478,7 +478,7 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
         i = j * sizeof(ulong);
 
         /* check bytes individually in word */
-        while (i < (j + 1) * sizeof(ulong) && i < qs_inf->sieve_size)
+        while (i < (slong) ((j + 1) * sizeof(ulong)) && i < qs_inf->sieve_size)
         {
             /* if we are over the threshold, check candidate for smoothness */
             if (sieve[i] > bits)

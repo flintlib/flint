@@ -21,7 +21,7 @@
     This is important as for negative N, exp(0) is 1, which is 0 mod p^N,
     and then log(0) does not converge.
  */
-static slong __rand_prec(flint_rand_t state, slong i) { return n_randint(state, PADIC_TEST_PREC_MAX) + 1; }
+static slong __rand_prec(flint_rand_t state, slong FLINT_UNUSED(i)) { return n_randint(state, PADIC_TEST_PREC_MAX) + 1; }
 #endif
 
 TEST_FUNCTION_START(padic_log_balanced, state)
