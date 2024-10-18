@@ -13,8 +13,6 @@
 
 #include "gr_mat.h"
 
-#include "gr_mat.h"
-
 /* todo: optimize for small matrices */
 /* todo: use fused add-mul operations when supported by
          the matrix interface in the future */
