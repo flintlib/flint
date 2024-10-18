@@ -178,6 +178,8 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
     nmod_poly_make_monic(v, poly);
 
+    res->num = 0;
+
     if (n == 1)
     {
         nmod_poly_factor_insert(res, v, 1);
