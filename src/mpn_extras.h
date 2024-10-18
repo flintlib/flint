@@ -862,8 +862,12 @@ int flint_mpn_factor_trial_tree(slong * factors, mp_srcptr x, mp_size_t xsize, s
 
 /* greatest common divisor ***************************************************/
 
+#define mpn_gcd_22 __gmpn_gcd_22
+
 mp_size_t flint_mpn_gcd_full2(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scr);
 mp_size_t flint_mpn_gcd_full(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn);
+
+mp_limb_pair_t mpn_gcd_22(mp_limb_t, mp_limb_t, mp_limb_t, mp_limb_t);
 
 /* modular arithmetic ********************************************************/
 
