@@ -294,9 +294,11 @@ void fmpz_mod_poly_sub_series(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, 
 /*  Scalar multiplication ****************************************************/
 
 void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong len, const fmpz_t x, const fmpz_mod_ctx_t ctx);
-void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len, ulong x, const fmpz_mod_ctx_t ctx);
+
+void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong x, const fmpz_mod_ctx_t ctx);
+
 void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 
 /*  Scalar division ****************************************************/

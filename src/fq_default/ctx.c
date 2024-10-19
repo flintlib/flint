@@ -205,10 +205,12 @@ void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t prime;
     slong deg;
+    int type;
 
-    /* Select a context type [1,...,5] */
-    int ctx_type = 1 + n_randint(state, 5);
-    switch (ctx_type)
+    fmpz_init(prime);
+    type = 1 + n_randint(state, 5);
+
+    switch (type)
     {
         /* Create GF(p^d) for FQ_ZECH context */
         case FQ_DEFAULT_FQ_ZECH:
@@ -237,5 +239,7 @@ void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state)
             break;
         default: FLINT_UNREACHABLE;
     }
-    fq_default_ctx_init_type(ctx, prime, deg, "a", ctx_type);
+
+    fq_default_ctx_init_type(ctx, prime, deg, "a", type);
+    fmpz_clear(prime);
 }

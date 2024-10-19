@@ -17,13 +17,15 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
     slong i, j, v;
 
     {
-        fmpz_mpoly_t A, A1, A2, B;
+        slong nvarsAC = 2, nvarsB = 3;
+        fmpz_mpoly_t A, A1, A2, B, B1;
         fmpz_mpoly_struct * Cp[3];
         fmpz_mpoly_struct C[3];
         fmpz_mpoly_ctx_t ctxAC, ctxB;
+        slong * c;
 
-        fmpz_mpoly_ctx_init(ctxB, 3, ORD_LEX);
-        fmpz_mpoly_ctx_init(ctxAC, 2, ORD_LEX);
+        fmpz_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX);
+        fmpz_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX);
 
         fmpz_mpoly_init(B, ctxB);
         fmpz_mpoly_init(A, ctxAC);
@@ -44,12 +46,7 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
         if (fmpz_mpoly_compose_fmpz_mpoly(A, B, Cp, ctxB, ctxAC) ||
             fmpz_mpoly_compose_fmpz_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             fmpz_mpoly_compose_fmpz_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check non-example 1\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check non-example 1\n");
 
         fmpz_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
         fmpz_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
@@ -57,12 +54,7 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
         if (fmpz_mpoly_compose_fmpz_mpoly(A, B, Cp, ctxB, ctxAC) ||
             fmpz_mpoly_compose_fmpz_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             fmpz_mpoly_compose_fmpz_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check non-example 2\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check non-example 2\n");
 
         fmpz_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
         fmpz_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
@@ -70,12 +62,50 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
         if (!fmpz_mpoly_compose_fmpz_mpoly(A, B, Cp, ctxB, ctxAC) ||
             !fmpz_mpoly_compose_fmpz_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             !fmpz_mpoly_compose_fmpz_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check example 3\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check example 3\n");
+
+        /* Aliased generator composition */
+        c = (slong *) flint_malloc(nvarsB*sizeof(slong));
+        fmpz_mpoly_init(B1, ctxB);
+        fmpz_mpoly_set(B1, B, ctxB);
+        for (i = 0; i < nvarsB; i++)
+            c[i] = i;
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!fmpz_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with aliased generators\n");
+
+        /* Reverse the generators, twice */
+        for (i = 0; i < nvarsB; i++)
+            c[i] = nvarsB - i - 1;
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (fmpz_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with reversed aliased generators\n");
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!fmpz_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with un-reversed aliased generators\n");
+
+        /* Composition with zero polys */
+        fmpz_mpoly_zero(B1, ctxB);
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(A, B1, c, ctxB, ctxAC);
+        if (!fmpz_mpoly_is_zero(B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with generators of zero poly\n");
+
+        fmpz_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!fmpz_mpoly_compose_fmpz_mpoly(A, B1, Cp, ctxB, ctxAC) ||
+            !fmpz_mpoly_compose_fmpz_mpoly_horner(A1, B1, Cp, ctxB, ctxAC) ||
+            !fmpz_mpoly_compose_fmpz_mpoly_geobucket(A2, B1, Cp, ctxB, ctxAC))
+            TEST_FUNCTION_FAIL("Check example 4\n");
+
+        if (!fmpz_mpoly_is_zero(A, ctxAC) ||
+            !fmpz_mpoly_is_zero(A1, ctxAC) ||
+            !fmpz_mpoly_is_zero(A2, ctxAC))
+            TEST_FUNCTION_FAIL("Check composition with zero poly\n");
 
         fmpz_mpoly_clear(B, ctxB);
         fmpz_mpoly_clear(A, ctxAC);
@@ -141,24 +171,14 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
             if (!fmpz_mpoly_compose_fmpz_mpoly(A1, B, C, ctxB, ctxAC) ||
                 !fmpz_mpoly_compose_fmpz_mpoly_horner(A2, B, C, ctxB, ctxAC) ||
                 !fmpz_mpoly_compose_fmpz_mpoly_geobucket(A3, B, C, ctxB, ctxAC))
-            {
-                printf("FAIL\n");
-                flint_printf("Check composition success with generators\n"
-                                                     "i: %wd, j: %wd\n", i, j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check composition success with generators\n"
+                                   "i: %wd, j: %wd\n", i, j);
 
             if (!fmpz_mpoly_equal(A, A1, ctxAC) ||
                 !fmpz_mpoly_equal(A, A2, ctxAC) ||
                 !fmpz_mpoly_equal(A, A3, ctxAC))
-            {
-                printf("FAIL\n");
-                flint_printf("Check composition with generators\n"
-                                                     "i: %wd, j: %wd\n", i, j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check composition with generators\n"
+                                   "i: %wd, j: %wd\n", i, j);
 
             fmpz_mpoly_assert_canonical(A, ctxAC);
             fmpz_mpoly_assert_canonical(A1, ctxAC);
@@ -219,24 +239,14 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
             !fmpz_mpoly_compose_fmpz_mpoly_geobucket(g2, f, vals1, ctx, ctx) ||
             !fmpz_mpoly_equal(g, g1, ctx) ||
             !fmpz_mpoly_equal(g, g2, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition success\ni: %wd\n", i);
 
         fmpz_mpoly_assert_canonical(g, ctx);
         fmpz_mpoly_assert_canonical(g1, ctx);
         fmpz_mpoly_assert_canonical(g2, ctx);
 
         if (!fmpz_mpoly_equal(f, g, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition with identity\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition with identity\ni: %wd\n", i);
 
         fmpz_mpoly_clear(f, ctx);
         fmpz_mpoly_clear(g, ctx);
@@ -311,12 +321,7 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
             vals3[v] = (fmpz *) flint_malloc(sizeof(fmpz));
             fmpz_init(vals3[v]);
             if (!fmpz_mpoly_evaluate_all_fmpz(vals3[v], vals1[v], vals2, ctx2))
-            {
-                printf("FAIL\n");
-                flint_printf("Check evaluation success\ni: %wd\n", i);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check evaluation success\ni: %wd\n", i);
         }
 
         fmpz_mpoly_randtest_bound(f, state, len1, coeff_bits1, exp_bound1, ctx1);
@@ -326,12 +331,7 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
             !fmpz_mpoly_compose_fmpz_mpoly_geobucket(g2, f, vals1, ctx1, ctx2) ||
             !fmpz_mpoly_equal(g, g1, ctx2) ||
             !fmpz_mpoly_equal(g, g2, ctx2))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition success\ni: %wd\n", i);
 
         fmpz_mpoly_assert_canonical(g, ctx2);
         fmpz_mpoly_assert_canonical(g1, ctx2);
@@ -339,20 +339,10 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
 
         if (!fmpz_mpoly_evaluate_all_fmpz(fe, f, vals3, ctx1) ||
             !fmpz_mpoly_evaluate_all_fmpz(ge, g, vals2, ctx2))
-        {
-            printf("FAIL\n");
-            flint_printf("Check evaluation success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check evaluation success\ni: %wd\n", i);
 
         if (!fmpz_equal(fe, ge))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition and evalall commute\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition and evalall commute\ni: %wd\n", i);
 
         for (v = 0; v < nvars1; v++)
         {

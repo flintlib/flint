@@ -239,14 +239,6 @@ arb_poly_scalar_div(arb_poly_t res, const arb_poly_t poly, const arb_t c, slong 
     _arb_poly_normalise(res);
 }
 
-void _arb_poly_mullow_ztrunc(arb_ptr res,
-    arb_srcptr poly1, slong len1,
-    arb_srcptr poly2, slong len2, slong n, slong prec);
-
-void arb_poly_mullow_ztrunc(arb_poly_t res, const arb_poly_t poly1,
-                                            const arb_poly_t poly2,
-                                                slong n, slong prec);
-
 void _arb_poly_mullow_classical(arb_ptr res,
     arb_srcptr poly1, slong len1,
     arb_srcptr poly2, slong len2, slong n, slong prec);

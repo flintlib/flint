@@ -71,6 +71,33 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 ])dnl AX_CXX_CHECK_COMPILE_FLAGS
 
 
+# Copyright (C) 1996-2024 Free Software Foundation, Inc.
+
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+dnl  AX_INIT
+dnl  -----------------------
+dnl  If build directory is not source directory, this function throws if source
+dnl  directory is already configured.
+
+AC_DEFUN([AX_INIT],[dnl
+if test "$ac_abs_confdir" != "`pwd`"; dnl ' Vim syntax fix
+then
+  if test -f $srcdir/config.status;
+  then
+    AC_MSG_ERROR([source directory already configured; run "make distclean" there first])
+  fi
+fi])
+
+
 dnl Copyright (C) 2024 Albin Ahlbäck
 dnl
 dnl This file is part of FLINT.
@@ -101,23 +128,45 @@ define(FAST_VROUNDPD_PATTERN,
 [[znver[2-4]* | sandybridge* | ivybridge*]])
 
 
-dnl  FLINT_CLANG([action-if-true],[action-if-false])
+dnl  FLINT_CC_IS_GCC([action-if-true],[action-if-false])
+dnl  -----------------------
+dnl  Checks if compiler is GCC.
+
+AC_DEFUN([FLINT_CC_IS_GCC],
+[AC_CACHE_CHECK([if compiler is GCC],
+                flint_cv_cc_is_gcc,
+[flint_cv_cc_is_gcc="no"
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
+#if !(defined(__GNUC__) && !defined(__clang__))
+#error
+error
+#endif
+],[])],
+[flint_cv_cc_is_gcc="yes"])
+])
+AS_VAR_IF([flint_cv_cc_is_gcc],"yes",
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
+
+dnl  FLINT_CC_IS_CLANG([action-if-true],[action-if-false])
 dnl  -----------------------
 dnl  Checks if compiler is clang.
 
-AC_DEFUN([FLINT_CLANG],
+AC_DEFUN([FLINT_CC_IS_CLANG],
 [AC_CACHE_CHECK([if compiler is Clang],
-                flint_cv_clang,
-[flint_cv_clang="no"
+                flint_cv_cc_is_clang,
+[flint_cv_cc_is_clang="no"
 AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
 #ifndef __clang__
 #error
 error
 #endif
 ],[])],
-[flint_cv_clang="yes"])
+[flint_cv_cc_is_clang="yes"])
 ])
-AS_VAR_IF([flint_cv_clang],"yes",
+AS_VAR_IF([flint_cv_cc_is_clang],"yes",
     [m4_default([$1], :)],
     [m4_default([$2], :)])
 ])
@@ -455,8 +504,9 @@ gmp_tmpconfigm4i=cnfm4i.tmp
 gmp_tmpconfigm4p=cnfm4p.tmp
 rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
 
-# All CPUs use asm-defs.m4
-echo ["include][(\`src/mpn_extras/asm-defs.m4')"] >>$gmp_tmpconfigm4i
+echo ["define(<CONFIG_TOP_SRCDIR>,<\`$srcdir'>)"] >>$gmp_tmpconfigm4
+
+echo ["include][(CONFIG_TOP_SRCDIR\`/src/mpn_extras/asm-defs.m4')"] >>$gmp_tmpconfigm4i
 ])
 
 
@@ -513,7 +563,7 @@ dnl
 
 AC_DEFUN([GMP_INCLUDE_MPN],
 [AC_REQUIRE([GMP_INIT])
-echo ["include(\`$1')"] >> $gmp_tmpconfigm4i
+echo ["include][(CONFIG_TOP_SRCDIR\`/$1')"] >>$gmp_tmpconfigm4i
 ])
 
 
@@ -692,6 +742,43 @@ else
   ifelse([$3],,:,[$3])
 fi
 rm -f conftest*
+])
+
+
+dnl  CL_ASM_NOEXECSTACK
+dnl  -------------------
+dnl
+dnl  Checks whether the stack can be marked nonexecutable by passing an option
+dnl  to the C-compiler when acting on .s files. Appends that option to ASMFLAGS.
+dnl  This macro is adapted from one found in GLIBC-2.3.5.
+dnl
+dnl  FIXME: This test looks broken. It tests that a file with
+dnl  .note.GNU-stack... can be compiled/assembled with -Wa,--noexecstack.  It
+dnl  does not determine if that command-line option has any effect on general
+dnl  asm code.
+AC_DEFUN([CL_ASM_NOEXECSTACK],
+[AC_REQUIRE([AC_PROG_CC])
+AC_CACHE_CHECK([whether assembler supports --noexecstack option],
+                cl_cv_asm_noexecstack,
+[dnl
+  cat > conftest.c <<EOF
+void foo() {}
+EOF
+  if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS
+                     -S -o conftest.s conftest.c >/dev/null]) \
+     && grep .note.GNU-stack conftest.s >/dev/null \
+     && AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -Wa,--noexecstack
+                       -c -o conftest.o conftest.s >/dev/null])
+  then
+    cl_cv_asm_noexecstack=yes
+  else
+    cl_cv_asm_noexecstack=no
+  fi
+  rm -f conftest*])
+  if test "$cl_cv_asm_noexecstack" = yes; then
+    ASMFLAGS="$ASMFLAGS -Wa,--noexecstack"
+  fi
+  AC_SUBST(ASMFLAGS)
 ])
 
 

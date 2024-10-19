@@ -570,9 +570,18 @@ int fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(fmpz_mod_mpoly_t A,
             const fmpz_mod_mpoly_t B, fmpz_mod_mpoly_struct * const * C,
             const fmpz_mod_mpoly_ctx_t ctxB, const fmpz_mod_mpoly_ctx_t ctxAC);
 
+int fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(fmpz_mod_mpoly_t A,
+            const fmpz_mod_mpoly_t B, fmpz_mod_mpoly_struct * const * C,
+            const fmpz_mod_mpoly_ctx_t ctxB, const fmpz_mod_mpoly_ctx_t ctxAC);
+
 int fmpz_mod_mpoly_compose_fmpz_mod_mpoly(fmpz_mod_mpoly_t A,
             const fmpz_mod_mpoly_t B, fmpz_mod_mpoly_struct * const * C,
             const fmpz_mod_mpoly_ctx_t ctxB, const fmpz_mod_mpoly_ctx_t ctxAC);
+
+void fmpz_mod_mpoly_compose_fmpz_mod_mpoly_gen(fmpz_mod_mpoly_t A,
+            const fmpz_mod_mpoly_t B, const slong * c,
+            const fmpz_mod_mpoly_ctx_t ctxB, const fmpz_mod_mpoly_ctx_t ctxAC);
+
 
 /* Multiplication ************************************************************/
 
