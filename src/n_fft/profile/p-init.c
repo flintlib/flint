@@ -61,31 +61,35 @@ void sample_init2_root(void * arg, ulong count)
 /*-----------------------------------------------------------------*/
 void time_fft_init(ulong * primes, ulong * max_depths)
 {
-    for (ulong k = 4; k < num_primes; k++)
+    for (ulong depth = 3; depth <= 25; depth++)
     {
-        for (ulong depth = 3; depth <= max_depths[k]; depth++)
+        printf("%ld\t", depth);
+        for (ulong k = 0; k < num_primes; k++)
         {
-            printf("%ld\t", depth);
+            if (depth <= max_depths[k])
+            {
+                info_t info;
+                info.prime = primes[k];
+                info.maxdepth = max_depths[k];
+                info.depth = depth;
 
-            info_t info;
-            info.prime = primes[k];
-            info.maxdepth = max_depths[k];
-            info.depth = depth;
+                const ulong len = UWORD(1) << depth;
+                const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));
 
-            const ulong len = UWORD(1) << depth;
-            const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));
+                double min;
+                double max;
 
-            double min;
-            double max;
+                prof_repeat(&min, &max, sample_init2_root, (void *) &info);
 
-            prof_repeat(&min, &max, sample_init2_root, (void *) &info);
-
-            flint_printf("\t%.1e|%.1e\t",
-                    min/(double)FLINT_CLOCK_SCALE_FACTOR/len/rep,
-                    min/(double)1000000/rep
-                    );
-            flint_printf("\n");
+                flint_printf("%.1e|%.1e\t",
+                        min/(double)1000000/rep,
+                        min/(double)FLINT_CLOCK_SCALE_FACTOR/len/rep
+                        );
+            }
+            else
+                flint_printf("  na   |  na   \t");
         }
+        flint_printf("\n");
     }
 
 }
@@ -95,9 +99,13 @@ void time_fft_init(ulong * primes, ulong * max_depths)
 /*------------------------------------------------------------*/
 int main()
 {
-    printf("- depth is log(fft length)\n");
-    printf("- timing init FFT context at this depth\n");
-    printf("depth\t\tred init new\n");
+    printf("- depth == precomputing w**k, 0 <= k < 2**depth\n");
+    printf("- timing init FFT context + clear at this depth:\n");
+    printf("      t_raw == raw time\n");
+    printf("      t_unit == raw time divided by 2**depth * clock scale factor\n");
+    printf("\n");
+
+    printf("depth\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\n");
 
     ulong primes[num_primes] = {
         786433,              // 20 bits, 1 + 2**18 * 3
