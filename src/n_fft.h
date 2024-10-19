@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifndef N_POLY_TYPES_H
-#define N_POLY_TYPES_H
+#ifndef N_FFT_H
+#define N_FFT_H
 
 #ifdef __cplusplus
 extern "C" {
