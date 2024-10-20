@@ -116,9 +116,7 @@ TEST_FUNCTION_START(n_fft_ctx_init2, state)
         }
 
         // take depth between 0 and min(12, max_depth)
-        ulong depth = n_randint(state, FLINT_MIN(10, max_depth));
-
-        printf("%lu, %lu, %lu\n", p, max_depth, depth);
+        ulong depth = n_randint(state, FLINT_MIN(12, max_depth));
 
         // init
         n_fft_ctx_t F;
