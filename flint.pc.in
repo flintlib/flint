@@ -9,4 +9,4 @@ Version: @PACKAGE_VERSION@
 URL: https://flintlib.org/
 Requires: gmp >= 6.2.1 mpfr >= 4.1.0
 Cflags: -I${includedir}
-Libs: -L${libdir} -lflint
+Libs: -L${libdir} -lflint @LIBS@

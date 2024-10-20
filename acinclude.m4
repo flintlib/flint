@@ -128,6 +128,58 @@ define(FAST_VROUNDPD_PATTERN,
 [[znver[2-4]* | sandybridge* | ivybridge*]])
 
 
+
+dnl  FLINT_SET_LIBFLAGS(lib,lib-path,include-path,[library_alias])
+dnl  -----------------------
+dnl  Sets lib_LDFLAGS and lib_CPPFLAGS to include and link library.
+dnl  If pkg-config is available, lib_CFLAGS, lib_LIBS, lib_libdir,
+dnl  lib_includedir are also set and also sets lib_LIBS with the appropriate
+dnl  `-l' flag(s).  Else, straight up use lib-path and include-path.
+
+AC_DEFUN([FLINT_SET_LIBFLAGS],
+[tmpalias=m4_default([$4],[$1])
+
+if test "x$PKG_CONFIG" != "x";
+then
+    if test "x$2" != "x";
+    then
+        withpath="--with-path=$2"
+    else
+        withpath=""
+    fi
+
+    # libdir
+    tmp=`$PKG_CONFIG --variable=libdir $withpath $1` dnl ' Fix Vim syntax
+    eval ${tmpalias}_libdir="\${tmp}"
+
+    # includedir
+    tmp=`$PKG_CONFIG --variable=includedir $withpath $1` dnl ' Fix Vim syntax
+    eval ${tmpalias}_includedir="\${tmp}"
+
+    # LIBS
+    tmp=`$PKG_CONFIG --libs-only-l $withpath $1` dnl ' Fix Vim syntax
+    eval ${tmpalias}_LIBS="\${tmp}"
+
+    # LDFLAGS
+    tmp=`$PKG_CONFIG --libs-only-L $withpath $1` dnl ' Fix Vim syntax
+    eval ${tmpalias}_LDFLAGS="\${tmp}"
+
+    # CPPFLAGS
+    tmp=`$PKG_CONFIG --cflags-only-other $withpath $1 | sed -n 's/\(-D\w\+\)\(\|=\w\+\)/\n\1\2\n/gp' | sed -n '/^-D/p'` dnl ' Fix Vim syntax
+    tmp="`$PKG_CONFIG --cflags-only-I $withpath $1` $tmp" dnl ' Fix Vim syntax
+    eval ${tmpalias}_CPPFLAGS="\${tmp}"
+
+    # CFLAGS
+    tmp=`$PKG_CONFIG --cflags-only-other $withpath $1 | sed 's/\(-D\w\+\)\(\|=\w\+\)//g' | sed 's/  / /g'` dnl ' Fix Vim syntax
+    eval ${tmpalias}_CFLAGS="\${tmp}"
+else
+    eval ${tmpalias}_LDFLAGS="-L\${2}"
+    eval ${tmpalias}_CPPFLAGS="-I\${3}"
+fi
+])
+
+
+
 dnl  FLINT_CC_IS_GCC([action-if-true],[action-if-false])
 dnl  -----------------------
 dnl  Checks if compiler is GCC.
