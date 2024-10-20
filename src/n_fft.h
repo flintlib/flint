@@ -47,22 +47,33 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  *              --> provide precomputation-free functions
  **/
 
-/** tab_w2: contains powers w**d for d a power of 2,
- * and corresponding precomputations for modular multiplication:
- *     - for 0 <= k < max_depth-1, tab_w2[2*k] = w**(2**(max_depth-2-k))
+/** tab_w2:
+ *    - length 128, with undefined entries at index 2*max_depth and beyond
+ *    - contains powers w**d for d a power of 2, and corresponding
+ *    precomputations for modular multiplication:
+ *       -- for 0 <= k < max_depth-1, tab_w2[2*k] = w**(2**(max_depth-2-k))
  *          and tab_w2[2*k+1] = floor(tab_w2[2*k] * 2**FLINT_BITS / mod)
- *     - for 2*max_depth <= k < 128, tab_w2[k] is undefined
- * In particular the first elements are tab_w2 = [I, I_pr, J, J_pr, ...]
+ *       -- for 2*max_depth <= k < 128, tab_w2[k] is undefined
+ *
+ * The first elements are tab_w2 = [I, I_pr, J, J_pr, ...]
  * where I is a square root of -1 and J is a square root of I.
  **/
 
-/** tab_w: contains 2**depth first powers of w**k in bit reversed order,
- * and corresponding precomputations for modular multiplication:
- *     - for 0 <= k < 2**depth, tab_w[2*k] = w**(br[k])
- *            and tab_w[2*k+1] = floor(tab_w[2*k] * 2**FLINT_BITS / mod)
- *  where br = [0, 2**(depth-1), 2**(depth-2), 3 * 2**(depth-2), ...]
- *  is the bit reversal permutation of length 2**depth
- *  (https://en.wikipedia.org/wiki/Bit-reversal_permutation).
+/** tab_w:
+ *     - length 2**depth
+ *     - contains 2**(depth-1) first powers of w in (max_depth-1)-bit reversed order,
+ *     and corresponding precomputations for modular multiplication:
+ *        -- for 0 <= k < 2**(depth-1), tab_w[2*k] = w**(br[k])
+ *           and tab_w[2*k+1] = floor(tab_w[2*k] * 2**FLINT_BITS / mod)
+ *  where br = [0, 2**(max_depth-2), 2**(max_depth-3), 3 * 2**(max_depth-3), ...]
+ *  is the bit reversal permutation of length 2**(max_depth-1)
+ *  (https://en.wikipedia.org/wiki/Bit-reversal_permutation)
+ *
+ * In particular the first elements are
+ *      tab_w = [1, 1_pr, I, I_pr, J, J_pr, IJ, IJ_pr, ...]
+ * where I is a square root of -1, J is a square root of I, and IJ = I*J. Note
+ * that powers of w beyond 2**(max_depth-1), for example -1, -I, -J, etc. are
+ * not stored.
  **/
 
 
