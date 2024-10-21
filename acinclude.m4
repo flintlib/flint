@@ -139,39 +139,44 @@ dnl  `-l' flag(s).  Else, straight up use lib-path and include-path.
 AC_DEFUN([FLINT_SET_LIBFLAGS],
 [tmpalias=m4_default([$4],[$1])
 
-if test "x$PKG_CONFIG" != "x" && test "x`$PKG_CONFIG --path $1`" != "x";
+if test "x$2" != "x";
 then
-    if test "x$2" != "x";
-    then
-        withpath="--with-path=$2"
-    else
-        withpath=""
-    fi
+    pkgconfigpath="PKG_CONFIG_PATH=$2/pkgconfig"
+fi
 
+if test "$enable_pkg_config" = "yes" && eval "$pkgconfigpath $PKG_CONFIG --path $1"; test "$?" = "0";
+then
     # libdir
-    tmp=`$PKG_CONFIG --variable=libdir $withpath $1` dnl ' Fix Vim syntax
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --variable=libdir $1"` dnl ' Fix Vim syntax
     eval ${tmpalias}_libdir="\${tmp}"
+    echo "libdir = $tmp"
 
     # includedir
-    tmp=`$PKG_CONFIG --variable=includedir $withpath $1` dnl ' Fix Vim syntax
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --variable=includedir $1"` dnl ' Fix Vim syntax
     eval ${tmpalias}_includedir="\${tmp}"
+    echo "includedir = $tmp"
 
     # LIBS
-    tmp=`$PKG_CONFIG --libs-only-l $withpath $1` dnl ' Fix Vim syntax
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --libs-only-l $1"` dnl ' Fix Vim syntax
     eval ${tmpalias}_LIBS="\${tmp}"
+    echo "LIBS = $tmp"
 
     # LDFLAGS
-    tmp=`$PKG_CONFIG --libs-only-L $withpath $1` dnl ' Fix Vim syntax
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --libs-only-L $1"` dnl ' Fix Vim syntax
     eval ${tmpalias}_LDFLAGS="\${tmp}"
+    echo "LDFLAGS = $tmp"
 
     # CPPFLAGS
-    tmp=`$PKG_CONFIG --cflags-only-other $withpath $1 | sed -n 's/\(-D\w\+\)\(\|=\w\+\)/\n\1\2\n/gp' | sed -n '/^-D/p'` dnl ' Fix Vim syntax
-    tmp="`$PKG_CONFIG --cflags-only-I $withpath $1` $tmp" dnl ' Fix Vim syntax
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --cflags-only-other $1" | sed -n 's/\(-D\w\+\)\(\|=\w\+\)/\n\1\2\n/gp' | sed -n '/^-D/p'` dnl ' Fix Vim syntax
+    tmp2=`eval "$pkgconfigpath $PKG_CONFIG --cflags-only-I $1"` dnl ' Fix Vim syntax
+    tmp="$tmp $tmp2"
     eval ${tmpalias}_CPPFLAGS="\${tmp}"
+    echo "CPPFLAGS = $tmp"
 
     # CFLAGS
-    tmp=`$PKG_CONFIG --cflags-only-other $withpath $1 | sed 's/\(-D\w\+\)\(\|=\w\+\)//g' | sed 's/  / /g'` dnl ' Fix Vim syntax
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --cflags-only-other $withpath $1" | sed 's/\(-D\w\+\)\(\|=\w\+\)//g' | sed 's/  / /g'` dnl ' Fix Vim syntax
     eval ${tmpalias}_CFLAGS="\${tmp}"
+    echo "CFLAGS = $tmp"
 else
     if test "x${2}" != "x";
     then

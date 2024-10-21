@@ -149,20 +149,6 @@ then
 fi
 
 ################################################################################
-# programs
-################################################################################
-
-dnl NOTE: The following line is invoked from LT_INIT
-dnl AC_PROG_CC
-
-AC_PROG_MKDIR_P
-AC_PATH_PROGS(PKG_CONFIG, [pkg-config pkgconf], [])
-AC_ARG_VAR([PKG_CONFIG], [path to pkg-config or pkgconf])
-
-FLINT_CC_IS_GCC
-FLINT_CC_IS_CLANG
-
-################################################################################
 # build system
 ################################################################################
 
@@ -271,6 +257,17 @@ yes|no)
 esac],
 enable_dependency_tracking="yes")
 
+AC_ARG_ENABLE(pkg-config,
+[AS_HELP_STRING([--enable-pkg-config],[Enable finding dependency information via pkg-config [default=auto]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-pkg-config. Need yes or no.])
+    ;;
+esac],
+enable_pkg_config="yes")
+
 AC_ARG_ENABLE(pretty-tests,
 [AS_HELP_STRING([--enable-pretty-tests],[Enable pretty printing for tests [default=yes]])],
 [case $enableval in
@@ -348,6 +345,28 @@ yes|no)
     ;;
 esac],
 enable_fast_build="no")
+
+################################################################################
+# programs
+################################################################################
+
+dnl NOTE: The following line is invoked from LT_INIT
+dnl AC_PROG_CC
+
+AC_PROG_MKDIR_P
+
+if test "$enable_pkg_config" = "yes";
+then
+    AC_PATH_PROGS(PKG_CONFIG, [pkg-config pkgconf], [])
+    if test "x$PKG_CONFIG" = "x";
+    then
+        enable_pkg_config="no"
+    fi
+fi
+AC_ARG_VAR([PKG_CONFIG], [path to pkg-config or pkgconf])
+
+FLINT_CC_IS_GCC
+FLINT_CC_IS_CLANG
 
 ################################################################################
 # library dependencies
@@ -543,6 +562,7 @@ done
 ################################################################################
 
 # FIXME: Not the prettiest solution for BLAS
+# FIXME: Fix Boehm GC
 
 for lib in $library_dependencies;
 do
