@@ -139,7 +139,7 @@ dnl  `-l' flag(s).  Else, straight up use lib-path and include-path.
 AC_DEFUN([FLINT_SET_LIBFLAGS],
 [tmpalias=m4_default([$4],[$1])
 
-if test "x$PKG_CONFIG" != "x";
+if test "x$PKG_CONFIG" != "x" && test "x`$PKG_CONFIG --path $1`" != "x";
 then
     if test "x$2" != "x";
     then
