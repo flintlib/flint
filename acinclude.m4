@@ -173,8 +173,15 @@ then
     tmp=`$PKG_CONFIG --cflags-only-other $withpath $1 | sed 's/\(-D\w\+\)\(\|=\w\+\)//g' | sed 's/  / /g'` dnl ' Fix Vim syntax
     eval ${tmpalias}_CFLAGS="\${tmp}"
 else
-    eval ${tmpalias}_LDFLAGS="-L\${2}"
-    eval ${tmpalias}_CPPFLAGS="-I\${3}"
+    if test "x${2}" != "x";
+    then
+        eval ${tmpalias}_LDFLAGS="-L\${2}"
+    fi
+
+    if test "x${3}" != "x";
+    then
+        eval ${tmpalias}_CPPFLAGS="-I\${3}"
+    fi
 fi
 ])
 

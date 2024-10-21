@@ -568,12 +568,26 @@ fi
 for lib in $library_dependencies;
 do
     eval "tmp=\"\${${lib}_CPPFLAGS}\""
-    eval "tmp2=\"\${${lib}_includedir}\""
-    CPPFLAGS="$CPPFLAGS $tmp -I$tmp2"
+    if test "x$tmp" != "x";
+    then
+        CPPFLAGS="$CPPFLAGS $tmp"
+    fi
+    eval "tmp=\"\${${lib}_includedir}\""
+    if test "x$tmp" != "x";
+    then
+        CPPFLAGS="$CPPFLAGS -I$tmp"
+    fi
 
     eval "tmp=\"\${${lib}_LDFLAGS}\""
-    eval "tmp2=\"\${${lib}_libdir}\""
-    LDFLAGS="$LDFLAGS $tmp -L$tmp2"
+    if test "x$tmp" != "x";
+    then
+        LDFLAGS="$LDFLAGS -L$tmp"
+    fi
+    eval "tmp=\"\${${lib}_libdir}\""
+    if test "x$tmp" != "x";
+    then
+        LDFLAGS="$LDFLAGS -L$tmp"
+    fi
 done
 
 ################################################################################
