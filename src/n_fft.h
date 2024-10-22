@@ -81,6 +81,7 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  *   - if it is < 3, it is pretended that it is 3
  *   - it it is more than F->max_depth (the maximum possible with the given
  *   prime), it is reduced to F->max_depth
+ * After calling init, precomputations support DFTs of length up to 2**depth
  **/
 
 // initialize with given root and given depth
@@ -100,6 +101,11 @@ FLINT_INLINE void n_fft_ctx_init(n_fft_ctx_t F, ulong p)
 void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth);
 
 void n_fft_ctx_clear(n_fft_ctx_t F);
+
+
+
+
+
 
 
 
