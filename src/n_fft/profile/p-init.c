@@ -107,6 +107,7 @@ int main()
 
     printf("depth\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\n");
 
+    // TODO fix for FLINT_BITS==32
     ulong primes[num_primes] = {
         786433,              // 20 bits, 1 + 2**18 * 3
         2013265921,          // 31 bits, 1 + 2**27 * 3 * 5

@@ -92,8 +92,12 @@ TEST_FUNCTION_START(n_fft_ctx_init2, state)
         ulong p, max_depth;
         if (i % 20 != 0)
         {
-            // take random prime in [17, 2**61)
+            // take random prime in [17, 2**(FLINT_BITS-3))
+#if FLINT_BITS == 64
             ulong bits = 5 + n_randint(state, 57);
+#else
+            ulong bits = 5 + n_randint(state, 24);
+#endif
             p = n_randprime(state, bits, 1);
             max_depth = flint_ctz(p-1);
 
@@ -108,7 +112,11 @@ TEST_FUNCTION_START(n_fft_ctx_init2, state)
         {
             // the above will most often have max_depth 3 or 4
             // every now and then we want p with larger max_depth
+#if FLINT_BITS == 64
+            max_depth = 40 + n_randint(state, 10);
+#else
             max_depth = 10 + n_randint(state, 10);
+#endif
             p = 1 + (UWORD(1) << max_depth);
             while (! n_is_prime(p))
                 p += (UWORD(1) << max_depth);
