@@ -22,7 +22,7 @@ void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, 
     // fill basic attributes
     F->mod = p;
     F->mod2 = 2*p;
-    F->mod4 = 4*p;
+    //F->mod4 = 4*p;
     F->max_depth = max_depth;
     F->depth = 3;  // to be able to call fit_depth below
 

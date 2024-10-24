@@ -35,7 +35,7 @@ typedef struct
 {
     ulong mod;                 // modulus, odd prime
     ulong mod2;                // 2*mod  (storing helps for speed)
-    ulong mod4;                // 4*mod  (storing helps for speed)
+    //ulong mod4;                // 4*mod  (storing helps for speed)
     ulong max_depth;           // maximum supported depth (w has order 2**max_depth)
     ulong depth;               // depth supported by current precomputation
     ulong * tab_w;             // tabulated powers of w, see below
