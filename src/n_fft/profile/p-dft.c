@@ -29,7 +29,7 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     nmod_t mod;                                                                  \
     nmod_init(&mod, p);                                                          \
     ulong w0 = nmod_pow_ui(n_primitive_root_prime(p), (p - 1) >> maxdepth, mod); \
-    ulong w = nmod_pow_ui(w0, 1UL<<(maxdepth - depth), mod);                     \
+    ulong w = nmod_pow_ui(w0, UWORD(1)<<(maxdepth - depth), mod);                \
     n_fft_ctx_t F;                                                               \
     n_fft_ctx_init2_root(F, w, depth, depth, p);                                 \
                                                                                  \
