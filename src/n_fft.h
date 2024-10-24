@@ -114,6 +114,9 @@ void n_fft_ctx_clear(n_fft_ctx_t F);
  * at length a power of 2
  */
 void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F);
+void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);
+void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
+void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
 
 
