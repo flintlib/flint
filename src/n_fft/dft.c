@@ -191,9 +191,7 @@ FLINT_FORCE_INLINE void dft8_node0_lazy24(ulong * p0, ulong * p1, ulong * p2, ul
     DFT2_NODE0_LAZY24(*p2, *p6, F->mod2, tmp);
     DFT2_NODE0_LAZY24(*p3, *p7, F->mod2, tmp);
 
-    DFT4_NODE0_LAZY24(*p0, *p1, *p2, *p3,
-                      F->tab_w[2], F->tab_w[3],
-                      F->mod, F->mod2, p_hi, p_lo);
+    DFT4_NODE0_LAZY24(*p0, *p1, *p2, *p3, F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     DFT4_LAZY44(*p4, *p5, *p6, *p7,
                 F->tab_w[2], F->tab_w[3],
                 F->tab_w[4], F->tab_w[5],
@@ -247,31 +245,21 @@ FLINT_FORCE_INLINE void dft16_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
 {
     ulong p_hi, p_lo, tmp;
 
-    DFT4_NODE0_LAZY24(p[0], p[4], p[ 8], p[12],
-                      F->tab_w[2], F->tab_w[3],
-                      F->mod, F->mod2, p_hi, p_lo);
+    DFT4_NODE0_LAZY24(p[0], p[4], p[ 8], p[12], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     if (p[0] >= F->mod2)
         p[0] -= F->mod2;
-    DFT4_NODE0_LAZY24(p[1], p[5], p[ 9], p[13],
-                      F->tab_w[2], F->tab_w[3],
-                      F->mod, F->mod2, p_hi, p_lo);
+    DFT4_NODE0_LAZY24(p[1], p[5], p[ 9], p[13], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     if (p[1] >= F->mod2)
         p[1] -= F->mod2;
-    DFT4_NODE0_LAZY24(p[2], p[6], p[10], p[14],
-                      F->tab_w[2], F->tab_w[3],
-                      F->mod, F->mod2, p_hi, p_lo);
+    DFT4_NODE0_LAZY24(p[2], p[6], p[10], p[14], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     if (p[2] >= F->mod2)
         p[2] -= F->mod2;
-    DFT4_NODE0_LAZY24(p[3], p[7], p[11], p[15],
-                      F->tab_w[2], F->tab_w[3],
-                      F->mod, F->mod2, p_hi, p_lo);
+    DFT4_NODE0_LAZY24(p[3], p[7], p[11], p[15], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     if (p[3] >= F->mod2)
         p[3] -= F->mod2;
 
     // next line requires < 2n, hence the four reductions above
-    DFT4_NODE0_LAZY24(p[0], p[1], p[2], p[3],
-                      F->tab_w[2], F->tab_w[3],
-                      F->mod, F->mod2, p_hi, p_lo);
+    DFT4_NODE0_LAZY24(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     DFT4_LAZY44(p[4], p[5], p[6], p[7],
                 F->tab_w[2], F->tab_w[3],
                 F->tab_w[4], F->tab_w[5],
@@ -303,26 +291,10 @@ FLINT_FORCE_INLINE void dft16_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
     Iw = F->tab_w[4*node+2];
     Iwpre = F->tab_w[4*node+3];
 
-    DFT4_LAZY44(p[0], p[4], p[8], p[12],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY44(p[1], p[5], p[9], p[13],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY44(p[2], p[6], p[10], p[14],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY44(p[3], p[7], p[11], p[15],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[0], p[4], p[ 8], p[12], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[1], p[5], p[ 9], p[13], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[2], p[6], p[10], p[14], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[3], p[7], p[11], p[15], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
 
     w2 = F->tab_w[8*node];
     w2pre = F->tab_w[8*node+1];
@@ -330,11 +302,7 @@ FLINT_FORCE_INLINE void dft16_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
     wpre = F->tab_w[16*node+1];
     Iw = F->tab_w[16*node+2];
     Iwpre = F->tab_w[16*node+3];
-    DFT4_LAZY44(p[0], p[1], p[2], p[3],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[0], p[1], p[2], p[3], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
 
     w2 = F->tab_w[8*node+2];
     w2pre = F->tab_w[8*node+3];
@@ -342,11 +310,7 @@ FLINT_FORCE_INLINE void dft16_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
     wpre = F->tab_w[16*node+5];
     Iw = F->tab_w[16*node+6];
     Iwpre = F->tab_w[16*node+7];
-    DFT4_LAZY44(p[4], p[5], p[6], p[7],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[4], p[5], p[6], p[7], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
 
     w2 = F->tab_w[8*node+4];
     w2pre = F->tab_w[8*node+5];
@@ -354,11 +318,7 @@ FLINT_FORCE_INLINE void dft16_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
     wpre = F->tab_w[16*node+9];
     Iw = F->tab_w[16*node+10];
     Iwpre = F->tab_w[16*node+11];
-    DFT4_LAZY44(p[8], p[9], p[10], p[11],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[8], p[9], p[10], p[11], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
 
     w2 = F->tab_w[8*node+6];
     w2pre = F->tab_w[8*node+7];
@@ -366,11 +326,7 @@ FLINT_FORCE_INLINE void dft16_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
     wpre = F->tab_w[16*node+13];
     Iw = F->tab_w[16*node+14];
     Iwpre = F->tab_w[16*node+15];
-    DFT4_LAZY44(p[12], p[13], p[14], p[15],
-                w2, w2pre,
-                w, wpre,
-                Iw, Iwpre,
-                F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[12], p[13], p[14], p[15], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
 }
 
 /*--------------*/
@@ -424,10 +380,10 @@ FLINT_FORCE_INLINE void dft32_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
         p[7] -= F->mod2;
 
     // next line requires < 2n, hence the 8 reductions above
-    dft8_red_lazy(        p+ 0, p+ 1, p+ 2, p+ 3, p+ 4, p+ 5, p+ 6, p+ 7,    F);
-    dft8_red_lazy_general(p+ 8, p+ 9, p+10, p+11, p+12, p+13, p+14, p+15, 1, F);
-    dft8_red_lazy_general(p+16, p+17, p+18, p+19, p+20, p+21, p+22, p+23, 2, F);
-    dft8_red_lazy_general(p+24, p+25, p+26, p+27, p+28, p+29, p+30, p+31, 3, F);
+    dft8_node0_lazy24(p+ 0, p+ 1, p+ 2, p+ 3, p+ 4, p+ 5, p+ 6, p+ 7,    F);
+    dft8_lazy44(      p+ 8, p+ 9, p+10, p+11, p+12, p+13, p+14, p+15, 1, F);
+    dft8_lazy44(      p+16, p+17, p+18, p+19, p+20, p+21, p+22, p+23, 2, F);
+    dft8_lazy44(      p+24, p+25, p+26, p+27, p+28, p+29, p+30, p+31, 3, F);
 }
 
 
@@ -442,20 +398,20 @@ FLINT_FORCE_INLINE void dft32_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
     ulong wpre = F->tab_w[4*node+1];
     ulong Iw = F->tab_w[4*node+2];
     ulong Iwpre = F->tab_w[4*node+3];
-    DFT4_LAZY(p[0], p[ 8], p[16], p[24], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY(p[1], p[ 9], p[17], p[25], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY(p[2], p[10], p[18], p[26], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY(p[3], p[11], p[19], p[27], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY(p[4], p[12], p[20], p[28], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY(p[5], p[13], p[21], p[29], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY(p[6], p[14], p[22], p[30], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-    DFT4_LAZY(p[7], p[15], p[23], p[31], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[0], p[ 8], p[16], p[24], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[1], p[ 9], p[17], p[25], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[2], p[10], p[18], p[26], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[3], p[11], p[19], p[27], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[4], p[12], p[20], p[28], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[5], p[13], p[21], p[29], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[6], p[14], p[22], p[30], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[7], p[15], p[23], p[31], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
 
     // next line requires < 2n, hence the four reductions above
-    dft8_red_lazy_general(p+ 0, p+ 1, p+ 2, p+ 3, p+ 4, p+ 5, p+ 6, p+ 7, 4*node, F);
-    dft8_red_lazy_general(p+ 8, p+ 9, p+10, p+11, p+12, p+13, p+14, p+15, 4*node+1, F);
-    dft8_red_lazy_general(p+16, p+17, p+18, p+19, p+20, p+21, p+22, p+23, 4*node+2, F);
-    dft8_red_lazy_general(p+24, p+25, p+26, p+27, p+28, p+29, p+30, p+31, 4*node+3, F);
+    dft8_lazy44(p+ 0, p+ 1, p+ 2, p+ 3, p+ 4, p+ 5, p+ 6, p+ 7, 4*node, F);
+    dft8_lazy44(p+ 8, p+ 9, p+10, p+11, p+12, p+13, p+14, p+15, 4*node+1, F);
+    dft8_lazy44(p+16, p+17, p+18, p+19, p+20, p+21, p+22, p+23, 4*node+2, F);
+    dft8_lazy44(p+24, p+25, p+26, p+27, p+28, p+29, p+30, p+31, 4*node+3, F);
 }
 
 /*-------------*/
@@ -482,8 +438,8 @@ void dft_lazy44(nn_ptr p, ulong len, ulong depth, ulong node, n_fft_ctx_t F)
         dft8_lazy44(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, node, F);
     else if (depth == 4)
         dft16_lazy44(p, node, F);
-    //else if (depth == 5)  // TODO unclear this helps (no acceleration on argiope)
-    //    dft32_red_lazy_general(p, node, F);
+    else if (depth == 5)  // TODO unclear this helps (no acceleration on argiope)
+        dft32_lazy44(p, node, F);
     else
     {
         // in: [0..4n), out: [0..4n)
@@ -540,8 +496,8 @@ void dft_node0_lazy24(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
         dft8_node0_lazy24(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F);  // in [0..2n), out [0..4n)
     else if (depth == 4)
         dft16_node0_lazy24(p, F);  // in [0..2n), out [0..4n)
-    //else if (depth == 5)   // TODO unclear this helps (no acceleration on argiope)
-    //    dft32_red_lazy(p, F);  // in [0..2n), out [0..4n)
+    else if (depth == 5)   // TODO unclear this helps (no acceleration on argiope)
+        dft32_node0_lazy24(p, F);  // in [0..2n), out [0..4n)
     else
     {
         // input [0..2n) x [0..2n), output [0..2n) x [0..4n)
@@ -580,7 +536,7 @@ void n_fft_dft(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
     else if (depth == 4)
         dft16_node0_lazy24(p, F);  // in [0..2n), out [0..4n)
     //else if (depth == 5)   // TODO unclear this helps (no acceleration on argiope)
-    //    dft32_red_lazy(p, F);  // in [0..2n), out [0..4n)
+    //    dft32_node0_lazy24(p, F);  // in [0..2n), out [0..4n)
     else
     {
         // input [0..2n) x [0..2n), output [0..2n) x [0..4n)
