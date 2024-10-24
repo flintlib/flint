@@ -20,6 +20,12 @@
 extern "C" {
 #endif
 
+/**
+ * TODO[short term] confirm the limit on the modulus
+ * TODO[short term] add testing for general variants, not only node0
+ * TODO[longer term] large depth can lead to heavy memory usage
+ *              --> provide precomputation-free functions
+ */
 
 /** n_fft context:
  * parameters and tabulated powers of the primitive root of unity "w".
@@ -41,10 +47,6 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  *     - mod is an odd prime < 2**61
  *     - max_depth must be >= 3 (so, 8 must divide mod - 1)
  * Total memory cost of precomputations: <= 128 + 2**(depth+1) ulong's
- *
- * TODO[short term] confirm the limit on the modulus
- * TODO[longer term] large depth can lead to heavy memory usage
- *              --> provide precomputation-free functions
  **/
 
 /** tab_w2:
@@ -108,7 +110,7 @@ void n_fft_ctx_clear(n_fft_ctx_t F);
 
 
 /** dft:
- * transforms, inverse transforms, transposed transforms
+ * transforms / inverse transforms / transposed transforms
  * at length a power of 2
  */
 void n_fft_dft(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F);

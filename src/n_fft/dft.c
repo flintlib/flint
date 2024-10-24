@@ -528,7 +528,7 @@ void dft_node0_lazy24(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
 // TODO try lazier variant for entry point < n, to see if any gain
 void n_fft_dft(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
 {
-    if (depth > 0)
+    if (depth == 0)
         return;
 
     if (depth == 1)
