@@ -48,6 +48,19 @@
             (a) -= (n2);               \
     } while(0)
 
+/** TODO Cooley-Tukey butterfly, node 0
+ * * in [0..n) x [0..n) / out [0..2n) x [0..2n) / max < 2n
+ * * In-place transform
+ *                            [1  1]
+ *           [a  b] <- [a  b] [1 -1]
+ */
+#define DFT2_NODE0_LAZY12(a, b, n, tmp) \
+    do {                                \
+        tmp = (b);                      \
+        (b) = (a) + (n) - tmp;          \
+        (a) = (a) + tmp;                \
+    } while(0)
+
 
 /** Cooley-Tukey butterfly, general
  * * in [0..4n) / out [0..4n) / max < 4n
@@ -110,6 +123,40 @@
         (a) = v4 + v6;                              /* < 4*n */      \
         (b) = v4 + (n2) - v6;                       /* < 4*n */      \
         (c) = v5 + v7;                              /* < 4*n */      \
+        (d) = v5 + (n2) - v7;                       /* < 4*n */      \
+    } while(0)
+
+/** TODO 4-point DFT, node 0
+ * * in [0..n) / out [0..4n) / max < 4n
+ * * In-place transform
+ *                              [1  1  1  1]
+ *                              [1 -1  I -I]
+ * [a  b  c  d] <- [a  b  c  d] [1  1 -1 -1]
+ *                              [1 -1 -I  I]
+ * * Corresponds to reducing down the tree with nodes
+ *                       x^4 - 1
+ *                     /         \
+ *             x^2 - 1             x^2 + 1
+ *             /     \             /     \
+ *         x - 1     x + 1     x - I     x + I
+ *  where I is typically a square root of -1
+ *  (but this property is not exploited)
+ */
+#define DFT4_NODE0_LAZY14(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)    \
+    do {                                                             \
+        const ulong v0 = (a);                                        \
+        const ulong v1 = (b);                                        \
+        const ulong v2 = (c);                                        \
+        const ulong v3 = (d);                                        \
+        ulong v4 = v0 + v2;                         /* < 2*n */      \
+        ulong v5 = v0 + (n) - v2;                   /* < 2*n */      \
+        ulong v6 = v1 + v3;                         /* < 2*n */      \
+        ulong v7;                                                    \
+        N_MULMOD_PRECOMP_LAZY(v7, (I), v1 + (n2) - v3, (I_pr), (n),  \
+                              p_hi, p_lo);                           \
+        (a) = v4 + v6;                              /* < 4*n */      \
+        (b) = v4 + (n2) - v6;                       /* < 4*n */      \
+        (c) = v5 + v7;                              /* < 3*n */      \
         (d) = v5 + (n2) - v7;                       /* < 4*n */      \
     } while(0)
 
@@ -199,6 +246,33 @@ FLINT_FORCE_INLINE void dft8_node0_lazy24(ulong * p0, ulong * p1, ulong * p2, ul
                 F->mod, F->mod2, p_hi, p_lo, tmp);
 }
 
+/** TODO 8-point DFT, node 0
+ * * in [0..n) / out [0..4n) / max < 8n
+ * * In-place transform p = [p0,p1,p2,p3,p4,p5,p6,p7], seen as a polynomial
+ * p(x) = p0 + p1*x + ... + p7*x**7 into its evaluations 
+ *       p(1), p(-1), p(I), p(-I), p(J), p(-J), p(I*J), p(-I*J)
+ * at all 8-th roots of unity J**k for 0 <= k < 8 in bit-reversed order.
+ * * Recall [F->tab_w[2*k] for k in range(4)] == [1, I, J, IJ]
+ */
+FLINT_FORCE_INLINE void dft8_node0_lazy14(ulong * p0, ulong * p1, ulong * p2, ulong * p3,
+                                          ulong * p4, ulong * p5, ulong * p6, ulong * p7,
+                                          n_fft_ctx_t F)
+{
+    ulong p_hi, p_lo, tmp;
+
+    DFT2_NODE0_LAZY12(*p0, *p4, F->mod, tmp);
+    DFT2_NODE0_LAZY12(*p1, *p5, F->mod, tmp);
+    DFT2_NODE0_LAZY12(*p2, *p6, F->mod, tmp);
+    DFT2_NODE0_LAZY12(*p3, *p7, F->mod, tmp);
+
+    DFT4_NODE0_LAZY24(*p0, *p1, *p2, *p3, F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    DFT4_LAZY44(*p4, *p5, *p6, *p7,
+                F->tab_w[2], F->tab_w[3],
+                F->tab_w[4], F->tab_w[5],
+                F->tab_w[6], F->tab_w[7],
+                F->mod, F->mod2, p_hi, p_lo, tmp);
+}
+
 /** 8-point DFT
  * * in [0..4n) / out [0..4n) / max < 8n
  * * In-place transform p = [p0,p1,p2,p3,p4,p5,p6,p7], seen as a polynomial
@@ -256,6 +330,46 @@ FLINT_FORCE_INLINE void dft16_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
     if (p[2] >= F->mod2)
         p[2] -= F->mod2;
     DFT4_NODE0_LAZY24(p[3], p[7], p[11], p[15], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    if (p[3] >= F->mod2)
+        p[3] -= F->mod2;
+
+    // next line requires < 2n, hence the four reductions above
+    DFT4_NODE0_LAZY24(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    DFT4_LAZY44(p[4], p[5], p[6], p[7],
+                F->tab_w[2], F->tab_w[3],
+                F->tab_w[4], F->tab_w[5],
+                F->tab_w[6], F->tab_w[7],
+                F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[8], p[9], p[10], p[11],
+                F->tab_w[4], F->tab_w[5],
+                F->tab_w[8], F->tab_w[9],
+                F->tab_w[10], F->tab_w[11],
+                F->mod, F->mod2, p_hi, p_lo, tmp);
+    DFT4_LAZY44(p[12], p[13], p[14], p[15],
+                F->tab_w[6], F->tab_w[7],
+                F->tab_w[12], F->tab_w[13],
+                F->tab_w[14], F->tab_w[15],
+                F->mod, F->mod2, p_hi, p_lo, tmp);
+}
+
+/** TODO 16-point DFT, node 0
+ * * in [0..n) / out [0..4n) / max < 8n
+ * * Same specification as dft_node0_lazy24, for depth==4
+ */
+FLINT_FORCE_INLINE void dft16_node0_lazy14(nn_ptr p, n_fft_ctx_t F)
+{
+    ulong p_hi, p_lo, tmp;
+
+    DFT4_NODE0_LAZY14(p[0], p[4], p[ 8], p[12], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    if (p[0] >= F->mod2)
+        p[0] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[1], p[5], p[ 9], p[13], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    if (p[1] >= F->mod2)
+        p[1] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[2], p[6], p[10], p[14], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    if (p[2] >= F->mod2)
+        p[2] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[3], p[7], p[11], p[15], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     if (p[3] >= F->mod2)
         p[3] -= F->mod2;
 
@@ -380,6 +494,62 @@ FLINT_FORCE_INLINE void dft32_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
     if (p[6] >= F->mod2)
         p[6] -= F->mod2;
     DFT4_NODE0_LAZY24(p[7], p[15], p[23], p[31],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[7] >= F->mod2)
+        p[7] -= F->mod2;
+
+    // next line requires < 2n, hence the 8 reductions above
+    dft8_node0_lazy24(p+ 0, p+ 1, p+ 2, p+ 3, p+ 4, p+ 5, p+ 6, p+ 7,    F);
+    dft8_lazy44(      p+ 8, p+ 9, p+10, p+11, p+12, p+13, p+14, p+15, 1, F);
+    dft8_lazy44(      p+16, p+17, p+18, p+19, p+20, p+21, p+22, p+23, 2, F);
+    dft8_lazy44(      p+24, p+25, p+26, p+27, p+28, p+29, p+30, p+31, 3, F);
+}
+
+/** TODO 32-point DFT, node 0
+ * * in [0..n) / out [0..4n) / max < 8n
+ * * Same specification as dft_node0_lazy24, for depth==5
+ */
+FLINT_FORCE_INLINE void dft32_node0_lazy14(nn_ptr p, n_fft_ctx_t F)
+{
+    ulong p_hi, p_lo;
+
+    DFT4_NODE0_LAZY14(p[0], p[8 ], p[16], p[24],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[0] >= F->mod2)
+        p[0] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[1], p[9 ], p[17], p[25],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[1] >= F->mod2)
+        p[1] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[2], p[10], p[18], p[26],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[2] >= F->mod2)
+        p[2] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[3], p[11], p[19], p[27],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[3] >= F->mod2)
+        p[3] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[4], p[12], p[20], p[28],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[4] >= F->mod2)
+        p[4] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[5], p[13], p[21], p[29],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[5] >= F->mod2)
+        p[5] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[6], p[14], p[22], p[30],
+                      F->tab_w[2], F->tab_w[3],
+                      F->mod, F->mod2, p_hi, p_lo);
+    if (p[6] >= F->mod2)
+        p[6] -= F->mod2;
+    DFT4_NODE0_LAZY14(p[7], p[15], p[23], p[31],
                       F->tab_w[2], F->tab_w[3],
                       F->mod, F->mod2, p_hi, p_lo);
     if (p[7] >= F->mod2)
@@ -537,19 +707,19 @@ void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
     if (depth == 1)
     {
         ulong tmp;
-        DFT2_NODE0_LAZY24(p[0], p[1], F->mod2, tmp);
+        DFT2_NODE0_LAZY12(p[0], p[1], F->mod, tmp);
     }
     else if (depth == 2)
     {
         ulong p_hi, p_lo;
-        DFT4_NODE0_LAZY24(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+        DFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     }
     else if (depth == 3)
-        dft8_node0_lazy24(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F);
+        dft8_node0_lazy14(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F);
     else if (depth == 4)
-        dft16_node0_lazy24(p, F);
+        dft16_node0_lazy14(p, F);
     else if (depth == 5)
-        dft32_node0_lazy24(p, F);
+        dft32_node0_lazy14(p, F);
     else
     {
         const ulong len = UWORD(1) << depth;
@@ -564,7 +734,7 @@ void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
         ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k++)
         {
-            DFT4_NODE0_LAZY24(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            DFT4_NODE0_LAZY14(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
             if (p0[k] >= F->mod2)
                 p0[k] -= F->mod2;
         }
