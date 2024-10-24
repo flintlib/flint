@@ -113,7 +113,7 @@ void n_fft_ctx_clear(n_fft_ctx_t F);
  * transforms / inverse transforms / transposed transforms
  * at length a power of 2
  */
-void n_fft_dft(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F);
+void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
 
 

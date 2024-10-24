@@ -90,7 +90,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
             ulong * p = _nmod_vec_init(len);
             _nmod_vec_set(p, pol->coeffs, len);
 
-            n_fft_dft(p, len, depth, F);
+            n_fft_dft(p, depth, F);
 
             int res = nmod_vec_red_equal(evals_br, p, len, mod);
 

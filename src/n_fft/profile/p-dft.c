@@ -42,7 +42,7 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     {                                                                            \
         prof_start();                                                            \
         for (ulong j = 0; j < rep; j++)                                          \
-            n_fft_##fun##_variant(coeffs, len, depth, F);                       \
+            n_fft_##fun##_variant(coeffs, depth, F);                             \
         prof_stop();                                                             \
     }                                                                            \
                                                                                  \
