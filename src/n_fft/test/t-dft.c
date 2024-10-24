@@ -65,9 +65,9 @@ TEST_FUNCTION_START(n_fft_dft, state)
         n_fft_ctx_t F;
         n_fft_ctx_init2(F, MAX_EVAL_DEPTH, p);
 
-        for (ulong depth = 3; depth <= MAX_EVAL_DEPTH; depth++)
+        for (ulong depth = 0; depth <= MAX_EVAL_DEPTH; depth++)
         {
-            const ulong len = (1UL<<depth);
+            const ulong len = (UWORD(1) << depth);
 
             // choose random poly of degree < len
             nmod_poly_t pol;
@@ -76,12 +76,15 @@ TEST_FUNCTION_START(n_fft_dft, state)
 
             // naive evals by Horner, in bit reversed order
             nn_ptr evals_br = _nmod_vec_init(len);
-            for (ulong k = 0; k < len/2; k++)
-            {
-                ulong point = F->tab_w[2*k];
-                evals_br[2*k] = nmod_poly_evaluate_nmod(pol, point);
-                evals_br[2*k+1] = nmod_poly_evaluate_nmod(pol, nmod_neg(point, mod));
-            }
+            if (len == 1)
+                evals_br[0] = nmod_poly_evaluate_nmod(pol, UWORD(1));
+            else
+                for (ulong k = 0; k < len/2; k++)
+                {
+                    ulong point = F->tab_w[2*k];
+                    evals_br[2*k] = nmod_poly_evaluate_nmod(pol, point);
+                    evals_br[2*k+1] = nmod_poly_evaluate_nmod(pol, nmod_neg(point, mod));
+                }
 
             // evals by DFT
             ulong * p = _nmod_vec_init(len);
