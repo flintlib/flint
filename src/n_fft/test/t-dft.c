@@ -53,17 +53,17 @@ TEST_FUNCTION_START(n_fft_dft, state)
     {
         // take some FFT prime p with max_depth >= 12
         ulong max_depth = 12 + n_randint(state, 10);
-        ulong p = 1 + (UWORD(1) << max_depth);
-        while (! n_is_prime(p))
-            p += (UWORD(1) << max_depth);
-        max_depth = flint_ctz(p-1);
+        ulong prime = 1 + (UWORD(1) << max_depth);
+        while (! n_is_prime(prime))
+            prime += (UWORD(1) << max_depth);
+        max_depth = flint_ctz(prime-1);
 
         nmod_t mod;
-        nmod_init(&mod, p);
+        nmod_init(&mod, prime);
 
         // init FFT root tables
         n_fft_ctx_t F;
-        n_fft_ctx_init2(F, MAX_EVAL_DEPTH, p);
+        n_fft_ctx_init2(F, MAX_EVAL_DEPTH, prime);
 
         for (ulong depth = 0; depth <= MAX_EVAL_DEPTH; depth++)
         {

@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "longlong_asm_gcc.h" // TODO change to longlong
+#include "longlong.h"
 #include "n_fft.h"
 
 /*---------*/
