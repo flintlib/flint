@@ -19,7 +19,7 @@
 #define MAX_EVAL_DEPTH 10
 
 // vector equality up to reduction mod
-static int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, nmod_t mod)
+static inline int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, nmod_t mod)
 {
     for (ulong k = 0; k < len; k++)
     {
@@ -35,7 +35,7 @@ static int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, nmod_t 
 }
 
 // testing that all elements of "vec" are less than "bound"
-static int nmod_vec_range(nn_srcptr vec, ulong len, ulong bound)
+static inline int nmod_vec_range(nn_srcptr vec, ulong len, ulong bound)
 {
     for (ulong k = 0; k < len; k++)
         if (vec[k] >= bound)

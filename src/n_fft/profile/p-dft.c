@@ -91,7 +91,6 @@ void sample_sd_fft(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
-
 int main()
 {
     flint_printf("- depth is log(fft length)\n");
