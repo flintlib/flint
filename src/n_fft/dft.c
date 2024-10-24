@@ -238,9 +238,10 @@ FLINT_FORCE_INLINE void dft8_lazy44(ulong * p0, ulong * p1, ulong * p2, ulong * 
 /* 16-point DFT */
 /*--------------*/
 
-// TODO doc for dft16
-// TODO simplify and bench other variants
-// in [0..2n), out [0..4n), max value < 8n
+/** 16-point DFT, node 0
+ * * in [0..2n) / out [0..4n) / max < 8n
+ * * Same specification as dft_node0_lazy24, for depth==4
+ */
 FLINT_FORCE_INLINE void dft16_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
 {
     ulong p_hi, p_lo, tmp;
@@ -277,8 +278,10 @@ FLINT_FORCE_INLINE void dft16_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
                 F->mod, F->mod2, p_hi, p_lo, tmp);
 }
 
-// TODO doc for dft16
-// TODO bench other variants
+/** 16-point DFT
+ * * in [0..4n) / out [0..4n) / max < 8n
+ * * Same specification as dft_lazy44, for depth==4
+ */
 FLINT_FORCE_INLINE void dft16_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
 {
     ulong p_hi, p_lo, tmp;
@@ -333,7 +336,10 @@ FLINT_FORCE_INLINE void dft16_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
 /* 32-point DFT */
 /*--------------*/
 
-// in [0..2n), out [0..4n), max value < 8n
+/** 32-point DFT, node 0
+ * * in [0..2n) / out [0..4n) / max < 8n
+ * * Same specification as dft_node0_lazy24, for depth==5
+ */
 FLINT_FORCE_INLINE void dft32_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
 {
     ulong p_hi, p_lo;
@@ -386,8 +392,10 @@ FLINT_FORCE_INLINE void dft32_node0_lazy24(nn_ptr p, n_fft_ctx_t F)
     dft8_lazy44(      p+24, p+25, p+26, p+27, p+28, p+29, p+30, p+31, 3, F);
 }
 
-
-// in [0..2n), out [0..4n), max value < 8n
+/** 32-point DFT
+ * * in [0..4n) / out [0..4n) / max < 8n
+ * * Same specification as dft_lazy44, for depth==5
+ */
 FLINT_FORCE_INLINE void dft32_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
 {
     ulong p_hi, p_lo, tmp;
@@ -428,20 +436,21 @@ FLINT_FORCE_INLINE void dft32_lazy44(nn_ptr p, ulong node, n_fft_ctx_t F)
  * * By construction these evaluation points are the roots of the
  * polynomial x**len - F->tab_w[node]
  * * Requirement (not checked):
+ *        3 <= depth
  *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
  */
 // TODO remove argument len
-// TODO remove restriction to length >= 3 ?
 void dft_lazy44(nn_ptr p, ulong len, ulong depth, ulong node, n_fft_ctx_t F)
 {
     if (depth == 3)
         dft8_lazy44(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, node, F);
     else if (depth == 4)
         dft16_lazy44(p, node, F);
-    else if (depth == 5)  // TODO unclear this helps (no acceleration on argiope)
+    else if (depth == 5)
         dft32_lazy44(p, node, F);
     else
     {
+        // 4-point butterflies 
         // in: [0..4n), out: [0..4n)
         const nn_ptr p0 = p;
         const nn_ptr p1 = p+len/4;
@@ -463,6 +472,7 @@ void dft_lazy44(nn_ptr p, ulong len, ulong depth, ulong node, n_fft_ctx_t F)
             DFT4_LAZY44(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
         }
 
+        // 4 recursive calls with depth-2
         dft_lazy44(p0, len/4, depth-2, 4*node, F);
         dft_lazy44(p1, len/4, depth-2, 4*node+1, F);
         dft_lazy44(p2, len/4, depth-2, 4*node+2, F);
@@ -480,18 +490,10 @@ void dft_lazy44(nn_ptr p, ulong len, ulong depth, ulong node, n_fft_ctx_t F)
  * * By construction these evaluation points are the roots of the polynomial
  * x**len - 1, precisely they are all powers of the chosen len-th primitive
  * root of unity with exponents listed in bit reversed order
- * * Requirement (not checked): depth <= F.depth
+ * * Requirements (not checked): 3 <= depth <= F.depth
  */
 void dft_node0_lazy24(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
 {
-    // depth == 0: nothing to do
-    //if (depth == 1)
-    //    // in [0..4n), out [0..4n)
-    //    DFT2_LAZY4_RED(p[0], p[1], F->mod4);
-    //else if (depth == 2)
-    //    // in [0..2n), out [0..4n)
-    //    DFT4_LAZY2_RED(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
-    //else
     if (depth == 3)
         dft8_node0_lazy24(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F);  // in [0..2n), out [0..4n)
     else if (depth == 4)
@@ -500,8 +502,9 @@ void dft_node0_lazy24(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
         dft32_node0_lazy24(p, F);  // in [0..2n), out [0..4n)
     else
     {
-        // input [0..2n) x [0..2n), output [0..2n) x [0..4n)
-        // (general accepts [0..4n) as input for depth >= 3)
+        // 4-point butterflies
+        // input p0,p1,p2,p3 in [0..2n) x [0..2n) x [0..2n) x [0..2n)
+        // output p0,p1,p2,p3 in [0..2n) x [0..4n) x [0..4n) x [0..4n)
         const nn_ptr p0 = p;
         const nn_ptr p1 = p + len/4;
         const nn_ptr p2 = p + 2*len/4;
@@ -510,9 +513,11 @@ void dft_node0_lazy24(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
         for (ulong k = 0; k < len/4; k++)
         {
             DFT4_NODE0_LAZY24(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
-            if (p[k] >= F->mod2)
-                p[k] -= F->mod2;
+            if (p0[k] >= F->mod2)
+                p0[k] -= F->mod2;
         }
+
+        // 4 recursive calls with depth-2
         dft_node0_lazy24(p0, len/4, depth-2, F);
         dft_lazy44(p1, len/4, depth-2, 1, F);
         dft_lazy44(p2, len/4, depth-2, 2, F);
@@ -524,23 +529,27 @@ void dft_node0_lazy24(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
 void n_fft_dft(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
 {
     // depth == 0: nothing to do
-    //if (depth == 1)
-    //    // in [0..4n), out [0..4n)
-    //    DFT2_LAZY4_RED(p[0], p[1], F->mod4);
-    //else if (depth == 2)
-    //    // in [0..2n), out [0..4n)
-    //    DFT4_LAZY2_RED(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
-    //else
-    if (depth == 3)
-        dft8_node0_lazy24(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F);  // in [0..2n), out [0..4n)
+    if (depth == 1)
+    {
+        ulong tmp;
+        DFT2_NODE0_LAZY24(p[0], p[1], F->mod2, tmp);
+    }
+    else if (depth == 2)
+    {
+        ulong p_hi, p_lo;
+        DFT4_NODE0_LAZY24(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    }
+    else if (depth == 3)
+        dft8_node0_lazy24(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F);
     else if (depth == 4)
-        dft16_node0_lazy24(p, F);  // in [0..2n), out [0..4n)
-    //else if (depth == 5)   // TODO unclear this helps (no acceleration on argiope)
-    //    dft32_node0_lazy24(p, F);  // in [0..2n), out [0..4n)
+        dft16_node0_lazy24(p, F);
+    else if (depth == 5)
+        dft32_node0_lazy24(p, F);
     else
     {
-        // input [0..2n) x [0..2n), output [0..2n) x [0..4n)
-        // (general accepts [0..4n) as input for depth >= 3)
+        // 4-point butterflies
+        // input p0,p1,p2,p3 in [0..2n) x [0..2n) x [0..2n) x [0..2n)
+        // output p0,p1,p2,p3 in [0..2n) x [0..4n) x [0..4n) x [0..4n)
         const nn_ptr p0 = p;
         const nn_ptr p1 = p + len/4;
         const nn_ptr p2 = p + 2*len/4;
@@ -549,9 +558,11 @@ void n_fft_dft(nn_ptr p, ulong len, ulong depth, n_fft_ctx_t F)
         for (ulong k = 0; k < len/4; k++)
         {
             DFT4_NODE0_LAZY24(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
-            if (p[k] >= F->mod2)
-                p[k] -= F->mod2;
+            if (p0[k] >= F->mod2)
+                p0[k] -= F->mod2;
         }
+
+        // 4 recursive calls with depth-2
         dft_node0_lazy24(p0, len/4, depth-2, F);
         dft_lazy44(p1, len/4, depth-2, 1, F);
         dft_lazy44(p2, len/4, depth-2, 2, F);
