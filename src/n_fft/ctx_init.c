@@ -60,7 +60,7 @@ void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, 
 
 void n_fft_ctx_init2(n_fft_ctx_t F, ulong depth, ulong p)
 {
-    FLINT_ASSERT(p > 2 && flint_clz(p) >= 3);    // 2 < p < 2**61
+    FLINT_ASSERT(p > 2 && flint_clz(p) >= 2);    // 2 < p < 2**62
     FLINT_ASSERT(flint_ctz(p - UWORD(1)) >= 3);  // p-1 divisible by 8
 
     // find the constant and exponent such that p == c * 2**max_depth + 1

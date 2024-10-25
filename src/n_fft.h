@@ -45,6 +45,15 @@ typedef struct
 } n_fft_ctx_struct;
 typedef n_fft_ctx_struct n_fft_ctx_t[1];
 
+typedef struct
+{
+    ulong mod;                 // modulus, odd prime
+    ulong mod2;                // 2*mod  (storing helps for speed)
+    ulong * tab_w;             // tabulated powers of w, see below
+} n_fft_params_struct;
+typedef n_fft_params_struct n_fft_params_t[1];
+
+
 /** Requirements (not checked upon init):
  *     - mod is an odd prime < 2**61
  *     - max_depth must be >= 3 (so, 8 must divide mod - 1)

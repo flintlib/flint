@@ -636,7 +636,7 @@ do {                                                                            
  *        3 <= depth
  *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
  */
-void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_ctx_t F)
+void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_params_t F)
 {
     if (depth == 3)
         DFT8_LAZY44(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, node, F->mod, F->mod2, F->tab_w);
@@ -719,9 +719,10 @@ void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_ctx_t F)
 
         // 4 recursive calls with depth-2
         dft_node0_lazy24(p0, depth-2, F);
-        dft_lazy44(p1, depth-2, 1, F);
-        dft_lazy44(p2, depth-2, 2, F);
-        dft_lazy44(p3, depth-2, 3, F);
+        n_fft_params_t Fpar = {{F->mod, F->mod2, F->tab_w}};
+        dft_lazy44(p1, depth-2, 1, Fpar);
+        dft_lazy44(p2, depth-2, 2, Fpar);
+        dft_lazy44(p3, depth-2, 3, Fpar);
     }
 }
 
@@ -779,8 +780,9 @@ void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 
         // 4 recursive calls with depth-2
         dft_node0_lazy24(p0, depth-2, F);
-        dft_lazy44(p1, depth-2, 1, F);
-        dft_lazy44(p2, depth-2, 2, F);
-        dft_lazy44(p3, depth-2, 3, F);
+        n_fft_params_t Fpar = {{F->mod, F->mod2, F->tab_w}};
+        dft_lazy44(p1, depth-2, 1, Fpar);
+        dft_lazy44(p2, depth-2, 2, Fpar);
+        dft_lazy44(p3, depth-2, 3, Fpar);
     }
 }
