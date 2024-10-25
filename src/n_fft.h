@@ -21,10 +21,13 @@ extern "C" {
 #endif
 
 /**
- * TODO[short term] confirm the limit on the modulus
+ * TODO[short term] augment precomputations with inverse roots
+ * TODO[short term] confirm the limit on the modulus (seems ok in dft; check via tests)
  * TODO[short term] add testing for general variants, not only node0
  * TODO[longer term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
+ * TODO[later] provide forward function which reduces output to [0..n) ?
+ *    unclear this is useful... to be decided later
  */
 
 /** n_fft context:
@@ -114,9 +117,9 @@ void n_fft_ctx_clear(n_fft_ctx_t F);
  * at length a power of 2
  */
 void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F);
-void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);
-void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
-void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
+void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO
+void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (idft on inverted roots)
+void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (dft on inverted roots)
 
 
 
