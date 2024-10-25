@@ -52,10 +52,26 @@ TEST_FUNCTION_START(n_fft_dft, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         // take some FFT prime p with max_depth >= 12
-        ulong max_depth = 12 + n_randint(state, 10);
-        ulong prime = 1 + (UWORD(1) << max_depth);
-        while (! n_is_prime(prime))
-            prime += (UWORD(1) << max_depth);
+        ulong max_depth, prime;
+
+        // occasionally test large prime
+        // 61 bits: prime = 2305840260434624513
+        //                == 1 + 2**39 * 29 * 61 * 2371, log_2 == 60.999998
+        // 29 bits: prime = 536608769
+        //                == 1 + 2**18 * 23 * 89, log_2 == 28.999295
+        if (i % 10 == 0)
+#if FLINT_BITS == 64
+            prime = UWORD(2305840260434624513);
+#else // FLINT_BITS == 32
+            prime = UWORD(536608769);
+#endif
+        else
+        {
+            max_depth = 12 + n_randint(state, 10);
+            prime = 1 + (UWORD(1) << max_depth);
+            while (! n_is_prime(prime))
+                prime += (UWORD(1) << max_depth);
+        }
         max_depth = flint_ctz(prime-1);
 
         nmod_t mod;

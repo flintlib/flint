@@ -12,9 +12,6 @@
 #include "longlong_asm_gcc.h"
 #include "n_fft.h"
 
-// TODO[later] provide function which reduces output to [0..n) ?
-// unclear this is useful... to be decided later
-
 /*---------*/
 /* helpers */
 /*---------*/
