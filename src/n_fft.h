@@ -22,7 +22,6 @@ extern "C" {
 
 /**
  * TODO[short term] augment precomputations with inverse roots
- * TODO[short term] confirm the limit on the modulus (seems ok in dft; check via tests)
  * TODO[short term] add testing for general variants, not only node0
  * TODO[longer term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions

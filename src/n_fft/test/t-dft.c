@@ -49,21 +49,19 @@ TEST_FUNCTION_START(n_fft_dft, state)
 {
     int i;
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         // take some FFT prime p with max_depth >= 12
         ulong max_depth, prime;
 
-        // occasionally test large prime
-        // 61 bits: prime = 2305840260434624513
-        //                == 1 + 2**39 * 29 * 61 * 2371, log_2 == 60.999998
-        // 29 bits: prime = 536608769
-        //                == 1 + 2**18 * 23 * 89, log_2 == 28.999295
-        if (i % 10 == 0)
+        // half of tests == large prime, close to limit
+        // 62 bits: prime = 4611686018427322369 == 2**62 - 2**16 + 1
+        // 30 bits: prime = 1073479681 == 2**30 - 2**18 + 1
+        if (i > 100)
 #if FLINT_BITS == 64
-            prime = UWORD(2305840260434624513);
+            prime = UWORD(4611686018427322369);
 #else // FLINT_BITS == 32
-            prime = UWORD(536608769);
+            prime = UWORD(1073479681);
 #endif
         else
         {
@@ -117,7 +115,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
                         "max_depth = %wu\n"
                         "depth = %wu\n"
                         "failed equality test\n",
-                        p, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+                        prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
 
             res = nmod_vec_range(p, len, 4*mod.n);
 
@@ -128,7 +126,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
                         "max_depth = %wu\n"
                         "depth = %wu\n"
                         "failed range test\n",
-                        p, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+                        prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
 
             _nmod_vec_clear(p);
             nmod_poly_clear(pol);

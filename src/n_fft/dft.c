@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "longlong_asm_gcc.h"
+#include "longlong.h"
 #include "n_fft.h"
 
 /*---------*/
@@ -150,7 +150,7 @@
     } while(0)
 
 /** 4-point DFT, general
- * * in [0..4n) / out [0..4n) / max < 8n
+ * * in [0..4n) / out [0..4n) / max < 4n
  * * In-place transform
  *                              [ 1          1       1       1]
  *                              [w2        -w2      w3     -w3]
@@ -190,13 +190,13 @@ do {                                                           \
                                                                \
     N_MULMOD_PRECOMP_LAZY(u3, w1, u3, w1_pr, n, p_hi, p_lo);   \
     tmp = u1;                                                  \
-    u1 = u1 + u3;                    /* [0..8n) */             \
-    u3 = tmp + n2 - u3;              /* [0..8n) */             \
+    u1 = u1 + u3;                    /* [0..4n) */             \
+    u3 = tmp + n2 - u3;              /* [0..4n) */             \
                                                                \
     N_MULMOD_PRECOMP_LAZY(u1, w2, u1, w2_pr, n, p_hi, p_lo);   \
     tmp = u0;                                                  \
-    (a) = u0 + u1;                    /* [0..4n) */            \
-    (b) = tmp + n2 - u1;              /* [0..4n) */            \
+    (a) = u0 + u1;                   /* [0..4n) */             \
+    (b) = tmp + n2 - u1;             /* [0..4n) */             \
                                                                \
     N_MULMOD_PRECOMP_LAZY(u3, w3, u3, w3_pr, n, p_hi, p_lo);   \
     tmp = u2;                                                  \
@@ -209,7 +209,7 @@ do {                                                           \
 /*-------------*/
 
 /** 8-point DFT, node 0
- * * in [0..n) / out [0..4n) / max < 8n
+ * * in [0..n) / out [0..4n) / max < 4n
  * * In-place transform p = [p0,p1,p2,p3,p4,p5,p6,p7], seen as a polynomial
  * p(x) = p0 + p1*x + ... + p7*x**7 into its evaluations 
  *       p(1), p(-1), p(I), p(-I), p(J), p(-J), p(I*J), p(-I*J)
@@ -240,7 +240,7 @@ do {                                                       \
 } while(0)
 
 /** 8-point DFT, node 0
- * * in [0..2n) / out [0..4n) / max < 8n
+ * * in [0..2n) / out [0..4n) / max < 4n
  * * apart from these ranges, same specification as DFT8_NODE0_LAZY14
  */
 #define DFT8_NODE0_LAZY24(p0, p1, p2, p3, p4, p5, p6, p7,  \
@@ -264,7 +264,7 @@ do {                                                       \
 } while(0)
 
 /** 8-point DFT
- * * in [0..4n) / out [0..4n) / max < 8n
+ * * in [0..4n) / out [0..4n) / max < 4n
  * * In-place transform p = [p0,p1,p2,p3,p4,p5,p6,p7], seen as a polynomial
  * p(x) = p0 + p1*x + ... + p7*x**7 into its evaluations 
  *       p(w0), p(-w0), p(w1), p(-w1), p(w2), p(-w2), p(w3), p(-w3)
@@ -302,7 +302,7 @@ do {                                                                  \
 /*--------------*/
 
 /** 16-point DFT, node 0
- * * in [0..n) / out [0..4n) / max < 8n
+ * * in [0..n) / out [0..4n) / max < 4n
  * * Apart from this range, same specification as dft_node0_lazy24, for depth==4
  */
 #define DFT16_NODE0_LAZY14(p, mod, mod2, tab_w)                     \
@@ -353,7 +353,7 @@ do {                                                                \
 } while(0)
 
 /** 16-point DFT, node 0
- * * in [0..2n) / out [0..4n) / max < 8n
+ * * in [0..2n) / out [0..4n) / max < 4n
  * * Same specification as dft_node0_lazy24, for depth==4
  */
 #define DFT16_NODE0_LAZY24(p, mod, mod2, tab_w)  \
@@ -404,7 +404,7 @@ do {                                             \
 } while(0)
 
 /** 16-point DFT
- * * in [0..4n) / out [0..4n) / max < 8n
+ * * in [0..4n) / out [0..4n) / max < 4n
  * * Same specification as dft_lazy44, for depth==4
  */
 #define DFT16_LAZY44(p, node, mod, mod2, tab_w)  \
@@ -478,7 +478,7 @@ do {                                             \
 /*--------------*/
 
 /** 32-point DFT, node 0
- * * in [0..n) / out [0..4n) / max < 8n
+ * * in [0..n) / out [0..4n) / max < 4n
  * * Apart from this range, same specification as dft_node0_lazy24, for depth==5
  */
 #define DFT32_NODE0_LAZY14(p, mod, mod2, tab_w)                                             \
@@ -534,7 +534,7 @@ do {                                                                            
 } while(0)
 
 /** 32-point DFT, node 0
- * * in [0..2n) / out [0..4n) / max < 8n
+ * * in [0..2n) / out [0..4n) / max < 4n
  * * Same specification as dft_node0_lazy24, for depth==5
  */
 #define DFT32_NODE0_LAZY24(p, mod, mod2, tab_w)                                               \
@@ -590,7 +590,7 @@ do {                                                                            
 } while(0)
 
 /** 32-point DFT
- * * in [0..4n) / out [0..4n) / max < 8n
+ * * in [0..4n) / out [0..4n) / max < 4n
  * * Same specification as dft_lazy44, for depth==5
  */
 #define DFT32_LAZY44(p, node, mod, mod2, tab_w)                                                         \
@@ -624,7 +624,7 @@ do {                                                                            
 /*-------------*/
 
 /** 2**depth-point DFT
- * * in [0..4n) / out [0..4n) / max < 8n
+ * * in [0..4n) / out [0..4n) / max < 4n
  * * In-place transform p of length len == 2**depth into
  * the concatenation of
  *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
@@ -679,7 +679,7 @@ void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_ctx_t F)
 }
 
 /** 2**depth-point DFT
- * * in [0..2n) / out [0..4n) / max < 8n
+ * * in [0..2n) / out [0..4n) / max < 4n
  * * In-place transform p of length len == 2**depth into
  * the concatenation of
  *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
@@ -726,7 +726,7 @@ void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_ctx_t F)
 }
 
 /** 2**depth-point DFT
- * * in [0..n) / out [0..4n) / max < 8n
+ * * in [0..n) / out [0..4n) / max < 4n
  * * In-place transform p of length len == 2**depth into
  * the concatenation of
  *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
