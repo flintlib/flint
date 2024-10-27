@@ -133,7 +133,7 @@ void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     }
 }
 
-void idft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F)
+void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 0)
         return;
@@ -152,7 +152,7 @@ void idft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F)
     else
     {
         const ulong len = UWORD(1) << depth;
-        idft_node0_lazy14(p, depth-1, F);
+        idft_node0_lazy12(p, depth-1, F);
         idft_lazy22(p+len/2, depth-1, 1, F);
 
         const ulong one = F->tab_w[0];

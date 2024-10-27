@@ -195,12 +195,12 @@ FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 // FIXME in progress
 // not tested yet --> test == applying dft yields identity
 // DOC. Note: output < n.
-void idft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F);
+void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F);
 FLINT_FORCE_INLINE void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_iw);
-    idft_node0_lazy14(p, depth, Fargs);
+    idft_node0_lazy12(p, depth, Fargs);
 
     if (depth > 0)
     {
@@ -229,7 +229,7 @@ FLINT_FORCE_INLINE void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_w);
-    idft_node0_lazy14(p, depth, Fargs);
+    idft_node0_lazy12(p, depth, Fargs);
 }
 
 // FIXME in progress
