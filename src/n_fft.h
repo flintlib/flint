@@ -13,6 +13,8 @@
 #define N_FFT_H
 
 #include "flint.h"
+#include "nmod.h"
+#include "nmod_vec.h"
 
 #define N_FFT_CTX_DEFAULT_DEPTH 12
 
@@ -142,10 +144,46 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
  * transforms / inverse transforms / transposed transforms
  * at length a power of 2
  */
-void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F);
+void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F);
+
+/** 2**depth-point DFT
+ * * in [0..n) / out [0..4n) / max < 4n
+ * * In-place transform p of length len == 2**depth into
+ * the concatenation of
+ *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
+ * for k in range(len),
+ * where w_k = F->tab_w[2*k] for 0 <= k < 2**(depth-1)
+ * * By construction these evaluation points are the roots of the polynomial
+ * x**len - 1, precisely they are all powers of the chosen len-th primitive
+ * root of unity with exponents listed in bit reversed order
+ * * Requirements (not checked): depth <= F.depth
+ */
+FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_w);
+    dft_node0_lazy14(p, depth, Fargs);
+}
+
+FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_iw);
+    dft_node0_lazy14(p, depth, Fargs);
+
+    if (depth > 0)
+    {
+        nmod_t mod;
+        nmod_init(&mod, F->mod);
+        const ulong len = UWORD(1) << depth;
+        const ulong invlen = nmod_inv(len, mod); // TODO store?
+        _nmod_vec_scalar_mul_nmod(p, p, len, invlen, mod);
+    }
+}
+
+
 void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO
 void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (idft on inverted roots, non-scaled)
-void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (dft on inverted roots, scaled)
 
 
 

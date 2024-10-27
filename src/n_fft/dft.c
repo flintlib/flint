@@ -767,36 +767,33 @@ void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_args_t F)
  * root of unity with exponents listed in bit reversed order
  * * Requirements (not checked): depth <= F.depth
  */
-void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
+void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 0)
         return;
 
-    n_fft_args_t Fargs;
-    n_fft_set_args(Fargs, F->mod, F->tab_w);
-
     if (depth == 1)
     {
         ulong tmp;
-        DFT2_NODE0_LAZY12(p[0], p[1], Fargs->mod, tmp);
+        DFT2_NODE0_LAZY12(p[0], p[1], F->mod, tmp);
     }
     else if (depth == 2)
     {
         ulong p_hi, p_lo;
-        DFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], Fargs->tab_w[2], Fargs->tab_w[3], Fargs->mod, Fargs->mod2, p_hi, p_lo);
+        DFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
     }
     else if (depth == 3)
-        DFT8_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], Fargs->mod, Fargs->mod2, Fargs->tab_w);
+        DFT8_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
     else if (depth == 4)
         DFT16_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                           Fargs->mod, Fargs->mod2, Fargs->tab_w);
+                           F->mod, F->mod2, F->tab_w);
     else if (depth == 5)
         DFT32_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                            p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
                            p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
-                           Fargs->mod, Fargs->mod2, Fargs->tab_w);
+                           F->mod, F->mod2, F->tab_w);
     else
     {
         const ulong len = UWORD(1) << depth;
@@ -811,15 +808,16 @@ void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
         ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k++)
         {
-            DFT4_NODE0_LAZY14(p0[k], p1[k], p2[k], p3[k], Fargs->tab_w[2], Fargs->tab_w[3], Fargs->mod, Fargs->mod2, p_hi, p_lo);
-            if (p0[k] >= Fargs->mod2)
-                p0[k] -= Fargs->mod2;
+            DFT4_NODE0_LAZY14(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            if (p0[k] >= F->mod2)
+                p0[k] -= F->mod2;
         }
 
         // 4 recursive calls with depth-2
-        dft_node0_lazy24(p0, depth-2, Fargs);
-        dft_lazy44(p1, depth-2, 1, Fargs);
-        dft_lazy44(p2, depth-2, 2, Fargs);
-        dft_lazy44(p3, depth-2, 3, Fargs);
+        dft_node0_lazy24(p0, depth-2, F);
+        dft_lazy44(p1, depth-2, 1, F);
+        dft_lazy44(p2, depth-2, 2, F);
+        dft_lazy44(p3, depth-2, 3, F);
     }
 }
+
