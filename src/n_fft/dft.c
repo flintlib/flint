@@ -272,29 +272,29 @@ do {                                                       \
  * * By construction these 8 evaluation points are the 8 roots of the
  * polynomial x**8 - F->tab_w[node]
  */
-#define DFT8_LAZY44(p0, p1, p2, p3, p4, p5, p6, p7,                   \
-                    node, mod, mod2, tab_w)                           \
-do {                                                                  \
-    ulong p_hi, p_lo, u, v;                                           \
-                                                                      \
-    const ulong w = tab_w[2*(node)];                                  \
-    const ulong w_pr = tab_w[2*(node)+1];                             \
-    DFT2_LAZY44(p0, p4, mod, mod2, w, w_pr, p_hi, p_lo, u, v);        \
-    DFT2_LAZY44(p1, p5, mod, mod2, w, w_pr, p_hi, p_lo, u, v);        \
-    DFT2_LAZY44(p2, p6, mod, mod2, w, w_pr, p_hi, p_lo, u, v);        \
-    DFT2_LAZY44(p3, p7, mod, mod2, w, w_pr, p_hi, p_lo, u, v);        \
-                                                                      \
-    DFT4_LAZY44(p0, p1, p2, p3,                                       \
-                tab_w[4*(node)], tab_w[4*(node)+1],                   \
-                tab_w[8*(node)], tab_w[8*(node)+1],                   \
-                tab_w[8*(node)+2], tab_w[8*(node)+3],                 \
-                mod, mod2, p_hi, p_lo, u);                            \
-                                                                      \
-    DFT4_LAZY44(p4, p5, p6, p7,                                       \
-                tab_w[4*(node)+2], tab_w[4*(node)+3],                 \
-                tab_w[8*(node)+4], tab_w[8*(node)+5],                 \
-                tab_w[8*(node)+6], tab_w[8*(node)+7],                 \
-                mod, mod2, p_hi, p_lo, u);                            \
+#define DFT8_LAZY44(p0, p1, p2, p3, p4, p5, p6, p7,              \
+                    node, mod, mod2, tab_w)                      \
+do {                                                             \
+    ulong p_hi, p_lo, u, v;                                      \
+                                                                 \
+    const ulong w = tab_w[2*(node)];                             \
+    const ulong w_pr = tab_w[2*(node)+1];                        \
+    DFT2_LAZY44(p0, p4, mod, mod2, w, w_pr, p_hi, p_lo, u, v);   \
+    DFT2_LAZY44(p1, p5, mod, mod2, w, w_pr, p_hi, p_lo, u, v);   \
+    DFT2_LAZY44(p2, p6, mod, mod2, w, w_pr, p_hi, p_lo, u, v);   \
+    DFT2_LAZY44(p3, p7, mod, mod2, w, w_pr, p_hi, p_lo, u, v);   \
+                                                                 \
+    DFT4_LAZY44(p0, p1, p2, p3,                                  \
+                tab_w[4*(node)], tab_w[4*(node)+1],              \
+                tab_w[8*(node)], tab_w[8*(node)+1],              \
+                tab_w[8*(node)+2], tab_w[8*(node)+3],            \
+                mod, mod2, p_hi, p_lo, u);                       \
+                                                                 \
+    DFT4_LAZY44(p4, p5, p6, p7,                                  \
+                tab_w[4*(node)+2], tab_w[4*(node)+3],            \
+                tab_w[8*(node)+4], tab_w[8*(node)+5],            \
+                tab_w[8*(node)+6], tab_w[8*(node)+7],            \
+                mod, mod2, p_hi, p_lo, u);                       \
 } while(0)
 
 /*--------------*/
