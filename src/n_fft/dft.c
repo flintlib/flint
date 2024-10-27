@@ -411,70 +411,72 @@ do {                                                             \
  * * in [0..4n) / out [0..4n) / max < 4n
  * * Same specification as dft_lazy44, for depth==4
  */
-#define DFT16_LAZY44(p, node, mod, mod2, tab_w)  \
-do {                                             \
-    ulong p_hi, p_lo, tmp;                       \
-    ulong w2, w2pre, w, wpre, Iw, Iwpre;         \
-                                                 \
-    w2 = tab_w[2*node];                          \
-    w2pre = tab_w[2*node+1];                     \
-    w = tab_w[4*node];                           \
-    wpre = tab_w[4*node+1];                      \
-    Iw = tab_w[4*node+2];                        \
-    Iwpre = tab_w[4*node+3];                     \
-                                                 \
-    DFT4_LAZY44(p[0], p[4], p[ 8], p[12],        \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
-    DFT4_LAZY44(p[1], p[5], p[ 9], p[13],        \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
-    DFT4_LAZY44(p[2], p[6], p[10], p[14],        \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
-    DFT4_LAZY44(p[3], p[7], p[11], p[15],        \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
-                                                 \
-    w2 = tab_w[8*node];                          \
-    w2pre = tab_w[8*node+1];                     \
-    w = tab_w[16*node];                          \
-    wpre = tab_w[16*node+1];                     \
-    Iw = tab_w[16*node+2];                       \
-    Iwpre = tab_w[16*node+3];                    \
-    DFT4_LAZY44(p[0], p[1], p[2], p[3],          \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
-                                                 \
-    w2 = tab_w[8*node+2];                        \
-    w2pre = tab_w[8*node+3];                     \
-    w = tab_w[16*node+4];                        \
-    wpre = tab_w[16*node+5];                     \
-    Iw = tab_w[16*node+6];                       \
-    Iwpre = tab_w[16*node+7];                    \
-    DFT4_LAZY44(p[4], p[5], p[6], p[7],          \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
-                                                 \
-    w2 = tab_w[8*node+4];                        \
-    w2pre = tab_w[8*node+5];                     \
-    w = tab_w[16*node+8];                        \
-    wpre = tab_w[16*node+9];                     \
-    Iw = tab_w[16*node+10];                      \
-    Iwpre = tab_w[16*node+11];                   \
-    DFT4_LAZY44(p[8], p[9], p[10], p[11],        \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
-                                                 \
-    w2 = tab_w[8*node+6];                        \
-    w2pre = tab_w[8*node+7];                     \
-    w = tab_w[16*node+12];                       \
-    wpre = tab_w[16*node+13];                    \
-    Iw = tab_w[16*node+14];                      \
-    Iwpre = tab_w[16*node+15];                   \
-    DFT4_LAZY44(p[12], p[13], p[14], p[15],      \
-                w2, w2pre, w, wpre, Iw, Iwpre,   \
-                mod, mod2, p_hi, p_lo, tmp);     \
+#define DFT16_LAZY44(p0, p1, p2, p3, p4, p5, p6, p7,       \
+                     p8, p9, p10, p11, p12, p13, p14, p15, \
+                     node, mod, mod2, tab_w)               \
+do {                                                       \
+    ulong p_hi, p_lo, tmp;                                 \
+    ulong w2, w2pre, w, wpre, Iw, Iwpre;                   \
+                                                           \
+    w2 = tab_w[2*node];                                    \
+    w2pre = tab_w[2*node+1];                               \
+    w = tab_w[4*node];                                     \
+    wpre = tab_w[4*node+1];                                \
+    Iw = tab_w[4*node+2];                                  \
+    Iwpre = tab_w[4*node+3];                               \
+                                                           \
+    DFT4_LAZY44(p0, p4, p8, p12,                           \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
+    DFT4_LAZY44(p1, p5, p9, p13,                           \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
+    DFT4_LAZY44(p2, p6, p10, p14,                          \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
+    DFT4_LAZY44(p3, p7, p11, p15,                          \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
+                                                           \
+    w2 = tab_w[8*node];                                    \
+    w2pre = tab_w[8*node+1];                               \
+    w = tab_w[16*node];                                    \
+    wpre = tab_w[16*node+1];                               \
+    Iw = tab_w[16*node+2];                                 \
+    Iwpre = tab_w[16*node+3];                              \
+    DFT4_LAZY44(p0, p1, p2, p3,                            \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
+                                                           \
+    w2 = tab_w[8*node+2];                                  \
+    w2pre = tab_w[8*node+3];                               \
+    w = tab_w[16*node+4];                                  \
+    wpre = tab_w[16*node+5];                               \
+    Iw = tab_w[16*node+6];                                 \
+    Iwpre = tab_w[16*node+7];                              \
+    DFT4_LAZY44(p4, p5, p6, p7,                            \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
+                                                           \
+    w2 = tab_w[8*node+4];                                  \
+    w2pre = tab_w[8*node+5];                               \
+    w = tab_w[16*node+8];                                  \
+    wpre = tab_w[16*node+9];                               \
+    Iw = tab_w[16*node+10];                                \
+    Iwpre = tab_w[16*node+11];                             \
+    DFT4_LAZY44(p8, p9, p10, p11,                          \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
+                                                           \
+    w2 = tab_w[8*node+6];                                  \
+    w2pre = tab_w[8*node+7];                               \
+    w = tab_w[16*node+12];                                 \
+    wpre = tab_w[16*node+13];                              \
+    Iw = tab_w[16*node+14];                                \
+    Iwpre = tab_w[16*node+15];                             \
+    DFT4_LAZY44(p12, p13, p14, p15,                        \
+                w2, w2pre, w, wpre, Iw, Iwpre,             \
+                mod, mod2, p_hi, p_lo, tmp);               \
 } while(0)
 
 /*--------------*/
@@ -647,7 +649,9 @@ void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     if (depth == 3)
         DFT8_LAZY44(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], node, F->mod, F->mod2, F->tab_w);
     else if (depth == 4)
-        DFT16_LAZY44(p, node, F->mod, F->mod2, F->tab_w);
+        DFT16_LAZY44(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], 
+                     p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                     node, F->mod, F->mod2, F->tab_w);
     else if (depth == 5)
         DFT32_LAZY44(p, node, F->mod, F->mod2, F->tab_w);
     else
