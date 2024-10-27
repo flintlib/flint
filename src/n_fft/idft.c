@@ -116,8 +116,8 @@ void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
         idft_lazy22(p, depth-1, 2*node, F);
         idft_lazy22(p+len/2, depth-1, 2*node+1, F);
 
-        const ulong w = F->tab_w[4*node];
-        const ulong w_pr = F->tab_w[4*node+1];
+        const ulong w = F->tab_w[2*node];
+        const ulong w_pr = F->tab_w[2*node+1];
         ulong p_hi, p_lo, tmp;
 
         for (ulong k = 0; k < len/2; k++)
