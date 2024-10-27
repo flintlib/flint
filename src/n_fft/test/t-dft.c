@@ -17,7 +17,7 @@
 #include "nmod_vec.h"
 #include "n_fft.h"
 
-#define MAX_EVAL_DEPTH 10
+#define MAX_EVAL_DEPTH 11  // must be <= 12
 
 // vector equality up to reduction mod
 static inline int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, nmod_t mod)
@@ -55,7 +55,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
         // take some FFT prime p with max_depth >= 12
         ulong max_depth, prime;
 
-        // half of tests == large prime, close to limit
+        // half of tests == fixed large prime, close to limit
         // 62 bits: prime = 4611686018427322369 == 2**62 - 2**16 + 1
         // 30 bits: prime = 1073479681 == 2**30 - 2**18 + 1
         if (i > 100)
@@ -66,7 +66,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
 #endif
         else
         {
-            max_depth = 12 + n_randint(state, 10);
+            max_depth = 12 + n_randint(state, 6);
             prime = 1 + (UWORD(1) << max_depth);
             while (! n_is_prime(prime))
                 prime += (UWORD(1) << max_depth);
@@ -102,8 +102,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
             if (len == 1)
                 evals_br[0] = nmod_poly_evaluate_nmod(pol, UWORD(1));
             else
-                for (ulong k = 0; k < len; k++)
-                    evals_br[k] = nmod_poly_evaluate_nmod(pol, roots[k]);
+                nmod_poly_evaluate_nmod_vec(evals_br, pol, roots, len);
 
             // evals by DFT
             ulong * p = _nmod_vec_init(len);
