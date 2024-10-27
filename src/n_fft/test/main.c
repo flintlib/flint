@@ -13,6 +13,7 @@
 
 #include "t-init.c"
 #include "t-dft.c"
+#include "t-idft.c"
 
 /* Array of test functions ***************************************************/
 
@@ -20,6 +21,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(n_fft_ctx_init2),
     TEST_FUNCTION(n_fft_dft),
+    TEST_FUNCTION(n_fft_idft),
 };
 
 /* main function *************************************************************/

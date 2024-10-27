@@ -11,56 +11,11 @@
 
 #include "longlong.h"
 #include "n_fft.h"
-
-/*---------*/
-/* helpers */
-/*---------*/
-
-/** Shoup's modular multiplication with precomputation, lazy
- * (does not perform the excess correction step)
- *  --> computes either r or r+n and store it is res, where r = (a*b) % n
- *  --> a_pr is the precomputation for n, p_hi and p_lo are temporaries
- *  --> requires nbits(n) < FLINT_BITS
- */
-#define N_MULMOD_PRECOMP_LAZY(res, a, b, a_pr, n, p_hi, p_lo) \
-    do {                                                      \
-        umul_ppmm(p_hi, p_lo, (a_pr), (b));                   \
-        res = (a) * (b) - p_hi * (n);                         \
-    } while(0)
+#include "basic.c"
 
 /*-------------*/
 /* 2-point DFT */
 /*-------------*/
-
-/** Cooley-Tukey butterfly, node 0
- * * in [0..n) x [0..n) / out [0..2n) x [0..2n) / max < 2n
- * * In-place transform
- *                            [1  1]
- *           [a  b] <- [a  b] [1 -1]
- * * n is the modulus, tmp is a temporary
- */
-#define DFT2_NODE0_LAZY12(a, b, n, tmp) \
-    do {                                \
-        tmp = (b);                      \
-        (b) = (a) + (n) - tmp;          \
-        (a) = (a) + tmp;                \
-    } while(0)
-
-/** Cooley-Tukey butterfly, node 0
- * * in [0..2n) x [0..2n) / out [0..2n) x [0..4n) / max < 4n
- * * In-place transform
- *                            [1  1]
- *           [a  b] <- [a  b] [1 -1]
- * * n2 is 2*n, tmp is a temporary
- */
-#define DFT2_NODE0_LAZY24(a, b, n2, tmp) \
-    do {                               \
-        tmp = (b);                     \
-        (b) = (a) + (n2) - tmp;        \
-        (a) = (a) + tmp;               \
-        if ((a) >= (n2))               \
-            (a) -= (n2);               \
-    } while(0)
 
 /** Cooley-Tukey butterfly, general
  * * in [0..4n) / out [0..4n) / max < 4n
@@ -80,7 +35,6 @@
         (a) = u + v;                   /* [0..4n) */              \
         (b) = u + (n2) - v;         /* [0..4n) */                 \
     } while(0)
-
 
 /*-------------*/
 /* 4-point DFT */
@@ -162,9 +116,9 @@
  *             x^2 - w1                 x^2 + w1
  *             /      \                 /      \
  *        x - w2      x + w2       x - w3      x + w3
- * typically w2**2 == w1 and w3 == I*w2 (hence w3**2 == -w1) so that this
- * really is the subproduct tree built from the four roots
- *           w2, -w2, I*w2, -I*w2   of x**4 - w1
+ * typically w2**2 == w1 and w3 == I*w2 (hence w3**2 == -w1) so that the above
+ * is a Vandermonde matrix and this tree really is the subproduct tree built
+ * from the four roots w2, -w2, I*w2, -I*w2 of x**4 - w1
  */
 #define DFT4_LAZY44(a, b, c, d,                                \
                    w1, w1_pr, w2, w2_pr, w3, w3_pr,            \
@@ -657,17 +611,23 @@ do {                                                                            
 void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 3)
+    {
         DFT8_LAZY44(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], node, F->mod, F->mod2, F->tab_w);
+    }
     else if (depth == 4)
+    {
         DFT16_LAZY44(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                      p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                      node, F->mod, F->mod2, F->tab_w);
+    }
     else if (depth == 5)
+    {
         DFT32_LAZY44(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                      p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                      p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
                      p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
                      node, F->mod, F->mod2, F->tab_w);
+    }
     else
     {
         const ulong len = UWORD(1) << depth;
@@ -717,17 +677,23 @@ void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 3)
+    {
         DFT8_NODE0_LAZY24(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
+    }
     else if (depth == 4)
+    {
         DFT16_NODE0_LAZY24(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                            F->mod, F->mod2, F->tab_w);
+    }
     else if (depth == 5)
+    {
         DFT32_NODE0_LAZY24(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                            p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
                            p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
                            F->mod, F->mod2, F->tab_w);
+    }
     else
     {
         const ulong len = UWORD(1) << depth;
@@ -769,32 +735,21 @@ void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_args_t F)
  */
 void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F)
 {
-    if (depth == 0)
-        return;
-
-    if (depth == 1)
+    if (depth == 4)
     {
-        ulong tmp;
-        DFT2_NODE0_LAZY12(p[0], p[1], F->mod, tmp);
-    }
-    else if (depth == 2)
-    {
-        ulong p_hi, p_lo;
-        DFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
-    }
-    else if (depth == 3)
-        DFT8_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
-    else if (depth == 4)
         DFT16_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                            F->mod, F->mod2, F->tab_w);
+    }
     else if (depth == 5)
+    {
         DFT32_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                            p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
                            p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
                            F->mod, F->mod2, F->tab_w);
-    else
+    }
+    else if (depth > 5)
     {
         const ulong len = UWORD(1) << depth;
 
@@ -818,6 +773,20 @@ void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F)
         dft_lazy44(p1, depth-2, 1, F);
         dft_lazy44(p2, depth-2, 2, F);
         dft_lazy44(p3, depth-2, 3, F);
+    }
+    else if (depth == 3)
+    {
+        DFT8_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
+    }
+    else if (depth == 2)
+    {
+        ulong p_hi, p_lo;
+        DFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+    }
+    else if (depth == 1)
+    {
+        ulong tmp;
+        DFT2_NODE0_LAZY12(p[0], p[1], F->mod, tmp);
     }
 }
 

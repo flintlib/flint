@@ -194,20 +194,12 @@ FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 
 // FIXME in progress
 // not tested yet --> test == applying dft yields identity
-void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO
-
-// FIXME in progress
-// not tested yet --> test == naive version?
-void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (idft on inverted roots, non-scaled)
-
-// FIXME in progress
-// not tested yet --> test == applying dft_t yields identity?
-// DOC. Note: output < n.
-FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
+void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F);
+FLINT_FORCE_INLINE void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_iw);
-    dft_node0_lazy14(p, depth, Fargs);
+    idft_node0_lazy12(p, depth, Fargs);
 
     if (depth > 0)
     {
@@ -225,6 +217,31 @@ FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
     }
     // FIXME see if that can be made less expensive at least for depths not too
     // small, by integrating into base cases of dft_node0
+}
+
+
+
+// FIXME in progress
+// not tested yet --> test == naive version?
+void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (idft on inverted roots, non-scaled)
+
+// FIXME in progress
+// not tested yet --> test == applying dft_t yields identity?
+// DOC. Note: output < n.
+FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_iw);
+    dft_node0_lazy14(p, depth, Fargs);
+
+    if (depth > 0)
+    {
+        // see comments in idft concerning this loop
+        const ulong inv2 = F->tab_inv2[2*depth-2];
+        const ulong inv2_pr = F->tab_inv2[2*depth-1];
+        for (ulong k = 0; k < (UWORD(1) << depth); k++)
+            p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
+    }
 }
 
 

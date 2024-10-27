@@ -20,7 +20,7 @@
 #define MAX_EVAL_DEPTH 11  // must be <= 12
 
 // vector equality up to reduction mod
-static inline int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, nmod_t mod)
+int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, nmod_t mod)
 {
     for (ulong k = 0; k < len; k++)
     {
@@ -36,7 +36,7 @@ static inline int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, 
 }
 
 // testing that all elements of "vec" are less than "bound"
-static inline int nmod_vec_range(nn_srcptr vec, ulong len, ulong bound)
+int nmod_vec_range(nn_srcptr vec, ulong len, ulong bound)
 {
     for (ulong k = 0; k < len; k++)
         if (vec[k] >= bound)
@@ -97,7 +97,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
             nmod_poly_init(pol, mod.n);
             nmod_poly_randtest(pol, state, len);
 
-            // naive evals by Horner, in bit reversed order
+            // evals via general multipoint evaluation
             nn_ptr evals_br = _nmod_vec_init(len);
             if (len == 1)
                 evals_br[0] = nmod_poly_evaluate_nmod(pol, UWORD(1));
