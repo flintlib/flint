@@ -144,8 +144,8 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
  */
 void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F);
 void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO
-void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (idft on inverted roots)
-void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (dft on inverted roots)
+void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (idft on inverted roots, non-scaled)
+void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (dft on inverted roots, scaled)
 
 
 

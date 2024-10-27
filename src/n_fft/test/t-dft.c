@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "nmod.h"
@@ -79,6 +80,14 @@ TEST_FUNCTION_START(n_fft_dft, state)
         n_fft_ctx_t F;
         n_fft_ctx_init2(F, MAX_EVAL_DEPTH, prime);
 
+        // retrieve roots, used later for multipoint evaluation
+        nn_ptr roots = flint_malloc((UWORD(1) << MAX_EVAL_DEPTH) * sizeof(ulong));
+        for (ulong k = 0; k < (UWORD(1) << (MAX_EVAL_DEPTH-1)); k++)
+        {
+            roots[2*k] = F->tab_w[2*k];
+            roots[2*k+1] = prime - F->tab_w[2*k];  // < prime since F->tab_w[2*k] != 0
+        }
+
         for (ulong depth = 0; depth <= MAX_EVAL_DEPTH; depth++)
         {
             const ulong len = (UWORD(1) << depth);
@@ -93,12 +102,8 @@ TEST_FUNCTION_START(n_fft_dft, state)
             if (len == 1)
                 evals_br[0] = nmod_poly_evaluate_nmod(pol, UWORD(1));
             else
-                for (ulong k = 0; k < len/2; k++)
-                {
-                    ulong point = F->tab_w[2*k];
-                    evals_br[2*k] = nmod_poly_evaluate_nmod(pol, point);
-                    evals_br[2*k+1] = nmod_poly_evaluate_nmod(pol, nmod_neg(point, mod));
-                }
+                for (ulong k = 0; k < len; k++)
+                    evals_br[k] = nmod_poly_evaluate_nmod(pol, roots[k]);
 
             // evals by DFT
             ulong * p = _nmod_vec_init(len);
@@ -133,6 +138,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
             _nmod_vec_clear(evals_br);
         }
 
+        flint_free(roots);
         n_fft_ctx_clear(F);
     }
 
