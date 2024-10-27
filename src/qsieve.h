@@ -24,6 +24,9 @@
 extern "C" {
 #endif
 
+/* Windows systems may define `small` macro, which leads to conflicts */
+#undef small
+
 #define QS_DEBUG 0 /* level of debug information printed, 0 = none */
 
 #define BITS_ADJUST 25 /* add to sieve entries to compensate approximations */
