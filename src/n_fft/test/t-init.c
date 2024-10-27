@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "nmod_vec.h"
 #include "n_fft.h"
 
 // return bit reversal index of k for given nbits:
@@ -47,10 +49,13 @@ int test_one(n_fft_ctx_t F, ulong max_depth, ulong depth, ulong p, flint_rand_t 
     if (F->depth != depth)
         return 5;
 
+    // retrieve primitive root and its inverse
+    const ulong w = F->tab_w2[2*(max_depth-2)];
+    const ulong iw = n_invmod(w, p);
+
     // check the primitive root
-    ulong w = F->tab_w2[2*(max_depth-2)];
     if (n_powmod2(w, UWORD(1)<<max_depth, p) != UWORD(1)
-            || n_powmod2(w, UWORD(1)<<(max_depth-1), p) == UWORD(1))
+            || n_powmod2(w, UWORD(1)<<(max_depth-1), p) != p-UWORD(1))
         return 6;
 
     // check all entries of tab_w2
@@ -63,18 +68,23 @@ int test_one(n_fft_ctx_t F, ulong max_depth, ulong depth, ulong p, flint_rand_t 
             return 8;
     }
 
-    // check a few random entries of tab_w
+    // check a few random entries of tab_w and tab_iw
     for (ulong j = 0; j < 1000; j++)
     {
         ulong k = n_randint(state, UWORD(1) << (F->depth - 1));
-        ulong wk = F->tab_w[2*k];
-
         ulong exp = br_index(k, F->max_depth - 1);
+
+        ulong wk = F->tab_w[2*k];
         if (wk != n_powmod2(w, exp, p))
             return 9;
-
         if (F->tab_w[2*k+1] != n_mulmod_precomp_shoup(wk, p))
             return 10;
+
+        ulong iwk = F->tab_iw[2*k];
+        if (iwk != n_powmod2(iw, exp, p))
+            return 11;
+        if (F->tab_iw[2*k+1] != n_mulmod_precomp_shoup(iwk, p))
+            return 12;
     }
 
     return 0;
@@ -89,11 +99,11 @@ TEST_FUNCTION_START(n_fft_ctx_init2, state)
         ulong p, max_depth;
         if (i % 20 != 0)
         {
-            // take random prime in [17, 2**(FLINT_BITS-3))
+            // take random prime in [17, 2**(FLINT_BITS-2))
 #if FLINT_BITS == 64
-            ulong bits = 5 + n_randint(state, 57);
+            ulong bits = 5 + n_randint(state, 58);
 #else
-            ulong bits = 5 + n_randint(state, 24);
+            ulong bits = 5 + n_randint(state, 25);
 #endif
             p = n_randprime(state, bits, 1);
             max_depth = flint_ctz(p-1);
@@ -126,7 +136,7 @@ TEST_FUNCTION_START(n_fft_ctx_init2, state)
         // init
         n_fft_ctx_t F;
         n_fft_ctx_init2(F, depth, p);
-
+        
         int res = test_one(F, max_depth, depth, p, state);
 
         if (res)

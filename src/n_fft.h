@@ -41,7 +41,6 @@ typedef struct
     nn_ptr tab_w;              // tabulated powers of w, see below
     nn_ptr tab_iw;             // tabulated powers of 1/w, see below
     ulong tab_w2[128];         // powers w**(2**k), see below
-    ulong tab_iw2[128];        // powers iw**(2**k), see below
 } n_fft_ctx_struct;
 typedef n_fft_ctx_struct n_fft_ctx_t[1];
 
@@ -64,8 +63,6 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  * --> the first elements are tab_w2 = [I, I_pr, J, J_pr, ...]
  * where I is a square root of -1 and J is a square root of I
  */
-
-/** tab_iw2: same as tab_w2 but for the primitive root 1/w */
 
 /** tab_w:
  *     - length 2**depth
