@@ -36,7 +36,8 @@ void sample_init2_root(void * arg, ulong count)
     // modulus, roots of unity
     nmod_t mod;
     nmod_init(&mod, p);
-    ulong w0 = nmod_pow_ui(n_primitive_root_prime(p), (p - 1) >> maxdepth, mod);
+    ulong cofactor = (p - 1) >> maxdepth;
+    ulong w0 = nmod_pow_ui(n_primitive_root_prime(p), cofactor, mod);
     ulong w = nmod_pow_ui(w0, 1UL<<(maxdepth - depth), mod);
 
     FLINT_TEST_INIT(state);
@@ -47,7 +48,7 @@ void sample_init2_root(void * arg, ulong count)
         for (ulong j = 0; j < rep; j++)
         {
             n_fft_ctx_t F;
-            n_fft_ctx_init2_root(F, w, depth, depth, p);
+            n_fft_ctx_init2_root(F, w, depth, cofactor, depth, p);
             n_fft_ctx_clear(F);
         }
         prof_stop();

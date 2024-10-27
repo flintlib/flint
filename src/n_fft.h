@@ -15,6 +15,7 @@
 #include "flint.h"
 #include "nmod.h"
 #include "nmod_vec.h"
+#include "ulong_extras.h"
 
 #define N_FFT_CTX_DEFAULT_DEPTH 12
 
@@ -43,29 +44,32 @@ extern "C" {
 
 typedef struct
 {
-    ulong mod;                 // modulus, odd prime
-    ulong max_depth;           // maximum supported depth (w has order 2**max_depth)
-    ulong depth;               // depth supported by current precomputation
-    nn_ptr tab_w;              // tabulated powers of w, see below
-    nn_ptr tab_iw;             // tabulated powers of 1/w, see below
-    ulong tab_w2[128];         // powers w**(2**k), see below
+    ulong mod;                    // modulus, odd prime
+    ulong max_depth;              // maximum supported depth (w has order 2**max_depth)
+    ulong cofactor;               // prime is 1 + cofactor * 2**max_depth
+    ulong depth;                  // depth supported by current precomputation
+    nn_ptr tab_w;                 // tabulated powers of w, see below
+    nn_ptr tab_iw;                // tabulated powers of 1/w, see below
+    ulong tab_w2[2*FLINT_BITS];   // tabulated powers w**(2**k), see below
+    ulong tab_inv2[2*FLINT_BITS]; // tabulated inverses of 2**k, see below
 } n_fft_ctx_struct;
 typedef n_fft_ctx_struct n_fft_ctx_t[1];
+
 
 /** Requirements (not checked upon init):
  *     - mod is an odd prime < 2**(FLINT_BITS-2)
  *     - max_depth must be >= 3 (so, 8 must divide mod - 1)
- * Total memory cost of precomputations for arrays tab_{w,iw}:
- *     at most 2 * (128 + 2**depth) ulong's
+ * Total memory cost of precomputations for arrays tab_{w,iw,w2,inv2}:
+ *     at most 2 * (2*FLINT_BITS + 2**depth) ulong's
  */
 
 /** tab_w2:
- *    - length 128, with undefined entries at index 2*max_depth and beyond
+ *    - length 2*FLINT_BITS, with undefined entries at index 2*(max_depth-1) and beyond
  *    - contains powers w**d for d a power of 2, and corresponding
  *    precomputations for modular multiplication:
  *       -- for 0 <= k < max_depth-1, tab_w2[2*k] = w**(2**(max_depth-2-k))
  *          and tab_w2[2*k+1] = floor(tab_w2[2*k] * 2**FLINT_BITS / mod)
- *       -- for 2*max_depth <= k < 128, tab_w2[k] is undefined
+ *       -- for 2*(max_depth-1) <= k < 2*FLINT_BITS, tab_w2[k] is undefined
  *
  * --> one can retrieve w as tab_w2[2 * (max_depth-2)]
  * --> the first elements are tab_w2 = [I, I_pr, J, J_pr, ...]
@@ -91,6 +95,27 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
 
 /** tab_iw: same as tab_w but for the primitive root 1/w */
 
+/** tab_inv2:
+ *     - length 2*FLINT_BITS, with undefined entries at index 2*max_depth and beyond
+ *     - contains the modular inverses of 2**k, and corresponding
+ *    precomputations for modular multiplication:
+ *       -- for 0 <= k < max_depth, tab_inv2[2*k] = the inverse of 2**(k+1)
+ *       modulo mod, and tab_inv2[2*k+1] = floor(tab_inv2[2*k] * 2**FLINT_BITS / mod)
+ *       -- for 2*max_depth <= k < 2*FLINT_BITS, tab_inv2[k] is undefined
+ * 
+ * Recall F->mod == 1 + cofactor * 2**max_depth, so
+ *          1 == F->mod - cofactor * 2**(max_depth - k) * 2**k
+ * --> the inverse of 2**k in (0, F->mod) is
+ *          F->mod - cofactor * 2**(max_depth - k),
+ * we do not really need to store it, but we want the precomputations as well
+ */
+
+
+
+
+
+
+
 /** Note for init functions, when depth is provided:
  *   - if it is < 3, it is pretended that it is 3
  *   - it it is more than F->max_depth (the maximum possible with the given
@@ -99,15 +124,15 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  */
 
 // initialize with given root and given depth
-void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, ulong mod);
+void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong depth, ulong mod);
 
 // find primitive root, initialize with given depth
 void n_fft_ctx_init2(n_fft_ctx_t F, ulong depth, ulong p);
 
 // same, with default depth
 FLINT_FORCE_INLINE
-void n_fft_ctx_init_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong p)
-{ n_fft_ctx_init2_root(F, w, max_depth, N_FFT_CTX_DEFAULT_DEPTH, p); }
+void n_fft_ctx_init_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong p)
+{ n_fft_ctx_init2_root(F, w, max_depth, cofactor, N_FFT_CTX_DEFAULT_DEPTH, p); }
 
 FLINT_FORCE_INLINE
 void n_fft_ctx_init(n_fft_ctx_t F, ulong p)
@@ -117,6 +142,7 @@ void n_fft_ctx_init(n_fft_ctx_t F, ulong p)
 void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth);
 
 void n_fft_ctx_clear(n_fft_ctx_t F);
+
 
 
 typedef struct
@@ -165,6 +191,8 @@ FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
     dft_node0_lazy14(p, depth, Fargs);
 }
 
+// FIXME in progress
+// DOC. Note: output < n.
 FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
@@ -173,14 +201,21 @@ FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 
     if (depth > 0)
     {
-        nmod_t mod;
-        nmod_init(&mod, F->mod);
-        const ulong len = UWORD(1) << depth;
-        const ulong invlen = nmod_inv(len, mod); // TODO store?
-        _nmod_vec_scalar_mul_nmod(p, p, len, invlen, mod);
+        const ulong inv2 = F->tab_inv2[2*depth-2];
+        const ulong inv2_pr = F->tab_inv2[2*depth-1];
+        //ulong p_hi, p_lo;
+        for (ulong k = 0; k < (UWORD(1) << depth); k++)
+        {
+            p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
+            //umul_ppmm(p_hi, p_lo, inv2_pr, p[k]);
+            //p[k] = inv2 * p[k] - p_hi * F->mod;
+        }
+        // NOTE: apparently no gain from lazy variant, so
+        // probably better to use non-lazy one
     }
+    // FIXME see if that can be made less expensive at least for depths not too
+    // small, by integrating into base cases of dft_node0
 }
-
 
 void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO
 void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);  // TODO (idft on inverted roots, non-scaled)

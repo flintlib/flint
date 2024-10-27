@@ -9,10 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod.h"
 #include "test_helpers.h"
 #include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "n_fft.h"
 
 // return bit reversal index of k for given nbits:
@@ -40,14 +38,14 @@ int test_one(n_fft_ctx_t F, ulong max_depth, ulong depth, ulong p, flint_rand_t 
     if (F->mod != p)
         return 1;
 
-    //if (F->mod4 != 4*p)
-    //    return 3;
-
     if (F->max_depth != max_depth)
-        return 4;
+        return 2;
+
+    if ((1 + (F->cofactor << max_depth)) != p)
+        return 3;
 
     if (F->depth != depth)
-        return 5;
+        return 4;
 
     // retrieve primitive root and its inverse
     const ulong w = F->tab_w2[2*(max_depth-2)];
@@ -56,16 +54,26 @@ int test_one(n_fft_ctx_t F, ulong max_depth, ulong depth, ulong p, flint_rand_t 
     // check the primitive root
     if (n_powmod2(w, UWORD(1)<<max_depth, p) != UWORD(1)
             || n_powmod2(w, UWORD(1)<<(max_depth-1), p) != p-UWORD(1))
-        return 6;
+        return 5;
 
     // check all entries of tab_w2
     for (ulong k = 0; k < max_depth-1; k++)
     {
         ulong w2 = F->tab_w2[2*k];
         if (w2 != n_powmod2(w, UWORD(1)<<(max_depth-2-k), p))
-            return 7;
+            return 6;
         if (F->tab_w2[2*k+1] != n_mulmod_precomp_shoup(w2, p))
+            return 7;
+    }
+
+    // check all entries of tab_inv2
+    for (ulong k = 0; k < max_depth; k++)
+    {
+        ulong inv2 = F->tab_inv2[2*k];
+        if (inv2 != n_invmod((UWORD(1)<<(k+1)), p))
             return 8;
+        if (F->tab_inv2[2*k+1] != n_mulmod_precomp_shoup(inv2, p))
+            return 9;
     }
 
     // check a few random entries of tab_w and tab_iw
@@ -76,15 +84,15 @@ int test_one(n_fft_ctx_t F, ulong max_depth, ulong depth, ulong p, flint_rand_t 
 
         ulong wk = F->tab_w[2*k];
         if (wk != n_powmod2(w, exp, p))
-            return 9;
-        if (F->tab_w[2*k+1] != n_mulmod_precomp_shoup(wk, p))
             return 10;
+        if (F->tab_w[2*k+1] != n_mulmod_precomp_shoup(wk, p))
+            return 11;
 
         ulong iwk = F->tab_iw[2*k];
         if (iwk != n_powmod2(iw, exp, p))
-            return 11;
-        if (F->tab_iw[2*k+1] != n_mulmod_precomp_shoup(iwk, p))
             return 12;
+        if (F->tab_iw[2*k+1] != n_mulmod_precomp_shoup(iwk, p))
+            return 13;
     }
 
     return 0;

@@ -30,7 +30,7 @@ FLINT_FORCE_INLINE ulong n_mulmod_precomp_shoup_negate(ulong a_pr)
     return UWORD_MAX - a_pr;
 }
 
-void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, ulong p)
+void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong depth, ulong p)
 {
     if (depth < 3)
         depth = 3;
@@ -40,6 +40,7 @@ void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, 
     // fill basic attributes
     F->mod = p;
     F->max_depth = max_depth;
+    F->cofactor = cofactor;
     F->depth = 3;  // to be able to call fit_depth below
 
     // fill tab_w2
@@ -58,6 +59,13 @@ void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, 
     }
     // at this stage, pr_quo and pr_rem are for k == 0 i.e. for I == tab_w2[0]
 
+    // fill tab_inv2
+    for (ulong k = 0; k < max_depth; k++)
+    {
+        F->tab_inv2[2*k] = p - (cofactor << (max_depth - k-1));
+        F->tab_inv2[2*k+1] = n_mulmod_precomp_shoup(F->tab_inv2[2*k], p);
+    }
+
     // fill tab_w and tab_iw for depth 3
     ulong len = UWORD(1) << (depth-1);  // len >= 4
     F->tab_w = (nn_ptr) flint_malloc(2*len * sizeof(ulong));
@@ -74,7 +82,6 @@ void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, 
     F->tab_w[3] = F->tab_w2[1];
     F->tab_iw[2] = p - F->tab_w2[0];
     F->tab_iw[3] = n_mulmod_precomp_shoup_negate(F->tab_w2[1]);
-
 
     // w**(L/8) == J and w**(3L/8) == I*J
     F->tab_w[4] = F->tab_w2[2];
@@ -98,14 +105,14 @@ void n_fft_ctx_init2(n_fft_ctx_t F, ulong depth, ulong p)
 
     // find the constant and exponent such that p == c * 2**max_depth + 1
     const ulong max_depth = flint_ctz(p - UWORD(1));
-    const ulong c = (p - UWORD(1)) >> max_depth;
+    const ulong cofactor = (p - UWORD(1)) >> max_depth;
 
     // find primitive root w of order 2**max_depth
     const ulong prim_root = n_primitive_root_prime(p);
-    const ulong w = n_powmod2(prim_root, c, p);
+    const ulong w = n_powmod2(prim_root, cofactor, p);
 
     // fill all attributes and tables
-    n_fft_ctx_init2_root(F, w, max_depth, depth, p);
+    n_fft_ctx_init2_root(F, w, max_depth, cofactor, depth, p);
 }
 
 void n_fft_ctx_clear(n_fft_ctx_t F)

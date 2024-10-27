@@ -3,13 +3,12 @@
 #include "fft_small.h"
 #include "n_fft.h"
 
-#define num_primes 5
+#define num_primes 7
 
 typedef struct
 {
    ulong prime;
    ulong depth;
-   ulong maxdepth;
    ulong stride;
 } info_t;
 
@@ -19,24 +18,20 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     info_t * info = (info_t *) arg;                                              \
     const ulong p = info->prime;                                                 \
     const ulong depth = info->depth;                                             \
-    const ulong maxdepth = info->maxdepth;                                       \
     const ulong stride = info->stride;                                           \
                                                                                  \
     const ulong len = stride * (UWORD(1) << depth);                              \
     const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));                \
                                                                                  \
     /* modulus, roots of unity */                                                \
-    nmod_t mod;                                                                  \
-    nmod_init(&mod, p);                                                          \
-    ulong w0 = nmod_pow_ui(n_primitive_root_prime(p), (p - 1) >> maxdepth, mod); \
-    ulong w = nmod_pow_ui(w0, UWORD(1)<<(maxdepth - depth), mod);                \
     n_fft_ctx_t F;                                                               \
-    n_fft_ctx_init2_root(F, w, depth, depth, p);                                 \
+    n_fft_ctx_init2(F, depth, p);                                                \
                                                                                  \
     FLINT_TEST_INIT(state);                                                      \
                                                                                  \
     ulong * coeffs = _nmod_vec_init(len);                                        \
-    _nmod_vec_randtest(coeffs, state, len, mod);                                 \
+    for (ulong k = 0; k < len; k++)                                              \
+        coeffs[k] = n_randint(state, p);                                         \
                                                                                  \
     for (ulong i = 0; i < count; i++)                                            \
     {                                                                            \
@@ -51,6 +46,7 @@ void sample_##fun##_variant(void * arg, ulong count)                            
 }                                                                                \
 
 SAMPLE(dft, )
+SAMPLE(idft_t, )
 //SAMPLE(n_fft_dft, _stride)
 
 void sample_sd_fft(void * arg, ulong count)
@@ -97,17 +93,18 @@ int main()
     flint_printf("- timing DFT (length power of 2) for several bit lengths and depths\n");
     flint_printf("depth\tsd_fft\trec4\n");
 
-    // FIXME FLINT_BITS issue
     ulong primes[num_primes] = {
         786433,              // 20 bits, 1 + 2**18 * 3
+        1073479681,          // 30 bits, 1 + 2**30 - 2**18 == 1 + 2**18 * (2**12 - 1)
         2013265921,          // 31 bits, 1 + 2**27 * 3 * 5
         2748779069441,       // 42 bits, 1 + 2**39 * 5
         1108307720798209,    // 50 bits, 1 + 2**44 * 3**2 * 7
         1139410705724735489, // 60 bits, 1 + 2**52 * 11 * 23
+        4611686018427322369  // 62 bits: 1 + 2**62 - 2**16 == 1 + 2**16 * (2**46 - 1)
     };
-    ulong max_depths[num_primes] = { 18, 25, 25, 25, 25 };
+    ulong max_depths[num_primes] = { 18, 18, 25, 25, 25, 25, 16 };
 
-    for (ulong k = 3; k < 4; k++)
+    for (ulong k = 4; k < 5; k++)
     {
         for (ulong depth = 3; depth <= max_depths[k]; depth++)
         {
@@ -115,7 +112,6 @@ int main()
 
             info_t info;
             info.prime = primes[k];
-            info.maxdepth = max_depths[k];
             info.depth = depth;
             info.stride = 1;
 
@@ -127,10 +123,12 @@ int main()
 
             prof_repeat(min+0, &max, sample_sd_fft, (void *) &info);
             prof_repeat(min+1, &max, sample_dft, (void *) &info);
+            prof_repeat(min+2, &max, sample_idft_t, (void *) &info);
 
-            flint_printf("%.1e\t%.1e\t\n",
+            flint_printf("%.1e\t%.1e\t%.1e\t\n",
                     min[0]/(double)1000000/rep,
-                    min[1]/(double)1000000/rep
+                    min[1]/(double)1000000/rep,
+                    min[2]/(double)1000000/rep
                     );
         }
     }
