@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-// rpcndr.h (included via windows.h) defines a `small` macro, which leads to conflicts
+/* Windows systems may define `small` macro, which leads to conflicts */
 #undef small
 
 #define QS_DEBUG 0 /* level of debug information printed, 0 = none */
