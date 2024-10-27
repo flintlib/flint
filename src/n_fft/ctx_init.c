@@ -123,6 +123,7 @@ void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth)
     {
         ulong len = UWORD(1) << (depth-1);  // len >= 8 (since depth >= 4)
         F->tab_w = flint_realloc(F->tab_w, 2*len * sizeof(ulong));
+        F->tab_iw = flint_realloc(F->tab_iw, 2*len * sizeof(ulong));
 
         // tab_w[2] is w**(L/8) * tab_w[0], where L = 2**max_depth,
         // tab_w[2*4,2*6] is w**(L/16) * tab_w[2*0,2*2],
@@ -137,15 +138,32 @@ void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth)
             pr_quo = F->tab_w2[2*d+1];
             pr_rem = n_mulmod_precomp_shoup_rem_from_quo(pr_quo, F->mod);
             // for each k, tab_w[2*(k+llen)] <- ww * tab_w[2*k], and deduce precomputation
-            for (ulong k = 0; k < llen; k++)
+            for (ulong k = 0; k+3 < llen; k+=4)
             {
-                n_mulmod_and_precomp_shoup(F->tab_w + 2*llen + 2*k, F->tab_w + 2*llen + 2*k+1,
-                                           ww, F->tab_w[2*k],
-                                           pr_quo, pr_rem, F->tab_w[2*k+1], F->mod);
-                F->tab_iw[2*llen + 2*(llen-1-k)] = F->mod - F->tab_w[2*llen + 2*k];
-                F->tab_iw[2*llen + 2*(llen-1-k) + 1] = n_mulmod_precomp_shoup_negate(F->tab_w[2*llen + 2*k+1]);
+                n_mulmod_and_precomp_shoup(F->tab_w + 2*llen + 2*(k+0), F->tab_w + 2*llen + 2*(k+0)+1,
+                                           ww, F->tab_w[2*(k+0)],
+                                           pr_quo, pr_rem, F->tab_w[2*(k+0)+1], F->mod);
+                n_mulmod_and_precomp_shoup(F->tab_w + 2*llen + 2*(k+1), F->tab_w + 2*llen + 2*(k+1)+1,
+                                           ww, F->tab_w[2*(k+1)],
+                                           pr_quo, pr_rem, F->tab_w[2*(k+1)+1], F->mod);
+                n_mulmod_and_precomp_shoup(F->tab_w + 2*llen + 2*(k+2), F->tab_w + 2*llen + 2*(k+2)+1,
+                                           ww, F->tab_w[2*(k+2)],
+                                           pr_quo, pr_rem, F->tab_w[2*(k+2)+1], F->mod);
+                n_mulmod_and_precomp_shoup(F->tab_w + 2*llen + 2*(k+3), F->tab_w + 2*llen + 2*(k+3)+1,
+                                           ww, F->tab_w[2*(k+3)],
+                                           pr_quo, pr_rem, F->tab_w[2*(k+3)+1], F->mod);
+
+                F->tab_iw[2*llen + 2*(llen-1-(k+0))] = F->mod - F->tab_w[2*llen + 2*(k+0)];
+                F->tab_iw[2*llen + 2*(llen-1-(k+0)) + 1] = n_mulmod_precomp_shoup_negate(F->tab_w[2*llen + 2*(k+0)+1]);
+                F->tab_iw[2*llen + 2*(llen-1-(k+1))] = F->mod - F->tab_w[2*llen + 2*(k+1)];
+                F->tab_iw[2*llen + 2*(llen-1-(k+1)) + 1] = n_mulmod_precomp_shoup_negate(F->tab_w[2*llen + 2*(k+1)+1]);
+                F->tab_iw[2*llen + 2*(llen-1-(k+2))] = F->mod - F->tab_w[2*llen + 2*(k+2)];
+                F->tab_iw[2*llen + 2*(llen-1-(k+2)) + 1] = n_mulmod_precomp_shoup_negate(F->tab_w[2*llen + 2*(k+2)+1]);
+                F->tab_iw[2*llen + 2*(llen-1-(k+3))] = F->mod - F->tab_w[2*llen + 2*(k+3)];
+                F->tab_iw[2*llen + 2*(llen-1-(k+3)) + 1] = n_mulmod_precomp_shoup_negate(F->tab_w[2*llen + 2*(k+3)+1]);
             }
         }
+
         F->depth = depth;
     }
 }
