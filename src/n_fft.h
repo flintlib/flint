@@ -23,8 +23,14 @@ extern "C" {
 /**
  * TODO[short term] augment precomputations with inverse roots
  * TODO[short term] add testing for general variants, not only node0
- * TODO[longer term] large depth can lead to heavy memory usage
+ * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
+ * TODO[long term] on zen4 (likely on other cpus as well) ctx_init becomes
+ * slower at some point, losing a factor 4 or more, probably due to caching;
+ * what is annoying is that the depth where it becomes slower is significantly
+ * smaller (~13-14) when tab_iw has been incorporated compared to without
+ * tab_iw (it was depth ~20-21); see if this can be understood, and maybe play
+ * with vectorization for those simple functions
  * TODO[later] provide forward function which reduces output to [0..n) ?
  *    unclear this is useful... to be decided later
  */
