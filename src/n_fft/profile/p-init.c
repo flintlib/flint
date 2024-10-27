@@ -105,6 +105,7 @@ int main()
     printf("      t_unit == raw time divided by 2**depth * clock scale factor\n");
     printf("\n");
 
+    printf("     \t    20 bits    \t    31 bits    \t    42 bits    \t    50 bits    \t    60 bits    \n");
     printf("depth\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\tt_raw  | t_unit\n");
 
     // TODO fix for FLINT_BITS==32

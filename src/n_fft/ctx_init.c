@@ -9,8 +9,26 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "ulong_extras.h"
 #include "n_fft.h"
+
+/** Given the precomputed quotient a_pr for modular multiplication by a mod n,
+ *          a_pr == floor(a * 2**FLINT_BITS / n)
+ * where we assume 0 < a < n and n does not divide a * 2**FLINT_BITS,
+ * this returns the quotient for mulmod by -a mod n,
+ *          floor( (n-a) * 2**FLINT_BITS / n)
+ *          == 2**FLINT_BITS - ceil(a * 2**FLINT_BITS / n)
+ *          == 2**FLINT_BITS - a_pr
+ *
+ * Note: the requirement "n does not divide a * 2**FLINT_BITS" follows
+ * from the other requirement 0 < a < n as soon as n is odd; in n_fft.h
+ * we will only use this for odd primes
+ */
+FLINT_FORCE_INLINE ulong n_mulmod_precomp_shoup_negate(ulong a_pr)
+{
+    return UWORD_MAX - a_pr;
+}
 
 void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, ulong p)
 {
@@ -40,17 +58,34 @@ void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, 
     }
     // at this stage, pr_quo and pr_rem are for k == 0 i.e. for I == tab_w2[0]
 
-    // fill tab_w for depth 3
+    // fill tab_w and tab_iw for depth 3
     ulong len = UWORD(1) << (depth-1);  // len >= 4
     F->tab_w = (nn_ptr) flint_malloc(2*len * sizeof(ulong));
+    F->tab_iw = (nn_ptr) flint_malloc(2*len * sizeof(ulong));
 
+    // w**0 == iw**0 == 1
     F->tab_w[0] = UWORD(1);
     F->tab_w[1] = n_mulmod_precomp_shoup(UWORD(1), p);
+    F->tab_iw[0] = UWORD(1);
+    F->tab_iw[1] = F->tab_w[1];
+
+    // w**(L/4) == I and iw**(L/4) == -I, L == 2**max_depth
     F->tab_w[2] = F->tab_w2[0];
     F->tab_w[3] = F->tab_w2[1];
+    F->tab_iw[2] = p - F->tab_w2[0];
+    F->tab_iw[3] = n_mulmod_precomp_shoup_negate(F->tab_w2[1]);
+
+
+    // w**(L/8) == J and w**(3L/8) == I*J
     F->tab_w[4] = F->tab_w2[2];
     F->tab_w[5] = F->tab_w2[3];
     n_mulmod_and_precomp_shoup(F->tab_w+6, F->tab_w+7, F->tab_w2[0], F->tab_w2[2], pr_quo, pr_rem, F->tab_w2[3], p);
+
+    // iw**(L/8) == -I*J and iw**(3L/8) == -J
+    F->tab_iw[4] = p - F->tab_w[6];
+    F->tab_iw[5] = n_mulmod_precomp_shoup_negate(F->tab_w[7]);
+    F->tab_iw[6] = p - F->tab_w[4];
+    F->tab_iw[7] = n_mulmod_precomp_shoup_negate(F->tab_w[5]);
 
     // complete tab_w up to specified depth
     n_fft_ctx_fit_depth(F, depth);
@@ -58,7 +93,7 @@ void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong depth, 
 
 void n_fft_ctx_init2(n_fft_ctx_t F, ulong depth, ulong p)
 {
-    FLINT_ASSERT(p > 2 && flint_clz(p) >= 2);    // 2 < p < 2**62
+    FLINT_ASSERT(p > 2 && flint_clz(p) >= 2);    // 2 < p < 2**(FLINT_BITS-2)
     FLINT_ASSERT(flint_ctz(p - UWORD(1)) >= 3);  // p-1 divisible by 8
 
     // find the constant and exponent such that p == c * 2**max_depth + 1
@@ -76,6 +111,7 @@ void n_fft_ctx_init2(n_fft_ctx_t F, ulong depth, ulong p)
 void n_fft_ctx_clear(n_fft_ctx_t F)
 {
     flint_free(F->tab_w);
+    flint_free(F->tab_iw);
 }
 
 void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth)
@@ -91,7 +127,7 @@ void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth)
         // tab_w[2] is w**(L/8) * tab_w[0], where L = 2**max_depth,
         // tab_w[2*4,2*6] is w**(L/16) * tab_w[2*0,2*2],
         // tab_w[2*8,2*10,2*12,2*14] is w**(L/32) * tab_w[2*0,2*2,2*4,2*6], etc.
-        // recall tab_w2[2*d] == w**(L / 2**(d+2))
+        // recall tab_w2[2*k] == w**(L / 2**(k+2))
         ulong d = F->depth - 1;
         ulong llen = UWORD(1) << (F->depth-1);
         ulong ww, pr_quo, pr_rem;
