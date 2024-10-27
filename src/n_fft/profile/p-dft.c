@@ -46,6 +46,8 @@ void sample_##fun##_variant(void * arg, ulong count)                            
 }                                                                                \
 
 SAMPLE(dft, )
+SAMPLE(idft, )
+SAMPLE(dft_t, )
 SAMPLE(idft_t, )
 //SAMPLE(n_fft_dft, _stride)
 
@@ -91,7 +93,7 @@ int main()
 {
     flint_printf("- depth is log(fft length)\n");
     flint_printf("- timing DFT (length power of 2) for several bit lengths and depths\n");
-    flint_printf("depth\tsd_fft\trec4\n");
+    flint_printf("depth\tsd_fft\tdft\tidft\tdft_t\tidft_t\n");
 
     ulong primes[num_primes] = {
         786433,              // 20 bits, 1 + 2**18 * 3
@@ -123,12 +125,16 @@ int main()
 
             prof_repeat(min+0, &max, sample_sd_fft, (void *) &info);
             prof_repeat(min+1, &max, sample_dft, (void *) &info);
-            prof_repeat(min+2, &max, sample_idft_t, (void *) &info);
+            prof_repeat(min+2, &max, sample_idft, (void *) &info);
+            prof_repeat(min+3, &max, sample_dft_t, (void *) &info);
+            prof_repeat(min+4, &max, sample_idft_t, (void *) &info);
 
-            flint_printf("%.1e\t%.1e\t%.1e\t\n",
+            flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t\n",
                     min[0]/(double)1000000/rep,
                     min[1]/(double)1000000/rep,
-                    min[2]/(double)1000000/rep
+                    min[2]/(double)1000000/rep,
+                    min[3]/(double)1000000/rep,
+                    min[4]/(double)1000000/rep
                     );
         }
     }

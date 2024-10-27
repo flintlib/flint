@@ -11,7 +11,7 @@
 
 #include "longlong.h"
 #include "n_fft.h"
-#include "basic.c"
+#include "n_fft_macros.h"
 
 /*-------------*/
 /* 2-point DFT */
@@ -39,69 +39,6 @@
 /*-------------*/
 /* 4-point DFT */
 /*-------------*/
-
-/** 4-point DFT, node 0
- * * in [0..n) / out [0..4n) / max < 4n
- * * In-place transform
- *                              [1  1  1  1]
- *                              [1 -1  I -I]
- * [a  b  c  d] <- [a  b  c  d] [1  1 -1 -1]
- *                              [1 -1 -I  I]
- * * Corresponds to reducing down the tree with nodes
- *                       x^4 - 1
- *                     /         \
- *             x^2 - 1             x^2 + 1
- *             /     \             /     \
- *         x - 1     x + 1     x - I     x + I
- *  where I is typically a square root of -1
- *  (but this property is not exploited)
- * * n is the modulus and n2 == 2*n, p_hi, p_lo are temporaries
- */
-#define DFT4_NODE0_LAZY14(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)    \
-    do {                                                             \
-        const ulong v0 = (a);                                        \
-        const ulong v1 = (b);                                        \
-        const ulong v2 = (c);                                        \
-        const ulong v3 = (d);                                        \
-        ulong v4 = v0 + v2;                         /* < 2*n */      \
-        ulong v5 = v0 + (n) - v2;                   /* < 2*n */      \
-        ulong v6 = v1 + v3;                         /* < 2*n */      \
-        ulong v7;                                                    \
-        N_MULMOD_PRECOMP_LAZY(v7, (I), v1 + (n) - v3, (I_pr), (n),   \
-                              p_hi, p_lo);                           \
-        (a) = v4 + v6;                              /* < 4*n */      \
-        (b) = v4 + (n2) - v6;                       /* < 4*n */      \
-        (c) = v5 + v7;                              /* < 3*n */      \
-        (d) = v5 + (n2) - v7;                       /* < 4*n */      \
-    } while(0)
-
-/** 4-point DFT, node 0
- * * in [0..2n) / out [0..4n) / max < 4n
- * * other than this, same specification as DFT4_NODE0_LAZY14
- */
-#define DFT4_NODE0_LAZY24(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)    \
-    do {                                                             \
-        const ulong v0 = (a);                                        \
-        const ulong v1 = (b);                                        \
-        const ulong v2 = (c);                                        \
-        const ulong v3 = (d);                                        \
-        ulong v4 = v0 + v2;                         /* < 4*n */      \
-        if (v4 >= (n2))                                              \
-            v4 -= (n2);                             /* < 2*n */      \
-        ulong v5 = v0 + (n2) - v2;                  /* < 4*n */      \
-        if (v5 >= (n2))                                              \
-            v5 -= (n2);                             /* < 2*n */      \
-        ulong v6 = v1 + v3;                         /* < 4*n */      \
-        if (v6 >= (n2))                                              \
-            v6 -= (n2);                             /* < 2*n */      \
-        ulong v7;                                                    \
-        N_MULMOD_PRECOMP_LAZY(v7, (I), v1 + (n2) - v3, (I_pr), (n),  \
-                              p_hi, p_lo);                           \
-        (a) = v4 + v6;                              /* < 4*n */      \
-        (b) = v4 + (n2) - v6;                       /* < 4*n */      \
-        (c) = v5 + v7;                              /* < 4*n */      \
-        (d) = v5 + (n2) - v7;                       /* < 4*n */      \
-    } while(0)
 
 /** 4-point DFT, general
  * * in [0..4n) / out [0..4n) / max < 4n
@@ -176,10 +113,10 @@ do {                                                           \
 do {                                                       \
     ulong p_hi, p_lo, tmp;                                 \
                                                            \
-    DFT2_NODE0_LAZY12(p0, p4, mod, tmp);                   \
-    DFT2_NODE0_LAZY12(p1, p5, mod, tmp);                   \
-    DFT2_NODE0_LAZY12(p2, p6, mod, tmp);                   \
-    DFT2_NODE0_LAZY12(p3, p7, mod, tmp);                   \
+    BUTTERFLY_LAZY12(p0, p4, mod, tmp);                    \
+    BUTTERFLY_LAZY12(p1, p5, mod, tmp);                    \
+    BUTTERFLY_LAZY12(p2, p6, mod, tmp);                    \
+    BUTTERFLY_LAZY12(p3, p7, mod, tmp);                    \
                                                            \
     DFT4_NODE0_LAZY24(p0, p1, p2, p3,                      \
                       tab_w[2], tab_w[3],                  \
@@ -202,10 +139,10 @@ do {                                                       \
 do {                                                       \
     ulong p_hi, p_lo, tmp;                                 \
                                                            \
-    DFT2_NODE0_LAZY24(p0, p4, mod2, tmp);                  \
-    DFT2_NODE0_LAZY24(p1, p5, mod2, tmp);                  \
-    DFT2_NODE0_LAZY24(p2, p6, mod2, tmp);                  \
-    DFT2_NODE0_LAZY24(p3, p7, mod2, tmp);                  \
+    BUTTERFLY_LAZY24(p0, p4, mod2, tmp);                   \
+    BUTTERFLY_LAZY24(p1, p5, mod2, tmp);                   \
+    BUTTERFLY_LAZY24(p2, p6, mod2, tmp);                   \
+    BUTTERFLY_LAZY24(p3, p7, mod2, tmp);                   \
                                                            \
     DFT4_NODE0_LAZY24(p0, p1, p2, p3,                      \
                       tab_w[2], tab_w[3],                  \
@@ -786,7 +723,7 @@ void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F)
     else if (depth == 1)
     {
         ulong tmp;
-        DFT2_NODE0_LAZY12(p[0], p[1], F->mod, tmp);
+        BUTTERFLY_LAZY12(p[0], p[1], F->mod, tmp);
     }
 }
 
