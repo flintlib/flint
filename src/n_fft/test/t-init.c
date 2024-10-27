@@ -38,9 +38,6 @@ int test_one(n_fft_ctx_t F, ulong max_depth, ulong depth, ulong p, flint_rand_t 
     if (F->mod != p)
         return 1;
 
-    if (F->mod2 != 2*p)
-        return 2;
-
     //if (F->mod4 != 4*p)
     //    return 3;
 

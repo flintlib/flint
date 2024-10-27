@@ -305,51 +305,53 @@ do {                                                                  \
  * * in [0..n) / out [0..4n) / max < 4n
  * * Apart from this range, same specification as dft_node0_lazy24, for depth==4
  */
-#define DFT16_NODE0_LAZY14(p, mod, mod2, tab_w)                     \
-do {                                                                \
-    ulong p_hi, p_lo, tmp;                                          \
-                                                                    \
-    DFT4_NODE0_LAZY14(p[0], p[4], p[ 8], p[12],                     \
-                      tab_w[2], tab_w[3],                           \
-                      mod, mod2, p_hi, p_lo);                       \
-    if (p[0] >= mod2)                                               \
-        p[0] -= mod2;                                               \
-    DFT4_NODE0_LAZY14(p[1], p[5], p[ 9], p[13],                     \
-                      tab_w[2], tab_w[3],                           \
-                      mod, mod2, p_hi, p_lo);                       \
-    if (p[1] >= mod2)                                               \
-        p[1] -= mod2;                                               \
-    DFT4_NODE0_LAZY14(p[2], p[6], p[10], p[14],                     \
-                      tab_w[2], tab_w[3],                           \
-                      mod, mod2, p_hi, p_lo);                       \
-    if (p[2] >= mod2)                                               \
-        p[2] -= mod2;                                               \
-    DFT4_NODE0_LAZY14(p[3], p[7], p[11], p[15],                     \
-                      tab_w[2], tab_w[3],                           \
-                      mod, mod2, p_hi, p_lo);                       \
-    if (p[3] >= mod2)                                               \
-        p[3] -= mod2;                                               \
-                                                                    \
-    /* next line requires < 2n,        */                           \
-    /* hence the four reductions above */                           \
-    DFT4_NODE0_LAZY24(p[0], p[1], p[2], p[3],                       \
-                      tab_w[2], tab_w[3],                           \
-                      mod, mod2, p_hi, p_lo);                       \
-    DFT4_LAZY44(p[4], p[5], p[6], p[7],                             \
-                tab_w[2], tab_w[3],                                 \
-                tab_w[4], tab_w[5],                                 \
-                tab_w[6], tab_w[7],                                 \
-                mod, mod2, p_hi, p_lo, tmp);                        \
-    DFT4_LAZY44(p[8], p[9], p[10], p[11],                           \
-                tab_w[4], tab_w[5],                                 \
-                tab_w[8], tab_w[9],                                 \
-                tab_w[10], tab_w[11],                               \
-                mod, mod2, p_hi, p_lo, tmp);                        \
-    DFT4_LAZY44(p[12], p[13], p[14], p[15],                         \
-                tab_w[6], tab_w[7],                                 \
-                tab_w[12], tab_w[13],                               \
-                tab_w[14], tab_w[15],                               \
-                mod, mod2, p_hi, p_lo, tmp);                        \
+#define DFT16_NODE0_LAZY14(p0, p1, p2, p3, p4, p5, p6, p7,        \
+                           p8, p9, p10, p11, p12, p13, p14, p15,  \
+                           mod, mod2, tab_w)                      \
+do {                                                              \
+    ulong p_hi, p_lo, tmp;                                        \
+                                                                  \
+    DFT4_NODE0_LAZY14((p0), (p4), (p8), (p12),                    \
+                      tab_w[2], tab_w[3],                         \
+                      mod, mod2, p_hi, p_lo);                     \
+    if ((p0) >= mod2)                                             \
+        (p0) -= mod2;                                             \
+    DFT4_NODE0_LAZY14((p1), (p5), (p9), (p13),                    \
+                      tab_w[2], tab_w[3],                         \
+                      mod, mod2, p_hi, p_lo);                     \
+    if ((p1) >= mod2)                                             \
+        (p1) -= mod2;                                             \
+    DFT4_NODE0_LAZY14((p2), (p6), (p10), (p14),                   \
+                      tab_w[2], tab_w[3],                         \
+                      mod, mod2, p_hi, p_lo);                     \
+    if ((p2) >= mod2)                                             \
+        (p2) -= mod2;                                             \
+    DFT4_NODE0_LAZY14((p3), (p7), (p11), (p15),                   \
+                      tab_w[2], tab_w[3],                         \
+                      mod, mod2, p_hi, p_lo);                     \
+    if ((p3) >= mod2)                                             \
+        (p3) -= mod2;                                             \
+                                                                  \
+    /* next line requires < 2n,        */                         \
+    /* hence the four reductions above */                         \
+    DFT4_NODE0_LAZY24((p0), (p1), (p2), (p3),                     \
+                      tab_w[2], tab_w[3],                         \
+                      mod, mod2, p_hi, p_lo);                     \
+    DFT4_LAZY44((p4), (p5), (p6), (p7),                           \
+                tab_w[2], tab_w[3],                               \
+                tab_w[4], tab_w[5],                               \
+                tab_w[6], tab_w[7],                               \
+                mod, mod2, p_hi, p_lo, tmp);                      \
+    DFT4_LAZY44((p8), (p9), (p10), (p11),                         \
+                tab_w[4], tab_w[5],                               \
+                tab_w[8], tab_w[9],                               \
+                tab_w[10], tab_w[11],                             \
+                mod, mod2, p_hi, p_lo, tmp);                      \
+    DFT4_LAZY44((p12), (p13), (p14), (p15),                       \
+                tab_w[6], tab_w[7],                               \
+                tab_w[12], tab_w[13],                             \
+                tab_w[14], tab_w[15],                             \
+                mod, mod2, p_hi, p_lo, tmp);                      \
 } while(0)
 
 /** 16-point DFT, node 0
@@ -636,7 +638,7 @@ do {                                                                            
  *        3 <= depth
  *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
  */
-void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_params_t F)
+void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 3)
         DFT8_LAZY44(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, node, F->mod, F->mod2, F->tab_w);
@@ -690,7 +692,7 @@ void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_params_t F)
  * root of unity with exponents listed in bit reversed order
  * * Requirements (not checked): 3 <= depth <= F.depth
  */
-void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_ctx_t F)
+void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 3)
         DFT8_NODE0_LAZY24(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F->mod, F->mod2, F->tab_w);
@@ -719,10 +721,9 @@ void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_ctx_t F)
 
         // 4 recursive calls with depth-2
         dft_node0_lazy24(p0, depth-2, F);
-        n_fft_params_t Fpar = {{F->mod, F->mod2, F->tab_w}};
-        dft_lazy44(p1, depth-2, 1, Fpar);
-        dft_lazy44(p2, depth-2, 2, Fpar);
-        dft_lazy44(p3, depth-2, 3, Fpar);
+        dft_lazy44(p1, depth-2, 1, F);
+        dft_lazy44(p2, depth-2, 2, F);
+        dft_lazy44(p3, depth-2, 3, F);
     }
 }
 
@@ -743,22 +744,27 @@ void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
     if (depth == 0)
         return;
 
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_w);
+
     if (depth == 1)
     {
         ulong tmp;
-        DFT2_NODE0_LAZY12(p[0], p[1], F->mod, tmp);
+        DFT2_NODE0_LAZY12(p[0], p[1], Fargs->mod, tmp);
     }
     else if (depth == 2)
     {
         ulong p_hi, p_lo;
-        DFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+        DFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], Fargs->tab_w[2], Fargs->tab_w[3], Fargs->mod, Fargs->mod2, p_hi, p_lo);
     }
     else if (depth == 3)
-        DFT8_NODE0_LAZY14(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, F->mod, F->mod2, F->tab_w);
+        DFT8_NODE0_LAZY14(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, Fargs->mod, Fargs->mod2, Fargs->tab_w);
     else if (depth == 4)
-        DFT16_NODE0_LAZY14(p, F->mod, F->mod2, F->tab_w);
+        DFT16_NODE0_LAZY14(p+0, p+1, p+2, p+3, p+4, p+5, p+6, p+7, 
+                           p+8, p+9, p+10, p+11, p+12, p+13, p+14, p+15,
+                Fargs->mod, Fargs->mod2, Fargs->tab_w);
     else if (depth == 5)
-        DFT32_NODE0_LAZY14(p, F->mod, F->mod2, F->tab_w);
+        DFT32_NODE0_LAZY14(p, Fargs->mod, Fargs->mod2, Fargs->tab_w);
     else
     {
         const ulong len = UWORD(1) << depth;
@@ -773,16 +779,15 @@ void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
         ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k++)
         {
-            DFT4_NODE0_LAZY14(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
-            if (p0[k] >= F->mod2)
-                p0[k] -= F->mod2;
+            DFT4_NODE0_LAZY14(p0[k], p1[k], p2[k], p3[k], Fargs->tab_w[2], Fargs->tab_w[3], Fargs->mod, Fargs->mod2, p_hi, p_lo);
+            if (p0[k] >= Fargs->mod2)
+                p0[k] -= Fargs->mod2;
         }
 
         // 4 recursive calls with depth-2
-        dft_node0_lazy24(p0, depth-2, F);
-        n_fft_params_t Fpar = {{F->mod, F->mod2, F->tab_w}};
-        dft_lazy44(p1, depth-2, 1, Fpar);
-        dft_lazy44(p2, depth-2, 2, Fpar);
-        dft_lazy44(p3, depth-2, 3, Fpar);
+        dft_node0_lazy24(p0, depth-2, Fargs);
+        dft_lazy44(p1, depth-2, 1, Fargs);
+        dft_lazy44(p2, depth-2, 2, Fargs);
+        dft_lazy44(p3, depth-2, 3, Fargs);
     }
 }
