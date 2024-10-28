@@ -165,7 +165,7 @@ do {                                                               \
     ulong v6 = v2 + v3;                         /* < 2*n */        \
     ulong v7;                                                      \
     N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n) - v3, (I_pr), (n),     \
-                            p_hi, p_lo);          /* < 2*n */      \
+                            p_hi, p_lo);        /* < 2*n */        \
     (a) = v4 + v6;                              /* < 4*n */        \
     if ((a) >= (n2))                                               \
         (a) -= (n2);                            /* < 2*n */        \
