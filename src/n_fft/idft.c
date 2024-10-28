@@ -167,7 +167,7 @@ do {                                                        \
  * TODO clean, check laziness
  * * in [0..?n) / out [0..?n) / max < ?n
  */
-#define DFT8_LAZY44(p0, p1, p2, p3, p4, p5, p6, p7,              \
+#define DFT8_LAZY14(p0, p1, p2, p3, p4, p5, p6, p7,              \
                     node, mod, mod2, tab_w)                      \
 do {                                                             \
     ulong p_hi, p_lo, tmp;                                       \
@@ -175,13 +175,13 @@ do {                                                             \
     const ulong w = tab_w[2*(node)];                             \
     const ulong w_pr = tab_w[2*(node)+1];                        \
                                                                  \
-    IDFT4_LAZY22(p0, p1, p2, p3,                                 \
+    IDFT4_LAZY12(p0, p1, p2, p3,                                 \
                  tab_w[4*(node)], tab_w[4*(node)+1],             \
                  tab_w[8*(node)], tab_w[8*(node)+1],             \
                  tab_w[8*(node)+2], tab_w[8*(node)+3],           \
                  mod, mod2, p_hi, p_lo);                         \
                                                                  \
-    IDFT4_LAZY22(p4, p5, p6, p7,                                 \
+    IDFT4_LAZY12(p4, p5, p6, p7,                                 \
                  tab_w[4*(node)+2], tab_w[4*(node)+3],           \
                  tab_w[8*(node)+4], tab_w[8*(node)+5],           \
                  tab_w[8*(node)+6], tab_w[8*(node)+7],           \
@@ -213,7 +213,7 @@ do {                                                             \
 
 // TODO doc
 // TODO add lazy12?
-void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
+void idft_lazy12(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 1)
     {
@@ -223,7 +223,7 @@ void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     else if (depth == 2)
     {
         ulong p_hi, p_lo;
-        IDFT4_LAZY22(p[0], p[1], p[2], p[3],
+        IDFT4_LAZY12(p[0], p[1], p[2], p[3],
                      F->tab_w[2*node], F->tab_w[2*node+1],
                      F->tab_w[4*node], F->tab_w[4*node+1],
                      F->tab_w[4*node+2], F->tab_w[4*node+3],
@@ -231,7 +231,7 @@ void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     }
     else if (depth == 3)
     {
-        DFT8_LAZY44(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+        DFT8_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                     node, F->mod, F->mod2, F->tab_w);
     }
     else
@@ -243,10 +243,10 @@ void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
         const nn_ptr p1 = p + len/4;
         const nn_ptr p2 = p + 2*len/4;
         const nn_ptr p3 = p + 3*len/4;
-        idft_lazy22(p0, depth-2, 4*node, F);
-        idft_lazy22(p1, depth-2, 4*node+1, F);
-        idft_lazy22(p2, depth-2, 4*node+2, F);
-        idft_lazy22(p3, depth-2, 4*node+3, F);
+        idft_lazy12(p0, depth-2, 4*node, F);
+        idft_lazy12(p1, depth-2, 4*node+1, F);
+        idft_lazy12(p2, depth-2, 4*node+2, F);
+        idft_lazy12(p3, depth-2, 4*node+3, F);
 
         const ulong w2 = F->tab_w[2*node];
         const ulong w2_pr = F->tab_w[2*node+1];
@@ -298,13 +298,13 @@ void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
         const nn_ptr p2 = p + 2*len/4;
         const nn_ptr p3 = p + 3*len/4;
         idft_node0_lazy12(p0, depth-2, F);
-        idft_lazy22(p1, depth-2, 1, F);
-        idft_lazy22(p2, depth-2, 2, F);
-        idft_lazy22(p3, depth-2, 3, F);
+        idft_lazy12(p1, depth-2, 1, F);
+        idft_lazy12(p2, depth-2, 2, F);
+        idft_lazy12(p3, depth-2, 3, F);
 
         // 4-point butterflies
-        // input p0,p1,p2,p3 in 4 2 2 2
-        // output p0,p1,p2,p3 in 4 4 4 4
+        // input p0 in [0,4n), p1,p2,p3 in [0,2n)
+        // output p0,p1,p2,p3 in [0,4n)
         ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k+=4)
         {
