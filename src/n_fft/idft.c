@@ -265,8 +265,14 @@ void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
         // input p0,p1,p2,p3 in ??
         // output p0,p1,p2,p3 in ??
         ulong p_hi, p_lo;
-        for (ulong k = 0; k < len/4; k++)
+        for (ulong k = 0; k < len/4; k+=4)
         {
+            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
+                                 F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
+                                 F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
+                                 F->mod, F->mod2, p_hi, p_lo);
             IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
                                  F->mod, F->mod2, p_hi, p_lo);
         }

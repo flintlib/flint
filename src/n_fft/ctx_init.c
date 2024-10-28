@@ -145,7 +145,7 @@ void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth)
             pr_quo = F->tab_w2[2*d+1];
             pr_rem = n_mulmod_precomp_shoup_rem_from_quo(pr_quo, F->mod);
             // for each k, tab_w[2*(k+llen)] <- ww * tab_w[2*k], and deduce precomputation
-            for (ulong k = 0; k+3 < llen; k+=4)
+            for (ulong k = 0; k < llen; k+=4)
             {
                 n_mulmod_and_precomp_shoup(F->tab_w + 2*llen + 2*(k+0), F->tab_w + 2*llen + 2*(k+0)+1,
                                            ww, F->tab_w[2*(k+0)],
