@@ -217,7 +217,7 @@ do {                                                                \
     ulong v6 = v2 + v3;                         /* < 4*n */         \
     if (v6 >= (n2))                                                 \
         v6 -= (n2);                             /* < 2*n */         \
-    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n) - v3, (I_pr), (n),      \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n2) - v3, (I_pr), (n),     \
                             p_hi, p_lo);        /* < 2*n */         \
     (a) = v4 + v6;                              /* < 4*n */         \
     (b) = v5 + v7;                              /* < 4*n */         \
@@ -225,6 +225,31 @@ do {                                                                \
     (d) = v5 + (n2) - v7;                       /* < 4*n */         \
 } while(0)
 
+#define IDFT4_NODE0_LAZY4222(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)  \
+do {                                                                \
+    ulong v0 = (a);                                           \
+    const ulong v1 = (b);                                           \
+    const ulong v2 = (c);                                           \
+    const ulong v3 = (d);                                           \
+    if (v0 >= (n2))                                                 \
+        v0 -= (n2);                             /* < 2*n */         \
+    ulong v4 = v0 + v1;                         /* < 4*n */         \
+    if (v4 >= (n2))                                                 \
+        v4 -= (n2);                             /* < 2*n */         \
+    ulong v5 = v0 + (n2) - v1;                  /* < 4*n */         \
+    if (v5 >= (n2))                                                 \
+        v5 -= (n2);                             /* < 2*n */         \
+    ulong v6 = v2 + v3;                         /* < 4*n */         \
+    if (v6 >= (n2))                                                 \
+        v6 -= (n2);                             /* < 2*n */         \
+    ulong v7;                                                       \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n2) - v3, (I_pr), (n),     \
+                            p_hi, p_lo);        /* < 2*n */         \
+    (a) = v4 + v6;                              /* < 4*n */         \
+    (b) = v5 + v7;                              /* < 4*n */         \
+    (c) = v4 + (n2) - v6;                       /* < 4*n */         \
+    (d) = v5 + (n2) - v7;                       /* < 4*n */         \
+} while(0)
 
 
 

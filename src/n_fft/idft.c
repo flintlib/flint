@@ -119,7 +119,7 @@ do {                                                               \
 do {                                                        \
     ulong p_hi, p_lo, tmp;                                  \
                                                             \
-    IDFT4_NODE0_LAZY14(p0, p1, p2, p3,                      \
+    IDFT4_NODE0_LAZY12(p0, p1, p2, p3,                      \
                        tab_w[2], tab_w[3],                  \
                        mod, mod2, p_hi, p_lo);              \
     /* TODO try a lazy12 variant of the next macro, */      \
@@ -250,16 +250,25 @@ void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
     else
     {
         const ulong len = UWORD(1) << depth;
-        idft_node0_lazy12(p, depth-1, F);
-        idft_lazy22(p+len/2, depth-1, 1, F);
 
-        ulong tmp;
-        for (ulong k = 0; k < len/2; k+=4)
+        // 4 recursive calls with depth-2
+        const nn_ptr p0 = p;
+        const nn_ptr p1 = p + len/4;
+        const nn_ptr p2 = p + 2*len/4;
+        const nn_ptr p3 = p + 3*len/4;
+        idft_node0_lazy12(p0, depth-2, F);
+        idft_lazy22(p1, depth-2, 1, F);
+        idft_lazy22(p2, depth-2, 2, F);
+        idft_lazy22(p3, depth-2, 3, F);
+
+        // 4-point butterflies
+        // input p0,p1,p2,p3 in ??
+        // output p0,p1,p2,p3 in ??
+        ulong p_hi, p_lo;
+        for (ulong k = 0; k < len/4; k++)
         {
-            BUTTERFLY_LAZY22(p[k+0], p[len/2 + k+0], F->mod2, tmp);
-            BUTTERFLY_LAZY22(p[k+1], p[len/2 + k+1], F->mod2, tmp);
-            BUTTERFLY_LAZY22(p[k+2], p[len/2 + k+2], F->mod2, tmp);
-            BUTTERFLY_LAZY22(p[k+3], p[len/2 + k+3], F->mod2, tmp);
+            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
+                                 F->mod, F->mod2, p_hi, p_lo);
         }
     }
 }
