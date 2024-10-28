@@ -113,26 +113,26 @@ do {                                                               \
 /* 8-point IDFT */
 /*--------------*/
 
-#define IDFT8_NODE0_LAZY12(p0, p1, p2, p3, p4, p5, p6, p7,  \
+// TODO see how to make lazier
+#define IDFT8_NODE0_LAZY14(p0, p1, p2, p3, p4, p5, p6, p7,  \
                            mod, mod2, tab_w)                \
 do {                                                        \
     ulong p_hi, p_lo, tmp;                                  \
                                                             \
-    DFT4_NODE0_LAZY24(p0, p1, p2, p3,                       \
-                      tab_w[2], tab_w[3],                   \
-                      mod, mod2, p_hi, p_lo);               \
-    /* could use a lazy24 variant of the next macro, */     \
-    /* but the gain is negligible                    */     \
-    DFT4_LAZY44(p4, p5, p6, p7,                             \
+    IDFT4_NODE0_LAZY12(p0, p1, p2, p3,                      \
+                       tab_w[2], tab_w[3],                  \
+                       mod, mod2, p_hi, p_lo);              \
+    /* TODO try a lazy12 variant of the next macro, */      \
+    IDFT4_LAZY22(p4, p5, p6, p7,                            \
                 tab_w[2], tab_w[3],                         \
                 tab_w[4], tab_w[5],                         \
                 tab_w[6], tab_w[7],                         \
-                mod, mod2, p_hi, p_lo, tmp);                \
+                mod, mod2, p_hi, p_lo);                     \
                                                             \
-    BUTTERFLY_LAZY12(p0, p4, mod, tmp);                     \
-    BUTTERFLY_LAZY12(p1, p5, mod, tmp);                     \
-    BUTTERFLY_LAZY12(p2, p6, mod, tmp);                     \
-    BUTTERFLY_LAZY12(p3, p7, mod, tmp);                     \
+    BUTTERFLY_LAZY22(p0, p4, mod2, tmp);                    \
+    BUTTERFLY_LAZY22(p1, p5, mod2, tmp);                    \
+    BUTTERFLY_LAZY22(p2, p6, mod2, tmp);                    \
+    BUTTERFLY_LAZY22(p3, p7, mod2, tmp);                    \
 } while(0)
 
 
@@ -203,6 +203,12 @@ void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
         ulong p_hi, p_lo;
         IDFT4_NODE0_LAZY12(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3],
                            F->mod, F->mod2, p_hi, p_lo);
+    }
+    else if (depth == 3)
+    {
+        // TODO to be improved
+        IDFT8_NODE0_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                           F->mod, F->mod2, F->tab_w);
     }
     else
     {
