@@ -41,7 +41,7 @@ do {                                                          \
 // move in macros?
 // in [0..4n) x [0..2n) -> out [0..4n) x [0..4n)
 // TODO rename
-#define BUTTERFLY_LAZY22(a, b, n2, tmp)                       \
+#define BUTTERFLY_LAZY4244(a, b, n2, tmp)                     \
 do {                                                          \
     tmp = (a);                                                \
     if (tmp >= (n2))                                          \
@@ -108,31 +108,58 @@ do {                                                               \
                             p_hi, p_lo);       /* < 2*n */         \
 } while(0)
 
+#define IDFT4_LAZY12(a, b, c, d,                                   \
+                     w1, w1_pr, w2, w2_pr, w3, w3_pr,              \
+                     n, n2, p_hi, p_lo)                            \
+do {                                                               \
+    const ulong v0 = (a);                                          \
+    const ulong v1 = (b);                                          \
+    const ulong v2 = (c);                                          \
+    const ulong v3 = (d);                                          \
+    ulong v4 = v0 + v1;                       /* < 2*n */          \
+    ulong v5;                                                      \
+    N_MULMOD_PRECOMP_LAZY(v5, (w2), v0 + (n) - v1, (w2_pr), (n),   \
+                            p_hi, p_lo);      /* < 2*n */          \
+    ulong v6 = v2 + v3;                       /* < 2*n */          \
+    ulong v7;                                                      \
+    N_MULMOD_PRECOMP_LAZY(v7, (w3), v2 + (n) - v3, (w3_pr), (n),   \
+                            p_hi, p_lo);      /* < 2*n */          \
+                                                                   \
+    (a) = v4 + v6;                            /* < 4*n */          \
+    if ((a) >= (n2))                                               \
+        (a) -= (n2);                           /* < 2*n */         \
+    (b) = v5 + v7;                            /* < 4*n */          \
+    if ((b) >= (n2))                                               \
+        (b) -= (n2);                           /* < 2*n */         \
+    N_MULMOD_PRECOMP_LAZY((c), (w1), v4 + (n2) - v6, (w1_pr), (n), \
+                            p_hi, p_lo);       /* < 2*n */         \
+    N_MULMOD_PRECOMP_LAZY((d), (w1), v5 + (n2) - v7, (w1_pr), (n), \
+                            p_hi, p_lo);       /* < 2*n */         \
+} while(0)
+
 /*--------------*/
 /* 8-point IDFT */
 /*--------------*/
 
 // TODO doc
-// TODO see how to make lazier
 #define IDFT8_NODE0_LAZY14(p0, p1, p2, p3, p4, p5, p6, p7,  \
                            mod, mod2, tab_w)                \
 do {                                                        \
     ulong p_hi, p_lo, tmp;                                  \
                                                             \
-    IDFT4_NODE0_LAZY12(p0, p1, p2, p3,                      \
+    IDFT4_NODE0_LAZY14(p0, p1, p2, p3,                      \
                        tab_w[2], tab_w[3],                  \
                        mod, mod2, p_hi, p_lo);              \
-    /* TODO try a lazy12 variant of the next macro, */      \
-    IDFT4_LAZY22(p4, p5, p6, p7,                            \
+    IDFT4_LAZY12(p4, p5, p6, p7,                            \
                 tab_w[2], tab_w[3],                         \
                 tab_w[4], tab_w[5],                         \
                 tab_w[6], tab_w[7],                         \
                 mod, mod2, p_hi, p_lo);                     \
                                                             \
-    BUTTERFLY_LAZY22(p0, p4, mod2, tmp);                    \
-    BUTTERFLY_LAZY22(p1, p5, mod2, tmp);                    \
-    BUTTERFLY_LAZY22(p2, p6, mod2, tmp);                    \
-    BUTTERFLY_LAZY22(p3, p7, mod2, tmp);                    \
+    BUTTERFLY_LAZY4244(p0, p4, mod2, tmp);                  \
+    BUTTERFLY_LAZY4244(p1, p5, mod2, tmp);                  \
+    BUTTERFLY_LAZY4244(p2, p6, mod2, tmp);                  \
+    BUTTERFLY_LAZY4244(p3, p7, mod2, tmp);                  \
 } while(0)
 
 
@@ -262,19 +289,19 @@ void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
         idft_lazy22(p3, depth-2, 3, F);
 
         // 4-point butterflies
-        // input p0,p1,p2,p3 in ??
-        // output p0,p1,p2,p3 in ??
+        // input p0,p1,p2,p3 in 4 2 2 2
+        // output p0,p1,p2,p3 in 4 4 4 4
         ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k+=4)
         {
-            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
-                                 F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
-                                 F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
-                                 F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_NODE0_LAZY4222(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3],
-                                 F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_NODE0_LAZY4222(p0[k+0], p1[k+0], p2[k+0], p3[k+0],
+                                 F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_NODE0_LAZY4222(p0[k+1], p1[k+1], p2[k+1], p3[k+1],
+                                 F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_NODE0_LAZY4222(p0[k+2], p1[k+2], p2[k+2], p3[k+2],
+                                 F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_NODE0_LAZY4222(p0[k+3], p1[k+3], p2[k+3], p3[k+3],
+                                 F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
         }
     }
 }
