@@ -167,7 +167,7 @@ do {                                                        \
  * TODO clean, check laziness
  * * in [0..?n) / out [0..?n) / max < ?n
  */
-#define DFT8_LAZY14(p0, p1, p2, p3, p4, p5, p6, p7,              \
+#define DFT8_LAZY12(p0, p1, p2, p3, p4, p5, p6, p7,              \
                     node, mod, mod2, tab_w)                      \
 do {                                                             \
     ulong p_hi, p_lo, tmp;                                       \
@@ -231,7 +231,7 @@ void idft_lazy12(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     }
     else if (depth == 3)
     {
-        DFT8_LAZY14(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+        DFT8_LAZY12(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                     node, F->mod, F->mod2, F->tab_w);
     }
     else
