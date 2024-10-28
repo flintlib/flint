@@ -211,6 +211,8 @@ do {                                                             \
 /*--------------*/
 
 
+// TODO doc
+// TODO add lazy12?
 void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 1)
@@ -235,19 +237,31 @@ void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     else
     {
         const ulong len = UWORD(1) << depth;
-        idft_lazy22(p, depth-1, 2*node, F);
-        idft_lazy22(p+len/2, depth-1, 2*node+1, F);
 
-        const ulong w = F->tab_w[2*node];
-        const ulong w_pr = F->tab_w[2*node+1];
-        ulong p_hi, p_lo, tmp;
+        // 4 recursive calls with depth-2
+        const nn_ptr p0 = p;
+        const nn_ptr p1 = p + len/4;
+        const nn_ptr p2 = p + 2*len/4;
+        const nn_ptr p3 = p + 3*len/4;
+        idft_lazy22(p0, depth-2, 4*node, F);
+        idft_lazy22(p1, depth-2, 4*node+1, F);
+        idft_lazy22(p2, depth-2, 4*node+2, F);
+        idft_lazy22(p3, depth-2, 4*node+3, F);
 
-        for (ulong k = 0; k < len/2; k+=4)
+        const ulong w2 = F->tab_w[2*node];
+        const ulong w2_pr = F->tab_w[2*node+1];
+        const ulong w = F->tab_w[4*node];
+        const ulong w_pr = F->tab_w[4*node+1];
+        const ulong Iw = F->tab_w[4*node+2];
+        const ulong Iw_pr = F->tab_w[4*node+3];
+        ulong p_hi, p_lo;
+
+        for (ulong k = 0; k < len/4; k+=4)
         {
-            IDFT2_LAZY22(p[k+0], p[len/2 + k+0], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
-            IDFT2_LAZY22(p[k+1], p[len/2 + k+1], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
-            IDFT2_LAZY22(p[k+2], p[len/2 + k+2], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
-            IDFT2_LAZY22(p[k+3], p[len/2 + k+3], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
+            IDFT4_LAZY22(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_LAZY22(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_LAZY22(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_LAZY22(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
         }
     }
 }
