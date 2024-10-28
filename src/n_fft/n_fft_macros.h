@@ -180,6 +180,24 @@ do {                                                               \
         (d) -= (n2);                            /* < 2*n */        \
 } while(0)
 
+#define IDFT4_NODE0_LAZY14(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
+do {                                                               \
+    const ulong v0 = (a);                                          \
+    const ulong v1 = (b);                                          \
+    const ulong v2 = (c);                                          \
+    const ulong v3 = (d);                                          \
+    ulong v4 = v0 + v1;                         /* < 2*n */        \
+    ulong v5 = v0 + (n) - v1;                   /* < 2*n */        \
+    ulong v6 = v2 + v3;                         /* < 2*n */        \
+    ulong v7;                                                      \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n) - v3, (I_pr), (n),     \
+                            p_hi, p_lo);        /* < 2*n */        \
+    (a) = v4 + v6;                              /* < 4*n */        \
+    (b) = v5 + v7;                              /* < 4*n */        \
+    (c) = v4 + (n2) - v6;                       /* < 4*n */        \
+    (d) = v5 + (n2) - v7;                       /* < 4*n */        \
+} while(0)
+
 /** 4-point butterfly, interpolation
  * * in [0..2n) / out [0..4n) / max < 4n
  * * other than this, same specification as IDFT4_NODE0_LAZY14

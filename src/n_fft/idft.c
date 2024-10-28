@@ -108,7 +108,6 @@ do {                                                               \
                             p_hi, p_lo);       /* < 2*n */         \
 } while(0)
 
-
 /*--------------*/
 /* 8-point IDFT */
 /*--------------*/
@@ -120,7 +119,7 @@ do {                                                               \
 do {                                                        \
     ulong p_hi, p_lo, tmp;                                  \
                                                             \
-    IDFT4_NODE0_LAZY12(p0, p1, p2, p3,                      \
+    IDFT4_NODE0_LAZY14(p0, p1, p2, p3,                      \
                        tab_w[2], tab_w[3],                  \
                        mod, mod2, p_hi, p_lo);              \
     /* TODO try a lazy12 variant of the next macro, */      \
@@ -216,9 +215,12 @@ void idft_lazy22(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
         const ulong w_pr = F->tab_w[2*node+1];
         ulong p_hi, p_lo, tmp;
 
-        for (ulong k = 0; k < len/2; k++)
+        for (ulong k = 0; k < len/2; k+=4)
         {
-            IDFT2_LAZY22(p[k], p[len/2 + k], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
+            IDFT2_LAZY22(p[k+0], p[len/2 + k+0], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
+            IDFT2_LAZY22(p[k+1], p[len/2 + k+1], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
+            IDFT2_LAZY22(p[k+2], p[len/2 + k+2], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
+            IDFT2_LAZY22(p[k+3], p[len/2 + k+3], F->mod, F->mod2, w, w_pr, p_hi, p_lo, tmp);
         }
     }
 }
@@ -236,7 +238,7 @@ void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
     else if (depth == 2)
     {
         ulong p_hi, p_lo;
-        IDFT4_NODE0_LAZY12(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3],
+        IDFT4_NODE0_LAZY14(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3],
                            F->mod, F->mod2, p_hi, p_lo);
     }
     else if (depth == 3)
@@ -252,9 +254,12 @@ void idft_node0_lazy12(nn_ptr p, ulong depth, n_fft_args_t F)
         idft_lazy22(p+len/2, depth-1, 1, F);
 
         ulong tmp;
-        for (ulong k = 0; k < len/2; k++)
+        for (ulong k = 0; k < len/2; k+=4)
         {
-            BUTTERFLY_LAZY22(p[k], p[len/2 + k], F->mod2, tmp);
+            BUTTERFLY_LAZY22(p[k+0], p[len/2 + k+0], F->mod2, tmp);
+            BUTTERFLY_LAZY22(p[k+1], p[len/2 + k+1], F->mod2, tmp);
+            BUTTERFLY_LAZY22(p[k+2], p[len/2 + k+2], F->mod2, tmp);
+            BUTTERFLY_LAZY22(p[k+3], p[len/2 + k+3], F->mod2, tmp);
         }
     }
 }
