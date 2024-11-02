@@ -12,12 +12,11 @@
 #include "double_extras.h"
 #include "arb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom-impl.h"
 
 #define LOG2 0.69314718055994531
 #define INV_LOG2 1.4426950408889634074
 #define EXP1 2.7182818284590452
-
-double arf_get_d_log2_abs_approx_clamped(const arf_t x);
 
 /* todo: minima and maxima at multiples of pi */
 static void

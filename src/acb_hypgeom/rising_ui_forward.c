@@ -10,9 +10,8 @@
 */
 
 #include "acb.h"
+#include "arb_hypgeom-impl.h"
 #include "acb_hypgeom.h"
-
-void _arb_increment_fast(arb_t x, slong prec);
 
 void
 acb_hypgeom_rising_ui_forward(acb_t res, const acb_t x, ulong n, slong prec)

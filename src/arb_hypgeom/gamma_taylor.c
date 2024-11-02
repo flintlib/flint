@@ -12,6 +12,7 @@
 #include "double_extras.h"
 #include "arb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom-impl.h"
 
 #define DEBUG 0
 
@@ -236,9 +237,6 @@ static void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
     mag_set_d(arb_radref(res), rad);
     arb_set_round(res, res, prec);
 }
-
-int _arf_increment_fast(arf_t x, slong prec);
-
 
 
 /* Try to compute gamma(x) using Taylor series. Returns 1 on success, 0 on

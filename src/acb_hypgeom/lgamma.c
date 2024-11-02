@@ -10,8 +10,9 @@
 */
 
 #include "acb.h"
-#include "acb_hypgeom.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom-impl.h"
+#include "acb_hypgeom.h"
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
@@ -19,9 +20,6 @@
 #else
 # include <math.h>
 #endif
-
-void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const acb_t z, int use_reflect, int digamma, slong prec);
 
 void acb_hypgeom_gamma_stirling_inner(acb_t s, const acb_t z, slong N, slong prec);
 

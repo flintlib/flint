@@ -11,15 +11,13 @@
 
 #include "arb-impl.h"
 #include "arb_poly.h"
+#include "arb_hypgeom-impl.h"
 
 /* FIXME: Remove this guard against warnings. Best thing would probably be to
  * implement an *-impl.h to keep track of local functions. */
 #ifdef __GNUC__
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
-
-void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const arb_t x, int use_reflect, int digamma, slong prec);
 
 void
 _arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec)

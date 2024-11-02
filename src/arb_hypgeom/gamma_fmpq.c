@@ -15,6 +15,7 @@
 #include "arb.h"
 #include "arb-impl.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom-impl.h"
 #include "hypgeom.h"
 
 static void
@@ -80,9 +81,6 @@ arb_gamma_const_1_4_eval(arb_t x, slong prec)
 
 _ARB_DEF_CACHED_CONSTANT(static, static, arb_gamma_const_1_4, arb_gamma_const_1_4_eval)
 
-
-void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n, const arb_t x, int use_reflect, int digamma, slong prec);
-void arb_hypgeom_gamma_stirling_inner(arb_t s, const arb_t z, slong N, slong prec);
 
 static void
 arb_hypgeom_gamma_fmpq_stirling(arb_t y, const fmpq_t a, slong prec)

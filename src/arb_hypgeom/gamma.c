@@ -13,16 +13,11 @@
 #include "arb-impl.h"
 #include "acb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom-impl.h"
 #include "bernoulli.h"
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
 /* tuning factor */
-double GAMMA_STIRLING_BETA = 0.0;
+static double GAMMA_STIRLING_BETA = 0.0;
 
 #define PI 3.1415926535897932385
 

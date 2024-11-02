@@ -10,11 +10,9 @@
 */
 
 #include "arb_poly.h"
+#include "arb_hypgeom-impl.h"
 
 void _arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec);
-
-void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const arb_t x, int use_reflect, int digamma, slong prec);
 
 void _arb_poly_gamma_stirling_eval(arb_ptr res, const arb_t z, slong n, slong num, slong prec);
 

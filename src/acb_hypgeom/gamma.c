@@ -12,6 +12,7 @@
 #include "arb-impl.h"
 #include "acb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom-impl.h"
 #include "acb_hypgeom.h"
 
 /* FIXME: Remove this guard against warnings. Best thing would probably be to
@@ -19,10 +20,6 @@
 #ifdef __GNUC__
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
-
-void
-acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const acb_t z, int use_reflect, int digamma, slong prec);
 
 void
 acb_hypgeom_gamma_stirling_inner(acb_t s, const acb_t z, slong N, slong prec)

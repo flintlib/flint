@@ -13,18 +13,13 @@
 #include "fmpz_vec.h"
 #include "arb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom-impl.h"
 
 #ifdef __GNUC__
 # define ldexp __builtin_ldexp
 # define log __builtin_log
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
 static double

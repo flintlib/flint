@@ -11,11 +11,9 @@
 
 #include "arb-impl.h"
 #include "arb_poly.h"
+#include "arb_hypgeom-impl.h"
 #include "acb_poly.h"
 #include "acb_poly-impl.h"
-
-void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const acb_t x, int use_reflect, int digamma, slong prec);
 
 static void
 bsplit(acb_ptr Q, acb_ptr T, const acb_t z, slong a, slong b, slong num, slong prec)
