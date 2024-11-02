@@ -11,16 +11,9 @@
 
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "n_poly-impl.h"
 #include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
-
-void n_fq_poly_mullow_(
-    n_fq_poly_t A,
-    const n_fq_poly_t B,
-    const n_fq_poly_t C,
-    slong order,
-    const fq_nmod_ctx_t ctx,
-    n_poly_stack_t St);
 
 void n_fq_bpoly_add(
     n_bpoly_t A,

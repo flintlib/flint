@@ -12,15 +12,10 @@
 #include "mpn_extras.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "n_poly-impl.h"
 
 #if FLINT_WANT_ASSERT
 # include "fq_nmod_poly.h"
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
 static void _n_fq_poly_mullow_(
