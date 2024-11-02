@@ -11,8 +11,7 @@
 
 #include "arb.h"
 #include "acb.h"
-
-int polylog_is_real(const acb_t s, const acb_t z);
+#include "acb_poly-impl.h"
 
 void
 arb_polylog(arb_t w, const arb_t s, const arb_t z, slong prec)

@@ -10,18 +10,13 @@
 */
 
 #include "acb_poly.h"
+#include "acb_poly-impl.h"
 #include "gr_poly.h"
 
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
 int

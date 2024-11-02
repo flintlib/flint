@@ -11,14 +11,10 @@
 
 #include "arb_poly.h"
 #include "acb_poly.h"
+#include "acb_poly-impl.h"
 
 void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
     const acb_t x, int use_reflect, int digamma, slong prec);
-
-void
-_acb_poly_gamma_stirling_eval(acb_ptr res, const acb_t z, slong n, slong num, slong prec);
-
-void _acb_poly_gamma_stirling_eval2(acb_ptr res, const acb_t z, slong n, slong num, int diff, slong prec);
 
 void
 _acb_poly_digamma_series(acb_ptr res, acb_srcptr h, slong hlen, slong len, slong prec)
