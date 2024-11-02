@@ -13,6 +13,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly-impl.h"
 #include "nmod_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
@@ -1057,8 +1058,6 @@ static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 
 
 #endif
 
-void _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod);
-
 int
 _gr_nmod_poly_inv_series_basecase(ulong * res,
     const ulong * f, slong flen, slong n, gr_ctx_t ctx)
@@ -1092,8 +1091,6 @@ _gr_nmod_poly_inv_series(ulong * res,
         return _gr_poly_inv_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
-
-void _nmod_poly_div_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr P, slong Plen, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod);
 
 int
 _gr_nmod_poly_div_series_basecase(ulong * res,
