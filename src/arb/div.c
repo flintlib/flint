@@ -10,12 +10,7 @@
 */
 
 #include "arb.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "arb-impl.h"
 
 /* We do Newton iteration in floating-point arithmetic with some
    guard bits. With GUARD_BITS = 32 the result is certainly accurate

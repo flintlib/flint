@@ -12,11 +12,10 @@
 #include "fmpq.h"
 #include "arith.h"
 #include "arb.h"
+#include "arb-impl.h"
 
 void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
     const arb_t x, int use_reflect, int digamma, slong prec);
-
-void arb_gamma_stirling_eval(arb_t s, const arb_t z, slong nterms, int digamma, slong prec);
 
 void
 arb_digamma(arb_t y, const arb_t x, slong prec)

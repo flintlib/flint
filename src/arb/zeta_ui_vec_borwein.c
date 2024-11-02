@@ -11,12 +11,11 @@
 
 #include "fmpz_vec.h"
 #include "arb.h"
+#include "arb-impl.h"
 
 /* With parameter n, the error is bounded by 3/(3+sqrt(8))^n */
 #define ERROR_A 1.5849625007211561815 /* log2(3) */
 #define ERROR_B 2.5431066063272239453 /* log2(3+sqrt(8)) */
-
-void mag_borwein_error(mag_t err, slong n);
 
 void
 arb_zeta_ui_vec_borwein(arb_ptr z, ulong start, slong num, ulong step, slong prec)

@@ -9,18 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-#include "mpn_extras.h"
-
 /* We need uint64_t instead of ulong on 32-bit systems for
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "mpn_extras.h"
+#include "arb.h"
+#include "arb-impl.h"
 
 void mpfr_mulhigh_n(nn_ptr rp, nn_srcptr np, nn_srcptr mp, slong n);
 void mpfr_sqrhigh_n(nn_ptr rp, nn_srcptr np, slong n);

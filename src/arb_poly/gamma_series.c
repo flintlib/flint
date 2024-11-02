@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb-impl.h"
 #include "arb_poly.h"
 
 /* FIXME: Remove this guard against warnings. Best thing would probably be to
@@ -17,12 +18,8 @@
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
-void arb_gamma_stirling_bound(mag_ptr err, const arb_t x, slong k0, slong knum, slong n);
-
 void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
     const arb_t x, int use_reflect, int digamma, slong prec);
-
-void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);
 
 void
 _arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec)

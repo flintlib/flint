@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "arb-impl.h"
 #include "arb_hypgeom.h"
 #include "bernoulli.h"
 
@@ -17,8 +18,6 @@ static const unsigned int central_bin_tab[] = {
     1, 2, 6, 20, 70, 252, 924, 3432, 12870, 48620, 184756, 705432, 2704156,
     10400600, 40116600, 155117520, 601080390, 2333606220U,
 };
-
-void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);
 
 /* See Richard P. Brent, "Asymptotic approximation of central binomial
 coefficients with rigorous error bounds". https://arxiv.org/abs/1608.04834 */

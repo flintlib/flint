@@ -12,10 +12,7 @@
 #include "thread_support.h"
 #include "fmpz_vec.h"
 #include "arb.h"
-
-slong _arb_compute_bs_exponents(slong * tab, slong n);
-
-slong _arb_get_exp_pos(const slong * tab, slong step);
+#include "arb-impl.h"
 
 static void
 bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,

@@ -12,7 +12,7 @@
 #ifndef ARB_MAT_IMPL_H
 #define ARB_MAT_IMPL_H
 
-#include "mag.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {

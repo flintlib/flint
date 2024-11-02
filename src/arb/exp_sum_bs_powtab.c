@@ -12,12 +12,7 @@
 #include "thread_support.h"
 #include "fmpz_vec.h"
 #include "arb.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "arb-impl.h"
 
 /* When splitting [a,b) into [a,m), [m,b), we need the power x^(m-a).
    This function computes all the exponents (m-a) that can appear when

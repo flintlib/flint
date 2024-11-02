@@ -12,6 +12,7 @@
 #include "thread_support.h"
 #include "fmpz_vec.h"
 #include "arb.h"
+#include "arb-impl.h"
 #include "acb.h"
 
 /* FIXME: Remove this guard against warnings. Best thing would probably be to
@@ -20,9 +21,6 @@
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
 # pragma message "arb_sin_cos_fmpz_div_2exp_bsplit only needs a symbol for test"
 #endif
-
-slong _arb_compute_bs_exponents(slong * tab, slong n);
-slong _arb_get_exp_pos(const slong * tab, slong step);
 
 static void
 bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,

@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
 #include "double_extras.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "arb.h"
+#include "arb-impl.h"
 
 /* Helper functions to compute W_{-1}(x) on (-1/e,0) in double precision --
    just to get a good starting value for the multiprecision code, and

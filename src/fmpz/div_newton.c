@@ -11,10 +11,7 @@
 
 #include <gmp.h>
 #include "fmpz.h"
-
-/* The underlying approximate division is implemented in arb/div.c.
-   One day this should have mpn code. */
-void _arb_fmpz_divapprox_newton(fmpz_t res, const fmpz_t x, const fmpz_t y, slong exp);
+#include "arb-impl.h"
 
 #if 1
 #define TEST_PERTURBATION

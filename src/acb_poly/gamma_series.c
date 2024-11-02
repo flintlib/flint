@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb-impl.h"
 #include "arb_poly.h"
 #include "acb_poly.h"
 
@@ -18,12 +19,8 @@
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
-void acb_gamma_stirling_bound(mag_ptr err, const acb_t x, slong k0, slong knum, slong n);
-
 void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
     const acb_t x, int use_reflect, int digamma, slong prec);
-
-void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);
 
 static void
 bsplit(acb_ptr Q, acb_ptr T, const acb_t z, slong a, slong b, slong num, slong prec)

@@ -9,18 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
 #include "mpn_extras.h"
-
-void
-_arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
-    nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn,
-    int negative, flint_bitcnt_t shift);
-
-void
-_arb_dot_add_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
-    nn_srcptr xptr, slong xn,
-    int negative, flint_bitcnt_t shift);
+#include "arb.h"
+#include "arb-impl.h"
 
 static void
 arf_approx_dot_simple(arf_t res, const arf_t initial, int subtract,

@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb-impl.h"
 #include "acb.h"
-
-void mag_agm(mag_t res, const mag_t x, const mag_t y);
 
 static void
 agm_helper(acb_t res, const acb_t a, const acb_t b, slong prec)

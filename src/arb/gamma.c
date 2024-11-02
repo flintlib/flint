@@ -10,15 +10,10 @@
 */
 
 #include "arb.h"
+#include "arb-impl.h"
 #include "arb_hypgeom.h"
 #include "acb.h"
 #include "bernoulli.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
 
 /* todo: move/cleanup helper functions */
 

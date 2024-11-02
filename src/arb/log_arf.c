@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
 #include "mpn_extras.h"
-
-int _arb_log_ui_smooth(arb_t res, ulong n, slong prec);
+#include "arb.h"
+#include "arb-impl.h"
 
 #define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
 

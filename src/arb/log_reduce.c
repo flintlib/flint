@@ -11,6 +11,7 @@
 
 #include "fmpz_vec.h"
 #include "arb.h"
+#include "arb-impl.h"
 
 #ifdef __GNUC__
 # define floor __builtin_floor
@@ -435,8 +436,6 @@ _arb_exp_arf_precomp(arb_t res, const arf_t x, slong prec, int minus_one,
     fmpz_clear(q);
     arb_clear(t);
 }
-
-void arb_exp_arf_huge(arb_t z, const arf_t x, slong mag, slong prec, int minus_one);
 
 void
 arb_exp_arf_log_reduction(arb_t res, const arf_t x, slong prec, int minus_one)

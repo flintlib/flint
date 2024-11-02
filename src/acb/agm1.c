@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb-impl.h"
 #include "acb.h"
 #include "acb_poly.h"
-
-void mag_agm(mag_t res, const mag_t x, const mag_t y);
 
 /* Checks that |arg(z)| <= 3 pi / 4 */
 static int

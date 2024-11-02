@@ -10,8 +10,7 @@
 */
 
 #include "arb.h"
-
-void arb_zeta_inv_ui_euler_product(arb_t z, ulong s, slong prec);
+#include "arb-impl.h"
 
 void
 arb_bernoulli_ui_zeta(arb_t b, ulong n, slong prec)

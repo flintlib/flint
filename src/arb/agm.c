@@ -10,12 +10,7 @@
 */
 
 #include "arb.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "arb-impl.h"
 
 /* Use series expansion of the elliptic integral
    pi/(4K(z^2)) = 1/2 - z^2/8 - 5z^4/128 - 11z^6/512 - 469z^8/32768 + O(z^10)

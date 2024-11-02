@@ -10,13 +10,8 @@
 */
 
 #include "arb.h"
+#include "arb-impl.h"
 #include "acb_dirichlet.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
 
 void
 arb_zeta_inv_ui_euler_product(arb_t z, ulong s, slong prec)

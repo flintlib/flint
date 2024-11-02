@@ -13,6 +13,7 @@
 #include "fmpz_poly.h"
 #include "fmpq.h"
 #include "arb.h"
+#include "arb-impl.h"
 #include "arb_hypgeom.h"
 #include "hypgeom.h"
 
@@ -221,9 +222,6 @@ arb_hypgeom_gamma_small_frac(arb_t y, unsigned int p, unsigned int q, slong prec
     }
 }
 
-slong _arb_compute_bs_exponents(slong * tab, slong n);
-slong _arb_get_exp_pos(const slong * tab, slong step);
-
 static void
 bsplit2(arb_t P, arb_t Q, const fmpz_t zp, const fmpz_t zq,
     const slong * xexp, arb_srcptr xpow,
@@ -318,8 +316,6 @@ bsplit3(arb_t P, arb_t Q, const fmpz_t zp, const fmpz_t zq,
         arb_clear(Qb);
     }
 }
-
-double d_lambertw_branch1(double x);
 
 static ulong
 more_trailing_zeros(ulong N)
