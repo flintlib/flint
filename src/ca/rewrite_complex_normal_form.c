@@ -12,12 +12,10 @@
 #include "ca.h"
 #include "ca-impl.h"
 #include "ca_vec.h"
+#include "qqbar-impl.h"
 
 /* todo */
 void ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx);
-
-/* todo */
-ulong qqbar_try_as_cyclotomic(qqbar_t zeta, fmpq_poly_t poly, const qqbar_t x);
 
 /* todo: Re, Im, Abs, Sgn ... */
 

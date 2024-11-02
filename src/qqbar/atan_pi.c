@@ -11,18 +11,13 @@
 
 #include "ulong_extras.h"
 #include "qqbar.h"
+#include "qqbar-impl.h"
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
 # define floor __builtin_floor
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
 void

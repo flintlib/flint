@@ -11,8 +11,7 @@
 
 #include "ulong_extras.h"
 #include "qqbar.h"
-
-void best_rational_fast(slong * p, ulong * q, double x, slong N);
+#include "qqbar-impl.h"
 
 int
 qqbar_asin_pi(slong * p, ulong * q, const qqbar_t x)

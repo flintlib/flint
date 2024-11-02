@@ -17,12 +17,7 @@
 #include "fexpr_builtin.h"
 #include "ulong_extras.h"
 #include "qqbar.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "qqbar-impl.h"
 
 static ulong _deflation(const fmpz * poly, slong len)
 {
