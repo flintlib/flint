@@ -11,8 +11,7 @@
 
 #include "thread_support.h"
 #include "gr_vec.h"
-
-int _gr_vec_parallel_reduce(gr_ptr res, gr_method_vec_reduce_op basecase, gr_srcptr vec, slong n, gr_ctx_t ctx, int thread_limit, int flags);
+#include "gr_vec-impl.h"
 
 int
 _gr_vec_product_parallel(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
