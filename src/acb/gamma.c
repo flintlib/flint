@@ -12,13 +12,8 @@
 #include "bernoulli.h"
 #include "arb-impl.h"
 #include "acb.h"
+#include "acb-impl.h"
 #include "acb_hypgeom.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
 
 void
 acb_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,

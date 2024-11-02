@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb_hypgeom-impl.h"
 #include "acb.h"
-
-void acb_gamma_stirling_eval(acb_t s, const acb_t z, slong nterms, int digamma, slong prec);
+#include "acb-impl.h"
+#include "arb_hypgeom-impl.h"
 
 void
 acb_digamma(acb_t y, const acb_t x, slong prec)

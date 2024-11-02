@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb-impl.h"
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
 
@@ -17,8 +18,6 @@
 #else
 # include <math.h>
 #endif
-
-void acb_zeta_si(acb_t z, slong s, slong prec);
 
 static void
 _acb_dirichlet_zeta(acb_t res, const acb_t s, slong prec)
