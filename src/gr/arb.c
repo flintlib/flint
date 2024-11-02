@@ -13,6 +13,7 @@
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "arb_poly.h"
+#include "arb_poly-impl.h"
 #include "acb_poly.h"
 #include "arb_mat.h"
 #include "arb_fmpz_poly.h"
@@ -1593,8 +1594,6 @@ _gr_arb_poly_mullow(arb_ptr res,
     _arb_poly_mullow(res, poly1, len1, poly2, len2, n, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
-
-int _gr_arb_poly_taylor_shift(arb_ptr res, arb_srcptr poly, slong len, const arb_t c, gr_ctx_t ctx);
 
 /* hidden feature: also works with arb ctx */
 int

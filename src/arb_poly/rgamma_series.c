@@ -10,12 +10,8 @@
 */
 
 #include "arb_poly.h"
+#include "arb_poly-impl.h"
 #include "arb_hypgeom-impl.h"
-
-void _arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec);
-
-void _arb_poly_gamma_stirling_eval(arb_ptr res, const arb_t z, slong n, slong num, slong prec);
-
 
 void
 _arb_poly_rgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong prec)
