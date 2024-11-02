@@ -13,10 +13,9 @@
 #include "fmpz_mat.h"
 #include "bool_mat.h"
 #include "arb_mat.h"
+#include "arb_mat-impl.h"
 #include "acb.h"
 #include "acb_mat.h"
-
-slong _arb_mat_exp_choose_N(const mag_t norm, slong prec);
 
 static slong
 _acb_mat_count_is_zero(const acb_mat_t A)
