@@ -10,6 +10,7 @@
 */
 
 #include "ca_ext.h"
+#include "ca_field-impl.h"
 
 static int
 _fmpz_poly_compare_abslex(const fmpz * a, const fmpz * b, slong len)
@@ -57,8 +58,6 @@ _qqbar_cmp_repr(const qqbar_t x1, const qqbar_t x2)
     c = qqbar_cmp_im(x1, x2);
     return c;
 }
-
-slong ca_depth(const ca_t x, ca_ctx_t ctx);
 
 int
 ca_ext_cmp_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx)

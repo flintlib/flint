@@ -14,6 +14,7 @@
 #include "ca-impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+#include "ca_field-impl.h"
 
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
@@ -21,12 +22,6 @@
 #include "fmpz_mpoly.h"
 
 #include "gr.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
 
 static slong
 acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int FLINT_UNUSED(check), slong prec)
@@ -895,13 +890,6 @@ ca_field_build_ideal_multiplicative(ca_field_t K, ca_ctx_t ctx)
 
     flint_free(powers);
 }
-
-/* todo: move to utils */
-void
-fmpz_mpoly_set_coeff_si_x(fmpz_mpoly_t poly,
-        slong c,
-        slong x_var, slong x_exp,
-        const fmpz_mpoly_ctx_t ctx);
 
 void
 ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)

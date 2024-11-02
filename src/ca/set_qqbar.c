@@ -14,6 +14,7 @@
 #include "ca-impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+#include "ca_field-impl.h"
 
 #define FACTOR_SMOOTH_BOUND 32
 
@@ -54,8 +55,6 @@ _fmpz_factor_square_root(fmpz_t A, fmpz_t B, const fmpz_t n, slong smooth_bound)
     fmpz_factor_clear(fac);
     fmpz_clear(t);
 }
-
-ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t ctx);
 
 ca_field_ptr ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x)
 {

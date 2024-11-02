@@ -11,12 +11,7 @@
 
 #include "ca_ext.h"
 #include "ca_field.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "ca_field-impl.h"
 
 ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {

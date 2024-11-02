@@ -10,8 +10,7 @@
 */
 
 #include "ca.h"
-
-ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t ctx);
+#include "ca_field-impl.h"
 
 static void
 _fmpz_mpoly_get_fmpq_poly_var_destructive(fmpq_poly_t res, fmpz_mpoly_t F, slong i, const fmpz_mpoly_ctx_t ctx)
