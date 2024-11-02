@@ -10,9 +10,8 @@
 */
 
 #include "ca.h"
+#include "ca-impl.h"
 #include "ca_field.h"
-
-void ca_clear_unchecked(ca_t x, ca_ctx_t ctx);
 
 /* todo: recycle storage when compatible */
 void

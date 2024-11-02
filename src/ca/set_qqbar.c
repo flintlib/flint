@@ -11,14 +11,9 @@
 
 #include "fmpz_factor.h"
 #include "ca.h"
+#include "ca-impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
 
 #define FACTOR_SMOOTH_BOUND 32
 

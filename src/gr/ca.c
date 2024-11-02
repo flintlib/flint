@@ -11,6 +11,7 @@
 
 #include "fmpzi.h"
 #include "ca.h"
+#include "ca-impl.h"
 #include "ca_mat.h"
 #include "ca_poly.h"
 #include "fexpr.h"
@@ -1085,9 +1086,6 @@ _gr_ca_arg(ca_t res, const ca_t x, gr_ctx_t ctx)
 
 #define CMP_UNDEFINED -2
 #define CMP_UNKNOWN -3
-
-int
-_ca_cmp(const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 int
 _gr_ca_cmp(int * res, const ca_t x, const ca_t y, gr_ctx_t ctx)

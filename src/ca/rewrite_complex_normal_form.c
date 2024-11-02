@@ -10,13 +10,11 @@
 */
 
 #include "ca.h"
+#include "ca-impl.h"
 #include "ca_vec.h"
 
 /* todo */
 void ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx);
-
-/* todo */
-void ca_set_ext(ca_t res, ca_ext_srcptr ext, ca_ctx_t ctx);
 
 /* todo */
 ulong qqbar_try_as_cyclotomic(qqbar_t zeta, fmpq_poly_t poly, const qqbar_t x);

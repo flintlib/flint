@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "ca.h"
+#include "ca-impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
 
@@ -186,8 +187,6 @@ acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int FLINT_UNUSED(che
     /* fixme: bogus */
     return found;
 }
-
-void _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_elem_t a, const nf_t nf);
 
 void
 _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t FLINT_UNUSED(ctx))

@@ -15,11 +15,11 @@
 #include "fmpz.h"
 #include "nf.h"
 #include "nf_elem.h"
+#include "ca-impl.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-#include "gr_generic.h"
 
 /* FIXME: Remove this guard against warnings. Best thing would probably be to
  * implement an *-impl.h to keep track of local functions. */
@@ -200,8 +200,6 @@ _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 
     return gr_generic_set_other(res, v, v_ctx, ctx);
 }
-
-void fexpr_set_nf_elem(fexpr_t res, const nf_elem_t a, const nf_t nf, const fexpr_t var);
 
 int
 _gr_nf_get_fexpr(fexpr_t res, const nf_elem_t a, const gr_ctx_t ctx)

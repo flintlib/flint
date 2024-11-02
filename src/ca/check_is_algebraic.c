@@ -10,8 +10,7 @@
 */
 
 #include "ca.h"
-
-int ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx);
+#include "ca-impl.h"
 
 /* todo: move, rename */
 static truth_t
