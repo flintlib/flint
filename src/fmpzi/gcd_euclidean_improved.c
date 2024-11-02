@@ -11,20 +11,7 @@
 
 #include <math.h>
 #include "fmpzi.h"
-
-#if FLINT_BITS == 64
-#define GCD_MAX_D WORD(1125899906842623)
-#define GCD_MIN_D WORD(-1125899906842623)
-#else
-#define GCD_MAX_D COEFF_MAX
-#define GCD_MIN_D COEFF_MIN
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "fmpzi-impl.h"
 
 void
 _fmpzi_gcd_dddd(fmpzi_t res, double a, double b, double c, double d)
