@@ -11,17 +11,7 @@
 
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
-slong
-acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p,
-                         acb_srcptr b, slong q, const acb_t z,
-                         slong prec, slong n_max);
+#include "acb_hypgeom-impl.h"
 
 int
 acb_hypgeom_u_asymp_determine_region(const mag_t r,

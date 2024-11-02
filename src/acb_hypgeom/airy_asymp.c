@@ -12,8 +12,7 @@
 #include "ulong_extras.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-void acb_hypgeom_mag_chi(mag_t chi, ulong n);
+#include "acb_hypgeom-impl.h"
 
 static int
 arg_lt_2pi3(const acb_t z, const acb_t zeta)

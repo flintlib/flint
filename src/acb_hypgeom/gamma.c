@@ -14,12 +14,7 @@
 #include "arb_hypgeom.h"
 #include "arb_hypgeom-impl.h"
 #include "acb_hypgeom.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "acb_hypgeom-impl.h"
 
 void
 acb_hypgeom_gamma_stirling_inner(acb_t s, const acb_t z, slong N, slong prec)

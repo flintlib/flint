@@ -11,18 +11,13 @@
 
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
+#include "acb_hypgeom-impl.h"
 
 #ifdef __GNUC__
 # define floor __builtin_floor
 # define log __builtin_log
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
 #define D_ABS(x) ((x) < 0.0 ? (-(x)) : (x))
