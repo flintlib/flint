@@ -10,9 +10,7 @@
 */
 
 #include "ca_poly.h"
-
-ca_field_ptr
-_ca_vec_same_field2(ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, ca_ctx_t ctx);
+#include "ca_poly-impl.h"
 
 void
 _ca_poly_div_series(ca_ptr Q,

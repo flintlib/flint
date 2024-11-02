@@ -11,9 +11,7 @@
 
 #include "ca_vec.h"
 #include "ca_poly.h"
-
-ca_field_ptr
-_ca_vec_same_field2(ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, ca_ctx_t ctx);
+#include "ca_poly-impl.h"
 
 static void
 _ca_poly_exp_series_basecase(ca_ptr f,
