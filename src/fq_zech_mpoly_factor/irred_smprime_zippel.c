@@ -15,6 +15,7 @@
 #include "fq_zech_poly_factor.h"
 #include "n_poly.h"
 #include "mpoly.h"
+#include "fq_zech_mpoly-impl.h"
 #include "fq_zech_mpoly_factor.h"
 
 static void fq_zech_mpoly_delete_duplicate_terms(
@@ -70,9 +71,6 @@ static void fq_zech_poly_product_roots(fq_zech_poly_t P, fq_zech_struct * r,
     fq_zech_poly_clear(B, fqctx);
 }
 
-
-fq_zech_mpoly_struct * _fq_zech_mpolyu_get_coeff(fq_zech_mpolyu_t A,
-                                     ulong pow, const fq_zech_mpoly_ctx_t uctx);
 
 void _fq_zech_mpoly_monomial_evals(
     fq_zech_struct * E,

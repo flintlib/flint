@@ -10,12 +10,7 @@
 */
 
 #include "fq_zech_mpoly.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "fq_zech_mpoly-impl.h"
 
 int fq_zech_mpolyu_is_canonical(const fq_zech_mpolyu_t A,
                                                  const fq_zech_mpoly_ctx_t ctx)
