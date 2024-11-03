@@ -14,6 +14,7 @@
 #include "arb.h"
 #include "arith.h"
 #include "partitions.h"
+#include "partitions-impl.h"
 
 #ifdef __GNUC__
 # define log __builtin_log
@@ -21,12 +22,6 @@
 # define sqrt __builtin_sqrt
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
 #define VERBOSE 0

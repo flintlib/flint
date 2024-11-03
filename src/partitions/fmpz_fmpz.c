@@ -11,6 +11,7 @@
 
 #include "arb.h"
 #include "partitions.h"
+#include "partitions-impl.h"
 
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
@@ -42,8 +43,6 @@ partitions_lookup[NUMBER_OF_SMALL_PARTITIONS] =
     UWORD(1482074143),UWORD(1653668665),UWORD(1844349560),UWORD(2056148051),UWORD(2291320912),
     UWORD(2552338241),UWORD(2841940500),UWORD(3163127352),UWORD(3519222692),UWORD(3913864295)
 };
-
-slong partitions_hrr_needed_terms(double n);
 
 static void
 partitions_fmpz_fmpz_hrr(fmpz_t p, const fmpz_t n, int use_doubles)
