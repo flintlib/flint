@@ -21,6 +21,7 @@
  * implement an *-impl.h to keep track of local functions. */
 #ifdef __GNUC__
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "fmpz_get_str_bsplit_threaded only needs a symbol for test"
 #endif
 
 /*

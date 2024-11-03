@@ -14,12 +14,7 @@
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "fmpz-impl.h"
 
 /* Will not get called with x or y small. */
 void

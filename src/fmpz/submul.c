@@ -13,10 +13,7 @@
 
 #include "gmpcompat.h"
 #include "fmpz.h"
-
-/* defined in addmul.c */
-void
-_flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate);
+#include "fmpz-impl.h"
 
 void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
