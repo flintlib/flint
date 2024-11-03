@@ -20,6 +20,7 @@
  * implement an *-impl.h to keep track of local functions. */
 #ifdef __GNUC__
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "_artin_schreier_preimage only needs a symbol for test"
 #endif
 
 static int __fmpz_mod_poly_invmod(fmpz *A,
