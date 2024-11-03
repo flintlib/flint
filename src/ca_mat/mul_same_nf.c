@@ -11,12 +11,7 @@
 
 #include "fmpz_poly_mat.h"
 #include "ca_mat.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "ca_mat-impl.h"
 
 static const fmpz * _nf_denref(const nf_elem_t a, const nf_t nf)
 {
