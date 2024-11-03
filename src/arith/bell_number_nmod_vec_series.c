@@ -13,12 +13,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "arith.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "arith-impl.h"
 
 ulong nmod_inv_check(ulong x, nmod_t mod)
 {

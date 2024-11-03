@@ -12,6 +12,7 @@
 #include <gmp.h>
 #include "nmod.h"
 #include "arith.h"
+#include "arith-impl.h"
 
 const ulong bell_number_tab[] =
 {
@@ -46,8 +47,6 @@ arith_bell_number_nmod_fallback(ulong n, nmod_t mod)
     return s;
 }
 
-
-ulong nmod_inv_check(ulong x, nmod_t mod);
 
 ulong
 arith_bell_number_nmod(ulong n, nmod_t mod)
