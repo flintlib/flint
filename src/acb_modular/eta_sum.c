@@ -11,6 +11,7 @@
 
 #include "acb.h"
 #include "acb_modular.h"
+#include "acb_modular-impl.h"
 
 static const int pentagonal_best_m[] = {
   2, 5, 7, 11, 13, 17, 19, 23, 25, 35,
@@ -35,8 +36,6 @@ static const int pentagonal_best_m_residues[] = {
   11340, 11340, 13608, 15120, 15120, 18144, 16632, 18480, 22176, 23760,
   27720, 27720, 31680, 33264, 36960, 0
 };
-
-slong acb_modular_rs_optimal_m(const int * best_ms, const int * num_residues, slong N);
 
 #define PENTAGONAL(N) ((((N)+2)/2) * ((3*(N)+5)/2)/2)
 
