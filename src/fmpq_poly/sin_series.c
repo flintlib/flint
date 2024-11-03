@@ -12,10 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
-
-void
-_fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
-    fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n, int can);
+#include "fmpq_poly-impl.h"
 
 static void
 _fmpq_poly_sin_series_basecase(fmpz * g, fmpz_t gden,

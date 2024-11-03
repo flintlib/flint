@@ -12,12 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "fmpq_poly-impl.h"
 
 void
 _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
@@ -88,7 +83,7 @@ _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
     fmpz_clear(v);
 }
 
-void
+static void
 _fmpq_poly_sin_cos_series_basecase(fmpz * S, fmpz_t Sden,
     fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n)
 {
