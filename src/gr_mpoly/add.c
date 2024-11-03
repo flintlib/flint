@@ -12,13 +12,7 @@
 #include "mpoly.h"
 #include "gr_mpoly.h"
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
-slong _gr_mpoly_add(
+static slong _gr_mpoly_add(
     slong * Alen,
     gr_ptr Acoeffs, ulong * Aexps,
     gr_srcptr Bcoeffs, const ulong * Bexps, slong Blen,
