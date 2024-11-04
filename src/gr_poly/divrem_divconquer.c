@@ -13,12 +13,7 @@
 
 #include "gr_vec.h"
 #include "gr_poly.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "gr_poly-impl.h"
 
 int
 _gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,
