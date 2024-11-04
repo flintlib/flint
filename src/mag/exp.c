@@ -11,12 +11,7 @@
 
 #include "double_extras.h"
 #include "mag.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "mag-impl.h"
 
 static const double inverse_factorials[] = {
     1.0,
