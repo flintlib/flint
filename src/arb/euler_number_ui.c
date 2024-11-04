@@ -12,6 +12,7 @@
 #include "thread_support.h"
 #include "arb.h"
 #include "acb_dirichlet.h"
+#include "bernoulli-impl.h"
 
 #ifdef __GNUC__
 # define log __builtin_log
@@ -452,10 +453,6 @@ mod_p_worker(slong i, void * param)
 
 #define TIMING 0
 #define DEBUG 0
-
-/* todo: optimize basecase and move to flint */
-void
-_arb_tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len);
 
 void
 arb_fmpz_euler_number_ui_multi_mod(fmpz_t num, ulong n, double alpha)
