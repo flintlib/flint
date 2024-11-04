@@ -21,12 +21,6 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
 typedef struct
 {
     nf_struct * nf;
@@ -39,7 +33,7 @@ _gr_nf_ctx_t;
 
 static const char * default_var = "a";
 
-int
+static int
 _gr_nf_ctx_write(gr_stream_t out, const gr_ctx_t ctx)
 {
     gr_stream_write(out, "Number field ");
@@ -47,7 +41,7 @@ _gr_nf_ctx_write(gr_stream_t out, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _gr_nf_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+static int _gr_nf_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
     len = strlen(s);
@@ -60,12 +54,12 @@ int _gr_nf_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
     return GR_SUCCESS;
 }
 
-int _gr_nf_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+static int _gr_nf_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 {
     return _gr_nf_ctx_set_gen_name(ctx, s[0]);
 }
 
-void
+static void
 _gr_nf_ctx_clear(gr_ctx_t ctx)
 {
     nf_clear(NF_CTX(ctx));
@@ -74,19 +68,19 @@ _gr_nf_ctx_clear(gr_ctx_t ctx)
         flint_free(NF_VAR(ctx));
 }
 
-void
+static void
 _gr_nf_init(nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_init(x, NF_CTX(ctx));
 }
 
-void
+static void
 _gr_nf_clear(nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_clear(x, NF_CTX(ctx));
 }
 
-void
+static void
 _gr_nf_swap(nf_elem_t x, nf_elem_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     nf_elem_t t;
@@ -95,13 +89,13 @@ _gr_nf_swap(nf_elem_t x, nf_elem_t y, const gr_ctx_t FLINT_UNUSED(ctx))
     *y = *t;
 }
 
-void
+static void
 _gr_nf_set_shallow(nf_elem_t res, const nf_elem_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
 
-int
+static int
 _gr_nf_randtest(nf_elem_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     switch (n_randint(state, 10))
@@ -116,63 +110,63 @@ _gr_nf_randtest(nf_elem_t res, flint_rand_t state, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_write(gr_stream_t out, const nf_elem_t x, const gr_ctx_t ctx)
 {
     gr_stream_write_free(out, nf_elem_get_str_pretty(x, NF_VAR(ctx), NF_CTX(ctx)));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_gen(nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_gen(x, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_zero(nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_zero(x, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_one(nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_one(x, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_set_si(nf_elem_t res, slong v, const gr_ctx_t ctx)
 {
     nf_elem_set_si(res, v, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_set_ui(nf_elem_t res, ulong v, const gr_ctx_t ctx)
 {
     nf_elem_set_ui(res, v, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_set_fmpz(nf_elem_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     nf_elem_set_fmpz(res, v, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_set_fmpq(nf_elem_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     nf_elem_set_fmpq(res, v, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 {
     if (v_ctx->which_ring == GR_CTX_NF && ctx->which_ring == GR_CTX_NF)
@@ -201,7 +195,7 @@ _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
     return gr_generic_set_other(res, v, v_ctx, ctx);
 }
 
-int
+static int
 _gr_nf_get_fexpr(fexpr_t res, const nf_elem_t a, const gr_ctx_t ctx)
 {
     fexpr_t var;
@@ -212,7 +206,7 @@ _gr_nf_get_fexpr(fexpr_t res, const nf_elem_t a, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_set_fexpr(nf_elem_t res, fexpr_vec_t inp, gr_vec_t out, const fexpr_t expr, gr_ctx_t ctx)
 {
     fexpr_t var;
@@ -237,52 +231,52 @@ _gr_nf_set_fexpr(nf_elem_t res, fexpr_vec_t inp, gr_vec_t out, const fexpr_t exp
     return status;
 }
 
-truth_t
+static truth_t
 _gr_nf_is_zero(const nf_elem_t x, const gr_ctx_t ctx)
 {
     return nf_elem_is_zero(x, NF_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_nf_is_one(const nf_elem_t x, const gr_ctx_t ctx)
 {
     return nf_elem_is_one(x, NF_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_nf_is_neg_one(const nf_elem_t x, const gr_ctx_t ctx)
 {
     return nf_elem_equal_si(x, -1, NF_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_nf_equal(const nf_elem_t x, const nf_elem_t y, const gr_ctx_t ctx)
 {
     return nf_elem_equal(x, y, NF_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_nf_set(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_set(res, x, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_neg(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_neg(res, x, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_add(nf_elem_t res, const nf_elem_t x, const nf_elem_t y, const gr_ctx_t ctx)
 {
     nf_elem_add(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_add_si(nf_elem_t res, const nf_elem_t x, slong y, const gr_ctx_t ctx)
 {
     nf_elem_add_si(res, x, y, NF_CTX(ctx));
@@ -298,28 +292,28 @@ _gr_nf_add_ui(nf_elem_t res, const nf_elem_t x, ulong y, const gr_ctx_t ctx)
 }
 */
 
-int
+static int
 _gr_nf_add_fmpz(nf_elem_t res, const nf_elem_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     nf_elem_add_fmpz(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_add_fmpq(nf_elem_t res, const nf_elem_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     nf_elem_add_fmpq(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_sub(nf_elem_t res, const nf_elem_t x, const nf_elem_t y, const gr_ctx_t ctx)
 {
     nf_elem_sub(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_sub_si(nf_elem_t res, const nf_elem_t x, slong y, const gr_ctx_t ctx)
 {
     nf_elem_sub_si(res, x, y, NF_CTX(ctx));
@@ -335,28 +329,28 @@ _gr_nf_sub_ui(nf_elem_t res, const nf_elem_t x, ulong y, const gr_ctx_t ctx)
 }
 */
 
-int
+static int
 _gr_nf_sub_fmpz(nf_elem_t res, const nf_elem_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     nf_elem_sub_fmpz(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_sub_fmpq(nf_elem_t res, const nf_elem_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     nf_elem_sub_fmpq(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_mul(nf_elem_t res, const nf_elem_t x, const nf_elem_t y, const gr_ctx_t ctx)
 {
     nf_elem_mul(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_mul_si(nf_elem_t res, const nf_elem_t x, slong y, const gr_ctx_t ctx)
 {
     nf_elem_scalar_mul_si(res, x, y, NF_CTX(ctx));
@@ -372,35 +366,35 @@ _gr_nf_mul_ui(nf_elem_t res, const nf_elem_t x, ulong y, const gr_ctx_t ctx)
 }
 */
 
-int
+static int
 _gr_nf_mul_fmpz(nf_elem_t res, const nf_elem_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     nf_elem_scalar_mul_fmpz(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_mul_fmpq(nf_elem_t res, const nf_elem_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     nf_elem_scalar_mul_fmpq(res, x, y, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_mul_two(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_add(res, x, x, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_sqr(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
 {
     nf_elem_mul(res, x, x, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_inv(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
 {
     if (nf_elem_is_zero(x, NF_CTX(ctx)))
@@ -410,7 +404,7 @@ _gr_nf_inv(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_div(nf_elem_t res, const nf_elem_t x, const nf_elem_t y, const gr_ctx_t ctx)
 {
     if (nf_elem_is_zero(y, NF_CTX(ctx)))
@@ -419,7 +413,7 @@ _gr_nf_div(nf_elem_t res, const nf_elem_t x, const nf_elem_t y, const gr_ctx_t c
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_div_si(nf_elem_t res, const nf_elem_t x, slong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -439,7 +433,7 @@ _gr_nf_div_ui(nf_elem_t res, const nf_elem_t x, ulong y, const gr_ctx_t ctx)
 }
 */
 
-int
+static int
 _gr_nf_div_fmpz(nf_elem_t res, const nf_elem_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -448,7 +442,7 @@ _gr_nf_div_fmpz(nf_elem_t res, const nf_elem_t x, const fmpz_t y, const gr_ctx_t
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_div_fmpq(nf_elem_t res, const nf_elem_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     if (fmpq_is_zero(y))
@@ -457,20 +451,20 @@ _gr_nf_div_fmpq(nf_elem_t res, const nf_elem_t x, const fmpq_t y, const gr_ctx_t
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_nf_is_invertible(const nf_elem_t x, const gr_ctx_t ctx)
 {
     return nf_elem_is_zero(x, NF_CTX(ctx)) ? T_FALSE : T_TRUE;
 }
 
-int
+static int
 _gr_nf_pow_ui(nf_elem_t res, const nf_elem_t x, ulong exp, const gr_ctx_t ctx)
 {
     nf_elem_pow(res, x, exp, NF_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_numerator(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
 {
     if (NF_CTX(ctx)->flag & NF_LINEAR)
@@ -493,7 +487,7 @@ _gr_nf_numerator(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_nf_denominator(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
 {
     if (NF_CTX(ctx)->flag & NF_LINEAR)

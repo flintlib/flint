@@ -398,6 +398,7 @@ _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
     return status;
 }
 
+#if 0
 static int
 _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
 {
@@ -416,6 +417,7 @@ _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
     acb_set_round(res, res, prec);
     return GR_SUCCESS;
 }
+#endif
 
 static int
 _gr_ca_get_fmpz(fmpz_t res, const ca_t x, gr_ctx_t ctx)

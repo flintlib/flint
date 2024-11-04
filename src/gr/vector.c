@@ -17,17 +17,9 @@
 #include "gr_poly.h"
 #include "gr_special.h"
 
-/* FIXME: Should these functions be static or not? */
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
 #define ENTRY_CTX(ctx) (VECTOR_CTX(ctx)->base_ring)
 
-int
+static int
 _gr_vec_check_resize(gr_vec_t res, slong n, gr_ctx_t ctx)
 {
     if (VECTOR_CTX(ctx)->all_sizes)
@@ -45,13 +37,13 @@ _gr_vec_check_resize(gr_vec_t res, slong n, gr_ctx_t ctx)
     }
 }
 
-void
+static void
 vector_gr_vec_init(gr_vec_t res, gr_ctx_t ctx)
 {
     gr_vec_init(res, VECTOR_CTX(ctx)->n, ENTRY_CTX(ctx));
 }
 
-int vector_gr_vec_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+static int vector_gr_vec_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_ctx_ptr elem_ctx = ENTRY_CTX(ctx);
 
@@ -70,7 +62,7 @@ int vector_gr_vec_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t vector_ctx_is_ring(gr_ctx_t ctx)
+static truth_t vector_ctx_is_ring(gr_ctx_t ctx)
 {
     if (VECTOR_CTX(ctx)->all_sizes)
         return T_FALSE;
@@ -81,7 +73,7 @@ truth_t vector_ctx_is_ring(gr_ctx_t ctx)
     return gr_ctx_is_ring(ENTRY_CTX(ctx));
 }
 
-truth_t vector_ctx_is_commutative_ring(gr_ctx_t ctx)
+static truth_t vector_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
     if (VECTOR_CTX(ctx)->all_sizes)
         return T_FALSE;
@@ -93,36 +85,36 @@ truth_t vector_ctx_is_commutative_ring(gr_ctx_t ctx)
 }
 
 /* todo: public */
-truth_t gr_ctx_vector_gr_vec_is_fixed_size(gr_ctx_t ctx)
+static truth_t gr_ctx_vector_gr_vec_is_fixed_size(gr_ctx_t ctx)
 {
     return (VECTOR_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
 
-truth_t
+static truth_t
 vector_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(ENTRY_CTX(ctx));
 }
 
-void
+static void
 vector_gr_vec_clear(gr_vec_t res, gr_ctx_t ctx)
 {
     gr_vec_clear(res, ENTRY_CTX(ctx));
 }
 
-void
+static void
 vector_gr_vec_swap(gr_vec_t vec1, gr_vec_t vec2, gr_ctx_t ctx)
 {
     gr_poly_swap((gr_poly_struct *) vec1, (gr_poly_struct *) vec2, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_write(gr_stream_t out, gr_vec_t vec, gr_ctx_t ctx)
 {
     return gr_vec_write(out, vec, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_randtest(gr_vec_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     slong i, n;
@@ -147,7 +139,7 @@ vector_gr_vec_randtest(gr_vec_t res, flint_rand_t state, gr_ctx_t ctx)
 truth_t
 gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 
-truth_t
+static truth_t
 vector_gr_vec_equal(const gr_vec_t vec1, const gr_vec_t vec2, gr_ctx_t ctx)
 {
     slong len1, len2;
@@ -161,7 +153,7 @@ vector_gr_vec_equal(const gr_vec_t vec1, const gr_vec_t vec2, gr_ctx_t ctx)
     return _gr_vec_equal(vec1->entries, vec2->entries, len1, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_set(gr_vec_t res, const gr_vec_t vec, gr_ctx_t ctx)
 {
     return gr_vec_set(res, vec, ENTRY_CTX(ctx));
@@ -249,7 +241,7 @@ _gr_vec_set_d(gr_ptr res, slong len, double x, gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 vector_gr_vec_set_ui(gr_vec_t res, ulong x, gr_ctx_t ctx)
 {
     slong len = VECTOR_CTX(ctx)->n;
@@ -264,7 +256,7 @@ vector_gr_vec_set_ui(gr_vec_t res, ulong x, gr_ctx_t ctx)
     return _gr_vec_set_ui(res->entries, len, x, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_set_si(gr_vec_t res, slong x, gr_ctx_t ctx)
 {
     slong len = VECTOR_CTX(ctx)->n;
@@ -279,7 +271,7 @@ vector_gr_vec_set_si(gr_vec_t res, slong x, gr_ctx_t ctx)
     return _gr_vec_set_si(res->entries, len, x, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_set_fmpz(gr_vec_t res, const fmpz_t x, gr_ctx_t ctx)
 {
     slong len = VECTOR_CTX(ctx)->n;
@@ -294,7 +286,7 @@ vector_gr_vec_set_fmpz(gr_vec_t res, const fmpz_t x, gr_ctx_t ctx)
     return _gr_vec_set_fmpz(res->entries, len, x, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_set_fmpq(gr_vec_t res, const fmpq_t x, gr_ctx_t ctx)
 {
     slong len = VECTOR_CTX(ctx)->n;
@@ -309,7 +301,7 @@ vector_gr_vec_set_fmpq(gr_vec_t res, const fmpq_t x, gr_ctx_t ctx)
     return _gr_vec_set_fmpq(res->entries, len, x, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_set_d(gr_vec_t res, double x, gr_ctx_t ctx)
 {
     slong len = VECTOR_CTX(ctx)->n;
@@ -326,7 +318,7 @@ vector_gr_vec_set_d(gr_vec_t res, double x, gr_ctx_t ctx)
 
 
 /* todo: convert from matrices, ...? */
-int
+static int
 vector_gr_vec_set_other(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx == ctx)
@@ -368,13 +360,13 @@ vector_gr_vec_set_other(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int
+static int
 vector_gr_vec_neg(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx)
 {
     return gr_poly_neg((gr_poly_struct *) res, (gr_poly_struct *) src, ENTRY_CTX(ctx));
 }
 
-int
+static int
 vector_gr_vec_zero(gr_vec_t res, gr_ctx_t ctx) \
 {
     slong xlen = VECTOR_CTX(ctx)->n; \
@@ -427,7 +419,7 @@ _gr_vec_all_binary_predicate(gr_method_binary_predicate f, gr_srcptr x, gr_srcpt
     return res;
 }
 
-truth_t
+static truth_t
 vector_gr_vec_divides(const gr_vec_t x, const gr_vec_t y, gr_ctx_t ctx)
 {
     if (x->length != y->length)
@@ -437,7 +429,7 @@ vector_gr_vec_divides(const gr_vec_t x, const gr_vec_t y, gr_ctx_t ctx)
 }
 
 #define DEF_CONSTANT_OP_FROM_OP(op, OP) \
-int \
+static int \
 vector_gr_vec_ ## op(gr_vec_t res, gr_ctx_t ctx) \
 { \
     slong xlen = VECTOR_CTX(ctx)->n; \
@@ -475,7 +467,7 @@ _gr_vec_apply_unary(gr_ptr res, gr_method_unary_op f, gr_srcptr src, slong len, 
 }
 
 #define DEF_UNARY_OP_FROM_ENTRY_OP(op, OP) \
-int \
+static int \
 vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -506,7 +498,7 @@ DEF_UNARY_OP_FROM_ENTRY_OP(log, LOG)
 
 
 #define DEF_BINARY_OP(op) \
-int \
+static int \
 vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -520,7 +512,7 @@ vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t 
     return _gr_vec_## op(res->entries, x->entries, y->entries, xlen, ENTRY_CTX(ctx)); \
 } \
  \
-int \
+static int \
 vector_gr_vec_ ## op ## _si(gr_vec_t res, const gr_vec_t x, slong c, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -531,7 +523,7 @@ vector_gr_vec_ ## op ## _si(gr_vec_t res, const gr_vec_t x, slong c, gr_ctx_t ct
     return _gr_vec_ ## op ## _scalar_si(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
 } \
  \
-int \
+static int \
 vector_gr_vec_ ## op ## _ui(gr_vec_t res, const gr_vec_t x, ulong c, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -542,7 +534,7 @@ vector_gr_vec_ ## op ## _ui(gr_vec_t res, const gr_vec_t x, ulong c, gr_ctx_t ct
     return _gr_vec_ ## op ## _scalar_ui(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
 } \
  \
-int \
+static int \
 vector_gr_vec_ ## op ## _fmpz(gr_vec_t res, const gr_vec_t x, const fmpz_t c, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -553,7 +545,7 @@ vector_gr_vec_ ## op ## _fmpz(gr_vec_t res, const gr_vec_t x, const fmpz_t c, gr
     return _gr_vec_ ## op ## _scalar_fmpz(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
 } \
  \
-int \
+static int \
 vector_gr_vec_ ## op ## _fmpq(gr_vec_t res, const gr_vec_t x, const fmpq_t c, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -564,7 +556,7 @@ vector_gr_vec_ ## op ## _fmpq(gr_vec_t res, const gr_vec_t x, const fmpq_t c, gr
     return _gr_vec_ ## op ## _scalar_fmpq(res->entries, x->entries, xlen, c, ENTRY_CTX(ctx)); \
 } \
  \
-int \
+static int \
 vector_gr_vec_ ## op ## _other(gr_vec_t res, const gr_vec_t x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -604,7 +596,7 @@ vector_gr_vec_ ## op ## _other(gr_vec_t res, const gr_vec_t x, gr_srcptr y, gr_c
         return _gr_vec_ ## op ## _scalar_other(res->entries, x->entries, xlen, y, y_ctx, entry_ctx); \
     } \
 } \
-int \
+static int \
 vector_gr_vec_other_ ## op(gr_vec_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_vec_t y, gr_ctx_t ctx) \
 { \
     slong ylen = y->length; \
@@ -653,7 +645,7 @@ DEF_BINARY_OP(divexact)
 DEF_BINARY_OP(pow)
 
 #define DEF_BINARY_OP_NO_TYPE_VARIANTS(op) \
-int \
+static int \
 vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t ctx) \
 { \
     slong xlen = x->length; \
@@ -667,7 +659,7 @@ vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t 
     return _gr_vec_## op(res->entries, x->entries, y->entries, xlen, ENTRY_CTX(ctx)); \
 } \
 
-int
+static int
 _gr_vec_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, slong len, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -685,7 +677,7 @@ DEF_BINARY_OP_NO_TYPE_VARIANTS(div_nonunique)
 
 /* todo: all versions */
 
-int gr_generic_mul_ui_via_ZZ(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+static int gr_generic_mul_ui_via_ZZ(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
 {
     gr_ctx_t ZZ;
     fmpz_t t;
@@ -806,7 +798,7 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-void
+static void
 _gr_ctx_init_vector(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong n)
 {
     ctx->which_ring = GR_CTX_GR_VEC;

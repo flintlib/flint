@@ -16,25 +16,17 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-/* FIXME: Should these functions be static or not? */
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
 /* todo: for matrix "ring", verify that element domain is a ring */
 
 /* todo: recycle storage? */
-void
+static void
 _gr_mat_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
 {
     gr_mat_clear(mat, ctx);
     gr_mat_init(mat, r, c, ctx);
 }
 
-int
+static int
 _gr_mat_check_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -54,13 +46,13 @@ _gr_mat_check_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
     }
 }
 
-void
+static void
 matrix_init(gr_mat_t res, gr_ctx_t ctx)
 {
     gr_mat_init(res, MATRIX_CTX(ctx)->nrows, MATRIX_CTX(ctx)->ncols, MATRIX_CTX(ctx)->base_ring);
 }
 
-int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+static int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_ctx_ptr elem_ctx = MATRIX_CTX(ctx)->base_ring;
 
@@ -87,7 +79,7 @@ int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
+static truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
 {
     int shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols);
 
@@ -100,7 +92,7 @@ truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
     return gr_ctx_is_ring(MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
+static truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
     int shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols);
 
@@ -117,42 +109,42 @@ truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
 }
 
 /* todo: public */
-truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
+static truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
 {
     return (MATRIX_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
 
-truth_t
+static truth_t
 matrix_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(MATRIX_CTX(ctx)->base_ring);
 }
 
-void
+static void
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
 {
     gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-void
+static void
 matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 {
     gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-void
+static void
 matrix_set_shallow(gr_mat_t res, const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *mat;
 }
 
-int
+static int
 matrix_write(gr_stream_t out, gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_write(out, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -161,13 +153,13 @@ matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
     return gr_mat_randtest(res, state, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_equal(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
@@ -176,7 +168,7 @@ matrix_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_set(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -185,7 +177,7 @@ matrix_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
     return gr_mat_set_si(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -194,7 +186,7 @@ matrix_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
     return gr_mat_set_ui(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -203,7 +195,7 @@ matrix_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
     return gr_mat_set_fmpz(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -212,7 +204,7 @@ matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
     return gr_mat_set_fmpq(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_other(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx == ctx)
@@ -261,7 +253,7 @@ matrix_set_other(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 matrix_zero(gr_mat_t res, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -270,7 +262,7 @@ matrix_zero(gr_mat_t res, gr_ctx_t ctx)
     return gr_mat_zero(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_one(gr_mat_t res, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -279,25 +271,25 @@ matrix_one(gr_mat_t res, gr_ctx_t ctx)
     return gr_mat_one(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_zero(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_is_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_one(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_neg_one(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
@@ -306,7 +298,7 @@ matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_neg(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     if (mat1->r != mat2->r || mat1->c != mat2->c)
@@ -318,7 +310,7 @@ matrix_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return gr_mat_add(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     if (mat1->r != mat2->r || mat1->c != mat2->c)
@@ -330,7 +322,7 @@ matrix_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return gr_mat_sub(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     if (mat1->c != mat2->r)
@@ -358,7 +350,7 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 }
 
 /* todo: fmpz etc */
-int
+static int
 matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 {
     if (y_ctx == ctx)
@@ -418,7 +410,7 @@ matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_
 }
 
 /* todo: fmpz etc */
-int
+static int
 matrix_div_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 {
     /* todo: matrix-matrix division ? */
@@ -461,7 +453,7 @@ matrix_div_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_
     return GR_UNABLE;
 }
 
-int
+static int
 matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (mat->r != mat->c)
@@ -473,7 +465,7 @@ matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_inv(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_exp(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
@@ -482,7 +474,7 @@ matrix_exp(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_exp(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_log(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
@@ -532,7 +524,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-void
+static void
 _gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong nrows, slong ncols)
 {
     ctx->which_ring = GR_CTX_GR_MAT;

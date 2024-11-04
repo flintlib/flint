@@ -14,32 +14,26 @@
 #include "gr.h"
 #include "gr_generic.h"
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
-int
+static int
 _gr_fexpr_ctx_write(gr_stream_t out, gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write(out, "Symbolic expressions (fexpr)");
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_fexpr_init(fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_init(x);
 }
 
-void
+static void
 _gr_fexpr_clear(fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_clear(x);
 }
 
-void
+static void
 _gr_fexpr_swap(fexpr_t x, fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_t t;
@@ -48,90 +42,90 @@ _gr_fexpr_swap(fexpr_t x, fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
     *y = *t;
 }
 
-void
+static void
 _gr_fexpr_set_shallow(fexpr_t res, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
 
 /* todo */
-int
+static int
 _gr_fexpr_randtest(fexpr_t res, flint_rand_t state, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_si(res, -5 + (slong) n_randint(state, 10));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_write(gr_stream_t out, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write_free(out, fexpr_get_str(x));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_zero(fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_zero(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_one(fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_si(x, 1);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_set_si(fexpr_t res, slong v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_si(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_set_ui(fexpr_t res, ulong v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_ui(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_set_fmpz(fexpr_t res, const fmpz_t v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_fmpz(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_set_fmpq(fexpr_t res, const fmpq_t v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_fmpq(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_set_other(fexpr_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return gr_get_fexpr(res, x, x_ctx);
 }
 
-int
+static int
 _gr_fexpr_set(fexpr_t res, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_set_d(fexpr_t res, double x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_d(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_get_fmpz(fmpz_t res, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fexpr_get_fmpz(res, x))
@@ -140,59 +134,59 @@ _gr_fexpr_get_fmpz(fmpz_t res, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx)
         return GR_UNABLE;
 }
 
-truth_t
+static truth_t
 _gr_fexpr_is_zero(const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fexpr_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fexpr_is_one(const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fexpr_equal_ui(x, 1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fexpr_is_neg_one(const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fexpr_equal_si(x, -1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fexpr_equal(const fexpr_t x, const fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fexpr_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fexpr_neg(fexpr_t res, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_neg(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_add(fexpr_t res, const fexpr_t x, const fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_add(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_sub(fexpr_t res, const fexpr_t x, const fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_sub(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_mul(fexpr_t res, const fexpr_t x, const fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_mul(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_inv(fexpr_t res, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_t b;
@@ -203,21 +197,21 @@ _gr_fexpr_inv(fexpr_t res, const fexpr_t x, const gr_ctx_t FLINT_UNUSED(ctx))
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_div(fexpr_t res, const fexpr_t x, const fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_div(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_pow(fexpr_t res, const fexpr_t x, const fexpr_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_pow(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_pow_ui(fexpr_t res, const fexpr_t x, ulong exp, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_t b;
@@ -228,7 +222,7 @@ _gr_fexpr_pow_ui(fexpr_t res, const fexpr_t x, ulong exp, const gr_ctx_t FLINT_U
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_pow_si(fexpr_t res, const fexpr_t x, slong exp, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_t b;
@@ -239,7 +233,7 @@ _gr_fexpr_pow_si(fexpr_t res, const fexpr_t x, slong exp, const gr_ctx_t FLINT_U
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_pow_fmpz(fexpr_t res, const fexpr_t x, const fmpz_t exp, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_t b;
@@ -250,7 +244,7 @@ _gr_fexpr_pow_fmpz(fexpr_t res, const fexpr_t x, const fmpz_t exp, const gr_ctx_
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_pow_fmpq(fexpr_t res, const fexpr_t x, const fmpq_t exp, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_t b;
@@ -261,14 +255,14 @@ _gr_fexpr_pow_fmpq(fexpr_t res, const fexpr_t x, const fmpq_t exp, const gr_ctx_
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_pi(fexpr_t res, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_symbol_builtin(res, FEXPR_Pi);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fexpr_i(fexpr_t res, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_symbol_builtin(res, FEXPR_NumberI);

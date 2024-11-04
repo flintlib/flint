@@ -24,33 +24,27 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
-
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
 static const char * default_var = "a";
 
 /* todo: lots of inlining */
 
-void
+static void
 _gr_fq_zech_ctx_clear(gr_ctx_t ctx)
 {
     fq_zech_ctx_clear(FQ_CTX(ctx));
     flint_free(GR_CTX_DATA_AS_PTR(ctx));
 }
 
-int
+static int
 _gr_fq_zech_ctx_write(gr_stream_t out, gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write(out, "Finite field (fq_zech)");
     return GR_SUCCESS;
 }
 
-int _gr_fq_zech_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+static int _gr_fq_zech_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
     len = strlen(s);
@@ -60,24 +54,24 @@ int _gr_fq_zech_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
     return GR_SUCCESS;
 }
 
-int _gr_fq_zech_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+static int _gr_fq_zech_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 {
     return _gr_fq_zech_ctx_set_gen_name(ctx, s[0]);
 }
 
-void
+static void
 _gr_fq_zech_init(fq_zech_t x, const gr_ctx_t ctx)
 {
     fq_zech_init(x, FQ_CTX(ctx));
 }
 
-void
+static void
 _gr_fq_zech_clear(fq_zech_t x, const gr_ctx_t ctx)
 {
     fq_zech_clear(x, FQ_CTX(ctx));
 }
 
-void
+static void
 _gr_fq_zech_swap(fq_zech_t x, fq_zech_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fq_zech_t t;
@@ -86,136 +80,136 @@ _gr_fq_zech_swap(fq_zech_t x, fq_zech_t y, const gr_ctx_t FLINT_UNUSED(ctx))
     *y = *t;
 }
 
-void
+static void
 _gr_fq_zech_set_shallow(fq_zech_t res, const fq_zech_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
 
-int
+static int
 _gr_fq_zech_randtest(fq_zech_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     fq_zech_randtest(res, state, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_write(gr_stream_t out, const fq_zech_t x, const gr_ctx_t ctx)
 {
     gr_stream_write_free(out, fq_zech_get_str_pretty(x, FQ_CTX(ctx)));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_zero(fq_zech_t x, const gr_ctx_t ctx)
 {
     fq_zech_zero(x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_one(fq_zech_t x, const gr_ctx_t ctx)
 {
     fq_zech_one(x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_set_si(fq_zech_t res, slong v, const gr_ctx_t ctx)
 {
     fq_zech_set_si(res, v, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_set_ui(fq_zech_t res, ulong v, const gr_ctx_t ctx)
 {
     fq_zech_set_ui(res, v, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_set_fmpz(fq_zech_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     fq_zech_set_fmpz(res, v, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_fq_zech_is_zero(const fq_zech_t x, const gr_ctx_t ctx)
 {
     return fq_zech_is_zero(x, FQ_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fq_zech_is_one(const fq_zech_t x, const gr_ctx_t ctx)
 {
     return fq_zech_is_one(x, FQ_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fq_zech_equal(const fq_zech_t x, const fq_zech_t y, const gr_ctx_t ctx)
 {
     return fq_zech_equal(x, y, FQ_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fq_zech_set(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 {
     fq_zech_set(res, x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_neg(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 {
     fq_zech_neg(res, x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_add(fq_zech_t res, const fq_zech_t x, const fq_zech_t y, const gr_ctx_t ctx)
 {
     fq_zech_add(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_sub(fq_zech_t res, const fq_zech_t x, const fq_zech_t y, const gr_ctx_t ctx)
 {
     fq_zech_sub(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_mul(fq_zech_t res, const fq_zech_t x, const fq_zech_t y, const gr_ctx_t ctx)
 {
     fq_zech_mul(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_mul_si(fq_zech_t res, const fq_zech_t x, slong y, const gr_ctx_t ctx)
 {
     fq_zech_mul_si(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_mul_ui(fq_zech_t res, const fq_zech_t x, ulong y, const gr_ctx_t ctx)
 {
     fq_zech_mul_ui(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_mul_fmpz(fq_zech_t res, const fq_zech_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fq_zech_mul_fmpz(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_inv(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 {
     if (fq_zech_is_zero(x, FQ_CTX(ctx)))
@@ -229,7 +223,7 @@ _gr_fq_zech_inv(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fq_zech_div(fq_zech_t res, const fq_zech_t x, const fq_zech_t y, const gr_ctx_t ctx)
 {
     if (fq_zech_is_zero(y, FQ_CTX(ctx)))
@@ -247,21 +241,21 @@ _gr_fq_zech_div(fq_zech_t res, const fq_zech_t x, const fq_zech_t y, const gr_ct
     }
 }
 
-int
+static int
 _gr_fq_zech_sqr(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 {
     fq_zech_sqr(res, x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_pow_ui(fq_zech_t res, const fq_zech_t x, ulong y, const gr_ctx_t ctx)
 {
     fq_zech_pow_ui(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_pow_fmpz(fq_zech_t res, const fq_zech_t x, const fmpz_t y, gr_ctx_t ctx)
 {
     if (fmpz_sgn(y) < 0)
@@ -275,19 +269,19 @@ _gr_fq_zech_pow_fmpz(fq_zech_t res, const fq_zech_t x, const fmpz_t y, gr_ctx_t 
     }
 }
 
-truth_t
+static truth_t
 _gr_fq_zech_is_invertible(const fq_zech_t x, const gr_ctx_t ctx)
 {
     return (!fq_zech_is_zero(x, FQ_CTX(ctx))) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fq_zech_is_square(const fq_zech_t x, const gr_ctx_t ctx)
 {
     return fq_zech_is_square(x, FQ_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fq_zech_sqrt(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 {
     if (fq_zech_sqrt(res, x, FQ_CTX(ctx)))
@@ -300,42 +294,42 @@ _gr_fq_zech_sqrt(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_ctx_fq_zech_prime(ulong * p, gr_ctx_t ctx)
 {
     *p = fq_zech_ctx_prime(FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_ctx_fq_zech_degree(slong * deg, gr_ctx_t ctx)
 {
     *deg = fq_zech_ctx_degree(FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_ctx_fq_zech_order(ulong * q, gr_ctx_t ctx)
 {
     *q = fq_zech_ctx_order_ui(FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_gen(gr_ptr res, gr_ctx_t ctx)
 {
     fq_zech_gen(res, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx)
 {
     fq_zech_frobenius(res, x, e, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
 {
     int ret;
@@ -348,34 +342,34 @@ _gr_fq_zech_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
     return GR_DOMAIN;
 }
 
-int
+static int
 _gr_fq_zech_norm(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
 {
     fq_zech_norm(res, x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_trace(fmpz_t res, gr_srcptr x, gr_ctx_t ctx)
 {
     fq_zech_trace(res, x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_fq_zech_is_primitive(gr_srcptr x, gr_ctx_t ctx)
 {
     return fq_zech_is_primitive(x, FQ_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fq_zech_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     fq_zech_pth_root(res, x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_fq_zech_vec_init(fq_zech_struct * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -384,12 +378,12 @@ _gr_fq_zech_vec_init(fq_zech_struct * vec, slong len, gr_ctx_t ctx)
         fq_zech_init(vec + i, FQ_CTX(ctx));
 }
 
-void
+static void
 _gr_fq_zech_vec_clear(fq_zech_struct * FLINT_UNUSED(vec), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
-void
+static void
 _gr_fq_zech_vec_swap(fq_zech_struct * vec1, fq_zech_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -398,7 +392,7 @@ _gr_fq_zech_vec_swap(fq_zech_struct * vec1, fq_zech_struct * vec2, slong len, gr
         fq_zech_swap(vec1 + i, vec2 + i, FQ_CTX(ctx));
 }
 
-int
+static int
 _gr_fq_zech_vec_set(fq_zech_struct * res, const fq_zech_struct * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
@@ -409,7 +403,7 @@ _gr_fq_zech_vec_set(fq_zech_struct * res, const fq_zech_struct * vec, slong len,
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_vec_normalise(slong * res, const fq_zech_struct * vec, slong len, gr_ctx_t ctx)
 {
     while (len > 0 && fq_zech_is_zero(vec + len - 1, FQ_CTX(ctx)))
@@ -419,7 +413,7 @@ _gr_fq_zech_vec_normalise(slong * res, const fq_zech_struct * vec, slong len, gr
     return GR_SUCCESS;
 }
 
-slong
+static slong
 _gr_fq_zech_vec_normalise_weak(const fq_zech_struct * vec, slong len, gr_ctx_t ctx)
 {
     while (len > 0 && fq_zech_is_zero(vec + len - 1, FQ_CTX(ctx)))
@@ -428,14 +422,14 @@ _gr_fq_zech_vec_normalise_weak(const fq_zech_struct * vec, slong len, gr_ctx_t c
     return len;
 }
 
-int
+static int
 _gr_fq_zech_vec_mul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, slong len, const fq_zech_t x, gr_ctx_t ctx)
 {
     _fq_zech_vec_scalar_mul_fq_zech(res, vec, len, x, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_vec_addmul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, slong len, const fq_zech_t x, gr_ctx_t ctx)
 {
     /* the poly method checks for special cases. worth it? */
@@ -443,7 +437,7 @@ _gr_fq_zech_vec_addmul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, 
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_vec_submul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, slong len, const fq_zech_t x, gr_ctx_t ctx)
 {
     /* the poly method checks for special cases. worth it? */
@@ -453,7 +447,7 @@ _gr_fq_zech_vec_submul_scalar(fq_zech_struct * res, const fq_zech_struct * vec, 
 
 
 /* todo: _fq_zech_poly_mullow should do the right thing */
-int
+static int
 _gr_fq_zech_poly_mullow(fq_zech_struct * res,
     const fq_zech_struct * poly1, slong len1,
     const fq_zech_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -481,7 +475,7 @@ _gr_fq_zech_poly_mullow(fq_zech_struct * res,
 /* todo: also need the _other version ... ? */
 /* todo: implement generically */
 
-int
+static int
 _gr_fq_zech_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_zech_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     if (poly->length == 0)
@@ -519,7 +513,7 @@ _gr_fq_zech_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fq_zech_poly_t po
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fq_zech_mat_mul(fq_zech_mat_t res, const fq_zech_mat_t x, const fq_zech_mat_t y, gr_ctx_t ctx)
 {
     fq_zech_mat_mul(res, x, y, FQ_CTX(ctx));
@@ -640,7 +634,7 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }
 
-int
+static int
 gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
     fq_zech_ctx_struct * fq_zech_ctx;
@@ -665,7 +659,7 @@ gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, c
     }
 }
 
-int
+static int
 gr_ctx_init_fq_zech_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 {
     nmod_poly_t nmodulus;
