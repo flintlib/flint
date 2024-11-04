@@ -131,11 +131,13 @@ _gr_psl2z_one(psl2z_t res, gr_ctx_t FLINT_UNUSED(ctx))
     return GR_SUCCESS;
 }
 
+#if 0
 static truth_t
 _gr_psl2z_is_one(const psl2z_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return psl2z_is_one(x) ? T_TRUE : T_FALSE;
 }
+#endif
 
 static int
 _gr_psl2z_mul(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t FLINT_UNUSED(ctx))

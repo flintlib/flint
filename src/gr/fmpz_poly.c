@@ -28,12 +28,14 @@
 
 static const char * default_var = "x";
 
+#if 0
 static void
 _gr_fmpz_poly_ctx_clear(gr_ctx_t ctx)
 {
     if (FMPZ_POLY_CTX_VAR(ctx) != default_var)
         flint_free(FMPZ_POLY_CTX_VAR(ctx));
 }
+#endif
 
 static int _gr_fmpz_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {

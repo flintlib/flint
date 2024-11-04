@@ -302,6 +302,7 @@ _gr_fmpq_poly_get_fmpz(fmpz_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNU
     return GR_DOMAIN;
 }
 
+#if 0
 static int
 _gr_fmpq_poly_get_fmpq(fmpq_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
@@ -320,7 +321,7 @@ _gr_fmpq_poly_get_fmpq(fmpq_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNU
 
     return GR_DOMAIN;
 }
-
+#endif
 
 static truth_t
 _gr_fmpq_poly_is_zero(const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))

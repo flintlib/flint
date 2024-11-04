@@ -159,12 +159,14 @@ _gr_nf_set_fmpz(nf_elem_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+#if 0
 static int
 _gr_nf_set_fmpq(nf_elem_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     nf_elem_set_fmpq(res, v, NF_CTX(ctx));
     return GR_SUCCESS;
 }
+#endif
 
 static int
 _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)

@@ -19,6 +19,7 @@
 
 #define ENTRY_CTX(ctx) (VECTOR_CTX(ctx)->base_ring)
 
+#if 0
 static int
 _gr_vec_check_resize(gr_vec_t res, slong n, gr_ctx_t ctx)
 {
@@ -36,6 +37,7 @@ _gr_vec_check_resize(gr_vec_t res, slong n, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 }
+#endif
 
 static void
 vector_gr_vec_init(gr_vec_t res, gr_ctx_t ctx)
@@ -84,11 +86,13 @@ static truth_t vector_ctx_is_commutative_ring(gr_ctx_t ctx)
     return gr_ctx_is_commutative_ring(ENTRY_CTX(ctx));
 }
 
+#if 0
 /* todo: public */
 static truth_t gr_ctx_vector_gr_vec_is_fixed_size(gr_ctx_t ctx)
 {
     return (VECTOR_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
+#endif
 
 static truth_t
 vector_ctx_is_threadsafe(gr_ctx_t ctx)
@@ -676,7 +680,7 @@ DEF_BINARY_OP_NO_TYPE_VARIANTS(div_nonunique)
 
 
 /* todo: all versions */
-
+#if 0
 static int gr_generic_mul_ui_via_ZZ(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
 {
     gr_ctx_t ZZ;
@@ -690,7 +694,7 @@ static int gr_generic_mul_ui_via_ZZ(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t c
     fmpz_clear(t);
     return status;
 }
-
+#endif
 
 int _gr_vec_methods_initialized = 0;
 

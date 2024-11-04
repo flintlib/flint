@@ -176,6 +176,7 @@ _gr_perm_one(perm_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+#if 0
 static truth_t
 _gr_perm_is_one(const perm_t x, gr_ctx_t ctx)
 {
@@ -187,6 +188,7 @@ _gr_perm_is_one(const perm_t x, gr_ctx_t ctx)
 
     return T_UNKNOWN;
 }
+#endif
 
 static int
 _gr_perm_mul(perm_t res, const perm_t x, const perm_t y, gr_ctx_t ctx)

@@ -739,6 +739,7 @@ gr_ctx_init_fq_nmod(gr_ctx_t ctx, ulong p, slong d, const char * var)
     _gr_ctx_init_fq_nmod_from_ref(ctx, fq_nmod_ctx);
 }
 
+#if 0
 static int gr_ctx_init_fq_nmod_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
@@ -763,3 +764,4 @@ gr_ctx_init_fq_nmod_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t mo
     nmod_poly_clear(nmodulus);
     return status;
 }
+#endif

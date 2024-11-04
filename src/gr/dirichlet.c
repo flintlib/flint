@@ -122,11 +122,13 @@ _gr_dirichlet_one(dirichlet_char_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+#if 0
 static truth_t
 _gr_dirichlet_is_one(const dirichlet_char_t x, gr_ctx_t ctx)
 {
     return dirichlet_char_is_principal(DIRICHLET_CTX(ctx), x) ? T_TRUE : T_FALSE;
 }
+#endif
 
 static int
 _gr_dirichlet_mul(dirichlet_char_t res, const dirichlet_char_t x, const dirichlet_char_t y, gr_ctx_t ctx)

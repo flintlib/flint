@@ -241,6 +241,7 @@ _gr_fq_zech_div(fq_zech_t res, const fq_zech_t x, const fq_zech_t y, const gr_ct
     }
 }
 
+#if 0
 static int
 _gr_fq_zech_sqr(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 {
@@ -268,6 +269,7 @@ _gr_fq_zech_pow_fmpz(fq_zech_t res, const fq_zech_t x, const fmpz_t y, gr_ctx_t 
         return GR_SUCCESS;
     }
 }
+#endif
 
 static truth_t
 _gr_fq_zech_is_invertible(const fq_zech_t x, const gr_ctx_t ctx)
@@ -634,6 +636,7 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }
 
+#if 0
 static int
 gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
@@ -674,3 +677,4 @@ gr_ctx_init_fq_zech_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t mo
     nmod_poly_clear(nmodulus);
     return status;
 }
+#endif

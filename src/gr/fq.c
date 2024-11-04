@@ -220,6 +220,7 @@ _gr_fq_mul_fmpz(fq_t res, const fq_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+#if 0
 static int
 _gr_fq_si_mul(fq_t res, slong y, const fq_t x, const gr_ctx_t ctx)
 {
@@ -240,6 +241,7 @@ _gr_fq_fmpz_mul(fq_t res, const fmpz_t y, const fq_t x, const gr_ctx_t ctx)
     fq_mul_fmpz(res, x, y, FQ_CTX(ctx));
     return GR_SUCCESS;
 }
+#endif
 
 static int
 _gr_fq_inv(fq_t res, const fq_t x, const gr_ctx_t ctx)
@@ -785,6 +787,7 @@ gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
 }
 
+#if 0
 static int gr_ctx_init_fq_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 {
     fq_ctx_struct * fq_ctx;
@@ -810,3 +813,4 @@ static int gr_ctx_init_fq_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modu
     fmpz_clear(p);
     return status;
 }
+#endif

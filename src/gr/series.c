@@ -221,6 +221,7 @@ gr_series_neg(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
 }
 
 
+#if 0
 static int
 gr_series_set_gr_poly(gr_series_t res, const gr_poly_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
@@ -229,6 +230,7 @@ gr_series_set_gr_poly(gr_series_t res, const gr_poly_t x, gr_series_ctx_t sctx, 
     tmp->error = SERIES_ERR_EXACT;
     return gr_series_set(res, tmp, sctx, cctx);
 }
+#endif
 
 static int
 gr_series_set_scalar(gr_series_t res, gr_srcptr x, gr_series_ctx_t sctx, gr_ctx_t cctx)
@@ -342,6 +344,7 @@ gr_series_is_zero(const gr_series_t x, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ct
     return T_UNKNOWN;
 }
 
+#if 0
 /* todo: recursive version */
 static int
 gr_series_make_exact(gr_series_t x, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t FLINT_UNUSED(cctx))
@@ -349,7 +352,7 @@ gr_series_make_exact(gr_series_t x, gr_series_ctx_t FLINT_UNUSED(sctx), gr_ctx_t
     x->error = SERIES_ERR_EXACT;
     return GR_SUCCESS;
 }
-
+#endif
 
 
 static truth_t
@@ -858,7 +861,9 @@ ARB_WRAPPER(digamma, arb_poly_digamma_series, acb_poly_digamma_series)
 ARB_WRAPPER(erf, arb_hypgeom_erf_series, acb_hypgeom_erf_series)
 ARB_WRAPPER(erfc, arb_hypgeom_erfc_series, acb_hypgeom_erfc_series)
 ARB_WRAPPER(erfi, arb_hypgeom_erfi_series, acb_hypgeom_erfi_series)
+#if 0
 ARB_WRAPPER(exp_integral_ei, arb_hypgeom_ei_series, acb_hypgeom_ei_series)
+#endif
 ARB_WRAPPER(cos_integral, arb_hypgeom_ci_series, acb_hypgeom_ci_series)
 ARB_WRAPPER(cosh_integral, arb_hypgeom_chi_series, acb_hypgeom_chi_series)
 ARB_WRAPPER(sin_integral, arb_hypgeom_si_series, acb_hypgeom_si_series)

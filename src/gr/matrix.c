@@ -108,11 +108,13 @@ static truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
     return gr_ctx_is_zero_ring(MATRIX_CTX(ctx)->base_ring);
 }
 
+#if 0
 /* todo: public */
 static truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
 {
     return (MATRIX_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
+#endif
 
 static truth_t
 matrix_ctx_is_threadsafe(gr_ctx_t ctx)

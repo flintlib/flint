@@ -2450,6 +2450,7 @@ gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flag
     return status;
 }
 
+#if 0
 static int
 gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
@@ -2494,6 +2495,7 @@ gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     return status;
 }
+#endif
 
 static int
 gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
@@ -3324,7 +3326,9 @@ static int gr_test_vec_sub(gr_ctx_t R, flint_rand_t state, int test_flags) { ret
 static int gr_test_vec_mul(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_mul", gr_mul, _gr_vec_mul, state, test_flags); }
 static int gr_test_vec_div(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_div", gr_div, _gr_vec_div, state, test_flags); }
 static int gr_test_vec_divexact(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_divexact", gr_divexact, _gr_vec_divexact, state, test_flags); }
+#if 0
 static int gr_test_vec_pow(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_pow", gr_pow, _gr_vec_pow, state, test_flags); }
+#endif
 
 static int
 gr_test_vec_binary_op_scalar(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
@@ -3592,6 +3596,7 @@ gr_test_integral_domain(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
+#if 0
 static int
 gr_test_field(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
@@ -3647,6 +3652,7 @@ gr_test_field(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     return status;
 }
+#endif
 
 int
 gr_test_cmp_fun(gr_ctx_t R, gr_method_binary_op_get_int op, gr_ctx_t R_ref, flint_rand_t state, int test_flags)

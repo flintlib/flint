@@ -255,12 +255,14 @@ _gr_fexpr_pow_fmpq(fexpr_t res, const fexpr_t x, const fmpq_t exp, const gr_ctx_
     return GR_SUCCESS;
 }
 
+#if 0
 static int
 _gr_fexpr_pi(fexpr_t res, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fexpr_set_symbol_builtin(res, FEXPR_Pi);
     return GR_SUCCESS;
 }
+#endif
 
 static int
 _gr_fexpr_i(fexpr_t res, const gr_ctx_t FLINT_UNUSED(ctx))
