@@ -18,12 +18,7 @@
 #include "n_poly.h"
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "fq_nmod_mpoly-impl.h"
 
 int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
 {
