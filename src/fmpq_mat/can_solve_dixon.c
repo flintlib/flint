@@ -15,11 +15,9 @@
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
 
 /* Algorithm developed with Claus Fieker */
-
-int
-_fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
 
 int
 fmpq_mat_can_solve_fmpz_mat_dixon(fmpq_mat_t X,

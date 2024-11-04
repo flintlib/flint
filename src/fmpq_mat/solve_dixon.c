@@ -14,12 +14,9 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
+#include "fmpq_mat-impl.h"
 
 #define USE_SLOW_MULTIPLICATION 1
-
-int
-_fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
-
 
 static void
 _fmpq_mat_solve_dixon(fmpq_mat_t X,

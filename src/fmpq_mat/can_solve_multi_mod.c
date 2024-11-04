@@ -16,12 +16,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#endif
+#include "fmpq_mat-impl.h"
 
 int
 _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
