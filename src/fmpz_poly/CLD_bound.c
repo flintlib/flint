@@ -13,9 +13,10 @@
 
 #include <math.h>
 #include <float.h>
+#include "double_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "double_extras.h"
+#include "fmpz_poly-impl.h"
 
 #define CLD_EPS 0.00000001
 
@@ -64,10 +65,6 @@ static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
          return -_d_cmp_2exp(b, b_exp - a_exp, a, 0);
    }
 }
-
-double _fmpz_poly_evaluate_horner_d_2exp2_precomp(slong * exp, const double * poly,
-    const slong * poly_exp, slong n, double d, slong dexp);
-
 
 void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 {
