@@ -21,6 +21,8 @@ extern "C" {
 
 void _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate);
 
+char * fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f);
+
 #ifdef __cplusplus
 }
 #endif

@@ -13,16 +13,10 @@
 #include <string.h>
 #include "gmpcompat.h"
 #include "fmpz.h"
+#include "fmpz-impl.h"
 #include "fmpz_vec.h"
 #include "thread_pool.h"
 #include "thread_support.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "fmpz_get_str_bsplit_threaded only needs a symbol for test"
-#endif
 
 /*
     Notes:
