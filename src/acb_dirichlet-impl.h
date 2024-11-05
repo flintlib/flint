@@ -12,7 +12,7 @@
 #ifndef ACB_DIRICHLET_IMPL_H
 #define ACB_DIRICHLET_IMPL_H
 
-#include "acb_types.h"
+#include "acb_dirichlet.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +35,10 @@ _acb_dirichlet_platt_multieval(arb_ptr out, acb_srcptr S_table,
 
 void acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec);
 void acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec);
+
+/* FIXME: This function is unused, untested and undocumented. */
+void
+acb_dirichlet_vec_mellin_arb(acb_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, const arb_t t, slong n, slong prec);
 
 #ifdef __cplusplus
 }

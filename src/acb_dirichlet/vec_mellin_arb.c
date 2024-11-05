@@ -11,13 +11,7 @@
 
 #include "acb.h"
 #include "acb_dirichlet.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "acb_dirichlet_vec_mellin_arb is currently unused/untested/undocumented!"
-#endif
+#include "acb_dirichlet-impl.h"
 
 void
 acb_dirichlet_vec_mellin_arb(acb_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, const arb_t t, slong n, slong prec)
