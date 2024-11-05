@@ -32,8 +32,6 @@ void _ca_ext_print(calcium_stream_t out, ca_ext_t x, const char * var, ca_print_
 
 void ca_write(calcium_stream_t out, const ca_t x, ca_ctx_t ctx);
 
-void _ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
-
 /* strings ********************************************************************/
 
 char * ca_get_str(const ca_t x, ca_ctx_t ctx)
