@@ -33,6 +33,9 @@ _acb_dirichlet_platt_multieval(arb_ptr out, acb_srcptr S_table,
         const arb_t t0, slong A, slong B, const arb_t h, const fmpz_t J,
         slong K, slong sigma, slong prec);
 
+void acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec);
+void acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec);
+
 #ifdef __cplusplus
 }
 #endif

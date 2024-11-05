@@ -10,10 +10,10 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
-
-void acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec);
-void acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec);
+#include "acb_dirichlet-impl.h"
 
 TEST_FUNCTION_START(acb_dirichlet_stieltjes, state)
 {

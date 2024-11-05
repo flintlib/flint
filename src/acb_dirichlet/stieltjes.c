@@ -11,6 +11,7 @@
 
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
+#include "acb_dirichlet-impl.h"
 #include "acb_calc.h"
 
 #ifdef __GNUC__
@@ -23,14 +24,6 @@
 # define tan __builtin_tan
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "acb_dirichlet_stieltjes_em only needs a symbol for test"
-# pragma message "acb_dirichlet_stieltjes_integral only needs a symbol for test"
 #endif
 
 /* Bound the quadratic Taylor error term. */
@@ -632,7 +625,7 @@ _acb_dirichlet_stieltjes_integral2(acb_t res, const fmpz_t n, const acb_t alpha,
     arb_clear(C);
 }
 
-void
+static void
 _acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec)
 {
     acb_t alpha;
