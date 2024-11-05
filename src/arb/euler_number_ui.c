@@ -11,6 +11,7 @@
 
 #include "thread_support.h"
 #include "arb.h"
+#include "arb-impl.h"
 #include "acb_dirichlet.h"
 #include "bernoulli-impl.h"
 
@@ -18,15 +19,6 @@
 # define log __builtin_log
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "euler_mod_p_powsum only needs a symbol for test"
-# pragma message "euler_mod_p_powsum_noredc only needs a symbol for test"
-# pragma message "euler_mod_p_powsum_1 only needs a symbol for test"
 #endif
 
 #if FLINT64
