@@ -17,8 +17,6 @@
 #include "ca_poly.h"
 #include "ca_poly-impl.h"
 
-void _ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
-
 void
 ca_poly_get_fexpr(fexpr_t res, const ca_poly_t A, ulong flags, ca_ctx_t ctx)
 {
