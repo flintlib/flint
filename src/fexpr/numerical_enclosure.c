@@ -512,15 +512,6 @@ fexpr_get_acb_with_accuracy(acb_t res, const fexpr_t expr, slong prec, ulong FLI
     return success;
 }
 
-/* FIXME: Should this function be used somewhere? */
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "fexpr_get_decimal_str is currently unused/untested/undocumented!"
-#endif
-
 char *
 fexpr_get_decimal_str(const fexpr_t expr, slong digits, ulong FLINT_UNUSED(flags))
 {

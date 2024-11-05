@@ -280,6 +280,8 @@ char * fexpr_get_symbol_str(const fexpr_t expr);
 void fexpr_set_string(fexpr_t res, const char * s);
 char * fexpr_get_string(const fexpr_t expr);
 
+char * fexpr_get_decimal_str(const fexpr_t expr, slong digits, ulong flags);
+
 slong fexpr_depth(const fexpr_t expr);
 slong fexpr_num_leaves(const fexpr_t expr);
 
