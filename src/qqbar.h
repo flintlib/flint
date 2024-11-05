@@ -183,6 +183,7 @@ void _qqbar_get_fmpq(fmpz_t num, fmpz_t den, const qqbar_t x);
 void qqbar_get_fmpq(fmpq_t res, const qqbar_t x);
 void qqbar_get_fmpz(fmpz_t res, const qqbar_t x);
 
+char * qqbar_get_str_nd(const qqbar_t x, slong n);
 
 /* Special values */
 

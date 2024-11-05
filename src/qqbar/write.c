@@ -12,13 +12,11 @@
 #include "calcium.h"
 #include "qqbar.h"
 
-/* FIXME: Should this function be used somewhere? */
-#if 0
 /* Todo: document, unify and generalize. This is currently only
    used for the Python interface, but other wrappers will want
    good printing code too. */
 
-void
+static void
 qqbar_writen(calcium_stream_t out, const qqbar_t x, slong n)
 {
     acb_t t;
@@ -34,7 +32,7 @@ qqbar_writen(calcium_stream_t out, const qqbar_t x, slong n)
     acb_clear(t);
 }
 
-void
+static void
 qqbar_writend(calcium_stream_t out, const qqbar_t x, slong n)
 {
     qqbar_writen(out, x, n);
@@ -50,6 +48,3 @@ char * qqbar_get_str_nd(const qqbar_t x, slong n)
     qqbar_writend(out, x, n);
     return out->s;
 }
-#else
-typedef int unused_file;
-#endif
