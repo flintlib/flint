@@ -22,6 +22,7 @@ extern "C" {
 int ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx);
 
 void ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
+void _ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
 
 void
 fexpr_set_nf_elem(fexpr_t res, const nf_elem_t a, const nf_t nf, const fexpr_t var);
