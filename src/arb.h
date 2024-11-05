@@ -613,7 +613,7 @@ arb_sqr(arb_t res, const arb_t val, slong prec)
     arb_mul(res, val, val, prec);
 }
 
-#define _ARB_DEF_CACHED_CONSTANT(DECL1, DECL2, name, comp_func) \
+#define __ARB_DEF_CACHED_CONSTANT(DECL1, DECL2, name, comp_func) \
     FLINT_TLS_PREFIX slong name ## _cached_prec = 0; \
     FLINT_TLS_PREFIX arb_t name ## _cached_value; \
     DECL1 void name ## _cleanup(void) \
@@ -636,7 +636,8 @@ arb_sqr(arb_t res, const arb_t val, slong prec)
         arb_set_round(x, name ## _cached_value, prec); \
     }
 
-#define ARB_DEF_CACHED_CONSTANT(name, comp_func) _ARB_DEF_CACHED_CONSTANT(static,, name, comp_func)
+#define _ARB_DEF_CACHED_CONSTANT(name, comp_func) __ARB_DEF_CACHED_CONSTANT(static, static, name, comp_func)
+#define ARB_DEF_CACHED_CONSTANT(name, comp_func) __ARB_DEF_CACHED_CONSTANT(static,, name, comp_func)
 
 /* vector functions */
 

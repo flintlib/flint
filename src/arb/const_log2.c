@@ -52,7 +52,7 @@ Note: for log(3) the corresponding formula is
 but currently we do not have a use for this as a standalone constant.
 */
 
-_ARB_DEF_CACHED_CONSTANT(static, static, arb_const_log2_hypgeom, arb_const_log2_hypgeom_eval)
+_ARB_DEF_CACHED_CONSTANT(arb_const_log2_hypgeom, arb_const_log2_hypgeom_eval)
 
 void
 arb_const_log2(arb_t res, slong prec)

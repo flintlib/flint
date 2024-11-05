@@ -52,7 +52,7 @@ arb_gamma_const_1_3_eval(arb_t s, slong prec)
     arb_clear(u);
 }
 
-_ARB_DEF_CACHED_CONSTANT(static, static, arb_gamma_const_1_3, arb_gamma_const_1_3_eval)
+_ARB_DEF_CACHED_CONSTANT(arb_gamma_const_1_3, arb_gamma_const_1_3_eval)
 
 static void
 arb_gamma_const_1_4_eval(arb_t x, slong prec)
@@ -79,7 +79,7 @@ arb_gamma_const_1_4_eval(arb_t x, slong prec)
     arb_clear(u);
 }
 
-_ARB_DEF_CACHED_CONSTANT(static, static, arb_gamma_const_1_4, arb_gamma_const_1_4_eval)
+_ARB_DEF_CACHED_CONSTANT(arb_gamma_const_1_4, arb_gamma_const_1_4_eval)
 
 
 static void

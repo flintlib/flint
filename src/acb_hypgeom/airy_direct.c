@@ -61,10 +61,10 @@ arb_const_airy_bi1_eval(arb_t y, slong prec)
     arb_clear(t); fmpq_clear(v);
 }
 
-_ARB_DEF_CACHED_CONSTANT(static, static, arb_const_airy_ai0, arb_const_airy_ai0_eval)
-_ARB_DEF_CACHED_CONSTANT(static, static, arb_const_airy_ai1, arb_const_airy_ai1_eval)
-_ARB_DEF_CACHED_CONSTANT(static, static, arb_const_airy_bi0, arb_const_airy_bi0_eval)
-_ARB_DEF_CACHED_CONSTANT(static, static, arb_const_airy_bi1, arb_const_airy_bi1_eval)
+_ARB_DEF_CACHED_CONSTANT(arb_const_airy_ai0, arb_const_airy_ai0_eval)
+_ARB_DEF_CACHED_CONSTANT(arb_const_airy_ai1, arb_const_airy_ai1_eval)
+_ARB_DEF_CACHED_CONSTANT(arb_const_airy_bi0, arb_const_airy_bi0_eval)
+_ARB_DEF_CACHED_CONSTANT(arb_const_airy_bi1, arb_const_airy_bi1_eval)
 
 static void
 acb_hypgeom_airy_0f1_sum_inner(acb_t s, acb_srcptr t, slong m, slong n, slong alpha, int real, slong prec)

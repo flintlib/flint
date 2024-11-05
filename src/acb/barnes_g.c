@@ -31,7 +31,7 @@ _arb_const_zeta_minus_one_eval(arb_t y, slong prec)
     acb_clear(a);
 }
 
-_ARB_DEF_CACHED_CONSTANT(static, static, _arb_const_zeta_minus_one, _arb_const_zeta_minus_one_eval)
+_ARB_DEF_CACHED_CONSTANT(_arb_const_zeta_minus_one, _arb_const_zeta_minus_one_eval)
 
 /* LogG(z) = (z-1) LogGamma(z) - zeta'(-1,z) + zeta'(-1)
    LogG'(z) = (1/2)(-2z + 1 + log(2pi)) + (z-1) digamma(z) */
