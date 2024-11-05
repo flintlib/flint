@@ -13,10 +13,7 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 #include "qadic.h"
-
-int
-_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
-                         const fmpz *a, const slong *j, slong lena);
+#include "qadic-impl.h"
 
 TEST_FUNCTION_START(qadic_sqrt, state)
 {
