@@ -595,8 +595,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-#if 0
-static void
+void
 gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 {
     ctx->which_ring = GR_CTX_FMPZ_MPOLY;
@@ -615,4 +614,3 @@ gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
         _gr_fmpz_mpoly_methods_initialized = 1;
     }
 }
-#endif
