@@ -29,6 +29,8 @@ void acb_hypgeom_mag_chi(mag_t chi, ulong n);
 void _acb_hypgeom_legendre_q_single(acb_t res, const acb_t n, const acb_t m, const acb_t z, slong prec);
 void _acb_hypgeom_legendre_q_double(acb_t res, const acb_t n, const acb_t m, const acb_t z, slong prec);
 
+int _mag_gt_norm_ui(const mag_t a, const mag_t b, const mag_t c, ulong n);
+
 #ifdef __cplusplus
 }
 #endif

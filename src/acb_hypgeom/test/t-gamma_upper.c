@@ -12,8 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-int _mag_gt_norm_ui(const mag_t a, const mag_t b, const mag_t c, ulong n);
+#include "acb_hypgeom-impl.h"
 
 static void
 _accuracy_regression_test(const acb_t s, const acb_t z,

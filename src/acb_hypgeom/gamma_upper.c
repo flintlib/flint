@@ -14,13 +14,6 @@
 #include "acb_hypgeom.h"
 #include "acb_hypgeom-impl.h"
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "_mag_gt_norm_ui only needs a symbol for test"
-#endif
-
 void
 acb_hypgeom_gamma_upper_asymp(acb_t res, const acb_t s,
         const acb_t z, int regularized, slong prec)
