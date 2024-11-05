@@ -21,6 +21,11 @@ extern "C" {
 void
 _arb_tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len);
 
+ulong _bernoulli_n_muldivrem_precomp(ulong * q, ulong a, ulong b, ulong n, double bnpre);
+
+ulong _bernoulli_mod_p_harvey_powg(ulong p, ulong pinv, ulong k);
+ulong _bernoulli_mod_p_harvey_pow2(ulong p, ulong pinv, ulong k);
+
 #ifdef __cplusplus
 }
 #endif

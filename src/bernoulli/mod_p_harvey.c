@@ -60,15 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <gmp.h>
 #include "ulong_extras.h"
 #include "bernoulli.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "_bernoulli_mod_p_harvey_powg only needs a symbol for test"
-# pragma message "_bernoulli_mod_p_harvey_pow2 only needs a symbol for test"
-# pragma message "_bernoulli_n_muldivrem_precomp only needs a symbol for test"
-#endif
+#include "bernoulli-impl.h"
 
 #define DEBUG 0
 #define TIMING 1

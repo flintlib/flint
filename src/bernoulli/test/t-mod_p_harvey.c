@@ -16,11 +16,10 @@
 #include "fmpz_extras.h"
 #include "arith.h"
 #include "bernoulli.h"
+#include "bernoulli-impl.h"
 
-/* test this internal function which should really be in FLINT */
-ulong _bernoulli_n_muldivrem_precomp(ulong * q, ulong a, ulong b, ulong n, double bnpre);
-ulong _bernoulli_mod_p_harvey_powg(ulong p, ulong pinv, ulong k);
-ulong _bernoulli_mod_p_harvey_pow2(ulong p, ulong pinv, ulong k);
+/* NOTE: We test internal functions in bernoulli-impl.h that should really be
+ * public. */
 
 void test_bern_modp_pow2(ulong p, ulong k)
 {
