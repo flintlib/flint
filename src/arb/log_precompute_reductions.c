@@ -13,6 +13,7 @@
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "arb.h"
+#include "arb-impl.h"
 
 #ifdef __GNUC__
 # define fabs __builtin_fabs
@@ -20,13 +21,6 @@
 # define pow __builtin_pow
 #else
 # include <math.h>
-#endif
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "_arb_log_precompute_reductions is currently unused/untested/undocumented!"
 #endif
 
 #define TERMINATOR -32768

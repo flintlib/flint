@@ -15,13 +15,6 @@
 #include "arb-impl.h"
 #include "acb.h"
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "arb_sin_cos_fmpz_div_2exp_bsplit only needs a symbol for test"
-#endif
-
 static void
 bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     const slong * xexp,

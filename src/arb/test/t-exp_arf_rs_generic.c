@@ -11,10 +11,7 @@
 
 #include "test_helpers.h"
 #include "arb.h"
-
-/* these functions are not exposed to the public for now,
-   but it still makes sense to test them explicitly */
-void arb_exp_taylor_sum_rs_generic(arb_t s, const arb_t x, slong N, slong prec);
+#include "arb-impl.h"
 
 TEST_FUNCTION_START(arb_exp_arf_rs_generic, state)
 {

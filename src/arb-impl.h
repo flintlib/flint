@@ -54,6 +54,15 @@ ulong euler_mod_p_powsum_1(ulong n, ulong p);
 ulong euler_mod_p_powsum_noredc(ulong n, ulong p, const unsigned int * divtab);
 ulong euler_mod_p_powsum(ulong n, ulong p, const unsigned int * divtab);
 
+/* FIXME: This function is untested, unused and undocumented. */
+void _arb_log_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slong n, slong max_rel, double C);
+
+void arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec);
+
+void arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos, const fmpz_t x, flint_bitcnt_t r, slong prec);
+
+void arb_sin_cos_taylor_sum_rs(arb_t s, const arb_t x, slong N, int cosine, slong prec);
+
 #ifdef __cplusplus
 }
 #endif

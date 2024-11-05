@@ -9,21 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "arb.h"
-
 #ifdef __GNUC__
 # define pow __builtin_pow
 #else
 # include <math.h>
 #endif
 
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "arb_exp_taylor_sum_rs_generic only needs a symbol for test"
-#endif
+#include "ulong_extras.h"
+#include "arb.h"
+#include "arb-impl.h"
 
 void
 arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec)
