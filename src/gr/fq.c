@@ -16,11 +16,12 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "gr.h"
 #include "fq.h"
 #include "fq_poly.h"
 #include "fq_mat.h"
 #include "fq_poly_factor.h"
+#include "gr.h"
+#include "gr-impl.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 
@@ -787,8 +788,7 @@ gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
 }
 
-#if 0
-static int gr_ctx_init_fq_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+int gr_ctx_init_fq_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 {
     fq_ctx_struct * fq_ctx;
     fq_ctx = flint_malloc(sizeof(fq_ctx_struct));
@@ -797,7 +797,7 @@ static int gr_ctx_init_fq_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_pol
     return GR_SUCCESS;
 }
 
-static int gr_ctx_init_fq_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
+int gr_ctx_init_fq_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
     fmpz_mod_ctx_t fmod_ctx;
     fmpz_mod_poly_t fmod;
@@ -813,4 +813,3 @@ static int gr_ctx_init_fq_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modu
     fmpz_clear(p);
     return status;
 }
-#endif

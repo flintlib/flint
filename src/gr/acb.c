@@ -24,6 +24,7 @@
 #include "acf.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -227,9 +228,6 @@ _gr_acb_set_d(acb_t res, double x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
-
 static int
 _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
@@ -323,11 +321,6 @@ _gr_acb_set_interval_mid_rad(acb_t res, const acb_t m, const acb_t r, const gr_c
     mag_clear(rad2);
     return GR_SUCCESS;
 }
-
-/* xxx: assumes that ctx are not read */
-int _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
 
 static int
 _gr_acb_get_fmpz(fmpz_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
@@ -987,9 +980,6 @@ _gr_acb_cmp(int * res, const acb_t x, const acb_t y, const gr_ctx_t FLINT_UNUSED
         return GR_UNABLE;
     }
 }
-
-int
-_gr_arb_cmpabs(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx);
 
 static int
 _gr_acb_cmpabs(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
@@ -1992,7 +1982,7 @@ roots_accurate(acb_ptr roots, slong len, slong prec)
 }
 
 /* hidden feature: also works with arb ctx */
-static int
+int
 _gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     slong prec, initial_prec, target_prec, isolated, maxiter, maxprec, deg, i;

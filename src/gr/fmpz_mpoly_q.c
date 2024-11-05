@@ -12,6 +12,7 @@
 #include "fmpq.h"
 #include "fmpz_mpoly_q.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 
@@ -39,10 +40,6 @@ static int _gr_fmpz_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
         gr_stream_write(out, ", degrevlex order");
     return GR_SUCCESS;
 }
-
-/* Some methods are identical to their fmpz_mpoly counterparts */
-void _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx);
-int _gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
 
 #define _gr_fmpz_mpoly_q_ctx_clear _gr_fmpz_mpoly_ctx_clear
 #define _gr_fmpz_mpoly_q_ctx_set_gen_names _gr_fmpz_mpoly_ctx_set_gen_names

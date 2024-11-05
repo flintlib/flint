@@ -18,6 +18,7 @@
 #include "qqbar.h"
 #include "qqbar-impl.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -269,8 +270,7 @@ _gr_qqbar_set(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 }
 
 /* todo: move */
-static void
-qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x)
+void qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x)
 {
     if (fmpz_is_zero(fmpzi_imagref(x)))
     {

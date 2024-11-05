@@ -13,6 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly_factor.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 
@@ -41,7 +42,7 @@ static int _gr_fmpz_mpoly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-static void
+void
 _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx)
 {
     if (MPOLYNOMIAL_CTX(ctx)->vars != NULL)
@@ -56,7 +57,7 @@ _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx)
     flint_free(GR_CTX_DATA_AS_PTR(ctx));
 }
 
-static int
+int
 _gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 {
     slong i, nvars, len;

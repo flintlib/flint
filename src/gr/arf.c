@@ -17,6 +17,7 @@
 #include "acb_poly.h"
 #include "arb_fmpz_poly.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
@@ -229,7 +230,7 @@ _gr_arf_set_other(arf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
     }
 }
 
-static int
+int
 _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!arf_is_int(x))
@@ -243,7 +244,7 @@ _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
     return GR_SUCCESS;
 }
 
-static int
+int
 _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {    fmpz_t t;
 
@@ -260,7 +261,7 @@ _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
     return GR_SUCCESS;
 }
 
-static int
+int
 _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_t t;
@@ -638,7 +639,7 @@ _gr_arf_cmp(int * res, const arf_t x, const arf_t y, const gr_ctx_t FLINT_UNUSED
     return GR_SUCCESS;
 }
 
-static int
+int
 _gr_arf_cmpabs(int * res, const arf_t x, const arf_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = arf_cmpabs(x, y);

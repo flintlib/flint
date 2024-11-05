@@ -21,6 +21,7 @@
 #include "nmod_poly.h"
 #include "fmpz_mod_poly.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 
@@ -636,8 +637,7 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }
 
-#if 0
-static int
+int
 gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
     fq_zech_ctx_struct * fq_zech_ctx;
@@ -662,7 +662,7 @@ gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, c
     }
 }
 
-static int
+int
 gr_ctx_init_fq_zech_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 {
     nmod_poly_t nmodulus;
@@ -677,4 +677,3 @@ gr_ctx_init_fq_zech_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t mo
     nmod_poly_clear(nmodulus);
     return status;
 }
-#endif

@@ -16,6 +16,7 @@
 #include "ca_poly.h"
 #include "fexpr.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -364,7 +365,7 @@ _gr_ca_set_other(ca_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
-static int
+int
 _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
 {
     int status = GR_UNABLE;
@@ -398,8 +399,7 @@ _gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
     return status;
 }
 
-#if 0
-static int
+int
 _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
 {
     if (x_ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA)
@@ -417,7 +417,6 @@ _gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec)
     acb_set_round(res, res, prec);
     return GR_SUCCESS;
 }
-#endif
 
 static int
 _gr_ca_get_fmpz(fmpz_t res, const ca_t x, gr_ctx_t ctx)

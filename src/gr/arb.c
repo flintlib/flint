@@ -21,6 +21,7 @@
 #include "fmpzi.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -243,9 +244,6 @@ _gr_arb_set_d(arb_t res, double x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
-
 static int
 _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
@@ -351,11 +349,6 @@ _gr_arb_set_interval_mid_rad(arb_t res, const arb_t m, const arb_t r, const gr_c
     mag_clear(rad);
     return GR_SUCCESS;
 }
-
-/* xxx: assumes that ctx are not read */
-int _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
 
 static int
 _gr_arb_get_fmpz(fmpz_t res, const arb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
@@ -878,7 +871,7 @@ _gr_arb_cmp(int * res, const arb_t x, const arb_t y, const gr_ctx_t FLINT_UNUSED
     }
 }
 
-static int
+int
 _gr_arb_cmpabs(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     arb_t t, u;
@@ -1588,10 +1581,6 @@ _gr_arb_poly_mullow(arb_ptr res,
     _arb_poly_mullow(res, poly1, len1, poly2, len2, n, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
-
-/* hidden feature: also works with arb ctx */
-int
-_gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx);
 
 static int
 _gr_arb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)

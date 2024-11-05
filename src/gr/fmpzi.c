@@ -15,6 +15,7 @@
 #include "qqbar.h"
 #include "fmpzi.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_generic.h"
 
 static int
@@ -259,9 +260,6 @@ _gr_fmpzi_get_fmpq(fmpq_t res, const fmpzi_t x, const gr_ctx_t FLINT_UNUSED(ctx)
     fmpq_set_fmpz(res, fmpzi_realref(x));
     return GR_SUCCESS;
 }
-
-/* todo: qqbar should call an fmpzi method rather than vice versa */
-void qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x);
 
 static int
 _gr_fmpzi_get_fexpr(fexpr_t res, const fmpzi_t x, const gr_ctx_t FLINT_UNUSED(ctx))
