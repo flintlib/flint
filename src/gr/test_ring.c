@@ -16,6 +16,7 @@
 #include "fexpr.h"
 #include "fmpq.h"
 #include "gr.h"
+#include "gr-impl.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
@@ -2275,7 +2276,7 @@ gr_test_divides(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-static int
+int
 gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2338,7 +2339,7 @@ gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-static int
+int
 gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2396,7 +2397,7 @@ gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int te
     return status;
 }
 
-static int
+int
 gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2450,8 +2451,7 @@ gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flag
     return status;
 }
 
-#if 0
-static int
+int
 gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2495,9 +2495,8 @@ gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     return status;
 }
-#endif
 
-static int
+int
 gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;

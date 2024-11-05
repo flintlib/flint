@@ -49,6 +49,13 @@ int gr_ctx_init_fq_zech_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_
 void _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx);
 int _gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
 
+int gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags);
+
+int gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
+
 #ifdef __cplusplus
 }
 #endif
