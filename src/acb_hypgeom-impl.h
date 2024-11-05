@@ -18,20 +18,16 @@
 extern "C" {
 #endif
 
-slong
-acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p,
-                         acb_srcptr b, slong q, const acb_t z,
-                         slong prec, slong n_max);
+slong acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p, acb_srcptr b, slong q, const acb_t z, slong prec, slong n_max);
 
-void
-acb_hypgeom_gamma_stirling_inner(acb_t s, const acb_t z, slong N, slong prec);
+void acb_hypgeom_gamma_stirling_inner(acb_t s, const acb_t z, slong N, slong prec);
 
-int
-acb_hypgeom_u_asymp_determine_region(const mag_t r,
-    const mag_t zlo, const acb_t z);
+int acb_hypgeom_u_asymp_determine_region(const mag_t r, const mag_t zlo, const acb_t z);
 
-void
-acb_hypgeom_mag_chi(mag_t chi, ulong n);
+void acb_hypgeom_mag_chi(mag_t chi, ulong n);
+
+void _acb_hypgeom_legendre_q_single(acb_t res, const acb_t n, const acb_t m, const acb_t z, slong prec);
+void _acb_hypgeom_legendre_q_double(acb_t res, const acb_t n, const acb_t m, const acb_t z, slong prec);
 
 #ifdef __cplusplus
 }

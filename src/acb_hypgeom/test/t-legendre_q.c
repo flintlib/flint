@@ -12,12 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-/* these functions are not public for now */
-void _acb_hypgeom_legendre_q_single(acb_t res, const acb_t n, const acb_t m,
-    const acb_t z, slong prec);
-void _acb_hypgeom_legendre_q_double(acb_t res, const acb_t n, const acb_t m,
-    const acb_t z, slong prec);
+#include "acb_hypgeom-impl.h"
 
 TEST_FUNCTION_START(acb_hypgeom_legendre_q, state)
 {

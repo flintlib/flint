@@ -11,14 +11,7 @@
 
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-/* FIXME: Remove this guard against warnings. Best thing would probably be to
- * implement an *-impl.h to keep track of local functions. */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmissing-prototypes"
-# pragma message "_acb_hypgeom_legendre_q_single only needs a symbol for test"
-# pragma message "_acb_hypgeom_legendre_q_double only needs a symbol for test"
-#endif
+#include "acb_hypgeom-impl.h"
 
 /* invalid in (-1,0) */
 static int
