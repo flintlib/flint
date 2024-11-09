@@ -28,6 +28,7 @@
  * by 1/2, since the inverse of [1  iw] is  1/2 * [1  1]
  *                              [1 -iw]           [w -w]
  */
+// TODO make order of arguments consistent
 #define IDFT2_LAZY22(a, b, n, n2, w, w_pr, p_hi, p_lo, tmp)   \
 do {                                                          \
     tmp = (a) + (n2) - (b);     /* [0..4n) */                 \
@@ -212,7 +213,6 @@ do {                                                             \
 
 
 // TODO doc
-// TODO add lazy12?
 void idft_lazy12(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 1)
