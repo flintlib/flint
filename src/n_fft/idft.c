@@ -212,6 +212,7 @@ do {                                                             \
 
 
 // TODO doc
+// TODO make sure this is tested (code coverage: including for small depths)
 void idft_lazy12(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 1)
