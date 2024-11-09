@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
 #include "n_fft.h"
 
 /** Given the precomputed quotient a_pr for modular multiplication by a mod n,

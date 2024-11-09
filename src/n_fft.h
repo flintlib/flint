@@ -12,9 +12,6 @@
 #ifndef N_FFT_H
 #define N_FFT_H
 
-#include "flint.h"
-#include "nmod.h"
-#include "nmod_vec.h"
 #include "ulong_extras.h"
 
 #define N_FFT_CTX_DEFAULT_DEPTH 12
