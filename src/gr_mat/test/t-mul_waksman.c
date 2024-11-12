@@ -41,9 +41,6 @@ TEST_FUNCTION_START(gr_mat_mul_waksman, state)
         b = n_randint(state, 2) ? a : n_randint(state, 8);
         c = n_randint(state, 2) ? a : n_randint(state, 8);
 
-        /* XXX */
-        a = b = c = 2;
-
         gr_mat_init(A, a, b, ctx);
         gr_mat_init(B, b, c, ctx);
         gr_mat_init(C, a, c, ctx);
