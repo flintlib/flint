@@ -15,6 +15,7 @@
 #include "gr_vec.h"
 
 /* todo: division by two should be divexact by two */
+/* todo: avoid redundant additions 0 + ... */
 
 int gr_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
