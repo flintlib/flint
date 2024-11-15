@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "double_extras.h"
 #include "mpn_extras.h"
 #include "gr.h"
 #include "gr_vec.h"
@@ -758,6 +759,51 @@ _nfixed_mat_mul_classical(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, 
 #undef C_ENTRY
 }
 
+/* todo: optimize */
+/* A is (m x n), B is (n x p), C is (m x p) */
+void
+_nfixed_mat_mul_classical_precise(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
+{
+    slong i;
+    nn_ptr t, tA, tB, tC, u;
+    nn_srcptr s;
+
+    t = flint_malloc(((m * n) + (n * p) + (m * p)) * (nlimbs + 2) * sizeof(ulong));
+    tA = t;
+    tB = tA + (m * n) * (nlimbs + 2);
+    tC = tB + (n * p) * (nlimbs + 2);
+
+    for (i = 0; i < m * n; i++)
+    {
+        s = A + i * (nlimbs + 1);
+        u = tA + i* (nlimbs + 2);
+        flint_mpn_copyi(u + 2, s + 1, nlimbs);
+        u[0] = s[0];
+        u[1] = 0;
+    }
+
+    for (i = 0; i < n * p; i++)
+    {
+        s = B + i * (nlimbs + 1);
+        u = tB + i * (nlimbs + 2);
+        flint_mpn_copyi(u + 2, s + 1, nlimbs);
+        u[0] = s[0];
+        u[1] = 0;
+    }
+
+    _nfixed_mat_mul_classical(tC, tA, tB, m, n, p, nlimbs + 1);
+
+    for (i = 0; i < m * p; i++)
+    {
+        s = tC + i * (nlimbs + 2);
+        u = C + i * (nlimbs + 1);
+        flint_mpn_copyi(u + 1, s + 2, nlimbs);
+        u[0] = s[0];
+    }
+
+    flint_free(t);
+}
+
 /* compute c += (a1 + b1) * (a2 + b2) */
 /* val0, val1, val2 are scratch space */
 FLINT_FORCE_INLINE void
@@ -1225,6 +1271,7 @@ _nfixed_mat_mul_strassen2(_nfixed_mat_t C, const _nfixed_mat_t A, const _nfixed_
     nn = FLINT_MIN(ar, ac);
     nn = FLINT_MIN(nn, bc);
 
+    /* Important: if the cutoff handling changes, _nfixed_mat_mul_bound_strassen must change too. */
     if (cutoff < 0)
         cutoff = nfixed_mat_mul_strassen_cutoff(nn, ac & 1, nlimbs);
     else
@@ -1392,6 +1439,7 @@ _nfixed_mat_mul(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, s
     d = FLINT_MIN(m, n);
     d = FLINT_MIN(d, p);
 
+    /* Important: if the cutoff handling changes, _nfixed_mat_mul_bound must change too. */
     if (d > 10)
     {
         cutoff = nfixed_mat_mul_strassen_cutoff(d, n & 1, nlimbs);
@@ -1407,4 +1455,173 @@ _nfixed_mat_mul(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, s
         _nfixed_mat_mul_waksman(C, A, B, m, n, p, nlimbs);
     else
         _nfixed_mat_mul_classical(C, A, B, m, n, p, nlimbs);
+}
+
+/*
+  Given an m x n x p matrix multiplication with inputs bounded
+  entrywise by A, B and nlimbs precision:
+
+  - Set *bound* to a bound for the entries in all intermediate
+    variables of the computation. This should be < 1 to
+    ensure correctness.
+  - Set *error* to a bound for the output error, measured in ulp.
+
+   The caller can assume that the bound is a nondecreasing function
+   of A and B.
+
+   IMPORTANT: when changing the algorithm in _nfixed_mat_mul, this
+   must be changed to correspond.
+*/
+
+void
+_nfixed_mat_mul_bound_classical(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong nlimbs)
+{
+    double fixup = 1.0 + 1e-6;
+
+    /* Error bound (in ulp) for naive scalar multiplication, and for dot product */
+    double error_mul = (2 * nlimbs - 1);
+    double error_dot = n * error_mul;
+
+    *bound = (n * A * B) * fixup;
+    *error = error_dot * fixup;
+}
+
+void
+_nfixed_mat_mul_bound_waksman(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong nlimbs)
+{
+    double fixup = 1.0 + 1e-6;
+
+    /* Error bound (in ulp) for naive scalar multiplication */
+    double error_mul = (2 * nlimbs - 1);
+
+    *bound = FLINT_MAX(A + B, 6 * (n / 2) * (A + B) * (A + B) + A * B) * fixup;
+    *error = ((6 * (n / 2) + 1) * error_mul + 5) * fixup;
+}
+
+void
+_nfixed_mat_mul_bound_strassen(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong cutoff, slong nlimbs)
+{
+    double fixup = 1.0 + 1e-6;
+    slong d;
+
+    /* Error bound (in ulp) for naive scalar multiplication, and for dot product */
+    double error_mul = (2 * nlimbs - 1);
+    double error_dot = n * error_mul;
+
+    d = FLINT_MIN(m, n);
+    d = FLINT_MIN(d, p);
+
+    if (cutoff < 0)
+        cutoff = nfixed_mat_mul_strassen_cutoff(d, n, nlimbs);
+    else
+        cutoff = FLINT_MAX(cutoff, 2);
+
+    if (d < cutoff)
+    {
+        if (nfixed_mat_mul_use_waksman(d, nlimbs))
+            _nfixed_mat_mul_bound_waksman(bound, error, m, n, p, A, B, nlimbs);
+        else
+            _nfixed_mat_mul_bound_classical(bound, error, m, n, p, A, B, nlimbs);
+        return;
+    }
+
+    slong mm, nn, pp;
+    double bound_transformed_A, bound_transformed_B;
+    double bound_everything, bound_recursive, error_recursive;
+    double bound_recombination, error_recombination;
+    double ulp;
+
+    /* Bound for entries of transformed block matrices */
+    /* S1 = A22 + A12   <= 2A
+       S2 = A22 - A21   <= 2A
+       S3 = S2 + A12    <= 3A
+       S4 = S3 - A11    <= 3A, and similarly Ti for B */
+    bound_transformed_A = 3.0 * A;
+    bound_transformed_B = 3.0 * B;
+    bound_everything = FLINT_MAX(bound_transformed_A, bound_transformed_B);
+
+    /* Bound intermediate entries and errors for recursive multiplications. */
+    mm = m / 2;
+    nn = n / 2;
+    pp = p / 2;
+    _nfixed_mat_mul_bound_strassen(&bound_recursive, &error_recursive, mm, nn, pp, bound_transformed_A, bound_transformed_B, cutoff, nlimbs);
+    bound_everything = FLINT_MAX(bound_everything, bound_recursive);
+
+    /* Bound for recombinations. We don't use bound_recursive here,
+       because this can be a huge overestimate if the basecase
+       is nonclassical multiplication. Instead, we use the
+       theoretical bounds for the subproducts and add the
+       bound u = error_recursive (in the event the recursive
+       multiplications were not rounded down). */
+    /* P1 = S1 T1      <= 4 nn A B + u
+       P2 = S2 T2      <= 4 nn A B + u
+       P3 = S3 T3      <= 9 nn A B + u
+       P4 = A11 B11    <= nn A B + u
+       P5 = A12 B21    <= nn A B + u
+       P6 = S4 B12     <= 3 nn A B + u
+       P7 = A21 T4     <= 3 nn A B + u
+       U1 = P3 + P5    <= 10 nn A B + 2u
+       U2 = P1 - U1    <= 14 nn A B + 3u
+       U3 = U1 - P2    <= 14 nn A B + 3u
+       C11 = P4 + P5   <= 2 nn A B + 2u
+       C12 = U3 - P6   <= 17 nn A B + 4u
+       C21 = U2 - P7   <= 17 nn A B + 4u
+       C22 = P2 + U2   <= 18 nn A B + 4u
+    */
+
+    ulp = ldexp(1.0, FLINT_MAX(-128, -nlimbs * FLINT_BITS));
+
+    error_recombination = 4 * error_recursive;
+    bound_recombination = 18 * nn * A * B + error_recombination * ulp;
+
+    /* Bound for border corrections when m, n, and/or p is odd.
+       Todo: could be added conditionally. Assumes border
+       corrections use classical multiplication. */
+    bound_recombination += A * B;
+    bound_recombination = FLINT_MAX(bound_recombination, n * A * B);
+    error_recombination += error_mul;
+    error_recombination = FLINT_MAX(error_recombination, error_dot);
+
+    bound_everything = FLINT_MAX(bound_everything, bound_recombination);
+
+    *bound = bound_everything * fixup;
+    *error = error_recombination * fixup;
+}
+
+void
+_nfixed_mat_mul_bound(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong nlimbs)
+{
+    slong d, cutoff;
+
+    d = FLINT_MIN(m, n);
+    d = FLINT_MIN(d, p);
+
+    if (d > 10)
+    {
+        cutoff = nfixed_mat_mul_strassen_cutoff(d, n & 1, nlimbs);
+
+        if (n >= cutoff)
+        {
+            _nfixed_mat_mul_bound_strassen(bound, error, m, n, p, A, B, -1, nlimbs);
+            return;
+        }
+    }
+
+    if (nfixed_mat_mul_use_waksman(d, nlimbs))
+        _nfixed_mat_mul_bound_waksman(bound, error, m, n, p, A, B, nlimbs);
+    else
+        _nfixed_mat_mul_bound_classical(bound, error, m, n, p, A, B, nlimbs);
+}
+
+/* Karatsuba formula */
+/* (A C - B D) + ((A + B)(C + D) - A C - B D) i */
+void
+_nfixed_complex_mat_mul_bound(double * bound, double * error, slong m, slong n, slong p, double A, double B, double C, double D, slong nlimbs)
+{
+    double rbound, rerror, fixup = 1.0 + 1e-6;
+
+    _nfixed_mat_mul_bound(&rbound, &rerror, m, n, p, A + B, C + D, nlimbs);
+
+    (*bound) = FLINT_MAX(3.0 * rbound, FLINT_MAX(A + B, C + D)) * fixup;
+    (*error) = rerror * (3.0 * fixup);
 }
