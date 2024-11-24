@@ -202,11 +202,7 @@ int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_
    return poly->length == 1 && poly->coeffs[0] == WORD(1);
 }
 
-FMPZ_MOD_POLY_INLINE
-int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
-{
-    return op->length == 2 && op->coeffs[1] == WORD(1) && op->coeffs[0] == WORD(0);
-}
+int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_poly_is_unit(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
 
