@@ -17,7 +17,7 @@
 #include "gr_special.h"
 #include "nfloat.h"
 
-TEST_FUNCTION_START(nfixed_mat_mul, state)
+TEST_FUNCTION_START(nfixed_mat_mul_classical, state)
 {
     slong iter, m, n, p, i, nlimbs;
     nn_ptr A, B, C, D, t;
@@ -43,7 +43,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
         top = 1;
         while (1)
         {
-            _nfixed_mat_mul_bound(&bound, &error, m, n, p, ldexp(1.0, -top), ldexp(1.0, -top), nlimbs);
+            _nfixed_mat_mul_bound_classical(&bound, &error, m, n, p, ldexp(1.0, -top), ldexp(1.0, -top), nlimbs);
             if (bound < 1.0)
                 break;
             top++;
@@ -86,7 +86,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
         }
 
         _nfixed_mat_mul_classical_precise(C, A, B, m, n, p, nlimbs);
-        _nfixed_mat_mul(D, A, B, m, n, p, nlimbs);
+        _nfixed_mat_mul_classical(D, A, B, m, n, p, nlimbs);
 
         for (i = 0; i < m * p; i++)
         {
@@ -94,8 +94,8 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
 
             if (!flint_mpn_zero_p(t + 2, nlimbs - 1) || t[1] > maxerr)
             {
-                TEST_FUNCTION_FAIL("nlimbs = %wd, m = %wd, n = %wd, p = %wd\n\nt = %{ulong*}, maxerr = %wu\n\nA = %{ulong*}\n\nB = %{ulong*}\n\nC = %{ulong*}\n\nD = %{ulong*}\n\n",
-                    nlimbs, m, n, p,
+                TEST_FUNCTION_FAIL("nlimbs = %wd, m = %wd, n = %wd, p = %wd, top = %d\n\nt = %{ulong*}, maxerr = %wu\n\nA = %{ulong*}\n\nB = %{ulong*}\n\nC = %{ulong*}\n\nD = %{ulong*}\n\n",
+                    nlimbs, m, n, p, top,
                     t, nlimbs + 1, maxerr, A, m * n * (nlimbs + 1), B, n * p * (nlimbs + 1), C, m * p * (nlimbs + 1), D, m * p * (nlimbs + 1));
             }
         }

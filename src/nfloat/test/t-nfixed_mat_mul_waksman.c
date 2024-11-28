@@ -17,7 +17,7 @@
 #include "gr_special.h"
 #include "nfloat.h"
 
-TEST_FUNCTION_START(nfixed_mat_mul, state)
+TEST_FUNCTION_START(nfixed_mat_mul_waksman, state)
 {
     slong iter, m, n, p, i, nlimbs;
     nn_ptr A, B, C, D, t;
@@ -43,7 +43,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
         top = 1;
         while (1)
         {
-            _nfixed_mat_mul_bound(&bound, &error, m, n, p, ldexp(1.0, -top), ldexp(1.0, -top), nlimbs);
+            _nfixed_mat_mul_bound_waksman(&bound, &error, m, n, p, ldexp(1.0, -top), ldexp(1.0, -top), nlimbs);
             if (bound < 1.0)
                 break;
             top++;
@@ -86,7 +86,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
         }
 
         _nfixed_mat_mul_classical_precise(C, A, B, m, n, p, nlimbs);
-        _nfixed_mat_mul(D, A, B, m, n, p, nlimbs);
+        _nfixed_mat_mul_waksman(D, A, B, m, n, p, nlimbs);
 
         for (i = 0; i < m * p; i++)
         {

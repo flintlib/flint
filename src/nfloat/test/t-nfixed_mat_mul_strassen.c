@@ -17,11 +17,12 @@
 #include "gr_special.h"
 #include "nfloat.h"
 
-TEST_FUNCTION_START(nfixed_mat_mul, state)
+TEST_FUNCTION_START(nfixed_mat_mul_strassen, state)
 {
     slong iter, m, n, p, i, nlimbs;
     nn_ptr A, B, C, D, t;
     nn_ptr a;
+    slong cutoff;
 
     slong MAXN = 20;
     slong MINLIMBS = 2;
@@ -29,6 +30,8 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
+        cutoff = n_randint(state, 6);
+
         m = 1 + n_randint(state, MAXN);
         n = 1 + n_randint(state, MAXN);
         p = 1 + n_randint(state, MAXN);
@@ -43,7 +46,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
         top = 1;
         while (1)
         {
-            _nfixed_mat_mul_bound(&bound, &error, m, n, p, ldexp(1.0, -top), ldexp(1.0, -top), nlimbs);
+            _nfixed_mat_mul_bound_strassen(&bound, &error, m, n, p, ldexp(1.0, -top), ldexp(1.0, -top), cutoff, nlimbs);
             if (bound < 1.0)
                 break;
             top++;
@@ -85,8 +88,8 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
             flint_mpn_rrandom(a + 1, state, nlimbs);
         }
 
-        _nfixed_mat_mul_classical_precise(C, A, B, m, n, p, nlimbs);
-        _nfixed_mat_mul(D, A, B, m, n, p, nlimbs);
+        _nfixed_mat_mul_classical(C, A, B, m, n, p, nlimbs);
+        _nfixed_mat_mul_strassen(D, A, B, m, n, p, cutoff, nlimbs);
 
         for (i = 0; i < m * p; i++)
         {

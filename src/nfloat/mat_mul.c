@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "double_extras.h"
 #include "mpn_extras.h"
 #include "gr.h"
 #include "gr_vec.h"
@@ -500,27 +501,39 @@ nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong max_e
     if (Adelta > 10 * prec || Bdelta > 10 * prec)
         return GR_UNABLE;
 
-    /*
-    To double check: for Waksman,
-        * The intermediate entries are bounded by 8n max(|A|,|B|)^2.
-        * The error, including error from converting
-          the input matrices, is bounded by 8n ulps.
-    */
+    /* We must scale inputs to 2^(-pad_top) so that intermediate
+       entries satisfy |x| < 1. */
+    {
+        double Abound, Bbound, bound, error;
 
-    pad_top = 3 + FLINT_BIT_COUNT(n);
-    pad_bot = 3 + FLINT_BIT_COUNT(n);
+        pad_top = 2;
+        Abound = Bbound = ldexp(1.0, -pad_top);
+        /* Option: improve accuracy by adding more trailing guard bits. */
+        /* pad_bot = 3 + FLINT_BIT_COUNT(n); */
+        pad_bot = 2;
 
-    extra_bits = Adelta + Bdelta + pad_top + pad_bot;
+        while (1)
+        {
+            Aexp = Amax + pad_top;
+            Bexp = Bmax + pad_top;
+            extra_bits = Adelta + Bdelta + pad_top + pad_bot;
 
-    if (extra_bits >= max_extra_bits)
-        return GR_UNABLE;
+            if (extra_bits >= max_extra_bits)
+                return GR_UNABLE;
 
-    Aexp = Amax + pad_top;
-    Bexp = Bmax + pad_top;
-    fbits = prec + extra_bits;
-    fnlimbs = (fbits + FLINT_BITS - 1) / FLINT_BITS;
+            fbits = prec + extra_bits;
+            fnlimbs = (fbits + FLINT_BITS - 1) / FLINT_BITS;
 
-    return _nfloat_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, ctx);
+            _nfixed_mat_mul_bound(&bound, &error, A->r, n, B->c, Abound, Bbound, fnlimbs);
+
+            if (bound < 0.999)
+                return _nfloat_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, ctx);
+
+            pad_top++;
+            Abound *= 0.5;
+            Bbound *= 0.5;
+        }
+    }
 }
 
 static void
@@ -1389,27 +1402,39 @@ nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slo
     if (Adelta > 10 * prec || Bdelta > 10 * prec)
         return GR_UNABLE;
 
-    /*
-    To double check: for Waksman,
-        * The intermediate entries are bounded by 8n max(|A|,|B|)^2.
-        * The error, including error from converting
-          the input matrices, is bounded by 8n ulps.
-    */
+    /* We must scale inputs to 2^(-pad_top) so that intermediate
+       entries satisfy |x| < 1. */
+    {
+        double Abound, Bbound, bound, error;
 
-    pad_top = 3 + FLINT_BIT_COUNT(n);
-    pad_bot = 3 + FLINT_BIT_COUNT(n);
+        pad_top = 2;
+        Abound = Bbound = ldexp(1.0, -pad_top);
+        /* Option: improve accuracy by adding more trailing guard bits. */
+        /* pad_bot = 3 + FLINT_BIT_COUNT(n); */
+        pad_bot = 2;
 
-    extra_bits = Adelta + Bdelta + pad_top + pad_bot;
+        while (1)
+        {
+            Aexp = Amax + pad_top;
+            Bexp = Bmax + pad_top;
+            extra_bits = Adelta + Bdelta + pad_top + pad_bot;
 
-    if (extra_bits >= max_extra_bits)
-        return GR_UNABLE;
+            if (extra_bits >= max_extra_bits)
+                return GR_UNABLE;
 
-    Aexp = Amax + pad_top;
-    Bexp = Bmax + pad_top;
-    fbits = prec + extra_bits;
-    fnlimbs = (fbits + FLINT_BITS - 1) / FLINT_BITS;
+            fbits = prec + extra_bits;
+            fnlimbs = (fbits + FLINT_BITS - 1) / FLINT_BITS;
 
-    return _nfloat_complex_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, ctx);
+            _nfixed_complex_mat_mul_bound(&bound, &error, A->r, n, B->c, Abound, Abound, Bbound, Bbound, fnlimbs);
+
+            if (bound < 0.999)
+                return _nfloat_complex_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, ctx);
+
+            pad_top++;
+            Abound *= 0.5;
+            Bbound *= 0.5;
+        }
+    }
 }
 
 FLINT_FORCE_INLINE slong
