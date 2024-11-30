@@ -758,6 +758,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
 	    ;;
 	esac
 
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
+
     if test "$have_avx512" = "yes";
     then
         have_avx2="yes"
@@ -802,6 +809,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         have_avx512="yes"
         ;;
     esac
+
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
 
     if test "$have_avx512" = "yes";
     then
