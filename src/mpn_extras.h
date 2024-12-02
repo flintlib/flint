@@ -491,6 +491,7 @@ mp_limb_t flint_mpn_addrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n,
         return FLINT_MPN_ADDRSH_HARD(rp, xp, yp, n, cnt);
     else
     {
+        FLINT_ASSERT(rp != xp);
         mpn_rshift(rp, yp, n, cnt);
         return mpn_add_n(rp, rp, xp, n);
     }
@@ -506,6 +507,7 @@ mp_limb_t flint_mpn_subrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n,
         return FLINT_MPN_SUBRSH_HARD(rp, xp, yp, n, cnt);
     else
     {
+        FLINT_ASSERT(rp != xp);
         mpn_rshift(rp, yp, n, cnt);
         return mpn_sub_n(rp, xp, rp, n);
     }

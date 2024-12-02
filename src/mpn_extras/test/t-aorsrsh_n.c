@@ -53,7 +53,7 @@ TEST_FUNCTION_START(flint_mpn_aorsrsh_n, state)
         /* 0: No aliasing
          * 1: fp = xp
          * 2: fp = yp */
-        aliasing = 0; /* n_randint(state, 3); */
+        aliasing = n_randint(state, 3);
 
         fp = flint_malloc(sizeof(mp_limb_t) * n);
         gp = flint_malloc(sizeof(mp_limb_t) * n);
@@ -65,6 +65,10 @@ TEST_FUNCTION_START(flint_mpn_aorsrsh_n, state)
         cnt = 1 + n_randint(state, FLINT_BITS - 1);
 
         type = n_randint(state, 2);
+
+        /* FIXME */
+        if (n > N_MAX && aliasing == 1)
+            aliasing = 0;
 
         if (type == 0)
         {
@@ -112,7 +116,7 @@ TEST_FUNCTION_START(flint_mpn_aorsrsh_n, state)
                     "FLINT (cy = %wu): %{ulong*}\n"
                     "GMP   (cy = %wu): %{ulong*}\n",
                     type == 0 ? "flint_mpn_addrsh_n" : "flint_mpn_subrsh_n",
-                    aliasing == 0 ? "none" : (aliasing == 1) ? "rp = xp" : "rp = yp",
+                    aliasing == 0 ? "none" : (aliasing == 1 ? "rp = xp" : "rp = yp"),
                     ix, n, cnt, xp, n, yp, n, cf, fp, n, cg, gp, n);
 
         flint_free(fp);
