@@ -13,13 +13,25 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
-#define N_MIN                                     1
-#define N_MAX   (FLINT_MPN_AORS_FUNC_TAB_WIDTH -  1)
-#define N_STOR  (FLINT_MPN_AORS_FUNC_TAB_WIDTH + 10)
+#define N_MIN                                        1
+#define N_MAX   (FLINT_MPN_AORSRSH_FUNC_TAB_WIDTH -  1)
+#define N_STOR  (FLINT_MPN_AORSRSH_FUNC_TAB_WIDTH + 10)
 
-TEST_FUNCTION_START(flint_mpn_aors_n, state)
+static mp_limb_t mpn_addrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n, unsigned int cnt)
 {
-#if FLINT_USE_AORS_FUNC_TAB
+    mpn_rshift(rp, yp, n, cnt);
+    return mpn_add_n(rp, rp, xp, n);
+}
+
+static mp_limb_t mpn_subrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n, unsigned int cnt)
+{
+    mpn_rshift(rp, yp, n, cnt);
+    return mpn_sub_n(rp, xp, rp, n);
+}
+
+TEST_FUNCTION_START(flint_mpn_aorsrsh_n, state)
+{
+#if FLINT_USE_AORSRSH_FUNC_TAB
     slong ix;
 
     for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
@@ -27,6 +39,7 @@ TEST_FUNCTION_START(flint_mpn_aors_n, state)
         int result;
         int type;
         int aliasing;
+        unsigned int cnt;
         mp_limb_t cf, cg;
         mp_size_t n;
         mp_ptr fp, gp, xp, yp;
@@ -47,40 +60,41 @@ TEST_FUNCTION_START(flint_mpn_aors_n, state)
 
         flint_mpn_rrandom(xp, state, n);
         flint_mpn_rrandom(yp, state, n);
+        cnt = 1 + n_randint(state, FLINT_BITS - 1);
 
         type = n_randint(state, 2);
 
         if (type == 0)
         {
             if (aliasing == 0)
-                cf = flint_mpn_add_n(fp, xp, yp, n);
+                cf = flint_mpn_addrsh_n(fp, xp, yp, n, cnt);
             else if (aliasing == 1)
             {
                 flint_mpn_copyi(fp, xp, n);
-                cf = flint_mpn_add_n(fp, fp, yp, n);
+                cf = flint_mpn_addrsh_n(fp, fp, yp, n, cnt);
             }
             else
             {
                 flint_mpn_copyi(fp, yp, n);
-                cf = flint_mpn_add_n(fp, xp, fp, n);
+                cf = flint_mpn_addrsh_n(fp, xp, fp, n, cnt);
             }
-            cg = mpn_add_n(gp, xp, yp, n);
+            cg = mpn_addrsh_n(gp, xp, yp, n, cnt);
         }
         else
         {
             if (aliasing == 0)
-                cf = flint_mpn_sub_n(fp, xp, yp, n);
+                cf = flint_mpn_subrsh_n(fp, xp, yp, n, cnt);
             else if (aliasing == 1)
             {
                 flint_mpn_copyi(fp, xp, n);
-                cf = flint_mpn_sub_n(fp, fp, yp, n);
+                cf = flint_mpn_subrsh_n(fp, fp, yp, n, cnt);
             }
             else
             {
                 flint_mpn_copyi(fp, yp, n);
-                cf = flint_mpn_sub_n(fp, xp, fp, n);
+                cf = flint_mpn_subrsh_n(fp, xp, fp, n, cnt);
             }
-            cg = mpn_sub_n(gp, xp, yp, n);
+            cg = mpn_subrsh_n(gp, xp, yp, n, cnt);
         }
 
         result = (cf == cg && mpn_cmp(fp, gp, n) == 0);
@@ -89,13 +103,14 @@ TEST_FUNCTION_START(flint_mpn_aors_n, state)
                     "%s:\n"
                     "aliasing: %d\n"
                     "ix = %wd\n"
-                    "n = %wd\n"
+                    "n = %u\n"
+                    "cnt = %wd\n"
                     "xp = %{ulong*}\n"
                     "yp = %{ulong*}\n"
                     "FLINT (cy = %wu): %{ulong*}\n"
                     "GMP   (cy = %wu): %{ulong*}\n",
                     type == 0 ? "flint_mpn_add_n" : "flint_mpn_sub_n",
-                    aliasing, ix, n, xp, n, yp, n, cf, fp, n, cg, gp, n + 1);
+                    aliasing, ix, n, cnt, xp, n, yp, n, cf, fp, n, cg, gp, n + 1);
 
         flint_free(fp);
         flint_free(gp);
@@ -108,7 +123,3 @@ TEST_FUNCTION_START(flint_mpn_aors_n, state)
     TEST_FUNCTION_END_SKIPPED(state);
 #endif
 }
-
-#undef N_MIN
-#undef N_MAX
-#undef N_STOR

@@ -463,7 +463,7 @@ mp_limb_t mpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_AORSRSH_FUNC_TAB_WIDTH 17
 
-# define FLINT_HAVE_AORS_FUNC(n) ((n) < FLINT_MPN_AORS_FUNC_TAB_WIDTH)
+# define FLINT_HAVE_AORSRSH_FUNC(n) ((n) < FLINT_MPN_AORSRSH_FUNC_TAB_WIDTH)
 
 # define FLINT_MPN_ADDRSH_HARD(rp, xp, yp, n, cnt) (flint_mpn_addrsh_func_tab[n](rp, xp, yp, cnt))
 # define FLINT_MPN_SUBRSH_HARD(rp, xp, yp, n, cnt) (flint_mpn_subrsh_func_tab[n](rp, xp, yp, cnt))
@@ -485,6 +485,7 @@ MPN_EXTRAS_INLINE
 mp_limb_t flint_mpn_addrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n, unsigned int cnt)
 {
     FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(1 <= cnt && cnt < FLINT_BITS);
 
     if (FLINT_HAVE_AORSRSH_FUNC(n))
         return FLINT_MPN_ADDRSH_HARD(rp, xp, yp, n, cnt);
@@ -499,12 +500,12 @@ MPN_EXTRAS_INLINE
 mp_limb_t flint_mpn_subrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n, unsigned int cnt)
 {
     FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(1 <= cnt && cnt < FLINT_BITS);
 
     if (FLINT_HAVE_AORSRSH_FUNC(n))
         return FLINT_MPN_SUBRSH_HARD(rp, xp, yp, n, cnt);
     else
     {
-        /* r = x - 2^c y */
         mpn_rshift(rp, yp, n, cnt);
         return mpn_sub_n(rp, xp, rp, n);
     }
