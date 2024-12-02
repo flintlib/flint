@@ -28,12 +28,19 @@ R8(sx::String) = "R8($sx)"
 s0 = "s0"
 s1 = "s1"
 s2 = "s2"
-sp = ["s$ix" for ix in 0:2] # Scrap registers
+s3 = "s3"
+sp = ["s$ix" for ix in 0:3] # Scrap registers
 s(ix::Int) = s[ix + 1]
 
 # Writes assembly that should be preprocessed by M4.
-function addrsh(n::Int)
-    str = "\tALIGN(16)\nPROLOGUE(flint_mpn_addrsh_$n)\n"
+function aorsrsh(n::Int; is_add::Bool = true)
+    str = "\tALIGN(16)\nPROLOGUE(flint_mpn_$(is_add ? "add" : "sub")rsh_$n)\n"
+    function push(s0::String)
+        str *= "\tpush\t$s0\n"
+    end
+    function pop(s0::String)
+        str *= "\tpop\t$s0\n"
+    end
     function mov(s0::String, s1::String)
         str *= "\tmov\t$s0, $s1\n"
     end
@@ -66,6 +73,9 @@ function addrsh(n::Int)
     end
 
     # Initialize variables
+    if !is_add
+        push(   s3)
+    end
     xor(    R32(tnc), R32(tnc))
     sub(    cnt, tnc)   # This is modulo 64, so -n = 64 - n.
     xor(    R32(sx), R32(sx))
@@ -76,7 +86,7 @@ function addrsh(n::Int)
             shrx(   cnt, bp(0), s0)
             mov(    bp(ix + 1), s1)
         elseif ix == n - 1
-            shrx(   cnt, s1, s0)
+            shrx(   cnt, s1, s1)
         else
             shrx(   cnt, s1, s0)
             mov(    bp(ix + 1), s1)
@@ -89,15 +99,33 @@ function addrsh(n::Int)
         end
     end # s1, s2 used
     function f_c(ix::Int)
-        if ix == 0
-            add(    ap(ix), s2)
-            mov(    s2, rp(ix))
-        elseif ix == n - 1
-            adc(    ap(ix), s2)
-            mov(    s2, rp(ix))
+        if is_add
+            if ix == 0
+                add(    ap(ix), s2)
+                mov(    s2, rp(ix))
+            elseif ix == n - 1
+                adc(    ap(ix), s1)
+                mov(    s1, rp(ix))
+            else
+                adc(    ap(ix), s2)
+                mov(    s2, rp(ix))
+            end
         else
-            adc(    ap(ix), s0)
-            mov(    s0, rp(ix))
+            # Due to the lack of an `rsub' instruction, we need an extra
+            # register.
+            if ix == 0
+                mov(    ap(ix), s3)
+                sub(    s2, s3)
+                mov(    s3, rp(ix))
+            elseif ix == n - 1
+                mov(    ap(ix), s0)
+                sub(    s1, s0)
+                mov(    s0, rp(ix))
+            else
+                mov(    ap(ix), s3)
+                sbb(    s2, s3)
+                mov(    s3, rp(ix))
+            end
         end
     end # nothing used
 
@@ -111,6 +139,9 @@ function addrsh(n::Int)
     end
     f_c(n - 1)
 
+    if !is_add
+        pop(    s3)
+    end
     setc(   R8(sx))
 
     str *= "\tret\nEPILOGUE()\n"
@@ -118,8 +149,11 @@ function addrsh(n::Int)
     return str
 end
 
-function print_all_addrsh(nmax::Int = 16)
+function print_all_aorsrsh(nmax::Int = 16)
     for n in 2:nmax
-        println(addrsh(n))
+        println(aorsrsh(n, is_add = true))
+    end
+    for n in 2:nmax
+        println(aorsrsh(n, is_add = false))
     end
 end

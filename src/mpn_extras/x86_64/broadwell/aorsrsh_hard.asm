@@ -125,7 +125,8 @@ ifelse(OP,`add',`
 
 	setc	R8(sx)
 	ret
-EPILOGUE()',`')
+EPILOGUE()
+',`')
 
 	TEXT
 	
@@ -148,11 +149,11 @@ PROLOGUE(flint_mpn_addrsh_2)
 	mov	1*8(bp), s1
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
+	shrx	cnt, s1, s1
 	add	0*8(ap), s2
 	mov	s2, 0*8(rp)
-	adc	1*8(ap), s2
-	mov	s2, 1*8(rp)
+	adc	1*8(ap), s1
+	mov	s1, 1*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -172,11 +173,11 @@ PROLOGUE(flint_mpn_addrsh_3)
 	mov	s2, 0*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
-	adc	2*8(ap), s2
-	mov	s2, 2*8(rp)
+	shrx	cnt, s1, s1
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
+	adc	2*8(ap), s1
+	mov	s1, 2*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -198,15 +199,15 @@ PROLOGUE(flint_mpn_addrsh_4)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
-	adc	3*8(ap), s2
-	mov	s2, 3*8(rp)
+	shrx	cnt, s1, s1
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
+	adc	3*8(ap), s1
+	mov	s1, 3*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -228,21 +229,21 @@ PROLOGUE(flint_mpn_addrsh_5)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
-	adc	4*8(ap), s2
-	mov	s2, 4*8(rp)
+	shrx	cnt, s1, s1
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
+	adc	4*8(ap), s1
+	mov	s1, 4*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -264,27 +265,27 @@ PROLOGUE(flint_mpn_addrsh_6)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
-	adc	5*8(ap), s2
-	mov	s2, 5*8(rp)
+	shrx	cnt, s1, s1
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
+	adc	5*8(ap), s1
+	mov	s1, 5*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -306,33 +307,33 @@ PROLOGUE(flint_mpn_addrsh_7)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
-	adc	6*8(ap), s2
-	mov	s2, 6*8(rp)
+	shrx	cnt, s1, s1
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
+	adc	6*8(ap), s1
+	mov	s1, 6*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -354,39 +355,39 @@ PROLOGUE(flint_mpn_addrsh_8)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
-	adc	7*8(ap), s2
-	mov	s2, 7*8(rp)
+	shrx	cnt, s1, s1
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
+	adc	7*8(ap), s1
+	mov	s1, 7*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -408,45 +409,45 @@ PROLOGUE(flint_mpn_addrsh_9)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
-	adc	8*8(ap), s2
-	mov	s2, 8*8(rp)
+	shrx	cnt, s1, s1
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
+	adc	8*8(ap), s1
+	mov	s1, 8*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -468,51 +469,51 @@ PROLOGUE(flint_mpn_addrsh_10)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	9*8(bp), s1
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	8*8(ap), s0
-	mov	s0, 8*8(rp)
-	adc	9*8(ap), s2
-	mov	s2, 9*8(rp)
+	shrx	cnt, s1, s1
+	adc	8*8(ap), s2
+	mov	s2, 8*8(rp)
+	adc	9*8(ap), s1
+	mov	s1, 9*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -534,57 +535,57 @@ PROLOGUE(flint_mpn_addrsh_11)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	9*8(bp), s1
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	10*8(bp), s1
-	adc	8*8(ap), s0
-	mov	s0, 8*8(rp)
+	adc	8*8(ap), s2
+	mov	s2, 8*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	9*8(ap), s0
-	mov	s0, 9*8(rp)
-	adc	10*8(ap), s2
-	mov	s2, 10*8(rp)
+	shrx	cnt, s1, s1
+	adc	9*8(ap), s2
+	mov	s2, 9*8(rp)
+	adc	10*8(ap), s1
+	mov	s1, 10*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -606,63 +607,63 @@ PROLOGUE(flint_mpn_addrsh_12)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	9*8(bp), s1
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	10*8(bp), s1
-	adc	8*8(ap), s0
-	mov	s0, 8*8(rp)
+	adc	8*8(ap), s2
+	mov	s2, 8*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	11*8(bp), s1
-	adc	9*8(ap), s0
-	mov	s0, 9*8(rp)
+	adc	9*8(ap), s2
+	mov	s2, 9*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	10*8(ap), s0
-	mov	s0, 10*8(rp)
-	adc	11*8(ap), s2
-	mov	s2, 11*8(rp)
+	shrx	cnt, s1, s1
+	adc	10*8(ap), s2
+	mov	s2, 10*8(rp)
+	adc	11*8(ap), s1
+	mov	s1, 11*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -684,69 +685,69 @@ PROLOGUE(flint_mpn_addrsh_13)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	9*8(bp), s1
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	10*8(bp), s1
-	adc	8*8(ap), s0
-	mov	s0, 8*8(rp)
+	adc	8*8(ap), s2
+	mov	s2, 8*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	11*8(bp), s1
-	adc	9*8(ap), s0
-	mov	s0, 9*8(rp)
+	adc	9*8(ap), s2
+	mov	s2, 9*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	12*8(bp), s1
-	adc	10*8(ap), s0
-	mov	s0, 10*8(rp)
+	adc	10*8(ap), s2
+	mov	s2, 10*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	11*8(ap), s0
-	mov	s0, 11*8(rp)
-	adc	12*8(ap), s2
-	mov	s2, 12*8(rp)
+	shrx	cnt, s1, s1
+	adc	11*8(ap), s2
+	mov	s2, 11*8(rp)
+	adc	12*8(ap), s1
+	mov	s1, 12*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -768,75 +769,75 @@ PROLOGUE(flint_mpn_addrsh_14)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	9*8(bp), s1
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	10*8(bp), s1
-	adc	8*8(ap), s0
-	mov	s0, 8*8(rp)
+	adc	8*8(ap), s2
+	mov	s2, 8*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	11*8(bp), s1
-	adc	9*8(ap), s0
-	mov	s0, 9*8(rp)
+	adc	9*8(ap), s2
+	mov	s2, 9*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	12*8(bp), s1
-	adc	10*8(ap), s0
-	mov	s0, 10*8(rp)
+	adc	10*8(ap), s2
+	mov	s2, 10*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	13*8(bp), s1
-	adc	11*8(ap), s0
-	mov	s0, 11*8(rp)
+	adc	11*8(ap), s2
+	mov	s2, 11*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	12*8(ap), s0
-	mov	s0, 12*8(rp)
-	adc	13*8(ap), s2
-	mov	s2, 13*8(rp)
+	shrx	cnt, s1, s1
+	adc	12*8(ap), s2
+	mov	s2, 12*8(rp)
+	adc	13*8(ap), s1
+	mov	s1, 13*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -858,81 +859,81 @@ PROLOGUE(flint_mpn_addrsh_15)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	9*8(bp), s1
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	10*8(bp), s1
-	adc	8*8(ap), s0
-	mov	s0, 8*8(rp)
+	adc	8*8(ap), s2
+	mov	s2, 8*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	11*8(bp), s1
-	adc	9*8(ap), s0
-	mov	s0, 9*8(rp)
+	adc	9*8(ap), s2
+	mov	s2, 9*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	12*8(bp), s1
-	adc	10*8(ap), s0
-	mov	s0, 10*8(rp)
+	adc	10*8(ap), s2
+	mov	s2, 10*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	13*8(bp), s1
-	adc	11*8(ap), s0
-	mov	s0, 11*8(rp)
+	adc	11*8(ap), s2
+	mov	s2, 11*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	14*8(bp), s1
-	adc	12*8(ap), s0
-	mov	s0, 12*8(rp)
+	adc	12*8(ap), s2
+	mov	s2, 12*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
-	shrx	cnt, s1, s0
-	adc	13*8(ap), s0
-	mov	s0, 13*8(rp)
-	adc	14*8(ap), s2
-	mov	s2, 14*8(rp)
+	shrx	cnt, s1, s1
+	adc	13*8(ap), s2
+	mov	s2, 13*8(rp)
+	adc	14*8(ap), s1
+	mov	s1, 14*8(rp)
 	setc	R8(sx)
 	ret
 EPILOGUE()
@@ -954,87 +955,1162 @@ PROLOGUE(flint_mpn_addrsh_16)
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	3*8(bp), s1
-	adc	1*8(ap), s0
-	mov	s0, 1*8(rp)
+	adc	1*8(ap), s2
+	mov	s2, 1*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	4*8(bp), s1
-	adc	2*8(ap), s0
-	mov	s0, 2*8(rp)
+	adc	2*8(ap), s2
+	mov	s2, 2*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	5*8(bp), s1
-	adc	3*8(ap), s0
-	mov	s0, 3*8(rp)
+	adc	3*8(ap), s2
+	mov	s2, 3*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	6*8(bp), s1
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
+	adc	4*8(ap), s2
+	mov	s2, 4*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	7*8(bp), s1
-	adc	5*8(ap), s0
-	mov	s0, 5*8(rp)
+	adc	5*8(ap), s2
+	mov	s2, 5*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	8*8(bp), s1
-	adc	6*8(ap), s0
-	mov	s0, 6*8(rp)
+	adc	6*8(ap), s2
+	mov	s2, 6*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	9*8(bp), s1
-	adc	7*8(ap), s0
-	mov	s0, 7*8(rp)
+	adc	7*8(ap), s2
+	mov	s2, 7*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	10*8(bp), s1
-	adc	8*8(ap), s0
-	mov	s0, 8*8(rp)
+	adc	8*8(ap), s2
+	mov	s2, 8*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	11*8(bp), s1
-	adc	9*8(ap), s0
-	mov	s0, 9*8(rp)
+	adc	9*8(ap), s2
+	mov	s2, 9*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	12*8(bp), s1
-	adc	10*8(ap), s0
-	mov	s0, 10*8(rp)
+	adc	10*8(ap), s2
+	mov	s2, 10*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	13*8(bp), s1
-	adc	11*8(ap), s0
-	mov	s0, 11*8(rp)
+	adc	11*8(ap), s2
+	mov	s2, 11*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	14*8(bp), s1
-	adc	12*8(ap), s0
-	mov	s0, 12*8(rp)
+	adc	12*8(ap), s2
+	mov	s2, 12*8(rp)
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
 	mov	15*8(bp), s1
-	adc	13*8(ap), s0
-	mov	s0, 13*8(rp)
+	adc	13*8(ap), s2
+	mov	s2, 13*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	adc	14*8(ap), s2
+	mov	s2, 14*8(rp)
+	adc	15*8(ap), s1
+	mov	s1, 15*8(rp)
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_1)
+	shrx	cnt, 0*8(bp), s0
+	xor	R32(sx), R32(sx)
+	mov	0*8(ap), s1
+	sub	s0, s1
+	mov	s1, 0*8(rp)
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+dnl Modified to avoid pushing and popping s3
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_2)
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	0*8(ap), tnc
+	sub	s2, tnc
+	mov	tnc, 0*8(rp)
+	mov	1*8(ap), s0
+	sub	s1, s0
+	mov	s0, 1*8(rp)
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_3)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
 	shlx	tnc, s1, s2
 	lea	(s0, s2), s2
 	shrx	cnt, s1, s0
-	adc	14*8(ap), s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	mov	2*8(ap), s0
+	sub	s1, s0
+	mov	s0, 2*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_4)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	mov	3*8(ap), s0
+	sub	s1, s0
+	mov	s0, 3*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_5)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	mov	4*8(ap), s0
+	sub	s1, s0
+	mov	s0, 4*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_6)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	mov	5*8(ap), s0
+	sub	s1, s0
+	mov	s0, 5*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_7)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	mov	6*8(ap), s0
+	sub	s1, s0
+	mov	s0, 6*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_8)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	mov	7*8(ap), s0
+	sub	s1, s0
+	mov	s0, 7*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_9)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	mov	8*8(ap), s0
+	sub	s1, s0
+	mov	s0, 8*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_10)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	9*8(bp), s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	8*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 8*8(rp)
+	mov	9*8(ap), s0
+	sub	s1, s0
+	mov	s0, 9*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_11)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	9*8(bp), s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	10*8(bp), s1
+	mov	8*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 8*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	9*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 9*8(rp)
+	mov	10*8(ap), s0
+	sub	s1, s0
+	mov	s0, 10*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_12)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	9*8(bp), s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	10*8(bp), s1
+	mov	8*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 8*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	11*8(bp), s1
+	mov	9*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 9*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	10*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 10*8(rp)
+	mov	11*8(ap), s0
+	sub	s1, s0
+	mov	s0, 11*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_13)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	9*8(bp), s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	10*8(bp), s1
+	mov	8*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 8*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	11*8(bp), s1
+	mov	9*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 9*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	12*8(bp), s1
+	mov	10*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 10*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	11*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 11*8(rp)
+	mov	12*8(ap), s0
+	sub	s1, s0
+	mov	s0, 12*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_14)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	9*8(bp), s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	10*8(bp), s1
+	mov	8*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 8*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	11*8(bp), s1
+	mov	9*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 9*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	12*8(bp), s1
+	mov	10*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 10*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	13*8(bp), s1
+	mov	11*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 11*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	12*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 12*8(rp)
+	mov	13*8(ap), s0
+	sub	s1, s0
+	mov	s0, 13*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_15)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	9*8(bp), s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	10*8(bp), s1
+	mov	8*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 8*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	11*8(bp), s1
+	mov	9*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 9*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	12*8(bp), s1
+	mov	10*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 10*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	13*8(bp), s1
+	mov	11*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 11*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	14*8(bp), s1
+	mov	12*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 12*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	13*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 13*8(rp)
+	mov	14*8(ap), s0
+	sub	s1, s0
 	mov	s0, 14*8(rp)
-	adc	15*8(ap), s2
-	mov	s2, 15*8(rp)
+	pop	s3
+	setc	R8(sx)
+	ret
+EPILOGUE()
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_subrsh_16)
+	push	s3
+	xor	R32(tnc), R32(tnc)
+	sub	cnt, tnc
+	xor	R32(sx), R32(sx)
+	shrx	cnt, 0*8(bp), s0
+	mov	1*8(bp), s1
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	2*8(bp), s1
+	mov	0*8(ap), s3
+	sub	s2, s3
+	mov	s3, 0*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	3*8(bp), s1
+	mov	1*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 1*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	4*8(bp), s1
+	mov	2*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 2*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	5*8(bp), s1
+	mov	3*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 3*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	6*8(bp), s1
+	mov	4*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 4*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	7*8(bp), s1
+	mov	5*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 5*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	8*8(bp), s1
+	mov	6*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 6*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	9*8(bp), s1
+	mov	7*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 7*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	10*8(bp), s1
+	mov	8*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 8*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	11*8(bp), s1
+	mov	9*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 9*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	12*8(bp), s1
+	mov	10*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 10*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	13*8(bp), s1
+	mov	11*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 11*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	14*8(bp), s1
+	mov	12*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 12*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s0
+	mov	15*8(bp), s1
+	mov	13*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 13*8(rp)
+	shlx	tnc, s1, s2
+	lea	(s0, s2), s2
+	shrx	cnt, s1, s1
+	mov	14*8(ap), s3
+	sbb	s2, s3
+	mov	s3, 14*8(rp)
+	mov	15*8(ap), s0
+	sub	s1, s0
+	mov	s0, 15*8(rp)
+	pop	s3
 	setc	R8(sx)
 	ret
 EPILOGUE()
