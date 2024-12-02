@@ -1066,7 +1066,7 @@ PROLOGUE(flint_mpn_subrsh_2)
 	sub	s2, tnc
 	mov	tnc, 0*8(rp)
 	mov	1*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 1*8(rp)
 	setc	R8(sx)
 	ret
@@ -1094,7 +1094,7 @@ PROLOGUE(flint_mpn_subrsh_3)
 	sbb	s2, s3
 	mov	s3, 1*8(rp)
 	mov	2*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 2*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1130,7 +1130,7 @@ PROLOGUE(flint_mpn_subrsh_4)
 	sbb	s2, s3
 	mov	s3, 2*8(rp)
 	mov	3*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 3*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1173,7 +1173,7 @@ PROLOGUE(flint_mpn_subrsh_5)
 	sbb	s2, s3
 	mov	s3, 3*8(rp)
 	mov	4*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 4*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1223,7 +1223,7 @@ PROLOGUE(flint_mpn_subrsh_6)
 	sbb	s2, s3
 	mov	s3, 4*8(rp)
 	mov	5*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 5*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1280,7 +1280,7 @@ PROLOGUE(flint_mpn_subrsh_7)
 	sbb	s2, s3
 	mov	s3, 5*8(rp)
 	mov	6*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 6*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1344,7 +1344,7 @@ PROLOGUE(flint_mpn_subrsh_8)
 	sbb	s2, s3
 	mov	s3, 6*8(rp)
 	mov	7*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 7*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1415,7 +1415,7 @@ PROLOGUE(flint_mpn_subrsh_9)
 	sbb	s2, s3
 	mov	s3, 7*8(rp)
 	mov	8*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 8*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1493,7 +1493,7 @@ PROLOGUE(flint_mpn_subrsh_10)
 	sbb	s2, s3
 	mov	s3, 8*8(rp)
 	mov	9*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 9*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1578,7 +1578,7 @@ PROLOGUE(flint_mpn_subrsh_11)
 	sbb	s2, s3
 	mov	s3, 9*8(rp)
 	mov	10*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 10*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1670,7 +1670,7 @@ PROLOGUE(flint_mpn_subrsh_12)
 	sbb	s2, s3
 	mov	s3, 10*8(rp)
 	mov	11*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 11*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1769,7 +1769,7 @@ PROLOGUE(flint_mpn_subrsh_13)
 	sbb	s2, s3
 	mov	s3, 11*8(rp)
 	mov	12*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 12*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1875,7 +1875,7 @@ PROLOGUE(flint_mpn_subrsh_14)
 	sbb	s2, s3
 	mov	s3, 12*8(rp)
 	mov	13*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 13*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -1988,7 +1988,7 @@ PROLOGUE(flint_mpn_subrsh_15)
 	sbb	s2, s3
 	mov	s3, 13*8(rp)
 	mov	14*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 14*8(rp)
 	pop	s3
 	setc	R8(sx)
@@ -2108,7 +2108,7 @@ PROLOGUE(flint_mpn_subrsh_16)
 	sbb	s2, s3
 	mov	s3, 14*8(rp)
 	mov	15*8(ap), s0
-	sub	s1, s0
+	sbb	s1, s0
 	mov	s0, 15*8(rp)
 	pop	s3
 	setc	R8(sx)

@@ -119,7 +119,7 @@ function aorsrsh(n::Int; is_add::Bool = true)
                 mov(    s3, rp(ix))
             elseif ix == n - 1
                 mov(    ap(ix), s0)
-                sub(    s1, s0)
+                sbb(    s1, s0)
                 mov(    s0, rp(ix))
             else
                 mov(    ap(ix), s3)

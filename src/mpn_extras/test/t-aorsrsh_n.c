@@ -102,7 +102,7 @@ TEST_FUNCTION_START(flint_mpn_aorsrsh_n, state)
         result = (cf == cg && mpn_cmp(fp, gp, n) == 0);
         if (!result)
             TEST_FUNCTION_FAIL(
-                    "%s:\n"
+                    "function: %s\n"
                     "aliasing: %s\n"
                     "ix = %wd\n"
                     "n = %wd\n"
