@@ -76,7 +76,7 @@ function aorsrsh(n::Int; is_add::Bool = true)
     if !is_add
         push(   s3)
     end
-    xor(    R32(tnc), R32(tnc))
+    xor(    tnc, tnc)   # We do not use 32 bit mode here since tnc = %r8.
     sub(    cnt, tnc)   # This is modulo 64, so -n = 64 - n.
     xor(    R32(sx), R32(sx))
 

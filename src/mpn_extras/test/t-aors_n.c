@@ -87,7 +87,7 @@ TEST_FUNCTION_START(flint_mpn_aors_n, state)
         if (!result)
             TEST_FUNCTION_FAIL(
                     "%s:\n"
-                    "aliasing: %d\n"
+                    "aliasing: %s\n"
                     "ix = %wd\n"
                     "n = %wd\n"
                     "xp = %{ulong*}\n"
@@ -95,7 +95,8 @@ TEST_FUNCTION_START(flint_mpn_aors_n, state)
                     "FLINT (cy = %wu): %{ulong*}\n"
                     "GMP   (cy = %wu): %{ulong*}\n",
                     type == 0 ? "flint_mpn_add_n" : "flint_mpn_sub_n",
-                    aliasing, ix, n, xp, n, yp, n, cf, fp, n, cg, gp, n + 1);
+                    aliasing == 0 ? "none" : (aliasing == 1) ? "rp = xp" : "rp = yp",
+                    ix, n, xp, n, yp, n, cf, fp, n, cg, gp, n);
 
         flint_free(fp);
         flint_free(gp);

@@ -54,79 +54,79 @@ dnl   rp[i] = u		C mov
 dnl fi
 
 dnl Non-optimized version.
-ifdef(blablablabla,`
-	ALIGN(16)
-PROLOGUE(flint_mpn_aorsrsh_5)
-	xor	R32(tnc), R32(tnc)
-	sub	cnt, tnc
-	xor	R32(sx), R32(sx)
-
-	shrx	cnt, 0*8(bp), s0
-	mov	1*8(bp), s1
-	shlx	tnc, s1, s2
-	lea	(s0, s2), s2
-ifelse(OP,`add',`
-	add	0*8(ap), s2
-	mov	s2, 0*8(rp)
-',`
-	mov	0*8(ap), s0
-	sub	s2, s0
-	mov	s0, 0*8(rp)
-')
-
-	shrx	cnt, s1, s0
-	mov	2*8(bp), s1
-	shlx	tnc, s1, s2
-	lea	(s0, s2), s2
-ifelse(OP,`add',`
-	adc	1*8(ap), s2
-	mov	s2, 1*8(rp)
-',`
-	mov	1*8(ap), s0
-	sbb	s2, s0
-	mov	s0, 1*8(rp)
-')
-
-	shrx	cnt, s1, s0
-	mov	3*8(bp), s1
-	shlx	tnc, s1, s2
-	lea	(s0, s2), s2
-ifelse(OP,`add',`
-	adc	2*8(ap), s2
-	mov	s2, 2*8(rp)
-',`
-	mov	2*8(ap), s0
-	sbb	s2, s0
-	mov	s0, 2*8(rp)
-')
-
-	shrx	cnt, s1, s0
-	mov	4*8(bp), s1
-	shlx	tnc, s1, s2
-	lea	(s0, s2), s2
-ifelse(OP,`add',`
-	adc	3*8(ap), s2
-	mov	s2, 3*8(rp)
-',`
-	mov	3*8(ap), s0
-	sbb	s2, s0
-	mov	s0, 3*8(rp)
-')
-
-	shrx	cnt, s1, s0
-ifelse(OP,`add',`
-	adc	4*8(ap), s0
-	mov	s0, 4*8(rp)
-',`
-	mov	4*8(ap), s2
-	sbb	s0, s2
-	mov	s2, 4*8(rp)
-')
-
-	setc	R8(sx)
-	ret
-EPILOGUE()
-',`')
+dnl ifdef(blablablabla,`
+dnl 	ALIGN(16)
+dnl PROLOGUE(flint_mpn_aorsrsh_5)
+dnl 	xor	tnc, tnc
+dnl 	sub	cnt, tnc
+dnl 	xor	R32(sx), R32(sx)
+dnl 
+dnl 	shrx	cnt, 0*8(bp), s0
+dnl 	mov	1*8(bp), s1
+dnl 	shlx	tnc, s1, s2
+dnl 	lea	(s0, s2), s2
+dnl ifelse(OP,`add',`
+dnl 	add	0*8(ap), s2
+dnl 	mov	s2, 0*8(rp)
+dnl ',`
+dnl 	mov	0*8(ap), s0
+dnl 	sub	s2, s0
+dnl 	mov	s0, 0*8(rp)
+dnl ')
+dnl 
+dnl 	shrx	cnt, s1, s0
+dnl 	mov	2*8(bp), s1
+dnl 	shlx	tnc, s1, s2
+dnl 	lea	(s0, s2), s2
+dnl ifelse(OP,`add',`
+dnl 	adc	1*8(ap), s2
+dnl 	mov	s2, 1*8(rp)
+dnl ',`
+dnl 	mov	1*8(ap), s0
+dnl 	sbb	s2, s0
+dnl 	mov	s0, 1*8(rp)
+dnl ')
+dnl 
+dnl 	shrx	cnt, s1, s0
+dnl 	mov	3*8(bp), s1
+dnl 	shlx	tnc, s1, s2
+dnl 	lea	(s0, s2), s2
+dnl ifelse(OP,`add',`
+dnl 	adc	2*8(ap), s2
+dnl 	mov	s2, 2*8(rp)
+dnl ',`
+dnl 	mov	2*8(ap), s0
+dnl 	sbb	s2, s0
+dnl 	mov	s0, 2*8(rp)
+dnl ')
+dnl 
+dnl 	shrx	cnt, s1, s0
+dnl 	mov	4*8(bp), s1
+dnl 	shlx	tnc, s1, s2
+dnl 	lea	(s0, s2), s2
+dnl ifelse(OP,`add',`
+dnl 	adc	3*8(ap), s2
+dnl 	mov	s2, 3*8(rp)
+dnl ',`
+dnl 	mov	3*8(ap), s0
+dnl 	sbb	s2, s0
+dnl 	mov	s0, 3*8(rp)
+dnl ')
+dnl 
+dnl 	shrx	cnt, s1, s0
+dnl ifelse(OP,`add',`
+dnl 	adc	4*8(ap), s0
+dnl 	mov	s0, 4*8(rp)
+dnl ',`
+dnl 	mov	4*8(ap), s2
+dnl 	sbb	s0, s2
+dnl 	mov	s2, 4*8(rp)
+dnl ')
+dnl 
+dnl 	setc	R8(sx)
+dnl 	ret
+dnl EPILOGUE()
+dnl ')
 
 	TEXT
 	
@@ -142,7 +142,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_2)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -160,7 +160,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_3)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -184,7 +184,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_4)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -214,7 +214,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_5)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -250,7 +250,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_6)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -292,7 +292,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_7)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -340,7 +340,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_8)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -394,7 +394,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_9)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -454,7 +454,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_10)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -520,7 +520,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_11)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -592,7 +592,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_12)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -670,7 +670,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_13)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -754,7 +754,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_14)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -844,7 +844,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_15)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -940,7 +940,7 @@ EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_addrsh_16)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1054,7 +1054,7 @@ EPILOGUE()
 dnl Modified to avoid pushing and popping s3
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_2)
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1075,7 +1075,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_3)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1104,7 +1104,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_4)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1140,7 +1140,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_5)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1183,7 +1183,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_6)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1233,7 +1233,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_7)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1290,7 +1290,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_8)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1354,7 +1354,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_9)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1425,7 +1425,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_10)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1503,7 +1503,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_11)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1588,7 +1588,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_12)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1680,7 +1680,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_13)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1779,7 +1779,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_14)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1885,7 +1885,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_15)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0
@@ -1998,7 +1998,7 @@ EPILOGUE()
 	ALIGN(16)
 PROLOGUE(flint_mpn_subrsh_16)
 	push	s3
-	xor	R32(tnc), R32(tnc)
+	xor	tnc, tnc
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
 	shrx	cnt, 0*8(bp), s0

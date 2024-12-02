@@ -40,8 +40,6 @@ DECL_AORSRSH(14);
 DECL_AORSRSH(15);
 DECL_AORSRSH(16);
 
-/* TODO: Should probably rename these types so to not have two different types.
- * Probably something like `mpn_binary_h_func`, where `h` is for hardcoded. */
 const flint_mpn_aorssh_func_t flint_mpn_addrsh_func_tab[] =
 {
     NULL,
@@ -63,7 +61,7 @@ const flint_mpn_aorssh_func_t flint_mpn_addrsh_func_tab[] =
     ADDRSH(16)
 };
 
-const flint_mpn_aorssh_func_t flint_mpn_subsh_func_tab[] =
+const flint_mpn_aorssh_func_t flint_mpn_subrsh_func_tab[] =
 {
     NULL,
     SUBRSH(1),
