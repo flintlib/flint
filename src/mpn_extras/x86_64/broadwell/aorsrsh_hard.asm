@@ -53,11 +53,10 @@ dnl   u -= s		C sbb
 dnl   rp[i] = u		C mov
 dnl fi
 
-dnl Non-optimized.  We probably should optimize add and sub differently.  We
-dnl probably need to use more registers to interleave more.
+dnl Non-optimized version.
 ifdef(blablablabla,`
 	ALIGN(16)
-PROLOGUE(flint_mpn_addrsh_5)
+PROLOGUE(flint_mpn_aorsrsh_5)
 	xor	R32(tnc), R32(tnc)
 	sub	cnt, tnc
 	xor	R32(sx), R32(sx)
