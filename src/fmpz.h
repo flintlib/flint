@@ -378,6 +378,13 @@ void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
 void fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e);
 int fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e);
 
+void fmpz_sum_powers(fmpz_t f, const fmpz_t g, ulong exp);
+void fmpz_sum_powers_horner(fmpz_t f, const fmpz_t g, ulong exp);
+void fmpz_sum_powers_div(fmpz_t f, const fmpz_t g, ulong exp);
+
+void fmpz_sum_divisors(fmpz_t f, const fmpz_t g);
+void fmpz_sum_divisors_proper(fmpz_t f, const fmpz_t g);
+
 void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
