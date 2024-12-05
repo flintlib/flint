@@ -223,6 +223,23 @@ then
 elif test "$1" = "padic";
 then
     echo "padic....SKIPPED"
+elif test "$1" = "padic_roots"
+then
+    echo -n "padic_roots...."
+    res=$($2/padic_roots 11)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/8\*11\^62\ \+\ 4\*11\^63 \(1\)/g) { $found=1; last } END { exit !$found }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0
 elif test "$1" = "partitions";
 then
     echo "partitions....SKIPPED"
