@@ -216,7 +216,7 @@ jobs:
           brew install autoconf
           brew install libtool
           brew install automake
-          $(brew --prefix llvm@15)/bin/clang --version
+          $(brew --prefix llvm)/bin/clang --version
           gmake --version
           autoconf --version
           echo "MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target" >> $GITHUB_ENV
@@ -225,7 +225,7 @@ jobs:
         run: |
           ./bootstrap.sh
           ./configure \
-            CC=$(brew --prefix llvm@15)/bin/clang \
+            CC=$(brew --prefix llvm)/bin/clang \
             --with-gmp=$(brew --prefix) \
             --with-mpfr=$(brew --prefix) \
             --disable-debug
