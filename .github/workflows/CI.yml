@@ -216,6 +216,7 @@ jobs:
           brew install autoconf
           brew install libtool
           brew install automake
+          brew install llvm
           $(brew --prefix llvm)/bin/clang --version
           gmake --version
           autoconf --version
