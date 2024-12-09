@@ -192,7 +192,7 @@ jobs:
   macos-m1:
     name: macOS-M1, Clang (x3)
 
-    runs-on: macos-14
+    runs-on: macos-15
 
     env:
       FLINT_TEST_MULTIPLIER: "3"
@@ -208,13 +208,16 @@ jobs:
 
       - name: "Setup"
         run: |
+          # GMP and MPFR are already installed, and it complains if we try to
+          # install it.
+          #   brew install gmp
+          #   brew install mpfr
           brew install make
-          brew install gmp
-          brew install mpfr
           brew install autoconf
           brew install libtool
           brew install automake
-          $(brew --prefix llvm@15)/bin/clang --version
+          brew install llvm
+          $(brew --prefix llvm)/bin/clang --version
           gmake --version
           autoconf --version
           echo "MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target" >> $GITHUB_ENV
@@ -223,67 +226,9 @@ jobs:
         run: |
           ./bootstrap.sh
           ./configure \
-            CC=$(brew --prefix llvm@15)/bin/clang \
+            CC=$(brew --prefix llvm)/bin/clang \
             --with-gmp=$(brew --prefix) \
             --with-mpfr=$(brew --prefix) \
-            --disable-debug
-
-      - name: "Compile library"
-        run: |
-          $MAKE
-
-      - name: "Compile tests"
-        run: |
-          $MAKE tests
-
-      - name: "Check"
-        run: |
-          $MAKE check
-
-
-
-  ##############################################################################
-  # macos (x86) with clang and blas
-  ##############################################################################
-  macos-x86:
-    name: macOS-x86 Clang with BLAS (x2)
-
-    runs-on: macos-12
-
-    env:
-      FLINT_TEST_MULTIPLIER: "2"
-
-    steps:
-      - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-
-      - name: "Setup"
-        run: |
-          brew install make
-          brew install gmp
-          brew install mpfr
-          brew install autoconf
-          brew install libtool
-          brew install automake
-          brew install openblas
-          $(brew --prefix llvm@15)/bin/clang --version
-          gmake --version
-          autoconf --version
-          echo "MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target" >> $GITHUB_ENV
-
-      - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=$(brew --prefix llvm@15)/bin/clang \
-            --with-gmp=$(brew --prefix) \
-            --with-mpfr=$(brew --prefix) \
-            --with-blas=$(brew --prefix)/opt/openblas \
             --disable-debug
 
       - name: "Compile library"
@@ -301,12 +246,16 @@ jobs:
 
 
   #############################################################################
-  # ubuntu with clang
+  # ubuntu with clang and BLAS
   #############################################################################
   ubuntu-clang:
-    name: Ubuntu Clang with examples (x5)
+    name: Ubuntu Clang, BLAS and examples (x5)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+
+    # NOTE: Clang is currently buggy on Ubuntu.  Hence, we temporarily allow
+    # this job to fail.
+    continue-on-error: true
 
     env:
       LOCAL: ${{ github.workspace }}/local
@@ -325,7 +274,7 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin perl
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin perl libopenblas-dev
           clang --version
           make --version
           autoconf --version
@@ -338,6 +287,7 @@ jobs:
           ./bootstrap.sh
           ./configure \
             CC=${CC} \
+            --with-blas \
             --disable-debug
 
       - name: "Compile library"
@@ -496,7 +446,7 @@ jobs:
   alpine-32bit:
     name: Alpine Linux, musl, 32-bit (assert, x1.5)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CC: "gcc"
@@ -565,7 +515,7 @@ jobs:
   # nemo
   ##############################################################################
   nemo:
-    name: Nemo.jl (temporary branch)
+    name: Nemo.jl
 
     runs-on: ubuntu-24.04
 

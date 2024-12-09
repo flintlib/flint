@@ -186,9 +186,9 @@ do \
 #define _mul_ppmm(big_type, small_type, r1, r0, u, v) \
 do \
 { \
-    big_type __r = (big_type) ((small_type) u) * (big_type) ((small_type) v); \
-    (r0) = (small_type) __r; \
-    (r1) = (small_type) (__r >> FLINT_BITS); \
+    big_type __rx = (big_type) ((small_type) u) * (big_type) ((small_type) v); \
+    (r0) = (small_type) __rx; \
+    (r1) = (small_type) (__rx >> FLINT_BITS); \
 } while (0)
 
 #define umul_ppmm(r1, r0, u, v) _mul_ppmm(_STOR_ULONG, ulong, r1, r0, u, v)
