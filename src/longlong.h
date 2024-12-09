@@ -65,7 +65,7 @@ extern "C" {
 
 /* Trailing and leading zeros */
 #if !defined(flint_ctz)
-# define NEED_CLZ_TAB
+# define NEED_CLZ_TAB 1
 FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 
 # define flint_clz flint_clz
