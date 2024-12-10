@@ -138,7 +138,7 @@ _flint_mpn_mullow_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 mp_limb_t
 _flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    if (n <= FLINT_MPN_MULHIGH_MULDERS_CUTOFF)
+    if (n <= FLINT_MPN_MULLOW_MULDERS_CUTOFF)
         return flint_mpn_mullow_basecase(res, u, v, n);
     else if (n <= FLINT_MPN_MULHIGH_MUL_CUTOFF)
         return _flint_mpn_mullow_n_mulders(res, u, v, n);

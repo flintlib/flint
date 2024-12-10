@@ -23,6 +23,66 @@ mp_limb_t flint_mpn_mulhigh_7(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_8(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_9(mp_ptr, mp_srcptr, mp_srcptr);
 
+mp_limb_t flint_mpn_mulhigh_10(nn_ptr r, nn_srcptr x, nn_srcptr y)
+{
+    mp_limb_t w0, w1, lo, w2, cy;
+
+    w0 = flint_mpn_mulhigh_9(r, x + 1, y);
+    r[9] = mpn_addmul_1(r, x + 1, 9, y[9]);
+    umul_ppmm(w1, lo, x[0], y[8]);
+    umul_ppmm(cy, w2, x[0], y[9]);
+    add_ssaaaa(cy, w0, cy, w0, 0, w1);
+    add_ssaaaa(cy, w0, cy, w0, 0, w2);
+    MPN_INCR_U(r, 10, cy);
+
+    return w0;
+}
+
+mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
+{
+    mp_limb_t w0, w1, lo, w2, cy;
+
+    w0 = flint_mpn_mulhigh_10(r, x + 1, y);
+    r[10] = mpn_addmul_1(r, x + 1, 10, y[10]);
+    umul_ppmm(w1, lo, x[0], y[9]);
+    umul_ppmm(cy, w2, x[0], y[10]);
+    add_ssaaaa(cy, w0, cy, w0, 0, w1);
+    add_ssaaaa(cy, w0, cy, w0, 0, w2);
+    MPN_INCR_U(r, 11, cy);
+
+    return w0;
+}
+
+mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
+{
+    mp_limb_t w0, w1, lo, w2, cy;
+
+    w0 = flint_mpn_mulhigh_11(r, x + 1, y);
+    r[11] = mpn_addmul_1(r, x + 1, 11, y[11]);
+    umul_ppmm(w1, lo, x[0], y[10]);
+    umul_ppmm(cy, w2, x[0], y[11]);
+    add_ssaaaa(cy, w0, cy, w0, 0, w1);
+    add_ssaaaa(cy, w0, cy, w0, 0, w2);
+    MPN_INCR_U(r, 12, cy);
+
+    return w0;
+}
+
+mp_limb_t flint_mpn_mulhigh_13(nn_ptr r, nn_srcptr x, nn_srcptr y)
+{
+    mp_limb_t w0, w1, lo, w2, cy;
+
+    w0 = flint_mpn_mulhigh_12(r, x + 1, y);
+    r[12] = mpn_addmul_1(r, x + 1, 12, y[12]);
+    umul_ppmm(w1, lo, x[0], y[11]);
+    umul_ppmm(cy, w2, x[0], y[12]);
+    add_ssaaaa(cy, w0, cy, w0, 0, w1);
+    add_ssaaaa(cy, w0, cy, w0, 0, w2);
+    MPN_INCR_U(r, 13, cy);
+
+    return w0;
+}
+
 mp_limb_pair_t flint_mpn_mulhigh_normalised_1(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_pair_t flint_mpn_mulhigh_normalised_2(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_pair_t flint_mpn_mulhigh_normalised_3(mp_ptr, mp_srcptr, mp_srcptr);
@@ -44,7 +104,11 @@ const flint_mpn_mul_func_t flint_mpn_mulhigh_func_tab[] =
     flint_mpn_mulhigh_6,
     flint_mpn_mulhigh_7,
     flint_mpn_mulhigh_8,
-    flint_mpn_mulhigh_9
+    flint_mpn_mulhigh_9,
+    flint_mpn_mulhigh_10,
+    flint_mpn_mulhigh_11,
+    flint_mpn_mulhigh_12,
+    flint_mpn_mulhigh_13,
 };
 
 const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[] =
