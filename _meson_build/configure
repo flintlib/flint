@@ -1,0 +1,217 @@
+#!/usr/bin/env python
+
+from os.path import join, abspath, dirname
+import sys
+import shutil
+from subprocess import check_call
+from argparse import ArgumentParser
+
+
+def enable_disable_to_do(args, feature):
+    """Translate --enable-foo=no etc to foo=True/False/None"""
+    enable = getattr(args, 'enable_' + feature)
+    disable = getattr(args, 'disable_' + feature)
+    if enable is not None and disable is not None:
+        msg = 'Cannot use --enable-{} and --disable-{} together'
+        raise ValueError(msg.format(feature, feature))
+    if enable is not None:
+        return enable == 'yes'
+    if disable is not None:
+        return disable == 'no'
+    return None
+
+
+def run_command(cmd):
+    print('-' * 80)
+    print('$', ' '.join(cmd))
+    print('-' * 80)
+    check_call(cmd)
+
+
+def enabled_disabled(value):
+    if value is True:
+        return 'enabled'
+    elif value is False:
+        return 'disabled'
+    else:
+        raise ValueError('Invalid value: ' + value)
+
+
+def true_false(value):
+    if value is True:
+        return 'true'
+    elif value is False:
+        return 'false'
+    else:
+        raise ValueError('Invalid value: ' + str(value))
+
+
+def add_feature_option(parser, feature):
+    parser.add_argument('--enable-' + feature, help='Enable ' + feature,
+        choices=['yes', 'no', 'auto'], nargs='?', const='yes', action='store')
+    parser.add_argument('--disable-' + feature, help='Disable ' + feature,
+        choices=['yes', 'no', 'auto'], nargs='?', const='yes', action='store')
+
+
+def add_with_option(parser, libname, default):
+    parser.add_argument('--with-' + libname, help=f'Link to {libname}',
+        default=default, const=True, nargs='?')
+
+
+parser = ArgumentParser(description='Configure FLINT for building with meson')
+
+parser.add_argument('--build-dir', default='build.meson', help='Build directory')
+
+parser.add_argument('--prefix', default=None, help='Installation prefix')
+parser.add_argument('--bindir', default=None, help='Binary directory')
+parser.add_argument('--libdir', default=None, help='Library directory')
+parser.add_argument('--includedir', default=None, help='Include directory')
+
+parser.add_argument('--build', default=None, help='Not supported...')
+parser.add_argument('--host', default=None, help='Not supported...')
+
+add_feature_option(parser, 'shared')
+add_feature_option(parser, 'static')
+
+add_feature_option(parser, 'libtool-lock')
+add_feature_option(parser, 'pthread')
+add_feature_option(parser, 'reentrant')
+add_feature_option(parser, 'thread-safe')
+add_feature_option(parser, 'assert')
+add_feature_option(parser, 'coverage')
+add_feature_option(parser, 'debug')
+add_feature_option(parser, 'dependency-tracking')
+add_feature_option(parser, 'pretty-tests')
+
+add_feature_option(parser, 'gmp-internals')
+add_feature_option(parser, 'assembly')
+add_feature_option(parser, 'avx2')
+add_feature_option(parser, 'avx512')
+
+add_with_option(parser, 'gmp', default=True)
+add_with_option(parser, 'mpfr', default=True)
+add_with_option(parser, 'ntl', default=False)
+
+parser.add_argument('--with-blas', default=None, help='Not supported...')
+parser.add_argument('--with-gc', default=None, help='Not supported...')
+
+
+def get_meson_command_from_configure_args(args):
+    """
+    Translate e.g. 
+        ./configure --prefix=/opt/foo --enable-assembly=no
+    to
+        meson setup build --prefix=/opt/foo -Dassembly=disabled
+    Raise ValueError if modifying an option is not supported.
+    """
+    args = parser.parse_args(args)
+
+    setup_args = []
+
+    if args.bindir is not None:
+        setup_args.append('--bindir=' + args.bindir)
+    if args.libdir is not None:
+        setup_args.append('--libdir=' + args.libdir)
+    else:
+        setup_args.append('--libdir=lib')
+    if args.includedir is not None:
+        setup_args.append('--includedir=' + args.includedir)
+    if args.prefix is not None:
+        setup_args.append('--prefix=' + args.prefix)
+
+    do_shared = enable_disable_to_do(args, 'shared')
+    do_static = enable_disable_to_do(args, 'static')
+
+    do_libtool_lock = enable_disable_to_do(args, 'libtool_lock')
+    do_pthread = enable_disable_to_do(args, 'pthread')
+    do_reentrant = enable_disable_to_do(args, 'reentrant')
+    do_thread_safe = enable_disable_to_do(args, 'thread_safe')
+    do_assert = enable_disable_to_do(args, 'assert')
+    do_coverage = enable_disable_to_do(args, 'coverage')
+    do_debug = enable_disable_to_do(args, 'debug')
+    do_dependency_tracking = enable_disable_to_do(args, 'dependency_tracking')
+    do_pretty_tests = enable_disable_to_do(args, 'pretty_tests')
+
+    do_gmp_internals = enable_disable_to_do(args, 'gmp_internals')
+    do_assembly = enable_disable_to_do(args, 'assembly')
+    do_avx2 = enable_disable_to_do(args, 'avx2')
+    do_avx512 = enable_disable_to_do(args, 'avx512')
+
+    if do_shared is None:
+        do_shared = True
+    if do_static is None:
+        do_static = False
+
+    if do_shared and not do_static:
+        pass
+    elif not do_shared and do_static:
+        setup_args.append('--default-library=static')
+    elif do_shared and do_static:
+        setup_args.append('--default-library=both')
+    else:
+        raise ValueError('Cannot disable both shared and static libraries')
+
+    if do_debug is True:
+        setup_args.append('--buildtype=debugoptimized')
+
+    if do_libtool_lock is not None:
+        setup_args.append('-Dlibtool_lock=' + 'disabled')
+    if do_pthread is not None:
+        setup_args.append('-Dpthread=' + enabled_disabled(do_pthread))
+    if do_reentrant is not None:
+        setup_args.append('-Dreentrant=' + enabled_disabled(do_reentrant))
+    if do_thread_safe is not None:
+        setup_args.append('-Dthread_safe=' + enabled_disabled(do_thread_safe))
+    if do_assert is not None:
+        setup_args.append('-Dassert=' + enabled_disabled(do_assert))
+    if do_coverage is not None:
+        setup_args.append('-Db_coverage=' + true_false(do_coverage))
+    if do_dependency_tracking is not None:
+        pass # Meson always does dependency tracking with Ninja
+    if do_pretty_tests is not None:
+        setup_args.append('-Dpretty_tests=' + enabled_disabled(do_pretty_tests))
+
+    if do_gmp_internals is not None:
+        setup_args.append('-Dgmp_internals=' + enabled_disabled(do_gmp_internals))
+
+    if do_assembly is not None:
+        setup_args.append('-Dassembly=' + enabled_disabled(do_assembly))
+
+    if do_avx2 is False or do_avx512 is False:
+        setup_args.append('-Dfft_small=' + 'disabled')
+    elif do_avx2 is True or do_avx512 is True:
+        setup_args.append('-Dfft_small=' + 'enabled')
+
+    for lib in ['gmp', 'mpfr', 'gc', 'ntl', 'blas']:
+        val = getattr(args, 'with_' + lib)
+        if isinstance(val, str):
+            setup_args.append('--pkg-config-path=' + join(val, 'lib', 'pkgconfig'))
+
+    if args.with_ntl:
+        setup_args.append('-Dntl=enabled')
+
+    if args.with_blas is not None:
+        raise ValueError('--with-blas is not supported')
+    if args.with_gc is not None:
+        raise ValueError('--with-gc is not supported')
+
+    cmd = ['meson', 'setup', args.build_dir] + setup_args
+    return cmd, args
+
+
+def main(*args):
+    cmd, args = get_meson_command_from_configure_args(args)
+    # The default behaviour of ./configure is to basically wipe out the build.
+    # Everything is then rebuilt from scratch. We will do the same here to
+    # match the semantics of configure which does not preserve any settings
+    # from one run of configure to the next. When using meson directly, it is
+    # better not to do this because the files might not need to be rebuilt.
+    shutil.rmtree(args.build_dir, ignore_errors=True)
+    run_command(cmd)
+    # The Makefile uses this to check if project is configured
+    with open(join(args.build_dir, '.build-dir-created'), 'w') as f:
+        pass
+
+
+if __name__ == '__main__':
+    sys.exit(main(*sys.argv[1:]))
