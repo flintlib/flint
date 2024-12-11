@@ -278,13 +278,13 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
 
 #define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
     do {                                                                  \
-        mp_limb_t __t1, __t2, __u1, __u2;                                 \
+        mp_limb_t __v1, __v2, __u1, __u2;                                 \
         mp_limb_t __r3, __r2, __r1, __r0;                                 \
         mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
         umul_ppmm(__r1, __r0, __a0, __b0);                                \
         umul_ppmm(__r3, __r2, __a1, __b1);                                \
-        umul_ppmm(__t2, __t1, __a0, __b1);                                \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __t2, __t1); \
+        umul_ppmm(__v2, __v1, __a0, __b1);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __v2, __v1); \
         umul_ppmm(__u2, __u1, __a1, __b0);                                \
         add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
         (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
@@ -307,14 +307,14 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
 
 #define FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)   \
     do {                                                                     \
-        mp_limb_t __t1, __t2, __t3;                                          \
+        mp_limb_t __u1, __u2, __u3;                                          \
         mp_limb_t __r3, __r2, __r1, __r0;                                    \
         mp_limb_t __a1 = (a1), __a0 = (a0);                                  \
-        umul_ppmm(__t2, __t1, __a0, __a1);                                   \
-        add_sssaaaaaa(__t3, __t2, __t1, 0, __t2, __t1, 0, __t2, __t1);       \
+        umul_ppmm(__u2, __u1, __a0, __a1);                                   \
+        add_sssaaaaaa(__u3, __u2, __u1, 0, __u2, __u1, 0, __u2, __u1);       \
         umul_ppmm(__r1, __r0, __a0, __a0);                                   \
         umul_ppmm(__r3, __r2, __a1, __a1);                                   \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __t3, __t2, __t1); \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __u3, __u2, __u1); \
         (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;                  \
     } while (0)
 

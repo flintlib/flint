@@ -25,9 +25,9 @@ Inc.
 */
 
 #include "flint.h"
+#include "longlong.h"
 
-#ifdef NEED_CLZ_TAB
-
+#if NEED_CLZ_TAB
 const unsigned char __flint_clz_tab[128] =
 {
   1,2,3,3,4,4,4,4,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
@@ -35,9 +35,6 @@ const unsigned char __flint_clz_tab[128] =
   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
 };
-
 #else
-
 typedef int this_file_is_empty;
-
 #endif

@@ -24,12 +24,12 @@
 /* Experimental: use fast but inaccurate product? */
 #define FLINT_MPN_MUL_2X2H(r3, r2, r1, a1, a0, b1, b0)   \
     do {                                                                  \
-        ulong __t1, __t2, __u1, __u2, __v3, __v2;                     \
+        ulong __s1, __s2, __u1, __u2, __v3, __v2;                     \
         ulong __r3, __r2, __r1;                                       \
         ulong __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
-        umul_ppmm(__t2, __t1, __a0, __b1);                                \
+        umul_ppmm(__s2, __s1, __a0, __b1);                                \
         umul_ppmm(__u2, __u1, __a1, __b0);                                \
-        add_sssaaaaaa(__r3, __r2, __r1, 0, __t2, __t1, 0, __u2, __u1);    \
+        add_sssaaaaaa(__r3, __r2, __r1, 0, __s2, __s1, 0, __u2, __u1);    \
         umul_ppmm(__v3, __v2, __a1, __b1);                                \
         add_ssaaaa(__r3, __r2, __r3, __r2, __v3, __v2);                   \
         (r1) = __r1; (r2) = __r2; (r3) = __r3;                            \
