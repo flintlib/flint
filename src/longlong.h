@@ -25,6 +25,13 @@
 extern "C" {
 #endif
 
+/* FIXME: Bug in Clang 18 */
+#if __clang_major__ >= 18
+# define CLANG_volatile volatile
+#else
+# define CLANG_volatile
+#endif
+
 #if defined(__GNUC__)
 
 /* Trailing and leading zeros */
@@ -313,8 +320,8 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
 
 # define udiv_qrnnd(q, r, n1, n0, d) \
   do { \
-    ulong __norm = flint_clz(d); \
-    if (__norm) \
+    CLANG_volatile int __norm = flint_clz(d); \
+    if (__norm != 0) \
     { \
       udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (FLINT_BITS - __norm)), (n0) << __norm, (d) << __norm); \
       (r) = ((ulong) (r) >> __norm); \
