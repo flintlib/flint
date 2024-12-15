@@ -53,7 +53,7 @@ jobs:
           tar -czvf doc.tar.gz doc
 
       - name: "Setup SSH key"
-        uses: shimataro/ssh-key-action@v2.5.0
+        uses: shimataro/ssh-key-action@v2.7.0
         with:
           key: ${{ secrets.SSH_KEY }}
           name: id_ed25519
