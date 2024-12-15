@@ -50,7 +50,7 @@ mulhigh(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n)
 
     if (k == 0)
     {
-        rp[n - 1] = _flint_mpn_mulhigh_basecase(rp + n, np, mp, n);
+        rp[n - 1] = _flint_mpn_mulhigh_n_basecase2(rp + n, np, mp, n);
         return;
     }
 
@@ -67,6 +67,17 @@ mulhigh(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n)
     mulhigh(rp, np, mp + k, l);
     cy += mpn_add_n(rp + n - 1, rp + n - 1, rp + l - 1, l + 1);
     mpn_add_1(rp + n + l, rp + n + l, k, cy);
+
+    {
+        mp_limb_t hi, lo;
+
+        FLINT_ASSERT(k != l);
+
+        umul_ppmm(hi, lo, np[k - 1], mp[l - 1]);
+        MPN_INCR_U(rp + n - 1, n + 1, hi);
+        umul_ppmm(hi, lo, np[l - 1], mp[k - 1]);
+        MPN_INCR_U(rp + n - 1, n + 1, hi);
+    }
 }
 
 int
@@ -87,7 +98,7 @@ main()
         Y[i] = -i - 1;
     }
 
-    for (n = 8; n < FLINT_MPN_MULHIGH_K_TAB_SIZE; n++)
+    for (n = FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH + 1; n < FLINT_MPN_MULHIGH_K_TAB_SIZE; n++)
     {
         flint_printf("n = %wd    ", n);
         fflush(stdout);
