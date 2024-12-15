@@ -84,7 +84,7 @@ jobs:
           $MAKE coverage
 
       - name: "Upload coverage data"
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         if: github.repository == 'flintlib/flint'
         with:
           files: build/coverage/coverage.info
