@@ -58,8 +58,8 @@ do \
 # define _FLINT_SBB _subborrow_u64
 
 /* Multiplication */
-#define umul_ppmm(r1, r0, u, v) do { (r0) = _umul128(u, v, &(r1)); } while (0)
-#define smul_ppmm(r1, r0, u, v) do { (r0) = _mul128(u, v, &(r1)); } while (0)
+#define umul_ppmm(r1, r0, u, v) do { (r0) = _umul128(u, v, (unsigned __int64 *) &(r1)); } while (0)
+#define smul_ppmm(r1, r0, u, v) do { (r0) = _mul128(u, v, (__int64 *) &(r1)); } while (0)
 
 /* Division */
 # define _FLINT_DIV _udiv128
