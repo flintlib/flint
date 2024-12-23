@@ -563,6 +563,9 @@ jobs:
           # memory sanitation which messes with finding mpfr_init in the
           # configure-script. Hence, we also omit the check for finding MPFR.
           # FIXME: Probably want to fix this.
+          #
+          # We disable pkg-config because Julia's pkg-config for GMP and MPFR
+          # are not correct.
           ./bootstrap.sh
           ./configure \
             CC=${CC} \
@@ -570,7 +573,8 @@ jobs:
             --with-gmp=${gmp_path} \
             --with-mpfr=${mpfr_path} \
             --disable-mpfr-check \
-            --disable-debug
+            --disable-debug \
+            --disable-pkg-config
 
       - name: "Compile and install"
         run: |
