@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Fredrik Johansson
+    Copyright (C) 2015, 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
@@ -109,8 +110,8 @@ acb_hypgeom_ci_asymp(acb_t res, const acb_t z, slong prec)
     acb_clear(one);
 }
 
-void
-acb_hypgeom_ci_2f3(acb_t res, const acb_t z, slong prec)
+static void
+_acb_hypgeom_ci_2f3(acb_t res, const acb_t z, int hyperbolic, slong prec)
 {
     acb_t a, t, u;
     acb_struct b[3];
@@ -130,7 +131,8 @@ acb_hypgeom_ci_2f3(acb_t res, const acb_t z, slong prec)
 
     acb_mul(t, z, z, prec);
     acb_mul_2exp_si(t, t, -2);
-    acb_neg(t, t);
+    if (!hyperbolic)
+        acb_neg(t, t);
     acb_hypgeom_pfq_direct(u, a, 1, b, 3, t, -1, prec);
     acb_mul(u, u, t, prec);
 
@@ -151,30 +153,123 @@ acb_hypgeom_ci_2f3(acb_t res, const acb_t z, slong prec)
 }
 
 void
+acb_hypgeom_ci_2f3(acb_t res, const acb_t z, slong prec)
+{
+    _acb_hypgeom_ci_2f3(res, z, 0, prec);
+}
+
+void
+acb_hypgeom_chi_2f3(acb_t res, const acb_t z, slong prec)
+{
+    _acb_hypgeom_ci_2f3(res, z, 1, prec);
+}
+
+/* Bound propagated error |ci(z)-ci(mid(z))| assuming that we
+   are off the branch cut (not checked here).
+   Uses |ci'(z)| = |cos(z)/z| <= cosh(|im(z)|)/|z|.
+*/
+static void
+acb_hypgeom_ci_prop_error(mag_t err, const acb_t z)
+{
+    mag_t t, u;
+
+    mag_init(t);
+    mag_init(u);
+
+    arb_get_mag(t, acb_imagref(z));
+    mag_cosh(t, t);
+    acb_get_mag_lower(u, z);
+    mag_div(t, t, u);
+    mag_hypot(u, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
+    mag_mul(err, t, u);
+
+    mag_clear(t);
+    mag_clear(u);
+}
+
+void
 acb_hypgeom_ci(acb_t res, const acb_t z, slong prec)
 {
-    if (acb_is_real(z) && arb_is_finite(acb_realref(z)))
+    if (!acb_is_finite(z) || acb_contains_zero(z))
+    {
+        acb_indeterminate(res);
+    }
+    else if (acb_is_real(z))
     {
         if (arb_is_positive(acb_realref(z)))
         {
             arb_hypgeom_ci(acb_realref(res), acb_realref(z), prec);
             arb_zero(acb_imagref(res));
         }
-        else if (arb_is_negative(acb_realref(z)))
+        else /* arb_is_negative(acb_realref(z)), since we already tested for 0 */
         {
             arb_neg(acb_realref(res), acb_realref(z));
             arb_hypgeom_ci(acb_realref(res), acb_realref(res), prec);
             arb_const_pi(acb_imagref(res), prec);
         }
+    }
+    else if (arb_contains_zero(acb_imagref(z)) &&
+                !arb_is_nonnegative(acb_imagref(z)) &&
+                !arb_is_positive(acb_realref(z)))
+    {
+        /* We straddle the branch cut; do something generic */
+        if (acb_hypgeom_u_use_asymp(z, prec))
+            acb_hypgeom_ci_asymp(res, z, prec);
+        else
+            acb_hypgeom_ci_2f3(res, z, prec);
+    }
+    else
+    {
+        double asymp_accuracy, a, b, absz, cancellation, rlog2 = 1.4426950408889634;
+
+        a = arf_get_d(arb_midref(acb_realref(z)), ARF_RND_DOWN);
+        b = arf_get_d(arb_midref(acb_imagref(z)), ARF_RND_DOWN);
+        a = fabs(a);
+        b = fabs(b);
+
+        if (a <= 1.0 && b <= 1.0)
+        {
+            acb_hypgeom_ci_2f3(res, z, prec);
+            return;
+        }
+
+        if (a > prec || b > prec)
+        {
+            acb_hypgeom_ci_asymp(res, z, prec);
+            return;
+        }
+
+        absz = sqrt(a * a + b * b);
+        asymp_accuracy = absz * rlog2 * 0.999 - 5;
+
+        if (asymp_accuracy > prec)
+        {
+            acb_hypgeom_ci_asymp(res, z, prec);
+        }
         else
         {
-            acb_indeterminate(res);
-        }
-        return;
-    }
+            acb_t m;
+            mag_t err;
+            slong wp;
 
-    if (acb_hypgeom_u_use_asymp(z, prec))
-        acb_hypgeom_ci_asymp(res, z, prec);
-    else
-        acb_hypgeom_ci_2f3(res, z, prec);
+            acb_init(m);
+            mag_init(err);
+
+            /* terms grow to ~ exp(|z|), sum is ~ exp(|im(z)|) */
+            cancellation = (absz - b) * rlog2;
+            wp = prec + FLINT_MAX(0, cancellation);
+            wp = wp * 1.001 + 5;
+
+            /* assumes that we already handled the branch cut */
+            acb_hypgeom_ci_prop_error(err, z);
+            acb_get_mid(m, z);
+
+            acb_hypgeom_ci_2f3(res, m, wp);
+
+            acb_add_error_mag(res, err);
+
+            acb_clear(m);
+            mag_clear(err);
+        }
+    }
 }

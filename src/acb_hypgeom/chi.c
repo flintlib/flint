@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
 #include "acb_hypgeom.h"
 
@@ -101,51 +102,112 @@ acb_hypgeom_chi_asymp(acb_t res, const acb_t z, slong prec)
     acb_clear(one);
 }
 
+/* defined in ci.c */
 void
-acb_hypgeom_chi_2f3(acb_t res, const acb_t z, slong prec)
+acb_hypgeom_chi_2f3(acb_t res, const acb_t z, slong prec);
+
+/* Bound propagated error |chi(z)-chi(mid(z))| assuming that we
+   are off the branch cut (not checked here).
+   Uses |chi'(z)| = |cosh(z)/z| <= cosh(|re(z)|)/|z|.
+*/
+static void
+acb_hypgeom_chi_prop_error(mag_t err, const acb_t z)
 {
-    acb_t a, t, u;
-    acb_struct b[3];
+    mag_t t, u;
 
-    acb_init(a);
-    acb_init(b);
-    acb_init(b + 1);
-    acb_init(b + 2);
-    acb_init(t);
-    acb_init(u);
+    mag_init(t);
+    mag_init(u);
 
-    acb_one(a);
-    acb_set_ui(b, 2);
-    acb_set(b + 1, b);
-    acb_set_ui(b + 2, 3);
-    acb_mul_2exp_si(b + 2, b + 2, -1);
+    arb_get_mag(t, acb_realref(z));
+    mag_cosh(t, t);
+    acb_get_mag_lower(u, z);
+    mag_div(t, t, u);
+    mag_hypot(u, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
+    mag_mul(err, t, u);
 
-    acb_mul(t, z, z, prec);
-    acb_mul_2exp_si(t, t, -2);
-    acb_hypgeom_pfq_direct(u, a, 1, b, 3, t, -1, prec);
-    acb_mul(u, u, t, prec);
-
-    acb_log(t, z, prec);
-    acb_add(u, u, t, prec);
-
-    arb_const_euler(acb_realref(t), prec);
-    arb_add(acb_realref(u), acb_realref(u), acb_realref(t), prec);
-
-    acb_swap(res, u);
-
-    acb_clear(a);
-    acb_clear(b);
-    acb_clear(b + 1);
-    acb_clear(b + 2);
-    acb_clear(t);
-    acb_clear(u);
+    mag_clear(t);
+    mag_clear(u);
 }
 
 void
 acb_hypgeom_chi(acb_t res, const acb_t z, slong prec)
 {
-    if (acb_hypgeom_u_use_asymp(z, prec))
-        acb_hypgeom_chi_asymp(res, z, prec);
+    if (!acb_is_finite(z) || acb_contains_zero(z))
+    {
+        acb_indeterminate(res);
+    }
+/* todo -- good real code
+    else if (acb_is_real(z))
+    {
+    }
+*/
+    else if (arb_contains_zero(acb_imagref(z)) &&
+                !arb_is_nonnegative(acb_imagref(z)) &&
+                !arb_is_positive(acb_realref(z)))
+    {
+        /* We straddle the branch cut; do something generic */
+        if (acb_hypgeom_u_use_asymp(z, prec))
+            acb_hypgeom_chi_asymp(res, z, prec);
+        else
+            acb_hypgeom_chi_2f3(res, z, prec);
+    }
     else
-        acb_hypgeom_chi_2f3(res, z, prec);
+    {
+        double asymp_accuracy, a, b, absz, cancellation, rlog2 = 1.4426950408889634;
+
+        a = arf_get_d(arb_midref(acb_realref(z)), ARF_RND_DOWN);
+        b = arf_get_d(arb_midref(acb_imagref(z)), ARF_RND_DOWN);
+        a = fabs(a);
+        b = fabs(b);
+
+        if (a <= 1.0 && b <= 1.0)
+        {
+            acb_hypgeom_chi_2f3(res, z, prec);
+            return;
+        }
+
+        if (a > prec || b > prec)
+        {
+            acb_hypgeom_chi_asymp(res, z, prec);
+            return;
+        }
+
+        absz = sqrt(a * a + b * b);
+        asymp_accuracy = absz * rlog2 * 0.999 - 5;
+
+        if (asymp_accuracy > prec)
+        {
+            acb_hypgeom_chi_asymp(res, z, prec);
+        }
+        else
+        {
+            acb_t m;
+            mag_t err;
+            slong wp;
+            /* since we don't have a special case for real z */
+            int pure_real = arb_is_zero(acb_imagref(z));
+
+            acb_init(m);
+            mag_init(err);
+
+            /* terms grow to ~ exp(|z|), sum is ~ exp(|re(z)|) */
+            cancellation = (absz - a) * rlog2;
+            wp = prec + FLINT_MAX(0, cancellation);
+            wp = wp * 1.001 + 5;
+
+            /* assumes that we already handled the branch cut */
+            acb_hypgeom_chi_prop_error(err, z);
+            acb_get_mid(m, z);
+
+            acb_hypgeom_chi_2f3(res, m, wp);
+
+            if (pure_real)
+                arb_add_error_mag(acb_realref(res), err);
+            else
+                acb_add_error_mag(res, err);
+
+            acb_clear(m);
+            mag_clear(err);
+        }
+    }
 }
