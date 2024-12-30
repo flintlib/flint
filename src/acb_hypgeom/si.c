@@ -215,6 +215,7 @@ acb_hypgeom_si(acb_t res, const acb_t z, slong prec)
             wp = prec + FLINT_MAX(0, cancellation);
             wp = wp * 1.001 + 5;
             acb_hypgeom_si_1f2(res, m, wp);
+            acb_set_round(res, res, prec);
         }
 
         if (pure_imag)

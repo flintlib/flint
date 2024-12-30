@@ -271,6 +271,7 @@ acb_hypgeom_ci(acb_t res, const acb_t z, slong prec)
             wp = prec + FLINT_MAX(0, cancellation);
             wp = wp * 1.001 + 5;
             acb_hypgeom_ci_2f3(res, m, wp);
+            acb_set_round(res, res, prec);
         }
 
         acb_add_error_mag(res, err);

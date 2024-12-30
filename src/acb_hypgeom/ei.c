@@ -236,6 +236,7 @@ acb_hypgeom_ei(acb_t res, const acb_t z, slong prec)
             wp = prec + FLINT_MAX(0, cancellation);
             wp = wp * 1.001 + 5;
             acb_hypgeom_ei_2f2(res, m, wp);
+            acb_set_round(res, res, prec);
         }
 
         if (pure_real)
