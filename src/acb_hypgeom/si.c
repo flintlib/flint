@@ -131,22 +131,29 @@ acb_hypgeom_si_1f2(acb_t res, const acb_t z, slong prec)
 static void
 acb_hypgeom_si_prop_error(mag_t err, const acb_t z)
 {
-    mag_t t, u;
+    if (acb_is_exact(z))
+    {
+        mag_zero(err);
+    }
+    else
+    {
+        mag_t t, u;
 
-    mag_init(t);
-    mag_init(u);
+        mag_init(t);
+        mag_init(u);
 
-    arb_get_mag(t, acb_imagref(z));
-    mag_cosh(t, t);
-    acb_get_mag_lower(u, z);
-    if (mag_cmp_2exp_si(u, 0) < 0)
-        mag_one(u);
-    mag_div(t, t, u);
-    mag_hypot(u, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
-    mag_mul(err, t, u);
+        arb_get_mag(t, acb_imagref(z));
+        mag_cosh(t, t);
+        acb_get_mag_lower(u, z);
+        if (mag_cmp_2exp_si(u, 0) < 0)
+            mag_one(u);
+        mag_div(t, t, u);
+        mag_hypot(u, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
+        mag_mul(err, t, u);
 
-    mag_clear(t);
-    mag_clear(u);
+        mag_clear(t);
+        mag_clear(u);
+    }
 }
 
 void
@@ -164,58 +171,58 @@ acb_hypgeom_si(acb_t res, const acb_t z, slong prec)
     else
     {
         double asymp_accuracy, a, b, absz, cancellation, rlog2 = 1.4426950408889634;
+        slong wp;
+        int use_asymp;
+        acb_t m;
+        mag_t err;
+        int pure_imag = arb_is_zero(acb_realref(z));
 
         a = arf_get_d(arb_midref(acb_realref(z)), ARF_RND_DOWN);
         b = arf_get_d(arb_midref(acb_imagref(z)), ARF_RND_DOWN);
         a = fabs(a);
         b = fabs(b);
+        absz = sqrt(a * a + b * b);
 
         if (a <= 1.0 && b <= 1.0)
         {
-            acb_hypgeom_si_1f2(res, z, prec);
-            return;
+            use_asymp = 0;
         }
-
-        if (a > prec || b > prec)
+        else if (a > prec || b > prec)
         {
-            acb_hypgeom_si_asymp(res, z, prec);
-            return;
-        }
-
-        absz = sqrt(a * a + b * b);
-        asymp_accuracy = absz * rlog2 * 0.999 - 5;
-
-        if (asymp_accuracy > prec)
-        {
-            acb_hypgeom_si_asymp(res, z, prec);
+            use_asymp = 1;
         }
         else
         {
-            acb_t m;
-            mag_t err;
-            slong wp;
-            int pure_imag = arb_is_zero(acb_realref(z));
+            asymp_accuracy = absz * rlog2 * 0.999 - 5;
+            use_asymp = asymp_accuracy > prec;
+        }
 
-            acb_init(m);
-            mag_init(err);
+        acb_init(m);
+        mag_init(err);
 
+        /* assumes that we already handled the branch cut */
+        acb_hypgeom_si_prop_error(err, z);
+        acb_get_mid(m, z);
+
+        if (use_asymp)
+        {
+            acb_hypgeom_si_asymp(res, m, prec);
+        }
+        else
+        {
             /* terms grow to ~ exp(|z|), sum is ~ exp(|im(z)|) */
             cancellation = (absz - b) * rlog2;
             wp = prec + FLINT_MAX(0, cancellation);
             wp = wp * 1.001 + 5;
-
-            acb_hypgeom_si_prop_error(err, z);
-            acb_get_mid(m, z);
-
             acb_hypgeom_si_1f2(res, m, wp);
-
-            if (pure_imag)
-                arb_add_error_mag(acb_imagref(res), err);
-            else
-                acb_add_error_mag(res, err);
-
-            acb_clear(m);
-            mag_clear(err);
         }
+
+        if (pure_imag)
+            arb_add_error_mag(acb_imagref(res), err);
+        else
+            acb_add_error_mag(res, err);
+
+        acb_clear(m);
+        mag_clear(err);
     }
 }
