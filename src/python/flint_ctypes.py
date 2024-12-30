@@ -1913,7 +1913,7 @@ class gr_ctx:
     def exp_integral_ei(ctx, x):
         """
             >>> RR.exp_integral_ei(1)
-            [1.89511781635594 +/- 5.11e-15]
+            [1.895117816355937 +/- 6.91e-16]
         """
         return ctx._unary_op(x, libgr.gr_exp_integral_ei, "exp_integral_ei($x)")
 
@@ -1921,6 +1921,10 @@ class gr_ctx:
         """
             >>> RR.sin_integral(1)
             [0.946083070367183 +/- 1.35e-16]
+            >>> CC.sin_integral(CC("(5 +/- 1e-10)*I"))
+            [20.09321183 +/- 5.79e-9]*I
+            >>> CC.sin_integral(CC("10 + (1 +/- 1e-10)*I"))
+            ([1.7002629761 +/- 6.33e-11] + [-0.0667638998 +/- 2.17e-11]*I)
         """
         return ctx._unary_op(x, libgr.gr_sin_integral, "sin_integral($x)")
 
@@ -1934,21 +1938,21 @@ class gr_ctx:
     def sinh_integral(ctx, x):
         """
             >>> RR.sinh_integral(1)
-            [1.05725087537573 +/- 2.77e-15]
+            [1.057250875375728 +/- 6.29e-16]
         """
         return ctx._unary_op(x, libgr.gr_sinh_integral, "sinh_integral($x)")
 
     def cosh_integral(ctx, x):
         """
             >>> RR.cosh_integral(1)
-            [0.837866940980208 +/- 4.78e-16]
+            [0.837866940980208 +/- 3.15e-16]
         """
         return ctx._unary_op(x, libgr.gr_cosh_integral, "cosh_integral($x)")
 
     def log_integral(ctx, x, offset=False):
         """
             >>> RR.log_integral(2)
-            [1.04516378011749 +/- 4.01e-15]
+            [1.04516378011749 +/- 3.31e-15]
             >>> RR.log_integral(2, offset=True)
             0
         """

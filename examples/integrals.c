@@ -732,11 +732,22 @@ scaled_bessel_select_N(arb_t N, ulong k, slong prec)
     arb_mul_2exp_si(N, N, e);
 }
 
+/* f(z) = Si(z) */
+int
+f_si(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+{
+    if (order > 1)
+        flint_abort();  /* Would be needed for Taylor method. */
+
+    acb_hypgeom_si(res, z, prec);
+    return 0;
+}
+
 /* ------------------------------------------------------------------------- */
 /*  Main test program                                                        */
 /* ------------------------------------------------------------------------- */
 
-#define NUM_INTEGRALS 37
+#define NUM_INTEGRALS 38
 
 const char * descr[NUM_INTEGRALS] =
 {
@@ -777,6 +788,7 @@ const char * descr[NUM_INTEGRALS] =
     "int_0^{inf} exp(-x) I_0(x/15)^{15} dx   (using domain truncation)",
     "int_{-1-i}^{-1+i} 1/sqrt(x) dx",
     "int_0^{inf} 1/gamma(x) dx   (using domain truncation)",
+    "int_0^{1000} Si(x) dx",
 };
 
 int main(int argc, char *argv[])
@@ -1272,6 +1284,13 @@ int main(int argc, char *argv[])
                 acb_calc_integrate(s, f_rgamma, NULL, a, b, goal, tol, options, prec);
                 arb_add_error_2exp_si(acb_realref(s), -goal);
                 break;
+
+            case 37:
+                acb_zero(a);
+                acb_set_ui(b, 1000);
+                acb_calc_integrate(s, f_si, NULL, a, b, goal, tol, options, prec);
+                break;
+
 
             default:
                 abort();
