@@ -520,7 +520,7 @@ then
         )
         if test "$enable_debug" = "yes";
         then
-            if "$ac_cv_prog_cxx_g" = "yes";
+            if test "$ac_cv_prog_cxx_g" = "yes";
             then
                 CXXFLAGS="-g $CXXFLAGS"
             else
