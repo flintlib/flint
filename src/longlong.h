@@ -122,43 +122,19 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     (s1) = (a1) + (b1) + ((ulong) (s0) < __t0); \
   } while (0)
 
+# define sub_ddmmss(s1, s0, a1, a0, b1, b0) \
+  do { \
+    ulong __t0 = (a0); \
+    (s0) = (a0) - (b0); \
+    (s1) = (a1) - (b1) - ((ulong) (s0) > __t0); \
+  } while (0)
+
 # define add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0) \
   do { \
     ulong __t1, __t2; \
     add_ssaaaa(__t1, s0, (ulong) 0, a0, (ulong) 0, b0); \
     add_ssaaaa(__t2, s1, (ulong) 0, a1, (ulong) 0, b1); \
     add_ssaaaa(s2, s1, (a2) + (b2), s1, __t2, __t1); \
-  } while (0)
-
-# define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0) \
-  do { \
-    ulong __t3; \
-    add_sssaaaaaa(__t3, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0); \
-    add_ssaaaa(s3, s2, a3, a2, b3, b2); \
-    add_ssaaaa(s3, s2, s3, s2, (ulong) 0, __t3); \
-  } while (0)
-
-#define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0) \
-  do { \
-    ulong __t4 = 0; \
-    add_ssssaaaaaaaa(__t4, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0); \
-    add_ssaaaa(s4, s3, a4, a3, b4, b3); \
-    add_ssaaaa(s4, s3, s4, s3, (ulong) 0, __t4); \
-  } while (0)
-
-#define add_ssssssaaaaaaaaaaaa(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0) \
-  do { \
-    ulong __t5 = 0; \
-    add_sssssaaaaaaaaaa(__t5, s3, s2, s1, s0, (ulong) 0, a3, a2, a1, a0, (ulong) 0, b3, b2, b1, b0); \
-    add_ssaaaa(s5, s4, a5, a4, b5, b4); \
-    add_ssaaaa(s5, s4, s5, s4, (ulong) 0, __t5); \
-  } while (0)
-
-# define sub_ddmmss(s1, s0, a1, a0, b1, b0) \
-  do { \
-    ulong __t0 = (a0); \
-    (s0) = (a0) - (b0); \
-    (s1) = (a1) - (b1) - ((ulong) (s0) > __t0); \
   } while (0)
 
 # define sub_dddmmmsss(d2, d1, d0, m2, m1, m0, s2, s1, s0) \
@@ -168,37 +144,61 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     sub_ddmmss(__t2, d1, (ulong) 0, m1, (ulong) 0, s1); \
     sub_ddmmss(d2, d1, (m2) - (s2), d1, -__t2, -__t1); \
   } while (0)
+#endif
 
-#define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)        \
-  do {                                                                          \
-    ulong __t3, __t4;                                                       \
-    sub_dddmmmsss(__t3, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0);  \
-    sub_ddmmss(__t4, s2, (ulong) 0, a2, (ulong) 0, b2);                 \
-    sub_ddmmss(s3, s2, (a3) - (b3), s2, -__t4, -__t3);                          \
+#if !defined(add_ssssaaaaaaaa)
+# define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0) \
+  do { \
+    ulong __t3; \
+    add_sssaaaaaa(__t3, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0); \
+    add_ssaaaa(s3, s2, a3, a2, b3, b2); \
+    add_ssaaaa(s3, s2, s3, s2, (ulong) 0, __t3); \
   } while (0)
 
-#define sub_dddddmmmmmsssss(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)         \
-  do {                                                                                          \
-    ulong __t5, __t6;                                                                       \
-    sub_ddddmmmmssss(__t5, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0);   \
-    sub_ddmmss(__t6, s3, (ulong) 0, a3, (ulong) 0, b3);                                 \
-    sub_ddmmss(s4, s3, (a4) - (b4), s3, -__t6, -__t5);                                          \
+# define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0) \
+  do { \
+    ulong __t3, __t4; \
+    sub_dddmmmsss(__t3, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0); \
+    sub_ddmmss(__t4, s2, (ulong) 0, a2, (ulong) 0, b2); \
+    sub_ddmmss(s3, s2, (a3) - (b3), s2, -__t4, -__t3); \
   } while (0)
 
-#define sub_ddddddmmmmmmssssss(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
-  do {                                                                                                      \
-    ulong __t7, __t8;                                                                                   \
+# define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t4 = 0; \
+    add_ssssaaaaaaaa(__t4, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0); \
+    add_ssaaaa(s4, s3, a4, a3, b4, b3); \
+    add_ssaaaa(s4, s3, s4, s3, (ulong) 0, __t4); \
+  } while (0)
+
+# define sub_dddddmmmmmsssss(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t5, __t6; \
+    sub_ddddmmmmssss(__t5, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0); \
+    sub_ddmmss(__t6, s3, (ulong) 0, a3, (ulong) 0, b3); \
+    sub_ddmmss(s4, s3, (a4) - (b4), s3, -__t6, -__t5); \
+  } while (0)
+
+# define add_ssssssaaaaaaaaaaaa(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t5 = 0; \
+    add_sssssaaaaaaaaaa(__t5, s3, s2, s1, s0, (ulong) 0, a3, a2, a1, a0, (ulong) 0, b3, b2, b1, b0); \
+    add_ssaaaa(s5, s4, a5, a4, b5, b4); \
+    add_ssaaaa(s5, s4, s5, s4, (ulong) 0, __t5); \
+  } while (0)
+
+# define sub_ddddddmmmmmmssssss(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t7, __t8; \
     sub_dddddmmmmmsssss(__t7, s3, s2, s1, s0, (ulong) 0, a3, a2, a1, a0, (ulong) 0, b3, b2, b1, b0);\
-    sub_ddmmss(__t8, s4, (ulong) 0, a4, (ulong) 0, b4);                                             \
-    sub_ddmmss(s5, s4, (a5) - (b5), s4, -__t8, -__t7);                                                      \
+    sub_ddmmss(__t8, s4, (ulong) 0, a4, (ulong) 0, b4); \
+    sub_ddmmss(s5, s4, (a5) - (b5), s4, -__t8, -__t7); \
   } while (0)
-
 #endif
 
 /* extra wide variants might not have inline asm if there are not enough registers */
 #if !defined(add_sssssssaaaaaaaaaaaaaa)
-
-#define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
+# define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
   do { \
     ulong __t6 = 0; \
     add_ssssssaaaaaaaaaaaa(__t6, s4, s3, s2, s1, s0, (ulong) 0, a4, a3, a2, a1, a0, (ulong) 0, b4, b3, b2, b1, b0); \
@@ -206,7 +206,7 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     add_ssaaaa(s6, s5, s6, s5, (ulong) 0, __t6); \
   } while (0)
 
-#define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
+# define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
   do { \
     ulong __t7 = 0; \
     add_sssssssaaaaaaaaaaaaaa(__t7, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0); \
@@ -214,22 +214,21 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     add_ssaaaa(s7, s6, s7, s6, (ulong) 0, __t7); \
   } while (0)
 
-#define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)       \
-  do {                                                                                                                      \
-    ulong __t9, __t10;                                                                                                   \
+# define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t9, __t10; \
     sub_ddddddmmmmmmssssss(__t9, s4, s3, s2, s1, s0, (ulong) 0, a4, a3, a2, a1, a0, (ulong) 0, b4, b3, b2, b1, b0); \
-    sub_ddmmss(__t10, s5, (ulong) 0, a5, (ulong) 0, b5);                                                             \
-    sub_ddmmss(s6, s5, (a6) - (b6), s5, -__t10, -__t9);                                                                      \
+    sub_ddmmss(__t10, s5, (ulong) 0, a5, (ulong) 0, b5); \
+    sub_ddmmss(s6, s5, (a6) - (b6), s5, -__t10, -__t9); \
   } while (0)
 
-#define sub_ddddddddmmmmmmmmssssssss(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)        \
-  do {                                                                                                                                      \
-    ulong __t11, __t12;                                                                                                                   \
-    sub_dddddddmmmmmmmsssssss(__t11, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0);  \
-    sub_ddmmss(__t12, s6, (ulong) 0, a6, (ulong) 0, b6);                                                                             \
-    sub_ddmmss(s7, s6, (a7) - (b7), s6, -__t12, -__t11);                                                                                      \
+# define sub_ddddddddmmmmmmmmssssssss(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t11, __t12; \
+    sub_dddddddmmmmmmmsssssss(__t11, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0); \
+    sub_ddmmss(__t12, s6, (ulong) 0, a6, (ulong) 0, b6); \
+    sub_ddmmss(s7, s6, (a7) - (b7), s6, -__t12, -__t11); \
   } while (0)
-
 #endif
 
 
