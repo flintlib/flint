@@ -59,7 +59,8 @@ STRIP:=@STRIP@
 RM_F:=rm -f
 RM_RF:=rm -rf
 CP:=cp
-CP_A:=cp -a
+# `cp -a` is not supported on all systems, but `cp -pRP` seems to be POSIX.
+CP_A:=cp -pRP
 GDB:=gdb
 
 STATIC:=@STATIC@
