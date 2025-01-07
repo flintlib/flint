@@ -39,6 +39,66 @@ _acb_poly_zeta_cpx_series(acb_ptr z, const acb_t s, const acb_t a, int deflate, 
         return;
     }
 
+    /* F(s) = zeta(s) - 1/(s-1) on small intervals containing 1 */
+    if (deflate && acb_is_one(a) && !acb_is_one(s) &&
+        (arb_contains_zero(acb_imagref(s)) && arb_contains_si(acb_realref(s), 1)))
+    {
+        acb_t t;
+        mag_t r, u, v;
+        slong n;
+
+        /* An extremely crude bound is |gamma_n| <= 8^(-n) n!.
+
+            (F^{(n)}(1+x) - F^{(n)}(1)) / n! = sum_{k>=1} F^{(n+k)} / (k! n!)
+            |(F^{(n)}(1+x) - F^{(n)}(1)) / n!| <= sum_{k>=1} x^k |gamma_{n+k}| / (k! n!)
+                                               <= sum_{k>=1} x^k (n+k)! / (k! n!) / 8^(n+k)
+                                               <= sum_{k>=1} x^k (n+1)^k / 8^(n+k)
+                                                = 8^(-n) (n+1) x / (8 - (n+1) x)
+        */
+
+        mag_init(r);
+        mag_init(u);
+        mag_init(v);
+        acb_init(t);
+
+        is_real = acb_is_real(s);
+
+        acb_sub_ui(t, s, 1, prec);
+        acb_get_mag(r, t);
+        mag_mul_ui(u, r, d);
+
+        if (mag_cmp_2exp_si(u, 3) < 0)
+        {
+            acb_one(t);
+            _acb_poly_zeta_cpx_series(z, t, a, 1, d, prec);
+
+            for (n = 0; n < d; n++)
+            {
+                mag_mul_ui(u, r, n + 1);
+                mag_one(v);
+                mag_mul_2exp_si(v, v, 3);
+                mag_sub_lower(v, v, u);
+                mag_div(v, u, v);
+                mag_mul_2exp_si(v, v, -3 * n);
+
+                arb_add_error_mag(acb_realref(z + n), v);
+                if (!is_real)
+                    arb_add_error_mag(acb_imagref(z + n), v);
+            }
+        }
+        else
+        {
+            _acb_vec_indeterminate(z, d);
+        }
+
+        mag_clear(r);
+        mag_clear(u);
+        mag_clear(v);
+        acb_clear(t);
+
+        return;
+    }
+
     is_real = const_is_real = 0;
 
     if (acb_is_real(s) && acb_is_real(a))
