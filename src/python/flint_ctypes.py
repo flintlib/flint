@@ -1969,6 +1969,10 @@ class gr_ctx:
         """
             >>> RR.bessel_j(2, 3)
             [0.486091260585891 +/- 4.75e-16]
+            >>> sum(CC.bessel_j(0, k) for k in range(100))
+            [1.419207859380 +/- 2.35e-13]
+            >>> w = CC.exp_pi_i(QQ(1)/100); sum(CC.bessel_j(0, w*k) for k in range(101))
+            ([0.78030446659 +/- 2.44e-12] + [0.62756344686 +/- 5.49e-12]*I)
         """
         return ctx._binary_op(x, y, libgr.gr_bessel_j, "bessel_j($n, $x)")
 
