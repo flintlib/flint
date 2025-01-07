@@ -562,7 +562,12 @@ acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec)
 {
     if (!acb_is_finite(nu) || !acb_is_finite(z))
     {
-        acb_indeterminate(res);
+        /* Some infinities */
+        if (acb_is_real(nu) && acb_is_finite(nu) &&
+            acb_is_real(z) && (mag_is_finite(arb_radref(acb_realref(z))) && arf_is_inf(arb_midref(acb_realref(z)))))
+            acb_zero(res);
+        else
+            acb_indeterminate(res);
     }
     else
     {
