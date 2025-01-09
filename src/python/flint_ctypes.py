@@ -7110,6 +7110,49 @@ def test_matrix():
     assert not MatZZ([[1,0],[0,2]]).is_scalar()
     assert MatZZ([[1,0],[0,1]]).is_scalar()
 
+    M = Mat(CC)
+    M2 = Mat(RR)
+    A = M([[1,2],[3,4]])
+    A2 = M2([[1,2],[3,4]])
+    B = M([[1,2,3],[3,4,5]])
+    B2 = M2([[1,2,3],[3,4,5]])
+    C = M([[2,3],[4,5]])
+    C2 = M2([[2,3],[4,5]])
+    c = M([[2, 0], [0, 2]])
+    cc = M([[0.5, 0], [0, 0.5]])
+    for T in [QQ, ZZ, RR, CC]:
+        assert A + T(2) == A + c
+        assert T(2) + A == c + A
+        assert A - T(2) == A - c
+        assert T(2) - A == c - A
+        assert A * T(2) == A * c
+        assert T(2) * A == c * A
+        assert A / T(2) == A * cc
+    assert A + C2 == A + C
+    assert A2 + C == A + C
+    assert A - C2 == A - C
+    assert A2 - C == A - C
+    assert raises(lambda: A + B, ValueError)
+    assert raises(lambda: A + B2, ValueError)
+    assert raises(lambda: A2 + B, ValueError)
+    assert raises(lambda: A - B, ValueError)
+    assert raises(lambda: A - B2, ValueError)
+    assert raises(lambda: A2 - B, ValueError)
+    assert A * B == M([[7,10,13],[15,22,29]])
+    assert A * B2 == M([[7,10,13],[15,22,29]])
+    assert A2 * B == M([[7,10,13],[15,22,29]])
+    assert raises(lambda: B * A, ValueError)
+    assert raises(lambda: B2 * A, ValueError)
+    assert raises(lambda: B * A2, ValueError)
+
+    M = Mat(ZZ)
+    MM = Mat(Mat(ZZ))
+    A = M([[1,2],[3,4]])
+    B = M([[2,3],[4,5]])
+    C = M([[3,4],[5,6]])
+    D = M([[4,5],[6,7]])
+    assert MM([[A,B],[C,D]]) * MM([[B,C],[D,A]]) == MM([[A*B + B*D, A*C + B*A], [C*B + D**2, C**2 + D*A]])
+
 def test_fq():
     Fq = FiniteField_fq(3, 5)
     x = Fq(random=True)
