@@ -77,6 +77,7 @@
 #include "t-sin_cos_pi_series.c"
 #include "t-sin_cos_series.c"
 #include "t-sinc_series.c"
+#include "t-sinc_pi_series.c"
 #include "t-sinh_cosh_series.c"
 #include "t-sin_pi_series.c"
 #include "t-sin_series_cos_series.c"
@@ -159,6 +160,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_sin_cos_pi_series),
     TEST_FUNCTION(acb_poly_sin_cos_series),
     TEST_FUNCTION(acb_poly_sinc_series),
+    TEST_FUNCTION(acb_poly_sinc_pi_series),
     TEST_FUNCTION(acb_poly_sinh_cosh_series),
     TEST_FUNCTION(acb_poly_sin_pi_series),
     TEST_FUNCTION(acb_poly_sin_series_cos_series),
