@@ -113,23 +113,15 @@ gr_mat_scalar_other_sub(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_mat_
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
-    if (res == mat)
+    for (i = 0; i < r; i++)
     {
-        for (i = 0; i < FLINT_MIN(r, c); i++)
-            status |= gr_other_sub(GR_MAT_ENTRY(res, i, i, sz), x, x_ctx, GR_MAT_ENTRY(res, i, i, sz), ctx);
-    }
-    else
-    {
-        for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
         {
-            for (j = 0; j < c; j++)
-            {
-                /* todo: vectorize */
-                if (i == j)
-                    status |= gr_other_sub(GR_MAT_ENTRY(res, i, j, sz), x, x_ctx, GR_MAT_ENTRY(mat, i, j, sz), ctx);
-                else
-                    status |= gr_set(GR_MAT_ENTRY(res, i, j, sz), GR_MAT_ENTRY(mat, i, j, sz), ctx);
-            }
+            /* todo: vectorize */
+            if (i == j)
+                status |= gr_other_sub(GR_MAT_ENTRY(res, i, j, sz), x, x_ctx, GR_MAT_ENTRY(mat, i, j, sz), ctx);
+            else
+                status |= gr_neg(GR_MAT_ENTRY(res, i, j, sz), GR_MAT_ENTRY(mat, i, j, sz), ctx);
         }
     }
 
