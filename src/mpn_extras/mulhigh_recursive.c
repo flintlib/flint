@@ -12,9 +12,6 @@
 
 #include "mpn_extras.h"
 
-/* Tuned for x86-64 */
-#define BEST_BASECASE_N 9
-
 mp_limb_t
 _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
@@ -22,15 +19,15 @@ _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
     {
         return flint_mpn_mulhigh_func_tab[n](r, x, y);
     }
-    else if (n <= 2 * BEST_BASECASE_N)
+    else if (n <= 2 * FLINT_MPN_MULHIGH_BEST_TAB_N)
     {
-        mp_limb_t t[2 * BEST_BASECASE_N];
+        mp_limb_t t[2 * FLINT_MPN_MULHIGH_BEST_TAB_N];
 
-        mp_size_t m1 = n - BEST_BASECASE_N;
-        mp_size_t m2 = BEST_BASECASE_N;
+        mp_size_t m1 = n - FLINT_MPN_MULHIGH_BEST_TAB_N;
+        mp_size_t m2 = FLINT_MPN_MULHIGH_BEST_TAB_N;
         mp_limb_t cy, lo, w0, w1, w2;
 
-        FLINT_ASSERT(BEST_BASECASE_N <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH);
+        FLINT_ASSERT(FLINT_MPN_MULHIGH_BEST_TAB_N <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH);
 
         flint_mpn_mul(r, x + m1, m2, y + m2, m1);
         w0 = flint_mpn_mulhigh_n(t, x + m1, y, m2);

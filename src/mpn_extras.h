@@ -619,6 +619,8 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 13
+/* n with best effective cycles/limb (and current largest assembly case) -- used by mulhigh_recursive */
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 9
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 9
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 8
@@ -632,6 +634,7 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #elif FLINT_HAVE_ASSEMBLY_armv8
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 8
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 8
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0
@@ -643,6 +646,7 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 /* TODO: generic hardcoded mullows */
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 16
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 16
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 2
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0

@@ -42,7 +42,18 @@ mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
     mp_limb_t w0, w1, lo, w2, cy;
 
+#if 0
     w0 = flint_mpn_mulhigh_10(r, x + 1, y);
+#else
+    w0 = flint_mpn_mulhigh_9(r, x + 2, y);
+    r[9] = mpn_addmul_1(r, x + 2, 9, y[9]);
+    umul_ppmm(w1, lo, x[1], y[8]);
+    umul_ppmm(cy, w2, x[1], y[9]);
+    add_ssaaaa(cy, w0, cy, w0, 0, w1);
+    add_ssaaaa(cy, w0, cy, w0, 0, w2);
+    MPN_INCR_U(r, 10, cy);
+#endif
+
     r[10] = mpn_addmul_1(r, x + 1, 10, y[10]);
     umul_ppmm(w1, lo, x[0], y[9]);
     umul_ppmm(cy, w2, x[0], y[10]);
@@ -51,13 +62,33 @@ mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
     MPN_INCR_U(r, 11, cy);
 
     return w0;
+
+    return w0;
 }
 
 mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
     mp_limb_t w0, w1, lo, w2, cy;
 
+#if 0
     w0 = flint_mpn_mulhigh_11(r, x + 1, y);
+#else
+    w0 = flint_mpn_mulhigh_9(r, x + 3, y);
+    r[9] = mpn_addmul_1(r, x + 3, 9, y[9]);
+    umul_ppmm(w1, lo, x[2], y[8]);
+    umul_ppmm(cy, w2, x[2], y[9]);
+    add_ssaaaa(cy, w0, cy, w0, 0, w1);
+    add_ssaaaa(cy, w0, cy, w0, 0, w2);
+    MPN_INCR_U(r, 10, cy);
+
+    r[10] = mpn_addmul_1(r, x + 2, 10, y[10]);
+    umul_ppmm(w1, lo, x[1], y[9]);
+    umul_ppmm(cy, w2, x[1], y[10]);
+    add_ssaaaa(cy, w0, cy, w0, 0, w1);
+    add_ssaaaa(cy, w0, cy, w0, 0, w2);
+    MPN_INCR_U(r, 11, cy);
+#endif
+
     r[11] = mpn_addmul_1(r, x + 1, 11, y[11]);
     umul_ppmm(w1, lo, x[0], y[10]);
     umul_ppmm(cy, w2, x[0], y[11]);
