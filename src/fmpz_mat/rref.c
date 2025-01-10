@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011-2012 Fredrik Johansson
+    Copyright (C) 2011-2012, 2025 Fredrik Johansson
     Copyright (C) 2014 Alex J. Best
 
     This file is part of FLINT.
@@ -15,9 +15,10 @@
 slong
 fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
-    if (FLINT_MIN(A->c, A->r) <= 20)
-        return fmpz_mat_rref_fflu(R, den, A);
-    else if (A->r <= 105 && A->c >= 1.4 * A->r)
+    slong r = A->r;
+    slong c = A->c;
+
+    if (r <= 3 || c <= 2 || (r <= 40 && c > r) || (r > 40 && r <= 100 && c > r + (r - 40) / 60.0 * r))
         return fmpz_mat_rref_fflu(R, den, A);
     else
         return fmpz_mat_rref_mul(R, den, A);
