@@ -18,7 +18,7 @@ fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
     slong r = A->r;
     slong c = A->c;
 
-    if (r <= 3 || c <= 2 || (r <= 40 && c > r) || (r > 40 && r <= 100 && c > r + (r - 40) / 60.0 * r))
+    if (r <= 3 || c <= 2 || (r <= 20 && c > r) || (r > 20 && r <= 100 && c > r + (r - 20) / 80.0 * r))
         return fmpz_mat_rref_fflu(R, den, A);
     else
         return fmpz_mat_rref_mul(R, den, A);
