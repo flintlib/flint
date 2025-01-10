@@ -24,21 +24,18 @@
 /* For printing */
 #include "arf.h"
 
+/* based on output of p-nfixed_mat_mul.c */
 static int nfixed_mat_mul_use_waksman(slong n, slong nlimbs)
 {
-    if (nlimbs <= 8)
-        return 0;
-    if (nlimbs == 9)
-        return (n >= 6);
-    if (nlimbs == 10)
-        return (n >= 5);
-    if (nlimbs <= 24)
-        return (n >= 4);
-    if (nlimbs <= 46)
-        return (n >= 3);
+    if (nlimbs <= 8) return 0;
+    if (nlimbs <= 11) return (n >= 6);
+    if (nlimbs == 12) return (n >= 5);
+    if (nlimbs <= 21) return (n >= 4);
+    if (nlimbs <= 46) return (n >= 3);
     return (n >= 2);
 }
 
+/* based on output of p-nfixed_mat_mul.c */
 static slong nfixed_mat_mul_strassen_cutoff(slong n, int parity, slong nlimbs)
 {
     if (nlimbs <= 3)
