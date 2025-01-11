@@ -18,8 +18,10 @@ int gr_mpoly_set_coeff_scalar_fmpz(
     gr_mpoly_t A,
     gr_srcptr c,
     const fmpz * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     flint_bitcnt_t exp_bits;
     slong i, N, index;
     ulong * cmpmask;
@@ -27,6 +29,7 @@ int gr_mpoly_set_coeff_scalar_fmpz(
     int exists;
     int status = GR_SUCCESS;
     slong sz = cctx->sizeof_elem;
+
     TMP_INIT;
 
     for (i = 0; i < mctx->nvars; i++)
@@ -95,14 +98,15 @@ int gr_mpoly_set_coeff_ui_fmpz(
     gr_mpoly_t A,
     ulong c,
     const fmpz * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
     gr_ptr t;
 
     GR_TMP_INIT(t, cctx);
     status = gr_set_ui(t, c, cctx);
-    status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, mctx, cctx);
+    status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, ctx);
     GR_TMP_CLEAR(t, cctx);
 
     return status;
@@ -112,14 +116,15 @@ int gr_mpoly_set_coeff_si_fmpz(
     gr_mpoly_t A,
     slong c,
     const fmpz * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
     gr_ptr t;
 
     GR_TMP_INIT(t, cctx);
     status = gr_set_si(t, c, cctx);
-    status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, mctx, cctx);
+    status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, ctx);
     GR_TMP_CLEAR(t, cctx);
 
     return status;
@@ -129,14 +134,15 @@ int gr_mpoly_set_coeff_fmpz_fmpz(
     gr_mpoly_t A,
     const fmpz_t c,
     const fmpz * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
     gr_ptr t;
 
     GR_TMP_INIT(t, cctx);
     status = gr_set_fmpz(t, c, cctx);
-    status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, mctx, cctx);
+    status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, ctx);
     GR_TMP_CLEAR(t, cctx);
 
     return status;
@@ -146,15 +152,16 @@ int gr_mpoly_set_coeff_fmpq_fmpz(
     gr_mpoly_t A,
     const fmpq_t c,
     const fmpz * exp,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
     gr_ptr t;
 
     GR_TMP_INIT(t, cctx);
     status = gr_set_fmpq(t, c, cctx);
     if (status == GR_SUCCESS)
-        status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, mctx, cctx);
+        status |= gr_mpoly_set_coeff_scalar_fmpz(A, t, exp, ctx);
     GR_TMP_CLEAR(t, cctx);
 
     return status;

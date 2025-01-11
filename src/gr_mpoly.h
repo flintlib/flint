@@ -44,6 +44,25 @@ gr_mpoly_struct;
 
 typedef gr_mpoly_struct gr_mpoly_t[1];
 
+typedef struct
+{
+    gr_ctx_struct * cctx;
+    mpoly_ctx_struct * mctx;
+    char ** vars;
+} _gr_mpoly_ctx_struct;
+
+typedef gr_ctx_struct gr_mpoly_ctx_struct;
+typedef gr_mpoly_ctx_struct gr_mpoly_ctx_t[1];
+
+#define GR_MPOLY_MCTX(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->mctx)
+#define GR_MPOLY_CCTX(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->cctx)
+#define GR_MPOLY_VARS(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->vars)
+#define GR_MPOLY_NVARS(ctx) (GR_MPOLY_MCTX(ctx)->nvars)
+
+/* Context object */
+
+void gr_mpoly_ctx_init_rand(gr_mpoly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring, slong max_nvars);
+void gr_mpoly_ctx_clear(gr_mpoly_ctx_t ctx);
 
 /* Memory management */
 
@@ -161,6 +180,7 @@ int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint
 
 /* Input and output */
 
+/* todo: vars stored in context object */
 int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 int gr_mpoly_print_pretty(const gr_mpoly_t A, const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
@@ -193,20 +213,20 @@ truth_t gr_mpoly_is_one(const gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cct
 
 /* Coefficient/exponent access */
 
-WARN_UNUSED_RESULT int gr_mpoly_get_coeff_scalar_fmpz(gr_ptr c, const gr_mpoly_t A, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_get_coeff_scalar_ui(gr_ptr c, const gr_mpoly_t A, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_get_coeff_scalar_fmpz(gr_ptr c, const gr_mpoly_t A, const fmpz * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_get_coeff_scalar_ui(gr_ptr c, const gr_mpoly_t A, const ulong * exp, gr_mpoly_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_scalar_fmpz(gr_mpoly_t A, gr_srcptr c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_ui_fmpz(gr_mpoly_t A, ulong c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_si_fmpz(gr_mpoly_t A, slong c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpz_fmpz(gr_mpoly_t A, const fmpz_t c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpq_fmpz(gr_mpoly_t A, const fmpq_t c, const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_scalar_fmpz(gr_mpoly_t A, gr_srcptr c, const fmpz * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_ui_fmpz(gr_mpoly_t A, ulong c, const fmpz * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_si_fmpz(gr_mpoly_t A, slong c, const fmpz * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpz_fmpz(gr_mpoly_t A, const fmpz_t c, const fmpz * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpq_fmpz(gr_mpoly_t A, const fmpq_t c, const fmpz * exp, gr_mpoly_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_scalar_ui(gr_mpoly_t poly, gr_srcptr c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_ui_ui(gr_mpoly_t A, ulong c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_si_ui(gr_mpoly_t A, slong c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpz_ui(gr_mpoly_t A, const fmpz_t c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpq_ui(gr_mpoly_t A, const fmpq_t c, const ulong * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_scalar_ui(gr_mpoly_t poly, gr_srcptr c, const ulong * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_ui_ui(gr_mpoly_t A, ulong c, const ulong * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_si_ui(gr_mpoly_t A, slong c, const ulong * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpz_ui(gr_mpoly_t A, const fmpz_t c, const ulong * exp, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_set_coeff_fmpq_ui(gr_mpoly_t A, const fmpq_t c, const ulong * exp, gr_mpoly_ctx_t ctx);
 
 /* Arithmetic */
 
@@ -223,6 +243,172 @@ WARN_UNUSED_RESULT int gr_mpoly_mul_si(gr_mpoly_t A, const gr_mpoly_t B, slong c
 WARN_UNUSED_RESULT int gr_mpoly_mul_ui(gr_mpoly_t A, const gr_mpoly_t B, ulong c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpz(gr_mpoly_t A, const gr_mpoly_t B, const fmpz_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpq(gr_mpoly_t A, const gr_mpoly_t B, const fmpq_t c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+
+/* Refactoring */
+
+FLINT_FORCE_INLINE void
+NEW_gr_mpoly_init(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
+{
+    gr_mpoly_init(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE void
+NEW_gr_mpoly_clear(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
+{
+    gr_mpoly_clear(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE void
+NEW_gr_mpoly_swap(gr_mpoly_t poly1, gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+{
+    gr_mpoly_swap(poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE void
+NEW_gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    *res = *poly;
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_randtest(gr_mpoly_t res, flint_rand_t state, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_randtest_bits(res, state, n_randint(state, 5), 1 + n_randint(state, 3), GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_randtest_bits(gr_mpoly_t res, flint_rand_t state, slong length, flint_bitcnt_t exp_bits, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_randtest_bits(res, state, length, exp_bits, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE slong
+NEW_gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
+{
+    return x->length;
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_write(gr_stream_t out, gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_write_pretty(out, poly, (const char **) GR_MPOLY_VARS(ctx), GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE truth_t
+NEW_gr_mpoly_equal(const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_equal(poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE truth_t
+NEW_gr_mpoly_is_zero(const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_is_zero(poly, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE truth_t
+NEW_gr_mpoly_is_one(const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_is_one(poly, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_zero(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_one(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_one(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_set(gr_mpoly_t res, const gr_mpoly_t mat, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_set(res, mat, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_set_si(gr_mpoly_t res, slong v, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_set_si(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_set_ui(gr_mpoly_t res, ulong v, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_set_ui(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_set_fmpz(gr_mpoly_t res, const fmpz_t v, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_set_fmpz(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_set_fmpq(gr_mpoly_t res, const fmpq_t v, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_set_fmpq(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_neg(gr_mpoly_t res, const gr_mpoly_t mat, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_neg(res, mat, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_add(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+{
+    if (poly1->length + poly2->length > ctx->size_limit)
+        return GR_UNABLE | gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+
+    return gr_mpoly_add(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_sub(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+{
+    if (poly1->length + poly2->length > ctx->size_limit)
+        return GR_UNABLE | gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+
+    return gr_mpoly_sub(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_mul(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+{
+    if (poly1->length * poly2->length > ctx->size_limit)
+        return GR_UNABLE | gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+
+    return gr_mpoly_mul(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE void NEW_gr_mpoly_assert_canonical(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
+{
+    gr_mpoly_assert_canonical(A, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+
+FLINT_FORCE_INLINE int NEW_gr_mpoly_print_pretty(const gr_mpoly_t A, const char ** x_in, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_print_pretty(A, x_in, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_mul_johnson(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_mul_johnson(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
+
+FLINT_FORCE_INLINE int
+NEW_gr_mpoly_mul_monomial(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_mul_monomial(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+}
 
 #ifdef __cplusplus
 }

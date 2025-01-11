@@ -17,20 +17,7 @@
 #include "gr_mpoly.h"
 #include "gr_generic.h"
 
-typedef struct
-{
-    gr_ctx_struct * cctx;
-    mpoly_ctx_struct * mctx;
-    char ** vars;
-} _gr_mpoly_ctx_struct;
 
-typedef gr_ctx_struct gr_mpoly_ctx_struct;
-typedef gr_mpoly_ctx_struct gr_mpoly_ctx_t[1];
-
-#define GR_MPOLY_MCTX(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->mctx)
-#define GR_MPOLY_CCTX(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->cctx)
-#define GR_MPOLY_VARS(ctx) (((_gr_mpoly_ctx_struct *) (ctx->data))->vars)
-#define GR_MPOLY_NVARS(ctx) (GR_MPOLY_MCTX(ctx)->nvars)
 
 
 int gr_mpoly_ctx_write(gr_stream_t out, gr_mpoly_ctx_t ctx)
@@ -379,4 +366,10 @@ gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const orderi
         gr_method_tab_init(_gr_mpoly_methods, _gr_mpoly_methods_input);
         _gr_mpoly_methods_initialized = 1;
     }
+}
+
+void
+gr_mpoly_ctx_init_rand(gr_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring, slong max_nvars)
+{
+    gr_ctx_init_gr_mpoly(ctx, base_ring, n_randint(state, max_nvars + 1), mpoly_ordering_randtest(state));
 }
