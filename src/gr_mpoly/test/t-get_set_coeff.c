@@ -33,14 +33,14 @@ TEST_FUNCTION_START(gr_mpoly_get_set_coeff, state)
         gr_mpoly_ctx_init_rand(ctx, state, cctx, 20);
         nvars = GR_MPOLY_NVARS(ctx);
 
-        NEW_gr_mpoly_init(f, ctx);
+        gr_mpoly_init(f, ctx);
         c = gr_heap_init(cctx);
         d = gr_heap_init(cctx);
 
         len = n_randint(state, 100);
         exp_bits = n_randint(state, 200) + 2;
 
-        GR_MUST_SUCCEED(NEW_gr_mpoly_randtest_bits(f, state, len, exp_bits, ctx));
+        GR_MUST_SUCCEED(gr_mpoly_randtest_bits(f, state, len, exp_bits, ctx));
 
         for (j = 0; j < 10; j++)
         {
@@ -53,7 +53,7 @@ TEST_FUNCTION_START(gr_mpoly_get_set_coeff, state)
                 exp[k] = n_randtest(state);
 
             status |= gr_mpoly_set_coeff_scalar_ui(f, c, exp, ctx);
-            NEW_gr_mpoly_assert_canonical(f, ctx);
+            gr_mpoly_assert_canonical(f, ctx);
             status |= gr_mpoly_get_coeff_scalar_ui(d, f, exp, ctx);
 
             if (status == GR_SUCCESS && gr_equal(c, d, cctx) == T_FALSE)
@@ -61,7 +61,7 @@ TEST_FUNCTION_START(gr_mpoly_get_set_coeff, state)
                 flint_printf("FAIL: scalar_ui\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
                 gr_ctx_println(ctx);
-                flint_printf("f = "); NEW_gr_mpoly_print_pretty(f, NULL, ctx); flint_printf("\n");
+                flint_printf("f = "); gr_mpoly_print_pretty(f, ctx); flint_printf("\n");
                 flint_printf("c = "); gr_print(c, cctx); flint_printf("\n");
                 flint_printf("d = "); gr_print(d, cctx); flint_printf("\n");
                 fflush(stdout);
@@ -71,7 +71,7 @@ TEST_FUNCTION_START(gr_mpoly_get_set_coeff, state)
             flint_free(exp);
         }
 
-        GR_MUST_SUCCEED(NEW_gr_mpoly_randtest_bits(f, state, len, exp_bits, ctx));
+        GR_MUST_SUCCEED(gr_mpoly_randtest_bits(f, state, len, exp_bits, ctx));
 
         for (j = 0; j < 10; j++)
         {
@@ -83,7 +83,7 @@ TEST_FUNCTION_START(gr_mpoly_get_set_coeff, state)
             _fmpz_vec_randtest(exp, state, nvars, exp_bits);
 
             status |= gr_mpoly_set_coeff_scalar_fmpz(f, c, exp, ctx);
-            NEW_gr_mpoly_assert_canonical(f, ctx);
+            gr_mpoly_assert_canonical(f, ctx);
             status |= gr_mpoly_get_coeff_scalar_fmpz(d, f, exp, ctx);
 
             if (status == GR_SUCCESS && gr_equal(c, d, cctx) == T_FALSE)
@@ -91,7 +91,7 @@ TEST_FUNCTION_START(gr_mpoly_get_set_coeff, state)
                 flint_printf("FAIL: scalar_fmpz\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
                 gr_ctx_println(ctx);
-                flint_printf("f = "); NEW_gr_mpoly_print_pretty(f, NULL, ctx); flint_printf("\n");
+                flint_printf("f = "); gr_mpoly_print_pretty(f, ctx); flint_printf("\n");
                 flint_printf("c = "); gr_print(c, cctx); flint_printf("\n");
                 flint_printf("d = "); gr_print(d, cctx); flint_printf("\n");
                 fflush(stdout);
@@ -101,7 +101,7 @@ TEST_FUNCTION_START(gr_mpoly_get_set_coeff, state)
             _fmpz_vec_clear(exp, nvars);
         }
 
-        NEW_gr_mpoly_clear(f, ctx);
+        gr_mpoly_clear(f, ctx);
         gr_heap_clear(c, cctx);
         gr_heap_clear(d, cctx);
 

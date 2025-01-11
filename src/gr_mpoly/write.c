@@ -43,16 +43,17 @@ want_parens(const char * s)
 }
 
 /* todo: error handling */
-int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
-                             const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong len = A->length;
     ulong * exp = A->exps;
     slong bits = A->bits;
     slong i, j, N;
     fmpz * exponents;
     char * s;
-    char ** x = (char **) x_in;
+    char ** x = GR_MPOLY_VARS(ctx);
     TMP_INIT;
 
     if (len == 0)
@@ -187,10 +188,9 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
     return GR_SUCCESS;
 }
 
-int gr_mpoly_print_pretty(const gr_mpoly_t A,
-                             const char ** x_in, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+int gr_mpoly_print_pretty(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 {
     gr_stream_t out;
     gr_stream_init_file(out, stdout);
-    return gr_mpoly_write_pretty(out, A, x_in, mctx, cctx);
+    return gr_mpoly_write_pretty(out, A, ctx);
 }

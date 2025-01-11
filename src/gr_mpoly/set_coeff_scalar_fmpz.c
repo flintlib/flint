@@ -42,7 +42,7 @@ int gr_mpoly_set_coeff_scalar_fmpz(
 
     exp_bits = mpoly_exp_bits_required_ffmpz(exp, mctx);
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
-    gr_mpoly_fit_length_fit_bits(A, A->length, exp_bits, mctx, cctx);
+    gr_mpoly_fit_length_fit_bits(A, A->length, exp_bits, ctx);
 
     N = mpoly_words_per_exp(A->bits, mctx);
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
@@ -58,7 +58,7 @@ int gr_mpoly_set_coeff_scalar_fmpz(
     {
         if (gr_is_zero(c, cctx) != T_TRUE) /* make new term only if coeff is nonzero*/
         {
-            gr_mpoly_fit_length(A, A->length + 1, mctx, cctx);
+            gr_mpoly_fit_length(A, A->length + 1, ctx);
 
             for (i = A->length; i >= index + 1; i--)
             {

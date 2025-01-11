@@ -114,68 +114,14 @@ gr_mpoly_ctx_is_threadsafe(gr_mpoly_ctx_t ctx)
     return gr_ctx_is_threadsafe(GR_MPOLY_CCTX(ctx));
 }
 
-void
-_gr_gr_mpoly_init(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
+int
+gr_mpoly_write(gr_stream_t out, gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
 {
-    gr_mpoly_init(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-void
-_gr_gr_mpoly_clear(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
-{
-    gr_mpoly_clear(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-void
-_gr_gr_mpoly_swap(gr_mpoly_t poly1, gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
-{
-    gr_mpoly_swap(poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-void
-_gr_gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
-{
-    *res = *poly;
+    return gr_mpoly_write_pretty(out, poly, ctx);
 }
 
 int
-_gr_gr_mpoly_randtest(gr_mpoly_t res, flint_rand_t state, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_randtest_bits(res, state, n_randint(state, 5), 1 + n_randint(state, 3), GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-slong
-_gr_gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
-{
-    return x->length;
-}
-
-int
-_gr_gr_mpoly_write(gr_stream_t out, gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_write_pretty(out, poly, (const char **) GR_MPOLY_VARS(ctx), GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-truth_t
-_gr_gr_mpoly_equal(const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_equal(poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-truth_t
-_gr_gr_mpoly_is_zero(const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_is_zero(poly, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-truth_t
-_gr_gr_mpoly_is_one(const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_is_one(poly, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_gens(gr_vec_t res, gr_mpoly_ctx_t ctx)
+gr_mpoly_gens(gr_vec_t res, gr_mpoly_ctx_t ctx)
 {
     slong i, n;
     int status = GR_SUCCESS;
@@ -184,13 +130,13 @@ _gr_gr_mpoly_gens(gr_vec_t res, gr_mpoly_ctx_t ctx)
 
     gr_vec_set_length(res, n, ctx);
     for (i = 0; i < n; i++)
-        status |= gr_mpoly_gen(((gr_mpoly_struct *) res->entries) + i, i, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
+        status |= gr_mpoly_gen(((gr_mpoly_struct *) res->entries) + i, i, ctx);
 
     return status;
 }
 
 int
-_gr_gr_mpoly_gens_recursive(gr_vec_t vec, gr_mpoly_ctx_t ctx)
+gr_mpoly_gens_recursive(gr_vec_t vec, gr_mpoly_ctx_t ctx)
 {
     int status;
     gr_vec_t vec1;
@@ -207,96 +153,15 @@ _gr_gr_mpoly_gens_recursive(gr_vec_t vec, gr_mpoly_ctx_t ctx)
 
     /* Promote to polynomials */
     for (i = 0; i < n; i++)
-    {
         status |= gr_mpoly_set_scalar(gr_vec_entry_ptr(vec, i, ctx),
-                gr_vec_entry_srcptr(vec1, i, GR_MPOLY_CCTX(ctx)),
-                    GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-    }
+                gr_vec_entry_srcptr(vec1, i, GR_MPOLY_CCTX(ctx)), ctx);
 
     for (i = 0; i < m; i++)
-    {
-        status |= gr_mpoly_gen(((gr_mpoly_struct *) vec->entries) + n + i,
-            i, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-    }
+        status |= gr_mpoly_gen(((gr_mpoly_struct *) vec->entries) + n + i, i, ctx);
 
     gr_vec_clear(vec1, GR_MPOLY_CCTX(ctx));
 
     return status;
-}
-
-int
-_gr_gr_mpoly_zero(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_one(gr_mpoly_t res, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_one(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_set(gr_mpoly_t res, const gr_mpoly_t mat, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_set(res, mat, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_set_si(gr_mpoly_t res, slong v, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_set_si(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_set_ui(gr_mpoly_t res, ulong v, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_set_ui(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_set_fmpz(gr_mpoly_t res, const fmpz_t v, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_set_fmpz(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_set_fmpq(gr_mpoly_t res, const fmpq_t v, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_set_fmpq(res, v, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_neg(gr_mpoly_t res, const gr_mpoly_t mat, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_neg(res, mat, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_add(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
-{
-    if (poly1->length + poly2->length > ctx->size_limit)
-        return GR_UNABLE | gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-
-    return gr_mpoly_add(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_sub(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
-{
-    if (poly1->length + poly2->length > ctx->size_limit)
-        return GR_UNABLE | gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-
-    return gr_mpoly_sub(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-}
-
-int
-_gr_gr_mpoly_mul(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
-{
-    if (poly1->length * poly2->length > ctx->size_limit)
-        return GR_UNABLE | gr_mpoly_zero(res, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
-
-    return gr_mpoly_mul(res, poly1, poly2, GR_MPOLY_MCTX(ctx), GR_MPOLY_CCTX(ctx));
 }
 
 
@@ -315,30 +180,30 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_mpoly_ctx_is_field},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_mpoly_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) gr_mpoly_ctx_set_gen_names},
-    {GR_METHOD_INIT,        (gr_funcptr) _gr_gr_mpoly_init},
-    {GR_METHOD_CLEAR,       (gr_funcptr) _gr_gr_mpoly_clear},
-    {GR_METHOD_SWAP,        (gr_funcptr) _gr_gr_mpoly_swap},
-    {GR_METHOD_SET_SHALLOW, (gr_funcptr) _gr_gr_mpoly_set_shallow},
-    {GR_METHOD_RANDTEST,    (gr_funcptr) _gr_gr_mpoly_randtest},
-    {_GR_METHOD_LENGTH,     (gr_funcptr) _gr_gr_mpoly_length},
-    {GR_METHOD_WRITE,       (gr_funcptr) _gr_gr_mpoly_write},
-    {GR_METHOD_GENS,        (gr_funcptr) _gr_gr_mpoly_gens},
-    {GR_METHOD_GENS_RECURSIVE,       (gr_funcptr) _gr_gr_mpoly_gens_recursive},
-    {GR_METHOD_ZERO,        (gr_funcptr) _gr_gr_mpoly_zero},
-    {GR_METHOD_ONE,         (gr_funcptr) _gr_gr_mpoly_one},
-    {GR_METHOD_IS_ZERO,     (gr_funcptr) _gr_gr_mpoly_is_zero},
-    {GR_METHOD_IS_ONE,      (gr_funcptr) _gr_gr_mpoly_is_one},
-    {GR_METHOD_EQUAL,       (gr_funcptr) _gr_gr_mpoly_equal},
-    {GR_METHOD_SET,         (gr_funcptr) _gr_gr_mpoly_set},
-    {GR_METHOD_SET_UI,      (gr_funcptr) _gr_gr_mpoly_set_ui},
-    {GR_METHOD_SET_SI,      (gr_funcptr) _gr_gr_mpoly_set_si},
-    {GR_METHOD_SET_FMPZ,    (gr_funcptr) _gr_gr_mpoly_set_fmpz},
-    {GR_METHOD_SET_FMPQ,    (gr_funcptr) _gr_gr_mpoly_set_fmpq},
+    {GR_METHOD_INIT,        (gr_funcptr) gr_mpoly_init},
+    {GR_METHOD_CLEAR,       (gr_funcptr) gr_mpoly_clear},
+    {GR_METHOD_SWAP,        (gr_funcptr) gr_mpoly_swap},
+    {GR_METHOD_SET_SHALLOW, (gr_funcptr) gr_mpoly_set_shallow},
+    {GR_METHOD_RANDTEST,    (gr_funcptr) gr_mpoly_randtest},
+    {_GR_METHOD_LENGTH,     (gr_funcptr) gr_mpoly_length},
+    {GR_METHOD_WRITE,       (gr_funcptr) gr_mpoly_write},
+    {GR_METHOD_GENS,        (gr_funcptr) gr_mpoly_gens},
+    {GR_METHOD_GENS_RECURSIVE,       (gr_funcptr) gr_mpoly_gens_recursive},
+    {GR_METHOD_ZERO,        (gr_funcptr) gr_mpoly_zero},
+    {GR_METHOD_ONE,         (gr_funcptr) gr_mpoly_one},
+    {GR_METHOD_IS_ZERO,     (gr_funcptr) gr_mpoly_is_zero},
+    {GR_METHOD_IS_ONE,      (gr_funcptr) gr_mpoly_is_one},
+    {GR_METHOD_EQUAL,       (gr_funcptr) gr_mpoly_equal},
+    {GR_METHOD_SET,         (gr_funcptr) gr_mpoly_set},
+    {GR_METHOD_SET_UI,      (gr_funcptr) gr_mpoly_set_ui},
+    {GR_METHOD_SET_SI,      (gr_funcptr) gr_mpoly_set_si},
+    {GR_METHOD_SET_FMPZ,    (gr_funcptr) gr_mpoly_set_fmpz},
+    {GR_METHOD_SET_FMPQ,    (gr_funcptr) gr_mpoly_set_fmpq},
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
-    {GR_METHOD_NEG,         (gr_funcptr) _gr_gr_mpoly_neg},
-    {GR_METHOD_ADD,         (gr_funcptr) _gr_gr_mpoly_add},
-    {GR_METHOD_SUB,         (gr_funcptr) _gr_gr_mpoly_sub},
-    {GR_METHOD_MUL,         (gr_funcptr) _gr_gr_mpoly_mul},
+    {GR_METHOD_NEG,         (gr_funcptr) gr_mpoly_neg},
+    {GR_METHOD_ADD,         (gr_funcptr) gr_mpoly_add},
+    {GR_METHOD_SUB,         (gr_funcptr) gr_mpoly_sub},
+    {GR_METHOD_MUL,         (gr_funcptr) gr_mpoly_mul},
     {0,                     (gr_funcptr) NULL},
 };
 
