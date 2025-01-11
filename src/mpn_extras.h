@@ -618,7 +618,9 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
-# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 9
+# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 13
+/* n with best effective cycles/limb (and current largest assembly case) -- used by mulhigh_recursive */
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 9
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 9
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 8
@@ -632,6 +634,7 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #elif FLINT_HAVE_ASSEMBLY_armv8
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 8
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 8
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0
@@ -643,6 +646,7 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 /* TODO: generic hardcoded mullows */
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 16
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 16
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 2
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0
@@ -650,8 +654,9 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #endif
 
 /* FIXME: this tuning is for x86_64_adx with fft_small */
-/* NOTE: we assume that the same cutoff is optimal for both mulhigh and mullow */
-#define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
+/* FIXME: we currently assume that the same parameters are optimal for both mulhigh and mullow */
+#define FLINT_MPN_MULLOW_MULDERS_CUTOFF 50
+#define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 40
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
 #define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
 
@@ -665,9 +670,24 @@ mp_limb_t _flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
+mp_limb_t _flint_mpn_mulhigh_n_naive(mp_ptr rp, mp_srcptr up, mp_srcptr vp, mp_size_t n);
+mp_limb_t _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+MPN_EXTRAS_INLINE
+mp_limb_t _flint_mpn_mulhigh_n_basecase2(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    if (n <= 22)
+        return _flint_mpn_mulhigh_n_recursive(rp, xp, yp, n);
+    else
+        return _flint_mpn_mulhigh_basecase(rp, xp, yp, n);
+}
+#else
+#define _flint_mpn_mulhigh_n_basecase2 _flint_mpn_mulhigh_basecase
+#endif
 
 MPN_EXTRAS_INLINE
 mp_limb_t flint_mpn_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
