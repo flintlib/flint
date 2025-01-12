@@ -64,6 +64,24 @@ typedef gr_mpoly_ctx_struct gr_mpoly_ctx_t[1];
 void gr_mpoly_ctx_init_rand(gr_mpoly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring, slong max_nvars);
 void gr_mpoly_ctx_clear(gr_mpoly_ctx_t ctx);
 
+void gr_mpoly_ctx_init(gr_mpoly_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
+void gr_mpoly_ctx_init_rand(gr_mpoly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring, slong max_nvars);
+
+WARN_UNUSED_RESULT int gr_mpoly_ctx_set_gen_names(gr_mpoly_ctx_t ctx, const char ** s);
+WARN_UNUSED_RESULT int gr_mpoly_gens(gr_vec_t res, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_gens_recursive(gr_vec_t vec, gr_mpoly_ctx_t ctx);
+
+int gr_mpoly_ctx_write(gr_stream_t out, gr_mpoly_ctx_t ctx);
+void gr_mpoly_ctx_clear(gr_mpoly_ctx_t ctx);
+
+truth_t gr_mpoly_ctx_is_ring(gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_ctx_is_zero_ring(gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_ctx_is_commutative_ring(gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_ctx_is_integral_domain(gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_ctx_is_field(gr_mpoly_ctx_t ctx);
+truth_t gr_mpoly_ctx_is_threadsafe(gr_mpoly_ctx_t ctx);
+
+
 /* Memory management */
 
 GR_MPOLY_INLINE
@@ -125,12 +143,24 @@ void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, gr_mpoly_ctx_t ctx)
     A->length = newlen;
 }
 
+GR_MPOLY_INLINE slong
+gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
+{
+    return x->length;
+}
+
 /* Basic manipulation */
 
 GR_MPOLY_INLINE
 void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 {
     FLINT_SWAP(gr_mpoly_struct, *A, *B);
+}
+
+GR_MPOLY_INLINE void
+gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    *res = *poly;
 }
 
 WARN_UNUSED_RESULT int gr_mpoly_set(gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
@@ -175,10 +205,16 @@ void gr_mpoly_assert_canonical(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
 int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint_bitcnt_t exp_bits, gr_mpoly_ctx_t ctx);
 
+GR_MPOLY_INLINE WARN_UNUSED_RESULT int
+_gr_mpoly_randtest_default(gr_mpoly_t res, flint_rand_t state, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_randtest_bits(res, state, n_randint(state, 5), 1 + n_randint(state, 3), ctx);
+}
+
 /* Input and output */
 
-/* todo: vars stored in context object */
 int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
+int gr_mpoly_write(gr_stream_t out, gr_mpoly_t poly, gr_mpoly_ctx_t ctx);
 int gr_mpoly_print_pretty(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
 /* Constants */
@@ -240,26 +276,6 @@ WARN_UNUSED_RESULT int gr_mpoly_mul_si(gr_mpoly_t A, const gr_mpoly_t B, slong c
 WARN_UNUSED_RESULT int gr_mpoly_mul_ui(gr_mpoly_t A, const gr_mpoly_t B, ulong c, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpz(gr_mpoly_t A, const gr_mpoly_t B, const fmpz_t c, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpq(gr_mpoly_t A, const gr_mpoly_t B, const fmpq_t c, gr_mpoly_ctx_t ctx);
-
-/* Todo */
-
-GR_MPOLY_INLINE WARN_UNUSED_RESULT int
-gr_mpoly_randtest(gr_mpoly_t res, flint_rand_t state, gr_mpoly_ctx_t ctx)
-{
-    return gr_mpoly_randtest_bits(res, state, n_randint(state, 5), 1 + n_randint(state, 3), ctx);
-}
-
-GR_MPOLY_INLINE void
-gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
-{
-    *res = *poly;
-}
-
-GR_MPOLY_INLINE slong
-gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
-{
-    return x->length;
-}
 
 #ifdef __cplusplus
 }

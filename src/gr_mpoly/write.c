@@ -194,3 +194,9 @@ int gr_mpoly_print_pretty(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
     gr_stream_init_file(out, stdout);
     return gr_mpoly_write_pretty(out, A, ctx);
 }
+
+int
+gr_mpoly_write(gr_stream_t out, gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    return gr_mpoly_write_pretty(out, poly, ctx);
+}
