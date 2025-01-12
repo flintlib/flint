@@ -19,10 +19,12 @@ void _gr_mpoly_fit_length(
     slong * exps_alloc,
     slong N,
     slong length,
-    gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
     if (length > *coeffs_alloc)
     {
+        gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
+
         slong old_alloc = *coeffs_alloc;
         slong new_alloc = FLINT_MAX(length, old_alloc*2);
         slong sz = cctx->sizeof_elem;
@@ -42,10 +44,10 @@ void _gr_mpoly_fit_length(
 void gr_mpoly_fit_length(
     gr_mpoly_t A,
     slong len,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
-    slong N = mpoly_words_per_exp(A->bits, mctx);
+    slong N = mpoly_words_per_exp(A->bits, GR_MPOLY_MCTX(ctx));
 
     _gr_mpoly_fit_length(&A->coeffs, &A->coeffs_alloc,
-                               &A->exps, &A->exps_alloc, N, len, cctx);
+                               &A->exps, &A->exps_alloc, N, len, ctx);
 }

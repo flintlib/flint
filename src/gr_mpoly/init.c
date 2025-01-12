@@ -16,8 +16,10 @@ void gr_mpoly_init3(
     gr_mpoly_t A,
     slong alloc,
     flint_bitcnt_t bits,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong N = mpoly_words_per_exp(bits, mctx);
 
     if (alloc > 0)
@@ -43,8 +45,8 @@ void gr_mpoly_init3(
 void gr_mpoly_init2(
     gr_mpoly_t A,
     slong alloc,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
-    flint_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, mctx);
-    gr_mpoly_init3(A, alloc, bits, mctx, cctx);
+    flint_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, GR_MPOLY_MCTX(ctx));
+    gr_mpoly_init3(A, alloc, bits, ctx);
 }

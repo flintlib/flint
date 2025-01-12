@@ -15,8 +15,10 @@
 int gr_mpoly_gen(
     gr_mpoly_t A,
     slong var,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     flint_bitcnt_t bits;
     int status = GR_SUCCESS;
 
@@ -25,7 +27,7 @@ int gr_mpoly_gen(
 
     bits = mpoly_gen_bits_required(var, mctx);
     bits = mpoly_fix_bits(bits, mctx);
-    gr_mpoly_fit_length_reset_bits(A, 1, bits, mctx, cctx);
+    gr_mpoly_fit_length_reset_bits(A, 1, bits, ctx);
 
     if (bits <= FLINT_BITS)
         mpoly_gen_monomial_sp(A->exps, var, bits, mctx);
@@ -33,13 +35,15 @@ int gr_mpoly_gen(
         mpoly_gen_monomial_offset_mp(A->exps, var, bits, mctx);
 
     status |= gr_one(A->coeffs, cctx);
-    _gr_mpoly_set_length(A, gr_is_zero(A->coeffs, cctx) != T_TRUE, mctx, cctx);
+    _gr_mpoly_set_length(A, gr_is_zero(A->coeffs, cctx) != T_TRUE, ctx);
 
     return status;
 }
 
-truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     truth_t res;
 
     if (var >= mctx->nvars || mctx->nvars == 0)
@@ -62,15 +66,14 @@ truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, const mpoly_ctx_t mctx, g
     {
         /* todo: cheaper check when possible */
         gr_mpoly_t t;
+        gr_mpoly_init(t, ctx);
 
-        gr_mpoly_init(t, mctx, cctx);
-
-        if (gr_mpoly_gen(t, var, mctx, cctx) != GR_SUCCESS)
+        if (gr_mpoly_gen(t, var, ctx) != GR_SUCCESS)
             res = T_UNKNOWN;
         else
-            res = gr_mpoly_equal(A, t, mctx, cctx);
+            res = gr_mpoly_equal(A, t, ctx);
 
-        gr_mpoly_clear(t, mctx, cctx);
+        gr_mpoly_clear(t, ctx);
     }
 
     return res;

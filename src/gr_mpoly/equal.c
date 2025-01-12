@@ -15,7 +15,7 @@
 truth_t gr_mpoly_equal(
     const gr_mpoly_t A,
     const gr_mpoly_t B,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
     truth_t eq;
     gr_mpoly_t t;
@@ -34,14 +34,14 @@ truth_t gr_mpoly_equal(
                                                         A->length, ctx->minfo)) ? T_TRUE : T_FALSE;
     */
 
-    gr_mpoly_init(t, mctx, cctx);
+    gr_mpoly_init(t, ctx);
 
-    if (gr_mpoly_sub(t, A, B, mctx, cctx) == GR_SUCCESS)
-        eq = gr_mpoly_is_zero(t, mctx, cctx);
+    if (gr_mpoly_sub(t, A, B, ctx) == GR_SUCCESS)
+        eq = gr_mpoly_is_zero(t, ctx);
     else
         eq = T_UNKNOWN;
 
-    gr_mpoly_clear(t, mctx, cctx);
+    gr_mpoly_clear(t, ctx);
 
     return eq;
 }
