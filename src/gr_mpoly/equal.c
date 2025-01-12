@@ -9,39 +9,60 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
-/* todo: proper algorithm */
 truth_t gr_mpoly_equal(
     const gr_mpoly_t A,
     const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    truth_t eq;
-    gr_mpoly_t t;
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
+    int canonical;
 
     if (A == B)
         return T_TRUE;
 
-    /* todo: if canonical representation */
-    /*
-    if (A->length != B->length)
-        return T_FALSE;
+    canonical = 1;
 
-    ... _gr_vec_equal(A->coeffs, B->coeffs, A->length) ...
+    if (gr_ctx_is_canonical(cctx) != T_TRUE)
+    {
+        slong i, sz = cctx->sizeof_elem;
 
-    return (0 == mpoly_monomials_cmp(A->exps, A->bits, B->exps, B->bits,
-                                                        A->length, ctx->minfo)) ? T_TRUE : T_FALSE;
-    */
+        for (i = 0; canonical && i < A->length; i++)
+            if (gr_is_zero(GR_ENTRY(A->coeffs, i, sz), cctx) != T_FALSE)
+                canonical = 0;
 
-    gr_mpoly_init(t, ctx);
+        for (i = 0; canonical && i < B->length; i++)
+            if (gr_is_zero(GR_ENTRY(B->coeffs, i, sz), cctx) != T_FALSE)
+                canonical = 0;
+    }
 
-    if (gr_mpoly_sub(t, A, B, ctx) == GR_SUCCESS)
-        eq = gr_mpoly_is_zero(t, ctx);
+    if (canonical)
+    {
+        if (A->length != B->length)
+            return T_FALSE;
+
+        if (0 != mpoly_monomials_cmp(A->exps, A->bits, B->exps, B->bits, A->length, mctx))
+            return T_FALSE;
+
+        return _gr_vec_equal(A->coeffs, B->coeffs, A->length, cctx);
+    }
     else
-        eq = T_UNKNOWN;
+    {
+        /* todo: a better fallback algorithm */
+        truth_t eq;
+        gr_mpoly_t t;
+        gr_mpoly_init(t, ctx);
 
-    gr_mpoly_clear(t, ctx);
+        if (gr_mpoly_sub(t, A, B, ctx) == GR_SUCCESS)
+            eq = gr_mpoly_is_zero(t, ctx);
+        else
+            eq = T_UNKNOWN;
 
-    return eq;
+        gr_mpoly_clear(t, ctx);
+
+        return eq;
+    }
 }

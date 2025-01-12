@@ -172,15 +172,7 @@ int gr_mpoly_zero(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-GR_MPOLY_INLINE
-truth_t gr_mpoly_is_zero(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
-{
-    if (A->length == 0)
-        return T_TRUE;
-
-    /* todo: skip when we have canonical representation */
-    return _gr_vec_is_zero(A->coeffs, A->length, GR_MPOLY_CCTX(ctx));
-}
+truth_t gr_mpoly_is_zero(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_gen(gr_mpoly_t A, slong var, gr_mpoly_ctx_t ctx);
 truth_t gr_mpoly_is_gen(const gr_mpoly_t A, slong var, gr_mpoly_ctx_t ctx);
@@ -231,18 +223,7 @@ int gr_mpoly_one(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
     return gr_mpoly_set_ui(A, 1, ctx);
 }
 
-/* todo: efficient version */
-GR_MPOLY_INLINE
-truth_t gr_mpoly_is_one(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
-{
-    gr_mpoly_t t;
-    truth_t res = T_UNKNOWN;
-    gr_mpoly_init(t, ctx);
-    if (gr_mpoly_one(t, ctx) == GR_SUCCESS)
-        res = gr_mpoly_equal(A, t, ctx);
-    gr_mpoly_clear(t, ctx);
-    return res;
-}
+truth_t gr_mpoly_is_one(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
 /* Coefficient/exponent access */
 
