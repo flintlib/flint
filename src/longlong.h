@@ -25,8 +25,8 @@
 extern "C" {
 #endif
 
-/* FIXME: Bug in Clang 18 */
-#if __clang_major__ >= 18
+/* FIXME: Bug in Clang 16+ */
+#if __clang_major__ >= 16
 # define CLANG_volatile volatile
 #else
 # define CLANG_volatile
