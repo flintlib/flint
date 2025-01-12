@@ -8083,6 +8083,9 @@ def test_mpoly():
     assert str(FiniteField_fq_nmod(3, 2, "d").gen()) == "d"
     assert str(FiniteField_fq_zech(3, 2, "e").gen()) == "e^1"
 
+    assert str(sum(PolynomialRing_gr_mpoly(ZZi, 20).gens())) == "x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 + x12 + x13 + x14 + x15 + x16 + x17 + x18 + x19 + x20"
+
+
 def test_mpoly_q():
     assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'
     assert str(FractionField_fmpz_mpoly_q(2, ["a", "b"]).gens()) == '[a, b]'

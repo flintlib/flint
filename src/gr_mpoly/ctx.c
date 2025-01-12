@@ -193,6 +193,10 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) gr_mpoly_add},
     {GR_METHOD_SUB,         (gr_funcptr) gr_mpoly_sub},
     {GR_METHOD_MUL,         (gr_funcptr) gr_mpoly_mul},
+    {GR_METHOD_MUL_UI,      (gr_funcptr) gr_mpoly_mul_ui},
+    {GR_METHOD_MUL_SI,      (gr_funcptr) gr_mpoly_mul_si},
+    {GR_METHOD_MUL_FMPZ,    (gr_funcptr) gr_mpoly_mul_fmpz},
+    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) gr_mpoly_mul_fmpq},
     {0,                     (gr_funcptr) NULL},
 };
 
