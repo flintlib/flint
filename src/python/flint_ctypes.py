@@ -8085,6 +8085,73 @@ def test_mpoly():
 
     assert str(sum(PolynomialRing_gr_mpoly(ZZi, 20).gens())) == "x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + x9 + x10 + x11 + x12 + x13 + x14 + x15 + x16 + x17 + x18 + x19 + x20"
 
+    RA = PolynomialRing_gr_mpoly(ZZi, 2)
+    RB = PolynomialRing_gr_mpoly(QQbar, 2)
+    IA, xA, yA = RA.gens(recursive=True)
+    xB, yB = RB.gens()
+    IB = QQbar.i()
+    cA = 2 - 3*IA
+    cB = 2 - 3*IB
+    assert xA == xB
+    assert yA == yB
+    assert xA != yB
+    assert xB != yA
+    assert RA(cB) == RB(cA)
+    assert xA + cB == cA + xB
+    assert RA(cB*yB + xB) == RB(cA*yA + xA)
+
+    RA = PolynomialRing_gr_mpoly(ZZ, 2, ["x", "y"])
+    RB = PolynomialRing_gr_mpoly(ZZmod(5), 2, ["x", "y"])
+    xA, yA = RA.gens()
+    xB, yB = RB.gens()
+    assert RB((xA+yA)**10) == xB**10 + 2*(xB*yB)**5 + yB**10
+
+    RA = PolynomialRing_gr_mpoly(RR, 2, ["x", "y"])
+    RB = PolynomialRing_gr_mpoly(CC, 2, ["x", "y"])
+    xA, yA = RA.gens()
+    xB, yB = RB.gens()
+    c = RR("0 +/- 1e-10")
+    v = (xA + yA + c)**3 - (xB + yB)**3
+    assert str(v) == "[+/- 3.01e-10]*x^2 + [+/- 6.01e-10]*x*y + [+/- 3.01e-20]*x + [+/- 3.01e-10]*y^2 + [+/- 3.01e-20]*y + [+/- 1.01e-30]"
+
+    RA = PolynomialRing_gr_mpoly(ZZi, 2, ["x", "y"])
+    RB = PolynomialRing_gr_mpoly(ZZi, 3, ["z", "y", "x"])
+    xA, yA = RA.gens()
+    zB, yB, xB = RB.gens()
+    assert RA(xB) == xA
+    assert RA(yB) == yA
+    assert RB(xA) == xB
+    assert RB(yA) == yB
+    assert RA((-3+xB+2*yB)**3) == (-3+xA+2*yA)**3
+    assert RB((-3+xA+2*yA)**3) == (-3+xB+2*yB)**3
+    assert RA(xB * 0) == 0
+    assert RB(xA * 0) == 0
+    assert RA(xB ** 0) == 1
+    assert RB(xA ** 0) == 1
+    assert raises(lambda: RA(zB), NotImplementedError)   # todo: domain error
+
+    RA2 = PolynomialRing_gr_mpoly(FiniteField_fq(2, 3), 2, ["x", "y"])
+    assert raises(lambda: RA(RA2(0)), NotImplementedError)
+
+    RA = PolynomialRing_gr_mpoly(ZZi, 2, ["x", "y"])
+    RB = PolynomialRing_fmpz_mpoly(3, ["z", "y", "x"])
+    xA, yA = RA.gens()
+    zB, yB, xB = RB.gens()
+    assert RA(xB) == xA
+    assert RA(yB) == yA
+    assert raises(lambda: RA(zB), NotImplementedError)   # todo: domain error
+    assert RA((-3+xB+2*yB)**3) == (-3+xA+2*yA)**3
+
+    # todo: match index when variables are not named ?
+    RA = PolynomialRing_gr_mpoly(ZZi, 2)
+    RB = PolynomialRing_gr_mpoly(ZZi, 3)
+    assert raises(lambda: RA(RB.gens()[0]), NotImplementedError)
+    assert raises(lambda: RB(RA.gens()[0]), NotImplementedError)
+    RA = PolynomialRing_gr_mpoly(ZZi, 2)
+    RB = PolynomialRing_gr_mpoly(ZZi, 2, ["x", "y"])
+    assert raises(lambda: RA(RB.gens()[0]), NotImplementedError)
+    assert raises(lambda: RB(RA.gens()[0]), NotImplementedError)
+
 
 def test_mpoly_q():
     assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'

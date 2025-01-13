@@ -184,6 +184,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_IS_ONE,      (gr_funcptr) gr_mpoly_is_one},
     {GR_METHOD_EQUAL,       (gr_funcptr) gr_mpoly_equal},
     {GR_METHOD_SET,         (gr_funcptr) gr_mpoly_set},
+    {GR_METHOD_SET_OTHER,   (gr_funcptr) gr_mpoly_set_other},
     {GR_METHOD_SET_UI,      (gr_funcptr) gr_mpoly_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) gr_mpoly_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) gr_mpoly_set_fmpz},

@@ -209,6 +209,10 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ct
 int gr_mpoly_write(gr_stream_t out, gr_mpoly_t poly, gr_mpoly_ctx_t ctx);
 int gr_mpoly_print_pretty(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
+/* Conversion */
+
+WARN_UNUSED_RESULT int gr_mpoly_set_other(gr_mpoly_t res, gr_srcptr A, gr_ctx_t A_ctx, gr_mpoly_ctx_t ctx);
+
 /* Constants */
 
 WARN_UNUSED_RESULT int gr_mpoly_set_scalar(gr_mpoly_t A, gr_srcptr c, gr_mpoly_ctx_t ctx);
