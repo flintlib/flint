@@ -62,10 +62,8 @@ Types, macros and constants
       initialized to ``NULL`` in which case some default names
       are used.
       Names are used for printing and parsing from strings
-      with :func:`gr_set_str` and are otherwise ignored for computations.
-      Currently, coercions between multivariate polynomial rings
-      match generators by index and ignore names;
-      in the future, an option may be added to match by name.
+      with :func:`gr_set_str` and in some cases for coercions
+      between different rings.
 
 .. macro:: GR_MPOLY_MCTX(ctx)
 
@@ -180,6 +178,35 @@ Generators
     Sets the vector *res* to a list of the recursive generators of `R`
     (as constant elements of `R[X_1, \ldots, X_n]`)
     followed by the generators `X_1, \ldots, X_n`.
+
+Conversions
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mpoly_set_scalar(gr_mpoly_t A, gr_srcptr c, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_set_ui(gr_mpoly_t A, ulong c, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_set_si(gr_mpoly_t A, slong c, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_set_fmpz(gr_mpoly_t A, const fmpz_t c, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_set_fmpq(gr_mpoly_t A, const fmpq_t c, gr_mpoly_ctx_t ctx)
+
+    Sets *A* to the given scalar *c*.
+
+.. function:: int gr_mpoly_set_other(gr_mpoly_t res, gr_srcptr A, gr_ctx_t A_ctx, gr_mpoly_ctx_t ctx)
+
+    Sets *res* to *A* (an element of *A_ctx*) converted to the
+    multivariate polynomial ring *ctx*.
+
+    If *A_ctx* is a multivariate polynomial ring, this attempts to
+    coerce the coefficients and translate the generators.
+    If both rings have named generators, we find all used
+    generators in *A* and match them to generators with the same names
+    in *ctx*. If both rings have the same number of unnamed generators
+    and the same term ordering, we perform a direct conversion.
+    Other cases are not currently supported.
+ 
+    Otherwise, we attempt to interpret *A* as a scalar.
+
+    Currently, absorbing generators from nested rings is not supported,
+    e.g. converting between `R[x,y][s,t]` and `R[x,y,s,t]` is likely to fail.
 
 
 Comparisons
