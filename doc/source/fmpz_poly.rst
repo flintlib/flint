@@ -151,7 +151,7 @@ Memory management
     This function sets the uninitialised polynomial ``trunc`` to the low
     `n` coefficients of ``poly``, or to ``poly`` if the latter doesn't
     have `n` coefficients. The polynomial ``trunc`` not be cleared or used
-    as the output of any Flint functions.
+    as the output of any FLINT functions.
 
 .. function:: void fmpz_poly_attach_shift(fmpz_poly_t trunc, const fmpz_poly_t poly, slong n)
 
@@ -159,7 +159,7 @@ Memory management
     high coefficients of ``poly``, i.e. the coefficients not among the low
     `n` coefficients of ``poly``. If the latter doesn't have `n`
     coefficients ``trunc`` is set to the zero polynomial. The polynomial
-    ``trunc`` not be cleared or used as the output of any Flint functions.
+    ``trunc`` not be cleared or used as the output of any FLINT functions.
 
 
 Polynomial parameters
@@ -2303,14 +2303,14 @@ Evaluation
 
     Evaluate ``(poly, n)`` at the double `d`. No attempt is made to do this
     efficiently or in a numerically stable way. It is currently only used in
-    Flint for quick and dirty evaluations of polynomials with all coefficients
+    FLINT for quick and dirty evaluations of polynomials with all coefficients
     positive.
 
 .. function:: double fmpz_poly_evaluate_horner_d(const fmpz_poly_t poly, double d)
 
     Evaluate ``poly`` at the double `d`. No attempt is made to do this
     efficiently or in a numerically stable way. It is currently only used in
-    Flint for quick and dirty evaluations of polynomials with all coefficients
+    FLINT for quick and dirty evaluations of polynomials with all coefficients
     positive.
 
 .. function:: double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n, double d)
@@ -2318,7 +2318,7 @@ Evaluation
     Evaluate ``(poly, n)`` at the double `d`. Return the result as a double
     and an exponent ``exp`` combination. No attempt is made to do this
     efficiently or in a numerically stable way. It is currently only used in
-    Flint for quick and dirty evaluations of polynomials with all coefficients
+    FLINT for quick and dirty evaluations of polynomials with all coefficients
     positive.
 
 .. function:: double fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz_poly_t poly, double d)
@@ -2326,7 +2326,7 @@ Evaluation
     Evaluate ``poly`` at the double `d`. Return the result as a double
     and an exponent ``exp`` combination. No attempt is made to do this
     efficiently or in a numerically stable way. It is currently only used in
-    Flint for quick and dirty evaluations of polynomials with all coefficients
+    FLINT for quick and dirty evaluations of polynomials with all coefficients
     positive.
 
 .. function:: double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp)
@@ -2334,7 +2334,7 @@ Evaluation
     Evaluate ``poly`` at ``d*2^dexp``. Return the result as a double
     and an exponent ``exp`` combination. No attempt is made to do this
     efficiently or in a numerically stable way. It is currently only used in
-    Flint for quick and dirty evaluations of polynomials with all coefficients
+    FLINT for quick and dirty evaluations of polynomials with all coefficients
     positive.
 
 
