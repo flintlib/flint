@@ -49,7 +49,7 @@ jobs:
         run: |
           cd doc/build
           mv html doc
-          cp latex/Flint.pdf doc
+          cp latex/flint.pdf doc
           tar -czvf doc.tar.gz doc
 
       - name: "Setup SSH key"
