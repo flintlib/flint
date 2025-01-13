@@ -43,27 +43,27 @@ test_mul_scalar(flint_rand_t state, int which)
         case 0:
             c_ui = n_randint(state, max_scalar);
             status |= gr_set_ui(c, c_ui, ctx);
-            status |= gr_poly_mul_scalar_ui(C, A, c_ui, ctx);
+            status |= gr_poly_mul_ui(C, A, c_ui, ctx);
             break;
         case 1:
             c_si = n_randint(state, max_scalar);
             if (c_si & 1)
                 c_si = - c_si;
             status |= gr_set_si(c, c_si, ctx);
-            status |= gr_poly_mul_scalar_si(C, A, c_si, ctx);
+            status |= gr_poly_mul_si(C, A, c_si, ctx);
             break;
         case 2:
             fmpz_init(c_fmpz);
             fmpz_randtest(c_fmpz, state, 8);
             status |= gr_set_fmpz(c,c_fmpz, ctx);
-            status |= gr_poly_mul_scalar_fmpz(C, A, c_fmpz, ctx);
+            status |= gr_poly_mul_fmpz(C, A, c_fmpz, ctx);
             fmpz_clear(c_fmpz);
             break;
         case 3:
             fmpq_init(c_fmpq);
             fmpq_randtest(c_fmpq, state, 8);
             status |= gr_set_fmpq(c, c_fmpq, ctx);
-            status |= gr_poly_mul_scalar_fmpq(C, A, c_fmpq, ctx);
+            status |= gr_poly_mul_fmpq(C, A, c_fmpq, ctx);
             fmpq_clear(c_fmpq);
             break;
 

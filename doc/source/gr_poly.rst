@@ -159,10 +159,10 @@ Arithmetic
               int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong len, gr_ctx_t ctx)
 
 .. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
-              int gr_poly_mul_scalar_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
-              int gr_poly_mul_scalar_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
-              int gr_poly_mul_scalar_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz c, gr_ctx_t ctx)
-              int gr_poly_mul_scalar_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq c, gr_ctx_t ctx)
+              int gr_poly_mul_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+              int gr_poly_mul_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+              int gr_poly_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz c, gr_ctx_t ctx)
+              int gr_poly_mul_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq c, gr_ctx_t ctx)
     
     Sets *res* to *poly* multiplied by the scalar *c* which must be
     an element of or coercible to the coefficient ring.

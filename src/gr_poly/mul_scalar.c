@@ -34,7 +34,7 @@ gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ct
 }
 
 int
-gr_poly_mul_scalar_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+gr_poly_mul_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
 {
     int status;
     slong len = poly->length;
@@ -54,7 +54,7 @@ gr_poly_mul_scalar_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx
 }
 
 int
-gr_poly_mul_scalar_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+gr_poly_mul_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
 {
     int status;
     slong len = poly->length;
@@ -74,7 +74,7 @@ gr_poly_mul_scalar_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx
 }
 
 int
-gr_poly_mul_scalar_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
+gr_poly_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
 {
     int status;
     slong len = poly->length;
@@ -82,17 +82,19 @@ gr_poly_mul_scalar_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_
     if (len == 0 || fmpz_is_zero(c))
         return gr_poly_zero(res, ctx);
 
-    gr_ptr t;
-    GR_TMP_INIT(t, ctx);
-    status = gr_set_fmpz(t, c, ctx);
-    status |= gr_poly_mul_scalar(res, poly, t, ctx);
-    GR_TMP_CLEAR(t, ctx);
+    if (res != poly)
+    {
+        gr_poly_fit_length(res, len, ctx);
+        _gr_poly_set_length(res, len, ctx);
+    }
 
+    status = _gr_vec_mul_scalar_fmpz(res->coeffs, poly->coeffs, len, c, ctx);
+    _gr_poly_normalise(res, ctx);
     return status;
 }
 
 int
-gr_poly_mul_scalar_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
+gr_poly_mul_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
 {
     int status;
     slong len = poly->length;
@@ -100,11 +102,13 @@ gr_poly_mul_scalar_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_
     if (len == 0 || fmpq_is_zero(c))
         return gr_poly_zero(res, ctx);
 
-    gr_ptr t;
-    GR_TMP_INIT(t, ctx);
-    status = gr_set_fmpq(t, c, ctx);
-    status |= gr_poly_mul_scalar(res, poly, t, ctx);
-    GR_TMP_CLEAR(t, ctx);
+    if (res != poly)
+    {
+        gr_poly_fit_length(res, len, ctx);
+        _gr_poly_set_length(res, len, ctx);
+    }
 
+    status = _gr_vec_mul_scalar_fmpq(res->coeffs, poly->coeffs, len, c, ctx);
+    _gr_poly_normalise(res, ctx);
     return status;
 }
