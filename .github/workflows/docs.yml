@@ -37,7 +37,7 @@ jobs:
           cd doc
           make html SPHINXOPTS="-W -j auto"
 
-      - name: "Build pdf documentation"
+      - name: "Build PDF documentation"
         uses: dante-ev/latex-action@latest
         with:
           root_file:
