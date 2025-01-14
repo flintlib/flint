@@ -120,7 +120,6 @@ ca_mat_det(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
 
             fmpq_mat_det(det, Qm);
 
-            flint_free(Qm->rows);
             flint_free(Qm->entries);
             ca_set_fmpq(res, det, ctx);
             fmpq_clear(det);

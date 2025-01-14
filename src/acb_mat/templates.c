@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpq_mat.h"
 #include "acb.h"
 #include "acb_mat.h"
 
@@ -137,7 +138,23 @@ COMPARISON_OP(acb_mat_equal,             acb_mat_t, acb_mat_t,  acb_equal)
 COMPARISON_OP(acb_mat_overlaps,          acb_mat_t, acb_mat_t,  acb_overlaps)
 COMPARISON_OP(acb_mat_contains,          acb_mat_t, acb_mat_t,  acb_contains)
 COMPARISON_OP(acb_mat_contains_fmpz_mat, acb_mat_t, fmpz_mat_t, acb_contains_fmpz)
-COMPARISON_OP(acb_mat_contains_fmpq_mat, acb_mat_t, fmpq_mat_t, acb_contains_fmpq)
+
+/* FIXME: structure changed */
+/* COMPARISON_OP(acb_mat_contains_fmpq_mat, acb_mat_t, fmpq_mat_t, acb_contains_fmpq) */
+int acb_mat_contains_fmpq_mat(const acb_mat_t am, const fmpq_mat_t bm)
+{
+    slong ix, jx;
+
+    if (mat_nrows(am) != mat_nrows(bm) || mat_ncols(am) != mat_ncols(bm))
+        return 0;
+
+    for (ix = 0; ix < mat_nrows(am); ix++)
+        for (jx = 0; jx < mat_ncols(am); jx++)
+            if (!acb_contains_fmpq(mat_entry(am, ix, jx), fmpq_mat_entry(bm, ix, jx)))
+                return 0;
+
+    return 1;
+}
 
 NOT_COMPARISON_OP(acb_mat_ne, acb_mat_t, acb_mat_t, acb_ne)
 
@@ -152,7 +169,17 @@ SET_OP(acb_mat_set_fmpz_mat,   acb_mat_t, const fmpz_mat_t, acb_set_fmpz)
 SET_OP(acb_mat_set_arb_mat,    acb_mat_t, const arb_mat_t,  acb_set_arb)
 SET_OP(acb_mat_conjugate,      acb_mat_t, const acb_mat_t,  acb_conj)
 
-SET_PREC_OP(acb_mat_set_fmpq_mat,       acb_mat_t, fmpq_mat_t, acb_set_fmpq)
+/* FIXME: structure changed */
+/* SET_PREC_OP(acb_mat_set_fmpq_mat, acb_mat_t, fmpq_mat_t, acb_set_fmpq) */
+void acb_mat_set_fmpq_mat(acb_mat_t rm, const fmpq_mat_t am, slong prec)
+{
+    slong ix, jx;
+
+    for (ix = 0; ix < mat_nrows(rm); ix++)
+        for (jx = 0; jx < mat_ncols(rm); jx++)
+            acb_set_fmpq(mat_entry(rm, ix, jx), fmpq_mat_entry(am, ix, jx), prec);
+}
+
 SET_PREC_OP(acb_mat_set_round_fmpz_mat, acb_mat_t, fmpz_mat_t, acb_set_round_fmpz)
 SET_PREC_OP(acb_mat_set_round_arb_mat,  acb_mat_t, arb_mat_t,  acb_set_round_arb)
 

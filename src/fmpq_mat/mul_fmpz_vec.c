@@ -32,7 +32,7 @@ void fmpq_mat_mul_fmpz_vec(
 
     for (i = 0; i < A->r; i++)
     {
-        const fmpq* Ai = A->rows[i];
+        const fmpq* Ai = fmpq_mat_entry(A, i, 0);
 
         fmpq_mul_fmpz(c + i, Ai + 0, b + 0);
         for (j = 1; j < len; j++)
@@ -67,7 +67,7 @@ void fmpq_mat_mul_fmpz_vec_ptr(
 
     for (i = 0; i < A->r; i++)
     {
-        const fmpq* Ai = A->rows[i];
+        const fmpq* Ai = fmpq_mat_entry(A, i, 0);
 
         fmpq_mul_fmpz(c[i], Ai + 0, b[0]);
         for (j = 1; j < len; j++)

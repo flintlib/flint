@@ -237,7 +237,6 @@ ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
             else
             {
                 flint_free(AQ->entries);
-                flint_free(AQ->rows);
             }
 
             if (Bintegral)
@@ -248,11 +247,9 @@ ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
             else
             {
                 flint_free(BQ->entries);
-                flint_free(BQ->rows);
             }
 
             flint_free(CQ->entries);
-            flint_free(CQ->rows);
         }
 
         return;

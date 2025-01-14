@@ -56,7 +56,7 @@ fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,
         fmpq_set(fmpq_mat_entry(Bq, 0, j), fmpq_mat_entry(Aq, 0, j));
     }
     /* diagonal of mu stores the squared GS norms */
-    _fmpq_vec_dot(fmpq_mat_entry(mu, 0, 0), Bq->rows[0], Bq->rows[0], n);
+    _fmpq_vec_dot(fmpq_mat_entry(mu, 0, 0), fmpq_mat_entry(Bq, 0, 0), fmpq_mat_entry(Bq, 0, 0), n);
     if (newd == 0 && fmpq_cmp(fmpq_mat_entry(mu, 0, 0), gs_Bq) < 0)
     {
         res = 0;
@@ -72,7 +72,7 @@ fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,
 
         for (j = 0; j < i; j++)
         {
-            _fmpq_vec_dot(tmp, Aq->rows[i], Bq->rows[j], n);
+            _fmpq_vec_dot(tmp, fmpq_mat_entry(Aq, i, 0), fmpq_mat_entry(Bq, j, 0), n);
 
             /* avoid division by zero */
             if (fmpq_is_zero(fmpq_mat_entry(mu, j, j)))
@@ -98,7 +98,7 @@ fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,
                 }
             }
         }
-        _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), Bq->rows[i], Bq->rows[i], n);
+        _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), fmpq_mat_entry(Bq, i, 0), fmpq_mat_entry(Bq, i, 0), n);
         if (i >= newd && fmpq_cmp(fmpq_mat_entry(mu, i, i), gs_Bq) < 0) /* check removals */
         {
             res = 0;
