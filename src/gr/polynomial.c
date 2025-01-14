@@ -579,7 +579,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
     {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul},
-    {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul_scalar},
+    /* {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul_scalar}, */
     {GR_METHOD_MUL_UI,      (gr_funcptr) polynomial_mul_ui},
     {GR_METHOD_MUL_SI,      (gr_funcptr) polynomial_mul_si},
     {GR_METHOD_MUL_FMPZ,    (gr_funcptr) polynomial_mul_fmpz},
