@@ -79,8 +79,24 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
 
 /* Windows and concatenation */
 
-void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, slong r1, slong c1, slong r2, slong c2);
-void nmod_mat_window_clear(nmod_mat_t window);
+NMOD_MAT_INLINE void
+nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
+    slong r1, slong c1, slong r2, slong c2)
+{
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
+
+    window->entries = nmod_mat_entry_ptr(mat, r1, c1);
+    window->r = r2 - r1;
+    window->c = c2 - c1;
+    window->stride = mat->stride;
+    window->mod = mat->mod;
+}
+
+NMOD_MAT_INLINE void
+nmod_mat_window_clear(nmod_mat_t window)
+{
+}
 
 void nmod_mat_concat_horizontal(nmod_mat_t res,
                            const nmod_mat_t mat1,  const nmod_mat_t mat2);
