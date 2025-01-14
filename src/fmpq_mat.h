@@ -82,7 +82,7 @@ fmpq_mat_window_init(fmpq_mat_t window, const fmpq_mat_t mat, slong r1,
 }
 
 FMPQ_MAT_INLINE void
-fmpq_mat_window_clear(fmpq_mat_t window)
+fmpq_mat_window_clear(fmpq_mat_t FLINT_UNUSED(window))
 {
 }
 

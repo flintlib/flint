@@ -1013,10 +1013,13 @@ _gr_fmpq_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_mat_det(fmpq_t res, const fmpq_mat_t x, const gr_ctx_t ctx)
+_gr_fmpq_mat_det(fmpq_t res, const gr_mat_t x, gr_ctx_t ctx)
 {
-    fmpq_mat_det(res, x);
+    /* FIXME: structure changed 
+    fmpq_mat_mul(res, x, y);
     return GR_SUCCESS;
+    */
+    return gr_mat_det_generic_field(res, x, ctx);
 }
 
 int _fmpq_methods_initialized = 0;
