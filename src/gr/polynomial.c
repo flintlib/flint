@@ -379,6 +379,36 @@ polynomial_sub(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
 }
 
 int
+polynomial_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_scalar(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_ui(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_si(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_fmpz(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_fmpq(gr_poly_t res, const gr_poly_t poly, fmpq_t c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
 polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
     if (POLYNOMIAL_CTX(ctx)->degree_limit != WORD_MAX)
@@ -549,6 +579,11 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
     {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul},
+    {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul_scalar},
+    {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul_ui},
+    {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul_si},
+    {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul_fmpz},
+    {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul_fmpq},
     {GR_METHOD_POW_UI,      (gr_funcptr) polynomial_pow_ui},
     {GR_METHOD_POW_SI,      (gr_funcptr) polynomial_pow_si},
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) polynomial_pow_fmpz},
