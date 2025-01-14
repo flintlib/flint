@@ -37,13 +37,13 @@ nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
             for (k = 0; k < A->c; k++)
             {
-                umul_ppmm(t1, t0, A->rows[i][k], B->rows[k][j]);
+                umul_ppmm(t1, t0, nmod_mat_entry(A, i, k), nmod_mat_entry(B, k, j));
                 add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
             }
 
             NMOD_RED(s2, s2, C->mod);
             NMOD_RED3(s0, s2, s1, s0, C->mod);
-            C->rows[i][j] = s0;
+            nmod_mat_entry(C, i, j) = s0;
         }
     }
 }

@@ -22,6 +22,7 @@ nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     for (i = 0; i < C->r; i++)
     {
-        _nmod_vec_add(C->rows[i], A->rows[i], B->rows[i], C->c, C->mod);
+        _nmod_vec_add(nmod_mat_entry_ptr(C, i, 0),
+            nmod_mat_entry_ptr(A, i, 0), nmod_mat_entry_ptr(B, i, 0), C->c, C->mod);
     }
 }

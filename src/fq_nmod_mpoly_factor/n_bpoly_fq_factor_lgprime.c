@@ -242,7 +242,7 @@ static void _lattice(
 
             for (i = 0; i < d; i++)
                 nmod_mat_entry(M, (j - starts[k])*deg + l, i) =
-                         _nmod_vec_dot(trow, N->rows[i], r, ctx->mod, params);
+                         _nmod_vec_dot(trow, nmod_mat_entry_ptr(N, i, 0), r, ctx->mod, params);
         }
 
         nmod_mat_init_nullspace_tr(T1, M);

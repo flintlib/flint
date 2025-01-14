@@ -385,7 +385,7 @@ pick_evaluation_point:
         {
             for (k = 0; k < (f->coeffs + j)->length; k++)
             {
-                (M + j)->rows[i][k] = (fevalski->coeffs + j)->coeffs[k];
+                nmod_mat_entry(M + j, i, k) = (fevalski->coeffs + j)->coeffs[k];
             }
         }
 
@@ -455,19 +455,20 @@ pick_evaluation_point:
             {
                 for (j = 0; j < (f->coeffs + s)->length; j++)
                 {
-                    (ML + s)->rows[i][j] = (M + s)->rows[i][j];
+                    nmod_mat_entry(ML + s, i, j) = nmod_mat_entry(M + s, i, j);
                 }
-                (ML + s)->rows[i][(f->coeffs + s)->length + i] = W[l*s + i];
+                nmod_mat_entry(ML + s, i, (f->coeffs + s)->length + i) = W[l*s + i];
+
             }
         } else {
             for (i = 0; i < l; i++)
             {
                 for (j = 0; j < (f->coeffs + s)->length; j++)
                 {
-                    (ML + s)->rows[i][j] = (M + s)->rows[i][j];
+                    nmod_mat_entry(ML + s, i, j) = nmod_mat_entry(M + s, i, j);
                 }
                 for (j = 0; j < l; j++) {
-                    (ML + s)->rows[i][(f->coeffs + s)->length + j]
+                    nmod_mat_entry(ML + s, i, (f->coeffs + s)->length + j)
                                              = (j==i ? W[l*s + i] : UWORD(0));
                 }
             }
@@ -477,7 +478,7 @@ pick_evaluation_point:
 
         for (i = 0; i < (f->coeffs + s)->length; i++)
         {
-            if ((ML + s)->rows[i][i] != UWORD(1))
+            if (nmod_mat_entry(ML + s, i, i) != UWORD(1))
             {
                 /* evaluation points produced a singular vandermonde matrix */
                 goto pick_evaluation_point;
@@ -563,7 +564,7 @@ pick_evaluation_point:
             ac0 = ac1 = ac2 = 0;
             for (j = 0; j < (f->coeffs + s)->length; j++)
             {
-                umul_ppmm(pp1, pp0, (M + s)->rows[i][j],
+                umul_ppmm(pp1, pp0, nmod_mat_entry(M + s, i, j),
                                     (G->coeffs + s)->coeffs[j]);
                 add_sssaaaaaa(ac2, ac1, ac0, ac2, ac1, ac0, WORD(0), pp1, pp0);
             }

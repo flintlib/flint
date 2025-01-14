@@ -14,6 +14,7 @@
 #include "d_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "nmod_mat.h"
 
 int
 fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
@@ -73,25 +74,30 @@ fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
 
     if (fmpz_mat_is_square(A))
     {
-       int symmetric = fmpz_mat_is_square(A);
+        int symmetric = 1;
 
-       for (i = 0; i < A->r; i++)
-       {
-           Amod->rows[i][i] = fmpz_get_nmod(A->rows[i]+i, mod);
+        for (i = 0; i < A->r; i++)
+        {
+            nmod_mat_entry(Amod, i, i) = fmpz_get_nmod(fmpz_mat_entry(A, i, i), mod);
 
-	   for (j = i + 1; j < A->c; j++)
-	   {
-               Amod->rows[i][j] = fmpz_get_nmod(A->rows[i] + j, mod);
-               if ((symmetric &= fmpz_equal(A->rows[j] + i, A->rows[i] + j)))
-	           Amod->rows[j][i] = Amod->rows[i][j];
-               else
-                   Amod->rows[j][i] = fmpz_get_nmod(A->rows[j] + i, mod);
-	   }
+            for (j = i + 1; j < A->c; j++)
+            {
+                nmod_mat_entry(Amod, i, j) = fmpz_get_nmod(fmpz_mat_entry(A, i, j), mod);
+
+                if (symmetric)
+                    symmetric = fmpz_equal(fmpz_mat_entry(A, j, i), fmpz_mat_entry(A, i, j));
+
+                if (symmetric)
+                    nmod_mat_entry(Amod, j, i) = nmod_mat_entry(Amod, i, j);
+                else
+                    nmod_mat_entry(Amod, j, i) = fmpz_get_nmod(fmpz_mat_entry(A, j, i), mod);
+            }
         }
-    } else
+    }
+    else
     {
         for (i = 0; i < A->r; i++)
             for (j = 0; j < A->c; j++)
-                Amod->rows[i][j] = fmpz_get_nmod(A->rows[i] + j, mod);
+                nmod_mat_entry(Amod, i, j) = fmpz_get_nmod(fmpz_mat_entry(A, i, j), mod);
     }
 }

@@ -72,7 +72,7 @@ static void _mod_worker(void * varg)
             {
                 fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
                 for (l = 0; l < num_primes; l++)
-                    mod_A[l]->rows[i][j] = residues[l];
+                    nmod_mat_entry(mod_A[l], i, j) = residues[l];
             }
         }
 
@@ -84,7 +84,7 @@ static void _mod_worker(void * varg)
                 {
                     fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
                     for (l = 0; l < num_primes; l++)
-                        mod_B[l]->rows[i][j] = residues[l];
+                        nmod_mat_entry(mod_B[l], i, j) = residues[l];
                 }
             }
         }
@@ -147,7 +147,7 @@ static void _crt_worker(void * varg)
         for (j = 0; j < n; j++)
         {
             for (l = 0; l < num_primes; l++)
-                residues[l] = mod_C[l]->rows[i][j];
+                residues[l] = nmod_mat_entry(mod_C[l], i, j);
 
             fmpz_multi_CRT_ui(&Crows[i][j], residues, comb, comb_temp, sign);
         }

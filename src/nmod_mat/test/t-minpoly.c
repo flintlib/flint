@@ -79,9 +79,9 @@ TEST_FUNCTION_START(nmod_mat_minpoly, state)
         {
            for (j = 0; j < n/2; j++)
            {
-              A->rows[i + n/2][j] = 0;
-              A->rows[i][j + n/2] = 0;
-              A->rows[i + n/2][j + n/2] = A->rows[i][j];
+              nmod_mat_entry(A, i + n/2, j) = 0;
+              nmod_mat_entry(A, i, j + n/2) = 0;
+              nmod_mat_entry(A, i + n/2, j + n/2) = nmod_mat_entry(A, i, j);
            }
         }
 

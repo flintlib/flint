@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mat.h"
 #include "thread_support.h"
 
@@ -87,7 +88,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     if (flint_num_threads > 1)
 	    nmod_mat_mul_classical_threaded(C, A, B);
-    else if (min_dim < cutoff)
+    else if (min_dim < cutoff || 1)
         nmod_mat_mul_classical(C, A, B);
     else
         nmod_mat_mul_strassen(C, A, B);

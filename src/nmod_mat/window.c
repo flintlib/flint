@@ -18,32 +18,16 @@ void
 nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
     slong r1, slong c1, slong r2, slong c2)
 {
-    slong i;
-    window->entries = NULL;
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
 
-    if (r2 > r1)
-        window->rows = (ulong **) flint_malloc((r2 - r1) * sizeof(ulong *));
-    else
-        window->rows = NULL;
-
-    if (mat->c > 0)
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = mat->rows[r1 + i] + c1;
-    } else
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = NULL;
-    }
-
+    window->entries = nmod_mat_entry_ptr(mat, r1, c1);
     window->r = r2 - r1;
     window->c = c2 - c1;
-    window->mod = mat->mod;
+    window->stride = mat->stride;
 }
 
 void
 nmod_mat_window_clear(nmod_mat_t window)
 {
-    if (window->r > 0)
-        flint_free(window->rows);
 }

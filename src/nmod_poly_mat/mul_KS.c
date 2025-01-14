@@ -32,14 +32,15 @@ nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     }
 
     A_len = nmod_poly_mat_max_length(A);
-    B_len = nmod_poly_mat_max_length(B);
+    B_len = (A == B) ? A_len : nmod_poly_mat_max_length(B);
 
     bit_size = 2 * FLINT_BIT_COUNT(nmod_poly_mat_modulus(A));
     bit_size += FLINT_BIT_COUNT(FLINT_MIN(A_len, B_len));
     bit_size += FLINT_BIT_COUNT(B->r);
 
     fmpz_mat_init(AA, A->r, A->c);
-    fmpz_mat_init(BB, B->r, B->c);
+    if (A != B)
+        fmpz_mat_init(BB, B->r, B->c);
     fmpz_mat_init(CC, C->r, C->c);
 
     for (i = 0; i < A->r; i++)
@@ -47,12 +48,19 @@ nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
             nmod_poly_bit_pack(fmpz_mat_entry(AA, i, j),
                                nmod_poly_mat_entry(A, i, j), bit_size);
 
-    for (i = 0; i < B->r; i++)
-        for (j = 0; j < B->c; j++)
-            nmod_poly_bit_pack(fmpz_mat_entry(BB, i, j),
-                               nmod_poly_mat_entry(B, i, j), bit_size);
+    if (A != B)
+    {
+        for (i = 0; i < B->r; i++)
+            for (j = 0; j < B->c; j++)
+                nmod_poly_bit_pack(fmpz_mat_entry(BB, i, j),
+                                   nmod_poly_mat_entry(B, i, j), bit_size);
 
-    fmpz_mat_mul(CC, AA, BB);
+        fmpz_mat_mul(CC, AA, BB);
+    }
+    else
+    {
+        fmpz_mat_sqr(CC, AA);
+    }
 
     for (i = 0; i < C->r; i++)
         for (j = 0; j < C->c; j++)
@@ -60,6 +68,7 @@ nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                     fmpz_mat_entry(CC, i, j), bit_size);
 
     fmpz_mat_clear(AA);
-    fmpz_mat_clear(BB);
+    if (A != B)
+        fmpz_mat_clear(BB);
     fmpz_mat_clear(CC);
 }

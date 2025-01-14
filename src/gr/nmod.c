@@ -1328,6 +1328,17 @@ _gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int 
 
 }
 
+/* TODO: data structure changed */
+int
+_gr_nmod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    if (A->r >= 256 && A->c >= 256 && B->c >= 256)
+        return gr_mat_mul_strassen(C, A, B, ctx);
+    else
+        return gr_mat_mul_classical(C, A, B, ctx);
+}
+
+/*
 int
 _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
 {
@@ -1376,6 +1387,7 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
 
     return GR_SUCCESS;
 }
+*/
 
 int __gr_nmod_methods_initialized = 0;
 

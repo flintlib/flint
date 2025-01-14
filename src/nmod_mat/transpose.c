@@ -27,16 +27,12 @@ nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
     {
         for (i = 0; i < A->r - 1; i++)
             for (j = i + 1; j < A->c; j++)
-            {
-                tmp = A->rows[i][j];
-                A->rows[i][j] = A->rows[j][i];
-                A->rows[j][i] = tmp;
-            }
+                FLINT_SWAP(ulong, nmod_mat_entry(A, i, j), nmod_mat_entry(A, j, i));
     }
     else /* Not aliased; general case */
     {
         for (i = 0; i < B->r; i++)
             for (j = 0; j < B->c; j++)
-                B->rows[i][j] = A->rows[j][i];
+                nmod_mat_entry(B, i, j) = nmod_mat_entry(A, j, i);
     }
 }

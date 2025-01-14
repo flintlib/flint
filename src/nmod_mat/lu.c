@@ -42,7 +42,7 @@ nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
             else
                 cutoff = 60;
 
-            if (n >= cutoff)
+            if (n >= cutoff && 0)
                 return nmod_mat_lu_recursive(P, A, rank_check);
         }
 

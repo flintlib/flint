@@ -64,10 +64,7 @@ _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
     {
         if (nmod_mat_entry(A, j, col) != 0)
         {
-            u = A->rows[j];
-            A->rows[j] = A->rows[start_row];
-            A->rows[start_row] = u;
-
+            nmod_mat_swap_rows(A, NULL, j, start_row);
             return -1;
         }
     }
