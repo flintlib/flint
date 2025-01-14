@@ -191,6 +191,7 @@ static size_t __nmod_fprint(FILE *, nmod_t);
 static size_t __fmpz_mod_ctx_fprint(FILE *, const fmpz_mod_ctx_struct *);
 static size_t __flint_vec_fprint(FILE *, const void *, slong, flint_type_t);
 static size_t __flint_mat_fprint(FILE *, const void *, flint_type_t);
+static size_t __flint_mat_fprint2(FILE *, const void *, flint_type_t);
 static size_t __flint_poly_fprint(FILE *, const void *, flint_type_t);
 
 /* flint_vfprintf and friends ************************************************/
@@ -512,7 +513,7 @@ print_flint_type:
         }
         else if (IS_FLINT_TYPE(ip, "nmod_mat"))
         {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const nmod_mat_struct *), ulong_type);
+            res += __flint_mat_fprint2(fs, va_arg(vlist, const nmod_mat_struct *), ulong_type);
             ip += STRING_LENGTH("nmod_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "nmod_poly"))
@@ -583,7 +584,7 @@ print_flint_type:
         }
         else if (IS_FLINT_TYPE(ip, "fmpq_mat"))
         {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpq_mat_struct *), fmpq_type);
+            res += __flint_mat_fprint2(fs, va_arg(vlist, const fmpq_mat_struct *), fmpq_type);
             ip += STRING_LENGTH("fmpq_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpq_poly"))
@@ -1046,6 +1047,36 @@ static size_t __flint_mat_fprint(FILE * fs, const void * ip, flint_type_t type)
     {
         res += fwrite(", ", sizeof(char), STRING_LENGTH(", "), fs);
         res += __flint_vec_fprint(fs, rows[ix], nc, type);
+    }
+
+    res += (fputc(']', fs) != EOF);
+
+    return res;
+}
+
+static size_t __flint_mat_fprint2(FILE * fs, const void * ip, flint_type_t type)
+{
+    size_t res = 0;
+    slong ix;
+    slong nr, nc;
+    const char * entries;
+    slong stride;
+
+    entries = (const char *) ((const fmpq_mat_struct *) ip)->entries;
+    nr = ((const fmpq_mat_struct *) ip)->r;
+    nc = ((const fmpq_mat_struct *) ip)->c;
+    stride = ((const fmpq_mat_struct *) ip)->stride * flint_type_size_in_chars(type);
+
+    if (nr == 0 || nc == 0)
+        return fprintf(fs, WORD_FMT "d by " WORD_FMT "d empty matrix", nr, nc);
+
+    res += (fputc('[', fs) != EOF);
+    res += __flint_vec_fprint(fs, entries, nc, type);
+
+    for (ix = 1; ix < nr; ix++)
+    {
+        res += fwrite(", ", sizeof(char), STRING_LENGTH(", "), fs);
+        res += __flint_vec_fprint(fs, entries + ix * stride, nc, type);
     }
 
     res += (fputc(']', fs) != EOF);

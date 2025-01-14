@@ -20,6 +20,7 @@ _apply_permutation_P(slong * AP, slong * P, slong n, slong offset)
         slong * APtmp;
         slong i;
 
+        /* todo: avoid temporary allocation when AP != P */
         APtmp = flint_malloc(sizeof(slong) * n);
 
         for (i = 0; i < n; i++) APtmp[i] = AP[P[i] + offset];
@@ -50,6 +51,8 @@ _apply_permutation_A(nmod_mat_t A, slong * P,
         flint_free(Atmp);
     }
 }
+
+
 
 slong
 nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
