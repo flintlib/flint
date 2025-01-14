@@ -25,6 +25,7 @@ nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
     window->r = r2 - r1;
     window->c = c2 - c1;
     window->stride = mat->stride;
+    window->mod = mat->mod;
 }
 
 void
