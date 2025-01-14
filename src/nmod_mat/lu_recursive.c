@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
-
+g
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -13,8 +13,7 @@
 #include "nmod_mat.h"
 
 static void
-_apply_permutation_P(slong * AP, nmod_mat_t A, slong * P,
-    slong n, slong offset)
+_apply_permutation_P(slong * AP, slong * P, slong n, slong offset)
 {
     if (n != 0)
     {
@@ -31,19 +30,22 @@ _apply_permutation_P(slong * AP, nmod_mat_t A, slong * P,
 }
 
 static void
-_apply_permutation_A(slong * AP, nmod_mat_t A, slong * P,
-    slong n, slong col_offset)
+_apply_permutation_A(nmod_mat_t A, slong * P,
+    slong num_rows, slong row_offset, slong num_cols, slong col_offset)
 {
-    if (n != 0)
+    if (num_rows != 0)
     {
         ulong * Atmp;
         slong i;
-        slong c = A->c - col_offset;
 
-        Atmp = flint_malloc(sizeof(ulong) * n * c);
+        /* todo: reduce memory allocation */
+        Atmp = flint_malloc(sizeof(ulong) * num_rows * num_cols);
 
-        for (i = 0; i < n; i++) _nmod_vec_set(Atmp + i * c, nmod_mat_entry_ptr(A, P[i], col_offset), c);
-        for (i = 0; i < n; i++) _nmod_vec_set(nmod_mat_entry_ptr(A, i, col_offset), Atmp + i * c, c);
+        for (i = 0; i < num_rows; i++)
+            _nmod_vec_set(Atmp + i * num_cols, nmod_mat_entry_ptr(A, P[i] + row_offset, col_offset), num_cols);
+
+        for (i = 0; i < num_rows; i++)
+            _nmod_vec_set(nmod_mat_entry_ptr(A, i + row_offset, col_offset), Atmp + i * num_cols, num_cols);
 
         flint_free(Atmp);
     }
@@ -85,8 +87,8 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
     if (r1 != 0)
     {
-        _apply_permutation_A(P, A, P1, m, 0);
-        _apply_permutation_P(P, A, P1, m, 0);
+        _apply_permutation_A(A, P1, m, 0, n - n1, n1);
+        _apply_permutation_P(P, P1, m, 0);
     }
 
     nmod_mat_window_init(A00, A, 0, 0, r1, r1);
@@ -108,7 +110,8 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
     }
     else
     {
-        _apply_permutation_P(P, A, P1, m - r1, r1);
+        _apply_permutation_A(A, P1, m - r1, r1, n1, 0);
+        _apply_permutation_P(P, P1, m - r1, r1);
 
         /* Compress L */
         if (r1 != n1)

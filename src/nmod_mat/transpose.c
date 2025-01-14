@@ -14,8 +14,6 @@
 void
 nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 {
-    ulong tmp;
-
     slong i, j;
 
     if (B->r != A->c || B->c != A->r)

@@ -181,15 +181,10 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
             }
          } else
          {
-            ulong * ptr;
-            ulong t;
-
             nmod_mat_swap_rows(M2, NULL, n - i - k - 1, n - i - 1);
 
             for (j = 1; j <= n - i + 1; j++)
-            {
                 FLINT_SWAP(ulong, A(j - 1, n - i - k - 1), A(j - 1, n - i - 1));
-            }
          }
 
          h = A(n - i, n - i - 1);

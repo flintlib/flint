@@ -26,9 +26,8 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
 {
     ulong d, e, f, *aa;
     nmod_t mod;
-    slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
+    slong i, j, nrows, ncols, rank, row, col, pivot_row;
     slong stride = A->stride;
-    nn_ptr tnn_ptr;
 
     nrows = A->r;
     ncols = A->c;
@@ -121,9 +120,8 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
 {
     ulong d, e, f, *aa;
     nmod_t mod;
-    slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
+    slong i, j, nrows, ncols, rank, row, col, pivot_row;
     slong stride = A->stride;
-    nn_ptr tnn_ptr;
     nn_ptr b;
     TMP_INIT;
 
@@ -290,9 +288,8 @@ nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
 {
     ulong d, e, f, *aa;
     nmod_t mod;
-    slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
+    slong i, j, nrows, ncols, rank, row, col, pivot_row;
     slong stride = A->stride;
-    nn_ptr tnn_ptr;
     nn_ptr b;
     TMP_INIT;
 

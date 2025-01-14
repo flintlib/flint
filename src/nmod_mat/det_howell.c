@@ -55,7 +55,6 @@ static inline int
 _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
 {
     slong j;
-    nn_ptr u;
 
     if (nmod_mat_entry(A, start_row, col) != 0)
         return 1;
