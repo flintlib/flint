@@ -94,7 +94,7 @@ nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
 }
 
 NMOD_MAT_INLINE void
-nmod_mat_window_clear(nmod_mat_t window)
+nmod_mat_window_clear(nmod_mat_t FLINT_UNUSED(window))
 {
 }
 
