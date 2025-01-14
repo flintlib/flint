@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
-g
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
