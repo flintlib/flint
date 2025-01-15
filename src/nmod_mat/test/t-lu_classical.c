@@ -24,7 +24,7 @@ void perm(nmod_mat_t A, slong * P)
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(nn_ptr) * A->r * A->c);
+    tmp = flint_malloc(sizeof(ulong) * A->r * A->c);
 
     for (i = 0; i < A->r; i++) _nmod_vec_set(tmp + P[i] * A->c, nmod_mat_entry_ptr(A, i, 0), A->c);
     for (i = 0; i < A->r; i++) _nmod_vec_set(nmod_mat_entry_ptr(A, i, 0), tmp + i * A->c, A->c);

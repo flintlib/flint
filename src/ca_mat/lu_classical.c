@@ -16,7 +16,6 @@ int
 ca_mat_lu_classical(slong * res_rank, slong * P, ca_mat_t LU, const ca_mat_t A, int rank_check, ca_ctx_t ctx)
 {
     ca_t d, e;
-    ca_ptr * a;
     slong i, j, m, n, r, rank, row, col;
     int success;
     truth_t found_pivot;
@@ -31,8 +30,6 @@ ca_mat_lu_classical(slong * res_rank, slong * P, ca_mat_t LU, const ca_mat_t A, 
     n = ca_mat_ncols(A);
 
     ca_mat_set(LU, A, ctx);
-
-    a = LU->rows;
 
     rank = row = col = 0;
     for (i = 0; i < m; i++)
@@ -69,17 +66,17 @@ ca_mat_lu_classical(slong * res_rank, slong * P, ca_mat_t LU, const ca_mat_t A, 
         if (r != row)
             _ca_mat_swap_rows(LU, P, row, r);
 
-        ca_inv(d, a[row] + col, ctx);
+        ca_inv(d, ca_mat_entry(LU, row, col), ctx);
 
         for (j = row + 1; j < m; j++)
         {
-            ca_mul(e, a[j] + col, d, ctx);
+            ca_mul(e, ca_mat_entry(LU, j, col), d, ctx);
             ca_neg(e, e, ctx);
 
-            _ca_vec_scalar_addmul_ca(a[j] + col + 1, a[row] + col + 1, n - col - 1, e, ctx);
+            _ca_vec_scalar_addmul_ca(ca_mat_entry(LU, j, col + 1), ca_mat_entry(LU, row, col + 1), n - col - 1, e, ctx);
 
-            ca_zero(a[j] + col, ctx);
-            ca_neg(a[j] + rank - 1, e, ctx);
+            ca_zero(ca_mat_entry(LU, j, col), ctx);
+            ca_neg(ca_mat_entry(LU, j, rank - 1), e, ctx);
         }
 
         row++;

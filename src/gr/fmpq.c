@@ -1003,23 +1003,17 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
 #include "gr_mat.h"
 
 int
-_gr_fmpq_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
+_gr_fmpq_mat_mul(fmpq_mat_t res, const fmpq_mat_t x, const fmpq_mat_t y, gr_ctx_t ctx)
 {
-    /* FIXME: structure changed 
     fmpq_mat_mul(res, x, y);
     return GR_SUCCESS;
-    */
-    return gr_mat_mul_classical(res, x, y, ctx);
 }
 
 int
-_gr_fmpq_mat_det(fmpq_t res, const gr_mat_t x, gr_ctx_t ctx)
+_gr_fmpq_mat_det(fmpq_t res, const fmpq_mat_t x, gr_ctx_t ctx)
 {
-    /* FIXME: structure changed 
-    fmpq_mat_mul(res, x, y);
+    fmpq_mat_det(res, x);
     return GR_SUCCESS;
-    */
-    return gr_mat_det_generic_field(res, x, ctx);
 }
 
 int _fmpq_methods_initialized = 0;

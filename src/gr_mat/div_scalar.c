@@ -17,13 +17,14 @@ gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
 {
     slong i, r, c;
     int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_div_scalar(res->rows[i], mat->rows[i], c, x, ctx);
+            status |= _gr_vec_div_scalar(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), c, x, ctx);
 
     return status;
 }
@@ -33,13 +34,14 @@ gr_mat_div_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t 
 {
     slong i, r, c;
     int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_div_scalar_other(res->rows[i], mat->rows[i], c, x, x_ctx, ctx);
+            status |= _gr_vec_div_scalar_other(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), c, x, x_ctx, ctx);
 
     return status;
 }
@@ -49,13 +51,14 @@ gr_mat_div_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx)
 {
     slong i, r, c;
     int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_div_scalar_ui(res->rows[i], mat->rows[i], c, x, ctx);
+            status |= _gr_vec_div_scalar_ui(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), c, x, ctx);
 
     return status;
 }
@@ -65,13 +68,14 @@ gr_mat_div_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx)
 {
     slong i, r, c;
     int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_div_scalar_si(res->rows[i], mat->rows[i], c, x, ctx);
+            status |= _gr_vec_div_scalar_si(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), c, x, ctx);
 
     return status;
 }
@@ -81,13 +85,14 @@ gr_mat_div_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx)
 {
     slong i, r, c;
     int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_div_scalar_fmpz(res->rows[i], mat->rows[i], c, x, ctx);
+            status |= _gr_vec_div_scalar_fmpz(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), c, x, ctx);
 
     return status;
 }
@@ -97,13 +102,14 @@ gr_mat_div_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx)
 {
     slong i, r, c;
     int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_div_scalar_fmpq(res->rows[i], mat->rows[i], c, x, ctx);
+            status |= _gr_vec_div_scalar_fmpq(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), c, x, ctx);
 
     return status;
 }

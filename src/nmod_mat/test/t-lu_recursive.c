@@ -24,7 +24,7 @@ void perm(nmod_mat_t A, slong * P)
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(nn_ptr) * A->r);
+    tmp = flint_malloc(sizeof(ulong) * A->r);
 
     for (i = 0; i < A->r; i++) tmp[P[i]] = A->rows[i];
     for (i = 0; i < A->r; i++) A->rows[i] = tmp[i];

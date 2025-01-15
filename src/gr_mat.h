@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->rows[i], j, sz)
+#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->entries, (i) * (mat)->stride + (j), sz)
 #define gr_mat_nrows(mat, ctx) ((mat)->r)
 #define gr_mat_ncols(mat, ctx) ((mat)->c)
 
@@ -74,9 +74,8 @@ WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t c
 void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
-gr_mat_window_clear(gr_mat_t window, gr_ctx_t FLINT_UNUSED(ctx))
+gr_mat_window_clear(gr_mat_t FLINT_UNUSED(window), gr_ctx_t FLINT_UNUSED(ctx))
 {
-    flint_free(window->rows);
 }
 
 WARN_UNUSED_RESULT int gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);

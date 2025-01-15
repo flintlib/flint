@@ -15,14 +15,13 @@ void
 gr_mat_window_init(gr_mat_t window, const gr_mat_t mat,
     slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx)
 {
-    slong i, sz = ctx->sizeof_elem;
-    window->entries = NULL;
+    slong sz = ctx->sizeof_elem;
 
-    window->rows = flint_malloc((r2 - r1) * sizeof(gr_ptr));
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
 
-    for (i = 0; i < r2 - r1; i++)
-        window->rows[i] = GR_ENTRY(mat->rows[r1 + i], c1, sz);
-
+    window->entries = GR_MAT_ENTRY(mat, r1, c1, sz);
     window->r = r2 - r1;
     window->c = c2 - c1;
+    window->stride = mat->stride;
 }

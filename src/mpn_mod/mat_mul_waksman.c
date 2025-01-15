@@ -61,6 +61,13 @@ int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_c
     slong m = A->r;
     slong n = B->r;
     slong p = B->c;
+    slong Astride = A->stride;
+    slong Bstride = B->stride;
+    slong Cstride = C->stride;
+    nn_srcptr Aentries = A->entries;
+    nn_srcptr Bentries = B->entries;
+    nn_ptr Centries = C->entries;
+
     /* Normally the sum of two input entries fits in nlimbs, but we may need
        an extra limb for a carry bit. */
     int add_can_overflow_nlimbs = (MPN_MOD_CTX_NORM(ctx) == 0);
@@ -79,10 +86,11 @@ int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_c
     nn_ptr val2 = val1 + slimbs;            /* val2 has room for 1 sum   */
     nn_ptr crow = val2 + slimbs;            /* crow has room for 1 sum   */
 
-#define A_ENTRY(ii, jj) (((nn_srcptr) A->rows[ii]) + (jj) * nlimbs)
-#define B_ENTRY(ii, jj) (((nn_srcptr) B->rows[ii]) + (jj) * nlimbs)
-
+#define A_ENTRY(ii, jj) (Aentries + ((ii) * Astride + (jj)) * nlimbs)
+#define B_ENTRY(ii, jj) (Bentries + ((ii) * Bstride + (jj)) * nlimbs)
 #define C_ENTRY(ii, jj) (Ctmp + ((ii) * p + (jj)) * slimbs)
+#define COUT_ENTRY(ii, jj) (Centries + ((ii) * Cstride + (jj)) * nlimbs)
+
 #define Crow_ENTRY(ii) (Crow + (ii) * slimbs)
 #define Ccol_ENTRY(ii) (Ccol + (ii) * slimbs)
 
@@ -156,7 +164,6 @@ int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_c
         for (k = 0; k < p; k++)
         {
             slong d;
-            nn_ptr Cptr = ((nn_ptr) C->rows[i]) + k * nlimbs;
 
             /* As currently implemented, there is no wraparound arithmetic.
                Were that the case, we would need something like
@@ -172,7 +179,7 @@ int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_c
 
             d = slimbs;
             MPN_NORM(C_ENTRY(i, k), d);
-            mpn_mod_set_mpn(Cptr, C_ENTRY(i, k), d, ctx);
+            mpn_mod_set_mpn(COUT_ENTRY(i, k), C_ENTRY(i, k), d, ctx);
         }
     }
 

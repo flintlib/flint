@@ -28,7 +28,7 @@ gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
 
     for (i = 0; i < r; i++)
     {
-        this_eq = _gr_vec_is_zero(mat->rows[i], c, ctx);
+        this_eq = _gr_vec_is_zero(gr_mat_entry_srcptr(mat, i, 0, ctx), c, ctx);
 
         if (this_eq == T_FALSE)
             return T_FALSE;

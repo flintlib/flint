@@ -13,42 +13,30 @@
 #include "nmod_mat.h"
 
 static void
-_apply_permutation_P(slong * AP, slong * P, slong n, slong offset)
-{
-    if (n != 0)
-    {
-        slong * APtmp;
-        slong i;
-
-        /* todo: avoid temporary allocation when AP != P */
-        APtmp = flint_malloc(sizeof(slong) * n);
-
-        for (i = 0; i < n; i++) APtmp[i] = AP[P[i] + offset];
-        for (i = 0; i < n; i++) AP[i + offset] = APtmp[i];
-
-        flint_free(APtmp);
-    }
-}
-
-static void
-_apply_permutation_A(nmod_mat_t A, slong * P,
+_apply_permutation(slong * AP, nmod_mat_t A, const slong * P,
     slong num_rows, slong row_offset, slong num_cols, slong col_offset)
 {
     if (num_rows != 0)
     {
         ulong * Atmp;
+        slong * APtmp;
         slong i;
 
         /* todo: reduce memory allocation */
         Atmp = flint_malloc(sizeof(ulong) * num_rows * num_cols);
+        /* todo: avoid temporary allocation when AP != P */
+        APtmp = flint_malloc(sizeof(slong) * num_rows);
 
         for (i = 0; i < num_rows; i++)
             _nmod_vec_set(Atmp + i * num_cols, nmod_mat_entry_ptr(A, P[i] + row_offset, col_offset), num_cols);
-
         for (i = 0; i < num_rows; i++)
             _nmod_vec_set(nmod_mat_entry_ptr(A, i + row_offset, col_offset), Atmp + i * num_cols, num_cols);
 
+        for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
+        for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
+
         flint_free(Atmp);
+        flint_free(APtmp);
     }
 }
 
@@ -90,8 +78,7 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
     if (r1 != 0)
     {
-        _apply_permutation_A(A, P1, m, 0, n - n1, n1);
-        _apply_permutation_P(P, P1, m, 0);
+        _apply_permutation(P, A, P1, m, 0, n - n1, n1);
     }
 
     nmod_mat_window_init(A00, A, 0, 0, r1, r1);
@@ -113,8 +100,7 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
     }
     else
     {
-        _apply_permutation_A(A, P1, m - r1, r1, n1, 0);
-        _apply_permutation_P(P, P1, m - r1, r1);
+        _apply_permutation(P, A, P1, m - r1, r1, n1, 0);
 
         /* Compress L */
         if (r1 != n1)

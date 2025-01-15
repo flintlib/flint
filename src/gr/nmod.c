@@ -1328,17 +1328,6 @@ _gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int 
 
 }
 
-/* TODO: data structure changed */
-int
-_gr_nmod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-{
-    if (A->r >= 256 && A->c >= 256 && B->c >= 256)
-        return gr_mat_mul_strassen(C, A, B, ctx);
-    else
-        return gr_mat_mul_classical(C, A, B, ctx);
-}
-
-/*
 int
 _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
 {
@@ -1346,9 +1335,9 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     nmod_mat_struct *XX, *YY;
 
     R->entries = res->entries;
-    R->rows = (nn_ptr *) res->rows;
     R->r = res->r;
     R->c = res->c;
+    R->stride = res->stride;
     R->mod = NMOD_CTX(ctx);
 
     if (res == x)
@@ -1358,9 +1347,9 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     else
     {
         X->entries = x->entries;
-        X->rows = (nn_ptr *) x->rows;
         X->r = x->r;
         X->c = x->c;
+        X->stride = x->stride;
         X->mod = NMOD_CTX(ctx);
         XX = X;
     }
@@ -1376,9 +1365,9 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     else
     {
         Y->entries = y->entries;
-        Y->rows = (nn_ptr *) y->rows;
         Y->r = y->r;
         Y->c = y->c;
+        Y->stride = y->stride;
         Y->mod = NMOD_CTX(ctx);
         YY = Y;
     }
@@ -1387,7 +1376,6 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
 
     return GR_SUCCESS;
 }
-*/
 
 int __gr_nmod_methods_initialized = 0;
 
