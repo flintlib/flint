@@ -138,24 +138,7 @@ COMPARISON_OP(acb_mat_eq,                acb_mat_t, acb_mat_t,  acb_eq)
 COMPARISON_OP(acb_mat_equal,             acb_mat_t, acb_mat_t,  acb_equal)
 COMPARISON_OP(acb_mat_overlaps,          acb_mat_t, acb_mat_t,  acb_overlaps)
 COMPARISON_OP(acb_mat_contains,          acb_mat_t, acb_mat_t,  acb_contains)
-
-
-/* COMPARISON_OP(acb_mat_contains_fmpz_mat, acb_mat_t, fmpz_mat_t, acb_contains_fmpz) */
-int acb_mat_contains_fmpz_mat(const acb_mat_t am, const fmpz_mat_t bm)
-{
-    slong ix, jx;
-
-    if (mat_nrows(am) != mat_nrows(bm) || mat_ncols(am) != mat_ncols(bm))
-        return 0;
-
-    for (ix = 0; ix < mat_nrows(am); ix++)
-        for (jx = 0; jx < mat_ncols(am); jx++)
-            if (!acb_contains_fmpz(mat_entry(am, ix, jx), fmpz_mat_entry(bm, ix, jx)))
-                return 0;
-
-    return 1;
-}
-
+COMPARISON_OP(acb_mat_contains_fmpz_mat, acb_mat_t, fmpz_mat_t, acb_contains_fmpz)
 COMPARISON_OP(acb_mat_contains_fmpq_mat, acb_mat_t, fmpq_mat_t, acb_contains_fmpq)
 
 NOT_COMPARISON_OP(acb_mat_ne, acb_mat_t, acb_mat_t, acb_ne)
@@ -167,33 +150,12 @@ SET_OP_1(acb_mat_ones,          acb_mat_t, acb_one)
 SET_OP(acb_mat_swap_entrywise, acb_mat_t, acb_mat_t,        acb_swap)
 SET_OP(acb_mat_get_mid,        acb_mat_t, const acb_mat_t,  acb_get_mid)
 SET_OP(acb_mat_neg,            acb_mat_t, const acb_mat_t,  acb_neg)
-
-
-/* SET_OP(acb_mat_set_fmpz_mat,   acb_mat_t, const fmpz_mat_t, acb_set_fmpz) */
-void acb_mat_set_fmpz_mat(acb_mat_t rm, const fmpz_mat_t am)
-{
-    slong ix, jx;
-
-    for (ix = 0; ix < mat_nrows(rm); ix++)
-        for (jx = 0; jx < mat_ncols(rm); jx++)
-            acb_set_fmpz(mat_entry(rm, ix, jx), fmpz_mat_entry(am, ix, jx));
-}
-
+SET_OP(acb_mat_set_fmpz_mat,   acb_mat_t, const fmpz_mat_t, acb_set_fmpz)
 SET_OP(acb_mat_set_arb_mat,    acb_mat_t, const arb_mat_t,  acb_set_arb)
 SET_OP(acb_mat_conjugate,      acb_mat_t, const acb_mat_t,  acb_conj)
 
+SET_PREC_OP(acb_mat_set_round_fmpz_mat, acb_mat_t, fmpz_mat_t, acb_set_round_fmpz)
 SET_PREC_OP(acb_mat_set_fmpq_mat, acb_mat_t, fmpq_mat_t, acb_set_fmpq)
-
-/* SET_PREC_OP(acb_mat_set_round_fmpz_mat, acb_mat_t, fmpz_mat_t, acb_set_round_fmpz) */
-void acb_mat_set_round_fmpz_mat(acb_mat_t rm, const fmpz_mat_t am, slong prec)
-{
-    slong ix, jx;
-
-    for (ix = 0; ix < mat_nrows(rm); ix++)
-        for (jx = 0; jx < mat_ncols(rm); jx++)
-            acb_set_round_fmpz(mat_entry(rm, ix, jx), fmpz_mat_entry(am, ix, jx), prec);
-}
-
 SET_PREC_OP(acb_mat_set_round_arb_mat,  acb_mat_t, arb_mat_t,  acb_set_round_arb)
 
 AORS_NATIVE_OP(acb_mat_add, acb_mat_t, acb_add)

@@ -36,23 +36,23 @@ fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, 
     for (i = 0; i < d; i++)
     {
         for (j = 0; j < i; j++)
-            fmpz_zero(mat->rows[i] + j);
-        fmpz_set_ui(mat->rows[i] + i, q);
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
+        fmpz_set_ui(fmpz_mat_entry(mat, i, i), q);
         for (j = i + 1; j < d; j++)
-            fmpz_zero(mat->rows[i] + j);
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
     }
 
     for (i = 0; i < d; i++)
         for (j = d; j < c; j++)
-            fmpz_zero(mat->rows[i] + j);
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
 
     for (i = d; i < c; i++)
     {
         for (j = d; j < i; j++)
-            fmpz_zero(mat->rows[i] + j);
-        fmpz_one(mat->rows[i] + i);
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
+        fmpz_one(fmpz_mat_entry(mat, i, i));
         for (j = i + 1; j < c; j++)
-            fmpz_zero(mat->rows[i] + j);
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
     }
 
     for (i = d; i < r; i++)
@@ -62,7 +62,7 @@ fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, 
             k = j + i;
             while (k >= d)
                 k -= d;
-            fmpz_set(mat->rows[i] + j, h + k);
+            fmpz_set(fmpz_mat_entry(mat, i, j), h + k);
         }
     }
 

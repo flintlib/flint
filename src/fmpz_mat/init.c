@@ -15,8 +15,6 @@
 
 void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
 {
-    slong i;
-
     mat->r = rows;
     mat->c = cols;
     mat->stride = cols;
@@ -31,4 +29,11 @@ void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
 
         mat->entries = flint_calloc(num,  sizeof(fmpz));
     }
+}
+
+void
+fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src)
+{
+    fmpz_mat_init(mat, src->r, src->c);
+    fmpz_mat_set(mat, src);
 }

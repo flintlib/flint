@@ -90,8 +90,23 @@ void fmpz_mat_one(fmpz_mat_t mat);
 
 /* Windows and concatenation *************************************************/
 
-void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1, slong c1, slong r2, slong c2);
-void fmpz_mat_window_clear(fmpz_mat_t window);
+FMPZ_MAT_INLINE void
+fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
+                     slong c1, slong r2, slong c2)
+{
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
+
+    window->entries = fmpz_mat_entry(mat, r1, c1);
+    window->r = r2 - r1;
+    window->c = c2 - c1;
+    window->stride = mat->stride;
+}
+
+FMPZ_MAT_INLINE void
+fmpz_mat_window_clear(fmpz_mat_t FLINT_UNUSED(window))
+{
+}
 
 void _fmpz_mat_window_readonly_init_strip_initial_zero_rows(fmpz_mat_t A, const fmpz_mat_t B);
 #define _fmpz_mat_window_readonly_clear(A) /* Do nothing */
