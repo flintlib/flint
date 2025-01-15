@@ -1016,7 +1016,7 @@ List of removals
 -------------------------------------------------------------------------------
 
 * Fix a bug in generator of finite field in characteristic 2
-* Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeably
+* Allow FLINT to work with GMP 6.1.2 and 6.2.0 interchangeably
 * Fix some old license headers
 
 2020-07-31 -- FLINT 2.6.2
@@ -2571,7 +2571,7 @@ Calcium version history
   * Special functions: ca_erf, ca_erfi, ca_erfc, with algebraic relations.
   * Special functions: ca_gamma (incomplete simplification algorithms).
 
-* New utils_flint module for Flint utilities
+* New utils_flint module for FLINT utilities
 
   * Vectors of multivariate polynomials.
   * Construction of elementary symmetric polynomials.
@@ -2718,7 +2718,7 @@ Arb version history
 2021-07-25 -- Arb 2.20.0
 -------------------------------------------------------------------------------
 
-* Flint 2.8 support.
+* FLINT 2.8 support.
 * Change arb_get_str with ARB_STR_NO_RADIUS: [+/- 1.20e-15] now prints as 0e-14.
 * Uniformly distributed random number functions arf_urandom, arb_urandom
   (contributed by Albin Ahlbäck).
@@ -2769,7 +2769,7 @@ Arb version history
 
 * General
 
-  * Flint 2.6 support.
+  * FLINT 2.6 support.
   * Several build system improvements (contributed by Isuru Fernando).
   * Changed arf_get_mpfr to return an MPFR underflow/overflow result
     (rounding to 0 or infinity with the right sign and MPFR overflow flags)

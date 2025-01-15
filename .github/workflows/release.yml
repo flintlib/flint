@@ -50,7 +50,7 @@ jobs:
       - id: get-tag_name
         run: |
           echo "tag_name=${TAG_NAME}"
-          echo "tag_name=${TAG_NAME}" >>  $GITHUB_OUTPUT
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
 
       - name: "Record FLINT version"
         id: get-version
@@ -88,7 +88,7 @@ jobs:
         run: dev/make_dist.sh ${FLINT_VERSION}
 
       - name: "Upload source archive as artifact"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: flint
@@ -103,7 +103,7 @@ jobs:
       TAG_NAME: ${{ needs.version_and_tag.outputs.tag_name }}
     steps:
       - name: "Download archive from previous job"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: flint
 
@@ -162,7 +162,7 @@ jobs:
 
     steps:
       - name: "Download archive from previous job"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: flint
 
@@ -206,6 +206,37 @@ jobs:
         run: |
           gh release create $TAG_NAME $PRERELEASE --notes-file "$RUNNER_TEMP/notes.md" --title "$SUBJECT" --target $GITHUB_SHA flint-${FLINT_VERSION}.{tar.gz,tar.xz,zip}
 
+      - if: env.TAG_NAME != 'nightly'
+        name: "Setup for PDF documentation"
+        run: |
+          sudo apt-get install -y python3-sphinx
+          sphinx-build --version
+
+      - if: env.TAG_NAME != 'nightly'
+        name: "Build PDF documentation"
+        uses: dante-ev/latex-action@latest
+        with:
+          root_file:
+          compiler:
+          args:
+          entrypoint: doc/entrypoint.sh
+
+      - if: env.TAG_NAME != 'nightly'
+        name: "Setup SSH key"
+        uses: shimataro/ssh-key-action@v2.7.0
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          name: id_ed25519
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - if: env.TAG_NAME != 'nightly'
+        name: "Upload to website"
+        run: |
+          # Push documentation and tarballs to server
+          mv doc/build/latex/flint.pdf flint-${FLINT_VERSION}.pdf
+          for ext in pdf tar.gz zip; do
+            scp flint-${FLINT_VERSION}.$ext wbhart@opal6.opalstack.com:~/apps/flintlib_org/download/
+          # Rebuild the website
+          ssh -t wbhart@opal6.opalstack.com 'cd ~/flintwebpage && python3 downloads.py ~/apps/flintlib_org && python3 build.py ~/apps/flintlib_org'
+
 # TODO: we could / should perhaps also test `make install` ?
-# TODO: also trigger a documentation build and upload the result?
-# TODO: if desired, we could e.g. also upload the archive to a server via scp

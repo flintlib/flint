@@ -29,9 +29,9 @@ Type compatibility
 -------------------------------------------------------------------------------
 
 The ``gr_mat`` type has the same data layout as most
-Flint, Arb and Calcium matrix types.
+FLINT, Arb and Calcium matrix types.
 Methods in this module can therefore be mixed freely with
-methods in the corresponding Flint, Arb and Calcium modules
+methods in the corresponding FLINT, Arb and Calcium modules
 when the underlying coefficient type is the same.
 
 It is not directly compatible with the ``nmod_mat`` type,
