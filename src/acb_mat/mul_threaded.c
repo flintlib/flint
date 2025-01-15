@@ -17,9 +17,12 @@
 
 typedef struct
 {
-    acb_ptr * C;
-    const acb_ptr * A;
-    const acb_ptr * B;
+    acb_ptr C;
+    acb_srcptr A;
+    acb_srcptr B;
+    slong Cstride;
+    slong Astride;
+    slong Bstride;
     slong ar0;
     slong ar1;
     slong bc0;
@@ -33,30 +36,20 @@ void
 _acb_mat_mul_thread(void * arg_ptr)
 {
     _worker_arg arg = *((_worker_arg *) arg_ptr);
-    slong i, j, br, bc;
-    acb_ptr tmp;
-    TMP_INIT;
+    slong i, j, br;
 
     br = arg.br;
-    bc = arg.bc1 - arg.bc0;
-
-    TMP_START;
-    tmp = TMP_ALLOC(sizeof(acb_struct) * br * bc);
-
-    for (i = 0; i < br; i++)
-        for (j = 0; j < bc; j++)
-            tmp[j * br + i] = arg.B[i][arg.bc0 + j];
 
     for (i = arg.ar0; i < arg.ar1; i++)
     {
         for (j = arg.bc0; j < arg.bc1; j++)
         {
-            acb_dot(arg.C[i] + j, NULL, 0,
-                arg.A[i], 1, tmp + (j - arg.bc0) * br, 1, br, arg.prec);
+            acb_dot(arg.C + i * arg.Cstride + j, NULL, 0,
+                arg.A + i * arg.Astride, 1,
+                arg.B + j, arg.Bstride, br, arg.prec);
         }
     }
 
-    TMP_END;
     flint_cleanup();
     return;
 }
@@ -99,9 +92,12 @@ acb_mat_mul_threaded(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pr
 
     for (i = 0; i < num_threads; i++)
     {
-        args[i].C = C->rows;
-        args[i].A = A->rows;
-        args[i].B = B->rows;
+        args[i].C = C->entries;
+        args[i].A = A->entries;
+        args[i].B = B->entries;
+        args[i].Cstride = C->stride;
+        args[i].Astride = A->stride;
+        args[i].Bstride = B->stride;
 
         if (ar >= bc)
         {

@@ -9,13 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
 #include "fmpq_mat.h"
 #include "arb.h"
 #include "arb_mat.h"
 
 /* helper macros *************************************************************/
 
-#define mat_entry(mat, i, j) ((mat)->rows[i] + (j))
+#define mat_entry(mat, i, j) ((mat)->entries + (i) * (mat)->stride + (j))
 #define mat_nrows(mat) ((mat)->r)
 #define mat_ncols(mat) ((mat)->c)
 
@@ -136,11 +137,9 @@ COMPARISON_OP(arb_mat_eq,                arb_mat_t, arb_mat_t,  arb_eq)
 COMPARISON_OP(arb_mat_equal,             arb_mat_t, arb_mat_t,  arb_equal)
 COMPARISON_OP(arb_mat_overlaps,          arb_mat_t, arb_mat_t,  arb_overlaps)
 COMPARISON_OP(arb_mat_contains,          arb_mat_t, arb_mat_t,  arb_contains)
-COMPARISON_OP(arb_mat_contains_fmpz_mat, arb_mat_t, fmpz_mat_t, arb_contains_fmpz)
 
-/* FIXME: structure changed */
-/* COMPARISON_OP(arb_mat_contains_fmpq_mat, arb_mat_t, fmpq_mat_t, arb_contains_fmpq) */
-int arb_mat_contains_fmpq_mat(const arb_mat_t am, const fmpq_mat_t bm)
+/* COMPARISON_OP(arb_mat_contains_fmpz_mat, arb_mat_t, fmpz_mat_t, arb_contains_fmpz) */
+int arb_mat_contains_fmpz_mat(const arb_mat_t am, const fmpz_mat_t bm)
 {
     slong ix, jx;
 
@@ -149,11 +148,14 @@ int arb_mat_contains_fmpq_mat(const arb_mat_t am, const fmpq_mat_t bm)
 
     for (ix = 0; ix < mat_nrows(am); ix++)
         for (jx = 0; jx < mat_ncols(am); jx++)
-            if (!arb_contains_fmpq(mat_entry(am, ix, jx), fmpq_mat_entry(bm, ix, jx)))
+            if (!arb_contains_fmpz(mat_entry(am, ix, jx), fmpz_mat_entry(bm, ix, jx)))
                 return 0;
 
     return 1;
 }
+
+COMPARISON_OP(arb_mat_contains_fmpq_mat, arb_mat_t, fmpq_mat_t, arb_contains_fmpq)
+
 
 NOT_COMPARISON_OP(arb_mat_ne, arb_mat_t, arb_mat_t, arb_ne)
 
@@ -164,21 +166,28 @@ SET_OP_1(arb_mat_ones,          arb_mat_t, arb_one)
 SET_OP(arb_mat_swap_entrywise, arb_mat_t, arb_mat_t,        arb_swap)
 SET_OP(arb_mat_get_mid,        arb_mat_t, const arb_mat_t,  arb_get_mid_arb)
 SET_OP(arb_mat_neg,            arb_mat_t, const arb_mat_t,  arb_neg)
-SET_OP(arb_mat_set_fmpz_mat,   arb_mat_t, const fmpz_mat_t, arb_set_fmpz)
 
-
-/* FIXME: structure changed */
-/* SET_PREC_OP(arb_mat_set_fmpq_mat, arb_mat_t, fmpq_mat_t, arb_set_fmpq) */
-void arb_mat_set_fmpq_mat(arb_mat_t rm, const fmpq_mat_t am, slong prec)
+/* SET_OP(arb_mat_set_fmpz_mat,   arb_mat_t, const fmpz_mat_t, arb_set_fmpz) */
+void arb_mat_set_fmpz_mat(arb_mat_t rm, const fmpz_mat_t am)
 {
     slong ix, jx;
 
     for (ix = 0; ix < mat_nrows(rm); ix++)
         for (jx = 0; jx < mat_ncols(rm); jx++)
-            arb_set_fmpq(mat_entry(rm, ix, jx), fmpq_mat_entry(am, ix, jx), prec);
+            arb_set_fmpz(mat_entry(rm, ix, jx), fmpz_mat_entry(am, ix, jx));
 }
 
-SET_PREC_OP(arb_mat_set_round_fmpz_mat, arb_mat_t, fmpz_mat_t, arb_set_round_fmpz)
+SET_PREC_OP(arb_mat_set_fmpq_mat, arb_mat_t, fmpq_mat_t, arb_set_fmpq)
+
+/* SET_PREC_OP(arb_mat_set_round_fmpz_mat, arb_mat_t, fmpz_mat_t, arb_set_round_fmpz) */
+void arb_mat_set_round_fmpz_mat(arb_mat_t rm, const fmpz_mat_t am, slong prec)
+{
+    slong ix, jx;
+
+    for (ix = 0; ix < mat_nrows(rm); ix++)
+        for (jx = 0; jx < mat_ncols(rm); jx++)
+            arb_set_round_fmpz(mat_entry(rm, ix, jx), fmpz_mat_entry(am, ix, jx), prec);
+}
 
 AORS_NATIVE_OP(arb_mat_add, arb_mat_t, arb_add)
 AORS_NATIVE_OP(arb_mat_sub, arb_mat_t, arb_sub)

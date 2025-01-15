@@ -28,9 +28,9 @@ acb_mat_approx_solve_lu_precomp(acb_mat_t X, const slong * perm,
         for (c = 0; c < m; c++)
         {
             for (i = 0; i < n; i++)
-                tmp[i] = B->rows[perm[i]][c];
+                tmp[i] = *acb_mat_entry(B, perm[i], c);
             for (i = 0; i < n; i++)
-                X->rows[i][c] = tmp[i];
+                *acb_mat_entry(X, i, c) = tmp[i];
         }
 
         flint_free(tmp);

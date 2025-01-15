@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2018 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,8 +13,13 @@
 #include "arb_mat.h"
 
 void
-arb_mat_clear(arb_mat_t mat)
+arb_mat_swap_rows(arb_mat_t mat, slong * perm, slong r, slong s)
 {
-    if (mat->entries != NULL)
-        _arb_vec_clear(mat->entries, mat->r * mat->c);
+    if (r != s)
+    {
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
+
+        _arb_vec_swap(arb_mat_entry(mat, r, 0), arb_mat_entry(mat, s, 0), mat->c);
+    }
 }
