@@ -27,7 +27,7 @@ int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
     for (j = 0; j < mat1->r; j++)
     {
-        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
+        if (!_fmpz_vec_equal(fmpz_mat_row(mat1, j), fmpz_mat_row(mat2, j), mat1->c))
         {
             return 0;
         }
@@ -42,7 +42,7 @@ int fmpz_mat_equal_col(fmpz_mat_t M, slong m, slong n)
 
    for (i = 0; i < M->r; i++)
    {
-      if (!fmpz_equal(M->rows[i] + m, M->rows[i] + n))
+      if (!fmpz_equal(fmpz_mat_entry(M, i, m), fmpz_mat_entry(M, i, n)))
          return 0;
    }
 
@@ -55,7 +55,7 @@ int fmpz_mat_equal_row(fmpz_mat_t M, slong m, slong n)
 
    for (i = 0; i < M->c; i++)
    {
-      if (!fmpz_equal(M->rows[m] + i, M->rows[n] + i))
+      if (!fmpz_equal(fmpz_mat_entry(M, m, i), fmpz_mat_entry(M, n, i)))
          return 0;
    }
 

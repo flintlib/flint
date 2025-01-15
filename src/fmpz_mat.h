@@ -31,7 +31,13 @@ extern "C" {
 FMPZ_MAT_INLINE
 fmpz * fmpz_mat_entry(const fmpz_mat_t mat, slong i, slong j)
 {
-   return mat->rows[i] + j;
+   return mat->entries + i * mat->stride + j;
+}
+
+FMPZ_MAT_INLINE
+fmpz * fmpz_mat_row(const fmpz_mat_t mat, slong i)
+{
+   return mat->entries + i * mat->stride;
 }
 
 FMPZ_MAT_INLINE
@@ -214,18 +220,7 @@ void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A);
 
 /* Permutations */
 
-FMPZ_MAT_INLINE
-void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
-{
-    if (r != s && !fmpz_mat_is_empty(mat))
-    {
-        if (perm != NULL)
-            FLINT_SWAP(slong, perm[r], perm[s]);
-
-        FLINT_SWAP(fmpz *, mat->rows[r], mat->rows[s]);
-    }
-}
-
+void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s);
 void fmpz_mat_invert_rows(fmpz_mat_t mat, slong * perm);
 void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm);
 

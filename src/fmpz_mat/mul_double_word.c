@@ -314,9 +314,12 @@ typedef struct {
     slong Bstopcol;
     slong br;
     slong bc;
-    fmpz ** Crows;
-    fmpz ** Arows;
-    fmpz ** Brows;
+    fmpz * Centries;
+    slong Cstride;
+    fmpz * Aentries;
+    slong Astride;
+    fmpz * Bentries;
+    slong Bstride;
     ulong * BL;
     int sign;
     int words;
@@ -328,7 +331,8 @@ static void _red_worker(void * varg)
     slong Bstartcol = arg->Bstartcol;
     slong Bstopcol = arg->Bstopcol;
     slong br = arg->br;
-    fmpz ** Brows = arg->Brows;
+    fmpz * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     ulong * BL = arg->BL;
     int sign = arg->sign;
     slong i, j;
@@ -338,14 +342,14 @@ static void _red_worker(void * varg)
         for (j = Bstartcol; j < Bstopcol; j++)
             for (i = 0; i < br; i++)
                 fmpz_get_signed_uiui(BL + 2*(j*br + i) + 1,
-                                     BL + 2*(j*br + i) + 0, &Brows[i][j]);
+                                     BL + 2*(j*br + i) + 0, Bentries + i * Bstride + j);
     }
     else
     {
         for (j = Bstartcol; j < Bstopcol; j++)
             for (i = 0; i < br; i++)
                 fmpz_get_uiui(BL + 2*(j*br + i) + 1,
-                              BL + 2*(j*br + i) + 0, &Brows[i][j]);
+                              BL + 2*(j*br + i) + 0, Bentries + i * Bstride + j);
     }
 }
 
@@ -357,8 +361,10 @@ static void _mul_worker(void * varg)
     slong ac = arg->br;
     slong br = arg->br;
     slong bc = arg->bc;
-    fmpz ** Crows = arg->Crows;
-    fmpz ** Arows = arg->Arows;
+    fmpz * Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
+    fmpz * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
     ulong * BL = arg->BL;
     int sign = arg->sign;
     int words = arg->words;
@@ -378,14 +384,14 @@ static void _mul_worker(void * varg)
         for (i = Astartrow; i < Astoprow; i++)
         {
             for (j = 0; j < ac; j++)
-                fmpz_get_signed_uiui(AL + 2*j + 1, AL + 2*j, &Arows[i][j]);
+                fmpz_get_signed_uiui(AL + 2*j + 1, AL + 2*j, Aentries + i * Astride + j);
 
             if (words == 4 && br < FMPZ_MAT_MUL_4_BRANCHLESS_CUTOFF)
-                _do_row_22_4_signed_branchy(Crows[i], AL, BL, br, bc);
+                _do_row_22_4_signed_branchy(Centries + i * Cstride, AL, BL, br, bc);
             else if (words == 4)
-                _do_row_22_4_signed(Crows[i], AL, BL, br, bc);
+                _do_row_22_4_signed(Centries + i * Cstride, AL, BL, br, bc);
             else
-                _do_row_22_5_signed(Crows[i], AL, BL, br, bc);
+                _do_row_22_5_signed(Centries + i * Cstride, AL, BL, br, bc);
         }
     }
     else
@@ -393,12 +399,12 @@ static void _mul_worker(void * varg)
         for (i = Astartrow; i < Astoprow; i++)
         {
             for (j = 0; j < ac; j++)
-                fmpz_get_uiui(AL + 2*j + 1, AL + 2*j, &Arows[i][j]);
+                fmpz_get_uiui(AL + 2*j + 1, AL + 2*j, Aentries + i * Astride + j);
 
             if (words == 4)
-                _do_row_22_4_unsigned(Crows[i], AL, BL, br, bc);
+                _do_row_22_4_unsigned(Centries + i * Cstride, AL, BL, br, bc);
             else
-                _do_row_22_5_unsigned(Crows[i], AL, BL, br, bc);
+                _do_row_22_5_unsigned(Centries + i * Cstride, AL, BL, br, bc);
         }
     }
 
@@ -451,9 +457,12 @@ void _fmpz_mat_mul_double_word_internal(
     mainarg.Bstopcol = bc;
     mainarg.br = br;
     mainarg.bc = bc;
-    mainarg.Crows = C->rows;
-    mainarg.Arows = A->rows;
-    mainarg.Brows = B->rows;
+    mainarg.Centries = C->entries;
+    mainarg.Cstride = C->stride;
+    mainarg.Aentries = A->entries;
+    mainarg.Astride = A->stride;
+    mainarg.Bentries = B->entries;
+    mainarg.Bstride = B->stride;
     mainarg.BL = TMP_ARRAY_ALLOC(br*bc*2, ulong);
     mainarg.sign = sign;
 
@@ -488,9 +497,12 @@ use_one_thread:
         args[i].Bstopcol = (i + 1)*bc/(num_workers + 1);
         args[i].br = mainarg.br;
         args[i].bc = mainarg.bc;
-        args[i].Crows = mainarg.Crows;
-        args[i].Arows = mainarg.Arows;
-        args[i].Brows = mainarg.Brows;
+        args[i].Centries = mainarg.Centries;
+        args[i].Cstride = mainarg.Cstride;
+        args[i].Aentries = mainarg.Aentries;
+        args[i].Astride = mainarg.Astride;
+        args[i].Bentries = mainarg.Bentries;
+        args[i].Bstride = mainarg.Bstride;
         args[i].BL = mainarg.BL;
         args[i].sign = mainarg.sign;
         args[i].words = mainarg.words;

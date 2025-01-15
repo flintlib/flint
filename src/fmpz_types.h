@@ -77,7 +77,7 @@ typedef struct
     fmpz * entries;
     slong r;
     slong c;
-    fmpz ** rows;
+    slong stride;
 }
 fmpz_mat_struct;
 

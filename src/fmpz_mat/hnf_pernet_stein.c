@@ -68,7 +68,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     /* set the last row of Bu to be random, such that Bu is nonsingular */
     while (fmpz_is_zero(tmp))
     {
-        _fmpz_vec_randtest(Bu->rows[n - 1], state, n, bits);
+        _fmpz_vec_randtest(fmpz_mat_row(Bu, n - 1), state, n, bits);
 
         fmpz_zero(tmp);
         for (j = 0; j < n; j++)

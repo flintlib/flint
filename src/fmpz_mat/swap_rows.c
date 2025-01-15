@@ -12,25 +12,13 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-int
-fmpz_mat_is_zero(const fmpz_mat_t mat)
+void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 {
-    slong j;
-
-    if (mat->r == 0 || mat->c == 0)
-        return 1;
-
-    for (j = 0; j < mat->r; j++)
+    if (r != s && !fmpz_mat_is_empty(mat))
     {
-        if (!_fmpz_vec_is_zero(fmpz_mat_row(mat, j), mat->c))
-            return 0;
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
+
+        _fmpz_vec_swap(fmpz_mat_entry(mat, r, 0), fmpz_mat_entry(mat, s, 0), mat->c);
     }
-
-    return 1;
-}
-
-int
-fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
-{
-    return _fmpz_vec_is_zero(fmpz_mat_row(mat, i), mat->c);
 }
