@@ -26,14 +26,18 @@
  extern "C" {
 #endif
 
-#define FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF 10
-
 /* Element access  ********************************************************/
 
 FMPZ_MOD_MAT_INLINE
 fmpz * fmpz_mod_mat_entry(const fmpz_mod_mat_t mat, slong i, slong j)
 {
     return fmpz_mat_entry(mat, i, j);
+}
+
+FMPZ_MOD_MAT_INLINE
+fmpz * fmpz_mod_mat_row(const fmpz_mod_mat_t mat, slong i)
+{
+    return fmpz_mod_mat_entry(mat, i, 0);
 }
 
 void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));

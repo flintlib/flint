@@ -11,6 +11,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
@@ -42,8 +43,8 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
    for (i = 0; i < k; i++)
    {
-      fmpz_poly_CLD_bound(res->rows[r] + i, f, i);
-      fmpz_poly_CLD_bound(res->rows[r] + 2*k - i - 1, f, f->length - i - 2);
+      fmpz_poly_CLD_bound(fmpz_mat_entry(res, r, i), f, i);
+      fmpz_poly_CLD_bound(fmpz_mat_entry(res, r, 2*k - i - 1), f, f->length - i - 2);
    }
 
    /* we exclude columns in the middle for which CLD bounds are too large */
@@ -54,7 +55,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
    for (lo_n = 0; lo_n < k; lo_n++)
    {
-      fmpz_mul_ui(t, res->rows[r] + lo_n, (slong) sqrt(f->length));
+      fmpz_mul_ui(t, fmpz_mat_entry(res, r, lo_n), (slong) sqrt(f->length));
 
       if (fmpz_bits(t) > bound)
          break;
@@ -64,7 +65,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
    for (hi_n = 0; hi_n < k; hi_n++)
    {
-      fmpz_mul_ui(t, res->rows[r] + 2*k - hi_n - 1, (slong) sqrt(f->length));
+      fmpz_mul_ui(t, fmpz_mat_entry(res, r, 2*k - hi_n - 1), (slong) sqrt(f->length));
 
       if (fmpz_bits(t) > bound)
          break;
@@ -90,7 +91,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
          fmpz_poly_attach_truncate(trunc_fac, lifted_fac->p + i, lo_n + zeroes + 1);
          fmpz_poly_derivative(gd, trunc_fac);
          fmpz_poly_mullow(gcld, f, gd, lo_n + zeroes);
-         fmpz_poly_divlow_smodp(res->rows[i], gcld, trunc_fac, P, lo_n);
+         fmpz_poly_divlow_smodp(fmpz_mat_entry(res, i, 0), gcld, trunc_fac, P, lo_n);
       }
    }
 
@@ -109,13 +110,13 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
             fmpz_poly_shift_left(temp, lifted_fac->p + i, -len);
             fmpz_poly_derivative(gd, temp);
             fmpz_poly_mulhigh_n(gcld, trunc_f, gd, hi_n);
-            fmpz_poly_divhigh_smodp(res->rows[i] + lo_n, gcld, temp, P, hi_n);
+            fmpz_poly_divhigh_smodp(fmpz_mat_entry(res, i, lo_n), gcld, temp, P, hi_n);
          } else
          {
             fmpz_poly_attach_shift(trunc_fac, lifted_fac->p + i, len);
             fmpz_poly_derivative(gd, trunc_fac);
             fmpz_poly_mulhigh_n(gcld, trunc_f, gd, hi_n);
-            fmpz_poly_divhigh_smodp(res->rows[i] + lo_n, gcld, trunc_fac, P, hi_n);
+            fmpz_poly_divhigh_smodp(fmpz_mat_entry(res, i, lo_n), gcld, trunc_fac, P, hi_n);
          }
       }
 
@@ -126,7 +127,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
    {
       /* move bounds into correct columns */
       for (i = 0; i < hi_n; i++)
-         fmpz_set(res->rows[r] + lo_n + i, res->rows[r] + 2*k - hi_n + i);
+         fmpz_set(fmpz_mat_entry(res, r, lo_n + i), fmpz_mat_entry(res, r, 2*k - hi_n + i));
    }
 
    /* do not clear trunc_fac */
