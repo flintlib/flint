@@ -12,6 +12,10 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
+/* Permute rows SLICE columns at a time to improve memory locality
+   and reduce temporary allocation. */
+#define SLICE 32
+
 static void
 _apply_permutation(slong * AP, nmod_mat_t A, const slong * P,
     slong num_rows, slong row_offset, slong num_cols, slong col_offset)
@@ -20,23 +24,40 @@ _apply_permutation(slong * AP, nmod_mat_t A, const slong * P,
     {
         ulong * Atmp;
         slong * APtmp;
-        slong i;
+        slong i, c, l;
+        TMP_INIT;
 
-        /* todo: reduce memory allocation */
-        Atmp = flint_malloc(sizeof(ulong) * num_rows * num_cols);
-        /* todo: avoid temporary allocation when AP != P */
-        APtmp = flint_malloc(sizeof(slong) * num_rows);
+        TMP_START;
 
-        for (i = 0; i < num_rows; i++)
-            _nmod_vec_set(Atmp + i * num_cols, nmod_mat_entry_ptr(A, P[i] + row_offset, col_offset), num_cols);
-        for (i = 0; i < num_rows; i++)
-            _nmod_vec_set(nmod_mat_entry_ptr(A, i + row_offset, col_offset), Atmp + i * num_cols, num_cols);
+        if (num_cols <= SLICE)
+        {
+            Atmp = TMP_ALLOC(sizeof(ulong) * num_rows * num_cols);
+
+            for (i = 0; i < num_rows; i++)
+                _nmod_vec_set(Atmp + i * num_cols, nmod_mat_entry_ptr(A, P[i] + row_offset, col_offset), num_cols);
+            for (i = 0; i < num_rows; i++)
+                _nmod_vec_set(nmod_mat_entry_ptr(A, i + row_offset, col_offset), Atmp + i * num_cols, num_cols);
+        }
+        else
+        {
+            Atmp = TMP_ALLOC(sizeof(ulong) * num_rows * SLICE);
+
+            for (c = 0; c < num_cols; c += SLICE)
+            {
+                l = FLINT_MIN(SLICE, num_cols - c);
+                for (i = 0; i < num_rows; i++)
+                    _nmod_vec_set(Atmp + i * SLICE, nmod_mat_entry_ptr(A, P[i] + row_offset, col_offset + c), l);
+                for (i = 0; i < num_rows; i++)
+                    _nmod_vec_set(nmod_mat_entry_ptr(A, i + row_offset, col_offset + c), Atmp + i * SLICE, l);
+            }
+        }
+
+        APtmp = TMP_ALLOC(sizeof(slong) * num_rows);
 
         for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
         for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
 
-        flint_free(Atmp);
-        flint_free(APtmp);
+        TMP_END;
     }
 }
 

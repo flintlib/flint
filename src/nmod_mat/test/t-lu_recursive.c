@@ -91,8 +91,17 @@ TEST_FUNCTION_START(nmod_mat_lu_recursive, state)
         slong m, n, r, d, rank;
         slong * P;
 
-        m = n_randint(state, 30);
-        n = n_randint(state, 30);
+        if (n_randint(state, 100) == 0)
+        {
+            m = n_randint(state, 100);
+            n = n_randint(state, 100);
+        }
+        else
+        {
+            m = n_randint(state, 30);
+            n = n_randint(state, 30);
+        }
+
         mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
