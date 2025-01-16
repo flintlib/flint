@@ -407,6 +407,10 @@ target_link_libraries(flint PUBLIC
     ${PThreads_LIBRARIES}
 )
 
+if(MSVC AND NOT "${CMAKE_CXX_SIMULATE_ID}" STREQUAL "MSVC")
+    target_compile_options(flint PUBLIC "/experimental:c11atomics")
+endif()
+
 if(FLINT_USES_BLAS)
     target_link_libraries(flint PUBLIC CBLAS::CBLAS)
 endif()
