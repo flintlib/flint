@@ -57,7 +57,7 @@ typedef struct
     nmod_poly_struct * entries;
     slong r;
     slong c;
-    nmod_poly_struct ** rows;
+    slong stride;
     ulong modulus;
 }
 nmod_poly_mat_struct;

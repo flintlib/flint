@@ -27,7 +27,7 @@ extern "C" {
 NMOD_POLY_MAT_INLINE
 nmod_poly_struct * nmod_poly_mat_entry(const nmod_poly_mat_t mat, slong i, slong j)
 {
-    return mat->rows[i] + j;
+    return mat->entries + i * mat->stride + j;
 }
 
 NMOD_POLY_MAT_INLINE slong
