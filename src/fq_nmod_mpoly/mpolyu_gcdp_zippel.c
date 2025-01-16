@@ -588,7 +588,7 @@ pick_evaluation_point:
         {
             for (k = 0; k < (f->coeffs + j)->length; k++)
             {
-                n_fq_get_fq_nmod((M + j)->rows[i] + k,
+                n_fq_get_fq_nmod(fq_nmod_mat_entry(M + j, i, k),
                                (fevalski->coeffs + j)->coeffs + d*k, ctx->fqctx);
             }
         }
@@ -658,10 +658,10 @@ pick_evaluation_point:
             {
                 for (j = 0; j < (f->coeffs + s)->length; j++)
                 {
-                    fq_nmod_set((ML + s)->rows[i] + j,
-                                 (M + s)->rows[i] + j, ctx->fqctx);
+                    fq_nmod_set(fq_nmod_mat_entry(ML + s, i, j),
+                                 fq_nmod_mat_entry(M + s, i, j), ctx->fqctx);
                 }
-                fq_nmod_set((ML + s)->rows[i] + (f->coeffs + s)->length + i,
+                fq_nmod_set(fq_nmod_mat_entry(ML + s, i, (f->coeffs + s)->length + i),
                                                       W + l*s + i, ctx->fqctx);
             }
         } else {
@@ -669,18 +669,16 @@ pick_evaluation_point:
             {
                 for (j = 0; j < (f->coeffs + s)->length; j++)
                 {
-                    fq_nmod_set((ML + s)->rows[i] + j,
-                                             (M + s)->rows[i] + j, ctx->fqctx);
+                    fq_nmod_set(fq_nmod_mat_entry(ML + s, i, j),
+                                             fq_nmod_mat_entry(M + s, i, j), ctx->fqctx);
                 }
                 for (j = 0; j < l; j++) {
                     if (j == i)
                     {
-                        fq_nmod_set((ML + s)->rows[i]
-                                     + (f->coeffs + s)->length + j,
+                        fq_nmod_set(fq_nmod_mat_entry(ML + s, i, (f->coeffs + s)->length + j),
                                                       W + l*s + i, ctx->fqctx);
                     } else {
-                        fq_nmod_zero((ML + s)->rows[i]
-                                     + (f->coeffs + s)->length + j,
+                        fq_nmod_zero(fq_nmod_mat_entry(ML + s, i, (f->coeffs + s)->length + j),
                                                                    ctx->fqctx);
                     }
                 }
@@ -691,7 +689,7 @@ pick_evaluation_point:
 
         for (i = 0; i < (f->coeffs + s)->length; i++)
         {
-            if (!fq_nmod_is_one((ML + s)->rows[i] + i, ctx->fqctx))
+            if (!fq_nmod_is_one(fq_nmod_mat_entry(ML + s, i, i), ctx->fqctx))
             {
                 /* evaluation points produced a singular vandermonde matrix */
                 goto pick_evaluation_point;
@@ -756,7 +754,7 @@ pick_evaluation_point:
         {
             FLINT_ASSERT((f->coeffs + i)->length <= l);
             FLINT_ASSERT(j < (f->coeffs + tlen[f->length - 1])->length);
-            fq_nmod_mul(b + j, W + l*i + j, Msol->rows[j] + 0, ctx->fqctx);
+            fq_nmod_mul(b + j, W + l*i + j, fq_nmod_mat_entry(Msol, j, 0), ctx->fqctx);
         }
         success = fq_nmod_vandsolve((G->coeffs + i)->coeffs,
                                  (fevalsk1->coeffs + i)->coeffs, b,
@@ -782,11 +780,11 @@ pick_evaluation_point:
             for (j = 0; j < (f->coeffs + s)->length; j++)
             {
                 n_fq_get_fq_nmod(u, (G->coeffs + s)->coeffs + d*j, ctx->fqctx);
-                fq_nmod_mul(pp, (M + s)->rows[i] + j, u, ctx->fqctx);
+                fq_nmod_mul(pp, fq_nmod_mat_entry(M + s, i, j), u, ctx->fqctx);
                 fq_nmod_add(acc, acc, pp, ctx->fqctx);
             }
 
-            fq_nmod_mul(u, W + l*s + i, Msol->rows[i] + 0, ctx->fqctx);
+            fq_nmod_mul(u, W + l*s + i, fq_nmod_mat_entry(Msol, i, 0), ctx->fqctx);
             if (!fq_nmod_equal(acc, u, ctx->fqctx))
             {
                 fq_nmod_clear(acc, ctx->fqctx);

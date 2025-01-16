@@ -45,7 +45,7 @@ TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
 FQ_MAT_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
 {
-    return mat->rows[i] + j;
+    return mat->entries + i * mat->stride + j;
 }
 
 void TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
@@ -92,10 +92,17 @@ TEMPLATE(T, mat_swap_rows)(TEMPLATE(T, mat_t) mat, slong * perm, slong r, slong 
 {
     if (r != s && !TEMPLATE(T, mat_is_empty)(mat, ctx))
     {
+        slong i;
+        TEMPLATE(T, struct) *u, *v;
+
         if (perm != NULL)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
-        FLINT_SWAP(TEMPLATE(T, struct) *, mat->rows[r], mat->rows[s]);
+        u = TEMPLATE(T, mat_entry)(mat, r, 0);
+        v = TEMPLATE(T, mat_entry)(mat, s, 0);
+
+        for (i = 0; i < mat->c; i++)
+            FLINT_SWAP(TEMPLATE(T, struct), u[i], v[i]);
     }
 }
 

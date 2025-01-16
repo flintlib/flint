@@ -89,11 +89,7 @@ TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
             }
          } else
          {
-            TEMPLATE(T, struct) * ptr;
-
-            ptr = A->rows[n - i - k - 1];
-            A->rows[n - i - k - 1] = A->rows[n - i - 1];
-            A->rows[n - i - 1] = ptr;
+            TEMPLATE(T, mat_swap_rows) (A, NULL, n - i - 1, n - i - k - 1, ctx);
 
             for (j = 1; j <= n - i + 1; j++)
             {

@@ -1242,8 +1242,8 @@ _gr_acf_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A
             {
                 for (j = 0; j < n; j++)
                 {
-                    arf_set(acf_realref(((acf_ptr) L->rows[i]) + j), arb_midref(acb_realref(acb_mat_entry(L_acb, i, j))));
-                    arf_set(acf_imagref(((acf_ptr) L->rows[i]) + j), arb_midref(acb_imagref(acb_mat_entry(L_acb, i, j))));
+                    arf_set(acf_realref(ACF_MAT_ENTRY(L, i, j), arb_midref(acb_realref(acb_mat_entry(L_acb, i, j))));
+                    arf_set(acf_imagref(ACF_MAT_ENTRY(L, i, j), arb_midref(acb_imagref(acb_mat_entry(L_acb, i, j))));
                 }
             }
         }

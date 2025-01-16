@@ -19,8 +19,7 @@ static inline int
 TEMPLATE(T, mat_pivot) (TEMPLATE(T, mat_t) A, slong * P, slong start_row,
                         slong col, const TEMPLATE(T, ctx_t) ctx)
 {
-    slong j, t;
-    TEMPLATE(T, struct) * u;
+    slong j;
 
     if (!TEMPLATE(T, is_zero)
         (TEMPLATE(T, mat_entry) (A, start_row, col), ctx))
@@ -30,14 +29,7 @@ TEMPLATE(T, mat_pivot) (TEMPLATE(T, mat_t) A, slong * P, slong start_row,
     {
         if (!TEMPLATE(T, is_zero) (TEMPLATE(T, mat_entry) (A, j, col), ctx))
         {
-            u = A->rows[j];
-            A->rows[j] = A->rows[start_row];
-            A->rows[start_row] = u;
-
-            t = P[j];
-            P[j] = P[start_row];
-            P[start_row] = t;
-
+            TEMPLATE(T, mat_swap_rows) (A, P, j, start_row, ctx);
             return -1;
         }
     }
@@ -51,12 +43,10 @@ TEMPLATE(T, mat_lu_classical) (slong * P,
                                int rank_check, const TEMPLATE(T, ctx_t) ctx)
 {
     TEMPLATE(T, t) d, e, neg_e;
-    TEMPLATE(T, struct) ** a;
     slong i, m, n, rank, length, row, col;
 
     m = A->r;
     n = A->c;
-    a = A->rows;
 
     rank = row = col = 0;
 
@@ -82,23 +72,23 @@ TEMPLATE(T, mat_lu_classical) (slong * P,
 
         rank++;
 
-        TEMPLATE(T, inv) (d, a[row] + col, ctx);
+        TEMPLATE(T, inv) (d, TEMPLATE(T, mat_entry) (A, row, col), ctx);
 
         length = n - col - 1;
 
         for (i = row + 1; i < m; i++)
         {
-            TEMPLATE(T, mul) (e, a[i] + col, d, ctx);
+            TEMPLATE(T, mul) (e, TEMPLATE(T, mat_entry) (A, i, col), d, ctx);
             if (length != 0)
             {
                 TEMPLATE(T, neg) (neg_e, e, ctx);
-                _TEMPLATE3(T, vec_scalar_addmul, T) (a[i] + col + 1,
-                                                     a[row] + col + 1,
+                _TEMPLATE3(T, vec_scalar_addmul, T) (TEMPLATE(T, mat_entry) (A, i, col + 1),
+                                                     TEMPLATE(T, mat_entry) (A, row, col + 1),
                                                      length, neg_e, ctx);
             }
 
-            TEMPLATE(T, zero) (a[i] + col, ctx);
-            TEMPLATE(T, set) (a[i] + rank - 1, e, ctx);
+            TEMPLATE(T, zero) (TEMPLATE(T, mat_entry) (A, i, col), ctx);
+            TEMPLATE(T, set) (TEMPLATE(T, mat_entry) (A, i, rank - 1), e, ctx);
         }
         row++;
         col++;

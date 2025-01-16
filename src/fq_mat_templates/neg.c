@@ -25,7 +25,8 @@ TEMPLATE(T, mat_neg) (TEMPLATE(T, mat_t) res,
         return;
 
     for (i = 0; i < res->r; i++)
-        _TEMPLATE(T, vec_neg) (res->rows[i], mat->rows[i], res->c, ctx);
+        _TEMPLATE(T, vec_neg) (TEMPLATE(T, mat_entry)(res, i, 0),
+            TEMPLATE(T, mat_entry)(mat, i, 0), res->c, ctx);
 }
 
 

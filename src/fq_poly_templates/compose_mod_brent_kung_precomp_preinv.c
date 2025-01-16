@@ -33,7 +33,7 @@ _TEMPLATE(T, poly_reduce_matrix_mod_poly) (TEMPLATE(T, mat_t) A,
     TEMPLATE(T, init) (invf, ctx);
     TEMPLATE(T, inv) (invf, f->coeffs + (f->length - 1), ctx);
     for (i = 1; i < m; i++)
-        _TEMPLATE(T, poly_rem) (A->rows[i], B->rows[i], B->c, f->coeffs,
+        _TEMPLATE(T, poly_rem) (TEMPLATE(T, mat_entry) (A, i, 0), TEMPLATE(T, mat_entry) (B, i, 0), B->c, f->coeffs,
                                 f->length, invf, ctx);
     TEMPLATE(T, clear) (invf, ctx);
 }
@@ -54,9 +54,9 @@ _TEMPLATE(T, poly_precompute_matrix) (
     m = n_sqrt(n) + 1;
 
     TEMPLATE(T, one) (TEMPLATE(T, mat_entry) (A, 0, 0), ctx);
-    _TEMPLATE(T, vec_set) (A->rows[1], poly1, n, ctx);
+    _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry) (A, 1, 0), poly1, n, ctx);
     for (i = 2; i < m; i++)
-        _TEMPLATE(T, poly_mulmod_preinv) (A->rows[i], A->rows[i - 1],
+        _TEMPLATE(T, poly_mulmod_preinv) (TEMPLATE(T, mat_entry) (A, i, 0), TEMPLATE(T, mat_entry) (A, i - 1, 0),
                                           n, poly1, n, poly2, len2,
                                           poly2inv, len2inv, ctx);
 }
@@ -159,22 +159,22 @@ _TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv) (
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
-        _TEMPLATE(T, vec_set) (B->rows[i], poly1 + i * m, m, ctx);
+        _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry) (B, i, 0), poly1 + i * m, m, ctx);
 
-    _TEMPLATE(T, vec_set) (B->rows[i], poly1 + i * m, len1 % m, ctx);
+    _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry) (B, i, 0), poly1 + i * m, len1 % m, ctx);
 
     TEMPLATE(T, mat_mul) (C, B, A, ctx);
 
     /* Evaluate block composition using the Horner scheme */
-    _TEMPLATE(T, vec_set) (res, C->rows[m - 1], n, ctx);
-    _TEMPLATE(T, poly_mulmod_preinv) (h, A->rows[m - 1], n, A->rows[1], n,
+    _TEMPLATE(T, vec_set) (res, TEMPLATE(T, mat_entry) (C, m - 1, 0), n, ctx);
+    _TEMPLATE(T, poly_mulmod_preinv) (h, TEMPLATE(T, mat_entry) (A, m - 1, 0), n, TEMPLATE(T, mat_entry) (A, 1, 0), n,
                                       poly3, len3, poly3inv, len3inv, ctx);
 
     for (i = m - 2; i >= 0; i--)
     {
         _TEMPLATE(T, poly_mulmod_preinv) (t, res, n, h, n, poly3, len3,
                                           poly3inv, len3inv, ctx);
-        _TEMPLATE(T, poly_add) (res, t, n, C->rows[i], n, ctx);
+        _TEMPLATE(T, poly_add) (res, t, n, TEMPLATE(T, mat_entry) (C, i, 0), n, ctx);
     }
 
     _TEMPLATE(T, vec_clear) (h, n, ctx);

@@ -53,7 +53,7 @@ randmat(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx)
     slong i;
 
     for (i = 0; i < mat->r; i++)
-        randvec(mat->rows[i], state, mat->c, ctx);
+        randvec(gr_mat_entry_ptr(mat, i, 0, ctx), state, mat->c, ctx);
 }
 
 slong cutoff_bits[1000];

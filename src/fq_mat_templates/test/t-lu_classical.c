@@ -12,6 +12,7 @@
 
 #ifdef T
 
+#include <string.h>
 #include "test_helpers.h"
 #include "templates.h"
 
@@ -22,17 +23,15 @@ void
 perm(TEMPLATE(T, mat_t) A, slong * P)
 {
     slong i;
-    TEMPLATE(T, struct) ** tmp;
+    TEMPLATE(T, struct) * tmp;
 
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(TEMPLATE(T, struct) *) * A->r);
+    tmp = flint_malloc(sizeof(TEMPLATE(T, struct)) * A->r * A->c);
 
-    for (i = 0; i < A->r; i++)
-        tmp[P[i]] = A->rows[i];
-    for (i = 0; i < A->r; i++)
-        A->rows[i] = tmp[i];
+    for (i = 0; i < A->r; i++) memcpy(tmp + P[i] * A->c, TEMPLATE(T, mat_entry)(A, i, 0), A->c * sizeof(TEMPLATE(T, struct)));
+    for (i = 0; i < A->r; i++) memcpy(TEMPLATE(T, mat_entry)(A, i, 0), tmp + i * A->c, A->c * sizeof(TEMPLATE(T, struct)));
 
     flint_free(tmp);
 }
