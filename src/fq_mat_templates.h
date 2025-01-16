@@ -140,7 +140,7 @@ void TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
                              slong r1, slong c1, slong r2, slong c2,
                              const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
-void TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window,
+void TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) FLINT_UNUSED(window),
                               const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 void TEMPLATE(T, mat_concat_horizontal)(TEMPLATE(T, mat_t) res,

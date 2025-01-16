@@ -18,7 +18,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_window_clear) (TEMPLATE(T, mat_t) window,
+TEMPLATE(T, mat_window_clear) (TEMPLATE(T, mat_t) FLINT_UNUSED(window),
                                const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
 }
