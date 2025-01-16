@@ -51,9 +51,9 @@ static void _red_worker(void * varg)
     slong Bstartrow = arg->Bstartrow;
     slong Bstoprow = arg->Bstoprow;
     fmpz * Aentries = arg->Aentries;
-    slong Astride;
+    slong Astride = arg->Astride;
     fmpz * Bentries = arg->Bentries;
-    slong Bstride;
+    slong Bstride = arg->Bstride;
     double * dA = arg->dA;
     double * dB = arg->dB;
 
