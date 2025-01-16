@@ -86,7 +86,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz * res, const fmpz * poly1,
     {
         _fmpz_mod_poly_mulmod_preinv(t, res, n, h, n, poly3, len3,
                                      poly3inv, len3inv, ctx);
-        _fmpz_mod_poly_add(res, t, n, fmpz_mod_mat_row(C, 1), n, ctx);
+        _fmpz_mod_poly_add(res, t, n, fmpz_mod_mat_row(C, i), n, ctx);
     }
 
     _fmpz_vec_clear(h, 2 * n - 1);
