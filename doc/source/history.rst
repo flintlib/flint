@@ -21,8 +21,7 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Add new module ``nfloat`` for packed fixed-size floating-point numbers with
     additional vector and matrix arithmetic (FJ).
   * Add fixed-point arithmetic under the ``nfloat`` module (FJ).
-  * Major work on ``gr`` modules.  Too much to include into this brief note,
-    but the work is very significant.  Some of it includes:
+  * Major work on ``gr`` modules, including:
 
     * Toom-Cook multiplications for ``gr_poly``,
     * Add Aberth and WDK root refinement for ``gr_poly``,
@@ -106,7 +105,7 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Do not calculate remainder in exact division of ``fq_nmod_mpoly`` unless
     assertion is needed.
   * Implement fast ``flint_mpn_mullow_n`` for large `n`, and use this in
-    preinvertion functions (FJ).
+    preinversion functions (FJ).
   * Simplify ``FLINT_MPN_MUL_2X2`` (FJ).
   * Reduce inlining of ``flint_mpn_mulhigh_normalised`` (FJ).
   * Implement faster version of ``flint_mpn_addmod_2`` (FJ).
@@ -144,6 +143,8 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
     ``(gr|fmpz)_mat`` (FJ).
   * Utilize symmetry when squaring in ``gr_mat_mul_strassen`` (FJ).
   * Improve algorithm selection in ``fmpz_mat_rref`` (FJ).
+  * Use ``acb_dot`` in recurrence for Eisenstein series instead of multiple
+    addmuls (FJ).
 
 * Bug fixes
 
@@ -333,8 +334,6 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Fix ``noreturn`` attribute for C23, as it uses ``[[noreturn]]`` for this
     (Michael Orlitzky).
   * Add newlines to end of files that where missing them (AA).
-  * Use ``acb_dot`` in recurrence for Eisenstein series instead of multiple
-    addmuls (FJ).
   * Add ``mpn_extras/inlines.c`` (AA).
 
 * Continuous integration
