@@ -27,7 +27,7 @@ void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
 
     fmpz_mat_init(T, r, c);
     for (i = 0; i < M->r; i++)
-        _fmpz_vec_swap(fmpz_mat_row(T, i), fmpz_mat_row(M, i), M->c);
+        _fmpz_vec_swap(fmpz_mat_row(T, i + r - M->r), fmpz_mat_row(M, i), M->c);
     fmpz_mat_swap(M, T);
     fmpz_mat_clear(T);
 }
