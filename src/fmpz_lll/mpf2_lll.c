@@ -75,7 +75,7 @@ FUNC_HEAD
         /* ************************** */
 
         for (i = 0; i < d; i++)
-            _mpf_vec_set_fmpz_vec(appB->rows[i], B->rows[i], n);
+            _mpf_vec_set_fmpz_vec(appB->rows[i], fmpz_mat_row(B, i), n);
 
         /* ********************************* */
         /* Step2: Initializing the main loop */
@@ -220,18 +220,31 @@ FUNC_HEAD
                 /* Step7: Update B and appB */
                 /* ************************ */
 
-                Btmp = B->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    B->rows[i] = B->rows[i - 1];
-                B->rows[kappa] = Btmp;
+                {
+                    /* todo: shallow moves */
+/*
+                    Btmp = B->rows[kappa2];
+                    for (i = kappa2; i > kappa; i--)
+                        B->rows[i] = B->rows[i - 1];
+                    B->rows[kappa] = Btmp;
+*/
+                    Btmp = _fmpz_vec_init(B->c);
+                    _fmpz_vec_set(Btmp, fmpz_mat_row(B, kappa2), B->c);
+                    for (i = kappa2; i > kappa; i--)
+                        _fmpz_vec_set(fmpz_mat_row(B, i), fmpz_mat_row(B, i - 1), B->c);
+                    _fmpz_vec_set(fmpz_mat_row(B, kappa), Btmp, B->c);
+                    _fmpz_vec_clear(Btmp, B->c);
+
+                }
 
                 if (U != NULL)
                 {
+                    /* todo: shallow moves */
                     Btmp = _fmpz_vec_init(U->c);
-                    _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
+                    _fmpz_vec_set(Btmp, fmpz_mat_row(U, kappa2), U->c);
                     for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], U->c);
-                    _fmpz_vec_set(U->rows[kappa], Btmp, U->c);
+                        _fmpz_vec_set(fmpz_mat_row(U, i), fmpz_mat_row(U, i - 1), U->c);
+                    _fmpz_vec_set(fmpz_mat_row(U, kappa), Btmp, U->c);
                     _fmpz_vec_clear(Btmp, U->c);
                 }
 
@@ -506,19 +519,27 @@ FUNC_HEAD
 
                 if (fl->rt == Z_BASIS && update_b)
                 {
+                    Btmp = _fmpz_vec_init(B->c);
+                    _fmpz_vec_set(Btmp, fmpz_mat_row(B, kappa2), B->c);
+                    for (i = kappa2; i > kappa; i--)
+                        _fmpz_vec_set(fmpz_mat_row(B, i), fmpz_mat_row(B, i - 1), B->c);
+                    _fmpz_vec_set(fmpz_mat_row(B, kappa), Btmp, B->c);
+                    _fmpz_vec_clear(Btmp, B->c);
+/*
                     Btmp = B->rows[kappa2];
                     for (i = kappa2; i > kappa; i--)
                         B->rows[i] = B->rows[i - 1];
                     B->rows[kappa] = Btmp;
+*/
                 }
 
                 if (U != NULL)
                 {
                     Btmp = _fmpz_vec_init(U->c);
-                    _fmpz_vec_set(Btmp, U->rows[kappa2], U->c);
+                    _fmpz_vec_set(Btmp, fmpz_mat_row(U, kappa2), U->c);
                     for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(U->rows[i], U->rows[i - 1], U->c);
-                    _fmpz_vec_set(U->rows[kappa], Btmp, U->c);
+                        _fmpz_vec_set(fmpz_mat_row(U, i), fmpz_mat_row(U, i - 1), U->c);
+                    _fmpz_vec_set(fmpz_mat_row(U, kappa), Btmp, U->c);
                     _fmpz_vec_clear(Btmp, U->c);
                 }
 
