@@ -188,6 +188,10 @@ arm*-*-* | aarch64-*-*)
 	    exact_cpu="applem1";;
 	  *Apple\ M2)
 	    exact_cpu="applem2";;
+	  *Apple\ M3)
+	    exact_cpu="applem3";;
+	  *Apple\ M4 | *Apple\ M4\ Pro)
+	    exact_cpu="applem4";;
       esac
   fi
 
