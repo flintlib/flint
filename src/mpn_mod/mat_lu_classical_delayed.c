@@ -78,7 +78,7 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
         pivot_row = -1;
         for (i = row; i < nrows; i++)
         {
-            if (!flint_mpn_zero_p(REDUCED(i, col), n) != 0)
+            if (!flint_mpn_zero_p(REDUCED(i, col), n))
             {
                 pivot_row = i;
                 break;
