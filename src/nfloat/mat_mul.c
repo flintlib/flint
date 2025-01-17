@@ -1441,6 +1441,7 @@ nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slo
     }
 }
 
+#if 0
 FLINT_FORCE_INLINE slong
 _nfloat_complex_nbits(nfloat_srcptr x, slong nlimbs)
 {
@@ -1460,6 +1461,7 @@ _nfloat_complex_nbits(nfloat_srcptr x, slong nlimbs)
 
     return bits;
 }
+#endif
 
 int
 nfloat_complex_mat_mul_block(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong min_block_size, gr_ctx_t ctx)
