@@ -28,7 +28,6 @@ _apply_permutation(slong * AP, TEMPLATE(T, mat_t) A, const slong * P,
 
         /* todo: reduce memory allocation */
         Atmp = flint_malloc(sizeof(TEMPLATE(T, struct)) * num_rows * num_cols);
-        /* todo: avoid temporary allocation when AP != P */
         APtmp = flint_malloc(sizeof(slong) * num_rows);
 
         for (i = 0; i < num_rows; i++)
