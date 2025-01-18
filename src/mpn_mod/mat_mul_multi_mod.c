@@ -50,6 +50,7 @@ nmod_set_mpn_2(nn_srcptr ad, nmod_t mod)
     return r;
 }
 
+#if 0
 FLINT_FORCE_INLINE ulong
 nmod_set_mpn_3(nn_srcptr ad, nmod_t mod)
 {
@@ -70,6 +71,7 @@ nmod_set_mpn_4(nn_srcptr ad, nmod_t mod)
     NMOD_RED2(r, r, ad[0], mod);
     return r;
 }
+#endif
 
 /* todo: precomputed inverse */
 FLINT_FORCE_INLINE ulong

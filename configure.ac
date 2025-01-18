@@ -642,6 +642,10 @@ case $host in
         gcc_cflags_arch="-march=armv8.6-a"
         gcc_cflags_tune=""
         ;;
+      applem4*)
+        gcc_cflags_arch="-march=armv8.7-a"
+        gcc_cflags_tune=""
+        ;;
       aarch64* | armv8*)
         gcc_cflags_arch="-march=armv8-a"
         gcc_cflags_tune=""
