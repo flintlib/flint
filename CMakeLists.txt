@@ -423,11 +423,15 @@ target_include_directories(flint PUBLIC
     ${PThreads_INCLUDE_DIRS}
 )
 
-if(BUILD_SHARED_LIBS AND MSVC)
-    # Export all functions automatically (except global data)
-    set_target_properties(flint PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
-    # Export flint's global data that are marked manually
-    target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
+if(MSVC)
+    if (BUILD_SHARED_LIBS)
+        # Export all functions automatically (except global data)
+        set_target_properties(flint PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+        # Export flint's global data that are marked manually
+        target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
+    else()
+        target_compile_definitions(flint PUBLIC "FLINT_STATIC_BUILD")
+    endif()
 endif()
 
 if (HAS_FLAG_MPOPCNT)
