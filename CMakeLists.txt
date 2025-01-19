@@ -343,6 +343,10 @@ else()
     set(FLINT_BITS 32)
 endif()
 
+if(MSVC AND NOT BUILD_SHARED_LIBS)
+    set(FLINT_STATIC_BUILD 1)
+endif()
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
@@ -423,15 +427,11 @@ target_include_directories(flint PUBLIC
     ${PThreads_INCLUDE_DIRS}
 )
 
-if(MSVC)
-    if (BUILD_SHARED_LIBS)
-        # Export all functions automatically (except global data)
-        set_target_properties(flint PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
-        # Export flint's global data that are marked manually
-        target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
-    else()
-        target_compile_definitions(flint PUBLIC "FLINT_STATIC_BUILD")
-    endif()
+if(BUILD_SHARED_LIBS AND MSVC)
+    # Export all functions automatically (except global data)
+    set_target_properties(flint PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+    # Export flint's global data that are marked manually
+    target_compile_definitions(flint PRIVATE "FLINT_BUILD_DLL")
 endif()
 
 if (HAS_FLAG_MPOPCNT)
