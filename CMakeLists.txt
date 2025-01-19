@@ -343,6 +343,10 @@ else()
     set(FLINT_BITS 32)
 endif()
 
+if(MSVC AND NOT BUILD_SHARED_LIBS)
+    set(FLINT_STATIC_BUILD 1)
+endif()
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
