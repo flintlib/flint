@@ -23,6 +23,33 @@ TEST_FUNCTION_START(n_is_probabprime_lucas, state)
 
     test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
+    {
+        /* A selection of Lucas pseudoprimes. These are known composites for
+           which the Lucas test *should* claim PRIME, but which a buggy
+           implementation may claim COMPOSITE for spurious reasons. */
+        ulong pseudo[] = {
+            /* Initial entries from Dana Jacobsen's table (http://ntheory.org/pseudoprimes.html) */
+            323, 377, 1159, 1829, 3827, 5459, 5777, 9071, 9179, 10877, 11419, 11663,
+            13919, 14839, 16109, 16211, 18407, 18971, 19043, 22499, 23407, 24569,
+            25199, 25877, 26069, 27323, 32759, 34943, 35207, 39059, 39203, 39689,
+            /* Some bigger entries (24 bits) */
+            8711699, 10402139, 12124559, 13695947, 13826231,
+            /* Even bigger entries (32 bits) */
+            UWORD(2877330059), UWORD(3816635327), UWORD(3964016279),
+#if FLINT_BITS == 64
+            /* Check that #2168 is fixed. */
+            UWORD(9508976851322519),
+#endif
+            0
+        };
+
+        for (i = 0; (d = pseudo[i]) != 0; i++)
+        {
+            if (!n_is_probabprime_lucas(d))
+                TEST_FUNCTION_FAIL("Lucas pseudoprime %wu claimed composite by Lucas test\n", d);
+        }
+    }
+
     for (i = 0; i < 10000 * test_multiplier; i++) /* Test that primes pass the test */
     {
         mpz_init(d_m);
