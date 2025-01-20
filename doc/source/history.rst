@@ -10,9 +10,9 @@ FLINT version history
 -------------------------------------------------------------------------------
 
 Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
-(RB), Edgar Costa (EC), Tommy Hofmann (TH), Max Horn (MH), Fredrik Johansson
-(FJ), Marc Mezzarobba (MM), Jake Moss (JM), Vincent Neiger (VN), Giacomo Pope
-(GP), Daniel Schultz (DS).
+(RB), Edgar Costa (EC), Tobias Diez (TD), Isuru Fernando (IF), Tommy Hofmann
+(TH), Max Horn (MH), Fredrik Johansson (FJ), Marc Mezzarobba (MM), Jake Moss
+(JM), Vincent Neiger (VN), Giacomo Pope (GP), Daniel Schultz (DS).
 
 * Features
 
@@ -179,6 +179,8 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Patch certain tests who caused segfaults during compilations in Clang (AA).
   * Avoid inline assembly for big ``aors_n`` in GCC on ARM since they lack
     enough registers to compile this (AA).
+  * Fix wrong arithmetic function used in ``n_is_probabprime_lucas`` (FJ,
+    reported by Mikhail Hogrefe).
 
 * Build system
 
@@ -209,6 +211,9 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Don't assume AVX is available if user specified their own CFLAGS (AA).
   * Use ``cp -pRP`` instead of ``cp -a`` in Make as the latter is not supported
     by POSIX, causing installation failures on some systems (AA).
+  * Add C11 atomics for MSVC builds (IF).
+  * Recognize Apple M3 and Apple M4 (Pro) in ``config.guess`` (AA).
+  * Fix static build for MSVC (IF, TD).
 
 * Tests
 
@@ -335,6 +340,11 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
     (Michael Orlitzky).
   * Add newlines to end of files that where missing them (AA).
   * Add ``mpn_extras/inlines.c`` (AA).
+  * Replace compound literal with a struct to accommodate MSVC (TD).
+  * Cast pointers in `machine_vectors.h` to suppress warnings about
+    incompatible pointers (AA).
+  * Make GCC pragmas dispatch only for GCC (AA).
+  * Comment out unused static functions (AA).
 
 * Continuous integration
 
