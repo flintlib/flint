@@ -44,11 +44,30 @@ conventions hold for several methods in this module, even if we don't restate
 them explicitly.
 
 :func:`acb_theta_all` first reduces the input using the action of the Siegel
-modular group `\mathrm{Sp}_{2g}(\mathbb{Z})` on `\mathbb{C}^g\times
-\mathbb{H}_g`, evaluates theta functions on the reduced arguments, and finally
-applies the transformation formula for theta functions under
-`\mathrm{Sp}_{2g}(\mathbb{Z})`. The second step (evaluating theta functions)
-has a uniform, quasi-linear complexity in terms of the required precision.
+modular group `\mathrm{Sp}_{2g}(\mathbb{Z})` (the symplectic group) on
+`\mathbb{C}^g\times \mathbb{H}_g`, evaluates theta functions on the reduced
+arguments, and finally applies the transformation formula for theta functions
+under `\mathrm{Sp}_{2g}(\mathbb{Z})`. The second step (evaluating theta
+functions) has a uniform, quasi-linear complexity in terms of the required
+precision. For future reference, we state the theta transformation formula of
+[Igu1972]_, p. 176 and [Mum1983]_, p. 189: for any symplectic matrix `m`, any
+`(z,\tau)\in \mathbb{C}^g\times \mathbb{H}_g`, and any characteristic `(a,b)`,
+we have
+
+    .. math::
+
+        \theta_{a,b}(m\cdot(z,\tau)) = \kappa(m) \zeta_8^{e(m, a, b)} \det(\gamma\tau + \delta)^{1/2} e^{\pi i z^T (\gamma\tau + \delta)^{-1} \gamma z} \theta_{a',b'}(z,\tau)
+
+where
+
+- `\gamma,\delta` are the lower `g\times g` blocks of `m`,
+- `a',b'` is another characteristic depending on `m,a,b`,
+- `\zeta_8=\exp(i\pi/4)`,
+- `e(m,a,b)` is an integer given by an explicit formula in terms of
+  `m,a,b` (this is `\phi_m` in Igusa's notation), and
+- `\kappa(m)` is an `8^{\mathrm{th}}` root of unity, only well-defined up to
+  sign unless we choose a particular branch of `\det(\gamma\tau +
+  \delta)^{1/2}` on `\mathbb{H}_g`.
 
 We also provide functionality to evaluate derivatives of theta functions, and
 to evaluate Siegel modular forms in terms of theta functions when `g=2`.
@@ -115,8 +134,8 @@ Example of usage
 -------------------------------------------------------------------------------
 
 The following code snippet constructs the period matrix `\tau = iI_2` for `g =
-2`, computes the associated theta values at `z = 0` at 10000 bits of precision
-in roughly 0.1s, and prints them.
+2`, computes the associated theta values at `z = 0` at 10000 bits of precision,
+and prints them.
 
 .. code-block:: c
 
@@ -133,7 +152,7 @@ in roughly 0.1s, and prints them.
         th = _acb_vec_init(16);
 
         acb_mat_onei(tau);
-        acb_theta_all(th, z, tau, 0, prec);
+        acb_theta_all(th, z, 1, tau, 0, prec);
         _acb_vec_printd(th, 16, 5);
 
         acb_mat_clear(tau);
@@ -168,8 +187,7 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
 
 .. function:: slong sp2gz_dim(const fmpz_mat_t mat)
 
-    Returns `g`, which is half the number of rows (or columns) of *mat*. This is
-    an inline function only.
+    Returns `g`, which is half the number of rows (or columns) of *mat*.
 
 .. function:: void sp2gz_set_blocks(fmpz_mat_t mat, const fmpz_mat_t alpha, const fmpz_mat_t beta, const fmpz_mat_t gamma, const fmpz_mat_t delta)
 
@@ -209,7 +227,7 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
     is square of size `2r\times 2r` for some `r\leq g`, sets *res* to the
     matrix whose `r\times r` blocks are the upper left corners of the
     corresponding `g\times g` block of *mat*. The result may not be a
-    symplectic matrix.
+    symplectic matrix in general.
 
 .. function:: slong sp2gz_nb_fundamental(slong g)
 
@@ -256,7 +274,8 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
 
 .. function:: void sp2gz_inv(fmpz_mat_t inv, const fmpz_mat_t mat)
 
-    Sets *inv* to the inverse of the symplectic matrix *mat*.
+    Sets *inv* to the inverse of the symplectic matrix *mat*. In contrast with
+    :func:`fmpz_mat_inv`, this involves no computation.
 
 .. function:: fmpz_mat_struct * sp2gz_decompose(slong * nb, const fmpz_mat_t mat)
 
@@ -302,23 +321,14 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 
     Sets *w* to `(\alpha\tau + \beta)(\gamma\tau + \delta)^{-1}`.
 
-.. function:: void acb_siegel_transform_z(acb_ptr r, acb_mat_t w, const fmpz_mat_t mat, acb_srcptr z, const acb_mat_t tau, slong prec)
+.. function:: void acb_siegel_cho_yinv(arb_mat_t cho, arb_mat_t yinv, const acb_mat_t tau, slong prec)
 
-    Sets *w* to `(\alpha\tau + \beta)(\gamma\tau + \delta)^{-1}` and *r* to
-    `(\gamma\tau + \delta)^{-T}z`.
-
-.. function:: void acb_siegel_cho(arb_mat_t C, const acb_mat_t tau, slong prec)
-
-    Sets *C* to an upper-triangular Cholesky matrix such that `\pi
-    \mathrm{Im}(\tau) = C^T C`. If one cannot determine that
-    `\mathrm{Im}(\tau)` is positive definite at the current working precision,
-    *C* is set to an indeterminate matrix.
-
-.. function:: void acb_siegel_yinv(arb_mat_t Yinv, const acb_mat_t tau, slong prec)
-
-    Sets *Yinv* to the inverse of `\mathrm{Im}(\tau)`. If one cannot determine
-    that `\mathrm{Im}(\tau)` is invertible at the current working precision,
-    *Yinv* is set to an indeterminate matrix.
+    Sets *yinv* to the inverse of the imaginary part `Y` of *tau*, and sets
+    *cho* to an upper-triangular Cholesky matrix for `\pi Y`, i.e. to the
+    upper-triangular matrix `C` with positive diagonal entries such that `\pi Y
+    = C^T C`. If one cannot determine that `Y` is positive definite at the
+    current working precision, *yinv* and *cho* are set to indeterminate
+    matrices.
 
 .. function:: void acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
 
@@ -339,6 +349,38 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     :func:`sp2gz_fundamental`, the determinant of the corresponding cocycle is
     at least `1-\varepsilon`.
 
+.. function:: slong acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+
+    Returns `0\leq r < 8` such that `\kappa(m) = \zeta_8^r` and sets *sqrtdet*
+    to the corresponding square root of `\det(\gamma\tau + \delta)` in the
+    theta transformation formula.
+
+    After applying :func:`sp2gz_decompose`, we only have to consider four
+    special cases for *mat*. If *mat* is trigonal or block-diagonal, one can
+    compute its action on `\theta_{0,0}` directly. If *mat* is an embedded
+    matrix from `\mathrm{SL}_2(\mathbb{Z})`, we rely on
+    :func:`acb_modular_theta_transform`. Finally, if *mat* is an embedded `J`
+    matrix from dimension `0\leq r\leq g`, then `\kappa(m) \zeta_8^{e(m,0,0)}
+    i^{r/2} \det(\tau_0)^{1/2} = 1`, where `\tau_0` denotes the upper left
+    `r\times r` submatrix of `\tau` and the branch of the square root is chosen
+    such that the result is `i^{g/2}\det(Y)` when `\tau = iY` is purely
+    imaginary.
+
+    To compute `\det(\tau_0)^{1/2}`, we pick a purely imaginary matrix *A* and
+    consider the polynomial `P(t) = \det(A + \tfrac{t+1}{2} (\tau_0 - A))`. Up
+    to choosing another `A`, we may assume that it has degree `g` and that its
+    roots (as complex balls) do not intersect the segment `[-1,1]\subset
+    \mathbb{C}`. We then find the correct branch of `P(t)^{1/2}` between `t=-1`
+    and `t=1` following [MN2019]_.
+
+.. function:: slong acb_siegel_kappa2(const fmpz_mat_t mat)
+
+    Returns `0\leq r < 3` such that `\kappa(m)^2 = i^r`, which makes sense
+    without reference to a branch of `\det(\gamma\tau + \delta)^{1/2}`.
+
+    We adopt a similar strategy to :func:`acb_theta_transform_kappa` but do not
+    call :func:`acb_theta_transform_sqrtdet`.
+
 .. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
     Sets *tau* to a random matrix in `\mathbb{H}_g`, possibly far from being
@@ -346,13 +388,25 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 
 .. function:: void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
-    Sets *tau* to a random reduced matrix in `\mathbb{H}_g` that is likely to
-    trigger corner cases for several functions in this module.
+    Sets *tau* to a random reduced matrix in `\mathbb{H}_g` whose imaginary
+    part possibly has large entries.
+
+.. function:: void acb_siegel_randtest_compact(acb_mat_t tau, flint_rand_t state, int exact, slong prec)
+
+    Sets *tau* to a random reduced matrix in `\mathbb{H}_g` whose imaginary
+    part has bounded entries. If *exact* is nonzero (true), then the entries of
+    *tau* are set to exact (dyadic) complex numbers.
 
 .. function:: void acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)
 
-    Sets *z* to a random vector of length *g* that is likely to trigger corner
-    cases for several functions in this module.
+    Sets *z* to a random vector of length *g*, possibly with large entries.
+
+.. function:: void acb_siegel_randtest_vec_reduced(acb_ptr zs, flint_rand_t state, slong nb, const acb_mat_t tau, int exact, slong prec)
+
+    Sets *zs* to the concatenation of *nb* random vectors *z* sampled from
+    `[-1,1]^g + \tau[-1,1]^g`, i.e.~close to being reduced with respect to
+    `tau`. If *exact* is nonzero (true), then the entries of *zs* are set to
+    exact (dyadic) complex numbers.
 
 Theta characteristics
 -------------------------------------------------------------------------------

@@ -58,8 +58,8 @@ void acb_siegel_cho_yinv(arb_mat_t cho, arb_mat_t yinv, const acb_mat_t tau, slo
 void acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 int acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec);
 
-slong acb_siegel_kappa2(const fmpz_mat_t mat);
 slong acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
+slong acb_siegel_kappa2(const fmpz_mat_t mat);
 
 void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
 void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
