@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
+#include "fmpq_mat.h"
 #include "arb.h"
 #include "arb_mat.h"
 
 /* helper macros *************************************************************/
 
-#define mat_entry(mat, i, j) ((mat)->rows[i] + (j))
+#define mat_entry(mat, i, j) ((mat)->entries + (i) * (mat)->stride + (j))
 #define mat_nrows(mat) ((mat)->r)
 #define mat_ncols(mat) ((mat)->c)
 
@@ -149,8 +151,8 @@ SET_OP(arb_mat_get_mid,        arb_mat_t, const arb_mat_t,  arb_get_mid_arb)
 SET_OP(arb_mat_neg,            arb_mat_t, const arb_mat_t,  arb_neg)
 SET_OP(arb_mat_set_fmpz_mat,   arb_mat_t, const fmpz_mat_t, arb_set_fmpz)
 
-SET_PREC_OP(arb_mat_set_fmpq_mat,       arb_mat_t, fmpq_mat_t, arb_set_fmpq)
 SET_PREC_OP(arb_mat_set_round_fmpz_mat, arb_mat_t, fmpz_mat_t, arb_set_round_fmpz)
+SET_PREC_OP(arb_mat_set_fmpq_mat, arb_mat_t, fmpq_mat_t, arb_set_fmpq)
 
 AORS_NATIVE_OP(arb_mat_add, arb_mat_t, arb_add)
 AORS_NATIVE_OP(arb_mat_sub, arb_mat_t, arb_sub)

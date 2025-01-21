@@ -15,8 +15,7 @@
 int
 fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c)
 {
-    slong t, j;
-    fmpq * u;
+    slong j;
 
     if (!fmpq_is_zero(fmpq_mat_entry(mat, r, c)))
         return 1;
@@ -25,16 +24,7 @@ fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c)
     {
         if (!fmpq_is_zero(fmpq_mat_entry(mat, j, c)))
         {
-            if (perm)
-            {
-                t = perm[j];
-                perm[j] = perm[r];
-                perm[r] = t;
-            }
-
-            u = mat->rows[j];
-            mat->rows[j] = mat->rows[r];
-            mat->rows[r] = u;
+            fmpq_mat_swap_rows(mat, perm, j, r);
             return -1;
         }
     }

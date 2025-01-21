@@ -17,6 +17,8 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
+#define FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF 10
+
 #define FLINT_FMPZ_MUL_CLASSICAL_CACHE_SIZE 32768 /* size of L1 cache in words */
 
 /*
@@ -26,21 +28,10 @@ with op = -1, computes D = C - A*B
 */
 
 static inline void
-_fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1, fmpz ** const vec2,
-                                                       slong offset, slong len)
+_fmpz_mod_mat_addmul_basic_op(fmpz * D, slong Dstride, const fmpz * C, slong Cstride, const fmpz * A, slong Astride,
+               const fmpz * B, slong Bstride, slong m, slong k, slong n, int op, const fmpz_mod_ctx_t ctx)
 {
-    slong i;
-
-    fmpz_zero(c);
-    for (i = 0; i < len; i++)
-        fmpz_addmul(c, vec1 + i, vec2[i] + offset);
-}
-
-static inline void
-_fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
-               fmpz ** const B, slong m, slong k, slong n, int op, const fmpz_mod_ctx_t ctx)
-{
-    slong i, j;
+    slong i, j, l;
     fmpz_t c;
 
     fmpz_init(c);
@@ -49,14 +40,16 @@ _fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
     {
         for (j = 0; j < n; j++)
         {
-            _fmpz_vec_dot_ptr(c, A[i], B, j, k);
+            fmpz_zero(c);
+            for (l = 0; l < k; l++)
+                fmpz_addmul(c, A + Astride * i + l, B + Bstride * l + j);
 
             if (op == 1)
-                fmpz_add(c, C[i] + j, c);
+                fmpz_add(c, C + i * Cstride + j, c);
             else if (op == -1)
-                fmpz_sub(c, C[i] + j, c);
+                fmpz_sub(c, C + i * Cstride + j, c);
 
-            fmpz_mod_set_fmpz(D[i] + j, c, ctx);
+            fmpz_mod_set_fmpz(D + i * Dstride + j, c, ctx);
         }
     }
 
@@ -71,9 +64,12 @@ typedef struct
     slong k;
     slong m;
     slong n;
-    fmpz ** A;
-    fmpz ** C;
-    fmpz ** D;
+    fmpz * A;
+    slong Astride;
+    fmpz * C;
+    slong Cstride;
+    fmpz * D;
+    slong Dstride;
     fmpz * tmp;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
@@ -91,9 +87,12 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
     slong k = arg.k;
     slong m = arg.m;
     slong n = arg.n;
-    fmpz ** const A = arg.A;
-    fmpz ** const C = arg.C;
-    fmpz ** D = arg.D;
+    fmpz * A = arg.A;
+    slong Astride = arg.Astride;
+    fmpz * C = arg.C;
+    slong Cstride = arg.Cstride;
+    fmpz * D = arg.D;
+    slong Dstride = arg.Dstride;
     fmpz * tmp = arg.tmp;
     int op = arg.op;
     const fmpz_mod_ctx_struct * ctx = arg.ctx;
@@ -133,23 +132,23 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
         {
             for (j = jstart ; j < jend; j++)
             {
-                _fmpz_vec_dot(c, A[i], tmp + j*k, k);
+                _fmpz_vec_dot(c, A + i * Astride, tmp + j*k, k);
 
                 /* todo: use dot_general */
                 if (op == 1)
-                    fmpz_add(c, C[i] + j, c);
+                    fmpz_add(c, C + i * Cstride + j, c);
                 else if (op == -1)
-                    fmpz_sub(c, C[i] + j, c);
+                    fmpz_sub(c, C + i * Cstride + j, c);
 
-                fmpz_mod_set_fmpz(D[i] + j, c, ctx);
+                fmpz_mod_set_fmpz(D + i * Dstride + j, c, ctx);
             }
         }
     }
 }
 
 static inline void
-_fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
-                            fmpz ** const A, fmpz ** const B, slong m,
+_fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz * D, slong Dstride, fmpz * C, slong Cstride,
+                            fmpz * A, slong Astride, fmpz * B, slong Bstride, slong m,
                                        slong k, slong n, int op,
                                thread_pool_handle * threads, slong num_threads, const fmpz_mod_ctx_t ctx)
 {
@@ -166,7 +165,7 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
     /* transpose B */
     for (i = 0; i < k; i++)
         for (j = 0; j < n; j++)
-            fmpz_set(tmp + j*k + i, B[i] + j);
+            fmpz_set(tmp + j*k + i, B + i * Bstride + j);
 
     nlimbs = fmpz_size(ctx->n);
 
@@ -187,8 +186,11 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
         args[i].m       = m;
         args[i].n       = n;
         args[i].A       = A;
+        args[i].Astride = Astride;
         args[i].C       = C;
+        args[i].Cstride = Cstride;
         args[i].D       = D;
+        args[i].Dstride = Dstride;
         args[i].tmp     = tmp;
 #if FLINT_USES_PTHREAD
         args[i].mutex   = &mutex;
@@ -234,8 +236,10 @@ _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D, const fmpz_mod_ma
     k = A->c;
     n = B->c;
 
-    _fmpz_mod_mat_addmul_transpose_threaded_pool_op(D->rows,
-                (op == 0) ? NULL : C->rows, A->rows, B->rows,
+    _fmpz_mod_mat_addmul_transpose_threaded_pool_op(D->entries, D->stride,
+                (op == 0) ? NULL : C->entries,
+                (op == 0) ? 0 : C->stride,
+                A->entries, A->stride, B->entries, B->stride,
                                     m, k, n, op, threads, num_threads, ctx);
 }
 
@@ -259,10 +263,11 @@ fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
         || A->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF
         || B->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        _fmpz_mod_mat_addmul_basic_op(D->rows,
-                                         (op == 0) ? NULL : C->rows,
-                                      A->rows, B->rows, A->r,
-                                             A->c, B->c, op, ctx);
+        _fmpz_mod_mat_addmul_basic_op(D->entries, D->stride,
+                (op == 0) ? NULL : C->entries,
+                (op == 0) ? 0 : C->stride,
+                A->entries, A->stride, B->entries, B->stride,
+                    A->r, A->c, B->c, op, ctx);
         return;
     }
 

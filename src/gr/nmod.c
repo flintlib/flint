@@ -1335,9 +1335,9 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     nmod_mat_struct *XX, *YY;
 
     R->entries = res->entries;
-    R->rows = (nn_ptr *) res->rows;
     R->r = res->r;
     R->c = res->c;
+    R->stride = res->stride;
     R->mod = NMOD_CTX(ctx);
 
     if (res == x)
@@ -1347,9 +1347,9 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     else
     {
         X->entries = x->entries;
-        X->rows = (nn_ptr *) x->rows;
         X->r = x->r;
         X->c = x->c;
+        X->stride = x->stride;
         X->mod = NMOD_CTX(ctx);
         XX = X;
     }
@@ -1365,9 +1365,9 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     else
     {
         Y->entries = y->entries;
-        Y->rows = (nn_ptr *) y->rows;
         Y->r = y->r;
         Y->c = y->c;
+        Y->stride = y->stride;
         Y->mod = NMOD_CTX(ctx);
         YY = Y;
     }

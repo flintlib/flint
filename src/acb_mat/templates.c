@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
+#include "fmpq_mat.h"
 #include "acb.h"
 #include "acb_mat.h"
 
 /* helper macros *************************************************************/
 
-#define mat_entry(mat, i, j) ((mat)->rows[i] + (j))
+#define mat_entry(mat, i, j) ((mat)->entries + (i) * (mat)->stride + (j))
 #define mat_nrows(mat) ((mat)->r)
 #define mat_ncols(mat) ((mat)->c)
 
@@ -152,8 +154,8 @@ SET_OP(acb_mat_set_fmpz_mat,   acb_mat_t, const fmpz_mat_t, acb_set_fmpz)
 SET_OP(acb_mat_set_arb_mat,    acb_mat_t, const arb_mat_t,  acb_set_arb)
 SET_OP(acb_mat_conjugate,      acb_mat_t, const acb_mat_t,  acb_conj)
 
-SET_PREC_OP(acb_mat_set_fmpq_mat,       acb_mat_t, fmpq_mat_t, acb_set_fmpq)
 SET_PREC_OP(acb_mat_set_round_fmpz_mat, acb_mat_t, fmpz_mat_t, acb_set_round_fmpz)
+SET_PREC_OP(acb_mat_set_fmpq_mat, acb_mat_t, fmpq_mat_t, acb_set_fmpq)
 SET_PREC_OP(acb_mat_set_round_arb_mat,  acb_mat_t, arb_mat_t,  acb_set_round_arb)
 
 AORS_NATIVE_OP(acb_mat_add, acb_mat_t, acb_add)

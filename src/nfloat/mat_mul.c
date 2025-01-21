@@ -1522,6 +1522,9 @@ _nfloat_complex_mat_parts_are_well_scaled(const gr_mat_t A, gr_ctx_t ctx)
     return 1;
 }
 
+#define NN_MAT(mat) ((nn_ptr) (mat)->entries)
+#define NN_SRCMAT(mat) (((nn_srcptr) (mat)->entries) + ((ii) * (str) + (jj)) * (ndl))
+
 static void
 _real_part(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
 {
@@ -1529,10 +1532,16 @@ _real_part(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
     slong m = A->r;
     slong n = A->c;
     slong ndlimbs = NFLOAT_CTX_DATA_NLIMBS(ctx);
+    slong Astride = A->stride;
+    slong rstride = res->stride;
+    nn_ptr rptr = (nn_ptr) res->entries;
+    nn_srcptr Aptr = (nn_srcptr) A->entries;
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            flint_mpn_copyi(((nn_ptr) res->rows[i]) + j * ndlimbs, ((nn_srcptr) A->rows[i]) + j * 2 * ndlimbs, ndlimbs);
+            flint_mpn_copyi(rptr + (i * rstride + j) * ndlimbs,
+                            Aptr + (i * Astride + j) * (2 * ndlimbs),
+                            ndlimbs);
 }
 
 static void
@@ -1542,10 +1551,16 @@ _imag_part(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
     slong m = A->r;
     slong n = A->c;
     slong ndlimbs = NFLOAT_CTX_DATA_NLIMBS(ctx);
+    slong Astride = A->stride;
+    slong rstride = res->stride;
+    nn_ptr rptr = (nn_ptr) res->entries;
+    nn_srcptr Aptr = (nn_srcptr) A->entries;
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            flint_mpn_copyi(((nn_ptr) res->rows[i]) + j * ndlimbs, ((nn_srcptr) A->rows[i]) + (j * 2 + 1) * ndlimbs, ndlimbs);
+            flint_mpn_copyi(rptr + (i * rstride + j) * ndlimbs,
+                            Aptr + (i * Astride + j) * (2 * ndlimbs) + ndlimbs,
+                            ndlimbs);
 }
 
 static void
@@ -1555,10 +1570,16 @@ _set_real_part(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
     slong m = A->r;
     slong n = A->c;
     slong ndlimbs = NFLOAT_CTX_DATA_NLIMBS(ctx);
+    slong Astride = A->stride;
+    slong rstride = res->stride;
+    nn_ptr rptr = (nn_ptr) res->entries;
+    nn_srcptr Aptr = (nn_srcptr) A->entries;
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            flint_mpn_copyi(((nn_ptr) res->rows[i]) + j * 2 * ndlimbs, ((nn_srcptr) A->rows[i]) + j * ndlimbs, ndlimbs);
+            flint_mpn_copyi(rptr + (i * rstride + j) * (2 * ndlimbs),
+                            Aptr + (i * Astride + j) * ndlimbs,
+                            ndlimbs);
 }
 
 static void
@@ -1568,10 +1589,16 @@ _set_imag_part(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
     slong m = A->r;
     slong n = A->c;
     slong ndlimbs = NFLOAT_CTX_DATA_NLIMBS(ctx);
+    slong Astride = A->stride;
+    slong rstride = res->stride;
+    nn_ptr rptr = (nn_ptr) res->entries;
+    nn_srcptr Aptr = (nn_srcptr) A->entries;
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            flint_mpn_copyi(((nn_ptr) res->rows[i]) + (j * 2 + 1) * ndlimbs, ((nn_srcptr) A->rows[i]) + j * ndlimbs, ndlimbs);
+            flint_mpn_copyi(rptr + (i * rstride + j) * (2 * ndlimbs) + ndlimbs,
+                            Aptr + (i * Astride + j) * ndlimbs,
+                            ndlimbs);
 }
 
 int
@@ -1600,9 +1627,12 @@ _nfloat_complex_mat_mul_reorder(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, 
         status |= gr_mat_mul(Z, X, Y, ctx2);
         _set_real_part(C, Z, ctx2);
 
+        /* zero the imaginary parts */
+        nn_ptr Cptr = (nn_ptr) C->entries;
+        slong Cstride = C->stride;
         for (i = 0; i < M; i++)
             for (j = 0; j < P; j++)
-                status |= nfloat_zero(((nn_ptr) C->rows[i]) + (j * 2 + 1) * ndlimbs, ctx2);
+                status |= nfloat_zero(Cptr + (i * Cstride + j) * (2 * ndlimbs) + ndlimbs, ctx2);
     }
     else if (Areal)
     {

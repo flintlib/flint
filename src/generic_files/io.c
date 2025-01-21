@@ -1030,22 +1030,24 @@ static size_t __flint_mat_fprint(FILE * fs, const void * ip, flint_type_t type)
     size_t res = 0;
     slong ix;
     slong nr, nc;
-    const void ** rows;
+    const char * entries;
+    slong stride;
 
-    rows = (const void **) ((const fmpz_mat_struct *) ip)->rows;
+    entries = (const char *) ((const fmpz_mat_struct *) ip)->entries;
     nr = ((const fmpz_mat_struct *) ip)->r;
     nc = ((const fmpz_mat_struct *) ip)->c;
+    stride = ((const fmpz_mat_struct *) ip)->stride * flint_type_size_in_chars(type);
 
     if (nr == 0 || nc == 0)
         return fprintf(fs, WORD_FMT "d by " WORD_FMT "d empty matrix", nr, nc);
 
     res += (fputc('[', fs) != EOF);
-    res += __flint_vec_fprint(fs, rows[0], nc, type);
+    res += __flint_vec_fprint(fs, entries, nc, type);
 
     for (ix = 1; ix < nr; ix++)
     {
         res += fwrite(", ", sizeof(char), STRING_LENGTH(", "), fs);
-        res += __flint_vec_fprint(fs, rows[ix], nc, type);
+        res += __flint_vec_fprint(fs, entries + ix * stride, nc, type);
     }
 
     res += (fputc(']', fs) != EOF);

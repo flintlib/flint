@@ -213,7 +213,7 @@ void tune_strassen(int * cutoffs)
 void prof_strassen_1()
 {
     nn_ptr A, B, C;
-    slong i, n, nlimbs;
+    slong n, nlimbs;
     int parity;
     double FLINT_SET_BUT_UNUSED(__), t1, t2;
 
@@ -259,8 +259,8 @@ void prof_strassen_1()
 
 int main()
 {
-    int tab_fixed_classical_vs_waksman[TABN];
-    int tab_strassen[TABN];
+    //int tab_fixed_classical_vs_waksman[TABN];
+    //int tab_strassen[TABN];
 
     //tune_fixed_vs_waksman(tab_fixed_classical_vs_waksman);
     //tune_strassen(tab_strassen);

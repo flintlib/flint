@@ -26,31 +26,31 @@ with op = -1, computes D = C - A*B
 */
 
 static inline void
-_nmod_mat_addmul_basic_op(nn_ptr * D, nn_ptr * const C, nn_ptr * const A,
-    nn_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
+_nmod_mat_addmul_basic_op(nn_ptr D, slong Dstride, nn_srcptr C, slong Cstride, nn_srcptr A, slong Astride,
+    nn_srcptr B, slong Bstride, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
 {
-    slong i, j;
+    slong i, j, l;
     ulong c;
 
     for (i = 0; i < m; i++)
     {
         for (j = 0; j < n; j++)
         {
-            c = _nmod_vec_dot_ptr(A[i], B, j, k, mod, params);
+            NMOD_VEC_DOT(c, l, k, A[i * Astride + l], B[l * Bstride + j], mod, params);
 
             if (op == 1)
-                c = nmod_add(C[i][j], c, mod);
+                c = nmod_add(C[i * Cstride + j], c, mod);
             else if (op == -1)
-                c = nmod_sub(C[i][j], c, mod);
+                c = nmod_sub(C[i * Cstride + j], c, mod);
 
-            D[i][j] = c;
+            D[i * Dstride + j] = c;
         }
     }
 }
 
 static inline void
-_nmod_mat_addmul_transpose_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
-    const nn_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
+_nmod_mat_addmul_transpose_op(nn_ptr D, slong Dstride, nn_srcptr C, slong Cstride, nn_srcptr A, slong Astride,
+    nn_srcptr B, slong Bstride, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
 {
     nn_ptr tmp;
     ulong c;
@@ -60,20 +60,20 @@ _nmod_mat_addmul_transpose_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
 
     for (i = 0; i < k; i++)
         for (j = 0; j < n; j++)
-            tmp[j*k + i] = B[i][j];
+            tmp[j*k + i] = B[i * Bstride + j];
 
     for (i = 0; i < m; i++)
     {
         for (j = 0; j < n; j++)
         {
-            c = _nmod_vec_dot(A[i], tmp + j*k, k, mod, params);
+            c = _nmod_vec_dot(A + i * Astride, tmp + j*k, k, mod, params);
 
             if (op == 1)
-                c = nmod_add(C[i][j], c, mod);
+                c = nmod_add(C[i * Cstride + j], c, mod);
             else if (op == -1)
-                c = nmod_sub(C[i][j], c, mod);
+                c = nmod_sub(C[i * Cstride + j], c, mod);
 
-            D[i][j] = c;
+            D[i * Dstride + j] = c;
         }
     }
 
@@ -82,15 +82,16 @@ _nmod_mat_addmul_transpose_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
 
 /* Assumes nlimbs = 1 */
 static void
-_nmod_mat_addmul_packed_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
-    const nn_ptr * B, slong M, slong N, slong K, int op, nmod_t mod)
+_nmod_mat_addmul_packed_op(nn_ptr D, slong Dstride, nn_srcptr C, slong Cstride, nn_srcptr A, slong Astride,
+    nn_srcptr B, slong Bstride, slong M, slong N, slong K, int op, nmod_t mod)
 {
     slong i, j, k;
     slong Kpack;
     int pack, pack_bits;
     ulong c, d, mask;
     nn_ptr tmp;
-    nn_ptr Aptr, Tptr;
+    nn_srcptr Aptr;
+    nn_ptr Tptr;
 
     /* bound unreduced entry */
     c = N * (mod.n-1) * (mod.n-1);
@@ -110,10 +111,10 @@ _nmod_mat_addmul_packed_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
     {
         for (k = 0; k < N; k++)
         {
-            c = B[k][i * pack];
+            c = B[k * Bstride + i * pack];
 
             for (j = 1; j < pack && i * pack + j < K; j++)
-                c |= B[k][i * pack + j] << (pack_bits * j);
+                c |= B[k * Bstride + i * pack + j] << (pack_bits * j);
 
             tmp[i * N + k] = c;
         }
@@ -124,7 +125,7 @@ _nmod_mat_addmul_packed_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
     {
         for (j = 0; j < Kpack; j++)
         {
-            Aptr = A[i];
+            Aptr = A + i * Astride;
             Tptr = tmp + j * N;
 
             c = 0;
@@ -148,11 +149,11 @@ _nmod_mat_addmul_packed_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
                 NMOD_RED(d, d, mod);
 
                 if (op == 1)
-                    d = nmod_add(C[i][j * pack + k], d, mod);
+                    d = nmod_add(C[i * Cstride + j * pack + k], d, mod);
                 else if (op == -1)
-                    d = nmod_sub(C[i][j * pack + k], d, mod);
+                    d = nmod_sub(C[i * Cstride + j * pack + k], d, mod);
 
-                D[i][j * pack + k] = d;
+                D[i * Dstride + j * pack + k] = d;
             }
         }
     }
@@ -188,20 +189,26 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
     // TODO vec_dot changes --> thresholds to re-examine
     if (params.method == _DOT1 && m > 10 && k > 10 && n > 10)
     {
-        _nmod_mat_addmul_packed_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod);
+        _nmod_mat_addmul_packed_op(D->entries, D->stride,
+            (op == 0) ? NULL : C->entries,
+            (op == 0) ? 0 : C->stride,
+            A->entries, A->stride, B->entries, B->stride, m, k, n, op, D->mod);
     }
     else if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        _nmod_mat_addmul_basic_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod, params);
+        _nmod_mat_addmul_basic_op(D->entries, D->stride,
+            (op == 0) ? NULL : C->entries,
+            (op == 0) ? 0 : C->stride,
+            A->entries, A->stride, B->entries, B->stride, m, k, n, op, D->mod, params);
     }
     else
     {
-        _nmod_mat_addmul_transpose_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod, params);
+        _nmod_mat_addmul_transpose_op(D->entries, D->stride,
+            (op == 0) ? NULL : C->entries,
+            (op == 0) ? 0 : C->stride,
+            A->entries, A->stride, B->entries, B->stride, m, k, n, op, D->mod, params);
     }
 }
 

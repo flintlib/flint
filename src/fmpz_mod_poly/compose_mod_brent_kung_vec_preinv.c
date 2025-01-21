@@ -18,6 +18,7 @@
 #include "fmpz_mat.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
+#include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
 
 void
@@ -29,7 +30,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                                                 const fmpz * polyinv,
                                                 slong leninv, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_t A, B, C;
+    fmpz_mod_mat_t A, B, C;
     fmpz *t, *h;
     slong i, j, k, n, m, len2 = l, len1;
 
@@ -42,44 +43,51 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
 
     k = len / m + 1;
 
-    fmpz_mat_init(A, m, n);
-    fmpz_mat_init(B, k * len2, m);
-    fmpz_mat_init(C, k * len2, n);
+    fmpz_mod_mat_init(A, m, n, ctx);
+    fmpz_mod_mat_init(B, k * len2, m, ctx);
+    fmpz_mod_mat_init(C, k * len2, n, ctx);
 
     /* Set rows of B to the segments of polys */
     for (j = 0; j < len2; j++)
     {
         len1 = (polys + j)->length;
         for (i = 0; i < len1 / m; i++)
-            _fmpz_vec_set(B->rows[i + j * k], (polys + j)->coeffs + i * m, m);
-        _fmpz_vec_set(B->rows[i + j * k], (polys + j)->coeffs + i * m,
+            _fmpz_vec_set(fmpz_mod_mat_row(B, i + j * k), (polys + j)->coeffs + i * m, m);
+        _fmpz_vec_set(fmpz_mod_mat_row(B, i + j * k), (polys + j)->coeffs + i * m,
                       len1 % m);
     }
 
     /* Set rows of A to powers of last element of polys */
-    _fmpz_mod_poly_powers_mod_preinv_naive(A->rows, g, glen,
-                                            m, poly, len, polyinv, leninv, ctx);
+    {
+        fmpz ** Arows;
+        slong i;
+        Arows = flint_malloc(sizeof(fmpz *) * A->r);
+        for (i = 0; i < A->r; i++)
+            Arows[i] = fmpz_mod_mat_row(A, i);
 
-    fmpz_mat_mul(C, B, A);
-    for (i = 0; i < k * len2; i++)
-        _fmpz_mod_vec_set_fmpz_vec(C->rows[i], C->rows[i], n, ctx);
+        _fmpz_mod_poly_powers_mod_preinv_naive(Arows, g, glen,
+                                            m, poly, len, polyinv, leninv, ctx);
+        flint_free(Arows);
+    }
+
+    fmpz_mod_mat_mul(C, B, A, ctx);
 
     /* Evaluate block composition using the Horner scheme */
     if (n == 1)
-        fmpz_mod_mul(h + 0, A->rows[m - 1] + 0, A->rows[1] + 0, ctx);
+        fmpz_mod_mul(h + 0, fmpz_mod_mat_row(A, m - 1) + 0, fmpz_mod_mat_row(A, 1) + 0, ctx);
     else
-        _fmpz_mod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly, len, polyinv, leninv, ctx);
+        _fmpz_mod_poly_mulmod_preinv(h, fmpz_mod_mat_row(A, m - 1), n, fmpz_mod_mat_row(A, 1), n, poly, len, polyinv, leninv, ctx);
 
     for (j = 0; j < len2; j++)
     {
-        _fmpz_vec_set((res + j)->coeffs, C->rows[(j + 1) * k - 1], n);
+        _fmpz_vec_set((res + j)->coeffs, fmpz_mod_mat_row(C, (j + 1) * k - 1), n);
 
         if (n == 1)
         {
             for (i = 2; i <= k; i++)
             {
                 fmpz_mod_mul(t + 0, res[j].coeffs + 0, h + 0, ctx);
-                fmpz_mod_add(res[j].coeffs + 0, t + 0, C->rows[(j + 1)*k - i] + 0, ctx);
+                fmpz_mod_add(res[j].coeffs + 0, t + 0, fmpz_mod_mat_row(C, (j + 1)*k - i) + 0, ctx);
             }
         }
         else
@@ -87,7 +95,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
             for (i = 2; i <= k; i++)
             {
                 _fmpz_mod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly, len, polyinv, leninv, ctx);
-                _fmpz_mod_poly_add(res[j].coeffs, t, n, C->rows[(j + 1)*k - i], n, ctx);
+                _fmpz_mod_poly_add(res[j].coeffs, t, n, fmpz_mod_mat_row(C, (j + 1)*k - i), n, ctx);
             }
         }
     }
@@ -95,9 +103,9 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
     _fmpz_vec_clear(h, n);
     _fmpz_vec_clear(t, n);
 
-    fmpz_mat_clear(A);
-    fmpz_mat_clear(B);
-    fmpz_mat_clear(C);
+    fmpz_mod_mat_clear(A, ctx);
+    fmpz_mod_mat_clear(B, ctx);
+    fmpz_mod_mat_clear(C, ctx);
 }
 
 void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(

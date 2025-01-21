@@ -30,9 +30,12 @@ typedef struct {
     slong Bstoprow;
     slong Cstartrow;
     slong Cstoprow;
-    nn_ptr * Arows;
-    nn_ptr * Brows;
-    nn_ptr * Crows;
+    nn_ptr Aentries;
+    slong Astride;
+    nn_ptr Bentries;
+    slong Bstride;
+    nn_ptr Centries;
+    slong Cstride;
     nmod_mat_t * mod_A;
     nmod_mat_t * mod_B;
     nmod_mat_t * mod_C;
@@ -90,8 +93,10 @@ static void _mod_worker(void * varg)
     slong Astoprow = arg->Astoprow;
     slong Bstartrow = arg->Bstartrow;
     slong Bstoprow = arg->Bstoprow;
-    nn_ptr * Arows = arg->Arows;
-    nn_ptr * Brows = arg->Brows;
+    nn_ptr Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
+    nn_ptr Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     nmod_mat_t * mod_A = arg->mod_A;
     nmod_mat_t * mod_B = arg->mod_B;
     slong num_primes = arg->num_primes;
@@ -106,9 +111,9 @@ static void _mod_worker(void * varg)
         {
             for (j = 0; j < k; j++)
             {
-                nmod_mat_entry(mod_A[0], i, j) = (Arows[i] + j * nlimbs)[0] & (first_prime - 1);
+                nmod_mat_entry(mod_A[0], i, j) = (Aentries + (i * Astride + j) * nlimbs)[0] & (first_prime - 1);
                 for (l = 1; l < num_primes; l++)
-                    nmod_mat_entry(mod_A[l], i, j) = nmod_set_mpn_2(Arows[i] + j * nlimbs, mod_A[l]->mod);
+                    nmod_mat_entry(mod_A[l], i, j) = nmod_set_mpn_2(Aentries + (i * Astride + j) * nlimbs, mod_A[l]->mod);
             }
         }
 
@@ -117,9 +122,9 @@ static void _mod_worker(void * varg)
             for (i = Bstartrow; i < Bstoprow; i++)
                 for (j = 0; j < n; j++)
                 {
-                    nmod_mat_entry(mod_B[0], i, j) = (Brows[i] + j * nlimbs)[0] & (first_prime - 1);
+                    nmod_mat_entry(mod_B[0], i, j) = (Bentries + (i * Bstride + j) * nlimbs)[0] & (first_prime - 1);
                     for (l = 1; l < num_primes; l++)
-                        nmod_mat_entry(mod_B[l], i, j) = nmod_set_mpn_2(Brows[i] + j * nlimbs, mod_A[l]->mod);
+                        nmod_mat_entry(mod_B[l], i, j) = nmod_set_mpn_2(Bentries + (i * Bstride + j) * nlimbs, mod_A[l]->mod);
                 }
         }
     }
@@ -128,14 +133,14 @@ static void _mod_worker(void * varg)
         for (i = Astartrow; i < Astoprow; i++)
             for (j = 0; j < k; j++)
                 for (l = 0; l < num_primes; l++)
-                    nmod_mat_entry(mod_A[l], i, j) = nmod_set_mpn(Arows[i] + j * nlimbs, nlimbs, mod_A[l]->mod);
+                    nmod_mat_entry(mod_A[l], i, j) = nmod_set_mpn(Aentries + (i * Astride + j) * nlimbs, nlimbs, mod_A[l]->mod);
 
         if (mod_B != NULL)
         {
             for (i = Bstartrow; i < Bstoprow; i++)
                 for (j = 0; j < n; j++)
                     for (l = 0; l < num_primes; l++)
-                        nmod_mat_entry(mod_B[l], i, j) = nmod_set_mpn(Brows[i] + j * nlimbs, nlimbs, mod_A[l]->mod);
+                        nmod_mat_entry(mod_B[l], i, j) = nmod_set_mpn(Bentries + (i * Bstride + j) * nlimbs, nlimbs, mod_A[l]->mod);
         }
     }
 }
@@ -147,7 +152,8 @@ static void _crt_worker(void * varg)
     slong n = arg->n;
     slong Cstartrow = arg->Cstartrow;
     slong Cstoprow = arg->Cstoprow;
-    nn_ptr * Crows = arg->Crows;
+    nn_ptr Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
     nmod_mat_t * mod_C = arg->mod_C;
     ulong * primes = arg->primes;
     slong num_primes = arg->num_primes;
@@ -212,7 +218,7 @@ static void _crt_worker(void * varg)
             /* todo: see what fft_small does here */
             mpn_tdiv_qr(U, T, 0, T, Nsize, M, Msize);
 
-            mpn_mod_set_mpn(Crows[i] + j * nlimbs, T, Msize, ctx);
+            mpn_mod_set_mpn(Centries + (i * Cstride + j) * nlimbs, T, Msize, ctx);
         }
 
         flint_free(M);
@@ -255,9 +261,12 @@ int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr
 
     mainarg.ctx = ctx;
 
-    mainarg.Arows = (nn_ptr *) A->rows;
-    mainarg.Brows = (nn_ptr *) B->rows;
-    mainarg.Crows = (nn_ptr *) C->rows;
+    mainarg.Aentries = (nn_ptr) A->entries;
+    mainarg.Astride = A->stride;
+    mainarg.Bentries = (nn_ptr) B->entries;
+    mainarg.Bstride = B->stride;
+    mainarg.Centries = (nn_ptr) C->entries;
+    mainarg.Cstride = C->stride;
 
     /* TUNING */
     primes_bits = NMOD_MAT_OPTIMAL_MODULUS_BITS;

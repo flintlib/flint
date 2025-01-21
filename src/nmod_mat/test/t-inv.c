@@ -16,7 +16,7 @@
 TEST_FUNCTION_START(nmod_mat_inv, state)
 {
     nmod_mat_t A, B, C, I;
-    slong i, j, m, r;
+    slong i, m, r;
     ulong mod;
     int result;
 
@@ -30,8 +30,7 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
         nmod_mat_init(C, m, m, mod);
         nmod_mat_init(I, m, m, mod);
 
-        for (j = 0; j < m; j++)
-            I->rows[j][j] = UWORD(1);
+        nmod_mat_one(I);
 
         /* Verify that A * A^-1 = I for random matrices */
 

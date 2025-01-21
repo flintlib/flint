@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->rows[i], j, sz)
+#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->entries, (i) * (mat)->stride + (j), sz)
 #define gr_mat_nrows(mat, ctx) ((mat)->r)
 #define gr_mat_ncols(mat, ctx) ((mat)->c)
 
@@ -71,12 +71,24 @@ WARN_UNUSED_RESULT int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t c
 WARN_UNUSED_RESULT int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
 
-void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
+GR_MAT_INLINE void
+gr_mat_window_init(gr_mat_t window, const gr_mat_t mat,
+    slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx)
+{
+    slong sz = ctx->sizeof_elem;
+
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
+
+    window->entries = GR_MAT_ENTRY(mat, r1, c1, sz);
+    window->r = r2 - r1;
+    window->c = c2 - c1;
+    window->stride = mat->stride;
+}
 
 GR_MAT_INLINE void
-gr_mat_window_clear(gr_mat_t window, gr_ctx_t FLINT_UNUSED(ctx))
+gr_mat_window_clear(gr_mat_t FLINT_UNUSED(window), gr_ctx_t FLINT_UNUSED(ctx))
 {
-    flint_free(window->rows);
 }
 
 WARN_UNUSED_RESULT int gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);

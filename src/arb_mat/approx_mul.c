@@ -73,7 +73,7 @@ arb_mat_approx_mul_classical(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, 
             for (j = 0; j < bc; j++)
             {
                 arb_approx_dot(arb_mat_entry(C, i, j), NULL, 0,
-                    A->rows[i], 1, tmp + j * br, 1, br, prec);
+                    arb_mat_entry(A, i, 0), 1, tmp + j * br, 1, br, prec);
             }
         }
 

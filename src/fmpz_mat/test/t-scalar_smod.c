@@ -44,15 +44,15 @@ TEST_FUNCTION_START(fmpz_mat_scalar_smod, state)
         {
            for (k = 0; k < A->c; k++)
            {
-              fmpz_smod(c, A->rows[j] + k, P);
+              fmpz_smod(c, fmpz_mat_entry(A, j, k), P);
 
-              if (!fmpz_equal(c, B->rows[j] + k))
+              if (!fmpz_equal(c, fmpz_mat_entry(B, j, k)))
               {
                  flint_printf("FAIL!\n");
                  flint_printf("%wd, %wd\n", j, k);
                  fmpz_print(c); flint_printf("\n");
-                 fmpz_print(A->rows[j] + k); flint_printf("\n");
-                 fmpz_print(B->rows[j] + k); flint_printf("\n");
+                 fmpz_print(fmpz_mat_entry(A, j, k)); flint_printf("\n");
+                 fmpz_print(fmpz_mat_entry(B, j, k)); flint_printf("\n");
                  fmpz_print(P); flint_printf("\n");
                  fflush(stdout);
                  flint_abort();

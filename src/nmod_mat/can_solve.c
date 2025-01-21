@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 
 int
@@ -58,9 +59,9 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
 
     *rank = nmod_mat_lu(perm, LU, 0);
 
-    nmod_mat_window_init(PB, B, 0, 0, B->r, B->c);
+    nmod_mat_init(PB, B->r, B->c, A->mod.n);
     for (i = 0; i < B->r; i++)
-        PB->rows[i] = B->rows[perm[i]];
+        _nmod_vec_set(nmod_mat_entry_ptr(PB, i, 0), nmod_mat_entry_ptr(B, perm[i], 0), B->c);
 
     nmod_mat_init(LU2, *rank, *rank, A->mod.n);
 
@@ -93,7 +94,7 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
     {
         nmod_mat_t P;
 
-        LU->rows += *rank;
+        LU->entries += *rank * LU->stride;
         LU->r = A->r - *rank;
         X->r = LU->c;
 
@@ -102,14 +103,14 @@ nmod_mat_can_solve_inner(slong * rank, slong * prm, slong * piv,
         nmod_mat_mul(P, LU, X);
 
         PB->r = LU->r;
-        PB->rows += *rank;
+        PB->entries += *rank * PB->stride;
 
         result = nmod_mat_equal(P, PB);
 
-        PB->rows -= *rank;
+        PB->entries -= *rank * PB->stride;
         nmod_mat_clear(P);
 
-        LU->rows -= *rank;
+        LU->entries -= *rank * LU->stride;
 
         if (!result)
         {
@@ -144,7 +145,7 @@ cleanup:
     nmod_mat_clear(LU2);
 
     PB->r = B->r;
-    nmod_mat_window_clear(PB);
+    nmod_mat_clear(PB);
 
     LU->r = A->r;
     nmod_mat_clear(LU);

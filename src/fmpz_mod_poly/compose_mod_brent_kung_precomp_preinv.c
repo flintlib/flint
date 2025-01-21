@@ -18,6 +18,7 @@
 #include "fmpz_mat.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
+#include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
 
 void
@@ -37,13 +38,13 @@ _fmpz_mod_poly_reduce_matrix_mod_poly(fmpz_mat_t A, const fmpz_mat_t B,
     tmp1 = _fmpz_vec_init(2 * (B->c) - n);
     tmp2 = tmp1 + (B->c - n);
 
-    fmpz_one(A->rows[0]);
+    fmpz_one(fmpz_mat_entry(A, 0, 0));
 
     for (i= 1; i < m; i++)
     {
-        _fmpz_mod_poly_divrem(tmp1, tmp2, B->rows[i], B->c, f->coeffs,
+        _fmpz_mod_poly_divrem(tmp1, tmp2, fmpz_mod_mat_row(B, i), B->c, f->coeffs,
                                    f->length, invf, ctx);
-        _fmpz_vec_set(A->rows[i], tmp2, n);
+        _fmpz_vec_set(fmpz_mat_row(A, i), tmp2, n);
     }
 
     _fmpz_vec_clear(tmp1, 2*(B->c) - n);
@@ -57,13 +58,21 @@ _fmpz_mod_poly_precompute_matrix(fmpz_mat_t A, const fmpz * poly1,
 {
     /* Set rows of A to powers of poly1 */
     slong n, m;
+    fmpz ** Arows;
 
     n = len2 - 1;
 
     m = n_sqrt(n) + 1;
 
-    _fmpz_mod_poly_powers_mod_preinv_naive(A->rows, poly1, n, m,
+    slong i;
+    Arows = flint_malloc(sizeof(fmpz *) * A->r);
+    for (i = 0; i < A->r; i++)
+        Arows[i] = fmpz_mat_row(A, i);
+
+    _fmpz_mod_poly_powers_mod_preinv_naive(Arows, poly1, n, m,
                                             poly2, len2, poly2inv, len2inv, ctx);
+
+    flint_free(Arows);
 }
 
 void
@@ -124,7 +133,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
          const fmpz * poly1, slong len1, const fmpz_mat_t A, const fmpz * poly3,
          slong len3, const fmpz * poly3inv, slong len3inv, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_t B, C;
+    fmpz_mod_mat_t B, C;
     fmpz * t, * h;
     slong i, n, m;
 
@@ -142,45 +151,43 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
 
     if (len3 == 2)
     {
-        _fmpz_mod_poly_evaluate_fmpz(res, poly1, len1, A->rows[1], ctx);
+        _fmpz_mod_poly_evaluate_fmpz(res, poly1, len1, fmpz_mod_mat_row(A, 1), ctx);
         return;
     }
 
     m = n_sqrt(n) + 1;
 
-    fmpz_mat_init(B, m, m);
-    fmpz_mat_init(C, m, n);
+    fmpz_mod_mat_init(B, m, m, ctx);
+    fmpz_mod_mat_init(C, m, n, ctx);
 
     h = _fmpz_vec_init(n);
     t = _fmpz_vec_init(n);
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
-        _fmpz_vec_set(B->rows[i], poly1 + i * m, m);
+        _fmpz_vec_set(fmpz_mod_mat_row(B, i), poly1 + i * m, m);
 
-    _fmpz_vec_set(B->rows[i], poly1 + i * m, len1 % m);
+    _fmpz_vec_set(fmpz_mod_mat_row(B, i), poly1 + i * m, len1 % m);
 
-    fmpz_mat_mul(C, B, A);
-    for (i = 0; i < m; i++)
-        _fmpz_mod_vec_set_fmpz_vec(C->rows[i], C->rows[i], n, ctx);
+    fmpz_mod_mat_mul(C, B, A, ctx);
 
     /* Evaluate block composition using the Horner scheme */
-    _fmpz_vec_set(res, C->rows[m - 1], n);
-    _fmpz_mod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly3,
+    _fmpz_vec_set(res, fmpz_mod_mat_row(C, m - 1), n);
+    _fmpz_mod_poly_mulmod_preinv(h, fmpz_mod_mat_row(A, m - 1), n, fmpz_mod_mat_row(A, 1), n, poly3,
                                  len3, poly3inv, len3inv, ctx);
 
     for (i = m - 2; i >= 0; i--)
     {
         _fmpz_mod_poly_mulmod_preinv(t, res, n, h, n, poly3, len3,
                                      poly3inv, len3inv, ctx);
-        _fmpz_mod_poly_add(res, t, n, C->rows[i], n, ctx);
+        _fmpz_mod_poly_add(res, t, n, fmpz_mod_mat_row(C, i), n, ctx);
     }
 
     _fmpz_vec_clear(h, n);
     _fmpz_vec_clear(t, n);
 
-    fmpz_mat_clear(B);
-    fmpz_mat_clear(C);
+    fmpz_mod_mat_clear(B, ctx);
+    fmpz_mod_mat_clear(C, ctx);
 }
 
 void fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,

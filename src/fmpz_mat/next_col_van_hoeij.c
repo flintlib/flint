@@ -13,65 +13,23 @@
 #include <gmp.h>
 #include "longlong.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
+/* todo: proper inplace realloc */
 void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
 {
-   slong i, j;
-   fmpz * old_entries = M->entries;
+    slong i;
+    fmpz_mat_t T;
 
-   M->entries = (fmpz *) flint_realloc(M->entries, r*c*sizeof(fmpz));
+    FLINT_ASSERT(r >= M->r);
+    FLINT_ASSERT(c >= M->c);
 
-   mpn_zero((nn_ptr) M->entries + M->r*M->c, r*c - M->r*M->c);
-
-   if (r != M->r) /* we will have an extra row and column */
-   {
-      M->rows = (fmpz **) flint_realloc(M->rows, r*sizeof(fmpz *));
-
-      for (i = r - 1; i >= 1; i--)
-      {
-         fmpz * old_row = M->entries + (i - 1)*M->c;
-         fmpz * new_row = M->entries + i*c;
-
-         for (j = M->c - 1; j >= 0; j--)
-            fmpz_swap(old_row + j, new_row + j);
-      }
-
-      for (i = M->r - 1; i >= 0; i--)
-      {
-         slong diff = (slong) (M->rows[i] - old_entries);
-
-         if (M->rows[i] >= old_entries + M->c*M->r)
-            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
-
-         j = diff/M->c;
-         M->rows[i + 1] = M->entries + (j + 1)*c;
-      }
-
-      M->rows[0] = M->entries;
-   } else /* have only an extra column */
-   {
-      /* rows of M may be out of order */
-      for (i = r - 1; i >= 0; i--)
-      {
-         fmpz * old_row = M->entries + i*M->c;
-         fmpz * new_row = M->entries + i*c;
-
-         for (j = M->c - 1; j >= 0; j--)
-            fmpz_swap(old_row + j, new_row + j);
-      }
-
-      for (i = 0; i < r; i++)
-      {
-         slong diff = (slong) (M->rows[i] - old_entries);
-
-         j = diff/M->c;
-         M->rows[i] = M->entries + j*c;
-      }
-   }
-
-   M->r = r;
-   M->c = c;
+    fmpz_mat_init(T, r, c);
+    for (i = 0; i < M->r; i++)
+        _fmpz_vec_swap(fmpz_mat_row(T, i + r - M->r), fmpz_mat_row(M, i), M->c);
+    fmpz_mat_swap(M, T);
+    fmpz_mat_clear(T);
 }
 
 int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
@@ -120,10 +78,10 @@ int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
    _fmpz_mat_resize_van_hoeij(M, s + 1, M->c + 1);
 
    /* insert new column and row data */
-   fmpz_set(M->rows[0] + M->c - 1, P_trunc);
+   fmpz_set(fmpz_mat_entry(M, 0, M->c - 1), P_trunc);
 
    for (j = 1; j < M->r; j++)
-      fmpz_set(M->rows[j] + M->c - 1, y->rows[j - 1]);
+      fmpz_set(fmpz_mat_entry(M, j, M->c - 1), fmpz_mat_entry(y, j - 1, 0));
 
    fmpz_mat_clear(x);
    fmpz_mat_clear(y);

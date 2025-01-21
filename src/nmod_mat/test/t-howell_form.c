@@ -110,7 +110,7 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
 
         g = A->mod.n/g;
 
-        _nmod_vec_scalar_mul_nmod(extra_row, A->rows[i], A->c, g, A->mod);
+        _nmod_vec_scalar_mul_nmod(extra_row, nmod_mat_entry_ptr(A, i, 0), A->c, g, A->mod);
 
         for ( j = pivots[i] + 1; j < A->c; j++)
         {
@@ -123,7 +123,7 @@ nmod_mat_is_in_howell_form(const nmod_mat_t A)
                         if(!(extra_row[j] % nmod_mat_entry(A, r, pivots[r])))
                         {
                             g = extra_row[j]/nmod_mat_entry(A, r, pivots[r]);
-                            _nmod_vec_scalar_addmul_nmod(extra_row, A->rows[r],
+                            _nmod_vec_scalar_addmul_nmod(extra_row, nmod_mat_entry_ptr(A, r, 0),
                                 A->c, nmod_neg(g, A->mod), A->mod);
                         }
 

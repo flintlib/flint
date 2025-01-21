@@ -33,7 +33,7 @@ arb_mat_solve_tril_classical(arb_mat_t X,
 
         for (j = 0; j < n; j++)
         {
-            arb_dot(s, arb_mat_entry(B, j, i), 1, L->rows[j], 1, tmp, 1, j, prec);
+            arb_dot(s, arb_mat_entry(B, j, i), 1, arb_mat_entry(L, j, 0), 1, tmp, 1, j, prec);
 
             if (!unit)
                 arb_div(tmp + j, s, arb_mat_entry(L, j, j), prec);

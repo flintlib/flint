@@ -33,7 +33,7 @@ nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
     if (rank == 0)
     {
         for (i = 0; i < nullity; i++)
-            nmod_poly_one(res->rows[i] + i);
+            nmod_poly_one(nmod_poly_mat_entry(res, i, i));
     }
     else if (nullity)
     {
@@ -42,7 +42,7 @@ nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
 
         for (i = j = k = 0; i < rank; i++)
         {
-            while (nmod_poly_is_zero(tmp->rows[i] + j))
+            while (nmod_poly_is_zero(nmod_poly_mat_entry(tmp, i, j)))
             {
                 nonpivots[k] = j;
                 k++;
@@ -58,14 +58,14 @@ nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
             j++;
         }
 
-        nmod_poly_set(den, tmp->rows[0] + pivots[0]);
+        nmod_poly_set(den, nmod_poly_mat_entry(tmp, 0, pivots[0]));
 
         for (i = 0; i < nullity; i++)
         {
             for (j = 0; j < rank; j++)
-                nmod_poly_set(res->rows[pivots[j]] + i,
-                    tmp->rows[j] + nonpivots[i]);
-            nmod_poly_neg(res->rows[nonpivots[i]] + i, den);
+                nmod_poly_set(nmod_poly_mat_entry(res, pivots[j], i),
+                    nmod_poly_mat_entry(tmp, j, nonpivots[i]));
+            nmod_poly_neg(nmod_poly_mat_entry(res, nonpivots[i], i), den);
         }
 
         flint_free(pivots);

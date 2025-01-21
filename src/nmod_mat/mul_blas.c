@@ -93,8 +93,10 @@ typedef struct {
     ulong ctxn;
     float * dA;
     float * dB;
-    ulong ** Arows;
-    ulong ** Brows;
+    ulong * Aentries;
+    slong Astride;
+    ulong * Bentries;
+    slong Bstride;
 } _lift_sp_worker_arg_struct;
 
 void _lift_sp_worker(void * arg_ptr)
@@ -109,15 +111,17 @@ void _lift_sp_worker(void * arg_ptr)
     ulong ctxn = arg->ctxn;
     float * dA = arg->dA;
     float * dB = arg->dB;
-    ulong ** Arows = arg->Arows;
-    ulong ** Brows = arg->Brows;
+    ulong * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
+    ulong * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     slong i;
 
     for (i = Astartrow; i < Astoprow; i++)
-        _lift_vec_sp(dA + i*k, Arows[i], k, ctxn);
+        _lift_vec_sp(dA + i*k, Aentries + i * Astride, k, ctxn);
 
     for (i = Bstartrow; i < Bstoprow; i++)
-        _lift_vec_sp(dB + i*n, Brows[i], n, ctxn);
+        _lift_vec_sp(dB + i*n, Bentries + i * Bstride, n, ctxn);
 }
 
 typedef struct {
@@ -127,7 +131,8 @@ typedef struct {
     nmod_t * ctx;
     ulong shift;
     float * dC;
-    ulong ** Crows;
+    ulong * Centries;
+    slong Cstride;
 } _reduce_sp_worker_arg_struct;
 
 void _reduce_sp_worker(void * arg_ptr)
@@ -139,7 +144,8 @@ void _reduce_sp_worker(void * arg_ptr)
     nmod_t ctx = *arg->ctx;
     ulong shift = arg->shift;
     float * dC = arg->dC;
-    ulong ** Crows = arg->Crows;
+    ulong * Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
     slong i, j;
 
     for (i = Cstartrow; i < Cstoprow; i++)
@@ -148,7 +154,7 @@ void _reduce_sp_worker(void * arg_ptr)
         {
             slong a = (slong) dC[i*n + j];
             ulong b = (a < 0) ? a + shift : a;
-            NMOD_RED(Crows[i][j], b, ctx);
+            NMOD_RED(Centries[i * Cstride + j], b, ctx);
         }
     }
 }
@@ -188,8 +194,10 @@ static int _nmod_mat_mul_blas_sp(nmod_mat_t C,
             args[i].ctxn = ctx.n;
             args[i].dA = dA;
             args[i].dB = dB;
-            args[i].Arows = A->rows;
-            args[i].Brows = B->rows;
+            args[i].Aentries = A->entries;
+            args[i].Astride = A->stride;
+            args[i].Bentries = B->entries;
+            args[i].Bstride = B->stride;
             _distribute_rows(&args[i].Astartrow, &args[i].Astoprow,
                              &args[i].Bstartrow, &args[i].Bstoprow, m,
                                           ((m + k)*(i + 0))/(num_workers + 1),
@@ -227,7 +235,8 @@ static int _nmod_mat_mul_blas_sp(nmod_mat_t C,
             args[i].ctx = &ctx;
             args[i].shift = shift;
             args[i].dC = dC;
-            args[i].Crows = C->rows;
+            args[i].Centries = C->entries;
+            args[i].Cstride = C->stride;
         }
 
         for (i = 0; i < num_workers; i++)
@@ -275,8 +284,10 @@ typedef struct {
     nmod_t crtmod;
     double * dA;
     double * dB;
-    ulong ** Arows;
-    ulong ** Brows;
+    ulong * Aentries;
+    slong Astride;
+    ulong * Bentries;
+    slong Bstride;
 } _lift_crt_worker_arg_struct;
 
 void _lift_crt_worker(void * arg_ptr)
@@ -291,15 +302,17 @@ void _lift_crt_worker(void * arg_ptr)
     nmod_t crtmod = arg->crtmod;
     double * dA = arg->dA;
     double * dB = arg->dB;
-    ulong ** Arows = arg->Arows;
-    ulong ** Brows = arg->Brows;
+    ulong * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
+    ulong * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     slong i;
 
     for (i = Astartrow; i < Astoprow; i++)
-        _lift_vec_crt(dA + i*k, Arows[i], k, crtmod);
+        _lift_vec_crt(dA + i*k, Aentries + i * Astride, k, crtmod);
 
     for (i = Bstartrow; i < Bstoprow; i++)
-        _lift_vec_crt(dB + i*n, Brows[i], n, crtmod);
+        _lift_vec_crt(dB + i*n, Bentries + i * Bstride, n, crtmod);
 }
 
 typedef struct {
@@ -311,7 +324,8 @@ typedef struct {
     nmod_t * crtmod;
     nmod_t * ctx;
     double * dC;
-    ulong ** Crows;
+    ulong * Centries;
+    slong Cstride;
 } _reduce_crt_worker_arg_struct;
 
 void _reduce_crt_worker(void * arg_ptr)
@@ -326,7 +340,8 @@ void _reduce_crt_worker(void * arg_ptr)
     nmod_t ctx = *arg->ctx;
     ulong s, t, hi, lo, reshi, reslo;
     slong crtnum = arg->crtnum;
-    ulong ** Crows = arg->Crows;
+    ulong * Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
     nmod_t crtmod[MAX_CRT_NUM];
     ulong q[MAX_CRT_NUM], v[MAX_CRT_NUM], u[MAX_CRT_NUM];
     ulong shifts[MAX_CRT_NUM], pmodinv[MAX_CRT_NUM*MAX_CRT_NUM];
@@ -387,9 +402,9 @@ void _reduce_crt_worker(void * arg_ptr)
             }
 
             if (reshi < ctx.n)
-                NMOD_RED2(Crows[i][j], reshi, reslo, ctx);
+                NMOD_RED2(Centries[i * Cstride + j], reshi, reslo, ctx);
             else
-                NMOD2_RED2(Crows[i][j], reshi, reslo, ctx);
+                NMOD2_RED2(Centries[i * Cstride + j], reshi, reslo, ctx);
         }
     }
 }
@@ -467,8 +482,10 @@ static int _nmod_mat_mul_blas_crt(nmod_mat_t C,
             args[i].crtmod = crtmod[pi];
             args[i].dA = dA;
             args[i].dB = dB;
-            args[i].Arows = A->rows;
-            args[i].Brows = B->rows;
+            args[i].Aentries = A->entries;
+            args[i].Astride = A->stride;
+            args[i].Bentries = B->entries;
+            args[i].Bstride = B->stride;
             _distribute_rows(&args[i].Astartrow, &args[i].Astoprow,
                              &args[i].Bstartrow, &args[i].Bstoprow, m,
                                           ((m + k)*(i + 0))/(num_workers + 1),
@@ -498,7 +515,8 @@ static int _nmod_mat_mul_blas_crt(nmod_mat_t C,
             args[i].crtmod = crtmod;
             args[i].ctx = &ctx;
             args[i].dC = dC;
-            args[i].Crows = C->rows;
+            args[i].Centries = C->entries;
+            args[i].Cstride = C->stride;
         }
 
         for (i = 0; i < num_workers; i++)
@@ -542,8 +560,10 @@ typedef struct {
     ulong ctxn;
     double * dA;
     double * dB;
-    ulong ** Arows;
-    ulong ** Brows;
+    ulong * Aentries;
+    slong Astride;
+    ulong * Bentries;
+    slong Bstride;
 } _lift_dp_worker_arg_struct;
 
 void _lift_dp_worker(void * arg_ptr)
@@ -558,15 +578,17 @@ void _lift_dp_worker(void * arg_ptr)
     ulong ctxn = arg->ctxn;
     double * dA = arg->dA;
     double * dB = arg->dB;
-    ulong ** Arows = arg->Arows;
-    ulong ** Brows = arg->Brows;
+    ulong * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
+    ulong * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     slong i;
 
     for (i = Astartrow; i < Astoprow; i++)
-        _lift_vec_dp(dA + i*k, Arows[i], k, ctxn);
+        _lift_vec_dp(dA + i*k, Aentries + i * Astride, k, ctxn);
 
     for (i = Bstartrow; i < Bstoprow; i++)
-        _lift_vec_dp(dB + i*n, Brows[i], n, ctxn);
+        _lift_vec_dp(dB + i*n, Bentries + i * Bstride, n, ctxn);
 }
 
 typedef struct {
@@ -576,7 +598,8 @@ typedef struct {
     nmod_t * ctx;
     ulong shift;
     double * dC;
-    ulong ** Crows;
+    ulong * Centries;
+    slong Cstride;
 } _reduce_dp_worker_arg_struct;
 
 void _reduce_dp_worker(void * arg_ptr)
@@ -588,7 +611,8 @@ void _reduce_dp_worker(void * arg_ptr)
     nmod_t ctx = *arg->ctx;
     ulong shift = arg->shift;
     double * dC = arg->dC;
-    ulong ** Crows = arg->Crows;
+    ulong * Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
     slong i, j;
 
     for (i = Cstartrow; i < Cstoprow; i++)
@@ -597,7 +621,7 @@ void _reduce_dp_worker(void * arg_ptr)
         {
             slong a = (slong) dC[i*n + j];
             ulong b = (a < 0) ? a + shift : a;
-            NMOD_RED(Crows[i][j], b, ctx);
+            NMOD_RED(Centries[i * Cstride + j], b, ctx);
         }
     }
 }
@@ -655,8 +679,10 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             args[i].ctxn = ctx.n;
             args[i].dA = dA;
             args[i].dB = dB;
-            args[i].Arows = A->rows;
-            args[i].Brows = B->rows;
+            args[i].Aentries = A->entries;
+            args[i].Astride = A->stride;
+            args[i].Bentries = B->entries;
+            args[i].Bstride = B->stride;
             _distribute_rows(&args[i].Astartrow, &args[i].Astoprow,
                              &args[i].Bstartrow, &args[i].Bstoprow, m,
                                           ((m + k)*(i + 0))/(num_workers + 1),
@@ -694,7 +720,8 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             args[i].ctx = &ctx;
             args[i].shift = shift;
             args[i].dC = dC;
-            args[i].Crows = C->rows;
+            args[i].Centries = C->entries;
+            args[i].Cstride = C->stride;
         }
 
         for (i = 0; i < num_workers; i++)

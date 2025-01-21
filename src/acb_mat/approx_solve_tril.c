@@ -57,7 +57,7 @@ acb_mat_approx_solve_tril_classical(acb_mat_t X,
 
         for (j = 0; j < n; j++)
         {
-            acb_approx_dot(s, acb_mat_entry(B, j, i), 1, L->rows[j], 1, tmp, 1, j, prec);
+            acb_approx_dot(s, acb_mat_entry(B, j, i), 1, acb_mat_entry(L, j, 0), 1, tmp, 1, j, prec);
 
             if (!unit)
                 acb_approx_div(tmp + j, s, acb_mat_entry(L, j, j), t, prec);

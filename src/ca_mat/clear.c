@@ -17,7 +17,10 @@ ca_mat_clear(ca_mat_t mat, ca_ctx_t ctx)
 {
     if (mat->entries != NULL)
     {
-        _ca_vec_clear(mat->entries, mat->r * mat->c, ctx);
-        flint_free(mat->rows);
+        slong i, j;
+        for (i = 0; i < mat->r; i++)
+            for (j = 0; j < mat->c; j++)
+                ca_clear(ca_mat_entry(mat, i, j), ctx);
+        flint_free(mat->entries);
     }
 }

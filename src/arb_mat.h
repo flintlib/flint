@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#define arb_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+#define arb_mat_entry(mat,i,j) ((mat)->entries + (i) * (mat)->stride + (j))
 #define arb_mat_nrows(mat) ((mat)->r)
 #define arb_mat_ncols(mat) ((mat)->c)
 
@@ -54,9 +54,8 @@ void arb_mat_swap_entrywise(arb_mat_t mat1, arb_mat_t mat2);
 void arb_mat_window_init(arb_mat_t window, const arb_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 
 ARB_MAT_INLINE void
-arb_mat_window_clear(arb_mat_t window)
+arb_mat_window_clear(arb_mat_t FLINT_UNUSED(window))
 {
-    flint_free(window->rows);
 }
 
 /* Conversions */
@@ -213,17 +212,7 @@ void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong 
 
 /* Solving */
 
-ARB_MAT_INLINE void
-arb_mat_swap_rows(arb_mat_t mat, slong * perm, slong r, slong s)
-{
-    if (r != s)
-    {
-        if (perm != NULL)
-            FLINT_SWAP(slong, perm[r], perm[s]);
-
-        FLINT_SWAP(arb_ptr, mat->rows[r], mat->rows[s]);
-    }
-}
+void arb_mat_swap_rows(arb_mat_t mat, slong * perm, slong r, slong s);
 
 slong arb_mat_find_pivot_partial(const arb_mat_t mat,
                                     slong start_row, slong end_row, slong c);

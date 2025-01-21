@@ -69,7 +69,7 @@ int TEMPLATE(T, mat_fprint) (FILE * file, const TEMPLATE(T, mat_t) mat,
     {
         for (j = 0; j < c; j++)
         {
-            xxx_T_print(mat->rows[i] + j, ctx);
+            xxx_T_print(TEMPLATE(T, mat_entry)(mat, i, j), ctx);
             if (j != c - 1)
                 xxx_putc(' ');
         }
@@ -94,7 +94,7 @@ int TEMPLATE(T, mat_fprint_pretty) (FILE * file, const TEMPLATE(T, mat_t) mat,
         xxx_putc('[');
         for (j = 0; j < c; j++)
         {
-            xxx_T_print_pretty(mat->rows[i] + j, ctx);
+            xxx_T_print_pretty(TEMPLATE(T, mat_entry)(mat, i, j), ctx);
             if (j != c - 1)
                 xxx_putc(' ');
         }

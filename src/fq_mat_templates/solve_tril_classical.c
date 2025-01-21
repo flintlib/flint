@@ -46,7 +46,7 @@ TEMPLATE(T, mat_solve_tril_classical) (TEMPLATE(T, mat_t) X,
         {
             TEMPLATE(T, t) s;
             TEMPLATE(T, init) (s, ctx);
-            _TEMPLATE(T, vec_dot) (s, L->rows[j], tmp, j, ctx);
+            _TEMPLATE(T, vec_dot) (s, TEMPLATE(T, mat_entry) (L, j, 0), tmp, j, ctx);
             TEMPLATE(T, sub) (s, TEMPLATE(T, mat_entry) (B, j, i), s, ctx);
             if (!unit)
                 TEMPLATE(T, mul) (s, s, inv + j, ctx);

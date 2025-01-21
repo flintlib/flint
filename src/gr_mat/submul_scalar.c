@@ -16,6 +16,7 @@ int
 gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
 {
     slong i, r, c;
+    slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
 
     r = gr_mat_nrows(res, ctx);
@@ -23,7 +24,8 @@ gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            status |= _gr_vec_submul_scalar(res->rows[i], mat->rows[i], c, x, ctx);
+            status |= _gr_vec_submul_scalar(GR_MAT_ENTRY(res, i, 0, sz),
+                GR_MAT_ENTRY(mat, i, 0, sz), c, x, ctx);
 
     return status;
 }

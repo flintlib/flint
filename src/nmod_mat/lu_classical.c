@@ -16,8 +16,7 @@
 static inline int
 nmod_mat_pivot(nmod_mat_t A, slong * P, slong start_row, slong col)
 {
-    slong j, t;
-    nn_ptr u;
+    slong j;
 
     if (nmod_mat_entry(A, start_row, col) != 0)
         return 1;
@@ -26,14 +25,7 @@ nmod_mat_pivot(nmod_mat_t A, slong * P, slong start_row, slong col)
     {
         if (nmod_mat_entry(A, j, col) != 0)
         {
-            u = A->rows[j];
-            A->rows[j] = A->rows[start_row];
-            A->rows[start_row] = u;
-
-            t = P[j];
-            P[j] = P[start_row];
-            P[start_row] = t;
-
+            nmod_mat_swap_rows(A, P, j, start_row);
             return -1;
         }
     }
@@ -44,13 +36,12 @@ nmod_mat_pivot(nmod_mat_t A, slong * P, slong start_row, slong col)
 slong
 nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
 {
-    ulong d, e, **a;
+    ulong d, e;
     nmod_t mod;
     slong i, m, n, rank, length, row, col;
 
     m = A->r;
     n = A->c;
-    a = A->rows;
     mod = A->mod;
 
     rank = row = col = 0;
@@ -70,19 +61,19 @@ nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
 
         rank++;
 
-        d = a[row][col];
+        d = nmod_mat_entry(A, row, col);
         d = nmod_inv(d, mod);
         length = n - col - 1;
 
         for (i = row + 1; i < m; i++)
         {
-            e = nmod_mul(a[i][col], d, mod);
+            e = nmod_mul(nmod_mat_entry(A, i, col), d, mod);
             if (length != 0)
-                _nmod_vec_scalar_addmul_nmod(a[i] + col + 1,
-                    a[row] + col + 1, length, nmod_neg(e, mod), mod);
+                _nmod_vec_scalar_addmul_nmod(nmod_mat_entry_ptr(A, i, col + 1),
+                    nmod_mat_entry_ptr(A, row, + col + 1), length, nmod_neg(e, mod), mod);
 
-            a[i][col] = 0;
-            a[i][rank - 1] = e;
+            nmod_mat_entry(A, i, col) = 0;
+            nmod_mat_entry(A, i, rank - 1) = e;
         }
         row++;
         col++;

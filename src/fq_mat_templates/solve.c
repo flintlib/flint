@@ -33,14 +33,15 @@ TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
     if (rank == A->r)
     {
         TEMPLATE(T, mat_t) PB;
-        TEMPLATE(T, mat_window_init)(PB, B, 0, 0, B->r, B->c, ctx);
+        TEMPLATE(T, mat_init)(PB, B->r, B->c, ctx);
         for (i = 0; i < A->r; i++)
-            PB->rows[i] = B->rows[perm[i]];
+            _TEMPLATE(T, vec_set)(TEMPLATE(T, mat_entry)(PB, i, 0),
+                                  TEMPLATE(T, mat_entry)(B, perm[i], 0), B->c, ctx);
 
         TEMPLATE(T, mat_solve_tril)(X, LU, PB, 1, ctx);
         TEMPLATE(T, mat_solve_triu)(X, LU, X, 0, ctx);
 
-        TEMPLATE(T, mat_window_clear)(PB, ctx);
+        TEMPLATE(T, mat_clear)(PB, ctx);
         result = 1;
     }
     else

@@ -9,22 +9,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_vec.h"
-#include "nmod_mat.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 
-int
-nmod_mat_is_zero(const nmod_mat_t mat)
+void fmpz_mat_swap_rows(fmpz_mat_t mat, slong * perm, slong r, slong s)
 {
-    slong j;
-
-    if (mat->r == 0 || mat->c == 0)
-        return 1;
-
-    for (j = 0; j < mat->r; j++)
+    if (r != s && !fmpz_mat_is_empty(mat))
     {
-        if (!_nmod_vec_is_zero(nmod_mat_entry_ptr(mat, j, 0), mat->c))
-            return 0;
-    }
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-    return 1;
+        _fmpz_vec_swap(fmpz_mat_entry(mat, r, 0), fmpz_mat_entry(mat, s, 0), mat->c);
+    }
 }

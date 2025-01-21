@@ -16,7 +16,6 @@ int
 arb_mat_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
 {
     arb_t d, e;
-    arb_ptr * a;
     slong i, j, m, n, r, row, col;
     int result;
 
@@ -27,8 +26,6 @@ arb_mat_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
     n = arb_mat_ncols(A);
 
     arb_mat_set(LU, A);
-
-    a = LU->rows;
 
     row = col = 0;
     for (i = 0; i < m; i++)
@@ -51,16 +48,16 @@ arb_mat_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
         else if (r != row)
             arb_mat_swap_rows(LU, P, row, r);
 
-        arb_set(d, a[row] + col);
+        arb_set(d, arb_mat_entry(LU, row, col));
 
         for (j = row + 1; j < m; j++)
         {
-            arb_div(e, a[j] + col, d, prec);
+            arb_div(e, arb_mat_entry(LU, j, col), d, prec);
             arb_neg(e, e);
-            _arb_vec_scalar_addmul(a[j] + col,
-                a[row] + col, n - col, e, prec);
-            arb_zero(a[j] + col);
-            arb_neg(a[j] + row, e);
+            _arb_vec_scalar_addmul(arb_mat_entry(LU, j, col),
+                arb_mat_entry(LU, row, col), n - col, e, prec);
+            arb_zero(arb_mat_entry(LU, j, col));
+            arb_neg(arb_mat_entry(LU, j, row), e);
         }
 
         row++;

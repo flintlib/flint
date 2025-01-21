@@ -9,31 +9,36 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "acb_mat.h"
 
 static void
-_apply_permutation(slong * AP, acb_mat_t A, slong * P,
-    slong n, slong offset)
+_apply_permutation(slong * AP, acb_mat_t A, const slong * P,
+    slong num_rows, slong row_offset, slong num_cols, slong col_offset)
 {
-    if (n != 0)
+    if (num_rows != 0)
     {
-        acb_ptr * Atmp;
+        acb_ptr Atmp;
         slong * APtmp;
         slong i;
 
-        Atmp = flint_malloc(sizeof(acb_ptr) * n);
-        APtmp = flint_malloc(sizeof(slong) * n);
+        /* todo: reduce memory allocation */
+        Atmp = flint_malloc(sizeof(acb_struct) * num_rows * num_cols);
+        APtmp = flint_malloc(sizeof(slong) * num_rows);
 
-        for (i = 0; i < n; i++) Atmp[i] = A->rows[P[i] + offset];
-        for (i = 0; i < n; i++) A->rows[i + offset] = Atmp[i];
+        for (i = 0; i < num_rows; i++)
+            memcpy(Atmp + i * num_cols, acb_mat_entry(A, P[i] + row_offset, col_offset), sizeof(acb_struct) * num_cols);
+        for (i = 0; i < num_rows; i++)
+            memcpy(acb_mat_entry(A, i + row_offset, col_offset), Atmp + i * num_cols, sizeof(acb_struct) * num_cols);
 
-        for (i = 0; i < n; i++) APtmp[i] = AP[P[i] + offset];
-        for (i = 0; i < n; i++) AP[i + offset] = APtmp[i];
+        for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
+        for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
 
         flint_free(Atmp);
         flint_free(APtmp);
     }
 }
+
 
 int
 acb_mat_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
@@ -75,7 +80,7 @@ acb_mat_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
     /* r1 = rank of A0 */
     r1 = FLINT_MIN(m, n1);
 
-    _apply_permutation(P, LU, P1, m, 0);
+    _apply_permutation(P, LU, P1, m, 0, n - n1, n1);
 
     acb_mat_window_init(A00, LU, 0, 0, r1, r1);
     acb_mat_window_init(A10, LU, r1, 0, m, r1);
@@ -98,7 +103,7 @@ acb_mat_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
     if (!r2)
         r1 = r2 = 0;
     else
-        _apply_permutation(P, LU, P1, m - r1, r1);
+        _apply_permutation(P, LU, P1, m - r1, r1, n1, 0);
 
     flint_free(P1);
     acb_mat_window_clear(A00);

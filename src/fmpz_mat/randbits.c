@@ -22,5 +22,5 @@ fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 
     for (i = 0; i < r; i++)
         for (j = 0; j < c; j++)
-            fmpz_randbits(mat->rows[i] + j, state, bits);
+            fmpz_randbits(fmpz_mat_entry(mat, i, j), state, bits);
 }
