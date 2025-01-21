@@ -5,15 +5,15 @@
 
 This module provides methods for the numerical evaluation of theta functions in
 any dimension `g\geq 1`. The algorithms will be detailed in the forthcoming paper
-[EK2023]_. In the case `g=1`, we rely on, but also improve on functionality
+[EK2025]_. In the case `g=1`, we rely on, but also improve on functionality
 from :ref:`acb_modular.h <acb-modular>`.
 
 In the context of this module, *tau* or `\tau` always denotes an element of the
 Siegel upper half-space `\mathbb{H}_g`, which consists of all symmetric
 `g\times g` complex matrices with positive definite imaginary part. The letter
 `z` denotes an element of `\mathbb{C}^g`. For each `a,b\in \{0,1\}^g`, the
-Riemann theta function of characteristic `(a,b)` is the following analytic
-function in `\tau\in \mathbb{H}_g` and `z\in \mathbb{C}^g`:
+Riemann theta function (of level 2) of characteristic `(a,b)` is the following
+analytic function in `\tau\in \mathbb{H}_g` and `z\in \mathbb{C}^g`:
 
     .. math::
 
@@ -28,61 +28,88 @@ vectors of theta values throughout. Similarly, a pair of characteristics
 `(a,b)` is encoded as an :type:`ulong` between `0` and `2^{2g}-1`, where `a`
 corresponds to the `g` more significant bits. With these conventions, the
 output of :func:`acb_modular_theta` is
-`(-\theta_3,\theta_2,\theta_0,\theta_1)`.
+`(-\theta_3,\theta_2,\theta_0,\theta_1)` in dimension 1.
 
-The main user-facing function to evaluate theta functions is
-:func:`acb_theta_all`. This function first reduces the input `(z,\tau)` using
-the action of the Siegel modular group `\mathrm{Sp}_{2g}(\mathbb{Z})` on
-`\mathbb{C}^g\times \mathbb{H}_g`, then uses a quasi-linear algorithm to
-compute theta values on the reduced domain. At low precisions and when `\tau`
-is reasonably reduced, one may also consider using "naive algorithms" directly,
-which consist in evaluating a partial sum of the theta series. The main
-functions to do so are :func:`acb_theta_naive_fixed_ab` and
-:func:`acb_theta_naive_all`. We also provide functionality to evaluate
-derivatives of theta functions, and to evaluate Siegel modular forms in terms
-of theta functions when `g=2`.
+The main method to evaluate theta functions is
+
+.. function:: void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, int sqr, slong prec)
+
+Here *zs* should be a vector of length *nb* `\times g`, and encodes a tuple of
+*nb* elements `z_1,\ldots,z_n\in \mathbb{C}^g`. The output, placed in *th*, is
+the concatenation of the vector containing `\theta_{a,b}(z_1,\tau)` or
+`\theta_{a,b}(z_1,\tau)^2` for all `a,b\in \{0,1\}^g`, depending on whether
+*sqr* is 0 (false) or nonzero (true), followed by the same for `z_2`, etc., up
+to `z_n`. (This function is faster when *sqr* is nonzero.) These intput/output
+conventions hold for several methods in this module, even if we don't restate
+them explicitly.
+
+:func:`acb_theta_all` first reduces the input using the action of the Siegel
+modular group `\mathrm{Sp}_{2g}(\mathbb{Z})` on `\mathbb{C}^g\times
+\mathbb{H}_g`, evaluates theta functions on the reduced arguments, and finally
+applies the transformation formula for theta functions under
+`\mathrm{Sp}_{2g}(\mathbb{Z})`. The second step (evaluating theta functions)
+has a uniform, quasi-linear complexity in terms of the required precision.
+
+We also provide functionality to evaluate derivatives of theta functions, and
+to evaluate Siegel modular forms in terms of theta functions when `g=2`.
 
 The numerical functions in this module compute certified error bounds: for
 instance, if `\tau` is represented by an :type:`acb_mat_t` which is not
 certainly positive definite at the chosen working precision, the output will
-have an infinite radius. Throughout, `g` must be at least 1 (this is not
-checked.)
+have an infinite radius. Throughout, `g` must be at least 1.
 
 Main user functions
 -------------------------------------------------------------------------------
 
-.. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
+.. function:: void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, int sqr, slong prec)
 
-    Sets *th* to the vector of theta values `\theta_{a,b}(z,\tau)` or
-    `\theta_{a,b}(z,\tau)^2` for all `a,b\in \{0,1\}^g`, depending on whether
-    *sqr* is 0 (false) or nonzero (true).
+    See above. This function is faster when *sqr* is nonzero (true).
 
-.. function:: void acb_theta_naive_fixed_ab(acb_ptr th, ulong ab, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
 
-.. function:: void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+    Sets *th* to the vector of partial derivatives with respect to `z` up to
+    total order *ord* of all functions `\theta_{a,b}` for `a,b\in \{0,1\}^g` at
+    the given points `(z,\tau)`. This is a concatenation of *nb* vectors, each
+    of them being a concatenation of `2^{2g}` vectors of derivatives of an
+    individual `\theta_{a,b}`. See below for conventions on the numbering and
+    normalization of derivatives.
 
-    Assuming that *zs* is the concatenation of *nb* vectors `z` of length `g`,
-    evaluates `\theta_{a,b}(z, \tau)` using the naive algorithm, for either the
-    given value of `(a,b)` or all `(a,b)\in\{0,1\}^{2g}`. The result *th* will
-    be a concatenation of *nb* vectors of length `1` or `2^{2g}`
-    respectively. The user should ensure that `\tau` is reasonably reduced
-    before calling these functions.
+.. function:: void acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
-.. function:: void acb_theta_jet_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+    Sets *th* to the vector containing `\theta_{0,0}(z,\tau)` for all input
+    values of `z`. We stress that the intermediate evaluation step in this case
+    is not quasi-linear in terms of the required precision: rather, it is
+    polynomial with exponent `1+g/2`. Depending on `g`, the required precision,
+    and the shape of the matrix `tau`, calling `acb_theta_all` then extracting
+    the desired entries might be faster.
 
-    Sets *dth* to the partial derivatives with respect to `z` up to total order
-    *ord* of all functions `\theta_{a,b}` for `a,b\in \{0,1\}^g` at the given
-    point `(z,\tau)`, as a concatenation of `2^{2g}` vectors. (See below for
-    conventions on the numbering and normalization of derivatives.)
+.. function:: void acb_theta_jet_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
 
-.. function:: void acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+    Sets *th* to the vector or partial derivatives of `\theta_{0,0}` respect to
+    `z` up to total order *ord* at the given points `(z,\tau)`. The same
+    warning as :func:`acb_theta_00` applies.
 
-.. function:: void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong ord, slong prec)
+.. function:: void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, int sqr, slong prec)
 
-    Sets *dth* to the partial derivatives with respect to `z` up to total order
-    *ord* of `\theta_{a,b}` for the given (resp. all) `(a,b)\in \{0,1\}^g` at
-    the given point `(z,\tau)` using the naive algorithm. The user should
-    ensure that `\tau` is reasonably reduced before calling these functions.
+    Same as :func:`acb_theta_all`, but does not attempt to reduce the input
+    under the Siegel modular group. For this function and the following, it is
+    advised to only use this function when `\tau` is already known to be
+    reduced.
+
+.. function:: void acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
+
+    Same as :func:`acb_theta_jet_all`, but does not attempt to reduce the input
+    under the Siegel modular group.
+
+.. function:: void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+
+    Same as :func:`acb_theta_00`, but does not attempt to reduce the input
+    under the Siegel modular group.
+
+.. function:: void acb_theta_jet_00_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
+
+    Same as :func:`acb_theta_jet_00`, but does not attempt to reduce the input
+    under the Siegel modular group.
 
 Example of usage
 -------------------------------------------------------------------------------
@@ -509,7 +536,7 @@ called successfully.
 Naive algorithms: error bounds
 -------------------------------------------------------------------------------
 
-By [EK2023]_, for any `v\in \mathbb{R}^g` and any upper-triangular Cholesky
+By [EK2025]_, for any `v\in \mathbb{R}^g` and any upper-triangular Cholesky
 matrix `C`, and any `R` such that `R^2 \geq\max(4,\mathit{ord})`, we have
 
     .. math::
@@ -813,7 +840,7 @@ differentiated series:
 Quasi-linear algorithms: presentation
 -------------------------------------------------------------------------------
 
-We refer to [EK2023]_ for a detailed description of the quasi-linear algorithm
+We refer to [EK2025]_ for a detailed description of the quasi-linear algorithm
 implemented here. In a nutshell, the algorithm relies on the following
 duplication formula: for all `z,z'\in \mathbb{C}^g` and `\tau\in \mathbb{H}_g`,
 
@@ -874,7 +901,7 @@ well as for theta values at `z\neq 0`:
   `\theta_{a,0}(2^{k+1}t, 2^k\tau)` using square roots (second formula above),
   then `\theta_{a,0}(0, 2^k\tau)` using divisions (third formula). For a huge
   majority of such `t`, none of the values `\theta_{a,0}(2^kt, 2^k\tau)` and
-  `\theta_{a,0}(2^{k+1}t, 2^k\tau)` will be too small [EK2023]_. In practice,
+  `\theta_{a,0}(2^{k+1}t, 2^k\tau)` will be too small [EK2025]_. In practice,
   we choose `t` at random and obtain a probabilistic algorithm with a
   negligible failure probability.
 
