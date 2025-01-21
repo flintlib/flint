@@ -411,14 +411,6 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 Theta characteristics
 -------------------------------------------------------------------------------
 
-.. function:: void acb_theta_char_get_slong(slong * n, ulong a, slong g)
-
-    Sets each entry of *n* to the corresponding bit of *a*.
-
-.. function:: ulong acb_theta_char_get_a(const slong * n, slong g)
-
-    Returns the unique characteristic *a* such that `n\in 2\mathbb{Z}^g + a`.
-
 .. function:: void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g)
 
 .. function:: void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g)
@@ -455,13 +447,33 @@ Theta characteristics
     Returns true iff the given characteristics define a syzygous triple,
     i.e. they can be completed into a Göpel quadruple.
 
-Ellipsoids: types and macros
+.. function:: void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
+
+    If *ab* encodes a valid characteristic, sets *ch* to the theta
+    characteristic `(a',b')` and sets *e* to `e(\mathit{mat},a,b)` as in the
+    transformation formula. If *ab* is negative, then sets *ch* and *e* to
+    vectors of length `2^{2g}` containing this output for all characteristics
+    from 0 to `2^{2g}-1`.
+
+.. function:: void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int sqr, slong prec)
+
+    Partially applies the theta transformation formula to the given vector *th*
+    for the symplectic matrix *mat* and stores the output in *res*. This omits
+    the `\kappa`, determinant, and exponential factors from the formula. If
+    *sqr* is nonzero (true), then replaces `\zeta_8` in the formula by `i` to
+    mimic the transformation formula on squared theta values.
+
+Ellipsoids
 -------------------------------------------------------------------------------
 
-Following [DHBHS2004]_, naive algorithms will compute a partial sum of theta
-series over points `n` in the lattice `\mathbb{Z}^g` contained in certain
-ellipsoids, and finally add an error bound coming from the tail. We first
-gather methods to compute with ellipsoids themselves.
+A direct way to evaluate theta functions with rigorous is to sum enough terms
+in the exponential series and obtain an explicit error bound on its tail. We
+refer to this approach as the summation algorithms. In this module, summation
+algorithms are mainly used for low to moderate precisions due to their higher
+complexity (except in special cases such as :func:`acb_theta_00`). Following
+[DHBHS2004]_, summation algorithms will compute a partial sum of theta series
+over points `n` in the lattice `\mathbb{Z}^g` contained in certain
+ellipsoids. We first gather methods to compute with ellipsoids themselves.
 
 Fix an upper-triangular matrix `C` with positive diagonal entries (henceforth
 called a "Cholesky matrix"), a radius `R\geq 0`, a vector `v\in \mathbb{R}^g`,
@@ -483,70 +495,7 @@ radius `R` containing approximately `O(R^{g})` points.
 
     An :type:`acb_theta_eld_t` is an array of length one of type
     :type:`acb_theta_eld_struct` encoding an ellipsoid as described above,
-    permitting it to be passed by reference.
-
-The following macros are available after *E* of type :type:`acb_theta_eld_t`
-has been initialized using :func:`acb_theta_eld_init` below.
-
-.. macro:: acb_theta_eld_dim(E)
-
-    Macro returning `d`.
-
-.. macro:: acb_theta_eld_ambient_dim(E)
-
-    Macro returning `g`.
-
-The following macros are available after *E* has been initialized and then
-computed using :func:`acb_theta_eld_set` below.
-
-.. macro:: acb_theta_eld_coord(E, k)
-
-    Macro returning the common coordinate `n_k` of the points in `E`. This
-    requires `d \leq k < g`.
-
-.. macro:: acb_theta_eld_min(E)
-
-.. macro:: acb_theta_eld_mid(E)
-
-.. macro:: acb_theta_eld_max(E)
-
-    Macros returning the minimum, midpoint, and maximum of `n_{d-1}` in `E`
-    respectively.
-
-.. macro:: acb_theta_eld_nr(E)
-
-.. macro:: acb_theta_eld_nl(E)
-
-    Macros returning the number of right and left children of `E`
-    respectively.
-
-.. macro:: acb_theta_eld_rchild(E, k)
-
-.. macro:: acb_theta_eld_lchild(E, k)
-
-    Macros returning a pointer to the `k^{\text{th}}` right (resp. left) child
-    of `E` as an :type:`acb_theta_eld_t`.
-
-.. macro:: acb_theta_eld_nb_pts(E)
-
-    Macro returning the number of points contained in `E`.
-
-.. macro:: acb_theta_eld_nb_border(E)
-
-    Macro returning the number of points in the border of `E`, defined as
-    follows. If `d=1`, then it consists of the two points with `n_0` equal to
-    `m - 1` and `M + 1`, where `m` and `M` are the result of
-    :macro:`acb_theta_eld_max` and :macro:`acb_theta_eld_min` respectively. If
-    `d\geq 2`, then it is the reunion of the borders of all children of
-    `E`. This is only used for testing.
-
-.. macro:: acb_theta_eld_box(E, k)
-
-    Macro returning the smallest nonnegative integer `M_k` such that all the
-    points in `E` satisfy `|n_k|\leq M_k`. This requires `0\leq k < d`.
-
-Ellipsoids: memory management and computations
--------------------------------------------------------------------------------
+    alllowing it to be passed by reference.
 
 .. function:: void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g)
 
@@ -565,17 +514,32 @@ Ellipsoids: memory management and computations
     fit in :type:`slong`'s or if the ellipsoid is unreasonably large, returns 0
     instead and leaves *E* undefined.
 
-The following functions are available after :func:`acb_theta_eld_set` has been
-called successfully.
+The following functions are available after *E* has been initialized and then
+computed using :func:`acb_theta_eld_init` and :func:`acb_theta_eld_set`.
+
+.. function:: acb_theta_eld_nb_pts(E)
+
+    Returns the number of points contained in `E`, which is stored in the data
+    structure.
 
 .. function:: void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E)
 
     Sets *pts* to the list of all the points in `E`, as a concatenation of
     vectors of length *g*.
 
+.. function:: acb_theta_eld_nb_border(E)
+
+    Macro returning the number of points in the border of `E`, defined as
+    follows. If `d=1`, then it consists of the two points with `n_0` equal to
+    `m - 1` and `M + 1`, where `m` and `M` are the result of
+    :macro:`acb_theta_eld_max` and :macro:`acb_theta_eld_min` respectively. If
+    `d\geq 2`, then it is the reunion of the borders of all children of
+    `E`. This number is stored in the data structure.
+
 .. function:: void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E)
 
-    Sets *pts* to the list of all the points in the border of `E`.
+    Sets *pts* to the list of all the points in the border of `E`. This is only
+    used for testing.
 
 .. function:: int acb_theta_eld_contains(const acb_theta_eld_t E, slong * pt)
 
