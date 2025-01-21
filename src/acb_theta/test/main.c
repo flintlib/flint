@@ -22,6 +22,7 @@
 #include "t-char_is_even.c"
 #include "t-char_is_goepel.c"
 #include "t-char_is_syzygous.c"
+#include "t-char_shuffle.c"
 #include "t-char_table.c"
 #include "t-ctx_exp_inv.c"
 #include "t-ctx_sqr_inv.c"
@@ -32,11 +33,11 @@
 #include "t-eld_border.c"
 #include "t-eld_points.c"
 #include "t-g2_character.c"
+#include "t-g2_chi3_6.c"
+#include "t-g2_chi5.c"
 #include "t-g2_chi10.c"
 #include "t-g2_chi12.c"
 #include "t-g2_chi35.c"
-#include "t-g2_chi3_6.c"
-#include "t-g2_chi5.c"
 #include "t-g2_covariants.c"
 #include "t-g2_covariants_lead.c"
 #include "t-g2_detk_symj.c"
@@ -49,21 +50,21 @@
 #include "t-jet_00.c"
 #include "t-jet_all.c"
 #include "t-jet_all_notransform.c"
-#include "t-jet_one_notransform.c"
 #include "t-jet_compose.c"
 #include "t-jet_error.c"
 #include "t-jet_mul.c"
+#include "t-jet_one_notransform.c"
 #include "t-jet_tuples.c"
 #include "t-one_notransform.c"
+#include "t-ql_exact.c"
+#include "t-ql_lower_dim.c"
 #include "t-ql_setup.c"
 #include "t-ql_steps.c"
-#include "t-ql_lower_dim.c"
-#include "t-ql_exact.c"
 #include "t-siegel_cocycle.c"
 #include "t-siegel_is_reduced.c"
+#include "t-siegel_kappa.c"
 #include "t-siegel_reduce.c"
 #include "t-siegel_transform.c"
-#include "t-siegel_kappa.c"
 #include "t-sp2gz_decompose.c"
 #include "t-sp2gz_inv.c"
 #include "t-sp2gz_is_correct.c"
@@ -76,7 +77,6 @@
 #include "t-sum_jet_all.c"
 #include "t-sum_jet_radius.c"
 #include "t-sum_radius.c"
-#include "t-char_shuffle.c"
 
 /* Array of test functions ***************************************************/
 
@@ -93,8 +93,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_char_is_even),
     TEST_FUNCTION(acb_theta_char_is_goepel),
     TEST_FUNCTION(acb_theta_char_is_syzygous),
-    TEST_FUNCTION(acb_theta_char_table),
     TEST_FUNCTION(acb_theta_char_shuffle),
+    TEST_FUNCTION(acb_theta_char_table),
     TEST_FUNCTION(acb_theta_ctx_exp_inv),
     TEST_FUNCTION(acb_theta_ctx_sqr_inv),
     TEST_FUNCTION(acb_theta_ctx_tau_dupl),
@@ -104,11 +104,11 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_eld_border),
     TEST_FUNCTION(acb_theta_eld_points),
     TEST_FUNCTION(acb_theta_g2_character),
+    TEST_FUNCTION(acb_theta_g2_chi3_6),
+    TEST_FUNCTION(acb_theta_g2_chi5),
     TEST_FUNCTION(acb_theta_g2_chi10),
     TEST_FUNCTION(acb_theta_g2_chi12),
     TEST_FUNCTION(acb_theta_g2_chi35),
-    TEST_FUNCTION(acb_theta_g2_chi3_6),
-    TEST_FUNCTION(acb_theta_g2_chi5),
     TEST_FUNCTION(acb_theta_g2_covariants),
     TEST_FUNCTION(acb_theta_g2_covariants_lead),
     TEST_FUNCTION(acb_theta_g2_detk_symj),
@@ -121,19 +121,19 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_jet_00),
     TEST_FUNCTION(acb_theta_jet_all),
     TEST_FUNCTION(acb_theta_jet_all_notransform),
-    TEST_FUNCTION(acb_theta_jet_one_notransform),
     TEST_FUNCTION(acb_theta_jet_compose),
     TEST_FUNCTION(acb_theta_jet_error),
     TEST_FUNCTION(acb_theta_jet_mul),
+    TEST_FUNCTION(acb_theta_jet_one_notransform),
     TEST_FUNCTION(acb_theta_jet_tuples),
     TEST_FUNCTION(acb_theta_one_notransform),
+    TEST_FUNCTION(acb_theta_ql_exact),
+    TEST_FUNCTION(acb_theta_ql_lower_dim),
     TEST_FUNCTION(acb_theta_ql_setup),
     TEST_FUNCTION(acb_theta_ql_steps),
-    TEST_FUNCTION(acb_theta_ql_lower_dim),
-    TEST_FUNCTION(acb_theta_ql_exact),
     TEST_FUNCTION(acb_theta_siegel_cocycle),
     TEST_FUNCTION(acb_theta_siegel_is_reduced),
-    TEST_FUNCTION(acb_siegel_kappa),
+    TEST_FUNCTION(acb_theta_siegel_kappa),
     TEST_FUNCTION(acb_theta_siegel_reduce),
     TEST_FUNCTION(acb_theta_siegel_transform),
     TEST_FUNCTION(acb_theta_sp2gz_decompose),

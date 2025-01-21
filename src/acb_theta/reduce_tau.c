@@ -49,7 +49,7 @@ acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_
         acb_mul_onei(ipi, ipi);
         acb_mat_scalar_mul_acb(N, N, ipi, prec);
 
-        /* Set exps and nex_zs */
+        /* Set exps and new_zs */
         for (j = 0; j < nb; j++)
         {
             acb_mat_vector_mul_col(y, N, zs + j * g, prec);

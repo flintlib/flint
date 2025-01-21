@@ -58,8 +58,8 @@ void acb_siegel_cho_yinv(arb_mat_t cho, arb_mat_t yinv, const acb_mat_t tau, slo
 void acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec);
 int acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec);
 
-slong acb_siegel_kappa2(const fmpz_mat_t mat);
 slong acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec);
+slong acb_siegel_kappa2(const fmpz_mat_t mat);
 
 void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
 void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits);
@@ -85,31 +85,6 @@ void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
 void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
     int sqr, slong prec);
 
-/* Ellipsoids */
-
-void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
-void acb_theta_eld_clear(acb_theta_eld_t E);
-
-int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
-
-slong acb_theta_eld_nb_pts(const acb_theta_eld_t E);
-void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E);
-slong acb_theta_eld_nb_border(const acb_theta_eld_t E);
-void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
-int acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt);
-void acb_theta_eld_print(const acb_theta_eld_t E);
-
-/* AGM steps */
-
-void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
-void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
-
-void acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong prec);
-slong acb_theta_agm_addprec(const arb_t d);
-void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
-    arb_srcptr d0, arb_srcptr d, slong g, slong prec);
-
 /* Toolbox for derivatives */
 
 slong acb_theta_jet_nb(slong ord, slong g);
@@ -124,10 +99,32 @@ void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
 void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec);
 void acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, slong prec);
 
-void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
-    acb_srcptr dth, slong ord, slong prec);
+/* Ellipsoids */
 
-/* Context for tau, z in summation algorithms */
+void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
+void acb_theta_eld_clear(acb_theta_eld_t E);
+
+int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
+
+slong acb_theta_eld_nb_pts(const acb_theta_eld_t E);
+void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E);
+slong acb_theta_eld_nb_border(const acb_theta_eld_t E);
+void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
+int acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt);
+void acb_theta_eld_print(const acb_theta_eld_t E);
+
+void acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong prec);
+
+/* Error bounds in summation algorithms */
+
+void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec);
+void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v,
+    slong ord, slong prec);
+void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
+    const slong * n, slong prec);
+
+/* Context structures in summation algorithms */
 
 void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t x, int is_real, slong prec);
 void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr, int is_real, slong prec);
@@ -153,12 +150,6 @@ int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z
 
 /* Summation algorithms */
 
-void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec);
-void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v,
-    slong ord, slong prec);
-void acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
-void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
-    const slong * n, slong prec);
 void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv,
     slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E,
     slong ord, slong prec, acb_theta_sum_worker_t worker);
@@ -176,14 +167,15 @@ void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong 
 void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
 
-/* Reduction */
+/* AGM steps */
 
-int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N,
-    acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
-    slong nb, const acb_mat_t tau, slong prec);
+void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
+void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
+slong acb_theta_agm_addprec(const arb_t d);
+void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
+    arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-/* Quasilinear algorithms on exact input */
+/* Quasilinear algorithms on exact, reduced input */
 
 int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec);
 
@@ -193,7 +185,7 @@ int acb_theta_ql_lower_dim(acb_ptr * new_zs, acb_ptr * cofactors, slong ** pts,
 void acb_theta_ql_recombine(acb_ptr th, acb_srcptr th0, acb_srcptr cofactors,
     const slong * pts, slong nb, const arf_t err, slong fullprec,
     slong s, ulong a, int all, slong g, slong prec);
-int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts0, acb_ptr t, slong * guard, slong * easy_steps,
+int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong * easy_steps,
     acb_srcptr zs, slong nb, const acb_mat_t tau, arb_srcptr distances,
     slong nb_steps, int all, slong prec);
 void acb_theta_ql_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
@@ -202,7 +194,11 @@ void acb_theta_ql_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
 int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     const slong * pattern, int all, int shifted_prec, slong prec);
 
-/* Main functions */
+/* Main functions on reduced input */
+
+void acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
+void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
+    acb_srcptr dth, slong ord, slong prec);
 
 void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
@@ -217,6 +213,13 @@ void acb_theta_jet_one_notransform(acb_ptr th, acb_srcptr zs, slong nb,
 void acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, slong prec);
 
+/* Reduction and main functions */
+
+int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N,
+    acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
+int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
+    slong nb, const acb_mat_t tau, slong prec);
+
 void acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
 void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb,
@@ -226,7 +229,7 @@ void acb_theta_jet_00(acb_ptr th, acb_srcptr zs, slong nb,
 void acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, slong prec);
 
-/* Genus 2 specifics */
+/* Dimension 2 specifics */
 
 #define ACB_THETA_G2_COV_NB 26
 

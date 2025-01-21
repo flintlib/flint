@@ -308,12 +308,12 @@ acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t t
 
     res = acb_theta_ql_nb_steps(pattern, tau, prec);
 
-    flint_printf("(all_notransform) pattern:");
+    /* flint_printf("(all_notransform) pattern:");
     for (j = 0; j < g; j++)
     {
         flint_printf(" %wd", pattern[j]);
     }
-    flint_printf("\n");
+    flint_printf("\n"); */
 
     if (res && sqr) /* duplication formula means one step less */
     {
