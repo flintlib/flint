@@ -463,7 +463,7 @@ Theta characteristics
     *sqr* is nonzero (true), then replaces `\zeta_8` in the formula by `i` to
     mimic the transformation formula on squared theta values.
 
-Ellipsoids
+Ellipsoids in summation algorithms
 -------------------------------------------------------------------------------
 
 A direct way to evaluate theta functions with rigorous is to sum enough terms
@@ -473,7 +473,7 @@ algorithms are mainly used for low to moderate precisions due to their higher
 complexity (except in special cases such as :func:`acb_theta_00`). Following
 [DHBHS2004]_, summation algorithms will compute a partial sum of theta series
 over points `n` in the lattice `\mathbb{Z}^g` contained in certain
-ellipsoids. We first gather methods to compute with ellipsoids themselves.
+ellipsoids. First, we gather methods to compute with ellipsoids themselves.
 
 Fix an upper-triangular matrix `C` with positive diagonal entries (henceforth
 called a "Cholesky matrix"), a radius `R\geq 0`, a vector `v\in \mathbb{R}^g`,
@@ -550,6 +550,71 @@ computed using :func:`acb_theta_eld_init` and :func:`acb_theta_eld_set`.
 
     Prints a faithful description of `E`. This may be unwieldy in high
     dimensions.
+
+Context structures in summation algorithms
+-------------------------------------------------------------------------------
+
+The summation algorithms only involve exponential terms in `\tau` and
+`z`. Sometimes, especially in the setting of the quasi-linear algorithms below,
+these exponentials can be computed once and for all at high precision, then
+used for several calls to the summation functions. This section introduces
+context structures to make these manipulations easier.
+
+.. type:: acb_theta_ctx_tau_struct
+
+.. type:: acb_theta_ctx_tau_t
+
+    An :type:`acb_theta_ctx_tau_t` is an array of length one of type
+    :type:`acb_theta_ctx_tau_struct` containing all the necessary data to run
+    the summation algorithm on a given matrix `\tau\in\mathcal{H}_g`. In
+    particular, it contains a matrix `exp_tau_div_4` whose `(j,k)` entry (when
+    `j\leq k`) is `\exp(\pi i (1 + \delta_{j,k}) \tau_{j,k}/4)`.
+
+.. type:: acb_theta_ctx_z_struct
+
+.. type:: acb_theta_ctx_z_t
+
+    An :type:`acb_theta_ctx_z_t` is an array of length one of type
+    :type:`acb_theta_ctx_tau_struct` containing all the necessary data to run
+    the summation algorithm on a given vector `z` (provided that an element of
+    type :type:`acb_theta_ctx_tau_t` is also given.) In particular, it contains
+    the values `\exp(2\pi i z_j)` for all `1\leq j\leq g`.
+
+.. function:: void acb_theta_ctx_tau_init(acb_theta_ctx_tau_t ctx, int allow_shift, slong g)
+
+    Initializes *ctx* for use in dimension *g*. If *allow_shift* is nonzero
+    (true), then additional fields in *ctx* are initialized to allow for the
+    evaluation of theta functions `\theta_{a,0}` for nonzero `a`.
+
+.. function:: void acb_theta_ctx_tau_clear(acb_theta_ctx_tau_t ctx)
+
+    Clears *ctx*.
+
+.. function:: void acb_theta_ctx_z_init(acb_theta_ctx_z_t ctx, slong g)
+
+    Initializes *ctx* for use in dimension *g*.
+
+.. function:: void acb_theta_ctx_z_clear(acb_theta_ctx_z_t ctx)
+
+    Clears *ctx*.
+
+.. function:: acb_theta_ctx_z_struct * acb_theta_ctx_z_vec_init(slong nb, slong g)
+
+    Returns a pointer to a vector of *nb* initialized elements of type
+    :type:`acb_theta_ctx_z_struct`.
+
+.. function:: void acb_theta_ctx_z_vec_clear(acb_theta_ctx_z_struct * vec, slong nb)
+
+    Clears the elements of type :type:`acb_theta_ctx_z_struct` pointed to by
+    *vec* as well as the pointer itself.
+
+.. function:: void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t x, int is_real, slong prec)
+
+    Given a complex value *x* and given *exp* containing `\exp(\pi i x)`, sets
+    *exp_inv* to `\exp(-\pi i x)`. This is computed by complex conjugation from
+    *exp* if *is_real* is nonzero (true). Otherwise, it is computed by
+    inverting *exp*, except if the result is indeterminate, in which case we
+    recompute *exp_inv* from *x* directly.
 
 Naive algorithms: error bounds
 -------------------------------------------------------------------------------
