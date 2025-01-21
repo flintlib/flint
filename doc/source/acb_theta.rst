@@ -616,7 +616,68 @@ context structures to make these manipulations easier.
     inverting *exp*, except if the result is indeterminate, in which case we
     recompute *exp_inv* from *x* directly.
 
-Naive algorithms: error bounds
+.. function:: void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr, int is_real, slong prec)
+
+    Given *inv* and *sqr* containing complex values `\exp(-\pi i x)` and
+    `\exp(2\pi i x)` respectively, sets *sqr_inv* to `\exp(-2\pi i x)`. This
+    uses complex conjugation from *sqr* if *is_real* is nonzero (true), and
+    otherwise a complex squaring from *inv*.
+
+.. function:: void acb_theta_ctx_tau_set(acb_theta_ctx_tau_t ctx, const acb_mat_t tau, slong prec)
+
+    Computes and stores in *ctx* the required data for the input matrix
+    `\tau`. The dimensions must match.
+
+.. function:: void acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec)
+
+    Modifies *ctx* in place to correspond to the matrix `2\tau` instead of
+    `\tau`. This is much cheaper than calling :func:`acb_theta_ctx_tau_set`
+    again.
+
+.. function:: void acb_theta_ctx_z_set(acb_theta_ctx_z_t ctx, acb_srcptr z, const acb_theta_ctx_tau_t ctx_tau, slong prec)
+
+    Computes and stores in *ctx* the required data for the complex vector
+    *z*. Here *ctx_tau* should contain context data for the matrix `\tau`. The
+    dimensions must match.
+
+.. function:: void acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
+
+    Modifies *ctx* in place to correspond to the pair `(2z,2\tau)` instead of
+    `(z,\tau)`. This is much cheaper than calling :func:`acb_theta_ctx_z_set`
+    again.
+
+.. function:: void acb_theta_ctx_z_add_real(acb_theta_ctx_z_t res, const acb_theta_ctx_z_t ctx, const acb_theta_ctx_z_t ctx_real, slong prec)
+
+    Assuming that *ctx* and *ctx_real* correspond to pairs `(z,\tau)` and `(t,
+    \tau)` respectively where `t` is a real vector, sets *res* to a valid
+    context for the pair `(z + t,\tau)`.
+
+.. function:: void acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t ctx, const acb_theta_ctx_tau_t ctx_tau, ulong a, slong prec)
+
+    Assuming that *ctx* and *ctx_tau* correspond to a pair `(z,\tau)`, and that
+    *allow_shift* was set to true when computing *ctx_tau*, sets *res* to a
+    valid context for the pair `(z + \tau \tfrac{a}{2},\tau)` and sets `c` to
+    the complex value such that for all `0\leq b\leq 2^g-1`,
+
+    .. math::
+
+        \theta_{a,b}(z,\tau) = c\theta_{0,b}(z + \tau\tfrac{a}{2},\tau).
+
+    We have `c = \exp(\pi i a^T z + \pi i a^T\tau a/4)`.
+
+.. function:: void acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slong nb, slong prec)
+
+    Given a vector *vec* of valid contexts for pairs
+    `(z_1,\tau),\ldots,(z_n,\tau)`, sets *v* to a valid ellipsoid center for
+    use in :func:`acb_theta_eld_set` when running the summation algorithm for
+    all these pairs.
+
+.. function:: int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z_t ctx2)
+
+    Returns true iff the data contained in *ctx1* and *ctx2* overlap in the
+    sense of :func:`acb_overlaps`. This is only used for testing.
+
+Summation algorithms
 -------------------------------------------------------------------------------
 
 By [EK2025]_, for any `v\in \mathbb{R}^g` and any upper-triangular Cholesky
