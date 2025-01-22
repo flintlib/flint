@@ -612,10 +612,15 @@ Characteristic polynomial
 .. function:: int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
-    Computes the characteristic polynomial using a default
-    algorithm choice. The
-    underscore method assumes that *res* is a preallocated
-    array of `n + 1` coefficients.
+    Computes the characteristic polynomial using an algorithm choice
+    which defaults to :func:`_gr_mat_charpoly_generic` but may be overridden
+    by specific rings for performance. The underscore method assumes that *res*
+    is a preallocated array of `n + 1` coefficients.
+
+.. function:: int _gr_mat_charpoly_generic(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_generic(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Computes the characteristic polynomial using a generic algorithm choice.
 
 .. function:: int _gr_mat_charpoly_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_berkowitz(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
