@@ -55,10 +55,29 @@ This module also provides functionality to evaluate derivatives of theta
 functions, and to evaluate Siegel modular forms in terms of theta functions
 when `g=2`.
 
-The numerical functions in this module compute certified error bounds: for
-instance, if `\tau` is represented by an :type:`acb_mat_t` which is not
-certainly positive definite at the chosen working precision, the output will
-have an infinite radius. Throughout, `g` must be at least 1.
+We conclude this presentation with a word on error bounds and the argument
+*prec*. Barring unexpected cancellations, the "expected" absolute value of
+`\theta_{a,b}(z,\tau)` is
+
+    .. math::
+
+        \left|\theta_{a,b}(z,\tau)\right| \approx \exp(\pi y^T Y^{-1} y) \exp(- d^2)
+
+where
+
+- `Y` and `y` denote the imaginary parts of `\tau` and `z` respectively,
+- `d` denotes the distance between the point `v = -Y^{-1}y \in \R^g` and the
+  shifted lattice `\Z^g + \tfrac{a}{2} \subset \R^g` for the Euclidean norm
+  given by the Gram matrix `\pi Y`.
+
+In most cases, when evaluating theta functions at precision *prec*, the
+expected error bound on the output should be of the order of `\exp(\pi y^Y
+Y^{-1} y) \cdot 2^{-\mathit{prec}}`. This prevents unreasonable computations
+when `y` is very far from zero. Some functions also take the factor
+`\exp(-d^2)` into account. In any case, the numerical functions in this module
+always compute certified error bounds: for instance, if `\tau` is represented
+by an :type:`acb_mat_t` which is not certainly positive definite at the chosen
+working precision, the output will have an infinite radius.
 
 Main user functions
 -------------------------------------------------------------------------------
@@ -190,8 +209,8 @@ we use the relation
         \theta_{a,b}(z,\tau) = \exp(\pi i a^T (z + \tfrac b2) + \pi i a^T\tau a/4) \theta_{0,b}(z + \tau\tfrac{a}{2},\tau)
 
 to avoid summing over `\mathbb{Z}^g + \tfrac{a}{2}` with a nonzero `a`. In
-order to make an ellipsoid appear in the sum defining `\theta_{0,0}(z,\tau)`,
-we can write:
+order to choose the right ellipsoid for the sum defining
+`\theta_{0,0}(z,\tau)`, we write:
 
     .. math::
 
@@ -206,22 +225,27 @@ where `Y` and `y` denote the imaginary parts of `tau` and `z` respectively, and
         \widetilde{\theta}_{a,b}(z,\tau) = \exp(-\pi y^T Y^{-1} y) \theta_{a,b}(z,\tau).
 
 For a given `\tau`, the functions `\widetilde{\theta}_{a,b}(\cdot,\tau)` are no
-longer holomorphic on `\mathbb{C}^g`, but are uniformly bounded. The center of
-the ellipsoid in the summation algorithm will be `v = -Y^{-1}y`. We can also write
+longer holomorphic on `\mathbb{C}^g`, but are uniformly bounded. As a rule of
+thumb, when calling functions such as :func:`acb_theta_all` at a working
+precision *prec*, the absolute error bound on the output is expected to be
+`2^{-\mathit{prec}} \exp(-\pi y^T Y^{-1} y)`.
+
+The center of the ellipsoid in the summation algorithm will be `v =
+-Y^{-1}y`. We can also write
 
     .. math::
 
         \lVert n + Y^{-1}y \rVert_\tau^2 = \lVert C (n + v) \rVert^2
 
 where `C` denotes an upper-triangular Cholesky matrix for `\pi Y` and `\lVert
-\cdot\rVert` denotes the usual Euclidean norm. By [EK2025]_, for any `w\in
+\cdot\rVert` denotes the usual Euclidean norm. By [EK2025]_, for any `v\in
 \mathbb{R}^g` and any upper-triangular Cholesky matrix `C`, any
 `\mathit{ord}\geq 0`, and any `R` such that `R^2 \geq\max(4,\mathit{ord})`, we
 have
 
     .. math::
 
-        \sum_{n\in C\mathbb{Z}^g + v,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
+        \sum_{n\in C\mathbb{Z}^g + Cv,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
         \leq 2^{2g+2} R^{g-1+p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})
 
 where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of
@@ -231,10 +255,10 @@ precision. (In order to evaluate theta functions, we set *ord* to zero; nonzero
 values will be useful when evaluating derivatives.)
 
 The third topic is how to adapt the summation algorithms to evaluate
-derivatives of theta functions. We only consider the successive partial
-derivatives of `\theta_{a,b}(z,\tau)` with respect to the `g` coordinates of
-`z`, because derivatives with respect to `\tau` are accounted for by the heat
-equation
+derivatives of theta functions. In this module, we only consider the successive
+partial derivatives of `\theta_{a,b}(z,\tau)` with respect to the `g`
+coordinates of `z`, because derivatives with respect to `\tau` are accounted
+for by the heat equation
 
     .. math::
 
@@ -265,11 +289,11 @@ differentiated series:
         e^{\pi i n^T \tau n + 2\pi i n^T (z + \tfrac b2)}.
 
 Looking at the absolute value of each term in the sum leads to considering
-partial sums over ellipsoids, too, with the parameter *ord* in the above upper
-bound.
+partial sums over ellipsoids, too, and use the above upper bound with the
+nonzero parameter *ord*.
 
 Fourth, we briefly explain how the quasi-linear algorithm to evaluate theta
-functions works; we refer to [EK2025]_ for more details. The algorithm relies
+functions works, referring to [EK2025]_ for more details. The algorithm relies
 on the following duplication formula: for all `z,z'\in \mathbb{C}^g` and
 `\tau\in \mathbb{H}_g`,
 
