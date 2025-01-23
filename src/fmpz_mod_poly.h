@@ -866,15 +866,10 @@ void _fmpz_mod_poly_split_rabin(fmpz_mod_poly_t a, fmpz_mod_poly_t b,
 
 /* Characteristic polynomial and minimal polynomial */
 
-void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t p,
+void _fmpz_mod_mat_charpoly(fmpz * p,
                              const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE void fmpz_mod_mat_charpoly(fmpz_mod_poly_t p,
-                              const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_mat_charpoly_berkowitz(p, M, ctx);
-}
-
+void fmpz_mod_mat_charpoly(fmpz_mod_poly_t p,
+                              const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t M,
                                                      const fmpz_mod_ctx_t ctx);
