@@ -172,7 +172,7 @@ slong acb_theta_agm_addprec(const arb_t d);
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-/* Quasilinear algorithms on exact input */
+/* Quasilinear algorithms on exact, reduced input */
 
 int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec);
 
@@ -191,7 +191,7 @@ void acb_theta_ql_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
 int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     const slong * pattern, int all, int shifted_prec, slong prec);
 
-/* Main functions without reduction */
+/* Main functions on reduced input */
 
 void acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
 void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
@@ -210,7 +210,7 @@ void acb_theta_jet_one_notransform(acb_ptr th, acb_srcptr zs, slong nb,
 void acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, slong prec);
 
-/* Main functions */
+/* Reduction and main functions */
 
 int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N,
     acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
@@ -226,7 +226,7 @@ void acb_theta_jet_00(acb_ptr th, acb_srcptr zs, slong nb,
 void acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, slong prec);
 
-/* Genus 2 specifics */
+/* Dimension 2 specifics */
 
 #define ACB_THETA_G2_COV_NB 26
 
