@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -23,7 +24,9 @@ void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
 {
     gr_ctx_t gr_ctx;
     _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
-    GR_MUST_SUCCEED(_gr_mat_charpoly_berkowitz(cp, (const gr_mat_struct *) mat, gr_ctx));
+
+    if (mat->r < 16 || _gr_mat_charpoly_danilevsky(cp, (const gr_mat_struct *) mat, gr_ctx) != GR_SUCCESS)
+        GR_MUST_SUCCEED(_gr_mat_charpoly_berkowitz(cp, (const gr_mat_struct *) mat, gr_ctx));
 }
 
 void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t cp,
