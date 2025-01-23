@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-adjugate.c"
+#include "t-charpoly.c"
 #include "t-charpoly_danilevsky.c"
 #include "t-charpoly_faddeev_bsgs.c"
 #include "t-charpoly_faddeev.c"
@@ -61,6 +62,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_mat_adjugate),
+    TEST_FUNCTION(gr_mat_charpoly),
     TEST_FUNCTION(gr_mat_charpoly_danilevsky),
     TEST_FUNCTION(gr_mat_charpoly_faddeev_bsgs),
     TEST_FUNCTION(gr_mat_charpoly_faddeev),
