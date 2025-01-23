@@ -351,20 +351,6 @@ Reduced row echelon form
     form via LU decomposition and then solving an additional
     triangular system.
 
-.. function:: slong fq_zech_mat_reduce_row(fq_zech_mat_t A, slong * P, slong * L, slong n, const fq_zech_ctx_t ctx)
-
-    Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
-    form. However those rows may not be in order. The entry `i` of the array
-    `P` is the row of `A` which has a pivot in the `i`-th column. If no such
-    row exists, the entry of `P` will be `-1`. The function returns the column
-    in which the `n`-th row has a pivot after reduction. This will always be
-    chosen to be the first available column for a pivot from the left. This
-    information is also updated in `P`. Entry `i` of the array `L` contains the
-    number of possibly nonzero columns of `A` row `i`. This speeds up reduction
-    in the case that `A` is chambered on the right. Otherwise the entries of
-    `L` can all be set to the number of columns of `A`. We require the entries
-    of `L` to be monotonic increasing.
-
 
 Triangular solving
 --------------------------------------------------------------------------------

@@ -859,7 +859,8 @@ with the intended number of rows and columns.
 Helper functions for reduction
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+.. function:: int gr_mat_reduce_row_generic(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+              int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
 
     Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
     form. However those rows may not be in order. The entry `i` of the array
@@ -872,6 +873,9 @@ Helper functions for reduction
     in the case that `A` is chambered on the right. Otherwise the entries of
     `L` can all be set to the number of columns of `A`. We require the entries
     of `L` to be monotonic increasing.
+
+    By default the *generic* version is called; specific rings
+    can overload this (typically to implement delayed canonicalisation).
 
 
 Test functions
