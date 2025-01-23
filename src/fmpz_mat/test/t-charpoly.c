@@ -24,8 +24,10 @@ TEST_FUNCTION_START(fmpz_mat_charpoly, state)
         fmpz_mat_t A, B, C, D;
         fmpz_poly_t f, g;
 
-        m = n_randint(state, 4);
+        m = n_randint(state, 5);
         n = m;
+
+        m = n = 4;
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, m, n);
@@ -33,6 +35,9 @@ TEST_FUNCTION_START(fmpz_mat_charpoly, state)
         fmpz_mat_init(D, n, n);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
+
+        fmpz_poly_randtest(f, state, 10, 100);
+        fmpz_poly_randtest(g, state, 10, 100);
 
         fmpz_mat_randtest(A, state, 10);
         fmpz_mat_randtest(B, state, 10);
@@ -68,7 +73,7 @@ TEST_FUNCTION_START(fmpz_mat_charpoly, state)
         fmpz_mat_t A, B;
         fmpz_poly_t f, g;
 
-        m = n_randint(state, 4);
+        m = n_randint(state, 5);
         n = m;
 
         fmpz_init(c);
@@ -76,6 +81,9 @@ TEST_FUNCTION_START(fmpz_mat_charpoly, state)
         fmpz_mat_init(B, m, n);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
+
+        fmpz_poly_randtest(f, state, 10, 100);
+        fmpz_poly_randtest(g, state, 10, 100);
 
         fmpz_mat_randtest(A, state, 10);
         fmpz_mat_set(B, A);
