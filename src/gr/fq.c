@@ -681,6 +681,13 @@ _gr_fq_mat_charpoly(fq_struct * res, const fq_mat_t mat, gr_ctx_t ctx)
         return _gr_mat_charpoly_danilevsky(res, (const gr_mat_struct *) mat, ctx);
 }
 
+int
+_gr_fq_mat_reduce_row(long * column, fq_mat_t mat, slong * P, slong * L, slong n, gr_ctx_t ctx)
+{
+    *column = fq_mat_reduce_row(mat, P, L, n, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 int _fq_methods_initialized = 0;
 
 gr_static_method_table _fq_methods;
@@ -770,6 +777,7 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_mat_mul},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fq_mat_charpoly},
+    {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) _gr_fq_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };
 
