@@ -99,16 +99,8 @@ void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt);
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
-/* AGM steps */
-
-void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
-void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
-
 void acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
-slong acb_theta_agm_addprec(const arb_t d);
-void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
-    arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
 /* Toolbox for derivatives */
 
@@ -172,6 +164,14 @@ void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong 
 void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
 
+/* AGM steps */
+
+void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
+void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
+slong acb_theta_agm_addprec(const arb_t d);
+void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
+    arb_srcptr d0, arb_srcptr d, slong g, slong prec);
+
 /* Quasilinear algorithms on exact input */
 
 int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec);
@@ -182,7 +182,7 @@ int acb_theta_ql_lower_dim(acb_ptr * new_zs, acb_ptr * cofactors, slong ** pts,
 void acb_theta_ql_recombine(acb_ptr th, acb_srcptr th0, acb_srcptr cofactors,
     const slong * pts, slong nb, const arf_t err, slong fullprec,
     slong s, ulong a, int all, slong g, slong prec);
-int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts0, acb_ptr t, slong * guard, slong * easy_steps,
+int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong * easy_steps,
     acb_srcptr zs, slong nb, const acb_mat_t tau, arb_srcptr distances,
     slong nb_steps, int all, slong prec);
 void acb_theta_ql_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
