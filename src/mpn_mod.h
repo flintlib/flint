@@ -212,6 +212,7 @@ int mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, co
 int mpn_mod_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
 int mpn_mod_mat_det(nn_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 int _mpn_mod_mat_charpoly(nn_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
+int mpn_mod_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx);
 
 /* Polynomial algorithms */
 

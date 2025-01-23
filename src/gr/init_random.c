@@ -16,6 +16,7 @@
 #include "long_extras.h"
 #include "mpoly.h"
 #include "gr.h"
+#include "mpn_mod.h"
 
 /* For random composite rings, some base rings that don't require
    memory allocation. */
@@ -80,7 +81,7 @@ gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t t;
 
-    switch (n_randint(state, 4))
+    switch (n_randint(state, 5))
     {
         case 0:
             gr_ctx_init_nmod8(ctx, n_randtest(state) % 255 + 1);
@@ -98,6 +99,16 @@ gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_fmpz_mod(ctx, t);
             fmpz_clear(t);
             break;
+        case 4:
+            while (1)
+            {
+                gr_ctx_init_mpn_mod_randtest(ctx, state);
+                if (MPN_MOD_CTX_NLIMBS(ctx) <= 5)
+                    break;
+                gr_ctx_clear(ctx);
+            }
+            break;
+
     }
 }
 

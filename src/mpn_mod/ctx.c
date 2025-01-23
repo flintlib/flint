@@ -134,6 +134,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_MAT_LU,          (gr_funcptr) mpn_mod_mat_lu},
     {GR_METHOD_MAT_DET,         (gr_funcptr) mpn_mod_mat_det},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _mpn_mod_mat_charpoly},
+    {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) mpn_mod_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };
 #if defined(__GNUC__)
