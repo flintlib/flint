@@ -27,8 +27,6 @@ TEST_FUNCTION_START(fmpz_mat_charpoly, state)
         m = n_randint(state, 5);
         n = m;
 
-        m = n = 4;
-
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, m, n);
         fmpz_mat_init(C, m, m);
