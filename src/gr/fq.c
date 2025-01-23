@@ -682,7 +682,7 @@ _gr_fq_mat_charpoly(fq_struct * res, const fq_mat_t mat, gr_ctx_t ctx)
 }
 
 int
-_gr_fq_mat_reduce_row(long * column, fq_mat_t mat, slong * P, slong * L, slong n, gr_ctx_t ctx)
+_gr_fq_mat_reduce_row(slong * column, fq_mat_t mat, slong * P, slong * L, slong n, gr_ctx_t ctx)
 {
     *column = fq_mat_reduce_row(mat, P, L, n, FQ_CTX(ctx));
     return GR_SUCCESS;
