@@ -1033,6 +1033,13 @@ _gr_fmpz_mat_det(fmpz_t res, const fmpz_mat_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_mat_charpoly(fmpz * res, const fmpz_mat_t mat, const gr_ctx_t ctx)
+{
+    _fmpz_mat_charpoly(res, mat);
+    return GR_SUCCESS;
+}
+
 
 
 
@@ -1160,6 +1167,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpz_roots_gr_poly_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpz_mat_det},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fmpz_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 

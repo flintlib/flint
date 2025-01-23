@@ -47,6 +47,7 @@ typedef int ((*gr_method_mat_binary_op_with_flag)(gr_mat_t, const gr_mat_t, cons
 typedef int ((*gr_method_mat_pivot_op)(slong *, gr_mat_t, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_mat_diagonalization_op)(gr_vec_t, gr_mat_t, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
 typedef int ((*gr_method_mat_lu_op)(slong *, slong *, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
+typedef int ((*gr_method_mat_reduce_row_op)(slong *, gr_mat_t, slong *, slong *, slong, gr_ctx_ptr));
 
 #define GR_MAT_UNARY_OP_GET_SCALAR(ctx, NAME) (((gr_method_mat_unary_op_get_scalar *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_UNARY_OP(ctx, NAME) (((gr_method_mat_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -55,6 +56,7 @@ typedef int ((*gr_method_mat_lu_op)(slong *, slong *, gr_mat_t, const gr_mat_t, 
 #define GR_MAT_PIVOT_OP(ctx, NAME) (((gr_method_mat_pivot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_DIAGONALIZATION_OP(ctx, NAME) (((gr_method_mat_diagonalization_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_LU_OP(ctx, NAME) (((gr_method_mat_lu_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_MAT_REDUCE_ROW_OP(ctx, NAME) (((gr_method_mat_reduce_row_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
 void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
@@ -294,6 +296,9 @@ WARN_UNUSED_RESULT int gr_mat_charpoly_gauss(gr_poly_t cp, const gr_mat_t mat, g
 WARN_UNUSED_RESULT int _gr_mat_charpoly_householder(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_charpoly_householder(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_mat_charpoly_generic(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_charpoly_generic(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx);
 
@@ -302,6 +307,7 @@ WARN_UNUSED_RESULT int gr_mat_hessenberg_gauss(gr_mat_t res, const gr_mat_t mat,
 WARN_UNUSED_RESULT int gr_mat_hessenberg_householder(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_hessenberg(const gr_mat_t mat, gr_ctx_t ctx);
 
+int gr_mat_reduce_row_generic(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx);
 int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx);
 int gr_mat_apply_row_similarity(gr_mat_t A, slong r, gr_ptr d, gr_ctx_t ctx);
 int gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx);
@@ -342,6 +348,7 @@ WARN_UNUSED_RESULT int gr_mat_norm_frobenius(gr_ptr res, const gr_mat_t mat, gr_
 void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_det(gr_method_mat_unary_op_get_scalar det_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void gr_mat_test_charpoly(gr_method_mat_unary_op_get_scalar charpoly_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_nonsingular_solve_tril(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_nonsingular_solve_triu(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);

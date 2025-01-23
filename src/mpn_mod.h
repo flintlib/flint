@@ -211,6 +211,7 @@ int mpn_mod_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_ma
 int mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const gr_mat_t A_in, int rank_check, gr_ctx_t ctx);
 int mpn_mod_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
 int mpn_mod_mat_det(nn_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+int _mpn_mod_mat_charpoly(nn_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 
 /* Polynomial algorithms */
 

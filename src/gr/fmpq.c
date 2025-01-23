@@ -13,6 +13,7 @@
 #include "gmpcompat.h"
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
+#include "fmpz_mat.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
@@ -1016,6 +1017,39 @@ _gr_fmpq_mat_det(fmpq_t res, const fmpq_mat_t x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* _fmpq_mat_charpoly returns fmpq_poly */
+int
+_gr_fmpq_mat_charpoly(fmpq * res, const fmpq_mat_t mat, gr_ctx_t ctx)
+{
+    fmpz_mat_t zmat;
+    fmpz_t den;
+    slong i, n = mat->r;
+
+    fmpz_mat_init(zmat, n, n);
+    fmpz_init(den);
+
+    fmpq_mat_get_fmpz_mat_matwise(zmat, den, mat);
+    _fmpz_mat_charpoly((fmpz *) res, zmat);
+
+    fmpz_swap(fmpq_numref(res + n), ((fmpz *) res) + n);
+    fmpz_one(fmpq_denref(res + n));
+
+    for (i = n - 1; i >= 0; i--)
+    {
+        fmpz_swap(fmpq_numref(res + i), ((fmpz *) res) + i);
+        fmpz_mul(fmpq_denref(res + i), fmpq_denref(res + i + 1), den);
+    }
+
+    if (!fmpz_is_one(den))
+        for (i = 0; i < n; i++)
+            fmpq_canonicalise(res + i);
+
+    fmpz_mat_clear(zmat);
+    fmpz_clear(den);
+
+    return GR_SUCCESS;
+}
+
 int _fmpq_methods_initialized = 0;
 
 gr_static_method_table _fmpq_methods;
@@ -1108,6 +1142,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpq_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpq_mat_det},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fmpq_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 

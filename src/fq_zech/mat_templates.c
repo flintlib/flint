@@ -63,7 +63,6 @@
 #include "fq_mat_templates/randtril.c"
 #include "fq_mat_templates/randtriu.c"
 #include "fq_mat_templates/rank.c"
-#include "fq_mat_templates/reduce_row.c"
 #include "fq_mat_templates/rref.c"
 #include "fq_mat_templates/set.c"
 #include "fq_mat_templates/set_fmpz_mod_mat.c"

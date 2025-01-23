@@ -612,10 +612,15 @@ Characteristic polynomial
 .. function:: int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
-    Computes the characteristic polynomial using a default
-    algorithm choice. The
-    underscore method assumes that *res* is a preallocated
-    array of `n + 1` coefficients.
+    Computes the characteristic polynomial using an algorithm choice
+    which defaults to :func:`_gr_mat_charpoly_generic` but may be overridden
+    by specific rings for performance. The underscore method assumes that *res*
+    is a preallocated array of `n + 1` coefficients.
+
+.. function:: int _gr_mat_charpoly_generic(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_generic(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Computes the characteristic polynomial using a generic algorithm choice.
 
 .. function:: int _gr_mat_charpoly_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_berkowitz(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
@@ -854,7 +859,8 @@ with the intended number of rows and columns.
 Helper functions for reduction
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+.. function:: int gr_mat_reduce_row_generic(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+              int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
 
     Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
     form. However those rows may not be in order. The entry `i` of the array
@@ -867,6 +873,9 @@ Helper functions for reduction
     in the case that `A` is chambered on the right. Otherwise the entries of
     `L` can all be set to the number of columns of `A`. We require the entries
     of `L` to be monotonic increasing.
+
+    By default the *generic* version is called; specific rings
+    can overload this (typically to implement delayed canonicalisation).
 
 
 Test functions
@@ -890,6 +899,11 @@ on each test iteration, otherwise the given ring is tested.
 
     Tests the given function ``det_impl`` for correctness as an implementation
     of :func:`gr_mat_det`.
+
+.. function:: void gr_mat_test_charpoly(gr_method_mat_unary_op_get_scalar charpoly_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``charpoly_impl`` for correctness as an implementation
+    of :func:`_gr_mat_charpoly`.
 
 .. function:: void gr_mat_test_nonsingular_solve_tril(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
               void gr_mat_test_nonsingular_solve_triu(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)

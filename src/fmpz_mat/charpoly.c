@@ -173,6 +173,7 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
         }
 
         fmpz_init_set_ui(m, 1);
+        _fmpz_vec_zero(rop, n + 1);
 
         for ( ; (slong) fmpz_bits(m) < bound; )
         {

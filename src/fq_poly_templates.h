@@ -1028,10 +1028,6 @@ char * TEMPLATE(T, poly_get_str)(const TEMPLATE(T, poly_t) poly,
 
 /* Characteristic polynomial ************************************************/
 
-
-void TEMPLATE(T, mat_charpoly_danilevsky) (TEMPLATE(T, poly_t) p,
-                      const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
-
 void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
                        const TEMPLATE(T, mat_t) M, const TEMPLATE(T, ctx_t) ctx);
 
