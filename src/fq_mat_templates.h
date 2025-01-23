@@ -339,7 +339,7 @@ void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
  * void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
  *                          TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
  * {
- *   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
+ *   TEMPLATE(T, mat_charpoly) (p, A, ctx);
  * }
  */
 

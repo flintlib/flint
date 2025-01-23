@@ -487,11 +487,6 @@ Characteristic polynomial
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_mat_charpoly_danilevsky(fq_zech_poly_t p, const fq_zech_mat_t M, const fq_zech_ctx_t ctx)
-
-    Compute the characteristic polynomial `p` of the matrix `M`. The matrix
-    is assumed to be square.
-
 .. function:: void fq_zech_mat_charpoly(fq_zech_poly_t p, const fq_zech_mat_t M, const fq_zech_ctx_t ctx)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
