@@ -354,23 +354,6 @@ LU decomposition
     will abandon the output matrix in an undefined state and return 0
     if `A` is detected to be rank-deficient.
 
-    This function calls ``fq_nmod_mat_lu_recursive``.
-
-.. function:: slong fq_nmod_mat_lu_classical(slong * P, fq_nmod_mat_t A, int rank_check, const fq_nmod_ctx_t ctx)
-
-    Computes a generalised LU decomposition `LU = PA` of a given
-    matrix `A`, returning the rank of `A`. The behavior of this
-    function is identical to that of ``fq_nmod_mat_lu``. Uses Gaussian
-    elimination.
-
-.. function:: slong fq_nmod_mat_lu_recursive(slong * P, fq_nmod_mat_t A, int rank_check, const fq_nmod_ctx_t ctx)
-
-    Computes a generalised LU decomposition `LU = PA` of a given
-    matrix `A`, returning the rank of `A`. The behavior of this
-    function is identical to that of ``fq_nmod_mat_lu``. Uses recursive
-    block decomposition, switching to classical Gaussian elimination
-    for sufficiently small blocks.
-
 
 Reduced row echelon form
 --------------------------------------------------------------------------------
@@ -412,33 +395,6 @@ Triangular solving
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
-.. function:: void fq_nmod_mat_solve_tril_classical(fq_nmod_mat_t X, const fq_nmod_mat_t L, const fq_nmod_mat_t B, int unit, const fq_nmod_ctx_t ctx)
-
-    Sets `X = L^{-1} B` where `L` is a full rank lower triangular
-    square matrix. If ``unit`` = 1, `L` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed. Uses forward substitution.
-
-.. function:: void fq_nmod_mat_solve_tril_recursive(fq_nmod_mat_t X, const fq_nmod_mat_t L, const fq_nmod_mat_t B, int unit, const fq_nmod_ctx_t ctx)
-
-    Sets `X = L^{-1} B` where `L` is a full rank lower triangular
-    square matrix. If ``unit`` = 1, `L` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed.
-
-    Uses the block inversion formula
-
-    .. math::
-        \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
-        \begin{pmatrix} X \\ Y \end{pmatrix} =
-        \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-
-
-    to reduce the problem to matrix multiplication and triangular
-    solving of smaller systems.
-
 .. function:: void fq_nmod_mat_solve_triu(fq_nmod_mat_t X, const fq_nmod_mat_t U, const fq_nmod_mat_t B, int unit, const fq_nmod_ctx_t ctx)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular
@@ -447,33 +403,6 @@ Triangular solving
     and `B` are allowed to be the same matrix, but no other aliasing
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
-
-.. function:: void fq_nmod_mat_solve_triu_classical(fq_nmod_mat_t X, const fq_nmod_mat_t U, const fq_nmod_mat_t B, int unit, const fq_nmod_ctx_t ctx)
-
-    Sets `X = U^{-1} B` where `U` is a full rank upper triangular
-    square matrix. If ``unit`` = 1, `U` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed. Uses forward substitution.
-
-.. function:: void fq_nmod_mat_solve_triu_recursive(fq_nmod_mat_t X, const fq_nmod_mat_t U, const fq_nmod_mat_t B, int unit, const fq_nmod_ctx_t ctx)
-
-    Sets `X = U^{-1} B` where `U` is a full rank upper triangular
-    square matrix. If ``unit`` = 1, `U` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed.
-
-    Uses the block inversion formula
-
-    .. math::
-        \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
-        \begin{pmatrix} X \\ Y \end{pmatrix} =
-        \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-
-
-    to reduce the problem to matrix multiplication and triangular
-    solving of smaller systems.
 
 
 Solving

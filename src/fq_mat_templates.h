@@ -236,14 +236,6 @@ slong TEMPLATE(T, mat_lu)(slong * P,
                     int rank_check,
                     const TEMPLATE(T, ctx_t) ctx);
 
-slong TEMPLATE(T, mat_lu_recursive)(slong * P,
-                              TEMPLATE(T, mat_t) A,
-                              int rank_check,
-                              const TEMPLATE(T, ctx_t) ctx);
-
-slong TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, int rank_check,
-                              const TEMPLATE(T, ctx_t) ctx);
-
 /* Inverse *******************************************************************/
 
 int TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
@@ -267,32 +259,9 @@ void TEMPLATE(T, mat_solve_tril)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) 
                             const TEMPLATE(T, mat_t) B, int unit,
                             const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, mat_solve_tril_classical)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) L,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
-
-void TEMPLATE(T, mat_solve_tril_recursive)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) L,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
-
 void TEMPLATE(T, mat_solve_triu)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) U,
                             const TEMPLATE(T, mat_t) B, int unit,
                             const TEMPLATE(T, ctx_t) ctx);
-
-void TEMPLATE(T, mat_solve_triu_classical)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) U,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
-void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) U,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_mul_vec)(TEMPLATE(T, struct) * c,
                                     const TEMPLATE(T, mat_t) A,

@@ -12,13 +12,19 @@
 
 #ifdef T
 
+#include "gr.h"
+#include "gr_mat.h"
 #include "templates.h"
 
 slong
 TEMPLATE(T, mat_lu) (slong * P, TEMPLATE(T, mat_t) A, int rank_check,
                      const TEMPLATE(T, ctx_t) ctx)
 {
-    return TEMPLATE(T, mat_lu_recursive) (P, A, rank_check, ctx);
+    gr_ctx_t gr_ctx;
+    slong rank;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_lu(&rank, P, (gr_mat_struct *) A, (const gr_mat_struct *) A, rank_check, gr_ctx));
+    return rank;
 }
 
 

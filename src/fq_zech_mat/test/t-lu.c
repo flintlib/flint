@@ -18,6 +18,6 @@
 
 #define T fq_zech
 #define CAP_T FQ_ZECH
-#include "fq_mat_templates/test/t-solve_tril_classical.c"
+#include "fq_mat_templates/test/t-lu.c"
 #undef CAP_T
 #undef T

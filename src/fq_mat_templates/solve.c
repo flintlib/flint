@@ -10,49 +10,22 @@
 */
 
 #ifdef T
+
+#include "gr.h"
+#include "gr_mat.h"
 #include "templates.h"
 
 int
 TEMPLATE(T, mat_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
                            const TEMPLATE(T, mat_t) B, const TEMPLATE(T, ctx_t) ctx)
 {
-    slong i, rank, *perm;
-    TEMPLATE(T, mat_t) LU;
-    int result;
-
-    if (A->r == 0 || B->c == 0)
-        return 1;
-
-    TEMPLATE(T, mat_init_set)(LU, A, ctx);
-    perm = flint_malloc(sizeof(slong) * A->r);
-    for (i = 0; i < A->r; i++)
-        perm[i] = i;
-
-    rank = TEMPLATE(T, mat_lu)(perm, LU, 1, ctx);
-
-    if (rank == A->r)
-    {
-        TEMPLATE(T, mat_t) PB;
-        TEMPLATE(T, mat_init)(PB, B->r, B->c, ctx);
-        for (i = 0; i < A->r; i++)
-            _TEMPLATE(T, vec_set)(TEMPLATE(T, mat_entry)(PB, i, 0),
-                                  TEMPLATE(T, mat_entry)(B, perm[i], 0), B->c, ctx);
-
-        TEMPLATE(T, mat_solve_tril)(X, LU, PB, 1, ctx);
-        TEMPLATE(T, mat_solve_triu)(X, LU, X, 0, ctx);
-
-        TEMPLATE(T, mat_clear)(PB, ctx);
-        result = 1;
-    }
-    else
-    {
-        result = 0;
-    }
-
-    TEMPLATE(T, mat_clear)(LU, ctx);
-    flint_free(perm);
-
-    return result;
+    gr_ctx_t gr_ctx;
+    int status;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    status = gr_mat_nonsingular_solve_lu((gr_mat_struct *) X,
+        (const gr_mat_struct *) A,
+        (const gr_mat_struct *) B, gr_ctx);
+    return (status == GR_SUCCESS);
 }
 
 #endif
