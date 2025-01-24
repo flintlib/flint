@@ -9,15 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq.h"
-#include "fq_mat.h"
+#include "fq_nmod.h"
+#include "fq_nmod_mat.h"
 
 #ifdef T
 #undef T
 #endif
 
-#define T fq
-#define CAP_T FQ
-#include "fq_mat_templates/test/t-solve_triu_classical.c"
+#define T fq_nmod
+#define CAP_T FQ_NMOD
+#include "fq_mat_templates/test/t-lu.c"
 #undef CAP_T
 #undef T

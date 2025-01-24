@@ -522,6 +522,24 @@ _gr_fq_zech_mat_mul(fq_zech_mat_t res, const fq_zech_mat_t x, const fq_zech_mat_
 }
 
 int
+_gr_fq_zech_mat_nonsingular_solve_tril(fq_zech_mat_t X, const fq_zech_mat_t L, const fq_zech_mat_t B, int unit, gr_ctx_t ctx)
+{
+    if (B->r < 64 || B->c < 64)
+        return gr_mat_nonsingular_solve_tril_classical((gr_mat_struct *) X, (const gr_mat_struct *) L, (const gr_mat_struct *) B, unit, ctx);
+    else
+        return gr_mat_nonsingular_solve_tril_recursive((gr_mat_struct *) X, (const gr_mat_struct *) L, (const gr_mat_struct *) B, unit, ctx);
+}
+
+int
+_gr_fq_zech_mat_nonsingular_solve_triu(fq_zech_mat_t X, const fq_zech_mat_t U, const fq_zech_mat_t B, int unit, gr_ctx_t ctx)
+{
+    if (B->r < 64 || B->c < 64)
+        return gr_mat_nonsingular_solve_triu_classical((gr_mat_struct *) X, (const gr_mat_struct *) U, (const gr_mat_struct *) B, unit, ctx);
+    else
+        return gr_mat_nonsingular_solve_triu_recursive((gr_mat_struct *) X, (const gr_mat_struct *) U, (const gr_mat_struct *) B, unit, ctx);
+}
+
+int
 _gr_fq_zech_mat_charpoly(fq_zech_struct * res, const fq_zech_mat_t mat, gr_ctx_t ctx)
 {
     slong n = mat->r;
@@ -616,6 +634,8 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_zech_roots_gr_poly},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_zech_mat_mul},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,      (gr_funcptr) _gr_fq_zech_mat_nonsingular_solve_tril},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,      (gr_funcptr) _gr_fq_zech_mat_nonsingular_solve_triu},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fq_zech_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };

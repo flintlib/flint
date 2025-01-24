@@ -16,7 +16,6 @@
 #include "test_helpers.h"
 #include "templates.h"
 
-/* Defined in t-lu_classical.c and t-lu_recursive.c */
 #ifndef perm
 #define perm perm
 void
@@ -37,7 +36,6 @@ perm(TEMPLATE(T, mat_t) A, slong * P)
 }
 #endif
 
-/* Defined in t-lu_classical.c and t-lu_recursive.c */
 #ifndef check
 #define check check
 void
@@ -105,7 +103,7 @@ check(slong * P, TEMPLATE(T, mat_t) LU, const TEMPLATE(T, mat_t) A, slong rank,
 }
 #endif
 
-TEST_TEMPLATE_FUNCTION_START(T, mat_lu_recursive, state)
+TEST_TEMPLATE_FUNCTION_START(T, mat_lu, state)
 {
     slong i;
 
@@ -136,7 +134,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_lu_recursive, state)
             TEMPLATE(T, mat_init_set) (LU, A, ctx);
             P = flint_malloc(sizeof(slong) * m);
 
-            rank = TEMPLATE(T, mat_lu_recursive) (P, LU, 0, ctx);
+            rank = TEMPLATE(T, mat_lu) (P, LU, 0, ctx);
 
             if (r != rank)
             {
@@ -155,6 +153,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_lu_recursive, state)
             TEMPLATE(T, mat_clear) (A, ctx);
             TEMPLATE(T, mat_clear) (LU, ctx);
             flint_free(P);
+
         }
 
         TEMPLATE(T, ctx_clear) (ctx);

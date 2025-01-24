@@ -18,6 +18,6 @@
 
 #define T fq
 #define CAP_T FQ
-#include "fq_mat_templates/test/t-solve_triu_recursive.c"
+#include "fq_mat_templates/test/t-lu.c"
 #undef CAP_T
 #undef T
