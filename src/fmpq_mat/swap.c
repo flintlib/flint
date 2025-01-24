@@ -43,9 +43,12 @@ fmpq_mat_swap_rows(fmpq_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !fmpq_mat_is_empty(mat))
     {
+        slong i;
+
         if (perm)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
-        FLINT_SWAP(fmpq *, mat->rows[r], mat->rows[s]);
+        for (i = 0; i < mat->c; i++)
+            fmpq_swap(fmpq_mat_entry(mat, r, i), fmpq_mat_entry(mat, s, i));
     }
 }

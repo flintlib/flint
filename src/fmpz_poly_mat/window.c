@@ -16,32 +16,16 @@ void
 fmpz_poly_mat_window_init(fmpz_poly_mat_t window, const fmpz_poly_mat_t mat, slong r1,
                      slong c1, slong r2, slong c2)
 {
-    slong i;
-    window->entries = NULL;
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
 
-    if (r2 > r1)
-        window->rows = (fmpz_poly_struct **) flint_malloc((r2 - r1)
-                                                  * sizeof(fmpz_poly_struct *));
-    else
-        window->rows = NULL;
-
-    if (mat->c > 0)
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = mat->rows[r1 + i] + c1;
-    } else
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = NULL;
-    }
-
+    window->entries = fmpz_poly_mat_entry(mat, r1, c1);
     window->r = r2 - r1;
     window->c = c2 - c1;
+    window->stride = mat->stride;
 }
 
 void
-fmpz_poly_mat_window_clear(fmpz_poly_mat_t window)
+fmpz_poly_mat_window_clear(fmpz_poly_mat_t FLINT_UNUSED(window))
 {
-    if (window->r != 0)
-        flint_free(window->rows);
 }

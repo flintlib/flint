@@ -127,7 +127,7 @@ static int n_poly_add_zip_must_match(
 
 static ulong * nmod_mat_row_ref(nmod_mat_t M, slong i)
 {
-    return M->rows[i];
+    return nmod_mat_entry_ptr(M, i, 0);
 }
 
 static void _nmod_vec_mul(ulong * a, ulong * b, ulong * c,

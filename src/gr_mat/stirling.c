@@ -99,8 +99,8 @@ _stirling_matrix_1u(gr_mat_t mat, gr_ctx_t ctx)
 
     if (mat->c != 0)
         for (n = 0; n < mat->r; n++)
-            status |= _stirling_number_1u_vec_next(mat->rows[n],
-                mat->rows[n - (n != 0)], n, mat->c, ctx);
+            status |= _stirling_number_1u_vec_next(gr_mat_entry_ptr(mat, n, 0, ctx),
+                gr_mat_entry_srcptr(mat, n - (n != 0), 0, ctx), n, mat->c, ctx);
 
     return status;
 }
@@ -113,8 +113,8 @@ _stirling_matrix_1(gr_mat_t mat, gr_ctx_t ctx)
 
     if (mat->c != 0)
         for (n = 0; n < mat->r; n++)
-            status |= _stirling_number_1_vec_next(mat->rows[n],
-                mat->rows[n - (n != 0)], n, mat->c, ctx);
+            status |= _stirling_number_1_vec_next(gr_mat_entry_ptr(mat, n, 0, ctx),
+                gr_mat_entry_srcptr(mat, n - (n != 0), 0, ctx), n, mat->c, ctx);
 
     return status;
 }
@@ -127,8 +127,8 @@ _stirling_matrix_2(gr_mat_t mat, gr_ctx_t ctx)
 
     if (mat->c != 0)
         for (n = 0; n < mat->r; n++)
-            status |= _stirling_number_2_vec_next(mat->rows[n],
-                mat->rows[n - (n != 0)], n, mat->c, ctx);
+            status |= _stirling_number_2_vec_next(gr_mat_entry_ptr(mat, n, 0, ctx),
+                gr_mat_entry_srcptr(mat, n - (n != 0), 0, ctx), n, mat->c, ctx);
 
     return status;
 }

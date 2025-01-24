@@ -14,5 +14,5 @@
 
 int nmod_mat_is_zero_row(const nmod_mat_t mat, slong i)
 {
-    return _nmod_vec_is_zero(mat->rows[i], mat->c);
+    return _nmod_vec_is_zero(nmod_mat_entry_ptr(mat, i, 0), mat->c);
 }

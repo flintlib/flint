@@ -17,40 +17,24 @@ void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 {
     slong i;
 
-    if (rows != 0)
-        mat->rows = flint_malloc(rows * sizeof(fmpq *));
-    else
-        mat->rows = NULL;
-
     mat->r = rows;
     mat->c = cols;
+    mat->stride = cols;
+    mat->entries = NULL;
 
     if (rows != 0 && cols != 0)
     {
         slong num;
-        int of;
 
-        of = z_mul_checked(&num, rows, cols);
-
-        if (of)
+        if (z_mul_checked(&num, rows, cols))
             flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
 
-        mat->entries = flint_calloc(num, sizeof(fmpq));
+        mat->entries = flint_malloc(num * sizeof(fmpq));
 
-        /* Set denominators */
         for (i = 0; i < rows * cols; i++)
-            mat->entries[i].den = WORD(1);
-
-        for (i = 0; i < rows; i++)
-            mat->rows[i] = mat->entries + i * cols;
-    }
-    else
-    {
-        mat->entries = NULL;
-        if (rows != 0)
         {
-            for (i = 0; i < rows; i++)
-                mat->rows[i] = NULL;
+            mat->entries[i].num = 0;
+            mat->entries[i].den = 1;
         }
     }
 }

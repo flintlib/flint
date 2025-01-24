@@ -249,9 +249,9 @@ fmpz_mat_hadamard(fmpz_mat_t A)
         ulong i;
         for (i = 0; i < m; i++)
         {
-            _fmpz_vec_set(A->rows[i] + m, A->rows[i], m);
-            _fmpz_vec_set(A->rows[i + m], A->rows[i], m);
-            _fmpz_vec_neg(A->rows[i + m] + m, A->rows[i], m);
+            _fmpz_vec_set(fmpz_mat_entry(A, i, m), fmpz_mat_entry(A, i, 0), m);
+            _fmpz_vec_set(fmpz_mat_entry(A, i + m, 0), fmpz_mat_entry(A, i, 0), m);
+            _fmpz_vec_neg(fmpz_mat_entry(A, i + m, m), fmpz_mat_entry(A, i, 0), m);
         }
     }
 

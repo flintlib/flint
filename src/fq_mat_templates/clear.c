@@ -18,15 +18,8 @@
 void
 TEMPLATE(T, mat_clear) (TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx)
 {
-    if (mat->entries)
-    {
-        slong i;
-        for (i = 0; i < mat->r * mat->c; i++)
-            TEMPLATE(T, clear) (mat->entries + i, ctx); /* Clear all coefficients */
-        flint_free(mat->entries);   /* Clean up array of entries */
-        flint_free(mat->rows);  /* Clean up row array */
-    } else if (mat->r != 0)
-        flint_free(mat->rows);
+    if (mat->entries != NULL)
+        _TEMPLATE(T, vec_clear)(mat->entries, mat->r * mat->c, ctx);
 }
 
 

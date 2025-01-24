@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-adjugate.c"
+#include "t-charpoly.c"
 #include "t-charpoly_danilevsky.c"
 #include "t-charpoly_faddeev_bsgs.c"
 #include "t-charpoly_faddeev.c"
@@ -35,6 +36,7 @@
 #include "t-lu_recursive.c"
 #include "t-minpoly_field.c"
 #include "t-mul_strassen.c"
+#include "t-mul_waksman.c"
 #include "t-nullspace.c"
 #include "t-properties.c"
 #include "t-randrank.c"
@@ -44,6 +46,7 @@
 #include "t-rref_den_fflu.c"
 #include "t-rref_fflu.c"
 #include "t-rref_lu.c"
+#include "t-scalar.c"
 #include "t-solve.c"
 #include "t-solve_den.c"
 #include "t-solve_den_fflu.c"
@@ -59,6 +62,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_mat_adjugate),
+    TEST_FUNCTION(gr_mat_charpoly),
     TEST_FUNCTION(gr_mat_charpoly_danilevsky),
     TEST_FUNCTION(gr_mat_charpoly_faddeev_bsgs),
     TEST_FUNCTION(gr_mat_charpoly_faddeev),
@@ -82,6 +86,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_lu_recursive),
     TEST_FUNCTION(gr_mat_minpoly_field),
     TEST_FUNCTION(gr_mat_mul_strassen),
+    TEST_FUNCTION(gr_mat_mul_waksman),
     TEST_FUNCTION(gr_mat_nullspace),
     TEST_FUNCTION(gr_mat_properties),
     TEST_FUNCTION(gr_mat_randrank),
@@ -91,6 +96,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_rref_den_fflu),
     TEST_FUNCTION(gr_mat_rref_fflu),
     TEST_FUNCTION(gr_mat_rref_lu),
+    TEST_FUNCTION(gr_mat_scalar),
     TEST_FUNCTION(gr_mat_solve),
     TEST_FUNCTION(gr_mat_solve_den),
     TEST_FUNCTION(gr_mat_solve_den_fflu),

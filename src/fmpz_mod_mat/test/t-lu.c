@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "test_helpers.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
@@ -18,17 +19,15 @@
 void perm(fmpz_mod_mat_t A, slong * P)
 {
     slong i;
-    fmpz ** tmp;
+    fmpz * tmp;
 
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(fmpz *) * A->r);
+    tmp = flint_malloc(sizeof(fmpz) * A->r * A->c);
 
-    for (i = 0; i < A->r; i++)
-        tmp[P[i]] = A->rows[i];
-    for (i = 0; i < A->r; i++)
-        A->rows[i] = tmp[i];
+    for (i = 0; i < A->r; i++) memcpy(tmp + P[i] * A->c, fmpz_mat_entry(A, i, 0), A->c * sizeof(fmpz));
+    for (i = 0; i < A->r; i++) memcpy(fmpz_mat_entry(A, i, 0), tmp + i * A->c, A->c * sizeof(fmpz));
 
     flint_free(tmp);
 }

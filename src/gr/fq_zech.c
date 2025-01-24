@@ -22,6 +22,7 @@
 #include "fmpz_mod_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
+#include "gr_mat.h"
 #include "gr_generic.h"
 
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
@@ -520,6 +521,17 @@ _gr_fq_zech_mat_mul(fq_zech_mat_t res, const fq_zech_mat_t x, const fq_zech_mat_
     return GR_SUCCESS;
 }
 
+int
+_gr_fq_zech_mat_charpoly(fq_zech_struct * res, const fq_zech_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    if (n <= 4)
+        return _gr_mat_charpoly_berkowitz(res, (const gr_mat_struct *) mat, ctx);
+    else
+        return _gr_mat_charpoly_danilevsky(res, (const gr_mat_struct *) mat, ctx);
+}
+
 int _fq_zech_methods_initialized = 0;
 
 gr_static_method_table _fq_zech_methods;
@@ -604,6 +616,7 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_zech_roots_gr_poly},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_zech_mat_mul},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fq_zech_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 

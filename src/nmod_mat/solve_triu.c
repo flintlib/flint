@@ -44,7 +44,7 @@ nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t
         for (j = n - 1; j >= 0; j--)
         {
             ulong s;
-            s = _nmod_vec_dot(U->rows[j] + j + 1,
+            s = _nmod_vec_dot(nmod_mat_entry_ptr(U, j, j + 1),
                               tmp + j + 1, n - j - 1, mod, params);
             s = nmod_sub(nmod_mat_entry(B, j, i), s, mod);
             if (!unit)

@@ -25,7 +25,7 @@ TEMPLATE(T, mat_is_zero) (const TEMPLATE(T, mat_t) mat,
 
     for (j = 0; j < mat->r; j++)
     {
-        if (!_TEMPLATE(T, vec_is_zero) (mat->rows[j], mat->c, ctx))
+        if (!_TEMPLATE(T, vec_is_zero) (TEMPLATE(T, mat_entry)(mat, j, 0), mat->c, ctx))
             return 0;
     }
 

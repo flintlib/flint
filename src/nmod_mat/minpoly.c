@@ -16,7 +16,7 @@
 void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
 {
    slong n = X->r, i, j, c, c1, c2, r1, r2;
-   ulong ** A, ** B, ** v, t, h;
+   ulong t, h;
    slong  * P1, * P2, * L1, * L2;
    nmod_mat_t matA, matB, matv;
    int first_poly = 1, indep = 1;
@@ -37,7 +37,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
    if (n == 1)
    {
       nmod_poly_set_coeff_ui(p, 1, 1);
-      nmod_poly_set_coeff_ui(p, 0, n_negmod(X->rows[0][0], p->mod.n));
+      nmod_poly_set_coeff_ui(p, 0, n_negmod(nmod_mat_entry(X, 0, 0), p->mod.n));
       _nmod_poly_set_length(p, 2);
       if (P != NULL)
          P[0] = 1;
@@ -53,9 +53,9 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
    nmod_mat_init(matB, n, n, p->mod.n);
    nmod_mat_init(matv, n, 1, p->mod.n);
 
-   A = matA->rows;
-   B = matB->rows;
-   v = matv->rows;
+#define A(ii, jj) nmod_mat_entry(matA, ii, jj)
+#define B(ii, jj) nmod_mat_entry(matB, ii, jj)
+#define v(ii, jj) nmod_mat_entry(matv, ii, jj)
 
    L1 = (slong *) TMP_ALLOC((n + 1)*sizeof(slong));
    L2 = (slong *) TMP_ALLOC(n*sizeof(slong));
@@ -82,18 +82,18 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
 
       for (i = 0; i < n; i++)
       {
-         v[i][0] = 0;
-         B[r2][i] = 0;
-         A[0][i] = 0;
+         v(i,0) = 0;
+         B(r2,i) = 0;
+         A(0,i) = 0;
       }
 
       P1[c2] = 0;
       P2[c2] = r2;
 
-      v[c2][0] = 1;
-      B[r2][c2] = 1;
-      A[0][c2] = 1;
-      A[0][n] = 1;
+      v(c2,0) = 1;
+      B(r2,c2) = 1;
+      A(0,c2) = 1;
+      A(0,n) = 1;
       if (P != NULL)
          P[c2] = 1;
 
@@ -108,22 +108,21 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
          r2 = indep ? r2 + 1 : r2;
 
          nmod_mat_mul(matv, X, matv);
-         v = matv->rows;
 
          for (i = 0; i < n; i++)
-            A[r1][i] = v[i][0];
+            A(r1,i) = v(i,0);
 
          for (i = n; i < n + r1; i++)
-            A[r1][i] = 0;
+            A(r1,i) = 0;
 
-         A[r1][n + r1] = 1;
+         A(r1,n + r1) = 1;
 
          c1 = nmod_mat_reduce_row(matA, P1, L1, r1);
 
          if (indep && r2 < n && !first_poly)
          {
             for (i = 0; i < n; i++)
-               B[r2][i] = v[i][0];
+               B(r2,i) = v(i,0);
 
             c = nmod_mat_reduce_row(matB, P2, L2, r2);
 
@@ -154,11 +153,11 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
 
       nmod_poly_fit_length(b, r1 + 1);
 
-      h = n_invmod(A[r1][n + r1], p->mod.n);
+      h = n_invmod(A(r1,n + r1), p->mod.n);
 
       for (i = 0; i < r1 + 1; i++)
       {
-         t = n_mulmod2_preinv(A[r1][n + i], h, p->mod.n, p->mod.ninv);
+         t = n_mulmod2_preinv(A(r1,n + i), h, p->mod.n, p->mod.ninv);
          nmod_poly_set_coeff_ui(b, i, t);
       }
       _nmod_poly_set_length(b, r1 + 1);
@@ -173,12 +172,16 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
          for (i = 0; i < r1; i++)
          {
             for (j = 0; j < n; j++)
-               B[i][j] = A[i][j];
+               B(i,j) = A(i,j);
          }
       }
 
       first_poly = 0;
    }
+
+#undef A
+#undef B
+#undef v
 
    nmod_mat_clear(matA);
    nmod_mat_clear(matB);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -18,24 +19,22 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
+void _fmpz_mod_mat_charpoly(fmpz* cp, const fmpz_mod_mat_t mat,
                                                       const fmpz_mod_ctx_t ctx)
 {
     gr_ctx_t gr_ctx;
     _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
-    GR_MUST_SUCCEED(_gr_mat_charpoly_berkowitz(cp, (const gr_mat_struct *) mat, gr_ctx));
+    GR_MUST_SUCCEED(_gr_mat_charpoly(cp, (const gr_mat_struct *) mat, gr_ctx));
 }
 
-void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t cp,
+void fmpz_mod_mat_charpoly(fmpz_mod_poly_t cp,
                             const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
     if (!fmpz_mod_mat_is_square(mat, ctx))
-    {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_mat_charpoly_berkowitz). Non-square matrix.\n");
-    }
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_mat_charpoly). Non-square matrix.\n");
 
     fmpz_mod_poly_fit_length(cp, fmpz_mod_mat_nrows(mat, ctx) + 1, ctx);
-    _fmpz_mod_mat_charpoly_berkowitz(cp->coeffs, mat, ctx);
+    _fmpz_mod_mat_charpoly(cp->coeffs, mat, ctx);
     _fmpz_mod_poly_set_length(cp, fmpz_mod_mat_nrows(mat, ctx) + 1);
     _fmpz_mod_poly_normalise(cp);
 }

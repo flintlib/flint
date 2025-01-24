@@ -28,7 +28,7 @@ TEST_FUNCTION_START(fmpz_mat_init_clear, state)
 
         for (j = 0; j < rows; j++)
             for (k = 0; k < cols; k++)
-                fmpz_zero(a->rows[j] + k);
+                fmpz_zero(fmpz_mat_entry(a, j, k));
 
         fmpz_mat_clear(a);
     }

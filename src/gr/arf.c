@@ -1194,6 +1194,8 @@ _gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 #include "gr_mat.h"
 #include "arb_mat.h"
 
+#define ARF_MAT_ENTRY(mat, ii, jj) (((arf_ptr) (mat)->entries) + (ii) * (mat)->stride + (jj))
+
 /* todo: test */
 int
 _gr_arf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
@@ -1230,11 +1232,11 @@ _gr_arf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
         for (i = 0; i < A->r; i++)
             for (j = 0; j < A->c; j++)
-                *arb_midref(arb_mat_entry(RA, i, j)) = ((arf_srcptr) A->rows[i])[j];
+                *arb_midref(arb_mat_entry(RA, i, j)) = *ARF_MAT_ENTRY(A, i, j);
 
         for (i = 0; i < B->r; i++)
             for (j = 0; j < B->c; j++)
-                *arb_midref(arb_mat_entry(RB, i, j)) = ((arf_srcptr) B->rows[i])[j];
+                *arb_midref(arb_mat_entry(RB, i, j)) = *ARF_MAT_ENTRY(B, i, j);
 
         arb_mat_approx_mul(RC, RA, RB, prec);
 
@@ -1248,7 +1250,7 @@ _gr_arf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
         for (i = 0; i < C->r; i++)
             for (j = 0; j < C->c; j++)
-                arf_swap(((arf_ptr) C->rows[i]) + j, arb_midref(arb_mat_entry(RC, i, j)));
+                arf_swap(ARF_MAT_ENTRY(C, i, j), arb_midref(arb_mat_entry(RC, i, j)));
 
         arb_mat_clear(RA);
         arb_mat_clear(RB);

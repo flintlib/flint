@@ -65,7 +65,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                           appB->rows[kappa], appB->rows[j], n, prec)))
                     {
 /* In this case a heuristic told us that some cancellation probably happened so we just compute the scalar product at full precision */
-                        _fmpz_vec_dot(ztmp, B->rows[kappa], B->rows[j], n);
+                        _fmpz_vec_dot(ztmp, fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
                         fmpz_get_mpf(mpf_mat_entry(A->appSP2, kappa, j), ztmp);
                     }
                 }
@@ -144,12 +144,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                         mpf_mat_entry(mu, kappa, k),
                                         mpf_mat_entry(mu, j, k));
                             }
-                            _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
-                                          B->rows[j], n);
+                            _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
+                                          fmpz_mat_row(B, j), n);
                             if (U != NULL)
                             {
-                                _fmpz_vec_sub(U->rows[kappa],
-                                              U->rows[kappa], U->rows[j],
+                                _fmpz_vec_sub(fmpz_mat_row(U, kappa),
+                                              fmpz_mat_row(U, kappa), fmpz_mat_row(U, j),
                                               U->c);
                             }
                         }
@@ -161,12 +161,12 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                         mpf_mat_entry(mu, kappa, k),
                                         mpf_mat_entry(mu, j, k));
                             }
-                            _fmpz_vec_add(B->rows[kappa], B->rows[kappa],
-                                          B->rows[j], n);
+                            _fmpz_vec_add(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
+                                          fmpz_mat_row(B, j), n);
                             if (U != NULL)
                             {
-                                _fmpz_vec_add(U->rows[kappa],
-                                              U->rows[kappa], U->rows[j],
+                                _fmpz_vec_add(fmpz_mat_row(U, kappa),
+                                              fmpz_mat_row(U, kappa), fmpz_mat_row(U, j),
                                               U->c);
                             }
                         }
@@ -197,25 +197,24 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         {
                             /* X is stored in an slong */
                             xx = flint_mpf_get_si(tmp);
-                            _fmpz_vec_scalar_submul_si(B->rows[kappa],
-                                                       B->rows[j], n, xx);
+                            _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
+                                                       fmpz_mat_row(B, j), n, xx);
                             if (U != NULL)
                             {
-                                _fmpz_vec_scalar_submul_si(U->rows[kappa],
-                                                           U->rows[j],
+                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(U, kappa),
+                                                           fmpz_mat_row(U, j),
                                                            U->c, xx);
                             }
                         }
                         else
                         {
                             fmpz_set_mpf(ztmp, tmp);
-                            _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
-                                                         B->rows[j], n, ztmp);
+                            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa),
+                                                         fmpz_mat_row(B, j), n, ztmp);
                             if (U != NULL)
                             {
-                                _fmpz_vec_scalar_submul_fmpz(U->rows
-                                                             [kappa],
-                                                             U->rows[j],
+                                _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(U, kappa),
+                                                             fmpz_mat_row(U, j),
                                                              U->c, ztmp);
                             }
                         }
@@ -225,7 +224,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             if (test)           /* Anything happened? */
             {
-                _mpf_vec_set_fmpz_vec(appB->rows[kappa], B->rows[kappa], n);
+                _mpf_vec_set_fmpz_vec(appB->rows[kappa], fmpz_mat_row(B, kappa), n);
                 aa = zeros + 1;
 
                 for (i = zeros + 1; i <= kappa; i++)
@@ -364,13 +363,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             }
                             if (fl->rt == Z_BASIS && B != NULL)
                             {
-                                _fmpz_vec_sub(B->rows[kappa], B->rows[kappa],
-                                              B->rows[j], n);
+                                _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
+                                              fmpz_mat_row(B, j), n);
                             }
                             if (U != NULL)
                             {
-                                _fmpz_vec_sub(U->rows[kappa],
-                                              U->rows[kappa], U->rows[j],
+                                _fmpz_vec_sub(fmpz_mat_row(U, kappa),
+                                              fmpz_mat_row(U, kappa), fmpz_mat_row(U, j),
                                               U->c);
                             }
                         }
@@ -385,13 +384,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             }
                             if (fl->rt == Z_BASIS && B != NULL)
                             {
-                                _fmpz_vec_add(B->rows[kappa],
-                                              B->rows[kappa], B->rows[j], n);
+                                _fmpz_vec_add(fmpz_mat_row(B, kappa),
+                                              fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
                             }
                             if (U != NULL)
                             {
-                                _fmpz_vec_add(U->rows[kappa],
-                                              U->rows[kappa], U->rows[j],
+                                _fmpz_vec_add(fmpz_mat_row(U, kappa),
+                                              fmpz_mat_row(U, kappa), fmpz_mat_row(U, j),
                                               U->c);
                             }
                         }
@@ -425,13 +424,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             fmpz_set_si(x + j, xx);
                             if (fl->rt == Z_BASIS && B != NULL)
                             {
-                                _fmpz_vec_scalar_submul_si(B->rows[kappa],
-                                                           B->rows[j], n, xx);
+                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
+                                                           fmpz_mat_row(B, j), n, xx);
                             }
                             if (U != NULL)
                             {
-                                _fmpz_vec_scalar_submul_si(U->rows[kappa],
-                                                           U->rows[j],
+                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(U, kappa),
+                                                           fmpz_mat_row(U, j),
                                                            U->c, xx);
                             }
                         }
@@ -440,15 +439,14 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                             fmpz_set_mpf(x + j, tmp);
                             if (fl->rt == Z_BASIS && B != NULL)
                             {
-                                _fmpz_vec_scalar_submul_fmpz(B->rows[kappa],
-                                                             B->rows[j], n,
+                                _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa),
+                                                             fmpz_mat_row(B, j), n,
                                                              x + j);
                             }
                             if (U != NULL)
                             {
-                                _fmpz_vec_scalar_submul_fmpz(U->rows
-                                                             [kappa],
-                                                             U->rows[j],
+                                _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(U, kappa),
+                                                             fmpz_mat_row(U, j),
                                                              U->c, x + j);
                             }
                         }

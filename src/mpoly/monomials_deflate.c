@@ -36,12 +36,18 @@ void mpoly_monomials_deflate(ulong * Aexps, flint_bitcnt_t Abits,
         for (j = 0; j < nvars; j++)
         {
             fmpz_sub(exps + j, exps + j, shift + j);
-            /* stride + j is allowed to be zero */
-            if (!fmpz_is_zero(exps + j))
+            /* stride + j is allowed to be zero, if it is then exps + j is
+               assumed to be zero, and the quotient is defined as zero */
+            if (!fmpz_is_zero(exps + j) && !fmpz_is_zero(stride + j))
             {
                 FLINT_ASSERT(fmpz_divisible(exps + j, stride + j));
                 fmpz_divexact(exps + j, exps + j, stride + j);
             }
+            else
+            {
+                fmpz_zero(exps + j);
+            }
+
         }
         FLINT_ASSERT(Abits >= mpoly_exp_bits_required_ffmpz(exps, mctx));
         mpoly_set_monomial_ffmpz(Aexps + NA*i, exps, Abits, mctx);

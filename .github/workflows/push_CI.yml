@@ -20,7 +20,7 @@ jobs:
   freebsd-gcc:
     name: FreeBSD Clang (x0.5)
 
-    runs-on: macos-13
+    runs-on: ubuntu-latest
     env:
       FLINT_TEST_MULTIPLIER: "0.5"
 
@@ -28,12 +28,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: "Run tests on FreeBSD"
-        uses: cross-platform-actions/action@v0.23.0
+        uses: cross-platform-actions/action@v0.26.0
         timeout-minutes: 15
         continue-on-error: true
         with:
           operating_system: freebsd
-          version: '14.0'
+          version: '14.2'
+          architecture: x86-64
           shell: bash
           run: |
             sudo pkg install -y pkgconf gmake gmp mpfr autoconf libtool automake

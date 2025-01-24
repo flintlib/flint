@@ -17,8 +17,7 @@ _acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec
 {
     slong r = acb_mat_nrows(A);
     slong c = acb_mat_ncols(A);
-    acb_ptr tmp;
-    slong k, j;
+    slong k;
 
     if (acb_mat_is_empty(A))
     {
@@ -26,19 +25,8 @@ _acb_mat_vector_mul_row(acb_ptr res, acb_srcptr v, const acb_mat_t A, slong prec
     }
     else
     {
-        tmp = flint_malloc(r * sizeof(acb_struct));
-
         for (k = 0; k < c; k++)
-        {
-            for (j = 0; j < r; j++)
-            {
-                tmp[j] = *acb_mat_entry(A, j, k);
-            }
-
-            acb_dot(&res[k], NULL, 0, tmp, 1, v, 1, r, prec);
-        }
-
-        flint_free(tmp);
+            acb_dot(res + k, NULL, 0, v, 1, acb_mat_entry(A, 0, k), A->stride, r, prec);
     }
 }
 
@@ -70,9 +58,7 @@ _acb_mat_vector_mul_col(acb_ptr res, const acb_mat_t A, acb_srcptr v, slong prec
     else
     {
         for (k = 0; k < r; k++)
-        {
-            acb_dot(&res[k], NULL, 0, A->rows[k], 1, v, 1, c, prec);
-        }
+            acb_dot(res + k, NULL, 0, acb_mat_entry(A, k, 0), 1, v, 1, c, prec);
     }
 }
 

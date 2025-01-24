@@ -122,10 +122,22 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     if (a > 2*anr)
     {
-        fmpz_mat_t Ar, Cr;
+        fmpz_mat_t Ar, Br, Cr;
         fmpz_mat_window_init(Ar, A, 2*anr, 0, a, b);
-        fmpz_mat_window_init(Cr, C, 2*anr, 0, a, c);
-        fmpz_mat_mul(Cr, Ar, B);
+        fmpz_mat_window_init(Cr, C, 2*anr, 0, a, 2*bnc);
+
+        /* don't compute the overlapping entries twice */
+        if (c > 2 * bnc)
+        {
+            fmpz_mat_window_init(Br, B, 0, 0, b, 2*bnc);
+            fmpz_mat_mul(Cr, Ar, Br);
+            fmpz_mat_window_clear(Br);
+        }
+        else
+        {
+            fmpz_mat_mul(Cr, Ar, B);
+        }
+
         fmpz_mat_window_clear(Ar);
         fmpz_mat_window_clear(Cr);
     }

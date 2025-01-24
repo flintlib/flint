@@ -16,8 +16,10 @@ void gr_mpoly_fit_length_fit_bits(
     gr_mpoly_t A,
     slong len,
     flint_bitcnt_t bits,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong N = mpoly_words_per_exp(A->bits, mctx);
 
     if (len > A->coeffs_alloc)

@@ -14,39 +14,6 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
-                     slong c1, slong r2, slong c2)
-{
-    slong i;
-    window->entries = NULL;
-
-    if (r2 > r1)
-        window->rows = (fmpz **) flint_malloc((r2 - r1) * sizeof(fmpz *));
-    else
-        window->rows = NULL;
-
-    if (mat->c > 0)
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = mat->rows[r1 + i] + c1;
-    } else
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = NULL;
-    }
-
-    window->r = r2 - r1;
-    window->c = c2 - c1;
-}
-
-void
-fmpz_mat_window_clear(fmpz_mat_t window)
-{
-    if (window->r != 0)
-        flint_free(window->rows);
-}
-
-void
 _fmpz_mat_window_readonly_init_strip_initial_zero_rows(fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong r = B->r;
@@ -55,12 +22,9 @@ _fmpz_mat_window_readonly_init_strip_initial_zero_rows(fmpz_mat_t A, const fmpz_
 
     for (i = 0; i < r; i++)
     {
-        if (!_fmpz_vec_is_zero(B->rows[i], c))
+        if (!_fmpz_vec_is_zero(fmpz_mat_row(B, i), c))
             break;
     }
 
-    A->entries = NULL;
-    A->rows = B->rows + i;
-    A->r = r - i;
-    A->c = c;
+    fmpz_mat_window_init(A, B, i, 0, r, c);
 }

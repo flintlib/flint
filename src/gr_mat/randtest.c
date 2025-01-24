@@ -32,7 +32,7 @@ gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx)
     else
     {
         for (i = 0; i < r; i++)
-            status |= _gr_vec_randtest(mat->rows[i], state, c, ctx);
+            status |= _gr_vec_randtest(GR_MAT_ENTRY(mat, i, 0, sz), state, c, ctx);
     }
 
     return status;

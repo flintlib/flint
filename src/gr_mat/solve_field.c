@@ -12,6 +12,7 @@
 */
 
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_mat.h"
 
 int
@@ -22,6 +23,7 @@ gr_mat_solve_field(gr_mat_t X, const gr_mat_t A,
     gr_mat_t LU, LU2, PB;
     int status = GR_SUCCESS;
     truth_t is_zero;
+    slong sz = ctx->sizeof_elem;
 
     if (A->r != B->r || A->c != X->r || X->c != B->c)
     {
@@ -58,9 +60,9 @@ gr_mat_solve_field(gr_mat_t X, const gr_mat_t A,
     if (status != GR_SUCCESS)
         goto cleanup1;
 
-    gr_mat_window_init(PB, B, 0, 0, B->r, B->c, ctx);
+    gr_mat_init(PB, B->r, B->c, ctx);
     for (i = 0; i < B->r; i++)
-        PB->rows[i] = B->rows[perm[i]];
+        status |= _gr_vec_set(GR_MAT_ENTRY(PB, i, 0, sz), GR_MAT_ENTRY(B, perm[i], 0, sz), B->c, ctx);
 
     gr_mat_init(LU2, rank, rank, ctx);
     pivots = flint_malloc(sizeof(slong) * rank);
@@ -110,7 +112,8 @@ gr_mat_solve_field(gr_mat_t X, const gr_mat_t A,
         gr_mat_t P;
         truth_t equal;
 
-        LU->rows += rank;
+        /* LU->rows += rank */
+        LU->entries = GR_ENTRY(LU->entries, rank * LU->stride, sz);
         LU->r = A->r - rank;
         X->r = LU->c;
 
@@ -119,14 +122,17 @@ gr_mat_solve_field(gr_mat_t X, const gr_mat_t A,
         status |= gr_mat_mul(P, LU, X, ctx);
 
         PB->r = LU->r;
-        PB->rows += rank;
+        /* PB->rows += rank */
+        PB->entries = GR_ENTRY(PB->entries, rank * PB->stride, sz);
 
         equal = gr_mat_equal(P, PB, ctx);
 
-        PB->rows -= rank;
+        /* PB->rows -= rank; */
+        PB->entries = GR_ENTRY(PB->entries, -rank * PB->stride, sz);
         gr_mat_clear(P, ctx);
 
-        LU->rows -= rank;
+        /* LU->rows -= rank; */
+        LU->entries = GR_ENTRY(LU->entries, -rank * LU->stride, sz);
         LU->r = A->r;
 
         if (equal == T_UNKNOWN)
@@ -178,7 +184,7 @@ cleanup:
     gr_mat_clear(LU2, ctx);
 
     PB->r = B->r;
-    gr_mat_window_clear(PB, ctx);
+    gr_mat_clear(PB, ctx);
 
     flint_free(pivots);
 

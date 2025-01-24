@@ -11,12 +11,6 @@
 
 #include "mpn_mod.h"
 
-/* for wide add_ssss.... macros. todo; these ought to be provided
-   everywhere */
-#if FLINT_BITS == 64 && defined(__AVX2__)
-#include "crt_helpers.h"
-#endif
-
 static void
 mpn_mod_set_mpn2(nn_ptr res, nn_srcptr s, slong l, gr_ctx_t ctx)
 {
@@ -103,7 +97,6 @@ static int _mpn_mod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
     mpn_mod_set(Q + nlimbs, q1, ctx);
     mpn_mod_neg(q1, q1, ctx);
 
-#if defined(add_sssssaaaaaaaaaa)
     if (nlimbs == 2)
     {
         slong bits = 2 * MPN_MOD_CTX_MODULUS_BITS(ctx) + 1;
@@ -141,7 +134,6 @@ static int _mpn_mod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
         }
     }
     else
-#endif
     {
         for (i = 1; i < lenB - 1; i++)
         {
@@ -240,7 +232,6 @@ _mpn_mod_poly_divrem_basecase_preinv1(nn_ptr Q, nn_ptr R,
                 /* todo: consider writing all products to a temporary
                    buffer and doing a single big mpn_add_n */
 
-#if defined(add_sssssaaaaaaaaaa)
                 if (nlimbs == 2)
                 {
                     ulong t[4];
@@ -277,7 +268,6 @@ _mpn_mod_poly_divrem_basecase_preinv1(nn_ptr Q, nn_ptr R,
                     }
                 }
                 else
-#endif
                 {
                     if (slimbs == 2 * nlimbs + 1)
                     {

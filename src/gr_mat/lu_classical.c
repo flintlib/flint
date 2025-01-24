@@ -17,19 +17,12 @@ _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 {
     if (r != s)
     {
-        gr_ptr u;
-        slong t;
+        slong sz = ctx->sizeof_elem;
 
         if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        _gr_vec_swap(GR_MAT_ENTRY(mat, r, 0, sz), GR_MAT_ENTRY(mat, s, 0, sz), mat->c, ctx);
     }
 }
 
@@ -37,7 +30,6 @@ int
 gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
     gr_ptr d, e;
-    gr_ptr * a;
     slong i, j, m, n, r, rank, row, col, sz;
     int status = GR_SUCCESS;
     int pivot_status;
@@ -56,7 +48,7 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
 
     status |= gr_mat_set(LU, A, ctx);
 
-    a = LU->rows;
+#define ENTRY(ii, jj) GR_MAT_ENTRY(LU, ii, jj, sz)
 
     rank = row = col = 0;
     for (i = 0; i < m; i++)
@@ -97,20 +89,20 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
             _gr_mat_swap_rows(LU, P, row, r, ctx);
 
         /* Must be able to invert pivot element. */
-        status |= gr_inv(d, GR_ENTRY(a[row], col, sz), ctx);
+        status |= gr_inv(d, ENTRY(row, col), ctx);
         if (status != GR_SUCCESS)
             break;
 
         for (j = row + 1; j < m; j++)
         {
-            status |= gr_mul(e, GR_ENTRY(a[j], col, sz), d, ctx);
+            status |= gr_mul(e, ENTRY(j, col), d, ctx);
             status |= gr_neg(e, e, ctx);
 
             if (n - col - 1 > 0)
-                status |= _gr_vec_addmul_scalar(GR_ENTRY(a[j], col + 1, sz), GR_ENTRY(a[row], col + 1, sz), n - col - 1, e, ctx);
+                status |= _gr_vec_addmul_scalar(ENTRY(j, col + 1), ENTRY(row, col + 1), n - col - 1, e, ctx);
 
-            status |= gr_zero(GR_ENTRY(a[j], col, sz), ctx);
-            status |= gr_neg(GR_ENTRY(a[j], rank - 1, sz), e, ctx);
+            status |= gr_zero(ENTRY(j, col), ctx);
+            status |= gr_neg(ENTRY(j, rank - 1), e, ctx);
         }
 
         row++;
@@ -118,6 +110,8 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     }
 
     GR_TMP_CLEAR2(d, e, ctx);
+
+#undef ENTRY
 
     *res_rank = rank;
     return status;

@@ -17,6 +17,7 @@ gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     int status;
     slong i, r, c;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(res, ctx);
     c = gr_mat_ncols(res, ctx);
@@ -31,7 +32,7 @@ gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
     for (i = 0; i < r; i++)
     {
-        status |= _gr_vec_neg(res->rows[i], mat->rows[i], c, ctx);
+        status |= _gr_vec_neg(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), c, ctx);
     }
 
     return status;

@@ -20,5 +20,5 @@ void fmpz_mod_mat_neg(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_c
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            _fmpz_mod_vec_neg(B->rows[i], A->rows[i], c, ctx);
+            _fmpz_mod_vec_neg(fmpz_mod_mat_row(B, i), fmpz_mod_mat_row(A, i), c, ctx);
 }

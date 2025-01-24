@@ -15,8 +15,11 @@
 
 /* -O3 seems to result in worse code here. Check results for
    nmod_mpoly_factor/profile/p-factor */
-
-#pragma GCC optimize ("-O2,-funroll-loops")
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC push_options
+# pragma GCC optimize("O2")
+# pragma GCC optimize("unroll-loops")
+#endif
 
 /*
     conversion between polynomials in coefficient form and point-value form
@@ -1092,3 +1095,7 @@ void n_fq_evals_fmma(
 
     TMP_END;
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC pop_options
+#endif

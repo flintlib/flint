@@ -42,7 +42,7 @@ int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat)
 
         for (j = 0; j < mat->c; j++)
         {
-            z = flint_printf(fmt, mat->rows[i][j]);
+            z = flint_printf(fmt, nmod_mat_entry(mat, i, j));
             if (z <= 0)
                 return z;
 

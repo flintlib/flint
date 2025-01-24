@@ -83,5 +83,59 @@ TEST_FUNCTION_START(acb_poly_sinc_series, state)
         acb_poly_clear(d);
     }
 
+    /* check intervals containing 0 */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        acb_t z1, z2;
+        acb_poly_t f1, f2, g1, g2;
+        slong len, prec;
+
+        acb_init(z1);
+        acb_init(z2);
+
+        acb_poly_init(f1);
+        acb_poly_init(f2);
+        acb_poly_init(g1);
+        acb_poly_init(g2);
+
+        prec = 2 + n_randint(state, 300);
+        len = 1 + n_randint(state, 5);
+
+        acb_randtest(z1, state, 300, 5);
+        acb_mul_2exp_si(z1, z1, -(slong) n_randint(state, 100));
+        if (n_randint(state, 2))
+            arb_zero(acb_realref(z1));
+
+        arb_get_mag(arb_radref(acb_realref(z2)), acb_realref(z1));
+        arb_get_mag(arb_radref(acb_imagref(z2)), acb_imagref(z1));
+
+        acb_poly_set_coeff_si(f1, 1, n_randint(state, 2) ? 1 : -1);
+        acb_poly_set(f2, f1);
+        acb_poly_set_coeff_acb(f1, 0, z1);
+        acb_poly_set_coeff_acb(f2, 0, z2);
+
+        acb_poly_sinc_series(g1, f1, len, prec);
+        acb_poly_sinc_series(g2, f2, len, prec);
+
+        if (!acb_poly_overlaps(g1, g2))
+        {
+            flint_printf("FAIL: overlap (0)\n\n");
+            flint_printf("iter = %wd\n", iter);
+            flint_printf("f1 = "); acb_poly_printd(f1, prec / 3.33); flint_printf("\n\n");
+            flint_printf("f2 = "); acb_poly_printd(f2, prec / 3.33); flint_printf("\n\n");
+            flint_printf("g1 = "); acb_poly_printd(g1, prec / 3.33); flint_printf("\n\n");
+            flint_printf("g2 = "); acb_poly_printd(g2, prec / 3.33); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        acb_clear(z1);
+        acb_clear(z2);
+
+        acb_poly_clear(f1);
+        acb_poly_clear(f2);
+        acb_poly_clear(g1);
+        acb_poly_clear(g2);
+    }
+
     TEST_FUNCTION_END(state);
 }

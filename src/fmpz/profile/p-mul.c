@@ -77,7 +77,7 @@ sample_new(void * arg, ulong count)
     _fmpz_vec_clear(res, ntests);
     _fmpz_vec_clear(a, ntests);
     _fmpz_vec_clear(b, ntests);
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 void
@@ -111,7 +111,7 @@ sample_old(void * arg, ulong count)
     _fmpz_vec_clear(res, ntests);
     _fmpz_vec_clear(a, ntests);
     _fmpz_vec_clear(b, ntests);
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 slong sizes[] = { 10, 30, 60, 62, 64, 66, 80, 128, 160, 256, 512, 1024, 4096, 0 };

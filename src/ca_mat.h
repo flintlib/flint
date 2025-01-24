@@ -26,7 +26,7 @@ extern "C" {
 
 /* Matrix object */
 
-#define ca_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+#define ca_mat_entry(mat,i,j) ((mat)->entries + (i) * (mat)->stride + (j))
 #define ca_mat_nrows(mat) ((mat)->r)
 #define ca_mat_ncols(mat) ((mat)->c)
 
@@ -53,9 +53,8 @@ ca_mat_swap(ca_mat_t mat1, ca_mat_t mat2, ca_ctx_t ctx)
 void ca_mat_window_init(ca_mat_t window, const ca_mat_t mat, slong r1, slong c1, slong r2, slong c2, ca_ctx_t ctx);
 
 CA_MAT_INLINE void
-ca_mat_window_clear(ca_mat_t window, ca_ctx_t ctx)
+ca_mat_window_clear(ca_mat_t FLINT_UNUSED(window), ca_ctx_t FLINT_UNUSED(ctx))
 {
-    flint_free(window->rows);
 }
 
 /* Shape */
@@ -236,10 +235,18 @@ _ca_mat_swap_rows(ca_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)
     {
+        ca_ptr u, v;
+        slong i;
+
         if (perm != NULL)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
-        FLINT_SWAP(ca_ptr, mat->rows[r], mat->rows[s]);
+        u = ca_mat_entry(mat, r, 0);
+        v = ca_mat_entry(mat, s, 0);
+
+        for (i = 0; i < mat->c; i++)
+            FLINT_SWAP(ca_struct, u[i], v[i]);
+
     }
 }
 

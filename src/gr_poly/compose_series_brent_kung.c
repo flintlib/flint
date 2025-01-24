@@ -28,6 +28,10 @@ _gr_poly_compose_series_brent_kung(gr_ptr res, gr_srcptr poly1, slong len1,
     if (n == 1)
        return gr_set(res, poly1, ctx);
 
+#define Arow(ii) gr_mat_entry_ptr(A, ii, 0, ctx)
+#define Brow(ii) gr_mat_entry_ptr(B, ii, 0, ctx)
+#define Crow(ii) gr_mat_entry_ptr(C, ii, 0, ctx)
+
     m = n_sqrt(n) + 1;
 
     gr_mat_init(A, m, n, ctx);
@@ -39,38 +43,42 @@ _gr_poly_compose_series_brent_kung(gr_ptr res, gr_srcptr poly1, slong len1,
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
-        status |= _gr_vec_set(B->rows[i], GR_ENTRY(poly1, i * m, sz), m, ctx);
-    status |= _gr_vec_set(B->rows[i], GR_ENTRY(poly1, i * m, sz), len1 % m, ctx);
+        status |= _gr_vec_set(Brow(i), GR_ENTRY(poly1, i * m, sz), m, ctx);
+    status |= _gr_vec_set(Brow(i), GR_ENTRY(poly1, i * m, sz), len1 % m, ctx);
 
     /* Set rows of A to powers of poly2 */
-    status |= gr_one(A->rows[0], ctx);
-    status |= _gr_vec_set(A->rows[1], poly2, len2, ctx);
+    status |= gr_one(Arow(0), ctx);
+    status |= _gr_vec_set(Arow(1), poly2, len2, ctx);
 
     /* Prefer squaring for powers? todo: the ring should know */
     if (len2 >= n && (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_has_real_prec(ctx) == T_TRUE))
     {
         for (i = 2; i < m; i++)
-            status |= _gr_poly_mullow(A->rows[i], A->rows[(i + 1) / 2], n, A->rows[i / 2], n, n, ctx);
+            status |= _gr_poly_mullow(Arow(i), Arow((i + 1) / 2), n, Arow(i / 2), n, n, ctx);
     }
     else
     {
         for (i = 2; i < m; i++)
-            status |= _gr_poly_mullow(A->rows[i], A->rows[i - 1], n, poly2, len2, n, ctx);
+            status |= _gr_poly_mullow(Arow(i), Arow(i - 1), n, poly2, len2, n, ctx);
     }
 
     status |= gr_mat_mul(C, B, A, ctx);
 
     /* Evaluate block composition using the Horner scheme */
-    status |= _gr_vec_set(res, C->rows[m - 1], n, ctx);
-    status |= _gr_poly_mullow(h, A->rows[m - 1], n, poly2, len2, n, ctx);
+    status |= _gr_vec_set(res, Crow(m - 1), n, ctx);
+    status |= _gr_poly_mullow(h, Arow(m - 1), n, poly2, len2, n, ctx);
 
     for (i = m - 2; i >= 0; i--)
     {
         status |= _gr_poly_mullow(t, res, n, h, n, n, ctx);
-        status |= _gr_poly_add(res, t, n, C->rows[i], n, ctx);
+        status |= _gr_poly_add(res, t, n, Crow(i), n, ctx);
     }
 
     GR_TMP_CLEAR_VEC(h, 2 * n, ctx);
+
+#undef Arow
+#undef Brow
+#undef Crow
 
     gr_mat_clear(A, ctx);
     gr_mat_clear(B, ctx);

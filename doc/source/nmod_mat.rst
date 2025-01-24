@@ -76,6 +76,12 @@ Memory management
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
 
+.. function:: void nmod_mat_set_mod(nmod_mat_t mat, ulong n);
+
+    Sets the modulus of an already initialized matrix ``mat`` to be `n`. Row
+    and column dimensions are unchanged, and allocated memory is unaffected.
+    Caution: this does not reduce the entries of ``mat`` modulo `n`.
+
 
 Basic properties and manipulation
 --------------------------------------------------------------------------------
@@ -142,7 +148,7 @@ Concatenate
 
 .. function:: void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
 
-    Sets ``res`` to vertical concatenation of (`mat1`, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
 
 .. function:: void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2)
 
@@ -309,16 +315,16 @@ Matrix-scalar arithmetic
 
 .. function:: void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
 
-    Sets `B = cA`, where the scalar `c` is assumed to be reduced
-    modulo the modulus. Dimensions of `A` and `B` must be identical.
+    Sets `B = cA`, where the scalar `c` is assumed to be reduced modulo the
+    modulus. Dimensions of `A` and `B` must be identical.
 
-.. function:: void nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X, const nmod_mat_t Y, const ulong b)
+.. function:: void nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c)
 
-    Sets `dest = X + bY`, where the scalar `b` is assumed to be reduced
-    modulo the modulus. Dimensions of dest, X and Y must be identical.
-    dest can be aliased with X or Y.
+    Sets `C = A + cB`, where the scalar `c` is assumed to be reduced modulo the
+    modulus. Dimensions of `C`, `A` and `B` must be identical.  `C` can be
+    aliased with `A` or `B`.
 
-.. function:: void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
+.. function:: void nmod_mat_scalar_mul_fmpz(nmod_mat_t B, const nmod_mat_t A, const fmpz_t c)
 
     Sets `B = cA`, where the scalar `c` is of type ``fmpz_t``. Dimensions of `A`
     and `B` must be identical.

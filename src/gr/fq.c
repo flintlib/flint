@@ -22,6 +22,7 @@
 #include "fq_mat.h"
 #include "fq_poly_factor.h"
 #include "gr_vec.h"
+#include "gr_mat.h"
 #include "gr_generic.h"
 
 #define FQ_CTX(ring_ctx) ((fq_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
@@ -669,6 +670,24 @@ _gr_fq_mat_mul(fq_mat_t res, const fq_mat_t x, const fq_mat_t y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fq_mat_charpoly(fq_struct * res, const fq_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    if (n <= 12)
+        return _gr_mat_charpoly_berkowitz(res, (const gr_mat_struct *) mat, ctx);
+    else
+        return _gr_mat_charpoly_danilevsky(res, (const gr_mat_struct *) mat, ctx);
+}
+
+int
+_gr_fq_mat_reduce_row(slong * column, fq_mat_t mat, slong * P, slong * L, slong n, gr_ctx_t ctx)
+{
+    *column = fq_mat_reduce_row(mat, P, L, n, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 int _fq_methods_initialized = 0;
 
 gr_static_method_table _fq_methods;
@@ -757,6 +776,8 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fq_poly_mullow},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fq_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fq_mat_mul},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fq_mat_charpoly},
+    {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) _gr_fq_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };
 

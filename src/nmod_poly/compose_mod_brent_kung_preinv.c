@@ -54,26 +54,36 @@ _nmod_poly_compose_mod_brent_kung_preinv(nn_ptr res, nn_srcptr poly1,
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1/m; i++)
-        _nmod_vec_set(B->rows[i], poly1 + i*m, m);
+        _nmod_vec_set(nmod_mat_entry_ptr(B, i, 0), poly1 + i*m, m);
 
-    _nmod_vec_set(B->rows[i], poly1 + i*m, len1%m);
+    _nmod_vec_set(nmod_mat_entry_ptr(B, i, 0), poly1 + i*m, len1%m);
 
     /* Set rows of A to powers of poly2 */
-    _nmod_poly_powers_mod_preinv_naive(A->rows, poly2, n,
-                                       m, poly3, len3, poly3inv, len3inv, mod);
+    {
+        nn_ptr * Arows;
+        slong i;
+        Arows = flint_malloc(sizeof(nn_ptr) * A->r);
+        for (i = 0; i < A->r; i++)
+            Arows[i] = nmod_mat_entry_ptr(A, i, 0);
+
+        _nmod_poly_powers_mod_preinv_naive(Arows, poly2, n,
+                                           m, poly3, len3, poly3inv, len3inv, mod);
+
+        flint_free(Arows);
+    }
 
     nmod_mat_mul(C, B, A);
 
     /* Evaluate block composition using the Horner scheme */
-    _nmod_vec_set(res, C->rows[m - 1], n);
-    _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, poly2, n,
+    _nmod_vec_set(res, nmod_mat_entry_ptr(C, m - 1, 0), n);
+    _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, poly2, n,
                                            poly3, len3, poly3inv, len3inv,mod);
 
     for (i = m - 2; i >= 0; i--)
     {
         _nmod_poly_mulmod_preinv(t, res, n, h, n, poly3, len3,
                                                        poly3inv, len3inv, mod);
-        _nmod_poly_add(res, t, n, C->rows[i], n, mod);
+        _nmod_poly_add(res, t, n, nmod_mat_entry_ptr(C, i, 0), n, mod);
     }
 
     _nmod_vec_clear(h);

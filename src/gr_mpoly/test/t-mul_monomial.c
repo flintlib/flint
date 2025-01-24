@@ -22,21 +22,21 @@ TEST_FUNCTION_START(gr_mpoly_mul_monomial, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         gr_ctx_t cctx;
-        mpoly_ctx_t mctx;
+        gr_mpoly_ctx_t ctx;
         gr_mpoly_t f, g, h, k1, k2, t;
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         int status;
 
         gr_ctx_init_random(cctx, state);
-        mpoly_ctx_init_rand(mctx, state, 4);
+        gr_mpoly_ctx_init_rand(ctx, state, cctx, 4);
 
-        gr_mpoly_init(f, mctx, cctx);
-        gr_mpoly_init(g, mctx, cctx);
-        gr_mpoly_init(h, mctx, cctx);
-        gr_mpoly_init(k1, mctx, cctx);
-        gr_mpoly_init(k2, mctx, cctx);
-        gr_mpoly_init(t, mctx, cctx);
+        gr_mpoly_init(f, ctx);
+        gr_mpoly_init(g, ctx);
+        gr_mpoly_init(h, ctx);
+        gr_mpoly_init(k1, ctx);
+        gr_mpoly_init(k2, ctx);
+        gr_mpoly_init(t, ctx);
 
         if (cctx->methods == _ca_methods)
         {
@@ -59,60 +59,60 @@ TEST_FUNCTION_START(gr_mpoly_mul_monomial, state)
         {
             status = GR_SUCCESS;
 
-            status |= gr_mpoly_randtest_bits(f, state, len1, exp_bits1, mctx, cctx);
-            status |= gr_mpoly_randtest_bits(g, state, 1, exp_bits2, mctx, cctx);
-            status |= gr_mpoly_randtest_bits(h, state, 1, exp_bits, mctx, cctx);
-            status |= gr_mpoly_randtest_bits(k1, state, len, exp_bits, mctx, cctx);
-            status |= gr_mpoly_randtest_bits(k2, state, len, exp_bits, mctx, cctx);
+            status |= gr_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
+            status |= gr_mpoly_randtest_bits(g, state, 1, exp_bits2, ctx);
+            status |= gr_mpoly_randtest_bits(h, state, 1, exp_bits, ctx);
+            status |= gr_mpoly_randtest_bits(k1, state, len, exp_bits, ctx);
+            status |= gr_mpoly_randtest_bits(k2, state, len, exp_bits, ctx);
 
             if (g->length != 1 || h->length != 1)
                 continue;
 
-            status |= gr_mpoly_add(k1, g, h, mctx, cctx);
+            status |= gr_mpoly_add(k1, g, h, ctx);
 
             if (n_randint(state, 2))
-                status |= gr_mpoly_mul_johnson(k1, f, k1, mctx, cctx);
+                status |= gr_mpoly_mul_johnson(k1, f, k1, ctx);
             else
-                status |= gr_mpoly_mul_johnson(k1, k1, f, mctx, cctx);
+                status |= gr_mpoly_mul_johnson(k1, k1, f, ctx);
 
             if (status == GR_SUCCESS)
-                gr_mpoly_assert_canonical(k1, mctx, cctx);
+                gr_mpoly_assert_canonical(k1, ctx);
 
-            status |= gr_mpoly_mul_monomial(k2, f, g, mctx, cctx);
-
-            if (status == GR_SUCCESS)
-                gr_mpoly_assert_canonical(k2, mctx, cctx);
-
-            status |= gr_mpoly_mul_monomial(t, f, h, mctx, cctx);
+            status |= gr_mpoly_mul_monomial(k2, f, g, ctx);
 
             if (status == GR_SUCCESS)
-                gr_mpoly_assert_canonical(t, mctx, cctx);
+                gr_mpoly_assert_canonical(k2, ctx);
 
-            status |= gr_mpoly_add(k2, k2, t, mctx, cctx);
+            status |= gr_mpoly_mul_monomial(t, f, h, ctx);
 
-            if (status == GR_SUCCESS && gr_mpoly_equal(k1, k2, mctx, cctx) == T_FALSE)
+            if (status == GR_SUCCESS)
+                gr_mpoly_assert_canonical(t, ctx);
+
+            status |= gr_mpoly_add(k2, k2, t, ctx);
+
+            if (status == GR_SUCCESS && gr_mpoly_equal(k1, k2, ctx) == T_FALSE)
             {
                 flint_printf("FAIL: Check (f + g) - g = f\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
-                gr_ctx_println(cctx);
-                flint_printf("f = "); gr_mpoly_print_pretty(f, NULL, mctx, cctx); flint_printf("\n");
-                flint_printf("g = "); gr_mpoly_print_pretty(g, NULL, mctx, cctx); flint_printf("\n");
-                flint_printf("h = "); gr_mpoly_print_pretty(h, NULL, mctx, cctx); flint_printf("\n");
-                flint_printf("f * (g + h) = "); gr_mpoly_print_pretty(k1, NULL, mctx, cctx); flint_printf("\n");
-                flint_printf("f * g + f * h = "); gr_mpoly_print_pretty(k2, NULL, mctx, cctx); flint_printf("\n");
+                gr_ctx_println(ctx);
+                flint_printf("f = "); gr_mpoly_print_pretty(f, ctx); flint_printf("\n");
+                flint_printf("g = "); gr_mpoly_print_pretty(g, ctx); flint_printf("\n");
+                flint_printf("h = "); gr_mpoly_print_pretty(h, ctx); flint_printf("\n");
+                flint_printf("f * (g + h) = "); gr_mpoly_print_pretty(k1, ctx); flint_printf("\n");
+                flint_printf("f * g + f * h = "); gr_mpoly_print_pretty(k2, ctx); flint_printf("\n");
                 fflush(stdout);
                 flint_abort();
             }
         }
 
-        gr_mpoly_clear(f, mctx, cctx);
-        gr_mpoly_clear(g, mctx, cctx);
-        gr_mpoly_clear(h, mctx, cctx);
-        gr_mpoly_clear(k1, mctx, cctx);
-        gr_mpoly_clear(k2, mctx, cctx);
-        gr_mpoly_clear(t, mctx, cctx);
+        gr_mpoly_clear(f, ctx);
+        gr_mpoly_clear(g, ctx);
+        gr_mpoly_clear(h, ctx);
+        gr_mpoly_clear(k1, ctx);
+        gr_mpoly_clear(k2, ctx);
+        gr_mpoly_clear(t, ctx);
 
-        mpoly_ctx_clear(mctx);
+        gr_mpoly_ctx_clear(ctx);
         gr_ctx_clear(cctx);
     }
 

@@ -82,7 +82,7 @@ sample(void *arg, ulong count)
     fmpz_mat_clear(D);
     fmpq_clear(delta);
     fmpq_clear(eta);
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 int

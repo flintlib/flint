@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "profiler.h"
 #include "fmpz.h"
 #include "aprcl.h"
@@ -418,6 +419,8 @@ int main(void)
 
         fmpz_clear(n);
     }
+
+    FLINT_TEST_CLEAR(state)
 
     return 0;
 }

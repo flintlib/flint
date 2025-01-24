@@ -190,6 +190,47 @@ flint_mpn_signed_sub_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t n)
     }
 }
 
+/* add without carry in or carry out */
+#define NN_ADD_2(r, u, v) add_ssaaaa((r)[1], (r)[0], (u)[1], (u)[0], (v)[1], (v)[0])
+#define NN_ADD_3(r, u, v) add_sssaaaaaa((r)[2], (r)[1], (r)[0], (u)[2], (u)[1], (u)[0], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_4(r, u, v) add_ssssaaaaaaaa((r)[3], (r)[2], (r)[1], (r)[0], (u)[3], (u)[2], (u)[1], (u)[0], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_5(r, u, v) add_sssssaaaaaaaaaa((r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_6(r, u, v) add_ssssssaaaaaaaaaaaa((r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_7(r, u, v) add_sssssssaaaaaaaaaaaaaa((r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_8(r, u, v) add_ssssssssaaaaaaaaaaaaaaaa((r)[7], (r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[7], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[7], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+
+#define NN_SUB_2(r, u, v) sub_ddmmss((r)[1], (r)[0], (u)[1], (u)[0], (v)[1], (v)[0])
+#define NN_SUB_3(r, u, v) sub_dddmmmsss((r)[2], (r)[1], (r)[0], (u)[2], (u)[1], (u)[0], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_4(r, u, v) sub_ddddmmmmssss((r)[3], (r)[2], (r)[1], (r)[0], (u)[3], (u)[2], (u)[1], (u)[0], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_5(r, u, v) sub_dddddmmmmmsssss((r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_6(r, u, v) sub_ddddddmmmmmmssssss((r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_7(r, u, v) sub_dddddddmmmmmmmsssssss((r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_8(r, u, v) sub_ddddddddmmmmmmmmssssssss((r)[7], (r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[7], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[7], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+
+#define DEF_SIGNED_SUB(n) \
+FLINT_FORCE_INLINE int \
+flint_mpn_signed_sub_ ## n(mp_ptr res, mp_srcptr x, mp_srcptr y) \
+{ \
+    if (mpn_cmp(x, y, n) >= 0) \
+    { \
+        NN_SUB_ ## n(res, x, y); \
+        return 0; \
+    } \
+    else \
+    { \
+        NN_SUB_ ## n(res, y, x); \
+        return 1; \
+    } \
+}
+
+DEF_SIGNED_SUB(2)
+DEF_SIGNED_SUB(3)
+DEF_SIGNED_SUB(4)
+DEF_SIGNED_SUB(5)
+DEF_SIGNED_SUB(6)
+DEF_SIGNED_SUB(7)
+DEF_SIGNED_SUB(8)
+
 FLINT_FORCE_INLINE void
 flint_mpn_signed_div2(mp_ptr res, mp_srcptr x, mp_size_t n)
 {
@@ -237,13 +278,13 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
 
 #define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
     do {                                                                  \
-        mp_limb_t __t1, __t2, __u1, __u2;                                 \
+        mp_limb_t __v1, __v2, __u1, __u2;                                 \
         mp_limb_t __r3, __r2, __r1, __r0;                                 \
         mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
         umul_ppmm(__r1, __r0, __a0, __b0);                                \
         umul_ppmm(__r3, __r2, __a1, __b1);                                \
-        umul_ppmm(__t2, __t1, __a0, __b1);                                \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __t2, __t1); \
+        umul_ppmm(__v2, __v1, __a0, __b1);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __v2, __v1); \
         umul_ppmm(__u2, __u1, __a1, __b0);                                \
         add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
         (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
@@ -266,14 +307,14 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
 
 #define FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)   \
     do {                                                                     \
-        mp_limb_t __t1, __t2, __t3;                                          \
+        mp_limb_t __u1, __u2, __u3;                                          \
         mp_limb_t __r3, __r2, __r1, __r0;                                    \
         mp_limb_t __a1 = (a1), __a0 = (a0);                                  \
-        umul_ppmm(__t2, __t1, __a0, __a1);                                   \
-        add_sssaaaaaa(__t3, __t2, __t1, 0, __t2, __t1, 0, __t2, __t1);       \
+        umul_ppmm(__u2, __u1, __a0, __a1);                                   \
+        add_sssaaaaaa(__u3, __u2, __u1, 0, __u2, __u1, 0, __u2, __u1);       \
         umul_ppmm(__r1, __r0, __a0, __a0);                                   \
         umul_ppmm(__r3, __r2, __a1, __a1);                                   \
-        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __t3, __t2, __t1); \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __u3, __u2, __u1); \
         (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;                  \
     } while (0)
 
@@ -577,7 +618,9 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
-# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 9
+# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 13
+/* n with best effective cycles/limb (and current largest assembly case) -- used by mulhigh_recursive */
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 9
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 9
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 8
@@ -591,6 +634,7 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #elif FLINT_HAVE_ASSEMBLY_armv8
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 8
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 8
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0
@@ -602,6 +646,7 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 /* TODO: generic hardcoded mullows */
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 16
+# define FLINT_MPN_MULHIGH_BEST_TAB_N 16
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 2
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0
@@ -609,8 +654,9 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #endif
 
 /* FIXME: this tuning is for x86_64_adx with fft_small */
-/* NOTE: we assume that the same cutoff is optimal for both mulhigh and mullow */
-#define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
+/* FIXME: we currently assume that the same parameters are optimal for both mulhigh and mullow */
+#define FLINT_MPN_MULLOW_MULDERS_CUTOFF 50
+#define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 40
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
 #define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
 
@@ -624,9 +670,24 @@ mp_limb_t _flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
+mp_limb_t _flint_mpn_mulhigh_n_naive(mp_ptr rp, mp_srcptr up, mp_srcptr vp, mp_size_t n);
+mp_limb_t _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+MPN_EXTRAS_INLINE
+mp_limb_t _flint_mpn_mulhigh_n_basecase2(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    if (n <= 22)
+        return _flint_mpn_mulhigh_n_recursive(rp, xp, yp, n);
+    else
+        return _flint_mpn_mulhigh_basecase(rp, xp, yp, n);
+}
+#else
+#define _flint_mpn_mulhigh_n_basecase2 _flint_mpn_mulhigh_basecase
+#endif
 
 MPN_EXTRAS_INLINE
 mp_limb_t flint_mpn_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)

@@ -13,6 +13,8 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_poly_gcd_euclidean, state)
 {
     slong iter;
@@ -35,7 +37,7 @@ TEST_FUNCTION_START(gr_poly_gcd_euclidean, state)
         gr_poly_init(G, ctx);
 
         n = 6;
-        if (ctx->which_ring == GR_CTX_CC_CA || ctx->which_ring == GR_CTX_RR_CA)
+        if (ctx->methods == _ca_methods)
             n = 3;
 
         status = gr_poly_randtest(A, state, n, ctx);

@@ -14,7 +14,7 @@
 
 TEST_FUNCTION_START(nmod_mat_init_clear, state)
 {
-    slong m, n, mod, i, j, rep;
+    slong m, n, mod, rep;
 
     for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
@@ -26,10 +26,8 @@ TEST_FUNCTION_START(nmod_mat_init_clear, state)
 
         nmod_mat_init(A, m, n, mod);
 
-        for (i = 0; i < m; i++)
-            for (j = 0; j < n; j++)
-                if (A->rows[i][j] != UWORD(0))
-                    TEST_FUNCTION_FAIL("entries not zero\n");
+        if (!nmod_mat_is_zero(A))
+            TEST_FUNCTION_FAIL("entries not zero\n");
 
         if (A->mod.n != mod)
             TEST_FUNCTION_FAIL("bad modulus\n");

@@ -34,9 +34,9 @@ TEST_FUNCTION_START(fmpz_mat_col_partition, state)
 
         /* set first row */
         for (j = 0; j < n; j++)
-           fmpz_randtest(A->rows[0] + j, state, 100);
+           fmpz_randtest(fmpz_mat_entry(A, 0, j), state, 100);
         /* ensure row is distinct */
-        fmpz_set_ui(A->rows[0] + n_randint(state, n), 0);
+        fmpz_set_ui(fmpz_mat_entry(A, 0, n_randint(state, n)), 0);
 
         /* fill remaining rows */
         for (k = 1; k < m; k++)
@@ -45,15 +45,15 @@ TEST_FUNCTION_START(fmpz_mat_col_partition, state)
            {
               /* random row */
               for (j = 0; j < n; j++)
-                 fmpz_randtest(A->rows[k] + j, state, 100);
+                 fmpz_randtest(fmpz_mat_entry(A, k, j), state, 100);
               /* ensure row is distinct */
-              fmpz_set_ui(A->rows[k] + n_randint(state, n), k);
+              fmpz_set_ui(fmpz_mat_entry(A, k, n_randint(state, n)), k);
               p1++;
            } else
            {
               /* same as last row */
               for (j = 0; j < n; j++)
-                 fmpz_set(A->rows[k] + j, A->rows[k - 1] + j);
+                 fmpz_set(fmpz_mat_entry(A, k, j), fmpz_mat_entry(A, k - 1, j));
            }
         }
 
@@ -62,9 +62,7 @@ TEST_FUNCTION_START(fmpz_mat_col_partition, state)
         {
            slong r1 = n_randint(state, m);
            slong r2 = n_randint(state, m);
-           fmpz * t = A->rows[r1];
-           A->rows[r1] = A->rows[r2];
-           A->rows[r2] = t;
+           fmpz_mat_swap_rows(A, NULL, r1, r2);
         }
 
         /* transpose so rows are now columns */

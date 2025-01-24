@@ -28,7 +28,7 @@ fmpz_mat_det_bound_inner(fmpz_t bound, const fmpz_mat_t A, int zero_cols)
         fmpz_zero(s);
 
         for (j = 0; j < A->c; j++)
-            fmpz_addmul(s, A->rows[i] + j, A->rows[i] + j);
+            fmpz_addmul(s, fmpz_mat_entry(A, i, j), fmpz_mat_entry(A, i, j));
 
         fmpz_sqrtrem(s, t, s);
         if (!fmpz_is_zero(t))

@@ -15,15 +15,11 @@
 void
 nmod_poly_mat_clear(nmod_poly_mat_t A)
 {
-    if (A->entries)
+    if (A->entries != NULL)
     {
         slong i;
-
         for (i = 0; i < A->r * A->c; i++)
             nmod_poly_clear(A->entries + i);
-
         flint_free(A->entries);
-        flint_free(A->rows);
-    } else if (A->r != 0)
-        flint_free(A->rows);
+    }
 }

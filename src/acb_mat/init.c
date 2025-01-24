@@ -15,19 +15,11 @@
 void
 acb_mat_init(acb_mat_t mat, slong r, slong c)
 {
-    if (r != 0 && c != 0)
-    {
-        slong i;
-
-        mat->entries = _acb_vec_init(r * c);
-        mat->rows = (acb_ptr *) flint_malloc(r * sizeof(acb_ptr));
-
-        for (i = 0; i < r; i++)
-            mat->rows[i] = mat->entries + i * c;
-    }
-    else
-        mat->entries = NULL;
-
+    mat->entries = NULL;
     mat->r = r;
     mat->c = c;
+    mat->stride = c;
+
+    if (r != 0 && c != 0)
+        mat->entries = _acb_vec_init(r * c);
 }

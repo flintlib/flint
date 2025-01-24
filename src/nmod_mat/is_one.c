@@ -21,16 +21,16 @@ int nmod_mat_is_one(const nmod_mat_t mat)
 
     for (i = 0; i < mat->r; i++)
     {
-        if (!_nmod_vec_is_zero(mat->rows[i], FLINT_MIN(mat->c, i)))
+        if (!_nmod_vec_is_zero(nmod_mat_entry_ptr(mat, i, 0), FLINT_MIN(mat->c, i)))
             return 0;
 
         if (i + 1 > mat->c)
             continue;
 
-        if (mat->rows[i][i] != 1)
+        if (nmod_mat_entry(mat, i, i) != 1)
             return 0;
 
-        if (!_nmod_vec_is_zero(mat->rows[i] + i + 1, mat->c - (i + 1)))
+        if (!_nmod_vec_is_zero(nmod_mat_entry_ptr(mat, i, i + 1), mat->c - (i + 1)))
             return 0;
     }
 

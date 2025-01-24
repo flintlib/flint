@@ -105,6 +105,10 @@ FLINT_PATCH_SO=0
 # Make sure that we are in the right directory
 AC_CONFIG_SRCDIR(src/fmpz/link/fmpz_reentrant.c)
 
+# Ensure that source directory is not already configured, so there are no
+# clashes between different configurations.
+AX_INIT
+
 ################################################################################
 # initialize libtool
 ################################################################################
@@ -638,6 +642,10 @@ case $host in
         gcc_cflags_arch="-march=armv8.6-a"
         gcc_cflags_tune=""
         ;;
+      applem4*)
+        gcc_cflags_arch="-march=armv8.7-a"
+        gcc_cflags_tune=""
+        ;;
       aarch64* | armv8*)
         gcc_cflags_arch="-march=armv8-a"
         gcc_cflags_tune=""
@@ -673,13 +681,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen3"
         ;;
       zen4)
-        gcc_cflags_arch="-march=znver4 -march=znver3"
-        param_path="x86_64/zen3"
+        gcc_cflags_arch="-march=znver4"
+        param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
       coreibwl | broadwell)
         gcc_cflags_arch="-march=broadwell"
-        param_path="x86_64/skylake"
+        param_path="x86_64/broadwell"
         ;;
       skylake)
         gcc_cflags_arch="-march=skylake"
@@ -701,12 +709,12 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       icelake)
         gcc_cflags_arch="-march=icelake-client"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"
         have_avx512="yes"
         ;;
       icelake_server)
         gcc_cflags_arch="-march=icelake-server"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"
         have_avx512="yes"
         ;;
       rocketlake)
@@ -737,7 +745,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         have_avx512="yes"
         ;;
       cometlake)
-        gcc_cflags_arch="-march=kabylake"
+        gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
       *)
@@ -753,6 +761,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64"
 	    ;;
 	esac
+
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
 
     if test "$have_avx512" = "yes";
     then
@@ -799,6 +814,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
     esac
 
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
+
     if test "$have_avx512" = "yes";
     then
         have_avx2="yes"
@@ -826,6 +848,9 @@ dnl NOTE: The following line is invoked from LT_INIT
 dnl AC_PROG_CC
 
 AC_PROG_MKDIR_P
+
+FLINT_CC_IS_GCC
+FLINT_CC_IS_CLANG
 
 ################################################################################
 # environment variables
@@ -1178,9 +1203,12 @@ AC_CHECK_FUNCS([aligned_alloc _aligned_malloc])
 # CFLAGS
 ################################################################################
 
-# The following is needed for Clang to check for unknown options.
-FLINT_CLANG([AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
-                                   [CFLAGS="-Werror=unknown-warning-option"])])
+if test "$flint_cv_cc_is_clang" = "yes";
+then
+    # The following is needed for Clang to check for unknown options.
+    AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
+                          [CFLAGS="-Werror=unknown-warning-option"])
+fi
 
 if test "$enable_coverage" = "yes";
 then
@@ -1287,8 +1315,6 @@ else
     TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
 fi
 
-CPPFLAGS="-I./src $CPPFLAGS"
-
 ################################################################################
 # fft_small module
 ################################################################################
@@ -1322,6 +1348,7 @@ then
     GMP_PROG_M4
     GMP_PATH_NM
 
+    CL_ASM_NOEXECSTACK
     GMP_ASM_TEXT
     GMP_ASM_DATA
     GMP_ASM_LABEL_SUFFIX
@@ -1384,13 +1411,8 @@ fi
 # parameters
 ################################################################################
 
-if test -f src/mpn_extras/$param_path/flint-mparam.h;
-then
-    AC_CONFIG_LINKS([src/flint-mparam.h:src/mpn_extras/$param_path/flint-mparam.h],[],[param_path="$param_path"])
-    AC_SUBST(PARAM_PATH,$param_path)
-else
-    AC_MSG_ERROR([Error establishing flint-mparam.h from param_path = $param_path])
-fi
+AC_CONFIG_LINKS([src/flint-mparam.h:src/mpn_extras/$param_path/flint-mparam.h],[],[param_path="$param_path"])
+AC_SUBST(PARAM_PATH,$param_path)
 
 ################################################################################
 # substitutions and definitions
@@ -1520,6 +1542,13 @@ fi
 if test "$enable_gmp_internals" = "yes";
 then
     AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
+fi
+
+if test "$ac_abs_confdir" = "`pwd`";
+then
+    AC_SUBST(IS_OUT_OF_TREE,0)
+else
+    AC_SUBST(IS_OUT_OF_TREE,1)
 fi
 
 ################################################################################

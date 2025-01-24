@@ -16,6 +16,8 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_poly_xgcd, state)
 {
     int i;
@@ -33,7 +35,7 @@ TEST_FUNCTION_START(gr_poly_xgcd, state)
 
         if (gr_ctx_is_finite(ctx) == T_TRUE && n_randint(state, 2) == 0)
             n = 20;
-        else if (ctx->which_ring == GR_CTX_CC_CA || ctx->which_ring == GR_CTX_RR_CA)
+        else if (ctx->methods == _ca_methods)
             n = 4;
         else
             n = 6;

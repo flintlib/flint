@@ -88,7 +88,7 @@ slong mpoly_words_per_exp(flint_bitcnt_t bits, const mpoly_ctx_t mctx)
     possibly upgrade it so that it is either
         (mp) a multiple of FLINT_BITS in the mp case, or
         (sp) as big as possible without increasing words_per_exp in the sp case
-    The upgrade in (mp) is manditory, while the upgrade in (sp) is simply nice.
+    The upgrade in (mp) is mandatory, while the upgrade in (sp) is simply nice.
 */
 FLINT_FORCE_INLINE
 flint_bitcnt_t mpoly_fix_bits(flint_bitcnt_t bits, const mpoly_ctx_t mctx)

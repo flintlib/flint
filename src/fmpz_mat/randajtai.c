@@ -37,16 +37,16 @@ fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
         fmpz_one(tmp);
         fmpz_mul_2exp(tmp, tmp, bits);
         fmpz_sub_ui(tmp, tmp, 1);
-        fmpz_randm(mat->rows[i] + i, state, tmp);
-        fmpz_add_ui(mat->rows[i] + i, mat->rows[i] + i, 2);
-        fmpz_fdiv_q_2exp(mat->rows[i] + i, mat->rows[i] + i, 1);
+        fmpz_randm(fmpz_mat_entry(mat, i, i), state, tmp);
+        fmpz_add_ui(fmpz_mat_entry(mat, i, i), fmpz_mat_entry(mat, i, i), 2);
+        fmpz_fdiv_q_2exp(fmpz_mat_entry(mat, i, i), fmpz_mat_entry(mat, i, i), 1);
 
         for (j = i + 1; j < d; j++)
         {
-            fmpz_randm(mat->rows[j] + i, state, tmp);
+            fmpz_randm(fmpz_mat_entry(mat, j, i), state, tmp);
             if (n_randint(state, 2))
-                fmpz_neg(mat->rows[j] + i, mat->rows[j] + i);
-            fmpz_zero(mat->rows[i] + j);
+                fmpz_neg(fmpz_mat_entry(mat, j, i), fmpz_mat_entry(mat, j, i));
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
         }
     }
 

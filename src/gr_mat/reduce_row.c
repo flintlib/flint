@@ -13,7 +13,7 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+int gr_mat_reduce_row_generic(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     slong n = A->c, i, j, r;
@@ -68,4 +68,9 @@ int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m,
     GR_TMP_CLEAR(h, ctx);
 
     return status;
+}
+
+int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+{
+    return GR_MAT_REDUCE_ROW_OP(ctx, MAT_REDUCE_ROW)(column, A, P, L, m, ctx);
 }

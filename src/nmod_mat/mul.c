@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mat.h"
 #include "thread_support.h"
 
@@ -42,7 +43,7 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             of large enough dimension
         (3) if nmod_mat_mul_blas beats nmod_mat_mul_classical on
             square multiplications of size d, then it beats it on
-            rectangular muliplications as long as all dimensions are >= d
+            rectangular multiplications as long as all dimensions are >= d
     */
     if (FLINT_BITS == 64 && min_dim > 100)
     {

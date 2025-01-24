@@ -996,7 +996,7 @@ static void _lattice(
 
                 for (i = 0; i < nrows; i++)
                     nmod_mat_entry(M, (j - CLD[k])*d + l, i) =
-                              _nmod_vec_dot(trow, N->rows[i], r, ctx->mod, params);
+                              _nmod_vec_dot(trow, nmod_mat_entry_ptr(N, i, 0), r, ctx->mod, params);
             }
 
         nmod_mat_init_nullspace_tr(T1, M);

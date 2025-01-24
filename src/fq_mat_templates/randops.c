@@ -34,12 +34,12 @@ TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat,
 
             if (n_randint(state, 2))
                 for (k = 0; k < n; k++)
-                    TEMPLATE(T, add) (mat->rows[j] + k,
-                                      mat->rows[j] + k, mat->rows[i] + k, ctx);
+                    TEMPLATE(T, add) (TEMPLATE(T, mat_entry)(mat, j, k),
+                                      TEMPLATE(T, mat_entry)(mat, j, k), TEMPLATE(T, mat_entry)(mat, i, k), ctx);
             else
                 for (k = 0; k < n; k++)
-                    TEMPLATE(T, sub) (mat->rows[j] + k,
-                                      mat->rows[j] + k, mat->rows[i] + k, ctx);
+                    TEMPLATE(T, sub) (TEMPLATE(T, mat_entry)(mat, j, k),
+                                      TEMPLATE(T, mat_entry)(mat, j, k), TEMPLATE(T, mat_entry)(mat, i, k), ctx);
         }
         else
         {
@@ -47,12 +47,12 @@ TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat,
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
-                    TEMPLATE(T, add) (mat->rows[k] + j,
-                                      mat->rows[k] + j, mat->rows[k] + i, ctx);
+                    TEMPLATE(T, add) (TEMPLATE(T, mat_entry)(mat, k, j),
+                                      TEMPLATE(T, mat_entry)(mat, k, j), TEMPLATE(T, mat_entry)(mat, k, i), ctx);
             else
                 for (k = 0; k < m; k++)
-                    TEMPLATE(T, sub) (mat->rows[k] + j,
-                                      mat->rows[k] + j, mat->rows[k] + i, ctx);
+                    TEMPLATE(T, sub) (TEMPLATE(T, mat_entry)(mat, k, j),
+                                      TEMPLATE(T, mat_entry)(mat, k, j), TEMPLATE(T, mat_entry)(mat, k, i), ctx);
         }
     }
 }

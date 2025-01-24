@@ -25,10 +25,10 @@ The Calcium modules use two kinds of predicate functions:
   decide). The return value is a :type:`truth_t` (``T_TRUE``,
   ``T_FALSE`` or ``T_UNKNOWN``).
 
-Flint, Arb and Antic extras
+FLINT, Arb and Antic extras
 -------------------------------------------------------------------------------
 
-Here we collect various utility methods for Flint, Arb and Antic
+Here we collect various utility methods for FLINT, Arb and Antic
 types that are missing in those libraries. Some of these functions
 may be migrated upstream in the future.
 

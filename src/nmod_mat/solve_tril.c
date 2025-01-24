@@ -44,7 +44,7 @@ nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t
         for (j = 0; j < n; j++)
         {
             ulong s;
-            s = _nmod_vec_dot(L->rows[j], tmp, j, mod, params);
+            s = _nmod_vec_dot(nmod_mat_entry_ptr(L, j, 0), tmp, j, mod, params);
             s = nmod_sub(nmod_mat_entry(B, j, i), s, mod);
             if (!unit)
                 s = n_mulmod2_preinv(s, inv[j], mod.n, mod.ninv);

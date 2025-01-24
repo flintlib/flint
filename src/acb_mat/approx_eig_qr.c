@@ -584,7 +584,7 @@ acb_mat_approx_eig_triu_r(acb_mat_t ER, const acb_mat_t A, slong prec)
 
         for (j = i - 1; j >= 0; j--)
         {
-            acb_approx_dot(r, NULL, 0, A->rows[j] + j + 1, 1, ER->rows[i] + j + 1, 1, i - j, prec);
+            acb_approx_dot(r, NULL, 0, acb_mat_entry(A, j, j + 1), 1, acb_mat_entry(ER, i, j + 1), 1, i - j, prec);
             acb_approx_sub(t, acb_mat_entry(A, j, j), s, prec);
 
             /* if abs(t) < smin: t = smin */
@@ -688,7 +688,7 @@ acb_mat_approx_eig_triu_l(acb_mat_t EL, const acb_mat_t A, slong prec)
 
         for (j = i + 1; j < n; j++)
         {
-            acb_approx_dot(r, NULL, 0, EL->rows[i] + i, 1, AT->rows[j] + i, 1, j - i, prec);
+            acb_approx_dot(r, NULL, 0, acb_mat_entry(EL, i, i), 1, acb_mat_entry(AT, j, i), 1, j - i, prec);
             acb_approx_sub(t, acb_mat_entry(AT, j, j), s, prec);
 
             /* if abs(t) < smin: t = smin */

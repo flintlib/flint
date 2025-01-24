@@ -44,7 +44,7 @@ void sample_xgcd_small(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 void sample_xgcd_mixed(void * arg, ulong count)
@@ -79,7 +79,7 @@ void sample_xgcd_mixed(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 void sample_xgcd_big(void * arg, ulong count)
@@ -114,7 +114,7 @@ void sample_xgcd_big(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
@@ -149,7 +149,7 @@ void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
@@ -184,7 +184,7 @@ void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 void sample_xgcd_canonical_bezout_big(void * arg, ulong count)
@@ -219,7 +219,7 @@ void sample_xgcd_canonical_bezout_big(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 int main(void)

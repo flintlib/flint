@@ -73,9 +73,9 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
         {
             for (j = 0; j < mat->c; j++)
             {
-                if (!fmpz_is_zero(mat->rows[i] + j))
+                if (!fmpz_is_zero(fmpz_mat_entry(mat, i, j)))
                 {
-                    fmpz_neg(mat->rows[i] + j, mat->rows[i] + j);
+                    fmpz_neg(fmpz_mat_entry(mat, i, j), fmpz_mat_entry(mat, i, j));
                     goto end;
                 }
             }

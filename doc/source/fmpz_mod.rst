@@ -42,7 +42,7 @@ Arithmetic
 --------------------------------------------------------------------------------
 
 Unless specified otherwise all functions here expect their relevant arguments to be in the canonical range `[0,n)`.
-Comparison of elements against each other or against zero can be accomplished with func::fmpz_equal or func::fmpz_is_zero without a context.
+Comparison of elements against each other or against zero can be accomplished with :func:`fmpz_equal` or :func:`fmpz_is_zero` without a context.
 
 .. function:: int fmpz_mod_is_canonical(const fmpz_t a, const fmpz_mod_ctx_t ctx)
 

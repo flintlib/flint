@@ -37,7 +37,7 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     }
 
     A_len = nmod_poly_mat_max_length(A);
-    B_len = nmod_poly_mat_max_length(B);
+    B_len = (A == B) ? A_len : nmod_poly_mat_max_length(B);
 
     if (A_len == 0 || B_len == 0)
     {
@@ -59,14 +59,15 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     weights = _nmod_vec_init(len);
 
     A_mod = flint_malloc(sizeof(nmod_mat_t) * len);
-    B_mod = flint_malloc(sizeof(nmod_mat_t) * len);
+    B_mod = (A == B) ? NULL : flint_malloc(sizeof(nmod_mat_t) * len);
     C_mod = flint_malloc(sizeof(nmod_mat_t) * len);
 
     for (i = 0; i < len; i++)
     {
         xs[i] = i;
         nmod_mat_init(A_mod[i], A->r, A->c, mod.n);
-        nmod_mat_init(B_mod[i], B->r, B->c, mod.n);
+        if (A != B)
+            nmod_mat_init(B_mod[i], B->r, B->c, mod.n);
         nmod_mat_init(C_mod[i], C->r, C->c, mod.n);
     }
 
@@ -84,26 +85,35 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                 tree, len, mod);
 
             for (k = 0; k < len; k++)
-                A_mod[k]->rows[i][j] = tt[k];
+                nmod_mat_entry(A_mod[k], i, j) = tt[k];
         }
     }
 
-    for (i = 0; i < B->r; i++)
+    if (A != B)
     {
-        for (j = 0; j < B->c; j++)
+        for (i = 0; i < B->r; i++)
         {
-            _nmod_poly_evaluate_nmod_vec_fast_precomp(tt,
-                nmod_poly_mat_entry(B, i, j)->coeffs,
-                nmod_poly_mat_entry(B, i, j)->length,
-                tree, len, mod);
+            for (j = 0; j < B->c; j++)
+            {
+                _nmod_poly_evaluate_nmod_vec_fast_precomp(tt,
+                    nmod_poly_mat_entry(B, i, j)->coeffs,
+                    nmod_poly_mat_entry(B, i, j)->length,
+                    tree, len, mod);
 
-            for (k = 0; k < len; k++)
-                B_mod[k]->rows[i][j] = tt[k];
+                for (k = 0; k < len; k++)
+                    nmod_mat_entry(B_mod[k], i, j) = tt[k];
+            }
         }
+
+        for (i = 0; i < len; i++)
+            nmod_mat_mul(C_mod[i], A_mod[i], B_mod[i]);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            nmod_mat_mul(C_mod[i], A_mod[i], A_mod[i]);
     }
 
-    for (i = 0; i < len; i++)
-        nmod_mat_mul(C_mod[i], A_mod[i], B_mod[i]);
 
     for (i = 0; i < C->r; i++)
     {
@@ -112,7 +122,7 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
             nmod_poly_struct * poly;
 
             for (k = 0; k < len; k++)
-                tt[k] = C_mod[k]->rows[i][j];
+                tt[k] = nmod_mat_entry(C_mod[k], i, j);
 
             poly = nmod_poly_mat_entry(C, i, j);
             nmod_poly_fit_length(poly, len);
@@ -128,12 +138,14 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     for (i = 0; i < len; i++)
     {
         nmod_mat_clear(A_mod[i]);
-        nmod_mat_clear(B_mod[i]);
+        if (A != B)
+            nmod_mat_clear(B_mod[i]);
         nmod_mat_clear(C_mod[i]);
     }
 
     flint_free(A_mod);
-    flint_free(B_mod);
+    if (A != B)
+        flint_free(B_mod);
     flint_free(C_mod);
 
     _nmod_vec_clear(xs);

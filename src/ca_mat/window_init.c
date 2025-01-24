@@ -15,14 +15,11 @@ void
 ca_mat_window_init(ca_mat_t window, const ca_mat_t mat,
     slong r1, slong c1, slong r2, slong c2, ca_ctx_t ctx)
 {
-    slong i;
-    window->entries = NULL;
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
 
-    window->rows = flint_malloc((r2 - r1) * sizeof(ca_ptr));
-
-    for (i = 0; i < r2 - r1; i++)
-        window->rows[i] = mat->rows[r1 + i] + c1;
-
+    window->entries = ca_mat_entry(mat, r1, c1);
     window->r = r2 - r1;
     window->c = c2 - c1;
+    window->stride = mat->stride;
 }

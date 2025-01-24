@@ -46,6 +46,10 @@ then
     fi
     echo "PASS"
     exit 0
+elif test "$1" = "check_n_is_prime";
+then
+    echo "check_n_is_prime....SKIPPED"
+    exit 0
 elif test "$1" = "class_poly";
 then
     echo "class_poly....SKIPPED"

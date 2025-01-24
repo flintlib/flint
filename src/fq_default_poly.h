@@ -2050,7 +2050,7 @@ void fq_default_poly_evaluate_fq_default(fq_default_t res,
     {
         res->nmod = nmod_poly_evaluate_nmod(f->nmod, a->nmod);
     }
-    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_evaluate_fmpz(res->fmpz_mod, f->fmpz_mod, a->fmpz_mod,
                                                         FQ_DEFAULT_CTX_FMPZ_MOD(ctx));

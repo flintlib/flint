@@ -10,23 +10,29 @@
 */
 
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_mat.h"
 #include "fmpz_mat.h"
 
-static void perm(gr_mat_t A, slong * P)
+static void perm(gr_mat_t A, slong * P, gr_ctx_t ctx)
 {
     slong i;
-    gr_ptr * tmp;
+    gr_mat_t tmp;
 
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(gr_ptr) * A->r);
+    gr_mat_init(tmp, A->r, A->c, ctx);
 
-    for (i = 0; i < A->r; i++) tmp[P[i]] = A->rows[i];
-    for (i = 0; i < A->r; i++) A->rows[i] = tmp[i];
+    for (i = 0; i < A->r; i++)
+        GR_MUST_SUCCEED(_gr_vec_set(gr_mat_entry_ptr(tmp, P[i], 0, ctx),
+                    gr_mat_entry_srcptr(A, i, 0, ctx), A->c, ctx));
 
-    flint_free(tmp);
+    for (i = 0; i < A->r; i++)
+        GR_MUST_SUCCEED(_gr_vec_set(gr_mat_entry_ptr(A, i, 0, ctx),
+                    gr_mat_entry_srcptr(tmp, i, 0, ctx), A->c, ctx));
+
+    gr_mat_clear(tmp, ctx);
 }
 
 static void check(slong * P, gr_mat_t LU, const gr_mat_t A, slong rank, gr_ctx_t ctx)
@@ -73,7 +79,7 @@ static void check(slong * P, gr_mat_t LU, const gr_mat_t A, slong rank, gr_ctx_t
     }
 
     status |= gr_mat_mul(B, L, U, ctx);
-    perm(B, P);
+    perm(B, P, ctx);
 
     if (status == GR_SUCCESS && gr_mat_equal(A, B, ctx) == T_FALSE)
     {

@@ -14,24 +14,23 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_make_monic(nn_ptr output,
-                            nn_srcptr input, slong len, nmod_t mod)
+void _nmod_poly_make_monic(nn_ptr res,
+                            nn_srcptr poly, slong len, nmod_t mod)
 {
     ulong inv;
 
-    inv = n_invmod(input[len - 1], mod.n);
-    _nmod_vec_scalar_mul_nmod(output, input, len, inv, mod);
+    inv = n_invmod(poly[len - 1], mod.n);
+    _nmod_vec_scalar_mul_nmod(res, poly, len, inv, mod);
 }
 
-void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
+void nmod_poly_make_monic(nmod_poly_t res, const nmod_poly_t poly)
 {
-    if (input->length == 0)
+    if (poly->length == 0)
     {
         flint_throw(FLINT_ERROR, "Exception (nmod_poly_make_monic). Division by zero.\n");
     }
 
-    nmod_poly_fit_length(output, input->length);
-    _nmod_poly_make_monic(output->coeffs,
-                            input->coeffs, input->length, input->mod);
-    output->length = input->length;
+    nmod_poly_fit_length(res, poly->length);
+    _nmod_poly_make_monic(res->coeffs, poly->coeffs, poly->length, poly->mod);
+    res->length = poly->length;
 }

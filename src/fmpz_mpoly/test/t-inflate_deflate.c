@@ -196,5 +196,65 @@ TEST_FUNCTION_START(fmpz_mpoly_inflate_deflate, state)
         fmpz_mpoly_ctx_clear(ctx);
     }
 
+    /* Check deflate with zero-stride does not divide by zero */
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t x, res;
+        fmpz *stride, *shift;
+
+        fmpz_mpoly_ctx_init(ctx, 1, ORD_LEX);
+        fmpz_mpoly_init(x, ctx);
+        fmpz_mpoly_init(res, ctx);
+
+        stride = flint_malloc(ctx->minfo->nvars * sizeof(fmpz));
+        shift = flint_malloc(ctx->minfo->nvars * sizeof(fmpz));
+        fmpz_init(stride + 0);
+        fmpz_init(shift + 0);
+
+        /* Set x to just the generator */
+        fmpz_mpoly_gen(x, 0, ctx);
+
+        /* --- With zero shift --- */
+        fmpz_set_ui(shift + 0, 0);
+
+        /* Attempt to deflate x to 1 with a shift and stride 0. */
+        /* That is 1 -> (1 - 0) / 0 */
+        /* Division by zero should not be raised here */
+        fmpz_mpoly_deflate(res, x, shift, stride, ctx);
+
+        if (!fmpz_mpoly_equal_ui(res, 1, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check deflate with zero-shift and zero-stride\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        /* --- With non-zero shift --- */
+        fmpz_set_ui(shift + 0, 1);
+
+        /* Attempt to deflate x to 1 with a shift of 1 and stride 0. */
+        /* That is 1 -> (1 - 1) / 0 */
+        /* Division by zero should not be raised here */
+        fmpz_mpoly_deflate(res, x, shift, stride, ctx);
+
+        if (!fmpz_mpoly_equal_ui(res, 1, ctx))
+        {
+            printf("FAIL\n");
+            flint_printf("Check deflate with non-zero shift and zero-stride\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_clear(stride + 0);
+        fmpz_clear(shift + 0);
+        flint_free(stride);
+        flint_free(shift);
+
+        fmpz_mpoly_clear(x, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }

@@ -17,7 +17,6 @@ static int
 _fmpz_mat_pivot(fmpz_mat_t A, slong start_row, slong col)
 {
     slong j;
-    fmpz * u;
 
     if (fmpz_is_zero(fmpz_mat_entry(A, start_row, col)) == 0)
         return 1;
@@ -26,10 +25,7 @@ _fmpz_mat_pivot(fmpz_mat_t A, slong start_row, slong col)
     {
         if (!fmpz_is_zero(fmpz_mat_entry(A, j, col)))
         {
-            u = A->rows[j];
-            A->rows[j] = A->rows[start_row];
-            A->rows[start_row] = u;
-
+            fmpz_mat_swap_rows(A, NULL, j, start_row);
             return -1;
         }
     }
@@ -161,7 +157,6 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
 {
     fmpz_t s, t, q, u, v, t1, t2, g;
     slong m, n, row, col, i, k, l;
-    fmpz  ** r;
     fmpz * extra_row;
 
     if (fmpz_mat_is_empty(A))
@@ -178,7 +173,6 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
 
     n = A->r;
     m = A->c;
-    r = A->rows;
 
     extra_row = _fmpz_vec_init(m);
 
@@ -275,12 +269,12 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
 
             }
             fmpz_divexact(g, mod, g);
-            _fmpz_vec_scalar_mul_fmpz(extra_row, r[col], m, g);
+            _fmpz_vec_scalar_mul_fmpz(extra_row, fmpz_mat_row(A, col), m, g);
             _fmpz_vec_scalar_mod_fmpz(extra_row, extra_row, m, mod);
         }
         else
         {
-          _fmpz_vec_set(extra_row, r[col], m);
+          _fmpz_vec_set(extra_row, fmpz_mat_row(A, col), m);
         }
 
         for (row = col + 1; row < m; row++)

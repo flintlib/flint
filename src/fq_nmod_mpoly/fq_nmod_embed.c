@@ -107,7 +107,7 @@ static void _set_matrices(bad_fq_nmod_embed_t cur)
     slong n = fq_nmod_ctx_degree(cur->lgctx);
     slong i;
     n_fq_poly_t phi_as_n_fq_poly, phi_pow, q;
-    ulong ** Mrows = cur->lg_to_sm_mat->rows;
+    nmod_mat_struct * M = cur->lg_to_sm_mat;
 
     n_fq_poly_init(phi_as_n_fq_poly);
     n_fq_poly_init(phi_pow);
@@ -120,7 +120,7 @@ static void _set_matrices(bad_fq_nmod_embed_t cur)
     {
         n_fq_poly_divrem(q, phi_pow, phi_pow, cur->h_as_n_fq_poly, cur->smctx);
         FLINT_ASSERT(phi_pow->length <= n/m);
-        _nmod_vec_set(Mrows[i], phi_pow->coeffs, phi_pow->length*m);
+        _nmod_vec_set(nmod_mat_entry_ptr(M, i, 0), phi_pow->coeffs, phi_pow->length*m);
         n_fq_poly_mul(phi_pow, phi_pow, phi_as_n_fq_poly, cur->smctx);
     }
 
@@ -356,7 +356,7 @@ void bad_n_fq_embed_lg_to_sm(
 
     n_poly_fit_length(out, lgd);
     for (i = 0; i < lgd; i++)
-        out->coeffs[i] = _nmod_vec_dot(emb->lg_to_sm_mat->rows[i], in, lgd,
+        out->coeffs[i] = _nmod_vec_dot(nmod_mat_entry_ptr(emb->lg_to_sm_mat, i, 0), in, lgd,
                                                       emb->lgctx->mod, params);
     FLINT_ASSERT(lgd/smd == emb->h->length - 1);
     out->length = emb->h->length - 1;
@@ -453,7 +453,7 @@ void bad_n_fq_embed_sm_to_lg(
     FLINT_ASSERT(smd*in_red->length <= lgd);
 
     for (i = 0; i < lgd; i++)
-        out[i] = _nmod_vec_dot(emb->sm_to_lg_mat->rows[i], in_red->coeffs,
+        out[i] = _nmod_vec_dot(nmod_mat_entry_ptr(emb->sm_to_lg_mat, i, 0), in_red->coeffs,
                                   smd*in_red->length, emb->lgctx->mod, params);
 
     n_poly_stack_give_back(St, 2);
@@ -547,7 +547,7 @@ void bad_n_fq_embed_sm_elem_to_lg(
     const dot_params_t params = _nmod_vec_dot_params(smd, emb->lgctx->mod);
 
     for (i = 0; i < lgd; i++)
-        out[i] = _nmod_vec_dot(emb->sm_to_lg_mat->rows[i], in, smd,
+        out[i] = _nmod_vec_dot(nmod_mat_entry_ptr(emb->sm_to_lg_mat, i, 0), in, smd,
                                                       emb->lgctx->mod, params);
 }
 
@@ -567,7 +567,7 @@ void bad_fq_nmod_embed_sm_elem_to_lg(
 
     for (i = 0; i < lgd; i++)
     {
-        out->coeffs[i] = _nmod_vec_dot(emb->sm_to_lg_mat->rows[i],
+        out->coeffs[i] = _nmod_vec_dot(nmod_mat_entry_ptr(emb->sm_to_lg_mat, i, 0),
                               in->coeffs, in->length, emb->lgctx->mod, params);
     }
 

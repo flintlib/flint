@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_vec.h"
 #include "gr_mat.h"
 
 int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
@@ -17,10 +18,12 @@ int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 
     if (r != s && gr_mat_is_empty(mat, ctx) == T_FALSE)
     {
+        slong sz = ctx->sizeof_elem;
+
         if (perm != NULL)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
-        FLINT_SWAP(gr_ptr, mat->rows[r], mat->rows[s]);
+        _gr_vec_swap(GR_MAT_ENTRY(mat, r, 0, sz), GR_MAT_ENTRY(mat, s, 0, sz), mat->c, ctx);
     }
 
     return GR_SUCCESS;

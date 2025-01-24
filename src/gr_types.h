@@ -84,7 +84,7 @@ typedef struct
     gr_ptr entries;
     slong r;
     slong c;
-    gr_ptr * rows;
+    slong stride;
 }
 gr_mat_struct;
 

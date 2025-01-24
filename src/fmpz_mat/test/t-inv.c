@@ -18,7 +18,7 @@ TEST_FUNCTION_START(fmpz_mat_inv, state)
 {
     fmpz_mat_t A, B, C, I;
     fmpz_t den;
-    slong i, j, m, r;
+    slong i, m, r;
 
     {
         fmpz_t d;
@@ -50,8 +50,7 @@ TEST_FUNCTION_START(fmpz_mat_inv, state)
         fmpz_mat_init(I, m, m);
         fmpz_init(den);
 
-        for (j = 0; j < m; j++)
-            fmpz_set_ui(&I->rows[j][j], UWORD(1));
+        fmpz_mat_one(I);
 
         /* Verify that A * A^-1 = I for random matrices */
 

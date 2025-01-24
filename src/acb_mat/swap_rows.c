@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Vladimir Glazachev
+    Copyright (C) 2018 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,13 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
+#include "acb.h"
+#include "acb_mat.h"
 
-/* Computes the W' = [w * b / p] (b = ulong power) */
-ulong
-n_mulmod_precomp_shoup(ulong w, ulong p)
+void
+acb_mat_swap_rows(acb_mat_t mat, slong * perm, slong r, slong s)
 {
-   ulong q, r;
-   udiv_qrnnd(q, r, w, UWORD(0), p);
-   return q;
+    if (r != s)
+    {
+        if (perm != NULL)
+            FLINT_SWAP(slong, perm[r], perm[s]);
+
+        _acb_vec_swap(acb_mat_entry(mat, r, 0), acb_mat_entry(mat, s, 0), mat->c);
+    }
 }

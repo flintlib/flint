@@ -39,7 +39,7 @@ slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
     else if (op->r == 1)
     {
         fmpz_one(rop + 1);
-        fmpz_neg(rop + 0, &(op->rows[0][0]));
+        fmpz_neg(rop + 0, fmpz_mat_entry(op, 0, 0));
         len = 2;
     }
 
@@ -267,7 +267,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
                      /* check f(A)v = 0 */
                      for (j = 0; j < n; j++)
                      {
-                        if (!fmpz_is_zero(v3->rows[j] + 0))
+                        if (!fmpz_is_zero(fmpz_mat_entry(v3, j, 0)))
                             break;
                      }
 

@@ -153,9 +153,12 @@ typedef struct {
     slong m;
     slong k_blk_sz;
     slong m_blk_sz;
-    fmpz ** Crows;
-    fmpz ** Arows;
-    fmpz ** Brows;
+    fmpz * Centries;
+    slong Cstride;
+    fmpz * Aentries;
+    slong Astride;
+    fmpz * Bentries;
+    slong Bstride;
     slong * BL;
     int words;
 } _worker_arg;
@@ -168,7 +171,8 @@ static void _tr_worker(void * varg)
     slong k = arg->k;
     slong n = arg->n;
     slong k_blk_sz = arg->k_blk_sz;
-    fmpz ** Brows = arg->Brows;
+    fmpz * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     slong * BL = arg->BL;
     slong i, iq, ir, j;
 
@@ -176,7 +180,7 @@ static void _tr_worker(void * varg)
     for (i = 0; i < k; i++)
     {
         for (j = Bstartcol; j < Bstopcol; j++)
-            BL[iq*n*k_blk_sz + j*k_blk_sz + ir] = Brows[i][j];
+            BL[iq*n*k_blk_sz + j*k_blk_sz + ir] = Bentries[i * Bstride + j];
 
         /* (iq, ir) = divrem(i, k_blk_sz) */
         ir++;
@@ -197,8 +201,10 @@ static void _mul_worker(void * varg)
     slong k = arg->k;
     slong m_blk_sz = arg->m_blk_sz;
     slong k_blk_sz = arg->k_blk_sz;
-    fmpz ** Crows = arg->Crows;
-    fmpz ** Arows = arg->Arows;
+    fmpz * Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
+    fmpz * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
     slong * BL = arg->BL;
     slong * TA;
     ulong * TC;
@@ -213,19 +219,19 @@ static void _mul_worker(void * varg)
         {
             for (h = Astartrow; h < Astoprow; h++)
                 for (j = 0; j < n; j++)
-                    _dot1(&Crows[h][j], Arows[h], &BL[j*k_blk_sz], k);
+                    _dot1(Centries + h * Cstride + j, Aentries + h * Astride, &BL[j*k_blk_sz], k);
         }
         else if (words == 2)
         {
             for (h = Astartrow; h < Astoprow; h++)
                 for (j = 0; j < n; j++)
-                    _dot2(&Crows[h][j], Arows[h], &BL[j*k_blk_sz], k);
+                    _dot2(Centries + h * Cstride + j, Aentries + h * Astride, &BL[j*k_blk_sz], k);
         }
         else
         {
             for (h = Astartrow; h < Astoprow; h++)
                 for (j = 0; j < n; j++)
-                    _dot3(&Crows[h][j], Arows[h], &BL[j*k_blk_sz], k);
+                    _dot3(Centries + h * Cstride + j, Aentries + h * Astride, &BL[j*k_blk_sz], k);
         }
 
         return;
@@ -251,7 +257,7 @@ static void _mul_worker(void * varg)
             /* get a compressed copy of A[h:h+hhstop, i:i+iistop] into TA */
             for (hh = 0; hh < hstop; hh++)
             for (ii = 0; ii < istop; ii++)
-                TA[hh*k_blk_sz + ii] = Arows[h + hh][i + ii];
+                TA[hh*k_blk_sz + ii] = Aentries[(h + hh) * Astride + (i + ii)];
 
             /* addmul into answer block */
             if (words == 1)
@@ -282,13 +288,13 @@ static void _mul_worker(void * varg)
         {
             for (j = 0; j < n; j++)
             for (hh = 0; hh < hstop; hh++)
-                fmpz_set_si(&Crows[h + hh][j], (slong)TC[hh + hstop*j]);
+                fmpz_set_si(Centries + (h + hh) * Cstride + j, (slong)TC[hh + hstop*j]);
         }
         else if (words == 2)
         {
             for (j = 0; j < n; j++)
             for (hh = 0; hh < hstop; hh++)
-                fmpz_set_signed_uiui(&Crows[h + hh][j],
+                fmpz_set_signed_uiui(Centries + (h + hh) * Cstride + j,
                                      TC[2*(hh + hstop*j) + 1],
                                      TC[2*(hh + hstop*j) + 0]);
         }
@@ -296,7 +302,7 @@ static void _mul_worker(void * varg)
         {
             for (j = 0; j < n; j++)
             for (hh = 0; hh < hstop; hh++)
-                fmpz_set_signed_uiuiui(&Crows[h + hh][j],
+                fmpz_set_signed_uiuiui(Centries + (h + hh) * Cstride + j,
                                        TC[3*(hh + hstop*j) + 2],
                                        TC[3*(hh + hstop*j) + 1],
                                        TC[3*(hh + hstop*j) + 0]);
@@ -359,9 +365,12 @@ void _fmpz_mat_mul_small_internal(
     mainarg.k = k;
     mainarg.m = m;
     mainarg.n = n;
-    mainarg.Crows = C->rows;
-    mainarg.Arows = A->rows;
-    mainarg.Brows = B->rows;
+    mainarg.Centries = C->entries;
+    mainarg.Cstride = C->stride;
+    mainarg.Aentries = A->entries;
+    mainarg.Astride = A->stride;
+    mainarg.Bentries = B->entries;
+    mainarg.Bstride = B->stride;
     mainarg.BL = TMP_ARRAY_ALLOC(n*k_blk_ct*k_blk_sz, slong);
 
     if (Cbits <= SMALL_FMPZ_BITCOUNT_MAX)
@@ -407,9 +416,12 @@ use_one_thread:
         args[i].k = mainarg.k;
         args[i].m = mainarg.m;
         args[i].n = mainarg.n;
-        args[i].Crows = mainarg.Crows;
-        args[i].Arows = mainarg.Arows;
-        args[i].Brows = mainarg.Brows;
+        args[i].Centries = mainarg.Centries;
+        args[i].Cstride = mainarg.Cstride;
+        args[i].Aentries = mainarg.Aentries;
+        args[i].Astride = mainarg.Astride;
+        args[i].Bentries = mainarg.Bentries;
+        args[i].Bstride = mainarg.Bstride;
         args[i].BL = mainarg.BL;
         args[i].words = mainarg.words;
     }

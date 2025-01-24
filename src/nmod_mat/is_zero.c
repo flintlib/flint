@@ -22,7 +22,7 @@ nmod_mat_is_zero(const nmod_mat_t mat)
 
     for (j = 0; j < mat->r; j++)
     {
-        if (!_nmod_vec_is_zero(mat->rows[j], mat->c))
+        if (!_nmod_vec_is_zero(nmod_mat_entry_ptr(mat, j, 0), mat->c))
             return 0;
     }
 

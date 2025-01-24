@@ -24,7 +24,7 @@ fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 
         if (mat2->r && mat2->c)
             for (i = 0; i < mat2->r; i++)
-                _fmpz_vec_set(mat1->rows[i], mat2->rows[i], mat2->c);
+                _fmpz_vec_set(fmpz_mat_row(mat1, i), fmpz_mat_row(mat2, i), mat2->c);
     }
 }
 

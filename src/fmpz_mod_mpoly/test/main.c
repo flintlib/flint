@@ -15,6 +15,7 @@
 #include "t-add_sub_fmpz.c"
 #include "t-add_sub_si.c"
 #include "t-cmp.c"
+#include "t-compose_fmpz_mod_mpoly.c"
 #include "t-degree.c"
 #include "t-degrees_term_exp_fits_ui_si.c"
 #include "t-derivative.c"
@@ -65,6 +66,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mpoly_add_sub),
     TEST_FUNCTION(fmpz_mod_mpoly_add_sub_fmpz),
     TEST_FUNCTION(fmpz_mod_mpoly_add_sub_si),
+    TEST_FUNCTION(fmpz_mod_mpoly_compose),
     TEST_FUNCTION(fmpz_mod_mpoly_cmp),
     TEST_FUNCTION(fmpz_mod_mpoly_degree),
     TEST_FUNCTION(fmpz_mod_mpoly_degrees_term_exp_fits_ui_si),

@@ -17,19 +17,12 @@ _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 {
     if (r != s)
     {
-        gr_ptr u;
-        slong t;
+        slong sz = ctx->sizeof_elem;
 
         if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
+            FLINT_SWAP(slong, perm[r], perm[s]);
 
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u;
+        _gr_vec_swap(GR_MAT_ENTRY(mat, r, 0, sz), GR_MAT_ENTRY(mat, s, 0, sz), mat->c, ctx);
     }
 }
 
@@ -37,7 +30,6 @@ int
 gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
     gr_ptr d, e;
-    gr_ptr * a;
     slong i, j, k, m, n, r, rank, row, col, sz;
     int status = GR_SUCCESS;
     int pivot_status;
@@ -59,9 +51,7 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
 
     status |= gr_mat_set(LU, A, ctx);
 
-    a = LU->rows;
-
-#define ENTRY(i, j) GR_ENTRY(a[i], j, sz)
+#define ENTRY(ii, jj) GR_MAT_ENTRY(LU, ii, jj, sz)
 
     rank = row = col = 0;
     for (i = 0; i < m; i++)
@@ -145,6 +135,8 @@ gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t
 
 cleanup:
     GR_TMP_CLEAR2(d, e, ctx);
+
+#undef ENTRY
 
     *res_rank = rank;
     return status;

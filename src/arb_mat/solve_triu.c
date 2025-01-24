@@ -33,7 +33,7 @@ arb_mat_solve_triu_classical(arb_mat_t X, const arb_mat_t U,
 
         for (j = n - 1; j >= 0; j--)
         {
-            arb_dot(s, arb_mat_entry(B, j, i), 1, U->rows[j] + j + 1, 1, tmp + j + 1, 1, n - j - 1, prec);
+            arb_dot(s, arb_mat_entry(B, j, i), 1, arb_mat_entry(U, j, j + 1), 1, tmp + j + 1, 1, n - j - 1, prec);
 
             if (!unit)
                 arb_div(tmp + j, s, arb_mat_entry(U, j, j), prec);

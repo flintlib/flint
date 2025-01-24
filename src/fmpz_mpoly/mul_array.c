@@ -17,9 +17,10 @@
 
 /* Currently we do not -funroll-loops by default in the fmpz_mpoly module,
    but it is worthwhile for the basic loops here. */
-#pragma GCC push_options
-#pragma GCC optimize("-funroll-loops")
-
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC push_options
+# pragma GCC optimize("unroll-loops")
+#endif
 
 /*
     NOTE: this file is dirty - it assumes that a zero fmpz is zero
@@ -169,7 +170,9 @@ void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
    }
 }
 
-#pragma GCC pop_options
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC pop_options
+#endif
 
 /*
    Addmul into a dense array poly1, given polys with coefficients

@@ -103,7 +103,7 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
         {
             fmpq_sub(max, max, half);
             fmpz_cdiv_q(lhs, fmpq_numref(max), fmpq_denref(max));
-            _fmpz_vec_scalar_submul_fmpz(A->rows[k], A->rows[k - 1], np, lhs);
+            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(A, k), fmpz_mat_row(A, k - 1), np, lhs);
             for (i = 0; i < n; i++)
             {
                 fmpz_submul(fmpz_mat_entry(T, i, k), lhs,
@@ -142,12 +142,12 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
             fmpz_mat_swap_rows(A, NULL, k - 1, k);
             if (k > 1)
             {
-                _fmpz_vec_scalar_mul_fmpz(T->rows[k], T->rows[k], n,
+                _fmpz_vec_scalar_mul_fmpz(fmpz_mat_row(T, k), fmpz_mat_row(T, k), n,
                                           fmpz_mat_entry(T, k - 2, k - 2));
             }
-            _fmpz_vec_scalar_addmul_fmpz(T->rows[k], T->rows[k - 1], n,
+            _fmpz_vec_scalar_addmul_fmpz(fmpz_mat_row(T, k), fmpz_mat_row(T, k - 1), n,
                                          fmpz_mat_entry(T, k - 1, k));
-            _fmpz_vec_scalar_divexact_fmpz(T->rows[k], T->rows[k], n,
+            _fmpz_vec_scalar_divexact_fmpz(fmpz_mat_row(T, k), fmpz_mat_row(T, k), n,
                                            fmpz_mat_entry(T, k - 1, k - 1));
             fmpz_mat_swap_rows(T, NULL, k - 1, k);
             for (i = 0; i < n; i++)
@@ -155,13 +155,13 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
                 fmpz_swap(fmpz_mat_entry(T, i, k - 1),
                           fmpz_mat_entry(T, i, k));
             }
-            _fmpz_vec_scalar_mul_fmpz(T->rows[k], T->rows[k], n,
+            _fmpz_vec_scalar_mul_fmpz(fmpz_mat_row(T, k), fmpz_mat_row(T, k), n,
                                       fmpz_mat_entry(T, k - 1, k - 1));
-            _fmpz_vec_scalar_submul_fmpz(T->rows[k], T->rows[k - 1], n,
+            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(T, k), fmpz_mat_row(T, k - 1), n,
                                          fmpz_mat_entry(T, k - 1, k));
             if (k > 1)
             {
-                _fmpz_vec_scalar_divexact_fmpz(T->rows[k], T->rows[k], n,
+                _fmpz_vec_scalar_divexact_fmpz(fmpz_mat_row(T, k), fmpz_mat_row(T, k), n,
                                                fmpz_mat_entry(T, k - 2,
                                                               k - 2));
             }
@@ -212,7 +212,7 @@ fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
             {
                 fmpq_sub(max, max, half);
                 fmpz_cdiv_q(lhs, fmpq_numref(max), fmpq_denref(max));
-                _fmpz_vec_scalar_submul_fmpz(A->rows[k], A->rows[j], np, lhs);
+                _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(A, k), fmpz_mat_row(A, j), np, lhs);
                 for (i = 0; i < n; i++)
                 {
                     fmpz_submul(fmpz_mat_entry(T, i, k), lhs,

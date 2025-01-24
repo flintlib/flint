@@ -52,27 +52,27 @@ _nmod_poly_compose_mod_brent_kung(nn_ptr res, nn_srcptr poly1, slong len1,
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
-        _nmod_vec_set(B->rows[i], poly1 + i*m, m);
+        _nmod_vec_set(nmod_mat_entry_ptr(B, i, 0), poly1 + i*m, m);
 
-    _nmod_vec_set(B->rows[i], poly1 + i*m, len1 % m);
+    _nmod_vec_set(nmod_mat_entry_ptr(B, i, 0), poly1 + i*m, len1 % m);
 
     /* Set rows of A to powers of poly2 */
-    A->rows[0][0] = UWORD(1);
-    _nmod_vec_set(A->rows[1], poly2, n);
+    nmod_mat_entry(A, 0, 0) = UWORD(1);
+    _nmod_vec_set(nmod_mat_entry_ptr(A, 1, 0), poly2, n);
     for (i = 2; i < m; i++)
-        _nmod_poly_mulmod(A->rows[i], A->rows[i-1],
+        _nmod_poly_mulmod(nmod_mat_entry_ptr(A, i, 0), nmod_mat_entry_ptr(A, i - 1, 0),
             n, poly2, n, poly3, len3, mod);
 
     nmod_mat_mul(C, B, A);
 
     /* Evaluate block composition using the Horner scheme */
-    _nmod_vec_set(res, C->rows[m - 1], n);
-    _nmod_poly_mulmod(h, A->rows[m - 1], n, poly2, n, poly3, len3, mod);
+    _nmod_vec_set(res, nmod_mat_entry_ptr(C, m - 1, 0), n);
+    _nmod_poly_mulmod(h, nmod_mat_entry_ptr(A, m - 1, 0), n, poly2, n, poly3, len3, mod);
 
     for (i = m - 2; i >= 0; i--)
     {
         _nmod_poly_mulmod(t, res, n, h, n, poly3, len3, mod);
-        _nmod_poly_add(res, t, n, C->rows[i], n, mod);
+        _nmod_poly_add(res, t, n, nmod_mat_entry_ptr(C, i, 0), n, mod);
     }
 
     _nmod_vec_clear(h);

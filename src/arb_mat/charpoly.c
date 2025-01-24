@@ -9,69 +9,24 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr.h"
+#include "gr_mat.h"
 #include "arb_poly.h"
 #include "arb_mat.h"
 
+/* todo: other algorithms */
 void _arb_mat_charpoly(arb_ptr cp, const arb_mat_t mat, slong prec)
 {
-    const slong n = mat->r;
-
-    if (n == 0)
+    if (!arb_mat_is_finite(mat))
     {
-        arb_one(cp);
-    }
-    else if (n == 1)
-    {
-        arb_neg(cp + 0, arb_mat_entry(mat, 0, 0));
-        arb_one(cp + 1);
+        _arb_vec_indeterminate(cp, mat->r + 1);
     }
     else
     {
-        slong i, k, t;
-        arb_ptr a, A, s;
-
-        a = _arb_vec_init(n * n);
-        A = a + (n - 1) * n;
-
-        _arb_vec_zero(cp, n + 1);
-        arb_neg(cp + 0, arb_mat_entry(mat, 0, 0));
-
-        for (t = 1; t < n; t++)
-        {
-            for (i = 0; i <= t; i++)
-            {
-                arb_set(a + 0 * n + i, arb_mat_entry(mat, i, t));
-            }
-
-            arb_set(A + 0, arb_mat_entry(mat, t, t));
-
-            for (k = 1; k < t; k++)
-            {
-                for (i = 0; i <= t; i++)
-                {
-                    s = a + k * n + i;
-                    arb_dot(s, NULL, 0, mat->rows[i], 1, a + (k - 1) * n, 1, t + 1, prec);
-                }
-
-                arb_set(A + k, a + k * n + t);
-            }
-
-            arb_dot(A + t, NULL, 0, mat->rows[t], 1, a + (t - 1) * n, 1, t + 1, prec);
-
-            for (k = 0; k <= t; k++)
-            {
-                arb_dot(cp + k, cp + k, 1, A, 1, cp + k - 1, -1, k, prec);
-                arb_sub(cp + k, cp + k, A + k, prec);
-            }
-        }
-
-        /* Shift all coefficients up by one */
-        for (i = n; i > 0; i--)
-            arb_swap(cp + i, cp + (i - 1));
-
-        arb_one(cp + 0);
-        _arb_poly_reverse(cp, cp, n + 1, n + 1);
-        _arb_vec_clear(a, n * n);
+        gr_ctx_t ctx;
+        gr_ctx_init_real_arb(ctx, prec);
+        if (_gr_mat_charpoly_berkowitz(cp, (const gr_mat_struct *) mat, ctx) != GR_SUCCESS)
+            _arb_vec_indeterminate(cp, mat->r + 1);
     }
 }
 

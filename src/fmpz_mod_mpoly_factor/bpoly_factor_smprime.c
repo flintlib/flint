@@ -1017,7 +1017,7 @@ static void _lattice(
 
             for (i = 0; i < nrows; i++)
                 _fmpz_mod_vec_dot(fmpz_mod_mat_entry(M, j - lower, i),
-                                                trow, N->rows[i], r, ctx);
+                                                trow, fmpz_mod_mat_row(N, i), r, ctx);
         }
 
         fmpz_mod_mat_init_nullspace_tr(T1, M, ctx);

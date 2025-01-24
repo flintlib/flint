@@ -12,31 +12,31 @@
 
 #ifdef T
 
+#include <string.h>
 #include "templates.h"
 
 
 static void
-_apply_permutation(slong * AP,
-                   TEMPLATE(T, mat_t) A, slong * P, slong n, slong offset)
+_apply_permutation(slong * AP, TEMPLATE(T, mat_t) A, const slong * P,
+    slong num_rows, slong row_offset, slong num_cols, slong col_offset)
 {
-    if (n != 0)
+    if (num_rows != 0)
     {
-        TEMPLATE(T, struct) ** Atmp;
-        slong *APtmp;
+        TEMPLATE(T, struct) * Atmp;
+        slong * APtmp;
         slong i;
 
-        Atmp = flint_malloc(sizeof(TEMPLATE(T, struct) *) * n);
-        APtmp = flint_malloc(sizeof(slong) * n);
+        /* todo: reduce memory allocation */
+        Atmp = flint_malloc(sizeof(TEMPLATE(T, struct)) * num_rows * num_cols);
+        APtmp = flint_malloc(sizeof(slong) * num_rows);
 
-        for (i = 0; i < n; i++)
-            Atmp[i] = A->rows[P[i] + offset];
-        for (i = 0; i < n; i++)
-            A->rows[i + offset] = Atmp[i];
+        for (i = 0; i < num_rows; i++)
+            memcpy(Atmp + i * num_cols, TEMPLATE(T, mat_entry) (A, P[i] + row_offset, col_offset), num_cols * sizeof(TEMPLATE(T, struct)));
+        for (i = 0; i < num_rows; i++)
+            memcpy(TEMPLATE(T, mat_entry) (A, i + row_offset, col_offset), Atmp + i * num_cols, num_cols * sizeof(TEMPLATE(T, struct)));
 
-        for (i = 0; i < n; i++)
-            APtmp[i] = AP[P[i] + offset];
-        for (i = 0; i < n; i++)
-            AP[i + offset] = APtmp[i];
+        for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
+        for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
 
         flint_free(Atmp);
         flint_free(APtmp);
@@ -85,7 +85,7 @@ TEMPLATE(T, mat_lu_recursive) (slong * P,
 
     if (r1 != 0)
     {
-        _apply_permutation(P, A, P1, m, 0);
+        _apply_permutation(P, A, P1, m, 0, n - n1, n1);
     }
 
     TEMPLATE(T, mat_window_init) (A00, A, 0, 0, r1, r1, ctx);
@@ -107,14 +107,14 @@ TEMPLATE(T, mat_lu_recursive) (slong * P,
     }
     else
     {
-        _apply_permutation(P, A, P1, m - r1, r1);
+        _apply_permutation(P, A, P1, m - r1, r1, n1, 0);
 
         /* Compress L */
         if (r1 != n1)
         {
             for (i = 0; i < m - r1; i++)
             {
-                TEMPLATE(T, struct) * row = A->rows[r1 + i];
+                TEMPLATE(T, struct) * row = TEMPLATE(T, mat_entry) (A, r1 + i, 0);
                 for (j = 0; j < FLINT_MIN(i, r2); j++)
                 {
                     TEMPLATE(T, set) (row + r1 + j, row + n1 + j, ctx);

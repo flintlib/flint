@@ -149,7 +149,7 @@ will not be tied to a particular programming language
 ecosystem: C is uniquely easy to interface from
 almost any other language.
 The second most important reason is familiarity: Calcium follows
-the design of Flint and Arb
+the design of FLINT and Arb
 (coding style, naming, module layout, memory management,
 test code, etc.) which has proved to work quite well for
 libraries of this type.
@@ -159,7 +159,7 @@ benefit from
 optimizations that are natural in C such as in-place operations
 and fine-grained manual memory management. However, the performance
 aspect should not be overemphasized: Calcium will spend
-most of its time in Flint and Arb kernel functions
+most of its time in FLINT and Arb kernel functions
 and this would probably still be true even if it were written
 in a slower language.
 

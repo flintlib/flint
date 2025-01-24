@@ -49,54 +49,20 @@ slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
 
 /*
    resize the matrix M to num_rows, where num_rows <= M->r
-   the algorithm assumes rows have been permuted in memory by LLL
 */
+/* todo: proper inplace realloc */
 void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
 {
-   slong i, j;
-   fmpz ** empty_rows;
-   slong num_empty = 0;
-   fmpz * end;
-   TMP_INIT;
+    slong i;
+    fmpz_mat_t T;
 
-   if (M->r == num_rows)
-      return; /* nothing to be done */
+    FLINT_ASSERT(num_rows <= M->r);
 
-   TMP_START;
-
-   /* space to record empty rows within bounds of new matrix */
-   empty_rows = (fmpz **) TMP_ALLOC(M->r*sizeof(fmpz *));
-
-   /* end of new matrix in memory */
-   end = M->entries + num_rows*M->c;
-
-   /* clear rows that aren't needed */
-   for (i = num_rows; i < M->r; i++)
-   {
-      _fmpz_vec_zero(M->rows[i], M->c);
-
-      /* this row can be repopulated */
-      if (M->rows[i] < end)
-         empty_rows[num_empty++] = M->rows[i];
-   }
-
-   for (i = 0; i < num_rows; i++)
-   {
-      if (M->rows[i] >= end) /* this row must be moved back to empty spot */
-      {
-         fmpz * old_row = M->rows[i];
-         fmpz * new_row = empty_rows[--num_empty];
-
-         for (j = 0; j < M->c; j++)
-            fmpz_swap(old_row + j, new_row + j);
-
-         M->rows[i] = new_row;
-      }
-   }
-
-   M->r = num_rows;
-
-   TMP_END;
+    fmpz_mat_init(T, num_rows, M->c);
+    for (i = 0; i < num_rows; i++)
+        _fmpz_vec_swap(fmpz_mat_row(T, i), fmpz_mat_row(M, i), M->c);
+    fmpz_mat_swap(M, T);
+    fmpz_mat_clear(T);
 }
 
 void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
@@ -118,9 +84,8 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
    /* set to identity */
    fmpz_mat_init(M, r, r);
-
    for (i = 0; i < r; i++)
-      fmpz_set_ui(M->rows[i] + i, 1);
+      fmpz_one(fmpz_mat_entry(M, i, i));
 
    /* we prescale the identity matrix by 2^U_exp */
    U_exp = (slong) FLINT_BIT_COUNT(bit_r);
@@ -205,11 +170,11 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
             else
                alt_col = num_data_cols - prev_num_coeffs - (diff + 1)/2;
 
-            fmpz_mul_ui(bound_sum, data->rows[r] + alt_col, sqN);
+            fmpz_mul_ui(bound_sum, fmpz_mat_entry(data, r, alt_col), sqN);
             worst_exp = fmpz_bits(bound_sum);
 
             for (i = 0; i < r; i++)
-               fmpz_set(col->rows[i], data->rows[i] + alt_col);
+               fmpz_set(fmpz_mat_entry(col, i, 0), fmpz_mat_entry(data, i, alt_col));
 
             do_lll = fmpz_mat_next_col_van_hoeij(M, P, col, worst_exp, U_exp);
 

@@ -273,7 +273,7 @@ TEST_FUNCTION_START(_nmod_poly_conway, state)
 
         if (result)
             flint_throw(FLINT_TEST_FAIL,
-                    "Exected return value 0 for prime = %wu and degree %wd.\n"
+                    "Expected return value 0 for prime = %wu and degree %wd.\n"
                     "Got return value %d.\n",
                     prime, deg, result);
     }

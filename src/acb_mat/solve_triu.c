@@ -33,7 +33,7 @@ acb_mat_solve_triu_classical(acb_mat_t X, const acb_mat_t U,
 
         for (j = n - 1; j >= 0; j--)
         {
-            acb_dot(s, acb_mat_entry(B, j, i), 1, U->rows[j] + j + 1, 1, tmp + j + 1, 1, n - j - 1, prec);
+            acb_dot(s, acb_mat_entry(B, j, i), 1, acb_mat_entry(U, j, j + 1), 1, tmp + j + 1, 1, n - j - 1, prec);
 
             if (!unit)
                 acb_div(tmp + j, s, acb_mat_entry(U, j, j), prec);

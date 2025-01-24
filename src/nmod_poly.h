@@ -188,20 +188,20 @@ int nmod_poly_is_zero(const nmod_poly_t poly)
 NMOD_POLY_INLINE
 int nmod_poly_is_one(const nmod_poly_t poly)
 {
-    return (poly->mod.n == 0) || (poly->length == 1 && poly->coeffs[0] == 1);
+    return (poly->mod.n == UWORD(1)) || (poly->length == 1 && poly->coeffs[0] == 1);
 }
 
 /* bogus for non-prime modulus */
 NMOD_POLY_INLINE
 int nmod_poly_is_unit(const nmod_poly_t poly)
 {
-    return (poly->length == 1) && poly->coeffs[0] != 0;
+    return (poly->mod.n == UWORD(1)) || ((poly->length == 1) && poly->coeffs[0] != 0);
 }
 
 NMOD_POLY_INLINE
 int nmod_poly_is_gen(const nmod_poly_t poly)
 {
-    return (poly->mod.n == 0) ||
+    return (poly->mod.n == UWORD(1)) ||
            (poly->length == 2 && poly->coeffs[0] == 0 && poly->coeffs[1] == 1);
 }
 
@@ -482,6 +482,8 @@ void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
 /* Evaluation  ***************************************************************/
 
 ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod);
+ulong _nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod);
+ulong _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod);
 ulong nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c);
 
 void _nmod_poly_evaluate_nmod_vec(nn_ptr ys, nn_srcptr coeffs, slong len, nn_srcptr xs, slong n, nmod_t mod);

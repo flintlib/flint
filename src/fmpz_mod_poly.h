@@ -202,11 +202,7 @@ int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_
    return poly->length == 1 && poly->coeffs[0] == WORD(1);
 }
 
-FMPZ_MOD_POLY_INLINE
-int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
-{
-    return op->length == 2 && op->coeffs[1] == WORD(1) && op->coeffs[0] == WORD(0);
-}
+int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_poly_is_unit(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
 
@@ -294,9 +290,11 @@ void fmpz_mod_poly_sub_series(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, 
 /*  Scalar multiplication ****************************************************/
 
 void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong len, const fmpz_t x, const fmpz_mod_ctx_t ctx);
-void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len, ulong x, const fmpz_mod_ctx_t ctx);
+
+void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong x, const fmpz_mod_ctx_t ctx);
+
 void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 
 /*  Scalar division ****************************************************/
@@ -868,15 +866,10 @@ void _fmpz_mod_poly_split_rabin(fmpz_mod_poly_t a, fmpz_mod_poly_t b,
 
 /* Characteristic polynomial and minimal polynomial */
 
-void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t p,
+void _fmpz_mod_mat_charpoly(fmpz * p,
                              const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE void fmpz_mod_mat_charpoly(fmpz_mod_poly_t p,
-                              const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_mat_charpoly_berkowitz(p, M, ctx);
-}
-
+void fmpz_mod_mat_charpoly(fmpz_mod_poly_t p,
+                              const fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t M,
                                                      const fmpz_mod_ctx_t ctx);

@@ -17,15 +17,16 @@
    mpoly_monomial_index_pfmpz function */
 
 int gr_mpoly_get_coeff_scalar_fmpz(gr_ptr c, const gr_mpoly_t A,
-                            const fmpz * exp, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+                            const fmpz * exp, gr_mpoly_ctx_t ctx)
 {
     int status;
     slong index;
+    slong nvars = GR_MPOLY_NVARS(ctx);
     fmpz ** exp_ptr;
     slong i;
     TMP_INIT;
 
-    for (i = 0; i < mctx->nvars; i++)
+    for (i = 0; i < nvars; i++)
     {
         if (fmpz_sgn(exp + i) < 0)
             return GR_DOMAIN;
@@ -33,19 +34,19 @@ int gr_mpoly_get_coeff_scalar_fmpz(gr_ptr c, const gr_mpoly_t A,
 
     TMP_START;
 
-    exp_ptr = (fmpz **) TMP_ALLOC(sizeof(fmpz *) * mctx->nvars);
-    for (i = 0; i < mctx->nvars; i++)
+    exp_ptr = (fmpz **) TMP_ALLOC(sizeof(fmpz *) * nvars);
+    for (i = 0; i < nvars; i++)
         exp_ptr[i] = (fmpz *) (exp + i);
 
-    index = mpoly_monomial_index_pfmpz(A->exps, A->bits, A->length, exp_ptr, mctx);
+    index = mpoly_monomial_index_pfmpz(A->exps, A->bits, A->length, exp_ptr, GR_MPOLY_MCTX(ctx));
     if (index < 0)
     {
-        status = gr_zero(c, cctx);
+        status = gr_zero(c, GR_MPOLY_CCTX(ctx));
     }
     else
     {
         FLINT_ASSERT(index < A->length);
-        status = gr_set(c, GR_ENTRY(A->coeffs, index, cctx->sizeof_elem), cctx);
+        status = gr_set(c, GR_ENTRY(A->coeffs, index, GR_MPOLY_CCTX(ctx)->sizeof_elem), GR_MPOLY_CCTX(ctx));
     }
 
     TMP_END;

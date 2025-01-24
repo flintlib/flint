@@ -26,17 +26,17 @@ fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits, f
         flint_throw(FLINT_ERROR, "Exception (fmpz_mat_randsimdioph). Ill-formed matrix.\n");
     }
 
-    fmpz_one(mat->rows[0]);
-    fmpz_mul_2exp(mat->rows[0], mat->rows[0], bits2);
+    fmpz_one(fmpz_mat_entry(mat, 0, 0));
+    fmpz_mul_2exp(fmpz_mat_entry(mat, 0, 0), fmpz_mat_entry(mat, 0, 0), bits2);
     for (j = 1; j < c; j++)
-        fmpz_randbits(mat->rows[0] + j, state, bits);
+        fmpz_randbits(fmpz_mat_entry(mat, 0, j), state, bits);
     for (i = 1; i < r; i++)
     {
         for (j = 0; j < i; j++)
-            fmpz_zero(mat->rows[i] + j);
-        fmpz_one(mat->rows[i] + i);
-        fmpz_mul_2exp(mat->rows[i] + i, mat->rows[i] + i, bits);
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
+        fmpz_one(fmpz_mat_entry(mat, i, i));
+        fmpz_mul_2exp(fmpz_mat_entry(mat, i, i), fmpz_mat_entry(mat, i, i), bits);
         for (j = i + 1; j < c; j++)
-            fmpz_zero(mat->rows[i] + j);
+            fmpz_zero(fmpz_mat_entry(mat, i, j));
     }
 }

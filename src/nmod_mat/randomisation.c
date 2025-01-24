@@ -17,12 +17,11 @@
 void
 nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 {
-    slong i;
+    slong i, j;
 
-    for (i = 0; i < mat->r * mat->c; i++)
-    {
-        mat->entries[i] = FLINT_MAX(1, n_randint(state, mat->mod.n));
-    }
+    for (i = 0; i < mat->r; i++)
+        for (j = 0; j < mat->c; j++)
+            nmod_mat_entry(mat, i, j) = FLINT_MAX(1, n_randint(state, mat->mod.n));
 }
 
 void
@@ -44,12 +43,12 @@ nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count)
 
             if (n_randint(state, 2))
                 for (k = 0; k < n; k++)
-                    mat->rows[j][k] = nmod_add(mat->rows[j][k],
-                        mat->rows[i][k], mat->mod);
+                    nmod_mat_entry(mat, j, k) = nmod_add(nmod_mat_entry(mat, j, k),
+                        nmod_mat_entry(mat, i, k), mat->mod);
             else
                 for (k = 0; k < n; k++)
-                    mat->rows[j][k] = nmod_sub(mat->rows[j][k],
-                        mat->rows[i][k], mat->mod);
+                    nmod_mat_entry(mat, j, k) = nmod_sub(nmod_mat_entry(mat, j, k),
+                        nmod_mat_entry(mat, i, k), mat->mod);
         }
         else
         {
@@ -57,12 +56,13 @@ nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count)
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
-                    mat->rows[k][j] = nmod_add(mat->rows[k][j],
-                        mat->rows[k][i], mat->mod);
+                    nmod_mat_entry(mat, k, j) = nmod_add(nmod_mat_entry(mat, k, j),
+                        nmod_mat_entry(mat, k, i), mat->mod);
+
             else
                 for (k = 0; k < m; k++)
-                    mat->rows[k][j] = nmod_sub(mat->rows[k][j],
-                        mat->rows[k][i], mat->mod);
+                    nmod_mat_entry(mat, k, j) = nmod_sub(nmod_mat_entry(mat, k, j),
+                        nmod_mat_entry(mat, k, i), mat->mod);
         }
     }
 }

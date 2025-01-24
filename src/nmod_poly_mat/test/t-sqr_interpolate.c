@@ -44,7 +44,7 @@ TEST_FUNCTION_START(nmod_poly_mat_sqr_interpolate, state)
         {
             nmod_poly_mat_sqr_interpolate(C, A);
 
-            x = n_randint(state, 0);
+            x = n_randint(state, mod);
 
             nmod_poly_mat_evaluate_nmod(a, A, x);
             nmod_poly_mat_evaluate_nmod(d, C, x);

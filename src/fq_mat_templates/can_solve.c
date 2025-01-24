@@ -45,9 +45,9 @@ TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
 
     rank = TEMPLATE(T, mat_lu)(perm, LU, 0, ctx);
 
-    TEMPLATE(T, mat_window_init)(PB, B, 0, 0, B->r, B->c, ctx);
+    TEMPLATE(T, mat_init)(PB, B->r, B->c, ctx);
     for (i = 0; i < B->r; i++)
-        PB->rows[i] = B->rows[perm[i]];
+        _TEMPLATE(T, vec_set)(TEMPLATE(T, mat_entry)(PB, i, 0), TEMPLATE(T, mat_entry)(B, perm[i], 0), B->c, ctx);
 
     TEMPLATE(T, mat_init)(LU2, rank, rank, ctx);
 
@@ -77,7 +77,7 @@ TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
     {
         TEMPLATE(T, mat_t) P;
 
-        LU->rows += rank;
+        LU->entries += rank * LU->stride;
         LU->r = A->r - rank;
         X->r = LU->c;
 
@@ -86,14 +86,14 @@ TEMPLATE(T, mat_can_solve)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
         TEMPLATE(T, mat_mul)(P, LU, X, ctx);
 
         PB->r = LU->r;
-        PB->rows += rank;
+        PB->entries += rank * PB->stride;
 
         result = TEMPLATE(T, mat_equal)(P, PB, ctx);
 
-        PB->rows -= rank;
+        PB->entries -= rank * PB->stride;
         TEMPLATE(T, mat_clear)(P, ctx);
 
-        LU->rows -= rank;
+        LU->entries -= rank * LU->stride;
 
         if (!result)
         {
@@ -128,7 +128,7 @@ cleanup:
     TEMPLATE(T, mat_clear)(LU2, ctx);
 
     PB->r = B->r;
-    TEMPLATE(T, mat_window_clear)(PB, ctx);
+    TEMPLATE(T, mat_clear)(PB, ctx);
 
     LU->r = A->r;
     TEMPLATE(T, mat_clear)(LU, ctx);

@@ -19,15 +19,15 @@
 void perm(nmod_mat_t A, slong * P)
 {
     slong i;
-    nn_ptr * tmp;
+    nn_ptr tmp;
 
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(nn_ptr) * A->r);
+    tmp = flint_malloc(sizeof(ulong) * A->r * A->c);
 
-    for (i = 0; i < A->r; i++) tmp[P[i]] = A->rows[i];
-    for (i = 0; i < A->r; i++) A->rows[i] = tmp[i];
+    for (i = 0; i < A->r; i++) _nmod_vec_set(tmp + P[i] * A->c, nmod_mat_entry_ptr(A, i, 0), A->c);
+    for (i = 0; i < A->r; i++) _nmod_vec_set(nmod_mat_entry_ptr(A, i, 0), tmp + i * A->c, A->c);
 
     flint_free(tmp);
 }
@@ -91,8 +91,17 @@ TEST_FUNCTION_START(nmod_mat_lu_recursive, state)
         slong m, n, r, d, rank;
         slong * P;
 
-        m = n_randint(state, 30);
-        n = n_randint(state, 30);
+        if (n_randint(state, 100) == 0)
+        {
+            m = n_randint(state, 100);
+            n = n_randint(state, 100);
+        }
+        else
+        {
+            m = n_randint(state, 30);
+            n = n_randint(state, 30);
+        }
+
         mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)

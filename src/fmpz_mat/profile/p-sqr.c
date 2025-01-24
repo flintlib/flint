@@ -57,7 +57,7 @@ void sample(void * arg, ulong count)
     fmpz_mat_clear(B);
     fmpz_mat_clear(C);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 int main(void)

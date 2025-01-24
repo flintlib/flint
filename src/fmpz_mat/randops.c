@@ -30,12 +30,12 @@ fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < n; k++)
-                    fmpz_add(&mat->rows[j][k], &mat->rows[j][k],
-                        &mat->rows[i][k]);
+                    fmpz_add(fmpz_mat_entry(mat, j, k), fmpz_mat_entry(mat, j, k),
+                        fmpz_mat_entry(mat, i, k));
             else
                 for (k = 0; k < n; k++)
-                    fmpz_sub(&mat->rows[j][k], &mat->rows[j][k],
-                        &mat->rows[i][k]);
+                    fmpz_sub(fmpz_mat_entry(mat, j, k), fmpz_mat_entry(mat, j, k),
+                        fmpz_mat_entry(mat, i, k));
         }
         else
         {
@@ -43,12 +43,12 @@ fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)
                 continue;
             if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
-                    fmpz_add(&mat->rows[k][j], &mat->rows[k][j],
-                        &mat->rows[k][i]);
+                    fmpz_add(fmpz_mat_entry(mat, k, j), fmpz_mat_entry(mat, k, j),
+                        fmpz_mat_entry(mat, k, i));
             else
                 for (k = 0; k < m; k++)
-                    fmpz_sub(&mat->rows[k][j], &mat->rows[k][j],
-                        &mat->rows[k][i]);
+                    fmpz_sub(fmpz_mat_entry(mat, k, j), fmpz_mat_entry(mat, k, j),
+                        fmpz_mat_entry(mat, k, i));
         }
     }
 }

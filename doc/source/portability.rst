@@ -12,7 +12,7 @@ respectively. These are guaranteed to be the same size as GMP's
 ``mp_limb_t`` and ``mp_limb_signed_t`` types, respectively.
 
 A full list of types provided by FLINT is available in
-``code_conventions.txt`` in the top-level source tree.
+``code_conventions.md`` in the top-level source tree.
 
 As FLINT supports Windows 64 on which the FLINT ``ulong`` and
 ``slong`` types are 64 bits, whilst ``unsigned long`` and

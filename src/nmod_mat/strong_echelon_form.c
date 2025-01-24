@@ -17,7 +17,6 @@ static inline int
 _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
 {
     slong j;
-    nn_ptr u;
 
     if (nmod_mat_entry(A, start_row, col) != 0)
         return 1;
@@ -26,10 +25,7 @@ _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
     {
         if (nmod_mat_entry(A, j, col) != 0)
         {
-            u = A->rows[j];
-            A->rows[j] = A->rows[start_row];
-            A->rows[start_row] = u;
-
+            nmod_mat_swap_rows(A, NULL, j, start_row);
             return -1;
         }
     }
@@ -104,7 +100,6 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
 {
     ulong s, t, u, v, q, t1, t2, g;
     slong m, n, row, col, i, k, l;
-    ulong **r;
     nmod_t mod;
     nn_ptr extra_row;
 
@@ -113,7 +108,6 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
 
     n = A->r;
     m = A->c;
-    r = A->rows;
     mod = A->mod;
 
     extra_row = _nmod_vec_init(m);
@@ -201,11 +195,11 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
                 continue;
             }
             g = mod.n/g;
-            _nmod_vec_scalar_mul_nmod(extra_row, r[col], m, g, mod);
+            _nmod_vec_scalar_mul_nmod(extra_row, nmod_mat_entry_ptr(A, col, 0), m, g, mod);
         }
         else
         {
-          _nmod_vec_set(extra_row, r[col], m);
+          _nmod_vec_set(extra_row, nmod_mat_entry_ptr(A, col, 0), m);
         }
 
         for (row = col + 1; row < m; row++)

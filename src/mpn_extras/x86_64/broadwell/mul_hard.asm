@@ -11,7 +11,7 @@ dnl
 
 include(`config.m4')
 
-dnl TODO: Alot to fix here...
+dnl TODO: A lot to fix here...
 dnl * Instead of flint_mpn_mul_M_N for hardcoded M and N, do flint_mpn_mul_M_n,
 dnl   where n is a variable instead. This will reduce the amount of code, and
 dnl   probably be around the same speed, although one register has to go to n

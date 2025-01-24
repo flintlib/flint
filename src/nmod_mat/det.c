@@ -40,33 +40,37 @@ _nmod_mat_det_3x3(ulong a, ulong b, ulong c,
 }
 
 static ulong
-_nmod_mat_det_4x4(ulong ** const mat, nmod_t mod)
+_nmod_mat_det_4x4(const ulong * mm, slong stride, nmod_t mod)
 {
     ulong s, t, u, v;
 
-    s = _nmod_mat_det_3x3(mat[1][1], mat[1][2], mat[1][3],
-                          mat[2][1], mat[2][2], mat[2][3],
-                          mat[3][1], mat[3][2], mat[3][3], mod);
+#define mat(ii,jj) mm[(ii) * stride + (jj)]
 
-    t = _nmod_mat_det_3x3(mat[1][0], mat[1][2], mat[1][3],
-                          mat[2][0], mat[2][2], mat[2][3],
-                          mat[3][0], mat[3][2], mat[3][3], mod);
+    s = _nmod_mat_det_3x3(mat(1,1), mat(1,2), mat(1,3),
+                          mat(2,1), mat(2,2), mat(2,3),
+                          mat(3,1), mat(3,2), mat(3,3), mod);
 
-    u = _nmod_mat_det_3x3(mat[1][0], mat[1][1], mat[1][3],
-                          mat[2][0], mat[2][1], mat[2][3],
-                          mat[3][0], mat[3][1], mat[3][3], mod);
+    t = _nmod_mat_det_3x3(mat(1,0), mat(1,2), mat(1,3),
+                          mat(2,0), mat(2,2), mat(2,3),
+                          mat(3,0), mat(3,2), mat(3,3), mod);
 
-    v = _nmod_mat_det_3x3(mat[1][0], mat[1][1], mat[1][2],
-                          mat[2][0], mat[2][1], mat[2][2],
-                          mat[3][0], mat[3][1], mat[3][2], mod);
+    u = _nmod_mat_det_3x3(mat(1,0), mat(1,1), mat(1,3),
+                          mat(2,0), mat(2,1), mat(2,3),
+                          mat(3,0), mat(3,1), mat(3,3), mod);
+
+    v = _nmod_mat_det_3x3(mat(1,0), mat(1,1), mat(1,2),
+                          mat(2,0), mat(2,1), mat(2,2),
+                          mat(3,0), mat(3,1), mat(3,2), mod);
 
     t = nmod_neg(t, mod);
     v = nmod_neg(v, mod);
 
-    s = nmod_mul(mat[0][0], s, mod);
-    s = nmod_addmul(s, mat[0][1], t, mod);
-    s = nmod_addmul(s, mat[0][2], u, mod);
-    s = nmod_addmul(s, mat[0][3], v, mod);
+    s = nmod_mul(mat(0,0), s, mod);
+    s = nmod_addmul(s, mat(0,1), t, mod);
+    s = nmod_addmul(s, mat(0,2), u, mod);
+    s = nmod_addmul(s, mat(0,3), v, mod);
+
+#undef mat
 
     return s;
 }
@@ -126,7 +130,7 @@ nmod_mat_det(const nmod_mat_t A)
         nmod_mat_entry(A, 1, 0), nmod_mat_entry(A, 1, 1), nmod_mat_entry(A, 1, 2),
         nmod_mat_entry(A, 2, 0), nmod_mat_entry(A, 2, 1), nmod_mat_entry(A, 2, 2), A->mod);
 
-    if (dim == 4) return _nmod_mat_det_4x4(A->rows, A->mod);
+    if (dim == 4) return _nmod_mat_det_4x4(A->entries, A->stride, A->mod);
 
     if (dim <= 8)
     {

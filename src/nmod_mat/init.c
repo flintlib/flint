@@ -14,18 +14,16 @@
 #include "mpn_extras.h"
 #include "nmod_mat.h"
 
+/* Set to 2 to check nonstandard strides */
+#define STRIDE_DEBUG 1
+
 void
 nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n)
 {
-    slong i;
-
-    if (rows != 0)
-        mat->rows = flint_malloc(rows * sizeof(ulong *));
-    else
-        mat->rows = NULL;
-
     mat->r = rows;
     mat->c = cols;
+    mat->entries = NULL;
+    mat->stride = STRIDE_DEBUG * cols;
 
     if (rows != 0 && cols != 0)
     {
@@ -37,19 +35,7 @@ nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n)
         if (of)
             flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
 
-        mat->entries = flint_calloc(num, sizeof(ulong));
-
-        for (i = 0; i < rows; i++)
-            mat->rows[i] = mat->entries + i * cols;
-    }
-    else
-    {
-        mat->entries = NULL;
-        if (rows != 0)
-        {
-            for (i = 0; i < rows; i++)
-                mat->rows[i] = NULL;
-        }
+        mat->entries = flint_calloc(STRIDE_DEBUG * num, sizeof(ulong));
     }
 
     nmod_mat_set_mod(mat, n);
@@ -62,14 +48,10 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
     slong cols = src->c;
     slong i;
 
-    if (rows != 0)
-        mat->rows = flint_malloc(rows * sizeof(ulong *));
-    else
-        mat->rows = NULL;
-
     mat->r = rows;
     mat->c = cols;
-
+    mat->entries = NULL;
+    mat->stride = cols;
     mat->mod = src->mod;
 
     if (rows != 0 && cols != 0)
@@ -85,18 +67,6 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
         mat->entries = flint_malloc(num * sizeof(ulong));
 
         for (i = 0; i < rows; i++)
-        {
-            mat->rows[i] = mat->entries + i * cols;
-            flint_mpn_copyi(mat->rows[i], src->rows[i], cols);
-        }
-    }
-    else
-    {
-        mat->entries = NULL;
-        if (rows != 0)
-        {
-            for (i = 0; i < rows; i++)
-                mat->rows[i] = NULL;
-        }
+            flint_mpn_copyi(nmod_mat_entry_ptr(mat, i, 0), nmod_mat_entry_ptr(src, i, 0), cols);
     }
 }

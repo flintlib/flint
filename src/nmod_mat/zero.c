@@ -24,5 +24,5 @@ nmod_mat_zero(nmod_mat_t mat)
         return;
 
     for (i = 0; i < m; i++)
-        _nmod_vec_zero(mat->rows[i], n);
+        _nmod_vec_zero(nmod_mat_entry_ptr(mat, i, 0), n);
 }

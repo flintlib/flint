@@ -21,9 +21,9 @@ sys.path.append(os.path.abspath('../../src/python'))
 
 # -- Project information -----------------------------------------------------
 
-project = u'Flint'
-copyright = u'2009-2023, The Flint development team'
-author = u'The Flint development team'
+project = u'FLINT'
+copyright = u'2009-2025, The FLINT development team'
+author = u'The FLINT development team'
 
 # The full version, including alpha/beta/rc tags
 with open("../../VERSION") as f:
@@ -134,7 +134,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Flintdoc'
+htmlhelp_basename = 'flintdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -164,8 +164,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Flint.tex', u'Flint Documentation',
-     u'The Flint development team', 'manual'),
+    (master_doc, 'flint.tex', u'FLINT Documentation',
+     u'The FLINT development team', 'manual'),
 ]
 
 
@@ -174,7 +174,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'flint', u'Flint Documentation',
+    (master_doc, 'flint', u'FLINT Documentation',
      [author], 1)
 ]
 
@@ -185,8 +185,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Flint', u'Flint Documentation',
-     author, 'Flint', 'One line description of project.',
+    (master_doc, 'FLINT', u'FLINT Documentation',
+     author, 'FLINT', 'One line description of project.',
      'Miscellaneous'),
 ]
 

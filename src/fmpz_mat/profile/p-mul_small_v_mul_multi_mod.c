@@ -96,6 +96,6 @@ int main(void)
         fmpz_mat_clear(D);
     }
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
     return 0;
 }

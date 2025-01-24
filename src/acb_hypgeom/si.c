@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Fredrik Johansson
+    Copyright (C) 2015, 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
@@ -80,6 +81,9 @@ acb_hypgeom_si_asymp(acb_t res, const acb_t z, slong prec)
 
     acb_swap(res, t);
 
+    if (!acb_is_finite(res))
+        acb_indeterminate(res);
+
     acb_clear(t);
     acb_clear(u);
     acb_clear(w);
@@ -121,18 +125,105 @@ acb_hypgeom_si_1f2(acb_t res, const acb_t z, slong prec)
     acb_clear(t);
 }
 
+/* Bound propagated error |si(z)-si(mid(z))| using
+   |si'(z)| = |sin(z)/z| <= cosh(|im(z)|)/max(1, |z|).
+*/
+static void
+acb_hypgeom_si_prop_error(mag_t err, const acb_t z)
+{
+    if (acb_is_exact(z))
+    {
+        mag_zero(err);
+    }
+    else
+    {
+        mag_t t, u;
+
+        mag_init(t);
+        mag_init(u);
+
+        arb_get_mag(t, acb_imagref(z));
+        mag_cosh(t, t);
+        acb_get_mag_lower(u, z);
+        if (mag_cmp_2exp_si(u, 0) < 0)
+            mag_one(u);
+        mag_div(t, t, u);
+        mag_hypot(u, arb_radref(acb_realref(z)), arb_radref(acb_imagref(z)));
+        mag_mul(err, t, u);
+
+        mag_clear(t);
+        mag_clear(u);
+    }
+}
+
 void
 acb_hypgeom_si(acb_t res, const acb_t z, slong prec)
 {
-    if (acb_is_real(z) && arb_is_finite(acb_realref(z)))
+    if (!acb_is_finite(z))
+    {
+        acb_indeterminate(res);
+    }
+    else if (acb_is_real(z))
     {
         arb_hypgeom_si(acb_realref(res), acb_realref(z), prec);
         arb_zero(acb_imagref(res));
-        return;
     }
-
-    if (acb_hypgeom_u_use_asymp(z, prec))
-        acb_hypgeom_si_asymp(res, z, prec);
     else
-        acb_hypgeom_si_1f2(res, z, prec);
+    {
+        double asymp_accuracy, a, b, absz, cancellation, rlog2 = 1.4426950408889634;
+        slong wp;
+        int use_asymp;
+        acb_t m;
+        mag_t err;
+        int pure_imag = arb_is_zero(acb_realref(z));
+
+        a = arf_get_d(arb_midref(acb_realref(z)), ARF_RND_DOWN);
+        b = arf_get_d(arb_midref(acb_imagref(z)), ARF_RND_DOWN);
+        a = fabs(a);
+        b = fabs(b);
+        absz = sqrt(a * a + b * b);
+
+        if (a <= 1.0 && b <= 1.0)
+        {
+            use_asymp = 0;
+        }
+        else if (a > prec || b > prec)
+        {
+            use_asymp = 1;
+        }
+        else
+        {
+            asymp_accuracy = absz * rlog2 * 0.999 - 5;
+            use_asymp = asymp_accuracy > prec;
+        }
+
+        acb_init(m);
+        mag_init(err);
+
+        /* assumes that we already handled the branch cut */
+        acb_hypgeom_si_prop_error(err, z);
+        acb_get_mid(m, z);
+
+        if (use_asymp)
+        {
+            acb_hypgeom_si_asymp(res, m, prec);
+        }
+        else
+        {
+            /* terms grow to ~ exp(|z|), sum is ~ exp(|im(z)|) */
+            cancellation = (absz - b) * rlog2;
+            wp = prec + FLINT_MAX(0, cancellation);
+            wp = wp * 1.001 + 5;
+            acb_hypgeom_si_1f2(res, m, wp);
+            acb_set_round(res, res, prec);
+        }
+
+        if (pure_imag)
+            arb_add_error_mag(acb_imagref(res), err);
+        else
+            acb_add_error_mag(res, err);
+
+        acb_clear(m);
+        mag_clear(err);
+    }
 }

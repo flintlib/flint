@@ -69,7 +69,7 @@
     `i = 0, 1, 2,\dots`, where `\operatorname{soln1} _p` and `\operatorname{soln2} _p` are the sieve offsets calculated
     for `p`.
 
-.. function:: void qsieve_do_sieving2(qs_t qs_inf, unsigned char * seive, qs_poly_t poly)
+.. function:: void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 
     Perform the same task as above but instead of sieving over whole array at once divide
     the array in blocks and then sieve over each block for all the primes in factor base.

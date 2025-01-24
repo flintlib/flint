@@ -104,10 +104,10 @@ Context Management
 
     Prints the context information to ``stdout``.
 
-.. function:: void fq_default_ctx_randtest(fq_default_ctx_t ctx)
+.. function:: void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state)
 
-    Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_default_ctx_init`` has not been called on ``ctx`` already.
+    Initializes ``ctx`` to a random finite field using one of the five internal representations.
+    Assumes that ``fq_default_ctx_init`` has not been called on ``ctx`` already.
 
 .. function:: void fq_default_get_coeff_fmpz(fmpz_t c, fq_default_t op, slong n, const fq_default_ctx_t ctx)
 

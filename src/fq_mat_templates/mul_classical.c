@@ -61,7 +61,7 @@ TEMPLATE(T, mat_mul_classical) (TEMPLATE(T, mat_t) C,
         for (j = 0; j < bc; j++)
         {
             _TEMPLATE(T, vec_dot) (TEMPLATE(T, mat_entry) (C, i, j),
-               A->rows[i], trB + j * br, br, ctx);
+               TEMPLATE(T, mat_entry) (A, i, 0), trB + j * br, br, ctx);
 
         }
     }

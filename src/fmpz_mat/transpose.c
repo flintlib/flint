@@ -15,7 +15,6 @@
 void
 fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    fmpz tmp;
     slong i, j;
 
     if (B->r != A->c || B->c != A->r)
@@ -27,16 +26,12 @@ fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
     {
         for (i = 0; i < A->r - 1; i++)
             for (j = i + 1; j < A->c; j++)
-            {
-                tmp = A->rows[i][j];
-                A->rows[i][j] = A->rows[j][i];
-                A->rows[j][i] = tmp;
-            }
+                FLINT_SWAP(fmpz, *fmpz_mat_entry(B, i, j), *fmpz_mat_entry(B, j, i));
     }
     else  /* Not aliased; general case */
     {
         for (i = 0; i < B->r; i++)
             for (j = 0; j < B->c; j++)
-                fmpz_set(&B->rows[i][j], &A->rows[j][i]);
+                fmpz_set(fmpz_mat_entry(B, i, j), fmpz_mat_entry(A, j, i));
     }
 }

@@ -46,15 +46,15 @@ TEST_FUNCTION_START(fmpz_lll_heuristic_dot, state)
         v1 = _d_vec_init(cols);
         v2 = _d_vec_init(cols);
 
-        expo1 = _fmpz_vec_get_d_vec_2exp(v1, B->rows[r1], cols);
-        expo2 = _fmpz_vec_get_d_vec_2exp(v2, B->rows[r2], cols);
+        expo1 = _fmpz_vec_get_d_vec_2exp(v1, fmpz_mat_row(B, r1), cols);
+        expo2 = _fmpz_vec_get_d_vec_2exp(v2, fmpz_mat_row(B, r2), cols);
 
         d1 = fmpz_lll_heuristic_dot(v1, v2, cols, B, r1, r2, expo1 + expo2);
         d2 = fmpz_lll_heuristic_dot(v1, v1, cols, B, r1, r1, expo1 + expo1);
         d3 = fmpz_lll_heuristic_dot(v2, v2, cols, B, r2, r2, expo2 + expo2);
 
         _d_vec_add(v2, v1, v2, cols);
-        _fmpz_vec_add(B->rows[r2], B->rows[r1], B->rows[r2], cols);
+        _fmpz_vec_add(fmpz_mat_row(B, r2), fmpz_mat_row(B, r1), fmpz_mat_row(B, r2), cols);
 
         d4 = fmpz_lll_heuristic_dot(v2, v2, cols, B, r2, r2, expo2 + expo2);
 

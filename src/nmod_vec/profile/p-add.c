@@ -96,7 +96,7 @@ void sample(void * arg, ulong unused)
         _nmod_vec_clear(vec2);
     }
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 int main(int argc, char ** argv)

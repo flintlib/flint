@@ -9,31 +9,32 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "gr.h"
 #include "gr_mat.h"
 
 static void
-_apply_permutation(slong * AP, gr_mat_t A, slong * P, slong n, slong offset)
+_apply_permutation(slong * AP, gr_mat_t A, const slong * P,
+    slong num_rows, slong row_offset, slong num_cols, slong col_offset, gr_ctx_t ctx)
 {
-    if (n != 0)
+    if (num_rows != 0)
     {
-        gr_ptr * Atmp;
-        slong *APtmp;
+        gr_ptr Atmp;
+        slong * APtmp;
         slong i;
+        slong sz = ctx->sizeof_elem;
 
-        /* todo: stack alloc */
-        Atmp = flint_malloc(sizeof(gr_ptr) * n);
-        APtmp = flint_malloc(sizeof(slong) * n);
+        /* todo: reduce memory allocation */
+        Atmp = flint_malloc(sz * num_rows * num_cols);
+        APtmp = flint_malloc(sizeof(slong) * num_rows);
 
-        for (i = 0; i < n; i++)
-            Atmp[i] = A->rows[P[i] + offset];
-        for (i = 0; i < n; i++)
-            A->rows[i + offset] = Atmp[i];
+        for (i = 0; i < num_rows; i++)
+            memcpy(GR_ENTRY(Atmp, i * num_cols, sz), GR_MAT_ENTRY(A, P[i] + row_offset, col_offset, sz), num_cols * sz);
+        for (i = 0; i < num_rows; i++)
+            memcpy(GR_MAT_ENTRY(A, i + row_offset, col_offset, sz), GR_ENTRY(Atmp, i * num_cols, sz), num_cols * sz);
 
-        for (i = 0; i < n; i++)
-            APtmp[i] = AP[P[i] + offset];
-        for (i = 0; i < n; i++)
-            AP[i + offset] = APtmp[i];
+        for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
+        for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
 
         flint_free(Atmp);
         flint_free(APtmp);
@@ -82,7 +83,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
 
     if (r1 != 0)
     {
-        _apply_permutation(P, LU, P1, m, 0);
+        _apply_permutation(P, LU, P1, m, 0, n - n1, n1, ctx);
     }
 
     gr_mat_window_init(A00, LU, 0, 0, r1, r1, ctx);
@@ -112,7 +113,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
         goto cleanup2;
     }
 
-    _apply_permutation(P, LU, P1, m - r1, r1);
+    _apply_permutation(P, LU, P1, m - r1, r1, n1, 0, ctx);
 
     /* Compress L */
     if (r1 != n1)
@@ -121,7 +122,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
 
         for (i = 0; i < m - r1; i++)
         {
-            gr_ptr row = LU->rows[r1 + i];
+            gr_ptr row = GR_MAT_ENTRY(LU, r1 + i, 0, sz);
 
             for (j = 0; j < FLINT_MIN(i, r2); j++)
             {

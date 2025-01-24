@@ -23,27 +23,13 @@ TEMPLATE(T, mat_window_init) (TEMPLATE(T, mat_t) window,
                               slong r1, slong c1, slong r2, slong c2,
                               const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
-    slong i;
-    window->entries = NULL;
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
 
-    if (r2 > r1)
-        window->rows = (TEMPLATE(T, struct) **) flint_malloc((r2 - r1)
-                                              * sizeof(TEMPLATE(T, struct) *));
-    else
-        window->rows = NULL;
-
-    if (mat->c > 0)
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = mat->rows[r1 + i] + c1;
-    } else
-    {
-        for (i = 0; i < r2 - r1; i++)
-            window->rows[i] = NULL;
-    }
-
+    window->entries = TEMPLATE(T, mat_entry)(mat, r1, c1);
     window->r = r2 - r1;
     window->c = c2 - c1;
+    window->stride = mat->stride;
 }
 
 

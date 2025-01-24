@@ -106,7 +106,7 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
     {
         fmpz_gcd(g, mod, fmpz_mat_entry(A, i, pivots[i]));
         fmpz_divexact(g, mod, g);
-        _fmpz_vec_scalar_mul_fmpz(extra_row, A->rows[i], A->c, g);
+        _fmpz_vec_scalar_mul_fmpz(extra_row, fmpz_mat_row(A, i), A->c, g);
         _fmpz_vec_scalar_mod_fmpz(extra_row, extra_row, A->c, mod);
 
         for ( j = pivots[i] + 1; j < A->c; j++)
@@ -121,7 +121,7 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
                         {
                             fmpz_divexact(g, extra_row + j, fmpz_mat_entry(A, r, pivots[r]));
                             fmpz_neg(g, g);
-                            _fmpz_vec_scalar_addmul_fmpz(extra_row, A->rows[r], A->c, g);
+                            _fmpz_vec_scalar_addmul_fmpz(extra_row, fmpz_mat_row(A, r), A->c, g);
                         }
                     }
                 }

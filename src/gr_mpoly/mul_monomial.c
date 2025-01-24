@@ -17,8 +17,10 @@ int gr_mpoly_mul_monomial(
     gr_mpoly_t A,
     const gr_mpoly_t B,
     const gr_mpoly_t C,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong i, N, Alen, Blen = B->length;
     ulong ofmask;
     flint_bitcnt_t Abits;
@@ -44,7 +46,7 @@ int gr_mpoly_mul_monomial(
     if (C->exps[0] == 0 && mpoly_monomial_is_zero(C->exps,
                                      mpoly_words_per_exp(C->bits, mctx)))
     {
-        status |= gr_mpoly_mul_scalar(A, B, Ccoeff0, mctx, cctx);
+        status |= gr_mpoly_mul_scalar(A, B, Ccoeff0, ctx);
         goto cleanup_C;
     }
 
@@ -62,7 +64,7 @@ int gr_mpoly_mul_monomial(
     if (A == B)
     {
         /* inplace operation on A */
-        gr_mpoly_fit_bits(A, Abits, mctx, cctx);
+        gr_mpoly_fit_bits(A, Abits, ctx);
         Bexps = Aexps = A->exps;
     }
     else
@@ -73,7 +75,7 @@ int gr_mpoly_mul_monomial(
             mpoly_repack_monomials(Bexps, Abits, B->exps, B->bits, Blen, mctx);
         }
 
-        gr_mpoly_fit_length_reset_bits(A, Blen, Abits, mctx, cctx);
+        gr_mpoly_fit_length_reset_bits(A, Blen, Abits, ctx);
         Aexps = A->exps;
     }
 
@@ -114,7 +116,7 @@ int gr_mpoly_mul_monomial(
 /* todo: when we can verify (quickly) that C is invertible */
 #if 0
     status |= _gr_vec_mul_scalar(A->coeffs, B->coeffs, Blen, Ccoeff0, cctx);
-    _gr_mpoly_set_length(A, Blen, mctx, cctx);
+    _gr_mpoly_set_length(A, Blen, ctx);
 #else
     {
         slong sz = cctx->sizeof_elem;

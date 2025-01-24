@@ -110,7 +110,7 @@ void sample(void * arg, ulong count)
     /* don't init r2 */
 
     gmp_randclear(st);
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 int main(void)

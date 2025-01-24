@@ -30,8 +30,8 @@ TEST_FUNCTION_START(gr_mat_mul_strassen, state)
             gr_ctx_init_nmod(ctx, n_randtest_not_zero(state));
 
         a = n_randint(state, 8);
-        b = n_randint(state, 8);
-        c = n_randint(state, 8);
+        b = n_randint(state, 2) ? a : n_randint(state, 8);
+        c = n_randint(state, 2) ? a : n_randint(state, 8);
 
         gr_mat_init(A, a, b, ctx);
         gr_mat_init(B, b, c, ctx);
@@ -43,7 +43,12 @@ TEST_FUNCTION_START(gr_mat_mul_strassen, state)
         status |= gr_mat_randtest(C, state, ctx);
         status |= gr_mat_randtest(D, state, ctx);
 
-        if (b == c && n_randint(state, 2))
+        if (a == b && b == c && n_randint(state, 2))
+        {
+            status |= gr_mat_set(B, A, ctx);
+            status |= gr_mat_mul_strassen(C, A, A, ctx);
+        }
+        else if (b == c && n_randint(state, 2))
         {
             status |= gr_mat_set(C, A, ctx);
             status |= gr_mat_mul_strassen(C, C, B, ctx);
@@ -60,7 +65,7 @@ TEST_FUNCTION_START(gr_mat_mul_strassen, state)
 
         status |= gr_mat_mul_classical(D, A, B, ctx);
 
-        if (status != GR_SUCCESS && gr_mat_equal(C, D, ctx) == T_FALSE)
+        if (status != GR_SUCCESS || gr_mat_equal(C, D, ctx) != T_TRUE)
         {
             flint_printf("FAIL:\n");
             gr_ctx_println(ctx);

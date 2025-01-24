@@ -27,12 +27,12 @@ void nmod_mat_nmod_vec_mul(
         return;
 
     if (len > 0)
-        _nmod_vec_scalar_mul_nmod(c, B->rows[0], ncols, a[0], B->mod);
+        _nmod_vec_scalar_mul_nmod(c, nmod_mat_entry_ptr(B, 0, 0), ncols, a[0], B->mod);
     else
         _nmod_vec_zero(c, ncols);
 
     for (i = 1; i < len; i++)
-        _nmod_vec_scalar_addmul_nmod(c, B->rows[i], ncols, a[i], B->mod);
+        _nmod_vec_scalar_addmul_nmod(c, nmod_mat_entry_ptr(B, i, 0), ncols, a[i], B->mod);
 }
 
 void nmod_mat_nmod_vec_mul_ptr(

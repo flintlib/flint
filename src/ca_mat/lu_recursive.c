@@ -9,29 +9,30 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "ca_mat.h"
 
 static void
-_apply_permutation(slong * AP, ca_mat_t A, slong * P, slong n, slong offset)
+_apply_permutation(slong * AP, ca_mat_t A, const slong * P,
+    slong num_rows, slong row_offset, slong num_cols, slong col_offset)
 {
-    if (n != 0)
+    if (num_rows != 0)
     {
-        ca_struct ** Atmp;
-        slong *APtmp;
+        ca_ptr Atmp;
+        slong * APtmp;
         slong i;
 
-        Atmp = flint_malloc(sizeof(ca_mat_struct *) * n);
-        APtmp = flint_malloc(sizeof(slong) * n);
+        /* todo: reduce memory allocation */
+        Atmp = flint_malloc(sizeof(ca_struct) * num_rows * num_cols);
+        APtmp = flint_malloc(sizeof(slong) * num_rows);
 
-        for (i = 0; i < n; i++)
-            Atmp[i] = A->rows[P[i] + offset];
-        for (i = 0; i < n; i++)
-            A->rows[i + offset] = Atmp[i];
+        for (i = 0; i < num_rows; i++)
+            memcpy(Atmp + i * num_cols, ca_mat_entry(A, P[i] + row_offset, col_offset), sizeof(ca_struct) * num_cols);
+        for (i = 0; i < num_rows; i++)
+            memcpy(ca_mat_entry(A, i + row_offset, col_offset), Atmp + i * num_cols, sizeof(ca_struct) * num_cols);
 
-        for (i = 0; i < n; i++)
-            APtmp[i] = AP[P[i] + offset];
-        for (i = 0; i < n; i++)
-            AP[i + offset] = APtmp[i];
+        for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
+        for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
 
         flint_free(Atmp);
         flint_free(APtmp);
@@ -43,7 +44,7 @@ ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int 
 {
 
     slong i, j, m, n, r1, r2, n1;
-    ca_mat_t A0, A1, A00, A01, A10, A11;
+    ca_mat_t A0, A00, A01, A10, A11;
     slong *P1;
     int success;
 
@@ -64,7 +65,6 @@ ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int 
 
     P1 = flint_malloc(sizeof(slong) * m);
     ca_mat_window_init(A0, LU, 0, 0, m, n1, ctx);
-    ca_mat_window_init(A1, LU, 0, n1, m, n, ctx);
 
     success = ca_mat_lu_recursive(&r1, P1, A0, A0, rank_check, ctx);
 
@@ -76,7 +76,7 @@ ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int 
 
     if (r1 != 0)
     {
-        _apply_permutation(P, LU, P1, m, 0);
+        _apply_permutation(P, LU, P1, m, 0, n - n1, n1);
     }
 
     ca_mat_window_init(A00, LU, 0, 0, r1, r1, ctx);
@@ -102,14 +102,15 @@ ca_mat_lu_recursive(slong * rank, slong * P, ca_mat_t LU, const ca_mat_t A, int 
         goto cleanup2;
     }
 
-    _apply_permutation(P, LU, P1, m - r1, r1);
+    _apply_permutation(P, LU, P1, m - r1, r1, n1, 0);
+
 
     /* Compress L */
     if (r1 != n1)
     {
         for (i = 0; i < m - r1; i++)
         {
-            ca_struct * row = LU->rows[r1 + i];
+            ca_ptr row = ca_mat_entry(LU, r1 + i, 0);
 
             for (j = 0; j < FLINT_MIN(i, r2) ; j++)
             {
@@ -128,7 +129,6 @@ cleanup2:
 cleanup1:
     flint_free(P1);
     ca_mat_window_clear(A0, ctx);
-    ca_mat_window_clear(A1, ctx);
 
     *rank = r1 + r2;
 

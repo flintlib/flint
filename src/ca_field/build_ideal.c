@@ -140,13 +140,13 @@ acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong pre
         for (i = 0; i < len; i++)
             acb_addmul_fmpz(z2, vec + i, fmpz_mat_entry(A, row, i), prec + 10);
 
-        if (!_fmpz_vec_is_zero(A->rows[row], len) && acb_contains_zero(z2))
+        if (!_fmpz_vec_is_zero(fmpz_mat_row(A, row), len) && acb_contains_zero(z2))
         {
             found++;
         }
         else
         {
-            _fmpz_vec_zero(A->rows[row], fmpz_mat_ncols(A));
+            _fmpz_vec_zero(fmpz_mat_row(A, row), fmpz_mat_ncols(A));
         }
     }
 
@@ -155,9 +155,9 @@ acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong pre
     i = 0;
     for (row = 0; row < len; row++)
     {
-        if (!_fmpz_vec_is_zero(A->rows[row], len))
+        if (!_fmpz_vec_is_zero(fmpz_mat_row(A, row), len))
         {
-            _fmpz_vec_set(rel->rows[i], A->rows[row], len);
+            _fmpz_vec_set(fmpz_mat_row(rel, i), fmpz_mat_row(A, row), len);
             i++;
         }
     }
@@ -464,7 +464,7 @@ ca_field_build_ideal_logs(ca_field_t K, ca_ctx_t ctx)
 
             for (row = 0; row < fmpz_mat_nrows(A); row++)
             {
-                rel = A->rows[row];
+                rel = fmpz_mat_row(A, row);
 
                 if (!_fmpz_vec_is_zero(rel, num_logs_with_pi_i) && FLINT_ABS(_fmpz_vec_max_bits(rel, num_logs_with_pi_i)) <= 10)
                 {
@@ -838,7 +838,7 @@ ca_field_build_ideal_multiplicative(ca_field_t K, ca_ctx_t ctx)
 
             for (row = 0; row < fmpz_mat_nrows(A); row++)
             {
-                rel = A->rows[row];
+                rel = fmpz_mat_row(A, row);
 
                 if (!_fmpz_vec_is_zero(rel, num_powers + 1) && FLINT_ABS(_fmpz_vec_max_bits(rel, num_powers + 1)) <= 10)
                 {

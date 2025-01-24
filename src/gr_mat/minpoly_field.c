@@ -47,7 +47,6 @@ gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx)
 
     GR_TMP_INIT2(t, h, ctx);
 
-    gr_init(h, ctx);
     gr_poly_init(b, ctx);
     gr_poly_init(g, ctx);
     gr_poly_init(r, ctx);

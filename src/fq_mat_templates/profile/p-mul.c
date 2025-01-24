@@ -111,7 +111,7 @@ main(int argc, char** argv)
     TEMPLATE(T, ctx_clear)(ctx);
     fmpz_clear(p);
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     return 0;
 }

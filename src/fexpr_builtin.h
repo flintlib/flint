@@ -18,11 +18,11 @@
 #define FEXPR_BUILTIN_INLINE static inline
 #endif
 
+#include "fexpr.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "fexpr.h"
 
 /* Builtin symbols */
 

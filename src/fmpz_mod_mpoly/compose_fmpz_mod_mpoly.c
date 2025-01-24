@@ -64,14 +64,14 @@ int fmpz_mod_mpoly_compose_fmpz_mod_mpoly(
 matrix_no_good:
 
     fmpz_mat_clear(M);
-/*
+
     for (i = 0; i < ctxB->minfo->nvars; i++)
     {
         if (C[i]->length > 1)
         {
-            return nmod_mpoly_compose_nmod_mpoly_horner(A, B, C, ctxB, ctxAC);
+            return fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(A, B, C, ctxB, ctxAC);
         }
     }
-*/
+
     return fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(A, B, C, ctxB, ctxAC);
 }

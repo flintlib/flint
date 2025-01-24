@@ -136,7 +136,7 @@ main(int argc, char** argv)
     fq_nmod_ctx_clear(ctxn);
     fmpz_clear(temp);
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     return 0;
 }

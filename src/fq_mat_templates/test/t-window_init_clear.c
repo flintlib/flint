@@ -46,7 +46,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_window_init_clear, state)
         TEMPLATE(T, mat_window_init) (w, a, r1, c1, r2, c2, ctx);
 
         for (j = 0; j < r2 - r1; j++)
-        	 _TEMPLATE(T, vec_zero) (w->rows[j], c2 - c1, ctx);
+        	 _TEMPLATE(T, vec_zero) (TEMPLATE(T, mat_entry) (w, j, 0), c2 - c1, ctx);
 
         TEMPLATE(T, mat_window_clear) (w, ctx);
         TEMPLATE(T, mat_clear) (a, ctx);

@@ -33,7 +33,7 @@ fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
     if (rank == 0)
     {
         for (i = 0; i < nullity; i++)
-            fmpz_one(res->rows[i] + i);
+            fmpz_one(fmpz_mat_entry(res, i, i));
     }
     else if (nullity)
     {
@@ -42,7 +42,7 @@ fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
 
         for (i = j = k = 0; i < rank; i++)
         {
-            while (fmpz_is_zero(tmp->rows[i] + j))
+            while (fmpz_is_zero(fmpz_mat_entry(tmp, i, j)))
             {
                 nonpivots[k] = j;
                 k++;
@@ -58,13 +58,13 @@ fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
             j++;
         }
 
-        fmpz_set(den, tmp->rows[0] + pivots[0]);
+        fmpz_set(den, fmpz_mat_entry(tmp, 0, pivots[0]));
 
         for (i = 0; i < nullity; i++)
         {
             for (j = 0; j < rank; j++)
-                fmpz_set(res->rows[pivots[j]] + i, tmp->rows[j] + nonpivots[i]);
-            fmpz_neg(res->rows[nonpivots[i]] + i, den);
+                fmpz_set(fmpz_mat_entry(res, pivots[j], i), fmpz_mat_entry(tmp, j, nonpivots[i]));
+            fmpz_neg(fmpz_mat_entry(res, nonpivots[i], + i), den);
         }
 
         flint_free(pivots);

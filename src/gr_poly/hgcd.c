@@ -219,7 +219,7 @@ __mat_mul_strassen(gr_ptr * C, slong * lenC,
 }
 
 /*
-    Computs the matrix product C of the two 2x2 matrices A and B,
+    Computes the matrix product C of the two 2x2 matrices A and B,
     using either classical or Strassen multiplication depending
     on the degrees of the input polynomials.
 

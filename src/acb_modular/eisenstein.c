@@ -18,7 +18,7 @@ acb_modular_eisenstein(acb_ptr r, const acb_t tau, slong len, slong prec)
     psl2z_t g;
     arf_t one_minus_eps;
     acb_t tau_prime, t1, t2, t3, t4, q;
-    slong m, n;
+    slong n;
     int real;
 
     if (len < 1)
@@ -128,19 +128,14 @@ acb_modular_eisenstein(acb_ptr r, const acb_t tau, slong len, slong prec)
     }
 
     /* compute more coefficients using recurrence */
+    /* T. Apostol (1976), Modular Functions and Dirichlet Series
+       in Number Theory, Springer. Theorem 1.13. */
     for (n = 4; n < len + 2; n++)
     {
-        acb_zero(r + n - 2);
-
-        m = 2;
-        for (m = 2; m * 2 < n; m++)
-            acb_addmul(r + n - 2, r + m - 2, r + n - m - 2, prec);
-
+        acb_dot(r + n - 2, NULL, 0, r, 1, r + n - 4, -1, (n - 3) / 2, prec);
         acb_mul_2exp_si(r + n - 2, r + n - 2, 1);
-
         if (n % 2 == 0)
             acb_addmul(r + n - 2, r + n / 2 - 2, r + n / 2 - 2, prec);
-
         acb_mul_ui(r + n - 2, r + n - 2, 3, prec);
         acb_div_ui(r + n - 2, r + n - 2, (2 * n + 1) * (n - 3), prec);
     }

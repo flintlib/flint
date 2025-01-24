@@ -20,16 +20,17 @@ gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, g
     slong r1 = mat1->r;
     slong c1 = mat1->c;
     slong r2 = mat2->r;
+    slong sz = ctx->sizeof_elem;
 
-    if (mat1->c != mat2->c || res->r != mat1->r + mat2->r)
+    if (mat1->c != mat2->c || res->c != mat1->c || res->r != mat1->r + mat2->r)
         return GR_DOMAIN;
 
     if (c1 > 0)
     {
         for (i = 0; i < r1; i++)
-            status |= _gr_vec_set(res->rows[i], mat1->rows[i], c1, ctx);
+            status |= _gr_vec_set(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat1, i, 0, sz), c1, ctx);
         for (i = 0; i < r2; i++)
-            status |= _gr_vec_set(res->rows[i + r1], mat2->rows[i], c1, ctx);
+            status |= _gr_vec_set(GR_MAT_ENTRY(res, i + r1, 0, sz), GR_MAT_ENTRY(mat2, i, 0, sz), c1, ctx);
     }
 
     return status;

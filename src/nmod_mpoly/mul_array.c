@@ -16,7 +16,10 @@
 
 /* Currently we do not -funroll-loops by default in the nmod_mpoly module,
    but it is worthwhile for the functions in this file. */
-#pragma GCC optimize("-funroll-loops")
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC push_options
+# pragma GCC optimize("unroll-loops")
+#endif
 
 /* improve locality */
 #define BLOCK 128
@@ -941,3 +944,7 @@ int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B,
     TMP_END;
     return success;
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC pop_options
+#endif

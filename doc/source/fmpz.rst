@@ -182,7 +182,7 @@ Types, macros and constants
 
    This function is for internal use. The resulting ``fmpz`` will be backed by
    an ``mpz_t`` that can be passed to GMP, but the ``fmpz`` will be in an
-   inconsistent state with respect to the other Flint ``fmpz`` functions such as
+   inconsistent state with respect to the other FLINT ``fmpz`` functions such as
    ``fmpz_is_zero``, etc.
 
    **Note:** Requires that ``gmp.h`` has been included before any FLINT

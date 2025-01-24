@@ -156,12 +156,10 @@ typedef const ulong * nn_srcptr;
 # define FLINT_DEPRECATED
 #endif
 
-#if defined(__cplusplus)
+#if defined(__cplusplus) || ( __STDC_VERSION__ >= 202300L )
 # define FLINT_NORETURN [[noreturn]]
-#elif __STDC_VERSION__ < 202300L
-# define FLINT_NORETURN _Noreturn
 #else
-# define FLINT_NORETURN noreturn
+# define FLINT_NORETURN _Noreturn
 #endif
 
 #if FLINT_USES_TLS
@@ -351,7 +349,7 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
    FLINT_GC_INIT(); \
    flint_rand_init(xxx)
 
-#define FLINT_TEST_CLEANUP(xxx) \
+#define FLINT_TEST_CLEAR(xxx) \
    flint_rand_clear(xxx); \
    flint_cleanup_master();
 

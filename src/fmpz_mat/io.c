@@ -61,7 +61,7 @@ int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
     {
         for (j = 0; j < c; j++)
         {
-            xxx_fmpz_print(mat->rows[i] + j);
+            xxx_fmpz_print(fmpz_mat_entry(mat, i, j));
             if (j != c - 1)
                 xxx_putc(' ');
         }
@@ -85,7 +85,7 @@ int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
         xxx_putc('[');
         for (j = 0; j < c; j++)
         {
-            xxx_fmpz_print(mat->rows[i] + j);
+            xxx_fmpz_print(fmpz_mat_entry(mat, i, j));
             if (j != c - 1)
                 xxx_putc(' ');
         }

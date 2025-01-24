@@ -78,15 +78,15 @@ _arb_log_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slon
             }
         }
 
-        if (_fmpz_vec_equal(M->rows[row], prev, n))
+        if (_fmpz_vec_equal(fmpz_mat_row(M, row), prev, n))
             continue;
 
-        if (FLINT_ABS(_fmpz_vec_max_bits(M->rows[row], n)) >= 16)
+        if (FLINT_ABS(_fmpz_vec_max_bits(fmpz_mat_row(M, row), n)) >= 16)
             break;
 
-        _fmpz_vec_set(prev, M->rows[row], n);
+        _fmpz_vec_set(prev, fmpz_mat_row(M, row), n);
 
-        arb_dot_fmpz(x, NULL, 0, alpha, 1, M->rows[row], 1, n, prec);
+        arb_dot_fmpz(x, NULL, 0, alpha, 1, fmpz_mat_row(M, row), 1, n, prec);
 
         for (j = 0; j < n; j++)
             rel[n * d + j] = fmpz_get_si(fmpz_mat_entry(M, row, j));

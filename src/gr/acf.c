@@ -1091,6 +1091,8 @@ _gr_acf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 #include "gr_mat.h"
 #include "acb_mat.h"
 
+#define ACF_MAT_ENTRY(mat, ii, jj) (((acf_ptr) (mat)->entries) + (ii) * (mat)->stride + (jj))
+
 /* todo: test */
 int
 _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
@@ -1129,8 +1131,8 @@ _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
         {
             for (j = 0; j < A->c; j++)
             {
-                *arb_midref(acb_realref(acb_mat_entry(RA, i, j))) = *acf_realref(((acf_srcptr) A->rows[i]) + j);
-                *arb_midref(acb_imagref(acb_mat_entry(RA, i, j))) = *acf_imagref(((acf_srcptr) A->rows[i]) + j);
+                *arb_midref(acb_realref(acb_mat_entry(RA, i, j))) = *acf_realref(ACF_MAT_ENTRY(A, i, j));
+                *arb_midref(acb_imagref(acb_mat_entry(RA, i, j))) = *acf_imagref(ACF_MAT_ENTRY(A, i, j));
             }
         }
 
@@ -1138,8 +1140,8 @@ _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
         {
             for (j = 0; j < B->c; j++)
             {
-                *arb_midref(acb_realref(acb_mat_entry(RB, i, j))) = *acf_realref(((acf_srcptr) B->rows[i]) + j);
-                *arb_midref(acb_imagref(acb_mat_entry(RB, i, j))) = *acf_imagref(((acf_srcptr) B->rows[i]) + j);
+                *arb_midref(acb_realref(acb_mat_entry(RB, i, j))) = *acf_realref(ACF_MAT_ENTRY(B, i, j));
+                *arb_midref(acb_imagref(acb_mat_entry(RB, i, j))) = *acf_imagref(ACF_MAT_ENTRY(B, i, j));
             }
         }
 
@@ -1167,8 +1169,8 @@ _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
         {
             for (j = 0; j < C->c; j++)
             {
-                arf_swap(acf_realref(((acf_ptr) C->rows[i]) + j), arb_midref(acb_realref(acb_mat_entry(RC, i, j))));
-                arf_swap(acf_imagref(((acf_ptr) C->rows[i]) + j), arb_midref(acb_imagref(acb_mat_entry(RC, i, j))));
+                arf_swap(acf_realref(ACF_MAT_ENTRY(C, i, j)), arb_midref(acb_realref(acb_mat_entry(RC, i, j))));
+                arf_swap(acf_imagref(ACF_MAT_ENTRY(C, i, j)), arb_midref(acb_imagref(acb_mat_entry(RC, i, j))));
             }
         }
 
@@ -1200,8 +1202,8 @@ _gr_acf_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A
     {
         for (j = 0; j < n; j++)
         {
-            arf_set(arb_midref(acb_realref(acb_mat_entry(A_acb, i, j))), acf_realref(((acf_srcptr) A->rows[i]) + j));
-            arf_set(arb_midref(acb_imagref(acb_mat_entry(A_acb, i, j))), acf_imagref(((acf_srcptr) A->rows[i]) + j));
+            arf_set(arb_midref(acb_realref(acb_mat_entry(A_acb, i, j))), acf_realref(ACF_MAT_ENTRY(A, i, j)));
+            arf_set(arb_midref(acb_imagref(acb_mat_entry(A_acb, i, j))), acf_imagref(ACF_MAT_ENTRY(A, i, j)));
         }
     }
 
@@ -1226,8 +1228,8 @@ _gr_acf_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A
             {
                 for (j = 0; j < n; j++)
                 {
-                    arf_set(acf_realref(((acf_ptr) R->rows[i]) + j), arb_midref(acb_realref(acb_mat_entry(R_acb, i, j))));
-                    arf_set(acf_imagref(((acf_ptr) R->rows[i]) + j), arb_midref(acb_imagref(acb_mat_entry(R_acb, i, j))));
+                    arf_set(acf_realref(ACF_MAT_ENTRY(R, i, j)), arb_midref(acb_realref(acb_mat_entry(R_acb, i, j))));
+                    arf_set(acf_imagref(ACF_MAT_ENTRY(R, i, j)), arb_midref(acb_imagref(acb_mat_entry(R_acb, i, j))));
                 }
             }
         }
@@ -1240,8 +1242,8 @@ _gr_acf_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A
             {
                 for (j = 0; j < n; j++)
                 {
-                    arf_set(acf_realref(((acf_ptr) L->rows[i]) + j), arb_midref(acb_realref(acb_mat_entry(L_acb, i, j))));
-                    arf_set(acf_imagref(((acf_ptr) L->rows[i]) + j), arb_midref(acb_imagref(acb_mat_entry(L_acb, i, j))));
+                    arf_set(acf_realref(ACF_MAT_ENTRY(L, i, j), arb_midref(acb_realref(acb_mat_entry(L_acb, i, j))));
+                    arf_set(acf_imagref(ACF_MAT_ENTRY(L, i, j), arb_midref(acb_imagref(acb_mat_entry(L_acb, i, j))));
                 }
             }
         }

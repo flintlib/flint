@@ -164,7 +164,7 @@ void fmpz_mat_scalar_smod(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t P)
    slong i;
 
    for (i = 0; i < A->r; i++)
-      _fmpz_vec_scalar_smod_fmpz(B->rows[i], A->rows[i], A->c, P);
+      _fmpz_vec_scalar_smod_fmpz(fmpz_mat_row(B, i), fmpz_mat_row(A, i), A->c, P);
 }
 
 void

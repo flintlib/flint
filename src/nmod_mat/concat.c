@@ -22,8 +22,8 @@ nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat
 
     for (i = 0; i < r; i++)
     {
-    	flint_mpn_copyi(res->rows[i], mat1->rows[i], c1);
-    	flint_mpn_copyi(res->rows[i] + c1, mat2->rows[i], c2);
+    	flint_mpn_copyi(nmod_mat_entry_ptr(res, i, 0), nmod_mat_entry_ptr(mat1, i, 0), c1);
+    	flint_mpn_copyi(nmod_mat_entry_ptr(res, i, c1), nmod_mat_entry_ptr(mat2, i, 0), c2);
     }
 }
 
@@ -36,8 +36,8 @@ nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t
     slong r2 = mat2->r;
 
     for (i = 0; i < r1; i++)
-    	flint_mpn_copyi(res->rows[i], mat1->rows[i], c1);
+    	flint_mpn_copyi(nmod_mat_entry_ptr(res, i, 0), nmod_mat_entry_ptr(mat1, i, 0), c1);
 
     for (i = 0; i < r2; i++)
-    	flint_mpn_copyi(res->rows[i + r1], mat2->rows[i], c1);
+    	flint_mpn_copyi(nmod_mat_entry_ptr(res, i + r1, 0), nmod_mat_entry_ptr(mat2, i, 0), c1);
 }

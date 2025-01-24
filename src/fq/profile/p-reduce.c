@@ -83,7 +83,7 @@ main(int argc, char** argv)
     fq_clear(c, ctx);
     fq_ctx_clear(ctx);
     fmpz_clear(p);
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     return 0;
 }

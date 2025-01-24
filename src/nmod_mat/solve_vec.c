@@ -16,25 +16,26 @@ nmod_mat_solve_vec(nn_ptr x, const nmod_mat_t A, nn_srcptr b)
 {
     nmod_mat_t X, B;
     int result;
-    slong i, m;
+    slong m;
 
     m = A->r;
 
     if (m == 0)
         return 1;
 
-    /* This is a bit of a hack. There should be a function to create
-       a window into a vector */
-    nmod_mat_window_init(X, A, 0, 0, m, 1);
-    nmod_mat_window_init(B, A, 0, 0, m, 1);
+    B->entries = (nn_ptr) b;
+    B->r = m;
+    B->c = 1;
+    B->stride = 1;
+    B->mod = A->mod;
 
-    for (i = 0; i < m; i++) X->rows[i] = x + i;
-    for (i = 0; i < m; i++) B->rows[i] = (nn_ptr) (b + i);
+    X->entries = x;
+    X->r = m;
+    X->c = 1;
+    X->stride = 1;
+    X->mod = A->mod;
 
     result = nmod_mat_solve(X, A, B);
-
-    nmod_mat_window_clear(X);
-    nmod_mat_window_clear(B);
 
     return result;
 }

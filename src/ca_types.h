@@ -234,7 +234,7 @@ typedef struct
     ca_ptr entries;
     slong r;
     slong c;
-    ca_ptr * rows;
+    slong stride;
 }
 ca_mat_struct;
 

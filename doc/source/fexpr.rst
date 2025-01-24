@@ -46,7 +46,7 @@ to a dedicated data structure (e.g. polynomials) internally
 and (optionally) convert the final result back to a symbolic expression.
 
 Symbolic expressions do not allow embedding arbitrary binary objects
-such as Flint/Arb/Antic/Calcium types as atoms.
+such as FLINT/Arb/Antic/Calcium types as atoms.
 This is done on purpose to make symbolic expressions easy to use
 as a data exchange format.
 To embed an object in an expression, one has the following options:

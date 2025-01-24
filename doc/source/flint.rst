@@ -179,7 +179,7 @@ Thread functions
 .. function:: int flint_get_num_threads(void)
 
     When called at the global level, this function returns one more than the
-    number of worker threads in the Flint thread pool, i.e. it returns the
+    number of worker threads in the FLINT thread pool, i.e. it returns the
     number of workers in the thread pool plus one for the master thread.
 
     In general, this function returns one more than the number of additional
@@ -194,7 +194,7 @@ Thread functions
     Restricts the number of worker threads that can be started by the current
     thread to ``num_workers``. This function can be called from any thread.
 
-    Assumes that the Flint thread pool is already set up.
+    Assumes that the FLINT thread pool is already set up.
 
     The function returns the old number of worker threads that can be started.
 

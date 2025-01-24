@@ -16,12 +16,10 @@ slong
 acb_mat_gauss_partial(acb_mat_t A, slong prec)
 {
     acb_t e;
-    acb_ptr * a;
     slong j, m, n, r, rank, row, col, sign;
 
     m = A->r;
     n = A->c;
-    a = A->rows;
     rank = row = col = 0;
     sign = 1;
 
@@ -45,9 +43,9 @@ acb_mat_gauss_partial(acb_mat_t A, slong prec)
 
         for (j = row + 1; j < m; j++)
         {
-            acb_div(e, a[j] + col, a[row] + col, prec);
+            acb_div(e, acb_mat_entry(A, j, col), acb_mat_entry(A, row, col), prec);
             acb_neg(e, e);
-            _acb_vec_scalar_addmul(a[j] + col + 1, a[row] + col + 1, n - col - 1, e, prec);
+            _acb_vec_scalar_addmul(acb_mat_entry(A, j, col + 1), acb_mat_entry(A, row, col + 1), n - col - 1, e, prec);
         }
 
         row++;
@@ -110,7 +108,7 @@ acb_mat_det_lu_inplace(acb_t det, acb_mat_t A, slong prec)
 
         for (i = rank; i < n; i++)
         {
-            acb_vec_get_arf_2norm_squared_bound(t, A->rows[i] + rank,  n - rank, MAG_BITS);
+            acb_vec_get_arf_2norm_squared_bound(t, acb_mat_entry(A, i, rank),  n - rank, MAG_BITS);
             arf_mul(d, d, t, MAG_BITS, ARF_RND_UP);
         }
 

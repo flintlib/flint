@@ -13,13 +13,14 @@
 #include "mpoly.h"
 #include "gr_mpoly.h"
 
-/* c is assumed to be reduced mod n */
 int gr_mpoly_mul_scalar(
     gr_mpoly_t A,
     const gr_mpoly_t B,
     gr_srcptr c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong i, N;
     slong Alen;
     slong Blen = B->length;
@@ -32,10 +33,12 @@ int gr_mpoly_mul_scalar(
 
     if (Blen == 0 || gr_is_zero(c, cctx) == T_TRUE)
     {
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
     }
 
 /*
+    todo: integral domains
+
     todo
     if (gr_is_one(c) == T_TRUE || (Blen > 10 && gr_is_invertible(c, cctx) == T_TRUE))
     {
@@ -45,7 +48,7 @@ int gr_mpoly_mul_scalar(
 
     N = mpoly_words_per_exp(B->bits, mctx);
 
-    gr_mpoly_fit_length_reset_bits(A, B->length, B->bits, mctx, cctx);
+    gr_mpoly_fit_length_reset_bits(A, B->length, B->bits, ctx);
 
     Aexp = A->exps;
     Bexp = B->exps;
@@ -69,19 +72,20 @@ int gr_mpoly_mul_si(
     gr_mpoly_t A,
     const gr_mpoly_t B,
     slong c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
     if (c == 0 || B->length == 0)
     {
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
     }
     else
     {
+        gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
         int status;
         gr_ptr t;
         GR_TMP_INIT(t, cctx);
         status = gr_set_si(t, c, cctx);
-        status |= gr_mpoly_mul_scalar(A, B, t, mctx, cctx);
+        status |= gr_mpoly_mul_scalar(A, B, t, ctx);
         GR_TMP_CLEAR(t, cctx);
         return status;
     }
@@ -91,19 +95,20 @@ int gr_mpoly_mul_ui(
     gr_mpoly_t A,
     const gr_mpoly_t B,
     ulong c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
     if (c == 0 || B->length == 0)
     {
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
     }
     else
     {
+        gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
         int status;
         gr_ptr t;
         GR_TMP_INIT(t, cctx);
         status = gr_set_ui(t, c, cctx);
-        status |= gr_mpoly_mul_scalar(A, B, t, mctx, cctx);
+        status |= gr_mpoly_mul_scalar(A, B, t, ctx);
         GR_TMP_CLEAR(t, cctx);
         return status;
     }
@@ -113,19 +118,20 @@ int gr_mpoly_mul_fmpz(
     gr_mpoly_t A,
     const gr_mpoly_t B,
     const fmpz_t c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
     if (fmpz_is_zero(c) || B->length == 0)
     {
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
     }
     else
     {
+        gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
         int status;
         gr_ptr t;
         GR_TMP_INIT(t, cctx);
         status = gr_set_fmpz(t, c, cctx);
-        status |= gr_mpoly_mul_scalar(A, B, t, mctx, cctx);
+        status |= gr_mpoly_mul_scalar(A, B, t, ctx);
         GR_TMP_CLEAR(t, cctx);
         return status;
     }
@@ -135,19 +141,20 @@ int gr_mpoly_mul_fmpq(
     gr_mpoly_t A,
     const gr_mpoly_t B,
     const fmpq_t c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
     if (fmpq_is_zero(c) || B->length == 0)
     {
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
     }
     else
     {
+        gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
         int status;
         gr_ptr t;
         GR_TMP_INIT(t, cctx);
         status = gr_set_fmpq(t, c, cctx);
-        status |= gr_mpoly_mul_scalar(A, B, t, mctx, cctx);
+        status |= gr_mpoly_mul_scalar(A, B, t, ctx);
         GR_TMP_CLEAR(t, cctx);
         return status;
     }

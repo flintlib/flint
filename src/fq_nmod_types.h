@@ -46,7 +46,7 @@ typedef struct
     fq_nmod_struct * entries;
     slong r;
     slong c;
-    fq_nmod_struct ** rows;
+    slong stride;
 }
 fq_nmod_mat_struct;
 

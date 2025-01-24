@@ -23,8 +23,8 @@ nfloat_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
         cutoff = 96;
     else if (prec <= 512)
         cutoff = 16;
-    else if (prec <= 576)
-        cutoff = 32;
+    else if (prec <= 1024)
+        cutoff = 12;
     else if (prec <= 1536)
         cutoff = 8;
     else if (prec <= 2176)
@@ -48,8 +48,8 @@ nfloat_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t L,
         cutoff = 96;
     else if (prec <= 512)
         cutoff = 16;
-    else if (prec <= 576)
-        cutoff = 32;
+    else if (prec <= 1024)
+        cutoff = 12;
     else if (prec <= 1536)
         cutoff = 8;
     else if (prec <= 2176)
@@ -75,8 +75,6 @@ nfloat_complex_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
         cutoff = 16;
     else if (prec <= 384)
         cutoff = 7;
-    else if (prec == 576)
-        cutoff = 16;
     else
         cutoff = 6;
 
@@ -98,8 +96,6 @@ nfloat_complex_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t L,
         cutoff = 16;
     else if (prec <= 384)
         cutoff = 7;
-    else if (prec == 576)
-        cutoff = 16;
     else
         cutoff = 6;
 
@@ -142,8 +138,6 @@ nfloat_complex_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, in
         cutoff = 12;
     else if (prec <= 512)
         cutoff = 8;
-    else if (prec <= 576)
-        cutoff = 16;
     else if (prec <= 1024)
         cutoff = 7;
     else

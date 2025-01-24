@@ -229,6 +229,7 @@ int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx);
 #endif
 
 void fq_default_ctx_print(const fq_default_ctx_t ctx);
+void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state);
 
 /* Memory management  *********************************************************/
 

@@ -22,7 +22,7 @@ void fmpz_mat_mul_fmpz_vec(
     slong len = FLINT_MIN(A->c, blen);
 
     for (i = A->r - 1; i >= 0; i--)
-        _fmpz_vec_dot(c + i, A->rows[i], b, len);
+        _fmpz_vec_dot(c + i, fmpz_mat_row(A, i), b, len);
 }
 
 void fmpz_mat_mul_fmpz_vec_ptr(
@@ -36,7 +36,7 @@ void fmpz_mat_mul_fmpz_vec_ptr(
     for (i = A->r - 1; i >= 0; i--)
     {
         fmpz * ci = c[i];
-        const fmpz * Ai = A->rows[i];
+        const fmpz * Ai = fmpz_mat_row(A, i);
 
         fmpz_zero(ci);
         for (j = 0; j < len; j++)
