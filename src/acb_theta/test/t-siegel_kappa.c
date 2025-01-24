@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_siegel_kappa, state)
+TEST_FUNCTION_START(acb_theta_siegel_kappa, state)
 {
     slong iter;
 
