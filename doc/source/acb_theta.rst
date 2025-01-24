@@ -78,8 +78,10 @@ unreasonable computations when `y` is very far from zero.
 
 In any case, the numerical functions in this module always compute certified
 error bounds: for instance, if `\tau` is represented by an :type:`acb_mat_t`
-which is not certainly positive definite at the chosen working precision, the
-output will have an infinite radius.
+whose imaginary part is not certainly positive definite at the chosen working
+precision, then the output will have an infinite radius. NaN outputs will also
+occur if something unexpectedly goes wrong during the computation (for
+instance, an *int*-valued internal function fails), unless otherwise specified.
 
 Behind the scenes, :func:`acb_theta_all` works as follows: it first reduces the
 inputs `(z_j,\tau)` using the action of the Siegel modular group
@@ -90,7 +92,7 @@ finally applies the transformation formula for theta functions under
 uses an advanced algorithm based on duplication formulas that has a uniform,
 quasi-linear complexity in terms of the required precision.
 
-Main user functions
+Other user functions
 -------------------------------------------------------------------------------
 
 In addition to :func:`acb_theta_all`, the following functions are the main
@@ -1385,16 +1387,17 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
 Main functions on reduced input
 -------------------------------------------------------------------------------
 
-This section wraps up the quasi-linear and summation algorithms on inputs that
-are reduced, but not necessarily exact.
+This section wraps up the quasi-linear and summation algorithms on inputs
+`(z,\tau)` that are reduced, but not necessarily exact.
 
 .. function:: void acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 
     Sets *c* and *rho* such that on every ball centered at (a point contained
-    in) *z* of radius *rho*, the functions `|\theta_{a,b}|` for all
+    in) *z* of radius *rho*, the functions `|\theta_{a,b}(\cdot,\tau)|` for all
     characteristics `(a,b)` are uniformly bounded by `c`. The choice of *rho*
     is tuned to get interesting upper bounds on derivatives of `\theta_{a,b}`
-    up to order *ord*.
+    up to order *ord* in the context of finite differences (see
+    :func:`acb_theta_jet_all_notransform` below).
 
     We proceed as follows. First, we compute `c_0`, `c_1`, `c_2` such that for
     any choice of `\rho`, one can take `c = c_0\exp((c_1 + c_2\rho)^2)`
@@ -1420,51 +1423,116 @@ are reduced, but not necessarily exact.
 
 .. function:: void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau, acb_srcptr dth, slong ord, slong prec)
 
-    Assuming that *dth* contains the derivatives of a theta function
-    `\theta_{a,b}` up to total order `\mathit{ord} + 2`, sets *err* to a vector
-    with the following property. Let `(z_0,\tau_0)` be the midpoint of
-    `(z,\tau)`, and let `(z_1,\tau_1)` be any point inside the ball specified
-    by the given *z* and *tau*. Then the vectors of derivatives of
-    `\theta_{a,b}` at `(z_0,\tau_0)` and `(z_1,\tau_1)` up to total order *ord*
-    differ by at most *err* elementwise.
+    Assuming that *dth* contains (approximations of) the derivatives of a theta
+    function `\theta_{a,b}` up to total order `\mathit{ord} + 2` at `(z,\tau)`,
+    sets *err* to a vector with the following property. Let `(z_0,\tau_0)` be
+    the midpoint of `(z,\tau)`, and let `(z_1,\tau_1)` be any point inside the
+    ball specified by the given *z* and *tau*. Then the vectors of derivatives
+    of `\theta_{a,b}` at `(z_0,\tau_0)` and `(z_1,\tau_1)` up to total order
+    *ord* differ by at most *err* elementwise. This uses the heat equation and
+    a Lipschitz-type inequality.
 
 .. function:: void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
     Same as :func:`acb_theta_00`, but does not attempt to reduce the input
-    under the Siegel modular group.
+    under the Siegel modular group, calling :func:`acb_theta_sum_00` directly.
 
 .. function:: void acb_theta_one_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, ulong ab, slong prec);
 
     Same as :func:`acb_theta_00_notransform`, but evalues `\theta_{a,b}` for a
-    fixed characteristic instead of `\theta_{0,0}`.
+    fixed characteristic instead of `\theta_{0,0}`. If `g=1`, we call
+    :func:`acb_modular_theta_sum` directly. Otherwise, we call
+    :func:`acb_theta_00_notransform` at `z + \tau \tfrac{a}{2} + \tfrac{b}{2}`.
 
 .. function:: void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, int sqr, slong prec)
 
     Same as :func:`acb_theta_all`, but does not attempt to reduce the input
     under the Siegel modular group.
 
+    We first call :func:`acb_theta_ql_nb_steps`. The following situations can arise:
+
+    - if *sqr* is false (zero) and the number of duplication steps is zero, we
+      call :func:`acb_theta_sum_all_tilde` directly.
+    - if *sqr* is true (nonzero) and the number of duplication steps is at most
+      1, we call :func:`acb_theta_sum_a0_tilde` at `2\tau` and perform one
+      duplication step, but without computing any distances.
+    - if more duplication steps are needed, we strip `(z,\tau)` of their error
+      bounds and call :func:`acb_theta_ql_exact` (either with *all = 1* at
+      `\tau` if *sqr* is false, or with *all = 0* at `2\tau` if *sqr* is
+      true). We finally call :func:`acb_theta_jet_error` to restore provably
+      correct error bounds on the final result, using
+      :func:`acb_theta_sum_jet_all` at low precision to provide the suitable
+      vector *dth*.
+
 .. function:: void acb_theta_jet_00_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
 
     Same as :func:`acb_theta_jet_00`, but does not attempt to reduce the input
-    under the Siegel modular group.
+    under the Siegel modular group, calling :func:`acb_theta_sum_jet_00`
+    directly.
 
 .. function:: void acb_theta_jet_one_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, ulong ab, slong prec)
 
     Same as :func:`acb_theta_jet_00_notransform`, but evaluates the derivatives
     of `\theta_{a,b}` for a fixed characteristic instead of derivatives of
-    `\theta_{0,0}`.
+    `\theta_{0,0}`. If `g=1`, we call :func:`acb_modular_theta_sum`
+    directly. Otherwise, we call :func:`acb_theta_jet_00_notransform` at `z +
+    \tau \tfrac{a}{2} + \tfrac{b}{2}`.
 
 .. function:: void acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
 
     Same as :func:`acb_theta_jet_all`, but does not attempt to reduce the input
     under the Siegel modular group.
 
+    At low precisions, we call :func:`acb_theta_sum_jet_all` directly. At
+    higher precisions, we rely on finite differences on the output of
+    :func:`acb_theta_all_notransform`, as follows. Consider the Taylor expansion:
+
+        .. math::
+
+            \theta_{a,b}(z + h, \tau)
+            = \sum_{k\in \mathbb{Z}^g,\ k\geq 0} a_k\, h_0^{k_0}\cdots h_{g-1}^{k_{g-1}}.
+
+    If one chooses `h = h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon
+    \zeta^{n_{g-1}})` where `\varepsilon > 0` and `\zeta` is a primitive `m`-th
+    root of unity and lets `n` run through all vectors in `\{0,\ldots, m -
+    1\}^g`, then taking a discrete Fourier transform of the resulting values
+    will compute the individual Taylor coefficient for each derivation tuple
+    that is bounded by `m-1` elementwise. (A constant proportion, for fixed
+    `g`, of this set consists of all tuples of total order at most `m-1`.) More
+    precisely, fix `p\in \mathbb{Z}^g`. Then
+
+        .. math::
+
+            \sum_{n\in \{0,\ldots,m-1\}^g} \zeta^{-p^T n} \theta_{a,b}(z + h_n, \tau)
+            = m^g \sum_{\substack{k\in \mathbb{Z}^g,\ k\geq 0,\\ k = p\ (\text{mod } m)}}
+            a_k\,\varepsilon^{|k|}.
+
+    We obtain an upper bound on the tail of this series from the Cauchy
+    integration formula: if `|\theta_{a,b}(z,\tau)|\leq c` uniformly on a ball
+    of radius `\rho` centered in `z` for `\lVert\cdot\rVert_\infty`, then the
+    sum is `m^g (a_p\,\varepsilon^{|p|} + T)` with
+
+        .. math::
+
+            |T|\leq 2c g\,\frac{\varepsilon^{|p|+m}}{\rho^m}.
+
+    Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error
+    of `2c g \varepsilon^m/\rho^{m+|p|}` to the result of the discrete Fourier
+    transform.
+
+    The algorithm based on finite differences computes `c` and `\rho` using
+    :func:`acb_theta_sum_bound`, chooses a suitable `\varepsilon`, strips
+    `(z,\tau)` of their error bounds, increases the working precision to
+    account for division by `\varepsilon^{\mathit{ord}}\cdot
+    (\mathit{ord}+1)^g`, calls :func:`acb_theta_all_notransform` on all the
+    auxiliary points, performs the relevant discrete Fourier transforms, and
+    finally restores provably correct error bounds on the results using
+    :func:`acb_theta_jet_error` and derivatives to order *ord* + 2 computed at
+    low precision. This algorithm runs in quasi-linear time in
+    `\mathit{prec}\cdot \mathit{ord}^{\,g}` for any fixed `g`.
+
 Reduction and main functions
 -------------------------------------------------------------------------------
-
-The only building blocks we still need to assemble :func:`acb_theta_all`,
-:func:`acb_theta_all`, :func:`acb_theta_jet_00` and :func:`acb_theta_jet_all`
-are the following reduction functions.
 
 .. function:: int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N, acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
@@ -1473,6 +1541,7 @@ are the following reduction functions.
     in *zs* according to the theta transformation formula.
 
     The output is as follows:
+
     - *new_tau* is the reduced matrix,
     - *mat* is the symplectic matrix such that *new_tau* is the result of *mat*
       acting on *tau*,
@@ -1502,62 +1571,22 @@ are the following reduction functions.
 
         .. math::
 
-            \theta_{a,b}(z',\tau) &= e^{- i \pi r^T (z + z')} \theta_{a,b}(z,\tau).
+            \theta_{a,b}(z',\tau) = e^{- i \pi r^T (z + z')} \theta_{a,b}(z,\tau).
 
-    Finally, we store this exponential as the corresponding entry of *cs*.
+    Finally, we store this exponential factor as the corresponding entry of *cs*.
 
     If rounding the imaginary part to integers does not succeed due to extreme
     values, then the return value is 0 and the output vectors are left
     undefined. Otherwise, the return value is 1.
 
-Let us now detail how the algorithm for :func:`acb_theta_jet_all_notransform`
-based on finite differences works. Consider the Taylor expansion:
-
-    .. math::
-
-        \theta_{a,b}(z + h, \tau)
-        = \sum_{k\in \mathbb{Z}^g,\ k\geq 0} a_k\, h_0^{k_0}\cdots h_{g-1}^{k_{g-1}}.
-
-If one chooses `h = h_n = (\varepsilon \zeta^{n_0},\ldots, \varepsilon
-\zeta^{n_{g-1}})` where `\varepsilon > 0` and `\zeta` is a primitive
-`m`-th root of unity and lets `n` run through all vectors in
-`\{0,\ldots, m - 1\}^g`, then taking a discrete Fourier transform of the
-resulting values will compute the individual Taylor coefficient for each
-derivation tuple that is bounded by `m-1` elementwise. (A constant proportion,
-for fixed `g`, of this set consists of all tuples of total order at most
-`m-1`.) More precisely, fix `p\in \mathbb{Z}^g`. Then
-
-    .. math::
-
-        \sum_{n\in \{0,\ldots,m-1\}^g} \zeta^{-p^T n} \theta_{a,b}(z + h_n, \tau)
-        = m^g \sum_{\substack{k\in \mathbb{Z}^g,\ k\geq 0,\\ k = p\ (\text{mod } m)}}
-        a_k\,\varepsilon^{|k|}.
-
-We obtain an upper bound on the tail of this series from the Cauchy integration
-formula: if `|\theta_{a,b}(z,\tau)|\leq c` uniformly on a ball of radius `\rho`
-centered in `z` for `\lVert\cdot\rVert_\infty`, then the sum is `m^g
-(a_p\,\varepsilon^{|p|} + T)` with
-
-    .. math::
-
-        |T|\leq 2c g\,\frac{\varepsilon^{|p|+m}}{\rho^m}.
-
-Since we divide by `\varepsilon^{|p|}` to get `a_p`, we will add an error of
-`2c g \varepsilon^m/\rho^{m+|p|}` to the result of the discrete Fourier
-transform.
-
-The algorithm first decides whether the summation algorithm
-:func:`acb_theta_sum_jet_all` should be used directly. (Right now, we use
-direct summation when less than 3 duplication steps would be used; this could
-be optimized more carefully in the future.) If not, it then computes `c` and
-`\rho` using :func:`acb_theta_sum_bound`, chooses a suitable `\varepsilon`,
-strips `(z,\tau)` of their error bounds, increases the working precision to
-account for division by `\varepsilon^{\mathit{ord}}\cdot (\mathit{ord}+1)^g`,
-calls :func:`acb_theta_all_notransform` on all the auxiliary points, performs
-the discrete Fourier transforms, and finally restores provably correct error
-bounds on the results using :func:`acb_theta_jet_error` and derivatives to
-order *ord* + 2 computed at low precision. This algorithm runs in quasi-linear
-time in `\mathit{prec}\cdot \mathit{ord}^{\,g}` for any fixed `g`.
+The main functions :func:`acb_theta_00`, :func:`acb_theta_all`,
+:func:`acb_theta_jet_00` and :func:`acb_theta_jet_all` are then assembled in a
+straightforward way. An additional feature of :func:`acb_theta_00` and
+:func:`acb_theta_all` is the following: if something went wrong during
+execution (e.g. :func:`acb_theta_reduce_tau`, :func:`acb_theta_ql_setup` or
+:func:`acb_theta_eld_set` failed), then we attempt to catch this error by
+calling :func:`acb_theta_sum_bound`. This allows us to return very rough (but
+hopefully finite) bounds on the result instead of NaNs.
 
 Dimension 2 specifics
 -------------------------------------------------------------------------------
