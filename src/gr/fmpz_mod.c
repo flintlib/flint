@@ -763,6 +763,11 @@ _gr_fmpz_mod_mat_charpoly(fmpz * res, const fmpz_mod_mat_t mat, gr_ctx_t ctx)
     return _gr_mat_charpoly_berkowitz(res, (const gr_mat_struct *) mat, ctx);
 }
 
+int
+_gr_fmpz_mod_mat_reduce_row(slong * column, fmpz_mod_mat_t mat, slong * P, slong * L, slong n, gr_ctx_t ctx)
+{
+    return fmpz_mod_mat_reduce_row(column, mat, P, L, n, FMPZ_MOD_CTX(ctx));
+}
 
 
 int _fmpz_mod_methods_initialized = 0;
@@ -856,6 +861,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_fmpz_mod_mat_lu},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpz_mod_mat_det},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fmpz_mod_mat_charpoly},
+    {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) _gr_fmpz_mod_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };
 

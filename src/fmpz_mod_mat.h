@@ -231,7 +231,7 @@ void fmpz_mod_mat_det(fmpz_t res, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t
 
 slong fmpz_mod_mat_rref(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
 
-slong fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, slong m, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_mat_reduce_row(slong * column, fmpz_mod_mat_t A, slong * P, slong * L, slong m, const fmpz_mod_ctx_t ctx);
 
 slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check, const fmpz_mod_ctx_t ctx);
 
