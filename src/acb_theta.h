@@ -121,6 +121,8 @@ void acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb,
 void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec);
 void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v,
     slong ord, slong prec);
+void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
+    const slong * n, slong prec);
 
 /* Context structures in summation algorithms */
 
@@ -164,9 +166,6 @@ void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong 
     const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
 void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
-
-void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
-    const slong * n, slong prec);
 
 /* AGM steps */
 

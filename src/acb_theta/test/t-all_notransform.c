@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_all_notransform, state)
 {
     slong iter;
 
-    /* Test: coincides with sum_all_tilde */
+    /* Test: agrees with sum_all_tilde */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);

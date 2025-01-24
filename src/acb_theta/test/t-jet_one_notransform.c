@@ -18,6 +18,7 @@ TEST_FUNCTION_START(acb_theta_jet_one_notransform, state)
 {
     slong iter;
 
+    /* Test: agrees with jet_all_notransform */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
