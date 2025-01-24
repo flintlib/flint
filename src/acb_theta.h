@@ -85,6 +85,20 @@ void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
 void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
     int sqr, slong prec);
 
+/* Toolbox for derivatives */
+
+slong acb_theta_jet_nb(slong ord, slong g);
+slong acb_theta_jet_total_order(const slong * tup, slong g);
+void acb_theta_jet_tuples(slong * tups, slong ord, slong g);
+slong acb_theta_jet_index(const slong * tup, slong g);
+
+void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord,
+    slong g, slong prec);
+void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
+    slong ord, slong prec);
+void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec);
+void acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, slong prec);
+
 /* Ellipsoids */
 
 void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
@@ -102,21 +116,13 @@ void acb_theta_eld_print(const acb_theta_eld_t E);
 void acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
 
-/* Toolbox for derivatives */
+/* Error bounds in summation algorithms */
 
-slong acb_theta_jet_nb(slong ord, slong g);
-slong acb_theta_jet_total_order(const slong * tup, slong g);
-void acb_theta_jet_tuples(slong * tups, slong ord, slong g);
-slong acb_theta_jet_index(const slong * tup, slong g);
-
-void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord,
-    slong g, slong prec);
-void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
+void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec);
+void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v,
     slong ord, slong prec);
-void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec);
-void acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, slong prec);
 
-/* Context for tau, z in summation algorithms */
+/* Context structures in summation algorithms */
 
 void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t x, int is_real, slong prec);
 void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr, int is_real, slong prec);
@@ -142,11 +148,6 @@ int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z
 
 /* Summation algorithms */
 
-void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec);
-void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v,
-    slong ord, slong prec);
-void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
-    const slong * n, slong prec);
 void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv,
     slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E,
     slong ord, slong prec, acb_theta_sum_worker_t worker);
@@ -163,6 +164,9 @@ void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong 
     const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
 void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
+
+void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
+    const slong * n, slong prec);
 
 /* AGM steps */
 

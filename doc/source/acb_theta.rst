@@ -478,6 +478,78 @@ Theta characteristics
     *sqr* is nonzero (true), then replaces `\zeta_8` in the formula by `i` to
     mimic the transformation formula on squared theta values.
 
+Toolbox for derivatives
+-------------------------------------------------------------------------------
+
+In this module, we only consider the successive partial derivatives of
+`\theta_{a,b}(z,\tau)` with respect to the `g` coordinates of `z`, because
+derivatives with respect to `\tau` are accounted for by the heat equation
+
+    .. math::
+
+        \frac{\partial\theta_{a,b}}{\partial \tau_{j,k}} = \frac{1}{2\pi i(1 +\delta_{j,k})}
+        \frac{\partial^2\theta_{a,b}}{\partial z_j \partial z_k}.
+
+where `\delta` is the Kronecker symbol. We encode tuples of derivation orders,
+henceforth called "derivation tuples", as vectors of type :type:`slong` and
+length `g`. In agreement with :ref:`acb_modular.h <acb-modular>`, we also
+normalize derivatives in the same way as in the Taylor expansion, so that the
+tuple `(k_0,\ldots,k_{g-1})` corresponds to the differential operator
+
+    .. math::
+
+        \frac{1}{k_0!}\cdots\frac{1}{k_{g-1}!} \cdot \frac{\partial^{|k|}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}}
+
+where `|k|:=\sum k_i`. We always consider all derivation tuples up to a total
+order *ord*, and order them first by their total order, then
+reverse-lexicographically. For example, in the case `g=2`, the sequence of
+orders is `(0,0)`, `(1,0)`, `(0,1)`, `(2,0)`, `(1,1)`, etc.
+
+This sections gathers methods to work with partial derivatives of holomorphic
+functions in general.
+
+.. function:: slong acb_theta_jet_nb(slong ord, slong g)
+
+    Returns the number of derivation tuples with total order at most *ord*. The
+    result will be zero if *ord* is negative.
+
+.. function:: slong acb_theta_jet_total_order(const slong * tup, slong g)
+
+    Returns the total derivation order for the given tuple *tup* of length *g*.
+
+.. function:: void acb_theta_jet_tuples(slong * tups, slong ord, slong g)
+
+    Sets *tups* to the concatenation of all derivation tuples up to total order
+    *ord*.
+
+.. function:: slong acb_theta_jet_index(const slong * tup, slong g)
+
+    Returns *n* such that *tup* is the `n`-th derivation tuple of
+    length *g*.
+
+.. function:: void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord, slong g, slong prec)
+
+    Sets *res* to the vector of derivatives of the product `fg`, assuming that
+    *v1* and *v2* contains the derivatives of `f` and `g` respectively.
+
+.. function:: void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N, slong ord, slong prec)
+
+    Sets *res* to the vector of derivatives of the composition `f(Nz)`,
+    assuming that *v* contains the derivatives of *f* at the point `Nz`. The
+    dimension `g` is obtained as the size of the square matrix `N`.
+
+.. function:: void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec)
+
+    Sets *res* to the vector of derivatives of the function `\exp(\pi i (a_0
+    z_1 + \cdots + a_{g-1} z_{g-1}))` at `z = 0`, where `a_0,\ldots a_{g-1}` are
+    the entries of *a*.
+
+.. function:: void acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, slong prec)
+
+    Sets *res* to the vector of derivatives of the function `\exp(\pi i z^T N
+    z)` at the chosen point `z`. The dimension `g` is obtained as the size of
+    the square matrix `N`.
+
 Ellipsoids
 -------------------------------------------------------------------------------
 
@@ -595,75 +667,83 @@ computed using :func:`acb_theta_eld_init` and :func:`acb_theta_eld_set`.
     then enumerate all the points in the ellipsoid of that radius to find all
     the closer points, if any.
 
-Toolbox for derivatives
+Error bounds in summation algorithms
 -------------------------------------------------------------------------------
 
-In this module, we only consider the successive partial derivatives of
-`\theta_{a,b}(z,\tau)` with respect to the `g` coordinates of `z`, because
-derivatives with respect to `\tau` are accounted for by the heat equation
+To compute the correct ellipsoids in summation algorithms for a target working
+precision, we use the following upper bound on the tail of the series: by
+[EK2025]_, for any `v\in \mathbb{R}^g`, any upper-triangular Cholesky matrix
+`C`, any `\mathit{ord}\geq 0`, and any `R` such that `R^2
+\geq\max(4,\mathit{ord})`, we have
 
     .. math::
 
-        \frac{\partial\theta_{a,b}}{\partial \tau_{j,k}} = \frac{1}{2\pi i(1 +\delta_{j,k})}
-        \frac{\partial^2\theta_{a,b}}{\partial z_j \partial z_k}.
+        \sum_{n\in C\mathbb{Z}^g + Cv,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
+        \leq 2^{2g+2} R^{g-1+p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})
 
-We encode tuples of derivation orders, henceforth called "derivation tuples",
-as vectors of type :type:`slong` and length `g`. In agreement with
-:ref:`acb_modular.h <acb-modular>`, we also normalize derivatives in the same way
-as in the Taylor expansion, so that the tuple `(k_0,\ldots,k_{g-1})`
-corresponds to the differential operator
+where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of
+`C`.
 
-    .. math::
+.. function:: void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec)
 
-        \frac{1}{k_0!}\cdots\frac{1}{k_{g-1}!} \cdot \frac{\partial^{|k|}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}},
+    Sets *R2* and *eps* such that the above upper bound for *R2* and the given
+    *ord* is at most *eps*, where `C` is *cho*. When *ord = 0*, the square root
+    of *R2* is a suitable ellipsoid radius for a partial sum of the theta
+    series, and *eps* is an upper bound on the absolute value of the tail of
+    the series defining `\widetilde{\theta}_{a,b}`.
 
-where `|k|:=\sum k_i`. We always consider all derivation tuples up to a total
-order *ord*, and order them first by their total order, then
-reverse-lexicographically. For example, in the case `g=2`, the sequence of
-orders is `(0,0)`, `(1,0)`, `(0,1)`, `(2,0)`, `(1,1)`, etc.
+    We choose *eps* so that the relative error on the output of the summation
+    algorithm should be roughly `2^{-\mathit{prec}}` if no unexpected
+    cancellations occur in the sum, i.e.  `\mathit{eps} \simeq
+    2^{-\mathit{prec}} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})`.
 
-This sections gathers methods to work with vectors of partial derivatives of
-holomorphic functions in general.
+.. function:: void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v, slong ord, slong prec)
 
-.. function:: slong acb_theta_jet_nb(slong ord, slong g)
+    Computes a suitable squared radius *R2* and error bound *eps* on the tail
+    of the theta series as in :func:`acb_theta_sum_radius`, but in the context
+    of evaluating partial derivatives of theta functions up to order *ord*. The
+    input vector *v* should be `-C Y^{-1}y`, where `C` is the Cholesky matrix
+    for `\pi Y`.
 
-    Returns the number of derivation tuples with total order at most *ord*. The
-    result will be zero if *ord* is negative.
+    We can rewrite the the differentiated series as
 
-.. function:: slong acb_theta_jet_total_order(const slong * tup, slong g)
+        .. math::
 
-    Returns the total derivation order for the given tuple *tup* of length *g*.
+           \begin{aligned}
+            \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}}(z,\tau)
+            & = (2\pi i)^{|k|} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}
+            e^{\pi i n^T \tau n + 2\pi i n^T (z + \tfrac b2)}\\
+            &= (2\pi i)^{|k|} e^{\pi y^T Y^{-1} y} \sum_{n\in \mathbb{Z}^g + \tfrac a2}
+            n_0^{k_0} \cdots n_{g-1}^{k_{g-1}} \xi_n e^{-\pi (n + Y^{-1}y)^T Y (n + Y^{-1}y)}.
+            \end{aligned}
 
-.. function:: void acb_theta_jet_tuples(slong * tups, slong ord, slong g)
+    where `|\xi_n| = 1`. We ignore the leading multiplicative factor. Writing `m = C n + v`, we have
 
-    Sets *tups* to the concatenation of all derivation tuples up to total order
-    *ord*.
+        .. math::
 
-.. function:: slong acb_theta_jet_index(const slong * tup, slong g)
+            n_0^{k_0}\cdots n_{g-1}^{k_{g-1}}\leq
+            (\lVert C^{-1}\rVert_\infty \lVert n\rVert_2 + \lVert Y^{-1}y\rVert_\infty)^{|k|}.
 
-    Returns *n* such that *tup* is the `n`-th derivation tuple of
-    length *g*.
+    Using the upper bound from :func:`acb_theta_sum_radius`, we see that the
+    absolute value of the tail of the series, when summing outside the
+    ellipsoid centered in `v` of radius `R`, is bounded above by
 
-.. function:: void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord, slong g, slong prec)
+        .. math::
 
-    Sets *res* to the vector of derivatives of the product `fg`, assuming that
-    *v1* and *v2* contains the derivatives of `f` and `g` respectively.
+            (\lVert C^{-1} \rVert_\infty R + \lVert Y^{-1}y \rVert_\infty)^{|k|}
+             2^{2g+2} R^{g-1} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1}).
 
-.. function:: void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N, slong ord, slong prec)
+    The output values *R2* and *eps* are such that this upper bound is at most
+    *eps* when `R` is the square root of *R2*.
 
-    Sets *res* to the vector of derivatives of the composition `f(Nz)`,
-    assuming that *v* contains the derivatives of *f* at the point `Nz`.
-
-.. function:: void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec)
-
-    Sets *res* to the vector of derivatives of the function `\exp(\pi i (a_0
-    z_1 + \cdots + a_{g-1} z_{g-1}))` at `z = 0`, where `a_0,\ldots a_{g-1}` are
-    the entries of *a*.
-
-.. function:: void acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, slong prec)
-
-    Sets *res* to the vector of derivatives of the function `\exp(\pi i z^T N
-    z)` at the chosen point `z`.
+    To obtain them, we first compute *R2* and *eps* using
+    :func:`acb_theta_sum_radius` with *ord* = 0. If `R\leq \lVert
+    Y^{-1}y\rVert_\infty/\lVert C^{-1}\rVert_\infty`, we simply multiply *eps*
+    by `\max\{1, 2 \lVert Y^{-1}y \rVert_\infty\}^{\mathit{ord}}`. Otherwise,
+    we compute *R2* and *eps* using :func:`acb_theta_sum_radius` with the given
+    value of *ord*. We can then set *R2* to the maximum of *R2* and `\lVert
+    Y^{-1}y \rVert_\infty /\lVert C^{-1} \rVert_\infty`, and multiply *eps* by
+    `\max\{1, 2\lVert C^{-1}\rVert_\infty\}^{\mathit{ord}}`.
 
 Context structures in summation algorithms
 -------------------------------------------------------------------------------
@@ -671,7 +751,7 @@ Context structures in summation algorithms
 After the relevant ellipsoid has been computed, summation algorithms only
 involve exponential terms in `\tau` and `z`. Sometimes, especially in the
 setting of the quasi-linear algorithms below, these exponentials can be
-computed once and for all at high precision, then used for several calls to the
+computed once and for all at high precision, then used for several calls to
 summation functions. This section introduces context structures to make these
 manipulations easier.
 
@@ -682,20 +762,21 @@ manipulations easier.
     An :type:`acb_theta_ctx_tau_t` is an array of length one of type
     :type:`acb_theta_ctx_tau_struct` containing all the necessary data to run
     the summation algorithm on a given matrix `\tau\in\mathcal{H}_g`. In
-    particular, it contains a matrix `exp_tau_div_4` whose `(j,k)` entry (when
+    particular, it contains a matrix *exp_tau_div_4* whose `(j,k)` entry (when
     `j\leq k`) is `\exp(\pi i (2 - \delta_{j,k}) \tau_{j,k}/4)`, where `\delta`
-    denotes the Kronecker symbol, as well as a Cholesky matrix for `\pi Y` if
-    `g>1`.
+    denotes the Kronecker symbol. It also contains the Cholesky matrix for `\pi
+    Y` if `g>1`.
 
 .. type:: acb_theta_ctx_z_struct
 
 .. type:: acb_theta_ctx_z_t
 
     An :type:`acb_theta_ctx_z_t` is an array of length one of type
-    :type:`acb_theta_ctx_tau_struct` containing all the necessary data to run
-    the summation algorithm on a given vector `z` (provided that an element of
-    type :type:`acb_theta_ctx_tau_t` is also given.) In particular, it contains
-    the values `\exp(2\pi i z_j)` for all `1\leq j\leq g`.
+    :type:`acb_theta_ctx_z_struct` containing all the necessary data to run the
+    summation algorithm on a given vector `z` (provided that an element of type
+    :type:`acb_theta_ctx_tau_t` is also given.) In particular, it contains the
+    values `\exp(2\pi i z_j)` for all `1\leq j\leq g`. If `g>1`, it also
+    contains the center of the ellipsoids used in summation algorithms at `z`.
 
 .. function:: void acb_theta_ctx_tau_init(acb_theta_ctx_tau_t ctx, int allow_shift, slong g)
 
@@ -718,7 +799,7 @@ manipulations easier.
 .. function:: acb_theta_ctx_z_struct * acb_theta_ctx_z_vec_init(slong nb, slong g)
 
     Returns a pointer to a vector of *nb* initialized elements of type
-    :type:`acb_theta_ctx_z_struct`.
+    :type:`acb_theta_ctx_z_struct` in dimension `g`.
 
 .. function:: void acb_theta_ctx_z_vec_clear(acb_theta_ctx_z_struct * vec, slong nb)
 
@@ -728,17 +809,19 @@ manipulations easier.
 .. function:: void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t x, int is_real, slong prec)
 
     Given a complex value *x* and given *exp* containing `\exp(\pi i x)`, sets
-    *exp_inv* to `\exp(-\pi i x)`. This is computed by complex conjugation from
-    *exp* if *is_real* is nonzero (true). Otherwise, it is computed by
-    inverting *exp*, except if the result is indeterminate, in which case we
-    recompute *exp_inv* from *x* directly.
+    *exp_inv* to `\exp(-\pi i x)`.
+
+    This is computed by complex conjugation from *exp* if *is_real* is nonzero
+    (true). Otherwise, it is computed by inverting *exp*, except if the result
+    is indeterminate, in which case we recompute *exp_inv* from *x* directly.
 
 .. function:: void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr, int is_real, slong prec)
 
     Given *inv* and *sqr* containing complex values `\exp(-\pi i x)` and
-    `\exp(2\pi i x)` respectively, sets *sqr_inv* to `\exp(-2\pi i x)`. This
-    uses complex conjugation from *sqr* if *is_real* is nonzero (true), and
-    otherwise a complex squaring from *inv*.
+    `\exp(2\pi i x)` respectively, sets *sqr_inv* to `\exp(-2\pi i x)`.
+
+    This uses complex conjugation from *sqr* if *is_real* is nonzero (true),
+    and otherwise a complex squaring from *inv*.
 
 .. function:: void acb_theta_ctx_tau_set(acb_theta_ctx_tau_t ctx, const acb_mat_t tau, slong prec)
 
@@ -772,9 +855,9 @@ manipulations easier.
 .. function:: void acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t ctx, const acb_theta_ctx_tau_t ctx_tau, ulong a, slong prec)
 
     Assuming that *ctx* and *ctx_tau* correspond to a pair `(z,\tau)`, and that
-    *allow_shift* was set to true when computing *ctx_tau*, sets *res* to a
-    valid context for the pair `(z + \tau \tfrac{a}{2},\tau)` and sets `c` to
-    the complex value such that for all `0\leq b\leq 2^g-1`,
+    *ctx_tau* was set with true *allow_shift*, sets *res* to a valid context
+    for the pair `(z + \tau \tfrac{a}{2},\tau)` and sets `c` to the complex
+    value such that for all `0\leq b\leq 2^g-1`,
 
     .. math::
 
@@ -799,27 +882,14 @@ Summation algorithms
 
 In this module, summation algorithms are mainly used for low to moderate
 precisions due to their higher complexity (except in special cases such as
-:func:`acb_theta_00`). Nevertheless, running summation algorithms at low
-precisions is a key step in the quasi-linear algorithms. They have been
-optimized in many ways and should already compare very favorably to other
-software packages that evaluate theta functions.
+:func:`acb_theta_00`). Since summations at low precisions are a key step in the
+quasi-linear algorithms, they have been optimized in many ways and should
+already compare favorably to other software packages that evaluate theta
+functions.
 
-We always assume in this section that the vectors `z` have been reduced. This
-allows us to use only one ellipsoid when several vectors `z` are given.
-
-In order to compute the correct ellipsoids for a target working precision, we
-use the following upper bound on the tail of the series: by [EK2025]_, for any
-`v\in \mathbb{R}^g` and any upper-triangular Cholesky matrix `C`, any
-`\mathit{ord}\geq 0`, and any `R` such that `R^2 \geq\max(4,\mathit{ord})`, we
-have
-
-    .. math::
-
-        \sum_{n\in C\mathbb{Z}^g + Cv,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
-        \leq 2^{2g+2} R^{g-1+p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})
-
-where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of
-`C`.
+We always assume in this section that the inpits `(z,\tau)` have been
+reduced. In particular, this allows us to use only one ellipsoid when several
+vectors `z` are given.
 
 After the relevant ellipsoid *E* has been computed, the main worker inside each
 version of the summation algorithm will process one line (i.e. 1-dimensional
@@ -852,8 +922,9 @@ lattice points far from the ellipsoid center. Different versions of the
 summation algorithm will rely on slightly different workers, so introducing a
 function pointer type is helpful to avoid code duplication.
 
-When `g=1`, the code does not rely on these worker functions, and calls
-:func:`acb_modular_theta_sum` from :ref:`acb_modular.h <acb-modular>` instead.
+When `g=1`, the code does not rely on ellipsoids and worker functions, and
+calls :func:`acb_modular_theta_sum` from :ref:`acb_modular.h <acb-modular>`
+instead.
 
 .. type:: acb_theta_sum_worker_t
 
@@ -876,108 +947,54 @@ When `g=1`, the code does not rely on these worker functions, and calls
       finally
     - *fullprec* is the working precision for summing into *th*.
 
-.. function:: void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec)
-
-    Sets *R2* and *eps* such that the above upper bound for *R2* and the given
-    *ord* is at most *eps*, where `C` is *cho*. We choose *eps* so that the
-    relative error on the output of the summation algorithm should be roughly
-    `2^{-\mathit{prec}}` if no cancellations occur in the sum, i.e.
-    `\mathit{eps} \simeq 2^{-\mathit{prec}} \prod_{j=0}^{g-1} (1 +
-    \gamma_j^{-1})`.
-
-.. function:: void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v, slong ord, slong prec)
-
-    Assuming that `C = \mathit{cho}` is the upper-triangular Cholesky matrix
-    for `\pi Y` and `v = C Y^{-1} y`, returns *R2* and *eps* so that, when
-    summing the above series on terms `n\in \mathbb{Z}^g` such that `(v + C
-    n)^T(v + C n)\leq R^2`, the absolute value of the tail of the series
-    (before multiplying by the leading factor `(2\pi i)^{|k|} e^{\pi y^T Y^{-1}
-    y}`, see below) will be bounded above by *eps*, for any derivation tuple
-    `k` with `|k|\leq \mathit{ord}`.
-
-    We can rewrite the the differentiated series
-
-        .. math::
-
-            \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}}(z,\tau) = (2\pi i)^{|k|} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}
-            e^{\pi i n^T \tau n + 2\pi i n^T (z + \tfrac b2)}.
-
-    as
-
-        .. math::
-
-            (2\pi i)^{|k|} e^{\pi y^T Y^{-1} y} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}} e^{\pi i(\cdots)} e^{-\pi (n + Y^{-1}y)^T Y (n + Y^{-1}y)}.
-
-    We ignore the leading multiplicative factor. Writing `m = C n + v`, we have
-
-        .. math::
-
-            n_0^{k_0}\cdots n_{g-1}^{k_{g-1}}\leq
-            (\lVert C^{-1}\rVert_\infty \lVert n\rVert_2 + \lVert Y^{-1}y\rVert_\infty)^{|k|}.
-
-    Using the upper bound from :func:`acb_theta_sum_radius`, we see that the
-    absolute value of the tail of the series is bounded above by
-
-        .. math::
-
-            (\lVert C^{-1} \rVert_\infty R + \lVert Y^{-1}y \rVert_\infty)^{|k|}
-             2^{2g+2} R^{g-1} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1}).
-
-    Thus, we proceed as follows. We first compute *R2* and *eps* using
-    :func:`acb_theta_sum_radius` with *ord* = 0. If `R\leq \lVert
-    Y^{-1}y\rVert_\infty/\lVert C^{-1}\rVert_\infty`, we simply multiply *eps*
-    by `\max\{1, 2 \lVert Y^{-1}y \rVert\}^{\mathit{ord}}`. Otherwise, we
-    compute *R2* and *eps* using :func:`acb_theta_sum_radius` with the given
-    value of *ord*. We can then set *R2* to the maximum of *R2* and `\lVert
-    Y^{-1}y \rVert_\infty /\lVert C^{-1} \rVert_\infty`, and multiply *eps* by
-    `\max\{1, 2\lVert C^{-1}\rVert\}^{\mathit{ord}}`.
-
-.. function:: void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong * tup, slong * n, slong prec)
-
-    Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(\pi i(n^T\tau n + 2
-    n^Tz))`, where the `k_j` and `n_j` denotes the `j`-th entry in
-    *tup* and *n* respectively. The vector *tup* may be *NULL*, which is
-    understood to mean the zero tuple. This is only used for testing.
-
 .. function:: void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv, slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E, slong ord, slong prec, acb_theta_sum_worker_t worker)
 
-    Runs the summation algorithm on the ellipsoid *E*, assuming `g\geq 2`. The
-    input related to `\tau` is the matrices *exp_tau* and *exp_tau_inv* whose
-    `(j,k)` entries for each `1\leq j\leq k\leq g` should contain `\exp(\pi i
-    (2 - \delta_{j,k}) \tau_{j,k})` and its inverse, respectively. The input
-    related to the *nb* vectors `z` is the vectors `exp_zs` and `exp_zs_inv`
-    which should contain the values `\exp(\pi i z_j)` (for each `z` and each
-    `1\leq j\leq g`) and their inverses, respectively. The parameters *len*,
-    *ord* and the output vector *th* are passed to *worker* when processing
-    each individual line in *E*. The data associated with *zs* and `\tau` is
-    typically stored in contexts of type :type:`acb_theta_ctx_tau_t` and
-    :type:`acb_theta_ctx_z_t` respectively. No error bound coming from the tail
-    of the theta series is added.
+    Runs the summation algorithm on the ellipsoid *E*, assuming `g\geq 2`. The input is as follows:
+
+    - for each `1\leq j\leq k\leq g`, the `(j,k)` entries of the matrices *exp_tau*
+      and *exp_tau_inv* whose should contain `\exp(\pi i (2 -
+      \delta_{j,k}) \tau_{j,k})` and its inverse, respectively.
+    - the vectors *exp_zs* and *exp_zs_inv* should have length *nb* times
+      *g*. For each `z` stored in *zs*, the corresponding pieces of *exp_zs*
+      and *exp_zs_inv* should contain `\exp(\pi i z_j)` for `1\leq j\leq g` and
+      their inverses, respectively.
+    - the parameters *len*, *ord* and the output vector *th* are passed to
+      *worker* when processing each individual line in *E*.
+
+    The data associated with *zs* and `\tau` is typically stored in contexts of
+    type :type:`acb_theta_ctx_tau_t` and :type:`acb_theta_ctx_z_t`
+    respectively. No error bound coming from the tail of the theta series is
+    added.
 
 .. function:: void acb_theta_sum_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong prec)
 
+    Evaluates `\theta_{0,0}` at each of the *nb* pairs `(z,\tau)` corresponding
+    to a context stored in *vec* together with *ctx_tau*. The result *th* is a
+    vector of length *nb*. The associated worker performs one :func:`acb_dot`
+    operation.
+
 .. function:: void acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong prec)
 
-    Evaluates either `\theta_{0,0}(z, \tau)`, or alternatively `\theta_{0,b}(z,
-    \tau)` for each `b\in \{0,1\}^g`, for each pair `(z,\tau)` corresponding to
-    a context stored in *vec* together with *ctx_tau*. The result *th* will be
-    a concatenation of *nb* vectors of length `1` or `2^g` respectively. The
-    associated worker performs one :func:`acb_dot` operation.
+    Evaluates either `\theta_{0,b}`, for all `b\in \{0,1\}^g`, at each of the
+    *nb* pairs `(z,\tau)` corresponding to a context stored in *vec* together
+    with *ctx_tau*. The result *th* will be a concatenation of *nb* vectors of
+    length `2^g` respectively. This function should only be marginally more
+    expensive than :func:`acb_theta_sum_00`.
 
 .. function:: void acb_theta_sum_a0_tilde(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, slong prec)
 
-    Evaluates `\widetilde{\theta_{a,0}}(z,\tau)` for each `a\in \{0,1\]^g` at
+    Evaluates `\widetilde{\theta}_{a,0}(z,\tau)` for each `a\in \{0,1\}^g` at
     each of the *nb* pairs `(z,\tau)` corresponding to a context stored in
     *vec* together with *ctx_tau*. The result *th* will be a concatenation of
     *nb* vectors of length `2^g`.
 
     In this function, the absolute error radius we add on
-    `\widetilde{\theta_{a,0}}(z,\tau)` from the tail of the exponential series
+    `\widetilde{\theta}_{a,0}(z,\tau)` from the tail of the exponential series
     depend on `a`. The amount of precision added is controlled by *distances*,
     which could be computed as in :func:`acb_theta_agm_distances` (although
     other values sometimes make sense, such as 0.) Since this vector is the
-    same for all vectors *z*, this function makes the most sense when the
-    different values of *z* differ by real vectors.
+    same for all vectors *z*, this internal function makes the most sense when
+    the different values of *z* differ by real vectors.
 
 .. function:: void acb_theta_sum_all_tilde(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, slong prec)
 
@@ -988,16 +1005,23 @@ When `g=1`, the code does not rely on these worker functions, and calls
 
 .. function:: void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec)
 
-    Sets *th* to the vector of derivatives of `\theta_{0,0}` at the given *nb*
-    points `(z,\tau)` up to total order *ord*.
+    Sets *th* to the vector of derivatives of `\theta_{0,0}` up to total order
+    *ord*, at each of the *nb* pairs `(z,\tau)` specified by the contexts.
 
 .. function:: void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec)
 
-    Sets *th* to the vector of derivatives of `\theta_{a,b}` for all
-    characteristics `a,b`, at all the given *nb* points `(z,\tau)`, up to total
-    order *ord*. The result will be a concatenation of *nb* vectors (one for
-    each *z*), each piece being the concatenation of `2^{2g}` vectors of
-    derivatives.
+    Sets *th* to the vector of derivatives of `\theta_{a,b}` up to total order
+    *ord*, for all characteristics `a,b`, at all the *nb* pairs `(z,\tau)`
+    specified by the contexts. The result will be a concatenation of *nb*
+    vectors (one for each *z*), each piece being the concatenation of `2^{2g}`
+    vectors of derivatives.
+
+.. function:: void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong * tup, slong * n, slong prec)
+
+    Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(\pi i(n^T\tau n + 2
+    n^Tz))`, where the `k_j` and `n_j` denotes the `j`-th entry in
+    *tup* and *n* respectively. The vector *tup* may be *NULL*, which is
+    understood to mean the zero tuple. This is only used for testing.
 
 AGM steps
 -------------------------------------------------------------------------------
