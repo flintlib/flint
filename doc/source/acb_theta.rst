@@ -4,16 +4,18 @@
 ===============================================================================
 
 This module provides methods for the numerical evaluation of theta functions in
-any dimension `g\geq 1`. The algorithms will be detailed in the forthcoming paper
-[EK2025]_. In the case `g=1`, we rely on, but also improve on functionality
-from :ref:`acb_modular.h <acb-modular>`.
+any dimension `g\geq 1`. The algorithms will be detailed in the forthcoming
+paper [EK2025]_. In the case `g=1`, we rely on, but also improve on
+functionality from :ref:`acb_modular.h <acb-modular>`. We also provide
+functionality to evaluate derivatives of theta functions, and to evaluate
+Siegel modular forms in terms of theta functions when `g=2`.
 
 In the context of this module, *tau* or `\tau` always denotes an element of the
-Siegel upper half-space `\mathbb{H}_g`, which consists of all symmetric
-`g\times g` complex matrices with positive definite imaginary part. The letter
-`z` denotes an element of `\mathbb{C}^g`. For each `a,b\in \{0,1\}^g`, the
-Riemann theta function (of level 2) of characteristic `(a,b)` is the following
-analytic function in `\tau\in \mathbb{H}_g` and `z\in \mathbb{C}^g`:
+Siegel upper half-space `\mathcal{H}_g`, i.e. `\tau` is a symmetric `g\times g`
+complex matrix with positive definite imaginary part. The letter `z` denotes an
+element of `\mathbb{C}^g`. For each `a,b\in \{0,1\}^g`, the Riemann theta
+function (of level 2) of characteristic `(a,b)` is the following analytic
+function in `\tau\in \mathcal{H}_g` and `z\in \mathbb{C}^g`:
 
     .. math::
 
@@ -21,43 +23,28 @@ analytic function in `\tau\in \mathbb{H}_g` and `z\in \mathbb{C}^g`:
 
 considering `a`, `b` and `z` as column vectors.
 
-We encode a theta characteristic `a\in \{0,1\}^g` as the :type:`ulong` between
-`0` and `2^g-1` that has the corresponding expansion in base 2: thus `a =
-(1,0,0)` for `g = 3` will be numbered `4`. We also use this encoding to order
-vectors of theta values throughout. Similarly, a pair of characteristics
-`(a,b)` is encoded as an :type:`ulong` between `0` and `2^{2g}-1`, where `a`
-corresponds to the `g` more significant bits. With these conventions, the
-output of :func:`acb_modular_theta` is
-`(-\theta_3,\theta_2,\theta_0,\theta_1)` in dimension 1.
-
 The main method to evaluate theta functions is
 
 .. function:: void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, int sqr, slong prec)
 
-Here *zs* should be a vector of length *nb* `\times g`, and encodes a tuple of
-*nb* elements `z_1,\ldots,z_n\in \mathbb{C}^g`. The output, placed in *th*, is
-the concatenation of the vector containing `\theta_{a,b}(z_1,\tau)` or
-`\theta_{a,b}(z_1,\tau)^2` for all `a,b\in \{0,1\}^g`, depending on whether
-*sqr* is 0 (false) or nonzero (true), followed by the same for `z_2`, etc., up
-to `z_n`. (This function is faster when *sqr* is nonzero.) These intput/output
-conventions hold for several methods in this module, even if we don't restate
-them explicitly.
+Here *zs* should be a vector of length `\mathit{nb}\times g`, and encodes a
+tuple of *nb* elements `z_1,\ldots,z_{\mathit{nb}}\in \mathbb{C}^g`. The
+output, stored in *th*, is the concatenation of *nb* vectors of length
+`2^{2g}`: for each `1\leq j\leq \mathit{nb}`, :func:`acb_theta_all` with *sqr*
+= 0 (false) computes `\theta_{a,b}(z_j,\tau)` for all `a,b\in \{0,1\}^g`. If
+*sqr* is nonzero (true), it computes `\theta_{a,b}(z_j,\tau)^2` instead using a
+faster algorithm.
 
-:func:`acb_theta_all` first reduces the input using the action of the Siegel
-modular group `\mathrm{Sp}_{2g}(\mathbb{Z})` (the symplectic group) on
-`\mathbb{C}^g\times \mathbb{H}_g`, evaluates theta functions on the reduced
-arguments, and finally applies the transformation formula for theta functions
-under `\mathrm{Sp}_{2g}(\mathbb{Z})`. The second step (evaluating theta
-functions) uses an advanced algorithm based on duplication forumas that has a
-uniform, quasi-linear complexity in terms of the required precision.
+Throughout, we order vectors of theta values by associating to each
+characteristic `(a,b)` the :type:`ulong` between 0 and `2^{2g}-1` whose `g`
+most (resp. least) significant bits are given by `a` (resp. `b`): thus `(a,b)`
+where `a = (0,1)` and `b = (1,0)` in dimension `2` will be numbered `6`. With
+these conventions, the output of :func:`acb_modular_theta` in dimension 1 is
+`(-\theta_3,\theta_2,\theta_0,\theta_1)`. When manipulating `a` or `b`
+individually, we map them to integers between 0 and `2^g-1`.
 
-This module also provides functionality to evaluate derivatives of theta
-functions, and to evaluate Siegel modular forms in terms of theta functions
-when `g=2`.
-
-We conclude this presentation with a word on error bounds and on the argument
-*prec*. Barring unexpected cancellations, the "expected" absolute value of
-`\theta_{a,b}(z,\tau)` is
+We handle the final argument *prec* as follows. Barring unexpected
+cancellations, the "expected" absolute value of `\theta_{a,b}(z,\tau)` is
 
     .. math::
 
@@ -67,8 +54,8 @@ where
 
 - `Y` and `y` denote the imaginary parts of `\tau` and `z` respectively (we
   keep this notation throughout);
-- `d` denotes the distance between the point `v = -Y^{-1}y \in \R^g` and the
-  shifted lattice `\Z^g + \tfrac{a}{2} \subset \R^g` for the Euclidean norm
+- `d` denotes the distance between the point `v = -Y^{-1}y \in \mathbb{R}^g` and the
+  shifted lattice `\mathbb{Z}^g + \tfrac{a}{2} \subset \mathbb{R}^g` for the Euclidean norm
   given by the Gram matrix `\pi Y`.
 
 This leads us to define the normalized functions
@@ -78,20 +65,30 @@ This leads us to define the normalized functions
         \widetilde{\theta}_{a,b}(z,\tau) = \exp(-\pi y^T Y^{-1} y) \theta_{a,b}(z,\tau)
 
 which are no longer holomorphic, but are uniformly bounded on `\mathbb{C}^g`
-for a fixed `\tau`. (Adding an element of `\mathbb{Z}^g + \tau\mathbb{Z}^g` to
-`z` multiplies the value by a complex number of absolute value one.)
-
-In most cases, when evaluating theta functions `\theta_{a,b}`
-(resp. `\widetilde{\theta}_{a,b}`) to precision *prec*, the expected error
-bound on the output should be of the order of `\exp(\pi y^Y Y^{-1} y) \cdot
-2^{-\mathit{prec}}` (resp. `2^{-\mathit{prec}}`) to prevent unreasonable
-computations when `y` is very far from zero. Some internal functions also take
-the factor `\exp(-d^2)` into account, and are documented as such.
+for a fixed `\tau`: in fact, adding an element of `\mathbb{Z}^g +
+\tau\mathbb{Z}^g` to `z` multiplies `\widetilde{\theta}_{a,b}(z,\tau)` a
+complex number of absolute value one. We use those internally for easier
+precision management: an argument *prec* means that
+`\widetilde{\theta}_{a,b}(z,\tau)` is computed with an absolute error bound of
+roughly `2^{-\mathit{prec}}`. (Some internal functions also take the factor
+`\exp(-d^2)` into account, and are documented as such.) The expected error
+bound on the output of :func:`acb_theta_all` and similar functions will be of
+the order of `\exp(\pi y^Y Y^{-1} y) \cdot 2^{-\mathit{prec}}` to avoid
+unreasonable computations when `y` is very far from zero.
 
 In any case, the numerical functions in this module always compute certified
 error bounds: for instance, if `\tau` is represented by an :type:`acb_mat_t`
 which is not certainly positive definite at the chosen working precision, the
 output will have an infinite radius.
+
+Behind the scenes, :func:`acb_theta_all` works as follows: it first reduces the
+inputs `(z_j,\tau)` using the action of the Siegel modular group
+`\mathrm{Sp}_{2g}(\mathbb{Z})` (the symplectic group) on `\mathbb{C}^g\times
+\mathcal{H}_g`, then evaluates theta functions on the reduced arguments, and
+finally applies the transformation formula for theta functions under
+`\mathrm{Sp}_{2g}(\mathbb{Z})`. The second step (evaluating theta functions)
+uses an advanced algorithm based on duplication formulas that has a uniform,
+quasi-linear complexity in terms of the required precision.
 
 Main user functions
 -------------------------------------------------------------------------------
@@ -233,7 +230,7 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
 .. function:: slong sp2gz_nb_fundamental(slong g)
 
     Returns the number of fundamental symplectic matrices used in the reduction
-    algorithm on `\mathbb{H}_g`. This number is 1 when `g=1` (the `J` matrix)
+    algorithm on `\mathcal{H}_g`. This number is 1 when `g=1` (the `J` matrix)
     and 19 when `g=2` [Got1959]_. When `g>2`, a complete set of matrices
     defining the boundary of a fundamental domain for the action of
     `\mathrm{Sp}_{2g}(\mathbb{Z})` is not currently known. As a substitute, we
@@ -356,7 +353,7 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     *sqrtdet* to the corresponding square root of `\det(\gamma\tau + \delta)`
     in the theta transformation formula of [Igu1972]_, p. 176 and
     [Mum1983]_, p. 189: for any symplectic matrix `m`, any `(z,\tau)\in
-    \mathbb{C}^g\times \mathbb{H}_g`, and any characteristic `(a,b)`, we have
+    \mathbb{C}^g\times \mathcal{H}_g`, and any characteristic `(a,b)`, we have
 
         .. math::
 
@@ -371,7 +368,7 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
       (this is `\phi_m` in Igusa's notation), and
     - `\kappa(m)` is an `8^{\mathrm{th}}` root of unity, only well-defined up
       to sign unless we choose a particular branch of `\det(\gamma\tau +
-      \delta)^{1/2}` on `\mathbb{H}_g`.
+      \delta)^{1/2}` on `\mathcal{H}_g`.
 
     We proceed as follows. After applying :func:`sp2gz_decompose`, we only have
     to consider four special cases for *mat*. If *mat* is trigonal or
@@ -399,17 +396,17 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 
 .. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
-    Sets *tau* to a random matrix in `\mathbb{H}_g`, possibly far from being
+    Sets *tau* to a random matrix in `\mathcal{H}_g`, possibly far from being
     reduced.
 
 .. function:: void acb_siegel_randtest_reduced(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
-    Sets *tau* to a random reduced matrix in `\mathbb{H}_g` whose imaginary
+    Sets *tau* to a random reduced matrix in `\mathcal{H}_g` whose imaginary
     part possibly has large entries.
 
 .. function:: void acb_siegel_randtest_compact(acb_mat_t tau, flint_rand_t state, int exact, slong prec)
 
-    Sets *tau* to a random reduced matrix in `\mathbb{H}_g` whose imaginary
+    Sets *tau* to a random reduced matrix in `\mathcal{H}_g` whose imaginary
     part has bounded entries. If *exact* is nonzero (true), then the entries of
     *tau* are set to exact (dyadic) complex numbers.
 
@@ -1004,7 +1001,7 @@ AGM steps
 
 The quasi-linear algorithm to evaluate theta functions uses the following
 *duplication formula*: for all `z,z'\in \mathbb{C}^g` and `\tau\in
-\mathbb{H}_g`,
+\mathcal{H}_g`,
 
     .. math::
 
@@ -1097,7 +1094,7 @@ Quasilinear algorithms on exact, reduced input
 -------------------------------------------------------------------------------
 
 Suppose that we wish to compute `\theta_{a,0}(0,\tau)` for all `a\in \{0,1\}^g`
-and a reduced matrix `\tau\in \mathbb{H}_g`. Applying the last of the above
+and a reduced matrix `\tau\in \mathcal{H}_g`. Applying the last of the above
 duplication formulas `n` times, we reduce to evaluating
 `\theta_{a,0}(0,2^n\tau)`. We expect that the absolute value of this complex
 number is roughly `\exp(-d^2)` for `d = 2^n\mathrm{Dist}_\tau(0, \mathbb{Z}^g +
@@ -1550,8 +1547,8 @@ Siegel modular forms. This section contains methods to do so, in analogy with
 
 We use the following notation. Fix `k,j\geq 0`. A Siegel modular form of weight
 `\det^k\otimes \mathrm{Sym}^j` is by definition an analytic function
-`f: \mathbb{H}_g\to \mathbb{C}_j[X]` (the vector space of polynomials of degree
-at most `j`) such that for any `\tau\in \mathbb{H}_g` and
+`f: \mathcal{H}_g\to \mathbb{C}_j[X]` (the vector space of polynomials of degree
+at most `j`) such that for any `\tau\in \mathcal{H}_g` and
 `m\in \mathrm{Sp}_4(\mathbb{Z})`, we have
 
     .. math::
@@ -1571,9 +1568,9 @@ For a nonzero `f` to exist, `j` must be even.
 
 Siegel modular forms generate a bi-graded ring which is not finitely
 generated. However, if we relax the definition of a Siegel modular form and
-allow them to have a pole along the diagonal `\mathbb{H}_1^2 =
+allow them to have a pole along the diagonal `\mathcal{H}_1^2 =
 \bigl\{\bigl(\begin{smallmatrix} \tau_1 & 0 \\ 0 &
-\tau_2\end{smallmatrix}\bigr)\bigr\}\subset \mathbb{H}_2` of a certain order
+\tau_2\end{smallmatrix}\bigr)\bigr\}\subset \mathcal{H}_2` of a certain order
 (depending on the weight), we indeed find a finitely generated ring
 corresponding to classical "covariants" of a binary sextic. Historically,
 covariants are classified in terms of their degree `k` and index `j`,
@@ -1783,7 +1780,7 @@ original matrix.
     ./build/acb_theta/test/main acb_siegel_cocycle
 
 Checks that the chain rule holds: if `m'' = m'm` is a product of two symplectic
-matrices and `\tau\in \mathbb{H}_g`, then `\gamma''\tau + \delta'' =
+matrices and `\tau\in \mathcal{H}_g`, then `\gamma''\tau + \delta'' =
 (\gamma'\tau' + \delta')(\gamma\tau+\delta)` where `\tau' = m\tau`. These
 quantities are computed using :func:`acb_siegel_cocycle` and
 :func:`acb_siegel_transform`.
@@ -1793,7 +1790,7 @@ quantities are computed using :func:`acb_siegel_cocycle` and
     ./build/acb_theta/test/main acb_siegel_transform
 
 Checks that the chain rule holds, i.e. :func:`acb_siegel_transform` defines an
-action of the group `\mathrm{Sp}_{2g}(\mathbb{Z})` on `\mathbb{H}_g`.
+action of the group `\mathrm{Sp}_{2g}(\mathbb{Z})` on `\mathcal{H}_g`.
 
 .. code-block:: bash
 
@@ -1878,7 +1875,7 @@ in *E* nor any of its children.
 
     ./build/acb_theta/test/main acb_theta_naive_radius
 
-Generates a reduced matrix `\tau` in `\mathbb{H}_g` and vector `z\in
+Generates a reduced matrix `\tau` in `\mathcal{H}_g` and vector `z\in
 \mathbb{C}^g`, calls :func:`acb_theta_naive_radius`, constructs the associated
 ellipsoid *E*, and checks that the sums of absolute values of terms of the
 theta series on the border of *E* is at most the specified bound.
@@ -1961,7 +1958,7 @@ Checks that the chain rule holds: if `N_3 = N_2 N_1`, then applying
 
     ./build/acb_theta/test/main acb_theta_jet_naive_radius
 
-Generates a reduced matrix `\tau` in `\mathbb{H}_g` and vector `z\in
+Generates a reduced matrix `\tau` in `\mathcal{H}_g` and vector `z\in
 \mathbb{C}^g`, chooses a random order of derivation, calls
 :func:`acb_theta_jet_naive_radius`, constructs the associated ellipsoid *E*,
 and checks that the sums of absolute values of terms of the differentiated
@@ -2158,7 +2155,7 @@ trigonal as in :func:`sp2gz_trig`.
     ./build/acb_theta/test/main acb_theta_transform_sqrtdet
 
 Checks that the result of :func:`acb_theta_transform_sqrtdet` on any input
-`\tau\in \mathbb{H}_g` squares to `\det(\tau)`.
+`\tau\in \mathcal{H}_g` squares to `\det(\tau)`.
 
 .. code-block:: bash
 
