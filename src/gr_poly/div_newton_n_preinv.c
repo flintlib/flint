@@ -28,13 +28,20 @@ _gr_poly_div_newton_n_preinv(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr FLINT_
 
     lenQ = lenA - lenB + 1;
 
-    Arev = GR_TMP_ALLOC(lenQ * sz);
-    _gr_vec_reverse_shallow(Arev, GR_ENTRY(A, lenA - lenQ, sz), lenQ, ctx);
+    if (lenBinv == 0)  /* fallback if the caller failed to invert B */
+    {
+        status = _gr_vec_zero(Q, lenQ, ctx);
+    }
+    else
+    {
+        Arev = GR_TMP_ALLOC(lenQ * sz);
+        _gr_vec_reverse_shallow(Arev, GR_ENTRY(A, lenA - lenQ, sz), lenQ, ctx);
 
-    status |= _gr_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
-    status |= _gr_poly_reverse(Q, Q, lenQ, lenQ, ctx);
+        status |= _gr_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
+        status |= _gr_poly_reverse(Q, Q, lenQ, lenQ, ctx);
 
-    GR_TMP_FREE(Arev, lenQ * sz);
+        GR_TMP_FREE(Arev, lenQ * sz);
+    }
 
     return status;
 }

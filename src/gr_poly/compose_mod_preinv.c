@@ -18,33 +18,33 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_compose_mod(
+_gr_poly_compose_mod_preinv(
     gr_ptr res,
     gr_srcptr poly1, slong len1,
     gr_srcptr poly2,
     gr_srcptr poly3, slong len3,
+    gr_srcptr poly3inv, slong len3inv,
     gr_ctx_t ctx)
 {
-    /* todo: for appropriate sizes, construct the inverse here and
-       call the preinv versions */
-
     /* todo: ring-specific tuning */
     if (len3 < 6 || len1 >= len3)
-        return _gr_poly_compose_mod_horner(res, poly1, len1, poly2, poly3, len3, ctx);
+        return _gr_poly_compose_mod_horner_preinv(res, poly1, len1, poly2, poly3, len3, poly3inv, len3inv, ctx);
     else
-        return _gr_poly_compose_mod_brent_kung(res, poly1, len1, poly2, poly3, len3, ctx);
+        return _gr_poly_compose_mod_brent_kung_preinv(res, poly1, len1, poly2, poly3, len3, poly3inv, len3inv, ctx);
 }
 
 int
-gr_poly_compose_mod_wrapper(_gr_method_compose_mod_op _compose_mod, gr_poly_t res,
+gr_poly_compose_mod_preinv_wrapper(_gr_method_compose_mod_preinv_op _compose_mod, gr_poly_t res,
                                       const gr_poly_t poly1,
                                       const gr_poly_t poly2,
                                       const gr_poly_t poly3,
+                                      const gr_poly_t poly3inv,
                                       gr_ctx_t ctx)
 {
     slong len1 = poly1->length;
     slong len2 = poly2->length;
     slong len3 = poly3->length;
+    slong len3inv = poly3inv->length;
     slong len = len3 - 1;
     slong vec_len = FLINT_MAX(len3 - 1, len2);
     gr_ptr ptr2;
@@ -64,7 +64,7 @@ gr_poly_compose_mod_wrapper(_gr_method_compose_mod_op _compose_mod, gr_poly_t re
     {
         gr_poly_t tmp;
         gr_poly_init(tmp, ctx);
-        status = gr_poly_compose_mod_wrapper(_compose_mod, tmp, poly1, poly2, poly3, ctx);
+        status = gr_poly_compose_mod_preinv_wrapper(_compose_mod, tmp, poly1, poly2, poly3, poly3inv, ctx);
         gr_poly_swap(tmp, res, ctx);
         gr_poly_clear(tmp, ctx);
         return status;
@@ -79,11 +79,12 @@ gr_poly_compose_mod_wrapper(_gr_method_compose_mod_op _compose_mod, gr_poly_t re
     }
     else
     {
+        /* todo: take advantage of preinv */
         status |= _gr_poly_rem(ptr2, poly2->coeffs, len2, poly3->coeffs, len3, ctx);
     }
 
     gr_poly_fit_length(res, len, ctx);
-    status |= _compose_mod(res->coeffs, poly1->coeffs, len1, ptr2, poly3->coeffs, len3, ctx);
+    status |= _compose_mod(res->coeffs, poly1->coeffs, len1, ptr2, poly3->coeffs, len3, poly3inv->coeffs, len3inv, ctx);
     _gr_poly_set_length(res, len, ctx);
     _gr_poly_normalise(res, ctx);
 
@@ -92,11 +93,12 @@ gr_poly_compose_mod_wrapper(_gr_method_compose_mod_op _compose_mod, gr_poly_t re
 }
 
 int
-gr_poly_compose_mod(gr_poly_t res,
-                      const gr_poly_t poly1,
-                      const gr_poly_t poly2,
-                      const gr_poly_t poly3,
-                      gr_ctx_t ctx)
+gr_poly_compose_mod_preinv(gr_poly_t res,
+                                      const gr_poly_t poly1,
+                                      const gr_poly_t poly2,
+                                      const gr_poly_t poly3,
+                                      const gr_poly_t poly3inv,
+                                      gr_ctx_t ctx)
 {
-    return gr_poly_compose_mod_wrapper(_gr_poly_compose_mod, res, poly1, poly2, poly3, ctx);
+    return gr_poly_compose_mod_preinv_wrapper(_gr_poly_compose_mod_preinv, res, poly1, poly2, poly3, poly3inv, ctx);
 }

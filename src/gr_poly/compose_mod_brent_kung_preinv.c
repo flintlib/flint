@@ -18,11 +18,12 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_compose_mod_brent_kung(
+_gr_poly_compose_mod_brent_kung_preinv(
     gr_ptr res,
     gr_srcptr poly1, slong len1,
     gr_srcptr poly2,
     gr_srcptr poly3, slong len3,
+    gr_srcptr poly3inv, slong len3inv,
     gr_ctx_t ctx)
 {
     gr_mat_t A, B, C;
@@ -71,11 +72,11 @@ _gr_poly_compose_mod_brent_kung(
     {
         /* Assume that squaring is better. XXX: this depends on the ring. */
 #if 1
-        status |= _gr_poly_mulmod(tmp, gr_mat_entry_srcptr(A, (i + 1) / 2, 0, ctx), n,
-                    gr_mat_entry_srcptr(A, i / 2, 0, ctx), n, poly3, len3, ctx);
+        status |= _gr_poly_mulmod_preinv(tmp, gr_mat_entry_srcptr(A, (i + 1) / 2, 0, ctx), n,
+                    gr_mat_entry_srcptr(A, i / 2, 0, ctx), n, poly3, len3, poly3inv, len3inv, ctx);
 #else
-        status |= _gr_poly_mulmod(tmp, gr_mat_entry_srcptr(A, i - 1, 0, ctx), n,
-                    poly2, n, poly3, len3, ctx);
+        status |= _gr_poly_mulmod_preinv(tmp, gr_mat_entry_srcptr(A, i - 1, 0, ctx), n,
+                    poly2, n, poly3, len3, poly3inv, len3inv, ctx);
 #endif
         status |= _gr_vec_set(gr_mat_entry_ptr(A, i, 0, ctx), tmp, n, ctx);
     }
@@ -86,11 +87,11 @@ _gr_poly_compose_mod_brent_kung(
 
     /* Evaluate block composition using the Horner scheme */
     status |= _gr_vec_set(res, gr_mat_entry_srcptr(C, m - 1, 0, ctx), n, ctx);
-    status |= _gr_poly_mulmod(h, gr_mat_entry_srcptr(A, m - 1, 0, ctx), n, poly2, n, poly3, len3, ctx);
+    status |= _gr_poly_mulmod_preinv(h, gr_mat_entry_srcptr(A, m - 1, 0, ctx), n, poly2, n, poly3, len3, poly3inv, len3inv, ctx);
 
     for (i = m - 2; i >= 0; i--)
     {
-        status |= _gr_poly_mulmod(t, res, n, h, n, poly3, len3, ctx);
+        status |= _gr_poly_mulmod_preinv(t, res, n, h, n, poly3, len3, poly3inv, len3inv, ctx);
         status |= _gr_poly_add(res, t, n, gr_mat_entry_srcptr(C, i, 0, ctx), n, ctx);
     }
 
@@ -105,11 +106,12 @@ _gr_poly_compose_mod_brent_kung(
 }
 
 int
-gr_poly_compose_mod_brent_kung(gr_poly_t res,
+gr_poly_compose_mod_brent_kung_preinv(gr_poly_t res,
                                       const gr_poly_t poly1,
                                       const gr_poly_t poly2,
                                       const gr_poly_t poly3,
+                                      const gr_poly_t poly3inv,
                                       gr_ctx_t ctx)
 {
-    return gr_poly_compose_mod_wrapper(_gr_poly_compose_mod_brent_kung, res, poly1, poly2, poly3, ctx);
+    return gr_poly_compose_mod_preinv_wrapper(_gr_poly_compose_mod_brent_kung_preinv, res, poly1, poly2, poly3, poly3inv, ctx);
 }

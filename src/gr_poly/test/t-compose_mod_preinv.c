@@ -61,6 +61,40 @@ test_compose_mod_preinv(flint_rand_t state, int which)
             status |= gr_poly_set(D, C, ctx);
             status |= gr_poly_compose_mod_horner_preinv(D, A, B, D, Cinv, ctx);
             break;
+
+        case 4:
+            status |= gr_poly_compose_mod_brent_kung_preinv(D, A, B, C, Cinv, ctx);
+            break;
+        case 5:
+            status |= gr_poly_set(D, A, ctx);
+            status |= gr_poly_compose_mod_brent_kung_preinv(D, D, B, C, Cinv, ctx);
+            break;
+        case 6:
+            status |= gr_poly_set(D, B, ctx);
+            status |= gr_poly_compose_mod_brent_kung_preinv(D, A, D, C, Cinv, ctx);
+            break;
+        case 7:
+            status |= gr_poly_set(D, C, ctx);
+            status |= gr_poly_compose_mod_brent_kung_preinv(D, A, B, D, Cinv, ctx);
+            break;
+
+        case 8:
+            status |= gr_poly_compose_mod_preinv(D, A, B, C, Cinv, ctx);
+            break;
+        case 9:
+            status |= gr_poly_set(D, A, ctx);
+            status |= gr_poly_compose_mod_preinv(D, D, B, C, Cinv, ctx);
+            break;
+        case 10:
+            status |= gr_poly_set(D, B, ctx);
+            status |= gr_poly_compose_mod_preinv(D, A, D, C, Cinv, ctx);
+            break;
+        case 11:
+            status |= gr_poly_set(D, C, ctx);
+            status |= gr_poly_compose_mod_preinv(D, A, B, D, Cinv, ctx);
+            break;
+
+
         default:
             flint_abort();
     }
@@ -102,7 +136,7 @@ TEST_FUNCTION_START(gr_poly_compose_mod_preinv, state)
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        test_compose_mod(state, n_randint(state, 4));
+        test_compose_mod_preinv(state, n_randint(state, 12));
     }
 
     TEST_FUNCTION_END(state);

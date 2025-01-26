@@ -463,8 +463,11 @@ WARN_UNUSED_RESULT int gr_poly_mulmod(gr_poly_t res, const gr_poly_t poly1, cons
 WARN_UNUSED_RESULT int _gr_poly_mulmod_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mulmod_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx);
 
+/* boilerplate */
 typedef int ((*_gr_method_compose_mod_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_srcptr, slong, gr_ctx_t));
 WARN_UNUSED_RESULT int gr_poly_compose_mod_wrapper(_gr_method_compose_mod_op _compose_mod, gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx);
+typedef int ((*_gr_method_compose_mod_preinv_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_t));
+WARN_UNUSED_RESULT int gr_poly_compose_mod_preinv_wrapper(_gr_method_compose_mod_preinv_op _compose_mod, gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_compose_mod_horner(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_compose_mod_horner(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx);
@@ -473,8 +476,12 @@ WARN_UNUSED_RESULT int gr_poly_compose_mod_brent_kung(gr_poly_t res, const gr_po
 WARN_UNUSED_RESULT int _gr_poly_compose_mod(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_compose_mod(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_compose_mod_horner_preinv(gr_ptr res, gr_srcptr f, slong lenf, gr_srcptr g, gr_srcptr h, slong lenh, gr_srcptr hinv, slong lenhinv, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_compose_mod_horner_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong inv3len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_compose_mod_horner_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_compose_mod_brent_kung_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong inv3len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_compose_mod_brent_kung_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_compose_mod_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong inv3len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_compose_mod_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx);
 
 /* Test functions */
 
