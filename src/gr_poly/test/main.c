@@ -15,6 +15,8 @@
 #include "t-compose.c"
 #include "t-compose_divconquer.c"
 #include "t-compose_horner.c"
+#include "t-compose_mod.c"
+#include "t-compose_mod_preinv.c"
 #include "t-compose_series.c"
 #include "t-div_basecase.c"
 #include "t-div.c"
@@ -45,6 +47,8 @@
 #include "t-make_monic.c"
 #include "t-mul_karatsuba.c"
 #include "t-mul_toom33.c"
+#include "t-mulmod.c"
+#include "t-mulmod_preinv.c"
 #include "t-nth_derivative.c"
 #include "t-pow_series_fmpq.c"
 #include "t-pow_series_ui.c"
@@ -78,6 +82,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_compose),
     TEST_FUNCTION(gr_poly_compose_divconquer),
     TEST_FUNCTION(gr_poly_compose_horner),
+    TEST_FUNCTION(gr_poly_compose_mod),
+    TEST_FUNCTION(gr_poly_compose_mod_preinv),
     TEST_FUNCTION(gr_poly_compose_series),
     TEST_FUNCTION(gr_poly_div_basecase),
     TEST_FUNCTION(gr_poly_div),
@@ -108,6 +114,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_make_monic),
     TEST_FUNCTION(gr_poly_mul_karatsuba),
     TEST_FUNCTION(gr_poly_mul_toom33),
+    TEST_FUNCTION(gr_poly_mulmod),
+    TEST_FUNCTION(gr_poly_mulmod_preinv),
     TEST_FUNCTION(gr_poly_nth_derivative),
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),
