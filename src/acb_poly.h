@@ -684,6 +684,19 @@ acb_poly_allocated_bytes(const acb_poly_t x)
     return _acb_vec_allocated_bytes(x->coeffs, x->alloc);
 }
 
+/* Vector functions */
+
+acb_poly_struct * _acb_poly_vec_init(slong n);
+void _acb_poly_vec_clear(acb_poly_struct *vec, slong n);
+void _acb_poly_vec_set(acb_poly_struct *dest, const acb_poly_struct *src, slong n);
+void _acb_poly_vec_set_block(acb_poly_struct *dest, const acb_poly_struct *src,
+                             slong n, slong base, slong len);
+void _acb_poly_vec_fit_length(acb_poly_struct *vec, slong n, slong len);
+void _acb_poly_vec_set_length(acb_poly_struct *vec, slong n, slong len);
+void _acb_poly_vec_normalise(acb_poly_struct *vec, slong n);
+int _acb_poly_vec_overlaps(acb_poly_struct *vec1, acb_poly_struct *vec2, slong n);
+
+
 #ifdef __cplusplus
 }
 #endif
