@@ -60,7 +60,7 @@ gr_poly_compose_mod_preinv_wrapper(_gr_method_compose_mod_preinv_op _compose_mod
     if (len1 == 1)
         return gr_poly_set(res, poly1, ctx);
 
-    if (res == poly3 || res == poly1)
+    if (res == poly3 || res == poly1 || res == poly3inv)
     {
         gr_poly_t tmp;
         gr_poly_init(tmp, ctx);
