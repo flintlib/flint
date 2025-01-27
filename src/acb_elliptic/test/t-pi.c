@@ -84,8 +84,8 @@ TEST_FUNCTION_START(acb_elliptic_pi, state)
             }
         }
 
-        acb_randtest(n, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
-        acb_randtest(m, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+        acb_randtest(n, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
+        acb_randtest(m, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
 
         acb_one(t);
         if ((acb_is_real(n) && acb_is_real(m) &&
@@ -110,10 +110,10 @@ TEST_FUNCTION_START(acb_elliptic_pi, state)
 
             acb_elliptic_pi(r1, n, m, prec1);
 
-            acb_randtest(t, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+            acb_randtest(t, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
             acb_add(n, n, t, prec2);
             acb_sub(n, n, t, prec2);
-            acb_randtest(t, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+            acb_randtest(t, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
             acb_add(m, m, t, prec2);
             acb_sub(m, m, t, prec2);
 

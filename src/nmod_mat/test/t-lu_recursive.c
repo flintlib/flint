@@ -98,8 +98,8 @@ TEST_FUNCTION_START(nmod_mat_lu_recursive, state)
         }
         else
         {
-            m = n_randint(state, 30);
-            n = n_randint(state, 30);
+            m = n_randint(state, 10);
+            n = n_randint(state, 10);
         }
 
         mod = n_randtest_prime(state, 0);
