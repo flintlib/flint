@@ -290,8 +290,10 @@ Arithmetic
     exact division by two.
 
 .. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
 .. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
-.. function:: int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t e, gr_ctx_t ctx)
+              int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
+              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, onst fmpz_t e, gr_ctx_t ctx)
 
 .. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
               int gr_mat_scalar_add(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
@@ -772,6 +774,15 @@ Matrix functions
 
 .. function:: int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
+.. function:: int gr_mat_pow_scalar_jordan(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_pow_fmpq_jordan(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
+              int gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
+
+    Compute `A^c` using Jordan decomposition by default. The non-Jordan
+    methods also check for small integer exponents and delegate those
+    to the standard powering method.
 
 
 Hessenberg form

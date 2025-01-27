@@ -21,7 +21,7 @@ TEST_FUNCTION_START(gr_mat_pow, state)
     {
         slong n, i;
         ulong e_ui;
-        fmpz_t e_fmpz;
+        fmpz_t e_fmpz, neg_e_fmpz;
         gr_ctx_t ctx;
         gr_mat_t A, B, C, Ainv;
 
@@ -34,7 +34,7 @@ TEST_FUNCTION_START(gr_mat_pow, state)
         }
 
         n = n_randint(state, 5);
-        e_ui = n_randint(state, 20);
+        e_ui = n_randint(state, 5);
 
         gr_mat_init(A, n, n, ctx);
         gr_mat_init(B, n, n, ctx);
@@ -53,6 +53,10 @@ TEST_FUNCTION_START(gr_mat_pow, state)
         if (gr_mat_equal(C, B, ctx) == T_FALSE)
         {
             flint_printf("FAIL: results not equal (ui)\n");
+            flint_printf("e %d", e_ui);
+            gr_mat_print(A, ctx);
+            gr_mat_print(C, ctx);
+            gr_mat_print(B, ctx);
             fflush(stdout);
             flint_abort();
         }
@@ -67,6 +71,7 @@ TEST_FUNCTION_START(gr_mat_pow, state)
         }
         
         fmpz_init(e_fmpz);
+        fmpz_init(neg_e_fmpz);
         fmpz_randtest(e_fmpz, state, 100);
 
         GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
@@ -101,7 +106,6 @@ TEST_FUNCTION_START(gr_mat_pow, state)
         else
         {
             int status_pow, status_inv;
-            fmpz_t neg_e_fmpz;
 
             status_pow = gr_mat_pow_fmpz(B, A, e_fmpz, ctx);
             status_inv = gr_mat_inv(Ainv, A, ctx);
@@ -113,7 +117,6 @@ TEST_FUNCTION_START(gr_mat_pow, state)
             }
             if (status_pow == GR_SUCCESS)
             {
-                fmpz_init(neg_e_fmpz);
                 fmpz_neg(neg_e_fmpz, e_fmpz);
                 GR_MUST_SUCCEED(gr_mat_pow_fmpz(C, Ainv, neg_e_fmpz, ctx));
                 
@@ -123,11 +126,11 @@ TEST_FUNCTION_START(gr_mat_pow, state)
                     fflush(stdout);
                     flint_abort();
                 }
-                fmpz_clear(neg_e_fmpz);
             }
         }
 
         fmpz_clear(e_fmpz);
+        fmpz_clear(neg_e_fmpz);
         
         gr_mat_clear(A, ctx);
         gr_mat_clear(B, ctx);

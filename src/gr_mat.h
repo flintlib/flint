@@ -200,7 +200,8 @@ gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 }
 
 WARN_UNUSED_RESULT int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong exp, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t exp, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong exp, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t exp, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_mat_gr_poly_evaluate(gr_mat_t y, gr_srcptr poly, slong len, const gr_mat_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t f, const gr_mat_t a, gr_ctx_t ctx);
@@ -344,9 +345,13 @@ WARN_UNUSED_RESULT int gr_mat_func_param_jordan(gr_mat_t res, const gr_mat_t A, 
 
 WARN_UNUSED_RESULT int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
-
 WARN_UNUSED_RESULT int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_pow_scalar_jordan(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_fmpq_jordan(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_norm_max(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_norm_1(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
