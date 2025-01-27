@@ -206,7 +206,7 @@ void fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C,
 
 void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_mat_pow(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong exp, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_mat_pow_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong exp, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_mat_submul(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
                                const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx);

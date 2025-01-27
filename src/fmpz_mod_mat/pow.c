@@ -14,8 +14,8 @@
 #include "fmpz_mod_mat.h"
 
 void
-fmpz_mod_mat_pow(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong exp,
-                 const fmpz_mod_ctx_t ctx)
+fmpz_mod_mat_pow_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong exp,
+                    const fmpz_mod_ctx_t ctx)
 {
     slong d = fmpz_mod_mat_nrows(A, ctx);
 

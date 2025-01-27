@@ -38,7 +38,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_pow, state)
         /* Make sure noise in the output is ok */
         fmpz_mod_mat_randtest(B, state, ctx);
 
-        fmpz_mod_mat_pow(B, A, e, ctx);
+        fmpz_mod_mat_pow_ui(B, A, e, ctx);
 
         fmpz_mod_mat_one(C, ctx);
         for (i = 0; i < e; i++)
@@ -51,7 +51,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_pow, state)
             flint_abort();
         }
 
-        fmpz_mod_mat_pow(A, A, e, ctx);
+        fmpz_mod_mat_pow_ui(A, A, e, ctx);
 
         if (!fmpz_mod_mat_equal(A, B, ctx))
         {

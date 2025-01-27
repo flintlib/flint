@@ -234,7 +234,7 @@ Matrix multiplication
 
     Set ``B`` to ``A^2``. The matrix ``A`` must be square.
 
-.. function:: void fmpz_mod_mat_pow(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong e, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_mat_pow_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong e, const fmpz_mod_ctx_t ctx)
 
     Sets ``B`` to the matrix ``A`` raised to the power ``e``,
     where ``A`` must be a square matrix. Aliasing is allowed.
