@@ -9,15 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb_poly.h"
 #include "gr_poly.h"
-
-#ifdef __GNUC__
-# define log __builtin_log
-# define pow __builtin_pow
-#else
-# include <math.h>
-#endif
 
 static void
 __acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, int times_pi, slong prec)

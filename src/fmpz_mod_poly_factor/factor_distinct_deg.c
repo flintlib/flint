@@ -12,20 +12,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
-
-#ifdef __GNUC__
-# define ceil __builtin_ceil
-# define log __builtin_log
-# define pow __builtin_pow
-#else
-# include <math.h>
-#endif
 
 /* the degrees are written as exponents of the corresponding factors */
 void fmpz_mod_poly_factor_distinct_deg_with_frob(

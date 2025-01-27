@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fexpr.h"
 #include "fexpr_builtin.h"
-
-#ifdef __GNUC__
-# define strcmp __builtin_strcmp
-#else
-# include <string.h>
-#endif
 
 slong
 fexpr_builtin_lookup(const char * s)

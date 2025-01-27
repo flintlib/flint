@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "arb.h"
 #include "partitions.h"
-
-#ifdef __GNUC__
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 /* This nice round number precisely fits on 32 bits */
 #define NUMBER_OF_SMALL_PARTITIONS 128

@@ -9,15 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "qqbar.h"
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-# define floor __builtin_floor
-#else
-# include <math.h>
-#endif
 
 void
 best_rational_fast(slong * p, ulong * q, double x, slong N)

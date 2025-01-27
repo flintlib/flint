@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "fmpq.h"
 #include "arb_mat.h"
 #include "arb_hypgeom.h"
 #include "acb.h"
 #include "acb_dirichlet.h"
-
-#ifdef __GNUC__
-# define log __builtin_log
-#else
-# include <math.h>
-#endif
 
 #define VERBOSE 0
 

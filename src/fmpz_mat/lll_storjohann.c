@@ -9,13 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifdef __GNUC__
-# define ceil __builtin_ceil
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
-
+#include <math.h>
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"

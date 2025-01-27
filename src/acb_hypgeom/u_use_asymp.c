@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-#ifdef __GNUC__
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 int
 acb_hypgeom_u_use_asymp(const acb_t z, slong prec)
