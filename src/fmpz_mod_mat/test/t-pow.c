@@ -23,10 +23,10 @@ TEST_FUNCTION_START(fmpz_mod_mat_pow, state)
         ulong e;
         fmpz_mod_ctx_t ctx;
 
-        n = n_randint(state, 5);
-        e = n_randint(state, 10);
+        n = n_randint(state, 10);
+        e = n_randint(state, 20);
 
-        fmpz_mod_ctx_init_rand_bits(ctx, state, 100);
+        fmpz_mod_ctx_init_rand_bits(ctx, state, 200);
 
         fmpz_mod_mat_init(A, n, n, ctx);
         fmpz_mod_mat_init(B, n, n, ctx);

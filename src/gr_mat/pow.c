@@ -10,6 +10,7 @@
 */
 
 #include "longlong.h"
+#include "fmpz.h"
 #include "gr.h"
 #include "gr_mat.h"
 
@@ -56,6 +57,49 @@ gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong exp, gr_ctx_t ctx)
 
         gr_ctx_init_matrix_ring(mctx, ctx, d);
         status |= gr_pow_ui(res, mat, exp, mctx);
+        gr_ctx_clear(mctx);
+    }
+
+    return status;
+}
+
+int
+gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t exp, gr_ctx_t ctx)
+{
+    int status;
+    slong sz = ctx->sizeof_elem;
+    slong d;
+
+    d = gr_mat_nrows(res, ctx);
+
+    if (d != gr_mat_ncols(res, ctx) || d != gr_mat_nrows(mat, ctx)
+        || d != gr_mat_ncols(mat, ctx))
+    {
+        return GR_DOMAIN;
+    }
+
+    status = GR_SUCCESS;
+
+
+    if (fmpz_is_zero(exp) || d == 0)
+    {
+        status |= gr_mat_one(res, ctx);
+    }
+    else if (d == 1)
+    {
+        status |= gr_pow_fmpz(GR_MAT_ENTRY(res, 0, 0, sz),
+                              GR_MAT_ENTRY(mat, 0, 0, sz), exp, ctx);
+    }
+    else if (fmpz_is_one(exp))
+    {
+        status |= gr_mat_set(res, mat, ctx);
+    }
+    else
+    {
+        gr_ctx_t mctx;
+
+        gr_ctx_init_matrix_ring(mctx, ctx, d);
+        status |= gr_pow_fmpz(res, mat, exp, mctx);
         gr_ctx_clear(mctx);
     }
 

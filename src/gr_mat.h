@@ -200,6 +200,7 @@ gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 }
 
 WARN_UNUSED_RESULT int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong exp, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t exp, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_mat_gr_poly_evaluate(gr_mat_t y, gr_srcptr poly, slong len, const gr_mat_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t f, const gr_mat_t a, gr_ctx_t ctx);
