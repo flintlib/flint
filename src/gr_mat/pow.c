@@ -52,25 +52,11 @@ gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong exp, gr_ctx_t ctx)
     }
     else
     {
-        gr_mat_t T, U;
-        slong i;
+        gr_ctx_t mctx;
 
-        status |= gr_mat_init_set(T, mat, ctx);
-        gr_mat_init(U, d, d, ctx);
-
-        for (i = FLINT_BIT_COUNT(exp) - 2; i >= 0; i--)
-        {
-            status |= gr_mat_sqr(U, T, ctx);
-
-            if (exp & (WORD(1) << i))
-                status |= gr_mat_mul(T, U, mat, ctx);
-            else
-                gr_mat_swap(T, U, ctx);
-        }
-
-        gr_mat_swap(res, T, ctx);
-        gr_mat_clear(T, ctx);
-        gr_mat_clear(U, ctx);
+        gr_ctx_init_matrix_ring(mctx, ctx, d);
+        status |= gr_pow_ui(res, mat, exp, mctx);
+        gr_ctx_clear(mctx);
     }
 
     return status;
