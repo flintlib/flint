@@ -342,30 +342,7 @@ acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t t
 
     if (!res)
     {
-        /* Use sum_bound to avoid returning NaN */
-        arb_t c, rho;
-        ulong ab;
-
-        arb_init(c);
-        arb_init(rho);
-
-        for (j = 0; j < nb; j++)
-        {
-            acb_theta_sum_bound(c, rho, zs + j * g, tau, 0);
-            if (sqr)
-            {
-                arb_sqr(c, c, prec);
-            }
-            for (ab = 0; ab < n * n; ab++)
-            {
-                arb_zero_pm_one(acb_realref(&th[j * n * n + ab]));
-                arb_zero_pm_one(acb_imagref(&th[j * n * n + ab]));
-            }
-            _acb_vec_scalar_mul_arb(th + j * n * n, th + j * n * n, n * n, c, prec);
-        }
-
-        arb_clear(c);
-        arb_clear(rho);
+        _acb_vec_indeterminate(th, nb * n * n);
     }
 
     flint_free(pattern);

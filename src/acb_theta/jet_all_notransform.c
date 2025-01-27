@@ -169,7 +169,7 @@ acb_theta_jet_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb,
     hprec = prec;
     for (l = 0; l < nb; l++)
     {
-        acb_theta_sum_bound(&c[l], &rho[l], zs + l * g, tau, ord);
+        acb_theta_local_bound(&c[l], &rho[l], zs + l * g, tau, ord);
         acb_theta_jet_finite_diff_radius(arb_midref(&eps[l]), arb_midref(&err[l]),
             &c[l], &rho[l], ord, g, prec);
 

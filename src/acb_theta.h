@@ -196,7 +196,7 @@ int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
 /* Main functions on reduced input */
 
-void acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
+void acb_theta_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
 void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     acb_srcptr dth, slong ord, slong prec);
 

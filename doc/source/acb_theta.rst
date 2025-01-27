@@ -1390,7 +1390,7 @@ Main functions on reduced input
 This section wraps up the quasi-linear and summation algorithms on inputs
 `(z,\tau)` that are reduced, but not necessarily exact.
 
-.. function:: void acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
+.. function:: void acb_theta_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 
     Sets *c* and *rho* such that on every ball centered at (a point contained
     in) *z* of radius *rho*, the functions `|\theta_{a,b}(\cdot,\tau)|` for all
@@ -1521,7 +1521,7 @@ This section wraps up the quasi-linear and summation algorithms on inputs
     transform.
 
     The algorithm based on finite differences computes `c` and `\rho` using
-    :func:`acb_theta_sum_bound`, chooses a suitable `\varepsilon`, strips
+    :func:`acb_theta_local_bound`, chooses a suitable `\varepsilon`, strips
     `(z,\tau)` of their error bounds, increases the working precision to
     account for division by `\varepsilon^{\mathit{ord}}\cdot
     (\mathit{ord}+1)^g`, calls :func:`acb_theta_all_notransform` on all the
@@ -1585,7 +1585,7 @@ straightforward way. An additional feature of :func:`acb_theta_00` and
 :func:`acb_theta_all` is the following: if something went wrong during
 execution (e.g. :func:`acb_theta_reduce_tau`, :func:`acb_theta_ql_setup` or
 :func:`acb_theta_eld_set` failed), then we attempt to catch this error by
-calling :func:`acb_theta_sum_bound`. This allows us to return very rough (but
+calling :func:`acb_theta_local_bound`. This allows us to return very rough (but
 hopefully finite) bounds on the result instead of NaNs.
 
 Dimension 2 specifics
@@ -2092,10 +2092,10 @@ input.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_sum_bound
+    ./build/acb_theta/test/main acb_theta_local_bound
 
 Generates random `(z,\tau)` at a working precision that is not too low and
-calls :func:`acb_theta_sum_bound` to compute the bounds *c* and *rho*. Checks
+calls :func:`acb_theta_local_bound` to compute the bounds *c* and *rho*. Checks
 that they are finite and that their definition is satisfied by sampling theta
 values on the corresponding neighborhood of `z` at low precisions with
 :func:`acb_theta_sum_all_tilde`.
