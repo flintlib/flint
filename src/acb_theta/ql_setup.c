@@ -70,12 +70,14 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
     slong n = 1 << g;
     acb_theta_ctx_tau_t ctx_tau, ctx_tau_dupl;
     acb_theta_ctx_z_t ctxt;
-    acb_theta_ctx_z_struct *vec, *aux;
+    acb_theta_ctx_z_struct * vec;
+    acb_theta_ctx_z_struct * aux;
     flint_rand_t state;
     arb_ptr d;
     slong lowprec;
     slong j, k, l;
     int res, easy;
+    int * is_zero;
 
     FLINT_ASSERT(nb >= 1);
     FLINT_ASSERT(_acb_vec_is_zero(zs, g));
@@ -96,7 +98,13 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
     aux = acb_theta_ctx_z_vec_init(2, g);
     acb_theta_ctx_z_init(ctxt, g);
     d = _arb_vec_init(n);
+    is_zero = flint_malloc(nb * sizeof(int));
     flint_rand_init(state);
+
+    for (j = 0; j < nb; j++)
+    {
+        is_zero[j] = _acb_vec_is_zero(zs + j * g, g);
+    }
 
     res = 0;
     for (lowprec = 16 + 2 * g; (lowprec < prec) && !res; lowprec *= 2)
@@ -116,6 +124,10 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
         {
             for (j = 0; j < nb; j++)
             {
+                if (easy_steps[j] > k)
+                {
+                    continue; /* was already set up during a previous pass */
+                }
                 if (easy_steps[j] < k)
                 {
                     continue; /* z was already discarded */
@@ -126,7 +138,30 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
                 {
                     acb_theta_sum_all_tilde(rts_all + j * n * n, &vec[j], 1,
                         ctx_tau_dupl, d, lowprec);
-                    easy = !_acb_vec_contains_zero(rts_all + j * n * n, n * n);
+                    /* odd theta constants are known to be zero */
+                    if (is_zero[j])
+                    {
+                        easy = 1;
+                        for (l = 0; l < n * n; l++)
+                        {
+                            if (acb_theta_char_is_even(l, g))
+                            {
+                                if(acb_contains_zero(&rts_all[j * n * n + l]))
+                                {
+                                    easy = 0;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                acb_zero(&rts_all[j * n * n + l]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        easy = !_acb_vec_contains_zero(rts_all + j * n * n, n * n);
+                    }
                 }
                 else
                 {
@@ -249,6 +284,7 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
     acb_theta_ctx_z_vec_clear(aux, 2);
     acb_theta_ctx_z_clear(ctxt);
     _arb_vec_clear(d, n);
+    flint_free(is_zero);
     flint_rand_clear(state);
     return res;
 }

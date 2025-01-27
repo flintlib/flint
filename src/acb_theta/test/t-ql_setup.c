@@ -72,7 +72,9 @@ TEST_FUNCTION_START(acb_theta_ql_setup, state)
                     {
                         for (a = 0; a < n * n; a++)
                         {
-                            if (acb_contains_zero(&rts_all[j * n * n + a]))
+                            if (acb_contains_zero(&rts_all[j * n * n + a])
+                                && (acb_theta_char_is_even(a, g)
+                                    || !_acb_vec_is_zero(zs + j * g, g)))
                             {
                                 flint_printf("FAIL (rts_all)\n");
                                 flint_printf("j = %wd, k = %wd, a = %wd, all = %wd\n", j, k, a, all);
