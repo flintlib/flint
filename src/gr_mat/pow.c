@@ -52,7 +52,7 @@ gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong exp, gr_ctx_t ctx)
     }
     else
     {
-        gr_ptr T, U;
+        gr_mat_t T, U;
         slong i;
 
         status |= gr_mat_init_set(T, mat, ctx);
