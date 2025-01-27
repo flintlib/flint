@@ -37,7 +37,7 @@ _gr_poly_compose_mod_horner(gr_ptr res,
 
     len = lenh - 1;
     i = lenf - 1;
-    GR_TMP_INIT_VEC(t, 2 * lenh - 3, ctx);
+    GR_TMP_INIT_VEC(t, len, ctx);
 
     status |= _gr_vec_mul_scalar(res, g, len, GR_ENTRY(f, i, sz), ctx);
     i--;
@@ -51,7 +51,7 @@ _gr_poly_compose_mod_horner(gr_ptr res,
         status |= _gr_poly_add(res, t, len, GR_ENTRY(f, i, sz), 1, ctx);
     }
 
-    GR_TMP_CLEAR_VEC(t, 2 * lenh - 3, ctx);
+    GR_TMP_CLEAR_VEC(t, len, ctx);
 
     return status;
 }

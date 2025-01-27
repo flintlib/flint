@@ -26,7 +26,7 @@ _gr_poly_compose_mod_brent_kung(
     gr_ctx_t ctx)
 {
     gr_mat_t A, B, C;
-    gr_ptr t, h, tmp;
+    gr_ptr t, h;
     slong i, n, m;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
@@ -52,10 +52,8 @@ _gr_poly_compose_mod_brent_kung(
     gr_mat_init(B, m, m, ctx);
     gr_mat_init(C, m, n, ctx);
 
-    /* TODO: merge allocations */
-    GR_TMP_INIT_VEC(h, 2 * n - 1, ctx);
-    GR_TMP_INIT_VEC(t, 2 * n - 1, ctx);
-    GR_TMP_INIT_VEC(tmp, 2 * n - 1, ctx);
+    GR_TMP_INIT_VEC(h, 2 * n, ctx);
+    t = GR_ENTRY(h, n, sz);
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
@@ -71,16 +69,15 @@ _gr_poly_compose_mod_brent_kung(
     {
         /* Assume that squaring is better. XXX: this depends on the ring. */
 #if 1
-        status |= _gr_poly_mulmod(tmp, gr_mat_entry_srcptr(A, (i + 1) / 2, 0, ctx), n,
+        status |= _gr_poly_mulmod(gr_mat_entry_ptr(A, i, 0, ctx),
+                    gr_mat_entry_srcptr(A, (i + 1) / 2, 0, ctx), n,
                     gr_mat_entry_srcptr(A, i / 2, 0, ctx), n, poly3, len3, ctx);
 #else
-        status |= _gr_poly_mulmod(tmp, gr_mat_entry_srcptr(A, i - 1, 0, ctx), n,
+        status |= _gr_poly_mulmod(gr_mat_entry_ptr(A, i, 0, ctx),
+                    gr_mat_entry_srcptr(A, i - 1, 0, ctx), n,
                     poly2, n, poly3, len3, ctx);
 #endif
-        status |= _gr_vec_set(gr_mat_entry_ptr(A, i, 0, ctx), tmp, n, ctx);
     }
-
-    GR_TMP_CLEAR_VEC(tmp, 2 * n - 1, ctx);
 
     status |= gr_mat_mul(C, B, A, ctx);
 
@@ -94,8 +91,7 @@ _gr_poly_compose_mod_brent_kung(
         status |= _gr_poly_add(res, t, n, gr_mat_entry_srcptr(C, i, 0, ctx), n, ctx);
     }
 
-    GR_TMP_CLEAR_VEC(h, 2 * n - 1, ctx);
-    GR_TMP_CLEAR_VEC(t, 2 * n - 1, ctx);
+    GR_TMP_CLEAR_VEC(h, 2 * n, ctx);
 
     gr_mat_clear(A, ctx);
     gr_mat_clear(B, ctx);

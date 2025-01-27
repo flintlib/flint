@@ -16,6 +16,7 @@
 #include "t-compose_divconquer.c"
 #include "t-compose_horner.c"
 #include "t-compose_mod.c"
+#include "t-compose_mod_precomp_preinv.c"
 #include "t-compose_mod_preinv.c"
 #include "t-compose_series.c"
 #include "t-div_basecase.c"
@@ -83,6 +84,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_compose_divconquer),
     TEST_FUNCTION(gr_poly_compose_horner),
     TEST_FUNCTION(gr_poly_compose_mod),
+    TEST_FUNCTION(gr_poly_compose_mod_precomp_preinv),
     TEST_FUNCTION(gr_poly_compose_mod_preinv),
     TEST_FUNCTION(gr_poly_compose_series),
     TEST_FUNCTION(gr_poly_div_basecase),

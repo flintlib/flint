@@ -483,6 +483,12 @@ WARN_UNUSED_RESULT int gr_poly_compose_mod_brent_kung_preinv(gr_poly_t res, cons
 WARN_UNUSED_RESULT int _gr_poly_compose_mod_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong inv3len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_compose_mod_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_poly_reduce_matrix_mod_poly(gr_mat_t A, const gr_mat_t B, const gr_poly_t f, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_precompute_matrix(gr_mat_t A, gr_srcptr poly1, gr_srcptr poly2, slong len2, gr_srcptr poly2inv, slong len2inv, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_precompute_matrix(gr_mat_t A, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly2inv, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_compose_mod_brent_kung_precomp_preinv(gr_ptr res, gr_srcptr poly1, slong len1, const gr_mat_t A, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong len3inv, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_compose_mod_brent_kung_precomp_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_mat_t A, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx);
+
 /* Test functions */
 
 void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);

@@ -300,6 +300,56 @@ Division with remainder
 
     Versions of the *divrem* functions which output only the remainder.
 
+Division with remainder with full precomputed inverse
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_poly_div_newton_n_preinv(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr FLINT_UNUSED(B), slong lenB, gr_srcptr Binv, slong lenBinv, gr_ctx_t ctx)
+
+    Notionally computes polynomials `Q` and `R` such that `A = BQ + R` with
+    `\operatorname{len}(R)` less than ``lenB``, where ``A`` is of length ``lenA``
+    and ``B`` is of length ``lenB``, but return only `Q`.
+
+    We require that `Q` have space for ``lenA - lenB + 1`` coefficients
+    and assume that the leading coefficient of `B` is a unit. Furthermore, we
+    assume that `Binv` is the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+.. function:: int gr_poly_div_newton_n_preinv(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, const gr_poly_t Binv, gr_ctx_t ctx)
+
+    Notionally computes `Q` and `R` such that `A = BQ + R` with
+    `\operatorname{len}(R) < \operatorname{len}(B)`, but returns only `Q`.
+
+    We assume that the leading coefficient of `B` is a unit and that `Binv` is
+    the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`.
+
+    It is required that the length of `A` is less than or equal to
+    2*the length of `B` - 2.
+
+    The algorithm used is to reverse the polynomials and divide the
+    resulting power series, then reverse the result.
+
+.. function:: int _gr_poly_divrem_newton_n_preinv(gr_ptr Q, gr_ptr R, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_srcptr Binv, slong lenBinv, gr_ctx_t ctx)
+
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R)` less
+    than ``lenB``, where `A` is of length ``lenA`` and `B` is of
+    length ``lenB``. We require that `Q` have space for
+    ``lenA - lenB + 1`` coefficients. Furthermore, we assume that `Binv` is
+    the inverse of the reverse of `B` mod `x^{\operatorname{len}(B)}`. The algorithm
+    used is to call :func:`_gr_poly_div_newton_n_preinv` and then multiply out
+    and compute the remainder.
+
+.. function:: int gr_poly_divrem_newton_n_preinv(gr_poly_t Q, gr_poly_t R, const gr_poly_t A, const gr_poly_t B, const gr_poly_t Binv, gr_ctx_t ctx)
+
+    Computes `Q` and `R` such that `A = BQ + R` with `\operatorname{len}(R) <
+    \operatorname{len}(B)`.  We assume `Binv` is the inverse of the reverse of `B`
+    mod `x^{\operatorname{len}(B)}`.
+
+    It is required (not checked) that the length of `A` is less than or equal to
+    2*the length of `B` - 2.
+
+
 Power series division
 --------------------------------------------------------------------------------
 
@@ -786,6 +836,111 @@ Power series special functions
               int gr_poly_tan_series_newton(gr_poly_t f, const gr_poly_t h, slong n, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_tan_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
               int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+
+Modular arithmetic and composition
+--------------------------------------------------------------------------------
+
+.. function:: int _gr_poly_mulmod(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+
+    Sets ``res`` to the remainder of the product of ``poly1``
+    and ``poly2`` upon polynomial division by ``f``.
+
+    It is required that ``len1 + len2 - lenf > 0``, which is
+    equivalent to requiring that the result will actually be
+    reduced. Otherwise, simply use ``_fq_poly_mul`` instead.
+
+    Aliasing of ``f`` and ``res`` is not permitted.
+
+.. function:: int gr_poly_mulmod(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t f, gr_ctx_t ctx)
+
+    Sets ``res`` to the remainder of the product of ``poly1``
+    and ``poly2`` upon polynomial division by ``f``.
+
+.. function:: int _gr_poly_mulmod_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+
+    Sets ``res`` to the remainder of the product of ``poly1``
+    and ``poly2`` upon polynomial division by ``f``.
+
+    It is required that ``finv`` is the inverse of the reverse of
+    ``f`` mod ``x^lenf``.
+
+    Aliasing of ``res`` with any of the inputs is not permitted.
+
+.. function:: int gr_poly_mulmod_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+
+    Sets ``res`` to the remainder of the product of ``poly1``
+    and ``poly2`` upon polynomial division by ``f``. ``finv``
+    is the inverse of the reverse of ``f``.
+
+.. function:: int _gr_poly_compose_mod_horner(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx)
+              int gr_poly_compose_mod_horner(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx)
+              int _gr_poly_compose_mod_brent_kung(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx)
+              int gr_poly_compose_mod_brent_kung(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx)
+              int _gr_poly_compose_mod(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx)
+              int gr_poly_compose_mod(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx)
+
+    Sets ``res`` to the composition `f(g)` modulo `h` where *f*, *g*
+    and *h* are given by *poly1*, *poly2* and *poly3*.
+
+    The underscore methods require that the lengths are nonzero
+    and that the length of `g` is one less than the length of `h` (possibly
+    with zero padding). We also require that the length of `f` is less than
+    the length of `h`. The underscore methods do not support aliasing.
+
+.. function:: int _gr_poly_compose_mod_horner_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong inv3len, gr_ctx_t ctx)
+              int gr_poly_compose_mod_horner_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx)
+              int _gr_poly_compose_mod_brent_kung_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong inv3len, gr_ctx_t ctx)
+              int gr_poly_compose_mod_brent_kung_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx)
+              int _gr_poly_compose_mod_preinv(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_srcptr poly3inv, slong inv3len, gr_ctx_t ctx)
+              int gr_poly_compose_mod_preinv(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, const gr_poly_t poly3inv, gr_ctx_t ctx)
+
+    Versions accepting an additional precomputed argument ``poly3inv``
+    representing the inverse of the reverse of ``poly3``.
+
+.. function:: int _gr_poly_reduce_matrix_mod_poly(gr_mat_t A, const gr_mat_t B, const gr_poly_t f, gr_ctx_t ctx)
+
+    Sets the ith row of ``A`` to the reduction of the ith row of `B` modulo
+    `f` for `i=1,\ldots,\sqrt{\deg(f)}`. We require `B` to be at least
+    a `\sqrt{\deg(f)}\times \deg(f)` matrix and `f` to be nonzero.
+
+.. function:: int _gr_poly_precompute_matrix(gr_mat_t A, gr_srcptr f, gr_srcptr g, slong leng, gr_srcptr ginv, slong lenginv, gr_ctx_t ctx)
+
+    Sets the ith row of ``A`` to `f^i` modulo `g` for
+    `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be a
+    `\sqrt{\deg(g)}\times \deg(g)` matrix. We require ``ginv`` to
+    be the inverse of the reverse of ``g`` and `g` to be nonzero.
+
+.. function:: int gr_poly_precompute_matrix(gr_mat_t A, const gr_poly_t f, const gr_poly_t g, const gr_poly_t ginv, gr_ctx_t ctx)
+
+    Sets the ith row of ``A`` to `f^i` modulo `g` for
+    `i=1,\ldots,\sqrt{\deg(g)}`. We require `A` to be a
+    `\sqrt{\deg(g)}\times \deg(g)` matrix. We require ``ginv`` to
+    be the inverse of the reverse of ``g``.
+
+.. function:: int _gr_poly_compose_mod_brent_kung_precomp_preinv(gr_ptr res, gr_srcptr f, slong lenf, const gr_mat_t A, gr_srcptr h, slong lenh, gr_srcptr hinv, slong lenhinv, gr_ctx_t ctx)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require
+    that `h` is nonzero. We require that the ith row of `A` contains
+    `g^i` for `i=1,\ldots,\sqrt{\deg(h)}`, i.e. `A` is a
+    `\sqrt{\deg(h)}\times \deg(h)` matrix. We also require that the
+    length of `f` is less than the length of `h`. Furthermore, we
+    require ``hinv`` to be the inverse of the reverse of ``h``.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+.. function:: int gr_poly_compose_mod_brent_kung_precomp_preinv(gr_poly_t res, const gr_poly_t f, const gr_mat_t A, const gr_poly_t h, const gr_poly_t hinv, gr_ctx_t ctx)
+
+    Sets ``res`` to the composition `f(g)` modulo `h`. We require
+    that the ith row of `A` contains `g^i` for
+    `i=1,\ldots,\sqrt{\deg(h)}`, i.e. `A` is a `\sqrt{\deg(h)}\times
+    \deg(h)` matrix. We require that `h` is nonzero and that `f` has
+    smaller degree than `h`. Furthermore, we require ``hinv`` to be
+    the inverse of the reverse of ``h``. This version of Brent-Kung
+    modular composition is particularly useful if one has to perform
+    several modular composition of the form `f(g)` modulo `h` for
+    fixed `g` and `h`.
+
 
 Test functions
 -------------------------------------------------------------------------------
