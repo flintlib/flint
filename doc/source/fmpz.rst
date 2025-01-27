@@ -911,12 +911,12 @@ Basic arithmetic
 .. function:: void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the remainder of `g` divided by `h` such that the remainder is
-    positive. Assumes that `h` is not zero.
+    non-negative. Assumes that `h` is not zero.
 
 .. function:: ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     Sets `f` to the remainder of `g` divided by `h` such that the remainder is
-    positive and also returns this value. Raises an exception if `h` is zero.
+    non-negative and also returns this value. Raises an exception if `h` is zero.
 
 .. function:: void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -1071,7 +1071,7 @@ Greatest common divisor
 .. function:: void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the greatest common divisor of `g` and `h`.  The
-    result is always positive, even if one of `g` and `h` is
+    result is always non-negative, even if one of `g` and `h` is
     negative.
 
 .. function:: void fmpz_gcd3(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c)
