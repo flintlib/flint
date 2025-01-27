@@ -38,6 +38,7 @@
 #include "t-mul_strassen.c"
 #include "t-mul_waksman.c"
 #include "t-nullspace.c"
+#include "t-pow.c"
 #include "t-properties.c"
 #include "t-randrank.c"
 #include "t-rank.c"
@@ -88,6 +89,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_mul_strassen),
     TEST_FUNCTION(gr_mat_mul_waksman),
     TEST_FUNCTION(gr_mat_nullspace),
+    TEST_FUNCTION(gr_mat_pow),
     TEST_FUNCTION(gr_mat_properties),
     TEST_FUNCTION(gr_mat_randrank),
     TEST_FUNCTION(gr_mat_rank),
