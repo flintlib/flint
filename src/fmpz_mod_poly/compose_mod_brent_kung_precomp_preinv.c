@@ -59,7 +59,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz * res,
     _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
     GR_MUST_SUCCEED(_gr_poly_compose_mod_brent_kung_precomp_preinv(res,
         poly1, len1, (gr_mat_struct *) A, poly3, len3,
-        poly3, len3inv, gr_ctx));
+        poly3inv, len3inv, gr_ctx));
 }
 
 void fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv(fmpz_mod_poly_t res,
