@@ -12,53 +12,17 @@
 #include "longlong.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 fmpz_mod_mat_pow_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong exp,
                     const fmpz_mod_ctx_t ctx)
 {
-    slong d = fmpz_mod_mat_nrows(A, ctx);
+    gr_ctx_t gr_ctx;
 
-    if (exp <= 2 || d <= 1)
-    {
-        if (exp == 0 || d == 0)
-        {
-            fmpz_mod_mat_one(B, ctx);
-        }
-        else if (d == 1)
-        {
-            fmpz_mod_pow_ui(fmpz_mod_mat_entry(B, 0, 0),
-                            fmpz_mod_mat_entry(A, 0, 0), exp, ctx);
-        }
-        else if (exp == 1)
-        {
-            fmpz_mod_mat_set(B, A, ctx);
-        }
-        else if (exp == 2)
-        {
-            fmpz_mod_mat_sqr(B, A, ctx);
-        }
-    }
-    else
-    {
-        fmpz_mod_mat_t T, U;
-        slong i;
-
-        fmpz_mod_mat_init_set(T, A, ctx);
-        fmpz_mod_mat_init(U, d, d, ctx);
-
-        for (i = ((slong) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
-        {
-            fmpz_mod_mat_sqr(U, T, ctx);
-
-            if (exp & (WORD(1) << i))
-                fmpz_mod_mat_mul(T, U, A, ctx);
-            else
-                fmpz_mod_mat_swap(T, U, ctx);
-        }
-
-        fmpz_mod_mat_swap(B, T, ctx);
-        fmpz_mod_mat_clear(T, ctx);
-        fmpz_mod_mat_clear(U, ctx);
-    }
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_pow_ui
+                    ((gr_mat_struct *) B, (const gr_mat_struct *) A, exp,
+                     gr_ctx));
 }
