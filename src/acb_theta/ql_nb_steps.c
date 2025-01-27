@@ -50,20 +50,65 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 
         nb =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
 
+        /* Adapt pattern in light of experimental performance */
         /* See /path/to/flint/build/acb_theta/profile/p-acb_theta_ql_exact */
         if (s == 0)
         {
-            nb -= 5;
-            if (cst)
+            /* Rationale is: acb_modular_theta_sum is so fast that we don't
+               need so many duplication steps. */
+            if (g == 1 && cst)
             {
-                nb -= 2;
+                nb -= 8;
+            }
+            else
+            {
+                nb -= 5;
+            }
+            /* One less step if at least 9 */
+            /* Rationale is: more balance with summation phase */
+            if (nb > 8)
+            {
+                nb -= 1;
+            }
+            /* Never make <= 2 duplication steps. */
+            /* Rationale is: this avoids having the slight overhead of
+               computing distances, etc. */
+            if (nb <= 2)
+            {
+                nb = 0;
             }
         }
         if (s == 1)
         {
-            nb -= 5;
+            /* Rationale is: summation in genus 2 is also quite efficient. */
+            nb -= 1;
+            if (nb < pattern[0])
+            {
+                /* Rationale is: if we use the dimension-lowering strategy, then
+                   one more duplication step will nicely decrease the number of
+                   auxiliary points. */
+                nb = FLINT_MIN(pattern[0] - 1, nb + 2);
+            }
+            /* Never make <= 2 duplication steps. */
+            /* Rationale is: this avoids having the slight overhead of
+               computing distances, etc. */
+            if (nb <= 2)
+            {
+                nb = 0;
+            }
         }
         pattern[s] = FLINT_MAX(0, nb);
+    }
+
+    /* Clean up: make pattern a nonincreasing vector */
+    for (s = g - 1; s >= 1; s--)
+    {
+        pattern[s - 1] = FLINT_MAX(pattern[s - 1], pattern[s]);
+    }
+    /* This seems to work experimentally. */
+    if (g >= 2 && pattern[1] == 0)
+    {
+        pattern[0] = FLINT_MAX(0, pattern[0] - 1);
     }
 
     arb_clear(x);
