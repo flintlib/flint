@@ -422,7 +422,7 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 
     Sets *zs* to the concatenation of *nb* random vectors *z* sampled from
     `[-1,1]^g + \tau[-1,1]^g`, i.e. close to being reduced with respect to
-    `tau`. If *exact* is nonzero (true), then the entries of *zs* are set to
+    `\tau`. If *exact* is nonzero (true), then the entries of *zs* are set to
     exact (dyadic) complex numbers.
 
 Theta characteristics
@@ -656,7 +656,7 @@ computed using :func:`acb_theta_eld_init` and :func:`acb_theta_eld_set`.
     Prints a faithful description of `E`. This may be unwieldy in high
     dimensions.
 
-.. function:: void acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_eld_distances(arb_ptr ds, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
     Sets *ds* to the concatenation of the following *nb* vectors of length
     `2^g`: for each input vector `z`, we compute `\mathrm{Dist}_\tau(-Y^{-1}y,
@@ -668,11 +668,6 @@ computed using :func:`acb_theta_eld_init` and :func:`acb_theta_eld_set`.
     `\mathbb{Z}^g + \tfrac{a}{2}` providing an upper bound on the distance,
     then enumerate all the points in the ellipsoid of that radius to find all
     the closer points, if any.
-
-.. function:: slong acb_theta_agm_addprec(const arb_t d)
-
-    Returns an integer that is close to `d/\log(2)` if *d* is
-    finite and of reasonable size, and otherwise returns 0.
 
 Error bounds in summation algorithms
 -------------------------------------------------------------------------------
@@ -758,6 +753,11 @@ where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of
     n^Tz))`, where the `k_j` and `n_j` denotes the `j`-th entry in
     *tup* and *n* respectively. The vector *tup* may be *NULL*, which is
     understood to mean the zero tuple. This is only used for testing.
+
+.. function:: slong acb_theta_sum_addprec(const arb_t d)
+
+    Returns an integer that is close to `d/\log(2)` if *d* is
+    finite and of reasonable size, and otherwise returns 0.
 
 Context structures in summation algorithms
 -------------------------------------------------------------------------------
@@ -1005,7 +1005,7 @@ instead.
     In this function, the absolute error radius we add on
     `\widetilde{\theta}_{a,0}(z,\tau)` from the tail of the exponential series
     depend on `a`. The amount of precision added is controlled by *distances*,
-    which could be computed as in :func:`acb_theta_agm_distances` (although
+    which could be computed as in :func:`acb_theta_eld_distances` (although
     other values sometimes make sense, such as 0.) Since this vector is the
     same for all vectors *z*, this internal function makes the most sense when
     the different values of *z* differ by real vectors.
@@ -1075,7 +1075,7 @@ approximations to make the correct choice.
 .. function:: void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 
     Assuming that *d0* and *d* are obtained as the result of
-    :func:`acb_theta_agm_distances` on `(0,\tau)` and `(z,\tau)` respectively,
+    :func:`acb_theta_eld_distances` on `(0,\tau)` and `(z,\tau)` respectively,
     performs the same computation as :func:`acb_theta_agm_mul` on the vectors
     *a0* and *a* with a different management of error bounds. The resulting
     error bounds on *res* will be tighter when the absolute value of `a_k` is
@@ -1093,7 +1093,7 @@ approximations to make the correct choice.
     working precision, and finally add `e^{-d_k} (m_0 \varepsilon + m
     \varepsilon_0 + \varepsilon\varepsilon_0)` to the error bound on the
     `k`-th entry of *res*. This is valid for the following reason:
-    keeping notation from :func:`acb_theta_agm_distances`, for each `b\in
+    keeping notation from :func:`acb_theta_eld_distances`, for each `b\in
     \{0,1\}^g`, the sum
 
         .. math::
@@ -1211,7 +1211,7 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
 
     - `(z,\tau)` should be an exact element of `\mathbb{C}^g\times
       \mathcal{H}_g` (ideally reduced)
-    - *distances* should be the output of :func:`acb_theta_agm_distances` on
+    - *distances* should be the output of :func:`acb_theta_eld_distances` on
       this pair
     - *s* should be an integer between `1` and `g-1`; we will reduce the
       evaluation of theta functions from dimension `g` to dimension `s`
@@ -1289,7 +1289,7 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
     vector in `\mathbb{C}^g`. The rest of the input is as follows:
 
     - *distances* should be the concatenation of *nb* vectors of length `2^g`
-      computed by :func:`acb_theta_agm_distances` for each pair `(z,\tau)`.
+      computed by :func:`acb_theta_eld_distances` for each pair `(z,\tau)`.
     - *nb_steps* should be the number of times we wish to apply the duplication
       formulas before falling back to either the summation algorithms or the
       dimension-lowering strategy.
@@ -1936,10 +1936,10 @@ in *E* nor any of its children.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_agm_distances
+    ./build/acb_theta/test/main acb_theta_eld_distances
 
 Checks that when `y = Y \tfrac{a}{2}` for some theta characteristic `a`, the
-result of :func:`acb_theta_agm_distances` on `(z,\tau)` contains zero in its
+result of :func:`acb_theta_eld_distances` on `(z,\tau)` contains zero in its
 `a`-th entry.
 
 .. code-block:: bash
@@ -2046,7 +2046,7 @@ contains the squared theta values `\theta_{0,b}^2(2z,2\tau)`.
 
 Generates random `\tau` and `z` at working precision *prec*, computes the
 associated vectors of distances *d0* and *d* using
-:func:`acb_theta_agm_distances`, and constructs vectors *a0* and *a* with
+:func:`acb_theta_eld_distances`, and constructs vectors *a0* and *a* with
 entries of the form `x e^{-t}` where `x` is uniformly random with `|x|\leq 1`
 (generated by :func:`acb_urandom`) and *t* is the corresponding entry of *d0*
 (resp. *d*). Calls :func:`acb_theta_agm_mul_tight` at a lower precision
