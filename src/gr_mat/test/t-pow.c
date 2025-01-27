@@ -39,7 +39,7 @@ TEST_FUNCTION_START(gr_mat_pow, state)
         for (i = 0; i < e; i++)
             GR_MUST_SUCCEED(gr_mat_mul(C, C, A, ctx));
 
-        if (!gr_mat_equal(C, B, ctx))
+        if (gr_mat_equal(C, B, ctx) == T_FALSE)
         {
             flint_printf("FAIL: results not equal\n");
             fflush(stdout);
@@ -48,7 +48,7 @@ TEST_FUNCTION_START(gr_mat_pow, state)
 
         GR_MUST_SUCCEED(gr_mat_pow_ui(A, A, e, ctx));
 
-        if (!gr_mat_equal(A, B, ctx))
+        if (gr_mat_equal(A, B, ctx) == T_FALSE)
         {
             flint_printf("FAIL: aliasing failed\n");
             fflush(stdout);
