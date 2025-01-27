@@ -170,7 +170,7 @@ _acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr f_prime, sl
             max_rootmag = -WORD_MAX;
             for (i = 0; i < deg; i++)
             {
-                GR_MUST_SUCCEED(gr_set_other(t, GR_ENTRY(z, i, sz), fp_ctx, acb_ctx));
+                status |= gr_set_other(t, GR_ENTRY(z, i, sz), fp_ctx, acb_ctx);
                 rootmag = _acb_get_mid_mag(t);
                 max_rootmag = FLINT_MAX(rootmag, max_rootmag);
             }
@@ -186,7 +186,7 @@ _acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr f_prime, sl
         max_correction = -ARF_PREC_EXACT;
         for (i = 0; i < deg; i++)
         {
-            GR_MUST_SUCCEED(gr_set_other(t, GR_ENTRY(w, i, sz), fp_ctx, acb_ctx));
+            status |= gr_set_other(t, GR_ENTRY(w, i, sz), fp_ctx, acb_ctx);
             correction = _acb_get_mid_mag(t);
             max_correction = FLINT_MAX(correction, max_correction);
         }
