@@ -335,11 +335,12 @@ truth_t gr_mat_is_upper_triangular(const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_mul_diag(gr_mat_t C, const gr_mat_t A, const gr_vec_t D, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_diag_mul(gr_mat_t C, const gr_vec_t D, const gr_mat_t A, gr_ctx_t ctx);
 
-/* xxx: needed for method typedefs */
-#ifdef GR_H
-WARN_UNUSED_RESULT int gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_op jet_func, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_func_param_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_scalar_op jet_func, gr_srcptr c, gr_ctx_t ctx);
-#endif
+/* xxx: typedefed in gr.h which is not included */
+typedef int ((*__gr_method_vec_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*__gr_method_vec_scalar_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_ptr));
+
+WARN_UNUSED_RESULT int gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, __gr_method_vec_op jet_func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_func_param_jordan(gr_mat_t res, const gr_mat_t A, __gr_method_vec_scalar_op jet_func, gr_srcptr c, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);

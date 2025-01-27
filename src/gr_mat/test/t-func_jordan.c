@@ -12,10 +12,35 @@
 #include "test_helpers.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
+#include "fmpz_mat.h"
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_GR_FUNCTION_START(gr_mat_exp, state, count_success, count_domain, count_unable)
+static int
+_my_polynomial_jet(gr_ptr res, gr_srcptr x, slong len, gr_poly_t f, gr_ctx_t ctx)
+{
+    slong i;
+    int status = GR_SUCCESS;
+    gr_poly_t g;
+    ulong c = 1;
+
+    gr_poly_init(g, ctx);
+    status |= gr_poly_set(g, f, ctx);
+
+    for (i = 0; i < len; i++)
+    {
+        c *= FLINT_MAX(1, i);
+        status |= gr_poly_evaluate(GR_ENTRY(res, i, ctx->sizeof_elem), g, x, ctx);
+        status |= gr_div_ui(GR_ENTRY(res, i, ctx->sizeof_elem),
+                            GR_ENTRY(res, i, ctx->sizeof_elem), c, ctx);
+        status |= gr_poly_derivative(g, g, ctx);
+    }
+
+    gr_poly_clear(g, ctx);
+    return status;
+}
+
+TEST_GR_FUNCTION_START(gr_mat_func_jordan, state, count_success, count_domain, count_unable)
 {
     slong iter;
 
@@ -24,8 +49,8 @@ TEST_GR_FUNCTION_START(gr_mat_exp, state, count_success, count_domain, count_una
         slong n;
         gr_ctx_t ctx;
         gr_mat_t A, B, C;
+        gr_poly_t f;
         int status = GR_SUCCESS;
-        int which;
 
         while (1)
         {
@@ -38,13 +63,15 @@ TEST_GR_FUNCTION_START(gr_mat_exp, state, count_success, count_domain, count_una
         if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);
         else
-            n = n_randint(state, 6);
-
-        which = n_randint(state, 4);
+            n = n_randint(state, 8);
 
         gr_mat_init(A, n, n, ctx);
         gr_mat_init(B, n, n, ctx);
         gr_mat_init(C, n, n, ctx);
+
+        gr_poly_init(f, ctx);
+
+        GR_MUST_SUCCEED(gr_poly_randtest(f, state, 1 + n_randint(state, 5), ctx));
 
         if (n_randint(state, 2))
         {
@@ -59,23 +86,16 @@ TEST_GR_FUNCTION_START(gr_mat_exp, state, count_success, count_domain, count_una
             fmpq_mat_clear(Q);
         }
 
-        if (which & 1)
-            status = gr_mat_log(B, A, ctx);
-        else
-            status = gr_mat_log_jordan(B, A, ctx);
+        status |= gr_mat_func_param_jordan(B, A, (gr_method_vec_scalar_op) _my_polynomial_jet, (gr_srcptr) f, ctx);
 
         if (status == GR_SUCCESS)
-        {
-            if (which & 3)
-                status = gr_mat_exp_jordan(C, B, ctx);
-            else
-                status = gr_mat_exp(C, B, ctx);
-        }
+            status |= gr_mat_gr_poly_evaluate(C, f, A, ctx);
 
-        if (status == GR_SUCCESS && gr_mat_equal(A, C, ctx) == T_FALSE)
+        if (status == GR_SUCCESS && gr_mat_equal(B, C, ctx) == T_FALSE)
         {
             flint_printf("FAIL\n");
             gr_ctx_println(ctx);
+            flint_printf("f = "), gr_poly_print(f, ctx); flint_printf("\n");
             flint_printf("A = "), gr_mat_print(A, ctx); flint_printf("\n");
             flint_printf("B = "), gr_mat_print(B, ctx); flint_printf("\n");
             flint_printf("C = "), gr_mat_print(C, ctx); flint_printf("\n");
@@ -89,6 +109,8 @@ TEST_GR_FUNCTION_START(gr_mat_exp, state, count_success, count_domain, count_una
         gr_mat_clear(A, ctx);
         gr_mat_clear(B, ctx);
         gr_mat_clear(C, ctx);
+
+        gr_poly_clear(f, ctx);
 
         gr_ctx_clear(ctx);
     }
