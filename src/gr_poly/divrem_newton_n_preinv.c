@@ -45,7 +45,9 @@ gr_poly_divrem_newton_n_preinv(gr_poly_t Q,
                                           const gr_poly_t Binv,
                                           gr_ctx_t ctx)
 {
-    slong lenA = A->length, lenB = B->length, lenBinv = Binv->length;
+    slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
+    slong lenBinv = Binv->length;
+    gr_poly_t tQ, tR;
     gr_ptr q, r;
     int status = GR_SUCCESS;
 
@@ -64,17 +66,19 @@ gr_poly_divrem_newton_n_preinv(gr_poly_t Q,
 
     if (Q == A || Q == B || Q == Binv)
     {
-        GR_TMP_INIT_VEC(q, lenA - lenB + 1, ctx);
+        gr_poly_init2(tQ, lenQ, ctx);
+        q = tQ->coeffs;
     }
     else
     {
-        gr_poly_fit_length(Q, lenA - lenB + 1, ctx);
+        gr_poly_fit_length(Q, lenQ, ctx);
         q = Q->coeffs;
     }
 
     if (R == A || R == B || R == Binv)
     {
-        GR_TMP_INIT_VEC(r, lenB - 1, ctx);
+        gr_poly_init2(tR, lenB - 1, ctx);
+        r = tR->coeffs;
     }
     else
     {
@@ -82,22 +86,22 @@ gr_poly_divrem_newton_n_preinv(gr_poly_t Q,
         r = R->coeffs;
     }
 
-    status |= _gr_poly_divrem_newton_n_preinv(q, r, A->coeffs, lenA,
-                                               B->coeffs, lenB, Binv->coeffs,
-                                               lenBinv, ctx);
+    status |= _gr_poly_divrem_newton_n_preinv(q, r, A->coeffs, lenA, B->coeffs, lenB, Binv->coeffs, lenBinv, ctx);
 
     if (Q == A || Q == B || Q == Binv)
     {
-        GR_TMP_CLEAR_VEC(Q->coeffs, Q->alloc, ctx);
-        Q->coeffs = q;
-        Q->alloc = lenA - lenB + 1;
+        gr_poly_swap(tQ, Q, ctx);
+        gr_poly_clear(tQ, ctx);
+    }
+    else
+    {
+        _gr_poly_set_length(Q, lenQ, ctx);
     }
 
     if (R == A || R == B || R == Binv)
     {
-        GR_TMP_CLEAR_VEC(R->coeffs, R->alloc, ctx);
-        R->coeffs = r;
-        R->alloc = lenB - 1;
+        gr_poly_swap(tR, R, ctx);
+        gr_poly_clear(tR, ctx);
     }
 
     _gr_poly_set_length(Q, lenA - lenB + 1, ctx);

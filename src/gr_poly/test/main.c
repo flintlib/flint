@@ -24,10 +24,12 @@
 #include "t-div_divconquer.c"
 #include "t-divexact.c"
 #include "t-div_newton.c"
+#include "t-div_newton_n_preinv.c"
 #include "t-divrem_basecase.c"
 #include "t-divrem.c"
 #include "t-divrem_divconquer.c"
 #include "t-divrem_newton.c"
+#include "t-divrem_newton_n_preinv.c"
 #include "t-div_series.c"
 #include "t-evaluate.c"
 #include "t-evaluate_horner.c"
@@ -92,10 +94,12 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_div_divconquer),
     TEST_FUNCTION(gr_poly_divexact),
     TEST_FUNCTION(gr_poly_div_newton),
+    TEST_FUNCTION(gr_poly_div_newton_n_preinv),
     TEST_FUNCTION(gr_poly_divrem_basecase),
     TEST_FUNCTION(gr_poly_divrem),
     TEST_FUNCTION(gr_poly_divrem_divconquer),
     TEST_FUNCTION(gr_poly_divrem_newton),
+    TEST_FUNCTION(gr_poly_divrem_newton_n_preinv),
     TEST_FUNCTION(gr_poly_div_series),
     TEST_FUNCTION(gr_poly_evaluate),
     TEST_FUNCTION(gr_poly_evaluate_horner),

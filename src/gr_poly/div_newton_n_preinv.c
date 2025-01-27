@@ -66,6 +66,9 @@ gr_poly_div_newton_n_preinv(gr_poly_t Q,
     if (Alen < Blen)
         return gr_poly_zero(Q, ctx);
 
+    if (Alen > 2 * Blen - 2)
+        return GR_UNABLE;
+
     Qlen = Alen - Blen + 1;
 
     if (Q == A || Q == B)
