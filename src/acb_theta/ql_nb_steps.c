@@ -81,7 +81,7 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
         if (s == 1)
         {
             /* Rationale is: summation in genus 2 is also quite efficient. */
-            nb -= 1;
+            nb -= 2;
             if (nb < pattern[0])
             {
                 /* Rationale is: if we use the dimension-lowering strategy, then

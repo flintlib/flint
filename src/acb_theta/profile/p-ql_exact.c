@@ -36,6 +36,7 @@ int main(int argc, char * argv[])
     acb_mat_t tau;
     acb_ptr z, th;
     slong j, k, l, m;
+    int useful;
 
     if (argc < 7)
     {
@@ -104,9 +105,20 @@ int main(int argc, char * argv[])
                 }
             }
 
+            useful = 1;
             for (j = 0; j < g; j++)
             {
-                test_pattern[j] = FLINT_MAX(0, pattern[j] + delta[j]);
+                test_pattern[j] = pattern[j] + delta[j];
+                if (test_pattern[j] < 0
+                    || (j > 0 && test_pattern[j] > test_pattern[j - 1]))
+                {
+                    useful = 0;
+                    break;
+                }
+            }
+            if (!useful)
+            {
+                continue;
             }
 
             flint_printf("Testing pattern", delta);
@@ -146,7 +158,7 @@ int main(int argc, char * argv[])
             flint_printf("\nAt prec = %wd, best pattern had t = %f ms:", prec, tmin);
             for (j = 0; j < g; j++)
             {
-                flint_printf(" %wd", FLINT_MAX(0, pattern[j] + best_delta[j]));
+                flint_printf(" %wd", pattern[j] + best_delta[j]);
             }
             flint_printf("\nCompared to suggested pattern with t = %f ms\n", tref);
         }
