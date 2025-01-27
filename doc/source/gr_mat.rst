@@ -293,7 +293,7 @@ Arithmetic
 
 .. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
               int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
-              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, onst fmpz_t e, gr_ctx_t ctx)
+              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t e, gr_ctx_t ctx)
 
 .. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
               int gr_mat_scalar_add(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
@@ -780,9 +780,18 @@ Matrix functions
               int gr_mat_pow_fmpq_jordan(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
               int gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
 
-    Compute `A^c` using Jordan decomposition by default. The non-Jordan
+    Compute `A^c` using Jordan decomposition. The non-Jordan
     methods also check for small integer exponents and delegate those
     to the standard powering method.
+
+.. function:: int gr_mat_sqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_rsqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
+    Compute a square root `A^{1/2}` or a reciprocal square root `A^{-1/2}`.
+    Currently the only implemented algorithm is the Jordan decomposition.
+    Warning: this will often fail and return ``GR_UNABLE`` when the
+    scalar type is not an algebraically closed field, even if the matrix
+    is a perfect square.
 
 
 Hessenberg form

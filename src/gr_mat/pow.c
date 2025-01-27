@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2025 Lars Göttgens
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,6 +14,7 @@
 #include "fmpz.h"
 #include "fmpq.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_mat.h"
 
 int
@@ -57,7 +59,7 @@ gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong exp, gr_ctx_t ctx)
         gr_ctx_t mctx;
 
         gr_ctx_init_matrix_ring(mctx, ctx, d);
-        status |= gr_pow_ui(res, mat, exp, mctx);
+        status |= gr_generic_pow_ui(res, mat, exp, mctx);
         gr_ctx_clear(mctx);
     }
 
@@ -100,7 +102,7 @@ gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t exp, gr_ctx_t ctx
         gr_ctx_t mctx;
 
         gr_ctx_init_matrix_ring(mctx, ctx, d);
-        status |= gr_pow_fmpz(res, mat, exp, mctx);
+        status |= gr_generic_pow_fmpz(res, mat, exp, mctx);
         gr_ctx_clear(mctx);
     }
 
@@ -173,9 +175,17 @@ gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
     /* we don't look for fmpz because a floating-point exponent
        could be something huge */
     if (gr_get_si(&n, c, ctx) == GR_SUCCESS)
+    {
         return gr_mat_pow_si(res, A, n, ctx);
+    }
     else
-        return gr_mat_pow_scalar_jordan(res, A, c, ctx);
+    {
+        int status = gr_mat_pow_scalar_jordan(res, A, c, ctx);
+
+        /* We cannot conclude nonexistence of a power just
+           because the Jordan algorithm failed. */
+        return (status == GR_SUCCESS) ? GR_SUCCESS : GR_UNABLE;
+    }
 }
 
 int
@@ -227,5 +237,29 @@ gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t A, const fmpq_t c, gr_ctx_t ctx)
     if (fmpz_is_one(fmpq_denref(c)))
         return gr_mat_pow_fmpz(res, A, fmpq_numref(c), ctx);
     else
-        return gr_mat_pow_fmpq_jordan(res, A, c, ctx);
+    {
+        int status = gr_mat_pow_fmpq_jordan(res, A, c, ctx);
+
+        /* We cannot conclude nonexistence of an Nth root just
+           because the Jordan algorithm failed. */
+        return (status == GR_SUCCESS) ? GR_SUCCESS : GR_UNABLE;
+    }
+}
+
+int
+gr_mat_sqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+{
+    fmpq_t c;
+    *fmpq_numref(c) = 1;
+    *fmpq_denref(c) = 2;
+    return gr_mat_pow_fmpq(res, A, c, ctx);
+}
+
+int
+gr_mat_rsqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+{
+    fmpq_t c;
+    *fmpq_numref(c) = -1;
+    *fmpq_denref(c) = 2;
+    return gr_mat_pow_fmpq(res, A, c, ctx);
 }

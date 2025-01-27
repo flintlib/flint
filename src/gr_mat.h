@@ -353,6 +353,9 @@ WARN_UNUSED_RESULT int gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcp
 WARN_UNUSED_RESULT int gr_mat_pow_fmpq_jordan(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_sqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_rsqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_norm_max(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_norm_1(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_norm_inf(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
