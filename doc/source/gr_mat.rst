@@ -752,11 +752,27 @@ Jordan decomposition
 Matrix functions
 -------------------------------------------------------------------------------
 
+.. function:: int gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_op jet_func, gr_ctx_t ctx)
+              int gr_mat_func_param_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_scalar_op jet_func, gr_srcptr c, gr_ctx_t ctx)
+
+    Computes the matrix function `f(A)` using Jordan decomposition.
+    The user supplies ``int jet_func(gr_ptr r, gr_srcptr x, slong n, gr_ctx_t ctx)`` which given a scalar
+    `x` writes the jet `f(x), f'(x), \ldots, f^{(n-1)} / (n-1)!` to
+    the array `r`.
+
+    The *param* version takes as input a function with
+    signature ``int jet_func(gr_ptr r, gr_srcptr x, slong n, gr_srcptr c, gr_ctx_t ctx)`` for evaluating
+    a function `f(x, c)` depending on an extra parameter `c`.
+    Although ``c`` is nominally passed as a ``gr_srcptr``,
+    it can be a void pointer to arbitrary data that ``jet_func`` knows
+    how to handle.
+
 .. function:: int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
 
 .. function:: int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
 
 Hessenberg form
 -------------------------------------------------------------------------------

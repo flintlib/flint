@@ -25,6 +25,7 @@
 #include "t-det_fflu.c"
 #include "t-det_lu.c"
 #include "t-diagonalization.c"
+#include "t-exp.c"
 #include "t-hadamard.c"
 #include "t-hessenberg.c"
 #include "t-hessenberg_gauss.c"
@@ -76,6 +77,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_det_fflu),
     TEST_FUNCTION(gr_mat_det_lu),
     TEST_FUNCTION(gr_mat_diagonalization),
+    TEST_FUNCTION(gr_mat_exp),
     TEST_FUNCTION(gr_mat_hadamard),
     TEST_FUNCTION(gr_mat_hessenberg),
     TEST_FUNCTION(gr_mat_hessenberg_gauss),
