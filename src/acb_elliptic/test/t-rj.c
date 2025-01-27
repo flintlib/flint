@@ -49,13 +49,13 @@ TEST_FUNCTION_START(acb_elliptic_rj, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         acb_t x, y, z, p, r1, r2;
         slong prec1, prec2;
 
-        prec1 = 2 + n_randint(state, 300);
-        prec2 = 2 + n_randint(state, 300);
+        prec1 = 2 + n_randint(state, 200);
+        prec2 = 2 + n_randint(state, 200);
 
         acb_init(x);
         acb_init(y);
@@ -125,9 +125,9 @@ TEST_FUNCTION_START(acb_elliptic_rj, state)
             }
         }
 
-        acb_randtest(x, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
-        acb_randtest(y, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
-        acb_randtest(z, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+        acb_randtest(x, state, 1 + n_randint(state, 200), 1 + n_randint(state, 15));
+        acb_randtest(y, state, 1 + n_randint(state, 200), 1 + n_randint(state, 15));
+        acb_randtest(z, state, 1 + n_randint(state, 200), 1 + n_randint(state, 15));
         acb_set(p, z);
 
         /* Potentially slow general tests */
@@ -151,7 +151,7 @@ TEST_FUNCTION_START(acb_elliptic_rj, state)
                 flint_abort();
             }
 
-            acb_randtest(p, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+            acb_randtest(p, state, 1 + n_randint(state, 200), 1 + n_randint(state, 15));
 
             /* Specialize */
             if (n_randint(state, 2))

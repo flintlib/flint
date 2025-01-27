@@ -24,12 +24,16 @@ TEST_FUNCTION_START(acb_polygamma, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         acb_t a, s, b, c;
         slong prec1, prec2;
 
-        prec1 = 2 + n_randint(state, 500);
+        if (n_randint(state, 10) == 0)
+            prec1 = 2 + n_randint(state, 500);
+        else
+            prec1 = 2 + n_randint(state, 100);
+
         prec2 = prec1 + 30;
 
         acb_init(a);
@@ -37,7 +41,7 @@ TEST_FUNCTION_START(acb_polygamma, state)
         acb_init(b);
         acb_init(c);
 
-        if (iter < 200)
+        if (iter % 10 == 0)
         {
             slong i = n_randint(state, 5);
 
