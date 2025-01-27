@@ -338,6 +338,7 @@ void
 acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, slong prec)
 {
+    slong g = acb_mat_nrows(tau);
     int use_sum = acb_theta_jet_all_use_sum(tau, _acb_vec_is_zero(zs, nb * g), prec);
 
     if (nb <= 0)

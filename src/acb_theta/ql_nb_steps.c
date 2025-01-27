@@ -53,7 +53,7 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
         /* See /path/to/flint/build/acb_theta/profile/p-acb_theta_ql_exact */
         if (s == 0)
         {
-            nb -= 6;
+            nb -= 5;
             if (cst)
             {
                 nb -= 2;

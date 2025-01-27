@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
 {
     flint_rand_t state;
     slong g, n, prec, s;
-    int all, cst;
+    int cst;
     slong * pattern;
     slong * test_pattern;
     slong delta;
@@ -33,7 +33,7 @@ int main(int argc, char * argv[])
     acb_ptr z, th;
     slong j, k;
 
-    if (argc < 6)
+    if (argc < 5)
     {
         return usage(argv);
     }
@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
     {
         acb_siegel_randtest_vec_reduced(z + g, state, 1, tau, 1, prec);
     }
-    acb_theta_ql_nb_steps(pattern, tau, prec);
+    acb_theta_ql_nb_steps(pattern, tau, cst, prec);
 
     flint_printf("g = %wd, prec = %wd, cst = %wd, s = %wd\n", g, prec, cst, s);
     flint_printf("Values of tau, z:\n");
