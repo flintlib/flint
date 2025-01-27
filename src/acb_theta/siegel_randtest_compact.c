@@ -28,7 +28,7 @@ acb_siegel_randtest_compact(acb_mat_t tau, flint_rand_t state, int exact, slong 
     while(!res)
     {
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        arb_sub_si(y, acb_imagref(acb_mat_entry(tau, g - 1, g - 1)), 100, prec);
+        arb_sub_si(y, acb_imagref(acb_mat_entry(tau, g - 1, g - 1)), 2, prec);
         res = arb_is_negative(y);
     }
 

@@ -76,14 +76,14 @@ acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong pre
     }
     else
     {
-        /* Use sum_bound to avoid returning NaN */
+        /* Use local_bound to avoid returning NaN */
         arb_t c, rho;
         arb_init(c);
         arb_init(rho);
 
         for (j = 0; j < nb; j++)
         {
-            acb_theta_sum_bound(c, rho, zs + j * g, tau, 0);
+            acb_theta_local_bound(c, rho, zs + j * g, tau, 0);
             arb_zero_pm_one(acb_realref(&th[j]));
             arb_zero_pm_one(acb_imagref(&th[j]));
             acb_mul_arb(&th[j], &th[j], c, prec);

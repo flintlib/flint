@@ -113,7 +113,7 @@ void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt);
 void acb_theta_eld_print(const acb_theta_eld_t E);
 
-void acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb,
+void acb_theta_eld_distances(arb_ptr ds, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
 
 /* Error bounds in summation algorithms */
@@ -123,6 +123,7 @@ void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcp
     slong ord, slong prec);
 void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
     const slong * n, slong prec);
+slong acb_theta_sum_addprec(const arb_t d);
 
 /* Context structures in summation algorithms */
 
@@ -171,13 +172,12 @@ void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong
 
 void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
 void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
-slong acb_theta_agm_addprec(const arb_t d);
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
 /* Quasilinear algorithms on exact, reduced input */
 
-int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec);
+int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec);
 
 int acb_theta_ql_lower_dim(acb_ptr * new_zs, acb_ptr * cofactors, slong ** pts,
     slong * nb, arf_t err, slong * fullprec, acb_srcptr z, const acb_mat_t tau,
@@ -196,7 +196,7 @@ int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
 /* Main functions on reduced input */
 
-void acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
+void acb_theta_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
 void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     acb_srcptr dth, slong ord, slong prec);
 

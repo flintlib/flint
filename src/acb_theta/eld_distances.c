@@ -160,7 +160,7 @@ acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t cho, slong prec)
 }
 
 void
-acb_theta_agm_distances(arb_ptr ds, acb_srcptr zs, slong nb,
+acb_theta_eld_distances(arb_ptr ds, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);

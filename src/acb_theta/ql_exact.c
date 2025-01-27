@@ -250,8 +250,8 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
         {
             flint_printf("%wd -> %wd\n", j, easy_steps[j]);
         }
-    }
-    flint_printf("distances:\n");
+        } */
+    /* flint_printf("distances:\n");
     _arb_vec_printd(distances, nb * n, 5); */
 
     if (res && (split > 0))
@@ -419,7 +419,7 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
     if (res) /* th_init is set; now perform steps */
     {
         /* flint_printf("(ql_exact_steps) got th_init:\n");
-           _acb_vec_printd(th_init, 3 * n * nb, 5);*/
+           _acb_vec_printd(th_init, 3 * n * nb, 5); */
 
         acb_theta_ql_steps(th, th_init, rts, rts_all, nb, nb_steps, distances,
             easy_steps, all, g, hp);
@@ -476,7 +476,7 @@ int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     if (nb_steps > 0 || shifted_prec)
     {
-        acb_theta_agm_distances(distances, zs, nb, tau, lp);
+        acb_theta_eld_distances(distances, zs, nb, tau, lp);
     }
 
     if (nb_steps == 0 && split == 0)

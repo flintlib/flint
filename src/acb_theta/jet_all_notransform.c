@@ -169,7 +169,7 @@ acb_theta_jet_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb,
     hprec = prec;
     for (l = 0; l < nb; l++)
     {
-        acb_theta_sum_bound(&c[l], &rho[l], zs + l * g, tau, ord);
+        acb_theta_local_bound(&c[l], &rho[l], zs + l * g, tau, ord);
         acb_theta_jet_finite_diff_radius(arb_midref(&eps[l]), arb_midref(&err[l]),
             &c[l], &rho[l], ord, g, prec);
 
@@ -306,7 +306,7 @@ acb_theta_jet_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb,
 }
 
 static int
-acb_theta_jet_all_use_sum(const acb_mat_t tau, slong prec)
+acb_theta_jet_all_use_sum(const acb_mat_t tau, int cst, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong * pattern;
@@ -315,7 +315,7 @@ acb_theta_jet_all_use_sum(const acb_mat_t tau, slong prec)
 
     pattern = flint_malloc(g * sizeof(slong));
 
-    b = acb_theta_ql_nb_steps(pattern, tau, prec);
+    b = acb_theta_ql_nb_steps(pattern, tau, cst, prec);
 
     /* Do not use sum only when at least 3 steps are needed */
     res = 1;
@@ -338,7 +338,8 @@ void
 acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, slong prec)
 {
-    int use_sum = acb_theta_jet_all_use_sum(tau, prec);
+    slong g = acb_mat_nrows(tau);
+    int use_sum = acb_theta_jet_all_use_sum(tau, _acb_vec_is_zero(zs, nb * g), prec);
 
     if (nb <= 0)
     {

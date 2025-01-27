@@ -46,7 +46,7 @@ TEST_FUNCTION_START(acb_theta_ql_setup, state)
         acb_siegel_randtest_vec_reduced(zs + g, state, nb - 1, tau, 1, prec);
 
         /* Compute distances */
-        acb_theta_agm_distances(distances, zs, nb, tau, prec);
+        acb_theta_eld_distances(distances, zs, nb, tau, prec);
 
         res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps, zs, nb, tau,
             distances, nb_steps, all, prec);
@@ -72,7 +72,9 @@ TEST_FUNCTION_START(acb_theta_ql_setup, state)
                     {
                         for (a = 0; a < n * n; a++)
                         {
-                            if (acb_contains_zero(&rts_all[j * n * n + a]))
+                            if (acb_contains_zero(&rts_all[j * n * n + a])
+                                && (acb_theta_char_is_even(a, g)
+                                    || !_acb_vec_is_zero(zs + j * g, g)))
                             {
                                 flint_printf("FAIL (rts_all)\n");
                                 flint_printf("j = %wd, k = %wd, a = %wd, all = %wd\n", j, k, a, all);

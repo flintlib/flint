@@ -1,8 +1,6 @@
 /*
     Copyright (C) 2023 Jean Kieffer
-
     This file is part of FLINT.
-
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 3 of the License, or
@@ -17,7 +15,7 @@
 /* This is the all-important function to increase performance. */
 
 int
-acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec)
+acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong lp = ACB_THETA_LOW_PREC;
@@ -29,7 +27,6 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec)
     arb_init(t);
     arb_mat_init(cho, g, g);
     arb_mat_init(yinv, g, g);
-
     acb_siegel_cho_yinv(cho, yinv, tau, lp);
 
     for (s = 0; s < g; s++)

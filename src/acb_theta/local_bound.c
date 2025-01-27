@@ -18,7 +18,7 @@
    around z is bounded above by c0 exp((c1 + c2 rho)^2) */
 
 static void
-acb_theta_sum_bound_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_mat_t tau)
+acb_theta_local_bound_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_mat_t tau)
 {
     slong lp = ACB_THETA_LOW_PREC;
     slong g = acb_mat_nrows(tau);
@@ -87,7 +87,7 @@ acb_theta_sum_bound_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_mat
    order ord */
 
 void
-acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
+acb_theta_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 {
     slong lp = ACB_THETA_LOW_PREC;
     slong b = ord + 1;
@@ -101,7 +101,7 @@ acb_theta_sum_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong
     arf_init(x);
 
     /* Get ci */
-    acb_theta_sum_bound_ci(c0, c1, c2, z, tau);
+    acb_theta_local_bound_ci(c0, c1, c2, z, tau);
 
     /* Set rho to positive root of 2 c_2 rho (c_1 + c_2 rho) = 2 b - 1 */
     arb_mul(t, c1, c2, lp);

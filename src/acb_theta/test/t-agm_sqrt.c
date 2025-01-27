@@ -42,11 +42,10 @@ TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
         }
 
         acb_sqr(x, rt, prec);
-        acb_one(t);
+        arb_zero_pm_one(acb_realref(t));
         acb_mul_2exp_si(t, t, -lowprec);
         acb_add_si(t, t, 1, lowprec);
         acb_mul(rt_low, rt, t, lowprec);
-
         acb_theta_agm_sqrt(t, x, rt_low, 1, prec);
         acb_get_rad_ubound_arf(err, t, prec);
 
@@ -77,12 +76,6 @@ TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
             acb_printd(rt_low, 10);
             flint_printf("\n");
             flint_abort();
-        }
-
-        if (iter % 10 == 1)
-        {
-            acb_randtest(rt_low, state, prec, mag_bits);
-            acb_theta_agm_sqrt(t, x, rt_low, 1, prec);
         }
 
         acb_clear(rt);

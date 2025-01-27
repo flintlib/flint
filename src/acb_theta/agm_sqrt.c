@@ -18,6 +18,12 @@ acb_theta_agm_sqrt_entry(acb_t res, const acb_t a, const acb_t rt, slong prec)
     acb_t y1, y2;
     int t1, t2;
 
+    if (acb_is_zero(rt))
+    {
+        acb_zero(res);
+        return;
+    }
+
     acb_init(y1);
     acb_init(y2);
 

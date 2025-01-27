@@ -62,12 +62,12 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
     }
     else
     {
-        /* Use sum_bound to avoid returning NaN */
+        /* Use local_bound to avoid returning NaN */
         arb_t c, rho;
         arb_init(c);
         arb_init(rho);
 
-        acb_theta_sum_bound(c, rho, zero, tau, 0);
+        acb_theta_local_bound(c, rho, zero, tau, 0);
         for (k = 0; k < nb * n2; k++)
         {
             arb_zero_pm_one(acb_realref(&dth[k]));

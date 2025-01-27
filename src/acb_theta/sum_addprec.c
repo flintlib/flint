@@ -13,7 +13,7 @@
 #include "acb_theta.h"
 
 slong
-acb_theta_agm_addprec(const arb_t d2)
+acb_theta_sum_addprec(const arb_t d2)
 {
     arb_t x;
     slong prec = ACB_THETA_LOW_PREC;

@@ -52,7 +52,7 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
 
         acb_siegel_randtest_compact(tau, state, 1, prec);
         acb_siegel_randtest_vec_reduced(zs + g, state, nb - 1, tau, 1, prec);
-        acb_theta_agm_distances(distances, zs, nb, tau, prec);
+        acb_theta_eld_distances(distances, zs, nb, tau, prec);
         res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps, zs, nb, tau,
             distances, nb_steps, all, prec);
         hp = prec + guard * nb_steps;

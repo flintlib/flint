@@ -45,7 +45,7 @@ TEST_FUNCTION_START(acb_theta_sum_a0_tilde, state)
         acb_siegel_randtest_vec(z, state, g, prec);
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx, z, ctx_tau, prec);
-        acb_theta_agm_distances(d, z, 1, tau, prec);
+        acb_theta_eld_distances(d, z, 1, tau, prec);
 
         /* Call sum_a0_tilde at precision mprec, test against sum_all_tilde */
         acb_theta_sum_a0_tilde(th1, ctx, 1, ctx_tau, d, mprec);

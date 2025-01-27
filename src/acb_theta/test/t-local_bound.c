@@ -13,7 +13,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_sum_bound, state)
+TEST_FUNCTION_START(acb_theta_local_bound, state)
 {
     slong iter;
 
@@ -54,7 +54,7 @@ TEST_FUNCTION_START(acb_theta_sum_bound, state)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_sum_bound(c, rho, z, tau, ord);
+        acb_theta_local_bound(c, rho, z, tau, ord);
 
         if (!arb_is_finite(rho) || !arb_is_finite(c))
         {
@@ -78,7 +78,7 @@ TEST_FUNCTION_START(acb_theta_sum_bound, state)
 
         acb_theta_ctx_tau_set(ctx_tau, tau, lp);
         acb_theta_ctx_z_set(ctx, x, ctx_tau, lp);
-        acb_theta_agm_distances(d, x, 1, tau, lp);
+        acb_theta_eld_distances(d, x, 1, tau, lp);
         acb_theta_sum_all_tilde(th, ctx, 1, ctx_tau, d, lp);
         _acb_vec_scalar_mul_arb(th, th, n2, &ctx->u, lp);
 
