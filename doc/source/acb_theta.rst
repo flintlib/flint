@@ -1184,11 +1184,12 @@ for theta values at `z\neq 0`, and for all characteristics:
 We always assume in this section that the inputs `(z,\tau)` are provided as
 exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
 
-.. function:: int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec)
+.. function:: int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 
     Determines how many duplication steps we should perform to evaluate theta
     functions at `\tau` at precision *prec*, and at which steps we should fall
-    back to lower dimensions, if any.
+    back to lower dimensions, if any. The flag *cst* should be set to nonzero
+    (true) iff theta functions at `z\neq 0` are to be computed.
 
     The output is stored in *pattern*, a vector of length `g`. Roughly
     speaking, the `j`-th entry of *pattern* is a nonnegative integer `m` such

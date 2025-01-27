@@ -17,7 +17,7 @@
 
 static int usage(char * argv[])
 {
-    flint_printf("usage: %s g prec all cst s\n", argv[0]);
+    flint_printf("usage: %s g prec cst s\n", argv[0]);
     return 1;
 }
 
@@ -41,16 +41,15 @@ int main(int argc, char * argv[])
     g = atol(argv[1]);
     n = 1 << g;
     prec = atol(argv[2]);
-    all = atoi(argv[3]);
-    cst = atoi(argv[4]);
-    s = atol(argv[5]);
+    cst = atoi(argv[3]);
+    s = atol(argv[4]);
 
     flint_rand_init(state);
     pattern = flint_malloc(g * sizeof(slong));
     test_pattern = flint_malloc(g * sizeof(slong));
     acb_mat_init(tau, g, g);
     z = _acb_vec_init(2 * g);
-    th = _acb_vec_init(2 * (all ? n * n : n));
+    th = _acb_vec_init(2 * n * n);
 
     acb_siegel_randtest_compact(tau, state, 1, prec);
     for (j = g - s; j < g; j++)
@@ -67,7 +66,7 @@ int main(int argc, char * argv[])
     }
     acb_theta_ql_nb_steps(pattern, tau, prec);
 
-    flint_printf("g = %wd, prec = %wd, all = %wd, cst = %wd, s = %wd\n", g, prec, all, cst, s);
+    flint_printf("g = %wd, prec = %wd, cst = %wd, s = %wd\n", g, prec, cst, s);
     flint_printf("Values of tau, z:\n");
     acb_mat_printd(tau, 5);
     _acb_vec_printd(z + g, g, 5);
@@ -78,7 +77,7 @@ int main(int argc, char * argv[])
     }
     flint_printf("\n\n");
 
-    for (delta = -6; delta <= 2; delta++)
+    for (delta = -4; delta <= 2; delta++)
     {
         for (j = 0; j < g; j++)
         {
@@ -89,14 +88,14 @@ int main(int argc, char * argv[])
             test_pattern[j] = FLINT_MAX(0, pattern[j] + delta);
         }
 
-        flint_printf("delta = %wd, testing pattern: ", delta);
+        flint_printf("delta = %wd, testing pattern:", delta);
         for (j = 0; j < g; j++)
         {
             flint_printf(" %wd", test_pattern[j]);
         }
         flint_printf("\n");
         TIMEIT_START;
-        acb_theta_ql_exact(th, z, 2, tau, test_pattern, all, 0, prec);
+        acb_theta_ql_exact(th, z, 2, tau, test_pattern, 1, 0, prec);
         TIMEIT_STOP;
         flint_printf("th[0], th[n]: ");
         acb_printd(&th[0], 5);
@@ -110,7 +109,7 @@ int main(int argc, char * argv[])
     flint_free(test_pattern);
     acb_mat_clear(tau);
     _acb_vec_clear(z, g);
-    _acb_vec_clear(th, 2 * (all ? n * n : n));
+    _acb_vec_clear(th, 2 * n * n);
 
     flint_cleanup();
     return 0;

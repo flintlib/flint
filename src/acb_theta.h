@@ -177,7 +177,7 @@ void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
 
 /* Quasilinear algorithms on exact, reduced input */
 
-int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec);
+int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec);
 
 int acb_theta_ql_lower_dim(acb_ptr * new_zs, acb_ptr * cofactors, slong ** pts,
     slong * nb, arf_t err, slong * fullprec, acb_srcptr z, const acb_mat_t tau,

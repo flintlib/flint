@@ -306,7 +306,7 @@ acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t t
 
     pattern = flint_malloc(g * sizeof(slong));
 
-    res = acb_theta_ql_nb_steps(pattern, tau, prec);
+    res = acb_theta_ql_nb_steps(pattern, tau, _acb_vec_is_zero(zs, nb * g), prec);
 
     /* flint_printf("(all_notransform) pattern:");
     for (j = 0; j < g; j++)

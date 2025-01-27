@@ -17,7 +17,7 @@
 /* This is the all-important function to increase performance. */
 
 int
-acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec)
+acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong lp = ACB_THETA_LOW_PREC;
@@ -49,24 +49,19 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec)
         }
 
         nb =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
+
+        /* See /path/to/flint/build/acb_theta/profile/p-acb_theta_ql_exact */
         if (s == 0)
         {
-            if (g == 1)
+            nb -= 6;
+            if (cst)
             {
-                nb -= 7;
-            }
-            else if (g == 2)
-            {
-                nb -= 3;
-            }
-            else if (g <= 5)
-            {
-                nb -= 1;
+                nb -= 2;
             }
         }
-        else
+        if (s == 1)
         {
-            nb += 1;
+            nb -= 5;
         }
         pattern[s] = FLINT_MAX(0, nb);
     }
