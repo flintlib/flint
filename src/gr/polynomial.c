@@ -361,9 +361,57 @@ polynomial_neg(gr_poly_t res, const gr_poly_t mat, gr_ctx_t ctx)
 }
 
 int
+polynomial_add_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+{
+    return gr_poly_add_ui(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_add_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+{
+    return gr_poly_add_si(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_add_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
+{
+    return gr_poly_add_fmpz(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_add_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
+{
+    return gr_poly_add_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
 polynomial_add(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
     return gr_poly_add(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_sub_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+{
+    return gr_poly_sub_ui(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_sub_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+{
+    return gr_poly_sub_si(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_sub_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
+{
+    return gr_poly_sub_fmpz(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_sub_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
+{
+    return gr_poly_sub_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 int
@@ -391,7 +439,7 @@ polynomial_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_
 }
 
 int
-polynomial_mul_fmpq(gr_poly_t res, const gr_poly_t poly, fmpq_t c, gr_ctx_t ctx)
+polynomial_mul_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
 {
     return gr_poly_mul_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
@@ -618,7 +666,15 @@ gr_method_tab_input _gr_poly_methods_input[] =
              before converting to the dense representation, to avoid O(n^2) behavior */
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_NEG,         (gr_funcptr) polynomial_neg},
+    {GR_METHOD_ADD_UI,      (gr_funcptr) polynomial_add_ui},
+    {GR_METHOD_ADD_SI,      (gr_funcptr) polynomial_add_si},
+    {GR_METHOD_ADD_FMPZ,    (gr_funcptr) polynomial_add_fmpz},
+    {GR_METHOD_ADD_FMPQ,    (gr_funcptr) polynomial_add_fmpq},
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
+    {GR_METHOD_SUB_UI,      (gr_funcptr) polynomial_sub_ui},
+    {GR_METHOD_SUB_SI,      (gr_funcptr) polynomial_sub_si},
+    {GR_METHOD_SUB_FMPZ,    (gr_funcptr) polynomial_sub_fmpz},
+    {GR_METHOD_SUB_FMPQ,    (gr_funcptr) polynomial_sub_fmpq},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
     {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul},
     {GR_METHOD_MUL_OTHER,   (gr_funcptr) polynomial_mul_other},
