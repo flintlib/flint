@@ -9,15 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "mag.h"
-
-#ifdef __GNUC__
-# define frexp __builtin_frexp
-# define ldexp __builtin_ldexp
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 void
 mag_sqrt(mag_t y, const mag_t x)

@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
-
-#ifdef __GNUC__
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 /* try to prove that A is not a square */
 static int _is_proved_not_square(

@@ -9,18 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
-
-#ifdef __GNUC__
-# define atan2 __builtin_atan2
-# define cos __builtin_cos
-# define fabs __builtin_fabs
-# define log __builtin_log
-# define pow __builtin_pow
-# define sin __builtin_sin
-#else
-# include <math.h>
-#endif
 
 /* Check if z crosses a branch cut. */
 int

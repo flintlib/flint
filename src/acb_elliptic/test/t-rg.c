@@ -9,15 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "test_helpers.h"
 #include "acb.h"
 #include "acb_elliptic.h"
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-#else
-# include <math.h>
-#endif
 
 /* Test input from Carlson's paper and checked with mpmath. */
 

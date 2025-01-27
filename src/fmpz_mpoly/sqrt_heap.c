@@ -10,12 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifdef __GNUC__
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
-
+#include <math.h>
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "nmod.h"

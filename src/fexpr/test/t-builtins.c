@@ -9,16 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "test_helpers.h"
 #include "calcium.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
-
-#ifdef __GNUC__
-# define strcmp __builtin_strcmp
-#else
-# include <string.h>
-#endif
 
 TEST_FUNCTION_START(fexpr_builtins, state)
 {

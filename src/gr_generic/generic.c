@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpq.h"
 #include "arb.h"
 #include "arith.h"
@@ -20,12 +21,6 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 #include "gr_special.h"
-
-#ifdef __GNUC__
-# define memcpy __builtin_memcpy
-#else
-# include <string.h>
-#endif
 
 int
 gr_generic_ctx_clear(gr_ctx_t ctx)

@@ -9,16 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq.h"
 #include "padic.h"
-
-#ifdef __GNUC__
-# define strcmp __builtin_strcmp
-#else
-# include <string.h>
-#endif
 
 TEST_FUNCTION_START(padic_get_str, state)
 {

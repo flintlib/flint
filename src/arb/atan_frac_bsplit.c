@@ -9,14 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "arb.h"
-
-#ifdef __GNUC__
-# define ceil __builtin_ceil
-# define fabs __builtin_fabs
-#else
-# include <math.h>
-#endif
 
 /* todo: arb arithmetic when sizes exceed prec */
 

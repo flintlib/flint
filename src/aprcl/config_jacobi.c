@@ -9,12 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifdef __GNUC__
-# define log __builtin_log
-#else
-# include <math.h>
-#endif
-
+#include <math.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"

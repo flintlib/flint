@@ -10,12 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifdef __GNUC__
-# define memset __builtin_memset
-#else
-# include <string.h>
-#endif
-
+#include <string.h>
 #include "fmpz.h"
 #include "qsieve.h"
 
