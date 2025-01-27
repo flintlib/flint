@@ -71,7 +71,7 @@ gr_poly_div_newton_n_preinv(gr_poly_t Q,
 
     Qlen = Alen - Blen + 1;
 
-    if (Q == A || Q == B)
+    if (Q == A || Q == B || Q == Binv)
     {
         gr_poly_t t;
         gr_poly_init2(t, Qlen, ctx);

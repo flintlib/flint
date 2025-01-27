@@ -43,7 +43,6 @@ TEST_FUNCTION_START(gr_poly_div_newton_n_preinv, state)
         /* different aliasing cases */
         switch (n_randint(state, 4))
         {
-/*
             case 0:
                 status |= gr_poly_set(Q, A, ctx);
                 status |= gr_poly_div_newton_n_preinv(Q, Q, B, Binv, ctx);
@@ -56,7 +55,6 @@ TEST_FUNCTION_START(gr_poly_div_newton_n_preinv, state)
                 status |= gr_poly_set(Q, Binv, ctx);
                 status |= gr_poly_div_newton_n_preinv(Q, A, B, Q, ctx);
                 break;
-*/
             default:
                 status |= gr_poly_div_newton_n_preinv(Q, A, B, Binv, ctx);
                 break;
