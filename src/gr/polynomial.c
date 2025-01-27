@@ -410,17 +410,17 @@ polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
 }
 
 int
-polynomial_mul_other(gr_poly_t res, const gr_poly_t f, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+polynomial_mul_other(gr_poly_t res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx == POLYNOMIAL_ELEM_CTX(ctx))
     {
-        return gr_poly_mul_scalar(res, f, x, x_ctx);
+        return gr_poly_mul_scalar(res, poly, x, x_ctx);
     }
-    else if (x_ctx->which_ring == GR_CTX_GR_POLY && 
+    else if (x_ctx->which_ring == GR_CTX_GR_POLY &&
         POLYNOMIAL_ELEM_CTX(x_ctx) == POLYNOMIAL_ELEM_CTX(ctx) &&
         !strcmp(POLYNOMIAL_CTX(x_ctx)->var, POLYNOMIAL_CTX(ctx)->var))
     {
-        return polynomial_mul(res, f, x, ctx);
+        return polynomial_mul(res, poly, x, ctx);
     }
     else
     {
@@ -430,7 +430,34 @@ polynomial_mul_other(gr_poly_t res, const gr_poly_t f, gr_srcptr x, gr_ctx_t x_c
         polynomial_init(t, ctx);
         status = polynomial_set_other(t, x, x_ctx, ctx);
         if (status == GR_SUCCESS)
-            status = polynomial_mul(res, f, t, ctx);
+            status = polynomial_mul(res, poly, t, ctx);
+        polynomial_clear(t, ctx);
+        return status;
+    }
+}
+
+int
+polynomial_other_mul(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_poly_t poly, gr_ctx_t ctx)
+{
+    if (x_ctx == POLYNOMIAL_ELEM_CTX(ctx))
+    {
+        return gr_poly_scalar_mul(res, x, poly, x_ctx);
+    }
+    else if (x_ctx->which_ring == GR_CTX_GR_POLY &&
+        POLYNOMIAL_ELEM_CTX(x_ctx) == POLYNOMIAL_ELEM_CTX(ctx) &&
+        !strcmp(POLYNOMIAL_CTX(x_ctx)->var, POLYNOMIAL_CTX(ctx)->var))
+    {
+        return polynomial_mul(res, x, poly, ctx);
+    }
+    else
+    {
+        gr_poly_t t;
+        int status = GR_SUCCESS;
+
+        polynomial_init(t, ctx);
+        status = polynomial_set_other(t, x, x_ctx, ctx);
+        if (status == GR_SUCCESS)
+            status = polynomial_mul(res, t, poly, ctx);
         polynomial_clear(t, ctx);
         return status;
     }
@@ -595,6 +622,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
     {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul},
     {GR_METHOD_MUL_OTHER,   (gr_funcptr) polynomial_mul_other},
+    {GR_METHOD_OTHER_MUL,   (gr_funcptr) polynomial_other_mul},
     {GR_METHOD_MUL_UI,      (gr_funcptr) polynomial_mul_ui},
     {GR_METHOD_MUL_SI,      (gr_funcptr) polynomial_mul_si},
     {GR_METHOD_MUL_FMPZ,    (gr_funcptr) polynomial_mul_fmpz},
