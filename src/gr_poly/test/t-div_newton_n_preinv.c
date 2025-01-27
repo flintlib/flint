@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2023, 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-TEST_FUNCTION_START(gr_poly_div_newton, state)
+TEST_FUNCTION_START(gr_poly_div_newton_n_preinv, state)
 {
     slong iter;
 
@@ -21,14 +21,14 @@ TEST_FUNCTION_START(gr_poly_div_newton, state)
     {
         int status;
         gr_ctx_t ctx;
-        gr_poly_t A, B, Q, R, Q2;
+        gr_poly_t A, B, Binv, Q, Q2;
 
         gr_ctx_init_random(ctx, state);
 
         gr_poly_init(A, ctx);
         gr_poly_init(B, ctx);
+        gr_poly_init(Binv, ctx);
         gr_poly_init(Q, ctx);
-        gr_poly_init(R, ctx);
         gr_poly_init(Q2, ctx);
 
         status = GR_SUCCESS;
@@ -36,44 +36,35 @@ TEST_FUNCTION_START(gr_poly_div_newton, state)
         status |= gr_poly_randtest(A, state, 1 + n_randint(state, 6), ctx);
         status |= gr_poly_randtest(B, state, 1 + n_randint(state, 6), ctx);
         status |= gr_poly_randtest(Q, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(R, state, 1 + n_randint(state, 6), ctx);
 
-        if (n_randint(state, 3) == 0)
-        {
-            status |= gr_poly_mul(A, A, B, ctx);
-            status |= gr_poly_add(A, A, R, ctx);
-        }
+        status |= gr_poly_reverse(Binv, B, B->length, ctx);
+        status |= gr_poly_inv_series(Binv, Binv, B->length, ctx);
 
-        /* test aliasing */
-        switch (n_randint(state, 5))
+        /* different aliasing cases */
+        switch (n_randint(state, 4))
         {
             case 0:
                 status |= gr_poly_set(Q, A, ctx);
-                status |= gr_poly_div_newton(Q, Q, B, ctx);
+                status |= gr_poly_div_newton_n_preinv(Q, Q, B, Binv, ctx);
                 break;
             case 1:
                 status |= gr_poly_set(Q, B, ctx);
-                status |= gr_poly_div_newton(Q, A, B, ctx);
+                status |= gr_poly_div_newton_n_preinv(Q, A, Q, Binv, ctx);
                 break;
             case 2:
-                status |= gr_poly_set(A, B, ctx);
-                status |= gr_poly_div_newton(Q, A, A, ctx);
-                break;
-            case 3:
-                status |= gr_poly_set(A, B, ctx);
-                status |= gr_poly_set(Q, A, ctx);
-                status |= gr_poly_div_newton(Q, Q, Q, ctx);
+                status |= gr_poly_set(Q, Binv, ctx);
+                status |= gr_poly_div_newton_n_preinv(Q, A, B, Q, ctx);
                 break;
             default:
-                status |= gr_poly_div_newton(Q, A, B, ctx);
+                status |= gr_poly_div_newton_n_preinv(Q, A, B, Binv, ctx);
                 break;
         }
 
         if (status == GR_SUCCESS)
         {
-            status |= gr_poly_divrem(Q2, R, A, B, ctx);
+            status |= gr_poly_div(Q2, A, B, ctx);
 
-            if (status == GR_SUCCESS && gr_poly_equal(Q, Q2, ctx) == T_FALSE)
+            if (status == GR_SUCCESS && (gr_poly_equal(Q, Q2, ctx) == T_FALSE))
             {
                 flint_printf("FAIL\n\n");
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
@@ -86,8 +77,8 @@ TEST_FUNCTION_START(gr_poly_div_newton, state)
 
         gr_poly_clear(A, ctx);
         gr_poly_clear(B, ctx);
+        gr_poly_clear(Binv, ctx);
         gr_poly_clear(Q, ctx);
-        gr_poly_clear(R, ctx);
         gr_poly_clear(Q2, ctx);
 
         gr_ctx_clear(ctx);
