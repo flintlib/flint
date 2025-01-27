@@ -34,7 +34,7 @@ TEST_FUNCTION_START(gr_mat_pow, state)
         }
 
         n = n_randint(state, 5);
-        e_ui = n_randint(state, 5);
+        e_ui = n_randint(state, 20);
 
         gr_mat_init(A, n, n, ctx);
         gr_mat_init(B, n, n, ctx);
@@ -53,10 +53,6 @@ TEST_FUNCTION_START(gr_mat_pow, state)
         if (gr_mat_equal(C, B, ctx) == T_FALSE)
         {
             flint_printf("FAIL: results not equal (ui)\n");
-            flint_printf("e %d", e_ui);
-            gr_mat_print(A, ctx);
-            gr_mat_print(C, ctx);
-            gr_mat_print(B, ctx);
             fflush(stdout);
             flint_abort();
         }
@@ -117,6 +113,7 @@ TEST_FUNCTION_START(gr_mat_pow, state)
             }
             if (status_pow == GR_SUCCESS)
             {
+                fmpz_init(neg_e_fmpz);
                 fmpz_neg(neg_e_fmpz, e_fmpz);
                 GR_MUST_SUCCEED(gr_mat_pow_fmpz(C, Ainv, neg_e_fmpz, ctx));
                 
