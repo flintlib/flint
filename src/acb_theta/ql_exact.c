@@ -476,7 +476,7 @@ int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     if (nb_steps > 0 || shifted_prec)
     {
-        acb_theta_agm_distances(distances, zs, nb, tau, lp);
+        acb_theta_eld_distances(distances, zs, nb, tau, lp);
     }
 
     if (nb_steps == 0 && split == 0)

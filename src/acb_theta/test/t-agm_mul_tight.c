@@ -47,7 +47,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         /* Generate distances, not too crazy */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_siegel_randtest_vec_reduced(z + g, state, 1, tau, 0, prec);
-        acb_theta_agm_distances(ds, z, 2, tau, prec);
+        acb_theta_eld_distances(ds, z, 2, tau, prec);
 
         /* Generate values */
         for (k = 0; k < n; k++)

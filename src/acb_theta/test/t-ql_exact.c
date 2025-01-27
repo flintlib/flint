@@ -55,7 +55,7 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
 
         if (shifted_prec)
         {
-            acb_theta_agm_distances(distances, zs, nb, tau, prec);
+            acb_theta_eld_distances(distances, zs, nb, tau, prec);
         }
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         for (j = 0; j < nb; j++)

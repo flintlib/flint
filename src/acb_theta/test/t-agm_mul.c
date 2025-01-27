@@ -49,7 +49,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx0, z, ctx_tau, prec);
         acb_theta_ctx_z_set(ctx, z + g, ctx_tau, prec);
-        acb_theta_agm_distances(ds, z, 2, tau, prec);
+        acb_theta_eld_distances(ds, z, 2, tau, prec);
 
         /* Make test vector using sum_a0_tilde squared */
         acb_theta_sum_a0_tilde(test, ctx0, 1, ctx_tau, ds, prec);

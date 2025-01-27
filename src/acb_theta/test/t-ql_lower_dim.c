@@ -59,7 +59,7 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
 
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx_z, z, ctx_tau, prec);
-        acb_theta_agm_distances(d, z, 1, tau, ACB_THETA_LOW_PREC);
+        acb_theta_eld_distances(d, z, 1, tau, ACB_THETA_LOW_PREC);
         if (all)
         {
             acb_theta_sum_all_tilde(th, ctx_z, 1, ctx_tau, d, prec);
@@ -83,7 +83,7 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
         acb_mat_window_init(tau0, tau, 0, 0, s, s);
 
         acb_theta_ctx_tau_set(ctx_tau0, tau0, prec);
-        acb_theta_agm_distances(d0, z0s, nb, tau0, ACB_THETA_LOW_PREC);
+        acb_theta_eld_distances(d0, z0s, nb, tau0, ACB_THETA_LOW_PREC);
         for (j = 0; j < nb; j++)
         {
             acb_theta_ctx_z_set(ctx_z0, z0s + j * s, ctx_tau0, prec);
