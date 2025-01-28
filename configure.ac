@@ -1175,6 +1175,8 @@ AC_SUBST(PIC_FLAG,$pic_flag)
 
 FLINT_CHECK_CPU_SET_T([AC_DEFINE([FLINT_USES_CPUSET],1,Define if system has cpu_set_t)])
 
+FLINT_CHECK_PRAGMAS
+
 # ensure alloca works
 AC_MSG_CHECKING([if alloca works])
 AC_LINK_IFELSE([AC_LANG_PROGRAM(

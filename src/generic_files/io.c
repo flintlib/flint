@@ -697,14 +697,10 @@ print_flint_type:
 printpercentcurlybracket:
         /* Invalid use of "%{FLINT_TYPE}". As we are currently pointed to
          * "FLINT_TYPE}", we let fprintf take care of printing "%{". */
-#ifdef __GNUC__
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wformat"
-#endif
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_FORMAT
         tmp = fprintf(fs, "%{");
-#ifdef __GNUC__
-# pragma GCC diagnostic pop
-#endif
+DIAGNOSTIC_POP
         if (tmp < 0)
         {
             res = tmp;
