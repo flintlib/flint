@@ -160,7 +160,8 @@ Set and transpose
 
 .. function:: void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
 
-    Set ``B`` to the transpose of ``A``.
+    Sets ``B`` to the transpose of ``A``. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
 
 
 Conversions

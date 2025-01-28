@@ -174,9 +174,10 @@ Basic row, column and entry operations
 
 .. function:: int gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
-.. function:: int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx)
+.. function:: int gr_mat_transpose(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
-    Sets *B* to the transpose of *A*.
+    Sets ``res`` to the transpose of ``mat``. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
 
 .. function:: int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 

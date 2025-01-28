@@ -262,7 +262,7 @@ Transposition and permutations
 .. function:: void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
-    `B` and `A` may be the same object if and only if the matrix is square.
+    Aliasing is allowed for square matrices.
 
 .. function:: void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 

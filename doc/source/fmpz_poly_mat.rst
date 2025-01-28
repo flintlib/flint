@@ -227,7 +227,8 @@ Transpose
 
 .. function:: void fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 
-    Sets `B` to `A^t`.
+    Sets `B` to `A^t`. The operands must have compatible dimensions.
+    Aliasing is allowed for square matrices.
 
 
 
