@@ -10,6 +10,7 @@
 */
 
 #include <stdlib.h>
+#include <math.h>
 #include "profiler.h"
 #include "ulong_extras.h"
 #include "acb.h"
@@ -79,7 +80,7 @@ int main(int argc, char * argv[])
     acb_mat_printd(tau, 5);
     _acb_vec_printd(z + g, g, 5);
 
-    for (prec = pmin; prec <= pmax; prec *= 2)
+    for (prec = pmin; prec <= pmax; prec = ceil(1.3 * prec))
     {
         acb_theta_ql_nb_steps(pattern, tau, cst, prec);
 
