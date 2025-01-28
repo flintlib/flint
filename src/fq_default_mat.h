@@ -26,6 +26,8 @@
 #include "fq_nmod_mat.h"
 #include "fq_zech_mat.h"
 #include "fq_default.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -292,6 +294,19 @@ fq_default_mat_is_square(const fq_default_mat_t mat,
     else
     {
         return fq_mat_is_square(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
+    }
+}
+
+FQ_DEFAULT_MAT_INLINE void
+fq_default_mat_transpose(fq_default_mat_t B, const fq_default_mat_t A, const fq_default_ctx_t ctx)
+{
+    if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
+    {
+        nmod_mat_transpose(B->nmod, A->nmod);
+    }
+    else
+    {
+        GR_MUST_SUCCEED(gr_mat_transpose((gr_mat_struct *) B, (const gr_mat_struct *) A, FQ_DEFAULT_GR_CTX(ctx)));
     }
 }
 
