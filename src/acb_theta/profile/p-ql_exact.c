@@ -80,7 +80,7 @@ int main(int argc, char * argv[])
     acb_mat_printd(tau, 5);
     _acb_vec_printd(z + g, g, 5);
 
-    for (prec = pmin; prec <= pmax; prec = ceil(1.3 * prec))
+    for (prec = pmin; prec <= pmax; prec = ceil(1.5 * prec))
     {
         acb_theta_ql_nb_steps(pattern, tau, cst, prec);
 

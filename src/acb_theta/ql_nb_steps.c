@@ -57,12 +57,19 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
         {
             /* acb_modular_theta_sum is so fast that we don't need so many
                duplication steps. */
-            nb -= 5;
+            nb -= 3;
+            if (g == 1)
+            {
+                if (nb > 8)
+                {
+                    nb -= 1;
+                }
+            }
         }
         else if (s == 1)
         {
             /* summation in genus 2 is also quite efficient. */
-            nb -= 3;
+            nb -= 2;
         }
         else if (s == 2)
         {
@@ -72,15 +79,17 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
         {
             nb += 1;
         }
-        /* One less step if at least 9 for more balance with summation phase */
-        if (nb > 8)
-        {
-            nb -= 1;
-        }
 
         pattern[s] = nb;
         nb_max = FLINT_MAX(nb_max, nb);
     }
+
+    flint_printf("(ql_nb_steps) rough pattern:");
+    for (s = 0; s < g; s++)
+    {
+        flint_printf(" %wd", pattern[s]);
+    }
+    flint_printf("\n");
 
     /* Start adapting the pattern from s = g-1 downwards. This is because the
       choice of whether to trigger dimension-lowering formulas in low
@@ -90,11 +99,15 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
     for (s = g - 1; s >= 0; s--)
     {
         /* Find out how many duplication steps have been performed so far
-           (could be negative) */
+           (could be negative if s < g - 1) */
         nb = -10;
         for (j = s + 1; j < g; j++)
         {
             nb = FLINT_MAX(nb, pattern[j]);
+        }
+        if (s == g - 1)
+        {
+            nb = 0;
         }
 
         /* Force trigger dimension-lowering at that point ? We only do this if
@@ -108,50 +121,54 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
            dimension-lowering later on. */
         if (pattern[s] < nb_max)
         {
-            pattern[s] = FLINT_MIN(nb_max - 1, pattern[s] + 3);
+            j = FLINT_MIN(nb_max - 1, pattern[s] + 3);
+            if (j <= 1)
+            {
+                j = -1; /* this is to still force nb < 0 */
+            }
+            pattern[s] = j;
+        }
+
+        /* Remove further duplication steps in genus 1 if it doesn't mess with
+           the dimension-lowering strategy (keep it triggered if nb < 0) */
+        if (s == 0 && pattern[s] > nb + 1)
+        {
+            pattern[s] = FLINT_MAX(FLINT_MAX(0, nb) + 1, pattern[s] - 3);
+            nb_max = pattern[s];
+        }
+        /* In the case of genus 1 theta constants, we are even more aggressive
+           in avoiding duplication as acb_modular_theta_sum is even faster */
+        if (s == 0 && nb == 0 && cst)
+        {
+            pattern[s] = FLINT_MAX(FLINT_MAX(0, nb) + 1, pattern[s] - 2);
+            nb_max = pattern[s];
         }
 
         /* Avoid making any duplication steps ? We only do this if the
            suggested number of steps for this s and the total number of steps
-           are small. */
-        if (nb == 0 && pattern[s] <= 2)
+           are small. (If nb < 0, we instead forced duplication to happen.) */
+        if (nb == 0 && pattern[s] >= 1 && pattern[s] <= 2)
         {
-            if (s >= 2 && nb_max <= 1)
+            if ((s >= 2 && nb_max <= 1)
+                || (s <= 1 && nb_max <= 2))
             {
                 for (j = 0; j <= s; j++)
                 {
                     pattern[s] = 0;
                 }
             }
-            else if (s == 1 && nb_max + pattern[s] <= 5)
-            {
-                pattern[0] = FLINT_MAX(pattern[0] - 2, 0);
-                pattern[s] == 0;
-            }
-            else if (s == 0)
+            if (s == 1 && pattern[s] <= 1)
             {
                 pattern[s] = 0;
             }
         }
-        /* In the case of genus 1 theta constants, we are more aggressive in
-           avoiding duplication, because acb_modular_theta_sum is faster for constants */
-        if (s == 0 && nb == 0 && cst)
-        {
-            pattern[0] = pattern[0] - 3;
-            if (pattern[0] <= 2)
-            {
-                pattern[0] = 0;
-            }
-        }
-        /* One less duplication step in for s = 0 if it doesn't mess with
-           dimension lowering */
-        if (s == 0 && pattern[0] > nb + 1)
-        {
-            pattern[0] -= 1;
-        }
 
         /* Make pattern a nonincreasing vector */
-        pattern[s] = FLINT_MAX(0, nb);
+        if (s < g - 1)
+        {
+            pattern[s] = FLINT_MAX(nb, pattern[s]);
+        }
+        flint_printf("s = %wd, set pattern to %wd\n", s, pattern[s]);
     }
 
     /* Clean up: make pattern a nonnegative vector */
