@@ -939,7 +939,8 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
 
     if (len <= 1)
     {
-        res[0] = (mod.n != 1);
+        if (len == 1)
+            res[0] = (mod.n != 1);
         return GR_SUCCESS;
     }
 
