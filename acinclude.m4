@@ -197,6 +197,90 @@ AS_VAR_IF([flint_cv_check_cpu_set_t],"yes",
     [m4_default([$2], :)])
 ])
 
+dnl  FLINT_CHECK_PRAGMA(string,define,[prestring])
+dnl  ---------------------------------
+
+AC_DEFUN([FLINT_CHECK_PRAGMA],[
+save_CFLAGS="$CFLAGS"
+CFLAGS="-Werror -Wunknown-pragmas"
+
+if test "x$3" != "x";
+then
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([${pragma_cc_prefix}$3${pragma_cc_suffix}
+${pragma_cc_prefix}$1${pragma_cc_suffix}],[])],[tmp="yes"],[tmp="no"])
+else
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([${pragma_cc_prefix}$1${pragma_cc_suffix}],[])],
+    [tmp="yes"],[tmp="no"])
+fi
+
+CFLAGS="$save_CFLAGS"
+
+if test "$tmp" = "yes";
+then
+    AC_DEFINE_UNQUOTED($2,${pragma_cc_prefix}$1${pragma_cc_suffix})
+fi
+])
+
+dnl  FLINT_CHECK_PRAGMAS
+dnl  -------------------
+dnl  Checks pragmas available and push them into config header.
+
+AC_DEFUN([FLINT_CHECK_PRAGMAS],
+[AC_REQUIRE([FLINT_CC_IS_GCC])
+AC_REQUIRE([FLINT_CC_IS_CLANG])
+
+AH_VERBATIM([PRAGMAS],
+[/* Define the following to what diagnostic pragmas your compiler allows.
+   These are used to silence certain warnings. */
+#define DIAGNOSTIC_PUSH
+#define DIAGNOSTIC_POP
+#define DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
+#define DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
+#define DIAGNOSTIC_IGNORE_FORMAT
+#define DIAGNOSTIC_IGNORE_DANGLING_POINTER
+#define DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE
+#define DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS
+#define DIAGNOSTIC_IGNORE_UNUSED_VARIABLE
+
+/* Define the following to what optimization pragmas your compiler allows. */
+#define PUSH_OPTIONS
+#define POP_OPTIONS
+#define OPTIMIZE_O2
+#define OPTIMIZE_UNROLL_LOOPS])
+
+flint_cv_pragma_compiler=""
+if test "$flint_cv_cc_is_clang" = "yes";
+then
+    flint_cv_pragma_compiler="clang"
+elif test "$flint_cv_cc_is_gcc" = "yes";
+then
+    flint_cv_pragma_compiler="GCC"
+fi
+
+if test "x$flint_cv_pragma_compiler" != "x";
+then
+    pragma_cc_prefix='_Pragma("'"$flint_cv_pragma_compiler "
+    pragma_cc_suffix='")'
+
+    FLINT_CHECK_PRAGMA([diagnostic push],[DIAGNOSTIC_PUSH])
+    FLINT_CHECK_PRAGMA([diagnostic pop],[DIAGNOSTIC_POP],[diagnostic push])
+
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wincompatible-function-pointer-types\"],[DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wdiscarded-qualifiers\"],[DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wformat\"],[DIAGNOSTIC_IGNORE_FORMAT])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wdangling-pointer\"],[DIAGNOSTIC_IGNORE_DANGLING_POINTER])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wcast-function-type\"],[DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Woverlength-strings\"],[DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wunused-variable\"],[DIAGNOSTIC_IGNORE_UNUSED_VARIABLE])
+
+    FLINT_CHECK_PRAGMA([push_options],[PUSH_OPTIONS])
+    FLINT_CHECK_PRAGMA([pop_options],[POP_OPTIONS])
+
+    FLINT_CHECK_PRAGMA([optimize (\"O2\")],[OPTIMIZE_O2])
+    FLINT_CHECK_PRAGMA([optimize (\"unroll-loops\")],[OPTIMIZE_UNROLL_LOOPS])
+fi
+])
+
 
 dnl  FLINT_CHECK_NTL([action-if-true],[action-if-false])
 dnl  -----------------------
