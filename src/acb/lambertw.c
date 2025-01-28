@@ -139,11 +139,7 @@ acb_lambertw_principal_d(acb_t res, const acb_t z)
 
     for (k = 0; k < maxk; k++)
     {
-#if __GNUC__
-        t = __builtin_exp(wa);
-#else
         t = exp(wa);
-#endif
         ewa = t * cos(wb);
         ewb = t * sin(wb);
         t = (ewa * wa - ewb * wb); q = t + ewa; t -= za;

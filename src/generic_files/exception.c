@@ -39,18 +39,11 @@ void flint_set_abort(void (*func)(void))
     pthread_mutex_lock(&abort_func_lock);
 #endif
 
-#ifdef __GNUC__
-# pragma GCC diagnostic push
-# if defined(__clang__)
-#  pragma GCC diagnostic ignored "-Wincompatible-function-pointer-types"
-# elif defined(__GNUC__)
-#  pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-# endif
-#endif
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
+DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
     abort_func = func;
-#ifdef __GNUC__
-# pragma GCC diagnostic pop
-#endif
+DIAGNOSTIC_POP
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&abort_func_lock);
