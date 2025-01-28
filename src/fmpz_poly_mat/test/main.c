@@ -35,6 +35,7 @@
 #include "t-sqrlow.c"
 #include "t-sub.c"
 #include "t-trace.c"
+#include "t-transpose.c"
 #include "t-window_init_clear.c"
 #include "t-zero.c"
 
@@ -66,6 +67,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_mat_sqrlow),
     TEST_FUNCTION(fmpz_poly_mat_sub),
     TEST_FUNCTION(fmpz_poly_mat_trace),
+    TEST_FUNCTION(fmpz_poly_mat_transpose),
     TEST_FUNCTION(fmpz_poly_mat_window_init_clear),
     TEST_FUNCTION(fmpz_poly_mat_zero)
 };
