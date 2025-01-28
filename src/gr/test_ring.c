@@ -20,6 +20,11 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize ("Os")
+#endif
+
 typedef int ((*gr_test_function)(gr_ctx_t, flint_rand_t, int));
 
 int
@@ -4475,3 +4480,9 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
         flint_printf("===============================================================================\n\n");
     }
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
+
+

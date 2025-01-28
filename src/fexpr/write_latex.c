@@ -15,6 +15,11 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize ("Os")
+#endif
+
 void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
 int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr);
 
@@ -4096,3 +4101,8 @@ fexpr_get_str_latex(const fexpr_t expr, ulong flags)
     fexpr_write_latex(t, expr, flags);
     return t->s;
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
+

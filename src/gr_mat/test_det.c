@@ -12,6 +12,11 @@
 #include "gr.h"
 #include "gr_mat.h"
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize ("Os")
+#endif
+
 void gr_mat_test_det(gr_method_mat_unary_op_get_scalar det_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
@@ -119,3 +124,8 @@ void gr_mat_test_det(gr_method_mat_unary_op_get_scalar det_impl, flint_rand_t st
             gr_ctx_clear(ctx);
     }
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
+

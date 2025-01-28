@@ -12,6 +12,11 @@
 #include "gr.h"
 #include "gr_mat.h"
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize ("Os")
+#endif
+
 void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
@@ -102,3 +107,8 @@ void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong
             gr_ctx_clear(ctx);
     }
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
+

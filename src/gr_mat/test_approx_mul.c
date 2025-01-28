@@ -12,6 +12,11 @@
 #include "gr.h"
 #include "gr_mat.h"
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize ("Os")
+#endif
+
 void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
@@ -230,3 +235,8 @@ void gr_mat_test_approx_mul_pos_entrywise_accurate(gr_method_mat_binary_op mul_i
             gr_ctx_clear(ctx);
     }
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
+

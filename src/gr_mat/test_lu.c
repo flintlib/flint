@@ -14,6 +14,11 @@
 #include "gr_mat.h"
 #include "fmpz_mat.h"
 
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC push_options
+#pragma GCC optimize ("Os")
+#endif
+
 static void perm(gr_mat_t A, slong * P, gr_ctx_t ctx)
 {
     slong i;
@@ -254,3 +259,8 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
             gr_ctx_clear(ctx);
     }
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC pop_options
+#endif
+
