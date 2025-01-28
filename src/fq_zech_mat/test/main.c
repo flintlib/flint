@@ -34,6 +34,7 @@
 #include "t-solve_tril.c"
 #include "t-solve_triu.c"
 #include "t-submul.c"
+#include "t-transpose.c"
 #include "t-vec_mul.c"
 #include "t-window_init_clear.c"
 #include "t-zero.c"
@@ -65,6 +66,7 @@ test_struct tests[] =
     TEST_FUNCTION(fq_zech_mat_solve_tril),
     TEST_FUNCTION(fq_zech_mat_solve_triu),
     TEST_FUNCTION(fq_zech_mat_submul),
+    TEST_FUNCTION(fq_zech_mat_transpose),
     TEST_FUNCTION(fq_zech_mat_vec_mul),
     TEST_FUNCTION(fq_zech_mat_window_init_clear),
     TEST_FUNCTION(fq_zech_mat_zero)

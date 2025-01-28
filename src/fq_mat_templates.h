@@ -189,6 +189,9 @@ void TEMPLATE(T, mat_randtriu)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
 
 /* Transpose */
 
+void TEMPLATE(T, mat_transpose)(TEMPLATE(T, mat_t) B, const TEMPLATE(T, mat_t) A,
+                           const TEMPLATE(T, ctx_t) ctx);
+
 /* Addition and subtraction */
 
 void TEMPLATE(T, mat_add)(TEMPLATE(T, mat_t) C,

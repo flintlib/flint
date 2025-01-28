@@ -73,6 +73,7 @@
 #include "fq_mat_templates/sub.c"
 #include "fq_mat_templates/submul.c"
 #include "fq_mat_templates/swap.c"
+#include "fq_mat_templates/transpose.c"
 #include "fq_mat_templates/vec_mul.c"
 #include "fq_mat_templates/window_clear.c"
 #include "fq_mat_templates/window_init.c"
