@@ -1369,7 +1369,7 @@ class gr_ctx:
             >>> QQ.log(2)
             Traceback (most recent call last):
               ...
-            FlintUnableError: failed to compute log(x) in {Rational field (fmpq)} for {x = 2}
+            FlintDomainError: log(x) is not an element of {Rational field (fmpq)} for {x = 2}
             >>> RR.log(2)
             [0.693147180559945 +/- 4.12e-16]
             >>> CC.log(1j)
@@ -1400,6 +1400,16 @@ class gr_ctx:
             [[0, 0, 1],
             [0, 1, 0],
             [1, 0, 0]]
+            >>> Mat(QQ)([[0,1,0,0],[0,0,1,0],[0,0,0,1],[-1,4,-6,4]]).log()
+            [[-11/6, 3, -3/2, 1/3],
+            [-1/3, -1/2, 1, -1/6],
+            [1/6, -1, 1/2, 1/3],
+            [-1/3, 3/2, -3, 11/6]]
+            >>> _.exp()
+            [[0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1],
+            [-1, 4, -6, 4]]
 
         """
         return ctx._unary_op(x, libgr.gr_log, "log($x)")
@@ -3880,6 +3890,18 @@ class gr_elem:
             FlintDomainError: sqrt(x) is not an element of {Real numbers (arb, prec = 53)} for {x = -1}
             >>> RF(-1).sqrt()
             nan
+            >>> Mat(QQ)([[1,0,1],[1,1,0],[0,0,1]]).sqrt()
+            [[1, 0, 1/2],
+            [1/2, 1, -1/8],
+            [0, 0, 1]]
+            >>> Mat(QQbar)([[1,2,3],[4,5,6],[7,8,9]]).sqrt()
+            [[Root a = 0.449756 + 0.762279*I of 132*a^4+100*a^2+81, Root a = 0.552622 + 0.206796*I of 99*a^4-52*a^2+12, Root a = 0.655487 - 0.348687*I of 1188*a^4-732*a^2+361],
+            [Root a = 1.01852 + 0.0841514*I of 33*a^4-68*a^2+36, Root a = 1.25147 + 0.0228291*I of 99*a^4-310*a^2+243, Root a = 1.48442 - 0.0384931*I of 297*a^4-1308*a^2+1444],
+            [Root a = 1.58729 - 0.593976*I of 12*a^4-52*a^2+99, Root a = 1.95032 - 0.161138*I of 9*a^4-68*a^2+132, Root a = 2.31335 + 0.271701*I of 108*a^4-1140*a^2+3179]]
+            >>> _ ** 2
+            [[1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]]
 
         """
         return self._unary_op(self, libgr.gr_sqrt, "sqrt($x)")
@@ -3890,6 +3912,11 @@ class gr_elem:
 
             >>> QQ(25).rsqrt()
             1/5
+            >>> Mat(QQ)([[1,0,1],[1,1,0],[0,0,1]]).rsqrt()
+            [[1, 0, -1/2],
+            [-1/2, 1, 3/8],
+            [0, 0, 1]]
+
         """
         return self._unary_op(self, libgr.gr_rsqrt, "rsqrt($x)")
 
@@ -4075,7 +4102,7 @@ class gr_elem:
             >>> QQ(1).exp()
             Traceback (most recent call last):
               ...
-            FlintUnableError: failed to compute exp(x) in {Rational field (fmpq)} for {x = 1}
+            FlintDomainError: exp(x) is not an element of {Rational field (fmpq)} for {x = 1}
             >>> QQser.gen().exp()
             1 + x + (1/2)*x^2 + (1/6)*x^3 + (1/24)*x^4 + (1/120)*x^5 + O(x^6)
 
@@ -4099,7 +4126,7 @@ class gr_elem:
             >>> QQ(1).expm1()
             Traceback (most recent call last):
               ...
-            FlintUnableError: failed to compute expm1(x) in {Rational field (fmpq)} for {x = 1}
+            FlintDomainError: expm1(x) is not an element of {Rational field (fmpq)} for {x = 1}
             >>> PowerSeriesModRing(RR, 4).gen().expm1()
             x + 0.5000000000000000*x^2 + [0.1666666666666667 +/- 7.04e-17]*x^3 (mod x^4)
             >>> (PowerSeriesModRing(RR, 2).gen() + 1).expm1()
@@ -4142,7 +4169,7 @@ class gr_elem:
             >>> QQ(2).log()
             Traceback (most recent call last):
               ...
-            FlintUnableError: failed to compute log(x) in {Rational field (fmpq)} for {x = 2}
+            FlintDomainError: log(x) is not an element of {Rational field (fmpq)} for {x = 2}
             >>> RF(2).log()
             0.6931471805599453
             >>> QQser(QQx([1, 1])).log()
@@ -5214,7 +5241,7 @@ class gr_poly(gr_elem):
             >>> QQx([1,1]).exp_series(2)
             Traceback (most recent call last):
               ...
-            FlintUnableError: failed to compute f.exp_series(n) in {Ring of polynomials over Rational field (fmpq)} for {f = 1 + x}, {n = 2}
+            FlintDomainError: f.exp_series(n) is not an element of {Ring of polynomials over Rational field (fmpq)} for {f = 1 + x}, {n = 2}
             >>> RRx([1,1]).exp_series(2)
             [2.718281828459045 +/- 5.41e-16] + [2.718281828459045 +/- 5.41e-16]*x
             >>> RRx([2,3]).log_series(3).exp_series(3)
@@ -5529,7 +5556,6 @@ class gr_mat(gr_elem):
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return res
-
 
     def norm_1(self):
         """
@@ -7152,6 +7178,15 @@ def test_matrix():
     C = M([[3,4],[5,6]])
     D = M([[4,5],[6,7]])
     assert MM([[A,B],[C,D]]) * MM([[B,C],[D,A]]) == MM([[A*B + B*D, A*C + B*A], [C*B + D**2, C**2 + D*A]])
+
+    A = MatCC([[5,2],[3,4]])
+    with optimistic_logic:
+        assert (A ** 2) ** (QQ(1) / 2) == A
+        assert (A ** 3) ** (RR(1) / 3) == A
+        assert (A ** CC.i()) ** (1 / CC.i()) == A
+        assert A ** (-5) == A ** ZZ(-5)
+        assert A ** QQ(-5) == (A ** ZZ(5)).inv()
+        assert A ** (-5) == ((A.log() * 5).exp()).inv()
 
 def test_fq():
     Fq = FiniteField_fq(3, 5)

@@ -290,8 +290,10 @@ Arithmetic
     exact division by two.
 
 .. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
 .. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
-.. function:: int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t e, gr_ctx_t ctx)
+              int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
+              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t e, gr_ctx_t ctx)
 
 .. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
               int gr_mat_scalar_add(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
@@ -752,11 +754,45 @@ Jordan decomposition
 Matrix functions
 -------------------------------------------------------------------------------
 
+.. function:: int gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_op jet_func, gr_ctx_t ctx)
+              int gr_mat_func_param_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_scalar_op jet_func, gr_srcptr c, gr_ctx_t ctx)
+
+    Computes the matrix function `f(A)` using Jordan decomposition.
+    The user supplies ``int jet_func(gr_ptr r, gr_srcptr x, slong n, gr_ctx_t ctx)`` which given a scalar
+    `x` writes the jet `f(x), f'(x), \ldots, f^{(n-1)} / (n-1)!` to
+    the array `r`.
+
+    The *param* version takes as input a function with
+    signature ``int jet_func(gr_ptr r, gr_srcptr x, slong n, gr_srcptr c, gr_ctx_t ctx)`` for evaluating
+    a function `f(x, c)` depending on an extra parameter `c`.
+    Although ``c`` is nominally passed as a ``gr_srcptr``,
+    it can be a void pointer to arbitrary data that ``jet_func`` knows
+    how to handle.
+
 .. function:: int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
 
 .. function:: int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
+.. function:: int gr_mat_pow_scalar_jordan(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_pow_fmpq_jordan(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
+              int gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
+
+    Compute `A^c` using Jordan decomposition. The non-Jordan
+    methods also check for small integer exponents and delegate those
+    to the standard powering method.
+
+.. function:: int gr_mat_sqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_rsqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
+    Compute a square root `A^{1/2}` or a reciprocal square root `A^{-1/2}`.
+    Currently the only implemented algorithm is the Jordan decomposition.
+    Warning: this will often fail and return ``GR_UNABLE`` when the
+    scalar type is not an algebraically closed field, even if the matrix
+    is a perfect square.
+
 
 Hessenberg form
 -------------------------------------------------------------------------------
