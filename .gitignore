@@ -30,6 +30,7 @@ doc/latex/flint-manual.*
 !doc/latex/flint-manual.tex
 doc/latex/input/*
 doc/latex/create_doc
+doc/source/*.rst
 libflint*
 *.suo
 *.pyc
