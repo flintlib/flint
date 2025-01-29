@@ -104,6 +104,7 @@ TEST_FUNCTION_START(nfixed_mat_mul_classical, state)
         flint_free(B);
         flint_free(C);
         flint_free(D);
+        flint_free(t);
     }
 
     TEST_FUNCTION_END(state);

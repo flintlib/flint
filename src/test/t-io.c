@@ -1013,6 +1013,8 @@ TEST_FUNCTION_START(flint_fprintf, state)
         ACB8_CLEAR(xacb8);
         MPZ1_CLEAR(xmpz1);
         MPZ2_CLEAR(xmpz2);
+        MPQ1_CLEAR(xmpq1);
+        MPQ2_CLEAR(xmpq2);
 
         SLONG_VEC_CLEAR(xslong_vec);
         NMOD_VEC_CLEAR(xnmod_vec);

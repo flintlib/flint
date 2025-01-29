@@ -687,6 +687,7 @@ gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, c
     else
     {
         fq_nmod_ctx_clear(fq_nmod_ctx);
+        flint_free(fq_zech_ctx);
         flint_free(fq_nmod_ctx);
         return GR_DOMAIN;
     }
