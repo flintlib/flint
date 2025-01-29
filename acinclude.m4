@@ -201,7 +201,7 @@ dnl  FLINT_CHECK_PRAGMA(string,define,[prestring])
 dnl  ---------------------------------
 
 AC_DEFUN([FLINT_CHECK_PRAGMA],[
-save_CFLAGS="$CFLAGS"
+tmp_CFLAGS="$CFLAGS"
 CFLAGS="-Werror -Wunknown-pragmas"
 
 if test "x$3" != "x";
@@ -213,7 +213,7 @@ else
     [tmp="yes"],[tmp="no"])
 fi
 
-CFLAGS="$save_CFLAGS"
+CFLAGS="$tmp_CFLAGS"
 
 if test "$tmp" = "yes";
 then
