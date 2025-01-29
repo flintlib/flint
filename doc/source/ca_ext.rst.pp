@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _ca-ext:
 
 **ca_ext.h** -- real and complex extension numbers

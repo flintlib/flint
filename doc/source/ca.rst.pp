@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _ca:
 
 **ca.h** -- exact real and complex numbers

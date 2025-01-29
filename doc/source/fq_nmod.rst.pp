@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq-nmod:
 
 **fq_nmod.h** -- finite fields (word-size characteristic)

@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _index-generic:
 
 **Generic rings** : *detailed table of contents*

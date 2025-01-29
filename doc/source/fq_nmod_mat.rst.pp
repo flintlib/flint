@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq-nmod-mat:
 
 **fq_nmod_mat.h** -- matrices over finite fields (word-size characteristic)

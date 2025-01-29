@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _dlog:
 
 **dlog.h** -- discrete logarithms mod ulong primes

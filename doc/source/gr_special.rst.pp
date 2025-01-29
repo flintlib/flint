@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _gr-special:
 
 **gr_special.h** -- special arithmetic and transcendental functions

@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq-vec:
 
 **fq_vec.h** -- vectors over finite fields

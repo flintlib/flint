@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _dirichlet:
 
 **dirichlet.h** -- Dirichlet characters

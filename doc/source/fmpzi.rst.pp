@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fmpzi:
 
 **fmpzi.h** -- Gaussian integers

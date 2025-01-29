@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _building:
 
 **Building, testing and installing**

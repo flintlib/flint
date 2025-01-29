@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _mpfr-vec:
 
 **mpfr_vec.h** -- vectors of MPFR floating-point numbers

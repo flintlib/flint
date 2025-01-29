@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _hypgeom:
 
 **hypgeom.h** -- support for hypergeometric series

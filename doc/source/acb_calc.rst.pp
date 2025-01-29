@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _acb-calc:
 
 **acb_calc.h** -- calculus with complex-valued functions

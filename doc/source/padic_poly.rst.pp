@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _padic-poly:
 
 **padic_poly.h** -- polynomials over p-adic numbers

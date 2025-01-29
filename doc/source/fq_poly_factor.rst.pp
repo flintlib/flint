@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq-poly-factor:
 
 **fq_poly_factor.h** -- factorisation of univariate polynomials over finite fields

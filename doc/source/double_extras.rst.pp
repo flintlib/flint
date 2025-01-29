@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _double-extras:
 
 **double_extras.h** -- support functions for double arithmetic

@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _nmod-vec:
 
 **nmod_vec.h** -- vectors over integers mod n (word-size n)

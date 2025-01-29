@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _general_formulas:
 
 General formulas and bounds

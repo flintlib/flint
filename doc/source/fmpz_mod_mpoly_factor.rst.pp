@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fmpz-mod-mpoly-factor:
 
 **fmpz_mod_mpoly_factor.h** -- factorisation of multivariate polynomials over the integers mod n

@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _examples-arb:
 
 Arb example programs

@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _pyflint:
 
 **flint_ctypes** - Python interface

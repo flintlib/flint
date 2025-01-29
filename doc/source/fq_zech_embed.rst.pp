@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq-zech-embed:
 
 **fq_zech_embed.h** -- Computing isomorphisms and embeddings of finite fields

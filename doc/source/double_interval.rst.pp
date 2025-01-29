@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _double_interval:
 
 **double_interval.h** -- double-precision interval arithmetic and helpers

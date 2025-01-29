@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _profiler:
 
 **profiler.h** -- performance profiling

@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq-zech:
 
 **fq_zech.h** -- finite fields (Zech logarithm representation)

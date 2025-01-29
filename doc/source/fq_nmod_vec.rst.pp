@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq-nmod-vec:
 
 **fq_nmod_vec.h** -- vectors over finite fields (word-size characteristic)

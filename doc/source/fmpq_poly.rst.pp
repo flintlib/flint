@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fmpq-poly:
 
 **fmpq_poly.h** -- univariate polynomials over the rational numbers

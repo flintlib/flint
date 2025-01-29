@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq_default_poly:
 
 **fq_default_poly.h** -- univariate polynomials over finite fields

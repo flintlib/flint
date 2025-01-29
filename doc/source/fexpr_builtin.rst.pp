@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fexpr-builtin:
 
 **fexpr_builtin.h** -- builtin symbols

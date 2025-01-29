@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _acb-mat:
 
 **acb_mat.h** -- matrices over the complex numbers

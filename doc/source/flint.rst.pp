@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _flint:
 
 **flint.h** -- global definitions

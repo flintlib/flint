@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 .. _fq_nmod-mpoly:
 
 **fq_nmod_mpoly.h** -- multivariate polynomials over finite fields of word-sized characteristic
