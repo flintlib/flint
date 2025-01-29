@@ -170,14 +170,55 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
        10 2 2 -> 5 4 4 or 5 3 3
        11 3 3 -> 6 5 5 or 6 4 4 */
 
-    /* First adjustments depending only on a given s */
+    /* Adjustments for s = 0 */
+    if (g == 0 && cst)
+    {
+        pattern[0] -= 8;
+        if (pattern[0] >= 6)
+        {
+            pattern[0] -= 1;
+        }
+        if (pattern[0] <= 2)
+        {
+            pattern[0] = 0;
+        }
+    }
+    else if (g == 0 && !cst)
+    {
+        pattern[0] -= 6;
+        if (pattern[0] <= 2)
+        {
+            pattern[0] = 0;
+        }
+    }
+    else /* higher genus */
+    {
+        nb = 0;
+        for (j = 1; j < g; j++)
+        {
+            nb = FLINT_MAX(nb, pattern[j]);
+        }
+        if (pattern[0] <= nb + 2) /* no dimension-lowering */
+        {
+            pattern[0] = FLINT_MIN(nb, pattern[0]);
+        }
+        else /* keep dimension-lowering */
+        {
+            pattern[0] = FLINT_MAX(pattern[0] - 5, FLINT_MAX(1, nb + 3));
+        }
+    }
+
+    /* Adjustments for other s */
+    for (s = 1; s < g; s++)
+    {
+        
+    }
+    
     for (s = 0; s < g; s++)
     {
         nb = pattern[s];
         if (s == 0)
         {
-            /* acb_modular_theta_sum is so fast that we don't need so many
-               duplication steps. */
             nb -= 2;
             if (g == 1)
             {
