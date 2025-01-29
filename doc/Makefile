@@ -10,6 +10,9 @@ BUILDDIR      = build
 
 M4 := m4
 
+SPHINX_ACTIONS := html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf latexpdfja text man texinfo info gettext changes xml pseudoxml linkcheck doctest coverage clean
+
+MACROS := $(SOURCEDIR)/macros.m4
 SRCS := $(wildcard $(SOURCEDIR)/*.rst.pp)
 OBJS := $(patsubst %.pp,%,$(SRCS))
 
@@ -19,12 +22,10 @@ help:
 
 preprocess: $(OBJS)
 
-%.rst: %.rst.pp
+%.rst: %.rst.pp $(MACROS)
 	@$(M4) -I $(SOURCEDIR) $< > $@
 
-.PHONY: help Makefile preprocess
+$(SPHINX_ACTIONS): Makefile preprocess
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-# # Catch-all target: route all unknown targets to Sphinx using the new
-# # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
-# %: Makefile preprocess
-# 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+.PHONY: help Makefile preprocess
