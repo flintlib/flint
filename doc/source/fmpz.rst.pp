@@ -375,14 +375,6 @@ Conversion
     the function.  Otherwise, it is up to the caller to ensure that
     the allocated block of memory is sufficiently large.
 
-.. function:: void fmpz_set_si(fmpz_t f, slong val)
-
-    Sets `f` to the given ``slong`` value.
-
-.. function:: void fmpz_set_ui(fmpz_t f, ulong val)
-
-    Sets `f` to the given ``ulong`` value.
-
 .. function:: void fmpz_set_d(fmpz_t f, double c)
 
     Sets `f` to the ``double`` `c`, rounding down towards zero if
@@ -659,17 +651,16 @@ Basic properties and manipulation
 
     Efficiently swaps `f` and `g`.  No data is copied.
 
-.. function:: void fmpz_set(fmpz_t f, const fmpz_t g)
+_prefix func_set(fmpz)
+_indent func_set_si(fmpz)
+_indent func_set_ui(fmpz)
+desc_set()
 
-    Sets `f` to the same value as `g`.
+_prefix func_zero(fmpz)
+desc_zero()
 
-.. function:: void fmpz_zero(fmpz_t f)
-
-    Sets `f` to zero.
-
-.. function:: void fmpz_one(fmpz_t f)
-
-    Sets `f` to one.
+_prefix func_one(fmpz)
+desc_one()
 
 .. function:: int fmpz_abs_fits_ui(const fmpz_t f)
 
@@ -708,15 +699,10 @@ Basic properties and manipulation
 Comparison
 --------------------------------------------------------------------------------
 
-
-.. function:: int fmpz_cmp(const fmpz_t f, const fmpz_t g)
-
-.. function:: int fmpz_cmp_ui(const fmpz_t f, ulong g)
-
-.. function:: int fmpz_cmp_si(const fmpz_t f, slong g)
-
-    Returns a negative value if `f < g`, positive value if `g < f`,
-    otherwise returns `0`.
+_prefix func_cmp(fmpz)
+_indent func_cmp_si(fmpz)
+_indent func_cmp_ui(fmpz)
+desc_cmp()
 
 .. function:: int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
 
@@ -728,21 +714,16 @@ Comparison
     Returns a negative value if `\lvert f\rvert < \lvert 2g\rvert`, positive value if
     `\lvert 2g\rvert < \lvert f \rvert`, otherwise returns `0`.
 
-.. function:: int fmpz_equal(const fmpz_t f, const fmpz_t g)
+_prefix func_equal(fmpz)
+_indent func_equal_si(fmpz)
+_indent func_equal_ui(fmpz)
+desc_equal()
 
-.. function:: int fmpz_equal_ui(const fmpz_t f, ulong g)
+_prefix func_is_zero(fmpz)
+desc_is_zero()
 
-.. function:: int fmpz_equal_si(const fmpz_t f, slong g)
-
-    Returns `1` if `f` is equal to `g`, otherwise returns `0`.
-
-.. function:: int fmpz_is_zero(const fmpz_t f)
-
-    Returns `1` if `f` is `0`, otherwise returns `0`.
-
-.. function:: int fmpz_is_one(const fmpz_t f)
-
-    Returns `1` if `f` is equal to one, otherwise returns `0`.
+_prefix func_is_one(fmpz)
+desc_is_one()
 
 .. function:: int fmpz_is_pm1(const fmpz_t f)
 
@@ -760,32 +741,41 @@ Comparison
 Basic arithmetic
 --------------------------------------------------------------------------------
 
+_prefix func_neg(fmpz)
+desc_neg()
 
-.. function:: void fmpz_neg(fmpz_t f1, const fmpz_t f2)
+_prefix func_abs(fmpz)
+desc_abs()
 
-    Sets `f_1` to `-f_2`.
-
-.. function:: void fmpz_abs(fmpz_t f1, const fmpz_t f2)
-
-    Sets `f_1` to the absolute value of `f_2`.
-
-func_add(fmpz)
-func_add_si(fmpz)
-func_add_ui(fmpz)
-
+_prefix func_add(fmpz)
+_indent func_add_si(fmpz)
+_indent func_add_ui(fmpz)
 desc_add()
 
-func_sub(fmpz)
-func_sub_si(fmpz)
-func_sub_ui(fmpz)
-
+_prefix func_sub(fmpz)
+_indent func_sub_si(fmpz)
+_indent func_sub_ui(fmpz)
 desc_sub()
 
-.. function:: void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
-              void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong h)
-              void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong h)
+_prefix func_mul(fmpz)
+_indent func_mul_si(fmpz)
+_indent func_mul_ui(fmpz)
+desc_mul()
 
-    Sets `f` to `g \times h`.
+_prefix func_divexact(fmpz)
+_indent func_divexact_si(fmpz)
+_indent func_divexact_ui(fmpz)
+desc_divexact()
+
+_prefix func_addmul(fmpz)
+_indent func_addmul_si(fmpz)
+_indent func_addmul_ui(fmpz)
+desc_addmul()
+
+_prefix func_submul(fmpz)
+_indent func_submul_si(fmpz)
+_indent func_submul_ui(fmpz)
+desc_submul()
 
 .. function:: void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
@@ -800,18 +790,6 @@ desc_sub()
 .. function:: void fmpz_one_2exp(fmpz_t f, ulong e)
 
     Sets `f` to `2^e`.
-
-.. function:: void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
-              void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong h)
-              void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to `f + g \times h`.
-
-.. function:: void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
-              void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong h)
-              void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to `f - g \times h`.
 
 .. function:: void fmpz_fmma(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)
 
@@ -880,16 +858,6 @@ desc_sub()
 
    Returns the absolute value remainder of `g` divided by `h`, following the
    convention of rounding as seen above. If `h` is zero an exception is raised.
-
-.. function:: void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
-
-.. function:: void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
-
-.. function:: void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
-
-    Sets `f` to the quotient of `g` and `h`, assuming that the
-    division is exact, i.e. `g` is a multiple of `h`.  If `h`
-    is `0` an exception is raised.
 
 .. function:: void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
