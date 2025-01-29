@@ -114,6 +114,7 @@ void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr
         gr_mat_clear(B, ctx);
         gr_mat_clear(C, ctx);
         gr_mat_clear(D, ctx);
+        gr_mat_clear(ERR, ctx);
         gr_heap_clear(err, ctx);
         gr_heap_clear(amag, ctx);
         gr_heap_clear(bmag, ctx);

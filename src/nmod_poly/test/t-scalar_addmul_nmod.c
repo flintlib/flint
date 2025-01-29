@@ -60,6 +60,7 @@ TEST_FUNCTION_START(nmod_poly_scalar_addmul_nmod, state)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(c);
+        nmod_poly_clear(d);
     }
 
     TEST_FUNCTION_END(state);
