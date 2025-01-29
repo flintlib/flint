@@ -235,6 +235,16 @@ Comparison
 
 
 
+Transpose
+--------------------------------------------------------------------------------
+
+
+.. function:: void fq_zech_mat_transpose(fq_zech_mat_t B, const fq_zech_mat_t A, const fq_zech_ctx_t ctx)
+
+    Sets `B` to `A^T`, the transpose of `A`. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
+
+
 
 Addition and subtraction
 --------------------------------------------------------------------------------

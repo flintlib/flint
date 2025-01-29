@@ -14,6 +14,7 @@
 #include "t-init.c"
 #include "t-inlines.c"
 #include "t-set_fmpz_mat.c"
+#include "t-transpose.c"
 
 /* Array of test functions ***************************************************/
 
@@ -21,7 +22,8 @@ test_struct tests[] =
 {
     TEST_FUNCTION(fq_default_mat_init),
     TEST_FUNCTION(fq_default_mat_inlines),
-    TEST_FUNCTION(fq_default_mat_set_fmpz_mat)
+    TEST_FUNCTION(fq_default_mat_set_fmpz_mat),
+    TEST_FUNCTION(fq_default_mat_transpose)
 };
 
 /* main function *************************************************************/

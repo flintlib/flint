@@ -257,6 +257,16 @@ Comparison
 
 
 
+Transpose
+--------------------------------------------------------------------------------
+
+
+.. function:: void fq_nmod_mat_transpose(fq_nmod_mat_t B, const fq_nmod_mat_t A, const fq_nmod_ctx_t ctx)
+
+    Sets `B` to `A^T`, the transpose of `A`. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
+
+
 
 Addition and subtraction
 --------------------------------------------------------------------------------

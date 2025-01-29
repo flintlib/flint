@@ -37,6 +37,7 @@
 #include "t-solve_triu.c"
 #include "t-sqr.c"
 #include "t-trace.c"
+#include "t-transpose.c"
 #include "t-window_init_clear.c"
 
 /* Array of test functions ***************************************************/
@@ -69,6 +70,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mat_solve_triu),
     TEST_FUNCTION(fmpz_mod_mat_sqr),
     TEST_FUNCTION(fmpz_mod_mat_trace),
+    TEST_FUNCTION(fmpz_mod_mat_transpose),
     TEST_FUNCTION(fmpz_mod_mat_window_init_clear)
 };
 

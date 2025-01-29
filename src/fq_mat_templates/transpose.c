@@ -1,5 +1,4 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2025 Lars Göttgens
 
     This file is part of FLINT.
@@ -10,14 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#ifdef T
+
 #include "gr.h"
 #include "gr_mat.h"
-
+#include "templates.h"
 void
-fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
+TEMPLATE(T, mat_transpose) (TEMPLATE(T, mat_t) B, const TEMPLATE(T, mat_t) A,
+                           const TEMPLATE(T, ctx_t) ctx)
 {
     gr_ctx_t gr_ctx;
-    gr_ctx_init_fmpz(gr_ctx);
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
     GR_MUST_SUCCEED(gr_mat_transpose((gr_mat_struct *)B, (const gr_mat_struct *) A, gr_ctx));
 }
+
+#endif
