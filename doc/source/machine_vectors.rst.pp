@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _machine-vectors:
 
 **machine_vectors.h** -- SIMD-accelerated operations on fixed-length vectors

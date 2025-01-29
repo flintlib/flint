@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _ca-field:
 
 **ca_field.h** -- extension fields

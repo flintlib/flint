@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fmpq-vec:
 
 **fmpq_vec.h** -- vectors over rational numbers

@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _ca-mat:
 
 **ca_mat.h** -- matrices over the real and complex numbers

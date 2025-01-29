@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _arb-mat:
 
 **arb_mat.h** -- matrices over the real numbers

@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _arf:
 
 **arf.h** -- arbitrary-precision floating-point numbers

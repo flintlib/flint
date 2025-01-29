@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fmpz-vec:
 
 **fmpz_vec.h** -- vectors of integers

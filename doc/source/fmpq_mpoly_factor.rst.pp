@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fmpq-mpoly-factor:
 
 **fmpq_mpoly_factor.h** -- factorisation of multivariate polynomials over the rational numbers

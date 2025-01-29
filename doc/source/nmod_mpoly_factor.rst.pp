@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _nmod-mpoly-factor:
 
 **nmod_mpoly_factor.h** -- factorisation of multivariate polynomials over integers mod n (word-size n)

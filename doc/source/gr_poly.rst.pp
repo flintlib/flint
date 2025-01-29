@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _gr-poly:
 
 **gr_poly.h** -- dense univariate polynomials over generic rings

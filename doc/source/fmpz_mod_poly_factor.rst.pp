@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fmpz-mod-poly-factor:
 
 **fmpz_mod_poly_factor.h** -- factorisation of polynomials over integers mod n

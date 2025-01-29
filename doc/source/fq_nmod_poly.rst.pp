@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fq-nmod-poly:
 
 **fq_nmod_poly.h** -- univariate polynomials over finite fields (word-size characteristic)

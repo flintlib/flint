@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fq-zech-vec:
 
 **fq_zech_vec.h** -- vectors over finite fields (Zech logarithm representation)

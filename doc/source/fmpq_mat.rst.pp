@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fmpq-mat:
 
 **fmpq_mat.h** -- matrices over the rational numbers

@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fmpz-mpoly:
 
 **fmpz_mpoly.h** -- multivariate polynomials over the integers

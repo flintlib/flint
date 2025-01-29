@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fq-zech-poly-factor:
 
 **fq_zech_poly_factor.h** -- factorisation of univariate polynomials over finite fields (Zech logarithm representation)

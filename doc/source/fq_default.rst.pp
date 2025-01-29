@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fq_default:
 
 **fq_default.h** -- unified finite fields

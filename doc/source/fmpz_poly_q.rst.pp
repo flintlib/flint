@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fmpz-poly-q:
 
 **fmpz_poly_q.h** -- rational functions over the rational numbers

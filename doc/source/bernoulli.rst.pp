@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _bernoulli:
 
 **bernoulli.h** -- support for Bernoulli numbers

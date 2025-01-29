@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fq-embed:
 
 **fq_embed.h** -- Computing isomorphisms and embeddings of finite fields

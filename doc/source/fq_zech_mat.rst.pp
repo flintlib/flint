@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fq-zech-mat:
 
 **fq_zech_mat.h** -- matrices over finite fields (Zech logarithm representation)

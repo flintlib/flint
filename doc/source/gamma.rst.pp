@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _algorithms_gamma:
 
 Algorithms for the gamma function

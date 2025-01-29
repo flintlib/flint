@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _acb-modular:
 
 **acb_modular.h** -- modular forms of complex variables

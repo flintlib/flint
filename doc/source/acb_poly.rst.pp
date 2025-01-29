@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _acb-poly:
 
 **acb_poly.h** -- polynomials over the complex numbers

@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _fft-small:
 
 **fft_small.h** -- FFT modulo word-size primes

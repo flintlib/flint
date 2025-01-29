@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _acb-elliptic:
 
 **acb_elliptic.h** -- elliptic integrals and functions of complex variables

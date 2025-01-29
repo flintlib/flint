@@ -1,4 +1,4 @@
-include(`config.m4')dnl
+include(`macros.m4')dnl
 .. _ca-poly:
 
 **ca_poly.h** -- dense univariate polynomials over the real and complex numbers
