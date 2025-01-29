@@ -593,7 +593,7 @@ LU decomposition
               slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check)
               slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
-    Computes a generalised LU decomposition `LU = PA` of a given
+    Computes a generalised LU decomposition `PLU = A` of a given
     matrix `A`, returning the rank of `A`.
 
     If `A` is a nonsingular square matrix, it will be overwritten with
