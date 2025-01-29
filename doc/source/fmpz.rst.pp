@@ -769,17 +769,17 @@ Basic arithmetic
 
     Sets `f_1` to the absolute value of `f_2`.
 
-.. function:: void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
-              void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong h)
-              void fmpz_add_si(fmpz_t f, const fmpz_t g, slong h)
+func_add(fmpz)
+func_add_si(fmpz)
+func_add_ui(fmpz)
 
-    Sets `f` to `g + h`.
+desc_add()
 
-.. function:: void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
-              void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong h)
-              void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong h)
+func_sub(fmpz)
+func_sub_si(fmpz)
+func_sub_ui(fmpz)
 
-    Sets `f` to `g - h`.
+desc_sub()
 
 .. function:: void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
               void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong h)
