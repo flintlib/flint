@@ -873,6 +873,22 @@ Modular arithmetic and composition
     and ``poly2`` upon polynomial division by ``f``. ``finv``
     is the inverse of the reverse of ``f``.
 
+.. function:: int _gr_poly_powmod_fmpz_binexp(gr_ptr res, gr_srcptr poly, const fmpz_t e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int gr_poly_powmod_fmpz_binexp(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, const gr_poly_t f, gr_ctx_t ctx)
+              int _gr_poly_powmod_fmpz_binexp_preinv(gr_ptr res, gr_srcptr poly, const fmpz_t e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_fmpz_binexp_preinv(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+              int _gr_poly_powmod_x_fmpz_preinv(gr_ptr res, const fmpz_t e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_x_fmpz_preinv(gr_poly_t res, const fmpz_t e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+              int _gr_poly_powmod_ui_binexp(gr_ptr res, gr_srcptr poly, ulong e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int gr_poly_powmod_ui_binexp(gr_poly_t res, const gr_poly_t poly, ulong e, const gr_poly_t f, gr_ctx_t ctx)
+              int _gr_poly_powmod_ui_binexp_preinv(gr_ptr res, gr_srcptr poly, ulong e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_ui_binexp_preinv(gr_poly_t res, const gr_poly_t poly, ulong e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+              int _gr_poly_powmod_fmpz_sliding_preinv(gr_ptr res, gr_srcptr poly, const fmpz_t e, ulong k, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_fmpz_sliding_preinv(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, ulong k, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``.
+
 .. function:: int _gr_poly_compose_mod_horner(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx)
               int gr_poly_compose_mod_horner(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx)
               int _gr_poly_compose_mod_brent_kung(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx)
