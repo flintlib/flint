@@ -44,11 +44,6 @@ gr_mat_jordan_form(gr_mat_t J, gr_mat_t P, const gr_mat_t A, gr_ctx_t ctx)
     if (status == GR_SUCCESS)
         status |= gr_mat_set_jordan_blocks(J, lambda, num_blocks, block_lambda, block_size, ctx);
 
-    if (status == GR_SUCCESS)
-    {
-        gr_ctx_println(ctx);
-    }
-
     gr_vec_clear(lambda, ctx);
     flint_free(block_lambda);
     flint_free(block_size);
