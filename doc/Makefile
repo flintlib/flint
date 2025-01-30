@@ -12,7 +12,7 @@ M4 := m4
 
 SPHINX_ACTIONS := html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf latexpdfja text man texinfo info gettext changes xml pseudoxml linkcheck doctest coverage clean
 
-MACROS := $(SOURCEDIR)/macros.m4
+CONFIG := $(SOURCEDIR)/config.m4 $(SOURCEDIR)/macros.m4
 SRCS := $(wildcard $(SOURCEDIR)/*.rst)
 OBJS := $(patsubst $(SOURCEDIR)/%,$(BUILDDIR)/%,$(SRCS))
 
@@ -22,7 +22,7 @@ help:
 
 preprocess: $(OBJS)
 
-$(BUILDDIR)/%.rst: $(SOURCEDIR)/%.rst $(MACROS)
+$(BUILDDIR)/%.rst: $(SOURCEDIR)/%.rst $(CONFIG)
 	@$(M4) -I $(SOURCEDIR) $< > $@
 
 $(SPHINX_ACTIONS): Makefile preprocess
