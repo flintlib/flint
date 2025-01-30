@@ -17,6 +17,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.append(os.path.abspath("."))
+sys.path.append(os.path.abspath("../build"))
 sys.path.append(os.path.abspath('../../src/python'))
 
 # -- Project information -----------------------------------------------------

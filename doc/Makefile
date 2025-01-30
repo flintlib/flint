@@ -13,8 +13,8 @@ M4 := m4
 SPHINX_ACTIONS := html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf latexpdfja text man texinfo info gettext changes xml pseudoxml linkcheck doctest coverage clean
 
 MACROS := $(SOURCEDIR)/macros.m4
-SRCS := $(wildcard $(SOURCEDIR)/*.rst.pp)
-OBJS := $(patsubst %.pp,%,$(SRCS))
+SRCS := $(wildcard $(SOURCEDIR)/*.rst)
+OBJS := $(patsubst $(SOURCEDIR)/%,$(BUILDDIR)/%,$(SRCS))
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -22,7 +22,7 @@ help:
 
 preprocess: $(OBJS)
 
-%.rst: %.rst.pp $(MACROS)
+$(BUILDDIR)/%.rst: $(SOURCEDIR)/%.rst $(MACROS)
 	@$(M4) -I $(SOURCEDIR) $< > $@
 
 $(SPHINX_ACTIONS): Makefile preprocess
