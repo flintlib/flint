@@ -47,7 +47,7 @@ TEST_FUNCTION_START(fmpz_divexact_si, state)
             fmpz_divexact_si(a, a, n);
         }
 
-        flint_mpz_divexact_ui(f, e, FLINT_ABS(n));
+        flint_mpz_divexact_ui(f, e, n >= 0 ? (ulong) n : -(ulong) n);
         if (n < 0)
             mpz_neg(f, f);
 

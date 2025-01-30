@@ -16,12 +16,12 @@ fexpr_set_si(fexpr_t res, slong c)
 {
     if (c >= FEXPR_COEFF_MIN && c <= FEXPR_COEFF_MAX)
     {
-        res->data[0] = (c << FEXPR_TYPE_BITS);
+        res->data[0] = ((ulong) c << FEXPR_TYPE_BITS);
     }
     else
     {
         fexpr_fit_size(res, 2);
         res->data[0] = ((c > 0) ? FEXPR_TYPE_BIG_INT_POS : FEXPR_TYPE_BIG_INT_NEG) | (2 << FEXPR_TYPE_BITS);
-        res->data[1] = (c > 0) ? c : -c;
+        res->data[1] = (c > 0) ? c : -(ulong) c;
     }
 }

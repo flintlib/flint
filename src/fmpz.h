@@ -340,7 +340,7 @@ FMPZ_INLINE void fmpz_add_si(fmpz_t f, const fmpz_t g, slong x)
     if (x >= 0)
         fmpz_add_ui(f, g, (ulong) x);
     else
-        fmpz_sub_ui(f, g, (ulong) -x);
+        fmpz_sub_ui(f, g, -(ulong) x);
 }
 
 FMPZ_INLINE void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
@@ -348,7 +348,7 @@ FMPZ_INLINE void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
     if (x >= 0)
         fmpz_sub_ui(f, g, (ulong) x);
     else
-        fmpz_add_ui(f, g, (ulong) -x);
+        fmpz_add_ui(f, g, -(ulong) x);
 }
 
 void fmpz_abs(fmpz_t f1, const fmpz_t f2);
@@ -385,7 +385,7 @@ int fmpz_root(fmpz_t r, const fmpz_t f, slong n);
 
 int fmpz_divisible(const fmpz_t f, const fmpz_t g);
 int fmpz_divisible_ui(const fmpz_t f, ulong g);
-FMPZ_INLINE int fmpz_divisible_si(const fmpz_t f, slong g) { return fmpz_divisible_ui(f, FLINT_ABS(g)); }
+FMPZ_INLINE int fmpz_divisible_si(const fmpz_t f, slong g) { return fmpz_divisible_ui(f, g >= 0 ? (ulong) g : -(ulong) g); }
 int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h);
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);

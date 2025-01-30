@@ -57,7 +57,7 @@ arb_dot_si(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xst
         }
         else
         {
-            av = FLINT_ABS(v);
+            av = (v >= 0) ? v : -(ulong) v;
             bc = flint_clz(av);
 
             ARF_EXP(arb_midref(t + i)) = FLINT_BITS - bc;
