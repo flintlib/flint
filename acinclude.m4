@@ -246,6 +246,7 @@ AH_VERBATIM([PRAGMAS],
 #define PUSH_OPTIONS
 #define POP_OPTIONS
 #define OPTIMIZE_O2
+#define OPTIMIZE_OSIZE
 #define OPTIMIZE_UNROLL_LOOPS])
 
 flint_cv_pragma_compiler=""
@@ -277,6 +278,7 @@ then
     FLINT_CHECK_PRAGMA([pop_options],[POP_OPTIONS])
 
     FLINT_CHECK_PRAGMA([optimize (\"O2\")],[OPTIMIZE_O2])
+    FLINT_CHECK_PRAGMA([optimize (\"Os\")],[OPTIMIZE_OSIZE])
     FLINT_CHECK_PRAGMA([optimize (\"unroll-loops\")],[OPTIMIZE_UNROLL_LOOPS])
 fi
 ])
