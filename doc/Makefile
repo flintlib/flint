@@ -11,7 +11,7 @@ BUILDDIR      = build
 
 M4 := m4
 
-SPHINX_ACTIONS := html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf latexpdfja text man texinfo info gettext changes xml pseudoxml linkcheck doctest coverage clean
+SPHINX_ACTIONS := html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf latexpdfja text man texinfo info gettext changes xml pseudoxml linkcheck doctest coverage
 
 CONFIG := macros.m4
 SRCS := $(wildcard $(ORIGSRCDIR)/*.rst)
@@ -28,6 +28,10 @@ preprocess: $(OBJS)
 
 $(SPHINX_ACTIONS): Makefile preprocess
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+clean:
+	rm -f $(OBJS)
+	rm -rf $(BUILDDIR)
 
 print-%:
 	@echo "$*=$($*)"
