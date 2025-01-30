@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _ca-field:
 
 **ca_field.h** -- extension fields

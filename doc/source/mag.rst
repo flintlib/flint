@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _mag:
 
 **mag.h** -- fixed-precision unsigned floating-point numbers for bounds

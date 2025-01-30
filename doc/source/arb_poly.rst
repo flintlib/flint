@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _arb-poly:
 
 **arb_poly.h** -- polynomials over the real numbers

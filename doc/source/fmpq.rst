@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpq:
 
 **fmpq.h** -- rational numbers

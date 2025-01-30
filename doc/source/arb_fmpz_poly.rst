@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _arb_fmpz_poly:
 
 **arb_fmpz_poly.h** -- extra methods for integer polynomials

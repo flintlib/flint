@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _d-mat:
 
 **d_mat.h** -- double precision matrices

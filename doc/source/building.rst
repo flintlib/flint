@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _building:
 
 **Building, testing and installing**

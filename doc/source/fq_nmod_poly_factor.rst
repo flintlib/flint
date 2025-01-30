@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fq-nmod-poly-factor:
 
 **fq_nmod_poly_factor.h** -- factorisation of univariate polynomials over finite fields (word-size characteristic)

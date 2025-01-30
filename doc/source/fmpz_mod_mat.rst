@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz_mod_mat:
 
 **fmpz_mod_mat.h** -- matrices over integers mod n

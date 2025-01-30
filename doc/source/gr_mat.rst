@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _gr-mat:
 
 **gr_mat.h** -- dense matrices over generic rings

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-poly-mat:
 
 **fmpz_poly_mat.h** -- matrices of polynomials over the integers

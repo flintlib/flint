@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _longlong:
 
 **longlong.h** -- support functions for multi-word arithmetic

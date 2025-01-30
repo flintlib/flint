@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _nmod-mat:
 
 **nmod_mat.h** -- matrices over integers mod n (word-size n)

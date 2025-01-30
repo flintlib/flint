@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-poly-factor:
 
 **fmpz_poly_factor.h** -- factorisation of polynomials over the integers

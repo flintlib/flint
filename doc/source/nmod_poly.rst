@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _nmod-poly:
 
 **nmod_poly.h** -- univariate polynomials over integers mod n (word-size n)

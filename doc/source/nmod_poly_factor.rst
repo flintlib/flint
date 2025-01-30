@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _nmod-poly-factor:
 
 **nmod_poly_factor.h** -- factorisation of univariate polynomials over integers mod n (word-size n)

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _bool-mat:
 
 **bool_mat.h** -- matrices over booleans

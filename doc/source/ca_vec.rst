@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _ca-vec:
 
 **ca_vec.h** -- vectors of real and complex numbers

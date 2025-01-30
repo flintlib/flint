@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _arith:
 
 **arith.h** -- arithmetic and special functions

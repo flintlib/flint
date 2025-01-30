@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _qqbar:
 
 **qqbar.h** -- algebraic numbers represented by minimal polynomials

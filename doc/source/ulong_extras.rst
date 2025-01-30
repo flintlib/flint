@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _ulong-extras:
 
 **ulong_extras.h** -- arithmetic and number-theoretic functions for single-word integers

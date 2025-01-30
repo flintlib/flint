@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-mod-vec:
 
 **fmpz_mod_vec.h** -- vectors over integers mod n

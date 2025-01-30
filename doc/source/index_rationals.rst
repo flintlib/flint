@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _index-rationals:
 
 **Rational numbers** : *detailed table of contents*

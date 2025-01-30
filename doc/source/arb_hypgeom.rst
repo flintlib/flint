@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _arb-hypgeom:
 
 **arb_hypgeom.h** -- hypergeometric functions of real variables

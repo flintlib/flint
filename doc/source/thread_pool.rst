@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _thread-pool:
 
 **thread_pool.h** -- thread pool

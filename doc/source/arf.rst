@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _arf:
 
 **arf.h** -- arbitrary-precision floating-point numbers

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-poly:
 
 **fmpz_poly.h** -- univariate polynomials over the integers

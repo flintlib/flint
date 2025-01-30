@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _algorithms_hurwitz:
 
 Algorithms for the Hurwitz zeta function

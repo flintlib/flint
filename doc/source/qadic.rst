@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _qadic:
 
 **qadic.h** -- unramified extensions over p-adic numbers

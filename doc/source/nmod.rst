@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _nmod:
 
 **nmod.h** -- integers mod n (word-size n)

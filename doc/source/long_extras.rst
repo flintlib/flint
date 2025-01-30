@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _long-extras:
 
 **long_extras.h** -- support functions for signed word arithmetic

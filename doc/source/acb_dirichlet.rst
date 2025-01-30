@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _acb-dirichlet:
 
 **acb_dirichlet.h** -- Dirichlet L-functions, Riemann zeta and related functions

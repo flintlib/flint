@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _qfb:
 
 **qfb.h** -- binary quadratic forms

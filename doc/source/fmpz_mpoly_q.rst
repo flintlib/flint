@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-mpoly-q:
 
 **fmpz_mpoly_q.h** -- multivariate rational functions over Q

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _acb-theta:
 
 **acb_theta.h** -- Riemann theta functions

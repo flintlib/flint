@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _acf:
 
 **acf.h** -- complex floating-point numbers

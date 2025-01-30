@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _gr-vec:
 
 **gr_vec.h** -- vectors over generic rings

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-mod:
 
 **fmpz_mod.h** -- arithmetic modulo integers

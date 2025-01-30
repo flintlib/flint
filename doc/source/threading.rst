@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _threading:
 
 **Threading**

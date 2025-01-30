@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _acb-hypgeom:
 
 **acb_hypgeom.h** -- hypergeometric functions of complex variables

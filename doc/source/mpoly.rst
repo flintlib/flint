@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _mpoly:
 
 **mpoly.h** -- support functions for multivariate polynomials

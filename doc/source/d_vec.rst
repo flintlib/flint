@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _d-vec:
 
 **d_vec.h** -- double precision vectors

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _aprcl:
 
 **aprcl.h** -- APRCL primality testing

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-mat:
 
 **fmpz_mat.h** -- matrices over the integers

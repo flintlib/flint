@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _mpn-mod:
 
 **mpn_mod.h** -- integers mod n (packed multi-word n)

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _nmod-poly-mat:
 
 **nmod_poly_mat.h** -- matrices of univariate polynomials over integers mod n (word-size n)

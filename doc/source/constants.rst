@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _algorithms_constants:
 
 Algorithms for mathematical constants

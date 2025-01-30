@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-lll:
 
 **fmpz_lll.h** -- LLL reduction

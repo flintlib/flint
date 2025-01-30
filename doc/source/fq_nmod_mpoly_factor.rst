@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fq_nmod-mpoly-factor:
 
 **fq_nmod_mpoly_factor.h** -- factorisation of multivariate polynomials over finite fields of word-sized characteristic

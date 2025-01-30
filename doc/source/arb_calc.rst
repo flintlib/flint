@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _arb-calc:
 
 **arb_calc.h** -- calculus with real-valued functions

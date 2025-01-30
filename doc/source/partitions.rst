@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _partitions:
 
 **partitions.h** -- computation of the partition function

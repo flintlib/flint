@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _issues:
 
 Technical conventions and potential issues

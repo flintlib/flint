@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _gr-generic:
 
 **gr_generic.h** -- basic algorithms and fallback implementations for generic elements

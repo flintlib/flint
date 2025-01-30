@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fq-mat:
 
 **fq_mat.h** -- matrices over finite fields

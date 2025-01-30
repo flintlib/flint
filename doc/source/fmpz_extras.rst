@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz_extras:
 
 **fmpz_extras.h** -- extra methods for FLINT integers

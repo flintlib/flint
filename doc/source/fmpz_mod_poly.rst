@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-mod-poly:
 
 **fmpz_mod_poly.h** -- polynomials over integers mod n

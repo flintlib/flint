@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _index-integers-mod:
 
 **Integers mod n** : *detailed table of contents*

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _mpn-extras:
 
 **mpn_extras.h** -- support functions for limb arrays

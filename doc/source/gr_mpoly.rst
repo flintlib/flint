@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _gr-mpoly:
 
 **gr_mpoly.h** -- sparse multivariate polynomials over generic rings

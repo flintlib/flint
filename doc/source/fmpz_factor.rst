@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _fmpz-factor:
 
 **fmpz_factor.h** -- integer factorisation

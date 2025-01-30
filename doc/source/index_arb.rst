@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _index-arb:
 
 **Real and complex numbers (Arb)** : *detailed table of contents*

@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _gr-domains:
 
 **gr.h (continued)** -- builtin domains and types

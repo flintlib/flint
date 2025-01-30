@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _perm:
 
 **perm.h** -- permutations

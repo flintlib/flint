@@ -1,3 +1,4 @@
+include(`macros.m4')dnl
 .. _padic-mat:
 
 **padic_mat.h** -- matrices over p-adic numbers
