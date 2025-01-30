@@ -152,9 +152,6 @@ n_cbrt_chebyshev_approx(ulong n)
     expo >>= mantissa_bits;
     expo -= bias;                        /* Subtracting bias */
 
-    if (expo > 100)
-        flint_printf("n %wu   expo %wu\n", n, expo);
-
     /* extracting first 4 bits of mantissa, this will help select correct poly */
     /* note mantissa of 0.5 is 0x0000000000000 not 0x1000000000000 */
 
