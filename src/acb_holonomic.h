@@ -7,6 +7,7 @@ typedef mp_limb_signed_t slong;
 /* */
 
 #include "acb_types.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,6 +21,36 @@ typedef struct
     slong mult;
 }
 acb_holonomic_shift_struct;
+
+
+typedef struct
+{
+    acb_t expo;
+    slong nshifts;
+    acb_holonomic_shift_struct * shifts;
+}
+acb_holonomic_group_struct;
+
+
+typedef struct
+{
+    slong len;
+    acb_holonomic_group_struct * grps;
+}
+acb_holonomic_exponents_struct;
+
+
+typedef enum
+{
+    ACB_HOLONOMIC_BASIS_ECHELON = 0,
+    ACB_HOLONOMIC_BASIS_CASCADE  /* XXX: same as Frobenius? */
+}
+acb_holonomic_basis_t;
+
+
+slong acb_holonomic_group_length(const acb_holonomic_group_struct * grp);
+
+/****************************************************************************/
 
 typedef struct
 {
@@ -70,6 +101,11 @@ _acb_holonomic_sol_add_term(
         const fmpz * binom_n,
         slong nder, slong prec, slong sums_prec);
 
+void _acb_holonomic_sol_value(acb_poly_struct * val, acb_srcptr expo,
+                              const acb_poly_struct * sums, slong nlogs,
+                              acb_srcptr pt, slong nder,
+                              slong nshifts, slong prec);
+
 /****************************************************************************/
 
 /* XXX see if this can be reused by other summation algorithms (probably not as
@@ -80,7 +116,7 @@ _acb_holonomic_sol_add_term(
 typedef struct
 {
     /* operator */
-    acb_poly_struct * dop;
+    acb_poly_struct * dop;  /* XXX FJ: move outside the struct? */
     slong dop_len;
     slong dop_clen;
 
@@ -127,14 +163,43 @@ void acb_holonomic_sum_context_init(
 void acb_holonomic_sum_context_clear(acb_holonomic_sum_context_struct * ctx);
 
 void acb_holonomic_sum_ordinary(acb_holonomic_sum_context_struct * ctx);
-void acb_holonomic_sum_mum(acb_holonomic_sum_context_struct * ctx);
 void acb_holonomic_sum_canonical_basis(acb_holonomic_sum_context_struct * ctx);
+void acb_holonomic_sum_highest(acb_holonomic_sum_context_struct * ctx);
+void acb_holonomic_sum_group(acb_holonomic_sum_context_struct * ctx, const acb_holonomic_group_struct * grp);
+
 
 void _acb_holonomic_sum_precompute(acb_holonomic_sum_context_struct * ctx);
 void _acb_holonomic_sum_reset(acb_holonomic_sum_context_struct * ctx);
 
 void acb_holonomic_sum_divconquer(
         acb_holonomic_sum_context_struct * ctx, slong nterms);
+
+void acb_holonomic_sum_value(acb_poly_struct * val, slong nfrobshifts,
+                             const acb_holonomic_sum_context_struct * ctx,
+                             slong i, slong j, slong prec);
+
+/****************************************************************************/
+
+/* XXX void * data or fix args */
+typedef void (* acb_holonomic_sum_worker_t)(
+        acb_holonomic_sum_context_struct * ctx, slong nterms);
+
+void _acb_holonomic_fundamental_matrix(
+        acb_mat_struct * mat,
+        const acb_poly_struct * dop, slong dop_len,
+        const acb_holonomic_group_struct * groups, slong ngroups,
+        acb_srcptr pts, slong npts,
+        acb_holonomic_basis_t basis,
+        acb_holonomic_sum_worker_t sum_worker,
+        slong nterms, slong prec);
+
+int acb_holonomic_fundamental_matrix(
+        acb_mat_struct * mat,
+        gr_srcptr dop, gr_ctx_t dop_ctx,
+        const acb_holonomic_exponents_struct * expos,
+        acb_srcptr pts, slong npts,
+        acb_holonomic_basis_t basis,
+        slong nterms, slong prec);
 
 /****************************************************************************/
 
@@ -147,7 +212,7 @@ void _acb_holonomic_apply_diffop_basecase_weights(
 
 void _acb_holonomic_apply_diffop_basecase_precomp(
         acb_poly_struct * g, slong goff,
-        acb_srcptr weights,
+        acb_srcptr weights, slong weights_nlogs,
         const acb_poly_struct * f, slong foff, slong flen,
         slong nlogs,
         slong start, slong len,

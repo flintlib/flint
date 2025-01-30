@@ -1,9 +1,9 @@
 #include "acb_types.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
-#include "fmpq_types.h"
-#include "fmpq_poly.h"
 #include "acb_holonomic.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 
 void
@@ -43,7 +43,7 @@ ordinary(void)
     acb_poly_set_coeff_si(ctx->dop + 1, 0, 2);
     acb_poly_set_coeff_si(ctx->dop + 0, 4, 7);
 
-    ctx->flags |= ACB_HOLONOMIC_WANT_SERIES;
+    /* ctx->flags |= ACB_HOLONOMIC_WANT_SERIES; */
 
     acb_holonomic_sum_ordinary(ctx);
     acb_holonomic_sum_canonical_basis(ctx);
@@ -142,9 +142,14 @@ void
 whittaker_m(void)  /* non-integer exponent, no logs */
 {
     acb_t kappa, mu2, half;
+    acb_poly_t val;
+
     acb_init(kappa);
     acb_init(mu2);
     acb_init(half);
+    acb_poly_init(val);
+
+    acb_holonomic_sum_context_t ctx;
 
     acb_set_si(kappa, 2);
     acb_set_si(mu2, 3);
@@ -153,8 +158,6 @@ whittaker_m(void)  /* non-integer exponent, no logs */
     slong prec = 64;
     slong dop_order = 2;
     slong len = dop_order;
-
-    acb_holonomic_sum_context_t ctx;
 
     acb_holonomic_sum_context_init(ctx, dop_order + 1, 1, 1, len);
 
@@ -166,7 +169,7 @@ whittaker_m(void)  /* non-integer exponent, no logs */
     acb_addmul_si((ctx->dop + 0)->coeffs + 0, mu2, -4, prec);
 
     acb_sqrt(ctx->expo, mu2, prec);
-    acb_add(ctx->expo, ctx->expo, half, prec);  /* sub for other expo */
+    acb_add(ctx->expo, ctx->expo, half, prec);  /* other expo = mu2 - 1/2 */
 
     ctx->sing_shifts[0].n = 0;
     ctx->sing_shifts[0].mult = 1;
@@ -180,38 +183,120 @@ whittaker_m(void)  /* non-integer exponent, no logs */
 
     acb_holonomic_sum_divconquer(ctx, prec);
 
+    acb_poly_struct * f = acb_holonomic_sol_sum_ptr(ctx->sol, 0, 0);
+
     flint_printf("(%{acb} + x)^(%{acb}) * (%{acb_poly})\n",
-                 ctx->pts, ctx->expo,
-                 acb_holonomic_sol_sum_ptr(ctx->sol, 0, 0));
+                 ctx->pts, ctx->expo, f);
 
-    acb_poly_t tmp;
-    acb_poly_init(tmp);
-    acb_poly_set_coeff_si(tmp, 1, 1);
-    acb_poly_set_coeff_acb(tmp, 0, ctx->pts);
-    acb_poly_pow_acb_series(tmp, tmp, ctx->expo, len, prec);
-    acb_poly_mullow(tmp, tmp, acb_holonomic_sol_sum_ptr(ctx->sol, 0, 0), len, prec);
+    _acb_holonomic_sol_value(val, ctx->expo, f, ctx->sol[0].nlogs, ctx->pts,
+                             ctx->nder, 1, ctx->prec);
 
-    flint_printf("M(%{acb} + x) = %{acb_poly} + O(x^%wd)\n", ctx->pts, tmp, len);
-
-    acb_poly_clear(tmp);
+    flint_printf("M(%{acb} + x) = %{acb_poly} + O(x^%wd)\n", ctx->pts, val, len);
 
     acb_holonomic_sum_context_clear(ctx);
     acb_clear(kappa);
     acb_clear(mu2);
     acb_clear(half);
+    acb_poly_clear(val);
 }
 
 
-/* TODO once we have more support for extracting the results: Apéry */
+void
+fundamental_matrix(const char * dop_str,
+                   const acb_holonomic_exponents_struct * expos,
+                   double pt_d)
+{
+    gr_ctx_t CC, Pol, Dop;
+    gr_ptr dop;
+
+    slong prec = 30;
+
+    int status = GR_SUCCESS;
+
+    gr_ctx_init_complex_acb(CC, prec);
+    gr_ctx_init_gr_poly(Pol, CC);
+    gr_ctx_init_gr_poly(Dop, Pol);  /* should be Ore poly */
+
+    GR_TMP_INIT(dop, Dop);
+
+    status |= gr_ctx_set_gen_name(Pol, "z");
+    status |= gr_ctx_set_gen_name(Dop, "Tz");
+    status |= gr_set_str(dop, dop_str, Dop);
+    status |= gr_println(dop, Dop);
+    GR_MUST_SUCCEED(status);
+
+    slong dop_order = gr_poly_length(dop, Dop) - 1;
+
+    acb_mat_t mat;
+    acb_mat_init(mat, dop_order, dop_order);
+
+    acb_t pt;
+    acb_init(pt);
+    acb_set_d(pt, pt_d);
+
+    acb_holonomic_fundamental_matrix(mat, dop, Dop, expos, pt, 1, 0, 8, prec);
+
+    flint_printf("%{acb_mat}\n", mat);
+
+    acb_mat_clear(mat);
+    GR_TMP_CLEAR(dop, Dop);
+    gr_ctx_clear(Dop);
+    gr_ctx_clear(Pol);
+    gr_ctx_clear(CC);
+    acb_clear(pt);
+}
+
+
+void
+apery(void)
+{
+    acb_holonomic_shift_struct shift[1] = {{ .n = 0, .mult = 3 }};
+    acb_holonomic_group_struct grp[1] = {{ .nshifts = 1, .shifts = shift }};
+    acb_init(grp->expo);
+    acb_zero(grp->expo);
+    acb_holonomic_exponents_struct expos[1] = {{ .len = 1, .grps = grp }};
+
+    fundamental_matrix(
+            "(z^2 - 34*z + 1)*Tz^3 + (3*z^2 - 51*z)*Tz^2 + (3*z^2 - 27*z)*Tz + z^2 - 5*z",
+            expos,
+            0.015625);
+
+    acb_clear(grp->expo);
+}
+
+
+void
+multiple_shifts(void)
+{
+    /* const char * dop = "Tz^4 - 4*Tz^3 + 3*Tz^2 - z"; */
+    const char * dop = "Tz^6 - 6*Tz^5 + 12*Tz^4 - 10*Tz^3 + 3*Tz^2 + z^2";
+
+    acb_holonomic_shift_struct shift[3] = {
+        { .n = 0, .mult = 2 },
+        { .n = 1, .mult = 3 },
+        { .n = 3, .mult = 1 },
+    };
+    acb_holonomic_group_struct grp[1] = {{ .nshifts = 3, .shifts = shift }};
+    acb_init(grp->expo);
+    acb_zero(grp->expo);
+    acb_holonomic_exponents_struct expos[1] = {{ .len = 1, .grps = grp }};
+
+    fundamental_matrix(dop, expos, 2.);
+
+    acb_clear(grp->expo);
+}
 
 
 int
 main(void)
 {
-    ordinary();
-    series();
-    bessel_j0();
-    whittaker_m();
+    /* ordinary(); */
+    /* series(); */
+    /* bessel_j0(); */
+    /* whittaker_m(); */
+
+    /* apery(); */
+    multiple_shifts();
 
     flint_cleanup_master();
 }

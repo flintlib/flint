@@ -20,6 +20,13 @@ _acb_poly_vec_clear(acb_poly_struct *vec, slong n)
 }
 
 void
+_acb_poly_vec_zero(acb_poly_struct *dest, slong n)
+{
+    for (slong i = 0; i < n; i++)
+        acb_poly_zero(dest + i);
+}
+
+void
 _acb_poly_vec_set(acb_poly_struct *dest, const acb_poly_struct *src, slong n)
 {
     for (slong i = 0; i < n; i++)

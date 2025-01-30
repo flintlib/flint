@@ -105,7 +105,7 @@ _acb_holonomic_apply_diffop_basecase_weights(
 void
 _acb_holonomic_apply_diffop_basecase_precomp(
         acb_poly_struct * g, slong goff,
-        acb_srcptr weights,
+        acb_srcptr weights, slong weights_nlogs,
         const acb_poly_struct * f, slong foff, slong flen,
         slong nlogs,
         slong start, slong len,
@@ -121,7 +121,7 @@ _acb_holonomic_apply_diffop_basecase_precomp(
             for (slong k = k1; k < nlogs; k++)
             {
                 acb_srcptr src = (f + k)->coeffs + foff;
-                acb_srcptr cofac = weights + p1 * nlogs * flen + (k - k1) * flen;
+                acb_srcptr cofac = weights + p1 * weights_nlogs * flen + (k - k1) * flen;
                 slong fklen = FLINT_MIN(flen, (f + k)->length - foff);
                 /* loop on p */
                 acb_dot(dest, dest, 0, cofac, 1, src, 1, fklen, prec);
@@ -155,7 +155,7 @@ acb_holonomic_apply_diffop_basecase(
     _acb_poly_vec_fit_length(g, nlogs, len);
     _acb_holonomic_apply_diffop_basecase_precomp(
             g, 0,
-            weights, f, 0, flen,
+            weights, nlogs, f, 0, flen,
             nlogs, start, len, prec);
     _acb_poly_vec_set_length(g, nlogs, len);
     _acb_poly_vec_normalise(g, nlogs);

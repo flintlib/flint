@@ -46,9 +46,9 @@ TEST_FUNCTION_START(acb_holonomic_apply_diffop, state)
 
         slong prec = 2 + n_randint(state, 100);
 
-        acb_poly_struct * g1 =_acb_poly_vec_init(logs);
-        acb_poly_struct * g2 =_acb_poly_vec_init(logs);
-        acb_poly_struct * g3 =_acb_poly_vec_init(logs);
+        acb_poly_struct * g1 = _acb_poly_vec_init(logs);
+        acb_poly_struct * g2 = _acb_poly_vec_init(logs);
+        acb_poly_struct * g3 = _acb_poly_vec_init(logs);
 
         acb_holonomic_apply_diffop_polmul(g1, dop, dop_len, expo, offset, f, logs, start, len, prec);
 

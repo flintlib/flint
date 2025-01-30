@@ -105,7 +105,7 @@ apply_diffop(acb_holonomic_sum_context_struct * ctx,
         for (slong m = 0; m < ctx->nsols; m++)
             _acb_holonomic_apply_diffop_basecase_precomp(
                     ctx->sol[m].series, mid - base,
-                    weights, ctx->sol[m].series, low - base, mid - low,
+                    weights, nlogs, ctx->sol[m].series, low - base, mid - low,
                     ctx->sol[m].nlogs, mid - low, high - mid, ctx->prec);
 
         _acb_vec_clear(weights, weights_len);

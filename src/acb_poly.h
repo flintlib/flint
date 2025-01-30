@@ -688,6 +688,7 @@ acb_poly_allocated_bytes(const acb_poly_t x)
 
 acb_poly_struct * _acb_poly_vec_init(slong n);
 void _acb_poly_vec_clear(acb_poly_struct *vec, slong n);
+void _acb_poly_vec_zero(acb_poly_struct *dest, slong n);
 void _acb_poly_vec_set(acb_poly_struct *dest, const acb_poly_struct *src, slong n);
 void _acb_poly_vec_set_block(acb_poly_struct *dest, const acb_poly_struct *src,
                              slong n, slong base, slong len);

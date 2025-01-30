@@ -1,5 +1,8 @@
+#include <string.h>
+
 #include "acb_types.h"
 #include "acb.h"
+#include "acb_mat.h"
 #include "acb_poly.h"
 #include "acb_holonomic.h"
 #include "fmpz_vec.h"
@@ -83,22 +86,32 @@ acb_holonomic_sum_ordinary(ctx_ptr ctx)
 
 
 void
-acb_holonomic_sum_mum(ctx_ptr ctx)
-{
-    if (ctx->dop_len <= 1)
-        return;
-    ctx->sing_shifts[0].n = 0;
-    ctx->sing_shifts[0].n = ctx->dop_len - 1;
-}
-
-
-/* XXX in the singular case, it is probably more useful to take the solutions of
- * highest level only... */
-void
 acb_holonomic_sum_canonical_basis(ctx_ptr ctx)
 {
     for (int m = 0; m < ctx->nsols; m++)
         acb_holonomic_sol_unit_ini(ctx->sol + m, m, ctx->sing_shifts);
+}
+
+
+void
+acb_holonomic_sum_highest(ctx_ptr ctx)
+{
+    for (int m = 0; m < ctx->nsols; m++)
+    {
+        acb_mat_zero(ctx->sol[m].extini);
+        acb_one(acb_mat_entry(ctx->sol[m].extini, m,
+                              ctx->sing_shifts[m].mult - 1));
+    }
+}
+
+
+void
+acb_holonomic_sum_group(ctx_ptr ctx, const acb_holonomic_group_struct * grp)
+{
+    acb_set(ctx->expo, grp->expo);
+    memcpy(ctx->sing_shifts, grp->shifts,
+           grp->nshifts * sizeof(acb_holonomic_shift_struct));
+    acb_holonomic_sum_highest(ctx);
 }
 
 
