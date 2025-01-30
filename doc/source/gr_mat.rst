@@ -577,6 +577,23 @@ Nullspace
     basis over the fraction field. The result may be meaningless
     if the ring is not an integral domain.
 
+.. function:: int gr_mat_nullspace_from_rref(gr_mat_t X, const gr_mat_t A, gr_srcptr Aden, slong rank, gr_ctx_t ctx)
+
+    Computes nullspace given the precomputed reduced row
+    echelon form matrix *A* with rank *rank*.
+    If *Aden* is not *NULL*, assume tha *A* has been multiplied
+    by this common denominator as in the output of
+    :func:`gr_mat_rref_den`.
+
+.. function:: int gr_mat_nullspace_no_resize(slong * nullity, gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
+
+    Similar to :func:`gr_mat_nullspace`, but does not resize the
+    matrix *X*, instead zero-padding if needed and returning
+    the nullity (number of basis columns) in a separate variable.
+    The user must supply a output matrix *X* with at least as many
+    columns as the nullity.
+
+
 Inverse and adjugate
 -------------------------------------------------------------------------------
 
