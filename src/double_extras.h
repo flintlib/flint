@@ -76,7 +76,7 @@ FLINT_FORCE_INLINE double d_mul_2exp_inrange(double x, int i)
 {
     FLINT_ASSERT(i >= D_MIN_NORMAL_EXPONENT && i <= D_MAX_NORMAL_EXPONENT);
     double_uint64_u u;
-    u.i = ((int64_t) (i + D_EXPONENT_BIAS)) << D_EXPONENT_SHIFT;
+    u.i = ((uint64_t) (i + D_EXPONENT_BIAS)) << D_EXPONENT_SHIFT;
     return x * u.f;
 }
 
@@ -89,7 +89,7 @@ FLINT_FORCE_INLINE double d_mul_2exp_inrange2(double x, int i)
 
     double_uint64_u u;
     u.f = x;
-    u.i += ((int64_t) i) << D_EXPONENT_SHIFT;
+    u.i += ((uint64_t) i) << D_EXPONENT_SHIFT;
     return u.f;
 }
 

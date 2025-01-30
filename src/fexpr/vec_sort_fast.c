@@ -15,5 +15,6 @@
 void
 _fexpr_vec_sort_fast(fexpr_ptr vec, slong len)
 {
-    qsort(vec, len, sizeof(fexpr_struct), (int(*)(const void*,const void*)) fexpr_cmp_fast);
+    if (len != 0)
+        qsort(vec, len, sizeof(fexpr_struct), (int(*)(const void*,const void*)) fexpr_cmp_fast);
 }

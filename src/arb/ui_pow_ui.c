@@ -16,7 +16,7 @@
 void
 arb_si_pow_ui(arb_t res, slong b, ulong e, slong prec)
 {
-    arb_ui_pow_ui(res, UI_ABS_SI(b), e, prec);
+    arb_ui_pow_ui(res, FLINT_UABS(b), e, prec);
 
     if ((e & 1) && b < 0)
         arb_neg(res, res);

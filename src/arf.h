@@ -366,13 +366,10 @@ arf_init_set_ui(arf_t x, ulong v)
     }
 }
 
-/* FLINT_ABS is unsafe for x = WORD_MIN */
-#define UI_ABS_SI(x) (((slong)(x) < 0) ? (-(ulong)(x)) : ((ulong)(x)))
-
 ARF_INLINE void
 arf_init_set_si(arf_t x, slong v)
 {
-    arf_init_set_ui(x, UI_ABS_SI(v));
+    arf_init_set_ui(x, FLINT_UABS(v));
     if (v < 0)
         ARF_NEG(x);
 }
@@ -401,7 +398,7 @@ arf_set_ui(arf_t x, ulong v)
 ARF_INLINE void
 arf_set_si(arf_t x, slong v)
 {
-    arf_set_ui(x, UI_ABS_SI(v));
+    arf_set_ui(x, FLINT_UABS(v));
     if (v < 0)
         ARF_NEG(x);
 }
@@ -492,7 +489,7 @@ arf_set_round_ui(arf_t x, ulong v, slong prec, arf_rnd_t rnd)
 ARF_INLINE int
 arf_set_round_si(arf_t x, slong v, slong prec, arf_rnd_t rnd)
 {
-    return _arf_set_round_ui(x, UI_ABS_SI(v), v < 0, prec, rnd);
+    return _arf_set_round_ui(x, FLINT_UABS(v), v < 0, prec, rnd);
 }
 
 ARF_INLINE int

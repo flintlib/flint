@@ -49,5 +49,5 @@ int n_jacobi_unsigned(ulong x, ulong y)
 
 int n_jacobi(slong x, ulong y)
 {
-    return _n_jacobi_unsigned(FLINT_ABS(x), y, FLINT_SIGN_EXT(x) & y);
+    return _n_jacobi_unsigned(FLINT_UABS(x), y, FLINT_SIGN_EXT(x) & y);
 }
