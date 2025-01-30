@@ -41,6 +41,12 @@ The file ``flint.h`` contains various useful macros.
     Returns the absolute value of *x* for primitive signed numerical types.  It
     might fail for least negative values such as *INT_MIN* and *LONG_MIN*.
 
+.. macro:: FLINT_UABS(x)
+
+    Returns the absolute value of *x* for primitive signed numerical types,
+    casting the result to an *ulong*. The result is well-defined
+    for least negative values.
+
 .. macro:: FLINT_MIN(x, y)
            FLINT_MAX(x, y)
 

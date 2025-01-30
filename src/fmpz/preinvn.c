@@ -25,7 +25,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
    {
       ulong cc;
       inv->dinv = flint_malloc(sizeof(ulong));
-      cc = (c >= 0) ? c : -(ulong) c;
+      cc = FLINT_UABS(c);
       norm = flint_clz(cc);
       if (norm) cc <<= norm;
       flint_mpn_preinvn(inv->dinv, &cc, 1);

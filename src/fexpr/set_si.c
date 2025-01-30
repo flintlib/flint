@@ -22,6 +22,6 @@ fexpr_set_si(fexpr_t res, slong c)
     {
         fexpr_fit_size(res, 2);
         res->data[0] = ((c > 0) ? FEXPR_TYPE_BIG_INT_POS : FEXPR_TYPE_BIG_INT_NEG) | (2 << FEXPR_TYPE_BITS);
-        res->data[1] = (c > 0) ? c : -(ulong) c;
+        res->data[1] = FLINT_UABS(c);
     }
 }
