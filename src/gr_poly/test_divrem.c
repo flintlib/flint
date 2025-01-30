@@ -12,10 +12,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC push_options
-#pragma GCC optimize ("Os")
-#endif
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
 
 void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
     flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
@@ -122,8 +120,4 @@ void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
     }
 }
 
-
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC pop_options
-#endif
-
+POP_OPTIONS

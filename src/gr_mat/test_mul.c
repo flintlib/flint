@@ -12,10 +12,8 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC push_options
-#pragma GCC optimize ("Os")
-#endif
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
 
 void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
@@ -108,7 +106,4 @@ void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong
     }
 }
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC pop_options
-#endif
-
+POP_OPTIONS

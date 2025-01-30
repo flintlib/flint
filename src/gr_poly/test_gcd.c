@@ -12,10 +12,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC push_options
-#pragma GCC optimize ("Os")
-#endif
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
 
 static int
 gr_poly_gcd_wrapper(gr_method_poly_gcd_op gcd_impl, gr_poly_t G, const gr_poly_t A,
@@ -218,8 +216,4 @@ void _gr_poly_test_gcd(gr_method_poly_gcd_op gcd_impl,
     }
 }
 
-
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC pop_options
-#endif
-
+POP_OPTIONS

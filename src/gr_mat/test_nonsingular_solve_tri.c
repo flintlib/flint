@@ -12,10 +12,8 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC push_options
-#pragma GCC optimize ("Os")
-#endif
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
 
 static void _gr_mat_test_nonsingular_solve_tri(gr_method_mat_binary_op_with_flag solve_impl, int upper, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
@@ -129,7 +127,4 @@ void gr_mat_test_nonsingular_solve_triu(gr_method_mat_binary_op_with_flag solve_
     _gr_mat_test_nonsingular_solve_tri(solve_impl, 1, state, iters, maxn, ctx);
 }
 
-#if defined(__GNUC__) && !defined(__clang__)
-#pragma GCC pop_options
-#endif
-
+POP_OPTIONS
