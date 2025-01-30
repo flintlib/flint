@@ -262,7 +262,7 @@ Transposition and permutations
 .. function:: void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B` to the transpose of `A`. Dimensions must be compatible.
-    `B` and `A` may be the same object if and only if the matrix is square.
+    Aliasing is allowed for square matrices.
 
 .. function:: void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 
@@ -593,7 +593,7 @@ LU decomposition
               slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check)
               slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
-    Computes a generalised LU decomposition `LU = PA` of a given
+    Computes a generalised LU decomposition `PLU = A` of a given
     matrix `A`, returning the rank of `A`.
 
     If `A` is a nonsingular square matrix, it will be overwritten with

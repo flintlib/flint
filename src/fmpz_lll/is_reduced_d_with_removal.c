@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "d_vec.h"
 #include "d_mat.h"
 #include "fmpz.h"
@@ -17,13 +18,6 @@
 
 #if HAVE_FENV_H
 #include <fenv.h>
-#endif
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
 #endif
 
 int

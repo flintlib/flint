@@ -386,7 +386,7 @@ Transpose
 .. function:: void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets `B` to `A^T`, the transpose of `A`. Dimensions must be compatible.
-    `A` and `B` are allowed to be the same object if `A` is a square matrix.
+    Aliasing is allowed for square matrices.
 
 
 

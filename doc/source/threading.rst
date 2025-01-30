@@ -26,7 +26,7 @@ multivariate polynomial algorithms are threaded in FLINT.
 Writing threaded functions in FLINT
 -----------------------------------
 
-Flint uses a custom thread pool for threading. This involves creating a worker
+FLINT uses a custom thread pool for threading. This involves creating a worker
 function, requesting threads from the thread pool, starting the threads,
 waiting for them to finish, then giving the threads back to the pool. Simple
 examples of this include ``fmpz_mod_mat_mul_classical_threaded`` and
@@ -65,7 +65,7 @@ Note that if ``flint_get_num_threads()`` returns ``n`` then the number of worker
 can be started is ``n - 1`` (in addition to the thread the function is already
 running in). For this reason our documentation often distinguishes number of
 workers and number of threads. Please refer to the thread pool interface and
-Flint threading interface documentation to see the exact specification.
+FLINT threading interface documentation to see the exact specification.
 
 Functional parallel programming helpers
 ---------------------------------------

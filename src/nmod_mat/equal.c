@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 
 int
@@ -26,14 +27,9 @@ nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
     {
         for (j = 0; j < mat1->c; j++)
         {
-            if (mat1->rows[i][j] != mat2->rows[i][j])
+            if (!_nmod_vec_equal(nmod_mat_entry_ptr(mat1, i, 0), nmod_mat_entry_ptr(mat2, i, 0), mat1->c))
                 return 0;
         }
-
-        /*
-        if (!_nmod_vec_equal(mat1->rows[i], mat2->rows[i], mat1->c))
-            return 0;
-        */
     }
 
     return 1;

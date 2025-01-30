@@ -445,6 +445,11 @@ Error functions and Fresnel integrals
 Bessel functions
 -------------------------------------------------------------------------------
 
+.. function:: void acb_hypgeom_bessel_j_deriv_bound(mag_t res, const acb_t nu, const acb_t z, ulong d)
+
+    Sets *res* to a bound, possibly crude, for `|J^{(d)}_{\nu}(z)|`.
+    Currently only specialized for small integer `\nu` and small `d`.
+
 .. function:: void acb_hypgeom_bessel_j_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
     Computes the Bessel function of the first kind

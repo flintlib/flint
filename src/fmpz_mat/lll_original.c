@@ -43,10 +43,10 @@ fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta)
     /* compute the rational GSO */
     for (i = 0; i < m; i++)
     {
-        _fmpz_vec_dot(fmpq_mat_entry_num(mu, i, i), A->rows[i], A->rows[i], n);
+        _fmpz_vec_dot(fmpq_mat_entry_num(mu, i, i), fmpz_mat_row(A, i), fmpz_mat_row(A, i), n);
         for (j = 0; j <= i - 1; j++)
         {
-            _fmpz_vec_dot(fmpq_mat_entry_num(R, i, j), A->rows[i], A->rows[j],
+            _fmpz_vec_dot(fmpq_mat_entry_num(R, i, j), fmpz_mat_row(A, i), fmpz_mat_row(A, j),
                           n);
             for (k = 0; k <= j - 1; k++)
             {

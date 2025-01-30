@@ -21,5 +21,5 @@ nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
         return;
 
     for (i = 0; i < A->r; i++)
-        _nmod_vec_set(B->rows[i], A->rows[i], A->c);
+        _nmod_vec_set(nmod_mat_entry_ptr(B, i, 0), nmod_mat_entry_ptr(A, i, 0), A->c);
 }

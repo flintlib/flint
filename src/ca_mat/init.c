@@ -15,19 +15,11 @@
 void
 ca_mat_init(ca_mat_t mat, slong r, slong c, ca_ctx_t ctx)
 {
-    if (r != 0 && c != 0)
-    {
-        slong i;
-
-        mat->entries = _ca_vec_init(r * c, ctx);
-        mat->rows = (ca_ptr *) flint_malloc(r * sizeof(ca_ptr));
-
-        for (i = 0; i < r; i++)
-            mat->rows[i] = mat->entries + i * c;
-    }
-    else
-        mat->entries = NULL;
-
+    mat->entries = NULL;
     mat->r = r;
     mat->c = c;
+    mat->stride = c;
+
+    if (r != 0 && c != 0)
+        mat->entries = _ca_vec_init(r * c, ctx);
 }

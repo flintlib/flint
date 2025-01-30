@@ -57,7 +57,7 @@ TEST_FUNCTION_START(gr_poly_resultant_hgcd, state)
             cutoff1 = n_randint(state, 100);
             cutoff2 = n_randint(state, 100);
         }
-        else if (ctx->which_ring == GR_CTX_CC_CA || ctx->which_ring == GR_CTX_RR_CA)
+        else if (ctx->methods == _ca_methods)
         {
             n = n_randint(state, 3);
             cutoff1 = n_randint(state, 3);

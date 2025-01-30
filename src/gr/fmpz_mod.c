@@ -739,9 +739,36 @@ _gr_fmpz_mod_mat_lu(slong * rank, slong * P, fmpz_mod_mat_t LU, const fmpz_mod_m
 int
 _gr_fmpz_mod_mat_det(fmpz_t res, const fmpz_mod_mat_t mat, gr_ctx_t ctx)
 {
-    fmpz_mod_mat_det(res, mat, FMPZ_MOD_CTX(ctx));
-    return GR_SUCCESS;
+    slong n = mat->r;
+
+    if (n <= 4)
+        return gr_mat_det_cofactor(res, (const gr_mat_struct *) mat, ctx);
+
+    if (gr_mat_det_lu(res, (const gr_mat_struct *) mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    /* Fall back on division-free algorithm if we encountered an impossible inverse */
+    /* Could try something else here: faddeev_bsgs (O(n^3.5)) or Howell form. */
+    return gr_mat_det_berkowitz(res, (const gr_mat_struct *) mat, ctx);
 }
+
+int
+_gr_fmpz_mod_mat_charpoly(fmpz * res, const fmpz_mod_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    if (n >= 16 && _gr_mat_charpoly_danilevsky(res, (const gr_mat_struct *) mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    return _gr_mat_charpoly_berkowitz(res, (const gr_mat_struct *) mat, ctx);
+}
+
+int
+_gr_fmpz_mod_mat_reduce_row(slong * column, fmpz_mod_mat_t mat, slong * P, slong * L, slong n, gr_ctx_t ctx)
+{
+    return fmpz_mod_mat_reduce_row(column, mat, P, L, n, FMPZ_MOD_CTX(ctx));
+}
+
 
 int _fmpz_mod_methods_initialized = 0;
 
@@ -833,6 +860,8 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_fmpz_mod_mat_lu},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpz_mod_mat_det},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fmpz_mod_mat_charpoly},
+    {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) _gr_fmpz_mod_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };
 

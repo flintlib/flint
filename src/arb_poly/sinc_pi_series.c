@@ -38,13 +38,19 @@ _arb_poly_sinc_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong pre
         {
             _arb_poly_sin_pi_series(t, u, hlen, n + 1, prec);
             _arb_poly_div_series(g, t + 1, n, u + 1, hlen - 1, n, prec);
+            _arb_vec_scalar_div(g, g, n, pi, prec);
+        }
+        else if (arb_contains_zero(h))
+        {
+            _arb_vec_scalar_mul(u, h, hlen, pi, prec);
+            _arb_poly_sinc_series(g, u, hlen, n, prec);
         }
         else
         {
             _arb_poly_sin_pi_series(t, u, hlen, n, prec);
             _arb_poly_div_series(g, t, n, u, hlen, n, prec);
+            _arb_vec_scalar_div(g, g, n, pi, prec);
         }
-        _arb_vec_scalar_div(g, g, n, pi, prec);
 
         arb_clear(pi);
         _arb_vec_clear(t, n + 1);

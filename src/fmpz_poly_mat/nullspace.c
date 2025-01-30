@@ -34,7 +34,7 @@ fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
     if (rank == 0)
     {
         for (i = 0; i < nullity; i++)
-            fmpz_poly_set_ui(res->rows[i] + i, UWORD(1));
+            fmpz_poly_one(fmpz_poly_mat_entry(res, i, i));
     }
     else if (nullity)
     {
@@ -43,7 +43,7 @@ fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
 
         for (i = j = k = 0; i < rank; i++)
         {
-            while (fmpz_poly_is_zero(tmp->rows[i] + j))
+            while (fmpz_poly_is_zero(fmpz_poly_mat_entry(tmp, i, j)))
             {
                 nonpivots[k] = j;
                 k++;
@@ -59,14 +59,14 @@ fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
             j++;
         }
 
-        fmpz_poly_set(den, tmp->rows[0] + pivots[0]);
+        fmpz_poly_set(den, fmpz_poly_mat_entry(tmp, 0, pivots[0]));
 
         for (i = 0; i < nullity; i++)
         {
             for (j = 0; j < rank; j++)
-                fmpz_poly_set(res->rows[pivots[j]] + i,
-                    tmp->rows[j] + nonpivots[i]);
-            fmpz_poly_neg(res->rows[nonpivots[i]] + i, den);
+                fmpz_poly_set(fmpz_poly_mat_entry(res, pivots[j], i),
+                    fmpz_poly_mat_entry(tmp, j, nonpivots[i]));
+            fmpz_poly_neg(fmpz_poly_mat_entry(res, nonpivots[i], i), den);
         }
 
         flint_free(pivots);

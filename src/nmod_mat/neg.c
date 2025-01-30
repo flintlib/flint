@@ -21,5 +21,5 @@ nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A)
         return;
 
     for (i = 0; i < A->r; i++)
-        _nmod_vec_neg(B->rows[i], A->rows[i], A->c, A->mod);
+        _nmod_vec_neg(nmod_mat_entry_ptr(B, i, 0), nmod_mat_entry_ptr(A, i, 0), A->c, A->mod);
 }

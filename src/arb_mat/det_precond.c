@@ -9,19 +9,32 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "perm.h"
 #include "arb.h"
 #include "arb_mat.h"
 
 static void
-_apply_permutation(arb_mat_t A, slong * P, slong n)
+_apply_permutation(arb_mat_t A, const slong * P, slong num_rows)
 {
-    arb_ptr * Atmp;
-    slong i;
-    Atmp = flint_malloc(sizeof(arb_ptr) * n);
-    for (i = 0; i < n; i++) Atmp[i] = A->rows[P[i]];
-    for (i = 0; i < n; i++) A->rows[i] = Atmp[i];
-    flint_free(Atmp);
+    if (num_rows != 0)
+    {
+        arb_ptr Atmp;
+        slong i;
+        slong row_offset = 0;
+        slong col_offset = 0;
+        slong num_cols = A->c;
+
+        /* todo: reduce memory allocation */
+        Atmp = flint_malloc(sizeof(arb_struct) * num_rows * num_cols);
+
+        for (i = 0; i < num_rows; i++)
+            memcpy(Atmp + i * num_cols, arb_mat_entry(A, P[i] + row_offset, col_offset), sizeof(arb_struct) * num_cols);
+        for (i = 0; i < num_rows; i++)
+            memcpy(arb_mat_entry(A, i + row_offset, col_offset), Atmp + i * num_cols, sizeof(arb_struct) * num_cols);
+
+        flint_free(Atmp);
+    }
 }
 
 /* Enclosure of det(I + eps) using Gershgorin circles.

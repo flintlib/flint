@@ -29,9 +29,9 @@ Type compatibility
 -------------------------------------------------------------------------------
 
 The ``gr_mat`` type has the same data layout as most
-Flint, Arb and Calcium matrix types.
+FLINT, Arb and Calcium matrix types.
 Methods in this module can therefore be mixed freely with
-methods in the corresponding Flint, Arb and Calcium modules
+methods in the corresponding FLINT, Arb and Calcium modules
 when the underlying coefficient type is the same.
 
 It is not directly compatible with the ``nmod_mat`` type,
@@ -174,9 +174,10 @@ Basic row, column and entry operations
 
 .. function:: int gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
-.. function:: int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx)
+.. function:: int gr_mat_transpose(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
-    Sets *B* to the transpose of *A*.
+    Sets ``res`` to the transpose of ``mat``. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
 
 .. function:: int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 
@@ -278,6 +279,7 @@ Arithmetic
 
 .. function:: int gr_mat_mul_classical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
               int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+              int gr_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
               int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
               int gr_mat_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
@@ -285,14 +287,59 @@ Arithmetic
     otherwise, it falls back to :func:`gr_mat_mul_generic` which currently
     only performs classical multiplication.
 
+    The *Waksman* algorithm assumes a commutative base ring which supports
+    exact division by two.
+
 .. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
-.. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
-              int gr_mat_sub_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
-              int gr_mat_mul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
-              int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+.. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
+              int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
+              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t e, gr_ctx_t ctx)
+
+.. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
+              int gr_mat_scalar_add(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_add_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx)
+              int gr_mat_add_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx)
+              int gr_mat_add_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx)
+              int gr_mat_add_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx)
+              int gr_mat_add_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+              int gr_mat_scalar_other_add(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Perform the matrix-scalar or scalar-matrix operation `A + Ix` or `Ix + A`.
+
+.. function:: int gr_mat_sub_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
+              int gr_mat_scalar_sub(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_sub_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx)
+              int gr_mat_sub_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx)
+              int gr_mat_sub_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx)
+              int gr_mat_sub_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx)
+              int gr_mat_sub_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+              int gr_mat_scalar_other_sub(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Perform the matrix-scalar or scalar-matrix operation `A - Ix` or `Ix - A`.
+
+.. function:: int gr_mat_mul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
+              int gr_mat_scalar_mul(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_mul_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx)
+              int gr_mat_mul_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx)
+              int gr_mat_mul_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx)
+              int gr_mat_mul_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx)
+              int gr_mat_mul_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+              int gr_mat_scalar_other_mul(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Perform the matrix-scalar or scalar-matrix operation `A x` or `x A`.
+
+.. function:: int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
+              int gr_mat_div_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+              int gr_mat_div_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx)
+              int gr_mat_div_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx)
+              int gr_mat_div_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx)
+              int gr_mat_div_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx)
+
+    Perform the matrix-scalar operation `A / x`.
+
+.. function:: int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
               int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
-              int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
 
 .. function:: int _gr_mat_gr_poly_evaluate(gr_mat_t res, gr_srcptr poly, slong len, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t poly, const gr_mat_t mat, gr_ctx_t ctx)
@@ -570,10 +617,15 @@ Characteristic polynomial
 .. function:: int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
 
-    Computes the characteristic polynomial using a default
-    algorithm choice. The
-    underscore method assumes that *res* is a preallocated
-    array of `n + 1` coefficients.
+    Computes the characteristic polynomial using an algorithm choice
+    which defaults to :func:`_gr_mat_charpoly_generic` but may be overridden
+    by specific rings for performance. The underscore method assumes that *res*
+    is a preallocated array of `n + 1` coefficients.
+
+.. function:: int _gr_mat_charpoly_generic(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_charpoly_generic(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Computes the characteristic polynomial using a generic algorithm choice.
 
 .. function:: int _gr_mat_charpoly_berkowitz(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_charpoly_berkowitz(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx)
@@ -703,11 +755,45 @@ Jordan decomposition
 Matrix functions
 -------------------------------------------------------------------------------
 
+.. function:: int gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_op jet_func, gr_ctx_t ctx)
+              int gr_mat_func_param_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_scalar_op jet_func, gr_srcptr c, gr_ctx_t ctx)
+
+    Computes the matrix function `f(A)` using Jordan decomposition.
+    The user supplies ``int jet_func(gr_ptr r, gr_srcptr x, slong n, gr_ctx_t ctx)`` which given a scalar
+    `x` writes the jet `f(x), f'(x), \ldots, f^{(n-1)} / (n-1)!` to
+    the array `r`.
+
+    The *param* version takes as input a function with
+    signature ``int jet_func(gr_ptr r, gr_srcptr x, slong n, gr_srcptr c, gr_ctx_t ctx)`` for evaluating
+    a function `f(x, c)` depending on an extra parameter `c`.
+    Although ``c`` is nominally passed as a ``gr_srcptr``,
+    it can be a void pointer to arbitrary data that ``jet_func`` knows
+    how to handle.
+
 .. function:: int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
 
 .. function:: int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
+.. function:: int gr_mat_pow_scalar_jordan(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
+              int gr_mat_pow_fmpq_jordan(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
+              int gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx)
+
+    Compute `A^c` using Jordan decomposition. The non-Jordan
+    methods also check for small integer exponents and delegate those
+    to the standard powering method.
+
+.. function:: int gr_mat_sqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_rsqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+
+    Compute a square root `A^{1/2}` or a reciprocal square root `A^{-1/2}`.
+    Currently the only implemented algorithm is the Jordan decomposition.
+    Warning: this will often fail and return ``GR_UNABLE`` when the
+    scalar type is not an algebraically closed field, even if the matrix
+    is a perfect square.
+
 
 Hessenberg form
 -------------------------------------------------------------------------------
@@ -812,7 +898,8 @@ with the intended number of rows and columns.
 Helper functions for reduction
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+.. function:: int gr_mat_reduce_row_generic(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
+              int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx)
 
     Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
     form. However those rows may not be in order. The entry `i` of the array
@@ -825,6 +912,9 @@ Helper functions for reduction
     in the case that `A` is chambered on the right. Otherwise the entries of
     `L` can all be set to the number of columns of `A`. We require the entries
     of `L` to be monotonic increasing.
+
+    By default the *generic* version is called; specific rings
+    can overload this (typically to implement delayed canonicalisation).
 
 
 Test functions
@@ -848,6 +938,11 @@ on each test iteration, otherwise the given ring is tested.
 
     Tests the given function ``det_impl`` for correctness as an implementation
     of :func:`gr_mat_det`.
+
+.. function:: void gr_mat_test_charpoly(gr_method_mat_unary_op_get_scalar charpoly_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``charpoly_impl`` for correctness as an implementation
+    of :func:`_gr_mat_charpoly`.
 
 .. function:: void gr_mat_test_nonsingular_solve_tril(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
               void gr_mat_test_nonsingular_solve_triu(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)

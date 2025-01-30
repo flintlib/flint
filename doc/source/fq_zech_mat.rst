@@ -235,6 +235,16 @@ Comparison
 
 
 
+Transpose
+--------------------------------------------------------------------------------
+
+
+.. function:: void fq_zech_mat_transpose(fq_zech_mat_t B, const fq_zech_mat_t A, const fq_zech_ctx_t ctx)
+
+    Sets `B` to `A^T`, the transpose of `A`. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
+
+
 
 Addition and subtraction
 --------------------------------------------------------------------------------
@@ -303,7 +313,7 @@ LU decomposition
 
 .. function:: slong fq_zech_mat_lu(slong * P, fq_zech_mat_t A, int rank_check, const fq_zech_ctx_t ctx)
 
-    Computes a generalised LU decomposition `LU = PA` of a given
+    Computes a generalised LU decomposition `PLU = A` of a given
     matrix `A`, returning the rank of `A`.
 
     If `A` is a nonsingular square matrix, it will be overwritten with
@@ -321,23 +331,6 @@ LU decomposition
     will abandon the output matrix in an undefined state and return 0
     if `A` is detected to be rank-deficient.
 
-    This function calls ``fq_zech_mat_lu_recursive``.
-
-.. function:: slong fq_zech_mat_lu_classical(slong * P, fq_zech_mat_t A, int rank_check, const fq_zech_ctx_t ctx)
-
-    Computes a generalised LU decomposition `LU = PA` of a given
-    matrix `A`, returning the rank of `A`. The behavior of this
-    function is identical to that of ``fq_zech_mat_lu``. Uses Gaussian
-    elimination.
-
-.. function:: slong fq_zech_mat_lu_recursive(slong * P, fq_zech_mat_t A, int rank_check, const fq_zech_ctx_t ctx)
-
-    Computes a generalised LU decomposition `LU = PA` of a given
-    matrix `A`, returning the rank of `A`. The behavior of this
-    function is identical to that of ``fq_zech_mat_lu``. Uses recursive
-    block decomposition, switching to classical Gaussian elimination
-    for sufficiently small blocks.
-
 
 Reduced row echelon form
 --------------------------------------------------------------------------------
@@ -350,20 +343,6 @@ Reduced row echelon form
     The rref is computed by first obtaining an unreduced row echelon
     form via LU decomposition and then solving an additional
     triangular system.
-
-.. function:: slong fq_zech_mat_reduce_row(fq_zech_mat_t A, slong * P, slong * L, slong n, const fq_zech_ctx_t ctx)
-
-    Reduce row n of the matrix `A`, assuming the prior rows are in Gauss
-    form. However those rows may not be in order. The entry `i` of the array
-    `P` is the row of `A` which has a pivot in the `i`-th column. If no such
-    row exists, the entry of `P` will be `-1`. The function returns the column
-    in which the `n`-th row has a pivot after reduction. This will always be
-    chosen to be the first available column for a pivot from the left. This
-    information is also updated in `P`. Entry `i` of the array `L` contains the
-    number of possibly nonzero columns of `A` row `i`. This speeds up reduction
-    in the case that `A` is chambered on the right. Otherwise the entries of
-    `L` can all be set to the number of columns of `A`. We require the entries
-    of `L` to be monotonic increasing.
 
 
 Triangular solving
@@ -379,33 +358,6 @@ Triangular solving
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
-.. function:: void fq_zech_mat_solve_tril_classical(fq_zech_mat_t X, const fq_zech_mat_t L, const fq_zech_mat_t B, int unit, const fq_zech_ctx_t ctx)
-
-    Sets `X = L^{-1} B` where `L` is a full rank lower triangular
-    square matrix. If ``unit`` = 1, `L` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed. Uses forward substitution.
-
-.. function:: void fq_zech_mat_solve_tril_recursive(fq_zech_mat_t X, const fq_zech_mat_t L, const fq_zech_mat_t B, int unit, const fq_zech_ctx_t ctx)
-
-    Sets `X = L^{-1} B` where `L` is a full rank lower triangular
-    square matrix. If ``unit`` = 1, `L` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed.
-
-    Uses the block inversion formula
-
-    .. math::
-      \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
-      \begin{pmatrix} X \\ Y \end{pmatrix} =
-      \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
-
-
-    to reduce the problem to matrix multiplication and triangular
-    solving of smaller systems.
-
 .. function:: void fq_zech_mat_solve_triu(fq_zech_mat_t X, const fq_zech_mat_t U, const fq_zech_mat_t B, int unit, const fq_zech_ctx_t ctx)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular
@@ -415,32 +367,6 @@ Triangular solving
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
-.. function:: void fq_zech_mat_solve_triu_classical(fq_zech_mat_t X, const fq_zech_mat_t U, const fq_zech_mat_t B, int unit, const fq_zech_ctx_t ctx)
-
-    Sets `X = U^{-1} B` where `U` is a full rank upper triangular
-    square matrix. If ``unit`` = 1, `U` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed. Uses forward substitution.
-
-.. function:: void fq_zech_mat_solve_triu_recursive(fq_zech_mat_t X, const fq_zech_mat_t U, const fq_zech_mat_t B, int unit, const fq_zech_ctx_t ctx)
-
-    Sets `X = U^{-1} B` where `U` is a full rank upper triangular
-    square matrix. If ``unit`` = 1, `U` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
-    and `B` are allowed to be the same matrix, but no other aliasing
-    is allowed.
-
-    Uses the block inversion formula
-
-    .. math::
-        \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
-        \begin{pmatrix} X \\ Y \end{pmatrix} =
-        \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
-
-
-    to reduce the problem to matrix multiplication and triangular
-    solving of smaller systems.
 
 Solving
 --------------------------------------------------------------------------------
@@ -486,11 +412,6 @@ Transforms
 Characteristic polynomial
 --------------------------------------------------------------------------------
 
-
-.. function:: void fq_zech_mat_charpoly_danilevsky(fq_zech_poly_t p, const fq_zech_mat_t M, const fq_zech_ctx_t ctx)
-
-    Compute the characteristic polynomial `p` of the matrix `M`. The matrix
-    is assumed to be square.
 
 .. function:: void fq_zech_mat_charpoly(fq_zech_poly_t p, const fq_zech_mat_t M, const fq_zech_ctx_t ctx)
 

@@ -96,9 +96,9 @@ Conversions
 
     Sets *dest* to *src*. The operands must have identical dimensions.
 
-.. function:: void acb_mat_get_real(arb_mat_t re, const arb_mat_t mat)
+.. function:: void acb_mat_get_real(arb_mat_t re, const acb_mat_t mat)
 
-.. function:: void acb_mat_get_imag(arb_mat_t im, const arb_mat_t mat)
+.. function:: void acb_mat_get_imag(arb_mat_t im, const acb_mat_t mat)
 
     Sets *re* or *im* to the real or imaginary part of *mat*, respectively.
     The operands must have identical dimensions.
@@ -251,12 +251,12 @@ Transpose
 .. function:: void acb_mat_transpose(acb_mat_t dest, const acb_mat_t src)
 
     Sets *dest* to the exact transpose *src*. The operands must have
-    compatible dimensions. Aliasing is allowed.
+    compatible dimensions. Aliasing is allowed for square matrices.
 
 .. function:: void acb_mat_conjugate_transpose(acb_mat_t dest, const acb_mat_t src)
 
     Sets *dest* to the conjugate transpose of *src*. The operands must have
-    compatible dimensions. Aliasing is allowed.
+    compatible dimensions. Aliasing is allowed for square matrices.
 
 .. function:: void acb_mat_conjugate(acb_mat_t dest, const acb_mat_t src)
 

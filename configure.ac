@@ -642,6 +642,10 @@ case $host in
         gcc_cflags_arch="-march=armv8.6-a"
         gcc_cflags_tune=""
         ;;
+      applem4*)
+        gcc_cflags_arch="-march=armv8.7-a"
+        gcc_cflags_tune=""
+        ;;
       aarch64* | armv8*)
         gcc_cflags_arch="-march=armv8-a"
         gcc_cflags_tune=""
@@ -758,6 +762,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
 	    ;;
 	esac
 
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
+
     if test "$have_avx512" = "yes";
     then
         have_avx2="yes"
@@ -802,6 +813,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         have_avx512="yes"
         ;;
     esac
+
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
 
     if test "$have_avx512" = "yes";
     then
@@ -1156,6 +1174,8 @@ fi
 AC_SUBST(PIC_FLAG,$pic_flag)
 
 FLINT_CHECK_CPU_SET_T([AC_DEFINE([FLINT_USES_CPUSET],1,Define if system has cpu_set_t)])
+
+FLINT_CHECK_PRAGMAS
 
 # ensure alloca works
 AC_MSG_CHECKING([if alloca works])

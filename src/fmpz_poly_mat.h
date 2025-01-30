@@ -29,7 +29,7 @@ extern "C" {
 FMPZ_POLY_MAT_INLINE
 fmpz_poly_struct * fmpz_poly_mat_entry(const fmpz_poly_mat_t mat, slong i, slong j)
 {
-   return mat->rows[i] + j;
+   return mat->entries + i * mat->stride + j;
 }
 
 FMPZ_POLY_MAT_INLINE

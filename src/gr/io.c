@@ -9,16 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include <stdio.h>
 #include "fmpz.h"
 #include "gr.h"
-
-#ifdef __GNUC__
-# define memcpy __builtin_memcpy
-# define strlen __builtin_strlen
-#else
-# include <math.h>
-#endif
 
 /* todo: error handling */
 

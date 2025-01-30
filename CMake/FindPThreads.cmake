@@ -9,7 +9,7 @@ if (PThreads_INCLUDE_DIRS AND PThreads_LIBRARIES)
 endif (PThreads_INCLUDE_DIRS AND PThreads_LIBRARIES)
 
 find_path(PThreads_INCLUDE_DIRS NAMES pthread.h )
-find_library(PThreads_LIBRARIES NAMES pthreads libpthreads )
+find_library(PThreads_LIBRARIES NAMES pthread pthreads libpthreads )
 
 include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(PThreads DEFAULT_MSG PThreads_INCLUDE_DIRS PThreads_LIBRARIES)

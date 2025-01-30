@@ -19,15 +19,15 @@
 void perm(ca_mat_t A, slong * P)
 {
     slong i;
-    ca_struct ** tmp;
+    ca_ptr tmp;
 
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(ca_struct *) * A->r);
+    tmp = flint_malloc(sizeof(ca_struct) * A->r * A->c);
 
-    for (i = 0; i < A->r; i++) tmp[P[i]] = A->rows[i];
-    for (i = 0; i < A->r; i++) A->rows[i] = tmp[i];
+    for (i = 0; i < A->r; i++) memcpy(tmp + P[i] * A->c, ca_mat_entry(A, i, 0), A->c * sizeof(ca_struct));
+    for (i = 0; i < A->r; i++) memcpy(ca_mat_entry(A, i, 0), tmp + i * A->c, A->c * sizeof(ca_struct));
 
     flint_free(tmp);
 }

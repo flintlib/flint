@@ -21,5 +21,5 @@ fmpz_mat_neg(fmpz_mat_t res, const fmpz_mat_t mat)
         return;
 
     for (i = 0; i < res->r; i++)
-        _fmpz_vec_neg(res->rows[i], mat->rows[i], res->c);
+        _fmpz_vec_neg(fmpz_mat_row(res, i), fmpz_mat_row(mat, i), res->c);
 }

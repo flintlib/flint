@@ -168,6 +168,7 @@ Albin Ahlbäck
 
   web      https://albinahlback.gitlab.io/
   github   albinahlback
+  grants   ERC-2023-ADG ODELIX
 
 Isuru Fernando
 
@@ -461,6 +462,10 @@ Michael Abshoff
 
   Original build system, project infrastructure. 
 
+Éric Schost
+
+  Waksman matrix multiplication.
+
 Other contributors
 -------------------------------------------------------------------------------
 
@@ -470,6 +475,7 @@ improvements, or other significant support. The list is certainly incomplete.
 Timothy Abbot
 Hrvoje Abraham
 Martin Albrecht
+Bill Allombert
 Shi Bai
 Robert Baillie
 Oscar Benjamin
@@ -490,6 +496,7 @@ Gianfranco Costamagna
 Håvard Damm-Johnsen
 Jeroen Demeyer
 Didier Deshommes
+Tobias Diez
 David Einstein
 Andreas Enge
 Jan Englehardt
@@ -522,12 +529,14 @@ Yuri Matiyasevich
 Anton Mellit
 Kate Minola
 Apoorv Mishra
+Jake Moss
 Oleksandr Motsak
 Michael Orlitzky
 Michele Orru
 Julien Ospald
 John Palmieri
 Dima Pasechnik
+Giacomo Pope
 Julien Puydt
 Josh Rickmar
 Erico Rolim Noguerira

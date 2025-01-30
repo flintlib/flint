@@ -15,106 +15,116 @@
 
 int gr_mpoly_set_scalar(gr_mpoly_t A,
     gr_srcptr c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
 
     if (gr_is_zero(c, cctx) == T_TRUE)
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
 
-    gr_mpoly_fit_length(A, 1, mctx, cctx);
+    gr_mpoly_fit_length(A, 1, ctx);
     mpoly_monomial_zero(A->exps, mpoly_words_per_exp(A->bits, mctx));
 
     status = gr_set(A->coeffs, c, cctx);
-    _gr_mpoly_set_length(A, 1, mctx, cctx);
+    _gr_mpoly_set_length(A, 1, ctx);
 
     return status;
 }
 
 int gr_mpoly_set_ui(gr_mpoly_t A,
     ulong c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
 
     if (c == 0)
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
 
-    gr_mpoly_fit_length(A, 1, mctx, cctx);
+    gr_mpoly_fit_length(A, 1, ctx);
     mpoly_monomial_zero(A->exps, mpoly_words_per_exp(A->bits, mctx));
 
     status = gr_set_ui(A->coeffs, c, cctx);
 
     if (gr_is_zero(A->coeffs, cctx) == T_TRUE)
-        _gr_mpoly_set_length(A, 0, mctx, cctx);
+        _gr_mpoly_set_length(A, 0, ctx);
     else
-        _gr_mpoly_set_length(A, 1, mctx, cctx);
+        _gr_mpoly_set_length(A, 1, ctx);
 
     return status;
 }
 
 int gr_mpoly_set_si(gr_mpoly_t A,
     slong c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
 
     if (c == 0)
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
 
-    gr_mpoly_fit_length(A, 1, mctx, cctx);
+    gr_mpoly_fit_length(A, 1, ctx);
     mpoly_monomial_zero(A->exps, mpoly_words_per_exp(A->bits, mctx));
 
     status = gr_set_si(A->coeffs, c, cctx);
 
     if (gr_is_zero(A->coeffs, cctx) == T_TRUE)
-        _gr_mpoly_set_length(A, 0, mctx, cctx);
+        _gr_mpoly_set_length(A, 0, ctx);
     else
-        _gr_mpoly_set_length(A, 1, mctx, cctx);
+        _gr_mpoly_set_length(A, 1, ctx);
 
     return status;
 }
 
 int gr_mpoly_set_fmpz(gr_mpoly_t A,
     const fmpz_t c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
 
     if (fmpz_is_zero(c))
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
 
-    gr_mpoly_fit_length(A, 1, mctx, cctx);
+    gr_mpoly_fit_length(A, 1, ctx);
     mpoly_monomial_zero(A->exps, mpoly_words_per_exp(A->bits, mctx));
 
     status = gr_set_fmpz(A->coeffs, c, cctx);
 
     if (gr_is_zero(A->coeffs, cctx) == T_TRUE)
-        _gr_mpoly_set_length(A, 0, mctx, cctx);
+        _gr_mpoly_set_length(A, 0, ctx);
     else
-        _gr_mpoly_set_length(A, 1, mctx, cctx);
+        _gr_mpoly_set_length(A, 1, ctx);
 
     return status;
 }
 
 int gr_mpoly_set_fmpq(gr_mpoly_t A,
     const fmpq_t c,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     int status;
 
     if (fmpq_is_zero(c))
-        return gr_mpoly_zero(A, mctx, cctx);
+        return gr_mpoly_zero(A, ctx);
 
-    gr_mpoly_fit_length(A, 1, mctx, cctx);
+    gr_mpoly_fit_length(A, 1, ctx);
     mpoly_monomial_zero(A->exps, mpoly_words_per_exp(A->bits, mctx));
 
     status = gr_set_fmpq(A->coeffs, c, cctx);
 
     if (gr_is_zero(A->coeffs, cctx) == T_TRUE)
-        _gr_mpoly_set_length(A, 0, mctx, cctx);
+        _gr_mpoly_set_length(A, 0, ctx);
     else
-        _gr_mpoly_set_length(A, 1, mctx, cctx);
+        _gr_mpoly_set_length(A, 1, ctx);
 
     return status;
 }

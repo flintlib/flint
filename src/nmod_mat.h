@@ -26,18 +26,18 @@
 extern "C" {
 #endif
 
-#define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
+#define nmod_mat_entry(mat,i,j) ((mat)->entries[(i) * (mat)->stride + (j)])
 
 NMOD_MAT_INLINE
 ulong nmod_mat_get_entry(const nmod_mat_t mat, slong i, slong j)
 {
-   return mat->rows[i][j];
+   return nmod_mat_entry(mat, i, j);
 }
 
 NMOD_MAT_INLINE
 ulong * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
 {
-   return mat->rows[i] + j;
+   return &nmod_mat_entry(mat, i, j);
 }
 
 /* See inlines.c */
@@ -70,8 +70,8 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
     slong i, j;
     for (i = 0; i < nmod_mat_nrows(mat1); i++)
     {
-       ulong * row1 = mat1->rows[i];
-       ulong * row2 = mat2->rows[i];
+       ulong * row1 = nmod_mat_entry_ptr(mat1, i, 0);
+       ulong * row2 = nmod_mat_entry_ptr(mat2, i, 0);
        for (j = 0; j < nmod_mat_ncols(mat1); j++)
           FLINT_SWAP(ulong, row1[j], row2[j]);
     }
@@ -79,8 +79,24 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
 
 /* Windows and concatenation */
 
-void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, slong r1, slong c1, slong r2, slong c2);
-void nmod_mat_window_clear(nmod_mat_t window);
+NMOD_MAT_INLINE void
+nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
+    slong r1, slong c1, slong r2, slong c2)
+{
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
+
+    window->entries = nmod_mat_entry_ptr(mat, r1, c1);
+    window->r = r2 - r1;
+    window->c = c2 - c1;
+    window->stride = mat->stride;
+    window->mod = mat->mod;
+}
+
+NMOD_MAT_INLINE void
+nmod_mat_window_clear(nmod_mat_t FLINT_UNUSED(window))
+{
+}
 
 void nmod_mat_concat_horizontal(nmod_mat_t res,
                            const nmod_mat_t mat1,  const nmod_mat_t mat2);
@@ -212,10 +228,17 @@ void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s && !nmod_mat_is_empty(mat))
     {
+        slong i;
+        nn_ptr u, v;
+
         if (perm)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
-        FLINT_SWAP(nn_ptr, mat->rows[r], mat->rows[s]);
+        u = nmod_mat_entry_ptr(mat, r, 0);
+        v = nmod_mat_entry_ptr(mat, s, 0);
+
+        for (i = 0; i < mat->c; i++)
+            FLINT_SWAP(ulong, u[i], v[i]);
     }
 }
 
@@ -239,7 +262,7 @@ void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
         for (i = 0; i < mat->r; i++)
-            FLINT_SWAP(ulong, mat->rows[i][r], mat->rows[i][s]);
+            FLINT_SWAP(ulong, nmod_mat_entry(mat, i, r), nmod_mat_entry(mat, i, s));
     }
 }
 
@@ -258,7 +281,7 @@ void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
 
         for (t = 0; t < mat->r; t++)
             for (i = 0; i < k; i++)
-                FLINT_SWAP(ulong, mat->rows[t][i], mat->rows[t][c - i - 1]);
+                FLINT_SWAP(ulong, nmod_mat_entry(mat, t, i), nmod_mat_entry(mat, t, c - i - 1));
     }
 }
 

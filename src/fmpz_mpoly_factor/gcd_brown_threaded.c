@@ -349,10 +349,9 @@ static void _find_edge(
  * dangling pointers after returning, that is, the values `input[ix]' will be
  * invalid after returning.  Hence, we silence warnings about dangling pointers.
  * However, this warning is only available in GCC 12 and forwards.*/
-#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdangling-pointer"
-#endif
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DANGLING_POINTER
+
 static slong _fmpz_mpoly_crt(
     const fmpz_multi_CRT_t P,
     _joinworker_arg_struct * S,
@@ -525,9 +524,8 @@ static slong _fmpz_mpoly_crt(
 
     return lastdegree;
 }
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
+
+DIAGNOSTIC_POP
 
 
 typedef struct

@@ -67,7 +67,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
         if (j >= arg.len2)
             return;
 
-        _nmod_vec_set(res[j].coeffs, C->rows[(j + 1)*k - 1], n);
+        _nmod_vec_set(res[j].coeffs, nmod_mat_entry_ptr(C, (j + 1)*k - 1, 0), n);
 
         if (n == 1) /* special case, constant polynomials */
         {
@@ -75,7 +75,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
             {
                 t[0] = n_mulmod2_preinv(res[j].coeffs[0], h[0], p.n, p.ninv);
                 res[j].coeffs[0] = n_addmod(t[0],
-                                               C->rows[(j + 1)*k - i][0], p.n);
+                                               nmod_mat_entry(C, (j + 1)*k - i, 0), p.n);
             }
         } else
         {
@@ -84,7 +84,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
                 _nmod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly,
                                                       len, polyinv, leninv, p);
                 _nmod_poly_add(res[j].coeffs, t, n,
-                                                 C->rows[(j + 1)*k - i], n, p);
+                                                 nmod_mat_entry_ptr(C, (j + 1)*k - i, 0), n, p);
             }
         }
     }
@@ -127,15 +127,24 @@ void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
         len1 = polys[j].length;
 
         for (i = 0; i < len1 / m; i++)
-            _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m, m);
+            _nmod_vec_set(nmod_mat_entry_ptr(B, i + j * k, 0), polys[j].coeffs + i * m, m);
 
-        _nmod_vec_set(B->rows[i + j * k], polys[j].coeffs + i * m,
-                      len1 % m);
+        _nmod_vec_set(nmod_mat_entry_ptr(B, i + j * k, 0), polys[j].coeffs + i * m, len1 % m);
     }
 
     /* Set rows of A to powers of g */
-    _nmod_poly_powers_mod_preinv_threaded_pool(A->rows, g, glen,
-                         m, poly, len, polyinv, leninv, mod, threads, num_threads);
+    {
+        nn_ptr * Arows;
+        slong i;
+        Arows = flint_malloc(sizeof(nn_ptr) * A->r);
+        for (i = 0; i < A->r; i++)
+            Arows[i] = nmod_mat_entry_ptr(A, i, 0);
+
+        _nmod_poly_powers_mod_preinv_threaded_pool(Arows, g, glen,
+                             m, poly, len, polyinv, leninv, mod, threads, num_threads);
+
+        flint_free(Arows);
+    }
 
     _nmod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,
                                                          threads, num_threads);
@@ -143,12 +152,12 @@ void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
     /* Evaluate block composition using the Horner scheme */
     if (n == 1)
     {
-        h[0] = n_mulmod2_preinv(A->rows[m - 1][0],
-                                               A->rows[1][0], mod.n, mod.ninv);
+        h[0] = n_mulmod2_preinv(nmod_mat_entry(A, m - 1, 0),
+                                               nmod_mat_entry(A, 1, 0), mod.n, mod.ninv);
     } else
     {
 
-        _nmod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1], n, poly,
+        _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, nmod_mat_entry_ptr(A, 1, 0), n, poly,
                              len, polyinv, leninv, mod);
     }
 

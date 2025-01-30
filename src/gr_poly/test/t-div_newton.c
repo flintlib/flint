@@ -45,7 +45,7 @@ TEST_FUNCTION_START(gr_poly_div_newton, state)
         }
 
         /* test aliasing */
-        switch (n_randint(state, 4))
+        switch (n_randint(state, 5))
         {
             case 0:
                 status |= gr_poly_set(Q, A, ctx);
@@ -55,11 +55,11 @@ TEST_FUNCTION_START(gr_poly_div_newton, state)
                 status |= gr_poly_set(Q, B, ctx);
                 status |= gr_poly_div_newton(Q, A, B, ctx);
                 break;
-            case 3:
+            case 2:
                 status |= gr_poly_set(A, B, ctx);
                 status |= gr_poly_div_newton(Q, A, A, ctx);
                 break;
-            case 4:
+            case 3:
                 status |= gr_poly_set(A, B, ctx);
                 status |= gr_poly_set(Q, A, ctx);
                 status |= gr_poly_div_newton(Q, Q, Q, ctx);

@@ -732,11 +732,44 @@ scaled_bessel_select_N(arb_t N, ulong k, slong prec)
     arb_mul_2exp_si(N, N, e);
 }
 
+/* f(z) = Si(z) */
+int
+f_si(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+{
+    if (order > 1)
+        flint_abort();  /* Would be needed for Taylor method. */
+
+    acb_hypgeom_si(res, z, prec);
+    return 0;
+}
+
+/* f(z) = J_0(z) J_1(z) J_2(z) */
+int
+f_triple_bessel_j(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+{
+    acb_t t;
+
+    if (order > 1)
+        flint_abort();  /* Would be needed for Taylor method. */
+
+    acb_init(t);
+    acb_hypgeom_bessel_j(res, t, z, prec);
+    acb_set_ui(t, 1);
+    acb_hypgeom_bessel_j(t, t, z, prec);
+    acb_mul(res, res, t, prec);
+    acb_set_ui(t, 2);
+    acb_hypgeom_bessel_j(t, t, z, prec);
+    acb_mul(res, res, t, prec);
+    acb_clear(t);
+
+    return 0;
+}
+
 /* ------------------------------------------------------------------------- */
 /*  Main test program                                                        */
 /* ------------------------------------------------------------------------- */
 
-#define NUM_INTEGRALS 37
+#define NUM_INTEGRALS 39
 
 const char * descr[NUM_INTEGRALS] =
 {
@@ -777,6 +810,8 @@ const char * descr[NUM_INTEGRALS] =
     "int_0^{inf} exp(-x) I_0(x/15)^{15} dx   (using domain truncation)",
     "int_{-1-i}^{-1+i} 1/sqrt(x) dx",
     "int_0^{inf} 1/gamma(x) dx   (using domain truncation)",
+    "int_0^{1000} Si(x) dx",
+    "int_0^{1000} J_0(x) J_1(x) J_2(x) dx",
 };
 
 int main(int argc, char *argv[])
@@ -1271,6 +1306,18 @@ int main(int argc, char *argv[])
                 acb_set_ui(b, 4 + (goal + 1) / 2);
                 acb_calc_integrate(s, f_rgamma, NULL, a, b, goal, tol, options, prec);
                 arb_add_error_2exp_si(acb_realref(s), -goal);
+                break;
+
+            case 37:
+                acb_zero(a);
+                acb_set_ui(b, 1000);
+                acb_calc_integrate(s, f_si, NULL, a, b, goal, tol, options, prec);
+                break;
+
+            case 38:
+                acb_zero(a);
+                acb_set_ui(b, 1000);
+                acb_calc_integrate(s, f_triple_bessel_j, NULL, a, b, goal, tol, options, prec);
                 break;
 
             default:

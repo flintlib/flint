@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "double_extras.h"
 #include "fmpq.h"
 #include "arf.h"
 #include "gr_vec.h"
@@ -21,23 +22,35 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
     slong iter, m, n, p, i, nlimbs;
     nn_ptr A, B, C, D, t;
     nn_ptr a;
-    int which;
 
-    slong MAXN = 12;
+    slong MAXN = 20;
     slong MINLIMBS = 2;
     slong MAXLIMBS = 12;
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        which = n_randint(state, 6);
-
         m = 1 + n_randint(state, MAXN);
         n = 1 + n_randint(state, MAXN);
         p = 1 + n_randint(state, MAXN);
 
         nlimbs = MINLIMBS + n_randint(state, MAXLIMBS - MINLIMBS + 1);
 
-        ulong maxerr = 2 * (2 * nlimbs - 1) * n;
+        ulong maxerr;
+
+        int top;
+        double bound, error, classical_precise_error;
+
+        top = 1;
+        while (1)
+        {
+            _nfixed_mat_mul_bound(&bound, &error, m, n, p, ldexp(1.0, -top), ldexp(1.0, -top), nlimbs);
+            if (bound < 1.0)
+                break;
+            top++;
+        }
+
+        classical_precise_error = 1.01;
+        maxerr = (ulong) (error + classical_precise_error + 1.0);
 
         A = flint_malloc((nlimbs + 1) * (m * n) * sizeof(ulong));
         B = flint_malloc((nlimbs + 1) * (n * p) * sizeof(ulong));
@@ -50,7 +63,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
             a = A + i * (nlimbs + 1);
             a[0] = n_randint(state, 2);
             flint_mpn_rrandom(a + 1, state, nlimbs);
-            a[nlimbs] >>= 10;
+            a[nlimbs] >>= top;
         }
 
         for (i = 0; i < n * p; i++)
@@ -58,7 +71,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
             a = B + i * (nlimbs + 1);
             a[0] = n_randint(state, 2);
             flint_mpn_rrandom(a + 1, state, nlimbs);
-            a[nlimbs] >>= 10;
+            a[nlimbs] >>= top;
         }
 
         for (i = 0; i < m * p; i++)
@@ -72,12 +85,8 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
             flint_mpn_rrandom(a + 1, state, nlimbs);
         }
 
-        _nfixed_mat_mul_classical(C, A, B, m, n, p, nlimbs);
-
-        if (which == 0)
-            _nfixed_mat_mul_waksman(D, A, B, m, n, p, nlimbs);
-        else
-            _nfixed_mat_mul_strassen(D, A, B, m, n, p, which, nlimbs);
+        _nfixed_mat_mul_classical_precise(C, A, B, m, n, p, nlimbs);
+        _nfixed_mat_mul(D, A, B, m, n, p, nlimbs);
 
         for (i = 0; i < m * p; i++)
         {
@@ -95,6 +104,7 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
         flint_free(B);
         flint_free(C);
         flint_free(D);
+        flint_free(t);
     }
 
     TEST_FUNCTION_END(state);

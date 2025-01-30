@@ -102,25 +102,25 @@ _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, slong len1,
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < len1 / m; i++)
-        _fmpz_vec_set(B->rows[i], poly1 + i*m, m);
-    _fmpz_vec_set(B->rows[i], poly1 + i*m, len1 % m);
+        _fmpz_vec_set(fmpz_mat_row(B, i), poly1 + i*m, m);
+    _fmpz_vec_set(fmpz_mat_row(B, i), poly1 + i*m, len1 % m);
 
     /* Set rows of A to powers of poly2 */
-    fmpz_one(A->rows[0]);
-    _fmpz_vec_set(A->rows[1], poly2, len2);
+    fmpz_one(fmpz_mat_row(A, 0));
+    _fmpz_vec_set(fmpz_mat_row(A, 1), poly2, len2);
     for (i = 2; i < m; i++)
-        _fmpz_poly_mullow(A->rows[i], A->rows[i-1], n, poly2, len2, n);
+        _fmpz_poly_mullow(fmpz_mat_row(A, i), fmpz_mat_row(A, i - 1), n, poly2, len2, n);
 
     fmpz_mat_mul(C, B, A);
 
     /* Evaluate block composition using the Horner scheme */
-    _fmpz_vec_set(res, C->rows[m - 1], n);
-    _fmpz_poly_mullow(h, A->rows[m - 1], n, poly2, len2, n);
+    _fmpz_vec_set(res, fmpz_mat_row(C, m - 1), n);
+    _fmpz_poly_mullow(h, fmpz_mat_row(A, m - 1), n, poly2, len2, n);
 
     for (i = m - 2; i >= 0; i--)
     {
         _fmpz_poly_mullow(t, res, n, h, n, n);
-        _fmpz_poly_add(res, t, n, C->rows[i], n);
+        _fmpz_poly_add(res, t, n, fmpz_mat_row(C, i), n);
     }
 
     _fmpz_vec_clear(h, n);

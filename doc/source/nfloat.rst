@@ -467,7 +467,8 @@ intermediate results (including rounding errors) lie in `(-1,1)`.
     indicate the offset in number of limbs between consecutive entries
     and may be negative.
 
-.. function:: void _nfixed_mat_mul_classical(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
+.. function:: void _nfixed_mat_mul_classical_precise(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
+              void _nfixed_mat_mul_classical(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
               void _nfixed_mat_mul_waksman(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
               void _nfixed_mat_mul_strassen(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong cutoff, slong nlimbs)
               void _nfixed_mat_mul(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
@@ -475,3 +476,24 @@ intermediate results (including rounding errors) lie in `(-1,1)`.
     Matrix multiplication using various algorithms.
     The *strassen* variant takes a *cutoff* parameter specifying where
     to switch from basecase multiplication to Strassen multiplication.
+    The *classical_precise* version computes with one extra limb of
+    internal precision; this is only intended for testing purposes.
+
+.. function:: void _nfixed_mat_mul_bound_classical(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong nlimbs)
+              void _nfixed_mat_mul_bound_waksman(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong nlimbs)
+              void _nfixed_mat_mul_bound_strassen(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong cutoff, slong nlimbs)
+              void _nfixed_mat_mul_bound(double * bound, double * error, slong m, slong n, slong p, double A, double B, slong nlimbs)
+              void _nfixed_complex_mat_mul_bound(double * bound, double * error, slong m, slong n, slong p, double A, double B, double C, double D, slong nlimbs)
+
+    For the respective matrix multiplication algorithm, computes bounds
+    for a size `m \times n \times p` product at precision *nlimbs*
+    given entrywise bounds *A* and *B*.
+
+    The *bound* output is set to a bound for the entries in all intermediate
+    variables of the computation. This should be < 1 to
+    ensure correctness. The *error* output is set to a bound for the
+    output error, measured in ulp.
+    The caller can assume that the computed bounds are nondecreasing
+    functions of *A* and *B*.
+
+    For complex multiplication, the entrywise bounds are for `A+Bi` and `C+Di`.

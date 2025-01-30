@@ -10,31 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 {
-    slong i, j;
-
-    if (B->r != A->c || B->c != A->r)
-    {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_mat_transpose). Incompatible dimensions.\n");
-    }
-
-    if (A == B)  /* In-place, guaranteed to be square */
-    {
-        for (i = 0; i < A->r - 1; i++)
-            for (j = i + 1; j < A->c; j++)
-                fmpz_poly_swap(fmpz_poly_mat_entry(B, i, j),
-                               fmpz_poly_mat_entry(B, j, i));
-    }
-    else  /* Not aliased; general case */
-    {
-        for (i = 0; i < B->r; i++)
-            for (j = 0; j < B->c; j++)
-                fmpz_poly_set(fmpz_poly_mat_entry(B, i, j),
-                              fmpz_poly_mat_entry(A, j, i));
-    }
+    gr_ctx_t gr_ctx;
+    gr_ctx_init_fmpz_poly(gr_ctx);
+    GR_MUST_SUCCEED(gr_mat_transpose((gr_mat_struct *)B, (const gr_mat_struct *) A, gr_ctx));
 }

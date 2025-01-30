@@ -219,6 +219,17 @@ Basic comparison and properties
     than its degree, this entry is first resized to the appropriate length,
     with intervening coefficients being set to zero.
 
+
+
+Transposition
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_poly_mat_transpose(nmod_poly_mat_t B, const nmod_poly_mat_t A)
+
+    Sets `B` to the transpose of `A`. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
+
+
 Norms
 --------------------------------------------------------------------------------
 

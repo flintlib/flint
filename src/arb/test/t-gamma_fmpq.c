@@ -9,16 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq.h"
 #include "arb.h"
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-#else
-# include <math.h>
-#endif
 
 TEST_FUNCTION_START(arb_gamma_fmpq, state)
 {

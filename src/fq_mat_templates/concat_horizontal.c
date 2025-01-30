@@ -26,9 +26,9 @@ TEMPLATE(T, mat_concat_horizontal) (TEMPLATE(T, mat_t) res,
 
    for (i = 0; i < r1; i++) {
        if (c1 > 0)
-          _TEMPLATE(T, vec_set) (res->rows[i], mat1->rows[i], c1, ctx);
+          _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry)(res, i, 0), TEMPLATE(T, mat_entry)(mat1, i, 0), c1, ctx);
        if (c2 > 0)
-          _TEMPLATE(T, vec_set) (res->rows[i] + c1, mat2->rows[i], c2, ctx);
+          _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry)(res, i, c1), TEMPLATE(T, mat_entry)(mat2, i, 0), c2, ctx);
    }
 }
 

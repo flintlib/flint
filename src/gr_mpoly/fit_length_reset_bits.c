@@ -16,10 +16,10 @@ void gr_mpoly_fit_length_reset_bits(
     gr_mpoly_t A,
     slong len,
     flint_bitcnt_t bits,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
-    slong N = mpoly_words_per_exp(bits, mctx);
+    slong N = mpoly_words_per_exp(bits, GR_MPOLY_MCTX(ctx));
     _gr_mpoly_fit_length(&A->coeffs, &A->coeffs_alloc,
-                               &A->exps, &A->exps_alloc, N, len, cctx);
+                               &A->exps, &A->exps_alloc, N, len, ctx);
     A->bits = bits;
 }

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 
 int
@@ -31,14 +32,15 @@ nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
     if (rank == A->r)
     {
         nmod_mat_t PB;
-        nmod_mat_window_init(PB, B, 0, 0, B->r, B->c);
+        nmod_mat_init(PB, B->r, B->c, B->mod.n);
+
         for (i = 0; i < A->r; i++)
-            PB->rows[i] = B->rows[perm[i]];
+            _nmod_vec_set(nmod_mat_entry_ptr(PB, i, 0), nmod_mat_entry_ptr(B, perm[i], 0), B->c);
 
         nmod_mat_solve_tril(X, LU, PB, 1);
         nmod_mat_solve_triu(X, LU, X, 0);
 
-        nmod_mat_window_clear(PB);
+        nmod_mat_clear(PB);
         result = 1;
     }
     else

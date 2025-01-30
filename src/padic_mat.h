@@ -36,7 +36,7 @@ fmpz_mat_struct * padic_mat(const padic_mat_t A)
 PADIC_MAT_INLINE
 fmpz * padic_mat_entry(const padic_mat_t A, slong i, slong j)
 {
-   return A->mat.rows[i] + j;
+   return A->mat.entries + i * A->mat.stride + j;
 }
 
 #define padic_mat_val(A) ((A)->val)

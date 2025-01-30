@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "perm.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -19,14 +20,11 @@ void _fmpz_mat_window_with_perm_init(fmpz_mat_t Ap, slong * perm,
 {
     slong i, n = A->r;
 
-    Ap->entries = NULL;
-    if (n > start)
-        Ap->rows = (fmpz **) flint_malloc((n - start)*sizeof(fmpz *));
-    else
-        Ap->rows = NULL;
+    fmpz_mat_init(Ap, n, A->c);
 
+    /* shallow copy */
     for (i = 0; i < n - start; i++)
-        Ap->rows[i] = A->rows[perm[start + i]];
+        memcpy(fmpz_mat_row(Ap, i), fmpz_mat_row(A, perm[start + i]), A->c * sizeof(fmpz));
 
     Ap->r = n - start;
     Ap->c = A->c;
@@ -34,8 +32,7 @@ void _fmpz_mat_window_with_perm_init(fmpz_mat_t Ap, slong * perm,
 
 void _fmpz_mat_window_with_perm_clear(fmpz_mat_t Ap)
 {
-    if (Ap->r != 0)
-        flint_free(Ap->rows);
+    flint_free(Ap->entries);
 }
 
 int

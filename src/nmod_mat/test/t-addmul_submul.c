@@ -98,7 +98,7 @@ TEST_FUNCTION_START(nmod_mat_addmul_submul, state)
                     "C = %{nmod_mat}\n"
                     "D = %{nmod_mat}\n"
                     "E = %{nmod_mat}\n",
-                    type, A, B, C, D, E);
+                    type, operation, A, B, C, D, E);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

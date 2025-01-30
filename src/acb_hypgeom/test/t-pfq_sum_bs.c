@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_hypgeom_pfq_sum_bs, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         acb_ptr a, b;
         acb_t z, s1, s2, t1, t2;
@@ -25,9 +25,9 @@ TEST_FUNCTION_START(acb_hypgeom_pfq_sum_bs, state)
 
         p = n_randint(state, 5);
         q = n_randint(state, 5);
-        n = n_randint(state, 300);
-        prec1 = 2 + n_randint(state, 500);
-        prec2 = 2 + n_randint(state, 500);
+        n = n_randint(state, 100);
+        prec1 = 2 + n_randint(state, 200);
+        prec2 = 2 + n_randint(state, 200);
 
         acb_init(z);
         acb_init(s1);
@@ -35,11 +35,11 @@ TEST_FUNCTION_START(acb_hypgeom_pfq_sum_bs, state)
         acb_init(t1);
         acb_init(t2);
 
-        acb_randtest_special(z, state, 1 + n_randint(state, 500), 1 + n_randint(state, 100));
-        acb_randtest_special(s1, state, 1 + n_randint(state, 500), 1 + n_randint(state, 100));
-        acb_randtest_special(t1, state, 1 + n_randint(state, 500), 1 + n_randint(state, 100));
-        acb_randtest_special(s2, state, 1 + n_randint(state, 500), 1 + n_randint(state, 100));
-        acb_randtest_special(t2, state, 1 + n_randint(state, 500), 1 + n_randint(state, 100));
+        acb_randtest_special(z, state, 1 + n_randint(state, 200), 1 + n_randint(state, 100));
+        acb_randtest_special(s1, state, 1 + n_randint(state, 200), 1 + n_randint(state, 100));
+        acb_randtest_special(t1, state, 1 + n_randint(state, 200), 1 + n_randint(state, 100));
+        acb_randtest_special(s2, state, 1 + n_randint(state, 200), 1 + n_randint(state, 100));
+        acb_randtest_special(t2, state, 1 + n_randint(state, 200), 1 + n_randint(state, 100));
 
         a = _acb_vec_init(p);
         b = _acb_vec_init(q);

@@ -77,12 +77,10 @@ slong _gr_mpoly_add(
     return status;
 }
 
-int gr_mpoly_add(
-    gr_mpoly_t A,
-    const gr_mpoly_t B,
-    const gr_mpoly_t C,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+int gr_mpoly_add(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong Abits, N;
     ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
@@ -91,10 +89,13 @@ int gr_mpoly_add(
     TMP_INIT;
 
     if (B->length == 0)
-        return gr_mpoly_set(A, C, mctx, cctx);
+        return gr_mpoly_set(A, C, ctx);
 
     if (C->length == 0)
-        return gr_mpoly_set(A, B, mctx, cctx);
+        return gr_mpoly_set(A, B, ctx);
+
+    if (B->length + C->length > ctx->size_limit)
+        return GR_UNABLE | gr_mpoly_zero(A, ctx);
 
     TMP_START;
     Abits = FLINT_MAX(B->bits, C->bits);
@@ -121,17 +122,17 @@ int gr_mpoly_add(
     if (A == B || A == C)
     {
         gr_mpoly_t T;
-        gr_mpoly_init3(T, B->length + C->length, Abits, mctx, cctx);
+        gr_mpoly_init3(T, B->length + C->length, Abits, ctx);
         status = _gr_mpoly_add(&T->length, T->coeffs, T->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,
                                                       N, cmpmask, cctx);
-        gr_mpoly_swap(A, T, mctx, cctx);
-        gr_mpoly_clear(T, mctx, cctx);
+        gr_mpoly_swap(A, T, ctx);
+        gr_mpoly_clear(T, ctx);
     }
     else
     {
-        gr_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, mctx, cctx);
+        gr_mpoly_fit_length_reset_bits(A, B->length + C->length, Abits, ctx);
         status = _gr_mpoly_add(&A->length, A->coeffs, A->exps,
                                         B->coeffs, Bexps, B->length,
                                         C->coeffs, Cexps, C->length,

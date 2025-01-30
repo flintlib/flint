@@ -10,6 +10,23 @@
 */
 
 #include "arb_poly.h"
+#include "acb_poly.h"
+
+void _acb_sinc_jet_zero(acb_ptr res, const acb_t z, slong len, slong prec);
+
+void
+_arb_sinc_jet_zero(arb_ptr res, const arb_t z, slong len, slong prec)
+{
+    acb_ptr t;
+    slong i;
+    t = _acb_vec_init(len + 1);
+    acb_set_arb(t + len, z);
+    _acb_sinc_jet_zero(t, t + len, len, prec);
+    for (i = 0; i < len; i++)
+        arb_swap(res + i, acb_realref(t + i));
+    _acb_vec_clear(t, len + 1);
+
+}
 
 void
 _arb_poly_sinc_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
@@ -34,6 +51,13 @@ _arb_poly_sinc_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
         {
             _arb_poly_sin_series(t, u, hlen, n + 1, prec);
             _arb_poly_div_series(g, t + 1, n, u + 1, hlen - 1, n, prec);
+        }
+        else if (arb_contains_zero(h))
+        {
+            _arb_sinc_jet_zero(t, h, n, prec);
+            /* compose with nonconstant part */
+            arb_zero(u);
+            _arb_poly_compose_series(g, t, n, u, hlen, n, prec);
         }
         else
         {

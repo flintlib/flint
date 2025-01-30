@@ -16,20 +16,14 @@
 void
 gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
 {
-    slong i, sz;
-
-    sz = ctx->sizeof_elem;
-
+    mat->entries = NULL;
     mat->r = rows;
     mat->c = cols;
-
-    if (rows != 0)
-        mat->rows = flint_malloc(rows * sizeof(gr_ptr));
-    else
-        mat->rows = NULL;
+    mat->stride = cols;
 
     if (rows != 0 && cols != 0)
     {
+        slong sz = ctx->sizeof_elem;
         slong num;
         int of;
 
@@ -39,16 +33,6 @@ gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
             flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
 
         mat->entries = flint_malloc(num * sz);
-
         _gr_vec_init(mat->entries, rows * cols, ctx);
-
-        for (i = 0; i < rows; i++)
-            mat->rows[i] = GR_ENTRY(mat->entries, i * cols, sz);
-    }
-    else
-    {
-        mat->entries = NULL;
-        for (i = 0; i < rows; i++)
-            mat->rows[i] = NULL;
     }
 }

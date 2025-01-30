@@ -23,6 +23,8 @@
 #cmakedefine FLINT_BITS @FLINT_BITS@
 #cmakedefine01 FLINT_LONG_LONG
 
+#cmakedefine FLINT_STATIC_BUILD
+
 /* NOTE: Here we assume this is how it works. */
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 # define HAVE__ALIGNED_MALLOC 1
@@ -31,9 +33,26 @@
 #endif
 
 #ifdef _MSC_VER
-# if defined(FLINT_BUILD_DLL)
+# if defined(FLINT_STATIC_BUILD)
+#  define FLINT_DLL
+# elif defined(FLINT_BUILD_DLL)
 #  define FLINT_DLL __declspec(dllexport)
 # else
 #  define FLINT_DLL __declspec(dllimport)
 # endif
 #endif
+
+#define DIAGNOSTIC_PUSH
+#define DIAGNOSTIC_POP
+#define DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
+#define DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
+#define DIAGNOSTIC_IGNORE_FORMAT
+#define DIAGNOSTIC_IGNORE_DANGLING_POINTER
+#define DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE
+#define DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS
+#define DIAGNOSTIC_IGNORE_UNUSED_VARIABLE
+
+#define PUSH_OPTIONS
+#define POP_OPTIONS
+#define OPTIMIZE_O2
+#define OPTIMIZE_UNROLL_LOOPS

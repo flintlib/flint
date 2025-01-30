@@ -22,7 +22,7 @@ fmpz_mat_is_zero(const fmpz_mat_t mat)
 
     for (j = 0; j < mat->r; j++)
     {
-        if (!_fmpz_vec_is_zero(mat->rows[j], mat->c))
+        if (!_fmpz_vec_is_zero(fmpz_mat_row(mat, j), mat->c))
             return 0;
     }
 
@@ -32,5 +32,5 @@ fmpz_mat_is_zero(const fmpz_mat_t mat)
 int
 fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i)
 {
-    return _fmpz_vec_is_zero(mat->rows[i], mat->c);
+    return _fmpz_vec_is_zero(fmpz_mat_row(mat, i), mat->c);
 }

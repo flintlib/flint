@@ -29,7 +29,7 @@ check_rref(fmpz_mod_mat_t A)
         for (j = 0; j < A->c; j++)
         {
             /* Found nonzero entry */
-            if (!fmpz_is_zero(A->rows[i] + j))
+            if (!fmpz_is_zero(fmpz_mod_mat_entry(A, i, j)))
             {
                 if (prev_row_zero)
                 {

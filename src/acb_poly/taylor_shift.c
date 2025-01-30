@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb_poly.h"
 #include "gr_poly.h"
-
-#ifdef __GNUC__
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 int
 _gr_acb_poly_taylor_shift(acb_ptr res, acb_srcptr poly, slong n, const acb_t c, gr_ctx_t ctx)

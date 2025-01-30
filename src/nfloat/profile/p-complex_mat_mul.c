@@ -136,7 +136,7 @@ void prof_classical_vs_fixed()
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
-    slong i, ni, n;
+    slong ni, n;
     slong prec;
     double FLINT_SET_BUT_UNUSED(__), t1, t2;
 
@@ -244,7 +244,7 @@ void prof_fixed_vs_block()
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
-    slong i, ni, n;
+    slong ni, n;
     slong prec;
     double FLINT_SET_BUT_UNUSED(__), t1, t2;
 
@@ -357,7 +357,7 @@ void prof_mul()
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
-    slong i, ni, n;
+    slong ni, n;
     slong prec;
     double FLINT_SET_BUT_UNUSED(__), t1, t2;
 
@@ -411,7 +411,7 @@ void prof_mul()
 
 int main()
 {
-    int tab[TABN];
+    //int tab[TABN];
 
     //tune_classical_vs_fixed(tab);
     //tune_fixed_vs_block(tab);

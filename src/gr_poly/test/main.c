@@ -15,16 +15,21 @@
 #include "t-compose.c"
 #include "t-compose_divconquer.c"
 #include "t-compose_horner.c"
+#include "t-compose_mod.c"
+#include "t-compose_mod_precomp_preinv.c"
+#include "t-compose_mod_preinv.c"
 #include "t-compose_series.c"
 #include "t-div_basecase.c"
 #include "t-div.c"
 #include "t-div_divconquer.c"
 #include "t-divexact.c"
 #include "t-div_newton.c"
+#include "t-div_newton_n_preinv.c"
 #include "t-divrem_basecase.c"
 #include "t-divrem.c"
 #include "t-divrem_divconquer.c"
 #include "t-divrem_newton.c"
+#include "t-divrem_newton_n_preinv.c"
 #include "t-div_series.c"
 #include "t-evaluate.c"
 #include "t-evaluate_horner.c"
@@ -45,6 +50,8 @@
 #include "t-make_monic.c"
 #include "t-mul_karatsuba.c"
 #include "t-mul_toom33.c"
+#include "t-mulmod.c"
+#include "t-mulmod_preinv.c"
 #include "t-nth_derivative.c"
 #include "t-pow_series_fmpq.c"
 #include "t-pow_series_ui.c"
@@ -78,16 +85,21 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_compose),
     TEST_FUNCTION(gr_poly_compose_divconquer),
     TEST_FUNCTION(gr_poly_compose_horner),
+    TEST_FUNCTION(gr_poly_compose_mod),
+    TEST_FUNCTION(gr_poly_compose_mod_precomp_preinv),
+    TEST_FUNCTION(gr_poly_compose_mod_preinv),
     TEST_FUNCTION(gr_poly_compose_series),
     TEST_FUNCTION(gr_poly_div_basecase),
     TEST_FUNCTION(gr_poly_div),
     TEST_FUNCTION(gr_poly_div_divconquer),
     TEST_FUNCTION(gr_poly_divexact),
     TEST_FUNCTION(gr_poly_div_newton),
+    TEST_FUNCTION(gr_poly_div_newton_n_preinv),
     TEST_FUNCTION(gr_poly_divrem_basecase),
     TEST_FUNCTION(gr_poly_divrem),
     TEST_FUNCTION(gr_poly_divrem_divconquer),
     TEST_FUNCTION(gr_poly_divrem_newton),
+    TEST_FUNCTION(gr_poly_divrem_newton_n_preinv),
     TEST_FUNCTION(gr_poly_div_series),
     TEST_FUNCTION(gr_poly_evaluate),
     TEST_FUNCTION(gr_poly_evaluate_horner),
@@ -108,6 +120,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_make_monic),
     TEST_FUNCTION(gr_poly_mul_karatsuba),
     TEST_FUNCTION(gr_poly_mul_toom33),
+    TEST_FUNCTION(gr_poly_mulmod),
+    TEST_FUNCTION(gr_poly_mulmod_preinv),
     TEST_FUNCTION(gr_poly_nth_derivative),
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),

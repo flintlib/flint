@@ -17,6 +17,7 @@ gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     int status;
     slong i, r, c;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(mat1, ctx);
     c = gr_mat_ncols(mat1, ctx);
@@ -30,7 +31,7 @@ gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     status = GR_SUCCESS;
 
     for (i = 0; i < r; i++)
-        _gr_vec_swap(mat1->rows[i], mat2->rows[i], c, ctx);
+        _gr_vec_swap(GR_MAT_ENTRY(mat1, i, 0, sz), GR_MAT_ENTRY(mat2, i, 0, sz), c, ctx);
 
     return status;
 }

@@ -26,6 +26,7 @@
 #include "t-mul_classical_threaded.c"
 #include "t-mul_fmpz_vec.c"
 #include "t-nullspace.c"
+#include "t-pow.c"
 #include "t-rank.c"
 #include "t-rref.c"
 #include "t-scalar_mul_fmpz.c"
@@ -36,6 +37,7 @@
 #include "t-solve_triu.c"
 #include "t-sqr.c"
 #include "t-trace.c"
+#include "t-transpose.c"
 #include "t-window_init_clear.c"
 
 /* Array of test functions ***************************************************/
@@ -57,6 +59,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mat_mul_classical_threaded),
     TEST_FUNCTION(fmpz_mod_mat_mul_fmpz_vec),
     TEST_FUNCTION(fmpz_mod_mat_nullspace),
+    TEST_FUNCTION(fmpz_mod_mat_pow),
     TEST_FUNCTION(fmpz_mod_mat_rank),
     TEST_FUNCTION(fmpz_mod_mat_rref),
     TEST_FUNCTION(fmpz_mod_mat_scalar_mul_fmpz),
@@ -67,6 +70,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mat_solve_triu),
     TEST_FUNCTION(fmpz_mod_mat_sqr),
     TEST_FUNCTION(fmpz_mod_mat_trace),
+    TEST_FUNCTION(fmpz_mod_mat_transpose),
     TEST_FUNCTION(fmpz_mod_mat_window_init_clear)
 };
 

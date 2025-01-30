@@ -261,6 +261,16 @@ Comparison
 
 
 
+Transpose
+--------------------------------------------------------------------------------
+
+
+.. function:: void fq_default_mat_transpose(fq_default_mat_t B, const fq_default_mat_t A, const fq_default_ctx_t ctx)
+
+    Sets `B` to `A^T`, the transpose of `A`. Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
+
+
 
 Addition and subtraction
 --------------------------------------------------------------------------------
@@ -313,7 +323,7 @@ LU decomposition
 
 .. function:: slong fq_default_mat_lu(slong * P, fq_default_mat_t A, int rank_check, const fq_default_ctx_t ctx)
 
-    Computes a generalised LU decomposition `LU = PA` of a given
+    Computes a generalised LU decomposition `PLU = A` of a given
     matrix `A`, returning the rank of `A`.
 
     If `A` is a nonsingular square matrix, it will be overwritten with

@@ -19,12 +19,6 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
-#ifdef __GNUC__
-# define strcmp __builtin_strcmp
-#else
-# include <string.h>
-#endif
-
 static const char * default_var = "x";
 
 void
@@ -379,6 +373,30 @@ polynomial_sub(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
 }
 
 int
+polynomial_mul_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_ui(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_si(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_fmpz(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_fmpq(gr_poly_t res, const gr_poly_t poly, fmpq_t c, gr_ctx_t ctx)
+{
+    return gr_poly_mul_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
 polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
     if (POLYNOMIAL_CTX(ctx)->degree_limit != WORD_MAX)
@@ -389,6 +407,60 @@ polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
     }
 
     return gr_poly_mul(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_mul_other(gr_poly_t res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+{
+    if (x_ctx == POLYNOMIAL_ELEM_CTX(ctx))
+    {
+        return gr_poly_mul_scalar(res, poly, x, x_ctx);
+    }
+    else if (x_ctx->which_ring == GR_CTX_GR_POLY &&
+        POLYNOMIAL_ELEM_CTX(x_ctx) == POLYNOMIAL_ELEM_CTX(ctx) &&
+        !strcmp(POLYNOMIAL_CTX(x_ctx)->var, POLYNOMIAL_CTX(ctx)->var))
+    {
+        return polynomial_mul(res, poly, x, ctx);
+    }
+    else
+    {
+        gr_poly_t t;
+        int status = GR_SUCCESS;
+
+        polynomial_init(t, ctx);
+        status = polynomial_set_other(t, x, x_ctx, ctx);
+        if (status == GR_SUCCESS)
+            status = polynomial_mul(res, poly, t, ctx);
+        polynomial_clear(t, ctx);
+        return status;
+    }
+}
+
+int
+polynomial_other_mul(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_poly_t poly, gr_ctx_t ctx)
+{
+    if (x_ctx == POLYNOMIAL_ELEM_CTX(ctx))
+    {
+        return gr_poly_scalar_mul(res, x, poly, x_ctx);
+    }
+    else if (x_ctx->which_ring == GR_CTX_GR_POLY &&
+        POLYNOMIAL_ELEM_CTX(x_ctx) == POLYNOMIAL_ELEM_CTX(ctx) &&
+        !strcmp(POLYNOMIAL_CTX(x_ctx)->var, POLYNOMIAL_CTX(ctx)->var))
+    {
+        return polynomial_mul(res, x, poly, ctx);
+    }
+    else
+    {
+        gr_poly_t t;
+        int status = GR_SUCCESS;
+
+        polynomial_init(t, ctx);
+        status = polynomial_set_other(t, x, x_ctx, ctx);
+        if (status == GR_SUCCESS)
+            status = polynomial_mul(res, t, poly, ctx);
+        polynomial_clear(t, ctx);
+        return status;
+    }
 }
 
 int
@@ -549,6 +621,12 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},
     {GR_METHOD_MUL,         (gr_funcptr) polynomial_mul},
+    {GR_METHOD_MUL_OTHER,   (gr_funcptr) polynomial_mul_other},
+    {GR_METHOD_OTHER_MUL,   (gr_funcptr) polynomial_other_mul},
+    {GR_METHOD_MUL_UI,      (gr_funcptr) polynomial_mul_ui},
+    {GR_METHOD_MUL_SI,      (gr_funcptr) polynomial_mul_si},
+    {GR_METHOD_MUL_FMPZ,    (gr_funcptr) polynomial_mul_fmpz},
+    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) polynomial_mul_fmpq},
     {GR_METHOD_POW_UI,      (gr_funcptr) polynomial_pow_ui},
     {GR_METHOD_POW_SI,      (gr_funcptr) polynomial_pow_si},
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) polynomial_pow_fmpz},

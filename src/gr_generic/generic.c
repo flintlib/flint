@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpq.h"
 #include "arb.h"
 #include "arith.h"
@@ -20,12 +21,6 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 #include "gr_special.h"
-
-#ifdef __GNUC__
-# define memcpy __builtin_memcpy
-#else
-# include <string.h>
-#endif
 
 int
 gr_generic_ctx_clear(gr_ctx_t ctx)
@@ -2914,6 +2909,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MAT_LOG,                 (gr_funcptr) gr_mat_log_jordan},
     {GR_METHOD_MAT_FIND_NONZERO_PIVOT,  (gr_funcptr) gr_mat_find_nonzero_pivot_generic},
     {GR_METHOD_MAT_DIAGONALIZATION,     (gr_funcptr) gr_mat_diagonalization_generic},
+    {GR_METHOD_MAT_CHARPOLY,            (gr_funcptr) _gr_mat_charpoly_generic},
+    {GR_METHOD_MAT_REDUCE_ROW,          (gr_funcptr) gr_mat_reduce_row_generic},
 
     {0,                                 (gr_funcptr) NULL},
 };
