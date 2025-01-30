@@ -1,13 +1,13 @@
 #include "acb_types.h"
 #include "acb_poly.h"
-#include "acb_holonomic.h"
+#include "acb_ode.h"
 
 
 void
-_acb_holonomic_sol_value(acb_poly_struct * val, acb_srcptr expo,
-                         const acb_poly_struct * sums, slong nlogs,
-                         acb_srcptr pt, slong nder,
-                         slong nfrobshifts, slong prec)
+_acb_ode_sol_value(acb_poly_struct * val, acb_srcptr expo,
+                   const acb_poly_struct * sums, slong nlogs,
+                   acb_srcptr pt, slong nder,
+                   slong nfrobshifts, slong prec)
 {
     acb_poly_t expt, exptpow, log, logpow, term;
 
@@ -60,14 +60,14 @@ _acb_holonomic_sol_value(acb_poly_struct * val, acb_srcptr expo,
 /* XXX rename? move? */
 
 void
-acb_holonomic_sum_value(acb_poly_struct * val, slong nfrobshifts,
-                        const acb_holonomic_sum_context_struct * ctx,
-                        slong i, slong j, slong prec)  /* sol #i, pt #j */
+acb_ode_sum_value(acb_poly_struct * val, slong nfrobshifts,
+                  const acb_ode_sum_context_struct * ctx,
+                  slong i, slong j, slong prec)  /* sol #i, pt #j */
 {
     /* flint_printf("i=%wd j=%wd nlogs=%wd\n", i, j, ctx->sol[i].nlogs); */
-    /* flint_printf("%{acb_poly}\n", acb_holonomic_sol_sum_ptr(ctx->sol + i, j, 0)); */
-    _acb_holonomic_sol_value(val, ctx->expo,
-                             acb_holonomic_sol_sum_ptr(ctx->sol + i, j, 0),
-                             ctx->sol[i].nlogs, ctx->pts + j, ctx->nder,
-                             nfrobshifts, prec);
+    /* flint_printf("%{acb_poly}\n", acb_ode_sol_sum_ptr(ctx->sol + i, j, 0)); */
+    _acb_ode_sol_value(val, ctx->expo,
+                       acb_ode_sol_sum_ptr(ctx->sol + i, j, 0),
+                       ctx->sol[i].nlogs, ctx->pts + j, ctx->nder,
+                       nfrobshifts, prec);
 }

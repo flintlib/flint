@@ -3,9 +3,9 @@
 #include "acb_poly.h"
 #include "fmpq_types.h"
 #include "fmpq_poly.h"
-#include "acb_holonomic.h"
+#include "acb_ode.h"
 
-TEST_FUNCTION_START(acb_holonomic_apply_diffop, state)
+TEST_FUNCTION_START(acb_ode_apply_diffop, state)
 {
     fmpq_poly_t tmp;
     fmpq_poly_init(tmp);
@@ -50,20 +50,20 @@ TEST_FUNCTION_START(acb_holonomic_apply_diffop, state)
         acb_poly_struct * g2 = _acb_poly_vec_init(logs);
         acb_poly_struct * g3 = _acb_poly_vec_init(logs);
 
-        acb_holonomic_apply_diffop_polmul(g1, dop, dop_len, expo, offset, f, logs, start, len, prec);
+        acb_ode_apply_diffop_polmul(g1, dop, dop_len, expo, offset, f, logs, start, len, prec);
 
         _acb_poly_vec_fit_length(g2, logs, len1 + len2);
         /* TODO play with foff and offset too */
-        _acb_holonomic_apply_diffop_polmul(g2, 0, dop, dop_len, expo, offset, f, 0, start + len1, logs, start, len1, prec);
-        _acb_holonomic_apply_diffop_polmul(g2, len1, dop, dop_len, expo, offset, f, 0, start + len, logs, start + len1, len2, prec);
+        _acb_ode_apply_diffop_polmul(g2, 0, dop, dop_len, expo, offset, f, 0, start + len1, logs, start, len1, prec);
+        _acb_ode_apply_diffop_polmul(g2, len1, dop, dop_len, expo, offset, f, 0, start + len, logs, start + len1, len2, prec);
         _acb_poly_vec_set_length(g2, logs, len);
         _acb_poly_vec_normalise(g2, logs);
 
-        acb_holonomic_apply_diffop_basecase(g3, dop, dop_len, expo, offset, f, logs, start, len, prec);
+        acb_ode_apply_diffop_basecase(g3, dop, dop_len, expo, offset, f, logs, start, len, prec);
 
         if (!_acb_poly_vec_overlaps(g1, g2, logs)
-                || !_acb_poly_vec_overlaps(g1, g3, logs)
-                || !_acb_poly_vec_overlaps(g2, g3, logs))
+            || !_acb_poly_vec_overlaps(g1, g3, logs)
+            || !_acb_poly_vec_overlaps(g2, g3, logs))
         {
             flint_printf("FAIL\n\n");
             for (slong i = 0; i < dop_len; i++)

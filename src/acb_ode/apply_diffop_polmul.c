@@ -37,7 +37,7 @@ xD_logcoeff_inplace(acb_poly_struct * f, acb_srcptr expo, slong offset, slong k,
  * we make the interface more natural / consistent with FLINT? */
 
 void
-_acb_holonomic_apply_diffop_polmul(
+_acb_ode_apply_diffop_polmul(
         acb_poly_struct * g, slong goff,
         const acb_poly_struct * dop, slong dop_len,
         acb_srcptr expo, slong offset,
@@ -81,7 +81,7 @@ _acb_holonomic_apply_diffop_polmul(
 
 /* XXX support aliasing */
 void
-acb_holonomic_apply_diffop_polmul(
+acb_ode_apply_diffop_polmul(
         acb_poly_struct * g,
         const acb_poly_struct * dop, slong dop_len,
         acb_srcptr expo, slong offset,
@@ -91,7 +91,7 @@ acb_holonomic_apply_diffop_polmul(
         slong prec)
 {
     _acb_poly_vec_fit_length(g, nlogs, len);
-    _acb_holonomic_apply_diffop_polmul(
+    _acb_ode_apply_diffop_polmul(
             g, 0,
             dop, dop_len,
             expo, offset,

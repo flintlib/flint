@@ -1,22 +1,22 @@
 #include "acb_types.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
-#include "acb_holonomic.h"
+#include "acb_ode.h"
 
 #include "gr.h"
 #include "gr_poly.h"
 
 
 static void
-init_context(acb_holonomic_sum_context_t ctx,
+init_context(acb_ode_sum_context_t ctx,
              const acb_poly_struct * dop, slong dop_len,
-             const acb_holonomic_group_struct * grp,
+             const acb_ode_group_struct * grp,
              acb_srcptr pts, slong npts, slong nder,
              slong prec)
 {
-    acb_holonomic_sum_context_init(ctx, dop_len, npts, grp->nshifts, nder);
+    acb_ode_sum_context_init(ctx, dop_len, npts, grp->nshifts, nder);
     _acb_poly_vec_set(ctx->dop, dop, dop_len);
-    acb_holonomic_sum_group(ctx, grp);
+    acb_ode_sum_group(ctx, grp);
     _acb_vec_set(ctx->pts, pts, npts);
     ctx->prec = prec;        /* XXX */
     ctx->sums_prec = prec;
@@ -24,7 +24,7 @@ init_context(acb_holonomic_sum_context_t ctx,
 
 
 static slong
-col(const acb_holonomic_group_struct * grp, slong s, slong k)
+col(const acb_ode_group_struct * grp, slong s, slong k)
 {
     slong j = 0;
     for (slong s1 = 0; s1 <= s; s1++)
@@ -35,7 +35,7 @@ col(const acb_holonomic_group_struct * grp, slong s, slong k)
 
 static void
 fill_column(acb_mat_struct * mat,
-            const acb_holonomic_group_struct * grp, slong s, slong k,
+            const acb_ode_group_struct * grp, slong s, slong k,
             const acb_poly_struct * val)
 {
     slong j = col(grp, s, k);
@@ -50,7 +50,7 @@ fill_column(acb_mat_struct * mat,
 
 static void
 fix_column_echelon(acb_mat_struct * mat,
-                   const acb_holonomic_group_struct * grp, slong s, slong k,
+                   const acb_ode_group_struct * grp, slong s, slong k,
                    const acb_mat_t extini, slong prec)
 {
     slong mult = grp->shifts[s].mult;
@@ -79,16 +79,16 @@ fix_column_echelon(acb_mat_struct * mat,
 
 
 static void
-fill_group(acb_mat_struct * mat, const acb_holonomic_sum_context_t ctx,
-           const acb_holonomic_group_struct * grp, slong p,
-           acb_holonomic_basis_t basis, slong prec)
+fill_group(acb_mat_struct * mat, const acb_ode_sum_context_t ctx,
+           const acb_ode_group_struct * grp, slong p,
+           acb_ode_basis_t basis, slong prec)
 {
     for (slong s = grp->nshifts - 1; s >= 0; s--)
     {
         acb_poly_struct * val = _acb_poly_vec_init(ctx->sol[s].nlogs);
 
         slong mult = grp->shifts[s].mult;
-        acb_holonomic_sum_value(val, mult, ctx, s, p, prec);
+        acb_ode_sum_value(val, mult, ctx, s, p, prec);
         /* flint_printf("s=%wd mult=%wd val=%{acb_poly}\n\n", s, mult, val); */
 
         for (slong k = 0; k < mult; k++)
@@ -100,9 +100,9 @@ fill_group(acb_mat_struct * mat, const acb_holonomic_sum_context_t ctx,
 
             switch (basis)
             {
-                case ACB_HOLONOMIC_BASIS_CASCADE:
+                case acb_ode_BASIS_CASCADE:
                     break;
-                case ACB_HOLONOMIC_BASIS_ECHELON:
+                case acb_ode_BASIS_ECHELON:
                     fix_column_echelon(mat, grp, s, k, ctx->sol[s].extini, prec);
                     break;
                 default:
@@ -118,25 +118,25 @@ fill_group(acb_mat_struct * mat, const acb_holonomic_sum_context_t ctx,
 
 
 void
-_acb_holonomic_fundamental_matrix(
+_acb_ode_fundamental_matrix(
         acb_mat_struct * mat,
         const acb_poly_struct * dop, slong dop_len,
-        const acb_holonomic_group_struct * groups, slong ngroups,
+        const acb_ode_group_struct * groups, slong ngroups,
         acb_srcptr pts, slong npts,
-        acb_holonomic_basis_t basis,
-        acb_holonomic_sum_worker_t sum_worker,
+        acb_ode_basis_t basis,
+        acb_ode_sum_worker_t sum_worker,
         slong nterms, slong prec)
 {
     slong nder = acb_mat_nrows(mat);
 
     for (slong g = 0, j = 0; g < ngroups; g++)
     {
-        slong glen = acb_holonomic_group_length(groups + g);
+        slong glen = acb_ode_group_length(groups + g);
 
-        acb_holonomic_sum_context_t ctx;
+        acb_ode_sum_context_t ctx;
         init_context(ctx, dop, dop_len, groups + g, pts, npts, nder, prec);
         /* XXX tmp */
-        /* ctx->flags |= ACB_HOLONOMIC_WANT_SERIES; */
+        /* ctx->flags |= acb_ode_WANT_SERIES; */
 
         sum_worker(ctx, nterms);
 
@@ -150,7 +150,7 @@ _acb_holonomic_fundamental_matrix(
             acb_mat_window_clear(win);
         }
 
-        acb_holonomic_sum_context_clear(ctx);
+        acb_ode_sum_context_clear(ctx);
 
         j += glen;
     }
@@ -158,12 +158,12 @@ _acb_holonomic_fundamental_matrix(
 
 
 int
-acb_holonomic_fundamental_matrix(
+acb_ode_fundamental_matrix(
         acb_mat_struct * mat,
         gr_srcptr dop, gr_ctx_t dop_ctx,
-        const acb_holonomic_exponents_struct * expos,
+        const acb_ode_exponents_struct * expos,
         acb_srcptr pts, slong npts,                   /* XXX gr_vec? */
-        acb_holonomic_basis_t basis,
+        acb_ode_basis_t basis,
         slong nterms, slong prec)
 {
     gr_ctx_t CC, Pol, Dop;
@@ -172,9 +172,9 @@ acb_holonomic_fundamental_matrix(
     if (dop_ctx->which_ring != GR_CTX_GR_POLY)
         return GR_UNABLE;
 
-     ulong which_base = POLYNOMIAL_ELEM_CTX(dop_ctx)->which_ring;
-     if (!(which_base == GR_CTX_GR_POLY || which_base == GR_CTX_FMPZ_POLY ||
-           which_base == GR_CTX_FMPQ_POLY))
+    ulong which_base = POLYNOMIAL_ELEM_CTX(dop_ctx)->which_ring;
+    if (!(which_base == GR_CTX_GR_POLY || which_base == GR_CTX_FMPZ_POLY ||
+          which_base == GR_CTX_FMPQ_POLY))
         return GR_UNABLE;
 
     int status = GR_SUCCESS;
@@ -195,11 +195,11 @@ acb_holonomic_fundamental_matrix(
     gr_ptr dop_coeff = gr_poly_entry_ptr(_dop, 0, Dop);
     slong dop_len = gr_poly_length(_dop, Dop);
 
-    _acb_holonomic_fundamental_matrix(mat, dop_coeff, dop_len,
-                                      expos->grps, expos->len,
-                                      pts, npts,
-                                      basis, acb_holonomic_sum_divconquer,
-                                      nterms, prec);
+    _acb_ode_fundamental_matrix(mat, dop_coeff, dop_len,
+                                expos->grps, expos->len,
+                                pts, npts,
+                                basis, acb_ode_sum_divconquer,
+                                nterms, prec);
 
     GR_TMP_CLEAR(_dop, Dop);
     gr_ctx_clear(Dop);

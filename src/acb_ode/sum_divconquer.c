@@ -1,7 +1,7 @@
 #include "acb_types.h"
 #include "acb.h"
 #include "acb_poly.h"
-#include "acb_holonomic.h"
+#include "acb_ode.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
@@ -41,7 +41,7 @@ acb_poly_shift_series(acb_poly_struct * g, const acb_poly_struct * f,
 
 
 static slong
-max_nlogs(acb_holonomic_sum_context_struct * ctx)
+max_nlogs(acb_ode_sum_context_struct * ctx)
 {
     slong nlogs = 0;
     for (slong m = 0; m < ctx->nsols; m++)
@@ -51,7 +51,7 @@ max_nlogs(acb_holonomic_sum_context_struct * ctx)
 
 
 static slong
-max_nlogs_xn(acb_holonomic_sum_context_struct * ctx, slong off)
+max_nlogs_xn(acb_ode_sum_context_struct * ctx, slong off)
 {
     for (slong nlogs = max_nlogs(ctx); nlogs > 0; nlogs--)
     {
@@ -73,7 +73,7 @@ max_nlogs_xn(acb_holonomic_sum_context_struct * ctx, slong off)
 
 
 static void
-apply_diffop(acb_holonomic_sum_context_struct * ctx,
+apply_diffop(acb_ode_sum_context_struct * ctx,
              slong base, slong low, slong mid, slong high)
 {
     /* flint_printf("apply_diffop: base=%wd low=%wd mid=%wd high=%wd\n"); */
@@ -81,7 +81,7 @@ apply_diffop(acb_holonomic_sum_context_struct * ctx,
     if (high - mid >= 7 * ctx->dop_len)  /* threshold from ore_algebra */
     {
         for (slong m = 0; m < ctx->nsols; m++)
-            _acb_holonomic_apply_diffop_polmul(
+            _acb_ode_apply_diffop_polmul(
                     ctx->sol[m].series, mid - base,
                     ctx->dop, ctx->dop_len,
                     ctx->expo, low,
@@ -97,13 +97,13 @@ apply_diffop(acb_holonomic_sum_context_struct * ctx,
         slong weights_len = (high - mid) * nlogs * (mid - low);
         acb_ptr weights = _acb_vec_init(weights_len);
 
-        _acb_holonomic_apply_diffop_basecase_weights(
+        _acb_ode_apply_diffop_basecase_weights(
                 weights, ctx->dop, ctx->dop_len, ctx->expo,
                 low, mid - low, nlogs, mid - low, high - mid,
                 ctx->prec);
 
         for (slong m = 0; m < ctx->nsols; m++)
-            _acb_holonomic_apply_diffop_basecase_precomp(
+            _acb_ode_apply_diffop_basecase_precomp(
                     ctx->sol[m].series, mid - base,
                     weights, nlogs, ctx->sol[m].series, low - base, mid - low,
                     ctx->sol[m].nlogs, mid - low, high - mid, ctx->prec);
@@ -130,8 +130,8 @@ next_binom_n(fmpz * binom_n, slong n, slong len)
 
 
 void
-_acb_holonomic_sum_forward_1(acb_holonomic_sum_context_struct * ctx,
-                             slong base, slong n)
+_acb_ode_sum_forward_1(acb_ode_sum_context_struct * ctx,
+                       slong base, slong n)
 {
     slong ini_i, mult, len;
     acb_poly_t ind_n;
@@ -172,8 +172,8 @@ _acb_holonomic_sum_forward_1(acb_holonomic_sum_context_struct * ctx,
 
     for (slong m = 0; m < ctx->nsols; m++)
     {
-        acb_holonomic_sol_struct * sol = ctx->sol + m;
-        _acb_holonomic_sol_add_term(
+        acb_ode_sol_struct * sol = ctx->sol + m;
+        _acb_ode_sol_add_term(
                 sol, base, n,
                 sol->series, sol->nlogs, mult, ini_i, ind_n,
                 ctx->pows, ctx->shifted_sums, ctx->npts, ctx->binom_n, ctx->nder,
@@ -196,7 +196,7 @@ _acb_holonomic_sum_forward_1(acb_holonomic_sum_context_struct * ctx,
 
 
 static void
-discard_block(acb_holonomic_sum_context_struct * ctx, slong size)
+discard_block(acb_ode_sum_context_struct * ctx, slong size)
 {
     for (slong m = 0; m < ctx->nsols; m++)
     {
@@ -213,8 +213,8 @@ discard_block(acb_holonomic_sum_context_struct * ctx, slong size)
 
 
 void
-_acb_holonomic_sum_divconquer(acb_holonomic_sum_context_struct * ctx,
-                              slong base, slong low, slong high)
+_acb_ode_sum_divconquer(acb_ode_sum_context_struct * ctx,
+                        slong base, slong low, slong high)
 {
     slong mid;
 
@@ -226,7 +226,7 @@ _acb_holonomic_sum_divconquer(acb_holonomic_sum_context_struct * ctx,
     if (high == low)
         return;
     else if (high == low + 1) {
-        _acb_holonomic_sum_forward_1(ctx, base, low);
+        _acb_ode_sum_forward_1(ctx, base, low);
         return;
     }
 
@@ -235,32 +235,32 @@ _acb_holonomic_sum_divconquer(acb_holonomic_sum_context_struct * ctx,
     else
         mid = low + bs;
 
-    _acb_holonomic_sum_divconquer(ctx, base, low, mid);
+    _acb_ode_sum_divconquer(ctx, base, low, mid);
 
     /*
-    acb_poly_t tmp;
-    acb_poly_init(tmp);
-    flint_printf("divconquer: bs=%wd base=%wd low=%wd mid=%wd high=%wd\n", bs, base, low, mid, high);
-    for (slong m = 0; m < ctx->nsols; m++)
-    {
-        acb_poly_set(tmp, ctx->sol[m].series);
-        acb_poly_truncate(tmp, mid - base);
-        flint_printf("series[%wd]=%{acb_poly}\n", m, tmp);
-    }
-    acb_poly_clear(tmp);
-    */
+       acb_poly_t tmp;
+       acb_poly_init(tmp);
+       flint_printf("divconquer: bs=%wd base=%wd low=%wd mid=%wd high=%wd\n", bs, base, low, mid, high);
+       for (slong m = 0; m < ctx->nsols; m++)
+       {
+       acb_poly_set(tmp, ctx->sol[m].series);
+       acb_poly_truncate(tmp, mid - base);
+       flint_printf("series[%wd]=%{acb_poly}\n", m, tmp);
+       }
+       acb_poly_clear(tmp);
+       */
 
     slong resid_len = FLINT_MIN(high - mid, bs);
 
     apply_diffop(ctx, base, low, mid, mid + resid_len);
 
     /*
-    for (slong m = 0; m < ctx->nsols; m++)
-        flint_printf("series+res[%wd]=%{acb_poly}\n", m, ctx->sol[m].series);
-    for (slong j = 0; j < ctx->npts; j++)
-        for (slong m = 0; m < ctx->nsols; m++)
-            flint_printf("sums[%wd][%wd]=%{acb_poly}\n", m, j, ctx->sol[m].sums + j);
-    */
+       for (slong m = 0; m < ctx->nsols; m++)
+       flint_printf("series+res[%wd]=%{acb_poly}\n", m, ctx->sol[m].series);
+       for (slong j = 0; j < ctx->npts; j++)
+       for (slong m = 0; m < ctx->nsols; m++)
+       flint_printf("sums[%wd][%wd]=%{acb_poly}\n", m, j, ctx->sol[m].sums + j);
+       */
 
     /* TODO convergence check (requires the residual!) */
 
@@ -268,10 +268,10 @@ _acb_holonomic_sum_divconquer(acb_holonomic_sum_context_struct * ctx,
 
     if (mid - low >= bs)
     {
-        if(ctx->flags & ACB_HOLONOMIC_WANT_SERIES)
+        if(ctx->flags & acb_ode_WANT_SERIES)
         {
             for (slong m = 0; m < ctx->nsols; m++)
-                acb_holonomic_sol_fit_length(ctx->sol + m, high + bs, 0);
+                acb_ode_sol_fit_length(ctx->sol + m, high + bs, 0);
         }
         else
         {
@@ -284,12 +284,12 @@ _acb_holonomic_sum_divconquer(acb_holonomic_sum_context_struct * ctx,
 
     /* XXX We sometimes do not compute the residual corresponding to the last
      * block. This may need to change when adding support for error bounds. */
-    _acb_holonomic_sum_divconquer(ctx, base, mid, high);
+    _acb_ode_sum_divconquer(ctx, base, mid, high);
 }
 
 
 void
-_acb_holonomic_sum_fix(acb_holonomic_sum_context_struct * ctx)
+_acb_ode_sum_fix(acb_ode_sum_context_struct * ctx)
 {
     acb_t inv, invpow;
     acb_init(inv);
@@ -310,7 +310,7 @@ _acb_holonomic_sum_fix(acb_holonomic_sum_context_struct * ctx)
             {
                 for (slong k = 0; k < ctx->sol[m].nlogs; k++)
                 {
-                    acb_poly_struct * f = acb_holonomic_sol_sum_ptr(
+                    acb_poly_struct * f = acb_ode_sol_sum_ptr(
                             ctx->sol + m, j, k);
                     acb_ptr c = f->coeffs + i;
                     acb_mul(c, c, invpow, ctx->sums_prec);
@@ -326,12 +326,12 @@ _acb_holonomic_sum_fix(acb_holonomic_sum_context_struct * ctx)
 
 /* XXX temporary, to be generalized */
 void
-acb_holonomic_sum_divconquer(
-        acb_holonomic_sum_context_struct * ctx,
+acb_ode_sum_divconquer(
+        acb_ode_sum_context_struct * ctx,
         slong nterms)
 {
-    _acb_holonomic_sum_precompute(ctx);
-    _acb_holonomic_sum_reset(ctx);
-    _acb_holonomic_sum_divconquer(ctx, 0, 0, nterms);
-    _acb_holonomic_sum_fix(ctx);
+    _acb_ode_sum_precompute(ctx);
+    _acb_ode_sum_reset(ctx);
+    _acb_ode_sum_divconquer(ctx, 0, 0, nterms);
+    _acb_ode_sum_fix(ctx);
 }

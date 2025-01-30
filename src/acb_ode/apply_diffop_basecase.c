@@ -29,7 +29,7 @@
 
 static void
 acb_addmul_binom(acb_ptr c, acb_srcptr b, fmpz_mat_t binom, slong i, slong t,
-        slong prec)
+                 slong prec)
 {
     if (t == 0)
         acb_add(c, c, b, prec);
@@ -41,7 +41,7 @@ acb_addmul_binom(acb_ptr c, acb_srcptr b, fmpz_mat_t binom, slong i, slong t,
 
 
 void
-_acb_holonomic_apply_diffop_basecase_weights(
+_acb_ode_apply_diffop_basecase_weights(
         acb_ptr weights,  /* len * nlogs * flen */
         const acb_poly_struct * dop, slong dop_len,
         acb_srcptr expo, slong offset,
@@ -103,7 +103,7 @@ _acb_holonomic_apply_diffop_basecase_weights(
 
 
 void
-_acb_holonomic_apply_diffop_basecase_precomp(
+_acb_ode_apply_diffop_basecase_precomp(
         acb_poly_struct * g, slong goff,
         acb_srcptr weights, slong weights_nlogs,
         const acb_poly_struct * f, slong foff, slong flen,
@@ -132,7 +132,7 @@ _acb_holonomic_apply_diffop_basecase_precomp(
 
 
 void
-acb_holonomic_apply_diffop_basecase(
+acb_ode_apply_diffop_basecase(
         acb_poly_struct * g,
         const acb_poly_struct * dop, slong dop_len,
         acb_srcptr expo, slong offset,
@@ -148,12 +148,12 @@ acb_holonomic_apply_diffop_basecase(
 
     acb_ptr weights = _acb_vec_init(len * nlogs * flen);
 
-    _acb_holonomic_apply_diffop_basecase_weights(
+    _acb_ode_apply_diffop_basecase_weights(
             weights, dop, dop_len, expo, offset,
             flen, nlogs, start, len, prec);
 
     _acb_poly_vec_fit_length(g, nlogs, len);
-    _acb_holonomic_apply_diffop_basecase_precomp(
+    _acb_ode_apply_diffop_basecase_precomp(
             g, 0,
             weights, nlogs, f, 0, flen,
             nlogs, start, len, prec);

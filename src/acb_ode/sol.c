@@ -1,11 +1,11 @@
 #include "acb_mat.h"
 #include "acb_poly.h"
-#include "acb_holonomic.h"
+#include "acb_ode.h"
 
 
 void
-acb_holonomic_sol_init(acb_holonomic_sol_struct * sol, slong nshifts,
-                       slong nlogs, slong npts)
+acb_ode_sol_init(acb_ode_sol_struct * sol, slong nshifts,
+                 slong nlogs, slong npts)
 {
     acb_mat_init(sol->extini, nshifts, nlogs);
 
@@ -20,8 +20,8 @@ acb_holonomic_sol_init(acb_holonomic_sol_struct * sol, slong nshifts,
 
 
 void
-acb_holonomic_sol_set_ini(acb_holonomic_sol_struct * sol, acb_srcptr ini,
-                          const acb_holonomic_shift_struct * shifts)
+acb_ode_sol_set_ini(acb_ode_sol_struct * sol, acb_srcptr ini,
+                    const acb_ode_shift_struct * shifts)
 {
     slong nshifts = acb_mat_nrows(sol->extini);
     slong i = 0;
@@ -35,8 +35,8 @@ acb_holonomic_sol_set_ini(acb_holonomic_sol_struct * sol, acb_srcptr ini,
 
 
 void
-acb_holonomic_sol_unit_ini(acb_holonomic_sol_struct * sol, slong i0,
-                           const acb_holonomic_shift_struct * shifts)
+acb_ode_sol_unit_ini(acb_ode_sol_struct * sol, slong i0,
+                     const acb_ode_shift_struct * shifts)
 {
     slong nshifts = acb_mat_nrows(sol->extini);
     for (slong i = 0, j = 0; j < nshifts; j++)
@@ -49,7 +49,7 @@ acb_holonomic_sol_unit_ini(acb_holonomic_sol_struct * sol, slong i0,
 
 
 void
-acb_holonomic_sol_clear(acb_holonomic_sol_struct * sol)
+acb_ode_sol_clear(acb_ode_sol_struct * sol)
 {
     acb_mat_clear(sol->extini);
     _acb_poly_vec_clear(sol->sums, sol->alloc_pts * sol->alloc_logs);
@@ -58,8 +58,8 @@ acb_holonomic_sol_clear(acb_holonomic_sol_struct * sol)
 
 
 void
-acb_holonomic_sol_fit_length(acb_holonomic_sol_struct * sol, slong len,
-                             slong nder)
+acb_ode_sol_fit_length(acb_ode_sol_struct * sol, slong len,
+                       slong nder)
 {
     for (slong k = 0; k < sol->alloc_logs; k++)
     {
@@ -78,7 +78,7 @@ acb_holonomic_sol_fit_length(acb_holonomic_sol_struct * sol, slong len,
 
 
 void
-acb_holonomic_sol_reset(acb_holonomic_sol_struct * sol)
+acb_ode_sol_reset(acb_ode_sol_struct * sol)
 {
     for (slong k = 0; k < sol->alloc_logs; k++)
         acb_poly_zero(sol->series + k);
@@ -89,8 +89,8 @@ acb_holonomic_sol_reset(acb_holonomic_sol_struct * sol)
 
 
 acb_poly_struct *
-acb_holonomic_sol_sum_ptr(const acb_holonomic_sol_struct * sol,
-                          slong j, slong k)
+acb_ode_sol_sum_ptr(const acb_ode_sol_struct * sol,
+                    slong j, slong k)
 {
     return sol->sums + j * sol->alloc_logs + k;
 }

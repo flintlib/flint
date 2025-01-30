@@ -4,16 +4,16 @@
 #include "acb.h"
 #include "acb_mat.h"
 #include "acb_poly.h"
-#include "acb_holonomic.h"
+#include "acb_ode.h"
 #include "fmpz_vec.h"
 
 
-typedef acb_holonomic_sum_context_struct * ctx_ptr;
+typedef acb_ode_sum_context_struct * ctx_ptr;
 
 
 void
-acb_holonomic_sum_context_init(ctx_ptr ctx, slong dop_len, slong npts,
-                               slong nsols, slong nder)
+acb_ode_sum_context_init(ctx_ptr ctx, slong dop_len, slong npts,
+                         slong nsols, slong nder)
 {
     slong dop_order = dop_len - 1;
 
@@ -28,13 +28,13 @@ acb_holonomic_sum_context_init(ctx_ptr ctx, slong dop_len, slong npts,
     for (slong s = 0; s < dop_order; s++)
         ctx->sing_shifts[s].n = -1;
 
-    ctx->sol = flint_malloc(nsols * sizeof(acb_holonomic_sol_struct));
+    ctx->sol = flint_malloc(nsols * sizeof(acb_ode_sol_struct));
     /* using dop_order as a bound
      * - for max possible log prec (will need updating to support inhomogeneous
      *   equations),
      * - for number of initial value positions */
     for (slong m = 0; m < nsols; m++)
-        acb_holonomic_sol_init(ctx->sol + m, dop_order, dop_order, npts);
+        acb_ode_sol_init(ctx->sol + m, dop_order, dop_order, npts);
     ctx->nsols = nsols;
 
     ctx->pts = _acb_vec_init(npts);
@@ -53,7 +53,7 @@ acb_holonomic_sum_context_init(ctx_ptr ctx, slong dop_len, slong npts,
 
 
 void
-acb_holonomic_sum_context_clear(ctx_ptr ctx)
+acb_ode_sum_context_clear(ctx_ptr ctx)
 {
     _acb_poly_vec_clear(ctx->dop, ctx->dop_len);
 
@@ -63,7 +63,7 @@ acb_holonomic_sum_context_clear(ctx_ptr ctx)
     flint_free(ctx->sing_shifts);
 
     for (slong m = 0; m < ctx->nsols; m++)
-        acb_holonomic_sol_clear(ctx->sol + m);
+        acb_ode_sol_clear(ctx->sol + m);
     flint_free(ctx->sol);
 
     _acb_vec_clear(ctx->pts, ctx->npts);
@@ -75,7 +75,7 @@ acb_holonomic_sum_context_clear(ctx_ptr ctx)
 
 
 void
-acb_holonomic_sum_ordinary(ctx_ptr ctx)
+acb_ode_sum_ordinary(ctx_ptr ctx)
 {
     for (slong n = 0; n < ctx->dop_len - 1; n++)
     {
@@ -86,15 +86,15 @@ acb_holonomic_sum_ordinary(ctx_ptr ctx)
 
 
 void
-acb_holonomic_sum_canonical_basis(ctx_ptr ctx)
+acb_ode_sum_canonical_basis(ctx_ptr ctx)
 {
     for (int m = 0; m < ctx->nsols; m++)
-        acb_holonomic_sol_unit_ini(ctx->sol + m, m, ctx->sing_shifts);
+        acb_ode_sol_unit_ini(ctx->sol + m, m, ctx->sing_shifts);
 }
 
 
 void
-acb_holonomic_sum_highest(ctx_ptr ctx)
+acb_ode_sum_highest(ctx_ptr ctx)
 {
     for (int m = 0; m < ctx->nsols; m++)
     {
@@ -106,17 +106,17 @@ acb_holonomic_sum_highest(ctx_ptr ctx)
 
 
 void
-acb_holonomic_sum_group(ctx_ptr ctx, const acb_holonomic_group_struct * grp)
+acb_ode_sum_group(ctx_ptr ctx, const acb_ode_group_struct * grp)
 {
     acb_set(ctx->expo, grp->expo);
     memcpy(ctx->sing_shifts, grp->shifts,
-           grp->nshifts * sizeof(acb_holonomic_shift_struct));
-    acb_holonomic_sum_highest(ctx);
+           grp->nshifts * sizeof(acb_ode_shift_struct));
+    acb_ode_sum_highest(ctx);
 }
 
 
 void
-_acb_holonomic_sum_precompute(ctx_ptr ctx)
+_acb_ode_sum_precompute(ctx_ptr ctx)
 {
     if (ctx->have_precomputed)
         return;
@@ -148,13 +148,13 @@ _acb_holonomic_sum_precompute(ctx_ptr ctx)
 
 
 void
-_acb_holonomic_sum_reset(ctx_ptr ctx)
+_acb_ode_sum_reset(ctx_ptr ctx)
 {
     for (slong m = 0; m < ctx->nsols; m++)
     {
-        acb_holonomic_sol_reset(ctx->sol + m);
-        acb_holonomic_sol_fit_length(ctx->sol + m, 2 * ctx->block_size,
-                                     ctx->nder);
+        acb_ode_sol_reset(ctx->sol + m);
+        acb_ode_sol_fit_length(ctx->sol + m, 2 * ctx->block_size,
+                               ctx->nder);
     }
 
     for (slong i = 0; i < ctx->npts; i++)

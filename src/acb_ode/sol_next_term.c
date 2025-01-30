@@ -1,7 +1,7 @@
 #include "acb_types.h"
 #include "acb.h"
 #include "acb_mat.h"
-#include "acb_holonomic.h"
+#include "acb_ode.h"
 
 
 typedef enum
@@ -18,7 +18,7 @@ lc_status_t;
 
 
 static void
-next_coeff(acb_holonomic_sol_struct * sol, slong base, slong n,
+next_coeff(acb_ode_sol_struct * sol, slong base, slong n,
            acb_poly_struct * rhs, slong rhs_nlogs,
            slong mult, slong ini_i, const acb_poly_struct * ind_n,
            slong prec)
@@ -33,10 +33,10 @@ next_coeff(acb_holonomic_sol_struct * sol, slong base, slong n,
 
     while (rhs_nlogs > 0
            && acb_is_zero((rhs + rhs_nlogs - 1)->coeffs + n - base))
-         rhs_nlogs--;
+        rhs_nlogs--;
 
-   /* Compute the high-log part of the new term from the coefficient of x^{λ+n}
-    * on the rhs and the indicial polynomial */
+    /* Compute the high-log part of the new term from the coefficient of x^{λ+n}
+     * on the rhs and the indicial polynomial */
 
     acb_struct * new_term = _acb_vec_init(rhs_nlogs);
 
@@ -109,7 +109,7 @@ next_coeff(acb_holonomic_sol_struct * sol, slong base, slong n,
 
 
 static void
-next_sums(acb_holonomic_sol_struct * sol, slong base, slong n,
+next_sums(acb_ode_sol_struct * sol, slong base, slong n,
           acb_srcptr pows, const char * shifted, slong npts,
           const fmpz * binom_n,
           slong nder, slong prec)
@@ -122,7 +122,7 @@ next_sums(acb_holonomic_sol_struct * sol, slong base, slong n,
         for (slong k = 0; k < sol->nlogs; k++)
         {
             acb_ptr c = (sol->series + k)->coeffs + n - base;
-            acb_ptr s = acb_holonomic_sol_sum_ptr(sol, j, k)->coeffs;
+            acb_ptr s = acb_ode_sol_sum_ptr(sol, j, k)->coeffs;
 
             if (shifted[j])
             {
@@ -150,8 +150,8 @@ next_sums(acb_holonomic_sol_struct * sol, slong base, slong n,
 
 
 void
-_acb_holonomic_sol_add_term(
-        acb_holonomic_sol_struct * sol, slong base, slong n,
+_acb_ode_sol_add_term(
+        acb_ode_sol_struct * sol, slong base, slong n,
         acb_poly_struct * rhs, slong rhs_nlogs,
         slong mult, slong ini_i, const acb_poly_struct * ind_n,
         acb_srcptr pows, const char * shifted, slong npts,
