@@ -6,25 +6,23 @@ SPHINXOPTS    = -j=auto
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = flint
 SOURCEDIR     = source
+ORIGSRCDIR    = origsrc
 BUILDDIR      = build
 
 M4 := m4
 
 SPHINX_ACTIONS := html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf latexpdfja text man texinfo info gettext changes xml pseudoxml linkcheck doctest coverage clean
 
-CONFIG := $(SOURCEDIR)/macros.m4
-SRCS := $(wildcard $(SOURCEDIR)/*.rst)
-OBJS := $(patsubst $(SOURCEDIR)/%,$(BUILDDIR)/%,$(SRCS))
+CONFIG := macros.m4
+SRCS := $(wildcard $(ORIGSRCDIR)/*.rst)
+OBJS := $(patsubst $(ORIGSRCDIR)/%,$(SOURCEDIR)/%,$(SRCS))
 
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-$(BUILDDIR):
-	mkdir $(BUILDDIR)
-
-$(BUILDDIR)/%.rst: $(SOURCEDIR)/%.rst $(CONFIG) | $(BUILDDIR)
-	@$(M4) -I $(SOURCEDIR) $< > $@
+$(SOURCEDIR)/%.rst: $(ORIGSRCDIR)/%.rst $(CONFIG)
+	@$(M4) $< > $@
 
 preprocess: $(OBJS)
 
