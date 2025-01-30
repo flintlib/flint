@@ -41,7 +41,7 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
     {
         nmod_poly_fit_length(res, 1);
         _nmod_poly_set_length(res, 1);
-        NMOD_RED(res->coeffs[0], len - 1, poly->mod);
+        NMOD_RED(res->coeffs[0], (ulong) (len - 1), poly->mod);
     }
     else
     {
