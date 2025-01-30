@@ -230,12 +230,9 @@ Memory management
     whether the reentrant or non-reentrant version of FLINT is built.
 
 .. function:: void fmpz_init_set(fmpz_t f, const fmpz_t g)
-
-.. function:: void fmpz_init_set_ui(fmpz_t f, ulong g)
-
-.. function:: void fmpz_init_set_si(fmpz_t f, slong g)
-
-    Initialises `f` and sets it to the value of `g`.
+              void fmpz_init_set_ui(fmpz_t f, ulong g)
+              void fmpz_init_set_si(fmpz_t f, slong g)
+desc_init_set(f, g)
 
 
 Random generation
@@ -375,14 +372,6 @@ Conversion
     the function.  Otherwise, it is up to the caller to ensure that
     the allocated block of memory is sufficiently large.
 
-.. function:: void fmpz_set_si(fmpz_t f, slong val)
-
-    Sets `f` to the given ``slong`` value.
-
-.. function:: void fmpz_set_ui(fmpz_t f, ulong val)
-
-    Sets `f` to the given ``ulong`` value.
-
 .. function:: void fmpz_set_d(fmpz_t f, double c)
 
     Sets `f` to the ``double`` `c`, rounding down towards zero if
@@ -458,13 +447,6 @@ Conversion
 
     Retrieves the value of `in` modulo `2^{2 * FLINT\_BITS}` and puts the high
     and low words into ``*hi`` and ``*lo`` respectively.
-
-.. function:: void fmpz_set_mpz(fmpz_t f, const mpz_t x)
-
-    Sets `f` to the given ``mpz_t`` value.
-
-    **Note:** Requires that ``gmp.h`` has been included before any FLINT
-    header is included.
 
 .. function:: int fmpz_set_str(fmpz_t f, const char * str, int b)
 
@@ -660,16 +642,19 @@ Basic properties and manipulation
     Efficiently swaps `f` and `g`.  No data is copied.
 
 .. function:: void fmpz_set(fmpz_t f, const fmpz_t g)
+              void fmpz_set_ui(fmpz_t f, ulong g)
+              void fmpz_set_si(fmpz_t f, slong g)
+              void fmpz_set_mpz(fmpz_t f, const mpz_t g)
+desc_set(f, g)
 
-    Sets `f` to the same value as `g`.
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpz_zero(fmpz_t f)
-
-    Sets `f` to zero.
+desc_zero(f)
 
 .. function:: void fmpz_one(fmpz_t f)
-
-    Sets `f` to one.
+desc_one(f)
 
 .. function:: int fmpz_abs_fits_ui(const fmpz_t f)
 
@@ -710,13 +695,9 @@ Comparison
 
 
 .. function:: int fmpz_cmp(const fmpz_t f, const fmpz_t g)
-
-.. function:: int fmpz_cmp_ui(const fmpz_t f, ulong g)
-
-.. function:: int fmpz_cmp_si(const fmpz_t f, slong g)
-
-    Returns a negative value if `f < g`, positive value if `g < f`,
-    otherwise returns `0`.
+              int fmpz_cmp_ui(const fmpz_t f, ulong g)
+              int fmpz_cmp_si(const fmpz_t f, slong g)
+desc_cmp(f, g)
 
 .. function:: int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
 
@@ -729,20 +710,15 @@ Comparison
     `\lvert 2g\rvert < \lvert f \rvert`, otherwise returns `0`.
 
 .. function:: int fmpz_equal(const fmpz_t f, const fmpz_t g)
-
-.. function:: int fmpz_equal_ui(const fmpz_t f, ulong g)
-
-.. function:: int fmpz_equal_si(const fmpz_t f, slong g)
-
-    Returns `1` if `f` is equal to `g`, otherwise returns `0`.
+              int fmpz_equal_ui(const fmpz_t f, ulong g)
+              int fmpz_equal_si(const fmpz_t f, slong g)
+desc_equal(f, g)
 
 .. function:: int fmpz_is_zero(const fmpz_t f)
-
-    Returns `1` if `f` is `0`, otherwise returns `0`.
+desc_is_zero(f)
 
 .. function:: int fmpz_is_one(const fmpz_t f)
-
-    Returns `1` if `f` is equal to one, otherwise returns `0`.
+desc_is_one(f)
 
 .. function:: int fmpz_is_pm1(const fmpz_t f)
 
@@ -761,31 +737,36 @@ Basic arithmetic
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpz_neg(fmpz_t f1, const fmpz_t f2)
+.. function:: void fmpz_neg(fmpz_t f, const fmpz_t g)
+desc_neg(f, g)
 
-    Sets `f_1` to `-f_2`.
-
-.. function:: void fmpz_abs(fmpz_t f1, const fmpz_t f2)
-
-    Sets `f_1` to the absolute value of `f_2`.
+.. function:: void fmpz_abs(fmpz_t f, const fmpz_t g)
+desc_abs(f, g)
 
 .. function:: void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
               void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong h)
               void fmpz_add_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to `g + h`.
+desc_add(f, g, h)
 
 .. function:: void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
               void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong h)
               void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to `g - h`.
+desc_sub(f, g, h)
 
 .. function:: void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
               void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong h)
               void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong h)
+desc_mul(f, g, h)
 
-    Sets `f` to `g \times h`.
+.. function:: void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+              void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong h)
+              void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong h)
+desc_addmul(f, g, h)
+
+.. function:: void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+              void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong h)
+              void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong h)
+desc_submul(f, g, h)
 
 .. function:: void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
@@ -801,25 +782,11 @@ Basic arithmetic
 
     Sets `f` to `2^e`.
 
-.. function:: void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
-              void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong h)
-              void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to `f + g \times h`.
-
-.. function:: void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
-              void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong h)
-              void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong h)
-
-    Sets `f` to `f - g \times h`.
-
 .. function:: void fmpz_fmma(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)
-
-    Sets `f` to `a \times b + c \times d`.
+desc_fmma(f, a, b, c, d)
 
 .. function:: void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_t d)
-
-    Sets `f` to `a \times b - c \times d`.
+desc_fmms(f, a, b, c, d)
 
 .. function:: void fmpz_cdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 

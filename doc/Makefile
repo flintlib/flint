@@ -12,7 +12,7 @@ M4 := m4
 
 SPHINX_ACTIONS := html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf latexpdfja text man texinfo info gettext changes xml pseudoxml linkcheck doctest coverage clean
 
-CONFIG := $(SOURCEDIR)/config.m4 $(SOURCEDIR)/macros.m4
+CONFIG := $(SOURCEDIR)/macros.m4
 SRCS := $(wildcard $(SOURCEDIR)/*.rst)
 OBJS := $(patsubst $(SOURCEDIR)/%,$(BUILDDIR)/%,$(SRCS))
 
@@ -20,12 +20,18 @@ OBJS := $(patsubst $(SOURCEDIR)/%,$(BUILDDIR)/%,$(SRCS))
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-preprocess: $(OBJS)
+$(BUILDDIR):
+	mkdir $(BUILDDIR)
 
-$(BUILDDIR)/%.rst: $(SOURCEDIR)/%.rst $(CONFIG)
+$(BUILDDIR)/%.rst: $(SOURCEDIR)/%.rst $(CONFIG) | $(BUILDDIR)
 	@$(M4) -I $(SOURCEDIR) $< > $@
+
+preprocess: $(OBJS)
 
 $(SPHINX_ACTIONS): Makefile preprocess
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+print-%:
+	@echo "$*=$($*)"
 
 .PHONY: help Makefile preprocess
