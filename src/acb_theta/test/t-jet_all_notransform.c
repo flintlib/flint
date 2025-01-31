@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_jet_all_notransform, state)
 {
     slong iter;
 
-    /* Test: coincides with sum_jet_all */
+    /* Test: coincides with sum_jet */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
@@ -48,7 +48,7 @@ TEST_FUNCTION_START(acb_theta_jet_all_notransform, state)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_jet_all(test, vec, nb, ctx_tau, ord, prec);
+        acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, 1, prec);
 
         /*flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, ord = %wd\n",
             g, prec, nb, ord);

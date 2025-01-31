@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -18,10 +19,12 @@ void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     slong g = acb_mat_nrows(tau);
     acb_theta_ctx_tau_t ctx_tau;
     acb_theta_ctx_z_struct * vec;
+    arb_t distance;
     slong j;
 
     acb_theta_ctx_tau_init(ctx_tau, 0, g);
     vec = acb_theta_ctx_z_vec_init(nb, g);
+    arb_init(distance);
 
     acb_theta_ctx_tau_set(ctx_tau, tau, prec);
     for (j = 0; j < nb; j++)
@@ -29,8 +32,9 @@ void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
         acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
     }
 
-    acb_theta_sum_00(th, vec, nb, ctx_tau, prec);
+    acb_theta_sum(th, vec, nb, ctx_tau, distance, 0, 0, 0, prec);
 
     acb_theta_ctx_tau_clear(ctx_tau);
     acb_theta_ctx_z_vec_clear(vec, nb);
+    arb_clear(distance);
 }

@@ -53,6 +53,7 @@
 #include "t-jet_compose.c"
 #include "t-jet_error.c"
 #include "t-jet_mul.c"
+#include "t-jet_notransform_ql.c"
 #include "t-jet_one_notransform.c"
 #include "t-jet_tuples.c"
 #include "t-local_bound.c"
@@ -60,7 +61,6 @@
 #include "t-ql_exact.c"
 #include "t-ql_lower_dim.c"
 #include "t-ql_setup.c"
-#include "t-ql_steps.c"
 #include "t-siegel_cocycle.c"
 #include "t-siegel_is_reduced.c"
 #include "t-siegel_kappa.c"
@@ -70,11 +70,8 @@
 #include "t-sp2gz_inv.c"
 #include "t-sp2gz_is_correct.c"
 #include "t-sp2gz_set_blocks.c"
-#include "t-sum_00.c"
-#include "t-sum_a0_tilde.c"
-#include "t-sum_all_tilde.c"
-#include "t-sum_jet_00.c"
-#include "t-sum_jet_all.c"
+#include "t-sum.c"
+#include "t-sum_jet.c"
 #include "t-sum_jet_radius.c"
 #include "t-sum_radius.c"
 
@@ -124,6 +121,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_jet_compose),
     TEST_FUNCTION(acb_theta_jet_error),
     TEST_FUNCTION(acb_theta_jet_mul),
+    TEST_FUNCTION(acb_theta_jet_notransform_ql),
     TEST_FUNCTION(acb_theta_jet_one_notransform),
     TEST_FUNCTION(acb_theta_jet_tuples),
     TEST_FUNCTION(acb_theta_local_bound),
@@ -131,7 +129,6 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_ql_exact),
     TEST_FUNCTION(acb_theta_ql_lower_dim),
     TEST_FUNCTION(acb_theta_ql_setup),
-    TEST_FUNCTION(acb_theta_ql_steps),
     TEST_FUNCTION(acb_theta_siegel_cocycle),
     TEST_FUNCTION(acb_theta_siegel_is_reduced),
     TEST_FUNCTION(acb_theta_siegel_kappa),
@@ -141,11 +138,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_sp2gz_inv),
     TEST_FUNCTION(acb_theta_sp2gz_is_correct),
     TEST_FUNCTION(acb_theta_sp2gz_set_blocks),
-    TEST_FUNCTION(acb_theta_sum_00),
-    TEST_FUNCTION(acb_theta_sum_a0_tilde),
-    TEST_FUNCTION(acb_theta_sum_all_tilde),
-    TEST_FUNCTION(acb_theta_sum_jet_00),
-    TEST_FUNCTION(acb_theta_sum_jet_all),
+    TEST_FUNCTION(acb_theta_sum),
+    TEST_FUNCTION(acb_theta_sum_jet),
     TEST_FUNCTION(acb_theta_sum_jet_radius),
     TEST_FUNCTION(acb_theta_sum_radius),
 };

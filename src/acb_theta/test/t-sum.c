@@ -14,7 +14,7 @@
 #include "acb_modular.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_sum_all_tilde, state)
+TEST_FUNCTION_START(acb_theta_sum, state)
 {
     slong iter;
 
@@ -55,9 +55,8 @@ TEST_FUNCTION_START(acb_theta_sum_all_tilde, state)
         acb_theta_ctx_z_set(ctx, z, ctx_tau, prec);
         acb_theta_eld_distances(d, z, 1, tau, prec);
 
-        /* Call sum_all_tilde at precision mprec, test against modular_theta */
-        acb_theta_sum_all_tilde(th, ctx, 1, ctx_tau, d, mprec);
-        _acb_vec_scalar_mul_arb(th, th, n2, &ctx->u, prec);
+        /* Call sum at precision mprec, test against modular_theta */
+        acb_theta_sum(th, ctx, 1, ctx_tau, d, 1, 1, 0, mprec);
 
         for (j = 0; j < n2; j++)
         {

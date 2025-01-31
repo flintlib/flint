@@ -15,7 +15,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-#define ACB_THETA_QL_TRY 4
+/* Helper functions */
 
 static void
 acb_theta_ctx_tau_copy(acb_theta_ctx_tau_t res, const acb_theta_ctx_tau_t ctx)
@@ -26,19 +26,17 @@ acb_theta_ctx_tau_copy(acb_theta_ctx_tau_t res, const acb_theta_ctx_tau_t ctx)
     FLINT_ASSERT(res->g == g);
 
     arb_mat_set(&res->yinv, &ctx->yinv);
+    arb_mat_set(&res->cho, &ctx->cho);
     acb_mat_set(res->exp_tau_div_4, ctx->exp_tau_div_4);
     acb_mat_set(res->exp_tau_div_2, ctx->exp_tau_div_2);
     acb_mat_set(res->exp_tau, ctx->exp_tau);
+    acb_mat_set(res->exp_tau_div_4_inv, ctx->exp_tau_div_4_inv);
+    acb_mat_set(res->exp_tau_div_2_inv, ctx->exp_tau_div_2_inv);
+    acb_mat_set(res->exp_tau_inv, ctx->exp_tau_inv);
 
-    if (g > 1)
+    if (ctx->allow_shift) /* will always be the case here */
     {
-        arb_mat_set(&res->cho, &ctx->cho);
-        acb_mat_set(res->exp_tau_div_4_inv, ctx->exp_tau_div_4_inv);
-        acb_mat_set(res->exp_tau_div_2_inv, ctx->exp_tau_div_2_inv);
-        acb_mat_set(res->exp_tau_inv, ctx->exp_tau_inv);
-        _acb_vec_set(res->exp_tau_a_div_2, ctx->exp_tau_a_div_2, n * g);
         _acb_vec_set(res->exp_tau_a, ctx->exp_tau_a, n * g);
-        _acb_vec_set(res->exp_tau_a_div_2_inv, ctx->exp_tau_a_div_2_inv, n * g);
         _acb_vec_set(res->exp_tau_a_inv, ctx->exp_tau_a_inv, n * g);
         _acb_vec_set(res->exp_a_tau_a_div_4, ctx->exp_a_tau_a_div_4, n);
     }
@@ -59,6 +57,298 @@ _acb_vec_contains_zero(acb_srcptr vec, slong nb)
     return 0;
 }
 
+static int
+acb_theta_contains_even_zero(acb_srcptr vec, slong g)
+{
+    slong n = 1 << (2 * g);
+    slong j;
+    int res = 0;
+
+    for (j = 0; j < n; j++)
+    {
+        if (acb_theta_char_is_even(j, g) && acb_contains_zero(&vec[j]))
+        {
+            res = 1;
+            break;
+        }
+    }
+
+    return res;
+}
+
+/* Find out for which z we can use t=0 at this precision. */
+/* Input/output:
+   - rts, rts_all, all, nb_steps, nb, distances are as in acb_theta_ql_setup
+   - prec should be small
+   - is_zero[j] is true iff the corresponding z is zero
+   - easy_steps[j] should contain the number of steps that are already known to
+     be easy for a given z. This number may increase in the output
+   - &vec[j] and ctx_tau should be a valid context for the pairs (z, tau). They
+     will get duplicated in acb_theta_ql_setup_easy.
+   - At exit, &vec[j] contains the context for 2^k z, where k = easy_steps[j],
+     except if easy_steps[j] is nb_steps in which case we guarantee nothing. */
+
+static void
+acb_theta_ql_setup_easy(acb_ptr rts, acb_ptr rts_all, slong * easy_steps,
+    acb_theta_ctx_z_struct * vec, slong nb, const int * is_zero, acb_theta_ctx_tau_t ctx_tau,
+    arb_srcptr distances, slong nb_steps, int all, slong prec)
+{
+    slong g = ctx_tau->g;
+    slong n = 1 << g;
+    arb_ptr d;
+    acb_ptr th;
+    slong j, k;
+    int easy;
+
+    d = _arb_vec_init(n);
+
+    for (k = 0; k < nb_steps; k++)
+    {
+        for (j = 0; j < nb; j++)
+        {
+            if (easy_steps[j] == nb_steps)
+            {
+                /* nothing more to be done for this z: we continue without
+                   duplicating the context */
+                continue;
+            }
+            else if (easy_steps[j] < k)
+            {
+                /* steps for this z aren't easy anymore: we continue without
+                   duplicating the context */
+                continue;
+            }
+            else if (easy_steps[j] > k)
+            {
+                /* easy step was set up during a previous pass: we continue but
+                   need to update the context */
+                acb_theta_ctx_z_dupl(&vec[j], prec + ACB_THETA_LOW_PREC);
+                continue;
+            }
+            /* we now have k == easy_steps[j], and vec[j] contains a valid
+               context for 2^k z_j */
+
+            _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, k);
+            if (k == 0 && all)
+            {
+                th = rts_all + j * n * n;
+                acb_theta_sum(th, &vec[j], 1, ctx_tau, d, 1, 1, 1, prec);
+                /* odd theta constants are known to be zero */
+                easy = (is_zero[j] && !acb_theta_contains_even_zero(th, g))
+                    || !_acb_vec_contains_zero(th, n * n);
+            }
+            else
+            {
+                th = rts + j * (3 * n * nb_steps) + k * (3 * n);
+                acb_theta_sum(th, &vec[j], 1, ctx_tau, d, 1, 0, 1, prec);
+                easy = !_acb_vec_contains_zero(th, n);
+            }
+
+            if (easy)
+            {
+                /* update easy_steps and duplicate context for k + 1 */
+                easy_steps[j]++;
+                if (k < nb_steps - 1)
+                {
+                    acb_theta_ctx_z_dupl(&vec[j], prec + ACB_THETA_LOW_PREC);
+                }
+            }
+        }
+        if (k < nb_steps - 1)
+        {
+            /* duplication on ctx_tau */
+            acb_theta_ctx_tau_dupl(ctx_tau, prec + ACB_THETA_LOW_PREC);
+        }
+    }
+
+    _arb_vec_clear(d, n);
+}
+
+/* Find out if the given vector t is usable for hard steps */
+/* Input/output:
+   - rts, rts_all, all, nb_steps, nb, distances should be as in acb_theta_ql_setup
+   - prec should be small
+   - t should be an exact real vector of length g
+   - easy_steps is as output by acb_theta_ql_setup_easy
+   - ctx_tau should contain a valid context for tau; it will get duplicated
+   - initially, &vec[j] should contain a valid context for 2^k z where
+     k = easy_steps[j]. It will get duplicated, and we guarantee nothing on the
+     output.
+*/
+
+static int
+acb_theta_ql_setup_hard(acb_ptr rts, acb_ptr rts_all, acb_ptr t,
+    acb_theta_ctx_z_struct * vec, slong nb, acb_theta_ctx_tau_t ctx_tau,
+    const slong * easy_steps, arb_srcptr distances, slong nb_steps, int all, slong prec)
+{
+    slong g = ctx_tau->g;
+    slong n = 1 << g;
+    flint_rand_t state;
+    acb_theta_ctx_z_struct * aux;
+    acb_theta_ctx_z_t ctxt;
+    acb_ptr th;
+    arb_ptr d;
+    slong j, k;
+    int res = 1;
+
+    flint_rand_init(state);
+    aux = acb_theta_ctx_z_vec_init(2, g);
+    acb_theta_ctx_z_init(ctxt, g);
+    d = _arb_vec_init(n);
+
+    /* Choose a random t and set context */
+    for (k = 0; k < g; k++)
+    {
+        arb_urandom(acb_realref(&t[k]), state, prec);
+        acb_get_mid(&t[k], &t[k]);
+    }
+    acb_theta_ctx_z_set(ctxt, t, ctx_tau, prec + ACB_THETA_LOW_PREC);
+
+    for (k = 0; (k < nb_steps) && res; k++)
+    {
+        for (j = 0; (j < nb) && res; j++)
+        {
+            if (easy_steps[j] > k)
+            {
+                /* nothing to be done yet for this z: we continue without
+                   duplicating the context */
+                continue;
+            }
+            /* we now have k >= easy_steps[j], and vec[j] currently
+               contains a valid context for 2^k z_j, while ctxt
+               contains a valid context for 2^k t */
+
+            /* set context vector aux at z + t and z + 2t */
+            _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, k);
+            acb_theta_ctx_z_add_real(&aux[0], &vec[j], ctxt, prec + ACB_THETA_LOW_PREC);
+            acb_theta_ctx_z_add_real(&aux[1], &aux[0], ctxt, prec + ACB_THETA_LOW_PREC);
+
+            if (k == 0 && all)
+            {
+                /* We just need roots for z + 2t */
+                th = rts_all + j * n * n;
+                acb_theta_sum(th, &aux[1], 1, ctx_tau, d, 1, 1, 1, prec);
+                res = !_acb_vec_contains_zero(rts, n * n);
+                /* if (!res)
+                   {
+                   flint_printf("(ql_setup) fail at lowprec = %wd (k = %wd, j = %wd)\n", prec, k, j);
+                   _acb_vec_printd(th, n * n, 5);
+                   }*/
+            }
+            else
+            {
+                /* we need roots at z + t and z + 2t */
+                th = rts + j * (3 * n * nb_steps) + k * (3 * n) + n;
+                acb_theta_sum(th, aux, 2, ctx_tau, d, 1, 0, 1, prec);
+                res = !_acb_vec_contains_zero(th, 2 * n);
+                /* if (!res)
+                   {
+                   flint_printf("(ql_setup) fail at lowprec = %wd (k = %wd, j = %wd)\n", prec, k, j);
+                   _acb_vec_printd(th, 2 * n, 5);
+                   } */
+            }
+
+            if (k < nb_steps - 1)
+            {
+                acb_theta_ctx_z_dupl(&vec[j], prec + ACB_THETA_LOW_PREC);
+            }
+        }
+        if (k < nb_steps - 1)
+        {
+            acb_theta_ctx_tau_dupl(ctx_tau, prec + ACB_THETA_LOW_PREC);
+            acb_theta_ctx_z_dupl(ctxt, prec + ACB_THETA_LOW_PREC);
+        }
+    }
+
+    flint_rand_clear(state);
+    acb_theta_ctx_z_vec_clear(aux, 2);
+    acb_theta_ctx_z_clear(ctxt);
+    _arb_vec_clear(d, n);
+    return res;
+}
+
+static slong
+acb_theta_ql_setup_lost_bits(acb_srcptr rts, acb_srcptr rts_all,
+    const slong * easy_steps, const int * is_zero, slong nb,
+    arb_srcptr distances, slong nb_steps, int all, slong g)
+{
+    slong n = 1 << g;
+    slong lost_bits, total_lost_bits;
+    arb_t x;
+    arf_t y, z;
+    fmpz_t e;
+    slong lp = ACB_THETA_LOW_PREC + nb_steps;
+    slong j, k, a, b;
+
+    arb_init(x);
+    arf_init(y);
+    arf_init(z);
+    fmpz_init(e);
+
+    total_lost_bits = 0;
+    for (k = 0; k < nb_steps; k++)
+    {
+        lost_bits = 0;
+        for (j = 0; j < nb; j++)
+        {
+            for (a = 0; a < n; a++)
+            {
+                arb_zero(x);
+                arb_get_lbound_arf(arb_midref(x), &distances[j * n + a], lp);
+                arb_mul_2exp_si(x, x, k);
+                arb_exp(x, x, lp);
+                /* Set y to the minimum absolute value of the roots */
+                if (k == 0 && all && easy_steps[j] > 0 && is_zero[j])
+                {
+                    arf_pos_inf(y);
+                    for (b = 0; b < n; b++)
+                    {
+                        if (acb_theta_char_is_even(n * a + b, g))
+                        {
+                            acb_get_abs_lbound_arf(z, &rts_all[j * n * n + a * n + b], lp);
+                            arf_min(y, y, z);
+                        }
+                    }
+                }
+                else if (k == 0 && all) /* easy or hard step, all theta values */
+                {
+                    arf_pos_inf(y);
+                    for (b = 0; b < n; b++)
+                    {
+                        acb_get_abs_lbound_arf(z, &rts_all[j * n * n + a * n + b], lp);
+                        arf_min(y, y, z);
+                    }
+                }
+                else if (k < easy_steps[j]) /* a generic easy step */
+                {
+                    acb_get_abs_lbound_arf(y, &rts[j * (3 * n * nb_steps) + k * (3 * n) + a], lp);
+                }
+                else /* a generic hard step */
+                {
+                    acb_get_abs_lbound_arf(y, &rts[j * (3 * n * nb_steps) + k * (3 * n) + n + a], lp);
+                    acb_get_abs_lbound_arf(z, &rts[j * (3 * n * nb_steps) + k * (3 * n) + 2 * n + a], lp);
+                    arf_min(y, y, z);
+                }
+                /* Find out how many bits of precision we approximately lose */
+                arb_mul_arf(x, x, y, lp);
+                arb_get_lbound_arf(y, x, lp);
+                arf_frexp(y, e, y);
+                if (fmpz_fits_si(e))
+                {
+                    lost_bits = FLINT_MAX(lost_bits, - fmpz_get_si(e));
+                }
+            }
+        }
+        total_lost_bits += lost_bits + g + 4;
+    }
+
+    arb_clear(x);
+    arf_clear(y);
+    arf_clear(z);
+    fmpz_clear(e);
+    return total_lost_bits;
+}
+
 /* Assume that zs always starts with zero. */
 
 int
@@ -67,224 +357,81 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
     slong nb_steps, int all, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n = 1 << g;
-    acb_theta_ctx_tau_t ctx_tau, ctx_tau_dupl;
-    acb_theta_ctx_z_t ctxt;
+    acb_theta_ctx_tau_t ctx_tau_1, ctx_tau_2;
     acb_theta_ctx_z_struct * vec;
-    acb_theta_ctx_z_struct * aux;
-    flint_rand_t state;
-    arb_ptr d;
-    slong lowprec;
-    slong j, k, l;
-    int res, easy;
+    slong lowprec, j;
+    int done = 0;
     int * is_zero;
 
     FLINT_ASSERT(nb >= 1);
     FLINT_ASSERT(_acb_vec_is_zero(zs, g));
 
+    for (j = 0; j < nb; j++)
+    {
+        easy_steps[j] = 0;
+    }
+    _acb_vec_zero(t, g);
     if (nb_steps == 0)
     {
         *guard = 0;
-        for (j = 0; j < nb; j++)
-        {
-            easy_steps[j] = 0;
-        }
         return 1;
     }
 
-    acb_theta_ctx_tau_init(ctx_tau, 1, g);
-    acb_theta_ctx_tau_init(ctx_tau_dupl, 1, g);
+    acb_theta_ctx_tau_init(ctx_tau_1, 1, g);
+    acb_theta_ctx_tau_init(ctx_tau_2, 1, g);
     vec = acb_theta_ctx_z_vec_init(nb, g);
-    aux = acb_theta_ctx_z_vec_init(2, g);
-    acb_theta_ctx_z_init(ctxt, g);
-    d = _arb_vec_init(n);
     is_zero = flint_malloc(nb * sizeof(int));
-    flint_rand_init(state);
 
     for (j = 0; j < nb; j++)
     {
         is_zero[j] = _acb_vec_is_zero(zs + j * g, g);
     }
 
-    res = 0;
-    for (lowprec = 16 + 2 * g; (lowprec < prec) && !res; lowprec *= 2)
+    for (lowprec = 8; (lowprec < prec) && !done; lowprec *= 2)
     {
-        *guard = lowprec;
-        /* Set context at precision lowprec */
-        /* Find out for which z we can use t=0 at this precision. */
-        acb_theta_ctx_tau_set(ctx_tau, tau, lowprec);
-        acb_theta_ctx_tau_copy(ctx_tau_dupl, ctx_tau);
-        res = 1;
+        /* Set contexts at low precision, but with some additional guard bits */
+        acb_theta_ctx_tau_set(ctx_tau_1, tau, lowprec + ACB_THETA_LOW_PREC);
+        acb_theta_ctx_tau_copy(ctx_tau_2, ctx_tau_1);
         for (j = 0; j < nb; j++)
         {
-            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lowprec);
-            easy_steps[j] = 0;
+            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau_1, lowprec + ACB_THETA_LOW_PREC);
         }
-        for (k = 0; k < nb_steps; k++)
-        {
-            for (j = 0; j < nb; j++)
-            {
-                if (easy_steps[j] > k)
-                {
-                    continue; /* was already set up during a previous pass */
-                }
-                if (easy_steps[j] < k)
-                {
-                    continue; /* z was already discarded */
-                }
 
-                _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, k);
-                if (k == 0 && all)
-                {
-                    acb_theta_sum_all_tilde(rts_all + j * n * n, &vec[j], 1,
-                        ctx_tau_dupl, d, lowprec);
-                    /* odd theta constants are known to be zero */
-                    if (is_zero[j])
-                    {
-                        easy = 1;
-                        for (l = 0; l < n * n; l++)
-                        {
-                            if (acb_theta_char_is_even(l, g))
-                            {
-                                if(acb_contains_zero(&rts_all[j * n * n + l]))
-                                {
-                                    easy = 0;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                acb_zero(&rts_all[j * n * n + l]);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        easy = !_acb_vec_contains_zero(rts_all + j * n * n, n * n);
-                    }
-                }
-                else
-                {
-                    acb_theta_sum_a0_tilde(rts + j * (3 * n * nb_steps) + k * (3 * n),
-                        &vec[j], 1, ctx_tau_dupl, d, lowprec);
-                    easy = !_acb_vec_contains_zero(rts + j * (3 * n * nb_steps) + k * (3 * n), n);
-                }
-                if (easy)
-                {
-                    easy_steps[j]++;
-                    if (k < nb_steps - 1)
-                    {
-                        acb_theta_ctx_z_dupl(&vec[j], lowprec);
-                    }
-                }
-                else
-                {
-                    res = 0; /* trigger search for t */
-                }
-            }
-            if (k < nb_steps - 1)
-            {
-                acb_theta_ctx_tau_dupl(ctx_tau_dupl, lowprec);
-            }
-        }
-        /* At this point, for every j such that easy_steps[j] = nb_steps,
-           we have computed all the roots we want. Pick an auxiliary t for the
-           other j's; we must include 0 in the "not done" list */
-        _acb_vec_zero(t, g);
-        for (j = 0; j < nb; j++)
+        /* Add possible easy steps compared to what we already know */
+        acb_theta_ql_setup_easy(rts, rts_all, easy_steps, vec, nb,
+            is_zero, ctx_tau_1, distances, nb_steps, all, lowprec);
+
+        /* Let easy_steps[0] be the minimal value (necessary for duplication
+           steps) */
+        for (j = 1; j < nb; j++)
         {
             easy_steps[0] = FLINT_MIN(easy_steps[0], easy_steps[j]);
         }
+        done = (easy_steps[0] == nb_steps);
 
-        for (l = 0; (l < ACB_THETA_QL_TRY) && !res; l++)
+        /* At this point, for every j such that easy_steps[j] = nb_steps, we
+           have computed all the roots we want. Pick an auxiliary t for the
+           other hard steps; if it doesn't work, then we restart with an
+           increased lowprec. */
+        if (!done)
         {
-            res = 1;
-            for (k = 0; k < g; k++)
-            {
-                arb_urandom(acb_realref(&t[k]), state, prec);
-                acb_get_mid(&t[k], &t[k]);
-            }
-            /* Reinitialize contexts */
-            acb_theta_ctx_tau_copy(ctx_tau_dupl, ctx_tau);
-            acb_theta_ctx_z_set(ctxt, t, ctx_tau, lowprec);
-
-            /* Find out if roots are all nonzero */
-            for (k = 0; (k < nb_steps) && res; k++)
-            {
-                for (j = 0; (j < nb) && res; j++)
-                {
-                    if (k < easy_steps[j])
-                    {
-                        continue; /* this step was already handled. */
-                    }
-
-                    acb_theta_ctx_z_add_real(&aux[0], &vec[j], ctxt, lowprec);
-                    acb_theta_ctx_z_add_real(&aux[1], &aux[0], ctxt, lowprec);
-                    _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, k);
-                    if (k == 0 && all)
-                    {
-                        /* We just need roots for z + 2t */
-                        acb_theta_sum_all_tilde(rts_all + j * n * n, aux + 1,
-                            1, ctx_tau_dupl, d, lowprec);
-                        res = res && !_acb_vec_contains_zero(rts_all + j * n * n, n * n);
-
-                        /* if (!res)
-                        {
-                            flint_printf("(ql_setup) fail at guard = %wd (l = %wd, k = %wd, j = %wd)\n", lowprec, l, k, j);
-                            _acb_vec_printd(rts_all + j * n * j, n * n, 5);
-                            }*/
-                    }
-                    else
-                    {
-                        acb_theta_sum_a0_tilde(rts + j * (3 * n * nb_steps) + k * (3 * n) + n,
-                            aux, 2, ctx_tau_dupl, d, lowprec);
-                        res = res && !_acb_vec_contains_zero(rts + j * (3 * n * nb_steps)
-                            + k * (3 * n) + n, 2 * n);
-
-                        /*if (!res)
-                        {
-                            flint_printf("(ql_setup) fail at guard = %wd (l = %wd, k = %wd, j = %wd)\n", lowprec, l, k, j);
-                            _acb_vec_printd(rts + j * (3 * n * nb_steps) + k * (3 * n) + n, 2 * n, 5);
-                            }*/
-                    }
-                    if (k < nb_steps - 1)
-                    {
-                        acb_theta_ctx_z_dupl(&vec[j], lowprec);
-                    }
-                }
-                if (k < nb_steps - 1)
-                {
-                    acb_theta_ctx_tau_dupl(ctx_tau_dupl, lowprec);
-                    acb_theta_ctx_z_dupl(ctxt, lowprec);
-                }
-            }
-            /* If res, then all the roots are computed, and we are done.
-               Otherwise, try a new vector t and reinitialize the entries of vec. */
-            if (!res)
-            {
-                for (j = 0; j < nb; j++)
-                {
-                    if (easy_steps[j] == nb_steps)
-                    {
-                        continue;
-                    }
-                    acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lowprec);
-                    for (k = 0; k < easy_steps[j]; k++)
-                    {
-                        acb_theta_ctx_z_dupl(&vec[j], lowprec);
-                    }
-                }
-            }
+            /* Reset ctx_tau_dupl; note that the input vec in
+               setup_hard is exactly as output by setup_easy */
+            done = acb_theta_ql_setup_hard(rts, rts_all, t, vec, nb,
+                ctx_tau_2, easy_steps, distances, nb_steps, all, lowprec);
         }
     }
 
-    acb_theta_ctx_tau_clear(ctx_tau);
-    acb_theta_ctx_tau_clear(ctx_tau_dupl);
+    if (done)
+    {
+        /* Estimate the number of bits lost in the duplication formulas */
+        *guard = acb_theta_ql_setup_lost_bits(rts, rts_all, easy_steps,
+            is_zero, nb, distances, nb_steps, all, g);
+    }
+
+    acb_theta_ctx_tau_clear(ctx_tau_1);
+    acb_theta_ctx_tau_clear(ctx_tau_2);
     acb_theta_ctx_z_vec_clear(vec, nb);
-    acb_theta_ctx_z_vec_clear(aux, 2);
-    acb_theta_ctx_z_clear(ctxt);
-    _arb_vec_clear(d, n);
     flint_free(is_zero);
-    flint_rand_clear(state);
-    return res;
+    return done;
 }

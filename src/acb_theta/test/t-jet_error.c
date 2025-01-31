@@ -91,15 +91,15 @@ TEST_FUNCTION_START(acb_theta_jet_error, state)
 
         acb_theta_ctx_tau_set(ctx_tau, tau1, hprec);
         acb_theta_ctx_z_set(ctx_z, z1, ctx_tau, hprec);
-        acb_theta_sum_jet_all(d1, ctx_z, 1, ctx_tau, ord, hprec);
+        acb_theta_sum_jet(d1, ctx_z, 1, ctx_tau, ord, 1, hprec);
 
         acb_theta_ctx_tau_set(ctx_tau, tau2, hprec);
         acb_theta_ctx_z_set(ctx_z, z2, ctx_tau, hprec);
-        acb_theta_sum_jet_all(d2, ctx_z, 1, ctx_tau, ord, hprec);
+        acb_theta_sum_jet(d2, ctx_z, 1, ctx_tau, ord, 1, hprec);
 
         acb_theta_ctx_tau_set(ctx_tau, tau3, lprec);
         acb_theta_ctx_z_set(ctx_z, z3, ctx_tau, lprec);
-        acb_theta_sum_jet_all(dth, ctx_z, 1, ctx_tau, ord + 2, lprec);
+        acb_theta_sum_jet(dth, ctx_z, 1, ctx_tau, ord + 2, 1, lprec);
 
         for (k = 0; k < n; k++)
         {

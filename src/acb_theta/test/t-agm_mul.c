@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
 {
     slong iter;
 
-    /* Test: duplication formula using sum_a0_tilde */
+    /* Test: duplication formula using sum */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
@@ -51,9 +51,9 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_ctx_z_set(ctx, z + g, ctx_tau, prec);
         acb_theta_eld_distances(ds, z, 2, tau, prec);
 
-        /* Make test vector using sum_a0_tilde squared */
-        acb_theta_sum_a0_tilde(test, ctx0, 1, ctx_tau, ds, prec);
-        acb_theta_sum_a0_tilde(test + n, ctx, 1, ctx_tau, ds + n, prec);
+        /* Make test vector using sum, squared */
+        acb_theta_sum(test, ctx0, 1, ctx_tau, ds, 1, 0, 1, prec);
+        acb_theta_sum(test + n, ctx, 1, ctx_tau, ds + n, 1, 0, 1, prec);
         for (j = 0; j < 2 * n; j++)
         {
             acb_sqr(&test[j], &test[j], prec);
@@ -64,8 +64,8 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_ctx_z_dupl(ctx0, prec);
         acb_theta_ctx_z_dupl(ctx, prec);
         _arb_vec_scalar_mul_2exp_si(ds, ds, 2 * n, 1);
-        acb_theta_sum_a0_tilde(th_dupl, ctx0, 1, ctx_tau, ds, prec);
-        acb_theta_sum_a0_tilde(th_dupl + n, ctx, 1, ctx_tau, ds + n, prec);
+        acb_theta_sum(th_dupl, ctx0, 1, ctx_tau, ds, 1, 0, 1, prec);
+        acb_theta_sum(th_dupl + n, ctx, 1, ctx_tau, ds + n, 1, 0, 1, prec);
 
         /* Call agm_mul at precision mprec and compare with test */
         acb_theta_agm_mul(th2, th_dupl, th_dupl, g, mprec);

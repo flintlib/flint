@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
 {
     slong iter;
 
-    /* Test: agrees with sum_a0_tilde */
+    /* Test: agrees with sum */
     for (iter = 0; iter < 25 * flint_test_multiplier(); iter++)
     {
         slong g = 2 + n_randint(state, 2);
@@ -60,14 +60,7 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx_z, z, ctx_tau, prec);
         acb_theta_eld_distances(d, z, 1, tau, ACB_THETA_LOW_PREC);
-        if (all)
-        {
-            acb_theta_sum_all_tilde(th, ctx_z, 1, ctx_tau, d, prec);
-        }
-        else
-        {
-            acb_theta_sum_a0_tilde(th, ctx_z, 1, ctx_tau, d, prec);
-        }
+        acb_theta_sum(th, ctx_z, 1, ctx_tau, d, 1, all, 1, prec);
 
         /*flint_printf("\n\ng = %wd, s = %wd, all = %wd, a = %wd, tau, z:\n", g, s, all, a);
            acb_mat_printd(tau, 5);
@@ -87,14 +80,7 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
         for (j = 0; j < nb; j++)
         {
             acb_theta_ctx_z_set(ctx_z0, z0s + j * s, ctx_tau0, prec);
-            if (all)
-            {
-                acb_theta_sum_all_tilde(th0s + j * nbth0, ctx_z0, 1, ctx_tau0, d0 + j * n0, prec);
-            }
-            else
-            {
-                acb_theta_sum_a0_tilde(th0s + j * nbth0, ctx_z0, 1, ctx_tau0, d0 + j * n0, prec);
-            }
+            acb_theta_sum(th0s + j * nbth0, ctx_z0, 1, ctx_tau0, d0 + j * n0, 1, all, 1, prec);
         }
 
         if (res)

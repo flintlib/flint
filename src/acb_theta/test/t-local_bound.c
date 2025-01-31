@@ -79,7 +79,7 @@ TEST_FUNCTION_START(acb_theta_local_bound, state)
         acb_theta_ctx_tau_set(ctx_tau, tau, lp);
         acb_theta_ctx_z_set(ctx, x, ctx_tau, lp);
         acb_theta_eld_distances(d, x, 1, tau, lp);
-        acb_theta_sum_all_tilde(th, ctx, 1, ctx_tau, d, lp);
+        acb_theta_sum(th, ctx, 1, ctx_tau, d, 1, 1, 1, lp);
         _acb_vec_scalar_mul_arb(th, th, n2, &ctx->u, lp);
 
         arb_zero(abs);

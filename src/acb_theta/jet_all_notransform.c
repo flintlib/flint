@@ -16,32 +16,9 @@
 #include "acb_dft.h"
 #include "acb_theta.h"
 
-static void
-acb_theta_jet_all_sum(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, slong prec)
-{
-    slong g = acb_mat_nrows(tau);
-    acb_theta_ctx_tau_t ctx_tau;
-    acb_theta_ctx_z_struct * vec;
-    slong j;
-
-    acb_theta_ctx_tau_init(ctx_tau, 0, g);
-    vec = acb_theta_ctx_z_vec_init(nb, g);
-
-    acb_theta_ctx_tau_set(ctx_tau, tau, prec);
-    for (j = 0; j < nb; j++)
-    {
-        acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
-    }
-
-    acb_theta_sum_jet_all(th, vec, nb, ctx_tau, ord, prec);
-
-    acb_theta_ctx_tau_clear(ctx_tau);
-    acb_theta_ctx_z_vec_clear(vec, nb);
-}
-
 /* Given values of f at (x_1 + eps zeta^{n_1}, ..., x_g + eps zeta^{n_g}), make
    Fourier transforms to get Taylor coefficients and add error bound */
+
 static void
 acb_theta_jet_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
     const arb_t rho, acb_srcptr val, slong ord, slong g, slong prec)
@@ -145,7 +122,7 @@ acb_theta_jet_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb,
     slong n2 = 1 << (2 * g);
     slong b = ord + 1;
     slong hprec;
-    slong lp = 8;
+    slong lp = 4;
     slong nbth = acb_theta_jet_nb(ord, g);
     slong nb_low = acb_theta_jet_nb(ord + 2, g);
     slong nbpts = n_pow(b, g);
@@ -259,19 +236,20 @@ acb_theta_jet_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb,
     }
 
     /* Attempt to get finite error bounds */
-    k = 0;
-    do
+    for (k = 0; k < 4; k++)
     {
-        k++;
         lp *= 2;
-        acb_theta_ctx_tau_set(ctx_tau, tau, lp);
+        acb_theta_ctx_tau_set(ctx_tau, tau, lp + ACB_THETA_LOW_PREC);
         for (l = 0; l < nb; l++)
         {
-            acb_theta_ctx_z_set(&vec[l], zs + l * g, ctx_tau, lp);
+            acb_theta_ctx_z_set(&vec[l], zs + l * g, ctx_tau, lp + ACB_THETA_LOW_PREC);
         }
-        acb_theta_sum_jet_all(dth_low, vec, nb, ctx_tau, ord + 2, lp);
+        acb_theta_sum_jet(dth_low, vec, nb, ctx_tau, ord + 2, 1, lp);
+        if (_acb_vec_is_finite(dth_low, nb * nb_low * n2))
+        {
+            break;
+        }
     }
-    while (!_acb_vec_is_finite(dth_low, nb * nb_low * n2) && k < 4);
 
     /* Add error */
     lp = ACB_THETA_LOW_PREC;
@@ -305,53 +283,61 @@ acb_theta_jet_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb,
     acb_theta_ctx_z_vec_clear(vec, nb);
 }
 
-static int
-acb_theta_jet_all_use_sum(const acb_mat_t tau, int cst, slong prec)
-{
-    slong g = acb_mat_nrows(tau);
-    slong * pattern;
-    slong j;
-    int b, res;
-
-    pattern = flint_malloc(g * sizeof(slong));
-
-    b = acb_theta_ql_nb_steps(pattern, tau, cst, prec);
-
-    /* Do not use sum only when at least 3 steps are needed */
-    res = 1;
-    if (b)
-    {
-        for (j = 0; j < g; j++)
-        {
-            if (pattern[j] > 2)
-            {
-                res = 0;
-            }
-        }
-    }
-
-    flint_free(pattern);
-    return res;
-}
-
 void
 acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    int use_sum = acb_theta_jet_all_use_sum(tau, _acb_vec_is_zero(zs, nb * g), prec);
+    slong * pattern;
+    slong j;
+    int b;
+    int cst = _acb_vec_is_zero(zs, nb * g);
+    int use_sum = 1;
 
     if (nb <= 0)
     {
         return;
     }
 
+    pattern = flint_malloc(g * sizeof(slong));
+
+    b = acb_theta_ql_nb_steps(pattern, tau, cst, prec);
+    /* Do not use sum when at least 3 steps are needed */
+    if (b)
+    {
+        for (j = 0; j < g; j++)
+        {
+            if (pattern[j] > 2)
+            {
+                use_sum = 0;
+                break;
+            }
+        }
+    }
+
     if (use_sum)
     {
-        acb_theta_jet_all_sum(th, zs, nb, tau, ord, prec);
+        acb_theta_ctx_tau_t ctx_tau;
+        acb_theta_ctx_z_struct * vec;
+
+        acb_theta_ctx_tau_init(ctx_tau, 0, g);
+        vec = acb_theta_ctx_z_vec_init(nb, g);
+
+        acb_theta_ctx_tau_set(ctx_tau, tau, prec);
+        for (j = 0; j < nb; j++)
+        {
+            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
+        }
+
+        acb_theta_sum_jet(th, vec, nb, ctx_tau, ord, 1, prec);
+
+        acb_theta_ctx_tau_clear(ctx_tau);
+        acb_theta_ctx_z_vec_clear(vec, nb);
     }
     else
     {
         acb_theta_jet_all_mid_err(th, zs, nb, tau, ord, prec);
     }
+
+    flint_free(pattern);
 }

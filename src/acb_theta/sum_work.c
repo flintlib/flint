@@ -316,7 +316,7 @@ acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_i
     acb_init(cf);
     precs = flint_malloc(width * sizeof(slong));
 
-    acb_theta_sum_sqr_pow(sqr_pow, exp_tau, E, prec);
+    acb_theta_sum_sqr_pow(sqr_pow, exp_tau, E, fullprec);
     acb_one(cf);
 
     for (j = 0; j < nb; j++)

@@ -19,14 +19,10 @@ acb_theta_ctx_z_clear(acb_theta_ctx_z_t ctx)
     slong g = ctx->g;
 
     _acb_vec_clear(ctx->exp_z, g);
+    _acb_vec_clear(ctx->exp_2z, g);
+    _acb_vec_clear(ctx->exp_z_inv, g);
+    _acb_vec_clear(ctx->exp_2z_inv, g);
+    _arb_vec_clear(ctx->v, g);
     arb_clear(&ctx->u);
     arb_clear(&ctx->uinv);
-
-    if (g > 1)
-    {
-        _acb_vec_clear(ctx->exp_2z, g);
-        _acb_vec_clear(ctx->exp_z_inv, g);
-        _acb_vec_clear(ctx->exp_2z_inv, g);
-        _arb_vec_clear(ctx->v, g);
-    }
 }

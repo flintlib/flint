@@ -40,24 +40,18 @@ acb_theta_ctx_z_set(acb_theta_ctx_z_t ctx, acb_srcptr z, const acb_theta_ctx_tau
     arb_mul(&ctx->u, &ctx->u, u, prec);
     arb_exp(&ctx->u, &ctx->u, prec);
     arb_inv(&ctx->uinv, &ctx->u, prec);
-    if (g > 1)
-    {
-        arb_mat_vector_mul_col(ctx->v, &ctx_tau->cho, t, prec);
-    }
+    arb_mat_vector_mul_col(ctx->v, &ctx_tau->cho, t, prec);
 
     /* Set z_is_real, exp_z, exp_z_inv, exp_2z, exp_2z_inv */
     for (k = 0; k < g; k++)
     {
         acb_exp_pi_i(&ctx->exp_z[k], &z[k], prec);
-        if (g > 1)
-        {
-            is_real = acb_is_real(&z[k]);
-            acb_sqr(&ctx->exp_2z[k], &ctx->exp_z[k], prec);
-            acb_theta_ctx_exp_inv(&ctx->exp_z_inv[k], &ctx->exp_z[k],
-                &z[k], is_real, prec);
-            acb_theta_ctx_sqr_inv(&ctx->exp_2z_inv[k], &ctx->exp_z_inv[k],
-                &ctx->exp_2z[k], is_real, prec);
-        }
+        is_real = acb_is_real(&z[k]);
+        acb_sqr(&ctx->exp_2z[k], &ctx->exp_z[k], prec);
+        acb_theta_ctx_exp_inv(&ctx->exp_z_inv[k], &ctx->exp_z[k],
+            &z[k], is_real, prec);
+        acb_theta_ctx_sqr_inv(&ctx->exp_2z_inv[k], &ctx->exp_z_inv[k],
+            &ctx->exp_2z[k], is_real, prec);
     }
     ctx->is_real = _acb_vec_is_real(z, g);
 

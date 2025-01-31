@@ -20,14 +20,10 @@ acb_theta_ctx_z_init(acb_theta_ctx_z_t ctx, slong g)
 
     ctx->g = g;
     ctx->exp_z = _acb_vec_init(g);
+    ctx->exp_2z = _acb_vec_init(g);
+    ctx->exp_z_inv = _acb_vec_init(g);
+    ctx->exp_2z_inv = _acb_vec_init(g);
+    ctx->v = _arb_vec_init(g);
     arb_init(&ctx->u);
     arb_init(&ctx->uinv);
-
-    if (g > 1)
-    {
-        ctx->exp_2z = _acb_vec_init(g);
-        ctx->exp_z_inv = _acb_vec_init(g);
-        ctx->exp_2z_inv = _acb_vec_init(g);
-        ctx->v = _arb_vec_init(g);
-    }
 }

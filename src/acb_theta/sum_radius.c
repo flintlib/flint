@@ -80,18 +80,32 @@ acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong 
 {
     slong g = arb_mat_nrows(cho);
     slong lp = ACB_THETA_LOW_PREC;
-    arb_t b, temp;
+    arb_t b, temp, sqrt2pi;
     arf_t cmp;
     slong k;
 
     arb_init(b);
     arb_init(temp);
+    arb_init(sqrt2pi);
     arf_init(cmp);
 
-    arf_one(eps);
-    arf_mul_2exp_si(eps, eps, -prec);
-    arb_set_arf(b, eps);
-    arb_mul_2exp_si(b, b, -2 * g - 2);
+    arb_const_pi(sqrt2pi, lp);
+    arb_mul_2exp_si(sqrt2pi, sqrt2pi, 1);
+    arb_sqrt(sqrt2pi, sqrt2pi, lp);
+
+    /* Set b such that
+       (1 + 8/sqrt(pi)) * prod_j (1 + sqrt(2pi)/c_j) * b \leq 2^(-prec) */
+    arb_set_si(b, 4);
+    arb_div(b, b, sqrt2pi, lp);
+    arb_add_si(b, b, 1, lp);
+    for (k = 0; k < g; k++)
+    {
+        arb_div(temp, sqrt2pi, arb_mat_entry(cho, k, k), lp);
+        arb_add_si(temp, temp, 1, lp);
+        arb_mul(b, b, temp, lp);
+    }
+    arb_inv(b, b, lp);
+    arb_mul_2exp_si(b, b, -prec);
 
     /* Solve R2^((g-1)/2+ord) exp(-R2) \leq b */
     arb_log(b, b, lp);
@@ -102,16 +116,9 @@ acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong 
     arf_set_si(cmp, FLINT_MAX(4, 2 * ord));
     arf_max(R2, R2, cmp);
 
-    /* Set error */
-    arb_one(b);
-    for (k = 0; k < g; k++)
-    {
-        arb_inv(temp, arb_mat_entry(cho, k, k), lp);
-        arb_add_si(temp, temp, 1, lp);
-        arb_mul(b, b, temp, lp);
-    }
-    arb_mul_arf(b, b, eps, lp);
-    arb_get_ubound_arf(eps, b, lp);
+    /* Set error 2^(-prec) */
+    arf_one(eps);
+    arf_mul_2exp_si(eps, eps, -prec);
 
     arb_clear(b);
     arb_clear(temp);

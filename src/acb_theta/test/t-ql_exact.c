@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
 {
     slong iter;
 
-    /* Test: coincides with sum_a0_tilde */
+    /* Test: coincides with sum */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
@@ -34,7 +34,6 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
         acb_theta_ctx_z_struct * vec;
         arb_ptr distances;
         slong j;
-        int res;
 
         acb_mat_init(tau, g, g);
         zs = _acb_vec_init(nb * g);
@@ -61,29 +60,12 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
         for (j = 0; j < nb; j++)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
-            if (shifted_prec)
-            {
-                if (all)
-                {
-                    acb_theta_sum_all_tilde(test + j * n * n, &vec[j], 1, ctx_tau, distances + j * n, prec);
-                }
-                else
-                {
-                    acb_theta_sum_a0_tilde(test + j * n, &vec[j], 1, ctx_tau, distances + j * n, prec);
-                }
-            }
+            acb_theta_sum(test + j * nbth, &vec[j], 1, ctx_tau, distances + j * n, 1, all, 1, prec);
         }
         if (!shifted_prec)
         {
             /* distances are set to zero */
-            if (all)
-            {
-                acb_theta_sum_all_tilde(test, vec, nb, ctx_tau, distances, prec);
-            }
-            else
-            {
-                acb_theta_sum_a0_tilde(test, vec, nb, ctx_tau, distances, prec);
-            }
+            acb_theta_sum(test, vec, nb, ctx_tau, distances, 1, all, 1, prec);
         }
 
         /* flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, all = %wd, shifted_prec = %wd\n",
@@ -98,13 +80,12 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
             flint_printf("%wd -> %wd\n", j, pattern[j]);
             } */
 
-        res = acb_theta_ql_exact(th, zs, nb, tau, pattern, all, shifted_prec, prec);
+        acb_theta_ql_exact(th, zs, nb, tau, pattern, all, shifted_prec, prec);
 
-        /* flint_printf("\nresult of ql_exact: %wd, got theta:\n", res);
+        /* flint_printf("\nresult of ql_exact:\n");
            _acb_vec_printd(th, nbth * nb, 5); */
 
-        if (!res
-            || !_acb_vec_overlaps(th, test, nb * nbth)
+        if (!_acb_vec_overlaps(th, test, nb * nbth)
             || (_acb_vec_is_finite(test, nb * nbth) && !_acb_vec_is_finite(th, nb * nbth)))
         {
             flint_printf("FAIL\n");

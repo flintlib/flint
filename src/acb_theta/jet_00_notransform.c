@@ -29,7 +29,7 @@ void acb_theta_jet_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
         acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
     }
 
-    acb_theta_sum_jet_00(th, vec, nb, ctx_tau, ord, prec);
+    acb_theta_sum_jet(th, vec, nb, ctx_tau, ord, 0, prec);
 
     acb_theta_ctx_tau_clear(ctx_tau);
     acb_theta_ctx_z_vec_clear(vec, nb);

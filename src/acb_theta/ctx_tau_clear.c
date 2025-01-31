@@ -22,24 +22,18 @@ acb_theta_ctx_tau_clear(acb_theta_ctx_tau_t ctx)
     slong n = 1 << g;
 
     arb_mat_clear(&ctx->yinv);
+    arb_mat_clear(&ctx->cho);
     acb_mat_clear(ctx->exp_tau_div_4);
     acb_mat_clear(ctx->exp_tau_div_2);
     acb_mat_clear(ctx->exp_tau);
+    acb_mat_clear(ctx->exp_tau_div_4_inv);
+    acb_mat_clear(ctx->exp_tau_div_2_inv);
+    acb_mat_clear(ctx->exp_tau_inv);
 
-    if (g > 1)
+    if (ctx->allow_shift)
     {
-        arb_mat_clear(&ctx->cho);
-        acb_mat_clear(ctx->exp_tau_div_4_inv);
-        acb_mat_clear(ctx->exp_tau_div_2_inv);
-        acb_mat_clear(ctx->exp_tau_inv);
-
-        if (ctx->allow_shift)
-        {
-            _acb_vec_clear(ctx->exp_tau_a_div_2, n * g);
-            _acb_vec_clear(ctx->exp_tau_a, n * g);
-            _acb_vec_clear(ctx->exp_tau_a_div_2_inv, n * g);
-            _acb_vec_clear(ctx->exp_tau_a_inv, n * g);
-            _acb_vec_clear(ctx->exp_a_tau_a_div_4, n);
-        }
+        _acb_vec_clear(ctx->exp_tau_a, n * g);
+        _acb_vec_clear(ctx->exp_tau_a_inv, n * g);
+        _acb_vec_clear(ctx->exp_a_tau_a_div_4, n);
     }
 }

@@ -26,21 +26,20 @@ acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t
 {
     slong g = ctx_tau->g;
     arb_ptr v_shift;
+    acb_t cinv;
     arb_t abs;
     slong j;
 
     v_shift = _arb_vec_init(g);
+    acb_init(cinv);
     arb_init(abs);
 
-    /* Replace exp_z by analogs for z + tau a/2 */
+    /* Do not set exp_z or exp_z_inv. */
+    /* Replace exp_2z by analogs for z + tau a/2 */
     for (j = 0; j < g; j++)
     {
-        acb_mul(&res->exp_z[j], &ctx->exp_z[j],
-            &ctx_tau->exp_tau_a_div_2[a * g + j], prec);
         acb_mul(&res->exp_2z[j], &ctx->exp_2z[j],
             &ctx_tau->exp_tau_a[a * g + j], prec);
-        acb_mul(&res->exp_z_inv[j], &ctx->exp_z_inv[j],
-            &ctx_tau->exp_tau_a_div_2_inv[a * g + j], prec);
         acb_mul(&res->exp_2z_inv[j], &ctx->exp_2z_inv[j],
             &ctx_tau->exp_tau_a_inv[a * g + j], prec);
     }
@@ -60,13 +59,31 @@ acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t
 
     /* Compute v; u and uinv must be multiplied by abs(c) */
     acb_abs(abs, c, prec);
-    arb_div(&res->u, &ctx->u, abs, prec);
     arb_mul(&res->uinv, &ctx->uinv, abs, prec);
+
+    arb_inv(abs, abs, prec);
+    if (acb_is_finite(c) && !arb_is_finite(abs))
+    {
+        /* Recompute cinv by multiplications */
+        acb_one(cinv);
+        for (j = 0; j < g; j++)
+        {
+            if (acb_theta_aj_is_zero(a, j, g))
+            {
+                continue;
+            }
+            acb_mul(cinv, cinv, &ctx->exp_z_inv[j], prec);
+        }
+        acb_div(cinv, cinv, &ctx_tau->exp_a_tau_a_div_4[a], prec);
+        acb_abs(abs, cinv, prec);
+    }
+    arb_mul(&res->u, &ctx->u, abs, prec);
 
     acb_theta_char_get_arb(v_shift, a, g);
     arb_mat_vector_mul_col(v_shift, &ctx_tau->cho, v_shift, prec);
     _arb_vec_add(res->v, v_shift, ctx->v, g, prec);
 
     _arb_vec_clear(v_shift, g);
+    acb_clear(cinv);
     arb_clear(abs);
 }

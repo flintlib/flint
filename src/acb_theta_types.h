@@ -36,20 +36,17 @@ struct acb_theta_ctx_tau_struct
     slong g;
     int allow_shift;
     arb_mat_struct yinv;
+    arb_mat_struct cho;
+
     acb_mat_t exp_tau_div_4;
     acb_mat_t exp_tau_div_2;
     acb_mat_t exp_tau;
-
-    /* g > 1 only */
-    arb_mat_struct cho;
     acb_mat_t exp_tau_div_4_inv;
     acb_mat_t exp_tau_div_2_inv;
     acb_mat_t exp_tau_inv;
 
     /* allow_shift only */
-    acb_ptr exp_tau_a_div_2;
     acb_ptr exp_tau_a;
-    acb_ptr exp_tau_a_div_2_inv;
     acb_ptr exp_tau_a_inv;
     acb_ptr exp_a_tau_a_div_4;
 };
@@ -60,15 +57,13 @@ typedef struct
 {
     slong g;
     acb_ptr exp_z;
-    arb_struct u;
-    arb_struct uinv;
-    int is_real;
-
-    /* g > 1 only */
     acb_ptr exp_2z;
     acb_ptr exp_z_inv;
     acb_ptr exp_2z_inv;
     arb_ptr v;
+    arb_struct u;
+    arb_struct uinv;
+    int is_real;
 }
 acb_theta_ctx_z_struct;
 

@@ -20,7 +20,7 @@ TEST_FUNCTION_START(acb_theta_ctx_z_shift_a0, state)
     /* Test: matches with acb_theta_ctx_z_set with shifted input */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
-        slong g = 2 + n_randint(state, 3);
+        slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 5);
@@ -40,7 +40,7 @@ TEST_FUNCTION_START(acb_theta_ctx_z_shift_a0, state)
         acb_init(c);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
-        acb_siegel_randtest_vec(z, state, g, prec);
+        acb_siegel_randtest_vec_reduced(z, state, 1, tau, 0, prec);
         acb_theta_char_get_acb(z_shift, a, g);
         acb_mat_vector_mul_col(z_shift, tau, z_shift, prec);
 
@@ -51,17 +51,7 @@ TEST_FUNCTION_START(acb_theta_ctx_z_shift_a0, state)
         _acb_vec_add(z, z, z_shift, g, prec);
         acb_theta_ctx_z_set(ctx2, z, ctx_tau, prec);
 
-        /* Check: contexts match except u, uinv */
-        if (!_acb_vec_overlaps(ctx1->exp_z, ctx2->exp_z, g))
-        {
-            flint_printf("FAIL (exp_z)\n");
-            flint_abort();
-        }
-        if (!_acb_vec_overlaps(ctx1->exp_z_inv, ctx2->exp_z_inv, g))
-        {
-            flint_printf("FAIL (exp_z_inv)\n");
-            flint_abort();
-        }
+        /* Check: contexts match for exp_2z, exp_2z_inv, v */
         if (!_acb_vec_overlaps(ctx1->exp_2z, ctx2->exp_2z, g))
         {
             flint_printf("FAIL (exp_2z)\n");

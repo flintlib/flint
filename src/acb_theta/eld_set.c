@@ -13,7 +13,7 @@
 #include "arb_mat.h"
 #include "acb_theta.h"
 
-#define ACB_THETA_ELD_MAX_PTS 1000000
+#define ACB_THETA_ELD_MAX_PTS 10000000
 #define ACB_THETA_ELD_MAX_ERR 100
 
 static void
