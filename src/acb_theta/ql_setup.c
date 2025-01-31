@@ -26,19 +26,17 @@ acb_theta_ctx_tau_copy(acb_theta_ctx_tau_t res, const acb_theta_ctx_tau_t ctx)
     FLINT_ASSERT(res->g == g);
 
     arb_mat_set(&res->yinv, &ctx->yinv);
+    arb_mat_set(&res->cho, &ctx->cho);
     acb_mat_set(res->exp_tau_div_4, ctx->exp_tau_div_4);
     acb_mat_set(res->exp_tau_div_2, ctx->exp_tau_div_2);
     acb_mat_set(res->exp_tau, ctx->exp_tau);
+    acb_mat_set(res->exp_tau_div_4_inv, ctx->exp_tau_div_4_inv);
+    acb_mat_set(res->exp_tau_div_2_inv, ctx->exp_tau_div_2_inv);
+    acb_mat_set(res->exp_tau_inv, ctx->exp_tau_inv);
 
-    if (g > 1)
+    if (ctx->allow_shift) /* will always be the case here */
     {
-        arb_mat_set(&res->cho, &ctx->cho);
-        acb_mat_set(res->exp_tau_div_4_inv, ctx->exp_tau_div_4_inv);
-        acb_mat_set(res->exp_tau_div_2_inv, ctx->exp_tau_div_2_inv);
-        acb_mat_set(res->exp_tau_inv, ctx->exp_tau_inv);
-        _acb_vec_set(res->exp_tau_a_div_2, ctx->exp_tau_a_div_2, n * g);
         _acb_vec_set(res->exp_tau_a, ctx->exp_tau_a, n * g);
-        _acb_vec_set(res->exp_tau_a_div_2_inv, ctx->exp_tau_a_div_2_inv, n * g);
         _acb_vec_set(res->exp_tau_a_inv, ctx->exp_tau_a_inv, n * g);
         _acb_vec_set(res->exp_a_tau_a_div_4, ctx->exp_a_tau_a_div_4, n);
     }
@@ -243,11 +241,11 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
                         res = res && !_acb_vec_contains_zero(rts + j * (3 * n * nb_steps)
                             + k * (3 * n) + n, 2 * n);
 
-                        /*if (!res)
+                        if (!res)
                         {
                             flint_printf("(ql_setup) fail at guard = %wd (l = %wd, k = %wd, j = %wd)\n", lowprec, l, k, j);
                             _acb_vec_printd(rts + j * (3 * n * nb_steps) + k * (3 * n) + n, 2 * n, 5);
-                            }*/
+                            }
                     }
                     if (k < nb_steps - 1)
                     {

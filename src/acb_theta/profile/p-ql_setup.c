@@ -72,10 +72,10 @@ int main(int argc, char * argv[])
     flint_printf("distances:\n");
     _arb_vec_printd(distances, 2 * n, 5);
 
-    //TIMEIT_START;
+    TIMEIT_START;
     res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps,
         zs, 2, tau, distances, nb_steps, all, prec);
-    //TIMEIT_STOP;
+    TIMEIT_STOP;
 
     flint_printf("res = %wd, guard = %wd, easy_steps:", res, guard);
     for (j = 0; j < nb; j++)

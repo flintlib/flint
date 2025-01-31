@@ -32,12 +32,9 @@ acb_theta_ctx_z_add_real(acb_theta_ctx_z_t res, const acb_theta_ctx_z_t ctx,
     for (j = 0; j < g; j++)
     {
         acb_mul(&res->exp_z[j], &ctx->exp_z[j], &ctx_real->exp_z[j], prec);
-        if (g > 1)
-        {
-            acb_mul(&res->exp_z_inv[j], &ctx->exp_z_inv[j], &ctx_real->exp_z_inv[j], prec);
-            acb_sqr(&res->exp_2z[j], &res->exp_z[j], prec);
-            acb_theta_ctx_sqr_inv(&res->exp_2z_inv[j], &res->exp_z_inv[j],
-                &res->exp_2z[j], ctx->is_real, prec);
-        }
+        acb_mul(&res->exp_z_inv[j], &ctx->exp_z_inv[j], &ctx_real->exp_z_inv[j], prec);
+        acb_sqr(&res->exp_2z[j], &res->exp_z[j], prec);
+        acb_theta_ctx_sqr_inv(&res->exp_2z_inv[j], &res->exp_z_inv[j],
+            &res->exp_2z[j], ctx->is_real, prec);
     }
 }

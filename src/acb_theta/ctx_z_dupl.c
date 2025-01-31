@@ -25,28 +25,18 @@ acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
     arb_set_si(sqrt2, 2);
     arb_sqrt(sqrt2, sqrt2, prec);
 
-    /* Compute exponentials, swapping vectors around if g > 1 */
-    if (g == 1)
+    /* Swap vectors around */
+    temp = ctx->exp_z;
+    ctx->exp_z = ctx->exp_2z;
+    ctx->exp_2z = temp;
+    temp = ctx->exp_z_inv;
+    ctx->exp_z_inv = ctx->exp_2z_inv;
+    ctx->exp_2z_inv = temp;
+    for (j = 0; j < g; j++)
     {
-        for (j = 0; j < g; j++)
-        {
-            acb_sqr(&ctx->exp_z[j], &ctx->exp_z[j], prec);
-        }
-    }
-    else
-    {
-        temp = ctx->exp_z;
-        ctx->exp_z = ctx->exp_2z;
-        ctx->exp_2z = temp;
-        temp = ctx->exp_z_inv;
-        ctx->exp_z_inv = ctx->exp_2z_inv;
-        ctx->exp_2z_inv = temp;
-        for (j = 0; j < g; j++)
-        {
-            acb_sqr(&ctx->exp_2z[j], &ctx->exp_z[j], prec);
-            acb_theta_ctx_sqr_inv(&ctx->exp_2z_inv[j], &ctx->exp_z_inv[j],
-                &ctx->exp_2z[j], ctx->is_real, prec);
-        }
+        acb_sqr(&ctx->exp_2z[j], &ctx->exp_z[j], prec);
+        acb_theta_ctx_sqr_inv(&ctx->exp_2z_inv[j], &ctx->exp_z_inv[j],
+            &ctx->exp_2z[j], ctx->is_real, prec);
     }
 
     /* Compute other quantities */

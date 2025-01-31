@@ -124,6 +124,11 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     }
     else
     {
+        flint_printf("(sum) Warning: could not set ellipsoid\n");
+        arb_mat_printd(&ctx_tau->cho, 5);
+        _arb_vec_printd(v, g, 5);
+        arf_printd(R2, 5);
+        flint_printf("\n");
         for (j = 0; j < nb * n; j++)
         {
             acb_indeterminate(&th[j]);
