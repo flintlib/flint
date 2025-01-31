@@ -392,7 +392,7 @@ Composition
               void acb_poly_taylor_shift(acb_poly_t g, const acb_poly_t f, const acb_t c, slong prec)
 
     Sets *g* to the Taylor shift `f(x+c)`.
-    The underscore methods act in-place on *g* = *f* which has length *n*.
+    The underscore method acts in-place on *g* = *f* which has length *n*.
 
 .. function:: void _acb_poly_compose(acb_ptr res, acb_srcptr poly1, slong len1, acb_srcptr poly2, slong len2, slong prec)
               void acb_poly_compose(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong prec)
