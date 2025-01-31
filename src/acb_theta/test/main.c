@@ -71,8 +71,7 @@
 #include "t-sp2gz_is_correct.c"
 #include "t-sp2gz_set_blocks.c"
 #include "t-sum_00.c"
-#include "t-sum_a0_tilde.c"
-#include "t-sum_all_tilde.c"
+#include "t-sum.c"
 #include "t-sum_jet_00.c"
 #include "t-sum_jet_all.c"
 #include "t-sum_jet_radius.c"
@@ -141,9 +140,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_sp2gz_inv),
     TEST_FUNCTION(acb_theta_sp2gz_is_correct),
     TEST_FUNCTION(acb_theta_sp2gz_set_blocks),
+    TEST_FUNCTION(acb_theta_sum),
     TEST_FUNCTION(acb_theta_sum_00),
-    TEST_FUNCTION(acb_theta_sum_a0_tilde),
-    TEST_FUNCTION(acb_theta_sum_all_tilde),
     TEST_FUNCTION(acb_theta_sum_jet_00),
     TEST_FUNCTION(acb_theta_sum_jet_all),
     TEST_FUNCTION(acb_theta_sum_jet_radius),

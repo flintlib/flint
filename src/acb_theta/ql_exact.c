@@ -20,6 +20,7 @@ acb_theta_ql_exact_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
+    slong nba = (all ? n : 1);
     acb_theta_ctx_tau_t ctx_tau;
     acb_theta_ctx_z_struct * vec;
     slong j;
@@ -39,27 +40,14 @@ acb_theta_ql_exact_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     {
         for (j = 0; j < nb; j++)
         {
-            if (all)
-            {
-                acb_theta_sum_all_tilde(th + j * n * n, &vec[j], 1, ctx_tau, distances + j * n, prec);
-            }
-            else
-            {
-                acb_theta_sum_a0_tilde(th + j * n, &vec[j], 1, ctx_tau, distances + j * n, prec);
-            }
+            acb_theta_sum(th + j * nba * n, &vec[j], 1, ctx_tau,
+                distances + j * n, 1, all, 1, prec);
         }
     }
     else
     {
         /* distances are all set to zero; use one ellipsoid */
-        if (all)
-        {
-            acb_theta_sum_all_tilde(th, vec, nb, ctx_tau, distances, prec);
-        }
-        else
-        {
-            acb_theta_sum_a0_tilde(th, vec, nb, ctx_tau, distances, prec);
-        }
+        acb_theta_sum(th, vec, nb, ctx_tau, distances, 1, all, 1, prec);
     }
 
     acb_theta_ctx_tau_clear(ctx_tau);

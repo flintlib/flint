@@ -137,8 +137,8 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
                 _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, k);
                 if (k == 0 && all)
                 {
-                    acb_theta_sum_all_tilde(rts_all + j * n * n, &vec[j], 1,
-                        ctx_tau_dupl, d, lowprec);
+                    acb_theta_sum(rts_all + j * n * n, &vec[j], 1,
+                        ctx_tau_dupl, d, 1, 1, 1, lowprec);
                     /* odd theta constants are known to be zero */
                     if (is_zero[j])
                     {
@@ -226,8 +226,8 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
                     if (k == 0 && all)
                     {
                         /* We just need roots for z + 2t */
-                        acb_theta_sum_all_tilde(rts_all + j * n * n, aux + 1,
-                            1, ctx_tau_dupl, d, lowprec);
+                        acb_theta_sum(rts_all + j * n * n, aux + 1,
+                            1, ctx_tau_dupl, d, 1, 1, 1, lowprec);
                         res = res && !_acb_vec_contains_zero(rts_all + j * n * n, n * n);
 
                         /* if (!res)

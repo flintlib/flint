@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_all_notransform, state)
 {
     slong iter;
 
-    /* Test: agrees with sum_all_tilde */
+    /* Test: agrees with sum */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
@@ -49,12 +49,7 @@ TEST_FUNCTION_START(acb_theta_all_notransform, state)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_all_tilde(test, vec, nb, ctx_tau, distances, prec);
-        for (j = 0; j < nb; j++)
-        {
-            _acb_vec_scalar_mul_arb(test + j * n * n, test + j * n * n, n * n,
-                &(&vec[j])->u, prec);
-        }
+        acb_theta_sum(test, vec, nb, ctx_tau, distances, 1, 1, 0, prec);
         if (sqr)
         {
             for (j = 0; j < n * n * nb; j++)

@@ -113,14 +113,7 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
             for (j = 0; j < nb; j++)
             {
                 acb_theta_ctx_z_set(aux, zs + j * g, ctx, prec);
-                if (all)
-                {
-                    acb_theta_sum_all_tilde(test + j * nbth, aux, 1, ctx, distances + j * n, prec);
-                }
-                else
-                {
-                    acb_theta_sum_a0_tilde(test + j * nbth, aux, 1, ctx, distances + j * n, prec);
-                }
+                acb_theta_sum(test + j * nbth, aux, 1, ctx, distances + j * n, 1, all, 1, prec);
             }
 
             /* flint_printf("After %wd steps:\n", nb_steps);

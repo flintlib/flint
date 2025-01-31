@@ -137,7 +137,7 @@ acb_theta_all_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     if (!sqr)
     {
-        acb_theta_sum_all_tilde(th, vec, nb, ctx_tau, distances, prec);
+        acb_theta_sum(th, vec, nb, ctx_tau, distances, 1, 1, 0, prec);
     }
     else
     {
@@ -149,7 +149,7 @@ acb_theta_all_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
             acb_theta_ctx_z_dupl(&vec[j], prec);
         }
 
-        acb_theta_sum_a0_tilde(new_th, vec, nb + add_zero, ctx_tau, distances, prec);
+        acb_theta_sum(new_th, vec, nb + add_zero, ctx_tau, distances, 1, 0, 0, prec);
         for (j = 0; j < nb; j++)
         {
             acb_theta_all_dupl(th + j * n * n, new_th,
@@ -157,13 +157,6 @@ acb_theta_all_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         }
 
         _acb_vec_clear(new_th, (nb + add_zero) * n);
-    }
-
-    for (j = 0; j < nb; j++)
-    {
-        /* if sqr, then u was squared during duplication. */
-        _acb_vec_scalar_mul_arb(th + j * n * n, th + j * n * n, n * n,
-            &(&vec[add_zero + j])->u, prec);
     }
 
     acb_theta_ctx_tau_clear(ctx_tau);

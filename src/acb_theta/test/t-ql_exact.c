@@ -61,29 +61,12 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
         for (j = 0; j < nb; j++)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
-            if (shifted_prec)
-            {
-                if (all)
-                {
-                    acb_theta_sum_all_tilde(test + j * n * n, &vec[j], 1, ctx_tau, distances + j * n, prec);
-                }
-                else
-                {
-                    acb_theta_sum_a0_tilde(test + j * n, &vec[j], 1, ctx_tau, distances + j * n, prec);
-                }
-            }
+            acb_theta_sum(test + j * nbth, &vec[j], 1, ctx_tau, distances + j * n, 1, all, 1, prec);
         }
         if (!shifted_prec)
         {
             /* distances are set to zero */
-            if (all)
-            {
-                acb_theta_sum_all_tilde(test, vec, nb, ctx_tau, distances, prec);
-            }
-            else
-            {
-                acb_theta_sum_a0_tilde(test, vec, nb, ctx_tau, distances, prec);
-            }
+            acb_theta_sum(test, vec, nb, ctx_tau, distances, 1, all, 1, prec);
         }
 
         /* flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, all = %wd, shifted_prec = %wd\n",
