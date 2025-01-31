@@ -32,6 +32,7 @@ TEST_FUNCTION_START(acb_theta_sum_00, state)
         acb_theta_ctx_tau_t ctx_tau;
         acb_theta_ctx_z_struct * vec;
         acb_ptr th1, th2;
+        arb_t distance;
         slong j;
 
         acb_mat_init(tau, g, g);
@@ -40,6 +41,7 @@ TEST_FUNCTION_START(acb_theta_sum_00, state)
         vec = acb_theta_ctx_z_vec_init(nb, g);
         th1 = _acb_vec_init(nb);
         th2 = _acb_vec_init(nb * n);
+        arb_init(distance);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_siegel_randtest_vec_reduced(zs, state, nb, tau, 0, prec);
@@ -50,8 +52,8 @@ TEST_FUNCTION_START(acb_theta_sum_00, state)
         }
 
         /* Call sum_00 at precision mprec, test against sum_0b */
-        acb_theta_sum_00(th1, vec, nb, ctx_tau, mprec);
-        acb_theta_sum_0b(th2, vec, nb, ctx_tau, prec);
+        acb_theta_sum(th1, vec, nb, ctx_tau, distance, 0, 0, 0, mprec);
+        acb_theta_sum(th2, vec, nb, ctx_tau, distance, 0, 1, 0, prec);
         for (j = 0; j < nb; j++)
         {
             acb_set(&th2[j], &th2[n * j]);
@@ -80,6 +82,7 @@ TEST_FUNCTION_START(acb_theta_sum_00, state)
         acb_theta_ctx_z_vec_clear(vec, nb);
         _acb_vec_clear(th1, nb);
         _acb_vec_clear(th2, nb * n);
+        arb_clear(distance);
     }
 
     TEST_FUNCTION_END(state);

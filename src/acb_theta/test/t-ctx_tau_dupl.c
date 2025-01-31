@@ -26,22 +26,26 @@ acb_theta_ctx_tau_overlaps(const acb_theta_ctx_tau_t ctx1, const acb_theta_ctx_t
     res = arb_mat_overlaps(&ctx1->yinv, &ctx2->yinv)
         && acb_mat_overlaps(ctx1->exp_tau_div_4, ctx2->exp_tau_div_4)
         && acb_mat_overlaps(ctx1->exp_tau_div_2, ctx2->exp_tau_div_2)
-        && acb_mat_overlaps(ctx1->exp_tau, ctx2->exp_tau);
+        && acb_mat_overlaps(ctx1->exp_tau, ctx2->exp_tau)
+        && arb_mat_overlaps(&ctx1->cho, &ctx2->cho);
 
     if (g > 1 && res)
     {
-        res = arb_mat_overlaps(&ctx1->cho, &ctx2->cho)
-            && acb_mat_overlaps(ctx1->exp_tau_div_4_inv, ctx2->exp_tau_div_4_inv)
+        res = acb_mat_overlaps(ctx1->exp_tau_div_4_inv, ctx2->exp_tau_div_4_inv)
             && acb_mat_overlaps(ctx1->exp_tau_div_2_inv, ctx2->exp_tau_div_2_inv)
             && acb_mat_overlaps(ctx1->exp_tau_inv, ctx2->exp_tau_inv);
     }
     if (ctx1->allow_shift && res)
     {
         res = _acb_vec_overlaps(ctx1->exp_tau_a_div_2, ctx2->exp_tau_a_div_2, n * g)
-            && _acb_vec_overlaps(ctx1->exp_tau_a, ctx2->exp_tau_a, n * g)
-            && _acb_vec_overlaps(ctx1->exp_tau_a_div_2_inv, ctx2->exp_tau_a_div_2_inv, n * g)
-            && _acb_vec_overlaps(ctx1->exp_tau_a_inv, ctx2->exp_tau_a_inv, n * g)
             && _acb_vec_overlaps(ctx1->exp_a_tau_a_div_4, ctx2->exp_a_tau_a_div_4, n);
+    }
+
+    if (ctx1->allow_shift && g > 1 && res)
+    {
+        res = _acb_vec_overlaps(ctx1->exp_tau_a, ctx2->exp_tau_a, n * g)
+            && _acb_vec_overlaps(ctx1->exp_tau_a_div_2_inv, ctx2->exp_tau_a_div_2_inv, n * g)
+            && _acb_vec_overlaps(ctx1->exp_tau_a_inv, ctx2->exp_tau_a_inv, n * g);
     }
 
     return res;
@@ -57,12 +61,13 @@ TEST_FUNCTION_START(acb_theta_ctx_tau_dupl, state)
         slong g = 1 + n_randint(state, 4);
         slong prec = 100 + n_randint(state, 100);
         slong mag_bits = n_randint(state, 5);
+        int allow_shift = iter % 2;
         acb_mat_t tau;
         acb_theta_ctx_tau_t ctx1, ctx2;
 
         acb_mat_init(tau, g, g);
-        acb_theta_ctx_tau_init(ctx1, 1, g);
-        acb_theta_ctx_tau_init(ctx2, 1, g);
+        acb_theta_ctx_tau_init(ctx1, allow_shift, g);
+        acb_theta_ctx_tau_init(ctx2, allow_shift, g);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         acb_theta_ctx_tau_set(ctx1, tau, prec);

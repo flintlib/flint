@@ -120,6 +120,7 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lowprec);
             easy_steps[j] = 0;
         }
+
         for (k = 0; k < nb_steps; k++)
         {
             for (j = 0; j < nb; j++)
@@ -165,8 +166,8 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
                 }
                 else
                 {
-                    acb_theta_sum_a0_tilde(rts + j * (3 * n * nb_steps) + k * (3 * n),
-                        &vec[j], 1, ctx_tau_dupl, d, lowprec);
+                    acb_theta_sum(rts + j * (3 * n * nb_steps) + k * (3 * n),
+                        &vec[j], 1, ctx_tau_dupl, d, 1, 0, 1, lowprec);
                     easy = !_acb_vec_contains_zero(rts + j * (3 * n * nb_steps) + k * (3 * n), n);
                 }
                 if (easy)
@@ -187,6 +188,7 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
                 acb_theta_ctx_tau_dupl(ctx_tau_dupl, lowprec);
             }
         }
+
         /* At this point, for every j such that easy_steps[j] = nb_steps,
            we have computed all the roots we want. Pick an auxiliary t for the
            other j's; we must include 0 in the "not done" list */
@@ -236,8 +238,8 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
                     }
                     else
                     {
-                        acb_theta_sum_a0_tilde(rts + j * (3 * n * nb_steps) + k * (3 * n) + n,
-                            aux, 2, ctx_tau_dupl, d, lowprec);
+                        acb_theta_sum(rts + j * (3 * n * nb_steps) + k * (3 * n) + n,
+                            aux, 2, ctx_tau_dupl, d, 1, 0, 1, lowprec);
                         res = res && !_acb_vec_contains_zero(rts + j * (3 * n * nb_steps)
                             + k * (3 * n) + n, 2 * n);
 

@@ -21,7 +21,14 @@ acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec)
     slong g = ctx->g;
     slong n = 1 << g;
     slong j, k;
+    arb_t sqrt2;
 
+    arb_init(sqrt2);
+    arb_set_si(sqrt2, 2);
+    arb_sqrt(sqrt2, sqrt2, prec);
+
+    /* Update cho, yinv */
+    arb_mat_scalar_mul_arb(&ctx->cho, &ctx->cho, sqrt2, prec);
     arb_mat_scalar_mul_2exp_si(&ctx->yinv, &ctx->yinv, -1);
 
     /* Swap matrices around */
@@ -38,16 +45,9 @@ acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec)
         }
     }
 
+    /* Update exp_tau_inv */
     if (g > 1)
     {
-        arb_t sqrt2;
-        acb_ptr temp;
-
-        arb_init(sqrt2);
-        arb_set_si(sqrt2, 2);
-        arb_sqrt(sqrt2, sqrt2, prec);
-
-        arb_mat_scalar_mul_arb(&ctx->cho, &ctx->cho, sqrt2, prec);
         FLINT_SWAP(acb_mat_struct, *ctx->exp_tau_div_4_inv, *ctx->exp_tau_div_2_inv);
         FLINT_SWAP(acb_mat_struct, *ctx->exp_tau_div_2_inv, *ctx->exp_tau_inv);
         for (j = 0; j < g; j++)
@@ -58,9 +58,16 @@ acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec)
                     acb_mat_entry(ctx->exp_tau_div_2_inv, j, k), prec);
             }
         }
+    }
 
-        if (ctx->allow_shift)
+    if (ctx->allow_shift)
+    {
+        /* Update exp_tau_a */
+        if (g > 1)
         {
+            /* Swap exp_tau_a_div_2 with exp_tau_a */
+            acb_ptr temp;
+
             temp = ctx->exp_tau_a_div_2;
             ctx->exp_tau_a_div_2 = ctx->exp_tau_a;
             ctx->exp_tau_a = temp;
@@ -72,12 +79,22 @@ acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec)
                 acb_sqr(&ctx->exp_tau_a[j], &ctx->exp_tau_a_div_2[j], prec);
                 acb_sqr(&ctx->exp_tau_a_inv[j], &ctx->exp_tau_a_div_2_inv[j], prec);
             }
-            for (j = 0; j < n; j++)
+        }
+        else
+        {
+            /* Just square exp_tau_a_div_2 */
+            for (j = 0; j < n * g; j++)
             {
-                acb_sqr(&ctx->exp_a_tau_a_div_4[j], &ctx->exp_a_tau_a_div_4[j], prec);
+                acb_sqr(&ctx->exp_tau_a_div_2[j], &ctx->exp_tau_a_div_2[j], prec);
             }
         }
 
-        arb_clear(sqrt2);
+        /* Update exp_a_tau_a_div_4 */
+        for (j = 0; j < n; j++)
+        {
+            acb_sqr(&ctx->exp_a_tau_a_div_4[j], &ctx->exp_a_tau_a_div_4[j], prec);
+        }
     }
+
+    arb_clear(sqrt2);
 }

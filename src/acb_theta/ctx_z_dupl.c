@@ -18,7 +18,12 @@ acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
 {
     slong g = ctx->g;
     acb_ptr temp;
+    arb_t sqrt2;
     slong j;
+
+    arb_init(sqrt2);
+    arb_set_si(sqrt2, 2);
+    arb_sqrt(sqrt2, sqrt2, prec);
 
     /* Compute exponentials, swapping vectors around if g > 1 */
     if (g == 1)
@@ -45,19 +50,9 @@ acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
     }
 
     /* Compute other quantities */
+    _arb_vec_scalar_mul(ctx->v, ctx->v, g, sqrt2, prec);
     arb_sqr(&ctx->u, &ctx->u, prec);
     arb_sqr(&ctx->uinv, &ctx->uinv, prec);
 
-    if (g > 1)
-    {
-        arb_t sqrt2;
-
-        arb_init(sqrt2);
-        arb_set_si(sqrt2, 2);
-        arb_sqrt(sqrt2, sqrt2, prec);
-
-        _arb_vec_scalar_mul(ctx->v, ctx->v, g, sqrt2, prec);
-
-        arb_clear(sqrt2);
-    }
+    arb_clear(sqrt2);
 }
