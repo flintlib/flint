@@ -3,43 +3,45 @@ dnl Change quotation marks to avoid conflicts
 dnl############################################################################
 changequote({{{,}}})dnl
 dnl############################################################################
-dnl helper stuff
+dnl notation
 dnl############################################################################
 define({{{_neg_}}},dnl
 {{{-$1}}})dnl
-dnl
 define({{{_add_}}},dnl
 {{{$1 + $2}}})dnl
-dnl
 define({{{_sub_}}},dnl
 {{{$1 - $2}}})dnl
-dnl
 define({{{_mul_}}},dnl
 {{{$1 \cdot $2}}})dnl
-dnl
 define({{{_div_}}},dnl
 {{{$1 / $2}}})dnl
-dnl
+define({{{_pow_}}},dnl
+{{{{$1}^{$2}}}})dnl
 define({{{_addmul_}}},dnl
 {{{_add_($1, _mul_($2, $3))}}})dnl
-dnl
 define({{{_submul_}}},dnl
 {{{_sub_($1, _mul_($2, $3))}}})dnl
-dnl
 define({{{_fmma_}}},dnl
 {{{_add_(_mul_($1, $2), _mul_($3, $4))}}})dnl
-dnl
 define({{{_fmms_}}},dnl
 {{{_sub_(_mul_($1, $2), _mul_($3, $4))}}})dnl
-dnl
 define({{{_lt_}}},dnl
 {{{$1 < $2}}})dnl
-dnl
 define({{{_gt_}}},dnl
 {{{$1 > $2}}})dnl
-dnl
-define({{{_equal_}}},dnl
+define({{{_eq_}}},dnl
 {{{$1 = $2}}})dnl
+dnl
+define({{{_boolzero_}}},dnl
+{{{`0`}}})dnl
+define({{{_boolpos_}}},dnl
+{{{`1`}}})dnl
+define({{{_boolneg}}},dnl
+{{{`-1`}}})dnl
+define({{{_zero_}}},dnl
+{{{`0`}}})dnl
+define({{{_one_}}},dnl
+{{{`1`}}})dnl
 dnl############################################################################
 dnl memory management
 dnl############################################################################
@@ -53,10 +55,10 @@ define({{{desc_set}}},{{{
     Sets `$1` to `$2`.dnl
 }}})dnl
 define({{{desc_zero}}},{{{
-    Sets `$1` to zero.dnl
+    Sets `$1` to _zero_.dnl
 }}})dnl
 define({{{desc_one}}},{{{
-    Sets `$1` to one.dnl
+    Sets `$1` to _one_.dnl
 }}})dnl
 dnl############################################################################
 dnl negation, absolute value etc.
@@ -81,7 +83,7 @@ define({{{desc_mul}}},{{{
 }}})dnl
 define({{{desc_divexact}}},{{{
     Sets `$1` to `_div_($2, $3)` under the assumption that the division is
-    exact.  If `$3` is zero, an exception is raised.dnl
+    exact.  If `$3` is _zero_, an exception is raised.dnl
 }}})dnl
 dnl############################################################################
 dnl extended basic arithmetic operations
@@ -99,25 +101,48 @@ define({{{desc_fmms}}},{{{
     Sets `$1` to `_fmms_($2, $3, $4, $5)`.dnl
 }}})dnl
 dnl############################################################################
-dnl sqrt
+dnl powering
 dnl############################################################################
-define({{{desc_sqrt_nonordered_ring}}},{{{
-    If `$2` is a perfect square, sets `$1` to a square root of `$2`
-    and returns nonzero.  Otherwise returns zero.dnl
+define({{{desc_pow}}},{{{
+    Sets `$1` to `_pow_($2, $3)`.  Defines `_eq_(_pow_(0, 0), 1)`.dnl
 }}})dnl
 dnl############################################################################
 dnl comparisons
 dnl############################################################################
 define({{{desc_cmp}}},{{{
-    Returns a negative value if `_lt_($1, $2)`, positive value if
-    `_gt_($1, $2)`, otherwise returns zero.dnl
+    Returns _boolneg_ if `_lt_($1, $2)`, _boolpos_ if `_gt_($1, $2)`, otherwise
+    returns zero.dnl
 }}})dnl
 define({{{desc_equal}}},{{{
-    Returns nonzero if `_equal_($1, $2)`, otherwise returns zero.dnl
+    Returns _boolpos_ if `_eq_($1, $2)`, otherwise returns _boolzero_.dnl
 }}})dnl
 define({{{desc_is_zero}}},{{{
-    Returns nonzero if `_equal_($1, 0)`, otherwise returns zero.dnl
+    Returns _boolpos_ if `_eq_($1, 0)`, otherwise returns _boolzero_.dnl
 }}})dnl
 define({{{desc_is_one}}},{{{
-    Returns nonzero if `_equal_($1, 1)`, otherwise returns zero.dnl
+    Returns _boolpos_ if `_eq_($1, 1)`, otherwise returns _boolzero_.dnl
+}}})dnl
+define({{{desc_sgn}}},{{{
+    Returns the sign of `$1`.  That is, returns `-1` if `_lt_($1, 0)`, `1` if
+    `_gt_($1, 0)` and `0` if `_eq_($1, 0)`.dnl
+}}})dnl
+dnl############################################################################
+dnl factoring
+dnl############################################################################
+define({{{desc_sqrt_nonordered_ring}}},{{{
+    If `$2` is a perfect square, sets `$1` to a square root of `$2`
+    and returns _boolpos_.  Otherwise returns _boolzero_.dnl
+}}})dnl
+define({{{desc_gcd_int}}},{{{
+    Sets `$1` to the greatest common divisor of `$2` and `$3`.  The result is
+    always non-negative.dnl
+}}})dnl
+define({{{desc_divisible}}},{{{
+    Returns _boolpos_ if there is an `x` such that `_eq_($1, _mul_(x, $2))`,
+    and returns _boolzero_ if there is none.dnl
+}}})dnl
+define({{{desc_divides}}},{{{
+    Returns _boolpos_ if there is an `x` such that `_eq_($2, _mul_(x, $3))` and
+    sets `_eq_($1, x)`, and returns _boolzero_ if there is none and sets
+    `_eq_($1, 0)`.dnl
 }}})dnl

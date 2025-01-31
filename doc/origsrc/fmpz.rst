@@ -321,14 +321,6 @@ Conversion
     `f` cannot be represented exactly. The outcome is undefined
     if `f` is too large to fit in the normal range of a double.
 
-.. function:: void fmpz_set_mpf(fmpz_t f, const mpf_t x)
-
-    Sets `f` to the ``mpf_t`` `x`, rounding down towards zero if
-    the value of `x` is fractional.
-
-    **Note:** Requires that ``gmp.h`` has been included before any FLINT
-    header is included.
-
 .. function:: void fmpz_get_mpf(mpf_t x, const fmpz_t f)
 
     Sets the value of the ``mpf_t`` `x` to the value of `f`.
@@ -371,12 +363,6 @@ Conversion
     If ``str`` is ``NULL``, the result string is allocated by
     the function.  Otherwise, it is up to the caller to ensure that
     the allocated block of memory is sufficiently large.
-
-.. function:: void fmpz_set_d(fmpz_t f, double c)
-
-    Sets `f` to the ``double`` `c`, rounding down towards zero if
-    the value of `c` is fractional. The outcome is undefined if `c` is
-    infinite, not-a-number, or subnormal.
 
 .. function:: void fmpz_set_d_2exp(fmpz_t f, double d, slong exp)
 
@@ -627,9 +613,7 @@ Basic properties and manipulation
     value of `f`.  If `f` is zero then `0` is returned.
 
 .. function:: int fmpz_sgn(const fmpz_t f)
-
-    Returns `-1` if the sign of `f` is negative, `+1` if it is positive,
-    otherwise returns `0`.
+desc_sgn(f)
 
 .. function:: flint_bitcnt_t fmpz_val2(const fmpz_t f)
 
@@ -645,10 +629,16 @@ Basic properties and manipulation
               void fmpz_set_ui(fmpz_t f, ulong g)
               void fmpz_set_si(fmpz_t f, slong g)
               void fmpz_set_mpz(fmpz_t f, const mpz_t g)
+              void fmpz_set_d(fmpz_t f, double g)
+              void fmpz_set_mpf(fmpz_t f, const mpf_t g)
 desc_set(f, g)
 
-    **Note:** Requires that ``gmp.h`` has been included before any FLINT
-    header is included.
+    For floating-points, the outcome is undefined if `g` is infinite, NaN or
+    subnormal.  Moreover, if `g` is fractional, the value is rounded down
+    towards zero.
+
+    **Note:** ``fmpz_set_mpz`` and ``fmpz_set_mpf`` requires that ``gmp.h`` has
+    been included before any FLINT header is included.
 
 .. function:: void fmpz_zero(fmpz_t f)
 desc_zero(f)
@@ -865,16 +855,11 @@ desc_fmms(f, a, b, c, d)
     If `x` or `y` is `0` an exception is raised.
 
 .. function:: int fmpz_divisible(const fmpz_t f, const fmpz_t g)
+              int fmpz_divisible_si(const fmpz_t f, slong g)
+desc_divisible(f, g)
 
-.. function:: int fmpz_divisible_si(const fmpz_t f, slong g)
-
-    Returns `1` if there is an integer `q` with `f = q g` and `0` if there is
-    none.
-
-.. function:: int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
-
-    Returns `1` if there is an integer `q` with `f = q g` and sets `q` to the
-    quotient. Otherwise returns `0` and sets `q` to `0`.
+.. function:: int fmpz_divides(fmpz_t f, const fmpz_t g, const fmpz_t h)
+desc_divides(f, g, h)
 
 .. function:: void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -911,8 +896,7 @@ desc_fmms(f, a, b, c, d)
 
 .. function:: void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
               void fmpz_ui_pow_ui(fmpz_t f, ulong g, ulong x)
-
-    Sets `f` to `g^x`.  Defines `0^0 = 1`.
+desc_pow(f, g, x)
 
 .. function:: int fmpz_pow_fmpz(fmpz_t f, const fmpz_t g, const fmpz_t x)
 
@@ -1034,13 +1018,9 @@ desc_fmms(f, a, b, c, d)
 Greatest common divisor
 --------------------------------------------------------------------------------
 
-.. function:: void fmpz_gcd_ui(fmpz_t f, const fmpz_t g, ulong h)
-
 .. function:: void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
-
-    Sets `f` to the greatest common divisor of `g` and `h`.  The
-    result is always non-negative, even if one of `g` and `h` is
-    negative.
+              void fmpz_gcd_ui(fmpz_t f, const fmpz_t g, ulong h)
+desc_gcd_int(f, g, h)
 
 .. function:: void fmpz_gcd3(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c)
 
