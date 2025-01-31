@@ -340,7 +340,7 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
         _arb_vec_clear(new_distances, new_nb * n);
         flint_free(new_pattern);
     }
-    else if (res) /* split = 0; set up th_init efficiently using sum_a0_tilde */
+    else if (res) /* split = 0; set up th_init efficiently using sum */
     {
         acb_theta_ctx_tau_t ctx_tau;
         acb_theta_ctx_z_struct * aux;
@@ -377,7 +377,7 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
             _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, nb_steps);
             if (easy_steps[j] == nb_steps)
             {
-                acb_theta_sum_a0_tilde(th_init + 3 * n * j, aux, 1, ctx_tau, d, hp);
+                acb_theta_sum(th_init + 3 * n * j, aux, 1, ctx_tau, d, 1, 0, 1, hp);
             }
             else
             {
@@ -385,11 +385,11 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
                 acb_theta_ctx_z_add_real(&aux[2], &aux[1], ctxt, hp);
                 if (j == 0)
                 {
-                    acb_theta_sum_a0_tilde(th_init + 3 * n * j, aux, 3, ctx_tau, d, hp);
+                    acb_theta_sum(th_init + 3 * n * j, aux, 3, ctx_tau, d, 1, 0, 1, hp);
                 }
                 else
                 {
-                    acb_theta_sum_a0_tilde(th_init + 3 * n * j + n, aux + 1, 2, ctx_tau, d, hp);
+                    acb_theta_sum(th_init + 3 * n * j + n, aux + 1, 2, ctx_tau, d, 1, 0, 1, hp);
                 }
             }
         }

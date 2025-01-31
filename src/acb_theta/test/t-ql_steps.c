@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
 {
     slong iter;
 
-    /* Test: coincides with sum_a0_tilde */
+    /* Test: coincides with sum */
     for (iter = 0; iter < 25 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
@@ -96,13 +96,13 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
                 _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, nb_steps);
                 if (easy_steps[j] == nb_steps)
                 {
-                    acb_theta_sum_a0_tilde(th_init + 3 * n * j, aux, 1, ctx, d, hp);
+                    acb_theta_sum(th_init + 3 * n * j, aux, 1, ctx, d, 1, 0, 1, hp);
                 }
                 else
                 {
                     acb_theta_ctx_z_add_real(&aux[1], &aux[0], ctxt, hp);
                     acb_theta_ctx_z_add_real(&aux[2], &aux[1], ctxt, hp);
-                    acb_theta_sum_a0_tilde(th_init + 3 * n * j, aux, 3, ctx, d, hp);
+                    acb_theta_sum(th_init + 3 * n * j, aux, 3, ctx, d, 1, 0, 1, hp);
                 }
             }
 
