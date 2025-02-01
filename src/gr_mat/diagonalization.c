@@ -106,6 +106,8 @@ gr_mat_diagonalization_generic(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_
     if (gr_mat_is_square(A, ctx) != T_TRUE)
         return GR_DOMAIN;
 
+    gr_ctx_println(ctx);
+
     gr_ctx_init_fmpz(ZZ);
     gr_vec_init(eigenvalues, 0, ctx);
     gr_vec_init(mult, 0, ZZ);
