@@ -251,7 +251,10 @@ Input/Output
     We currently support printing vectors of pointers to the following base
     types: :type:`slong`, :type:`ulong`, :type:`fmpz`, :type:`fmpq`,
     :type:`mag_struct`, :type:`arf_struct`, :type:`arb_struct` and
-    :type:`acb_struct`.
+    :type:`acb_struct`. In this case the nonnegative length of the vector
+    must be passed as a second parameter following the pointer.
+    Warning: the length parameter must be passed as a :type:`slong`,
+    not ``int``.
 
     We also support printing matrices of the following types:
     :type:`nmod_mat_t`, :type:`fmpz_mat_t`, :type:`fmpq_mat_t`,
@@ -263,8 +266,9 @@ Input/Output
 
     Finally, we support printing generic elements of type :type:`gr_ptr`
     as well as :type:`gr_poly_t` and :type:`gr_mat_t`. For
-    each of these the object to be printed must be followed
-    by the corresponding :type:`gr_ctx_t`.
+    each of these types, the object to be printed must be followed
+    by the corresponding :type:`gr_ctx_t`. The context object itself
+    can also printed as a standalone object.
 
 
 .. code-block:: c
@@ -300,6 +304,7 @@ Input/Output
         "mpz: %{mpz}\n"
         "mpq: %{mpq}\n"
         "gr: %{gr}\n",
+        "gr: %{gr_ctx}\n",
         bulong,
         bslong,
         bfmpz,
@@ -312,7 +317,8 @@ Input/Output
         bfmpz_mod_ctx,
         bmpz,
         bmpq,
-        gr, bgr_ctx);
+        gr, bgr_ctx,
+        gr_ctx);
 
 .. code-block:: c
 

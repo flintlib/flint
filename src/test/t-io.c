@@ -431,11 +431,34 @@ do                      \
 
 /* Generics */
 
-#define GR_VEC_LEN 3
+#define MY_GR_CTX_INIT(xgr_ctx) gr_ctx_init_fmpzi(xgr_ctx)
+#define MY_GR_INIT(xgr, xgr_ctx) xgr = gr_heap_init(xgr_ctx)
+#define MY_GR_VEC_INIT(xgr_vec, xgr_ctx) xgr_vec = gr_heap_init_vec(GR_VEC_LEN, xgr_ctx)
+#define MY_GR_POLY_INIT(xgr_poly, xgr_ctx) gr_poly_init(xgr_poly, xgr_ctx)
+#define MY_GR_MAT_INIT(xgr_mat, xgr_ctx) gr_mat_init(xgr_mat, 1, 2, xgr_ctx)
+
+#define MY_GR_SET(xgr, xgr_ctx) GR_IGNORE(gr_set_ui(xgr, 5, xgr_ctx))
+#define MY_GR_VEC_SET(xgr_vec, xgr_ctx) \
+        GR_IGNORE(gr_set_ui(GR_ENTRY(xgr_vec, 0, xgr_ctx->sizeof_elem), 1, xgr_ctx)); \
+        GR_IGNORE(gr_set_ui(GR_ENTRY(xgr_vec, 1, xgr_ctx->sizeof_elem), 2, xgr_ctx)); \
+        GR_IGNORE(gr_set_str(GR_ENTRY(xgr_vec, 2, xgr_ctx->sizeof_elem), "I", xgr_ctx));
+#define MY_GR_POLY_SET(xgr_poly, xgr_ctx) GR_IGNORE(gr_poly_set_coeff_si(xgr_poly, 1, -1, xgr_ctx))
+#define MY_GR_MAT_SET(xgr_mat, xgr_ctx) \
+        GR_IGNORE(gr_set_ui(gr_mat_entry_ptr(xgr_mat, 0, 0, xgr_ctx), 4, xgr_ctx)); \
+        GR_IGNORE(gr_set_ui(gr_mat_entry_ptr(xgr_mat, 0, 1, xgr_ctx), 3, xgr_ctx))
+
+#define MY_GR_CLEAR(xgr, xgr_ctx) gr_heap_clear(xgr, xgr_ctx)
+#define MY_GR_VEC_CLEAR(xgr_vec, GR_VEC_LEN, xgr_ctx) gr_heap_clear_vec(xgr_vec, GR_VEC_LEN, xgr_ctx)
+#define MY_GR_POLY_CLEAR(xgr_poly, xgr_ctx) gr_poly_clear(xgr_poly, xgr_ctx)
+#define MY_GR_MAT_CLEAR(xgr_mat, xgr_ctx) gr_mat_clear(xgr_mat, xgr_ctx)
+#define MY_GR_CTX_CLEAR(xgr_ctx) gr_ctx_clear(xgr_ctx)
+
+#define GR_VEC_LEN WORD(3)
 #define GR_STRING "5"
 #define GR_VEC_STRING "[1, 2, I]"
 #define GR_POLY_STRING "-x"
 #define GR_MAT_STRING "[[4, 3]]"
+#define GR_CTX_STRING "Gaussian integer ring (fmpzi)"
 
 #define TMP_FILENAME "tmp"
 
@@ -485,6 +508,12 @@ TEST_FUNCTION_START(flint_fprintf, state)
         fmpq * xfmpq_vec;
         arb_ptr xarb_vec;
         acb_ptr xacb_vec;
+
+        gr_ctx_t xgr_ctx;
+        gr_ptr xgr;
+        gr_ptr xgr_vec;
+        gr_poly_t xgr_poly;
+        gr_mat_t xgr_mat;
 
         /* Matrix printing relies on vector printing, so no need to check other
          * types */
@@ -551,6 +580,12 @@ TEST_FUNCTION_START(flint_fprintf, state)
         ARB_POLY_INIT(xarb_poly);
         ACB_POLY_INIT(xacb_poly);
 
+        MY_GR_CTX_INIT(xgr_ctx);
+        MY_GR_INIT(xgr, xgr_ctx);
+        MY_GR_VEC_INIT(xgr_vec, xgr_ctx);
+        MY_GR_POLY_INIT(xgr_poly, xgr_ctx);
+        MY_GR_MAT_INIT(xgr_mat, xgr_ctx);
+
         /* Set *******************************************************************/
         NMOD_SET(xnmod);
         FMPZ1_SET(xfmpz1);
@@ -601,22 +636,11 @@ TEST_FUNCTION_START(flint_fprintf, state)
         FMPQ_POLY2_SET(xfmpq_poly2);
         ARB_POLY_SET(xarb_poly);
         ACB_POLY_SET(xacb_poly);
-
-        gr_ctx_t xgr_ctx;
-        gr_ctx_init_fmpzi(xgr_ctx);
-        gr_ptr xgr = gr_heap_init(xgr_ctx);
-        gr_ptr xgr_vec = gr_heap_init_vec(GR_VEC_LEN, xgr_ctx);
-        gr_poly_t xgr_poly;
-        gr_mat_t xgr_mat;
-        GR_IGNORE(gr_set_ui(xgr, 5, xgr_ctx));
-        GR_IGNORE(gr_set_ui(GR_ENTRY(xgr_vec, 0, xgr_ctx->sizeof_elem), 1, xgr_ctx));
-        GR_IGNORE(gr_set_ui(GR_ENTRY(xgr_vec, 1, xgr_ctx->sizeof_elem), 2, xgr_ctx));
-        GR_IGNORE(gr_set_str(GR_ENTRY(xgr_vec, 2, xgr_ctx->sizeof_elem), "I", xgr_ctx));
-        gr_poly_init(xgr_poly, xgr_ctx);
-        GR_IGNORE(gr_poly_set_coeff_si(xgr_poly, 1, -1, xgr_ctx));
-        gr_mat_init(xgr_mat, 1, 2, xgr_ctx);
-        GR_IGNORE(gr_set_ui(gr_mat_entry_ptr(xgr_mat, 0, 0, xgr_ctx), 4, xgr_ctx));
-        GR_IGNORE(gr_set_ui(gr_mat_entry_ptr(xgr_mat, 0, 1, xgr_ctx), 3, xgr_ctx));
+ 
+        MY_GR_SET(xgr, xgr_ctx);
+        MY_GR_VEC_SET(xgr_vec, xgr_ctx);
+        MY_GR_POLY_SET(xgr_poly, xgr_ctx);
+        MY_GR_MAT_SET(xgr_mat, xgr_ctx);
 
         /* Print *****************************************************************/
 #define STR_SIZE 10000 /* 10 kB should suffice. */
@@ -725,7 +749,8 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 "gr: " GR_STRING "\n"
                 "gr_vec: " GR_VEC_STRING "\n"
                 "gr_poly: " GR_POLY_STRING "\n"
-                "gr_mat: " GR_MAT_STRING "\n",
+                "gr_mat: " GR_MAT_STRING "\n"
+                "gr_ctx: " GR_CTX_STRING "\n",
                 xulong1,
                 xslong,
                 xulong2,
@@ -850,7 +875,8 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 "gr: %{gr}\n"
                 "gr_vec: %{gr*}\n"
                 "gr_poly: %{gr_poly}\n"
-                "gr_mat: %{gr_mat}\n",
+                "gr_mat: %{gr_mat}\n"
+                "gr_ctx: %{gr_ctx}\n",
                 xulong1,
                 xslong,
                 xulong2,
@@ -920,7 +946,8 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 xgr, xgr_ctx,
                 xgr_vec, GR_VEC_LEN, xgr_ctx,
                 xgr_poly, xgr_ctx,
-                xgr_mat, xgr_ctx);
+                xgr_mat, xgr_ctx,
+                xgr_ctx);
 
         if (res2 > STR_SIZE - 1)
             TEST_FUNCTION_FAIL(
@@ -1078,11 +1105,11 @@ TEST_FUNCTION_START(flint_fprintf, state)
         ARB_POLY_CLEAR(xarb_poly);
         ACB_POLY_CLEAR(xacb_poly);
 
-        gr_ctx_clear(xgr_ctx);
-        gr_heap_clear(xgr, xgr_ctx);
-        gr_heap_clear_vec(xgr_vec, GR_VEC_LEN, xgr_ctx);
-        gr_poly_clear(xgr_poly, xgr_ctx);
-        gr_mat_clear(xgr_mat, xgr_ctx);
+        MY_GR_CLEAR(xgr, xgr_ctx);
+        MY_GR_VEC_CLEAR(xgr_vec, GR_VEC_LEN, xgr_ctx);
+        MY_GR_POLY_CLEAR(xgr_poly, xgr_ctx);
+        MY_GR_MAT_CLEAR(xgr_mat, xgr_ctx);
+        MY_GR_CTX_CLEAR(xgr_ctx);
     }
 
     fs = freopen(TMP_FILENAME, "w+", fs);

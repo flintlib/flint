@@ -736,6 +736,13 @@ print_flint_type:
             res += out->len;
             ip += STRING_LENGTH("gr_mat}");
         }
+        else if (IS_FLINT_TYPE(ip, "gr_ctx"))
+        {
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(gr_ctx_write(out, ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr_ctx}");
+        }
         else
             goto printpercentcurlybracket;
     }
