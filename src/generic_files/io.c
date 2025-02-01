@@ -23,6 +23,12 @@
 #include "arf_types.h"
 #include "arb.h"
 #include "acb.h"
+#include "gr.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
+#include "gr_mat.h"
+
+int _gr_mat_write(gr_stream_t out, const gr_mat_t mat, int linebreaks, gr_ctx_t ctx);
 
 /* Helper functions **********************************************************/
 
@@ -691,6 +697,54 @@ print_flint_type:
     {
         res += __mpq_fprint(fs, va_arg(vlist, mpq_srcptr));
         ip += STRING_LENGTH("mpq}");
+    }
+    else if (IS_FLINT_BASE_TYPE(ip, "gr"))
+    {
+        gr_stream_t out;
+        gr_stream_init_file(out, fs);
+
+        if (IS_FLINT_TYPE(ip, "gr"))
+        {
+            gr_srcptr elem = va_arg(vlist, gr_srcptr);
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(gr_write(out, elem, ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr}");
+        }
+        else if (IS_FLINT_TYPE(ip, "gr*"))
+        {
+            gr_srcptr elem = va_arg(vlist, gr_srcptr);
+            slong len = va_arg(vlist, slong);
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(_gr_vec_write(out, elem, len, ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr*}");
+        }
+        else if (IS_FLINT_TYPE(ip, "gr_poly"))
+        {
+            const gr_poly_struct * elem = va_arg(vlist, const gr_poly_struct *);
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(gr_poly_write(out, elem, "x", ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr_poly}");
+        }
+        else if (IS_FLINT_TYPE(ip, "gr_mat"))
+        {
+            const gr_mat_struct * elem = va_arg(vlist, const gr_mat_struct *);
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(_gr_mat_write(out, elem, 0, ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr_mat}");
+        }
+        else if (IS_FLINT_TYPE(ip, "gr_ctx"))
+        {
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(gr_ctx_write(out, ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr_ctx}");
+        }
+        else
+            goto printpercentcurlybracket;
     }
     else
     {
