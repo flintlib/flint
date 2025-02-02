@@ -11,6 +11,9 @@
 
 #include "arb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void
 arb_dot_ui(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep, const ulong * y, slong ystep, slong len, slong prec)
 {
@@ -71,3 +74,5 @@ arb_dot_ui(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xst
 
     TMP_END;
 }
+
+POP_OPTIONS
