@@ -11,6 +11,9 @@
 
 #include "acb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void
 acb_dot_ui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const ulong * y, slong ystep, slong len, slong prec)
 {
@@ -72,3 +75,5 @@ acb_dot_ui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xst
 
     TMP_END;
 }
+
+POP_OPTIONS

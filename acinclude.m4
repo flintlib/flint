@@ -241,6 +241,7 @@ AH_VERBATIM([PRAGMAS],
 #define DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE
 #define DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS
 #define DIAGNOSTIC_IGNORE_UNUSED_VARIABLE
+#define DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
 
 /* Define the following to what optimization pragmas your compiler allows. */
 #define PUSH_OPTIONS
@@ -273,6 +274,7 @@ then
     FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wcast-function-type\"],[DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE])
     FLINT_CHECK_PRAGMA([diagnostic ignored \"-Woverlength-strings\"],[DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS])
     FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wunused-variable\"],[DIAGNOSTIC_IGNORE_UNUSED_VARIABLE])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wmaybe-uninitialized\"],[DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED])
 
     FLINT_CHECK_PRAGMA([push_options],[PUSH_OPTIONS])
     FLINT_CHECK_PRAGMA([pop_options],[POP_OPTIONS])
