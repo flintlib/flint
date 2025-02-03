@@ -16,16 +16,20 @@ slong
 acb_theta_sum_addprec(const arb_t d2)
 {
     arb_t x;
+    arf_t b;
     slong prec = ACB_THETA_LOW_PREC;
     slong res;
 
     arb_init(x);
+    arf_init(b);
+
     arb_const_log2(x, prec);
     arb_div(x, d2, x, prec);
+    arb_get_ubound_arf(b, x, prec);
 
-    if (arb_is_finite(x) && (arf_cmpabs_2exp_si(arb_midref(x), 30) <= 0))
+    if (arf_is_finite(b) && (arf_cmpabs_2exp_si(b, 40) <= 0))
     {
-        res = arf_get_si(arb_midref(x), prec);
+        res = arf_get_si(b, prec);
     }
     else /* should never happen */
     {

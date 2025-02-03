@@ -40,7 +40,7 @@ TEST_FUNCTION_START(acb_theta_ctx_z_shift_a0, state)
         acb_init(c);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
-        acb_siegel_randtest_vec(z, state, g, prec);
+        acb_siegel_randtest_vec_reduced(z, state, 1, tau, 0, prec);
         acb_theta_char_get_acb(z_shift, a, g);
         acb_mat_vector_mul_col(z_shift, tau, z_shift, prec);
 
