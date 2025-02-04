@@ -223,9 +223,9 @@ ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
 NMOD_INLINE
 void nmod_init(nmod_t * mod, ulong n)
 {
-   mod->n = n;
-   mod->ninv = n_preinvert_limb(n);
-   mod->norm = flint_clz(n);
+    mod->n = n;
+    mod->norm = flint_clz(n);
+    mod->ninv = n_preinvert_limb_prenorm(n << (mod->norm));
 }
 
 /* discrete logs a la Pohlig - Hellman ***************************************/

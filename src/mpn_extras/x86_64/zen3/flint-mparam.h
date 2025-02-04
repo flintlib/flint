@@ -27,6 +27,8 @@
 #define FFT_N_NUM                                 19
 #define FFT_MULMOD_2EXPP1_CUTOFF                 128
 
+#define FLINT_PREINVERT_LIMB_USE_NATIVE 1
+
 /* warning: set by default, likely not optimal         */
 /* if you have the relevant architecture, you can help */
 /* determine this by running profiling files:          */
