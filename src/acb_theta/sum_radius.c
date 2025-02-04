@@ -89,9 +89,9 @@ acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong 
     arb_init(sqrt2pi);
     arf_init(cmp);
 
-    arb_const_pi(sqrt2pi, prec);
+    arb_const_pi(sqrt2pi, lp);
     arb_mul_2exp_si(sqrt2pi, sqrt2pi, 1);
-    arb_sqrt(sqrt2pi, sqrt2pi, prec);
+    arb_sqrt(sqrt2pi, sqrt2pi, lp);
 
     /* Set b such that
        (1 + 8/sqrt(pi)) * prod_j (1 + sqrt(2pi)/c_j) * b \leq 2^(-prec) */
