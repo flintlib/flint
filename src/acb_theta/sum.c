@@ -107,6 +107,10 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         prec + FLINT_MAX(0, acb_theta_sum_addprec(distance)));
     b = acb_theta_eld_set(E, &ctx_tau->cho, R2, v);
 
+    flint_printf("(sum) ellipsoid radius: ");
+    arf_printd(R2, 5);
+    flint_printf("\n(sum) number of points: %wd\n", E->nb_pts);
+
     if (b)
     {
         for (j = 0; j < nb; j++)

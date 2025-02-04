@@ -122,7 +122,7 @@ acb_theta_ql_setup_easy(acb_ptr rts, acb_ptr rts_all, slong * easy_steps,
             {
                 /* easy step was set up during a previous pass: we continue but
                    need to update the context */
-                acb_theta_ctx_z_dupl(&vec[j], prec);
+                acb_theta_ctx_z_dupl(&vec[j], prec + ACB_THETA_LOW_PREC);
                 continue;
             }
             /* we now have k == easy_steps[j], and vec[j] contains a valid
@@ -150,14 +150,14 @@ acb_theta_ql_setup_easy(acb_ptr rts, acb_ptr rts_all, slong * easy_steps,
                 easy_steps[j]++;
                 if (k < nb_steps - 1)
                 {
-                    acb_theta_ctx_z_dupl(&vec[j], prec);
+                    acb_theta_ctx_z_dupl(&vec[j], prec + ACB_THETA_LOW_PREC);
                 }
             }
         }
         if (k < nb_steps - 1)
         {
             /* duplication on ctx_tau */
-            acb_theta_ctx_tau_dupl(ctx_tau, prec);
+            acb_theta_ctx_tau_dupl(ctx_tau, prec + ACB_THETA_LOW_PREC);
         }
     }
 
@@ -202,7 +202,7 @@ acb_theta_ql_setup_hard(acb_ptr rts, acb_ptr rts_all, acb_ptr t,
         arb_urandom(acb_realref(&t[k]), state, prec);
         acb_get_mid(&t[k], &t[k]);
     }
-    acb_theta_ctx_z_set(ctxt, t, ctx_tau, prec);
+    acb_theta_ctx_z_set(ctxt, t, ctx_tau, prec + ACB_THETA_LOW_PREC);
 
     for (k = 0; (k < nb_steps) && res; k++)
     {
@@ -220,8 +220,8 @@ acb_theta_ql_setup_hard(acb_ptr rts, acb_ptr rts_all, acb_ptr t,
 
             /* set context vector aux at z + t and z + 2t */
             _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, k);
-            acb_theta_ctx_z_add_real(&aux[0], &vec[j], ctxt, prec);
-            acb_theta_ctx_z_add_real(&aux[1], &aux[0], ctxt, prec);
+            acb_theta_ctx_z_add_real(&aux[0], &vec[j], ctxt, prec + ACB_THETA_LOW_PREC);
+            acb_theta_ctx_z_add_real(&aux[1], &aux[0], ctxt, prec + ACB_THETA_LOW_PREC);
 
             if (k == 0 && all)
             {
@@ -250,13 +250,13 @@ acb_theta_ql_setup_hard(acb_ptr rts, acb_ptr rts_all, acb_ptr t,
 
             if (k < nb_steps - 1)
             {
-                acb_theta_ctx_z_dupl(&vec[j], prec);
+                acb_theta_ctx_z_dupl(&vec[j], prec + ACB_THETA_LOW_PREC);
             }
         }
         if (k < nb_steps - 1)
         {
-            acb_theta_ctx_tau_dupl(ctx_tau, prec);
-            acb_theta_ctx_z_dupl(ctxt, prec);
+            acb_theta_ctx_tau_dupl(ctx_tau, prec + ACB_THETA_LOW_PREC);
+            acb_theta_ctx_z_dupl(ctxt, prec + ACB_THETA_LOW_PREC);
         }
     }
 
@@ -387,14 +387,14 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
         is_zero[j] = _acb_vec_is_zero(zs + j * g, g);
     }
 
-    for (lowprec = ACB_THETA_LOW_PREC; (lowprec < prec) && !done; lowprec *= 2)
+    for (lowprec = 8; (lowprec < prec) && !done; lowprec *= 2)
     {
-        /* Set contexts at precision lowprec */
-        acb_theta_ctx_tau_set(ctx_tau_1, tau, lowprec);
+        /* Set contexts at low precision, but with some additional guard bits */
+        acb_theta_ctx_tau_set(ctx_tau_1, tau, lowprec + ACB_THETA_LOW_PREC);
         acb_theta_ctx_tau_copy(ctx_tau_2, ctx_tau_1);
         for (j = 0; j < nb; j++)
         {
-            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau_1, lowprec);
+            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau_1, lowprec + ACB_THETA_LOW_PREC);
         }
 
         /* Add possible easy steps compared to what we already know */

@@ -58,12 +58,12 @@ int main(int argc, char * argv[])
     easy_steps = flint_malloc(2 * sizeof(slong));
 
     acb_siegel_randtest_compact(tau, state, 1, prec);
-    acb_siegel_randtest_vec_reduced(zs + g, state, 1, tau, 1, prec);
     for (j = 0; j < g; j++)
     {
         acb_mul_si(acb_mat_entry(tau, j, g - 1), acb_mat_entry(tau, j, g - 1), skew, prec);
         acb_mul_si(acb_mat_entry(tau, g - 1, j), acb_mat_entry(tau, g - 1, j), skew, prec);
     }
+    acb_siegel_randtest_vec_reduced(zs + g, state, 1, tau, 1, prec);
     acb_theta_eld_distances(distances, zs, 2, tau, 32);
 
     flint_printf("g = %wd, nb_steps = %wd, tau, z:\n", g, nb_steps);
