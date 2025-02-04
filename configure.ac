@@ -732,7 +732,11 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/skylake"
         ;;
       raptorlake)
-        gcc_cflags_arch="-march=alderlake"
+        gcc_cflags_arch="-march=raptorlake"
+        param_path="x86_64/skylake"
+        ;;
+      meteorlake)
+        gcc_cflags_arch="-march=meteorlake"
         param_path="x86_64/skylake"
         ;;
       knightslanding)
