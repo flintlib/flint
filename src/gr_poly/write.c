@@ -55,16 +55,15 @@ want_parens(const char * s)
 }
 
 int
-gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ctx)
+_gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_t ctx)
 {
     int status;
-    slong i, n;
+    slong i;
     slong sz;
     char * s;
     int printed_previously = 0;
 
     sz = ctx->sizeof_elem;
-    n = gr_poly_length(poly, ctx);
     status = GR_SUCCESS;
 
     if (n == 0)
@@ -75,10 +74,10 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ct
 
     for (i = 0; i < n; i++)
     {
-        if (gr_is_zero(GR_ENTRY(poly->coeffs, i, sz), ctx) == T_TRUE)
+        if (gr_is_zero(GR_ENTRY(poly, i, sz), ctx) == T_TRUE)
             continue;
 
-        gr_get_str(&s, GR_ENTRY(poly->coeffs, i, sz), ctx);
+        gr_get_str(&s, GR_ENTRY(poly, i, sz), ctx);
 
         if (i >= 1 && !strcmp(s, "1"))
         {
@@ -159,7 +158,7 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ct
 
 /*
         gr_stream_write(out, "(");
-        status |= gr_write(out, GR_ENTRY(poly->coeffs, i, sz), ctx);
+        status |= gr_write(out, GR_ENTRY(poly, i, sz), ctx);
         gr_stream_write(out, ")");
 
         if (i == 1)
@@ -180,9 +179,32 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ct
 }
 
 int
+gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ctx)
+{
+    return _gr_poly_write(out, poly->coeffs, poly->length, x, ctx);
+}
+
+int
 gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx)
 {
     gr_stream_t out;
     gr_stream_init_file(out, stdout);
     return gr_poly_write(out, poly, "x", ctx);
+}
+
+int
+_gr_poly_get_str(char ** res, gr_srcptr f, slong len, const char * x, gr_ctx_t ctx)
+{
+    gr_stream_t out;
+    int status;
+    gr_stream_init_str(out);
+    status = _gr_poly_write(out, f, len, x, ctx);
+    *res = out->s;
+    return status;
+}
+
+int
+gr_poly_get_str(char ** res, const gr_poly_t f, const char * x, gr_ctx_t ctx)
+{
+    return _gr_poly_get_str(res, f->coeffs, f->length, x, ctx);
 }

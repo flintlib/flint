@@ -114,7 +114,22 @@ Basic manipulation
               int gr_poly_gen(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: int gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ctx)
+              int _gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_t ctx)
+              int _gr_poly_get_str(char ** res, const gr_poly_t f, const char * x, gr_ctx_t ctx)
+              int gr_poly_get_str(char ** res, const gr_poly_t f, const char * x, gr_ctx_t ctx)
               int gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_set_str(gr_ptr res, const char * s, const char * x, slong len, gr_ctx_t ctx)
+              int gr_poly_set_str(gr_poly_t res, const char * s, const char * x, gr_ctx_t ctx)
+
+    Parse polynomial from an expression string, assuming that the string in *x* gives
+    the name of the generator. The underscore method zero-pads the result if
+    the length of the parsed polynomial is shorter than *len*, and returns
+    ``GR_UNABLE`` if the length of the parsed polynomial exceeds *len*.
+    Intermediate terms are allowed to be longer than *len*.
+
+    Warning: these methods are not currently optimized for polynomials of high degree
+    and may run with quadratic complexity.
 
 .. function:: int gr_poly_randtest(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx)
 
