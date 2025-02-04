@@ -61,15 +61,15 @@ int main(int argc, char * argv[])
     th = _acb_vec_init(nbth);
     arb_init(det);
 
-    acb_siegel_randtest_compact(tau, state, 1, prec + ACB_THETA_LOW_PREC);
+    acb_siegel_randtest_compact(tau, state, 1, prec + lp);
     for (j = 0; j < g; j++)
     {
-        acb_mul_si(acb_mat_entry(tau, j, g - 1), acb_mat_entry(tau, j, g - 1), skew, prec);
-        acb_mul_si(acb_mat_entry(tau, g - 1, j), acb_mat_entry(tau, g - 1, j), skew, prec);
+        acb_mul_si(acb_mat_entry(tau, j, g - 1), acb_mat_entry(tau, j, g - 1), skew, prec + lp);
+        acb_mul_si(acb_mat_entry(tau, g - 1, j), acb_mat_entry(tau, g - 1, j), skew, prec + lp);
     }
-    acb_siegel_randtest_vec_reduced(z, state, 1, tau, 1, prec + ACB_THETA_LOW_PREC);
+    acb_siegel_randtest_vec_reduced(z, state, 1, tau, 1, prec + lp);
     acb_mat_get_imag(im, tau);
-    arb_mat_det(det, im, prec + ACB_THETA_LOW_PREC);
+    arb_mat_det(det, im, prec + lp);
 
     flint_printf("g = %wd, prec = %wd, tau, z:\n", g, prec);
     acb_mat_printd(tau, 5);

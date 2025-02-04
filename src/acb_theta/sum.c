@@ -89,6 +89,7 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     /* Call sum_work at the right precision */
     slong g = ctx_tau->g;
     slong n = (all_b ? 1 << g : 1);
+    slong guard = ACB_THETA_LOW_PREC;
     acb_theta_eld_t E;
     arf_t R2, eps;
     arb_t err;
@@ -102,7 +103,7 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     arb_init(err);
     v = _arb_vec_init(g);
 
-    acb_theta_ctx_z_common_v(v, vec, nb, prec);
+    acb_theta_ctx_z_common_v(v, vec, nb, prec + guard);
     acb_theta_sum_radius(R2, eps, &ctx_tau->cho, 0,
         prec + FLINT_MAX(0, acb_theta_sum_addprec(distance)));
     b = acb_theta_eld_set(E, &ctx_tau->cho, R2, v);
@@ -119,11 +120,17 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                 (&vec[j])->exp_2z_inv, 1, ctx_tau->exp_tau,
                 ctx_tau->exp_tau_inv, E, 0, prec,
                 (all_b ? acb_theta_sum_0b_worker : acb_theta_sum_00_worker));
-            arb_mul_arf(err, &(&vec[j])->u, eps, prec);
+            arb_mul_arf(err, &(&vec[j])->u, eps, prec + guard);
+            flint_printf("(sum) error: ");
+            arb_printd(err, 5);
+            flint_printf("\n");
             for (k = 0; k < n; k++)
             {
                 acb_add_error_arb(&th[j * n + k], err);
             }
+            flint_printf("(sum) 1st value: ");
+            acb_printd(&th[j * n], 5);
+            flint_printf("\n");
         }
     }
     else
@@ -151,6 +158,7 @@ acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     slong nba = (all_a ? n : 1);
     slong nbb = (all_b ? n : 1);
     slong nbab = nba * nbb;
+    slong guard = ACB_THETA_LOW_PREC;
     acb_theta_ctx_z_struct * new_vec;
     acb_ptr cs, res;
     slong new_prec, dot;
@@ -180,7 +188,7 @@ acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         {
             acb_modular_theta_sum(&res[0], &res[1], &res[2], &res[3],
                 (&vec[j])->exp_z, (&vec[j])->is_real,
-                acb_mat_entry(ctx_tau->exp_tau, 0, 0), 1, prec);
+                acb_mat_entry(ctx_tau->exp_tau, 0, 0), 1, new_prec);
 
             acb_set(&th[nbab * j], &res[2]);
             if (all_a && all_b)
@@ -189,13 +197,13 @@ acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                 acb_set(&th[nbab * j + 2], &res[1]);
                 acb_neg(&th[nbab * j + 3], &res[0]);
                 _acb_vec_scalar_mul(th + nbab * j + 2, th + nbab * j + 2, 2,
-                    acb_mat_entry(ctx_tau->exp_tau_div_4, 0, 0), prec);
+                    acb_mat_entry(ctx_tau->exp_tau_div_4, 0, 0), prec + guard);
             }
             else if (all_a)
             {
                 acb_set(&th[nbab * j + 1], &res[1]);
                 acb_mul(&th[nbab * j + 1], &th[nbab * j + 1],
-                    acb_mat_entry(ctx_tau->exp_tau_div_4, 0, 0), prec);
+                    acb_mat_entry(ctx_tau->exp_tau_div_4, 0, 0), prec + guard);
             }
             else if (all_b)
             {
@@ -214,13 +222,13 @@ acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         {
             for (j = 0; j < nb; j++)
             {
-                acb_theta_ctx_z_shift_a0(&new_vec[j], &cs[j], &vec[j], ctx_tau, a, prec);
+                acb_theta_ctx_z_shift_a0(&new_vec[j], &cs[j], &vec[j], ctx_tau, a, prec + guard);
             }
             acb_theta_sum_0x(res, new_vec, nb, ctx_tau, &distances[a], all_b, prec);
             for (j = 0; j < nb; j++)
             {
                 _acb_vec_scalar_mul(th + nbab * j + nbb * a, res + nbb * j,
-                    nbb, &cs[j], prec);
+                    nbb, &cs[j], prec + guard);
             }
             for (b = 1; b < nbb; b++) /* No sign changes for b=0 */
             {
@@ -246,7 +254,7 @@ acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         for (j = 0; j < nb; j++)
         {
             _acb_vec_scalar_mul_arb(th + nbab * j, th + nbab * j, nbab,
-                &(&vec[j])->uinv, prec);
+                &(&vec[j])->uinv, prec + guard);
         }
     }
 }
