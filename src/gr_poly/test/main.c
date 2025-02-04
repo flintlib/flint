@@ -66,6 +66,7 @@
 #include "t-roots.c"
 #include "t-roots_other.c"
 #include "t-rsqrt_series.c"
+#include "t-set_str.c"
 #include "t-shift_left_right.c"
 #include "t-sqrt_series.c"
 #include "t-squarefree_part.c"
@@ -136,6 +137,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_roots),
     TEST_FUNCTION(gr_poly_roots_other),
     TEST_FUNCTION(gr_poly_rsqrt_series),
+    TEST_FUNCTION(gr_poly_set_str),
     TEST_FUNCTION(gr_poly_shift_left_right),
     TEST_FUNCTION(gr_poly_sqrt_series),
     TEST_FUNCTION(gr_poly_squarefree_part),
