@@ -61,7 +61,11 @@ int main(int argc, char * argv[])
     th = _acb_vec_init(nbth);
     arb_init(det);
 
+    flint_printf("Siegel reduction: ");
+    TIMEIT_START;
     acb_siegel_randtest_compact(tau, state, 1, prec + lp);
+    TIMEIT_STOP;
+
     for (j = 0; j < g; j++)
     {
         acb_mul_si(acb_mat_entry(tau, j, g - 1), acb_mat_entry(tau, j, g - 1), skew, prec + lp);
