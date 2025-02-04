@@ -38,6 +38,9 @@ _gr_poly_set_str(gr_ptr res, const char * s, const char * x, slong len, gr_ctx_t
         {
             _gr_vec_swap(res, t->coeffs, t->length, ctx);
             status |= _gr_vec_zero(GR_ENTRY(res, t->length, ctx->sizeof_elem), len - t->length, ctx);
+            /* make sure t is a valid polynomial before clearing
+               just so that we don't strike the debug assertion in gr_poly_clear */
+            _gr_poly_set_length(t, 0, ctx);
         }
         else
         {
