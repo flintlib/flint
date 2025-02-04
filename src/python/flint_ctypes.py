@@ -8216,6 +8216,38 @@ def test_set_str():
 
     assert RRx("1 +/- 0") == RR(1)
 
+    assert raises(lambda: RR("foo"), FlintUnableError)
+    assert raises(lambda: RR("expexp2"), FlintUnableError)
+    assert raises(lambda: RR("sqrt(1"), FlintUnableError)
+    assert raises(lambda: RR("sqrt1)"), FlintUnableError)
+    assert raises(lambda: RR("foo(3)"), FlintUnableError)
+    assert ZZ("sqrt 1") == 1
+    assert CC("sqrt -1") == 1j
+    assert ZZ("sqrt(5 * 5)") == 5
+    assert raises(lambda: ZZ("sqrt(5 * 5 + 1)"), FlintUnableError)
+    assert ZZ("fac(10) / fac(9)") == 10
+    assert CC_ca("cos(1)^2 + sin(1)^2") == 1
+    assert QQ("abs(floor(-11/2))") == 6
+    assert QQ("ceil(-11/2)") == -5
+    assert QQ("rsqrt(16)") == 0.25
+    assert raises(lambda: QQ("rsqrt(0)"), FlintUnableError)
+    assert QQbar("sinpi(1/4)/2 + 2*cospi(1/4) + tanpi(-1/3)^2/2") == QQbar("3/2 + 5*sqrt(2)/4")
+    assert raises(lambda: QQbar("tanpi(1/2)"), FlintUnableError)
+    assert RR("gamma(5)") == 24
+    assert QQbar("re(2-7*i) * im(2-7*I)") == -14
+    assert QQbar("conj(3+4*I)") == QQbar(3+4j).conj()
+
+    with optimistic_logic:
+        assert RR("exp(log(10))") == 10
+        assert RR("tan(atan(1))") == 1
+        assert RR("sin(asin(0.5))") == 0.5
+        assert RR("cos(acos(0.5))") == 0.5
+        assert CC("arg(sgn(1+I)) - pi/4") == 0
+        assert RR("sqrt2 + sqrt3") == RR(2).sqrt() + RR(3).sqrt()
+        assert RR("sqrt 2 + sqrt 3") == RR(2).sqrt() + RR(3).sqrt()
+        assert RR("log log log (10^100)") == (RR(10)**100).log().log().log()
+        assert RR("zeta(2)") == RR("pi^2/6")
+
 def test_qqbar_roots():
     for R in [ZZ, QQ, ZZi, QQbar, AA, QQbar_ca, AA_ca, RR_ca, CC_ca]:
         Rx = PolynomialRing(R)
