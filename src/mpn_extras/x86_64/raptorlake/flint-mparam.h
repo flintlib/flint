@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* parameters found for TODO */
+/* parameters found for Intel(R) Core(TM) i5-1335U */
 
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
