@@ -724,7 +724,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       tigerlake)
         gcc_cflags_arch="-march=tigerlake"
-        param_path="x86_64/skylake"
+        param_path="x86_64/tigerlake"
         have_avx512="yes"
         ;;
       alderlake)
@@ -733,10 +733,10 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       raptorlake)
         gcc_cflags_arch="-march=raptorlake -march=alderlake"
-        param_path="x86_64/skylake"
+        param_path="x86_64/raptorlake"
         ;;
       meteorlake)
-        gcc_cflags_arch="-march=meteorlake"
+        gcc_cflags_arch="-march=meteorlake -march=alderlake"
         param_path="x86_64/meteorlake"
         ;;
       knightslanding)
