@@ -698,11 +698,6 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/skylake"
         have_avx512="yes"
         ;;
-      cannonlake)
-        gcc_cflags_arch="-march=cannonlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
       kabylake)
         gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
@@ -710,6 +705,15 @@ Please report at <https://github.com/flintlib/flint/issues/>])
       cometlake)
         gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
+        ;;
+      knightslanding)
+        gcc_cflags_arch="-march=knl"
+        param_path="x86_64/skylake"
+        ;;
+      cannonlake)
+        gcc_cflags_arch="-march=cannonlake"
+        param_path="x86_64/icelake"  # fallback
+        have_avx512="yes"
         ;;
       icelake)
         gcc_cflags_arch="-march=icelake-client"
@@ -723,7 +727,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       rocketlake)
         gcc_cflags_arch="-march=rocketlake"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"  # fallback
         have_avx512="yes"
         ;;
       tigerlake)
@@ -733,7 +737,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       alderlake)
         gcc_cflags_arch="-march=alderlake"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"  # fallback
         ;;
       raptorlake)
         gcc_cflags_arch="-march=raptorlake -march=alderlake"
@@ -743,13 +747,9 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         gcc_cflags_arch="-march=meteorlake -march=alderlake"
         param_path="x86_64/meteorlake"
         ;;
-      knightslanding)
-        gcc_cflags_arch="-march=knl"
-        param_path="x86_64/skylake"
-        ;;
       sapphirerapids)
         gcc_cflags_arch="-march=sapphirerapids"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"  # fallback
         have_avx512="yes"
         ;;
       *)
