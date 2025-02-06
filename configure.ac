@@ -707,6 +707,10 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
+      cometlake)
+        gcc_cflags_arch="-march=skylake"
+        param_path="x86_64/skylake"
+        ;;
       icelake)
         gcc_cflags_arch="-march=icelake-client"
         param_path="x86_64/icelake"
@@ -747,10 +751,6 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         gcc_cflags_arch="-march=sapphirerapids"
         param_path="x86_64/skylake"
         have_avx512="yes"
-        ;;
-      cometlake)
-        gcc_cflags_arch="-march=skylake"
-        param_path="x86_64/skylake"
         ;;
       *)
         AC_MSG_ERROR([Error in deciding flags for $host.
