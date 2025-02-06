@@ -29,6 +29,9 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
     arb_mat_init(yinv, g, g);
     acb_siegel_cho_yinv(cho, yinv, tau, lp);
 
+    /* Compute rough pattern (could be negative) */
+    /* Note: we could be more precise by scaling x by something else than
+       powers of 2 */
     for (s = 0; s < g; s++)
     {
         arb_sqr(x, arb_mat_entry(cho, s, s), lp);
@@ -45,7 +48,19 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
             return 0;
         }
 
-        nb =  -arf_get_si(arb_midref(x), ARF_RND_NEAR);
+        pattern[s] = -arf_get_si(arb_midref(x), ARF_RND_NEAR);
+    }
+
+    flint_printf("(ql_nb_steps) rough pattern:");
+    for (s = 0; s < g; s++)
+    {
+        flint_printf(" %wd", pattern[s]);
+    }
+    flint_printf("\n");
+
+    for (s = 0; s < g; s++)
+    {
+        nb = pattern[s];
         if (s == 0)
         {
             if (g == 1)

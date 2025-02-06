@@ -31,6 +31,8 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         acb_ptr zs, t, rts, rts_all;
         acb_ptr th, th_init, test;
         arb_ptr distances;
+        acb_theta_ctx_tau_t ctx_tau;
+        acb_theta_ctx_z_t ctx_z;
         slong * easy_steps;
         slong guard, hp;
         slong j;
@@ -48,6 +50,8 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         th_init = _acb_vec_init(3 * n * nb);
         test = _acb_vec_init(nb * nbth);
         distances = _arb_vec_init(nb * n);
+        acb_theta_ctx_tau_init(ctx_tau, 1, g);
+        acb_theta_ctx_z_init(ctx_z, g);
         easy_steps = flint_malloc(nb * sizeof(slong));
 
         acb_siegel_randtest_compact(tau, state, 1, prec);
@@ -55,65 +59,23 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         acb_theta_eld_distances(distances, zs, nb, tau, prec);
         res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps, zs, nb, tau,
             distances, nb_steps, all, prec);
-        hp = prec + guard * nb_steps;
+        hp = prec + guard;
         /* flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, nb_steps = %wd, all = %wd\n", g, prec, nb, nb_steps, all);
            acb_mat_printd(tau, 5);
            _acb_vec_printd(zs, nb * g, 5); */
 
         if (res)
         {
-            /* Fill in th_init with correct values */
-            /* Copied from ql_exact */
-            acb_theta_ctx_tau_t ctx;
-            acb_theta_ctx_z_struct * aux;
-            acb_theta_ctx_z_t ctxt;
-            acb_mat_t new_tau;
-            acb_ptr new_z;
-            arb_ptr d;
-
-            acb_theta_ctx_tau_init(ctx, 1, g);
-            aux = acb_theta_ctx_z_vec_init(3, g);
-            acb_mat_init(new_tau, g, g);
-            new_z = _acb_vec_init(g);
-            d = _arb_vec_init(n);
-            if (easy_steps[0] < nb_steps)
-            {
-                acb_theta_ctx_z_init(ctxt, g);
-            }
-
-            acb_mat_scalar_mul_2exp_si(new_tau, tau, nb_steps);
-            acb_theta_ctx_tau_set(ctx, new_tau, hp);
-            if (easy_steps[0] < nb_steps)
-            {
-                _acb_vec_scalar_mul_2exp_si(new_z, t, g, nb_steps);
-                acb_theta_ctx_z_set(ctxt, new_z, ctx, hp);
-            }
-
-            for (j = 0; j < nb; j++)
-            {
-                _acb_vec_scalar_mul_2exp_si(new_z, zs + j * g, g, nb_steps);
-                acb_theta_ctx_z_set(&aux[0], new_z, ctx, hp);
-                _arb_vec_scalar_mul_2exp_si(d, distances + j * n, n, nb_steps);
-                if (easy_steps[j] == nb_steps)
-                {
-                    acb_theta_sum(th_init + 3 * n * j, aux, 1, ctx, d, 1, 0, 1, hp);
-                }
-                else
-                {
-                    acb_theta_ctx_z_add_real(&aux[1], &aux[0], ctxt, hp);
-                    acb_theta_ctx_z_add_real(&aux[2], &aux[1], ctxt, hp);
-                    acb_theta_sum(th_init + 3 * n * j, aux, 3, ctx, d, 1, 0, 1, hp);
-                }
-            }
-
+            acb_theta_ql_steps_input_sum(th_init, zs, nb, t, tau, distances,
+                nb_steps, easy_steps, hp);
             acb_theta_ql_steps(th, th_init, rts, rts_all, nb, nb_steps, distances,
                 easy_steps, all, g, hp);
 
-            acb_theta_ctx_tau_set(ctx, tau, prec);
+            acb_theta_ctx_tau_set(ctx_tau, tau, prec);
             for (j = 0; j < nb; j++)
             {
-                acb_theta_ctx_z_set(aux, zs + j * g, ctx, prec);
-                acb_theta_sum(test + j * nbth, aux, 1, ctx, distances + j * n, 1, all, 1, prec);
+                acb_theta_ctx_z_set(ctx_z, zs + j * g, ctx_tau, prec);
+                acb_theta_sum(test + j * nbth, ctx_z, 1, ctx_tau, distances + j * n, 1, all, 1, prec);
             }
 
             /* flint_printf("After %wd steps:\n", nb_steps);
@@ -129,17 +91,6 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
                 _acb_vec_printd(th, nb * nbth, 5);
                 flint_abort();
             }
-
-            /* Clear */
-            acb_theta_ctx_tau_clear(ctx);
-            acb_theta_ctx_z_vec_clear(aux, 3);
-            acb_mat_clear(new_tau);
-            _acb_vec_clear(new_z, g);
-            _arb_vec_clear(d, n);
-            if (easy_steps[0] < nb_steps)
-            {
-                acb_theta_ctx_z_clear(ctxt);
-            }
         }
 
         acb_mat_clear(tau);
@@ -154,6 +105,8 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         _acb_vec_clear(th_init, 3 * n * nb);
         _acb_vec_clear(test, nbth * nb);
         _arb_vec_clear(distances, nb * n);
+        acb_theta_ctx_tau_clear(ctx_tau);
+        acb_theta_ctx_z_clear(ctx_z);
         flint_free(easy_steps);
     }
 
