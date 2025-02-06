@@ -186,7 +186,7 @@ int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, s
 void acb_theta_ql_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
     acb_srcptr rts_all, slong nb, slong nb_steps, arb_srcptr distances,
     const slong * easy_steps, int all, slong g, slong prec);
-int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
+void acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     const slong * pattern, int all, int shifted_prec, slong prec);
 
 /* Main functions on reduced input */

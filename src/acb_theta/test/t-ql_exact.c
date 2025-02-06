@@ -34,7 +34,6 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
         acb_theta_ctx_z_struct * vec;
         arb_ptr distances;
         slong j;
-        int res;
 
         acb_mat_init(tau, g, g);
         zs = _acb_vec_init(nb * g);
@@ -81,13 +80,12 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
             flint_printf("%wd -> %wd\n", j, pattern[j]);
             } */
 
-        res = acb_theta_ql_exact(th, zs, nb, tau, pattern, all, shifted_prec, prec);
+        acb_theta_ql_exact(th, zs, nb, tau, pattern, all, shifted_prec, prec);
 
-        /* flint_printf("\nresult of ql_exact: %wd, got theta:\n", res);
+        /* flint_printf("\nresult of ql_exact:\n");
            _acb_vec_printd(th, nbth * nb, 5); */
 
-        if (!res
-            || !_acb_vec_overlaps(th, test, nb * nbth)
+        if (!_acb_vec_overlaps(th, test, nb * nbth)
             || (_acb_vec_is_finite(test, nb * nbth) && !_acb_vec_is_finite(th, nb * nbth)))
         {
             flint_printf("FAIL\n");
