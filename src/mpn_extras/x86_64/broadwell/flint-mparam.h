@@ -31,7 +31,6 @@
 #define FFT_N_NUM 23
 #define FFT_MULMOD_2EXPP1_CUTOFF 128
 
-/* TODO: check this tuning */
 #define FLINT_PREINVERT_LIMB_USE_NATIVE 0
 
 #define FLINT_MULMOD_SHOUP_THRESHOLD 14
