@@ -712,7 +712,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       cannonlake)
         gcc_cflags_arch="-march=cannonlake"
-        param_path="x86_64/icelake"  # fallback
+        param_path="x86_64/icelake"  # fallback, to be refined
         have_avx512="yes"
         ;;
       icelake)
@@ -727,7 +727,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       rocketlake)
         gcc_cflags_arch="-march=rocketlake"
-        param_path="x86_64/icelake"  # fallback
+        param_path="x86_64/icelake"  # fallback, to be refined
         have_avx512="yes"
         ;;
       tigerlake)
@@ -737,7 +737,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       alderlake)
         gcc_cflags_arch="-march=alderlake"
-        param_path="x86_64/icelake"  # fallback
+        param_path="x86_64/icelake"  # fallback, to be refined
         ;;
       raptorlake)
         gcc_cflags_arch="-march=raptorlake -march=alderlake"
@@ -749,7 +749,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       sapphirerapids)
         gcc_cflags_arch="-march=sapphirerapids"
-        param_path="x86_64/icelake"  # fallback
+        param_path="x86_64/icelake"  # fallback, to be refined
         have_avx512="yes"
         ;;
       *)
