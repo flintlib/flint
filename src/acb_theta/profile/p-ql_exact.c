@@ -139,6 +139,7 @@ int main(int argc, char * argv[])
 
             tcur = ((double) t0->cpu) / reps;
             flint_printf("time: %f ms (%wd reps)\n", tcur, reps);
+
             if (k == 0)
             {
                 tmin = tcur;

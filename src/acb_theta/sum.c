@@ -179,7 +179,7 @@ acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         }
     }
 
-    if (g == 1 && new_prec <= 2 * prec)
+    if (g == 1 && new_prec <= 4 * prec)
     {
         /* Call acb_modular_theta_sum directly: we accept to run computations
            at a slightly higher precision than necessary. */
