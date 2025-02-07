@@ -50,7 +50,7 @@ acb_theta_all_add_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
-    slong lp = 8;
+    slong lp = 4;
     slong nb_der = acb_theta_jet_nb(2, g);
     acb_ptr dth;
     acb_theta_ctx_tau_t ctx_tau;
@@ -65,19 +65,20 @@ acb_theta_all_add_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     arb_init(x);
 
     /* Attempt to get finite derivatives of theta */
-    k = 0;
-    do
+    for (k = 0; k < 4; k++)
     {
-        k++;
         lp *= 2;
-        acb_theta_ctx_tau_set(ctx_tau, tau, lp);
+        acb_theta_ctx_tau_set(ctx_tau, tau, lp + ACB_THETA_LOW_PREC);
         for (j = 0; j < nb; j++)
         {
-            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lp);
+            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lp + ACB_THETA_LOW_PREC);
         }
-        acb_theta_sum_jet_all(dth, vec, nb, ctx_tau, 2, lp);
+        acb_theta_sum_jet(dth, vec, nb, ctx_tau, 2, 1, lp);
+        if (_acb_vec_is_finite(dth, n * n * nb * nb_der))
+        {
+            break;
+        }
     }
-    while (!_acb_vec_is_finite(dth, n * n * nb * nb_der) && k < 4);
 
     /* Get error bounds */
     for (j = 0; j < nb; j++)

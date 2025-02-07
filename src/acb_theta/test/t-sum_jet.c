@@ -15,7 +15,7 @@
 #include "acb_modular.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
+TEST_FUNCTION_START(acb_theta_sum_jet, state)
 {
     slong iter;
 
@@ -55,13 +55,13 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
         }
         acb_siegel_randtest_vec_reduced(zs, state, nbz, tau, 0, prec);
 
-        /* Call sum_jet_all at precision mprec */
+        /* Call sum_jet at precision mprec */
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         for (j = 0; j < nbz; j++)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_jet_all(th, vec, nbz, ctx_tau, ord, mprec);
+        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 1, mprec);
 
         if (g == 1)
         {
@@ -113,7 +113,7 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
                     acb_theta_ctx_z_set(&vec_g1[j], &zs[j * g + k], ctx_tau11, prec);
                 }
 
-                acb_theta_sum_jet_all(aux, vec_g1, nbz, ctx_tau11, ord, prec);
+                acb_theta_sum_jet(aux, vec_g1, nbz, ctx_tau11, ord, 1, prec);
 
                 for (j = 0; j < nbz; j++)
                 {
@@ -145,6 +145,25 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
             flint_free(tups);
             acb_theta_ctx_tau_clear(ctx_tau11);
             acb_theta_ctx_z_vec_clear(vec_g1, nbz);
+        }
+
+        /* Check that calling sum_jet with all = 0 gives the right answers */
+        for (j = 0; j < nbz; j++)
+        {
+            _acb_vec_set(test + j * nbth, test + j * n2 * nbth, nbth);
+        }
+        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 0, mprec);
+        if (!_acb_vec_overlaps(th, test, nbz * nbth))
+        {
+            flint_printf("FAIL (all = 0, g = %wd, ord = %wd, nbz = %wd, mprec = %wd, prec = %wd)\n",
+                g, ord, nbz, mprec, prec);
+            acb_mat_printd(tau, 5);
+            _acb_vec_printd(zs, nbz * g, 5);
+            flint_printf("th: ");
+            _acb_vec_printd(th, nbz * nbth, 5);
+            flint_printf("test: ");
+            _acb_vec_printd(test, nbz * nbth, 5);
+            flint_abort();
         }
 
         acb_mat_clear(tau);

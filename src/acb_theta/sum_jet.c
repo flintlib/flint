@@ -194,6 +194,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     slong n = 1 << g;
     slong nbjet = acb_theta_jet_nb(ord, g);
     slong nbth = (all ? n * n : 1);
+    slong guard = ACB_THETA_LOW_PREC;
     slong j, k;
 
     FLINT_ASSERT(nb >= 0);
@@ -250,7 +251,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         fmpz_init(m);
         fmpz_init(t);
 
-        acb_theta_ctx_z_common_v(v, vec, nb, prec);
+        acb_theta_ctx_z_common_v(v, vec, nb, prec + guard);
         acb_theta_sum_jet_radius(R2, eps, &ctx_tau->cho, v, ord, prec);
         if (all)
         {
@@ -281,7 +282,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                         ctx_tau->exp_tau, ctx_tau->exp_tau_inv, E,
                         ord, prec, acb_theta_sum_jet_00_worker);
                 }
-                arb_mul_arf(err, &(&vec[j])->u, eps, ACB_THETA_LOW_PREC);
+                arb_mul_arf(err, &(&vec[j])->u, eps, guard);
                 for (k = 0; k < nbth * nbjet; k++)
                 {
                     acb_add_error_arb(&th[j * nbth * nbjet + k], err);
