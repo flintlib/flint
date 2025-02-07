@@ -282,9 +282,9 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                         ord, prec, acb_theta_sum_jet_00_worker);
                 }
                 arb_mul_arf(err, &(&vec[j])->u, eps, ACB_THETA_LOW_PREC);
-                for (k = 0; k < nbth; k++)
+                for (k = 0; k < nbth * nbjet; k++)
                 {
-                    acb_add_error_arb(&th[j * nbth + k], err);
+                    acb_add_error_arb(&th[j * nbth * nbjet + k], err);
                 }
             }
 
