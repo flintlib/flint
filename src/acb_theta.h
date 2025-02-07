@@ -182,9 +182,6 @@ void acb_theta_ql_recombine(acb_ptr th, acb_srcptr th0, acb_srcptr cofactors,
 int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong * easy_steps,
     acb_srcptr zs, slong nb, const acb_mat_t tau, arb_srcptr distances,
     slong nb_steps, int all, slong prec);
-void acb_theta_ql_steps_input_sum(acb_ptr th_init, acb_srcptr zs, slong nb,
-    acb_srcptr t, const acb_mat_t tau, arb_srcptr distances, slong nb_steps,
-    const slong * easy_steps, slong prec);
 void acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     const slong * pattern, int all, int shifted_prec, slong prec);
 
