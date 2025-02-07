@@ -166,6 +166,8 @@ void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr roots, slong nb, s
 void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
+void acb_theta_agm_mul_all_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
+    arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
 /* Quasilinear algorithms on exact, reduced input */
 
@@ -183,9 +185,6 @@ int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, s
 void acb_theta_ql_steps_input_sum(acb_ptr th_init, acb_srcptr zs, slong nb,
     acb_srcptr t, const acb_mat_t tau, arb_srcptr distances, slong nb_steps,
     const slong * easy_steps, slong prec);
-void acb_theta_ql_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
-    acb_srcptr rts_all, slong nb, slong nb_steps, arb_srcptr distances,
-    const slong * easy_steps, int all, slong g, slong prec);
 void acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     const slong * pattern, int all, int shifted_prec, slong prec);
 

@@ -60,7 +60,6 @@
 #include "t-ql_exact.c"
 #include "t-ql_lower_dim.c"
 #include "t-ql_setup.c"
-#include "t-ql_steps.c"
 #include "t-siegel_cocycle.c"
 #include "t-siegel_is_reduced.c"
 #include "t-siegel_kappa.c"
@@ -128,7 +127,6 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_ql_exact),
     TEST_FUNCTION(acb_theta_ql_lower_dim),
     TEST_FUNCTION(acb_theta_ql_setup),
-    TEST_FUNCTION(acb_theta_ql_steps),
     TEST_FUNCTION(acb_theta_siegel_cocycle),
     TEST_FUNCTION(acb_theta_siegel_is_reduced),
     TEST_FUNCTION(acb_theta_siegel_kappa),
