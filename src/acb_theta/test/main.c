@@ -53,6 +53,7 @@
 #include "t-jet_compose.c"
 #include "t-jet_error.c"
 #include "t-jet_mul.c"
+#include "t-jet_notransform_ql.c"
 #include "t-jet_one_notransform.c"
 #include "t-jet_tuples.c"
 #include "t-local_bound.c"
@@ -120,6 +121,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_jet_compose),
     TEST_FUNCTION(acb_theta_jet_error),
     TEST_FUNCTION(acb_theta_jet_mul),
+    TEST_FUNCTION(acb_theta_jet_notransform_ql),
     TEST_FUNCTION(acb_theta_jet_one_notransform),
     TEST_FUNCTION(acb_theta_jet_tuples),
     TEST_FUNCTION(acb_theta_local_bound),

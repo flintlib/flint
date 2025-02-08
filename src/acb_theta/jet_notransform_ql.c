@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "acb.h"
 #include "arb_mat.h"
@@ -40,6 +41,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     acb_mat_init(new_tau, g, g);
     new_zs = _acb_vec_init((nb + add_zero) * g);
     new_th = _acb_vec_init((nb + add_zero) * nbth);
+    err = _arb_vec_init(nb * nbth);
     arb_mat_init(cho, g, g);
     arb_mat_init(yinv, g, g);
     y = _arb_vec_init(g);
@@ -98,6 +100,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     acb_mat_clear(new_tau);
     _acb_vec_clear(new_zs, (nb + add_zero) * g);
     _acb_vec_clear(new_th, (nb + add_zero) * nbth);
+    _arb_vec_clear(err, nb * nbth);
     arb_mat_clear(cho);
     arb_mat_clear(yinv);
     _arb_vec_clear(y, g);
@@ -214,10 +217,12 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     slong nbth = (all ? n * n : n);
     slong nbaux = n_pow(ord + 1, g);
     slong nbjet = acb_theta_jet_nb(ord, g);
+    slong nbjet_2 = acb_theta_jet_nb(ord + 2, g);
+    slong nbjet_0 = acb_theta_jet_nb(2, g);
     arb_ptr c, rho, eps, err;
     arb_t t;
     arf_t e;
-    acb_ptr zetas, new_zs, new_th, dft;
+    acb_ptr zetas, new_zs, new_th, new_dth, dft;
     slong j, k, kmod, l;
     int res = 1;
 
@@ -230,6 +235,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     zetas = _acb_vec_init(ord + 1);
     new_zs = _acb_vec_init(g * nb * nbaux);
     new_th = _acb_vec_init(nbth * nb * nbaux);
+    new_dth = _acb_vec_init(nb * nbth * nbaux * nbjet_0);
     dft = _acb_vec_init(nbaux);
 
     /* Get bounds and high precision, fail if too large */
@@ -264,12 +270,12 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
                 kmod = kmod / (ord + 1);
             }
             _acb_vec_scalar_mul_arb(new_zs + j * g * nbaux + k * g,
-                new_zs + j * g * nbaux + k * g, g, &eps[l], hprec);
-            /* eps[l] should be much smaller than 2^(-prec), but still check it. */
+                new_zs + j * g * nbaux + k * g, g, &eps[j], hprec);
+            /* eps[j] should be much smaller than 2^(-prec / (ord + 1)), but still check it. */
             for (l = 0; (l < g) && res; l++)
             {
-                acb_get_abs_ubound_arf(e, &new_zs[j * g + l], ACB_THETA_LOW_PREC);
-                res = arf_cmp_2exp_si(e, -prec) <= 0;
+                acb_get_abs_ubound_arf(e, &new_zs[j * g * nbaux + k * g + l], ACB_THETA_LOW_PREC);
+                res = arf_cmp_2exp_si(e, -floor(prec / (ord + 1))) <= 0;
             }
             _acb_vec_add(new_zs + j * g * nbaux + k * g,
                 new_zs + j * g * nbaux + k * g, zs + j * g, g, hprec);
@@ -277,10 +283,29 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     }
     if (res)
     {
-        /* Call ql_inexact (as zetas is inexact). We can reuse dth here,
-           because all the auxiliary points are contained in the vector zs
-           where dth was initially computed. */
-        acb_theta_ql_inexact(new_th, new_zs, nb * nbaux, tau, dth, pattern, all, hprec);
+        /* Call ql_inexact (as zetas is inexact). We can reuse entries from dth
+           here, because all the auxiliary points are contained in the vector
+           zs where dth was initially computed. */
+        /* Todo ? If ord = 1 or ord = 3, then zetas is exact. Don't make a
+           special case because ql_inexact doesn't have a lot of overhead */
+        for (j = 0; j < nb; j++)
+        {
+            for (k = 0; k < nbaux; k++)
+            {
+                for (l = 0; l < nbth; l++)
+                {
+                    _acb_vec_set(new_dth + j * nbth * nbaux * nbjet_0
+                        + k * nbth * nbjet_0 + l * nbjet_0,
+                        dth + j * nbth * nbjet_2 + l * nbjet_2,
+                        nbjet_0);
+                }
+            }
+        }
+        acb_theta_ql_inexact(new_th, new_zs, nb * nbaux, tau, new_dth, pattern, all, hprec);
+
+        /* flint_printf("(ql_jet_exact) new_zs, new_th:\n");
+           _acb_vec_printd(new_zs, nb * g * nbaux, 5);
+           _acb_vec_printd(new_th, nb * nbth * nbaux, 5); */
 
         /* Make finite differences */
         for (j = 0; j < nb; j++)
@@ -310,6 +335,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     _acb_vec_clear(zetas, ord + 1);
     _acb_vec_clear(new_zs, g * nb * nbaux);
     _acb_vec_clear(new_th, nbth * nb * nbaux);
+    _acb_vec_clear(new_dth, nb * nbth * nbaux * nbjet_0);
     _acb_vec_clear(dft, nbaux);
 }
 
@@ -332,6 +358,11 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
     slong j, k, lp;
     int res = 0;
 
+    if (nb <= 0)
+    {
+        return;
+    }
+
     new_zs = _acb_vec_init(nb * g);
     acb_theta_ctx_tau_init(ctx_tau, 0, g);
     vec = acb_theta_ctx_z_vec_init(nb, g);
@@ -340,12 +371,11 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
     acb_mat_init(tau_mid, g, g);
     arf_init(e);
 
-    arf_one(e);
-    arf_mul_2exp_si(e, e, -prec);
-
     /* Compute low-precision derivatives of theta */
-    /* Add an error of 2^(-prec) around z, so that the auxiliary evaluation
-       points used in finite differences are contained in new_zs */
+    /* Add an error of 2^(-prec/(ord + 1)) around z, so that the auxiliary
+       evaluation points used in finite differences are contained in new_zs */
+    arf_one(e);
+    arf_mul_2exp_si(e, e, -floor(prec / (ord + 1)));
     _acb_vec_set(new_zs, zs, nb * g);
     for (j = 0; j < nb * g; j++)
     {
@@ -372,11 +402,15 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
     {
         for (k = 0; k < nbth; k++)
         {
-            acb_theta_jet_error(err + j * nbth * nbjet, zs + j * g, tau,
-                dth + j * nbth * nbjet_2 + k * nbjet_2, ord, lp);
+            acb_theta_jet_error(err + j * nbth * nbjet + k * nbjet, zs + j * g,
+                tau, dth + j * nbth * nbjet_2 + k * nbjet_2, ord, lp);
         }
     }
     /* Todo: adjust current working precision so that 2^(-prec) is roughly err ? */
+
+    /* flint_printf("(jet_notransform_ql) got derivatives and error bounds:\n");
+       _acb_vec_printd(dth, nb * nbth * nbjet_2, 5);
+       _arb_vec_printd(err, nb * nbth * nbjet, 5); */
 
     if (res && ord == 0)
     {
