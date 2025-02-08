@@ -34,7 +34,6 @@ TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
         acb_ptr zs, th, test;
         acb_theta_ctx_tau_t ctx_tau;
         acb_theta_ctx_z_struct * vec;
-        slong * pattern;
         slong j;
 
         acb_mat_init(tau, g, g);
@@ -43,7 +42,6 @@ TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
         test = _acb_vec_init(nb * nbth * nbjet);
         acb_theta_ctx_tau_init(ctx_tau, 0, g);
         vec = acb_theta_ctx_z_vec_init(nb, g);
-        pattern = flint_malloc(g * sizeof(slong));
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_siegel_randtest_vec_reduced(zs, state, nb, tau, 0, prec);
@@ -53,10 +51,9 @@ TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_ql_nb_steps(pattern, tau, 0, prec);
 
         acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, all, prec);
-        acb_theta_jet_notransform_ql(th, zs, nb, tau, pattern, ord, all, mprec);
+        acb_theta_jet_notransform_ql(th, zs, nb, tau, ord, all, mprec);
 
         /* flint_printf("g = %wd, nb = %wd, ord = %wd, mprec = %wd, prec = %wd\n",
            g, nb, ord, mprec, prec);
@@ -80,7 +77,6 @@ TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
         _acb_vec_clear(test, nb * nbth * nbjet);
         acb_theta_ctx_tau_clear(ctx_tau);
         acb_theta_ctx_z_vec_clear(vec, nb);
-        flint_free(pattern);
     }
 
     TEST_FUNCTION_END(state);

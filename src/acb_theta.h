@@ -192,7 +192,7 @@ void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     acb_srcptr dth, slong ord, slong prec);
 
 void acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, const slong * pattern, slong ord, int all, slong prec);
+    const acb_mat_t tau, slong ord, int all, slong prec);
 void acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, ulong ab, int all, slong prec);
 

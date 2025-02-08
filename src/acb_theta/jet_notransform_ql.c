@@ -19,7 +19,7 @@
 
 void
 acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
-    acb_srcptr dth, const slong * pattern, int all, slong prec)
+    acb_srcptr dth, int all, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -28,6 +28,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     slong lp = ACB_THETA_LOW_PREC;
     acb_mat_t new_tau;
     acb_ptr new_zs, new_th;
+    slong * pattern;
     arb_ptr err;
     arb_mat_t cho, yinv;
     arb_ptr y, w;
@@ -41,6 +42,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     acb_mat_init(new_tau, g, g);
     new_zs = _acb_vec_init((nb + add_zero) * g);
     new_th = _acb_vec_init((nb + add_zero) * nbth);
+    pattern = flint_malloc(g * sizeof(slong));
     err = _arb_vec_init(nb * nbth);
     arb_mat_init(cho, g, g);
     arb_mat_init(yinv, g, g);
@@ -75,6 +77,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     /* Call ql_exact */
     /* Todo: adjust current working precision so that 2^(-prec) is roughly err ? */
+    acb_theta_ql_nb_steps(pattern, new_tau, 0, prec);
     acb_theta_ql_exact(new_th, new_zs, nb + add_zero, new_tau, pattern, all, 0, prec);
     _acb_vec_set(th, new_th + add_zero * nbth, nb * nbth);
 
@@ -100,6 +103,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     acb_mat_clear(new_tau);
     _acb_vec_clear(new_zs, (nb + add_zero) * g);
     _acb_vec_clear(new_th, (nb + add_zero) * nbth);
+    flint_free(pattern);
     _arb_vec_clear(err, nb * nbth);
     arb_mat_clear(cho);
     arb_mat_clear(yinv);
@@ -209,7 +213,7 @@ acb_theta_jet_finite_diff_radius(arf_t eps, arf_t err, const arb_t c, const arb_
 
 static void
 acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
-    acb_srcptr dth, const slong * pattern, slong ord, int all, slong prec)
+    acb_srcptr dth, slong ord, int all, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -257,6 +261,8 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         }
     }
 
+    /* flint_printf("(ql_jet_exact) got res = %wd, g = %wd, prec = %wd, ord = %wd, hprec = %wd\n", res, g, prec, ord, hprec); */
+
     /* Fill in new_zs */
     _acb_vec_unit_roots(zetas, ord + 1, ord + 1, hprec);
     for (j = 0; (j < nb) && res; j++)
@@ -301,7 +307,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
                 }
             }
         }
-        acb_theta_ql_inexact(new_th, new_zs, nb * nbaux, tau, new_dth, pattern, all, hprec);
+        acb_theta_ql_inexact(new_th, new_zs, nb * nbaux, tau, new_dth, all, hprec);
 
         /* flint_printf("(ql_jet_exact) new_zs, new_th:\n");
            _acb_vec_printd(new_zs, nb * g * nbaux, 5);
@@ -341,7 +347,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
 void
 acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, const slong * pattern, slong ord, int all, slong prec)
+    const acb_mat_t tau, slong ord, int all, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -415,7 +421,7 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
     if (res && ord == 0)
     {
         /* Just call ql_inexact */
-        acb_theta_ql_inexact(th, zs, nb, tau, dth, pattern, all, prec);
+        acb_theta_ql_inexact(th, zs, nb, tau, dth, all, prec);
     }
     else if (res)
     {
@@ -434,7 +440,7 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
         }
 
         /* Call ql_jet_exact and add error */
-        acb_theta_ql_jet_exact(th, new_zs, nb, tau, dth, pattern, ord, all, prec);
+        acb_theta_ql_jet_exact(th, new_zs, nb, tau_mid, dth, ord, all, prec);
         for (j = 0; j < nb * nbth * nbjet; j++)
         {
             acb_add_error_arb(&th[j], &err[j]);

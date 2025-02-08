@@ -29,10 +29,8 @@ int main(int argc, char * argv[])
     slong g, n, ord, prec, nbth, nbjet;
     acb_mat_t tau;
     acb_ptr z, th;
-    slong * pattern;
     acb_theta_ctx_tau_t ctx_tau;
     acb_theta_ctx_z_t ctx_z;
-    slong j;
     int all = 1;
 
     if (argc < 4)
@@ -52,23 +50,16 @@ int main(int argc, char * argv[])
     acb_mat_init(tau, g, g);
     z = _acb_vec_init(g);
     th = _acb_vec_init(nbth * nbjet);
-    pattern = flint_malloc(g * sizeof(slong));
     acb_theta_ctx_tau_init(ctx_tau, 0, g);
     acb_theta_ctx_z_init(ctx_z, g);
 
     acb_siegel_randtest_compact(tau, state, 0, prec);
     acb_siegel_randtest_vec_reduced(z, state, 1, tau, 0, prec);
-    acb_theta_ql_nb_steps(pattern, tau, 0, prec);
 
-    flint_printf("g = %wd, prec = %wd, pattern:", g, prec);
-    for (j = 0; j < g; j++)
-    {
-        flint_printf(" %wd", pattern[j]);
-    }
-
+    flint_printf("g = %wd, prec = %wd", g, prec);
     flint_printf("\njet_notransform_ql: ");
     TIMEIT_START;
-    acb_theta_jet_notransform_ql(th, z, 1, tau, pattern, ord, all, prec);
+    acb_theta_jet_notransform_ql(th, z, 1, tau, ord, all, prec);
     TIMEIT_STOP;
     acb_printd(&th[nbth * nbjet - 1], 5);
     flint_printf("\nsum_jet: ");
@@ -84,7 +75,6 @@ int main(int argc, char * argv[])
     acb_mat_clear(tau);
     _acb_vec_clear(z, g);
     _acb_vec_clear(th, nbth * nbjet);
-    flint_free(pattern);
     acb_theta_ctx_tau_clear(ctx_tau);
     acb_theta_ctx_z_clear(ctx_z);
     flint_cleanup();
