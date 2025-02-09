@@ -158,7 +158,7 @@ void acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, int all_a,
     int all_b, int tilde, slong prec);
 void acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
-    const acb_theta_ctx_tau_t ctx_tau, slong ord, int all, slong prec);
+    const acb_theta_ctx_tau_t ctx_tau, slong ord, int all_a, int all_b, slong prec);
 
 /* AGM steps */
 

@@ -48,7 +48,7 @@ TEST_FUNCTION_START(acb_theta_jet_all_notransform, state)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, 1, prec);
+        acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, 1, 1, prec);
 
         /*flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, ord = %wd\n",
             g, prec, nb, ord);

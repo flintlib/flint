@@ -73,7 +73,7 @@ acb_theta_all_add_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lp + ACB_THETA_LOW_PREC);
         }
-        acb_theta_sum_jet(dth, vec, nb, ctx_tau, 2, 1, lp);
+        acb_theta_sum_jet(dth, vec, nb, ctx_tau, 2, 1, 1, lp);
         if (_acb_vec_is_finite(dth, n * n * nb * nb_der))
         {
             break;

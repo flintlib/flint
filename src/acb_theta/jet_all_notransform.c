@@ -244,7 +244,7 @@ acb_theta_jet_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb,
         {
             acb_theta_ctx_z_set(&vec[l], zs + l * g, ctx_tau, lp + ACB_THETA_LOW_PREC);
         }
-        acb_theta_sum_jet(dth_low, vec, nb, ctx_tau, ord + 2, 1, lp);
+        acb_theta_sum_jet(dth_low, vec, nb, ctx_tau, ord + 2, 1, 1, lp);
         if (_acb_vec_is_finite(dth_low, nb * nb_low * n2))
         {
             break;
@@ -329,7 +329,7 @@ acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
 
-        acb_theta_sum_jet(th, vec, nb, ctx_tau, ord, 1, prec);
+        acb_theta_sum_jet(th, vec, nb, ctx_tau, ord, 1, 1, prec);
 
         acb_theta_ctx_tau_clear(ctx_tau);
         acb_theta_ctx_z_vec_clear(vec, nb);

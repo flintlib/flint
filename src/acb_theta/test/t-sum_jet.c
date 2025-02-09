@@ -61,7 +61,7 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 1, mprec);
+        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 1, 1, mprec);
 
         if (g == 1)
         {
@@ -113,7 +113,7 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
                     acb_theta_ctx_z_set(&vec_g1[j], &zs[j * g + k], ctx_tau11, prec);
                 }
 
-                acb_theta_sum_jet(aux, vec_g1, nbz, ctx_tau11, ord, 1, prec);
+                acb_theta_sum_jet(aux, vec_g1, nbz, ctx_tau11, ord, 1, 1, prec);
 
                 for (j = 0; j < nbz; j++)
                 {
@@ -152,7 +152,7 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
         {
             _acb_vec_set(test + j * nbth, test + j * n2 * nbth, nbth);
         }
-        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 0, mprec);
+        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 0, 0, mprec);
         if (!_acb_vec_overlaps(th, test, nbz * nbth))
         {
             flint_printf("FAIL (all = 0, g = %wd, ord = %wd, nbz = %wd, mprec = %wd, prec = %wd)\n",

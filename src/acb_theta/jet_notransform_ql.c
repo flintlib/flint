@@ -394,7 +394,7 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lp + ACB_THETA_LOW_PREC);
         }
-        acb_theta_sum_jet(dth, vec, nb, ctx_tau, ord + 2, 1, lp); /* todo: only _a0 if all=0 */
+        acb_theta_sum_jet(dth, vec, nb, ctx_tau, ord + 2, 1, 1, lp); /* todo: only _a0 if all=0 */
         if (_acb_vec_is_finite(dth, nb * nbth * nbjet_2))
         {
             res = 1;
