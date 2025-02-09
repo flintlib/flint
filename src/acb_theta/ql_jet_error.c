@@ -15,7 +15,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
+acb_theta_ql_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     acb_srcptr dth, slong ord, slong prec)
 {
     slong g = acb_mat_nrows(tau);

@@ -13,7 +13,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_jet_error, state)
+TEST_FUNCTION_START(acb_theta_ql_jet_error, state)
 {
     slong iter;
 
@@ -103,7 +103,7 @@ TEST_FUNCTION_START(acb_theta_jet_error, state)
 
         for (k = 0; k < n; k++)
         {
-            acb_theta_jet_error(err + k * nb, z3, tau3, dth + k * nb_der, ord, lprec);
+            acb_theta_ql_jet_error(err + k * nb, z3, tau3, dth + k * nb_der, ord, lprec);
         }
          /* Errors are wrt midpoint, so multiply by 2 */
         _arb_vec_scalar_mul_2exp_si(err, err, n * nb, 1);

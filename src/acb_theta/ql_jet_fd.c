@@ -70,7 +70,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     {
         for (k = 0; k < nbth; k++)
         {
-            acb_theta_jet_error(err + j * nbth + k, zs + j * g, tau,
+            acb_theta_ql_jet_error(err + j * nbth + k, zs + j * g, tau,
                 dth + j * (nbth * nbjet) + k * nbjet, 0, lp);
         }
     }
@@ -408,7 +408,7 @@ acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb,
     {
         for (k = 0; k < nbth; k++)
         {
-            acb_theta_jet_error(err + j * nbth * nbjet + k * nbjet, zs + j * g,
+            acb_theta_ql_jet_error(err + j * nbth * nbjet + k * nbjet, zs + j * g,
                 tau, dth + j * nbth * nbjet_2 + k * nbjet_2, ord, lp);
         }
     }
