@@ -45,7 +45,7 @@ TEST_FUNCTION_START(acb_theta_jet_all, state)
 
         /* Call jet_all at precision mprec, test against jet_all_notransform */
         acb_theta_jet_all(th, z, nb, tau, ord, mprec);
-        acb_theta_jet_all_notransform(test, z, nb, tau, ord, prec);
+        acb_theta_jet_notransform(test, z, nb, tau, ord, 0, 1, prec);
 
         if (!_acb_vec_overlaps(th, test, nb * n2 * nbth))
         {
