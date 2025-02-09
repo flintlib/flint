@@ -13,7 +13,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
+TEST_FUNCTION_START(acb_theta_ql_jet_fd, state)
 {
     slong iter;
 
@@ -53,7 +53,7 @@ TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
         }
 
         acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, 1, all, prec);
-        acb_theta_jet_notransform_ql(th, zs, nb, tau, ord, all, mprec);
+        acb_theta_ql_jet_fd(th, zs, nb, tau, ord, all, mprec);
 
         /* flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, mprec = %wd, prec = %wd\n",
            g, nb, ord, all, mprec, prec);

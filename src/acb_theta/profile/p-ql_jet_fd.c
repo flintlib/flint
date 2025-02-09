@@ -67,9 +67,9 @@ int main(int argc, char * argv[])
         flint_printf(" %wd", pattern[j]);
     }
 
-    flint_printf("\njet_notransform_ql: ");
+    flint_printf("\nql_jet_fd: ");
     TIMEIT_START;
-    acb_theta_jet_notransform_ql(th, z, 1, tau, ord, all, prec);
+    acb_theta_ql_jet_fd(th, z, 1, tau, ord, all, prec);
     TIMEIT_STOP;
     acb_printd(&th[nbth * nbjet - 1], 5);
     flint_printf("\nsum_jet: ");

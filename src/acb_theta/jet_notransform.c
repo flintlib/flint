@@ -13,61 +13,6 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-/* We make a choice between direct summation or jet_notransform_ql */
-/* See p-jet_notransform_ql */
-
-static void
-acb_theta_jet_notransform_ax(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, int all, slong prec)
-{
-    slong g = acb_mat_nrows(tau);
-    slong guard = ACB_THETA_LOW_PREC;
-    slong * pattern;
-    acb_theta_ctx_tau_t ctx_tau;
-    acb_theta_ctx_z_struct * vec;
-    slong j;
-    int use_sum = 1;
-
-    pattern = flint_malloc(g * sizeof(slong));
-
-    acb_theta_ql_nb_steps(pattern, tau, 0, prec);
-    if (pattern[0] >= 8 + ord)
-    {
-        use_sum = 0;
-    }
-    if (g >= 2 && pattern[1] >= 6 + ord)
-    {
-        use_sum = 0;
-    }
-    if (g >= 3 && pattern[2] >= 7)
-    {
-        use_sum = 0;
-    }
-
-    if (use_sum)
-    {
-        acb_theta_ctx_tau_init(ctx_tau, 0, g);
-        vec = acb_theta_ctx_z_vec_init(nb, g);
-
-        acb_theta_ctx_tau_set(ctx_tau, tau, prec + guard);
-        for (j = 0; j < nb; j++)
-        {
-            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec + guard);
-        }
-
-        acb_theta_sum_jet(th, vec, nb, ctx_tau, ord, 1, all, prec);
-
-        acb_theta_ctx_tau_clear(ctx_tau);
-        acb_theta_ctx_z_vec_clear(vec, nb);
-    }
-    else
-    {
-        acb_theta_jet_notransform_ql(th, zs, nb, tau, ord, all, prec);
-    }
-
-    flint_free(pattern);
-}
-
 /* We use the formula:
    theta_00(z, tau) = sum_a theta_{a,0}(2z, 4tau) */
 
@@ -90,7 +35,7 @@ acb_theta_jet_notransform_00(acb_ptr th, acb_srcptr zs, slong nb,
 
     _acb_vec_scalar_mul_2exp_si(new_zs, zs, nb * g, 1);
     acb_mat_scalar_mul_2exp_si(new_tau, tau, 2);
-    acb_theta_jet_notransform_ax(aux, new_zs, nb, new_tau, ord, 0, prec);
+    acb_theta_ql_jet(aux, new_zs, nb, new_tau, ord, 0, prec);
 
     _acb_vec_zero(th, nb * nbjet);
     acb_theta_jet_tuples(tups, ord, g);
@@ -188,7 +133,7 @@ acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb,
 {
     if (all)
     {
-        acb_theta_jet_notransform_ax(th, zs, nb, tau, ord, 1, prec);
+        acb_theta_ql_jet(th, zs, nb, tau, ord, 1, prec);
     }
     else if (ab == 0)
     {

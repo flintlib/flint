@@ -346,7 +346,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 }
 
 void
-acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
+acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, int all, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -414,7 +414,7 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
     }
     /* Todo: adjust current working precision so that 2^(-prec) is roughly err ? */
 
-    /* flint_printf("(jet_notransform_ql) got derivatives and error bounds:\n");
+    /* flint_printf("(ql_jet_fd) got derivatives and error bounds:\n");
        _acb_vec_printd(dth, nb * nbth * nbjet_2, 5);
        _arb_vec_printd(err, nb * nbth * nbjet, 5); */
 

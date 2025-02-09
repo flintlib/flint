@@ -164,12 +164,13 @@ void acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
 
 void acb_theta_agm_sqrt(acb_ptr res, acb_srcptr a, acb_srcptr roots, slong nb, slong prec);
 void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
+void acb_theta_agm_mul_all(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec);
 void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 void acb_theta_agm_mul_all_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec);
 
-/* Quasilinear algorithms on exact, reduced input */
+/* Quasilinear algorithms on reduced input */
 
 int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec);
 
@@ -185,21 +186,21 @@ int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, s
 void acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     const slong * pattern, int all, int shifted_prec, slong prec);
 
-/* Main functions on reduced input */
-
 void acb_theta_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord);
 void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     acb_srcptr dth, slong ord, slong prec);
 
-void acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
+void acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, int all, slong prec);
-void acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, ulong ab, int all, slong prec);
-
-void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, int sqr, slong prec);
+void acb_theta_ql_jet(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong ord, int all, slong prec);
 
 /* Reduction and main functions */
+
+void acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong ord, ulong ab, int all, slong prec);
+void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, int sqr, slong prec);
 
 int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N,
     acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
