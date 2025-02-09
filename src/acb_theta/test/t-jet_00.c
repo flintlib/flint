@@ -48,7 +48,7 @@ TEST_FUNCTION_START(acb_theta_jet_00, state)
 
         /* Call jet_00 at precision mprec, compare with jet_00_notransform */
         acb_theta_jet_00(th, z, nb, tau, ord, prec);
-        acb_theta_jet_00_notransform(test, z, nb, tau, ord, prec);
+        acb_theta_jet_notransform(test, z, nb, tau, ord, 0, 0, prec);
 
         /* flint_printf("th, test:\n");
         _acb_vec_printd(th, nb * nbth, 5);
