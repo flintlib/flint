@@ -19,7 +19,7 @@
 
 static int usage(char * argv[])
 {
-    flint_printf("usage: %s g prec ord\n", argv[0]);
+    flint_printf("usage: %s g prec ord all\n", argv[0]);
     return 1;
 }
 
@@ -27,15 +27,15 @@ int main(int argc, char * argv[])
 {
     flint_rand_t state;
     slong g, n, ord, prec, nbth, nbjet;
+    int all;
     acb_mat_t tau;
     acb_ptr z, th;
     slong * pattern;
     acb_theta_ctx_tau_t ctx_tau;
     acb_theta_ctx_z_t ctx_z;
     slong j;
-    int all = 1;
 
-    if (argc < 4)
+    if (argc < 5)
     {
         return usage(argv);
     }
@@ -43,6 +43,7 @@ int main(int argc, char * argv[])
     g = atol(argv[1]);
     prec = atol(argv[2]);
     ord = atol(argv[3]);
+    all = atoi(argv[4]);
 
     n = 1 << g;
     nbjet = acb_theta_jet_nb(ord, g);
