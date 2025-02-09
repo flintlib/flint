@@ -58,7 +58,7 @@ acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong pre
         _acb_vec_unit_roots(units, 8, 8, prec);
         kappa = acb_siegel_kappa(s, mat, new_tau, prec);
 
-        acb_theta_one_notransform(th, new_zs, nb, new_tau, ab, prec);
+        acb_theta_jet_notransform(th, new_zs, nb, new_tau, 0, ab, 0, prec);
 
         /* Account for reduce_z */
         for (j = 0; j < nb; j++)

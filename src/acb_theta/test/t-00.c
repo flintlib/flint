@@ -41,7 +41,7 @@ TEST_FUNCTION_START(acb_theta_00, state)
         _acb_vec_scalar_mul_2exp_si(z, z, nb * g, 1);
 
         acb_theta_00(th, z, nb, tau, prec);
-        acb_theta_00_notransform(test, z, nb, tau, prec);
+        acb_theta_jet_notransform(test, z, nb, tau, 0, 0, 0, prec);
 
         /*   flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, tau, z:\n", g, prec, nb);
             acb_mat_printd(tau, 5);

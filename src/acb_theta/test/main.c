@@ -58,7 +58,6 @@
 #include "t-jet_one_notransform.c"
 #include "t-jet_tuples.c"
 #include "t-local_bound.c"
-#include "t-one_notransform.c"
 #include "t-ql_exact.c"
 #include "t-ql_lower_dim.c"
 #include "t-ql_setup.c"
@@ -127,7 +126,6 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_jet_one_notransform),
     TEST_FUNCTION(acb_theta_jet_tuples),
     TEST_FUNCTION(acb_theta_local_bound),
-    TEST_FUNCTION(acb_theta_one_notransform),
     TEST_FUNCTION(acb_theta_ql_exact),
     TEST_FUNCTION(acb_theta_ql_lower_dim),
     TEST_FUNCTION(acb_theta_ql_setup),

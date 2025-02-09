@@ -196,10 +196,6 @@ void acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
 void acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, ulong ab, int all, slong prec);
 
-void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong prec);
-void acb_theta_one_notransform(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, ulong ab, slong prec);
 void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, int sqr, slong prec);
 void acb_theta_jet_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
