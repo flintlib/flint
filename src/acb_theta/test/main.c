@@ -47,8 +47,7 @@
 #include "t-g2_sextic_chi5.c"
 #include "t-g2_transvectant.c"
 #include "t-g2_transvectant_lead.c"
-#include "t-jet_00.c"
-#include "t-jet_all.c"
+#include "t-jet.c"
 #include "t-jet_compose.c"
 #include "t-jet_mul.c"
 #include "t-jet_notransform.c"
@@ -113,8 +112,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_g2_sextic_chi5),
     TEST_FUNCTION(acb_theta_g2_transvectant),
     TEST_FUNCTION(acb_theta_g2_transvectant_lead),
-    TEST_FUNCTION(acb_theta_jet_00),
-    TEST_FUNCTION(acb_theta_jet_all),
+    TEST_FUNCTION(acb_theta_jet),
     TEST_FUNCTION(acb_theta_jet_compose),
     TEST_FUNCTION(acb_theta_jet_mul),
     TEST_FUNCTION(acb_theta_jet_notransform),

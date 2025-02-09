@@ -207,14 +207,12 @@ int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_
 int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
     slong nb, const acb_mat_t tau, slong prec);
 
+void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong ord, int all, slong prec);
 void acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
 void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, int sqr, slong prec);
-void acb_theta_jet_00(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, slong prec);
-void acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, slong prec);
 
 /* Dimension 2 specifics */
 
