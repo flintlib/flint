@@ -13,7 +13,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_jet_error, state)
+TEST_FUNCTION_START(acb_theta_ql_jet_error, state)
 {
     slong iter;
 
@@ -91,19 +91,19 @@ TEST_FUNCTION_START(acb_theta_jet_error, state)
 
         acb_theta_ctx_tau_set(ctx_tau, tau1, hprec);
         acb_theta_ctx_z_set(ctx_z, z1, ctx_tau, hprec);
-        acb_theta_sum_jet(d1, ctx_z, 1, ctx_tau, ord, 1, hprec);
+        acb_theta_sum_jet(d1, ctx_z, 1, ctx_tau, ord, 1, 1, hprec);
 
         acb_theta_ctx_tau_set(ctx_tau, tau2, hprec);
         acb_theta_ctx_z_set(ctx_z, z2, ctx_tau, hprec);
-        acb_theta_sum_jet(d2, ctx_z, 1, ctx_tau, ord, 1, hprec);
+        acb_theta_sum_jet(d2, ctx_z, 1, ctx_tau, ord, 1, 1, hprec);
 
         acb_theta_ctx_tau_set(ctx_tau, tau3, lprec);
         acb_theta_ctx_z_set(ctx_z, z3, ctx_tau, lprec);
-        acb_theta_sum_jet(dth, ctx_z, 1, ctx_tau, ord + 2, 1, lprec);
+        acb_theta_sum_jet(dth, ctx_z, 1, ctx_tau, ord + 2, 1, 1, lprec);
 
         for (k = 0; k < n; k++)
         {
-            acb_theta_jet_error(err + k * nb, z3, tau3, dth + k * nb_der, ord, lprec);
+            acb_theta_ql_jet_error(err + k * nb, z3, tau3, dth + k * nb_der, ord, lprec);
         }
          /* Errors are wrt midpoint, so multiply by 2 */
         _arb_vec_scalar_mul_2exp_si(err, err, n * nb, 1);

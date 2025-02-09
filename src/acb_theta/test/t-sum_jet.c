@@ -21,16 +21,19 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
 
     /* Test: matches acb_modular_theta_jet in genus 1;
        agrees with product of dim 1 case on diagonal matrices */
-    for (iter = 0; iter < 25 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
-        slong n2 = 1 << (2 * g);
+        slong n = 1 << g;
         slong mprec = 100 + n_randint(state, 100);
         slong prec = mprec + 50;
         slong ord = n_randint(state, 3);
         slong bits = n_randint(state, 4);
         slong nbz = n_randint(state, 3);
-        slong nbth = acb_theta_jet_nb(ord, g);
+        slong nbjet = acb_theta_jet_nb(ord, g);
+        int all_a = n_randint(state, 2);
+        int all_b = n_randint(state, 2);
+        slong nbth = (all_a ? n : 1) * (all_b ? n : 1);
         acb_mat_t tau, tau11;
         acb_ptr zs;
         acb_theta_ctx_tau_t ctx_tau;
@@ -43,9 +46,9 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
         zs = _acb_vec_init(nbz * g);
         acb_theta_ctx_tau_init(ctx_tau, 0, g);
         vec = acb_theta_ctx_z_vec_init(nbz, g);
-        th = _acb_vec_init(nbz * nbth * n2);
+        th = _acb_vec_init(nbz * nbjet * nbth);
         aux = _acb_vec_init(nbz * 4 * (ord + 1));
-        test = _acb_vec_init(nbz * nbth * n2);
+        test = _acb_vec_init(nbz * nbjet * nbth);
 
         /* Sample diagonal matrix tau */
         for (j = 0; j < g; j++)
@@ -61,29 +64,25 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 1, mprec);
+        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, all_a, all_b, mprec);
 
         if (g == 1)
         {
-            /* Call acb_modular_theta_jet */
+            /* Make test vector using acb_modular_theta_jet */
             for (j = 0; j < nbz; j++)
             {
-                acb_modular_theta_jet(aux + 3 * nbth, aux + 2 * nbth, aux,
-                    aux + nbth, &zs[j], acb_mat_entry(tau, 0, 0), nbth, prec);
-                _acb_vec_neg(aux + 3 * nbth, aux + 3 * nbth, nbth);
-                _acb_vec_set(test + j * 4 * nbth, aux, 4 * nbth);
-            }
-            if (!_acb_vec_overlaps(th, test, n2 * nbz * nbth))
-            {
-                flint_printf("FAIL (g = 1, ord = %wd, nbz = %wd, mprec = %wd, prec = %wd)\n",
-                    ord, nbz, mprec, prec);
-                acb_mat_printd(tau, 5);
-                _acb_vec_printd(zs, nbz * g, 5);
-                flint_printf("th: ");
-                _acb_vec_printd(th, nbz * n2 * nbth, 5);
-                flint_printf("test: ");
-                _acb_vec_printd(test, nbz * n2 * nbth, 5);
-                flint_abort();
+                acb_modular_theta_jet(aux + 3 * nbjet, aux + 2 * nbjet, aux,
+                    aux + nbjet, &zs[j], acb_mat_entry(tau, 0, 0), nbjet, prec);
+                _acb_vec_neg(aux + 3 * nbjet, aux + 3 * nbjet, nbjet);
+                if (all_a && !all_b)
+                {
+                    _acb_vec_set(test + 2 * j * nbjet, aux, nbjet);
+                    _acb_vec_set(test + (2 * j + 1) * nbjet, aux + 2 * nbjet, nbjet);
+                }
+                else
+                {
+                    _acb_vec_set(test + j * nbth * nbjet, aux, nbth * nbjet);
+                }
             }
         }
         else
@@ -94,12 +93,12 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
             acb_theta_ctx_z_struct * vec_g1;
             ulong ab, a1b1;
 
-            tups = flint_malloc(nbth * g * sizeof(slong));
+            tups = flint_malloc(nbjet * g * sizeof(slong));
             acb_theta_ctx_tau_init(ctx_tau11, 0, 1);
             vec_g1 = acb_theta_ctx_z_vec_init(nbz, 1);
 
             acb_theta_jet_tuples(tups, ord, g);
-            for (j = 0; j < n2 * nbth * nbz; j++)
+            for (j = 0; j < nbth * nbjet * nbz; j++)
             {
                 acb_one(&test[j]);
             }
@@ -113,33 +112,29 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
                     acb_theta_ctx_z_set(&vec_g1[j], &zs[j * g + k], ctx_tau11, prec);
                 }
 
-                acb_theta_sum_jet(aux, vec_g1, nbz, ctx_tau11, ord, 1, prec);
+                acb_theta_sum_jet(aux, vec_g1, nbz, ctx_tau11, ord, 1, 1, prec);
 
                 for (j = 0; j < nbz; j++)
                 {
-                    for (ab = 0; ab < n2; ab++)
+                    for (ab = 0; ab < nbth; ab++)
                     {
-                        a1b1 = 2 * ((ab >> (2 * g - k - 1)) % 2) + ((ab >> (g - k - 1)) % 2);
-                        for (l = 0; l < nbth; l++)
+                        if (all_a && !all_b)
                         {
-                            acb_mul(&test[j * n2 * nbth + ab * nbth + l],
-                                &test[j * n2 * nbth + ab * nbth + l],
+                            /* ab actually encodes the characteristic n * ab */
+                            a1b1 = 2 * ((ab >> (g - k - 1)) % 2);
+                        }
+                        else
+                        {
+                            a1b1 = 2 * ((ab >> (2 * g - k - 1)) % 2) + ((ab >> (g - k - 1)) % 2);
+                        }
+                        for (l = 0; l < nbjet; l++)
+                        {
+                            acb_mul(&test[j * nbth * nbjet + ab * nbjet + l],
+                                &test[j * nbth * nbjet + ab * nbjet + l],
                                 &aux[j * 4 * (ord + 1) + a1b1 * (ord + 1) + tups[l * g + k]], prec);
                         }
                     }
                 }
-            }
-            if (!_acb_vec_overlaps(th, test, n2 * nbz * nbth))
-            {
-                flint_printf("FAIL (g = %wd, ord = %wd, nbz = %wd, mprec = %wd, prec = %wd)\n",
-                    g, ord, nbz, mprec, prec);
-                acb_mat_printd(tau, 5);
-                _acb_vec_printd(zs, nbz * g, 5);
-                flint_printf("th: ");
-                _acb_vec_printd(th, nbz * n2 * nbth, 5);
-                flint_printf("test: ");
-                _acb_vec_printd(test, nbz * n2 * nbth, 5);
-                flint_abort();
             }
 
             flint_free(tups);
@@ -147,22 +142,16 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
             acb_theta_ctx_z_vec_clear(vec_g1, nbz);
         }
 
-        /* Check that calling sum_jet with all = 0 gives the right answers */
-        for (j = 0; j < nbz; j++)
+        if (!_acb_vec_overlaps(th, test, nbth * nbz * nbjet))
         {
-            _acb_vec_set(test + j * nbth, test + j * n2 * nbth, nbth);
-        }
-        acb_theta_sum_jet(th, vec, nbz, ctx_tau, ord, 0, mprec);
-        if (!_acb_vec_overlaps(th, test, nbz * nbth))
-        {
-            flint_printf("FAIL (all = 0, g = %wd, ord = %wd, nbz = %wd, mprec = %wd, prec = %wd)\n",
-                g, ord, nbz, mprec, prec);
+            flint_printf("FAIL (g = %wd, ord = %wd, nbz = %wd, all_a = %wd, all_b = %wd, mprec = %wd, prec = %wd)\n",
+                g, ord, nbz, all_a, all_b, mprec, prec);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(zs, nbz * g, 5);
             flint_printf("th: ");
-            _acb_vec_printd(th, nbz * nbth, 5);
+            _acb_vec_printd(th, nbz * nbth * nbjet, 5);
             flint_printf("test: ");
-            _acb_vec_printd(test, nbz * nbth, 5);
+            _acb_vec_printd(test, nbz * nbth * nbjet, 5);
             flint_abort();
         }
 
@@ -171,9 +160,9 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
         _acb_vec_clear(zs, nbz * g);
         acb_theta_ctx_tau_clear(ctx_tau);
         acb_theta_ctx_z_vec_clear(vec, nbz);
-        _acb_vec_clear(th, nbz * n2 * nbth);
+        _acb_vec_clear(th, nbz * nbth * nbjet);
         _acb_vec_clear(aux, nbz * 4 * (ord + 1));
-        _acb_vec_clear(test, nbz * n2 * nbth);
+        _acb_vec_clear(test, nbz * nbth * nbjet);
     }
 
     TEST_FUNCTION_END(state);

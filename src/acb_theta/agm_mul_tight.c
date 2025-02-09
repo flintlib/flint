@@ -50,7 +50,7 @@ acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr d,
 /* This is assuming a0 corresponds to theta constants */
 void
 acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
-    arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+    arb_srcptr d0, arb_srcptr d, slong g, int all, slong prec)
 {
     slong n = 1 << g;
     slong lp = ACB_THETA_LOW_PREC;
@@ -58,7 +58,7 @@ acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     acb_ptr v0, v;
     arf_t m0, m, eps0, eps, e;
     arb_t err;
-    slong k;
+    slong k, b;
 
     v0 = _acb_vec_init(n);
     v = _acb_vec_init(n);
@@ -82,14 +82,14 @@ acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     /* Perform agm_mul or agm_sqr at high precision */
     if (a0 == a)
     {
-        acb_theta_agm_mul(res, v0, v0, g, hprec);
+        acb_theta_agm_mul(res, v0, v0, g, all, hprec);
     }
     else
     {
-        acb_theta_agm_mul(res, v0, v, g, hprec);
+        acb_theta_agm_mul(res, v0, v, g, all, hprec);
     }
 
-    /* New relative error wrt distances is m0 eps + m eps0 + eps0 eps */
+    /* New relative error wrt distances is 2^g (m0 eps + m eps0 + eps0 eps) */
     arf_mul(e, m0, eps, lp, ARF_RND_CEIL);
     arf_addmul(e, m, eps0, lp, ARF_RND_CEIL);
     arf_addmul(e, eps, eps0, lp, ARF_RND_CEIL);
@@ -99,7 +99,19 @@ acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
         arb_neg(err, &d[k]);
         arb_exp(err, err, lp);
         arb_mul_arf(err, err, e, lp);
-        acb_add_error_arb(&res[k], err);
+        arb_mul_2exp_si(err, err, g);
+
+        if (all)
+        {
+            for (b = 0; b < n; b++)
+            {
+                acb_add_error_arb(&res[k * n + b], err);
+            }
+        }
+        else
+        {
+            acb_add_error_arb(&res[k], err);
+        }
     }
 
     _acb_vec_clear(v0, n);

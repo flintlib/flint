@@ -13,7 +13,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_local_bound, state)
+TEST_FUNCTION_START(acb_theta_ql_local_bound, state)
 {
     slong iter;
 
@@ -54,7 +54,7 @@ TEST_FUNCTION_START(acb_theta_local_bound, state)
             acb_urandom(&z[k], state, prec);
         }
 
-        acb_theta_local_bound(c, rho, z, tau, ord);
+        acb_theta_ql_local_bound(c, rho, z, tau, ord);
 
         if (!arb_is_finite(rho) || !arb_is_finite(c))
         {

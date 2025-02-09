@@ -388,8 +388,7 @@ acb_theta_ql_step_1(acb_ptr res, acb_srcptr th0, acb_srcptr th, acb_srcptr rts,
 {
     slong n = 1 << g;
 
-    acb_theta_agm_mul_tight(res, th0, th, d0, d, g, prec);
-    _acb_vec_scalar_mul_2exp_si(res, res, n, g);
+    acb_theta_agm_mul_tight(res, th0, th, d0, d, g, 0, prec);
     acb_theta_agm_sqrt(res, res, rts, n, prec);
 }
 
@@ -422,8 +421,8 @@ acb_theta_ql_perform_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
             if (k == 0 && all && easy_steps[j] > k)
             {
                 /* Compute all theta_ab with an easy step */
-                acb_theta_agm_mul_all_tight(th + j * n * n, th_init,
-                    th_init + 3 * j * n, d0, d, g, prec);
+                acb_theta_agm_mul_tight(th + j * n * n, th_init,
+                    th_init + 3 * j * n, d0, d, g, 1, prec);
                 acb_theta_agm_sqrt(th + j * n * n, th + j * n * n,
                     rts_all + j * n * n, n * n, prec);
             }
@@ -431,11 +430,11 @@ acb_theta_ql_perform_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
             {
                 /* Compute all theta_ab with a harder step */
                 /* Store theta_ab(2t, tau) in aux */
-                acb_theta_agm_mul_all_tight(aux, th_init,
-                    th_init + 3 * j * n + 2 * n, d0, d, g, prec);
+                acb_theta_agm_mul_tight(aux, th_init,
+                    th_init + 3 * j * n + 2 * n, d0, d, g, 1, prec);
                 acb_theta_agm_sqrt(aux, aux, rts_all + j * n * n, n * n, prec);
-                acb_theta_agm_mul_all_tight(th + j * n * n, th_init + n,
-                    th_init + 3 * j * n + n, d0, d, g, prec);
+                acb_theta_agm_mul_tight(th + j * n * n, th_init + n,
+                    th_init + 3 * j * n + n, d0, d, g, 1, prec);
                 for (a = 0; a < n * n; a++)
                 {
                     acb_div(&th[j * n * n + a], &th[j * n * n + a],
@@ -464,9 +463,7 @@ acb_theta_ql_perform_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
                     /* theta(z, tau) theta(z + 2t, tau)
                        = sum of theta(2t, 2tau) theta(2z + 2t, 2tau) */
                     acb_theta_agm_mul_tight(th_next + 3 * j * n, th_init + n,
-                        th_init + 3 * j * n + n, d0, d, g, prec);
-                    _acb_vec_scalar_mul_2exp_si(th_next + 3 * j * n,
-                        th_next + 3 * j * n, n, g);
+                        th_init + 3 * j * n + n, d0, d, g, 0, prec);
                     for (a = 0; a < n; a++)
                     {
                         acb_div(&th_next[3 * j * n + a], &th_next[3 * j * n + a],

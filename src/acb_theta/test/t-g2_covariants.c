@@ -66,15 +66,15 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         sp2gz_randtest(mat, state, bits);
 
-        acb_theta_all(th2, z, 1, tau, 1, prec);
+        acb_theta_all(th2, z, tau, 1, prec);
         acb_theta_g2_psi4(psi4, th2, prec);
         acb_theta_g2_sextic(u, tau, prec);
-        acb_theta_g2_covariants(cov1, u, prec);
+        acb_theta_g2_covariants(cov1, u, 0, prec);
 
         acb_siegel_transform(w, mat, tau, prec);
         acb_siegel_cocycle(c, mat, tau, prec);
         acb_theta_g2_sextic(u, w, prec);
-        acb_theta_g2_covariants(cov2, u, prec);
+        acb_theta_g2_covariants(cov2, u, 0, prec);
 
         /* Test psi4 */
         acb_poly_set_si(u, -3);
@@ -127,13 +127,37 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         {
             acb_poly_set_coeff_si(u, k, n_randint(state, 10));
         }
-        acb_theta_g2_covariants(cov1, u, prec);
+        acb_theta_g2_covariants(cov1, u, 0, prec);
         for (k = 0; k < 26; k++)
         {
             if (!acb_poly_get_unique_fmpz_poly(pol, &cov1[k]))
             {
                 flint_printf("FAIL (integrality, k = %wd)\n", k);
                 acb_poly_printd(&cov1[k], 5);
+                flint_printf("\n");
+                flint_abort();
+            }
+        }
+
+        /* Test leading coefficients */
+        acb_theta_g2_covariants(cov2, u, 1, prec);
+        for (k = 0; k < 26; k++)
+        {
+            if (acb_poly_degree(&cov2[k]) > 0)
+            {
+                flint_printf("FAIL (degree, k = %wd)\n", k);
+                acb_poly_printd(&cov2[k], 5);
+                flint_printf("\n");
+                flint_abort();
+            }
+            acb_poly_get_coeff_acb(psi4, &cov2[k], 0);
+            acb_poly_get_coeff_acb(test, &cov1[k], jlist[k]);
+            if (!acb_overlaps(psi4, test))
+            {
+                flint_printf("FAIL (leading coefficient, k = %wd)\n", k);
+                acb_poly_printd(&cov1[k], 5);
+                flint_printf("\n");
+                acb_poly_printd(&cov2[k], 5);
                 flint_printf("\n");
                 flint_abort();
             }

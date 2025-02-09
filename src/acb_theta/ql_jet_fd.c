@@ -70,7 +70,7 @@ acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     {
         for (k = 0; k < nbth; k++)
         {
-            acb_theta_jet_error(err + j * nbth + k, zs + j * g, tau,
+            acb_theta_ql_jet_error(err + j * nbth + k, zs + j * g, tau,
                 dth + j * (nbth * nbjet) + k * nbjet, 0, lp);
         }
     }
@@ -246,7 +246,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     hprec = prec;
     for (j = 0; (j < nb) && res; j++)
     {
-        acb_theta_local_bound(&c[j], &rho[j], zs + j * g, tau, ord);
+        acb_theta_ql_local_bound(&c[j], &rho[j], zs + j * g, tau, ord);
         acb_theta_jet_finite_diff_radius(arb_midref(&eps[j]), arb_midref(&err[j]),
             &c[j], &rho[j], ord, g, prec);
 
@@ -292,8 +292,8 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         /* Call ql_inexact (as zetas is inexact). We can reuse entries from dth
            here, because all the auxiliary points are contained in the vector
            zs where dth was initially computed. */
-        /* Todo ? If ord = 1 or ord = 3, then zetas is exact. Don't make a
-           special case because ql_inexact doesn't have a lot of overhead */
+        /* If ord = 1 or ord = 3, then zetas is exact. We don't make a special
+           case because ql_inexact doesn't have a lot of overhead */
         for (j = 0; j < nb; j++)
         {
             for (k = 0; k < nbaux; k++)
@@ -346,7 +346,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 }
 
 void
-acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
+acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, int all, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -394,7 +394,7 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lp + ACB_THETA_LOW_PREC);
         }
-        acb_theta_sum_jet(dth, vec, nb, ctx_tau, ord + 2, 1, lp); /* todo: only _a0 if all=0 */
+        acb_theta_sum_jet(dth, vec, nb, ctx_tau, ord + 2, 1, all, lp);
         if (_acb_vec_is_finite(dth, nb * nbth * nbjet_2))
         {
             res = 1;
@@ -408,13 +408,13 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
     {
         for (k = 0; k < nbth; k++)
         {
-            acb_theta_jet_error(err + j * nbth * nbjet + k * nbjet, zs + j * g,
+            acb_theta_ql_jet_error(err + j * nbth * nbjet + k * nbjet, zs + j * g,
                 tau, dth + j * nbth * nbjet_2 + k * nbjet_2, ord, lp);
         }
     }
     /* Todo: adjust current working precision so that 2^(-prec) is roughly err ? */
 
-    /* flint_printf("(jet_notransform_ql) got derivatives and error bounds:\n");
+    /* flint_printf("(ql_jet_fd) got derivatives and error bounds:\n");
        _acb_vec_printd(dth, nb * nbth * nbjet_2, 5);
        _arb_vec_printd(err, nb * nbth * nbjet, 5); */
 

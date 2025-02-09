@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Jean Kieffer
+    Copyright (C) 2025 Jean Kieffer
 
     This file is part of FLINT.
 
@@ -15,12 +15,14 @@
 #include "acb_theta.h"
 
 void
-acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
-    slong ord, slong prec)
+acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
+    slong ord, int all, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n2 = 1 << (2 * g);
-    slong nbth = acb_theta_jet_nb(ord, g);
+    slong n = 1 << g;
+    slong nbth = (all ? n * n : 1);
+    slong nbjet = acb_theta_jet_nb(ord, g);
+    slong nbu = (sqr ? 4 : 8);
     fmpz_mat_t mat;
     acb_mat_t new_tau, N, ct;
     acb_ptr new_zs, exps, cs, aux, units, jet;
@@ -44,43 +46,48 @@ acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     new_zs = _acb_vec_init(nb * g);
     exps = _acb_vec_init(nb);
     cs = _acb_vec_init(nb);
-    aux = _acb_vec_init(n2 * nb * nbth);
+    aux = _acb_vec_init(nbth * nb * nbjet);
     units = _acb_vec_init(8);
-    jet = _acb_vec_init(nbth);
+    jet = _acb_vec_init(nbjet);
     rs = _arb_vec_init(nb * g);
     r = _arb_vec_init(g);
     acb_init(s);
     acb_init(t);
-    ch = flint_malloc(n2 * sizeof(ulong));
-    e = flint_malloc(n2 * sizeof(slong));
+    ch = flint_malloc(nbth * sizeof(ulong));
+    e = flint_malloc(nbth * sizeof(slong));
 
     res = acb_theta_reduce_tau(new_zs, new_tau, mat, N, ct, exps, zs, nb, tau, prec);
     if (res)
     {
         res = acb_theta_reduce_z(new_zs, rs, cs, new_zs, nb, new_tau, prec);
     }
+    sqr = sqr && (ord == 0);
 
     if (res)
     {
         /* Setup */
-        _acb_vec_unit_roots(units, 8, 8, prec);
-        kappa = acb_siegel_kappa(s, mat, new_tau, prec);
-        acb_theta_char_table(ch, e, mat, -1);
+        _acb_vec_unit_roots(units, nbu, nbu, prec);
+        kappa = acb_siegel_kappa(s, mat, new_tau, sqr, prec);
+        acb_theta_char_table(ch, e, mat, (all ? -1 : 0));
 
-        acb_theta_jet_all_notransform(aux, new_zs, nb, new_tau, ord, prec);
+        acb_theta_jet_notransform(aux, new_zs, nb, new_tau, ord, *ch, all, sqr, prec);
 
         /* Account for reduce_z */
         for (j = 0; j < nb; j++)
         {
-            _acb_vec_scalar_mul(aux + j * n2 * nbth, aux + j * n2 * nbth,
-                n2 * nbth, &cs[j], prec);
+            if (sqr)
+            {
+                acb_sqr(&cs[j], &cs[j], prec);
+            }
+            _acb_vec_scalar_mul(aux + j * nbth * nbjet, aux + j * nbth * nbjet,
+                nbth * nbjet, &cs[j], prec);
             _arb_vec_neg(r, rs + j * g, g);
             _arb_vec_scalar_mul_2exp_si(r, r, g, 1);
             acb_theta_jet_exp_pi_i(jet, r, ord, g, prec);
-            for (ab = 0; ab < n2; ab++)
+            for (ab = 0; ab < nbth; ab++)
             {
-                acb_theta_jet_mul(aux + j * n2 * nbth + ab * nbth,
-                    aux + j * n2 * nbth + ab * nbth, jet, ord, g, prec);
+                acb_theta_jet_mul(aux + j * nbth * nbjet + ab * nbjet,
+                    aux + j * nbth * nbjet + ab * nbjet, jet, ord, g, prec);
                 /* No signs because 2r is divisible by 4 */
             }
         }
@@ -89,22 +96,27 @@ acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         for (j = 0; j < nb; j++)
         {
             acb_theta_jet_exp_qf(jet, zs + j * g, N, ord, prec);
-
-            for (ab = 0; ab < n2; ab++)
+            if (sqr)
             {
-                acb_mul(t, s, &units[(kappa + e[ab]) % 8], prec);
-                _acb_vec_scalar_mul(th + j * n2 * nbth + ab * nbth,
-                    aux + j * n2 * nbth + ch[ab] * nbth, nbth, t, prec);
-                acb_theta_jet_compose(th + j * n2 * nbth + ab * nbth,
-                    th + j * n2 * nbth + ab * nbth, ct, ord, prec);
-                acb_theta_jet_mul(th + j * n2 * nbth + ab * nbth,
-                    th + j * n2 * nbth + ab * nbth, jet, ord, g, prec);
+                acb_sqr(&jet[0], &jet[0], prec);
+            }
+
+            for (ab = 0; ab < nbth; ab++)
+            {
+                acb_mul(t, s, &units[(kappa + e[ab]) % (sqr ? 4 : 8)], prec);
+                _acb_vec_scalar_mul(th + j * nbth * nbjet + ab * nbjet,
+                    aux + j * nbth * nbjet + (all ? ch[ab] : 0) * nbjet,
+                    nbjet, t, prec);
+                acb_theta_jet_compose(th + j * nbth * nbjet + ab * nbjet,
+                    th + j * nbth * nbjet + ab * nbjet, ct, ord, prec);
+                acb_theta_jet_mul(th + j * nbth * nbjet + ab * nbjet,
+                    th + j * nbth * nbjet + ab * nbjet, jet, ord, g, prec);
             }
         }
     }
     else
     {
-        _acb_vec_indeterminate(th, nb * n2 * nbth);
+        _acb_vec_indeterminate(th, nb * nbth * nbjet);
     }
 
     fmpz_mat_clear(mat);
@@ -114,9 +126,9 @@ acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     _acb_vec_clear(new_zs, nb * g);
     _acb_vec_clear(exps, nb);
     _acb_vec_clear(cs, nb);
-    _acb_vec_clear(aux, nb * n2 * nbth);
+    _acb_vec_clear(aux, nb * nbth * nbjet);
     _acb_vec_clear(units, 8);
-    _acb_vec_clear(jet, nbth);
+    _acb_vec_clear(jet, nbjet);
     _arb_vec_clear(rs, nb * g);
     _arb_vec_clear(r, g);
     acb_clear(s);

@@ -189,7 +189,7 @@ acb_siegel_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
 
 static slong
 acb_siegel_kappa_g1(acb_t sqrtdet, const fmpz_mat_t mat, const fmpz_mat_t x,
-    const acb_mat_t tau, slong prec)
+    const acb_mat_t tau, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     psl2z_t y;
@@ -209,9 +209,12 @@ acb_siegel_kappa_g1(acb_t sqrtdet, const fmpz_mat_t mat, const fmpz_mat_t x,
 
     acb_modular_theta_transform(R, S, &C, y);
 
-    acb_mul_fmpz(sqrtdet, acb_mat_entry(tau, 0, 0), &y->c, prec);
-    acb_add_fmpz(sqrtdet, sqrtdet, &y->d, prec);
-    acb_sqrt(sqrtdet, sqrtdet, prec);
+    if (!sqr)
+    {
+        acb_mul_fmpz(sqrtdet, acb_mat_entry(tau, 0, 0), &y->c, prec);
+        acb_add_fmpz(sqrtdet, sqrtdet, &y->d, prec);
+        acb_sqrt(sqrtdet, sqrtdet, prec);
+    }
 
     /* find out where theta_00 is going */
     if (S[2] == 1) /* theta_2 */
@@ -243,7 +246,7 @@ acb_siegel_kappa_g1(acb_t sqrtdet, const fmpz_mat_t mat, const fmpz_mat_t x,
 }
 
 static slong
-acb_siegel_kappa_j(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+acb_siegel_kappa_j(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, int sqr, slong prec)
 {
     slong g = sp2gz_dim(mat);
     fmpz_mat_t gamma;
@@ -256,9 +259,12 @@ acb_siegel_kappa_j(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slo
 
     /* Mumford: theta_00(mtau) = det(tau0/i)^{1/2} theta_00(tau), and
        transform_sqrtdet(tau0) = i^{r/2} det(tau0/i)^{1/2} */
-    acb_mat_window_init(tau0, tau, 0, 0, r, r);
-    acb_siegel_sqrtdet(sqrtdet, tau0, prec);
-    acb_mat_window_clear(tau0);
+    if (!sqr)
+    {
+        acb_mat_window_init(tau0, tau, 0, 0, r, r);
+        acb_siegel_sqrtdet(sqrtdet, tau0, prec);
+        acb_mat_window_clear(tau0);
+    }
 
     res = -r;
     if (r % 2 == 1)
@@ -270,7 +276,7 @@ acb_siegel_kappa_j(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slo
 }
 
 slong
-acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     fmpz_mat_struct * dec;
@@ -295,6 +301,9 @@ acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong
 
     for (k = nb_dec - 1; k >= 0; k--)
     {
+        /* c keeps track of sqrtdet; only meaningful when sqr is false */
+        acb_one(c);
+
         if (sp2gz_is_trig(&dec[k]) || sp2gz_is_block_diag(&dec[k]))
         {
             /* theta_00(mtau) = theta_ab(tau) */
@@ -302,14 +311,13 @@ acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong
             fmpz_mat_det(det, delta);
             fmpz_mat_window_clear(delta);
 
-            if (fmpz_is_one(det))
+            if (!fmpz_is_one(det))
             {
-                acb_one(c);
-            }
-            else
-            {
-                acb_onei(c);
                 res -= 2;
+                if (!sqr)
+                {
+                    acb_onei(c);
+                }
             }
         }
         else if (sp2gz_is_embedded(x, &dec[k]))
@@ -319,21 +327,32 @@ acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong
                     && fmpz_cmp_si(fmpz_mat_entry(x, 1, 1), 0) < 0))
             {
                 fmpz_mat_neg(x, x);
-                res += acb_siegel_kappa_g1(c, &dec[k], x, w, prec);
+                res += acb_siegel_kappa_g1(c, &dec[k], x, w, sqr, prec);
                 acb_div_onei(c, c);
                 res += 2;
             }
             else
             {
-                res += acb_siegel_kappa_g1(c, &dec[k], x, w, prec);
+                res += acb_siegel_kappa_g1(c, &dec[k], x, w, sqr, prec);
             }
         }
         else /* embedded j */
         {
-            res += acb_siegel_kappa_j(c, &dec[k], w, prec);
+            res += acb_siegel_kappa_j(c, &dec[k], w, sqr, prec);
         }
-        acb_siegel_transform(w, &dec[k], w, prec);
-        acb_mul(sqrtdet, sqrtdet, c, prec);
+
+        if (!sqr)
+        {
+            acb_siegel_transform(w, &dec[k], w, prec);
+            acb_mul(sqrtdet, sqrtdet, c, prec);
+        }
+    }
+
+    /* Compute det if sqr is true */
+    if (sqr)
+    {
+        acb_siegel_cocycle(w, mat, tau, prec);
+        acb_mat_det(sqrtdet, w, prec);
     }
 
     /* Adjust final sign based on transformation of coordinates */
@@ -354,5 +373,5 @@ acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong
         fmpz_mat_clear(&dec[k]);
     }
     flint_free(dec);
-    return res & 7;
+    return res & (sqr ? 3 : 7);
 }

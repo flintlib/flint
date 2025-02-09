@@ -40,7 +40,7 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
 
     if (acb_siegel_is_reduced(w, -10, prec))
     {
-        acb_theta_jet_all_notransform(dth, zero, 1, w, 1, prec);
+        acb_theta_jet_notransform(dth, zero, 1, w, 1, 0, 1, 0, prec);
 
         for (k = 0; k < n2; k++)
         {
@@ -62,32 +62,11 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
     }
     else
     {
-        /* Use local_bound to avoid returning NaN */
-        arb_t c, rho;
-        arb_init(c);
-        arb_init(rho);
-
-        acb_theta_local_bound(c, rho, zero, tau, 0);
-        for (k = 0; k < nb * n2; k++)
+        acb_indeterminate(chi5);
+        for (k = 0; k < 6; k++)
         {
-            arb_zero_pm_one(acb_realref(&dth[k]));
-            arb_zero_pm_one(acb_imagref(&dth[k]));
-            acb_mul_arb(&dth[k], &dth[k], c, prec);
-            if (k % nb != 0) /* order 1 */
-            {
-                acb_div_arb(&dth[k], &dth[k], rho, prec);
-            }
+            acb_poly_set_coeff_acb(res, k, chi5);
         }
-
-        for (k = 0; k < n2; k++)
-        {
-            acb_set(&th[k], &dth[k * nb]);
-        }
-        acb_theta_g2_chi3_6(res, dth, prec);
-        acb_theta_g2_chi5(chi5, th, prec);
-
-        arb_clear(c);
-        arb_clear(rho);
     }
 
     fmpz_mat_clear(mat);

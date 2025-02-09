@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -25,6 +26,8 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         slong mprec = 100 + n_randint(state, 200);
         slong prec = mprec + 50;
         slong bits = n_randint(state, 2);
+        int all = iter % 2;
+        slong nbth = (all ? n * n : n);
         acb_mat_t tau;
         acb_ptr z;
         acb_theta_ctx_tau_t ctx_tau;
@@ -38,9 +41,9 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_ctx_tau_init(ctx_tau, 1, g);
         acb_theta_ctx_z_init(ctx0, g);
         acb_theta_ctx_z_init(ctx, g);
-        th2 = _acb_vec_init(2 * n);
+        th2 = _acb_vec_init(2 * nbth);
         th_dupl = _acb_vec_init(2 * n);
-        test = _acb_vec_init(2 * n);
+        test = _acb_vec_init(2 * nbth);
         ds = _arb_vec_init(2 * n);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
@@ -52,9 +55,9 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_eld_distances(ds, z, 2, tau, prec);
 
         /* Make test vector using sum, squared */
-        acb_theta_sum(test, ctx0, 1, ctx_tau, ds, 1, 0, 1, prec);
-        acb_theta_sum(test + n, ctx, 1, ctx_tau, ds + n, 1, 0, 1, prec);
-        for (j = 0; j < 2 * n; j++)
+        acb_theta_sum(test, ctx0, 1, ctx_tau, ds, 1, all, 1, prec);
+        acb_theta_sum(test + nbth, ctx, 1, ctx_tau, ds + n, 1, all, 1, prec);
+        for (j = 0; j < 2 * nbth; j++)
         {
             acb_sqr(&test[j], &test[j], prec);
         }
@@ -68,22 +71,21 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_sum(th_dupl + n, ctx, 1, ctx_tau, ds + n, 1, 0, 1, prec);
 
         /* Call agm_mul at precision mprec and compare with test */
-        acb_theta_agm_mul(th2, th_dupl, th_dupl, g, mprec);
-        acb_theta_agm_mul(th2 + n, th_dupl, th_dupl + n, g, mprec);
-        _acb_vec_scalar_mul_2exp_si(th2, th2, 2 * n, g);
+        acb_theta_agm_mul(th2, th_dupl, th_dupl, g, all, mprec);
+        acb_theta_agm_mul(th2 + nbth, th_dupl, th_dupl + n, g, all, mprec);
 
-        if (!_acb_vec_overlaps(test, th2, 2 * n))
+        if (!_acb_vec_overlaps(test, th2, 2 * nbth))
         {
             flint_printf("FAIL (overlap)\n");
             flint_printf("g = %wd, prec = %wd, tau, z:\n", g, prec);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, 2 * g, 5);
             flint_printf("th2:\n");
-            _acb_vec_printd(th2, 2 * n, 5);
+            _acb_vec_printd(th2, 2 * nbth, 5);
             flint_printf("th_dupl:\n");
             _acb_vec_printd(th_dupl, 2 * n, 5);
             flint_printf("test:\n");
-            _acb_vec_printd(test, 2 * n, 5);
+            _acb_vec_printd(test, 2 * nbth, 5);
             flint_abort();
         }
 
@@ -92,9 +94,9 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_ctx_tau_clear(ctx_tau);
         acb_theta_ctx_z_clear(ctx0);
         acb_theta_ctx_z_clear(ctx);
-        _acb_vec_clear(th2, 2 * n);
+        _acb_vec_clear(th2, 2 * nbth);
         _acb_vec_clear(th_dupl, 2 * n);
-        _acb_vec_clear(test, 2 * n);
+        _acb_vec_clear(test, 2 * nbth);
         _arb_vec_clear(ds, 2 * n);
     }
 
