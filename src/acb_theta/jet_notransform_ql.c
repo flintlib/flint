@@ -292,8 +292,8 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         /* Call ql_inexact (as zetas is inexact). We can reuse entries from dth
            here, because all the auxiliary points are contained in the vector
            zs where dth was initially computed. */
-        /* Todo ? If ord = 1 or ord = 3, then zetas is exact. Don't make a
-           special case because ql_inexact doesn't have a lot of overhead */
+        /* If ord = 1 or ord = 3, then zetas is exact. We don't make a special
+           case because ql_inexact doesn't have a lot of overhead */
         for (j = 0; j < nb; j++)
         {
             for (k = 0; k < nbaux; k++)
@@ -394,7 +394,7 @@ acb_theta_jet_notransform_ql(acb_ptr th, acb_srcptr zs, slong nb,
         {
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, lp + ACB_THETA_LOW_PREC);
         }
-        acb_theta_sum_jet(dth, vec, nb, ctx_tau, ord + 2, 1, 1, lp); /* todo: only _a0 if all=0 */
+        acb_theta_sum_jet(dth, vec, nb, ctx_tau, ord + 2, 1, all, lp);
         if (_acb_vec_is_finite(dth, nb * nbth * nbjet_2))
         {
             res = 1;

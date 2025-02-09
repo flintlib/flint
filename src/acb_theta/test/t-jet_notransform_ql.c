@@ -21,7 +21,7 @@ TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
-        int all = 1;
+        int all = iter % 2;
         slong n = 1 << g;
         slong nbth = (all ? n * n : n);
         slong mprec = 100 + n_randint(state, 100);
@@ -55,8 +55,8 @@ TEST_FUNCTION_START(acb_theta_jet_notransform_ql, state)
         acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, 1, all, prec);
         acb_theta_jet_notransform_ql(th, zs, nb, tau, ord, all, mprec);
 
-        /* flint_printf("g = %wd, nb = %wd, ord = %wd, mprec = %wd, prec = %wd\n",
-           g, nb, ord, mprec, prec);
+        /* flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, mprec = %wd, prec = %wd\n",
+           g, nb, ord, all, mprec, prec);
            _acb_vec_printd(th, nb * nbth * nbjet, 5);
            _acb_vec_printd(test, nb * nbth * nbjet, 5); */
 
