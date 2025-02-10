@@ -13,35 +13,6 @@
 #include "arb_mat.h"
 #include "acb_theta.h"
 
-static int
-acb_theta_ctx_tau_overlaps(const acb_theta_ctx_tau_t ctx1, const acb_theta_ctx_tau_t ctx2)
-{
-    slong g = ctx2->g;
-    slong n = 1 << g;
-    int res;
-
-    FLINT_ASSERT(ctx1->g == g);
-    FLINT_ASSERT(ctx1->allow_shift == ctx2->allow_shift);
-
-    res = arb_mat_overlaps(&ctx1->yinv, &ctx2->yinv)
-        && arb_mat_overlaps(&ctx1->cho, &ctx2->cho)
-        && acb_mat_overlaps(ctx1->exp_tau_div_4, ctx2->exp_tau_div_4)
-        && acb_mat_overlaps(ctx1->exp_tau_div_2, ctx2->exp_tau_div_2)
-        && acb_mat_overlaps(ctx1->exp_tau, ctx2->exp_tau)
-        && acb_mat_overlaps(ctx1->exp_tau_div_4_inv, ctx2->exp_tau_div_4_inv)
-        && acb_mat_overlaps(ctx1->exp_tau_div_2_inv, ctx2->exp_tau_div_2_inv)
-        && acb_mat_overlaps(ctx1->exp_tau_inv, ctx2->exp_tau_inv);
-
-    if (ctx1->allow_shift && res)
-    {
-        res = _acb_vec_overlaps(ctx1->exp_tau_a, ctx2->exp_tau_a, n * g)
-            && _acb_vec_overlaps(ctx1->exp_tau_a_inv, ctx2->exp_tau_a_inv, n * g)
-            && _acb_vec_overlaps(ctx1->exp_a_tau_a_div_4, ctx2->exp_a_tau_a_div_4, n);
-    }
-
-    return res;
-}
-
 TEST_FUNCTION_START(acb_theta_ctx_tau_dupl, state)
 {
     slong iter;
