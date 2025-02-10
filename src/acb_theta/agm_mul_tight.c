@@ -93,13 +93,13 @@ acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arf_mul(e, m0, eps, lp, ARF_RND_CEIL);
     arf_addmul(e, m, eps0, lp, ARF_RND_CEIL);
     arf_addmul(e, eps, eps0, lp, ARF_RND_CEIL);
+    arf_mul_2exp_si(e, e, g);
 
     for (k = 0; k < n; k++)
     {
         arb_neg(err, &d[k]);
         arb_exp(err, err, lp);
         arb_mul_arf(err, err, e, lp);
-        arb_mul_2exp_si(err, err, g);
 
         if (all)
         {

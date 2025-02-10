@@ -109,6 +109,7 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
             else
             {
                 /* Initialize with length 0 to be able to free later. */
+                /* Should not happen in tests */
                 new_zs[j * nba + a] = _acb_vec_init(0);
                 cofactors[j * nba + a] = _acb_vec_init(0);
                 nb_pts[j * nba + a] = 0;
@@ -120,6 +121,7 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
 
     if (!res)
     {
+        /* Should not happen in tests */
         nb0 = 0;
     }
     z0s = _acb_vec_init(nb0 * s);
@@ -140,7 +142,6 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
         }
 
         /* Call acb_theta_ql_exact in dimension s */
-        /* flint_printf("(ql_exact_lower_dim) calling ql_exact on %wd vectors in dimension %wd\n", nb0, s); */
         acb_theta_ql_exact(th0, z0s, nb0, tau0, pattern, all, shifted_prec, prec);
 
         /* Recombine into th */
@@ -159,15 +160,7 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
     }
     else
     {
-        /* flint_printf("WARNING: ql_lower_dim failed, falling back to summation\n");
-           flint_printf("g = %wd, nb = %wd, tau:\n", g, nb);
-           acb_mat_printd(tau, 5);
-        flint_printf("zs:\n");
-        for (j = 0; j < nb; j++)
-        {
-            _acb_vec_printd(zs + j * g, g, 5);
-            } */
-
+        /* Should not happen in tests */
         acb_theta_ql_exact_sum(th, zs, nb, tau, distances, all, shifted_prec, prec);
     }
 
@@ -450,10 +443,13 @@ acb_theta_ql_perform_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
             }
             else
             {
-                /* theta(z + t, tau)^2 = sum of theta(0, 2tau) theta(2z + 2t, 2tau) */
-                acb_theta_ql_step_1(th_next + 3 * j * n + n, th_init,
-                    th_init + 3 * j * n + n,
-                    rts + j * (3 * n * nb_steps) + k * (3 * n) + n, d0, d, g, prec);
+                if (k > 0)
+                {
+                    /* theta(z + t, tau)^2 = sum of theta(0, 2tau) theta(2z + 2t, 2tau) */
+                    acb_theta_ql_step_1(th_next + 3 * j * n + n, th_init,
+                        th_init + 3 * j * n + n,
+                        rts + j * (3 * n * nb_steps) + k * (3 * n) + n, d0, d, g, prec);
+                }
                 /* theta(z + 2t, tau)^2 = sum of theta(0, 2tau) theta(2z + 4t, 2tau) */
                 acb_theta_ql_step_1(th_next + 3 * j * n + 2 * n, th_init,
                     th_init + 3 * j * n + 2 * n,
@@ -531,18 +527,6 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
     res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps, zs, nb, tau, distances,
         nb_steps, all, prec);
 
-    /* flint_printf("(ql_exact_steps) g = %wd, split = %wd, setup: %wd, nb_steps = %wd, guard = %wd, prec = %wd\n",
-       g, split, res, nb_steps, guard, prec); */
-    /* if (easy_steps[0] < nb_steps)
-    {
-        for (j = 0; j < nb; j++)
-        {
-            flint_printf("%wd -> %wd\n", j, easy_steps[j]);
-        }
-        } */
-    /* flint_printf("distances:\n");
-    _arb_vec_printd(distances, nb * n, 5); */
-
     if (res)
     {
         if (split > 0)
@@ -559,17 +543,10 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
         acb_theta_ql_perform_steps(th, th_init, rts, rts_all, nb, nb_steps,
             distances, easy_steps, all, g, prec + guard);
     }
-    else /* setup or intput did not succeed, fall back to summation */
+    else
     {
-        /* flint_printf("WARNING: ql_setup failed, falling back to summation\n");
-        flint_printf("g = %wd, nb = %wd, tau:\n", g, nb);
-        acb_mat_printd(tau, 5);
-        flint_printf("zs:\n");
-        for (j = 0; j < nb; j++)
-        {
-            _acb_vec_printd(zs + j * g, g, 5);
-            } */
-
+        /* Setup or intput did not succeed, fall back to summation */
+        /* Should not happen in tests */
         acb_theta_ql_exact_sum(th, zs, nb, tau, distances, all, 1, prec);
     }
 

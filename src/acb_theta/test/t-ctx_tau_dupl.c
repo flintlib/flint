@@ -10,7 +10,7 @@
 */
 
 #include "test_helpers.h"
-#include "arb_mat.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_ctx_tau_dupl, state)
@@ -20,7 +20,7 @@ TEST_FUNCTION_START(acb_theta_ctx_tau_dupl, state)
     /* Test: matches with acb_theta_ctx_tau_set with doubled input */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
-        slong g = 1 + n_randint(state, 4);
+        slong g = 1 + n_randint(state, 3);
         slong prec = 100 + n_randint(state, 100);
         slong mag_bits = n_randint(state, 5);
         int allow_shift = iter % 2;

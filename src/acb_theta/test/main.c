@@ -15,9 +15,6 @@
 #include "t-agm_mul_tight.c"
 #include "t-agm_sqrt.c"
 #include "t-char_dot.c"
-#include "t-char_is_even.c"
-#include "t-char_is_goepel.c"
-#include "t-char_is_syzygous.c"
 #include "t-char_shuffle.c"
 #include "t-char_table.c"
 #include "t-ctx_exp_inv.c"
@@ -32,14 +29,10 @@
 #include "t-g2_character.c"
 #include "t-g2_chi3_6.c"
 #include "t-g2_chi5.c"
-#include "t-g2_chi10.c"
-#include "t-g2_chi12.c"
 #include "t-g2_chi35.c"
 #include "t-g2_covariants.c"
 #include "t-g2_detk_symj.c"
-#include "t-g2_psi4.c"
-#include "t-g2_psi6.c"
-#include "t-g2_sextic.c"
+#include "t-g2_even_weight.c"
 #include "t-g2_sextic_chi5.c"
 #include "t-g2_transvectant.c"
 #include "t-jet.c"
@@ -53,6 +46,7 @@
 #include "t-ql_local_bound.c"
 #include "t-ql_lower_dim.c"
 #include "t-ql_setup.c"
+#include "t-reduce_z.c"
 #include "t-siegel_cocycle.c"
 #include "t-siegel_is_reduced.c"
 #include "t-siegel_kappa.c"
@@ -75,9 +69,6 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_agm_mul_tight),
     TEST_FUNCTION(acb_theta_agm_sqrt),
     TEST_FUNCTION(acb_theta_char_dot),
-    TEST_FUNCTION(acb_theta_char_is_even),
-    TEST_FUNCTION(acb_theta_char_is_goepel),
-    TEST_FUNCTION(acb_theta_char_is_syzygous),
     TEST_FUNCTION(acb_theta_char_shuffle),
     TEST_FUNCTION(acb_theta_char_table),
     TEST_FUNCTION(acb_theta_ctx_exp_inv),
@@ -92,14 +83,10 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_g2_character),
     TEST_FUNCTION(acb_theta_g2_chi3_6),
     TEST_FUNCTION(acb_theta_g2_chi5),
-    TEST_FUNCTION(acb_theta_g2_chi10),
-    TEST_FUNCTION(acb_theta_g2_chi12),
     TEST_FUNCTION(acb_theta_g2_chi35),
     TEST_FUNCTION(acb_theta_g2_covariants),
     TEST_FUNCTION(acb_theta_g2_detk_symj),
-    TEST_FUNCTION(acb_theta_g2_psi4),
-    TEST_FUNCTION(acb_theta_g2_psi6),
-    TEST_FUNCTION(acb_theta_g2_sextic),
+    TEST_FUNCTION(acb_theta_g2_even_weight),
     TEST_FUNCTION(acb_theta_g2_sextic_chi5),
     TEST_FUNCTION(acb_theta_g2_transvectant),
     TEST_FUNCTION(acb_theta_jet),
@@ -107,13 +94,13 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_jet_mul),
     TEST_FUNCTION(acb_theta_jet_notransform),
     TEST_FUNCTION(acb_theta_jet_tuples),
-    TEST_FUNCTION(acb_theta_ql_local_bound),
     TEST_FUNCTION(acb_theta_ql_exact),
     TEST_FUNCTION(acb_theta_ql_jet_error),
     TEST_FUNCTION(acb_theta_ql_jet_fd),
     TEST_FUNCTION(acb_theta_ql_local_bound),
     TEST_FUNCTION(acb_theta_ql_lower_dim),
     TEST_FUNCTION(acb_theta_ql_setup),
+    TEST_FUNCTION(acb_theta_reduce_z),
     TEST_FUNCTION(acb_theta_siegel_cocycle),
     TEST_FUNCTION(acb_theta_siegel_is_reduced),
     TEST_FUNCTION(acb_theta_siegel_kappa),

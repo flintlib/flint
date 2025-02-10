@@ -15,7 +15,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec)
+acb_theta_g2_sextic_chi5(acb_poly_t f, acb_t chi5, const acb_mat_t tau, slong prec)
 {
     slong g = 2;
     slong n2 = 1 << (2 * g);
@@ -46,11 +46,11 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
         {
             acb_set(&th[k], &dth[k * nb]);
         }
-        acb_theta_g2_chi3_6(res, dth, prec);
+        acb_theta_g2_chi3_6(f, dth, prec);
         acb_theta_g2_chi5(chi5, th, prec);
-        acb_poly_scalar_div(res, res, chi5, prec);
+        acb_poly_scalar_div(f, f, chi5, prec);
 
-        acb_theta_g2_detk_symj(res, cinv, res, -2, 6, prec);
+        acb_theta_g2_detk_symj(f, cinv, f, -2, 6, prec);
         acb_mat_det(det, cinv, prec);
         acb_pow_ui(det, det, 5, prec);
 
@@ -62,10 +62,11 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
     }
     else
     {
+        /* Should not happen in tests */
         acb_indeterminate(chi5);
         for (k = 0; k < 6; k++)
         {
-            acb_poly_set_coeff_acb(res, k, chi5);
+            acb_poly_set_coeff_acb(f, k, chi5);
         }
     }
 

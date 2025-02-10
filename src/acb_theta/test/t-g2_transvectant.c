@@ -58,7 +58,9 @@ TEST_FUNCTION_START(acb_theta_g2_transvectant, state)
         acb_poly_get_coeff_acb(c, g, 0);
         acb_mul_si(c, c, 60, prec);
 
-        if (!acb_overlaps(test, c))
+        if (!acb_overlaps(test, c)
+            || !acb_is_finite(test)
+            || !acb_is_finite(c))
         {
             flint_printf("FAIL (value)\n");
             acb_printd(test, 5);

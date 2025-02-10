@@ -10,7 +10,8 @@
 */
 
 #include "test_helpers.h"
-#include "arb_mat.h"
+#include "acb.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_ctx_z_shift_a0, state)
@@ -22,7 +23,7 @@ TEST_FUNCTION_START(acb_theta_ctx_z_shift_a0, state)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
-        slong prec = 100 + n_randint(state, 200);
+        slong prec = 2 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 5);
         ulong a = n_randint(state, n);
         acb_mat_t tau;

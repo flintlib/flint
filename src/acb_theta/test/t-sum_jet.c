@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "acb.h"
 #include "arb_mat.h"
+#include "acb_mat.h"
 #include "acb_modular.h"
 #include "acb_theta.h"
 
@@ -142,7 +143,9 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
             acb_theta_ctx_z_vec_clear(vec_g1, nbz);
         }
 
-        if (!_acb_vec_overlaps(th, test, nbth * nbz * nbjet))
+        if (!_acb_vec_overlaps(th, test, nbth * nbz * nbjet)
+            || !_acb_vec_is_finite(th, nbth * nbz * nbjet)
+            || !_acb_vec_is_finite(test, nbth * nbz * nbjet))
         {
             flint_printf("FAIL (g = %wd, ord = %wd, nbz = %wd, all_a = %wd, all_b = %wd, mprec = %wd, prec = %wd)\n",
                 g, ord, nbz, all_a, all_b, mprec, prec);

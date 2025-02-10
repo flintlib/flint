@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_ctx_sqr_inv, state)
@@ -20,7 +21,7 @@ TEST_FUNCTION_START(acb_theta_ctx_sqr_inv, state)
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         acb_t z, exp, sqr, inv, sqr_inv, test;
-        slong prec = 10 + n_randint(state, 200);
+        slong prec = 2 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 4);
         int is_real = iter % 2;
 

@@ -46,6 +46,7 @@ acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
     arb_mat_t cho, yinv;
     arb_ptr y;
     acb_ptr t, x;
+    arf_t e;
     slong j, k;
     int res = 1;
 
@@ -56,6 +57,7 @@ acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
     y = _arb_vec_init(g);
     t = _acb_vec_init(g);
     x = _acb_vec_init(g);
+    arf_init(e);
 
     acb_siegel_cho_yinv(cho, yinv, tau, prec);
 
@@ -98,14 +100,14 @@ acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
                 acb_sub_arb(&x[k], &x[k], &y[k], prec);
             }
         }
-        else
+
+        /* Set real part to [-1,1] if error is too large */
+        for (k = 0; k < g; k++)
         {
-            /* Still OK; set real part to [-1,1] */
-            for (k = 0; k < g; k++)
+            if (mag_cmp_2exp_si(arb_radref(acb_realref(&x[k])), 0) > 0)
             {
                 arb_zero_pm_one(acb_realref(&x[k]));
             }
-            res = 1;
         }
 
         /* Set new_z */
@@ -117,5 +119,6 @@ acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
     _arb_vec_clear(y, g);
     _acb_vec_clear(t, g);
     _acb_vec_clear(x, g);
+    arf_clear(e);
     return res;
 }

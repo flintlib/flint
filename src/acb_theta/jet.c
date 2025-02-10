@@ -22,7 +22,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     slong n = 1 << g;
     slong nbth = (all ? n * n : 1);
     slong nbjet = acb_theta_jet_nb(ord, g);
-    slong nbu = (sqr ? 4 : 8);
+    slong nbu;
     fmpz_mat_t mat;
     acb_mat_t new_tau, N, ct;
     acb_ptr new_zs, exps, cs, aux, units, jet;
@@ -38,6 +38,8 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     {
         return;
     }
+    sqr = sqr && (ord == 0);
+    nbu = (sqr ? 4 : 8);
 
     fmpz_mat_init(mat, 2 * g, 2 * g);
     acb_mat_init(new_tau, g, g);
@@ -47,7 +49,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     exps = _acb_vec_init(nb);
     cs = _acb_vec_init(nb);
     aux = _acb_vec_init(nbth * nb * nbjet);
-    units = _acb_vec_init(8);
+    units = _acb_vec_init(nbu);
     jet = _acb_vec_init(nbjet);
     rs = _arb_vec_init(nb * g);
     r = _arb_vec_init(g);
@@ -61,7 +63,6 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     {
         res = acb_theta_reduce_z(new_zs, rs, cs, new_zs, nb, new_tau, prec);
     }
-    sqr = sqr && (ord == 0);
 
     if (res)
     {
@@ -116,6 +117,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     }
     else
     {
+        /* Should not happen in tests */
         _acb_vec_indeterminate(th, nb * nbth * nbjet);
     }
 
@@ -127,7 +129,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     _acb_vec_clear(exps, nb);
     _acb_vec_clear(cs, nb);
     _acb_vec_clear(aux, nb * nbth * nbjet);
-    _acb_vec_clear(units, 8);
+    _acb_vec_clear(units, nbu);
     _acb_vec_clear(jet, nbjet);
     _arb_vec_clear(rs, nb * g);
     _arb_vec_clear(r, g);

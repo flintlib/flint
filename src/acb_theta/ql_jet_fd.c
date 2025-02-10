@@ -261,8 +261,6 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         }
     }
 
-    /* flint_printf("(ql_jet_exact) got res = %wd, g = %wd, prec = %wd, ord = %wd, hprec = %wd\n", res, g, prec, ord, hprec); */
-
     /* Fill in new_zs */
     _acb_vec_unit_roots(zetas, ord + 1, ord + 1, hprec);
     for (j = 0; (j < nb) && res; j++)
@@ -309,10 +307,6 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         }
         acb_theta_ql_inexact(new_th, new_zs, nb * nbaux, tau, new_dth, all, hprec);
 
-        /* flint_printf("(ql_jet_exact) new_zs, new_th:\n");
-           _acb_vec_printd(new_zs, nb * g * nbaux, 5);
-           _acb_vec_printd(new_th, nb * nbth * nbaux, 5); */
-
         /* Make finite differences */
         for (j = 0; j < nb; j++)
         {
@@ -329,6 +323,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     }
     else
     {
+        /* Should not happen in tests */
         _acb_vec_indeterminate(th, nb * nbth * nbjet);
     }
 
@@ -414,10 +409,6 @@ acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb,
     }
     /* Todo: adjust current working precision so that 2^(-prec) is roughly err ? */
 
-    /* flint_printf("(ql_jet_fd) got derivatives and error bounds:\n");
-       _acb_vec_printd(dth, nb * nbth * nbjet_2, 5);
-       _arb_vec_printd(err, nb * nbth * nbjet, 5); */
-
     if (res && ord == 0)
     {
         /* Just call ql_inexact */
@@ -448,6 +439,7 @@ acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb,
     }
     else
     {
+        /* Should not happen in tests */
         _acb_vec_indeterminate(th, nb * nbth * nbjet);
     }
 

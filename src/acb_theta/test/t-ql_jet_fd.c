@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -27,7 +28,7 @@ TEST_FUNCTION_START(acb_theta_ql_jet_fd, state)
         slong mprec = 100 + n_randint(state, 100);
         slong prec = mprec + 50;
         slong bits = n_randint(state, 4);
-        slong nb = 1 + n_randint(state, 2);
+        slong nb = n_randint(state, 3);
         slong ord = n_randint(state, 3);
         slong nbjet = acb_theta_jet_nb(ord, g);
         acb_mat_t tau;
@@ -55,16 +56,15 @@ TEST_FUNCTION_START(acb_theta_ql_jet_fd, state)
         acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, 1, all, prec);
         acb_theta_ql_jet_fd(th, zs, nb, tau, ord, all, mprec);
 
-        /* flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, mprec = %wd, prec = %wd\n",
-           g, nb, ord, all, mprec, prec);
-           _acb_vec_printd(th, nb * nbth * nbjet, 5);
-           _acb_vec_printd(test, nb * nbth * nbjet, 5); */
-
         if (!_acb_vec_overlaps(th, test, nb * nbth * nbjet)
-            || (_acb_vec_is_finite(test, nb * nbth * nbjet)
-                && !_acb_vec_is_finite(th, nb * nbth * nbjet)))
+            || !_acb_vec_is_finite(test, nb * nbth * nbjet)
+            || !_acb_vec_is_finite(th, nb * nbth * nbjet))
         {
             flint_printf("FAIL\n");
+            flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, mprec = %wd, prec = %wd\n",
+                g, nb, ord, all, mprec, prec);
+            _acb_vec_printd(th, nb * nbth * nbjet, 5);
+            _acb_vec_printd(test, nb * nbth * nbjet, 5);
             flint_printf("difference:\n");
             _acb_vec_sub(th, th, test, nb * nbth * nbjet, prec);
             _acb_vec_printd(th, nb * nbth * nbjet, 5);

@@ -10,6 +10,9 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mat.h"
+#include "acb.h"
+#include "acb_mat.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_siegel_kappa, state)
@@ -66,7 +69,9 @@ TEST_FUNCTION_START(acb_theta_siegel_kappa, state)
         {
             acb_neg(t, t);
         }
-        if (!acb_overlaps(t, s))
+        if (!acb_overlaps(t, s)
+            || !acb_is_finite(t)
+            || !acb_is_finite(s))
         {
             flint_printf("FAIL (square roots)\n");
             flint_printf("s, t:\n");
@@ -79,7 +84,10 @@ TEST_FUNCTION_START(acb_theta_siegel_kappa, state)
 
         acb_sqr(t, s2, prec);
         kappa = acb_siegel_kappa(s2, m2, tau, 1, prec);
-        if ((kappa != kappa2 % 4) || !acb_overlaps(t, s2))
+        if ((kappa != kappa2 % 4)
+            || !acb_overlaps(t, s2)
+            || !acb_is_finite(t)
+            || !acb_is_finite(s2))
         {
             flint_printf("FAIL (sqr)\n");
             flint_printf("kappa2 = %wd, kappa = %wd, s2, t:\n", kappa2, kappa);

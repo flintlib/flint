@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -54,7 +55,7 @@ TEST_FUNCTION_START(acb_theta_ql_jet_error, state)
         acb_init(x);
 
         acb_siegel_randtest_reduced(tau1, state, hprec, bits);
-        acb_siegel_randtest_vec(z1, state, g, hprec);
+        acb_siegel_randtest_vec_reduced(z1, state, 1, tau1, 0, hprec);
 
         for (j = 0; j < g; j++)
         {
@@ -114,7 +115,9 @@ TEST_FUNCTION_START(acb_theta_ql_jet_error, state)
             acb_add_error_arb(&test[k], &err[k]);
         }
 
-        if (!_acb_vec_overlaps(test, d2, n * nb))
+        if (!_acb_vec_overlaps(test, d2, n * nb)
+            || !_acb_vec_is_finite(test, n * nb)
+            || !_acb_vec_is_finite(d2, n * nb))
         {
             flint_printf("FAIL (bounds)\n");
             flint_printf("values:\n");

@@ -46,6 +46,7 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 
         if (!arb_is_finite(x) || arf_cmpabs_2exp_si(arb_midref(x), FLINT_BITS - 4) > 0)
         {
+            /* Should not happen in tests */
             arb_clear(x);
             arb_clear(t);
             return 0;
@@ -53,13 +54,6 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 
         rough[s] = -arf_get_si(arb_midref(x), ARF_RND_NEAR);
     }
-
-    /* flint_printf("(ql_nb_steps) rough pattern:");
-    for (s = 0; s < g; s++)
-    {
-        flint_printf(" %wd", rough[s]);
-    }
-    flint_printf("\n"); */
 
     /* Experimental data from p-acb_theta_ql_exact: rough -> desired pattern */
     /* Genus 1 theta constants */
@@ -103,6 +97,7 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
       dimensions will depend on whether or not duplications/dimension-lowerings
       have already been applied. */
     /* See /path/to/flint/build/acb_theta/profile/p-acb_theta_ql_exact */
+    /* Some of these branches will not show up in tests. */
     for (s = g - 1; s >= 0; s--)
     {
         /* Find out how many duplication steps have been performed so far

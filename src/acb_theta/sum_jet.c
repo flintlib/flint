@@ -429,7 +429,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                 if (all_a)
                 {
                     acb_theta_sum_work(th + j * nbth * nbjet, nbth * nbjet,
-                        (&vec[j])->exp_z, (&vec[j])->exp_z_inv, 1,
+                        (&vec[j])->exp_z, (&vec[j])->exp_z_inv,
                         ctx_tau->exp_tau_div_4, ctx_tau->exp_tau_div_4_inv, E,
                         ord, prec,
                         (all_b ? acb_theta_sum_jet_all_worker : acb_theta_sum_jet_a0_worker));
@@ -437,7 +437,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                 else
                 {
                     acb_theta_sum_work(th + j * nbth * nbjet, nbth * nbjet,
-                        (&vec[j])->exp_2z,(&vec[j])->exp_2z_inv, 1,
+                        (&vec[j])->exp_2z,(&vec[j])->exp_2z_inv,
                         ctx_tau->exp_tau, ctx_tau->exp_tau_inv, E,
                         ord, prec,
                         (all_b ? acb_theta_sum_jet_0b_worker : acb_theta_sum_jet_00_worker));
@@ -475,6 +475,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         }
         else
         {
+            /* Should not happen in tests */
             _acb_vec_indeterminate(th, nb * nbth * nbjet);
         }
 

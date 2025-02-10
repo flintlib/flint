@@ -51,5 +51,14 @@ acb_siegel_randtest_vec_reduced(acb_ptr zs, flint_rand_t state, slong nb,
         }
     }
 
+    /* Sometimes, force zeros */
+    for (j = 0; j < nb; j++)
+    {
+        if (n_randint(state, 5) == 0)
+        {
+            _acb_vec_zero(zs + j * g, g);
+        }
+    }
+
     arb_clear(t);
 }

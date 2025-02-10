@@ -75,11 +75,12 @@ void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, const slong * n, slong g);
-void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec);
 
-int acb_theta_char_is_even(ulong ab, slong g);
-int acb_theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g);
-int acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g);
+FLINT_FORCE_INLINE int
+acb_theta_char_is_even(ulong ab, slong g)
+{
+    return acb_theta_char_dot(ab >> g, ab, g) % 2 == 0;
+}
 
 void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab);
 void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
@@ -152,8 +153,8 @@ int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z
 
 /* Summation algorithms */
 
-void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv,
-    slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E,
+void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_z, acb_srcptr exp_z_inv,
+    const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E,
     slong ord, slong prec, acb_theta_sum_worker_t worker);
 void acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, int all_a,
@@ -209,24 +210,19 @@ void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong
 
 /* Dimension 2 specifics */
 
-#define ACB_THETA_G2_COV_NB 26
-
 void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f,
     slong k, slong j, slong prec);
 void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h,
     slong m, slong n, slong k, int lead, slong prec);
 slong acb_theta_g2_character(const fmpz_mat_t mat);
 
-void acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec);
-void acb_theta_g2_psi6(acb_t res, acb_srcptr th2, slong prec);
-void acb_theta_g2_chi10(acb_t res, acb_srcptr th2, slong prec);
-void acb_theta_g2_chi12(acb_t res, acb_srcptr th2, slong prec);
+void acb_theta_g2_even_weight(acb_t psi4, acb_t psi6, acb_t chi10, acb_t chi12,
+    acb_srcptr th2, slong prec);
 void acb_theta_g2_chi5(acb_t res, acb_srcptr th, slong prec);
 void acb_theta_g2_chi35(acb_t res, acb_srcptr th, slong prec);
 void acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec);
 
-void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec);
-void acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec);
+void acb_theta_g2_sextic_chi5(acb_poly_t f, acb_t chi5, const acb_mat_t tau, slong prec);
 void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, int lead, slong prec);
 
 #ifdef __cplusplus

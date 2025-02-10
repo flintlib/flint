@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -56,7 +58,9 @@ TEST_FUNCTION_START(acb_theta_ql_local_bound, state)
 
         acb_theta_ql_local_bound(c, rho, z, tau, ord);
 
-        if (!arb_is_finite(rho) || !arb_is_finite(c))
+        if (!arb_is_finite(rho)
+            || !arb_is_finite(c)
+            || arb_contains_zero(rho))
         {
             flint_printf("FAIL (infinite)\n");
             acb_mat_printd(tau, 5);
@@ -89,7 +93,7 @@ TEST_FUNCTION_START(acb_theta_ql_local_bound, state)
             arb_max(abs, abs, t, lp);
         }
 
-        if (arb_gt(abs, c))
+        if (arb_gt(abs, c) || !arb_is_finite(abs))
         {
             flint_printf("FAIL (bound)\n");
             acb_mat_printd(tau, 5);

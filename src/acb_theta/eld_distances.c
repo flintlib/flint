@@ -15,6 +15,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
+/* Should not be used in tests */
 static void
 acb_theta_dist_unif(arb_t d, const arb_mat_t cho, slong prec)
 {
@@ -150,6 +151,7 @@ acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t cho, slong prec)
     }
     else
     {
+        /* Should not happen in tests */
         acb_theta_dist_unif(d, cho, prec);
     }
     arb_nonnegative_part(d, d);

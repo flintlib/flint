@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "arb_mat.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
@@ -95,7 +96,9 @@ TEST_FUNCTION_START(acb_theta_sum_jet_radius, state)
                 arb_add(sum, sum, abs, prec);
             }
 
-            if (arb_gt(sum, u))
+            if (arb_gt(sum, u)
+                || !arb_is_finite(sum)
+                || !arb_is_finite(u))
             {
                 flint_printf("FAIL\n");
                 flint_printf("sum, bound:\n");

@@ -108,37 +108,25 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         prec + FLINT_MAX(0, acb_theta_sum_addprec(distance)));
     b = acb_theta_eld_set(E, &ctx_tau->cho, R2, v);
 
-    /* flint_printf("(sum) ellipsoid radius: ");
-       arf_printd(R2, 5);
-       flint_printf("\n(sum) number of points: %wd\n", E->nb_pts); */
-
     if (b)
     {
         for (j = 0; j < nb; j++)
         {
             acb_theta_sum_work(th + j * n, n, (&vec[j])->exp_2z,
-                (&vec[j])->exp_2z_inv, 1, ctx_tau->exp_tau,
+                (&vec[j])->exp_2z_inv, ctx_tau->exp_tau,
                 ctx_tau->exp_tau_inv, E, 0, prec,
                 (all_b ? acb_theta_sum_0b_worker : acb_theta_sum_00_worker));
             arb_mul_arf(err, &(&vec[j])->u, eps, guard);
-            /* flint_printf("(sum) error: ");
-               arb_printd(err, 5);
-               flint_printf("\n"); */
             for (k = 0; k < n; k++)
             {
                 acb_add_error_arb(&th[j * n + k], err);
             }
-            /* flint_printf("(sum) 1st value: ");
-               acb_printd(&th[j * n], 5);
-               flint_printf("\n"); */
         }
     }
     else
     {
-        for (j = 0; j < nb * n; j++)
-        {
-            acb_indeterminate(&th[j]);
-        }
+        /* Should not happen in tests */
+        _acb_vec_indeterminate(th, nb * n);
     }
 
     acb_theta_eld_clear(E);

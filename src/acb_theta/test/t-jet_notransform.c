@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -68,16 +69,15 @@ TEST_FUNCTION_START(acb_theta_jet_notransform, state)
             _acb_vec_sqr(test, test, nb * nbth, prec);
         }
 
-        /* flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, ab = %wd, sqr = %wd, mprec = %wd, prec = %wd\n",
-            g, nb, ord, all, ab, sqr, mprec, prec);
-           _acb_vec_printd(th, nb * nbth * nbjet, 5);
-           _acb_vec_printd(test, nb * nbth * nbjet, 5); */
-
         if (!_acb_vec_overlaps(th, test, nb * nbth * nbjet)
             || (_acb_vec_is_finite(test, nb * nbth * nbjet)
                 && !_acb_vec_is_finite(th, nb * nbth * nbjet)))
         {
             flint_printf("FAIL\n");
+            flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, ab = %wd, sqr = %wd, mprec = %wd, prec = %wd\n",
+            g, nb, ord, all, ab, sqr, mprec, prec);
+           _acb_vec_printd(th, nb * nbth * nbjet, 5);
+           _acb_vec_printd(test, nb * nbth * nbjet, 5);
             flint_printf("difference:\n");
             _acb_vec_sub(th, th, test, nb * nbth * nbjet, prec);
             _acb_vec_printd(th, nb * nbth * nbjet, 5);

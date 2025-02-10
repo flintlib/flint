@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -68,27 +69,24 @@ TEST_FUNCTION_START(acb_theta_ql_exact, state)
             acb_theta_sum(test, vec, nb, ctx_tau, distances, 1, all, 1, prec);
         }
 
-        /* flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, all = %wd, shifted_prec = %wd\n",
-            g, prec, nb, all, shifted_prec);
-        acb_mat_printd(tau, 5);
-        _acb_vec_printd(zs, nb * g, 5);
-        flint_printf("result of sum:\n");
-        _acb_vec_printd(test, nbth * nb, 5);
-        flint_printf("pattern:\n");
-        for (j = 0; j < g; j++)
-        {
-            flint_printf("%wd -> %wd\n", j, pattern[j]);
-            } */
-
         acb_theta_ql_exact(th, zs, nb, tau, pattern, all, shifted_prec, prec);
 
-        /* flint_printf("\nresult of ql_exact:\n");
-           _acb_vec_printd(th, nbth * nb, 5); */
-
         if (!_acb_vec_overlaps(th, test, nb * nbth)
-            || (_acb_vec_is_finite(test, nb * nbth) && !_acb_vec_is_finite(th, nb * nbth)))
+            || !_acb_vec_is_finite(test, nb * nbth)
+            || !_acb_vec_is_finite(th, nb * nbth))
         {
             flint_printf("FAIL\n");
+            flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, all = %wd, shifted_prec = %wd\n",
+                g, prec, nb, all, shifted_prec);
+            acb_mat_printd(tau, 5);
+            _acb_vec_printd(zs, nb * g, 5);
+            flint_printf("result of sum:\n");
+            _acb_vec_printd(test, nbth * nb, 5);
+            flint_printf("pattern:\n");
+            for (j = 0; j < g; j++)
+            {
+                flint_printf("%wd -> %wd\n", j, pattern[j]);
+            }
             flint_printf("difference:\n");
             _acb_vec_sub(th, th, test, nb * nbth, prec);
             _acb_vec_printd(th, nb * nbth, 5);

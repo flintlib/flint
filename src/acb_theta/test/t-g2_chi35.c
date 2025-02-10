@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mat.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -45,7 +47,9 @@ TEST_FUNCTION_START(acb_theta_g2_chi35, state)
         acb_theta_g2_chi35(s, th, prec);
         acb_mul_i_pow_si(s, s, -acb_siegel_kappa2(mat));
 
-        if (!acb_overlaps(r, s))
+        if (!acb_overlaps(r, s)
+            || !acb_is_finite(r)
+            || !acb_is_finite(s))
         {
             flint_printf("FAIL\n");
             acb_printd(r, 10);

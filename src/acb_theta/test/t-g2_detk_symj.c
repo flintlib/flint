@@ -28,6 +28,8 @@ TEST_FUNCTION_START(acb_theta_g2_detk_symj, state)
         slong j = n_randint(state, 10);
         slong bits = 2;
         slong prec = 100 + n_randint(state, 200);
+        slong i;
+        int res = 1;
 
         acb_mat_init(c1, g, g);
         acb_mat_init(c2, g, g);
@@ -45,7 +47,16 @@ TEST_FUNCTION_START(acb_theta_g2_detk_symj, state)
         acb_theta_g2_detk_symj(r, c1, r, k, j, prec);
         acb_theta_g2_detk_symj(t, c3, s, k, j, prec);
 
-        if (!acb_poly_overlaps(t, r))
+        for (i = 0; i <= acb_poly_degree(t); i++)
+        {
+            res = res && acb_is_finite(acb_poly_get_coeff_ptr(t, i));
+        }
+        for (i = 0; i <= acb_poly_degree(r); i++)
+        {
+            res = res && acb_is_finite(acb_poly_get_coeff_ptr(r, i));
+        }
+
+        if (!acb_poly_overlaps(t, r) || !res)
         {
             flint_printf("FAIL\n");
             acb_mat_printd(c1, 5);

@@ -58,6 +58,7 @@ acb_theta_ql_eld_points(slong ** pts, slong * nb_pts, arb_ptr v,
     }
     else
     {
+        /* Should not happen in tests */
         *nb_pts = 0;
         *pts = flint_malloc(0);
     }

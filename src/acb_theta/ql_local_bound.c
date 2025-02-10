@@ -84,7 +84,7 @@ acb_theta_local_bound_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_m
 
 /* Pick rho and c such that |theta_{a,b}(z,tau)| on a ball of radius rho around
    z is bounded above by c, and is a good choice to bound derivatives up to
-   order ord */
+   order ord. We always force rho <= 1 and c >= 1; this helps in ql_jet_fd */
 
 void
 acb_theta_ql_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
@@ -117,12 +117,20 @@ acb_theta_ql_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, 
     arb_mul_2exp_si(t, t, 2);
     arb_div(rho, rho, t, lp);
 
+    /* Set rho = min(rho, 1) */
+    arb_set_si(t, 1);
+    arb_min(rho, rho, t, lp);
+
     /* Set c to corresponding bound */
     arb_mul(c, c2, rho, lp);
     arb_add(c, c, c1, lp);
     arb_sqr(c, c, lp);
     arb_exp(c, c, lp);
     arb_mul(c, c, c0, lp);
+
+    /* Set c = max(c, 1) */
+    arb_set_si(t, 1);
+    arb_max(c, c, t, lp);
 
     arb_clear(t);
     arb_clear(c0);
