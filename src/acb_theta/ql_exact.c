@@ -140,7 +140,6 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
         }
 
         /* Call acb_theta_ql_exact in dimension s */
-        /* flint_printf("(ql_exact_lower_dim) calling ql_exact on %wd vectors in dimension %wd\n", nb0, s); */
         acb_theta_ql_exact(th0, z0s, nb0, tau0, pattern, all, shifted_prec, prec);
 
         /* Recombine into th */
@@ -159,15 +158,6 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
     }
     else
     {
-        /* flint_printf("WARNING: ql_lower_dim failed, falling back to summation\n");
-           flint_printf("g = %wd, nb = %wd, tau:\n", g, nb);
-           acb_mat_printd(tau, 5);
-        flint_printf("zs:\n");
-        for (j = 0; j < nb; j++)
-        {
-            _acb_vec_printd(zs + j * g, g, 5);
-            } */
-
         acb_theta_ql_exact_sum(th, zs, nb, tau, distances, all, shifted_prec, prec);
     }
 
@@ -531,18 +521,6 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
     res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps, zs, nb, tau, distances,
         nb_steps, all, prec);
 
-    /* flint_printf("(ql_exact_steps) g = %wd, split = %wd, setup: %wd, nb_steps = %wd, guard = %wd, prec = %wd\n",
-       g, split, res, nb_steps, guard, prec); */
-    /* if (easy_steps[0] < nb_steps)
-    {
-        for (j = 0; j < nb; j++)
-        {
-            flint_printf("%wd -> %wd\n", j, easy_steps[j]);
-        }
-        } */
-    /* flint_printf("distances:\n");
-    _arb_vec_printd(distances, nb * n, 5); */
-
     if (res)
     {
         if (split > 0)
@@ -561,15 +539,6 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
     }
     else /* setup or intput did not succeed, fall back to summation */
     {
-        /* flint_printf("WARNING: ql_setup failed, falling back to summation\n");
-        flint_printf("g = %wd, nb = %wd, tau:\n", g, nb);
-        acb_mat_printd(tau, 5);
-        flint_printf("zs:\n");
-        for (j = 0; j < nb; j++)
-        {
-            _acb_vec_printd(zs + j * g, g, 5);
-            } */
-
         acb_theta_ql_exact_sum(th, zs, nb, tau, distances, all, 1, prec);
     }
 

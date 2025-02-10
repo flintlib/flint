@@ -54,13 +54,6 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
         rough[s] = -arf_get_si(arb_midref(x), ARF_RND_NEAR);
     }
 
-    /* flint_printf("(ql_nb_steps) rough pattern:");
-    for (s = 0; s < g; s++)
-    {
-        flint_printf(" %wd", rough[s]);
-    }
-    flint_printf("\n"); */
-
     /* Experimental data from p-acb_theta_ql_exact: rough -> desired pattern */
     /* Genus 1 theta constants */
     /* 0, ..., 9 -> 0

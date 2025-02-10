@@ -229,11 +229,6 @@ acb_theta_ql_setup_hard(acb_ptr rts, acb_ptr rts_all, acb_ptr t,
                 th = rts_all + j * n * n;
                 acb_theta_sum(th, &aux[1], 1, ctx_tau, d, 1, 1, 1, prec);
                 res = !_acb_vec_contains_zero(rts, n * n);
-                /* if (!res)
-                   {
-                   flint_printf("(ql_setup) fail at lowprec = %wd (k = %wd, j = %wd)\n", prec, k, j);
-                   _acb_vec_printd(th, n * n, 5);
-                   }*/
             }
             else
             {
@@ -241,11 +236,6 @@ acb_theta_ql_setup_hard(acb_ptr rts, acb_ptr rts_all, acb_ptr t,
                 th = rts + j * (3 * n * nb_steps) + k * (3 * n) + n;
                 acb_theta_sum(th, aux, 2, ctx_tau, d, 1, 0, 1, prec);
                 res = !_acb_vec_contains_zero(th, 2 * n);
-                /* if (!res)
-                   {
-                   flint_printf("(ql_setup) fail at lowprec = %wd (k = %wd, j = %wd)\n", prec, k, j);
-                   _acb_vec_printd(th, 2 * n, 5);
-                   } */
             }
 
             if (k < nb_steps - 1)
