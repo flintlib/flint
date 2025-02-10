@@ -221,8 +221,7 @@ void acb_theta_g2_chi5(acb_t res, acb_srcptr th, slong prec);
 void acb_theta_g2_chi35(acb_t res, acb_srcptr th, slong prec);
 void acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec);
 
-void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec);
-void acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec);
+void acb_theta_g2_sextic_chi5(acb_poly_t f, acb_t chi5, const acb_mat_t tau, slong prec);
 void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, int lead, slong prec);
 
 #ifdef __cplusplus

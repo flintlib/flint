@@ -14,11 +14,11 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_g2_sextic, state)
+TEST_FUNCTION_START(acb_theta_g2_sextic_chi5, state)
 {
     slong iter;
 
-    /* Test: discriminant of sextic is chi10 */
+    /* Test: discriminant of sextic is chi10 = chi5^2 */
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
@@ -28,7 +28,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
         acb_mat_t tau;
         acb_ptr z, th2, roots, mf;
         acb_poly_t f;
-        acb_t d, t;
+        acb_t chi5, d, t;
         slong nb, k, j;
 
         acb_mat_init(tau, g, g);
@@ -37,13 +37,14 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
         roots = _acb_vec_init(6);
         mf = _acb_vec_init(4);
         acb_poly_init(f);
+        acb_init(chi5);
         acb_init(d);
         acb_init(t);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_mat_scalar_mul_2exp_si(tau, tau, -2);
 
-        acb_theta_g2_sextic(f, tau, prec);
+        acb_theta_g2_sextic_chi5(f, chi5, tau, prec);
         nb = acb_poly_find_roots(roots, f, NULL, 0, prec);
 
         if (nb == 6)
@@ -65,15 +66,18 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
 
             acb_theta_all(th2, z, tau, 1, prec);
             acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
+            acb_sqr(chi5, chi5, prec);
 
-            if (!acb_overlaps(d, &mf[2]))
+            if (!acb_overlaps(d, &mf[2]) || !acb_overlaps(chi5, &mf[2]))
             {
                 flint_printf("FAIL\n");
-                flint_printf("roots, discr, chi10:\n");
+                flint_printf("roots, discr, chi10, chi5^2:\n");
                 _acb_vec_printd(roots, 6, 5);
                 acb_printd(d, 5);
                 flint_printf("\n");
                 acb_printd(&mf[2], 5);
+                flint_printf("\n");
+                acb_printd(chi5, 5);
                 flint_printf("\n");
                 flint_abort();
             }
@@ -85,6 +89,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
         _acb_vec_clear(roots, 6);
         _acb_vec_clear(mf, 4);
         acb_poly_clear(f);
+        acb_clear(chi5);
         acb_clear(d);
         acb_clear(t);
     }

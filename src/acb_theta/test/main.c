@@ -36,7 +36,7 @@
 #include "t-g2_covariants.c"
 #include "t-g2_detk_symj.c"
 #include "t-g2_even_weight.c"
-#include "t-g2_sextic.c"
+#include "t-g2_sextic_chi5.c"
 #include "t-g2_transvectant.c"
 #include "t-jet.c"
 #include "t-jet_compose.c"
@@ -92,7 +92,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_g2_covariants),
     TEST_FUNCTION(acb_theta_g2_detk_symj),
     TEST_FUNCTION(acb_theta_g2_even_weight),
-    TEST_FUNCTION(acb_theta_g2_sextic),
+    TEST_FUNCTION(acb_theta_g2_sextic_chi5),
     TEST_FUNCTION(acb_theta_g2_transvectant),
     TEST_FUNCTION(acb_theta_jet),
     TEST_FUNCTION(acb_theta_jet_compose),

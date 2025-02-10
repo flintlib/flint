@@ -69,12 +69,12 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
 
         acb_theta_all(th2, z, tau, 1, prec);
         acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
-        acb_theta_g2_sextic(u, tau, prec);
+        acb_theta_g2_sextic_chi5(u, test, tau, prec);
         acb_theta_g2_covariants(cov1, u, 0, prec);
 
         acb_siegel_transform(w, mat, tau, prec);
         acb_siegel_cocycle(c, mat, tau, prec);
-        acb_theta_g2_sextic(u, w, prec);
+        acb_theta_g2_sextic_chi5(u, test, w, prec);
         acb_theta_g2_covariants(cov2, u, 0, prec);
 
         /* Test psi4 */
