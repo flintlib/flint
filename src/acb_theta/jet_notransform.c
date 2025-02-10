@@ -64,6 +64,24 @@ acb_theta_jet_notransform_00(acb_ptr th, acb_srcptr zs, slong nb,
            theta_00(z + tau a/2 + b/2, tau) */
 
 static void
+acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec)
+{
+    slong * v;
+    slong j;
+
+    v = flint_malloc(g * sizeof(slong));
+
+    for (j = 0; j < g; j++)
+    {
+        v[g - 1 - j] = (a >> j) % 2;
+    }
+    acb_dot_si(x, NULL, 0, z, 1, v, 1, g, prec);
+    acb_mul_2exp_si(x, x, -1);
+
+    flint_free(v);
+}
+
+static void
 acb_theta_jet_notransform_one(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, ulong ab, slong prec)
 {

@@ -75,7 +75,6 @@ void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, const slong * n, slong g);
-void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec);
 
 FLINT_FORCE_INLINE int
 acb_theta_char_is_even(ulong ab, slong g)
