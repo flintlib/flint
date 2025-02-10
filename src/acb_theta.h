@@ -198,7 +198,7 @@ void acb_theta_ql_jet(acb_ptr th, acb_srcptr zs, slong nb,
 /* Reduction and main functions */
 
 void acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, ulong ab, int all, slong prec);
+    const acb_mat_t tau, slong ord, ulong ab, int all, int sqr, slong prec);
 void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, int sqr, slong prec);
 

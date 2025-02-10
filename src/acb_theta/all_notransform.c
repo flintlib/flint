@@ -53,6 +53,6 @@ acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t t
     }
     else
     {
-        acb_theta_jet_notransform(th, zs, nb, tau, 0, 0, 1, prec);
+        acb_theta_jet_notransform(th, zs, nb, tau, 0, 0, 1, 0, prec);
     }
 }

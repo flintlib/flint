@@ -68,7 +68,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         kappa = acb_siegel_kappa(s, mat, new_tau, prec);
         acb_theta_char_table(ch, e, mat, (all ? -1 : 0));
 
-        acb_theta_jet_notransform(aux, new_zs, nb, new_tau, ord, *ch, all, prec);
+        acb_theta_jet_notransform(aux, new_zs, nb, new_tau, ord, *ch, all, 0, prec);
 
         /* Account for reduce_z */
         for (j = 0; j < nb; j++)

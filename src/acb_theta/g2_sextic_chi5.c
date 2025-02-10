@@ -40,7 +40,7 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
 
     if (acb_siegel_is_reduced(w, -10, prec))
     {
-        acb_theta_jet_notransform(dth, zero, 1, w, 1, 0, 1, prec);
+        acb_theta_jet_notransform(dth, zero, 1, w, 1, 0, 1, 0, prec);
 
         for (k = 0; k < n2; k++)
         {

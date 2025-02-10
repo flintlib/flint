@@ -25,12 +25,13 @@ TEST_FUNCTION_START(acb_theta_jet_notransform, state)
         int all = iter % 2;
         ulong ab = n_randint(state, n);
         slong nbth = (all ? n * n : 1);
-        slong mprec = 100 + n_randint(state, 100);
-        slong prec = mprec + 50;
+        slong mprec = 50 + n_randint(state, 100);
+        slong prec = mprec + 25;
         slong bits = n_randint(state, 4);
-        slong nb = 1 + n_randint(state, 2);
+        slong nb = n_randint(state, 3);
         slong ord = n_randint(state, 3);
         slong nbjet = acb_theta_jet_nb(ord, g);
+        int sqr = n_randint(state, 2);
         acb_mat_t tau;
         acb_ptr zs, th, test;
         acb_theta_ctx_tau_t ctx_tau;
@@ -53,7 +54,7 @@ TEST_FUNCTION_START(acb_theta_jet_notransform, state)
             acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
 
-        acb_theta_jet_notransform(th, zs, nb, tau, ord, ab, all, mprec);
+        acb_theta_jet_notransform(th, zs, nb, tau, ord, ab, all, sqr, mprec);
         acb_theta_sum_jet(test, vec, nb, ctx_tau, ord, 1, 1, prec);
         if (!all)
         {
@@ -62,9 +63,13 @@ TEST_FUNCTION_START(acb_theta_jet_notransform, state)
                 _acb_vec_set(test + j * nbjet, test + j * n * n * nbjet + ab * nbjet, nbjet);
             }
         }
+        if (ord == 0 && sqr)
+        {
+            _acb_vec_sqr(test, test, nb * nbth, prec);
+        }
 
-        /* flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, ab = %wd, mprec = %wd, prec = %wd\n",
-            g, nb, ord, all, ab, mprec, prec);
+        /* flint_printf("g = %wd, nb = %wd, ord = %wd, all = %wd, ab = %wd, sqr = %wd, mprec = %wd, prec = %wd\n",
+            g, nb, ord, all, ab, sqr, mprec, prec);
            _acb_vec_printd(th, nb * nbth * nbjet, 5);
            _acb_vec_printd(test, nb * nbth * nbjet, 5); */
 
