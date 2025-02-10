@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mat.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 

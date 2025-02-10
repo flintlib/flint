@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
 #include "arb_mat.h"
 #include "acb_theta.h"
 

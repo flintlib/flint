@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_ctx_sqr_inv, state)

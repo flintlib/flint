@@ -40,7 +40,6 @@
 #include "t-g2_psi4.c"
 #include "t-g2_psi6.c"
 #include "t-g2_sextic.c"
-#include "t-g2_sextic_chi5.c"
 #include "t-g2_transvectant.c"
 #include "t-jet.c"
 #include "t-jet_compose.c"
@@ -100,14 +99,12 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_g2_psi4),
     TEST_FUNCTION(acb_theta_g2_psi6),
     TEST_FUNCTION(acb_theta_g2_sextic),
-    TEST_FUNCTION(acb_theta_g2_sextic_chi5),
     TEST_FUNCTION(acb_theta_g2_transvectant),
     TEST_FUNCTION(acb_theta_jet),
     TEST_FUNCTION(acb_theta_jet_compose),
     TEST_FUNCTION(acb_theta_jet_mul),
     TEST_FUNCTION(acb_theta_jet_notransform),
     TEST_FUNCTION(acb_theta_jet_tuples),
-    TEST_FUNCTION(acb_theta_ql_local_bound),
     TEST_FUNCTION(acb_theta_ql_exact),
     TEST_FUNCTION(acb_theta_ql_jet_error),
     TEST_FUNCTION(acb_theta_ql_jet_fd),
