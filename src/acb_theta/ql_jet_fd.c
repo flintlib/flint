@@ -246,7 +246,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     hprec = prec;
     for (j = 0; (j < nb) && res; j++)
     {
-        acb_theta_local_bound(&c[j], &rho[j], zs + j * g, tau, ord);
+        acb_theta_ql_local_bound(&c[j], &rho[j], zs + j * g, tau, ord);
         acb_theta_jet_finite_diff_radius(arb_midref(&eps[j]), arb_midref(&err[j]),
             &c[j], &rho[j], ord, g, prec);
 

@@ -87,7 +87,7 @@ acb_theta_local_bound_ci(arb_t c0, arb_t c1, arb_t c2, acb_srcptr z, const acb_m
    order ord */
 
 void
-acb_theta_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
+acb_theta_ql_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 {
     slong lp = ACB_THETA_LOW_PREC;
     slong b = ord + 1;
