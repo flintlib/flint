@@ -64,7 +64,7 @@ acb_theta_agm_mul_one(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong 
     }
 
     acb_theta_agm_hadamard(res, v, g, prec);
-    _acb_vec_scalar_mul_2exp_si(res, res, n, -2 * g);
+    _acb_vec_scalar_mul_2exp_si(res, res, n, -g);
 
     _acb_vec_clear(v, 2 * n);
 }

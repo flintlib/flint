@@ -26,17 +26,19 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         slong prec = mprec + 50;
         slong bits = n_randint(state, 3);
         slong delta = 25;
+        int all = iter % 2;
+        slong nbth = (all ? n * n : n);
         acb_mat_t tau;
         acb_ptr z;
         acb_ptr th, th0, r;
         arb_ptr ds;
         arb_t x, t;
         arf_t eps;
-        slong k;
+        slong k, b;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(2 * g);
-        r = _acb_vec_init(n);
+        r = _acb_vec_init(nbth);
         th = _acb_vec_init(n);
         th0 = _acb_vec_init(n);
         ds = _arb_vec_init(2 * n);
@@ -63,13 +65,27 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
             acb_mul_arb(&th0[k], &th0[k], x, prec);
         }
 
-        acb_theta_agm_mul_tight(r, th0, th, ds, ds + n, g, mprec);
+        acb_theta_agm_mul_tight(r, th0, th, ds, ds + n, g, all, mprec);
 
         for (k = 0; k < n; k++)
         {
-            acb_abs(x, &r[k], prec);
+            if (all)
+            {
+                arb_zero(x);
+                for (b = 0; b < n; b++)
+                {
+                    acb_abs(t, &r[k * n + b], prec);
+                    arb_max(x, x, t, prec);
+                }
+            }
+            else
+            {
+                acb_abs(x, &r[k], prec);
+            }
+
             arb_neg(t, &ds[n + k]);
             arb_exp(t, t, prec);
+            arb_mul_2exp_si(t, t, g);
             if (arb_gt(x, t))
             {
                 flint_printf("FAIL (absolute value, k = %wd)\n", k);
@@ -113,7 +129,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
-        _acb_vec_clear(r, n);
+        _acb_vec_clear(r, nbth);
         _acb_vec_clear(th, n);
         _acb_vec_clear(th0, n);
         _arb_vec_clear(ds, 2 * n);

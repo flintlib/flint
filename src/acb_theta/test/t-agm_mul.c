@@ -73,7 +73,6 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         /* Call agm_mul at precision mprec and compare with test */
         acb_theta_agm_mul(th2, th_dupl, th_dupl, g, all, mprec);
         acb_theta_agm_mul(th2 + nbth, th_dupl, th_dupl + n, g, all, mprec);
-        _acb_vec_scalar_mul_2exp_si(th2, th2, 2 * nbth, g);
 
         if (!_acb_vec_overlaps(test, th2, 2 * nbth))
         {
