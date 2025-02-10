@@ -12,8 +12,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
-    int sqr, slong prec)
+acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 {
-    acb_theta_jet(th, zs, nb, tau, 0, 1, sqr, prec);
+    acb_theta_jet(th, z, 1, tau, 0, 1, sqr, prec);
 }

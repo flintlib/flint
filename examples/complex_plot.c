@@ -411,7 +411,7 @@ riemanntheta(acb_t res, const acb_t z, slong prec)
     acb_set(t, z);
     acb_div_onei(t + 1, z);
     acb_mul_2exp_si(t + 1, t + 1, -1);
-    acb_theta_all(th, t, 1, tau, 0, prec);
+    acb_theta_all(th, t, tau, 0, prec);
     acb_set(res, th + 9);
     acb_mul_2exp_si(res, res, -2);
 

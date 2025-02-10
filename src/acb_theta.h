@@ -207,8 +207,7 @@ int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
 
 void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, int all, int sqr, slong prec);
-void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, int sqr, slong prec);
+void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
 
 /* Dimension 2 specifics */
 
