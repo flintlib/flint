@@ -77,9 +77,11 @@ slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, const slong * n, slong g);
 void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec);
 
-int acb_theta_char_is_even(ulong ab, slong g);
-int acb_theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g);
-int acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g);
+FLINT_FORCE_INLINE int
+acb_theta_char_is_even(ulong ab, slong g)
+{
+    return acb_theta_char_dot(ab >> g, ab, g) % 2 == 0;
+}
 
 void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab);
 void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,

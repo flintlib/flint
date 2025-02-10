@@ -12,6 +12,28 @@
 #include "acb.h"
 #include "acb_theta.h"
 
+static int
+acb_theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g)
+{
+    if (ch1 == ch2 || ch1 == ch3 || ch1 == ch4
+        || ch2 == ch3 || ch2 == ch4 || ch3 == ch4)
+    {
+        return 0;
+    }
+
+    return acb_theta_char_is_even(ch1, g)
+        && acb_theta_char_is_even(ch2, g)
+        && acb_theta_char_is_even(ch3, g)
+        && acb_theta_char_is_even(ch4, g)
+        && ((ch1 ^ ch2 ^ ch3 ^ ch4) == 0);
+}
+
+static int
+acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g)
+{
+    return acb_theta_char_is_goepel(ch1, ch2, ch3, ch1 ^ ch2 ^ ch3, g);
+}
+
 static void
 g2_psi6_bits(int * b1, int * b2, int * b3, int * b4, ulong b)
 {
