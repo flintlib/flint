@@ -26,7 +26,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
         slong prec = 100 + n_randint(state, 1000);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
-        acb_ptr z, th2, roots;
+        acb_ptr z, th2, roots, mf;
         acb_poly_t f;
         acb_t d, t;
         slong nb, k, j;
@@ -35,6 +35,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
         z = _acb_vec_init(g);
         th2 = _acb_vec_init(n);
         roots = _acb_vec_init(6);
+        mf = _acb_vec_init(4);
         acb_poly_init(f);
         acb_init(d);
         acb_init(t);
@@ -63,16 +64,16 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
             acb_mul_2exp_si(d, d, -12);
 
             acb_theta_all(th2, z, tau, 1, prec);
-            acb_theta_g2_chi10(t, th2, prec);
+            acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
 
-            if (!acb_overlaps(d, t))
+            if (!acb_overlaps(d, &mf[2]))
             {
                 flint_printf("FAIL\n");
                 flint_printf("roots, discr, chi10:\n");
                 _acb_vec_printd(roots, 6, 5);
                 acb_printd(d, 5);
                 flint_printf("\n");
-                acb_printd(t, 5);
+                acb_printd(&mf[2], 5);
                 flint_printf("\n");
                 flint_abort();
             }
@@ -82,6 +83,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
         _acb_vec_clear(z, g);
         _acb_vec_clear(th2, n);
         _acb_vec_clear(roots, 6);
+        _acb_vec_clear(mf, 4);
         acb_poly_clear(f);
         acb_clear(d);
         acb_clear(t);

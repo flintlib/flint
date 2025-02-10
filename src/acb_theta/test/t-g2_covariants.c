@@ -37,12 +37,12 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         slong klist[26] = ACB_THETA_G2_COV_K;
         fmpz_mat_t mat;
         acb_mat_t tau, w, c;
-        acb_ptr z, th2;
+        acb_ptr z, th2, mf;
         acb_poly_struct * cov1;
         acb_poly_struct * cov2;
         acb_poly_t u, v;
         fmpz_poly_t pol;
-        acb_t psi4, test;
+        acb_t test;
         slong k;
 
         fmpz_mat_init(mat, 2 * g, 2 * g);
@@ -51,6 +51,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_mat_init(c, g, g);
         z = _acb_vec_init(g);
         th2 = _acb_vec_init(n);
+        mf = _acb_vec_init(4);
         cov1 = flint_malloc(26 * sizeof(acb_poly_struct));
         cov2 = flint_malloc(26 * sizeof(acb_poly_struct));
         for (k = 0; k < 26; k++)
@@ -61,14 +62,13 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_init(u);
         acb_poly_init(v);
         fmpz_poly_init(pol);
-        acb_init(psi4);
         acb_init(test);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         sp2gz_randtest(mat, state, bits);
 
         acb_theta_all(th2, z, tau, 1, prec);
-        acb_theta_g2_psi4(psi4, th2, prec);
+        acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
         acb_theta_g2_sextic(u, tau, prec);
         acb_theta_g2_covariants(cov1, u, 0, prec);
 
@@ -85,12 +85,12 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_get_coeff_acb(test, u, 0);
         acb_div_si(test, test, -20, prec);
 
-        if (!acb_overlaps(psi4, test))
+        if (!acb_overlaps(&mf[0], test))
         {
             flint_printf("FAIL (psi4)\n");
             acb_mat_printd(tau, 5);
             flint_printf("psi4, test:\n");
-            acb_printd(psi4, 10);
+            acb_printd(&mf[0], 10);
             flint_printf("\n");
             acb_printd(test, 10);
             flint_printf("\nu:\n");
@@ -151,9 +151,9 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
                 flint_printf("\n");
                 flint_abort();
             }
-            acb_poly_get_coeff_acb(psi4, &cov2[k], 0);
+            acb_poly_get_coeff_acb(&mf[0], &cov2[k], 0);
             acb_poly_get_coeff_acb(test, &cov1[k], jlist[k]);
-            if (!acb_overlaps(psi4, test))
+            if (!acb_overlaps(&mf[0], test))
             {
                 flint_printf("FAIL (leading coefficient, k = %wd)\n", k);
                 acb_poly_printd(&cov1[k], 5);
@@ -170,6 +170,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_mat_clear(c);
         _acb_vec_clear(z, g);
         _acb_vec_clear(th2, n);
+        _acb_vec_clear(mf, 4);
         for (k = 0; k < 26; k++)
         {
             acb_poly_clear(&cov1[k]);
@@ -180,7 +181,6 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_clear(u);
         acb_poly_clear(v);
         fmpz_poly_clear(pol);
-        acb_clear(psi4);
         acb_clear(test);
     }
 

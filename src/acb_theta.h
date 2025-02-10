@@ -217,10 +217,8 @@ void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_pol
     slong m, slong n, slong k, int lead, slong prec);
 slong acb_theta_g2_character(const fmpz_mat_t mat);
 
-void acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec);
-void acb_theta_g2_psi6(acb_t res, acb_srcptr th2, slong prec);
-void acb_theta_g2_chi10(acb_t res, acb_srcptr th2, slong prec);
-void acb_theta_g2_chi12(acb_t res, acb_srcptr th2, slong prec);
+void acb_theta_g2_even_weight(acb_t psi4, acb_t psi6, acb_t chi10, acb_t chi12,
+    acb_srcptr th2, slong prec);
 void acb_theta_g2_chi5(acb_t res, acb_srcptr th, slong prec);
 void acb_theta_g2_chi35(acb_t res, acb_srcptr th, slong prec);
 void acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec);

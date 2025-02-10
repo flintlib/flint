@@ -32,13 +32,10 @@
 #include "t-g2_character.c"
 #include "t-g2_chi3_6.c"
 #include "t-g2_chi5.c"
-#include "t-g2_chi10.c"
-#include "t-g2_chi12.c"
 #include "t-g2_chi35.c"
 #include "t-g2_covariants.c"
 #include "t-g2_detk_symj.c"
-#include "t-g2_psi4.c"
-#include "t-g2_psi6.c"
+#include "t-g2_even_weight.c"
 #include "t-g2_sextic.c"
 #include "t-g2_transvectant.c"
 #include "t-jet.c"
@@ -91,13 +88,10 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_g2_character),
     TEST_FUNCTION(acb_theta_g2_chi3_6),
     TEST_FUNCTION(acb_theta_g2_chi5),
-    TEST_FUNCTION(acb_theta_g2_chi10),
-    TEST_FUNCTION(acb_theta_g2_chi12),
     TEST_FUNCTION(acb_theta_g2_chi35),
     TEST_FUNCTION(acb_theta_g2_covariants),
     TEST_FUNCTION(acb_theta_g2_detk_symj),
-    TEST_FUNCTION(acb_theta_g2_psi4),
-    TEST_FUNCTION(acb_theta_g2_psi6),
+    TEST_FUNCTION(acb_theta_g2_even_weight),
     TEST_FUNCTION(acb_theta_g2_sextic),
     TEST_FUNCTION(acb_theta_g2_transvectant),
     TEST_FUNCTION(acb_theta_jet),
