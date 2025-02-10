@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_all, state)
 {
     slong iter;
 
-    /* Test: agrees with all_notransform */
+    /* Test: agrees with jet_notransform */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
@@ -41,9 +41,9 @@ TEST_FUNCTION_START(acb_theta_all, state)
         acb_mat_scalar_mul_2exp_si(tau, tau, -1);
         acb_siegel_randtest_vec_reduced(z, state, nb, tau, 0, prec);
 
-        /* Call theta_all at precision mprec, test against all_notransform */
+        /* Call theta_all at precision mprec, test against jet_notransform */
         acb_theta_all(th, z, nb, tau, sqr, mprec);
-        acb_theta_all_notransform(test, z, nb, tau, sqr, prec);
+        acb_theta_jet_notransform(test, z, nb, tau, 0, 0, 1, sqr, prec);
 
         if (!_acb_vec_overlaps(th, test, nb * n2))
         {
