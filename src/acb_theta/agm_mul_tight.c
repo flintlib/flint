@@ -82,11 +82,11 @@ acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     /* Perform agm_mul or agm_sqr at high precision */
     if (a0 == a)
     {
-        acb_theta_agm_mul(res, v0, v0, g, hprec);
+        acb_theta_agm_mul(res, v0, v0, g, 0, hprec);
     }
     else
     {
-        acb_theta_agm_mul(res, v0, v, g, hprec);
+        acb_theta_agm_mul(res, v0, v, g, 0, hprec);
     }
 
     /* New relative error wrt distances is m0 eps + m eps0 + eps0 eps */

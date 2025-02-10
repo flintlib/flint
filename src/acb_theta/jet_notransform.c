@@ -157,9 +157,10 @@ acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb,
 
         for (j = 0; j < nb; j++)
         {
-            acb_theta_agm_mul_all(th + j * n * n, new_th,
-                new_th + (j + add_zero) * n, g, prec);
+            acb_theta_agm_mul(th + j * n * n, new_th,
+                new_th + (j + add_zero) * n, g, 1, prec);
         }
+        _acb_vec_scalar_mul_2exp_si(th, th, nb * n * n, g);
 
         _acb_vec_clear(new_zs, (nb + add_zero) * g);
         _acb_vec_clear(new_th, (nb + add_zero) * n);
