@@ -11,7 +11,6 @@
 
 /* Include functions *********************************************************/
 
-#include "t-00.c"
 #include "t-agm_mul.c"
 #include "t-agm_mul_tight.c"
 #include "t-agm_sqrt.c"
@@ -74,7 +73,6 @@
 
 test_struct tests[] =
 {
-    TEST_FUNCTION(acb_theta_00),
     TEST_FUNCTION(acb_theta_agm_mul),
     TEST_FUNCTION(acb_theta_agm_mul_tight),
     TEST_FUNCTION(acb_theta_agm_sqrt),
