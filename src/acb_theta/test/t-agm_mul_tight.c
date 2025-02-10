@@ -130,7 +130,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         }
 
         acb_mat_clear(tau);
-        _acb_vec_clear(z, g);
+        _acb_vec_clear(z, 2 * g);
         _acb_vec_clear(r, nbth);
         _acb_vec_clear(th, n);
         _acb_vec_clear(th0, n);
