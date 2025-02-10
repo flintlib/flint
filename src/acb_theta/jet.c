@@ -16,7 +16,7 @@
 
 void
 acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
-    slong ord, int all, slong prec)
+    slong ord, int all, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -60,19 +60,33 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     {
         res = acb_theta_reduce_z(new_zs, rs, cs, new_zs, nb, new_tau, prec);
     }
+    sqr = sqr && (ord == 0);
 
     if (res)
     {
         /* Setup */
-        _acb_vec_unit_roots(units, 8, 8, prec);
-        kappa = acb_siegel_kappa(s, mat, new_tau, prec);
+        if (sqr)
+        {
+            _acb_vec_unit_roots(units, 4, 4, prec);
+            kappa = acb_siegel_kappa2(mat);
+            acb_mat_det(s, ct, prec);
+        }
+        else
+        {
+            _acb_vec_unit_roots(units, 8, 8, prec);
+            kappa = acb_siegel_kappa(s, mat, new_tau, prec);
+        }
         acb_theta_char_table(ch, e, mat, (all ? -1 : 0));
 
-        acb_theta_jet_notransform(aux, new_zs, nb, new_tau, ord, *ch, all, 0, prec);
+        acb_theta_jet_notransform(aux, new_zs, nb, new_tau, ord, *ch, all, sqr, prec);
 
         /* Account for reduce_z */
         for (j = 0; j < nb; j++)
         {
+            if (sqr)
+            {
+                acb_sqr(&cs[j], &cs[j], prec);
+            }
             _acb_vec_scalar_mul(aux + j * nbth * nbjet, aux + j * nbth * nbjet,
                 nbth * nbjet, &cs[j], prec);
             _arb_vec_neg(r, rs + j * g, g);
@@ -90,10 +104,14 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         for (j = 0; j < nb; j++)
         {
             acb_theta_jet_exp_qf(jet, zs + j * g, N, ord, prec);
+            if (sqr)
+            {
+                acb_sqr(&jet[0], &jet[0], prec);
+            }
 
             for (ab = 0; ab < nbth; ab++)
             {
-                acb_mul(t, s, &units[(kappa + e[ab]) % 8], prec);
+                acb_mul(t, s, &units[(kappa + e[ab]) % (sqr ? 4 : 8)], prec);
                 _acb_vec_scalar_mul(th + j * nbth * nbjet + ab * nbjet,
                     aux + j * nbth * nbjet + (all ? ch[ab] : 0) * nbjet,
                     nbjet, t, prec);

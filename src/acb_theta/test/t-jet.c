@@ -30,6 +30,7 @@ TEST_FUNCTION_START(acb_theta_jet, state)
         slong nbjet = acb_theta_jet_nb(ord, g);
         int all = iter % 2;
         slong nbth = (all ? n * n : 1);
+        int sqr = n_randint(state, 2);
         acb_mat_t tau;
         acb_ptr z;
         acb_ptr th, test;
@@ -46,8 +47,12 @@ TEST_FUNCTION_START(acb_theta_jet, state)
         _acb_vec_scalar_mul_2exp_si(z, z, nb * g, 1);
 
         /* Call jet at precision mprec, test against jet_notransform */
-        acb_theta_jet(th, z, nb, tau, ord, all, mprec);
+        acb_theta_jet(th, z, nb, tau, ord, all, sqr, mprec);
         acb_theta_jet_notransform(test, z, nb, tau, ord, 0, all, 0, prec);
+        if (ord == 0 && sqr)
+        {
+            _acb_vec_sqr(test, test, nb * nbth, prec);
+        }
 
         if (!_acb_vec_overlaps(th, test, nb * nbth * nbjet))
         {

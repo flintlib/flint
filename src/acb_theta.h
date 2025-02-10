@@ -206,7 +206,7 @@ int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
     slong nb, const acb_mat_t tau, slong prec);
 
 void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, int all, slong prec);
+    const acb_mat_t tau, slong ord, int all, int sqr, slong prec);
 void acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
 void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb,
