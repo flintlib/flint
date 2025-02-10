@@ -35,7 +35,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         acb_ptr th, th0, r;
         arb_ptr ds;
         arb_t x, t;
-        arf_t eps;
+        arf_t eps, u;
         slong k, b;
 
         acb_mat_init(tau, g, g);
@@ -47,6 +47,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         arb_init(x);
         arb_init(t);
         arf_init(eps);
+        arf_init(u);
 
         /* Generate distances, not too crazy */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
@@ -100,11 +101,23 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
                 _acb_vec_printd(th0, n, 5);
                 _acb_vec_printd(th, n, 5);
                 flint_printf("result:\n");
-                _acb_vec_printd(r, n, 5);
+                _acb_vec_printd(r, nbth, 5);
                 flint_abort();
             }
 
-            acb_get_rad_ubound_arf(eps, &r[k], prec);
+            if (all)
+            {
+                arf_zero(eps);
+                for (b = 0; b < n; b++)
+                {
+                    acb_get_rad_ubound_arf(u, &r[k * n + b], prec);
+                    arf_max(eps, eps, u);
+                }
+            }
+            else
+            {
+                acb_get_rad_ubound_arf(eps, &r[k], prec);
+            }
             arb_set_arf(x, eps);
             arb_mul_2exp_si(t, t, -mprec + delta);
             if (arb_gt(x, t))
@@ -119,7 +132,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
                 _acb_vec_printd(th0, n, 5);
                 _acb_vec_printd(th, n, 5);
                 flint_printf("result:\n");
-                _acb_vec_printd(r, n, 5);
+                _acb_vec_printd(r, nbth, 5);
                 flint_printf("x, t:\n");
                 arb_printd(x, 5);
                 flint_printf("\n");
@@ -138,6 +151,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         arb_clear(x);
         arb_clear(t);
         arf_clear(eps);
+        arf_clear(u);
     }
 
     TEST_FUNCTION_END(state);
