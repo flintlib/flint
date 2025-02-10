@@ -22,6 +22,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     slong n = 1 << g;
     slong nbth = (all ? n * n : 1);
     slong nbjet = acb_theta_jet_nb(ord, g);
+    slong nbu = (sqr ? 4 : 8);
     fmpz_mat_t mat;
     acb_mat_t new_tau, N, ct;
     acb_ptr new_zs, exps, cs, aux, units, jet;
@@ -65,17 +66,8 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     if (res)
     {
         /* Setup */
-        if (sqr)
-        {
-            _acb_vec_unit_roots(units, 4, 4, prec);
-            kappa = acb_siegel_kappa2(mat);
-            acb_mat_det(s, ct, prec);
-        }
-        else
-        {
-            _acb_vec_unit_roots(units, 8, 8, prec);
-            kappa = acb_siegel_kappa(s, mat, new_tau, prec);
-        }
+        _acb_vec_unit_roots(units, nbu, nbu, prec);
+        kappa = acb_siegel_kappa(s, mat, new_tau, sqr, prec);
         acb_theta_char_table(ch, e, mat, (all ? -1 : 0));
 
         acb_theta_jet_notransform(aux, new_zs, nb, new_tau, ord, *ch, all, sqr, prec);

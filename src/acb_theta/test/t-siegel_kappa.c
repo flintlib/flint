@@ -16,45 +16,88 @@ TEST_FUNCTION_START(acb_theta_siegel_kappa, state)
 {
     slong iter;
 
-    /* Test: kappa and kappa2 agree */
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    /* Test: compatibility with matrix multiplication, and compatible with sqr */
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong bits = n_randint(state, 4);
         slong prec = 200;
-        fmpz_mat_t mat;
-        fmpz_mat_t x;
+        fmpz_mat_t m1, m2, m;
         acb_mat_t tau;
-        acb_t sqrtdet;
-        slong kappa, kappa2;
+        acb_t s1, s2, s, t;
+        slong kappa1, kappa2, kappa, e1, e2, e;
+        ulong c1, c2, c;
 
-        fmpz_mat_init(mat, 2 * g, 2 * g);
-        fmpz_mat_init(x, 2, 2);
+        fmpz_mat_init(m1, 2 * g, 2 * g);
+        fmpz_mat_init(m2, 2 * g, 2 * g);
+        fmpz_mat_init(m, 2 * g, 2 * g);
         acb_mat_init(tau, g, g);
-        acb_init(sqrtdet);
+        acb_init(s1);
+        acb_init(s2);
+        acb_init(s);
+        acb_init(t);
 
-        sp2gz_randtest(mat, state, bits);
+        sp2gz_randtest(m1, state, bits);
+        sp2gz_randtest(m2, state, bits);
         acb_siegel_randtest_reduced(tau, state, prec, bits);
 
-        kappa = acb_siegel_kappa(sqrtdet, mat, tau, prec);
-        kappa2 = acb_siegel_kappa2(mat);
+        fmpz_mat_mul(m, m2, m1);
+        kappa = acb_siegel_kappa(s, m, tau, 0, prec);
 
-        if (kappa % 4 != kappa2)
+        kappa1 = acb_siegel_kappa(s1, m1, tau, 0, prec);
+        acb_siegel_transform(tau, m1, tau, prec);
+        kappa2 = acb_siegel_kappa(s2, m2, tau, 0, prec);
+
+        acb_theta_char_table(&c2, &e2, m2, 0);
+        acb_theta_char_table(&c1, &e1, m1, c2);
+        acb_theta_char_table(&c, &e, m, 0);
+
+        if (c1 != c
+            || ((kappa1 + e1 + kappa2 + e2) % 4 != (kappa + e) % 4))
         {
-            flint_printf("FAIL\n");
-            flint_printf("tau, mat:\n");
-            acb_mat_printd(tau, 5);
-            fmpz_mat_print_pretty(mat);
-            flint_printf("kappa = %wd, kappa2 = %wd, sqrtdet:\n", kappa, kappa2);
-            acb_printd(sqrtdet, 5);
+            flint_printf("FAIL (characteristics)\n");
+            flint_printf("c1 = %wd, c2 = %wd, c = %wd, e1 = %wd, e2 = %wd, e = %wd, kappa1 = %wd, kappa2 = %wd, kappa = %wd\n",
+                c1, c2, c, e1, e2, e, kappa1, kappa2, kappa);
+            flint_abort();
+        }
+
+        acb_mul(t, s1, s2, prec);
+        if ((kappa1 + e1 + kappa2 + e2) % 8 != (kappa + e) % 8)
+        {
+            acb_neg(t, t);
+        }
+        if (!acb_overlaps(t, s))
+        {
+            flint_printf("FAIL (square roots)\n");
+            flint_printf("s, t:\n");
+            acb_printd(t, 5);
+            flint_printf("\n");
+            acb_printd(s, 5);
             flint_printf("\n");
             flint_abort();
         }
 
-        fmpz_mat_clear(mat);
-        fmpz_mat_clear(x);
+        acb_sqr(t, s2, prec);
+        kappa = acb_siegel_kappa(s2, m2, tau, 1, prec);
+        if ((kappa != kappa2 % 4) || !acb_overlaps(t, s2))
+        {
+            flint_printf("FAIL (sqr)\n");
+            flint_printf("kappa2 = %wd, kappa = %wd, s2, t:\n", kappa2, kappa);
+            acb_printd(s2, 5);
+            flint_printf("\n");
+            acb_printd(t, 5);
+            flint_printf("\n");
+            flint_abort();
+        }
+
+        fmpz_mat_clear(m1);
+        fmpz_mat_clear(m2);
+        fmpz_mat_clear(m);
         acb_mat_clear(tau);
-        acb_clear(sqrtdet);
+        acb_clear(s1);
+        acb_clear(s2);
+        acb_clear(s);
+        acb_clear(t);
     }
 
     TEST_FUNCTION_END(state);
