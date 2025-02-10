@@ -22,6 +22,7 @@ TEST_FUNCTION_START(acb_theta_g2_transvectant, state)
     {
         slong prec = 200;
         slong bits = 2;
+        int lead = iter % 2;
         acb_poly_t f, g;
         acb_t c, test;
 
@@ -33,7 +34,7 @@ TEST_FUNCTION_START(acb_theta_g2_transvectant, state)
         acb_poly_randtest(f, state, 6, prec, bits);
         acb_poly_set_coeff_si(f, 6, 1);
 
-        acb_theta_g2_transvectant(g, f, f, 6, 6, 6, prec);
+        acb_theta_g2_transvectant(g, f, f, 6, 6, 6, lead, prec);
 
         if (acb_poly_degree(g) > 0)
         {

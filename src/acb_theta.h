@@ -214,9 +214,7 @@ void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong
 void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f,
     slong k, slong j, slong prec);
 void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h,
-    slong m, slong n, slong k, slong prec);
-void acb_theta_g2_transvectant_lead(acb_t r, const acb_poly_t g, const acb_poly_t h,
-    slong m, slong n, slong k, slong prec);
+    slong m, slong n, slong k, int lead, slong prec);
 slong acb_theta_g2_character(const fmpz_mat_t mat);
 
 void acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec);
@@ -229,8 +227,7 @@ void acb_theta_g2_chi3_6(acb_poly_t res, acb_srcptr dth, slong prec);
 
 void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec);
 void acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec);
-void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, slong prec);
-void acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec);
+void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, int lead, slong prec);
 
 #ifdef __cplusplus
 }
