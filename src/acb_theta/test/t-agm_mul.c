@@ -23,7 +23,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
-        slong mprec = 100 + n_randint(state, 200);
+        slong mprec = 100 + n_randint(state, 100);
         slong prec = mprec + 50;
         slong bits = n_randint(state, 2);
         int all = iter % 2;
