@@ -62,6 +62,7 @@ acb_theta_g2_sextic_chi5(acb_poly_t f, acb_t chi5, const acb_mat_t tau, slong pr
     }
     else
     {
+        /* Should not happen in tests */
         acb_indeterminate(chi5);
         for (k = 0; k < 6; k++)
         {

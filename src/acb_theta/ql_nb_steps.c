@@ -97,6 +97,7 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
       dimensions will depend on whether or not duplications/dimension-lowerings
       have already been applied. */
     /* See /path/to/flint/build/acb_theta/profile/p-acb_theta_ql_exact */
+    /* Some of these branches will not show up in tests. */
     for (s = g - 1; s >= 0; s--)
     {
         /* Find out how many duplication steps have been performed so far
@@ -134,7 +135,6 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
            the dimension-lowering strategy. */
         if (s == 0)
         {
-            /* Some of these branches will not show up in tests. */
             nb = pattern[s] - 5;
             if (nb >= 10)
             {

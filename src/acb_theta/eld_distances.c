@@ -15,6 +15,7 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
+/* Should not be used in tests */
 static void
 acb_theta_dist_unif(arb_t d, const arb_mat_t cho, slong prec)
 {

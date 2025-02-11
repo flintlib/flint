@@ -543,8 +543,10 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
         acb_theta_ql_perform_steps(th, th_init, rts, rts_all, nb, nb_steps,
             distances, easy_steps, all, g, prec + guard);
     }
-    else /* setup or intput did not succeed, fall back to summation */
+    else
     {
+        /* Setup or intput did not succeed, fall back to summation */
+        /* Should not happen in tests */
         acb_theta_ql_exact_sum(th, zs, nb, tau, distances, all, 1, prec);
     }
 
