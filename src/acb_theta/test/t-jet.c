@@ -51,7 +51,9 @@ TEST_FUNCTION_START(acb_theta_jet, state)
         acb_theta_jet(th, z, nb, tau, ord, all, sqr, mprec);
         acb_theta_jet_notransform(test, z, nb, tau, ord, 0, all, sqr, prec);
 
-        if (!_acb_vec_overlaps(th, test, nb * nbth * nbjet))
+        if (!_acb_vec_overlaps(th, test, nb * nbth * nbjet)
+            || !_acb_vec_is_finite(th, nb * nbth * nbjet)
+            || !_acb_vec_is_finite(test, nb * nbth * nbjet))
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, prec = %wd, nb = %wd, ord = %wd, all = %wd, sqr = %wd, tau, z:\n",

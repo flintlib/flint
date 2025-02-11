@@ -75,7 +75,9 @@ TEST_FUNCTION_START(acb_theta_sum, state)
             }
         }
 
-        if (!_acb_vec_overlaps(th, test, n2))
+        if (!_acb_vec_overlaps(th, test, n2)
+            || !_acb_vec_is_finite(th, n2)
+            || !_acb_vec_is_finite(test, n2))
         {
             flint_printf("FAIL\n");
             flint_printf("g=%wd\n", g);

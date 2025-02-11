@@ -30,6 +30,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic_chi5, state)
         acb_poly_t f;
         acb_t chi5, d, t;
         slong nb, k, j;
+        int res = 1;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
@@ -45,6 +46,21 @@ TEST_FUNCTION_START(acb_theta_g2_sextic_chi5, state)
         acb_mat_scalar_mul_2exp_si(tau, tau, -2);
 
         acb_theta_g2_sextic_chi5(f, chi5, tau, prec);
+
+        for (k = 0; k <= 6; k++)
+        {
+            acb_poly_get_coeff_acb(t, f, k);
+            res = res && acb_is_finite(t);
+        }
+
+        if (!res)
+        {
+            flint_printf("FAIL (finite)\n");
+            acb_poly_printd(f, 5);
+            flint_printf("\n");
+            flint_abort();
+        }
+
         nb = acb_poly_find_roots(roots, f, NULL, 0, prec);
 
         if (nb == 6)
@@ -68,7 +84,10 @@ TEST_FUNCTION_START(acb_theta_g2_sextic_chi5, state)
             acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
             acb_sqr(chi5, chi5, prec);
 
-            if (!acb_overlaps(d, &mf[2]) || !acb_overlaps(chi5, &mf[2]))
+            if (!acb_overlaps(d, &mf[2])
+                || !acb_overlaps(chi5, &mf[2])
+                || !_acb_vec_is_finite(mf, 4)
+                || !acb_is_finite(d))
             {
                 flint_printf("FAIL\n");
                 flint_printf("roots, discr, chi10, chi5^2:\n");

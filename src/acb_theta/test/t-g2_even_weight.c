@@ -50,7 +50,9 @@ TEST_FUNCTION_START(acb_theta_g2_even_weight, state)
             acb_neg(&test[3], &test[3]);
         }
 
-        if (!_acb_vec_overlaps(test, mf, 4))
+        if (!_acb_vec_overlaps(test, mf, 4)
+            || !_acb_vec_is_finite(test, 4)
+            || !_acb_vec_is_finite(mf, 4))
         {
             flint_printf("FAIL\n");
             fmpz_mat_print_pretty(mat);

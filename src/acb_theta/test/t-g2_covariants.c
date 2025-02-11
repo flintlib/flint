@@ -85,7 +85,9 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_get_coeff_acb(test, u, 0);
         acb_div_si(test, test, -20, prec);
 
-        if (!acb_overlaps(&mf[0], test))
+        if (!acb_overlaps(&mf[0], test)
+            || !_acb_vec_is_finite(mf, 4)
+            || !acb_is_finite(test))
         {
             flint_printf("FAIL (psi4)\n");
             acb_mat_printd(tau, 5);
@@ -153,7 +155,9 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
             }
             acb_poly_get_coeff_acb(&mf[0], &cov2[k], 0);
             acb_poly_get_coeff_acb(test, &cov1[k], jlist[k]);
-            if (!acb_overlaps(&mf[0], test))
+            if (!acb_overlaps(&mf[0], test)
+                || !acb_is_finite(&mf[0])
+                || !acb_is_finite(test))
             {
                 flint_printf("FAIL (leading coefficient, k = %wd)\n", k);
                 acb_poly_printd(&cov1[k], 5);

@@ -50,7 +50,8 @@ TEST_FUNCTION_START(acb_theta_eld_distances, state)
 
         acb_theta_eld_distances(d, z, 1, tau, prec);
 
-        if (!arb_contains_zero(&d[a]))
+        if (!arb_contains_zero(&d[a])
+            || !_arb_vec_is_finite(d, n))
         {
             flint_printf("FAIL\n");
             flint_printf("g = %wd, a = %wd, tau:\n", g, a);

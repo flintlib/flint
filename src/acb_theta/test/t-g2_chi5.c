@@ -42,7 +42,9 @@ TEST_FUNCTION_START(acb_theta_g2_chi5, state)
         _acb_vec_sqr(th, th, n2, prec);
         acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th, prec);
 
-        if (!acb_overlaps(r, &mf[2]))
+        if (!acb_overlaps(r, &mf[2])
+            || !_acb_vec_is_finite(mf, 4)
+            || !acb_is_finite(r))
         {
             flint_printf("FAIL\n");
             acb_printd(r, 10);
