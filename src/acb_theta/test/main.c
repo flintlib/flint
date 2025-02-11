@@ -95,7 +95,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_jet_tuples),
     TEST_FUNCTION(acb_theta_ql_exact),
     TEST_FUNCTION(acb_theta_ql_jet_error),
-    //TEST_FUNCTION(acb_theta_ql_jet_fd),
+    TEST_FUNCTION(acb_theta_ql_jet_fd),
     TEST_FUNCTION(acb_theta_ql_local_bound),
     TEST_FUNCTION(acb_theta_ql_lower_dim),
     TEST_FUNCTION(acb_theta_ql_setup),
