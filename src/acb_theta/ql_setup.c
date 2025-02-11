@@ -228,7 +228,14 @@ acb_theta_ql_setup_hard(acb_ptr rts, acb_ptr rts_all, acb_ptr t,
                 /* We just need roots for z + 2t */
                 th = rts_all + j * n * n;
                 acb_theta_sum(th, &aux[1], 1, ctx_tau, d, 1, 1, 1, prec);
-                res = !_acb_vec_contains_zero(rts, n * n);
+                res = !_acb_vec_contains_zero(th, n * n);
+            }
+            else if (k == 0)
+            {
+                /* We just need roots for z + 2t */
+                th = rts + j * (3 * n * nb_steps) + 2 * n;
+                acb_theta_sum(th, &aux[1], 1, ctx_tau, d, 1, 0, 1, prec);
+                res = !_acb_vec_contains_zero(th, n);
             }
             else
             {

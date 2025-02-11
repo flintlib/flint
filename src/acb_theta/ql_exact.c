@@ -440,10 +440,13 @@ acb_theta_ql_perform_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
             }
             else
             {
-                /* theta(z + t, tau)^2 = sum of theta(0, 2tau) theta(2z + 2t, 2tau) */
-                acb_theta_ql_step_1(th_next + 3 * j * n + n, th_init,
-                    th_init + 3 * j * n + n,
-                    rts + j * (3 * n * nb_steps) + k * (3 * n) + n, d0, d, g, prec);
+                if (k > 0)
+                {
+                    /* theta(z + t, tau)^2 = sum of theta(0, 2tau) theta(2z + 2t, 2tau) */
+                    acb_theta_ql_step_1(th_next + 3 * j * n + n, th_init,
+                        th_init + 3 * j * n + n,
+                        rts + j * (3 * n * nb_steps) + k * (3 * n) + n, d0, d, g, prec);
+                }
                 /* theta(z + 2t, tau)^2 = sum of theta(0, 2tau) theta(2z + 4t, 2tau) */
                 acb_theta_ql_step_1(th_next + 3 * j * n + 2 * n, th_init,
                     th_init + 3 * j * n + 2 * n,

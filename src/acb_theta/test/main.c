@@ -98,7 +98,7 @@ test_struct tests[] =
     //TEST_FUNCTION(acb_theta_ql_jet_fd),
     TEST_FUNCTION(acb_theta_ql_local_bound),
     TEST_FUNCTION(acb_theta_ql_lower_dim),
-    //TEST_FUNCTION(acb_theta_ql_setup),
+    TEST_FUNCTION(acb_theta_ql_setup),
     TEST_FUNCTION(acb_theta_siegel_cocycle),
     TEST_FUNCTION(acb_theta_siegel_is_reduced),
     TEST_FUNCTION(acb_theta_siegel_kappa),

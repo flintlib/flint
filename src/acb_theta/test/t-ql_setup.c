@@ -56,6 +56,11 @@ TEST_FUNCTION_START(acb_theta_ql_setup, state)
         if (!res)
         {
             flint_printf("FAIL (ql_setup)\n");
+            flint_printf("prec = %wd, nb = %wd, nb_steps = %wd, all = %wd, tau, z, distances:\n",
+                prec, nb, nb_steps, all);
+            acb_mat_printd(tau, 5);
+            _acb_vec_printd(zs, nb * g, 5);
+            _arb_vec_printd(distances, nb * n, 5);
             flint_abort();
         }
 
@@ -108,7 +113,8 @@ TEST_FUNCTION_START(acb_theta_ql_setup, state)
                             flint_abort();
                         }
                         if (k >= easy_steps[j]
-                            && acb_contains_zero(&rts[j * (3 * n * nb_steps) + k * (3 * n) + n + a]))
+                            && acb_contains_zero(&rts[j * (3 * n * nb_steps) + k * (3 * n) + n + a])
+                            && k > 0)
                         {
                             flint_printf("FAIL (root 2)\n");
                             flint_printf("j = %wd, k = %wd, a = %wd\n", j, k, a);
