@@ -117,6 +117,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     }
     else
     {
+        /* Should not happen in tests */
         _acb_vec_indeterminate(th, nb * nbth * nbjet);
     }
 

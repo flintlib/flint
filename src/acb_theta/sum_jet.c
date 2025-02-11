@@ -475,6 +475,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         }
         else
         {
+            /* Should not happen in tests */
             _acb_vec_indeterminate(th, nb * nbth * nbjet);
         }
 

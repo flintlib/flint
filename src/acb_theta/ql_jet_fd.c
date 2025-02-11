@@ -323,6 +323,7 @@ acb_theta_ql_jet_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     }
     else
     {
+        /* Should not happen in tests */
         _acb_vec_indeterminate(th, nb * nbth * nbjet);
     }
 
@@ -438,6 +439,7 @@ acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb,
     }
     else
     {
+        /* Should not happen in tests */
         _acb_vec_indeterminate(th, nb * nbth * nbjet);
     }
 

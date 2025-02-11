@@ -28,7 +28,7 @@ TEST_FUNCTION_START(acb_theta_ql_jet_fd, state)
         slong mprec = 100 + n_randint(state, 100);
         slong prec = mprec + 50;
         slong bits = n_randint(state, 4);
-        slong nb = 1 + n_randint(state, 2);
+        slong nb = n_randint(state, 3);
         slong ord = n_randint(state, 3);
         slong nbjet = acb_theta_jet_nb(ord, g);
         acb_mat_t tau;

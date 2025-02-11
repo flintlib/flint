@@ -115,6 +115,20 @@ TEST_FUNCTION_START(acb_theta_eld_points, state)
                     }
                     flint_abort();
                 }
+                res = 0;
+                for (j = 0; j < E->nr; j++)
+                {
+                    res += acb_theta_eld_contains(&(E->rchildren)[j], pt);
+                }
+                for (j = 0; j < E->nl; j++)
+                {
+                    res += acb_theta_eld_contains(&(E->lchildren)[j], pt);
+                }
+                if (g >= 2 && res != 1)
+                {
+                    flint_printf("FAIL: not contained in exactly 1 child\n");
+                    flint_abort();
+                }
             }
 
             if (!acb_theta_eld_contains(E, pt))

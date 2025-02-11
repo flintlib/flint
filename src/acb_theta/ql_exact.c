@@ -109,6 +109,7 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
             else
             {
                 /* Initialize with length 0 to be able to free later. */
+                /* Should not happen in tests */
                 new_zs[j * nba + a] = _acb_vec_init(0);
                 cofactors[j * nba + a] = _acb_vec_init(0);
                 nb_pts[j * nba + a] = 0;
@@ -120,6 +121,7 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
 
     if (!res)
     {
+        /* Should not happen in tests */
         nb0 = 0;
     }
     z0s = _acb_vec_init(nb0 * s);
@@ -158,6 +160,7 @@ acb_theta_ql_exact_lower_dim(acb_ptr th, acb_srcptr zs, slong nb,
     }
     else
     {
+        /* Should not happen in tests */
         acb_theta_ql_exact_sum(th, zs, nb, tau, distances, all, shifted_prec, prec);
     }
 

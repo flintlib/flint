@@ -46,6 +46,7 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 
         if (!arb_is_finite(x) || arf_cmpabs_2exp_si(arb_midref(x), FLINT_BITS - 4) > 0)
         {
+            /* Should not happen in tests */
             arb_clear(x);
             arb_clear(t);
             return 0;
@@ -133,6 +134,7 @@ acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
            the dimension-lowering strategy. */
         if (s == 0)
         {
+            /* Some of these branches will not show up in tests. */
             nb = pattern[s] - 5;
             if (nb >= 10)
             {

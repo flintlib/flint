@@ -125,10 +125,8 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     }
     else
     {
-        for (j = 0; j < nb * n; j++)
-        {
-            acb_indeterminate(&th[j]);
-        }
+        /* Should not happen in tests */
+        _acb_vec_indeterminate(th, nb * n);
     }
 
     acb_theta_eld_clear(E);

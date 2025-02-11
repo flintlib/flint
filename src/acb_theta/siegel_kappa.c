@@ -113,12 +113,9 @@ acb_siegel_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
         /* Check that no root intersects the [-1,1] segment */
         for (j = 0; (j < g) && success; j++)
         {
-            if (arb_contains_zero(acb_imagref(&rts[j])))
-            {
-                arb_abs(x, acb_realref(&rts[j]));
-                arb_sub_si(x, x, 1, prec);
-                success = arb_is_positive(x);
-            }
+            arb_abs(x, acb_realref(&rts[j]));
+            arb_sub_si(x, x, 1, prec);
+            success = !arb_contains_zero(acb_imagref(&rts[j])) || arb_is_positive(x);
         }
     }
 
@@ -167,6 +164,7 @@ acb_siegel_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
     }
     else
     {
+        /* Should not happen in tests */
         acb_mat_det(res, tau, prec);
         acb_sqrts(res, z, res, prec);
         acb_union(res, res, z, prec);

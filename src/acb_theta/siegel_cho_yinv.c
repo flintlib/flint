@@ -27,6 +27,7 @@ acb_siegel_cho_yinv(arb_mat_t cho, arb_mat_t yinv, const acb_mat_t tau, slong pr
     res = arb_mat_cho(cho, cho, prec);
     if (!res)
     {
+        /* Should not happen in tests */
         arb_mat_indeterminate(cho);
     }
     arb_mat_inv_cho_precomp(yinv, cho, prec);

@@ -150,6 +150,7 @@ acb_theta_dist_lat(arb_t d, arb_srcptr v, const arb_mat_t cho, slong prec)
     }
     else
     {
+        /* Should not happen in tests */
         acb_theta_dist_unif(d, cho, prec);
     }
     arb_nonnegative_part(d, d);
