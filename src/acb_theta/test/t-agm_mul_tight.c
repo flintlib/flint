@@ -19,20 +19,20 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
 {
     slong iter;
 
-    /* Test: respects relative precision */
+    /* Test: respects relative precision, and agrees with agm_mul at huge precision */
     for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
         slong n = 1 << g;
         slong mprec = 50 + n_randint(state, 200);
-        slong prec = mprec + 50;
+        slong prec = mprec + 500;
         slong bits = n_randint(state, 3);
         slong delta = 25;
         int all = iter % 2;
         slong nbth = (all ? n * n : n);
         acb_mat_t tau;
         acb_ptr z;
-        acb_ptr th, th0, r;
+        acb_ptr th, th0, r, test;
         arb_ptr ds;
         arb_t x, t;
         arf_t eps, u;
@@ -41,6 +41,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(2 * g);
         r = _acb_vec_init(nbth);
+        test = _acb_vec_init(nbth);
         th = _acb_vec_init(n);
         th0 = _acb_vec_init(n);
         ds = _arb_vec_init(2 * n);
@@ -69,6 +70,15 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         }
 
         acb_theta_agm_mul_tight(r, th0, th, ds, ds + n, g, all, mprec);
+        acb_theta_agm_mul(test, th0, th, g, all, prec);
+
+        if (!_acb_vec_overlaps(r, test, nbth)
+            || !_acb_vec_is_finite(r, nbth)
+            || !_acb_vec_is_finite(test, nbth))
+        {
+            flint_printf("FAIL (overlap)\n");
+            flint_abort();
+        }
 
         for (k = 0; k < n; k++)
         {
@@ -145,6 +155,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul_tight, state)
         acb_mat_clear(tau);
         _acb_vec_clear(z, 2 * g);
         _acb_vec_clear(r, nbth);
+        _acb_vec_clear(test, nbth);
         _acb_vec_clear(th, n);
         _acb_vec_clear(th0, n);
         _arb_vec_clear(ds, 2 * n);
