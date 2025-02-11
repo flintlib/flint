@@ -45,6 +45,9 @@ struct acb_theta_ctx_tau_struct
     acb_mat_t exp_tau_div_2_inv;
     acb_mat_t exp_tau_inv;
 
+    slong * sqr_pow_len;
+    acb_ptr * sqr_pow;
+
     /* allow_shift only */
     acb_ptr exp_tau_a;
     acb_ptr exp_tau_a_inv;

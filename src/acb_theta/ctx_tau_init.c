@@ -19,6 +19,8 @@ void
 acb_theta_ctx_tau_init(acb_theta_ctx_tau_t ctx, int allow_shift, slong g)
 {
     slong n = 1 << g;
+    slong j;
+
     FLINT_ASSERT(g >= 1);
 
     ctx->g = g;
@@ -32,6 +34,13 @@ acb_theta_ctx_tau_init(acb_theta_ctx_tau_t ctx, int allow_shift, slong g)
     acb_mat_init(ctx->exp_tau_div_4_inv, g, g);
     acb_mat_init(ctx->exp_tau_div_2_inv, g, g);
     acb_mat_init(ctx->exp_tau_inv, g, g);
+
+    ctx->sqr_pow_len = flint_malloc(g * sizeof(slong));
+    ctx->sqr_pow = flint_malloc(g * sizeof(acb_ptr));
+    for (j = 0; j < g; j++)
+    {
+        ctx->sqr_pow[j] = _acb_vec_init(0);
+    }
 
     if (allow_shift)
     {

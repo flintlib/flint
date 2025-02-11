@@ -421,6 +421,8 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
 
         if (b)
         {
+            acb_theta_ctx_tau_fit_eld(ctx_tau, E, prec);
+
             /* Sum series, rescale by c factor */
             for (j = 0; j < nb; j++)
             {

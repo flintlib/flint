@@ -20,6 +20,7 @@ acb_theta_ctx_tau_clear(acb_theta_ctx_tau_t ctx)
 {
     slong g = ctx->g;
     slong n = 1 << g;
+    slong j;
 
     arb_mat_clear(&ctx->yinv);
     arb_mat_clear(&ctx->cho);
@@ -29,6 +30,13 @@ acb_theta_ctx_tau_clear(acb_theta_ctx_tau_t ctx)
     acb_mat_clear(ctx->exp_tau_div_4_inv);
     acb_mat_clear(ctx->exp_tau_div_2_inv);
     acb_mat_clear(ctx->exp_tau_inv);
+
+    for (j = 0; j < g; j++)
+    {
+        _acb_vec_clear(ctx->sqr_pow[j], ctx->sqr_pow_len[j]);
+    }
+    flint_free(ctx->sqr_pow);
+    flint_free(ctx->sqr_pow_len);
 
     if (ctx->allow_shift)
     {

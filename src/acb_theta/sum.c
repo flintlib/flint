@@ -110,6 +110,8 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
 
     if (b)
     {
+        acb_theta_ctx_tau_fit_eld(ctx_tau, E, prec);
+
         for (j = 0; j < nb; j++)
         {
             acb_theta_sum_work(th + j * n, n, (&vec[j])->exp_2z,
