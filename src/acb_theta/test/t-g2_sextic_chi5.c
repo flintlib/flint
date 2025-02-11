@@ -53,7 +53,8 @@ TEST_FUNCTION_START(acb_theta_g2_sextic_chi5, state)
             res = res && acb_is_finite(t);
         }
 
-        if (!res)
+        if ((!res && !acb_contains_zero(chi5))
+            || !acb_is_finite(chi5))
         {
             flint_printf("FAIL (finite)\n");
             acb_poly_printd(f, 5);

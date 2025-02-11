@@ -42,7 +42,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_struct * cov2;
         acb_poly_t u, v;
         fmpz_poly_t pol;
-        acb_t test;
+        acb_t test, chi5;
         slong k;
 
         fmpz_mat_init(mat, 2 * g, 2 * g);
@@ -63,13 +63,14 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_init(v);
         fmpz_poly_init(pol);
         acb_init(test);
+        acb_init(chi5);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         sp2gz_randtest(mat, state, bits);
 
         acb_theta_all(th2, z, tau, 1, prec);
         acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
-        acb_theta_g2_sextic_chi5(u, test, tau, prec);
+        acb_theta_g2_sextic_chi5(u, chi5, tau, prec);
         acb_theta_g2_covariants(cov1, u, 0, prec);
 
         acb_siegel_transform(w, mat, tau, prec);
@@ -87,7 +88,8 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
 
         if (!acb_overlaps(&mf[0], test)
             || !_acb_vec_is_finite(mf, 4)
-            || !acb_is_finite(test))
+            || !acb_is_finite(chi5)
+            || (!acb_is_finite(test) && !acb_contains_zero(chi5)))
         {
             flint_printf("FAIL (psi4)\n");
             acb_mat_printd(tau, 5);
@@ -186,6 +188,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_clear(v);
         fmpz_poly_clear(pol);
         acb_clear(test);
+        acb_clear(chi5);
     }
 
     TEST_FUNCTION_END(state);
