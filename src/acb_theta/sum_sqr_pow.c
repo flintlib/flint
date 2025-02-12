@@ -30,7 +30,7 @@ acb_theta_sum_sqr_pow(acb_ptr * sqr_pow, const acb_mat_t exp_tau, const acb_thet
         acb_one(c);
         acb_set(dc, acb_mat_entry(exp_tau, k, k));
         acb_sqr(ddc, dc, prec);
-        for (j = 0; j <= (E->box[k]); j++)
+        for (j = 0; j <= acb_theta_eld_box(E, k); j++)
         {
             acb_set(&sqr_pow[k][j], c);
             acb_mul(c, c, dc, prec);

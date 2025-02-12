@@ -269,7 +269,7 @@ acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_z, acb_srcptr exp_z_inv
 
     for (j = 0; j < g; j++)
     {
-        width = FLINT_MAX(width, 2 * (E->box[j]) + 1);
+        width = FLINT_MAX(width, 2 * acb_theta_eld_box(E, j) + 1);
     }
 
     acb_mat_init(lin_pow, g, g);

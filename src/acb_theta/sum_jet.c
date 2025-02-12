@@ -425,7 +425,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         {
             for (j = 0; j < g; j++)
             {
-                sqr_pow[j] = _acb_vec_init(E->box[j] + 1);
+                sqr_pow[j] = _acb_vec_init(acb_theta_eld_box(E, j) + 1);
             }
             /* If all_a, use exp_z, exp_tau_div_4 instead of exp_2z, exp_tau */
             acb_theta_sum_sqr_pow(sqr_pow,
@@ -484,7 +484,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
 
             for (j = 0; j < g; j++)
             {
-                _acb_vec_clear(sqr_pow[j], E->box[j] + 1);
+                _acb_vec_clear(sqr_pow[j], acb_theta_eld_box(E, j) + 1);
             }
         }
         else

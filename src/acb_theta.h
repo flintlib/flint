@@ -14,7 +14,6 @@
 
 #include "fmpz_types.h"
 #include "acb_types.h"
-#include "acb_theta_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,6 +101,19 @@ void acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong or
 
 /* Ellipsoids */
 
+struct acb_theta_eld_struct
+{
+    slong dim, ambient_dim;
+    slong * last_coords;
+    slong min, mid, max, nr, nl;
+    struct acb_theta_eld_struct * rchildren;
+    struct acb_theta_eld_struct * lchildren;
+    slong nb_pts, nb_border;
+    slong * box;
+};
+
+typedef struct acb_theta_eld_struct acb_theta_eld_t[1];
+
 void acb_theta_eld_init(acb_theta_eld_t E, slong d, slong g);
 void acb_theta_eld_clear(acb_theta_eld_t E);
 
@@ -109,6 +121,7 @@ int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_
 
 slong acb_theta_eld_nb_pts(const acb_theta_eld_t E);
 void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E);
+slong acb_theta_eld_box(const acb_theta_eld_t E, slong j);
 slong acb_theta_eld_nb_border(const acb_theta_eld_t E);
 void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt);
@@ -128,8 +141,43 @@ slong acb_theta_sum_addprec(const arb_t d);
 
 /* Context structures in summation algorithms */
 
-void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t x, int is_real, slong prec);
-void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr, int is_real, slong prec);
+struct acb_theta_ctx_tau_struct
+{
+    slong g;
+    int allow_shift;
+    arb_mat_struct yinv;
+    arb_mat_struct cho;
+
+    acb_mat_t exp_tau_div_4;
+    acb_mat_t exp_tau_div_2;
+    acb_mat_t exp_tau;
+    acb_mat_t exp_tau_div_4_inv;
+    acb_mat_t exp_tau_div_2_inv;
+    acb_mat_t exp_tau_inv;
+
+    /* allow_shift only */
+    acb_ptr exp_tau_a;
+    acb_ptr exp_tau_a_inv;
+    acb_ptr exp_a_tau_a_div_4;
+};
+
+typedef struct acb_theta_ctx_tau_struct acb_theta_ctx_tau_t[1];
+
+typedef struct
+{
+    slong g;
+    acb_ptr exp_z;
+    acb_ptr exp_2z;
+    acb_ptr exp_z_inv;
+    acb_ptr exp_2z_inv;
+    arb_ptr v;
+    arb_struct u;
+    arb_struct uinv;
+    int is_real;
+}
+acb_theta_ctx_z_struct;
+
+typedef acb_theta_ctx_z_struct acb_theta_ctx_z_t[1];
 
 void acb_theta_ctx_tau_init(acb_theta_ctx_tau_t ctx, int allow_shift, slong g);
 void acb_theta_ctx_tau_clear(acb_theta_ctx_tau_t ctx);
@@ -137,6 +185,9 @@ void acb_theta_ctx_z_init(acb_theta_ctx_z_t ctx, slong g);
 void acb_theta_ctx_z_clear(acb_theta_ctx_z_t ctx);
 acb_theta_ctx_z_struct * acb_theta_ctx_z_vec_init(slong nb, slong g);
 void acb_theta_ctx_z_vec_clear(acb_theta_ctx_z_struct * vec, slong nb);
+
+void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t x, int is_real, slong prec);
+void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr, int is_real, slong prec);
 
 void acb_theta_ctx_tau_set(acb_theta_ctx_tau_t ctx, const acb_mat_t tau, slong prec);
 void acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec);
@@ -152,6 +203,9 @@ void acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slo
 int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z_t ctx2);
 
 /* Summation algorithms */
+
+typedef void (*acb_theta_sum_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
+    slong, const acb_t, const slong *, slong, slong, slong, slong);
 
 void acb_theta_sum_sqr_pow(acb_ptr * sqr_pow, const acb_mat_t exp_tau, const acb_theta_eld_t E, slong prec);
 void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_z, acb_srcptr exp_z_inv,
