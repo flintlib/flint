@@ -37,13 +37,10 @@ acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g)
 static void
 g2_psi6_bits(int * b1, int * b2, int * b3, int * b4, ulong b)
 {
-    *b4 = b % 2;
-    b = b >> 1;
-    *b3 = b % 2;
-    b = b >> 1;
-    *b2 = b % 2;
-    b = b >> 1;
-    *b1 = b % 2;
+    *b1 = acb_theta_char_bit(b, 0, 4);
+    *b2 = acb_theta_char_bit(b, 1, 4);
+    *b3 = acb_theta_char_bit(b, 2, 4);
+    *b4 = acb_theta_char_bit(b, 3, 4);
 }
 
 static slong

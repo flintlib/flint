@@ -58,21 +58,15 @@ acb_theta_sum_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     for (b = 0; b < n; b++)
     {
         dot = acb_theta_char_dot_slong(b, coords, g) % 2;
-        if ((b >> (g - 1)) && dot)
+        if (dot)
         {
-            acb_sub(&th[b], &th[b], sub, fullprec);
-        }
-        else if ((b >> (g - 1)))
-        {
-            acb_add(&th[b], &th[b], sub, fullprec);
-        }
-        else if (dot)
-        {
-            acb_sub(&th[b], &th[b], add, fullprec);
+            acb_sub(&th[b], &th[b],
+                (acb_theta_char_bit(b, 0, g) ? sub : add), fullprec);
         }
         else
         {
-            acb_add(&th[b], &th[b], add, fullprec);
+            acb_add(&th[b], &th[b],
+                (acb_theta_char_bit(b, 0, g) ? sub : add), fullprec);
         }
     }
 
@@ -91,6 +85,7 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     slong n = (all_b ? 1 << g : 1);
     slong guard = ACB_THETA_LOW_PREC;
     acb_theta_eld_t E;
+    acb_ptr * sqr_pow;
     arf_t R2, eps;
     arb_t err;
     arb_ptr v;
@@ -102,6 +97,7 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     arf_init(eps);
     arb_init(err);
     v = _arb_vec_init(g);
+    sqr_pow = flint_malloc(g * sizeof(acb_ptr));
 
     acb_theta_ctx_z_common_v(v, vec, nb, prec + guard);
     acb_theta_sum_radius(R2, eps, &ctx_tau->cho, 0,
@@ -110,17 +106,28 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
 
     if (b)
     {
+        for (j = 0; j < g; j++)
+        {
+            sqr_pow[j] = _acb_vec_init(acb_theta_eld_box(E, j) + 1);
+        }
+        acb_theta_sum_sqr_pow(sqr_pow, ctx_tau->exp_tau, E, prec + guard);
+
         for (j = 0; j < nb; j++)
         {
             acb_theta_sum_work(th + j * n, n, (&vec[j])->exp_2z,
                 (&vec[j])->exp_2z_inv, ctx_tau->exp_tau,
-                ctx_tau->exp_tau_inv, E, 0, prec,
+                ctx_tau->exp_tau_inv, sqr_pow, E, 0, prec,
                 (all_b ? acb_theta_sum_0b_worker : acb_theta_sum_00_worker));
             arb_mul_arf(err, &(&vec[j])->u, eps, guard);
             for (k = 0; k < n; k++)
             {
                 acb_add_error_arb(&th[j * n + k], err);
             }
+        }
+
+        for (j = 0; j < g; j++)
+        {
+            _acb_vec_clear(sqr_pow[j], acb_theta_eld_box(E, j) + 1);
         }
     }
     else
@@ -134,6 +141,75 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     arf_clear(eps);
     arb_clear(err);
     _arb_vec_clear(v, g);
+    flint_free(sqr_pow);
+}
+
+static void
+acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t ctx,
+    const acb_theta_ctx_tau_t ctx_tau, ulong a, slong prec)
+{
+    slong g = ctx_tau->g;
+    arb_ptr v_shift;
+    acb_t cinv;
+    arb_t abs;
+    slong j;
+
+    v_shift = _arb_vec_init(g);
+    acb_init(cinv);
+    arb_init(abs);
+
+    /* Do not set exp_z or exp_z_inv. */
+    /* Replace exp_2z by analogs for z + tau a/2 */
+    for (j = 0; j < g; j++)
+    {
+        acb_mul(&res->exp_2z[j], &ctx->exp_2z[j],
+            &ctx_tau->exp_tau_a[a * g + j], prec);
+        acb_mul(&res->exp_2z_inv[j], &ctx->exp_2z_inv[j],
+            &ctx_tau->exp_tau_a_inv[a * g + j], prec);
+    }
+
+    /* Compute cofactor exp(pi i a^T z), and multiply by common cofactor
+       exp(pi i/4 a^T tau a) */
+    acb_one(c);
+    for (j = 0; j < g; j++)
+    {
+        if (!acb_theta_char_bit(a, j, g))
+        {
+            continue;
+        }
+        acb_mul(c, c, &ctx->exp_z[j], prec);
+    }
+    acb_mul(c, c, &ctx_tau->exp_a_tau_a_div_4[a], prec);
+
+    /* Compute v; u and uinv must be multiplied by abs(c) */
+    acb_abs(abs, c, prec);
+    arb_mul(&res->uinv, &ctx->uinv, abs, prec);
+
+    arb_inv(abs, abs, prec);
+    if (acb_is_finite(c) && !arb_is_finite(abs))
+    {
+        /* Recompute cinv by multiplications */
+        acb_one(cinv);
+        for (j = 0; j < g; j++)
+        {
+            if (!acb_theta_char_bit(a, j, g))
+            {
+                continue;
+            }
+            acb_mul(cinv, cinv, &ctx->exp_z_inv[j], prec);
+        }
+        acb_div(cinv, cinv, &ctx_tau->exp_a_tau_a_div_4[a], prec);
+        acb_abs(abs, cinv, prec);
+    }
+    arb_mul(&res->u, &ctx->u, abs, prec);
+
+    acb_theta_char_get_arb(v_shift, a, g);
+    arb_mat_vector_mul_col(v_shift, &ctx_tau->cho, v_shift, prec);
+    _arb_vec_add(res->v, v_shift, ctx->v, g, prec);
+
+    _arb_vec_clear(v_shift, g);
+    acb_clear(cinv);
+    arb_clear(abs);
 }
 
 void

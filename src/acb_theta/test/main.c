@@ -22,7 +22,6 @@
 #include "t-ctx_tau_dupl.c"
 #include "t-ctx_z_add_real.c"
 #include "t-ctx_z_dupl.c"
-#include "t-ctx_z_shift_a0.c"
 #include "t-eld_border.c"
 #include "t-eld_distances.c"
 #include "t-eld_points.c"
@@ -76,7 +75,6 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_ctx_tau_dupl),
     TEST_FUNCTION(acb_theta_ctx_z_add_real),
     TEST_FUNCTION(acb_theta_ctx_z_dupl),
-    TEST_FUNCTION(acb_theta_ctx_z_shift_a0),
     TEST_FUNCTION(acb_theta_eld_border),
     TEST_FUNCTION(acb_theta_eld_distances),
     TEST_FUNCTION(acb_theta_eld_points),

@@ -250,49 +250,18 @@ acb_theta_sum_work_rec(acb_ptr th, acb_ptr v1, acb_ptr v2, slong * precs,
     _acb_vec_clear(diff_lin_pow_inv, d - 1);
 }
 
-static void
-acb_theta_sum_sqr_pow(acb_ptr * sqr_pow, const acb_mat_t exp_tau, const acb_theta_eld_t E, slong prec)
-{
-    slong g = acb_mat_nrows(exp_tau);
-    acb_t c, dc, ddc;
-    slong k, j;
-
-    acb_init(c);
-    acb_init(dc);
-    acb_init(ddc);
-
-    /* Addition chains do not make a huge difference here. */
-    for (k = 0; k < g; k++)
-    {
-        acb_one(c);
-        acb_set(dc, acb_mat_entry(exp_tau, k, k));
-        acb_sqr(ddc, dc, prec);
-        for (j = 0; j <= (E->box[k]); j++)
-        {
-            acb_set(&sqr_pow[k][j], c);
-            acb_mul(c, c, dc, prec);
-            acb_mul(dc, dc, ddc, prec);
-        }
-    }
-
-    acb_clear(c);
-    acb_clear(dc);
-    acb_clear(ddc);
-}
-
 /* Main function */
 
 void
 acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_z, acb_srcptr exp_z_inv,
-    const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E,
-    slong ord, slong prec, acb_theta_sum_worker_t worker)
+    const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_ptr * sqr_pow,
+    const acb_theta_eld_t E, slong ord, slong prec, acb_theta_sum_worker_t worker)
 {
     slong g = E->ambient_dim;
     slong fullprec = acb_theta_sum_fullprec(E, prec);
     slong width = 0;
 
     acb_mat_t lin_pow, lin_pow_inv;
-    acb_ptr * sqr_pow;
     acb_ptr v1, v2, res;
     slong * precs;
     acb_t cf;
@@ -300,23 +269,17 @@ acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_z, acb_srcptr exp_z_inv
 
     for (j = 0; j < g; j++)
     {
-        width = FLINT_MAX(width, 2 * (E->box[j]) + 1);
+        width = FLINT_MAX(width, 2 * acb_theta_eld_box(E, j) + 1);
     }
 
     acb_mat_init(lin_pow, g, g);
     acb_mat_init(lin_pow_inv, g, g);
-    sqr_pow = flint_malloc(g * sizeof(acb_ptr));
-    for (j = 0; j < g; j++)
-    {
-        sqr_pow[j] = _acb_vec_init((E->box[j]) + 1);
-    }
     v1 = _acb_vec_init(width);
     v2 = _acb_vec_init(width);
     res = _acb_vec_init(len);
     acb_init(cf);
     precs = flint_malloc(width * sizeof(slong));
 
-    acb_theta_sum_sqr_pow(sqr_pow, exp_tau, E, fullprec);
     acb_one(cf);
 
     acb_mat_set(lin_pow, exp_tau);
@@ -330,11 +293,6 @@ acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_z, acb_srcptr exp_z_inv
 
     acb_mat_clear(lin_pow);
     acb_mat_clear(lin_pow_inv);
-    for (j = 0; j < g; j++)
-    {
-        _acb_vec_clear(sqr_pow[j], (E->box[j]) + 1);
-    }
-    flint_free(sqr_pow);
     _acb_vec_clear(v1, width);
     _acb_vec_clear(v2, width);
     _acb_vec_clear(res, len);

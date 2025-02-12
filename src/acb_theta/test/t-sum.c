@@ -74,11 +74,12 @@ TEST_FUNCTION_START(acb_theta_sum, state)
             {
                 if (all_a && !all_b)
                 {
-                    a1b1 = 2 * ((ab >> (g - j - 1)) % 2);
+                    a1b1 = 2 * acb_theta_char_bit(ab, j, g);
                 }
                 else
                 {
-                    a1b1 = 2 * ((ab >> (2 * g - j - 1)) % 2) + ((ab >> (g - j - 1)) % 2);
+                    a1b1 = 2 * acb_theta_char_bit(ab, j, 2 * g)
+                        + acb_theta_char_bit(ab, g + j, 2 * g);
                 }
                 acb_mul(&test[ab], &test[ab], &aux[a1b1], prec);
             }

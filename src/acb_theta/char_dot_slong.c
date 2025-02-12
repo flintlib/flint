@@ -14,17 +14,15 @@
 slong
 acb_theta_char_dot_slong(ulong a, const slong * n, slong g)
 {
-    ulong a_shift = a;
     slong sgn = 0;
     slong k;
 
     for (k = 0; k < g; k++)
     {
-        if (a_shift & 1)
+        if (acb_theta_char_bit(a, k, g))
         {
-            sgn += n[g - 1 - k] & 3;
+            sgn += n[k] & 3;
         }
-        a_shift = a_shift >> 1;
     }
 
     return sgn % 4;

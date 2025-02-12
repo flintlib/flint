@@ -63,8 +63,8 @@ acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
         /* Turn ab into a 2g x 1 fmpz matrix, set alphabeta = diags + ab */
         for (i = 0; i < 2 * g; i++)
         {
-            fmpz_add_si(fmpz_mat_entry(alphabeta, 2 * g - 1 - i, 0),
-                fmpz_mat_entry(diags, 2 * g - 1 - i, 0), (ab >> i) % 2);
+            fmpz_add_si(fmpz_mat_entry(alphabeta, i, 0),
+                fmpz_mat_entry(diags, i, 0), acb_theta_char_bit(ab, i, 2 * g));
         }
 
         /* Perform matrix-vector multiplication */

@@ -122,11 +122,12 @@ TEST_FUNCTION_START(acb_theta_sum_jet, state)
                         if (all_a && !all_b)
                         {
                             /* ab actually encodes the characteristic n * ab */
-                            a1b1 = 2 * ((ab >> (g - k - 1)) % 2);
+                            a1b1 = 2 * acb_theta_char_bit(ab, k, g);
                         }
                         else
                         {
-                            a1b1 = 2 * ((ab >> (2 * g - k - 1)) % 2) + ((ab >> (g - k - 1)) % 2);
+                            a1b1 = 2 * acb_theta_char_bit(ab, k, 2 * g)
+                                + acb_theta_char_bit(ab, g + k, 2 * g);
                         }
                         for (l = 0; l < nbjet; l++)
                         {
