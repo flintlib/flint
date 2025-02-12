@@ -49,17 +49,6 @@ acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec)
         }
     }
 
-    /* Empty sqr_pow */
-    for (j = 0; j < g; j++)
-    {
-        if (ctx->sqr_pow_len[j] > 0)
-        {
-            _acb_vec_clear(ctx->sqr_pow[j], ctx->sqr_pow_len[j]);
-            ctx->sqr_pow[j] = _acb_vec_init(0);
-            ctx->sqr_pow_len[j] = 0;
-        }
-    }
-
     if (ctx->allow_shift)
     {
         /* Update exp_tau_a */
