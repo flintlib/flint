@@ -7,7 +7,7 @@ This module provides methods for the numerical evaluation of theta functions in
 any dimension `g\geq 1`. The algorithms will be detailed in the forthcoming
 paper [EK2025]_. In the case `g=1`, we rely on, but also improve on
 functionality from :ref:`acb_modular.h <acb-modular>`. We also provide
-functionality to evaluate derivatives of theta functions, and to evaluate
+functionality to evaluate derivatives of theta functions, and also to evaluate
 Siegel modular forms in terms of theta functions when `g=2`.
 
 In the context of this module, *tau* or `\tau` always denotes an element of the
@@ -25,23 +25,19 @@ considering `a`, `b` and `z` as column vectors.
 
 The main method to evaluate theta functions is
 
-.. function:: void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, int sqr, slong prec)
+.. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 
-Here *zs* should be a vector of length `\mathit{nb}\times g`, and encodes a
-tuple of *nb* elements `z_1,\ldots,z_{\mathit{nb}}\in \mathbb{C}^g`. The
-output, stored in *th*, is the concatenation of *nb* vectors of length
-`2^{2g}`: for each `1\leq j\leq \mathit{nb}`, :func:`acb_theta_all` with *sqr*
-= 0 (false) computes `\theta_{a,b}(z_j,\tau)` for all `a,b\in \{0,1\}^g`. If
-*sqr* is nonzero (true), it computes `\theta_{a,b}(z_j,\tau)^2` instead using a
-faster algorithm.
-
-Throughout, we order vectors of theta values by associating to each
+Here *z* should be a vector of length `g`. The output, stored in *th*, is
+a vector of length `2^{2g}`. If *sqr* = 0 (false), this function computes
+`\theta_{a,b}(z_j,\tau)` for all `a,b\in \{0,1\}^g`; if *sqr* is nonzero
+(true), it computes `\theta_{a,b}(z_j,\tau)^2` instead using a faster
+algorithm. Throughout, we order vectors of theta values by associating to each
 characteristic `(a,b)` the :type:`ulong` between 0 and `2^{2g}-1` whose `g`
 most (resp. least) significant bits are given by `a` (resp. `b`): thus `(a,b)`
 where `a = (0,1)` and `b = (1,0)` in dimension `2` will be numbered `6`. With
 these conventions, the output of :func:`acb_modular_theta` in dimension 1 is
-`(-\theta_3,\theta_2,\theta_0,\theta_1)`. When manipulating `a` or `b`
-individually, we map them to integers between 0 and `2^g-1`.
+`(-\theta_3,\theta_2,\theta_0,\theta_1)`. (When manipulating `a` or `b`
+individually, we map them to integers between 0 and `2^g-1`.)
 
 We handle the final argument *prec* as follows. Barring unexpected
 cancellations, the "expected" absolute value of `\theta_{a,b}(z,\tau)` is
@@ -79,57 +75,38 @@ unreasonable computations when `y` is very far from zero.
 In any case, the numerical functions in this module always compute certified
 error bounds: for instance, if `\tau` is represented by an :type:`acb_mat_t`
 whose imaginary part is not certainly positive definite at the chosen working
-precision, then the output will have an infinite radius. NaN outputs will also
-occur if something unexpectedly goes wrong during the computation (for
-instance, an *int*-valued internal function fails), unless otherwise specified.
+precision, then the output will have an infinite radius.
 
-Behind the scenes, :func:`acb_theta_all` works as follows: it first reduces the
-inputs `(z_j,\tau)` using the action of the Siegel modular group
+The function :func:`acb_theta_all` is in fact a simple interface to the more complete method
+
+.. function:: void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, int sqr, slong prec)
+
+which allows for several input vectors *z* (for the same matrix *tau*) for more
+efficiency, and also evaluates derivatives of theta functions. Its parameters
+are as follows:
+
+- *nb* is the number of vectors `z` that we consider, and the input vector *zs*
+  should have length *nb* times `g`. The output vector *th* will be the
+  concatenation of the *nb* individual outputs for each `z`.
+- *ord* is the order of derivatives to be computed: we will compute all the
+  partial derivatives of theta functions `\theta_{a,b}` with respect to the
+  entries of `z` of total order up to *ord*. (Partial derivatives with respect
+  to the entries of `\tau` are then accounted for by the heat equation.) We
+  refer to the documentation below for conventions on the normalization and
+  ordering of those derivatives.
+- *all* is a boolean: if false (zero), then we compute (partial derivatives of)
+  `\theta_{0,0}` only, rather than `\theta_{a,b}` for all characteristics,
+  using a slightly faster algorithm.
+- *sqr* is as in :func:`acb_theta_all`, but is ignored if *ord* is positive.
+
+Behind the scenes, :func:`acb_theta_jet` works as follows: it first reduces the
+inputs `(z,\tau)` using the action of the Siegel modular group
 `\mathrm{Sp}_{2g}(\mathbb{Z})` (the symplectic group) on `\mathbb{C}^g\times
-\mathcal{H}_g`, then evaluates theta functions on the reduced arguments, and
-finally applies the transformation formula for theta functions under
-`\mathrm{Sp}_{2g}(\mathbb{Z})`. The second step (evaluating theta functions)
-uses an advanced algorithm based on duplication formulas that has a uniform,
-quasi-linear complexity in terms of the required precision.
-
-Other user functions
--------------------------------------------------------------------------------
-
-In addition to :func:`acb_theta_all`, the following functions are the main
-outcome of this module. Note that when the inputs `(z,\tau)` are already known
-to be reduced, one can bypass the transformation formula using
-:func:`acb_theta_all_notransform` and similar functions documented later on.
-
-.. function:: void acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
-
-    Sets *th* to the vector containing `\theta_{0,0}(z,\tau)` for all input
-    values of `z`.
-
-    We stress that the intermediate evaluation step in this case is not
-    quasi-linear in terms of the required precision: rather, it is polynomial
-    with exponent `1+g/2`. Depending on `g`, the required precision, and the
-    shape of the matrix `\tau`, calling :func:`acb_theta_all` then extracting the
-    desired entries might be faster.
-
-.. function:: void acb_theta_jet_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
-
-    Sets *th* to the vector or partial derivatives of `\theta_{0,0}` respect to
-    `z` up to total order *ord* at the given points `(z,\tau)`. (See below for
-    conventions on the numbering and normalization of derivatives.)
-
-    The same complexity warning as in :func:`acb_theta_00` applies.
-
-.. function:: void acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
-
-    Sets *th* to the vector of partial derivatives with respect to `z` up to
-    total order *ord* of all functions `\theta_{a,b}` for `a,b\in \{0,1\}^g` at
-    the given points `(z,\tau)`. This is a concatenation of *nb* vectors, each
-    of them being a concatenation of `2^{2g}` vectors of derivatives of an
-    individual `\theta_{a,b}`.
-
-    The algorithm uses direct summation of the theta series at low precisions,
-    and finite differences on the output of :func:`acb_theta_all` at higher
-    precisions.
+\mathcal{H}_g`, then evaluates (partial derivatives of) theta functions on the
+reduced arguments, and finally applies the transformation formula for theta
+functions under `\mathrm{Sp}_{2g}(\mathbb{Z})`. The second step (evaluating
+theta functions) uses an advanced algorithm based on duplication formulas that
+has a uniform, quasi-linear complexity in terms of the required precision.
 
 Example of usage
 -------------------------------------------------------------------------------
@@ -153,7 +130,7 @@ and prints them.
         th = _acb_vec_init(16);
 
         acb_mat_onei(tau);
-        acb_theta_all(th, z, 1, tau, 0, prec);
+        acb_theta_all(th, z, tau, 0, prec);
         _acb_vec_printd(th, 16, 5);
 
         acb_mat_clear(tau);
@@ -349,11 +326,14 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     :func:`sp2gz_fundamental`, the determinant of the corresponding cocycle is
     at least `1-\varepsilon`.
 
-.. function:: slong acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, slong prec)
+.. function:: slong acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, int sqr, slong prec)
 
-    Returns `0\leq r < 8` such that `\kappa(\mathit{mat}) = \zeta_8^r` and sets
-    *sqrtdet* to the corresponding square root of `\det(\gamma\tau + \delta)`
-    in the theta transformation formula.
+    If *sqr* is zero (false), returns `0\leq r < 8` such that
+    `\kappa(\mathit{mat}) = \zeta_8^r` and sets *sqrtdet* to the corresponding
+    square root of `\det(\gamma\tau + \delta)` in the theta transformation
+    formula. If *sqr* is nonzero (true), returns instead `0\leq r < 4` such
+    that `\kappa(\mathit{mat})^2 = i^r` and sets *sqrtdet* to
+    `\det(\gamma\tau + \delta)`.
 
     By [Igu1972]_, p. 176 and [Mum1983]_, p. 189, for any symplectic matrix
     `m`, any `(z,\tau)\in \mathbb{C}^g\times \mathcal{H}_g`, and any
@@ -383,20 +363,21 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     i^{r/2} \det(\tau_0)^{1/2} = 1`, where `\tau_0` denotes the upper left
     `r\times r` submatrix of `\tau` and the branch of the square root is chosen
     such that the result is `i^{g/2}\det(Y)` when `\tau = iY` is purely
-    imaginary. To compute `\det(\tau_0)^{1/2}`, we pick a purely imaginary
-    matrix *A* and consider the polynomial `P(t) = \det(A + \tfrac{t+1}{2}
-    (\tau_0 - A))`. Up to choosing another `A`, we may assume that it has
-    degree `g` and that its roots (as complex balls) do not intersect the
-    segment `[-1,1]\subset \mathbb{C}`. We then find the correct branch of
-    `P(t)^{1/2}` between `t=-1` and `t=1` following [MN2019]_.
+    imaginary.
+
+    To compute `\det(\tau_0)^{1/2}` (assuming that *sqr* is false), we pick a
+    purely imaginary matrix *A* and consider the polynomial `P(t) = \det(A +
+    \tfrac{t+1}{2} (\tau_0 - A))`. Up to choosing another `A`, we may assume
+    that it has degree `g` and that its roots (as complex balls) do not
+    intersect the segment `[-1,1]\subset \mathbb{C}`. We then find the correct
+    branch of `P(t)^{1/2}` between `t=-1` and `t=1` following [MN2019]_.
 
 .. function:: slong acb_siegel_kappa2(const fmpz_mat_t mat)
 
-    Returns `0\leq r < 3` such that `\kappa(m)^2 = i^r`, which makes sense
-    without reference to a branch of `\det(\gamma\tau + \delta)^{1/2}`.
-
-    We adopt a similar strategy to :func:`acb_siegel_kappa`, but do
-    not have to choose the correct square root of `\det(\tau_0)`.
+    Returns `0\leq r < 3` such that `\kappa(\mathit{mat})^2 = i^r`, which makes
+    sense without reference to a branch of `\det(\gamma\tau +
+    \delta)^{1/2}`. This is a simpler interface to :func:`acb_siegel_kappa`
+    when *sqr* is true.
 
 .. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
@@ -445,24 +426,11 @@ Theta characteristics
 
     Returns `\sum_{i=0}^{g-1} a_i n_i` modulo 4 as an integer between 0 and 3.
 
-.. function:: void acb_theta_char_dot_acb(acb_t x, ulong a, acb_srcptr z, slong g, slong prec)
-
-    Sets *x* to `\sum_{i=0}^{g-1} a_i z_i`.
-
 .. function:: int acb_theta_char_is_even(ulong ab, slong g)
 
-    Returns true iff the characteristic `(a,b)` is even, i.e. `a^Tb` is divisible by 2.
-
-.. function:: int acb_theta_char_is_goepel(ulong ch1, ulong ch2, ulong ch3, ulong ch4, slong g)
-
-    Returns true iff the given characteristics define a Göpel quadruple,
-    i.e. they are distinct even characteristics whose sum belongs to
-    `2\mathbb{Z}^g`.
-
-.. function:: int acb_theta_char_is_syzygous(ulong ch1, ulong ch2, ulong ch3, slong g)
-
-    Returns true iff the given characteristics define a syzygous triple,
-    i.e. they can be completed into a Göpel quadruple.
+    Returns true iff the characteristic `(a,b)` is even, i.e. `a^Tb` is
+    divisible by 2. Odd characteristics `(a,b)` have the property that
+    `\theta_{a,b}(0,\tau)` is identically zero.
 
 .. function:: void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
 
@@ -560,8 +528,14 @@ evaluating a partial sum of the exponential series defining them, then adding
 an error bound coming from the tail of the series. We refer to this strategy as
 the *summation algorithms*.
 
-The upper bound on the tail will be obtained from the triangle inequality. To
-analyze the absolute value of each term in the sum defining
+The upper bound on the tail will be obtained from the triangle inequality. First, we use the relation
+
+    .. math::
+
+        \theta_{a,b}(z,\tau) = \exp(\pi i a^T (z + \tfrac b2) + \pi i a^T\tau a/4) \theta_{0,b}(z + \tau\tfrac{a}{2},\tau)
+
+to avoid summing over `\mathbb{Z}^g + \tfrac{a}{2}` with a nonzero `a`. Next,
+to analyze the absolute value of each term in the sum defining
 `\theta_{0,b}(z,\tau)`, we write:
 
     .. math::
@@ -573,14 +547,8 @@ values are less than a given threshold correspond to lattice points `n\in
 \mathbb{Z}^g` lying outside a certain ball centered in `v = -Y^{-1}y` for
 `\lVert\cdot\rVert_\tau`; in other words, we should be computing partial sums
 over points `n\in \mathbb{Z}^g` lying in certain ellipsoids, as in
-[DHBHS2004]_. We use the relation
-
-    .. math::
-
-        \theta_{a,b}(z,\tau) = \exp(\pi i a^T (z + \tfrac b2) + \pi i a^T\tau a/4) \theta_{0,b}(z + \tau\tfrac{a}{2},\tau)
-
-to avoid summing over `\mathbb{Z}^g + \tfrac{a}{2}` with a nonzero `a`. This
-section gathers methods to manipulate such ellipsoids directly.
+[DHBHS2004]_. This section gathers methods to manipulate such ellipsoids
+directly.
 
 Fix an upper-triangular matrix `C` with positive diagonal entries (henceforth
 called a "Cholesky matrix"), a radius `R\geq 0`, a vector `v\in \mathbb{R}^g`,
@@ -681,23 +649,19 @@ precision, we use the following upper bound on the tail of the series: by
     .. math::
 
         \sum_{n\in C\mathbb{Z}^g + Cv,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
-        \leq 2^{2g+2} R^{g-1+p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})
+        \leq (1 + \sqrt{\tfrac{8}{\pi}}) \max\{2,R\}^{g-1} R^{p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \tfrac{\sqrt{2\pi}}{\gamma_j})
 
 where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of
 `C`.
 
 .. function:: void acb_theta_sum_radius(arf_t R2, arf_t eps, const arb_mat_t cho, slong ord, slong prec)
 
-    Sets *R2* and *eps* such that the above upper bound for *R2* and the given
-    *ord* is at most *eps*, where `C` is *cho*. When *ord = 0*, the square root
-    of *R2* is a suitable ellipsoid radius for a partial sum of the theta
-    series, and *eps* is an upper bound on the absolute value of the tail of
-    the series defining `\widetilde{\theta}_{a,b}`.
-
-    We choose *eps* so that the relative error on the output of the summation
-    algorithm should be roughly `2^{-\mathit{prec}}` if no unexpected
-    cancellations occur in the sum, i.e.  `\mathit{eps} \simeq
-    2^{-\mathit{prec}} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})`.
+    Sets *eps* to `2^{-\mathit{prec}}` and chooses *R2* such that the above
+    upper bound for *R2* and the given *ord* is at most *eps*, where `C` is
+    *cho*. When *ord = 0*, the square root of *R2* is a suitable ellipsoid
+    radius for a partial sum of the theta series, and *eps* is an upper bound
+    on the absolute value of the tail of the series defining
+    `\widetilde{\theta}_{a,b}`.
 
 .. function:: void acb_theta_sum_jet_radius(arf_t R2, arf_t eps, const arb_mat_t cho, arb_srcptr v, slong ord, slong prec)
 
@@ -848,6 +812,11 @@ manipulations easier.
     `\tau`. This is much cheaper than calling :func:`acb_theta_ctx_tau_set`
     again.
 
+.. function:: int acb_theta_ctx_tau_overlaps(const acb_theta_ctx_tau_t ctx1, const acb_theta_ctx_tau_t ctx2)
+
+    Returns true iff the data contained in *ctx1* and *ctx2* overlap in the
+    sense of :func:`acb_overlaps`. This is only used for testing.
+
 .. function:: void acb_theta_ctx_z_set(acb_theta_ctx_z_t ctx, acb_srcptr z, const acb_theta_ctx_tau_t ctx_tau, slong prec)
 
     Computes and stores in *ctx* the required data for the complex vector
@@ -961,13 +930,18 @@ instead.
       finally
     - *fullprec* is the working precision for summing into *th*.
 
-.. function:: void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv, slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E, slong ord, slong prec, acb_theta_sum_worker_t worker)
+.. function:: void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv, slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_ptr * sqr_pow, const acb_theta_eld_t E, slong ord, slong prec, acb_theta_sum_worker_t worker)
 
     Runs the summation algorithm on the ellipsoid *E*, assuming `g\geq 2`. The input is as follows:
 
     - for each `1\leq j\leq k\leq g`, the `(j,k)` entries of the matrices *exp_tau*
       and *exp_tau_inv* whose should contain `\exp(\pi i (2 -
       \delta_{j,k}) \tau_{j,k})` and its inverse, respectively.
+    - *E* is the ellipsoid we want to sum on.
+    - *sqr_pow* should be a vector of length `g`. For each `1\leq j\leq g`, its
+      `j`th entry should be a vector containing `\exp(\pi i n^2 \tau_{j,j})`
+      for `n = 0, 1,\ldots, B_j` where `B_j` is an upper bound on the absolute
+      value of `j`th coordinate of all the points in `E`.
     - the vectors *exp_zs* and *exp_zs_inv* should have length *nb* times
       *g*. For each `z` stored in *zs*, the corresponding pieces of *exp_zs*
       and *exp_zs_inv* should contain `\exp(\pi i z_j)` for `1\leq j\leq g` and
