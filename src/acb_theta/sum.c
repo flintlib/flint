@@ -91,6 +91,7 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     slong n = (all_b ? 1 << g : 1);
     slong guard = ACB_THETA_LOW_PREC;
     acb_theta_eld_t E;
+    acb_ptr * sqr_pow;
     arf_t R2, eps;
     arb_t err;
     arb_ptr v;
@@ -102,6 +103,7 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     arf_init(eps);
     arb_init(err);
     v = _arb_vec_init(g);
+    sqr_pow = flint_malloc(g * sizeof(acb_ptr));
 
     acb_theta_ctx_z_common_v(v, vec, nb, prec + guard);
     acb_theta_sum_radius(R2, eps, &ctx_tau->cho, 0,
@@ -110,17 +112,28 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
 
     if (b)
     {
+        for (j = 0; j < g; j++)
+        {
+            sqr_pow[j] = _acb_vec_init(E->box[j] + 1);
+        }
+        acb_theta_sum_sqr_pow(sqr_pow, ctx_tau->exp_tau, E, prec + guard);
+
         for (j = 0; j < nb; j++)
         {
             acb_theta_sum_work(th + j * n, n, (&vec[j])->exp_2z,
                 (&vec[j])->exp_2z_inv, ctx_tau->exp_tau,
-                ctx_tau->exp_tau_inv, E, 0, prec,
+                ctx_tau->exp_tau_inv, sqr_pow, E, 0, prec,
                 (all_b ? acb_theta_sum_0b_worker : acb_theta_sum_00_worker));
             arb_mul_arf(err, &(&vec[j])->u, eps, guard);
             for (k = 0; k < n; k++)
             {
                 acb_add_error_arb(&th[j * n + k], err);
             }
+        }
+
+        for (j = 0; j < g; j++)
+        {
+            _acb_vec_clear(sqr_pow[j], E->box[j] + 1);
         }
     }
     else
@@ -134,6 +147,7 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     arf_clear(eps);
     arb_clear(err);
     _arb_vec_clear(v, g);
+    flint_free(sqr_pow);
 }
 
 void

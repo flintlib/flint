@@ -391,6 +391,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     else
     {
         acb_theta_eld_t E;
+        acb_ptr * sqr_pow;
         arf_t R2, eps;
         arb_t err;
         arb_ptr v;
@@ -400,6 +401,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         int b;
 
         acb_theta_eld_init(E, g, g);
+        sqr_pow = flint_malloc(g * sizeof(acb_ptr));
         arf_init(R2);
         arf_init(eps);
         arb_init(err);
@@ -421,25 +423,32 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
 
         if (b)
         {
+            for (j = 0; j < g; j++)
+            {
+                sqr_pow[j] = _acb_vec_init(E->box[j] + 1);
+            }
+            /* If all_a, use exp_z, exp_tau_div_4 instead of exp_2z, exp_tau */
+            acb_theta_sum_sqr_pow(sqr_pow,
+                (all_a ? ctx_tau->exp_tau_div_4 : ctx_tau->exp_tau),
+                E, prec + guard);
+
             /* Sum series, rescale by c factor */
             for (j = 0; j < nb; j++)
             {
-                /* Duplication in worker: use exp_z instead of exp_2z,
-                   exp_tau_div_4 instead of exp_tau */
                 if (all_a)
                 {
                     acb_theta_sum_work(th + j * nbth * nbjet, nbth * nbjet,
                         (&vec[j])->exp_z, (&vec[j])->exp_z_inv,
-                        ctx_tau->exp_tau_div_4, ctx_tau->exp_tau_div_4_inv, E,
-                        ord, prec,
+                        ctx_tau->exp_tau_div_4, ctx_tau->exp_tau_div_4_inv,
+                        sqr_pow, E, ord, prec,
                         (all_b ? acb_theta_sum_jet_all_worker : acb_theta_sum_jet_a0_worker));
                 }
                 else
                 {
                     acb_theta_sum_work(th + j * nbth * nbjet, nbth * nbjet,
                         (&vec[j])->exp_2z,(&vec[j])->exp_2z_inv,
-                        ctx_tau->exp_tau, ctx_tau->exp_tau_inv, E,
-                        ord, prec,
+                        ctx_tau->exp_tau, ctx_tau->exp_tau_inv,
+                        sqr_pow, E, ord, prec,
                         (all_b ? acb_theta_sum_jet_0b_worker : acb_theta_sum_jet_00_worker));
                 }
                 arb_mul_arf(err, &(&vec[j])->u, eps, guard);
@@ -472,6 +481,11 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                     acb_mul(&th[j * nbjet + k], &th[j * nbjet + k], c, prec);
                 }
             }
+
+            for (j = 0; j < g; j++)
+            {
+                _acb_vec_clear(sqr_pow[j], E->box[j] + 1);
+            }
         }
         else
         {
@@ -480,6 +494,7 @@ acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         }
 
         acb_theta_eld_clear(E);
+        flint_free(sqr_pow);
         arf_clear(R2);
         arf_clear(eps);
         arb_clear(err);
