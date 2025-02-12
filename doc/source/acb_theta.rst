@@ -603,6 +603,11 @@ computed using :func:`acb_theta_eld_init` and :func:`acb_theta_eld_set`.
     vectors of length *g*. The vector *pts* must be pre-allocated to the
     correct length.
 
+.. function:: slong acb_theta_eld_box(const acb_theta_eld_t E, slong j)
+
+    Returns an upper bound on the absolute value of the `j`-th coordinate of any
+    point stored in *E*. We require `0\leq j < g`.
+
 .. function:: slong acb_theta_eld_nb_border(acb_theta_eld_t E)
 
     Returns the number of points in the "border" of `E`, a certain set of
@@ -939,9 +944,9 @@ instead.
       \delta_{j,k}) \tau_{j,k})` and its inverse, respectively.
     - *E* is the ellipsoid we want to sum on.
     - *sqr_pow* should be a vector of length `g`. For each `1\leq j\leq g`, its
-      `j`th entry should be a vector containing `\exp(\pi i n^2 \tau_{j,j})`
-      for `n = 0, 1,\ldots, B_j` where `B_j` is an upper bound on the absolute
-      value of `j`th coordinate of all the points in `E`.
+      `j`-th entry should point to a vector containing `\exp(\pi i n^2
+      \tau_{j,j})` for `n = 0, 1,\ldots, B_j` where `B_j` is an upper bound on
+      the absolute value of `j`-th coordinate of all the points in *E*.
     - the vectors *exp_zs* and *exp_zs_inv* should have length *nb* times
       *g*. For each `z` stored in *zs*, the corresponding pieces of *exp_zs*
       and *exp_zs_inv* should contain `\exp(\pi i z_j)` for `1\leq j\leq g` and
@@ -954,55 +959,34 @@ instead.
     respectively. No error bound coming from the tail of the theta series is
     added.
 
-.. function:: void acb_theta_sum_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong prec)
+.. function:: void acb_theta_sum(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, int all_a, int all_b, int tilde, slong prec)
 
-    Evaluates `\theta_{0,0}` at each of the *nb* pairs `(z,\tau)` corresponding
-    to a context stored in *vec* together with *ctx_tau*. The result *th* is a
-    vector of length *nb*. The associated worker performs one :func:`acb_dot`
-    operation.
+    Evaluates theta functions at each of the *nb* pairs `(z,\tau)`
+    corresponding to a context stored in *vec* together with *ctx_tau* using
+    summation. Precisely what we compute depends on the parameters *all_a*,
+    *all_b* and *tilde*:
 
-.. function:: void acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong prec)
+    - if *all_a* is false (zero), we only compute `\theta_{a,b}` for `a=0`,
+      otherwise `a` varies from `0` to `2^g - 1`.
+    - if *all_b* is false (zero), we only compute `\theta_{a,b}` for `b=0`,
+      otherwise `b` varies from `0` to `2^g - 1`.
+    - if *tilde* is true (nonzero), then we compute `\widetilde{\theta}_{a,b}`
+      instead of `\theta_{a,b}`.
 
-    Evaluates either `\theta_{0,b}`, for all `b\in \{0,1\}^g`, at each of the
-    *nb* pairs `(z,\tau)` corresponding to a context stored in *vec* together
-    with *ctx_tau*. The result *th* will be a concatenation of *nb* vectors of
-    length `2^g` respectively. This function should only be marginally more
-    expensive than :func:`acb_theta_sum_00`.
+    In this function, the absolute error radius we add from the tail of the
+    exponential series depend on `a`. The amount of precision added is
+    controlled by *distances*, a vector of length `2^g` (the same for all
+    vectors *z*). One could for instance set *distances* to zero, or compute it
+    as in :func:`acb_theta_eld_distances`, which makes sense when the different
+    values of *z* differ by real vectors.
 
-.. function:: void acb_theta_sum_a0_tilde(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, slong prec)
+.. function:: void acb_theta_sum_jet(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong ord, int all_a, int all_b, slong prec)
 
-    Evaluates `\widetilde{\theta}_{a,0}(z,\tau)` for each `a\in \{0,1\}^g` at
-    each of the *nb* pairs `(z,\tau)` corresponding to a context stored in
-    *vec* together with *ctx_tau*. The result *th* will be a concatenation of
-    *nb* vectors of length `2^g`.
-
-    In this function, the absolute error radius we add on
-    `\widetilde{\theta}_{a,0}(z,\tau)` from the tail of the exponential series
-    depend on `a`. The amount of precision added is controlled by *distances*,
-    which could be computed as in :func:`acb_theta_eld_distances` (although
-    other values sometimes make sense, such as 0.) Since this vector is the
-    same for all vectors *z*, this internal function makes the most sense when
-    the different values of *z* differ by real vectors.
-
-.. function:: void acb_theta_sum_all_tilde(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, slong prec)
-
-    Evaluates `\widetilde{\theta}_{a,b}(z,\tau)` for all characteristics `a,b`
-    and all *nb* pairs `(z,\tau)` specified by the contexts. The precision used
-    depends on *a* and the vector *distances* exactly as in
-    :func:`acb_theta_sum_a0_tilde`.
-
-.. function:: void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec)
-
-    Sets *th* to the vector of derivatives of `\theta_{0,0}` up to total order
-    *ord*, at each of the *nb* pairs `(z,\tau)` specified by the contexts.
-
-.. function:: void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb, const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec)
-
-    Sets *th* to the vector of derivatives of `\theta_{a,b}` up to total order
-    *ord*, for all characteristics `a,b`, at all the *nb* pairs `(z,\tau)`
-    specified by the contexts. The result will be a concatenation of *nb*
-    vectors (one for each *z*), each piece being the concatenation of `2^{2g}`
-    vectors of derivatives.
+    Sets *th* to the vector of derivatives of theta functions up to total order
+    *ord*, at each of the *nb* pairs `(z,\tau)` specified by the contexts,
+    using summation. Precisely which characteristics `(a,b)` we consider is
+    controlled by the parameters *all_a* and *all_b* as in
+    :func:`acb_theta_sum`.
 
 AGM steps
 -------------------------------------------------------------------------------
@@ -1034,11 +1018,23 @@ approximations to make the correct choice.
     *res* to the :func:`acb_union` of both square roots (when both overlap
     *roots*) or an indeterminate value (when none overlap *roots*).
 
-.. function:: void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
+.. function:: void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, int all, slong prec)
 
     For each `0\leq k < 2^g`, sets the `k`-th entry of *res* to
-    `2^{-g}\sum_{b\in \{0,1\}^g} a_{1,b}\, a_{2, b + k}`, where addition is
-    meant in `(\mathbb{Z}/2\mathbb{Z}^g)` (a bitwise xor).
+
+        .. math::
+
+            \sum_{b\in \{0,1\}^g} a_{1,b}\, a_{2, b + k}
+
+    where addition is meant in `(\mathbb{Z}/2\mathbb{Z}^g)` (a bitwise xor). If
+    *all* is nonzero (true), then we additionally compute, for each `1\leq a
+    \leq 2^g-1`, the vector of length `2^g` whose `k`-th entry contains
+
+        .. math::
+
+            \sum_{b\in \{0,1\}^g} (-1)^{a^T b} a_{1,b} a_{2, b+k},
+
+    so *res* has total length `2^{2g}` in that case.
 
     Following [LT2016]_, we apply the Hadamard matrix twice with
     multiplications in-between. This causes precision losses when the absolute
@@ -1046,37 +1042,35 @@ approximations to make the correct choice.
     magnitude. This function is faster when *a1* and *a2* are equal as
     pointers, as we can use squarings instead of multiplications.
 
-.. function:: void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a, arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+.. function:: void acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a, arb_srcptr d0, arb_srcptr d, slong g, int all, slong prec)
 
     Assuming that *d0* and *d* are obtained as the result of
-    :func:`acb_theta_eld_distances` on `(0,\tau)` and `(z,\tau)` respectively,
-    performs the same computation as :func:`acb_theta_agm_mul` on the vectors
-    *a0* and *a* with a different management of error bounds. The resulting
-    error bounds on *res* will be tighter when the absolute value of `a_k` is
-    roughly `e^{-d_k}` for each `0\leq k < 2^g`, and similarly for *a0* and
-    *d0*, for instance when applying the duplication formula on normalized
-    theta values.
+    :func:`acb_theta_eld_distances` on pairs `(0,\tau)` and `(z,\tau)`
+    respectively, performs the same computation as :func:`acb_theta_agm_mul` on
+    the vectors *a0* and *a* (and the parameter *all*) with a different
+    management of error bounds. The resulting error bounds on *res* will be
+    tighter when the absolute value of `a_k` is roughly `e^{-d_k}` for each
+    `0\leq k < 2^g`, and similarly for *a0* and *d0*, for instance when
+    applying the duplication formula on normalized theta values.
 
-    When `g>1`, we manage error bounds as follows. We compute `m, \varepsilon`
-    such that the following holds: for each `0\leq k < \mathit{nb}`, if `d_k`
-    (resp. `a_k`) denotes the `k`-th entry of *d* (resp. *a*), then
-    the absolute value of `a_k` is at most `m \cdot e^{-d_k}` and the radius of
-    the complex ball `a_k` is at most `\mathit{eps}\cdot e^{-d_k}`. We proceed
-    similarly on *a0* and *d0* to obtain `m_0, \varepsilon_0`. Then we call
-    :func:`acb_theta_agm_mul` on the midpoints of *a0* and *a* at a higher
-    working precision, and finally add `e^{-d_k} (m_0 \varepsilon + m
-    \varepsilon_0 + \varepsilon\varepsilon_0)` to the error bound on the
-    `k`-th entry of *res*. This is valid for the following reason:
-    keeping notation from :func:`acb_theta_eld_distances`, for each `b\in
-    \{0,1\}^g`, the sum
+    We first compute `m, \varepsilon` such that the following holds: for each
+    `0\leq k < \mathit{nb}`, if `d_k` (resp. `a_k`) denotes the `k`-th entry of
+    *d* (resp. *a*), then the absolute value of `a_k` is at most `m \cdot
+    e^{-d_k}` and the radius of the complex ball `a_k` is at most
+    `\mathit{eps}\cdot e^{-d_k}`. We proceed similarly on *a0* and *d0* to
+    obtain `m_0, \varepsilon_0`. Then we call :func:`acb_theta_agm_mul` on the
+    midpoints of *a0* and *a* at a higher working precision, and finally add
+    `2^g e^{-d_k} (m_0 \varepsilon + m \varepsilon_0 +
+    \varepsilon\varepsilon_0)` to the error bound on the `k`-th entry of
+    *res*. This is valid because of the parallelogram identity: keeping
+    notation from :func:`acb_theta_eld_distances`, for each `b\in \{0,1\}^g`,
+    we have
 
         .. math::
 
             \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac b2)^2
             + \mathrm{Dist}_\tau(-Y^{-1} y, \mathbb{Z}^g + \tfrac{b + k}{2})^2
-
-    is at most `\mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2` by
-    the parallelogram identity.
+            \leq \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2.
 
 Quasilinear algorithms on exact, reduced input
 -------------------------------------------------------------------------------
