@@ -1072,7 +1072,7 @@ approximations to make the correct choice.
             + \mathrm{Dist}_\tau(-Y^{-1} y, \mathbb{Z}^g + \tfrac{b + k}{2})^2
             \leq \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac{k}{2})^2.
 
-Quasilinear algorithms on exact, reduced input
+Quasilinear algorithms on reduced input
 -------------------------------------------------------------------------------
 
 The general duplication formula specializes to the three following equalities:
@@ -1094,10 +1094,10 @@ duplication formulas `n` times, we reduce to evaluating
 `\theta_{a,0}(0,2^n\tau)`. We expect that the absolute value of this complex
 number is roughly `\exp(-d^2)` for `d = 2^n\mathrm{Dist}_\tau(0, \mathbb{Z}^g +
 \tfrac a2)`, where `\mathrm{Dist}_\tau` denotes the distance in `\mathbb{R}^g`
-attached to the quadratic form `\pi Y`. Provided that `n \simeq
-\log_2(\mathit{prec})`, we have to sum only `O_g(1)` terms in the summation
-algorithm to evaluate `\theta_{a,0}(0,2^n\tau)` at "shifted absolute precision"
-*prec*, i.e. absolute precision `\mathit{prec} + d^2/\log(2)`.
+attached to the quadratic form `\pi Y`. Provided that `2^n` is roughly *prec*,
+we have to sum only `O_g(1)` terms in the summation algorithm to evaluate
+`\theta_{a,0}(0,2^n\tau)` at "shifted absolute precision" *prec*, i.e. absolute
+precision *prec* `+\ d^2/\log(2)`.
 
 In order to recover `\theta_{a,0}(0,\tau)`, we then perform `n` AGM
 steps. *Assuming* that each `|\theta_{a,0}(0, 2^k\tau)|` is indeed of the
@@ -1122,13 +1122,17 @@ for theta values at `z\neq 0`, and for all characteristics:
   algorithm with a negligible failure probability.
 
 - When computing `\theta_{a,0}(z,\tau)` for a nonzero `z`, we compute
-  `\widetilde{\theta}_{a,0}(0, 2^k\tau)` and `\widetilde{\theta}_{a,0}(2^k z,
+  `\theta_{a,0}(0, 2^k\tau)` and `\theta_{a,0}(2^k z,
   2^k\tau)` using the first and third formulas at each step.
 
-- These two techniques can be combined by evaluating (normalized) theta values
+- These two techniques can be combined by evaluating theta values
   at the six vectors `2^k v` for `v = 0, t, 2t, z, z + t, z + 2t`. Note that we
   only have to compute `\widetilde{\theta}_{a,0}(2^kz, 2^k\tau)` at the last
   step `k=0`.
+
+- To simplify the precision management, we use :func:`acb_theta_agm_mul_tight`
+  and work with normalized theta values throughout, which also satisfy the
+  duplication formulas.
 
 - If the eigenvalues of `Y` have different orders of magnitude, then as we
   consider `\tau`, `2\tau`, `4\tau`, etc., the ellipsoids we would consider in
@@ -1136,7 +1140,7 @@ for theta values at `z\neq 0`, and for all characteristics:
   thick in other directions. In such a case, we can rewrite theta values as a
   sum of `O(1)` theta values in lower dimensions. This increases the efficiency
   of the algorithm while ensuring that the absolute precisions we consider are
-  always in `O(\mathit{prec})`.
+  always of the order of *prec*.
 
 - Finally, we note that the duplication formulas also have analogues for all
   theta values, not just `\theta_{a,0}`: for instance, we have
@@ -1149,8 +1153,8 @@ for theta values at `z\neq 0`, and for all characteristics:
   We use those generalized formulas for the very last duplication step when
   needed.
 
-We always assume in this section that the inputs `(z,\tau)` are provided as
-exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
+We always assume in this section that the inputs `(z,\tau)` have been
+reduced.
 
 .. function:: int acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, int cst, slong prec)
 
@@ -1185,21 +1189,21 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
     - *s* should be an integer between `1` and `g-1`; we will reduce the
       evaluation of theta functions from dimension `g` to dimension `s`
     - *a* should be an integer between `0` and `2^{g-s}-1` included; we will
-      only decompose `\theta_{a',0}(z,\tau)` when the last `g - s` bits of `a'`
-      correspond to those of *a*.
+      only decompose `\wildetilde{\theta}_{a',0}(z,\tau)` when the last `g - s`
+      bits of `a'` correspond to those of *a*.
 
     We then proceed as follows:
 
     - *fullprec* is set to the binary precision at which those theta values
-      `\theta_{a',0}(z,\tau)` should be computed. We take distances into
-      account, so *fullprec* is *prec* plus additional guard bits derived from
-      the maximum of the entries in *distances* corresponding to the possible
-      characteristics *a'*.
+      `\widetilde{\theta}_{a',0}(z,\tau)` should be computed. We take
+      distances into account, so *fullprec* is *prec* plus additional guard
+      bits derived from the maximum of the entries in *distances* corresponding
+      to the possible characteristics *a'*.
     - *R2* and *err* are set as in :func:`acb_theta_sum_radius` for this choice
       of *fullprec*. (*R2* is not part of the output.) Thus,
-      `\theta_{a',0}(z,\tau)` can be obtained by summing over an ellipsoid of
-      squared radius *R2* and adding an error *err* coming from the tail. We do
-      *not* compute that possibly huge ellipsoid.
+      `\widetilde{\theta}_{a',0}(z,\tau)` can be obtained by summing over an
+      ellipsoid of squared radius *R2* and adding an error *err* coming from
+      the tail. We do *not* compute that possibly huge ellipsoid.
     - Let `n\in \mathbb{Z}^g + \tfrac{a'}{2}` be a point in that
       ellipsoid. Write `a' = (a_0,a)` and `n = (n_0,n_1)` where `n_0\in
       \mathbb{Z}^s + \tfrac{a_0}{2}` and `n_1\in \mathbb{Z}^{g - s} +
@@ -1215,8 +1219,8 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
 
         .. math::
 
-            e^{\pi i \bigl(n_1^T \tau_1 n_1 + 2 n_1^T z_1\bigr)}
-            \theta_{a_0,0}(z_0 + x n_1, \tau_0).
+            e^{\pi i \bigl(n_1^T \tau_1 n_1 + 2 n_1^T z_1 + \pi y_0^T Y_0 y_0 - \pi y^T Y y \bigr)}
+            \widetilde{\theta}_{a_0,0}(z_0 + x n_1, \tau_0).
 
       where `\tau = \Bigl(\begin{smallmatrix} \tau_0 & x\\x^T &
       \tau_1\end{smallmatrix}\Bigr)` and `z = (z_0,z_1)`. Thus, we allocate
@@ -1229,24 +1233,25 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
 .. function:: void acb_theta_ql_recombine(acb_ptr th, acb_srcptr th0, acb_srcptr cofactors, const slong * pts, slong nb, const arf_t err, slong fullprec, slong s, ulong a, int all, slong g, slong prec)
 
     Performs the converse to :func:`acb_theta_ql_lower_dim`, namely recovers
-    theta values `\theta_{a',0}(z,\tau)` from the output of
-    :func:`acb_theta_ql_lower_dim` and theta values in dimension `s`. The input
-    is as follows:
+    normalized theta values `\widetilde{\theta}_{a',0}(z,\tau)` from the output
+    of :func:`acb_theta_ql_lower_dim` and theta values in dimension `s`. The
+    input is as follows:
 
     - *cofactors*, *pts*, *nb*, *err*, *fullprec*, *s*, *a*, *g*, *prec* should
       be as output by :func:`acb_theta_ql_lower_dim`.
     - If *all* is true (nonzero), then *th0* should be a concatenation of *nb*
-      vectors of length `2^{2s}` containing `\theta_{a_0,b_0}(z_0,\tau_0)` for
-      all characteristics `(a_0,b_0)` in dimension `s`, where `z_0` runs
-      through *new_zs* as output by :func:`acb_theta_ql_lower_dim`, and
-      `\tau_0` is defined as above. If *all* is false (zero), then *th0* should
-      be a concatenation of *nb* vectors of length `2^{s}` containing
-      `\theta_{a_0,0}(z_0,\tau_0)` only.
+      vectors of length `2^{2s}` containing
+      `\widetilde{\theta}_{a_0,b_0}(z_0,\tau_0)` for all characteristics
+      `(a_0,b_0)` in dimension `s`, where `z_0` runs through *new_zs* as output
+      by :func:`acb_theta_ql_lower_dim`, and `\tau_0` is defined as above. If
+      *all* is false (zero), then *th0* should be a concatenation of *nb*
+      vectors of length `2^{s}` containing
+      `\widetilde{\theta}_{a_0,0}(z_0,\tau_0)` only.
 
     The output, stored in *th*, is either the vector containing
-    `\theta_{a,b}(z,\tau)` for all `g`-dimensional characteristics `(a,b)` (if
-    *all* is true) or only `\theta_{a,0}(z,\tau)` for all `a` (if *all* is
-    false), where `(z,\tau)` was the initial input to
+    `\widetilde{\theta}_{a,b}(z,\tau)` for all `g`-dimensional characteristics
+    `(a,b)` (if *all* is true) or only `\widetilde{\theta}_{a,0}(z,\tau)` for
+    all `a` (if *all* is false), where `(z,\tau)` was the initial input to
     :func:`acb_theta_ql_lower_dim`.
 
 .. function:: int acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong * easy_steps, acb_srcptr zs, slong nb, const acb_mat_t tau, arb_srcptr distances, slong nb_steps, int all, slong prec)
@@ -1255,16 +1260,20 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
     *nb* pairs `(z,\tau)` where `z` runs through *zs*, which are assumed to be
     exact and reduced, using *nb_steps* duplication steps. The parameters *nb*
     and *nb_steps* must be at least one, and *zs* must begin with the zero
-    vector in `\mathbb{C}^g`. The rest of the input is as follows:
+    vector in `\mathbb{C}^g`. If `(z,\tau)` are not exact, then the output will
+    still be mathematically correct, but NaN values or unreasonable precision
+    losses might occur.
+
+    The rest of the input is as follows:
 
     - *distances* should be the concatenation of *nb* vectors of length `2^g`
       computed by :func:`acb_theta_eld_distances` for each pair `(z,\tau)`.
     - *nb_steps* should be the number of times we wish to apply the duplication
       formulas before falling back to either the summation algorithms or the
       dimension-lowering strategy.
-    - if *all* is nonzero (true), then we will compute `\theta_{a,b}(z,\tau)`
-      for all characteristics `(a,b)`, and otherwise only
-      `\theta_{a,0}(z,\tau)`.
+    - if *all* is nonzero (true), then we will compute
+      `\widetilde{\theta}_{a,b}(z,\tau)` for all characteristics `(a,b)`, and
+      otherwise only `\widetilde{\theta}_{a,0}(z,\tau)`.
 
     The vectors *rts*, *rts_all*, *t*, and *easy_steps* should be
     preinitialized with lengths `2^g \times 3\times
@@ -1272,22 +1281,23 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
     if *all* is true), `g` and *nb* respectively, while *guard* is a pointer to
     one :type:`slong`.
 
-    We proceed as follows. Initially, *guard* is set to a small value such as 16.
+    We proceed as follows. Initially, we work at a very low precision such as 8.
 
     1. For each `z`, we use the summation algorithms to obtain approximations
-       of `\theta_{a,b}(z,\tau)` (if *all* is true) or `\theta_{a,0}(z,\tau)`
-       (if *all* is false), and store them in *rts_all* or *rts*
-       respectively. We adjust the choice of precision in terms of *distances*
-       and add *guard* bits, so that the computed approximations do not contain
-       zero with a good probability. If none of the computed approximations
-       contains zero, it means that we can successfully apply the last (and
-       simplest) duplication formula for the last step of the quasi-linear
-       algorithm. In that case, we go on and compute approximations of
-       `\theta_{a,0}(2^k z,2^k\tau)`, for `k = 1,2,` etc., up to *nb_steps*-1
-       or until one of the approximations we compute contains zero, taking
-       distances into account at each step. We store the computed values in
-       *rts*, and set the corresponding entry of *easy_steps* to be the number
-       of steps for which the simplest duplication formula can be applied.
+       of `\widetilde{\theta}_{a,b}(z,\tau)` (if *all* is true) or
+       `\widetilde{\theta}_{a,0}(z,\tau)` (if *all* is false), and store them
+       in *rts_all* or *rts* respectively. We adjust the error bounds in terms
+       of *distances*, so that the computed approximations do not contain zero
+       with a good probability. If none of the computed approximations contains
+       zero, it means that we can successfully apply the last (and simplest)
+       duplication formula for the last step of the quasi-linear algorithm. In
+       that case, we go on and compute approximations of
+       `\widetilde{\theta}_{a,0}(2^k z,2^k\tau)`, for `k = 1,2,` etc., up to
+       *nb_steps*-1 or until one of the approximations we compute contains
+       zero, taking distances into account at each step. We store the computed
+       values in *rts*, and set the corresponding entry of *easy_steps* to be
+       the number of steps for which the simplest duplication formula can be
+       applied.
     2. At that point, if the entries of *easy_steps* are all equal to *nb_steps*,
        we are done. Otherwise, we pick an auxiliary vector `t` at
        random. The 1st entry of *easy_steps*, corresponding to `z=0`, is set to
@@ -1295,42 +1305,31 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
        the duplication formulas.)
     3. For each `z`, if `m` denotes the corresponding entry of *easy_steps*, we
        use the summation algorithms to compute approximations of
-       `\theta_{a,0}(2^k (z + t), 2^k\tau)` and `\theta_{a,0}(2^k(z + 2t),
-       2^k\tau)` for each `k` between `m` and *nb_steps*-1 included at low
-       precision. If one of these values contains zero, we restart step 3 with
-       another `t` (we allow a small number of retries, such as 4). We store
-       those approximations in *rts*. If `k=0` and *all* is true, then the
-       values we need are `\theta_{a,b}(z+2t,\tau)` for all `(a,b)` instead;
-       those are stored in *rts_all*.
-    4. If no suitable `t` was found in step 4, then we double *guard* and go
-       back to step 1. We allow this until *guard* reaches *prec*. After that,
-       if `t` still cannot be found, then we declare failure and output 0. This
-       should only happen with negligible probability for well-formed
-       input. The output value if 1 if a suitable `t` was found.
+       `\widetilde{\theta}_{a,0}(2^k (z + t), 2^k\tau)` and
+       `\widetilde{\theta}_{a,0}(2^k(z + 2t), 2^k\tau)` for each `k` between
+       `m` and *nb_steps*-1 included at low precision. (We only need the second
+       vector for `k=0`.) If one of these values contains zero, we restart step
+       3 with another `t` (we allow a small number of such retries, such as
+       4). We store those approximations in *rts*. If `k=0` and *all* is true,
+       then the values we need are `\widetilde{\theta}_{a,b}(z+2t,\tau)` for
+       all `(a,b)` instead; those are stored in *rts_all*.
+    4. If no suitable `t` was found in step 4, then we double the working
+       precision and go back to step 1. We allow this until the working
+       precision reaches *prec*. After that, if `t` still cannot be found, then
+       we declare failure and output 0. This should only happen with negligible
+       probability for well-formed input. The output value if 1 if a suitable
+       `t` was found.
 
-.. function:: void acb_theta_ql_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts, acb_srcptr rts_all, slong nb, slong nb_steps, arb_srcptr distances, const slong * easy_steps, int all, slong g, slong prec)
+    Finally, we set *guard* to the total number of bits of precision we expect
+    to lose when actually performing the suggested duplication steps later on.
 
-    Performs AGM steps in the context of the quasi-linear algorithm for theta
-    functions. The parameters *nb* and *nb_steps* must be at least one, and
-    *zs* must begin with the zero vector. The rest of input is as follows:
-
-    - *rts*, *rts_all*, *nb*, *nb_steps*, *distances*, *easy_steps*, *all*, *g*
-      and *prec* are as input to (or output by) :func:`acb_theta_ql_setup`.
-    - *th_init* should be a vector of length `\mathit{nb} \times 3 \times
-      2^{2g}` containing the initial theta values needed in the duplication
-      algorithm. (These will differ depending on the content of *easy_steps*.)
-
-    The output is either the collection of theta values
-    `\widetilde{\theta}_{a,b}(z,\tau)` for all `a,b` or
-    `\widetilde{\theta}_{a,0}(z,\tau)` for all `a` (depending on whether *all*
-    is true or not) for each vector `z` in *zs*, and is stored in *th*. The
-    precise duplication steps taken depends on the contents of *easy_steps*.
-
-.. function:: int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, const slong * pattern, int all, int shifted_prec, slong prec)
+.. function:: void acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, const slong * pattern, int all, int shifted_prec, slong prec)
 
     Runs the full quasi-linear algorithm to evaluate theta functions at the
     given *nb* pairs `(z,\tau)` where `z` runs through *zs*, which are assumed
-    to be exact and reduced.
+    to be exact and reduced. If `(z,\tau)` are not exact, then the function
+    will still be correct, but NaN values or unreasonable precision losses
+    might occur.
 
     The output is either the collection of theta values
     `\widetilde{\theta}_{a,b}(z,\tau)` for all `a,b` or
@@ -1338,35 +1337,29 @@ exact dyadic numbers and that the pairs `(z,\tau)` have been reduced.
     is true or not) for each vector `z` in *zs*, and is stored in *th*. If
     *shifted_prec* is nonzero (true), then the precision to which these values
     are computed will take distances into account similarly to
-    :func:`acb_theta_sum_a0_tilde`.
+    :func:`acb_theta_sum`.
 
     The input *pattern* conditions how many duplication steps will be performed
     and when to apply the dimension-lowering strategy (if at all). If zero
-    duplication steps are needed, we call :func:`acb_theta_sum_a0_tilde` or
-    :func:`acb_theta_sum_all_tilde` directly. Otherwise, we call
-    :func:`acb_theta_ql_setup`, which we expect to succeed with overwhelming
-    probability. The initial theta values required for the final call to
-    :func:`acb_theta_ql_steps` are computed either by the summation algorithms
-    or, if the dimension-lowering strategy is used, by calling
-    :func:`acb_theta_ql_lower_dim`, making a recursive call to
+    duplication steps are needed, we call :func:`acb_theta_sum`
+    directly. Otherwise, we call :func:`acb_theta_ql_setup`, which we expect to
+    succeed with overwhelming probability. The initial theta values required
+    in the duplication formulas are computed either by the
+    summation algorithms or, if the dimension-lowering strategy is used, by
+    calling :func:`acb_theta_ql_lower_dim`, making a recursive call to
     :func:`acb_theta_ql_exact` in a lower dimension but (possibly) a longer
     list of vectors *zs*, and finally recombining the values with
     :func:`acb_theta_ql_recombine`.
 
-Main functions on reduced input
--------------------------------------------------------------------------------
-
-This section wraps up the quasi-linear and summation algorithms on inputs
-`(z,\tau)` that are reduced, but not necessarily exact.
-
-.. function:: void acb_theta_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
+.. function:: void acb_theta_ql_local_bound(arb_t c, arb_t rho, acb_srcptr z, const acb_mat_t tau, slong ord)
 
     Sets *c* and *rho* such that on every ball centered at (a point contained
     in) *z* of radius *rho*, the functions `|\theta_{a,b}(\cdot,\tau)|` for all
     characteristics `(a,b)` are uniformly bounded by `c`. The choice of *rho*
     is tuned to get interesting upper bounds on derivatives of `\theta_{a,b}`
     up to order *ord* in the context of finite differences (see
-    :func:`acb_theta_jet_all_notransform` below).
+    :func:`acb_theta_ql_jet_fd` below). We always ensure that *rho* is at most
+    1 and *c* is at least 1.
 
     We proceed as follows. First, we compute `c_0`, `c_1`, `c_2` such that for
     any choice of `\rho`, one can take `c = c_0\exp((c_1 + c_2\rho)^2)`
@@ -1387,10 +1380,10 @@ This section wraps up the quasi-linear and summation algorithms on inputs
     One can easily compute an upper bound on `c_2` from the Cholesky
     decomposition of `\pi Y^{-1}`. We then look for a value of `\rho` that
     minimizes `\exp((c_1 + c_2\rho)^2)/\rho^{2m-1}` where `m = \mathit{ord}+1`,
-    i.e. we set `\rho` to the positive root of `2c_2\rho (c_1 + c_2\rho) =
-    2m-1`.
+    i.e. we set `\rho` to minimum of 1 and the positive root of `2c_2\rho
+    (c_1 + c_2\rho) = 2m-1`.
 
-.. function:: void acb_theta_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau, acb_srcptr dth, slong ord, slong prec)
+.. function:: void acb_theta_ql_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau, acb_srcptr dth, slong ord, slong prec)
 
     Assuming that *dth* contains (approximations of) the derivatives of a theta
     function `\theta_{a,b}` up to total order `\mathit{ord} + 2` at `(z,\tau)`,
@@ -1400,6 +1393,17 @@ This section wraps up the quasi-linear and summation algorithms on inputs
     of `\theta_{a,b}` at `(z_0,\tau_0)` and `(z_1,\tau_1)` up to total order
     *ord* differ by at most *err* elementwise. This uses the heat equation and
     a Lipschitz-type inequality.
+
+.. function:: void acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, slong prec)
+
+.. function:: void acb_theta_ql_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, slong prec)
+
+    Same as :func:`acb_theta_ql_jet_fd`, but makes an automatic choice of
+    algorithm between finite differences and direct summation depending on the
+    working precision.
+
+Reduction and main functions
+-------------------------------------------------------------------------------
 
 .. function:: void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
