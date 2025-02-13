@@ -1396,69 +1396,14 @@ reduced.
 
 .. function:: void acb_theta_ql_jet_fd(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, slong prec)
 
-.. function:: void acb_theta_ql_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, slong prec)
+    Evaluates partial derivatives of theta functions `\theta_{a,b}` with
+    respect to `z` at the given *nb* points `(z,\tau)`. The characteristic `a`
+    varies from `0` to `2^g-1`, and so does *b* if *all* is true (nonzero). If
+    *all* is false, then we only consider `b=0`. The result is a concatenation
+    of *nb* times `2^{2g}` (or `2^g`) vectors of derivatives.
 
-    Same as :func:`acb_theta_ql_jet_fd`, but makes an automatic choice of
-    algorithm between finite differences and direct summation depending on the
-    working precision.
-
-Reduction and main functions
--------------------------------------------------------------------------------
-
-.. function:: void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
-
-    Same as :func:`acb_theta_00`, but does not attempt to reduce the input
-    under the Siegel modular group, calling :func:`acb_theta_sum_00` directly.
-
-.. function:: void acb_theta_one_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, ulong ab, slong prec);
-
-    Same as :func:`acb_theta_00_notransform`, but evalues `\theta_{a,b}` for a
-    fixed characteristic instead of `\theta_{0,0}`. If `g=1`, we call
-    :func:`acb_modular_theta_sum` directly. Otherwise, we call
-    :func:`acb_theta_00_notransform` at `z + \tau \tfrac{a}{2} + \tfrac{b}{2}`.
-
-.. function:: void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, int sqr, slong prec)
-
-    Same as :func:`acb_theta_all`, but does not attempt to reduce the input
-    under the Siegel modular group.
-
-    We first call :func:`acb_theta_ql_nb_steps`. The following situations can arise:
-
-    - if *sqr* is false (zero) and the number of duplication steps is zero, we
-      call :func:`acb_theta_sum_all_tilde` directly.
-    - if *sqr* is true (nonzero) and the number of duplication steps is at most
-      1, we call :func:`acb_theta_sum_a0_tilde` at `2\tau` and perform one
-      duplication step, but without computing any distances.
-    - if more duplication steps are needed, we strip `(z,\tau)` of their error
-      bounds and call :func:`acb_theta_ql_exact` (either with *all = 1* at
-      `\tau` if *sqr* is false, or with *all = 0* at `2\tau` if *sqr* is
-      true). We finally call :func:`acb_theta_jet_error` to restore provably
-      correct error bounds on the final result, using
-      :func:`acb_theta_sum_jet_all` at low precision to provide the suitable
-      vector *dth*.
-
-.. function:: void acb_theta_jet_00_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
-
-    Same as :func:`acb_theta_jet_00`, but does not attempt to reduce the input
-    under the Siegel modular group, calling :func:`acb_theta_sum_jet_00`
-    directly.
-
-.. function:: void acb_theta_jet_one_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, ulong ab, slong prec)
-
-    Same as :func:`acb_theta_jet_00_notransform`, but evaluates the derivatives
-    of `\theta_{a,b}` for a fixed characteristic instead of derivatives of
-    `\theta_{0,0}`. If `g=1`, we call :func:`acb_modular_theta_sum`
-    directly. Otherwise, we call :func:`acb_theta_jet_00_notransform` at `z +
-    \tau \tfrac{a}{2} + \tfrac{b}{2}`.
-
-.. function:: void acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, slong prec)
-
-    Same as :func:`acb_theta_jet_all`, but does not attempt to reduce the input
-    under the Siegel modular group.
-
-    At low precisions, we call :func:`acb_theta_sum_jet_all` directly. At
-    higher precisions, we rely on finite differences on the output of
-    :func:`acb_theta_all_notransform`, as follows. Consider the Taylor expansion:
+    We rely on finite differences on the output of :func:`acb_theta_ql_exact`,
+    as follows. Consider the Taylor expansion:
 
         .. math::
 
@@ -1494,18 +1439,57 @@ Reduction and main functions
     transform.
 
     The algorithm based on finite differences computes `c` and `\rho` using
-    :func:`acb_theta_local_bound`, chooses a suitable `\varepsilon`, strips
+    :func:`acb_theta_ql_local_bound`, chooses a suitable `\varepsilon`, strips
     `(z,\tau)` of their error bounds, increases the working precision to
     account for division by `\varepsilon^{\mathit{ord}}\cdot
-    (\mathit{ord}+1)^g`, calls :func:`acb_theta_all_notransform` on all the
-    auxiliary points, performs the relevant discrete Fourier transforms, and
-    finally restores provably correct error bounds on the results using
-    :func:`acb_theta_jet_error` and derivatives to order *ord* + 2 computed at
-    low precision. This algorithm runs in quasi-linear time in
-    `\mathit{prec}\cdot \mathit{ord}^{\,g}` for any fixed `g`.
+    (\mathit{ord}+1)^g`, calls :func:`acb_theta_ql_exact` on all the auxiliary
+    points at a higher working precision, performs the relevant discrete
+    Fourier transforms, and finally restores provably correct error bounds on
+    the results using :func:`acb_theta_ql_jet_error` and derivatives to order
+    *ord* + 2 computed at low precision. This algorithm runs in quasi-linear
+    time in `\mathit{prec}\cdot \mathit{ord}^{\,g}` for any fixed `g`.
+
+.. function:: void acb_theta_ql_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, slong prec)
+
+    Same as :func:`acb_theta_ql_jet_fd`, but makes an automatic choice of
+    algorithm between finite differences and direct summation depending on the
+    working precision.
 
 Reduction and main functions
 -------------------------------------------------------------------------------
+
+.. function:: void acb_theta_jet_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, ulong ab, int all, int sqr, slong prec)
+
+    Same as :func:`acb_theta_jet`, but does not attempt to reduce the input
+    pairs `(z,\tau)`. When *all* is false, the parameter *ab* can be used to
+    specify an individual characteristic `(a,b)` so that we will compute
+    (derivatives of) `\widetilde{\theta}_{a,b}` instead of `\theta_{0,0}`. This
+    function should only be used when the input is already known to be reduced.
+
+    Depending on the cases, we use the following formulas before calling
+    :func:`acb_theta_ql_jet`:
+
+    - if *ord* is zero and *all* and *sqr* are both true, we use the
+      duplication formula
+
+        .. math::
+
+            \theta_{a,b}(z,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
+            \theta_{a',0}(0,2\tau) \theta_{a+a',0}(2z,2\tau).
+
+    - if *all* is false and *ab* is zero, we use the formula
+
+        .. math::
+
+            \theta_{0,0}(z,\tau) = \sum_{a \in (\mathbb{Z}/2\mathbb{Z})^g}
+            \theta_{a,0}(2z, 4\tau).
+
+    - if *all* is false and *ab* is not zero, we use the formula
+
+        .. math::
+
+            \theta_{a,b}(z,\tau) = e^{\pi i (a^T \tau a/4 + a^T b + 2 a^T z)}
+            \theta_{0,0}(z + \tau\tfrac{a}{2} + \tfrac{b}{2}, \tau).
 
 .. function:: int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N, acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
@@ -1552,14 +1536,12 @@ Reduction and main functions
     values, then the return value is 0 and the output vectors are left
     undefined. Otherwise, the return value is 1.
 
-The main functions :func:`acb_theta_00`, :func:`acb_theta_all`,
-:func:`acb_theta_jet_00` and :func:`acb_theta_jet_all` are then assembled in a
-straightforward way. An additional feature of :func:`acb_theta_00` and
-:func:`acb_theta_all` is the following: if something went wrong during
-execution (e.g. :func:`acb_theta_reduce_tau`, :func:`acb_theta_ql_setup` or
-:func:`acb_theta_eld_set` failed), then we attempt to catch this error by
-calling :func:`acb_theta_local_bound`. This allows us to return very rough (but
-hopefully finite) bounds on the result instead of NaNs.
+We then assemble the main function :func:`acb_theta_jet` as follows. If
+:func:`acb_theta_reduce_tau`, then :func:`acb_theta_reduce_z` succeed, we call
+:func:`acb_theta_jet_notransform` on the reduced pairs `(z,\tau)`. We finally
+apply the transformation formula with the help of :func:`acb_theta_char_table`
+and :func:`acb_theta_siegel_kappa`. If reduction does not succeed, then the
+output is set to indeterminate values.
 
 Dimension 2 specifics
 -------------------------------------------------------------------------------
