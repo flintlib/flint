@@ -92,6 +92,8 @@ int main(int argc, char * argv[])
         }
         flint_printf("\n");
 
+        tref = 0;
+        tmin = 0;
         m = 9 - 2 * g;
         for (k = 0; k < n_pow(m, g); k++)
         {
