@@ -10,12 +10,14 @@ functionality from :ref:`acb_modular.h <acb-modular>`. We also provide
 functionality to evaluate derivatives of theta functions, and also to evaluate
 Siegel modular forms in terms of theta functions when `g=2`.
 
-In the context of this module, *tau* or `\tau` always denotes an element of the
-Siegel upper half-space `\mathcal{H}_g`, i.e. `\tau` is a symmetric `g\times g`
-complex matrix with positive definite imaginary part. The letter `z` denotes an
-element of `\mathbb{C}^g`. For each `a,b\in \{0,1\}^g`, the Riemann theta
-function (of level 2) of characteristic `(a,b)` is the following analytic
-function in `\tau\in \mathcal{H}_g` and `z\in \mathbb{C}^g`:
+In this module, *tau* or `\tau` always denotes an element of the Siegel upper
+half-space `\mathcal{H}_g`, i.e. `\tau` is a symmetric `g\times g` complex
+matrix with positive definite imaginary part, encoded as an :type:`acb_mat_t`,
+while *z* or *zs* denotes a vector (resp. a tuple of vectors) in
+`\mathbb{C}^g`, encoded as an :type:`acb_ptr` of length `g` (resp. *nb* times
+`g`). For each `a,b\in \{0,1\}^g`, the Riemann theta function (of level 2) of
+characteristic `(a,b)` is the following analytic function in `\tau\in
+\mathcal{H}_g` and `z\in \mathbb{C}^g`:
 
     .. math::
 
@@ -23,28 +25,29 @@ function in `\tau\in \mathcal{H}_g` and `z\in \mathbb{C}^g`:
 
 considering `a`, `b` and `z` as column vectors.
 
-The main method to evaluate theta functions is
-
-.. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
-
-Here *z* should be a vector of length `g`. The output, stored in *th*, is
-a vector of length `2^{2g}`. If *sqr* = 0 (false), this function computes
-`\theta_{a,b}(z_j,\tau)` for all `a,b\in \{0,1\}^g`; if *sqr* is nonzero
-(true), it computes `\theta_{a,b}(z_j,\tau)^2` instead using a faster
-algorithm. Throughout, we order vectors of theta values by associating to each
+Throughout, we order vectors of theta values by associating to each
 characteristic `(a,b)` the :type:`ulong` between 0 and `2^{2g}-1` whose `g`
 most (resp. least) significant bits are given by `a` (resp. `b`): thus `(a,b)`
 where `a = (0,1)` and `b = (1,0)` in dimension `2` will be numbered `6`. With
 these conventions, the output of :func:`acb_modular_theta` in dimension 1 is
-`(-\theta_3,\theta_2,\theta_0,\theta_1)`. (When manipulating `a` or `b`
-individually, we map them to integers between 0 and `2^g-1`.)
+`(-\theta_3,\theta_2,\theta_0,\theta_1)`. When manipulating `a` or `b`
+individually, we map them to integers between 0 and `2^g-1`.
+
+The main method to evaluate theta functions is
+
+.. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
+
+The output, stored in *th*, is a vector of length `2^{2g}`. If *sqr* is zero
+(false), this function computes `\theta_{a,b}(z,\tau)` for all `a,b\in
+\{0,1\}^g`; if *sqr* is nonzero (true), it computes `\theta_{a,b}(z_j,\tau)^2`
+instead using a faster algorithm.
 
 We handle the final argument *prec* as follows. Barring unexpected
-cancellations, the "expected" absolute value of `\theta_{a,b}(z,\tau)` is
+cancellations, the absolute value of `\theta_{a,b}(z,\tau)` should be roughly
 
     .. math::
 
-        \left|\theta_{a,b}(z,\tau)\right| \approx \exp(\pi y^T Y^{-1} y) \exp(- d^2)
+        \left|\theta_{a,b}(z,\tau)\right| \approx e^{\pi y^T Y^{-1} y} e^{- d^2}
 
 where
 
@@ -58,7 +61,7 @@ This leads us to define the normalized functions
 
     .. math::
 
-        \widetilde{\theta}_{a,b}(z,\tau) = \exp(-\pi y^T Y^{-1} y) \theta_{a,b}(z,\tau)
+        \widetilde{\theta}_{a,b}(z,\tau) = e^{-\pi y^T Y^{-1} y} \theta_{a,b}(z,\tau)
 
 which are no longer holomorphic, but are uniformly bounded on `\mathbb{C}^g`
 for a fixed `\tau`: in fact, adding an element of `\mathbb{Z}^g +
@@ -66,18 +69,19 @@ for a fixed `\tau`: in fact, adding an element of `\mathbb{Z}^g +
 complex number of absolute value one. We use those internally for easier
 precision management: an argument *prec* means that
 `\widetilde{\theta}_{a,b}(z,\tau)` is computed with an absolute error bound of
-roughly `2^{-\mathit{prec}}`. (Some internal functions also take the factor
-`\exp(-d^2)` into account, and are documented as such.) The expected error
-bound on the output of :func:`acb_theta_all` and similar functions will be of
-the order of `\exp(\pi y^Y Y^{-1} y) \cdot 2^{-\mathit{prec}}` to avoid
-unreasonable computations when `y` is very far from zero.
+roughly `2^{-\mathit{prec}}`. The expected error bound on the output of
+:func:`acb_theta_all` and similar functions will be of the order of `\exp(\pi
+y^T Y^{-1} y) \cdot 2^{-\mathit{prec}}` to avoid unreasonable computations when
+`y` is very far from zero. Some internal functions also take the factor
+`\exp(-d^2)` into account, and are documented as such.
 
-In any case, the numerical functions in this module always compute certified
-error bounds: for instance, if `\tau` is represented by an :type:`acb_mat_t`
-whose imaginary part is not certainly positive definite at the chosen working
+In any case, the numerical functions in this module compute certified error
+bounds: for instance, if `\tau` is represented by an :type:`acb_mat_t` whose
+imaginary part is not certainly positive definite at the chosen working
 precision, then the output will have an infinite radius.
 
-The function :func:`acb_theta_all` is in fact a simple interface to the more complete method
+The function :func:`acb_theta_all` is in fact an interface to the more complete
+method
 
 .. function:: void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, int sqr, slong prec)
 
@@ -350,16 +354,16 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
     - `\zeta_8=\exp(i\pi/4)`,
     - `e(m,a,b)` is an integer given by an explicit formula in terms of `m,a,b`
       (this is `\phi_m` in Igusa's notation), and
-    - `\kappa(m)` is an 8th root of unity, only well-defined up
-      to sign unless we choose a particular branch of `\det(\gamma\tau +
-      \delta)^{1/2}` on `\mathcal{H}_g`.
+    - `\kappa(m)` is an 8th root of unity, only well-defined up to sign unless
+      we choose a particular branch of `\det(\gamma\tau + \delta)^{1/2}` on
+      `\mathcal{H}_g`. Hence `\kamma(m)^2` is a well-defined 4th root of unity.
 
     We proceed as follows. After applying :func:`sp2gz_decompose`, we only have
     to consider four special cases for *mat*. If *mat* is trigonal or
     block-diagonal, one can compute its action on `\theta_{0,0}` directly. If
     *mat* is an embedded matrix from `\mathrm{SL}_2(\mathbb{Z})`, we rely on
     :func:`acb_modular_theta_transform`. Finally, if *mat* is an embedded `J`
-    matrix from dimension `0\leq r\leq g`, then `\kappa(m) \zeta_8^{e(m,0,0)}
+    matrix from dimension `2\leq r\leq g`, then `\kappa(m) \zeta_8^{e(m,0,0)}
     i^{r/2} \det(\tau_0)^{1/2} = 1`, where `\tau_0` denotes the upper left
     `r\times r` submatrix of `\tau` and the branch of the square root is chosen
     such that the result is `i^{g/2}\det(Y)` when `\tau = iY` is purely
@@ -376,8 +380,9 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 
     Returns `0\leq r < 3` such that `\kappa(\mathit{mat})^2 = i^r`, which makes
     sense without reference to a branch of `\det(\gamma\tau +
-    \delta)^{1/2}`. This is a simpler interface to :func:`acb_siegel_kappa`
-    when *sqr* is true.
+    \delta)^{1/2}`.
+
+    This is a simpler interface to :func:`acb_siegel_kappa` when *sqr* is true.
 
 .. function:: void acb_siegel_randtest(acb_mat_t tau, flint_rand_t state, slong prec, slong mag_bits)
 
@@ -436,9 +441,9 @@ Theta characteristics
 
     If *ab* encodes a valid characteristic, sets *ch* to the theta
     characteristic `(a',b')` and sets *e* to `e(\mathit{mat},a,b)` as in the
-    transformation formula. If *ab* is negative, then sets *ch* and *e* to
-    vectors of length `2^{2g}` containing this output for all characteristics
-    from 0 to `2^{2g}-1`.
+    transformation formula (see :func:`acb_siegel_kappa`). If *ab* is negative,
+    then sets *ch* and *e* to vectors of length `2^{2g}` containing this output
+    for all characteristics from 0 to `2^{2g}-1`.
 
 .. function:: void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int sqr, slong prec)
 
@@ -446,7 +451,8 @@ Theta characteristics
     for the symplectic matrix *mat* and stores the output in *res*. This omits
     the `\kappa`, determinant, and exponential factors from the formula. If
     *sqr* is nonzero (true), then replaces `\zeta_8` in the formula by `i` to
-    mimic the transformation formula on squared theta values.
+    mimic the transformation formula on squared theta values. This is only used
+    for testing.
 
 Toolbox for derivatives
 -------------------------------------------------------------------------------
