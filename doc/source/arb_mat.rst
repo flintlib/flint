@@ -264,7 +264,7 @@ Transpose
 .. function:: void arb_mat_transpose(arb_mat_t dest, const arb_mat_t src)
 
     Sets *dest* to the exact transpose *src*. The operands must have
-    compatible dimensions. Aliasing is allowed.
+    compatible dimensions. Aliasing is allowed for square matrices.
 
 Norms
 -------------------------------------------------------------------------------

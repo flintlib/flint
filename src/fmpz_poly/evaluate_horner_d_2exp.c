@@ -15,6 +15,9 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 /* Naive double+exponent arithmetic; not designed to deal with
    underflow/overflow. */
 typedef struct
@@ -198,3 +201,5 @@ double fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz_poly_t poly, dou
 
    return _fmpz_poly_evaluate_horner_d_2exp(exp, poly->coeffs, poly->length, d);
 }
+
+POP_OPTIONS

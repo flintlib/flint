@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include "nmod_poly.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void nmod_poly_multi_crt_init(nmod_poly_multi_crt_t P)
 {
     P->prog = NULL;
@@ -500,3 +503,5 @@ void _nmod_poly_multi_crt_run_p(
         }
     }
 }
+
+POP_OPTIONS

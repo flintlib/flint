@@ -13,6 +13,9 @@
 #include "gr_vec.h"
 #include "gr_mat.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 void gr_mat_test_charpoly(gr_method_mat_unary_op_get_scalar charpoly_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
@@ -70,3 +73,5 @@ void gr_mat_test_charpoly(gr_method_mat_unary_op_get_scalar charpoly_impl, flint
             gr_ctx_clear(ctx);
     }
 }
+
+POP_OPTIONS

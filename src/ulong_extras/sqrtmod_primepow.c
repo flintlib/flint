@@ -55,8 +55,8 @@ slong n_sqrtmod_2pow(ulong ** sqrt, ulong a, slong exp)
 
     if (r) /* a is odd */
     {
-        ulong roots[2];
-        slong i, ex, pow;
+        ulong pow, roots[2];
+        slong i, ex;
 
         if ((a & 7) != 1) /* check square root exists */
         {

@@ -13,10 +13,8 @@
 #include "fmpz.h"
 #include "nmod_mpoly_factor.h"
 
-#if defined(__GNUC__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Woverlength-strings"
-#endif
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS
 
 slong check_omega(slong om, const nmod_mpoly_t p, const char ** vars, const nmod_mpoly_ctx_t ctx)
 {
@@ -1225,6 +1223,4 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-#if defined(__GNUC__)
-# pragma GCC diagnostic pop
-#endif
+DIAGNOSTIC_POP

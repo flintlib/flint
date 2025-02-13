@@ -33,7 +33,7 @@ void _fmpz_promote_neg_ui(fmpz_t f, ulong v)
 void _fmpz_promote_set_si(fmpz_t f, slong v)
 {
     mpz_ptr zf = _fmpz_promote(f);
-    zf->_mp_d[0] = FLINT_ABS(v);
+    zf->_mp_d[0] = FLINT_UABS(v);
     zf->_mp_size = (v < 0) ? -1 : 1;
 }
 
@@ -49,7 +49,7 @@ void _fmpz_init_promote_set_si(fmpz_t f, slong v)
 {
     mpz_ptr zf = _fmpz_new_mpz();
     *f = PTR_TO_COEFF(zf);
-    zf->_mp_d[0] = FLINT_ABS(v);
+    zf->_mp_d[0] = FLINT_UABS(v);
     zf->_mp_size = (v < 0) ? -1 : 1;
 }
 

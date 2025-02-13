@@ -11,6 +11,9 @@
 
 #include "acb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void
 acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const fmpz * y, slong ystep, slong len, slong prec)
 {
@@ -143,3 +146,5 @@ acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
 
     TMP_END;
 }
+
+POP_OPTIONS

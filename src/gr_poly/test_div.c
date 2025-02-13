@@ -12,6 +12,9 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 void _gr_poly_test_div(gr_method_poly_binary_op div_impl,
     flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
@@ -101,3 +104,5 @@ void _gr_poly_test_div(gr_method_poly_binary_op div_impl,
             gr_ctx_clear(ctx);
     }
 }
+
+POP_OPTIONS

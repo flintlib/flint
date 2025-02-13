@@ -3,6 +3,7 @@
     2004, 2005 Free Software Foundation, Inc.
 
     Copyright 2009, 2015 William Hart
+    Copyright 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,7 +13,33 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "ulong_extras.h"
+
+#if FLINT_PREINVERT_LIMB_USE_NATIVE
+
+ulong n_preinvert_limb(ulong n)
+{
+    ulong ninv, r;
+    unsigned int norm;
+
+    norm = flint_clz(n);
+    n <<= norm;
+
+    udiv_qrnnd(ninv, r, ~n, ~UWORD(0), n);
+    return ninv;
+}
+
+ulong n_preinvert_limb_prenorm(ulong n)
+{
+    ulong ninv, r;
+
+    udiv_qrnnd(ninv, r, ~n, ~UWORD(0), n);
+    return ninv;
+}
+
+#else
+
 
 #if FLINT_BITS == 32
 
@@ -116,19 +143,18 @@ static const unsigned short rec_word_tab[256] = {
 
 ulong n_preinvert_limb(ulong n)
 {
-   ulong norm, ninv;
+    ulong norm, ninv;
 
-   norm = flint_clz(n);
-   _invert_limb(ninv, n << norm);
-
-   return ninv;
+    norm = flint_clz(n);
+    _invert_limb(ninv, n << norm);
+    return ninv;
 }
 
 ulong n_preinvert_limb_prenorm(ulong n)
 {
-   ulong ninv;
-
-   _invert_limb(ninv, n);
-
-   return ninv;
+    ulong ninv;
+    _invert_limb(ninv, n);
+    return ninv;
 }
+
+#endif

@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "mag.h"
-
-#ifdef __GNUC__
-# define ceil __builtin_ceil
-#else
-# include <math.h>
-#endif
 
 #define MAG_FAC_TABLE_NUM 256
 

@@ -20,6 +20,9 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 typedef int ((*gr_test_function)(gr_ctx_t, flint_rand_t, int));
 
 int
@@ -4475,3 +4478,5 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
         flint_printf("===============================================================================\n\n");
     }
 }
+
+POP_OPTIONS

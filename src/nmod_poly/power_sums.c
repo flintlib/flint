@@ -41,7 +41,7 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
     {
         nmod_poly_fit_length(res, 1);
         _nmod_poly_set_length(res, 1);
-        NMOD_RED(res->coeffs[0], len - 1, poly->mod);
+        NMOD_RED(res->coeffs[0], (ulong) (len - 1), poly->mod);
     }
     else
     {
@@ -72,7 +72,7 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
                                   len - i, n, poly->mod);
         }
         if (i)
-            NMOD_RED(res->coeffs[0], len - 1, poly->mod);
+            NMOD_RED(res->coeffs[0], (ulong) (len - 1), poly->mod);
         _nmod_poly_set_length(res, n);
         _nmod_poly_normalise(res);
     }
@@ -85,7 +85,7 @@ _nmod_poly_power_sums_naive(nn_ptr res, nn_srcptr poly, slong len, slong n,
 {
     slong i, k;
 
-    NMOD_RED(res[0], len - 1, mod);
+    NMOD_RED(res[0], (ulong) (len - 1), mod);
     for (k = 1; k < FLINT_MIN(n, len); k++)
     {
         res[k] = nmod_mul(poly[len - 1 - k], k, mod);

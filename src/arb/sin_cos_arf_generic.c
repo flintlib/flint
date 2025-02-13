@@ -9,15 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "thread_support.h"
 #include "arb.h"
-
-#ifdef __GNUC__
-# define pow __builtin_pow
-#else
-# include <math.h>
-#endif
 
 /* Computes sin(x) or cos(x) using Taylor series truncated at x^N exclusive.
    Computes error bound automatically. Does not allow aliasing of s and x.  */

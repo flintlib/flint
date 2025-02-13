@@ -36,17 +36,22 @@ TEST_TEMPLATE_FUNCTION_START(T, is_square, state)
             TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 #endif
         else
-            do
+            while (1) {
 #if defined(FQ_ZECH_H)
                 TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 #else
                 TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
 #endif
 #if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
-            while (TEMPLATE(T, ctx_prime)(ctx) == 2);
+                if (TEMPLATE(T, ctx_prime)(ctx) != 2) {
 #else
-            while (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0);
+                if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0) {
 #endif
+                    break;
+                } else {
+                    TEMPLATE(T, ctx_clear)(ctx);
+                }
+            }
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);

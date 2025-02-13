@@ -14,10 +14,8 @@
 #include "nmod_mat.h"
 
 /* gcc11 on x86_64 generates significantly worse code with -O3 */
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC push_options
-# pragma GCC optimize("O2")
-#endif
+PUSH_OPTIONS
+OPTIMIZE_O2
 
 /*
 with op = 0, computes D = A*B
@@ -219,6 +217,4 @@ nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     _nmod_mat_mul_classical_op(C, NULL, A, B, 0);
 }
 
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC pop_options
-#endif
+POP_OPTIONS

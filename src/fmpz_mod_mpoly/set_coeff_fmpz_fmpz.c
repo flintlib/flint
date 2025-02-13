@@ -13,6 +13,9 @@
 #include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void _fmpz_mod_mpoly_set_coeff_fmpz_fmpz(
     fmpz_mod_mpoly_t A,
     const fmpz_t c,
@@ -123,3 +126,5 @@ void fmpz_mod_mpoly_set_coeff_si_fmpz(fmpz_mod_mpoly_t poly,
     fmpz_mod_mpoly_set_coeff_fmpz_fmpz(poly, C, exp, ctx);
     fmpz_clear(C);
 }
+
+POP_OPTIONS

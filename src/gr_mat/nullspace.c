@@ -13,45 +13,26 @@
 #include "gr_mat.h"
 
 int
-gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
+gr_mat_nullspace_from_rref(gr_mat_t X, const gr_mat_t A, gr_srcptr Aden, slong rank, gr_ctx_t ctx)
 {
-    slong i, j, k, m, n, rank, nullity;
+    slong i, j, k, m, n, nullity;
     slong *p;
     slong *pivots;
     slong *nonpivots;
-    gr_mat_t tmp;
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    gr_ptr den;
     int with_den;
+
+    with_den = (Aden != NULL);
 
     m = gr_mat_nrows(A, ctx);
     n = gr_mat_ncols(A, ctx);
 
     p = flint_malloc(sizeof(slong) * FLINT_MAX(m, n));
-    gr_mat_init(tmp, m, n, ctx);
-
-    GR_TMP_INIT(den, ctx);
-
-    with_den = gr_ctx_is_field(ctx) == T_FALSE && gr_ctx_is_integral_domain(ctx) == T_TRUE;
-
-    if (with_den)
-    {
-        status |= gr_mat_rref_den(&rank, tmp, den, A, ctx);
-    }
-    else
-    {
-        status |= gr_mat_rref(&rank, tmp, A, ctx);
-    }
 
     nullity = n - rank;
 
-    if (status != GR_SUCCESS)
-        goto cleanup;
-
-    /* todo: have a resize function */
-    gr_mat_clear(X, ctx);
-    gr_mat_init(X, n, nullity, ctx);
+    status |= gr_mat_zero(X, ctx);
 
     if (rank == 0)
     {
@@ -69,7 +50,7 @@ gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
             {
                 /* Todo: this should not be T_UNKNOWN. Should we save
                    the pivot data in the lu algorithm? */
-                truth_t is_zero = gr_is_zero(GR_MAT_ENTRY(tmp, i, j, sz), ctx);
+                truth_t is_zero = gr_is_zero(GR_MAT_ENTRY(A, i, j, sz), ctx);
 
                 if (is_zero == T_FALSE)
                 {
@@ -98,35 +79,83 @@ gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
             j++;
         }
 
-        if (with_den)
+        for (i = 0; i < nullity; i++)
         {
-            /* if we did not keep den, equivalently den = tmp[0, pivots[0]] here */
+            for (j = 0; j < rank; j++)
+                status |= gr_neg(GR_MAT_ENTRY(X, pivots[j], i, sz), GR_MAT_ENTRY(A, j, nonpivots[i], sz), ctx);
 
-            for (i = 0; i < nullity; i++)
-            {
-                for (j = 0; j < rank; j++)
-                    status |= gr_neg(GR_MAT_ENTRY(X, pivots[j], i, sz), GR_MAT_ENTRY(tmp, j, nonpivots[i], sz), ctx);
-
-                status |= gr_set(GR_MAT_ENTRY(X, nonpivots[i], + i, sz), den, ctx);
-            }
-        }
-        else
-        {
-            for (i = 0; i < nullity; i++)
-            {
-                for (j = 0; j < rank; j++)
-                    status |= gr_neg(GR_MAT_ENTRY(X, pivots[j], i, sz), GR_MAT_ENTRY(tmp, j, nonpivots[i], sz), ctx);
-
+            /* if we did not keep Aden, equivalently Aden = tmp[0, pivots[0]] here */
+            if (with_den)
+                status |= gr_set(GR_MAT_ENTRY(X, nonpivots[i], + i, sz), Aden, ctx);
+            else
                 status |= gr_one(GR_MAT_ENTRY(X, nonpivots[i], i, sz), ctx);
-            }
         }
     }
 
 cleanup:
     flint_free(p);
-    gr_mat_clear(tmp, ctx);
-
-    GR_TMP_CLEAR(den, ctx);
 
     return status;
+}
+
+int
+_gr_mat_nullspace(slong * _nullity, gr_mat_t X, const gr_mat_t A, int resize, gr_ctx_t ctx)
+{
+    slong m, n, rank, nullity;
+    gr_mat_t tmp;
+    int status = GR_SUCCESS;
+    gr_ptr den;
+    int with_den;
+
+    m = gr_mat_nrows(A, ctx);
+    n = gr_mat_ncols(A, ctx);
+    gr_mat_init(tmp, m, n, ctx);
+
+    with_den = (gr_ctx_is_field(ctx) == T_FALSE) && (gr_ctx_is_integral_domain(ctx) == T_TRUE);
+
+    if (with_den)
+    {
+        GR_TMP_INIT(den, ctx);
+        status |= gr_mat_rref_den(&rank, tmp, den, A, ctx);
+    }
+    else
+    {
+        status |= gr_mat_rref(&rank, tmp, A, ctx);
+        den = NULL;
+    }
+
+    nullity = n - rank;
+
+    if (status != GR_SUCCESS)
+        goto cleanup;
+
+    if (resize)
+    {
+        gr_mat_clear(X, ctx);
+        gr_mat_init(X, n, nullity, ctx);
+    }
+
+    status |= gr_mat_nullspace_from_rref(X, tmp, den, rank, ctx);
+
+cleanup:
+    if (with_den)
+        GR_TMP_CLEAR(den, ctx);
+
+    gr_mat_clear(tmp, ctx);
+
+    *_nullity = nullity;
+    return status;
+}
+
+int
+gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
+{
+    slong nullity;
+    return _gr_mat_nullspace(&nullity, X, A, 1, ctx);
+}
+
+int
+gr_mat_nullspace_no_resize(slong * nullity, gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx)
+{
+    return _gr_mat_nullspace(nullity, X, A, 0, ctx);
 }

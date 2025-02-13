@@ -27,19 +27,37 @@ gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx)
 
     if (A == B)  /* In-place, guaranteed to be square */
     {
-        for (i = 0; i < A->r - 1; i++)
+        slong stride = A->stride;
+
+        /* Optimize for common sizes */
+        if (ctx->sizeof_elem == sizeof(ulong))
         {
-            for (j = i + 1; j < A->c; j++)
-            {
-                gr_swap(GR_MAT_ENTRY(A, i, j, sz), GR_MAT_ENTRY(A, j, i, sz), ctx);
-            }
+            ulong * a = A->entries;
+
+            for (i = 0; i < A->r - 1; i++)
+                for (j = i + 1; j < A->c; j++)
+                    FLINT_SWAP(ulong, a[i * stride + j], a[j * stride + i]);
+        }
+        else
+        {
+            gr_ptr a = A->entries;
+
+            for (i = 0; i < A->r - 1; i++)
+                for (j = i + 1; j < A->c; j++)
+                    gr_swap(GR_ENTRY(a, i * stride + j, sz), GR_ENTRY(a, j * stride + i, sz), ctx);
         }
     }
     else  /* Not aliased; general case */
     {
-        for (i = 0; i < B->r; i++)
-            for (j = 0; j < B->c; j++)
-                status |= gr_set(GR_MAT_ENTRY(B, i, j, sz), GR_MAT_ENTRY(A, j, i, sz), ctx);
+        slong Astride = A->stride;
+        slong Bstride = B->stride;
+        gr_srcptr a = A->entries;
+        gr_ptr b = B->entries;
+        gr_method_unary_op set = GR_UNARY_OP(ctx, SET);
+
+        for (i = 0; i < A->r; i++)
+            for (j = 0; j < A->c; j++)
+                status |= set(GR_ENTRY(b, j * Bstride + i, sz), GR_ENTRY(a, i * Astride + j, sz), ctx);
     }
 
     return status;

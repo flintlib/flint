@@ -96,7 +96,7 @@ _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, const fmpz * vec2, slong len2,
             for (i = 0; i < len2; i++)
             {
                 fmpz_mul_2exp(temp, vec2 + i, exp);
-                fmpz_submul_ui(vec1 + i, temp, -c);
+                fmpz_submul_ui(vec1 + i, temp, -(ulong) c);
             }
         }
     }
@@ -114,7 +114,7 @@ _fmpz_vec_scalar_addmul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
             fmpz_addmul_ui(vec1 + i, vec2 + i, c);
     else
         for (i = 0; i < len2; i++)
-            fmpz_submul_ui(vec1 + i, vec2 + i, -c);
+            fmpz_submul_ui(vec1 + i, vec2 + i, -(ulong) c);
 }
 
 void
@@ -362,7 +362,7 @@ _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, slong len2,
             for (i = 0; i < len2; i++)
             {
                 fmpz_mul_2exp(temp, vec2 + i, exp);
-                fmpz_addmul_ui(vec1 + i, temp, -c);
+                fmpz_addmul_ui(vec1 + i, temp, -(ulong) c);
             }
         }
     }
@@ -380,7 +380,7 @@ _fmpz_vec_scalar_submul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
             fmpz_submul_ui(vec1 + i, vec2 + i, c);
     else
         for (i = 0; i < len2; i++)
-            fmpz_addmul_ui(vec1 + i, vec2 + i, -c);
+            fmpz_addmul_ui(vec1 + i, vec2 + i, -(ulong) c);
 }
 
 void

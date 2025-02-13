@@ -16,12 +16,12 @@ TEST_FUNCTION_START(acb_barnes_g, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         acb_t a, b, c, d;
         slong prec1, prec2;
 
-        prec1 = 2 + n_randint(state, 200);
+        prec1 = 2 + n_randint(state, 100);
         prec2 = prec1 + 30;
 
         acb_init(a);

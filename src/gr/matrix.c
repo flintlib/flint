@@ -449,10 +449,17 @@ matrix_div(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
+static int
+matrix_pow(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
 DEF_MAT_OP_OTHER(matrix_add_other, matrix_add, gr_mat_add_scalar)
 DEF_MAT_OP_OTHER(matrix_sub_other, matrix_sub, gr_mat_sub_scalar)
 DEF_MAT_OP_OTHER(matrix_mul_other, matrix_mul, gr_mat_mul_scalar)
 DEF_MAT_OP_OTHER(matrix_div_other, matrix_div, gr_mat_div_scalar)
+DEF_MAT_OP_OTHER(matrix_pow_other, matrix_pow, gr_mat_pow_scalar)
 
 DEF_MAT_OTHER_OP(matrix_other_add, matrix_add, gr_mat_scalar_add)
 DEF_MAT_OTHER_OP(matrix_other_sub, matrix_sub, gr_mat_scalar_sub)
@@ -477,6 +484,12 @@ DEF_MAT_SCALAR_OP_1(matrix_div_ui, ulong, gr_mat_div_ui)
 DEF_MAT_SCALAR_OP_1(matrix_div_si, slong, gr_mat_div_si)
 DEF_MAT_SCALAR_OP_1(matrix_div_fmpz, const fmpz_t, gr_mat_div_fmpz)
 DEF_MAT_SCALAR_OP_1(matrix_div_fmpq, const fmpq_t, gr_mat_div_fmpq)
+
+DEF_MAT_SCALAR_OP_1(matrix_pow_ui, ulong, gr_mat_pow_ui)
+DEF_MAT_SCALAR_OP_1(matrix_pow_si, slong, gr_mat_pow_si)
+DEF_MAT_SCALAR_OP_1(matrix_pow_fmpz, const fmpz_t, gr_mat_pow_fmpz)
+DEF_MAT_SCALAR_OP_1(matrix_pow_fmpq, const fmpq_t, gr_mat_pow_fmpq)
+
 
 static int
 matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
@@ -506,6 +519,24 @@ matrix_log(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
         _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
 
     return gr_mat_log(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+static int
+matrix_sqrt(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (res->r != mat->r || res->c != mat->c)
+        _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
+
+    return gr_mat_sqrt(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+static int
+matrix_rsqrt(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (res->r != mat->r || res->c != mat->c)
+        _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
+
+    return gr_mat_rsqrt(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
 
@@ -564,8 +595,15 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_DIV_SI,      (gr_funcptr) matrix_div_si},
     {GR_METHOD_DIV_FMPZ,    (gr_funcptr) matrix_div_fmpz},
     {GR_METHOD_DIV_FMPQ,    (gr_funcptr) matrix_div_fmpq},
+    {GR_METHOD_POW_OTHER,   (gr_funcptr) matrix_pow_other},
+    {GR_METHOD_POW_UI,      (gr_funcptr) matrix_pow_ui},
+    {GR_METHOD_POW_SI,      (gr_funcptr) matrix_pow_si},
+    {GR_METHOD_POW_FMPZ,    (gr_funcptr) matrix_pow_fmpz},
+    {GR_METHOD_POW_FMPQ,    (gr_funcptr) matrix_pow_fmpq},
     {GR_METHOD_INV,         (gr_funcptr) matrix_inv},
     {GR_METHOD_EXP,         (gr_funcptr) matrix_exp},
+    {GR_METHOD_SQRT,        (gr_funcptr) matrix_sqrt},
+    {GR_METHOD_RSQRT,       (gr_funcptr) matrix_rsqrt},
     {GR_METHOD_LOG,         (gr_funcptr) matrix_log},
     {0,                     (gr_funcptr) NULL},
 };

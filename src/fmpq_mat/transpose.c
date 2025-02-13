@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2025 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -9,25 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
 #include "fmpq_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
-void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op)
+void
+fmpq_mat_transpose(fmpq_mat_t B, const fmpq_mat_t A)
 {
-    slong i, j;
-
-    if (rop == op)
-    {
-        for (i = 0; i < rop->r; i++)
-            for (j = 0; j < i; j++)
-                fmpq_swap(fmpq_mat_entry(rop, i, j),
-                          fmpq_mat_entry(rop, j, i));
-    }
-    else
-    {
-        for (i = 0; i < rop->r; i++)
-            for (j = 0; j < rop->c; j++)
-                fmpq_set(fmpq_mat_entry(rop, i, j),
-                         fmpq_mat_entry(op, j, i));
-    }
+    gr_ctx_t gr_ctx;
+    gr_ctx_init_fmpq(gr_ctx);
+    GR_MUST_SUCCEED(gr_mat_transpose((gr_mat_struct *) B, (const gr_mat_struct *) A, gr_ctx));
 }

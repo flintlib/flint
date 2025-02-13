@@ -12,6 +12,8 @@
 
 #ifdef T
 
+#include "gr.h"
+#include "gr_mat.h"
 #include "templates.h"
 
 void
@@ -19,16 +21,11 @@ TEMPLATE(T, mat_solve_triu) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) U,
                              const TEMPLATE(T, mat_t) B, int unit,
                              const TEMPLATE(T, ctx_t) ctx)
 {
-    if (B->r < TEMPLATE(CAP_T, MAT_SOLVE_TRI_ROWS_CUTOFF) ||
-        B->c < TEMPLATE(CAP_T, MAT_SOLVE_TRI_COLS_CUTOFF))
-    {
-        TEMPLATE(T, mat_solve_triu_classical) (X, U, B, unit, ctx);
-    }
-    else
-    {
-        TEMPLATE(T, mat_solve_triu_recursive) (X, U, B, unit, ctx);
-    }
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_nonsingular_solve_triu((gr_mat_struct *) X,
+        (const gr_mat_struct *) U,
+        (const gr_mat_struct *) B, unit, gr_ctx));
 }
-
 
 #endif

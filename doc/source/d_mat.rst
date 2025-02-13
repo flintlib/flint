@@ -100,7 +100,7 @@ Transpose
 .. function:: void d_mat_transpose(d_mat_t B, const d_mat_t A)
 
     Sets `B` to `A^T`, the transpose of `A`. Dimensions must be compatible.
-    `A` and `B` are allowed to be the same object if `A` is a square matrix.
+    Aliasing is allowed for square matrices.
 
 
 Matrix multiplication

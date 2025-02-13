@@ -36,7 +36,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        }
 
        uc2 = FLINT_ABS(c2);
-       ux = FLINT_ABS(x);
+       ux = FLINT_UABS(x);
 
        umul_ppmm(prod[1], prod[0], uc2, ux);
 

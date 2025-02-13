@@ -9,116 +9,45 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr.h"
 #include "gr_special.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 
 int
-gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+gr_log_jet(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
 {
-    truth_t is_zero;
-    int status = GR_SUCCESS;
-    slong i, j, len, n;
-    gr_mat_t P, Q, J;
-    gr_ptr t;
-    gr_vec_t lambda, f_lambda;
-    slong num_blocks, num_lambda, offset;
-    slong * block_lambda, * block_size;
+    slong i;
+    int status;
+    slong sz = ctx->sizeof_elem;
 
-    n = gr_mat_nrows(A, ctx);
-
-    if (n != gr_mat_ncols(A, ctx))
-        return GR_DOMAIN;
-
-    if (n == 0)
+    if (len <= 0)
         return GR_SUCCESS;
 
-    gr_mat_init(P, n, n, ctx);
-    gr_mat_init(Q, n, n, ctx);
-    gr_mat_init(J, n, n, ctx);
-    GR_TMP_INIT(t, ctx);
-    block_lambda = flint_malloc(sizeof(slong) * n);
-    block_size = flint_malloc(sizeof(slong) * n);
-    gr_vec_init(lambda, 0, ctx);
-    gr_vec_init(f_lambda, 0, ctx);
+    status = gr_log(res, x, ctx);
 
-    status |= gr_mat_jordan_blocks(lambda, &num_blocks, block_lambda, block_size, A, ctx);
-    if (status != GR_SUCCESS)
-        goto cleanup;
-
-    num_lambda = gr_vec_length(lambda, ctx);
-
-    /* Zero must not be an eigenvalue */
-    for (i = 0; i < num_lambda; i++)
+    if (status == GR_SUCCESS && len > 1)
     {
-        is_zero = gr_is_zero(gr_vec_entry_srcptr(lambda, i, ctx), ctx);
+        status |= gr_inv(GR_ENTRY(res, 1, sz), x, ctx);
 
-        if (is_zero == T_UNKNOWN)
-        {
-            status = GR_UNABLE;
-            goto cleanup;
-        }
+        /* todo: figure out in which rings we want to multiply by res[1] instead */
+        for (i = 2; i < len; i++)
+            status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, (i + 1) / 2, sz), GR_ENTRY(res, i / 2, sz), ctx);
 
-        if (is_zero == T_TRUE)
-        {
-            status = GR_DOMAIN;
-            goto cleanup;
-        }
+        for (i = 2; i < len; i++)
+            status |= gr_div_ui(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), i, ctx);
+
+        for (i = 2; i < len; i += 2)
+            status |= gr_neg(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), ctx);
     }
-
-    status |= gr_mat_jordan_transformation(P, lambda, num_blocks, block_lambda, block_size, A, ctx);
-    if (status != GR_SUCCESS)
-        goto cleanup;
-
-    status |= gr_mat_inv(Q, P, ctx);
-    if (status != GR_SUCCESS)
-        goto cleanup;
-
-    /* Evaluate Jordan blocks and build matrix */
-    gr_vec_set_length(f_lambda, num_lambda, ctx);
-    for (i = 0; i < num_lambda && status == GR_SUCCESS; i++)
-        status |= gr_log(gr_vec_entry_ptr(f_lambda, i, ctx), gr_vec_entry_srcptr(lambda, i, ctx), ctx);
-
-    offset = 0;
-    for (i = 0; i < num_blocks; i++)
-    {
-        len = block_size[i];
-
-        status |= gr_set(gr_mat_entry_ptr(J, offset, offset, ctx), gr_vec_entry_srcptr(f_lambda, block_lambda[i], ctx), ctx);
-
-        if (len > 1)
-        {
-            status |= gr_inv(t, gr_vec_entry_srcptr(lambda, block_lambda[i], ctx), ctx);
-            status |= gr_set(gr_mat_entry_ptr(J, offset, offset + 1, ctx), t, ctx);
-            status |= gr_neg(t, t, ctx);
-
-            for (j = 2; j < len; j++)
-                status |= gr_mul(gr_mat_entry_ptr(J, offset, offset + j, ctx), gr_mat_entry_srcptr(J, offset, offset + j - 1, ctx), t, ctx);
-
-            for (j = 2; j < len; j++)
-                status |= gr_div_ui(gr_mat_entry_ptr(J, offset, offset + j, ctx), gr_mat_entry_srcptr(J, offset, offset + j, ctx), j, ctx);
-
-            for (j = 1; j < len; j++)
-                status |= _gr_vec_set(gr_mat_entry_ptr(J, offset + j, offset + j, ctx), gr_mat_entry_srcptr(J, offset + j - 1, offset + j - 1, ctx), len - j, ctx);
-        }
-
-        offset += block_size[i];
-    }
-
-    status |= gr_mat_mul(res, P, J, ctx);
-    status |= gr_mat_mul(res, res, Q, ctx);
-
-cleanup:
-    gr_mat_clear(P, ctx);
-    gr_mat_clear(Q, ctx);
-    gr_mat_clear(J, ctx);
-    gr_vec_clear(lambda, ctx);
-    gr_vec_clear(f_lambda, ctx);
-    GR_TMP_CLEAR(t, ctx);
-    flint_free(block_lambda);
-    flint_free(block_size);
 
     return status;
+}
+
+int
+gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
+{
+    return gr_mat_func_jordan(res, A, (gr_method_vec_op) gr_log_jet, ctx);
 }
 
 int

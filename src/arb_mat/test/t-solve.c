@@ -17,7 +17,7 @@ TEST_FUNCTION_START(arb_mat_solve, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         fmpq_mat_t Q, QX, QB;
         arb_mat_t A, X, B;

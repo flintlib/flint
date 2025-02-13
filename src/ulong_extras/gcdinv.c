@@ -51,7 +51,7 @@ n_gcdinv(ulong * s, ulong x, ulong y)
         {
             x = r;
             t2 = v2;
-            v2 = v1 - (v2 << 1);
+            v2 = v1 - ((ulong) v2 << 1);
             v1 = t2;
             r = d - x;
         }
@@ -83,7 +83,7 @@ n_gcdinv(ulong * s, ulong x, ulong y)
             {
                 x = r;
                 t2 = v2;
-                v2 = v1 - (v2 << 1);
+                v2 = v1 - ((ulong) v2 << 1);
                 v1 = t2;
                 r = d - x;
             }
@@ -91,7 +91,7 @@ n_gcdinv(ulong * s, ulong x, ulong y)
             {
                 x = r;
                 t2 = v2;
-                v2 = v1 - 3 * v2;
+                v2 = v1 - 3 * (ulong) v2;
                 v1 = t2;
                 r = d - (x << 1);
             }

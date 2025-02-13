@@ -226,7 +226,8 @@ Transpose
 
 .. function:: void padic_mat_transpose(padic_mat_t B, const padic_mat_t A)
 
-    Sets `B` to `A^t`.
+    Sets `B` to `A^t`.Dimensions must be compatible.
+    Aliasing is allowed for square matrices.
 
 
 Addition and subtraction

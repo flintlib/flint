@@ -579,8 +579,11 @@ jobs:
 
       - name: "Set up Nemo.jl"
         run: |
-          # Use Nemo's master branch
-          git clone https://github.com/Nemocas/Nemo.jl.git
+          # # Use Nemo's master branch
+          # git clone https://github.com/Nemocas/Nemo.jl.git
+
+          # Use temporary branch
+          git clone -b flint_matrix_stride --depth 1 https://github.com/albinahlback/Nemo.jl.git
 
           # Override FLINT_jll's libflint with ours
           julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\");"

@@ -27,11 +27,19 @@ gr_poly_is_one(const gr_poly_t poly, gr_ctx_t ctx)
     }
     else
     {
-        one->coeffs = tmp;
-        one->length = 1;
-        one->alloc = 1;
+        /* 0 = 1 in the zero ring */
+        if (poly->length == 0)
+        {
+            res = gr_is_zero(tmp, ctx);
+        }
+        else
+        {
+            one->coeffs = tmp;
+            one->length = 1;
+            one->alloc = 1;
 
-        res = gr_poly_equal(poly, one, ctx);
+            res = gr_poly_equal(poly, one, ctx);
+        }
     }
 
     GR_TMP_CLEAR(tmp, ctx);

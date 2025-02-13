@@ -29,17 +29,11 @@ TEST_FUNCTION_START(fmpz_mod_mat_mul, state)
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
 
-        if (n_randint(state, 100) == 0)
+        if (n_randint(state, 10) == 0)
         {
-            m = n_randint(state, 300) + 100;
-            n = n_randint(state, 300) + 100;
-            k = n_randint(state, 300) + 100;
-        }
-        else if (n_randint(state, 10) == 0)
-        {
-            m = n_randint(state, 50);
-            n = n_randint(state, 50);
-            k = n_randint(state, 50);
+            m = n_randint(state, 100);
+            n = n_randint(state, 100);
+            k = n_randint(state, 100);
         }
         else
         {

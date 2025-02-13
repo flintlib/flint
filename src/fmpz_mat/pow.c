@@ -46,7 +46,7 @@ fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
         fmpz_mat_init_set(T, A);
         fmpz_mat_init(U, d, d);
 
-        for (i = ((slong) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
+        for (i = FLINT_BIT_COUNT(exp) - 2; i >= 0; i--)
         {
             fmpz_mat_sqr(U, T);
 

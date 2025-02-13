@@ -126,8 +126,7 @@ double flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp)
   /* Adjust exp to a radix point just above {ptr,size}, guarding against
      overflow.	After this exp can of course be reduced to anywhere within
      the {ptr,size} region without underflow.  */
-  if ((unsigned long) (FLINT_BITS * size)
-		> (unsigned long) (LONG_MAX - exp))
+  if ((unsigned long) (FLINT_BITS * size) > ((unsigned long) LONG_MAX - (unsigned long) exp))
     {
 	goto ieee_infinity;
 

@@ -9,18 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "arb.h"
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-# define log __builtin_log
-# define pow __builtin_pow
-#else
-# include <math.h>
-#endif
 
 #define TERMINATOR -32768
 

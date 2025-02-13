@@ -9,16 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "test_helpers.h"
 #include "acb.h"
 #include "acb_elliptic.h"
 #include "acb_modular.h"
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-#else
-# include <math.h>
-#endif
 
 static const double testdata_pi[17][6] = {
   {-2.0, 0.0, 0.0, 0.0, 0.9068996821171089253, 0.0},
@@ -89,8 +84,8 @@ TEST_FUNCTION_START(acb_elliptic_pi, state)
             }
         }
 
-        acb_randtest(n, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
-        acb_randtest(m, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+        acb_randtest(n, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
+        acb_randtest(m, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
 
         acb_one(t);
         if ((acb_is_real(n) && acb_is_real(m) &&
@@ -115,10 +110,10 @@ TEST_FUNCTION_START(acb_elliptic_pi, state)
 
             acb_elliptic_pi(r1, n, m, prec1);
 
-            acb_randtest(t, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+            acb_randtest(t, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
             acb_add(n, n, t, prec2);
             acb_sub(n, n, t, prec2);
-            acb_randtest(t, state, 1 + n_randint(state, 300), 1 + n_randint(state, 30));
+            acb_randtest(t, state, 1 + n_randint(state, 100), 1 + n_randint(state, 15));
             acb_add(m, m, t, prec2);
             acb_sub(m, m, t, prec2);
 

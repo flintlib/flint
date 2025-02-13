@@ -84,6 +84,7 @@ void test_with_dims(ulong m, ulong n, flint_rand_t state)
     nmod_poly_mat_clear(a);
     nmod_poly_mat_clear(b);
     nmod_poly_mat_clear(c);
+    nmod_poly_clear(poly);
 }
 
 TEST_FUNCTION_START(nmod_poly_mat_set_trunc, state)

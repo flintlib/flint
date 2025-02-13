@@ -9,15 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "fmpz_vec.h"
 #include "arb.h"
-
-#ifdef __GNUC__
-# define floor __builtin_floor
-# define ldexp __builtin_ldexp
-#else
-# include <math.h>
-#endif
 
 #define TERMINATOR -32768
 

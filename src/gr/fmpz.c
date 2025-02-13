@@ -247,7 +247,17 @@ _gr_fmpz_equal(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 int
 _gr_fmpz_set(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
-    fmpz_set(res, x);
+    if (res == x)
+        return GR_SUCCESS;
+
+    if (!COEFF_IS_MPZ(*x))
+    {
+        _fmpz_demote(res);
+        *res = *x;
+    }
+    else
+        mpz_set(_fmpz_promote(res), COEFF_TO_PTR(*x));
+
     return GR_SUCCESS;
 }
 

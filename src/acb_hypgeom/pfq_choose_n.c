@@ -9,15 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
-
-#ifdef __GNUC__
-# define floor __builtin_floor
-# define log __builtin_log
-#else
-# include <math.h>
-#endif
 
 #define D_ABS(x) ((x) < 0.0 ? (-(x)) : (x))
 

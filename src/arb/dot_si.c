@@ -11,6 +11,9 @@
 
 #include "arb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void
 arb_dot_si(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep, const slong * y, slong ystep, slong len, slong prec)
 {
@@ -57,7 +60,7 @@ arb_dot_si(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xst
         }
         else
         {
-            av = FLINT_ABS(v);
+            av = FLINT_UABS(v);
             bc = flint_clz(av);
 
             ARF_EXP(arb_midref(t + i)) = FLINT_BITS - bc;
@@ -73,3 +76,5 @@ arb_dot_si(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xst
 
     TMP_END;
 }
+
+POP_OPTIONS

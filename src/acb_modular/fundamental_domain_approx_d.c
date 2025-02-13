@@ -9,13 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb_modular.h"
-
-#ifdef __GNUC__
-# define floor __builtin_floor
-#else
-# include <math.h>
-#endif
 
 static inline int
 d_is_ok(double x)

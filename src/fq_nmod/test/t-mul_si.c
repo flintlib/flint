@@ -103,7 +103,7 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
         fq_nmod_mul_si(c, a, x, ctx);
         if (x < 0)
         {
-            nmod_poly_scalar_mul_nmod(b, a, nmod_set_ui(-x, ctx->mod));
+            nmod_poly_scalar_mul_nmod(b, a, nmod_set_ui(-(ulong) x, ctx->mod));
             nmod_poly_neg(b, b);
         }
         else

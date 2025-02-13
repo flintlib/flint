@@ -253,6 +253,7 @@ TEST_FUNCTION_START(fmpz_mpoly_inflate_deflate, state)
         flint_free(shift);
 
         fmpz_mpoly_clear(x, ctx);
+        fmpz_mpoly_clear(res, ctx);
         fmpz_mpoly_ctx_clear(ctx);
     }
 

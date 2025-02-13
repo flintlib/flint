@@ -33,7 +33,7 @@ gr_poly_is_gen(const gr_poly_t poly, gr_ctx_t ctx)
         if (res != T_UNKNOWN)
         {
             gen->coeffs = tmp;
-            gen->length = (res == T_TRUE) ? 1 : 2;
+            gen->length = (res == T_TRUE) ? 0 : 2;
             gen->alloc = gen->length;
             res = gr_poly_equal(poly, gen, ctx);
         }

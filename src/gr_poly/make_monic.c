@@ -72,6 +72,7 @@ gr_poly_make_monic(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx)
         gr_poly_fit_length(res, src->length, ctx);
         status = _gr_poly_make_monic(res->coeffs, src->coeffs, src->length, ctx);
         _gr_poly_set_length(res, src->length, ctx);
+        _gr_poly_normalise(res, ctx);
         return status;
     }
     else

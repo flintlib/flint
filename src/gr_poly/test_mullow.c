@@ -12,6 +12,9 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref,
     flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
@@ -91,3 +94,5 @@ void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_
             gr_ctx_clear(ctx);
     }
 }
+
+POP_OPTIONS

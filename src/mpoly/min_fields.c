@@ -11,6 +11,9 @@
 
 #include "mpoly.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 /* this file does not need to change with new orderings */
 
 /* unpack the field-wise minimum of poly_exps into min_fields */
@@ -80,3 +83,5 @@ void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
 
     TMP_END;
 }
+
+POP_OPTIONS

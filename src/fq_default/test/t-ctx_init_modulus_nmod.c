@@ -40,6 +40,8 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
         fq_default_clear(fq, ctx);
 
         fq_default_ctx_clear(ctx);
+
+        nmod_poly_clear(mod);
     }
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -64,6 +66,8 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
         fq_default_clear(fq, ctx);
 
         fq_default_ctx_clear(ctx);
+
+        nmod_poly_clear(mod);
     }
 
     {

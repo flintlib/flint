@@ -319,6 +319,7 @@ gr_poly_divrem_divconquer(gr_poly_t Q, gr_poly_t R,
 
     _gr_poly_set_length(Q, lenQ, ctx);
     _gr_poly_set_length(R, lenB - 1, ctx);
+    _gr_poly_normalise(Q, ctx);
     _gr_poly_normalise(R, ctx);
 
     return status;

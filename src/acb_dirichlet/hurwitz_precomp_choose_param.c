@@ -9,16 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
 #include "acb_dirichlet.h"
-
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-# define log __builtin_log
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 void
 acb_dirichlet_hurwitz_precomp_choose_param(ulong * _A, ulong *_K, ulong *_N,

@@ -13,10 +13,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "longlong.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mod.h"
+#include "gr.h"
+#include "gr_poly.h"
 #include "fmpz_mod_poly.h"
 
 void
@@ -24,39 +22,10 @@ _fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz * res, const fmpz * poly,
                                ulong e, const fmpz * f, slong lenf,
                                const fmpz * finv, slong lenfinv, const fmpz_mod_ctx_t ctx)
 {
-    fmpz * T, * Q;
-    slong lenT, lenQ;
-    int i;
-
-    if (lenf == 2)
-    {
-        fmpz_mod_pow_ui(res, poly, e, ctx);
-        return;
-    }
-
-    lenT = 2 * lenf - 3;
-    lenQ = FLINT_MAX(lenT - lenf + 1, 1);
-
-    T = _fmpz_vec_init(lenT + lenQ);
-    Q = T + lenT;
-
-    _fmpz_vec_set(res, poly, lenf - 1);
-
-    for (i = ((int) FLINT_BIT_COUNT(e) - 2); i >= 0; i--)
-    {
-        _fmpz_mod_poly_sqr(T, res, lenf - 1, ctx);
-        _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf, finv, lenfinv, ctx);
-
-        if (e & (UWORD (1) << i))
-        {
-            _fmpz_mod_poly_mul(T, res, lenf - 1, poly, lenf - 1, ctx);
-            _fmpz_mod_poly_divrem_newton_n_preinv(Q, res, T, 2 * lenf - 3, f, lenf, finv, lenfinv, ctx);
-        }
-    }
-
-    _fmpz_vec_clear(T, lenT + lenQ);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_powmod_ui_binexp_preinv(res, poly, e, f, lenf, finv, lenfinv, gr_ctx));
 }
-
 
 void
 fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
@@ -64,92 +33,10 @@ fmpz_mod_poly_powmod_ui_binexp_preinv(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t f, const fmpz_mod_poly_t finv,
                                                       const fmpz_mod_ctx_t ctx)
 {
-    fmpz * q;
-    slong len = poly->length;
-    slong lenf = f->length;
-    slong trunc = lenf - 1;
-    int qcopy = 0;
-
-    if (lenf == 0)
-    {
-        flint_throw(FLINT_ERROR, "(fmpz_mod_poly_powmod_ui_binexp_preinv): "
-                     "Divide by zero\n");
-    }
-
-    if (lenf == 1)
-    {
-        fmpz_mod_poly_zero(res, ctx);
-        return;
-    }
-
-    if (len >= lenf)
-    {
-        fmpz_mod_poly_t t, r;
-        fmpz_mod_poly_init(t, ctx);
-        fmpz_mod_poly_init(r, ctx);
-        fmpz_mod_poly_divrem(t, r, poly, f, ctx);
-        fmpz_mod_poly_powmod_ui_binexp_preinv(res, r, e, f, finv, ctx);
-        fmpz_mod_poly_clear(t, ctx);
-        fmpz_mod_poly_clear(r, ctx);
-        return;
-    }
-
-    if (e <= 2)
-    {
-        if (e == UWORD (0))
-        {
-            fmpz_mod_poly_fit_length(res, 1, ctx);
-            fmpz_one(res->coeffs);
-            _fmpz_mod_poly_set_length(res, 1);
-        }
-        else if (e == UWORD (1))
-        {
-            fmpz_mod_poly_set(res, poly, ctx);
-        }
-        else
-        {
-            fmpz_mod_poly_mulmod_preinv(res, poly, poly, f, finv, ctx);
-        }
-        return;
-    }
-
-    if (len == 0)
-    {
-        fmpz_mod_poly_zero(res, ctx);
-        return;
-    }
-
-    if (len < trunc)
-    {
-        q = _fmpz_vec_init(trunc);
-        _fmpz_vec_set(q, poly->coeffs, len);
-        _fmpz_vec_zero(q + len, trunc - len);
-        qcopy = 1;
-    }
-    else
-    {
-        q = poly->coeffs;
-    }
-
-    if ((res == poly && !qcopy) || (res == f) || (res == finv))
-    {
-        fmpz_mod_poly_t t;
-        fmpz_mod_poly_init2(t, 2*lenf - 3, ctx);
-        _fmpz_mod_poly_powmod_ui_binexp_preinv(t->coeffs, q, e, f->coeffs,
-                  lenf, finv->coeffs, finv->length, ctx);
-        fmpz_mod_poly_swap(res, t, ctx);
-        fmpz_mod_poly_clear(t, ctx);
-    }
-    else
-    {
-        fmpz_mod_poly_fit_length(res, 2*lenf - 3, ctx);
-        _fmpz_mod_poly_powmod_ui_binexp_preinv(res->coeffs, q, e, f->coeffs,
-                  lenf, finv->coeffs, finv->length, ctx);
-    }
-
-    if (qcopy)
-        _fmpz_vec_clear(q, trunc);
-
-    _fmpz_mod_poly_set_length(res, trunc);
-    _fmpz_mod_poly_normalise(res);
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_poly_powmod_ui_binexp_preinv((gr_poly_struct *) res,
+        (const gr_poly_struct *) poly, e,
+        (const gr_poly_struct *) f,
+        (const gr_poly_struct *) finv, gr_ctx));
 }

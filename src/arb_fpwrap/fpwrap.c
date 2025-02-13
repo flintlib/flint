@@ -18,6 +18,9 @@
 #include "acb_modular.h"
 #include "arb_fpwrap.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 int
 arb_accurate_enough_d(const arb_t x, int flags)
 {
@@ -1546,3 +1549,5 @@ int arb_fpwrap_cdouble_lambertw(complex_double * res, complex_double x, slong br
 /* todo: elliptic invariants, roots */
 /* todo: eisenstein series */
 /* todo: dirichlet functions requiring characters */
+
+POP_OPTIONS

@@ -675,6 +675,30 @@ _gr_fmpq_cmpabs(int * res, const fmpq_t x, const fmpq_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpq_log(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (fmpq_is_one(x))
+    {
+        fmpq_zero(res);
+        return GR_SUCCESS;
+    }
+
+    return GR_DOMAIN;
+}
+
+int
+_gr_fmpq_exp(fmpq_t res, const fmpq_t x, const gr_ctx_t ctx)
+{
+    if (fmpq_is_zero(x))
+    {
+        fmpq_one(res);
+        return GR_SUCCESS;
+    }
+
+    return GR_DOMAIN;
+}
+
+int
 _gr_fmpq_vec_is_zero(const fmpq * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -1126,6 +1150,8 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_NINT,            (gr_funcptr) _gr_fmpq_nint},
     {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
     {GR_METHOD_PI,              (gr_funcptr) gr_not_in_domain},
+    {GR_METHOD_LOG,             (gr_funcptr) _gr_fmpq_log},
+    {GR_METHOD_EXP,             (gr_funcptr) _gr_fmpq_exp},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_fmpq_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpq_set},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpq_set},

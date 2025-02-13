@@ -9,15 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "arb.h"
 #include "arb_mat.h"
-
-#ifdef __GNUC__
-# define frexp __builtin_frexp
-# define ldexp __builtin_ldexp
-#else
-# include <math.h>
-#endif
 
 #include "double_extras.h"
 

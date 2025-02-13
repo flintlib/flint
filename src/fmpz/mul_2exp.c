@@ -35,7 +35,7 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         if (COEFF_IS_MPZ(*f))
             _fmpz_clear_mpz(*f);
 
-        *f = c1 << exp;
+        *f = (slong) ((ulong) c1 << exp);
     }
     else if (c1bits <= SMALL_FMPZ_BITCOUNT_MAX)   /* g is small */
     {

@@ -33,7 +33,7 @@ fexpr_set_fmpq(fexpr_t res, const fmpq_t x)
             fexpr_fit_size(res, 4);
             res->data[0] = FEXPR_TYPE_CALL2 | (4 << FEXPR_TYPE_BITS);
             res->data[1] = FEXPR_SYMBOL_Div;
-            res->data[2] = p << FEXPR_TYPE_BITS;
+            res->data[2] = (ulong) p << FEXPR_TYPE_BITS;
             res->data[3] = q << FEXPR_TYPE_BITS;
         }
         else   /* todo: copy directly without temporaries */

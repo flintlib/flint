@@ -199,7 +199,8 @@ Conjugate and transpose
 
 .. function:: void ca_mat_transpose(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
 
-    Sets *res* to the transpose of *A*.
+    Sets *res* to the transpose of *A*. The operands must have
+    compatible dimensions. Aliasing is allowed for square matrices.
 
 .. function:: void ca_mat_conj(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx)
 

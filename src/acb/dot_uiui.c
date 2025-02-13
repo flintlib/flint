@@ -11,6 +11,9 @@
 
 #include "acb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 static void
 arf_shallow_set_uiui(arf_t res, ulong vhi, ulong vlo)
 {
@@ -103,3 +106,5 @@ acb_dot_uiui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
 
     TMP_END;
 }
+
+POP_OPTIONS

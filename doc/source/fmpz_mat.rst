@@ -386,7 +386,7 @@ Transpose
 .. function:: void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets `B` to `A^T`, the transpose of `A`. Dimensions must be compatible.
-    `A` and `B` are allowed to be the same object if `A` is a square matrix.
+    Aliasing is allowed for square matrices.
 
 
 
@@ -1328,7 +1328,7 @@ Smith normal form
 .. function:: void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of the diagonal matrix ``A``. The algorithm used here is due
+    normal form of the matrix ``A``. The algorithm used here is due
     to Kannan and Bachem [KanBac1979]_
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be

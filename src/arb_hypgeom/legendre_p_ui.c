@@ -9,17 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "arb.h"
 #include "arb_hypgeom.h"
-
-#ifdef __GNUC__
-# define ldexp __builtin_ldexp
-# define fabs __builtin_fabs
-# define log __builtin_log
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 /* todo: improve for small k */
 static double log2_bin_uiui_fast(ulong n, ulong k)

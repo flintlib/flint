@@ -9,12 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifdef __GNUC__
-# define fabs __builtin_fabs
-#else
-# include <math.h>
-#endif
-
+#include <math.h>
 #include "test_helpers.h"
 #include "d_vec.h"
 #include "fmpz_vec.h"

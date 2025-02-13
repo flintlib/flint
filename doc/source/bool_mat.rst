@@ -165,7 +165,7 @@ Transpose
 .. function:: void bool_mat_transpose(bool_mat_t dest, const bool_mat_t src)
 
     Sets *dest* to the transpose of *src*. The operands must have
-    compatible dimensions. Aliasing is allowed.
+    compatible dimensions. Aliasing is allowed for square matrices.
 
 
 Arithmetic

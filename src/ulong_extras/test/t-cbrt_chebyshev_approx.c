@@ -28,7 +28,7 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
         mpz_init(mpz_n);
         mpz_init(mpz_val);
 
-        n = n_randtest(state);
+        n = n_randtest_not_zero(state);
         val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);
@@ -52,10 +52,12 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
         mpz_init(mpz_n);
         mpz_init(mpz_val);
 
-        bits = n_randint(state, FLINT_BITS/3 + 1);
-        n = n_randtest_bits(state, bits);
-        n = n*n*n;
-        n += (n_randint(state, 100) - 50);
+        do {
+            bits = n_randint(state, FLINT_BITS/3 + 1);
+            n = n_randtest_bits(state, bits);
+            n = n*n*n;
+            n += (n_randint(state, 100) - 50);
+        } while (n == 0);
         val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);
@@ -80,10 +82,12 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
         mpz_init(mpz_n);
         mpz_init(mpz_val);
 
-        bits = n_randint(state, FLINT_BITS/3 + 1);
-        n = n_randtest_bits(state, bits);
-        n = n*n*n;
-        n += 1;
+        do {
+            bits = n_randint(state, FLINT_BITS/3 + 1);
+            n = n_randtest_bits(state, bits);
+            n = n*n*n;
+            n += 1;
+        } while (n == 0);
         val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);
@@ -108,10 +112,12 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
         mpz_init(mpz_n);
         mpz_init(mpz_val);
 
-        bits = n_randint(state, FLINT_BITS/3 + 1);
-        n = n_randtest_bits(state, bits);
-        n = n*n*n;
-        n -= 1;
+        do {
+            bits = n_randint(state, FLINT_BITS/3 + 1);
+            n = n_randtest_bits(state, bits);
+            n = n*n*n;
+            n -= 1;
+        } while (n == 0);
         val = n_cbrt_chebyshev_approx(n);
 
         flint_mpz_set_ui(mpz_n, n);

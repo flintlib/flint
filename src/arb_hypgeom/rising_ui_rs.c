@@ -9,15 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "arb.h"
 #include "arb_hypgeom.h"
-
-#ifdef __GNUC__
-# define pow __builtin_pow
-#else
-# include <math.h>
-#endif
 
 void
 _arb_hypgeom_rising_coeffs_1(ulong * c, ulong k, slong l)

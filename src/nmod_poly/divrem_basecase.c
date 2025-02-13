@@ -82,7 +82,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
         {
             for (i = 1; i < lenB - 1; i++)
             {
-                NMOD_RED2(R[i], 0, A[i] + q1*B[i - 1] + q0*B[i], mod);
+                NMOD_RED2(R[i], UWORD(0), A[i] + q1*B[i - 1] + q0*B[i], mod);
             }
         }
         else if (mod.norm != 0)

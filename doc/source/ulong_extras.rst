@@ -1198,6 +1198,7 @@ Square root and perfect power testing
     values of the coefficient are calculated from the Python module mpmath,
     https://mpmath.org, using the function chebyfit. x is multiplied
     by ``2^exp`` and the cube root of 1, 2 or 4 (according to ``exp%3``).
+    Requires that `n` is nonzero.
 
 .. function:: ulong n_cbrtrem(ulong * remainder, ulong n)
 

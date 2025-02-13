@@ -113,6 +113,8 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
         fmpz_mpoly_clear(A2, ctxAC);
         for (i = 0; i < 3; i++)
             fmpz_mpoly_clear(C + i, ctxAC);
+        flint_free(c);
+        fmpz_mpoly_clear(B1, ctxB);
 
         fmpz_mpoly_ctx_clear(ctxB);
         fmpz_mpoly_ctx_clear(ctxAC);

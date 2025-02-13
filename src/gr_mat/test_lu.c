@@ -14,6 +14,9 @@
 #include "gr_mat.h"
 #include "fmpz_mat.h"
 
+PUSH_OPTIONS
+OPTIMIZE_OSIZE
+
 static void perm(gr_mat_t A, slong * P, gr_ctx_t ctx)
 {
     slong i;
@@ -254,3 +257,5 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
             gr_ctx_clear(ctx);
     }
 }
+
+POP_OPTIONS

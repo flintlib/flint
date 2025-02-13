@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
 #include "acb_elliptic.h"
-
-#ifdef __GNUC__
-# define pow __builtin_pow
-#else
-# include <math.h>
-#endif
 
 static const unsigned short den_ratio_tab[512] = {
     1,1,10,7,12,11,26,1,136,19,2,23,20,1,58,31,

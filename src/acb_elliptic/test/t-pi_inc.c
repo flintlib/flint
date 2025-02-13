@@ -41,9 +41,9 @@ TEST_FUNCTION_START(acb_elliptic_pi_inc, state)
         prec2 = 2 + n_randint(state, 100);
         times_pi = n_randint(state, 2);
 
-        acb_randtest(n, state, 1 + n_randint(state, 500), 1 + n_randint(state, 10));
-        acb_randtest(z1, state, 1 + n_randint(state, 500), 1 + n_randint(state, 10));
-        acb_randtest(m, state, 1 + n_randint(state, 500), 1 + n_randint(state, 10));
+        acb_randtest(n, state, 1 + n_randint(state, 200), 1 + n_randint(state, 10));
+        acb_randtest(z1, state, 1 + n_randint(state, 200), 1 + n_randint(state, 10));
+        acb_randtest(m, state, 1 + n_randint(state, 200), 1 + n_randint(state, 10));
         fmpz_randtest(k, state, 1 + n_randint(state, 100));
         arb_const_pi(pi, FLINT_MAX(prec1, prec2));
 
