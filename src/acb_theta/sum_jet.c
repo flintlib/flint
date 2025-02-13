@@ -15,71 +15,12 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_sum_jet_00_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
+acb_theta_sum_jet_0x_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     const slong * precs, slong len, const acb_t cofactor, const slong * coords,
-    slong ord, slong g, slong prec, slong fullprec)
+    slong ord, int all_b, slong g, slong prec, slong fullprec)
 {
-    slong nb = acb_theta_jet_nb(ord, g);
-    slong * tups;
-    acb_ptr v3, aux;
-    acb_t x;
-    fmpz_t num, t;
-    slong j, i;
-
-    tups = flint_malloc(g * nb * sizeof(slong));
-    v3 = _acb_vec_init(len);
-    aux = _acb_vec_init(nb);
-    acb_init(x);
-    fmpz_init(num);
-    fmpz_init(t);
-
-    /* Compute products in v3 */
-    for (i = 0; i < len; i++)
-    {
-        acb_mul(&v3[i], &v1[i], &v2[i], precs[i]);
-    }
-
-    acb_theta_jet_tuples(tups, ord, g);
-    for (j = 0; j < nb; j++)
-    {
-        fmpz_one(num);
-        for (i = 1; i < g; i++)
-        {
-            fmpz_set_si(t, coords[i]);
-            fmpz_pow_ui(t, t, tups[j * g + i]);
-            fmpz_mul(num, num, t);
-        }
-
-        /* Loop over lattice points */
-        for (i = 0; i < len; i++)
-        {
-            fmpz_set_si(t, coords[0] + i);
-            fmpz_pow_ui(t, t, tups[j * g]);
-            acb_mul_fmpz(x, &v3[i], t, precs[i]);
-            acb_add(&aux[j], &aux[j], x, prec);
-        }
-
-        /* Multiply by cofactor * num */
-        acb_mul_fmpz(x, cofactor, num, prec);
-        acb_mul(&aux[j], &aux[j], x, prec);
-    }
-    _acb_vec_add(th, th, aux, nb, fullprec);
-
-    flint_free(tups);
-    _acb_vec_clear(v3, len);
-    _acb_vec_clear(aux, nb);
-    acb_clear(x);
-    fmpz_clear(num);
-    fmpz_clear(t);
-}
-
-static void
-acb_theta_sum_jet_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
-    const slong * precs, slong len, const acb_t cofactor, const slong * coords,
-    slong ord, slong g, slong prec, slong fullprec)
-{
-    slong n = 1 << g;
-    slong nb = acb_theta_jet_nb(ord, g);
+    slong nbth = (all_b ? (1 << g) : 1);
+    slong nbjet = acb_theta_jet_nb(ord, g);
     slong * tups;
     slong * dots;
     acb_ptr v3, aux;
@@ -87,16 +28,16 @@ acb_theta_sum_jet_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     fmpz_t num, t;
     slong j, i, b;
 
-    tups = flint_malloc(g * nb * sizeof(slong));
-    dots = flint_malloc(n * sizeof(slong));
+    tups = flint_malloc(g * nbjet * sizeof(slong));
+    dots = flint_malloc(nbth * sizeof(slong));
     v3 = _acb_vec_init(len);
-    aux = _acb_vec_init(n * nb);
+    aux = _acb_vec_init(nbth * nbjet);
     acb_init(x);
     acb_init(y);
     fmpz_init(num);
     fmpz_init(t);
 
-    for (b = 0; b < n; b++)
+    for (b = 0; b < nbth; b++)
     {
         dots[b] = acb_theta_char_dot_slong(b, coords, g);
     }
@@ -108,7 +49,7 @@ acb_theta_sum_jet_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     }
 
     acb_theta_jet_tuples(tups, ord, g);
-    for (j = 0; j < nb; j++)
+    for (j = 0; j < nbjet; j++)
     {
         fmpz_one(num);
         for (i = 1; i < g; i++)
@@ -124,30 +65,49 @@ acb_theta_sum_jet_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
             fmpz_set_si(t, coords[0] + i);
             fmpz_pow_ui(t, t, tups[j * g]);
             acb_mul_fmpz(x, &v3[i], t, precs[i]);
-            for (b = 0; b < n; b++)
+            for (b = 0; b < nbth; b++)
             {
                 acb_mul_i_pow_si(y, x, 2 * ((dots[b] + i * acb_theta_char_bit(b, 0, g)) % 4));
-                acb_add(&aux[b * nb + j], &aux[b * nb + j], y, prec);
+                acb_add(&aux[b * nbjet + j], &aux[b * nbjet + j], y, prec);
             }
         }
 
         /* Multiply by cofactor * num */
         acb_mul_fmpz(x, cofactor, num, prec);
-        for (b = 0; b < n; b++)
+        for (b = 0; b < nbth; b++)
         {
-            acb_mul(&aux[b * nb + j], &aux[b * nb + j], x, prec);
+            acb_mul(&aux[b * nbjet + j], &aux[b * nbjet + j], x, prec);
         }
     }
-    _acb_vec_add(th, th, aux, nb * n, fullprec);
+    _acb_vec_add(th, th, aux, nbth * nbjet, fullprec);
 
     flint_free(tups);
     flint_free(dots);
     _acb_vec_clear(v3, len);
-    _acb_vec_clear(aux, n * nb);
+    _acb_vec_clear(aux, nbth * nbjet);
     acb_clear(x);
     acb_clear(y);
     fmpz_clear(num);
     fmpz_clear(t);
+
+}
+
+static void
+acb_theta_sum_jet_00_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
+    const slong * precs, slong len, const acb_t cofactor, const slong * coords,
+    slong ord, slong g, slong prec, slong fullprec)
+{
+    acb_theta_sum_jet_0x_worker(th, v1, v2, precs, len, cofactor, coords, ord,
+        0, g, prec, fullprec);
+}
+
+static void
+acb_theta_sum_jet_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
+    const slong * precs, slong len, const acb_t cofactor, const slong * coords,
+    slong ord, slong g, slong prec, slong fullprec)
+{
+    acb_theta_sum_jet_0x_worker(th, v1, v2, precs, len, cofactor, coords, ord,
+        1, g, prec, fullprec);
 }
 
 /* To compute derivatives of all theta values, we use a big ellipsoid to avoid
@@ -170,87 +130,13 @@ acb_theta_char_get_a(const slong * n, slong g)
 }
 
 static void
-acb_theta_sum_jet_a0_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
+acb_theta_sum_jet_ax_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     const slong * precs, slong len, const acb_t cofactor, const slong * coords,
-    slong ord, slong g, slong prec, slong fullprec)
+    slong ord, int all_b, slong g, slong prec, slong fullprec)
 {
     slong n = 1 << g;
-    slong nb = acb_theta_jet_nb(ord, g);
-    slong * tups;
-    slong a0, a1;
-    acb_ptr v3, aux;
-    acb_t x;
-    fmpz_t num, t;
-    slong j, i;
-
-    tups = flint_malloc(g * nb * sizeof(slong));
-    v3 = _acb_vec_init(len);
-    aux = _acb_vec_init(nb * n);
-    acb_init(x);
-    fmpz_init(num);
-    fmpz_init(t);
-
-    /* Precompute a0, a1 */
-    a0 = acb_theta_char_get_a(coords, g);
-    a1 = a0 ^ (1 << (g - 1));
-
-    /* Compute products in v3 */
-    for (i = 0; i < len; i++)
-    {
-        acb_mul(&v3[i], &v1[i], &v2[i], precs[i]);
-    }
-
-    acb_theta_jet_tuples(tups, ord, g);
-    for (j = 0; j < nb; j++)
-    {
-        fmpz_one(num);
-        for (i = 1; i < g; i++)
-        {
-            fmpz_set_si(t, coords[i]);
-            fmpz_pow_ui(t, t, tups[j * g + i]);
-            fmpz_mul(num, num, t);
-        }
-
-        /* Loop over lattice points */
-        for (i = 0; i < len; i++)
-        {
-            fmpz_set_si(t, coords[0] + i);
-            fmpz_pow_ui(t, t, tups[j * g]);
-            acb_mul_fmpz(x, &v3[i], t, precs[i]);
-            /* Adding coefficient in either a0 or a1 */
-            if (i % 2 == 0)
-            {
-                acb_add(&aux[a0 * nb + j], &aux[a0 * nb + j], x, prec);
-            }
-            else
-            {
-                acb_add(&aux[a1 * nb + j], &aux[a1 * nb + j], x, prec);
-            }
-        }
-
-        /* Multiply by cofactor * num */
-        acb_mul_fmpz(x, cofactor, num, prec);
-        acb_mul(&aux[a0 * nb + j], &aux[a0 * nb + j], x, prec);
-        acb_mul(&aux[a1 * nb + j], &aux[a1 * nb + j], x, prec);
-    }
-
-    _acb_vec_add(th, th, aux, nb * n, fullprec);
-
-    flint_free(tups);
-    _acb_vec_clear(v3, len);
-    _acb_vec_clear(aux, nb * n);
-    acb_clear(x);
-    fmpz_clear(num);
-    fmpz_clear(t);
-}
-
-static void
-acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
-    const slong * precs, slong len, const acb_t cofactor, const slong * coords,
-    slong ord, slong g, slong prec, slong fullprec)
-{
-    slong n = 1 << g;
-    slong nb = acb_theta_jet_nb(ord, g);
+    slong nbb = (all_b ? n : 1);
+    slong nbjet = acb_theta_jet_nb(ord, g);
     slong * tups;
     slong a0, a1;
     slong * dots;
@@ -260,10 +146,10 @@ acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     slong j, i;
     ulong b;
 
-    tups = flint_malloc(g * nb * sizeof(slong));
-    dots = flint_malloc(n * sizeof(slong));
+    tups = flint_malloc(g * nbjet * sizeof(slong));
+    dots = flint_malloc(nbb * sizeof(slong));
     v3 = _acb_vec_init(len);
-    aux = _acb_vec_init(nb * n * n);
+    aux = _acb_vec_init(nbjet * nbb * n);
     acb_init(x);
     acb_init(y);
     fmpz_init(num);
@@ -272,7 +158,7 @@ acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     /* Precompute a0, a1, dots */
     a0 = acb_theta_char_get_a(coords, g);
     a1 = a0 ^ (1 << (g - 1));
-    for (b = 0; b < n; b++)
+    for (b = 0; b < nbb; b++)
     {
         dots[b] = acb_theta_char_dot_slong(b, coords, g);
     }
@@ -284,7 +170,7 @@ acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     }
 
     acb_theta_jet_tuples(tups, ord, g);
-    for (j = 0; j < nb; j++)
+    for (j = 0; j < nbjet; j++)
     {
         fmpz_one(num);
         for (i = 1; i < g; i++)
@@ -301,41 +187,62 @@ acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
             fmpz_pow_ui(t, t, tups[j * g]);
             acb_mul_fmpz(x, &v3[i], t, precs[i]);
             /* Loop over b, adding coefficients in both a0b and a1b */
-            for (b = 0; b < n; b++)
+            for (b = 0; b < nbb; b++)
             {
                 acb_mul_i_pow_si(y, x, (dots[b] + i * acb_theta_char_bit(b, 0, g)) % 4);
                 if (i % 2 == 0)
                 {
-                    acb_add(&aux[(n * a0 + b) * nb + j],
-                        &aux[(n * a0 + b) * nb + j], y, prec);
+                    acb_add(&aux[(nbb * a0 + b) * nbjet + j],
+                        &aux[(nbb * a0 + b) * nbjet + j], y, prec);
                 }
                 else
                 {
-                    acb_add(&aux[(n * a1 + b) * nb + j],
-                        &aux[(n * a1 + b) * nb + j], y, prec);
+                    acb_add(&aux[(nbb * a1 + b) * nbjet + j],
+                        &aux[(nbb * a1 + b) * nbjet + j], y, prec);
                 }
             }
         }
 
         /* Multiply by cofactor * num */
         acb_mul_fmpz(x, cofactor, num, prec);
-        for (b = 0; b < n; b++)
+        for (b = 0; b < nbb; b++)
         {
-            acb_mul(&aux[(n * a0 + b) * nb + j], &aux[(n * a0 + b) * nb + j], x, prec);
-            acb_mul(&aux[(n * a1 + b) * nb + j], &aux[(n * a1 + b) * nb + j], x, prec);
+            acb_mul(&aux[(nbb * a0 + b) * nbjet + j],
+                &aux[(nbb * a0 + b) * nbjet + j], x, prec);
+            acb_mul(&aux[(nbb * a1 + b) * nbjet + j],
+                &aux[(nbb * a1 + b) * nbjet + j], x, prec);
         }
     }
 
-    _acb_vec_add(th, th, aux, nb * n * n, fullprec);
+    _acb_vec_add(th, th, aux, nbjet * nbb * n, fullprec);
 
     flint_free(tups);
     flint_free(dots);
     _acb_vec_clear(v3, len);
-    _acb_vec_clear(aux, nb * n * n);
+    _acb_vec_clear(aux, nbjet * nbb * n);
     acb_clear(x);
     acb_clear(y);
     fmpz_clear(num);
     fmpz_clear(t);
+}
+
+
+static void
+acb_theta_sum_jet_a0_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
+    const slong * precs, slong len, const acb_t cofactor, const slong * coords,
+    slong ord, slong g, slong prec, slong fullprec)
+{
+    acb_theta_sum_jet_ax_worker(th, v1, v2, precs, len, cofactor, coords, ord,
+        0, g, prec, fullprec);
+}
+
+static void
+acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
+    const slong * precs, slong len, const acb_t cofactor, const slong * coords,
+    slong ord, slong g, slong prec, slong fullprec)
+{
+    acb_theta_sum_jet_ax_worker(th, v1, v2, precs, len, cofactor, coords, ord,
+        1, g, prec, fullprec);
 }
 
 void

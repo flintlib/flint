@@ -416,9 +416,8 @@ Theta characteristics
 
 .. function:: int acb_theta_char_bit(ulong ch, slong j, slong n)
 
-    Returns the `j`-th bit of *ch* seen as an element of `\{0,1\}^{n}`,
-    counting from zero. For instance, in dimension 2,
-    :func:`acb_theta_char_bit(8,j,4)` returns 1, 0, 0, 0 for `j = 0,1,2,3`.
+    Returns the `j`-th bit of *ch* seen as an element of `\{0,1\}^{n}` with the
+    above conventions, counting from `j=0` to `n-1`.
 
 .. function:: void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g)
 
@@ -931,7 +930,16 @@ instead.
       finally
     - *fullprec* is the working precision for summing into *th*.
 
-.. function:: void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv, slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_ptr * sqr_pow, const acb_theta_eld_t E, slong ord, slong prec, acb_theta_sum_worker_t worker)
+.. function:: void acb_theta_sum_sqr_pow(acb_ptr * sqr_pow, const acb_mat_t exp_tau, const acb_theta_eld_t E, slong prec)
+
+    For each `0\leq j\leq g-1`, sets *sqr_pow[j]* to a vector of length `B_j +
+    1` containing `e_j^{n^2}` for `0\leq n \leq B_j`, where `B_j` is an upper
+    bound on the absolute values of `j`-th coordinates of points in *E*
+    (obtained by :func:`acb_theta_eld_box`) and `e_{j}` is the `j`-th diagonal
+    entry of *exp_tau*. The entries of *sqr_pow* need to be preallocated to the
+    correct lengths.
+
+.. function:: void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_z, acb_srcptr exp_z_inv, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_ptr * sqr_pow, const acb_theta_eld_t E, slong ord, slong prec, acb_theta_sum_worker_t worker)
 
     Runs the summation algorithm on the ellipsoid *E*, assuming `g\geq 2`. The input is as follows:
 
