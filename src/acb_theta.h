@@ -140,10 +140,26 @@ void acb_theta_eld_clear(acb_theta_eld_t E);
 
 int acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v);
 
-slong acb_theta_eld_nb_pts(const acb_theta_eld_t E);
+FLINT_FORCE_INLINE slong
+acb_theta_eld_nb_pts(const acb_theta_eld_t E)
+{
+    return E->nb_pts;
+}
+
 void acb_theta_eld_points(slong * pts, const acb_theta_eld_t E);
-slong acb_theta_eld_box(const acb_theta_eld_t E, slong j);
-slong acb_theta_eld_nb_border(const acb_theta_eld_t E);
+
+FLINT_FORCE_INLINE slong
+acb_theta_eld_box(const acb_theta_eld_t E, slong j)
+{
+    return E->box[j];
+}
+
+FLINT_FORCE_INLINE slong
+acb_theta_eld_nb_border(const acb_theta_eld_t E)
+{
+    return E->nb_border;
+}
+
 void acb_theta_eld_border(slong * pts, const acb_theta_eld_t E);
 int acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt);
 void acb_theta_eld_print(const acb_theta_eld_t E);
@@ -280,7 +296,12 @@ int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
 
 void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, int all, int sqr, slong prec);
-void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec);
+
+FLINT_FORCE_INLINE void
+acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
+{
+    acb_theta_jet(th, z, 1, tau, 0, 1, sqr, prec);
+}
 
 /* Dimension 2 specifics */
 
