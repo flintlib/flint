@@ -33,6 +33,14 @@ conventions, the output of :func:`acb_modular_theta` in dimension 1 is
 `(-\theta_3,\theta_2,\theta_0,\theta_1)`. When manipulating `a` or `b`
 individually, we map them to integers between 0 and `2^g-1`.
 
+The numerical functions in this module always compute certified error bounds:
+for instance, if `\tau` is represented by an :type:`acb_mat_t` whose imaginary
+part is not certainly positive definite at the chosen working precision, then
+the output theta values will have an infinite radius.
+
+Main user functions
+-------------------------------------------------------------------------------
+
 The main method to evaluate theta functions is
 
 .. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
@@ -72,11 +80,6 @@ the order of `\exp(\pi y^T Y^{-1} y) \cdot 2^{-\mathit{prec}}` to avoid
 unreasonable computations when `y` is very far from zero. Some internal
 functions also take the factor `\exp(-d^2)` into account, and are documented as
 such.
-
-In any case, the numerical functions in this module compute certified error
-bounds: for instance, if `\tau` is represented by an :type:`acb_mat_t` whose
-imaginary part is not certainly positive definite at the chosen working
-precision, then the output will have an infinite radius.
 
 The function :func:`acb_theta_all` is in fact an interface to the more complete
 method
