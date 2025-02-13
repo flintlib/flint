@@ -356,7 +356,7 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
       (this is `\phi_m` in Igusa's notation), and
     - `\kappa(m)` is an 8th root of unity, only well-defined up to sign unless
       we choose a particular branch of `\det(\gamma\tau + \delta)^{1/2}` on
-      `\mathcal{H}_g`. Hence `\kamma(m)^2` is a well-defined 4th root of unity.
+      `\mathcal{H}_g`. Hence `\kappa(m)^2` is a well-defined 4th root of unity.
 
     We proceed as follows. After applying :func:`sp2gz_decompose`, we only have
     to consider four special cases for *mat*. If *mat* is trigonal or
@@ -947,10 +947,8 @@ instead.
       and *exp_tau_inv* whose should contain `\exp(\pi i (2 -
       \delta_{j,k}) \tau_{j,k})` and its inverse, respectively.
     - *E* is the ellipsoid we want to sum on.
-    - *sqr_pow* should be a vector of length `g`. For each `1\leq j\leq g`, its
-      `j`-th entry should point to a vector containing `\exp(\pi i n^2
-      \tau_{j,j})` for `n = 0, 1,\ldots, B_j` where `B_j` is an upper bound on
-      the absolute value of `j`-th coordinate of all the points in *E*.
+    - *sqr_pow* should be as output by :func:`acb_theta_sum_sqr_pow` on
+      *exp_tau* and *E*.
     - the vectors *exp_zs* and *exp_zs_inv* should have length *nb* times
       *g*. For each `z` stored in *zs*, the corresponding pieces of *exp_zs*
       and *exp_zs_inv* should contain `\exp(\pi i z_j)` for `1\leq j\leq g` and
@@ -1129,10 +1127,9 @@ for theta values at `z\neq 0`, and for all characteristics:
   `\theta_{a,0}(0, 2^k\tau)` and `\theta_{a,0}(2^k z,
   2^k\tau)` using the first and third formulas at each step.
 
-- These two techniques can be combined by evaluating theta values
-  at the six vectors `2^k v` for `v = 0, t, 2t, z, z + t, z + 2t`. Note that we
-  only have to compute `\widetilde{\theta}_{a,0}(2^kz, 2^k\tau)` at the last
-  step `k=0`.
+- These two techniques can be combined by evaluating theta values at the six
+  vectors `2^k v` for `v = 0, t, 2t, z, z + t, z + 2t`. Note that we only have
+  to compute `\theta_{a,0}(2^kz, 2^k\tau)` at the last step `k=0`.
 
 - To simplify the precision management, we use :func:`acb_theta_agm_mul_tight`
   and work with normalized theta values throughout, which also satisfy the
@@ -1193,7 +1190,7 @@ reduced.
     - *s* should be an integer between `1` and `g-1`; we will reduce the
       evaluation of theta functions from dimension `g` to dimension `s`
     - *a* should be an integer between `0` and `2^{g-s}-1` included; we will
-      only decompose `\wildetilde{\theta}_{a',0}(z,\tau)` when the last `g - s`
+      only decompose `\widetilde{\theta}_{a',0}(z,\tau)` when the last `g - s`
       bits of `a'` correspond to those of *a*.
 
     We then proceed as follows:
@@ -1383,9 +1380,9 @@ reduced.
 
     One can easily compute an upper bound on `c_2` from the Cholesky
     decomposition of `\pi Y^{-1}`. We then look for a value of `\rho` that
-    minimizes `\exp((c_1 + c_2\rho)^2)/\rho^{2m-1}` where `m = \mathit{ord}+1`,
-    i.e. we set `\rho` to minimum of 1 and the positive root of `2c_2\rho
-    (c_1 + c_2\rho) = 2m-1`.
+    minimizes `\exp((c_1 + c_2\rho)^2)/\rho^{2\mathit{ord}+1}`, i.e. we set
+    `\rho` to minimum of 1 and the positive root of `2c_2\rho (c_1 + c_2\rho) =
+    2\mathit{ord}+1`.
 
 .. function:: void acb_theta_ql_jet_error(arb_ptr err, acb_srcptr z, const acb_mat_t tau, acb_srcptr dth, slong ord, slong prec)
 
@@ -1447,11 +1444,12 @@ reduced.
     `(z,\tau)` of their error bounds, increases the working precision to
     account for division by `\varepsilon^{\mathit{ord}}\cdot
     (\mathit{ord}+1)^g`, calls :func:`acb_theta_ql_exact` on all the auxiliary
-    points at a higher working precision, performs the relevant discrete
-    Fourier transforms, and finally restores provably correct error bounds on
-    the results using :func:`acb_theta_ql_jet_error` and derivatives to order
-    *ord* + 2 computed at low precision. This algorithm runs in quasi-linear
-    time in `\mathit{prec}\cdot \mathit{ord}^{\,g}` for any fixed `g`.
+    points for `m = \mathit{ord} + 1` at a higher working precision, performs
+    the relevant discrete Fourier transforms, and finally restores provably
+    correct error bounds on the results using :func:`acb_theta_ql_jet_error`
+    and derivatives to order *ord* + 2 computed at low precision. This
+    algorithm runs in quasi-linear time in `\mathit{prec}\cdot
+    \mathit{ord}^{\,g}` for any fixed `g`.
 
 .. function:: void acb_theta_ql_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, slong prec)
 
@@ -1467,8 +1465,8 @@ Reduction and main functions
     Same as :func:`acb_theta_jet`, but does not attempt to reduce the input
     pairs `(z,\tau)`. When *all* is false, the parameter *ab* can be used to
     specify an individual characteristic `(a,b)` so that we will compute
-    (derivatives of) `\widetilde{\theta}_{a,b}` instead of `\theta_{0,0}`. This
-    function should only be used when the input is already known to be reduced.
+    (derivatives of) `\theta_{a,b}` instead of `\theta_{0,0}`. This function
+    should only be used when the input is already known to be reduced.
 
     Depending on the cases, we use the following formulas before calling
     :func:`acb_theta_ql_jet`:
@@ -1494,6 +1492,8 @@ Reduction and main functions
 
             \theta_{a,b}(z,\tau) = e^{\pi i (a^T \tau a/4 + a^T b + 2 a^T z)}
             \theta_{0,0}(z + \tau\tfrac{a}{2} + \tfrac{b}{2}, \tau).
+
+      to fall back to the case where *ab* is zero.
 
 .. function:: int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N, acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 
@@ -1544,7 +1544,7 @@ We then assemble the main function :func:`acb_theta_jet` as follows. If
 :func:`acb_theta_reduce_tau`, then :func:`acb_theta_reduce_z` succeed, we call
 :func:`acb_theta_jet_notransform` on the reduced pairs `(z,\tau)`. We finally
 apply the transformation formula with the help of :func:`acb_theta_char_table`
-and :func:`acb_theta_siegel_kappa`. If reduction does not succeed, then the
+and :func:`acb_siegel_kappa`. If reduction does not succeed, then the
 output is set to indeterminate values.
 
 Dimension 2 specifics
