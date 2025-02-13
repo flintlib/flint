@@ -1587,20 +1587,21 @@ corresponding to Siegel modular functions of weight `\det^{k - j/2}\otimes
 \mathrm{Sym}^j`. See [CFG2017]_ for more details on the correspondence between
 modular forms and covariants.
 
-.. macro:: ACB_THETA_G2_COV_NB
-
-    Macro giving the number of generators of the ring of covariants, equal to 26.
-
 .. function:: void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f, slong k, slong j, slong prec)
 
     Sets *res* to `\det(m)^k \mathrm{Sym}^j(m)(f)`. The polynomial `f` should
     be of degree at most `j` (any coefficients of larger degree are ignored).
 
-.. function:: void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h, slong m, slong n, slong k, slong prec)
+.. function:: void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h, slong m, slong n, slong k, int lead, slong prec)
 
-    Sets *res* to the `k`-th transvectant of the polynomials `g` and
-    `h` of degrees `m` and `n`: considering `g` and `h` as homogeneous
-    polynomials of degree `m` (resp. `n`) in `x_1,x_2`, this sets *res* to
+    Sets *res* to the `k`-th transvectant of the polynomials `g` and `h` of
+    degrees `m` and `n`. If *lead* is true (nonzero), we instead set *res* to
+    the constant polynomial containing the leading coefficient of this
+    transvectant.
+
+    Considering `g` and `h` as homogeneous polynomials of degree `m`
+    (resp. `n`) in `x_1,x_2`, this sets *res* to (the leading coefficient of)
+    the polynomial
 
         .. math::
 
@@ -1611,28 +1612,18 @@ modular forms and covariants.
     Any coefficients of `g` or `h` of larger degree than `m` (resp. `n`) are
     ignored.
 
-.. function:: void acb_theta_g2_transvectant_lead(acb_t res, const acb_poly_t g, const acb_poly_t h, slong m, slong n, slong k, slong prec)
-
-    Sets *res* to the leading coefficient of `(g,h)_k` in `x_1`, with the same
-    conventions as in :func:`acb_theta_g2_transvectant`.
-
 .. function:: slong acb_theta_g2_character(const fmpz_mat_t mat)
 
     Returns the value in `\mathbb{Z}/2\mathbb{Z}` (0 or 1) of the unique
     nontrivial character of `\mathrm{Sp}_4(\mathbb{Z})` at *mat*, following
     [CFG2019]_, §12.
 
-.. function:: void acb_theta_g2_psi4(acb_t res, acb_srcptr th2, slong prec)
+.. function:: void acb_theta_g2_even_weight(acb_t psi4, acb_t psi6, acb_t chi10, acb_t chi12, acb_srcptr th2, slong prec)
 
-.. function:: void acb_theta_g2_psi6(acb_t res, acb_srcptr th2, slong prec)
-
-.. function:: void acb_theta_g2_chi10(acb_t res, acb_srcptr th2, slong prec)
-
-.. function:: void acb_theta_g2_chi12(acb_t res, acb_srcptr th2, slong prec)
-
-    Sets *res* to the value of the Eisenstein series `\psi_4`, `\psi_6` or the
-    cusp forms `\chi_{10}, \chi_{12}` corresponding to the given vector *th2* of
-    squared theta values (of length 16).
+    Sets *psi4*, *psi6*, *chi10*, and *chi12* to the value of the Eisenstein
+    series `\psi_4`, `\psi_6` and cusp forms `\chi_{10}, \chi_{12}`
+    corresponding to the given vector *th2* of squared theta values (of length
+    16).
 
     We use the formulas from §7.1 in [Str2014]_, with the following normalizations:
 
@@ -1681,8 +1672,8 @@ modular forms and covariants.
 
     Sets *res* to the value of the vector-valued cusp form with character
     `\chi_{6,3}` of weight `\det^3\otimes \mathrm{Sym}^6` corresponding to the
-    given values of *dth*, computed as in e.g. :func:`acb_theta_jet_all` with
-    `\mathit{ord}=1`. We have by [CFG2017]_:
+    given values of *dth*, computed as in e.g. :func:`acb_theta_jet` with
+    `\mathit{ord}=1` and *all* set to true. We have by [CFG2017]_:
 
         .. math::
 
@@ -1694,21 +1685,17 @@ modular forms and covariants.
 
     Sets *res* and *chi5* to the values of `\chi_{-2,6}` and `\chi_5` at
     `\tau`. We reduce `\tau` to the Siegel fundamental domain, call
-    :func:`acb_theta_jet_all_notransform`, then apply the transformation
-    formula for Siegel modular forms (which is simpler than the transformation
-    formula on derivatives of theta functions.) Under the correspondence
-    between Siegel modular functions and covariants of binary sextics,
-    `\chi_{-2,6}` corresponds to the binary sextic itself, hence the name.
+    :func:`acb_theta_jet_notransform`, then apply the transformation formula
+    for Siegel modular forms (which is simpler than the transformation formula
+    on derivatives of theta functions.) Under the correspondence between Siegel
+    modular functions and covariants of binary sextics, `\chi_{-2,6}`
+    corresponds to the binary sextic itself, hence the name.
 
-.. function:: void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec)
+.. function:: void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, int lead, slong prec)
 
-    Same as :func:`acb_theta_g2_sextic_chi5`, but does not output *chi5*.
-
-.. function:: void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, slong prec)
-
-    Sets *res* to the vector of 26 generators of the ring of covariants
-    evaluated at the sextic *f* (any terms of degree `>6` are ignored), in the
-    following order:
+    Sets *res* to the vector of 26 generators of the ring of covariants (or
+    their leading coefficients, when *lead* is true) evaluated at the sextic
+    *f* (any terms of degree `>6` are ignored). We use the following ordering:
 
     0. `C_{1,6}=f`
     1. `C_{2,0}= 60(f,f)_6`
@@ -1740,14 +1727,6 @@ modular forms and covariants.
     The scalar factors are chosen so that when evaluated at a formal sextic `f
     = \sum a_i x_1^{6-i}x_2^i`, the covariants are integral and primitive as
     multivariate polynomials in `a_0,\ldots,a_6,x_1,x_2`.
-
-.. function:: void acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec)
-
-    Sets *res* to the vector of leading coefficients in `x_1` of the 26
-    covariants evaluated at *f*. This is more efficient than taking leading
-    coefficients of :func:`acb_theta_g2_covariants`, since we can use
-    :func:`acb_theta_g2_transvectant_lead` instead of
-    :func:`acb_theta_g2_transvectant`.
 
 Tests
 -------------------------------------------------------------------------------
