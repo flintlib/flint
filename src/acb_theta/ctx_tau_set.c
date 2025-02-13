@@ -14,12 +14,6 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-static int
-acb_theta_aj_is_zero(ulong a, slong j, slong g)
-{
-    return !((a >> (g - 1 - j)) & 1);
-}
-
 static void
 acb_theta_ctx_tau_set_shift(acb_theta_ctx_tau_t ctx, slong a, slong prec)
 {
@@ -35,7 +29,7 @@ acb_theta_ctx_tau_set_shift(acb_theta_ctx_tau_t ctx, slong a, slong prec)
         acb_one(x);
         for (k = 0; k < g; k++)
         {
-            if (acb_theta_aj_is_zero(a, k, g))
+            if (!acb_theta_char_bit(a, k, g))
             {
                 continue;
             }
@@ -58,7 +52,7 @@ acb_theta_ctx_tau_set_shift(acb_theta_ctx_tau_t ctx, slong a, slong prec)
         acb_one(x);
         for (k = 0; k < g; k++)
         {
-            if (acb_theta_aj_is_zero(a, k, g))
+            if (!acb_theta_char_bit(a, k, g))
             {
                 continue;
             }
@@ -81,13 +75,13 @@ acb_theta_ctx_tau_set_shift(acb_theta_ctx_tau_t ctx, slong a, slong prec)
     acb_one(x);
     for (j = 0; j < g; j++)
     {
-        if (acb_theta_aj_is_zero(a, j, g))
+        if (!acb_theta_char_bit(a, j, g))
         {
             continue;
         }
         for (k = j; k < g; k++)
         {
-            if (acb_theta_aj_is_zero(a, k, g))
+            if (!acb_theta_char_bit(a, k, g))
             {
                 continue;
             }

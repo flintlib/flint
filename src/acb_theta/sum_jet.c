@@ -126,7 +126,7 @@ acb_theta_sum_jet_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
             acb_mul_fmpz(x, &v3[i], t, precs[i]);
             for (b = 0; b < n; b++)
             {
-                acb_mul_i_pow_si(y, x, 2 * ((dots[b] + i * (b >> (g - 1))) % 4));
+                acb_mul_i_pow_si(y, x, 2 * ((dots[b] + i * acb_theta_char_bit(b, 0, g)) % 4));
                 acb_add(&aux[b * nb + j], &aux[b * nb + j], y, prec);
             }
         }
@@ -163,7 +163,7 @@ acb_theta_char_get_a(const slong * n, slong g)
     for (k = 0; k < g; k++)
     {
         a *= 2;
-        a += ((n[k] % 2) + 2) % 2;
+        a += n[k] & 1;
     }
 
     return a;
@@ -303,7 +303,7 @@ acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
             /* Loop over b, adding coefficients in both a0b and a1b */
             for (b = 0; b < n; b++)
             {
-                acb_mul_i_pow_si(y, x, (dots[b] + i * (b >> (g - 1))) % 4);
+                acb_mul_i_pow_si(y, x, (dots[b] + i * acb_theta_char_bit(b, 0, g)) % 4);
                 if (i % 2 == 0)
                 {
                     acb_add(&aux[(n * a0 + b) * nb + j],

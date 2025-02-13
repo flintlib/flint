@@ -58,21 +58,15 @@ acb_theta_sum_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     for (b = 0; b < n; b++)
     {
         dot = acb_theta_char_dot_slong(b, coords, g) % 2;
-        if ((b >> (g - 1)) && dot)
+        if (dot)
         {
-            acb_sub(&th[b], &th[b], sub, fullprec);
-        }
-        else if ((b >> (g - 1)))
-        {
-            acb_add(&th[b], &th[b], sub, fullprec);
-        }
-        else if (dot)
-        {
-            acb_sub(&th[b], &th[b], add, fullprec);
+            acb_sub(&th[b], &th[b],
+                (acb_theta_char_bit(b, 0, g) ? sub : add), fullprec);
         }
         else
         {
-            acb_add(&th[b], &th[b], add, fullprec);
+            acb_add(&th[b], &th[b],
+                (acb_theta_char_bit(b, 0, g) ? sub : add), fullprec);
         }
     }
 
@@ -150,12 +144,6 @@ acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     flint_free(sqr_pow);
 }
 
-static int
-acb_theta_aj_is_zero(ulong a, slong j, slong g)
-{
-    return !((a >> (g - 1 - j)) & 1);
-}
-
 static void
 acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t ctx,
     const acb_theta_ctx_tau_t ctx_tau, ulong a, slong prec)
@@ -185,7 +173,7 @@ acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t
     acb_one(c);
     for (j = 0; j < g; j++)
     {
-        if (acb_theta_aj_is_zero(a, j, g))
+        if (!acb_theta_char_bit(a, j, g))
         {
             continue;
         }
@@ -204,7 +192,7 @@ acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t
         acb_one(cinv);
         for (j = 0; j < g; j++)
         {
-            if (acb_theta_aj_is_zero(a, j, g))
+            if (!acb_theta_char_bit(a, j, g))
             {
                 continue;
             }

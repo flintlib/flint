@@ -42,7 +42,7 @@ TEST_FUNCTION_START(acb_theta_char_dot, state)
         x1 = acb_theta_char_dot(a, b, g);
         for (j = 0; j < g; j++)
         {
-            n[g - 1 - j] = (b >> j) % 2;
+            n[j] = acb_theta_char_bit(b, j, g);
         }
         x2 = acb_theta_char_dot_slong(a, n, g);
 

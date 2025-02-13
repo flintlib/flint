@@ -28,8 +28,8 @@ considering `a`, `b` and `z` as column vectors.
 Throughout, we order vectors of theta values by associating to each
 characteristic `(a,b)` the :type:`ulong` between 0 and `2^{2g}-1` whose `g`
 most (resp. least) significant bits are given by `a` (resp. `b`): thus `(a,b)`
-where `a = (0,1)` and `b = (1,0)` in dimension `2` will be numbered `6`. With
-these conventions, the output of :func:`acb_modular_theta` in dimension 1 is
+where `a = (1,0)` and `b = (0,0)` in dimension `2` is numbered `8`. With these
+conventions, the output of :func:`acb_modular_theta` in dimension 1 is
 `(-\theta_3,\theta_2,\theta_0,\theta_1)`. When manipulating `a` or `b`
 individually, we map them to integers between 0 and `2^g-1`.
 
@@ -414,6 +414,12 @@ We continue to denote by `\alpha,\beta,\gamma,\delta` the `g\times g` blocks of
 Theta characteristics
 -------------------------------------------------------------------------------
 
+.. function:: int acb_theta_char_bit(ulong ch, slong j, slong n)
+
+    Returns the `j`-th bit of *ch* seen as an element of `\{0,1\}^{n}`,
+    counting from zero. For instance, in dimension 2,
+    :func:`acb_theta_char_bit(8,j,4)` returns 1, 0, 0, 0 for `j = 0,1,2,3`.
+
 .. function:: void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g)
 
 .. function:: void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g)
@@ -654,8 +660,7 @@ Error bounds in summation algorithms
 To compute the correct ellipsoids in summation algorithms for a target working
 precision, we use the following upper bound on the tail of the series: by
 [EK2025]_, for any `v\in \mathbb{R}^g`, any upper-triangular Cholesky matrix
-`C`, any `\mathit{ord}\geq 0`, and any `R` such that `R^2
-\geq\max(4,\mathit{ord})`, we have
+`C`, any nonnegative *ord*, and any `R\geq 0`, we have
 
     .. math::
 
@@ -740,9 +745,8 @@ Context structures in summation algorithms
 After the relevant ellipsoid has been computed, summation algorithms only
 involve exponential terms in `\tau` and `z`. Sometimes, especially in the
 setting of the quasi-linear algorithms below, these exponentials can be
-computed once and for all at high precision, then used for several calls to
-summation functions. This section introduces context structures to make these
-manipulations easier.
+computed once, and then used for several calls to summation functions. This
+section introduces context structures to make these manipulations easier.
 
 .. type:: acb_theta_ctx_tau_struct
 
@@ -846,19 +850,6 @@ manipulations easier.
     \tau)` respectively where `t` is a real vector, sets *res* to a valid
     context for the pair `(z + t,\tau)`.
 
-.. function:: void acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t ctx, const acb_theta_ctx_tau_t ctx_tau, ulong a, slong prec)
-
-    Assuming that *ctx* and *ctx_tau* correspond to a pair `(z,\tau)`, and that
-    *ctx_tau* was set with true *allow_shift*, sets *res* to a valid context
-    for the pair `(z + \tau \tfrac{a}{2},\tau)` and sets `c` to the complex
-    value such that for all `0\leq b\leq 2^g-1`,
-
-    .. math::
-
-        \theta_{a,b}(z,\tau) = c \exp(\pi i a^T b/2) \theta_{0,b}(z + \tau\tfrac{a}{2},\tau).
-
-    We have `c = \exp(\pi i a^T z + \pi i a^T\tau a/4)`.
-
 .. function:: void acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slong nb, slong prec)
 
     Given a vector *vec* of valid contexts for pairs
@@ -875,11 +866,10 @@ Summation algorithms
 -------------------------------------------------------------------------------
 
 In this module, summation algorithms are mainly used for low to moderate
-precisions due to their higher complexity (except in special cases such as
-:func:`acb_theta_00`). Since summations at low precisions are a key step in the
-quasi-linear algorithms, they have been optimized in many ways and should
-already compare favorably to other software packages that evaluate theta
-functions.
+precisions due to their higher asymptotic complexity. Since summations at low
+precisions are a key step in the quasi-linear algorithms, the summation
+functions below optimized in many ways and should already compare favorably to
+other software packages that evaluate theta functions.
 
 We always assume in this section that the inpits `(z,\tau)` have been
 reduced. In particular, this allows us to use only one ellipsoid when several

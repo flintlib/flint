@@ -23,7 +23,12 @@ extern "C" {
 
 /* The Siegel modular group */
 
-slong sp2gz_dim(const fmpz_mat_t mat);
+FLINT_FORCE_INLINE slong
+sp2gz_dim(const fmpz_mat_t mat)
+{
+    return (mat->r) / 2;
+}
+
 void sp2gz_set_blocks(fmpz_mat_t mat, const fmpz_mat_t alpha, const fmpz_mat_t beta,
     const fmpz_mat_t gamma, const fmpz_mat_t delta);
 void sp2gz_j(fmpz_mat_t mat);
@@ -32,7 +37,17 @@ void sp2gz_trig(fmpz_mat_t mat, const fmpz_mat_t S);
 void sp2gz_embed(fmpz_mat_t res, const fmpz_mat_t mat);
 void sp2gz_restrict(fmpz_mat_t res, const fmpz_mat_t mat);
 
-slong sp2gz_nb_fundamental(slong g);
+FLINT_FORCE_INLINE slong
+sp2gz_nb_fundamental(slong g)
+{
+    if (g == 1)
+        return 1;
+    if (g == 2)
+        return 19;
+    else
+        return 19 * ((g * (g - 1)) / 2) + (1 << g);
+}
+
 void sp2gz_fundamental(fmpz_mat_t mat, slong j);
 
 int sp2gz_is_correct(const fmpz_mat_t mat);
@@ -68,6 +83,12 @@ void acb_siegel_randtest_vec_reduced(acb_ptr zs, flint_rand_t state,
     slong nb, const acb_mat_t tau, int exact, slong prec);
 
 /* Theta characteristics */
+
+FLINT_FORCE_INLINE int
+acb_theta_char_bit(ulong ch, slong j, slong n)
+{
+    return (ch >> (n - 1 - j)) & 1;
+}
 
 void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
 void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
@@ -197,8 +218,6 @@ void acb_theta_ctx_z_set(acb_theta_ctx_z_t ctx, acb_srcptr z, const acb_theta_ct
 void acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec);
 void acb_theta_ctx_z_add_real(acb_theta_ctx_z_t res, const acb_theta_ctx_z_t ctx,
     const acb_theta_ctx_z_t ctx_real, slong prec);
-void acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, acb_t c, const acb_theta_ctx_z_t ctx,
-    const acb_theta_ctx_tau_t ctx_tau, ulong a, slong prec);
 void acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slong nb, slong prec);
 int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z_t ctx2);
 
