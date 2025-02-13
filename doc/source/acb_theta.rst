@@ -1794,26 +1794,15 @@ Checks that :func:`acb_siegel_is_reduced` returns 1 on the matrix `i I_g`, but
 
     ./build/acb_theta/test/main acb_theta_siegel_kappa
 
-Checks that the results of :func:`acb_siegel_kappa` and
-:func:`acb_siegel_kappa2` are compatible on random input.
+Checks that the results of :func:`acb_siegel_kappa` are compatible under matrix
+multiplication, and when varying the *sqr* parameter.
 
 .. code-block:: bash
 
     ./build/acb_theta/test/main acb_theta_char_dot
 
-Checks that dot products computed by :func:`acb_theta_char_dot`,
-:func:`acb_theta_char_dot_slong` and :func:`acb_theta_char_dot_acb` agree on
-random input.
-
-.. code-block:: bash
-
-    ./build/acb_theta/test/main acb_theta_char_is_even
-    ./build/acb_theta/test/main acb_theta_char_is_goepel
-    ./build/acb_theta/test/main acb_theta_char_is_syzygous
-
-Respectively checks, for `g=2`, that the 10 even theta characteristics are 0,
-1, 2, 3, 4, 6, 8, 9, 12, 15; that there are exactly 15 Göpel quadruples; and
-that there are exactly 60 syzygous triples.
+Checks that dot products computed by :func:`acb_theta_char_dot`, and
+:func:`acb_theta_char_dot_slong` agree on random input.
 
 .. code-block:: bash
 
@@ -1860,9 +1849,9 @@ Checks that the chain rule holds: if `N_3 = N_2 N_1`, then applying
 
 Generates a random ellipsoid *E* using :func:`acb_theta_eld_set`. Then,
 generates random points *pt*: if *pt* is in *E* according to
-:func:`acb_theta_eld_contains`, then *pt* must appear in the list of points,
-otherwise the norm of *pt* according to the chosen Cholesky matrix must be at
-least the radius of *E*.
+:func:`acb_theta_eld_contains`, then *pt* must appear in the list of points and
+be contained in exactly one child of *E*; otherwise the norm of *pt* according
+to the chosen Cholesky matrix must be at least the radius of *E*.
 
 .. code-block:: bash
 
@@ -1870,7 +1859,7 @@ least the radius of *E*.
 
 Generates a random ellipsoid *E*, computes its border using
 :func:`acb_theta_eld_border`, and checks that none of these border points lie
-in *E* nor any of its children.
+in *E*.
 
 .. code-block:: bash
 
@@ -1903,7 +1892,6 @@ expected values and are never indeterminate.
     ./build/acb_theta/test/main acb_theta_ctx_tau_dupl
     ./build/acb_theta/test/main acb_theta_ctx_z_dupl
     ./build/acb_theta/test/main acb_theta_ctx_z_add_real
-    ./build/acb_theta/test/main acb_theta_ctx_z_shift_a0
 
 Checks that the result of those functions overlaps with new contexts
 constructed with :func:`acb_theta_ctx_tau_set` and/or
@@ -1912,23 +1900,9 @@ constructed with :func:`acb_theta_ctx_tau_set` and/or
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_sum_00
+    ./build/acb_theta/test/main acb_theta_sum
 
-Checks that the ouput of :func:`acb_theta_sum_00` overlaps the first entry of
-the output of :func:`acb_theta_sum_0b`.
-
-.. code-block:: bash
-
-    ./build/acb_theta/test/main acb_theta_sum_a0_tilde
-
-Checks that the ouput of :func:`acb_theta_sum_a0_tilde` overlaps the relevant
-entries of the output of :func:`acb_theta_sum_all_tilde`.
-
-.. code-block:: bash
-
-    ./build/acb_theta/test/main acb_theta_sum_all_tilde
-
-Checks that the results of :func:`acb_theta_sum_all_tilde` agree with
+Checks that the results of :func:`acb_theta_sum` agree with
 :func:`acb_modular_theta` as follows: if the input matrix `\tau` is diagonal
 with coefficients `\tau_0,\ldots, \tau_{g-1}`, then for all characteristics
 `(a,b)` and vectors `z`, we have
@@ -1939,16 +1913,9 @@ with coefficients `\tau_0,\ldots, \tau_{g-1}`, then for all characteristics
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_sum_jet_00
+    ./build/acb_theta/test/main acb_theta_sum_jet
 
-Checks that the output of :func:`acb_theta_sum_jet_00` agrees with the relevant
-entries of :func:`acb_theta_sum_jet_all` on random input.
-
-.. code-block:: bash
-
-    ./build/acb_theta/test/main acb_theta_sum_jet_all
-
-Checks that the results of :func:`acb_theta_sum_jet_all` agree with
+Checks that the results of :func:`acb_theta_sum_jet` agree with
 :func:`acb_modular_theta_jet` as follows: if the input matrix `\tau` is
 diagonal with coefficients `\tau_0,\ldots, \tau_{g-1}`, then for all
 characteristics `(a,b)`, any vector `z`, and any derivation tuple
@@ -1998,90 +1965,68 @@ value of `\delta` (e.g. 25).
     ./build/acb_theta/test/main acb_theta_ql_lower_dim
 
 Checks that applying :func:`acb_theta_ql_lower_dim`, computing
-lower-dimensional theta values using :func:`acb_theta_sum_a0_tilde` or
-:func:`acb_theta_sum_all_tilde`, then recombining them using
-:func:`acb_theta_ql_recombine` agrees with a call to summation algorithms in
-dimension `g`.
+lower-dimensional theta values using :func:`acb_theta_sum`, then recombining
+them using :func:`acb_theta_ql_recombine` agrees with a call to summation
+algorithms in dimension `g`.
 
 .. code-block:: bash
 
     ./build/acb_theta/test/main acb_theta_ql_setup
 
-Calls :func:`acb_theta_ql_setup` on random input. If the output is 1, then
-checks that all the computed low-precision approximations of theta values are
-indeed nonzero.
-
-.. code-block:: bash
-
-    ./build/acb_theta/test/main acb_theta_ql_steps
-
-Constructs suitable input data for :func:`acb_theta_ql_steps` using
-:func:`acb_theta_ql_setup` and :func:`acb_theta_sum_a0_tilde`, then checks that
-the result of the duplication steps agrees with another call to
-:func:`acb_theta_sum_a0_tilde` or :func:`acb_theta_sum_all_tilde`.
+Calls :func:`acb_theta_ql_setup` on random input, checks that the output value
+is 1, then checks that all the computed low-precision approximations of theta
+values are indeed nonzero.
 
 .. code-block:: bash
 
     ./build/acb_theta/test/main acb_theta_ql_exact
 
 Checks that the result of :func:`acb_theta_ql_exact` agrees with
-:func:`acb_theta_sum_a0_tilde` or :func:`acb_theta_sum_all_tilde` on random
-input.
+:func:`acb_theta_sum` on random input, and is not indeterminate.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_local_bound
+    ./build/acb_theta/test/main acb_theta_ql_local_bound
 
 Generates random `(z,\tau)` at a working precision that is not too low and
-calls :func:`acb_theta_local_bound` to compute the bounds *c* and *rho*. Checks
-that they are finite and that their definition is satisfied by sampling theta
-values on the corresponding neighborhood of `z` at low precisions with
-:func:`acb_theta_sum_all_tilde`.
+calls :func:`acb_theta_ql_local_bound` to compute the bounds *c* and
+*rho*. Checks that they are finite and that their definition is satisfied by
+sampling theta values on the corresponding neighborhood of `z` at low
+precisions with :func:`acb_theta_sum`.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_jet_error
+    ./build/acb_theta/test/main acb_theta_ql_jet_error
 
 Generates two pairs `(z_1,\tau_1)` and `(z_2,\tau_2)` close to each other but
 not overlapping, sets `(z,\tau)` to be their reunion (as complex balls on each
-coefficient), and calls :func:`acb_theta_jet_error` on `(z,\tau)` for some
+coefficient), and calls :func:`acb_theta_ql_jet_error` on `(z,\tau)` for some
 choice of derivation order. The difference between the results of
-:func:`acb_theta_sum_jet_all` on `(z_1,\tau_1)` and `(z_2,\tau_2)` must then be
-at most two times the computed error.
+:func:`acb_theta_sum_jet` on `(z_1,\tau_1)` and `(z_2,\tau_2)` must then be at
+most two times the computed error.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_all_notransform
+    ./build/acb_theta/test/main acb_theta_ql_jet_fd
+    ./build/acb_theta/test/main acb_theta_jet_notransform
 
-Checks that :func:`acb_theta_all_notransform` agrees with
-:func:`acb_theta_sum_all_tilde` (after multiplying back by the correct
-exponential factors) on random input.
-
-.. code-block:: bash
-
-    ./build/acb_theta/test/main acb_theta_jet_all_notransform
-
-Checks that :func:`acb_theta_jet_all_notransform` agrees with
-:func:`acb_theta_sum_jet_all` on random input.
+Checks that the output of these functions agrees with :func:`acb_theta_sum_jet`
+on random input, and is not indeterminate.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_one_notransform
-    ./build/acb_theta/test/main acb_theta_jet_one_notransform
+    ./build/acb_theta/test/main acb_theta_reduce_z
 
-Checks that the output of these function agrees with their *all_notransform*
-counterparts.
+Checks that on random input, the entries of the output *r* always consist of
+even integers, and the imaginary part of *new_zs* is indeed `y - Yr`.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_00
-    ./build/acb_theta/test/main acb_theta_all
-    ./build/acb_theta/test/main acb_theta_jet_00
-    ./build/acb_theta/test/main acb_theta_jet_all
+    ./build/acb_theta/test/main acb_theta_jet
 
-Checks that these functions agree with their *notransform* counterparts on
-random input. The matrix `\tau` is chosen to be a priori non-reduced but still
-reasonably close to the reduced domain.
+Checks that the output of :func:`acb_theta_jet` and
+:func:`acb_theta_jet_notransform` agree. The matrix `\tau` is chosen to be a
+priori non-reduced but still reasonably close to the reduced domain.
 
 .. code-block:: bash
 
@@ -2100,14 +2045,6 @@ transvectant `(f,f)_6` as computed by :func:`acb_theta_g2_transvectant` is
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_g2_transvectant_lead
-
-Checks that the result of :func:`acb_theta_g2_transvectant_lead` is indeed the
-leading term of the result of :func:`acb_theta_g2_transvectant` on random
-input.
-
-.. code-block:: bash
-
     ./build/acb_theta/test/main acb_theta_g2_character
 
 Checks that the results of :func:`acb_theta_g2_character` and
@@ -2117,23 +2054,20 @@ character.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_g2_psi4
-    ./build/acb_theta/test/main acb_theta_g2_psi6
-    ./build/acb_theta/test/main acb_theta_g2_chi10
-    ./build/acb_theta/test/main acb_theta_g2_chi12
+    ./build/acb_theta/test/main acb_theta_g2_even_weight
     ./build/acb_theta/test/main acb_theta_g2_chi35
 
-Checks that the result of the test is either invariant, multiplied by `\pm 1`,
-or by a power of `i` (depending on the weight modulo 4) when applying
-:func:`acb_theta_char_shuffle` on any input vector. The multiplicative factor
-is given by :func:`acb_siegel_kappa2`.
+Checks that the computed values of those modular forms are either invariant,
+multiplied by `\pm 1`, or by a power of `i` (depending on the weight modulo 4)
+when applying :func:`acb_theta_char_shuffle` on any input vector. The
+multiplicative factor is given by :func:`acb_siegel_kappa2`.
 
 .. code-block:: bash
 
     ./build/acb_theta/test/main acb_theta_g2_chi5
 
-Checks that the result of :func:`acb_theta_g2_chi5` squares to the result of
-:func:`acb_theta_g2_chi10` on any input vector.
+Checks that the result of :func:`acb_theta_g2_chi5` squares to `\chi_{10}` on
+any input vector.
 
 .. code-block:: bash
 
@@ -2146,34 +2080,23 @@ transformation law on random input.
 
 .. code-block:: bash
 
-    ./build/acb_theta/test/main acb_theta_g2_sextic
-
-Checks that the discriminant of the result of :func:`acb_theta_g2_sextic` on a
-random matrix `\tau` is `2^{12}\chi_{10}(\tau)`, as computed by
-:func:`acb_theta_g2_chi10`.
-
-.. code-block:: bash
-
     ./build/acb_theta/test/main acb_theta_g2_sextic_chi5
 
-Checks that the results of :func:`acb_theta_g2_sextic_chi5` agree with those of
-:func:`acb_theta_g2_sextic` and :func:`acb_theta_g2_chi5` on random input.
+Checks that the discriminant of the computed sextic on a random matrix `\tau`
+is `2^{12}\chi_{10}(\tau)`, as computed by :func:`acb_theta_g2_even_weight`,
+and also that `\chi_5(\tau)^2 = \chi_{10}(\tau)`.
 
 .. code-block:: bash
 
     ./build/acb_theta/test/main acb_theta_g2_covariants
 
 Checks that the output of :func:`acb_theta_g2_covariants` agrees with that of
-:func:`acb_theta_g2_psi4` using the relation `20\psi_4 = - C_{2,0} + 3
+:func:`acb_theta_g2_even_weight` using the relation `20\psi_4 = - C_{2,0} + 3
 C_{4,0})`. Also checks that each covariant, when evaluated on the result of
-:func:`acb_theta_g2_sextic`, defines a Siegel modular function of the correct
-weight by evaluating the transformation law, and that covariants take integral
-values when the input polynomial is integral.
+:func:`acb_theta_g2_sextic_chi5`, defines a Siegel modular function of the
+correct weight by evaluating the transformation law, and that covariants take
+integral values when the input polynomial is integral.
 
-.. code-block:: bash
+Profiling
+-------------------------------------------------------------------------------
 
-    ./build/acb_theta/test/main acb_theta_g2_covariants_lead
-
-Checks that the results of :func:`acb_theta_g2_covariants_lead` are indeed the
-leading terms of the results of :func:`acb_theta_g2_covariants` on random
-input.
