@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "acb_theta.h"
 
 /* See Cléry, Faber, van der Geer, "Covariants of binary sextics and modular
