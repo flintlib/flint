@@ -1,0 +1,38 @@
+option('tests', type : 'feature', value : 'disabled',
+        description: 'Build the tests')
+option('libtool_lock', type : 'feature', value : 'enabled',
+        description: 'Use libtool lock')
+option('pthread', type : 'feature', value : 'enabled',
+        description: 'Use pthread')
+option('reentrant', type : 'feature', value : 'disabled',
+        description: 'Build the reentrant module')
+option('thread_safe', type : 'feature', value : 'enabled',
+        description: 'Build the threadsafe module')
+option('assert', type : 'feature', value : 'disabled',
+        description: 'Enable assertions')
+option('pretty_tests', type : 'feature', value : 'enabled',
+        description: 'Pretty print test output')
+option('gmp_internals', type : 'feature', value : 'auto',
+        description: 'Use GMP internals')
+option('assembly', type : 'feature', value : 'auto',
+        description: 'Use assembly code')
+option('avx2', type : 'feature', value : 'disabled',
+        description: 'Use AVX2 instructions')
+option('avx512', type : 'feature', value : 'disabled',
+        description: 'Use AVX512 instructions')
+option('fft_small', type : 'feature', value : 'auto',
+        description: 'Build the fft_small module')
+option('blas', type : 'feature', value : 'disabled',
+        description: 'Use BLAS')
+option('gc', type : 'feature', value : 'disabled',
+        description: 'Use the Boehm garbage collector')
+option('ntl', type : 'feature', value : 'disabled',
+        description: 'Use NTL (in tests)')
+# Not included from original configure:
+# coverage  -Db_coverage=true
+# debug
+# dependency_tracking
+# with-pic
+# with-aix-soname
+# with-gnu-ld
+# with-sysroot
