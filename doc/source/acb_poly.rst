@@ -1159,3 +1159,23 @@ Root-finding
     If this function returns zero, then the signs of the imaginary parts
     are not known for certain, based on the accuracy of the inputs
     and the working precision *prec*.
+
+
+Vector functions
+-------------------------------------------------------------------------------
+
+.. function:: acb_poly_struct * _acb_poly_vec_init(slong n)
+
+.. function:: void _acb_poly_vec_clear(acb_poly_struct *vec, slong n)
+
+.. function:: void _acb_poly_vec_set(acb_poly_struct *dest, const acb_poly_struct *src, slong n)
+
+.. function:: void _acb_poly_vec_set_block(acb_poly_struct *dest, const acb_poly_struct *src, slong n, slong base, slong len)
+
+.. function:: void _acb_poly_vec_fit_length(acb_poly_struct *vec, slong n, slong len)
+
+.. function:: void _acb_poly_vec_set_length(acb_poly_struct *vec, slong n, slong len)
+
+.. function:: void _acb_poly_vec_normalise(acb_poly_struct *vec, slong n)
+
+.. function:: int _acb_poly_vec_overlaps(acb_poly_struct *vec1, acb_poly_struct *vec2, slong n)
