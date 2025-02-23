@@ -12,6 +12,8 @@
 /* Include functions *********************************************************/
 
 #include "t-2add_n_inplace.c"
+#include "t-aors_n.c"
+#include "t-aorsrsh_n.c"
 #include "t-divides.c"
 #include "t-divrem_preinv1.c"
 #include "t-divrem_preinvn.c"
@@ -40,6 +42,8 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(flint_mpn_2add_n_inplace),
+    TEST_FUNCTION(flint_mpn_aors_n),
+    TEST_FUNCTION(flint_mpn_aorsrsh_n),
     TEST_FUNCTION(flint_mpn_divides),
     TEST_FUNCTION(flint_mpn_divrem_preinv1),
     TEST_FUNCTION(flint_mpn_divrem_preinvn),
