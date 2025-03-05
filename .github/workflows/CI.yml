@@ -311,13 +311,7 @@ jobs:
 
     runs-on: ubuntu-24.04
 
-    # NOTE: Clang is currently buggy on Ubuntu.  Hence, we temporarily allow
-    # this job to fail.
-    continue-on-error: true
-
     env:
-      LOCAL: ${{ github.workspace }}/local
-      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CC: "clang"
       FLINT_TEST_MULTIPLIER: "5"
 
