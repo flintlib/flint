@@ -189,7 +189,8 @@ HEADER_DIRS :=                                                              \
         fmpz_mod_mpoly_factor           fmpq_mpoly_factor                   \
         fq_nmod_mpoly_factor            fq_zech_mpoly_factor                \
                                                                             \
-        fft             @FFT_SMALL@     fmpz_poly_q     fmpz_lll            \
+        fft             n_fft		@FFT_SMALL@                         \
+	fmpz_poly_q     fmpz_lll            				    \
         n_poly          arith           qsieve          aprcl               \
                                                                             \
         nf              nf_elem         qfb                                 \
