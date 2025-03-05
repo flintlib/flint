@@ -187,6 +187,64 @@ jobs:
 
 
   ##############################################################################
+  # ubuntu arm
+  ##############################################################################
+  ubuntu-arm:
+    name: Ubuntu ARM (x5)
+
+    runs-on: ubuntu-24.04-arm
+
+    env:
+      CC: "gcc"
+      FLINT_TEST_MULTIPLIER: "5"
+
+    steps:
+      - name: "Rescale multiplier"
+        run: |
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y \
+            libgmp-dev \
+            libmpfr-dev \
+            autoconf \
+            libtool-bin
+
+          # Check versions
+          gcc --version
+          make --version
+          autoconf --version
+          libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+
+      - name: "Configure"
+        run: |
+          ./bootstrap.sh
+          ./configure \
+            CC=${CC} \
+            --disable-debug
+
+      - name: "Compile library"
+        run: |
+          $MAKE
+          ldd libflint.so
+
+      - name: "Compile tests"
+        run: |
+          $MAKE tests
+
+      - name: "Check"
+        run: |
+          $MAKE check
+
+
+
+  ##############################################################################
   # macos (M1) with clang
   ##############################################################################
   macos-m1:
