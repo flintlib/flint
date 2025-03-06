@@ -6,7 +6,7 @@ rm -rf autom4te.cache
 autoreconf -i -v -Wall
 
 # The following lines are from Semigroups/Semigroups, written by Max Horn.
-if ! test -x config/config.guess -a -x config/config.sub ;
+if ! test -x config/install-sh ;
 then
     automake -acf 2> /dev/null || :
 fi
