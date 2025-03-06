@@ -685,7 +685,12 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
-      coreibwl | broadwell)
+      zen5)
+        gcc_cflags_arch="-march=znver5 -march=znver4"
+        param_path="x86_64/zen4"  # fallback, to be refined
+        have_avx512="yes"
+        ;;
+      broadwell)
         gcc_cflags_arch="-march=broadwell"
         param_path="x86_64/broadwell"
         ;;
