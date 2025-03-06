@@ -685,7 +685,12 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
-      coreibwl | broadwell)
+      zen5)
+        gcc_cflags_arch="-march=znver5 -march=znver4"
+        param_path="x86_64/zen4"  # fallback, to be refined
+        have_avx512="yes"
+        ;;
+      broadwell)
         gcc_cflags_arch="-march=broadwell"
         param_path="x86_64/broadwell"
         ;;
@@ -1396,12 +1401,16 @@ then
 
     GMP_FINISH
 else
-    # NOTE: LSYM_PREFIX is needed for longlong_asm_gnu.h
-    GMP_INIT(tmpconf)
-    GMP_ASM_TEXT
-    GMP_ASM_LABEL_SUFFIX
-    GMP_ASM_LSYM_PREFIX
-    rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
+    # LSYM_PREFIX is still needed for x86-64 and ARM64 in longlong_asm_gnu.h
+    case $host in
+        ARM64_PATTERN | X86_64_PATTERN)
+            GMP_INIT(tmpconf)
+            GMP_ASM_TEXT
+            GMP_ASM_LABEL_SUFFIX
+            GMP_ASM_LSYM_PREFIX
+            rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
+            ;;
+    esac
 fi
 
 if test "$enable_assembly" = "yes";
