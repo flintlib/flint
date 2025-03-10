@@ -12,29 +12,18 @@
 
 #ifdef T
 
+#include "gr.h"
+#include "gr_mat.h"
 #include "templates.h"
 
 slong
 TEMPLATE(T, mat_rank) (const TEMPLATE(T, mat_t) A,
                        const TEMPLATE(T, ctx_t) ctx)
 {
-    slong m, n, rank;
-    slong *perm;
-    TEMPLATE(T, mat_t) tmp;
-
-    m = A->r;
-    n = A->c;
-
-    if (m == 0 || n == 0)
-        return 0;
-
-    TEMPLATE(T, mat_init_set) (tmp, A, ctx);
-    perm = flint_malloc(sizeof(slong) * m);
-
-    rank = TEMPLATE(T, mat_lu) (perm, tmp, 0, ctx);
-
-    flint_free(perm);
-    TEMPLATE(T, mat_clear) (tmp, ctx);
+    gr_ctx_t gr_ctx;
+    slong rank;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_rank_lu(&rank, (const gr_mat_struct *) A, gr_ctx));
     return rank;
 }
 

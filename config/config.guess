@@ -955,6 +955,7 @@ main ()
           else if (model == 0xa7) cpu_64bit = 1, cpu_avx=1, modelstr = "rocketlake"; /* Rocket Lake S */
           else if (model == 0xba) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
           else if (model == 0xb7) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
+          else if (model == 0xaa) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Meteor Lake H, U */
           else                    cpu_64bit = 1,            modelstr = "nehalem";    /* default */
 
           if (strcmp (modelstr, "haswell") == 0 ||
@@ -1063,6 +1064,10 @@ main ()
               modelstr = "zen4";
               break;
           }
+          break;
+        case 26:                /* Zen 5 */
+          cpu_64bit = 1, cpu_avx = 1, modelstr = "zen5";
+          break;
       }
   }
   else if (strcmp (vendor_string, "HygonGenuine") == 0)

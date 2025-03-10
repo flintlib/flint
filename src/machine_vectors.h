@@ -1469,7 +1469,7 @@ FLINT_FORCE_INLINE vec2d vec2n_convert_limited_vec2d(vec2n a) {
 }
 
 FLINT_FORCE_INLINE void vec2n_store_unaligned(ulong* z, vec2n a) {
-   vst1q_u64((unsigned long long *) z, a);
+   vst1q_u64((uint64_t *) z, a);
 }
 
 FLINT_FORCE_INLINE vec2n vec2d_convert_limited_vec2n(vec2d a) {
@@ -1482,7 +1482,7 @@ FLINT_FORCE_INLINE vec2n vec2n_set_n(ulong a) {
 }
 
 FLINT_FORCE_INLINE vec2n vec2n_load_unaligned(const ulong* a) {
-    return vld1q_u64((const unsigned long long *) a);
+    return vld1q_u64((const uint64_t *) a);
 }
 
 // Right shift 32bits

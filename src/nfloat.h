@@ -137,13 +137,13 @@ int nfloat_set(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 truth_t nfloat_equal(nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 
 NFLOAT_INLINE
-int _nfloat_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+int nfloat_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
     return GR_UNABLE;
 }
 
 NFLOAT_INLINE
-int _nfloat_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
+int nfloat_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 {
     *res = NFLOAT_CTX_PREC(ctx);
     return GR_SUCCESS;

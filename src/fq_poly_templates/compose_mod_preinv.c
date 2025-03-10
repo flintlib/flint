@@ -14,7 +14,7 @@
 #ifdef T
 
 #include "gr.h"
-#include "gr_mat.h"
+#include "gr_poly.h"
 #include "templates.h"
 
 void

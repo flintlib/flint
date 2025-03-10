@@ -404,7 +404,7 @@ Evaluation
 
     These functions return `0` when the operation would imply unreasonable arithmetic.
 
-.. function:: void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A, fq_nmod_struct * const *  vals, const fq_nmod_mpoly_ctx_t ctx)
+.. function:: void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A, fq_nmod_struct * const * vals, const fq_nmod_mpoly_ctx_t ctx)
 
     Set *ev* the evaluation of *A* where the variables are replaced by the corresponding elements of the array *vals*.
 

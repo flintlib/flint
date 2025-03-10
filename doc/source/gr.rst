@@ -175,8 +175,8 @@ Flags can be OR'ed and checked only at the top level of a computation
 to avoid complex control flow::
 
     status = GR_SUCCESS;
-    gr |= gr_add(res, a, b, ctx);
-    gr |= gr_pow_ui(res, res, 2, ctx);
+    status |= gr_add(res, a, b, ctx);
+    status |= gr_pow_ui(res, res, 2, ctx);
     ...
 
 If we do not care about recovering from *undefined*/*unknown* results,

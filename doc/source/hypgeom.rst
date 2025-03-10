@@ -8,7 +8,7 @@ of the form
 
 .. math::
 
-    \sum_{k=0}^{n-1} \frac{A(k)}{B(k)} \prod_{j=1}^k \frac{P(k)}{Q(k)} z^k
+    \sum_{k=0}^{n-1} \frac{A(k)}{B(k)} z^k \prod_{j=1}^k \frac{P(j)}{Q(j)}
 
 where `A, B, P, Q` are polynomials. The present version only supports
 `A, B, P, Q \in \mathbb{Z}[k]` (represented using the

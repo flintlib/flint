@@ -113,16 +113,16 @@ define(X86_PATTERN,
 [[i?86*-*-* | k[5-8]*-*-* | pentium*-*-* | athlon-*-* | viac3*-*-* | geode*-*-* | atom-*-*]])
 
 define(X86_64_PATTERN,
-[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | zen*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-* | x86_64v[1234]-*-*]])
+[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar-*-* | bulldozer-*-* | piledriver-*-* | steamroller-*-* | excavator-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | x86_64v[1234]-*-* | nano-*-* | nehalem-*-* | westmere-*-* | sandybridge-*-* | ivybridge-*-* | haswell-*-* | zen[12345]-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | cometlake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | meteorlake-*-* | knightslanding-*-* | sapphirerapids-*-*]])
 
 define(X86_64_ADX_PATTERN,
-[[zen[1234]-*-* | coreibwl-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | knightslanding-*-* | sapphirerapids-*-* | cometlake-*-*]])
+[[zen[12345]-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | cometlake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | meteorlake-*-* | knightslanding-*-* | sapphirerapids-*-*]])
 
 define(ARM64_PATTERN,
 [[armcortexa53-*-* | armcortexa53neon-*-* | armcortexa55-*-* | armcortexa55neon-*-* | armcortexa57-*-* | armcortexa57neon-*-* | armcortexa7[2-9]-*-* | armcortexa7[2-9]neon-*-* | armexynosm1-*-* | armthunderx-*-* | armxgene1-*-* | aarch64*-*-* | applem[1-9]*-*-* | armv8*-*-*]])
 
 define(SLOW_VROUNDPD_PATTERN,
-[[haswell* | broadwell* | skylake* | kabylake* | icelake* | tigerlake* | rocketlake* | alderlake* | raptorlake*]])
+[[haswell* | broadwell* | skylake* | kabylake* | icelake* | tigerlake* | rocketlake* | alderlake* | raptorlake* | meteorlake*]])
 
 define(FAST_VROUNDPD_PATTERN,
 [[znver[2-4]* | sandybridge* | ivybridge*]])
@@ -241,11 +241,13 @@ AH_VERBATIM([PRAGMAS],
 #define DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE
 #define DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS
 #define DIAGNOSTIC_IGNORE_UNUSED_VARIABLE
+#define DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
 
 /* Define the following to what optimization pragmas your compiler allows. */
 #define PUSH_OPTIONS
 #define POP_OPTIONS
 #define OPTIMIZE_O2
+#define OPTIMIZE_OSIZE
 #define OPTIMIZE_UNROLL_LOOPS])
 
 flint_cv_pragma_compiler=""
@@ -272,11 +274,13 @@ then
     FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wcast-function-type\"],[DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE])
     FLINT_CHECK_PRAGMA([diagnostic ignored \"-Woverlength-strings\"],[DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS])
     FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wunused-variable\"],[DIAGNOSTIC_IGNORE_UNUSED_VARIABLE])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wmaybe-uninitialized\"],[DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED])
 
     FLINT_CHECK_PRAGMA([push_options],[PUSH_OPTIONS])
     FLINT_CHECK_PRAGMA([pop_options],[POP_OPTIONS])
 
     FLINT_CHECK_PRAGMA([optimize (\"O2\")],[OPTIMIZE_O2])
+    FLINT_CHECK_PRAGMA([optimize (\"Os\")],[OPTIMIZE_OSIZE])
     FLINT_CHECK_PRAGMA([optimize (\"unroll-loops\")],[OPTIMIZE_UNROLL_LOOPS])
 fi
 ])

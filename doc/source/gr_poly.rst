@@ -114,7 +114,22 @@ Basic manipulation
               int gr_poly_gen(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: int gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ctx)
+              int _gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_t ctx)
+              int _gr_poly_get_str(char ** res, const gr_poly_t f, const char * x, gr_ctx_t ctx)
+              int gr_poly_get_str(char ** res, const gr_poly_t f, const char * x, gr_ctx_t ctx)
               int gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_set_str(gr_ptr res, const char * s, const char * x, slong len, gr_ctx_t ctx)
+              int gr_poly_set_str(gr_poly_t res, const char * s, const char * x, gr_ctx_t ctx)
+
+    Parse polynomial from an expression string, assuming that the string in *x* gives
+    the name of the generator. The underscore method zero-pads the result if
+    the length of the parsed polynomial is shorter than *len*, and returns
+    ``GR_UNABLE`` if the length of the parsed polynomial exceeds *len*.
+    Intermediate terms are allowed to be longer than *len*.
+
+    Warning: these methods are not currently optimized for polynomials of high degree
+    and may run with quadratic complexity.
 
 .. function:: int gr_poly_randtest(gr_poly_t poly, flint_rand_t state, slong len, gr_ctx_t ctx)
 
@@ -158,16 +173,6 @@ Arithmetic
               int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
               int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong len, gr_ctx_t ctx)
 
-.. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
-              int gr_poly_scalar_mul(gr_poly_t res, gr_srcptr c, const gr_poly_t poly, gr_ctx_t ctx)
-              int gr_poly_mul_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
-              int gr_poly_mul_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
-              int gr_poly_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz c, gr_ctx_t ctx)
-              int gr_poly_mul_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq c, gr_ctx_t ctx)
-    
-    Sets *res* to *poly* multiplied by the scalar *c* (or the scalar *c* multiplied by *poly*)
-    which must be an element of or coercible to the coefficient ring.
-
 .. function:: int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 
@@ -190,6 +195,41 @@ Arithmetic
     algorithm with `O(n^{1.5})` complexity, the ring must overload :func:`_gr_poly_mul` to dispatch
     to :func:`_gr_poly_mul_toom33` above some cutoff.
 
+.. function:: int gr_poly_add_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+              int gr_poly_add_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+              int gr_poly_add_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+              int gr_poly_add_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz c, gr_ctx_t ctx)
+              int gr_poly_add_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq c, gr_ctx_t ctx)
+
+    Sets *res* to *poly* plus the scalar *c* which must be
+    an element of or coercible to the coefficient ring.
+
+.. function:: int gr_poly_sub_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+              int gr_poly_sub_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+              int gr_poly_sub_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+              int gr_poly_sub_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz c, gr_ctx_t ctx)
+              int gr_poly_sub_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq c, gr_ctx_t ctx)
+
+    Sets *res* to *poly* minus the scalar *c* which must be
+    an element of or coercible to the coefficient ring.
+
+.. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+              int gr_poly_scalar_mul(gr_poly_t res, gr_srcptr c, const gr_poly_t poly, gr_ctx_t ctx)
+              int gr_poly_mul_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
+              int gr_poly_mul_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
+              int gr_poly_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz c, gr_ctx_t ctx)
+              int gr_poly_mul_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq c, gr_ctx_t ctx)
+
+    Sets *res* to *poly* multiplied by the scalar *c* (or the scalar *c* multiplied by *poly*)
+    which must be an element of or coercible to the coefficient ring.
+
+.. function:: int gr_poly_addmul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+
+    Adds *poly* multiplied by the scalar *c* to *res*.
+
+.. function:: int gr_poly_submul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+
+    Subtracts *poly* multiplied by the scalar *c* from *res*.
 
 Powering
 --------------------------------------------------------------------------------
@@ -872,6 +912,22 @@ Modular arithmetic and composition
     Sets ``res`` to the remainder of the product of ``poly1``
     and ``poly2`` upon polynomial division by ``f``. ``finv``
     is the inverse of the reverse of ``f``.
+
+.. function:: int _gr_poly_powmod_fmpz_binexp(gr_ptr res, gr_srcptr poly, const fmpz_t e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int gr_poly_powmod_fmpz_binexp(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, const gr_poly_t f, gr_ctx_t ctx)
+              int _gr_poly_powmod_fmpz_binexp_preinv(gr_ptr res, gr_srcptr poly, const fmpz_t e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_fmpz_binexp_preinv(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+              int _gr_poly_powmod_x_fmpz_preinv(gr_ptr res, const fmpz_t e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_x_fmpz_preinv(gr_poly_t res, const fmpz_t e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+              int _gr_poly_powmod_ui_binexp(gr_ptr res, gr_srcptr poly, ulong e, gr_srcptr f, slong lenf, gr_ctx_t ctx)
+              int gr_poly_powmod_ui_binexp(gr_poly_t res, const gr_poly_t poly, ulong e, const gr_poly_t f, gr_ctx_t ctx)
+              int _gr_poly_powmod_ui_binexp_preinv(gr_ptr res, gr_srcptr poly, ulong e, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_ui_binexp_preinv(gr_poly_t res, const gr_poly_t poly, ulong e, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+              int _gr_poly_powmod_fmpz_sliding_preinv(gr_ptr res, gr_srcptr poly, const fmpz_t e, ulong k, gr_srcptr f, slong lenf, gr_srcptr finv, slong lenfinv, gr_ctx_t ctx)
+              int gr_poly_powmod_fmpz_sliding_preinv(gr_poly_t res, const gr_poly_t poly, const fmpz_t e, ulong k, const gr_poly_t f, const gr_poly_t finv, gr_ctx_t ctx)
+
+    Sets ``res`` to ``poly`` raised to the power ``e``
+    modulo ``f``.
 
 .. function:: int _gr_poly_compose_mod_horner(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, gr_srcptr poly3, slong len3, gr_ctx_t ctx)
               int gr_poly_compose_mod_horner(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, const gr_poly_t poly3, gr_ctx_t ctx)

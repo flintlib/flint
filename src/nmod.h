@@ -30,7 +30,7 @@ extern "C" {
   do { \
     ulong q0xx, q1xx, r1xx; \
     const ulong u1xx = ((a_hi)<<(mod).norm) \
-     + (((mod).norm == 0) ? WORD(0) : (a_lo)>>(FLINT_BITS - (mod).norm)); \
+     + (((mod).norm == 0) ? UWORD(0) : (a_lo)>>(FLINT_BITS - (mod).norm)); \
     const ulong u0xx = (a_lo)<<(mod).norm; \
     const ulong nxx = (mod).n<<(mod).norm; \
     umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx); \
@@ -43,7 +43,7 @@ extern "C" {
 
 #define NMOD_RED(r, a, mod) \
   do { \
-    NMOD_RED2(r, 0, a, mod); \
+    NMOD_RED2(r, UWORD(0), a, mod); \
   } while (0)
 
 #define NMOD2_RED2(r, a_hi, a_lo, mod) \
@@ -109,7 +109,7 @@ NMOD_INLINE ulong nmod_set_ui(ulong x, nmod_t mod)
 NMOD_INLINE
 ulong nmod_set_si(slong x, nmod_t mod)
 {
-    ulong res = FLINT_ABS(x);
+    ulong res = (x >= 0) ? (ulong) x : -(ulong) x;
     NMOD_RED(res, res, mod);
     return (res == 0 || x > 0) ? res : mod.n - res;
 }
@@ -223,9 +223,9 @@ ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
 NMOD_INLINE
 void nmod_init(nmod_t * mod, ulong n)
 {
-   mod->n = n;
-   mod->ninv = n_preinvert_limb(n);
-   mod->norm = flint_clz(n);
+    mod->n = n;
+    mod->norm = flint_clz(n);
+    mod->ninv = n_preinvert_limb_prenorm(n << (mod->norm));
 }
 
 /* discrete logs a la Pohlig - Hellman ***************************************/

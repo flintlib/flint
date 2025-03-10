@@ -255,6 +255,8 @@ WARN_UNUSED_RESULT int gr_mat_rref(slong * res_rank, gr_mat_t R, const gr_mat_t 
 WARN_UNUSED_RESULT int gr_mat_rref_den_fflu(slong * res_rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_rref_den(slong * res_rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_nullspace_from_rref(gr_mat_t X, const gr_mat_t A, gr_srcptr Aden, slong rank, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nullspace_no_resize(slong * nullity, gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx);

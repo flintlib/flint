@@ -11,6 +11,9 @@
 
 #include "arb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void
 arb_dot_fmpz(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep, const fmpz * y, slong ystep, slong len, slong prec)
 {
@@ -142,3 +145,5 @@ arb_dot_fmpz(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
 
     TMP_END;
 }
+
+POP_OPTIONS

@@ -539,7 +539,7 @@ then
     gcc_cflags="-O3 "
 fi
 gcc_cflags="$gcc_cflags-pedantic -std=c11"
-gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
+gcc_warnings="-Werror=implicit-function-declaration -Werror=newline-eof -Wall -Wno-stringop-overread -Wno-stringop-overflow"
 
 dnl We only try to provide specifics for those systems that currently supports
 dnl our assembly routines. If more combinations are wished for than what is
@@ -685,7 +685,12 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
-      coreibwl | broadwell)
+      zen5)
+        gcc_cflags_arch="-march=znver5 -march=znver4"
+        param_path="x86_64/zen4"  # fallback, to be refined
+        have_avx512="yes"
+        ;;
+      broadwell)
         gcc_cflags_arch="-march=broadwell"
         param_path="x86_64/broadwell"
         ;;
@@ -698,14 +703,22 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/skylake"
         have_avx512="yes"
         ;;
-      cannonlake)
-        gcc_cflags_arch="-march=cannonlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
       kabylake)
         gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
+        ;;
+      cometlake)
+        gcc_cflags_arch="-march=skylake"
+        param_path="x86_64/skylake"
+        ;;
+      knightslanding)
+        gcc_cflags_arch="-march=knl"
+        param_path="x86_64/skylake"
+        ;;
+      cannonlake)
+        gcc_cflags_arch="-march=cannonlake"
+        param_path="x86_64/icelake"  # fallback, to be refined
+        have_avx512="yes"
         ;;
       icelake)
         gcc_cflags_arch="-march=icelake-client"
@@ -719,34 +732,30 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       rocketlake)
         gcc_cflags_arch="-march=rocketlake"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"  # fallback, to be refined
         have_avx512="yes"
         ;;
       tigerlake)
         gcc_cflags_arch="-march=tigerlake"
-        param_path="x86_64/skylake"
+        param_path="x86_64/tigerlake"
         have_avx512="yes"
         ;;
       alderlake)
         gcc_cflags_arch="-march=alderlake"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"  # fallback, to be refined
         ;;
       raptorlake)
-        gcc_cflags_arch="-march=alderlake"
-        param_path="x86_64/skylake"
+        gcc_cflags_arch="-march=raptorlake -march=alderlake"
+        param_path="x86_64/raptorlake"
         ;;
-      knightslanding)
-        gcc_cflags_arch="-march=knl"
-        param_path="x86_64/skylake"
+      meteorlake)
+        gcc_cflags_arch="-march=meteorlake -march=alderlake"
+        param_path="x86_64/meteorlake"
         ;;
       sapphirerapids)
         gcc_cflags_arch="-march=sapphirerapids"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"  # fallback, to be refined
         have_avx512="yes"
-        ;;
-      cometlake)
-        gcc_cflags_arch="-march=skylake"
-        param_path="x86_64/skylake"
         ;;
       *)
         AC_MSG_ERROR([Error in deciding flags for $host.
@@ -1392,12 +1401,16 @@ then
 
     GMP_FINISH
 else
-    # NOTE: LSYM_PREFIX is needed for longlong_asm_gnu.h
-    GMP_INIT(tmpconf)
-    GMP_ASM_TEXT
-    GMP_ASM_LABEL_SUFFIX
-    GMP_ASM_LSYM_PREFIX
-    rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
+    # LSYM_PREFIX is still needed for x86-64 and ARM64 in longlong_asm_gnu.h
+    case $host in
+        ARM64_PATTERN | X86_64_PATTERN)
+            GMP_INIT(tmpconf)
+            GMP_ASM_TEXT
+            GMP_ASM_LABEL_SUFFIX
+            GMP_ASM_LSYM_PREFIX
+            rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
+            ;;
+    esac
 fi
 
 if test "$enable_assembly" = "yes";

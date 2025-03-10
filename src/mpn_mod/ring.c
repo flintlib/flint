@@ -475,7 +475,6 @@ mpn_mod_mul_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)
 }
 
 /* todo: check for 0? */
-#define UI_ABS_SI(x) (((slong)(x) < 0) ? (-(ulong)(x)) : ((ulong)(x)))
 
 int
 mpn_mod_mul_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
@@ -484,7 +483,7 @@ mpn_mod_mul_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
     slong tn;
 
-    t[n] = mpn_mul_1(t, x, n, UI_ABS_SI(y));
+    t[n] = mpn_mul_1(t, x, n, FLINT_UABS(y));
     tn = n + (t[n] != 0);
     mpn_mod_set_mpn(res, t, tn, ctx);
     if (y < 0)

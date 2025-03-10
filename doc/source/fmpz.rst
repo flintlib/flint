@@ -903,7 +903,7 @@ Basic arithmetic
     Returns `1` if there is an integer `q` with `f = q g` and `0` if there is
     none.
 
-.. function:: int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
+.. function:: int fmpz_divides(fmpz_t q, const fmpz_t f, const fmpz_t g)
 
     Returns `1` if there is an integer `q` with `f = q g` and sets `q` to the
     quotient. Otherwise returns `0` and sets `q` to `0`.
