@@ -172,21 +172,28 @@ jobs:
         run: |
           (echo "SUBJECT=\"FLINT nightly release\"";
            echo "PRERELEASE=\"--prerelease --draft\"") >> $GITHUB_ENV
-          gh release delete nightly --yes || true
-          git push origin :nightly || true
+          # gh release delete nightly --yes || true
+          # git push origin :nightly || true
 
 
       - if: env.TAG_NAME != 'nightly'
         run: |
           (echo "SUBJECT=\"FLINT v${FLINT_VERSION}\"";
            echo "PRERELEASE=") >> $GITHUB_ENV
-          gh release delete stable --yes || true
-          git push origin :stable || true
+          # gh release delete stable --yes || true
+          # git push origin :stable || true
 
       - name: Generate release message
         run: |
           # Print tag message
+          mkdir tmp
+          cd tmp
+          git clone --bare --filter=blob:none --depth=1 --branch v${FLINT_VERSION} git@github.com:flintlib/flint.git
+          mv flint.git .git
           git for-each-ref refs/tags/v${FLINT_VERSION} --format='%(contents)' > $RUNNER_TEMP/notes.md
+          cd ..
+          rm -rf tmp/
+
           # Generate checksums
           printf '## SHA256 Checksums\n```\n' >> $RUNNER_TEMP/notes.md
           for ext in tar.gz tar.xz zip; do
