@@ -219,7 +219,9 @@ jobs:
       - if: env.TAG_NAME != 'nightly'
         name: "Build PDF documentation"
         run: |
-          sudo apt-get install -y python3-sphinx texlive-full
+          sudo apt-get install -y python3-sphinx
+          # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
+          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk
           sphinx-build --version
           tar -xf flint-${FLINT_VERSION}.tar.gz
           cd flint-${FLINT_VERSION}/doc/
