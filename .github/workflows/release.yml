@@ -245,6 +245,6 @@ jobs:
           done
 
           # Rebuild the website and append version-date tuple to HISTORY
-          ssh -t wbhart@opal6.opalstack.com 'cd ~/flintwebpage && date +'"'"'%Y-%m-%d'"'"' >> HISTORY && export LANG=en_US.UTF-8 && python3 downloads.py ~/apps/flintlib_org && python3 build.py ~/apps/flintlib_org'
+          ssh -t wbhart@opal6.opalstack.com 'cd ~/flintwebpage && printf "%-12s%s\n" '"${FLINT_VERSION}"' "$(date +%Y-%m-%d)" >> HISTORY && export LANG=en_US.UTF-8 && python3 downloads.py ~/apps/flintlib_org && python3 build.py ~/apps/flintlib_org'
 
 # TODO: we could / should perhaps also test `make install` ?
