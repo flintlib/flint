@@ -154,8 +154,7 @@ jobs:
       GH_REPO: ${{ github.repository }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    permissions:
-      contents: write
+    permissions: write-all
 
     # so it only publishes releases on the main repository
     if: github.repository == 'flintlib/flint'
