@@ -315,7 +315,7 @@ Conversion
 
 .. function:: ulong fmpz_get_nmod(const fmpz_t f, nmod_t mod)
 
-    Returns `f \mod n`.
+    Returns `f` modulo the integer given by `mod`.
 
 .. function:: double fmpz_get_d(const fmpz_t f)
 
