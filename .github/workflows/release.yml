@@ -154,8 +154,7 @@ jobs:
       GH_REPO: ${{ github.repository }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    permissions:
-      contents: write
+    permissions: write-all
 
     # so it only publishes releases on the main repository
     if: github.repository == 'flintlib/flint'
@@ -188,7 +187,7 @@ jobs:
           # Print tag message
           mkdir tmp
           cd tmp
-          git clone --bare --filter=blob:none --depth=1 --branch v${FLINT_VERSION} git@github.com:flintlib/flint.git
+          git clone --bare --filter=blob:none --depth=1 --branch v${FLINT_VERSION} https://github.com/flintlib/flint.git
           mv flint.git .git
           git for-each-ref refs/tags/v${FLINT_VERSION} --format='%(contents)' > $RUNNER_TEMP/notes.md
           cd ..
@@ -219,9 +218,12 @@ jobs:
       - if: env.TAG_NAME != 'nightly'
         name: "Build PDF documentation"
         run: |
-          sudo apt-get install -y python3-sphinx texlive-full
+          sudo apt-get install -y python3-sphinx
+          # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
+          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk
           sphinx-build --version
-          cd doc/
+          tar -xf flint-${FLINT_VERSION}.tar.gz
+          cd flint-${FLINT_VERSION}/doc/
           make latexpdf SPHINXOPTS="-W -j auto"
 
       - if: env.TAG_NAME != 'nightly'
@@ -236,10 +238,12 @@ jobs:
         name: "Upload to website"
         run: |
           # Push documentation and tarballs to server
-          mv doc/build/latex/flint.pdf flint-${FLINT_VERSION}.pdf
+          mv flint-${FLINT_VERSION}/doc/build/latex/flint.pdf flint-${FLINT_VERSION}.pdf
           for ext in pdf tar.gz zip; do
             scp flint-${FLINT_VERSION}.$ext wbhart@opal6.opalstack.com:~/apps/flintlib_org/download/
+          done
+
           # Rebuild the website and append version-date tuple to HISTORY
-          ssh -t wbhart@opal6.opalstack.com 'cd ~/flintwebpage && date +'"'"'%Y-%m-%d'"'"' >> HISTORY && python3 downloads.py ~/apps/flintlib_org && python3 build.py ~/apps/flintlib_org'
+          ssh -t wbhart@opal6.opalstack.com 'cd ~/flintwebpage && printf "%-12s%s\n" '"${FLINT_VERSION}"' "$(date +%Y-%m-%d)" >> HISTORY && export LANG=en_US.UTF-8 && python3 downloads.py ~/apps/flintlib_org && python3 citation.py && python3 build.py ~/apps/flintlib_org'
 
 # TODO: we could / should perhaps also test `make install` ?
