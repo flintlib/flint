@@ -243,8 +243,8 @@ Random generation
 For thread-safety, the randomisation methods take as one of their parameters an
 object of type ``flint_rand_t``.  Before calling any of the randomisation
 functions such an object first has to be initialised with a call to
-:func:`flint_randinit`.  When one is finished generating random numbers, one
-should call :func:`flint_randclear` to clean up.
+:func:`flint_rand_init`.  When one is finished generating random numbers, one
+should call :func:`flint_rand_clear` to clean up.
 
 .. function:: void fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
               void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
