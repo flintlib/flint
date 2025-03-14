@@ -63,13 +63,13 @@ AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint/issues/], flint
 AC_CONFIG_AUX_DIR([config])
 AC_LANG(C)
 
-# Every major version of Flint (1.0, 1.1, 1.2, etc.) gets
+# Every major version of FLINT (1.0, 1.1, 1.2, etc.) gets
 # a new major soname number.
 
 # Every time a release happens where interfaces are added
-# to Flint, the minor soname number gets incremented.
+# to FLINT, the minor soname number gets incremented.
 
-# Every patch that is made that doesn't change the Flint
+# Every patch that is made that doesn't change the FLINT
 # interface updates the patch number.
 
 # However, if backwards incompatible changes are made, both
@@ -96,9 +96,10 @@ AC_LANG(C)
 # 3.0.0 => 18.0.0
 # 3.1.0 => 19.0.0
 # 3.2.0 => 20.0.0
+# 3.3.0 => 21.0.0
 
 # NOTE: This must be after AC_INIT
-FLINT_MAJOR_SO=20
+FLINT_MAJOR_SO=21
 FLINT_MINOR_SO=0
 FLINT_PATCH_SO=0
 
