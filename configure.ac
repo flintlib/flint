@@ -258,6 +258,17 @@ yes|no)
 esac],
 enable_dependency_tracking="yes")
 
+AC_ARG_ENABLE(pkg-config,
+[AS_HELP_STRING([--enable-pkg-config],[Enable finding dependency information via pkg-config [default=auto]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-pkg-config. Need yes or no.])
+    ;;
+esac],
+enable_pkg_config="yes")
+
 AC_ARG_ENABLE(pretty-tests,
 [AS_HELP_STRING([--enable-pretty-tests],[Enable pretty printing for tests [default=yes]])],
 [case $enableval in
@@ -337,19 +348,42 @@ esac],
 enable_fast_build="no")
 
 ################################################################################
-# packages
+# programs
 ################################################################################
+
+dnl NOTE: The following line is invoked from LT_INIT
+dnl AC_PROG_CC
+
+AC_PROG_MKDIR_P
+
+if test "$enable_pkg_config" = "yes";
+then
+    AC_PATH_PROGS(PKG_CONFIG, [pkg-config pkgconf], [])
+    if test "x$PKG_CONFIG" = "x";
+    then
+        enable_pkg_config="no"
+    fi
+fi
+AC_ARG_VAR([PKG_CONFIG], [path to pkg-config or pkgconf])
+
+FLINT_CC_IS_GCC
+FLINT_CC_IS_CLANG
+
+################################################################################
+# library dependencies
+################################################################################
+
+# We remove the unused dependencies at a later point
+library_dependencies="gmp mpfr blas gc ntl"
 
 AC_ARG_WITH(gmp_include,
 [AS_HELP_STRING([--with-gmp-include=DIR],[GMP include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-gmp_include_path="$withval"
+gmp_includedir="$withval"
 )
 
 AC_ARG_WITH(gmp_lib,
 [AS_HELP_STRING([--with-gmp-lib=DIR],[GMP library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-gmp_lib_path="$withval"
+gmp_libdir="$withval"
 )
 
 AC_ARG_WITH(gmp,
@@ -360,12 +394,10 @@ then
 elif test "$with_gmp" = "yes";
 then
     :
-elif test -z "$gmp_include_path" && test -z "$gmp_lib_path";
+elif test -z "$gmp_includedir" && test -z "$gmp_libdir";
 then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    gmp_include_path="$withval/include"
-    gmp_lib_path="$withval/lib"
+    gmp_includedir="$withval/include"
+    gmp_libdir="$withval/lib"
     with_gmp="yes"
 else
     AC_MSG_FAILURE([Cannot use --with-gmp along with --with-gmp-include or --with-gmp-lib.])
@@ -375,14 +407,12 @@ with_gmp="yes"
 
 AC_ARG_WITH(mpfr_include,
 [AS_HELP_STRING([--with-mpfr-include=DIR],[MPFR include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-mpfr_include_path="$withval"
+mpfr_includedir="$withval"
 )
 
 AC_ARG_WITH(mpfr_lib,
 [AS_HELP_STRING([--with-mpfr-lib=DIR],[MPFR library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-mpfr_lib_path="$withval"
+mpfr_libdir="$withval"
 )
 
 AC_ARG_WITH(mpfr,
@@ -393,12 +423,10 @@ then
 elif test "$with_mpfr" = "yes";
 then
     :
-elif test -z "$mpfr_include_path" && test -z "$mpfr_lib_path";
+elif test -z "$mpfr_includedir" && test -z "$mpfr_libdir";
 then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    mpfr_include_path="$withval/include"
-    mpfr_lib_path="$withval/lib"
+    mpfr_includedir="$withval/include"
+    mpfr_libdir="$withval/lib"
     with_mpfr="yes"
 else
     AC_MSG_FAILURE([Cannot use --with-mpfr along with --with-mpfr-include or --with-mpfr-lib.])
@@ -408,14 +436,12 @@ with_mpfr="yes"
 
 AC_ARG_WITH(blas_include,
 [AS_HELP_STRING([--with-blas-include=DIR],[Use BLAS and specify its include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-blas_include_path="$withval"
+blas_includedir="$withval"
 )
 
 AC_ARG_WITH(blas_lib,
 [AS_HELP_STRING([--with-blas-lib=DIR],[Use BLAS and specify its library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-blas_lib_path="$withval"
+blas_libdir="$withval"
 )
 
 AC_ARG_WITH(blas,
@@ -425,16 +451,14 @@ then
     :
 elif test "$with_blas" = "no";
 then
-    if test -n "$blas_include_path" || test -n "$blas_lib_path";
+    if test -n "$blas_includedir" || test -n "$blas_libdir";
     then
         AC_MSG_FAILURE([--with-blas-include or --with-blas-lib was specified but --with-blas=no.])
     fi
-elif test -z "$blas_include_path" && test -z "$blas_lib_path";
+elif test -z "$blas_includedir" && test -z "$blas_libdir";
 then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    blas_include_path="$withval/include"
-    blas_lib_path="$withval/lib"
+    blas_includedir="$withval/include"
+    blas_libdir="$withval/lib"
     with_blas="yes"
 else
     AC_MSG_FAILURE([Cannot use --with-blas along with --with-blas-include or --with-blas-lib.])
@@ -442,22 +466,20 @@ fi,
 with_blas="no"
 )
 
-if test "$with_blas" != "no" || test -n "$blas_include_path" || test -n "$blas_lib_path";
+if test "$with_blas" != "no" || test -n "$blas_includedir" || test -n "$blas_libdir";
 then
     with_blas="yes"
 fi
 
 AC_ARG_WITH(gc_include,
 [AS_HELP_STRING([--with-gc-include=DIR],[Use GC and specify its include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-gc_include_path="$withval",
+gc_includedir="$withval",
 with_gc_include="no"
 )
 
 AC_ARG_WITH(gc_lib,
 [AS_HELP_STRING([--with-gc-lib=DIR],[Use GC and specify its library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-gc_lib_path="$withval",
+gc_libdir="$withval",
 with_gc_lib="no"
 )
 
@@ -468,16 +490,14 @@ then
     :
 elif test "$with_gc" = "no";
 then
-    if test -n "$gc_include_path" || test -n "$gc_lib_path";
+    if test -n "$gc_includedir" || test -n "$gc_libdir";
     then
         AC_MSG_FAILURE([--with-gc-include or --with-gc-lib was specified but --with-gc=no.])
     fi
-elif test -z "$gc_include_path" && test -z "$gc_lib_path";
+elif test -z "$gc_includedir" && test -z "$gc_libdir";
 then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    gc_include_path="$withval/include"
-    gc_lib_path="$withval/lib"
+    gc_includedir="$withval/include"
+    gc_libdir="$withval/lib"
     with_gc="yes"
 else
     AC_MSG_FAILURE([Cannot use --with-gc along with --with-gc-include or --with-gc-lib.])
@@ -485,21 +505,19 @@ fi,
 with_gc="no"
 )
 
-if test "$with_gc" != "no" || test -n "$gc_include_path" || test -n "$gc_lib_path";
+if test "$with_gc" != "no" || test -n "$gc_includedir" || test -n "$gc_libdir";
 then
     with_gc="yes"
 fi
 
 AC_ARG_WITH(ntl_include,
 [AS_HELP_STRING([--with-ntl-include=DIR],[Use NTL (in tests) and specify its include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-ntl_include_path="$withval"
+ntl_includedir="$withval"
 )
 
 AC_ARG_WITH(ntl_lib,
 [AS_HELP_STRING([--with-ntl-lib=DIR],[Use NTL (in tests) and specify its library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-ntl_lib_path="$withval"
+ntl_libdir="$withval"
 )
 
 AC_ARG_WITH(ntl,
@@ -509,16 +527,14 @@ then
     :
 elif test "$with_ntl" = "no";
 then
-    if test -n "$ntl_include_path" || test -n "$ntl_lib_path";
+    if test -n "$ntl_includedir" || test -n "$ntl_libdir";
     then
         AC_MSG_FAILURE([--with-ntl-include or --with-ntl-lib was specified but --with-ntl=no.])
     fi
-elif test -z "$ntl_include_path" && test -z "$ntl_lib_path";
+elif test -z "$ntl_includedir" && test -z "$ntl_libdir";
 then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    ntl_include_path="$withval/include"
-    ntl_lib_path="$withval/lib"
+    ntl_includedir="$withval/include"
+    ntl_libdir="$withval/lib"
     with_ntl="yes"
 else
     AC_MSG_FAILURE([Cannot use --with-ntl along with --with-ntl-include or --with-ntl-lib.])
@@ -526,10 +542,74 @@ fi,
 with_ntl="no"
 )
 
-if test "$with_ntl" != "no" || test -n "$ntl_include_path" || test -n "$ntl_lib_path";
+if test "$with_ntl" != "no" || test -n "$ntl_includedir" || test -n "$ntl_libdir";
 then
     with_ntl="yes"
 fi
+
+# Remove unused dependencies from list
+tmp="$library_dependencies"
+for lib in $tmp;
+do
+    eval "with_lib=\"\${with_${lib}}\""
+    if test "$with_lib" = "no";
+    then
+        library_dependencies=`echo $library_dependencies | sed "s/$lib//"`
+    fi
+done
+
+################################################################################
+# library specific flags
+################################################################################
+
+# FIXME: Not the prettiest solution for BLAS
+# FIXME: Fix Boehm GC
+
+for lib in $library_dependencies;
+do
+    eval "with_lib=\"\${with_${lib}}\""
+    eval "tmplibdir=\"\${${lib}_libdir}\""
+    eval "tmpincludedir=\"\${${lib}_includedir}\""
+
+    if test "$lib" = "blas";
+    then
+        FLINT_SET_LIBFLAGS([cblas],[$tmplibdir],[$tmpincludedir],[blas])
+    else
+        FLINT_SET_LIBFLAGS([$lib],[$tmplibdir],[$tmpincludedir])
+    fi
+done
+
+# It may be the case that the user does not have CBLAS but has OpenBLAS.
+if test "$with_blas" = "yes" && test "x$PKG_CONFIG" != "x" && test "x$blas_LIB" = "x";
+then
+    FLINT_SET_LIBFLAGS([openblas],[$blas_libdir],[$blas_includedir],[blas])
+fi
+
+# Push CPPFLAGS and LDFLAGS. CFLAGS and LIBS are done at a later stage.
+for lib in $library_dependencies;
+do
+    eval "tmp=\"\${${lib}_CPPFLAGS}\""
+    if test "x$tmp" != "x";
+    then
+        CPPFLAGS="$CPPFLAGS $tmp"
+    fi
+    eval "tmp=\"\${${lib}_includedir}\""
+    if test "x$tmp" != "x";
+    then
+        CPPFLAGS="$CPPFLAGS -I$tmp"
+    fi
+
+    eval "tmp=\"\${${lib}_LDFLAGS}\""
+    if test "x$tmp" != "x";
+    then
+        LDFLAGS="$LDFLAGS -L$tmp"
+    fi
+    eval "tmp=\"\${${lib}_libdir}\""
+    if test "x$tmp" != "x";
+    then
+        LDFLAGS="$LDFLAGS -L$tmp"
+    fi
+done
 
 ################################################################################
 # architecture specifics
@@ -851,18 +931,6 @@ Please report at <https://github.com/flintlib/flint/issues/>])
 esac
 
 ################################################################################
-# programs
-################################################################################
-
-dnl NOTE: The following line is invoked from LT_INIT
-dnl AC_PROG_CC
-
-AC_PROG_MKDIR_P
-
-FLINT_CC_IS_GCC
-FLINT_CC_IS_CLANG
-
-################################################################################
 # environment variables
 ################################################################################
 
@@ -1056,9 +1124,11 @@ then
 fi
 
 ################################################################################
-# check libraries
+# check libraries, set LIBS
 ################################################################################
 
+# PUSH CFLAGS
+#
 # With certain CFLAGS, the compiler may return an error, thinking that the
 # compiler has not found the function in the library.
 save_CFLAGS="$CFLAGS"
@@ -1161,7 +1231,7 @@ then
     )
 fi
 
-if test "$with_blas" = "yes";
+if test "$with_blas" = "yes" && test "x$blas_LIBS" = "x";
 then
     AC_SEARCH_LIBS([cblas_dgemm],[cblas openblas blas],[],
         [AC_MSG_ERROR([BLAS library was not found.  If you indeed have BLAS installed, please
@@ -1170,12 +1240,18 @@ that we can either fix the issue or give a more proper error message.])]
     )
 fi
 
-if test "$with_ntl" = "yes";
+if test "$with_ntl" = "yes" && test "x$ntl_LIBS" = "x";
 then
     FLINT_CHECK_NTL(,[AC_MSG_ERROR([NTL library was not found.  If you indeed have NTL installed, please
 submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])])
 fi
+
+for lib in $library_dependencies;
+do
+    eval "tmp=\"\${${lib}_LIBS}\"" # " Just to fix highlighting
+    LIBS="$LIBS $tmp"
+done
 
 ################################################################################
 # check settings and environment
@@ -1221,6 +1297,15 @@ then
     AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
                           [CFLAGS="-Werror=unknown-warning-option"])
 fi
+
+for lib in $library_dependencies;
+do
+    eval "tmp=\"\${${lib}_CFLAGS}\"" # " Just to fix highlighting
+    for flag in $tmp;
+    do
+        AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"])
+    done
+done
 
 if test "$enable_coverage" = "yes";
 then
@@ -1313,12 +1398,20 @@ then
     else
         AC_SUBST(UNROLL_LOOPS,0)
     fi
+    # POP CFLAGS
     CFLAGS="$save_CFLAGS"
 else
+    # POP CFLAGS
     CFLAGS="$save_CFLAGS"
     AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR(["Couldn't compile with given CFLAGS!"]))
     AC_SUBST(UNROLL_LOOPS,0)
 fi
+
+# Trim flags
+LIBS=`echo "$LIBS" | tr ' ' '\n' | sort | uniq | xargs`
+LDFLAGS=`echo "$LDFLAGS" | tr ' ' '\n' | sort | uniq | xargs`
+CFLAGS=`echo "$CFLAGS" | tr ' ' '\n' | sort | uniq | xargs`
+CPPFLAGS=`echo "$CPPFLAGS" | tr ' ' '\n' | sort | uniq | xargs`
 
 if test "$testcflags_set" = "no";
 then
@@ -1451,11 +1544,11 @@ AC_SUBST(FLINT_MAJOR_SO)
 AC_SUBST(FLINT_MINOR_SO)
 AC_SUBST(FLINT_PATCH_SO)
 
-AC_SUBST(GMP_LIB_PATH,$gmp_lib_path)
-AC_SUBST(MPFR_LIB_PATH,$mpfr_lib_path)
-AC_SUBST(BLAS_LIB_PATH,$blas_lib_path)
-AC_SUBST(GC_LIB_PATH,$gc_lib_path)
-AC_SUBST(NTL_LIB_PATH,$ntl_lib_path)
+AC_SUBST(GMP_LIB_PATH,$gmp_libdir)
+AC_SUBST(MPFR_LIB_PATH,$mpfr_libdir)
+AC_SUBST(BLAS_LIB_PATH,$blas_libdir)
+AC_SUBST(GC_LIB_PATH,$gc_libdir)
+AC_SUBST(NTL_LIB_PATH,$ntl_libdir)
 
 AC_SUBST(LIB_CPPFLAGS,["-DFLINT_NOSTDIO -DFLINT_NOSTDARG"])
 

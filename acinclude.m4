@@ -128,6 +128,70 @@ define(FAST_VROUNDPD_PATTERN,
 [[znver[2-4]* | sandybridge* | ivybridge*]])
 
 
+
+dnl  FLINT_SET_LIBFLAGS(lib,lib-path,include-path,[library_alias])
+dnl  -----------------------
+dnl  Sets lib_LDFLAGS and lib_CPPFLAGS to include and link library.
+dnl  If pkg-config is available, lib_CFLAGS, lib_LIBS, lib_libdir,
+dnl  lib_includedir are also set and also sets lib_LIBS with the appropriate
+dnl  `-l' flag(s).  Else, straight up use lib-path and include-path.
+
+AC_DEFUN([FLINT_SET_LIBFLAGS],
+[tmpalias=m4_default([$4],[$1])
+
+if test "x$2" != "x";
+then
+    pkgconfigpath="PKG_CONFIG_PATH=$2/pkgconfig"
+fi
+
+if test "$enable_pkg_config" = "yes" && eval "$pkgconfigpath $PKG_CONFIG --path $1"; test "$?" = "0";
+then
+    # libdir
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --variable=libdir $1"` dnl ' Fix Vim syntax
+    eval ${tmpalias}_libdir="\${tmp}"
+    echo "libdir = $tmp"
+
+    # includedir
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --variable=includedir $1"` dnl ' Fix Vim syntax
+    eval ${tmpalias}_includedir="\${tmp}"
+    echo "includedir = $tmp"
+
+    # LIBS
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --libs-only-l $1"` dnl ' Fix Vim syntax
+    eval ${tmpalias}_LIBS="\${tmp}"
+    echo "LIBS = $tmp"
+
+    # LDFLAGS
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --libs-only-L $1"` dnl ' Fix Vim syntax
+    eval ${tmpalias}_LDFLAGS="\${tmp}"
+    echo "LDFLAGS = $tmp"
+
+    # CPPFLAGS
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --cflags-only-other $1" | sed -n 's/\(-D\w\+\)\(\|=\w\+\)/\n\1\2\n/gp' | sed -n '/^-D/p'` dnl ' Fix Vim syntax
+    tmp2=`eval "$pkgconfigpath $PKG_CONFIG --cflags-only-I $1"` dnl ' Fix Vim syntax
+    tmp="$tmp $tmp2"
+    eval ${tmpalias}_CPPFLAGS="\${tmp}"
+    echo "CPPFLAGS = $tmp"
+
+    # CFLAGS
+    tmp=`eval "$pkgconfigpath $PKG_CONFIG --cflags-only-other $withpath $1" | sed 's/\(-D\w\+\)\(\|=\w\+\)//g' | sed 's/  / /g'` dnl ' Fix Vim syntax
+    eval ${tmpalias}_CFLAGS="\${tmp}"
+    echo "CFLAGS = $tmp"
+else
+    if test "x${2}" != "x";
+    then
+        eval ${tmpalias}_LDFLAGS="-L\${2}"
+    fi
+
+    if test "x${3}" != "x";
+    then
+        eval ${tmpalias}_CPPFLAGS="-I\${3}"
+    fi
+fi
+])
+
+
+
 dnl  FLINT_CC_IS_GCC([action-if-true],[action-if-false])
 dnl  -----------------------
 dnl  Checks if compiler is GCC.
