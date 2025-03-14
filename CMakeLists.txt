@@ -13,7 +13,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 if(NOT WIN32)
-    message(WARNING "Detected system is not Windows. Please use the Autotools configuration along with the Makefile instead as it is more up-to-date. Read INSTALL.")
+    message(FATAL_ERROR "Detected system is not Windows.  Please use the Autotools configuration along with the Makefile instead as it is more up-to-date.  Read INSTALL.md.")
 endif()
 
 include(CheckCCompilerFlag)
