@@ -122,6 +122,15 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Fix docstring for ``fmpz_get_nmod`` (David Lowry-Duda).
 
 
+2025-03-17 -- FLINT 3.2.1
+-------------------------------------------------------------------------------
+
+* Bug fixes
+
+  * Properly recognize AMD Zen during configuration (Albin Ahlbäck, reported by
+    Doug Torrance).
+
+
 2025-03-12 -- FLINT 3.2.0
 -------------------------------------------------------------------------------
 
