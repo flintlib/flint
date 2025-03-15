@@ -6,7 +6,15 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-2025-01-20 -- FLINT 3.2.0-rc1
+2025-03-17 -- FLINT 3.2.1
+-------------------------------------------------------------------------------
+
+* Bug fixes
+
+  * Properly recognize AMD Zen during configuration (Albin Ahlbäck, reported by
+    Doug Torrance).
+
+2025-03-12 -- FLINT 3.2.0
 -------------------------------------------------------------------------------
 
 Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
@@ -181,6 +189,7 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
     enough registers to compile this (AA).
   * Fix wrong arithmetic function used in ``n_is_probabprime_lucas`` (FJ,
     reported by Mikhail Hogrefe).
+  * Correct pointer casting for ARM in ``machine_vectors.h`` (AA).
 
 * Build system
 
@@ -214,6 +223,13 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Add C11 atomics for MSVC builds (IF).
   * Recognize Apple M3 and Apple M4 (Pro) in ``config.guess`` (AA).
   * Fix static build for MSVC (IF, TD).
+  * Only check assembly labels when it is actually being used (AA).
+  * Update ``X86_64_PATTERN`` and ``X86_64_ADX_PATTERN`` and add some missing
+    patterns (AA).
+  * Recognize and map Zen 5 with correct CFLAGS and set some initial parameters
+    for the architecture (AA).
+  * Check presence of ``install-sh`` instead of ``config.guess`` during
+    bootstrapping as ``config.guess`` is always present (AA).
 
 * Tests
 
@@ -341,10 +357,11 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Add newlines to end of files that where missing them (AA).
   * Add ``mpn_extras/inlines.c`` (AA).
   * Replace compound literal with a struct to accommodate MSVC (TD).
-  * Cast pointers in `machine_vectors.h` to suppress warnings about
+  * Cast pointers in ``machine_vectors.h`` to suppress warnings about
     incompatible pointers (AA).
   * Make GCC pragmas dispatch only for GCC (AA).
   * Comment out unused static functions (AA).
+  * Check availability of ``rbit`` instruction for ARM in ``n_revbin`` (AA).
 
 * Continuous integration
 
@@ -359,6 +376,10 @@ Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
   * Exclude profiler source code from Codecov (AA).
   * Assume ``lcov`` version 2.1 is available (AA).
   * Touchups and fixes for the release CI (EC).
+  * Add Linux ARM runner (AA).
+  * Fix release CI to automatically make releases when new tags are created,
+    and push related files and generate website accordingly (AA, EC).
+  * Rebuild citation block on website after each release (AA).
 
 * Documentation
 
