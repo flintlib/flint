@@ -978,7 +978,15 @@ fi
 # check GMP
 ################################################################################
 
-FLINT_CHECK_GMP_H(6,2,1)
+AS_IF([test "$enable_gmp_internals" = "yes"], [
+	FLINT_CHECK_GMP_H(6,2,1)
+	GMP_REQUIREMENT="6.2.1"
+], [
+	dnl Dependency on mpn_zero_p
+	FLINT_CHECK_GMP_H(6,1,0)
+	GMP_REQUIREMENT="6.1.0"
+])
+AC_SUBST([GMP_REQUIREMENT])
 FLINT_GMP_LONG_LONG_LIMB([SLONG="long long int"
                           ULONG="unsigned long long int"
                           gmpcompat_h_in="gmpcompat-longlong.h.in"],
@@ -1001,7 +1009,8 @@ AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
 # check MPFR
 ################################################################################
 
-FLINT_CHECK_MPFR_H(4,1,0)
+dnl Dependency on mpfr_rootn_ui
+FLINT_CHECK_MPFR_H(4,0,0)
 
 ################################################################################
 # check ABI
