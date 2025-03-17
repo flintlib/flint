@@ -933,7 +933,7 @@ endif
 ifneq ($(STATIC), 0)
 	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(DESTDIR)$(LIBDIR)
 endif
-	$(CP) $(HEADERS) $(DESTDIR)$(INCLUDEDIR)/flint
+	$(CP) $(HEADERS) $(SRC_DIR)/*.h $(DESTDIR)$(INCLUDEDIR)/flint
 	@echo ""
 	@echo '############################################################'
 	@echo '# NOTE:                                                    #'
