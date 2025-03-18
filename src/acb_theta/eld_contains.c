@@ -14,12 +14,11 @@
 static int
 acb_theta_eld_contains_rec(const acb_theta_eld_t E, const slong * pt)
 {
-    slong d = acb_theta_eld_dim(E);
+    slong d = E->dim;
     slong c = pt[d - 1];
     slong k;
 
-    if (c < acb_theta_eld_min(E)
-        || c > acb_theta_eld_max(E))
+    if (c < (E->min) || c > (E)->max)
     {
         return 0;
     }
@@ -27,23 +26,23 @@ acb_theta_eld_contains_rec(const acb_theta_eld_t E, const slong * pt)
     {
         return 1;
     }
-    else if (c >= acb_theta_eld_mid(E))
+    else if (c >= (E->mid))
     {
-        k = c - acb_theta_eld_mid(E);
-        return acb_theta_eld_contains_rec(acb_theta_eld_rchild(E, k), pt);
+        k = c - (E->mid);
+        return acb_theta_eld_contains_rec(&E->rchildren[k], pt);
     }
     else
     {
-        k = acb_theta_eld_mid(E) - 1 - c;
-        return acb_theta_eld_contains_rec(acb_theta_eld_lchild(E, k), pt);
+        k = (E->mid) - 1 - c;
+        return acb_theta_eld_contains_rec(&E->lchildren[k], pt);
     }
 }
 
 int
 acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt)
 {
-    slong g = acb_theta_eld_ambient_dim(E);
-    slong d = acb_theta_eld_dim(E);
+    slong g = E->ambient_dim;
+    slong d = E->dim;
     slong k;
 
     if (acb_theta_eld_nb_pts(E) == 0)
@@ -53,7 +52,7 @@ acb_theta_eld_contains(const acb_theta_eld_t E, const slong * pt)
 
     for (k = d; k < g; k++)
     {
-        if (pt[k] != acb_theta_eld_coord(E, k))
+        if (pt[k] != E->last_coords[k - d])
         {
             return 0;
         }

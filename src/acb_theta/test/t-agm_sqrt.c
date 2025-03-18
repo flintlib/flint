@@ -19,7 +19,7 @@ TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
 
     /* Test:
        - if nonzero, value of square root should agree; precision remains high
-       - no abort on wrong values of rt_low */
+       - indeterminate on wrong values of rt_low */
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong prec = 100 + n_randint(state, 1000);
@@ -42,11 +42,10 @@ TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
         }
 
         acb_sqr(x, rt, prec);
-        acb_one(t);
+        arb_zero_pm_one(acb_realref(t));
         acb_mul_2exp_si(t, t, -lowprec);
         acb_add_si(t, t, 1, lowprec);
         acb_mul(rt_low, rt, t, lowprec);
-
         acb_theta_agm_sqrt(t, x, rt_low, 1, prec);
         acb_get_rad_ubound_arf(err, t, prec);
 
@@ -79,10 +78,20 @@ TEST_FUNCTION_START(acb_theta_agm_sqrt, state)
             flint_abort();
         }
 
-        if (iter % 10 == 1)
+        acb_randtest_precise(x, state, prec, mag_bits);
+        acb_randtest_precise(rt_low, state, lowprec, mag_bits);
+        acb_theta_agm_sqrt(t, x, rt_low, 1, prec);
+        acb_sqr(rt_low, rt_low, lowprec);
+        if (!acb_overlaps(rt_low, x) && acb_is_finite(t))
         {
-            acb_randtest(rt_low, state, prec, mag_bits);
-            acb_theta_agm_sqrt(t, x, rt_low, 1, prec);
+            flint_printf("FAIL (indeterminate)\n");
+            acb_printd(x, 5);
+            flint_printf("\n");
+            acb_printd(t, 5);
+            flint_printf("\n");
+            acb_printd(rt_low, 5);
+            flint_printf("\n");
+            flint_abort();
         }
 
         acb_clear(rt);
