@@ -19,7 +19,7 @@
 # define HAVE_RBIT 1
 #endif
 
-#if defined(__GNUC__) && FLINT64 && HAVE_RBIT
+#if FLINT64 && __ARM_ACLE && HAVE_RBIT
 # include <arm_acle.h>
 ulong
 n_revbin(ulong n, ulong b)
