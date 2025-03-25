@@ -20,15 +20,18 @@ the bug is of mathematical nature we will need the mathematical context. If
 applicable please provide references to relevant papers.
 
 **System (please complete the following information):**
-* Your OS and its version:
-* The CPU you are on:
-* The version of FLINT (if using the Git version, please specify commit):
-* How you configured FLINT (options pushed to `configure`):
-* <details><summary>The output of `configure`</summary><p>
----
-INSERT HERE
----
-</p></details>
+<ul>
+<li>System CPU:</li>
+<li>Version of FLINT (if using Git, please specify commit):</li>
+<li>How FLINT was configured (i.e. options pushed): <code>INSERT HERE</code></li>
+<li><details>
+<summary>Output of <code>configure</code></summary>
+
+```
+Insert here
+```
+
+</details></li></ul>
 
 **Additional context**
 Add any other context about the problem here.
