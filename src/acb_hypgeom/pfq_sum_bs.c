@@ -31,10 +31,10 @@ A1 B2 + B1 B2 = B2 (A1 + B1) -- use to save time?
 
 */
 
-static void
-factor(acb_t A, acb_t tmp, acb_srcptr a, slong p, const acb_t z, slong k, slong prec)
+static slong
+factor_nonzeros(acb_t A, acb_t tmp, acb_srcptr a, slong p, const acb_t z, slong k, slong prec)
 {
-    slong i;
+    slong i, n_zeros = 0;
 
     if (p == 0)
     {
@@ -50,12 +50,24 @@ factor(acb_t A, acb_t tmp, acb_srcptr a, slong p, const acb_t z, slong k, slong 
         for (i = 1; i < p; i++)
         {
             acb_add_ui(tmp, a + i, k, prec);
-            acb_mul(A, A, tmp, prec);
+            if (acb_is_zero(tmp))
+                n_zeros += 1;
+            else
+                acb_mul(A, A, tmp, prec);
         }
 
         if (z != NULL)
             acb_mul(A, A, z, prec);
     }
+    return n_zeros;
+}
+
+static void
+factor(acb_t A, acb_t tmp, acb_srcptr a, slong p, const acb_t z, slong k, slong prec)
+{
+    slong n_zeros = factor_nonzeros(A, tmp, a, p, z, k, prec);
+    if (n_zeros)
+        acb_zero(A);
 }
 
 static void
@@ -143,11 +155,16 @@ acb_hypgeom_pfq_sum_bs(acb_t s, acb_t t,
     acb_div(s, s, w, prec);
 
     /* split off last factor */
-    factor(t, tmp, a, p, z, n - 1, prec);
+    slong n_zeros_a = factor_nonzeros(t, tmp, a, p, z, n - 1, prec);
     acb_mul(u, u, t, prec);
-    factor(t, tmp, b, q, NULL, n - 1, prec);
+    slong n_zeros_b = factor_nonzeros(t, tmp, b, q, NULL, n - 1, prec);
     acb_mul(w, w, t, prec);
-    acb_div(t, u, w, prec);
+    if (n_zeros_a > n_zeros_b)
+        acb_zero(t);
+    else if (n_zeros_a < n_zeros_b)
+        acb_indeterminate(t);
+    else
+        acb_div(t, u, w, prec);
 
     acb_clear(u);
     acb_clear(v);
@@ -184,11 +201,17 @@ acb_hypgeom_pfq_sum_bs_invz(acb_t s, acb_t t,
     acb_div(s, s, w, prec);
 
     /* split off last factor */
-    factor(t, tmp, a, p, NULL, n - 1, prec);
+    slong n_zeros_a = factor_nonzeros(t, tmp, a, p, z, n - 1, prec);
     acb_mul(u, u, t, prec);
-    factor(t, tmp, b, q, z, n - 1, prec);
+    slong n_zeros_b = factor_nonzeros(t, tmp, b, q, NULL, n - 1, prec);
     acb_mul(w, w, t, prec);
-    acb_div(t, u, w, prec);
+    if (n_zeros_a > n_zeros_b)
+        acb_zero(t);
+    else if (n_zeros_a < n_zeros_b)
+        acb_indeterminate(t);
+    else
+        acb_div(t, u, w, prec);
+
 
     acb_clear(u);
     acb_clear(v);

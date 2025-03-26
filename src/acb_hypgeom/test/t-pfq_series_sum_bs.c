@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
+#include "arb_hypgeom.h"
 
 TEST_FUNCTION_START(acb_hypgeom_pfq_series_sum_bs, state)
 {
@@ -103,6 +104,49 @@ TEST_FUNCTION_START(acb_hypgeom_pfq_series_sum_bs, state)
         acb_poly_clear(t1);
         acb_poly_clear(t2);
     }
+
+
+    /* issue #2268 */
+    arb_t result;
+    arb_init(result);
+
+    slong p = 64;  // Precision
+
+    // Define hypergeometric parameters: pFq({-10, 11, -10}, {1, -10}, 1)
+    arb_struct *a, *b, z;
+    slong p_len = 3, q_len = 2;  // 3F2
+
+    a = _arb_vec_init(p_len);
+    b = _arb_vec_init(q_len);
+    arb_init(&z);
+
+    // Set parameters
+    arb_set_si(&a[0], -10);
+    arb_set_si(&a[1], 11);
+    arb_set_si(&a[2], -10);
+
+    arb_set_si(&b[0], 1);
+    arb_set_si(&b[1], -10);
+
+    arb_set_si(&z, 1);  // z = 1
+
+    // Compute the hypergeometric function
+    arb_hypgeom_pfq(result, a, p_len, b, q_len, &z, 0, p);
+
+    if (!arb_is_one(result))
+    {
+        flint_printf("FAIL: wrong result\n\n");
+        flint_printf("HypergeometricPFQ[{-10, 11, -10}, {1, -10}, 1] = ");
+        arb_print(result);
+        flint_printf("\n");
+        flint_abort();
+    }
+
+    // Clean up
+    _arb_vec_clear(a, p_len);
+    _arb_vec_clear(b, q_len);
+    arb_clear(&z);
+    arb_clear(result);
 
     TEST_FUNCTION_END(state);
 }
