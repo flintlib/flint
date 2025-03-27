@@ -41,6 +41,9 @@ gr_poly_gcd(gr_poly_t G, const gr_poly_t A,
     if (A->length == 0 && B->length == 0)
         return gr_poly_zero(G, ctx);
 
+    if (gr_ctx_is_field(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     if (A->length == 0)
         return gr_poly_make_monic(G, B, ctx);
 
