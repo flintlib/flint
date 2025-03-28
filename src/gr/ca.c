@@ -1484,6 +1484,15 @@ _gr_ca_poly_mullow(ca_ptr res,
 }
 
 int
+_gr_ca_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
+                   int flags, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_algebraically_closed(ctx) == T_TRUE)
+        return gr_generic_poly_factor_roots(c, fac, mult, elt, flags, ctx);
+    return GR_UNABLE;
+}
+
+int
 _gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -1786,6 +1795,7 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_GAMMA,            (gr_funcptr) _gr_ca_gamma},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_ca_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_ca_poly_factor},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_ca_poly_roots},
     /* {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_ca_poly_roots_other}, */
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_ca_mat_mul},

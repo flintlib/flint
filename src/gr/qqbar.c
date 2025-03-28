@@ -1163,6 +1163,15 @@ TRIG3(acsc_pi)
 /* todo: exploit when we know that the field is real */
 
 
+int
+_gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
+                      int flags, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_algebraically_closed(ctx) == T_TRUE)
+        return gr_generic_poly_factor_roots(c, fac, mult, elt, flags, ctx);
+    return GR_UNABLE;
+}
+
 /* todo: quickly skip nonreal roots over the real algebraic numbers */
 int
 _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
@@ -1489,6 +1498,7 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_ASEC_PI,          (gr_funcptr) _gr_qqbar_asec_pi},
     {GR_METHOD_ACSC_PI,          (gr_funcptr) _gr_qqbar_acsc_pi},
 
+    {GR_METHOD_POLY_FACTOR,      (gr_funcptr) _gr_qqbar_poly_factor},
     {GR_METHOD_POLY_ROOTS,       (gr_funcptr) _gr_qqbar_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER, (gr_funcptr) _gr_qqbar_poly_roots_other},
 

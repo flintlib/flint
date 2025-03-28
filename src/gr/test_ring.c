@@ -3165,15 +3165,18 @@ gr_factor_always_able(gr_ctx_t ctx)
 {
     switch (ctx->which_ring)
     {
-        case GR_CTX_FMPZ:
         case GR_CTX_FMPQ:
-        case GR_CTX_FMPZ_POLY:
+        case GR_CTX_FMPZ:
         case GR_CTX_FMPZ_MPOLY:
         case GR_CTX_FMPZ_MPOLY_Q:
+        case GR_CTX_FMPZ_POLY:
             return 1;
         case GR_CTX_GR_POLY:
             switch (POLYNOMIAL_CTX(ctx)->base_ring->which_ring)
             {
+                case GR_CTX_CC_CA:
+                case GR_CTX_COMPLEX_ALGEBRAIC_CA:
+                case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
                 case GR_CTX_FMPZ:
                     return 1;
             }
