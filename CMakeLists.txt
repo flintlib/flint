@@ -150,7 +150,7 @@ set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
 if(HAS_FLAG_ARCH)
     set(CMAKE_REQUIRED_FLAGS "-march=${ENABLE_ARCH}")
 endif()
-if(HAS_FLAG_AVX2)
+if(ENABLE_AVX2)
     set(CMAKE_REQUIRED_FLAGS "${avx2_flag}")
 endif()
 check_c_source_compiles([[
