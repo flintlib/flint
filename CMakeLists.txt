@@ -13,7 +13,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 if(NOT WIN32)
-    message(WARNING "Detected system is not Windows. Please use the Autotools configuration along with the Makefile instead as it is more up-to-date. Read INSTALL.")
+    message(FATAL_ERROR "Detected system is not Windows.  Please use the Autotools configuration along with the Makefile instead as it is more up-to-date.  Read INSTALL.md.")
 endif()
 
 include(CheckCCompilerFlag)
@@ -150,7 +150,7 @@ set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
 if(HAS_FLAG_ARCH)
     set(CMAKE_REQUIRED_FLAGS "-march=${ENABLE_ARCH}")
 endif()
-if(HAS_FLAG_AVX2)
+if(ENABLE_AVX2)
     set(CMAKE_REQUIRED_FLAGS "${avx2_flag}")
 endif()
 check_c_source_compiles([[

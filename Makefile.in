@@ -135,13 +135,17 @@ endif
 # configuration files
 ################################################################################
 
-CFG_FILES :=                                                                \
-        $(FLINT_DIR)/config.h           $(SRC_DIR)/flint-config.h           \
-        $(FLINT_DIR)/config.log         $(SRC_DIR)/flint.h                  \
-        $(SRC_DIR)/gmpcompat.h          $(FLINT_DIR)/flint.pc               \
+CFG_HEADERS :=                                                              \
+        $(SRC_DIR)/config.h             $(SRC_DIR)/flint-config.h           \
+        $(SRC_DIR)/flint.h              $(SRC_DIR)/gmpcompat.h              \
+        $(SRC_DIR)/flint-mparam.h
+
+_CFG_FILES :=                                                                \
+        $(FLINT_DIR)/config.log         $(FLINT_DIR)/flint.pc               \
         $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c              \
-        $(FLINT_DIR)/config.m4          $(SRC_DIR)/flint-mparam.h           \
-        $(FLINT_DIR)/config.status
+        $(FLINT_DIR)/config.m4          $(FLINT_DIR)/config.status
+
+CFG_FILES := $(_CFG_FILES) $(CFG_HEADERS)
 
 ################################################################################
 # directories
@@ -255,7 +259,7 @@ endif
 # headers
 ################################################################################
 
-HEADERS := $(wildcard $(ABS_SRC_DIR)/*.h)
+HEADERS := $(wildcard $(ABS_SRC_DIR)/*.h) $(CFG_HEADERS)
 
 ################################################################################
 # sources
