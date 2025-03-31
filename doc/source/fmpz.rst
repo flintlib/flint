@@ -959,6 +959,28 @@ Basic arithmetic
 
     Assumes that `m \neq 0`, raises an ``abort`` signal otherwise.
 
+.. function:: void fmpz_sum_powers_horner(fmpz_t f, const fmpz_t g, ulong e)
+              void fmpz_sum_powers_div(fmpz_t f, const fmpz_t g, ulong e)
+	      void fmpz_sum_powers(fmpz_t f, const fmpz_t g, ulong e)
+
+   Sets `f` to the sum of powers of `g`, starting at `g^0 = 1` up to and
+   including `p^e`.
+
+   The `horner` method uses a horner-style method to evaluate the sum
+   iteratively.
+
+   The `div` method uses polynomial division to evaluate the sum with a
+   single exponentiation and a single division.
+
+.. function:: void fmpz_sum_divisors(fmpz_t f, const fmpz_t g)
+
+   Sets `f` to the sum of divisors of `g`, including 1 and `g` itself.
+
+.. function:: void fmpz_sum_divisors_proper(fmpz_t f, const fmpz_t g)
+
+   Sets `f` to the sum of proper divisors of `g`, including 1 but excluding
+   `g` itself.
+
 .. function:: slong fmpz_clog(const fmpz_t x, const fmpz_t b)
               slong fmpz_clog_ui(const fmpz_t x, ulong b)
 
