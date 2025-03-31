@@ -213,7 +213,14 @@ jobs:
 
       - name: Release
         run: |
-          gh release create $TAG_NAME $PRERELEASE --notes-file "$RUNNER_TEMP/notes.md" --title "$SUBJECT" --target $GITHUB_SHA flint-${FLINT_VERSION}.{tar.gz,tar.xz,zip}
+          # In the case that some thing after the release failed, we still want
+          # to be able to rerun it without having to create a new release.
+          API_URL="https://api.github.com/repos/flintlib/flint/releases/tags/v${FLINT_VERSION}"
+          response=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL")
+          if test "$response" != "200";
+          then
+            gh release create $TAG_NAME $PRERELEASE --notes-file "$RUNNER_TEMP/notes.md" --title "$SUBJECT" --target $GITHUB_SHA flint-${FLINT_VERSION}.{tar.gz,tar.xz,zip}
+          fi
 
       - if: env.TAG_NAME != 'nightly'
         name: "Build PDF documentation"
