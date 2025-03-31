@@ -652,7 +652,7 @@ Shoup. For references, see
     modular multiplications with fixed `a` and `n` and several values of `b`'s,
     which amortizes the time for precomputing ``a_precomp``. Examples are
     scalar multiplication of vectors such as :func:`_nmod_vec_scalar_mul_nmod`
-    or of matrices such as :func:`_nmod_vec_scalar_mul_nmod`.
+    or of matrices such as :func:`nmod_mat_scalar_mul`.
 
 .. function:: void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp, \
                              ulong a, ulong b,                                \
