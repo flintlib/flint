@@ -441,15 +441,6 @@ Input/Output
 Exceptions
 -----------------
 
-.. function:: void flint_abort(void)
-
-    FLINT version of the C standard function ``abort``.
-
-.. function:: void flint_set_abort(void (* func)(void))
-
-    Sets the :func:`flint_abort` function to call ``func`` instead of
-    ``abort``.
-
 .. enum:: flint_err_t
 
     An error code with one of the following values
@@ -486,9 +477,29 @@ Exceptions
 
         Describes a test fail.
 
+.. function:: void flint_abort(void)
+
+    FLINT's function for aborting, which defaults to the C standard function
+    ``abort``.  To redirect what function should be used for the abort, use
+    :func:`flint_set_abort`.
+
 .. function:: void flint_throw(flint_err_t exc, const char * msg, ...)
 
-    Throws an error of type ``exc`` with message ``msg`` and aborts via
-    :func:`flint_abort`. The printing back-end function is
-    :func:`flint_fprintf`, and so it allows for printing of FLINT types as
-    well.
+    FLINT's function for throwing, which is throwing an error of type ``exc``
+    with message ``msg``.  This defaults to printing ``exc`` followed by
+    printing the message ``msg``, to then abort via :func:`flint_abort`, where
+    the back-end printing function is :func:`flint_fprintf` that allows
+    printing of FLINT types.
+
+    To redirect what function should be used for throwing, use
+    :func:`flint_set_throw`.
+
+.. function:: void flint_set_abort(void (* func)(void))
+
+    Sets the :func:`flint_abort` function to call ``func`` instead of
+    ``abort``.
+
+.. function:: void flint_set_throw(void (* func)(flint_err_t, const char *, va_list))
+
+    Sets the :func:`flint_throw` function use ``func`` instead of a private
+    throw function.
