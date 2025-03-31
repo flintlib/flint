@@ -83,8 +83,6 @@ _nfloat_vec_dot_add_limbs(ulong * s, slong sexp, mp_srcptr x, slong xexp, int su
         delta_bits = xexp - sexp;
         delta_limbs = 0;
 
-        FLINT_ASSERT(delta < FLINT_BITS);
-
         mpn_lshift(t, x, n, delta_bits);
 
         if (subtract)
