@@ -12,10 +12,6 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-if(NOT WIN32)
-    message(FATAL_ERROR "Detected system is not Windows.  Please use the Autotools configuration along with the Makefile instead as it is more up-to-date.  Read INSTALL.md.")
-endif()
-
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
 include(CheckIPOSupported)
@@ -31,6 +27,11 @@ project(flint
   DESCRIPTION "Fast Library for Number Theory"
   HOMEPAGE_URL https://flintlib.org/
   LANGUAGES C CXX)
+
+if(NOT WIN32 AND NOT EMSCRIPTEN)
+    message(STATUS "CMAKE_SYSTEM_NAME: ${EMSCRIPTEN}")
+    message(FATAL_ERROR "Detected system is not Windows.  Please use the Autotools configuration along with the Makefile instead as it is more up-to-date.  Read INSTALL.md.")
+endif()
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_CONTENTS)
 foreach(version in MAJOR MINOR PATCH)
