@@ -902,9 +902,10 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
 {
     gr_parse_t parse;
     gr_vec_t gens;
-    slong i;
-    char * g;
-    int status;
+    slong i, i1;
+    char * g, * g1;
+
+    int status = GR_SUCCESS;
 
     /* Quickly see if we simply have an integer literal, e.g. 0 */
     fmpz_t c;
@@ -925,6 +926,14 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
             for (i = 0; i < gens->length; i++)
             {
                 GR_MUST_SUCCEED(gr_get_str(&g, gr_vec_entry_srcptr(gens, i, ctx), ctx));
+                /* Fail in the presence of duplicate generator names */
+                for (i1 = 0; i1 < i; i1++)
+                {
+                    GR_MUST_SUCCEED(gr_get_str(&g1, gr_vec_entry_srcptr(gens, i1, ctx), ctx));
+                    if (!strcmp(g, g1))
+                        status = GR_UNABLE;
+                    flint_free(g1);
+                }
                 /* todo: version that consumes s and x */
                 _gr_parse_add_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx));
                 flint_free(g);
@@ -933,7 +942,7 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
 
         gr_vec_clear(gens, ctx);
 
-        status = _gr_parse_parse(parse, res, s, strlen(s)) ? GR_UNABLE : GR_SUCCESS;
+        status |= _gr_parse_parse(parse, res, s, strlen(s)) ? GR_UNABLE : GR_SUCCESS;
 
         _gr_parse_clear(parse);
     }

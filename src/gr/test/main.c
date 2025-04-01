@@ -44,6 +44,7 @@
 #include "t-nmod8.c"
 #include "t-nmod.c"
 #include "t-perm.c"
+#include "t-poly.c"
 #include "t-polynomial_acb.c"
 #include "t-polynomial_arb.c"
 #include "t-polynomial_fmpq.c"
@@ -98,6 +99,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_nmod8),
     TEST_FUNCTION(gr_nmod),
     TEST_FUNCTION(gr_perm),
+    TEST_FUNCTION(gr_poly),
     TEST_FUNCTION(gr_polynomial_acb),
     TEST_FUNCTION(gr_polynomial_arb),
     TEST_FUNCTION(gr_polynomial_fmpq),
