@@ -27,6 +27,7 @@ Types and basic operations
     The index must be in bounds.
 
 .. function:: gr_ptr gr_vec_entry_ptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_vec_entry_srcptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
 
     Returns a pointer to the *i*-th element in the vector *vec*,
     indexed from zero. The index must be in bounds.
