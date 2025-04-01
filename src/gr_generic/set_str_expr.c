@@ -11,6 +11,7 @@
 */
 
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
 #include "mpoly.h"
@@ -224,6 +225,34 @@ void _gr_parse_add_terminal(gr_parse_t E, const char * s, const void * val)
         gr_swap(GR_ENTRY(E->terminal_values, n - 1, sz), GR_ENTRY(E->terminal_values, n, sz), E->R);
         n--;
     }
+}
+
+static int string_with_length_cmp(const void * _a, const void * _b)
+{
+    string_with_length_struct * a = (string_with_length_struct *) _a;
+    string_with_length_struct * b = (string_with_length_struct *) _b;
+    return strncmp(a->str, b->str, a->str_len);
+}
+
+int _gr_parse_check_duplicates(gr_parse_t E)
+{
+    size_t size = E->terminals_len * sizeof(string_with_length_struct);
+    string_with_length_struct * names = (string_with_length_struct *) flint_malloc(size);
+    memcpy(names, E->terminal_strings, size);
+    qsort(names, E->terminals_len, sizeof(string_with_length_struct),
+          string_with_length_cmp);
+    int ok = 1;
+    for (slong k = 1; k < E->terminals_len; k++)
+    {
+        if (!strncmp(names[k-1].str, E->terminal_strings[k].str,
+                     names[k-1].str_len))
+        {
+            ok = 0;
+            break;
+        }
+    }
+    flint_free(names);
+    return ok;
 }
 
 static int gr_parse_top_is_expr(const gr_parse_t E)
@@ -902,8 +931,8 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
 {
     gr_parse_t parse;
     gr_vec_t gens;
-    slong i, i1;
-    char * g, * g1;
+    slong i;
+    char * g;
 
     int status = GR_SUCCESS;
 
@@ -926,18 +955,12 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
             for (i = 0; i < gens->length; i++)
             {
                 GR_MUST_SUCCEED(gr_get_str(&g, gr_vec_entry_srcptr(gens, i, ctx), ctx));
-                /* Fail in the presence of duplicate generator names */
-                for (i1 = 0; i1 < i; i1++)
-                {
-                    GR_MUST_SUCCEED(gr_get_str(&g1, gr_vec_entry_srcptr(gens, i1, ctx), ctx));
-                    if (!strcmp(g, g1))
-                        status = GR_UNABLE;
-                    flint_free(g1);
-                }
                 /* todo: version that consumes s and x */
                 _gr_parse_add_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx));
                 flint_free(g);
             }
+            if (!_gr_parse_check_duplicates(parse))
+                status = GR_UNABLE;
         }
 
         gr_vec_clear(gens, ctx);
