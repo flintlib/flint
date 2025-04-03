@@ -143,8 +143,9 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 
         if (fmpz_mat_is_zero(op))
         {
-           fmpz_set_ui(rop + 0, 1);
-           return 1;
+           fmpz_set_ui(rop + 0, 0);
+           fmpz_set_ui(rop + 1, 1);
+           return 2;
         }
 
         /* Determine the bound in bits */
