@@ -3160,6 +3160,30 @@ gr_test_numerator_denominator(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
+static int
+gr_factor_always_able(gr_ctx_t ctx)
+{
+    switch (ctx->which_ring)
+    {
+        case GR_CTX_FMPQ:
+        case GR_CTX_FMPZ:
+        case GR_CTX_FMPZ_MPOLY:
+        case GR_CTX_FMPZ_MPOLY_Q:
+        case GR_CTX_FMPZ_POLY:
+            return 1;
+        case GR_CTX_GR_POLY:
+            switch (POLYNOMIAL_CTX(ctx)->base_ring->which_ring)
+            {
+                case GR_CTX_CC_CA:
+                case GR_CTX_COMPLEX_ALGEBRAIC_CA:
+                case GR_CTX_COMPLEX_ALGEBRAIC_QQBAR:
+                case GR_CTX_FMPZ:
+                    return 1;
+            }
+        default:
+            return 0;
+    }
+}
 
 int
 gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
@@ -3216,6 +3240,24 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
             flint_printf("c = "); gr_println(c, R);
             flint_printf("fac = "); gr_vec_print(fac, R); flint_printf("\n");
             flint_printf("exp = "); gr_vec_print(exp, ZZ); flint_printf("\n");
+            flint_printf("\n");
+        }
+    }
+    else
+    {
+        if (status == GR_DOMAIN && gr_is_zero(x, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+        else if (status == GR_UNABLE && gr_factor_always_able(R))
+        {
+            status = GR_TEST_FAIL;
+        }
+
+        if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+        {
+            flint_printf("factor\n");
+            flint_printf("x = "); gr_println(x, R);
             flint_printf("\n");
         }
     }

@@ -301,6 +301,12 @@ To do: move to ``gr_vec``
               int gr_generic_scalar_other_divexact_vec(gr_ptr vec1, gr_srcptr c, gr_ctx_t cctx, gr_srcptr vec2, slong len, gr_ctx_t ctx)
               int gr_generic_scalar_other_pow_vec(gr_ptr vec1, gr_srcptr c, gr_ctx_t cctx, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
+Generic polynomial methods
+-----------------------------------------------------------------------------------------
+
+.. function:: int gr_generic_poly_factor_roots( gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx)
+
+    Calls :func:`gr_poly_roots` to factor a polynomial that splits into linear factors.
 
 .. raw:: latex
 

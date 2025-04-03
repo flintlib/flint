@@ -1401,6 +1401,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acf_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acf_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) gr_generic_poly_factor_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_acf_poly_roots_other},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_acf_mat_mul},

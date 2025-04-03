@@ -622,6 +622,14 @@ polynomial_gcd(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
     return gr_poly_gcd(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+int
+polynomial_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    return GR_FACTOR_OP(cctx, POLY_FACTOR)(c, fac, mult, pol, flags, cctx);
+}
+
+
 int _gr_poly_methods_initialized = 0;
 
 gr_static_method_table _gr_poly_methods;
@@ -700,6 +708,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) polynomial_euclidean_divrem},
 
     {GR_METHOD_GCD,         (gr_funcptr) polynomial_gcd},
+
+    {GR_METHOD_FACTOR,      (gr_funcptr) polynomial_factor},
 
     {0,                     (gr_funcptr) NULL},
 };
