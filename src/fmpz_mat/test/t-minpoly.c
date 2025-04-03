@@ -144,12 +144,9 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_mat_minpoly(f, A);
 
         if (fmpz_poly_length(f) != 2 || f->coeffs[0] != 0 || f->coeffs[1] != 1)
-        {
-            flint_printf("FAIL: for zero matrix A, found minpoly(A) != X.\n");
-            flint_printf("mp(A) = "), fmpz_poly_print_pretty(f, "X"), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("minpoly(A) != X for zero matrix A\n"
+                               "minpoly(A) = %{fmpz_poly}\n",
+                               f);
 
         fmpz_mat_clear(A);
         fmpz_poly_clear(f);
