@@ -1209,6 +1209,23 @@ Square root and perfect power testing
 Factorisation
 --------------------------------------------------------------------------------
 
+.. type:: n_factor_t
+
+    Represents a set of distinct prime factors and their corresponding
+    exponents.
+
+    .. member:: int num
+
+        The number of distinct prime factors.
+
+    .. member:: ulong p[]
+
+        An array containing the distinct prime factors.
+
+    .. member:: int exp[]
+
+        An array containing the corresponding exponents.
+
 .. function:: void n_factor_init(n_factor_t * factors)
 
     Initializes factors.
@@ -1246,9 +1263,7 @@ Factorisation
 
 .. function:: void n_factor_insert(n_factor_t * factors, ulong p, ulong exp)
 
-    Inserts the given prime power factor ``p^exp`` into
-    the ``n_factor_t`` ``factors``. See the documentation for
-    :func:`n_factor_trial` for a description of the ``n_factor_t`` type.
+    Inserts the given prime power factor ``p^exp`` into ``factors``.
 
     The algorithm performs a simple search to see if `p` already
     exists as a prime factor in the structure. If so the exponent
@@ -1267,11 +1282,6 @@ Factorisation
     will be added by default to an already used ``n_factor_t``. Use
     the function :func:`n_factor_init` defined in ``ulong_extras`` if
     initialisation has not already been completed on factors.
-
-    Once completed, ``num`` will contain the number of distinct
-    prime factors found. The field `p` is an array of ``ulong``\s
-    containing the distinct prime factors, ``exp`` an array
-    containing the corresponding exponents.
 
     The return value is the unfactored cofactor after trial
     factoring is done.
@@ -1355,9 +1365,6 @@ Factorisation
     However, in future, this flag may produce and separately check
     a primality certificate. This may be quite slow (and probably no
     less reliable in practice).
-
-    For details on the ``n_factor_t`` structure, see
-    :func:`n_factor_trial`.
 
     This function first tries trial factoring with a number of primes
     specified by the constant ``FLINT_FACTOR_TRIAL_PRIMES``. If the
