@@ -299,10 +299,12 @@ Assignment, rounding and conversions
     The warnings for :func:`arf_get_fmpz` apply.
 
 .. function:: void arf_floor(arf_t res, const arf_t x)
+              void arf_ceil(arf_t res, const arf_t x)
+              void arf_nint(arf_t res, const arf_t x)
 
-.. function:: void arf_ceil(arf_t res, const arf_t x)
-
-    Sets *res* to `\lfloor x \rfloor` and `\lceil x \rceil` respectively.
+    Sets *res* respectively to the floor `\lfloor x \rfloor`,
+    ceiling `\lceil x \rceil`
+    or nearest integer `\lfloor x \rceil` (with ties-to-even).
     The result is always represented exactly, requiring no more bits to
     store than the input. To round the result to a floating-point number
     with a lower precision, call :func:`arf_set_round` afterwards.
