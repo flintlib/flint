@@ -12,42 +12,30 @@
 #include "arb.h"
 
 void
-arb_nint(arb_t res, const arb_t x, slong prec)
+arb_nint(arb_t z, const arb_t x, slong prec)
 {
-    if (arb_is_int(x))
+    if (!arb_is_finite(x))
     {
-        arb_set(res, x);
+        arb_indeterminate(z);
+    }
+    else if (arb_is_exact(x))
+    {
+        arf_nint(arb_midref(z), arb_midref(x));
+        mag_zero(arb_radref(z));
+        arb_set_round(z, z, prec);
     }
     else
     {
-        arb_t t, u;
-        arb_init(t);
-        arb_init(u);
+        arf_t a, b;
+        arf_init(a);
+        arf_init(b);
 
-        arb_set_d(t, 0.5);
-        arb_add(t, x, t, prec);
+        arb_get_interval_arf(a, b, x, prec);
+        arf_nint(a, a);
+        arf_nint(b, b);
+        arb_set_interval_arf(z, a, b, prec);
 
-        arb_mul_2exp_si(u, x, 1);
-        arb_sub_ui(u, u, 1, prec);
-        arb_mul_2exp_si(u, u, -2);
-
-        arb_floor(res, t, prec);
-
-        /* nint(x) = floor(x+0.5) - isint((2*x-1)/4) */
-
-        if (arb_is_int(u))
-        {
-            arb_sub_ui(res, res, 1, prec);
-        }
-        else if (arb_contains_int(u))
-        {
-            arf_one(arb_midref(u));
-            mag_one(arb_radref(u));
-            arb_mul_2exp_si(u, u, -1);
-            arb_sub_ui(res, res, 1, prec);
-        }
-
-        arb_clear(t);
-        arb_clear(u);
+        arf_clear(a);
+        arf_clear(b);
     }
 }
