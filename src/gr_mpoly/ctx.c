@@ -153,6 +153,76 @@ gr_mpoly_gens_recursive(gr_vec_t vec, gr_mpoly_ctx_t ctx)
     return status;
 }
 
+/* FIXME: this may inappropriately return GR_DOMAIN for nonconstant
+   polynomials non-integral domains. See AbstractAlgebra. */
+int
+gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    if (poly->length == 0)
+    {
+        if (gr_ctx_is_zero_ring(GR_MPOLY_CCTX(ctx)) == T_TRUE)
+            return gr_mpoly_zero(res, ctx);
+        else
+            return GR_DOMAIN;
+    }
+    else if (poly->length == 1)
+    {
+        slong N;
+        gr_ptr c;
+        int status;
+
+        N = mpoly_words_per_exp(poly->bits, GR_MPOLY_MCTX(ctx));
+        if (!mpoly_monomial_is_zero(poly->exps + N*0, N))
+            return GR_DOMAIN;
+
+        /* todo: avoid the temporary */
+        GR_TMP_INIT(c, GR_MPOLY_CCTX(ctx));
+        status = gr_inv(c, poly->coeffs, GR_MPOLY_CCTX(ctx));
+        status |= gr_mpoly_set_scalar(res, c, ctx);
+        GR_TMP_CLEAR(c, GR_MPOLY_CCTX(ctx));
+        return status;
+    }
+    else
+    {
+        if (gr_is_zero(poly->coeffs, GR_MPOLY_CCTX(ctx)) == T_FALSE)
+            return GR_DOMAIN;
+        else
+            return GR_UNABLE;
+    }
+}
+
+int
+gr_mpoly_canonical_unit(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    if (poly->length == 0)
+    {
+        return gr_mpoly_zero(res, ctx);
+    }
+    else
+    {
+        gr_srcptr lc;
+        gr_ptr c;
+        int status;
+
+        lc = poly->coeffs;
+
+        if (gr_is_zero(lc, GR_MPOLY_CCTX(ctx)) == T_FALSE)
+        {
+            /* todo: avoid the temporary */
+            GR_TMP_INIT(c, GR_MPOLY_CCTX(ctx));
+            status = gr_canonical_unit(c, lc, GR_MPOLY_CCTX(ctx));
+            status |= gr_mpoly_set_scalar(res, c, ctx);
+            GR_TMP_CLEAR(c, GR_MPOLY_CCTX(ctx));
+        }
+        else
+        {
+            status = GR_UNABLE;
+        }
+
+        return status;
+    }
+}
+
 
 int _gr_mpoly_methods_initialized = 0;
 
@@ -198,6 +268,8 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_MUL_SI,      (gr_funcptr) gr_mpoly_mul_si},
     {GR_METHOD_MUL_FMPZ,    (gr_funcptr) gr_mpoly_mul_fmpz},
     {GR_METHOD_MUL_FMPQ,    (gr_funcptr) gr_mpoly_mul_fmpq},
+    {GR_METHOD_INV,         (gr_funcptr) gr_mpoly_inv},
+    {GR_METHOD_CANONICAL_UNIT,         (gr_funcptr) gr_mpoly_canonical_unit},
     {0,                     (gr_funcptr) NULL},
 };
 

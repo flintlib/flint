@@ -744,6 +744,18 @@ _gr_fmpz_poly_rsqrt(fmpz_poly_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_poly_canonical_unit(fmpz_poly_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_poly_is_zero(x))
+        fmpz_poly_zero(res);
+    else
+        fmpz_poly_set_si(res, fmpz_sgn(x->coeffs + x->length - 1));
+
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_poly_factor_t fac;
@@ -863,6 +875,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_poly_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_poly_rsqrt},
+    {GR_METHOD_CANONICAL_UNIT,  (gr_funcptr) _gr_fmpz_poly_canonical_unit},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {0,                         (gr_funcptr) NULL},
 };

@@ -279,6 +279,7 @@ typedef enum
     GR_METHOD_SGN,
     GR_METHOD_CSGN,
     GR_METHOD_ARG,
+    GR_METHOD_CANONICAL_UNIT,
 
     GR_METHOD_POS_INF,
     GR_METHOD_NEG_INF,
@@ -1099,6 +1100,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { 
 GR_INLINE WARN_UNUSED_RESULT int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SGN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CSGN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_arg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ARG)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_canonical_unit(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CANONICAL_UNIT)(res, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_pos_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, POS_INF)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_neg_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_INF)(res, ctx); }

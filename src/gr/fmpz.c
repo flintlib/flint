@@ -1164,6 +1164,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_IM,              (gr_funcptr) _gr_fmpz_im},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpz_sgn},
+    {GR_METHOD_CANONICAL_UNIT,  (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpz_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
     {GR_METHOD_FIB_UI,          (gr_funcptr) _gr_fmpz_fib_ui},

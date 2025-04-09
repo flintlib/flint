@@ -491,6 +491,18 @@ _gr_fmpz_mpoly_gcd(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_
 }
 
 int
+_gr_fmpz_mpoly_canonical_unit(fmpz_mpoly_t res, const fmpz_mpoly_t poly, gr_ctx_t ctx)
+{
+    if (fmpz_mpoly_is_zero(poly, MPOLYNOMIAL_MCTX(ctx)))
+        fmpz_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx));
+    else
+        fmpz_mpoly_set_si(res, fmpz_sgn(fmpz_mpoly_leadcoeff(poly)), MPOLYNOMIAL_MCTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_fmpz_mpoly_factor(fmpz_mpoly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_mpoly_factor_t fac;
@@ -589,6 +601,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) _gr_fmpz_mpoly_pow_fmpz},
     {GR_METHOD_SQRT,        (gr_funcptr) _gr_fmpz_mpoly_sqrt},
     {GR_METHOD_IS_SQUARE,   (gr_funcptr) _gr_fmpz_mpoly_is_square},
+    {GR_METHOD_CANONICAL_UNIT,   (gr_funcptr) _gr_fmpz_mpoly_canonical_unit},
     {GR_METHOD_GCD,         (gr_funcptr) _gr_fmpz_mpoly_gcd},
     {GR_METHOD_FACTOR,      (gr_funcptr) _gr_fmpz_mpoly_factor},
     {0,                     (gr_funcptr) NULL},
