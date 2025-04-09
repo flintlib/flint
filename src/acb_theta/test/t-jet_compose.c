@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -49,7 +50,9 @@ TEST_FUNCTION_START(acb_theta_jet_compose, state)
         acb_theta_jet_compose(v1, v2, N1, ord, prec);
         acb_theta_jet_compose(test, v3, N3, ord, prec);
 
-        if (!_acb_vec_overlaps(test, v1, nb))
+        if (!_acb_vec_overlaps(test, v1, nb)
+            || !_acb_vec_is_finite(test, nb)
+            || !_acb_vec_is_finite(v1, nb))
         {
             flint_printf("FAIL (g = %wd, ord = %wd)\n", g, ord);
             _acb_vec_printd(v3, nb, 5);

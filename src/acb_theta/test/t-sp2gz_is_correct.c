@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mat.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_sp2gz_is_correct, state)
