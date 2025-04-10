@@ -222,6 +222,13 @@ that the value is not computable:
     etc. depending on whether the unknown case should be included
     or excluded.
 
+.. function:: truth_t truth_and(truth_t x, truth_t y)
+              truth_t truth_or(truth_t x, truth_t y)
+              truth_t truth_not(truth_t x)
+
+    Performs the corresponding operation in ternary logic.
+
+.. function:: void truth_println(truth_t x)
 
 Context operations
 -------------------------------------------------------------------------------
