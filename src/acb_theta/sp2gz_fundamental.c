@@ -185,6 +185,7 @@ sp2gz_fundamental_gen_2(fmpz_mat_t mat, slong j)
             fmpz_set_si(fmpz_mat_entry(mat, k + g, k), -1);
             fmpz_zero(fmpz_mat_entry(mat, k + g, k + g));
         }
+        j = j >> 1;
     }
 }
 
