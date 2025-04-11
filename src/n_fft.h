@@ -21,7 +21,6 @@ extern "C" {
 #endif
 
 /**
- * TODO[short term] augment precomputations with inverse roots
  * TODO[short term] add testing for general variants, not only node0
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
