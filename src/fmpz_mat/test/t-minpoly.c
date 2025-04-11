@@ -132,5 +132,25 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_poly_clear(g);
     }
 
+    /* special case: zero matrix used to give incorrect result: constant 1 polynomial */
+    {
+        fmpz_mat_t A;
+        fmpz_poly_t f;
+
+        fmpz_mat_init(A, 2, 2);
+        fmpz_poly_init(f);
+
+        fmpz_mat_zero(A);
+        fmpz_mat_minpoly(f, A);
+
+        if (fmpz_poly_length(f) != 2 || f->coeffs[0] != 0 || f->coeffs[1] != 1)
+            TEST_FUNCTION_FAIL("minpoly(A) != X for zero matrix A\n"
+                               "minpoly(A) = %{fmpz_poly}\n",
+                               f);
+
+        fmpz_mat_clear(A);
+        fmpz_poly_clear(f);
+    }
+
     TEST_FUNCTION_END(state);
 }

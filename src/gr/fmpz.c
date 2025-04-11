@@ -953,6 +953,9 @@ _gr_fmpz_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
+/* defined in gr/fmpz_poly.c */
+int _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx);
+
 /* integer roots of integer polynomial */
 int
 _gr_fmpz_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_poly_t poly, int flags, gr_ctx_t ctx)
@@ -1173,6 +1176,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_roots_gr_poly},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpz_roots_gr_poly_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mat_mul},

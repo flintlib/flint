@@ -17,6 +17,7 @@
 
 #include "t-fmpz_mpoly_evaluate.c"
 #include "t-fmpz_poly_evaluate.c"
+#include "t-poly_factor.c"
 #include "t-pow.c"
 
 /* Array of test functions ***************************************************/
@@ -25,6 +26,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(gr_generic_fmpz_mpoly_evaluate),
     TEST_FUNCTION(gr_generic_fmpz_poly_evaluate),
+    TEST_FUNCTION(gr_generic_poly_factor),
     TEST_FUNCTION(gr_generic_pow)
 };
 

@@ -693,8 +693,8 @@ arf_set_fmpz_2exp(arf_t x, const fmpz_t man, const fmpz_t exp)
 }
 
 void arf_floor(arf_t z, const arf_t x);
-
 void arf_ceil(arf_t z, const arf_t x);
+void arf_nint(arf_t z, const arf_t x);
 
 void arf_debug(const arf_t x);
 

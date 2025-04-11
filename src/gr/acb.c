@@ -2474,6 +2474,7 @@ gr_method_tab_input _acb_methods_input[] =
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},
     {GR_METHOD_POLY_TAYLOR_SHIFT,   (gr_funcptr) _gr_acb_poly_taylor_shift},
+    {GR_METHOD_POLY_FACTOR,     (gr_funcptr) gr_generic_poly_factor_roots},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_acb_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_acb_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_acb_mat_mul},

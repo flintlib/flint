@@ -80,6 +80,12 @@ polynomial_ctx_is_integral_domain(gr_ctx_t ctx)
 }
 
 truth_t
+polynomial_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
+{
+    return gr_ctx_is_unique_factorization_domain(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+truth_t
 polynomial_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(POLYNOMIAL_ELEM_CTX(ctx));
@@ -616,6 +622,13 @@ polynomial_gcd(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
     return gr_poly_gcd(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+int
+polynomial_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    return GR_FACTOR_OP(cctx, POLY_FACTOR)(c, fac, mult, pol, flags, cctx);
+}
+
 
 int _gr_poly_methods_initialized = 0;
 
@@ -629,6 +642,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) polynomial_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) polynomial_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) polynomial_ctx_is_integral_domain},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,  (gr_funcptr) polynomial_ctx_is_unique_factorization_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
@@ -694,6 +708,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) polynomial_euclidean_divrem},
 
     {GR_METHOD_GCD,         (gr_funcptr) polynomial_gcd},
+
+    {GR_METHOD_FACTOR,      (gr_funcptr) polynomial_factor},
 
     {0,                     (gr_funcptr) NULL},
 };

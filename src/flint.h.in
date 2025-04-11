@@ -53,14 +53,14 @@
 #endif
 
 #ifdef va_start
-# define FLINT_HAVE_VA_LIST
+# define FLINT_HAVE_VA_LIST 1
 #endif
 
 #if defined(FILE)       || defined(_FILE_DEFINED) || defined(__DEFINED_FILE) \
  || defined(H_STDIO)    || defined(_H_STDIO)      || defined(_STDIO_H)       \
  || defined(_STDIO_H_)  || defined(__STDIO_H)     || defined(__STDIO_H__)    \
  || defined(__STDIO__)
-# define FLINT_HAVE_FILE
+# define FLINT_HAVE_FILE 1
 #endif
 
 #ifdef FLINT_INLINES_C
@@ -403,16 +403,16 @@ int flint_sprintf(char * s, const char * str, ...);
 int flint_scanf(const char * str, ...);
 int flint_sscanf(const char * s, const char * str, ...);
 
-#ifdef FLINT_HAVE_VA_LIST
+#if FLINT_HAVE_VA_LIST
 int flint_vprintf(const char * str, va_list ap);
 #endif
 
-#ifdef FLINT_HAVE_FILE
+#if FLINT_HAVE_FILE
 int flint_fprintf(FILE * f, const char * str, ...);
 int flint_fscanf(FILE * f, const char * str, ...);
 #endif
 
-#if defined(FLINT_HAVE_VA_LIST) && defined(FLINT_HAVE_FILE)
+#if FLINT_HAVE_VA_LIST && FLINT_HAVE_FILE
 int flint_vfprintf(FILE * f, const char * str, va_list ap);
 #endif
 
@@ -431,6 +431,10 @@ typedef enum
 } flint_err_t;
 
 FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...);
+
+#if FLINT_HAVE_VA_LIST
+void flint_set_throw(void (* func)(flint_err_t, const char *, va_list));
+#endif
 
 /* FLINT generic type definitions ********************************************/
 
