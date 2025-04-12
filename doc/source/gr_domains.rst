@@ -318,6 +318,17 @@ Polynomial rings
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
 
+Ore polynomials
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_gr_ore_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
+
+    Initializes *ctx* to a ring of densely represented Ore polynomials over the
+    given *base_ring*, with the choice of Ore algebra structure given by
+    *which_algebra*. The Ore algebra structure may refer to a distinguished
+    generator of *base_ring*; this will be the generator of index *base_var*.
+    Elements have type :type:`gr_ore_poly_struct`.
+
 Power series
 -------------------------------------------------------------------------------
 
