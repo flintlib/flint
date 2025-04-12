@@ -27,6 +27,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_ore_poly.h"
 #include "gr_mat.h"
 #include "gr_mat/impl.h"
 

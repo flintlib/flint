@@ -725,6 +725,14 @@ print_flint_type:
             res += gr_out->len;
             ip += STRING_LENGTH("gr_poly}");
         }
+        else if (IS_FLINT_TYPE(ip, "gr_ore_poly"))
+        {
+            const gr_ore_poly_struct * elem = va_arg(vlist, const gr_ore_poly_struct *);
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(gr_ore_poly_write(gr_out, elem, ctx));
+            res += gr_out->len;
+            ip += STRING_LENGTH("gr_ore_poly}");
+        }
         else if (IS_FLINT_TYPE(ip, "gr_mat"))
         {
             const gr_mat_struct * elem = va_arg(vlist, const gr_mat_struct *);
