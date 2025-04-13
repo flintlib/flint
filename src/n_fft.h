@@ -21,8 +21,10 @@ extern "C" {
 #endif
 
 /**
+ * TODO[short term] finalize interface and reducing output to [0..n)
  * TODO[short term] add testing for general variants, not only node0
  * TODO[short term] add testing for transposed variants
+ * TODO[short term]  write general note about the names (node ; lazy14 - lazy24 - lazy44...)
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
  * TODO[long term] on zen4 (likely on other cpus as well) ctx_init becomes
@@ -31,8 +33,6 @@ extern "C" {
  * smaller (~13-14) when tab_iw has been incorporated compared to without
  * tab_iw (it was depth ~20-21); see if this can be understood, and maybe play
  * with vectorization for those simple functions
- * TODO[later] provide forward function which reduces output to [0..n) ?
- *    unclear this is useful... to be decided later
  */
 
 /** n_fft context:
@@ -181,6 +181,14 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
  * root of unity with exponents listed in bit reversed order
  * * Requirements (not checked): depth <= F.depth
  */
+void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
+FLINT_FORCE_INLINE void n_fft_dft_lazy44(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_w);
+    dft_lazy44(p, depth, 0, Fargs);
+}
+
 void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F);
 FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {

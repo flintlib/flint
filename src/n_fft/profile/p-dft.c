@@ -49,6 +49,7 @@ SAMPLE(dft, )
 SAMPLE(idft, )
 SAMPLE(dft_t, )
 SAMPLE(idft_t, )
+SAMPLE(dft_lazy44, )
 //SAMPLE(n_fft_dft, _stride)
 
 void sample_sd_fft(void * arg, ulong count)
@@ -128,13 +129,15 @@ int main()
             prof_repeat(min+2, &max, sample_idft, (void *) &info);
             prof_repeat(min+3, &max, sample_dft_t, (void *) &info);
             prof_repeat(min+4, &max, sample_idft_t, (void *) &info);
+            prof_repeat(min+5, &max, sample_dft_lazy44, (void *) &info);
 
-            flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t\n",
+            flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",
                     min[0]/(double)1000000/rep,
                     min[1]/(double)1000000/rep,
                     min[2]/(double)1000000/rep,
                     min[3]/(double)1000000/rep,
-                    min[4]/(double)1000000/rep
+                    min[4]/(double)1000000/rep,
+                    min[5]/(double)1000000/rep
                     );
         }
     }

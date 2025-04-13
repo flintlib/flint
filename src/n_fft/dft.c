@@ -12,27 +12,33 @@
 #include "n_fft.h"
 #include "n_fft_macros.h"
 
+// Note for DFT with general node:
+// - lazy14 variants would be basically identical to the lazy24 variants (see the macros)
+// - writing lazy24 variants of the DFTxx_LAZY44 macros and then of dft_lazy44 brings almost no speedup (very marginal gain up to length 32 or 64, nothing observable beyond this)
+
+// General note:
+
 /*-------------*/
 /* 2-point DFT */
 /*-------------*/
 
 /** Cooley-Tukey butterfly, general
- * * in [0..4n) / out [0..4n) / max < 4n
  * * In-place transform
  *                            [1  1]
  *           [a  b] <- [a  b] [w -w]
  * * n2 is 2*n, w_pr is the precomputed data for multiplication by w mod n
  *   p_hi, p_lo, u, v are temporaries
  */
-#define DFT2_LAZY44(a, b, n, n2, w, w_pr, p_hi, p_lo, u, v) \
-    do {                                                          \
-        u = (a);                                                  \
-        if (u >= (n2))                                            \
-            u -= (n2);  /* [0..2n) */                             \
-        v = (b);                                                  \
-        N_MULMOD_PRECOMP_LAZY(v, w, v, w_pr, n, p_hi, p_lo);      \
-        (a) = u + v;                   /* [0..4n) */              \
-        (b) = u + (n2) - v;         /* [0..4n) */                 \
+/* in [0..4n) / out [0..4n) / max < 4n */
+#define DFT2_LAZY44(a, b, n, n2, w, w_pr, p_hi, p_lo, u, v)  \
+    do {                                                     \
+        u = (a);                                             \
+        if (u >= (n2))                                       \
+            u -= (n2);  /* [0..2n) */                        \
+        v = (b);                                             \
+        N_MULMOD_PRECOMP_LAZY(v, w, v, w_pr, n, p_hi, p_lo); \
+        (a) = u + v;                                         \
+        (b) = u + (n2) - v;                                  \
     } while(0)
 
 /*-------------*/
@@ -40,7 +46,6 @@
 /*-------------*/
 
 /** 4-point DFT, general
- * * in [0..4n) / out [0..4n) / max < 4n
  * * In-place transform
  *                              [ 1          1       1       1]
  *                              [w2        -w2      w3     -w3]
@@ -56,6 +61,7 @@
  * is a Vandermonde matrix and this tree really is the subproduct tree built
  * from the four roots w2, -w2, I*w2, -I*w2 of x**4 - w1
  */
+/* in [0..4n) / out [0..4n) / max < 4n */
 #define DFT4_LAZY44(a, b, c, d,                                \
                    w1, w1_pr, w2, w2_pr, w3, w3_pr,            \
                    n, n2, p_hi, p_lo, tmp)                     \
@@ -154,7 +160,6 @@ do {                                                       \
 } while(0)
 
 /** 8-point DFT
- * * in [0..4n) / out [0..4n) / max < 4n
  * * In-place transform p = [p0,p1,p2,p3,p4,p5,p6,p7], seen as a polynomial
  * p(x) = p0 + p1*x + ... + p7*x**7 into its evaluations
  *       p(w0), p(-w0), p(w1), p(-w1), p(w2), p(-w2), p(w3), p(-w3)
@@ -162,6 +167,7 @@ do {                                                       \
  * * By construction these 8 evaluation points are the 8 roots of the
  * polynomial x**8 - F->tab_w[node]
  */
+/* in [0..4n) / out [0..4n) / max < 4n */
 #define DFT8_LAZY44(p0, p1, p2, p3, p4, p5, p6, p7,              \
                     node, mod, mod2, tab_w)                      \
 do {                                                             \
@@ -597,14 +603,6 @@ void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
         dft_lazy44(p3, depth-2, 4*node+3, F);
     }
 }
-
-/** TODO same, but lazy24 */
-/** TODO same, but lazy14 */
-
-
-
-
-
 
 
 
