@@ -22,6 +22,7 @@ extern "C" {
 
 /**
  * TODO[short term] add testing for general variants, not only node0
+ * TODO[short term] add testing for transposed variants
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
  * TODO[long term] on zen4 (likely on other cpus as well) ctx_init becomes
@@ -111,6 +112,10 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
 
 
 
+/*------------------------*/
+/* CONTEXT INITIALIZATION */
+/*------------------------*/
+
 
 /** Note for init functions, when depth is provided:
  *   - if it is < 3, it is pretended that it is 3
@@ -139,13 +144,17 @@ void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth);
 
 void n_fft_ctx_clear(n_fft_ctx_t F);
 
+/*-----------------------------*/
+/* DFT / IDFT / DFT_t / IDFT_t */
+/*-----------------------------*/
 
+/* transforms / inverse transforms / transposed transforms at length a power */
+/* of 2 */
 
 typedef struct
 {
     ulong mod;                 // modulus, odd prime
     ulong mod2;                // 2*mod  (storing helps for speed)
-    //ulong mod4;                // 4*mod  (storing helps for speed)
     nn_srcptr tab_w;           // tabulated powers of w, see below
 } n_fft_args_struct;
 typedef n_fft_args_struct n_fft_args_t[1];
@@ -160,15 +169,6 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
 
 
 
-
-
-/** dft:
- * transforms / inverse transforms / transposed transforms
- * at length a power of 2
- */
-
-void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F);
-
 /** 2**depth-point DFT
  * * in [0..n) / out [0..4n) / max < 4n
  * * In-place transform p of length len == 2**depth into
@@ -181,12 +181,17 @@ void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F);
  * root of unity with exponents listed in bit reversed order
  * * Requirements (not checked): depth <= F.depth
  */
+void dft_node0_lazy14(nn_ptr p, ulong depth, n_fft_args_t F);
 FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_w);
     dft_node0_lazy14(p, depth, Fargs);
 }
+
+
+
+
 
 // FIXME in progress
 // not tested yet --> test == applying dft yields identity

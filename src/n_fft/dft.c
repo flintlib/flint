@@ -546,7 +546,7 @@ do {                                                                            
  */
 void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
-    if (depth == 3)
+    if (depth == 3) // FIXME useless if not exposed?
     {
         DFT8_LAZY44(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], node, F->mod, F->mod2, F->tab_w);
     }
@@ -598,6 +598,16 @@ void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     }
 }
 
+/** TODO same, but lazy24 */
+/** TODO same, but lazy14 */
+
+
+
+
+
+
+
+
 /** 2**depth-point DFT
  * * in [0..2n) / out [0..4n) / max < 4n
  * * In-place transform p of length len == 2**depth into
@@ -612,7 +622,7 @@ void dft_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
  */
 void dft_node0_lazy24(nn_ptr p, ulong depth, n_fft_args_t F)
 {
-    if (depth == 3)
+    if (depth == 3)  // FIXME useless if function not exposed?
     {
         DFT8_NODE0_LAZY24(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
     }
