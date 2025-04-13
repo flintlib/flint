@@ -32,34 +32,40 @@
 /*---------------------*/
 
 /** Butterfly radix 2
- * * in [0..n) x [0..n) / out [0..2n) x [0..2n) / max < 2n
- * * In-place transform
- *                            [1  1]
- *           [a  b] <- [a  b] [1 -1]
- * * n is the modulus, tmp is a temporary
+ * In-place transform:                    [1  1]
+ *                       [a  b] <- [a  b] [1 -1]
  */
-#define BUTTERFLY_LAZY12(a, b, n, tmp) \
-    do {                                \
-        tmp = (b);                      \
-        (b) = (a) + (n) - tmp;          \
-        (a) = (a) + tmp;                \
+/* lazy12:  in [0..n) x [0..n) / out [0..2n) x [0..2n) / max < 2n */
+/* n is the modulus, tmp is a temporary */
+#define DFT2_LAZY12(a, b, n, tmp) \
+    do {                          \
+        tmp = (b);                \
+        (b) = (a) + (n) - tmp;    \
+        (a) = (a) + tmp;          \
     } while(0)
 
-/** Butterfly radix 2
- * * in [0..2n) x [0..2n) / out [0..2n) x [0..4n) / max < 4n
- * * In-place transform
- *                            [1  1]
- *           [a  b] <- [a  b] [1 -1]
- * * n2 is 2*n, tmp is a temporary
- */
-#define BUTTERFLY_LAZY24(a, b, n2, tmp) \
-    do {                               \
-        tmp = (b);                     \
-        (b) = (a) + (n2) - tmp;        \
-        (a) = (a) + tmp;               \
-        if ((a) >= (n2))               \
-            (a) -= (n2);               \
+/* lazy24:  in [0..2n) x [0..2n) / out [0..2n) x [0..4n) / max < 4n */
+/* n2 is 2*n, tmp is a temporary */
+#define DFT2_LAZY24(a, b, n2, tmp) \
+    do {                           \
+        tmp = (b);                 \
+        (b) = (a) + (n2) - tmp;    \
+        (a) = (a) + tmp;           \
+        if ((a) >= (n2))           \
+            (a) -= (n2);           \
     } while(0)
+
+// lazy4244:  in [0..4n) x [0..2n) / out [0..4n) x [0..4n) / max < 4n */
+/* n2 is 2*n, tmp is a temporary */
+#define DFT2_LAZY4244(a, b, n2, tmp)           \
+do {                                           \
+    tmp = (a);                                 \
+    if (tmp >= (n2))                           \
+        tmp -= (n2);            /* [0..2n) */  \
+    (a) = tmp + (b);            /* [0..4n) */  \
+    (b) = tmp + (n2) - (b);     /* [0..4n) */  \
+} while(0)
+
 
 /*---------------------*/
 /* radix-4 butterflies */
@@ -86,7 +92,7 @@
  *  (but this property is not exploited)
  * * n is the modulus and n2 == 2*n, p_hi, p_lo are temporaries
  */
-#define DFT4_NODE0_LAZY14(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)    \
+#define DFT4_LAZY14(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)    \
     do {                                                             \
         const ulong v0 = (a);                                        \
         const ulong v1 = (b);                                        \
@@ -106,9 +112,9 @@
 
 /** 4-point butterfly, evaluation
  * * in [0..2n) / out [0..4n) / max < 4n
- * * other than this, same specification as DFT4_NODE0_LAZY14
+ * * other than this, same specification as DFT4_LAZY14
  */
-#define DFT4_NODE0_LAZY24(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)    \
+#define DFT4_LAZY24(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)    \
     do {                                                             \
         const ulong v0 = (a);                                        \
         const ulong v1 = (b);                                        \
@@ -132,7 +138,6 @@
         (d) = v5 + (n2) - v7;                       /* < 4*n */      \
     } while(0)
 
-
 /** 4-point butterfly, interpolation
  * * in [0..n) / out [0..4n) / max < 4n
  * * In-place transform
@@ -154,7 +159,7 @@
  *             /     \             /     \
  *         x - 1     x + 1     x - I     x + I
  */
-#define IDFT4_NODE0_LAZY12(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
+#define IDFT4_LAZY12(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
 do {                                                               \
     const ulong v0 = (a);                                          \
     const ulong v1 = (b);                                          \
@@ -180,7 +185,7 @@ do {                                                               \
         (d) -= (n2);                            /* < 2*n */        \
 } while(0)
 
-#define IDFT4_NODE0_LAZY14(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
+#define IDFT4_LAZY14(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
 do {                                                               \
     const ulong v0 = (a);                                          \
     const ulong v1 = (b);                                          \
@@ -200,9 +205,9 @@ do {                                                               \
 
 /** 4-point butterfly, interpolation
  * * in [0..2n) / out [0..4n) / max < 4n
- * * other than this, same specification as IDFT4_NODE0_LAZY14
+ * * other than this, same specification as IDFT4_LAZY14
  */
-#define IDFT4_NODE0_LAZY24(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)  \
+#define IDFT4_LAZY24(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)  \
 do {                                                                \
     const ulong v0 = (a);                                           \
     const ulong v1 = (b);                                           \
@@ -225,7 +230,7 @@ do {                                                                \
     (d) = v5 + (n2) - v7;                       /* < 4*n */         \
 } while(0)
 
-#define IDFT4_NODE0_LAZY4222(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)  \
+#define IDFT4_LAZY4222(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo)  \
 do {                                                                \
     ulong v0 = (a);                                           \
     const ulong v1 = (b);                                           \
