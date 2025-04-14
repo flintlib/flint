@@ -15,6 +15,8 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 #include "mpoly.h"
+#include "fmpz_mpoly.h"
+#include "fmpz_mpoly_q.h"
 #include "gr.h"
 #include "mpn_mod.h"
 
@@ -198,9 +200,30 @@ gr_ctx_init_random_ring_real_complex_exact(gr_ctx_t ctx, flint_rand_t state)
     }
 }
 
+void
+gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
+{
+
+    switch (n_randint(state, 4))
+    {
+        case 0:
+            gr_ctx_init_fmpz_poly(ctx);
+            break;
+        case 1:
+            gr_ctx_init_fmpq_poly(ctx);
+            break;
+        case 2:
+            gr_ctx_init_fmpz_mpoly(ctx, n_randint(state, 3), mpoly_ordering_randtest(state));
+            break;
+        case 3:
+            gr_ctx_init_fmpz_mpoly_q(ctx, n_randint(state, 2), mpoly_ordering_randtest(state));
+            break;
+    }
+}
+
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
 {
-    switch (n_randint(state, 11))
+    switch (n_randint(state, 12))
     {
         case 0:
         case 1:
@@ -230,6 +253,9 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
             break;
         case 10:
             gr_ctx_init_random_ring_composite(ctx, state);
+            break;
+        case 11:
+            gr_ctx_init_random_ring_builtin_poly(ctx, state);
             break;
     }
 

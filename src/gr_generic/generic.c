@@ -1273,6 +1273,28 @@ gr_generic_canonical_unit(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) == T_TRUE)
+    {
+        truth_t x_zero, y_zero;
+
+        x_zero = gr_is_zero(x, ctx);
+        y_zero = gr_is_zero(y, ctx);
+
+        if (x_zero == T_TRUE && y_zero == T_TRUE)
+            return gr_zero(res, ctx);
+
+        if (x_zero == T_FALSE || y_zero == T_FALSE)
+            return gr_one(res, ctx);
+
+        return GR_UNABLE;
+    }
+
+    return GR_UNABLE;
+}
+
+int
 gr_generic_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     return GR_UNABLE;
@@ -2693,6 +2715,8 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_NUMERATOR,               (gr_funcptr) gr_generic_numerator},
     {GR_METHOD_DENOMINATOR,             (gr_funcptr) gr_generic_denominator},
+
+    {GR_METHOD_GCD,                     (gr_funcptr) gr_generic_gcd},
 
     {GR_METHOD_CMP,                     (gr_funcptr) gr_generic_cmp},
     {GR_METHOD_CMPABS,                  (gr_funcptr) gr_generic_cmpabs},

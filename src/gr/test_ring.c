@@ -3252,7 +3252,7 @@ gr_factor_always_able(gr_ctx_t ctx)
         case GR_CTX_FMPQ:
         case GR_CTX_FMPZ:
         case GR_CTX_FMPZ_MPOLY:
-        case GR_CTX_FMPZ_MPOLY_Q:
+        /* case GR_CTX_FMPZ_MPOLY_Q:    not implemented */
         case GR_CTX_FMPZ_POLY:
             return 1;
         case GR_CTX_GR_POLY:
@@ -3320,6 +3320,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
         if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
         {
             flint_printf("factor\n");
+            gr_ctx_println(R);
             flint_printf("x = "); gr_println(x, R);
             flint_printf("c = "); gr_println(c, R);
             flint_printf("fac = "); gr_vec_print(fac, R); flint_printf("\n");
@@ -3341,6 +3342,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
         if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
         {
             flint_printf("factor\n");
+            gr_ctx_println(R);
             flint_printf("x = "); gr_println(x, R);
             flint_printf("\n");
         }
