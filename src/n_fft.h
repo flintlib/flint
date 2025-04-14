@@ -35,30 +35,56 @@ extern "C" {
  * with vectorization for those simple functions
  */
 
-/** n_fft context:
- * parameters and tabulated powers of the primitive root of unity "w".
- **/
 
+/*-------------------------------------------------*/
+/* STRUCTURES FOR FFT CONTEXT / FUNCTION ARGUMENTS */
+/*-------------------------------------------------*/
+
+
+/** n_fft context:
+ *     - basic parameters
+ *     - precomputed powers of the primitive root of unity and its inverse
+ *     - precomputed inverses of 2**k
+ *
+ * Requirements (not checked upon init):
+ *     - mod is an odd prime < 2**(FLINT_BITS-2)
+ *     - max_depth must be >= 3 (so, 8 must divide mod - 1)
+ * Total memory cost of precomputations for arrays tab_{w,iw,w2,inv2}:
+ *     at most 2 * (2*FLINT_BITS + 2**depth) ulong's
+ *
+ * For more details about the content of tab_{w,iw,w2,inv2}, see comments below
+ **/
 typedef struct
 {
     ulong mod;                    // modulus, odd prime
     ulong max_depth;              // maximum supported depth (w has order 2**max_depth)
     ulong cofactor;               // prime is 1 + cofactor * 2**max_depth
     ulong depth;                  // depth supported by current precomputation
-    nn_ptr tab_w;                 // tabulated powers of w, see below
-    nn_ptr tab_iw;                // tabulated powers of 1/w, see below
-    ulong tab_w2[2*FLINT_BITS];   // tabulated powers w**(2**k), see below
-    ulong tab_inv2[2*FLINT_BITS]; // tabulated inverses of 2**k, see below
+    nn_ptr tab_w;                 // precomputed powers of w
+    nn_ptr tab_iw;                // precomputed powers of 1/w
+    ulong tab_w2[2*FLINT_BITS];   // precomputed powers w**(2**k)
+    ulong tab_inv2[2*FLINT_BITS]; // precomputed inverses of 2**k
 } n_fft_ctx_struct;
 typedef n_fft_ctx_struct n_fft_ctx_t[1];
 
 
-/** Requirements (not checked upon init):
- *     - mod is an odd prime < 2**(FLINT_BITS-2)
- *     - max_depth must be >= 3 (so, 8 must divide mod - 1)
- * Total memory cost of precomputations for arrays tab_{w,iw,w2,inv2}:
- *     at most 2 * (2*FLINT_BITS + 2**depth) ulong's
- */
+/** n_fft arguments:
+ *     - modulus mod
+ *     - its double 2*mod (storing helps for speed)
+ *     - precomputed powers of w
+ * To be used as an argument in FFT functions. In some parts, providing this
+ * instead of the whole context increased performance. Also, this facilitate
+ * using the same function with both tab_w and tab_iw (by forming an fft_args
+ * with Fargs->tab_w = F->tab_iw.
+ **/
+typedef struct
+{
+    ulong mod;                 // modulus, odd prime
+    ulong mod2;                // 2*mod
+    nn_srcptr tab_w;           // tabulated powers of w, see below
+} n_fft_args_struct;
+typedef n_fft_args_struct n_fft_args_t[1];
+
 
 /** tab_w2:
  *    - length 2*FLINT_BITS, with undefined entries at index 2*(max_depth-1) and beyond
@@ -112,10 +138,9 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
 
 
 
-/*------------------------*/
-/* CONTEXT INITIALIZATION */
-/*------------------------*/
-
+/*------------------------------------------*/
+/* PRECOMPUTATIONS / CONTEXT INITIALIZATION */
+/*------------------------------------------*/
 
 /** Note for init functions, when depth is provided:
  *   - if it is < 3, it is pretended that it is 3
@@ -124,13 +149,13 @@ typedef n_fft_ctx_struct n_fft_ctx_t[1];
  * After calling init, precomputations support DFTs of length up to 2**depth
  */
 
-// initialize with given root and given depth
+/* initialize with given root and given depth */
 void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong depth, ulong mod);
 
-// find primitive root, initialize with given depth
+/* find primitive root, initialize with given depth */
 void n_fft_ctx_init2(n_fft_ctx_t F, ulong depth, ulong p);
 
-// same, with default depth
+/* same, with default depth */
 FLINT_FORCE_INLINE
 void n_fft_ctx_init_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong p)
 { n_fft_ctx_init2_root(F, w, max_depth, cofactor, N_FFT_CTX_DEFAULT_DEPTH, p); }
@@ -139,25 +164,10 @@ FLINT_FORCE_INLINE
 void n_fft_ctx_init(n_fft_ctx_t F, ulong p)
 { n_fft_ctx_init2(F, N_FFT_CTX_DEFAULT_DEPTH, p); }
 
-// grows F->depth and precomputations to support DFTs of depth up to depth
+/* grows F->depth and precomputations to support DFTs of depth up to depth */
 void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth);
 
 void n_fft_ctx_clear(n_fft_ctx_t F);
-
-/*-----------------------------*/
-/* DFT / IDFT / DFT_t / IDFT_t */
-/*-----------------------------*/
-
-/* transforms / inverse transforms / transposed transforms at length a power */
-/* of 2 */
-
-typedef struct
-{
-    ulong mod;                 // modulus, odd prime
-    ulong mod2;                // 2*mod  (storing helps for speed)
-    nn_srcptr tab_w;           // tabulated powers of w, see below
-} n_fft_args_struct;
-typedef n_fft_args_struct n_fft_args_t[1];
 
 FLINT_FORCE_INLINE
 void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
@@ -167,7 +177,12 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
     F->tab_w = tab_w;
 }
 
+/*-----------------------------*/
+/* DFT / IDFT / DFT_t / IDFT_t */
+/*-----------------------------*/
 
+/* transforms / inverse transforms / transposed transforms */
+/* length is a power of 2 */
 
 /** 2**depth-point DFT
  * * in [0..n) / out [0..4n) / max < 4n
