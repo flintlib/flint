@@ -24,7 +24,7 @@ extern "C" {
  * TODO[short term] finalize interface and reducing output to [0..n)
  * TODO[short term] add testing for general node variants
  * TODO[short term] add testing for transposed variants
- * TODO[short term]  write general note about the names (node ; lazy14 - lazy24 - lazy44...)
+ * TODO[short term]  write general note about the names (node ; lazy14 - lazy24 - lazy_4_4...)
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
  * TODO[long term] on zen4 (likely on other cpus as well) ctx_init becomes
@@ -196,20 +196,20 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
  * root of unity with exponents listed in bit reversed order
  * * Requirements (not checked): depth <= F.depth
  */
-void dft_node_lazy44(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
-FLINT_FORCE_INLINE void n_fft_dft_lazy44(nn_ptr p, ulong depth, n_fft_ctx_t F)
+void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
+FLINT_FORCE_INLINE void n_fft_dft_lazy_4_4(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_w);
-    dft_node_lazy44(p, depth, 0, Fargs);
+    dft_node_lazy_4_4(p, depth, 0, Fargs);
 }
 
-void dft_lazy14(nn_ptr p, ulong depth, n_fft_args_t F);
+void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_w);
-    dft_lazy14(p, depth, Fargs);
+    dft_lazy_1_4(p, depth, Fargs);
 }
 
 
@@ -219,12 +219,12 @@ FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 // FIXME in progress
 // not tested yet --> test == applying dft yields identity
 // DOC. Note: output < n.
-void idft_lazy12(nn_ptr p, ulong depth, n_fft_args_t F);
+void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 FLINT_FORCE_INLINE void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_iw);
-    idft_lazy12(p, depth, Fargs);
+    idft_lazy_1_4(p, depth, Fargs);
 
     if (depth > 0)
     {
@@ -253,7 +253,7 @@ FLINT_FORCE_INLINE void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_w);
-    idft_lazy12(p, depth, Fargs);
+    idft_lazy_1_4(p, depth, Fargs);
 }
 
 // FIXME in progress
@@ -263,7 +263,7 @@ FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
     n_fft_args_t Fargs;
     n_fft_set_args(Fargs, F->mod, F->tab_iw);
-    dft_lazy14(p, depth, Fargs);
+    dft_lazy_1_4(p, depth, Fargs);
 
     if (depth > 0)
     {
