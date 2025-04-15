@@ -53,28 +53,32 @@ ca_field_build_elliptic_relation(ca_field_t K, slong i, slong j, slong k, slong 
         fmpz_mpoly_init(poly, CA_FIELD_MCTX(K, ctx));
         
         slong len = CA_FIELD_LENGTH(K);
-        ulong exp[len];
-        for (slong v = 0; v < len; v++){
-            exp[v] = 0;
+        ulong* exp = (ulong*) flint_malloc(len * sizeof(ulong));
+        if (exp != NULL){
+            for (slong v = 0; v < len; v++){
+                exp[v] = 0;
+            }
+            
+            exp[i] = 1;
+            exp[l] = 1;
+            fmpz_mpoly_set_coeff_si_ui(poly, 2, exp, CA_FIELD_MCTX(K, ctx));
+            exp[i] = 0;
+            exp[l] = 0;
+            exp[j] = 1;
+            exp[k] = 1;
+            fmpz_mpoly_set_coeff_si_ui(poly, 2, exp, CA_FIELD_MCTX(K, ctx));
+            exp[k] = 0;
+            exp[i] = 1;
+            fmpz_mpoly_set_coeff_si_ui(poly, -2, exp, CA_FIELD_MCTX(K, ctx));
+            exp[i] = 0;
+            exp[j] = 0;
+            exp[pi_index] = 1;
+            fmpz_mpoly_set_coeff_si_ui(poly, -1, exp, CA_FIELD_MCTX(K, ctx));
+            
+            _ca_field_ideal_insert_clear_mpoly(K, poly, CA_FIELD_MCTX(K, ctx), ctx);
+            
+            flint_free(exp);
         }
-        
-        exp[i] = 1;
-        exp[l] = 1;
-        fmpz_mpoly_set_coeff_si_ui(poly, 2, exp, CA_FIELD_MCTX(K, ctx));
-        exp[i] = 0;
-        exp[l] = 0;
-        exp[j] = 1;
-        exp[k] = 1;
-        fmpz_mpoly_set_coeff_si_ui(poly, 2, exp, CA_FIELD_MCTX(K, ctx));
-        exp[k] = 0;
-        exp[i] = 1;
-        fmpz_mpoly_set_coeff_si_ui(poly, -2, exp, CA_FIELD_MCTX(K, ctx));
-        exp[i] = 0;
-        exp[j] = 0;
-        exp[pi_index] = 1;
-        fmpz_mpoly_set_coeff_si_ui(poly, -1, exp, CA_FIELD_MCTX(K, ctx));
-        
-        _ca_field_ideal_insert_clear_mpoly(K, poly, CA_FIELD_MCTX(K, ctx), ctx);
     }
     
     ca_clear(t, ctx);
