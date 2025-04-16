@@ -20,13 +20,6 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 
-#define MINPOLY_M_LOG2E  1.44269504088896340736  /* log2(e) */
-
-static inline long double _log2(const long double x)
-{
-    return log(x) * MINPOLY_M_LOG2E;
-}
-
 slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
 {
     slong len = 0;
@@ -109,6 +102,55 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
    fmpz_clear(q);
 }
 
+static inline double _log2e(const double x, slong exp)
+{
+    return log(x) * 1.44269504088896340736 + exp;
+}
+
+/*
+    If $A$ is an $n \times n$ matrix with spectral radius
+    bound by b, the coefficients of the minimal polynomial have
+    at most $\ceil{d\log_2(b)}$ bits if $d \leq b$. Otherwise
+    if $d > 0$ it has at most
+    $\min{\ceil{d/2\log_2(bd)}, \ceil{d\log_2(2b)}}$
+    bits, where $d$ is the degree of the minimal polynomial.
+    See Lemma 3.1 in Dumas, "Bounds on the coefficients of the
+    characteristic and minimal polynomials", 2007.
+*/
+slong
+_fmpz_mat_minpoly_bound_bits(const fmpz_mat_t op)
+{
+    const slong n = op->r;
+    double B;
+    slong bound;
+
+    fmpz_t b;
+    fmpz_init(b);
+
+    _fmpz_mat_bound_ovals_of_cassini(b, op);
+    fmpz_add_ui(b, b, fmpz_is_zero(b));
+
+    double bb, b1, b2;
+    slong exp;
+
+    bb = fmpz_get_d_2exp(&exp, b);
+
+    if (fmpz_cmp_ui(b, n) >= 0)
+    {
+        b1 = _log2e(bb, exp);
+    }
+    else
+    {
+        b1 = _log2e(bb * n, exp) * 0.5;
+        b2 = _log2e(bb * 2, exp);
+        b1 = FLINT_MIN(b1, b2);
+    }
+
+    bound = ceil(n * b1 * (1 + 1e-10));
+
+    return bound;
+}
+
 slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 {
     const slong n = op->r;
@@ -149,28 +191,9 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
         }
 
         /* Determine the bound in bits */
-        {
-            fmpz_t b;
-
-            fmpz_init(b);
-
-            _fmpz_mat_bound_ovals_of_cassini(b, op);
-            bb = fmpz_get_d(b);
-            if (bb <= 1.0)
-               bb = 1.0;
-
-            b1 = _log2(bb);
-            b2 = _log2(bb*n)/2;
-            b3 = _log2(bb*2);
-
-            if (b3 < b2)
-               b2 = b3;
-
-            bound = n <= bb ? (ulong) ceil(n*b1) : (ulong) ceil(n*b2);
-            bound = bound + 1;
-
-            fmpz_clear(b);
-        }
+        bound = _fmpz_mat_minpoly_bound_bits(op);
+        /* Allow for signs */
+        bound += 1;
 
         P = (ulong *) flint_calloc(n, sizeof(ulong));
         Q = (ulong *) flint_calloc(n, sizeof(ulong));
