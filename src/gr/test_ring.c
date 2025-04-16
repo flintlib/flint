@@ -3160,6 +3160,94 @@ gr_test_numerator_denominator(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
+int
+gr_test_canonical_associate(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, v, xv, y1, u1, y2, u2, xu1, xvu2;
+    int i;
+
+    GR_TMP_INIT5(x, v, xv, y1, u1, R);
+    GR_TMP_INIT4(u2, y2, xu1, xvu2, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+
+    if (gr_is_zero(x, R) != T_FALSE)
+    {
+        status |= gr_canonical_associate(y1, u1, x, R);
+
+        if (status == GR_SUCCESS)
+        {
+            if (gr_is_zero(y1, R) == T_FALSE || gr_is_one(u1, R) == T_FALSE)
+                status = GR_TEST_FAIL;
+        }
+    }
+    else
+    {
+        /*
+            Evaluating:
+                y1, u1 = canonical_associate(x)
+                y2, u2 = canonical_associate(x * v)
+            Check:
+                y1 = y2
+                x * u1 = y1
+                xv * u2 = y2
+        */
+
+        for (i = 0; ; i++)
+        {
+            GR_IGNORE(gr_randtest(v, state, R));
+
+            if (gr_is_invertible(v, R) == T_TRUE)
+                break;
+
+            if (i == 5)
+            {
+                GR_MUST_SUCCEED(n_randint(state, 2) ? gr_one(v, R) : gr_neg_one(v, R));
+                break;
+            }
+        }
+
+        status |= gr_mul(xv, x, v, R);
+        status |= gr_canonical_associate(y1, u1, x, R);
+        status |= gr_canonical_associate(y2, u2, xv, R);
+
+        if (status == GR_SUCCESS)
+        {
+            status |= gr_mul(xu1, x, u1, R);
+            status |= gr_mul(xvu2, xv, u2, R);
+
+            if (gr_equal(y1, y2, R) == T_FALSE ||
+                gr_equal(xu1, y1, R) == T_FALSE ||
+                gr_equal(xvu2, y2, R) == T_FALSE)
+            {
+                status = GR_TEST_FAIL;
+            }
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("v = \n"); gr_println(v, R);
+        flint_printf("xv = \n"); gr_println(xv, R);
+        flint_printf("y1 = \n"); gr_println(y1, R);
+        flint_printf("u1 = \n"); gr_println(u1, R);
+        flint_printf("y2 = \n"); gr_println(y2, R);
+        flint_printf("u2 = \n"); gr_println(u2, R);
+        flint_printf("xu1 = \n"); gr_println(xu1, R);
+        flint_printf("xvu2= \n"); gr_println(xvu2, R);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR5(x, v, xv, y1, u1, R);
+    GR_TMP_CLEAR4(u2, y2, xu1, xvu2, R);
+
+    return status;
+}
+
 static int
 gr_factor_always_able(gr_ctx_t ctx)
 {
@@ -3168,7 +3256,7 @@ gr_factor_always_able(gr_ctx_t ctx)
         case GR_CTX_FMPQ:
         case GR_CTX_FMPZ:
         case GR_CTX_FMPZ_MPOLY:
-        case GR_CTX_FMPZ_MPOLY_Q:
+        /* case GR_CTX_FMPZ_MPOLY_Q:    not implemented */
         case GR_CTX_FMPZ_POLY:
             return 1;
         case GR_CTX_GR_POLY:
@@ -3236,6 +3324,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
         if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
         {
             flint_printf("factor\n");
+            gr_ctx_println(R);
             flint_printf("x = "); gr_println(x, R);
             flint_printf("c = "); gr_println(c, R);
             flint_printf("fac = "); gr_vec_print(fac, R); flint_printf("\n");
@@ -3257,6 +3346,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
         if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
         {
             flint_printf("factor\n");
+            gr_ctx_println(R);
             flint_printf("x = "); gr_println(x, R);
             flint_printf("\n");
         }
@@ -4361,6 +4451,8 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 
     if (gr_ctx_is_ordered_ring(R) == T_TRUE)
         gr_test_iter(R, state, "ordered_ring_cmp", gr_test_ordered_ring_cmp, iters, test_flags);
+
+    gr_test_iter(R, state, "canonical_associate", gr_test_canonical_associate, iters, test_flags);
 
     gr_test_iter(R, state, "ordered_ring_cmpabs", gr_test_ordered_ring_cmpabs, iters, test_flags);
 

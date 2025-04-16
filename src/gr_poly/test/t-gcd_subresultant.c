@@ -15,8 +15,8 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_FUNCTION_START(gr_poly_gcd, state)
+TEST_FUNCTION_START(gr_poly_gcd_subresultant, state)
 {
-    _gr_poly_test_gcd_ufd((gr_method_poly_gcd_op) _gr_poly_gcd, state, 1000, 6, NULL);
+    _gr_poly_test_gcd_ufd((gr_method_poly_gcd_op) _gr_poly_gcd_subresultant, state, 10000, 6, NULL);
     TEST_FUNCTION_END(state);
 }

@@ -491,6 +491,30 @@ _gr_fmpz_mpoly_gcd(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_
 }
 
 int
+_gr_fmpz_mpoly_canonical_associate(fmpz_mpoly_t ux, fmpz_mpoly_t u, const fmpz_mpoly_t poly, gr_ctx_t ctx)
+{
+    if (fmpz_mpoly_is_zero(poly, MPOLYNOMIAL_MCTX(ctx)))
+    {
+        fmpz_mpoly_zero(ux, MPOLYNOMIAL_MCTX(ctx));
+        fmpz_mpoly_one(u, MPOLYNOMIAL_MCTX(ctx));
+    }
+    else
+    {
+        slong sgn = fmpz_sgn(fmpz_mpoly_leadcoeff(poly));
+
+        if (sgn >= 0)
+            fmpz_mpoly_set(ux, poly, MPOLYNOMIAL_MCTX(ctx));
+        else
+            fmpz_mpoly_neg(ux, poly, MPOLYNOMIAL_MCTX(ctx));
+
+        fmpz_mpoly_set_si(u, sgn, MPOLYNOMIAL_MCTX(ctx));
+    }
+
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_fmpz_mpoly_factor(fmpz_mpoly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_mpoly_factor_t fac;
@@ -539,6 +563,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_RING,                     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING,         (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,          (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FIELD,                    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE,                   (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,    (gr_funcptr) gr_generic_ctx_predicate_false},
@@ -589,6 +614,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) _gr_fmpz_mpoly_pow_fmpz},
     {GR_METHOD_SQRT,        (gr_funcptr) _gr_fmpz_mpoly_sqrt},
     {GR_METHOD_IS_SQUARE,   (gr_funcptr) _gr_fmpz_mpoly_is_square},
+    {GR_METHOD_CANONICAL_ASSOCIATE,   (gr_funcptr) _gr_fmpz_mpoly_canonical_associate},
     {GR_METHOD_GCD,         (gr_funcptr) _gr_fmpz_mpoly_gcd},
     {GR_METHOD_FACTOR,      (gr_funcptr) _gr_fmpz_mpoly_factor},
     {0,                     (gr_funcptr) NULL},
