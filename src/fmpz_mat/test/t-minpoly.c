@@ -42,7 +42,7 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_poly_t f, g, q, r;
         slong ix;
 
-        n = n_randint(state, 4);
+        n = n_randint(state, 10);
 
         fmpz_init(c);
         fmpz_mat_init(A, n, n);
@@ -51,7 +51,10 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
 
-        fmpz_mat_randtest(A, state, 10);
+        if (n_randint(state, 50) == 0)
+            fmpz_mat_randtest(A, state, 1000);
+        else
+            fmpz_mat_randtest(A, state, 10);
 
         set_matrix(A, n);
 
@@ -91,7 +94,7 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_poly_t f, g;
         slong ix;
 
-        n = n_randint(state, 4);
+        n = n_randint(state, 10);
 
         fmpz_init(c);
         fmpz_mat_init(A, n, n);
