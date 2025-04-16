@@ -12,46 +12,44 @@
 #include "n_fft.h"
 #include "n_fft_macros.h"
 
-// Note for DFT with general node:
-// - lazy_1_4 variants would be basically identical to the lazy_2_4 variants (see the macros)
-// - writing lazy_2_4 variants of the DFTxx_NODE_LAZY_4_4 macros and then of dft_node_lazy_4_4 brings almost no speedup (very marginal gain up to length 32 or 64, nothing observable beyond this)
+/** Structure:
+ * TODO add/improve explanations here
+ * - the core function is dft_node_lazy_4_4, which reduces from an arbitrary point in the tree
+ * - this core function costs more than a DFT at node 0, so specific functions for that are given
+ * - and also specific less lazy variants (in the end, this is often used non-lazy, [0..n) -> [0..n))
+ */
 
-/*-------------*/
-/* general DFT */
-/*-------------*/
-
-/** 2**depth-point DFT
- * * in [0..4n) / out [0..4n) / max < 4n
- * * In-place transform p of length len == 2**depth into
- * the concatenation of
- *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
- * for k in range(len),
+/** 2**depth-point DFT, general node
+ * * In-place transform p of length len == 2**depth, seen as a polynomial of
+ * degree < len, into the concatenation of all polynomial evaluations
+ *          [p(w_k), p(-w_k)] for k in range(len),
  * where w_k = F->tab_w[2**depth * node + 2*k] for 0 <= k < 2**(depth-1)
- * * By construction these evaluation points are the roots of the
+ * * By construction these evaluation points are the len roots of the
  * polynomial x**len - F->tab_w[node]
  * * Requirement (not checked):
  *        3 <= depth
  *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
+ * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
 void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
-    if (depth == 3) // FIXME useless if not exposed?
+    if (depth == 3) // FIXME useless if not exposed
     {
         DFT8_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], node, F->mod, F->mod2, F->tab_w);
     }
     else if (depth == 4)
     {
         DFT16_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                          p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                          node, F->mod, F->mod2, F->tab_w);
+                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                            node, F->mod, F->mod2, F->tab_w);
     }
     else if (depth == 5)
     {
         DFT32_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                          p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                          p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
-                          p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
-                          node, F->mod, F->mod2, F->tab_w);
+                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                            p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
+                            p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
+                            node, F->mod, F->mod2, F->tab_w);
     }
     else
     {
@@ -88,20 +86,20 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 }
 
 /** 2**depth-point DFT
- * * in [0..2n) / out [0..4n) / max < 4n
- * * In-place transform p of length len == 2**depth into
- * the concatenation of
- *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
- * for k in range(len),
+ * * In-place transform p of length len == 2**depth, seen as a polynomial of
+ * degree < len, into the concatenation of all polynomial evaluations
+ *          [p(w_k), p(-w_k)] for k in range(len),
  * where w_k = F->tab_w[2*k] for 0 <= k < 2**(depth-1)
  * * By construction these evaluation points are the roots of the polynomial
  * x**len - 1, precisely they are all powers of the chosen len-th primitive
  * root of unity with exponents listed in bit reversed order
- * * Requirements (not checked): 3 <= depth <= F.depth
+ * * Requirement (not checked): 3 <= depth <= F.depth
+ * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
+ * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
  */
 void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
-    if (depth == 3)  // FIXME useless if function not exposed?
+    if (depth == 3)  // FIXME useless if function not exposed
     {
         DFT8_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
     }
@@ -146,18 +144,6 @@ void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
     }
 }
 
-/** 2**depth-point DFT
- * * in [0..n) / out [0..4n) / max < 4n
- * * In-place transform p of length len == 2**depth into
- * the concatenation of
- *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
- * for k in range(len),
- * where w_k = F->tab_w[2*k] for 0 <= k < 2**(depth-1)
- * * By construction these evaluation points are the roots of the polynomial
- * x**len - 1, precisely they are all powers of the chosen len-th primitive
- * root of unity with exponents listed in bit reversed order
- * * Requirements (not checked): depth <= F.depth
- */
 void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 4)
@@ -214,4 +200,16 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
         DFT2_LAZY_1_2(p[0], p[1], F->mod, tmp);
     }
 }
+
+
+/*---------------*/
+/* some comments */
+/*---------------*/
+
+/** Lazier variants for DFT with general node:
+ * - lazy_1_4 variants would be basically identical to the lazy_2_4 variants (see the macros)
+ * - writing lazy_2_4 variants of the DFTxx_NODE_LAZY_4_4 macros and then of
+ * dft_node_lazy_4_4 brings almost no speedup (very marginal gain up to length
+ * 32 or 64, nothing observable beyond this)
+ */
 
