@@ -121,7 +121,6 @@ slong
 _fmpz_mat_minpoly_bound_bits(const fmpz_mat_t op)
 {
     const slong n = op->r;
-    double B;
     slong bound;
 
     fmpz_t b;
@@ -134,6 +133,8 @@ _fmpz_mat_minpoly_bound_bits(const fmpz_mat_t op)
     slong exp;
 
     bb = fmpz_get_d_2exp(&exp, b);
+
+    fmpz_clear(b);
 
     if (fmpz_cmp_ui(b, n) >= 0)
     {
@@ -173,7 +174,6 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             characteristic and minimal polynomials", 2007.
         */
         ulong bound;
-        double b1, b2, b3, bb;
 
         slong pbits  = FLINT_BITS - 1, i, j;
         ulong p = (UWORD(1) << pbits);
