@@ -263,7 +263,7 @@ WARN_UNUSED_RESULT int gr_mpoly_mul_fmpz(gr_mpoly_t A, const gr_mpoly_t B, const
 WARN_UNUSED_RESULT int gr_mpoly_mul_fmpq(gr_mpoly_t A, const gr_mpoly_t B, const fmpq_t c, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mpoly_canonical_unit(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_canonical_associate(gr_mpoly_t res, gr_mpoly_t u, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }

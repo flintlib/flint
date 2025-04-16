@@ -744,12 +744,24 @@ _gr_fmpz_poly_rsqrt(fmpz_poly_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpz_poly_canonical_unit(fmpz_poly_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
+_gr_fmpz_poly_canonical_associate(fmpz_poly_t ux, fmpz_poly_t u, const fmpz_poly_t poly, const gr_ctx_t ctx)
 {
-    if (fmpz_poly_is_zero(x))
-        fmpz_poly_zero(res);
+    if (fmpz_poly_is_zero(poly))
+    {
+        fmpz_poly_zero(ux);
+        fmpz_poly_one(u);
+    }
     else
-        fmpz_poly_set_si(res, fmpz_sgn(x->coeffs + x->length - 1));
+    {
+        slong sgn = fmpz_sgn(poly->coeffs + poly->length - 1);
+
+        if (sgn >= 0)
+            fmpz_poly_set(ux, poly);
+        else
+            fmpz_poly_neg(ux, poly);
+
+        fmpz_poly_set_si(u, sgn);
+    }
 
     return GR_SUCCESS;
 }
@@ -875,7 +887,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_poly_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_poly_rsqrt},
-    {GR_METHOD_CANONICAL_UNIT,  (gr_funcptr) _gr_fmpz_poly_canonical_unit},
+    {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpz_poly_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {0,                         (gr_funcptr) NULL},
 };

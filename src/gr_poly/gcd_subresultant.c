@@ -227,32 +227,14 @@ _gr_poly_gcd_subresultant(gr_ptr res, slong * len_res, gr_srcptr poly1, slong le
         if (lenA == 1)
         {
             status |= gr_set(res, d, ctx);
-/*
-            status |= _gr_vec_zero(GR_ENTRY(res, 1, sz), len2 - 1, ctx);
-*/
             *len_res = 1;
         }
         else
         {
             status |= _gr_vec_content(b, B, lenB, ctx);
             status |= _gr_vec_divexact_scalar(B, B, lenB, b, ctx);
-
             status |= _gr_vec_mul_scalar(res, B, lenB, d, ctx);
-
-/*
-            if (gr_canonical_unit(g, GR_ENTRY(res, lenB - 1, sz), ctx) == GR_SUCCESS)
-            {
-                status |= gr_inv(g, g, ctx);
-                status |= _gr_vec_mul_scalar(res, res, lenB, g, ctx);
-            }
-*/
-
             *len_res = lenB;
-
-/*
-            if (len2 >= lenB)
-                status |= _gr_vec_zero(GR_ENTRY(res, lenB, sz), len2 - lenB, ctx);
-*/
         }
 
 cleanup:

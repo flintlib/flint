@@ -1264,10 +1264,28 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
-gr_generic_canonical_unit(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_ctx_is_field(ctx) == T_TRUE)
-        return gr_set(res, x, ctx);
+    {
+        int status = gr_inv(u, x, ctx);
+
+        if (!(status & GR_UNABLE))
+        {
+            if (status == GR_SUCCESS)
+            {
+                status |= gr_one(ux, ctx);
+            }
+            else
+            {
+                /* x = 0 */
+                status = gr_zero(ux, ctx);
+                status |= gr_one(u, ctx);
+            }
+        }
+
+        return status;
+    }
 
     return GR_UNABLE;
 }
@@ -2711,7 +2729,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SQRT,                    (gr_funcptr) gr_generic_sqrt},
     {GR_METHOD_RSQRT,                   (gr_funcptr) gr_generic_rsqrt},
 
-    {GR_METHOD_CANONICAL_UNIT,          (gr_funcptr) gr_generic_canonical_unit},
+    {GR_METHOD_CANONICAL_ASSOCIATE,     (gr_funcptr) gr_generic_canonical_associate},
 
     {GR_METHOD_NUMERATOR,               (gr_funcptr) gr_generic_numerator},
     {GR_METHOD_DENOMINATOR,             (gr_funcptr) gr_generic_denominator},

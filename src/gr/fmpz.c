@@ -574,6 +574,23 @@ _gr_fmpz_lcm(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_canonical_associate(fmpz_t ux, fmpz_t u, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(x) < 0)
+    {
+        fmpz_neg(ux, x);
+        fmpz_set_si(u, -1);
+    }
+    else
+    {
+        fmpz_set(ux, x);
+        fmpz_one(u);
+    }
+
+    return GR_SUCCESS;
+}
+
 int _gr_fmpz_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_factor_t fac;
@@ -1144,6 +1161,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIVREM,(gr_funcptr) _gr_fmpz_euclidean_divrem},
     {GR_METHOD_GCD,             (gr_funcptr) _gr_fmpz_gcd},
     {GR_METHOD_LCM,             (gr_funcptr) _gr_fmpz_lcm},
+    {GR_METHOD_CANONICAL_ASSOCIATE,          (gr_funcptr) _gr_fmpz_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_factor},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpz_pow_si},
@@ -1164,7 +1182,6 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_IM,              (gr_funcptr) _gr_fmpz_im},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpz_sgn},
-    {GR_METHOD_CANONICAL_UNIT,  (gr_funcptr) _gr_fmpz_sgn},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpz_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpz_cmpabs},
     {GR_METHOD_FIB_UI,          (gr_funcptr) _gr_fmpz_fib_ui},

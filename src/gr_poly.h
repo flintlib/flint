@@ -366,10 +366,8 @@ WARN_UNUSED_RESULT int gr_poly_make_monic(gr_poly_t res, const gr_poly_t src, gr
 WARN_UNUSED_RESULT truth_t _gr_poly_is_monic(gr_srcptr poly, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_poly_is_monic(const gr_poly_t res, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_poly_canonical_unit(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int _gr_poly_canonicalise_unit(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_canonicalise_unit(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_canonical_associate(gr_ptr res, gr_ptr u, gr_srcptr poly, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_canonical_associate(gr_poly_t res, gr_poly_t u, const gr_poly_t poly, gr_ctx_t ctx);
 
 /* GCD, resultant */
 

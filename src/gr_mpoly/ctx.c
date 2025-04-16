@@ -191,36 +191,75 @@ gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
     }
 }
 
-int
-gr_mpoly_canonical_unit(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+
+static int _gr_mpoly_remove_zeros(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 {
-    if (poly->length == 0)
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
+    slong i, N;
+    slong Alen, Blen;
+    ulong * Aexp;
+    fmpz * Acoeff;
+    int status = GR_SUCCESS;
+    slong sz = cctx->sizeof_elem;
+
+    N = mpoly_words_per_exp(A->bits, mctx);
+
+    Blen = A->length;
+    Aexp = A->exps;
+    Acoeff = A->coeffs;
+
+    Alen = 0;
+    for (i = 0; i < Blen; i++)
     {
-        return gr_mpoly_zero(res, ctx);
+        if (i != Alen)
+            mpoly_monomial_set(Aexp + N*Alen, Aexp + N*i, N);
+
+        Alen += (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx) != T_TRUE);
+    }
+
+    A->length = Alen;
+
+    return status;
+}
+
+int
+gr_mpoly_canonical_associate(gr_mpoly_t res, gr_mpoly_t u, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    slong len = poly->length;
+
+    if (len == 0)
+    {
+        status = gr_mpoly_zero(res, ctx);
+        if (u != NULL)
+            status |= gr_mpoly_one(u, ctx);
     }
     else
     {
-        gr_srcptr lc;
         gr_ptr c;
-        int status;
 
-        lc = poly->coeffs;
+        if (res != poly)
+            status |= gr_mpoly_set(res, poly, ctx);
 
-        if (gr_is_zero(lc, GR_MPOLY_CCTX(ctx)) == T_FALSE)
-        {
-            /* todo: avoid the temporary */
-            GR_TMP_INIT(c, GR_MPOLY_CCTX(ctx));
-            status = gr_canonical_unit(c, lc, GR_MPOLY_CCTX(ctx));
-            status |= gr_mpoly_set_scalar(res, c, ctx);
-            GR_TMP_CLEAR(c, GR_MPOLY_CCTX(ctx));
-        }
-        else
-        {
-            status = GR_UNABLE;
-        }
+        FLINT_ASSERT(len == res->length);
 
-        return status;
+        GR_TMP_INIT(c, GR_MPOLY_CCTX(ctx));
+
+        status |= gr_canonical_associate(res->coeffs, c, res->coeffs, GR_MPOLY_CCTX(ctx));
+        status |= _gr_vec_mul_scalar(GR_ENTRY(res->coeffs, 1, GR_MPOLY_CCTX(ctx)->sizeof_elem),
+                                     GR_ENTRY(res->coeffs, 1, GR_MPOLY_CCTX(ctx)->sizeof_elem),
+                                     len - 1, c, GR_MPOLY_CCTX(ctx));
+        /* todo: can skip over some rings */
+        status |= _gr_mpoly_remove_zeros(res, ctx);
+
+        if (u != NULL)
+            status |= gr_mpoly_set_scalar(u, c, ctx);
+
+        GR_TMP_CLEAR(c, GR_MPOLY_CCTX(ctx));
     }
+
+    return status;
 }
 
 
@@ -269,7 +308,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_MUL_FMPZ,    (gr_funcptr) gr_mpoly_mul_fmpz},
     {GR_METHOD_MUL_FMPQ,    (gr_funcptr) gr_mpoly_mul_fmpq},
     {GR_METHOD_INV,         (gr_funcptr) gr_mpoly_inv},
-    {GR_METHOD_CANONICAL_UNIT,         (gr_funcptr) gr_mpoly_canonical_unit},
+    {GR_METHOD_CANONICAL_ASSOCIATE,         (gr_funcptr) gr_mpoly_canonical_associate},
     {0,                     (gr_funcptr) NULL},
 };
 

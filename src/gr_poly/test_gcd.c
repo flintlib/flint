@@ -284,7 +284,7 @@ void _gr_poly_test_gcd_ufd(gr_method_poly_gcd_op gcd_impl,
                 }
             }
 
-            /* gcd(A,B) = 1  ==>  gcd(AC, BC) = canonicalise_unit(C) */
+            /* gcd(A,B) = 1  ==>  gcd(AC, BC) = canonical_associate(C) */
             status |= gr_poly_gcd_wrapper(gcd_impl, 1, G, A, B, ctx);
 
             if (status == GR_SUCCESS && gr_poly_is_one(G, ctx) == T_TRUE)
@@ -313,7 +313,7 @@ void _gr_poly_test_gcd_ufd(gr_method_poly_gcd_op gcd_impl,
                 {
                     if (gr_poly_is_zero(C, ctx) == T_FALSE)
                     {
-                        status |= gr_poly_canonicalise_unit(MC, C, ctx);
+                        status |= gr_poly_canonical_associate(MC, NULL, C, ctx);
 
                         if (status == GR_SUCCESS && gr_poly_equal(MC, G, ctx) == T_FALSE)
                         {
@@ -352,7 +352,7 @@ void _gr_poly_test_gcd_ufd(gr_method_poly_gcd_op gcd_impl,
 
             if (status == GR_SUCCESS)
             {
-                status |= gr_poly_canonicalise_unit(B, A, ctx);
+                status |= gr_poly_canonical_associate(B, NULL, A, ctx);
 
                 if (status == GR_SUCCESS && gr_poly_equal(G, B, ctx) == T_FALSE)
                 {

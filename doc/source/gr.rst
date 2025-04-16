@@ -751,11 +751,11 @@ Greatest common divisors
 Factorization
 ........................................................................
 
-.. function:: int gr_canonical_unit(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+.. function:: int gr_canonical_associate(gr_ptr res, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 
-    Assuming that `x \ne 0`, sets *res* to a unit `u` such that `u^{-1} x`
-    is a canonical form of `x` with respect to multiplication by units.
-    If `x = 0`, sets *res* to 0.
+    Given a commutative ring element *x*, sets *res* to a canonical form
+    `u x` with respect to multiplication by units, also writing the normalizing
+    unit *u* as a second output. If `x = 0`, sets *res* to 0 and *u* to 1.
 
 .. function:: int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 

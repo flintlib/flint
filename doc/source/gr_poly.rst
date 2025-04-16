@@ -641,9 +641,7 @@ Monic polynomials
 .. function:: truth_t _gr_poly_is_monic(gr_srcptr poly, slong len, gr_ctx_t ctx)
               truth_t gr_poly_is_monic(const gr_poly_t res, gr_ctx_t ctx)
 
-.. function:: int gr_poly_canonical_unit(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
-              int _gr_poly_canonicalise_unit(gr_ptr res, gr_srcptr poly, slong len, gr_ctx_t ctx)
-              int gr_poly_canonicalise_unit(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx)
+.. function:: int gr_poly_canonical_associate(gr_poly_t res, gr_poly_t u, const gr_poly_t src, gr_ctx_t ctx)
 
 GCD
 -------------------------------------------------------------------------------
@@ -692,7 +690,7 @@ GCD
     *gcd_generic* unless overridden by a particular ring.
 
     The non-underscore methods canonicalise the leading coefficient of the output
-    by calling ``gr_poly_canonicalise_unit``. Over a field, this corresponds
+    by calling ``gr_poly_canonical_associate``. Over a field, this corresponds
     to making the output monic. The underscore methods need not perform this
     canonicalisation.
 

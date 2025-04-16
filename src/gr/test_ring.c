@@ -3160,66 +3160,68 @@ gr_test_numerator_denominator(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-/* test x/canonical_unit(x) == (x*u)/canonical_unit(x*u) */
 int
-gr_test_canonical_unit(gr_ctx_t R, flint_rand_t state, int test_flags)
+gr_test_canonical_associate(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
-    gr_ptr x, u, cx, xu, cxu, a, b;
+    gr_ptr x, v, xv, y1, u1, y2, u2, xu1, xvu2;
     int i;
 
-    GR_TMP_INIT5(x, u, cx, xu, cxu, R);
-    GR_TMP_INIT2(a, b, R);
+    GR_TMP_INIT5(x, v, xv, y1, u1, R);
+    GR_TMP_INIT4(u2, y2, xu1, xvu2, R);
 
     GR_MUST_SUCCEED(gr_randtest(x, state, R));
 
     if (gr_is_zero(x, R) != T_FALSE)
     {
-        status |= gr_canonical_unit(cx, x, R);
+        status |= gr_canonical_associate(y1, u1, x, R);
 
         if (status == GR_SUCCESS)
         {
-            if (gr_is_zero(x, R) == T_TRUE && gr_is_zero(cx, R) == T_FALSE)
+            if (gr_is_zero(y1, R) == T_FALSE || gr_is_one(u1, R) == T_FALSE)
                 status = GR_TEST_FAIL;
         }
     }
     else
     {
+        /*
+            Evaluating:
+                y1, u1 = canonical_associate(x)
+                y2, u2 = canonical_associate(x * v)
+            Check:
+                y1 = y2
+                x * u1 = y1
+                xv * u2 = y2
+        */
+
         for (i = 0; ; i++)
         {
-            GR_IGNORE(gr_randtest(u, state, R));
+            GR_IGNORE(gr_randtest(v, state, R));
 
-            if (gr_is_invertible(u, R) == T_TRUE)
+            if (gr_is_invertible(v, R) == T_TRUE)
                 break;
 
             if (i == 5)
             {
-                GR_MUST_SUCCEED(n_randint(state, 2) ? gr_one(u, R) : gr_neg_one(u, R));
+                GR_MUST_SUCCEED(n_randint(state, 2) ? gr_one(v, R) : gr_neg_one(v, R));
                 break;
             }
         }
 
-        status |= gr_mul(xu, x, u, R);
-        status |= gr_canonical_unit(cx, x, R);
-        status |= gr_canonical_unit(cxu, xu, R);
+        status |= gr_mul(xv, x, v, R);
+        status |= gr_canonical_associate(y1, u1, x, R);
+        status |= gr_canonical_associate(y2, u2, xv, R);
 
         if (status == GR_SUCCESS)
         {
-            status |= gr_inv(a, cx, R);
-            status |= gr_mul(a, a, x, R);
-            status |= gr_inv(b, cxu, R);
-            status |= gr_mul(b, b, xu, R);
+            status |= gr_mul(xu1, x, u1, R);
+            status |= gr_mul(xvu2, xv, u2, R);
 
-            if (status == GR_DOMAIN)
+            if (gr_equal(y1, y2, R) == T_FALSE ||
+                gr_equal(xu1, y1, R) == T_FALSE ||
+                gr_equal(xvu2, y2, R) == T_FALSE)
             {
                 status = GR_TEST_FAIL;
-            }
-            else if (status == GR_SUCCESS)
-            {
-                if (gr_equal(a, b, R) == T_FALSE)
-                {
-                    status = GR_TEST_FAIL;
-                }
             }
         }
     }
@@ -3229,17 +3231,19 @@ gr_test_canonical_unit(gr_ctx_t R, flint_rand_t state, int test_flags)
         flint_printf("\n");
         gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
-        flint_printf("u = \n"); gr_println(u, R);
-        flint_printf("cx = \n"); gr_println(cx, R);
-        flint_printf("xu = \n"); gr_println(xu, R);
-        flint_printf("cxu = \n"); gr_println(cxu, R);
-        flint_printf("a = \n"); gr_println(a, R);
-        flint_printf("b = \n"); gr_println(b, R);
+        flint_printf("v = \n"); gr_println(v, R);
+        flint_printf("xv = \n"); gr_println(xv, R);
+        flint_printf("y1 = \n"); gr_println(y1, R);
+        flint_printf("u1 = \n"); gr_println(u1, R);
+        flint_printf("y2 = \n"); gr_println(y2, R);
+        flint_printf("u2 = \n"); gr_println(u2, R);
+        flint_printf("xu1 = \n"); gr_println(xu1, R);
+        flint_printf("xvu2= \n"); gr_println(xvu2, R);
         flint_printf("\n");
     }
 
-    GR_TMP_CLEAR5(x, u, cx, xu, cxu, R);
-    GR_TMP_CLEAR2(a, b, R);
+    GR_TMP_CLEAR5(x, v, xv, y1, u1, R);
+    GR_TMP_CLEAR4(u2, y2, xu1, xvu2, R);
 
     return status;
 }
@@ -4448,7 +4452,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     if (gr_ctx_is_ordered_ring(R) == T_TRUE)
         gr_test_iter(R, state, "ordered_ring_cmp", gr_test_ordered_ring_cmp, iters, test_flags);
 
-    gr_test_iter(R, state, "canonical_unit", gr_test_canonical_unit, iters, test_flags);
+    gr_test_iter(R, state, "canonical_associate", gr_test_canonical_associate, iters, test_flags);
 
     gr_test_iter(R, state, "ordered_ring_cmpabs", gr_test_ordered_ring_cmpabs, iters, test_flags);
 

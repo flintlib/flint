@@ -55,10 +55,10 @@ gr_poly_gcd_wrapper(gr_method_poly_gcd_op gcd_impl, int canonicalise_unit, gr_po
         return gr_poly_zero(G, ctx);
 
     if (A->length == 0)
-        return canonicalise_unit ? gr_poly_canonicalise_unit(G, B, ctx) : gr_set(G, B, ctx);
+        return canonicalise_unit ? gr_poly_canonical_associate(G, NULL, B, ctx) : gr_set(G, B, ctx);
 
     if (B->length == 0)
-        return canonicalise_unit ? gr_poly_canonicalise_unit(G, A, ctx) : gr_set(G, A, ctx);
+        return canonicalise_unit ? gr_poly_canonical_associate(G, NULL, A, ctx) : gr_set(G, A, ctx);
 
     if (A->length < B->length)
         return gr_poly_gcd_wrapper(gcd_impl, canonicalise_unit, G, B, A, ctx);
@@ -95,7 +95,7 @@ gr_poly_gcd_wrapper(gr_method_poly_gcd_op gcd_impl, int canonicalise_unit, gr_po
 
     if (status == GR_SUCCESS && lenG != 0 && canonicalise_unit)
     {
-        status = gr_poly_canonicalise_unit(G, G, ctx);
+        status = gr_poly_canonical_associate(G, NULL, G, ctx);
     }
 
     return status;
