@@ -14,6 +14,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* todo: make this public and tested */
 int
 _gr_poly_pseudo_rem_cohen(gr_ptr R, gr_srcptr A, slong lenA,
                             gr_srcptr B, slong lenB, gr_ctx_t ctx)
@@ -96,6 +97,7 @@ gr_poly_pseudo_rem_cohen(gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_c
     return status;
 }
 
+/* todo: before making this public, when len == 1, call canonical_associate */
 int
 _gr_vec_content(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 {
