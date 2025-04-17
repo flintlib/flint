@@ -710,6 +710,21 @@ Minimal polynomial
     Compute the minimal polynomial of the matrix *mat*.
     The algorithm assumes that the coefficient ring is a field.
 
+Companion matrix
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_mat_companion(gr_mat_t res, gr_srcptr poly, slong len, gr_ctx_t ctx)
+              int gr_mat_companion(gr_mat_t res, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Construct the companion matrix of the polynomial *poly*.
+    The algorithm assumes that the leading coefficient of *poly* is invertible.
+
+.. function:: int _gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, gr_srcptr poly, slong len, gr_ctx_t ctx)
+              int gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Construct a numerator and denominator such that the fraction is the companion
+    matrix of the polynomial *poly*.
+
 Similarity transformations
 -------------------------------------------------------------------------------
 
