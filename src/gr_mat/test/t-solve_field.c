@@ -17,6 +17,8 @@
 
 #include "fq_nmod_mat.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_mat_solve_field, state)
 {
     gr_ctx_t ctx;
@@ -36,9 +38,19 @@ TEST_FUNCTION_START(gr_mat_solve_field, state)
         gr_ctx_init_fq_nmod(ctx, &p, 1, "a");
 */
 
-        m = n_randint(state, 6);
-        n = n_randint(state, 6);
-        k = n_randint(state, 6);
+        /* Hack: avoid because slow */
+        if (ctx->methods == _ca_methods)
+        {
+            m = n_randint(state, 4);
+            n = n_randint(state, 4);
+            k = n_randint(state, 4);
+        }
+        else
+        {
+            m = n_randint(state, 6);
+            n = n_randint(state, 6);
+            k = n_randint(state, 6);
+        }
 
         gr_mat_init(A, m, k, ctx);
         gr_mat_init(B, m, n, ctx);

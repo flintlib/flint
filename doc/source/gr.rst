@@ -222,6 +222,13 @@ that the value is not computable:
     etc. depending on whether the unknown case should be included
     or excluded.
 
+.. function:: truth_t truth_and(truth_t x, truth_t y)
+              truth_t truth_or(truth_t x, truth_t y)
+              truth_t truth_not(truth_t x)
+
+    Performs the corresponding operation in ternary logic.
+
+.. function:: void truth_println(truth_t x)
 
 Context operations
 -------------------------------------------------------------------------------
@@ -750,6 +757,12 @@ Greatest common divisors
 
 Factorization
 ........................................................................
+
+.. function:: int gr_canonical_associate(gr_ptr res, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
+
+    Given a commutative ring element *x*, sets *res* to a canonical form
+    `u x` with respect to multiplication by units, also writing the normalizing
+    unit *u* as a second output. If `x = 0`, sets *res* to 0 and *u* to 1.
 
 .. function:: int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 

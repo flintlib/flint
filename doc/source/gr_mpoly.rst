@@ -289,6 +289,14 @@ Arithmetic
     Sets *A* to *B* multiplied by the scalar *c* which must be
     an element of or coercible to the coefficient ring.
 
+.. function:: int gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t src, gr_mpoly_ctx_t ctx)
+
+Other operations
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mpoly_canonical_associate(gr_mpoly_t res, gr_mpoly_t u, const gr_mpoly_t src, gr_mpoly_ctx_t ctx)
+
+
 Container operations
 -------------------------------------------------------------------------------
 

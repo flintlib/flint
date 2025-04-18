@@ -43,6 +43,7 @@
 #include "t-gcd.c"
 #include "t-gcd_euclidean.c"
 #include "t-gcd_hgcd.c"
+#include "t-gcd_subresultant.c"
 #include "t-hgcd.c"
 #include "t-integral.c"
 #include "t-inv_series.c"
@@ -114,6 +115,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_gcd),
     TEST_FUNCTION(gr_poly_gcd_euclidean),
     TEST_FUNCTION(gr_poly_gcd_hgcd),
+    TEST_FUNCTION(gr_poly_gcd_subresultant),
     TEST_FUNCTION(gr_poly_hgcd),
     TEST_FUNCTION(gr_poly_integral),
     TEST_FUNCTION(gr_poly_inv_series),
