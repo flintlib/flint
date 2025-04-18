@@ -269,8 +269,8 @@ do {                                                                \
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
 #define DFT4_NODE_LAZY_4_4(a, b, c, d,                        \
-                         w1, w1_pr, w2, w2_pr, w3, w3_pr,     \
-                         n, n2, p_hi, p_lo, tmp)              \
+                           w1, w1_pr, w2, w2_pr, w3, w3_pr,   \
+                           n, n2, p_hi, p_lo, tmp)            \
 do {                                                          \
     ulong u0 = (a);                                           \
     ulong u1 = (b);                                           \
@@ -296,14 +296,12 @@ do {                                                          \
     u3 = tmp + n2 - u3;              /* [0..4n) */            \
                                                               \
     N_MULMOD_PRECOMP_LAZY(u1, w2, u1, w2_pr, n, p_hi, p_lo);  \
-    tmp = u0;                                                 \
     (a) = u0 + u1;                   /* [0..4n) */            \
-    (b) = tmp + n2 - u1;             /* [0..4n) */            \
+    (b) = u0 + n2 - u1;             /* [0..4n) */            \
                                                               \
     N_MULMOD_PRECOMP_LAZY(u3, w3, u3, w3_pr, n, p_hi, p_lo);  \
-    tmp = u2;                                                 \
     (c) = u2 + u3;                    /* [0..4n) */           \
-    (d) = tmp + n2 - u3;              /* [0..4n) */           \
+    (d) = u2 + n2 - u3;              /* [0..4n) */           \
 } while(0)
 
 /** 4-point FFT, interpolation, general node
@@ -770,10 +768,10 @@ do {                                                                            
 } while(0)
 
 #define DFT32_LAZY_2_4(p0, p1, p2, p3, p4, p5, p6, p7,                             \
-                     p8, p9, p10, p11, p12, p13, p14, p15,                         \
-                     p16, p17, p18, p19, p20, p21, p22, p23,                       \
-                     p24, p25, p26, p27, p28, p29, p30, p31,                       \
-                     mod, mod2, tab_w)                                             \
+                       p8, p9, p10, p11, p12, p13, p14, p15,                       \
+                       p16, p17, p18, p19, p20, p21, p22, p23,                     \
+                       p24, p25, p26, p27, p28, p29, p30, p31,                     \
+                       mod, mod2, tab_w)                                           \
 do {                                                                               \
     ulong p_hi, p_lo;                                                              \
                                                                                    \
@@ -808,7 +806,6 @@ do {                                                                            
     DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 2, mod, mod2, tab_w); \
     DFT8_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 3, mod, mod2, tab_w); \
 } while(0)
-
 
 /*-------------------------*/
 /* length 32, general node */

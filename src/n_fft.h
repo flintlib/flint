@@ -12,6 +12,12 @@
 #ifndef N_FFT_H
 #define N_FFT_H
 
+#include "fft_small.h"
+#include "flint.h"
+#include "longlong.h"
+#include "nmod.h"
+#include "nmod_poly.h"
+#include "nmod_vec.h"
 #include "ulong_extras.h"
 
 #define N_FFT_CTX_DEFAULT_DEPTH 12
@@ -196,13 +202,6 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
  * root of unity with exponents listed in bit reversed order
  * * Requirements (not checked): depth <= F.depth
  */
-void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
-FLINT_FORCE_INLINE void n_fft_dft_lazy_4_4(nn_ptr p, ulong depth, n_fft_ctx_t F)
-{
-    n_fft_args_t Fargs;
-    n_fft_set_args(Fargs, F->mod, F->tab_w);
-    dft_node_lazy_4_4(p, depth, 0, Fargs);
-}
 
 void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
@@ -212,7 +211,22 @@ FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
     dft_lazy_1_4(p, depth, Fargs);
 }
 
-
+FLINT_FORCE_INLINE void n_fft_dft_lazy_1_1(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_w);
+    dft_lazy_1_4(p, depth, Fargs);
+    if (depth > 0)
+    {
+        for (ulong k = 0; k < (UWORD(1) << depth); k++)
+        {
+            if (p[k] >= Fargs->mod2)
+                p[k] -= Fargs->mod2;
+            if (p[k] >= Fargs->mod)
+                p[k] -= Fargs->mod;
+        }
+    }
+}
 
 
 
@@ -274,9 +288,6 @@ FLINT_FORCE_INLINE void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
             p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
     }
 }
-
-
-
 
 #ifdef __cplusplus
 }

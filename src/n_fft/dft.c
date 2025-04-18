@@ -33,7 +33,7 @@
  */
 void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
-    if (depth == 3) // FIXME useless if not exposed
+    if (depth == 3)
     {
         DFT8_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], node, F->mod, F->mod2, F->tab_w);
     }
@@ -99,23 +99,23 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
  */
 void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
-    if (depth == 3)  // FIXME useless if function not exposed
+    if (depth == 3)
     {
         DFT8_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
     }
     else if (depth == 4)
     {
         DFT16_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                     p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                     F->mod, F->mod2, F->tab_w);
+                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                       F->mod, F->mod2, F->tab_w);
     }
     else if (depth == 5)
     {
         DFT32_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                     p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                     p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
-                     p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
-                     F->mod, F->mod2, F->tab_w);
+                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                       p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
+                       p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
+                       F->mod, F->mod2, F->tab_w);
     }
     else
     {
@@ -149,16 +149,16 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
     if (depth == 4)
     {
         DFT16_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                     p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                     F->mod, F->mod2, F->tab_w);
+                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                       F->mod, F->mod2, F->tab_w);
     }
     else if (depth == 5)
     {
         DFT32_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                     p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                     p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
-                     p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
-                     F->mod, F->mod2, F->tab_w);
+                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                       p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
+                       p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
+                       F->mod, F->mod2, F->tab_w);
     }
     else if (depth > 5)
     {
@@ -201,7 +201,6 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
     }
 }
 
-
 /*---------------*/
 /* some comments */
 /*---------------*/
@@ -213,3 +212,8 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
  * 32 or 64, nothing observable beyond this)
  */
 
+/** Base cases:
+ * - having macros for "small" lengths (up to 16 or 32 at least) improves performance
+ * - removing the base cases depth==3 in internal functions where this case is
+ *   not really used (eg dft_node_lazy_4_4) does not make a difference
+ */
