@@ -51,6 +51,28 @@ GR_INLINE truth_t truth_not(truth_t x)
     return T_UNKNOWN;
 }
 
+GR_INLINE truth_t gr_in_domain(int status)
+{
+    if (status == GR_SUCCESS)
+	return T_TRUE;
+    else if (status & GR_UNABLE)
+	return T_UNKNOWN;
+    else if (status & GR_DOMAIN)
+	return T_FALSE;
+    else
+	return T_UNKNOWN;
+}
+
+GR_INLINE int gr_check(truth_t t)
+{
+    if (t == T_TRUE)
+	return GR_SUCCESS;
+    else if (t == T_FALSE)
+	return GR_DOMAIN;
+    else
+	return GR_UNABLE;
+}
+
 GR_INLINE void truth_println(truth_t x)
 {
     if (x == T_TRUE) flint_printf("T_TRUE\n");

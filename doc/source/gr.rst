@@ -230,6 +230,14 @@ that the value is not computable:
 
 .. function:: void truth_println(truth_t x)
 
+.. function:: truth_t gr_in_domain(int status)
+
+   Returns ``T_TRUE`` when ``status`` is ``GR_SUCCESS``, ``T_FALSE`` when ``GR_DOMAIN`` is set but ``GR_UNABLE`` is not, and ``T_UNKNOWN`` otherwise.
+
+.. function:: int gr_check(truth_t t)
+
+   Maps ``T_TRUE`` to ``GR_SUCCESS``, ``T_FALSE`` to ``GR_DOMAIN``, and ``T_UNKNOWN`` to ``GR_UNABLE``.
+
 Context operations
 -------------------------------------------------------------------------------
 
