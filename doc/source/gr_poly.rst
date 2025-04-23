@@ -793,6 +793,30 @@ Shift equivalence
 
     Computes (if possible) *s* such that `p(x+s) = q(x)(1+O(x^2))`.
 
+.. function:: int gr_poly_dispersion_resultant(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+              int _gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_vec_t ffac, const gr_vec_t gfac, gr_ctx_t ctx);
+              int gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+              int gr_poly_dispersion(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+
+    Computes the dispersion and/or the dispersion set of *f* and *g*.
+
+    The dispersion set of two polynomials *f* and *g* (over a unique
+    factorization domain of characteristic zero) is the set of nonnegative
+    integers *n* such that `f(x + n)` and `g(x)` have a nonconstant common
+    factor. The dispersion is the largest element of the dispersion set.
+
+    The output variables *disp* and/or *disp_set* can be ``NULL``, in which case
+    the corresponding result is not stored.
+    When the dispersion set is empty, *disp* is left unchanged.
+    The elements of *disp_set* are sorted in increasing order.
+
+    The *factor* version uses the algorithm described in [ManWright1994]_.
+    Its underscore variant assumes that *f* and *g* are nonzero and takes as
+    input their nonconstant irreducible factors (without multiplicities)
+    instead of the polynomials themselves.
+    The *resultant* version computes the integer roots of a bivariate resultant
+    and is mainly intended for testing.
+
 Roots
 -------------------------------------------------------------------------------
 
