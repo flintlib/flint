@@ -123,6 +123,7 @@ typedef enum
 
     GR_METHOD_RANDTEST,
     GR_METHOD_RANDTEST_NOT_ZERO,
+    GR_METHOD_RANDTEST_INVERTIBLE,
     GR_METHOD_RANDTEST_SMALL,
 
     GR_METHOD_ZERO,
@@ -955,6 +956,7 @@ GR_INLINE void _gr_length(gr_srcptr x, gr_ctx_t ctx) { _GR_GET_SI_OP(ctx, LENGTH
 
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_INVERTIBLE)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_SMALL)(x, state, ctx); }
 GR_INLINE /* todo: warn? */ int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
 GR_INLINE /* todo: warn? */ int gr_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx) { return GR_STREAM_IN_SI(ctx, WRITE_N)(out, x, n, ctx); }

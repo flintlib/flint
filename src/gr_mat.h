@@ -103,6 +103,7 @@ WARN_UNUSED_RESULT int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_
 WARN_UNUSED_RESULT int gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randpermdiag(int * parity, gr_mat_t mat, flint_rand_t state, gr_ptr diag, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_randsimilar(gr_mat_t mat, flint_rand_t state, slong opcount, gr_ctx_t ctx);
 
 GR_MAT_INLINE truth_t
 gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
