@@ -817,6 +817,35 @@ Shift equivalence
     The *resultant* version computes the integer roots of a bivariate resultant
     and is mainly intended for testing.
 
+
+.. function:: int _gr_poly_shiftless_decomposition_factor(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx)
+
+
+    Computes a decomposition of ``self`` of the form
+
+        .. math:: c \prod_i \prod_j g_i(x + h_{i,j})^{e_{i,j}}
+
+    where
+
+    * `c` is a constant,
+    * the `g_i` are squarefree polynomials of degree at least one,
+    * `g_i(x)` and `g_j(x + h)` (with `i \neq j`) are coprime for all
+      `h \in \mathbb Z`,
+    * `g_i(x)` and `g_i(x + h)` are coprime for all nonzero `h \in \mathbb Z`,
+    * `e_{i,j}` and `h_{i,j}` are integers with `e_{i,j} \geq 1`
+      and `0 = h_{i,1} < h_{i,2} < \cdots`.
+
+    The output variable *slfac* must be initialized to a vector of polynomials
+    of the same type as *pol*. The other two output vectors *slshift* and
+    *slmult* must be initialized to vectors *of vectors* with entries of type
+    *fmpz*.
+
+    The *factor* version computes an irreducible factorization and sorts the
+    factors into shift-equivalence classes. Its underscore variant takes the
+    irreducible factorization (without the prefactor *c*) as input.
+
 Roots
 -------------------------------------------------------------------------------
 
