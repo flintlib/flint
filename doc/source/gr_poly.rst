@@ -780,6 +780,19 @@ TODO: currently only fields of characteristic 0 are supported.
 
     Sets *res* to the squarefreepart of *poly*.
 
+Shift equivalence
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_poly_shift_equivalent(fmpz_t shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx)
+
+    Returns whether there exists an integer *n* such that `p(x + n) = q(x)`. If
+    the result is ``T_TRUE`` and *shift* is not ``NULL``, *shift* is set to
+    such an *n*.
+
+.. function:: int gr_poly_leading_taylor_shift(gr_ptr shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx)
+
+    Computes (if possible) *s* such that `p(x+s) = q(x)(1+O(x^2))`.
+
 Roots
 -------------------------------------------------------------------------------
 
