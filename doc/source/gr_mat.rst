@@ -861,6 +861,12 @@ Random matrices
 
     This operation only makes sense over integral domains (currently not checked).
 
+.. function:: int gr_mat_randsimilar(gr_mat_t mat, flint_rand_t state, slong opcount, gr_ctx_t ctx)
+
+    Randomises *mat* in-place by conjugating by elementary row/column
+    operations. More precisely, at most *opcount* conjugations by random
+    elementary row/column operations will be performed.
+
 Special matrices
 -------------------------------------------------------------------------------
 
