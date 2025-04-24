@@ -688,6 +688,7 @@ typedef enum
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
+    GR_CTX_GR_FRACTION,
     GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
     GR_CTX_GR_MAT,
     GR_CTX_GR_VEC,
@@ -1405,6 +1406,13 @@ void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const o
 #ifdef FMPZ_MPOLY_Q_H
 void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
+
+/* Generic fractions */
+
+#define GR_FRACTION_NO_REDUCTION        1
+#define GR_FRACTION_STRONGLY_CANONICAL  2
+
+void gr_ctx_init_gr_fraction(gr_ctx_t ctx, gr_ctx_t domain, int flags);
 
 /* Generic series */
 /* TODO: move parts of this to its own module */
