@@ -73,6 +73,7 @@ _gr_fraction_init(gr_ptr x, gr_fraction_ctx_t ctx)
 
     gr_init(a, domain_ctx);
     gr_init(b, domain_ctx);
+    GR_MUST_SUCCEED(gr_one(b, domain_ctx));
 }
 
 void
@@ -998,7 +999,11 @@ _gr_fraction_sqrt(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
 
     /* todo: when can we guarantee GR_DOMAIN? */
     if (status != GR_SUCCESS)
+    {
+        /* don't accidentally construct the invalid fraction 1 / 0 */
+        GR_IGNORE(gr_zero(res, ctx));
         status = GR_UNABLE;
+    }
 
     return status;
 }
