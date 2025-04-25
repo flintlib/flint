@@ -309,6 +309,11 @@ WARN_UNUSED_RESULT int gr_mat_charpoly_generic(gr_poly_t cp, const gr_mat_t mat,
 WARN_UNUSED_RESULT int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_mat_companion(gr_mat_t res, gr_srcptr poly, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_companion(gr_mat_t res, const gr_poly_t poly, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, gr_srcptr poly, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, const gr_poly_t poly, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hessenberg_gauss(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hessenberg_householder(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);

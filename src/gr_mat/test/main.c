@@ -18,6 +18,7 @@
 #include "t-charpoly_faddeev.c"
 #include "t-charpoly_gauss.c"
 #include "t-charpoly_householder.c"
+#include "t-companion.c"
 #include "t-concat_horizontal.c"
 #include "t-concat_vertical.c"
 #include "t-det_berkowitz.c"
@@ -74,6 +75,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_charpoly_faddeev),
     TEST_FUNCTION(gr_mat_charpoly_gauss),
     TEST_FUNCTION(gr_mat_charpoly_householder),
+    TEST_FUNCTION(gr_mat_companion),
     TEST_FUNCTION(gr_mat_concat_horizontal),
     TEST_FUNCTION(gr_mat_concat_vertical),
     TEST_FUNCTION(gr_mat_det_berkowitz),
