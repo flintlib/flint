@@ -560,6 +560,12 @@ polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
 }
 
 int
+polynomial_divexact(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
+{
+    return gr_poly_divexact(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
 polynomial_euclidean_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     gr_poly_t r;
@@ -707,6 +713,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_POW_SI,      (gr_funcptr) polynomial_pow_si},
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) polynomial_pow_fmpz},
     {GR_METHOD_DIV,         (gr_funcptr) polynomial_div},
+    {GR_METHOD_DIVEXACT,    (gr_funcptr) polynomial_divexact},
     {GR_METHOD_INV,         (gr_funcptr) polynomial_inv},
 
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
