@@ -15,22 +15,20 @@ void
 acb_theta_eld_clear(acb_theta_eld_t E)
 {
     slong k;
-    slong nr = acb_theta_eld_nr(E);
-    slong nl = acb_theta_eld_nl(E);
 
-    if (nr > 0)
+    if ((E->nr) > 0)
     {
-        for (k = 0; k < nr; k++)
+        for (k = 0; k < (E->nr); k++)
         {
-            acb_theta_eld_clear(acb_theta_eld_rchild(E, k));
+            acb_theta_eld_clear(&E->rchildren[k]);
         }
         flint_free(E->rchildren);
     }
-    if (nl > 0)
+    if ((E->nl) > 0)
     {
-        for (k = 0; k < nl; k++)
+        for (k = 0; k < (E->nl); k++)
         {
-            acb_theta_eld_clear(acb_theta_eld_lchild(E, k));
+            acb_theta_eld_clear(&E->lchildren[k]);
         }
         flint_free(E->lchildren);
     }
