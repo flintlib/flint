@@ -51,6 +51,7 @@ void gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx);
+void gr_vec_append_swap(gr_vec_t vec, gr_ptr f, gr_ctx_t ctx);
 
 truth_t _gr_vec_contains(gr_srcptr vec, slong len, gr_srcptr x, gr_ctx_t ctx);
 
