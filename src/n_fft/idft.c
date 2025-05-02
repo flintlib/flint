@@ -17,24 +17,31 @@
 // larger base cases?
 void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
-    if (depth == 1)
-    {
-        ulong p_hi, p_lo, tmp;
-        IDFT2_NODE_LAZY_2_2(p[0], p[1], F->tab_w[2*node], F->tab_w[2*node+1], F->mod, F->mod2, p_hi, p_lo, tmp);
-    }
-    else if (depth == 2)
-    {
-        ulong p_hi, p_lo;
-        IDFT4_NODE_LAZY_1_2(p[0], p[1], p[2], p[3],
-                          F->tab_w[2*node], F->tab_w[2*node+1],
-                          F->tab_w[4*node], F->tab_w[4*node+1],
-                          F->tab_w[4*node+2], F->tab_w[4*node+3],
-                          F->mod, F->mod2, p_hi, p_lo);
-    }
-    else if (depth == 3)
+    //if (depth == 1)
+    //{
+    //    ulong p_hi, p_lo, tmp;
+    //    IDFT2_NODE_LAZY_2_2(p[0], p[1], F->tab_w[2*node], F->tab_w[2*node+1], F->mod, F->mod2, p_hi, p_lo, tmp);
+    //}
+    //else if (depth == 2)
+    //{
+    //    ulong p_hi, p_lo;
+    //    IDFT4_NODE_LAZY_1_2(p[0], p[1], p[2], p[3],
+    //                      F->tab_w[2*node], F->tab_w[2*node+1],
+    //                      F->tab_w[4*node], F->tab_w[4*node+1],
+    //                      F->tab_w[4*node+2], F->tab_w[4*node+3],
+    //                      F->mod, F->mod2, p_hi, p_lo);
+    //}
+    //else
+    if (depth == 3)
     {
         IDFT8_NODE_LAZY_1_2(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                             node, F->mod, F->mod2, F->tab_w);
+    }
+    else if (depth == 4)
+    {
+        IDFT16_NODE_LAZY_1_2(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                             p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                             node, F->mod, F->mod2, F->tab_w);
     }
     else
     {
@@ -84,10 +91,17 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
         IDFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3],
                            F->mod, F->mod2, p_hi, p_lo);
     }
-    else if (depth == 3)
+    else
+    if (depth == 3)
     {
         IDFT8_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                           F->mod, F->mod2, F->tab_w);
+                       F->mod, F->mod2, F->tab_w);
+    }
+    else if (depth == 4)
+    {
+        IDFT16_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                        p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                        F->mod, F->mod2, F->tab_w);
     }
     else
     {

@@ -12,12 +12,7 @@
 #ifndef N_FFT_H
 #define N_FFT_H
 
-#include "fft_small.h"
 #include "flint.h"
-#include "longlong.h"
-#include "nmod.h"
-#include "nmod_poly.h"
-#include "nmod_vec.h"
 #include "ulong_extras.h"
 
 #define N_FFT_CTX_DEFAULT_DEPTH 12
@@ -28,9 +23,8 @@ extern "C" {
 
 /**
  * TODO[short term] finalize interface and reducing output to [0..n)
- * TODO[short term] add testing for general node variants
- * TODO[short term] add testing for transposed variants
- * TODO[short term]  write general note about the names (node ; lazy14 - lazy24 - lazy_4_4...)
+ * TODO[short term] add proper testing for inverse / transposed variants
+ * TODO[short term] write general note about the names (node ; lazy14 - lazy24 - lazy_4_4...)
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
  * TODO[long term] on zen4 (likely on other cpus as well) ctx_init becomes
@@ -39,6 +33,10 @@ extern "C" {
  * smaller (~13-14) when tab_iw has been incorporated compared to without
  * tab_iw (it was depth ~20-21); see if this can be understood, and maybe play
  * with vectorization for those simple functions
+ *
+ * TODO for perf:
+ *   - try inserting final reduction into base cases
+ *   - idft16 / idft32
  */
 
 
@@ -191,17 +189,33 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
 /* length is a power of 2 */
 
 /** 2**depth-point DFT
- * * in [0..n) / out [0..4n) / max < 4n
- * * In-place transform p of length len == 2**depth into
- * the concatenation of
- *       [sum(p[i] * w_k**i for i in range(len), sum(p[i] * (-w_k)**i for i in range(len)]
- * for k in range(len),
- * where w_k = F->tab_w[2*k] for 0 <= k < 2**(depth-1)
+ * * In-place transform p of length len == 2**depth, seen as a polynomial f(x)
+ * of degree < len, into the concatenation of all polynomial evaluations
+ *          [f(w_k), f(-w_k)] for 0 <= k < len/2,
+ * where w_k = F->tab_w[2*k]
  * * By construction these evaluation points are the roots of the polynomial
  * x**len - 1, precisely they are all powers of the chosen len-th primitive
  * root of unity with exponents listed in bit reversed order
- * * Requirements (not checked): depth <= F.depth
+ * * Requirement (not checked): depth <= F.depth
+ * * TODO variants lazy_1_4: in [0..n) / out [0..4n) / max < 4n
+ * * TODO variants lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
  */
+
+/** 2**depth-point inverse DFT
+ * * In-place transform p of length len == 2**depth, seen as a vector
+ * of concatenated evaluations
+ *          [f(w_k), f(-w_k)] for 0 <= k < len/2,
+ * of some polynomial f(x) of degree < len, into the coefficients of this
+ * polynomial, where w_k = F->tab_w[2*k]
+ * * By construction these evaluation points are the roots of the polynomial
+ * x**len - 1, precisely they are all powers of the chosen len-th primitive
+ * root of unity with exponents listed in bit reversed order
+ * * Requirement (not checked): depth <= F.depth
+ * * TODO variants lazy_1_4: in [0..n) / out [0..4n) / max < 4n
+ * * TODO variants lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
+ */
+
+
 
 void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 FLINT_FORCE_INLINE void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
@@ -246,13 +260,9 @@ FLINT_FORCE_INLINE void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F)
         const ulong inv2_pr = F->tab_inv2[2*depth-1];
         //ulong p_hi, p_lo;
         for (ulong k = 0; k < (UWORD(1) << depth); k++)
-        {
             p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
-            //umul_ppmm(p_hi, p_lo, inv2_pr, p[k]);
-            //p[k] = inv2 * p[k] - p_hi * F->mod;
-        }
-        // NOTE: apparently no gain from lazy variant, so
-        // probably better to use non-lazy one (ensures output < n)
+        // NOTE: apparently no gain from lazy variant (output [0..2n)), so
+        // better to use non-lazy one (ensures output < n)
     }
     // FIXME see if that can be made less expensive at least for depths not too
     // small, by integrating into base cases of dft (node0) ?

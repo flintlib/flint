@@ -166,7 +166,61 @@ void sample_polymul(void * arg, ulong count)
 
     nmod_poly_clear(a);
     nmod_poly_clear(b);
+    nmod_poly_clear(ab);
     n_fft_ctx_clear(F);
+    FLINT_TEST_CLEAR(state);
+}
+
+void sample_nmod_poly_mul(void * arg, ulong count)
+{
+    info_t * info = (info_t *) arg;
+    const ulong p = info->prime;
+    const ulong depth = info->depth;
+    const ulong stride = info->stride;
+
+    const ulong len = stride * (UWORD(1) << depth);
+    const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));
+
+    /* modulus, roots of unity */
+    nmod_t mod;
+    nmod_init(&mod, p);
+
+    /* polynomials */
+    /* FIXME: vary the lengths */
+    const ulong pdepth = depth-1;
+    const ulong plen = stride * (UWORD(1) << pdepth);
+    nmod_poly_t a;
+    nmod_poly_t b;
+    nmod_poly_t ab;
+    nmod_poly_init(a, p);
+    nmod_poly_init(b, p);
+    nmod_poly_init(ab, p);
+
+    FLINT_TEST_INIT(state);
+
+    nmod_poly_fit_length(a, plen);
+    _nmod_poly_set_length(a, plen);
+    nmod_poly_fit_length(b, plen);
+    _nmod_poly_set_length(b, plen);
+    for (ulong k = 0; k < plen; k++)
+    {
+        a->coeffs[k] = n_randint(state, p);
+        b->coeffs[k] = n_randint(state, p);
+    }
+    _nmod_poly_normalise(a);
+    _nmod_poly_normalise(b);
+
+    for (ulong i = 0; i < count; i++)
+    {
+        prof_start();
+        for (ulong j = 0; j < rep; j++)
+            nmod_poly_mul(ab, a, b);
+        prof_stop();
+    }
+
+    nmod_poly_clear(a);
+    nmod_poly_clear(b);
+    nmod_poly_clear(ab);
     FLINT_TEST_CLEAR(state);
 }
 
@@ -219,7 +273,7 @@ int main()
 {
     flint_printf("- depth is log(fft length)\n");
     flint_printf("- timing DFT (length power of 2) for several bit lengths and depths\n");
-    flint_printf("depth\tsd_fft\tdft\tidft\tdft_t\tidft_t\n");
+    flint_printf("depth\tsd_fft\tdft\tidft\tdft_t\tidft_t\tdft11\tnewmul\tmul\n");
 
     ulong primes[num_primes] = {
         786433,              // 20 bits, 1 + 2**18 * 3
@@ -256,15 +310,17 @@ int main()
             prof_repeat(min+4, &max, sample_idft_t, (void *) &info);
             prof_repeat(min+5, &max, sample_dft_lazy_1_1, (void *) &info);
             prof_repeat(min+6, &max, sample_polymul, (void *) &info);
+            prof_repeat(min+7, &max, sample_nmod_poly_mul, (void *) &info);
 
-            flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",
+            flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",
                     min[0]/(double)1000000/rep,
                     min[1]/(double)1000000/rep,
                     min[2]/(double)1000000/rep,
                     min[3]/(double)1000000/rep,
                     min[4]/(double)1000000/rep,
                     min[5]/(double)1000000/rep,
-                    min[6]/(double)1000000/rep
+                    min[6]/(double)1000000/rep,
+                    min[7]/(double)1000000/rep
                     );
         }
     }

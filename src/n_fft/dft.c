@@ -13,10 +13,17 @@
 #include "n_fft_macros.h"
 
 /** Structure:
- * TODO add/improve explanations here
- * - the core function is dft_node_lazy_4_4, which reduces from an arbitrary point in the tree
- * - this core function costs more than a DFT at node 0, so specific functions for that are given
- * - and also specific less lazy variants (in the end, this is often used non-lazy, [0..n) -> [0..n))
+ * - the core function is dft_node_lazy_4_4, which goes down the subproduct
+ *   tree from an arbitrary node in this tree; it takes input values in [0..4n)
+ *   and return values in [0..4n)
+ * TODO add/improve explanations below
+ * - this core function costs more than a DFT at node 0 (at least for small /
+ *   small-ish lengths), so a specific function for that are given, targeting
+ *   input values in [0..n) and return values in [0..4n)
+ *   (and in [0..2n) respectively (the former
+ *   calls the latter)
+ * - less lazy variants (in the end, this is often used
+ *   non-lazy, [0..n) -> [0..n))
  */
 
 /** 2**depth-point DFT, general node
