@@ -26,6 +26,11 @@
  *   non-lazy, [0..n) -> [0..n))
  */
 
+/*************************
+*  auxiliary functions  *
+*************************/
+
+
 /** 2**depth-point DFT, general node
  * * In-place transform p of length len == 2**depth, seen as a polynomial of
  * degree < len, into the concatenation of all polynomial evaluations
@@ -205,6 +210,43 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
     {
         ulong tmp;
         DFT2_LAZY_1_2(p[0], p[1], F->mod, tmp);
+    }
+}
+
+/********************
+*  main interfaces  *
+*********************/
+
+void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    if (depth > 0)
+    {
+        n_fft_args_t Fargs;
+        n_fft_set_args(Fargs, F->mod, F->tab_w);
+        dft_lazy_1_4(p, depth, Fargs);
+        for (ulong k = 0; k < (UWORD(1) << depth); k++)
+        {
+            if (p[k] >= Fargs->mod2)
+                p[k] -= Fargs->mod2;
+            if (p[k] >= Fargs->mod)
+                p[k] -= Fargs->mod;
+        }
+    }
+}
+
+void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    if (depth > 0)
+    {
+        n_fft_args_t Fargs;
+        n_fft_set_args(Fargs, F->mod, F->tab_iw);
+        dft_lazy_1_4(p, depth, Fargs);
+
+        // see comments in idft concerning this loop
+        const ulong inv2 = F->tab_inv2[2*depth-2];
+        const ulong inv2_pr = F->tab_inv2[2*depth-1];
+        for (ulong k = 0; k < (UWORD(1) << depth); k++)
+            p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
     }
 }
 

@@ -59,8 +59,8 @@ void n_fft_mul_poly(nmod_poly_t ab, nmod_poly_t a, nmod_poly_t b, n_fft_ctx_t F)
     _nmod_vec_set(vb, b->coeffs, b->length);
     _nmod_vec_zero(vb + b->length, len - b->length);
 
-    n_fft_dft_lazy_1_1(va, depth, F);
-    n_fft_dft_lazy_1_1(vb, depth, F);
+    n_fft_dft(va, depth, F);
+    n_fft_dft(vb, depth, F);
     for (ulong k = 0; k < len; k++)
     {
         va[k] = nmod_mul(va[k], vb[k], a->mod);
@@ -228,7 +228,6 @@ SAMPLE(dft, )
 SAMPLE(idft, )
 SAMPLE(dft_t, )
 SAMPLE(idft_t, )
-SAMPLE(dft_lazy_1_1, )
 //SAMPLE(n_fft_dft, _stride)
 
 void sample_sd_fft(void * arg, ulong count)
@@ -308,9 +307,8 @@ int main()
             prof_repeat(min+2, &max, sample_idft, (void *) &info);
             prof_repeat(min+3, &max, sample_dft_t, (void *) &info);
             prof_repeat(min+4, &max, sample_idft_t, (void *) &info);
-            prof_repeat(min+5, &max, sample_dft_lazy_1_1, (void *) &info);
-            prof_repeat(min+6, &max, sample_polymul, (void *) &info);
-            prof_repeat(min+7, &max, sample_nmod_poly_mul, (void *) &info);
+            prof_repeat(min+5, &max, sample_polymul, (void *) &info);
+            prof_repeat(min+6, &max, sample_nmod_poly_mul, (void *) &info);
 
             flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",
                     min[0]/(double)1000000/rep,

@@ -12,26 +12,13 @@
 #include "n_fft.h"
 #include "n_fft_macros.h"
 
+/*************************
+*  auxiliary functions  *
+*************************/
+
 // TODO doc
-// TODO make sure this is tested (code coverage: including for small depths)
-// larger base cases?
 void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
-    //if (depth == 1)
-    //{
-    //    ulong p_hi, p_lo, tmp;
-    //    IDFT2_NODE_LAZY_2_2(p[0], p[1], F->tab_w[2*node], F->tab_w[2*node+1], F->mod, F->mod2, p_hi, p_lo, tmp);
-    //}
-    //else if (depth == 2)
-    //{
-    //    ulong p_hi, p_lo;
-    //    IDFT4_NODE_LAZY_1_2(p[0], p[1], p[2], p[3],
-    //                      F->tab_w[2*node], F->tab_w[2*node+1],
-    //                      F->tab_w[4*node], F->tab_w[4*node+1],
-    //                      F->tab_w[4*node+2], F->tab_w[4*node+3],
-    //                      F->mod, F->mod2, p_hi, p_lo);
-    //}
-    //else
     if (depth == 3)
     {
         IDFT8_NODE_LAZY_1_2(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
@@ -75,6 +62,7 @@ void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     }
 }
 
+// TODO doc
 void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 0)
@@ -129,4 +117,45 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
             IDFT4_LAZY_4222_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
         }
     }
+}
+
+
+/********************
+*  main interfaces  *
+*********************/
+
+void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    if (depth > 0)
+    {
+        n_fft_args_t Fargs;
+        n_fft_set_args(Fargs, F->mod, F->tab_w);
+        idft_lazy_1_4(p, depth, Fargs);
+        for (ulong k = 0; k < (UWORD(1) << depth); k++)
+        {
+            if (p[k] >= Fargs->mod2)
+                p[k] -= Fargs->mod2;
+            if (p[k] >= Fargs->mod)
+                p[k] -= Fargs->mod;
+        }
+    }
+}
+
+void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F)
+{
+    if (depth > 0)
+    {
+        n_fft_args_t Fargs;
+        n_fft_set_args(Fargs, F->mod, F->tab_iw);
+        idft_lazy_1_4(p, depth, Fargs);
+
+        const ulong inv2 = F->tab_inv2[2*depth-2];
+        const ulong inv2_pr = F->tab_inv2[2*depth-1];
+        for (ulong k = 0; k < (UWORD(1) << depth); k++)
+            p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
+        /* NOTE: apparently no gain from lazy variant (output [0..2n)), */
+        /* so let's use non-lazy one (ensures output < n)               */
+    }
+    // FIXME see if that can be made less expensive at least for depths not too
+    // small, by integrating into base cases (node0) ?
 }
