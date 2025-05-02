@@ -30,6 +30,14 @@ void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
                              p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                              node, F->mod, F->mod2, F->tab_w);
     }
+    else if (depth == 5)
+    {
+        IDFT32_NODE_LAZY_1_2(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                             p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                             p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
+                             p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
+                             node, F->mod, F->mod2, F->tab_w);
+    }
     else
     {
         const ulong len = UWORD(1) << depth;
@@ -91,6 +99,14 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
                         p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                         F->mod, F->mod2, F->tab_w);
     }
+    else if (depth == 5)
+    {
+        IDFT32_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                        p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                        p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
+                        p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
+                        F->mod, F->mod2, F->tab_w);
+    }
     else
     {
         const ulong len = UWORD(1) << depth;
@@ -120,9 +136,9 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 }
 
 
-/********************
-*  main interfaces  *
-*********************/
+/*-------------------*/
+/*  main interfaces  */
+/*-------------------*/
 
 void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
@@ -153,9 +169,14 @@ void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F)
         const ulong inv2_pr = F->tab_inv2[2*depth-1];
         for (ulong k = 0; k < (UWORD(1) << depth); k++)
             p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
-        /* NOTE: apparently no gain from lazy variant (output [0..2n)), */
-        /* so let's use non-lazy one (ensures output < n)               */
     }
-    // FIXME see if that can be made less expensive at least for depths not too
-    // small, by integrating into base cases (node0) ?
 }
+
+/*---------------*/
+/* some comments */
+/*---------------*/
+
+/** In n_fft_idft, there is apparently no gain from using the lazy mulmod_shoup
+ * variant whose output is in [0..2n) (so one may as well use the non-lazy one
+ * which ensures output < n)              
+ */

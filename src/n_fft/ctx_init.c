@@ -10,6 +10,7 @@
 */
 
 #include "n_fft.h"
+#include "ulong_extras.h"  /* for mulmod_shoup* functions */
 
 /** Given the precomputed quotient a_pr for modular multiplication by a mod n,
  *          a_pr == floor(a * 2**FLINT_BITS / n)

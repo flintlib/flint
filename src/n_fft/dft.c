@@ -26,10 +26,9 @@
  *   non-lazy, [0..n) -> [0..n))
  */
 
-/*************************
-*  auxiliary functions  *
-*************************/
-
+/*-----------------------*/
+/*  auxiliary functions  */
+/*-----------------------*/
 
 /** 2**depth-point DFT, general node
  * * In-place transform p of length len == 2**depth, seen as a polynomial of
@@ -213,9 +212,9 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
     }
 }
 
-/********************
-*  main interfaces  *
-*********************/
+/*-------------------*/
+/*  main interfaces  */
+/*-------------------*/
 
 void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
@@ -253,6 +252,11 @@ void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 /*---------------*/
 /* some comments */
 /*---------------*/
+
+/** In n_fft_idft_t, there is apparently no gain from using the lazy
+ * mulmod_shoup variant whose output is in [0..2n) (so one may as well use the
+ * non-lazy one which ensures output < n)              
+ */
 
 /** Lazier variants for DFT with general node:
  * - lazy_1_4 variants would be basically identical to the lazy_2_4 variants (see the macros)

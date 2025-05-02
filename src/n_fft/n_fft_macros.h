@@ -12,6 +12,9 @@
 #ifndef N_FFT_MACROS_H
 #define N_FFT_MACROS_H
 
+#include "longlong.h"      /* for umul_ppmm */
+#include "ulong_extras.h"  /* for mulmod_shoup* functions */
+
 /*---------*/
 /* helpers */
 /*---------*/
@@ -520,6 +523,7 @@ do {                                                               \
  * * By construction these 8 evaluation points are the 8 roots of the
  * polynomial x**8 - F->tab_w[node]
  * * lazy_1_2: in [0..n) / out [0..2n) / max < 4n
+ * * lazy_2_2: in [0..2n) / out [0..2n) / max < 4n
  */
 #define IDFT8_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7,        \
                             node, n, n2, tab_w)                    \
@@ -919,6 +923,35 @@ do {                                                                            
     DFT8_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 3, n, n2, tab_w); \
 } while(0)
 
+/** 32-point FFT, interpolation
+ * * In-place transform p of length 32, seen as the evaluations at all 32-th
+ * roots of unity  1, -1, I, -I... (bit-reversed order) of a polynomial p(x) of
+ * degree < 32, into the coefficients of this polynomial 
+ * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
+ */
+#define IDFT32_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,                           \
+                        p8, p9, p10, p11, p12, p13, p14, p15,                     \
+                        p16, p17, p18, p19, p20, p21, p22, p23,                   \
+                        p24, p25, p26, p27, p28, p29, p30, p31,                   \
+                        n, n2, tab_w)                                             \
+do {                                                                              \
+    ulong p_hi, p_lo;                                                             \
+                                                                                  \
+    IDFT8_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7, n, n2, tab_w);                 \
+    IDFT8_NODE_LAZY_1_2(p8, p9, p10, p11, p12, p13, p14, p15, 1, n, n2, tab_w);   \
+    IDFT8_NODE_LAZY_1_2(p16, p17, p18, p19, p20, p21, p22, p23, 2, n, n2, tab_w); \
+    IDFT8_NODE_LAZY_1_2(p24, p25, p26, p27, p28, p29, p30, p31, 3, n, n2, tab_w); \
+                                                                                  \
+    IDFT4_LAZY_4222_4(p0, p8, p16, p24, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);   \
+    IDFT4_LAZY_4222_4(p1, p9, p17, p25, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);   \
+    IDFT4_LAZY_4222_4(p2, p10, p18, p26, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
+    IDFT4_LAZY_4222_4(p3, p11, p19, p27, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
+    IDFT4_LAZY_4222_4(p4, p12, p20, p28, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
+    IDFT4_LAZY_4222_4(p5, p13, p21, p29, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
+    IDFT4_LAZY_4222_4(p6, p14, p22, p30, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
+    IDFT4_LAZY_4222_4(p7, p15, p23, p31, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
+} while(0)
+
 /*-------------------------*/
 /* length 32, general node */
 /*-------------------------*/
@@ -961,5 +994,40 @@ do {                                                                            
     DFT8_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);           \
 } while(0)
 
+/** 32-point FFT, interpolation, general node
+ * * In-place transform p of length 32, seen as the evaluations at 
+ *       w0, -w0, w1, -w1, ..., w15, -w15
+ * where w_k = F->tab_w[32*node + 2*k] for 0 <= k < 16 of a polynomial of
+ * degree < 32, into the coefficients of this polynomial 
+ * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
+ */
+#define IDFT32_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7,                                  \
+                             p8, p9, p10, p11, p12, p13, p14, p15,                            \
+                             p16, p17, p18, p19, p20, p21, p22, p23,                          \
+                             p24, p25, p26, p27, p28, p29, p30, p31,                          \
+                             node, n, n2, tab_w)                                              \
+do {                                                                                          \
+    ulong p_hi, p_lo;                                                                         \
+                                                                                              \
+    IDFT8_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);                \
+    IDFT8_NODE_LAZY_1_2(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);        \
+    IDFT8_NODE_LAZY_1_2(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);      \
+    IDFT8_NODE_LAZY_1_2(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);      \
+                                                                                              \
+    ulong w2 = tab_w[2*node];                                                                 \
+    ulong w2pre = tab_w[2*node+1];                                                            \
+    ulong w = tab_w[4*node];                                                                  \
+    ulong wpre = tab_w[4*node+1];                                                             \
+    ulong Iw = tab_w[4*node+2];                                                               \
+    ulong Iwpre = tab_w[4*node+3];                                                            \
+    IDFT4_NODE_LAZY_2_2(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo);  \
+    IDFT4_NODE_LAZY_2_2(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo);  \
+    IDFT4_NODE_LAZY_2_2(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
+    IDFT4_NODE_LAZY_2_2(p3, p11, p19, p27, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
+    IDFT4_NODE_LAZY_2_2(p4, p12, p20, p28, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
+    IDFT4_NODE_LAZY_2_2(p5, p13, p21, p29, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
+    IDFT4_NODE_LAZY_2_2(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
+    IDFT4_NODE_LAZY_2_2(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
+} while(0)
 
 #endif  /* N_FFT_MACROS_H */

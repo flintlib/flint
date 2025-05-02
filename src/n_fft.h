@@ -21,9 +21,12 @@ extern "C" {
 #endif
 
 /**
- * TODO[short term] finalize interface and reducing output to [0..n)
+ * TODO[short term] for perf vs simplifying code:
+ *   - bench intermediate functions to make sure there is nothing surprising
+ *   - check if the dft32 and idft32 macros actually help or not (remove them if not)
+ *   - check if having these p_hi,p_lo tmp in macro args is useful or they can be removed
  * TODO[short term] add proper testing for inverse / transposed variants
- * TODO[short term] write general note about the names (node ; lazy14 - lazy24 - lazy_4_4...)
+ *
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
  * TODO[long term] on zen4 (likely on other cpus as well) ctx_init becomes
@@ -32,10 +35,6 @@ extern "C" {
  * smaller (~13-14) when tab_iw has been incorporated compared to without
  * tab_iw (it was depth ~20-21); see if this can be understood, and maybe play
  * with vectorization for those simple functions
- *
- * TODO for perf:
- *   - try inserting final reduction into base cases
- *   - idft16 / idft32
  */
 
 
