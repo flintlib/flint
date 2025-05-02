@@ -1231,6 +1231,37 @@ Special functions
 
     Sets *res* to the imaginary error function of *x*.
 
+.. function:: void ca_elliptic_k(ca_t res, const ca_t m, ca_ctx_t ctx)
+
+    Sets *res* to the complete elliptic integral of the first kind `K(m)` of *m*, defined by
+    
+    .. math::
+
+        K(m) = \int_0^{\pi/2} \frac{dt}{\sqrt{1-m \sin^2 t}}
+                  = \int_0^1
+            \frac{dt}{\left(\sqrt{1-t^2}\right)\left(\sqrt{1-mt^2}\right)}.
+
+.. function:: void ca_elliptic_e(ca_t res, const ca_t m, ca_ctx_t ctx)
+
+    Sets *res* to the complete elliptic integral of the second kind `E(m)` of *m*, defined by
+    
+    .. math::
+
+        E(m) = \int_0^{\pi/2} \sqrt{1-m \sin^2 t} \, dt =
+                    \int_0^1
+                    \frac{\sqrt{1-mt^2}}{\sqrt{1-t^2}} \, dt.
+
+.. function:: void ca_elliptic_pi(ca_t res, const ca_t n, const ca_t m, ca_ctx_t ctx)
+
+    Sets *res* to the complete elliptic integral of the third kind `\Pi(n,m)` of *n* and *m*, defined by
+    
+    .. math::
+
+        \Pi(n, m) = \int_0^{\pi/2}
+            \frac{dt}{(1-n \sin^2 t) \sqrt{1-m \sin^2 t}} =
+            \int_0^1
+            \frac{dt}{(1-nt^2) \sqrt{1-t^2} \sqrt{1-mt^2}}.
+
 
 Numerical evaluation
 -------------------------------------------------------------------------------
