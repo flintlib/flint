@@ -13,7 +13,6 @@
 #define N_FFT_H
 
 #include "flint.h"
-#include "ulong_extras.h"
 
 #define N_FFT_CTX_DEFAULT_DEPTH 12
 
