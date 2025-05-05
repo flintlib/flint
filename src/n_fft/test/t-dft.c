@@ -17,7 +17,7 @@
 #include "nmod_vec.h"
 #include "n_fft.h"
 
-#define MAX_EVAL_DEPTH 11  // must be <= 12
+#define MAX_EVAL_DEPTH 10  // must be <= 10
 
 TEST_FUNCTION_START(n_fft_dft, state)
 {
@@ -25,7 +25,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
 
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        // take some FFT prime p with max_depth >= 12
+        // take some FFT prime p with max_depth >= 10
         ulong max_depth, prime;
 
         // half of tests == fixed large prime, close to limit
@@ -39,7 +39,7 @@ TEST_FUNCTION_START(n_fft_dft, state)
 #endif
         else
         {
-            max_depth = 12 + n_randint(state, 6);
+            max_depth = 10 + n_randint(state, 6);
             prime = 1 + (UWORD(1) << max_depth);
             while (! n_is_prime(prime))
                 prime += (UWORD(1) << max_depth);
