@@ -140,7 +140,7 @@ int main()
 }
 
 /** Output on zen4 (AMD Ryzen 7 PRO 7840U)
- * 4th prime 50 bits
+ * 50 bit prime, commit "introduce_nmod_fft f1852d1c5"
  * depth   sd_fft  dft     idft    dft_t   idft_t
  * 3       1.5e-08 2.2e-08 2.0e-08 2.3e-08 1.8e-08
  * 4       2.1e-08 4.4e-08 4.5e-08 4.3e-08 4.7e-08

@@ -100,9 +100,10 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 
 /** 2**depth-point DFT
  * Same specification as n_fft_dft, except for:
- * * requirement (not checked): 3 <= depth <= F.depth
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
+ *             requirement (not checked): depth <= F.depth
  * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
+ *             requirement (not checked): 3 <= depth <= F.depth
  */
 void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {

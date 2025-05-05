@@ -21,18 +21,17 @@ extern "C" {
 #endif
 
 /**
- * TODO[short term] for perf vs simplifying code:
- *   - bench intermediate functions to make sure there is nothing surprising
- *   - check if having these p_hi,p_lo tmp in macro args is useful or they can be removed
- *
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
+ *
+ * TODO[long term] avx512 vectorization
+ *
  * TODO[long term] on zen4 (likely on other cpus as well) ctx_init becomes
- * slower at some point, losing a factor 4 or more, probably due to caching;
- * what is annoying is that the depth where it becomes slower is significantly
- * smaller (~13-14) when tab_iw has been incorporated compared to without
- * tab_iw (it was depth ~20-21); see if this can be understood, and maybe play
- * with vectorization for those simple functions
+ * slower at some point, losing a factor 4 or more; this is expected due to
+ * memory aspects but arises rather early, in fact the depth where it becomes
+ * slower is significantly smaller (~13-14) when tab_iw has been incorporated
+ * compared to without tab_iw (it was depth ~20-21); see if this can be
+ * understood, and maybe play with vectorization for those simple functions
  */
 
 

@@ -12,11 +12,42 @@
 #include "n_fft.h"
 #include "n_fft_macros.h"
 
+/** Structure.
+ * - The main interface is n_fft_idft, it solves the problem at node 0
+ *   (interpolating at all roots of unity of order 2**depth), as documented in
+ *   n_fft.h.
+ * - The core function is `idft_node_lazy_1_2`, which goes up the subproduct
+ *   tree towards an arbitrary node in this tree; it takes input values in
+ *   [0..n) and return values in [0..2n), following the idea of lazy
+ *   butterflies highlighted by David Harvey [Faster arithmetic for
+ *   number-theoretic transforms, Journal of Symbolic Computation, Volume 60,
+ *   2014, pp 113-119]. This function does not scale the output by the inverse
+ *   of 2**depth.
+ * - This core function costs more than a iDFT at node 0, at least for small or
+ *   smallish lengths. So a specific function for node 0 is given
+ *   (`idft_lazy_1_4`), targeting input values in [0..n) and return values in
+ *   [0..4n). The main function `n_fft_idft` just calls `idft_lazy_1_4`, and
+ *   then scales the output value by the inverse of 2**depth, also ensuring the
+ *   output is in [0..n).
+ */
+
 /*************************
 *  auxiliary functions  *
 *************************/
 
-// TODO doc
+/** 2**depth-point inverse DFT, general node
+ * * In-place transform p = [p[i] for 0 <= i < len], where len == 2**depth,
+ * into the list of coefficients q = [q[j] for 0 <= j < len] of the unique
+ * polynomial q(x) of degree < len such that p[i] == q(w[i])  for 0 <= i < len
+ * * Here we write w[k] for 0 <= k < len/2, defined as
+ *            w[2*k]   == F->tab_w[2**depth * node + 2*k]
+ *            w[2*k+1] == - F->tab_w[2**depth * node + 2*k];
+ * these are the len roots of the polynomial x**len - F->tab_w[node]
+ * * Requirements (not checked):
+ *        3 <= depth
+ *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
+ * * lazy_1_2: in [0..n) / out [0..2n) / max < 4n
+ */
 void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 {
     if (depth == 3)
@@ -69,7 +100,10 @@ void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
     }
 }
 
-// TODO doc
+/** 2**depth-point inverse DFT
+ * Same specification as n_fft_idft, except that the
+ * output values are in [0..4n)
+ */
 void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
     if (depth == 0)
