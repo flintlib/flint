@@ -25,7 +25,6 @@ extern "C" {
  *   - bench intermediate functions to make sure there is nothing surprising
  *   - check if the dft32 and idft32 macros actually help or not (remove them if not)
  *   - check if having these p_hi,p_lo tmp in macro args is useful or they can be removed
- * TODO[short term] add proper testing for inverse / transposed variants
  *
  * TODO[long term] large depth can lead to heavy memory usage
  *              --> provide precomputation-free functions
