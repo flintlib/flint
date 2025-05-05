@@ -17,7 +17,7 @@
 #include "nmod_vec.h"
 #include "n_fft.h"
 
-#define MAX_EVAL_DEPTH 10  // must be <= 10
+#define MAX_EVAL_DEPTH 10
 
 TEST_FUNCTION_START(n_fft_idft, state)
 {
@@ -39,7 +39,7 @@ TEST_FUNCTION_START(n_fft_idft, state)
 #endif
         else
         {
-            max_depth = 10 + n_randint(state, 6);
+            max_depth = MAX_EVAL_DEPTH + n_randint(state, 6);
             prime = 1 + (UWORD(1) << max_depth);
             while (! n_is_prime(prime))
                 prime += (UWORD(1) << max_depth);
@@ -103,3 +103,5 @@ TEST_FUNCTION_START(n_fft_idft, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#undef MAX_EVAL_DEPTH

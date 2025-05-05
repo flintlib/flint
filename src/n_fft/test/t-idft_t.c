@@ -16,40 +16,13 @@
 #include "nmod_vec.h"
 #include "n_fft.h"
 
-#define MAX_EVAL_DEPTH 9
+#define MAX_EVAL_DEPTH 13
 
-/** computes the weighted power sums
- *      q == [PowerSum(p, w**j) for 0 <= j < len]
- * where PowerSum(p, w**j) == sum(p[i] * w[i]**j for 0 <= i < len)
- * and where roots == [w[i] for 0 <= i < len]
- */
-static void t_dft_t_weighted_power_sums(nn_ptr q, nn_srcptr p, nn_ptr roots, ulong len, nmod_t mod)
-{
-    // initially w**0 == [1,..,1]:
-    nn_ptr w_pow_j = _nmod_vec_init(len);
-    for (ulong i = 0; i < len; i++)
-        w_pow_j[i] = 1;
-
-    for (ulong j = 0; j < len; j++)
-    {
-        // at this stage, w_pow_j holds [w[i]**j for 0 <= i < len]
-        q[j] = 0;
-        for (ulong i = 0; i < len; i++)
-        {
-            q[j] = nmod_add(q[j], 
-                            nmod_mul(p[i], w_pow_j[i], mod),
-                            mod);
-            w_pow_j[i] = nmod_mul(w_pow_j[i], roots[i], mod);
-        }
-    }
-    _nmod_vec_clear(w_pow_j);
-}
-
-TEST_FUNCTION_START(n_fft_dft_t, state)
+TEST_FUNCTION_START(n_fft_idft_t, state)
 {
     int i;
 
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         // take some FFT prime p with max_depth >= 10
         ulong max_depth, prime;
@@ -79,14 +52,6 @@ TEST_FUNCTION_START(n_fft_dft_t, state)
         n_fft_ctx_t F;
         n_fft_ctx_init2(F, MAX_EVAL_DEPTH, prime);
 
-        // retrieve roots
-        nn_ptr roots = flint_malloc((UWORD(1) << MAX_EVAL_DEPTH) * sizeof(ulong));
-        for (ulong k = 0; k < (UWORD(1) << (MAX_EVAL_DEPTH-1)); k++)
-        {
-            roots[2*k] = F->tab_w[2*k];
-            roots[2*k+1] = prime - F->tab_w[2*k];  // < prime since F->tab_w[2*k] != 0
-        }
-
         for (ulong depth = 0; depth <= MAX_EVAL_DEPTH; depth++)
         {
             const ulong len = (UWORD(1) << depth);
@@ -96,31 +61,32 @@ TEST_FUNCTION_START(n_fft_dft_t, state)
             for (ulong k = 0; k < len; k++)
                 p[k] = n_randint(state, prime);
             // copy it before in-place transform
-            ulong * q = _nmod_vec_init(len);
+            nn_ptr q = _nmod_vec_init(len);
             _nmod_vec_set(q, p, len);
 
-            // naive weighted power sums
-            t_dft_t_weighted_power_sums(q, p, roots, len, mod);
-
-            // transposed DFT
+            // apply idft_t
+            n_fft_idft_t(p, depth, F);
+            // apply dft_t
             n_fft_dft_t(p, depth, F);
 
+            // check dft_t o idft_t == 1
             int res = _nmod_vec_equal(p, q, len);
 
             if (!res)
+            {
                 TEST_FUNCTION_FAIL(
-                        "prime = %wu\n"
-                        "root of unity = %wu\n"
-                        "max_depth = %wu\n"
-                        "depth = %wu\n"
-                        "failed equality test\n",
-                        prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+                    "prime = %wu\n"
+                    "root of unity = %wu\n"
+                    "max_depth = %wu\n"
+                    "depth = %wu\n"
+                    "failed equality test\n",
+                    prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+            }
 
             _nmod_vec_clear(p);
             _nmod_vec_clear(q);
         }
 
-        flint_free(roots);
         n_fft_ctx_clear(F);
     }
 
