@@ -136,10 +136,6 @@ typedef n_fft_args_struct n_fft_args_t[1];
  */
 
 
-
-
-
-
 /*------------------------------------------*/
 /* PRECOMPUTATIONS / CONTEXT INITIALIZATION */
 /*------------------------------------------*/
@@ -183,41 +179,55 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
 /* DFT / IDFT / DFT_t / IDFT_t */
 /*-----------------------------*/
 
-/* transforms / inverse transforms / transposed transforms */
-/* length is a power of 2 */
-
-/** 2**depth-point DFT
- * * In-place transform p of length len == 2**depth, seen as a polynomial f(x)
- * of degree < len, into the concatenation of all polynomial evaluations
- *          [f(w_k), f(-w_k)] for 0 <= k < len/2,
- * where w_k = F->tab_w[2*k]
- * * By construction these evaluation points are the roots of the polynomial
- * x**len - 1, precisely they are all powers of the chosen len-th primitive
- * root of unity with exponents listed in bit reversed order
- * * Requirement (not checked): depth <= F.depth
+/** forward and inverse transforms, and their transposes:
+ *    - length is a power of 2, len == 2**depth
+ *    - requirement of all functions (not checked): depth <= F.depth
+ *    - the comments below describe algorithms that modify the input array p in
+ *    place: in these comments p stands for the input p, whereas q stands
+ *    for the array p after running the algorithm
+ *    - below in comments we write w[k] for 0 <= k < len/2, defined as
+ *            w[2*k]   == F->tab_w[2*k]
+ *            w[2*k+1] == - F->tab_w[2*k]
+ *    - hence the list w[k] for 0 <= k < len gives the len roots of the
+ *    polynomial x**len - 1, which are all powers of the chosen len-th
+ *    primitive root of unity, with exponents listed in bit reversed order
+ *    - the matrix of DFT of length len is the len x len matrix
+ *             DFT_{w,len} = [ w[i]**j ]_{0 <= i, j < len}
  */
 
-/** 2**depth-point inverse DFT
- * * In-place transform p of length len == 2**depth, seen as a vector
- * of concatenated evaluations
- *          [f(w_k), f(-w_k)] for 0 <= k < len/2,
- * of some polynomial f(x) of degree < len, into the coefficients of this
- * polynomial, where w_k = F->tab_w[2*k]
- * * By construction these evaluation points are the roots of the polynomial
- * x**len - 1, precisely they are all powers of the chosen len-th primitive
- * root of unity with exponents listed in bit reversed order
- * * Requirement (not checked): depth <= F.depth
+/** dft: discrete Fourier transform (q = DFT_{w,len} * p)
+ * In-place transform p = [p[j] for 0 <= j < len], seen as a polynomial p(x) of
+ * degree < len, into its evaluations
+ *     q == [p(w[i])  for 0 <= i < len],
+ * where p(w[i]) = sum(p[j] * w[i]**j for 0 <= j < len)
  */
 
+/** idft: inverse discrete Fourier transform (q = DFT_{w,len}^{-1} * p)
+ * In-place transform p = [p[i] for 0 <= i < len] into the list of coefficients
+ * q = [q[j] for 0 <= j < len] of the unique polynomial q(x) of degree < len
+ * such that p[i] == q(w[i])  for 0 <= i < len
+ */
+
+/** dft_t: transposed discrete Fourier transform (q = p * DFT_{w,len})
+ * In-place transform p = [p[i] for 0 <= i < len] into the list of weighted
+ * power sums
+ *        q == [PowerSum(p, w**j) for 0 <= j < len]
+ * where PowerSum(p, w**j) == sum(p[i] * w[i]**j for 0 <= i < len)
+ */
+
+/** idft_t: transposed inverse discrete Fourier transform (q = p * DFT_{w,len}^{-1})
+ * In-place transform p = [p[j] for 0 <= j < len] into the coefficients q =
+ * [q[i] for 0 <= i < len] which appear in the partial fraction decomposition
+ *      p(x) = sum_{0 <= i < len} q[i] / (1 - w[i] * x) + O(x**len)
+ * where p(x) is the power series p(x) = sum_{0 <= j < len} p[j] x**j  + O(x**len)
+ */
 
 void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
 void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
-// TODO doc + test
 void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
-// TODO doc + test
 void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
 #ifdef __cplusplus

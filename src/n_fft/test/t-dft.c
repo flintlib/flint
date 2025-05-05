@@ -19,33 +19,6 @@
 
 #define MAX_EVAL_DEPTH 11  // must be <= 12
 
-// vector equality up to reduction mod
-int nmod_vec_red_equal(nn_srcptr vec1, nn_srcptr vec2, ulong len, nmod_t mod)
-{
-    for (ulong k = 0; k < len; k++)
-    {
-        ulong v1;
-        ulong v2;
-        NMOD_RED(v1, vec1[k], mod);
-        NMOD_RED(v2, vec2[k], mod);
-        if (v1 != v2)
-            return 0;
-    }
-
-    return 1;
-}
-
-// testing that all elements of "vec" are less than "bound"
-int nmod_vec_range(nn_srcptr vec, ulong len, ulong bound)
-{
-    for (ulong k = 0; k < len; k++)
-        if (vec[k] >= bound)
-            return 0;
-
-    return 1;
-}
-
-
 TEST_FUNCTION_START(n_fft_dft, state)
 {
     int i;
@@ -96,21 +69,18 @@ TEST_FUNCTION_START(n_fft_dft, state)
             nmod_poly_t pol;
             nmod_poly_init(pol, mod.n);
             nmod_poly_randtest(pol, state, len);
+            // copy it for DFT
+            nn_ptr p = _nmod_vec_init(len);
+            _nmod_vec_set(p, pol->coeffs, len);
 
             // evals via general multipoint evaluation
             nn_ptr evals_br = _nmod_vec_init(len);
-            if (len == 1)
-                evals_br[0] = nmod_poly_evaluate_nmod(pol, UWORD(1));
-            else
-                nmod_poly_evaluate_nmod_vec(evals_br, pol, roots, len);
+            nmod_poly_evaluate_nmod_vec(evals_br, pol, roots, len);
 
             // evals by DFT
-            ulong * p = _nmod_vec_init(len);
-            _nmod_vec_set(p, pol->coeffs, len);
-
             n_fft_dft(p, depth, F);
 
-            int res = nmod_vec_red_equal(evals_br, p, len, mod);
+            int res = _nmod_vec_equal(evals_br, p, len);
 
             if (!res)
                 TEST_FUNCTION_FAIL(
@@ -119,17 +89,6 @@ TEST_FUNCTION_START(n_fft_dft, state)
                         "max_depth = %wu\n"
                         "depth = %wu\n"
                         "failed equality test\n",
-                        prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
-
-            res = nmod_vec_range(p, len, 4*mod.n);
-
-            if (!res)
-                TEST_FUNCTION_FAIL(
-                        "prime = %wu\n"
-                        "root of unity = %wu\n"
-                        "max_depth = %wu\n"
-                        "depth = %wu\n"
-                        "failed range test\n",
                         prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
 
             _nmod_vec_clear(p);
