@@ -58,14 +58,13 @@ void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
         const ulong w_pr = F->tab_w[4*node+1];
         const ulong Iw = F->tab_w[4*node+2];
         const ulong Iw_pr = F->tab_w[4*node+3];
-        ulong p_hi, p_lo;
 
         for (ulong k = 0; k < len/4; k+=4)
         {
-            IDFT4_NODE_LAZY_2_2(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_NODE_LAZY_2_2(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_NODE_LAZY_2_2(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_NODE_LAZY_2_2(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_NODE_LAZY_2_2(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
+            IDFT4_NODE_LAZY_2_2(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
+            IDFT4_NODE_LAZY_2_2(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
+            IDFT4_NODE_LAZY_2_2(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2_pr, w, w_pr, Iw, Iw_pr, F->mod, F->mod2);
         }
     }
 }
@@ -78,14 +77,12 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 
     if (depth == 1)
     {
-        ulong tmp;
-        DFT2_LAZY_1_2(p[0], p[1], F->mod, tmp);
+        DFT2_LAZY_1_2(p[0], p[1], F->mod);
     }
     else if (depth == 2)
     {
-        ulong p_hi, p_lo;
         IDFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3],
-                           F->mod, F->mod2, p_hi, p_lo);
+                           F->mod, F->mod2);
     }
     else
     if (depth == 3)
@@ -124,13 +121,12 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
         // 4-point butterflies
         // input p0 in [0,4n), p1,p2,p3 in [0,2n)
         // output p0,p1,p2,p3 in [0,4n)
-        ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k+=4)
         {
-            IDFT4_LAZY_4222_4(p0[k+0], p1[k+0], p2[k+0], p3[k+0], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_LAZY_4222_4(p0[k+1], p1[k+1], p2[k+1], p3[k+1], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_LAZY_4222_4(p0[k+2], p1[k+2], p2[k+2], p3[k+2], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
-            IDFT4_LAZY_4222_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            IDFT4_LAZY_4222_4(p0[k+0], p1[k+0], p2[k+0], p3[k+0], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
+            IDFT4_LAZY_4222_4(p0[k+1], p1[k+1], p2[k+1], p3[k+1], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
+            IDFT4_LAZY_4222_4(p0[k+2], p1[k+2], p2[k+2], p3[k+2], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
+            IDFT4_LAZY_4222_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
         }
     }
 }

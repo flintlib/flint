@@ -81,14 +81,13 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
         const ulong wpre = F->tab_w[4*node+1];
         const ulong Iw = F->tab_w[4*node+2];
         const ulong Iwpre = F->tab_w[4*node+3];
-        ulong p_hi, p_lo, tmp;
 
         for (ulong k = 0; k < len/4; k+=4)
         {
-            DFT4_NODE_LAZY_4_4(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-            DFT4_NODE_LAZY_4_4(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-            DFT4_NODE_LAZY_4_4(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
-            DFT4_NODE_LAZY_4_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2, p_hi, p_lo, tmp);
+            DFT4_NODE_LAZY_4_4(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
+            DFT4_NODE_LAZY_4_4(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
+            DFT4_NODE_LAZY_4_4(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
+            DFT4_NODE_LAZY_4_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
         }
 
         // 4 recursive calls with depth-2
@@ -136,10 +135,9 @@ void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
         const nn_ptr p1 = p + len/4;
         const nn_ptr p2 = p + 2*len/4;
         const nn_ptr p3 = p + 3*len/4;
-        ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k++)
         {
-            DFT4_LAZY_2_4(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            DFT4_LAZY_2_4(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
             if (p0[k] >= F->mod2)
                 p0[k] -= F->mod2;
         }
@@ -179,10 +177,9 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
         const nn_ptr p1 = p + len/4;
         const nn_ptr p2 = p + 2*len/4;
         const nn_ptr p3 = p + 3*len/4;
-        ulong p_hi, p_lo;
         for (ulong k = 0; k < len/4; k++)
         {
-            DFT4_LAZY_1_4(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+            DFT4_LAZY_1_4(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
             if (p0[k] >= F->mod2)
                 p0[k] -= F->mod2;
         }
@@ -199,13 +196,11 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
     }
     else if (depth == 2)
     {
-        ulong p_hi, p_lo;
-        DFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2, p_hi, p_lo);
+        DFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
     }
     else if (depth == 1)
     {
-        ulong tmp;
-        DFT2_LAZY_1_2(p[0], p[1], F->mod, tmp);
+        DFT2_LAZY_1_2(p[0], p[1], F->mod);
     }
 }
 

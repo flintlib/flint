@@ -24,8 +24,9 @@
  *  --> computes either r or r+n and store it is res, where r = (a*b) % n
  *  --> a_pr is the precomputation for n, p_hi and p_lo are temporaries
  */
-#define N_MULMOD_PRECOMP_LAZY(res, a, b, a_pr, n, p_hi, p_lo) \
+#define N_MULMOD_PRECOMP_LAZY(res, a, b, a_pr, n)             \
 do {                                                          \
+    ulong p_hi, p_lo;                                         \
     umul_ppmm(p_hi, p_lo, (a_pr), (b));                       \
     res = (a) * (b) - p_hi * (n);                             \
 } while(0)
@@ -37,29 +38,32 @@ do {                                                          \
 /** Butterfly radix 2
  * * In-place transform:                    [1  1]
  *                         [a  b] <- [a  b] [1 -1]
- * * n is the modulus, n2 is 2*n, tmp is a temporary
+ * * n is the modulus, n2 is 2*n
  * * lazy_1_2:    in [0..n) / out [0..2n) / max < 2n
  * * lazy_22_24:  in [0..2n) x [0..2n) / out [0..2n) x [0..4n) / max < 4n
  * * lazy_42_44:  in [0..4n) x [0..2n) / out [0..4n) x [0..4n) / max < 4n
  */
-#define DFT2_LAZY_1_2(a, b, n, tmp) \
-do {                                \
-    tmp = (b);                      \
-    (b) = (a) + (n) - tmp;          \
-    (a) = (a) + tmp;                \
+#define DFT2_LAZY_1_2(a, b, n) \
+do {                           \
+    ulong tmp;                 \
+    tmp = (b);                 \
+    (b) = (a) + (n) - tmp;     \
+    (a) = (a) + tmp;           \
 } while(0)
 
-#define DFT2_LAZY_22_24(a, b, n2, tmp) \
-do {                                   \
-    tmp = (b);                         \
-    (b) = (a) + (n2) - tmp;            \
-    (a) = (a) + tmp;                   \
-    if ((a) >= (n2))                   \
-        (a) -= (n2);                   \
+#define DFT2_LAZY_22_24(a, b, n2) \
+do {                              \
+    ulong tmp;                    \
+    tmp = (b);                    \
+    (b) = (a) + (n2) - tmp;       \
+    (a) = (a) + tmp;              \
+    if ((a) >= (n2))              \
+        (a) -= (n2);              \
 } while(0)
 
-#define DFT2_LAZY_42_44(a, b, n2, tmp)     \
+#define DFT2_LAZY_42_44(a, b, n2)          \
 do {                                       \
+    ulong tmp;                             \
     tmp = (a);                             \
     if (tmp >= (n2))                       \
         tmp -= (n2);         /* [0..2n) */ \
@@ -77,20 +81,19 @@ do {                                       \
  *                            [1  1]
  *           [a  b] <- [a  b] [w -w]
  * * n2 is 2*n, w_pr is the precomputed data for multiplication by w mod n
- *   p_hi, p_lo, u, v are temporaries
  * * can be seen as evaluation at points w and -w of a+b*x
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
-#define DFT2_NODE_LAZY_4_4(a, b, w, w_pr,                \
-                           n, n2, p_hi, p_lo, u, v)      \
-do {                                                     \
-    u = (a);                                             \
-    if (u >= (n2))                                       \
-        u -= (n2);  /* [0..2n) */                        \
-    v = (b);                                             \
-    N_MULMOD_PRECOMP_LAZY(v, w, v, w_pr, n, p_hi, p_lo); \
-    (a) = u + v;                                         \
-    (b) = u + (n2) - v;                                  \
+#define DFT2_NODE_LAZY_4_4(a, b, w, w_pr, n, n2) \
+do {                                             \
+    ulong u, v;                                  \
+    u = (a);                                     \
+    if (u >= (n2))                               \
+        u -= (n2);  /* [0..2n) */                \
+    v = (b);                                     \
+    N_MULMOD_PRECOMP_LAZY(v, w, v, w_pr, n);     \
+    (a) = u + v;                                 \
+    (b) = u + (n2) - v;                          \
 } while(0)
 
 /** Gentleman-Sande butterfly:
@@ -98,21 +101,21 @@ do {                                                     \
  *                            [1  w]
  *           [a  b] <- [a  b] [1 -w]
  * * n2 is 2*n, w_pr is the precomputed data for multiplication by w mod n
- *   p_hi, p_lo, tmp are temporaries
  * * can be seen as degree-1 interpolation at points iw = 1 / w and -iw, up to
  * a scaling by 1/2, since the inverse of [1  w] is  1/2 * [ 1   1]
  *                                        [1 -w]           [iw -iw]
  * * lazy_22: in [0..2n) / out [0..2n) / max < 4n
  */
-#define IDFT2_NODE_LAZY_2_2(a, b, w, w_pr,                   \
-                            n, n2, p_hi, p_lo, tmp)          \
-do {                                                         \
-    tmp = (a) + (n2) - (b);     /* [0..4n) */                \
-    (a) = (a) + (b);            /* [0..4n) */                \
-    if ((a) >= (n2))                                         \
-        (a) -= (n2);            /* [0..2n) */                \
-    N_MULMOD_PRECOMP_LAZY((b), w, tmp, w_pr, n, p_hi, p_lo); \
-                                /* --> (b) in [0..2n) */     \
+#define IDFT2_NODE_LAZY_2_2(a, b, w, w_pr,        \
+                            n, n2)                \
+do {                                              \
+    ulong tmp;                                    \
+    tmp = (a) + (n2) - (b);     /* [0..4n) */     \
+    (a) = (a) + (b);            /* [0..4n) */     \
+    if ((a) >= (n2))                              \
+        (a) -= (n2);            /* [0..2n) */     \
+    N_MULMOD_PRECOMP_LAZY((b), w, tmp, w_pr, n);  \
+                        /* --> (b) in [0..2n) */  \
 } while(0)
 
 /*------------------*/
@@ -137,51 +140,49 @@ do {                                                         \
  *         x - 1     x + 1     x - I     x + I
  *  where I is typically a square root of -1
  *  (but this property is not exploited)
- * * n is the modulus, n2 is 2*n, p_hi, p_lo are temporaries
+ * * n is the modulus, n2 is 2*n
  *   I_pr is the precomputed data for multiplication by I mod n
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
  */
-#define DFT4_LAZY_1_4(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
-do {                                                          \
-    const ulong v0 = (a);                                     \
-    const ulong v1 = (b);                                     \
-    const ulong v2 = (c);                                     \
-    const ulong v3 = (d);                                     \
-    ulong v4 = v0 + v2;                     /* < 2*n */       \
-    ulong v5 = v0 + (n) - v2;               /* < 2*n */       \
-    ulong v6 = v1 + v3;                     /* < 2*n */       \
-    ulong v7;                                                 \
-    N_MULMOD_PRECOMP_LAZY(v7, (I), v1 + (n) - v3, (I_pr),     \
-                          (n), p_hi, p_lo);                   \
-    (a) = v4 + v6;                          /* < 4*n */       \
-    (b) = v4 + (n2) - v6;                   /* < 4*n */       \
-    (c) = v5 + v7;                          /* < 4*n */       \
-    (d) = v5 + (n2) - v7;                   /* < 4*n */       \
+#define DFT4_LAZY_1_4(a, b, c, d, I, I_pr, n, n2)               \
+do {                                                            \
+    const ulong v0 = (a);                                       \
+    const ulong v1 = (b);                                       \
+    const ulong v2 = (c);                                       \
+    const ulong v3 = (d);                                       \
+    ulong v4 = v0 + v2;                     /* < 2*n */         \
+    ulong v5 = v0 + (n) - v2;               /* < 2*n */         \
+    ulong v6 = v1 + v3;                     /* < 2*n */         \
+    ulong v7;                                                   \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v1 + (n) - v3, (I_pr), (n)); \
+    (a) = v4 + v6;                          /* < 4*n */         \
+    (b) = v4 + (n2) - v6;                   /* < 4*n */         \
+    (c) = v5 + v7;                          /* < 4*n */         \
+    (d) = v5 + (n2) - v7;                   /* < 4*n */         \
 } while(0)
 
-#define DFT4_LAZY_2_4(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
-do {                                                          \
-    const ulong v0 = (a);                                     \
-    const ulong v1 = (b);                                     \
-    const ulong v2 = (c);                                     \
-    const ulong v3 = (d);                                     \
-    ulong v4 = v0 + v2;                      /* < 4*n */      \
-    if (v4 >= (n2))                                           \
-        v4 -= (n2);                          /* < 2*n */      \
-    ulong v5 = v0 + (n2) - v2;               /* < 4*n */      \
-    if (v5 >= (n2))                                           \
-        v5 -= (n2);                          /* < 2*n */      \
-    ulong v6 = v1 + v3;                      /* < 4*n */      \
-    if (v6 >= (n2))                                           \
-        v6 -= (n2);                          /* < 2*n */      \
-    ulong v7;                                                 \
-    N_MULMOD_PRECOMP_LAZY(v7, (I), v1 + (n2) - v3, (I_pr),    \
-                          (n), p_hi, p_lo);                   \
-    (a) = v4 + v6;                           /* < 4*n */      \
-    (b) = v4 + (n2) - v6;                    /* < 4*n */      \
-    (c) = v5 + v7;                           /* < 4*n */      \
-    (d) = v5 + (n2) - v7;                    /* < 4*n */      \
+#define DFT4_LAZY_2_4(a, b, c, d, I, I_pr, n, n2)                 \
+do {                                                              \
+    const ulong v0 = (a);                                         \
+    const ulong v1 = (b);                                         \
+    const ulong v2 = (c);                                         \
+    const ulong v3 = (d);                                         \
+    ulong v4 = v0 + v2;                      /* < 4*n */          \
+    if (v4 >= (n2))                                               \
+        v4 -= (n2);                          /* < 2*n */          \
+    ulong v5 = v0 + (n2) - v2;               /* < 4*n */          \
+    if (v5 >= (n2))                                               \
+        v5 -= (n2);                          /* < 2*n */          \
+    ulong v6 = v1 + v3;                      /* < 4*n */          \
+    if (v6 >= (n2))                                               \
+        v6 -= (n2);                          /* < 2*n */          \
+    ulong v7;                                                     \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v1 + (n2) - v3, (I_pr), (n));  \
+    (a) = v4 + v6;                           /* < 4*n */          \
+    (b) = v4 + (n2) - v6;                    /* < 4*n */          \
+    (c) = v5 + v7;                           /* < 4*n */          \
+    (d) = v5 + (n2) - v7;                    /* < 4*n */          \
 } while(0)
 
 /** 4-point FFT interpolation
@@ -203,30 +204,29 @@ do {                                                          \
  *             x^2 - 1             x^2 + 1
  *             /     \             /     \
  *         x - 1     x + 1     x - I     x + I
- * * n is the modulus, n2 is 2*n, p_hi, p_lo are temporaries
+ * * n is the modulus, n2 is 2*n
  *   I_pr is the precomputed data for multiplication by I mod n
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  * * lazy_4222_4: a in [0..4n), b,c,d in [0..2n) / out [0..4n) / max < 4n
  */
-#define IDFT4_LAZY_1_4(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
-do {                                                           \
-    const ulong v0 = (a);                                      \
-    const ulong v1 = (b);                                      \
-    const ulong v2 = (c);                                      \
-    const ulong v3 = (d);                                      \
-    ulong v4 = v0 + v1;                         /* < 2*n */    \
-    ulong v5 = v0 + (n) - v1;                   /* < 2*n */    \
-    ulong v6 = v2 + v3;                         /* < 2*n */    \
-    ulong v7;                                                  \
-    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n) - v3, (I_pr),      \
-                          (n), p_hi, p_lo);     /* < 2*n */    \
-    (a) = v4 + v6;                              /* < 4*n */    \
-    (b) = v5 + v7;                              /* < 4*n */    \
-    (c) = v4 + (n2) - v6;                       /* < 4*n */    \
-    (d) = v5 + (n2) - v7;                       /* < 4*n */    \
+#define IDFT4_LAZY_1_4(a, b, c, d, I, I_pr, n, n2)               \
+do {                                                             \
+    const ulong v0 = (a);                                        \
+    const ulong v1 = (b);                                        \
+    const ulong v2 = (c);                                        \
+    const ulong v3 = (d);                                        \
+    ulong v4 = v0 + v1;                         /* < 2*n */      \
+    ulong v5 = v0 + (n) - v1;                   /* < 2*n */      \
+    ulong v6 = v2 + v3;                         /* < 2*n */      \
+    ulong v7;                                                    \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n) - v3, (I_pr), (n));  \
+    (a) = v4 + v6;                              /* < 4*n */      \
+    (b) = v5 + v7;                              /* < 4*n */      \
+    (c) = v4 + (n2) - v6;                       /* < 4*n */      \
+    (d) = v5 + (n2) - v7;                       /* < 4*n */      \
 } while(0)
 
-#define IDFT4_LAZY_4222_4(a, b, c, d, I, I_pr, n, n2, p_hi, p_lo) \
+#define IDFT4_LAZY_4222_4(a, b, c, d, I, I_pr, n, n2)             \
 do {                                                              \
     ulong v0 = (a);                                               \
     const ulong v1 = (b);                                         \
@@ -244,8 +244,7 @@ do {                                                              \
     if (v6 >= (n2))                                               \
         v6 -= (n2);                             /* < 2*n */       \
     ulong v7;                                                     \
-    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n2) - v3, (I_pr),        \
-                          (n), p_hi, p_lo);     /* < 2*n */       \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v2 + (n2) - v3, (I_pr), (n));  \
     (a) = v4 + v6;                              /* < 4*n */       \
     (b) = v5 + v7;                              /* < 4*n */       \
     (c) = v4 + (n2) - v6;                       /* < 4*n */       \
@@ -275,8 +274,9 @@ do {                                                              \
  */
 #define DFT4_NODE_LAZY_4_4(a, b, c, d,                        \
                            w1, w1_pr, w2, w2_pr, w3, w3_pr,   \
-                           n, n2, p_hi, p_lo, tmp)            \
+                           n, n2)                             \
 do {                                                          \
+    ulong tmp;                                                \
     ulong u0 = (a);                                           \
     ulong u1 = (b);                                           \
     ulong u2 = (c);                                           \
@@ -286,7 +286,7 @@ do {                                                          \
     if (u1 >= n2)                                             \
         u1 -= n2;                                             \
                                                               \
-    N_MULMOD_PRECOMP_LAZY(u2, w1, u2, w1_pr, n, p_hi, p_lo);  \
+    N_MULMOD_PRECOMP_LAZY(u2, w1, u2, w1_pr, n);              \
     tmp = u0;                                                 \
     u0 = u0 + u2;                    /* [0..4n) */            \
     u2 = tmp + n2 - u2;              /* [0..4n) */            \
@@ -295,16 +295,16 @@ do {                                                          \
     if (u2 >= n2)                                             \
         u2 -= n2;                    /* [0..2n) */            \
                                                               \
-    N_MULMOD_PRECOMP_LAZY(u3, w1, u3, w1_pr, n, p_hi, p_lo);  \
+    N_MULMOD_PRECOMP_LAZY(u3, w1, u3, w1_pr, n);              \
     tmp = u1;                                                 \
     u1 = u1 + u3;                    /* [0..4n) */            \
     u3 = tmp + n2 - u3;              /* [0..4n) */            \
                                                               \
-    N_MULMOD_PRECOMP_LAZY(u1, w2, u1, w2_pr, n, p_hi, p_lo);  \
+    N_MULMOD_PRECOMP_LAZY(u1, w2, u1, w2_pr, n);              \
     (a) = u0 + u1;                   /* [0..4n) */            \
     (b) = u0 + n2 - u1;              /* [0..4n) */            \
                                                               \
-    N_MULMOD_PRECOMP_LAZY(u3, w3, u3, w3_pr, n, p_hi, p_lo);  \
+    N_MULMOD_PRECOMP_LAZY(u3, w3, u3, w3_pr, n);              \
     (c) = u2 + u3;                    /* [0..4n) */           \
     (d) = u2 + n2 - u3;              /* [0..4n) */            \
 } while(0)
@@ -331,66 +331,58 @@ do {                                                          \
  * * lazy_1_2: in [0..n) / out [0..2n) / max < 4n
  * * lazy_2_2: in [0..2n) / out [0..2n) / max < 4n
  */
-#define IDFT4_NODE_LAZY_2_2(a, b, c, d,                       \
-                            w1, w1_pr, w2, w2_pr, w3, w3_pr,  \
-                            n, n2, p_hi, p_lo)                \
-do {                                                          \
-    const ulong v0 = (a);                                     \
-    const ulong v1 = (b);                                     \
-    const ulong v2 = (c);                                     \
-    const ulong v3 = (d);                                     \
-    ulong v4 = v0 + v1;                       /* < 4*n */     \
-    if (v4 >= (n2))                                           \
-        v4 -= (n2);                           /* < 2*n */     \
-    ulong v5;                                                 \
-    N_MULMOD_PRECOMP_LAZY(v5, (w2), v0 + (n2) - v1, (w2_pr),  \
-                          (n), p_hi, p_lo);   /* < 2*n */     \
-    ulong v6 = v2 + v3;                       /* < 4*n */     \
-    if (v6 >= (n2))                                           \
-        v6 -= (n2);                           /* < 2*n */     \
-    ulong v7;                                                 \
-    N_MULMOD_PRECOMP_LAZY(v7, (w3), v2 + (n2) - v3, (w3_pr),  \
-                          (n), p_hi, p_lo);    /* < 2*n */    \
-                                                              \
-    (a) = v4 + v6;                                            \
-    if ((a) >= (n2))                                          \
-        (a) -= (n2);                           /* < 2*n */    \
-    (b) = v5 + v7;                                            \
-    if ((b) >= (n2))                                          \
-        (b) -= (n2);                           /* < 2*n */    \
-    N_MULMOD_PRECOMP_LAZY((c), (w1), v4 + (n2) - v6, (w1_pr), \
-                          (n), p_hi, p_lo);    /* < 2*n */    \
-    N_MULMOD_PRECOMP_LAZY((d), (w1), v5 + (n2) - v7, (w1_pr), \
-                          (n), p_hi, p_lo);    /* < 2*n */    \
+#define IDFT4_NODE_LAZY_2_2(a, b, c, d,                              \
+                            w1, w1_pr, w2, w2_pr, w3, w3_pr,         \
+                            n, n2)                                   \
+do {                                                                 \
+    const ulong v0 = (a);                                            \
+    const ulong v1 = (b);                                            \
+    const ulong v2 = (c);                                            \
+    const ulong v3 = (d);                                            \
+    ulong v4 = v0 + v1;                       /* < 4*n */            \
+    if (v4 >= (n2))                                                  \
+        v4 -= (n2);                           /* < 2*n */            \
+    ulong v5;                                                        \
+    N_MULMOD_PRECOMP_LAZY(v5, (w2), v0 + (n2) - v1, (w2_pr), (n));   \
+    ulong v6 = v2 + v3;                       /* < 4*n */            \
+    if (v6 >= (n2))                                                  \
+        v6 -= (n2);                           /* < 2*n */            \
+    ulong v7;                                                        \
+    N_MULMOD_PRECOMP_LAZY(v7, (w3), v2 + (n2) - v3, (w3_pr), (n));   \
+                                                                     \
+    (a) = v4 + v6;                                                   \
+    if ((a) >= (n2))                                                 \
+        (a) -= (n2);                           /* < 2*n */           \
+    (b) = v5 + v7;                                                   \
+    if ((b) >= (n2))                                                 \
+        (b) -= (n2);                           /* < 2*n */           \
+    N_MULMOD_PRECOMP_LAZY((c), (w1), v4 + (n2) - v6, (w1_pr), (n));  \
+    N_MULMOD_PRECOMP_LAZY((d), (w1), v5 + (n2) - v7, (w1_pr), (n));  \
 } while(0)
 
-#define IDFT4_NODE_LAZY_1_2(a, b, c, d,                       \
-                            w1, w1_pr, w2, w2_pr, w3, w3_pr,  \
-                            n, n2, p_hi, p_lo)                \
-do {                                                          \
-    const ulong v0 = (a);                                     \
-    const ulong v1 = (b);                                     \
-    const ulong v2 = (c);                                     \
-    const ulong v3 = (d);                                     \
-    ulong v4 = v0 + v1;                       /* < 2*n */     \
-    ulong v5;                                                 \
-    N_MULMOD_PRECOMP_LAZY(v5, (w2), v0 + (n) - v1, (w2_pr),   \
-                          (n), p_hi, p_lo);   /* < 2*n */     \
-    ulong v6 = v2 + v3;                       /* < 2*n */     \
-    ulong v7;                                                 \
-    N_MULMOD_PRECOMP_LAZY(v7, (w3), v2 + (n) - v3, (w3_pr),   \
-                          (n), p_hi, p_lo);   /* < 2*n */     \
-                                                              \
-    (a) = v4 + v6;                            /* < 4*n */     \
-    if ((a) >= (n2))                                          \
-        (a) -= (n2);                           /* < 2*n */    \
-    (b) = v5 + v7;                            /* < 4*n */     \
-    if ((b) >= (n2))                                          \
-        (b) -= (n2);                           /* < 2*n */    \
-    N_MULMOD_PRECOMP_LAZY((c), (w1), v4 + (n2) - v6, (w1_pr), \
-                          (n), p_hi, p_lo);    /* < 2*n */    \
-    N_MULMOD_PRECOMP_LAZY((d), (w1), v5 + (n2) - v7, (w1_pr), \
-                          (n), p_hi, p_lo);    /* < 2*n */    \
+#define IDFT4_NODE_LAZY_1_2(a, b, c, d,                              \
+                            w1, w1_pr, w2, w2_pr, w3, w3_pr,         \
+                            n, n2)                                   \
+do {                                                                 \
+    const ulong v0 = (a);                                            \
+    const ulong v1 = (b);                                            \
+    const ulong v2 = (c);                                            \
+    const ulong v3 = (d);                                            \
+    ulong v4 = v0 + v1;                       /* < 2*n */            \
+    ulong v5;                                                        \
+    N_MULMOD_PRECOMP_LAZY(v5, (w2), v0 + (n) - v1, (w2_pr), (n));    \
+    ulong v6 = v2 + v3;                       /* < 2*n */            \
+    ulong v7;                                                        \
+    N_MULMOD_PRECOMP_LAZY(v7, (w3), v2 + (n) - v3, (w3_pr), (n));    \
+                                                                     \
+    (a) = v4 + v6;                            /* < 4*n */            \
+    if ((a) >= (n2))                                                 \
+        (a) -= (n2);                           /* < 2*n */           \
+    (b) = v5 + v7;                            /* < 4*n */            \
+    if ((b) >= (n2))                                                 \
+        (b) -= (n2);                           /* < 2*n */           \
+    N_MULMOD_PRECOMP_LAZY((c), (w1), v4 + (n2) - v6, (w1_pr), (n));  \
+    N_MULMOD_PRECOMP_LAZY((d), (w1), v5 + (n2) - v7, (w1_pr), (n));  \
 } while(0)
 
 /*------------------*/
@@ -410,43 +402,39 @@ do {                                                          \
 #define DFT8_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7, \
                       n, n2, tab_w)                   \
 do {                                                  \
-    ulong p_hi, p_lo, tmp;                            \
-                                                      \
-    DFT2_LAZY_1_2(p0, p4, n, tmp);                    \
-    DFT2_LAZY_1_2(p1, p5, n, tmp);                    \
-    DFT2_LAZY_1_2(p2, p6, n, tmp);                    \
-    DFT2_LAZY_1_2(p3, p7, n, tmp);                    \
+    DFT2_LAZY_1_2(p0, p4, n);                         \
+    DFT2_LAZY_1_2(p1, p5, n);                         \
+    DFT2_LAZY_1_2(p2, p6, n);                         \
+    DFT2_LAZY_1_2(p3, p7, n);                         \
                                                       \
     DFT4_LAZY_2_4(p0, p1, p2, p3,                     \
                 tab_w[2], tab_w[3],                   \
-                n, n2, p_hi, p_lo);                   \
+                n, n2);                               \
     /* could use a lazy_2_4 variant of the  */        \
     /* next one, but the gain is negligible */        \
     DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                \
                      tab_w[2], tab_w[3],              \
                      tab_w[4], tab_w[5],              \
                      tab_w[6], tab_w[7],              \
-                     n, n2, p_hi, p_lo, tmp);         \
+                     n, n2);                          \
 } while(0)
 
 #define DFT8_LAZY_2_4(p0, p1, p2, p3, p4, p5, p6, p7,  \
                       n, n2, tab_w)                    \
 do {                                                   \
-    ulong p_hi, p_lo, tmp;                             \
-                                                       \
-    DFT2_LAZY_22_24(p0, p4, n2, tmp);                  \
-    DFT2_LAZY_22_24(p1, p5, n2, tmp);                  \
-    DFT2_LAZY_22_24(p2, p6, n2, tmp);                  \
-    DFT2_LAZY_22_24(p3, p7, n2, tmp);                  \
+    DFT2_LAZY_22_24(p0, p4, n2);                       \
+    DFT2_LAZY_22_24(p1, p5, n2);                       \
+    DFT2_LAZY_22_24(p2, p6, n2);                       \
+    DFT2_LAZY_22_24(p3, p7, n2);                       \
                                                        \
     DFT4_LAZY_2_4(p0, p1, p2, p3,                      \
                 tab_w[2], tab_w[3],                    \
-                n, n2, p_hi, p_lo);                    \
+                n, n2);                                \
     DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                 \
                      tab_w[2], tab_w[3],               \
                      tab_w[4], tab_w[5],               \
                      tab_w[6], tab_w[7],               \
-                     n, n2, p_hi, p_lo, tmp);          \
+                     n, n2);                           \
 } while(0)
 
 /** 8-point FFT, interpolation
@@ -460,21 +448,19 @@ do {                                                   \
 #define IDFT8_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7, \
                        n, n2, tab_w)                   \
 do {                                                   \
-    ulong p_hi, p_lo, tmp;                             \
-                                                       \
     IDFT4_LAZY_1_4(p0, p1, p2, p3,                     \
                    tab_w[2], tab_w[3],                 \
-                   n, n2, p_hi, p_lo);                 \
+                   n, n2);                             \
     IDFT4_NODE_LAZY_1_2(p4, p5, p6, p7,                \
                 tab_w[2], tab_w[3],                    \
                 tab_w[4], tab_w[5],                    \
                 tab_w[6], tab_w[7],                    \
-                n, n2, p_hi, p_lo);                    \
+                n, n2);                                \
                                                        \
-    DFT2_LAZY_42_44(p0, p4, n2, tmp);                  \
-    DFT2_LAZY_42_44(p1, p5, n2, tmp);                  \
-    DFT2_LAZY_42_44(p2, p6, n2, tmp);                  \
-    DFT2_LAZY_42_44(p3, p7, n2, tmp);                  \
+    DFT2_LAZY_42_44(p0, p4, n2);                       \
+    DFT2_LAZY_42_44(p1, p5, n2);                       \
+    DFT2_LAZY_42_44(p2, p6, n2);                       \
+    DFT2_LAZY_42_44(p3, p7, n2);                       \
 } while(0)
 
 /*------------------------*/
@@ -490,29 +476,27 @@ do {                                                   \
  * polynomial x**8 - F->tab_w[node]
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
-#define DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,         \
-                           node, n, n2, tab_w)                     \
-do {                                                               \
-    ulong p_hi, p_lo, u, v;                                        \
-                                                                   \
-    const ulong w = tab_w[2*(node)];                               \
-    const ulong w_pr = tab_w[2*(node)+1];                          \
-    DFT2_NODE_LAZY_4_4(p0, p4, w, w_pr, n, n2, p_hi, p_lo, u, v);  \
-    DFT2_NODE_LAZY_4_4(p1, p5, w, w_pr, n, n2, p_hi, p_lo, u, v);  \
-    DFT2_NODE_LAZY_4_4(p2, p6, w, w_pr, n, n2, p_hi, p_lo, u, v);  \
-    DFT2_NODE_LAZY_4_4(p3, p7, w, w_pr, n, n2, p_hi, p_lo, u, v);  \
-                                                                   \
-    DFT4_NODE_LAZY_4_4(p0, p1, p2, p3,                             \
-                       tab_w[4*(node)], tab_w[4*(node)+1],         \
-                       tab_w[8*(node)], tab_w[8*(node)+1],         \
-                       tab_w[8*(node)+2], tab_w[8*(node)+3],       \
-                       n, n2, p_hi, p_lo, u);                      \
-                                                                   \
-    DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                             \
-                       tab_w[4*(node)+2], tab_w[4*(node)+3],       \
-                       tab_w[8*(node)+4], tab_w[8*(node)+5],       \
-                       tab_w[8*(node)+6], tab_w[8*(node)+7],       \
-                       n, n2, p_hi, p_lo, u);                      \
+#define DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,    \
+                           node, n, n2, tab_w)                \
+do {                                                          \
+    const ulong w = tab_w[2*(node)];                          \
+    const ulong w_pr = tab_w[2*(node)+1];                     \
+    DFT2_NODE_LAZY_4_4(p0, p4, w, w_pr, n, n2);               \
+    DFT2_NODE_LAZY_4_4(p1, p5, w, w_pr, n, n2);               \
+    DFT2_NODE_LAZY_4_4(p2, p6, w, w_pr, n, n2);               \
+    DFT2_NODE_LAZY_4_4(p3, p7, w, w_pr, n, n2);               \
+                                                              \
+    DFT4_NODE_LAZY_4_4(p0, p1, p2, p3,                        \
+                       tab_w[4*(node)], tab_w[4*(node)+1],    \
+                       tab_w[8*(node)], tab_w[8*(node)+1],    \
+                       tab_w[8*(node)+2], tab_w[8*(node)+3],  \
+                       n, n2);                                \
+                                                              \
+    DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                        \
+                       tab_w[4*(node)+2], tab_w[4*(node)+3],  \
+                       tab_w[8*(node)+4], tab_w[8*(node)+5],  \
+                       tab_w[8*(node)+6], tab_w[8*(node)+7],  \
+                       n, n2);                                \
 } while(0)
 
 /** 8-point FFT, interpolation, general node
@@ -525,30 +509,28 @@ do {                                                               \
  * * lazy_1_2: in [0..n) / out [0..2n) / max < 4n
  * * lazy_2_2: in [0..2n) / out [0..2n) / max < 4n
  */
-#define IDFT8_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7,        \
-                            node, n, n2, tab_w)                    \
-do {                                                               \
-    ulong p_hi, p_lo, tmp;                                         \
-                                                                   \
-    const ulong w = tab_w[2*(node)];                               \
-    const ulong w_pr = tab_w[2*(node)+1];                          \
-                                                                   \
-    IDFT4_NODE_LAZY_1_2(p0, p1, p2, p3,                            \
-                        tab_w[4*(node)], tab_w[4*(node)+1],        \
-                        tab_w[8*(node)], tab_w[8*(node)+1],        \
-                        tab_w[8*(node)+2], tab_w[8*(node)+3],      \
-                        n, n2, p_hi, p_lo);                        \
-                                                                   \
-    IDFT4_NODE_LAZY_1_2(p4, p5, p6, p7,                            \
-                        tab_w[4*(node)+2], tab_w[4*(node)+3],      \
-                        tab_w[8*(node)+4], tab_w[8*(node)+5],      \
-                        tab_w[8*(node)+6], tab_w[8*(node)+7],      \
-                        n, n2, p_hi, p_lo);                        \
-                                                                   \
-    IDFT2_NODE_LAZY_2_2(p0, p4, w, w_pr, n, n2, p_hi, p_lo, tmp);  \
-    IDFT2_NODE_LAZY_2_2(p1, p5, w, w_pr, n, n2, p_hi, p_lo, tmp);  \
-    IDFT2_NODE_LAZY_2_2(p2, p6, w, w_pr, n, n2, p_hi, p_lo, tmp);  \
-    IDFT2_NODE_LAZY_2_2(p3, p7, w, w_pr, n, n2, p_hi, p_lo, tmp);  \
+#define IDFT8_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7,    \
+                            node, n, n2, tab_w)                \
+do {                                                           \
+    const ulong w = tab_w[2*(node)];                           \
+    const ulong w_pr = tab_w[2*(node)+1];                      \
+                                                               \
+    IDFT4_NODE_LAZY_1_2(p0, p1, p2, p3,                        \
+                        tab_w[4*(node)], tab_w[4*(node)+1],    \
+                        tab_w[8*(node)], tab_w[8*(node)+1],    \
+                        tab_w[8*(node)+2], tab_w[8*(node)+3],  \
+                        n, n2);                                \
+                                                               \
+    IDFT4_NODE_LAZY_1_2(p4, p5, p6, p7,                        \
+                        tab_w[4*(node)+2], tab_w[4*(node)+3],  \
+                        tab_w[8*(node)+4], tab_w[8*(node)+5],  \
+                        tab_w[8*(node)+6], tab_w[8*(node)+7],  \
+                        n, n2);                                \
+                                                               \
+    IDFT2_NODE_LAZY_2_2(p0, p4, w, w_pr, n, n2);               \
+    IDFT2_NODE_LAZY_2_2(p1, p5, w, w_pr, n, n2);               \
+    IDFT2_NODE_LAZY_2_2(p2, p6, w, w_pr, n, n2);               \
+    IDFT2_NODE_LAZY_2_2(p3, p7, w, w_pr, n, n2);               \
 } while(0)
 
 /*-------------------*/
@@ -562,82 +544,78 @@ do {                                                               \
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
  */
-#define DFT16_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,                      \
-                       p8, p9, p10, p11, p12, p13, p14, p15,                \
-                       n, n2, tab_w)                                        \
-do {                                                                        \
-    ulong p_hi, p_lo, tmp;                                                  \
-                                                                            \
-    DFT4_LAZY_1_4(p0, p4, p8, p12, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    if (p0 >= n2)                                                           \
-        p0 -= n2;                                                           \
-    DFT4_LAZY_1_4(p1, p5, p9, p13, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    if (p1 >= n2)                                                           \
-        p1 -= n2;                                                           \
-    DFT4_LAZY_1_4(p2, p6, p10, p14, tab_w[2], tab_w[3], n, n2, p_hi, p_lo); \
-    if (p2 >= n2)                                                           \
-        p2 -= n2;                                                           \
-    DFT4_LAZY_1_4(p3, p7, p11, p15, tab_w[2], tab_w[3], n, n2, p_hi, p_lo); \
-    if (p3 >= n2)                                                           \
-        p3 -= n2;                                                           \
-                                                                            \
-    /* next line requires < 2n,        */                                   \
-    /* hence the four reductions above */                                   \
-    DFT4_LAZY_2_4(p0, p1, p2, p3, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);   \
-    DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                                      \
-                       tab_w[2], tab_w[3],                                  \
-                       tab_w[4], tab_w[5],                                  \
-                       tab_w[6], tab_w[7],                                  \
-                       n, n2, p_hi, p_lo, tmp);                             \
-    DFT4_NODE_LAZY_4_4(p8, p9, p10, p11,                                    \
-                       tab_w[4], tab_w[5],                                  \
-                       tab_w[8], tab_w[9],                                  \
-                       tab_w[10], tab_w[11],                                \
-                       n, n2, p_hi, p_lo, tmp);                             \
-    DFT4_NODE_LAZY_4_4(p12, p13, p14, p15,                                  \
-                       tab_w[6], tab_w[7],                                  \
-                       tab_w[12], tab_w[13],                                \
-                       tab_w[14], tab_w[15],                                \
-                       n, n2, p_hi, p_lo, tmp);                             \
+#define DFT16_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,           \
+                       p8, p9, p10, p11, p12, p13, p14, p15,     \
+                       n, n2, tab_w)                             \
+do {                                                             \
+    DFT4_LAZY_1_4(p0, p4, p8, p12, tab_w[2], tab_w[3], n, n2);   \
+    if (p0 >= n2)                                                \
+        p0 -= n2;                                                \
+    DFT4_LAZY_1_4(p1, p5, p9, p13, tab_w[2], tab_w[3], n, n2);   \
+    if (p1 >= n2)                                                \
+        p1 -= n2;                                                \
+    DFT4_LAZY_1_4(p2, p6, p10, p14, tab_w[2], tab_w[3], n, n2);  \
+    if (p2 >= n2)                                                \
+        p2 -= n2;                                                \
+    DFT4_LAZY_1_4(p3, p7, p11, p15, tab_w[2], tab_w[3], n, n2);  \
+    if (p3 >= n2)                                                \
+        p3 -= n2;                                                \
+                                                                 \
+    /* next line requires < 2n,        */                        \
+    /* hence the four reductions above */                        \
+    DFT4_LAZY_2_4(p0, p1, p2, p3, tab_w[2], tab_w[3], n, n2);    \
+    DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                           \
+                       tab_w[2], tab_w[3],                       \
+                       tab_w[4], tab_w[5],                       \
+                       tab_w[6], tab_w[7],                       \
+                       n, n2);                                   \
+    DFT4_NODE_LAZY_4_4(p8, p9, p10, p11,                         \
+                       tab_w[4], tab_w[5],                       \
+                       tab_w[8], tab_w[9],                       \
+                       tab_w[10], tab_w[11],                     \
+                       n, n2);                                   \
+    DFT4_NODE_LAZY_4_4(p12, p13, p14, p15,                       \
+                       tab_w[6], tab_w[7],                       \
+                       tab_w[12], tab_w[13],                     \
+                       tab_w[14], tab_w[15],                     \
+                       n, n2);                                   \
 } while(0)
 
-#define DFT16_LAZY_2_4(p0, p1, p2, p3, p4, p5, p6, p7,                      \
-                       p8, p9, p10, p11, p12, p13, p14, p15,                \
-                       n, n2, tab_w)                                        \
-do {                                                                        \
-    ulong p_hi, p_lo, tmp;                                                  \
-                                                                            \
-    DFT4_LAZY_2_4(p0, p4, p8, p12, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    if (p0 >= n2)                                                           \
-        p0 -= n2;                                                           \
-    DFT4_LAZY_2_4(p1, p5, p9, p13, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    if (p1 >= n2)                                                           \
-        p1 -= n2;                                                           \
-    DFT4_LAZY_2_4(p2, p6, p10, p14, tab_w[2], tab_w[3], n, n2, p_hi, p_lo); \
-    if (p2 >= n2)                                                           \
-        p2 -= n2;                                                           \
-    DFT4_LAZY_2_4(p3, p7, p11, p15, tab_w[2], tab_w[3], n, n2, p_hi, p_lo); \
-    if (p3 >= n2)                                                           \
-        p3 -= n2;                                                           \
-                                                                            \
-    /* next line requires < 2n,        */                                   \
-    /* hence the four reductions above */                                   \
-    DFT4_LAZY_2_4(p0, p1, p2, p3, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);   \
-    DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                                      \
-                       tab_w[2], tab_w[3],                                  \
-                       tab_w[4], tab_w[5],                                  \
-                       tab_w[6], tab_w[7],                                  \
-                       n, n2, p_hi, p_lo, tmp);                             \
-    DFT4_NODE_LAZY_4_4(p8, p9, p10, p11,                                    \
-                       tab_w[4], tab_w[5],                                  \
-                       tab_w[8], tab_w[9],                                  \
-                       tab_w[10], tab_w[11],                                \
-                       n, n2, p_hi, p_lo, tmp);                             \
-    DFT4_NODE_LAZY_4_4(p12, p13, p14, p15,                                  \
-                       tab_w[6], tab_w[7],                                  \
-                       tab_w[12], tab_w[13],                                \
-                       tab_w[14], tab_w[15],                                \
-                       n, n2, p_hi, p_lo, tmp);                             \
+#define DFT16_LAZY_2_4(p0, p1, p2, p3, p4, p5, p6, p7,           \
+                       p8, p9, p10, p11, p12, p13, p14, p15,     \
+                       n, n2, tab_w)                             \
+do {                                                             \
+    DFT4_LAZY_2_4(p0, p4, p8, p12, tab_w[2], tab_w[3], n, n2);   \
+    if (p0 >= n2)                                                \
+        p0 -= n2;                                                \
+    DFT4_LAZY_2_4(p1, p5, p9, p13, tab_w[2], tab_w[3], n, n2);   \
+    if (p1 >= n2)                                                \
+        p1 -= n2;                                                \
+    DFT4_LAZY_2_4(p2, p6, p10, p14, tab_w[2], tab_w[3], n, n2);  \
+    if (p2 >= n2)                                                \
+        p2 -= n2;                                                \
+    DFT4_LAZY_2_4(p3, p7, p11, p15, tab_w[2], tab_w[3], n, n2);  \
+    if (p3 >= n2)                                                \
+        p3 -= n2;                                                \
+                                                                 \
+    /* next line requires < 2n,        */                        \
+    /* hence the four reductions above */                        \
+    DFT4_LAZY_2_4(p0, p1, p2, p3, tab_w[2], tab_w[3], n, n2);    \
+    DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                           \
+                       tab_w[2], tab_w[3],                       \
+                       tab_w[4], tab_w[5],                       \
+                       tab_w[6], tab_w[7],                       \
+                       n, n2);                                   \
+    DFT4_NODE_LAZY_4_4(p8, p9, p10, p11,                         \
+                       tab_w[4], tab_w[5],                       \
+                       tab_w[8], tab_w[9],                       \
+                       tab_w[10], tab_w[11],                     \
+                       n, n2);                                   \
+    DFT4_NODE_LAZY_4_4(p12, p13, p14, p15,                       \
+                       tab_w[6], tab_w[7],                       \
+                       tab_w[12], tab_w[13],                     \
+                       tab_w[14], tab_w[15],                     \
+                       n, n2);                                   \
 } while(0)
 
 /** 16-point FFT, interpolation
@@ -646,33 +624,31 @@ do {                                                                        \
  * degree < 16, into the coefficients of this polynomial 
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  */
-#define IDFT16_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,                         \
-                        p8, p9, p10, p11, p12, p13, p14, p15,                   \
-                        n, n2, tab_w)                                           \
-do {                                                                            \
-    ulong p_hi, p_lo;                                                           \
-                                                                                \
-    IDFT4_LAZY_1_4(p0, p1, p2, p3, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);      \
-    IDFT4_NODE_LAZY_1_2(p4, p5, p6, p7,                                         \
-                        tab_w[2], tab_w[3],                                     \
-                        tab_w[4], tab_w[5],                                     \
-                        tab_w[6], tab_w[7],                                     \
-                        n, n2, p_hi, p_lo);                                     \
-    IDFT4_NODE_LAZY_1_2(p8, p9, p10, p11,                                       \
-                        tab_w[4], tab_w[5],                                     \
-                        tab_w[8], tab_w[9],                                     \
-                        tab_w[10], tab_w[11],                                   \
-                        n, n2, p_hi, p_lo);                                     \
-    IDFT4_NODE_LAZY_1_2(p12, p13, p14, p15,                                     \
-                        tab_w[6], tab_w[7],                                     \
-                        tab_w[12], tab_w[13],                                   \
-                        tab_w[14], tab_w[15],                                   \
-                        n, n2, p_hi, p_lo);                                     \
-                                                                                \
-    IDFT4_LAZY_4222_4(p0, p4, p8, p12, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    IDFT4_LAZY_4222_4(p1, p5, p9, p13, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    IDFT4_LAZY_4222_4(p2, p6, p10, p14, tab_w[2], tab_w[3], n, n2, p_hi, p_lo); \
-    IDFT4_LAZY_4222_4(p3, p7, p11, p15, tab_w[2], tab_w[3], n, n2, p_hi, p_lo); \
+#define IDFT16_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,              \
+                        p8, p9, p10, p11, p12, p13, p14, p15,        \
+                        n, n2, tab_w)                                \
+do {                                                                 \
+    IDFT4_LAZY_1_4(p0, p1, p2, p3, tab_w[2], tab_w[3], n, n2);       \
+    IDFT4_NODE_LAZY_1_2(p4, p5, p6, p7,                              \
+                        tab_w[2], tab_w[3],                          \
+                        tab_w[4], tab_w[5],                          \
+                        tab_w[6], tab_w[7],                          \
+                        n, n2);                                      \
+    IDFT4_NODE_LAZY_1_2(p8, p9, p10, p11,                            \
+                        tab_w[4], tab_w[5],                          \
+                        tab_w[8], tab_w[9],                          \
+                        tab_w[10], tab_w[11],                        \
+                        n, n2);                                      \
+    IDFT4_NODE_LAZY_1_2(p12, p13, p14, p15,                          \
+                        tab_w[6], tab_w[7],                          \
+                        tab_w[12], tab_w[13],                        \
+                        tab_w[14], tab_w[15],                        \
+                        n, n2);                                      \
+                                                                     \
+    IDFT4_LAZY_4222_4(p0, p4, p8, p12, tab_w[2], tab_w[3], n, n2);   \
+    IDFT4_LAZY_4222_4(p1, p5, p9, p13, tab_w[2], tab_w[3], n, n2);   \
+    IDFT4_LAZY_4222_4(p2, p6, p10, p14, tab_w[2], tab_w[3], n, n2);  \
+    IDFT4_LAZY_4222_4(p3, p7, p11, p15, tab_w[2], tab_w[3], n, n2);  \
 } while(0)
 
 /*-------------------------*/
@@ -692,7 +668,6 @@ do {                                                                            
                             p8, p9, p10, p11, p12, p13, p14, p15, \
                             node, n, n2, tab_w)                   \
 do {                                                              \
-    ulong p_hi, p_lo, tmp;                                        \
     ulong w2, w2pre, w, wpre, Iw, Iwpre;                          \
                                                                   \
     w2 = tab_w[2*node];                                           \
@@ -704,16 +679,16 @@ do {                                                              \
                                                                   \
     DFT4_NODE_LAZY_4_4(p0, p4, p8, p12,                           \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
     DFT4_NODE_LAZY_4_4(p1, p5, p9, p13,                           \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
     DFT4_NODE_LAZY_4_4(p2, p6, p10, p14,                          \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
     DFT4_NODE_LAZY_4_4(p3, p7, p11, p15,                          \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
                                                                   \
     w2 = tab_w[8*node];                                           \
     w2pre = tab_w[8*node+1];                                      \
@@ -723,7 +698,7 @@ do {                                                              \
     Iwpre = tab_w[16*node+3];                                     \
     DFT4_NODE_LAZY_4_4(p0, p1, p2, p3,                            \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
                                                                   \
     w2 = tab_w[8*node+2];                                         \
     w2pre = tab_w[8*node+3];                                      \
@@ -733,7 +708,7 @@ do {                                                              \
     Iwpre = tab_w[16*node+7];                                     \
     DFT4_NODE_LAZY_4_4(p4, p5, p6, p7,                            \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
                                                                   \
     w2 = tab_w[8*node+4];                                         \
     w2pre = tab_w[8*node+5];                                      \
@@ -743,7 +718,7 @@ do {                                                              \
     Iwpre = tab_w[16*node+11];                                    \
     DFT4_NODE_LAZY_4_4(p8, p9, p10, p11,                          \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
                                                                   \
     w2 = tab_w[8*node+6];                                         \
     w2pre = tab_w[8*node+7];                                      \
@@ -753,7 +728,7 @@ do {                                                              \
     Iwpre = tab_w[16*node+15];                                    \
     DFT4_NODE_LAZY_4_4(p12, p13, p14, p15,                        \
                        w2, w2pre, w, wpre, Iw, Iwpre,             \
-                       n, n2, p_hi, p_lo, tmp);                   \
+                       n, n2);                                    \
 } while(0)
 
 /** 16-point FFT, interpolation, general node
@@ -767,7 +742,6 @@ do {                                                              \
                              p8, p9, p10, p11, p12, p13, p14, p15, \
                              node, n, n2, tab_w)                   \
 do {                                                               \
-    ulong p_hi, p_lo;                                              \
     ulong w2, w2pre, w, wpre, Iw, Iwpre;                           \
                                                                    \
     w2 = tab_w[8*node];                                            \
@@ -778,7 +752,7 @@ do {                                                               \
     Iwpre = tab_w[16*node+3];                                      \
     IDFT4_NODE_LAZY_1_2(p0, p1, p2, p3,                            \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
                                                                    \
     w2 = tab_w[8*node+2];                                          \
     w2pre = tab_w[8*node+3];                                       \
@@ -788,7 +762,7 @@ do {                                                               \
     Iwpre = tab_w[16*node+7];                                      \
     IDFT4_NODE_LAZY_1_2(p4, p5, p6, p7,                            \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
                                                                    \
     w2 = tab_w[8*node+4];                                          \
     w2pre = tab_w[8*node+5];                                       \
@@ -798,7 +772,7 @@ do {                                                               \
     Iwpre = tab_w[16*node+11];                                     \
     IDFT4_NODE_LAZY_1_2(p8, p9, p10, p11,                          \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
                                                                    \
     w2 = tab_w[8*node+6];                                          \
     w2pre = tab_w[8*node+7];                                       \
@@ -808,7 +782,7 @@ do {                                                               \
     Iwpre = tab_w[16*node+15];                                     \
     IDFT4_NODE_LAZY_1_2(p12, p13, p14, p15,                        \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
                                                                    \
     w2 = tab_w[2*node];                                            \
     w2pre = tab_w[2*node+1];                                       \
@@ -819,16 +793,16 @@ do {                                                               \
                                                                    \
     IDFT4_NODE_LAZY_2_2(p0, p4, p8, p12,                           \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
     IDFT4_NODE_LAZY_2_2(p1, p5, p9, p13,                           \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
     IDFT4_NODE_LAZY_2_2(p2, p6, p10, p14,                          \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
     IDFT4_NODE_LAZY_2_2(p3, p7, p11, p15,                          \
                        w2, w2pre, w, wpre, Iw, Iwpre,              \
-                       n, n2, p_hi, p_lo);                         \
+                       n, n2);                                     \
 } while(0)
 
 
@@ -849,30 +823,28 @@ do {                                                               \
                        p24, p25, p26, p27, p28, p29, p30, p31,                   \
                        n, n2, tab_w)                                             \
 do {                                                                             \
-    ulong p_hi, p_lo;                                                            \
-                                                                                 \
-    DFT4_LAZY_1_4(p0, p8, p16, p24, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);      \
+    DFT4_LAZY_1_4(p0, p8, p16, p24, tab_w[2], tab_w[3], n, n2);                  \
     if (p0 >= n2)                                                                \
         p0 -= n2;                                                                \
-    DFT4_LAZY_1_4(p1, p9, p17, p25, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);      \
+    DFT4_LAZY_1_4(p1, p9, p17, p25, tab_w[2], tab_w[3], n, n2);                  \
     if (p1 >= n2)                                                                \
         p1 -= n2;                                                                \
-    DFT4_LAZY_1_4(p2, p10, p18, p26, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_1_4(p2, p10, p18, p26, tab_w[2], tab_w[3], n, n2);                 \
     if (p2 >= n2)                                                                \
         p2 -= n2;                                                                \
-    DFT4_LAZY_1_4(p3, p11, p19, p27, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_1_4(p3, p11, p19, p27, tab_w[2], tab_w[3], n, n2);                 \
     if (p3 >= n2)                                                                \
         p3 -= n2;                                                                \
-    DFT4_LAZY_1_4(p4, p12, p20, p28, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_1_4(p4, p12, p20, p28, tab_w[2], tab_w[3], n, n2);                 \
     if (p4 >= n2)                                                                \
         p4 -= n2;                                                                \
-    DFT4_LAZY_1_4(p5, p13, p21, p29, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_1_4(p5, p13, p21, p29, tab_w[2], tab_w[3], n, n2);                 \
     if (p5 >= n2)                                                                \
         p5 -= n2;                                                                \
-    DFT4_LAZY_1_4(p6, p14, p22, p30, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_1_4(p6, p14, p22, p30, tab_w[2], tab_w[3], n, n2);                 \
     if (p6 >= n2)                                                                \
         p6 -= n2;                                                                \
-    DFT4_LAZY_1_4(p7, p15, p23, p31, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_1_4(p7, p15, p23, p31, tab_w[2], tab_w[3], n, n2);                 \
     if (p7 >= n2)                                                                \
         p7 -= n2;                                                                \
                                                                                  \
@@ -889,30 +861,28 @@ do {                                                                            
                        p24, p25, p26, p27, p28, p29, p30, p31,                   \
                        n, n2, tab_w)                                             \
 do {                                                                             \
-    ulong p_hi, p_lo;                                                            \
-                                                                                 \
-    DFT4_LAZY_2_4(p0, p8, p16, p24, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);      \
+    DFT4_LAZY_2_4(p0, p8, p16, p24, tab_w[2], tab_w[3], n, n2);                  \
     if (p0 >= n2)                                                                \
         p0 -= n2;                                                                \
-    DFT4_LAZY_2_4(p1, p9, p17, p25, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);      \
+    DFT4_LAZY_2_4(p1, p9, p17, p25, tab_w[2], tab_w[3], n, n2);                  \
     if (p1 >= n2)                                                                \
         p1 -= n2;                                                                \
-    DFT4_LAZY_2_4(p2, p10, p18, p26, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_2_4(p2, p10, p18, p26, tab_w[2], tab_w[3], n, n2);                 \
     if (p2 >= n2)                                                                \
         p2 -= n2;                                                                \
-    DFT4_LAZY_2_4(p3, p11, p19, p27, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_2_4(p3, p11, p19, p27, tab_w[2], tab_w[3], n, n2);                 \
     if (p3 >= n2)                                                                \
         p3 -= n2;                                                                \
-    DFT4_LAZY_2_4(p4, p12, p20, p28, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_2_4(p4, p12, p20, p28, tab_w[2], tab_w[3], n, n2);                 \
     if (p4 >= n2)                                                                \
         p4 -= n2;                                                                \
-    DFT4_LAZY_2_4(p5, p13, p21, p29, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_2_4(p5, p13, p21, p29, tab_w[2], tab_w[3], n, n2);                 \
     if (p5 >= n2)                                                                \
         p5 -= n2;                                                                \
-    DFT4_LAZY_2_4(p6, p14, p22, p30, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_2_4(p6, p14, p22, p30, tab_w[2], tab_w[3], n, n2);                 \
     if (p6 >= n2)                                                                \
         p6 -= n2;                                                                \
-    DFT4_LAZY_2_4(p7, p15, p23, p31, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);     \
+    DFT4_LAZY_2_4(p7, p15, p23, p31, tab_w[2], tab_w[3], n, n2);                 \
     if (p7 >= n2)                                                                \
         p7 -= n2;                                                                \
                                                                                  \
@@ -935,21 +905,19 @@ do {                                                                            
                         p24, p25, p26, p27, p28, p29, p30, p31,                   \
                         n, n2, tab_w)                                             \
 do {                                                                              \
-    ulong p_hi, p_lo;                                                             \
-                                                                                  \
     IDFT8_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7, n, n2, tab_w);                 \
     IDFT8_NODE_LAZY_1_2(p8, p9, p10, p11, p12, p13, p14, p15, 1, n, n2, tab_w);   \
     IDFT8_NODE_LAZY_1_2(p16, p17, p18, p19, p20, p21, p22, p23, 2, n, n2, tab_w); \
     IDFT8_NODE_LAZY_1_2(p24, p25, p26, p27, p28, p29, p30, p31, 3, n, n2, tab_w); \
                                                                                   \
-    IDFT4_LAZY_4222_4(p0, p8, p16, p24, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);   \
-    IDFT4_LAZY_4222_4(p1, p9, p17, p25, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);   \
-    IDFT4_LAZY_4222_4(p2, p10, p18, p26, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    IDFT4_LAZY_4222_4(p3, p11, p19, p27, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    IDFT4_LAZY_4222_4(p4, p12, p20, p28, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    IDFT4_LAZY_4222_4(p5, p13, p21, p29, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    IDFT4_LAZY_4222_4(p6, p14, p22, p30, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
-    IDFT4_LAZY_4222_4(p7, p15, p23, p31, tab_w[2], tab_w[3], n, n2, p_hi, p_lo);  \
+    IDFT4_LAZY_4222_4(p0, p8, p16, p24, tab_w[2], tab_w[3], n, n2);               \
+    IDFT4_LAZY_4222_4(p1, p9, p17, p25, tab_w[2], tab_w[3], n, n2);               \
+    IDFT4_LAZY_4222_4(p2, p10, p18, p26, tab_w[2], tab_w[3], n, n2);              \
+    IDFT4_LAZY_4222_4(p3, p11, p19, p27, tab_w[2], tab_w[3], n, n2);              \
+    IDFT4_LAZY_4222_4(p4, p12, p20, p28, tab_w[2], tab_w[3], n, n2);              \
+    IDFT4_LAZY_4222_4(p5, p13, p21, p29, tab_w[2], tab_w[3], n, n2);              \
+    IDFT4_LAZY_4222_4(p6, p14, p22, p30, tab_w[2], tab_w[3], n, n2);              \
+    IDFT4_LAZY_4222_4(p7, p15, p23, p31, tab_w[2], tab_w[3], n, n2);              \
 } while(0)
 
 /*-------------------------*/
@@ -965,33 +933,31 @@ do {                                                                            
  * polynomial x**32 - F->tab_w[node]
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
-#define DFT32_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                                       \
-                            p8, p9, p10, p11, p12, p13, p14, p15,                                 \
-                            p16, p17, p18, p19, p20, p21, p22, p23,                               \
-                            p24, p25, p26, p27, p28, p29, p30, p31,                               \
-                            node, n, n2, tab_w)                                                   \
-do {                                                                                              \
-    ulong p_hi, p_lo, tmp;                                                                        \
-                                                                                                  \
-    ulong w2 = tab_w[2*node];                                                                     \
-    ulong w2pre = tab_w[2*node+1];                                                                \
-    ulong w = tab_w[4*node];                                                                      \
-    ulong wpre = tab_w[4*node+1];                                                                 \
-    ulong Iw = tab_w[4*node+2];                                                                   \
-    ulong Iwpre = tab_w[4*node+3];                                                                \
-    DFT4_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp);  \
-    DFT4_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp);  \
-    DFT4_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp); \
-    DFT4_NODE_LAZY_4_4(p3, p11, p19, p27, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp); \
-    DFT4_NODE_LAZY_4_4(p4, p12, p20, p28, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp); \
-    DFT4_NODE_LAZY_4_4(p5, p13, p21, p29, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp); \
-    DFT4_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp); \
-    DFT4_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo, tmp); \
-                                                                                                  \
-    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);                     \
-    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);             \
-    DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);           \
-    DFT8_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);           \
+#define DFT32_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7,                              \
+                            p8, p9, p10, p11, p12, p13, p14, p15,                        \
+                            p16, p17, p18, p19, p20, p21, p22, p23,                      \
+                            p24, p25, p26, p27, p28, p29, p30, p31,                      \
+                            node, n, n2, tab_w)                                          \
+do {                                                                                     \
+    ulong w2 = tab_w[2*node];                                                            \
+    ulong w2pre = tab_w[2*node+1];                                                       \
+    ulong w = tab_w[4*node];                                                             \
+    ulong wpre = tab_w[4*node+1];                                                        \
+    ulong Iw = tab_w[4*node+2];                                                          \
+    ulong Iwpre = tab_w[4*node+3];                                                       \
+    DFT4_NODE_LAZY_4_4(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);          \
+    DFT4_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);          \
+    DFT4_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    DFT4_NODE_LAZY_4_4(p3, p11, p19, p27, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    DFT4_NODE_LAZY_4_4(p4, p12, p20, p28, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    DFT4_NODE_LAZY_4_4(p5, p13, p21, p29, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    DFT4_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    DFT4_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+                                                                                         \
+    DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);            \
+    DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);    \
+    DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);  \
 } while(0)
 
 /** 32-point FFT, interpolation, general node
@@ -1001,33 +967,31 @@ do {                                                                            
  * degree < 32, into the coefficients of this polynomial 
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  */
-#define IDFT32_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7,                                  \
-                             p8, p9, p10, p11, p12, p13, p14, p15,                            \
-                             p16, p17, p18, p19, p20, p21, p22, p23,                          \
-                             p24, p25, p26, p27, p28, p29, p30, p31,                          \
-                             node, n, n2, tab_w)                                              \
-do {                                                                                          \
-    ulong p_hi, p_lo;                                                                         \
-                                                                                              \
-    IDFT8_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);                \
-    IDFT8_NODE_LAZY_1_2(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);        \
-    IDFT8_NODE_LAZY_1_2(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);      \
-    IDFT8_NODE_LAZY_1_2(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);      \
-                                                                                              \
-    ulong w2 = tab_w[2*node];                                                                 \
-    ulong w2pre = tab_w[2*node+1];                                                            \
-    ulong w = tab_w[4*node];                                                                  \
-    ulong wpre = tab_w[4*node+1];                                                             \
-    ulong Iw = tab_w[4*node+2];                                                               \
-    ulong Iwpre = tab_w[4*node+3];                                                            \
-    IDFT4_NODE_LAZY_2_2(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo);  \
-    IDFT4_NODE_LAZY_2_2(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo);  \
-    IDFT4_NODE_LAZY_2_2(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
-    IDFT4_NODE_LAZY_2_2(p3, p11, p19, p27, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
-    IDFT4_NODE_LAZY_2_2(p4, p12, p20, p28, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
-    IDFT4_NODE_LAZY_2_2(p5, p13, p21, p29, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
-    IDFT4_NODE_LAZY_2_2(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
-    IDFT4_NODE_LAZY_2_2(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2, p_hi, p_lo); \
+#define IDFT32_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7,                              \
+                             p8, p9, p10, p11, p12, p13, p14, p15,                        \
+                             p16, p17, p18, p19, p20, p21, p22, p23,                      \
+                             p24, p25, p26, p27, p28, p29, p30, p31,                      \
+                             node, n, n2, tab_w)                                          \
+do {                                                                                      \
+    IDFT8_NODE_LAZY_1_2(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);            \
+    IDFT8_NODE_LAZY_1_2(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);    \
+    IDFT8_NODE_LAZY_1_2(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);  \
+    IDFT8_NODE_LAZY_1_2(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);  \
+                                                                                          \
+    ulong w2 = tab_w[2*node];                                                             \
+    ulong w2pre = tab_w[2*node+1];                                                        \
+    ulong w = tab_w[4*node];                                                              \
+    ulong wpre = tab_w[4*node+1];                                                         \
+    ulong Iw = tab_w[4*node+2];                                                           \
+    ulong Iwpre = tab_w[4*node+3];                                                        \
+    IDFT4_NODE_LAZY_2_2(p0, p8, p16, p24, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);          \
+    IDFT4_NODE_LAZY_2_2(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);          \
+    IDFT4_NODE_LAZY_2_2(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    IDFT4_NODE_LAZY_2_2(p3, p11, p19, p27, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    IDFT4_NODE_LAZY_2_2(p4, p12, p20, p28, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    IDFT4_NODE_LAZY_2_2(p5, p13, p21, p29, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    IDFT4_NODE_LAZY_2_2(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
+    IDFT4_NODE_LAZY_2_2(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
 } while(0)
 
 #endif  /* N_FFT_MACROS_H */
