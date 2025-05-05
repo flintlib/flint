@@ -83,13 +83,15 @@ TEST_FUNCTION_START(n_fft_dft, state)
             int res = _nmod_vec_equal(evals_br, p, len);
 
             if (!res)
+            {
                 TEST_FUNCTION_FAIL(
-                        "prime = %wu\n"
-                        "root of unity = %wu\n"
-                        "max_depth = %wu\n"
-                        "depth = %wu\n"
-                        "failed equality test\n",
-                        prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+                    "prime = %wu\n"
+                    "root of unity = %wu\n"
+                    "max_depth = %wu\n"
+                    "depth = %wu\n"
+                    "failed equality test\n",
+                    prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+            }
 
             _nmod_vec_clear(p);
             nmod_poly_clear(pol);

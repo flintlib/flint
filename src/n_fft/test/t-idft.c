@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
 #include "flint.h"
 #include "test_helpers.h"
 #include "ulong_extras.h"
@@ -70,16 +69,16 @@ TEST_FUNCTION_START(n_fft_idft, state)
             nn_ptr evals = flint_malloc(len * sizeof(ulong));
             for (ulong k = 0; k < len; k++)
                 evals[k] = n_randint(state, prime);
+            // copy them for IDFT
+            ulong * p = _nmod_vec_init(len);
+            _nmod_vec_set(p, evals, len);
 
             // general interpolation
             nmod_poly_t pol;
             nmod_poly_init(pol, prime);
             nmod_poly_interpolate_nmod_vec(pol, roots, evals, len);
 
-            // evals by IDFT
-            ulong * p = _nmod_vec_init(len);
-            _nmod_vec_set(p, evals, len);
-
+            // interpolate via IDFT
             n_fft_idft(p, depth, F);
 
             int res = _nmod_vec_equal(pol->coeffs, p, len);
@@ -89,35 +88,13 @@ TEST_FUNCTION_START(n_fft_idft, state)
                 _nmod_vec_print(p, len, mod);
                 _nmod_vec_print(pol->coeffs, len, mod);
                 TEST_FUNCTION_FAIL(
-                                   "prime = %wu\n"
-                                   "root of unity = %wu\n"
-                                   "max_depth = %wu\n"
-                                   "depth = %wu\n"
-                                   "failed equality test\n",
-                                   prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+                    "prime = %wu\n"
+                    "root of unity = %wu\n"
+                    "max_depth = %wu\n"
+                    "depth = %wu\n"
+                    "failed equality test\n",
+                    prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
             }
-
-            //int res = nmod_vec_red_equal(evals_br, p, len, mod);
-
-            //if (!res)
-            //    TEST_FUNCTION_FAIL(
-            //            "prime = %wu\n"
-            //            "root of unity = %wu\n"
-            //            "max_depth = %wu\n"
-            //            "depth = %wu\n"
-            //            "failed equality test\n",
-            //            prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
-
-            //res = nmod_vec_range(p, len, 4*mod.n);
-
-            //if (!res)
-            //    TEST_FUNCTION_FAIL(
-            //            "prime = %wu\n"
-            //            "root of unity = %wu\n"
-            //            "max_depth = %wu\n"
-            //            "depth = %wu\n"
-            //            "failed range test\n",
-            //            prime, F->tab_w2[2*(max_depth-2)], max_depth, depth);
 
             _nmod_vec_clear(p);
             flint_free(evals);
