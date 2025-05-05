@@ -970,6 +970,15 @@ _gr_fmpz_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_poly_divexact2(fmpz * res,
+    const fmpz * poly1, slong len1,
+    const fmpz * poly2, slong len2, gr_ctx_t ctx)
+{
+    _fmpz_poly_divexact(res, poly1, len1, poly2, len2);
+    return GR_SUCCESS;
+}
+
 /* defined in gr/fmpz_poly.c */
 int _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx);
 
@@ -1194,6 +1203,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},
+    {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_fmpz_poly_divexact2},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_roots_gr_poly},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpz_roots_gr_poly_other},

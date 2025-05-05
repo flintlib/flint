@@ -117,6 +117,36 @@ int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
+int gr_generic_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
+{
+    slong i;
+    truth_t is_invertible;
+    int status = GR_SUCCESS;
+
+    for (i = 0; i < 5; i++)
+    {
+        status |= gr_randtest(x, state, ctx);
+
+        is_invertible = gr_is_invertible(x, ctx);
+        if (is_invertible == T_TRUE)
+            return GR_SUCCESS;
+    }
+
+    for (i = 0; i < 5; i++)
+    {
+        status |= gr_randtest_small(x, state, ctx);
+
+        is_invertible = gr_is_invertible(x, ctx);
+        if (is_invertible == T_TRUE)
+            return GR_SUCCESS;
+    }
+
+    /* unused */
+    (void) status;
+
+    return n_randint(state, 2) ? gr_one(x, ctx) : gr_neg_one(x, ctx);
+}
+
 int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -2620,6 +2650,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
     {GR_METHOD_RANDTEST_NOT_ZERO,       (gr_funcptr) gr_generic_randtest_not_zero},
+    {GR_METHOD_RANDTEST_INVERTIBLE,     (gr_funcptr) gr_generic_randtest_invertible},
     {GR_METHOD_RANDTEST_SMALL,          (gr_funcptr) gr_generic_randtest_small},
 
     {GR_METHOD_GENS,                    (gr_funcptr) gr_generic_gens},

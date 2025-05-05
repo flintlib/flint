@@ -503,3 +503,20 @@ Exceptions
 
     Sets the :func:`flint_throw` function use ``func`` instead of a private
     throw function.
+
+Sorting and searching
+-----------------------------------------------
+
+.. function:: void flint_merge_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data)
+              void flint_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data)
+
+    Sorts an array *buf* with *len* elements of size *size* according to the
+    comparison function *cmp*. The comparison function takes as arguments
+    pointers to the two elements being compared and a pointer to arbitrary data
+    passed to the sorting function. It must return an `int` less than, equal to
+    or greater than zero according to whether the first element is strictly
+    smaller than, equal to, or strictly larger than the second.
+
+    The ``merge_sort`` version uses a simple implementation of the merge sort
+    algorithm. The generic version uses the system's ``qsort_r`` (or equivalent)
+    function when detected and falls back to ``flint_merge_sort`` otherwise.

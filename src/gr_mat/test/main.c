@@ -18,6 +18,7 @@
 #include "t-charpoly_faddeev.c"
 #include "t-charpoly_gauss.c"
 #include "t-charpoly_householder.c"
+#include "t-companion.c"
 #include "t-concat_horizontal.c"
 #include "t-concat_vertical.c"
 #include "t-det_berkowitz.c"
@@ -45,6 +46,7 @@
 #include "t-pow_scalar.c"
 #include "t-properties.c"
 #include "t-randrank.c"
+#include "t-randsimilar.c"
 #include "t-rank.c"
 #include "t-rank_fflu.c"
 #include "t-rank_lu.c"
@@ -73,6 +75,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_charpoly_faddeev),
     TEST_FUNCTION(gr_mat_charpoly_gauss),
     TEST_FUNCTION(gr_mat_charpoly_householder),
+    TEST_FUNCTION(gr_mat_companion),
     TEST_FUNCTION(gr_mat_concat_horizontal),
     TEST_FUNCTION(gr_mat_concat_vertical),
     TEST_FUNCTION(gr_mat_det_berkowitz),
@@ -100,6 +103,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_pow_scalar),
     TEST_FUNCTION(gr_mat_properties),
     TEST_FUNCTION(gr_mat_randrank),
+    TEST_FUNCTION(gr_mat_randsimilar),
     TEST_FUNCTION(gr_mat_rank),
     TEST_FUNCTION(gr_mat_rank_fflu),
     TEST_FUNCTION(gr_mat_rank_lu),

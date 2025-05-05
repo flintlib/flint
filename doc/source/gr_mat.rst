@@ -710,6 +710,24 @@ Minimal polynomial
     Compute the minimal polynomial of the matrix *mat*.
     The algorithm assumes that the coefficient ring is a field.
 
+Companion matrix
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_mat_companion(gr_mat_t res, gr_srcptr poly, gr_ctx_t ctx)
+              int gr_mat_companion(gr_mat_t res, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Sets the *n* by *n* matrix *res* to the companion matrix of the polynomial
+    *poly* which must have degree *n*.
+    The underscore method reads `n + 1` input coefficients.
+    The algorithm assumes that the leading coefficient of *poly* is invertible.
+
+.. function:: int _gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, gr_srcptr poly, gr_ctx_t ctx)
+              int gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Sets the *n* by *n* matrix *res_num* and the polynomial *res_den* so that
+    the fraction is the companion matrix of the polynomial *poly* which must
+    have degree *n*. The underscore method reads `n + 1` input coefficients.
+
 Similarity transformations
 -------------------------------------------------------------------------------
 
@@ -860,6 +878,12 @@ Random matrices
     with unchanged rank by subsequently calling :func:`gr_mat_randops`.
 
     This operation only makes sense over integral domains (currently not checked).
+
+.. function:: int gr_mat_randsimilar(gr_mat_t mat, flint_rand_t state, slong opcount, gr_ctx_t ctx)
+
+    Randomises *mat* in-place by conjugating by elementary row/column
+    operations. More precisely, at most *opcount* conjugations by random
+    elementary row/column operations will be performed.
 
 Special matrices
 -------------------------------------------------------------------------------

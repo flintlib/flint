@@ -337,6 +337,40 @@ Power series
 Fraction fields
 -------------------------------------------------------------------------------
 
+.. function:: void gr_ctx_init_gr_fraction(gr_ctx_t ctx, gr_ctx_t domain, int flags)
+
+    Initializes *ctx* to a generic implementation of the fraction field
+    over the given integral domain *domain*.
+    Fractions are represented as pairs of elements of *domain*, stored
+    consecutively in memory as (numerator, denominator).
+    By default, fractions are simplified by removing common content between
+    the numerator and denominator (using :func:`gr_gcd`) and normalising the
+    denominator by a canonical unit (using :func:`gr_canonical_associate`).
+    The following optional *flags* can be set:
+
+    .. macro :: GR_FRACTION_NO_REDUCTION
+
+        Setting this flag disables canonicalisation, allowing
+        one to perform fraction field arithmetic over domains which do not
+        implement GCD or unit canonicalisation.
+        This flag can also improve performance in certain cases when
+        GCDs are more expensive than just allowing coefficients to blow up.
+
+    .. macro :: GR_FRACTION_STRONGLY_CANONICAL
+
+        Assert that fractions are in strongly canonical form,
+        meaning that `a/b = c/d` if and only if `a = c` and `b = d`.
+        Setting this flag allows faster equality testing.
+        This should be valid in UFDs that implement a correct GCD and
+        correct unit canonicalisation, but need not be true over
+        integral domains which are not UFDs. In this future this may
+        be automatic.
+
+    This constructor does not verify that *domain* is really an integral
+    domain. The behavior over non-integral domains is undefined, as no attempt
+    is made to detect the product of two nonzero denominators becoming zero.
+    In the future, such checks may be implemented as an optional feature.
+
 .. function:: void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate

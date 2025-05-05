@@ -19,6 +19,7 @@
 #include "t-memory_manager.c"
 #include "t-sdiv_qrnnd.c"
 #include "t-smul_ppmm.c"
+#include "t-sort.c"
 #include "t-sub_dddmmmsss.c"
 #include "t-sub_ddmmss.c"
 #include "t-udiv_qrnnd.c"
@@ -38,6 +39,7 @@ test_struct tests[] =
     TEST_FUNCTION(memory_manager),
     TEST_FUNCTION(sdiv_qrnnd),
     TEST_FUNCTION(smul_ppmm),
+    TEST_FUNCTION(flint_sort),
     TEST_FUNCTION(sub_dddmmmsss),
     TEST_FUNCTION(sub_ddmmss),
     TEST_FUNCTION(udiv_qrnnd),
