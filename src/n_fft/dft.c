@@ -12,18 +12,21 @@
 #include "n_fft.h"
 #include "n_fft_macros.h"
 
-/** Structure:
- * - the core function is dft_node_lazy_4_4, which goes down the subproduct
+/** Structure.
+ * - The main interface is n_fft_dft, it solves the problem at node 0
+ *   (evaluating at all roots of unity of order 2**depth), as documented
+ *   in n_fft.h.
+ * - The core function is `dft_node_lazy_4_4`, which goes down the subproduct
  *   tree from an arbitrary node in this tree; it takes input values in [0..4n)
- *   and return values in [0..4n)
- * TODO add/improve explanations below
- * - this core function costs more than a DFT at node 0 (at least for small /
- *   small-ish lengths), so a specific function for that are given, targeting
- *   input values in [0..n) and return values in [0..4n)
- *   (and in [0..2n) respectively (the former
- *   calls the latter)
- * - less lazy variants (in the end, this is often used
- *   non-lazy, [0..n) -> [0..n))
+ *   and return values in [0..4n), following the idea of lazy butterflies
+ *   highlighted by David Harvey [Faster arithmetic for number-theoretic
+ *   transforms, Journal of Symbolic Computation, Volume 60, 2014, pp 113-119].
+ * - This core function costs more than a DFT at node 0, at least for small or
+ *   smallish lengths. So a specific function for node 0 is given
+ *   (`dft_lazy_1_4`), targeting input values in [0..n) and return values in
+ *   [0..4n) (it iself uses a similar function `dft_lazy_2_4`). The main
+ *   function `n_fft_dft` just calls `dft_lazy_1_4` and then reduces the output
+ *   to [0..n).
  */
 
 /*-----------------------*/
@@ -37,7 +40,7 @@
  * where w_k = F->tab_w[2**depth * node + 2*k] for 0 <= k < 2**(depth-1)
  * * By construction these evaluation points are the len roots of the
  * polynomial x**len - F->tab_w[node]
- * * Requirement (not checked):
+ * * Requirements (not checked):
  *        3 <= depth
  *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
@@ -97,14 +100,8 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 }
 
 /** 2**depth-point DFT
- * * In-place transform p of length len == 2**depth, seen as a polynomial of
- * degree < len, into the concatenation of all polynomial evaluations
- *          [p(w_k), p(-w_k)] for k in range(len),
- * where w_k = F->tab_w[2*k] for 0 <= k < 2**(depth-1)
- * * By construction these evaluation points are the roots of the polynomial
- * x**len - 1, precisely they are all powers of the chosen len-th primitive
- * root of unity with exponents listed in bit reversed order
- * * Requirement (not checked): 3 <= depth <= F.depth
+ * Same specification as n_fft_dft, except for:
+ * * requirement (not checked): 3 <= depth <= F.depth
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
  * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
  */

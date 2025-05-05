@@ -23,7 +23,6 @@ extern "C" {
 /**
  * TODO[short term] for perf vs simplifying code:
  *   - bench intermediate functions to make sure there is nothing surprising
- *   - check if the dft32 and idft32 macros actually help or not (remove them if not)
  *   - check if having these p_hi,p_lo tmp in macro args is useful or they can be removed
  *
  * TODO[long term] large depth can lead to heavy memory usage
