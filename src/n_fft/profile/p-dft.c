@@ -168,6 +168,7 @@ int main()
  */
 
 /** Output on meteorlake (Intel(R) Core(TM) Ultra 7 165H)
+ * 50 bit prime, commit "introduce_nmod_fft f1852d1c5"
  * depth   sd_fft  dft     idft    dft_t   idft_t
  * 3       1.9e-08 2.1e-08 1.6e-08 2.4e-08 1.3e-08
  * 4       2.2e-08 4.6e-08 3.6e-08 4.5e-08 3.7e-08
