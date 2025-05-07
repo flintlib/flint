@@ -139,8 +139,10 @@ int main()
     return 0;
 }
 
-/** Output on zen4 (AMD Ryzen 7 PRO 7840U)
- * 50 bit prime, commit "introduce_nmod_fft f1852d1c5"
+/** 50 bit prime, commit "introduce_nmod_fft f1852d1c5"
+ *
+ * Output on zen4 (AMD Ryzen 7 PRO 7840U)
+ *
  * depth   sd_fft  dft     idft    dft_t   idft_t
  * 3       1.5e-08 2.2e-08 2.0e-08 2.3e-08 1.8e-08
  * 4       2.1e-08 4.4e-08 4.5e-08 4.3e-08 4.7e-08
@@ -165,10 +167,9 @@ int main()
  * 23      2.8e-02 1.0e-01 1.1e-01 1.0e-01 1.1e-01
  * 24      6.2e-02 2.2e-01 2.3e-01 2.0e-01 2.3e-01
  * 25      1.3e-01 4.5e-01 4.5e-01 4.4e-01 4.7e-01
- */
-
-/** Output on meteorlake (Intel(R) Core(TM) Ultra 7 165H)
- * 50 bit prime, commit "introduce_nmod_fft f1852d1c5"
+ *
+ * Output on meteorlake (Intel(R) Core(TM) Ultra 7 165H)
+ *
  * depth   sd_fft  dft     idft    dft_t   idft_t
  * 3       1.9e-08 2.1e-08 1.6e-08 2.4e-08 1.3e-08
  * 4       2.2e-08 4.6e-08 3.6e-08 4.5e-08 3.7e-08
