@@ -70,6 +70,18 @@ gr_mpoly_ctx_set_gen_names(gr_mpoly_ctx_t ctx, const char ** s)
     return GR_SUCCESS;
 }
 
+slong
+_gr_mpoly_ctx_ngens(gr_ctx_t ctx)
+{
+    return GR_MPOLY_NVARS(ctx);
+}
+
+char const * const *
+_gr_mpoly_ctx_gen_names_srcptr(gr_ctx_t ctx)
+{
+    return (char const * const *) GR_MPOLY_VARS(ctx);
+}
+
 truth_t
 gr_mpoly_ctx_is_ring(gr_mpoly_ctx_t ctx)
 {
@@ -278,6 +290,8 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_mpoly_ctx_is_field},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_mpoly_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) gr_mpoly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,               (gr_funcptr) _gr_mpoly_ctx_ngens},
+    {GR_METHOD_CTX_GEN_NAMES_SRCPTR,    (gr_funcptr) _gr_mpoly_ctx_gen_names_srcptr},
     {GR_METHOD_INIT,        (gr_funcptr) gr_mpoly_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_mpoly_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_mpoly_swap},
