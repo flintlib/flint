@@ -24,6 +24,13 @@ _gr_fmpzi_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+char const * const *
+_gr_fmpzi_ctx_gen_names_srcptr(gr_ctx_t ctx)
+{
+    static const char * name = "I";
+    return &name;
+}
+
 void
 _gr_fmpzi_init(fmpzi_t x, const gr_ctx_t ctx)
 {
@@ -951,6 +958,8 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAMES_SRCPTR,  (gr_funcptr) _gr_fmpzi_ctx_gen_names_srcptr},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpzi_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpzi_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpzi_swap},

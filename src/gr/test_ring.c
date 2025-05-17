@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include "profiler.h"
 #include "long_extras.h"
 
@@ -646,6 +647,42 @@ gr_test_ctx_get_str(gr_ctx_t R, flint_rand_t state, int test_flags)
     }
 
     flint_free(s);
+
+    return status;
+}
+
+int
+gr_test_ctx_gen_names(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+
+    gr_vec_t gens;
+    gr_vec_init(gens, 0, R);
+
+    slong ngens = gr_ctx_ngens(R);
+    char const * const * names = gr_ctx_gen_names_srcptr(R);
+
+    if (ngens < 0)
+        status = GR_TEST_FAIL;
+
+    if (gr_gens(gens, R) == GR_SUCCESS)
+        if (gens->length != ngens)
+            status = GR_TEST_FAIL;
+
+    const char * mynames[] = { "α", "x", "x1" };
+
+    if (ngens <= 3 && gr_ctx_set_gen_names(R, mynames) == GR_SUCCESS)
+    {
+        names = gr_ctx_gen_names_srcptr(R);
+        for (slong i = 0; i < ngens; i++)
+            if (strcmp(mynames[i], names[i]))
+                status = GR_TEST_FAIL;
+    }
+
+    if (status == GR_TEST_FAIL)
+        flint_printf("gen_names\n");
+
+    gr_vec_clear(gens, R);
 
     return status;
 }
@@ -4360,6 +4397,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
         flint_abort(); */
 
     gr_test_iter(R, state, "ctx_get_str", gr_test_ctx_get_str, 1, test_flags);
+    gr_test_iter(R, state, "ctx_gen_names", gr_test_ctx_gen_names, 1, test_flags);
 
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
     gr_test_iter(R, state, "equal", gr_test_equal, iters, test_flags);

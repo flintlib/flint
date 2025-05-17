@@ -86,6 +86,10 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_ctx_clear(gr_ctx_t ctx);
 
+slong gr_generic_ctx_ngens_0(gr_ctx_t ctx);
+slong gr_generic_ctx_ngens_1(gr_ctx_t ctx);
+char const * const * gr_generic_ctx_gen_names_srcptr(gr_ctx_t ctx);
+
 void gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx);

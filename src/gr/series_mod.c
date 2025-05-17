@@ -88,6 +88,12 @@ int _gr_gr_series_mod_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return _gr_gr_series_mod_ctx_set_gen_name(ctx, s[0]);
 }
 
+char const * const *
+_gr_gr_series_mod_ctx_gen_names_srcptr(gr_ctx_t ctx)
+{
+    return (char const * const *) &SERIES_MOD_CTX(ctx)->var;
+}
+
 static int
 _gr_gr_series_mod_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
 {
@@ -371,6 +377,8 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_gr_series_mod_ctx_write},
     {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_gr_series_mod_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES, (gr_funcptr) _gr_gr_series_mod_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,   (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAMES_SRCPTR, (gr_funcptr) _gr_gr_series_mod_ctx_gen_names_srcptr},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) _gr_gr_series_mod_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) _gr_gr_series_mod_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN, (gr_funcptr) _gr_gr_series_mod_ctx_is_integral_domain},
