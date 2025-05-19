@@ -21,7 +21,7 @@ characteristic `(a,b)` is the following analytic function in `\tau\in
 
     .. math::
 
-        \theta_{a,b}(z,\tau) = \sum_{n\in \mathbb{Z}^{g} + \tfrac a2} \exp(\pi i n^T\tau n + 2\pi i n^T (z + \tfrac b2)),
+        \theta_{a,b}(z,\tau) = \sum_{n\in \mathbb{Z}^{g} + \tfrac a2} \exp(\pi i n^T \tau n + 2\pi i n^T (z + \tfrac b2)),
 
 considering `a`, `b` and `z` as column vectors.
 
@@ -458,7 +458,7 @@ Theta characteristics
 
 .. function:: int acb_theta_char_is_even(ulong ab, slong g)
 
-    Returns true iff the characteristic `(a,b)` is even, i.e. `a^Tb` is
+    Returns true iff the characteristic `(a,b)` is even, i.e. `a^T b` is
     divisible by 2. Odd characteristics `(a,b)` have the property that
     `\theta_{a,b}(0,\tau)` is identically zero.
 
@@ -563,7 +563,7 @@ The upper bound on the tail will be obtained from the triangle inequality. First
 
     .. math::
 
-        \theta_{a,b}(z,\tau) = \exp(\pi i a^T (z + \tfrac b2) + \pi i a^T\tau a/4) \theta_{0,b}(z + \tau\tfrac{a}{2},\tau)
+        \theta_{a,b}(z,\tau) = \exp(\pi i a^T (z + \tfrac b2) + \pi i a^T \tau a/4) \theta_{0,b}(z + \tau\tfrac{a}{2},\tau)
 
 to avoid summing over `\mathbb{Z}^g + \tfrac{a}{2}` with a nonzero `a`. Next,
 to analyze the absolute value of each term in the sum defining
@@ -571,7 +571,7 @@ to analyze the absolute value of each term in the sum defining
 
     .. math::
 
-        \bigl| \exp(i\pi n^T\tau n + 2n^T (z + \tfrac{b}{2}) \bigr| = \exp(\pi y^T Y^{-1} y) \exp (-\lVert n + Y^{-1}y \rVert_\tau^2)
+        \bigl| \exp(i\pi n^T \tau n + 2n^T (z + \tfrac{b}{2}) \bigr| = \exp(\pi y^T Y^{-1} y) \exp (-\lVert n + Y^{-1}y \rVert_\tau^2)
 
 (notation as in the introduction). Thus, the exponential terms whose absolute
 values are less than a given threshold correspond to lattice points `n\in
@@ -584,7 +584,7 @@ directly.
 Fix an upper-triangular matrix `C` with positive diagonal entries (henceforth
 called a "Cholesky matrix"), a radius `R\geq 0`, a vector `v\in \mathbb{R}^g`,
 and `1\leq d\leq g`. Consider the ellipsoid `E` consisting of points `n =
-(n_0,\ldots,n_{g-1})` satisfying `(v + Cn)^T(v + Cn)\leq R^2` and such that
+(n_0,\ldots,n_{g-1})` satisfying `(v + Cn)^T (v + Cn)\leq R^2` and such that
 their last coordinates `n_{d},\ldots, n_{g-1}` are fixed. We encode `E` as
 follows: we store the endpoints and midpoint of the interval of allowed values
 for `n_{d-1}` as :type:`slong`'s, and if `d\geq 1`, we store a
@@ -748,10 +748,10 @@ where `\gamma_0,\ldots, \gamma_{g-1}` are the diagonal coefficients of
 
 .. function:: void acb_theta_sum_term(acb_t res, acb_srcptr z, const acb_mat_t tau, slong * tup, slong * n, slong prec)
 
-    Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(\pi i(n^T\tau n + 2
-    n^Tz))`, where the `k_j` and `n_j` denotes the `j`-th entry in
-    *tup* and *n* respectively. The vector *tup* may be *NULL*, which is
-    understood to mean the zero tuple. This is only used for testing.
+    Sets *res* to `n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}\exp(\pi i(n^T \tau n + 2
+    n^T z))`, where the `k_j` and `n_j` denotes the `j`-th entry in *tup* and
+    *n* respectively. The vector *tup* may be *NULL*, which is understood to
+    mean the zero tuple. This is only used for testing.
 
 .. function:: slong acb_theta_sum_addprec(const arb_t d)
 
@@ -1168,7 +1168,7 @@ for theta values at `z\neq 0`, and for all characteristics:
 
       .. math::
 
-          \theta_{a,b}(0,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g} (-1)^{a'^Tb}
+          \theta_{a,b}(0,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g} (-1)^{a'^T b}
           \theta_{a',0}(0,2\tau)\theta_{a+a',0}(0,2\tau).
 
   We use those generalized formulas for the very last duplication step when
