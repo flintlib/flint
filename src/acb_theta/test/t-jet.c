@@ -29,6 +29,7 @@ TEST_FUNCTION_START(acb_theta_jet, state)
         slong prec = mprec + 50;
         slong bits = n_randint(state, 4);
         slong nbjet = acb_theta_jet_nb(ord, g);
+        ulong ab = n_randint(state, n * n);
         int all = iter % 2;
         slong nbth = (all ? n * n : 1);
         int sqr = n_randint(state, 2);
@@ -48,16 +49,16 @@ TEST_FUNCTION_START(acb_theta_jet, state)
         _acb_vec_scalar_mul_2exp_si(z, z, nb * g, 1);
 
         /* Call jet at precision mprec, test against jet_notransform */
-        acb_theta_jet(th, z, nb, tau, ord, all, sqr, mprec);
-        acb_theta_jet_notransform(test, z, nb, tau, ord, 0, all, sqr, prec);
+        acb_theta_jet(th, z, nb, tau, ord, ab, all, sqr, mprec);
+        acb_theta_jet_notransform(test, z, nb, tau, ord, ab, all, sqr, prec);
 
         if (!_acb_vec_overlaps(th, test, nb * nbth * nbjet)
             || !_acb_vec_is_finite(th, nb * nbth * nbjet)
             || !_acb_vec_is_finite(test, nb * nbth * nbjet))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, nb = %wd, ord = %wd, all = %wd, sqr = %wd, tau, z:\n",
-                g, prec, nb, ord, all, sqr);
+            flint_printf("g = %wd, prec = %wd, nb = %wd, ord = %wd, ab = %wd, all = %wd, sqr = %wd, tau, z:\n",
+                g, prec, nb, ord, ab, all, sqr);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, nb * g, 5);
             flint_printf("th, test:\n");

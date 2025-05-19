@@ -14,7 +14,7 @@
 #include "acb_theta.h"
 
 void
-acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
+acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, ulong ab, int all)
 {
     slong g = sp2gz_dim(mat);
     slong n2 = 1 << (2 * g);
@@ -25,8 +25,8 @@ acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
     fmpz_mat_t coef;
     fmpz_t eps, x;
     slong i;
-    slong start = (ab < 0 ? 0 : ab);
-    slong end = (ab < 0 ? n2 : ab + 1);
+    slong start = (all ? 0 : ab);
+    slong end = (all ? n2 : ab + 1);
 
     fmpz_mat_window_init(a, mat, 0, 0, g, g);
     fmpz_mat_window_init(b, mat, 0, g, g, 2 * g);

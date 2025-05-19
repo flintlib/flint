@@ -227,7 +227,7 @@ acb_siegel_kappa_g1(acb_t sqrtdet, const fmpz_mat_t mat, const fmpz_mat_t x,
     {
         ab = 1 << (g - 1);
     }
-    acb_theta_char_table(&ab, &e, mat, ab);
+    acb_theta_char_table(&ab, &e, mat, ab, 0);
 
     /* adjust root of unity based on R */
     if (fmpz_is_zero(&y->c))
@@ -354,12 +354,12 @@ acb_siegel_kappa(acb_t sqrtdet, const fmpz_mat_t mat, const acb_mat_t tau, int s
     }
 
     /* Adjust final sign based on transformation of coordinates */
-    acb_theta_char_table(&ab, &e, mat, 0);
+    acb_theta_char_table(&ab, &e, mat, 0, 0);
     res -= e;
     ab = 0;
     for (k = 0; k < nb_dec; k++)
     {
-        acb_theta_char_table(&ab, &e, &dec[k], ab);
+        acb_theta_char_table(&ab, &e, &dec[k], ab, 0);
         res += e;
     }
 

@@ -103,7 +103,7 @@ acb_theta_char_is_even(ulong ab, slong g)
     return acb_theta_char_dot(ab >> g, ab, g) % 2 == 0;
 }
 
-void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab);
+void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, ulong ab, int all);
 void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th,
     int sqr, slong prec);
 
@@ -296,12 +296,18 @@ int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
     slong nb, const acb_mat_t tau, slong prec);
 
 void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong ord, int all, int sqr, slong prec);
+    const acb_mat_t tau, slong ord, ulong ab, int all, int sqr, slong prec);
+
+FLINT_FORCE_INLINE void
+acb_theta_one(acb_ptr th, acb_srcptr z, const acb_mat_t tau, ulong ab, slong prec)
+{
+    acb_theta_jet(th, z, 1, tau, 0, ab, 0, 0, prec);
+}
 
 FLINT_FORCE_INLINE void
 acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 {
-    acb_theta_jet(th, z, 1, tau, 0, 1, sqr, prec);
+    acb_theta_jet(th, z, 1, tau, 0, 0, 1, sqr, prec);
 }
 
 /* Dimension 2 specifics */

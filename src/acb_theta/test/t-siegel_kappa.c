@@ -51,9 +51,9 @@ TEST_FUNCTION_START(acb_theta_siegel_kappa, state)
         acb_siegel_transform(tau, m1, tau, prec);
         kappa2 = acb_siegel_kappa(s2, m2, tau, 0, prec);
 
-        acb_theta_char_table(&c2, &e2, m2, 0);
-        acb_theta_char_table(&c1, &e1, m1, c2);
-        acb_theta_char_table(&c, &e, m, 0);
+        acb_theta_char_table(&c2, &e2, m2, 0, 0);
+        acb_theta_char_table(&c1, &e1, m1, c2, 0);
+        acb_theta_char_table(&c, &e, m, 0, 0);
 
         if (c1 != c
             || ((kappa1 + e1 + kappa2 + e2) % 4 != (kappa + e) % 4))

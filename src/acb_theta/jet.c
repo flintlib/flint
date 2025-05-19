@@ -16,7 +16,7 @@
 
 void
 acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
-    slong ord, int all, int sqr, slong prec)
+    slong ord, ulong ab, int all, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
@@ -28,10 +28,9 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     acb_ptr new_zs, exps, cs, aux, units, jet;
     arb_ptr rs, r;
     acb_t s, t;
-    ulong ab;
     ulong * ch;
     slong * e;
-    slong kappa, j;
+    slong kappa, j, k;
     int res;
 
     if (nb <= 0)
@@ -69,7 +68,7 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         /* Setup */
         _acb_vec_unit_roots(units, nbu, nbu, prec);
         kappa = acb_siegel_kappa(s, mat, new_tau, sqr, prec);
-        acb_theta_char_table(ch, e, mat, (all ? -1 : 0));
+        acb_theta_char_table(ch, e, mat, ab, all);
 
         acb_theta_jet_notransform(aux, new_zs, nb, new_tau, ord, *ch, all, sqr, prec);
 
@@ -85,10 +84,10 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
             _arb_vec_neg(r, rs + j * g, g);
             _arb_vec_scalar_mul_2exp_si(r, r, g, 1);
             acb_theta_jet_exp_pi_i(jet, r, ord, g, prec);
-            for (ab = 0; ab < nbth; ab++)
+            for (k = 0; k < nbth; k++)
             {
-                acb_theta_jet_mul(aux + j * nbth * nbjet + ab * nbjet,
-                    aux + j * nbth * nbjet + ab * nbjet, jet, ord, g, prec);
+                acb_theta_jet_mul(aux + j * nbth * nbjet + k * nbjet,
+                    aux + j * nbth * nbjet + k * nbjet, jet, ord, g, prec);
                 /* No signs because 2r is divisible by 4 */
             }
         }
@@ -102,16 +101,16 @@ acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
                 acb_sqr(&jet[0], &jet[0], prec);
             }
 
-            for (ab = 0; ab < nbth; ab++)
+            for (k = 0; k < nbth; k++)
             {
-                acb_mul(t, s, &units[(kappa + e[ab]) % (sqr ? 4 : 8)], prec);
-                _acb_vec_scalar_mul(th + j * nbth * nbjet + ab * nbjet,
-                    aux + j * nbth * nbjet + (all ? ch[ab] : 0) * nbjet,
+                acb_mul(t, s, &units[(kappa + e[k]) % (sqr ? 4 : 8)], prec);
+                _acb_vec_scalar_mul(th + j * nbth * nbjet + k * nbjet,
+                    aux + j * nbth * nbjet + (all ? ch[k] : 0) * nbjet,
                     nbjet, t, prec);
-                acb_theta_jet_compose(th + j * nbth * nbjet + ab * nbjet,
-                    th + j * nbth * nbjet + ab * nbjet, ct, ord, prec);
-                acb_theta_jet_mul(th + j * nbth * nbjet + ab * nbjet,
-                    th + j * nbth * nbjet + ab * nbjet, jet, ord, g, prec);
+                acb_theta_jet_compose(th + j * nbth * nbjet + k * nbjet,
+                    th + j * nbth * nbjet + k * nbjet, ct, ord, prec);
+                acb_theta_jet_mul(th + j * nbth * nbjet + k * nbjet,
+                    th + j * nbth * nbjet + k * nbjet, jet, ord, g, prec);
             }
         }
     }

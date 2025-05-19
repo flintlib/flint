@@ -49,17 +49,23 @@ conventions, the output of :func:`acb_modular_theta` in dimension 1 is
 individually (and hence compute only `2^g` theta values), we map them to
 integers between 0 and `2^g-1` instead, taking *len* to be `g`.
 
-The main method to evaluate theta functions is
+There are two main user-facing functions in this modules:
+
+.. function:: void acb_theta_one(acb_t th, acb_srcptr z, const acb_mat_t tau, ulong ab, slong prec)
+
+    Sets *th* to the single value `\theta_{a,b}(z,\tau)`.
 
 .. function:: void acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 
-The output, stored in *th*, is a vector of length `2^{2g}`. If *sqr* is zero
-(false), this function computes `\theta_{a,b}(z,\tau)` for all `a,b\in
-\{0,1\}^g`; if *sqr* is nonzero (true), it computes `\theta_{a,b}(z_j,\tau)^2`
-instead using a faster algorithm.
+    If *sqr* is zero (false), this function computes `\theta_{a,b}(z,\tau)` for
+    all `a,b\in \{0,1\}^g`; if *sqr* is nonzero (true), it computes
+    `\theta_{a,b}(z_j,\tau)^2` instead using a faster algorithm. In both cases,
+    the output, stored in *th*, is a vector of length `2^{2g}`, and
+    :func:`acb_theta_all` is only slightly slower than :func:`acb_theta_one`.
 
-We handle the final argument *prec* as follows. Barring unexpected
-cancellations, the absolute value of `\theta_{a,b}(z,\tau)` should be roughly
+In both :func:`acb_theta_one` and :func:`acb_theta_all`, we handle the final
+argument *prec* as follows. Barring unexpected cancellations, the absolute
+value of `\theta_{a,b}(z,\tau)` should be roughly
 
     .. math::
 
@@ -89,10 +95,10 @@ unreasonable computations when `y` is very far from zero. Some internal
 functions also take the factor `\exp(-d^2)` into account, and are documented as
 such.
 
-The function :func:`acb_theta_all` is in fact an interface to the more complete
-method
+Both functions :func:`acb_theta_one` and :func:`acb_theta_all` are in fact
+interfaces to the more complete method
 
-.. function:: void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, int all, int sqr, slong prec)
+.. function:: void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong ord, ulong ab, int all, int sqr, slong prec)
 
 which allows for several input vectors *z* (for the same matrix *tau*) for more
 efficiency, and also evaluates derivatives of theta functions. Its parameters
@@ -107,9 +113,12 @@ are as follows:
   to the entries of `\tau` are then accounted for by the heat equation.) We
   refer to the documentation below for conventions on the normalization and
   ordering of those derivatives.
-- *all* is a boolean: if false (zero), then we compute (partial derivatives of)
-  `\theta_{0,0}` only, rather than `\theta_{a,b}` for all characteristics,
-  using a slightly faster algorithm.
+- *ab* indicates the characteristic `(a,b)` we are interested in. It is ignored
+  if *all* is set to true.
+- *all* is a boolean: if true (nonzero), then the output is a concatenation of
+  `2^{2g}` vectors of partial derivatives of theta functions, one for each
+  characteristic. If false (zero), then we evaluate (partial derivatives of) a
+  single theta function `\theta_{a,b}` using a slightly faster algorithm.
 - *sqr* is as in :func:`acb_theta_all`, but is ignored if *ord* is positive.
 
 Behind the scenes, :func:`acb_theta_jet` works as follows: it first reduces the
@@ -453,13 +462,13 @@ Theta characteristics
     divisible by 2. Odd characteristics `(a,b)` have the property that
     `\theta_{a,b}(0,\tau)` is identically zero.
 
-.. function:: void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, slong ab)
+.. function:: void acb_theta_char_table(ulong * ch, slong * e, const fmpz_mat_t mat, ulong ab, int all)
 
-    If *ab* encodes a valid characteristic, sets *ch* to the theta
-    characteristic `(a',b')` and sets *e* to `e(\mathit{mat},a,b)` as in the
-    transformation formula (see :func:`acb_siegel_kappa`). If *ab* is negative,
-    then sets *ch* and *e* to vectors of length `2^{2g}` containing this output
-    for all characteristics from 0 to `2^{2g}-1`.
+    If *all* is false, sets *ch* to the theta characteristic `(a',b')` and sets
+    *e* to `e(\mathit{mat},a,b)` as in the transformation formula (see
+    :func:`acb_siegel_kappa`). If *all* is true, then *ab* is ignored, and *ch*
+    and *e* are set to vectors of length `2^{2g}` containing this output for
+    all characteristics from 0 to `2^{2g}-1`.
 
 .. function:: void acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int sqr, slong prec)
 

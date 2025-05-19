@@ -28,7 +28,7 @@ acb_theta_char_shuffle(acb_ptr res, const fmpz_mat_t mat, acb_srcptr th, int sqr
     chars = flint_malloc(n2 * sizeof(ulong));
     es = flint_malloc(n2 * sizeof(slong));
 
-    acb_theta_char_table(chars, es, mat, -1);
+    acb_theta_char_table(chars, es, mat, 0, 1);
     _acb_vec_unit_roots(units, k, k, prec);
 
     for (ab = 0; ab < n2; ab++)

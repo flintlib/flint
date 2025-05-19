@@ -27,6 +27,8 @@ TEST_FUNCTION_START(acb_theta_char_table, state)
         fmpz_mat_t mat;
         ulong * chars;
         slong * es;
+        ulong c;
+        slong e;
         ulong ab;
         slong j, k;
 
@@ -44,10 +46,13 @@ TEST_FUNCTION_START(acb_theta_char_table, state)
         }
         sp2gz_trig(mat, mat);
 
-        acb_theta_char_table(chars, es, mat, -1);
+        acb_theta_char_table(chars, es, mat, 0, 1);
         for (ab = 0; ab < n2; ab++)
         {
-            if ((chars[ab] >> g) != (ab >> g))
+            acb_theta_char_table(&c, &e, mat, ab, 0);
+            if ((chars[ab] >> g) != (ab >> g)
+                || chars[ab] != c
+                || es[ab] != e)
             {
                 flint_printf("FAIL\n");
                 flint_printf("ab = %wd, test = %wd, matrix:\n", ab, chars[ab]);
