@@ -37,6 +37,7 @@
 #include "t-g2_transvectant.c"
 #include "t-jet.c"
 #include "t-jet_compose.c"
+#include "t-jet_exp_pi_i.c"
 #include "t-jet_mul.c"
 #include "t-jet_notransform.c"
 #include "t-jet_tuples.c"
@@ -91,6 +92,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_g2_transvectant),
     TEST_FUNCTION(acb_theta_jet),
     TEST_FUNCTION(acb_theta_jet_compose),
+    TEST_FUNCTION(acb_theta_jet_exp_pi_i),
     TEST_FUNCTION(acb_theta_jet_mul),
     TEST_FUNCTION(acb_theta_jet_notransform),
     TEST_FUNCTION(acb_theta_jet_tuples),

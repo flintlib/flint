@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Jean Kieffer
+    Copyright (C) 2025 Jean Kieffer
 
     This file is part of FLINT.
 
@@ -10,15 +10,15 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
 #include "acb.h"
-#include "acb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_jet_compose, state)
+TEST_FUNCTION_START(acb_theta_jet_exp_pi_i, state)
 {
     slong iter;
 
-    /* Test: chain rule */
+    /* Test: compatible with sum of exponentials */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
@@ -26,43 +26,43 @@ TEST_FUNCTION_START(acb_theta_jet_compose, state)
         slong nb = acb_theta_jet_nb(ord, g);
         slong prec = 200;
         slong mag_bits = 2;
-        acb_mat_t N1, N2, N3;
+        arb_ptr a1, a2, a3;
         acb_ptr v1, v2, v3, test;
         slong k;
 
-        acb_mat_init(N1, g, g);
-        acb_mat_init(N2, g, g);
-        acb_mat_init(N3, g, g);
+        a1 = _arb_vec_init(g);
+        a2 = _arb_vec_init(g);
+        a3 = _arb_vec_init(g);
         v1 = _acb_vec_init(nb);
         v2 = _acb_vec_init(nb);
         v3 = _acb_vec_init(nb);
         test = _acb_vec_init(nb);
 
-        for (k = 0; k < nb; k++)
+        for (k = 0; k < g; k++)
         {
-            acb_randtest_precise(&v3[k], state, prec, mag_bits);
+            arb_randtest_precise(&a1[k], state, prec, mag_bits);
+            arb_randtest_precise(&a2[k], state, prec, mag_bits);
+            arb_add(&a3[k], &a1[k], &a2[k], prec);
         }
-        acb_mat_randtest(N1, state, prec, mag_bits);
-        acb_mat_randtest(N2, state, prec, mag_bits);
-        acb_mat_mul(N3, N2, N1, prec);
 
-        acb_theta_jet_compose(v2, v3, N2, ord, prec);
-        acb_theta_jet_compose(v1, v2, N1, ord, prec);
-        acb_theta_jet_compose(test, v3, N3, ord, prec);
+        acb_theta_jet_exp_pi_i(v1, a1, ord, g, prec);
+        acb_theta_jet_exp_pi_i(v2, a2, ord, g, prec);
+        acb_theta_jet_exp_pi_i(v3, a3, ord, g, prec);
+        acb_theta_jet_mul(test, v1, v2, ord, g, prec);
 
-        if (!_acb_vec_overlaps(test, v1, nb)
+        if (!_acb_vec_overlaps(test, v3, nb)
             || !_acb_vec_is_finite(test, nb)
-            || !_acb_vec_is_finite(v1, nb))
+            || !_acb_vec_is_finite(v3, nb))
         {
             flint_printf("FAIL (g = %wd, ord = %wd)\n", g, ord);
-            _acb_vec_printd(v1, nb, 5);
+            _acb_vec_printd(v3, nb, 5);
             _acb_vec_printd(test, nb, 5);
             flint_abort();
         }
 
-        acb_mat_clear(N1);
-        acb_mat_clear(N2);
-        acb_mat_clear(N3);
+        _arb_vec_clear(a1, g);
+        _arb_vec_clear(a2, g);
+        _arb_vec_clear(a3, g);
         _acb_vec_clear(v1, nb);
         _acb_vec_clear(v2, nb);
         _acb_vec_clear(v3, nb);
