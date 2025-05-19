@@ -1306,7 +1306,7 @@ In order to calculate the rhs, we need
     l-k        k           min(l-k,k)
 
 
-requies k <= l < 3k < h <= 4k
+requires k <= l < 3k < h <= 4k
 
 */
 

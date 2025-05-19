@@ -60,7 +60,7 @@ n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
             u1 = t1;
             u3 = v3;
             t2 = v2;
-            v2 = v1 - (v2 << 1);
+            v2 = v1 - ((ulong) v2 << 1);
             v1 = t2;
             v3 = d - u3;
         }
@@ -98,24 +98,24 @@ n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
             else if (d < (v3 << 1)) /* quot = 2 */
             {
                 t1 = u2;
-                u2 = u1 - (u2 << 1);
+                u2 = u1 - ((ulong) u2 << 1);
                 u1 = t1;
                 u3 = v3;
                 t2 = v2;
-                v2 = v1 - (v2 << 1);
+                v2 = v1 - ((ulong) v2 << 1);
                 v1 = t2;
                 v3 = d - u3;
             }
             else                /* quot = 3 */
             {
                 t1 = u2;
-                u2 = u1 - 3 * u2;
+                u2 = u1 - 3 * (ulong) u2;
                 u1 = t1;
                 u3 = v3;
                 t2 = v2;
-                v2 = v1 - 3 * v2;
+                v2 = v1 - 3 * (ulong) v2;
                 v1 = t2;
-                v3 = d - (u3 << 1);
+                v3 = d - ((ulong) u3 << 1);
             }
         }
         else
@@ -141,7 +141,7 @@ n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
     }
 
     *a = u1;
-    *b = -v1;
+    *b = -(ulong) v1;
 
     return u3;
 }

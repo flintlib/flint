@@ -9,19 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "arb.h"
 #include "arith.h"
 #include "partitions.h"
-
-#ifdef __GNUC__
-# define log __builtin_log
-# define sinh __builtin_sinh
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 #define VERBOSE 0
 

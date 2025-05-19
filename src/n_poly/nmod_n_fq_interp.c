@@ -15,8 +15,9 @@
 
 /* -O3 seems to result in worse code here. Check results for
    nmod_mpoly_factor/profile/p-factor */
-
-#pragma GCC optimize ("-O2,-funroll-loops")
+PUSH_OPTIONS
+OPTIMIZE_O2
+OPTIMIZE_UNROLL_LOOPS
 
 /*
     conversion between polynomials in coefficient form and point-value form
@@ -1092,3 +1093,5 @@ void n_fq_evals_fmma(
 
     TMP_END;
 }
+
+POP_OPTIONS

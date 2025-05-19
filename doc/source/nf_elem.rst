@@ -315,7 +315,7 @@ Modular reduction
 .. function:: void nf_elem_mod_fmpz_den(nf_elem_t z, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den)
 
     If ``den == 0``, return an element `z` with denominator `1`, such that
-    the coefficients of `z - da` are divisble by ``mod``, where `d` is the
+    the coefficients of `z - da` are divisible by ``mod``, where `d` is the
     denominator of `a`. The coefficients of `z` are reduced modulo ``mod``.
 
     If ``den == 1``, return an element `z`, such that `z - a` has
@@ -328,7 +328,7 @@ Modular reduction
 .. function:: void nf_elem_smod_fmpz_den(nf_elem_t z, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den)
 
     If ``den == 0``, return an element `z` with denominator `1`, such that
-    the coefficients of `z - da` are divisble by ``mod``, where `d` is the
+    the coefficients of `z - da` are divisible by ``mod``, where `d` is the
     denominator of `a`. The coefficients of `z` are reduced modulo ``mod``.
 
     If ``den == 1``, return an element `z`, such that `z - a` has

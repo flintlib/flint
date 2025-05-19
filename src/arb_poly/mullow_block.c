@@ -9,15 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "arb_poly.h"
-
-#ifdef __GNUC__
-# define ldexp __builtin_ldexp
-#else
-# include <math.h>
-#endif
 
 void
 _arb_poly_get_scale(fmpz_t scale, arb_srcptr x, slong xlen,

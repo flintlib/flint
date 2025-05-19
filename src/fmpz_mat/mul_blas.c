@@ -32,8 +32,10 @@ typedef struct {
     slong Astoprow;
     slong Bstartrow;
     slong Bstoprow;
-    fmpz ** Arows;
-    fmpz ** Brows;
+    fmpz * Aentries;
+    slong Astride;
+    fmpz * Bentries;
+    slong Bstride;
     double * dA;
     double * dB;
 } _red_worker_arg;
@@ -48,18 +50,20 @@ static void _red_worker(void * varg)
     slong Astoprow = arg->Astoprow;
     slong Bstartrow = arg->Bstartrow;
     slong Bstoprow = arg->Bstoprow;
-    fmpz ** Arows = arg->Arows;
-    fmpz ** Brows = arg->Brows;
+    fmpz * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
+    fmpz * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     double * dA = arg->dA;
     double * dB = arg->dB;
 
     for (i = Astartrow; i < Astoprow; i++)
         for (j = 0; j < k; j++)
-            dA[k*i + j] = (double)(Arows[i][j]);
+            dA[k*i + j] = (double)(Aentries[i * Astride + j]);
 
     for (i = Bstartrow; i < Bstoprow; i++)
         for (j = 0; j < n; j++)
-            dB[n*i + j] = (double)(Brows[i][j]);
+            dB[n*i + j] = (double)(Bentries[i * Bstride + j]);
 }
 
 static int _fmpz_mat_mul_blas_direct(
@@ -85,8 +89,10 @@ static int _fmpz_mat_mul_blas_direct(
     mainarg.m = m = A->r;
     mainarg.k = k = A->c;
     mainarg.n = n = B->c;
-    mainarg.Arows = A->rows;
-    mainarg.Brows = B->rows;
+    mainarg.Aentries = A->entries;
+    mainarg.Astride = A->stride;
+    mainarg.Bentries = B->entries;
+    mainarg.Bstride = B->stride;
     mainarg.dA = dA;
     mainarg.dB = dB;
 
@@ -140,7 +146,7 @@ red_single:
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
-            fmpz_set_si(&C->rows[i][j], (slong)(dC[n*i + j]));
+            fmpz_set_si(fmpz_mat_entry(C, i, j), (slong)(dC[n*i + j]));
 
     flint_free(dA);
     flint_free(dB);
@@ -255,9 +261,12 @@ typedef struct {
     double * dA;
     double * dB;
     double * dC;
-    fmpz ** Arows;
-    fmpz ** Brows;
-    fmpz ** Crows;
+    fmpz * Aentries;
+    slong Astride;
+    fmpz * Bentries;
+    slong Bstride;
+    fmpz * Centries;
+    slong Cstride;
     const fmpz_comb_struct * comb;
     int sign;
 } _worker_arg;
@@ -275,8 +284,10 @@ static void _mod_worker(void * arg_ptr)
     slong Bstoprow = arg->Bstoprow;
     uint32_t * bigA = arg->bigA;
     uint32_t * bigB = arg->bigB;
-    fmpz ** Arows = arg->Arows;
-    fmpz ** Brows = arg->Brows;
+    fmpz * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
+    fmpz * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     const fmpz_comb_struct * comb = arg->comb;
     fmpz_comb_temp_t comb_temp;
 
@@ -285,12 +296,12 @@ static void _mod_worker(void * arg_ptr)
     for (i = Astartrow; i < Astoprow; i++)
         for (j = 0; j < k; j++)
             fmpz_multi_mod_uint32_stride(bigA + i*k*num_primes + j, k,
-                                                &Arows[i][j], comb, comb_temp);
+                                                Aentries + i * Astride + j, comb, comb_temp);
 
     for (i = Bstartrow; i < Bstoprow; i++)
         for (j = 0; j < n; j++)
             fmpz_multi_mod_uint32_stride(bigB + i*n*num_primes + j, n,
-                                                &Brows[i][j], comb, comb_temp);
+                                                Bentries + i * Bstride + j, comb, comb_temp);
 
     fmpz_comb_temp_clear(comb_temp);
 }
@@ -360,7 +371,8 @@ void _crt_worker(void * arg_ptr)
     slong Cstartrow = arg->Cstartrow;
     slong Cstoprow = arg->Cstoprow;
     uint32_t * bigC = arg->bigC;
-    fmpz ** Crows = arg->Crows;
+    fmpz * Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
     const fmpz_comb_struct * comb = arg->comb;
     fmpz_comb_temp_t comb_temp;
     ulong * r;
@@ -376,7 +388,7 @@ void _crt_worker(void * arg_ptr)
             for (k = 0; k < num_primes; k++)
                 r[k] = bigC[(i*num_primes + k)*n + j];
 
-            fmpz_multi_CRT_ui(&Crows[i][j], r, comb, comb_temp, sign);
+            fmpz_multi_CRT_ui(Centries + i * Cstride + j, r, comb, comb_temp, sign);
         }
     }
 
@@ -510,9 +522,12 @@ int _fmpz_mat_mul_blas(
         args[i].bigA = bigA;
         args[i].bigB = bigB;
         args[i].bigC = bigC;
-        args[i].Arows = A->rows;
-        args[i].Brows = B->rows;
-        args[i].Crows = C->rows;
+        args[i].Aentries = A->entries;
+        args[i].Astride = A->stride;
+        args[i].Bentries = B->entries;
+        args[i].Bstride = B->stride;
+        args[i].Centries = C->entries;
+        args[i].Cstride = C->stride;
         args[i].dA = dA;
         args[i].dB = dB;
         args[i].dC = dC;

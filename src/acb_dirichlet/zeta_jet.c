@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
-
-#ifdef __GNUC__
-# define sqrt __builtin_sqrt
-#else
-# include <math.h>
-#endif
 
 void
 _acb_dirichlet_zeta_jet(acb_t t, const acb_t h, int deflate, slong len, slong prec)

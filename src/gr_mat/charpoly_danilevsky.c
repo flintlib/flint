@@ -129,11 +129,7 @@ _gr_mat_charpoly_danilevsky_inplace(gr_ptr p, gr_mat_t A, gr_ctx_t ctx)
             }
             else
             {
-                gr_ptr ptr;
-
-                ptr = A->rows[n - i - k - 1];
-                A->rows[n - i - k - 1] = A->rows[n - i - 1];
-                A->rows[n - i - 1] = ptr;
+                status |= gr_mat_swap_rows(A, NULL, n - i - k - 1, n - i - 1, ctx);
 
                 for (j = 1; j <= n - i + 1; j++)
                 {

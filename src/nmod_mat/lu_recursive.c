@@ -9,31 +9,58 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 
+/* Permute rows SLICE columns at a time to improve memory locality
+   and reduce temporary allocation. */
+#define SLICE 32
+
 static void
-_apply_permutation(slong * AP, nmod_mat_t A, slong * P,
-    slong n, slong offset)
+_apply_permutation(slong * AP, nmod_mat_t A, const slong * P,
+    slong num_rows, slong row_offset, slong num_cols, slong col_offset)
 {
-    if (n != 0)
+    if (num_rows != 0)
     {
-        nn_ptr * Atmp;
+        ulong * Atmp;
         slong * APtmp;
-        slong i;
+        slong i, c, l;
+        TMP_INIT;
 
-        Atmp = flint_malloc(sizeof(nn_ptr) * n);
-        APtmp = flint_malloc(sizeof(slong) * n);
+        TMP_START;
 
-        for (i = 0; i < n; i++) Atmp[i] = A->rows[P[i] + offset];
-        for (i = 0; i < n; i++) A->rows[i + offset] = Atmp[i];
+        if (num_cols <= SLICE)
+        {
+            Atmp = TMP_ALLOC(sizeof(ulong) * num_rows * num_cols);
 
-        for (i = 0; i < n; i++) APtmp[i] = AP[P[i] + offset];
-        for (i = 0; i < n; i++) AP[i + offset] = APtmp[i];
+            for (i = 0; i < num_rows; i++)
+                _nmod_vec_set(Atmp + i * num_cols, nmod_mat_entry_ptr(A, P[i] + row_offset, col_offset), num_cols);
+            for (i = 0; i < num_rows; i++)
+                _nmod_vec_set(nmod_mat_entry_ptr(A, i + row_offset, col_offset), Atmp + i * num_cols, num_cols);
+        }
+        else
+        {
+            Atmp = TMP_ALLOC(sizeof(ulong) * num_rows * SLICE);
 
-        flint_free(Atmp);
-        flint_free(APtmp);
+            for (c = 0; c < num_cols; c += SLICE)
+            {
+                l = FLINT_MIN(SLICE, num_cols - c);
+                for (i = 0; i < num_rows; i++)
+                    _nmod_vec_set(Atmp + i * SLICE, nmod_mat_entry_ptr(A, P[i] + row_offset, col_offset + c), l);
+                for (i = 0; i < num_rows; i++)
+                    _nmod_vec_set(nmod_mat_entry_ptr(A, i + row_offset, col_offset + c), Atmp + i * SLICE, l);
+            }
+        }
+
+        APtmp = TMP_ALLOC(sizeof(slong) * num_rows);
+
+        for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
+        for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
+
+        TMP_END;
     }
 }
+
 
 
 slong
@@ -72,7 +99,7 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 
     if (r1 != 0)
     {
-        _apply_permutation(P, A, P1, m, 0);
+        _apply_permutation(P, A, P1, m, 0, n - n1, n1);
     }
 
     nmod_mat_window_init(A00, A, 0, 0, r1, r1);
@@ -94,14 +121,15 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
     }
     else
     {
-        _apply_permutation(P, A, P1, m - r1, r1);
+        _apply_permutation(P, A, P1, m - r1, r1, n1, 0);
 
         /* Compress L */
         if (r1 != n1)
         {
             for (i = 0; i < m - r1; i++)
             {
-                nn_ptr row = A->rows[r1 + i];
+                nn_ptr row = nmod_mat_entry_ptr(A, r1 + i, 0);
+
                 for (j = 0; j < FLINT_MIN(i, r2); j++)
                 {
                     row[r1 + j] = row[n1 + j];

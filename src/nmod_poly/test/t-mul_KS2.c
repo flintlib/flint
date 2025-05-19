@@ -13,7 +13,8 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-#pragma GCC diagnostic ignored "-Woverlength-strings"
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS
 
 TEST_FUNCTION_START(nmod_poly_mul_KS2, state)
 {
@@ -145,3 +146,5 @@ TEST_FUNCTION_START(nmod_poly_mul_KS2, state)
 
     TEST_FUNCTION_END(state);
 }
+
+DIAGNOSTIC_POP

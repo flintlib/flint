@@ -16,6 +16,12 @@ void nmod_mpoly_gen(nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx)
 {
     flint_bitcnt_t bits;
 
+    if (ctx->mod.n == UWORD(1))
+    {
+        nmod_mpoly_zero(A, ctx);
+        return;
+    }
+
     bits = mpoly_gen_bits_required(var, ctx->minfo);
     bits = mpoly_fix_bits(bits, ctx->minfo);
     nmod_mpoly_fit_length_reset_bits(A, 1, bits, ctx);

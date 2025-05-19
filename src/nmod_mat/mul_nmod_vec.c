@@ -21,7 +21,7 @@ void nmod_mat_mul_nmod_vec(
     const dot_params_t params = _nmod_vec_dot_params(len, A->mod);
 
     for (slong i = 0; i < A->r; i++)
-        c[i] = _nmod_vec_dot(A->rows[i], b, len, A->mod, params);
+        c[i] = _nmod_vec_dot(nmod_mat_entry_ptr(A, i, 0), b, len, A->mod, params);
 }
 
 void nmod_mat_mul_nmod_vec_ptr(

@@ -25,8 +25,8 @@ TEMPLATE(T, mat_set) (TEMPLATE(T, mat_t) mat1, const TEMPLATE(T, mat_t) mat2,
 
         if (mat2->r && mat2->c)
             for (i = 0; i < mat2->r; i++)
-                _TEMPLATE(T, vec_set) (mat1->rows[i], mat2->rows[i], mat2->c,
-                                       ctx);
+                _TEMPLATE(T, vec_set) (TEMPLATE(T, mat_entry)(mat1, i, 0),
+                    TEMPLATE(T, mat_entry)(mat2, i, 0), mat2->c, ctx);
     }
 }
 

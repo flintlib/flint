@@ -9,14 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "arb.h"
-
-#ifdef __GNUC__
-# define ceil __builtin_ceil
-# define fabs __builtin_fabs
-#else
-# include <math.h>
-#endif
 
 /* todo: arb arithmetic when sizes exceed prec */
 
@@ -90,7 +84,7 @@ arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, sl
         return;
     }
 
-    if (fmpz_is_zero(q))
+    if (fmpz_is_zero(q) || fmpz_cmpabs(p, q) >= 0)
     {
         arb_indeterminate(s);
         return;

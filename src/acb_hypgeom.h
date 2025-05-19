@@ -130,6 +130,7 @@ void acb_hypgeom_m_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z, i
 void acb_hypgeom_m(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
 void acb_hypgeom_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec);
 
+void acb_hypgeom_bessel_j_deriv_bound(mag_t res, const acb_t nu, const acb_t z, ulong d);
 void acb_hypgeom_bessel_j_0f1(acb_t res, const acb_t nu, const acb_t z, slong prec);
 void acb_hypgeom_bessel_j_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec);
 void acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec);

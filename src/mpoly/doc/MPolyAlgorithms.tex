@@ -588,7 +588,7 @@ We wish to determine if $X^2+AX+B$ has a root in $R$. Since $X_0+A$ is a root
 if $X_0$ is, at least one of the two roots does not have $\operatorname{lt}(A)$
 as a term. (It very well may be the case that both roots have a monomial
 matching $\operatorname{lm}(A)$, but then both corresponding coefficients must
-be different from the leading coffcient of $A$). Therefore, we make the
+be different from the leading coefficient of $A$). Therefore, we make the
 important assumption that \emph{we are searching for a root $X_0$ with
 $\operatorname{lt}(A)$ not a term of $X_0$}. Let $m$ denote the leading term of
 $X_0$. By taking leading terms in $X_0^2+AX_0+B$ and applying the assumption,
@@ -793,7 +793,7 @@ in the lifting.
 In this recursive approach \cite{KALTOFEN}, after substituting away all but
 \emph{two} of the variables, the bivariate polynomial is factored and the
 leading coefficients of the bivariate factors can be lifted against the leading
-cofficient of the original polynomial. Since only squarefree lifting is
+coefficient of the original polynomial. Since only squarefree lifting is
 implemented, it is actually the squarefree parts of everything that are lifted.
 
 \subsubsection{Dense Hensel lifting}
@@ -802,7 +802,7 @@ lifting over $\mathbb{Z}$, we do not lift over $\mathbb{Z}/p^k\mathbb{Z}$ as
 Wang \cite{WANG} advises but do the lifting directly over $\mathbb{Z}$.
 
 \subsubsection{Sparse Hensel lifting}
-Sparse Zippel interpolation applies directly to the lifting proceedure
+Sparse Zippel interpolation applies directly to the lifting procedure
 (\cite{SHLZIP}, \cite{SHL}). Suppose we have a given factorization into three
 factors $A$, $B$, $C$,
 \begin{equation*}
@@ -811,7 +811,7 @@ F(x_1, x_2, x_3, x_4) = (A B C)(x_1, x_2, \alpha_3, \alpha_4) \mod \langle x_3
 \end{equation*}
 and we would like to lift this to a factorization modulo only $\langle
 x_4=\alpha_4 \rangle$. This amounts to finding $A(x_1, x_2, x_3, \alpha_4)$
-(ditto for $B$ and $C$ as well). If we apply Zippel's probabalistic assumption
+(ditto for $B$ and $C$ as well). If we apply Zippel's probabilistic assumption
 that no new monomial in $x_1$ and $x_2$ appear when lifting from $A(x_1, x_2,
 \alpha_3, \alpha_4)$ to $A(x_1, x_2, x_3, \alpha_4)$, then the latter can be
 guessed by evaluation and interpolation using a basecase bivariate lifter. In
@@ -888,7 +888,7 @@ factorization in $\mathbb{Q}_q[y][x]$:
 \begin{equation*}
 f(x,y) = \prod_j \widetilde{g}_j(x,y) \text{ in } \mathbb{Q}_q[y][x]\text{.}
 \end{equation*}
-In order to attemp this lift the $\operatorname{lc}_x(\widetilde{g}_j(x,y)) \in
+In order to attempt this lift the $\operatorname{lc}_x(\widetilde{g}_j(x,y)) \in
 \mathbb{Q}_q[y]$ must be correct before starting. Assume
 $\operatorname{lc}_x(f(x,y))$ is monic in $y$, and that its squarefree part
 remains squarefree modulo $p$. Then, the squarefree factors of the

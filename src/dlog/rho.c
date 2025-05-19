@@ -9,14 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "nmod.h"
 #include "dlog.h"
-
-#ifdef __GNUC__
-# define floor __builtin_floor
-#else
-# include <math.h>
-#endif
 
 static ulong
 dlog_single(ulong b, ulong a, const nmod_t mod, ulong n)

@@ -11,16 +11,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "d_vec.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mat.h"
 #include "fmpz_lll.h"
-
-#ifdef __GNUC__
-# define ldexp __builtin_ldexp
-#else
-# include <math.h>
-#endif
 
 double
 fmpz_lll_heuristic_dot(const double *vec1, const double *vec2, slong len2,
@@ -38,7 +34,7 @@ fmpz_lll_heuristic_dot(const double *vec1, const double *vec2, slong len2,
         slong exp;
         fmpz_t sp;
         fmpz_init(sp);
-        _fmpz_vec_dot(sp, B->rows[k], B->rows[j], len2);
+        _fmpz_vec_dot(sp, fmpz_mat_row(B, k), fmpz_mat_row(B, j), len2);
         sum = fmpz_get_d_2exp(&exp, sp);
         sum = ldexp(sum, sum - exp_adj);
         fmpz_clear(sp);

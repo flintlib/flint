@@ -15,42 +15,53 @@
 #include "fmpz_mat.h"
 #include "fmpz_poly.h"
 
+/* NOTE: Clang >= 18 cannot compile this on x86 systems for some reason.
+ * Therefore, push this to a separate function to avoid segfaults during
+ * compilation. */
+FLINT_STATIC_NOINLINE void set_matrix(fmpz_mat_t am, slong n)
+{
+    slong ix, jx;
+
+    for (ix = 0; ix < n/2; ix++)
+        for (jx = 0; jx < n/2; jx++)
+        {
+            fmpz_zero(fmpz_mat_entry(am, ix + n/2, jx));
+            fmpz_zero(fmpz_mat_entry(am, ix, jx + n/2));
+            fmpz_set(fmpz_mat_entry(am, ix + n/2, jx + n/2), fmpz_mat_entry(am, ix, jx));
+        }
+}
+
 TEST_FUNCTION_START(fmpz_mat_minpoly, state)
 {
-    slong m, n, rep, i, j;
+    slong n, rep;
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         fmpz_t c;
         fmpz_mat_t A;
         fmpz_poly_t f, g, q, r;
+        slong ix;
 
-        m = n_randint(state, 4);
-        n = m;
+        n = n_randint(state, 10);
 
         fmpz_init(c);
-        fmpz_mat_init(A, m, n);
+        fmpz_mat_init(A, n, n);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
 
-        fmpz_mat_randtest(A, state, 10);
+        if (n_randint(state, 50) == 0)
+            fmpz_mat_randtest(A, state, 1000);
+        else
+            fmpz_mat_randtest(A, state, 10);
 
-        for (i = 0; i < n/2; i++)
-        {
-           for (j = 0; j < n/2; j++)
-           {
-              fmpz_zero(fmpz_mat_entry(A, i + n/2, j));
-              fmpz_zero(fmpz_mat_entry(A, i, j + n/2));
-              fmpz_set(fmpz_mat_entry(A, i + n/2, j + n/2), fmpz_mat_entry(A, i, j));
-           }
-        }
+        set_matrix(A, n);
 
-        for (i = 0; i < 10; i++)
+        for (ix = 0; ix < 10; ix++)
         {
            fmpz_randtest(c, state, 5);
-           fmpz_mat_similarity(A, n_randint(state, m), c);
+           fmpz_mat_similarity(A, n_randint(state, n), c);
         }
 
         fmpz_mat_minpoly(f, A);
@@ -81,34 +92,26 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_t c;
         fmpz_mat_t A, B;
         fmpz_poly_t f, g;
+        slong ix;
 
-        m = n_randint(state, 4);
-        n = m;
+        n = n_randint(state, 10);
 
         fmpz_init(c);
-        fmpz_mat_init(A, m, n);
-        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(A, n, n);
+        fmpz_mat_init(B, n, n);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
 
         fmpz_mat_randtest(A, state, 10);
 
-        for (i = 0; i < n/2; i++)
-        {
-           for (j = 0; j < n/2; j++)
-           {
-              fmpz_zero(fmpz_mat_entry(A, i + n/2, j));
-              fmpz_zero(fmpz_mat_entry(A, i, j + n/2));
-              fmpz_set(fmpz_mat_entry(A, i + n/2, j + n/2), fmpz_mat_entry(A, i, j));
-           }
-        }
+        set_matrix(A, n);
 
         fmpz_mat_set(B, A);
 
-        for (i = 0; i < 10; i++)
+        for (ix = 0; ix < 10; ix++)
         {
            fmpz_randtest(c, state, 5);
-           fmpz_mat_similarity(B, n_randint(state, m), c);
+           fmpz_mat_similarity(B, n_randint(state, n), c);
         }
 
         fmpz_mat_minpoly(f, A);
@@ -130,6 +133,26 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_mat_clear(B);
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);
+    }
+
+    /* special case: zero matrix used to give incorrect result: constant 1 polynomial */
+    {
+        fmpz_mat_t A;
+        fmpz_poly_t f;
+
+        fmpz_mat_init(A, 2, 2);
+        fmpz_poly_init(f);
+
+        fmpz_mat_zero(A);
+        fmpz_mat_minpoly(f, A);
+
+        if (fmpz_poly_length(f) != 2 || f->coeffs[0] != 0 || f->coeffs[1] != 1)
+            TEST_FUNCTION_FAIL("minpoly(A) != X for zero matrix A\n"
+                               "minpoly(A) = %{fmpz_poly}\n",
+                               f);
+
+        fmpz_mat_clear(A);
+        fmpz_poly_clear(f);
     }
 
     TEST_FUNCTION_END(state);

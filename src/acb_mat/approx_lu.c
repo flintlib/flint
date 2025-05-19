@@ -9,27 +9,31 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "acb.h"
 #include "acb_mat.h"
 
 static void
-_apply_permutation(slong * AP, acb_mat_t A, slong * P,
-    slong n, slong offset)
+_apply_permutation(slong * AP, acb_mat_t A, const slong * P,
+    slong num_rows, slong row_offset, slong num_cols, slong col_offset)
 {
-    if (n != 0)
+    if (num_rows != 0)
     {
-        acb_ptr * Atmp;
+        acb_ptr Atmp;
         slong * APtmp;
         slong i;
 
-        Atmp = flint_malloc(sizeof(acb_ptr) * n);
-        APtmp = flint_malloc(sizeof(slong) * n);
+        /* todo: reduce memory allocation */
+        Atmp = flint_malloc(sizeof(acb_struct) * num_rows * num_cols);
+        APtmp = flint_malloc(sizeof(slong) * num_rows);
 
-        for (i = 0; i < n; i++) Atmp[i] = A->rows[P[i] + offset];
-        for (i = 0; i < n; i++) A->rows[i + offset] = Atmp[i];
+        for (i = 0; i < num_rows; i++)
+            memcpy(Atmp + i * num_cols, acb_mat_entry(A, P[i] + row_offset, col_offset), sizeof(acb_struct) * num_cols);
+        for (i = 0; i < num_rows; i++)
+            memcpy(acb_mat_entry(A, i + row_offset, col_offset), Atmp + i * num_cols, sizeof(acb_struct) * num_cols);
 
-        for (i = 0; i < n; i++) APtmp[i] = AP[P[i] + offset];
-        for (i = 0; i < n; i++) AP[i + offset] = APtmp[i];
+        for (i = 0; i < num_rows; i++) APtmp[i] = AP[P[i] + row_offset];
+        for (i = 0; i < num_rows; i++) AP[i + row_offset] = APtmp[i];
 
         flint_free(Atmp);
         flint_free(APtmp);
@@ -86,7 +90,6 @@ int
 acb_mat_approx_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
 {
     acb_t d, e;
-    acb_ptr * a;
     slong i, j, m, n, r, row, col;
     int result;
 
@@ -97,8 +100,6 @@ acb_mat_approx_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
     n = acb_mat_ncols(A);
 
     acb_mat_get_mid(LU, A);
-
-    a = LU->rows;
 
     row = col = 0;
     for (i = 0; i < m; i++)
@@ -121,16 +122,16 @@ acb_mat_approx_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
         else if (r != row)
             acb_mat_swap_rows(LU, P, row, r);
 
-        _acb_approx_inv(d, a[row] + col, prec);
+        _acb_approx_inv(d, acb_mat_entry(LU, row, col), prec);
 
         for (j = row + 1; j < m; j++)
         {
-            _acb_approx_mul(e, a[j] + col, d, prec);
+            _acb_approx_mul(e, acb_mat_entry(LU, j, col), d, prec);
             acb_neg(e, e);
-            _acb_vec_approx_scalar_addmul(a[j] + col,
-                a[row] + col, n - col, e, prec);
-            acb_zero(a[j] + col);
-            acb_neg(a[j] + row, e);
+            _acb_vec_approx_scalar_addmul(acb_mat_entry(LU, j, col),
+                acb_mat_entry(LU, row, col), n - col, e, prec);
+            acb_zero(acb_mat_entry(LU, j, col));
+            acb_neg(acb_mat_entry(LU, j, row), e);
         }
 
         row++;
@@ -182,7 +183,7 @@ acb_mat_approx_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
     /* r1 = rank of A0 */
     r1 = FLINT_MIN(m, n1);
 
-    _apply_permutation(P, LU, P1, m, 0);
+    _apply_permutation(P, LU, P1, m, 0, n - n1, n1);
 
     acb_mat_window_init(A00, LU, 0, 0, r1, r1);
     acb_mat_window_init(A10, LU, r1, 0, m, r1);
@@ -206,8 +207,7 @@ acb_mat_approx_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
     if (!r2)
         r1 = r2 = 0;
     else
-        _apply_permutation(P, LU, P1, m - r1, r1);
-
+        _apply_permutation(P, LU, P1, m - r1, r1, n1, 0);
     flint_free(P1);
     acb_mat_window_clear(A00);
     acb_mat_window_clear(A01);

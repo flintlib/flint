@@ -41,6 +41,12 @@ The file ``flint.h`` contains various useful macros.
     Returns the absolute value of *x* for primitive signed numerical types.  It
     might fail for least negative values such as *INT_MIN* and *LONG_MIN*.
 
+.. macro:: FLINT_UABS(x)
+
+    Returns the absolute value of *x* for primitive signed numerical types,
+    casting the result to an *ulong*. The result is well-defined
+    for least negative values.
+
 .. macro:: FLINT_MIN(x, y)
            FLINT_MAX(x, y)
 
@@ -179,7 +185,7 @@ Thread functions
 .. function:: int flint_get_num_threads(void)
 
     When called at the global level, this function returns one more than the
-    number of worker threads in the Flint thread pool, i.e. it returns the
+    number of worker threads in the FLINT thread pool, i.e. it returns the
     number of workers in the thread pool plus one for the master thread.
 
     In general, this function returns one more than the number of additional
@@ -194,7 +200,7 @@ Thread functions
     Restricts the number of worker threads that can be started by the current
     thread to ``num_workers``. This function can be called from any thread.
 
-    Assumes that the Flint thread pool is already set up.
+    Assumes that the FLINT thread pool is already set up.
 
     The function returns the old number of worker threads that can be started.
 
@@ -245,15 +251,25 @@ Input/Output
     We currently support printing vectors of pointers to the following base
     types: :type:`slong`, :type:`ulong`, :type:`fmpz`, :type:`fmpq`,
     :type:`mag_struct`, :type:`arf_struct`, :type:`arb_struct` and
-    :type:`acb_struct`.
+    :type:`acb_struct`. In this case the nonnegative length of the vector
+    must be passed as a second parameter following the pointer.
+    Warning: the length parameter must be passed as a :type:`slong`,
+    not ``int``.
 
     We also support printing matrices of the following types:
     :type:`nmod_mat_t`, :type:`fmpz_mat_t`, :type:`fmpq_mat_t`,
     :type:`arb_mat_t` and :type:`acb_mat_t`.
 
-    Finally, we currently support printing polynomial of the following types:
+    We also support printing polynomial of the following types:
     :type:`nmod_poly_t`, :type:`fmpz_poly_t`, :type:`fmpq_poly_t`,
     :type:`arb_poly_t` and :type:`acb_poly_t`.
+
+    Finally, we support printing generic elements of type :type:`gr_ptr`
+    as well as :type:`gr_poly_t` and :type:`gr_mat_t`. For
+    each of these types, the object to be printed must be followed
+    by the corresponding :type:`gr_ctx_t`. The context object itself
+    can also printed as a standalone object.
+
 
 .. code-block:: c
 
@@ -269,6 +285,8 @@ Input/Output
     fmpz_mod_ctx_t bfmpz_mod_ctx;
     mpz_t bmpz;
     mpq_t bmpq;
+    gr_ctx_t bgr_ctx;
+    gr_ptr bgr;
 
     /* Initialize and set variables */
 
@@ -284,7 +302,9 @@ Input/Output
         "nmod: %{nmod}\n"
         "fmpz_mod_ctx: %{fmpz_mod_ctx}\n"
         "mpz: %{mpz}\n"
-        "mpq: %{mpq}\n",
+        "mpq: %{mpq}\n"
+        "gr: %{gr}\n",
+        "gr: %{gr_ctx}\n",
         bulong,
         bslong,
         bfmpz,
@@ -296,7 +316,9 @@ Input/Output
         bnmod,
         bfmpz_mod_ctx,
         bmpz,
-        bmpq);
+        bmpq,
+        gr, bgr_ctx,
+        gr_ctx);
 
 .. code-block:: c
 
@@ -309,6 +331,7 @@ Input/Output
     arf_ptr varf; slong varf_len;
     arb_ptr varb; slong varb_len;
     acb_ptr vacb; slong vacb_len;
+    gr_ptr vgr; slong vgr_len; gr_ctx_t vgr_ctx;
 
     /* Initialize and set variables */
 
@@ -321,6 +344,7 @@ Input/Output
         "arf vector: %{arf*}\n"
         "arb vector: %{arb*}\n"
         "acb vector: %{acb*}\n"
+        "gr vector: %{gr*}\n"
         vslong, vslong_len, /* They require a vector length specifier */
         vnmod, vnmod_len,
         vfmpz, vfmpz_len,
@@ -328,7 +352,8 @@ Input/Output
         vmag, vmag_len,
         varf, varf_len,
         varb, varb_len,
-        vacb, vacb_len);
+        vacb, vacb_len,
+        vgr, vgr_len, vgr_ctx);
 
 .. code-block:: c
 
@@ -338,6 +363,7 @@ Input/Output
     fmpq_mat_t mfmpq;
     arb_mat_t marb;
     acb_mat_t macb;
+    gr_mat_t mgr; gr_ctx_t mgr_ctx;
 
     /* Initialize and set variables */
 
@@ -346,14 +372,16 @@ Input/Output
         "fmpz matrix: %{fmpz_mat}\n"
         "fmpz_mod matrix: %{fmpz_mod_mat}\n"
         "fmpq matrix: %{fmpq_mat}\n"
-        "arb vector: %{arb_mat}\n"
-        "acb vector: %{acb_mat}\n"
+        "arb matrix: %{arb_mat}\n"
+        "acb matrix: %{acb_mat}\n"
+        "gr matrix: %{gr_mat}\n"
         mnmod,
         mfmpz,
         mfmpz_mod,
         mfmpq,
         marb,
-        macb);
+        macb,
+        mgr, mgr_ctx);
 
 .. code-block:: c
 
@@ -363,6 +391,7 @@ Input/Output
     fmpq_poly_t pfmpq;
     arb_poly_t parb;
     acb_poly_t pacb;
+    gr_poly_t pgr; gr_ctx_t pgr_ctx;
 
     /* Initialize and set variables */
 
@@ -378,7 +407,8 @@ Input/Output
         pfmpz_mod,
         pfmpq,
         parb,
-        pacb);
+        pacb,
+        pgr, pgr_ctx);
 
 .. note::
 
@@ -410,15 +440,6 @@ Input/Output
 
 Exceptions
 -----------------
-
-.. function:: void flint_abort(void)
-
-    FLINT version of the C standard function ``abort``.
-
-.. function:: void flint_set_abort(void (* func)(void))
-
-    Sets the :func:`flint_abort` function to call ``func`` instead of
-    ``abort``.
 
 .. enum:: flint_err_t
 
@@ -456,9 +477,46 @@ Exceptions
 
         Describes a test fail.
 
+.. function:: void flint_abort(void)
+
+    FLINT's function for aborting, which defaults to the C standard function
+    ``abort``.  To redirect what function should be used for the abort, use
+    :func:`flint_set_abort`.
+
 .. function:: void flint_throw(flint_err_t exc, const char * msg, ...)
 
-    Throws an error of type ``exc`` with message ``msg`` and aborts via
-    :func:`flint_abort`. The printing back-end function is
-    :func:`flint_fprintf`, and so it allows for printing of FLINT types as
-    well.
+    FLINT's function for throwing, which is throwing an error of type ``exc``
+    with message ``msg``.  This defaults to printing ``exc`` followed by
+    printing the message ``msg``, to then abort via :func:`flint_abort`, where
+    the back-end printing function is :func:`flint_fprintf` that allows
+    printing of FLINT types.
+
+    To redirect what function should be used for throwing, use
+    :func:`flint_set_throw`.
+
+.. function:: void flint_set_abort(void (* func)(void))
+
+    Sets the :func:`flint_abort` function to call ``func`` instead of
+    ``abort``.
+
+.. function:: void flint_set_throw(void (* func)(flint_err_t, const char *, va_list))
+
+    Sets the :func:`flint_throw` function use ``func`` instead of a private
+    throw function.
+
+Sorting and searching
+-----------------------------------------------
+
+.. function:: void flint_merge_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data)
+              void flint_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data)
+
+    Sorts an array *buf* with *len* elements of size *size* according to the
+    comparison function *cmp*. The comparison function takes as arguments
+    pointers to the two elements being compared and a pointer to arbitrary data
+    passed to the sorting function. It must return an `int` less than, equal to
+    or greater than zero according to whether the first element is strictly
+    smaller than, equal to, or strictly larger than the second.
+
+    The ``merge_sort`` version uses a simple implementation of the merge sort
+    algorithm. The generic version uses the system's ``qsort_r`` (or equivalent)
+    function when detected and falls back to ``flint_merge_sort`` otherwise.

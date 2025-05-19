@@ -23,7 +23,7 @@ typedef struct
     fmpq * entries;
     slong r;
     slong c;
-    fmpq ** rows;
+    slong stride;
 }
 fmpq_mat_struct;
 

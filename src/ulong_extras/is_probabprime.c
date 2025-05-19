@@ -422,8 +422,8 @@ n_is_probabprime_lucas(ulong n)
         ulong ninv = n_preinvert_limb(n);
         V = lchain2_preinv(n + 1, A, n, ninv);
 
-        left = n_mulmod_precomp(A, V.x, n, ninv);
-        right = n_mulmod_precomp(2, V.y, n, ninv);
+        left = n_mulmod2_preinv(A, V.x, n, ninv);
+        right = n_mulmod2_preinv(2, V.y, n, ninv);
     }
 
     return (left == right);

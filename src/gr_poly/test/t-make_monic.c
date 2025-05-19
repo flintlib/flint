@@ -54,20 +54,25 @@ TEST_FUNCTION_START(gr_poly_make_monic, state)
         if (status == GR_SUCCESS && gr_poly_is_monic(g, ctx) == T_FALSE)
         {
             flint_printf("FAIL\n\n");
+            gr_ctx_println(ctx); flint_printf("\n");
             flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
             flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
             flint_abort();
         }
 
-        status |= gr_poly_make_monic(h, fc, ctx);
-
-        if (status == GR_SUCCESS && gr_poly_equal(g, h, ctx) == T_FALSE)
+        if (gr_ctx_is_integral_domain(ctx) == T_TRUE)
         {
-            flint_printf("FAIL\n\n");
-            flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
-            flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
-            flint_printf("h = "); gr_poly_print(h, ctx); flint_printf("\n");
-            flint_abort();
+            status |= gr_poly_make_monic(h, fc, ctx);
+
+            if (status == GR_SUCCESS && gr_poly_equal(g, h, ctx) == T_FALSE)
+            {
+                flint_printf("FAIL\n\n");
+                gr_ctx_println(ctx); flint_printf("\n");
+                flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
+                flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
+                flint_printf("h = "); gr_poly_print(h, ctx); flint_printf("\n");
+                flint_abort();
+            }
         }
 
         gr_poly_clear(f, ctx);

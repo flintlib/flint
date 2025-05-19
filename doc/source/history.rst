@@ -6,27 +6,194 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-????-??-?? -- FLINT 3.2.0-dev
+XXXX-XX-XX -- FLINT 3.3.0-dev
 -------------------------------------------------------------------------------
 
-Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring (RB),
-Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
+Main contributors: Albin Ahlbäck (AA), Ricardo Buring (RB), Lars Göttgens (LG),
+Fredrik Johansson (FJ), Vincent Neiger (VN).
 
 * Features
 
-  * Add new module ``mpn_mod`` for fixed-size few-word modulo arithmetic (FJ).
+  * Allow rings to overload ``_gr_mat_charpoly`` and provide such overloads for
+    ``fmpz``, ``fmpq``, ``mpn_mod`` and ``fmpz_mod``.  Furthermore, remove
+    ``fq_*_mat_charpoly_danilevsky`` and ``fmpz_mod_mat_charpoly_berkowitz``,
+    and wrap ``fq_*_mat_minpoly`` and ``fq_*_mat_charpoly`` around GR functions
+    (FJ).
+  * Remove ``fq_zech_mat_reduce_rows`` (FJ).
+  * Add various ``mulmod``, ``div_preinv`` and ``compose_mod`` methods for
+    ``gr_poly`` (FJ).
+  * Add ``fmpz_mod_mat_pow_ui`` (LG).
+  * Add ``gr_poly_scalar_mul`` (FJ).
+  * Implement ``GR_METHOD_OTHER_MUL`` for ``gr_poly`` (FJ).
+  * Add ``gr_mat_pow_(si|fmpz|fmpq|scalar)`` (LG, FJ).
+  * Add ``gr_mat_func_jordan`` (FJ).
+  * Add ``nmod_poly_mat_transpose`` and ``fq_default_mat_transpose`` (LG).
+  * Add different ``powmod``-methods for ``gr_poly``, based on methods from
+    ``fq_poly`` (FJ).
+  * Add ``gr_poly_(add|sub)_scalar`` (RB).
+  * Support GR objects in ``flint_printf`` (FJ).
+  * Add support for parsing builtin functions like ``sqrt(x)`` in
+    ``gr_set_str`` (FJ).
+
+* Examples
+
+  * Add example script to check ``n_is_prime`` against list of Fermat
+    pseudoprimes (FJ).
+  * Replace generated code with strings in ``huge_expr.c`` (FJ).
+
+* Performance
+
+  * Use stride instead of row pointers in all matrix types (FJ).
+  * Refactor characteristic polynomial and retune it (FJ).  
+  * Use delayed canonicalization in ``mpn_mod_mat_reduce_row`` and
+    ``fmpz_mod_mat_reduce_row`` (FJ).
+  * Improve method choise in ``gr_mat_rank`` (FJ).
+  * Inline operations in ``_gr_fmpz_set`` (FJ).
+  * Use ``udiv_qrnnd`` in ``n_preinvert_limb`` whenever CPU has fast division
+    (AA, FJ, VN).
+
+* Bug fixes
+
+  * Fix bug in ``fmpz_mat_charpoly_modular`` where wrong results were given if
+    output polynomial was not initially set to zero by caller (FJ).
+  * Fix memory leak in ``gr_mat_minpoly_field`` (FJ).
+  * Fix aliasing for ``gr_poly_div_newton_n_preinv`` (FJ).
+  * Fix memory leak in ``gr_mat_fflu`` (FJ).
+  * Fix invalid write in ``_gr_nmod_vec_reciprocals`` when length is zero (FJ).
+  * Fix various memory leaks found by the address sanitizer (Ricardo Buring).
+  * Fix cases where ``gr_poly`` were not correctly normalized over a degenerate
+    ring (FJ).
+
+* Build system
+
+  * Push pragmas into macros, allowing them to be set during configuration
+    (AA).
+  * Fix an overwriting of CFLAGS in ``configure.ac`` (AA).
+  * Re-enable ``-Wmaybe-uninitialized`` (FJ).
+  * Enable ``-Werror=newline-eof`` (AA).
+  * Accommodate for Meteor Lake, Raptor Lake and Tiger Lake (VN).
+  * Make sure Comet Lake enables ``fft_small`` (VN).
+  * Error when trying to build FLINT on a non-Windows system (AA).
+
+* Tests
+
+  * Add more test code for preinv division for ``gr_poly`` (FJ).
+  * Add tests for ``gr_mat_exp`` and ``gr_mat_log`` (FJ).
+  * Add test for ``fmpz_mod_mat_transpose`` (LG).
+
+* Profiling
+
+* Maintenance
+
+  * Replace some ``fq_poly`` and ``fmpz_mod_poly`` methods with GR wrappers
+    (FJ).
+  * Include standard headers instead of using builtins (AA).
+  * Propagate failure in ``acb_poly_find_roots`` if numerical stage returns NaN
+    (FJ).
+  * Refactor ``gr_mat_exp_jordan`` and ``gr_mat_log_jordan`` (FJ).
+  * Delegate ``(fmpz|fmpz_poly|fmpq)_mat_transpose`` to ``gr_mat`` (LG).
+  * Add issue templates to Github (AA, Lars Kastner).
+  * Optimize for code size in some less performance-critical functions (FJ).
+  * Fix various undefined behaviors reported by GCC's address sanitizer (FJ).
+  * Add ``FLINT_UABS`` macro (FJ).
+  * Refactor nullspace and rref in GR, and make ``fq_*_mat`` use these instead
+    (FJ).
+  * Use ``gr_poly``-methods for ``powmod`` in ``fmpz_mod_poly`` and
+    ``fq_*_poly`` (FJ).
+  * Use ``gr_mat_rank_lu`` in ``fmpz_mod_mat_rank`` and ``fq_*_mat_rank`` (FJ).
+  * Remove underscore in front of ``nfloat_ctx_(set|get)_real_prec`` to match
+    documentation (Joel Dahne).
+  * Add missing newlines at end of file (FJ).
+
+* Continuous integration
+
+  * Use temporary Nemo branch for CI due to the change of using stride instead
+    of row pointers in matrices (AA).
+
+* Documentation
+
+  * Fix ``fmpz`` docstrings to clarify that GCD of integers and rationals is
+    non-negative (Max Horn).
+  * Unify some docstrings (LG).
+  * Fix docstrings for various LU functions (LG).
+  * Fix typos (AA, Marc Mezzarobba, user202729).
+  * Touch up formula in ``hypgeom.rst`` (FJ).
+  * Fix docstring for ``fmpz_mat_snf_kannan_bachem`` (Dima Pasechnik).
+  * Fix docstring for ``fmpz_get_nmod`` (David Lowry-Duda).
+
+
+2025-03-17 -- FLINT 3.2.1
+-------------------------------------------------------------------------------
+
+* Bug fixes
+
+  * Properly recognize AMD Zen during configuration (Albin Ahlbäck, reported by
+    Doug Torrance).
+
+
+2025-03-12 -- FLINT 3.2.0
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring
+(RB), Edgar Costa (EC), Tobias Diez (TD), Isuru Fernando (IF), Tommy Hofmann
+(TH), Max Horn (MH), Fredrik Johansson (FJ), Marc Mezzarobba (MM), Jake Moss
+(JM), Vincent Neiger (VN), Giacomo Pope (GP), Daniel Schultz (DS).
+
+* Features
+
+  * Add new module ``mpn_mod`` for fixed-size few-word modulo arithmetic, with
+    additional vector, matrix and polynomial arithmetic (FJ).
+  * Add new module ``nfloat`` for packed fixed-size floating-point numbers with
+    additional vector and matrix arithmetic (FJ).
+  * Add fixed-point arithmetic under the ``nfloat`` module (FJ).
+  * Major work on ``gr`` modules, including:
+
+    * Toom-Cook multiplications for ``gr_poly``,
+    * Add Aberth and WDK root refinement for ``gr_poly``,
+    * Handle valuations and exact results in ``gr_series_div``,
+    * Addition of missing modular arithmetic routines,
+    * Addition of comparison routines,
+    * Matrix norms,
+    * Improvements of Strassen matrix multiplication,
+    * Addition of Waksman matrix multiplication,
+    * Add all remaining scalar arithmetic methods for ``gr_mat``,
+    * Refactoring of ``gr_mpoly`` contexts,
+    * Improve equality testing code for ``gr_mpoly``.
+
+    All was contributed by (FJ).
+
   * Implement computing qqbar roots of qqbar polynomials (FJ).
   * Implement generic ``flint_mpn_mulhigh`` and ``flint_mpn_sqrhigh`` for all
     ranges based on Mulders' algorithm (FJ).
   * Implement ``n_factor_evaluate`` (AA).
-  * Add ``gr_poly_mul_karatsuba`` (FJ).
   * Wrap some more methods in ``flint_ctypes`` (FJ).
-  * Handle valuations and exact results in ``gr_series_div`` (FJ).
+  * Let ``flint_mpn`` random functions take ``flint_randstate_t`` as input
+    (FJ).
+  * Add ``fmpz_randbits_unsigned`` (AA).
+  * Add special case for ``_acb_dirichlet_zeta`` whenever `s` is a positive
+    integer (FJ).
+  * Typedef ``ulong`` and ``slong`` based on C primitives rather than relying
+    on GMP's ``mp_limb_t`` and ``mp_limb_signed_t`` (AA).
+  * Refactor FLINT's base randomisation, and rename the types and functions to
+    be in proper FLINT-style.
+  * Add some missing GR methods for modular arithmetic (FJ).
+  * Add ``vec4n_(zero|mul|permute)`` in ``machine_vectors.h`` (VN).
+  * Add ``cmpabs`` routines for ``acb`` and ``acf`` (FJ).
+  * Add ``fq_default_ctx_init_randtest`` (GP).
+  * Add some missing ``fmpz_mod_mpoly_compose`` functions (JM).
+  * Improve enclosures in exponential integrals (FJ).
+  * Improve transition regions and on wide intervals in
+    ``acb_hypgeom_bessel_j`` (FJ).
+  * Allow evaluation of the deflated Riemann zeta function on small intervals
+    containing `1` (FJ).
+  * Allow evaluation of ``a[rc]b_poly_sinc_series`` and
+    ``a[rc]b_poly_sinc_pi_series`` on intervals containing `0` (FJ).
 
 * Examples
 
   * Add AKS primality example program (FJ).
   * Add example on double exponential integration (Hartmut Monien).
+  * Update integral examples (FJ).
 
 * Performance
 
@@ -55,8 +222,54 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Add ``flint_mpn_sqrhigh_N`` routines for `N \le 8` for Arm v8 (AA).
   * Add ``_flint_mpn_mulhigh_basecase`` routines Arm v8 optimized for Apple M1
     (AA).
-  * In gr matrix rings, call ``gr_mat_mul`` rather than ``gr_mat_mul_classical`` (FJ).
-  * Change generic truncated power series to use ``gr_poly`` instead of ``gr_series`` as the data type (FJ).
+  * In gr matrix rings, call ``gr_mat_mul`` rather than
+    ``gr_mat_mul_classical`` (FJ).
+  * Change generic truncated power series to use ``gr_poly`` instead of
+    ``gr_series`` as the data type (FJ).
+  * Optimize ``nmod_poly_gcd`` with 64-bit moduli (FJ).
+  * Do not calculate remainder in exact division of ``fq_nmod_mpoly`` unless
+    assertion is needed.
+  * Implement fast ``flint_mpn_mullow_n`` for large `n`, and use this in
+    preinversion functions (FJ).
+  * Simplify ``FLINT_MPN_MUL_2X2`` (FJ).
+  * Reduce inlining of ``flint_mpn_mulhigh_normalised`` (FJ).
+  * Implement faster version of ``flint_mpn_addmod_2`` (FJ).
+  * Use ``flint_mpn_(add|sub)mod_n`` in the ``fmpz_factor`` module (FJ).
+  * Use ``fmpz_poly_divexact`` instead of ``fmpz_poly_divides`` in one place
+    (FJ).
+  * Inline ``n_randint`` to avoid division operations when limit is
+    compile-time constant (AA).
+  * Simplify ``fmpz_randprime``, and rely on ``n_randprime`` for bitsizes up to
+    ``FLINT_BITS`` (AA).
+  * Skip up to one call to ``fmpz_equal`` in ``fmpz_is_strong_probabprime``
+    (Mathieu Gouttenoire).
+  * Optimize ``n_revbin`` for Aarch64 (AA).
+  * Use builtin check arithmetic in ``ulong_extras.h`` and ``long_extras.h``,
+    where it was useful (AA).
+  * Use ``_fmpz_new_mpz`` instead of ``mpz_init`` to allow the use of already
+    allocated ``mpz`` (AA).
+  * Improve formula selection for ``acb_hypgeom_beta_lower`` (FJ).
+  * Write proper function for ``fmpz_mul2_uiui`` (AA).
+  * Replace some ``n_[cf]log(X, 2)`` to ``FLINT_[CF]LOG2(X)`` (AA).
+  * Replace ``malloc`` + ``memset`` calls by ``calloc`` in ``block_lanczos``
+    (AA).
+  * Improve tuning for ``_mpz_tdiv_qr_preinvn`` (FJ).
+  * Use preinversions in more cases in ``fmpz_mod`` (FJ).
+  * Rewrite ``fmpz_lucas_chain`` to use various `\mathbb{Z} / n \mathbb{Z}`
+    implementations (FJ).
+  * Use Bini's algorithm to select initial values in ``acb_poly_find_roots``
+    (FJ).
+  * Speed up ``nmod`` dot products, including vectorized routines (VN).
+  * Use ``nmod`` dot products more throughout FLINT (VN).
+  * Implement more modular multiplication routines with precomputated inverses
+    (VN).
+  * Add tuning for Intel Icelake (VN).
+  * Avoid computing some entries twice in Strassen multiplication for
+    ``(gr|fmpz)_mat`` (FJ).
+  * Utilize symmetry when squaring in ``gr_mat_mul_strassen`` (FJ).
+  * Improve algorithm selection in ``fmpz_mat_rref`` (FJ).
+  * Use ``acb_dot`` in recurrence for Eisenstein series instead of multiple
+    addmuls (FJ).
 
 * Bug fixes
 
@@ -69,6 +282,31 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Fix primitive root prime (VN).
   * Fix ``gr_ctx_is_finite_characteristic`` for ``fmpz_mod`` (FJ).
   * Fix setting generator names for univariate gr rings (FJ).
+  * Fix memory usage in x86 sqrhigh assembly where out-of-bound elements were
+    accessed (AA).
+  * Fix bugs in ``fq_default`` context initialisers (AA).
+  * ``mpz_remove`` may reduce the number of limbs allocated, which may silently
+    reduce the number of limbs contained in a big ``fmpz``.  Thus, ensure that
+    after each call to ``mpz_remove``, the result has a proper number of limbs
+    allocated (AA).
+  * Fix leading coefficient bug in ``fmpz_mpoly_factor`` (DS).
+  * Fix bug in ``fq_default_poly_evaluate_fq_default`` where the check for
+    ``fmpz_mod`` representation was incorrect (GP).
+  * Fix division by zero in ``mpoly_monomials_deflate`` (JM).
+  * Fix bug introduced in new function ``fq_default_ctx_init_randtest`` (AA).
+  * Fix crash potential crashes in ``fmpz_poly_sub_fmpz`` (MH)
+  * Fix modulus 1 for ``nmod_poly`` and ``fmpz_poly`` modules (TH).
+  * Fix name clashes of variables in macros, as this becomes a problem whenever
+    macros are layered (AA).
+  * Fix ``NEED_CLZ_TAB`` (AA).
+  * Patch a bug in Clang where it assumes ``__builtin_clz`` always returns
+    something non-zero (AA).
+  * Patch certain tests who caused segfaults during compilations in Clang (AA).
+  * Avoid inline assembly for big ``aors_n`` in GCC on ARM since they lack
+    enough registers to compile this (AA).
+  * Fix wrong arithmetic function used in ``n_is_probabprime_lucas`` (FJ,
+    reported by Mikhail Hogrefe).
+  * Correct pointer casting for ARM in ``machine_vectors.h`` (AA).
 
 * Build system
 
@@ -84,6 +322,31 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Create an include directory to build examples in ``Makefile`` (BA).
   * Fix missing header (VN).
   * Use CXX when testing NTL (George Huebner).
+  * Check for GMP's ``mpn_invert_limb`` during build (AA).
+  * Add ``-Wno-maybe-uninitialized`` to default C flags (AA).
+  * Enable backup Cflags in the configuration, such as if ``-march=znver4`` is
+    prioritised over ``-march=znver3``, then it will first try
+    ``-march=znver4`` and fall back to ``-march=znver3`` if necessary.
+  * Deprecate the ``--enable-tls`` option in the configuration (AA).
+  * Add maintainer-level only option for fast build where optimizations are
+    disabled (AA).
+  * Recognize Comet Lake U in ``config.guess`` (AA).
+  * Push non-executable stack when compiling assembly files (AA).
+  * Remove unused compiler options for Clang, hence silencing warnings (AA).
+  * Make Autotools build work out of tree (AA).
+  * Don't assume AVX is available if user specified their own CFLAGS (AA).
+  * Use ``cp -pRP`` instead of ``cp -a`` in Make as the latter is not supported
+    by POSIX, causing installation failures on some systems (AA).
+  * Add C11 atomics for MSVC builds (IF).
+  * Recognize Apple M3 and Apple M4 (Pro) in ``config.guess`` (AA).
+  * Fix static build for MSVC (IF, TD).
+  * Only check assembly labels when it is actually being used (AA).
+  * Update ``X86_64_PATTERN`` and ``X86_64_ADX_PATTERN`` and add some missing
+    patterns (AA).
+  * Recognize and map Zen 5 with correct CFLAGS and set some initial parameters
+    for the architecture (AA).
+  * Check presence of ``install-sh`` instead of ``config.guess`` during
+    bootstrapping as ``config.guess`` is always present (AA).
 
 * Tests
 
@@ -94,11 +357,39 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Fix warning in test (AA).
   * Add functions ``gr_mat_test_mul``, ``gr_mat_test_lu`` and
     ``gr_poly_test_mullow`` for testing generics overrides (FJ).
+  * Avoid ``mpn_random2`` in tests (FJ).
+  * Check correct type initialisation in ``fq_default`` (AA).
+  * Add stricter bound to test of ``flint_mpn_mulhigh`` (AA).
+  * Revise tests for ``ulong_extras`` (AA).
+  * Reduce test multiplier where it was excessive (AA).
+  * Speedup the test for ``flint_mpn_mul_toom22`` (AA).
+  * Merge tests for ``nmod_mat_(add|sub)mul`` (AA).
+  * Simplify test for ``fmpz_randprime``, and remove the risk this test failing
+    (AA).
+  * Revise test for ``fmpz_init_set_readonly`` (AA).
+  * Add missing abort in test for ``arb_mat_solve_preapprox`` (AA).
+  * Add more tests for ``gr`` module (FJ).
+  * Add test for ``dlog_rho_t`` (FJ).
+  * Add test for ``fq_default_poly_evaluate`` (GP).
+  * Correct initialisation-utilisation-clearing order in test for
+    ``fq_default_init`` (GP).
+  * Add test for division by zero in ``fmpz_mpoly_(inflate|deflate)`` (JM).
+  * Uncomment some previously commented code in ``fmpz_mod_mpoly_compose``
+    test, use smaller primes for this test (JM).
+  * Use ``TEST_FUNCTION_FAIL`` macro in more multivariate polynomial tests
+    (JM).
+  * Explicitly check zero polynomial compositions for most multivariate
+    polynomial modules (JM).
+  * Randomize modulus in multivariate polynomial tests (JM).
 
 * Profiling
 
   * Add profile program for ``flint_mpn_divrem_preinvn`` (FJ).
-  * Add profiler for ``flint_mpn_mullow`` (AA).
+  * Add profile program for ``flint_mpn_mullow`` (AA).
+  * Fix ``p-mulmod_preinvn`` (FJ).
+  * Add profile program for dot products in the ``nmod_vec`` module (VN).
+  * Add profile program for ``nmod_vec_scalar_addmul*`` (VN).
+  * General profile program fixes and touchups on the ``nmod`` modules (VN).
 
 * Maintenance
 
@@ -126,6 +417,68 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Do not remove intermediate assembly files for making debugging easier (AA).
   * Add ``make debug MOD=XXX ARGS=YYY`` shortcut for debugging with GDB (AA).
   * Add ``gdb_history`` and ``vgcore.*`` to ``.gitignore`` (AA).
+  * Replace "FLINT2" by "FLINT" (Julian Rüth).
+  * Remove obviously outdated entries in ``TODO.md`` (FJ).
+  * Remove unnecessary inclusions of ``mpn_extras.h`` (FJ).
+  * Remove some undocumented and/or unused functions, including most of
+    ``mpfr_*`` modules and ``n_cbrt_newton_iteration`` (AA, FJ).
+  * Change ``__mpz_struct *`` to ``mpz_ptr`` (AA).
+  * Add keywords ``FLINT_MALLOC`` and ``FLINT_RETURNS_NONNULL``.  Use these
+    along with ``FLINT_WARN_UNUSED`` whenever suitable in the memory managing
+    functions in ``flint.h`` (AA).
+  * Remove inclusion of ``gmp.h`` and ``limits.h`` in ``flint.h`` and other
+    headers (AA).
+  * Use FLINT types instead of GMP types in source code (AA).
+  * Remove ``signed_mpn_sub_n`` in favor of ``flint_mpn_signed_sub_n`` (AA).
+  * Cleanup copyright claims in ``longlong.h`` (AA).
+  * Remove ``byte_swap`` from ``longlong.h`` (AA).
+  * Remove ``flint_mul_sizes`` and use ``z_mul_checked`` instead (AA).
+  * Remove ``r_shift`` and ``l_shift`` from ``flint.h``, and only define where
+    needed (AA).
+  * Remove inclusion of ``longlong.h`` from ``flint.h`` (AA).
+  * Remove old deprecations in ``fmpz.h`` (AA).
+  * General header cleanups and removal of unnecessary inclusions in them (AA).
+  * Replace calls to ``mpz_realloc2`` to ``mpz_realloc``, and only do these
+    calls if it is truly necessary (AA).
+  * Add constant ``MPZ_MIN_ALLOC`` that decides the minimum number of allocated
+    limbs that the ``fmpz``-collector may receive such that ``_fmpz_new_mpz``
+    always returns an ``mpz`` with at least ``MPZ_MIN_ALLOC`` limbs allocated
+    (AA).
+  * Merge several source files (AA).
+  * Simplify ``MAG_FIXMUL`` for 32-bit systems (AA).
+  * Delete ``acb_vec_printd_index``, and only define where needed in test files
+    (AA).
+  * Add flags to ``gr_acb_ctx``, currently only analytic flag implemented (FJ).
+  * Further maintenance of ``fft_small`` (DS).
+  * Increase code coverage in tests (AA, FJ).
+  * Use ``_mm256_srli_epi64`` instead of ``_mm256_srl_epi64`` in
+    ``machine_vectors.h`` (VN).
+  * Clarify that ``libtool`` is needed in ``INSTALL.md`` and ``README.md``
+    (AA).
+  * Do not use ``I`` as a variable name as it is reserved in C99 (Dima
+    Pasechnik).
+  * Deprecate aliases in the ``arith`` module (AA).
+  * Move ``add_s{n}a{2n}`` and friends from ``crt_helpers.h`` to ``longlong.h``
+    (FJ).
+  * Rename ``FLINT_TEST_CLEANUP`` to ``FLINT_TEST_CLEAR`` (VN).
+  * Add multiple missing ``flint_rand_clear`` (VN).
+  * Fix typos in source code (Frédéric Chapoton).
+  * Add ``flint-mparam.h`` for Zen 4 (VN).
+  * Remove prototypes of non-existing functions ``arb_poly_mullow_ztrunc``
+    (MM).
+  * Only include headers before ``extern "C"`` (AA).
+  * Undefine ``small`` macro in ``qsieve.h`` as it may cause clashes on Windows
+    systems (AA).
+  * Fix ``noreturn`` attribute for C23, as it uses ``[[noreturn]]`` for this
+    (Michael Orlitzky).
+  * Add newlines to end of files that where missing them (AA).
+  * Add ``mpn_extras/inlines.c`` (AA).
+  * Replace compound literal with a struct to accommodate MSVC (TD).
+  * Cast pointers in ``machine_vectors.h`` to suppress warnings about
+    incompatible pointers (AA).
+  * Make GCC pragmas dispatch only for GCC (AA).
+  * Comment out unused static functions (AA).
+  * Check availability of ``rbit`` instruction for ARM in ``n_revbin`` (AA).
 
 * Continuous integration
 
@@ -136,17 +489,38 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Add runner that checks against regression when compiling with ``-Wextra
     -Werror`` (AA).
   * Publish prepreleases only as drafts (Mahrud Sayrafi).
+  * Multiple updates of the runners according to Github's runners (AA, EC).
+  * Exclude profiler source code from Codecov (AA).
+  * Assume ``lcov`` version 2.1 is available (AA).
+  * Touchups and fixes for the release CI (EC).
+  * Add Linux ARM runner (AA).
+  * Fix release CI to automatically make releases when new tags are created,
+    and push related files and generate website accordingly (AA, EC).
+  * Rebuild citation block on website after each release (AA).
 
 * Documentation
 
-  * Fix typos (EC).
+  * Fix typos (BA, Frédéric Chapoton, EC, MM, VN).
   * Clarify usage of inline assembly addition and subtraction macros such as
     ``add_ssaaaa`` (AA).
-  * Fix another typo (BA).
-  * Some explanations for ``mpn_ctx_mpn_mul`` (FJ).
+  * Add some explanations for ``mpn_ctx_mpn_mul`` (FJ).
   * Add human-readable text to documentation of ``ordering_t`` (RB).
   * Document Generic Ring setters for infinities and extended values (RB).
-  * Fix documentation of ``gr_cmp_other`` (Marc Mezzarobba).
+  * Fix documentation of ``gr_cmp_other`` (MM).
+  * Fix reference to Granlund-Montgomery division (AA).
+  * Correct names of the SFB-TRR 195 grant by the DFG (MH).
+  * Correct ``fq_default_default`` to ``fq_default`` (AA).
+  * Clarify documentation for ``fq_default`` context initialisers (AA).
+  * Revise some ``fmpz`` docstrings (AA).
+  * Document ``MPZ_MIN_ALLOC`` and low-level ``fmpz`` memory management
+    functions (AA).
+  * Correct docstring for ``udiv_qrnnd`` (VN).
+  * Rework docstring for ``n_mulmod_precomp_shoup``, and clarify its
+    constraints (VN).
+  * Document ``nmod_mat_set_mod`` (VN).
+  * Document ``fmpz_mod_poly``-``ulong`` scalar functions (AA).
+  * Clarify that releases do not require Autotools (AA).
+  * Fix signatures for ``acb_mat_get_(real|imag)`` (Marek Kaluba).
 
 
 2024-03-18 -- FLINT 3.1.2
@@ -789,7 +1163,7 @@ List of removals
 -------------------------------------------------------------------------------
 
 * Fix a bug in generator of finite field in characteristic 2
-* Allow Flint to work with GMP 6.1.2 and 6.2.0 interchangeably
+* Allow FLINT to work with GMP 6.1.2 and 6.2.0 interchangeably
 * Fix some old license headers
 
 2020-07-31 -- FLINT 2.6.2
@@ -2344,7 +2718,7 @@ Calcium version history
   * Special functions: ca_erf, ca_erfi, ca_erfc, with algebraic relations.
   * Special functions: ca_gamma (incomplete simplification algorithms).
 
-* New utils_flint module for Flint utilities
+* New utils_flint module for FLINT utilities
 
   * Vectors of multivariate polynomials.
   * Construction of elementary symmetric polynomials.
@@ -2491,7 +2865,7 @@ Arb version history
 2021-07-25 -- Arb 2.20.0
 -------------------------------------------------------------------------------
 
-* Flint 2.8 support.
+* FLINT 2.8 support.
 * Change arb_get_str with ARB_STR_NO_RADIUS: [+/- 1.20e-15] now prints as 0e-14.
 * Uniformly distributed random number functions arf_urandom, arb_urandom
   (contributed by Albin Ahlbäck).
@@ -2542,7 +2916,7 @@ Arb version history
 
 * General
 
-  * Flint 2.6 support.
+  * FLINT 2.6 support.
   * Several build system improvements (contributed by Isuru Fernando).
   * Changed arf_get_mpfr to return an MPFR underflow/overflow result
     (rounding to 0 or infinity with the right sign and MPFR overflow flags)

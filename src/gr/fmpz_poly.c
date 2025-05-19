@@ -744,10 +744,34 @@ _gr_fmpz_poly_rsqrt(fmpz_poly_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_poly_canonical_associate(fmpz_poly_t ux, fmpz_poly_t u, const fmpz_poly_t poly, const gr_ctx_t ctx)
+{
+    if (fmpz_poly_is_zero(poly))
+    {
+        fmpz_poly_zero(ux);
+        fmpz_poly_one(u);
+    }
+    else
+    {
+        slong sgn = fmpz_sgn(poly->coeffs + poly->length - 1);
+
+        if (sgn >= 0)
+            fmpz_poly_set(ux, poly);
+        else
+            fmpz_poly_neg(ux, poly);
+
+        fmpz_poly_set_si(u, sgn);
+    }
+
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_poly_factor_t fac;
-    gr_ctx_t ZZ;
+    gr_ctx_t Pol, ZZ;
     slong i;
 
     fmpz_poly_factor_init(fac);
@@ -755,9 +779,12 @@ _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_src
 
     fmpz_poly_set_fmpz(c, &fac->c);
 
+    /* Avoid using ctx so that this function can be used both with ctx = ZZ and
+     * with ctx = ZZ[x] */
+    gr_ctx_init_fmpz_poly(Pol);
     gr_ctx_init_fmpz(ZZ);
 
-    gr_vec_set_length(factors, fac->num, ctx);
+    gr_vec_set_length(factors, fac->num, Pol);
     gr_vec_set_length(exponents, fac->num, ZZ);
 
     for (i = 0; i < fac->num; i++)
@@ -767,6 +794,7 @@ _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_src
     }
 
     gr_ctx_clear(ZZ);
+    gr_ctx_clear(Pol);
 
     fmpz_poly_factor_clear(fac);
 
@@ -859,6 +887,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_poly_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_poly_rsqrt},
+    {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpz_poly_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {0,                         (gr_funcptr) NULL},
 };

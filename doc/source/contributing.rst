@@ -27,7 +27,7 @@ Use the following checklist regarding code style:
 
 * Try to keep names and function arguments consistent with existing code.
 * Follow the conventions regarding types, aliasing rules, etc. described
-  in :ref:`issues` and in ``code_conventions.txt``.
+  in :ref:`issues` and in ``code_conventions.md``.
 * Use basic FLINT constants, types and functions: ``FLINT_BITS``, ``flint_malloc``/``flint_free``, ``flint_abort``, ``flint_printf``, etc.
 * Complex macros should be avoided.
 * Indentation is four spaces.

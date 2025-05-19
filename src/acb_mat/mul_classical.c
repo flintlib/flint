@@ -72,25 +72,10 @@ acb_mat_mul_classical(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong p
     }
     else
     {
-        acb_ptr tmp;
-        TMP_INIT;
-
-        TMP_START;
-        tmp = TMP_ALLOC(sizeof(acb_struct) * br * bc);
-
-        for (i = 0; i < br; i++)
-            for (j = 0; j < bc; j++)
-                tmp[j * br + i] = *acb_mat_entry(B, i, j);
-
         for (i = 0; i < ar; i++)
-        {
             for (j = 0; j < bc; j++)
-            {
                 acb_dot(acb_mat_entry(C, i, j), NULL, 0,
-                    A->rows[i], 1, tmp + j * br, 1, br, prec);
-            }
-        }
-
-        TMP_END;
+                    acb_mat_entry(A, i, 0), 1,
+                    acb_mat_entry(B, 0, j), B->stride, br, prec);
     }
 }

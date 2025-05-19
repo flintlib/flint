@@ -2,6 +2,7 @@
     Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2014 Ashish Kedia
     Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2024 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -11,75 +12,110 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"
+#include "nmod.h"
 #include "fmpz.h"
 
+/*******************/
+/*  scalar_addmul  */
+/*******************/
+
 void
-nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X,
-                                          const nmod_mat_t Y, const ulong b)
+_nmod_mat_scalar_addmul_ui_generic(nmod_mat_t C, const nmod_mat_t A,
+                                          const nmod_mat_t B, const ulong c)
 {
-    slong i, j;
-
-    if (b == UWORD(0))
+    for (slong i = 0; i < A->r; i++)
     {
-        if (dest != X)
-            nmod_mat_set(dest, X);
-        return;
-    }
-
-    for (i = 0; i < X->r; i++)
-    {
-        for (j = 0; j < X->c; j++)
+        for (slong j = 0; j < A->c; j++)
         {
-            nmod_mat_entry(dest, i, j) =
-                n_addmod(nmod_mat_entry(X, i, j),
-                    n_mulmod2_preinv(nmod_mat_entry(Y, i, j), b, Y->mod.n,
-                                                        Y->mod.ninv), X->mod.n);
+            nmod_mat_entry(C, i, j) =
+                n_addmod(nmod_mat_entry(A, i, j),
+                         nmod_mul(nmod_mat_entry(B, i, j), c, B->mod),
+                         A->mod.n);
         }
     }
 }
 
-#define UWORD_HALF (UWORD_MAX / 2 + 1)
+void
+_nmod_mat_scalar_addmul_ui_precomp(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
+                                    const ulong c, const ulong c_pr)
+{
+    for (slong i = 0; i < A->r; i++)
+    {
+        for (slong j = 0; j < A->c; j++)
+        {
+            nmod_mat_entry(C, i, j) =
+                n_addmod(nmod_mat_entry(A, i, j),
+                         n_mulmod_shoup(c, nmod_mat_entry(B, i, j),
+                                          c_pr, B->mod.n),
+                         A->mod.n);
+        }
+    }
+}
+
+void
+nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
+                          const ulong c)
+{
+    if (c == UWORD(0))
+        nmod_mat_set(C, A);
+    else if (c == UWORD(1))
+        nmod_mat_add(C, A, B);
+    else if (c == A->mod.n - UWORD(1))
+        nmod_mat_sub(C, A, B);
+    else if (A->r * A->c >= FLINT_MULMOD_SHOUP_THRESHOLD && A->mod.norm > 0)
+    {
+        const ulong c_pr = n_mulmod_precomp_shoup(c, A->mod.n);
+        _nmod_mat_scalar_addmul_ui_precomp(C, A, B, c, c_pr);
+    }
+    else
+        _nmod_mat_scalar_addmul_ui_generic(C, A, B, c);
+}
+
+/****************/
+/*  scalar_mul  */
+/****************/
+
+void
+_nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c)
+{
+    for (slong i = 0; i < A->r; i++)
+        for (slong j = 0; j < A->c; j++)
+            nmod_mat_entry(B, i, j) = nmod_mul(nmod_mat_entry(A, i, j), c, A->mod);
+}
+
+void
+_nmod_mat_scalar_mul_precomp(nmod_mat_t B, const nmod_mat_t A, ulong c, ulong c_pr)
+{
+    for (slong i = 0; i < A->r; i++)
+        for (slong j = 0; j < A->c; j++)
+            nmod_mat_entry(B, i, j) = n_mulmod_shoup(
+                c, nmod_mat_entry(A, i, j), c_pr, A->mod.n);
+}
 
 void
 nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
 {
     if (c == UWORD(0))
-    {
         nmod_mat_zero(B);
-    }
     else if (c == UWORD(1))
-    {
         nmod_mat_set(B, A);
-    }
     else if (c == A->mod.n - UWORD(1))
-    {
         nmod_mat_neg(B, A);
-    }
-    else if (A->r * A->c > 10 && A->mod.n < UWORD_HALF)
+    else if (A->r * A->c >= FLINT_MULMOD_SHOUP_THRESHOLD && A->mod.norm > 0)
     {
-        slong i, j;
-        ulong w_pr = n_mulmod_precomp_shoup(c, A->mod.n);
-
-        for (i = 0; i < A->r; i++)
-            for (j = 0; j < A->c; j++)
-                nmod_mat_entry(B, i, j) = n_mulmod_shoup(
-                    c, nmod_mat_entry(A, i, j), w_pr, A->mod.n);
+        const ulong c_pr = n_mulmod_precomp_shoup(c, A->mod.n);
+        _nmod_mat_scalar_mul_precomp(B, A, c, c_pr);
     }
     else
-    {
-        slong i, j;
-
-        for (i = 0; i < A->r; i++)
-            for (j = 0; j < A->c; j++)
-                nmod_mat_entry(B, i, j) = n_mulmod2_preinv(
-                    nmod_mat_entry(A, i, j), c, A->mod.n, A->mod.ninv);
-    }
+        _nmod_mat_scalar_mul_generic(B, A, c);
 }
 
+
 void
-nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
+nmod_mat_scalar_mul_fmpz(nmod_mat_t B, const nmod_mat_t A, const fmpz_t c)
 {
-    nmod_mat_scalar_mul(res, M, fmpz_get_nmod(c, res->mod));
+    nmod_mat_scalar_mul(B, A, fmpz_get_nmod(c, B->mod));
 }

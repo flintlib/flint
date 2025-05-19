@@ -51,6 +51,28 @@ GR_INLINE truth_t truth_not(truth_t x)
     return T_UNKNOWN;
 }
 
+GR_INLINE truth_t gr_in_domain(int status)
+{
+    if (status == GR_SUCCESS)
+	return T_TRUE;
+    else if (status & GR_UNABLE)
+	return T_UNKNOWN;
+    else if (status & GR_DOMAIN)
+	return T_FALSE;
+    else
+	return T_UNKNOWN;
+}
+
+GR_INLINE int gr_check(truth_t t)
+{
+    if (t == T_TRUE)
+	return GR_SUCCESS;
+    else if (t == T_FALSE)
+	return GR_DOMAIN;
+    else
+	return GR_UNABLE;
+}
+
 GR_INLINE void truth_println(truth_t x)
 {
     if (x == T_TRUE) flint_printf("T_TRUE\n");
@@ -63,11 +85,11 @@ void gr_stream_init_file(gr_stream_t out, FILE * fp);
 #endif
 
 void gr_stream_init_str(gr_stream_t out);
-void gr_stream_write(gr_stream_t out, const char * s);
-void gr_stream_write_si(gr_stream_t out, slong x);
-void gr_stream_write_ui(gr_stream_t out, ulong x);
-void gr_stream_write_free(gr_stream_t out, char * s);
-void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
+int gr_stream_write(gr_stream_t out, const char * s);
+int gr_stream_write_si(gr_stream_t out, slong x);
+int gr_stream_write_ui(gr_stream_t out, ulong x);
+int gr_stream_write_free(gr_stream_t out, char * s);
+int gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
 #define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
@@ -123,6 +145,7 @@ typedef enum
 
     GR_METHOD_RANDTEST,
     GR_METHOD_RANDTEST_NOT_ZERO,
+    GR_METHOD_RANDTEST_INVERTIBLE,
     GR_METHOD_RANDTEST_SMALL,
 
     GR_METHOD_ZERO,
@@ -279,6 +302,7 @@ typedef enum
     GR_METHOD_SGN,
     GR_METHOD_CSGN,
     GR_METHOD_ARG,
+    GR_METHOD_CANONICAL_ASSOCIATE,
 
     GR_METHOD_POS_INF,
     GR_METHOD_NEG_INF,
@@ -651,6 +675,8 @@ typedef enum
     GR_METHOD_MAT_LOG,
     GR_METHOD_MAT_FIND_NONZERO_PIVOT,
     GR_METHOD_MAT_DIAGONALIZATION,
+    GR_METHOD_MAT_CHARPOLY,
+    GR_METHOD_MAT_REDUCE_ROW,
 
     GR_METHOD_TAB_SIZE
 }
@@ -685,6 +711,7 @@ typedef enum
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
+    GR_CTX_GR_FRACTION,
     GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
     GR_CTX_GR_MAT,
     GR_CTX_GR_VEC,
@@ -952,6 +979,7 @@ GR_INLINE void _gr_length(gr_srcptr x, gr_ctx_t ctx) { _GR_GET_SI_OP(ctx, LENGTH
 
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_INVERTIBLE)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_SMALL)(x, state, ctx); }
 GR_INLINE /* todo: warn? */ int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
 GR_INLINE /* todo: warn? */ int gr_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx) { return GR_STREAM_IN_SI(ctx, WRITE_N)(out, x, n, ctx); }
@@ -1097,6 +1125,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { 
 GR_INLINE WARN_UNUSED_RESULT int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SGN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CSGN)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_arg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ARG)(res, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_canonical_associate(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx) { return GR_BINARY_UNARY_OP(ctx, CANONICAL_ASSOCIATE)(res1, res2, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_pos_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, POS_INF)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_neg_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_INF)(res, ctx); }
@@ -1401,6 +1430,13 @@ void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const o
 #ifdef FMPZ_MPOLY_Q_H
 void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
+
+/* Generic fractions */
+
+#define GR_FRACTION_NO_REDUCTION        1
+#define GR_FRACTION_STRONGLY_CANONICAL  2
+
+void gr_ctx_init_gr_fraction(gr_ctx_t ctx, gr_ctx_t domain, int flags);
 
 /* Generic series */
 /* TODO: move parts of this to its own module */

@@ -16,8 +16,5 @@ void
 arb_mat_clear(arb_mat_t mat)
 {
     if (mat->entries != NULL)
-    {
         _arb_vec_clear(mat->entries, mat->r * mat->c);
-        flint_free(mat->rows);
-    }
 }

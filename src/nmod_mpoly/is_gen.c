@@ -15,6 +15,9 @@
 int nmod_mpoly_is_gen(const nmod_mpoly_t A,
                                          slong var, const nmod_mpoly_ctx_t ctx)
 {
+    if (ctx->mod.n == UWORD(1))
+        return 1;
+
     if (A->length != WORD(1))
         return 0;
 

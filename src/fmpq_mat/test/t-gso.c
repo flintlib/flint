@@ -53,7 +53,7 @@ TEST_FUNCTION_START(fmpq_mat_gso, state)
 
                 if (m)
                 {
-                   _fmpq_vec_dot(dot, C->rows[j], C->rows[k], m);
+                   _fmpq_vec_dot(dot, fmpq_mat_entry(C, j, 0), fmpq_mat_entry(C, k, 0), m);
 
                    if (!fmpq_is_zero(dot))
                    {

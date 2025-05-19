@@ -14,12 +14,15 @@
 #include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mat.h"
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
 
 typedef struct {
-    fmpz ** Mrows;
-    fmpz * const * Arows;
+    fmpz * M;
+    slong Mstride;
+    const fmpz * A;
+    slong Astride;
     slong c;
     const fmpz_mod_ctx_struct * ctx;
 } _worker_arg;
@@ -27,7 +30,7 @@ typedef struct {
 static void _red_worker(slong i, void * varg)
 {
     _worker_arg * arg = (_worker_arg *) varg;
-    _fmpz_mod_vec_set_fmpz_vec(arg->Mrows[i], arg->Arows[i], arg->c, arg->ctx);
+    _fmpz_mod_vec_set_fmpz_vec(arg->M + i * arg->Mstride, arg->A + i * arg->Astride, arg->c, arg->ctx);
 }
 
 static void
@@ -39,7 +42,7 @@ _fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t M, const fmpz_mat_t A, const fmpz_mod_
     c = fmpz_mod_mat_ncols(M, ctx);
 
     for (i = 0; i < r; i++)
-        _fmpz_mod_vec_set_fmpz_vec(M->rows[i], A->rows[i], c, ctx);
+        _fmpz_mod_vec_set_fmpz_vec(fmpz_mod_mat_row(M, i), fmpz_mat_row(A, i), c, ctx);
 }
 
 void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t M, const fmpz_mat_t A, const fmpz_mod_ctx_t ctx)
@@ -63,8 +66,10 @@ void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t M, const fmpz_mat_t A, const fmpz_
     {
         _worker_arg arg;
 
-        arg.Mrows = M->rows;
-        arg.Arows = A->rows;
+        arg.M = M->entries;
+        arg.Mstride = M->stride;
+        arg.A = A->entries;
+        arg.Astride = A->stride;
         arg.c = c;
         arg.ctx = ctx;
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
 
     This file is part of FLINT.
@@ -26,8 +26,10 @@ TEMPLATE(T, mat_sub) (TEMPLATE(T, mat_t) res,
         return;
 
     for (i = 0; i < res->r; i++)
-        _TEMPLATE(T, vec_sub) (res->rows[i], mat1->rows[i], mat2->rows[i],
-                               res->c, ctx);
+        _TEMPLATE(T, vec_sub) (TEMPLATE(T, mat_entry)(res, i, 0),
+            TEMPLATE(T, mat_entry)(mat1, i, 0),
+            TEMPLATE(T, mat_entry)(mat2, i, 0),
+            res->c, ctx);
 }
 
 

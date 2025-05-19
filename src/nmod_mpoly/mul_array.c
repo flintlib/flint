@@ -14,9 +14,8 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-/* Currently we do not -funroll-loops by default in the nmod_mpoly module,
-   but it is worthwhile for the functions in this file. */
-#pragma GCC optimize("-funroll-loops")
+PUSH_OPTIONS
+OPTIMIZE_UNROLL_LOOPS
 
 /* improve locality */
 #define BLOCK 128
@@ -941,3 +940,5 @@ int nmod_mpoly_mul_array(nmod_mpoly_t A, const nmod_mpoly_t B,
     TMP_END;
     return success;
 }
+
+POP_OPTIONS

@@ -21,5 +21,5 @@ void fmpz_mod_mat_sub(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_m
 
     if (c != 0)
         for (i = 0; i < r; i++)
-            _fmpz_mod_vec_sub(C->rows[i], A->rows[i], B->rows[i], c, ctx);
+            _fmpz_mod_vec_sub(fmpz_mod_mat_row(C, i), fmpz_mod_mat_row(A, i), fmpz_mod_mat_row(B, i), c, ctx);
 }

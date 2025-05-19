@@ -18,14 +18,14 @@
 #define FMPZ_MPOLY_Q_INLINE static inline
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mpoly.h"
 #include "acb_types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define fmpz_mpoly_q_numref(x) (&((x)->num))
 #define fmpz_mpoly_q_denref(x) (&((x)->den))

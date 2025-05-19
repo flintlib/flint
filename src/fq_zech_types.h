@@ -51,7 +51,7 @@ typedef struct
     fq_zech_struct * entries;
     slong r;
     slong c;
-    fq_zech_struct ** rows;
+    slong stride;
 }
 fq_zech_mat_struct;
 

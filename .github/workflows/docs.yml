@@ -15,9 +15,9 @@ on:
       - '.github/workflows/docs.yml'
 
 jobs:
-  ##############################################################################
+  #############################################################################
   # build documentation
-  ##############################################################################
+  #############################################################################
   build-doc:
     name: Push documentation to website
     if: github.repository == 'flintlib/flint'
@@ -29,7 +29,10 @@ jobs:
 
       - name: "Setup"
         run: |
+          sudo apt-get update
           sudo apt-get install -y python3-sphinx
+          # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
+          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk
           sphinx-build --version
 
       - name: "Build documentation"
@@ -37,23 +40,20 @@ jobs:
           cd doc
           make html SPHINXOPTS="-W -j auto"
 
-      - name: "Build pdf documentation"
-        uses: dante-ev/latex-action@latest
-        with:
-          root_file:
-          compiler:
-          args:
-          entrypoint: doc/entrypoint.sh
+      - name: "Build PDF documentation"
+        run: |
+          cd doc
+          make latexpdf SPHINXOPTS="-W -j auto"
 
       - name: "Create a tarball of the documentation"
         run: |
           cd doc/build
           mv html doc
-          cp latex/Flint.pdf doc
+          cp latex/flint.pdf doc
           tar -czvf doc.tar.gz doc
 
       - name: "Setup SSH key"
-        uses: shimataro/ssh-key-action@v2.5.0
+        uses: shimataro/ssh-key-action@v2.7.0
         with:
           key: ${{ secrets.SSH_KEY }}
           name: id_ed25519

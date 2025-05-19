@@ -116,9 +116,12 @@ void _nmod_vec_sub(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod);
 
 void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+void _nmod_vec_scalar_mul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
 void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
 
 /* ---- compute dot parameters ---- */
@@ -158,18 +161,31 @@ typedef struct
         if (len == fixedlen)                                      \
         {                                                         \
             if (mod.n <= UWORD(onelimb_bnd))                      \
-                return (dot_params_t) {_DOT1, UWORD(0)};          \
+            {                                                     \
+                dot_params_t params = {_DOT1, UWORD(0)};          \
+                return params;                                    \
+            }                                                     \
             if (mod.n <= UWORD(twolimb_bnd))                      \
-                return (dot_params_t) {_DOT2, UWORD(0)};          \
-            return (dot_params_t) {_DOT3, UWORD(0)};              \
+            {                                                     \
+                dot_params_t params = {_DOT2, UWORD(0)};          \
+                return params;                                    \
+            }                                                     \
+            dot_params_t params = {_DOT3, UWORD(0)};              \
+            return params;                                        \
         }
 
 FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 {
     if (len == 0 || mod.n == 1)
-        return (dot_params_t) {_DOT0, UWORD(0)};
+    {
+        dot_params_t params = {_DOT0, UWORD(0)};
+        return params;
+    }
     if ((mod.n & (mod.n - 1)) == 0)
-        return (dot_params_t) {_DOT_POW2, UWORD(0)};
+    {
+        dot_params_t params = {_DOT_POW2, UWORD(0)};
+        return params;
+    }
     // from here on len >= 1, n > 1 not power of 2
 
     // short dot products: we use only _DOT1, _DOT2, _DOT3 in that case
@@ -202,8 +218,12 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 #endif  // FLINT_BITS == 64
         // remains len == 1
         if (mod.n <= (UWORD(1) << FLINT_BITS / 2))
-            return (dot_params_t) {_DOT1, UWORD(0)};
-        return (dot_params_t) {_DOT2, UWORD(0)};
+        {
+            dot_params_t params = {_DOT1, UWORD(0)};
+            return params;
+        }
+        dot_params_t params = {_DOT2, UWORD(0)};
+        return params;
     }
 
     if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
@@ -212,7 +232,10 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         ulong u1, u0;
         umul_ppmm(u1, u0, t0, len);
         if (u1 == 0)  // 1 limb
-            return (dot_params_t) {_DOT1, UWORD(0)};
+        {
+            dot_params_t params = {_DOT1, UWORD(0)};
+            return params;
+        }
 
         // u1 != 0 <=> 2 limbs
 #if (FLINT_BITS == 64) // _SPLIT: see end of file for these constraints
@@ -220,10 +243,12 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         {
             ulong pow2_precomp;
             NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
-            return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
+            dot_params_t params = {_DOT2_SPLIT, pow2_precomp};
+            return params;
         }
 #endif
-        return (dot_params_t) {_DOT2_HALF, UWORD(0)};
+        dot_params_t params = {_DOT2_HALF, UWORD(0)};
+        return params;
     }
     // from here on, mod.n > 2**(FLINT_BITS / 2)
     // --> unreduced dot cannot fit in 1 limb
@@ -235,7 +260,10 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
 
     if (t2 == 0) // 2 limbs
-        return (dot_params_t) {_DOT2, UWORD(0)};
+    {
+        dot_params_t params = {_DOT2, UWORD(0)};
+        return params;
+    }
 
     // 3 limbs:
 #if (FLINT_BITS == 64)
@@ -243,9 +271,13 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 #else
     if (mod.n <= UWORD(1518500250))           // room for accumulating 8 terms
 #endif
-        return (dot_params_t) {_DOT3_ACC, UWORD(0)};
+    {
+        dot_params_t params = {_DOT3_ACC, UWORD(0)};
+        return params;
+    }
 
-    return (dot_params_t) {_DOT3, UWORD(0)};
+    dot_params_t params = {_DOT3, UWORD(0)};
+    return params;
 }
 
 #undef _FIXED_LEN_MOD_BOUNDS

@@ -191,19 +191,19 @@ to have a non-trivial content.
     Sets `f` to a random polynomial with coefficients up to the given
     length and where each coefficient has up to the given number of bits.
     The coefficients are signed randomly.  One must call
-    :func:`flint_randinit` before calling this function.
+    :func:`flint_rand_init` before calling this function.
 
 .. function:: void fmpq_poly_randtest_unsigned(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with coefficients up to the given length
     and where each coefficient has up to the given number of bits.  One must
-    call :func:`flint_randinit` before calling this function.
+    call :func:`flint_rand_init` before calling this function.
 
 .. function:: void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     As for :func:`fmpq_poly_randtest` except that ``len`` and ``bits``
     may not be zero and the polynomial generated is guaranteed not to be the
-    zero polynomial.  One must call :func:`flint_randinit` before calling
+    zero polynomial.  One must call :func:`flint_rand_init` before calling
     this function.
 
 

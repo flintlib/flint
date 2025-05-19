@@ -11,6 +11,9 @@
 
 #include "arb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 static void
 arf_shallow_set_siui(arf_t res, ulong vhi, ulong vlo)
 {
@@ -110,3 +113,5 @@ arb_dot_siui(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
 
     TMP_END;
 }
+
+POP_OPTIONS

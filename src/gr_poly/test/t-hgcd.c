@@ -124,9 +124,13 @@ TEST_FUNCTION_START(gr_poly_hgcd, state)
 
             __mul(s->coeffs, s->length, M[0], lenM[0], a->coeffs, a->length);
             __mul(t->coeffs, t->length, M[1], lenM[1], b->coeffs, b->length);
+            _gr_poly_normalise(s, ctx);
+            _gr_poly_normalise(t, ctx);
             status |= gr_poly_add(c1, s, t, ctx);
             __mul(s->coeffs, s->length, M[2], lenM[2], a->coeffs, a->length);
             __mul(t->coeffs, t->length, M[3], lenM[3], b->coeffs, b->length);
+            _gr_poly_normalise(s, ctx);
+            _gr_poly_normalise(t, ctx);
             status |= gr_poly_add(d1, s, t, ctx);
         }
 

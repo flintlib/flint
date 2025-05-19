@@ -12,7 +12,14 @@
 
 #include "ulong_extras.h"
 
-#if defined(__GNUC__) && FLINT64 && defined(__aarch64__)
+/* The following checks whether the `rbit' instruction is available [1].
+ *
+ * [1]: Section 8.2.1 in https://github.com/ARM-software/acle/releases/download/r2024Q4/acle-2024Q4.pdf. */
+#if (__ARM_ARCH >= 6 && __ARM_ISA_THUMB >= 2) || __ARM_ARCH >= 7
+# define HAVE_RBIT 1
+#endif
+
+#if FLINT64 && __ARM_ACLE && HAVE_RBIT
 # include <arm_acle.h>
 ulong
 n_revbin(ulong n, ulong b)

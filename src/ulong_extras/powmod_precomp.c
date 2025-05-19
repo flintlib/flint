@@ -40,7 +40,7 @@ n_powmod_precomp(ulong a, slong exp, ulong n, double npre)
     if (exp < 0)
     {
         a = n_invmod(a, n);
-        exp = -exp;
+        exp = -(ulong) exp;
     }
 
     return n_powmod_ui_precomp(a, exp, n, npre);

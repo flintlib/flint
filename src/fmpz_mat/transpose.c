@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2025 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -9,34 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void
 fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    fmpz tmp;
-    slong i, j;
-
-    if (B->r != A->c || B->c != A->r)
-    {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_transpose). Incompatible dimensions.\n");
-    }
-
-    if (A == B)  /* In-place, guaranteed to be square */
-    {
-        for (i = 0; i < A->r - 1; i++)
-            for (j = i + 1; j < A->c; j++)
-            {
-                tmp = A->rows[i][j];
-                A->rows[i][j] = A->rows[j][i];
-                A->rows[j][i] = tmp;
-            }
-    }
-    else  /* Not aliased; general case */
-    {
-        for (i = 0; i < B->r; i++)
-            for (j = 0; j < B->c; j++)
-                fmpz_set(&B->rows[i][j], &A->rows[j][i]);
-    }
+    gr_ctx_t gr_ctx;
+    gr_ctx_init_fmpz(gr_ctx);
+    GR_MUST_SUCCEED(gr_mat_transpose((gr_mat_struct *)B, (const gr_mat_struct *) A, gr_ctx));
 }

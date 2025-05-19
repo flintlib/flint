@@ -16,7 +16,6 @@ int
 acb_mat_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
 {
     acb_t d, e;
-    acb_ptr * a;
     slong i, j, m, n, r, row, col;
     int result;
 
@@ -27,8 +26,6 @@ acb_mat_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
     n = acb_mat_ncols(A);
 
     acb_mat_set(LU, A);
-
-    a = LU->rows;
 
     row = col = 0;
     for (i = 0; i < m; i++)
@@ -51,16 +48,16 @@ acb_mat_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
         else if (r != row)
             acb_mat_swap_rows(LU, P, row, r);
 
-        acb_set(d, a[row] + col);
+        acb_set(d, acb_mat_entry(LU, row, col));
 
         for (j = row + 1; j < m; j++)
         {
-            acb_div(e, a[j] + col, d, prec);
+            acb_div(e, acb_mat_entry(LU, j, col), d, prec);
             acb_neg(e, e);
-            _acb_vec_scalar_addmul(a[j] + col,
-                a[row] + col, n - col, e, prec);
-            acb_zero(a[j] + col);
-            acb_neg(a[j] + row, e);
+            _acb_vec_scalar_addmul(acb_mat_entry(LU, j, col),
+                acb_mat_entry(LU, row, col), n - col, e, prec);
+            acb_zero(acb_mat_entry(LU, j, col));
+            acb_neg(acb_mat_entry(LU, j, row), e);
         }
 
         row++;

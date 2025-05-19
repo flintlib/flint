@@ -28,9 +28,12 @@ typedef struct {
     slong Bstoprow;
     slong Cstartrow;
     slong Cstoprow;
-    fmpz ** Arows;
-    fmpz ** Brows;
-    fmpz ** Crows;
+    fmpz * Aentries;
+    slong Astride;
+    fmpz * Bentries;
+    slong Bstride;
+    fmpz * Centries;
+    slong Cstride;
     nmod_mat_t * mod_A;
     nmod_mat_t * mod_B;
     nmod_mat_t * mod_C;
@@ -51,8 +54,10 @@ static void _mod_worker(void * varg)
     slong Astoprow = arg->Astoprow;
     slong Bstartrow = arg->Bstartrow;
     slong Bstoprow = arg->Bstoprow;
-    fmpz ** Arows = arg->Arows;
-    fmpz ** Brows = arg->Brows;
+    fmpz * Aentries = arg->Aentries;
+    slong Astride = arg->Astride;
+    fmpz * Bentries = arg->Bentries;
+    slong Bstride = arg->Bstride;
     nmod_mat_t * mod_A = arg->mod_A;
     nmod_mat_t * mod_B = arg->mod_B;
     slong num_primes = arg->num_primes;
@@ -70,9 +75,9 @@ static void _mod_worker(void * varg)
         {
             for (j = 0; j < k; j++)
             {
-                fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
+                fmpz_multi_mod_ui(residues, Aentries + i * Astride + j, comb, comb_temp);
                 for (l = 0; l < num_primes; l++)
-                    mod_A[l]->rows[i][j] = residues[l];
+                    nmod_mat_entry(mod_A[l], i, j) = residues[l];
             }
         }
 
@@ -82,9 +87,9 @@ static void _mod_worker(void * varg)
             {
                 for (j = 0; j < n; j++)
                 {
-                    fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
+                    fmpz_multi_mod_ui(residues, Bentries + i * Bstride + j, comb, comb_temp);
                     for (l = 0; l < num_primes; l++)
-                        mod_B[l]->rows[i][j] = residues[l];
+                        nmod_mat_entry(mod_B[l], i, j) = residues[l];
                 }
             }
         }
@@ -99,7 +104,7 @@ static void _mod_worker(void * varg)
             for (j = 0; j < k; j++)
             {
                 for (l = 0; l < num_primes; l++)
-                    nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(&Arows[i][j],
+                    nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(Aentries + i * Astride + j,
                                                                     mod_A[l]->mod);
             }
         }
@@ -111,7 +116,7 @@ static void _mod_worker(void * varg)
                 for (j = 0; j < n; j++)
                 {
                     for (l = 0; l < num_primes; l++)
-                        nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(&Brows[i][j],
+                        nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(Bentries + i * Bstride + j,
                                                                         mod_A[l]->mod);
                 }
             }
@@ -126,7 +131,8 @@ static void _crt_worker(void * varg)
     slong n = arg->n;
     slong Cstartrow = arg->Cstartrow;
     slong Cstoprow = arg->Cstoprow;
-    fmpz ** Crows = arg->Crows;
+    fmpz * Centries = arg->Centries;
+    slong Cstride = arg->Cstride;
     nmod_mat_t * mod_C = arg->mod_C;
     ulong * primes = arg->primes;
     slong num_primes = arg->num_primes;
@@ -147,9 +153,9 @@ static void _crt_worker(void * varg)
         for (j = 0; j < n; j++)
         {
             for (l = 0; l < num_primes; l++)
-                residues[l] = mod_C[l]->rows[i][j];
+                residues[l] = nmod_mat_entry(mod_C[l], i, j);
 
-            fmpz_multi_CRT_ui(&Crows[i][j], residues, comb, comb_temp, sign);
+            fmpz_multi_CRT_ui(Centries + i * Cstride + j, residues, comb, comb_temp, sign);
         }
 
         flint_free(residues);
@@ -167,9 +173,9 @@ static void _crt_worker(void * varg)
                 r = nmod_mat_entry(mod_C[0], i, j);
                 t = p - r;
                 if (t < r)
-                    fmpz_neg_ui(&Crows[i][j], t);
+                    fmpz_neg_ui(Centries + i * Cstride + j, t);
                 else
-                    fmpz_set_ui(&Crows[i][j], r);
+                    fmpz_set_ui(Centries + i * Cstride + j, r);
             }
         }
         else
@@ -178,7 +184,7 @@ static void _crt_worker(void * varg)
             for (j = 0; j < n; j++)
             {
                 r = nmod_mat_entry(mod_C[0], i, j);
-                fmpz_set_ui(&Crows[i][j], r);
+                fmpz_set_ui(Centries + i * Cstride + j, r);
             }
         }
     }
@@ -219,13 +225,13 @@ static void _crt_worker(void * varg)
             {
                 sub_ddmmss(u[1], u[0], M[1], M[0], t[1], t[0]);
                 if (u[1] < t[1] || (u[1] == t[1] && u[0] < t[0]))
-                    fmpz_neg_uiui(&Crows[i][j], u[1], u[0]);
+                    fmpz_neg_uiui(Centries + i * Cstride + j, u[1], u[0]);
                 else
-                    fmpz_set_uiui(&Crows[i][j], t[1], t[0]);
+                    fmpz_set_uiui(Centries + i * Cstride + j, t[1], t[0]);
             }
             else
             {
-                fmpz_set_uiui(&Crows[i][j], t[1], t[0]);
+                fmpz_set_uiui(Centries + i * Cstride + j, t[1], t[0]);
             }
         }
     }
@@ -283,12 +289,12 @@ static void _crt_worker(void * varg)
 
             if (sign && (mpn_sub_n(U, M, T, Msize), mpn_cmp(U, T, Msize) < 0))
             {
-                fmpz_set_ui_array(&Crows[i][j], U, Msize);
-                fmpz_neg(&Crows[i][j], &Crows[i][j]);
+                fmpz_set_ui_array(Centries + i * Cstride + j, U, Msize);
+                fmpz_neg(Centries + i * Cstride + j, Centries + i * Cstride + j);
             }
             else
             {
-                fmpz_set_ui_array(&Crows[i][j], T, Msize);
+                fmpz_set_ui_array(Centries + i * Cstride + j, T, Msize);
             }
         }
 
@@ -322,9 +328,12 @@ void _fmpz_mat_mul_multi_mod(
     mainarg.m = m = A->r;
     mainarg.k = k = A->c;
     mainarg.n = n = B->c;
-    mainarg.Arows = A->rows;
-    mainarg.Brows = B->rows;
-    mainarg.Crows = C->rows;
+    mainarg.Aentries = A->entries;
+    mainarg.Astride = A->stride;
+    mainarg.Bentries = B->entries;
+    mainarg.Bstride = B->stride;
+    mainarg.Centries = C->entries;
+    mainarg.Cstride = C->stride;
 
     if (m < 1 || n < 1 || k < 1)
     {

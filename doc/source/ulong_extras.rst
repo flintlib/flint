@@ -596,19 +596,163 @@ Modular Arithmetic
     ``m`` then 0 is returned by the function and the location ``sqrt``
     points to is set to NULL.
 
-.. function:: ulong n_mulmod_shoup(ulong w, ulong t, ulong w_precomp, ulong p)
 
-    Returns `w t \bmod{p}` given a precomputed scaled approximation of `w / p`
-    computed by :func:`n_mulmod_precomp_shoup`. The value of `p` should be
-    less than `2^{\mathtt{FLINT\_BITS} - 1}`. `w` and `t` should be less than `p`.
-    Works faster than :func:`n_mulmod2_preinv` if `w` fixed and `t` from array
-    (for example, scalar multiplication of vector).
+Modular Arithmetic with Fixed Operand
+--------------------------------------------------------------------------------
 
-.. function:: ulong n_mulmod_precomp_shoup(ulong w, ulong p)
+This is about computing several modular multiplications where one operand and
+the modulus are fixed, that is, computing `a b_i \bmod n` for several `b_i`'s
+and fixed `a` and `n`. Most functions below require `a < n <
+2^{\mathtt{FLINT\_BITS} - 1}` but have no constraint on `b_i` (it can be `\ge
+n`).
 
-    Returns `w'`, scaled approximation of `w / p`. `w'`  is equal to the integer
-    part of `w \cdot 2^{\mathtt{FLINT\_BITS}} / p`.
+Some explanations about the method can be found after the functions
+descriptions. This has been introduced in NTL and is attributed to Victor
+Shoup. For references, see
 
+- NTL code (in particular file FFT.cpp, consulted in NTL v11.5.1);
+
+- David Harvey, Faster arithmetic for number-theoretic transforms, 2014 J.Symbolic Computation (http://dx.doi.org/10.1016/j.jsc.2013.09.002);
+
+- Victor Shoup, "Arithmetic Software Libraries", 2021 (https://doi.org/10.1017/9781108854207.012) (chapter 9 of the book https://doi.org/10.1017/9781108854207).
+
+.. function:: ulong n_mulmod_precomp_shoup(ulong a, ulong n)
+
+    Returns ``a_precomp``, a scaled approximation of `a / n`. This requires `a
+    < n`. Precisely, ``a_precomp``  is the integer `\lfloor a \cdot
+    2^{\mathtt{FLINT\_BITS}} / n \rfloor`, and is intended to be used as the
+    precomputed data for :func:`n_mulmod_shoup`, which requires `n <
+    2^{\mathtt{FLINT\_BITS} - 1}`.
+
+.. function:: void n_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n)
+
+     Sets ``a_pr_quo`` to the above scaled approximation of `\lfloor a \cdot
+     2^{\mathtt{FLINT\_BITS}} / n \rfloor`, which is the quotient in the integer
+     division of `a \cdot 2^{\mathtt{FLINT\_BITS}}` by `n`, and also sets
+     ``a_pr_rem`` to the remainder in this division. This requires `a < n` and
+     is intended to be used as the precomputed data for
+     :func:`n_mulmod_and_precomp_shoup`, which requires `n <
+     2^{\mathtt{FLINT\_BITS} - 1}`.
+
+.. function:: ulong n_mulmod_precomp_shoup_rem_from_quo(ulong a_pr_quo, ulong n)
+
+    Returns the remainder in the integer division of `a \cdot
+    2^{\mathtt{FLINT\_BITS}}` by `n`. This requires `a < n` and is intended to
+    be used as the precomputed data for :func:`n_mulmod_and_precomp_shoup`,
+    which requires `n < 2^{\mathtt{FLINT\_BITS} - 1}`. This is faster than
+    :func:`n_mulmod_precomp_shoup_quo_rem` when ``a_pr_quo`` is already known.
+
+.. function:: ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
+
+    Returns `a b \bmod n` given ``a_precomp``, a precomputed scaled
+    approximation of `a / n` equal to `\lfloor a \cdot 2^{\mathtt{FLINT\_BITS}}
+    / n \rfloor`. This requires `n < 2^{\mathtt{FLINT\_BITS} - 1}` and `a < n`,
+    there is no restriction on `b`. Works faster than other ``mulmod``
+    routines (e.g. :func:`n_mulmod2_preinv`) in situations where one repeats
+    modular multiplications with fixed `a` and `n` and several values of `b`'s,
+    which amortizes the time for precomputing ``a_precomp``. Examples are
+    scalar multiplication of vectors such as :func:`_nmod_vec_scalar_mul_nmod`
+    or of matrices such as :func:`nmod_mat_scalar_mul`.
+
+.. function:: void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp, \
+                             ulong a, ulong b,                                \
+                             ulong a_pr_quo, ulong a_pr_rem, ulong b_precomp, \
+                             ulong n)
+
+    Sets ``ab`` to `a b \bmod n` and sets ``ab_precomp`` to the precomputed
+    scaled approximation for ``ab / n``, that is, `\lfloor (ab \bmod n) \cdot
+    2^{\mathtt{FLINT\_BITS}} / n \rfloor`. This requires `n <
+    2^{\mathtt{FLINT\_BITS} - 1}`, `a < n`, and `b < n`. The input ``a_pr_quo``
+    and ``a_pr_rem`` is as in the description of
+    :func:`n_mulmod_precomp_shoup_quo_rem`, and ``b_precomp`` is as in the
+    description of :func:`n_mulmod_precomp_shoup`. This can be used for example
+    when seeking a list of powers `[a \bmod n, a^2 \bmod n, a^3 \bmod n,
+    \ldots]` along with associated precomputed data to speed up repeated
+    modular multiplications by these fixed powers.
+
+Here are some explanations. Let `B = \mathtt{FLINT\_BITS}`, and `W = 2^B`. We have as input
+`a, b, n`, and the goal is mainly to output `ab \bmod n`. Constraints are: `a <
+n`, and `n` has `< B` bits, i.e. `0 \le a < n < 2^{B-1}`. There is no
+restriction on b.
+
+This is intended for repeated multiplications with fixed `a` and `n`, and
+varying `b`; hence the initial step is seen as a precomputation (it
+depends on `a` and `n` only).
+
+**Precomputation step:**  The main function is ``n_mulmod_precomp_shoup``,
+which computes `\mathtt{a\_precomp} = \lfloor a W / n \rfloor`. The requirement
+`a < n` ensures ``a_precomp`` fits in a word (i.e. `\mathtt{a\_precomp} < W`).
+The variant ending in ``_quo_rem`` computes the same quotient
+`\mathtt{a\_pr\_quo} = \mathtt{a\_precomp}` but also stores the remainder
+`\mathtt{a\_pr\_rem}` in the division of `a W` by `n`; the variant ending in
+``_rem_from_quo`` deduces the remainder from the quotient if the latter is
+already known.
+
+**Modular multiplication:** The main function is ``n_mulmod_shoup``, which
+takes `a, b, \hat{a}, n` as input and returns `ab \bmod n`, where `\hat{a} =
+\mathtt{a\_precomp}`. The steps are:
+
+1. find `\mathtt{p_hi}, \mathtt{p_lo}` such that `\hat{a} b = \mathtt{p_hi} W + \mathtt{p_lo}`     (high part of a double-word multiplication, `\mathtt{p_lo}` will not be used)
+2. compute `c = ab - \mathtt{p_hi} n`                  (two single-word multiplications)
+3. if `c \ge n`, return `c-n`, else return `c`
+
+*Step 1.* One has `\mathtt{p_hi} = \lfloor ab/n \rfloor` or `\mathtt{p_hi} = \lfloor ab/n \rfloor - 1`.
+
+Proof: Write `aW = \hat{a} n + r`, with `0 \le r < n`.  Thus `\frac{\hat{a}
+b}{W} = \frac{ab}{n} - \frac{rb}{nW}`.  So `\mathtt{p_hi} = \lfloor
+\frac{\hat{a} b}{W} \rfloor = \lfloor \frac{ab}{n} - \frac{rb}{nW} \rfloor`.
+Clearly `\mathtt{p_hi} \le \lfloor \frac{ab}{n} \rfloor`. And `rb < nW` (since
+`r < n` and `b < W`) so `-\frac{rb}{nW} > -1`, hence `\mathtt{p_hi} \ge
+\lfloor \frac{ab}{n} \rfloor - 1`.
+
+*Step 2.* It follows that either `c = ab \bmod n` or `c = (ab \bmod n) + n`.
+
+This is where the restriction on `n` comes into play: allowing `n` to have `B`
+bits prevents us from detecting which case we are in (a comparison such as `c
+\ge n` would not tell). Since `n` has `< B` bits, `c \ge n` if and only if `c =
+(ab \bmod n) + n`.
+
+*Step 3.* we use this to detect which case we are in and correct the possible
+excess.
+
+**Combining precomputation and multiplication:** The main function is
+``n_mulmod_and_precomp_shoup``. The goal is to compute not only `ab \bmod n`,
+but also the corresponding quotient `\mathtt{ab\_precomp} = \lfloor (ab \bmod
+n) \cdot W / n \rfloor`. For this we require as input both the precomputed
+quotient and remainder for `a` (that is, ``a_pr_quo`` and ``a_pr_rem``), as
+well as the precomputed quotient for ``b`` (``b_precomp``). This adds the
+constraint that `b < n`.
+
+To simplify notation, write the integer division `aW = \hat{a} n + \check{a}`
+so that `\hat{a} = \mathtt{a\_pr\_quo}` and `\check{a} = \mathtt{a\_pr\_rem}`,
+and similarly for `bW = \hat{b} n + \check{b}` with `\hat{b} =
+\mathtt{b\_precomp}` (we will not use `\check{b}`).
+
+The first three steps follow the above-described approach to compute `ab \bmod
+n` using `\hat{a}` (but this time, the lower part of the double-word
+multiplication is kept):
+
+1. find `d, \hat{c}` such that `\hat{a} b = d W + \hat{c}` (double-word multiplication)
+2. compute `c = a b - d n` (two single-word multiplications)
+3. if `c \ge n` then `c \gets c - n`
+
+At this stage, `c = ab \bmod n`, and `\hat{c} = \hat{a} b \bmod W`. Now suppose
+we have the quotient `q = \lfloor \frac{\check{a} b}{n} \rfloor` in the
+division of `\check{a}b` by `n`. The claim is that `\hat{c} + q` is the sought
+precomputation quotient for `ab \bmod n` up to a multiple of `W`, that is,
+`\hat{c} + q = \lfloor \frac{c W}{n} \rfloor \bmod W`. Indeed, one has `\lfloor
+\frac{c W}{n} \rfloor = \lfloor \frac{ab W}{n} \rfloor \bmod W`, and it remains
+to observe that `\lfloor \frac{ab W}{n} \rfloor = \lfloor
+\frac{(\hat{a}n+\check{a}) b}{n} \rfloor = \hat{a} b + \lfloor \frac{\check{a}
+b}{n} \rfloor = \hat{c} + q \bmod W`.
+
+Therefore the remaining steps consist in computing the quotient `q`, which can
+be done via the modular multiplication of `\check{a}` by `b` using the
+precomputed quotient for `b`:
+
+4. find `q,e` such that `\hat{b} \check{a} = q W + e` (high-part of double word multiplication, `e` will not be used)
+5. compute `h = b \check{a} - q n` (two single-word multiplications)
+6. if `h \ge n` then `q \gets q+1`
 
 Divisibility testing
 --------------------------------------------------------------------------------
@@ -1054,6 +1198,7 @@ Square root and perfect power testing
     values of the coefficient are calculated from the Python module mpmath,
     https://mpmath.org, using the function chebyfit. x is multiplied
     by ``2^exp`` and the cube root of 1, 2 or 4 (according to ``exp%3``).
+    Requires that `n` is nonzero.
 
 .. function:: ulong n_cbrtrem(ulong * remainder, ulong n)
 
@@ -1063,6 +1208,23 @@ Square root and perfect power testing
 
 Factorisation
 --------------------------------------------------------------------------------
+
+.. type:: n_factor_t
+
+    Represents a set of distinct prime factors and their corresponding
+    exponents.
+
+    .. member:: int num
+
+        The number of distinct prime factors.
+
+    .. member:: ulong p[]
+
+        An array containing the distinct prime factors.
+
+    .. member:: int exp[]
+
+        An array containing the corresponding exponents.
 
 .. function:: void n_factor_init(n_factor_t * factors)
 
@@ -1101,9 +1263,7 @@ Factorisation
 
 .. function:: void n_factor_insert(n_factor_t * factors, ulong p, ulong exp)
 
-    Inserts the given prime power factor ``p^exp`` into
-    the ``n_factor_t`` ``factors``. See the documentation for
-    :func:`n_factor_trial` for a description of the ``n_factor_t`` type.
+    Inserts the given prime power factor ``p^exp`` into ``factors``.
 
     The algorithm performs a simple search to see if `p` already
     exists as a prime factor in the structure. If so the exponent
@@ -1122,11 +1282,6 @@ Factorisation
     will be added by default to an already used ``n_factor_t``. Use
     the function :func:`n_factor_init` defined in ``ulong_extras`` if
     initialisation has not already been completed on factors.
-
-    Once completed, ``num`` will contain the number of distinct
-    prime factors found. The field `p` is an array of ``ulong``\s
-    containing the distinct prime factors, ``exp`` an array
-    containing the corresponding exponents.
 
     The return value is the unfactored cofactor after trial
     factoring is done.
@@ -1210,9 +1365,6 @@ Factorisation
     However, in future, this flag may produce and separately check
     a primality certificate. This may be quite slow (and probably no
     less reliable in practice).
-
-    For details on the ``n_factor_t`` structure, see
-    :func:`n_factor_trial`.
 
     This function first tries trial factoring with a number of primes
     specified by the constant ``FLINT_FACTOR_TRIAL_PRIMES``. If the

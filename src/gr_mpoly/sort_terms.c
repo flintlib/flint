@@ -187,8 +187,10 @@ void _gr_mpoly_radix_sort(
     sort the terms in A by exponent
     assuming that the exponents are valid (other than being in order)
 */
-void gr_mpoly_sort_terms(gr_mpoly_t A, const mpoly_ctx_t mctx, gr_ctx_t cctx)
+void gr_mpoly_sort_terms(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong i, N;
     flint_bitcnt_t pos;
     gr_ptr Acoeffs = A->coeffs;

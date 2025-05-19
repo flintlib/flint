@@ -175,8 +175,8 @@ Flags can be OR'ed and checked only at the top level of a computation
 to avoid complex control flow::
 
     status = GR_SUCCESS;
-    gr |= gr_add(res, a, b, ctx);
-    gr |= gr_pow_ui(res, res, 2, ctx);
+    status |= gr_add(res, a, b, ctx);
+    status |= gr_pow_ui(res, res, 2, ctx);
     ...
 
 If we do not care about recovering from *undefined*/*unknown* results,
@@ -222,6 +222,21 @@ that the value is not computable:
     etc. depending on whether the unknown case should be included
     or excluded.
 
+.. function:: truth_t truth_and(truth_t x, truth_t y)
+              truth_t truth_or(truth_t x, truth_t y)
+              truth_t truth_not(truth_t x)
+
+    Performs the corresponding operation in ternary logic.
+
+.. function:: void truth_println(truth_t x)
+
+.. function:: truth_t gr_in_domain(int status)
+
+   Returns ``T_TRUE`` when ``status`` is ``GR_SUCCESS``, ``T_FALSE`` when ``GR_DOMAIN`` is set but ``GR_UNABLE`` is not, and ``T_UNKNOWN`` otherwise.
+
+.. function:: int gr_check(truth_t t)
+
+   Maps ``T_TRUE`` to ``GR_SUCCESS``, ``T_FALSE`` to ``GR_DOMAIN``, and ``T_UNKNOWN`` to ``GR_UNABLE``.
 
 Context operations
 -------------------------------------------------------------------------------
@@ -365,6 +380,10 @@ Random elements
     The distribution is determined by the implementation.
     Typically the distribution is non-uniform in order to
     find corner cases more easily in test code.
+
+.. function:: int gr_randtest_invertible(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
+
+    Sets *res* to a random invertible element of the domain *ctx*.
 
 .. function:: int gr_randtest_not_zero(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
 
@@ -750,6 +769,12 @@ Greatest common divisors
 
 Factorization
 ........................................................................
+
+.. function:: int gr_canonical_associate(gr_ptr res, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
+
+    Given a commutative ring element *x*, sets *res* to a canonical form
+    `u x` with respect to multiplication by units, also writing the normalizing
+    unit *u* as a second output. If `x = 0`, sets *res* to 0 and *u* to 1.
 
 .. function:: int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 

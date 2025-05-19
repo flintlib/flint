@@ -63,47 +63,56 @@ AC_INIT(FLINT, FLINT_VERSION, [https://github.com/flintlib/flint/issues/], flint
 AC_CONFIG_AUX_DIR([config])
 AC_LANG(C)
 
-# Every major version of Flint (1.0, 1.1, 1.2, etc.) gets
-# a new major soname number.
-
-# Every time a release happens where interfaces are added
-# to Flint, the minor soname number gets incremented.
-
-# Every patch that is made that doesn't change the Flint
-# interface updates the patch number.
-
-# However, if backwards incompatible changes are made, both
-# the minor and patch numbers are set to 0. (Hopefully this
-# doesn't happen in practice.)
-
-# flint => soname
-# 2.5.0 => 13.5.0
-# 2.5.1 => 13.5.1
-# 2.5.2 => 13.5.2
-# 2.6.0 => 14.0.0
-# 2.6.1 => 14.0.1
-# 2.6.2 => 14.0.2
-# 2.6.3 => 14.0.3
-# 2.7.0 => 15.0.0
-# 2.7.1 => 15.0.1
-# 2.8.0 => 16.1.0
-# 2.8.1 => 16.1.1
-# 2.8.2 => 16.1.2
-# 2.8.3 => 16.1.3
-# 2.8.4 => 16.1.4
-# 2.8.5 => 16.1.5
-# 2.9.0 => 17.0.0
-# 3.0.0 => 18.0.0
-# 3.1.0 => 19.0.0
-# 3.2.0 => 20.0.0
+# Every major version of FLINT (1.0, 1.1, 1.2, etc.) gets a new major soname
+# number.
+#
+# Every time a release happens where interfaces are added to FLINT, the minor
+# soname number gets incremented.
+#
+# Every patch that is made that doesn't change the FLINT interface updates the
+# patch number.
+#
+# However, if backwards incompatible changes are made, both the minor and patch
+# numbers are set to 0. (Hopefully this doesn't happen in practice.)
+#
+# Version  => soname
+# 2.5.0    => 13.5.0
+# 2.5.1    => 13.5.1
+# 2.5.2    => 13.5.2
+# 2.6.0    => 14.0.0
+# 2.6.1    => 14.0.1
+# 2.6.2    => 14.0.2
+# 2.6.3    => 14.0.3
+# 2.7.0    => 15.0.0
+# 2.7.1    => 15.0.1
+# 2.8.0    => 16.1.0
+# 2.8.1    => 16.1.1
+# 2.8.2    => 16.1.2
+# 2.8.3    => 16.1.3
+# 2.8.4    => 16.1.4
+# 2.8.5    => 16.1.5
+# 2.9.0    => 17.0.0
+# 3.0.0    => 18.0.0
+# 3.1.0    => 19.0.0
+# 3.1.1    => 19.0.0
+# 3.1.2    => 19.0.0
+# 3.1.3    => 19.0.0
+# 3.1.3-p1 => 19.0.0
+# 3.2.0    => 20.0.0
+# 3.2.1    => 20.0.1
+# 3.3.0    => 21.0.0
 
 # NOTE: This must be after AC_INIT
-FLINT_MAJOR_SO=20
+FLINT_MAJOR_SO=21
 FLINT_MINOR_SO=0
 FLINT_PATCH_SO=0
 
 # Make sure that we are in the right directory
 AC_CONFIG_SRCDIR(src/fmpz/link/fmpz_reentrant.c)
+
+# Ensure that source directory is not already configured, so there are no
+# clashes between different configurations.
+AX_INIT
 
 ################################################################################
 # initialize libtool
@@ -535,7 +544,7 @@ then
     gcc_cflags="-O3 "
 fi
 gcc_cflags="$gcc_cflags-pedantic -std=c11"
-gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
+gcc_warnings="-Werror=implicit-function-declaration -Werror=newline-eof -Wall -Wno-stringop-overread -Wno-stringop-overflow"
 
 dnl We only try to provide specifics for those systems that currently supports
 dnl our assembly routines. If more combinations are wished for than what is
@@ -638,6 +647,10 @@ case $host in
         gcc_cflags_arch="-march=armv8.6-a"
         gcc_cflags_tune=""
         ;;
+      applem4*)
+        gcc_cflags_arch="-march=armv8.7-a"
+        gcc_cflags_tune=""
+        ;;
       aarch64* | armv8*)
         gcc_cflags_arch="-march=armv8-a"
         gcc_cflags_tune=""
@@ -673,13 +686,18 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen3"
         ;;
       zen4)
-        gcc_cflags_arch="-march=znver4 -march=znver3"
-        param_path="x86_64/zen3"
+        gcc_cflags_arch="-march=znver4"
+        param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
-      coreibwl | broadwell)
+      zen5)
+        gcc_cflags_arch="-march=znver5 -march=znver4"
+        param_path="x86_64/zen4"  # fallback, to be refined
+        have_avx512="yes"
+        ;;
+      broadwell)
         gcc_cflags_arch="-march=broadwell"
-        param_path="x86_64/skylake"
+        param_path="x86_64/broadwell"
         ;;
       skylake)
         gcc_cflags_arch="-march=skylake"
@@ -690,55 +708,59 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/skylake"
         have_avx512="yes"
         ;;
-      cannonlake)
-        gcc_cflags_arch="-march=cannonlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
       kabylake)
         gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
-      icelake)
-        gcc_cflags_arch="-march=icelake-client"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      icelake_server)
-        gcc_cflags_arch="-march=icelake-server"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      rocketlake)
-        gcc_cflags_arch="-march=rocketlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      tigerlake)
-        gcc_cflags_arch="-march=tigerlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      alderlake)
-        gcc_cflags_arch="-march=alderlake"
-        param_path="x86_64/skylake"
-        ;;
-      raptorlake)
-        gcc_cflags_arch="-march=alderlake"
+      cometlake)
+        gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
       knightslanding)
         gcc_cflags_arch="-march=knl"
         param_path="x86_64/skylake"
         ;;
-      sapphirerapids)
-        gcc_cflags_arch="-march=sapphirerapids"
-        param_path="x86_64/skylake"
+      cannonlake)
+        gcc_cflags_arch="-march=cannonlake"
+        param_path="x86_64/icelake"  # fallback, to be refined
         have_avx512="yes"
         ;;
-      cometlake)
-        gcc_cflags_arch="-march=kabylake"
-        param_path="x86_64/skylake"
+      icelake)
+        gcc_cflags_arch="-march=icelake-client"
+        param_path="x86_64/icelake"
+        have_avx512="yes"
+        ;;
+      icelake_server)
+        gcc_cflags_arch="-march=icelake-server"
+        param_path="x86_64/icelake"
+        have_avx512="yes"
+        ;;
+      rocketlake)
+        gcc_cflags_arch="-march=rocketlake"
+        param_path="x86_64/icelake"  # fallback, to be refined
+        have_avx512="yes"
+        ;;
+      tigerlake)
+        gcc_cflags_arch="-march=tigerlake"
+        param_path="x86_64/tigerlake"
+        have_avx512="yes"
+        ;;
+      alderlake)
+        gcc_cflags_arch="-march=alderlake"
+        param_path="x86_64/icelake"  # fallback, to be refined
+        ;;
+      raptorlake)
+        gcc_cflags_arch="-march=raptorlake -march=alderlake"
+        param_path="x86_64/raptorlake"
+        ;;
+      meteorlake)
+        gcc_cflags_arch="-march=meteorlake -march=alderlake"
+        param_path="x86_64/meteorlake"
+        ;;
+      sapphirerapids)
+        gcc_cflags_arch="-march=sapphirerapids"
+        param_path="x86_64/icelake"  # fallback, to be refined
+        have_avx512="yes"
         ;;
       *)
         AC_MSG_ERROR([Error in deciding flags for $host.
@@ -753,6 +775,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64"
 	    ;;
 	esac
+
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
 
     if test "$have_avx512" = "yes";
     then
@@ -799,6 +828,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
     esac
 
+    if test "$cflags_set" = "yes";
+    then
+        # We cannot be sure that AVX2 and AVX512 are enabled.
+        have_avx2="no"
+        have_avx512="no"
+    fi
+
     if test "$have_avx512" = "yes";
     then
         have_avx2="yes"
@@ -826,6 +862,9 @@ dnl NOTE: The following line is invoked from LT_INIT
 dnl AC_PROG_CC
 
 AC_PROG_MKDIR_P
+
+FLINT_CC_IS_GCC
+FLINT_CC_IS_CLANG
 
 ################################################################################
 # environment variables
@@ -1150,6 +1189,8 @@ AC_SUBST(PIC_FLAG,$pic_flag)
 
 FLINT_CHECK_CPU_SET_T([AC_DEFINE([FLINT_USES_CPUSET],1,Define if system has cpu_set_t)])
 
+FLINT_CHECK_PRAGMAS
+
 # ensure alloca works
 AC_MSG_CHECKING([if alloca works])
 AC_LINK_IFELSE([AC_LANG_PROGRAM(
@@ -1178,9 +1219,12 @@ AC_CHECK_FUNCS([aligned_alloc _aligned_malloc])
 # CFLAGS
 ################################################################################
 
-# The following is needed for Clang to check for unknown options.
-FLINT_CLANG([AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
-                                   [CFLAGS="-Werror=unknown-warning-option"])])
+if test "$flint_cv_cc_is_clang" = "yes";
+then
+    # The following is needed for Clang to check for unknown options.
+    AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
+                          [CFLAGS="-Werror=unknown-warning-option"])
+fi
 
 if test "$enable_coverage" = "yes";
 then
@@ -1287,8 +1331,6 @@ else
     TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
 fi
 
-CPPFLAGS="-I./src $CPPFLAGS"
-
 ################################################################################
 # fft_small module
 ################################################################################
@@ -1322,6 +1364,7 @@ then
     GMP_PROG_M4
     GMP_PATH_NM
 
+    CL_ASM_NOEXECSTACK
     GMP_ASM_TEXT
     GMP_ASM_DATA
     GMP_ASM_LABEL_SUFFIX
@@ -1363,12 +1406,16 @@ then
 
     GMP_FINISH
 else
-    # NOTE: LSYM_PREFIX is needed for longlong_asm_gnu.h
-    GMP_INIT(tmpconf)
-    GMP_ASM_TEXT
-    GMP_ASM_LABEL_SUFFIX
-    GMP_ASM_LSYM_PREFIX
-    rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
+    # LSYM_PREFIX is still needed for x86-64 and ARM64 in longlong_asm_gnu.h
+    case $host in
+        ARM64_PATTERN | X86_64_PATTERN)
+            GMP_INIT(tmpconf)
+            GMP_ASM_TEXT
+            GMP_ASM_LABEL_SUFFIX
+            GMP_ASM_LSYM_PREFIX
+            rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
+            ;;
+    esac
 fi
 
 if test "$enable_assembly" = "yes";
@@ -1384,13 +1431,8 @@ fi
 # parameters
 ################################################################################
 
-if test -f src/mpn_extras/$param_path/flint-mparam.h;
-then
-    AC_CONFIG_LINKS([src/flint-mparam.h:src/mpn_extras/$param_path/flint-mparam.h],[],[param_path="$param_path"])
-    AC_SUBST(PARAM_PATH,$param_path)
-else
-    AC_MSG_ERROR([Error establishing flint-mparam.h from param_path = $param_path])
-fi
+AC_CONFIG_LINKS([src/flint-mparam.h:src/mpn_extras/$param_path/flint-mparam.h],[],[param_path="$param_path"])
+AC_SUBST(PARAM_PATH,$param_path)
 
 ################################################################################
 # substitutions and definitions
@@ -1520,6 +1562,13 @@ fi
 if test "$enable_gmp_internals" = "yes";
 then
     AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
+fi
+
+if test "$ac_abs_confdir" = "`pwd`";
+then
+    AC_SUBST(IS_OUT_OF_TREE,0)
+else
+    AC_SUBST(IS_OUT_OF_TREE,1)
 fi
 
 ################################################################################

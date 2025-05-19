@@ -101,7 +101,7 @@ arf_add_si(arf_ptr z, arf_srcptr x, slong y, slong prec, arf_rnd_t rnd)
 
     ysgnbit = (y < 0);
     if (ysgnbit)
-        ytmp = -y;
+        ytmp = -(ulong) y;
     else
         ytmp = y;
     yptr = &ytmp;

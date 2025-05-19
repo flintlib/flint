@@ -27,6 +27,7 @@ Types and basic operations
     The index must be in bounds.
 
 .. function:: gr_ptr gr_vec_entry_ptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_vec_entry_srcptr(gr_vec_t vec, slong i, gr_ctx_t ctx)
 
     Returns a pointer to the *i*-th element in the vector *vec*,
     indexed from zero. The index must be in bounds.
@@ -203,6 +204,30 @@ Dot products
 .. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
     Sets *res* to `c \pm \sum_{i=0}^{n-1} a_i b_{n-1-i}`.
+
+Sorting and searching
+--------------------------------------------------------------------------------
+
+.. function:: truth_t _gr_vec_contains(gr_srcptr vec, slong len, gr_srcptr x, gr_ctx_t ctx)
+              truth_t gr_vec_contains(const gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx);
+
+.. function:: int _gr_vec_sort(gr_ptr vec, slong len, gr_ctx_t ctx)
+              int gr_vec_sort(gr_vec_t dest, const gr_vec_t src, gr_ctx_t ctx)
+
+    Sorts the entries in increasing order. The underscore version works
+    in-place; when it returns a status code other than `GR_SUCCESS`, the vector
+    may not be sorted but still contains some permutation of the original
+    entries.
+
+.. function:: void _gr_vec_permute(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
+              int gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
+
+    Applies a permutation to a vector. The underscore version works in-place and
+    overwrites `perm`.
+
+.. function:: void _gr_vec_shuffle(gr_ptr vec, flint_rand_t state, slong len, gr_ctx_t ctx)
+
+    Applies a uniform random permutation.
 
 Other functions
 --------------------------------------------------------------------------------

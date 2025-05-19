@@ -47,7 +47,7 @@ TEST_FUNCTION_START(fmpz_mat_transpose, state)
     }
 
     /* Self-transpose */
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         fmpz_mat_t A, B;
 

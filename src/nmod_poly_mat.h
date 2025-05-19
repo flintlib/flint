@@ -27,7 +27,7 @@ extern "C" {
 NMOD_POLY_MAT_INLINE
 nmod_poly_struct * nmod_poly_mat_entry(const nmod_poly_mat_t mat, slong i, slong j)
 {
-    return mat->rows[i] + j;
+    return mat->entries + i * mat->stride + j;
 }
 
 NMOD_POLY_MAT_INLINE slong
@@ -69,6 +69,8 @@ void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);
 void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat);
 
 void nmod_poly_mat_clear(nmod_poly_mat_t mat);
+
+void nmod_poly_mat_transpose(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
 /* Truncate, shift *********************************************************/
 

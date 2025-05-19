@@ -88,7 +88,7 @@ exact_cpu=
 # can't be done, or don't work.
 #
 # When a number of probes are done, test -z "$exact_cpu" can be used instead
-# of putting each probe under an "else" of the preceeding.  That can stop
+# of putting each probe under an "else" of the preceding.  That can stop
 # the code getting horribly nested and marching off the right side of the
 # screen.
 
@@ -188,6 +188,10 @@ arm*-*-* | aarch64-*-*)
 	    exact_cpu="applem1";;
 	  *Apple\ M2)
 	    exact_cpu="applem2";;
+	  *Apple\ M3)
+	    exact_cpu="applem3";;
+	  *Apple\ M4 | *Apple\ M4\ Pro)
+	    exact_cpu="applem4";;
       esac
   fi
 
@@ -946,10 +950,12 @@ main ()
           else if (model == 0x9a) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Alder Lake P */
           else if (model == 0x9c) cpu_64bit = 1,            modelstr = "tremont";    /* Tremont */
           else if (model == 0x9e) cpu_64bit = 1, cpu_avx=1, modelstr = "kabylake";   /* Kaby Lake desktop */
-          else if (model == 0xa5) cpu_64bit = 1, cpu_avx=1, modelstr = "cometlake";  /* Comet Lake */
+          else if (model == 0xa5) cpu_64bit = 1, cpu_avx=1, modelstr = "cometlake";  /* Comet Lake S, H */
+          else if (model == 0xa6) cpu_64bit = 1, cpu_avx=1, modelstr = "cometlake";  /* Comet Lake U */
           else if (model == 0xa7) cpu_64bit = 1, cpu_avx=1, modelstr = "rocketlake"; /* Rocket Lake S */
           else if (model == 0xba) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
           else if (model == 0xb7) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
+          else if (model == 0xaa) cpu_64bit = 1, cpu_avx=1, modelstr = "meteorlake"; /* Meteor Lake H, U */
           else                    cpu_64bit = 1,            modelstr = "nehalem";    /* default */
 
           if (strcmp (modelstr, "haswell") == 0 ||
@@ -1058,6 +1064,10 @@ main ()
               modelstr = "zen4";
               break;
           }
+          break;
+        case 26:                /* Zen 5 */
+          cpu_64bit = 1, cpu_avx = 1, modelstr = "zen5";
+          break;
       }
   }
   else if (strcmp (vendor_string, "HygonGenuine") == 0)

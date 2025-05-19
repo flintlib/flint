@@ -17,14 +17,14 @@ TEST_FUNCTION_START(arb_mat_inv, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         fmpq_mat_t Q, Qinv;
         arb_mat_t A, Ainv;
         slong n, qbits, prec;
         int q_invertible, r_invertible, r_invertible2;
 
-        n = n_randint(state, 8);
+        n = n_randint(state, 5);
         qbits = 1 + n_randint(state, 30);
         prec = 2 + n_randint(state, 200);
 

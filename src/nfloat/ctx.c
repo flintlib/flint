@@ -39,8 +39,8 @@ gr_method_tab_input _nfloat_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
 
     {GR_METHOD_CTX_HAS_REAL_PREC, (gr_funcptr) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_SET_REAL_PREC, (gr_funcptr) _nfloat_ctx_set_real_prec},
-    {GR_METHOD_CTX_GET_REAL_PREC, (gr_funcptr) _nfloat_ctx_get_real_prec},
+    {GR_METHOD_CTX_SET_REAL_PREC, (gr_funcptr) nfloat_ctx_set_real_prec},
+    {GR_METHOD_CTX_GET_REAL_PREC, (gr_funcptr) nfloat_ctx_get_real_prec},
 
     {GR_METHOD_INIT,            (gr_funcptr) nfloat_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) nfloat_clear},

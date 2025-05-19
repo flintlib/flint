@@ -22,15 +22,15 @@ gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2,
     slong c2 = mat2->c;
     slong sz = ctx->sizeof_elem;
 
-    if (mat1->r != mat2->r || res->c != mat1->c + mat2->c)
+    if (mat1->r != mat2->r || res->r != mat1->r || res->c != mat1->c + mat2->c)
         return GR_DOMAIN;
 
     for (i = 0; i < r1; i++)
     {
         if (c1 > 0)
-            status |= _gr_vec_set(res->rows[i], mat1->rows[i], c1, ctx);
+            status |= _gr_vec_set(GR_MAT_ENTRY(res, i, 0, sz), GR_MAT_ENTRY(mat1, i, 0, sz), c1, ctx);
         if (c2 > 0)
-            status |= _gr_vec_set(GR_ENTRY(res->rows[i], c1, sz), mat2->rows[i], c2, ctx);
+            status |= _gr_vec_set(GR_MAT_ENTRY(res, i, c1, sz), GR_MAT_ENTRY(mat2, i, 0, sz), c2, ctx);
     }
 
     return status;

@@ -13,7 +13,7 @@
 #include "gr_mat.h"
 
 int
-gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
+_gr_mat_write(gr_stream_t out, const gr_mat_t mat, int linebreaks, gr_ctx_t ctx)
 {
     int status;
     slong r, c;
@@ -39,10 +39,16 @@ gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
         }
 
         if (i < r - 1)
-            gr_stream_write(out, "],\n");
+            gr_stream_write(out, linebreaks ? "],\n" : "], ");
         else
             gr_stream_write(out, "]");
     }
     gr_stream_write(out, "]");
     return status;
+}
+
+int
+gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return _gr_mat_write(out, mat, 1, ctx);
 }

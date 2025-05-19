@@ -71,6 +71,33 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 ])dnl AX_CXX_CHECK_COMPILE_FLAGS
 
 
+# Copyright (C) 1996-2024 Free Software Foundation, Inc.
+
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+dnl  AX_INIT
+dnl  -----------------------
+dnl  If build directory is not source directory, this function throws if source
+dnl  directory is already configured.
+
+AC_DEFUN([AX_INIT],[dnl
+if test "$ac_abs_confdir" != "`pwd`"; dnl ' Vim syntax fix
+then
+  if test -f $srcdir/config.status;
+  then
+    AC_MSG_ERROR([source directory already configured; run "make distclean" there first])
+  fi
+fi])
+
+
 dnl Copyright (C) 2024 Albin Ahlbäck
 dnl
 dnl This file is part of FLINT.
@@ -86,38 +113,60 @@ define(X86_PATTERN,
 [[i?86*-*-* | k[5-8]*-*-* | pentium*-*-* | athlon-*-* | viac3*-*-* | geode*-*-* | atom-*-*]])
 
 define(X86_64_PATTERN,
-[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | zen*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-* | x86_64v[1234]-*-*]])
+[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar-*-* | bulldozer-*-* | piledriver-*-* | steamroller-*-* | excavator-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | x86_64v[1234]-*-* | nano-*-* | nehalem-*-* | westmere-*-* | sandybridge-*-* | ivybridge-*-* | haswell-*-* | zen-*-* | zen[2345]-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | cometlake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | meteorlake-*-* | knightslanding-*-* | sapphirerapids-*-*]])
 
 define(X86_64_ADX_PATTERN,
-[[zen[1234]-*-* | coreibwl-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | knightslanding-*-* | sapphirerapids-*-* | cometlake-*-*]])
+[[zen-*-* | zen[2345]-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | cometlake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | meteorlake-*-* | knightslanding-*-* | sapphirerapids-*-*]])
 
 define(ARM64_PATTERN,
 [[armcortexa53-*-* | armcortexa53neon-*-* | armcortexa55-*-* | armcortexa55neon-*-* | armcortexa57-*-* | armcortexa57neon-*-* | armcortexa7[2-9]-*-* | armcortexa7[2-9]neon-*-* | armexynosm1-*-* | armthunderx-*-* | armxgene1-*-* | aarch64*-*-* | applem[1-9]*-*-* | armv8*-*-*]])
 
 define(SLOW_VROUNDPD_PATTERN,
-[[haswell* | broadwell* | skylake* | kabylake* | icelake* | tigerlake* | rocketlake* | alderlake* | raptorlake*]])
+[[haswell* | broadwell* | skylake* | kabylake* | icelake* | tigerlake* | rocketlake* | alderlake* | raptorlake* | meteorlake*]])
 
 define(FAST_VROUNDPD_PATTERN,
 [[znver[2-4]* | sandybridge* | ivybridge*]])
 
 
-dnl  FLINT_CLANG([action-if-true],[action-if-false])
+dnl  FLINT_CC_IS_GCC([action-if-true],[action-if-false])
+dnl  -----------------------
+dnl  Checks if compiler is GCC.
+
+AC_DEFUN([FLINT_CC_IS_GCC],
+[AC_CACHE_CHECK([if compiler is GCC],
+                flint_cv_cc_is_gcc,
+[flint_cv_cc_is_gcc="no"
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
+#if !(defined(__GNUC__) && !defined(__clang__))
+#error
+error
+#endif
+],[])],
+[flint_cv_cc_is_gcc="yes"])
+])
+AS_VAR_IF([flint_cv_cc_is_gcc],"yes",
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
+
+dnl  FLINT_CC_IS_CLANG([action-if-true],[action-if-false])
 dnl  -----------------------
 dnl  Checks if compiler is clang.
 
-AC_DEFUN([FLINT_CLANG],
+AC_DEFUN([FLINT_CC_IS_CLANG],
 [AC_CACHE_CHECK([if compiler is Clang],
-                flint_cv_clang,
-[flint_cv_clang="no"
+                flint_cv_cc_is_clang,
+[flint_cv_cc_is_clang="no"
 AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
 #ifndef __clang__
 #error
 error
 #endif
 ],[])],
-[flint_cv_clang="yes"])
+[flint_cv_cc_is_clang="yes"])
 ])
-AS_VAR_IF([flint_cv_clang],"yes",
+AS_VAR_IF([flint_cv_cc_is_clang],"yes",
     [m4_default([$1], :)],
     [m4_default([$2], :)])
 ])
@@ -146,6 +195,94 @@ pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), 0);])],
 AS_VAR_IF([flint_cv_check_cpu_set_t],"yes",
     [m4_default([$1], :)],
     [m4_default([$2], :)])
+])
+
+dnl  FLINT_CHECK_PRAGMA(string,define,[prestring])
+dnl  ---------------------------------
+
+AC_DEFUN([FLINT_CHECK_PRAGMA],[
+tmp_CFLAGS="$CFLAGS"
+CFLAGS="-Werror -Wunknown-pragmas"
+
+if test "x$3" != "x";
+then
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([${pragma_cc_prefix}$3${pragma_cc_suffix}
+${pragma_cc_prefix}$1${pragma_cc_suffix}],[])],[tmp="yes"],[tmp="no"])
+else
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([${pragma_cc_prefix}$1${pragma_cc_suffix}],[])],
+    [tmp="yes"],[tmp="no"])
+fi
+
+CFLAGS="$tmp_CFLAGS"
+
+if test "$tmp" = "yes";
+then
+    AC_DEFINE_UNQUOTED($2,${pragma_cc_prefix}$1${pragma_cc_suffix})
+fi
+])
+
+dnl  FLINT_CHECK_PRAGMAS
+dnl  -------------------
+dnl  Checks pragmas available and push them into config header.
+
+AC_DEFUN([FLINT_CHECK_PRAGMAS],
+[AC_REQUIRE([FLINT_CC_IS_GCC])
+AC_REQUIRE([FLINT_CC_IS_CLANG])
+
+AH_VERBATIM([PRAGMAS],
+[/* Define the following to what diagnostic pragmas your compiler allows.
+   These are used to silence certain warnings. */
+#define DIAGNOSTIC_PUSH
+#define DIAGNOSTIC_POP
+#define DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
+#define DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
+#define DIAGNOSTIC_IGNORE_FORMAT
+#define DIAGNOSTIC_IGNORE_DANGLING_POINTER
+#define DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE
+#define DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS
+#define DIAGNOSTIC_IGNORE_UNUSED_VARIABLE
+#define DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
+/* Define the following to what optimization pragmas your compiler allows. */
+#define PUSH_OPTIONS
+#define POP_OPTIONS
+#define OPTIMIZE_O2
+#define OPTIMIZE_OSIZE
+#define OPTIMIZE_UNROLL_LOOPS])
+
+flint_cv_pragma_compiler=""
+if test "$flint_cv_cc_is_clang" = "yes";
+then
+    flint_cv_pragma_compiler="clang"
+elif test "$flint_cv_cc_is_gcc" = "yes";
+then
+    flint_cv_pragma_compiler="GCC"
+fi
+
+if test "x$flint_cv_pragma_compiler" != "x";
+then
+    pragma_cc_prefix='_Pragma("'"$flint_cv_pragma_compiler "
+    pragma_cc_suffix='")'
+
+    FLINT_CHECK_PRAGMA([diagnostic push],[DIAGNOSTIC_PUSH])
+    FLINT_CHECK_PRAGMA([diagnostic pop],[DIAGNOSTIC_POP],[diagnostic push])
+
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wincompatible-function-pointer-types\"],[DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wdiscarded-qualifiers\"],[DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wformat\"],[DIAGNOSTIC_IGNORE_FORMAT])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wdangling-pointer\"],[DIAGNOSTIC_IGNORE_DANGLING_POINTER])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wcast-function-type\"],[DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Woverlength-strings\"],[DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wunused-variable\"],[DIAGNOSTIC_IGNORE_UNUSED_VARIABLE])
+    FLINT_CHECK_PRAGMA([diagnostic ignored \"-Wmaybe-uninitialized\"],[DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED])
+
+    FLINT_CHECK_PRAGMA([push_options],[PUSH_OPTIONS])
+    FLINT_CHECK_PRAGMA([pop_options],[POP_OPTIONS])
+
+    FLINT_CHECK_PRAGMA([optimize (\"O2\")],[OPTIMIZE_O2])
+    FLINT_CHECK_PRAGMA([optimize (\"Os\")],[OPTIMIZE_OSIZE])
+    FLINT_CHECK_PRAGMA([optimize (\"unroll-loops\")],[OPTIMIZE_UNROLL_LOOPS])
+fi
 ])
 
 
@@ -455,8 +592,9 @@ gmp_tmpconfigm4i=cnfm4i.tmp
 gmp_tmpconfigm4p=cnfm4p.tmp
 rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
 
-# All CPUs use asm-defs.m4
-echo ["include][(\`src/mpn_extras/asm-defs.m4')"] >>$gmp_tmpconfigm4i
+echo ["define(<CONFIG_TOP_SRCDIR>,<\`$srcdir'>)"] >>$gmp_tmpconfigm4
+
+echo ["include][(CONFIG_TOP_SRCDIR\`/src/mpn_extras/asm-defs.m4')"] >>$gmp_tmpconfigm4i
 ])
 
 
@@ -513,7 +651,7 @@ dnl
 
 AC_DEFUN([GMP_INCLUDE_MPN],
 [AC_REQUIRE([GMP_INIT])
-echo ["include(\`$1')"] >> $gmp_tmpconfigm4i
+echo ["include][(CONFIG_TOP_SRCDIR\`/$1')"] >>$gmp_tmpconfigm4i
 ])
 
 
@@ -692,6 +830,43 @@ else
   ifelse([$3],,:,[$3])
 fi
 rm -f conftest*
+])
+
+
+dnl  CL_ASM_NOEXECSTACK
+dnl  -------------------
+dnl
+dnl  Checks whether the stack can be marked nonexecutable by passing an option
+dnl  to the C-compiler when acting on .s files. Appends that option to ASMFLAGS.
+dnl  This macro is adapted from one found in GLIBC-2.3.5.
+dnl
+dnl  FIXME: This test looks broken. It tests that a file with
+dnl  .note.GNU-stack... can be compiled/assembled with -Wa,--noexecstack.  It
+dnl  does not determine if that command-line option has any effect on general
+dnl  asm code.
+AC_DEFUN([CL_ASM_NOEXECSTACK],
+[AC_REQUIRE([AC_PROG_CC])
+AC_CACHE_CHECK([whether assembler supports --noexecstack option],
+                cl_cv_asm_noexecstack,
+[dnl
+  cat > conftest.c <<EOF
+void foo() {}
+EOF
+  if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS
+                     -S -o conftest.s conftest.c >/dev/null]) \
+     && grep .note.GNU-stack conftest.s >/dev/null \
+     && AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -Wa,--noexecstack
+                       -c -o conftest.o conftest.s >/dev/null])
+  then
+    cl_cv_asm_noexecstack=yes
+  else
+    cl_cv_asm_noexecstack=no
+  fi
+  rm -f conftest*])
+  if test "$cl_cv_asm_noexecstack" = yes; then
+    ASMFLAGS="$ASMFLAGS -Wa,--noexecstack"
+  fi
+  AC_SUBST(ASMFLAGS)
 ])
 
 
@@ -1200,7 +1375,7 @@ dnl
 dnl  The default is "L" if the tests fail for any reason.  There's a good
 dnl  chance this will be adequate, since on most systems labels are local
 dnl  anyway unless given a ".globl", and an "L" will avoid clashes with
-dnl  other identifers.
+dnl  other identifiers.
 dnl
 dnl  For gas, ".L" is normally purely local to the assembler, it doesn't get
 dnl  put into the object file at all.  This style is preferred, to keep the

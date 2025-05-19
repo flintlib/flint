@@ -23,8 +23,9 @@ int _gr_mpoly_mul_johnson(
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
-    gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     gr_method_binary_op mul = GR_BINARY_OP(cctx, MUL);
     gr_method_binary_op add = GR_BINARY_OP(cctx, ADD);
     slong i, j;
@@ -86,7 +87,7 @@ int _gr_mpoly_mul_johnson(
     {
         exp = heap[1].exp;
 
-        _gr_mpoly_fit_length(&p1, alloc, &e1, exps_alloc, N, len1 + 1, cctx);
+        _gr_mpoly_fit_length(&p1, alloc, &e1, exps_alloc, N, len1 + 1, ctx);
 
         mpoly_monomial_set(e1 + len1*N, exp, N);
 
@@ -190,8 +191,10 @@ int gr_mpoly_mul_johnson(
     gr_mpoly_t poly1,
     const gr_mpoly_t poly2,
     const gr_mpoly_t poly3,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong i, N, len1 = 0;
     flint_bitcnt_t exp_bits;
     fmpz * max_fields2, * max_fields3;
@@ -203,18 +206,18 @@ int gr_mpoly_mul_johnson(
 
     if (poly2->length == 0 || poly3->length == 0)
     {
-        return gr_mpoly_zero(poly1, mctx, cctx);
+        return gr_mpoly_zero(poly1, ctx);
     }
 
     if (poly3->length == 1)
     {
-        return gr_mpoly_mul_monomial(poly1, poly2, poly3, mctx, cctx);
+        return gr_mpoly_mul_monomial(poly1, poly2, poly3, ctx);
     }
 
     /* todo: could have a version of mul_monomial for the noncommutative case */
     if (poly2->length == 1 && gr_ctx_is_commutative_ring(cctx) == T_TRUE)
     {
-        return gr_mpoly_mul_monomial(poly1, poly3, poly2, mctx, cctx);
+        return gr_mpoly_mul_monomial(poly1, poly3, poly2, ctx);
     }
 
     TMP_START;
@@ -270,9 +273,9 @@ int gr_mpoly_mul_johnson(
     {
         gr_mpoly_t temp;
 
-        gr_mpoly_init(temp, mctx, cctx);
+        gr_mpoly_init(temp, ctx);
         gr_mpoly_fit_length_reset_bits(temp,
-                                poly2->length + poly3->length, exp_bits, mctx, cctx);
+                                poly2->length + poly3->length, exp_bits, ctx);
 
         if (poly2->length >= poly3->length)
         {
@@ -280,7 +283,7 @@ int gr_mpoly_mul_johnson(
                                     &temp->coeffs, &temp->exps, &temp->coeffs_alloc, &temp->exps_alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                          exp_bits, N, cmpmask, cctx);
+                                          exp_bits, N, cmpmask, ctx);
         }
         else
         {
@@ -288,15 +291,15 @@ int gr_mpoly_mul_johnson(
                 &temp->coeffs, &temp->exps, &temp->coeffs_alloc, &temp->exps_alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                          exp_bits, N, cmpmask, cctx);
+                                          exp_bits, N, cmpmask, ctx);
         }
 
-        gr_mpoly_swap(temp, poly1, mctx, cctx);
-        gr_mpoly_clear(temp, mctx, cctx);
+        gr_mpoly_swap(temp, poly1, ctx);
+        gr_mpoly_clear(temp, ctx);
     }
     else
     {
-        gr_mpoly_fit_length_reset_bits(poly1, poly2->length + poly3->length, exp_bits, mctx, cctx);
+        gr_mpoly_fit_length_reset_bits(poly1, poly2->length + poly3->length, exp_bits, ctx);
 
         if (poly2->length > poly3->length)
         {
@@ -304,7 +307,7 @@ int gr_mpoly_mul_johnson(
                                     &poly1->coeffs, &poly1->exps, &poly1->coeffs_alloc, &poly1->exps_alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                          exp_bits, N, cmpmask, cctx);
+                                          exp_bits, N, cmpmask, ctx);
         }
         else
         {
@@ -312,7 +315,7 @@ int gr_mpoly_mul_johnson(
                                     &poly1->coeffs, &poly1->exps, &poly1->coeffs_alloc, &poly1->exps_alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                          exp_bits, N, cmpmask, cctx);
+                                          exp_bits, N, cmpmask, ctx);
         }
     }
 
@@ -322,7 +325,7 @@ int gr_mpoly_mul_johnson(
     if (free3)
         flint_free(exp3);
 
-    _gr_mpoly_set_length(poly1, len1, mctx, cctx);
+    _gr_mpoly_set_length(poly1, len1, ctx);
 
     TMP_END;
 

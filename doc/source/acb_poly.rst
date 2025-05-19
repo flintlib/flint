@@ -392,7 +392,7 @@ Composition
               void acb_poly_taylor_shift(acb_poly_t g, const acb_poly_t f, const acb_t c, slong prec)
 
     Sets *g* to the Taylor shift `f(x+c)`.
-    The underscore methods act in-place on *g* = *f* which has length *n*.
+    The underscore method acts in-place on *g* = *f* which has length *n*.
 
 .. function:: void _acb_poly_compose(acb_ptr res, acb_srcptr poly1, slong len1, acb_srcptr poly2, slong len2, slong prec)
               void acb_poly_compose(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong prec)
@@ -847,6 +847,13 @@ Elementary functions
 
     Sets *s* to the sinc function of the power series *h*, truncated
     to length *n*.
+
+.. function:: void _acb_poly_sinc_pi_series(acb_ptr s, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_sinc_pi_series(acb_poly_t s, const acb_poly_t h, slong n, slong prec)
+
+    Compute the sinc function of the input multiplied by `\pi`.
+
 
 Lambert W function
 -------------------------------------------------------------------------------

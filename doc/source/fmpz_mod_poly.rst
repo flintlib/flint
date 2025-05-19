@@ -437,11 +437,13 @@ Scalar multiplication and division
 
 
 .. function:: void _fmpz_mod_poly_scalar_mul_fmpz(fmpz * res, const fmpz * poly, slong len, const fmpz_t x, const fmpz_mod_ctx_t ctx)
+              void _fmpz_mod_poly_scalar_mul_ui(fmpz * res, const fmpz * poly, slong len, ulong x, const fmpz_mod_ctx_t ctx)
 
     Sets ``(res, len``) to ``(poly, len)`` multiplied by `x`,
     reduced modulo `p`.
 
 .. function:: void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x, const fmpz_mod_ctx_t ctx)
+              void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong x, const fmpz_mod_ctx_t ctx)
 
     Sets ``res`` to ``poly`` multiplied by `x`.
 
@@ -1909,7 +1911,7 @@ Berlekamp-Massey Algorithm
 
 .. function:: const fmpz * fmpz_mod_berlekamp_massey_points(const fmpz_mod_berlekamp_massey_t B)
 
-    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if func::fmpz_mod_berlekamp_massey_point_count returns ``0``.
+    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if :func:`fmpz_mod_berlekamp_massey_point_count` returns ``0``.
 
 .. function:: const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_V_poly(const fmpz_mod_berlekamp_massey_t B)
 

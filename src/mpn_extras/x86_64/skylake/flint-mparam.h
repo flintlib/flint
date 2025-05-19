@@ -27,4 +27,9 @@
 #define FFT_N_NUM                                 19
 #define FFT_MULMOD_2EXPP1_CUTOFF                 128
 
+#define FLINT_PREINVERT_LIMB_USE_NATIVE 0
+
+/* verified on Xeon(R) Gold 6244 (cascade lake) */
+#define FLINT_MULMOD_SHOUP_THRESHOLD 23
+
 #endif

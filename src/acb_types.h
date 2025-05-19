@@ -34,7 +34,7 @@ typedef struct
     acb_ptr entries;
     slong r;
     slong c;
-    acb_ptr * rows;
+    slong stride;
 }
 acb_mat_struct;
 

@@ -27,9 +27,9 @@ ca_mat_solve_lu_precomp(ca_mat_t X, const slong * perm,
         for (c = 0; c < m; c++)
         {
             for (i = 0; i < n; i++)
-                tmp[i] = B->rows[perm[i]][c];
+                tmp[i] = *ca_mat_entry(B, perm[i], c);
             for (i = 0; i < n; i++)
-                X->rows[i][c] = tmp[i];
+                *ca_mat_entry(X, i, c) = tmp[i];
         }
 
         flint_free(tmp);

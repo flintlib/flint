@@ -14,15 +14,14 @@
 
 void fmpq_mat_clear(fmpq_mat_t mat)
 {
-    if (mat->entries)
+    if (mat->entries != NULL)
     {
-        slong i;
+        slong i, j;
 
-        for (i = 0; i < mat->r * mat->c; i++)
-            fmpq_clear(mat->entries + i);
+        for (i = 0; i < mat->r; i++)
+            for (j = 0; j < mat->c; j++)
+                fmpq_clear(fmpq_mat_entry(mat, i, j));
 
         flint_free(mat->entries);
-        flint_free(mat->rows);
-    } else if (mat->r != 0)
-        flint_free(mat->rows);
+    }
 }

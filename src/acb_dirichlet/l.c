@@ -10,14 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "acb.h"
 #include "acb_dirichlet.h"
-
-#ifdef __GNUC__
-# define log __builtin_log
-#else
-# include <math.h>
-#endif
 
 void
 acb_dirichlet_l_general(acb_t res, const acb_t s,

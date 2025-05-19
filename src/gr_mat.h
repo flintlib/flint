@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->rows[i], j, sz)
+#define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->entries, (i) * (mat)->stride + (j), sz)
 #define gr_mat_nrows(mat, ctx) ((mat)->r)
 #define gr_mat_ncols(mat, ctx) ((mat)->c)
 
@@ -47,6 +47,7 @@ typedef int ((*gr_method_mat_binary_op_with_flag)(gr_mat_t, const gr_mat_t, cons
 typedef int ((*gr_method_mat_pivot_op)(slong *, gr_mat_t, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_mat_diagonalization_op)(gr_vec_t, gr_mat_t, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
 typedef int ((*gr_method_mat_lu_op)(slong *, slong *, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
+typedef int ((*gr_method_mat_reduce_row_op)(slong *, gr_mat_t, slong *, slong *, slong, gr_ctx_ptr));
 
 #define GR_MAT_UNARY_OP_GET_SCALAR(ctx, NAME) (((gr_method_mat_unary_op_get_scalar *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_UNARY_OP(ctx, NAME) (((gr_method_mat_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -55,6 +56,7 @@ typedef int ((*gr_method_mat_lu_op)(slong *, slong *, gr_mat_t, const gr_mat_t, 
 #define GR_MAT_PIVOT_OP(ctx, NAME) (((gr_method_mat_pivot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_DIAGONALIZATION_OP(ctx, NAME) (((gr_method_mat_diagonalization_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_LU_OP(ctx, NAME) (((gr_method_mat_lu_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_MAT_REDUCE_ROW_OP(ctx, NAME) (((gr_method_mat_reduce_row_op *) ctx->methods)[GR_METHOD_ ## NAME])
 
 void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
@@ -71,12 +73,24 @@ WARN_UNUSED_RESULT int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t c
 WARN_UNUSED_RESULT int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
 
-void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
+GR_MAT_INLINE void
+gr_mat_window_init(gr_mat_t window, const gr_mat_t mat,
+    slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx)
+{
+    slong sz = ctx->sizeof_elem;
+
+    FLINT_ASSERT(r1 >= 0 && r1 <= r2 && r2 <= mat->r);
+    FLINT_ASSERT(c2 >= 0 && c1 <= c2 && c2 <= mat->c);
+
+    window->entries = GR_MAT_ENTRY(mat, r1, c1, sz);
+    window->r = r2 - r1;
+    window->c = c2 - c1;
+    window->stride = mat->stride;
+}
 
 GR_MAT_INLINE void
-gr_mat_window_clear(gr_mat_t window, gr_ctx_t FLINT_UNUSED(ctx))
+gr_mat_window_clear(gr_mat_t FLINT_UNUSED(window), gr_ctx_t FLINT_UNUSED(ctx))
 {
-    flint_free(window->rows);
 }
 
 WARN_UNUSED_RESULT int gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
@@ -89,6 +103,7 @@ WARN_UNUSED_RESULT int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_
 WARN_UNUSED_RESULT int gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randpermdiag(int * parity, gr_mat_t mat, flint_rand_t state, gr_ptr diag, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_randsimilar(gr_mat_t mat, flint_rand_t state, slong opcount, gr_ctx_t ctx);
 
 GR_MAT_INLINE truth_t
 gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
@@ -135,16 +150,46 @@ WARN_UNUSED_RESULT int gr_mat_swap_entrywise(gr_mat_t mat1, const gr_mat_t mat2,
 WARN_UNUSED_RESULT int gr_mat_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 
-/* todo: test, wrap; div; more conversions */
 WARN_UNUSED_RESULT int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_scalar_add(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_scalar_other_add(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_mat_t mat, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_sub_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_scalar_sub(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_scalar_other_sub(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_mat_t mat, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_mul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_scalar_mul(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_scalar_other_mul(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_mat_t mat, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_scalar_other(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t x, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
@@ -154,6 +199,10 @@ gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_mul(res, mat, mat, ctx);
 }
+
+WARN_UNUSED_RESULT int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong exp, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong exp, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t exp, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_mat_gr_poly_evaluate(gr_mat_t y, gr_srcptr poly, slong len, const gr_mat_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t f, const gr_mat_t a, gr_ctx_t ctx);
@@ -207,6 +256,8 @@ WARN_UNUSED_RESULT int gr_mat_rref(slong * res_rank, gr_mat_t R, const gr_mat_t 
 WARN_UNUSED_RESULT int gr_mat_rref_den_fflu(slong * res_rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_rref_den(slong * res_rank, gr_mat_t R, gr_ptr den, const gr_mat_t A, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_nullspace_from_rref(gr_mat_t X, const gr_mat_t A, gr_srcptr Aden, slong rank, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nullspace_no_resize(slong * nullity, gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nullspace(gr_mat_t X, const gr_mat_t A, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_ones(gr_mat_t mat, gr_ctx_t ctx);
@@ -252,14 +303,23 @@ WARN_UNUSED_RESULT int gr_mat_charpoly_gauss(gr_poly_t cp, const gr_mat_t mat, g
 WARN_UNUSED_RESULT int _gr_mat_charpoly_householder(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_charpoly_householder(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_mat_charpoly_generic(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_charpoly_generic(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int _gr_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_charpoly(gr_poly_t res, const gr_mat_t mat, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_mat_companion(gr_mat_t res, gr_srcptr poly, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_companion(gr_mat_t res, const gr_poly_t poly, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, gr_srcptr poly, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, const gr_poly_t poly, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_hessenberg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hessenberg_gauss(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hessenberg_householder(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_hessenberg(const gr_mat_t mat, gr_ctx_t ctx);
 
+int gr_mat_reduce_row_generic(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx);
 int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx);
 int gr_mat_apply_row_similarity(gr_mat_t A, slong r, gr_ptr d, gr_ctx_t ctx);
 int gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx);
@@ -284,11 +344,25 @@ truth_t gr_mat_is_upper_triangular(const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_mul_diag(gr_mat_t C, const gr_mat_t A, const gr_vec_t D, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_diag_mul(gr_mat_t C, const gr_vec_t D, const gr_mat_t A, gr_ctx_t ctx);
 
+/* xxx: typedefed in gr.h which is not included */
+typedef int ((*__gr_method_vec_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*__gr_method_vec_scalar_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_ptr));
+
+WARN_UNUSED_RESULT int gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, __gr_method_vec_op jet_func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_func_param_jordan(gr_mat_t res, const gr_mat_t A, __gr_method_vec_scalar_op jet_func, gr_srcptr c, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_exp_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
-
 WARN_UNUSED_RESULT int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_pow_scalar_jordan(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_fmpq_jordan(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_pow_fmpq(gr_mat_t res, const gr_mat_t mat, const fmpq_t exp, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_sqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_rsqrt(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_norm_max(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_norm_1(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
@@ -300,6 +374,7 @@ WARN_UNUSED_RESULT int gr_mat_norm_frobenius(gr_ptr res, const gr_mat_t mat, gr_
 void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_det(gr_method_mat_unary_op_get_scalar det_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void gr_mat_test_charpoly(gr_method_mat_unary_op_get_scalar charpoly_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_nonsingular_solve_tril(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_nonsingular_solve_triu(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);

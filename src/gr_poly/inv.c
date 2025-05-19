@@ -11,6 +11,8 @@
 
 #include "gr_poly.h"
 
+/* FIXME: this may inappropriately return GR_DOMAIN for nonconstant
+   polynomials non-integral domains. See AbstractAlgebra. */
 int
 gr_poly_inv(gr_poly_t res,
     const gr_poly_t poly, gr_ctx_t ctx)

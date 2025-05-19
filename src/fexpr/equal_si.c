@@ -15,7 +15,7 @@ int
 fexpr_equal_si(const fexpr_t expr, slong c)
 {
     if (c >= FEXPR_COEFF_MIN && c <= FEXPR_COEFF_MAX)
-        return expr->data[0] == (c << FEXPR_TYPE_BITS);
+        return expr->data[0] == ((ulong) c << FEXPR_TYPE_BITS);
     else if (c > 0)
         return (expr->data[0] == (FEXPR_TYPE_BIG_INT_POS | (2 << FEXPR_TYPE_BITS)) && expr->data[1] == c);
     else

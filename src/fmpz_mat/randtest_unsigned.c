@@ -22,5 +22,5 @@ fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bi
 
     for (i = 0; i < r; i++)
         for (j = 0; j < c; j++)
-            fmpz_randtest_unsigned(mat->rows[i] + j, state, bits);
+            fmpz_randtest_unsigned(fmpz_mat_entry(mat, i, j), state, bits);
 }

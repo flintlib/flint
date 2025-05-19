@@ -15,12 +15,6 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
-#ifdef __GNUC__
-# define strcmp __builtin_strcmp
-#else
-# include <string.h>
-#endif
-
 #define SERIES_ERR_EXACT WORD_MAX
 #define SERIES_ERR_MAX WORD_MAX / 4
 

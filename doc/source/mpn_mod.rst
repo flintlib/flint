@@ -57,7 +57,7 @@ Context objects
 
 .. macro:: MPN_MOD_CTX_NLIMBS(ctx)
 
-    Retrives the number of limbs `\ell` of the modulus.
+    Retrieves the number of limbs `\ell` of the modulus.
 
 .. macro:: MPN_MOD_CTX_MODULUS_BITS
 
@@ -259,7 +259,7 @@ Division
 .. function:: int _mpn_mod_poly_inv_series(nn_ptr Q, nn_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
               int _mpn_mod_poly_div_series(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
 
-    Power series inversion and divison with automatic selection
+    Power series inversion and division with automatic selection
     between basecase and Newton algorithms.
 
 .. function:: int _mpn_mod_poly_divrem_basecase_preinv1(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr invL, gr_ctx_t ctx)

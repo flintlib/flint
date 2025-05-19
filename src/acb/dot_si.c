@@ -11,6 +11,9 @@
 
 #include "acb.h"
 
+PUSH_OPTIONS
+DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
+
 void
 acb_dot_si(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep, const slong * y, slong ystep, slong len, slong prec)
 {
@@ -57,7 +60,7 @@ acb_dot_si(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xst
         }
         else
         {
-            av = FLINT_ABS(v);
+            av = FLINT_UABS(v);
             bc = flint_clz(av);
 
             ARF_EXP(arb_midref(t + i)) = FLINT_BITS - bc;
@@ -74,3 +77,5 @@ acb_dot_si(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xst
 
     TMP_END;
 }
+
+POP_OPTIONS

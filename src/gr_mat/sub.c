@@ -16,6 +16,7 @@ int
 gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     int status;
+    slong sz = ctx->sizeof_elem;
     slong i, r, c;
 
     r = gr_mat_nrows(res, ctx);
@@ -32,7 +33,9 @@ gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     status = GR_SUCCESS;
     for (i = 0; i < r; i++)
     {
-        status |= _gr_vec_sub(res->rows[i], mat1->rows[i], mat2->rows[i], c, ctx);
+        status |= _gr_vec_sub(GR_MAT_ENTRY(res, i, 0, sz),
+                              GR_MAT_ENTRY(mat1, i, 0, sz),
+                              GR_MAT_ENTRY(mat2, i, 0, sz), c, ctx);
     }
 
     return status;

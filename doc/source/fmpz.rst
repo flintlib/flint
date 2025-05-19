@@ -182,7 +182,7 @@ Types, macros and constants
 
    This function is for internal use. The resulting ``fmpz`` will be backed by
    an ``mpz_t`` that can be passed to GMP, but the ``fmpz`` will be in an
-   inconsistent state with respect to the other Flint ``fmpz`` functions such as
+   inconsistent state with respect to the other FLINT ``fmpz`` functions such as
    ``fmpz_is_zero``, etc.
 
    **Note:** Requires that ``gmp.h`` has been included before any FLINT
@@ -243,8 +243,8 @@ Random generation
 For thread-safety, the randomisation methods take as one of their parameters an
 object of type ``flint_rand_t``.  Before calling any of the randomisation
 functions such an object first has to be initialised with a call to
-:func:`flint_randinit`.  When one is finished generating random numbers, one
-should call :func:`flint_randclear` to clean up.
+:func:`flint_rand_init`.  When one is finished generating random numbers, one
+should call :func:`flint_rand_clear` to clean up.
 
 .. function:: void fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
               void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
@@ -315,7 +315,7 @@ Conversion
 
 .. function:: ulong fmpz_get_nmod(const fmpz_t f, nmod_t mod)
 
-    Returns `f \mod n`.
+    Returns `f` modulo the integer given by `mod`.
 
 .. function:: double fmpz_get_d(const fmpz_t f)
 
@@ -903,7 +903,7 @@ Basic arithmetic
     Returns `1` if there is an integer `q` with `f = q g` and `0` if there is
     none.
 
-.. function:: int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
+.. function:: int fmpz_divides(fmpz_t q, const fmpz_t f, const fmpz_t g)
 
     Returns `1` if there is an integer `q` with `f = q g` and sets `q` to the
     quotient. Otherwise returns `0` and sets `q` to `0`.
@@ -911,12 +911,12 @@ Basic arithmetic
 .. function:: void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the remainder of `g` divided by `h` such that the remainder is
-    positive. Assumes that `h` is not zero.
+    non-negative. Assumes that `h` is not zero.
 
 .. function:: ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     Sets `f` to the remainder of `g` divided by `h` such that the remainder is
-    positive and also returns this value. Raises an exception if `h` is zero.
+    non-negative and also returns this value. Raises an exception if `h` is zero.
 
 .. function:: void fmpz_smod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -1071,7 +1071,7 @@ Greatest common divisor
 .. function:: void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets `f` to the greatest common divisor of `g` and `h`.  The
-    result is always positive, even if one of `g` and `h` is
+    result is always non-negative, even if one of `g` and `h` is
     negative.
 
 .. function:: void fmpz_gcd3(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c)

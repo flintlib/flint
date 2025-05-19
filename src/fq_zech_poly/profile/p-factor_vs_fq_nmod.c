@@ -128,7 +128,7 @@ main(int argc, char** argv)
     fq_nmod_ctx_clear(ctx);
     fq_zech_ctx_clear(ctx_zech);
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     return 0;
 }

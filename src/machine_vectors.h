@@ -477,7 +477,7 @@ FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
 DEFINE_IT(3,2,1,0)
 #undef DEFINE_IT
 
-FLINT_FORCE_INLINE vec4n vec4n_zero()
+FLINT_FORCE_INLINE vec4n vec4n_zero(void)
 {
     return _mm256_setzero_si256();
 }
@@ -1469,7 +1469,7 @@ FLINT_FORCE_INLINE vec2d vec2n_convert_limited_vec2d(vec2n a) {
 }
 
 FLINT_FORCE_INLINE void vec2n_store_unaligned(ulong* z, vec2n a) {
-   vst1q_u64(z, a);
+   vst1q_u64((uint64_t *) z, a);
 }
 
 FLINT_FORCE_INLINE vec2n vec2d_convert_limited_vec2n(vec2d a) {
@@ -1482,7 +1482,7 @@ FLINT_FORCE_INLINE vec2n vec2n_set_n(ulong a) {
 }
 
 FLINT_FORCE_INLINE vec2n vec2n_load_unaligned(const ulong* a) {
-    return vld1q_u64(a);
+    return vld1q_u64((const uint64_t *) a);
 }
 
 // Right shift 32bits

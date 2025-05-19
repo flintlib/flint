@@ -45,7 +45,7 @@ TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
 FQ_MAT_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, mat_entry)(const TEMPLATE(T, mat_t) mat, slong i, slong j)
 {
-    return mat->rows[i] + j;
+    return mat->entries + i * mat->stride + j;
 }
 
 void TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
@@ -92,10 +92,17 @@ TEMPLATE(T, mat_swap_rows)(TEMPLATE(T, mat_t) mat, slong * perm, slong r, slong 
 {
     if (r != s && !TEMPLATE(T, mat_is_empty)(mat, ctx))
     {
+        slong i;
+        TEMPLATE(T, struct) *u, *v;
+
         if (perm != NULL)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
-        FLINT_SWAP(TEMPLATE(T, struct) *, mat->rows[r], mat->rows[s]);
+        u = TEMPLATE(T, mat_entry)(mat, r, 0);
+        v = TEMPLATE(T, mat_entry)(mat, s, 0);
+
+        for (i = 0; i < mat->c; i++)
+            FLINT_SWAP(TEMPLATE(T, struct), u[i], v[i]);
     }
 }
 
@@ -133,7 +140,7 @@ void TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
                              slong r1, slong c1, slong r2, slong c2,
                              const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
-void TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window,
+void TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) FLINT_UNUSED(window),
                               const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 void TEMPLATE(T, mat_concat_horizontal)(TEMPLATE(T, mat_t) res,
@@ -182,6 +189,9 @@ void TEMPLATE(T, mat_randtriu)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
 
 /* Transpose */
 
+void TEMPLATE(T, mat_transpose)(TEMPLATE(T, mat_t) B, const TEMPLATE(T, mat_t) A,
+                           const TEMPLATE(T, ctx_t) ctx);
+
 /* Addition and subtraction */
 
 void TEMPLATE(T, mat_add)(TEMPLATE(T, mat_t) C,
@@ -229,14 +239,6 @@ slong TEMPLATE(T, mat_lu)(slong * P,
                     int rank_check,
                     const TEMPLATE(T, ctx_t) ctx);
 
-slong TEMPLATE(T, mat_lu_recursive)(slong * P,
-                              TEMPLATE(T, mat_t) A,
-                              int rank_check,
-                              const TEMPLATE(T, ctx_t) ctx);
-
-slong TEMPLATE(T, mat_lu_classical)(slong * P, TEMPLATE(T, mat_t) A, int rank_check,
-                              const TEMPLATE(T, ctx_t) ctx);
-
 /* Inverse *******************************************************************/
 
 int TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
@@ -260,32 +262,9 @@ void TEMPLATE(T, mat_solve_tril)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) 
                             const TEMPLATE(T, mat_t) B, int unit,
                             const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, mat_solve_tril_classical)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) L,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
-
-void TEMPLATE(T, mat_solve_tril_recursive)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) L,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
-
 void TEMPLATE(T, mat_solve_triu)(TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) U,
                             const TEMPLATE(T, mat_t) B, int unit,
                             const TEMPLATE(T, ctx_t) ctx);
-
-void TEMPLATE(T, mat_solve_triu_classical)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) U,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
-void TEMPLATE(T, mat_solve_triu_recursive)(TEMPLATE(T, mat_t) X,
-                                      const TEMPLATE(T, mat_t) U,
-                                      const TEMPLATE(T, mat_t) B,
-                                      int unit,
-                                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_mul_vec)(TEMPLATE(T, struct) * c,
                                     const TEMPLATE(T, mat_t) A,
@@ -332,7 +311,7 @@ void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
  * void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
  *                          TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx)
  * {
- *   TEMPLATE(T, mat_charpoly_danilevsky) (p, A, ctx);
+ *   TEMPLATE(T, mat_charpoly) (p, A, ctx);
  * }
  */
 

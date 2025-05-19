@@ -11,12 +11,6 @@
 
 #include "mpn_mod.h"
 
-/* for wide add_ssss.... macros. todo; these ought to be provided
-   everywhere */
-#if FLINT_BITS == 64 && defined(__AVX2__)
-#include "crt_helpers.h"
-#endif
-
 /* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
 mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const gr_mat_t A_in, int rank_check, gr_ctx_t ctx)
@@ -24,12 +18,13 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
     ulong d[MPN_MOD_MAX_LIMBS];
     ulong e[MPN_MOD_MAX_LIMBS];
     ulong f[MPN_MOD_MAX_LIMBS];
-    nn_ptr * a;
+    nn_ptr aa;
     nn_ptr tmprow;
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
     slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
+    slong Astride = A->stride;
     int status = GR_SUCCESS;
-    nn_ptr tnn_ptr, b;
+    nn_ptr b;
     TMP_INIT;
 
     nrows = A->r;
@@ -41,12 +36,12 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
         return GR_SUCCESS;
     }
 
-    a = (nn_ptr *) A->rows;
+    aa = A->entries;
 
     if (A != A_in)
     {
         for (i = 0; i < nrows; i++)
-            flint_mpn_copyi(a[i], A_in->rows[i], n * ncols);
+            flint_mpn_copyi(aa + i * Astride * n, ((nn_srcptr) A_in->entries) + i * A_in->stride * n, n * ncols);
     }
 
     rank = row = col = 0;
@@ -59,7 +54,7 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
     tmprow = b + (2 * n + 1) * (nrows * ncols);
 
 #define UNREDUCED(ii, jj) (b + (2 * n + 1) * ((ii) * ncols + (jj)))
-#define REDUCED(ii, jj) (a[ii] + ((jj) * n))
+#define REDUCED(ii, jj) (aa + (((ii) * Astride + (jj)) * n))
 #define TMPROW(ii) (tmprow + (2 * n + 1) * (ii))
 
     flint_mpn_zero(tmprow, (2 * n + 1) * ncols);
@@ -84,7 +79,7 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
         pivot_row = -1;
         for (i = row; i < nrows; i++)
         {
-            if (!flint_mpn_zero_p(REDUCED(i, col), n) != 0)
+            if (!flint_mpn_zero_p(REDUCED(i, col), n))
             {
                 pivot_row = i;
                 break;
@@ -107,9 +102,8 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
         /* swap rows */
         if (pivot_row != row)
         {
-            tnn_ptr = a[pivot_row];
-            a[pivot_row] = a[row];
-            a[row] = tnn_ptr;
+            for (j = 0; j < n * ncols; j++)
+                FLINT_SWAP(ulong, REDUCED(row, 0)[j], REDUCED(pivot_row, 0)[j]);
 
             tmp_index = P[pivot_row];
             P[pivot_row] = P[row];
@@ -143,7 +137,6 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
             mpn_mod_mul(e, REDUCED(i, col), d, ctx);
             mpn_mod_neg(f, e, ctx);
 
-#if defined(add_sssssaaaaaaaaaa)
             if (n == 2)
             {
                 for (j = col + 1; j < ncols; j++)
@@ -161,7 +154,6 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
                 REDUCED(i, rank - 1)[1] = e[1];
             }
             else
-#endif
             {
                 if (col + 1 < ncols)
                 {

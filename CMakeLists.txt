@@ -13,7 +13,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 if(NOT WIN32)
-    message(WARNING "Detected system is not Windows. Please use the Autotools configuration along with the Makefile instead as it is more up-to-date. Read INSTALL.")
+    message(FATAL_ERROR "Detected system is not Windows.  Please use the Autotools configuration along with the Makefile instead as it is more up-to-date.  Read INSTALL.md.")
 endif()
 
 include(CheckCCompilerFlag)
@@ -150,7 +150,7 @@ set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
 if(HAS_FLAG_ARCH)
     set(CMAKE_REQUIRED_FLAGS "-march=${ENABLE_ARCH}")
 endif()
-if(HAS_FLAG_AVX2)
+if(ENABLE_AVX2)
     set(CMAKE_REQUIRED_FLAGS "${avx2_flag}")
 endif()
 check_c_source_compiles([[
@@ -336,6 +336,10 @@ else()
     set(FLINT_BITS 32)
 endif()
 
+if(MSVC AND NOT BUILD_SHARED_LIBS)
+    set(FLINT_STATIC_BUILD 1)
+endif()
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
@@ -399,6 +403,10 @@ target_link_libraries(flint PUBLIC
     mpfr::mpfr
     ${PThreads_LIBRARIES}
 )
+
+if(MSVC AND NOT "${CMAKE_CXX_SIMULATE_ID}" STREQUAL "MSVC")
+    target_compile_options(flint PUBLIC "/experimental:c11atomics")
+endif()
 
 if(FLINT_USES_BLAS)
     target_link_libraries(flint PUBLIC CBLAS::CBLAS)

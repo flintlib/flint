@@ -23,9 +23,9 @@ void nmod_mat_randfull_half(nmod_mat_t mat, flint_rand_t state)
     for (i = 0; i < r; i++)
     for (j = 0; j < c; j++)
     {
-        mat->rows[i][j] = mat->mod.n/2;
+        nmod_mat_entry(mat, i, j) = mat->mod.n/2;
         if (mat->mod.n > 2 && (mat->mod.n % 2))
-            mat->rows[i][j] += n_randint(state, 2);
+            nmod_mat_entry(mat, i, j) += n_randint(state, 2);
     }
 }
 

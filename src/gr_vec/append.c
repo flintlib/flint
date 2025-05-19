@@ -18,3 +18,11 @@ gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx)
     vec->length++;
     return gr_set(GR_ENTRY(vec->entries, vec->length - 1, ctx->sizeof_elem), f, ctx);
 }
+
+void
+gr_vec_append_swap(gr_vec_t vec, gr_ptr f, gr_ctx_t ctx)
+{
+    gr_vec_fit_length(vec, vec->length + 1, ctx);
+    vec->length++;
+    gr_swap(GR_ENTRY(vec->entries, vec->length - 1, ctx->sizeof_elem), f, ctx);
+}

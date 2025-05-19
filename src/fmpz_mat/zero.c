@@ -21,5 +21,5 @@ fmpz_mat_zero(fmpz_mat_t mat)
         return;
 
     for (i = 0; i < mat->r; i++)
-        _fmpz_vec_zero(mat->rows[i], mat->c);
+        _fmpz_vec_zero(fmpz_mat_row(mat, i), mat->c);
 }

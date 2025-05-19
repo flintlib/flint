@@ -100,13 +100,6 @@ static int fmpz_mod_poly_add_zip_must_match(
     return ai < 0;
 }
 
-
-static fmpz * fmpz_mod_mat_row_ref(fmpz_mod_mat_t M, slong i)
-{
-    return M->rows[i];
-}
-
-
 /*
     Try to set G to the gcd of A and B given the form f of G.
 
@@ -320,18 +313,18 @@ general_case:
             fmpz_mod_mat_init(ML + s, l, l + n, ctx->ffinfo);
         }
 
-        _fmpz_vec_set(fmpz_mod_mat_row_ref(ML + s, 0), HG->coeffs[s].coeffs, n);
+        _fmpz_vec_set(fmpz_mod_mat_row(ML + s, 0), HG->coeffs[s].coeffs, n);
         for (i = 1; i < l; i++)
         {
-            _fmpz_mod_vec_mul(fmpz_mod_mat_row_ref(ML + s, i),
-                              fmpz_mod_mat_row_ref(ML + s, i - 1),
+            _fmpz_mod_vec_mul(fmpz_mod_mat_row(ML + s, i),
+                              fmpz_mod_mat_row(ML + s, i - 1),
                                          HG->coeffs[s].coeffs, n, ctx->ffinfo);
         }
 
         for (i = 0; i < l; i++)
         {
-            _fmpz_vec_zero(fmpz_mod_mat_row_ref(ML + s, i) + n, l);
-            fmpz_set(fmpz_mod_mat_row_ref(ML + s, i) + n + i, ZG->coeffs[s].coeffs + i);
+            _fmpz_vec_zero(fmpz_mod_mat_row(ML + s, i) + n, l);
+            fmpz_set(fmpz_mod_mat_row(ML + s, i) + n + i, ZG->coeffs[s].coeffs + i);
         }
 
         /*
@@ -352,7 +345,7 @@ general_case:
 
         /* delete zero rows from MF, matrix interface makes this fun */
         i = fmpz_mod_mat_nrows(MF, ctx->ffinfo);
-        while (i > 1 && _fmpz_vec_is_zero(fmpz_mod_mat_row_ref(MF, i - 1), l))
+        while (i > 1 && _fmpz_vec_is_zero(fmpz_mod_mat_row(MF, i - 1), l))
             i--;
 
         if (i < fmpz_mod_mat_nrows(MF, ctx->ffinfo))
@@ -402,7 +395,7 @@ try_it:
     for (s = 0; s < Gmarkslen; s++)
     {
         _fmpz_mod_vec_mul(ZG->coeffs[s].coeffs, ZG->coeffs[s].coeffs,
-                                fmpz_mod_mat_row_ref(Msol, 0), l, ctx->ffinfo);
+                                fmpz_mod_mat_row(Msol, 0), l, ctx->ffinfo);
     }
 
     success = fmpz_mod_polyun_zip_solve(G, ZG, HG, MG, ctx);

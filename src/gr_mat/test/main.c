@@ -12,11 +12,13 @@
 /* Include functions *********************************************************/
 
 #include "t-adjugate.c"
+#include "t-charpoly.c"
 #include "t-charpoly_danilevsky.c"
 #include "t-charpoly_faddeev_bsgs.c"
 #include "t-charpoly_faddeev.c"
 #include "t-charpoly_gauss.c"
 #include "t-charpoly_householder.c"
+#include "t-companion.c"
 #include "t-concat_horizontal.c"
 #include "t-concat_vertical.c"
 #include "t-det_berkowitz.c"
@@ -24,6 +26,8 @@
 #include "t-det_fflu.c"
 #include "t-det_lu.c"
 #include "t-diagonalization.c"
+#include "t-exp.c"
+#include "t-func_jordan.c"
 #include "t-hadamard.c"
 #include "t-hessenberg.c"
 #include "t-hessenberg_gauss.c"
@@ -35,15 +39,21 @@
 #include "t-lu_recursive.c"
 #include "t-minpoly_field.c"
 #include "t-mul_strassen.c"
+#include "t-mul_waksman.c"
 #include "t-nullspace.c"
+#include "t-pow.c"
+#include "t-pow_fmpq.c"
+#include "t-pow_scalar.c"
 #include "t-properties.c"
 #include "t-randrank.c"
+#include "t-randsimilar.c"
 #include "t-rank.c"
 #include "t-rank_fflu.c"
 #include "t-rank_lu.c"
 #include "t-rref_den_fflu.c"
 #include "t-rref_fflu.c"
 #include "t-rref_lu.c"
+#include "t-scalar.c"
 #include "t-solve.c"
 #include "t-solve_den.c"
 #include "t-solve_den_fflu.c"
@@ -59,11 +69,13 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_mat_adjugate),
+    TEST_FUNCTION(gr_mat_charpoly),
     TEST_FUNCTION(gr_mat_charpoly_danilevsky),
     TEST_FUNCTION(gr_mat_charpoly_faddeev_bsgs),
     TEST_FUNCTION(gr_mat_charpoly_faddeev),
     TEST_FUNCTION(gr_mat_charpoly_gauss),
     TEST_FUNCTION(gr_mat_charpoly_householder),
+    TEST_FUNCTION(gr_mat_companion),
     TEST_FUNCTION(gr_mat_concat_horizontal),
     TEST_FUNCTION(gr_mat_concat_vertical),
     TEST_FUNCTION(gr_mat_det_berkowitz),
@@ -71,6 +83,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_det_fflu),
     TEST_FUNCTION(gr_mat_det_lu),
     TEST_FUNCTION(gr_mat_diagonalization),
+    TEST_FUNCTION(gr_mat_exp),
+    TEST_FUNCTION(gr_mat_func_jordan),
     TEST_FUNCTION(gr_mat_hadamard),
     TEST_FUNCTION(gr_mat_hessenberg),
     TEST_FUNCTION(gr_mat_hessenberg_gauss),
@@ -82,15 +96,21 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_lu_recursive),
     TEST_FUNCTION(gr_mat_minpoly_field),
     TEST_FUNCTION(gr_mat_mul_strassen),
+    TEST_FUNCTION(gr_mat_mul_waksman),
     TEST_FUNCTION(gr_mat_nullspace),
+    TEST_FUNCTION(gr_mat_pow),
+    TEST_FUNCTION(gr_mat_pow_fmpq),
+    TEST_FUNCTION(gr_mat_pow_scalar),
     TEST_FUNCTION(gr_mat_properties),
     TEST_FUNCTION(gr_mat_randrank),
+    TEST_FUNCTION(gr_mat_randsimilar),
     TEST_FUNCTION(gr_mat_rank),
     TEST_FUNCTION(gr_mat_rank_fflu),
     TEST_FUNCTION(gr_mat_rank_lu),
     TEST_FUNCTION(gr_mat_rref_den_fflu),
     TEST_FUNCTION(gr_mat_rref_fflu),
     TEST_FUNCTION(gr_mat_rref_lu),
+    TEST_FUNCTION(gr_mat_scalar),
     TEST_FUNCTION(gr_mat_solve),
     TEST_FUNCTION(gr_mat_solve_den),
     TEST_FUNCTION(gr_mat_solve_den_fflu),

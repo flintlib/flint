@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_mpoly_gen, state)
         slong len, exp_bits, k1, k2;
         ulong modulus;
 
-        modulus = UWORD(2) + n_randint(state, -UWORD(2));
+        modulus = UWORD(1) + n_randint(state, -UWORD(2));
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
         if (ctx->minfo->nvars < 1)
         {

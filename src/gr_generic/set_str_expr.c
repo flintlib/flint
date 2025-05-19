@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
 #include "mpoly.h"
@@ -28,6 +30,7 @@
 #define PREC_UMINUS      3
 #define PREC_UPLUSMINUS  3
 #define PREC_POWER       4
+#define PREC_FUNCTION    5
 #define PREC_HIGHEST   255
 
 #define OP_TIMES       0
@@ -37,11 +40,55 @@
 #define OP_LROUND      4
 #define OP_POWER       5
 #define OP_PLUSMINUS   6
+#define OP_FUNCTION    8
 
 #define FIX_INFIX      0
 #define FIX_PREFIX     1
 #define FIX_POSTFIX    2
 #define FIX_MATCHFIX   3
+
+/* Parsing function applications is a bit of a hack. We basically
+   treat f as a prefix operator acting on the expression to the
+   right. Only univariate functions are supported. */
+
+/* Parse a few common functions. If we want to extend this table,
+   we should probably generate a prefix tree so that lookups are not O(n). */
+
+typedef struct { const char * name; int len; gr_method method; } function1;
+
+#define OP_MAKE_FUNCTION1(op) (OP_FUNCTION | (op << 5))
+#define OP_GET_FUNCTION1(op) ((op) >> 5)
+
+static const function1 functions1[] = {
+    { "abs", 3, GR_METHOD_ABS },
+    { "sgn", 3, GR_METHOD_SGN },
+    { "arg", 3, GR_METHOD_ARG },
+    { "inv", 3, GR_METHOD_INV },
+    { "sqrt", 4, GR_METHOD_SQRT },
+    { "rsqrt", 5, GR_METHOD_RSQRT },
+    { "floor", 5, GR_METHOD_FLOOR },
+    { "ceil", 4, GR_METHOD_CEIL },
+    { "nint", 4, GR_METHOD_NINT },
+    { "re", 2, GR_METHOD_RE },
+    { "im", 2, GR_METHOD_IM },
+    { "conj", 4, GR_METHOD_CONJ },
+    { "fac", 3, GR_METHOD_FAC },
+    { "log", 3, GR_METHOD_LOG },
+    { "exp", 3, GR_METHOD_EXP },
+    { "sin", 3, GR_METHOD_SIN },
+    { "cos", 3, GR_METHOD_COS },
+    { "tan", 3, GR_METHOD_TAN },
+    { "asin", 4, GR_METHOD_ASIN },
+    { "acos", 4, GR_METHOD_ACOS },
+    { "atan", 4, GR_METHOD_ATAN },
+    { "sinpi", 5, GR_METHOD_SIN_PI },
+    { "cospi", 5, GR_METHOD_COS_PI },
+    { "tanpi", 5, GR_METHOD_TAN_PI },
+    { "gamma", 5, GR_METHOD_GAMMA },
+    { "zeta", 4, GR_METHOD_ZETA },
+};
+
+#define NUM_FUNCTIONS1 (sizeof(functions1) / sizeof(function1))
 
 typedef struct {
     gr_ctx_struct * R;
@@ -74,22 +121,22 @@ FLINT_FORCE_INLINE int _is_op(slong a)
 
 FLINT_FORCE_INLINE slong _op_make(slong name, slong fix, slong prec)
 {
-    return (prec << 10) + (fix << 8) + (name << 0);
+    return (prec << 24) + (fix << 16) + (name << 0);
 }
 
 FLINT_FORCE_INLINE slong _op_prec(slong a)
 {
-    return (ulong)(a) >> 10;
+    return (ulong)(a) >> 24;
 }
 
 FLINT_FORCE_INLINE slong _op_fix(slong a)
 {
-    return ((ulong)(a) >> 8) & 3;
+    return ((ulong)(a) >> 16) & 3;
 }
 
 FLINT_FORCE_INLINE slong _op_name(slong a)
 {
-    return a&255;
+    return a & 0xffff;
 }
 
 /* initialize the R member first */
@@ -180,6 +227,34 @@ void _gr_parse_add_terminal(gr_parse_t E, const char * s, const void * val)
     }
 }
 
+static int string_with_length_cmp(const void * _a, const void * _b)
+{
+    string_with_length_struct * a = (string_with_length_struct *) _a;
+    string_with_length_struct * b = (string_with_length_struct *) _b;
+    return strncmp(a->str, b->str, a->str_len);
+}
+
+int _gr_parse_check_duplicates(gr_parse_t E)
+{
+    size_t size = E->terminals_len * sizeof(string_with_length_struct);
+    string_with_length_struct * names = (string_with_length_struct *) flint_malloc(size);
+    memcpy(names, E->terminal_strings, size);
+    qsort(names, E->terminals_len, sizeof(string_with_length_struct),
+          string_with_length_cmp);
+    int ok = 1;
+    for (slong k = 1; k < E->terminals_len; k++)
+    {
+        if (names[k].str_len == names[k - 1].str_len &&
+            !strncmp(names[k - 1].str, names[k].str, names[k-1].str_len))
+        {
+            ok = 0;
+            break;
+        }
+    }
+    flint_free(names);
+    return ok;
+}
+
 static int gr_parse_top_is_expr(const gr_parse_t E)
 {
     return E->stack_len > 0 && !_is_op(E->stack[E->stack_len - 1]);
@@ -262,7 +337,7 @@ static int _gr_parse_pop_prec(gr_parse_t E, slong prec)
     slong sz = E->R->sizeof_elem;
 
     if (E->stack_len < 1)
-        return -1;
+       return -1;
 
 again:
 
@@ -433,6 +508,18 @@ again:
                 return -1;
             }
             GR_TMP_CLEAR(zero, E->R);
+        }
+        else
+        {
+            if (_op_name(n2) & OP_FUNCTION)
+            {
+                int method_id = OP_GET_FUNCTION1(_op_name(n2));
+
+                gr_method_unary_op func1 = (gr_method_unary_op) E->R->methods[method_id];
+
+                if (GR_SUCCESS != func1(GR_ENTRY(E->estore, n1, sz), GR_ENTRY(E->estore, n1, sz), E->R))
+                    return -1;
+            }
         }
 
         E->stack[n-2] = -1-n1;
@@ -740,7 +827,7 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
         else if (*s == ')' || *s == ']')
         {
             if (_gr_parse_pop_prec(E, PREC_LOWEST))
-                goto failed;
+                 goto failed;
 
             if (_gr_parse_pop_expr(E))
                 goto failed;
@@ -771,9 +858,8 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
             }
 
             /* some builtin constants (for R and C) */
-            /* todo: builtin functions */
 
-            if (0 == strncmp(s, "pi", 2) || 0 == strncmp(s, "Pi", 2))
+            if ((0 == strncmp(s, "pi", 2) || 0 == strncmp(s, "Pi", 2)) && !isalpha(s[2]))
             {
                 if (GR_SUCCESS != gr_pi(E->tmp, E->R))
                     goto failed;
@@ -783,7 +869,7 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
                 goto continue_outer;
             }
 
-            if (0 == strncmp(s, "i", 1) || 0 == strncmp(s, "I", 1))
+            if ((0 == strncmp(s, "i", 1) || 0 == strncmp(s, "I", 1)) && !isalpha(s[1]))
             {
                 if (GR_SUCCESS != gr_i(E->tmp, E->R))
                     goto failed;
@@ -791,6 +877,25 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
                     goto failed;
                 s += 1;
                 goto continue_outer;
+            }
+
+            /* Some builtin functions. */
+
+            int i;
+            for (i = 0; i < NUM_FUNCTIONS1; i++)
+            {
+                if (0 == strncmp(s, functions1[i].name, functions1[i].len)
+                        && !isalpha(s[functions1[i].len]))
+                {
+                    if (!gr_parse_top_is_expr(E))
+                    {
+                        _gr_parse_push_op(E, _op_make(OP_MAKE_FUNCTION1(functions1[i].method), FIX_PREFIX, PREC_FUNCTION));
+                        s += functions1[i].len;
+                        goto continue_outer;
+                    }
+
+                    break;
+                }
             }
 
             goto failed;
@@ -828,7 +933,8 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
     gr_vec_t gens;
     slong i;
     char * g;
-    int status;
+
+    int status = GR_SUCCESS;
 
     /* Quickly see if we simply have an integer literal, e.g. 0 */
     fmpz_t c;
@@ -853,11 +959,13 @@ gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
                 _gr_parse_add_terminal(parse, g, gr_vec_entry_srcptr(gens, i, ctx));
                 flint_free(g);
             }
+            if (!_gr_parse_check_duplicates(parse))
+                status = GR_UNABLE;
         }
 
         gr_vec_clear(gens, ctx);
 
-        status = _gr_parse_parse(parse, res, s, strlen(s)) ? GR_UNABLE : GR_SUCCESS;
+        status |= _gr_parse_parse(parse, res, s, strlen(s)) ? GR_UNABLE : GR_SUCCESS;
 
         _gr_parse_clear(parse);
     }

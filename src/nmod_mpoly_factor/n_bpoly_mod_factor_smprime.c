@@ -1133,7 +1133,7 @@ static void _lattice(
 
             for (i = 0; i < nrows; i++)
                 nmod_mat_entry(M, j - lower, i) =
-                             _nmod_vec_dot(trow, N->rows[i], r, ctx, params);
+                             _nmod_vec_dot(trow, nmod_mat_entry_ptr(N, i, 0), r, ctx, params);
         }
 
         nmod_mat_init_nullspace_tr(T1, M);

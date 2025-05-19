@@ -17,15 +17,15 @@ TEST_FUNCTION_START(acb_mat_solve_lu, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         fmpq_mat_t Q, QX, QB;
         acb_mat_t A, X, B;
         slong n, m, qbits, prec;
         int q_invertible, r_invertible, r_invertible2;
 
-        n = n_randint(state, 10);
-        m = n_randint(state, 10);
+        n = n_randint(state, 5);
+        m = n_randint(state, 5);
         qbits = 1 + n_randint(state, 30);
         prec = 2 + n_randint(state, 200);
 

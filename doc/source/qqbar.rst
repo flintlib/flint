@@ -823,7 +823,7 @@ Symbolic expressions and conversion to radicals
       small factors from *c*. This is a tradeoff that provides pretty
       output in most cases while avoiding extreme worst-case slowdown.
       The smooth factorization guarantees finding all small factors
-      (up to some trial division limit determined internally by Flint),
+      (up to some trial division limit determined internally by FLINT),
       but large factors are only found heuristically.
 
 .. function:: int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr)

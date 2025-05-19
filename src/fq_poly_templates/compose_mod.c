@@ -13,21 +13,20 @@
 
 #ifdef T
 
+#include "gr.h"
+#include "gr_poly.h"
 #include "templates.h"
 
-#include "ulong_extras.h"
 void
 _TEMPLATE(T, poly_compose_mod) (TEMPLATE(T, struct) * res,
-                                const TEMPLATE(T, struct) * f, slong lenf,
-                                const TEMPLATE(T, struct) * g,
-                                const TEMPLATE(T, struct) * h, slong lenh,
+                                const TEMPLATE(T, struct) * poly1, slong len1,
+                                const TEMPLATE(T, struct) * poly2,
+                                const TEMPLATE(T, struct) * poly3, slong len3,
                                 const TEMPLATE(T, ctx_t) ctx)
 {
-    if (lenh < TEMPLATE(CAP_T, COMPOSE_MOD_LENH_CUTOFF) || lenf >= lenh)
-        _TEMPLATE(T, poly_compose_mod_horner) (res, f, lenf, g, h, lenh, ctx);
-    else
-        _TEMPLATE(T, poly_compose_mod_brent_kung) (res, f, lenf, g, h, lenh,
-                                                   ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_poly_compose_mod(res, poly1, len1, poly2, poly3, len3, gr_ctx));
 }
 
 void
@@ -37,66 +36,12 @@ TEMPLATE(T, poly_compose_mod) (TEMPLATE(T, poly_t) res,
                                const TEMPLATE(T, poly_t) poly3,
                                const TEMPLATE(T, ctx_t) ctx)
 {
-    TEMPLATE(T, t) inv3;
-    slong len1 = poly1->length;
-    slong len2 = poly2->length;
-    slong len3 = poly3->length;
-    slong len = len3 - 1;
-    slong vec_len = FLINT_MAX(len3 - 1, len2);
-
-    TEMPLATE(T, struct) * ptr2;
-
-    if (len3 == 0)
-    {
-        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
-    }
-
-    if (len1 == 0 || len3 == 1)
-    {
-        TEMPLATE(T, poly_zero) (res, ctx);
-        return;
-    }
-
-    if (len1 == 1)
-    {
-        TEMPLATE(T, poly_set) (res, poly1, ctx);
-        return;
-    }
-
-    if (res == poly3 || res == poly1)
-    {
-        TEMPLATE(T, poly_t) tmp;
-        TEMPLATE(T, poly_init) (tmp, ctx);
-        TEMPLATE(T, poly_compose_mod) (tmp, poly1, poly2, poly3, ctx);
-        TEMPLATE(T, poly_swap) (tmp, res, ctx);
-        TEMPLATE(T, poly_clear) (tmp, ctx);
-        return;
-    }
-
-    ptr2 = _TEMPLATE(T, vec_init) (vec_len, ctx);
-
-    if (len2 <= len)
-    {
-        _TEMPLATE(T, vec_set) (ptr2, poly2->coeffs, len2, ctx);
-        _TEMPLATE(T, vec_zero) (ptr2 + len2, len - len2, ctx);
-    }
-    else
-    {
-        TEMPLATE(T, init) (inv3, ctx);
-        TEMPLATE(T, inv) (inv3, poly3->coeffs + len, ctx);
-        _TEMPLATE(T, poly_rem) (ptr2, poly2->coeffs, len2,
-                                poly3->coeffs, len3, inv3, ctx);
-        TEMPLATE(T, clear) (inv3, ctx);
-    }
-
-    TEMPLATE(T, poly_fit_length) (res, len, ctx);
-    _TEMPLATE(T, poly_compose_mod) (res->coeffs,
-                                    poly1->coeffs, len1, ptr2, poly3->coeffs,
-                                    len3, ctx);
-    _TEMPLATE(T, poly_set_length) (res, len, ctx);
-    _TEMPLATE(T, poly_normalise) (res, ctx);
-
-    _TEMPLATE(T, vec_clear) (ptr2, vec_len, ctx);
+    gr_ctx_t gr_ctx;
+    TEMPLATE3(_gr_ctx_init, T, from_ref)(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_poly_compose_mod((gr_poly_struct *) res,
+            (const gr_poly_struct *) poly1,
+            (const gr_poly_struct *) poly2,
+            (const gr_poly_struct *) poly3, gr_ctx));
 }
 
 

@@ -53,14 +53,14 @@
 #endif
 
 #ifdef va_start
-# define FLINT_HAVE_VA_LIST
+# define FLINT_HAVE_VA_LIST 1
 #endif
 
 #if defined(FILE)       || defined(_FILE_DEFINED) || defined(__DEFINED_FILE) \
  || defined(H_STDIO)    || defined(_H_STDIO)      || defined(_STDIO_H)       \
  || defined(_STDIO_H_)  || defined(__STDIO_H)     || defined(__STDIO_H__)    \
  || defined(__STDIO__)
-# define FLINT_HAVE_FILE
+# define FLINT_HAVE_FILE 1
 #endif
 
 #ifdef FLINT_INLINES_C
@@ -120,12 +120,6 @@ typedef const ulong * nn_srcptr;
 # define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 # define FLINT_UNLIKELY(x) __builtin_expect((x),0)
 # define FLINT_LIKELY(x) __builtin_expect((x),1)
-# define FLINT_PUSH_OPTIONS _Pragma("GCC push_options")
-# define FLINT_POP_OPTIONS _Pragma("GCC pop_options")
-# define FLINT_OPTIMIZE_NESTED_3(part) _Pragma(#part)
-# define FLINT_OPTIMIZE_NESTED_2(part) FLINT_OPTIMIZE_NESTED_3(GCC optimize part)
-# define FLINT_OPTIMIZE_NESTED_1(part) FLINT_OPTIMIZE_NESTED_2(#part)
-# define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
 # define FLINT_CONSTANT_P __builtin_constant_p
 # define FLINT_UNREACHABLE __builtin_unreachable()
 # define FLINT_RETURNS_NONNULL __attribute__((returns_nonnull))
@@ -147,21 +141,16 @@ typedef const ulong * nn_srcptr;
 # define FLINT_CONST
 # define FLINT_UNLIKELY(x) (x)
 # define FLINT_LIKELY(x) (x)
-# define FLINT_PUSH_OPTIONS
-# define FLINT_POP_OPTIONS
-# define FLINT_OPTIMIZE(x)
 # define FLINT_CONSTANT_P(x) 0
 # define FLINT_RETURNS_NONNULL
 # define FLINT_MALLOC
 # define FLINT_DEPRECATED
 #endif
 
-#if defined(__cplusplus)
+#if defined(__cplusplus) || ( __STDC_VERSION__ >= 202300L )
 # define FLINT_NORETURN [[noreturn]]
-#elif __STDC_VERSION__ < 202300L
-# define FLINT_NORETURN _Noreturn
 #else
-# define FLINT_NORETURN noreturn
+# define FLINT_NORETURN _Noreturn
 #endif
 
 #if FLINT_USES_TLS
@@ -351,7 +340,7 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
    FLINT_GC_INIT(); \
    flint_rand_init(xxx)
 
-#define FLINT_TEST_CLEANUP(xxx) \
+#define FLINT_TEST_CLEAR(xxx) \
    flint_rand_clear(xxx); \
    flint_cleanup_master();
 
@@ -360,9 +349,15 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
+#define FLINT_UABS(x) (((slong)(x) < 0) ? (-(ulong)(x)) : ((ulong)(x)))
 #define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
 #define FLINT_SGN(x) ((0 < (slong)(x)) - ((slong)(x) < 0))
 #define FLINT_SWAP(T, x, y) do { T _swap_t = (x); (x) = (y); (y) = _swap_t; } while(0)
+
+/* sorting *******************************************************************/
+
+void flint_merge_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data);
+void flint_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data);
 
 /* allocation macros *********************************************************/
 
@@ -413,16 +408,16 @@ int flint_sprintf(char * s, const char * str, ...);
 int flint_scanf(const char * str, ...);
 int flint_sscanf(const char * s, const char * str, ...);
 
-#ifdef FLINT_HAVE_VA_LIST
+#if FLINT_HAVE_VA_LIST
 int flint_vprintf(const char * str, va_list ap);
 #endif
 
-#ifdef FLINT_HAVE_FILE
+#if FLINT_HAVE_FILE
 int flint_fprintf(FILE * f, const char * str, ...);
 int flint_fscanf(FILE * f, const char * str, ...);
 #endif
 
-#if defined(FLINT_HAVE_VA_LIST) && defined(FLINT_HAVE_FILE)
+#if FLINT_HAVE_VA_LIST && FLINT_HAVE_FILE
 int flint_vfprintf(FILE * f, const char * str, va_list ap);
 #endif
 
@@ -441,6 +436,10 @@ typedef enum
 } flint_err_t;
 
 FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...);
+
+#if FLINT_HAVE_VA_LIST
+void flint_set_throw(void (* func)(flint_err_t, const char *, va_list));
+#endif
 
 /* FLINT generic type definitions ********************************************/
 

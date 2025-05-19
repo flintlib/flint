@@ -17,10 +17,9 @@ int _mpn_mod_methods_initialized = 0;
 
 gr_static_method_table _mpn_mod_methods;
 
-#if defined(__GNUC__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wcast-function-type"
-#endif
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE
+
 gr_method_tab_input _mpn_mod_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) mpn_mod_ctx_write},
@@ -133,11 +132,12 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,                 (gr_funcptr) mpn_mod_mat_nonsingular_solve_triu},
     {GR_METHOD_MAT_LU,          (gr_funcptr) mpn_mod_mat_lu},
     {GR_METHOD_MAT_DET,         (gr_funcptr) mpn_mod_mat_det},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _mpn_mod_mat_charpoly},
+    {GR_METHOD_MAT_REDUCE_ROW,  (gr_funcptr) mpn_mod_mat_reduce_row},
     {0,                         (gr_funcptr) NULL},
 };
-#if defined(__GNUC__)
-# pragma GCC diagnostic pop
-#endif
+
+DIAGNOSTIC_POP
 
 int
 _gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs)

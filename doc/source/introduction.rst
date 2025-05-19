@@ -3,7 +3,7 @@
 **Introduction**
 ===============================================================================
 
-What is Flint?
+What is FLINT?
 -------------------------------------------------------------------------------
 
 FLINT is a C library of functions for doing basic arithmetic in support of
@@ -28,7 +28,7 @@ FLINT was rewritten as FLINT 2 by William Hart, Fredrik Johansson and
 Sebastian Pancratz. Many other substantial contributions have been made
 by other authors, e.g. Tom Bachmann, Mike Hansen, Daniel Schultz and Andy
 Novocin. There have been a great number of other contributors, listed on
-the main Flint website and the contributors section of this documentation.
+the main FLINT website and the contributors section of this documentation.
 
 Requirements
 -------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ this support has been dropped.
 It is also required that the platform provide a ``uint64_t`` type if a
 native 64 bit type is not available. Full C99 compliance is not required.
 
-Structure of Flint
+Structure of FLINT
 -----------------------------------------------------------------------------
 
 FLINT is supplied as a set of modules, ``fmpz``, ``fmpz_poly``, etc.,

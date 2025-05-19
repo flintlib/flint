@@ -21,8 +21,10 @@
 */
 int gr_mpoly_combine_like_terms(
     gr_mpoly_t A,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
+    mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     gr_method_binary_op add = GR_BINARY_OP(cctx, ADD);
     gr_method_swap_op swap = GR_SWAP_OP(cctx, SWAP);
     gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(cctx, IS_ZERO);

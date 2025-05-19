@@ -15,7 +15,10 @@
 int gr_mpoly_mul(gr_mpoly_t poly1,
     const gr_mpoly_t poly2,
     const gr_mpoly_t poly3,
-    const mpoly_ctx_t mctx, gr_ctx_t cctx)
+    gr_mpoly_ctx_t ctx)
 {
-    return gr_mpoly_mul_johnson(poly1, poly2, poly3, mctx, cctx);
+    if (poly2->length * poly3->length > ctx->size_limit)
+        return GR_UNABLE | gr_mpoly_zero(poly1, ctx);
+
+    return gr_mpoly_mul_johnson(poly1, poly2, poly3, ctx);
 }

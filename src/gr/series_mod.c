@@ -15,12 +15,6 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
-#ifdef __GNUC__
-# define strcmp __builtin_strcmp
-#else
-# include <string.h>
-#endif
-
 static const char * default_var = "x";
 
 static void _gr_gr_series_mod_ctx_clear(gr_ctx_t ctx)
@@ -165,7 +159,7 @@ static int _gr_gr_series_mod_one(gr_poly_t res, gr_ctx_t ctx)
 
 static int _gr_gr_series_mod_gen(gr_poly_t res, gr_ctx_t ctx)
 {
-    return (SERIES_MOD_N(ctx) <= 1) ? gr_poly_zero(res, ctx) : gr_poly_gen(res, SERIES_MOD_ELEM_CTX(ctx));
+    return (SERIES_MOD_N(ctx) <= 1) ? gr_poly_zero(res, SERIES_MOD_ELEM_CTX(ctx)) : gr_poly_gen(res, SERIES_MOD_ELEM_CTX(ctx));
 }
 
 static int _gr_gr_series_mod_set(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)

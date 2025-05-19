@@ -881,6 +881,34 @@ _gr_fmpzi_im(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpzi_canonical_associate(fmpzi_t ux, fmpzi_t u, const fmpzi_t x, const gr_ctx_t ctx)
+{
+    if (fmpzi_is_zero(x))
+    {
+        fmpzi_one(u);
+        fmpzi_zero(ux);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        slong e = fmpzi_canonical_unit_i_pow(x);
+
+        fmpzi_mul_i_pow_si(ux, x, e);
+
+        if (e == 0)
+            fmpzi_one(u);
+        else if (e == 1)
+            fmpzi_set_si_si(u, 0, 1);
+        else if (e == 2)
+            fmpzi_set_si_si(u, -1, 0);
+        else
+            fmpzi_set_si_si(u, 0, -1);
+
+        return GR_SUCCESS;
+    }
+}
+
 /*
 int
 _gr_fmpzi_sgn(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
@@ -1008,6 +1036,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_CONJ,            (gr_funcptr) _gr_fmpzi_conj},
     {GR_METHOD_RE,              (gr_funcptr) _gr_fmpzi_re},
     {GR_METHOD_IM,              (gr_funcptr) _gr_fmpzi_im},
+    {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpzi_canonical_associate},
 /*
     {GR_METHOD_SGN,             (gr_funcptr) _gr_fmpzi_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpzi_csgn},

@@ -46,13 +46,14 @@ _gr_mat_check_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
     }
 }
 
-void
+static void
 matrix_init(gr_mat_t res, gr_ctx_t ctx)
 {
     gr_mat_init(res, MATRIX_CTX(ctx)->nrows, MATRIX_CTX(ctx)->ncols, MATRIX_CTX(ctx)->base_ring);
 }
 
-int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+static int
+matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_ctx_ptr elem_ctx = MATRIX_CTX(ctx)->base_ring;
 
@@ -79,7 +80,7 @@ int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
+static truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
 {
     int shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols);
 
@@ -92,7 +93,7 @@ truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
     return gr_ctx_is_ring(MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
+static truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
     int shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols);
 
@@ -114,37 +115,37 @@ truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
     return (MATRIX_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
 
-truth_t
+static truth_t
 matrix_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(MATRIX_CTX(ctx)->base_ring);
 }
 
-void
+static void
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
 {
     gr_mat_clear(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-void
+static void
 matrix_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
 {
     gr_mat_swap(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-void
+static void
 matrix_set_shallow(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     *res = *mat;
 }
 
-int
+static int
 matrix_write(gr_stream_t out, gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_write(out, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -153,13 +154,13 @@ matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
     return gr_mat_randtest(res, state, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     return gr_mat_equal(mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
@@ -168,7 +169,7 @@ matrix_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_set(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -177,7 +178,7 @@ matrix_set_si(gr_mat_t res, slong v, gr_ctx_t ctx)
     return gr_mat_set_si(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -186,7 +187,7 @@ matrix_set_ui(gr_mat_t res, ulong v, gr_ctx_t ctx)
     return gr_mat_set_ui(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -195,7 +196,7 @@ matrix_set_fmpz(gr_mat_t res, const fmpz_t v, gr_ctx_t ctx)
     return gr_mat_set_fmpz(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -204,7 +205,7 @@ matrix_set_fmpq(gr_mat_t res, const fmpq_t v, gr_ctx_t ctx)
     return gr_mat_set_fmpq(res, v, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_set_other(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx == ctx)
@@ -253,7 +254,7 @@ matrix_set_other(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 matrix_zero(gr_mat_t res, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -262,7 +263,7 @@ matrix_zero(gr_mat_t res, gr_ctx_t ctx)
     return gr_mat_zero(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_one(gr_mat_t res, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -271,25 +272,25 @@ matrix_one(gr_mat_t res, gr_ctx_t ctx)
     return gr_mat_one(res, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_is_zero(const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_zero(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_is_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_one(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-truth_t
+static truth_t
 matrix_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx)
 {
     return gr_mat_is_neg_one(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
@@ -298,31 +299,124 @@ matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_neg(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
-matrix_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-{
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
-        return GR_DOMAIN;
+#define DEF_MAT_OP_1(op, gr_mat_op) static int \
+    op (gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx) \
+    { \
+        if (mat1->r != mat2->r || mat1->c != mat2->c) \
+            return GR_DOMAIN; \
+        if (res->r != mat1->r || res->c != mat1->c) \
+            _gr_mat_resize(res, mat1->r, mat1->c, MATRIX_CTX(ctx)->base_ring); \
+        return gr_mat_op(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring); \
+    }
 
-    if (res->r != mat1->r || res->c != mat1->c)
-        _gr_mat_resize(res, mat1->r, mat1->c, MATRIX_CTX(ctx)->base_ring);
+#define DEF_MAT_SCALAR_OP_1(op, typ, gr_mat_op_scalar) static int \
+    op (gr_mat_t res, const gr_mat_t mat1, typ x, gr_ctx_t ctx) \
+    { \
+        if (res->r != mat1->r || res->c != mat1->c) \
+            _gr_mat_resize(res, mat1->r, mat1->c, MATRIX_CTX(ctx)->base_ring); \
+        return gr_mat_op_scalar(res, mat1, x, MATRIX_CTX(ctx)->base_ring); \
+    }
 
-    return gr_mat_add(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
-}
+#define DEF_MAT_OP_OTHER(op, matrix_op, gr_mat_op_scalar) static int \
+    op(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) \
+    { \
+        if (y_ctx == ctx) \
+        { \
+            return matrix_op(res, mat, y, ctx); \
+        } \
+        else if (y_ctx == MATRIX_CTX(ctx)->base_ring) \
+        { \
+            int status = GR_SUCCESS; \
+            if (res->r != mat->r || res->c != mat->c) \
+                status = _gr_mat_check_resize(res, mat->r, mat->c, ctx); \
+            if (status != GR_SUCCESS) \
+                return status; \
+            return gr_mat_op_scalar(res, mat, y, y_ctx); \
+        } \
+        else if (y_ctx->which_ring == GR_CTX_GR_MAT) \
+        { \
+            int status; \
+            gr_mat_t tmp; \
+            gr_mat_init(tmp, ((gr_mat_struct *) y)->r, ((gr_mat_struct *) y)->c, MATRIX_CTX(ctx)->base_ring); \
+            status = matrix_set_other(tmp, y, y_ctx, ctx); \
+            if (status == GR_SUCCESS) \
+            { \
+                status = matrix_op(res, mat, tmp, ctx); \
+            } \
+            gr_mat_clear(tmp, MATRIX_CTX(ctx)->base_ring); \
+            return status; \
+        } \
+        else \
+        { \
+            int status; \
+            gr_ptr c; \
+            GR_TMP_INIT(c, MATRIX_CTX(ctx)->base_ring); \
+            status = gr_set_other(c, y, y_ctx, MATRIX_CTX(ctx)->base_ring); \
+            if (status == GR_SUCCESS) \
+            { \
+                if (res->r != mat->r || res->c != mat->c) \
+                    status = _gr_mat_check_resize(res, mat->r, mat->c, ctx); \
+                if (status == GR_SUCCESS) \
+                    status = gr_mat_op_scalar(res, mat, c, MATRIX_CTX(ctx)->base_ring); \
+            } \
+            GR_TMP_CLEAR(c, MATRIX_CTX(ctx)->base_ring); \
+            return status; \
+        } \
+        return GR_UNABLE; \
+    } \
 
-int
-matrix_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-{
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
-        return GR_DOMAIN;
+#define DEF_MAT_OTHER_OP(op, matrix_op, gr_scalar_op_mat) static int \
+    op(gr_mat_t res, gr_ptr x, gr_ctx_t x_ctx, const gr_mat_t mat, gr_ctx_t ctx) \
+    { \
+        if (x_ctx == ctx) \
+        { \
+            return matrix_op(res, x, mat, ctx); \
+        } \
+        else if (x_ctx == MATRIX_CTX(ctx)->base_ring) \
+        { \
+            int status = GR_SUCCESS; \
+            if (res->r != mat->r || res->c != mat->c) \
+                status = _gr_mat_check_resize(res, mat->r, mat->c, ctx); \
+            if (status != GR_SUCCESS) \
+                return status; \
+            return gr_scalar_op_mat(res, x, mat, x_ctx); \
+        } \
+        else if (x_ctx->which_ring == GR_CTX_GR_MAT) \
+        { \
+            int status; \
+            gr_mat_t tmp; \
+            gr_mat_init(tmp, ((gr_mat_struct *) x)->r, ((gr_mat_struct *) x)->c, MATRIX_CTX(ctx)->base_ring); \
+            status = matrix_set_other(tmp, x, x_ctx, ctx); \
+            if (status == GR_SUCCESS) \
+            { \
+                status = matrix_op(res, tmp, mat, ctx); \
+            } \
+            gr_mat_clear(tmp, MATRIX_CTX(ctx)->base_ring); \
+            return status; \
+        } \
+        else \
+        { \
+            int status; \
+            gr_ptr c; \
+            GR_TMP_INIT(c, MATRIX_CTX(ctx)->base_ring); \
+            status = gr_set_other(c, x, x_ctx, MATRIX_CTX(ctx)->base_ring); \
+            if (status == GR_SUCCESS) \
+            { \
+                if (res->r != mat->r || res->c != mat->c) \
+                    status = _gr_mat_check_resize(res, mat->r, mat->c, ctx); \
+                if (status == GR_SUCCESS) \
+                    status = gr_scalar_op_mat(res, c, mat, MATRIX_CTX(ctx)->base_ring); \
+            } \
+            GR_TMP_CLEAR(c, MATRIX_CTX(ctx)->base_ring); \
+            return status; \
+        } \
+        return GR_UNABLE; \
+    } \
 
-    if (res->r != mat1->r || res->c != mat1->c)
-        _gr_mat_resize(res, mat1->r, mat1->c, MATRIX_CTX(ctx)->base_ring);
+DEF_MAT_OP_1(matrix_add, gr_mat_add)
+DEF_MAT_OP_1(matrix_sub, gr_mat_sub)
 
-    return gr_mat_sub(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
-}
-
-int
+static int
 matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
     if (mat1->c != mat2->r)
@@ -349,111 +443,55 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
     return gr_mat_mul(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
-/* todo: fmpz etc */
-int
-matrix_mul_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+static int
+matrix_div(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
-    if (y_ctx == ctx)
-    {
-        return matrix_mul(res, mat, y, ctx);
-    }
-    else if (y_ctx == MATRIX_CTX(ctx)->base_ring)
-    {
-        int status = GR_SUCCESS;
-
-        if (res->r != mat->r || res->c != mat->c)
-            status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
-
-        if (status != GR_SUCCESS)
-            return status;
-
-        /* todo: resizing */
-        return gr_mat_mul_scalar(res, mat, y, y_ctx);
-    }
-    else if (y_ctx->which_ring == GR_CTX_GR_MAT)
-    {
-        int status;
-        gr_mat_t tmp;
-        gr_mat_init(tmp, ((gr_mat_struct *) y)->r, ((gr_mat_struct *) y)->c, MATRIX_CTX(ctx)->base_ring);
-        status = matrix_set_other(tmp, y, y_ctx, ctx);
-        if (status == GR_SUCCESS)
-        {
-            status = matrix_mul(res, mat, tmp, ctx);
-        }
-        gr_mat_clear(tmp, MATRIX_CTX(ctx)->base_ring);
-        return status;
-    }
-    else
-    {
-        int status;
-        gr_ptr c;
-
-        GR_TMP_INIT(c, MATRIX_CTX(ctx)->base_ring);
-
-        status = gr_set_other(c, y, y_ctx, MATRIX_CTX(ctx)->base_ring);
-
-        if (status == GR_SUCCESS)
-        {
-            if (res->r != mat->r || res->c != mat->c)
-                status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
-
-            if (status == GR_SUCCESS)
-                status = gr_mat_mul_scalar(res, mat, c, MATRIX_CTX(ctx)->base_ring);
-        }
-
-        GR_TMP_CLEAR(c, MATRIX_CTX(ctx)->base_ring);
-
-        return status;
-    }
-
     return GR_UNABLE;
 }
 
-/* todo: fmpz etc */
-int
-matrix_div_other(gr_mat_t res, const gr_mat_t mat, gr_ptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+static int
+matrix_pow(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 {
-    /* todo: matrix-matrix division ? */
-
-    if (y_ctx == MATRIX_CTX(ctx)->base_ring)
-    {
-        int status = GR_SUCCESS;
-
-        if (res->r != mat->r || res->c != mat->c)
-            status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
-
-        if (status != GR_SUCCESS)
-            return status;
-
-        return gr_mat_div_scalar(res, mat, y, y_ctx);
-    }
-    else
-    {
-        int status;
-        gr_ptr c;
-
-        GR_TMP_INIT(c, MATRIX_CTX(ctx)->base_ring);
-
-        status = gr_set_other(c, y, y_ctx, MATRIX_CTX(ctx)->base_ring);
-
-        if (status == GR_SUCCESS)
-        {
-            if (res->r != mat->r || res->c != mat->c)
-                status = _gr_mat_check_resize(res, mat->r, mat->c, ctx);
-
-            if (status == GR_SUCCESS)
-                status = gr_mat_div_scalar(res, mat, c, MATRIX_CTX(ctx)->base_ring);
-        }
-
-        GR_TMP_CLEAR(c, MATRIX_CTX(ctx)->base_ring);
-
-        return status;
-    }
-
     return GR_UNABLE;
 }
 
-int
+DEF_MAT_OP_OTHER(matrix_add_other, matrix_add, gr_mat_add_scalar)
+DEF_MAT_OP_OTHER(matrix_sub_other, matrix_sub, gr_mat_sub_scalar)
+DEF_MAT_OP_OTHER(matrix_mul_other, matrix_mul, gr_mat_mul_scalar)
+DEF_MAT_OP_OTHER(matrix_div_other, matrix_div, gr_mat_div_scalar)
+DEF_MAT_OP_OTHER(matrix_pow_other, matrix_pow, gr_mat_pow_scalar)
+
+DEF_MAT_OTHER_OP(matrix_other_add, matrix_add, gr_mat_scalar_add)
+DEF_MAT_OTHER_OP(matrix_other_sub, matrix_sub, gr_mat_scalar_sub)
+DEF_MAT_OTHER_OP(matrix_other_mul, matrix_mul, gr_mat_scalar_mul)
+
+DEF_MAT_SCALAR_OP_1(matrix_add_ui, ulong, gr_mat_add_ui)
+DEF_MAT_SCALAR_OP_1(matrix_add_si, slong, gr_mat_add_si)
+DEF_MAT_SCALAR_OP_1(matrix_add_fmpz, const fmpz_t, gr_mat_add_fmpz)
+DEF_MAT_SCALAR_OP_1(matrix_add_fmpq, const fmpq_t, gr_mat_add_fmpq)
+
+DEF_MAT_SCALAR_OP_1(matrix_sub_ui, ulong, gr_mat_sub_ui)
+DEF_MAT_SCALAR_OP_1(matrix_sub_si, slong, gr_mat_sub_si)
+DEF_MAT_SCALAR_OP_1(matrix_sub_fmpz, const fmpz_t, gr_mat_sub_fmpz)
+DEF_MAT_SCALAR_OP_1(matrix_sub_fmpq, const fmpq_t, gr_mat_sub_fmpq)
+
+DEF_MAT_SCALAR_OP_1(matrix_mul_ui, ulong, gr_mat_mul_ui)
+DEF_MAT_SCALAR_OP_1(matrix_mul_si, slong, gr_mat_mul_si)
+DEF_MAT_SCALAR_OP_1(matrix_mul_fmpz, const fmpz_t, gr_mat_mul_fmpz)
+DEF_MAT_SCALAR_OP_1(matrix_mul_fmpq, const fmpq_t, gr_mat_mul_fmpq)
+
+DEF_MAT_SCALAR_OP_1(matrix_div_ui, ulong, gr_mat_div_ui)
+DEF_MAT_SCALAR_OP_1(matrix_div_si, slong, gr_mat_div_si)
+DEF_MAT_SCALAR_OP_1(matrix_div_fmpz, const fmpz_t, gr_mat_div_fmpz)
+DEF_MAT_SCALAR_OP_1(matrix_div_fmpq, const fmpq_t, gr_mat_div_fmpq)
+
+DEF_MAT_SCALAR_OP_1(matrix_pow_ui, ulong, gr_mat_pow_ui)
+DEF_MAT_SCALAR_OP_1(matrix_pow_si, slong, gr_mat_pow_si)
+DEF_MAT_SCALAR_OP_1(matrix_pow_fmpz, const fmpz_t, gr_mat_pow_fmpz)
+DEF_MAT_SCALAR_OP_1(matrix_pow_fmpq, const fmpq_t, gr_mat_pow_fmpq)
+
+
+static int
 matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (mat->r != mat->c)
@@ -465,7 +503,7 @@ matrix_inv(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_inv(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_exp(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
@@ -474,13 +512,31 @@ matrix_exp(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_exp(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
-int
+static int
 matrix_log(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
     if (res->r != mat->r || res->c != mat->c)
         _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
 
     return gr_mat_log(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+static int
+matrix_sqrt(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (res->r != mat->r || res->c != mat->c)
+        _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
+
+    return gr_mat_sqrt(res, mat, MATRIX_CTX(ctx)->base_ring);
+}
+
+static int
+matrix_rsqrt(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    if (res->r != mat->r || res->c != mat->c)
+        _gr_mat_resize(res, mat->r, mat->c, MATRIX_CTX(ctx)->base_ring);
+
+    return gr_mat_rsqrt(res, mat, MATRIX_CTX(ctx)->base_ring);
 }
 
 
@@ -514,12 +570,40 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_SET_OTHER,   (gr_funcptr) matrix_set_other},
     {GR_METHOD_NEG,         (gr_funcptr) matrix_neg},
     {GR_METHOD_ADD,         (gr_funcptr) matrix_add},
+    {GR_METHOD_ADD_OTHER,   (gr_funcptr) matrix_add_other},
+    {GR_METHOD_OTHER_ADD,   (gr_funcptr) matrix_other_add},
+    {GR_METHOD_ADD_UI,      (gr_funcptr) matrix_add_ui},
+    {GR_METHOD_ADD_SI,      (gr_funcptr) matrix_add_si},
+    {GR_METHOD_ADD_FMPZ,    (gr_funcptr) matrix_add_fmpz},
+    {GR_METHOD_ADD_FMPQ,    (gr_funcptr) matrix_add_fmpq},
     {GR_METHOD_SUB,         (gr_funcptr) matrix_sub},
+    {GR_METHOD_SUB_OTHER,   (gr_funcptr) matrix_sub_other},
+    {GR_METHOD_OTHER_SUB,   (gr_funcptr) matrix_other_sub},
+    {GR_METHOD_SUB_UI,      (gr_funcptr) matrix_sub_ui},
+    {GR_METHOD_SUB_SI,      (gr_funcptr) matrix_sub_si},
+    {GR_METHOD_SUB_FMPZ,    (gr_funcptr) matrix_sub_fmpz},
+    {GR_METHOD_SUB_FMPQ,    (gr_funcptr) matrix_sub_fmpq},
     {GR_METHOD_MUL,         (gr_funcptr) matrix_mul},
     {GR_METHOD_MUL_OTHER,   (gr_funcptr) matrix_mul_other},
+    {GR_METHOD_OTHER_MUL,   (gr_funcptr) matrix_other_mul},
+    {GR_METHOD_MUL_UI,      (gr_funcptr) matrix_mul_ui},
+    {GR_METHOD_MUL_SI,      (gr_funcptr) matrix_mul_si},
+    {GR_METHOD_MUL_FMPZ,    (gr_funcptr) matrix_mul_fmpz},
+    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) matrix_mul_fmpq},
     {GR_METHOD_DIV_OTHER,   (gr_funcptr) matrix_div_other},
+    {GR_METHOD_DIV_UI,      (gr_funcptr) matrix_div_ui},
+    {GR_METHOD_DIV_SI,      (gr_funcptr) matrix_div_si},
+    {GR_METHOD_DIV_FMPZ,    (gr_funcptr) matrix_div_fmpz},
+    {GR_METHOD_DIV_FMPQ,    (gr_funcptr) matrix_div_fmpq},
+    {GR_METHOD_POW_OTHER,   (gr_funcptr) matrix_pow_other},
+    {GR_METHOD_POW_UI,      (gr_funcptr) matrix_pow_ui},
+    {GR_METHOD_POW_SI,      (gr_funcptr) matrix_pow_si},
+    {GR_METHOD_POW_FMPZ,    (gr_funcptr) matrix_pow_fmpz},
+    {GR_METHOD_POW_FMPQ,    (gr_funcptr) matrix_pow_fmpq},
     {GR_METHOD_INV,         (gr_funcptr) matrix_inv},
     {GR_METHOD_EXP,         (gr_funcptr) matrix_exp},
+    {GR_METHOD_SQRT,        (gr_funcptr) matrix_sqrt},
+    {GR_METHOD_RSQRT,       (gr_funcptr) matrix_rsqrt},
     {GR_METHOD_LOG,         (gr_funcptr) matrix_log},
     {0,                     (gr_funcptr) NULL},
 };

@@ -23,7 +23,7 @@ acb_mat_bits(const acb_mat_t A)
     b = 0;
     for (i = 0; i < ar; i++)
     {
-        t = _arb_vec_bits((arb_srcptr) A->rows[i], 2 * ac);
+        t = _arb_vec_bits((arb_srcptr) acb_mat_entry(A, i, 0), 2 * ac);
         b = FLINT_MAX(b, t);
     }
 
