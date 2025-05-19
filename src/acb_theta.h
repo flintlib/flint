@@ -92,6 +92,7 @@ acb_theta_char_bit(ulong ch, slong j, slong n)
 
 void acb_theta_char_get_arb(arb_ptr v, ulong a, slong g);
 void acb_theta_char_get_acb(acb_ptr v, ulong a, slong g);
+ulong acb_theta_char_set_slong_vec(const slong * vec, slong len);
 
 slong acb_theta_char_dot(ulong a, ulong b, slong g);
 slong acb_theta_char_dot_slong(ulong a, const slong * n, slong g);

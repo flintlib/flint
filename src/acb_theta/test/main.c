@@ -15,6 +15,7 @@
 #include "t-agm_mul_tight.c"
 #include "t-agm_sqrt.c"
 #include "t-char_dot.c"
+#include "t-char_set_slong_vec.c"
 #include "t-char_shuffle.c"
 #include "t-char_table.c"
 #include "t-ctx_exp_inv.c"
@@ -68,6 +69,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_agm_mul_tight),
     TEST_FUNCTION(acb_theta_agm_sqrt),
     TEST_FUNCTION(acb_theta_char_dot),
+    TEST_FUNCTION(acb_theta_char_set_slong_vec),
     TEST_FUNCTION(acb_theta_char_shuffle),
     TEST_FUNCTION(acb_theta_char_table),
     TEST_FUNCTION(acb_theta_ctx_exp_inv),

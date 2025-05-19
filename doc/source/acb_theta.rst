@@ -25,14 +25,6 @@ characteristic `(a,b)` is the following analytic function in `\tau\in
 
 considering `a`, `b` and `z` as column vectors.
 
-Throughout, we order vectors of theta values by associating to each
-characteristic `(a,b)` the :type:`ulong` between 0 and `2^{2g}-1` whose `g`
-most (resp. least) significant bits are given by `a` (resp. `b`): thus `(a,b)`
-where `a = (1,0)` and `b = (0,0)` in dimension `2` is numbered `8`. With these
-conventions, the output of :func:`acb_modular_theta` in dimension 1 is
-`(-\theta_3,\theta_2,\theta_0,\theta_1)`. When manipulating `a` or `b`
-individually, we map them to integers between 0 and `2^g-1`.
-
 The numerical functions in this module always compute certified error bounds:
 for instance, if `\tau` is represented by an :type:`acb_mat_t` whose imaginary
 part is not certainly positive definite at the chosen working precision, then
@@ -40,6 +32,22 @@ the output theta values will have an infinite radius.
 
 Main user functions
 -------------------------------------------------------------------------------
+
+First, if the user knows `(a,b)` as a vector *vec* of length `2g` with entries
+0 or 1, then the function
+
+.. function:: ulong acb_theta_char_set_slong_vec(const slong * vec, slong len)
+
+(where *len* is `2g`) computes the :type:`ulong` between 0 and `2^{2g}-1` whose
+binary expansion is exactly `(a,b)` (most significant bits first). Throughout,
+we order vectors of theta values according to this encoding: in other words,
+the computed :type:`ulong` will exactly be the index of `\theta_{a,b}` inside
+the vector of theta values. For instance, the characteristic `(a,b)` where `a =
+(1,0)` and `b = (0,0)` in dimension `g=2` is numbered `8`. With these
+conventions, the output of :func:`acb_modular_theta` in dimension 1 is
+`(-\theta_3,\theta_2,\theta_0,\theta_1)`. When we manipulate `a` or `b`
+individually (and hence compute only `2^g` theta values), we map them to
+integers between 0 and `2^g-1` instead, taking *len* to be `g`.
 
 The main method to evaluate theta functions is
 
@@ -1799,6 +1807,13 @@ Checks that :func:`acb_siegel_is_reduced` returns 1 on the matrix `i I_g`, but
 
 Checks that the results of :func:`acb_siegel_kappa` are compatible under matrix
 multiplication, and when varying the *sqr* parameter.
+
+.. code-block:: bash
+
+    ./build/acb_theta/test/main acb_theta_char_set_slong_vec
+
+Checks that the functions :func:`acb_theta_char_set_slong_vec` and
+:func:`acb_theta_char_bit` are inverses of each other on random input.
 
 .. code-block:: bash
 
