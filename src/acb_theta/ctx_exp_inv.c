@@ -20,7 +20,7 @@ void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t z,
         acb_conj(exp_inv, exp);
     }
     else if (acb_contains_zero(exp)
-        || acb_rel_error_bits(exp) <= 0.75 * prec)
+        || acb_rel_accuracy_bits(exp) <= 0.75 * prec)
     {
         acb_t x;
         acb_init(x);
