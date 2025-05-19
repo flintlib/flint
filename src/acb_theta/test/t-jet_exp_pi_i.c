@@ -18,7 +18,7 @@ TEST_FUNCTION_START(acb_theta_jet_exp_pi_i, state)
 {
     slong iter;
 
-    /* Test: compatible with sum of exponentials */
+    /* Test: compatible with exponential of a sum */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
