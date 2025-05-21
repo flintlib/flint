@@ -17,10 +17,9 @@ acb_theta_char_get_arb(arb_ptr v, ulong a, slong g)
 {
     slong k;
 
-    for (k = g - 1; k >= 0; k--)
+    for (k = 0; k < g; k++)
     {
-        arb_set_si(&v[k], a & 1);
-        a = a >> 1;
+        arb_set_si(&v[k], acb_theta_char_bit(a, k, g));
     }
     _arb_vec_scalar_mul_2exp_si(v, v, g, -1);
 }

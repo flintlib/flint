@@ -24,13 +24,13 @@ TEST_FUNCTION_START(acb_theta_g2_chi5, state)
         slong n2 = 1 << (2 * g);
         slong prec = 100 + n_randint(state, 500);
         slong mag_bits = n_randint(state, 10);
-        acb_ptr th;
+        acb_ptr th, mf;
         slong k;
-        acb_t r, s;
+        acb_t r;
 
         th = _acb_vec_init(n2);
+        mf = _acb_vec_init(4);
         acb_init(r);
-        acb_init(s);
 
         for (k = 0; k < n2; k++)
         {
@@ -40,21 +40,23 @@ TEST_FUNCTION_START(acb_theta_g2_chi5, state)
         acb_theta_g2_chi5(r, th, prec);
         acb_sqr(r, r, prec);
         _acb_vec_sqr(th, th, n2, prec);
-        acb_theta_g2_chi10(s, th, prec);
+        acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th, prec);
 
-        if (!acb_overlaps(r, s))
+        if (!acb_overlaps(r, &mf[2])
+            || !_acb_vec_is_finite(mf, 4)
+            || !acb_is_finite(r))
         {
             flint_printf("FAIL\n");
             acb_printd(r, 10);
             flint_printf("\n");
-            acb_printd(s, 10);
+            acb_printd(&mf[2], 10);
             flint_printf("\n");
             flint_abort();
         }
 
         _acb_vec_clear(th, n2);
+        _acb_vec_clear(mf, 4);
         acb_clear(r);
-        acb_clear(s);
     }
 
     TEST_FUNCTION_END(state);

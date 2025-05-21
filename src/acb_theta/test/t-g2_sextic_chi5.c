@@ -18,62 +18,100 @@ TEST_FUNCTION_START(acb_theta_g2_sextic_chi5, state)
 {
     slong iter;
 
-    /* Test: agrees with sextic and chi5 */
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    /* Test: discriminant of sextic is chi10 = chi5^2 */
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         slong g = 2;
         slong n = 1 << (2 * g);
-        slong prec = 100 + n_randint(state, 100);
+        slong prec = 100 + n_randint(state, 1000);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
-        acb_ptr z, th;
-        acb_poly_t s1, s2;
-        acb_t c1, c2;
+        acb_ptr z, th2, roots, mf;
+        acb_poly_t f;
+        acb_t chi5, d, t;
+        slong nb, k, j;
+        int res = 1;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
-        th = _acb_vec_init(n);
-        acb_poly_init(s1);
-        acb_poly_init(s2);
-        acb_init(c1);
-        acb_init(c2);
+        th2 = _acb_vec_init(n);
+        roots = _acb_vec_init(6);
+        mf = _acb_vec_init(4);
+        acb_poly_init(f);
+        acb_init(chi5);
+        acb_init(d);
+        acb_init(t);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_mat_scalar_mul_2exp_si(tau, tau, -2);
 
-        acb_theta_g2_sextic_chi5(s1, c1, tau, prec);
-        acb_theta_g2_sextic(s2, tau, prec);
+        acb_theta_g2_sextic_chi5(f, chi5, tau, prec);
 
-        if (!acb_poly_overlaps(s1, s2))
+        for (k = 0; k <= 6; k++)
         {
-            flint_printf("FAIL (sextic)\n");
-            acb_poly_printd(s1, 5);
-            flint_printf("\n");
-            acb_poly_printd(s2, 5);
+            acb_poly_get_coeff_acb(t, f, k);
+            res = res && acb_is_finite(t);
+        }
+
+        if ((!res && !acb_contains_zero(chi5))
+            || !acb_is_finite(chi5))
+        {
+            flint_printf("FAIL (finite)\n");
+            acb_poly_printd(f, 5);
             flint_printf("\n");
             flint_abort();
         }
 
-        acb_theta_all(th, z, tau, 0, prec);
-        acb_theta_g2_chi5(c2, th, prec);
+        nb = acb_poly_find_roots(roots, f, NULL, 0, prec);
 
-        if (!acb_overlaps(c1, c2))
+        if (nb == 6)
         {
-            flint_printf("FAIL (chi5)\n");
-            acb_printd(c1, 10);
-            flint_printf("\n");
-            acb_printd(c2, 10);
-            flint_printf("\n");
-            flint_abort();
+            acb_one(d);
+            for (k = 0; k < 6; k++)
+            {
+                for (j = k + 1; j < 6; j++)
+                {
+                    acb_sub(t, &roots[k], &roots[j], prec);
+                    acb_mul(d, d, t, prec);
+                }
+            }
+            acb_sqr(d, d, prec);
+            acb_poly_get_coeff_acb(t, f, 6);
+            acb_pow_ui(t, t, 10, prec);
+            acb_mul(d, d, t, prec);
+            acb_mul_2exp_si(d, d, -12);
+
+            acb_theta_all(th2, z, tau, 1, prec);
+            acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
+            acb_sqr(chi5, chi5, prec);
+
+            if (!acb_overlaps(d, &mf[2])
+                || !acb_overlaps(chi5, &mf[2])
+                || !_acb_vec_is_finite(mf, 4)
+                || !acb_is_finite(d))
+            {
+                flint_printf("FAIL\n");
+                flint_printf("roots, discr, chi10, chi5^2:\n");
+                _acb_vec_printd(roots, 6, 5);
+                acb_printd(d, 5);
+                flint_printf("\n");
+                acb_printd(&mf[2], 5);
+                flint_printf("\n");
+                acb_printd(chi5, 5);
+                flint_printf("\n");
+                flint_abort();
+            }
         }
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, g);
-        _acb_vec_clear(th, n);
-        acb_poly_clear(s1);
-        acb_poly_clear(s2);
-        acb_clear(c1);
-        acb_clear(c2);
+        _acb_vec_clear(th2, n);
+        _acb_vec_clear(roots, 6);
+        _acb_vec_clear(mf, 4);
+        acb_poly_clear(f);
+        acb_clear(chi5);
+        acb_clear(d);
+        acb_clear(t);
     }
 
     TEST_FUNCTION_END(state);
