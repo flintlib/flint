@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpz_poly.h"
+#include "fmpz_mat.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
@@ -36,12 +37,12 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         slong klist[26] = ACB_THETA_G2_COV_K;
         fmpz_mat_t mat;
         acb_mat_t tau, w, c;
-        acb_ptr z, th2;
+        acb_ptr z, th2, mf;
         acb_poly_struct * cov1;
         acb_poly_struct * cov2;
         acb_poly_t u, v;
         fmpz_poly_t pol;
-        acb_t psi4, test;
+        acb_t test, chi5;
         slong k;
 
         fmpz_mat_init(mat, 2 * g, 2 * g);
@@ -50,6 +51,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_mat_init(c, g, g);
         z = _acb_vec_init(g);
         th2 = _acb_vec_init(n);
+        mf = _acb_vec_init(4);
         cov1 = flint_malloc(26 * sizeof(acb_poly_struct));
         cov2 = flint_malloc(26 * sizeof(acb_poly_struct));
         for (k = 0; k < 26; k++)
@@ -60,21 +62,21 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_init(u);
         acb_poly_init(v);
         fmpz_poly_init(pol);
-        acb_init(psi4);
         acb_init(test);
+        acb_init(chi5);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         sp2gz_randtest(mat, state, bits);
 
         acb_theta_all(th2, z, tau, 1, prec);
-        acb_theta_g2_psi4(psi4, th2, prec);
-        acb_theta_g2_sextic(u, tau, prec);
-        acb_theta_g2_covariants(cov1, u, prec);
+        acb_theta_g2_even_weight(&mf[0], &mf[1], &mf[2], &mf[3], th2, prec);
+        acb_theta_g2_sextic_chi5(u, chi5, tau, prec);
+        acb_theta_g2_covariants(cov1, u, 0, prec);
 
         acb_siegel_transform(w, mat, tau, prec);
         acb_siegel_cocycle(c, mat, tau, prec);
-        acb_theta_g2_sextic(u, w, prec);
-        acb_theta_g2_covariants(cov2, u, prec);
+        acb_theta_g2_sextic_chi5(u, test, w, prec);
+        acb_theta_g2_covariants(cov2, u, 0, prec);
 
         /* Test psi4 */
         acb_poly_set_si(u, -3);
@@ -84,12 +86,15 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_get_coeff_acb(test, u, 0);
         acb_div_si(test, test, -20, prec);
 
-        if (!acb_overlaps(psi4, test))
+        if (!acb_overlaps(&mf[0], test)
+            || !_acb_vec_is_finite(mf, 4)
+            || !acb_is_finite(chi5)
+            || (!acb_is_finite(test) && !acb_contains_zero(chi5)))
         {
             flint_printf("FAIL (psi4)\n");
             acb_mat_printd(tau, 5);
             flint_printf("psi4, test:\n");
-            acb_printd(psi4, 10);
+            acb_printd(&mf[0], 10);
             flint_printf("\n");
             acb_printd(test, 10);
             flint_printf("\nu:\n");
@@ -127,7 +132,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         {
             acb_poly_set_coeff_si(u, k, n_randint(state, 10));
         }
-        acb_theta_g2_covariants(cov1, u, prec);
+        acb_theta_g2_covariants(cov1, u, 0, prec);
         for (k = 0; k < 26; k++)
         {
             if (!acb_poly_get_unique_fmpz_poly(pol, &cov1[k]))
@@ -139,12 +144,39 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
             }
         }
 
+        /* Test leading coefficients */
+        acb_theta_g2_covariants(cov2, u, 1, prec);
+        for (k = 0; k < 26; k++)
+        {
+            if (acb_poly_degree(&cov2[k]) > 0)
+            {
+                flint_printf("FAIL (degree, k = %wd)\n", k);
+                acb_poly_printd(&cov2[k], 5);
+                flint_printf("\n");
+                flint_abort();
+            }
+            acb_poly_get_coeff_acb(&mf[0], &cov2[k], 0);
+            acb_poly_get_coeff_acb(test, &cov1[k], jlist[k]);
+            if (!acb_overlaps(&mf[0], test)
+                || !acb_is_finite(&mf[0])
+                || !acb_is_finite(test))
+            {
+                flint_printf("FAIL (leading coefficient, k = %wd)\n", k);
+                acb_poly_printd(&cov1[k], 5);
+                flint_printf("\n");
+                acb_poly_printd(&cov2[k], 5);
+                flint_printf("\n");
+                flint_abort();
+            }
+        }
+
         fmpz_mat_clear(mat);
         acb_mat_clear(tau);
         acb_mat_clear(w);
         acb_mat_clear(c);
         _acb_vec_clear(z, g);
         _acb_vec_clear(th2, n);
+        _acb_vec_clear(mf, 4);
         for (k = 0; k < 26; k++)
         {
             acb_poly_clear(&cov1[k]);
@@ -155,8 +187,8 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_poly_clear(u);
         acb_poly_clear(v);
         fmpz_poly_clear(pol);
-        acb_clear(psi4);
         acb_clear(test);
+        acb_clear(chi5);
     }
 
     TEST_FUNCTION_END(state);

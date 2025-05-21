@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mat.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
@@ -25,7 +26,7 @@ acb_theta_g2_chi8_6(acb_poly_t res, const acb_mat_t tau, slong prec)
     z = _acb_vec_init(2);
     acb_init(c);
 
-    acb_theta_jet_all(dth, z, tau, 1, prec);
+    acb_theta_jet(dth, z, 1, tau, 1, 0, 1, 0, prec);
     acb_theta_g2_chi3_6(res, dth, prec);
     for (k = 0; k < 16; k++)
     {
@@ -52,6 +53,8 @@ TEST_FUNCTION_START(acb_theta_g2_chi3_6, state)
         fmpz_mat_t mat;
         acb_mat_t tau, w, c, cinv;
         acb_poly_t r, s;
+        slong k;
+        int res = 1;
 
         fmpz_mat_init(mat, 2 * g, 2 * g);
         acb_mat_init(tau, g, g);
@@ -69,7 +72,16 @@ TEST_FUNCTION_START(acb_theta_g2_chi3_6, state)
         acb_theta_g2_chi8_6(s, w, prec);
         acb_theta_g2_detk_symj(s, cinv, s, 8, 6, prec);
 
-        if (!acb_poly_overlaps(r, s))
+        for (k = 0; k <= acb_poly_degree(r); k++)
+        {
+            res = res && acb_is_finite(acb_poly_get_coeff_ptr(r, k));
+        }
+        for (k = 0; k <= acb_poly_degree(r); k++)
+        {
+            res = res && acb_is_finite(acb_poly_get_coeff_ptr(s, k));
+        }
+
+        if (!acb_poly_overlaps(r, s) || !res)
         {
             flint_printf("FAIL\n");
             acb_mat_printd(tau, 5);
