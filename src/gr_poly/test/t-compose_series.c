@@ -110,7 +110,7 @@ test_compose_series(flint_rand_t state, int which)
                 status |= gr_poly_one(E, ctx);
             else
                 status |= gr_poly_mullow(E, E, B, n, ctx);
-            status |= gr_poly_mul_scalar(F, E, gr_poly_entry_ptr(A, i, ctx), ctx);
+            status |= gr_poly_mul_scalar(F, E, gr_poly_coeff_ptr(A, i, ctx), ctx);
             status |= gr_poly_add(D, D, F, ctx);
         }
 

@@ -562,7 +562,7 @@ gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_series_ctx_t sctx, gr_c
     if (i < 0)
         return T_TRUE;
 
-    return gr_is_zero(gr_poly_entry_srcptr(&x->poly, i, cctx), cctx);
+    return gr_is_zero(gr_poly_coeff_srcptr(&x->poly, i, cctx), cctx);
 }
 
 int
@@ -665,9 +665,9 @@ gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
         {
             gr_poly_t xb, yb;
 
-            xb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&x->poly, val, cctx);
+            xb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(&x->poly, val, cctx);
             xb->length = xlen;
-            yb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&y->poly, val, cctx);
+            yb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(&y->poly, val, cctx);
             yb->length = ylen;
 
             status |= gr_poly_div_series(t, xb, yb, len + 1, cctx);
@@ -703,9 +703,9 @@ gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
     {
         gr_poly_t xb, yb;
 
-        xb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&x->poly, val, cctx);
+        xb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(&x->poly, val, cctx);
         xb->length = xlen;
-        yb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&y->poly, val, cctx);
+        yb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(&y->poly, val, cctx);
         yb->length = ylen;
 
         if (x == res || y == res)

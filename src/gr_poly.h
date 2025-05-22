@@ -30,11 +30,23 @@ void gr_poly_init2(gr_poly_t poly, slong len, gr_ctx_t ctx);
 void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx);
 
 GR_POLY_INLINE gr_ptr
+gr_poly_coeff_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+{
+    return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
+}
+/* deprecated old function name */
+GR_POLY_INLINE gr_ptr
 gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
 {
     return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
 }
 
+GR_POLY_INLINE gr_srcptr
+gr_poly_coeff_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+{
+    return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
+}
+/* deprecated old function name */
 GR_POLY_INLINE gr_srcptr
 gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
 {

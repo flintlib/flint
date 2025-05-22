@@ -50,8 +50,8 @@ gr_poly_divrem(gr_poly_t Q, gr_poly_t R,
     gr_ptr q, r;
     int status = GR_SUCCESS;
 
-    FLINT_ASSERT(lenA == 0 || gr_is_zero(gr_poly_entry_srcptr(A, lenA - 1, ctx), ctx) != T_TRUE);
-    FLINT_ASSERT(lenB == 0 || gr_is_zero(gr_poly_entry_srcptr(B, lenB - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(lenA == 0 || gr_is_zero(gr_poly_coeff_srcptr(A, lenA - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(lenB == 0 || gr_is_zero(gr_poly_coeff_srcptr(B, lenB - 1, ctx), ctx) != T_TRUE);
 
     if (lenB == 0)
         return GR_DOMAIN;

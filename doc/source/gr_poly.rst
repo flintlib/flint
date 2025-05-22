@@ -82,8 +82,14 @@ Memory management
 
 .. function:: void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx)
 
+.. function:: gr_ptr gr_poly_coeff_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_poly_coeff_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+
 .. function:: gr_ptr gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
               gr_srcptr gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+
+    These functions are deprecated aliases of :func:`gr_poly_coeff_ptr` and
+    :func:`gr_poly_coeff_srcptr`; use those functions instead.
 
 .. function:: slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 

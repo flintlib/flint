@@ -37,7 +37,7 @@ gr_poly_add_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ct
     }
 
     if (gr_is_zero(c, ctx) != T_TRUE) {
-        gr_ptr constant_coeff = gr_poly_entry_ptr(res, 0, ctx);
+        gr_ptr constant_coeff = gr_poly_coeff_ptr(res, 0, ctx);
         status |= gr_add(constant_coeff, constant_coeff, c, ctx);
         if (len == 1 && gr_is_zero(constant_coeff, ctx) == T_TRUE) {
             _gr_poly_set_length(res, 0, ctx);
@@ -72,7 +72,7 @@ gr_poly_add_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
     }
 
     if (c != 0) {
-        gr_ptr constant_coeff = gr_poly_entry_ptr(res, 0, ctx);
+        gr_ptr constant_coeff = gr_poly_coeff_ptr(res, 0, ctx);
         status |= gr_add_ui(constant_coeff, constant_coeff, c, ctx);
         if (len == 1 && gr_is_zero(constant_coeff, ctx) == T_TRUE) {
             _gr_poly_set_length(res, 0, ctx);
@@ -107,7 +107,7 @@ gr_poly_add_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
     }
 
     if (c != 0) {
-        gr_ptr constant_coeff = gr_poly_entry_ptr(res, 0, ctx);
+        gr_ptr constant_coeff = gr_poly_coeff_ptr(res, 0, ctx);
         status |= gr_add_si(constant_coeff, constant_coeff, c, ctx);
         if (len == 1 && gr_is_zero(constant_coeff, ctx) == T_TRUE) {
             _gr_poly_set_length(res, 0, ctx);
@@ -142,7 +142,7 @@ gr_poly_add_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t c
     }
 
     if (!fmpz_is_zero(c)) {
-        gr_ptr constant_coeff = gr_poly_entry_ptr(res, 0, ctx);
+        gr_ptr constant_coeff = gr_poly_coeff_ptr(res, 0, ctx);
         status |= gr_add_fmpz(constant_coeff, constant_coeff, c, ctx);
         if (len == 1 && gr_is_zero(constant_coeff, ctx) == T_TRUE) {
             _gr_poly_set_length(res, 0, ctx);
@@ -177,7 +177,7 @@ gr_poly_add_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t c
     }
 
     if (!fmpq_is_zero(c)) {
-        gr_ptr constant_coeff = gr_poly_entry_ptr(res, 0, ctx);
+        gr_ptr constant_coeff = gr_poly_coeff_ptr(res, 0, ctx);
         status |= gr_add_fmpq(constant_coeff, constant_coeff, c, ctx);
         if (len == 1 && gr_is_zero(constant_coeff, ctx) == T_TRUE) {
             _gr_poly_set_length(res, 0, ctx);

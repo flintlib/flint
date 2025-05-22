@@ -41,7 +41,7 @@ gr_poly_canonical_associate(gr_poly_t ux, gr_poly_t u,
         FLINT_ASSERT(len == ux->length);
 
         GR_TMP_INIT(c, ctx);
-        lc = gr_poly_entry_ptr(ux, len - 1, ctx);
+        lc = gr_poly_coeff_ptr(ux, len - 1, ctx);
         status |= gr_canonical_associate(lc, c, lc, ctx);
         status |= _gr_vec_mul_scalar(ux->coeffs, ux->coeffs, len - 1, c, ctx);
         _gr_poly_normalise(ux, ctx);

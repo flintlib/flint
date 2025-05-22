@@ -250,23 +250,23 @@ polynomial_set_interval_mid_rad(gr_poly_t res, const gr_poly_t m, const gr_poly_
         {
             if (i < mlen && i < rlen)
             {
-                status |= gr_set_interval_mid_rad(gr_poly_entry_ptr(res, i, cctx),
-                        gr_poly_entry_srcptr(m, i, cctx),
-                        gr_poly_entry_srcptr(r, i, cctx), cctx);
+                status |= gr_set_interval_mid_rad(gr_poly_coeff_ptr(res, i, cctx),
+                        gr_poly_coeff_srcptr(m, i, cctx),
+                        gr_poly_coeff_srcptr(r, i, cctx), cctx);
             }
             else if (i < mlen)
             {
-                status |= gr_set(gr_poly_entry_ptr(res, i, cctx),
-                            gr_poly_entry_srcptr(m, i, cctx), cctx);
+                status |= gr_set(gr_poly_coeff_ptr(res, i, cctx),
+                            gr_poly_coeff_srcptr(m, i, cctx), cctx);
             }
             else if (i < rlen)
             {
                 if (zero == NULL)
                     zero = gr_heap_init(cctx);
 
-                status |= gr_set_interval_mid_rad(gr_poly_entry_ptr(res, i, cctx),
+                status |= gr_set_interval_mid_rad(gr_poly_coeff_ptr(res, i, cctx),
                         zero,
-                        gr_poly_entry_srcptr(r, i, cctx), cctx);
+                        gr_poly_coeff_srcptr(r, i, cctx), cctx);
             }
         }
 

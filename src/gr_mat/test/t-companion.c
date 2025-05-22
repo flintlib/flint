@@ -36,14 +36,14 @@ TEST_FUNCTION_START(gr_mat_companion, state)
         do {
             status |= gr_poly_randtest(f, state, 1 + n_randint(state, 8), ctx);
             n = gr_poly_length(f, ctx) - 1;
-        } while (n < 0 || gr_is_invertible(gr_poly_entry_srcptr(f, n, ctx), ctx) != T_TRUE);
+        } while (n < 0 || gr_is_invertible(gr_poly_coeff_srcptr(f, n, ctx), ctx) != T_TRUE);
 
         gr_mat_init(A, n, n, ctx);
         status |= gr_mat_randtest(A, state, ctx);
         status |= gr_mat_companion(A, f, ctx);
         status |= gr_mat_charpoly(g, A, ctx);
 
-        status |= gr_poly_scalar_mul(g, gr_poly_entry_srcptr(f, n, ctx), g, ctx);
+        status |= gr_poly_scalar_mul(g, gr_poly_coeff_srcptr(f, n, ctx), g, ctx);
 
         if (gr_poly_equal(g, f, ctx) == T_FALSE)
         {

@@ -43,8 +43,8 @@ gr_poly_add(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_
     int status;
     slong max = FLINT_MAX(poly1->length, poly2->length);
 
-    FLINT_ASSERT(poly1->length == 0 || gr_is_zero(gr_poly_entry_srcptr(poly1, poly1->length - 1, ctx), ctx) != T_TRUE);
-    FLINT_ASSERT(poly2->length == 0 || gr_is_zero(gr_poly_entry_srcptr(poly2, poly2->length - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(poly1->length == 0 || gr_is_zero(gr_poly_coeff_srcptr(poly1, poly1->length - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(poly2->length == 0 || gr_is_zero(gr_poly_coeff_srcptr(poly2, poly2->length - 1, ctx), ctx) != T_TRUE);
 
     gr_poly_fit_length(res, max, ctx);
 
