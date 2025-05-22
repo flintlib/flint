@@ -108,7 +108,7 @@ test_compose_mod(flint_rand_t state, int which)
             else
                 status |= gr_poly_mul(F, F, B, ctx);
             status |= gr_poly_rem(F, F, C, ctx);
-            status |= gr_poly_mul_scalar(G, F, gr_poly_entry_ptr(A, i, ctx), ctx);
+            status |= gr_poly_mul_scalar(G, F, gr_poly_coeff_ptr(A, i, ctx), ctx);
             status |= gr_poly_add(E, E, G, ctx);
         }
 

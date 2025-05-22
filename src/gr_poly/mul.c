@@ -25,8 +25,8 @@ gr_poly_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_
     slong len_out;
     int status;
 
-    FLINT_ASSERT(poly1->length == 0 || gr_is_zero(gr_poly_entry_srcptr(poly1, poly1->length - 1, ctx), ctx) != T_TRUE);
-    FLINT_ASSERT(poly2->length == 0 || gr_is_zero(gr_poly_entry_srcptr(poly2, poly2->length - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(poly1->length == 0 || gr_is_zero(gr_poly_coeff_srcptr(poly1, poly1->length - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(poly2->length == 0 || gr_is_zero(gr_poly_coeff_srcptr(poly2, poly2->length - 1, ctx), ctx) != T_TRUE);
 
     if (poly1->length == 0 || poly2->length == 0)
         return gr_poly_zero(res, ctx);
