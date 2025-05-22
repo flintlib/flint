@@ -235,5 +235,41 @@ TEST_FUNCTION_START(arb_div, state)
         arb_clear(d);
     }
 
+    /* Check that a bug has been fixed */
+    {
+        arb_t x, y, z;
+        slong prec = 100000;
+
+        arb_init(x);
+        arb_init(y);
+        arb_init(z);
+
+        arb_set_ui(y, 3);
+        arb_inv(y, y, prec);
+        arb_div(z, x, y, prec);
+
+        if (!arb_is_zero(z))
+        {
+            flint_printf("FAIL: 0 / y at high precision\n\n");
+            flint_abort();
+        }
+
+        mag_zero(arb_radref(y));
+        mag_set_d(arb_radref(x), 1e-10);
+
+        arb_div(z, x, y, prec);
+
+        if (!arb_is_finite(z))
+        {
+            flint_printf("FAIL: [0 +/- eps] / y at high precision\n\n");
+            flint_abort();
+        }
+
+        arb_clear(x);
+        arb_clear(y);
+        arb_clear(z);
+
+    }
+
     TEST_FUNCTION_END(state);
 }
