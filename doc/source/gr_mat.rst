@@ -268,7 +268,7 @@ Norms
 
     Frobenius norm: `\sqrt{\sum_{i,j} |a_{i,j}|^2}`.
 
-Arithmetic
+Addition and scalar arithmetic
 -------------------------------------------------------------------------------
 
 .. function:: int gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
@@ -276,25 +276,6 @@ Arithmetic
 .. function:: int gr_mat_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
 .. function:: int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-
-.. function:: int gr_mat_mul_classical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-              int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-
-    Matrix multiplication. The default function can be overloaded by specific rings;
-    otherwise, it falls back to :func:`gr_mat_mul_generic` which currently
-    only performs classical multiplication.
-
-    The *Waksman* algorithm assumes a commutative base ring which supports
-    exact division by two.
-
-.. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
-
-.. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
-              int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
-              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t e, gr_ctx_t ctx)
 
 .. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
               int gr_mat_scalar_add(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
@@ -340,6 +321,69 @@ Arithmetic
 
 .. function:: int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
               int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+
+Matrix multiplication
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Compute `AB` using the default algorithm chosen by the element ring.
+    If the element ring does not overload matrix multiplication, this will
+    fall back to :func:`gr_mat_mul_generic` by default.
+
+.. function:: int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Multiply matrices using a generic algorithm choice.
+    Currently this always chooses classical multiplication, but may implement
+    other strategies in the future.
+
+.. function:: int gr_mat_mul_classical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Computes the `m \times n \times p` matrix product using the classical algorithm,
+    performing `mp` dot products of length `n`.
+
+.. function:: int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Uses Strassen's algorithm to evaluate `AB` using 7 recursive matrix multiplications
+    of roughly half the size. This function calls :func:`gr_mat_mul` for the recursive
+    multiplications; to use Strassen recursively, the base ring must overload
+    :func:`gr_mat_mul` to choose Strassen multiplication above some cutoff.
+    This results in `O(n^{2.81})` asymptotic complexity in the case of an `n \times n \times n`
+    product.
+
+    This function does not implement Strassen's original evaluation sequence
+    but that of Bodrato [Bodrato2010]_ which uses fewer additions and offers
+    some further time savings when squaring.
+
+.. function:: int gr_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Compute the product `AB` using roughly half the number of multiplications
+    of the classical algorithm, using Waksman's algorithm [Waksman1970]_.
+    The base ring must be commutative and must support exact division by two.
+
+.. function:: int gr_mat_mul_rosowski(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Compute the product `AB` using roughly half the number of multiplications
+    of the classical algorithm, using Rosowski's algorithm [Rosowski2023]_.
+    The base ring must be commutative. This uses the same number of multiplications
+    as Waksman's algorithm when the inner dimension *n* is even,
+    but uses fewer multiplications when *n* is odd, and does not
+    require division by two.
+
+
+Powering
+-------------------------------------------------------------------------------
+
+See the section on matrix functions for non-integer exponents.
+
+.. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+.. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
+              int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
+              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t e, gr_ctx_t ctx)
+
+Polynomial evaluation
+-------------------------------------------------------------------------------
 
 .. function:: int _gr_mat_gr_poly_evaluate(gr_mat_t res, gr_srcptr poly, slong len, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t poly, const gr_mat_t mat, gr_ctx_t ctx)
