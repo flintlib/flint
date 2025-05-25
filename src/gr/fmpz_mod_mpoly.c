@@ -110,14 +110,14 @@ _gr_fmpz_mod_mpoly_set_shallow(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t poly
 }
 
 int
-_gr_fmpz_mod_mpoly_randtest(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
+_gr_fmpz_mod_mpoly_randtest(fmpz_mod_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_randtest_bits(res, state, n_randint(state, 5), 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpz_mod_mpoly_randtest_small(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
+_gr_fmpz_mod_mpoly_randtest_small(fmpz_mod_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_randtest_bits(res, state, n_randint(state, 3), 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
@@ -143,7 +143,7 @@ _gr_fmpz_mod_mpoly_equal(const fmpz_mod_mpoly_t poly1, const fmpz_mod_mpoly_t po
 }
 
 truth_t
-_gr_fmpz_mod_mpoly_is_zero(const fmpz_mpoly_t poly, gr_ctx_t ctx)
+_gr_fmpz_mod_mpoly_is_zero(const fmpz_mod_mpoly_t poly, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_is_zero(poly, MPOLYNOMIAL_MCTX(ctx)) ? T_TRUE : T_FALSE;
 }
