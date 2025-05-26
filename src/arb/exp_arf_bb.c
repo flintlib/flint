@@ -131,6 +131,18 @@ pmerge(arb_t res, const arb_t a, const arb_t b, pwork_t * work)
     arb_mul(res, a, b, work->prec);
 }
 
+static void
+pinit(arb_t x, void * args)
+{
+    arb_init(x);
+}
+
+static void
+pclear(arb_t x, void * args)
+{
+    arb_clear(x);
+}
+
 void
 _arb_vec_prod_bsplit_threaded(arb_t res, arb_srcptr vec, slong len, slong prec)
 {
@@ -143,8 +155,8 @@ _arb_vec_prod_bsplit_threaded(arb_t res, arb_srcptr vec, slong len, slong prec)
         (bsplit_basecase_func_t) pbasecase,
         (bsplit_merge_func_t) pmerge,
         sizeof(arb_struct),
-        (bsplit_init_func_t) arb_init,
-        (bsplit_clear_func_t) arb_clear,
+        (bsplit_init_func_t) pinit,
+        (bsplit_clear_func_t) pclear,
         &work, 0, len, 3, -1, FLINT_PARALLEL_BSPLIT_LEFT_INPLACE);
 }
 

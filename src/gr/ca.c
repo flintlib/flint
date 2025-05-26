@@ -1609,12 +1609,11 @@ _gr_ca_mat_det(ca_t res, const ca_mat_t x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+void
 _gr_ca_ctx_clear(gr_ctx_t ctx)
 {
     ca_ctx_clear(GR_CA_CTX(ctx));
     flint_free(GR_CA_CTX(ctx));
-    return GR_SUCCESS;
 }
 
 truth_t

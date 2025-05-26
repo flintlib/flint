@@ -740,6 +740,7 @@ GR_INLINE slong gr_ctx_sizeof_elem(gr_ctx_t ctx)
 typedef void ((*gr_method_init_clear_op)(gr_ptr, gr_ctx_ptr));
 typedef void ((*gr_method_swap_op)(gr_ptr, gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_ctx)(gr_ctx_ptr));
+typedef void ((*gr_method_ctx_void_op)(gr_ctx_ptr));
 typedef truth_t ((*gr_method_ctx_predicate)(gr_ctx_ptr));
 typedef int ((*gr_method_ctx_set_si)(gr_ctx_ptr, slong));
 typedef int ((*gr_method_ctx_get_si)(slong *, gr_ctx_ptr));
@@ -836,6 +837,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 
 /* Macros to retrieve methods (with correct call signature) from context object. */
 #define GR_CTX_OP(ctx, NAME) (((gr_method_ctx *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_VOID_OP(ctx, NAME) (((gr_method_ctx_void_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_STREAM(ctx, NAME) (((gr_method_ctx_stream *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_PREDICATE(ctx, NAME) (((gr_method_ctx_predicate *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_SET_SI(ctx, NAME) (((gr_method_ctx_set_si *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -933,7 +935,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 
 /* Wrappers to call methods. */
 
-GR_INLINE int gr_ctx_clear(gr_ctx_t ctx) { return GR_CTX_OP(ctx, CTX_CLEAR)(ctx); }
+GR_INLINE void gr_ctx_clear(gr_ctx_t ctx) { GR_CTX_VOID_OP(ctx, CTX_CLEAR)(ctx); }
 GR_INLINE int gr_ctx_write(gr_stream_t out, gr_ctx_t ctx) { return GR_CTX_STREAM(ctx, CTX_WRITE)(out, ctx); }
 
 GR_INLINE truth_t gr_ctx_is_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_RING)(ctx); }
