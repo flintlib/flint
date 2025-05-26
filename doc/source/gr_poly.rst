@@ -82,8 +82,14 @@ Memory management
 
 .. function:: void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx)
 
+.. function:: gr_ptr gr_poly_coeff_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_poly_coeff_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+
 .. function:: gr_ptr gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
               gr_srcptr gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+
+    These functions are deprecated aliases of :func:`gr_poly_coeff_ptr` and
+    :func:`gr_poly_coeff_srcptr`; use those functions instead.
 
 .. function:: slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 
@@ -779,6 +785,82 @@ TODO: currently only fields of characteristic 0 are supported.
 .. function:: int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 
     Sets *res* to the squarefreepart of *poly*.
+
+Shift equivalence
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_poly_shift_equivalent(fmpz_t shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx)
+
+    Returns whether there exists an integer *n* such that `p(x + n) = q(x)`. If
+    the result is ``T_TRUE`` and *shift* is not ``NULL``, *shift* is set to
+    such an *n*.
+
+.. function:: int gr_poly_leading_taylor_shift(gr_ptr shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx)
+
+    Computes (if possible) *s* such that `p(x+s) = q(x)(1+O(x^2))`.
+
+.. function:: int gr_poly_dispersion_resultant(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+              int gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+              int gr_poly_dispersion(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+
+    Computes the dispersion and/or the dispersion set of *f* and *g*.
+
+    The dispersion set of two polynomials *f* and *g* (over a unique
+    factorization domain of characteristic zero) is the set of nonnegative
+    integers *n* such that `f(x + n)` and `g(x)` have a nonconstant common
+    factor. The dispersion is the largest element of the dispersion set.
+
+    The output variables *disp* and/or *disp_set* can be ``NULL``, in which case
+    the corresponding result is not stored.
+    When the dispersion set is empty, *disp* is left unchanged.
+    The elements of *disp_set* are sorted in increasing order.
+
+    The *factor* version uses the algorithm described in [ManWright1994]_.
+    The *resultant* version computes the integer roots of a bivariate resultant
+    and is mainly intended for testing.
+
+.. function:: int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_vec_t ffac, const gr_vec_t gfac, gr_ctx_t ctx);
+
+    Same as :func:`gr_poly_dispersion_factor` for nonzero *f* and *g* but takes
+    as input their nonconstant irreducible factors (without multiplicities)
+    instead of the polynomials themselves.
+
+.. function:: int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
+
+
+    Computes a decomposition of *f* of the form
+
+        .. math:: c \prod_i \prod_j g_i(x + h_{i,j})^{e_{i,j}}
+
+    where
+
+    * `c` is a constant,
+    * the `g_i` are squarefree polynomials of degree at least one,
+    * `g_i(x)` and `g_j(x + h)` (with `i \neq j`) are coprime for all
+      `h \in \mathbb Z`,
+    * `g_i(x)` and `g_i(x + h)` are coprime for all nonzero `h \in \mathbb Z`,
+    * `e_{i,j}` and `h_{i,j}` are integers with `e_{i,j} \geq 1`
+      and `0 = h_{i,1} < h_{i,2} < \cdots`.
+
+    The output variable *slfac* must be initialized to a vector of polynomials
+    of the same type as *f*. The other two output vectors *slshift* and
+    *slmult* must be initialized to vectors *of vectors* with entries of type
+    *fmpz*.
+
+    The *factor* version computes an irreducible factorization and sorts the
+    factors into shift-equivalence classes.
+
+    No algorithm avoiding a full irreducible factorization is currently
+    implemented.
+
+.. function:: int _gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
+
+    Same as :func:`gr_poly_shiftless_decomposition_factor` but takes as input
+    an irreducible factorization (*fac*, *mult*) of *f* (without the
+    prefactor *c*). The underscore method does not support aliasing of *slfac*
+    with *fac*.
 
 Roots
 -------------------------------------------------------------------------------

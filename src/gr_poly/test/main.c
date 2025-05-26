@@ -19,6 +19,7 @@
 #include "t-compose_mod_precomp_preinv.c"
 #include "t-compose_mod_preinv.c"
 #include "t-compose_series.c"
+#include "t-dispersion.c"
 #include "t-div_basecase.c"
 #include "t-div.c"
 #include "t-div_divconquer.c"
@@ -47,6 +48,7 @@
 #include "t-hgcd.c"
 #include "t-integral.c"
 #include "t-inv_series.c"
+#include "t-leading_taylor_shift.c"
 #include "t-log_series.c"
 #include "t-make_monic.c"
 #include "t-mul_karatsuba.c"
@@ -69,6 +71,8 @@
 #include "t-rsqrt_series.c"
 #include "t-set_str.c"
 #include "t-shift_left_right.c"
+#include "t-shift_equivalent.c"
+#include "t-shiftless_decomposition.c"
 #include "t-sqrt_series.c"
 #include "t-squarefree_part.c"
 #include "t-taylor_shift.c"
@@ -91,6 +95,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_compose_mod_precomp_preinv),
     TEST_FUNCTION(gr_poly_compose_mod_preinv),
     TEST_FUNCTION(gr_poly_compose_series),
+    TEST_FUNCTION(gr_poly_dispersion),
     TEST_FUNCTION(gr_poly_div_basecase),
     TEST_FUNCTION(gr_poly_div),
     TEST_FUNCTION(gr_poly_div_divconquer),
@@ -119,6 +124,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_hgcd),
     TEST_FUNCTION(gr_poly_integral),
     TEST_FUNCTION(gr_poly_inv_series),
+    TEST_FUNCTION(gr_poly_leading_taylor_shift),
     TEST_FUNCTION(gr_poly_log_series),
     TEST_FUNCTION(gr_poly_make_monic),
     TEST_FUNCTION(gr_poly_mul_karatsuba),
@@ -141,6 +147,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_rsqrt_series),
     TEST_FUNCTION(gr_poly_set_str),
     TEST_FUNCTION(gr_poly_shift_left_right),
+    TEST_FUNCTION(gr_poly_shift_equivalent),
+    TEST_FUNCTION(gr_poly_shiftless_decomposition),
     TEST_FUNCTION(gr_poly_sqrt_series),
     TEST_FUNCTION(gr_poly_squarefree_part),
     TEST_FUNCTION(gr_poly_taylor_shift),

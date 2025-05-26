@@ -30,11 +30,23 @@ void gr_poly_init2(gr_poly_t poly, slong len, gr_ctx_t ctx);
 void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx);
 
 GR_POLY_INLINE gr_ptr
+gr_poly_coeff_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+{
+    return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
+}
+/* deprecated old function name */
+GR_POLY_INLINE gr_ptr
 gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
 {
     return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
 }
 
+GR_POLY_INLINE gr_srcptr
+gr_poly_coeff_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+{
+    return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
+}
+/* deprecated old function name */
 GR_POLY_INLINE gr_srcptr
 gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
 {
@@ -428,6 +440,22 @@ WARN_UNUSED_RESULT int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t po
 
 int gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t F, gr_ctx_t ctx);
 int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
+
+/* Shift factorization */
+
+WARN_UNUSED_RESULT int gr_poly_leading_taylor_shift(gr_ptr shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx);
+
+truth_t gr_poly_shift_equivalent(fmpz_t shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_poly_dispersion_resultant(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_vec_t ffac, const gr_vec_t gfac, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_dispersion(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx);
 
 /* Roots */
 

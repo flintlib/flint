@@ -244,8 +244,8 @@ int _gr_parse_check_duplicates(gr_parse_t E)
     int ok = 1;
     for (slong k = 1; k < E->terminals_len; k++)
     {
-        if (!strncmp(names[k-1].str, E->terminal_strings[k].str,
-                     names[k-1].str_len))
+        if (names[k].str_len == names[k - 1].str_len &&
+            !strncmp(names[k - 1].str, names[k].str, names[k-1].str_len))
         {
             ok = 0;
             break;

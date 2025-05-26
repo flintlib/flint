@@ -14,21 +14,19 @@
 void
 acb_theta_eld_points(slong * pts, const acb_theta_eld_t E)
 {
-    slong d = acb_theta_eld_dim(E);
-    slong g = acb_theta_eld_ambient_dim(E);
-    slong nr = acb_theta_eld_nr(E);
-    slong nl = acb_theta_eld_nl(E);
+    slong d = E->dim;
+    slong g = E->ambient_dim;
     slong k, j, i;
 
     if (d == 1)
     {
         i = 0;
-        for (k = acb_theta_eld_min(E); k <= acb_theta_eld_max(E); k++)
+        for (k = (E->min); k <= (E->max); k++)
         {
             pts[i] = k;
             for (j = 1; j < g; j++)
             {
-                pts[i + j] = acb_theta_eld_coord(E, j);
+                pts[i + j] = E->last_coords[j - d];
             }
             i += g;
         }
@@ -36,15 +34,15 @@ acb_theta_eld_points(slong * pts, const acb_theta_eld_t E)
     else /* d > 1 */
     {
         i = 0;
-        for (k = 0; k < nr; k++)
+        for (k = 0; k < (E->nr); k++)
         {
-            acb_theta_eld_points(&pts[i], acb_theta_eld_rchild(E, k));
-            i += g * acb_theta_eld_nb_pts(acb_theta_eld_rchild(E, k));
+            acb_theta_eld_points(&pts[i], &E->rchildren[k]);
+            i += g * ((&E->rchildren[k])->nb_pts);
         }
-        for (k = 0; k < nl; k++)
+        for (k = 0; k < (E->nl); k++)
         {
-            acb_theta_eld_points(&pts[i], acb_theta_eld_lchild(E, k));
-            i += g * acb_theta_eld_nb_pts(acb_theta_eld_lchild(E, k));
+            acb_theta_eld_points(&pts[i], &E->lchildren[k]);
+            i += g * ((&E->lchildren[k])->nb_pts);
         }
     }
 }

@@ -103,7 +103,7 @@ gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t 
             status |= gr_poly_sub(s, w, t1, ctx);
 
             /* check if polynomial is proper */
-            if (s->length != 0 && gr_is_zero(gr_poly_entry_ptr(s, s->length - 1, ctx), ctx) != T_FALSE)
+            if (s->length != 0 && gr_is_zero(gr_poly_coeff_ptr(s, s->length - 1, ctx), ctx) != T_FALSE)
             {
                 status = GR_UNABLE;
                 goto cleanup;
