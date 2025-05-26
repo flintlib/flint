@@ -31,8 +31,8 @@ fmpz_mod_mpoly_q_set_si(fmpz_mod_mpoly_q_t res, slong x, const fmpz_mod_mpoly_ct
 void
 fmpz_mod_mpoly_q_set_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_t x, const fmpz_mod_mpoly_ctx_t ctx)
 {
-    fmpz_mod_mpoly_set_fmpz(fmpz_mpoly_q_numref(res), x, ctx);
-    fmpz_mod_mpoly_one(fmpz_mpoly_q_denref(res), ctx);
+    fmpz_mod_mpoly_set_fmpz(fmpz_mod_mpoly_q_numref(res), x, ctx);
+    fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), ctx);
 }
 
 void

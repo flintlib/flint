@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpq.h"
 #include "fmpz_mod_mpoly_q.h"
 #include "gr.h"
@@ -41,12 +42,48 @@ int _gr_fmpz_mod_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-void _gr_fmpz_mod_mpoly_ctx_clear(gr_ctx_t ctx);
-int _gr_fmpz_mod_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
+void _gr_fmpz_mod_mpoly_q_ctx_clear(gr_ctx_t ctx)
+{
+    if (MPOLYNOMIAL_CTX(ctx)->vars != NULL)
+    {
+        slong i;
+        for (i = 0; i < MPOLYNOMIAL_MCTX(ctx)->minfo->nvars; i++)
+            flint_free(MPOLYNOMIAL_CTX(ctx)->vars[i]);
+        flint_free(MPOLYNOMIAL_CTX(ctx)->vars);
+    }
 
-#define _gr_fmpz_mod_mpoly_q_ctx_clear _gr_fmpz_mod_mpoly_ctx_clear
-#define _gr_fmpz_mod_mpoly_q_ctx_set_gen_names _gr_fmpz_mod_mpoly_ctx_set_gen_names
+    fmpz_mod_mpoly_ctx_clear(MPOLYNOMIAL_MCTX(ctx));
+    flint_free(GR_CTX_DATA_AS_PTR(ctx));  
+}
 
+int
+_gr_fmpz_mod_mpoly_q_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    slong i, nvars, len;
+
+    nvars = MPOLYNOMIAL_MCTX(ctx)->minfo->nvars;
+
+    if (MPOLYNOMIAL_CTX(ctx)->vars == NULL)
+    {
+        MPOLYNOMIAL_CTX(ctx)->vars = flint_malloc(nvars * sizeof(char *));
+        for (i = 0; i < nvars; i++)
+            MPOLYNOMIAL_CTX(ctx)->vars[i] = NULL;
+    }
+    else
+    {
+        for (i = 0; i < nvars; i++)
+            flint_free(MPOLYNOMIAL_CTX(ctx)->vars[i]);
+    }
+
+    for (i = 0; i < nvars; i++)
+    {
+        len = strlen(s[i]);
+        MPOLYNOMIAL_CTX(ctx)->vars[i] = flint_realloc(MPOLYNOMIAL_CTX(ctx)->vars[i], len + 1);
+        memcpy(MPOLYNOMIAL_CTX(ctx)->vars[i], s[i], len + 1);
+    }
+
+    return GR_SUCCESS;
+}
 void
 _gr_fmpz_mod_mpoly_q_init(fmpz_mod_mpoly_q_t res, gr_ctx_t ctx)
 {
@@ -193,28 +230,28 @@ _gr_fmpz_mod_mpoly_q_set_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_t v, gr_ctx_t c
 }
 
 int
-_gr_fmpz_mod_mpoly_q_set_fmpq(fmpz_mpoly_q_t res, const fmpq_t v, gr_ctx_t ctx)
+_gr_fmpz_mod_mpoly_q_set_fmpq(fmpz_mod_mpoly_q_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_set_fmpq(res, v, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpz_mod_mpoly_q_neg(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t mat, gr_ctx_t ctx)
+_gr_fmpz_mod_mpoly_q_neg(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t mat, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_neg(res, mat, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpz_mod_mpoly_q_add(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t poly1, const fmpz_mpoly_q_t poly2, gr_ctx_t ctx)
+_gr_fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_add(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpz_mod_mpoly_q_add_si(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
+_gr_fmpz_mod_mpoly_q_add_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_add_si(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
@@ -303,7 +340,7 @@ gr_method_tab_input _gr_fmpz_mod_mpoly_q_methods_input[] =
 
 
 void
-gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz *mod)
+gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz *mod)
 {
     ctx->which_ring = GR_CTX_FMPZ_MOD_MPOLY_Q;
     ctx->sizeof_elem = sizeof(fmpz_mod_mpoly_q_struct);

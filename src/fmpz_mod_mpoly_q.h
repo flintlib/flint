@@ -138,10 +138,10 @@ void fmpz_mod_mpoly_q_neg(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
 
 void fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
 void fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
-void fmpz_mpoly_q_mul(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
-void fmpz_mpoly_q_div(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx);
 
 void
 _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
@@ -150,38 +150,38 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             const fmpz_mod_mpoly_ctx_t ctx);
 
 void
-_fmpz_mod_mpoly_q_sub(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
-            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
-            const fmpz_mpoly_t y_num, const fmpz_mpoly_t y_den,
+_fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
+            const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
+            const fmpz_mod_mpoly_t y_num, const fmpz_mod_mpoly_t y_den,
             const fmpz_mod_mpoly_ctx_t ctx);
 
 void
-_fmpz_mpoly_q_mul(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
-            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
-            const fmpz_mpoly_t y_num, const fmpz_mpoly_t y_den,
+_fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
+            const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
+            const fmpz_mod_mpoly_t y_num, const fmpz_mod_mpoly_t y_den,
             const fmpz_mod_mpoly_ctx_t ctx);
 
 void
-_fmpz_mpoly_q_div(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
-            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
-            const fmpz_mpoly_t y_num, const fmpz_mpoly_t y_den,
+_fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
+            const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
+            const fmpz_mod_mpoly_t y_num, const fmpz_mod_mpoly_t y_den,
             const fmpz_mod_mpoly_ctx_t ctx);
 
 void
-_fmpz_mpoly_q_add_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
-            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
+_fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
+            const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
             const fmpz_t y_num, const fmpz_t y_den,
             const fmpz_mod_mpoly_ctx_t ctx);
 
 void
-_fmpz_mpoly_q_sub_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
-            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
+_fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
+            const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
             const fmpz_t y_num, const fmpz_t y_den,
             const fmpz_mod_mpoly_ctx_t ctx);
 
 void
-_fmpz_mpoly_q_mul_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
-            const fmpz_mpoly_t x_num, const fmpz_mpoly_t x_den,
+_fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
+            const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
             const fmpz_t y_num, const fmpz_t y_den,
             const fmpz_mod_mpoly_ctx_t ctx);
 
@@ -191,45 +191,45 @@ void fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t 
 void fmpz_mod_mpoly_q_sub_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx);
 void fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_q_mul_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx);
-void fmpz_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_q_mul_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx);
-void fmpz_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx);
 
 FMPZ_MOD_MPOLY_Q_INLINE void
-fmpz_mpoly_q_add_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
+fmpz_mod_mpoly_q_add_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
 {
     fmpz_t t;
     fmpz_init_set_si(t, c);
-    fmpz_mpoly_q_add_fmpz(res, x, t, ctx);
+    fmpz_mod_mpoly_q_add_fmpz(res, x, t, ctx);
     fmpz_clear(t);
 }
 
 FMPZ_MOD_MPOLY_Q_INLINE void
-fmpz_mpoly_q_sub_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
+fmpz_mod_mpoly_q_sub_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
 {
     fmpz_t t;
     fmpz_init_set_si(t, c);
-    fmpz_mpoly_q_sub_fmpz(res, x, t, ctx);
+    fmpz_mod_mpoly_q_sub_fmpz(res, x, t, ctx);
     fmpz_clear(t);
 }
 
 FMPZ_MOD_MPOLY_Q_INLINE void
-fmpz_mpoly_q_mul_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
+fmpz_mod_mpoly_q_mul_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
 {
     fmpz_t t;
     fmpz_init_set_si(t, c);
-    fmpz_mpoly_q_mul_fmpz(res, x, t, ctx);
+    fmpz_mod_mpoly_q_mul_fmpz(res, x, t, ctx);
     fmpz_clear(t);
 }
 
 FMPZ_MOD_MPOLY_Q_INLINE void
-fmpz_mpoly_q_div_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
+fmpz_mod_mpoly_q_div_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong c, const fmpz_mod_mpoly_ctx_t ctx)
 {
     fmpz_t t;
     fmpz_init_set_si(t, c);
-    fmpz_mpoly_q_div_fmpz(res, x, t, ctx);
+    fmpz_mod_mpoly_q_div_fmpz(res, x, t, ctx);
     fmpz_clear(t);
 }
 

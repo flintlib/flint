@@ -43,7 +43,7 @@ _fmpz_mod_mpoly_used_vars(int * used, const fmpz_mod_mpoly_t f, const fmpz_mod_m
         used[i] |= !fmpz_is_zero(max + i);
 
     for (i = 0; i < n; i++)
-        fmpz_mod_clear(max + i);
+        fmpz_clear(max + i);
 
     TMP_END;
 }

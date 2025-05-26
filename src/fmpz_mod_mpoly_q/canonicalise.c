@@ -81,15 +81,15 @@ fmpz_mod_mpoly_q_canonicalise(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_ctx_t
         fmpz_mod_mpoly_gcd_assert_successful(g, fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res), ctx);
 
         if (fmpz_sgn(fmpz_mod_mpoly_q_denref(res)->coeffs) < 0)
-            fmpz_mod_mpoly_neg(g_coeff, g_coeff, ctx);
+            fmpz_mod_mpoly_neg(g, g, ctx);
 
         if (!fmpz_mod_mpoly_is_one(g, ctx))
         {
             fmpz_mod_inv(g_coeff, g_coeff, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g, ctx);
-            fmpz_mod_mpoly_divides(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g_coeff, ctx);
-            fmpz_mod_mpoly_divides(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g_coeff, ctx);
+            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g_coeff, ctx);
+            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g_coeff, ctx);
+            fmpz_mod_mpoly_divides(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g, ctx);
+            fmpz_mod_mpoly_divides(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g, ctx);
         }
 
         fmpz_mod_mpoly_clear(g, ctx);

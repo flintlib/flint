@@ -39,7 +39,7 @@ fmpz_mod_mpoly_q_is_canonical(const fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly
         ans = fmpz_mod_mpoly_is_one(g, ctx);
         fmpz_gcd(g_coeff, fmpz_mod_mpoly_q_numref(res)->coeffs, fmpz_mod_mpoly_q_denref(res)->coeffs);
         
-        ans_coeff = fmpz_mod_mpoly_is_one(g_coeff, ctx);
+        ans_coeff = fmpz_mod_is_one(g_coeff, ctx->ffinfo);
         fmpz_mod_mpoly_clear(g, ctx);
 
         return ans*ans_coeff;
