@@ -90,13 +90,13 @@ merge(arb_poly_t res, const arb_poly_t a, const arb_poly_t b, work_t * work)
 }
 
 static void
-init(arb_poly_t * x, void * args)
+init(arb_poly_t x, void * args)
 {
     arb_poly_init(x);
 }
 
 static void
-clear(arb_poly_t * x, void * args)
+clear(arb_poly_t x, void * args)
 {
     arb_poly_clear(x);
 }
