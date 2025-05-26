@@ -246,7 +246,7 @@ Context operations
     Return ``sizeof(type)`` where ``type`` is the underlying C
     type for elements of *ctx*.
 
-.. function:: int gr_ctx_clear(gr_ctx_t ctx)
+.. function:: void gr_ctx_clear(gr_ctx_t ctx)
 
     Clears the context object *ctx*, freeing any memory
     allocated by this object.

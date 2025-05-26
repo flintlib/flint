@@ -22,10 +22,9 @@
 #include "gr_poly.h"
 #include "gr_special.h"
 
-int
+void
 gr_generic_ctx_clear(gr_ctx_t ctx)
 {
-    return GR_SUCCESS;
 }
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
