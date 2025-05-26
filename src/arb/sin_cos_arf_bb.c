@@ -390,6 +390,19 @@ pmerge(acb_t res, acb_t a, acb_t b, pwork_t * work)
     arb_clear(tmp1);
 }
 
+static void
+pinit(acb_t x, void * args)
+{
+    acb_init(x);
+}
+
+static void
+pclear(acb_t x, void * args)
+{
+    acb_clear(x);
+}
+
+
 void
 _acb_vec_prod_bsplit_threaded(acb_t res, acb_ptr vec, slong len, slong prec)
 {
@@ -402,8 +415,8 @@ _acb_vec_prod_bsplit_threaded(acb_t res, acb_ptr vec, slong len, slong prec)
         (bsplit_basecase_func_t) pbasecase,
         (bsplit_merge_func_t) pmerge,
         sizeof(acb_struct),
-        (bsplit_init_func_t) acb_init,
-        (bsplit_clear_func_t) acb_clear,
+        (bsplit_init_func_t) pinit,
+        (bsplit_clear_func_t) pclear,
         &work, 0, len, 1, -1, FLINT_PARALLEL_BSPLIT_LEFT_INPLACE);
 }
 
