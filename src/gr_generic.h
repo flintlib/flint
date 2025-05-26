@@ -84,7 +84,7 @@ truth_t gr_generic_ctx_predicate(gr_ctx_t ctx);
 truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx);
 truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_generic_ctx_clear(gr_ctx_t ctx);
+void gr_generic_ctx_clear(gr_ctx_t ctx);
 
 void gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx);
 
