@@ -29,4 +29,5 @@ fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const f
         fmpz_mod_mpoly_neg(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), ctx);
         fmpz_mod_mpoly_neg(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), ctx);
     }
+    fmpz_mod_mpoly_q_canonicalise(res, ctx);
 }

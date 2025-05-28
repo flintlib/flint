@@ -28,18 +28,14 @@ fmpz_mod_mpoly_q_is_canonical(const fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly
 
     {
         int ans;
-        int ans_coeff = 0;
-        fmpz_t g_coeff;
+        int ans_coeff;
         fmpz_mod_mpoly_t g;
-        fmpz_init(g_coeff);
         fmpz_mod_mpoly_init(g, ctx);
 
         fmpz_mod_mpoly_gcd_assert_successful(g, fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res), ctx);
 
         ans = fmpz_mod_mpoly_is_one(g, ctx);
-        fmpz_gcd(g_coeff, fmpz_mod_mpoly_q_numref(res)->coeffs, fmpz_mod_mpoly_q_denref(res)->coeffs);
-        
-        ans_coeff = fmpz_mod_is_one(g_coeff, ctx->ffinfo);
+        ans_coeff = fmpz_mod_is_one(fmpz_mod_mpoly_q_denref(res)->coeffs + 0, ctx->ffinfo);
         fmpz_mod_mpoly_clear(g, ctx);
 
         return ans*ans_coeff;

@@ -10,52 +10,60 @@
 */
 
 #include "test_helpers.h"
-#include "fmpz_mpoly_q.h"
+#include "fmpz_mod_mpoly_q.h"
 
-TEST_FUNCTION_START(fmpz_mpoly_q_inv, state)
+TEST_FUNCTION_START(fmpz_mod_mpoly_q_inv, state)
 {
     slong iter;
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
-        fmpz_mpoly_ctx_t ctx;
-        fmpz_mpoly_q_t A, B, C;
+        fmpz_mod_mpoly_ctx_t ctx;
+        fmpz_mod_mpoly_q_t A, B, C;
 
-        fmpz_mpoly_ctx_init(ctx, 1 + n_randint(state, 4), ORD_LEX);
+        fmpz_t m;
 
-        fmpz_mpoly_q_init(A, ctx);
-        fmpz_mpoly_q_init(B, ctx);
-        fmpz_mpoly_q_init(C, ctx);
+        fmpz_init(m);
+        fmpz_randtest_unsigned(m, state, 200);
+        fmpz_add_ui(m, m, 20);
+        fmpz_nextprime(m, m, 0);
+        fmpz_mod_mpoly_ctx_init(ctx, 1 + n_randint(state, 4), ORD_LEX, m);
+
+        fmpz_mod_mpoly_q_init(A, ctx);
+        fmpz_mod_mpoly_q_init(B, ctx);
+        fmpz_mod_mpoly_q_init(C, ctx);
 
         do {
-            fmpz_mpoly_q_randtest(A, state, 10, 2 + n_randint(state, 100), 5, ctx);
-        } while (fmpz_mpoly_q_is_zero(A, ctx));
+            fmpz_mod_mpoly_q_randtest(A, state, 10, 5, ctx);
+        } while (fmpz_mod_mpoly_q_is_zero(A, ctx));
 
-        fmpz_mpoly_q_inv(B, A, ctx);
+        fmpz_mod_mpoly_q_inv(B, A, ctx);
         if (n_randint(state, 2))
         {
-            fmpz_mpoly_q_inv(C, B, ctx);
+            fmpz_mod_mpoly_q_inv(C, B, ctx);
         }
         else
         {
-            fmpz_mpoly_q_set(C, B, ctx);
-            fmpz_mpoly_q_inv(C, C, ctx);
+            fmpz_mod_mpoly_q_set(C, B, ctx);
+            fmpz_mod_mpoly_q_inv(C, C, ctx);
         }
 
-        if (!fmpz_mpoly_q_is_canonical(B, ctx) || !fmpz_mpoly_q_equal(A, C, ctx))
+        if (!fmpz_mod_mpoly_q_is_canonical(B, ctx) || !fmpz_mod_mpoly_q_equal(A, C, ctx))
         {
             flint_printf("FAIL\n");
-            flint_printf("A = "); fmpz_mpoly_q_print_pretty(A, NULL, ctx); flint_printf("\n\n");
-            flint_printf("B = "); fmpz_mpoly_q_print_pretty(B, NULL, ctx); flint_printf("\n\n");
-            flint_printf("C = "); fmpz_mpoly_q_print_pretty(C, NULL, ctx); flint_printf("\n\n");
+            flint_printf("A = "); fmpz_mod_mpoly_q_print_pretty(A, NULL, ctx); flint_printf("\n\n");
+            flint_printf("B = "); fmpz_mod_mpoly_q_print_pretty(B, NULL, ctx); flint_printf("\n\n");
+            flint_printf("C = "); fmpz_mod_mpoly_q_print_pretty(C, NULL, ctx); flint_printf("\n\n");
+            flint_printf("mod = "); fmpz_print(ctx->ffinfo->n); flint_printf("\n\n");
             flint_abort();
         }
 
-        fmpz_mpoly_q_clear(A, ctx);
-        fmpz_mpoly_q_clear(B, ctx);
-        fmpz_mpoly_q_clear(C, ctx);
+        fmpz_mod_mpoly_q_clear(A, ctx);
+        fmpz_mod_mpoly_q_clear(B, ctx);
+        fmpz_mod_mpoly_q_clear(C, ctx);
 
-        fmpz_mpoly_ctx_clear(ctx);
+        fmpz_clear(m);
+        fmpz_mod_mpoly_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);
