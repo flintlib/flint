@@ -29,18 +29,10 @@ fmpz_mod_mpoly_q_canonicalise(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_ctx_t
         fmpz_t g;
         fmpz_init(g);
 
-        _fmpz_vec_content(g, fmpz_mod_mpoly_q_numref(res)->coeffs, fmpz_mod_mpoly_q_numref(res)->length);
-        fmpz_gcd(g, g, fmpz_mod_mpoly_q_denref(res)->coeffs);
-
-        if (fmpz_sgn(fmpz_mod_mpoly_q_denref(res)->coeffs) < 0)
-            fmpz_neg(g, g);
-
-        if (!fmpz_is_one(g))
-        {
-            fmpz_mod_inv(g, g, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g, ctx);
-        }
+        fmpz_mod_inv(g, fmpz_mod_mpoly_q_denref(res)->coeffs, ctx->ffinfo);
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g, ctx);
+        fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), ctx);
+        
 
         fmpz_clear(g);
     }
@@ -49,18 +41,14 @@ fmpz_mod_mpoly_q_canonicalise(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_ctx_t
         fmpz_t g;
         fmpz_init(g);
 
-        _fmpz_vec_content(g, fmpz_mod_mpoly_q_denref(res)->coeffs, fmpz_mod_mpoly_q_denref(res)->length);
-        fmpz_gcd(g, g, fmpz_mod_mpoly_q_numref(res)->coeffs);
-
         if (fmpz_sgn(fmpz_mod_mpoly_q_denref(res)->coeffs) < 0)
             fmpz_neg(g, g);
 
         if (!fmpz_is_one(g))
         {
-            fmpz_mod_inv(g, g, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g, ctx);
+            fmpz_mod_inv(g, fmpz_mod_mpoly_q_denref(res)-> coeffs + 0, ctx->ffinfo);
             fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g, ctx);
-        
+            fmpz_mod_mpoly_make_monic(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), ctx);
         }
 
         fmpz_clear(g);
@@ -85,13 +73,13 @@ fmpz_mod_mpoly_q_canonicalise(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_ctx_t
 
         if (!fmpz_mod_mpoly_is_one(g, ctx))
         {
-            fmpz_mod_inv(g_coeff, g_coeff, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g_coeff, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g_coeff, ctx);
             fmpz_mod_mpoly_divides(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g, ctx);
             fmpz_mod_mpoly_divides(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g, ctx);
         }
-
+        fmpz_mod_inv(g_coeff, fmpz_mod_mpoly_q_denref(res)-> coeffs + 0, ctx->ffinfo);
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g_coeff, ctx);
+        fmpz_mod_mpoly_make_monic(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), ctx);
+        
         fmpz_mod_mpoly_clear(g, ctx);
         fmpz_clear(n);
         fmpz_clear(d);

@@ -69,7 +69,9 @@ fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
     fmpz_init(yy_num);
     fmpz_init(yy_den);
     fmpz_init(yy);
-    fmpz_mod_inv(yy_den, fmpq_denref(y), ctx->ffinfo);
+    fmpz_mod_set_fmpz(yy_den, fmpq_denref(y), ctx->ffinfo);
+
+    fmpz_mod_inv(yy_den, yy_den, ctx->ffinfo);
     fmpz_mod_set_fmpz(yy_num, fmpq_numref(y), ctx->ffinfo);
     fmpz_mod_mul(yy, yy_num, yy_den, ctx->ffinfo);
 
@@ -82,29 +84,10 @@ fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
     }
     else
     {
-        if (fmpz_sgn(fmpq_numref(y)) > 0)
-        {
-            _fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res),
-                        fmpz_mod_mpoly_q_numref(x), fmpz_mod_mpoly_q_denref(x),
-                        fmpq_denref(y), fmpq_numref(y),
-                        ctx);
-        }
-        else
-        {
-            fmpz_t t, u;
-            fmpz_init(t);
-            fmpz_init(u);
-            fmpz_mod_neg(t, fmpq_numref(y), ctx->ffinfo);
-            fmpz_mod_neg(u, fmpq_denref(y), ctx->ffinfo);
-
-            _fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res),
-                        fmpz_mod_mpoly_q_numref(x), fmpz_mod_mpoly_q_denref(x),
-                        u, t,
-                        ctx);
-
-            fmpz_clear(t);
-            fmpz_clear(u);
-        }
+        _fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res),
+            fmpz_mod_mpoly_q_numref(x), fmpz_mod_mpoly_q_denref(x),
+            fmpq_denref(y), fmpq_numref(y),
+            ctx);
     }
     fmpz_clear(yy_num);
     fmpz_clear(yy_den);

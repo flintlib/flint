@@ -372,11 +372,15 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     fmpz_t yy, yy_num, yy_den;
     fmpz_init(yy_num);
     fmpz_init(yy_den);
+    fmpz_mod_set_fmpz(yy_num, y_num, ctx->ffinfo);
+    fmpz_mod_set_fmpz(yy_den, y_den, ctx->ffinfo);
     fmpz_init(yy);
-    fmpz_mod_inv(yy_den, y_den, ctx->ffinfo);
+
+    
+    fmpz_mod_inv(yy_den, yy_den, ctx->ffinfo);
     fmpz_mod_set_fmpz(yy_num, y_num, ctx->ffinfo);
     fmpz_mod_mul(yy, yy_num, yy_den, ctx->ffinfo);
-    
+
     if (fmpz_mod_mpoly_is_zero(x_num, ctx))
     {
         fmpz_mod_mpoly_set_fmpz(res_num, y_num, ctx);
@@ -388,22 +392,21 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     {
         fmpz_mod_mpoly_set(res_num, x_num, ctx);
         fmpz_mod_mpoly_set(res_den, x_den, ctx);
-        fmpz_clear(yy_num);
-        fmpz_clear(yy_den);
+
         fmpz_clear(yy);
         return;
     }
-    fmpz_clear(yy_num);
-    fmpz_clear(yy_den);
     fmpz_clear(yy);
-
+    
+    fmpz_mod_set_fmpz(yy_den, y_den, ctx->ffinfo);
+    
     /* todo: special-case integer x_den */
 
-    if (fmpz_mod_mpoly_equal_fmpz(x_den, y_den, ctx))
+    if (fmpz_mod_mpoly_equal_fmpz(x_den, yy_den, ctx))
     {
         fmpz_mod_mpoly_add_fmpz(res_num, x_num, y_num, ctx);
 
-        if (fmpz_mod_is_one(y_den, ctx->ffinfo))
+        if (fmpz_mod_is_one(yy_den, ctx->ffinfo))
         {
             fmpz_mod_mpoly_one(res_den, ctx);
         }
@@ -412,7 +415,7 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             fmpz_t t;
             fmpz_init(t);
 
-            _fmpz_vec_content2(t, res_num->coeffs, res_num->length, y_den);
+            _fmpz_vec_content2(t, res_num->coeffs, res_num->length, yy_den);
 
             if (fmpz_mod_is_one(t, ctx->ffinfo))
             {
@@ -422,7 +425,7 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             {   
                 fmpz_mod_inv(t, t, ctx->ffinfo);
                 fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, t, ctx);
-                fmpz_mod_mul(t, y_den, t, ctx->ffinfo);
+                fmpz_mod_mul(t, yy_den, t, ctx->ffinfo);
                 fmpz_mod_mpoly_set_fmpz(res_den, t, ctx);
             }
 
@@ -434,13 +437,13 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 
     if (fmpz_mod_mpoly_is_one(x_den, ctx))
     {
-        fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_den, ctx);
+        fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, yy_den, ctx);
         fmpz_mod_mpoly_add_fmpz(res_num, res_num, y_num, ctx);
-        fmpz_mod_mpoly_set_fmpz(res_den, y_den, ctx);
+        fmpz_mod_mpoly_set_fmpz(res_den, yy_den, ctx);
         return;
     }
 
-    if (fmpz_mod_is_one(y_den, ctx->ffinfo))
+    if (fmpz_mod_is_one(yy_den, ctx->ffinfo))
     {
         if (res_num == x_num)
         {
@@ -463,7 +466,7 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         fmpz_t g;
         fmpz_init(g);
 
-        _fmpz_vec_content2(g, x_den->coeffs, x_den->length, y_den);
+        _fmpz_vec_content2(g, x_den->coeffs, x_den->length, yy_den);
 
         if (fmpz_mod_is_one(g, ctx->ffinfo))
         {
@@ -472,10 +475,10 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             fmpz_mod_mpoly_init(t, ctx);
             fmpz_mod_mpoly_init(u, ctx);
 
-            fmpz_mod_mpoly_scalar_mul_fmpz(t, x_num, y_den, ctx);  /* todo: avoid one alloc? */
+            fmpz_mod_mpoly_scalar_mul_fmpz(t, x_num, yy_den, ctx);  /* todo: avoid one alloc? */
             fmpz_mod_mpoly_scalar_mul_fmpz(u, x_den, y_num, ctx);
             fmpz_mod_mpoly_add(res_num, t, u, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
+            fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, yy_den, ctx);
 
             fmpz_mod_mpoly_clear(t, ctx);
             fmpz_mod_mpoly_clear(u, ctx);
@@ -492,7 +495,7 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 
             fmpz_mod_inv(g, g, ctx->ffinfo);
             fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(u, x_den, g, ctx);
-            fmpz_mod_mul(b, y_den, g, ctx->ffinfo);
+            fmpz_mod_mul(b, yy_den, g, ctx->ffinfo);
 
             fmpz_mod_mpoly_scalar_mul_fmpz(t, x_num, b, ctx);
             fmpz_mod_mpoly_scalar_mul_fmpz(u, u, y_num, ctx);
@@ -517,7 +520,8 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             fmpz_mod_mpoly_clear(t, ctx);
             fmpz_mod_mpoly_clear(u, ctx);
         }
-
+        fmpz_clear(yy_num);
+        fmpz_clear(yy_den);
         fmpz_clear(g);
     }
 }

@@ -36,6 +36,6 @@ fmpz_mod_mpoly_q_randtest(fmpz_mod_mpoly_q_t res, flint_rand_t state,
         if (fmpz_mod_mpoly_is_zero(fmpz_mod_mpoly_q_denref(res), ctx))
             fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), ctx);
     }
-
+    
     fmpz_mod_mpoly_q_canonicalise(res, ctx);
 }

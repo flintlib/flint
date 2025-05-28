@@ -37,7 +37,7 @@ fmpz_mod_mpoly_q_set_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_t x, const fmpz_mod
 
 void
 fmpz_mod_mpoly_q_set_fmpq(fmpz_mod_mpoly_q_t res, const fmpq_t x, const fmpz_mod_mpoly_ctx_t ctx)
-{
+{  
     fmpz_mod_mpoly_set_fmpz(fmpz_mod_mpoly_q_numref(res), fmpq_numref(x), ctx);
     fmpz_mod_mpoly_set_fmpz(fmpz_mod_mpoly_q_denref(res), fmpq_denref(x), ctx);
 }

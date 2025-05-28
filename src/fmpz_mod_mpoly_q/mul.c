@@ -154,7 +154,8 @@ _fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     fmpz_init(yy_num);
     fmpz_init(yy_den);
     fmpz_init(yy);
-    fmpz_mod_inv(yy_den, y_den, ctx->ffinfo);
+    fmpz_mod_set_fmpz(yy_den, y_den, ctx->ffinfo);
+    fmpz_mod_inv(yy_den, yy_den, ctx->ffinfo);
     fmpz_mod_set_fmpz(yy_num, y_num, ctx->ffinfo);
     fmpz_mod_mul(yy, yy_num, yy_den, ctx->ffinfo);
 
@@ -168,127 +169,132 @@ _fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         fmpz_clear(yy);
         return;
     }
+    
+    fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, yy, ctx);
+    fmpz_mod_mpoly_set(res_den, x_den, ctx);
+
     fmpz_clear(yy_num);
     fmpz_clear(yy_den);
     fmpz_clear(yy);
-    
-    if (fmpz_mod_mpoly_equal_fmpz(x_den, y_den, ctx))
-    {
-        fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
-        fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
-        return;
-    }
+    return;    
 
-    if (fmpz_mod_mpoly_is_one(x_den, ctx))
-    {
-        fmpz_t t;
-        fmpz_init(t);
+    // if (fmpz_mod_mpoly_equal_fmpz(x_den, y_den, ctx))
+    // {
+    //     fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
+    //     fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
+    //     return;
+    // }
 
-        _fmpz_vec_content2(t, x_num->coeffs, x_num->length, y_den);
+    // if (fmpz_mod_mpoly_is_one(x_den, ctx))
+    // {
+    //     fmpz_t t;
+    //     fmpz_init(t);
 
-        if (fmpz_mod_is_one(t, ctx->ffinfo))
-        {
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
-        }
-        else
-        {   
-            fmpz_mod_inv(t, t, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, t, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_num, res_num, y_num, ctx);
-            fmpz_mod_mul(t, y_den, t, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, t, ctx);
-        }
+    //     _fmpz_vec_content2(t, x_num->coeffs, x_num->length, y_den);
 
-        fmpz_clear(t);
-        return;
-    }
+    //     if (fmpz_mod_is_one(t, ctx->ffinfo))
+    //     {
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
+    //     }
+    //     else
+    //     {   
+    //         fmpz_mod_inv(t, t, ctx->ffinfo);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, t, ctx);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_num, res_num, y_num, ctx);
+    //         fmpz_mod_mul(t, y_den, t, ctx->ffinfo);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, t, ctx);
+    //     }
 
-    if (fmpz_mod_is_one(y_den, ctx->ffinfo))
-    {
-        fmpz_t t;
-        fmpz_init(t);
+    //     fmpz_clear(t);
+    //     return;
+    // }
 
-        _fmpz_vec_content2(t, x_den->coeffs, x_den->length, y_num);
+    // if (fmpz_mod_is_one(y_den, ctx->ffinfo))
+    // {
+    //     fmpz_t t;
+    //     fmpz_init(t);
 
-        if (fmpz_mod_is_one(t, ctx->ffinfo))
-        {
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
-        }
-        else
-        {
-            fmpz_mod_inv(t, t, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_den, x_den, t, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_den, res_den, y_den, ctx);
-            fmpz_mod_mul(t, y_num, t, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, t, ctx);
-        }
+    //     _fmpz_vec_content2(t, x_den->coeffs, x_den->length, y_num);
 
-        fmpz_clear(t);
-        return;
-    }
+    //     if (fmpz_mod_is_one(t, ctx->ffinfo))
+    //     {
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
+    //     }
+    //     else
+    //     {
+    //         fmpz_mod_inv(t, t, ctx->ffinfo);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_den, x_den, t, ctx);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_den, res_den, y_den, ctx);
+    //         fmpz_mod_mul(t, y_num, t, ctx->ffinfo);
+    //         fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, t, ctx);
+    //     }
 
-    {
-        fmpz_t t, u;
+    //     fmpz_clear(t);
+    //     return;
+    // }
 
-        fmpz_init(t);
-        fmpz_init(u);
+    // {
+    //     fmpz_t t, u;
 
-        _fmpz_vec_content2(t, x_num->coeffs, x_num->length, y_den);
-        _fmpz_vec_content2(u, x_den->coeffs, x_den->length, y_num);
+    //     fmpz_init(t);
+    //     fmpz_init(u);
 
-        if (fmpz_mod_is_one(t, ctx->ffinfo))
-        {
-            if (fmpz_mod_is_one(u, ctx->ffinfo))
-            {
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
-            }
-            else
-            {
-                fmpz_mod_inv(u, u, ctx->ffinfo);
-                fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_den, x_den, u, ctx);
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_den, res_den, y_den, ctx);
-                fmpz_mod_mul(u, y_num, u, ctx->ffinfo);
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, u, ctx);
-            }
-        }
-        else
-        {
-            if (fmpz_mod_is_one(u, ctx->ffinfo))
-            {
-                fmpz_mod_inv(t, t, ctx->ffinfo);
-                fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, t, ctx);
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_num, res_num, y_num, ctx);
-                fmpz_mod_mul(t, y_den, t, ctx->ffinfo);
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, t, ctx);
-            }
-            else
-            {
-                fmpz_t v;
-                fmpz_init(v);
+    //     fmpz_mod_set_fmpz(t, x_num->coeffs + 0, ctx->ffinfo);
+    //     fmpz_mod_set_fmpz(u, x_den->coeffs + 0, ctx->ffinfo);
 
-                fmpz_mod_inv(t, t, ctx->ffinfo);
-                fmpz_mod_inv(u, u, ctx->ffinfo);
+    //     if (fmpz_mod_is_one(t, ctx->ffinfo))
+    //     {
+    //         if (fmpz_mod_is_one(u, ctx->ffinfo))
+    //         {
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, y_num, ctx);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, y_den, ctx);
+    //         }
+    //         else
+    //         {
+    //             fmpz_mod_inv(u, u, ctx->ffinfo);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_den, x_den, u, ctx);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_den, res_den, y_den, ctx);
+    //             fmpz_mod_mul(u, y_num, u, ctx->ffinfo);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_num, x_num, u, ctx);
+    //         }
+    //     }
+    //     else
+    //     {
+    //         if (fmpz_mod_is_one(u, ctx->ffinfo))
+    //         {
+    //             fmpz_mod_inv(t, t, ctx->ffinfo);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, t, ctx);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_num, res_num, y_num, ctx);
+    //             fmpz_mod_mul(t, y_den, t, ctx->ffinfo);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_den, x_den, t, ctx);
+    //         }
+    //         else
+    //         {
+    //             fmpz_t v;
+    //             fmpz_init(v);
 
-                fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, t, ctx);
-                fmpz_mod_mul(v, y_num, u, ctx->ffinfo);
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_num, res_num, v, ctx);
+    //             fmpz_mod_inv(t, t, ctx->ffinfo);
+    //             fmpz_mod_inv(u, u, ctx->ffinfo);
 
-                fmpz_mod_inv(v, v, ctx->ffinfo);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, t, ctx);
+    //             fmpz_mod_mul(v, y_num, u, ctx->ffinfo);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_num, res_num, v, ctx);
 
-                fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_den, x_den, u, ctx);
-                fmpz_mod_mul(v, y_den, t, ctx->ffinfo);
-                fmpz_mod_mpoly_scalar_mul_fmpz(res_den, res_den, v, ctx);
+    //             fmpz_mod_inv(v, v, ctx->ffinfo);
 
-                fmpz_clear(v);
-            }
-        }
+    //             fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_den, x_den, u, ctx);
+    //             fmpz_mod_mul(v, y_den, t, ctx->ffinfo);
+    //             fmpz_mod_mpoly_scalar_mul_fmpz(res_den, res_den, v, ctx);
 
-        fmpz_clear(t);
-        fmpz_clear(u);
-    }
+    //             fmpz_clear(v);
+    //         }
+    //     }
+
+    //     fmpz_clear(t);
+    //     fmpz_clear(u);
+    // }
 }
 
 void

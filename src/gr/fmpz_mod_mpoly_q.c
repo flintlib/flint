@@ -287,6 +287,160 @@ _gr_fmpz_mod_mpoly_q_sub_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t pol
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_mod_mpoly_q_sub_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_q_sub_fmpz(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpq_t c, gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_q_sub_fmpq(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_q_mul(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_mul_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_q_mul_si(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_mul_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_q_mul_fmpz(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpq_t c, gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_q_mul_fmpq(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
+{
+    if (fmpz_mod_mpoly_q_is_zero(poly2, MPOLYNOMIAL_MCTX(ctx)))
+        return GR_DOMAIN;
+
+    fmpz_mod_mpoly_q_div(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_div_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
+{
+    if (c == 0)
+        return GR_DOMAIN;
+
+    fmpz_mod_mpoly_q_div_si(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(c))
+        return GR_DOMAIN;
+
+    fmpz_mod_mpoly_q_div_fmpz(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpq_t c, gr_ctx_t ctx)
+{
+    if (fmpq_is_zero(c))
+        return GR_DOMAIN;
+
+    fmpz_mod_mpoly_q_div_fmpq(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+truth_t
+_gr_fmpz_mod_mpoly_q_is_invertible(const fmpz_mod_mpoly_q_t c, gr_ctx_t ctx)
+{
+    return fmpz_mod_mpoly_q_is_zero(c, MPOLYNOMIAL_MCTX(ctx)) ? T_FALSE : T_TRUE;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t c, gr_ctx_t ctx)
+{
+    if (!fmpz_mod_mpoly_q_is_zero(c, MPOLYNOMIAL_MCTX(ctx)))
+    {
+        fmpz_mod_mpoly_q_inv(res, c, MPOLYNOMIAL_MCTX(ctx));
+        return GR_SUCCESS;
+    }
+
+    return GR_DOMAIN;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_pow_ui(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, ulong c, gr_ctx_t ctx)
+{
+    if (fmpz_mod_mpoly_pow_ui(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(poly1), c, MPOLYNOMIAL_MCTX(ctx)) &&
+        fmpz_mod_mpoly_pow_ui(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(poly1), c, MPOLYNOMIAL_MCTX(ctx)))
+        return GR_SUCCESS;
+    else
+        return GR_UNABLE;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_pow_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(c) < 0)
+    {
+        int status;
+
+        status = gr_inv(res, poly1, ctx);
+
+        if (status == GR_SUCCESS)
+        {
+            fmpz_t e;
+            fmpz_init(e);
+            fmpz_neg(e, c);
+            status = _gr_fmpz_mod_mpoly_q_pow_fmpz(res, res, e, ctx);
+            fmpz_clear(e);
+        }
+
+        return status;
+    }
+
+    if (fmpz_mod_mpoly_pow_fmpz(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(poly1), c, MPOLYNOMIAL_MCTX(ctx)) &&
+        fmpz_mod_mpoly_pow_fmpz(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(poly1), c, MPOLYNOMIAL_MCTX(ctx)))
+        return GR_SUCCESS;
+    else
+        return GR_UNABLE;
+
+}
+
+int
+_gr_fmpz_mod_mpoly_q_numerator(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_set(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(x), MPOLYNOMIAL_MCTX(ctx));
+    fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mpoly_q_denominator(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const gr_ctx_t ctx)
+{
+    fmpz_mod_mpoly_set(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(x), MPOLYNOMIAL_MCTX(ctx));
+    fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), MPOLYNOMIAL_MCTX(ctx));
+    return GR_SUCCESS;
+}
 
 int _gr_fmpz_mod_mpoly_q_methods_initialized = 0;
 
@@ -334,6 +488,29 @@ gr_method_tab_input _gr_fmpz_mod_mpoly_q_methods_input[] =
     {GR_METHOD_SUB,         (gr_funcptr) _gr_fmpz_mod_mpoly_q_sub},
     {GR_METHOD_SUB_SI,      (gr_funcptr) _gr_fmpz_mod_mpoly_q_sub_si},
 
+    {GR_METHOD_SUB_FMPZ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_sub_fmpz},
+    {GR_METHOD_SUB_FMPQ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_sub_fmpq},
+    {GR_METHOD_MUL,         (gr_funcptr) _gr_fmpz_mod_mpoly_q_mul},
+    {GR_METHOD_MUL_SI,      (gr_funcptr) _gr_fmpz_mod_mpoly_q_mul_si},
+
+    {GR_METHOD_MUL_FMPZ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_mul_fmpz},
+    {GR_METHOD_MUL_FMPQ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_mul_fmpq},
+    {GR_METHOD_DIV,         (gr_funcptr) _gr_fmpz_mod_mpoly_q_div},
+    {GR_METHOD_DIV_SI,      (gr_funcptr) _gr_fmpz_mod_mpoly_q_div_si},
+ 
+    {GR_METHOD_DIV_FMPZ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_div_fmpz},
+    {GR_METHOD_DIV_FMPQ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_div_fmpq},
+    {GR_METHOD_DIVEXACT,         (gr_funcptr) _gr_fmpz_mod_mpoly_q_div},
+    {GR_METHOD_DIVEXACT_SI,      (gr_funcptr) _gr_fmpz_mod_mpoly_q_div_si},
+ 
+    {GR_METHOD_DIVEXACT_FMPZ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_div_fmpz},
+    {GR_METHOD_DIVEXACT_FMPQ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_div_fmpq},
+    {GR_METHOD_INV,             (gr_funcptr) _gr_fmpz_mod_mpoly_q_inv},
+    {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpz_mod_mpoly_q_is_invertible},
+    {GR_METHOD_POW_UI,      (gr_funcptr) _gr_fmpz_mod_mpoly_q_pow_ui},
+    {GR_METHOD_POW_FMPZ,    (gr_funcptr) _gr_fmpz_mod_mpoly_q_pow_fmpz},
+    {GR_METHOD_NUMERATOR,      (gr_funcptr) _gr_fmpz_mod_mpoly_q_numerator},
+    {GR_METHOD_DENOMINATOR,      (gr_funcptr) _gr_fmpz_mod_mpoly_q_denominator},
     {0,                     (gr_funcptr) NULL},
 };
 
