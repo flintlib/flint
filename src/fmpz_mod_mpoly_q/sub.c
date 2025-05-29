@@ -40,70 +40,31 @@ _fmpz_mod_mpoly_q_sub_fmpz_mod_mpoly_den(fmpz_mod_mpoly_t res_num, fmpz_mod_mpol
 
     if (fmpz_mod_mpoly_is_fmpz(x_den, ctx))
     {
-        fmpz_gcd(g, x_den->coeffs, y_den);
+        fmpz_t a, b;
+        fmpz_mod_mpoly_t t, u;
 
-        if (fmpz_mod_is_one(g, ctx->ffinfo))
-        {
-            fmpz_mod_mpoly_t t, u;
+        fmpz_init(a);
+        fmpz_init(b);
 
-            fmpz_mod_mpoly_init(t, ctx);
-            fmpz_mod_mpoly_init(u, ctx);
+        fmpz_mod_inv(a, x_den->coeffs, ctx->ffinfo);
+        fmpz_mod_inv(b, y_den, ctx->ffinfo);            
 
-            /* todo: avoid one alloc? not helpful right now because
-               fmpz_mpoly_sub does not work inplace */
-            fmpz_mod_mpoly_scalar_mul_fmpz(t, y_num, x_den->coeffs, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz(u, x_num, y_den, ctx);
-            fmpz_mod_mpoly_sub(res_num, u, t, ctx);
-            fmpz_mod_mul(g, x_den->coeffs, y_den, ctx->ffinfo);
-            fmpz_mod_mpoly_set_fmpz(res_den, g, ctx);
+        fmpz_mod_mpoly_init(t, ctx);
+        fmpz_mod_mpoly_init(u, ctx);
 
-            fmpz_mod_mpoly_clear(t, ctx);
-            fmpz_mod_mpoly_clear(u, ctx);
-        }
-        else
-        {
-            fmpz_t a, b, g_inv;
-            fmpz_mod_mpoly_t t, u;
+        /* todo: avoid one alloc? not helpful right now because
+            fmpz_mpoly_sub does not work inplace */
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(t, y_num, b, ctx);
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(u, x_num, a, ctx);
+        fmpz_mod_mpoly_sub(res_num, u, t, ctx);
+        
+        if (fmpz_mod_mpoly_is_zero(res_num, ctx))
+            fmpz_mod_mpoly_one(res_den, ctx);
 
-            fmpz_init(a);
-            fmpz_init(b);
-            fmpz_init(g_inv);
-            fmpz_mod_mpoly_init(t, ctx);
-            fmpz_mod_mpoly_init(u, ctx);
-
-            fmpz_mod_inv(g_inv, g, ctx->ffinfo);
-            fmpz_mod_mul(a, y_den, g_inv, ctx->ffinfo);
-            fmpz_mod_mul(b, x_den->coeffs, g_inv, ctx->ffinfo);
-
-            fmpz_mod_mpoly_scalar_mul_fmpz(t, y_num, b, ctx);
-            fmpz_mod_mpoly_scalar_mul_fmpz(u, x_num, a, ctx);
-            fmpz_mod_mpoly_sub(res_num, u, t, ctx);
-
-            if (fmpz_mod_mpoly_is_zero(res_num, ctx))
-                fmpz_one(a);
-            else
-                _fmpz_vec_content2(a, res_num->coeffs, res_num->length, g);
-
-            if (fmpz_mod_is_one(a, ctx->ffinfo))
-            {
-                fmpz_mod_mul(g, b, y_den, ctx->ffinfo);
-                fmpz_mod_mpoly_set_fmpz(res_den, g, ctx);
-            }
-            else
-            {   
-                fmpz_mod_inv(a, a, ctx->ffinfo);
-                fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, a, ctx);
-                fmpz_mod_mul(g, y_den, a, ctx->ffinfo);
-                fmpz_mod_mul(g, g, b, ctx->ffinfo);
-                fmpz_mod_mpoly_set_fmpz(res_den, g, ctx);
-            }
-
-            fmpz_clear(a);
-            fmpz_clear(b);
-            fmpz_clear(g_inv);
-            fmpz_mod_mpoly_clear(t, ctx);
-            fmpz_mod_mpoly_clear(u, ctx);
-        }
+        fmpz_mod_mpoly_clear(t, ctx);
+        fmpz_mod_mpoly_clear(u, ctx);
+        fmpz_clear(a);
+        fmpz_clear(b);
     }
     else
     {

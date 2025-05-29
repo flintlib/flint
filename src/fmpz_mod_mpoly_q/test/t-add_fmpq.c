@@ -53,6 +53,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_add_fmpq, state)
         
         fmpz_mod_mpoly_q_add_fmpq(B, A, c, ctx);
         fmpz_mod_mpoly_q_add(C, A, C, ctx);
+        fmpz_mod_mpoly_q_canonicalise(C,ctx);
 
         if (!fmpz_mod_mpoly_q_equal(B, C, ctx))
         {
