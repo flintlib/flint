@@ -37,9 +37,6 @@ void fmpz_mod_mpoly_q_init(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_ctx_t ct
 
 void fmpz_mod_mpoly_q_clear(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_ctx_t ctx);
 
-void fmpz_mod_mpoly_fit_bits(fmpz_mod_mpoly_q_t A, flint_bitcnt_t bits, const fmpz_mod_mpoly_ctx_t ctx);
-
-
 /* Assignment */
 
 void fmpz_mod_mpoly_q_swap(fmpz_mod_mpoly_q_t x, fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
@@ -52,16 +49,13 @@ void fmpz_mod_mpoly_q_set_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_t x, const fmp
 
 void fmpz_mod_mpoly_q_set_si(fmpz_mod_mpoly_q_t res, slong x, const fmpz_mod_mpoly_ctx_t ctx);
 
-
 /* Canonicalisation */
 
 void fmpz_mod_mpoly_q_canonicalise(fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx);
 
 int fmpz_mod_mpoly_q_is_canonical(const fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_ctx_t ctx);
 
-
 /* Properties */
-
 
 FMPZ_MOD_MPOLY_Q_INLINE int
 fmpz_mod_mpoly_q_is_zero(const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx)
@@ -130,7 +124,6 @@ void fmpz_mod_mpoly_q_randtest(fmpz_mod_mpoly_q_t res, flint_rand_t state, slong
 /* Comparisons */
 
 int fmpz_mod_mpoly_q_equal(const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx);
-
 
 /* Arithmetic */
 
@@ -233,30 +226,7 @@ fmpz_mod_mpoly_q_div_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slon
     fmpz_clear(t);
 }
 
-
-
-
 /* Polynomial helper functions */
-
-FMPZ_MOD_MPOLY_Q_INLINE void
-_fmpz_vec_content2(fmpz_t res, const fmpz * vec, slong len, const fmpz_t inp)
-{
-    if (fmpz_is_pm1(inp))
-    {
-        fmpz_one(res);
-    }
-    else
-    {
-        slong i;
-        fmpz_abs(res, inp);
-        for (i = len - 1; i >= 0; i--)
-        {
-            fmpz_gcd(res, res, vec + i);
-            if (fmpz_is_one(res))
-                break;
-        }
-    }
-}
 
 FMPZ_MOD_MPOLY_Q_INLINE void
 fmpz_mod_mpoly_gcd_assert_successful(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t x, const fmpz_mod_mpoly_t y, const fmpz_mod_mpoly_ctx_t ctx)

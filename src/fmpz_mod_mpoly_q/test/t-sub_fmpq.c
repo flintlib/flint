@@ -52,6 +52,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_sub_fmpq, state)
         fmpz_mod_mpoly_q_set_fmpq(C, c, ctx);
         fmpz_mod_mpoly_q_sub(C, A, C, ctx);
 
+        fmpz_mod_mpoly_q_canonicalise(C, ctx);
+
         if (!fmpz_mod_mpoly_q_equal(B, C, ctx))
         {
             flint_printf("FAIL\n");

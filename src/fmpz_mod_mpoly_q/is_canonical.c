@@ -20,12 +20,6 @@ fmpz_mod_mpoly_q_is_canonical(const fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly
     if (!fmpz_mod_mpoly_is_canonical(fmpz_mod_mpoly_q_denref(res), ctx))
         return 0;
 
-    if (fmpz_mod_mpoly_is_zero(fmpz_mod_mpoly_q_denref(res), ctx))
-        return 0;
-
-    if (fmpz_sgn(fmpz_mod_mpoly_q_denref(res)->coeffs) < 0)
-        return 0;
-
     {
         int ans;
         int ans_coeff;
@@ -38,6 +32,6 @@ fmpz_mod_mpoly_q_is_canonical(const fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly
         ans_coeff = fmpz_mod_is_one(fmpz_mod_mpoly_q_denref(res)->coeffs + 0, ctx->ffinfo);
         fmpz_mod_mpoly_clear(g, ctx);
 
-        return ans*ans_coeff;
+        return ans && ans_coeff;
     }
 }

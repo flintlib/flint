@@ -35,9 +35,11 @@ _fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         fmpz_mod_mpoly_t t, u;
         fmpz_mod_mpoly_init(t, ctx);
         fmpz_mod_mpoly_init(u, ctx);
+
         _fmpz_mod_mpoly_q_mul(t, u, x_num, x_den, y_den, y_num, ctx);
         fmpz_mod_mpoly_swap(res_num, t, ctx);
         fmpz_mod_mpoly_swap(res_den, u, ctx);
+
         fmpz_mod_mpoly_clear(t, ctx);
         fmpz_mod_mpoly_clear(u, ctx);
     }
@@ -77,10 +79,10 @@ fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
 
     if (fmpz_is_zero(yy))
     {
-        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_q_div_fmpq: division by zero\n");
         fmpz_clear(yy_num);
         fmpz_clear(yy_den);
         fmpz_clear(yy);
+        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_q_div_fmpq: division by zero\n");
     }
     else
     {
@@ -103,8 +105,8 @@ fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
 
     if (fmpz_is_zero(yy))
     {
-        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_q_div_fmpz: division by zero\n");
         fmpz_clear(yy);
+        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_q_div_fmpz: division by zero\n");
     }
     else
     {
@@ -116,6 +118,8 @@ fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
                         fmpz_mod_mpoly_q_numref(x), fmpz_mod_mpoly_q_denref(x),
                         one, y,
                         ctx);
+                        
+            fmpz_clear(one);
         }
         else
         {
@@ -130,6 +134,7 @@ fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
                         one, t,
                         ctx);
 
+            fmpz_clear(one);
             fmpz_clear(t);
         }
     }

@@ -35,7 +35,7 @@ _fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 
     if (fmpz_mod_mpoly_is_one(x_den, ctx))
     {
-        fmpz_mod_mpoly_t t, u;
+        fmpz_mod_mpoly_t t;
         fmpz_mod_mpoly_init(t, ctx);
 
         fmpz_mod_mpoly_gcd_assert_successful(t, x_num, y_den, ctx);
@@ -47,11 +47,14 @@ _fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         }
         else
         {
+            fmpz_mod_mpoly_t u;
             fmpz_mod_mpoly_init(u, ctx);
+
             _fmpz_mod_mpoly_q_mpoly_divexact(u, x_num, t, ctx);
             fmpz_mod_mpoly_mul(res_num, u, y_num, ctx);
             _fmpz_mod_mpoly_q_mpoly_divexact(u, y_den, t, ctx);
             fmpz_mod_mpoly_mul(res_den, x_den, u, ctx);
+
             fmpz_mod_mpoly_clear(u, ctx);
         }
 
@@ -61,7 +64,7 @@ _fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 
     if (fmpz_mod_mpoly_is_one(y_den, ctx))
     {
-        fmpz_mod_mpoly_t t, u;
+        fmpz_mod_mpoly_t t;
         fmpz_mod_mpoly_init(t, ctx);
 
         fmpz_mod_mpoly_gcd_assert_successful(t, y_num, x_den, ctx);
@@ -73,15 +76,19 @@ _fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         }
         else
         {
+            fmpz_mod_mpoly_t u;
             fmpz_mod_mpoly_init(u, ctx);
+
             _fmpz_mod_mpoly_q_mpoly_divexact(u, y_num, t, ctx);
             fmpz_mod_mpoly_mul(res_num, u, x_num, ctx);
             _fmpz_mod_mpoly_q_mpoly_divexact(u, x_den, t, ctx);
             fmpz_mod_mpoly_mul(res_den, y_den, u, ctx);
+            
             fmpz_mod_mpoly_clear(u, ctx);
         }
 
         fmpz_mod_mpoly_clear(t, ctx);
+        
         return;
     }
 
