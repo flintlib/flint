@@ -171,6 +171,7 @@ _fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         
         fmpz_mod_mpoly_mul(t, x_num, y_den, ctx);
         fmpz_mod_mpoly_sub(res_num, t, y_num, ctx);
+
         fmpz_mod_mpoly_clear(t, ctx);
 
         fmpz_mod_mpoly_set(res_den, y_den, ctx);
@@ -185,6 +186,7 @@ _fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         
         fmpz_mod_mpoly_mul(t, y_num, x_den, ctx);
         fmpz_mod_mpoly_sub(res_num, x_num, t, ctx);
+
         fmpz_mod_mpoly_clear(t, ctx);
 
         fmpz_mod_mpoly_set(res_den, x_den, ctx);
@@ -312,6 +314,7 @@ _fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     {
         fmpz_mod_mpoly_t t;
         fmpz_mod_mpoly_init(t, ctx);
+        
         fmpz_mod_mpoly_scalar_mul_fmpz(t, x_den, yy_num, ctx);
         fmpz_mod_mpoly_sub(res_num, x_num, t, ctx);
         fmpz_mod_mpoly_clear(t, ctx);

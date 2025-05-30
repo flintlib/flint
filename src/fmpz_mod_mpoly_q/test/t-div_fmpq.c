@@ -68,6 +68,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_div_fmpq, state)
         fmpz_mod_mpoly_q_clear(B, ctx);
         fmpz_mod_mpoly_q_clear(C, ctx);
         fmpq_clear(c);
+        fmpz_clear(m);
+        fmpz_clear(t);
 
         fmpz_mod_mpoly_ctx_clear(ctx);
     }
