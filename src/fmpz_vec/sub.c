@@ -12,10 +12,24 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
+static void
+_fmpz_sub_inline(fmpz_t z, const fmpz_t x, const fmpz_t y)
+{
+    fmpz f, g;
+
+    f = *x;
+    g = *y;
+
+    if (!COEFF_IS_MPZ(f) && !COEFF_IS_MPZ(g))
+        fmpz_set_si(z, f - g);
+    else
+        fmpz_sub(z, x, y);
+}
+
 void
 _fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len2)
 {
     slong i;
     for (i = 0; i < len2; i++)
-        fmpz_sub(res + i, vec1 + i, vec2 + i);
+        _fmpz_sub_inline(res + i, vec1 + i, vec2 + i);
 }
