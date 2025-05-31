@@ -278,6 +278,15 @@ Context operations
     The name is used when printing and may be used to choose
     coercions.
 
+.. function:: slong gr_ctx_ngens(gr_ctx_t ctx)
+
+    Returns the number of generators.
+
+.. function:: char const * const * gr_ctx_gen_names_srcptr(gr_ctx_t ctx)
+
+    Returns an array containing the names of the generators, or `NULL` if there
+    are no generators.
+
 Element operations
 --------------------------------------------------------------------------------
 
