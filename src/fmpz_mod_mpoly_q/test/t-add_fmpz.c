@@ -37,15 +37,6 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_add_fmpz, state)
         fmpz_mod_mpoly_q_randtest(A, state, 10, 5, ctx);
         fmpz_randtest(c, state, 10);
 
-        fmpz_t t;
-        fmpz_init(t);
-        fmpz_mod_set_fmpz(t, c, ctx->ffinfo);
-
-        if (fmpz_is_zero(t))
-        {
-            fmpz_sub_si(c,c,1);
-        }
-
         fmpz_mod_mpoly_q_add_fmpz(B, A, c, ctx);
 
         fmpz_mod_mpoly_q_set_fmpz(C, c, ctx);
@@ -67,7 +58,6 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_add_fmpz, state)
         fmpz_mod_mpoly_q_clear(C, ctx);
         fmpz_clear(c);
         fmpz_clear(m);
-        fmpz_clear(t);
 
         fmpz_mod_mpoly_ctx_clear(ctx);
     }

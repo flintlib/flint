@@ -48,10 +48,16 @@ _fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         _fmpz_mod_mpoly_q_mul(res_num, res_den, x_num, x_den, y_den, y_num, ctx);
     }
 
-    if (fmpz_sgn(res_den->coeffs) < 0)
+    if (!fmpz_is_one(res_den->coeffs))
     {
-        fmpz_mod_mpoly_neg(res_num, res_num, ctx);
-        fmpz_mod_mpoly_neg(res_den, res_den, ctx);
+        fmpz_t g;
+        fmpz_init(g);
+
+        fmpz_mod_inv(g, res_den->coeffs, ctx->ffinfo);
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g, ctx);
+        fmpz_mod_mpoly_make_monic(res_den, res_den, ctx);
+    
+        fmpz_clear(g);
     }
 }
 
@@ -103,40 +109,13 @@ fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
     fmpz_init(yy);
     fmpz_mod_set_fmpz(yy, y, ctx->ffinfo);
 
-    if (fmpz_is_zero(yy))
+    if (!fmpz_is_zero(yy))
     {
-        fmpz_clear(yy);
-        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_q_div_fmpz: division by zero\n");
+        fmpz_mod_inv(yy, yy, ctx->ffinfo);
     }
-    else
-    {
-        if (fmpz_sgn(y) > 0)
-        {
-            fmpz_t one;
-            *one = 1;
-            _fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res),
-                        fmpz_mod_mpoly_q_numref(x), fmpz_mod_mpoly_q_denref(x),
-                        one, y,
-                        ctx);
-                        
-            fmpz_clear(one);
-        }
-        else
-        {
-            fmpz_t t;
-            fmpz_t one;
-            *one = -1;
-            fmpz_init(t);
-            fmpz_mod_neg(t, y, ctx->ffinfo);
-
-            _fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res),
-                        fmpz_mod_mpoly_q_numref(x), fmpz_mod_mpoly_q_denref(x),
-                        one, t,
-                        ctx);
-
-            fmpz_clear(one);
-            fmpz_clear(t);
-        }
-    }
+        
+    fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(x), yy, ctx);
+    fmpz_mod_mpoly_set(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(x), ctx);
+    
     fmpz_clear(yy);
 }

@@ -44,7 +44,6 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_div, state)
         fmpz_mod_mpoly_mul(fmpz_mod_mpoly_q_numref(D), fmpz_mod_mpoly_q_numref(A), fmpz_mod_mpoly_q_denref(B), ctx);
         fmpz_mod_mpoly_mul(fmpz_mod_mpoly_q_denref(D), fmpz_mod_mpoly_q_denref(A), fmpz_mod_mpoly_q_numref(B), ctx);
         
-        fmpz_mod_mpoly_q_canonicalise(C, ctx);
         fmpz_mod_mpoly_q_canonicalise(D, ctx);
 
         if (!fmpz_mod_mpoly_q_equal(C, D, ctx))
@@ -68,11 +67,6 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_div, state)
             fmpz_mod_mpoly_q_set(C, B, ctx);
             fmpz_mod_mpoly_q_div(C, A, C, ctx);
         }
-
-        /* todo: make sure all arithmetic functions output in canonical form */
-        
-        fmpz_mod_mpoly_q_canonicalise(C, ctx);
-        fmpz_mod_mpoly_q_canonicalise(D, ctx);
         
         if (!fmpz_mod_mpoly_q_equal(C, D, ctx))
         {

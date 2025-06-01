@@ -45,7 +45,6 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_mul_fmpq, state)
         {
             fmpz_sub_si(fmpq_denref(c),fmpq_denref(c),1);
         }
-        fmpq_canonicalise(c);
 
         fmpz_mod_mpoly_q_mul_fmpq(B, A, c, ctx);
 
@@ -68,7 +67,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_mul_fmpq, state)
         fmpz_mod_mpoly_q_clear(B, ctx);
         fmpz_mod_mpoly_q_clear(C, ctx);
         fmpq_clear(c);
-        fmpq_clear(t);
+        fmpz_clear(t);
         fmpz_clear(m);
         fmpz_mod_mpoly_ctx_clear(ctx);
     }

@@ -19,13 +19,6 @@ fmpz_mod_mpoly_q_print_pretty(const fmpz_mod_mpoly_q_t f, const char ** x, const
     {
         fmpz_mod_mpoly_print_pretty(fmpz_mod_mpoly_q_numref(f), x, ctx);
     }
-    else if (fmpz_mod_mpoly_is_fmpz(fmpz_mod_mpoly_q_denref(f), ctx))
-    {
-        flint_printf("(");
-        fmpz_mod_mpoly_print_pretty(fmpz_mod_mpoly_q_numref(f), x, ctx);
-        flint_printf(")/");
-        fmpz_mod_mpoly_print_pretty(fmpz_mod_mpoly_q_denref(f), x, ctx);
-    }
     else
     {
         flint_printf("(");

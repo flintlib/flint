@@ -12,76 +12,6 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mpoly_q.h"
 
-static void
-_fmpz_mod_mpoly_q_add_fmpz_mod_mpoly_den(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
-            const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
-            const fmpz_mod_mpoly_t y_num, const fmpz_t y_den,
-            const fmpz_mod_mpoly_ctx_t ctx)
-{
-    if (fmpz_mod_mpoly_is_fmpz(y_num, ctx))
-    {   
-        _fmpz_mod_mpoly_q_add_fmpq(res_num, res_den, x_num, x_den, y_num->coeffs, y_den, ctx);
-        return;
-    }
-
-    if (fmpz_mod_mpoly_is_fmpz(x_den, ctx))
-    {
-        fmpz_mod_mpoly_t t, u;
-        fmpz_t a, b;
-
-        fmpz_init(a);
-        fmpz_init(b);
-
-        fmpz_mod_mpoly_init(t, ctx);
-        fmpz_mod_mpoly_init(u, ctx);
-
-        fmpz_mod_set_fmpz(a, x_den->coeffs, ctx->ffinfo);
-        fmpz_mod_set_fmpz(b, y_den, ctx->ffinfo);
-
-        fmpz_mod_inv(a, a, ctx->ffinfo);
-        fmpz_mod_inv(b, b, ctx->ffinfo);
-
-        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(t, x_num, a, ctx);
-        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(u, y_num, b, ctx);
-        fmpz_mod_mpoly_add(res_num, t, u, ctx);
-
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_mod_mpoly_clear(t, ctx);
-        fmpz_mod_mpoly_clear(u, ctx);
-        return;
-    }
-    else
-    {
-        fmpz_mod_mpoly_t u;
-        fmpz_t b;
-
-        fmpz_init(b);        
-
-        fmpz_mod_set_fmpz(b, y_den, ctx->ffinfo);
-
-        fmpz_mod_inv(b, b, ctx->ffinfo);
-
-        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(u, y_num, b, ctx);
-        fmpz_mod_mpoly_mul(u, u, x_den, ctx);
-        fmpz_mod_mpoly_add(res_num, x_num, u, ctx);
-
-        if (fmpz_mod_mpoly_is_zero(res_num, ctx))
-        {
-            fmpz_mod_mpoly_one(res_den, ctx);
-
-            fmpz_clear(b);
-            fmpz_mod_mpoly_clear(u, ctx);
-            return;
-        }
-
-        fmpz_mod_mpoly_set(res_den, x_den, ctx);
-
-        fmpz_clear(b);
-        fmpz_mod_mpoly_clear(u, ctx);
-    }
-}
-
 void
 _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
@@ -90,15 +20,80 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 {
     if (fmpz_mod_mpoly_is_zero(x_num, ctx))
     {
-        fmpz_mod_mpoly_set(res_num, y_num, ctx);
-        fmpz_mod_mpoly_set(res_den, y_den, ctx);
+        if (fmpz_mod_is_one(y_den->coeffs, ctx->ffinfo))
+        {
+            fmpz_mod_mpoly_set(res_num, y_num, ctx);
+            fmpz_mod_mpoly_set(res_den, y_den, ctx);
+            return;
+        }
+        else
+        {
+            fmpz_t g;
+            fmpz_mod_mpoly_t t;
+
+            fmpz_init(g);
+            fmpz_mod_mpoly_init(t, ctx);
+
+            fmpz_mod_mpoly_gcd_assert_successful(t, y_num, y_den,ctx);
+
+            fmpz_mod_set_fmpz(g, y_den->coeffs, ctx->ffinfo);
+            fmpz_mod_inv(g, g, ctx->ffinfo);
+
+            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, y_num, g, ctx);
+            fmpz_mod_mpoly_make_monic(res_den, y_den, ctx);
+
+            fmpz_mod_mpoly_gcd_assert_successful(t, res_num, res_den, ctx);
+
+            if (!fmpz_mod_mpoly_is_one(t, ctx))
+            {
+                fmpz_mod_mpoly_divexact(res_num, res_num, t, ctx);
+                fmpz_mod_mpoly_divexact(res_den, res_den, t, ctx);
+
+            }
+            
+            fmpz_mod_mpoly_clear(t, ctx);
+            fmpz_clear(g);
+        }
+
         return;
     }
 
     if (fmpz_mod_mpoly_is_zero(y_num, ctx))
     {
-        fmpz_mod_mpoly_set(res_num, x_num, ctx);
-        fmpz_mod_mpoly_set(res_den, x_den, ctx);
+        if (fmpz_mod_is_one(x_den->coeffs, ctx->ffinfo))
+        {
+            fmpz_mod_mpoly_set(res_num, x_num, ctx);
+            fmpz_mod_mpoly_set(res_den, x_den, ctx);
+            return;
+        }
+        else
+        {
+            fmpz_t g;
+            fmpz_mod_mpoly_t t;
+
+            fmpz_init(g);
+            fmpz_mod_mpoly_init(t, ctx);
+
+            fmpz_mod_mpoly_gcd_assert_successful(t, x_num, x_den,ctx);
+
+            fmpz_mod_set_fmpz(g, x_den->coeffs, ctx->ffinfo);
+            fmpz_mod_inv(g, g, ctx->ffinfo);
+
+            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, g, ctx);
+
+            fmpz_mod_mpoly_make_monic(res_den, x_den, ctx);
+            
+            if (!fmpz_mod_mpoly_is_one(t, ctx))
+            {
+                fmpz_mod_mpoly_divexact(res_num, res_num, t, ctx);
+                fmpz_mod_mpoly_divexact(res_den, res_den, t, ctx);
+
+            }
+
+            fmpz_mod_mpoly_clear(t, ctx);
+            fmpz_clear(g);
+        }
+
         return;
     }
 
@@ -111,20 +106,6 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             fmpz_mod_mpoly_one(res_den, ctx);
             return;
         }
-        else if (fmpz_mod_mpoly_is_fmpz(x_den, ctx))
-        {
-            fmpz_t t;
-            fmpz_init(t);
-
-            fmpz_mod_set_fmpz(t, x_den->coeffs, ctx->ffinfo);
-
-            fmpz_mod_inv(t, t, ctx->ffinfo);
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, t, ctx);
-            fmpz_mod_mpoly_one(res_den, ctx);
-        
-            fmpz_clear(t);
-            return;
-        }
         else
         {
             fmpz_t g;
@@ -133,7 +114,7 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             fmpz_init(g);
             fmpz_mod_mpoly_init(t, ctx);
 
-            fmpz_mod_set_fmpz(g, x_den->coeffs + 0, ctx->ffinfo);
+            fmpz_mod_set_fmpz(g, x_den->coeffs, ctx->ffinfo);
             fmpz_mod_inv(g, g, ctx->ffinfo);
 
             fmpz_mod_mpoly_gcd_assert_successful(t, res_num, x_den, ctx);
@@ -155,7 +136,6 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
                 fmpz_mod_mpoly_divides(res_num, res_num, t, ctx);
                 fmpz_mod_mpoly_divides(res_den, res_den, t, ctx);
 
-                
                 fmpz_mod_mpoly_clear(t, ctx);
                 fmpz_clear(g);                 
                 return;
@@ -165,41 +145,74 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 
     if (fmpz_mod_mpoly_is_one(x_den, ctx))
     {  
-        fmpz_mod_mpoly_t t;
+        fmpz_t g;
+        fmpz_mod_mpoly_t t, u;
 
+        fmpz_init(g);
         fmpz_mod_mpoly_init(t, ctx);
+        fmpz_mod_mpoly_init(u, ctx);
+
+
+        fmpz_mod_set_fmpz(g, y_den->coeffs, ctx->ffinfo);
+        fmpz_mod_inv(g, g, ctx->ffinfo);
         
         fmpz_mod_mpoly_mul(t, x_num, y_den, ctx);
         fmpz_mod_mpoly_add(res_num, t, y_num, ctx);
-        fmpz_mod_mpoly_clear(t, ctx);
 
-        fmpz_mod_mpoly_set(res_den, y_den, ctx);
+        if (fmpz_mod_mpoly_is_zero(res_num,ctx))
+        {
+            fmpz_mod_mpoly_clear(u, ctx);
+            fmpz_mod_mpoly_clear(t, ctx);
+            fmpz_clear(g);
+            return;
+        }
+
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g, ctx);
+        fmpz_mod_mpoly_make_monic(res_den, y_den, ctx);
+
+        fmpz_mod_mpoly_gcd_assert_successful(u, res_num, res_den, ctx);
+        fmpz_mod_mpoly_divexact(res_num, res_num, u, ctx);
+        fmpz_mod_mpoly_divexact(res_den, res_den, u, ctx);
+
+        fmpz_mod_mpoly_clear(u, ctx);
+        fmpz_mod_mpoly_clear(t, ctx);
+        fmpz_clear(g);
         return;
     }
 
     if (fmpz_mod_mpoly_is_one(y_den, ctx))
     {
-        fmpz_mod_mpoly_t t;
+        fmpz_t g;
+        fmpz_mod_mpoly_t t, u;
 
+        fmpz_init(g);
         fmpz_mod_mpoly_init(t, ctx);
+        fmpz_mod_mpoly_init(u, ctx);
+
+        fmpz_mod_set_fmpz(g, x_den->coeffs, ctx->ffinfo);
+        fmpz_mod_inv(g, g, ctx->ffinfo);
         
         fmpz_mod_mpoly_mul(t, y_num, x_den, ctx);
         fmpz_mod_mpoly_add(res_num, t, x_num, ctx);
+
+        if (fmpz_mod_mpoly_is_zero(res_num,ctx))
+        {
+            fmpz_mod_mpoly_clear(u, ctx);
+            fmpz_mod_mpoly_clear(t, ctx);
+            fmpz_clear(g);
+            return;
+        }
+
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g, ctx);
+        fmpz_mod_mpoly_make_monic(res_den, x_den, ctx);
+
+        fmpz_mod_mpoly_gcd_assert_successful(u, res_num, res_den, ctx);
+        fmpz_mod_mpoly_divexact(res_num, res_num, u, ctx);
+        fmpz_mod_mpoly_divexact(res_den, res_den, u, ctx);
+
+        fmpz_mod_mpoly_clear(u, ctx);
         fmpz_mod_mpoly_clear(t, ctx);
-
-        fmpz_mod_mpoly_set(res_den, x_den, ctx);
-        return;
-    }
-
-    if (fmpz_mod_mpoly_is_fmpz(y_den, ctx))
-    {
-        _fmpz_mod_mpoly_q_add_fmpz_mod_mpoly_den(res_num, res_den, x_num, x_den, y_num, y_den->coeffs, ctx);
-        return;
-    }
-
-    if (fmpz_mod_mpoly_is_fmpz(x_den, ctx))
-    {
-        _fmpz_mod_mpoly_q_add_fmpz_mod_mpoly_den(res_num, res_den, y_num, y_den, x_num, x_den->coeffs, ctx);
+        fmpz_clear(g);
         return;
     }
 
@@ -213,15 +226,31 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         fmpz_mod_mpoly_gcd_assert_successful(g, x_den, y_den, ctx);
 
         if (fmpz_mod_mpoly_is_one(g, ctx))
-        {
+        {   
+            fmpz_t g_coeff;
+            
+            fmpz_init(g_coeff);
+
             fmpz_mod_mpoly_mul(t, x_num, y_den, ctx);
             fmpz_mod_mpoly_mul(u, y_num, x_den, ctx);
             fmpz_mod_mpoly_add(res_num, t, u, ctx);
             fmpz_mod_mpoly_mul(res_den, x_den, y_den, ctx);
+                        
+            fmpz_mod_set_fmpz(g_coeff,res_den->coeffs,ctx->ffinfo);
+            fmpz_mod_inv(g_coeff, g_coeff, ctx->ffinfo);
+            
+            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g_coeff, ctx);
+            fmpz_mod_mpoly_make_monic(res_den, res_den, ctx);
+
+            fmpz_clear(g_coeff);
+
         }
         else
         {
             fmpz_mod_mpoly_t a, b;
+            fmpz_t g_coeff;
+            
+            fmpz_init(g_coeff);
 
             fmpz_mod_mpoly_init(a, ctx);
             fmpz_mod_mpoly_init(b, ctx);
@@ -246,13 +275,22 @@ _fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
                 fmpz_mod_mpoly_mul(res_den, g, b, ctx);
             }
 
+            fmpz_mod_set_fmpz(g_coeff,res_den->coeffs,ctx->ffinfo);
+            fmpz_mod_inv(g_coeff, g_coeff, ctx->ffinfo);
+            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g_coeff, ctx);
+            fmpz_mod_mpoly_make_monic(res_den, res_den, ctx);
+
             fmpz_mod_mpoly_clear(a, ctx);
             fmpz_mod_mpoly_clear(b, ctx);
+            fmpz_clear(g_coeff);
         }
 
+        fmpz_mod_mpoly_gcd_assert_successful(g, res_num, res_den, ctx);
+        fmpz_mod_mpoly_divexact(res_num, res_num, g, ctx);
+        fmpz_mod_mpoly_divexact(res_den, res_den, g, ctx);
 
-        fmpz_mod_mpoly_init(t, ctx);
-        fmpz_mod_mpoly_init(u, ctx);
+        fmpz_mod_mpoly_clear(t, ctx);
+        fmpz_mod_mpoly_clear(u, ctx);
         fmpz_mod_mpoly_clear(g, ctx);
         return;
     }
@@ -278,6 +316,7 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     if (fmpz_mod_mpoly_is_zero(x_num, ctx))
     {
         fmpz_mod_mpoly_set_fmpz(res_num, yy, ctx);
+        fmpz_mod_mpoly_one(res_den, ctx);
         
         fmpz_clear(yy_num);
         fmpz_clear(yy_den);
@@ -290,6 +329,25 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         fmpz_mod_mpoly_set(res_num, x_num, ctx);
         fmpz_mod_mpoly_set(res_den, x_den, ctx);
 
+        if (!fmpz_mod_mpoly_is_one(res_den, ctx))
+        {
+            fmpz_t g;
+            fmpz_mod_mpoly_t t;
+
+            fmpz_init(g);
+            fmpz_mod_mpoly_init(t, ctx);
+
+            fmpz_mod_set_fmpz(g,res_den->coeffs, ctx->ffinfo);
+            fmpz_mod_mpoly_gcd_assert_successful(t, res_num, res_den, ctx);
+
+            fmpz_mod_inv(g, g, ctx->ffinfo);
+            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g, ctx);
+            fmpz_mod_mpoly_divexact(res_den, res_den, t, ctx);
+
+            fmpz_mod_mpoly_clear(t, ctx);
+            fmpz_clear(g);
+        }
+
         fmpz_clear(yy_num);
         fmpz_clear(yy_den);
         fmpz_clear(yy);
@@ -299,6 +357,7 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     if (fmpz_mod_mpoly_is_one(x_den, ctx))
     {
         fmpz_mod_mpoly_add_fmpz(res_num, x_num, yy, ctx);
+        fmpz_mod_mpoly_one(res_den, ctx);
 
         fmpz_clear(yy_num);
         fmpz_clear(yy_den);
@@ -306,27 +365,46 @@ _fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         return;
     }
 
-    if (res_num == x_num)
+    fmpz_t g;
+    fmpz_mod_mpoly_t t, u;
+
+    fmpz_init(g);
+    fmpz_mod_mpoly_init(t, ctx);
+    fmpz_mod_mpoly_init(u, ctx);
+
+    fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(u, x_den, yy, ctx);
+    fmpz_mod_mpoly_add(res_num, x_num, u, ctx);
+
+    if (fmpz_mod_mpoly_is_zero(res_num, ctx))
     {
-        fmpz_mod_mpoly_t t;
-        fmpz_mod_mpoly_init(t, ctx);
-        fmpz_mod_mpoly_scalar_mul_fmpz(t, x_den, yy_num, ctx);
-        fmpz_mod_mpoly_add(res_num, x_num, t, ctx);
+        fmpz_mod_mpoly_one(res_den, ctx);
+        
+        fmpz_clear(g);
+        fmpz_clear(yy);
+        fmpz_clear(yy_num);
+        fmpz_clear(yy_den);
         fmpz_mod_mpoly_clear(t, ctx);
+        fmpz_mod_mpoly_clear(u, ctx);
+        return;
     }
-    else
-    {
-        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_den, yy, ctx);
-        fmpz_mod_mpoly_add(res_num, x_num, res_num, ctx);
-    }
+    
     fmpz_mod_mpoly_set(res_den, x_den, ctx);
 
+    fmpz_mod_set_fmpz(g,res_den->coeffs, ctx->ffinfo);
+    fmpz_mod_mpoly_gcd_assert_successful(t, res_num, res_den, ctx);
+
+    fmpz_mod_inv(g, g, ctx->ffinfo);
+    fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g, ctx);
+    fmpz_mod_mpoly_make_monic(res_den, res_den, ctx);
+    fmpz_mod_mpoly_divexact(res_num, res_num, t, ctx);
+    fmpz_mod_mpoly_divexact(res_den, res_den, t, ctx);
+
+    fmpz_clear(g);
     fmpz_clear(yy);
     fmpz_clear(yy_num);
     fmpz_clear(yy_den);
-    return;
-    
-    
+    fmpz_mod_mpoly_clear(t, ctx);
+    fmpz_mod_mpoly_clear(u, ctx);
 }
 
 void

@@ -31,8 +31,6 @@ _fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         return;
     }
 
-    /* todo: special-case integer denominators; scalar multiplication */
-
     if (fmpz_mod_mpoly_is_one(x_den, ctx))
     {
         fmpz_mod_mpoly_t t;

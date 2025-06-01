@@ -11,6 +11,7 @@
 
 #include "mpoly.h"
 #include "fmpz_mpoly_q.h"
+#include "fmpz_mod_mpoly_q.h"
 #include "nf.h"
 #include "gr.h"
 
@@ -29,6 +30,7 @@
 #include "t-fmpz_mod.c"
 #include "t-fmpz_mpoly.c"
 #include "t-fmpz_mpoly_q.c"
+#include "t-fmpz_mod_mpoly_q.c"
 #include "t-fmpz_poly.c"
 #include "t-fq.c"
 #include "t-fq_nmod.c"
@@ -85,6 +87,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_fmpz_mod),
     TEST_FUNCTION(gr_fmpz_mpoly),
     TEST_FUNCTION(gr_fmpz_mpoly_q),
+    TEST_FUNCTION(gr_fmpz_mod_mpoly_q),
     TEST_FUNCTION(gr_fmpz_poly),
     TEST_FUNCTION(gr_fq),
     TEST_FUNCTION(gr_fq_nmod),

@@ -47,13 +47,11 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_add_fmpq, state)
         {
             fmpz_sub_si(fmpq_denref(c),fmpq_denref(c),1);
         }
-        fmpq_canonicalise(c);
 
         fmpz_mod_mpoly_q_set_fmpq(C, c, ctx);
         
         fmpz_mod_mpoly_q_add_fmpq(B, A, c, ctx);
         fmpz_mod_mpoly_q_add(C, A, C, ctx);
-        fmpz_mod_mpoly_q_canonicalise(C,ctx);
 
         if (!fmpz_mod_mpoly_q_equal(B, C, ctx))
         {
