@@ -25,7 +25,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_div_fmpz, state)
 
         fmpz_init(m);
         fmpz_randtest_unsigned(m, state, 200);
-        fmpz_add_ui(m, m, 20);
+        fmpz_add_ui(m, m, 2);
         fmpz_nextprime(m, m, 0);
         fmpz_mod_mpoly_ctx_init(ctx, 1 + n_randint(state, 4), ORD_LEX, m);
 
@@ -36,6 +36,15 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_div_fmpz, state)
 
         fmpz_mod_mpoly_q_randtest(A, state, 10, 5, ctx);
         fmpz_randtest_not_zero(c, state, 10);
+
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_mod_set_fmpz(t, c, ctx->ffinfo);
+
+        if (fmpz_is_zero(t))
+        {
+            fmpz_add_si(c,c,1);
+        }
 
         fmpz_mod_mpoly_q_div_fmpz(B, A, c, ctx);
 
@@ -58,6 +67,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_div_fmpz, state)
         fmpz_mod_mpoly_q_clear(B, ctx);
         fmpz_mod_mpoly_q_clear(C, ctx);
         fmpz_clear(c);
+        fmpz_clear(t);
 
         fmpz_clear(m);
         fmpz_mod_mpoly_ctx_clear(ctx);

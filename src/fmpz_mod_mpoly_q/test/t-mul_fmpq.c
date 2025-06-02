@@ -26,7 +26,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_mul_fmpq, state)
 
         fmpz_init(m);
         fmpz_randtest_unsigned(m, state, 200);
-        fmpz_add_ui(m, m, 20);
+        fmpz_add_ui(m, m, 2);
         fmpz_nextprime(m, m, 0);
         fmpz_mod_mpoly_ctx_init(ctx, 1 + n_randint(state, 4), ORD_LEX, m);
 
@@ -39,11 +39,16 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_mul_fmpq, state)
         fmpq_randtest(c, state, 10);
         fmpz_t t;
         fmpz_init(t);
-        fmpz_mod_set_fmpz(t, fmpq_denref(c), ctx->ffinfo);
+        fmpz_mod_set_fmpz(t, fmpq_numref(c), ctx->ffinfo);
 
         if (fmpz_is_zero(t))
         {
-            fmpz_sub_si(fmpq_denref(c),fmpq_denref(c),1);
+            fmpz_sub_si(fmpq_numref(c),fmpq_numref(c),1);
+        }
+        fmpz_mod_set_fmpz(t, fmpq_denref(c), ctx->ffinfo);
+        if (fmpz_is_zero(t))
+        {
+            fmpz_add_si(fmpq_denref(c),fmpq_denref(c),1);
         }
 
         fmpz_mod_mpoly_q_mul_fmpq(B, A, c, ctx);

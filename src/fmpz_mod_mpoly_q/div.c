@@ -85,10 +85,11 @@ fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
 
     if (fmpz_is_zero(yy))
     {
+        fmpz_mod_mpoly_q_zero(res, ctx);
         fmpz_clear(yy_num);
         fmpz_clear(yy_den);
         fmpz_clear(yy);
-        flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_q_div_fmpq: division by zero\n");
+        return;
     }
     else
     {

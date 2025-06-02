@@ -25,7 +25,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_inv, state)
 
         fmpz_init(m);
         fmpz_randtest_unsigned(m, state, 200);
-        fmpz_add_ui(m, m, 20);
+        fmpz_add_ui(m, m, 2);
         fmpz_nextprime(m, m, 0);
         fmpz_mod_mpoly_ctx_init(ctx, 1 + n_randint(state, 4), ORD_LEX, m);
 
