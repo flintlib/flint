@@ -31,7 +31,7 @@ TEST_FUNCTION_START(arb_get_interval_mpfr, state)
         arb_get_interval_mpfr(aa, bb, x);
         arb_set_interval_mpfr(y, aa, bb, 2 + n_randint(state, 200));
 
-        if (!arb_contains(y, x))
+        if (!arb_contains(y, x) || (!arf_is_nan(arb_midref(x)) && (mpfr_nan_p(aa) || mpfr_nan_p(bb))))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("x = "); arb_print(x); flint_printf("\n\n");
