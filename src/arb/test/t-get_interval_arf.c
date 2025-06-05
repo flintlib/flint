@@ -30,7 +30,7 @@ TEST_FUNCTION_START(arb_get_interval_arf, state)
         arb_get_interval_arf(a, b, x, 2 + n_randint(state, 200));
         arb_set_interval_arf(y, a, b, 2 + n_randint(state, 200));
 
-        if (!arb_contains(y, x))
+        if (!arb_contains(y, x) || (!arf_is_nan(arb_midref(x)) && (arf_is_nan(a) || arf_is_nan(b))))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("x = "); arb_print(x); flint_printf("\n\n");

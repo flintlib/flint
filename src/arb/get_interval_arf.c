@@ -14,8 +14,16 @@
 void
 arb_get_interval_arf(arf_t a, arf_t b, const arb_t x, slong prec)
 {
-    arf_t r;
-    arf_init_set_mag_shallow(r, arb_radref(x));
-    arf_sub(a, arb_midref(x), r, prec, ARF_RND_FLOOR);
-    arf_add(b, arb_midref(x), r, prec, ARF_RND_CEIL);
+    if (mag_is_inf(arb_radref(x)) && !arf_is_nan(arb_midref(x)))
+    {
+        arf_neg_inf(a);
+        arf_pos_inf(b);
+    }
+    else
+    {
+        arf_t r;
+        arf_init_set_mag_shallow(r, arb_radref(x));
+        arf_sub(a, arb_midref(x), r, prec, ARF_RND_FLOOR);
+        arf_add(b, arb_midref(x), r, prec, ARF_RND_CEIL);
+    }
 }

@@ -20,7 +20,7 @@
               void gr_generic_sub(void)
               void gr_generic_mul(void)
 
-.. function:: int gr_generic_ctx_clear(gr_ctx_t ctx)
+.. function:: void gr_generic_ctx_clear(gr_ctx_t ctx)
 
 .. function:: void gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
 
