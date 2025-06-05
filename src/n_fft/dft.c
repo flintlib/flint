@@ -29,6 +29,36 @@
  *   to [0..n).
  */
 
+/** Example for nodes/depth:
+ *   if F.depth is 3, the tree of roots of unity in F->tab_w is
+ *                    1                               d3n0                <-- depth 3 
+ *               /        \                        /        \
+ *             1            -1                 d2n0          d2n1         <-- depth 2
+ *           /   \        /     \     =        /   \        /     \
+ *         1     -1      I      -I         d1n0   d1n1   d1n2    d1n3     <-- depth 1
+ *        / \    / \    / \    /  \         / \    / \    / \    /  \
+ *       1  -1  I  -I  J  -J  IJ -IJ       1  -1  I  -I  J  -J  IJ -IJ    <-- depth 0
+ *  stored as, ommitting precomputations:
+ *    F->tab_w == [1, 1_pr, I, I_pr, J, J_pr, IJ, IJ_pr]
+ *  (the elements -1, -I, -J, -IJ are not stored)
+ *
+ *
+ *  -> calling a function with depth==3 and node==0 is performing
+ *  evaluation at all these 8 points (8th roots of 1)
+ *  -> calling a function with depth==2 and node==0 is performing
+ *  evaluation at all points at the leaves of the left child d2n0
+ *  of the root of the tree d3n0 (4th roots of 1)
+ *  -> calling a function with depth==2 and node==1 is performing
+ *  evaluation at all points at the leaves of the right child d2n1
+ *  of d3n0 (4th roots of -1)
+ *  -> calling a function with depth==1 and node==1 is performing
+ *  evaluation at all points at the leaves of the subtree rooted
+ *  at d1n1 (square roots of -1)
+ *  -> calling a function with depth==1 and node==2 is performing
+ *  evaluation at all points at the leaves of the subtree rooted
+ *  at d1n2 (square roots of I)
+ */
+
 /*-----------------------*/
 /*  auxiliary functions  */
 /*-----------------------*/
@@ -39,10 +69,10 @@
  *          [p(w_k), p(-w_k)] for k in range(len),
  * where w_k = F->tab_w[2**depth * node + 2*k] for 0 <= k < 2**(depth-1)
  * * By construction these evaluation points are the len roots of the
- * polynomial x**len - F->tab_w[node]
+ * polynomial x**len - F->tab_w[2*node] (for example, if depth=
  * * Requirements (not checked):
  *        3 <= depth
- *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
+ *        (node+1) * 2**depth < 2**F.depth (length of F->tab_w)
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
 void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)

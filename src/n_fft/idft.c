@@ -42,10 +42,10 @@
  * * Here we write w[k] for 0 <= k < len/2, defined as
  *            w[2*k]   == F->tab_w[2**depth * node + 2*k]
  *            w[2*k+1] == - F->tab_w[2**depth * node + 2*k];
- * these are the len roots of the polynomial x**len - F->tab_w[node]
+ * these are the len roots of the polynomial x**len - F->tab_w[2*node]
  * * Requirements (not checked):
  *        3 <= depth
- *        (node+1) * 2**depth <= 2**F.depth (length of F->tab_w)
+ *        (node+1) * 2**depth < 2**F.depth (length of F->tab_w)
  * * lazy_1_2: in [0..n) / out [0..2n) / max < 4n
  */
 void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
