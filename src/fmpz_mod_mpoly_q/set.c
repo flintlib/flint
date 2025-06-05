@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
+    Copyright (C) 2025 Andrii Yanovets
 
     This file is part of FLINT.
 
@@ -51,7 +52,7 @@ fmpz_mod_mpoly_q_set_fmpq(fmpz_mod_mpoly_q_t res, const fmpq_t x, const fmpz_mod
 
     if (fmpz_is_zero(d))
     {
-        fmpz_zero(d);
+        flint_throw(FLINT_ERROR, "_fmpz_mod_mpoly_q_set: division by zero\n");
     }
     else
     {

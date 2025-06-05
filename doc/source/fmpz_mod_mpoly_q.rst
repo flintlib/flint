@@ -11,7 +11,8 @@ of numerator and denominator is 1 and then normalizing denominator to a monic po
 
 The user must create a multivariate polynomial context
 (:type:`fmpz_mod_mpoly_ctx_t`) specifying the prime number *m* for the field `\mathbb{F}_m` 
-the number of variables *n* and the monomial ordering.
+the number of variables *n* and the monomial ordering. It is important to ensure *m* is a prime number
+otherwise undefined behaviour may occur.
 
 
 Types and macros
@@ -168,7 +169,7 @@ Arithmetic
               void fmpz_mod_mpoly_q_add_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_add_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong y, const fmpz_mod_mpoly_ctx_t ctx)
 
-    Sets *res* to the sum of *x* and *y*.
+    Sets *res* to the sum of *x* and *y*. 
 
 .. function:: void fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)

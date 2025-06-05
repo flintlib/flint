@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
+    Copyright (C) 2025 Andrii Yanovets
 
     This file is part of FLINT.
 
@@ -85,11 +86,7 @@ fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
 
     if (fmpz_is_zero(yy))
     {
-        fmpz_mod_mpoly_q_zero(res, ctx);
-        fmpz_clear(yy_num);
-        fmpz_clear(yy_den);
-        fmpz_clear(yy);
-        return;
+        flint_throw(FLINT_ERROR, "_fmpz_mod_mpoly_q_div_fmpz: division by zero\n");
     }
     else
     {
@@ -110,7 +107,11 @@ fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, co
     fmpz_init(yy);
     fmpz_mod_set_fmpz(yy, y, ctx->ffinfo);
 
-    if (!fmpz_is_zero(yy))
+    if (fmpz_is_zero(yy))
+    {
+        flint_throw(FLINT_ERROR, "_fmpz_mod_mpoly_q_div_fmpq: division by zero\n");
+    }
+    else
     {
         fmpz_mod_inv(yy, yy, ctx->ffinfo);
     }

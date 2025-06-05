@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
+    Copyright (C) 2025 Andrii Yanovets
 
     This file is part of FLINT.
 
@@ -20,79 +21,15 @@ _fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 {
     if (fmpz_mod_mpoly_is_zero(x_num, ctx))
     {
-        if (fmpz_mod_is_one(y_den->coeffs, ctx->ffinfo))
-        {
-            fmpz_mod_mpoly_neg(res_num, y_num, ctx);
-            fmpz_mod_mpoly_set(res_den, y_den, ctx);
-            return;
-        }
-        else
-        {
-            fmpz_t g;
-            fmpz_mod_mpoly_t t;
-
-            fmpz_init(g);
-            fmpz_mod_mpoly_init(t, ctx);
-
-            fmpz_mod_set_fmpz(g, y_den->coeffs, ctx->ffinfo);
-            fmpz_mod_inv(g, g, ctx->ffinfo);
-
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, y_num, g, ctx);
-            fmpz_mod_mpoly_neg(res_num, res_num, ctx);
-            fmpz_mod_mpoly_make_monic(res_den, y_den, ctx);
-
-            fmpz_mod_mpoly_gcd_assert_successful(t, res_num, res_den, ctx);
-
-            if (!fmpz_mod_mpoly_is_one(t, ctx))
-            {
-                fmpz_mod_mpoly_divexact(res_num, res_num, t, ctx);
-                fmpz_mod_mpoly_divexact(res_den, res_den, t, ctx);
-
-            }
-
-            fmpz_mod_mpoly_clear(t, ctx);
-            fmpz_clear(g);
-        }
-
+        fmpz_mod_mpoly_neg(res_num, y_num, ctx);
+        fmpz_mod_mpoly_set(res_den, y_den, ctx);
         return;
     }
 
     if (fmpz_mod_mpoly_is_zero(y_num, ctx))
     {
-        if (fmpz_mod_is_one(x_den->coeffs, ctx->ffinfo))
-        {
-            fmpz_mod_mpoly_set(res_num, x_num, ctx);
-            fmpz_mod_mpoly_set(res_den, x_den, ctx);
-            return;
-        }
-        else
-        {
-            fmpz_t g;
-            fmpz_mod_mpoly_t t;
-
-            fmpz_init(g);
-            fmpz_mod_mpoly_init(t, ctx);
-
-            fmpz_mod_mpoly_gcd_assert_successful(t, x_num, x_den,ctx);
-
-            fmpz_mod_set_fmpz(g, x_den->coeffs, ctx->ffinfo);
-            fmpz_mod_inv(g, g, ctx->ffinfo);
-
-            fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, x_num, g, ctx);
-
-            fmpz_mod_mpoly_make_monic(res_den, x_den, ctx);
-
-            if (!fmpz_mod_mpoly_is_one(t, ctx))
-            {
-                fmpz_mod_mpoly_divexact(res_num, res_num, t, ctx);
-                fmpz_mod_mpoly_divexact(res_den, res_den, t, ctx);
-
-            }
-
-            fmpz_mod_mpoly_clear(t, ctx);
-            fmpz_clear(g);
-        }
-
+        fmpz_mod_mpoly_set(res_num, x_num, ctx);
+        fmpz_mod_mpoly_set(res_den, x_den, ctx);
         return;
     }
 
@@ -152,20 +89,11 @@ _fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         fmpz_mod_mpoly_init(t, ctx);
         fmpz_mod_mpoly_init(u, ctx);
 
-
         fmpz_mod_set_fmpz(g, y_den->coeffs, ctx->ffinfo);
         fmpz_mod_inv(g, g, ctx->ffinfo);
         
         fmpz_mod_mpoly_mul(t, x_num, y_den, ctx);
         fmpz_mod_mpoly_sub(res_num, t, y_num, ctx);
-
-        if (fmpz_mod_mpoly_is_zero(res_num,ctx))
-        {
-            fmpz_mod_mpoly_clear(u, ctx);
-            fmpz_mod_mpoly_clear(t, ctx);
-            fmpz_clear(g);
-            return;
-        }
 
         fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g, ctx);
         fmpz_mod_mpoly_make_monic(res_den, y_den, ctx);
@@ -194,14 +122,6 @@ _fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
         
         fmpz_mod_mpoly_mul(t, y_num, x_den, ctx);
         fmpz_mod_mpoly_sub(res_num, x_num, t, ctx);
-
-        if (fmpz_mod_mpoly_is_zero(res_num,ctx))
-        {
-            fmpz_mod_mpoly_clear(u, ctx);
-            fmpz_mod_mpoly_clear(t, ctx);
-            fmpz_clear(g);
-            return;
-        }
 
         fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(res_num, res_num, g, ctx);
         fmpz_mod_mpoly_make_monic(res_den, x_den, ctx);
@@ -307,6 +227,11 @@ _fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     fmpz_init(yy_den);
     fmpz_mod_set_fmpz(yy_num, y_num, ctx->ffinfo);
     fmpz_mod_set_fmpz(yy_den, y_den, ctx->ffinfo);
+
+    if (fmpz_is_zero(yy_den))
+    {
+        flint_throw(FLINT_ERROR, "_fmpz_mpoly_q_sub_fmpq: division by zero\n");
+    }
     
     fmpz_mod_inv(yy_den, yy_den, ctx->ffinfo);
     fmpz_mod_mul(yy, yy_num, yy_den, ctx->ffinfo);
@@ -373,19 +298,6 @@ _fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
 
     fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(t, x_den, yy, ctx);
     fmpz_mod_mpoly_sub(res_num, x_num, t, ctx);
-
-    if (fmpz_mod_mpoly_is_zero(res_num, ctx))
-    {
-        fmpz_mod_mpoly_one(res_den, ctx);
-
-        fmpz_clear(g);
-        fmpz_clear(yy);
-        fmpz_clear(yy_num);
-        fmpz_clear(yy_den);
-        fmpz_mod_mpoly_clear(t, ctx);
-        fmpz_mod_mpoly_clear(u, ctx);
-        return;
-    }
     
     fmpz_mod_mpoly_set(res_den, x_den, ctx);
 

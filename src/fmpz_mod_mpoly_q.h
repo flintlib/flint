@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
+    Copyright (C) 2025 Andrii Yanovets
 
     This file is part of FLINT.
 
@@ -83,10 +84,6 @@ fmpz_mod_mpoly_q_is_fmpq(const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t 
     return fmpz_mod_mpoly_is_fmpz(fmpz_mod_mpoly_q_numref(x), ctx) &&
            fmpz_mod_mpoly_is_fmpz(fmpz_mod_mpoly_q_denref(x), ctx);
 }
-
-void fmpz_mod_mpoly_q_used_vars(int * used, const fmpz_mod_mpoly_q_t f, const fmpz_mod_mpoly_ctx_t ctx);
-void fmpz_mod_mpoly_q_used_vars_num(int * used, const fmpz_mod_mpoly_q_t f, const fmpz_mod_mpoly_ctx_t ctx);
-void fmpz_mod_mpoly_q_used_vars_den(int * used, const fmpz_mod_mpoly_q_t f, const fmpz_mod_mpoly_ctx_t ctx);
 
 /* Special values */
 
