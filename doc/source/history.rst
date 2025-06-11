@@ -125,8 +125,6 @@ Vincent Neiger (VN).
   * Accommodate for Meteor Lake, Raptor Lake and Tiger Lake (VN).
   * Make sure Comet Lake enables ``fft_small`` (VN).
   * Error when trying to build FLINT on a non-Windows system (AA).
-  * Fix installation of headers for out-of-tree builds (AA).
-  * Use ``__ARM_ACLE`` to guard inclusion of ``arm_acle.h`` (LG).
   * Do not use ``find_library()`` in ``flint_ctypes`` (MM).
 
 * Tests
@@ -158,7 +156,6 @@ Vincent Neiger (VN).
   * Remove underscore in front of ``nfloat_ctx_(set|get)_real_prec`` to match
     documentation (Joel Dahne).
   * Add missing newlines at end of file (FJ).
-  * Remove assertion with uninitialied variable (AA).
   * Fix ``ENABLE_AVX2=OFF`` for ``CMake`` (AA).
   * Add ``gr_poly_coeff_ptr`` and deprecate ``gr_poly_entry_ptr`` (RB).
 
@@ -181,6 +178,25 @@ Vincent Neiger (VN).
   * Document ``n_factor_t`` structure (Matthew House).
   * Document ``gr_vec_entry_srcptr`` (MM).
   * Document ``truth_t`` functions (MM).
+
+
+2025-03-31 -- FLINT 3.2.2
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA)
+
+* Continuous integration
+
+  * Enable redoing upload release CI (AA).
+
+* Build system
+
+  * Fix installation of headers for out-of-tree builds (AA).
+  * Use ``__ARM_ACLE`` to guard inclusion of ``arm_acle.h`` (Lars Göttgens).
+
+* Maintenance
+
+  * Remove assertion with uninitialized variable (AA).
 
 
 2025-03-17 -- FLINT 3.2.1
