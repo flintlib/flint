@@ -5647,6 +5647,38 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def permanent(self, algorithm=None):
+        """
+        Permanent of this matrix.
+
+            >>> MatZZ(3, 3, ZZ.fac_vec(9)).permanent()
+            1995840
+            >>> Mat(RealField_arb(64))(8, 8, ZZ.fac_vec(64)).permanent()
+            [+/- 4.07e+321]
+            >>> Mat(RealField_arb(64))(8, 8, ZZ.fac_vec(64)).permanent(algorithm="cofactor")
+            [5.5848931822182876e+307 +/- 6.08e+290]
+            >>> Mat(RealField_arb(128))(8, 8, ZZ.fac_vec(64)).permanent()
+            [5.5849e+307 +/- 2.12e+302]
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        if algorithm is None:
+            status = libgr.gr_mat_permanent(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "cofactor":
+            status = libgr.gr_mat_permanent_cofactor(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "ryser":
+            status = libgr.gr_mat_permanent_ryser(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "glynn":
+            status = libgr.gr_mat_permanent_glynn(res._ref, self._ref, element_ring._ref)
+        elif algorithm == "glynn_threaded":
+            status = libgr.gr_mat_permanent_glynn_threaded(res._ref, self._ref, element_ring._ref)
+        else:
+            raise ValueError("unknown algorithm")
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
     def trace(self):
         """
             >>> MatZZ([[3,4],[5,6]]).trace()
