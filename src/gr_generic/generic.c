@@ -71,6 +71,24 @@ truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
     return res;
 }
 
+slong
+gr_generic_ctx_ngens_0(gr_ctx_t ctx)
+{
+    return 0;
+}
+
+slong
+gr_generic_ctx_ngens_1(gr_ctx_t ctx)
+{
+    return 1;
+}
+
+char const * const *
+gr_generic_ctx_gen_names_srcptr(gr_ctx_t ctx)
+{
+    return 0;
+}
+
 void
 gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
 {
@@ -2636,6 +2654,9 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CTX_IS_EXACT,            (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_CANONICAL,        (gr_funcptr) gr_generic_ctx_predicate},
+
+    {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_0},
+    {GR_METHOD_CTX_GEN_NAMES_SRCPTR,    (gr_funcptr) gr_generic_ctx_gen_names_srcptr},
 
     {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},
