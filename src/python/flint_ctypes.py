@@ -5651,12 +5651,14 @@ class gr_mat(gr_elem):
         """
         Permanent of this matrix.
 
-            >>> MatZZ(3, 3, ZZ.fac_vec(9)).det()
-            233280
-            >>> MatRR(3, 3, ZZ.fac_vec(9)).det()
-            233280.0000000000
-            >>> MatRR(3, 3, ZZ.fac_vec(9)).det(algorithm="lu")
-            [233280.000000000 +/- 2.67e-10]
+            >>> MatZZ(3, 3, ZZ.fac_vec(9)).permanent()
+            1995840
+            >>> Mat(RealField_arb(64))(8, 8, ZZ.fac_vec(64)).permanent()
+            [+/- 4.07e+321]
+            >>> Mat(RealField_arb(64))(8, 8, ZZ.fac_vec(64)).permanent(algorithm="cofactor")
+            [5.5848931822182876e+307 +/- 6.08e+290]
+            >>> Mat(RealField_arb(128))(8, 8, ZZ.fac_vec(64)).permanent()
+            [5.5849e+307 +/- 2.12e+302]
         """
         element_ring = self.parent()._element_ring
         res = element_ring()
