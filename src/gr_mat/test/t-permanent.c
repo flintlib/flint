@@ -46,11 +46,9 @@ TEST_FUNCTION_START(gr_mat_permanent, state)
 
         GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
 
-        algorithm = n_randint(state, 5);
-
         status |= gr_mat_permanent_cofactor(a, A, ctx);
 
-        for (algorithm = 0; algorithm < 3; algorithm++)
+        for (algorithm = 0; algorithm < 4; algorithm++)
         {
             status = GR_SUCCESS;
 
@@ -61,6 +59,10 @@ TEST_FUNCTION_START(gr_mat_permanent, state)
                     break;
                 case 1:
                     status |= gr_mat_permanent_glynn(b, A, ctx);
+                    break;
+                case 2:
+                    flint_set_num_threads(1 + n_randint(state, 5));
+                    status |= gr_mat_permanent_glynn_threaded(b, A, ctx);
                     break;
                 default:
                     status |= gr_mat_permanent(b, A, ctx);

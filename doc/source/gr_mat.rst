@@ -577,6 +577,7 @@ Permanent
 .. function:: int gr_mat_permanent_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_permanent_ryser(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_permanent_glynn(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_glynn_threaded(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_permanent(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 
     Sets *res* to the permanent of the square matrix *A*,
@@ -596,9 +597,12 @@ Permanent
       requires about half as many operations as *ryser* but requires (exact)
       division by 2.
 
+    * The *glynn_threaded* version is a multithreaded implementation
+      of Glynn's formula.
+
     The default method chooses cofactor expansion for `n \le 4` and otherwise
-    chooses *ryser* or *glynn* depending on whether the ring supports
-    division by 2.
+    chooses *ryser*, *glynn* or *glynn_threaded* depending on whether the ring
+    supports division by 2.
 
 Rank
 -------------------------------------------------------------------------------

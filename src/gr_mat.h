@@ -249,6 +249,7 @@ WARN_UNUSED_RESULT int gr_mat_adjugate(gr_mat_t adj, gr_ptr det, const gr_mat_t 
 WARN_UNUSED_RESULT int gr_mat_permanent_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_permanent_ryser(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_permanent_glynn(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_permanent_glynn_threaded(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_permanent(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_rank_lu(slong * rank, const gr_mat_t A, gr_ctx_t ctx);
