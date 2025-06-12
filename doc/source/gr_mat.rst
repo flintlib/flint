@@ -571,6 +571,38 @@ Determinant and trace
     the square matrix *mat*.
     If the matrix is not square, ``GR_DOMAIN`` is returned.
 
+Permanent
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_permanent_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_ryser(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_glynn(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_glynn_threaded(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+
+    Sets *res* to the permanent of the square matrix *A*,
+    The permanent `\operatorname{perm}(A)` is a polynomial expression
+    in the entries of `A` equivalent to that for the determinant
+    but with all subtractions replaced by additions.
+    Several algorithms are implemented:
+
+    * The *cofactor* version uses recursive cofactor expansion, requiring
+      `O(n!)` additions and multiplications.
+
+    * The *ryser* version uses Ryser's formula [Rys1963]_ with Gray code traversal,
+      requiring `O(2^n n)` additions, subtractions and multiplications.
+
+    * The *glynn* version uses Glynn's formula [Gly2010]_ (actually equivalent
+      to a method described earlier by Nijenhuis and Wilf [NW1978]_). This
+      requires about half as many operations as *ryser* but requires (exact)
+      division by 2.
+
+    * The *glynn_threaded* version is a multithreaded implementation
+      of Glynn's formula.
+
+    The default method chooses cofactor expansion for `n \le 4` and otherwise
+    chooses *ryser*, *glynn* or *glynn_threaded* depending on whether the ring
+    supports division by 2.
 
 Rank
 -------------------------------------------------------------------------------
