@@ -6,7 +6,7 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-XXXX-XX-XX -- FLINT 3.3.0-dev
+2025-06-11 -- FLINT 3.3.0
 -------------------------------------------------------------------------------
 
 Main contributors: Albin Ahlbäck (AA), Ricardo Buring (RB), Lars Göttgens (LG),
