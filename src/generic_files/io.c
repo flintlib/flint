@@ -26,6 +26,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_ore_poly.h"
 #include "gr_mat.h"
 
 int _gr_mat_write(gr_stream_t out, const gr_mat_t mat, int linebreaks, gr_ctx_t ctx);
@@ -727,6 +728,14 @@ print_flint_type:
             GR_MUST_SUCCEED(gr_poly_write(out, elem, "x", ctx));
             res += out->len;
             ip += STRING_LENGTH("gr_poly}");
+        }
+        else if (IS_FLINT_TYPE(ip, "gr_ore_poly"))
+        {
+            const gr_ore_poly_struct * elem = va_arg(vlist, const gr_ore_poly_struct *);
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(gr_ore_poly_write(out, elem, ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr_ore_poly}");
         }
         else if (IS_FLINT_TYPE(ip, "gr_mat"))
         {
