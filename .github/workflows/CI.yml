@@ -203,7 +203,11 @@ jobs:
         working-directory: ./msolve
         run: |
           $MAKE
-          make check
+
+      - name: "Check msolve"
+        working-directory: ./msolve
+        run: |
+          $MAKE check
 
 
   ##############################################################################
