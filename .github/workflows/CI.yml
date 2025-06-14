@@ -189,9 +189,9 @@ jobs:
           sudo make install
           sudo ldconfig
 
-      - name: "Check msolve"
+      - name: "Fetch msolve"
         run: |
-          git clone https://github.com/algebraic-solving/msolve
+          git clone --depth=1 https://github.com/algebraic-solving/msolve
           cd msolve
           ./autogen.sh
           ./configure
