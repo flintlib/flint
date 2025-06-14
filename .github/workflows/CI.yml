@@ -185,13 +185,13 @@ jobs:
           $MAKE check
 
       - name: "Check msolve"
+        run: |
           git clone https://github.com/algebraic-solving/msolve
           cd msolve
           ./autogen.sh
           ./configure
           $MAKE
           $MAKE check
-
 
 
   ##############################################################################
