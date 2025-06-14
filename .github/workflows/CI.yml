@@ -184,6 +184,11 @@ jobs:
         run: |
           $MAKE check
 
+      - name: "Install"
+        run: |
+          sudo make install
+          sudo ldconfig
+
       - name: "Check msolve"
         run: |
           git clone https://github.com/algebraic-solving/msolve
