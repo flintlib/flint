@@ -34,25 +34,26 @@ gr_mat_lu_classical(slong * res_rank, slong * P, gr_mat_t LU, const gr_mat_t A, 
     int status = GR_SUCCESS;
     int pivot_status;
 
-    if (gr_mat_is_empty(A, ctx) == T_TRUE)
+    m = gr_mat_nrows(A, ctx);
+    n = gr_mat_ncols(A, ctx);
+
+    rank = row = col = 0;
+    for (i = 0; i < m; i++)
+        P[i] = i;
+
+    if (m == 0 || n == 0)
     {
         *res_rank = 0;
         return GR_SUCCESS;
     }
 
-    GR_TMP_INIT2(d, e, ctx);
-
-    m = gr_mat_nrows(A, ctx);
-    n = gr_mat_ncols(A, ctx);
     sz = ctx->sizeof_elem;
 
     status |= gr_mat_set(LU, A, ctx);
 
-#define ENTRY(ii, jj) GR_MAT_ENTRY(LU, ii, jj, sz)
+    GR_TMP_INIT2(d, e, ctx);
 
-    rank = row = col = 0;
-    for (i = 0; i < m; i++)
-        P[i] = i;
+#define ENTRY(ii, jj) GR_MAT_ENTRY(LU, ii, jj, sz)
 
     while (row < m && col < n)
     {
