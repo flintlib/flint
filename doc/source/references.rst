@@ -125,6 +125,8 @@ References
 
 .. [Gas2018] \D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
 
+.. [Gly2010] \D. G. Glynn, "The permanent of a square matrix", European Journal of Combinatorics, Volume 31, Issue 7, October 2010, Pages 1887-1891, https://doi.org/10.1016/j.ejc.2010.01.010
+
 .. [Gos1974] \R. W. Gosper, "Acceleration of series", MIT AI Memo no.304, (March-1974). https://dspace.mit.edu/handle/1721.1/6088
 
 .. [Got1959] \E. Gottschling, "Explizite Bestimmung der Randflächen es Fundamentalbereiches der Modulgruppe zweiten Grades'', Math. Annalen 138 (1959), 103--124. https://doi.org/10.1007/BF01342938
@@ -249,6 +251,8 @@ References
 
 .. [NakTurWil1997] \Nakos, George and Turner, Peter and Williams, Robert : Fraction-free algorithms for linear and polynomial equations, ACM SIGSAM Bull. 31 (1997) 3 11--19
 
+.. [NW1978] \A. Nijenhuis and H. S. Wilf, *Combinatorial Algorithms for Computers and Calculators*. 2nd Edition, Academic Press, 1978.
+
 .. [Olv1997] \F. Olver, *Asymptotics and special functions*, AKP Classics, AK Peters Ltd., Wellesley, MA, 1997. Reprint of the 1974 original.
 
 .. [PP2010] \K. H. Pilehrood and T. H. Pilehrood. "Series acceleration formulas for beta values", Discrete Mathematics and Theoretical Computer Science, DMTCS, 12 (2) (2010), 223-236, https://hal.inria.fr/hal-00990465/
@@ -288,6 +292,8 @@ References
 .. [RosSch1962] \Rosser, J. Barkley; Schoenfeld, Lowell: Approximate formulas for some functions of prime numbers. Illinois J. Math. 6 (1962), no. 1, 64--94.
 
 .. [Rum2010] \S. M. Rump, "Verification methods: Rigorous results using floating-point arithmetic", Acta Numerica 19 (2010), 287-449.
+
+.. [Rys1963] \H. J. Ryser, *Combinatorial Mathematics*, The Carus Mathematical Monographs #14, The Mathematical Association of America (1963).
 
 .. [Smi2001] \D. M. Smith, "Algorithm: Fortran 90 Software for Floating-Point Multiple Precision Arithmetic, Gamma and Related Functions", Transactions on Mathematical Software 27 (2001) 377-387, http://myweb.lmu.edu/dmsmith/toms2001.pdf
 
@@ -345,4 +351,21 @@ References
 
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 
-All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [Arn2012]_, [ArnoldMonagan2011]_, [BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_, [Bin1996]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bol1887]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_, [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_, [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2025]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_, [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_, [HanZim2004]_, [Har2010]_, [HZ2011]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_, [Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_, [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_, [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_, [MN2019]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [Mum1983]_, [Mum1984]_, [NIST2012]_, [NakTurWil1997]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_, [RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [Rosowski2023]_, [RosSch1962]_, [Rum2010]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [Sut2007]_, [StoMul1998]_, [Str2014]_, [Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [Waksman1970]_, [WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [Zun2023]_, [Zun2023b]_, [vHP2012]_, [vdH1995]_, [vdH2006]_
+All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [Arn2012]_, [ArnoldMonagan2011]_,
+[BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_,
+[Bin1996]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bol1887]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_,
+[BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_,
+[Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_,
+[DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2025]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_,
+[GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
+[HanZim2004]_, [Har2010]_, [HZ2011]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_,
+[Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_,
+[Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
+[JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_,
+[MN2019]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [Mum1983]_, [Mum1984]_, [NIST2012]_,
+[NakTurWil1997]_, [NW1978]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_,
+[RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [Rosowski2023]_, [RosSch1962]_,
+[Rum2010]_, [Rys1963]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [Sut2007]_, [StoMul1998]_, [Str2014]_,
+[Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [Waksman1970]_,
+[WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [Zun2023]_, [Zun2023b]_, [vHP2012]_, [vdH1995]_, [vdH2006]_
+
