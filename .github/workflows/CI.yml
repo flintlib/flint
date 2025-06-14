@@ -192,7 +192,10 @@ jobs:
       - name: "Fetch msolve"
         run: |
           git clone --depth=1 https://github.com/algebraic-solving/msolve
-          cd msolve
+
+      - name: "Configure msolve"
+        working-directory: ./msolve
+        run: |
           ./autogen.sh
           ./configure
           make 
