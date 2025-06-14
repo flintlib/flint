@@ -198,7 +198,11 @@ jobs:
         run: |
           ./autogen.sh
           ./configure
-          make 
+
+      - name: "Build msolve"
+        working-directory: ./msolve
+        run: |
+          $MAKE
           make check
 
 
