@@ -16,6 +16,15 @@ Main contributors: Fredrik Johansson (FJ)
   * Matrix permanent (``gr_mat_permanent``) (FJ).
 
 
+2025-06-16 -- FLINT 3.3.1
+-------------------------------------------------------------------------------
+
+* Bug fixes
+
+  * Set permutation vector in ``gr_mat_lu_classical`` even if there are zero
+    columns (Fredrik Johansson).
+
+
 2025-06-11 -- FLINT 3.3.0
 -------------------------------------------------------------------------------
 
