@@ -442,6 +442,15 @@ Determinant
     determinant over the integers. Matrices of size 0, 1 or 2 are handled
     directly.
 
+Permanent
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpq_mat_permanent(fmpq_t res, const fmpq_mat_t A)
+
+    Sets ``res`` to the permanent of the square matrix *A*, returning 1
+    on success. If the matrix is too large, returns 0.
+
 
 Nonsingular solving
 --------------------------------------------------------------------------------

@@ -2994,6 +2994,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MAT_DIAGONALIZATION,     (gr_funcptr) gr_mat_diagonalization_generic},
     {GR_METHOD_MAT_CHARPOLY,            (gr_funcptr) _gr_mat_charpoly_generic},
     {GR_METHOD_MAT_REDUCE_ROW,          (gr_funcptr) gr_mat_reduce_row_generic},
+    {GR_METHOD_MAT_PERMANENT,           (gr_funcptr) gr_mat_permanent_generic},
 
     {0,                                 (gr_funcptr) NULL},
 };
