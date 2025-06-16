@@ -6,6 +6,15 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+2025-06-16 -- FLINT 3.3.1
+-------------------------------------------------------------------------------
+
+* Bug fixes
+
+  * Set permutation vector in ``gr_mat_lu_classical`` even if there are zero
+    columns (Fredrik Johansson).
+
+
 2025-06-11 -- FLINT 3.3.0
 -------------------------------------------------------------------------------
 
