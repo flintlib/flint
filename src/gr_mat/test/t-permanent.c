@@ -26,11 +26,15 @@ TEST_FUNCTION_START(gr_mat_permanent, state)
         gr_ptr a, b;
         int algorithm;
 
-        switch (n_randint(state, 3) % 2)
+        switch (n_randint(state, 3) % 3)
         {
             case 0:
                 gr_ctx_init_fmpz(ctx);
                 n = n_randint(state, 7);
+                break;
+            case 1:
+                gr_ctx_init_fmpq(ctx);
+                n = n_randint(state, 3);
                 break;
             default:
                 m = n_randtest_not_zero(state);

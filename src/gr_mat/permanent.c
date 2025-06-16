@@ -399,7 +399,7 @@ can_maybe_divide_by_two(gr_ptr res, gr_ctx_t ctx)
 }
 
 int
-gr_mat_permanent(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+gr_mat_permanent_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {
     slong n = A->r;
 
@@ -428,5 +428,11 @@ gr_mat_permanent(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 
         return gr_mat_permanent_ryser(res, A, ctx);
     }
+}
+
+int
+gr_mat_permanent(gr_ptr res, const gr_mat_t x, gr_ctx_t ctx)
+{
+    return GR_MAT_UNARY_OP_GET_SCALAR(ctx, MAT_PERMANENT)(res, x, ctx);
 }
 
