@@ -38,32 +38,35 @@ fmpz_mod_mpoly_q_set_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_t x, const fmpz_mod
     fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), ctx);
 }
 
-void
+int
 fmpz_mod_mpoly_q_set_fmpq(fmpz_mod_mpoly_q_t res, const fmpq_t x, const fmpz_mod_mpoly_ctx_t ctx)
-{   
-
-    fmpz_t n, d;
-
-    fmpz_init(n);
-    fmpz_init(d);
-
-    fmpz_mod_set_fmpz(n, fmpq_numref(x), ctx->ffinfo);
-    fmpz_mod_set_fmpz(d, fmpq_denref(x), ctx->ffinfo);
-
-    if (fmpz_is_zero(d))
+{
+    if (fmpz_is_one(fmpq_denref(x)))
     {
-        flint_throw(FLINT_ERROR, "_fmpz_mod_mpoly_q_set: division by zero\n");
+        fmpz_mod_mpoly_q_set_fmpz(res, fmpq_numref(x), ctx);
+        return 1;
     }
     else
     {
-        fmpz_mod_inv(d, d, ctx->ffinfo);
-    }       
+        fmpz_t t;
+        int invertible;
 
-    fmpz_mod_mul_fmpz(n, n, d, ctx->ffinfo);
-    fmpz_mod_mpoly_set_fmpz(fmpz_mod_mpoly_q_numref(res), n, ctx);
-    fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), ctx);
+        fmpz_init(t);
 
-    fmpz_clear(n);
-    fmpz_clear(d);
+        fmpz_mod_set_fmpz(t, fmpq_denref(x), ctx->ffinfo);
+        invertible = !fmpz_is_zero(t);
 
+        if (invertible)
+        {
+            fmpz_mod_inv(t, t, ctx->ffinfo);
+            fmpz_mod_mul_fmpz(t, t, fmpq_numref(x), ctx->ffinfo);
+            fmpz_mod_mpoly_set_fmpz_mod(fmpz_mod_mpoly_q_numref(res), t, ctx);
+            fmpz_mod_mpoly_one(fmpz_mod_mpoly_q_denref(res), ctx);
+        }
+
+        fmpz_clear(t);
+
+        return invertible;
+    }
 }
+

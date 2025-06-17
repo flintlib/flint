@@ -147,6 +147,7 @@ Integers mod n
    fmpz_mod_poly_factor.rst
    fmpz_mod_mpoly.rst
    fmpz_mod_mpoly_factor.rst
+   fmpz_mod_mpoly_q.rst
 
 .. only:: not latex
 

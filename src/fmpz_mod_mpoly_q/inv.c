@@ -21,13 +21,13 @@ fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const f
     fmpz_mod_mpoly_swap(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(res), ctx);
 
     if (!fmpz_is_one(fmpz_mod_mpoly_q_denref(res)->coeffs))
-    {   
+    {
         fmpz_t g;
         fmpz_init(g);
 
         fmpz_mod_inv(g, fmpz_mod_mpoly_q_denref(res)->coeffs, ctx->ffinfo);
         fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(res), g, ctx);
-        fmpz_mod_mpoly_make_monic(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), ctx);
+        fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(fmpz_mod_mpoly_q_denref(res), fmpz_mod_mpoly_q_denref(res), g, ctx);
     
         fmpz_clear(g);
     }
