@@ -378,15 +378,15 @@ Fraction fields
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_q_struct`.
 
-.. function:: void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz *mod)
+.. function:: void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz_t mod)
 
     Initializes *ctx* to a ring of sparsely represented multivariate
     fractions in *nvars* variables over the `\mathbb{F}_mod` field,
-    with monomial ordering *ord*, and *mod* being a prime number. In case *mod* is not
-    a prime undefined behavior might occur.
+    with monomial ordering *ord*, and *mod* being a prime number.
+    The user is responsible
+    for verifying that *mod* is a prime number;
+    if *mod* is composite, undefined behaviour may occur.
     Elements have type :type:`fmpz_mod_mpoly_q_struct`.
-    The user is responsible for avoiding rational numbers with denominator
-    divisible by *mod*. It is recommended to provide big enough integer for *mod*.
 
 Symbolic expressions
 -------------------------------------------------------------------------------

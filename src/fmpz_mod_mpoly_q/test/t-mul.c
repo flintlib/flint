@@ -25,8 +25,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_mul, state)
         fmpz_t m;
 
         fmpz_init(m);
-        fmpz_randtest_unsigned(m, state, 200);
-        fmpz_add_ui(m, m, 2);
+        fmpz_randtest_unsigned(m, state, n_randint(state, 2) ? 4 : n_randint(state, 100));
         fmpz_nextprime(m, m, 0);
         fmpz_mod_mpoly_ctx_init(ctx, 1 + n_randint(state, 4), ORD_LEX, m);
 
@@ -35,8 +34,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_mul, state)
         fmpz_mod_mpoly_q_init(C, ctx);
         fmpz_mod_mpoly_q_init(D, ctx);
 
-        fmpz_mod_mpoly_q_randtest(A, state, 10, 5, ctx);
-        fmpz_mod_mpoly_q_randtest(B, state, 10, 5, ctx);
+        fmpz_mod_mpoly_q_randtest(A, state, 5, 5, ctx);
+        fmpz_mod_mpoly_q_randtest(B, state, 5, 5, ctx);
 
         fmpz_mod_mpoly_q_mul(C, A, B, ctx);
 

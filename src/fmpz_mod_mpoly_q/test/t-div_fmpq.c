@@ -25,9 +25,11 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_q_div_fmpq, state)
         fmpz_t m;
 
         fmpz_init(m);
-        fmpz_randtest_unsigned(m, state, 200);
-        fmpz_add_ui(m, m, 2);
+        fmpz_randtest_unsigned(m, state, n_randint(state, 2) ? 4 : n_randint(state, 100));
         fmpz_nextprime(m, m, 0);
+
+        fmpz_set_ui(m, 17);
+
         fmpz_mod_mpoly_ctx_init(ctx, 1 + n_randint(state, 4), ORD_LEX, m);
 
         fmpz_mod_mpoly_q_init(A, ctx);

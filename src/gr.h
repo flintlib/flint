@@ -1436,7 +1436,7 @@ void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
 
 #ifdef FMPZ_MOD_MPOLY_Q_H
-void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz *mod);
+void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz_t mod);
 #endif
 
 /* Generic fractions */

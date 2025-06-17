@@ -1,6 +1,6 @@
-.. _fmpz-mpoly-q:
+.. _fmpz-mod-mpoly-q:
 
-**fmpz_mod_mpoly_q.h** -- multivariate rational functions over Q
+**fmpz_mod_mpoly_q.h** -- multivariate rational functions over Z/mZ
 ===============================================================================
 
 An :type:`fmpz_mod_mpoly_q_t` represents an element of 
@@ -11,8 +11,9 @@ of numerator and denominator is 1 and then normalizing denominator to a monic po
 
 The user must create a multivariate polynomial context
 (:type:`fmpz_mod_mpoly_ctx_t`) specifying the prime number *m* for the field `\mathbb{F}_m` 
-the number of variables *n* and the monomial ordering. It is important to ensure *m* is a prime number
-otherwise undefined behaviour may occur.
+the number of variables *n* and the monomial ordering. The user is responsible
+for verifying that *m* is a prime number;
+if *m* is composite, undefined behaviour may occur.
 
 
 Types and macros
@@ -56,11 +57,13 @@ Assignment
     Swaps the values of *x* and *y* efficiently.
 
 .. function:: void fmpz_mod_mpoly_q_set(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_set_fmpq(fmpz_mod_mpoly_q_t res, const fmpq_t x, const fmpz_mod_mpoly_ctx_t ctx)
+              int fmpz_mod_mpoly_q_set_fmpq(fmpz_mod_mpoly_q_t res, const fmpq_t x, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_set_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_t x, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_set_si(fmpz_mod_mpoly_q_t res, slong x, const fmpz_mod_mpoly_ctx_t ctx)
 
     Sets *res* to the value *x*.
+    The *fmpq* version returns 1 if the denominator of *x* is invertible,
+    otherwise returns 0.
 
 
 Canonicalisation
@@ -160,51 +163,50 @@ Comparisons
 Arithmetic
 -------------------------------------------------------------------------------
 
+The functions below which coerce from an *fmpq* or divide by an integer type
+perform error handling by returning 1 if the denominator is invertible
+and 0 otherwise.
+
 .. function:: void fmpz_mod_mpoly_q_neg(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx)
 
     Sets *res* to the negation of *x*.
 
 .. function:: void fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              int fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_add_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_q_add_fmpz_mod(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_add_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong y, const fmpz_mod_mpoly_ctx_t ctx)
 
     Sets *res* to the sum of *x* and *y*. 
 
 .. function:: void fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              int fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_sub_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_q_sub_fmpz_mod(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_sub_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong y, const fmpz_mod_mpoly_ctx_t ctx)
 
     Sets *res* to the difference of *x* and *y*.
 
 .. function:: void fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              int fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_mul_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              void fmpz_mod_mpoly_q_mul_fmpz_mod(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
               void fmpz_mod_mpoly_q_mul_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong y, const fmpz_mod_mpoly_ctx_t ctx)
 
     Sets *res* to the product of *x* and *y*.
 
 .. function:: void fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_q_t y, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_div_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong y, const fmpz_mod_mpoly_ctx_t ctx)
+              int fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpq_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              int fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_t y, const fmpz_mod_mpoly_ctx_t ctx)
+              int fmpz_mod_mpoly_q_div_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, slong y, const fmpz_mod_mpoly_ctx_t ctx)
 
     Sets *res* to the quotient of *x* and *y*.
-    Division by zero calls *flint_abort*.
 
 .. function:: void fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx)
 
     Sets *res* to the inverse of *x*. Division by zero
     calls *flint_abort*.
 
-Content
--------------------------------------------------------------------------------
-
-.. function:: void _fmpz_mod_mpoly_q_content(fmpz_t num, fmpz_t den, const fmpz_mod_mpoly_t xnum, const fmpz_mod_mpoly_t xden, const fmpz_mod_mpoly_ctx_t ctx)
-              void fmpz_mod_mpoly_q_content(fmpq_t res, const fmpz_mod_mpoly_q_t x, const fmpz_mod_mpoly_ctx_t ctx)
-
-    Sets *res* to the content of the coefficients of *x*.
 
 
 .. raw:: latex
