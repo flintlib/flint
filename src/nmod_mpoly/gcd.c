@@ -530,6 +530,7 @@ try_again:
         goto cleanup;
     }
 
+    fq_zech_ctx_clear(medctx);
     fq_zech_ctx_init_ui(medctx, smctx->mod.n, d, "#");
 
     for (j = 0; j < nvars; j++)
