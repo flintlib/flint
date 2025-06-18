@@ -1459,23 +1459,15 @@ series_mod_ctx_t;
 
 typedef struct
 {
-    slong prec;     /* default approximate truncation */
-}
-gr_series_ctx_struct;
-
-typedef gr_series_ctx_struct gr_series_ctx_t[1];
-
-typedef struct
-{
     gr_ctx_struct * base_ring;
-    gr_series_ctx_struct sctx;
+    slong prec;     /* default approximate truncation */
     char * var;
 }
 series_ctx_t;
 
-#define SERIES_CTX(ring_ctx) ((series_ctx_t *)((ring_ctx)))
-#define SERIES_ELEM_CTX(ring_ctx) (SERIES_CTX(ring_ctx)->base_ring)
-#define SERIES_SCTX(ring_ctx) (&(((series_ctx_t *)((ring_ctx)))->sctx))
+#define GR_SERIES_CTX(ring_ctx) ((series_ctx_t *)((ring_ctx)))
+#define GR_SERIES_ELEM_CTX(ring_ctx) (GR_SERIES_CTX(ring_ctx)->base_ring)
+#define GR_SERIES_PREC(ring_ctx) (GR_SERIES_CTX(ring_ctx)->prec)
 
 #define SERIES_MOD_CTX(ring_ctx) ((series_mod_ctx_t *)((ring_ctx)))
 #define SERIES_MOD_ELEM_CTX(ring_ctx) (SERIES_MOD_CTX(ring_ctx)->base_ring)

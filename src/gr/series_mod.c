@@ -329,13 +329,13 @@ _gr_gr_series_mod_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t
     {
         return _set_truncate_poly(res, x, POLYNOMIAL_ELEM_CTX(x_ctx), SERIES_MOD_N(ctx), SERIES_MOD_ELEM_CTX(ctx));
     }
-    else if (x_ctx->which_ring == GR_CTX_GR_SERIES && !strcmp(SERIES_CTX(x_ctx)->var, SERIES_MOD_CTX(ctx)->var))
+    else if (x_ctx->which_ring == GR_CTX_GR_SERIES && !strcmp(GR_SERIES_CTX(x_ctx)->var, SERIES_MOD_CTX(ctx)->var))
     {
         /* all coefficients below x^n must be known */
         if (((const gr_series_struct *) x)->error < SERIES_MOD_N(ctx))
             return GR_UNABLE;
         else
-            return _set_truncate_poly(res, &((const gr_series_struct *) x)->poly, SERIES_ELEM_CTX(x_ctx), SERIES_MOD_N(ctx), SERIES_MOD_ELEM_CTX(ctx));
+            return _set_truncate_poly(res, &((const gr_series_struct *) x)->poly, GR_SERIES_ELEM_CTX(x_ctx), SERIES_MOD_N(ctx), SERIES_MOD_ELEM_CTX(ctx));
     }
     else
     {
