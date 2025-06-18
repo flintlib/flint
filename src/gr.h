@@ -1469,9 +1469,9 @@ series_ctx_t;
 #define GR_SERIES_ELEM_CTX(ring_ctx) (GR_SERIES_CTX(ring_ctx)->base_ring)
 #define GR_SERIES_PREC(ring_ctx) (GR_SERIES_CTX(ring_ctx)->prec)
 
-#define SERIES_MOD_CTX(ring_ctx) ((series_mod_ctx_t *)((ring_ctx)))
-#define SERIES_MOD_ELEM_CTX(ring_ctx) (SERIES_MOD_CTX(ring_ctx)->base_ring)
-#define SERIES_MOD_N(ring_ctx) (SERIES_MOD_CTX(ring_ctx)->n)
+#define GR_SERIES_MOD_CTX(ring_ctx) ((series_mod_ctx_t *)((ring_ctx)))
+#define GR_SERIES_MOD_ELEM_CTX(ring_ctx) (GR_SERIES_MOD_CTX(ring_ctx)->base_ring)
+#define GR_SERIES_MOD_N(ring_ctx) (GR_SERIES_MOD_CTX(ring_ctx)->n)
 
 void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec);
 void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
