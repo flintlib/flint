@@ -203,7 +203,7 @@ class fq_nmod_struct(ctypes.Structure):
                 ('nnorm', c_slong)]
 
 class fq_zech_struct(ctypes.Structure):
-    _fields_ = [('n', ctypes.c_ulong)]
+    _fields_ = [('n', c_ulong)]
 
 class gr_vec_struct(ctypes.Structure):
     _fields_ = [('entries', ctypes.c_void_p),
@@ -307,6 +307,8 @@ _div_methods = [libgr.gr_div, libgr.gr_div_si, libgr.gr_div_fmpz, libgr.gr_div_o
 _divexact_methods = [libgr.gr_divexact, libgr.gr_divexact_si, libgr.gr_divexact_fmpz, libgr.gr_divexact_other, libgr.gr_other_divexact]
 _pow_methods = [libgr.gr_pow, libgr.gr_pow_si, libgr.gr_pow_fmpz, libgr.gr_pow_other, libgr.gr_other_pow]
 
+libgr._gr_series_set_error.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr._gr_series_get_error.restype = c_slong
 
 
 
@@ -5352,9 +5354,68 @@ class gr_series(gr_elem):
     _struct_type = gr_series_struct
 
     def __init__(self, val=None, error=None, context=None, random=False):
+        """
+        If error is not None, add O(x^error) to the input val.
+
+            >>> QQser("exp(-x)")
+            1 - x + (1/2)*x^2 + (-1/6)*x^3 + (1/24)*x^4 + (-1/120)*x^5 + O(x^6)
+            >>> QQser("exp(-x)", error=3)
+            1 - x + (1/2)*x^2 + O(x^3)
+            >>> QQser("exp(-x)", error=10)
+            1 - x + (1/2)*x^2 + (-1/6)*x^3 + (1/24)*x^4 + (-1/120)*x^5 + O(x^6)
+        """
         gr_elem.__init__(self, val, context, random)
         if error is not None:
-            raise NotImplementedError
+            cur_err = self._error()
+            if cur_err > error:
+                libgr._gr_series_set_error(self._ref, error, self.parent()._ref)
+
+    def _error(self):
+        """
+        Returns the exponent n in the O(x^n) error term of self.
+        If self is exact, returns None.
+
+            >>> x = ZZser.gen()
+            >>> f = 1+x
+            >>> f._error()
+            >>> g = (1+x)**10
+            >>> g
+            1 + 10*x + 45*x^2 + 120*x^3 + 210*x^4 + 252*x^5 + O(x^6)
+            >>> g._error()
+            6
+        """
+        if libgr._gr_series_is_exact(self._ref, self.parent()._ref) == T_TRUE:
+            return None
+        else:
+            return libgr._gr_series_get_error(self._ref, self.parent()._ref)
+
+    def _set_error(self, n):
+        """
+        Set the error of self to O(x^n) in-place, truncating
+        any higher terms present. If n is None, makes self exact.
+
+            >>> x = ZZser.gen()
+            >>> g = (1+x)**10
+            >>> g
+            1 + 10*x + 45*x^2 + 120*x^3 + 210*x^4 + 252*x^5 + O(x^6)
+            >>> g._set_error(3)
+            >>> g
+            1 + 10*x + 45*x^2 + O(x^3)
+            >>> g._set_error(None)
+            >>> g
+            1 + 10*x + 45*x^2
+            >>> g._set_error(1000)
+            >>> g
+            1 + 10*x + 45*x^2 + O(x^1000)
+            >>> g._set_error(-10)
+            >>> g
+            0 + O(x^0)
+        """
+        if n is None:
+            libgr._gr_series_make_exact(self._ref, self.parent()._ref)
+        else:
+            libgr._gr_series_set_error(self._ref, n, self.parent()._ref)
+
 
 
 class ModularGroup_psl2z(gr_ctx_ca):
@@ -5771,7 +5832,7 @@ class gr_mat(gr_elem):
             NotImplementedError
         """
         element_ring = self.parent()._element_ring
-        r = (ctypes.c_long * 1)()
+        r = (c_slong * 1)()
         status = libgr.gr_mat_rank(r, self._ref, element_ring._ref)
         if status:
             if status & GR_UNABLE: raise NotImplementedError
@@ -7049,7 +7110,7 @@ libflint.fexpr_builtin_name.restype = ctypes.c_char_p
 libflint.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
 libflint.fexpr_get_str.restype = ctypes.c_void_p
 libflint.fexpr_get_str_latex.restype = ctypes.c_void_p
-libflint.fexpr_set_si.argtypes = fexpr, ctypes.c_long
+libflint.fexpr_set_si.argtypes = fexpr, c_slong
 libflint.fexpr_set_d.argtypes = fexpr, ctypes.c_double
 libflint.fexpr_set_re_im_d.argtypes = fexpr, ctypes.c_double, ctypes.c_double
 libflint.fexpr_get_decimal_str.restype = ctypes.c_void_p

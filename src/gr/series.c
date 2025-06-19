@@ -112,7 +112,36 @@ gr_series_set_shallow(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
     *res = *x;
 }
 
-/* todo: create a canonical element? */
+slong
+_gr_series_get_error(const gr_series_t x, gr_ctx_t ctx)
+{
+    return GR_SERIES_ERROR(x);
+}
+
+truth_t
+_gr_series_is_exact(const gr_series_t x, gr_ctx_t ctx)
+{
+    return (GR_SERIES_ERROR(x) == GR_SERIES_ERR_EXACT) ? T_TRUE : T_FALSE;
+}
+
+void
+_gr_series_set_error(gr_series_t x, slong err, gr_ctx_t ctx)
+{
+    err = FLINT_MAX(err, 0);
+    err = FLINT_MIN(err, GR_SERIES_ERR_MAX);
+
+    GR_SERIES_ERROR(x) = err;
+
+    if (GR_SERIES_POLY(x)->length > err)
+        GR_MUST_SUCCEED(gr_poly_truncate(GR_SERIES_POLY(x), GR_SERIES_POLY(x), err, GR_SERIES_ELEM_CTX(ctx)));
+}
+
+void
+_gr_series_make_exact(gr_series_t x, gr_ctx_t ctx)
+{
+    GR_SERIES_ERROR(x) = GR_SERIES_ERR_EXACT;
+}
+
 int
 gr_series_randtest(gr_series_t res, flint_rand_t state, gr_ctx_t ctx)
 {
@@ -125,9 +154,9 @@ gr_series_randtest(gr_series_t res, flint_rand_t state, gr_ctx_t ctx)
     int status = gr_poly_randtest(GR_SERIES_POLY(res), state, len, GR_SERIES_ELEM_CTX(ctx));
 
     if (n_randint(state, 2))
-        GR_SERIES_ERROR(res) = GR_SERIES_ERR_EXACT;
+        _gr_series_make_exact(res, ctx);
     else
-        GR_SERIES_ERROR(res) = n_randint(state, len + 1);
+        _gr_series_set_error(res, n_randint(state, len + 1), ctx);
 
     return status;
 }
@@ -354,15 +383,6 @@ gr_series_is_zero(const gr_series_t x, gr_ctx_t ctx)
 
     return T_UNKNOWN;
 }
-
-int
-gr_series_make_exact(gr_series_t x, gr_ctx_t ctx)
-{
-    GR_SERIES_ERROR(x) = GR_SERIES_ERR_EXACT;
-    return GR_SUCCESS;
-}
-
-
 
 truth_t
 _gr_poly_equal2(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
