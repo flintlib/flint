@@ -304,6 +304,7 @@ _add_methods = [libgr.gr_add, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_o
 _sub_methods = [libgr.gr_sub, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_other, libgr.gr_other_sub]
 _mul_methods = [libgr.gr_mul, libgr.gr_mul_si, libgr.gr_mul_fmpz, libgr.gr_mul_other, libgr.gr_other_mul]
 _div_methods = [libgr.gr_div, libgr.gr_div_si, libgr.gr_div_fmpz, libgr.gr_div_other, libgr.gr_other_div]
+_divexact_methods = [libgr.gr_divexact, libgr.gr_divexact_si, libgr.gr_divexact_fmpz, libgr.gr_divexact_other, libgr.gr_other_divexact]
 _pow_methods = [libgr.gr_pow, libgr.gr_pow_si, libgr.gr_pow_fmpz, libgr.gr_pow_other, libgr.gr_other_pow]
 
 
@@ -3744,6 +3745,32 @@ class gr_elem:
 
     def is_neg_one(self):
         return self._unary_predicate(self, libgr.gr_is_neg_one, "is_neg_one")
+
+    def divexact(self, other):
+        """
+        Assert that other divides self exactly in the ring and compute
+        the quotient, allowing the implementation to skip checks
+        for correctness. This will often be faster than performing a checked
+        division with the / operator.
+
+        Exact division is useful, for example, when manipulating
+        inexact power series over non-fields, where the default checked
+        division cannot tell whether terms beyond the O(x^n) error term
+        would divide if the denominator is not a unit:
+
+            >>> x = ZZser.gen()
+            >>> A = 7 + 3*x + 5*x**2
+            >>> B = 12 + 2*x + 19*x**3 + 3*x**4
+            >>> A * B
+            84 + 50*x + 66*x^2 + 143*x^3 + 78*x^4 + 104*x^5 + O(x^6)
+            >>> (A * B) / B
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute x / y in {Power series over Integer ring (fmpz) with precision O(x^6)} for {x = 84 + 50*x + 66*x^2 + 143*x^3 + 78*x^4 + 104*x^5 + O(x^6)}, {y = 12 + 2*x + 19*x^3 + 3*x^4}
+            >>> (A * B).divexact(B)
+            7 + 3*x + 5*x^2 + O(x^6)
+        """
+        return self._binary_op2(self, other, _divexact_methods, "$x / $y (exact division)")
 
     def is_invertible(self):
         """
@@ -8084,7 +8111,22 @@ def test_all():
     b, t = PolynomialRing(PowerSeriesModRing(ZZ, 6, var="b"), "t").gens(recursive=True)
     assert (5+2*b+3*t)**5 / (5+2*b+3*t)**5 == 1
 
+def test_series():
+
+    x = ZZser.gen()
+    assert (x**2 / x) == x
+    assert ((x**3 - x**4) / x**2) == x - x**2
+    assert (3 * x) / (-3) == -x
+    assert (3 * x**2) / (-3 * x) == -x
+    assert (3 * x**2) / (-3 * x**2) == -1
+    assert raises((lambda: (3 + 3*x**6) / 3), FlintUnableError)
+    assert str((3 + 3*x**6) / (-1)) == "-3 + O(x^6)"
+    x = QQser.gen()
+    assert str((3 + 3*x**6) / 3) == "1 + O(x^6)"
+
     assert CCser(1+ZZser.gen()) == 1 + RRser.gen()
+
+    
 
 def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)

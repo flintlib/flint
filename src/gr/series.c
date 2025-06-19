@@ -583,8 +583,9 @@ gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_ctx_t ctx)
     return gr_is_zero(gr_poly_coeff_srcptr(GR_SERIES_POLY(x), i, GR_SERIES_ELEM_CTX(ctx)), GR_SERIES_ELEM_CTX(ctx));
 }
 
+/* Todo: optimizations for len == 1 denominator */
 int
-gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_t ctx)
+_gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, int divexact, gr_ctx_t ctx)
 {
     slong len, xlen, ylen, xerr, yerr, err;
     int status = GR_SUCCESS;
@@ -597,9 +598,6 @@ gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_
     yerr = GR_SERIES_ERROR(y);
 
     /* Divide out common leading zeros. */
-    /* TODO: for power series mods, this results in non-unique
-             quotients. Should be done when calling gr_div_nonunique
-             but not when calling gr_div. */
     val = 0;
     while (val < FLINT_MAX(xlen, ylen))
     {
@@ -640,6 +638,54 @@ gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_
     /* If y = 0 + O(t^n), we do not know anything. */
     if (ylen <= 0 || yerr == 0)
         return GR_UNABLE;
+
+    /* If not over a field, we must have an invertible denominator to guarantee
+       that the quotient exists, unless this is a polynomial division. */
+    if (!divexact && gr_ctx_is_field(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE)
+    {
+        gr_srcptr y0 = gr_poly_coeff_srcptr(GR_SERIES_POLY(y), val, GR_SERIES_ELEM_CTX(ctx));
+
+        if (gr_is_invertible(y0, GR_SERIES_ELEM_CTX(ctx)) != T_TRUE)
+        {
+            if (xerr == GR_SERIES_ERR_EXACT && yerr == GR_SERIES_ERR_EXACT)
+            {
+                gr_poly_t xb, yb;
+                gr_poly_t q, r;
+                int status;
+
+                xb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(GR_SERIES_POLY(x), val, GR_SERIES_ELEM_CTX(ctx));
+                xb->length = xlen;
+                yb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(GR_SERIES_POLY(y), val, GR_SERIES_ELEM_CTX(ctx));
+                yb->length = ylen;
+
+                gr_poly_init(q, GR_SERIES_ELEM_CTX(ctx));
+                gr_poly_init(r, GR_SERIES_ELEM_CTX(ctx));
+
+                status = gr_poly_divrem(q, r, xb, yb, GR_SERIES_ELEM_CTX(ctx));
+
+                if (status == GR_SUCCESS && gr_poly_is_zero(r, GR_SERIES_ELEM_CTX(ctx)) == T_TRUE)
+                {
+                    gr_poly_swap(GR_SERIES_POLY(res), q, GR_SERIES_ELEM_CTX(ctx));
+                    GR_SERIES_ERROR(res) = GR_SERIES_ERR_EXACT;
+                }
+                else if (xb->length == 1 && yb->length == 1 && gr_poly_is_zero(r, GR_SERIES_ELEM_CTX(ctx)) == T_FALSE)
+                {
+                    status = GR_DOMAIN;
+                }
+                else
+                {
+                    status = GR_UNABLE;
+                }
+
+                gr_poly_clear(q, GR_SERIES_ELEM_CTX(ctx));
+                gr_poly_clear(r, GR_SERIES_ELEM_CTX(ctx));
+
+                return status;
+            }
+
+            return GR_UNABLE;
+        }
+    }
 
     err = FLINT_MIN(xerr, yerr);
     err = FLINT_MIN(err, GR_SERIES_PREC(ctx));
@@ -743,6 +789,18 @@ gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_
             return status;
         }
     }
+}
+
+int
+gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_t ctx)
+{
+    return _gr_series_div(res, x, y, 0, ctx);
+}
+
+int
+gr_series_divexact(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_ctx_t ctx)
+{
+    return _gr_series_div(res, x, y, 1, ctx);
 }
 
 int
@@ -1930,6 +1988,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_MUL,         (gr_funcptr) gr_series_mul},
     {GR_METHOD_INV,         (gr_funcptr) gr_series_inv},
     {GR_METHOD_DIV,         (gr_funcptr) gr_series_div},
+    {GR_METHOD_DIVEXACT,    (gr_funcptr) gr_series_divexact},
     {GR_METHOD_SQRT,        (gr_funcptr) gr_series_sqrt},
     {GR_METHOD_RSQRT,       (gr_funcptr) gr_series_rsqrt},
     {GR_METHOD_EXP,         (gr_funcptr) gr_series_exp},

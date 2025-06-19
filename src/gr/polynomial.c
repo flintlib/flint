@@ -542,6 +542,7 @@ polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
         gr_poly_t r;
         int status;
         gr_poly_init(r, POLYNOMIAL_ELEM_CTX(ctx));
+        /* todo: gr_poly_divides */
         status = gr_poly_divrem(res, r, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 
         if (status == GR_SUCCESS)
