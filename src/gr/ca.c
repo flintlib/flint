@@ -1622,6 +1622,11 @@ _gr_ca_ctx_is_field(gr_ctx_t ctx)
     return (ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA) ? T_FALSE : T_TRUE;
 }
 
+truth_t
+_gr_ca_ctx_is_complex_field(gr_ctx_t ctx)
+{
+    return (ctx->which_ring == GR_CTX_CC_CA) ? T_TRUE : T_FALSE;
+}
 
 truth_t
 _gr_ca_ctx_is_algebraically_closed(gr_ctx_t ctx)
@@ -1668,6 +1673,9 @@ gr_method_tab_input _ca_methods_input[] =
     {GR_METHOD_CTX_IS_FINITE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED, (gr_funcptr) _gr_ca_ctx_is_algebraically_closed},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) _gr_ca_ctx_is_field},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) _gr_ca_ctx_is_field},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) _gr_ca_ctx_is_complex_field},
     {GR_METHOD_CTX_IS_ORDERED_RING, (gr_funcptr) _gr_ca_ctx_is_ordered_ring},
 
     /* important */

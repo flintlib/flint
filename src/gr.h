@@ -112,8 +112,9 @@ typedef enum
     GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
     GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
     GR_METHOD_CTX_IS_ZERO_RING,
-
-    /* ring properties related to orderings and norms */
+    GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,
+    GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,
+    GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,
     GR_METHOD_CTX_IS_ORDERED_RING,
 
     /* group properties */
@@ -945,6 +946,9 @@ GR_INLINE truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx) { return GR_CTX_PREDI
 GR_INLINE truth_t gr_ctx_is_integral_domain(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_INTEGRAL_DOMAIN)(ctx); }
 GR_INLINE truth_t gr_ctx_is_field(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FIELD)(ctx); }
 GR_INLINE truth_t gr_ctx_is_zero_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_ZERO_RING)(ctx); }
+GR_INLINE truth_t gr_ctx_is_rational_vector_space(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_RATIONAL_VECTOR_SPACE)(ctx); }
+GR_INLINE truth_t gr_ctx_is_real_vector_space(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_REAL_VECTOR_SPACE)(ctx); }
+GR_INLINE truth_t gr_ctx_is_complex_vector_space(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_COMPLEX_VECTOR_SPACE)(ctx); }
 
 GR_INLINE truth_t gr_ctx_is_unique_factorization_domain(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_UNIQUE_FACTORIZATION_DOMAIN)(ctx); }
 GR_INLINE truth_t gr_ctx_is_finite(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FINITE)(ctx); }

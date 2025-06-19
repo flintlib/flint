@@ -62,6 +62,33 @@ gr_series_mod_ctx_is_integral_domain(gr_ctx_t ctx)
 }
 
 truth_t
+gr_series_mod_ctx_is_rational_vector_space(gr_ctx_t ctx)
+{
+    if (GR_SERIES_MOD_N(ctx) == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_rational_vector_space(GR_SERIES_MOD_ELEM_CTX(ctx));
+}
+
+truth_t
+gr_series_mod_ctx_is_real_vector_space(gr_ctx_t ctx)
+{
+    if (GR_SERIES_MOD_N(ctx) == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_real_vector_space(GR_SERIES_MOD_ELEM_CTX(ctx));
+}
+
+truth_t
+gr_series_mod_ctx_is_complex_vector_space(gr_ctx_t ctx)
+{
+    if (GR_SERIES_MOD_N(ctx) == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_complex_vector_space(GR_SERIES_MOD_ELEM_CTX(ctx));
+}
+
+truth_t
 gr_series_mod_ctx_is_field(gr_ctx_t ctx)
 {
     if (GR_SERIES_MOD_N(ctx) != 1)
@@ -375,6 +402,9 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_series_mod_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN, (gr_funcptr) gr_series_mod_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD, (gr_funcptr) gr_series_mod_ctx_is_field},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_rational_vector_space},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_real_vector_space},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_complex_vector_space},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_mod_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_mod_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_series_mod_swap},

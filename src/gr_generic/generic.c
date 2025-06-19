@@ -71,6 +71,26 @@ truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
     return res;
 }
 
+truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
+{
+    if (gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
+        return gr_ctx_is_zero_ring(ctx);
+    else
+        return T_UNKNOWN;
+}
+
+truth_t gr_generic_ctx_is_real_vector_space(gr_ctx_t ctx)
+{
+    /* currently this does the same thing */
+    return gr_generic_ctx_is_rational_vector_space(ctx);
+}
+
+truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
+{
+    /* currently this does the same thing */
+    return gr_generic_ctx_is_rational_vector_space(ctx);
+}
+
 void
 gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
 {
@@ -2628,6 +2648,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,        (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,         (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_ZERO_RING,        (gr_funcptr) gr_generic_ctx_is_zero_ring},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_rational_vector_space},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,            (gr_funcptr) gr_generic_ctx_is_real_vector_space},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_complex_vector_space},
 
     {GR_METHOD_CTX_IS_ORDERED_RING,     (gr_funcptr) gr_generic_ctx_predicate},
 

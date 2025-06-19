@@ -533,7 +533,6 @@ class gr_ctx:
         """
         return self._ctx_predicate(libflint.gr_ctx_is_integral_domain, "is_integral_domain")
 
-
     def is_field(self):
         """
         Return whether this structure is a field.
@@ -557,6 +556,47 @@ class gr_ctx:
 
         """
         return self._ctx_predicate(libflint.gr_ctx_is_field, "is_field")
+
+    def is_rational_vector_space(self):
+        """
+        Return whether this structure is a vector space over the rational numbers.
+
+            >>> QQx.is_rational_vector_space()
+            True
+            >>> ZZi.is_rational_vector_space()
+            False
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_rational_vector_space, "is_rational_vector_space")
+
+    def is_real_vector_space(self):
+        """
+        Return whether this structure is a vector space over the real numbers.
+
+            >>> QQx.is_real_vector_space()
+            False
+            >>> RRx.is_real_vector_space()
+            True
+            >>> CC.is_real_vector_space()
+            True
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_real_vector_space, "is_real_vector_space")
+
+    def is_complex_vector_space(self):
+        """
+        Return whether this structure is a vector space over the complex numbers.
+
+            >>> QQx.is_complex_vector_space()
+            False
+            >>> CC.is_complex_vector_space()
+            True
+            >>> CCx.is_complex_vector_space()
+            True
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_complex_vector_space, "is_complex_vector_space")
+
 
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
@@ -8121,8 +8161,24 @@ def test_series():
     assert (3 * x**2) / (-3 * x**2) == -1
     assert raises((lambda: (3 + 3*x**6) / 3), FlintUnableError)
     assert str((3 + 3*x**6) / (-1)) == "-3 + O(x^6)"
+
+    assert (4 * x**0).sqrt() == 2
+    assert raises(lambda: (4 + x**5).sqrt(), FlintUnableError)
+
     x = QQser.gen()
     assert str((3 + 3*x**6) / 3) == "1 + O(x^6)"
+    assert str((4 + x**5).sqrt()) == "2 + (1/4)*x^5 + O(x^6)"
+    assert str((4 + x**6).sqrt()) == "2 + O(x^6)"
+    assert str((4 + 3*x).sqrt() * (4 + 3*x).rsqrt()) == "1 + O(x^6)"
+
+    x = PowerSeriesRing(IntegersMod_nmod(17)).gen()
+    assert raises(lambda: x.sqrt(), FlintUnableError)
+    assert str((2 + x).sqrt()) == "6 + 10*x + 3*x^2 + 12*x^3 + 9*x^4 + 13*x^5 + O(x^6)"
+    assert str((1 + 3*x).sqrt() * (1 + 3*x).rsqrt()) == "1 + O(x^6)"
+
+    x = PowerSeriesRing(IntegersMod_nmod(16)).gen()
+    assert raises(lambda: (1 + x).sqrt(), FlintUnableError)
+    assert raises(lambda: (1 + x).rsqrt(), FlintUnableError)
 
     assert CCser(1+ZZser.gen()) == 1 + RRser.gen()
 
@@ -8618,6 +8674,33 @@ def test_gen_name():
         assert str(R.gen()) in ["c", "c^1", "c (mod c^3)"]
         R._set_gen_names(["d"])
         assert str(R.gen()) in ["d", "d^1", "d (mod d^3)"]
+
+def test_is_vector_space():
+    for R in [ZZ, ZZi, ZZx, PolynomialRing(ZZi), PolynomialRing_gr_mpoly(ZZi, 2), \
+                Mat(ZZ), Mat(QQ), IntegersMod_nmod(5), Mat(IntegersMod_nmod(5), 3, 3), \
+                PowerSeriesRing(ZZ), PowerSeriesModRing(ZZ, 3)]:
+        assert not R.is_rational_vector_space()
+        assert not R.is_real_vector_space()
+        assert not R.is_complex_vector_space()
+    for R in [QQ, QQx, AA, QQbar, Mat(QQ, 2, 3), NumberField(QQx.gen()**2 + 1), FractionField_fmpz_mpoly_q(2), PowerSeriesRing(QQ), PowerSeriesModRing(QQ, 3)]:
+        assert R.is_rational_vector_space()
+        assert not R.is_real_vector_space()
+        assert not R.is_complex_vector_space()
+    for R in [RR, RRx, RR_ca, Mat(RR, 2, 3), Vec(RR, 2)]:
+        assert R.is_rational_vector_space()
+        assert R.is_real_vector_space()
+        assert not R.is_complex_vector_space()
+    for R in [CC, CCx, CC_ca, Mat(CC, 2, 3), Vec(CC, 1)]:
+        assert R.is_rational_vector_space()
+        assert R.is_real_vector_space()
+        assert R.is_complex_vector_space()
+    for R in [PowerSeriesModRing(ZZ, 0), Mat(ZZ, 0, 0), Vec(ZZ, 0),
+                PowerSeriesModRing(IntegersMod_nmod(5), 0), Mat(IntegersMod_nmod(5), 0, 0), Vec(IntegersMod_nmod(5), 0),
+            IntegersMod_nmod(1)]:
+        assert R.is_rational_vector_space()
+        assert R.is_real_vector_space()
+        assert R.is_complex_vector_space()
+
 
 if __name__ == "__main__":
     from time import time

@@ -584,6 +584,7 @@ gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_ctx_t ctx)
 }
 
 /* Todo: optimizations for len == 1 denominator */
+/* Todo: user gr_poly_series_divexact when there is one (currently only basecase) */
 int
 _gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, int divexact, gr_ctx_t ctx)
 {
@@ -819,6 +820,48 @@ gr_series_sqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
     if (xlen == 0 || xerr == 0)
         return GR_UNABLE;
 
+    if (xlen == 1 && xerr == GR_SERIES_ERR_EXACT)
+    {
+        gr_poly_fit_length(GR_SERIES_POLY(res), 1, GR_SERIES_ELEM_CTX(ctx));
+
+        status = gr_sqrt(GR_SERIES_POLY(res)->coeffs, GR_SERIES_POLY(x)->coeffs, GR_SERIES_ELEM_CTX(ctx));
+
+        if (status == GR_SUCCESS && GR_SERIES_PREC(ctx) != 0)
+        {
+            _gr_poly_set_length(GR_SERIES_POLY(res), 1, GR_SERIES_ELEM_CTX(ctx));
+            _gr_poly_normalise(GR_SERIES_POLY(res), GR_SERIES_ELEM_CTX(ctx));
+            GR_SERIES_ERROR(res) = GR_SERIES_ERR_EXACT;
+        }
+        else
+        {
+            _gr_poly_set_length(GR_SERIES_POLY(res), 0, GR_SERIES_ELEM_CTX(ctx));
+            GR_SERIES_ERROR(res) = 0;
+        }
+
+        return status;
+    }
+
+    /* todo: handle even valuations; exact polynomial square roots */
+
+    if (gr_ctx_is_field(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE)
+        return GR_UNABLE;
+
+    /* todo: function to check for odd characteristic */
+    if (gr_ctx_is_finite_characteristic(GR_SERIES_ELEM_CTX(ctx)) != T_FALSE)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, GR_SERIES_ELEM_CTX(ctx));
+
+        status = gr_set_ui(t, 2, GR_SERIES_ELEM_CTX(ctx));
+        if (status == GR_SUCCESS)
+            status = (gr_is_invertible(t, GR_SERIES_ELEM_CTX(ctx)) == T_TRUE) ? GR_SUCCESS : GR_UNABLE;
+
+        GR_TMP_CLEAR(t, GR_SERIES_ELEM_CTX(ctx));
+
+        if (status != GR_SUCCESS)
+            return GR_UNABLE;
+    }
+
     if (xlen > 1 && gr_is_zero(GR_SERIES_POLY(x)->coeffs, GR_SERIES_ELEM_CTX(ctx)) != T_FALSE)
         return GR_UNABLE;
 
@@ -830,6 +873,79 @@ gr_series_sqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
     return status;
 }
 
+int
+gr_series_rsqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
+{
+    slong len, xlen, xerr, err;
+    int status = GR_SUCCESS;
+
+    xlen = GR_SERIES_POLY(x)->length;
+    xerr = GR_SERIES_ERROR(x);
+    err = xerr;
+
+    if (gr_ctx_is_zero_ring(GR_SERIES_ELEM_CTX(ctx)) == T_TRUE)
+        return gr_series_zero(res, ctx);
+
+    if (xerr == 0)
+        return GR_UNABLE;
+
+    if (xlen == 0)
+        return GR_DOMAIN;
+
+    if (xlen == 1 && xerr == GR_SERIES_ERR_EXACT)
+    {
+        gr_poly_fit_length(GR_SERIES_POLY(res), 1, GR_SERIES_ELEM_CTX(ctx));
+
+        status = gr_rsqrt(GR_SERIES_POLY(res)->coeffs, GR_SERIES_POLY(x)->coeffs, GR_SERIES_ELEM_CTX(ctx));
+
+        if (status == GR_SUCCESS && GR_SERIES_PREC(ctx) != 0)
+        {
+            _gr_poly_set_length(GR_SERIES_POLY(res), 1, GR_SERIES_ELEM_CTX(ctx));
+            _gr_poly_normalise(GR_SERIES_POLY(res), GR_SERIES_ELEM_CTX(ctx));
+            GR_SERIES_ERROR(res) = GR_SERIES_ERR_EXACT;
+        }
+        else
+        {
+            _gr_poly_set_length(GR_SERIES_POLY(res), 0, GR_SERIES_ELEM_CTX(ctx));
+            GR_SERIES_ERROR(res) = 0;
+        }
+
+        return status;
+    }
+
+    /* todo: handle even valuations; exact polynomial square roots */
+
+    if (gr_ctx_is_field(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE)
+        return GR_UNABLE;
+
+    /* todo: function to check for odd characteristic */
+    if (gr_ctx_is_finite_characteristic(GR_SERIES_ELEM_CTX(ctx)) != T_FALSE)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, GR_SERIES_ELEM_CTX(ctx));
+
+        status = gr_set_ui(t, 2, GR_SERIES_ELEM_CTX(ctx));
+        if (status == GR_SUCCESS)
+            status = (gr_is_invertible(t, GR_SERIES_ELEM_CTX(ctx)) == T_TRUE) ? GR_SUCCESS : GR_UNABLE;
+
+        GR_TMP_CLEAR(t, GR_SERIES_ELEM_CTX(ctx));
+
+        if (status != GR_SUCCESS)
+            return GR_UNABLE;
+    }
+
+    if (xlen > 1 && gr_is_zero(GR_SERIES_POLY(x)->coeffs, GR_SERIES_ELEM_CTX(ctx)) != T_FALSE)
+        return GR_UNABLE;
+
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
+    err = len;
+
+    GR_SERIES_ERROR(res) = err;
+    status |= gr_poly_rsqrt_series(GR_SERIES_POLY(res), GR_SERIES_POLY(x), len, GR_SERIES_ELEM_CTX(ctx));
+    return status;
+}
+
+
 
 #define UNARY_POLY_WRAPPER(func) \
 int \
@@ -838,6 +954,9 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) \
     slong len, xlen, xerr, err; \
     int status = GR_SUCCESS; \
  \
+    if (gr_ctx_is_rational_vector_space(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE) \
+        return GR_UNABLE; \
+\
     xlen = GR_SERIES_POLY(x)->length; \
     xerr = GR_SERIES_ERROR(x); \
     err = xerr; \
@@ -858,7 +977,6 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) \
 
 UNARY_POLY_WRAPPER(exp)
 UNARY_POLY_WRAPPER(log)
-UNARY_POLY_WRAPPER(rsqrt)
 UNARY_POLY_WRAPPER(tan)
 
 UNARY_POLY_WRAPPER(asin)
@@ -1843,6 +1961,24 @@ gr_series_ctx_is_integral_domain(gr_ctx_t ctx)
     return gr_ctx_is_integral_domain(GR_SERIES_ELEM_CTX(ctx));
 }
 
+truth_t
+gr_series_ctx_is_rational_vector_space(gr_ctx_t ctx)
+{
+    return gr_ctx_is_rational_vector_space(GR_SERIES_ELEM_CTX(ctx));
+}
+
+truth_t
+gr_series_ctx_is_real_vector_space(gr_ctx_t ctx)
+{
+    return gr_ctx_is_real_vector_space(GR_SERIES_ELEM_CTX(ctx));
+}
+
+truth_t
+gr_series_ctx_is_complex_vector_space(gr_ctx_t ctx)
+{
+    return gr_ctx_is_complex_vector_space(GR_SERIES_ELEM_CTX(ctx));
+}
+
 int gr_series_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
@@ -1961,6 +2097,9 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) gr_series_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_series_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN, (gr_funcptr) gr_series_ctx_is_integral_domain},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_rational_vector_space},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_real_vector_space},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_complex_vector_space},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_series_swap},
