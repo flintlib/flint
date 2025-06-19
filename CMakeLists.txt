@@ -261,7 +261,7 @@ set(_BUILD_DIRS
     acb_theta       dirichlet       bernoulli       hypgeom
 
     gr              gr_generic      gr_vec          gr_mat
-    gr_poly         gr_mpoly        gr_special
+    gr_poly         gr_mpoly        gr_series       gr_special
 
     calcium
     fmpz_mpoly_q

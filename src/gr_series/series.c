@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2023, 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -14,21 +14,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
-
-#define GR_SERIES_ERR_EXACT WORD_MAX
-#define GR_SERIES_ERR_MAX WORD_MAX / 4
-
-typedef struct
-{
-    gr_poly_struct poly;
-    slong error;
-}
-gr_series_struct;
-
-typedef gr_series_struct gr_series_t[1];
-
-#define GR_SERIES_POLY(x) (&((x)->poly))
-#define GR_SERIES_ERROR(x) ((x)->error)
+#include "gr_series.h"
 
 
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */

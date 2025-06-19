@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "gr.h"
+#include "gr_series.h"
 
 TEST_FUNCTION_START(gr_series_mod_gr_poly, state)
 {

@@ -11,30 +11,31 @@
 
 #include "test_helpers.h"
 #include "gr.h"
+#include "gr_series.h"
 
-TEST_FUNCTION_START(gr_series_fmpq, state)
+TEST_FUNCTION_START(gr_series_fmpz, state)
 {
-    gr_ctx_t QQ, QQx;
+    gr_ctx_t ZZ, ZZx;
     int flags = 0;
     slong i;
 
-    gr_ctx_init_fmpq(QQ);
+    gr_ctx_init_fmpz(ZZ);
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_gr_series(QQx, QQ, i);
-        gr_test_ring(QQx, 100, flags);
-        gr_ctx_clear(QQx);
+        gr_ctx_init_gr_series(ZZx, ZZ, i);
+        gr_test_ring(ZZx, 100, flags);
+        gr_ctx_clear(ZZx);
     }
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_series_mod_gr_poly(QQx, QQ, i);
-        gr_test_ring(QQx, 100, flags);
-        gr_ctx_clear(QQx);
+        gr_ctx_init_series_mod_gr_poly(ZZx, ZZ, i);
+        gr_test_ring(ZZx, 100, flags);
+        gr_ctx_clear(ZZx);
     }
 
-    gr_ctx_clear(QQ);
+    gr_ctx_clear(ZZ);
 
     TEST_FUNCTION_END(state);
 }

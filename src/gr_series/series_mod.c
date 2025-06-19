@@ -14,6 +14,8 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
+#include "gr_series.h"
+
 
 static const char * default_var = "x";
 
@@ -300,13 +302,6 @@ static int gr_series_mod_sqrt(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
     return gr_poly_sqrt_series(res, x, n, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-
-typedef struct
-{
-    gr_poly_struct poly;
-    slong error;
-}
-gr_series_struct;
 
 static int
 _set_truncate_poly(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_elem_ctx, slong n, gr_ctx_t elem_ctx)

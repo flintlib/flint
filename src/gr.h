@@ -1450,32 +1450,7 @@ void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t or
 
 void gr_ctx_init_gr_fraction(gr_ctx_t ctx, gr_ctx_t domain, int flags);
 
-/* Generic series */
-/* TODO: move parts of this to its own module */
-
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    slong n;
-    char * var;
-}
-series_mod_ctx_t;
-
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    slong prec;     /* default approximate truncation */
-    char * var;
-}
-series_ctx_t;
-
-#define GR_SERIES_CTX(ring_ctx) ((series_ctx_t *)((ring_ctx)))
-#define GR_SERIES_ELEM_CTX(ring_ctx) (GR_SERIES_CTX(ring_ctx)->base_ring)
-#define GR_SERIES_PREC(ring_ctx) (GR_SERIES_CTX(ring_ctx)->prec)
-
-#define GR_SERIES_MOD_CTX(ring_ctx) ((series_mod_ctx_t *)((ring_ctx)))
-#define GR_SERIES_MOD_ELEM_CTX(ring_ctx) (GR_SERIES_MOD_CTX(ring_ctx)->base_ring)
-#define GR_SERIES_MOD_N(ring_ctx) (GR_SERIES_MOD_CTX(ring_ctx)->n)
+/* Generic series - moved to gr_series.h */
 
 void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec);
 void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
