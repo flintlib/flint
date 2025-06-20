@@ -15,7 +15,7 @@
 
 TEST_FUNCTION_START(gr_poly_shift_equivalent, state)
 {
-    for (slong i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (slong i = 0; i < 20000 * flint_test_multiplier(); i++)
     {
         gr_ctx_t ctx;
         gr_poly_t f, g;
