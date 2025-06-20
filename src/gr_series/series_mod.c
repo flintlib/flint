@@ -19,13 +19,13 @@
 
 static const char * default_var = "x";
 
-static void gr_series_mod_ctx_clear(gr_ctx_t ctx)
+void gr_series_mod_ctx_clear(gr_ctx_t ctx)
 {
     if (GR_SERIES_MOD_CTX(ctx)->var != default_var)
         flint_free(GR_SERIES_MOD_CTX(ctx)->var);
 }
 
-static int gr_series_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+int gr_series_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Power series over ");
     gr_ctx_write(out, GR_SERIES_MOD_ELEM_CTX(ctx));
@@ -117,7 +117,7 @@ int gr_series_mod_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return gr_series_mod_ctx_set_gen_name(ctx, s[0]);
 }
 
-static int
+int
 gr_series_mod_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
 {
     int status;
@@ -144,27 +144,27 @@ gr_series_mod_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
-static void gr_series_mod_init(gr_poly_t res, gr_ctx_t ctx)
+void gr_series_mod_init(gr_poly_t res, gr_ctx_t ctx)
 {
     gr_poly_init(res, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static void gr_series_mod_clear(gr_poly_t res, gr_ctx_t ctx)
+void gr_series_mod_clear(gr_poly_t res, gr_ctx_t ctx)
 {
     gr_poly_clear(res, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static void gr_series_mod_swap(gr_poly_t x, gr_poly_t y, gr_ctx_t ctx)
+void gr_series_mod_swap(gr_poly_t x, gr_poly_t y, gr_ctx_t ctx)
 {
     gr_poly_swap(x, y, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_randtest(gr_poly_t res, flint_rand_t state, gr_ctx_t ctx)
+int gr_series_mod_randtest(gr_poly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     return gr_poly_randtest(res, state, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_write(gr_stream_t out, const gr_poly_t x, gr_ctx_t ctx)
+int gr_series_mod_write(gr_stream_t out, const gr_poly_t x, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     status |= gr_poly_write(out, x, GR_SERIES_MOD_CTX(ctx)->var, GR_SERIES_MOD_ELEM_CTX(ctx));
@@ -176,92 +176,92 @@ static int gr_series_mod_write(gr_stream_t out, const gr_poly_t x, gr_ctx_t ctx)
     return status;
 }
 
-static int gr_series_mod_zero(gr_poly_t res, gr_ctx_t ctx)
+int gr_series_mod_zero(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_zero(res, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_one(gr_poly_t res, gr_ctx_t ctx)
+int gr_series_mod_one(gr_poly_t res, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) == 0) ? GR_SUCCESS : gr_poly_one(res, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_gen(gr_poly_t res, gr_ctx_t ctx)
+int gr_series_mod_gen(gr_poly_t res, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) <= 1) ? gr_poly_zero(res, GR_SERIES_MOD_ELEM_CTX(ctx)) : gr_poly_gen(res, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_set(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
+int gr_series_mod_set(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 {
     return gr_poly_set(res, x, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static void gr_series_mod_set_shallow(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
+void gr_series_mod_set_shallow(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 {
     *res = *x;
 }
 
-static int gr_series_mod_set_si(gr_poly_t res, slong c, gr_ctx_t ctx)
+int gr_series_mod_set_si(gr_poly_t res, slong c, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) == 0) ? GR_SUCCESS : gr_poly_set_si(res, c, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_set_ui(gr_poly_t res, ulong c, gr_ctx_t ctx)
+int gr_series_mod_set_ui(gr_poly_t res, ulong c, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) == 0) ? GR_SUCCESS : gr_poly_set_ui(res, c, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_set_fmpz(gr_poly_t res, const fmpz_t c, gr_ctx_t ctx)
+int gr_series_mod_set_fmpz(gr_poly_t res, const fmpz_t c, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) == 0) ? GR_SUCCESS : gr_poly_set_fmpz(res, c, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_set_fmpq(gr_poly_t res, const fmpq_t c, gr_ctx_t ctx)
+int gr_series_mod_set_fmpq(gr_poly_t res, const fmpq_t c, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) == 0) ? GR_SUCCESS : gr_poly_set_fmpq(res, c, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static truth_t gr_series_mod_is_zero(const gr_poly_t x, gr_ctx_t ctx)
+truth_t gr_series_mod_is_zero(const gr_poly_t x, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) == 0) ? T_TRUE : gr_poly_is_zero(x, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static truth_t gr_series_mod_is_one(const gr_poly_t x, gr_ctx_t ctx)
+truth_t gr_series_mod_is_one(const gr_poly_t x, gr_ctx_t ctx)
 {
     return (GR_SERIES_MOD_N(ctx) == 0) ? T_TRUE : gr_poly_is_one(x, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static truth_t gr_series_mod_equal(const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
+truth_t gr_series_mod_equal(const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
     return gr_poly_equal(x, y, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_neg(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
+int gr_series_mod_neg(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 {
     return gr_poly_neg(res, x, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_add(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
+int gr_series_mod_add(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
     return gr_poly_add(res, x, y, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_sub(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
+int gr_series_mod_sub(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
     return gr_poly_sub(res, x, y, GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_mul(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
+int gr_series_mod_mul(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
     return gr_poly_mullow(res, x, y, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_inv(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
+int gr_series_mod_inv(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 {
     return gr_poly_inv_series(res, x, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static int gr_series_mod_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
+int gr_series_mod_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
     return gr_poly_div_series(res, x, y, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
@@ -286,7 +286,7 @@ UNARY_POLY_WRAPPER(atanh)
 
 
 /* fixme: gr_poly_sqrt_series does not deal with leading zeros */
-static int gr_series_mod_sqrt(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
+int gr_series_mod_sqrt(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 {
     slong n = GR_SERIES_MOD_N(ctx);
 
@@ -303,7 +303,7 @@ static int gr_series_mod_sqrt(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 }
 
 
-static int
+int
 _set_truncate_poly(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_elem_ctx, slong n, gr_ctx_t elem_ctx)
 {
     if (x_elem_ctx == elem_ctx)
@@ -329,7 +329,7 @@ _set_truncate_poly(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_elem_ctx, slong 
     }
 }
 
-static int
+int
 gr_series_mod_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx == ctx)
@@ -482,7 +482,7 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
 };
 
 void
-gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+gr_series_mod_ctx_init(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
     ctx->which_ring = GR_CTX_SERIES_MOD_GR_POLY;
     ctx->sizeof_elem = sizeof(gr_poly_struct);
@@ -500,3 +500,11 @@ gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
         _gr_series_mod_methods_initialized = 1;
     }
 }
+
+/* compatibility */
+void
+gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+{
+    gr_series_mod_ctx_init(ctx, base_ring, n);
+}
+

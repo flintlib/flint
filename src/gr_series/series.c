@@ -1835,16 +1835,6 @@ gr_series_weierstrass_p(gr_series_t res, const gr_series_t x, const gr_series_t 
     return status;
 }
 
-typedef struct
-{
-    gr_series_struct * entries;
-    slong alloc;
-    slong length;
-}
-gr_series_vec_struct;
-
-typedef gr_series_vec_struct gr_series_vec_t[1];
-
 int
 gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, const gr_series_vec_t b, const gr_series_t x, int regularized, gr_ctx_t ctx)
 {
@@ -1927,7 +1917,7 @@ gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, const gr_series_
     return status;
 }
 
-static void gr_series_ctx_clear(gr_ctx_t ctx)
+void gr_series_ctx_clear(gr_ctx_t ctx)
 {
     if (GR_SERIES_CTX(ctx)->var != default_var)
     {
@@ -1936,7 +1926,7 @@ static void gr_series_ctx_clear(gr_ctx_t ctx)
 
 }
 
-static int gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+int gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Power series over ");
     gr_ctx_write(out, GR_SERIES_ELEM_CTX(ctx));
@@ -2188,7 +2178,7 @@ gr_method_tab_input _gr_series_methods_input[] =
 };
 
 void
-gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
+gr_series_ctx_init(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
 {
     ctx->which_ring = GR_CTX_GR_SERIES;
     ctx->sizeof_elem = sizeof(gr_series_struct);
@@ -2208,5 +2198,12 @@ gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
         gr_method_tab_init(_gr_series_methods, _gr_series_methods_input);
         _gr_series_methods_initialized = 1;
     }
+}
+
+/* compatibility */
+void
+gr_ctx_init_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+{
+    gr_series_ctx_init(ctx, base_ring, n);
 }
 

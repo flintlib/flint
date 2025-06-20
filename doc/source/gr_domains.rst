@@ -321,21 +321,8 @@ Polynomial rings
 Power series
 -------------------------------------------------------------------------------
 
-.. function:: void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
-
-    Initializes *ctx* to a ring of truncated power series `R[[x]] / \langle x^n \rangle`
-    over the given *base_ring*.
-    Elements have type :type:`gr_poly_struct`.
-    It is assumed that all inputs are already truncated to length *n*,
-    and this invariant is enforced for all outputs.
-
-.. function:: void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
-
-    Initializes *ctx* to a ring of power series `R[[x]]` over the given *base_ring*.
-    Elements are generally inexact, having an error term `O(x^n)`.
-    The parameter *prec* defines the default precision.
-    Elements have type ``gr_series_struct`` (this type is currently internal).
-
+See :func:`gr_series_ctx_init` and :func:`gr_series_mod_ctx_init`
+in :ref:`gr-series`.
 
 Fraction fields
 -------------------------------------------------------------------------------
