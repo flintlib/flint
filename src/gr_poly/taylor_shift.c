@@ -30,5 +30,12 @@ gr_poly_taylor_shift(gr_poly_t res, const gr_poly_t f, gr_srcptr c, gr_ctx_t ctx
         status |= gr_poly_set(res, f, ctx);
 
     status |= _gr_poly_taylor_shift(res->coeffs, res->coeffs, res->length, c, ctx);
+
+    /* Normally the leading coefficient does not change, but it may have
+       exactified from maybe-zero to definitely-zero when working with
+       inexact represenations of the zero ring; it may also have been
+       mutated to a temporary value by an algorithm which fails with GR_UNABLE. */
+    _gr_poly_normalise(res, ctx);
+
     return status;
 }
