@@ -11,32 +11,33 @@
 
 #include "test_helpers.h"
 #include "gr.h"
+#include "gr_series.h"
 
-TEST_FUNCTION_START(gr_series_acb, state)
+TEST_FUNCTION_START(gr_series_arb, state)
 {
-    gr_ctx_t CCn, CCnx;
+    gr_ctx_t RRn, RRnx;
     int flags = 0;
     slong i;
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_complex_acb(CCn, 2 + n_randint(state, 200));
-        gr_ctx_init_gr_series(CCnx, CCn, i);
-        gr_test_ring(CCnx, 100, flags);
-        gr_ctx_clear(CCnx);
-        gr_ctx_clear(CCn);
+        gr_ctx_init_real_arb(RRn, 2 + n_randint(state, 200));
+        gr_series_ctx_init(RRnx, RRn, i);
+        gr_test_ring(RRnx, 100, flags);
+        gr_ctx_clear(RRnx);
+        gr_ctx_clear(RRn);
     }
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_complex_acb(CCn, 2 + n_randint(state, 200));
-        gr_ctx_init_series_mod_gr_poly(CCnx, CCn, i);
-        gr_test_ring(CCnx, 100, flags);
-        gr_ctx_clear(CCnx);
-        gr_ctx_clear(CCn);
+        gr_ctx_init_real_arb(RRn, 2 + n_randint(state, 200));
+        gr_series_mod_ctx_init(RRnx, RRn, i);
+        gr_test_ring(RRnx, 100, flags);
+        gr_ctx_clear(RRnx);
+        gr_ctx_clear(RRn);
     }
 
-    gr_ctx_clear(CCn);
+    gr_ctx_clear(RRn);
 
     TEST_FUNCTION_END(state);
 }

@@ -166,20 +166,15 @@ _gr_poly_div_series_basecase_generic(gr_ptr Q,
     if (len == 2)
     {
         /* todo: in appropriate cases, don't do a division */
+        status |= gr_div(Q, A, B, ctx);
+        status |= gr_mul(GR_ENTRY(Q, 1, sz), Q, GR_ENTRY(B, 1, sz), ctx);
+
         if (Alen == 1)
-        {
-            status |= gr_div(Q, A, B, ctx);
-            status |= gr_div(GR_ENTRY(Q, 1, sz), Q, B, ctx);
-            status |= gr_mul(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), GR_ENTRY(B, 1, sz), ctx);
             status |= gr_neg(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
-        }
         else
-        {
-            status |= gr_div(Q, A, B, ctx);
-            status |= gr_mul(GR_ENTRY(Q, 1, sz), Q, GR_ENTRY(B, 1, sz), ctx);
             status |= gr_sub(GR_ENTRY(Q, 1, sz), GR_ENTRY(A, 1, sz), GR_ENTRY(Q, 1, sz), ctx);
-            status |= gr_div(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), B, ctx);
-        }
+
+        status |= gr_div(GR_ENTRY(Q, 1, sz), GR_ENTRY(Q, 1, sz), B, ctx);
 
         return status;
     }

@@ -109,6 +109,33 @@ static truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
     return gr_ctx_is_zero_ring(MATRIX_CTX(ctx)->base_ring);
 }
 
+static truth_t matrix_ctx_is_rational_vector_space(gr_ctx_t ctx)
+{
+    if (MATRIX_CTX(ctx)->all_sizes)
+        return T_FALSE;
+    if (MATRIX_CTX(ctx)->nrows == 0 || MATRIX_CTX(ctx)->ncols == 0)
+        return T_TRUE;
+    return gr_ctx_is_rational_vector_space(MATRIX_CTX(ctx)->base_ring);
+}
+
+static truth_t matrix_ctx_is_real_vector_space(gr_ctx_t ctx)
+{
+    if (MATRIX_CTX(ctx)->all_sizes)
+        return T_FALSE;
+    if (MATRIX_CTX(ctx)->nrows == 0 || MATRIX_CTX(ctx)->ncols == 0)
+        return T_TRUE;
+    return gr_ctx_is_real_vector_space(MATRIX_CTX(ctx)->base_ring);
+}
+
+static truth_t matrix_ctx_is_complex_vector_space(gr_ctx_t ctx)
+{
+    if (MATRIX_CTX(ctx)->all_sizes)
+        return T_FALSE;
+    if (MATRIX_CTX(ctx)->nrows == 0 || MATRIX_CTX(ctx)->ncols == 0)
+        return T_TRUE;
+    return gr_ctx_is_complex_vector_space(MATRIX_CTX(ctx)->base_ring);
+}
+
 /* todo: public */
 truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
 {
@@ -550,6 +577,9 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) matrix_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) matrix_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) matrix_ctx_is_threadsafe},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_rational_vector_space},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_real_vector_space},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_complex_vector_space},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},

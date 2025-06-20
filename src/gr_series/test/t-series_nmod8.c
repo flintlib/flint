@@ -10,33 +10,33 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "gr.h"
+#include "gr_series.h"
 
-TEST_FUNCTION_START(gr_series_arb, state)
+TEST_FUNCTION_START(gr_series_nmod8, state)
 {
-    gr_ctx_t RRn, RRnx;
+    gr_ctx_t ZZn, ZZnx;
     int flags = 0;
     slong i;
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_real_arb(RRn, 2 + n_randint(state, 200));
-        gr_ctx_init_gr_series(RRnx, RRn, i);
-        gr_test_ring(RRnx, 100, flags);
-        gr_ctx_clear(RRnx);
-        gr_ctx_clear(RRn);
+        gr_ctx_init_nmod8(ZZn, 1 + n_randtest(state) % 255);
+        gr_series_ctx_init(ZZnx, ZZn, i);
+        gr_test_ring(ZZnx, 100, flags);
+        gr_ctx_clear(ZZnx);
+        gr_ctx_clear(ZZn);
     }
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_real_arb(RRn, 2 + n_randint(state, 200));
-        gr_ctx_init_series_mod_gr_poly(RRnx, RRn, i);
-        gr_test_ring(RRnx, 100, flags);
-        gr_ctx_clear(RRnx);
-        gr_ctx_clear(RRn);
+        gr_ctx_init_nmod8(ZZn, 1 + n_randtest(state) % 255);
+        gr_series_mod_ctx_init(ZZnx, ZZn, i);
+        gr_test_ring(ZZnx, 100, flags);
+        gr_ctx_clear(ZZnx);
+        gr_ctx_clear(ZZn);
     }
-
-    gr_ctx_clear(RRn);
 
     TEST_FUNCTION_END(state);
 }

@@ -203,7 +203,7 @@ class fq_nmod_struct(ctypes.Structure):
                 ('nnorm', c_slong)]
 
 class fq_zech_struct(ctypes.Structure):
-    _fields_ = [('n', ctypes.c_ulong)]
+    _fields_ = [('n', c_ulong)]
 
 class gr_vec_struct(ctypes.Structure):
     _fields_ = [('entries', ctypes.c_void_p),
@@ -304,8 +304,11 @@ _add_methods = [libgr.gr_add, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_o
 _sub_methods = [libgr.gr_sub, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_other, libgr.gr_other_sub]
 _mul_methods = [libgr.gr_mul, libgr.gr_mul_si, libgr.gr_mul_fmpz, libgr.gr_mul_other, libgr.gr_other_mul]
 _div_methods = [libgr.gr_div, libgr.gr_div_si, libgr.gr_div_fmpz, libgr.gr_div_other, libgr.gr_other_div]
+_divexact_methods = [libgr.gr_divexact, libgr.gr_divexact_si, libgr.gr_divexact_fmpz, libgr.gr_divexact_other, libgr.gr_other_divexact]
 _pow_methods = [libgr.gr_pow, libgr.gr_pow_si, libgr.gr_pow_fmpz, libgr.gr_pow_other, libgr.gr_other_pow]
 
+libgr._gr_series_set_error.argtypes = (ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr._gr_series_get_error.restype = c_slong
 
 
 
@@ -532,7 +535,6 @@ class gr_ctx:
         """
         return self._ctx_predicate(libflint.gr_ctx_is_integral_domain, "is_integral_domain")
 
-
     def is_field(self):
         """
         Return whether this structure is a field.
@@ -556,6 +558,47 @@ class gr_ctx:
 
         """
         return self._ctx_predicate(libflint.gr_ctx_is_field, "is_field")
+
+    def is_rational_vector_space(self):
+        """
+        Return whether this structure is a vector space over the rational numbers.
+
+            >>> QQx.is_rational_vector_space()
+            True
+            >>> ZZi.is_rational_vector_space()
+            False
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_rational_vector_space, "is_rational_vector_space")
+
+    def is_real_vector_space(self):
+        """
+        Return whether this structure is a vector space over the real numbers.
+
+            >>> QQx.is_real_vector_space()
+            False
+            >>> RRx.is_real_vector_space()
+            True
+            >>> CC.is_real_vector_space()
+            True
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_real_vector_space, "is_real_vector_space")
+
+    def is_complex_vector_space(self):
+        """
+        Return whether this structure is a vector space over the complex numbers.
+
+            >>> QQx.is_complex_vector_space()
+            False
+            >>> CC.is_complex_vector_space()
+            True
+            >>> CCx.is_complex_vector_space()
+            True
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_complex_vector_space, "is_complex_vector_space")
+
 
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
@@ -3745,6 +3788,32 @@ class gr_elem:
     def is_neg_one(self):
         return self._unary_predicate(self, libgr.gr_is_neg_one, "is_neg_one")
 
+    def divexact(self, other):
+        """
+        Assert that other divides self exactly in the ring and compute
+        the quotient, allowing the implementation to skip checks
+        for correctness. This will often be faster than performing a checked
+        division with the / operator.
+
+        Exact division is useful, for example, when manipulating
+        inexact power series over non-fields, where the default checked
+        division cannot tell whether terms beyond the O(x^n) error term
+        would divide if the denominator is not a unit:
+
+            >>> x = ZZser.gen()
+            >>> A = 7 + 3*x + 5*x**2
+            >>> B = 12 + 2*x + 19*x**3 + 3*x**4
+            >>> A * B
+            84 + 50*x + 66*x^2 + 143*x^3 + 78*x^4 + 104*x^5 + O(x^6)
+            >>> (A * B) / B
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute x / y in {Power series over Integer ring (fmpz) with precision O(x^6)} for {x = 84 + 50*x + 66*x^2 + 143*x^3 + 78*x^4 + 104*x^5 + O(x^6)}, {y = 12 + 2*x + 19*x^3 + 3*x^4}
+            >>> (A * B).divexact(B)
+            7 + 3*x + 5*x^2 + O(x^6)
+        """
+        return self._binary_op2(self, other, _divexact_methods, "$x / $y (exact division)")
+
     def is_invertible(self):
         """
         Return whether self has a multiplicative inverse in its domain.
@@ -5285,9 +5354,68 @@ class gr_series(gr_elem):
     _struct_type = gr_series_struct
 
     def __init__(self, val=None, error=None, context=None, random=False):
+        """
+        If error is not None, add O(x^error) to the input val.
+
+            >>> QQser("exp(-x)")
+            1 - x + (1/2)*x^2 + (-1/6)*x^3 + (1/24)*x^4 + (-1/120)*x^5 + O(x^6)
+            >>> QQser("exp(-x)", error=3)
+            1 - x + (1/2)*x^2 + O(x^3)
+            >>> QQser("exp(-x)", error=10)
+            1 - x + (1/2)*x^2 + (-1/6)*x^3 + (1/24)*x^4 + (-1/120)*x^5 + O(x^6)
+        """
         gr_elem.__init__(self, val, context, random)
         if error is not None:
-            raise NotImplementedError
+            cur_err = self._error()
+            if cur_err > error:
+                libgr._gr_series_set_error(self._ref, error, self.parent()._ref)
+
+    def _error(self):
+        """
+        Returns the exponent n in the O(x^n) error term of self.
+        If self is exact, returns None.
+
+            >>> x = ZZser.gen()
+            >>> f = 1+x
+            >>> f._error()
+            >>> g = (1+x)**10
+            >>> g
+            1 + 10*x + 45*x^2 + 120*x^3 + 210*x^4 + 252*x^5 + O(x^6)
+            >>> g._error()
+            6
+        """
+        if libgr._gr_series_is_exact(self._ref, self.parent()._ref) == T_TRUE:
+            return None
+        else:
+            return libgr._gr_series_get_error(self._ref, self.parent()._ref)
+
+    def _set_error(self, n):
+        """
+        Set the error of self to O(x^n) in-place, truncating
+        any higher terms present. If n is None, makes self exact.
+
+            >>> x = ZZser.gen()
+            >>> g = (1+x)**10
+            >>> g
+            1 + 10*x + 45*x^2 + 120*x^3 + 210*x^4 + 252*x^5 + O(x^6)
+            >>> g._set_error(3)
+            >>> g
+            1 + 10*x + 45*x^2 + O(x^3)
+            >>> g._set_error(None)
+            >>> g
+            1 + 10*x + 45*x^2
+            >>> g._set_error(1000)
+            >>> g
+            1 + 10*x + 45*x^2 + O(x^1000)
+            >>> g._set_error(-10)
+            >>> g
+            0 + O(x^0)
+        """
+        if n is None:
+            libgr._gr_series_make_exact(self._ref, self.parent()._ref)
+        else:
+            libgr._gr_series_set_error(self._ref, n, self.parent()._ref)
+
 
 
 class ModularGroup_psl2z(gr_ctx_ca):
@@ -5704,7 +5832,7 @@ class gr_mat(gr_elem):
             NotImplementedError
         """
         element_ring = self.parent()._element_ring
-        r = (ctypes.c_long * 1)()
+        r = (c_slong * 1)()
         status = libgr.gr_mat_rank(r, self._ref, element_ring._ref)
         if status:
             if status & GR_UNABLE: raise NotImplementedError
@@ -6982,7 +7110,7 @@ libflint.fexpr_builtin_name.restype = ctypes.c_char_p
 libflint.fexpr_set_symbol_str.argtypes = ctypes.c_void_p, ctypes.c_char_p
 libflint.fexpr_get_str.restype = ctypes.c_void_p
 libflint.fexpr_get_str_latex.restype = ctypes.c_void_p
-libflint.fexpr_set_si.argtypes = fexpr, ctypes.c_long
+libflint.fexpr_set_si.argtypes = fexpr, c_slong
 libflint.fexpr_set_d.argtypes = fexpr, ctypes.c_double
 libflint.fexpr_set_re_im_d.argtypes = fexpr, ctypes.c_double, ctypes.c_double
 libflint.fexpr_get_decimal_str.restype = ctypes.c_void_p
@@ -8084,7 +8212,38 @@ def test_all():
     b, t = PolynomialRing(PowerSeriesModRing(ZZ, 6, var="b"), "t").gens(recursive=True)
     assert (5+2*b+3*t)**5 / (5+2*b+3*t)**5 == 1
 
+def test_series():
+
+    x = ZZser.gen()
+    assert (x**2 / x) == x
+    assert ((x**3 - x**4) / x**2) == x - x**2
+    assert (3 * x) / (-3) == -x
+    assert (3 * x**2) / (-3 * x) == -x
+    assert (3 * x**2) / (-3 * x**2) == -1
+    assert raises((lambda: (3 + 3*x**6) / 3), FlintUnableError)
+    assert str((3 + 3*x**6) / (-1)) == "-3 + O(x^6)"
+
+    assert (4 * x**0).sqrt() == 2
+    assert raises(lambda: (4 + x**5).sqrt(), FlintUnableError)
+
+    x = QQser.gen()
+    assert str((3 + 3*x**6) / 3) == "1 + O(x^6)"
+    assert str((4 + x**5).sqrt()) == "2 + (1/4)*x^5 + O(x^6)"
+    assert str((4 + x**6).sqrt()) == "2 + O(x^6)"
+    assert str((4 + 3*x).sqrt() * (4 + 3*x).rsqrt()) == "1 + O(x^6)"
+
+    x = PowerSeriesRing(IntegersMod_nmod(17)).gen()
+    assert raises(lambda: x.sqrt(), FlintUnableError)
+    assert str((2 + x).sqrt()) == "6 + 10*x + 3*x^2 + 12*x^3 + 9*x^4 + 13*x^5 + O(x^6)"
+    assert str((1 + 3*x).sqrt() * (1 + 3*x).rsqrt()) == "1 + O(x^6)"
+
+    x = PowerSeriesRing(IntegersMod_nmod(16)).gen()
+    assert raises(lambda: (1 + x).sqrt(), FlintUnableError)
+    assert raises(lambda: (1 + x).rsqrt(), FlintUnableError)
+
     assert CCser(1+ZZser.gen()) == 1 + RRser.gen()
+
+    
 
 def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)
@@ -8576,6 +8735,33 @@ def test_gen_name():
         assert str(R.gen()) in ["c", "c^1", "c (mod c^3)"]
         R._set_gen_names(["d"])
         assert str(R.gen()) in ["d", "d^1", "d (mod d^3)"]
+
+def test_is_vector_space():
+    for R in [ZZ, ZZi, ZZx, PolynomialRing(ZZi), PolynomialRing_gr_mpoly(ZZi, 2), \
+                Mat(ZZ), Mat(QQ), IntegersMod_nmod(5), Mat(IntegersMod_nmod(5), 3, 3), \
+                PowerSeriesRing(ZZ), PowerSeriesModRing(ZZ, 3)]:
+        assert not R.is_rational_vector_space()
+        assert not R.is_real_vector_space()
+        assert not R.is_complex_vector_space()
+    for R in [QQ, QQx, AA, QQbar, Mat(QQ, 2, 3), NumberField(QQx.gen()**2 + 1), FractionField_fmpz_mpoly_q(2), PowerSeriesRing(QQ), PowerSeriesModRing(QQ, 3)]:
+        assert R.is_rational_vector_space()
+        assert not R.is_real_vector_space()
+        assert not R.is_complex_vector_space()
+    for R in [RR, RRx, RR_ca, Mat(RR, 2, 3), Vec(RR, 2)]:
+        assert R.is_rational_vector_space()
+        assert R.is_real_vector_space()
+        assert not R.is_complex_vector_space()
+    for R in [CC, CCx, CC_ca, Mat(CC, 2, 3), Vec(CC, 1)]:
+        assert R.is_rational_vector_space()
+        assert R.is_real_vector_space()
+        assert R.is_complex_vector_space()
+    for R in [PowerSeriesModRing(ZZ, 0), Mat(ZZ, 0, 0), Vec(ZZ, 0),
+                PowerSeriesModRing(IntegersMod_nmod(5), 0), Mat(IntegersMod_nmod(5), 0, 0), Vec(IntegersMod_nmod(5), 0),
+            IntegersMod_nmod(1)]:
+        assert R.is_rational_vector_space()
+        assert R.is_real_vector_space()
+        assert R.is_complex_vector_space()
+
 
 if __name__ == "__main__":
     from time import time

@@ -11,30 +11,33 @@
 
 #include "test_helpers.h"
 #include "gr.h"
+#include "gr_series.h"
 
-TEST_FUNCTION_START(gr_series_fmpq, state)
+TEST_FUNCTION_START(gr_series_acb, state)
 {
-    gr_ctx_t QQ, QQx;
+    gr_ctx_t CCn, CCnx;
     int flags = 0;
     slong i;
 
-    gr_ctx_init_fmpq(QQ);
-
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_gr_series(QQx, QQ, i);
-        gr_test_ring(QQx, 100, flags);
-        gr_ctx_clear(QQx);
+        gr_ctx_init_complex_acb(CCn, 2 + n_randint(state, 200));
+        gr_series_ctx_init(CCnx, CCn, i);
+        gr_test_ring(CCnx, 100, flags);
+        gr_ctx_clear(CCnx);
+        gr_ctx_clear(CCn);
     }
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_series_mod_gr_poly(QQx, QQ, i);
-        gr_test_ring(QQx, 100, flags);
-        gr_ctx_clear(QQx);
+        gr_ctx_init_complex_acb(CCn, 2 + n_randint(state, 200));
+        gr_series_mod_ctx_init(CCnx, CCn, i);
+        gr_test_ring(CCnx, 100, flags);
+        gr_ctx_clear(CCnx);
+        gr_ctx_clear(CCn);
     }
 
-    gr_ctx_clear(QQ);
+    gr_ctx_clear(CCn);
 
     TEST_FUNCTION_END(state);
 }
