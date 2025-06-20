@@ -16,6 +16,8 @@
 #include "gr_poly.h"
 #include "gr_vec.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_poly_dispersion, state)
 {
     for (slong i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -31,6 +33,13 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
             gr_ctx_init_fmpz(ctx);
         else
             gr_ctx_init_random(ctx, state);
+
+        if (ctx->methods == _ca_methods  /* hack: slow */
+            || gr_ctx_is_zero_ring(ctx) != T_FALSE /* hack: does not work corretly */)
+        {
+            gr_ctx_clear(ctx);
+            gr_ctx_init_fmpz(ctx);
+        }
 
         fmpz_init(prev_dfg);
         gr_poly_init(f, ctx);

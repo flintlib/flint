@@ -220,6 +220,13 @@ gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
 {
+    if (n_randint(state, 2))
+    {
+        gr_ctx_init_nmod(_gr_some_base_rings + 1, 1);
+        gr_series_ctx_init(ctx, _gr_some_base_rings + 1, 1);
+        return;
+    }
+
     switch (n_randint(state, 12))
     {
         case 0:
