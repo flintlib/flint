@@ -320,10 +320,11 @@ _set_truncate_poly(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_elem_ctx, slong 
         {
             int status = GR_SUCCESS;
             gr_poly_t t;
-            gr_poly_init(t, x_elem_ctx);
-            status |= gr_poly_truncate(t, x, n, x_elem_ctx);
-            status |= gr_poly_set_gr_poly_other(res, x, x_elem_ctx, elem_ctx);
-            gr_poly_clear(t, x_elem_ctx);
+            /* hack: t may not be normalised, but that's fine because
+               gr_poly_set_gr_poly_other currently always normalises */
+            t->coeffs = x->coeffs;
+            t->length = n;
+            status |= gr_poly_set_gr_poly_other(res, t, x_elem_ctx, elem_ctx);
             return status;
         }
     }

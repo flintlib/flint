@@ -57,11 +57,7 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_gr_mpoly(ctx, base_ring, n_randint(state, 3), mpoly_ordering_randtest(state));
             break;
         case 2:
-            gr_ctx_init_gr_poly(ctx, base_ring);
-/*
-    this currently breaks some tests
             gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
-*/
             break;
         case 3:
             gr_series_mod_ctx_init(ctx, base_ring, n_randint(state, 6));
@@ -224,6 +220,13 @@ gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
 {
+    if (n_randint(state, 2))
+    {
+        gr_ctx_init_nmod(_gr_some_base_rings + 1, 1);
+        gr_series_ctx_init(ctx, _gr_some_base_rings + 1, 1);
+        return;
+    }
+
     switch (n_randint(state, 12))
     {
         case 0:
