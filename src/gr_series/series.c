@@ -2202,7 +2202,7 @@ gr_series_ctx_init(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
 
 /* compatibility */
 void
-gr_ctx_init_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
     gr_series_ctx_init(ctx, base_ring, n);
 }

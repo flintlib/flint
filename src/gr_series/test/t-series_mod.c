@@ -13,7 +13,7 @@
 #include "gr.h"
 #include "gr_series.h"
 
-TEST_FUNCTION_START(gr_series_mod_gr_poly, state)
+TEST_FUNCTION_START(gr_series_mod, state)
 {
     gr_ctx_t R, Rx;
     int flags = 0;
@@ -25,7 +25,12 @@ TEST_FUNCTION_START(gr_series_mod_gr_poly, state)
         for (i = 0; i < 4; i++)
         {
             gr_ctx_init_random(R, state);
-            gr_ctx_init_series_mod_gr_poly(Rx, R, i);
+
+            if (i == 0)
+                gr_ctx_init_series_mod_gr_poly(Rx, R, i); /* compatibility */
+            else
+                gr_series_mod_ctx_init(Rx, R, i);
+
             /* hack: avoid collisions with parent ring generators */
             GR_MUST_SUCCEED(gr_ctx_set_gen_name(Rx, "u"));
             gr_test_ring(Rx, 10, flags);

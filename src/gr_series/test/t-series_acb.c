@@ -22,7 +22,7 @@ TEST_FUNCTION_START(gr_series_acb, state)
     for (i = 0; i < 5; i++)
     {
         gr_ctx_init_complex_acb(CCn, 2 + n_randint(state, 200));
-        gr_ctx_init_gr_series(CCnx, CCn, i);
+        gr_series_ctx_init(CCnx, CCn, i);
         gr_test_ring(CCnx, 100, flags);
         gr_ctx_clear(CCnx);
         gr_ctx_clear(CCn);
@@ -31,7 +31,7 @@ TEST_FUNCTION_START(gr_series_acb, state)
     for (i = 0; i < 5; i++)
     {
         gr_ctx_init_complex_acb(CCn, 2 + n_randint(state, 200));
-        gr_ctx_init_series_mod_gr_poly(CCnx, CCn, i);
+        gr_series_mod_ctx_init(CCnx, CCn, i);
         gr_test_ring(CCnx, 100, flags);
         gr_ctx_clear(CCnx);
         gr_ctx_clear(CCn);
