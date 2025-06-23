@@ -422,6 +422,19 @@ WARN_UNUSED_RESULT int gr_poly_resultant_small(gr_ptr r, const gr_poly_t f, cons
 WARN_UNUSED_RESULT int _gr_poly_resultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_resultant(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
 
+/* Newton basis */
+
+int _gr_poly_newton_basis_evaluate(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx);
+int gr_poly_newton_basis_evaluate(gr_ptr res, const gr_vec_t basis, const gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx);
+int _gr_poly_newton_basis_interpolate_exact(gr_ptr res, gr_srcptr basis, gr_srcptr ys, slong len, gr_ctx_t ctx);
+int gr_poly_newton_basis_interpolate_exact(gr_poly_t res, const gr_vec_t basis, const gr_vec_t ys, gr_ctx_t ctx);
+int _gr_poly_newton_basis_interpolate(gr_ptr res, gr_srcptr basis, gr_srcptr ys, slong len, gr_ctx_t ctx);
+int gr_poly_newton_basis_interpolate(gr_poly_t res, const gr_vec_t basis, const gr_vec_t ys, gr_ctx_t ctx);
+int _gr_poly_newton_basis_to_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_ctx_t ctx);
+int gr_poly_newton_basis_to_monomial(gr_poly_t res, const gr_vec_t basis, const gr_poly_t poly, gr_ctx_t ctx);
+int _gr_poly_newton_basis_from_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_ctx_t ctx);
+int gr_poly_newton_basis_from_monomial(gr_poly_t res, const gr_vec_t basis, const gr_poly_t poly, gr_ctx_t ctx);
+
 /* Multipoint evaluation/interpolation */
 
 gr_ptr * _gr_poly_tree_alloc(slong len, gr_ctx_t ctx);
@@ -435,6 +448,16 @@ WARN_UNUSED_RESULT int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t po
 
 WARN_UNUSED_RESULT int _gr_poly_evaluate_vec_iter(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx);
+
+int _gr_poly_interpolate_exact_newton(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx);
+int gr_poly_interpolate_exact_newton(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
+int _gr_poly_interpolate_newton(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx);
+int gr_poly_interpolate_newton(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
+
+int _gr_poly_interpolate_exact(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx);
+int gr_poly_interpolate_exact(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
+int _gr_poly_interpolate(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx);
+int gr_poly_interpolate(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
 
 /* Squarefree factorization */
 

@@ -47,6 +47,8 @@
 #include "t-gcd_subresultant.c"
 #include "t-hgcd.c"
 #include "t-integral.c"
+#include "t-interpolate.c"
+#include "t-interpolate_newton.c"
 #include "t-inv_series.c"
 #include "t-leading_taylor_shift.c"
 #include "t-log_series.c"
@@ -55,6 +57,7 @@
 #include "t-mul_toom33.c"
 #include "t-mulmod.c"
 #include "t-mulmod_preinv.c"
+#include "t-newton_basis.c"
 #include "t-nth_derivative.c"
 #include "t-pow_series_fmpq.c"
 #include "t-pow_series_ui.c"
@@ -123,6 +126,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_gcd_subresultant),
     TEST_FUNCTION(gr_poly_hgcd),
     TEST_FUNCTION(gr_poly_integral),
+    TEST_FUNCTION(gr_poly_interpolate),
+    TEST_FUNCTION(gr_poly_interpolate_newton),
     TEST_FUNCTION(gr_poly_inv_series),
     TEST_FUNCTION(gr_poly_leading_taylor_shift),
     TEST_FUNCTION(gr_poly_log_series),
@@ -131,6 +136,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_mul_toom33),
     TEST_FUNCTION(gr_poly_mulmod),
     TEST_FUNCTION(gr_poly_mulmod_preinv),
+    TEST_FUNCTION(gr_poly_newton_basis),
     TEST_FUNCTION(gr_poly_nth_derivative),
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),
