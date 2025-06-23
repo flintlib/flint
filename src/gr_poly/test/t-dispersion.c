@@ -34,8 +34,7 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
         else
             gr_ctx_init_random(ctx, state);
 
-        if (ctx->methods == _ca_methods  /* hack: slow */
-            || gr_ctx_is_zero_ring(ctx) != T_FALSE /* hack: does not work corretly */)
+        if (ctx->methods == _ca_methods)  /* hack: slow */
         {
             gr_ctx_clear(ctx);
             gr_ctx_init_fmpz(ctx);
@@ -96,7 +95,7 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
                 status |= gr_poly_dispersion(dug, NULL, u, g, ctx);
                 status |= gr_poly_dispersion(dfg, disp, f, g, ctx);
 
-                if (status == GR_UNABLE) {
+                if (status & GR_UNABLE) {
                     if (ctx->which_ring == GR_CTX_FMPZ)
                         status = GR_TEST_FAIL;
                     goto cleanup_inner;
