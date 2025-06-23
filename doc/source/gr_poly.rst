@@ -530,14 +530,14 @@ Let `C = (c_0, c_1, c_2, \ldots)` be a sequence of
 values of the commutative ring *R*.
 Then the sequence of polynomials
 
-.. math ::
+.. math::
 
-   \begin{eqnarray}
+      \begin{matrix}
       N_0 & = & 1, \\
       N_1 & = & (x-c_0), \\
       N_2 & = & (x-c_0)(x-c_1), \\
       N_3 & = & (x-c_0)(x-c_1)(x-c_2), \ldots
-   \end{eqnarray}
+      \end{matrix}
 
 with roots in `C` forms a basis of `R[x]` called the *Newton basis*
 associated with *C*.
@@ -614,15 +614,20 @@ Multipoint evaluation and interpolation
 
 .. function:: int _gr_poly_tree_build(gr_ptr * tree, gr_srcptr roots, slong len, gr_ctx_t ctx)
 
+    Initialize a subproduct tree over the given roots.
+
+.. function:: int _gr_poly_product_roots(gr_ptr poly, gr_srcptr xs, slong n, gr_ctx_t ctx)
+              int gr_poly_product_roots(gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+
+    Set *poly* to the polynomial `(x-x_0) (x-x_1) \cdots (x-x_{n-1})`.
+
 .. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, gr_ptr * tree, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_evaluate_vec_fast(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
-
-.. function:: int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+              int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_evaluate_vec_iter(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
-
-.. function:: int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+              int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_interpolate_exact(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
               int gr_poly_interpolate_exact(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
