@@ -162,7 +162,7 @@ _gr_poly_rem_2(gr_ptr q, gr_ptr r, gr_srcptr a, slong al,
 
 int
 _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly,
-    slong plen, gr_ptr * tree, slong len, gr_ctx_t ctx)
+    slong plen, const gr_ptr * tree, slong len, gr_ctx_t ctx)
 {
     slong height, i, j, pow, left;
     slong tree_height;
