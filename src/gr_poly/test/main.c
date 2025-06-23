@@ -48,6 +48,7 @@
 #include "t-hgcd.c"
 #include "t-integral.c"
 #include "t-interpolate.c"
+#include "t-interpolate_fast.c"
 #include "t-interpolate_newton.c"
 #include "t-inv_series.c"
 #include "t-leading_taylor_shift.c"
@@ -128,6 +129,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_hgcd),
     TEST_FUNCTION(gr_poly_integral),
     TEST_FUNCTION(gr_poly_interpolate),
+    TEST_FUNCTION(gr_poly_interpolate_fast),
     TEST_FUNCTION(gr_poly_interpolate_newton),
     TEST_FUNCTION(gr_poly_inv_series),
     TEST_FUNCTION(gr_poly_leading_taylor_shift),

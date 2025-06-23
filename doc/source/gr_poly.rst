@@ -621,7 +621,7 @@ Multipoint evaluation and interpolation
 
     Set *poly* to the polynomial `(x-x_0) (x-x_1) \cdots (x-x_{n-1})`.
 
-.. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, gr_ptr * tree, slong len, gr_ctx_t ctx)
+.. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, const gr_ptr * tree, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_evaluate_vec_fast(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
               int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
@@ -655,6 +655,18 @@ Multipoint evaluation and interpolation
     The *exact* versions presume that the evaluation points are distinct
     and that *f* has coefficients in *R*; they may silently output some
     arbitary polynomial otherwise.
+
+.. function:: int _gr_poly_interpolation_weights(gr_ptr w, const gr_ptr * tree, slong len, gr_ctx_t ctx)
+              int _gr_poly_interpolate_fast_precomp(gr_ptr poly, gr_srcptr ys, const gr_ptr * tree, gr_srcptr weights, slong len, gr_ctx_t ctx)
+              int _gr_poly_interpolate_fast(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_interpolate_fast(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
+
+    Fast polynomial interpolation using a subproduct tree. The *precomp*
+    version requires a precomputed subproduct tree generated using
+    :func:`_gr_poly_tree_build` and precomputed interpolation weights
+    generated using :func:`_gr_poly_interpolation_weights`.
+
+    This currently requires a field.
 
 
 Composition

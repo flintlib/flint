@@ -444,7 +444,7 @@ WARN_UNUSED_RESULT int _gr_poly_tree_build(gr_ptr * tree, gr_srcptr roots, slong
 WARN_UNUSED_RESULT int _gr_poly_product_roots(gr_ptr poly, gr_srcptr xs, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_product_roots(gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, gr_ptr * tree, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, const gr_ptr * tree, slong len, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_evaluate_vec_fast(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx);
@@ -456,6 +456,11 @@ WARN_UNUSED_RESULT int _gr_poly_interpolate_exact_newton(gr_ptr res, gr_srcptr x
 WARN_UNUSED_RESULT int gr_poly_interpolate_exact_newton(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_interpolate_newton(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_interpolate_newton(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_interpolation_weights(gr_ptr w, const gr_ptr * tree, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_interpolate_fast_precomp(gr_ptr poly, gr_srcptr ys, const gr_ptr * tree, gr_srcptr weights, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_interpolate_fast(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_interpolate_fast(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_interpolate_exact(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_interpolate_exact(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx);
