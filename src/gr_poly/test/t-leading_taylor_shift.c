@@ -40,7 +40,7 @@ TEST_FUNCTION_START(gr_poly_leading_taylor_shift, state)
 
         status |= gr_poly_leading_taylor_shift(s, f, g, ctx);
 
-        if (status == GR_UNABLE && ctx->which_ring == GR_CTX_FMPZ)
+        if (status & GR_UNABLE && ctx->which_ring == GR_CTX_FMPZ)
         {
             flint_printf("FAIL (unexpected failure)\n");
             fflush(stdout);

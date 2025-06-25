@@ -34,13 +34,6 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
         else
             gr_ctx_init_random(ctx, state);
 
-        if (ctx->methods == _ca_methods  /* hack: slow */
-            || gr_ctx_is_zero_ring(ctx) != T_FALSE /* hack: does not work corretly */)
-        {
-            gr_ctx_clear(ctx);
-            gr_ctx_init_fmpz(ctx);
-        }
-
         fmpz_init(prev_dfg);
         gr_poly_init(f, ctx);
         gr_poly_init(g, ctx);
@@ -86,6 +79,10 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
                 if (n_randint(state, 2))
                     status |= gr_poly_mul(g, g, u, ctx);
 
+                if (ctx->methods == _ca_methods
+                    && (f->length > 4 || g->length > 4))  /* slow */
+                    goto cleanup_inner;
+
                 /* overwritten iff nonempty dispersion set */
                 fmpz_set_si(dfu, -1);
                 /* overwritten whenever successful */
@@ -96,7 +93,7 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
                 status |= gr_poly_dispersion(dug, NULL, u, g, ctx);
                 status |= gr_poly_dispersion(dfg, disp, f, g, ctx);
 
-                if (status == GR_UNABLE) {
+                if (status & GR_UNABLE) {
                     if (ctx->which_ring == GR_CTX_FMPZ)
                         status = GR_TEST_FAIL;
                     goto cleanup_inner;
@@ -156,7 +153,10 @@ cleanup_inner:
         gr_poly_struct * g0 = aliasing_mode == 0 ? f : g;
         gr_poly_struct * g1 = aliasing_mode == 1 ? f : g;
 
-        if (status != GR_SUCCESS || (f->length > 8 && g->length > 8))
+        if (status != GR_SUCCESS
+            /* slow */
+            || ctx->methods == _ca_methods
+            || f->length + g->length > 10)
             goto epilogue;
 
         int want_d = n_randint(state, 16);
