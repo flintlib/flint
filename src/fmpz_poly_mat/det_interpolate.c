@@ -54,7 +54,7 @@ fmpz_poly_mat_det_interpolate(fmpz_poly_t det, const fmpz_poly_mat_t A)
         fmpz_mat_det(d + i, X);
     }
 
-    fmpz_poly_interpolate_fmpz_vec(det, x, d, len);
+    fmpz_poly_interpolate_exact(det, x, d, len);
 
     _fmpz_vec_clear(x, len);
     _fmpz_vec_clear(d, len);
