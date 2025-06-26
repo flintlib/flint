@@ -14,6 +14,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
+#include "gr_special.h"
 #include "gr_series.h"
 
 
@@ -658,34 +659,43 @@ _gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, int di
             {
                 gr_poly_t xb, yb;
                 gr_poly_t q, r;
-                int status;
+                int status = GR_UNABLE;
 
                 xb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(GR_SERIES_POLY(x), val, GR_SERIES_ELEM_CTX(ctx));
                 xb->length = xlen;
                 yb->coeffs = (gr_ptr) gr_poly_coeff_srcptr(GR_SERIES_POLY(y), val, GR_SERIES_ELEM_CTX(ctx));
                 yb->length = ylen;
 
-                gr_poly_init(q, GR_SERIES_ELEM_CTX(ctx));
-                gr_poly_init(r, GR_SERIES_ELEM_CTX(ctx));
-
-                status = gr_poly_divrem(q, r, xb, yb, GR_SERIES_ELEM_CTX(ctx));
-
-                if (status == GR_SUCCESS && gr_poly_is_zero(r, GR_SERIES_ELEM_CTX(ctx)) == T_TRUE)
+                if (xb->length == 1 && yb->length == 1)
                 {
-                    gr_poly_swap(GR_SERIES_POLY(res), q, GR_SERIES_ELEM_CTX(ctx));
-                    GR_SERIES_ERROR(res) = GR_SERIES_ERR_EXACT;
-                }
-                else if (xb->length == 1 && yb->length == 1 && gr_poly_is_zero(r, GR_SERIES_ELEM_CTX(ctx)) == T_FALSE)
-                {
-                    status = GR_DOMAIN;
+                    gr_ptr t;
+                    GR_TMP_INIT(t, GR_SERIES_ELEM_CTX(ctx));
+
+                    status = gr_div(t, xb->coeffs, yb->coeffs, GR_SERIES_ELEM_CTX(ctx));
+                    status |= gr_series_set_scalar(res, t, ctx);
+
+                    GR_TMP_CLEAR(t, GR_SERIES_ELEM_CTX(ctx));
                 }
                 else
                 {
-                    status = GR_UNABLE;
-                }
+                    gr_poly_init(q, GR_SERIES_ELEM_CTX(ctx));
+                    gr_poly_init(r, GR_SERIES_ELEM_CTX(ctx));
 
-                gr_poly_clear(q, GR_SERIES_ELEM_CTX(ctx));
-                gr_poly_clear(r, GR_SERIES_ELEM_CTX(ctx));
+                    status = gr_poly_divrem(q, r, xb, yb, GR_SERIES_ELEM_CTX(ctx));
+
+                    if (status == GR_SUCCESS && gr_poly_is_zero(r, GR_SERIES_ELEM_CTX(ctx)) == T_TRUE)
+                    {
+                        gr_poly_swap(GR_SERIES_POLY(res), q, GR_SERIES_ELEM_CTX(ctx));
+                        GR_SERIES_ERROR(res) = GR_SERIES_ERR_EXACT;
+                    }
+                    else
+                    {
+                        status = GR_UNABLE;
+                    }
+
+                    gr_poly_clear(q, GR_SERIES_ELEM_CTX(ctx));
+                    gr_poly_clear(r, GR_SERIES_ELEM_CTX(ctx));
+                }
 
                 return status;
             }
@@ -952,6 +962,31 @@ gr_series_rsqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
 }
 
 
+int
+gr_series_i(gr_series_t res, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_INIT(t, GR_SERIES_ELEM_CTX(ctx));
+    status = gr_i(t, GR_SERIES_ELEM_CTX(ctx));
+    if (status == GR_SUCCESS)
+        status = gr_series_set_scalar(res, t, ctx);
+    GR_TMP_CLEAR(t, GR_SERIES_ELEM_CTX(ctx));
+    return status;
+}
+
+int
+gr_series_pi(gr_series_t res, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    GR_TMP_INIT(t, GR_SERIES_ELEM_CTX(ctx));
+    status = gr_pi(t, GR_SERIES_ELEM_CTX(ctx));
+    if (status == GR_SUCCESS)
+        status = gr_series_set_scalar(res, t, ctx);
+    GR_TMP_CLEAR(t, GR_SERIES_ELEM_CTX(ctx));
+    return status;
+}
 
 #define UNARY_POLY_WRAPPER(func) \
 int \
@@ -1013,62 +1048,133 @@ acb_poly_is_finite(const acb_poly_t x)
     return _acb_vec_is_finite(x->coeffs, x->length);
 }
 
-#define ARB_WRAPPER(func, arb_func, acb_func) \
-int \
-gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) \
-{ \
-    slong xlen, len, xerr, err; \
-    slong prec; \
-    int status = GR_SUCCESS; \
- \
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_RR_ARB && GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB) \
-        return GR_UNABLE; \
- \
-    xlen = GR_SERIES_POLY(x)->length; \
-    xerr = GR_SERIES_ERROR(x); \
-    err = xerr; \
- \
-    len = FLINT_MIN(GR_SERIES_PREC(ctx), err); \
-    err = len; \
- \
-    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT) \
-    { \
-        len = FLINT_MIN(len, 1); \
-        err = GR_SERIES_ERR_EXACT; \
-    } \
- \
-    GR_SERIES_ERROR(res) = err; \
- \
-    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx)); \
- \
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring == GR_CTX_RR_ARB) \
-    { \
-        arb_func((arb_poly_struct *) GR_SERIES_POLY(res), (arb_poly_struct *) GR_SERIES_POLY(x), len, prec); \
-        if (!arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res))) \
-            status = GR_UNABLE; \
-    } \
-    else \
-    { \
-        acb_func((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), len, prec); \
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res))) \
-            status = GR_UNABLE; \
-    } \
- \
-    return status; \
-} \
+typedef void (*_arb_func_1)(arb_poly_t, const arb_poly_t, slong, slong);
+typedef void (*_acb_func_1)(acb_poly_t, const acb_poly_t, slong, slong);
 
-ARB_WRAPPER(gamma, arb_poly_gamma_series, acb_poly_gamma_series)
-ARB_WRAPPER(rgamma, arb_poly_rgamma_series, acb_poly_rgamma_series)
-ARB_WRAPPER(lgamma, arb_poly_lgamma_series, acb_poly_lgamma_series)
-ARB_WRAPPER(digamma, arb_poly_digamma_series, acb_poly_digamma_series)
-ARB_WRAPPER(erf, arb_hypgeom_erf_series, acb_hypgeom_erf_series)
-ARB_WRAPPER(erfc, arb_hypgeom_erfc_series, acb_hypgeom_erfc_series)
-ARB_WRAPPER(erfi, arb_hypgeom_erfi_series, acb_hypgeom_erfi_series)
-ARB_WRAPPER(exp_integral_ei, arb_hypgeom_ei_series, acb_hypgeom_ei_series)
-ARB_WRAPPER(cos_integral, arb_hypgeom_ci_series, acb_hypgeom_ci_series)
-ARB_WRAPPER(cosh_integral, arb_hypgeom_chi_series, acb_hypgeom_chi_series)
-ARB_WRAPPER(sin_integral, arb_hypgeom_si_series, acb_hypgeom_si_series)
-ARB_WRAPPER(sinh_integral, arb_hypgeom_shi_series, acb_hypgeom_shi_series)
+typedef void (*_arb_func_c2_flag)(arb_poly_t, const arb_t, const arb_poly_t, int, slong, slong);
+typedef void (*_acb_func_c2_flag)(acb_poly_t, const acb_t, const acb_poly_t, int, slong, slong);
+
+static int check_arb(int status, const gr_poly_t res)
+{
+    if (res != NULL && !arb_poly_is_finite((arb_poly_struct *) res))
+        status = GR_UNABLE;
+    return status;
+}
+
+static int check_acb(int status, gr_poly_t res)
+{
+    if (res != NULL && !acb_poly_is_finite((acb_poly_struct *) res))
+        status = GR_UNABLE;
+    return status;
+}
+
+int
+_gr_series_arb_wrapper1(gr_series_t res, const gr_series_t x, gr_ctx_t ctx, _arb_func_1 arb_func, _acb_func_1 acb_func)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_RR_ARB && GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = GR_SERIES_POLY(x)->length;
+    xerr = GR_SERIES_ERROR(x);
+    err = xerr;
+
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
+    err = len;
+
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = GR_SERIES_ERR_EXACT;
+    }
+
+    GR_SERIES_ERROR(res) = err;
+
+    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
+
+    if (GR_SERIES_ELEM_CTX(ctx)->which_ring == GR_CTX_RR_ARB)
+    {
+        arb_func((arb_poly_struct *) GR_SERIES_POLY(res), (arb_poly_struct *) GR_SERIES_POLY(x), len, prec);
+        status = check_arb(status, GR_SERIES_POLY(res));
+    }
+    else
+    {
+        acb_func((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), len, prec);
+        status = check_acb(status, GR_SERIES_POLY(res));
+    }
+
+    return status;
+}
+
+int
+_gr_series_arb_wrapper_c2_flag(gr_series_t res, const gr_series_t s, const gr_series_t x, int regularized, gr_ctx_t ctx, _arb_func_c2_flag func1, _acb_func_c2_flag func2)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_RR_ARB && GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = GR_SERIES_POLY(x)->length;
+    xerr = GR_SERIES_ERROR(x);
+    err = xerr;
+
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
+    err = len;
+
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = GR_SERIES_ERR_EXACT;
+    }
+
+    /* we only handle constant s */
+    if (len >= 2 && GR_SERIES_POLY(s)->length >= 2)
+        return GR_UNABLE;
+
+    GR_SERIES_ERROR(res) = err;
+
+    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
+
+    if (GR_SERIES_ELEM_CTX(ctx)->which_ring == GR_CTX_RR_ARB)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_poly_get_coeff_arb(t, (arb_poly_struct *) GR_SERIES_POLY(s), 0);
+        func1((arb_poly_struct *) GR_SERIES_POLY(res), t, (arb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
+        status = check_arb(status, GR_SERIES_POLY(res));
+        arb_clear(t);
+    }
+    else
+    {
+        acb_t t;
+        acb_init(t);
+        acb_poly_get_coeff_acb(t, (acb_poly_struct *) GR_SERIES_POLY(s), 0);
+        func2((acb_poly_struct *) GR_SERIES_POLY(res), t, (acb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
+        status = check_acb(status, GR_SERIES_POLY(res));
+        acb_clear(t);
+    }
+
+    return status;
+}
+
+int gr_series_gamma(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_poly_gamma_series, acb_poly_gamma_series); }
+int gr_series_rgamma(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_poly_rgamma_series, acb_poly_rgamma_series); }
+int gr_series_lgamma(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_poly_lgamma_series, acb_poly_lgamma_series); }
+int gr_series_digamma(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_poly_digamma_series, acb_poly_digamma_series); }
+int gr_series_erf(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_erf_series, acb_hypgeom_erf_series); }
+int gr_series_erfc(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_erfc_series, acb_hypgeom_erfc_series); }
+int gr_series_erfi(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_erfi_series, acb_hypgeom_erfi_series); }
+int gr_series_exp_integral_ei(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_ei_series, acb_hypgeom_ei_series); }
+int gr_series_cos_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_ci_series, acb_hypgeom_ci_series); }
+int gr_series_cosh_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_chi_series, acb_hypgeom_chi_series); }
+int gr_series_sin_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_si_series, acb_hypgeom_si_series); }
+int gr_series_sinh_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return _gr_series_arb_wrapper1(res, x, ctx, arb_hypgeom_shi_series, acb_hypgeom_shi_series); }
+
 
 int
 gr_series_fresnel(gr_series_t res1, gr_series_t res2, const gr_series_t x, int normalized, gr_ctx_t ctx)
@@ -1103,20 +1209,16 @@ gr_series_fresnel(gr_series_t res1, gr_series_t res2, const gr_series_t x, int n
         arb_hypgeom_fresnel_series(res1 ? (arb_poly_struct *) GR_SERIES_POLY(res1) : NULL,
                                    res2 ? (arb_poly_struct *) GR_SERIES_POLY(res2) : NULL,
                                     (arb_poly_struct *) GR_SERIES_POLY(x), normalized, len, prec);
-        if (res1 && !arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res1)))
-            status = GR_UNABLE;
-        if (res2 && !arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res2)))
-            status = GR_UNABLE;
+        status = check_arb(status, GR_SERIES_POLY(res1));
+        status = check_arb(status, GR_SERIES_POLY(res2));
     }
     else
     {
         acb_hypgeom_fresnel_series(res1 ? (acb_poly_struct *) GR_SERIES_POLY(res1) : NULL,
                                    res2 ? (acb_poly_struct *) GR_SERIES_POLY(res2) : NULL,
                                     (acb_poly_struct *) GR_SERIES_POLY(x), normalized, len, prec);
-        if (res1 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res1)))
-            status = GR_UNABLE;
-        if (res2 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res2)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res1));
+        status = check_acb(status, GR_SERIES_POLY(res2));
     }
 
     return status;
@@ -1171,14 +1273,10 @@ gr_series_airy(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t
                                 res3 ? (arb_poly_struct *) GR_SERIES_POLY(res3) : NULL,
                                 res4 ? (arb_poly_struct *) GR_SERIES_POLY(res4) : NULL,
                                 (arb_poly_struct *) GR_SERIES_POLY(x), len, prec);
-        if (res1 && !arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res1)))
-            status = GR_UNABLE;
-        if (res2 && !arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res2)))
-            status = GR_UNABLE;
-        if (res3 && !arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res3)))
-            status = GR_UNABLE;
-        if (res4 && !arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res4)))
-            status = GR_UNABLE;
+        status = check_arb(status, GR_SERIES_POLY(res1));
+        status = check_arb(status, GR_SERIES_POLY(res2));
+        status = check_arb(status, GR_SERIES_POLY(res3));
+        status = check_arb(status, GR_SERIES_POLY(res4));
     }
     else
     {
@@ -1187,14 +1285,10 @@ gr_series_airy(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t
                                 res3 ? (acb_poly_struct *) GR_SERIES_POLY(res3) : NULL,
                                 res4 ? (acb_poly_struct *) GR_SERIES_POLY(res4) : NULL,
                                 (acb_poly_struct *) GR_SERIES_POLY(x), len, prec);
-        if (res1 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res1)))
-            status = GR_UNABLE;
-        if (res2 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res2)))
-            status = GR_UNABLE;
-        if (res3 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res3)))
-            status = GR_UNABLE;
-        if (res4 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res4)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res1));
+        status = check_acb(status, GR_SERIES_POLY(res2));
+        status = check_acb(status, GR_SERIES_POLY(res3));
+        status = check_acb(status, GR_SERIES_POLY(res4));
     }
 
     return status;
@@ -1255,14 +1349,12 @@ gr_series_log_integral(gr_series_t res, const gr_series_t x, int offset, gr_ctx_
     if (GR_SERIES_ELEM_CTX(ctx)->which_ring == GR_CTX_RR_ARB)
     {
         arb_hypgeom_li_series((arb_poly_struct *) GR_SERIES_POLY(res), (arb_poly_struct *) GR_SERIES_POLY(x), offset, len, prec);
-        if (!arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_arb(status, GR_SERIES_POLY(res));
     }
     else
     {
         acb_hypgeom_li_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), offset, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res));
     }
 
     return status;
@@ -1271,111 +1363,13 @@ gr_series_log_integral(gr_series_t res, const gr_series_t x, int offset, gr_ctx_
 int
 gr_series_gamma_upper(gr_series_t res, const gr_series_t s, const gr_series_t x, int regularized, gr_ctx_t ctx)
 {
-    slong xlen, len, xerr, err;
-    slong prec;
-    int status = GR_SUCCESS;
-
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_RR_ARB && GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
-        return GR_UNABLE;
-
-    xlen = GR_SERIES_POLY(x)->length;
-    xerr = GR_SERIES_ERROR(x);
-    err = xerr;
-
-    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
-    err = len;
-
-    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
-    {
-        len = FLINT_MIN(len, 1);
-        err = GR_SERIES_ERR_EXACT;
-    }
-
-    /* we only handle constant s */
-    if (len >= 2 && GR_SERIES_POLY(s)->length >= 2)
-        return GR_UNABLE;
-
-    GR_SERIES_ERROR(res) = err;
-
-    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
-
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring == GR_CTX_RR_ARB)
-    {
-        arb_t t;
-        arb_init(t);
-        arb_poly_get_coeff_arb(t, (arb_poly_struct *) GR_SERIES_POLY(s), 0);
-        arb_hypgeom_gamma_upper_series((arb_poly_struct *) GR_SERIES_POLY(res), t, (arb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
-        if (!arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
-        arb_clear(t);
-    }
-    else
-    {
-        acb_t t;
-        acb_init(t);
-        acb_poly_get_coeff_acb(t, (acb_poly_struct *) GR_SERIES_POLY(s), 0);
-        acb_hypgeom_gamma_upper_series((acb_poly_struct *) GR_SERIES_POLY(res), t, (acb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
-        acb_clear(t);
-    }
-
-    return status;
+    return _gr_series_arb_wrapper_c2_flag(res, s, x, regularized, ctx, arb_hypgeom_gamma_upper_series, acb_hypgeom_gamma_upper_series);
 }
 
 int
 gr_series_gamma_lower(gr_series_t res, const gr_series_t s, const gr_series_t x, int regularized, gr_ctx_t ctx)
 {
-    slong xlen, len, xerr, err;
-    slong prec;
-    int status = GR_SUCCESS;
-
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_RR_ARB && GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
-        return GR_UNABLE;
-
-    xlen = GR_SERIES_POLY(x)->length;
-    xerr = GR_SERIES_ERROR(x);
-    err = xerr;
-
-    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
-    err = len;
-
-    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
-    {
-        len = FLINT_MIN(len, 1);
-        err = GR_SERIES_ERR_EXACT;
-    }
-
-    /* we only handle constant s */
-    if (len >= 2 && GR_SERIES_POLY(s)->length >= 2)
-        return GR_UNABLE;
-
-    GR_SERIES_ERROR(res) = err;
-
-    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
-
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring == GR_CTX_RR_ARB)
-    {
-        arb_t t;
-        arb_init(t);
-        arb_poly_get_coeff_arb(t, (arb_poly_struct *) GR_SERIES_POLY(s), 0);
-        arb_hypgeom_gamma_lower_series((arb_poly_struct *) GR_SERIES_POLY(res), t, (arb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
-        if (!arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
-        arb_clear(t);
-    }
-    else
-    {
-        acb_t t;
-        acb_init(t);
-        acb_poly_get_coeff_acb(t, (acb_poly_struct *) GR_SERIES_POLY(s), 0);
-        acb_hypgeom_gamma_lower_series((acb_poly_struct *) GR_SERIES_POLY(res), t, (acb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
-        acb_clear(t);
-    }
-
-    return status;
+    return _gr_series_arb_wrapper_c2_flag(res, s, x, regularized, ctx, arb_hypgeom_gamma_lower_series, acb_hypgeom_gamma_lower_series);
 }
 
 int
@@ -1419,8 +1413,7 @@ gr_series_beta_lower(gr_series_t res, const gr_series_t a, const gr_series_t b, 
         arb_poly_get_coeff_arb(t, (arb_poly_struct *) GR_SERIES_POLY(a), 0);
         arb_poly_get_coeff_arb(u, (arb_poly_struct *) GR_SERIES_POLY(b), 0);
         arb_hypgeom_beta_lower_series((arb_poly_struct *) GR_SERIES_POLY(res), t, u, (arb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
-        if (!arb_poly_is_finite((arb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_arb(status, GR_SERIES_POLY(res));
         arb_clear(t);
         arb_clear(u);
     }
@@ -1432,8 +1425,7 @@ gr_series_beta_lower(gr_series_t res, const gr_series_t a, const gr_series_t b, 
         acb_poly_get_coeff_acb(t, (acb_poly_struct *) GR_SERIES_POLY(a), 0);
         acb_poly_get_coeff_acb(u, (acb_poly_struct *) GR_SERIES_POLY(b), 0);
         acb_hypgeom_beta_lower_series((acb_poly_struct *) GR_SERIES_POLY(res), t, u, (acb_poly_struct *) GR_SERIES_POLY(x), regularized, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res));
         acb_clear(t);
         acb_clear(u);
     }
@@ -1477,8 +1469,7 @@ gr_series_polylog(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_
         acb_init(t);
         acb_poly_get_coeff_acb(t, (acb_poly_struct *) GR_SERIES_POLY(z), 0);
         acb_poly_polylog_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(s), t, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res));
         acb_clear(t);
     }
 
@@ -1521,9 +1512,49 @@ gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z
         acb_init(t);
         acb_poly_get_coeff_acb(t, (acb_poly_struct *) GR_SERIES_POLY(z), 0);
         acb_poly_zeta_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(s), t, 0, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res));
         acb_clear(t);
+    }
+
+    return status;
+}
+
+int
+_gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_ctx_t ctx, int function)
+{
+    slong xlen, len, xerr, err;
+    slong prec;
+    int status = GR_SUCCESS;
+
+    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
+        return GR_UNABLE;
+
+    xlen = GR_SERIES_POLY(x)->length;
+    xerr = GR_SERIES_ERROR(x);
+    err = xerr;
+
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
+    err = len;
+
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
+    {
+        len = FLINT_MIN(len, 1);
+        err = GR_SERIES_ERR_EXACT;
+    }
+
+    GR_SERIES_ERROR(res) = err;
+
+    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
+
+    {
+        if (function == 0)
+            acb_dirichlet_l_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), G, chi, 0, len, prec);
+        else if (function == 1)
+            acb_dirichlet_hardy_z_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), G, chi, len, prec);
+        else
+            acb_dirichlet_hardy_theta_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), G, chi, len, prec);
+
+        status = check_acb(status, GR_SERIES_POLY(res));
     }
 
     return status;
@@ -1532,109 +1563,19 @@ gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z
 int
 gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_ctx_t ctx)
 {
-    slong xlen, len, xerr, err;
-    slong prec;
-    int status = GR_SUCCESS;
-
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
-        return GR_UNABLE;
-
-    xlen = GR_SERIES_POLY(x)->length;
-    xerr = GR_SERIES_ERROR(x);
-    err = xerr;
-
-    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
-    err = len;
-
-    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
-    {
-        len = FLINT_MIN(len, 1);
-        err = GR_SERIES_ERR_EXACT;
-    }
-
-    GR_SERIES_ERROR(res) = err;
-
-    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
-
-    {
-        acb_dirichlet_l_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), G, chi, 0, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
-    }
-
-    return status;
-}
-
-int
-gr_series_dirichlet_hardy_theta(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_ctx_t ctx)
-{
-    slong xlen, len, xerr, err;
-    slong prec;
-    int status = GR_SUCCESS;
-
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
-        return GR_UNABLE;
-
-    xlen = GR_SERIES_POLY(x)->length;
-    xerr = GR_SERIES_ERROR(x);
-    err = xerr;
-
-    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
-    err = len;
-
-    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
-    {
-        len = FLINT_MIN(len, 1);
-        err = GR_SERIES_ERR_EXACT;
-    }
-
-    GR_SERIES_ERROR(res) = err;
-
-    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
-
-    {
-        acb_dirichlet_hardy_theta_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), G, chi, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
-    }
-
-    return status;
+    return _gr_series_dirichlet_l(res, G, chi, x, ctx, 0);
 }
 
 int
 gr_series_dirichlet_hardy_z(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_ctx_t ctx)
 {
-    slong xlen, len, xerr, err;
-    slong prec;
-    int status = GR_SUCCESS;
+    return _gr_series_dirichlet_l(res, G, chi, x, ctx, 1);
+}
 
-    if (GR_SERIES_ELEM_CTX(ctx)->which_ring != GR_CTX_CC_ACB)
-        return GR_UNABLE;
-
-    xlen = GR_SERIES_POLY(x)->length;
-    xerr = GR_SERIES_ERROR(x);
-    err = xerr;
-
-    len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
-    err = len;
-
-    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT)
-    {
-        len = FLINT_MIN(len, 1);
-        err = GR_SERIES_ERR_EXACT;
-    }
-
-    GR_SERIES_ERROR(res) = err;
-
-    prec = _gr_ctx_get_real_prec(GR_SERIES_ELEM_CTX(ctx));
-
-    {
-        acb_dirichlet_hardy_z_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), G, chi, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
-    }
-
-    return status;
+int
+gr_series_dirichlet_hardy_theta(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_ctx_t ctx)
+{
+    return _gr_series_dirichlet_l(res, G, chi, x, ctx, 2);
 }
 
 int
@@ -1680,14 +1621,11 @@ gr_series_jacobi_theta(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_
                                 res3 ? (acb_poly_struct *) GR_SERIES_POLY(res3) : NULL,
                                 res4 ? (acb_poly_struct *) GR_SERIES_POLY(res4) : NULL,
                                 (acb_poly_struct *) GR_SERIES_POLY(x), t, len, prec);
-        if (res1 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res1)))
-            status = GR_UNABLE;
-        if (res2 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res2)))
-            status = GR_UNABLE;
-        if (res3 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res3)))
-            status = GR_UNABLE;
-        if (res4 && !acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res4)))
-            status = GR_UNABLE;
+
+        status = check_acb(status, GR_SERIES_POLY(res1));
+        status = check_acb(status, GR_SERIES_POLY(res2));
+        status = check_acb(status, GR_SERIES_POLY(res3));
+        status = check_acb(status, GR_SERIES_POLY(res4));
         acb_clear(t);
     }
 
@@ -1748,8 +1686,7 @@ gr_series_agm1(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
 
     {
         acb_poly_agm1_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res));
     }
 
     return status;
@@ -1784,8 +1721,7 @@ gr_series_elliptic_k(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
 
     {
         acb_poly_elliptic_k_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res));
     }
 
     return status;
@@ -1827,8 +1763,7 @@ gr_series_weierstrass_p(gr_series_t res, const gr_series_t x, const gr_series_t 
         acb_init(t);
         acb_poly_get_coeff_acb(t, (acb_poly_struct *) GR_SERIES_POLY(tau), 0);
         acb_elliptic_p_series((acb_poly_struct *) GR_SERIES_POLY(res), (acb_poly_struct *) GR_SERIES_POLY(x), t, len, prec);
-        if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-            status = GR_UNABLE;
+        status = check_acb(status, GR_SERIES_POLY(res));
         acb_clear(t);
     }
 
@@ -1906,8 +1841,7 @@ gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, const gr_series_
 
     acb_hypgeom_pfq_series_direct((acb_poly_struct *) GR_SERIES_POLY(res), aa, pp, bb, qq, (const acb_poly_struct *) GR_SERIES_POLY(x), regularized, -1, len, prec);
 
-    if (!acb_poly_is_finite((acb_poly_struct *) GR_SERIES_POLY(res)))
-        status = GR_UNABLE;
+    status = check_acb(status, GR_SERIES_POLY(res));
 
     if (!have_one)
         acb_poly_clear(bb + qq - 1);
@@ -2126,6 +2060,8 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_DIVEXACT,    (gr_funcptr) gr_series_divexact},
     {GR_METHOD_SQRT,        (gr_funcptr) gr_series_sqrt},
     {GR_METHOD_RSQRT,       (gr_funcptr) gr_series_rsqrt},
+    {GR_METHOD_PI,          (gr_funcptr) gr_series_pi},
+    {GR_METHOD_I,           (gr_funcptr) gr_series_i},
     {GR_METHOD_EXP,         (gr_funcptr) gr_series_exp},
     {GR_METHOD_LOG,         (gr_funcptr) gr_series_log},
     {GR_METHOD_TAN,         (gr_funcptr) gr_series_tan},
