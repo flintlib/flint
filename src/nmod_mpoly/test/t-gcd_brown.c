@@ -235,6 +235,58 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_brown, state)
         nmod_mpoly_ctx_clear(ctx);
     }
 
+    for (i = 0; i < 1 * flint_test_multiplier(); i++)
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a, b, g, t;
+        slong len, len1, len2;
+        slong n, degbound;
+        ulong p;
+
+        p = n_randint(state, FLINT_BITS - 1) + 1;
+        p = n_randbits(state, p);
+        p = n_nextprime(p, 1);
+
+        flint_set_num_threads(2 + n_randint(state, max_threads - 1));
+
+        nmod_mpoly_ctx_init_rand(ctx, state, p < 3000 ? 3 : 4, p);
+
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t, ctx);
+
+        len = n_randint(state, 100) + 1;
+        len1 = n_randint(state, 200);
+        len2 = n_randint(state, 200);
+
+        n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
+        degbound = 1 + 120/n/n;
+
+        for (j = 0; j < 3; j++)
+        {
+            nmod_mpoly_randtest_bound(t, state, len, degbound, ctx);
+            if (nmod_mpoly_is_zero(t, ctx))
+                nmod_mpoly_one(t, ctx);
+            nmod_mpoly_randtest_bound(a, state, len1, degbound, ctx);
+            nmod_mpoly_randtest_bound(b, state, len2, degbound, ctx);
+            nmod_mpoly_mul(a, a, t, ctx);
+            nmod_mpoly_mul(b, b, t, ctx);
+            nmod_mpoly_randtest_bits(g, state, len, FLINT_BITS, ctx);
+
+            gcd_check(g, a, b, t, ctx, i, j, "random dense 2");
+        }
+
+        flint_set_num_threads(1);
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+
     TEST_FUNCTION_END(state);
 }
 #undef gcd_check

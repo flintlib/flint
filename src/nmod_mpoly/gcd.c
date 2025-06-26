@@ -457,6 +457,10 @@ cleanup:
     return;
 }
 
+/* With this value, _set_estimates_medprime almost always succeeds.
+   Hack: allow changing this parameter to a small value from the test code
+   to verify what happens when it fails. */
+FLINT_DLL slong _nmod_mpoly_medprime_ignore_limit = WORD(9999);
 
 /* call to improve on the (valid) results of smprime */
 static void _set_estimates_medprime(
@@ -501,7 +505,7 @@ static void _set_estimates_medprime(
     fq_zech_poly_init(Geval, medctx);
 
     ignore_limit = (A->length + B->length)/4096;
-    ignore_limit = FLINT_MAX(WORD(9999), ignore_limit);
+    ignore_limit = FLINT_MAX(_nmod_mpoly_medprime_ignore_limit, ignore_limit);
     I->Gdeflate_deg_bounds_are_nice = 1;
     for (j = 0; j < nvars; j++)
     {
