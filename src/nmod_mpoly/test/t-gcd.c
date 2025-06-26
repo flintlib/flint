@@ -15,6 +15,11 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
+/* Hack: internal parameter of nmod_mpoly_gcd that we randomly change
+   to trigger unlikely code paths which are currently unreachable
+   from the test code. */
+FLINT_DLL extern slong _nmod_mpoly_medprime_ignore_limit;
+
 /* Defined in t-gcd.c, t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,
  * t-gcd_zippel2.c and t-gcd_zippel.c */
 #define gcd_check gcd_check_gcd
@@ -32,6 +37,11 @@ void gcd_check(
     nmod_mpoly_init(ca, ctx);
     nmod_mpoly_init(cb, ctx);
     nmod_mpoly_init(cg, ctx);
+
+    if ((i + j) % 2)
+        _nmod_mpoly_medprime_ignore_limit = 8;
+    else
+        _nmod_mpoly_medprime_ignore_limit = 9999;
 
     if (!nmod_mpoly_gcd(g, a, b, ctx))
     {
