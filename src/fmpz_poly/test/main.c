@@ -97,7 +97,10 @@
 #include "t-hermite_he.c"
 #include "t-inflate.c"
 #include "t-init_realloc_clear.c"
+#include "t-interpolate.c"
 #include "t-interpolate_fmpz_vec.c"
+#include "t-interpolate_multi_mod.c"
+#include "t-interpolate_newton.c"
 #include "t-inv_series_basecase.c"
 #include "t-inv_series.c"
 #include "t-inv_series_newton.c"
@@ -275,7 +278,10 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_hermite_he),
     TEST_FUNCTION(fmpz_poly_inflate),
     TEST_FUNCTION(fmpz_poly_init_realloc_clear),
+    TEST_FUNCTION(fmpz_poly_interpolate),
     TEST_FUNCTION(fmpz_poly_interpolate_fmpz_vec),
+    TEST_FUNCTION(fmpz_poly_interpolate_multi_mod),
+    TEST_FUNCTION(fmpz_poly_interpolate_newton),
     TEST_FUNCTION(fmpz_poly_inv_series_basecase),
     TEST_FUNCTION(fmpz_poly_inv_series),
     TEST_FUNCTION(fmpz_poly_inv_series_newton),

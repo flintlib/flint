@@ -2365,18 +2365,45 @@ Newton basis
 Interpolation
 --------------------------------------------------------------------------------
 
+.. function:: int _fmpz_poly_interpolate_newton(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              int fmpz_poly_interpolate_newton(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+              int _fmpz_poly_interpolate_multi_mod(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              int fmpz_poly_interpolate_multi_mod(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+              int _fmpz_poly_interpolate(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              int fmpz_poly_interpolate(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+
+    Sets ``poly`` to the unique interpolating polynomial of
+    degree at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i` in
+    ``xs`` and ``ys``, assuming that this polynomial has integer
+    coefficients and that the evaluation points `x_i` are distinct.
+
+    If the `x_i` are not distinct or if the interpolating polynomial does
+    not have integer coefficients, returns 0 indicating failure.
+    Otherwise returns 1 indicating success.
+
+    The *newton* algorithm first interpolates in the Newton basis
+    and then converts to the monomial basis.
+    The *multi_mod* algorithm interpolates modulo one or more prime numbers
+    and combines the results using CRT, using adaptive termination.
+    The default implementation chooses automatically between the *newton* and
+    *multi_mod* algorithms.
+
+.. function:: void _fmpz_poly_interpolate_exact_newton(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              void fmpz_poly_interpolate_exact_newton(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+              void _fmpz_poly_interpolate_exact(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              void fmpz_poly_interpolate_exact(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+
+    Like :func:`fmpz_poly_interpolate` etc., but optimized by omitting
+    error handling. If the `x_i` are not distinct or if the interpolating
+    polynomial does not have integer coefficients, the behavior is undefined.
+    The default implementation chooses automatically between the *exact_newton* and
+    *multi_mod* algorithms.
 
 .. function:: void fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
 
-    Sets ``poly`` to the unique interpolating polynomial of degree at
-    most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_u` in
-    ``xs`` and ``ys``, assuming that this polynomial has integer
-    coefficients.
-
-    If an interpolating polynomial with integer coefficients does not
-    exist, a ``FLINT_INEXACT`` exception is thrown.
-
-    It is assumed that the `x` values are distinct.
+    Like :func:`fmpz_poly_interpolate`, but if the `x_i` values are not distinct
+    or if the interpolating polynomial does not have integer coefficients,
+    a ``FLINT_INEXACT`` exception is thrown.
 
 
 Composition

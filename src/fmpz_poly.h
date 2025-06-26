@@ -1125,6 +1125,18 @@ void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
 void fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, slong n);
 
+int _fmpz_poly_interpolate_newton(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n);
+int fmpz_poly_interpolate_newton(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n);
+int _fmpz_poly_interpolate_multi_mod(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n);
+int fmpz_poly_interpolate_multi_mod(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n);
+int _fmpz_poly_interpolate(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n);
+int fmpz_poly_interpolate(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n);
+
+void _fmpz_poly_interpolate_exact_newton(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n);
+void fmpz_poly_interpolate_exact_newton(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n);
+void _fmpz_poly_interpolate_exact(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n);
+void fmpz_poly_interpolate_exact(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n);
+
 /* Hensel lifting ************************************************************/
 
 void fmpz_poly_hensel_build_tree(slong * link, fmpz_poly_t *v, fmpz_poly_t *w,
