@@ -297,7 +297,7 @@ _fmpz_poly_interpolate_multi_mod(fmpz * poly,
         }
 
         /* No solution */
-        if (fmpz_bits(M) > bound_bits + 1)
+        if ((slong) fmpz_bits(M) > bound_bits + 1)
         {
             ok = 0;
             break;
