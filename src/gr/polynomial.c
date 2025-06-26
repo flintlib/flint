@@ -18,6 +18,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
+#include "gr_special.h"
 
 static const char * default_var = "x";
 
@@ -321,6 +322,17 @@ polynomial_i(gr_poly_t res, gr_ctx_t ctx)
     gr_poly_fit_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
     _gr_poly_set_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
     status = gr_i(res->coeffs, POLYNOMIAL_ELEM_CTX(ctx));
+    _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
+}
+
+int
+polynomial_pi(gr_poly_t res, gr_ctx_t ctx)
+{
+    int status;
+    gr_poly_fit_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
+    _gr_poly_set_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_pi(res->coeffs, POLYNOMIAL_ELEM_CTX(ctx));
     _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
     return status;
 }
@@ -692,7 +704,6 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ZERO,        (gr_funcptr) polynomial_zero},
     {GR_METHOD_ONE,         (gr_funcptr) polynomial_one},
     {GR_METHOD_NEG_ONE,     (gr_funcptr) polynomial_neg_one},
-    {GR_METHOD_I,           (gr_funcptr) polynomial_i},
 
     {GR_METHOD_GEN,            (gr_funcptr) polynomial_gen},
     {GR_METHOD_GENS,           (gr_funcptr) gr_generic_gens_single},
@@ -741,6 +752,9 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
     {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},
     {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) polynomial_euclidean_divrem},
+
+    {GR_METHOD_I,           (gr_funcptr) polynomial_i},
+    {GR_METHOD_PI,          (gr_funcptr) polynomial_pi},
 
     {GR_METHOD_CANONICAL_ASSOCIATE,         (gr_funcptr) polynomial_canonical_associate},
     {GR_METHOD_GCD,         (gr_funcptr) polynomial_gcd},
