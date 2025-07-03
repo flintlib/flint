@@ -61,6 +61,8 @@
 #include "t-init_realloc_clear.c"
 #include "t-integral.c"
 #include "t-interpolate_fmpz_vec.c"
+#include "t-interpolate_fmpz_fmpq_vec.c"
+#include "t-interpolate_fmpq_vec.c"
 #include "t-inv.c"
 #include "t-inv_series_newton.c"
 #include "t-invsqrt_series.c"
@@ -157,6 +159,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_poly_init_realloc_clear),
     TEST_FUNCTION(fmpq_poly_integral),
     TEST_FUNCTION(fmpq_poly_interpolate_fmpz_vec),
+    TEST_FUNCTION(fmpq_poly_interpolate_fmpz_fmpq_vec),
+    TEST_FUNCTION(fmpq_poly_interpolate_fmpq_vec),
     TEST_FUNCTION(fmpq_poly_inv),
     TEST_FUNCTION(fmpq_poly_inv_series_newton),
     TEST_FUNCTION(fmpq_poly_invsqrt_series),
