@@ -26,7 +26,7 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_fmpz_vec, state)
         slong j, n, bits;
 
         n = n_randint(state, 50);
-        bits = n_randint(state, 100);
+        bits = n_randint(state, 100) + 1;
 
         x = _fmpz_vec_init(n);
         y = _fmpz_vec_init(n);
