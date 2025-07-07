@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 #include "fmpz.h"
+#include "fmpq.h"
+#include "fmpq_vec.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
@@ -103,6 +105,92 @@ fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
         fmpq_poly_canonicalise(poly);
     }
 }
+
+void _fmpq_poly_interpolate_newton_fmpz_vec(fmpz *coeffs, fmpz_t den,
+                                                 const fmpz *xs, const fmpz *ys, slong n)
+{
+    fmpq *poly = _fmpq_vec_init(n);
+    fmpq_t p, t;
+    fmpz_t q;
+    fmpz_t t1;
+    slong i, j;
+
+    /* Constant */
+    if (n == 1)
+    {
+        fmpz_set(coeffs, ys);
+        fmpz_one(den);
+        return;
+    }
+
+    /* Linear */
+    if (n == 2)
+    {
+        fmpz_sub(den, xs, xs + 1);
+        fmpz_sub(coeffs + 1, ys, ys + 1);
+        fmpz_mul(coeffs, xs, ys + 1);
+        fmpz_submul(coeffs, xs + 1, ys);
+        return;
+    }
+
+    _fmpq_vec_set_fmpz_vec(poly, ys, n);
+
+    fmpq_init(p);
+    fmpz_init(q);
+    fmpq_init(t);
+
+    for (i = 1; i < n; i++)
+    {
+        fmpq_set(t, poly + i - 1);
+
+        for (j = i; j < n; j++)
+        {
+            fmpq_sub(p, poly + j, t);
+            fmpz_sub(q, xs + j, xs + j - i);
+            fmpq_swap(t, poly + j);
+            fmpq_div_fmpz(poly + j, p, q);
+        }
+    }
+    // Global denominator
+    for (i = 0; i < n; i++)
+        fmpz_lcm(den, den, fmpq_denref(poly + i));
+
+    for (i = 0; i < n; i++)
+    {
+        fmpz_divexact(t1, den, fmpq_denref(poly + i));
+        fmpz_mul(coeffs + i, fmpq_numref(poly + i), t1);
+    }
+     FMPZ_VEC_NORM(coeffs, n);
+    _fmpz_poly_newton_to_monomial(coeffs, xs, n);
+
+    _fmpq_vec_clear(poly, n);
+    fmpq_clear(p);
+    fmpz_clear(q);
+    fmpq_clear(t);
+    fmpz_clear(t1);
+}
+
+void
+fmpq_poly_interpolate_newton_fmpz_vec(fmpq_poly_t poly,
+                                    const fmpz * xs, const fmpz * ys, slong n)
+{
+    if (n == 0)
+    {
+        fmpq_poly_zero(poly);
+    }
+    else if (n == 1)
+    {
+        fmpq_poly_set_fmpz(poly, ys);
+    }
+    else
+    {
+        fmpq_poly_fit_length(poly, n);
+        _fmpq_poly_interpolate_newton_fmpz_vec(poly->coeffs, poly->den, xs, ys, n);
+        _fmpq_poly_set_length(poly, n);
+        fmpq_poly_canonicalise(poly);
+    }
+}
+
 
 void
 fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
