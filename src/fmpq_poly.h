@@ -616,6 +616,18 @@ void fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a)
 
 /*  Interpolation ************************************************************/
 
+void _fmpq_poly_interpolate_fmpq_vec(fmpz *coeffs, fmpz_t den,
+                                            const fmpq *xs, const fmpq *ys, slong n);
+
+void fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
+                                    const fmpq * xs, const fmpq * ys, slong n);
+
+void _fmpq_poly_interpolate_fmpz_fmpq_vec(fmpz * poly, fmpz_t den,
+                                    const fmpz * xs, const fmpq * ys, slong n);
+
+void fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
+                                        const fmpz * xs, const fmpq * ys, slong n);
+
 void _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
                                     const fmpz * xs, const fmpz * ys, slong n);
 
@@ -623,22 +635,10 @@ void fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, slong n);
 
 void _fmpq_poly_interpolate_newton_fmpz_vec(fmpz *coeffs, fmpz_t den,
-                                                 const fmpz *xs, const fmpz *ys, slong n);
+                                            const fmpz *xs, const fmpz *ys, slong n);
 
 void fmpq_poly_interpolate_newton_fmpz_vec(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpz * ys, slong n);
-
-void fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpq * ys, slong n);
-
-void fmpq_poly_interpolate_fmpz_fmpq_vec_bis(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpq * ys, slong n);
-
-void fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
-                                    const fmpq * xs, const fmpq * ys, slong n);
-
-void fmpq_poly_interpolate_fmpq_vec_bis(fmpq_poly_t poly,
-                                    const fmpq * xs, const fmpq * ys, slong n);
+                                            const fmpz *xs, const fmpz *ys, slong n);
 
 /*  Composition  *************************************************************/
 

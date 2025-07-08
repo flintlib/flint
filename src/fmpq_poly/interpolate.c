@@ -193,59 +193,7 @@ fmpq_poly_interpolate_newton_fmpz_vec(fmpq_poly_t poly,
 
 
 void
-fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpq * ys, slong n)
-{
-    fmpz *yi;
-    fmpz_t Y_den, tmp;
-
-    slong i;
-
-    if (n == 0)
-    {
-        fmpq_poly_zero(poly);
-        return;
-    }
-
-    if (n == 1)
-    {
-        fmpq_poly_set_fmpq(poly, ys);
-        return;
-    }
-
-    yi = _fmpz_vec_init(n);
-    fmpz_init(Y_den);
-    fmpz_init(tmp);
-
-    // LCM of denominators of the ys -> Y_den
-    fmpz_set_ui(Y_den, 1);
-    for (i = 0; i < n; i++)
-        fmpz_lcm(Y_den, Y_den, fmpq_denref(ys + i));
-
-    // Convert to integer samples
-    for (i = 0; i < n; i++)
-    {
-        // yi = ci * (Y_den / di) where ys = ci/di
-        fmpz_divexact(tmp, Y_den, fmpq_denref(ys + i));
-        fmpz_mul(yi + i, fmpq_numref(ys + i), tmp);
-    }
-
-    // Allocation and interpolation
-    fmpq_poly_fit_length(poly, n);
-    _fmpq_poly_interpolate_fmpz_vec(poly->coeffs, poly->den, xs, yi, n);
-
-    // Ajust denominators: P / Y_den
-    fmpz_mul(poly->den, poly->den, Y_den);
-    _fmpq_poly_set_length(poly, n);
-    fmpq_poly_canonicalise(poly);
-
-    _fmpz_vec_clear(yi, n);
-    fmpz_clear(Y_den);
-    fmpz_clear(tmp);
-}
-
-void
-_fmpq_poly_interpolate_fmpz_fmpq_vec_bis(fmpz * poly, fmpz_t den,
+_fmpq_poly_interpolate_fmpz_fmpq_vec(fmpz * poly, fmpz_t den,
                                     const fmpz * xs, const fmpq * ys, slong n)
 {
     fmpz *P, *Q, *w;
@@ -253,21 +201,35 @@ _fmpq_poly_interpolate_fmpz_fmpq_vec_bis(fmpz * poly, fmpz_t den,
 
     slong i, j;
 
-    /* Constant */
+   /* Constant */
     if (n == 1)
     {
-        fmpz_set(poly, ys);
-        fmpz_one(den);
+        fmpz_set(poly, fmpq_numref(ys));
+        fmpz_set(den, fmpq_denref(ys));
         return;
     }
 
     /* Linear */
     if (n == 2)
     {
+        fmpz_t Dy;
+        fmpz *yi;
+
+        fmpz_init(Dy);
+        yi = _fmpz_vec_init(2);
+
+        fmpz_lcm(Dy, fmpq_denref(ys), fmpq_denref(ys + 1));
+
+        for (i=0; i < 2; i++) {
+            fmpz_divexact(yi + i, Dy, fmpq_denref(ys + i));
+            fmpz_mul(yi + i, yi + i, fmpq_numref(ys + i));
+        }
         fmpz_sub(den, xs, xs + 1);
-        fmpz_sub(poly + 1, ys, ys + 1);
-        fmpz_mul(poly, xs, ys + 1);
-        fmpz_submul(poly, xs + 1, ys);
+        fmpz_mul(den, den, Dy);
+
+        fmpz_sub(poly + 1, yi, yi + 1);
+        fmpz_mul(poly, xs, yi + 1);
+        fmpz_submul(poly, xs + 1, yi);
         return;
     }
 
@@ -316,7 +278,7 @@ _fmpq_poly_interpolate_fmpz_fmpq_vec_bis(fmpz * poly, fmpz_t den,
 }
 
 void
-fmpq_poly_interpolate_fmpz_fmpq_vec_bis(fmpq_poly_t poly,
+fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
                                     const fmpz * xs, const fmpq * ys, slong n)
 {
     if (n == 0)
@@ -325,57 +287,19 @@ fmpq_poly_interpolate_fmpz_fmpq_vec_bis(fmpq_poly_t poly,
     }
     else if (n == 1)
     {
-        fmpq_poly_set_fmpz(poly, ys);
+        fmpq_poly_set_fmpq(poly, ys);
     }
     else
     {
         fmpq_poly_fit_length(poly, n);
-        _fmpq_poly_interpolate_fmpz_fmpq_vec_bis(poly->coeffs, poly->den, xs, ys, n);
+        _fmpq_poly_interpolate_fmpz_fmpq_vec(poly->coeffs, poly->den, xs, ys, n);
         _fmpq_poly_set_length(poly, n);
         fmpq_poly_canonicalise(poly);
     }
 }
 
 void
-_fmpz_poly_div_root_fmpq(fmpz *Q, fmpz_t Q_den, const fmpz *A, slong len, const fmpz_t den, const fmpq_t x)
-{
-    if (len < 2)
-        return;
-
-    fmpz_t r, t;
-
-    fmpz_init(r);
-    fmpz_init(t);
-    // Extract x = a / b
-
-    // r = A[len - 1]
-    fmpz_set(r, A + len - 1);
-
-    for (slong i = len - 2; i > 0; i--)
-    {
-        // t = r * a
-        fmpz_mul(t, r, fmpq_numref(x));
-        // t = t + b * A[i]
-        fmpz_addmul(t, fmpq_denref(x), A + i);
-        // Q[i] = r
-        fmpz_swap(Q + i, r);
-        // r = t
-        fmpz_swap(r, t);
-    }
-
-    // Q[0] = r
-    fmpz_swap(Q, r);
-
-    // Final output denominator = den * b^{deg - 1}
-    fmpz_pow_ui(Q_den, fmpq_denref(x), len - 1);
-    fmpz_mul(Q_den, Q_den, den);
-
-    fmpz_clear(r);
-    fmpz_clear(t);
-}
-
-void
-_fmpz_poly_div_root_fmpq_bis(fmpz *Q, const fmpz *A, slong len, const fmpq_t x)
+_fmpz_poly_div_root_fmpq(fmpz *Q, const fmpz *A, slong len, const fmpq_t x)
 {
     if (len < 2)
         return;
@@ -409,63 +333,8 @@ _fmpz_poly_div_root_fmpq_bis(fmpz *Q, const fmpz *A, slong len, const fmpq_t x)
     fmpz_clear(t);
 }
 
-
 void
-_fmpq_poly_product_roots_fmpq_vec_std(fmpz * poly, fmpz * den, const fmpq * xs, slong n)
-{
-    if (n == 0)
-    {
-        fmpz_one(poly);
-        fmpz_one(den);
-    }
-    else if (n < 20)
-    {
-        slong i, j;
-        fmpz_t tmp;
-        fmpz_init(tmp);
-
-        fmpz_set(den, fmpq_denref(xs));
-        fmpz_set(poly + n, den);
-        fmpz_neg(poly + n - 1, fmpq_numref(xs));
-
-        for (i = 1; i < n; i++)
-        {
-            fmpz_lcm(den, den, fmpq_denref(xs + i));
-            fmpz_divexact(tmp, den, fmpq_denref(xs + i));
-            fmpz_mul(poly + n - i - 1, poly + n - i, tmp);
-            fmpz_neg(poly + n - i - 1, poly + n - i - 1);
-            for (j = 0; j < i; j++) {
-                fmpz_mul(poly + n - i + j, poly + n - i + j, den);
-                fmpz_submul(poly + n - i + j, poly + n - i + j + 1, tmp);
-            }
-        }
-
-        fmpz_clear(tmp);
-    }
-    else
-    {
-        slong m;
-        fmpz * t_poly;
-        fmpz_t t_den;
-
-        m = (n + 1) / 2;
-
-        t_poly = _fmpz_vec_init(n + 2);
-        fmpz_init(t_den);
-
-        _fmpq_poly_product_roots_fmpq_vec_std(t_poly, t_den, xs, m);
-        fmpz_set(den, t_den);
-        _fmpq_poly_product_roots_fmpq_vec_std(t_poly + m + 1, t_den, xs + m, n - m);
-        fmpz_mul(den, den, t_den);
-        _fmpz_poly_mul(poly, t_poly, m + 1, t_poly + m + 1, n - m + 1);
-
-        _fmpz_vec_clear(t_poly, n + 2);
-        fmpz_clear(t_den);
-    }
-}
-
-void
-_fmpq_poly_product_roots_fmpq_vec_bis(fmpz * poly, const fmpq * xs, slong n)
+_fmpq_poly_product_roots_fmpq_vec(fmpz * poly, const fmpq * xs, slong n)
 {
     if (n == 0)
     {
@@ -499,8 +368,8 @@ _fmpq_poly_product_roots_fmpq_vec_bis(fmpz * poly, const fmpq * xs, slong n)
 
         t_poly = _fmpz_vec_init(n + 2);
 
-        _fmpq_poly_product_roots_fmpq_vec_bis(t_poly, xs, m);
-        _fmpq_poly_product_roots_fmpq_vec_bis(t_poly + m + 1, xs + m, n - m);
+        _fmpq_poly_product_roots_fmpq_vec(t_poly, xs, m);
+        _fmpq_poly_product_roots_fmpq_vec(t_poly + m + 1, xs + m, n - m);
         _fmpz_poly_mul(poly, t_poly, m + 1, t_poly + m + 1, n - m + 1);
 
         _fmpz_vec_clear(t_poly, n + 2);
@@ -509,7 +378,7 @@ _fmpq_poly_product_roots_fmpq_vec_bis(fmpz * poly, const fmpq * xs, slong n)
 
 
 void
-_fmpq_poly_interpolate_fmpq_vec_bis(fmpz * poly, fmpz_t den,
+_fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
                                     const fmpq * xs, const fmpq * ys, slong n)
 {
     slong i, j;
@@ -563,7 +432,7 @@ _fmpq_poly_interpolate_fmpq_vec_bis(fmpz * poly, fmpz_t den,
     w = _fmpz_vec_init(n);
 
     /* P = (x-x[0])*(x-x[1])*...*(x-x[n-1]) */
-    _fmpq_poly_product_roots_fmpq_vec_bis(P, xs, n);
+    _fmpq_poly_product_roots_fmpq_vec(P, xs, n);
 
     /* Weights */
     for (i = 0; i < n; i++)
@@ -588,7 +457,7 @@ _fmpq_poly_interpolate_fmpq_vec_bis(fmpz * poly, fmpz_t den,
     for (i = 0; i < n; i++)
     {
         /* Q = P / (x - x[i]) */ //This has to be adapted
-        _fmpz_poly_div_root_fmpq_bis(Q, P, n + 1, xs + i);
+        _fmpz_poly_div_root_fmpq(Q, P, n + 1, xs + i);
 
         /* result += Q * weight(i) */
 
@@ -609,7 +478,7 @@ _fmpq_poly_interpolate_fmpq_vec_bis(fmpz * poly, fmpz_t den,
 }
 
 void
-fmpq_poly_interpolate_fmpq_vec_bis(fmpq_poly_t poly,
+fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
                                     const fmpq * xs, const fmpq * ys, slong n)
 {
     if (n == 0)
@@ -623,81 +492,8 @@ fmpq_poly_interpolate_fmpq_vec_bis(fmpq_poly_t poly,
     else
     {
         fmpq_poly_fit_length(poly, n);
-        _fmpq_poly_interpolate_fmpq_vec_bis(poly->coeffs, poly->den, xs, ys, n);
+        _fmpq_poly_interpolate_fmpq_vec(poly->coeffs, poly->den, xs, ys, n);
         _fmpq_poly_set_length(poly, n);
         fmpq_poly_canonicalise(poly);
     }
-}
-
-
-void
-fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
-                                    const fmpq * xs, const fmpq * ys, slong n)
-{
-    fmpz *xi, *yi;
-    fmpz_t X_den, Y_den, tmp;
-
-    slong i;
-
-    if (n == 0)
-    {
-        fmpq_poly_zero(poly);
-        return;
-    }
-
-    if (n == 1)
-    {
-        fmpq_poly_set_fmpq(poly, ys);
-        return;
-    }
-
-    xi = _fmpz_vec_init(n);
-    yi = _fmpz_vec_init(n);
-    fmpz_init(X_den);
-    fmpz_init(Y_den);
-    fmpz_init(tmp);
-
-    // LCM of denominators of the xs -> X_den
-    fmpz_set_ui(X_den, 1);
-    for (i = 0; i < n; i++)
-        fmpz_lcm(X_den, X_den, fmpq_denref(xs + i));
-
-    // LCM of denominators of the ys -> Y_den
-    fmpz_set_ui(Y_den, 1);
-    for (i = 0; i < n; i++)
-        fmpz_lcm(Y_den, Y_den, fmpq_denref(ys + i));
-
-    // Convert to integer samples
-    for (i = 0; i < n; i++)
-    {
-        // xi = ai * (X_den / bi) where xs = ai/bi
-        fmpz_divexact(tmp, X_den, fmpq_denref(xs + i));
-        fmpz_mul(xi + i, fmpq_numref(xs + i), tmp);
-
-        // yi = ci * (Y_den / di) where ys = ci/di
-        fmpz_divexact(tmp, Y_den, fmpq_denref(ys + i));
-        fmpz_mul(yi + i, fmpq_numref(ys + i), tmp);
-    }
-
-    // Allocation and interpolation
-    fmpq_poly_fit_length(poly, n);
-    _fmpq_poly_interpolate_fmpz_vec(poly->coeffs, poly->den, xi, yi, n);
-
-    // Adjust variable: P(x/X_den) => multiply x^k coeff by X_den^k
-    fmpz_set(tmp, X_den);
-    for (i = 1; i < n; i++)
-    {
-        fmpz_mul(poly->coeffs + i, poly->coeffs + i, tmp);
-        fmpz_mul(tmp, tmp, X_den); // tmp = X_den^i
-    }
-    // Ajust denominators: P / Y_den
-    fmpz_mul(poly->den, poly->den, Y_den);
-    _fmpq_poly_set_length(poly, n);
-    fmpq_poly_canonicalise(poly);
-
-    _fmpz_vec_clear(xi, n);
-    _fmpz_vec_clear(yi, n);
-    fmpz_clear(X_den);
-    fmpz_clear(Y_den);
-    fmpz_clear(tmp);
 }
