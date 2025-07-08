@@ -1390,7 +1390,7 @@ Interpolation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den, const fmpz * xs, const fmpz * ys, slong n)
+.. function:: void _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
 
     Sets ``poly`` / ``den`` to the unique interpolating polynomial of
     degree at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
@@ -1407,6 +1407,12 @@ Interpolation
     interpolation, clearing denominators to avoid working with fractions.
     It is currently not designed to be efficient for large `n`.
 
+.. function:: void fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
+
+    Sets ``poly`` to the unique interpolating polynomial of degree
+    at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
+    in ``xs`` and ``ys``. It is assumed that the `x` values are distinct.
+
 .. function:: void fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
 
     Sets ``poly`` to the unique interpolating polynomial of degree
@@ -1418,13 +1424,6 @@ Interpolation
     Sets ``poly`` to the unique interpolating polynomial of degree
     at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
     in ``xs`` and ``ys``. It is assumed that the `x` values are distinct.
-
-.. function:: void fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
-
-    Sets ``poly`` to the unique interpolating polynomial of degree
-    at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
-    in ``xs`` and ``ys``. It is assumed that the `x` values are distinct.
-
 
 Composition
 --------------------------------------------------------------------------------
