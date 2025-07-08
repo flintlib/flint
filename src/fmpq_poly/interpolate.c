@@ -15,205 +15,10 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
+
+// computes A / (b*x-a) where x = a / b is a root of A = prod_i(bi*x-ai)
 void
-_fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
-                                    const fmpz * xs, const fmpz * ys, slong n)
-{
-    fmpz *P, *Q, *w;
-    fmpz_t t;
-
-    slong i, j;
-
-    /* Constant */
-    if (n == 1)
-    {
-        fmpz_set(poly, ys);
-        fmpz_one(den);
-        return;
-    }
-
-    /* Linear */
-    if (n == 2)
-    {
-        fmpz_sub(den, xs, xs + 1);
-        fmpz_sub(poly + 1, ys, ys + 1);
-        fmpz_mul(poly, xs, ys + 1);
-        fmpz_submul(poly, xs + 1, ys);
-        return;
-    }
-
-    fmpz_init(t);
-
-    P = _fmpz_vec_init(n + 1);
-    Q = _fmpz_vec_init(n);
-    w = _fmpz_vec_init(n);
-
-    /* P = (x-x[0])*(x-x[1])*...*(x-x[n-1]) */
-    _fmpz_poly_product_roots_fmpz_vec(P, xs, n);
-
-    /* Weights */
-    for (i = 0; i < n; i++)
-    {
-        fmpz_one(w + i);
-        for (j = 0; j < n; j++)
-        {
-            if (i != j)
-            {
-                fmpz_sub(t, xs + i, xs + j);
-                fmpz_mul(w + i, w + i, t);
-            }
-        }
-    }
-
-    _fmpz_vec_zero(poly, n);
-    _fmpz_vec_lcm(den, w, n);
-
-    for (i = 0; i < n; i++)
-    {
-        /* Q = P / (x - x[i]) */
-        _fmpz_poly_div_root(Q, P, n + 1, xs + i);
-
-        /* result += Q * weight(i) */
-        fmpz_divexact(t, den, w + i);
-        fmpz_mul(t, t, ys + i);
-        _fmpz_vec_scalar_addmul_fmpz(poly, Q, n, t);
-    }
-
-    _fmpz_vec_clear(P, n + 1);
-    _fmpz_vec_clear(Q, n);
-    _fmpz_vec_clear(w, n);
-    fmpz_clear(t);
-}
-
-void
-fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpz * ys, slong n)
-{
-    if (n == 0)
-    {
-        fmpq_poly_zero(poly);
-    }
-    else if (n == 1)
-    {
-        fmpq_poly_set_fmpz(poly, ys);
-    }
-    else
-    {
-        fmpq_poly_fit_length(poly, n);
-        _fmpq_poly_interpolate_fmpz_vec(poly->coeffs, poly->den, xs, ys, n);
-        _fmpq_poly_set_length(poly, n);
-        fmpq_poly_canonicalise(poly);
-    }
-}
-
-void
-_fmpq_poly_interpolate_fmpz_fmpq_vec(fmpz * poly, fmpz_t den,
-                                    const fmpz * xs, const fmpq * ys, slong n)
-{
-    fmpz *P, *Q, *w;
-    fmpz_t t;
-
-    slong i, j;
-
-   /* Constant */
-    if (n == 1)
-    {
-        fmpz_set(poly, fmpq_numref(ys));
-        fmpz_set(den, fmpq_denref(ys));
-        return;
-    }
-
-    /* Linear */
-    if (n == 2)
-    {
-        fmpz_t Dy;
-        fmpz *yi;
-
-        fmpz_init(Dy);
-        yi = _fmpz_vec_init(2);
-
-        fmpz_lcm(Dy, fmpq_denref(ys), fmpq_denref(ys + 1));
-
-        for (i=0; i < 2; i++) {
-            fmpz_divexact(yi + i, Dy, fmpq_denref(ys + i));
-            fmpz_mul(yi + i, yi + i, fmpq_numref(ys + i));
-        }
-        fmpz_sub(den, xs, xs + 1);
-        fmpz_mul(den, den, Dy);
-
-        fmpz_sub(poly + 1, yi, yi + 1);
-        fmpz_mul(poly, xs, yi + 1);
-        fmpz_submul(poly, xs + 1, yi);
-        return;
-    }
-
-    fmpz_init(t);
-
-    P = _fmpz_vec_init(n + 1);
-    Q = _fmpz_vec_init(n);
-    w = _fmpz_vec_init(n);
-
-    /* P = (x-x[0])*(x-x[1])*...*(x-x[n-1]) */
-    _fmpz_poly_product_roots_fmpz_vec(P, xs, n);
-
-
-    /* Weights */
-    for (i = 0; i < n; i++)
-    {
-        fmpz_set(w + i, fmpq_denref(ys + i));
-        for (j = 0; j < n; j++)
-        {
-            if (i != j)
-            {
-                fmpz_sub(t, xs + i, xs + j);
-                fmpz_mul(w + i, w + i, t);
-            }
-        }
-    }
-
-    _fmpz_vec_zero(poly, n);
-    _fmpz_vec_lcm(den, w, n);
-
-    for (i = 0; i < n; i++)
-    {
-        /* Q = P / (x - x[i]) */
-        _fmpz_poly_div_root(Q, P, n + 1, xs + i);
-
-        /* result += Q * weight(i) */
-        fmpz_divexact(t, den, w + i);
-        fmpz_mul(t, t, fmpq_numref(ys + i));
-        _fmpz_vec_scalar_addmul_fmpz(poly, Q, n, t);
-    }
-
-    _fmpz_vec_clear(P, n + 1);
-    _fmpz_vec_clear(Q, n);
-    _fmpz_vec_clear(w, n);
-    fmpz_clear(t);
-}
-
-void
-fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpq * ys, slong n)
-{
-    if (n == 0)
-    {
-        fmpq_poly_zero(poly);
-    }
-    else if (n == 1)
-    {
-        fmpq_poly_set_fmpq(poly, ys);
-    }
-    else
-    {
-        fmpq_poly_fit_length(poly, n);
-        _fmpq_poly_interpolate_fmpz_fmpq_vec(poly->coeffs, poly->den, xs, ys, n);
-        _fmpq_poly_set_length(poly, n);
-        fmpq_poly_canonicalise(poly);
-    }
-}
-
-void
-_fmpz_poly_div_root_fmpq(fmpz *Q, const fmpz *A, slong len, const fmpq_t x)
+_fmpz_poly_div_root_fmpq(fmpz * Q, const fmpz * A, slong len, const fmpq_t x)
 {
     if (len < 2)
         return;
@@ -223,30 +28,27 @@ _fmpz_poly_div_root_fmpq(fmpz *Q, const fmpz *A, slong len, const fmpq_t x)
     fmpz_init(r);
     fmpz_init(t);
 
-    // r = A[len - 1]
+    // r = A[len - 1] / b
     fmpz_divexact(r, A + len - 1, fmpq_denref(x));
 
     for (slong i = len - 2; i > 0; i--)
     {
-        //x = a / b
-        // t = r * a
-        fmpz_mul(t, r, fmpq_numref(x));
-        // t = t + b * A[i]
-        fmpz_add(t, t, A + i);
+        // Q[i] = (A[i] + Q[i+1] * a) / b
+        fmpz_set(t, A + i);
+        fmpz_addmul(t, r, fmpq_numref(x));
         fmpz_divexact(t, t, fmpq_denref(x));
-        // Q[i] = r
+
         fmpz_swap(Q + i, r);
-        // r = t
         fmpz_swap(r, t);
     }
-
-    // Q[0] = r
+    // Q[0] = (A[0] + Q[1] * a) / b
     fmpz_swap(Q, r);
 
     fmpz_clear(r);
     fmpz_clear(t);
 }
 
+// computes prod_i(bi*x - ai) where x = ai/bi
 void
 _fmpq_poly_product_roots_fmpq_vec(fmpz * poly, const fmpq * xs, slong n)
 {
@@ -263,24 +65,23 @@ _fmpq_poly_product_roots_fmpq_vec(fmpz * poly, const fmpq * xs, slong n)
 
         for (i = 1; i < n; i++)
         {
+            // new_trail_coeff = -ai * old_trail_coeff
             fmpz_mul(poly + n - i - 1, poly + n - i, fmpq_numref(xs + i));
             fmpz_neg(poly + n - i - 1, poly + n - i - 1);
+            // new_coeff_deg(j+1) = old_coeff_deg(j)*bi - old_coeff_deg(j+1)*ai
             for (j = 0; j < i; j++) {
                 fmpz_mul(poly + n - i + j, poly + n - i + j, fmpq_denref(xs + i));
                 fmpz_submul(poly + n - i + j, poly + n - i + j + 1, fmpq_numref(xs + i));
             }
+            // new_lead_coeff = bi * old_lead_coeff
             fmpz_mul(poly + n, poly + n, fmpq_denref(xs + i));
         }
 
     }
     else
     {
-        slong m;
-        fmpz *t_poly;
-
-        m = (n + 1) / 2;
-
-        t_poly = _fmpz_vec_init(n + 2);
+        fmpz * t_poly _fmpz_vec_init(n + 2);
+        slong m = (n + 1) / 2;
 
         _fmpq_poly_product_roots_fmpq_vec(t_poly, xs, m);
         _fmpq_poly_product_roots_fmpq_vec(t_poly + m + 1, xs + m, n - m);
@@ -319,9 +120,11 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
         fmpz_lcm(Dx, fmpq_denref(xs), fmpq_denref(xs + 1));
         fmpz_lcm(Dy, fmpq_denref(ys), fmpq_denref(ys + 1));
 
-        for (i=0; i < 2; i++) {
+        for (i = 0; i < 2; i++) {
+            // xi = Dx * xs
             fmpz_divexact(xi + i, Dx, fmpq_denref(xs + i));
             fmpz_mul(xi + i, xi + i, fmpq_numref(xs + i));
+            // yi = Dy * ys
             fmpz_divexact(yi + i, Dy, fmpq_denref(ys + i));
             fmpz_mul(yi + i, yi + i, fmpq_numref(ys + i));
         }
@@ -334,8 +137,7 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
         return;
     }
 
-    fmpz *P, *Q;
-    fmpz *w;
+    fmpz *P, *Q, *w;
     fmpz_t t, t1;
 
     fmpz_init(t);
@@ -345,10 +147,10 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
     Q = _fmpz_vec_init(n);
     w = _fmpz_vec_init(n);
 
-    /* P = (x-x[0])*(x-x[1])*...*(x-x[n-1]) */
+    /* P = (b[0]*x-a[0])*(b[1]*x-a[1])*...*(b[n-1]*x-a[n-1]) with xs[i]=a[i]/b[i]*/
     _fmpq_poly_product_roots_fmpq_vec(P, xs, n);
 
-    /* Weights */
+    /* Weights: w[i] = d[i] * prod_(j!=i) (a[i]*b[j] - a[j]*b[j]) with ys[i] = c[i]/d[i]*/
     for (i = 0; i < n; i++)
     {
         fmpz_set(w + i, fmpq_denref(ys + i));
@@ -364,22 +166,18 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
     }
 
     _fmpz_vec_zero(poly, n);
-    fmpz_one(den);
-    for (i=0; i < n; i++)
-        fmpz_lcm(den, den, w + i);
+    _fmpz_vec_lcm(den, w, n);
 
     for (i = 0; i < n; i++)
     {
-        /* Q = P / (x - x[i]) */ //This has to be adapted
+        /* Q = P / (b[i]*x - a[i]) with xs[i]=a[i]/b[i]*/
         _fmpz_poly_div_root_fmpq(Q, P, n + 1, xs + i);
 
-        /* result += Q * weight(i) */
-
+        /* poly += (den / w[i]) * c[i] * b[i]^(n-1) * Q(x) */
         fmpz_divexact(t, den, w + i);
-
+        fmpz_mul(t, t, fmpq_numref(ys + i));
         fmpz_pow_ui(t1, fmpq_denref(xs + i), n - 1);
         fmpz_mul(t, t, t1);
-        fmpz_mul(t, t, fmpq_numref(ys + i));
 
         _fmpz_vec_scalar_addmul_fmpz(poly, Q, n, t);
     }
@@ -407,6 +205,56 @@ fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
     {
         fmpq_poly_fit_length(poly, n);
         _fmpq_poly_interpolate_fmpq_vec(poly->coeffs, poly->den, xs, ys, n);
+        _fmpq_poly_set_length(poly, n);
+        fmpq_poly_canonicalise(poly);
+    }
+}
+
+void
+fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
+                                    const fmpz * xs, const fmpq * ys, slong n)
+{
+    if (n == 0)
+    {
+        fmpq_poly_zero(poly);
+    }
+    else if (n == 1)
+    {
+        fmpq_poly_set_fmpq(poly, ys);
+    }
+    else
+    {
+        fmpq * ys1 = _fmpq_vec_init(n);
+        _fmpq_vec_set_fmpz_vec(ys1, ys);
+
+        fmpq_poly_fit_length(poly, n);
+        _fmpq_poly_interpolate_fmpq_vec(poly->coeffs, poly->den, xs, ys1, n);
+        _fmpq_poly_set_length(poly, n);
+        fmpq_poly_canonicalise(poly);
+    }
+}
+
+void
+fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
+                                    const fmpz * xs, const fmpz * ys, slong n)
+{
+    if (n == 0)
+    {
+        fmpq_poly_zero(poly);
+    }
+    else if (n == 1)
+    {
+        fmpq_poly_set_fmpz(poly, ys);
+    }
+    else
+    {
+        fmpq * xs1 = _fmpq_vec_init(n);
+        fmpq * ys1 = _fmpq_vec_init(n);
+        _fmpq_vec_set_fmpz_vec(xs1, xs);
+        _fmpq_vec_set_fmpz_vec(ys1, ys);
+
+        fmpq_poly_fit_length(poly, n);
+        _fmpq_poly_interpolate_fmpq_vec(poly->coeffs, poly->den, xs1, ys1, n);
         _fmpq_poly_set_length(poly, n);
         fmpq_poly_canonicalise(poly);
     }
