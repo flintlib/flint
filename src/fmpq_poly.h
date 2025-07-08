@@ -631,7 +631,13 @@ void fmpq_poly_interpolate_newton_fmpz_vec(fmpq_poly_t poly,
 void fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
                                     const fmpz * xs, const fmpq * ys, slong n);
 
+void fmpq_poly_interpolate_fmpz_fmpq_vec_bis(fmpq_poly_t poly,
+                                    const fmpz * xs, const fmpq * ys, slong n);
+
 void fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
+                                    const fmpq * xs, const fmpq * ys, slong n);
+
+void fmpq_poly_interpolate_fmpq_vec_bis(fmpq_poly_t poly,
                                     const fmpq * xs, const fmpq * ys, slong n);
 
 /*  Composition  *************************************************************/
