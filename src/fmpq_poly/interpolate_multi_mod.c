@@ -23,6 +23,7 @@
 #include "ulong_extras.h"
 #include "gr.h"
 #include "gr_poly.h"
+#include "profiler.h"
 
 static void
 _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong n)
@@ -157,8 +158,9 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     cs = _fmpz_vec_init(n);
     ds = _fmpz_vec_init(n);
 
-    coeffs = _fmpq_vec_init(n);
+    timeit_t t0, t1;
 
+    coeffs = _fmpq_vec_init(n);
     for (i = 0; i < n; i++) {
         fmpz_set(as + i, fmpq_numref(xs + i));
         fmpz_set(bs + i, fmpq_denref(xs + i));
@@ -172,15 +174,17 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
 
         w_i = prod_{j != i} (x - x_i) / (x_j - x_i)
 
-        height(w_i) <= height((x - max height(x_i))^(n-1))
-                    <= (2 max height(x_i))^(n-1)
+        height(w_i) <= height(max height(x_i^(n-1)) / max height(x_i^(2(n-1)))
+                    <= (max height(x_i)) * 2(n-1)
 
-        height(f) <= sum_i height(y_i) height(w_i)^(n -1)
+        height(f) <= sum_i height(y_i) + height(w_i) * 2(n -1)
+                  <= n * ( height(y_i) + height(w_i) * 2(n -1) )
     */
 
     xbits = FLINT_ABS(_fmpz_vec_max_bits(as, n)) + FLINT_ABS(_fmpz_vec_max_bits(bs, n));
     ybits = FLINT_ABS(_fmpz_vec_max_bits(cs, n)) + FLINT_ABS(_fmpz_vec_max_bits(ds, n));
-    bound_bits = (xbits + 1) * 2 * (n - 1) + FLINT_BIT_COUNT(n) * ybits;
+    bound_bits = n * (xbits  * (n - 1) + ybits);
+    flint_printf("%ld %ld\n", xbits, ybits);
 
     xm = _nmod_vec_init(n);
     ym = _nmod_vec_init(n);
@@ -194,6 +198,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     //flint_printf("(%wd, %wd)\n", xbits, ybits);
     for (;;)
     {
+        timeit_start(t1);
         if (total_primes < 16)
         {
             /*todo: divides no den? */
@@ -263,17 +268,20 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             for (j = 0; j < n; j++)
             {
                 /* todo: do iterative evaluation may perform better if small values */
+               //flint_printf("modular reduction of xs\n");
                 fmpz_multi_mod_ui(residues, as + j, comb, temp);
                 fmpz_multi_mod_ui(residuesden, bs + j, comb, temp);
                 for (k = 0; k < num_primes; k++) {
                     nmod_init(&mod, primes[k]);
                     xmod[k * n + j] = nmod_div(residues[k], residuesden[k], mod);
                 }
+                //flint_printf("modular reduction of ys\n");
                 fmpz_multi_mod_ui(residues, cs + j, comb, temp);
                 fmpz_multi_mod_ui(residuesden, ds + j, comb, temp);
                 for (k = 0; k < num_primes; k++) {
                     nmod_init(&mod, primes[k]);
-                    ymod[k * n + j] = nmod_div(residues[i], residuesden[i], mod);
+                    //flint_printf("\t%lu %lu %lu\n", residuesden[k], mod.n, primes[k]);
+                    ymod[k * n + j] = nmod_div(residues[k], residuesden[k], mod);
                 }
             }
 
@@ -317,6 +325,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
 
             if (num_primes != 0)
             {
+                //flint_printf("CRT\n");
                 fmpz_mul(M1M2, M, M2);
                 fmpz_mod(c, M, M2);
                 fmpz_invmod(c, c, M2);
@@ -332,8 +341,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                     _fmpz_CRT(u, poly + j, M, t, M2, M1M2, c, 0);
                     fmpz_set(poly + j, u);
                 }
-
-                fmpz_swap(M, M1M2);
+                fmpz_set(M, M1M2);
             }
 
             fmpz_comb_temp_clear(temp);
@@ -341,8 +349,10 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
         }
 
         total_primes += num_primes;
+        timeit_stop(t1);
+        //flint_printf("interp + CRT: cpu = %ld ms wall = %ld ms\n", t1->cpu, t1->wall);
 
-        /* At that step we have poly modulo M,
+        /* At that step we have in poly, the polynomial modulo M,
            which a product of total_primes primes */
         //flint_printf("Reconstruct\n");
         //_fmpz_vec_print(poly, n);flint_printf("\n modulo= ");
@@ -351,10 +361,13 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
         /* todo: handle failure */
         i = 0;
         rat_rec = 1;
+        timeit_start(t0);
         while (rat_rec && i < n) {
-            rat_rec |= fmpq_reconstruct_fmpz(coeffs + i, poly + i, M);
+            rat_rec = fmpq_reconstruct_fmpz(coeffs + i, poly + i, M);
             i++;
         }
+        timeit_stop(t0);
+        //flint_printf("Rat rec: stopped after %ld / %ld iteration; cpu = %ld ms wall = %ld ms\n", i, n, t0->cpu, t0->wall);
 
         /* No primes succeeded -- verify that evaluation points are actually OK */
         if (num_primes == 0 && !checked_unique)
@@ -368,18 +381,17 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
         }
         else if (rat_rec)
         {
-            //flint_printf("Checks\n");
+            flint_printf("Checks\n");
             //_fmpq_vec_print(coeffs, n); flint_printf("\n");
             /* Check for termination */
             if (_fmpq_poly_check_interpolant(coeffs, xs, ys, n)) {
                 _fmpq_vec_get_fmpz_vec_fmpz(poly, den, coeffs, n);
                 break;
             }
-
         }
 
         /* No solution */
-        if ((slong) fmpz_bits(M) > 10*bound_bits + 1)
+        if ((slong) fmpz_bits(M) > bound_bits + 1)
         {
             ok = 0;
             break;
@@ -398,6 +410,13 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
 
     _nmod_vec_clear(xm);
     _nmod_vec_clear(ym);
+
+    _fmpz_vec_clear(as, n);
+    _fmpz_vec_clear(bs, n);
+    _fmpz_vec_clear(cs, n);
+    _fmpz_vec_clear(ds, n);
+
+    _fmpq_vec_clear(coeffs, n);
 
     flint_free(primes);
     flint_free(xmod);
