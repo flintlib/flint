@@ -161,7 +161,7 @@ arb_set_float_str(arb_t res, const char * inp, slong prec)
          * all arb methods round down. */
         arf_set_round(arb_midref(t), arb_midref(res), prec, ARF_RND_NEAR);
         arf_swap(arb_midref(t), arb_midref(res));
-        arf_sub(arb_midref(t), arb_midref(t), arb_midref(res), 30, ARF_RND_DOWN);
+        arf_sub(arb_midref(t), arb_midref(t), arb_midref(res), 30, ARF_RND_UP);
         arb_add_error_arf(res, arb_midref(t));
 
         arb_clear(t);
