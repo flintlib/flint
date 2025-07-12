@@ -17,6 +17,14 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
+void
+_fmpq_vec_zero(fmpq * vec, slong len)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        fmpq_zero(vec + i);
+}
+
 fmpz ** _fmpz_poly_tree_alloc(slong len)
 {
     fmpz ** tree = NULL;
@@ -33,7 +41,7 @@ fmpz ** _fmpz_poly_tree_alloc(slong len)
     return tree;
 }
 
-void _fmpz_poly_tree_free(fmpz_t * tree, slong len)
+void _fmpz_poly_tree_free(fmpz ** tree, slong len)
 {
     if (len)
     {
@@ -122,38 +130,40 @@ _fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len)
 
 /* This gives some speedup for small lengths. */
 void
-_fmpz_poly_rem_2(fmpz * q, fmpz * r, const fmpz * a, slong al,
-                                     const fmpz * b, slong bl)
+_fmpz_poly_pseudo_rem_2(fmpz * q, fmpz * r, ulong * d, const fmpz * a, slong al,
+                                                const fmpz * b, slong bl)
 {
     if (al == 2)
     {
-        fmpz_mul(r, a + 1, b);
-        fmpz_sub(r, a, r);
+        fmpz_mul(r, a, b + 1);
+        fmpz_submul(r, a + 1, b);
     }
     else
     {
-        _fmpz_poly_divrem(q, r, a, al, b, bl);
+        _fmpz_poly_pseudo_divrem(q, r, d, a, al, b, bl, NULL);
     }
 }
 
 void
-_fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, fmpz_t den,
-    slong plen, const fmpz ** tree, slong len)
+_fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, const fmpz_t den,
+    slong plen, fmpz * const * tree, slong len)
 {
     slong height, i, j, pow, left;
     slong tree_height;
     slong tlen, alloc, qalloc;
-    fmpz * tmp, * q, * t, * tdens, * u, * swap, * pa, * pb, * pc;
+    ulong d;
+    fmpz * tmp, * q, * t, * tdens, * u, * swap, * pa, * pb, * pc, * pd;
+    fmpz_t tmpdens;
 
     /* avoid worrying about some degenerate cases */
     if (len < 2 || plen < 2)
     {
         if (len == 1)
         {
-            fmpz_init(tmp);
-            fmpz_neg(tmp, tree[0]);
-            _fmpq_poly_evaluate_fmpq(fmpq_numref(vs), fmpq_denref(vs), poly, den, plen, tmp, tree[0] + 1);
-            fmpz_clear(tmp);
+            fmpz_init(tmpdens);
+            fmpz_neg(tmpdens, tree[0]);
+            _fmpq_poly_evaluate_fmpq(fmpq_numref(vs), fmpq_denref(vs), poly, den, plen, tmpdens, tree[0] + 1);
+            fmpz_clear(tmpdens);
         }
         else if (len != 0 && plen == 0)
         {
@@ -195,10 +205,17 @@ _fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, fmpz_t den,
     u = t + len;
     q = u + len;
 
+    fmpz_init(tmpdens);
+    tdens = _fmpz_vec_init(len);
+    for (i = 0; i < len; i++)
+        fmpz_set(tdens + i, den);
+
     for (i = j = 0; i < len; i += pow, j += (pow + 1))
     {
         tlen = ((i + pow) <= len) ? pow : len % pow;
-        _fmpz_poly_divrem(q, t + i, poly, plen, tree[height] + j, tlen + 1);
+        _fmpz_poly_pseudo_divrem(q, t + i, &d, poly, plen, tree[height] + j, tlen + 1, NULL);
+        fmpz_pow_ui(tmpdens, tree[height] + j + tlen, d);
+        _fmpz_vec_scalar_mul_fmpz(tdens + i, tdens + i, tlen, tmpdens);
     }
 
     for (i = height - 1; i >= 0; i--)
@@ -208,22 +225,34 @@ _fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, fmpz_t den,
         pa = tree[i];
         pb = t;
         pc = u;
+        pd = tdens;
 
         while (left >= 2 * pow)
         {
-            _fmpz_poly_rem_2(q, pc, pb, 2 * pow, pa, pow + 1);
-            _fmpz_poly_rem_2(q, pc + pow, pb, 2 * pow, pa + pow + 1, pow + 1);
+            _fmpz_poly_pseudo_rem_2(q, pc, &d, pb, 2 * pow, pa, pow + 1);
+            fmpz_pow_ui(tmpdens, pa + pow, d);
+            _fmpz_vec_scalar_mul_fmpz(pd, pd, pow, tmpdens);
+
+            _fmpz_poly_pseudo_rem_2(q, pc + pow, &d, pb, 2 * pow, pa + pow + 1, pow + 1);
+            fmpz_pow_ui(tmpdens, pa + 2 * pow + 1, d);
+            _fmpz_vec_scalar_mul_fmpz(pd + pow, pd + pow, pow, tmpdens);
 
             pa = pa + 2 * pow + 2;
             pb = pb + 2 * pow;
             pc = pc + 2 * pow;
+            pd = pd + 2 * pow;
             left -= 2 * pow;
         }
 
         if (left > pow)
         {
-            _fmpz_poly_divrem(q, pc, pb, left, pa, pow + 1);
-            _fmpz_poly_divrem(q, pc + pow, pb, left, pa + pow + 1, left - pow + 1);
+            _fmpz_poly_pseudo_divrem(q, pc, &d, pb, left, pa, pow + 1, NULL);
+            fmpz_pow_ui(tmpdens, pa + pow, d);
+            _fmpz_vec_scalar_mul_fmpz(pd, pd, pow, tmpdens);
+
+            _fmpz_poly_pseudo_divrem(q, pc + pow, &d, pb, left, pa + pow + 1, left - pow + 1, NULL);
+            fmpz_pow_ui(tmpdens, pa + left, d);
+            _fmpz_vec_scalar_mul_fmpz(pd + pow, pd + pow, left, tmpdens);
         }
         else if (left > 0)
             _fmpz_vec_set(pc, pb, left);
@@ -234,18 +263,18 @@ _fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, fmpz_t den,
     }
 
     for (i = 0; i < len; i++)
-        fmpq_set_fmpz_frac(vs + i, t + i, tdens);
+        fmpq_set_fmpz_frac(vs + i, t + i, tdens + i);
 
     _fmpz_vec_clear(tmp, alloc);
 }
 
-void _fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpz * poly, const fmpz_t den, slong plen, const fmpz * xs, slong n)
+void _fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpz * poly, const fmpz_t den, slong plen, const fmpq * xs, slong n)
 {
     fmpz ** tree;
 
     tree = _fmpz_poly_tree_alloc(n);
-    _fmpz_poly_tree_build(tree, xs, n);
-    _fmpz_poly_evaluate_vec_fast_precomp(ys, poly, den, plen, tree, n);
+    _fmpz_poly_tree_build_fmpq_vec(tree, xs, n);
+    _fmpq_poly_evaluate_vec_fast_precomp(ys, poly, den, plen, tree, n);
     _fmpz_poly_tree_free(tree, n);
 }
 

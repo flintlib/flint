@@ -614,6 +614,12 @@ void _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 
 void fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a);
 
+void fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpq_poly_t poly,
+                                const fmpq * xs, slong n);
+
+void _fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpz * poly, const fmpz_t den,
+                                    slong plen, const fmpq * xs, slong n);
+
 /*  Interpolation ************************************************************/
 
 void _fmpq_poly_interpolate_fmpq_vec(fmpz *coeffs, fmpz_t den,
