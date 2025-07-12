@@ -122,23 +122,18 @@ _fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len)
 
 /* This gives some speedup for small lengths. */
 void
-_fmpz_poly_rem_2(gr_ptr q, gr_ptr r, gr_srcptr a, slong al,
-    gr_srcptr b, slong bl, gr_ctx_t ctx)
+_fmpz_poly_rem_2(fmpz * q, fmpz * r, const fmpz * a, slong al,
+                                     const fmpz * b, slong bl)
 {
-    slong sz = ctx->sizeof_elem;
-    int status = GR_SUCCESS;
-
     if (al == 2)
     {
-        status |= gr_mul(r, GR_ENTRY(a, 1, sz), b, ctx);
-        status |= gr_sub(r, a, r, ctx);
+        fmpz_mul(r, a + 1, b);
+        fmpz_sub(r, a, r);
     }
     else
     {
-        status |= _gr_poly_divrem(q, r, a, al, b, bl, ctx);
+        _fmpz_poly_divrem(q, r, a, al, b, bl);
     }
-
-    return status;
 }
 
 void
@@ -148,31 +143,28 @@ _fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, fmpz_t den,
     slong height, i, j, pow, left;
     slong tree_height;
     slong tlen, alloc, qalloc;
-    gr_ptr tmp, q, t, u, swap, pa, pb, pc;
-    slong sz = ctx->sizeof_elem;
-    int status = GR_SUCCESS;
+    fmpz * tmp, * q, * t, * tdens, * u, * swap, * pa, * pb, * pc;
 
     /* avoid worrying about some degenerate cases */
     if (len < 2 || plen < 2)
     {
         if (len == 1)
         {
-            gr_ptr tmp;
-            GR_TMP_INIT(tmp, ctx);
-            status |= gr_neg(tmp, tree[0], ctx);
-            status |= _gr_poly_evaluate(vs, poly, plen, tmp, ctx);
-            GR_TMP_CLEAR(tmp, ctx);
+            fmpz_init(tmp);
+            fmpz_neg(tmp, tree[0]);
+            _fmpq_poly_evaluate_fmpq(fmpq_numref(vs), fmpq_denref(vs), poly, den, plen, tmp, tree[0] + 1);
+            fmpz_clear(tmp);
         }
         else if (len != 0 && plen == 0)
         {
-            status |= _gr_vec_zero(vs, len, ctx);
+            _fmpq_vec_zero(vs, len);
         }
         else if (len != 0 && plen == 1)
         {
             for (i = 0; i < len; i++)
-                status |= gr_set(GR_ENTRY(vs, i, sz), poly, ctx);
+                fmpq_set_fmpz_frac(vs + i, poly, den);
         }
-        return status;
+        return;
     }
 
     left = len;
@@ -197,16 +189,16 @@ _fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, fmpz_t den,
 
     alloc = 2 * len + qalloc;
 
-    GR_TMP_INIT_VEC(tmp, alloc, ctx);
+    tmp = _fmpz_vec_init(alloc);
 
     t = tmp;
-    u = GR_ENTRY(t, len, sz);
-    q = GR_ENTRY(u, len, sz);
+    u = t + len;
+    q = u + len;
 
     for (i = j = 0; i < len; i += pow, j += (pow + 1))
     {
         tlen = ((i + pow) <= len) ? pow : len % pow;
-        status |= _gr_poly_divrem(q, GR_ENTRY(t, i, sz), poly, plen, GR_ENTRY(tree[height], j, sz), tlen + 1, ctx);
+        _fmpz_poly_divrem(q, t + i, poly, plen, tree[height] + j, tlen + 1);
     }
 
     for (i = height - 1; i >= 0; i--)
@@ -219,51 +211,46 @@ _fmpq_poly_evaluate_vec_fast_precomp(fmpq * vs, const fmpz * poly, fmpz_t den,
 
         while (left >= 2 * pow)
         {
-            status |= _gr_poly_rem_2(q, pc, pb, 2 * pow, pa, pow + 1, ctx);
-            status |= _gr_poly_rem_2(q, GR_ENTRY(pc, pow, sz), pb, 2 * pow, GR_ENTRY(pa, pow + 1, sz), pow + 1, ctx);
+            _fmpz_poly_rem_2(q, pc, pb, 2 * pow, pa, pow + 1);
+            _fmpz_poly_rem_2(q, pc + pow, pb, 2 * pow, pa + pow + 1, pow + 1);
 
-            pa = GR_ENTRY(pa, 2 * pow + 2, sz);
-            pb = GR_ENTRY(pb, 2 * pow, sz);
-            pc = GR_ENTRY(pc, 2 * pow, sz);
+            pa = pa + 2 * pow + 2;
+            pb = pb + 2 * pow;
+            pc = pc + 2 * pow;
             left -= 2 * pow;
         }
 
         if (left > pow)
         {
-            status |= _gr_poly_divrem(q, pc, pb, left, pa, pow + 1, ctx);
-            status |= _gr_poly_divrem(q, GR_ENTRY(pc, pow, sz), pb, left, GR_ENTRY(pa, pow + 1, sz), left - pow + 1, ctx);
+            _fmpz_poly_divrem(q, pc, pb, left, pa, pow + 1);
+            _fmpz_poly_divrem(q, pc + pow, pb, left, pa + pow + 1, left - pow + 1);
         }
         else if (left > 0)
-            status |= _gr_vec_set(pc, pb, left, ctx);
+            _fmpz_vec_set(pc, pb, left);
 
         swap = t;
         t = u;
         u = swap;
     }
 
-    _gr_vec_swap(vs, t, len, ctx);
+    for (i = 0; i < len; i++)
+        fmpq_set_fmpz_frac(vs + i, t + i, tdens);
 
-    GR_TMP_CLEAR_VEC(tmp, alloc, ctx);
-
-    return status;
+    _fmpz_vec_clear(tmp, alloc);
 }
 
-int _gr_poly_evaluate_vec_fast(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
+void _fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpz * poly, const fmpz_t den, slong plen, const fmpz * xs, slong n)
 {
-    gr_ptr * tree;
-    int status = GR_SUCCESS;
+    fmpz ** tree;
 
-    tree = _gr_poly_tree_alloc(n, ctx);
-    status |= _gr_poly_tree_build(tree, xs, n, ctx);
-    status |= _gr_poly_evaluate_vec_fast_precomp(ys, poly, plen, tree, n, ctx);
-    _gr_poly_tree_free(tree, n, ctx);
-
-    return status;
+    tree = _fmpz_poly_tree_alloc(n);
+    _fmpz_poly_tree_build(tree, xs, n);
+    _fmpz_poly_evaluate_vec_fast_precomp(ys, poly, den, plen, tree, n);
+    _fmpz_poly_tree_free(tree, n);
 }
 
-int
-gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+void
+fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpq_poly_t poly, const fmpq * xs, slong n)
 {
-    gr_vec_set_length(ys, xs->length, ctx);
-    return _gr_poly_evaluate_vec_fast(ys->entries, poly->coeffs, poly->length, xs->entries, xs->length, ctx);
+    _fmpq_poly_evaluate_vec_fast(ys, poly->coeffs, poly->den, poly->length, xs, n);
 }
