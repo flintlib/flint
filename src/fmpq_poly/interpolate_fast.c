@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "profiler.h"
 #include "longlong.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "fmpq_vec.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
