@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2025 Rémi Prébet
 
     This file is part of FLINT.
 
