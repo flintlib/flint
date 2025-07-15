@@ -18,35 +18,66 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
+void
+_fmpq_poly_interpolation_weights(fmpz * w, fmpz_t wden, const fmpq * xs, slong len)
+{
+    slong i, j;
+    fmpz_t t;
+    fmpz_init(t);
+
+    /* Weights: b[i]^(n-1) / w[i] = prod_(j!=i) (a[i]*b[j] - a[j]*b[j]) with ys[i] = c[i]/d[i]*/
+    for (i = 0; i < len; i++)
+    {
+        fmpz_one(w + i);
+        for (j = 0; j < len; j++)
+        {
+            if (i == j) continue;
+            fmpz_mul(t, fmpq_numref(xs + i), fmpq_denref(xs + j));
+            fmpz_submul(t, fmpq_numref(xs + j), fmpq_denref(xs + i));
+            fmpz_mul(w + i, w + i, t);
+        }
+    }
+
+    /* Same denominator reduction */
+    _fmpz_vec_lcm(wden, w, len);
+    for (i = 0; i < len; i++) {
+        fmpz_pow_ui(t, fmpq_denref(xs + i), len - 1);
+        fmpz_mul(t, t, wden);
+        fmpz_divexact(w + i, t, w + i);
+    }
+
+    fmpz_clear(t);
+}
+
 
 void
-_fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den, const fmpq * xs,
+_fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den,
     const fmpq * ys, fmpz * const * tree, const fmpz * weights, slong len)
 {
     fmpz * t, * u,  * pa, * pb;
-    fmpz_t t1;
+    fmpz_t yden;
     slong i, pow, left;
-    timeit_t t0;
 
     if (len == 0)
         return;
 
     t = _fmpz_vec_init(2 * len);
     u = t + len;
-    fmpz_init(t1);
 
-    timeit_start(t0);
-    _fmpz_vec_lcm(den, weights, len);
-    /* Integer coefficients are (den / w[i]) * c[i] * b[i]^(n-1) */
+    fmpz_init(yden);
+    fmpz_one(yden);
+    for (i = 0; i < len; i++)
+        fmpz_lcm(yden, yden, fmpq_denref(ys + i));
+    fmpz_mul(den, den, yden);
+
+    /* Integer coefficients are l[i] = (yden / d[i]) * c[i] * w[i] */
     for (i = 0; i < len; i++) {
-        fmpz_divexact(poly + i, den, weights + i);
+        fmpz_divexact(poly + i, yden, fmpq_denref(ys + i));
         fmpz_mul(poly + i, poly + i, fmpq_numref(ys + i));
-        fmpz_pow_ui(t1, fmpq_denref(xs + i), len - 1);
-        fmpz_mul(poly + i, poly + i, t1);
+        fmpz_mul(poly + i, poly + i, weights + i );
     }
-    timeit_stop(t0);
-    flint_printf("Int coeffs: cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
-    timeit_start(t0);
+
+    /* Compute numerator of sum_i l[i] / (b[i]*x - a[i]) */
     for (i = 0; i < FLINT_CLOG2(len); i++)
     {
         pow = (WORD(1) << i);
@@ -72,11 +103,8 @@ _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den, const fmpq * xs,
             _fmpz_vec_add(pb, t, u, left);
         }
     }
-    timeit_stop(t0);
-    flint_printf("Poly: cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
 
     _fmpz_vec_clear(t, 2 * len);
-    fmpz_clear(t1);
 }
 
 void
@@ -85,47 +113,19 @@ _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den,
 {
     fmpz ** tree;
     fmpz * w;
-    fmpz_t t;
-    slong i, j;
-    timeit_t t0;
 
-    timeit_start(t0);
     // Build tree of subproducts of (bi*x-ai) where xs[i]=ai/bi
     tree = _fmpz_poly_tree_alloc(len);
     _fmpz_poly_tree_build_fmpq_vec(tree, xs, len);
-    timeit_stop(t0);
-    flint_printf("Tree building: cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
 
-    timeit_start(t0);
-    // Build efficiently (in practice) the interpolation weights
-    fmpz_init(t);
+    // Build naively the interpolation weights (cheap)
     w = _fmpz_vec_init(len);
-    /* Weights: w[i] = d[i] * prod_(j!=i) (a[i]*b[j] - a[j]*b[j]) with ys[i] = c[i]/d[i]*/
-    for (i = 0; i < len; i++)
-    {
-        fmpz_set(w + i, fmpq_denref(ys + i));
-        for (j = 0; j < len; j++)
-        {
-            if (i != j)
-            {
-                fmpz_mul(t, fmpq_numref(xs + i), fmpq_denref(xs + j));
-                fmpz_submul(t, fmpq_numref(xs + j), fmpq_denref(xs + i));
-                fmpz_mul(w + i, w + i, t);
-            }
-        }
-    }
-    timeit_stop(t0);
-    flint_printf("Weights: cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
+    _fmpq_poly_interpolation_weights(w, den, xs, len);
 
-    timeit_start(t0);
     // Perform fast polynomial operations using the precomputed tree and weights (avoiding dens)
-    _fmpq_poly_interpolate_fast_precomp(poly, den, xs, ys, tree, w, len);
-    timeit_stop(t0);
-    flint_printf("Interp: cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
-
+    _fmpq_poly_interpolate_fast_precomp(poly, den, ys, tree, w, len);
 
     _fmpz_vec_clear(w, len);
-    fmpz_clear(t);
     _fmpz_poly_tree_free(tree, len);
 }
 
