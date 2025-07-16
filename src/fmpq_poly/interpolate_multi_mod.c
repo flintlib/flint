@@ -140,6 +140,8 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     nn_ptr primes = NULL, xmod = NULL, ymod = NULL, residues = NULL, residuesden = NULL;
     int * good = NULL;
     fmpq * coeffs;
+    fmpq_t old_coeffs, curr_coeff;
+    fmpz * Lprimes, * Lres;
 
     fmpz *as, *bs, *cs, *ds;
 
@@ -152,6 +154,9 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     fmpz_init(c);
     fmpz_init(M2);
     fmpz_init(M1M2);
+
+    fmpq_init(old_coeffs);
+    fmpq_init(curr_coeff);
 
     as = _fmpz_vec_init(n);
     bs = _fmpz_vec_init(n);
@@ -185,6 +190,13 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     ybits = FLINT_ABS(_fmpz_vec_max_bits(cs, n)) + FLINT_ABS(_fmpz_vec_max_bits(ds, n));
     bound_bits = n * (xbits  * (n - 1) + ybits);
     flint_printf("%ld %ld\n", xbits, ybits);
+
+
+    slong boundprimes = bound_bits / (FLINT_BITS - 1) + 1;
+    flint_printf("boundprimes: %ld\n", boundprimes);
+
+    Lprimes = _fmpz_vec_init(boundprimes);
+    Lres = _fmpz_vec_init(boundprimes * n);
 
     xm = _nmod_vec_init(n);
     ym = _nmod_vec_init(n);
@@ -224,6 +236,8 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                 {
                     for (i = 0; i < n; i++)
                         fmpz_set_ui(poly + i, ym[i]);
+                    //fmpz_set_ui(Lprimes, p)
+                    //fmpz_set_ui(curr_coeff, ym[n-1]);
                     fmpz_set_ui(M, p);
                 }
                 else
@@ -350,7 +364,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
 
         total_primes += num_primes;
         timeit_stop(t1);
-        //flint_printf("interp + CRT: cpu = %ld ms wall = %ld ms\n", t1->cpu, t1->wall);
+        flint_printf("interp + CRT: cpu = %ld ms wall = %ld ms\n", t1->cpu, t1->wall);
 
         /* At that step we have in poly, the polynomial modulo M,
            which a product of total_primes primes */
@@ -359,15 +373,27 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
         //fmpz_print(M); flint_printf("\n");
         /* Rational reconstruction */
         /* todo: handle failure */
-        i = 0;
         rat_rec = 1;
+        fmpz_t tmp;
+        fmpz_init(tmp);
         timeit_start(t0);
-        while (rat_rec && i < n) {
+        rat_rec = fmpq_reconstruct_fmpz(coeffs + n - 1, poly + n - 1, M);
+        if (rat_rec && total_primes > 1) {
+            rat_rec = fmpq_equal(coeffs + n - 1, old_coeffs);
+            flint_printf(rat_rec ? "Stab\n" : "Not stab\n");
+            fmpq_set(old_coeffs, coeffs + n - 1);
+        }
+        i = 0;
+        while (rat_rec && i < n - 1) {
+            fmpz_mul(poly + i, poly + i, fmpq_denref(coeffs + n - 1));
+            fmpz_mod(poly + i, poly + i, M);
             rat_rec = fmpq_reconstruct_fmpz(coeffs + i, poly + i, M);
+            if (rat_rec)
+                fmpz_mul(fmpq_denref(coeffs + i), fmpq_denref(coeffs + i), fmpq_denref(coeffs + n - 1));
             i++;
         }
         timeit_stop(t0);
-        //flint_printf("Rat rec: stopped after %ld / %ld iteration; cpu = %ld ms wall = %ld ms\n", i, n, t0->cpu, t0->wall);
+        flint_printf("Rat rec: stopped after %ld / %ld iteration; cpu = %ld ms wall = %ld ms\n", i + 1, n, t0->cpu, t0->wall);
 
         /* No primes succeeded -- verify that evaluation points are actually OK */
         if (num_primes == 0 && !checked_unique)
