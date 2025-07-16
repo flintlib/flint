@@ -56,6 +56,7 @@ _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den,
     fmpz * t, * u,  * pa, * pb;
     fmpz_t yden;
     slong i, pow, left;
+    ulong j;
 
     if (len == 0)
         return;
@@ -76,11 +77,11 @@ _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den,
         fmpz_mul(poly + i, poly + i, weights + i );
     }
 
-    /* Compute numerator of sum_i l[i] / (b[i]*x - a[i]) */
-    for (i = 0; i < FLINT_CLOG2(len); i++)
+    /* Compute numerator of sum_j l[j] / (b[j]*x - a[j]) */
+    for (j = 0; j < FLINT_CLOG2(len); j++)
     {
-        pow = (WORD(1) << i);
-        pa = tree[i];
+        pow = (WORD(1) << j);
+        pa = tree[j];
         pb = poly;
         left = len;
 
@@ -149,4 +150,3 @@ fmpq_poly_interpolate_fast(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, s
         fmpq_poly_canonicalise(poly);
     }
 }
-
