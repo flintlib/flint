@@ -614,19 +614,6 @@ void _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 
 void fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a);
 
-void fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpq_poly_t poly,
-                                const fmpq * xs, slong n);
-
-void _fmpq_poly_evaluate_vec_fast(fmpq * ys, const fmpz * poly, const fmpz_t den,
-                                    slong plen, const fmpq * xs, slong n);
-
-fmpz ** _fmpz_poly_tree_alloc(slong len);
-
-void _fmpz_poly_tree_free(fmpz ** tree, slong len);
-
-void
-_fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len);
-
 /*  Interpolation ************************************************************/
 
 void _fmpq_poly_interpolate_fmpq_vec(fmpz *coeffs, fmpz_t den,
@@ -641,8 +628,14 @@ void fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
 void fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, slong n);
 
-int fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly,
-                                const fmpq * xs, const fmpq * ys, slong n);
+void _fmpq_poly_interpolation_weights(fmpz * w, fmpz_t wden,
+                                      const fmpq * xs, slong len);
+
+void _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den,
+    const fmpq * ys, fmpz * const * tree, const fmpz * weights, slong len);
+
+void _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den,
+                                const fmpq * xs, const fmpq * ys, slong len);
 
 void fmpq_poly_interpolate_fast(fmpq_poly_t poly,
                                 const fmpq * xs, const fmpq * ys, slong n);

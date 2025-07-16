@@ -103,8 +103,10 @@ _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den,
     }
 
     _fmpz_vec_clear(t, 2 * len);
+    fmpz_clear(yden);
 }
 
+/* Perform Lagrange interpolation with basis (bi*x-ai) */
 void
 _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den,
     const fmpq * xs, const fmpq * ys, slong len)

@@ -741,9 +741,13 @@ void _fmpz_poly_rem(fmpz * R, const fmpz * A, slong lenA,
 
 void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B);
 
-void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c);
+void fmpz_poly_div_root_fmpz(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c);
 
-void _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c);
+void _fmpz_poly_div_root_fmpz(fmpz * Q, const fmpz * A, slong len, const fmpz_t c);
+
+void fmpz_poly_divexact_root_fmpq(fmpz_poly_t Q, const fmpz_poly_t A, const fmpq_t c);
+
+void _fmpz_poly_divexact_root_fmpq(fmpz * Q, const fmpz * A, slong len, const fmpq_t x);
 
 /*  Power series division  ***************************************************/
 
@@ -1109,6 +1113,11 @@ void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
 void fmpz_poly_product_roots_fmpq_vec(fmpz_poly_t poly,
                                         const fmpq * xs, slong n);
 
+fmpz ** _fmpz_poly_tree_alloc(slong len);
+
+void _fmpz_poly_tree_free(fmpz ** tree, slong len);
+
+void _fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len);
 
 /* Newton basis *************************************************************/
 
@@ -1117,7 +1126,7 @@ void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, slong n);
 void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, slong n);
 
 
-/* Multipoint evaluation and interpolation *********************************/
+/* Evaluation and interpolation *********************************/
 
 void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
                                 const fmpz * a, slong n);

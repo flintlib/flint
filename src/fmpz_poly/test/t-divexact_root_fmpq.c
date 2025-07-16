@@ -11,9 +11,10 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
+#include "fmpq.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_div_root, state)
+TEST_FUNCTION_START(fmpz_poly_divexact_root_fmpq, state)
 {
     int i, result;
 
@@ -21,26 +22,27 @@ TEST_FUNCTION_START(fmpz_poly_div_root, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t P, Q, D, DQ;
-        fmpz_t c;
+        fmpq_t c;
         slong n, b;
 
         n = n_randint(state, 100);
-        b = n_randint(state, 200);
+        b = n_randint(state, 200) + 1;
 
-        fmpz_init(c);
+        fmpq_init(c);
         fmpz_poly_init(P);
         fmpz_poly_init(Q);
         fmpz_poly_init(D);
         fmpz_poly_init(DQ);
 
         fmpz_poly_randtest(P, state, n, b);
-        fmpz_randtest(c, state, b);
+        fmpq_randtest(c, state, b);
 
-        fmpz_poly_div_root(Q, P, c);
-
-        fmpz_poly_set_coeff_fmpz(D, 0, c);
+        fmpz_poly_set_coeff_fmpz(D, 0, fmpq_numref(c));
         fmpz_poly_neg(D, D);
-        fmpz_poly_set_coeff_ui(D, 1, UWORD(1));
+        fmpz_poly_set_coeff_fmpz(D, 1, fmpq_denref(c));
+        fmpz_poly_mul(P, P, D);
+
+        fmpz_poly_divexact_root_fmpq(Q, P, c);
 
         fmpz_poly_div_basecase(DQ, P, D);
 
@@ -57,7 +59,7 @@ TEST_FUNCTION_START(fmpz_poly_div_root, state)
             flint_abort();
         }
 
-        fmpz_clear(c);
+        fmpq_clear(c);
         fmpz_poly_clear(P);
         fmpz_poly_clear(Q);
         fmpz_poly_clear(D);
@@ -67,24 +69,30 @@ TEST_FUNCTION_START(fmpz_poly_div_root, state)
     /* Check aliasing */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_poly_t P, Q1, Q2;
-        fmpz_t c;
+        fmpz_poly_t P, D, Q1, Q2;
+        fmpq_t c;
         slong n, b;
 
         n = n_randint(state, 100);
-        b = n_randint(state, 200);
+        b = n_randint(state, 200) + 1;
 
-        fmpz_init(c);
+        fmpq_init(c);
         fmpz_poly_init(P);
+        fmpz_poly_init(D);
         fmpz_poly_init(Q1);
         fmpz_poly_init(Q2);
 
-        fmpz_randtest(c, state, b);
+        fmpq_randtest(c, state, b);
         fmpz_poly_randtest(P, state, n, b);
+        fmpz_poly_set_coeff_fmpz(D, 0, fmpq_numref(c));
+        fmpz_poly_neg(D, D);
+        fmpz_poly_set_coeff_fmpz(D, 1, fmpq_denref(c));
+        fmpz_poly_mul(P, P, D);
+
         fmpz_poly_set(Q2, P);
 
-        fmpz_poly_div_root(Q1, P, c);
-        fmpz_poly_div_root(Q2, Q2, c);
+        fmpz_poly_divexact_root_fmpq(Q1, P, c);
+        fmpz_poly_divexact_root_fmpq(Q2, Q2, c);
 
         result = fmpz_poly_equal(Q1, Q2);
 
@@ -98,8 +106,9 @@ TEST_FUNCTION_START(fmpz_poly_div_root, state)
             flint_abort();
         }
 
-        fmpz_clear(c);
+        fmpq_clear(c);
         fmpz_poly_clear(P);
+        fmpz_poly_clear(D);
         fmpz_poly_clear(Q1);
         fmpz_poly_clear(Q2);
     }
