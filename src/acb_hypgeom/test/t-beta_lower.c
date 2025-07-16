@@ -188,7 +188,7 @@ TEST_FUNCTION_START(acb_hypgeom_beta_lower, state)
         acb_hypgeom_beta_lower(res, a, b, z, 1, prec);
         arb_set_str(acb_realref(res2), "0.9999999999999999999999999999999999999999999999999999999999999999998474866919 +/- 2.07e-77", prec);
 
-        if (!acb_overlaps(res, res2) || acb_rel_accuracy_bits(res) < acb_rel_accuracy_bits(res2) - 20)
+        if (!acb_overlaps(res, res2) || acb_rel_accuracy_bits(res) < prec - 20)
         {
             flint_printf("FAIL: test case (4)\n\n");
             flint_printf("res = "); acb_printd(res, 100); flint_printf("\n\n");
