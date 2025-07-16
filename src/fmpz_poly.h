@@ -1133,7 +1133,7 @@ void _fmpz_poly_tree_free(fmpz ** tree, slong len);
 
 void _fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len);
 
-/* Evaluation and interpolation *********************************/
+/* Multipoint evaluation and interpolation *********************************/
 
 void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
                                 const fmpz * a, slong n);
