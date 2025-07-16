@@ -1125,6 +1125,13 @@ void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, slong n);
 
 void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, slong n);
 
+/* Subproduct trees *********************************************************/
+
+fmpz ** _fmpz_poly_tree_alloc(slong len);
+
+void _fmpz_poly_tree_free(fmpz ** tree, slong len);
+
+void _fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len);
 
 /* Evaluation and interpolation *********************************/
 
