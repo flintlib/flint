@@ -13,8 +13,12 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+/* for continuity support? */
+#define _fmpz_poly_div_root _fmpz_poly_div_root_fmpz
+#define fmpz_poly_div_root fmpz_poly_div_root_fmpz
+
 void
-_fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
+_fmpz_poly_div_root_fmpz(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
 {
     fmpz_t r, t;
     slong i;
@@ -40,7 +44,7 @@ _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
 }
 
 void
-fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
+fmpz_poly_div_root_fmpz(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
 {
     slong len = A->length;
 

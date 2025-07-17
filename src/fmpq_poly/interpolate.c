@@ -11,44 +11,10 @@
 */
 #include "fmpz.h"
 #include "fmpq.h"
-#include "fmpq_vec.h"
 #include "fmpz_vec.h"
+#include "fmpq_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
-
-
-// computes A / (b*x-a) where x = a / b is a root of A = prod_i(bi*x-ai)
-void
-_fmpz_poly_div_root_fmpq(fmpz * Q, const fmpz * A, slong len, const fmpq_t x)
-{
-    if (len < 2)
-        return;
-
-    fmpz_t r, t;
-
-    fmpz_init(r);
-    fmpz_init(t);
-
-    // r = A[len - 1] / b
-    fmpz_divexact(r, A + len - 1, fmpq_denref(x));
-
-    for (slong i = len - 2; i > 0; i--)
-    {
-        // Q[i] = (A[i] + Q[i+1] * a) / b
-        fmpz_set(t, A + i);
-        fmpz_addmul(t, r, fmpq_numref(x));
-        fmpz_divexact(t, t, fmpq_denref(x));
-
-        fmpz_swap(Q + i, r);
-        fmpz_swap(r, t);
-    }
-    // Q[0] = (A[0] + Q[1] * a) / b
-    fmpz_swap(Q, r);
-
-    fmpz_clear(r);
-    fmpz_clear(t);
-}
-
 
 void
 _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
@@ -92,6 +58,11 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
         fmpz_sub(poly + 1, yi, yi + 1);
         fmpz_mul(poly, xi, yi + 1);
         fmpz_submul(poly, xi + 1, yi);
+
+        fmpz_clear(Dx);
+        fmpz_clear(Dy);
+        _fmpz_vec_clear(xi, 2);
+        _fmpz_vec_clear(yi, 2);
         return;
     }
 
@@ -114,12 +85,10 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
         fmpz_set(w + i, fmpq_denref(ys + i));
         for (j = 0; j < n; j++)
         {
-            if (i != j)
-            {
-                fmpz_mul(t, fmpq_numref(xs + i), fmpq_denref(xs + j));
-                fmpz_submul(t, fmpq_numref(xs + j), fmpq_denref(xs + i));
-                fmpz_mul(w + i, w + i, t);
-            }
+            if (i == j) continue;
+            fmpz_mul(t, fmpq_numref(xs + i), fmpq_denref(xs + j));
+            fmpz_submul(t, fmpq_numref(xs + j), fmpq_denref(xs + i));
+            fmpz_mul(w + i, w + i, t);
         }
     }
 
@@ -129,7 +98,7 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
     for (i = 0; i < n; i++)
     {
         /* Q = P / (b[i]*x - a[i]) with xs[i]=a[i]/b[i]*/
-        _fmpz_poly_div_root_fmpq(Q, P, n + 1, xs + i);
+        _fmpz_poly_divexact_root_fmpq(Q, P, n + 1, xs + i);
 
         /* poly += (den / w[i]) * c[i] * b[i]^(n-1) * Q(x) */
         fmpz_divexact(t, den, w + i);
