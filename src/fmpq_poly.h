@@ -640,6 +640,9 @@ void _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den,
 void fmpq_poly_interpolate_fast(fmpq_poly_t poly,
                                 const fmpq * xs, const fmpq * ys, slong n);
 
+int fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly,
+                                    const fmpq * xs, const fmpq * ys, slong n);
+
 /*  Composition  *************************************************************/
 
 void _fmpq_poly_compose(fmpz * res, fmpz_t den,
