@@ -92,7 +92,7 @@ TEST_FUNCTION_START(fmpz_mpoly_scalar_divexact_fmpz, state)
           fmpz_mpoly_randtest_bits(f, state, len, coeff_bits, exp_bits, ctx);
           fmpz_mpoly_randtest_bits(h, state, len, coeff_bits, exp_bits, ctx);
 
-          fmpz_randtest_not_zero(c, state, n_randint(state, 200));
+          fmpz_randtest_not_zero(c, state, n_randint(state, 200) + 1);
 
           fmpz_mpoly_scalar_mul_fmpz(f, f, c, ctx);
 
