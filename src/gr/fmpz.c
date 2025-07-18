@@ -881,6 +881,8 @@ _gr_fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr
 int
 _gr_fmpz_vec_divexact_scalar_fmpz(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
 {
+    if (fmpz_is_zero(c))
+        return GR_DOMAIN;
     _fmpz_vec_scalar_divexact_fmpz(res, vec1, len, c);
     return GR_SUCCESS;
 }
@@ -888,6 +890,8 @@ _gr_fmpz_vec_divexact_scalar_fmpz(fmpz * res, const fmpz * vec1, slong len, cons
 int
 _gr_fmpz_vec_divexact_scalar_ui(fmpz * res, const fmpz * vec1, slong len, ulong c, gr_ctx_t ctx)
 {
+    if (c == 0)
+        return GR_DOMAIN;
     _fmpz_vec_scalar_divexact_ui(res, vec1, len, c);
     return GR_SUCCESS;
 }
@@ -895,6 +899,8 @@ _gr_fmpz_vec_divexact_scalar_ui(fmpz * res, const fmpz * vec1, slong len, ulong 
 int
 _gr_fmpz_vec_divexact_scalar_si(fmpz * res, const fmpz * vec1, slong len, slong c, gr_ctx_t ctx)
 {
+    if (c == 0)
+        return GR_DOMAIN;
     _fmpz_vec_scalar_divexact_si(res, vec1, len, c);
     return GR_SUCCESS;
 }

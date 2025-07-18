@@ -249,7 +249,6 @@ _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
                     FLINT_ASSERT(zd[xn - 1] != 0);
                     rp->_mp_size = negative ? -xn : xn;
                 }
-
             }
         }
     }
@@ -341,8 +340,6 @@ _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
                     xn -= (zd[xn - 1] == 0);
                     FLINT_ASSERT(zd[xn - 1] != 0);
                     rp->_mp_size = negative ? -xn : xn;
-
-                    _fmpz_demote_val(res + i);
                 }
             }
         }
