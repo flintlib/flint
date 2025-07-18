@@ -879,6 +879,27 @@ _gr_fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr
 }
 
 int
+_gr_fmpz_vec_divexact_scalar_fmpz(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_divexact_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_vec_divexact_scalar_ui(fmpz * res, const fmpz * vec1, slong len, ulong c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_divexact_ui(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_vec_divexact_scalar_si(fmpz * res, const fmpz * vec1, slong len, slong c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_divexact_si(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
 {
     if (len <= 2)
@@ -1207,6 +1228,10 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpz_vec_equal},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_vec_sub},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR,        (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_FMPZ,   (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_UI,     (gr_funcptr) _gr_fmpz_vec_divexact_scalar_ui},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_SI,     (gr_funcptr) _gr_fmpz_vec_divexact_scalar_si},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpz_vec_sum},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
