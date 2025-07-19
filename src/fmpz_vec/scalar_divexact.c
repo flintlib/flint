@@ -180,6 +180,10 @@ void nn_divexact_1_even(nn_ptr res, nn_srcptr x, slong xn, ulong d, ulong dinv, 
     } \
     while (0)
 
+/* Disable for a small speedup, which however risks creating corrupted fmpzs
+   if the user somehow did not provide exact quotients. */
+#define SAFE_VERSION 1
+
 static void
 _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
 {
@@ -214,8 +218,12 @@ _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
 
             if (!COEFF_IS_MPZ(v))
             {
+#if SAFE_VERSION
+                fmpz_set_si(res + i, v * cinv_signed);
+#else
                 _fmpz_demote(res + i);
                 res[i] = v * cinv_signed;
+#endif
             }
             else
             {
@@ -248,6 +256,9 @@ _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
                     xn -= (zd[xn - 1] == 0);
                     FLINT_ASSERT(zd[xn - 1] != 0);
                     rp->_mp_size = negative ? -xn : xn;
+#if SAFE_VERSION
+                    _fmpz_demote_val(res + i);
+#endif
                 }
             }
         }
@@ -305,8 +316,12 @@ _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
 
             if (!COEFF_IS_MPZ(v))
             {
+#if SAFE_VERSION
+                fmpz_set_si(res + i, ((slong) (v * cinv_signed)) >> norm);
+#else
                 _fmpz_demote(res + i);
                 res[i] = ((slong) (v * cinv_signed)) >> norm;
+#endif
             }
             else
             {
@@ -340,6 +355,9 @@ _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
                     xn -= (zd[xn - 1] == 0);
                     FLINT_ASSERT(zd[xn - 1] != 0);
                     rp->_mp_size = negative ? -xn : xn;
+#if SAFE_VERSION
+                    _fmpz_demote_val(res + i);
+#endif
                 }
             }
         }
@@ -349,12 +367,11 @@ _fmpz_vec_divexact_ui(fmpz * res, const fmpz * x, slong len, ulong c, int negc)
 void
 _fmpz_vec_scalar_divexact_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
 {
-/*
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_divexact_si(vec1 + i, vec2 + i, c);
-    return ;
-*/
+    if (len2 == 1)
+    {
+        fmpz_divexact_si(vec1, vec2, c);
+        return;
+    }
 
     if (c > 0)
         _fmpz_vec_divexact_ui(vec1, vec2, len2, c, 0);
@@ -366,12 +383,11 @@ void
 _fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2,
                              slong len2, ulong c)
 {
-/*
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_divexact_ui(vec1 + i, vec2 + i, c);
-    return ;
-*/
+    if (len2 == 1)
+    {
+        fmpz_divexact_ui(vec1, vec2, c);
+        return;
+    }
 
     _fmpz_vec_divexact_ui(vec1, vec2, len2, c, 0);
 }
