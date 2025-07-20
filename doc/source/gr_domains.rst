@@ -24,6 +24,9 @@ Domain properties
               truth_t gr_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
               truth_t gr_ctx_is_field(gr_ctx_t ctx)
               truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)
+              truth_t gr_ctx_is_rational_vector_space(gr_ctx_t ctx)
+              truth_t gr_ctx_is_real_vector_space(gr_ctx_t ctx)
+              truth_t gr_ctx_is_complex_vector_space(gr_ctx_t ctx)
               truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx)
               truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx)
               truth_t gr_ctx_is_zero_ring(gr_ctx_t ctx)
@@ -318,24 +321,45 @@ Polynomial rings
 Power series
 -------------------------------------------------------------------------------
 
-.. function:: void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
-
-    Initializes *ctx* to a ring of truncated power series `R[[x]] / \langle x^n \rangle`
-    over the given *base_ring*.
-    Elements have type :type:`gr_poly_struct`.
-    It is assumed that all inputs are already truncated to length *n*,
-    and this invariant is enforced for all outputs.
-
-.. function:: void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
-
-    Initializes *ctx* to a ring of power series `R[[x]]` over the given *base_ring*.
-    Elements are generally inexact, having an error term `O(x^n)`.
-    The parameter *prec* defines the default precision.
-    Elements have type ``gr_series_struct`` (this type is currently internal).
-
+See :func:`gr_series_ctx_init` and :func:`gr_series_mod_ctx_init`
+in :ref:`gr-series`.
 
 Fraction fields
 -------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_gr_fraction(gr_ctx_t ctx, gr_ctx_t domain, int flags)
+
+    Initializes *ctx* to a generic implementation of the fraction field
+    over the given integral domain *domain*.
+    Fractions are represented as pairs of elements of *domain*, stored
+    consecutively in memory as (numerator, denominator).
+    By default, fractions are simplified by removing common content between
+    the numerator and denominator (using :func:`gr_gcd`) and normalising the
+    denominator by a canonical unit (using :func:`gr_canonical_associate`).
+    The following optional *flags* can be set:
+
+    .. macro :: GR_FRACTION_NO_REDUCTION
+
+        Setting this flag disables canonicalisation, allowing
+        one to perform fraction field arithmetic over domains which do not
+        implement GCD or unit canonicalisation.
+        This flag can also improve performance in certain cases when
+        GCDs are more expensive than just allowing coefficients to blow up.
+
+    .. macro :: GR_FRACTION_STRONGLY_CANONICAL
+
+        Assert that fractions are in strongly canonical form,
+        meaning that `a/b = c/d` if and only if `a = c` and `b = d`.
+        Setting this flag allows faster equality testing.
+        This should be valid in UFDs that implement a correct GCD and
+        correct unit canonicalisation, but need not be true over
+        integral domains which are not UFDs. In this future this may
+        be automatic.
+
+    This constructor does not verify that *domain* is really an integral
+    domain. The behavior over non-integral domains is undefined, as no attempt
+    is made to detect the product of two nonzero denominators becoming zero.
+    In the future, such checks may be implemented as an optional feature.
 
 .. function:: void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 
@@ -343,6 +367,16 @@ Fraction fields
     fractions in *nvars* variables over the integers (equivalently, rationals),
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_q_struct`.
+
+.. function:: void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz_t mod)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    fractions in *nvars* variables over the `\mathbb{F}_mod` field,
+    with monomial ordering *ord*, and *mod* being a prime number.
+    The user is responsible
+    for verifying that *mod* is a prime number;
+    if *mod* is composite, undefined behaviour may occur.
+    Elements have type :type:`fmpz_mod_mpoly_q_struct`.
 
 Symbolic expressions
 -------------------------------------------------------------------------------

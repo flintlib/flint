@@ -82,8 +82,14 @@ Memory management
 
 .. function:: void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx)
 
+.. function:: gr_ptr gr_poly_coeff_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_poly_coeff_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+
 .. function:: gr_ptr gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
               gr_srcptr gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+
+    These functions are deprecated aliases of :func:`gr_poly_coeff_ptr` and
+    :func:`gr_poly_coeff_srcptr`; use those functions instead.
 
 .. function:: slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 
@@ -516,6 +522,89 @@ Evaluation
     Set *res* to *poly* evaluated at *x*, where the coefficients of *f*
     belong to *ctx* while both *x* and *res* belong to *x_ctx*.
 
+
+Newton basis
+-------------------------------------------------------------------------------
+
+Let `C = (c_0, c_1, c_2, \ldots)` be a sequence of
+values of the commutative ring *R*.
+Then the sequence of polynomials
+
+.. math::
+
+      \begin{matrix}
+      N_0 & = & 1, \\
+      N_1 & = & (x-c_0), \\
+      N_2 & = & (x-c_0)(x-c_1), \\
+      N_3 & = & (x-c_0)(x-c_1)(x-c_2), \ldots
+      \end{matrix}
+
+with roots in `C` forms a basis of `R[x]` called the *Newton basis*
+associated with *C*.
+Given a polynomial `f = f_0 + f_1 x + \ldots + f_n x^n` in the
+standard monomial basis, there are accordingly coefficients `g_0, \ldots, g_n`
+such that `f = g_0 N_0 + g_1 N_1 + \ldots + g_n N_n`
+and vice versa.
+In the following functions, some finite initial segment of `C` is represented
+by a vector called *basis*, and a polynomial in the Newton basis is
+represented formally as the polynomial
+`g = g_0 + g_1 x + \ldots + g_n x^n`.
+
+The following functions all support aliasing between inputs and outputs
+except that no output may be aliased with *basis*.
+
+.. function:: int _gr_poly_newton_basis_from_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_from_monomial(gr_poly_t res, const gr_vec_t basis, const gr_poly_t poly, gr_ctx_t ctx)
+              int _gr_poly_newton_basis_to_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_to_monomial(gr_poly_t res, const gr_vec_t basis, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Given *poly* of length *len* in the standard monomial basis, set *res* to
+    the polynomial in the Newton basis and vice versa.
+    The underscore methods require that ``basis`` is a pointer to at least
+    `len - 1` entries. The non-underscore methods return ``GR_UNABLE`` if
+    *basis* does not contain at least `len - 1` entries.
+
+.. function:: int _gr_poly_newton_basis_evaluate(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx)
+              int gr_poly_newton_basis_evaluate(gr_ptr res, const gr_vec_t basis, const gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx)
+
+    Given *poly* of length *len* in the Newton basis, set *res* to the
+    evaluation at *x*.
+    The underscore method requires that ``basis`` is a pointer to at least
+    `len - 1` entries. The non-underscore method returns ``GR_UNABLE`` if
+    *basis* does not contain at least `len - 1` entries.
+
+.. function:: int _gr_poly_newton_basis_interpolate_exact(gr_ptr res, gr_srcptr basis, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_interpolate_exact(gr_poly_t res, const gr_vec_t basis, const gr_vec_t ys, gr_ctx_t ctx)
+              int _gr_poly_newton_basis_interpolate(gr_ptr res, gr_srcptr basis, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_interpolate(gr_poly_t res, const gr_vec_t basis, const gr_vec_t ys, gr_ctx_t ctx)
+
+    Given a vector *y* containing *len* values, set *res* to the Newton basis form
+    of the unique interpolating
+    polynomial *f* of length (up to) *len* such that
+    `y_0 = f(c_0), \ldots, y_{len-1} = f(c_{len-1})`
+    evaluated at the roots of the Newton basis.
+
+    We presume, but do not check, that the ring is an integral domain.
+    These functions may succeed over non-integral domains, but
+    the result need not be an interpolating polynomial.
+
+    We require that *basis* contains at least *len* initial roots which
+    are pairwise distinct.
+
+    These functions return ``GR_DOMAIN`` (and/or ``GR_UNABLE``)
+    in either of the following situations:
+
+    * The vector *basis* does not have sufficiently many points (checked by the
+      non-underscore functions only).
+    * The evaluation points *xs* are not pairwise distinct.
+    * The interpolating polynomial *f* has coefficients in the fraction field
+      of *R* but not in *R* itself.
+
+    The *exact* versions presume that the evaluation points are distinct
+    and that *f* has coefficients in *R*; they may silently output some
+    arbitary polynomial otherwise.
+
+
 Multipoint evaluation and interpolation
 -------------------------------------------------------------------------------
 
@@ -525,15 +614,59 @@ Multipoint evaluation and interpolation
 
 .. function:: int _gr_poly_tree_build(gr_ptr * tree, gr_srcptr roots, slong len, gr_ctx_t ctx)
 
-.. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, gr_ptr * tree, slong len, gr_ctx_t ctx)
+    Initialize a subproduct tree over the given roots.
+
+.. function:: int _gr_poly_product_roots(gr_ptr poly, gr_srcptr xs, slong n, gr_ctx_t ctx)
+              int gr_poly_product_roots(gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+
+    Set *poly* to the polynomial `(x-x_0) (x-x_1) \cdots (x-x_{n-1})`.
+
+.. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, const gr_ptr * tree, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_evaluate_vec_fast(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
-
-.. function:: int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+              int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_evaluate_vec_iter(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
+              int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
 
-.. function:: int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+.. function:: int _gr_poly_interpolate_exact(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_interpolate_exact(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
+              int _gr_poly_interpolate(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_interpolate(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
+
+    Given vectors *xs* and *ys* of length *len* where the entries of *xs*
+    are pairwise distinct, set *res* to the
+    interpolating polynomial *f* of length (up to) *len* such that
+    `y_0 = f(x_0), \ldots, y_{len-1} = f(x_{len-1})`.
+
+    We presume, but do not check, that the ring is an integral domain.
+    These functions may succeed over non-integral domains, but
+    the result might not be an interpolating polynomial.
+
+    These functions return ``GR_DOMAIN`` (and/or ``GR_UNABLE``)
+    in either of the following situations:
+
+    * The vectors *xs* and *ys* do not have the same length (checked by the
+      non-underscore functions only).
+    * The evaluation points *xs* are not pairwise distinct.
+    * The interpolating polynomial *f* has coefficients in the fraction field
+      of *R* but not in *R* itself.
+
+    The *exact* versions presume that the evaluation points are distinct
+    and that *f* has coefficients in *R*; they may silently output some
+    arbitary polynomial otherwise.
+
+.. function:: int _gr_poly_interpolation_weights(gr_ptr w, const gr_ptr * tree, slong len, gr_ctx_t ctx)
+              int _gr_poly_interpolate_fast_precomp(gr_ptr poly, gr_srcptr ys, const gr_ptr * tree, gr_srcptr weights, slong len, gr_ctx_t ctx)
+              int _gr_poly_interpolate_fast(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_interpolate_fast(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
+
+    Fast polynomial interpolation using a subproduct tree. The *precomp*
+    version requires a precomputed subproduct tree generated using
+    :func:`_gr_poly_tree_build` and precomputed interpolation weights
+    generated using :func:`_gr_poly_interpolation_weights`.
+
+    This currently requires a field.
 
 
 Composition
@@ -641,6 +774,8 @@ Monic polynomials
 .. function:: truth_t _gr_poly_is_monic(gr_srcptr poly, slong len, gr_ctx_t ctx)
               truth_t gr_poly_is_monic(const gr_poly_t res, gr_ctx_t ctx)
 
+.. function:: int gr_poly_canonical_associate(gr_poly_t res, gr_poly_t u, const gr_poly_t src, gr_ctx_t ctx)
+
 GCD
 -------------------------------------------------------------------------------
 
@@ -669,19 +804,31 @@ GCD
               int gr_poly_gcd_hgcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_gcd_euclidean(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_gcd_subresultant(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_gcd_subresultant(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
               int _gr_poly_gcd_generic(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int _gr_poly_gcd(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_gcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
-    Polynomial GCD. Currently only useful over fields.
+    GCD in the polynomial ring `R[x]`.
+
+    The *gcd_subresultant* algorithm assumes that *R* is a unique factorization
+    domain. The *euclidean* and *hgcd* algorithms assume that *R* is a field.
+    The time complexity of the half-GCD algorithm is `\mathcal{O}(n \log^2 n)`
+    field operations. For further details, see [ThullYap1990]_.
+
+    The *gcd_generic* fallback implementation checks if *R* is a field
+    or UFD and dispatches to an appropriate algorithm, and otherwise
+    returns ``GR_UNABLE``. The main *gcd* function is synonymous with
+    *gcd_generic* unless overridden by a particular ring.
+
+    The non-underscore methods canonicalise the leading coefficient of the output
+    by calling ``gr_poly_canonical_associate``. Over a field, this corresponds
+    to making the output monic. The underscore methods need not perform this
+    canonicalisation.
 
     The underscore methods assume ``lenA >= lenB >= 1`` and that both
     *A* and *B* have nonzero leading coefficient.
-    The underscore methods do not attempt to make the result monic.
-
-    The time complexity of the half-GCD algorithm is `\mathcal{O}(n \log^2 n)`
-    ring operations. For further details, see [ThullYap1990]_.
-
 
 .. function:: int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
@@ -765,6 +912,82 @@ TODO: currently only fields of characteristic 0 are supported.
 .. function:: int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 
     Sets *res* to the squarefreepart of *poly*.
+
+Shift equivalence
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_poly_shift_equivalent(fmpz_t shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx)
+
+    Returns whether there exists an integer *n* such that `p(x + n) = q(x)`. If
+    the result is ``T_TRUE`` and *shift* is not ``NULL``, *shift* is set to
+    such an *n*.
+
+.. function:: int gr_poly_leading_taylor_shift(gr_ptr shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx)
+
+    Computes (if possible) *s* such that `p(x+s) = q(x)(1+O(x^2))`.
+
+.. function:: int gr_poly_dispersion_resultant(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+              int gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+              int gr_poly_dispersion(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+
+    Computes the dispersion and/or the dispersion set of *f* and *g*.
+
+    The dispersion set of two polynomials *f* and *g* (over a unique
+    factorization domain of characteristic zero) is the set of nonnegative
+    integers *n* such that `f(x + n)` and `g(x)` have a nonconstant common
+    factor. The dispersion is the largest element of the dispersion set.
+
+    The output variables *disp* and/or *disp_set* can be ``NULL``, in which case
+    the corresponding result is not stored.
+    When the dispersion set is empty, *disp* is left unchanged.
+    The elements of *disp_set* are sorted in increasing order.
+
+    The *factor* version uses the algorithm described in [ManWright1994]_.
+    The *resultant* version computes the integer roots of a bivariate resultant
+    and is mainly intended for testing.
+
+.. function:: int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_vec_t ffac, const gr_vec_t gfac, gr_ctx_t ctx);
+
+    Same as :func:`gr_poly_dispersion_factor` for nonzero *f* and *g* but takes
+    as input their nonconstant irreducible factors (without multiplicities)
+    instead of the polynomials themselves.
+
+.. function:: int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
+
+
+    Computes a decomposition of *f* of the form
+
+        .. math:: c \prod_i \prod_j g_i(x + h_{i,j})^{e_{i,j}}
+
+    where
+
+    * `c` is a constant,
+    * the `g_i` are squarefree polynomials of degree at least one,
+    * `g_i(x)` and `g_j(x + h)` (with `i \neq j`) are coprime for all
+      `h \in \mathbb Z`,
+    * `g_i(x)` and `g_i(x + h)` are coprime for all nonzero `h \in \mathbb Z`,
+    * `e_{i,j}` and `h_{i,j}` are integers with `e_{i,j} \geq 1`
+      and `0 = h_{i,1} < h_{i,2} < \cdots`.
+
+    The output variable *slfac* must be initialized to a vector of polynomials
+    of the same type as *f*. The other two output vectors *slshift* and
+    *slmult* must be initialized to vectors *of vectors* with entries of type
+    *fmpz*.
+
+    The *factor* version computes an irreducible factorization and sorts the
+    factors into shift-equivalence classes.
+
+    No algorithm avoiding a full irreducible factorization is currently
+    implemented.
+
+.. function:: int _gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
+
+    Same as :func:`gr_poly_shiftless_decomposition_factor` but takes as input
+    an irreducible factorization (*fac*, *mult*) of *f* (without the
+    prefactor *c*). The underscore method does not support aliasing of *slfac*
+    with *fac*.
 
 Roots
 -------------------------------------------------------------------------------

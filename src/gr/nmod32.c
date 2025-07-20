@@ -398,6 +398,18 @@ _nmod32_vec_sub(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
     return GR_SUCCESS;
 }
 
+int
+_nmod32_vec_mul(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD32_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_mul(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
 /* todo: overflow checks */
 int
 _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
@@ -558,6 +570,7 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod32_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod32_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _nmod32_vec_sub},
+    {GR_METHOD_VEC_MUL,         (gr_funcptr) _nmod32_vec_mul},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod32_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod32_vec_dot_rev},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},

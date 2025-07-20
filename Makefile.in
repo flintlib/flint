@@ -187,7 +187,7 @@ HEADER_DIRS :=                                                              \
         nmod_poly_mat                   fmpz_poly_mat                       \
                                                                             \
         mpoly           nmod_mpoly      fmpz_mpoly      fmpz_mod_mpoly      \
-        fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly                       \
+        fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly   fmpz_mod_mpoly_q    \
                                                                             \
         nmod_mpoly_factor               fmpz_mpoly_factor                   \
         fmpz_mod_mpoly_factor           fmpq_mpoly_factor                   \
@@ -210,7 +210,7 @@ HEADER_DIRS :=                                                              \
         acb_theta       dirichlet       bernoulli       hypgeom             \
                                                                             \
         gr              gr_generic      gr_vec          gr_mat              \
-        gr_poly         gr_mpoly        gr_special                          \
+        gr_poly         gr_mpoly        gr_series       gr_special          \
                                                                             \
         calcium                                                             \
         fmpz_mpoly_q                                                        \

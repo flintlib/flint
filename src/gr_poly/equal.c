@@ -35,8 +35,8 @@ gr_poly_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
     slong len1 = poly1->length;
     slong len2 = poly2->length;
 
-    FLINT_ASSERT(len1 == 0 || gr_is_zero(gr_poly_entry_srcptr(poly1, len1 - 1, ctx), ctx) != T_TRUE);
-    FLINT_ASSERT(len2 == 0 || gr_is_zero(gr_poly_entry_srcptr(poly2, len2 - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(len1 == 0 || gr_is_zero(gr_poly_coeff_srcptr(poly1, len1 - 1, ctx), ctx) != T_TRUE);
+    FLINT_ASSERT(len2 == 0 || gr_is_zero(gr_poly_coeff_srcptr(poly2, len2 - 1, ctx), ctx) != T_TRUE);
 
     if (len1 >= len2)
         return _gr_poly_equal(poly1->coeffs, len1, poly2->coeffs, len2, ctx);

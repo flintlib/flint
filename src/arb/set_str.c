@@ -127,26 +127,42 @@ arb_set_float_str(arb_t res, const char * inp, slong prec)
     }
     else if (fmpz_is_zero(exp))
     {
-        arb_set_round_fmpz(res, man, prec);
+        int inexact;
+        inexact = arf_set_round_fmpz(arb_midref(res), man, prec, ARF_RND_NEAR);
+
+        /* nearest rounding guarantees half-ulp accuracy */
+        if (inexact)
+            arf_mag_set_ulp(arb_radref(res), arb_midref(res), prec+1);
+        else
+            mag_zero(arb_radref(res));
     }
     else
     {
+        slong wp;
         arb_t t;
         arb_init(t);
         arb_set_ui(t, 10);
         arb_set_fmpz(res, man);
+        wp = arb_bits(res);
+        wp = (wp > prec ? wp : prec) + 10;
 
         if (fmpz_sgn(exp) > 0)
         {
-            arb_pow_fmpz_binexp(t, t, exp, prec + 4);
-            arb_mul(res, res, t, prec);
+            arb_pow_fmpz_binexp(t, t, exp, wp);
+            arb_mul(res, res, t, prec + 10);
         }
         else
         {
             fmpz_neg(exp, exp);
-            arb_pow_fmpz_binexp(t, t, exp, prec + 4);
-            arb_div(res, res, t, prec);
+            arb_pow_fmpz_binexp(t, t, exp, wp);
+            arb_div(res, res, t, prec + 10);
         }
+        /* There doesn't seem to be a faster way to do this in one shot, since
+         * all arb methods round down. */
+        arf_set_round(arb_midref(t), arb_midref(res), prec, ARF_RND_NEAR);
+        arf_swap(arb_midref(t), arb_midref(res));
+        arf_sub(arb_midref(t), arb_midref(t), arb_midref(res), 30, ARF_RND_UP);
+        arb_add_error_arf(res, arb_midref(t));
 
         arb_clear(t);
     }

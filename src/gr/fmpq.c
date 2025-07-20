@@ -1074,6 +1074,12 @@ _gr_fmpq_mat_charpoly(fmpq * res, const fmpq_mat_t mat, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpq_mat_permanent(fmpq_t res, const fmpq_mat_t x, const gr_ctx_t ctx)
+{
+    return fmpq_mat_permanent(res, x) ? GR_SUCCESS : GR_UNABLE;
+}
+
 int _fmpq_methods_initialized = 0;
 
 gr_static_method_table _fmpq_methods;
@@ -1093,6 +1099,9 @@ gr_method_tab_input _fmpq_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -1169,6 +1178,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpq_mat_det},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fmpq_mat_charpoly},
+    {GR_METHOD_MAT_PERMANENT,   (gr_funcptr) _gr_fmpq_mat_permanent},
     {0,                         (gr_funcptr) NULL},
 };
 

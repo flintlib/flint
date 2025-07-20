@@ -6,14 +6,35 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-XXXX-XX-XX -- FLINT 3.3.0-dev
+Future -- FLINT 3.4.0-dev
 -------------------------------------------------------------------------------
 
-Main contributors: Albin Ahlbäck (AA), Ricardo Buring (RB), Lars Göttgens (LG),
-Fredrik Johansson (FJ), Vincent Neiger (VN).
+Main contributors: Fredrik Johansson (FJ)
 
 * Features
 
+  * Matrix permanent (``gr_mat_permanent``) (FJ).
+
+
+2025-06-16 -- FLINT 3.3.1
+-------------------------------------------------------------------------------
+
+* Bug fixes
+
+  * Set permutation vector in ``gr_mat_lu_classical`` even if there are zero
+    columns (Fredrik Johansson).
+
+
+2025-06-11 -- FLINT 3.3.0
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA), Ricardo Buring (RB), Lars Göttgens (LG),
+Max Horn (MH), Fredrik Johansson (FJ), Jean Kieffer (JK), Marc Mezzarobba (MM),
+Vincent Neiger (VN).
+
+* Features
+
+  * Add generic fraction fields (``gr_ctx_init_gr_fraction``) (FJ).
   * Allow rings to overload ``_gr_mat_charpoly`` and provide such overloads for
     ``fmpz``, ``fmpq``, ``mpn_mod`` and ``fmpz_mod``.  Furthermore, remove
     ``fq_*_mat_charpoly_danilevsky`` and ``fmpz_mod_mat_charpoly_berkowitz``,
@@ -34,6 +55,33 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Support GR objects in ``flint_printf`` (FJ).
   * Add support for parsing builtin functions like ``sqrt(x)`` in
     ``gr_set_str`` (FJ).
+  * Recognize when generic polynomial rings are UFDs (MM).
+  * Add ``flint_set_throw`` (AA).
+  * Add ``gr_generic_poly_factor_roots`` for factoring generic polynomials
+    over algebraically closed fields providing ``gr_poly_roots`` (MM).
+  * Add ``gr_factor`` for ``gr_poly`` (MM).
+  * Add ``arf_nint`` (FJ).
+  * Add ``gr_poly_gcd_subresultant`` (FJ).
+  * Add generic ``gr_gcd`` for fields (FJ).
+  * Add ``gr_mpoly_inv`` (FJ).
+  * Implement ``gr_poly_gcd`` over any UFD, not only fields (FJ).
+  * Add ``gr_canonical_associate`` and corresponding implementations for
+    several types (FJ).
+  * Add ``gr_mat_companion`` and ``gr_mat_companion_fraction`` to construct
+    companion matrices (RB).
+  * Add ``gr_randtest_invertible`` (RB).
+  * Add ``gr_mat_randsimilar`` (RB).
+  * Add ``flint_merge_sort`` and ``flint_sort`` (MM).
+  * Add ``gr_vec_sort`` for sorting generic vectors (MM).
+  * Add ``_gr_vec_shuffle``, ``gr_vec_permute``, ``gr_vec_contains`` (MM).
+  * Add ``gr_in_domain`` and ``gr_check`` (MM).
+  * Add ``gr_poly_leading_taylor_shift`` (MM).
+  * Add shift equivalence, dispersion, and shiftless decomposition of generic
+    polynomials (``gr_poly_shift_equivalent``, ``gr_poly_dispersion``,
+    ``gr_poly_shiftless_decomposition``) (MM).
+  * Add ``gr_mat_mul_rosowski`` (FJ).
+  * Add ``acb_theta_one`` to compute a single theta function (JK).
+  * Add parameter ``ab`` in ``acb_theta_jet`` (JK).
 
 * Examples
 
@@ -47,10 +95,17 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Refactor characteristic polynomial and retune it (FJ).  
   * Use delayed canonicalization in ``mpn_mod_mat_reduce_row`` and
     ``fmpz_mod_mat_reduce_row`` (FJ).
-  * Improve method choise in ``gr_mat_rank`` (FJ).
+  * Improve method choice in ``gr_mat_rank`` (FJ).
   * Inline operations in ``_gr_fmpz_set`` (FJ).
   * Use ``udiv_qrnnd`` in ``n_preinvert_limb`` whenever CPU has fast division
     (AA, FJ, VN).
+  * Have ``gr_divexact`` over a ``gr_poly`` ring dispatch to
+    ``gr_poly_divexact`` (FJ).
+  * Rewrite the ``acb_theta`` module for substantially improved performance
+    (JK).
+  * Overload ``_gr_vec_mul`` for nmod types (FJ).
+  * Optimize ``_fmpz_vec_add`` and ``_fmpz_vec_sub`` for small coefficients
+    by inlining (FJ).
 
 * Bug fixes
 
@@ -60,9 +115,24 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Fix aliasing for ``gr_poly_div_newton_n_preinv`` (FJ).
   * Fix memory leak in ``gr_mat_fflu`` (FJ).
   * Fix invalid write in ``_gr_nmod_vec_reciprocals`` when length is zero (FJ).
-  * Fix various memory leaks found by the address sanitizer (Ricardo Buring).
+  * Fix various memory leaks found by the address sanitizer (RB).
   * Fix cases where ``gr_poly`` were not correctly normalized over a degenerate
     ring (FJ).
+  * Fix ``gr_set_str`` with duplicate generator names (MM).
+  * Fix ``fmpz_mat_minpoly`` and ``fmpq_mat_minpoly`` to return the correct
+    result for the zero matrix (MH).
+  * Fix bug in ``arb_nint`` (FJ).
+  * Fix ``fmpz_mat_minpoly_modular`` with large coefficients (FJ).
+  * Fix context bug in ``_gr_gr_series_mod_gen`` (RB).
+  * Propagate failure in ``acb_poly_find_roots`` if numerical stage returns NaN
+    (FJ).
+  * Fix bug in ``arb_div`` giving NaN when the numerator contained zero at
+    high precision (FJ).
+  * Fix NaN output for ``[+/-inf +/- inf]`` in ``arb_get_interval_arf``
+    and ``arb_get_interval_mpfr`` (FJ).
+  * Correct signature of ``gr_ctx_clear`` to have ``void`` return type (FJ).
+  * Fix function signatures in internal callbacks for
+    ``flint_parallel_binary_splitting`` (Oscar Benjamin, FJ).
 
 * Build system
 
@@ -74,12 +144,15 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Accommodate for Meteor Lake, Raptor Lake and Tiger Lake (VN).
   * Make sure Comet Lake enables ``fft_small`` (VN).
   * Error when trying to build FLINT on a non-Windows system (AA).
+  * Do not use ``find_library()`` in ``flint_ctypes`` (MM).
 
 * Tests
 
   * Add more test code for preinv division for ``gr_poly`` (FJ).
   * Add tests for ``gr_mat_exp`` and ``gr_mat_log`` (FJ).
   * Add test for ``fmpz_mod_mat_transpose`` (LG).
+  * Test ``gr_poly`` over random rings (MM).
+  * Have ``gr_ctx_init_random`` generate polynomial contexts (FJ).
 
 * Profiling
 
@@ -88,8 +161,6 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Replace some ``fq_poly`` and ``fmpz_mod_poly`` methods with GR wrappers
     (FJ).
   * Include standard headers instead of using builtins (AA).
-  * Propagate failure in ``acb_poly_find_roots`` if numerical stage returns NaN
-    (FJ).
   * Refactor ``gr_mat_exp_jordan`` and ``gr_mat_log_jordan`` (FJ).
   * Delegate ``(fmpz|fmpz_poly|fmpq)_mat_transpose`` to ``gr_mat`` (LG).
   * Add issue templates to Github (AA, Lars Kastner).
@@ -104,6 +175,8 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Remove underscore in front of ``nfloat_ctx_(set|get)_real_prec`` to match
     documentation (Joel Dahne).
   * Add missing newlines at end of file (FJ).
+  * Fix ``ENABLE_AVX2=OFF`` for ``CMake`` (AA).
+  * Add ``gr_poly_coeff_ptr`` and deprecate ``gr_poly_entry_ptr`` (RB).
 
 * Continuous integration
 
@@ -113,13 +186,36 @@ Fredrik Johansson (FJ), Vincent Neiger (VN).
 * Documentation
 
   * Fix ``fmpz`` docstrings to clarify that GCD of integers and rationals is
-    non-negative (Max Horn).
+    non-negative (MH).
   * Unify some docstrings (LG).
   * Fix docstrings for various LU functions (LG).
-  * Fix typos (AA, Marc Mezzarobba, user202729).
+  * Fix typos (AA, MM, user202729).
   * Touch up formula in ``hypgeom.rst`` (FJ).
   * Fix docstring for ``fmpz_mat_snf_kannan_bachem`` (Dima Pasechnik).
   * Fix docstring for ``fmpz_get_nmod`` (David Lowry-Duda).
+  * Minor fix in documentation of ``ulong_extras`` (VN).
+  * Document ``n_factor_t`` structure (Matthew House).
+  * Document ``gr_vec_entry_srcptr`` (MM).
+  * Document ``truth_t`` functions (MM).
+
+
+2025-03-31 -- FLINT 3.2.2
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA)
+
+* Continuous integration
+
+  * Enable redoing upload release CI (AA).
+
+* Build system
+
+  * Fix installation of headers for out-of-tree builds (AA).
+  * Use ``__ARM_ACLE`` to guard inclusion of ``arm_acle.h`` (Lars Göttgens).
+
+* Maintenance
+
+  * Remove assertion with uninitialized variable (AA).
 
 
 2025-03-17 -- FLINT 3.2.1

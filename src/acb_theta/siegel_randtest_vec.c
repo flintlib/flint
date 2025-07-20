@@ -34,6 +34,9 @@ acb_siegel_randtest_vec(acb_ptr z, flint_rand_t state, slong g, slong prec)
         case 3:
             acb_randtest(&z[k], state, prec, 20);
             break;
+        case 4:
+            arb_urandom(acb_imagref(&z[k]), state, prec);
+            arb_randtest(acb_realref(&z[k]), state, prec, mag_bits);
         default:
             acb_urandom(&z[k], state, prec);
         }

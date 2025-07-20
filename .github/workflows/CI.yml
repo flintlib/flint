@@ -136,7 +136,7 @@ jobs:
   # ubuntu gcc with assert
   ##############################################################################
   ubuntu-gcc-assert:
-    name: Ubuntu GCC with NTL (assert, x2)
+    name: Ubuntu GCC with NTL and checking msolve (assert, x2)
 
     runs-on: ubuntu-24.04
 
@@ -184,6 +184,30 @@ jobs:
         run: |
           $MAKE check
 
+      - name: "Install"
+        run: |
+          sudo make install
+          sudo ldconfig
+
+      - name: "Fetch msolve"
+        run: |
+          git clone --depth=1 https://github.com/algebraic-solving/msolve
+
+      - name: "Configure msolve"
+        working-directory: ./msolve
+        run: |
+          ./autogen.sh
+          ./configure
+
+      - name: "Build msolve"
+        working-directory: ./msolve
+        run: |
+          $MAKE
+
+      - name: "Check msolve"
+        working-directory: ./msolve
+        run: |
+          $MAKE check
 
 
   ##############################################################################

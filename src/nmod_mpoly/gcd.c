@@ -457,6 +457,10 @@ cleanup:
     return;
 }
 
+/* With this value, _set_estimates_medprime almost always succeeds.
+   Hack: allow changing this parameter to a small value from the test code
+   to verify what happens when it fails. */
+FLINT_DLL slong _nmod_mpoly_medprime_ignore_limit = WORD(9999);
 
 /* call to improve on the (valid) results of smprime */
 static void _set_estimates_medprime(
@@ -501,7 +505,7 @@ static void _set_estimates_medprime(
     fq_zech_poly_init(Geval, medctx);
 
     ignore_limit = (A->length + B->length)/4096;
-    ignore_limit = FLINT_MAX(WORD(9999), ignore_limit);
+    ignore_limit = FLINT_MAX(_nmod_mpoly_medprime_ignore_limit, ignore_limit);
     I->Gdeflate_deg_bounds_are_nice = 1;
     for (j = 0; j < nvars; j++)
     {
@@ -530,6 +534,7 @@ try_again:
         goto cleanup;
     }
 
+    fq_zech_ctx_clear(medctx);
     fq_zech_ctx_init_ui(medctx, smctx->mod.n, d, "#");
 
     for (j = 0; j < nvars; j++)
@@ -1910,7 +1915,25 @@ skip_monomial_cofactors:
             goto successful;
     }
 
-    if (I->mvars < 3)
+    if (algo == MPOLY_GCD_USE_HENSEL)
+    {
+        mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
+        success = _try_hensel(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (algo == MPOLY_GCD_USE_BROWN)
+    {
+        mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
+        success = _try_brown(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (algo == MPOLY_GCD_USE_ZIPPEL)
+    {
+        mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
+        success = _try_zippel(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (I->mvars < 3)
     {
         mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
         mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
@@ -1943,24 +1966,6 @@ skip_monomial_cofactors:
             }
         }
 
-        goto cleanup;
-    }
-    else if (algo == MPOLY_GCD_USE_HENSEL)
-    {
-        mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
-        success = _try_hensel(G, Abar, Bbar, A, B, I, ctx);
-        goto cleanup;
-    }
-    else if (algo == MPOLY_GCD_USE_BROWN)
-    {
-        mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
-        success = _try_brown(G, Abar, Bbar, A, B, I, ctx);
-        goto cleanup;
-    }
-    else if (algo == MPOLY_GCD_USE_ZIPPEL)
-    {
-        mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
-        success = _try_zippel(G, Abar, Bbar, A, B, I, ctx);
         goto cleanup;
     }
     else if (algo == MPOLY_GCD_USE_ZIPPEL2)

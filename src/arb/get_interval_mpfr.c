@@ -15,12 +15,20 @@
 void
 arb_get_interval_mpfr(mpfr_t a, mpfr_t b, const arb_t x)
 {
-    arf_t r, t;
-    arf_init(t);
-    arf_init_set_mag_shallow(r, arb_radref(x));
-    arf_sub(t, arb_midref(x), r, mpfr_get_prec(a), ARF_RND_FLOOR);
-    arf_get_mpfr(a, t, MPFR_RNDD);
-    arf_add(t, arb_midref(x), r, mpfr_get_prec(b), ARF_RND_CEIL);
-    arf_get_mpfr(b, t, MPFR_RNDU);
-    arf_clear(t);
+    if (mag_is_inf(arb_radref(x)) && !arf_is_nan(arb_midref(x)))
+    {
+        mpfr_set_inf(a, -1);
+        mpfr_set_inf(b, 1);
+    }
+    else
+    {
+        arf_t r, t;
+        arf_init(t);
+        arf_init_set_mag_shallow(r, arb_radref(x));
+        arf_sub(t, arb_midref(x), r, mpfr_get_prec(a), ARF_RND_FLOOR);
+        arf_get_mpfr(a, t, MPFR_RNDD);
+        arf_add(t, arb_midref(x), r, mpfr_get_prec(b), ARF_RND_CEIL);
+        arf_get_mpfr(b, t, MPFR_RNDU);
+        arf_clear(t);
+    }
 }

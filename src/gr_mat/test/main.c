@@ -18,6 +18,7 @@
 #include "t-charpoly_faddeev.c"
 #include "t-charpoly_gauss.c"
 #include "t-charpoly_householder.c"
+#include "t-companion.c"
 #include "t-concat_horizontal.c"
 #include "t-concat_vertical.c"
 #include "t-det_berkowitz.c"
@@ -37,14 +38,17 @@
 #include "t-lu_classical.c"
 #include "t-lu_recursive.c"
 #include "t-minpoly_field.c"
+#include "t-mul_rosowski.c"
 #include "t-mul_strassen.c"
 #include "t-mul_waksman.c"
 #include "t-nullspace.c"
+#include "t-permanent.c"
 #include "t-pow.c"
 #include "t-pow_fmpq.c"
 #include "t-pow_scalar.c"
 #include "t-properties.c"
 #include "t-randrank.c"
+#include "t-randsimilar.c"
 #include "t-rank.c"
 #include "t-rank_fflu.c"
 #include "t-rank_lu.c"
@@ -73,6 +77,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_charpoly_faddeev),
     TEST_FUNCTION(gr_mat_charpoly_gauss),
     TEST_FUNCTION(gr_mat_charpoly_householder),
+    TEST_FUNCTION(gr_mat_companion),
     TEST_FUNCTION(gr_mat_concat_horizontal),
     TEST_FUNCTION(gr_mat_concat_vertical),
     TEST_FUNCTION(gr_mat_det_berkowitz),
@@ -92,14 +97,17 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_lu_classical),
     TEST_FUNCTION(gr_mat_lu_recursive),
     TEST_FUNCTION(gr_mat_minpoly_field),
+    TEST_FUNCTION(gr_mat_mul_rosowski),
     TEST_FUNCTION(gr_mat_mul_strassen),
     TEST_FUNCTION(gr_mat_mul_waksman),
     TEST_FUNCTION(gr_mat_nullspace),
+    TEST_FUNCTION(gr_mat_permanent),
     TEST_FUNCTION(gr_mat_pow),
     TEST_FUNCTION(gr_mat_pow_fmpq),
     TEST_FUNCTION(gr_mat_pow_scalar),
     TEST_FUNCTION(gr_mat_properties),
     TEST_FUNCTION(gr_mat_randrank),
+    TEST_FUNCTION(gr_mat_randsimilar),
     TEST_FUNCTION(gr_mat_rank),
     TEST_FUNCTION(gr_mat_rank_fflu),
     TEST_FUNCTION(gr_mat_rank_lu),

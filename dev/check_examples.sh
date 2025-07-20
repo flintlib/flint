@@ -221,6 +221,24 @@ then
 elif test "$1" = "machin";
 then
     echo "machin....SKIPPED"
+elif test "$1" = "mfcoefs";
+then
+    echo "mfcoefs...."
+    res=$($2/mfcoefs --tail 2 --raw 23 1000000)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/2 2  -536 -528 -907 322/) { $found=1; last } END { exit !$found }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0
+
 elif test "$1" = "multi_crt";
 then
     echo "multi_crt....SKIPPED"

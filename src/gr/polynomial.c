@@ -18,6 +18,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
+#include "gr_special.h"
 
 static const char * default_var = "x";
 
@@ -83,6 +84,24 @@ truth_t
 polynomial_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
 {
     return gr_ctx_is_unique_factorization_domain(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+truth_t
+polynomial_ctx_is_rational_vector_space(gr_ctx_t ctx)
+{
+    return gr_ctx_is_rational_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+truth_t
+polynomial_ctx_is_real_vector_space(gr_ctx_t ctx)
+{
+    return gr_ctx_is_real_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+truth_t
+polynomial_ctx_is_complex_vector_space(gr_ctx_t ctx)
+{
+    return gr_ctx_is_complex_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 truth_t
@@ -250,23 +269,23 @@ polynomial_set_interval_mid_rad(gr_poly_t res, const gr_poly_t m, const gr_poly_
         {
             if (i < mlen && i < rlen)
             {
-                status |= gr_set_interval_mid_rad(gr_poly_entry_ptr(res, i, cctx),
-                        gr_poly_entry_srcptr(m, i, cctx),
-                        gr_poly_entry_srcptr(r, i, cctx), cctx);
+                status |= gr_set_interval_mid_rad(gr_poly_coeff_ptr(res, i, cctx),
+                        gr_poly_coeff_srcptr(m, i, cctx),
+                        gr_poly_coeff_srcptr(r, i, cctx), cctx);
             }
             else if (i < mlen)
             {
-                status |= gr_set(gr_poly_entry_ptr(res, i, cctx),
-                            gr_poly_entry_srcptr(m, i, cctx), cctx);
+                status |= gr_set(gr_poly_coeff_ptr(res, i, cctx),
+                            gr_poly_coeff_srcptr(m, i, cctx), cctx);
             }
             else if (i < rlen)
             {
                 if (zero == NULL)
                     zero = gr_heap_init(cctx);
 
-                status |= gr_set_interval_mid_rad(gr_poly_entry_ptr(res, i, cctx),
+                status |= gr_set_interval_mid_rad(gr_poly_coeff_ptr(res, i, cctx),
                         zero,
-                        gr_poly_entry_srcptr(r, i, cctx), cctx);
+                        gr_poly_coeff_srcptr(r, i, cctx), cctx);
             }
         }
 
@@ -308,6 +327,17 @@ polynomial_i(gr_poly_t res, gr_ctx_t ctx)
 }
 
 int
+polynomial_pi(gr_poly_t res, gr_ctx_t ctx)
+{
+    int status;
+    gr_poly_fit_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
+    _gr_poly_set_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_pi(res->coeffs, POLYNOMIAL_ELEM_CTX(ctx));
+    _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
+}
+
+int
 polynomial_gen(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_gen(res, POLYNOMIAL_ELEM_CTX(ctx));
@@ -340,7 +370,6 @@ polynomial_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
-/*
 truth_t
 polynomial_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
 {
@@ -353,6 +382,7 @@ polynomial_is_one(const gr_poly_t poly, gr_ctx_t ctx)
     return gr_poly_is_one(poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+/*
 truth_t
 polynomial_is_neg_one(const gr_poly_t poly, gr_ctx_t ctx)
 {
@@ -542,6 +572,7 @@ polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
         gr_poly_t r;
         int status;
         gr_poly_init(r, POLYNOMIAL_ELEM_CTX(ctx));
+        /* todo: gr_poly_divides */
         status = gr_poly_divrem(res, r, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 
         if (status == GR_SUCCESS)
@@ -557,6 +588,12 @@ polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
         gr_poly_clear(r, POLYNOMIAL_ELEM_CTX(ctx));
         return status;
     }
+}
+
+int
+polynomial_divexact(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
+{
+    return gr_poly_divexact(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 int
@@ -623,6 +660,13 @@ polynomial_gcd(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
 }
 
 int
+polynomial_canonical_associate(gr_poly_t ux, gr_poly_t u, const gr_poly_t x, gr_ctx_t ctx)
+{
+    return gr_poly_canonical_associate(ux, u, x, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+
+int
 polynomial_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
 {
     gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
@@ -644,6 +688,9 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) polynomial_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,  (gr_funcptr) polynomial_ctx_is_unique_factorization_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_rational_vector_space},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_real_vector_space},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_complex_vector_space},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_poly_ctx_set_gen_names},
@@ -657,15 +704,13 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ZERO,        (gr_funcptr) polynomial_zero},
     {GR_METHOD_ONE,         (gr_funcptr) polynomial_one},
     {GR_METHOD_NEG_ONE,     (gr_funcptr) polynomial_neg_one},
-    {GR_METHOD_I,           (gr_funcptr) polynomial_i},
 
     {GR_METHOD_GEN,            (gr_funcptr) polynomial_gen},
     {GR_METHOD_GENS,           (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE, (gr_funcptr) polynomial_gens_recursive},
-
-/*
     {GR_METHOD_IS_ZERO,     (gr_funcptr) polynomial_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) polynomial_is_one},
+/*
     {GR_METHOD_IS_NEG_ONE,  (gr_funcptr) polynomial_is_neg_one},
 */
     {GR_METHOD_EQUAL,       (gr_funcptr) polynomial_equal},
@@ -701,12 +746,17 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_POW_SI,      (gr_funcptr) polynomial_pow_si},
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) polynomial_pow_fmpz},
     {GR_METHOD_DIV,         (gr_funcptr) polynomial_div},
+    {GR_METHOD_DIVEXACT,    (gr_funcptr) polynomial_divexact},
     {GR_METHOD_INV,         (gr_funcptr) polynomial_inv},
 
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
     {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},
     {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) polynomial_euclidean_divrem},
 
+    {GR_METHOD_I,           (gr_funcptr) polynomial_i},
+    {GR_METHOD_PI,          (gr_funcptr) polynomial_pi},
+
+    {GR_METHOD_CANONICAL_ASSOCIATE,         (gr_funcptr) polynomial_canonical_associate},
     {GR_METHOD_GCD,         (gr_funcptr) polynomial_gcd},
 
     {GR_METHOD_FACTOR,      (gr_funcptr) polynomial_factor},

@@ -109,60 +109,6 @@ int
 gr_poly_gcd_euclidean(gr_poly_t G, const gr_poly_t A,
                         const gr_poly_t B, gr_ctx_t ctx)
 {
-    slong lenA = A->length, lenB = B->length, lenG;
-    slong sz = ctx->sizeof_elem;
-    gr_ptr g;
-    int status;
-
-    if (A->length == 0 && B->length == 0)
-        return gr_poly_zero(G, ctx);
-
-    if (A->length == 0)
-        return gr_poly_make_monic(G, B, ctx);
-
-    if (B->length == 0)
-        return gr_poly_make_monic(G, A, ctx);
-
-    if (A->length < B->length)
-        return gr_poly_gcd_euclidean(G, B, A, ctx);
-
-    if (gr_is_zero(GR_ENTRY(A->coeffs, A->length - 1, sz), ctx) != T_FALSE ||
-        gr_is_zero(GR_ENTRY(B->coeffs, B->length - 1, sz), ctx) != T_FALSE)
-    {
-        return GR_UNABLE;
-    }
-
-    /* lenA >= lenB >= 1 */
-    if (G == A || G == B)
-    {
-        g = flint_malloc(FLINT_MIN(lenA, lenB) * sz);
-        _gr_vec_init(g, FLINT_MIN(lenA, lenB), ctx);
-    }
-    else
-    {
-        gr_poly_fit_length(G, FLINT_MIN(lenA, lenB), ctx);
-        g = G->coeffs;
-    }
-
-    status = _gr_poly_gcd_euclidean(g, &lenG, A->coeffs, lenA, B->coeffs, lenB, ctx);
-
-    if (G == A || G == B)
-    {
-        _gr_vec_clear(G->coeffs, G->alloc, ctx);
-        flint_free(G->coeffs);
-        G->coeffs = g;
-        G->alloc = FLINT_MIN(lenA, lenB);
-        G->length = FLINT_MIN(lenA, lenB);
-    }
-    _gr_poly_set_length(G, lenG, ctx);
-
-    if (status == GR_SUCCESS && lenG != 0)
-    {
-        if (lenG == 1)
-            status = gr_one(G->coeffs, ctx);
-        else
-            status = gr_poly_make_monic(G, G, ctx);
-    }
-
-    return status;
+    return gr_poly_gcd_wrapper((gr_method_poly_gcd_op) _gr_poly_gcd_euclidean, 1, G, A, B, ctx);
 }
+

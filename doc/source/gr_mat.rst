@@ -268,7 +268,7 @@ Norms
 
     Frobenius norm: `\sqrt{\sum_{i,j} |a_{i,j}|^2}`.
 
-Arithmetic
+Addition and scalar arithmetic
 -------------------------------------------------------------------------------
 
 .. function:: int gr_mat_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
@@ -276,25 +276,6 @@ Arithmetic
 .. function:: int gr_mat_add(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
 
 .. function:: int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-
-.. function:: int gr_mat_mul_classical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-              int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-              int gr_mat_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
-
-    Matrix multiplication. The default function can be overloaded by specific rings;
-    otherwise, it falls back to :func:`gr_mat_mul_generic` which currently
-    only performs classical multiplication.
-
-    The *Waksman* algorithm assumes a commutative base ring which supports
-    exact division by two.
-
-.. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
-
-.. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
-              int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
-              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t e, gr_ctx_t ctx)
 
 .. function:: int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
               int gr_mat_scalar_add(gr_mat_t res, gr_srcptr x, const gr_mat_t mat, gr_ctx_t ctx)
@@ -340,6 +321,69 @@ Arithmetic
 
 .. function:: int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
               int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+
+Matrix multiplication
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Compute `AB` using the default algorithm chosen by the element ring.
+    If the element ring does not overload matrix multiplication, this will
+    fall back to :func:`gr_mat_mul_generic` by default.
+
+.. function:: int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Multiply matrices using a generic algorithm choice.
+    Currently this always chooses classical multiplication, but may implement
+    other strategies in the future.
+
+.. function:: int gr_mat_mul_classical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Computes the `m \times n \times p` matrix product using the classical algorithm,
+    performing `mp` dot products of length `n`.
+
+.. function:: int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Uses Strassen's algorithm to evaluate `AB` using 7 recursive matrix multiplications
+    of roughly half the size. This function calls :func:`gr_mat_mul` for the recursive
+    multiplications; to use Strassen recursively, the base ring must overload
+    :func:`gr_mat_mul` to choose Strassen multiplication above some cutoff.
+    This results in `O(n^{2.81})` asymptotic complexity in the case of an `n \times n \times n`
+    product.
+
+    This function does not implement Strassen's original evaluation sequence
+    but that of Bodrato [Bodrato2010]_ which uses fewer additions and offers
+    some further time savings when squaring.
+
+.. function:: int gr_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Compute the product `AB` using roughly half the number of multiplications
+    of the classical algorithm, using Waksman's algorithm [Waksman1970]_.
+    The base ring must be commutative and must support exact division by two.
+
+.. function:: int gr_mat_mul_rosowski(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Compute the product `AB` using roughly half the number of multiplications
+    of the classical algorithm, using Rosowski's algorithm [Rosowski2023]_.
+    The base ring must be commutative. This uses the same number of multiplications
+    as Waksman's algorithm when the inner dimension *n* is even,
+    but uses fewer multiplications when *n* is odd, and does not
+    require division by two.
+
+
+Powering
+-------------------------------------------------------------------------------
+
+See the section on matrix functions for non-integer exponents.
+
+.. function:: int gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+
+.. function:: int gr_mat_pow_ui(gr_mat_t res, const gr_mat_t mat, ulong e, gr_ctx_t ctx)
+              int gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx)
+              int gr_mat_pow_fmpz(gr_mat_t res, const gr_mat_t mat, const fmpz_t e, gr_ctx_t ctx)
+
+Polynomial evaluation
+-------------------------------------------------------------------------------
 
 .. function:: int _gr_mat_gr_poly_evaluate(gr_mat_t res, gr_srcptr poly, slong len, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_gr_poly_evaluate(gr_mat_t res, const gr_poly_t poly, const gr_mat_t mat, gr_ctx_t ctx)
@@ -527,6 +571,39 @@ Determinant and trace
     the square matrix *mat*.
     If the matrix is not square, ``GR_DOMAIN`` is returned.
 
+Permanent
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_permanent_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_ryser(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_glynn(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_glynn_threaded(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+
+    Sets *res* to the permanent of the square matrix *A*,
+    The permanent `\operatorname{perm}(A)` is a polynomial expression
+    in the entries of `A` equivalent to that for the determinant
+    but with all subtractions replaced by additions.
+    Several algorithms are implemented:
+
+    * The *cofactor* version uses recursive cofactor expansion, requiring
+      `O(n!)` additions and multiplications.
+
+    * The *ryser* version uses Ryser's formula [Rys1963]_ with Gray code traversal,
+      requiring `O(2^n n)` additions, subtractions and multiplications.
+
+    * The *glynn* version uses Glynn's formula [Gly2010]_ (actually equivalent
+      to a method described earlier by Nijenhuis and Wilf [NW1978]_). This
+      requires about half as many operations as *ryser* but requires (exact)
+      division by 2.
+
+    * The *glynn_threaded* version is a multithreaded implementation
+      of Glynn's formula.
+
+    The *generic* method chooses cofactor expansion for `n \le 4` and otherwise
+    chooses *ryser*, *glynn* or *glynn_threaded* depending on whether the ring
+    supports division by 2. The default method can be overloaded.
 
 Rank
 -------------------------------------------------------------------------------
@@ -710,6 +787,24 @@ Minimal polynomial
     Compute the minimal polynomial of the matrix *mat*.
     The algorithm assumes that the coefficient ring is a field.
 
+Companion matrix
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_mat_companion(gr_mat_t res, gr_srcptr poly, gr_ctx_t ctx)
+              int gr_mat_companion(gr_mat_t res, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Sets the *n* by *n* matrix *res* to the companion matrix of the polynomial
+    *poly* which must have degree *n*.
+    The underscore method reads `n + 1` input coefficients.
+    The algorithm assumes that the leading coefficient of *poly* is invertible.
+
+.. function:: int _gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, gr_srcptr poly, gr_ctx_t ctx)
+              int gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Sets the *n* by *n* matrix *res_num* and the polynomial *res_den* so that
+    the fraction is the companion matrix of the polynomial *poly* which must
+    have degree *n*. The underscore method reads `n + 1` input coefficients.
+
 Similarity transformations
 -------------------------------------------------------------------------------
 
@@ -860,6 +955,12 @@ Random matrices
     with unchanged rank by subsequently calling :func:`gr_mat_randops`.
 
     This operation only makes sense over integral domains (currently not checked).
+
+.. function:: int gr_mat_randsimilar(gr_mat_t mat, flint_rand_t state, slong opcount, gr_ctx_t ctx)
+
+    Randomises *mat* in-place by conjugating by elementary row/column
+    operations. More precisely, at most *opcount* conjugations by random
+    elementary row/column operations will be performed.
 
 Special matrices
 -------------------------------------------------------------------------------

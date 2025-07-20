@@ -354,6 +354,11 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
 #define FLINT_SGN(x) ((0 < (slong)(x)) - ((slong)(x) < 0))
 #define FLINT_SWAP(T, x, y) do { T _swap_t = (x); (x) = (y); (y) = _swap_t; } while(0)
 
+/* sorting *******************************************************************/
+
+void flint_merge_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data);
+void flint_sort(void * buf, slong len, slong size, int (* cmp) (const void *, const void *, void *), void * data);
+
 /* allocation macros *********************************************************/
 
 #define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))

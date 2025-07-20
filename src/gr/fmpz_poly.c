@@ -744,6 +744,30 @@ _gr_fmpz_poly_rsqrt(fmpz_poly_t res, const fmpz_poly_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_poly_canonical_associate(fmpz_poly_t ux, fmpz_poly_t u, const fmpz_poly_t poly, const gr_ctx_t ctx)
+{
+    if (fmpz_poly_is_zero(poly))
+    {
+        fmpz_poly_zero(ux);
+        fmpz_poly_one(u);
+    }
+    else
+    {
+        slong sgn = fmpz_sgn(poly->coeffs + poly->length - 1);
+
+        if (sgn >= 0)
+            fmpz_poly_set(ux, poly);
+        else
+            fmpz_poly_neg(ux, poly);
+
+        fmpz_poly_set_si(u, sgn);
+    }
+
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_poly_factor_t fac;
@@ -796,6 +820,9 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -863,6 +890,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_poly_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_poly_rsqrt},
+    {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpz_poly_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {0,                         (gr_funcptr) NULL},
 };

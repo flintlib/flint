@@ -11,6 +11,7 @@
 
 #include "mpoly.h"
 #include "fmpz_mpoly_q.h"
+#include "fmpz_mod_mpoly_q.h"
 #include "nf.h"
 #include "gr.h"
 
@@ -29,10 +30,12 @@
 #include "t-fmpz_mod.c"
 #include "t-fmpz_mpoly.c"
 #include "t-fmpz_mpoly_q.c"
+#include "t-fmpz_mod_mpoly_q.c"
 #include "t-fmpz_poly.c"
 #include "t-fq.c"
 #include "t-fq_nmod.c"
 #include "t-fq_zech.c"
+#include "t-fraction.c"
 #include "t-matrix_acb.c"
 #include "t-matrix_arb.c"
 #include "t-matrix_fmpq.c"
@@ -52,13 +55,6 @@
 #include "t-polynomial_nmod8.c"
 #include "t-psl2z.c"
 #include "t-qqbar.c"
-#include "t-series.c"
-#include "t-series_acb.c"
-#include "t-series_arb.c"
-#include "t-series_fmpq.c"
-#include "t-series_fmpz.c"
-#include "t-series_mod_gr_poly.c"
-#include "t-series_nmod8.c"
 #include "t-vector_acb.c"
 #include "t-vector_arb.c"
 #include "t-vector_fmpz.c"
@@ -84,10 +80,12 @@ test_struct tests[] =
     TEST_FUNCTION(gr_fmpz_mod),
     TEST_FUNCTION(gr_fmpz_mpoly),
     TEST_FUNCTION(gr_fmpz_mpoly_q),
+    TEST_FUNCTION(gr_fmpz_mod_mpoly_q),
     TEST_FUNCTION(gr_fmpz_poly),
     TEST_FUNCTION(gr_fq),
     TEST_FUNCTION(gr_fq_nmod),
     TEST_FUNCTION(gr_fq_zech),
+    TEST_FUNCTION(gr_fraction),
     TEST_FUNCTION(gr_matrix_acb),
     TEST_FUNCTION(gr_matrix_arb),
     TEST_FUNCTION(gr_matrix_fmpq),
@@ -107,13 +105,6 @@ test_struct tests[] =
     TEST_FUNCTION(gr_polynomial_nmod8),
     TEST_FUNCTION(gr_psl2z),
     TEST_FUNCTION(gr_qqbar),
-    TEST_FUNCTION(gr_series),
-    TEST_FUNCTION(gr_series_acb),
-    TEST_FUNCTION(gr_series_arb),
-    TEST_FUNCTION(gr_series_fmpq),
-    TEST_FUNCTION(gr_series_fmpz),
-    TEST_FUNCTION(gr_series_mod_gr_poly),
-    TEST_FUNCTION(gr_series_nmod8),
     TEST_FUNCTION(gr_vector_acb),
     TEST_FUNCTION(gr_vector_arb),
     TEST_FUNCTION(gr_vector_fmpz),

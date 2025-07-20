@@ -392,6 +392,18 @@ _nmod8_vec_sub(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct
 }
 
 int
+_nmod8_vec_mul(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    nmod_t mod = NMOD8_CTX(ctx);
+
+    for (i = 0; i < len; i++)
+        res[i] = nmod_mul(vec1[i], vec2[i], mod);
+
+    return GR_SUCCESS;
+}
+
+int
 _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -586,6 +598,7 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod8_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod8_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _nmod8_vec_sub},
+    {GR_METHOD_VEC_MUL,         (gr_funcptr) _nmod8_vec_mul},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod8_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod8_vec_dot_rev},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod8_mat_mul},

@@ -22,10 +22,9 @@
 #include "gr_poly.h"
 #include "gr_special.h"
 
-int
+void
 gr_generic_ctx_clear(gr_ctx_t ctx)
 {
-    return GR_SUCCESS;
 }
 
 truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
@@ -72,6 +71,26 @@ truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
     return res;
 }
 
+truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
+{
+    if (gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
+        return gr_ctx_is_zero_ring(ctx);
+    else
+        return T_UNKNOWN;
+}
+
+truth_t gr_generic_ctx_is_real_vector_space(gr_ctx_t ctx)
+{
+    /* currently this does the same thing */
+    return gr_generic_ctx_is_rational_vector_space(ctx);
+}
+
+truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
+{
+    /* currently this does the same thing */
+    return gr_generic_ctx_is_rational_vector_space(ctx);
+}
+
 void
 gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
 {
@@ -115,6 +134,36 @@ int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
         return GR_DOMAIN;
 
     return GR_UNABLE;
+}
+
+int gr_generic_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
+{
+    slong i;
+    truth_t is_invertible;
+    int status = GR_SUCCESS;
+
+    for (i = 0; i < 5; i++)
+    {
+        status |= gr_randtest(x, state, ctx);
+
+        is_invertible = gr_is_invertible(x, ctx);
+        if (is_invertible == T_TRUE)
+            return GR_SUCCESS;
+    }
+
+    for (i = 0; i < 5; i++)
+    {
+        status |= gr_randtest_small(x, state, ctx);
+
+        is_invertible = gr_is_invertible(x, ctx);
+        if (is_invertible == T_TRUE)
+            return GR_SUCCESS;
+    }
+
+    /* unused */
+    (void) status;
+
+    return n_randint(state, 2) ? gr_one(x, ctx) : gr_neg_one(x, ctx);
 }
 
 int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
@@ -1258,6 +1307,55 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
             if (status == GR_SUCCESS)
                 return status;
         }
+    }
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) == T_TRUE)
+    {
+        int status = gr_inv(u, x, ctx);
+
+        if (!(status & GR_UNABLE))
+        {
+            if (status == GR_SUCCESS)
+            {
+                status |= gr_one(ux, ctx);
+            }
+            else
+            {
+                /* x = 0 */
+                status = gr_zero(ux, ctx);
+                status |= gr_one(u, ctx);
+            }
+        }
+
+        return status;
+    }
+
+    return GR_UNABLE;
+}
+
+int
+gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    if (gr_ctx_is_field(ctx) == T_TRUE)
+    {
+        truth_t x_zero, y_zero;
+
+        x_zero = gr_is_zero(x, ctx);
+        y_zero = gr_is_zero(y, ctx);
+
+        if (x_zero == T_TRUE && y_zero == T_TRUE)
+            return gr_zero(res, ctx);
+
+        if (x_zero == T_FALSE || y_zero == T_FALSE)
+            return gr_one(res, ctx);
+
+        return GR_UNABLE;
     }
 
     return GR_UNABLE;
@@ -2550,6 +2648,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,        (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,         (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_ZERO_RING,        (gr_funcptr) gr_generic_ctx_is_zero_ring},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_rational_vector_space},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,            (gr_funcptr) gr_generic_ctx_is_real_vector_space},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_complex_vector_space},
 
     {GR_METHOD_CTX_IS_ORDERED_RING,     (gr_funcptr) gr_generic_ctx_predicate},
 
@@ -2571,6 +2672,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
     {GR_METHOD_RANDTEST_NOT_ZERO,       (gr_funcptr) gr_generic_randtest_not_zero},
+    {GR_METHOD_RANDTEST_INVERTIBLE,     (gr_funcptr) gr_generic_randtest_invertible},
     {GR_METHOD_RANDTEST_SMALL,          (gr_funcptr) gr_generic_randtest_small},
 
     {GR_METHOD_GENS,                    (gr_funcptr) gr_generic_gens},
@@ -2680,8 +2782,12 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SQRT,                    (gr_funcptr) gr_generic_sqrt},
     {GR_METHOD_RSQRT,                   (gr_funcptr) gr_generic_rsqrt},
 
+    {GR_METHOD_CANONICAL_ASSOCIATE,     (gr_funcptr) gr_generic_canonical_associate},
+
     {GR_METHOD_NUMERATOR,               (gr_funcptr) gr_generic_numerator},
     {GR_METHOD_DENOMINATOR,             (gr_funcptr) gr_generic_denominator},
+
+    {GR_METHOD_GCD,                     (gr_funcptr) gr_generic_gcd},
 
     {GR_METHOD_CMP,                     (gr_funcptr) gr_generic_cmp},
     {GR_METHOD_CMPABS,                  (gr_funcptr) gr_generic_cmpabs},
@@ -2911,6 +3017,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MAT_DIAGONALIZATION,     (gr_funcptr) gr_mat_diagonalization_generic},
     {GR_METHOD_MAT_CHARPOLY,            (gr_funcptr) _gr_mat_charpoly_generic},
     {GR_METHOD_MAT_REDUCE_ROW,          (gr_funcptr) gr_mat_reduce_row_generic},
+    {GR_METHOD_MAT_PERMANENT,           (gr_funcptr) gr_mat_permanent_generic},
 
     {0,                                 (gr_funcptr) NULL},
 };

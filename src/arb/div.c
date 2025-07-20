@@ -198,6 +198,15 @@ arb_div_arf(arb_t z, const arb_t x, const arf_t y, slong prec)
         else
             mag_zero(arb_radref(z));
     }
+    else if (arf_is_zero(arb_midref(x)))
+    {
+        /* [0 +/- eps] / y  ->  [0 +/- eps / y] */
+        mag_init(ym);
+        arf_get_mag_lower(ym, y);
+        mag_div(arb_radref(z), arb_radref(x), ym);
+        arf_zero(arb_midref(z));
+        mag_clear(ym);
+    }
     else if (WANT_NEWTON(prec, arb_bits(x), arf_bits(y)))
     {
         arb_div_arf_newton(z, x, y, prec);
@@ -311,6 +320,10 @@ arb_div(arb_t z, const arb_t x, const arb_t y, slong prec)
     else if (arf_is_zero(arb_midref(y))) /* anything / 0 = nan */
     {
         arb_indeterminate(z);
+    }
+    else if (arf_is_zero(arb_midref(x)) && arb_is_finite(y))
+    {
+        arb_div_wide(z, x, y, prec);
     }
     else if (ARB_IS_LAGOM(x) && ARB_IS_LAGOM(y)) /* fast case */
     {

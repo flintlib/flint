@@ -14,8 +14,8 @@
 void
 acb_theta_eld_print(const acb_theta_eld_t E)
 {
-    slong d = acb_theta_eld_dim(E);
-    slong g = acb_theta_eld_ambient_dim(E);
+    slong d = E->dim;
+    slong g = E->ambient_dim;
     slong k;
 
     for (k = 0; k < g - d; k++)
@@ -25,19 +25,18 @@ acb_theta_eld_print(const acb_theta_eld_t E)
     flint_printf("Slice (...");
     for (k = 0; k < g - d; k++)
     {
-        flint_printf(", %wd", acb_theta_eld_coord(E, k + d));
+        flint_printf(", %wd", E->last_coords[k]);
     }
-    flint_printf("): from %wd to %wd (mid: %wd)\n",
-        acb_theta_eld_min(E), acb_theta_eld_max(E), acb_theta_eld_mid(E));
+    flint_printf("): from %wd to %wd (mid: %wd)\n", E->min, E->max, E->mid);
     if (d > 1)
     {
-        for (k = 0; k < acb_theta_eld_nr(E); k++)
+        for (k = 0; k < (E->nr); k++)
         {
-            acb_theta_eld_print(acb_theta_eld_rchild(E, k));
+            acb_theta_eld_print(&E->rchildren[k]);
         }
-        for (k = 0; k < acb_theta_eld_nl(E); k++)
+        for (k = 0; k < (E->nl); k++)
         {
-            acb_theta_eld_print(acb_theta_eld_lchild(E, k));
+            acb_theta_eld_print(&E->lchildren[k]);
         }
     }
 }

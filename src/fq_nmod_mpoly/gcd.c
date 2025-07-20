@@ -1638,7 +1638,25 @@ skip_monomial_cofactors:
             goto successful;
     }
 
-    if (I->mvars < 3)
+    if (algo == MPOLY_GCD_USE_HENSEL)
+    {
+        mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
+        success = _try_hensel(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (algo == MPOLY_GCD_USE_BROWN)
+    {
+        mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
+        success = _try_brown(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (algo == MPOLY_GCD_USE_ZIPPEL)
+    {
+        mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
+        success = _try_zippel(G, Abar, Bbar, A, B, I, ctx);
+        goto cleanup;
+    }
+    else if (I->mvars < 3)
     {
         mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
         mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
@@ -1667,24 +1685,6 @@ skip_monomial_cofactors:
             }
         }
 
-        goto cleanup;
-    }
-    else if (algo == MPOLY_GCD_USE_HENSEL)
-    {
-        mpoly_gcd_info_measure_hensel(I, A->length, B->length, ctx->minfo);
-        success = _try_hensel(G, Abar, Bbar, A, B, I, ctx);
-        goto cleanup;
-    }
-    else if (algo == MPOLY_GCD_USE_BROWN)
-    {
-        mpoly_gcd_info_measure_brown(I, A->length, B->length, ctx->minfo);
-        success = _try_brown(G, Abar, Bbar, A, B, I, ctx);
-        goto cleanup;
-    }
-    else if (algo == MPOLY_GCD_USE_ZIPPEL)
-    {
-        mpoly_gcd_info_measure_zippel(I, A->length, B->length, ctx->minfo);
-        success = _try_zippel(G, Abar, Bbar, A, B, I, ctx);
         goto cleanup;
     }
     else if (algo == MPOLY_GCD_USE_ZIPPEL2)

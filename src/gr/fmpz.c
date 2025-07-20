@@ -574,6 +574,23 @@ _gr_fmpz_lcm(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_canonical_associate(fmpz_t ux, fmpz_t u, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_sgn(x) < 0)
+    {
+        fmpz_neg(ux, x);
+        fmpz_set_si(u, -1);
+    }
+    else
+    {
+        fmpz_set(ux, x);
+        fmpz_one(u);
+    }
+
+    return GR_SUCCESS;
+}
+
 int _gr_fmpz_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_factor_t fac;
@@ -953,6 +970,15 @@ _gr_fmpz_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_poly_divexact2(fmpz * res,
+    const fmpz * poly1, slong len1,
+    const fmpz * poly2, slong len2, gr_ctx_t ctx)
+{
+    _fmpz_poly_divexact(res, poly1, len1, poly2, len2);
+    return GR_SUCCESS;
+}
+
 /* defined in gr/fmpz_poly.c */
 int _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx);
 
@@ -1053,6 +1079,11 @@ _gr_fmpz_mat_charpoly(fmpz * res, const fmpz_mat_t mat, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_mat_permanent(fmpz_t res, const fmpz_mat_t x, const gr_ctx_t ctx)
+{
+    return fmpz_mat_permanent(res, x) ? GR_SUCCESS : GR_UNABLE;
+}
 
 
 
@@ -1075,6 +1106,9 @@ gr_method_tab_input _fmpz_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -1144,6 +1178,7 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIVREM,(gr_funcptr) _gr_fmpz_euclidean_divrem},
     {GR_METHOD_GCD,             (gr_funcptr) _gr_fmpz_gcd},
     {GR_METHOD_LCM,             (gr_funcptr) _gr_fmpz_lcm},
+    {GR_METHOD_CANONICAL_ASSOCIATE,          (gr_funcptr) _gr_fmpz_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_factor},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpz_pow_si},
@@ -1176,12 +1211,14 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_mullow},
+    {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_fmpz_poly_divexact2},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_roots_gr_poly},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpz_roots_gr_poly_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpz_mat_det},
     {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _gr_fmpz_mat_charpoly},
+    {GR_METHOD_MAT_PERMANENT,   (gr_funcptr) _gr_fmpz_mat_permanent},
     {0,                         (gr_funcptr) NULL},
 };
 

@@ -652,6 +652,27 @@ _gr_fmpq_poly_denominator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t c
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpq_poly_canonical_associate(fmpq_poly_t ux, fmpq_poly_t u, const fmpq_poly_t x, const gr_ctx_t ctx)
+{
+    if (fmpq_poly_is_zero(x))
+    {
+        fmpq_poly_zero(ux);
+        fmpq_poly_one(u);
+    }
+    else
+    {
+        fmpq_t q;
+        fmpq_init(q);
+        fmpq_set_fmpz_frac(q, x->den, x->coeffs + x->length - 1);
+        fmpq_poly_make_monic(ux, x);
+        fmpq_poly_set_fmpq(u, q);
+        fmpq_clear(q);
+    }
+
+    return GR_SUCCESS;
+}
+
 /*
 todo: fmpq_poly_sqrt, fmpq_poly_is_square
 
@@ -698,6 +719,9 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE,
@@ -773,6 +797,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpq_poly_pow_fmpz},
     {GR_METHOD_NUMERATOR,       (gr_funcptr) _gr_fmpq_poly_numerator},
     {GR_METHOD_DENOMINATOR,     (gr_funcptr) _gr_fmpq_poly_denominator},
+    {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpq_poly_canonical_associate},
 /*
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpq_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpq_poly_sqrt},

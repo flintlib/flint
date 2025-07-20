@@ -15,8 +15,11 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 #include "mpoly.h"
+#include "fmpz_mpoly.h"
+#include "fmpz_mpoly_q.h"
 #include "gr.h"
 #include "mpn_mod.h"
+#include "gr_series.h"
 
 /* For random composite rings, some base rings that don't require
    memory allocation. */
@@ -54,14 +57,10 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_gr_mpoly(ctx, base_ring, n_randint(state, 3), mpoly_ordering_randtest(state));
             break;
         case 2:
-            gr_ctx_init_gr_poly(ctx, base_ring);
-/*
-    this currently breaks some tests
-            gr_ctx_init_gr_series(ctx, base_ring, n_randint(state, 6));
-*/
+            gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
             break;
         case 3:
-            gr_ctx_init_series_mod_gr_poly(ctx, base_ring, n_randint(state, 6));
+            gr_series_mod_ctx_init(ctx, base_ring, n_randint(state, 6));
             break;
         case 4:
             gr_ctx_init_vector_space_gr_vec(ctx, base_ring, n_randint(state, 4));
@@ -198,9 +197,37 @@ gr_ctx_init_random_ring_real_complex_exact(gr_ctx_t ctx, flint_rand_t state)
     }
 }
 
+void
+gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
+{
+
+    switch (n_randint(state, 4))
+    {
+        case 0:
+            gr_ctx_init_fmpz_poly(ctx);
+            break;
+        case 1:
+            gr_ctx_init_fmpq_poly(ctx);
+            break;
+        case 2:
+            gr_ctx_init_fmpz_mpoly(ctx, n_randint(state, 3), mpoly_ordering_randtest(state));
+            break;
+        case 3:
+            gr_ctx_init_fmpz_mpoly_q(ctx, n_randint(state, 2), mpoly_ordering_randtest(state));
+            break;
+    }
+}
+
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
 {
-    switch (n_randint(state, 11))
+    if (n_randint(state, 2))
+    {
+        gr_ctx_init_nmod(_gr_some_base_rings + 1, 1);
+        gr_series_ctx_init(ctx, _gr_some_base_rings + 1, 1);
+        return;
+    }
+
+    switch (n_randint(state, 12))
     {
         case 0:
         case 1:
@@ -230,6 +257,9 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
             break;
         case 10:
             gr_ctx_init_random_ring_composite(ctx, state);
+            break;
+        case 11:
+            gr_ctx_init_random_ring_builtin_poly(ctx, state);
             break;
     }
 

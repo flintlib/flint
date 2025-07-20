@@ -36,7 +36,7 @@ gr_generic_poly_factor_roots(
 
     int status = GR_SUCCESS;
 
-    gr_ptr lc = gr_poly_entry_ptr(poly, poly->length - 1, ctx);
+    gr_ptr lc = gr_poly_coeff_ptr(poly, poly->length - 1, ctx);
     if (gr_is_zero(lc, ctx) != T_FALSE)
     {
         status = GR_UNABLE;

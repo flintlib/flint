@@ -60,6 +60,7 @@ Generic rings
    gr_mat.rst
    gr_poly.rst
    gr_mpoly.rst
+   gr_series.rst
 
 .. only:: not latex
 
@@ -67,7 +68,6 @@ Generic rings
       :maxdepth: 1
 
       index_generic.rst
-
 
 Integers
 ---------------
@@ -147,6 +147,7 @@ Integers mod n
    fmpz_mod_poly_factor.rst
    fmpz_mod_mpoly.rst
    fmpz_mod_mpoly_factor.rst
+   fmpz_mod_mpoly_q.rst
 
 .. only:: not latex
 
