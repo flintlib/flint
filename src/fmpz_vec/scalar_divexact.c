@@ -21,16 +21,15 @@
 /* Helper functions that could go in longlong.h, ulong_extras.h
    and mpn_extras.h as soon as they find a use elsewhere. */
 
-/* The table is slightly faster but requires GMP internals. */
-#define USE BINVERT_TABLE 0
-
 /* Tuned for Zen 3; with assembly code we would not need GMP. */
 #define DIVEXACT_1_ODD_GMP_CUTOFF 35
 #define DIVEXACT_1_EVEN_GMP_CUTOFF 25
 
+/* The table is slightly faster but requires GMP internals. */
+#define USE BINVERT_TABLE 0
+
 #if USE_BINVERT_TABLE
 extern const unsigned char  __gmp_binvert_limb_table[128];
-#endif
 
 /* Invert n mod 2^FLINT_BITS */
 static ulong n_binvert(ulong n)
@@ -39,13 +38,8 @@ static ulong n_binvert(ulong n)
 
     FLINT_ASSERT(n % 2);
 
-#if USE_BINVERT_TABLE
     r = __gmp_binvert_limb_table[(n / 2) & 0x7F];
-#else
-    r = (((n + 2) & 4) << 1) ^ n;   /* 4 bits */
     r = 2 * r - r * r * n;          /* 8 bits */
-#endif
-
     r = 2 * r - r * r * n;          /* 16 bits */
     r = 2 * r - r * r * n;          /* 32 bits */
 #if FLINT_BITS == 64
@@ -54,6 +48,27 @@ static ulong n_binvert(ulong n)
 
     return r;
 }
+#else
+
+/* Use Hurchalla's algorithm https://arxiv.org/abs/2204.04342 */
+static ulong n_binvert(ulong a)
+{
+    ulong r, y;
+
+    r = (3 * a) ^ 2;    /* 5 bits */
+    y = 1 - a * r;
+    r = r * (1 + y);    /* 10 bits */
+    y *= y;
+    r = r * (1 + y);    /* 20 bits */
+    y *= y;
+    r = r * (1 + y);    /* 40 bits */
+#if FLINT_BITS == 64
+    y *= y;
+    r = r * (1 + y);    /* 80 bits */
+#endif
+    return r;
+}
+#endif
 
 FLINT_FORCE_INLINE
 ulong n_mulhi(ulong a, ulong b)
