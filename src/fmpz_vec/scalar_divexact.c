@@ -26,7 +26,7 @@
 #define DIVEXACT_1_EVEN_GMP_CUTOFF 25
 
 /* The table is slightly faster but requires GMP internals. */
-#define USE BINVERT_TABLE 0
+#define USE_BINVERT_TABLE 0
 
 #if USE_BINVERT_TABLE
 extern const unsigned char  __gmp_binvert_limb_table[128];
