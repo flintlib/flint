@@ -63,21 +63,14 @@ _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong n)
 }
 
 static int
-_fmpq_poly_check_interpolant(const fmpq * coeffs,
+_fmpq_poly_check_interpolant(const fmpz * poly, const fmpz_t den,
                                 const fmpq * xs, const fmpq * ys, slong n)
 {
     fmpq_t y;
-    fmpz * poly;
-    fmpz_t den;
     slong i;
     int ok = 1;
 
     fmpq_init(y);
-    fmpz_init(den);
-    poly = _fmpz_vec_init(n);
-
-    _fmpq_vec_get_fmpz_vec_fmpz(poly, den, coeffs, n);
-
     for (i = 0; i < n && ok; i++)
     {
         _fmpq_poly_evaluate_fmpq(fmpq_numref(y), fmpq_denref(y), poly, den, n,
@@ -85,8 +78,6 @@ _fmpq_poly_check_interpolant(const fmpq * coeffs,
         ok = fmpq_equal(y, ys + i);
     }
     fmpq_clear(y);
-    fmpz_clear(den);
-    _fmpz_vec_clear(poly, n);
 
     return ok;
 }
@@ -113,13 +104,7 @@ _fmpq_vec_has_unique_entries(const fmpq * x, slong n)
 
 /* _nmod_poly_interpolate_nmod_vec currently lacks error handling */
 int
-_checked_nmod_poly_interpolate_bis(nn_ptr r, nn_srcptr x, nn_srcptr y, slong n, nmod_t mod)
-{
-    gr_ctx_t ctx;
-    gr_ctx_init_nmod(ctx, mod.n);
-    return (_gr_poly_interpolate_fast(r, x, y, n, ctx) == GR_SUCCESS);
-}
-
+_checked_nmod_poly_interpolate(nn_ptr r, nn_srcptr x, nn_srcptr y, slong n, nmod_t mod);
 
 void
 _fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2,
@@ -202,7 +187,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                 ym[i] = nmod_div(ym[i], mden, mod);
             }
             //flint_printf("Interpolate\n");
-            if (_checked_nmod_poly_interpolate_bis(ym, xm, ym, n, mod))
+            if (_checked_nmod_poly_interpolate(ym, xm, ym, n, mod))
             {
                 num_primes = 1;
                 /* CRT */
@@ -278,7 +263,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             for (k = 0; k < num_primes; k++)
             {
                 nmod_init(&mod, primes[k]);
-                good[k] = _checked_nmod_poly_interpolate_bis(ymod + k * n, xmod + k * n, ymod + k * n, n, mod);
+                good[k] = _checked_nmod_poly_interpolate(ymod + k * n, xmod + k * n, ymod + k * n, n, mod);
                 count_good += (good[k] != 0);
             }
 
@@ -328,7 +313,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                     fmpz_multi_CRT_ui(t, residues, comb, temp, 0);
                     // reconstruct modulo M1M2 = M*M2
                     _fmpz_CRT(u, poly + j, M, t, M2, M1M2, c, 0);
-                    fmpz_set(poly + j, u);
+                    fmpz_swap(poly + j, u);
                 }
                 fmpz_swap(M, M1M2);
             }
@@ -349,18 +334,8 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
         /* Rational reconstruction */
         /* todo: handle failure */
         timeit_start(t0);
-        rat_rec = fmpq_reconstruct_fmpz(coeffs + n - 1, poly + n - 1, M);
-        if (rat_rec)
-            fmpz_set(t, fmpq_denref(coeffs + n -1));
-        i = 0;
-        while (rat_rec && i < n - 1) {
-            //mpz_mul(poly + i, poly + i, t);
-            //fmpz_mod(poly + i, poly + i, M);
+        for (i = 0, rat_rec = 1; rat_rec && i < n; i++)
             rat_rec = fmpq_reconstruct_fmpz(coeffs + i, poly + i, M);
-            //if (!rat_rec) break;
-            //fmpz_mul(fmpq_denref(coeffs + i), fmpq_denref(coeffs + i), t);
-            i++;
-        }
         timeit_stop(t0);
         flint_printf("Rat rec: stopped after %ld / %ld iteration; cpu = %ld ms wall = %ld ms\n", i, n, t0->cpu, t0->wall);
 
@@ -380,8 +355,8 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             //_fmpq_vec_print(coeffs, n); flint_printf("\n");
             /* Check for termination */
             timeit_start(t0);
-            if (_fmpq_poly_check_interpolant(coeffs, xs, ys, n)) {
-                _fmpq_vec_get_fmpz_vec_fmpz(poly, den, coeffs, n);
+            _fmpq_vec_get_fmpz_vec_fmpz(poly, den, coeffs, n);
+            if (_fmpq_poly_check_interpolant(poly, den, xs, ys, n)) {
                 timeit_stop(t0);
                 flint_printf(" done cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
                 break;
