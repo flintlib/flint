@@ -442,7 +442,7 @@ nmod_mat_modular_form_series(nmod_mat_t a, const mf_space_t mf, slong len, mf_ti
     cols = n_prime_pi(len);
     FLINT_ASSERT(n_prime_pi(len) == nmod_mat_ncols(a));
     FLINT_ASSERT(mf->rank == nmod_mat_nrows(a));
-    FLINT_ASSERT(n_trailing_zeros(f.modp-1) > n_clog2(len));
+    FLINT_ASSERT(n_trailing_zeros(mf->modp-1) > n_clog2(len));
 
 
     /* precompute chars */
