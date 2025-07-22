@@ -39,6 +39,15 @@ _fmpq_vec_max_height_bits(const fmpq * x, slong len)
     return max_bits;
 }
 
+int _is_lucky_prime_ui(ulong p, const fmpq * xs, slong n)
+{
+    int ok = 1;
+    slong i;
+    for (i = 0; i < n && ok; i++)
+        ok = !fmpz_divisible_ui(fmpq_denref(xs + i), p);
+    return ok;
+}
+
 
 static void
 _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong n)
@@ -126,7 +135,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     nmod_t mod;
     nn_ptr xm, ym;
     fmpz_t M, t, u, c, M2, M1M2;
-    slong total_primes, num_primes, total_skipped, count_good;
+    slong total_primes, num_primes, count_good;
     flint_bitcnt_t xbits, ybits, bound_bits;
     int ok = 1, rat_rec;
     int checked_unique = 0;
@@ -167,7 +176,6 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     xm = _nmod_vec_init(n);
     ym = _nmod_vec_init(n);
 
-    total_skipped = 0;
     total_primes = 0;
     /* Important: when changing this, change the list of adversarial primes
        in the test code to match. */
@@ -176,8 +184,11 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     {
         if (total_primes < 16)
         {
-            /*todo: divides no den? */
-            p = n_nextprime(p, 1);
+            do /* p must not divide any denominator */
+            {
+                p = n_nextprime(p, 1);
+            } while (!(_is_lucky_prime_ui(p, xs, n) && _is_lucky_prime_ui(p, ys, n)));
+
             nmod_init(&mod, p);
             for (i = 0; i < n; i++) {
                 xm[i] = fmpz_get_nmod(fmpq_numref(xs + i), mod);
@@ -203,10 +214,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                 }
             }
             else
-            {
-                total_skipped++;
                 num_primes = 0;
-            }
         }
         else  /* Do a batch of primes at once with fast reduction/CRT */
         {
@@ -223,11 +231,14 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             residuesden = flint_realloc(residuesden, sizeof(ulong) * num_primes);
             good = flint_realloc(good, sizeof(int) * num_primes);
 
-            for (k = 0; k < num_primes; k++)
+            for (k = 0; k < num_primes;)
             {
-                /* todo: make sure divides no dens? */
                 p = n_nextprime(p, 1);
-                primes[k] = p;
+                if (_is_lucky_prime_ui(p, xs, n) && _is_lucky_prime_ui(p, ys, n))
+                {
+                    primes[k] = p;
+                    k++;
+                }
             }
 
             _fmpz_ui_vec_prod(M2, primes, num_primes);
@@ -275,8 +286,6 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                         count_good++;
                     }
                 }
-
-                total_skipped += (num_primes - count_good);
 
                 /* Reinitialize CRT for the product of correct primes */
                 num_primes = count_good;
