@@ -48,6 +48,35 @@ use multiple threads::
     virt/peak/res/peak(MB): 25.56 29.19 9.58 13.11
     [2.71828182845904523536{...999959 digits...}01379817644769422819 +/- 1.39e-1000000]
 
+pi_agm.c
+-------------------------------------------------------------------------------
+
+This program implements the Brent-Salamin AGM iteration to compute `\pi`.
+This algorithm is not used by :func:`arb_const_pi` since the Chudnovsky
+algorithm is faster in practice.
+
+    > build/examples/pi_agm 100000
+    precision = 332197 bits...
+    Iteration 1 / 16: error bound 0.00391
+    Iteration 2 / 16: error bound 2.98e-8
+    Iteration 3 / 16: error bound 8.67e-19
+    Iteration 4 / 16: error bound 1.84e-40
+    Iteration 5 / 16: error bound 8.24e-84
+    Iteration 6 / 16: error bound 8.28e-171
+    Iteration 7 / 16: error bound 4.18e-345
+    Iteration 8 / 16: error bound 5.34e-694
+    Iteration 9 / 16: error bound 2.18e-1392
+    Iteration 10 / 16: error bound 3.62e-2789
+    Iteration 11 / 16: error bound 5.01e-5583
+    Iteration 12 / 16: error bound 2.39e-11171
+    Iteration 13 / 16: error bound 5.46e-22348
+    Iteration 14 / 16: error bound 1.42e-44701
+    Iteration 15 / 16: error bound 4.82e-89409
+    Iteration 16 / 16: error bound 1.38e-178824
+    cpu/wall(s): 0.028 0.028
+    virt/peak/res/peak(MB): 19.19 19.19 7.17 7.20
+    [3.14159265358979323846{...99959 digits...}76742080565549362465 +/- 3.91e-100000]
+
 zeta_zeros.c
 -------------------------------------------------------------------------------
 
