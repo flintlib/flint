@@ -24,20 +24,6 @@
 #include "gr.h"
 #include "gr_poly.h"
 
-flint_bitcnt_t
-_fmpq_vec_max_height_bits(const fmpq * x, slong len)
-{
-    flint_bitcnt_t bits, max_bits = 0;
-
-    for (slong i = 0; i < len; i++)
-    {
-        bits = fmpq_height_bits(x + i);
-        if (bits > max_bits)
-            max_bits = bits;
-    }
-
-    return max_bits;
-}
 
 int _is_lucky_prime_ui(ulong p, const fmpq * xs, slong n)
 {
@@ -86,7 +72,7 @@ _fmpq_poly_check_interpolant(const fmpz * poly, const fmpz_t den,
     for (i = 0; i < n && ok; i++)
     {
         _fmpz_poly_evaluate_fmpq(ynum, yden, poly, n,
-                                            fmpq_numref(xs + i), fmpq_denref(xs + i));
+                                fmpq_numref(xs + i), fmpq_denref(xs + i));
         fmpq_mul_fmpz(y1, ys + i, den);
         fmpq_mul_fmpz(y1, y1, yden);
         ok = fmpq_equal_fmpz(y1, ynum);
@@ -142,6 +128,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     nn_ptr primes = NULL, xmod = NULL, ymod = NULL, residues = NULL, residuesden = NULL;
     int * good = NULL;
     fmpq * coeffs;
+    fmpz * rescoeffs;
 
     if (n == 0)
         return 1;
@@ -154,6 +141,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     fmpz_init(M1M2);
 
     coeffs = _fmpq_vec_init(n);
+    rescoeffs = _fmpz_vec_init(n);
 
     /* Lagrange interpolation gives:
 
@@ -188,13 +176,11 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             {
                 p = n_nextprime(p, 1);
             } while (!(_is_lucky_prime_ui(p, xs, n) && _is_lucky_prime_ui(p, ys, n)));
-
             nmod_init(&mod, p);
             for (i = 0; i < n; i++) {
                 xm[i] = fmpz_get_nmod(fmpq_numref(xs + i), mod);
                 mden = fmpz_get_nmod(fmpq_denref(xs + i), mod);
                 xm[i] = nmod_div(xm[i], mden, mod);
-
                 ym[i] = fmpz_get_nmod(fmpq_numref(ys + i), mod);
                 mden = fmpz_get_nmod(fmpq_denref(ys + i), mod);
                 ym[i] = nmod_div(ym[i], mden, mod);
@@ -204,12 +190,13 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                 num_primes = 1;
                 if (total_primes == 0)
                 {
-                    _fmpz_vec_set_nmod_vec(poly, ym, n, mod);
+                    for (i = 0; i < n; i++)
+                        fmpz_set_ui(rescoeffs + i, ym[i]);
                     fmpz_set_ui(M, p);
                 }
                 else
                 {
-                    _fmpz_poly_CRT_ui(poly, poly, n, M, ym, n, mod.n, mod.ninv, 0);
+                    _fmpz_poly_CRT_ui(rescoeffs, rescoeffs, n, M, ym, n, mod.n, mod.ninv, 0);
                     fmpz_mul_ui(M, M, p);
                 }
             }
@@ -313,8 +300,8 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                     // reconstruct modulo M2 = prod(primes)
                     fmpz_multi_CRT_ui(t, residues, comb, temp, 0);
                     // reconstruct modulo M1M2 = M*M2
-                    _fmpz_CRT(u, poly + j, M, t, M2, M1M2, c, 0);
-                    fmpz_swap(poly + j, u);
+                    _fmpz_CRT(u, rescoeffs + j, M, t, M2, M1M2, c, 0);
+                    fmpz_swap(rescoeffs + j, u);
                 }
                 fmpz_swap(M, M1M2);
             }
@@ -338,11 +325,11 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             }
             checked_unique = 1;
         }
-        else
+        else if (num_primes > 0)
         {
             /* Rational reconstruction */
             for (i = 0, rat_rec = 1; rat_rec && i < n; i++)
-                rat_rec = fmpq_reconstruct_fmpz(coeffs + i, poly + i, M);
+                rat_rec = fmpq_reconstruct_fmpz(coeffs + i, rescoeffs + i, M);
 
             if (rat_rec)
             {/* Check for termination */
@@ -358,6 +345,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             ok = 0;
             break;
         }
+        //flint_printf("nprimes: %ld  bits: %lu bound: %lu\n", total_primes, fmpz_bits(M), bound_bits);
     }
 
     fmpz_clear(M);
@@ -370,6 +358,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     _nmod_vec_clear(xm);
     _nmod_vec_clear(ym);
 
+    _fmpz_vec_clear(rescoeffs,n);
     _fmpq_vec_clear(coeffs, n);
 
     flint_free(primes);
