@@ -1,0 +1,127 @@
+/*
+    Copyright (C) 2025 Fredrik Johansson, Rémi Prébet
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
+
+TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
+{
+    int i, result;
+
+    ulong adversarial_primes[100];
+    for (i = 0; i < 100; i++)
+    {
+        adversarial_primes[i] = n_nextprime((i == 0) ? (UWORD(1) << (FLINT_BITS - 1))
+                                                     : adversarial_primes[i - 1], 1);
+    }
+
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        fmpq_poly_t P, Q;
+        fmpq *x, *y, *z;
+        slong j, k, n, npoints, nbad, bits;
+
+        if (n_randint(state, 10))
+        {
+            npoints = n_randint(state, 10);
+            n = n_randint(state, npoints + 1);
+            bits = n_randint(state, 400) + 1;
+        }
+        else
+        {
+            npoints = n_randint(state, 6);
+            n = n_randint(state, npoints + 1);
+            bits = n_randint(state, 10000) + 1;
+        }
+
+        x = _fmpq_vec_init(npoints);
+        y = _fmpq_vec_init(npoints);
+        z = _fmpq_vec_init(npoints);
+
+        fmpq_poly_init(P);
+        fmpq_poly_init(Q);
+
+        fmpq_poly_randtest(P, state, n, bits);
+
+        for (j = 0; j < npoints; j++)
+            fmpq_set_si(x + j, -npoints/2 + j, WORD(1));
+
+        nbad = n_randint(state, 100);
+
+        for (k = 0; k < nbad && npoints; k++)
+        {
+            j = n_randint(state, npoints);
+            fmpq_mul_ui(x + j, x + j, adversarial_primes[n_randint(state, 100)]);
+        }
+
+        for (j = 0; j < npoints; j++)
+            fmpq_poly_evaluate_fmpq(y + j, P, x + j);
+
+        result = fmpq_poly_interpolate_multi_mod(Q, x, y, npoints);
+        if (!result)
+        {
+            flint_printf("FAIL (exact):\n");
+            flint_printf("P  %{fmpq_poly}\n\n", P);
+            flint_printf("x  %{fmpq*}\n\n", x, npoints);
+            flint_printf("y  %{fmpq*}\n\n", y, npoints);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        result = (fmpq_poly_equal(P, Q));
+        if (!result)
+        {
+            flint_printf("FAIL (P != Q):\n");
+            flint_printf("P  %{fmpq_poly}\n\n", P);
+            flint_printf("x  %{fmpq*}\n\n", x, npoints);
+            flint_printf("y  %{fmpq*}\n\n", y, npoints);
+            flint_printf("Q  %{fmpq_poly}\n\n", Q);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        /* Test arbitrary x and y */
+        if (n_randint(state, 2))
+            _fmpq_vec_randtest(x, state, npoints, 1 + n_randint(state, 10));
+        _fmpq_vec_randtest(y, state, npoints, 1 + n_randint(state, 10));
+
+        result = fmpq_poly_interpolate_multi_mod(Q, x, y, npoints);
+
+        if (result)
+        {
+            for (j = 0; j < npoints; j++)
+                fmpq_poly_evaluate_fmpq(z + j, Q, x + j);
+
+            result = (_fmpq_vec_equal(z, y, npoints));
+
+            if (!result)
+            {
+                flint_printf("FAIL (P != Q, 2):\n");
+                flint_printf("x  %{fmpq*}\n\n", x, npoints);
+                flint_printf("y  %{fmpq*}\n\n", y, npoints);
+                flint_printf("Q  %{fmpq_poly}\n\n", Q);
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        fmpq_poly_clear(P);
+        fmpq_poly_clear(Q);
+        _fmpq_vec_clear(x, npoints);
+        _fmpq_vec_clear(y, npoints);
+        _fmpq_vec_clear(z, npoints);
+    }
+
+    TEST_FUNCTION_END(state);
+}
