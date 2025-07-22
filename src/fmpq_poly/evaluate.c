@@ -20,19 +20,8 @@ _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
                         const fmpz * poly, const fmpz_t den, slong len,
                         const fmpz_t anum, const fmpz_t aden)
 {
-    fmpz_t d;
-
     _fmpz_poly_evaluate_fmpq(rnum, rden, poly, len, anum, aden);
     fmpz_mul(rden, rden, den);
-
-    fmpz_init(d);
-    fmpz_gcd(d, rnum, rden);
-    if (!fmpz_is_one(d))
-    {
-        fmpz_divexact(rnum, rnum, d);
-        fmpz_divexact(rden, rden, d);
-    }
-    fmpz_clear(d);
 }
 
 void
@@ -43,6 +32,7 @@ fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a)
         _fmpq_poly_evaluate_fmpq(fmpq_numref(res), fmpq_denref(res),
             poly->coeffs, poly->den, poly->length,
             fmpq_numref(a), fmpq_denref(a));
+        fmpq_canonicalise(res);
     }
     else
     {
@@ -59,22 +49,8 @@ void
 _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly,
                          const fmpz_t den, slong len, const fmpz_t a)
 {
-    fmpz_t d;
-
     _fmpz_poly_evaluate_horner_fmpz(rnum, poly, len, a);
-
-    fmpz_init(d);
-    fmpz_gcd(d, rnum, den);
-    if (*d != WORD(1))
-    {
-        fmpz_divexact(rnum, rnum, d);
-        fmpz_divexact(rden, den, d);
-    }
-    else
-    {
-        fmpz_set(rden, den);
-    }
-    fmpz_clear(d);
+    fmpz_set(rden, den);
 }
 
 void
@@ -82,4 +58,5 @@ fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly, const fmpz_t a)
 {
     _fmpq_poly_evaluate_fmpz(fmpq_numref(res), fmpq_denref(res),
                              poly->coeffs, poly->den, poly->length, a);
+    fmpq_canonicalise(res);
 }

@@ -66,18 +66,26 @@ static int
 _fmpq_poly_check_interpolant(const fmpz * poly, const fmpz_t den,
                                 const fmpq * xs, const fmpq * ys, slong n)
 {
-    fmpq_t y;
+    fmpz_t ynum, yden;
+    fmpq_t y1;
     slong i;
     int ok = 1;
 
-    fmpq_init(y);
+    fmpq_init(y1);
+    fmpz_init(ynum);
+    fmpz_init(yden);
+
     for (i = 0; i < n && ok; i++)
     {
-        _fmpq_poly_evaluate_fmpq(fmpq_numref(y), fmpq_denref(y), poly, den, n,
-                                 fmpq_numref(xs + i), fmpq_denref(xs + i));
-        ok = fmpq_equal(y, ys + i);
+        _fmpz_poly_evaluate_fmpq(ynum, yden, poly, n,
+                                            fmpq_numref(xs + i), fmpq_denref(xs + i));
+        fmpq_mul_fmpz(y1, ys + i, den);
+        fmpq_mul_fmpz(y1, y1, yden);
+        ok = fmpq_equal_fmpz(y1, ynum);
     }
-    fmpq_clear(y);
+    fmpq_clear(y1);
+    fmpz_clear(ynum);
+    fmpz_clear(yden);
 
     return ok;
 }
@@ -351,14 +359,12 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
         }
         else if (rat_rec)
         {
-            flint_printf("Checks\n");
-            //_fmpq_vec_print(coeffs, n); flint_printf("\n");
             /* Check for termination */
             timeit_start(t0);
             _fmpq_vec_get_fmpz_vec_fmpz(poly, den, coeffs, n);
             if (_fmpq_poly_check_interpolant(poly, den, xs, ys, n)) {
                 timeit_stop(t0);
-                flint_printf(" done cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
+                flint_printf("Check cpu = %ld ms wall = %ld ms\n", t0->cpu, t0->wall);
                 break;
             }
             flint_printf("\n");
