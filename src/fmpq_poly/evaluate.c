@@ -49,7 +49,7 @@ void
 _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly,
                          const fmpz_t den, slong len, const fmpz_t a)
 {
-    _fmpz_poly_evaluate_horner_fmpz(rnum, poly, len, a);
+    _fmpz_poly_evaluate_fmpz(rnum, poly, len, a);
     fmpz_set(rden, den);
 }
 
