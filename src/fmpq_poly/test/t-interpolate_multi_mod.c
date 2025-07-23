@@ -62,7 +62,12 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
         for (k = 0; k < nbad && npoints; k++)
         {
             j = n_randint(state, npoints);
-            fmpq_mul_ui(x + j, x + j, adversarial_primes[n_randint(state, 100)]);
+            if (n_randint(state, 2))
+                fmpz_mul_ui(fmpq_numref(x + j), fmpq_numref(x + j),
+                            adversarial_primes[n_randint(state, 100)]);
+            else
+                fmpz_mul_ui(fmpq_denref(x + j), fmpq_denref(x + j),
+                            adversarial_primes[n_randint(state, 100)]);
         }
 
         for (j = 0; j < npoints; j++)
