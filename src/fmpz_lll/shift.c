@@ -23,13 +23,10 @@ fmpz_lll_shift(const fmpz_mat_t B)
     for (i = 0; i < B->r; i++)
     {
         int j;
-        for (j = n - 1;
-             j >= i + shift + 1 && fmpz_size(fmpz_mat_entry(B, i, j)) == 0L;
-             j--) ;
+        for (j = n - 1; j >= i + shift + 1 && fmpz_is_zero(fmpz_mat_entry(B, i, j)); j--) ;
 
         if (shift < j - i)
             shift = j - i;
-
     }
 
     return shift;

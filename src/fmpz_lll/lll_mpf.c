@@ -95,7 +95,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         {
             _mpf_vec_norm2(mpf_mat_entry(A->appSP2, i, i), appB->rows[i],
                            n, prec);
-        } while ((mpf_sgn(mpf_mat_entry(A->appSP2, i, i)) == 0.0)
+        } while ((mpf_sgn(mpf_mat_entry(A->appSP2, i, i)) == 0)
                  && (++i < d));
 
         zeros = i - 1;          /* all vectors B[i] with i <= zeros are zero vectors */
@@ -298,7 +298,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 for (i = kappa2 + 1; i <= kappamax; i++)
                     mpf_set(mpf_mat_entry(A->appSP2, i, kappa), appSPtmp + i);
 
-                if (mpf_sgn(mpf_mat_entry(r, kappa, kappa)) <= 0.0)
+                if (mpf_sgn(mpf_mat_entry(r, kappa, kappa)) <= 0)
                 {
                     zeros++;
                     kappa++;
@@ -580,7 +580,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                     fmpz_swap(fmpz_mat_entry(GM, kappa + j, kappa),
                               fmpz_mat_entry(GM, kappa2 - j, kappa));
 
-                if (mpf_sgn(mpf_mat_entry(r, kappa, kappa)) <= 0.0)
+                if (mpf_sgn(mpf_mat_entry(r, kappa, kappa)) <= 0)
                 {
                     zeros++;
                     kappa++;
