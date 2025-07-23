@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -39,5 +39,29 @@ _fmpz_vec_prod(fmpz_t res, const fmpz * vec, slong len)
         _fmpz_vec_prod(tmp, vec + m, len - m);
         fmpz_mul(res, res, tmp);
         fmpz_clear(tmp);
+    }
+}
+
+void
+_fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong len)
+{
+    if (!len)
+        fmpz_one(res);
+    else if (len < 16)
+    {
+        slong i;
+
+        fmpz_set_ui(res, x[0]);
+        for (i = 1; i < len; i++)
+            fmpz_mul_ui(res, res, x[i]);
+    }
+    else
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        _fmpz_ui_vec_prod(res, x, len / 2);
+        _fmpz_ui_vec_prod(t, x + len / 2, len - len / 2);
+        fmpz_mul(res, res, t);
+        fmpz_clear(t);
     }
 }

@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2011, 2025 Fredrik Johansson
     Copyright (C) 2025 Rémi Prébet
 
     This file is part of FLINT.
@@ -24,37 +25,6 @@
 #include "gr.h"
 #include "gr_poly.h"
 
-
-int _is_lucky_prime_ui(ulong p, const fmpq * xs, slong n)
-{
-    int ok = 1;
-    slong i;
-    for (i = 0; i < n && ok; i++)
-        ok = !fmpz_divisible_ui(fmpq_denref(xs + i), p);
-    return ok;
-}
-
-
-static void
-_fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong n)
-{
-    if (n < 16)
-    {
-        slong i;
-        fmpz_set_ui(res, x[0]);
-        for (i = 1; i < n; i++)
-            fmpz_mul_ui(res, res, x[i]);
-    }
-    else
-    {
-        fmpz_t t;
-        fmpz_init(t);
-        _fmpz_ui_vec_prod(res, x, n / 2);
-        _fmpz_ui_vec_prod(t, x + n / 2, n - n / 2);
-        fmpz_mul(res, res, t);
-        fmpz_clear(t);
-    }
-}
 
 static int
 _fmpq_poly_check_interpolant(const fmpz * poly, const fmpz_t den,
@@ -119,6 +89,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     ulong p, mden;
     slong i, j, k;
     nmod_t mod;
+    nmod_t * Lmod = NULL;
     nn_ptr xm, ym;
     fmpz_t M, t, u, c, M2, M1M2;
     slong total_primes, num_primes, count_good;
@@ -172,20 +143,22 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     {
         if (total_primes < 16)
         {
-            do /* p must not divide any denominator */
-            {
-                p = n_nextprime(p, 1);
-            } while (!(_is_lucky_prime_ui(p, xs, n) && _is_lucky_prime_ui(p, ys, n)));
+            p = n_nextprime(p, 1);
+            mden = 0;
             nmod_init(&mod, p);
+            /* Modular reduction */
             for (i = 0; i < n; i++) {
                 xm[i] = fmpz_get_nmod(fmpq_numref(xs + i), mod);
                 mden = fmpz_get_nmod(fmpq_denref(xs + i), mod);
+                if (!mden) break;
                 xm[i] = nmod_div(xm[i], mden, mod);
                 ym[i] = fmpz_get_nmod(fmpq_numref(ys + i), mod);
                 mden = fmpz_get_nmod(fmpq_denref(ys + i), mod);
+                if (!mden) break;
                 ym[i] = nmod_div(ym[i], mden, mod);
             }
-            if (_checked_nmod_poly_interpolate(ym, xm, ym, n, mod))
+            /* Modular interpolation and CRT */
+            if (mden && _checked_nmod_poly_interpolate(ym, xm, ym, n, mod))
             {
                 num_primes = 1;
                 if (total_primes == 0)
@@ -212,20 +185,19 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             num_primes = FLINT_MAX(1, total_primes / 2);
 
             primes = flint_realloc(primes, sizeof(ulong) * num_primes);
+            Lmod = flint_realloc(Lmod, sizeof(nmod_t) * num_primes);
             xmod = flint_realloc(xmod, sizeof(ulong) * n * num_primes);
             ymod = flint_realloc(ymod, sizeof(ulong) * n * num_primes);
             residues = flint_realloc(residues, sizeof(ulong) * num_primes);
             residuesden = flint_realloc(residuesden, sizeof(ulong) * num_primes);
             good = flint_realloc(good, sizeof(int) * num_primes);
 
-            for (k = 0; k < num_primes;)
+            for (k = 0; k < num_primes; k++)
             {
                 p = n_nextprime(p, 1);
-                if (_is_lucky_prime_ui(p, xs, n) && _is_lucky_prime_ui(p, ys, n))
-                {
-                    primes[k] = p;
-                    k++;
-                }
+                nmod_init(Lmod + k, p);
+                primes[k] = p;
+                good[k] = 1;
             }
 
             _fmpz_ui_vec_prod(M2, primes, num_primes);
@@ -233,29 +205,35 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             fmpz_comb_init(comb, primes, num_primes);
             fmpz_comb_temp_init(temp, comb);
 
-            // Reduce each j-th coeff mod all primes
+            // Reduce each j-th coeff mod all primes (report zero denominators)
             for (j = 0; j < n; j++)
-                {
+            {
                 fmpz_multi_mod_ui(residues, fmpq_numref(xs + j), comb, temp);
                 fmpz_multi_mod_ui(residuesden, fmpq_denref(xs + j), comb, temp);
-                for (k = 0; k < num_primes; k++) {
-                    nmod_init(&mod, primes[k]);
-                    xmod[k * n + j] = nmod_div(residues[k], residuesden[k], mod);
+                for (k = 0; k < num_primes; k++)
+                {
+                    if (residuesden[k] && good[k])
+                        xmod[k * n + j] = nmod_div(residues[k], residuesden[k], Lmod[k]);
+                    else
+                        good[k] = 0;
                 }
 
                 fmpz_multi_mod_ui(residues, fmpq_numref(ys + j), comb, temp);
                 fmpz_multi_mod_ui(residuesden, fmpq_denref(ys + j), comb, temp);
-                for (k = 0; k < num_primes; k++) {
-                    nmod_init(&mod, primes[k]);
-                    ymod[k * n + j] = nmod_div(residues[k], residuesden[k], mod);
+                for (k = 0; k < num_primes; k++)
+                {
+                    if (residuesden[k] && good[k])
+                        ymod[k * n + j] = nmod_div(residues[k], residuesden[k], Lmod[k]);
+                    else
+                        good[k] = 0;
                 }
             }
 
             count_good = 0;
             for (k = 0; k < num_primes; k++)
             {
-                nmod_init(&mod, primes[k]);
-                good[k] = _checked_nmod_poly_interpolate(ymod + k * n, xmod + k * n, ymod + k * n, n, mod);
+                if (!good[k]) continue;
+                good[k] = _checked_nmod_poly_interpolate(ymod + k * n, xmod + k * n, ymod + k * n, n, Lmod[k]);
                 count_good += (good[k] != 0);
             }
 
@@ -325,7 +303,8 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
             }
             checked_unique = 1;
         }
-        else if (num_primes > 0)
+
+        if (num_primes > 0)
         {
             /* Rational reconstruction */
             for (i = 0, rat_rec = 1; rat_rec && i < n; i++)
@@ -367,6 +346,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     flint_free(residues);
     flint_free(residuesden);
     flint_free(good);
+    flint_free(Lmod);
 
     return ok;
 }

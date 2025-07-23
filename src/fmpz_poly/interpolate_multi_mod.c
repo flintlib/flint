@@ -21,27 +21,6 @@
 #include "gr.h"
 #include "gr_poly.h"
 
-static void
-_fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong n)
-{
-    if (n < 16)
-    {
-        slong i;
-        fmpz_set_ui(res, x[0]);
-        for (i = 1; i < n; i++)
-            fmpz_mul_ui(res, res, x[i]);
-    }
-    else
-    {
-        fmpz_t t;
-        fmpz_init(t);
-        _fmpz_ui_vec_prod(res, x, n / 2);
-        _fmpz_ui_vec_prod(t, x + n / 2, n - n / 2);
-        fmpz_mul(res, res, t);
-        fmpz_clear(t);
-    }
-}
-
 static int
 _fmpz_poly_check_interpolant(const fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
 {

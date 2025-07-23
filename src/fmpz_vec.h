@@ -175,6 +175,8 @@ void _fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len);
 
 void _fmpz_vec_prod(fmpz_t res, const fmpz * vec, slong len);
 
+void _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong len);
+
 /*  Reduction mod p **********************************************************/
 
 void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p);
