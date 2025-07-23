@@ -289,8 +289,7 @@ Bluestein transform
    `2^e \geq 2n-1` and a size *n* array of convolution factors.
 
 .. function:: void acb_dft_bluestein_init(acb_dft_bluestein_t t, slong len, slong prec)
-
-.. function:: void acb_dft_bluestein_clear(acb_dft_bluestein_t t)
+              void acb_dft_bluestein_clear(acb_dft_bluestein_t t)
 
    Initialize and clear a Bluestein scheme to compute DFT of size *len*.
 
