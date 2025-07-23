@@ -93,7 +93,6 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     nn_ptr xm, ym;
     fmpz_t M, t, u, c, M2, M1M2;
     slong total_primes, num_primes, count_good;
-    flint_bitcnt_t xbits, ybits, bound_bits;
     int ok = 1, rat_rec;
     int checked_unique = 0;
     nn_ptr primes = NULL, xmod = NULL, ymod = NULL, residues = NULL, residuesden = NULL;
@@ -113,24 +112,6 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
 
     coeffs = _fmpq_vec_init(n);
     rescoeffs = _fmpz_vec_init(n);
-
-    /* Lagrange interpolation gives:
-
-        w_i = prod_{j != i} (x - x_i) / (x_j - x_i)
-        hb = heightbits
-
-        hb(w_i) <= max_i hb(x_i) * 2(n-1)
-
-        hb(f) <= sum_i hb(y_i) + hb(w_i) * 2(n -1)
-              <= n * (hb(y_i) + hb(x_i) * 4(n -1))
-
-    */
-
-    xbits = _fmpq_vec_max_height_bits(xs, n);
-    ybits = _fmpq_vec_max_height_bits(ys, n);
-    bound_bits = n * (xbits * 4 * (n - 1) + ybits);
-    /* Rational reconstruction needs modulus M >= 1/2*height(f)^2 + 1 */
-    bound_bits *= 2;
 
     xm = _nmod_vec_init(n);
     ym = _nmod_vec_init(n);
@@ -317,14 +298,6 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                     break;
             }
         }
-
-        /* No solution */
-        if (fmpz_bits(M) > bound_bits + 1)
-        {
-            ok = 0;
-            break;
-        }
-        //flint_printf("nprimes: %ld  bits: %lu bound: %lu\n", total_primes, fmpz_bits(M), bound_bits);
     }
 
     fmpz_clear(M);
