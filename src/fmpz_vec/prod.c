@@ -43,7 +43,7 @@ _fmpz_vec_prod(fmpz_t res, const fmpz * vec, slong len)
 }
 
 void
-_fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong len)
+_fmpz_ui_vec_prod(fmpz_t res, nn_srcptr vec, slong len)
 {
     if (!len)
         fmpz_one(res);
@@ -51,16 +51,16 @@ _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong len)
     {
         slong i;
 
-        fmpz_set_ui(res, x[0]);
+        fmpz_set_ui(res, vec[0]);
         for (i = 1; i < len; i++)
-            fmpz_mul_ui(res, res, x[i]);
+            fmpz_mul_ui(res, res, vec[i]);
     }
     else
     {
         fmpz_t t;
         fmpz_init(t);
-        _fmpz_ui_vec_prod(res, x, len / 2);
-        _fmpz_ui_vec_prod(t, x + len / 2, len - len / 2);
+        _fmpz_ui_vec_prod(res, vec, len / 2);
+        _fmpz_ui_vec_prod(t, vec + len / 2, len - len / 2);
         fmpz_mul(res, res, t);
         fmpz_clear(t);
     }

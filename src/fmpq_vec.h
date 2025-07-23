@@ -41,7 +41,7 @@ void _fmpq_vec_randtest_uniq_sorted(fmpq * vec,
 
 void _fmpq_vec_max_height(fmpz_t height, const fmpq * vec, slong len);
 
-flint_bitcnt_t _fmpq_vec_max_height_bits(const fmpq * x, slong len);
+flint_bitcnt_t _fmpq_vec_max_height_bits(const fmpq * vec, slong len);
 
 /* Sorting  ******************************************************************/
 

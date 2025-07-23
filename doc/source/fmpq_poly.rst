@@ -1388,40 +1388,42 @@ Evaluation
 
 Interpolation
 --------------------------------------------------------------------------------
-
-
 .. function:: void _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
+              void fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
 
-    Sets ``poly`` / ``den`` to the unique interpolating polynomial of
+    Sets ``poly`` (or ``poly`` / ``den``) to the unique interpolating polynomial of
     degree at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
-    in ``xs`` and ``ys``.
-
-    The vector ``poly`` must have room for ``n+1`` coefficients,
-    even if the interpolating polynomial is shorter.
-    Aliasing of ``poly`` or ``den`` with any other argument is not
-    allowed.
-
-    It is assumed that the `x` values are distinct.
+    in ``xs`` and ``ys``, assuming that the evaluation points `x_i` are distinct.
 
     This function uses a simple `O(n^2)` implementation of Lagrange
     interpolation, clearing denominators to avoid working with fractions.
     It is currently not designed to be efficient for large `n`.
 
-.. function:: void fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
-
-    Sets ``poly`` to the unique interpolating polynomial of degree
-    at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
-    in ``xs`` and ``ys``. It is assumed that the `x` values are distinct.
-
-.. function:: void _fmpq_poly_interpolation_weights(fmpz * w, fmpz_t wden, const fmpq * xs, slong len);
-              void _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den, const fmpq * ys, fmpz * const * tree, const fmpz * weights, slong len);
-              void _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong len);
-              void fmpq_poly_interpolate_fast(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n);
+.. function:: void _fmpq_poly_interpolation_weights(fmpz * w, fmpz_t wden, const fmpq * xs, slong len)
+              void _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den, const fmpq * ys, fmpz * const * tree, const fmpz * weights, slong len)
+              void _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong len)
+              void fmpq_poly_interpolate_fast(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
 
     Fast polynomial interpolation using a subproduct tree. The *precomp*
     version requires a precomputed subproduct tree generated using
     :func:`_fmpz_poly_tree_build_fmpq_vec` and precomputed interpolation weights
     generated using :func:`_fmpq_poly_interpolation_weights`.
+
+.. function:: int _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
+              int fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
+
+    Sets ``poly`` (or ``poly`` / ``den``) to the unique interpolating polynomial of
+    degree at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i` in
+    ``xs`` and ``ys``, assuming that the evaluation points `x_i` are distinct.
+
+    If the `x_i` are not distinct returns 0 indicating failure.
+    Otherwise returns 1 indicating success.
+
+    This function performs interpolation modulo one or more prime numbers and combines
+    the results using the Chinese Remainder Theorem (CRT) with adaptive termination.
+    This function is particularly efficient when the interpolated polynomial is expected
+    to have small-bitsize coefficients.
+
 
 Composition
 --------------------------------------------------------------------------------
