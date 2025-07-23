@@ -2,6 +2,7 @@
     Copyright (C) 2009, 2010 William Hart
     Copyright (C) 2009, 2010 Andy Novocin
     Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,15 +12,43 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "double_extras.h"
+#include "d_vec.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 #include "fmpz_lll.h"
 
-#if defined(FUNC_HEAD) && defined(LIMIT) && defined(COMPUTE) && defined(TYPE)
 #ifdef GM
 #undef GM
 #endif
 #define GM ((fl->rt == Z_BASIS) ? A->exactSP : B)
 
-FUNC_HEAD
+#define LIMIT (advance ? cur_kappa : kappa)
+
+#define COMPUTE(G, I, J, C) \
+    do { \
+        if (heuristic) \
+        { \
+            d_mat_entry(G, I, J) = fmpz_lll_heuristic_dot(appB->rows[I], appB->rows[J], C, B, I, J, expo[I] + expo[J]); \
+        } \
+        else if (advance) \
+        { \
+            d_mat_entry(G, I, J) = _d_vec_dot(appB->rows[I], appB->rows[J], C); \
+        } \
+        else \
+        { \
+            if (I != J) \
+                d_mat_entry(G, I, J) = _d_vec_dot(appB->rows[I], appB->rows[J], C); \
+            else \
+                d_mat_entry(G, I, J) = _d_vec_norm(appB->rows[I], C); \
+        } \
+    } while (0)
+
+int _fmpz_lll_check_babai(int cur_kappa, int kappa,
+    fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s,
+    d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros,
+    int kappamax, int n, const fmpz_lll_t fl, int advance, int heuristic)
 {
     if (fl->rt == Z_BASIS && fl->gt == APPROX)
     {
@@ -265,28 +294,30 @@ FUNC_HEAD
             }
             else
             {
-#if TYPE == 2
-                for (i = zeros + 1; i <= LIMIT; i++)
-                    d_mat_entry(A->appSP, kappa, i) = D_NAN;
-#endif
+                if (advance)
+                {
+                    for (i = zeros + 1; i <= LIMIT; i++)
+                        d_mat_entry(A->appSP, kappa, i) = D_NAN;
+                }
             }
             loops++;
         } while (test);
 
-#if TYPE == 1
-        if (d_is_nan(d_mat_entry(A->appSP, kappa, kappa)))
+        if (!advance)
         {
-            COMPUTE(A->appSP, kappa, kappa, n);
-        }
+            if (d_is_nan(d_mat_entry(A->appSP, kappa, kappa)))
+            {
+                COMPUTE(A->appSP, kappa, kappa, n);
+            }
 
-        s[zeros + 1] = d_mat_entry(A->appSP, kappa, kappa);
+            s[zeros + 1] = d_mat_entry(A->appSP, kappa, kappa);
 
-        for (k = zeros + 1; k < kappa - 1; k++)
-        {
-            tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
-            s[k + 1] = s[k] - tmp;
+            for (k = zeros + 1; k < kappa - 1; k++)
+            {
+                tmp = d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k);
+                s[k + 1] = s[k] - tmp;
+            }
         }
-#endif
     }
     else
     {
@@ -626,6 +657,31 @@ FUNC_HEAD
     return 0;
 }
 
-#undef GM
+int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U,
+    d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+    int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+{
+    return _fmpz_lll_check_babai(cur_kappa, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 1, 0);
+}
 
-#endif
+int fmpz_lll_advance_check_babai_heuristic_d(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U,
+    d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+    int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+{
+    return _fmpz_lll_check_babai(cur_kappa, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 1, 1);
+}
+
+int fmpz_lll_check_babai(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+    d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+    int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+{
+    return _fmpz_lll_check_babai(INT_MIN, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 0, 0);
+}
+
+int fmpz_lll_check_babai_heuristic_d(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+    d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A,
+    int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
+{
+    return _fmpz_lll_check_babai(INT_MIN, kappa, B, U, mu, r, s, appB, expo, A, a, zeros, kappamax, n, fl, 0, 1);
+}
+

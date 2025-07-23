@@ -21,9 +21,12 @@
 #include "double_extras.h"
 #include "fmpz_lll.h"
 
+#ifdef GM
+#undef GM
+#endif
 #define GM ((fl->rt == Z_BASIS) ? A->exactSP : B)
 
-int _fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl)
+int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl)
 {
     int newd = 0;
     int ok = 1;
@@ -640,12 +643,7 @@ int _fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_t
 
 int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl)
 {
-    return _fmpz_lll_mpf2(B, U, prec, NULL, fl);
-}
-
-int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_t gs_B, const fmpz_lll_t fl)
-{
-    return _fmpz_lll_mpf2(B, U, prec, gs_B, fl);
+    return fmpz_lll_mpf2_with_removal(B, U, prec, NULL, fl);
 }
 
 int
