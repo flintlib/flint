@@ -58,7 +58,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             {
                 if (mpf_cmp_d(mpf_mat_entry(A->appSP2, kappa, j), DBL_MIN) == 0)
                 {
-#if 1
+#if 0
 /* Use slow dot product and check for cancellation */
                     if (!(_mpf_vec_dot2(mpf_mat_entry(A->appSP2, kappa, j), appB->rows[kappa], appB->rows[j], n, prec)))
 #else
