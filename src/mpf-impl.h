@@ -39,6 +39,7 @@ typedef mpf_mat_struct mpf_mat_t[1];
 mpf * _mpf_vec_init(slong len, flint_bitcnt_t prec);
 void _mpf_vec_clear(mpf * vec, slong len);
 void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len);
+int _mpf_vec_dot1(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
 int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
 void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec);
 void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
