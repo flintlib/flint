@@ -76,6 +76,25 @@ void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec)
 }
 
 int
+_mpf_vec_dot1(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec)
+{
+    slong i;
+    mpf_t tmp;
+    mpf_init2(tmp, prec);
+
+    flint_mpf_set_ui(res, 0);
+    for (i = 0; i < len2; i++)
+    {
+        mpf_mul(tmp, vec1 + i, vec2 + i);
+        mpf_add(res, res, tmp);
+    }
+
+    mpf_clear(tmp);
+
+    return 1;
+}
+
+int
 _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec)
 {
     slong i;
