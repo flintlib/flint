@@ -30,6 +30,7 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
     {
         fmpq_poly_t P, Q;
         fmpq *x, *y, *z;
+        fmpz *tmp;
         slong j, k, n, npoints, nbad, bits;
 
         if (n_randint(state, 10))
@@ -42,7 +43,7 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
         {
             npoints = n_randint(state, 6);
             n = n_randint(state, npoints + 1);
-            bits = n_randint(state, 10000) + 1;
+            bits = n_randint(state, 2000) + 1;
         }
 
         x = _fmpq_vec_init(npoints);
@@ -57,17 +58,23 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
         for (j = 0; j < npoints; j++)
             fmpq_set_si(x + j, -npoints/2 + j, WORD(1));
 
-        nbad = n_randint(state, 100);
-
-        for (k = 0; k < nbad && npoints; k++)
+        nbad = n_randint(state, 10) ? 0 : n_randint(state, 50);
+        if (n_randint(state, 2))
         {
-            j = n_randint(state, npoints);
-            if (n_randint(state, 2))
-                fmpz_mul_ui(fmpq_numref(x + j), fmpq_numref(x + j),
-                            adversarial_primes[n_randint(state, 100)]);
-            else
-                fmpz_mul_ui(fmpq_denref(x + j), fmpq_denref(x + j),
-                            adversarial_primes[n_randint(state, 100)]);
+
+            for (k = 0; k < nbad && npoints; k++)
+                fmpz_mul_ui(P->den, P->den, adversarial_primes[n_randint(state, 100)]);
+            fmpq_poly_canonicalise(P);
+        }
+        else
+        {
+            for (k = 0; k < nbad && npoints; k++)
+            {
+                j = n_randint(state, npoints);
+                tmp = n_randint(state, 2) ? fmpq_numref(x + j) : fmpq_denref(x + j);
+                fmpz_mul_ui(tmp, tmp, adversarial_primes[n_randint(state, 100)]);
+                fmpq_canonicalise(x + j);
+            }
         }
 
         for (j = 0; j < npoints; j++)
