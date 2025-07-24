@@ -3,7 +3,7 @@ name: Run Sage CI
 ## This GitHub Actions workflow provides:
 ##
 ##  - portability testing, by building and testing this project on many platforms
-##    (Linux variants and Cygwin), each with two configurations (installed packages),
+##    (Linux variants, macOS, Windows with mingw32), each with two configurations (installed packages),
 ##
 ##  - continuous integration, by building and testing other software
 ##    that depends on this project.
@@ -49,9 +49,6 @@ env:
   DIST_PREREQ:      tar libgmp-dev libmpfr-dev
   # Name of this project in the Sage distribution
   SPKG:             flint
-  # Standard setting: Test the current beta release of Sage:
-  SAGE_REPO:        sagemath/sage
-  SAGE_REF:         develop
   REMOVE_PATCHES:   "*"
 
 jobs:
@@ -60,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out ${{ env.SPKG }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: build/pkgs/${{ env.SPKG }}/src
       - name: Install prerequisites
@@ -75,19 +72,19 @@ jobs:
           && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=standard" > upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
           && ls -l upstream/
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           path: upstream
           name: upstream
 
   linux:
-    uses: sagemath/sage/.github/workflows/docker.yml@develop
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
     with:
       # Sage distribution packages to build
       targets: SAGE_CHECK=no SAGE_CHECK_flint=yes flint
-      # Standard setting: Test the current beta release of Sage:
-      sage_repo: sagemath/sage
-      sage_ref: develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
       # Docker targets (stages) to tag
       docker_targets: "with-targets"
@@ -97,33 +94,44 @@ jobs:
     needs: [dist]
 
   macos:
-    uses: sagemath/sage/.github/workflows/macos.yml@develop
+    uses: passagemath/passagemath/.github/workflows/macos.yml@main
     with:
-      osversion_xcodeversion_toxenv_tuples: >-
-        [["latest", "",           "homebrew-macos-usrlocal-minimal"],
-         ["latest", "",           "homebrew-macos-usrlocal-standard"]]
       targets: SAGE_CHECK=no SAGE_CHECK_flint=yes flint
-      # Standard setting: Test the current beta release of Sage:
-      sage_repo:         sagemath/sage
-      sage_ref:          develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
+      upstream_artifact: upstream
+    needs: [dist]
+
+  mingw:
+    uses: passagemath/passagemath/.github/workflows/mingw.yml@main
+    with:
+      # Extra system packages to install. See available packages at
+      # https://github.com/passagemath/passagemath/tree/main/build/pkgs
+      extra_sage_packages: "info"
+      # Sage distribution packages to build
+      targets: SAGE_CHECK=no SAGE_CHECK_flint=yes flint
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
     needs: [dist]
 
   sage:
-    uses: sagemath/sage/.github/workflows/docker.yml@develop
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
     with:
-      # Standard setting: Test the current beta release of Sage:
-      sage_repo: sagemath/sage
-      sage_ref: develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
       # Build incrementally from published Docker image
       incremental: true
       free_disk_space: true
-      from_docker_repository: ghcr.io/sagemath/sage/
+      from_docker_repository: ghcr.io/passagemath/passagemath/
       from_docker_target: "with-targets"
       from_docker_tag: "dev"
       docker_targets: "with-targets"
-      targets: "build msolve ptest-nodoc"
+      targets: "SAGE_CHECK_passagemath_flint=yes sagemath_flint msolve"
       tox_system_factors: >-
         ["debian-bookworm"]
       tox_packages_factors: >-
