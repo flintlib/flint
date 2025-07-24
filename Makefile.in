@@ -273,9 +273,6 @@ ifeq ($(IS_OUT_OF_TREE),1)
 fmpz_SOURCES += $(SRC_DIR)/fmpz/fmpz.c
 endif
 
-# We clear some template files
-fmpz_lll_SOURCES := $(filter-out $(ABS_SRC_DIR)/fmpz_lll/babai.c $(ABS_SRC_DIR)/fmpz_lll/mpf2_lll.c $(ABS_SRC_DIR)/fmpz_lll/d_lll.c,$(fmpz_lll_SOURCES))
-
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 
 ifeq ($(WANT_ASSEMBLY),1)
