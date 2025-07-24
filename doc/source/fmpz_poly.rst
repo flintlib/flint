@@ -1485,14 +1485,13 @@ Square-free
 
 
 .. function:: int _fmpz_poly_is_squarefree(const fmpz * poly, slong len)
-
-    Returns whether the polynomial ``(poly, len)`` is square-free.
-
-.. function:: int fmpz_poly_is_squarefree(const fmpz_poly_t poly)
+              int fmpz_poly_is_squarefree(const fmpz_poly_t poly)
 
     Returns whether the polynomial ``poly`` is square-free.  A non-zero
-    polynomial is defined to be square-free if it has no non-unit square
-    factors.  We also define the zero polynomial to be square-free.
+    polynomial is defined to be square-free if its factorisation contains no
+    non-constant square factors. We also define the zero polynomial to be
+    square-free. This differs somewhat from the usual definition, e.g. we
+    consider the polynomial `4 x` in `\mathbb{Z}[x]` as square-free.
 
     Returns `1` if the length of ``poly`` is at most `2`.  Returns whether
     the discriminant is zero for quadratic polynomials.  Otherwise, returns
