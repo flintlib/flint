@@ -12,7 +12,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#define flint_set_abort gurkmacka
+#define flint_set_throw cclusi
 #include "flint.h"
+#undef flint_set_abort
+#undef flint_set_throw
 
 #undef FLINT_NORETURN
 #if defined(__GNUC__)
