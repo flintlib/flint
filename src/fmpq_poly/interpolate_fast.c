@@ -113,6 +113,51 @@ void
 _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den,
     const fmpq * xs, const fmpq * ys, slong len)
 {
+    /* Constant */
+    if (len == 1)
+    {
+        fmpz_set(poly, fmpq_numref(ys));
+        fmpz_set(den, fmpq_denref(ys));
+        return;
+    }
+
+    /* Linear */
+    if (len == 2)
+    {
+        fmpz_t Dx, Dy;
+        fmpz *xi, *yi;
+        slong i;
+
+        fmpz_init(Dx);
+        fmpz_init(Dy);
+        xi = _fmpz_vec_init(2);
+        yi = _fmpz_vec_init(2);
+
+        fmpz_lcm(Dx, fmpq_denref(xs), fmpq_denref(xs + 1));
+        fmpz_lcm(Dy, fmpq_denref(ys), fmpq_denref(ys + 1));
+
+        for (i = 0; i < 2; i++) {
+            // xi = Dx * xs
+            fmpz_divexact(xi + i, Dx, fmpq_denref(xs + i));
+            fmpz_mul(xi + i, xi + i, fmpq_numref(xs + i));
+            // yi = Dy * ys
+            fmpz_divexact(yi + i, Dy, fmpq_denref(ys + i));
+            fmpz_mul(yi + i, yi + i, fmpq_numref(ys + i));
+        }
+        fmpz_sub(den, xi, xi + 1);
+        fmpz_mul(den, den, Dy);
+
+        fmpz_sub(poly + 1, yi, yi + 1);
+        fmpz_mul(poly, xi, yi + 1);
+        fmpz_submul(poly, xi + 1, yi);
+
+        fmpz_clear(Dx);
+        fmpz_clear(Dy);
+        _fmpz_vec_clear(xi, 2);
+        _fmpz_vec_clear(yi, 2);
+        return;
+    }
+
     fmpz ** tree;
     fmpz * w;
 
