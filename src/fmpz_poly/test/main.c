@@ -60,7 +60,8 @@
 #include "t-divrem.c"
 #include "t-divrem_divconquer.c"
 #include "t-divrem_preinv.c"
-#include "t-div_root.c"
+#include "t-div_root_fmpz.c"
+#include "t-divexact_root_fmpq.c"
 #include "t-div_series_basecase.c"
 #include "t-div_series.c"
 #include "t-div_series_divconquer.c"
@@ -241,7 +242,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_divrem),
     TEST_FUNCTION(fmpz_poly_divrem_divconquer),
     TEST_FUNCTION(fmpz_poly_divrem_preinv),
-    TEST_FUNCTION(fmpz_poly_div_root),
+    TEST_FUNCTION(fmpz_poly_div_root_fmpz),
+    TEST_FUNCTION(fmpz_poly_divexact_root_fmpq),
     TEST_FUNCTION(fmpz_poly_div_series_basecase),
     TEST_FUNCTION(fmpz_poly_div_series),
     TEST_FUNCTION(fmpz_poly_div_series_divconquer),

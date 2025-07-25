@@ -361,7 +361,8 @@ Sums and products
     Sets ``res`` to the sum of the entries in ``(vec, len)``.
     Aliasing of ``res`` with the entries in ``vec`` is not permitted.
 
-.. function:: void _fmpz_vec_prod(fmpz_t res, const fmpz * vec, slong len)
+.. function:: void _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr vec, slong len)
+              void _fmpz_vec_prod(fmpz_t res, const fmpz * vec, slong len)
 
     Sets ``res`` to the product of the entries in ``(vec, len)``.
     Aliasing of ``res`` with the entries in ``vec`` is not permitted.

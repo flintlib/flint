@@ -1811,7 +1811,7 @@ Euclidean division
     the division is exact, this is the same as division over `\mathbb{Q}`.  An
     exception is raised if `B` is zero.
 
-.. function:: void _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
+.. function:: void _fmpz_poly_div_root_fmpz(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
     division by `x - c`.
@@ -1819,7 +1819,7 @@ Euclidean division
     Supports aliasing of ``Q`` and ``A``, but the result is
     undefined in case of partial overlap.
 
-.. function:: void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
+.. function:: void fmpz_poly_div_root_fmpz(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
     division by `x - c`.
@@ -1828,6 +1828,19 @@ Euclidean division
               void fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Like :func:`fmpz_poly_div`, but assumes that the division is exact.
+
+.. function:: void _fmpz_poly_divexact_root_fmpq(fmpz * Q, const fmpz * A, slong len, const fmpq_t c)
+
+    Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
+    division by `q x - p` where `c = p/q`. Assumes the division is exact.
+
+    Supports aliasing of ``Q`` and ``A``, but the result is
+    undefined in case of partial overlap.
+
+.. function:: void fmpz_poly_divexact_root_fmpq(fmpz_poly_t Q, const fmpz_poly_t A, const fmpq_t c)
+
+    Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
+    division by `q x - p` where `c = p/q`. Assumes the division is exact.
 
 Division with precomputed inverse
 --------------------------------------------------------------------------------
@@ -3174,6 +3187,40 @@ Products
     Sets ``poly`` to the polynomial which is the product
     of `(q_0 x - p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})`, the roots
     `p_i/q_i` being given by ``xs``.
+
+
+Subproduct trees
+--------------------------------------------------------------------------------
+
+
+.. function:: fmpz ** _fmpz_poly_tree_alloc(slong len)
+
+    Allocates space for a subproduct tree of the given length, having
+    linear factors at the lowest level.
+
+    Entry `i` in the tree is a pointer to a single array of limbs,
+    capable of storing `\lfloor n / 2^i \rfloor` subproducts of
+    degree `2^i` adjacently, plus a trailing entry if `n / 2^i` is
+    not an integer.
+
+    For example, a tree of length 7 built from monic linear factors has
+    the following structure, where spaces have been inserted
+    for illustrative purposes::
+
+        X1 X1 X1 X1 X1 X1 X1
+        XX1   XX1   XX1   X1
+        XXXX1       XX1   X1
+        XXXXXXX1
+
+.. function:: void _fmpz_poly_tree_free(fmpz ** tree, slong len)
+
+    Free the allocated space for the subproduct.
+
+.. function:: void _fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len)
+
+    Builds a subproduct tree in the preallocated space from
+    the ``len`` monic linear factors `(q_i x-p_i)` the roots `p_i/q_i`
+    being given by ``xs``. The top level product is not computed.
 
 
 Roots

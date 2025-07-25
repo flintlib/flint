@@ -14,6 +14,8 @@
 #include "t-dot.c"
 #include "t-get_set_fmpz_vec.c"
 #include "t-randtest_uniq_sorted.c"
+#include "t-max_height.c"
+#include "t-max_height_bits.c"
 
 /* Array of test functions ***************************************************/
 
@@ -21,7 +23,9 @@ test_struct tests[] =
 {
     TEST_FUNCTION(fmpq_vec_dot),
     TEST_FUNCTION(fmpq_vec_get_set_fmpz_vec),
-    TEST_FUNCTION(fmpq_vec_randtest_uniq_sorted)
+    TEST_FUNCTION(fmpq_vec_randtest_uniq_sorted),
+    TEST_FUNCTION(fmpq_vec_max_height),
+    TEST_FUNCTION(fmpq_vec_max_height_bits)
 };
 
 /* main function *************************************************************/

@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_poly_div_root, state)
+TEST_FUNCTION_START(fmpz_poly_div_root_fmpz, state)
 {
     int i, result;
 
@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fmpz_poly_div_root, state)
         fmpz_poly_randtest(P, state, n, b);
         fmpz_randtest(c, state, b);
 
-        fmpz_poly_div_root(Q, P, c);
+        fmpz_poly_div_root_fmpz(Q, P, c);
 
         fmpz_poly_set_coeff_fmpz(D, 0, c);
         fmpz_poly_neg(D, D);
@@ -83,8 +83,8 @@ TEST_FUNCTION_START(fmpz_poly_div_root, state)
         fmpz_poly_randtest(P, state, n, b);
         fmpz_poly_set(Q2, P);
 
-        fmpz_poly_div_root(Q1, P, c);
-        fmpz_poly_div_root(Q2, Q2, c);
+        fmpz_poly_div_root_fmpz(Q1, P, c);
+        fmpz_poly_div_root_fmpz(Q2, Q2, c);
 
         result = fmpz_poly_equal(Q1, Q2);
 

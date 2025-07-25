@@ -29,6 +29,7 @@
 #include "t-max_limbs.c"
 #include "t-neg.c"
 #include "t-prod.c"
+#include "t-prod_ui.c"
 #include "t-scalar_abs.c"
 #include "t-scalar_addmul_fmpz.c"
 #include "t-scalar_addmul_si_2exp.c"
@@ -74,6 +75,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_vec_max_limbs),
     TEST_FUNCTION(fmpz_vec_neg),
     TEST_FUNCTION(fmpz_vec_prod),
+    TEST_FUNCTION(fmpz_ui_vec_prod),
     TEST_FUNCTION(fmpz_vec_scalar_abs),
     TEST_FUNCTION(fmpz_vec_scalar_addmul_fmpz),
     TEST_FUNCTION(fmpz_vec_scalar_addmul_si_2exp),
