@@ -1034,6 +1034,36 @@ Helper functions for reduction
     By default the *generic* version is called; specific rings
     can overload this (typically to implement delayed canonicalisation).
 
+LLL
+-------------------------------------------------------------------------------
+
+Let `A = (a_0, \ldots, a_{n-1})` be a set of linearly independent vectors over `\mathbb{R}`
+with Gram-Schmidt orthogonalization `(b_0, \ldots, b_{n-1})`
+and Gram-Schmidt coefficients `\mu_{i,j} = \langle a_i, b_i \rangle / \| b_j \|^2`.
+The basis `A` is said to be LLL-reduced with parameter (`\delta`, `\eta`)
+where `0.25 < \delta \le 1` and `0.5 \le \eta < \sqrt{\delta}` if they satisfy
+the size reduction condition
+
+.. math ::
+
+    |\mu_{i,j}| \le \eta, \quad 0 \le j < i < n
+
+and the Lovász condition
+
+.. math ::
+
+    (\delta - \mu_{i,i-1}^2) \| b_{i-1} \|_2^2 \le \| b_i \|_2^2, \quad 1 \le i \le n - 1.
+
+.. function:: truth_t gr_mat_is_row_lll_reduced_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_ctx_t ctx)
+              truth_t gr_mat_is_row_lll_reduced_with_removal_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_srcptr gs_B, slong newd, gr_ctx_t ctx)
+
+    Check if the rows of *A* are LLL-reduced by naively performing the
+    Gram-Schmidt orthogonalization and checking the conditions one row
+    at a time.
+
+    In interval arithmetic, these functions terminate eagerly: ``T_UNKNOWN``
+    is returned if the tests are inconclusive for one row, even if there is a
+    possibility that a later row could prove that the result should be ``T_FALSE``.
 
 Test functions
 -------------------------------------------------------------------------------
