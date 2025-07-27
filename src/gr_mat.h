@@ -377,6 +377,11 @@ WARN_UNUSED_RESULT int gr_mat_norm_1(gr_ptr res, const gr_mat_t mat, gr_ctx_t ct
 WARN_UNUSED_RESULT int gr_mat_norm_inf(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_norm_frobenius(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 
+/* LLL */
+
+truth_t gr_mat_is_row_lll_reduced_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_ctx_t ctx);
+truth_t gr_mat_is_row_lll_reduced_with_removal_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_srcptr gs_B, slong newd, gr_ctx_t ctx);
+
 /* Test functions */
 
 void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);

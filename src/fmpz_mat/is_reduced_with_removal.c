@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,125 +10,59 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <gmp.h>
+#include "gr.h"
+#include "gr_mat.h"
 #include "fmpz_mat.h"
-#include "fmpq.h"
-#include "fmpq_vec.h"
-#include "fmpq_mat.h"
 
 int
 fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A, double delta, double eta,
                                  const fmpz_t gs_B, int newd)
 {
-    int res;
-    slong i, j, k, d = A->r, n = A->c;
-    fmpq_mat_t Aq, Bq, mu;
-    mpq_t deltax, etax;
-    fmpq_t deltaq, etaq, tmp, gs_Bq;
+    truth_t is_reduced = T_UNKNOWN;
+    slong prec;
+    gr_ctx_t ctx;
+    gr_ptr Rdelta, Reta, Rgs_B;
+    gr_mat_t RA;
+    slong exact_cutoff;
 
-    if (d == 0 || d == 1)
-        return 1;
+    /* To do: for very small matrices, consider doing a division-free version
+       of the naive algorithm over Z instead of working over Q. */
+    /* To do: this is not at all tuned. */
+    exact_cutoff = fmpz_mat_max_bits(A);
+    exact_cutoff = FLINT_ABS(exact_cutoff);
+    exact_cutoff = (64 + exact_cutoff) * FLINT_MAX(A->r, A->c);
 
-    fmpq_mat_init(Aq, d, n);
-    fmpq_mat_init(Bq, d, n);
-    fmpq_mat_init(mu, d, d);
-
-    mpq_init(deltax);
-    mpq_init(etax);
-
-    fmpq_init(deltaq);
-    fmpq_init(etaq);
-    fmpq_init(tmp);
-    fmpq_init(gs_Bq);
-
-    mpq_set_d(deltax, delta);
-    mpq_set_d(etax, eta);
-    fmpq_set_mpq(deltaq, deltax);
-    fmpq_set_mpq(etaq, etax);
-    mpq_clears(deltax, etax, NULL);
-
-    fmpq_mat_set_fmpz_mat(Aq, A);
-
-    fmpz_set(fmpq_numref(gs_Bq), gs_B);
-    fmpz_one(fmpq_denref(gs_Bq));
-
-    for (j = 0; j < n; j++)
+    for (prec = 64; ; prec *= 2)
     {
-        fmpq_set(fmpq_mat_entry(Bq, 0, j), fmpq_mat_entry(Aq, 0, j));
-    }
-    /* diagonal of mu stores the squared GS norms */
-    _fmpq_vec_dot(fmpq_mat_entry(mu, 0, 0), fmpq_mat_entry(Bq, 0, 0), fmpq_mat_entry(Bq, 0, 0), n);
-    if (newd == 0 && fmpq_cmp(fmpq_mat_entry(mu, 0, 0), gs_Bq) < 0)
-    {
-        res = 0;
-        goto cleanup;
-    }
+        /* flint_printf("fmpz_mat_is_reduced_with_removal : prec %wd / %wd\n", prec, exact_cutoff); */
+        if (prec >= exact_cutoff)
+            gr_ctx_init_fmpq(ctx);
+        else
+            gr_ctx_init_real_arb(ctx, prec);
 
-    for (i = 1; i < d; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            fmpq_set(fmpq_mat_entry(Bq, i, j), fmpq_mat_entry(Aq, i, j));
-        }
+        gr_mat_init(RA, A->r, A->c, ctx);
+        Rdelta = gr_heap_init(ctx);
+        Reta = gr_heap_init(ctx);
+        Rgs_B = gr_heap_init(ctx);
 
-        for (j = 0; j < i; j++)
-        {
-            _fmpq_vec_dot(tmp, fmpq_mat_entry(Aq, i, 0), fmpq_mat_entry(Bq, j, 0), n);
+        GR_MUST_SUCCEED(gr_mat_set_fmpz_mat(RA, A, ctx));
+        GR_MUST_SUCCEED(gr_set_d(Rdelta, delta, ctx));
+        GR_MUST_SUCCEED(gr_set_d(Reta, eta, ctx));
+        GR_MUST_SUCCEED(gr_set_fmpz(Rgs_B, gs_B, ctx));
 
-            /* avoid division by zero */
-            if (fmpq_is_zero(fmpq_mat_entry(mu, j, j)))
-            {
-                res = 0;
-                goto cleanup;
-            }
+        is_reduced = gr_mat_is_row_lll_reduced_with_removal_naive(RA, Rdelta, Reta, Rgs_B, newd, ctx);
 
-            fmpq_div(fmpq_mat_entry(mu, i, j), tmp, fmpq_mat_entry(mu, j, j));
+        gr_mat_clear(RA, ctx);
+        gr_heap_clear(Rdelta, ctx);
+        gr_heap_clear(Reta, ctx);
+        gr_heap_clear(Rgs_B, ctx);
 
-            for (k = 0; k < n; k++)
-            {
-                fmpq_submul(fmpq_mat_entry(Bq, i, k),
-                            fmpq_mat_entry(mu, i, j), fmpq_mat_entry(Bq, j, k));
-            }
-            if (i < newd)
-            {
-                fmpq_abs(tmp, fmpq_mat_entry(mu, i, j));
-                if (fmpq_cmp(tmp, etaq) > 0)    /* check size reduction */
-                {
-                    res = 0;
-                    goto cleanup;
-                }
-            }
-        }
-        _fmpq_vec_dot(fmpq_mat_entry(mu, i, i), fmpq_mat_entry(Bq, i, 0), fmpq_mat_entry(Bq, i, 0), n);
-        if (i >= newd && fmpq_cmp(fmpq_mat_entry(mu, i, i), gs_Bq) < 0) /* check removals */
-        {
-            res = 0;
-            goto cleanup;
-        }
-        if (i < newd)
-        {
-            fmpq_set(tmp, deltaq);
-            fmpq_submul(tmp, fmpq_mat_entry(mu, i, i - 1),
-                             fmpq_mat_entry(mu, i, i - 1));
-            fmpq_mul(tmp, tmp, fmpq_mat_entry(mu, i - 1, i - 1));
-            if (fmpq_cmp(tmp, fmpq_mat_entry(mu, i, i)) > 0)    /* check Lovasz condition */
-            {
-                res = 0;
-                goto cleanup;
-            }
-        }
+        gr_ctx_clear(ctx);
+
+        if (is_reduced != T_UNKNOWN)
+            break;
     }
 
-    res = 1;
-
-cleanup:
-
-    fmpq_mat_clear(Aq);
-    fmpq_mat_clear(Bq);
-    fmpq_mat_clear(mu);
-    fmpq_clear(deltaq);
-    fmpq_clear(etaq);
-    fmpq_clear(tmp);
-    fmpq_clear(gs_Bq);
-    return res;
+    return (is_reduced == T_TRUE);
 }
+
