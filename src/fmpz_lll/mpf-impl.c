@@ -131,6 +131,7 @@ mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec)
     mat->r = rows;
     mat->c = cols;
     mat->prec = prec;
+    mat->stride = cols;
 
     if (rows != 0 && cols != 0)
     {
@@ -144,17 +145,12 @@ mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec)
             flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
 
         mat->entries = flint_malloc(num * sizeof(mpf));
-        mat->rows = flint_malloc(rows * sizeof(mpf *));
-
         for (i = 0; i < rows * cols; i++)
             mpf_init2(mat->entries + i, prec);
-        for (i = 0; i < rows; i++)
-            mat->rows[i] = mat->entries + i * cols;
     }
     else
     {
        mat->entries = NULL;
-       mat->rows = NULL;
     }
 }
 
@@ -166,6 +162,5 @@ void mpf_mat_clear(mpf_mat_t mat)
         for (i = 0; i < mat->r * mat->c; i++)
             mpf_clear(mat->entries + i);
         flint_free(mat->entries);
-        flint_free(mat->rows);
     }
 }

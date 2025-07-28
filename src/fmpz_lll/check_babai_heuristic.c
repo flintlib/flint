@@ -22,6 +22,10 @@
 #endif
 #define GM ((fl->rt == Z_BASIS) ? A->exactSP : B)
 
+#include "gr.h"
+#include "gr_vec.h"
+#include "gr_mat.h"
+
 int
 fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                mpf_mat_t mu, mpf_mat_t r, mpf * s,
@@ -29,6 +33,13 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                                int kappamax, int n, mpf_t tmp, mpf_t rtmp,
                                flint_bitcnt_t prec, const fmpz_lll_t fl)
 {
+    gr_ctx_t ctx;
+    int status = GR_SUCCESS;
+    gr_ctx_init_mpf(ctx, prec);
+    slong sz = ctx->sizeof_elem;
+
+#define ENTRY(mat, ii, jj) GR_MAT_ENTRY(mat, ii, jj, sz)
+
     if (fl->rt == Z_BASIS && fl->gt == APPROX)
     {
         int i, j, k, test, aa;
@@ -58,18 +69,14 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             {
                 if (mpf_cmp_d(mpf_mat_entry(A->appSP2, kappa, j), DBL_MIN) == 0)
                 {
+                    status |= _gr_vec_dot(mpf_mat_entry(A->appSP2, kappa, j), NULL, 0, mpf_mat_row(appB, kappa), mpf_mat_row(appB, j), n, ctx);
+
 #if 0
-/* Use slow dot product and check for cancellation */
-                    if (!(_mpf_vec_dot2(mpf_mat_entry(A->appSP2, kappa, j), appB->rows[kappa], appB->rows[j], n, prec)))
-#else
-/* Use fast dot product (always returns 1, pretending that there is no cancellation) */
-                    if (!(_mpf_vec_dot1(mpf_mat_entry(A->appSP2, kappa, j), appB->rows[kappa], appB->rows[j], n, prec)))
+                    /* If a heuristic told us that some cancellation probably happened,
+                       recompute the scalar product at full precision */
+                    _fmpz_vec_dot(ztmp, fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
+                    status |= gr_set_fmpz(ENTRY(A->appSP2, kappa, j), ztmp, ctx);
 #endif
-                    {
-                        /* In this case a heuristic told us that some cancellation probably happened so we just compute the scalar product at full precision */
-                        _fmpz_vec_dot(ztmp, fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
-                        fmpz_get_mpf(mpf_mat_entry(A->appSP2, kappa, j), ztmp);
-                    }
                 }
 
                 if (j > zeros + 2)
@@ -226,7 +233,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             if (test)           /* Anything happened? */
             {
-                _mpf_vec_set_fmpz_vec(appB->rows[kappa], fmpz_mat_row(B, kappa), n);
+                _mpf_vec_set_fmpz_vec(mpf_mat_row(appB, kappa), fmpz_mat_row(B, kappa), n);
                 aa = zeros + 1;
 
                 for (i = zeros + 1; i <= kappa; i++)
@@ -241,7 +248,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
         if (mpf_cmp_d(mpf_mat_entry(A->appSP2, kappa, kappa), DBL_MIN) == 0)
         {
             _mpf_vec_norm2(mpf_mat_entry(A->appSP2, kappa, kappa),
-                           appB->rows[kappa], n, prec);
+                           mpf_mat_row(appB, kappa), n, prec);
         }
 
         mpf_set(s + zeros + 1, mpf_mat_entry(A->appSP2, kappa, kappa));
@@ -514,6 +521,10 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
         fmpz_clear(ztmp);
     }
+
+    if (status != GR_SUCCESS)
+        return -1;
+
     return 0;
 }
 

@@ -32,6 +32,14 @@ fmpz_mat_move_row(fmpz_mat_t A, slong i, slong j)
     GR_MUST_SUCCEED(gr_mat_move_row((gr_mat_struct *) A, i, j, ctx));
 }
 
+static void
+mpf_mat_move_row(mpf_mat_t A, slong i, slong j)
+{
+    gr_ctx_t ctx;
+    gr_ctx_init_mpf(ctx, 64);
+    GR_MUST_SUCCEED(gr_mat_move_row((gr_mat_struct *) A, i, j, ctx));
+}
+
 #ifdef GM
 #undef GM
 #endif
@@ -49,7 +57,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         int kappa, kappa2, d, n, i, j, zeros, kappamax;
         mpf_mat_t mu, r, appB;
         fmpz_gram_t A;
-        mpf *s, *mutmp, *appBtmp, *appSPtmp;
+        mpf *s, *appSPtmp;
         mpf_t ctt, tmp, rtmp;
         int *alpha;
 
@@ -92,7 +100,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         /* ************************** */
 
         for (i = 0; i < d; i++)
-            _mpf_vec_set_fmpz_vec(appB->rows[i], fmpz_mat_row(B, i), n);
+            _mpf_vec_set_fmpz_vec(mpf_mat_row(appB, i), fmpz_mat_row(B, i), n);
 
         /* ********************************* */
         /* Step2: Initializing the main loop */
@@ -103,7 +111,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
 
         do
         {
-            _mpf_vec_norm2(mpf_mat_entry(A->appSP2, i, i), appB->rows[i],
+            _mpf_vec_norm2(mpf_mat_entry(A->appSP2, i, i), mpf_mat_row(appB, i),
                            n, prec);
         } while ((mpf_sgn(mpf_mat_entry(A->appSP2, i, i)) == 0)
                  && (++i < d));
@@ -224,15 +232,8 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 /* Step6: Update the mu's and r's */
                 /* ****************************** */
 
-                mutmp = mu->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    mu->rows[i] = mu->rows[i - 1];
-                mu->rows[kappa] = mutmp;
-
-                mutmp = r->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    r->rows[i] = r->rows[i - 1];
-                r->rows[kappa] = mutmp;
+                mpf_mat_move_row(mu, kappa2, kappa);
+                mpf_mat_move_row(r, kappa2, kappa);
 
                 mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
 
@@ -245,10 +246,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 if (U != NULL)
                     fmpz_mat_move_row(U, kappa2, kappa);
 
-                appBtmp = appB->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    appB->rows[i] = appB->rows[i - 1];
-                appB->rows[kappa] = appBtmp;
+                mpf_mat_move_row(appB, kappa2, kappa);
 
                 /* *************************** */
                 /* Step8: Update appSP: tricky */
@@ -290,7 +288,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                     zeros++;
                     kappa++;
                     _mpf_vec_norm2(mpf_mat_entry(A->appSP2, kappa, kappa),
-                                   appB->rows[kappa], n, prec);
+                                   mpf_mat_row(appB, kappa), n, prec);
                     mpf_set(mpf_mat_entry(r, kappa, kappa),
                             mpf_mat_entry(A->appSP2, kappa, kappa));
                 }
@@ -333,7 +331,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         int kappa, kappa2, d, n, i, j, zeros, kappamax, update_b = 1;
         mpf_mat_t mu, r;
         fmpz_gram_t A;
-        mpf *s, *mutmp;
+        mpf *s;
         mpf_t ctt, tmp, rtmp;
         int *alpha;
 
@@ -501,15 +499,8 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 /* Step6: Update the mu's and r's */
                 /* ****************************** */
 
-                mutmp = mu->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    mu->rows[i] = mu->rows[i - 1];
-                mu->rows[kappa] = mutmp;
-
-                mutmp = r->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    r->rows[i] = r->rows[i - 1];
-                r->rows[kappa] = mutmp;
+                mpf_mat_move_row(mu, kappa2, kappa);
+                mpf_mat_move_row(r, kappa2, kappa);
 
                 mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
 

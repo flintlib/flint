@@ -30,8 +30,8 @@ typedef struct
     mpf * entries;
     slong r;
     slong c;
+    slong stride;
     flint_bitcnt_t prec;
-    mpf ** rows;
 } mpf_mat_struct;
 
 typedef mpf_mat_struct mpf_mat_t[1];
@@ -47,8 +47,15 @@ void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
 FLINT_FORCE_INLINE
 mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
 {
-   return mat->rows[i] + j;
+   return mat->entries + (i * mat->stride + j);
 }
+
+FLINT_FORCE_INLINE
+mpf * mpf_mat_row(const mpf_mat_t mat, slong i)
+{
+   return mpf_mat_entry(mat, i, 0);
+}
+
 void mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec);
 void mpf_mat_clear(mpf_mat_t mat);
 
