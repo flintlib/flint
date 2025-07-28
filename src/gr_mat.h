@@ -73,6 +73,8 @@ WARN_UNUSED_RESULT int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t c
 WARN_UNUSED_RESULT int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx);
+
 GR_MAT_INLINE void
 gr_mat_window_init(gr_mat_t window, const gr_mat_t mat,
     slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx)

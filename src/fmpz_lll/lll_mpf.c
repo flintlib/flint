@@ -19,7 +19,18 @@
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "double_extras.h"
-#include "fmpz_lll.h"
+
+
+#include "gr.h"
+#include "gr_mat.h"
+
+static void
+fmpz_mat_move_row(fmpz_mat_t A, slong i, slong j)
+{
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(gr_mat_move_row((gr_mat_struct *) A, i, j, ctx));
+}
 
 #ifdef GM
 #undef GM
@@ -41,7 +52,6 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         mpf *s, *mutmp, *appBtmp, *appSPtmp;
         mpf_t ctt, tmp, rtmp;
         int *alpha;
-        fmpz *Btmp;
 
         n = B->c;
         d = B->r;
@@ -230,33 +240,10 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 /* Step7: Update B and appB */
                 /* ************************ */
 
-                {
-                    /* todo: shallow moves */
-/*
-                    Btmp = B->rows[kappa2];
-                    for (i = kappa2; i > kappa; i--)
-                        B->rows[i] = B->rows[i - 1];
-                    B->rows[kappa] = Btmp;
-*/
-                    Btmp = _fmpz_vec_init(B->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(B, kappa2), B->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(B, i), fmpz_mat_row(B, i - 1), B->c);
-                    _fmpz_vec_set(fmpz_mat_row(B, kappa), Btmp, B->c);
-                    _fmpz_vec_clear(Btmp, B->c);
-
-                }
+                fmpz_mat_move_row(B, kappa2, kappa);
 
                 if (U != NULL)
-                {
-                    /* todo: shallow moves */
-                    Btmp = _fmpz_vec_init(U->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(U, kappa2), U->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(U, i), fmpz_mat_row(U, i - 1), U->c);
-                    _fmpz_vec_set(fmpz_mat_row(U, kappa), Btmp, U->c);
-                    _fmpz_vec_clear(Btmp, U->c);
-                }
+                    fmpz_mat_move_row(U, kappa2, kappa);
 
                 appBtmp = appB->rows[kappa2];
                 for (i = kappa2; i > kappa; i--)
@@ -349,7 +336,6 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         mpf *s, *mutmp;
         mpf_t ctt, tmp, rtmp;
         int *alpha;
-        fmpz *Btmp;
 
         n = B->c;
         d = B->r;
@@ -532,30 +518,10 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 /* *************** */
 
                 if (fl->rt == Z_BASIS && update_b)
-                {
-                    Btmp = _fmpz_vec_init(B->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(B, kappa2), B->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(B, i), fmpz_mat_row(B, i - 1), B->c);
-                    _fmpz_vec_set(fmpz_mat_row(B, kappa), Btmp, B->c);
-                    _fmpz_vec_clear(Btmp, B->c);
-/*
-                    Btmp = B->rows[kappa2];
-                    for (i = kappa2; i > kappa; i--)
-                        B->rows[i] = B->rows[i - 1];
-                    B->rows[kappa] = Btmp;
-*/
-                }
+                    fmpz_mat_move_row(B, kappa2, kappa);
 
                 if (U != NULL)
-                {
-                    Btmp = _fmpz_vec_init(U->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(U, kappa2), U->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(U, i), fmpz_mat_row(U, i - 1), U->c);
-                    _fmpz_vec_set(fmpz_mat_row(U, kappa), Btmp, U->c);
-                    _fmpz_vec_clear(Btmp, U->c);
-                }
+                    fmpz_mat_move_row(U, kappa2, kappa);
 
                 /* ********************* */
                 /* Step8: Update exactSP */
