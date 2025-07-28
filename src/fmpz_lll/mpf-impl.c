@@ -130,7 +130,6 @@ mpf_mat_init(mpf_mat_t mat, slong rows, slong cols, flint_bitcnt_t prec)
 {
     mat->r = rows;
     mat->c = cols;
-    mat->prec = prec;
     mat->stride = cols;
 
     if (rows != 0 && cols != 0)

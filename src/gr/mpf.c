@@ -198,6 +198,41 @@ static int _gr_mpf_set_d(mpf_t res, double x, gr_ctx_t ctx)
     }
 }
 
+static int _gr_mpf_get_fmpz(fmpz_t res, const mpf_t x, gr_ctx_t ctx)
+{
+    slong exp, xn;
+
+    if (x->_mp_size == 0)
+    {
+        fmpz_zero(res);
+        return GR_SUCCESS;
+    }
+
+    exp = x->_mp_exp;
+    xn = FLINT_ABS(x->_mp_size);
+
+    if (exp <= 0)
+        return GR_DOMAIN;
+
+    if (exp >= xn)
+    {
+        fmpz_set_ui_array(res, x->_mp_d, xn);
+        fmpz_mul_2exp(res, res, (exp - xn) * FLINT_BITS);
+    }
+    else
+    {
+        if (!mpn_zero_p(x->_mp_d, xn - exp))
+            return GR_DOMAIN;
+
+        fmpz_set_ui_array(res, x->_mp_d + (xn - exp), exp);
+    }
+
+    if (x->_mp_size < 0)
+        fmpz_neg(res, res);
+
+    return GR_SUCCESS;
+}
+
 static truth_t _gr_mpf_equal(const mpf_t x, const mpf_t y, gr_ctx_t ctx)
 {
     return (mpf_cmp(x, y) == 0) ? T_TRUE : T_FALSE;
@@ -293,6 +328,12 @@ static int _gr_mpf_cmp(int * res, const mpf_t x, const mpf_t y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+static int _gr_mpf_sgn(int * res, const mpf_t x, gr_ctx_t ctx)
+{
+    *res = mpf_sgn(x);
+    return GR_SUCCESS;
+}
+
 static int _gr_mpf_pi(mpf_t res, gr_ctx_t ctx)
 {
     mpfr_t t;
@@ -316,6 +357,71 @@ static int _gr_mpf_get_d_2exp_si(double * res, slong * exp, const mpf_t x, gr_ct
     *exp = e;
     return GR_SUCCESS;
 }
+
+static int
+_gr_mpf_vec_dot(mpf_t res, mpf_t initial, int subtract, const __mpf_struct * vec1, const __mpf_struct * vec2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    mpf_t t;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            mpf_set_ui(res, 0);
+        else
+            mpf_set(res, initial);
+        return GR_SUCCESS;
+    }
+
+    mpf_init2(t, GR_MPF_CTX_PREC(ctx));
+
+    if (initial == NULL)
+    {
+        mpf_mul(res, vec1, vec2);
+    }
+    else
+    {
+        if (subtract)
+            mpf_neg(res, initial);
+        else
+            mpf_set(res, initial);
+
+        mpf_mul(t, vec1, vec2);
+        mpf_add(res, res, t);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        mpf_mul(t, vec1 + i, vec2 + i);
+        mpf_add(res, res, t);
+    }
+
+    if (subtract)
+        mpf_neg(res, res);
+
+    mpf_clear(t);
+    return GR_SUCCESS;
+}
+
+
+int
+_gr_mpf_vec_submul_scalar(__mpf_struct * vec1, const __mpf_struct * vec2, slong len, mpf_t c, gr_ctx_t ctx)
+{
+    slong i;
+    mpf_t t;
+
+    mpf_init2(t, GR_MPF_CTX_PREC(ctx));
+
+    for (i = 0; i < len; i++)
+    {
+        mpf_mul(t, vec2 + i, c);
+        mpf_sub(vec1 + i, vec1 + i, t);
+    }
+
+    mpf_clear(t);
+    return GR_SUCCESS;
+}
+
 
 
 int _gr_mpf_methods_initialized = 0;
@@ -349,6 +455,8 @@ gr_method_tab_input _gr_mpf_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_mpf_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_mpf_set_fmpz},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_mpf_set_d},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_mpf_get_fmpz},
+    {GR_METHOD_GET_D_2EXP_SI,   (gr_funcptr) _gr_mpf_get_d_2exp_si},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_mpf_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_mpf_add},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_mpf_sub},
@@ -357,21 +465,16 @@ gr_method_tab_input _gr_mpf_methods_input[] =
     {GR_METHOD_DIV,             (gr_funcptr) _gr_mpf_div},
     {GR_METHOD_MUL_2EXP_SI,     (gr_funcptr) _gr_mpf_mul_2exp_si},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_mpf_cmp},
+    {GR_METHOD_SGN,             (gr_funcptr) _gr_mpf_sgn},
     {GR_METHOD_ABS,             (gr_funcptr) _gr_mpf_abs},
     {GR_METHOD_FLOOR,           (gr_funcptr) _gr_mpf_floor},
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_mpf_ceil},
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_mpf_trunc},
-    {GR_METHOD_GET_D_2EXP_SI,   (gr_funcptr) _gr_mpf_get_d_2exp_si},
     {GR_METHOD_PI,              (gr_funcptr) _gr_mpf_pi},
+    {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_mpf_vec_dot},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,         (gr_funcptr) _gr_mpf_vec_submul_scalar},
     {0,                         (gr_funcptr) NULL},
 };
-
-/*
-
-get_fmpz ...
-get_d_2exp_si ...
-
-*/
 
 void
 gr_ctx_init_mpf(gr_ctx_t ctx, slong prec)

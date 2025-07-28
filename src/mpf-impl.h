@@ -31,7 +31,6 @@ typedef struct
     slong r;
     slong c;
     slong stride;
-    flint_bitcnt_t prec;
 } mpf_mat_struct;
 
 typedef mpf_mat_struct mpf_mat_t[1];
