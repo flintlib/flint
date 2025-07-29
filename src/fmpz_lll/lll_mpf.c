@@ -24,6 +24,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
+#include "nfloat.h"
 
 static void
 fmpz_mat_move_row(fmpz_mat_t A, slong i, slong j)
@@ -43,9 +44,11 @@ static int _gr_cmp(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 
 static int _gr_sgn(gr_srcptr x, gr_ctx_t ctx)
 {
-    int sgn, status;
-    status = gr_sgn(&sgn, x, ctx);
-    GR_MUST_SUCCEED(status);
+    gr_ptr t;
+    int sgn;
+    GR_TMP_INIT(t, ctx);
+    GR_MUST_SUCCEED(gr_cmp(&sgn, x, t, ctx));
+    GR_TMP_CLEAR(t, ctx);
     return sgn;
 }
 
@@ -69,7 +72,14 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
 
     gr_ctx_t ctx;
     int status = GR_SUCCESS;
+
+#if 0
     gr_ctx_init_mpf(ctx, prec);
+#else
+    if (nfloat_ctx_init(ctx, prec, 0) != GR_SUCCESS)
+        gr_ctx_init_real_float_arf(ctx, prec);
+#endif
+
     slong sz = ctx->sizeof_elem;
 
 #define ENTRY(mat, ii, jj) GR_MAT_ENTRY(mat, ii, jj, sz)
@@ -158,7 +168,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, appB,
                                                A, alpha[kappa], zeros,
                                                kappamax, n, tmp, rtmp,
-                                               prec, fl);
+                                               ctx, fl);
 
             if (babai_ok == -1)
             {
@@ -416,7 +426,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 fmpz_lll_check_babai_heuristic(kappa, (update_b ? B : NULL), U,
                                                mu, r, s, NULL, A, alpha[kappa],
                                                zeros, kappamax, n, tmp, rtmp,
-                                               prec, fl);
+                                               ctx, fl);
 
             if (babai_ok == -1)
             {
@@ -620,8 +630,9 @@ fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     do
     {
+        /* todo: why not always double prec? */
         if (num_loops < 20)
-            prec += D_BITS;
+            prec += 64;
         else
             prec *= 2;
 
@@ -643,8 +654,9 @@ fmpz_lll_mpf_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
 
     do
     {
+        /* todo: why not always double prec? */
         if (num_loops < 20)
-            prec += D_BITS;
+            prec += 64;
         else
             prec *= 2;
 

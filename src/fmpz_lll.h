@@ -101,10 +101,10 @@ int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
 int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
-                               gr_mat_t mu, gr_mat_t r, mpf * s,
+                               gr_mat_t mu, gr_mat_t r, gr_ptr s,
                                gr_mat_t appB, fmpz_gram_t A, int a, int zeros,
                                int kappamax, int n, gr_ptr tmp, gr_ptr rtmp,
-                               flint_bitcnt_t prec, const fmpz_lll_t fl);
+                               gr_ctx_t ctx, const fmpz_lll_t fl);
 
 int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl);
 

@@ -25,6 +25,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
+#include "nfloat.h"
 
 static int _gr_cmp_d(gr_srcptr x, double y, gr_ctx_t ctx)
 {
@@ -41,9 +42,11 @@ static int _gr_cmp_d(gr_srcptr x, double y, gr_ctx_t ctx)
 
 static int _gr_sgn(gr_srcptr x, gr_ctx_t ctx)
 {
-    int sgn, status;
-    status = gr_sgn(&sgn, x, ctx);
-    GR_MUST_SUCCEED(status);
+    gr_ptr t;
+    int sgn;
+    GR_TMP_INIT(t, ctx);
+    GR_MUST_SUCCEED(gr_cmp(&sgn, x, t, ctx));
+    GR_TMP_CLEAR(t, ctx);
     return sgn;
 }
 
@@ -69,14 +72,12 @@ static int _gr_vec_norm2(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 
 int
 fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
-                               gr_mat_t mu, gr_mat_t r, mpf * s,
+                               gr_mat_t mu, gr_mat_t r, gr_ptr s,
                                gr_mat_t appB, fmpz_gram_t A, int a, int zeros,
                                int kappamax, int n, gr_ptr tmp, gr_ptr rtmp,
-                               flint_bitcnt_t prec, const fmpz_lll_t fl)
+                               gr_ctx_t ctx, const fmpz_lll_t fl)
 {
-    gr_ctx_t ctx;
     int status = GR_SUCCESS;
-    gr_ctx_init_mpf(ctx, prec);
     slong sz = ctx->sizeof_elem;
 
 #define ENTRY(mat, ii, jj) GR_MAT_ENTRY(mat, ii, jj, sz)
@@ -378,6 +379,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                     {
                         status |= gr_set(tmp, ENTRY(mu, kappa, j), ctx);
                         status |= gr_set_d(rtmp, 0.5, ctx);
+
                         if (_gr_sgn(tmp, ctx) < 0)
                         {
                             status |= gr_sub(tmp, tmp, rtmp, ctx);
@@ -393,6 +395,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         /* TODO: or make nfloat check for small multiplier */
                         status |= _gr_vec_submul_scalar(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), tmp, ctx);
                         status |= gr_get_fmpz(x + j, tmp, ctx);
+
                         if (fl->rt == Z_BASIS && B != NULL)
                         {
                             _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa),

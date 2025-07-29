@@ -328,9 +328,9 @@ static int _gr_mpf_cmp(int * res, const mpf_t x, const mpf_t y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-static int _gr_mpf_sgn(int * res, const mpf_t x, gr_ctx_t ctx)
+static int _gr_mpf_sgn(mpf_t res, const mpf_t x, gr_ctx_t ctx)
 {
-    *res = mpf_sgn(x);
+    mpf_set_si(res, mpf_sgn(x));
     return GR_SUCCESS;
 }
 

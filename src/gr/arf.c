@@ -284,6 +284,41 @@ _gr_arf_get_d(double * res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
+_gr_arf_get_d_2exp_si(double * res, slong * exp, const arf_t x, const gr_ctx_t ctx)
+{
+    if (ARF_IS_SPECIAL(x))
+    {
+        *exp = 0;
+        return _gr_arf_get_d(res, x, ctx);
+    }
+
+    /* todo: better code */
+
+    if (!ARF_IS_LAGOM(x))
+        return GR_UNABLE;
+
+    double m;
+    slong e = ARF_EXP(x);
+    arf_t t;
+    *t = *x;
+    ARF_EXP(t) = 0;
+
+    m = arf_get_d(x, ARF_CTX_RND(ctx));
+
+    /* may have rounded up */
+    if (m <= -1.0 || m >= 1.0)
+    {
+        m *= 0.5;
+        e++;
+    }
+
+    *res = m;
+    *exp = e;
+
+    return GR_SUCCESS;
+}
+
+int
 _gr_arf_get_fmpq(fmpq_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (!arf_is_finite(x))
@@ -1344,6 +1379,8 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_MUL_2EXP_FMPZ,      (gr_funcptr) _gr_arf_mul_2exp_fmpz},
     {GR_METHOD_SET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_arf_set_fmpz_2exp_fmpz},
     {GR_METHOD_GET_FMPZ_2EXP_FMPZ, (gr_funcptr) _gr_arf_get_fmpz_2exp_fmpz},
+    {GR_METHOD_GET_D_2EXP_SI,      (gr_funcptr) _gr_arf_get_d_2exp_si},
+
 
     {GR_METHOD_POW,             (gr_funcptr) _gr_arf_pow},
 /*
