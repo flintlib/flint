@@ -22,7 +22,6 @@
 
 #include "fmpz_types.h"
 #include "d_mat.h"
-#include "mpf-impl.h"
 #include "gr_types.h"
 
 #ifdef __cplusplus
