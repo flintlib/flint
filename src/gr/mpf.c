@@ -358,70 +358,6 @@ static int _gr_mpf_get_d_2exp_si(double * res, slong * exp, const mpf_t x, gr_ct
     return GR_SUCCESS;
 }
 
-static int
-_gr_mpf_vec_dot(mpf_t res, mpf_t initial, int subtract, const __mpf_struct * vec1, const __mpf_struct * vec2, slong len, gr_ctx_t ctx)
-{
-    slong i;
-    mpf_t t;
-
-    if (len <= 0)
-    {
-        if (initial == NULL)
-            mpf_set_ui(res, 0);
-        else
-            mpf_set(res, initial);
-        return GR_SUCCESS;
-    }
-
-    mpf_init2(t, GR_MPF_CTX_PREC(ctx));
-
-    if (initial == NULL)
-    {
-        mpf_mul(res, vec1, vec2);
-    }
-    else
-    {
-        if (subtract)
-            mpf_neg(res, initial);
-        else
-            mpf_set(res, initial);
-
-        mpf_mul(t, vec1, vec2);
-        mpf_add(res, res, t);
-    }
-
-    for (i = 1; i < len; i++)
-    {
-        mpf_mul(t, vec1 + i, vec2 + i);
-        mpf_add(res, res, t);
-    }
-
-    if (subtract)
-        mpf_neg(res, res);
-
-    mpf_clear(t);
-    return GR_SUCCESS;
-}
-
-
-int
-_gr_mpf_vec_submul_scalar(__mpf_struct * vec1, const __mpf_struct * vec2, slong len, mpf_t c, gr_ctx_t ctx)
-{
-    slong i;
-    mpf_t t;
-
-    mpf_init2(t, GR_MPF_CTX_PREC(ctx));
-
-    for (i = 0; i < len; i++)
-    {
-        mpf_mul(t, vec2 + i, c);
-        mpf_sub(vec1 + i, vec1 + i, t);
-    }
-
-    mpf_clear(t);
-    return GR_SUCCESS;
-}
-
 
 
 int _gr_mpf_methods_initialized = 0;
@@ -471,8 +407,6 @@ gr_method_tab_input _gr_mpf_methods_input[] =
     {GR_METHOD_CEIL,            (gr_funcptr) _gr_mpf_ceil},
     {GR_METHOD_TRUNC,           (gr_funcptr) _gr_mpf_trunc},
     {GR_METHOD_PI,              (gr_funcptr) _gr_mpf_pi},
-    {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_mpf_vec_dot},
-    {GR_METHOD_VEC_SUBMUL_SCALAR,         (gr_funcptr) _gr_mpf_vec_submul_scalar},
     {0,                         (gr_funcptr) NULL},
 };
 
