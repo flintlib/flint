@@ -22,7 +22,7 @@
 
 #include "fmpz_types.h"
 #include "d_mat.h"
-#include "mpf-impl.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,7 +63,7 @@ typedef fmpz_lll_struct fmpz_lll_t[1];
 typedef union
 {
     d_mat_t appSP;
-    mpf_mat_t appSP2;
+    gr_mat_t appSP2;
     fmpz_mat_t exactSP;
 } fmpz_gram_union;
 
@@ -99,9 +99,11 @@ int fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
 int fmpz_lll_d_heuristic(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl);
 
-int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf *s,
-       mpf_mat_t appB, fmpz_gram_t A,
-       int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl);
+int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
+                               gr_mat_t mu, gr_mat_t r, gr_ptr s,
+                               gr_mat_t appB, fmpz_gram_t A, int a, int zeros,
+                               int kappamax, int n, gr_ptr tmp, gr_ptr rtmp,
+                               gr_ctx_t ctx, const fmpz_lll_t fl);
 
 int fmpz_lll_mpf2(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, const fmpz_lll_t fl);
 

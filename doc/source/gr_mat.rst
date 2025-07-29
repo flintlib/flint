@@ -201,6 +201,16 @@ Basic row, column and entry operations
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
+.. function:: int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
+
+    Moves row ``i`` to the new position ``new_i``, displacing all intervening
+    rows. For example, with ``i = 4`` and ``new_i = 7`` this replaces the
+    block of rows ``A4, A5, A6, A7`` by ``A5, A6, A7, A4``.
+    With ``i = 7`` and ``new_i = 4`` replaces ``A4, A5, A6, A7``
+    by ``A7, A4, A5, A6``.
+    Returns ``GR_DOMAIN`` if either index is not in bounds, otherwise is
+    guaranteed to succeed.
+
 .. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
 
     Returns whether *mat* is an empty matrix, having either zero

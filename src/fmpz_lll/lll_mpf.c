@@ -19,7 +19,44 @@
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "double_extras.h"
-#include "fmpz_lll.h"
+
+
+#include "gr.h"
+#include "gr_vec.h"
+#include "gr_mat.h"
+#include "nfloat.h"
+
+static void
+fmpz_mat_move_row(fmpz_mat_t A, slong i, slong j)
+{
+    gr_ctx_t ctx;
+    gr_ctx_init_fmpz(ctx);
+    GR_MUST_SUCCEED(gr_mat_move_row((gr_mat_struct *) A, i, j, ctx));
+}
+
+static int _gr_cmp(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    int sgn, status;
+    status = gr_cmp(&sgn, x, y, ctx);
+    GR_MUST_SUCCEED(status);
+    return sgn;
+}
+
+static int _gr_sgn(gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int sgn;
+    GR_TMP_INIT(t, ctx);
+    GR_MUST_SUCCEED(gr_cmp(&sgn, x, t, ctx));
+    GR_TMP_CLEAR(t, ctx);
+    return sgn;
+}
+
+static int _gr_vec_norm2(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+{
+    /* todo */
+    return _gr_vec_dot(res, NULL, 0, vec, vec, len, ctx);
+}
 
 #ifdef GM
 #undef GM
@@ -33,30 +70,43 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
     fmpz_t rii;
     int with_removal = (gs_B != NULL);
 
+    gr_ctx_t ctx;
+    int status = GR_SUCCESS;
+
+#if 0
+    gr_ctx_init_mpf(ctx, prec);
+#else
+    if (nfloat_ctx_init(ctx, prec, 0) != GR_SUCCESS)
+        gr_ctx_init_real_float_arf(ctx, prec);
+#endif
+
+    slong sz = ctx->sizeof_elem;
+
+#define ENTRY(mat, ii, jj) GR_MAT_ENTRY(mat, ii, jj, sz)
+#define ROW(mat, ii) GR_MAT_ENTRY(mat, ii, 0, sz)
+
     if (fl->rt == Z_BASIS && fl->gt == APPROX)
     {
         int kappa, kappa2, d, n, i, j, zeros, kappamax;
-        mpf_mat_t mu, r, appB;
+        gr_mat_t mu, r, appB;
         fmpz_gram_t A;
-        mpf *s, *mutmp, *appBtmp, *appSPtmp;
-        mpf_t ctt, tmp, rtmp;
+        gr_ptr s, appSPtmp;
+        gr_ptr ctt, tmp, rtmp;
         int *alpha;
-        fmpz *Btmp;
 
         n = B->c;
         d = B->r;
 
-        mpf_init_set_d(ctt, (fl->delta + 1) / 2);
+        GR_TMP_INIT3(ctt, tmp, rtmp, ctx);
+
+        status |= gr_set_d(ctt, (fl->delta + 1) / 2, ctx);
 
         alpha = (int *) flint_malloc(d * sizeof(int));
 
-        mpf_init2(tmp, prec);
-        mpf_init2(rtmp, prec);
-
-        mpf_mat_init(mu, d, d, prec);
-        mpf_mat_init(r, d, d, prec);
-        mpf_mat_init(appB, d, n, prec);
-        mpf_mat_init(A->appSP2, d, d, prec);
+        gr_mat_init(mu, d, d, ctx);
+        gr_mat_init(r, d, d, ctx);
+        gr_mat_init(appB, d, n, ctx);
+        gr_mat_init(A->appSP2, d, d, ctx);
 
         if (U != NULL)
         {
@@ -66,23 +116,18 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
             }
         }
 
-        s = _mpf_vec_init(d, prec);
-        appSPtmp = _mpf_vec_init(d, prec);
+        GR_TMP_INIT_VEC(s, d, ctx);
+        GR_TMP_INIT_VEC(appSPtmp, d, ctx);
 
         for (i = 0; i < d; i++)
-        {
             for (j = 0; j < d; j++)
-            {
-                mpf_set_d(mpf_mat_entry(A->appSP2, i, j), DBL_MIN);
-            }
-        }
+                status |= gr_set_d(ENTRY(A->appSP2, i, j), DBL_MIN, ctx);
 
         /* ************************** */
         /* Step1: Initialization Step */
         /* ************************** */
 
-        for (i = 0; i < d; i++)
-            _mpf_vec_set_fmpz_vec(appB->rows[i], fmpz_mat_row(B, i), n);
+        status |= gr_mat_set_fmpz_mat(appB, B, ctx);
 
         /* ********************************* */
         /* Step2: Initializing the main loop */
@@ -93,9 +138,8 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
 
         do
         {
-            _mpf_vec_norm2(mpf_mat_entry(A->appSP2, i, i), appB->rows[i],
-                           n, prec);
-        } while ((mpf_sgn(mpf_mat_entry(A->appSP2, i, i)) == 0)
+            status |= _gr_vec_norm2(ENTRY(A->appSP2, i, i), ROW(appB, i), n, ctx);
+        } while ((_gr_sgn(ENTRY(A->appSP2, i, i), ctx) == 0)
                  && (++i < d));
 
         zeros = i - 1;          /* all vectors B[i] with i <= zeros are zero vectors */
@@ -104,7 +148,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
 
         if (zeros < d - 1)
         {
-            mpf_set(mpf_mat_entry(r, i, i), mpf_mat_entry(A->appSP2, i, i));
+            status |= gr_set(ENTRY(r, i, i), ENTRY(A->appSP2, i, i), ctx);
         }
 
         for (i = zeros + 1; i < d; i++)
@@ -124,18 +168,18 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 fmpz_lll_check_babai_heuristic(kappa, B, U, mu, r, s, appB,
                                                A, alpha[kappa], zeros,
                                                kappamax, n, tmp, rtmp,
-                                               prec, fl);
+                                               ctx, fl);
 
             if (babai_ok == -1)
             {
                 flint_free(alpha);
-                mpf_clears(ctt, tmp, rtmp, NULL);
-                mpf_mat_clear(mu);
-                mpf_mat_clear(r);
-                mpf_mat_clear(appB);
-                mpf_mat_clear(A->appSP2);
-                _mpf_vec_clear(s, d);
-                _mpf_vec_clear(appSPtmp, d);
+                GR_TMP_CLEAR3(ctt, tmp, rtmp, ctx);
+                gr_mat_clear(mu, ctx);
+                gr_mat_clear(r, ctx);
+                gr_mat_clear(appB, ctx);
+                gr_mat_clear(A->appSP2, ctx);
+                GR_TMP_CLEAR_VEC(s, d, ctx);
+                GR_TMP_CLEAR_VEC(appSPtmp, d, ctx);
                 /* Need to switch to mpf / arb */
                 return -1;
             }
@@ -144,14 +188,13 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
             /* Step4: Success of Lovasz's condition */
             /* ************************************ */
 
-            mpf_mul(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), ctt);
+            status |= gr_mul(tmp, ENTRY(r, kappa - 1, kappa - 1), ctt, ctx);
 
-            if (mpf_cmp(tmp, s + kappa - 1) <= 0)
+            if (_gr_cmp(tmp, GR_ENTRY(s, kappa - 1, sz), ctx) <= 0)
             {
                 alpha[kappa] = kappa;
-                mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
-                        mpf_mat_entry(r, kappa, kappa - 1));
-                mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1, tmp);
+                status |= gr_mul(tmp, ENTRY(mu, kappa, kappa - 1), ENTRY(r, kappa, kappa - 1), ctx);
+                status |= gr_sub(ENTRY(r, kappa, kappa), GR_ENTRY(s, kappa - 1, sz), tmp, ctx);
                 kappa++;
             }
             else
@@ -169,11 +212,11 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                     if (kappa == d - 1 && gs_B != NULL)
                     {
                         fmpz_init(rii);
-                        mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
-                                mpf_mat_entry(r, kappa, kappa - 1));
-                        mpf_mul_2exp(tmp, tmp, 1);
-                        mpf_sub(tmp, s + kappa - 1, tmp);
-                        fmpz_set_mpf(rii, tmp); /* using a heuristic lower bound on the final GS norm */
+                        status |= gr_mul(tmp, ENTRY(mu, kappa, kappa - 1), ENTRY(r, kappa, kappa - 1), ctx);
+                        status |= gr_mul_2exp_si(tmp, tmp, 1, ctx);
+                        status |= gr_sub(tmp, GR_ENTRY(s, kappa - 1, sz), tmp, ctx);
+                        status |= gr_trunc(tmp, tmp, ctx);
+                        status |= gr_get_fmpz(rii, tmp, ctx); /* using a heuristic lower bound on the final GS norm */
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
@@ -191,11 +234,10 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                     kappa--;
                     if (kappa > zeros + 1)
                     {
-                        mpf_mul(tmp,
-                                mpf_mat_entry(r, kappa - 1, kappa - 1), ctt);
+                        status |= gr_mul(tmp, ENTRY(r, kappa - 1, kappa - 1), ctt, ctx);
                     }
                 } while ((kappa >= zeros + 2)
-                         && (mpf_cmp(s + kappa - 1, tmp) <= 0));
+                         && (_gr_cmp(GR_ENTRY(s, kappa - 1, sz), tmp, ctx) <= 0));
 
                 for (i = kappa; i < kappa2; i++)
                     if (kappa <= alpha[i])
@@ -214,98 +256,58 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 /* Step6: Update the mu's and r's */
                 /* ****************************** */
 
-                mutmp = mu->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    mu->rows[i] = mu->rows[i - 1];
-                mu->rows[kappa] = mutmp;
-
-                mutmp = r->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    r->rows[i] = r->rows[i - 1];
-                r->rows[kappa] = mutmp;
-
-                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+                status |= gr_mat_move_row(mu, kappa2, kappa, ctx);
+                status |= gr_mat_move_row(r, kappa2, kappa, ctx);
+                status |= gr_set(ENTRY(r, kappa, kappa), GR_ENTRY(s, kappa, sz), ctx);
 
                 /* ************************ */
                 /* Step7: Update B and appB */
                 /* ************************ */
 
-                {
-                    /* todo: shallow moves */
-/*
-                    Btmp = B->rows[kappa2];
-                    for (i = kappa2; i > kappa; i--)
-                        B->rows[i] = B->rows[i - 1];
-                    B->rows[kappa] = Btmp;
-*/
-                    Btmp = _fmpz_vec_init(B->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(B, kappa2), B->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(B, i), fmpz_mat_row(B, i - 1), B->c);
-                    _fmpz_vec_set(fmpz_mat_row(B, kappa), Btmp, B->c);
-                    _fmpz_vec_clear(Btmp, B->c);
-
-                }
+                fmpz_mat_move_row(B, kappa2, kappa);
 
                 if (U != NULL)
-                {
-                    /* todo: shallow moves */
-                    Btmp = _fmpz_vec_init(U->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(U, kappa2), U->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(U, i), fmpz_mat_row(U, i - 1), U->c);
-                    _fmpz_vec_set(fmpz_mat_row(U, kappa), Btmp, U->c);
-                    _fmpz_vec_clear(Btmp, U->c);
-                }
+                    fmpz_mat_move_row(U, kappa2, kappa);
 
-                appBtmp = appB->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    appB->rows[i] = appB->rows[i - 1];
-                appB->rows[kappa] = appBtmp;
+                status |= gr_mat_move_row(appB, kappa2, kappa, ctx);
 
                 /* *************************** */
                 /* Step8: Update appSP: tricky */
                 /* *************************** */
 
-                for (i = 0; i <= kappa2; i++)
-                    mpf_set(appSPtmp + i, mpf_mat_entry(A->appSP2, kappa2, i));
+                status |= _gr_vec_set(appSPtmp, ENTRY(A->appSP2, kappa2, 0), kappa2 + 1, ctx);
 
                 for (i = kappa2 + 1; i <= kappamax; i++)
-                    mpf_set(appSPtmp + i, mpf_mat_entry(A->appSP2, i, kappa2));
+                    status |= gr_set(GR_ENTRY(appSPtmp, i, sz), ENTRY(A->appSP2, i, kappa2), ctx);
 
                 for (i = kappa2; i > kappa; i--)
                 {
                     for (j = 0; j < kappa; j++)
-                        mpf_set(mpf_mat_entry(A->appSP2, i, j),
-                                mpf_mat_entry(A->appSP2, i - 1, j));
-                    mpf_set(mpf_mat_entry(A->appSP2, i, kappa),
-                            appSPtmp + i - 1);
+                        status |= gr_set(ENTRY(A->appSP2, i, j), ENTRY(A->appSP2, i - 1, j), ctx);
+
+                    status |= gr_set(ENTRY(A->appSP2, i, kappa), GR_ENTRY(appSPtmp, i - 1, sz), ctx);
 
                     for (j = kappa + 1; j <= i; j++)
-                        mpf_set(mpf_mat_entry(A->appSP2, i, j),
-                                mpf_mat_entry(A->appSP2, i - 1, j - 1));
+                        status |= gr_set(ENTRY(A->appSP2, i, j), ENTRY(A->appSP2, i - 1, j - 1), ctx);
 
                     for (j = kappa2 + 1; j <= kappamax; j++)
-                        mpf_set(mpf_mat_entry(A->appSP2, j, i),
-                                mpf_mat_entry(A->appSP2, j, i - 1));
+                        status |= gr_set(ENTRY(A->appSP2, j, i), ENTRY(A->appSP2, j, i - 1), ctx);
                 }
 
                 for (i = 0; i < kappa; i++)
-                    mpf_set(mpf_mat_entry(A->appSP2, kappa, i), appSPtmp + i);
-                mpf_set(mpf_mat_entry(A->appSP2, kappa, kappa),
-                        appSPtmp + kappa2);
+                    status |= gr_set(ENTRY(A->appSP2, kappa, i), GR_ENTRY(appSPtmp, i, sz), ctx);
+
+                status |= gr_set(ENTRY(A->appSP2, kappa, kappa), GR_ENTRY(appSPtmp, kappa2, sz), ctx);
 
                 for (i = kappa2 + 1; i <= kappamax; i++)
-                    mpf_set(mpf_mat_entry(A->appSP2, i, kappa), appSPtmp + i);
+                    status |= gr_set(ENTRY(A->appSP2, i, kappa), GR_ENTRY(appSPtmp, i, sz), ctx);
 
-                if (mpf_sgn(mpf_mat_entry(r, kappa, kappa)) <= 0)
+                if (_gr_sgn(ENTRY(r, kappa, kappa), ctx) <= 0)
                 {
                     zeros++;
                     kappa++;
-                    _mpf_vec_norm2(mpf_mat_entry(A->appSP2, kappa, kappa),
-                                   appB->rows[kappa], n, prec);
-                    mpf_set(mpf_mat_entry(r, kappa, kappa),
-                            mpf_mat_entry(A->appSP2, kappa, kappa));
+                    status |= _gr_vec_norm2(ENTRY(A->appSP2, kappa, kappa), ROW(appB, kappa), n, ctx);
+                    status |= gr_set(ENTRY(r, kappa, kappa), ENTRY(A->appSP2, kappa, kappa), ctx);
                 }
 
                 kappa++;
@@ -320,9 +322,11 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 fmpz_init(rii);
                 for (i = d - 1; (i >= 0) && (ok > 0); i--)
                 {
-                    mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
+                    status |= gr_mul_2exp_si(tmp, ENTRY(r, i, i), -1, ctx);
                     /* rii is the G-S length of ith vector divided by 2 */
-                    fmpz_set_mpf(rii, tmp);
+                    status |= gr_trunc(tmp, tmp, ctx);
+                    status |= gr_get_fmpz(rii, tmp, ctx);
+
                     if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                     {
                         newd--;
@@ -333,42 +337,40 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         }
 
         flint_free(alpha);
-        mpf_clears(ctt, tmp, rtmp, NULL);
-        mpf_mat_clear(mu);
-        mpf_mat_clear(r);
-        mpf_mat_clear(appB);
-        mpf_mat_clear(A->appSP2);
-        _mpf_vec_clear(s, B->r);
-        _mpf_vec_clear(appSPtmp, B->r);
+        GR_TMP_CLEAR3(ctt, tmp, rtmp, ctx);
+        gr_mat_clear(mu, ctx);
+        gr_mat_clear(r, ctx);
+        gr_mat_clear(appB, ctx);
+        gr_mat_clear(A->appSP2, ctx);
+        GR_TMP_CLEAR_VEC(s, d, ctx);
+        GR_TMP_CLEAR_VEC(appSPtmp, d, ctx);
     }
     else
     {
         int kappa, kappa2, d, n, i, j, zeros, kappamax, update_b = 1;
-        mpf_mat_t mu, r;
+        gr_mat_t mu, r;
         fmpz_gram_t A;
-        mpf *s, *mutmp;
-        mpf_t ctt, tmp, rtmp;
+        gr_ptr s;
+        gr_ptr ctt, tmp, rtmp;
         int *alpha;
-        fmpz *Btmp;
 
         n = B->c;
         d = B->r;
 
-        mpf_init_set_d(ctt, (fl->delta + 1) / 2);
+        GR_TMP_INIT3(ctt, tmp, rtmp, ctx);
+
+        status |= gr_set_d(ctt, (fl->delta + 1) / 2, ctx);
 
         alpha = (int *) flint_malloc(d * sizeof(int));
 
-        mpf_init2(tmp, prec);
-        mpf_init2(rtmp, prec);
-
-        mpf_mat_init(mu, d, d, prec);
-        mpf_mat_init(r, d, d, prec);
+        gr_mat_init(mu, d, d, ctx);
+        gr_mat_init(r, d, d, ctx);
         if (fl->rt == Z_BASIS)
         {
             fmpz_mat_init(A->exactSP, d, d);
         }
 
-        s = _mpf_vec_init(d, prec);
+        GR_TMP_INIT_VEC(s, d, ctx);
 
         if (U != NULL)
         {
@@ -404,7 +406,7 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
 
         if (zeros < d - 1)
         {
-            fmpz_get_mpf(mpf_mat_entry(r, i, i), fmpz_mat_entry(GM, i, i));
+            status |= gr_set_fmpz(ENTRY(r, i, i), fmpz_mat_entry(GM, i, i), ctx);
         }
 
         for (i = zeros + 1; i < d; i++)
@@ -424,19 +426,19 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 fmpz_lll_check_babai_heuristic(kappa, (update_b ? B : NULL), U,
                                                mu, r, s, NULL, A, alpha[kappa],
                                                zeros, kappamax, n, tmp, rtmp,
-                                               prec, fl);
+                                               ctx, fl);
 
             if (babai_ok == -1)
             {
                 flint_free(alpha);
-                mpf_clears(ctt, tmp, rtmp, NULL);
-                mpf_mat_clear(mu);
-                mpf_mat_clear(r);
+                GR_TMP_CLEAR3(ctt, tmp, rtmp, ctx);
+                gr_mat_clear(mu, ctx);
+                gr_mat_clear(r, ctx);
                 if (fl->rt == Z_BASIS)
                 {
                     fmpz_mat_clear(A->exactSP);
                 }
-                _mpf_vec_clear(s, d);
+                GR_TMP_CLEAR_VEC(s, d, ctx);
                 /* Need to switch to mpf / arb */
                 return -1;
             }
@@ -445,14 +447,13 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
             /* Step4: Success of Lovasz's condition */
             /* ************************************ */
 
-            mpf_mul(tmp, mpf_mat_entry(r, kappa - 1, kappa - 1), ctt);
+            status |= gr_mul(tmp, ENTRY(r, kappa - 1, kappa - 1), ctt, ctx);
 
-            if (mpf_cmp(tmp, s + kappa - 1) <= 0)
+            if (_gr_cmp(tmp, GR_ENTRY(s, kappa - 1, sz), ctx) <= 0)
             {
                 alpha[kappa] = kappa;
-                mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
-                        mpf_mat_entry(r, kappa, kappa - 1));
-                mpf_sub(mpf_mat_entry(r, kappa, kappa), s + kappa - 1, tmp);
+                status |= gr_mul(tmp, ENTRY(mu, kappa, kappa - 1), ENTRY(r, kappa, kappa - 1), ctx);
+                status |= gr_sub(ENTRY(r, kappa, kappa), GR_ENTRY(s, kappa - 1, sz), tmp, ctx);
                 kappa++;
             }
             else
@@ -470,11 +471,11 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                     if (kappa == d - 1 && gs_B != NULL)
                     {
                         fmpz_init(rii);
-                        mpf_mul(tmp, mpf_mat_entry(mu, kappa, kappa - 1),
-                                mpf_mat_entry(r, kappa, kappa - 1));
-                        mpf_mul_2exp(tmp, tmp, 1);
-                        mpf_sub(tmp, s + kappa - 1, tmp);
-                        fmpz_set_mpf(rii, tmp); /* using a heuristic lower bound on the final GS norm */
+                        status |= gr_mul(tmp, ENTRY(mu, kappa, kappa - 1), ENTRY(r, kappa, kappa - 1), ctx);
+                        status |= gr_mul_2exp_si(tmp, tmp, 1, ctx);
+                        status |= gr_sub(tmp, GR_ENTRY(s, kappa - 1, sz), tmp, ctx);
+                        status |= gr_trunc(tmp, tmp, ctx);
+                        status |= gr_get_fmpz(rii, tmp, ctx); /* using a heuristic lower bound on the final GS norm */
                         if (fmpz_cmp(rii, gs_B) > 0)
                         {
                             d--;
@@ -492,11 +493,10 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                     kappa--;
                     if (kappa > zeros + 1)
                     {
-                        mpf_mul(tmp,
-                                mpf_mat_entry(r, kappa - 1, kappa - 1), ctt);
+                        status |= gr_mul(tmp, ENTRY(r, kappa - 1, kappa - 1), ctt, ctx);
                     }
                 } while ((kappa >= zeros + 2)
-                         && (mpf_cmp(s + kappa - 1, tmp) <= 0));
+                         && (_gr_cmp(GR_ENTRY(s, kappa - 1, sz), tmp, ctx) <= 0));
 
                 for (i = kappa; i < kappa2; i++)
                     if (kappa <= alpha[i])
@@ -515,47 +515,19 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 /* Step6: Update the mu's and r's */
                 /* ****************************** */
 
-                mutmp = mu->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    mu->rows[i] = mu->rows[i - 1];
-                mu->rows[kappa] = mutmp;
-
-                mutmp = r->rows[kappa2];
-                for (i = kappa2; i > kappa; i--)
-                    r->rows[i] = r->rows[i - 1];
-                r->rows[kappa] = mutmp;
-
-                mpf_set(mpf_mat_entry(r, kappa, kappa), s + kappa);
+                status |= gr_mat_move_row(mu, kappa2, kappa, ctx);
+                status |= gr_mat_move_row(r, kappa2, kappa, ctx);
+                status |= gr_set(ENTRY(r, kappa, kappa), GR_ENTRY(s, kappa, sz), ctx);
 
                 /* *************** */
                 /* Step7: Update B */
                 /* *************** */
 
                 if (fl->rt == Z_BASIS && update_b)
-                {
-                    Btmp = _fmpz_vec_init(B->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(B, kappa2), B->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(B, i), fmpz_mat_row(B, i - 1), B->c);
-                    _fmpz_vec_set(fmpz_mat_row(B, kappa), Btmp, B->c);
-                    _fmpz_vec_clear(Btmp, B->c);
-/*
-                    Btmp = B->rows[kappa2];
-                    for (i = kappa2; i > kappa; i--)
-                        B->rows[i] = B->rows[i - 1];
-                    B->rows[kappa] = Btmp;
-*/
-                }
+                    fmpz_mat_move_row(B, kappa2, kappa);
 
                 if (U != NULL)
-                {
-                    Btmp = _fmpz_vec_init(U->c);
-                    _fmpz_vec_set(Btmp, fmpz_mat_row(U, kappa2), U->c);
-                    for (i = kappa2; i > kappa; i--)
-                        _fmpz_vec_set(fmpz_mat_row(U, i), fmpz_mat_row(U, i - 1), U->c);
-                    _fmpz_vec_set(fmpz_mat_row(U, kappa), Btmp, U->c);
-                    _fmpz_vec_clear(Btmp, U->c);
-                }
+                    fmpz_mat_move_row(U, kappa2, kappa);
 
                 /* ********************* */
                 /* Step8: Update exactSP */
@@ -580,12 +552,11 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                     fmpz_swap(fmpz_mat_entry(GM, kappa + j, kappa),
                               fmpz_mat_entry(GM, kappa2 - j, kappa));
 
-                if (mpf_sgn(mpf_mat_entry(r, kappa, kappa)) <= 0)
+                if (_gr_sgn(ENTRY(r, kappa, kappa), ctx) <= 0)
                 {
                     zeros++;
                     kappa++;
-                    fmpz_get_mpf(mpf_mat_entry(r, kappa, kappa),
-                                 fmpz_mat_entry(GM, kappa, kappa));
+                    status |= gr_set_fmpz(ENTRY(r, kappa, kappa), fmpz_mat_entry(GM, kappa, kappa), ctx);
                 }
 
                 kappa++;
@@ -616,9 +587,10 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
                 fmpz_init(rii);
                 for (i = d - 1; (i >= 0) && (ok > 0); i--)
                 {
-                    mpf_div_2exp(tmp, mpf_mat_entry(r, i, i), 1);
+                    status |= gr_mul_2exp_si(tmp, ENTRY(r, i, i), -1, ctx);
+                    status |= gr_trunc(tmp, tmp, ctx);
                     /* rii is the G-S length of ith vector divided by 2 */
-                    fmpz_set_mpf(rii, tmp);
+                    status |= gr_get_fmpz(rii, tmp, ctx);
                     if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                     {
                         newd--;
@@ -629,15 +601,19 @@ int fmpz_lll_mpf2_with_removal(fmpz_mat_t B, fmpz_mat_t U, flint_bitcnt_t prec, 
         }
 
         flint_free(alpha);
-        mpf_clears(ctt, tmp, rtmp, NULL);
-        mpf_mat_clear(mu);
-        mpf_mat_clear(r);
+        GR_TMP_CLEAR3(ctt, tmp, rtmp, ctx);
+        gr_mat_clear(mu, ctx);
+        gr_mat_clear(r, ctx);
         if (fl->rt == Z_BASIS)
         {
             fmpz_mat_clear(A->exactSP);
         }
-        _mpf_vec_clear(s, B->r);
+        GR_TMP_CLEAR_VEC(s, d, ctx);
     }
+
+    /* Debugging */
+    GR_MUST_SUCCEED(status);
+
     return newd;
 }
 
@@ -654,8 +630,9 @@ fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     do
     {
+        /* todo: why not always double prec? */
         if (num_loops < 20)
-            prec += D_BITS;
+            prec += 64;
         else
             prec *= 2;
 
@@ -677,8 +654,9 @@ fmpz_lll_mpf_with_removal(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B,
 
     do
     {
+        /* todo: why not always double prec? */
         if (num_loops < 20)
-            prec += D_BITS;
+            prec += 64;
         else
             prec *= 2;
 

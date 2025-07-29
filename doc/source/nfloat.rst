@@ -238,6 +238,12 @@ These methods are interchangeable with their ``gr`` counterparts.
 .. function:: int nfloat_set_arf(nfloat_ptr res, const arf_t x, gr_ctx_t ctx)
               int nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx)
 
+.. function:: int nfloat_get_d_2exp_si(double * m, slong * e, nfloat_srcptr x, gr_ctx_t ctx)
+
+.. function:: int nfloat_get_fmpz(fmpz_t res, nfloat_srcptr x, gr_ctx_t ctx)
+
+    Succeeds only if ``x`` is integer-valued.
+
 .. function:: int nfloat_set_fmpq(nfloat_ptr res, const fmpq_t v, gr_ctx_t ctx)
               int nfloat_set_d(nfloat_ptr res, double x, gr_ctx_t ctx)
               int nfloat_set_str(nfloat_ptr res, const char * x, gr_ctx_t ctx)

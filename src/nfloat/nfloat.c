@@ -468,6 +468,119 @@ nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+#include <math.h>
+
+int
+nfloat_get_d_2exp_si(double * mant, slong * expo, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_ZERO(x))
+        {
+            *mant = 0.0;
+            *expo = 0;
+            return GR_SUCCESS;
+        }
+
+        return GR_UNABLE;
+    }
+    else
+    {
+        /* todo: rounding? */
+        double m;
+        slong e = NFLOAT_EXP(x);
+
+        m = NFLOAT_D(x)[NFLOAT_CTX_NLIMBS(ctx) - 1];
+#if FLINT_BITS == 32
+        if (NFLOAT_CTX_NLIMBS(ctx) > 1)
+            m += NFLOAT_D(x)[NFLOAT_CTX_NLIMBS(ctx) - 2] * ldexp(1.0, -FLINT_BITS);
+#endif
+
+        m *= ldexp(1.0, -FLINT_BITS);
+
+        /* may have rounded up */
+        if (m >= 1.0)
+        {
+            m *= 0.5;
+            e++;
+        }
+
+        if (NFLOAT_SGNBIT(x))
+            m = -m;
+
+        *mant = m;
+        *expo = e;
+    }
+
+    return GR_SUCCESS;
+}
+
+int
+nfloat_get_fmpz(fmpz_t res, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_ZERO(x))
+        {
+            fmpz_zero(res);
+            return GR_SUCCESS;
+        }
+
+        return GR_UNABLE;
+    }
+    else
+    {
+        slong exp = NFLOAT_EXP(x);
+        slong n = NFLOAT_CTX_NLIMBS(ctx);
+
+        if (exp <= 0)
+            return GR_DOMAIN;
+
+        nn_srcptr d = NFLOAT_D(x);
+
+        while (d[0] == 0)
+        {
+            d++;
+            n--;
+        }
+
+        slong bc = n * FLINT_BITS - flint_ctz(d[0]);
+
+        if (bc > exp)
+            return GR_DOMAIN;
+
+        if (exp <= FLINT_BITS)
+        {
+            if (NFLOAT_SGNBIT(x))
+                fmpz_neg_ui(res, d[n - 1] >> (FLINT_BITS - exp));
+            else
+                fmpz_set_ui(res, d[n - 1] >> (FLINT_BITS - exp));
+        }
+        else
+        {
+            slong rn = (exp + FLINT_BITS - 1) / FLINT_BITS;
+
+            FLINT_ASSERT(rn >= 2);
+
+            /* todo: optimize */
+            if (rn <= n)
+            {
+                fmpz_set_mpn_large(res, d + n - rn, rn, NFLOAT_SGNBIT(x));
+                fmpz_tdiv_q_2exp(res, res, rn * FLINT_BITS - exp);
+            }
+            else
+            {
+                fmpz_set_ui_array(res, d, n);
+                if (NFLOAT_SGNBIT(x))
+                    fmpz_neg(res, res);
+                fmpz_mul_2exp(res, res, exp - n * FLINT_BITS);
+            }
+        }
+
+        return GR_SUCCESS;
+    }
+}
+
 int
 nfloat_neg(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 {
