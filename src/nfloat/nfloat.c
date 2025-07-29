@@ -563,14 +563,16 @@ nfloat_get_fmpz(fmpz_t res, nfloat_srcptr x, gr_ctx_t ctx)
             FLINT_ASSERT(rn >= 2);
 
             /* todo: optimize */
-            if (rn < n)
+            if (rn <= n)
             {
                 fmpz_set_mpn_large(res, d + n - rn, rn, NFLOAT_SGNBIT(x));
                 fmpz_tdiv_q_2exp(res, res, rn * FLINT_BITS - exp);
             }
             else
             {
-                fmpz_set_mpn_large(res, d, n, NFLOAT_SGNBIT(x));
+                fmpz_set_ui_array(res, d, n);
+                if (NFLOAT_SGNBIT(x))
+                    fmpz_neg(res, res);
                 fmpz_mul_2exp(res, res, exp - n * FLINT_BITS);
             }
         }
