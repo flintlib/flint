@@ -373,6 +373,9 @@ _gr_acb_get_ui(ulong * res, const acb_t x, const gr_ctx_t ctx)
 int
 _gr_acb_get_d(double * res, const acb_t x, const gr_ctx_t ctx)
 {
+    if (!arb_is_zero(acb_imagref(x)))
+        return GR_UNABLE;
+
     *res = arf_get_d(arb_midref(acb_realref(x)), ARF_RND_NEAR);
     return GR_SUCCESS;
 }

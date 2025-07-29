@@ -303,7 +303,7 @@ _gr_arf_get_d_2exp_si(double * res, slong * exp, const arf_t x, const gr_ctx_t c
     *t = *x;
     ARF_EXP(t) = 0;
 
-    m = arf_get_d(x, ARF_CTX_RND(ctx));
+    m = arf_get_d(t, ARF_CTX_RND(ctx));
 
     /* may have rounded up */
     if (m <= -1.0 || m >= 1.0)
