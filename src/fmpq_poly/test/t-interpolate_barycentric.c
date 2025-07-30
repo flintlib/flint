@@ -14,7 +14,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-TEST_FUNCTION_START(fmpq_poly_interpolate_fmpq_vec, state)
+TEST_FUNCTION_START(fmpq_poly_interpolate_barycentric, state)
 {
     int i;
 
@@ -41,7 +41,7 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_fmpq_vec, state)
         for (j = 0; j < npoints; j++)
             fmpq_poly_evaluate_fmpq(y + j, P, x + j);
 
-        fmpq_poly_interpolate_fmpq_vec(Q, x, y, npoints);
+        fmpq_poly_interpolate_barycentric(Q, x, y, npoints);
 
         if (!fmpq_poly_equal(P, Q))
         {

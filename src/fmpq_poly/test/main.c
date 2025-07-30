@@ -63,6 +63,7 @@
 #include "t-interpolate_fmpq_vec.c"
 #include "t-interpolate_fast.c"
 #include "t-interpolate_multi_mod.c"
+#include "t-interpolate_barycentric.c"
 #include "t-inv.c"
 #include "t-inv_series_newton.c"
 #include "t-invsqrt_series.c"
@@ -161,6 +162,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_poly_interpolate_fmpq_vec),
     TEST_FUNCTION(fmpq_poly_interpolate_fast),
     TEST_FUNCTION(fmpq_poly_interpolate_multi_mod),
+    TEST_FUNCTION(fmpq_poly_interpolate_barycentric),
     TEST_FUNCTION(fmpq_poly_inv),
     TEST_FUNCTION(fmpq_poly_inv_series_newton),
     TEST_FUNCTION(fmpq_poly_invsqrt_series),

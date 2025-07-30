@@ -20,51 +20,43 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_fast, state)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        fmpq_poly_t P;
-        fmpq *x, *y, *z;
-        fmpq_t q;
-        slong j, n, bits;
+        fmpq_poly_t P, Q;
+        fmpq *x, *y;
+        slong j, npoints, n, bits;
 
-        n = n_randint(state, 50);
-        bits = n_randint(state, 100) + 1;
+        npoints = n_randint(state, 200);
+        n = n_randint(state, npoints + 1);
+        bits = n_randint(state, 400) + 1;
 
-        x = _fmpq_vec_init(n);
-        y = _fmpq_vec_init(n);
-        z = _fmpq_vec_init(n);
+        x = _fmpq_vec_init(npoints);
+        y = _fmpq_vec_init(npoints);
 
         fmpq_poly_init(P);
+        fmpq_poly_init(Q);
 
-        for (j = 0; j < n; j++)
-            fmpq_set_si(x + j, -n/2 + j, 1);
+        fmpq_poly_randtest(P, state, n, bits);
 
-        _fmpq_vec_randtest(y, state, n, bits);
+        for (j = 0; j < npoints; j++)
+            fmpq_set_si(x + j, -npoints/2 + j, 1);
+        for (j = 0; j < npoints; j++)
+            fmpq_poly_evaluate_fmpq(y + j, P, x + j);
 
-        fmpq_poly_interpolate_fast(P, x, y, n);
+        fmpq_poly_interpolate_fast(Q, x, y, npoints);
 
-        fmpq_init(q);
-        for (j = 0; j < n; j++)
+        if (!fmpq_poly_equal(P, Q))
         {
-            fmpq_poly_evaluate_fmpq(q, P, x + j);
-            fmpq_set(z + j, q);
-
-            if (!fmpq_equal(z + j, y + j))
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("x:\n"); _fmpq_vec_print(x, n); flint_printf("\n\n");
-                flint_printf("y:\n"); _fmpq_vec_print(y, n); flint_printf("\n\n");
-                flint_printf("P:\n"); fmpq_poly_print(P), flint_printf("\n\n");
-                fflush(stdout);
-                flint_abort();
-            }
+            flint_printf("FAIL (P != Q):\n");
+            fmpq_poly_print(P), flint_printf("\n\n");
+            fmpq_poly_print(Q), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
         }
-        fmpq_clear(q);
 
         fmpq_poly_clear(P);
-        _fmpq_vec_clear(x, n);
-        _fmpq_vec_clear(y, n);
-        _fmpq_vec_clear(z, n);
+        fmpq_poly_clear(Q);
+        _fmpq_vec_clear(x, npoints);
+        _fmpq_vec_clear(y, npoints);
     }
 
     TEST_FUNCTION_END(state);
 }
-

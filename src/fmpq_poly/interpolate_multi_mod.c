@@ -100,9 +100,6 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     fmpq * coeffs;
     fmpz * rescoeffs;
 
-    if (n == 0)
-        return 1;
-
     fmpz_init(M);
     fmpz_init(t);
     fmpz_init(u);
@@ -328,10 +325,15 @@ int
 fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly,
                                     const fmpq * xs, const fmpq * ys, slong n)
 {
-    int ok;
-    fmpq_poly_fit_length(poly, n);
-    ok = _fmpq_poly_interpolate_multi_mod(poly->coeffs, poly->den, xs, ys, n);
-    _fmpq_poly_set_length(poly, n);
-    _fmpq_poly_normalise(poly);
+    int ok = 1;
+    if (n == 0)
+        fmpq_poly_zero(poly);
+    else
+    {
+        fmpq_poly_fit_length(poly, n);
+        ok = _fmpq_poly_interpolate_multi_mod(poly->coeffs, poly->den, xs, ys, n);
+        _fmpq_poly_set_length(poly, n);
+        _fmpq_poly_normalise(poly);
+    }
     return ok;
 }

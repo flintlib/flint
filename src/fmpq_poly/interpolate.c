@@ -9,6 +9,7 @@
     by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
+#include "math.h"
 #include "fmpz.h"
 #include "fmpq.h"
 #include "fmpz_vec.h"
@@ -20,8 +21,6 @@ void
 _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
                                     const fmpq * xs, const fmpq * ys, slong n)
 {
-    slong i, j;
-
     /* Constant */
     if (n == 1)
     {
@@ -33,6 +32,7 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
     /* Linear */
     if (n == 2)
     {
+        slong i;
         fmpz_t Dx, Dy;
         fmpz *xi, *yi;
 
@@ -66,54 +66,23 @@ _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den,
         return;
     }
 
-    fmpz *P, *Q, *w;
-    fmpz_t t, t1;
+    /*  Estimate on f = (1/D) * sum_{k=1..n-1} fk * X^k,
+        whith xi = a/b and yi = c/d:
 
-    fmpz_init(t);
-    fmpz_init(t1);
+        ci / di = sum_k fk * ai^k * bi^(n-1-k) / D * bi^(n-1)
+        => ht(yi) ~= ht(f) - (n - 1) * ht(xi)
+    */
+    flint_bitcnt_t xbits, ybits, fbits;
+    xbits = _fmpq_vec_max_height_bits(xs, n);
+    ybits = _fmpq_vec_max_height_bits(ys, n);
+    fbits = FLINT_MAX( ybits - ( n - 1) *  FLINT_MAX(xbits - 1,0), 0);
 
-    P = _fmpz_vec_init(n + 1);
-    Q = _fmpz_vec_init(n);
-    w = _fmpz_vec_init(n);
-
-    /* P = (b[0]*x-a[0])*(b[1]*x-a[1])*...*(b[n-1]*x-a[n-1]) with xs[i]=a[i]/b[i]*/
-    _fmpz_poly_product_roots_fmpq_vec(P, xs, n);
-
-    /* Weights: w[i] = d[i] * prod_(j!=i) (a[i]*b[j] - a[j]*b[j]) with ys[i] = c[i]/d[i]*/
-    for (i = 0; i < n; i++)
-    {
-        fmpz_set(w + i, fmpq_denref(ys + i));
-        for (j = 0; j < n; j++)
-        {
-            if (i == j) continue;
-            fmpz_mul(t, fmpq_numref(xs + i), fmpq_denref(xs + j));
-            fmpz_submul(t, fmpq_numref(xs + j), fmpq_denref(xs + i));
-            fmpz_mul(w + i, w + i, t);
-        }
-    }
-
-    _fmpz_vec_zero(poly, n);
-    _fmpz_vec_lcm(den, w, n);
-
-    for (i = 0; i < n; i++)
-    {
-        /* Q = P / (b[i]*x - a[i]) with xs[i]=a[i]/b[i]*/
-        _fmpz_poly_divexact_root_fmpq(Q, P, n + 1, xs + i);
-
-        /* poly += (den / w[i]) * c[i] * b[i]^(n-1) * Q(x) */
-        fmpz_divexact(t, den, w + i);
-        fmpz_mul(t, t, fmpq_numref(ys + i));
-        fmpz_pow_ui(t1, fmpq_denref(xs + i), n - 1);
-        fmpz_mul(t, t, t1);
-
-        _fmpz_vec_scalar_addmul_fmpz(poly, Q, n, t);
-    }
-
-    _fmpz_vec_clear(P, n + 1);
-    _fmpz_vec_clear(Q, n);
-    _fmpz_vec_clear(w, n);
-    fmpz_clear(t);
-    fmpz_clear(t1);
+    if ((fbits < FLINT_BITS -  2 && n > 10) || n > 2 * (sqrt(fbits) + 1))
+        _fmpq_poly_interpolate_multi_mod(poly, den, xs, ys, n);
+    else if (n < 80)
+        _fmpq_poly_interpolate_barycentric(poly, den, xs, ys, n);
+    else
+        _fmpq_poly_interpolate_fast(poly, den, xs, ys, n);
 }
 
 void
@@ -121,13 +90,7 @@ fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
                                     const fmpq * xs, const fmpq * ys, slong n)
 {
     if (n == 0)
-    {
         fmpq_poly_zero(poly);
-    }
-    else if (n == 1)
-    {
-        fmpq_poly_set_fmpq(poly, ys);
-    }
     else
     {
         fmpq_poly_fit_length(poly, n);
@@ -142,13 +105,7 @@ fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
                                     const fmpz * xs, const fmpq * ys, slong n)
 {
     if (n == 0)
-    {
         fmpq_poly_zero(poly);
-    }
-    else if (n == 1)
-    {
-        fmpq_poly_set_fmpq(poly, ys);
-    }
     else
     {
         fmpq *xs1 = _fmpq_vec_init(n);
@@ -158,6 +115,8 @@ fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
         _fmpq_poly_interpolate_fmpq_vec(poly->coeffs, poly->den, xs1, ys, n);
         _fmpq_poly_set_length(poly, n);
         fmpq_poly_canonicalise(poly);
+
+        _fmpq_vec_clear(xs1, n);
     }
 }
 
@@ -166,13 +125,7 @@ fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, slong n)
 {
     if (n == 0)
-    {
         fmpq_poly_zero(poly);
-    }
-    else if (n == 1)
-    {
-        fmpq_poly_set_fmpz(poly, ys);
-    }
     else
     {
         fmpq *xs1 = _fmpq_vec_init(n);
@@ -184,6 +137,8 @@ fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
         _fmpq_poly_interpolate_fmpq_vec(poly->coeffs, poly->den, xs1, ys1, n);
         _fmpq_poly_set_length(poly, n);
         fmpq_poly_canonicalise(poly);
+
+        _fmpq_vec_clear(xs1, n);
+        _fmpq_vec_clear(ys1, n);
     }
 }
-
