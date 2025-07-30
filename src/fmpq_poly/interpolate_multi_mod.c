@@ -54,26 +54,6 @@ _fmpq_poly_check_interpolant(const fmpz * poly, const fmpz_t den,
     return ok;
 }
 
-static int
-_fmpq_vec_has_unique_entries(const fmpq * x, slong n)
-{
-    fmpq * t;
-    slong i;
-    int ok = 1;
-
-    t = _fmpq_vec_init(n);
-    for (i = 0; i < n; i++)
-        fmpq_set(t + i, x + i);
-    _fmpq_vec_sort(t, n);
-    for (i = 1; i < n; i++)
-        if (fmpq_equal(t + i - 1, t + i))
-            ok = 0;
-
-    _fmpq_vec_clear(t, n);
-
-    return ok;
-}
-
 /* _nmod_poly_interpolate_nmod_vec currently lacks error handling */
 int
 _checked_nmod_poly_interpolate(nn_ptr r, nn_srcptr x, nn_srcptr y, slong n, nmod_t mod);
@@ -82,7 +62,7 @@ void
 _fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2,
                    const fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign);
 
-int
+void
 _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
                                     const fmpq * xs, const fmpq * ys, slong n)
 {
@@ -93,8 +73,7 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     nn_ptr xm, ym;
     fmpz_t M, t, u, c, M2, M1M2;
     slong total_primes, num_primes, count_good;
-    int ok = 1, rat_rec;
-    int checked_unique = 0;
+    int rat_rec;
     nn_ptr primes = NULL, xmod = NULL, ymod = NULL, residues = NULL, residuesden = NULL;
     int * good = NULL;
     fmpq * coeffs;
@@ -271,17 +250,6 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
         /* At that step we have in poly, the polynomial modulo M,
            which a product of total_primes primes */
 
-        /* No primes succeeded -- verify that evaluation points are actually OK */
-        if (num_primes == 0 && !checked_unique)
-        {
-            if (!_fmpq_vec_has_unique_entries(xs, n))
-            {
-                ok = 0;
-                break;
-            }
-            checked_unique = 1;
-        }
-
         if (num_primes > 0)
         {
             /* Rational reconstruction */
@@ -317,23 +285,19 @@ _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
     flint_free(residuesden);
     flint_free(good);
     flint_free(Lmod);
-
-    return ok;
 }
 
-int
+void
 fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly,
                                     const fmpq * xs, const fmpq * ys, slong n)
 {
-    int ok = 1;
     if (n == 0)
         fmpq_poly_zero(poly);
     else
     {
         fmpq_poly_fit_length(poly, n);
-        ok = _fmpq_poly_interpolate_multi_mod(poly->coeffs, poly->den, xs, ys, n);
+        _fmpq_poly_interpolate_multi_mod(poly->coeffs, poly->den, xs, ys, n);
         _fmpq_poly_set_length(poly, n);
         _fmpq_poly_normalise(poly);
     }
-    return ok;
 }

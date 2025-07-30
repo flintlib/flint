@@ -1400,8 +1400,8 @@ Interpolation
 
 .. function:: void _fmpq_poly_interpolate_barycentric(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
               void fmpq_poly_interpolate_barycentric(fmpz_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
-              int _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
-              int fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
+              void _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
+              void fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
               void _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
               void fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
               void fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly, const fmpz * xs, const fmpq * ys, slong n)

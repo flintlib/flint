@@ -17,7 +17,7 @@
 
 TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
 {
-    int i, result;
+    slong i;
 
     ulong adversarial_primes[100];
     for (i = 0; i < 100; i++)
@@ -29,7 +29,7 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t P, Q;
-        fmpq *x, *y, *z;
+        fmpq *x, *y;
         fmpz *tmp;
         slong j, k, n, npoints, nbad, bits;
 
@@ -48,7 +48,6 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
 
         x = _fmpq_vec_init(npoints);
         y = _fmpq_vec_init(npoints);
-        z = _fmpq_vec_init(npoints);
 
         fmpq_poly_init(P);
         fmpq_poly_init(Q);
@@ -80,19 +79,9 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
         for (j = 0; j < npoints; j++)
             fmpq_poly_evaluate_fmpq(y + j, P, x + j);
 
-        result = fmpq_poly_interpolate_multi_mod(Q, x, y, npoints);
-        if (!result)
-        {
-            flint_printf("FAIL (exact):\n");
-            flint_printf("P  %{fmpq_poly}\n\n", P);
-            flint_printf("x  %{fmpq*}\n\n", x, npoints);
-            flint_printf("y  %{fmpq*}\n\n", y, npoints);
-            fflush(stdout);
-            flint_abort();
-        }
+        fmpq_poly_interpolate_multi_mod(Q, x, y, npoints);
 
-        result = (fmpq_poly_equal(P, Q));
-        if (!result)
+        if (!fmpq_poly_equal(P, Q))
         {
             flint_printf("FAIL (P != Q):\n");
             flint_printf("P  %{fmpq_poly}\n\n", P);
@@ -103,36 +92,10 @@ TEST_FUNCTION_START(fmpq_poly_interpolate_multi_mod, state)
             flint_abort();
         }
 
-        /* Test arbitrary x and y */
-        if (n_randint(state, 2))
-            _fmpq_vec_randtest(x, state, npoints, 1 + n_randint(state, 10));
-        _fmpq_vec_randtest(y, state, npoints, 1 + n_randint(state, 10));
-
-        result = fmpq_poly_interpolate_multi_mod(Q, x, y, npoints);
-
-        if (result)
-        {
-            for (j = 0; j < npoints; j++)
-                fmpq_poly_evaluate_fmpq(z + j, Q, x + j);
-
-            result = (_fmpq_vec_equal(z, y, npoints));
-
-            if (!result)
-            {
-                flint_printf("FAIL (P != Q, 2):\n");
-                flint_printf("x  %{fmpq*}\n\n", x, npoints);
-                flint_printf("y  %{fmpq*}\n\n", y, npoints);
-                flint_printf("Q  %{fmpq_poly}\n\n", Q);
-                fflush(stdout);
-                flint_abort();
-            }
-        }
-
         fmpq_poly_clear(P);
         fmpq_poly_clear(Q);
         _fmpq_vec_clear(x, npoints);
         _fmpq_vec_clear(y, npoints);
-        _fmpq_vec_clear(z, npoints);
     }
 
     TEST_FUNCTION_END(state);
