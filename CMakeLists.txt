@@ -277,7 +277,7 @@ string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "$
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h flint-mparam.h
-    profiler.h templates.h mpf-impl.h
+    profiler.h templates.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 

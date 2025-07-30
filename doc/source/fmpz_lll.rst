@@ -95,11 +95,12 @@ The various Babai's
     rather than a purely floating point inner product. The heuristic will
     compute at full precision when there is cancellation.
 
-.. function:: int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, mpf_mat_t mu, mpf_mat_t r, mpf * s, mpf_mat_t appB, fmpz_gram_t A, int a, int zeros, int kappamax, int n, mpf_t tmp, mpf_t rtmp, flint_bitcnt_t prec, const fmpz_lll_t fl)
+.. function:: int fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U, gr_mat_t mu, gr_mat_t r, gr_ptr s, gr_mat_t appB, fmpz_gram_t A, int a, int zeros, int kappamax, int n, gr_ptr tmp, gr_ptr rtmp, gr_ctx_t ctx, const fmpz_lll_t fl)
 
-    This function is like the ``mpf`` version of
-    :func:`fmpz_lll_check_babai_heuristic_d`. However, it also inherits some
-    temporary ``mpf_t`` variables ``tmp`` and ``rtmp``.
+    This function is like :func:`fmpz_lll_check_babai_heuristic_d` but
+    works with a generic floating-point type defined by the given context
+    object ``ctx``. Temporary scratch variables ``tmp`` and ``rtmp`` must
+    be given as input.
 
 .. function:: int fmpz_lll_advance_check_babai(int cur_kappa, int kappa, fmpz_mat_t B, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double * s, d_mat_t appB, int * expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl)
 
@@ -166,13 +167,14 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
 
     This is LLL using ``mpf`` with the given precision, ``prec`` for the
     underlying GSO. It reduces ``B`` in place like the other LLL functions.
-    The `mpf2` in the function name refers to the way the ``mpf_t``'s are
-    initialised.
+    The original implementation of this function used GMP's ``mpf`` for
+    arithmetic; it currently uses ``nfloat`` if ``prec`` is small enough
+    and otherwise falls back to ``arf``.
 
 .. function:: int fmpz_lll_mpf(fmpz_mat_t B, fmpz_mat_t U, const fmpz_lll_t fl)
 
     A wrapper of :func:`fmpz_lll_mpf2`. This currently begins with
-    `prec == D\_BITS`, then for the first 20 loops, increases the precision one
+    `prec == 64`, then for the first 20 loops, increases the precision one
     limb at a time. After 20 loops, it doubles the precision each time. There
     is a proof that this will eventually work. The return value of this
     function is 0 if the LLL is successful or -1 if the precision maxes out

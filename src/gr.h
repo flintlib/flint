@@ -231,6 +231,7 @@ typedef enum
     GR_METHOD_SET_FMPZ_2EXP_FMPZ,
     GR_METHOD_GET_FMPZ_2EXP_FMPZ,
     GR_METHOD_SET_FMPZ_10EXP_FMPZ,
+    GR_METHOD_GET_D_2EXP_SI,
 
     GR_METHOD_IS_INVERTIBLE,
     GR_METHOD_INV,
@@ -710,6 +711,7 @@ typedef enum
     GR_CTX_RR_ARB, GR_CTX_CC_ACB,
     GR_CTX_REAL_FLOAT_ARF, GR_CTX_COMPLEX_FLOAT_ACF,
     GR_CTX_NFLOAT, GR_CTX_NFLOAT_COMPLEX,
+    GR_CTX_MPF,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
@@ -771,6 +773,7 @@ typedef int ((*gr_method_unary_op_get_si)(slong *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpz)(fmpz_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpq)(fmpq_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_d)(double *, gr_srcptr, gr_ctx_ptr));
+typedef int ((*gr_method_unary_op_get_d_si)(double *, slong *, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_get_fmpz_fmpz)(fmpz_t, fmpz_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_unary_op_with_flag)(gr_ptr, gr_srcptr, int, gr_ctx_ptr));
 typedef int ((*gr_method_binary_unary_op)(gr_ptr, gr_ptr, gr_srcptr, gr_ctx_ptr));
@@ -870,6 +873,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_UNARY_OP_GET_FMPZ(ctx, NAME) (((gr_method_unary_op_get_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_FMPQ(ctx, NAME) (((gr_method_unary_op_get_fmpq *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_D(ctx, NAME) (((gr_method_unary_op_get_d *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_UNARY_OP_GET_D_SI(ctx, NAME) (((gr_method_unary_op_get_d_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_GET_FMPZ_FMPZ(ctx, NAME) (((gr_method_unary_op_get_fmpz_fmpz *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_UNARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_unary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_BINARY_UNARY_OP(ctx, NAME) (((gr_method_binary_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -1074,6 +1078,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const
 GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_2EXP_FMPZ)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ_FMPZ(ctx, GET_FMPZ_2EXP_FMPZ)(res1, res2, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_10EXP_FMPZ)(res, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_get_d_2exp_si(double * res, slong * exp, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_D_SI(ctx, GET_D_2EXP_SI)(res, exp, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, INV)(res, x, ctx); }
 GR_INLINE truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_INVERTIBLE)(x, ctx); }
@@ -1380,6 +1385,7 @@ void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_real_float_arf(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_complex_float_acf(gr_ctx_t ctx, slong prec);
 
+void gr_ctx_init_mpf(gr_ctx_t ctx, slong prec);
 
 void gr_ctx_init_real_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_ca(gr_ctx_t ctx);

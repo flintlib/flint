@@ -113,8 +113,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                     mpfr_add(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
                              norm, MPFR_RNDN);
                 }
-                mpfr_mul_si(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                            -WORD(1), MPFR_RNDN);
+                mpfr_neg(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i), MPFR_RNDN);
                 mpfr_mul(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
                          mpfr_mat_entry(V, j, j), MPFR_RNDN);
             }
@@ -560,8 +559,7 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                     mpfr_add(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
                              norm, MPFR_RNDN);
                 }
-                mpfr_mul_si(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                            -WORD(1), MPFR_RNDN);
+                mpfr_neg(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i), MPFR_RNDN);
                 mpfr_mul(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
                          mpfr_mat_entry(V, j, j), MPFR_RNDN);
             }

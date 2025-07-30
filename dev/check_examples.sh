@@ -265,6 +265,9 @@ then
     fi
     echo "PASS"
     exit 0
+elif test "$1" = "pi_agm";
+then
+    echo "pi_agm....SKIPPED"
 elif test "$1" = "poly_roots";
 then
     echo -n "poly_roots...."

@@ -33,12 +33,12 @@ If `G=\mathbb Z/n\mathbb Z`, we compute the DFT according to the usual conventio
 
    w_x = \sum_{y\bmod n} v_y e^{-\frac{2i \pi}nxy}
 
-.. function:: void acb_dft(acb_ptr w, acb_srcptr v, slong n, slong prec)
+.. function:: void acb_dft(acb_ptr w, acb_srcptr v, slong len, slong prec)
 
    Set *w* to the DFT of *v* of length *len*, using an automatic choice
    of algorithm.
 
-.. function:: void acb_dft_inverse(acb_ptr w, acb_srcptr v, slong n, slong prec)
+.. function:: void acb_dft_inverse(acb_ptr w, acb_srcptr v, slong len, slong prec)
 
    Compute the inverse DFT of *v* into *w*.
 
@@ -289,8 +289,7 @@ Bluestein transform
    `2^e \geq 2n-1` and a size *n* array of convolution factors.
 
 .. function:: void acb_dft_bluestein_init(acb_dft_bluestein_t t, slong len, slong prec)
- 
-.. function:: void acb_dft_bluestein_clear(acb_dft_bluestein_t t)
+              void acb_dft_bluestein_clear(acb_dft_bluestein_t t)
 
    Initialize and clear a Bluestein scheme to compute DFT of size *len*.
 

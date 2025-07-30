@@ -201,6 +201,16 @@ Basic row, column and entry operations
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
+.. function:: int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
+
+    Moves row ``i`` to the new position ``new_i``, displacing all intervening
+    rows. For example, with ``i = 4`` and ``new_i = 7`` this replaces the
+    block of rows ``A4, A5, A6, A7`` by ``A5, A6, A7, A4``.
+    With ``i = 7`` and ``new_i = 4`` replaces ``A4, A5, A6, A7``
+    by ``A7, A4, A5, A6``.
+    Returns ``GR_DOMAIN`` if either index is not in bounds, otherwise is
+    guaranteed to succeed.
+
 .. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
 
     Returns whether *mat* is an empty matrix, having either zero
@@ -1034,6 +1044,36 @@ Helper functions for reduction
     By default the *generic* version is called; specific rings
     can overload this (typically to implement delayed canonicalisation).
 
+LLL
+-------------------------------------------------------------------------------
+
+Let `A = (a_0, \ldots, a_{n-1})` be a set of linearly independent vectors over `\mathbb{R}`
+with Gram-Schmidt orthogonalization `(b_0, \ldots, b_{n-1})`
+and Gram-Schmidt coefficients `\mu_{i,j} = \langle a_i, b_i \rangle / \| b_j \|^2`.
+The basis `A` is said to be LLL-reduced with parameter (`\delta`, `\eta`)
+where `0.25 < \delta \le 1` and `0.5 \le \eta < \sqrt{\delta}` if they satisfy
+the size reduction condition
+
+.. math ::
+
+    |\mu_{i,j}| \le \eta, \quad 0 \le j < i < n
+
+and the Lovász condition
+
+.. math ::
+
+    (\delta - \mu_{i,i-1}^2) \| b_{i-1} \|_2^2 \le \| b_i \|_2^2, \quad 1 \le i \le n - 1.
+
+.. function:: truth_t gr_mat_is_row_lll_reduced_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_ctx_t ctx)
+              truth_t gr_mat_is_row_lll_reduced_with_removal_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_srcptr gs_B, slong newd, gr_ctx_t ctx)
+
+    Check if the rows of *A* are LLL-reduced by naively performing the
+    Gram-Schmidt orthogonalization and checking the conditions one row
+    at a time.
+
+    In interval arithmetic, these functions terminate eagerly: ``T_UNKNOWN``
+    is returned if the tests are inconclusive for one row, even if there is a
+    possibility that a later row could prove that the result should be ``T_FALSE``.
 
 Test functions
 -------------------------------------------------------------------------------

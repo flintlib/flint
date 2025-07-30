@@ -907,7 +907,7 @@ static int _nmod_mpoly_divides_stripe1(
         FLINT_ASSERT(mpoly_monomial_cmp1(exp, emin, cmpmask) >= 0);
 
         _nmod_mpoly_fit_length(&Qcoeff, &Q->coeffs_alloc,
-                               &Qexp, &Q->exps_alloc, 1, Alen + 1);
+                               &Qexp, &Q->exps_alloc, 1, Qlen + 1);
 
         lt_divides = mpoly_monomial_divides1(Qexp + Qlen, exp, Bexp[0], mask);
 

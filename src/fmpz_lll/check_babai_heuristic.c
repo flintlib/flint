@@ -22,17 +22,71 @@
 #endif
 #define GM ((fl->rt == Z_BASIS) ? A->exactSP : B)
 
+#include "gr.h"
+#include "gr_vec.h"
+#include "gr_mat.h"
+#include "nfloat.h"
+
+static int _gr_cmp_d(gr_srcptr x, double y, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int status;
+    int cmp;
+    GR_TMP_INIT(t, ctx);
+    status = gr_set_d(t, y, ctx);
+    status |= gr_cmp(&cmp, x, t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+    GR_MUST_SUCCEED(status);
+    return cmp;
+}
+
+static int _gr_sgn(gr_srcptr x, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    int sgn;
+    GR_TMP_INIT(t, ctx);
+    GR_MUST_SUCCEED(gr_cmp(&sgn, x, t, ctx));
+    GR_TMP_CLEAR(t, ctx);
+    return sgn;
+}
+
+static int _gr_vec_set_fmpz_vec(gr_srcptr res, const fmpz * vec, slong len, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    slong i, sz = ctx->sizeof_elem;
+
+    for (i = 0; i < len; i++)
+        status |= gr_set_fmpz(GR_ENTRY(res, i, sz), vec + i, ctx);
+
+    return status;
+}
+
+static int _gr_vec_norm2(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
+{
+    /* todo */
+    return _gr_vec_dot(res, NULL, 0, vec, vec, len, ctx);
+}
+
+
+/* XXX: dubious use of DBL_MIN */
+
 int
 fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
-                               mpf_mat_t mu, mpf_mat_t r, mpf * s,
-                               mpf_mat_t appB, fmpz_gram_t A, int a, int zeros,
-                               int kappamax, int n, mpf_t tmp, mpf_t rtmp,
-                               flint_bitcnt_t prec, const fmpz_lll_t fl)
+                               gr_mat_t mu, gr_mat_t r, gr_ptr s,
+                               gr_mat_t appB, fmpz_gram_t A, int a, int zeros,
+                               int kappamax, int n, gr_ptr tmp, gr_ptr rtmp,
+                               gr_ctx_t ctx, const fmpz_lll_t fl)
 {
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+
+#define ENTRY(mat, ii, jj) GR_MAT_ENTRY(mat, ii, jj, sz)
+#define ROW(mat, ii) GR_MAT_ENTRY(mat, ii, 0, sz)
+
     if (fl->rt == Z_BASIS && fl->gt == APPROX)
     {
         int i, j, k, test, aa;
-        slong xx, exponent, max_expo = WORD_MAX;
+        slong max_expo = WORD_MAX;
         fmpz_t ztmp;
         double halfplus, onedothalfplus;
         ulong loops;
@@ -56,50 +110,41 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 
             for (j = aa; j < kappa; j++)
             {
-                if (mpf_cmp_d(mpf_mat_entry(A->appSP2, kappa, j), DBL_MIN)
-                    == 0)
+                if (_gr_cmp_d(ENTRY(A->appSP2, kappa, j), DBL_MIN, ctx) == 0)
                 {
-                    if (!
-                        (_mpf_vec_dot2
-                         (mpf_mat_entry(A->appSP2, kappa, j),
-                          appB->rows[kappa], appB->rows[j], n, prec)))
-                    {
-/* In this case a heuristic told us that some cancellation probably happened so we just compute the scalar product at full precision */
-                        _fmpz_vec_dot(ztmp, fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
-                        fmpz_get_mpf(mpf_mat_entry(A->appSP2, kappa, j), ztmp);
-                    }
+                    status |= _gr_vec_dot(ENTRY(A->appSP2, kappa, j), NULL, 0, ROW(appB, kappa), ROW(appB, j), n, ctx);
+
+#if 0
+                    /* If a heuristic told us that some cancellation probably happened,
+                       recompute the scalar product at full precision */
+                    _fmpz_vec_dot(ztmp, fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
+                    status |= gr_set_fmpz(ENTRY(A->appSP2, kappa, j), ztmp, ctx);
+#endif
                 }
 
                 if (j > zeros + 2)
                 {
-                    mpf_mul(tmp, mpf_mat_entry(mu, j, zeros + 1),
-                            mpf_mat_entry(r, kappa, zeros + 1));
-                    mpf_sub(rtmp, mpf_mat_entry(A->appSP2, kappa, j), tmp);
+                    status |= gr_mul(tmp, ENTRY(mu, j, zeros + 1), ENTRY(r, kappa, zeros + 1), ctx);
+                    status |= gr_sub(rtmp, ENTRY(A->appSP2, kappa, j), tmp, ctx);
 
                     for (k = zeros + 2; k < j - 1; k++)
                     {
-                        mpf_mul(tmp, mpf_mat_entry(mu, j, k),
-                                mpf_mat_entry(r, kappa, k));
-                        mpf_sub(rtmp, rtmp, tmp);
+                        status |= gr_mul(tmp, ENTRY(mu, j, k), ENTRY(r, kappa, k), ctx);
+                        status |= gr_sub(rtmp, rtmp, tmp, ctx);
                     }
 
-                    mpf_mul(tmp, mpf_mat_entry(mu, j, j - 1),
-                            mpf_mat_entry(r, kappa, j - 1));
-                    mpf_sub(mpf_mat_entry(r, kappa, j), rtmp, tmp);
+                    status |= gr_mul(tmp, ENTRY(mu, j, j - 1), ENTRY(r, kappa, j - 1), ctx);
+                    status |= gr_sub(ENTRY(r, kappa, j), rtmp, tmp, ctx);
                 }
                 else if (j == zeros + 2)
                 {
-                    mpf_mul(tmp, mpf_mat_entry(mu, j, zeros + 1),
-                            mpf_mat_entry(r, kappa, zeros + 1));
-                    mpf_sub(mpf_mat_entry(r, kappa, j),
-                            mpf_mat_entry(A->appSP2, kappa, j), tmp);
+                    status |= gr_mul(tmp, ENTRY(mu, j, zeros + 1), ENTRY(r, kappa, zeros + 1), ctx);
+                    status |= gr_sub(ENTRY(r, kappa, j), ENTRY(A->appSP2, kappa, j), tmp, ctx);
                 }
                 else
-                    mpf_set(mpf_mat_entry(r, kappa, j),
-                            mpf_mat_entry(A->appSP2, kappa, j));
+                    status |= gr_set(ENTRY(r, kappa, j), ENTRY(A->appSP2, kappa, j), ctx);
 
-                mpf_div(mpf_mat_entry(mu, kappa, j),
-                        mpf_mat_entry(r, kappa, j), mpf_mat_entry(r, j, j));
+                status |= gr_div(ENTRY(mu, kappa, j), ENTRY(r, kappa, j), ENTRY(r, j, j), ctx);
             }
 
             if (loops >= 20)
@@ -108,7 +153,8 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                 for (j = 0; j < kappa; j++)
                 {
                     slong expo2;
-                    flint_mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
+                    double FLINT_SET_BUT_UNUSED(mant);
+                    status |= gr_get_d_2exp_si(&mant, &expo2, ENTRY(mu, kappa, j), ctx);
                     new_max_expo = FLINT_MAX(new_max_expo, expo2);
                 }
                 if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
@@ -126,129 +172,82 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             for (j = kappa - 1; j > zeros; j--)
             {
                 /* test of the relaxed size-reduction condition */
-                mpf_abs(tmp, mpf_mat_entry(mu, kappa, j));
+                status |= gr_abs(tmp, ENTRY(mu, kappa, j), ctx);
 
-                if (mpf_cmp_d(tmp, halfplus) > 0)
+                if (_gr_cmp_d(tmp, halfplus, ctx) > 0)
                 {
                     test = 1;
 
                     /* we consider separately the cases X = +-1 */
-                    if (mpf_cmp_d(tmp, onedothalfplus) <= 0)
+                    if (_gr_cmp_d(tmp, onedothalfplus, ctx) <= 0)
                     {
-                        int sgn = mpf_sgn(mpf_mat_entry(mu, kappa, j));
+                        int sgn = _gr_sgn(ENTRY(mu, kappa, j), ctx);
                         if (sgn >= 0)   /* in this case, X is 1 */
                         {
-                            for (k = zeros + 1; k < j; k++)
-                            {
-                                mpf_sub(mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, j, k));
-                            }
-                            _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
-                                          fmpz_mat_row(B, j), n);
+                            status |= _gr_vec_sub(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), ctx);
+                            _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
                             if (U != NULL)
-                            {
-                                _fmpz_vec_sub(fmpz_mat_row(U, kappa),
-                                              fmpz_mat_row(U, kappa), fmpz_mat_row(U, j),
-                                              U->c);
-                            }
+                                _fmpz_vec_sub(fmpz_mat_row(U, kappa), fmpz_mat_row(U, kappa), fmpz_mat_row(U, j), U->c);
                         }
                         else    /* otherwise X is -1 */
                         {
-                            for (k = zeros + 1; k < j; k++)
-                            {
-                                mpf_add(mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, j, k));
-                            }
-                            _fmpz_vec_add(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
-                                          fmpz_mat_row(B, j), n);
+                            status |= _gr_vec_add(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), ctx);
+                            _fmpz_vec_add(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n);
                             if (U != NULL)
-                            {
-                                _fmpz_vec_add(fmpz_mat_row(U, kappa),
-                                              fmpz_mat_row(U, kappa), fmpz_mat_row(U, j),
-                                              U->c);
-                            }
+                                _fmpz_vec_add(fmpz_mat_row(U, kappa), fmpz_mat_row(U, kappa), fmpz_mat_row(U, j), U->c);
                         }
                     }
                     else        /* we must have |X| >= 2 */
                     {
-                        mpf_set(tmp, mpf_mat_entry(mu, kappa, j));
-                        mpf_set_d(rtmp, 0.5);
-                        if (flint_mpf_cmp_ui(tmp, 0) < 0)
+                        status |= gr_set(tmp, ENTRY(mu, kappa, j), ctx);
+                        status |= gr_set_d(rtmp, 0.5, ctx);
+
+                        if (_gr_sgn(tmp, ctx) < 0)
                         {
-                            mpf_sub(tmp, tmp, rtmp);
-                            mpf_ceil(tmp, tmp);
+                            status |= gr_sub(tmp, tmp, rtmp, ctx);
+                            status |= gr_ceil(tmp, tmp, ctx);
                         }
                         else
                         {
-                            mpf_add(tmp, tmp, rtmp);
-                            mpf_floor(tmp, tmp);
-                        }
-                        for (k = zeros + 1; k < j; k++)
-                        {
-                            mpf_mul(rtmp, tmp, mpf_mat_entry(mu, j, k));
-                            mpf_sub(mpf_mat_entry(mu, kappa, k),
-                                    mpf_mat_entry(mu, kappa, k), rtmp);
+                            status |= gr_add(tmp, tmp, rtmp, ctx);
+                            status |= gr_floor(tmp, tmp, ctx);
                         }
 
-                        flint_mpf_get_d_2exp(&exponent, tmp);
-                        if (exponent < CPU_SIZE_1 - 2)
-                        {
-                            /* X is stored in an slong */
-                            xx = flint_mpf_get_si(tmp);
-                            _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
-                                                       fmpz_mat_row(B, j), n, xx);
-                            if (U != NULL)
-                            {
-                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(U, kappa),
-                                                           fmpz_mat_row(U, j),
-                                                           U->c, xx);
-                            }
-                        }
-                        else
-                        {
-                            fmpz_set_mpf(ztmp, tmp);
-                            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa),
-                                                         fmpz_mat_row(B, j), n, ztmp);
-                            if (U != NULL)
-                            {
-                                _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(U, kappa),
-                                                             fmpz_mat_row(U, j),
-                                                             U->c, ztmp);
-                            }
-                        }
+                        /* TODO: consider converting to integer if high precision? */
+                        /* TODO: or make nfloat check for small multiplier */
+                        status |= _gr_vec_submul_scalar(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), tmp, ctx);
+                        status |= gr_get_fmpz(ztmp, tmp, ctx);
+
+                        _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa), fmpz_mat_row(B, j), n, ztmp);
+                        if (U != NULL)
+                            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(U, kappa), fmpz_mat_row(U, j), U->c, ztmp);
                     }
                 }
             }
 
             if (test)           /* Anything happened? */
             {
-                _mpf_vec_set_fmpz_vec(appB->rows[kappa], fmpz_mat_row(B, kappa), n);
+                status |= _gr_vec_set_fmpz_vec(ROW(appB, kappa), fmpz_mat_row(B, kappa), n, ctx);
                 aa = zeros + 1;
 
                 for (i = zeros + 1; i <= kappa; i++)
-                    mpf_set_d(mpf_mat_entry(A->appSP2, kappa, i), DBL_MIN);
+                    status |= gr_set_d(ENTRY(A->appSP2, kappa, i), DBL_MIN, ctx);
 
                 for (i = kappa + 1; i <= kappamax; i++)
-                    mpf_set_d(mpf_mat_entry(A->appSP2, i, kappa), DBL_MIN);
+                    status |= gr_set_d(ENTRY(A->appSP2, i, kappa), DBL_MIN, ctx);
             }
             loops++;
         } while (test);
 
-        if (mpf_cmp_d(mpf_mat_entry(A->appSP2, kappa, kappa), DBL_MIN) == 0)
-        {
-            _mpf_vec_norm2(mpf_mat_entry(A->appSP2, kappa, kappa),
-                           appB->rows[kappa], n, prec);
-        }
+        if (_gr_cmp_d(ENTRY(A->appSP2, kappa, kappa), DBL_MIN, ctx) == 0)
+            status |= _gr_vec_norm2(ENTRY(A->appSP2, kappa, kappa), ROW(appB, kappa), n, ctx);
 
-        mpf_set(s + zeros + 1, mpf_mat_entry(A->appSP2, kappa, kappa));
+        status |= gr_set(GR_ENTRY(s, zeros + 1, sz), ENTRY(A->appSP2, kappa, kappa), ctx);
 
         for (k = zeros + 1; k < kappa - 1; k++)
         {
-            mpf_mul(tmp, mpf_mat_entry(mu, kappa, k),
-                    mpf_mat_entry(r, kappa, k));
-            mpf_sub(s + k + 1, s + k, tmp);
+            status |= gr_mul(tmp, ENTRY(mu, kappa, k), ENTRY(r, kappa, k), ctx);
+            status |= gr_sub(GR_ENTRY(s, k + 1, sz), GR_ENTRY(s, k, sz), tmp, ctx);
         }
 
         fmpz_clear(ztmp);
@@ -256,7 +255,7 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
     else
     {
         int i, j, k, test, aa;
-        slong xx, exponent, max_expo = WORD_MAX;
+        slong max_expo = WORD_MAX;
         fmpz_t ztmp;
         double halfplus, onedothalfplus;
         ulong loops;
@@ -284,37 +283,21 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             {
                 if (j > zeros + 2)
                 {
-                    mpf_mul(tmp, mpf_mat_entry(mu, j, zeros + 1),
-                            mpf_mat_entry(r, kappa, zeros + 1));
-                    fmpz_get_mpf(rtmp, fmpz_mat_entry(GM, kappa, j));
-                    mpf_sub(rtmp, rtmp, tmp);
-
-                    for (k = zeros + 2; k < j - 1; k++)
-                    {
-                        mpf_mul(tmp, mpf_mat_entry(mu, j, k),
-                                mpf_mat_entry(r, kappa, k));
-                        mpf_sub(rtmp, rtmp, tmp);
-                    }
-
-                    mpf_mul(tmp, mpf_mat_entry(mu, j, j - 1),
-                            mpf_mat_entry(r, kappa, j - 1));
-                    mpf_sub(mpf_mat_entry(r, kappa, j), rtmp, tmp);
+                    status |= gr_set_fmpz(rtmp, fmpz_mat_entry(GM, kappa, j), ctx);
+                    status |= _gr_vec_dot(rtmp, rtmp, 1, ENTRY(mu, j, zeros + 1), ENTRY(r, kappa, zeros + 1), (j - 1) - (zeros + 1), ctx);
+                    status |= gr_mul(tmp, ENTRY(mu, j, j - 1), ENTRY(r, kappa, j - 1), ctx);
+                    status |= gr_sub(ENTRY(r, kappa, j), rtmp, tmp, ctx);
                 }
                 else if (j == zeros + 2)
                 {
-                    mpf_mul(tmp, mpf_mat_entry(mu, j, zeros + 1),
-                            mpf_mat_entry(r, kappa, zeros + 1));
-                    fmpz_get_mpf(mpf_mat_entry(r, kappa, j),
-                                 fmpz_mat_entry(GM, kappa, j));
-                    mpf_sub(mpf_mat_entry(r, kappa, j),
-                            mpf_mat_entry(r, kappa, j), tmp);
+                    status |= gr_mul(tmp, ENTRY(mu, j, zeros + 1), ENTRY(r, kappa, zeros + 1), ctx);
+                    status |= gr_set_fmpz(ENTRY(r, kappa, j), fmpz_mat_entry(GM, kappa, j), ctx);
+                    status |= gr_sub(ENTRY(r, kappa, j), ENTRY(r, kappa, j), tmp, ctx);
                 }
                 else
-                    fmpz_get_mpf(mpf_mat_entry(r, kappa, j),
-                                 fmpz_mat_entry(GM, kappa, j));
+                    status |= gr_set_fmpz(ENTRY(r, kappa, j), fmpz_mat_entry(GM, kappa, j), ctx);
 
-                mpf_div(mpf_mat_entry(mu, kappa, j),
-                        mpf_mat_entry(r, kappa, j), mpf_mat_entry(r, j, j));
+                status |= gr_div(ENTRY(mu, kappa, j), ENTRY(r, kappa, j), ENTRY(r, j, j), ctx);
             }
 
             if (loops >= 20)
@@ -322,8 +305,9 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                 slong new_max_expo = WORD_MIN;
                 for (j = 0; j < kappa; j++)
                 {
+                    double mant;
                     slong expo2;
-                    flint_mpf_get_d_2exp(&expo2, mpf_mat_entry(mu, kappa, j));
+                    status |= gr_get_d_2exp_si(&mant, &expo2, ENTRY(mu, kappa, j), ctx);
                     new_max_expo = FLINT_MAX(new_max_expo, expo2);
                 }
                 if (new_max_expo > max_expo - SIZE_RED_FAILURE_THRESH)
@@ -342,25 +326,23 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             for (j = kappa - 1; j > zeros; j--)
             {
                 /* test of the relaxed size-reduction condition */
-                mpf_abs(tmp, mpf_mat_entry(mu, kappa, j));
+                status |= gr_abs(tmp, ENTRY(mu, kappa, j), ctx);
 
-                if (mpf_cmp_d(tmp, halfplus) > 0)
+                if (_gr_cmp_d(tmp, halfplus, ctx) > 0)
                 {
                     test = 1;
 
                     /* we consider separately the cases X = +-1 */
-                    if (mpf_cmp_d(tmp, onedothalfplus) <= 0)
+                    if (_gr_cmp_d(tmp, onedothalfplus, ctx) <= 0)
                     {
-                        int sgn = mpf_sgn(mpf_mat_entry(mu, kappa, j));
+                        int sgn = _gr_sgn(ENTRY(mu, kappa, j), ctx);
                         if (sgn >= 0)   /* in this case, X is 1 */
                         {
-                            fmpz_set_ui(x + j, 1);
-                            for (k = zeros + 1; k < j; k++)
-                            {
-                                mpf_sub(mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, j, k));
-                            }
+                            fmpz_one(x + j);
+
+                            status |= _gr_vec_sub(ENTRY(mu, kappa, zeros + 1),
+                                ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), ctx);
+
                             if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_sub(fmpz_mat_row(B, kappa), fmpz_mat_row(B, kappa),
@@ -376,12 +358,10 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                         else    /* otherwise X is -1 */
                         {
                             fmpz_set_si(x + j, -WORD(1));
-                            for (k = zeros + 1; k < j; k++)
-                            {
-                                mpf_add(mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, kappa, k),
-                                        mpf_mat_entry(mu, j, k));
-                            }
+
+                            status |= _gr_vec_add(ENTRY(mu, kappa, zeros + 1),
+                                ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), ctx);
+
                             if (fl->rt == Z_BASIS && B != NULL)
                             {
                                 _fmpz_vec_add(fmpz_mat_row(B, kappa),
@@ -397,58 +377,36 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
                     }
                     else        /* we must have |X| >= 2 */
                     {
-                        mpf_set(tmp, mpf_mat_entry(mu, kappa, j));
-                        mpf_set_d(rtmp, 0.5);
-                        if (flint_mpf_cmp_ui(tmp, 0) < 0)
+                        status |= gr_set(tmp, ENTRY(mu, kappa, j), ctx);
+                        status |= gr_set_d(rtmp, 0.5, ctx);
+
+                        if (_gr_sgn(tmp, ctx) < 0)
                         {
-                            mpf_sub(tmp, tmp, rtmp);
-                            mpf_ceil(tmp, tmp);
+                            status |= gr_sub(tmp, tmp, rtmp, ctx);
+                            status |= gr_ceil(tmp, tmp, ctx);
                         }
                         else
                         {
-                            mpf_add(tmp, tmp, rtmp);
-                            mpf_floor(tmp, tmp);
-                        }
-                        for (k = zeros + 1; k < j; k++)
-                        {
-                            mpf_mul(rtmp, tmp, mpf_mat_entry(mu, j, k));
-                            mpf_sub(mpf_mat_entry(mu, kappa, k),
-                                    mpf_mat_entry(mu, kappa, k), rtmp);
+                            status |= gr_add(tmp, tmp, rtmp, ctx);
+                            status |= gr_floor(tmp, tmp, ctx);
                         }
 
-                        flint_mpf_get_d_2exp(&exponent, tmp);
-                        if (exponent < CPU_SIZE_1 - 2)
+                        /* TODO: consider converting to integer if high precision? */
+                        /* TODO: or make nfloat check for small multiplier */
+                        status |= _gr_vec_submul_scalar(ENTRY(mu, kappa, zeros + 1), ENTRY(mu, j, zeros + 1), j - (zeros + 1), tmp, ctx);
+                        status |= gr_get_fmpz(x + j, tmp, ctx);
+
+                        if (fl->rt == Z_BASIS && B != NULL)
                         {
-                            /* X is stored in an slong */
-                            xx = flint_mpf_get_si(tmp);
-                            fmpz_set_si(x + j, xx);
-                            if (fl->rt == Z_BASIS && B != NULL)
-                            {
-                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(B, kappa),
-                                                           fmpz_mat_row(B, j), n, xx);
-                            }
-                            if (U != NULL)
-                            {
-                                _fmpz_vec_scalar_submul_si(fmpz_mat_row(U, kappa),
-                                                           fmpz_mat_row(U, j),
-                                                           U->c, xx);
-                            }
+                            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa),
+                                                         fmpz_mat_row(B, j), n,
+                                                         x + j);
                         }
-                        else
+                        if (U != NULL)
                         {
-                            fmpz_set_mpf(x + j, tmp);
-                            if (fl->rt == Z_BASIS && B != NULL)
-                            {
-                                _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(B, kappa),
-                                                             fmpz_mat_row(B, j), n,
-                                                             x + j);
-                            }
-                            if (U != NULL)
-                            {
-                                _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(U, kappa),
-                                                             fmpz_mat_row(U, j),
-                                                             U->c, x + j);
-                            }
+                            _fmpz_vec_scalar_submul_fmpz(fmpz_mat_row(U, kappa),
+                                                         fmpz_mat_row(U, j),
+                                                         U->c, x + j);
                         }
                     }
                 }
@@ -501,17 +459,23 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
             loops++;
         } while (test);
 
-        fmpz_get_mpf(s + zeros + 1, fmpz_mat_entry(GM, kappa, kappa));
+        status |= gr_set_fmpz(GR_ENTRY(s, zeros + 1, sz), fmpz_mat_entry(GM, kappa, kappa), ctx);
 
         for (k = zeros + 1; k < kappa - 1; k++)
         {
-            mpf_mul(tmp, mpf_mat_entry(mu, kappa, k),
-                    mpf_mat_entry(r, kappa, k));
-            mpf_sub(s + k + 1, s + k, tmp);
+            status |= gr_mul(tmp, ENTRY(mu, kappa, k), ENTRY(r, kappa, k), ctx);
+            status |= gr_sub(GR_ENTRY(s, k + 1, sz), GR_ENTRY(s, k, sz), tmp, ctx);
         }
 
         fmpz_clear(ztmp);
     }
+
+    /* Debugging */
+    GR_MUST_SUCCEED(status);
+
+    if (status != GR_SUCCESS)
+        return -1;
+
     return 0;
 }
 
