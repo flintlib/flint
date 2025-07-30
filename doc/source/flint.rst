@@ -502,7 +502,8 @@ Exceptions
 .. function:: void flint_set_throw(void (* func)(flint_err_t, const char *, va_list))
 
     Sets the :func:`flint_throw` function use ``func`` instead of a private
-    throw function.
+    throw function. ``func`` is expected to ``va_end`` the ``va_list``,
+    but it does not take ownership of the ``char *``.
 
 Sorting and searching
 -----------------------------------------------
