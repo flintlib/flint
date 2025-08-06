@@ -1065,6 +1065,25 @@ and the Lovász condition
     is returned if the tests are inconclusive for one row, even if there is a
     possibility that a later row could prove that the result should be ``T_FALSE``.
 
+Linear ODEs
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_mat_gr_poly_solve_lode_newton_start(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denominator_inv, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, gr_ctx_t sol_poly_ctx)
+              int _gr_mat_gr_poly_solve_lode_newton_step(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denominator_inv, slong *len, const gr_mat_t A_numerator, const gr_poly_t A_denominator, int A_is_companion, gr_ctx_t sol_poly_ctx)
+              int _gr_mat_gr_poly_solve_lode_newton(gr_mat_t Y, gr_mat_t Z, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, slong len, gr_ctx_t A_poly_ctx, gr_ctx_t sol_poly_ctx)
+              int gr_mat_gr_poly_solve_lode_newton(gr_mat_t Y, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, slong len, gr_ctx_t A_poly_ctx, gr_ctx_t sol_poly_ctx)
+
+    Solves the system of linear ordinary differential
+    equations `Y'(t) = A(t)Y(t)` with rational function coefficients `A(t)`
+    and initial condition `Y(0) = Y_0`. Sets *Y* to the power series solution
+    truncated to length *len*.
+    The algorithm is a Newton iteration as described in [BCOSSS2007]_,
+    but using an iteration for the power series inverse of *A_denominator*,
+    and using a specialized implementation of multiplication by `A(t)` mod `t^m`
+    in the case where `A(t)` is a companion matrix.
+    An optimal sequence of precisions is used to reach the target *len*, even
+    when it is not a power of two.
+
 Test functions
 -------------------------------------------------------------------------------
 
