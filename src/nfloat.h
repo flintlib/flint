@@ -73,6 +73,9 @@ extern "C" {
 #define NFLOAT_ALLOW_UNDERFLOW 1
 #define NFLOAT_ALLOW_INF       2
 #define NFLOAT_ALLOW_NAN       4
+/* Context flags for directed rounding (experimental) */
+#define NFLOAT_RND_FLOOR       8
+#define NFLOAT_RND_CEIL        16
 
 typedef struct
 {
@@ -92,6 +95,7 @@ typedef const void * nfloat_srcptr;
 #define NFLOAT_CTX_RND(ctx) (NFLOAT_CTX(ctx)->rnd)
 #define NFLOAT_CTX_DATA_NLIMBS(ctx) (NFLOAT_CTX_NLIMBS(ctx) + NFLOAT_HEADER_LIMBS)
 #define NFLOAT_CTX_HAS_INF_NAN(ctx) ((NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)) != 0)
+#define NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx) ((NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_RND_FLOOR | NFLOAT_RND_CEIL)) != 0)
 
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[64 / FLINT_BITS]; } nfloat64_struct;
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[128 / FLINT_BITS]; } nfloat128_struct;
@@ -201,54 +205,7 @@ int nfloat_set_ui(nfloat_ptr res, ulong x, gr_ctx_t ctx);
 int nfloat_set_si(nfloat_ptr res, slong x, gr_ctx_t ctx);
 
 /* Here exp is understood such that {x, xn} is a fraction in [0, 1). */
-NFLOAT_INLINE int
-_nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
-{
-    ulong top;
-    slong norm;
-    slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
-
-    FLINT_ASSERT(xn >= 1);
-    FLINT_ASSERT(x[xn - 1] != 0);
-
-    top = x[xn - 1];
-
-    if (LIMB_MSB_IS_SET(top))
-    {
-        if (xn >= nlimbs)
-        {
-            flint_mpn_copyi(NFLOAT_D(res), x + xn - nlimbs, nlimbs);
-        }
-        else
-        {
-            flint_mpn_zero(NFLOAT_D(res), nlimbs - xn);
-            flint_mpn_copyi(NFLOAT_D(res) + nlimbs - xn, x, xn);
-        }
-    }
-    else
-    {
-        norm = flint_clz(top);
-
-        if (xn > nlimbs)
-        {
-            mpn_lshift(NFLOAT_D(res), x + xn - nlimbs, nlimbs, norm);
-            NFLOAT_D(res)[0] |= (x[xn - nlimbs - 1] >> (FLINT_BITS - norm));
-        }
-        else
-        {
-            flint_mpn_zero(NFLOAT_D(res), nlimbs - xn);
-            mpn_lshift(NFLOAT_D(res) + nlimbs - xn, x, xn, norm);
-        }
-
-        exp -= norm;
-    }
-
-    NFLOAT_SGNBIT(res) = xsgnbit;
-    NFLOAT_EXP(res) = exp;
-    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
-
-    return GR_SUCCESS;
-}
+int _nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx);
 
 NFLOAT_INLINE int
 nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
