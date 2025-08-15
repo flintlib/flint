@@ -16,7 +16,8 @@
 #include "qqbar.h"
 #include "profiler.h"
 
-#define MAXN 300
+#define MINN 10
+#define MAXN 320
 
 int main()
 {
@@ -36,7 +37,7 @@ int main()
     for (i = 0; i < MAXN; i++)
         arb_urandom(u + i, state, 65536);
 
-    for (n = 10; n <= MAXN; n += 10)
+    for (n = MINN; n <= MAXN; n += 10)
     {
         x = _acb_vec_init(n);
         rel = _fmpz_vec_init(n);
@@ -108,7 +109,7 @@ int main()
         _acb_vec_clear(x, n);
     }
 
-    _arb_vec_clear(u, 5300);
+    _arb_vec_clear(u, MAXN);
 
     flint_rand_clear(state);
     flint_cleanup_master();
