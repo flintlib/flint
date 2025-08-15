@@ -213,7 +213,6 @@ set(_BUILD_DIRS
     double_extras   d_vec           d_mat
     nfloat
     mpn_extras
-    mpfr_vec                        mpfr_mat
     nmod            nmod_vec        nmod_mat        nmod_poly
     mpn_mod
     fmpz            fmpz_vec        fmpz_mat        fmpz_poly
