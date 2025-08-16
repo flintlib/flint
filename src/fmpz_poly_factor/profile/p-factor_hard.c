@@ -88,10 +88,10 @@ int main(void)
     factor_poly(MY_DIR"C1_flint", "C1", 32);
 
     /* Not run by default because they are too slow currently */
-    factor_poly(MY_DIR"H2_flint", "H2", 6);     /* 400 seconds */
-    factor_poly(MY_DIR"S9_flint", "S9", 1);     /* 360 seconds */
-#if 1
-    factor_poly(MY_DIR"S10_flint", "S10", 1);   /* long */
+#if 0
+    factor_poly(MY_DIR"H2_flint", "H2", 6);     /*  86 seconds */
+    factor_poly(MY_DIR"S9_flint", "S9", 1);     /*  70 seconds */
+    factor_poly(MY_DIR"S10_flint", "S10", 1);   /* 7100 seconds */
 #endif
 
 }
