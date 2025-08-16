@@ -28,7 +28,6 @@ static int _arf_inv(arf_t res, const arf_t x, slong prec, arf_rnd_t rnd)
     return arf_ui_div(res, 1, x, prec, rnd);
 }
 
-
 TEST_FUNCTION_START(nfloat_directed, state)
 {
     gr_ctx_t ctx;
@@ -122,6 +121,61 @@ TEST_FUNCTION_START(nfloat_directed, state)
                     TEST_OP1(gr_rsqrt, arf_rsqrt, "rsqrt")
 #undef TEST_OP
 #undef TEST_OP1
+
+                    gr_ptr X, Y;
+                    arf_ptr aX, aY;
+                    slong j, N = n_randint(state, 5);
+                    int initial = n_randint(state, 2);
+                    int subtract = n_randint(state, 2);
+                    int reverse = n_randint(state, 2);
+                    int status;
+
+                    X = gr_heap_init_vec(N, ctx);
+                    Y = gr_heap_init_vec(N, ctx);
+                    aX = _arf_vec_init(N);
+                    aY = _arf_vec_init(N);
+
+                    for (j = 0; j < N; j++)
+                    {
+                        GR_MUST_SUCCEED(gr_randtest(GR_ENTRY(X, j, ctx->sizeof_elem), state, ctx));
+                        GR_MUST_SUCCEED(gr_randtest(GR_ENTRY(Y, j, ctx->sizeof_elem), state, ctx));
+                        nfloat_get_arf(aX + j, GR_ENTRY(X, j, ctx->sizeof_elem), ctx);
+                        nfloat_get_arf(aY + j, GR_ENTRY(Y, j, ctx->sizeof_elem), ctx);
+                    }
+
+                    nfloat_get_arf(ax, x, ctx);
+
+                    if (reverse)
+                        status = _gr_vec_dot_rev(z, initial ? x : NULL, subtract, X, Y, N, ctx);
+                    else
+                        status = _gr_vec_dot(z, initial ? x : NULL, subtract, X, Y, N, ctx);
+
+                    if (status == GR_SUCCESS)
+                    {
+                        nfloat_get_arf(az2, z, ctx);
+
+                        if (reverse)
+                            arf_dot(az, initial ? ax : NULL, subtract, aX, 1, aY + N - 1, -1, N, prec, rnd);
+                        else
+                            arf_dot(az, initial ? ax : NULL, subtract, aX, 1, aY, 1, N, prec, rnd);
+
+                        if (arf_cmp(az2, az) == ((rnd == ARF_RND_FLOOR) ? 1 : -1))
+                        {
+                            flint_printf("FAIL: dot\n");
+                            flint_printf("prec = %wd, direction = %s\n", prec, (rnd == ARF_RND_FLOOR) ? "floor" : "ceil");
+                            flint_printf("X = %{gr*}\n", X, N, ctx);
+                            flint_printf("Y = %{gr*}\n", Y, N, ctx);
+                            flint_printf("x = "); arf_printd(x, prec / 3.32 + 1); flint_printf("\n");
+                            flint_printf("az = "); arf_printd(az, prec / 3.32 + 1); flint_printf("\n");
+                            flint_printf("az2 = "); arf_printd(az2, prec / 3.32 + 1); flint_printf("\n");
+                            flint_abort();
+                        }
+                    }
+
+                    gr_heap_clear_vec(X, N, ctx);
+                    gr_heap_clear_vec(Y, N, ctx);
+                    _arf_vec_clear(aX, N);
+                    _arf_vec_clear(aY, N);
                 }
 
                 arf_clear(ax);

@@ -650,6 +650,13 @@ Summation
 Dot products
 -------------------------------------------------------------------------------
 
+.. function:: int arf_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)
+
+    Computes a dot product, with the same meaning of
+    the parameters as :func:`arb_dot`. The result is correctly rounded
+    in the direction specified by ``rnd``. This function is currently not optimized
+    for speed.
+
 .. function:: void arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd)
 
     Computes an approximate dot product, with the same meaning of
