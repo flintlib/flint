@@ -44,7 +44,6 @@ e.g. with 1-2 ulp error. The rounding is not guaranteed to be identical
 on 64-bit and 32-bit machines.
 Planned features include:
 
-* Directed rounding modes
 * Support for special values (partially implemented)
 * Optional (but slower) IEEE 754-like semantics
 * Complex and ball types
@@ -182,6 +181,16 @@ Context objects
     output a garbage value and return ``GR_UNABLE`` or ``GR_DOMAIN``.
     Setting this flag allows such operations to
     output NaN and return ``GR_SUCCESS`` instead.
+
+.. macro:: NFLOAT_RND_FLOOR
+           NFLOAT_RND_CEIL
+
+    Enable directed rounding towards `-\infty` or `+\infty` respectively.
+    At most one of these flags may be set. If neither is set, rounding is done
+    in an arbitrary direction for efficiency
+    (usually but not always truncating towards zero).
+    See below for a list of operations which support directed
+    rounding.
 
 Infinities and NaNs are disabled by default to improve performance,
 as this allows certain functions to skip checks for such values.
@@ -503,3 +512,51 @@ intermediate results (including rounding errors) lie in `(-1,1)`.
     functions of *A* and *B*.
 
     For complex multiplication, the entrywise bounds are for `A+Bi` and `C+Di`.
+
+Directed rounding (experimental)
+-------------------------------------------------------------------------------
+
+Currently, the following operations
+respect the rounding mode toggled with ``NFLOAT_CTX_RND_FLOOR``
+``NFLOAT_CTX_RND_CEIL``.
+Warning: directed rounding may not function
+correctly in combination with the ``NFLOAT_ALLOW_UNDERFLOW`` flag.
+
+* Operations that are always exact, including ``set``, ``neg``, ``abs``, ``floor``, ``ceil``, ``nint``, ``trunc``, ``sgn``.
+
+* Simple conversions from other types:
+
+  * ``set_si``, ``set_ui``
+  * ``set_d``
+  * ``set_arf``
+  * ``set_fmpz``
+  * ``set_fmpq``
+  * ``set_other`` with an ``fmpz``, ``fmpq``, ``arf`` or ``nfloat`` operand
+
+* Basic arithmetic
+
+  * ``add``, ``add_ui``, ``add_si``
+  * ``sub``, ``sub_ui``, ``sub_si``
+  * ``mul``, ``mul_ui``, ``mul_si``
+  * ``mul_2exp_si``
+  * ``sqr``
+  * ``addmul``, ``addmul_ui``, ``addmul_si``
+  * ``submul``
+  * ``inv``
+  * ``div``, ``div_ui``, ``div_si``
+  * ``sqrt``
+  * ``rsqrt``
+  * Vector versions of any of the above, e.g. ``_gr_vec_mul_scalar_ui``
+  * ``vec_dot``
+  * ``vec_dot_rev``
+  * ``mat_mul``
+
+The following operations currently **do not** respect the rounding mode:
+
+* Fused operations and generic algorithms other than those above
+* ``set_str``
+* ``set_other`` except for the types listed above
+* Mixed arithmetic operations with an ``other``, ``fmpz`` or ``fmpq`` operand
+* Transcendental functions
+* ``nfloat_complex`` operations
+

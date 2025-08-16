@@ -283,6 +283,8 @@ See https://arxiv.org/abs/cs/0701183 for the algorithm of Villard.
     * :func:`fmpz_mat_is_reduced_with_removal` or :func:`fmpz_mat_is_reduced_gram_with_removal` (for the last two)
     return non-zero. A zero return value is inconclusive.
     The `_d` variants are performed in machine precision, while the `_mpfr` uses a precision of `prec` bits.
+    The current ``mpfr`` implementations actually use
+    the ``nfloat`` type instead of MPFR for arithmetic.
 
 .. function:: int fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec)
               int fmpz_lll_is_reduced_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl, const fmpz_t gs_B, int newd, flint_bitcnt_t prec)
