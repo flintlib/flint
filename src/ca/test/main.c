@@ -19,6 +19,7 @@
 #include "t-ctx_init_clear.c"
 #include "t-div.c"
 #include "t-erf.c"
+#include "t-elliptic.c"
 #include "t-exp.c"
 #include "t-field_init_clear.c"
 #include "t-fmpz_mpoly_evaluate.c"
@@ -53,6 +54,7 @@ test_struct tests[] =
     TEST_FUNCTION(ca_ctx_init_clear),
     TEST_FUNCTION(ca_div),
     TEST_FUNCTION(ca_erf),
+    TEST_FUNCTION(ca_elliptic),
     TEST_FUNCTION(ca_exp),
     TEST_FUNCTION(ca_field_init_clear),
     TEST_FUNCTION(ca_fmpz_mpoly_evaluate),
