@@ -122,28 +122,10 @@ fmpz_lll_check_babai_heuristic(int kappa, fmpz_mat_t B, fmpz_mat_t U,
 #endif
                 }
 
-                if (j > zeros + 2)
-                {
-                    status |= gr_mul(tmp, ENTRY(mu, j, zeros + 1), ENTRY(r, kappa, zeros + 1), ctx);
-                    status |= gr_sub(rtmp, ENTRY(A->appSP2, kappa, j), tmp, ctx);
-
-                    for (k = zeros + 2; k < j - 1; k++)
-                    {
-                        status |= gr_mul(tmp, ENTRY(mu, j, k), ENTRY(r, kappa, k), ctx);
-                        status |= gr_sub(rtmp, rtmp, tmp, ctx);
-                    }
-
-                    status |= gr_mul(tmp, ENTRY(mu, j, j - 1), ENTRY(r, kappa, j - 1), ctx);
-                    status |= gr_sub(ENTRY(r, kappa, j), rtmp, tmp, ctx);
-                }
-                else if (j == zeros + 2)
-                {
-                    status |= gr_mul(tmp, ENTRY(mu, j, zeros + 1), ENTRY(r, kappa, zeros + 1), ctx);
-                    status |= gr_sub(ENTRY(r, kappa, j), ENTRY(A->appSP2, kappa, j), tmp, ctx);
-                }
-                else
-                    status |= gr_set(ENTRY(r, kappa, j), ENTRY(A->appSP2, kappa, j), ctx);
-
+                /* we write to rtmp instead of ENTRY(r, kappa, j) directly
+                   to avoid possible aliasing issues */
+                status |= _gr_vec_dot(rtmp, ENTRY(A->appSP2, kappa, j), 1, ENTRY(mu, j, zeros + 1), ENTRY(r, kappa, zeros + 1), j - 1 - zeros, ctx);
+                status |= gr_set(ENTRY(r, kappa, j), rtmp, ctx);
                 status |= gr_div(ENTRY(mu, kappa, j), ENTRY(r, kappa, j), ENTRY(r, j, j), ctx);
             }
 
