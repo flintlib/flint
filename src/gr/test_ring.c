@@ -454,15 +454,9 @@ gr_test_get_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
             if (gr_abs(y, x, R) == GR_SUCCESS)
             {
                 if (gr_get_d(&t, y, R) != GR_SUCCESS)
-                {
                     GR_IGNORE(gr_zero(x, R));
-                }
                 else if (t < -1e300 || t > 1e300)
-                {
-                    gr_ctx_println(R);
-                    gr_println(x, R);
                     GR_IGNORE(gr_zero(x, R));
-                }
             }
         }
     }
