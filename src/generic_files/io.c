@@ -698,6 +698,14 @@ print_flint_type:
         res += __mpq_fprint(fs, va_arg(vlist, mpq_srcptr));
         ip += STRING_LENGTH("mpq}");
     }
+    else if (IS_FLINT_TYPE(ip, "truth"))
+    {
+        truth_t t = va_arg(vlist, truth_t);
+        if (t == T_TRUE) res += fprintf(fs, "T_TRUE");
+        else if (t == T_FALSE) res += fprintf(fs, "T_FALSE");
+        else res += fprintf(fs, "T_UNKNOWN");
+        ip += STRING_LENGTH("truth}");
+    }
     else if (IS_FLINT_BASE_TYPE(ip, "gr"))
     {
         gr_stream_t out;
