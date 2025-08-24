@@ -379,6 +379,10 @@ WARN_UNUSED_RESULT int gr_mat_norm_1(gr_ptr res, const gr_mat_t mat, gr_ctx_t ct
 WARN_UNUSED_RESULT int gr_mat_norm_inf(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_norm_frobenius(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
 
+/* Orthogonal matrices */
+truth_t gr_mat_is_orthogonal(const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_randtest_orthogonal(gr_mat_t A, flint_rand_t state, gr_ctx_t ctx);
+
 /* LLL */
 
 truth_t gr_mat_is_row_lll_reduced_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_ctx_t ctx);

@@ -34,6 +34,7 @@
 #include "t-hessenberg_householder.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
+#include "t-is_orthogonal.c"
 #include "t-lu.c"
 #include "t-lu_classical.c"
 #include "t-lu_recursive.c"
@@ -95,6 +96,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_hessenberg_householder),
     TEST_FUNCTION(gr_mat_inv),
     TEST_FUNCTION(gr_mat_invert_rows_cols),
+    TEST_FUNCTION(gr_mat_is_orthogonal),
     TEST_FUNCTION(gr_mat_lu),
     TEST_FUNCTION(gr_mat_lu_classical),
     TEST_FUNCTION(gr_mat_lu_recursive),

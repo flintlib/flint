@@ -453,6 +453,8 @@ do                      \
 #define MY_GR_MAT_CLEAR(xgr_mat, xgr_ctx) gr_mat_clear(xgr_mat, xgr_ctx)
 #define MY_GR_CTX_CLEAR(xgr_ctx) gr_ctx_clear(xgr_ctx)
 
+#define TRUTH_STRING "T_TRUE T_FALSE T_UNKNOWN"
+
 #define GR_VEC_LEN WORD(3)
 #define GR_STRING "5"
 #define GR_VEC_STRING "[1, 2, I]"
@@ -746,6 +748,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 "fmpq_poly (2): " FMPQ_POLY2_STRING "\n"
                 "arb_poly: " ARB_POLY_STRING "\n"
                 "acb_poly: " ACB_POLY_STRING "\n"
+                "truth: " TRUTH_STRING "\n"
                 "gr: " GR_STRING "\n"
                 "gr_vec: " GR_VEC_STRING "\n"
                 "gr_poly: " GR_POLY_STRING "\n"
@@ -872,6 +875,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 "fmpq_poly (2): %{fmpq_poly}\n"
                 "arb_poly: %{arb_poly}\n"
                 "acb_poly: %{acb_poly}\n"
+                "truth: %{truth} %{truth} %{truth}\n"
                 "gr: %{gr}\n"
                 "gr_vec: %{gr*}\n"
                 "gr_poly: %{gr_poly}\n"
@@ -943,6 +947,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 xfmpq_poly2,
                 xarb_poly,
                 xacb_poly,
+                T_TRUE, T_FALSE, T_UNKNOWN,
                 xgr, xgr_ctx,
                 xgr_vec, GR_VEC_LEN, xgr_ctx,
                 xgr_poly, xgr_ctx,

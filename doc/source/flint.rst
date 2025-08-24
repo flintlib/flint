@@ -264,6 +264,8 @@ Input/Output
     :type:`nmod_poly_t`, :type:`fmpz_poly_t`, :type:`fmpq_poly_t`,
     :type:`arb_poly_t` and :type:`acb_poly_t`.
 
+    Triple-valued booleans of type :type:`truth_t` can also be printed.
+
     Finally, we support printing generic elements of type :type:`gr_ptr`
     as well as :type:`gr_poly_t` and :type:`gr_mat_t`. For
     each of these types, the object to be printed must be followed
@@ -285,6 +287,7 @@ Input/Output
     fmpz_mod_ctx_t bfmpz_mod_ctx;
     mpz_t bmpz;
     mpq_t bmpq;
+    truth_t btruth;
     gr_ctx_t bgr_ctx;
     gr_ptr bgr;
 
@@ -303,7 +306,8 @@ Input/Output
         "fmpz_mod_ctx: %{fmpz_mod_ctx}\n"
         "mpz: %{mpz}\n"
         "mpq: %{mpq}\n"
-        "gr: %{gr}\n",
+        "truth: %{truth}\n"
+        "gr: %{gr}\n"
         "gr: %{gr_ctx}\n",
         bulong,
         bslong,
@@ -317,8 +321,9 @@ Input/Output
         bfmpz_mod_ctx,
         bmpz,
         bmpq,
-        gr, bgr_ctx,
-        gr_ctx);
+        btruth,
+        bgr, bgr_ctx,
+        bgr_ctx);
 
 .. code-block:: c
 

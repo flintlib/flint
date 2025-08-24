@@ -972,6 +972,22 @@ Random matrices
     operations. More precisely, at most *opcount* conjugations by random
     elementary row/column operations will be performed.
 
+Orthogonal matrices
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_mat_is_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
+
+    Returns whether *A* is an orthogonal matrix, i.e. a square matrix
+    satisfying `A A^T = A^T A = I`. It is assumed (not checked) that the
+    scalar ring is commutative.
+
+.. function:: int gr_mat_randtest_orthogonal(gr_mat_t A, flint_rand_t state, gr_ctx_t ctx)
+
+    Generates a random orthogonal matrix. Uses Cayley's construction
+    with a permutation matrix is a fallback. It is assumed (not checked) that
+    the scalar ring is commutative.
+    Fails with ``GR_DOMAIN`` if *A* is not square.
+
 Special matrices
 -------------------------------------------------------------------------------
 
