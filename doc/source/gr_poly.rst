@@ -522,6 +522,89 @@ Evaluation
     Set *res* to *poly* evaluated at *x*, where the coefficients of *f*
     belong to *ctx* while both *x* and *res* belong to *x_ctx*.
 
+
+Newton basis
+-------------------------------------------------------------------------------
+
+Let `C = (c_0, c_1, c_2, \ldots)` be a sequence of
+values of the commutative ring *R*.
+Then the sequence of polynomials
+
+.. math::
+
+      \begin{matrix}
+      N_0 & = & 1, \\
+      N_1 & = & (x-c_0), \\
+      N_2 & = & (x-c_0)(x-c_1), \\
+      N_3 & = & (x-c_0)(x-c_1)(x-c_2), \ldots
+      \end{matrix}
+
+with roots in `C` forms a basis of `R[x]` called the *Newton basis*
+associated with *C*.
+Given a polynomial `f = f_0 + f_1 x + \ldots + f_n x^n` in the
+standard monomial basis, there are accordingly coefficients `g_0, \ldots, g_n`
+such that `f = g_0 N_0 + g_1 N_1 + \ldots + g_n N_n`
+and vice versa.
+In the following functions, some finite initial segment of `C` is represented
+by a vector called *basis*, and a polynomial in the Newton basis is
+represented formally as the polynomial
+`g = g_0 + g_1 x + \ldots + g_n x^n`.
+
+The following functions all support aliasing between inputs and outputs
+except that no output may be aliased with *basis*.
+
+.. function:: int _gr_poly_newton_basis_from_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_from_monomial(gr_poly_t res, const gr_vec_t basis, const gr_poly_t poly, gr_ctx_t ctx)
+              int _gr_poly_newton_basis_to_monomial(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_to_monomial(gr_poly_t res, const gr_vec_t basis, const gr_poly_t poly, gr_ctx_t ctx)
+
+    Given *poly* of length *len* in the standard monomial basis, set *res* to
+    the polynomial in the Newton basis and vice versa.
+    The underscore methods require that ``basis`` is a pointer to at least
+    `len - 1` entries. The non-underscore methods return ``GR_UNABLE`` if
+    *basis* does not contain at least `len - 1` entries.
+
+.. function:: int _gr_poly_newton_basis_evaluate(gr_ptr res, gr_srcptr basis, gr_srcptr poly, slong len, gr_srcptr x, gr_ctx_t ctx)
+              int gr_poly_newton_basis_evaluate(gr_ptr res, const gr_vec_t basis, const gr_poly_t poly, gr_srcptr x, gr_ctx_t ctx)
+
+    Given *poly* of length *len* in the Newton basis, set *res* to the
+    evaluation at *x*.
+    The underscore method requires that ``basis`` is a pointer to at least
+    `len - 1` entries. The non-underscore method returns ``GR_UNABLE`` if
+    *basis* does not contain at least `len - 1` entries.
+
+.. function:: int _gr_poly_newton_basis_interpolate_exact(gr_ptr res, gr_srcptr basis, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_interpolate_exact(gr_poly_t res, const gr_vec_t basis, const gr_vec_t ys, gr_ctx_t ctx)
+              int _gr_poly_newton_basis_interpolate(gr_ptr res, gr_srcptr basis, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_newton_basis_interpolate(gr_poly_t res, const gr_vec_t basis, const gr_vec_t ys, gr_ctx_t ctx)
+
+    Given a vector *y* containing *len* values, set *res* to the Newton basis form
+    of the unique interpolating
+    polynomial *f* of length (up to) *len* such that
+    `y_0 = f(c_0), \ldots, y_{len-1} = f(c_{len-1})`
+    evaluated at the roots of the Newton basis.
+
+    We presume, but do not check, that the ring is an integral domain.
+    These functions may succeed over non-integral domains, but
+    the result need not be an interpolating polynomial.
+
+    We require that *basis* contains at least *len* initial roots which
+    are pairwise distinct.
+
+    These functions return ``GR_DOMAIN`` (and/or ``GR_UNABLE``)
+    in either of the following situations:
+
+    * The vector *basis* does not have sufficiently many points (checked by the
+      non-underscore functions only).
+    * The evaluation points *xs* are not pairwise distinct.
+    * The interpolating polynomial *f* has coefficients in the fraction field
+      of *R* but not in *R* itself.
+
+    The *exact* versions presume that the evaluation points are distinct
+    and that *f* has coefficients in *R*; they may silently output some
+    arbitary polynomial otherwise.
+
+
 Multipoint evaluation and interpolation
 -------------------------------------------------------------------------------
 
@@ -531,15 +614,59 @@ Multipoint evaluation and interpolation
 
 .. function:: int _gr_poly_tree_build(gr_ptr * tree, gr_srcptr roots, slong len, gr_ctx_t ctx)
 
-.. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, gr_ptr * tree, slong len, gr_ctx_t ctx)
+    Initialize a subproduct tree over the given roots.
+
+.. function:: int _gr_poly_product_roots(gr_ptr poly, gr_srcptr xs, slong n, gr_ctx_t ctx)
+              int gr_poly_product_roots(gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+
+    Set *poly* to the polynomial `(x-x_0) (x-x_1) \cdots (x-x_{n-1})`.
+
+.. function:: int _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly, slong plen, const gr_ptr * tree, slong len, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_evaluate_vec_fast(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
-
-.. function:: int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+              int gr_poly_evaluate_vec_fast(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
 
 .. function:: int _gr_poly_evaluate_vec_iter(gr_ptr ys, gr_srcptr poly, slong plen, gr_srcptr xs, slong n, gr_ctx_t ctx)
+              int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
 
-.. function:: int gr_poly_evaluate_vec_iter(gr_vec_t ys, const gr_poly_t poly, const gr_vec_t xs, gr_ctx_t ctx)
+.. function:: int _gr_poly_interpolate_exact(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_interpolate_exact(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
+              int _gr_poly_interpolate(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_interpolate(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
+
+    Given vectors *xs* and *ys* of length *len* where the entries of *xs*
+    are pairwise distinct, set *res* to the
+    interpolating polynomial *f* of length (up to) *len* such that
+    `y_0 = f(x_0), \ldots, y_{len-1} = f(x_{len-1})`.
+
+    We presume, but do not check, that the ring is an integral domain.
+    These functions may succeed over non-integral domains, but
+    the result might not be an interpolating polynomial.
+
+    These functions return ``GR_DOMAIN`` (and/or ``GR_UNABLE``)
+    in either of the following situations:
+
+    * The vectors *xs* and *ys* do not have the same length (checked by the
+      non-underscore functions only).
+    * The evaluation points *xs* are not pairwise distinct.
+    * The interpolating polynomial *f* has coefficients in the fraction field
+      of *R* but not in *R* itself.
+
+    The *exact* versions presume that the evaluation points are distinct
+    and that *f* has coefficients in *R*; they may silently output some
+    arbitary polynomial otherwise.
+
+.. function:: int _gr_poly_interpolation_weights(gr_ptr w, const gr_ptr * tree, slong len, gr_ctx_t ctx)
+              int _gr_poly_interpolate_fast_precomp(gr_ptr poly, gr_srcptr ys, const gr_ptr * tree, gr_srcptr weights, slong len, gr_ctx_t ctx)
+              int _gr_poly_interpolate_fast(gr_ptr res, gr_srcptr xs, gr_srcptr ys, slong len, gr_ctx_t ctx)
+              int gr_poly_interpolate_fast(gr_poly_t poly, const gr_vec_t xs, const gr_vec_t ys, gr_ctx_t ctx)
+
+    Fast polynomial interpolation using a subproduct tree. The *precomp*
+    version requires a precomputed subproduct tree generated using
+    :func:`_gr_poly_tree_build` and precomputed interpolation weights
+    generated using :func:`_gr_poly_interpolation_weights`.
+
+    This currently requires a field.
 
 
 Composition

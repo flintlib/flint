@@ -174,6 +174,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
             if (do_lll)
             {
+                /* flint_printf("LLL %wd %wd  %wd\n", M->r, M->c, fmpz_mat_max_bits(M)); */
                num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
 
                fmpz_mat_van_hoeij_resize_matrix(M, num_rows);

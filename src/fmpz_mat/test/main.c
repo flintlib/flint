@@ -85,6 +85,7 @@
 #include "t-multi_CRT_ui_unsigned.c"
 #include "t-nullspace.c"
 #include "t-one.c"
+#include "t-permanent.c"
 #include "t-pow.c"
 #include "t-print_read.c"
 #include "t-rank.c"
@@ -184,6 +185,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_multi_CRT_ui_unsigned),
     TEST_FUNCTION(fmpz_mat_nullspace),
     TEST_FUNCTION(fmpz_mat_one),
+    TEST_FUNCTION(fmpz_mat_permanent),
     TEST_FUNCTION(fmpz_mat_pow),
     TEST_FUNCTION(fmpz_mat_print_read),
     TEST_FUNCTION(fmpz_mat_rank),

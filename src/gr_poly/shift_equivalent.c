@@ -26,7 +26,10 @@ gr_poly_shift_equivalent(fmpz_t shift, const gr_poly_t p, const gr_poly_t q,
     int status = GR_SUCCESS;
 
     status |= gr_poly_leading_taylor_shift(elt, p, q, ctx);
+    /* todo: what we actually want here is to lift _shift to ZZ */
     status |= gr_get_fmpz(_shift, elt, ctx);
+    if (status == GR_DOMAIN && gr_ctx_is_finite_characteristic(ctx) != T_FALSE)
+	status = GR_UNABLE;
 
     /* when status == GR_SUCCESS, deg(p) is well-defined */
     if (status == GR_SUCCESS && p->length > 2)

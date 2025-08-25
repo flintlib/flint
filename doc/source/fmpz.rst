@@ -861,7 +861,7 @@ Basic arithmetic
 .. function:: void fmpz_tdiv_r_2exp(fmpz_t s, const fmpz_t g, ulong exp)
 
     Sets `f` to the quotient of `g` by `h` and/or `s` to the remainder. For the
-    ``2exp`` functions, ``g = 2^exp``. `If `h` is `0` an exception is raised.
+    ``2exp`` functions, ``h = 2^exp``. If `h` is `0` an exception is raised.
 
     Rounding is made in the following way:
 

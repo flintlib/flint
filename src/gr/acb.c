@@ -373,6 +373,9 @@ _gr_acb_get_ui(ulong * res, const acb_t x, const gr_ctx_t ctx)
 int
 _gr_acb_get_d(double * res, const acb_t x, const gr_ctx_t ctx)
 {
+    if (!arb_is_zero(acb_imagref(x)))
+        return GR_UNABLE;
+
     *res = arf_get_d(arb_midref(acb_realref(x)), ARF_RND_NEAR);
     return GR_SUCCESS;
 }
@@ -2238,6 +2241,9 @@ gr_method_tab_input _acb_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},

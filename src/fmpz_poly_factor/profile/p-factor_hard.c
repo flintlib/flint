@@ -38,6 +38,19 @@ void factor_poly(const char * file_str, const char * name, slong wanted_factors)
         fmpz_poly_swinnerton_dyer(f, 9);
     else if (!strcmp(name, "S10"))
         fmpz_poly_swinnerton_dyer(f, 10);
+    else if (!strcmp(name, "P7*M12_5") || !strcmp(name, "P7*M12_6"))
+    {
+        fmpz_poly_t g;
+        fmpz_poly_init(g);
+        file = fopen(MY_DIR"P7_flint", "rw");
+        fmpz_poly_fread(file, g);
+        fclose(file);
+        file = fopen((!strcmp(name, "P7*M12_5") ? MY_DIR"M12_5_flint" : MY_DIR"M12_6_flint"), "rw");
+        fmpz_poly_fread(file, f);
+        fclose(file);
+        fmpz_poly_mul(f, f, g);
+        fmpz_poly_clear(g);
+    }
     else
     {
         file = fopen(file_str, "rw");
@@ -65,7 +78,7 @@ void factor_poly(const char * file_str, const char * name, slong wanted_factors)
     fmpz_poly_clear(f);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     flint_printf("\n");
     flint_set_num_threads(8);
@@ -88,10 +101,15 @@ int main(void)
     factor_poly(MY_DIR"C1_flint", "C1", 32);
 
     /* Not run by default because they are too slow currently */
-#if 0
-    factor_poly(MY_DIR"H2_flint", "H2", 6);     /* 400 seconds */
-    factor_poly(MY_DIR"S9_flint", "S9", 1);     /* 360 seconds */
-    factor_poly(MY_DIR"S10_flint", "S10", 1);   /* long */
-#endif
+    if (argc > 1 && !strcmp(argv[1], "-hard"))
+    {
+        factor_poly(MY_DIR"P7_M12_5_flint", "P7*M12_5", 2);     /*  51 seconds */
+        factor_poly(MY_DIR"P7_M12_6_flint", "P7*M12_6", 3);     /*  96 seconds */
+        factor_poly(MY_DIR"H2_flint", "H2", 6);     /*  71 seconds */
+        factor_poly(MY_DIR"S9_flint", "S9", 1);     /*  57 seconds */
+        factor_poly(MY_DIR"S10_flint", "S10", 1);   /* 6300 seconds */
+    }
+
+    return 0;
 }
 

@@ -203,6 +203,8 @@ void fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat);
 
 void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat);
 
+int fmpq_mat_permanent(fmpq_t res, const fmpq_mat_t A);
+
 /* Nonsingular solving *******************************************************/
 
 int fmpq_mat_solve_fmpz_mat_fraction_free(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);

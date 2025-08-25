@@ -17,6 +17,37 @@
 #include "gr_generic.h"
 #include "gr_special.h"
 
+FLINT_FORCE_INLINE int
+nfloat_mpfr_rounding_mode(gr_ctx_t ctx)
+{
+    if (!NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+        return MPFR_RNDZ;
+    else if ((NFLOAT_CTX_FLAGS(ctx) & NFLOAT_RND_CEIL) != 0)
+        return MPFR_RNDU;
+    else
+        return MPFR_RNDD;
+}
+
+FLINT_FORCE_INLINE int
+nfloat_arf_rounding_mode(gr_ctx_t ctx)
+{
+    if (!NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+        return ARF_RND_DOWN;
+    else if ((NFLOAT_CTX_FLAGS(ctx) & NFLOAT_RND_CEIL) != 0)
+        return ARF_RND_CEIL;
+    else
+        return ARF_RND_FLOOR;
+}
+
+FLINT_FORCE_INLINE int
+nfloat_should_round_up(int sgnbit, gr_ctx_t ctx)
+{
+    if (!NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+        return 0;
+    else
+        return sgnbit ^ ((NFLOAT_CTX_FLAGS(ctx) & NFLOAT_RND_CEIL) != 0);
+}
+
 int
 nfloat_write(gr_stream_t out, nfloat_srcptr x, gr_ctx_t ctx)
 {
@@ -262,6 +293,75 @@ nfloat_set_si(nfloat_ptr res, slong x, gr_ctx_t ctx)
     }
 }
 
+/* Here exp is understood such that {x, xn} is a fraction in [0, 1). */
+int
+_nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
+{
+    ulong top;
+    slong norm;
+    slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+
+    FLINT_ASSERT(xn >= 1);
+    FLINT_ASSERT(x[xn - 1] != 0);
+
+    top = x[xn - 1];
+
+    if (LIMB_MSB_IS_SET(top))
+    {
+        norm = 0;
+
+        if (xn >= nlimbs)
+        {
+            flint_mpn_copyi(NFLOAT_D(res), x + xn - nlimbs, nlimbs);
+        }
+        else
+        {
+            flint_mpn_zero(NFLOAT_D(res), nlimbs - xn);
+            flint_mpn_copyi(NFLOAT_D(res) + nlimbs - xn, x, xn);
+        }
+    }
+    else
+    {
+        norm = flint_clz(top);
+
+        if (xn > nlimbs)
+        {
+            mpn_lshift(NFLOAT_D(res), x + xn - nlimbs, nlimbs, norm);
+            NFLOAT_D(res)[0] |= (x[xn - nlimbs - 1] >> (FLINT_BITS - norm));
+        }
+        else
+        {
+            flint_mpn_zero(NFLOAT_D(res), nlimbs - xn);
+            mpn_lshift(NFLOAT_D(res) + nlimbs - xn, x, xn, norm);
+        }
+
+        exp -= norm;
+    }
+
+    if (xn > nlimbs && nfloat_should_round_up(xsgnbit, ctx))
+    {
+        int round_up;
+
+        round_up = !flint_mpn_zero_p(x, xn - nlimbs - 1);
+        round_up |= (x[xn - nlimbs - 1] << norm) != 0;
+
+        if (round_up)
+        {
+            if (mpn_add_1(NFLOAT_D(res), NFLOAT_D(res), nlimbs, 1))
+            {
+                NFLOAT_D(res)[nlimbs - 1] = (UWORD(1) << (FLINT_BITS - 1));
+                exp++;
+            }
+        }
+    }
+
+    NFLOAT_SGNBIT(res) = xsgnbit;
+    NFLOAT_EXP(res) = exp;
+    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+
+    return GR_SUCCESS;
+}
+
 int
 nfloat_set_fmpz(nfloat_ptr res, const fmpz_t x, gr_ctx_t ctx)
 {
@@ -288,7 +388,7 @@ nfloat_set_fmpq(nfloat_ptr res, const fmpq_t v, gr_ctx_t ctx)
     arf_t t;
     int status;
     arf_init(t);
-    arf_set_fmpq(t, v, NFLOAT_CTX_PREC(ctx), ARF_RND_DOWN);
+    arf_set_fmpq(t, v, NFLOAT_CTX_PREC(ctx), nfloat_arf_rounding_mode(ctx));
     status = nfloat_set_arf(res, t, ctx);
     arf_clear(t);
     return status;
@@ -307,6 +407,7 @@ nfloat_set_d(nfloat_ptr res, double x, gr_ctx_t ctx)
     return status;
 }
 
+/* todo: directed rounding */
 int
 nfloat_set_str(nfloat_ptr res, const char * x, gr_ctx_t ctx)
 {
@@ -363,6 +464,19 @@ nfloat_set_other(nfloat_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 {
                     flint_mpn_zero(NFLOAT_D(res), nlimbs - x_nlimbs);
                     flint_mpn_copyi(NFLOAT_D(res) + nlimbs - x_nlimbs, NFLOAT_D(x), x_nlimbs);
+                }
+
+                if (nlimbs < x_nlimbs && nfloat_should_round_up(NFLOAT_SGNBIT(res), ctx))
+                {
+                    if (!flint_mpn_zero_p(NFLOAT_D(x), x_nlimbs - nlimbs))
+                    {
+                        if (mpn_add_1(NFLOAT_D(res), NFLOAT_D(res), nlimbs, 1))
+                        {
+                            NFLOAT_D(res)[nlimbs - 1] = (UWORD(1) << (FLINT_BITS - 1));
+                            NFLOAT_EXP(res)++;
+                            NFLOAT_HANDLE_OVERFLOW(res, ctx);
+                        }
+                    }
                 }
 
                 return GR_SUCCESS;
@@ -466,6 +580,119 @@ nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx)
     }
 
     return GR_SUCCESS;
+}
+
+#include <math.h>
+
+int
+nfloat_get_d_2exp_si(double * mant, slong * expo, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_ZERO(x))
+        {
+            *mant = 0.0;
+            *expo = 0;
+            return GR_SUCCESS;
+        }
+
+        return GR_UNABLE;
+    }
+    else
+    {
+        /* todo: rounding? */
+        double m;
+        slong e = NFLOAT_EXP(x);
+
+        m = NFLOAT_D(x)[NFLOAT_CTX_NLIMBS(ctx) - 1];
+#if FLINT_BITS == 32
+        if (NFLOAT_CTX_NLIMBS(ctx) > 1)
+            m += NFLOAT_D(x)[NFLOAT_CTX_NLIMBS(ctx) - 2] * ldexp(1.0, -FLINT_BITS);
+#endif
+
+        m *= ldexp(1.0, -FLINT_BITS);
+
+        /* may have rounded up */
+        if (m >= 1.0)
+        {
+            m *= 0.5;
+            e++;
+        }
+
+        if (NFLOAT_SGNBIT(x))
+            m = -m;
+
+        *mant = m;
+        *expo = e;
+    }
+
+    return GR_SUCCESS;
+}
+
+int
+nfloat_get_fmpz(fmpz_t res, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_ZERO(x))
+        {
+            fmpz_zero(res);
+            return GR_SUCCESS;
+        }
+
+        return GR_UNABLE;
+    }
+    else
+    {
+        slong exp = NFLOAT_EXP(x);
+        slong n = NFLOAT_CTX_NLIMBS(ctx);
+
+        if (exp <= 0)
+            return GR_DOMAIN;
+
+        nn_srcptr d = NFLOAT_D(x);
+
+        while (d[0] == 0)
+        {
+            d++;
+            n--;
+        }
+
+        slong bc = n * FLINT_BITS - flint_ctz(d[0]);
+
+        if (bc > exp)
+            return GR_DOMAIN;
+
+        if (exp <= FLINT_BITS)
+        {
+            if (NFLOAT_SGNBIT(x))
+                fmpz_neg_ui(res, d[n - 1] >> (FLINT_BITS - exp));
+            else
+                fmpz_set_ui(res, d[n - 1] >> (FLINT_BITS - exp));
+        }
+        else
+        {
+            slong rn = (exp + FLINT_BITS - 1) / FLINT_BITS;
+
+            FLINT_ASSERT(rn >= 2);
+
+            /* todo: optimize */
+            if (rn <= n)
+            {
+                fmpz_set_mpn_large(res, d + n - rn, rn, NFLOAT_SGNBIT(x));
+                fmpz_tdiv_q_2exp(res, res, rn * FLINT_BITS - exp);
+            }
+            else
+            {
+                fmpz_set_ui_array(res, d, n);
+                if (NFLOAT_SGNBIT(x))
+                    fmpz_neg(res, res);
+                fmpz_mul_2exp(res, res, exp - n * FLINT_BITS);
+            }
+        }
+
+        return GR_SUCCESS;
+    }
 }
 
 int
@@ -1507,6 +1734,80 @@ _nfloat_add_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr y
 }
 
 int
+_nfloat_add_n_round_up(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
+{
+    slong shift_limbs, shift_bits;
+    ulong cy;
+    ulong ci;
+    ulong t[NFLOAT_MAX_LIMBS];
+
+    NFLOAT_SGNBIT(res) = xsgnbit;
+
+    if (delta == 0)
+    {
+        cy = mpn_add_n(NFLOAT_D(res), xd, yd, nlimbs);
+    }
+    else if (delta < FLINT_BITS)
+    {
+        mpn_rshift(t, yd, nlimbs, delta);
+        ci = (yd[0] << (FLINT_BITS - delta)) != 0;
+        MPN_INCR_U(t, nlimbs, ci);
+        cy = mpn_add_n(NFLOAT_D(res), xd, t, nlimbs);
+    }
+    else if (delta < nlimbs * FLINT_BITS)
+    {
+        shift_limbs = delta / FLINT_BITS;
+        shift_bits = delta % FLINT_BITS;
+
+        ci = !flint_mpn_zero_p(yd, shift_limbs);
+
+        if (shift_bits == 0)
+            flint_mpn_copyi(t, yd + shift_limbs, nlimbs - shift_limbs);
+        else
+        {
+            ci |= ((yd[shift_limbs] << (FLINT_BITS - shift_bits)) != 0);
+            mpn_rshift(t, yd + shift_limbs, nlimbs - shift_limbs, shift_bits);
+        }
+
+        cy = mpn_add(NFLOAT_D(res), xd, nlimbs, t, nlimbs - shift_limbs);
+        cy += mpn_add_1(NFLOAT_D(res), NFLOAT_D(res), nlimbs, ci);
+    }
+    else
+    {
+        cy = mpn_add_1(NFLOAT_D(res), xd, nlimbs, 1);
+    }
+
+    if (cy == 0)
+    {
+        NFLOAT_EXP(res) = xexp;
+    }
+    else
+    {
+        ci = NFLOAT_D(res)[0] & 1;
+        mpn_rshift(NFLOAT_D(res), NFLOAT_D(res), nlimbs, 1);
+        NFLOAT_D(res)[nlimbs - 1] |= (UWORD(1) << (FLINT_BITS - 1));
+        cy = mpn_add_1(NFLOAT_D(res), NFLOAT_D(res), nlimbs, ci);
+
+        /* can this happen? */
+        if (cy)
+        {
+            NFLOAT_D(res)[nlimbs - 1] = (UWORD(1) << (FLINT_BITS - 1));
+            NFLOAT_EXP(res) = xexp + 2;
+        }
+        else
+        {
+            NFLOAT_EXP(res) = xexp + 1;
+        }
+        NFLOAT_HANDLE_OVERFLOW(res, ctx);
+    }
+
+    if (NFLOAT_D(res)[nlimbs - 1] < (UWORD(1) << (FLINT_BITS - 1)))
+        flint_abort();
+
+    return GR_SUCCESS;
+}
+
+int
 _nfloat_sub_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
 {
     slong shift_limbs, shift_bits, n, norm;
@@ -1617,6 +1918,40 @@ _nfloat_sub_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr y
 }
 
 int
+_nfloat_sub_n_directed(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
+{
+    mpfr_t rf, xf, yf;
+    slong prec = NFLOAT_CTX_PREC(ctx);
+
+    FLINT_ASSERT(delta >= 1);
+
+    delta = FLINT_MIN(delta, 2 * prec);
+
+    /* todo: make sure aliasing is correct */
+    rf->_mpfr_d = NFLOAT_D(res);
+    rf->_mpfr_prec = prec;
+    rf->_mpfr_sign = 1;
+    rf->_mpfr_exp = 0;
+
+    xf->_mpfr_d = (nn_ptr) xd;
+    xf->_mpfr_prec = prec;
+    xf->_mpfr_sign = xsgnbit ? -1 : 1;
+    xf->_mpfr_exp = 0;
+
+    yf->_mpfr_d = (nn_ptr) yd;
+    yf->_mpfr_prec = prec;
+    yf->_mpfr_sign = xsgnbit ? 1 : -1;
+    yf->_mpfr_exp = -delta;
+
+    mpfr_add(rf, xf, yf, nfloat_mpfr_rounding_mode(ctx));
+
+    NFLOAT_EXP(res) = xexp + rf->_mpfr_exp;
+    NFLOAT_SGNBIT(res) = xsgnbit;
+    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+    return GR_SUCCESS;
+}
+
+int
 nfloat_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 {
     slong xexp, yexp, delta, nlimbs;
@@ -1650,6 +1985,26 @@ nfloat_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     ysgnbit = NFLOAT_SGNBIT(y);
 
     delta = xexp - yexp;
+
+    if (NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+    {
+        if (xsgnbit == ysgnbit)
+        {
+            if (nfloat_should_round_up(xsgnbit, ctx))
+                return _nfloat_add_n_round_up(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+            else
+                return _nfloat_add_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+        }
+        else
+        {
+            /* Guaranteed to be exact */
+            if (delta == 0)
+                return _nfloat_sub_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+
+            /* |x| > |y| */
+            return _nfloat_sub_n_directed(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+        }
+    }
 
     if (xsgnbit == ysgnbit)
     {
@@ -1714,6 +2069,26 @@ nfloat_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     }
 
     delta = xexp - yexp;
+
+    if (NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+    {
+        if (xsgnbit == ysgnbit)
+        {
+            if (nfloat_should_round_up(xsgnbit, ctx))
+                return _nfloat_add_n_round_up(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+            else
+                return _nfloat_add_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+        }
+        else
+        {
+            /* Guaranteed to be exact */
+            if (delta == 0)
+                return _nfloat_sub_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+
+            /* |x| > |y| */
+            return _nfloat_sub_n_directed(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
+        }
+    }
 
     if (xsgnbit == ysgnbit)
     {
@@ -1989,7 +2364,7 @@ _nfloat_vec_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
 
     nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
-    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    if (!(NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx)))
     {
         if (nlimbs == 1)
             return _nfloat_vec_aors_1(res, x, y, 0, len, ctx);
@@ -2025,7 +2400,7 @@ _nfloat_vec_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
 
     nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
-    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    if (!(NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx)))
     {
         if (nlimbs == 1)
             return _nfloat_vec_aors_1(res, x, y, 1, len, ctx);
@@ -2074,6 +2449,13 @@ nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     }
 
     nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+
+    if (FLINT_UNLIKELY(nfloat_should_round_up(NFLOAT_SGNBIT(x) ^ NFLOAT_SGNBIT(y), ctx)))
+    {
+        ulong t[2 * NFLOAT_MAX_LIMBS];
+        flint_mpn_mul_n(t, NFLOAT_D(x), NFLOAT_D(y), nlimbs);
+        return _nfloat_set_mpn_2exp(res, t, 2 * nlimbs, NFLOAT_EXP(x) + NFLOAT_EXP(y), NFLOAT_SGNBIT(x) ^ NFLOAT_SGNBIT(y), ctx);
+    }
 
     if (nlimbs == 1)
     {
@@ -2138,6 +2520,13 @@ nfloat_sqr(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
     }
 
     nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+
+    if (FLINT_UNLIKELY(nfloat_should_round_up(0, ctx)))
+    {
+        ulong t[2 * NFLOAT_MAX_LIMBS];
+        flint_mpn_sqr(t, NFLOAT_D(x), nlimbs);
+        return _nfloat_set_mpn_2exp(res, t, 2 * nlimbs, 2 * NFLOAT_EXP(x), 0, ctx);
+    }
 
     if (nlimbs == 1)
     {
@@ -2392,7 +2781,7 @@ _nfloat_vec_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
 
     nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
-    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    if (!(NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx)))
     {
         if (nlimbs == 1)
             return _nfloat_vec_mul_1(res, x, y, len, ctx);
@@ -2561,7 +2950,7 @@ _nfloat_vec_mul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr
 
     nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
-    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    if (!(NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx)))
     {
         if (nlimbs == 1)
             return _nfloat_vec_mul_scalar_1(res, x, len, y, ctx);
@@ -2618,8 +3007,20 @@ nfloat_submul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     ulong t[NFLOAT_MAX_ALLOC];
     int status;
 
-    status = nfloat_mul(t, x, y, ctx);
-    status |= nfloat_sub(res, res, t, ctx);
+    if (NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+    {
+        /* todo: optimize */
+        ulong u[NFLOAT_MAX_ALLOC];
+        status = nfloat_neg(u, y, ctx);
+        status |= nfloat_mul(t, x, u, ctx);
+        status |= nfloat_add(res, res, t, ctx);
+    }
+    else
+    {
+        status = nfloat_mul(t, x, y, ctx);
+        status |= nfloat_sub(res, res, t, ctx);
+    }
+
     return status;
 }
 
@@ -2932,7 +3333,7 @@ _nfloat_vec_aorsmul_scalar_n(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_
 int
 _nfloat_vec_addmul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx)
 {
-    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    if (!(NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx)))
     {
         slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
@@ -2951,14 +3352,21 @@ _nfloat_vec_addmul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_src
     }
     else
     {
-        return gr_generic_vec_scalar_addmul(res, x, len, y, ctx);
+        slong i;
+        int status = GR_SUCCESS;
+        slong sz = ctx->sizeof_elem;
+
+        for (i = 0; i < len; i++)
+            status |= nfloat_addmul(GR_ENTRY(res, i, sz), GR_ENTRY(x, i, sz), y, ctx);
+
+        return status;
     }
 }
 
 int
 _nfloat_vec_submul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx)
 {
-    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    if (!(NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx)))
     {
         slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
@@ -2977,7 +3385,17 @@ _nfloat_vec_submul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_src
     }
     else
     {
-        return gr_generic_vec_scalar_submul(res, x, len, y, ctx);
+        slong i;
+        int status = GR_SUCCESS;
+        slong sz = ctx->sizeof_elem;
+
+        ulong u[NFLOAT_MAX_ALLOC];
+        status |= nfloat_neg(u, y, ctx);
+
+        for (i = 0; i < len; i++)
+            status |= nfloat_addmul(GR_ENTRY(res, i, sz), GR_ENTRY(x, i, sz), u, ctx);
+
+        return status;
     }
 }
 
@@ -3014,10 +3432,10 @@ nfloat_inv(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 
     xf->_mpfr_d = NFLOAT_D(x);
     xf->_mpfr_prec = prec;
-    xf->_mpfr_sign = 1;
+    xf->_mpfr_sign = NFLOAT_SGNBIT(x) ? -1 : 1;
     xf->_mpfr_exp = 0;
 
-    mpfr_ui_div(rf, 1, xf, MPFR_RNDZ);
+    mpfr_ui_div(rf, 1, xf, nfloat_mpfr_rounding_mode(ctx));
 
     NFLOAT_EXP(res) = -NFLOAT_EXP(x) + rf->_mpfr_exp;
     NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x);
@@ -3048,15 +3466,15 @@ nfloat_div(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 
     xf->_mpfr_d = NFLOAT_D(x);
     xf->_mpfr_prec = prec;
-    xf->_mpfr_sign = 1;
+    xf->_mpfr_sign = NFLOAT_SGNBIT(x) ? -1 : 1;
     xf->_mpfr_exp = 0;
 
     yf->_mpfr_d = NFLOAT_D(y);
     yf->_mpfr_prec = prec;
-    yf->_mpfr_sign = 1;
+    yf->_mpfr_sign = NFLOAT_SGNBIT(y) ? -1 : 1;
     yf->_mpfr_exp = 0;
 
-    mpfr_div(rf, xf, yf, MPFR_RNDZ);
+    mpfr_div(rf, xf, yf, nfloat_mpfr_rounding_mode(ctx));
 
     NFLOAT_EXP(res) = NFLOAT_EXP(x) - NFLOAT_EXP(y) + rf->_mpfr_exp;
     NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x) ^ NFLOAT_SGNBIT(y);
@@ -3090,10 +3508,10 @@ nfloat_div_ui(nfloat_ptr res, nfloat_srcptr x, ulong y, gr_ctx_t ctx)
 
     xf->_mpfr_d = NFLOAT_D(x);
     xf->_mpfr_prec = prec;
-    xf->_mpfr_sign = 1;
+    xf->_mpfr_sign = NFLOAT_SGNBIT(x) ? -1 : 1;
     xf->_mpfr_exp = 0;
 
-    mpfr_div_ui(rf, xf, y, MPFR_RNDZ);
+    mpfr_div_ui(rf, xf, y, nfloat_mpfr_rounding_mode(ctx));
 
     NFLOAT_EXP(res) = NFLOAT_EXP(x) + rf->_mpfr_exp;
     NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x);
@@ -3124,10 +3542,10 @@ nfloat_div_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
 
     xf->_mpfr_d = NFLOAT_D(x);
     xf->_mpfr_prec = prec;
-    xf->_mpfr_sign = 1;
+    xf->_mpfr_sign = NFLOAT_SGNBIT(x) ? -1 : 1;
     xf->_mpfr_exp = 0;
 
-    mpfr_div_si(rf, xf, y, MPFR_RNDZ);
+    mpfr_div_si(rf, xf, y, nfloat_mpfr_rounding_mode(ctx));
 
     NFLOAT_EXP(res) = NFLOAT_EXP(x) + rf->_mpfr_exp;
     NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x) ^ (y < 0);
@@ -3210,7 +3628,7 @@ nfloat_sqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
         zf->_mpfr_sign = 1;
         zf->_mpfr_exp = odd_exp;
 
-        mpfr_sqrt(zf, zf, MPFR_RNDZ);
+        mpfr_sqrt(zf, zf, nfloat_mpfr_rounding_mode(ctx));
     }
     else
     {
@@ -3224,7 +3642,7 @@ nfloat_sqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
         zf->_mpfr_sign = 1;
         zf->_mpfr_exp = 0;
 
-        mpfr_sqrt(zf, xf, MPFR_RNDZ);
+        mpfr_sqrt(zf, xf, nfloat_mpfr_rounding_mode(ctx));
     }
 
     /* floor division */
@@ -3275,7 +3693,7 @@ nfloat_rsqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
         zf->_mpfr_sign = 1;
         zf->_mpfr_exp = odd_exp;
 
-        mpfr_rec_sqrt(zf, zf, MPFR_RNDZ);
+        mpfr_rec_sqrt(zf, zf, nfloat_mpfr_rounding_mode(ctx));
     }
     else
     {
@@ -3289,7 +3707,7 @@ nfloat_rsqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
         zf->_mpfr_sign = 1;
         zf->_mpfr_exp = 0;
 
-        mpfr_rec_sqrt(zf, xf, MPFR_RNDZ);
+        mpfr_rec_sqrt(zf, xf, nfloat_mpfr_rounding_mode(ctx));
     }
 
     /* floor division */
@@ -3374,3 +3792,4 @@ int nfloat_tanh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_
 int nfloat_atan(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_atan, res, x, ctx); }
 int nfloat_gamma(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_gamma, res, x, ctx); }
 int nfloat_zeta(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_zeta, res, x, ctx); }
+

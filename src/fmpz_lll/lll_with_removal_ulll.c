@@ -28,7 +28,8 @@ fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new_size,
 
         r = FM->r;
         c = FM->c;
-        mbits = FLINT_ABS(fmpz_mat_max_bits(FM));
+        mbits = fmpz_mat_max_bits(FM);
+        mbits = FLINT_ABS(mbits);
         prev_mbits = mbits;
 
         fmpz_mat_init(big_td, r, c + r);
@@ -82,7 +83,8 @@ fmpz_lll_with_removal_ulll(fmpz_mat_t FM, fmpz_mat_t UM, slong new_size,
                     fmpz_mat_mul(FM, U, FM);
                 }
 
-                mbits = FLINT_ABS(fmpz_mat_max_bits(FM));
+                mbits = fmpz_mat_max_bits(FM);
+                mbits = FLINT_ABS(mbits);
                 /* make this condition better? */
                 if ((mbits - new_size > 0)
                     && (mbits <= prev_mbits - (slong) (new_size / 4))

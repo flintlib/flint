@@ -60,7 +60,8 @@
 #include "t-divrem.c"
 #include "t-divrem_divconquer.c"
 #include "t-divrem_preinv.c"
-#include "t-div_root.c"
+#include "t-div_root_fmpz.c"
+#include "t-divexact_root_fmpq.c"
 #include "t-div_series_basecase.c"
 #include "t-div_series.c"
 #include "t-div_series_divconquer.c"
@@ -97,7 +98,10 @@
 #include "t-hermite_he.c"
 #include "t-inflate.c"
 #include "t-init_realloc_clear.c"
+#include "t-interpolate.c"
 #include "t-interpolate_fmpz_vec.c"
+#include "t-interpolate_multi_mod.c"
+#include "t-interpolate_newton.c"
 #include "t-inv_series_basecase.c"
 #include "t-inv_series.c"
 #include "t-inv_series_newton.c"
@@ -238,7 +242,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_divrem),
     TEST_FUNCTION(fmpz_poly_divrem_divconquer),
     TEST_FUNCTION(fmpz_poly_divrem_preinv),
-    TEST_FUNCTION(fmpz_poly_div_root),
+    TEST_FUNCTION(fmpz_poly_div_root_fmpz),
+    TEST_FUNCTION(fmpz_poly_divexact_root_fmpq),
     TEST_FUNCTION(fmpz_poly_div_series_basecase),
     TEST_FUNCTION(fmpz_poly_div_series),
     TEST_FUNCTION(fmpz_poly_div_series_divconquer),
@@ -275,7 +280,10 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_hermite_he),
     TEST_FUNCTION(fmpz_poly_inflate),
     TEST_FUNCTION(fmpz_poly_init_realloc_clear),
+    TEST_FUNCTION(fmpz_poly_interpolate),
     TEST_FUNCTION(fmpz_poly_interpolate_fmpz_vec),
+    TEST_FUNCTION(fmpz_poly_interpolate_multi_mod),
+    TEST_FUNCTION(fmpz_poly_interpolate_newton),
     TEST_FUNCTION(fmpz_poly_inv_series_basecase),
     TEST_FUNCTION(fmpz_poly_inv_series),
     TEST_FUNCTION(fmpz_poly_inv_series_newton),

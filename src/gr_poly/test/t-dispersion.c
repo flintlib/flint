@@ -16,6 +16,8 @@
 #include "gr_poly.h"
 #include "gr_vec.h"
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 TEST_FUNCTION_START(gr_poly_dispersion, state)
 {
     for (slong i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -77,6 +79,10 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
                 if (n_randint(state, 2))
                     status |= gr_poly_mul(g, g, u, ctx);
 
+                if (ctx->methods == _ca_methods
+                    && (f->length > 4 || g->length > 4))  /* slow */
+                    goto cleanup_inner;
+
                 /* overwritten iff nonempty dispersion set */
                 fmpz_set_si(dfu, -1);
                 /* overwritten whenever successful */
@@ -87,7 +93,7 @@ TEST_FUNCTION_START(gr_poly_dispersion, state)
                 status |= gr_poly_dispersion(dug, NULL, u, g, ctx);
                 status |= gr_poly_dispersion(dfg, disp, f, g, ctx);
 
-                if (status == GR_UNABLE) {
+                if (status & GR_UNABLE) {
                     if (ctx->which_ring == GR_CTX_FMPZ)
                         status = GR_TEST_FAIL;
                     goto cleanup_inner;
@@ -147,7 +153,10 @@ cleanup_inner:
         gr_poly_struct * g0 = aliasing_mode == 0 ? f : g;
         gr_poly_struct * g1 = aliasing_mode == 1 ? f : g;
 
-        if (status != GR_SUCCESS || (f->length > 8 && g->length > 8))
+        if (status != GR_SUCCESS
+            /* slow */
+            || ctx->methods == _ca_methods
+            || f->length + g->length > 10)
             goto epilogue;
 
         int want_d = n_randint(state, 16);

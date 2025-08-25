@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,167 +10,167 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpfr.h"
-#include "mpfr_vec.h"
-#include "mpfr_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
+#include "nfloat.h"
+#include "gr_vec.h"
+#include "gr_mat.h"
 
 int
 fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
                          flint_bitcnt_t prec)
 {
-    mpfr_mat_t A, R, V, Wu, Wd, bound;
-    mpfr_ptr du, dd;
-    mpfr_t s, norm, ti, tj, tmp;
+    gr_mat_t A, R, V, Wu, Wd, bound;
+    gr_ptr du, dd;
+    gr_ptr s, norm, ti, tj, tmp;
+    gr_ptr zero, one;
     slong n;
+    int status = GR_SUCCESS;
+
+    gr_ctx_t ctx, ctx_rnd_floor, ctx_rnd_ceil;
+
+#define ENTRY(vv,ii) GR_ENTRY(vv,ii,ctx->sizeof_elem)
+#define MAT_ENTRY(mm,ii,jj) GR_MAT_ENTRY(mm,ii,jj,ctx->sizeof_elem)
+
+    /* Technical detail: we currently require prec >= 53 so that
+       conversion from double is exact, because there is no atomic
+       gr_mul_d or gr_cmp_d respecting directed rounding. */
+    prec = FLINT_MAX(prec, 64);
+
+    status |= nfloat_ctx_init(ctx, prec, 0);
+    status |= nfloat_ctx_init(ctx_rnd_floor, prec, NFLOAT_RND_FLOOR);
+    status |= nfloat_ctx_init(ctx_rnd_ceil, prec, NFLOAT_RND_CEIL);
+
+    if (status != GR_SUCCESS)
+        return 0;
+
+    GR_TMP_INIT2(zero, one, ctx);
+    status |= gr_one(one, ctx);
 
     if (fl->rt == Z_BASIS)
     {
         /* NOTE: this algorithm should *not* be changed */
         slong i, j, k, m;
-        mpfr_mat_t Q, bound2, bound3, boundt, mm, rm, mn, rn, absR;
+        gr_mat_t Q, bound2, bound3, boundt, mm, rm, mn, rn, absR;
 
         if (B->r == 0 || B->r == 1)
+        {
+            GR_TMP_CLEAR2(zero, one, ctx);
             return 1;
+        }
 
         m = B->c;
         n = B->r;
 
-        mpfr_mat_init(A, m, n, prec);
-        mpfr_mat_init(Q, m, n, prec);
-        mpfr_mat_init(R, n, n, prec);
-        mpfr_mat_init(V, n, n, prec);
-        mpfr_mat_zero(R);
-        mpfr_mat_zero(V);
+        gr_mat_init(A, m, n, ctx);
+        gr_mat_init(Q, n, m, ctx);
+        gr_mat_init(R, n, n, ctx);
+        gr_mat_init(V, n, n, ctx);
 
-        mpfr_inits2(prec, s, norm, ti, tj, tmp, NULL);
+        GR_TMP_INIT5(s, norm, ti, tj, tmp, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < m; j++)
             {
-                fmpz_get_mpfr(mpfr_mat_entry(A, j, i), fmpz_mat_entry(B, i, j),
-                              MPFR_RNDN);
+                status |= gr_set_fmpz(MAT_ENTRY(A, j, i), fmpz_mat_entry(B, i, j), ctx);
             }
         }
 
+        /* Here Q is transposed wrt the original double code to allow using vector
+           operations. To do: use the same optimization in the double code. */
         for (k = 0; k < n; k++)
         {
             for (j = 0; j < m; j++)
             {
-                mpfr_set(mpfr_mat_entry(Q, j, k), mpfr_mat_entry(A, j, k),
-                         MPFR_RNDN);
+                status |= gr_set(MAT_ENTRY(Q, k, j), MAT_ENTRY(A, j, k), ctx);
             }
             for (i = 0; i < k; i++)
             {
-                mpfr_set_zero(s, 1);
-                for (j = 0; j < m; j++)
-                {
-                    mpfr_mul(norm, mpfr_mat_entry(Q, j, i),
-                             mpfr_mat_entry(Q, j, k), MPFR_RNDN);
-                    mpfr_add(s, s, norm, MPFR_RNDN);
-                }
-                mpfr_set(mpfr_mat_entry(R, i, k), s, MPFR_RNDN);
-                for (j = 0; j < m; j++)
-                {
-                    mpfr_mul(norm, s, mpfr_mat_entry(Q, j, i), MPFR_RNDN);
-                    mpfr_sub(mpfr_mat_entry(Q, j, k), mpfr_mat_entry(Q, j, k),
-                             norm, MPFR_RNDN);
-                }
+                status |= _gr_vec_dot(s, NULL, 0, MAT_ENTRY(Q, i, 0), MAT_ENTRY(Q, k, 0), m, ctx);
+                status |= gr_set(MAT_ENTRY(R, i, k), s, ctx);
+                status |= _gr_vec_submul_scalar(MAT_ENTRY(Q, k, 0), MAT_ENTRY(Q, i, 0), m, s, ctx);
             }
-            mpfr_set_zero(s, 1);
-            for (j = 0; j < m; j++)
+
+            /* todo: optimized vec_norm2 (or optimize self-dot for nfloat, arf) */
+            status |= _gr_vec_dot(s, NULL, 0, MAT_ENTRY(Q, k, 0), MAT_ENTRY(Q, k, 0), m, ctx);
+            status |= gr_sqrt(s, s, ctx);
+            status |= gr_set(MAT_ENTRY(R, k, k), s, ctx);
+
+            if (gr_is_zero(s, ctx) == T_FALSE)
             {
-                mpfr_mul(norm, mpfr_mat_entry(Q, j, k),
-                         mpfr_mat_entry(Q, j, k), MPFR_RNDN);
-                mpfr_add(s, s, norm, MPFR_RNDN);
-            }
-            mpfr_sqrt(s, s, MPFR_RNDN);
-            mpfr_set(mpfr_mat_entry(R, k, k), s, MPFR_RNDN);
-            if (!mpfr_zero_p(s))
-            {
-                mpfr_ui_div(s, 1, s, MPFR_RNDN);
-                for (j = 0; j < m; j++)
-                {
-                    mpfr_mul(mpfr_mat_entry(Q, j, k), mpfr_mat_entry(Q, j, k),
-                             s, MPFR_RNDN);
-                }
+                status |= gr_inv(s, s, ctx);
+                status |= _gr_vec_mul_scalar(MAT_ENTRY(Q, k, 0), MAT_ENTRY(Q, k, 0), m, s, ctx);
             }
         }
-        mpfr_mat_clear(Q);
+
+        gr_mat_clear(Q, ctx);
 
         for (j = n - 1; j >= 0; j--)
         {
-            mpfr_ui_div(mpfr_mat_entry(V, j, j), 1, mpfr_mat_entry(R, j, j),
-                        MPFR_RNDN);
+            status |= gr_inv(MAT_ENTRY(V, j, j), MAT_ENTRY(R, j, j), ctx);
             for (i = j + 1; i < n; i++)
             {
-                for (k = j + 1; k < n; k++)
-                {
-                    mpfr_mul(norm, mpfr_mat_entry(V, k, i),
-                             mpfr_mat_entry(R, j, k), MPFR_RNDN);
-                    mpfr_add(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                             norm, MPFR_RNDN);
-                }
-                mpfr_mul_si(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                            -WORD(1), MPFR_RNDN);
-                mpfr_mul(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                         mpfr_mat_entry(V, j, j), MPFR_RNDN);
+                status |= _gr_vec_dot(MAT_ENTRY(V, i, j), MAT_ENTRY(V, i, j), 0,
+                    MAT_ENTRY(V, i, j + 1), MAT_ENTRY(R, j, j + 1), n - (j + 1), ctx);
+                status |= gr_neg(MAT_ENTRY(V, i, j), MAT_ENTRY(V, i, j), ctx);
+                status |= gr_mul(MAT_ENTRY(V, i, j), MAT_ENTRY(V, i, j), MAT_ENTRY(V, j, j), ctx);
             }
         }
+        status |= gr_mat_transpose(V, V, ctx);
 
-        mpfr_mat_init(Wu, n, n, prec);
-        mpfr_mat_init(Wd, n, n, prec);
-        du = _mpfr_vec_init(n, prec);
-        dd = _mpfr_vec_init(n, prec);
+        gr_mat_init(Wu, n, n, ctx);
+        gr_mat_init(Wd, n, n, ctx);
+        du = gr_heap_init_vec(n, ctx);
+        dd = gr_heap_init_vec(n, ctx);
 
-        mpfr_mat_mul_classical(Wd, R, V, MPFR_RNDD);
+        status |= gr_mat_mul(Wd, R, V, ctx_rnd_floor);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(dd + i, mpfr_mat_entry(Wd, i, i), 1, MPFR_RNDD);
+            status |= gr_sub_ui(ENTRY(dd, i), MAT_ENTRY(Wd, i, i), 1, ctx_rnd_floor);
         }
-        mpfr_mat_mul_classical(Wu, R, V, MPFR_RNDU);
+        status |= gr_mat_mul(Wu, R, V, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(du + i, mpfr_mat_entry(Wu, i, i), 1, MPFR_RNDU);
+            status |= gr_sub_ui(ENTRY(du, i), MAT_ENTRY(Wu, i, i), 1, ctx_rnd_ceil);
         }
-        mpfr_set_zero(norm, 1);
+        status |= gr_zero(norm, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_set_zero(s, 1);
+            status |= gr_zero(s, ctx_rnd_ceil);
             for (j = 0; j < n; j++)
             {
                 if (i != j)
                 {
-                    mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                    mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                    mpfr_max(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(s, s, tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                    status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                    status |= gr_max(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(s, s, tmp, ctx_rnd_ceil);
                 }
                 else
                 {
-                    mpfr_abs(ti, dd + i, MPFR_RNDU);
-                    mpfr_abs(tj, du + i, MPFR_RNDU);
-                    mpfr_max(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(s, s, tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, ENTRY(dd, i), ctx_rnd_ceil);
+                    status |= gr_abs(tj, ENTRY(du, i), ctx_rnd_ceil);
+                    status |= gr_max(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(s, s, tmp, ctx_rnd_ceil);
                 }
             }
-            mpfr_max(norm, norm, s, MPFR_RNDU);
+            status |= gr_max(norm, norm, s, ctx_rnd_ceil);
         }
-        if (mpfr_cmp_ui(norm, 1) >= 0)
+
+        if (status != GR_SUCCESS || gr_lt(norm, one, ctx) != T_TRUE)
             goto fail_clear_all;
 
-        mpfr_mat_init(bound, n, n, prec);
+        gr_mat_init(bound, n, n, ctx);
 
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(dd + i, mpfr_mat_entry(Wd, i, i), 2, MPFR_RNDD);
+            status |= gr_sub_ui(ENTRY(dd, i), MAT_ENTRY(Wd, i, i), 2, ctx_rnd_floor);
         }
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(du + i, mpfr_mat_entry(Wu, i, i), 2, MPFR_RNDU);
+            status |= gr_sub_ui(ENTRY(du, i), MAT_ENTRY(Wu, i, i), 2, ctx_rnd_ceil);
         }
         for (i = 0; i < n; i++)
         {
@@ -177,458 +178,425 @@ fmpz_lll_is_reduced_mpfr(const fmpz_mat_t B, const fmpz_lll_t fl,
             {
                 if (j > i)
                 {
-                    mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                    mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                    mpfr_max(mpfr_mat_entry(bound, i, j), ti, tj, MPFR_RNDU);
-                    mpfr_mul(ti, norm, norm, MPFR_RNDU);
-                    mpfr_ui_sub(tj, 1, norm, MPFR_RNDU);
-                    mpfr_div(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(mpfr_mat_entry(bound, i, j),
-                             mpfr_mat_entry(bound, i, j), tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                    status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                    status |= gr_max(MAT_ENTRY(bound, i, j), ti, tj, ctx_rnd_ceil);
+                    status |= gr_mul(ti, norm, norm, ctx_rnd_ceil);
+                    status |= gr_sub(tj, one, norm, ctx_rnd_ceil);
+                    status |= gr_div(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(MAT_ENTRY(bound, i, j), MAT_ENTRY(bound, i, j), tmp, ctx_rnd_ceil);
                 }
                 else if (j < i)
                 {
-                    mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                    mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                    mpfr_max(mpfr_mat_entry(bound, i, j), ti, tj, MPFR_RNDU);
+                    status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                    status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                    status |= gr_max(MAT_ENTRY(bound, i, j), ti, tj, ctx_rnd_ceil);
                 }
                 else
                 {
-                    mpfr_abs(ti, dd + i, MPFR_RNDU);
-                    mpfr_abs(tj, du + i, MPFR_RNDU);
-                    mpfr_max(mpfr_mat_entry(bound, i, j), ti, tj, MPFR_RNDU);
-                    mpfr_mul(ti, norm, norm, MPFR_RNDU);
-                    mpfr_ui_sub(tj, 1, norm, MPFR_RNDU);
-                    mpfr_div(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(mpfr_mat_entry(bound, i, j),
-                             mpfr_mat_entry(bound, i, j), tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, ENTRY(dd, i), ctx_rnd_ceil);
+                    status |= gr_abs(tj, ENTRY(du, i), ctx_rnd_ceil);
+                    status |= gr_max(MAT_ENTRY(bound, i, j), ti, tj, ctx_rnd_ceil);
+                    status |= gr_mul(ti, norm, norm, ctx_rnd_ceil);
+                    status |= gr_sub(tj, one, norm, ctx_rnd_ceil);
+                    status |= gr_div(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(MAT_ENTRY(bound, i, j), MAT_ENTRY(bound, i, j), tmp, ctx_rnd_ceil);
                 }
             }
         }
-        _mpfr_vec_clear(dd, n);
-        _mpfr_vec_clear(du, n);
+        gr_heap_clear_vec(dd, n, ctx);
+        gr_heap_clear_vec(du, n, ctx);
 
-        mpfr_mat_init(mm, n, n, prec);
-        mpfr_mat_init(rm, n, n, prec);
-        mpfr_mat_init(mn, n, n, prec);
-        mpfr_mat_init(rn, n, n, prec);
-        mpfr_mat_init(bound2, n, n, prec);
+        gr_mat_init(mm, n, n, ctx);
+        gr_mat_init(rm, n, n, ctx);
+        gr_mat_init(mn, n, n, ctx);
+        gr_mat_init(rn, n, n, ctx);
+        gr_mat_init(bound2, n, n, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(tmp, mpfr_mat_entry(Wu, i, j),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_div_ui(mpfr_mat_entry(mm, j, i), tmp, 2, MPFR_RNDU);
-                mpfr_sub(mpfr_mat_entry(rm, j, i), mpfr_mat_entry(mm, j, i),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_div_ui(mpfr_mat_entry(mn, i, j), tmp, 2, MPFR_RNDU);
-                mpfr_sub(mpfr_mat_entry(rn, i, j), mpfr_mat_entry(mn, i, j),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
+                status |= gr_add(tmp, MAT_ENTRY(Wu, i, j), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_div_ui(MAT_ENTRY(mm, j, i), tmp, 2, ctx_rnd_ceil);
+                status |= gr_sub(MAT_ENTRY(rm, j, i), MAT_ENTRY(mm, j, i), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_div_ui(MAT_ENTRY(mn, i, j), tmp, 2, ctx_rnd_ceil);
+                status |= gr_sub(MAT_ENTRY(rn, i, j), MAT_ENTRY(mn, i, j), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(Wd, mm, mn, MPFR_RNDD);
+        status |= gr_mat_mul(Wd, mm, mn, ctx_rnd_floor);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(Wd, i, i), mpfr_mat_entry(Wd, i, i), 1,
-                        MPFR_RNDD);
+            status |= gr_sub_ui(MAT_ENTRY(Wd, i, i), MAT_ENTRY(Wd, i, i), 1, ctx_rnd_floor);
         }
-        mpfr_mat_mul_classical(Wu, mm, mn, MPFR_RNDU);
+        status |= gr_mat_mul_classical(Wu, mm, mn, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(Wu, i, i), mpfr_mat_entry(Wu, i, i), 1,
-                        MPFR_RNDU);
+            status |= gr_sub_ui(MAT_ENTRY(Wu, i, i), MAT_ENTRY(Wu, i, i), 1, ctx_rnd_ceil);
             for (j = 0; j < n; j++)
             {
-                mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                mpfr_max(mpfr_mat_entry(Wu, i, j), ti, tj, MPFR_RNDU);
-                mpfr_abs(mpfr_mat_entry(mm, i, j), mpfr_mat_entry(mm, i, j),
-                         MPFR_RNDU);
-                mpfr_abs(mpfr_mat_entry(mn, i, j), mpfr_mat_entry(mn, i, j),
-                         MPFR_RNDU);
+                status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                status |= gr_max(MAT_ENTRY(Wu, i, j), ti, tj, ctx_rnd_ceil);
+                status |= gr_abs(MAT_ENTRY(mm, i, j), MAT_ENTRY(mm, i, j), ctx_rnd_ceil);
+                status |= gr_abs(MAT_ENTRY(mn, i, j), MAT_ENTRY(mn, i, j), ctx_rnd_ceil);
             }
         }
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound2, i, j),
-                         mpfr_mat_entry(mn, i, j), mpfr_mat_entry(rn, i, j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), MAT_ENTRY(mn, i, j), MAT_ENTRY(rn, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(bound2, rm, bound2, MPFR_RNDU);
+        status |= gr_mat_mul(bound2, rm, bound2, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound2, i, j),
-                         mpfr_mat_entry(bound2, i, j), mpfr_mat_entry(Wu, i,
-                                                                      j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), MAT_ENTRY(bound2, i, j), MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+
             }
         }
-        mpfr_mat_mul_classical(Wu, mm, rn, MPFR_RNDU);
+        status |= gr_mat_mul(Wu, mm, rn, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound2, i, j),
-                         mpfr_mat_entry(bound2, i, j), mpfr_mat_entry(Wu, i,
-                                                                      j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), MAT_ENTRY(bound2, i, j), MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+
             }
         }
 
-        mpfr_mat_clear(Wu);
-        mpfr_mat_clear(Wd);
-        mpfr_mat_clear(mm);
-        mpfr_mat_clear(mn);
-        mpfr_mat_clear(rm);
-        mpfr_mat_clear(rn);
+        gr_mat_clear(Wu, ctx);
+        gr_mat_clear(Wd, ctx);
+        gr_mat_clear(mm, ctx);
+        gr_mat_clear(mn, ctx);
+        gr_mat_clear(rm, ctx);
+        gr_mat_clear(rn, ctx);
 
-        mpfr_mat_init(Wu, m, n, prec);
-        mpfr_mat_init(Wd, m, n, prec);
-        mpfr_mat_init(mm, n, m, prec);
-        mpfr_mat_init(mn, m, n, prec);
-        mpfr_mat_init(rm, n, m, prec);
-        mpfr_mat_init(rn, m, n, prec);
+        gr_mat_init(Wu, m, n, ctx);
+        gr_mat_init(Wd, m, n, ctx);
+        gr_mat_init(mm, n, m, ctx);
+        gr_mat_init(mn, m, n, ctx);
+        gr_mat_init(rm, n, m, ctx);
+        gr_mat_init(rn, m, n, ctx);
 
-        mpfr_mat_mul_classical(Wd, A, V, MPFR_RNDD);
-        mpfr_mat_mul_classical(Wu, A, V, MPFR_RNDU);
+        status |= gr_mat_mul(Wd, A, V, ctx_rnd_floor);
+        status |= gr_mat_mul(Wu, A, V, ctx_rnd_ceil);
 
-        mpfr_mat_clear(A);
-        mpfr_mat_clear(V);
+        gr_mat_clear(A, ctx);
+        gr_mat_clear(V, ctx);
 
-        mpfr_mat_init(bound3, n, n, prec);
+        gr_mat_init(bound3, n, n, ctx);
 
         for (i = 0; i < m; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(tmp, mpfr_mat_entry(Wu, i, j),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_div_ui(mpfr_mat_entry(mm, j, i), tmp, 2, MPFR_RNDU);
-                mpfr_sub(mpfr_mat_entry(rm, j, i), mpfr_mat_entry(mm, j, i),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_div_ui(mpfr_mat_entry(mn, i, j), tmp, 2, MPFR_RNDU);
-                mpfr_sub(mpfr_mat_entry(rn, i, j), mpfr_mat_entry(mn, i, j),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
+                status |= gr_add(tmp, MAT_ENTRY(Wu, i, j), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_div_ui(MAT_ENTRY(mm, j, i), tmp, 2, ctx_rnd_ceil);
+                status |= gr_sub(MAT_ENTRY(rm, j, i), MAT_ENTRY(mm, j, i), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_div_ui(MAT_ENTRY(mn, i, j), tmp, 2, ctx_rnd_ceil);
+                status |= gr_sub(MAT_ENTRY(rn, i, j), MAT_ENTRY(mn, i, j), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
             }
         }
 
-        mpfr_mat_clear(Wd);
-        mpfr_mat_clear(Wu);
+        gr_mat_clear(Wd, ctx);
+        gr_mat_clear(Wu, ctx);
 
-        mpfr_mat_init(Wd, n, n, prec);
-        mpfr_mat_init(Wu, n, n, prec);
+        gr_mat_init(Wd, n, n, ctx);
+        gr_mat_init(Wu, n, n, ctx);
 
-        mpfr_mat_mul_classical(Wd, mm, mn, MPFR_RNDD);
+        status |= gr_mat_mul(Wd, mm, mn, ctx_rnd_floor);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(Wd, i, i), mpfr_mat_entry(Wd, i, i), 1,
-                        MPFR_RNDD);
+            status |= gr_sub_ui(MAT_ENTRY(Wd, i, i), MAT_ENTRY(Wd, i, i), 1, ctx_rnd_floor);
         }
-        mpfr_mat_mul_classical(Wu, mm, mn, MPFR_RNDU);
+        status |= gr_mat_mul(Wu, mm, mn, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(Wu, i, i), mpfr_mat_entry(Wu, i, i), 1,
-                        MPFR_RNDU);
+            status |= gr_sub_ui(MAT_ENTRY(Wu, i, i), MAT_ENTRY(Wu, i, i), 1, ctx_rnd_ceil);
             for (j = 0; j < m; j++)
             {
                 if (j < n)
                 {
-                    mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                    mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                    mpfr_max(mpfr_mat_entry(Wu, i, j), ti, tj, MPFR_RNDU);
+                    status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                    status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                    status |= gr_max(MAT_ENTRY(Wu, i, j), ti, tj, ctx_rnd_ceil);
                 }
-                mpfr_abs(mpfr_mat_entry(mm, i, j), mpfr_mat_entry(mm, i, j),
-                         MPFR_RNDU);
+                status |= gr_abs(MAT_ENTRY(mm, i, j), MAT_ENTRY(mm, i, j), ctx_rnd_ceil);
             }
         }
 
-        mpfr_mat_clear(Wd);
-        mpfr_mat_init(Wd, m, n, prec);
+        gr_mat_clear(Wd, ctx);
+        gr_mat_init(Wd, m, n, ctx);
 
         for (i = 0; i < m; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_abs(mpfr_mat_entry(mn, i, j), mpfr_mat_entry(mn, i, j),
-                         MPFR_RNDU);
-                mpfr_add(mpfr_mat_entry(Wd, i, j), mpfr_mat_entry(mn, i, j),
-                         mpfr_mat_entry(rn, i, j), MPFR_RNDU);
+                status |= gr_abs(MAT_ENTRY(mn, i, j), MAT_ENTRY(mn, i, j), ctx_rnd_ceil);
+                status |= gr_add(MAT_ENTRY(Wd, i, j), MAT_ENTRY(mn, i, j), MAT_ENTRY(rn, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(bound3, rm, Wd, MPFR_RNDU);
+        status |= gr_mat_mul(bound3, rm, Wd, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound3, i, j),
-                         mpfr_mat_entry(bound3, i, j), mpfr_mat_entry(Wu, i,
-                                                                      j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound3, i, j), MAT_ENTRY(bound3, i, j), MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(Wu, mm, rn, MPFR_RNDU);
+        status |= gr_mat_mul(Wu, mm, rn, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound3, i, j),
-                         mpfr_mat_entry(bound3, i, j), mpfr_mat_entry(Wu, i,
-                                                                      j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound3, i, j), MAT_ENTRY(bound3, i, j), MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
             }
         }
 
-        mpfr_mat_clear(Wu);
-        mpfr_mat_clear(Wd);
-        mpfr_mat_clear(mm);
-        mpfr_mat_clear(mn);
-        mpfr_mat_clear(rm);
-        mpfr_mat_clear(rn);
+        gr_mat_clear(Wu, ctx);
+        gr_mat_clear(Wd, ctx);
+        gr_mat_clear(mm, ctx);
+        gr_mat_clear(mn, ctx);
+        gr_mat_clear(rm, ctx);
+        gr_mat_clear(rn, ctx);
 
-        mpfr_mat_init(boundt, n, n, prec);
+        gr_mat_init(boundt, n, n, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_set(mpfr_mat_entry(boundt, j, i),
-                         mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                mpfr_set(ti, mpfr_mat_entry(bound2, i, j), MPFR_RNDU);
-                mpfr_set(tj, mpfr_mat_entry(bound3, i, j), MPFR_RNDU);
-                mpfr_add(mpfr_mat_entry(bound2, i, j), ti, tj, MPFR_RNDU);
+                status |= gr_set(MAT_ENTRY(boundt, j, i), MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
+                status |= gr_set(ti, MAT_ENTRY(bound2, i, j), ctx_rnd_ceil);
+                status |= gr_set(tj, MAT_ENTRY(bound3, i, j), ctx_rnd_ceil);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), ti, tj, ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(bound, bound2, bound, MPFR_RNDU);
-        mpfr_mat_mul_classical(bound, boundt, bound, MPFR_RNDU);
+        status |= gr_mat_mul(bound, bound2, bound, ctx_rnd_ceil);
+        status |= gr_mat_mul(bound, boundt, bound, ctx_rnd_ceil);
 
-        mpfr_mat_clear(bound2);
-        mpfr_mat_clear(bound3);
-        mpfr_mat_clear(boundt);
+        gr_mat_clear(bound2, ctx);
+        gr_mat_clear(bound3, ctx);
+        gr_mat_clear(boundt, ctx);
 
-        mpfr_set_zero(norm, 1);
+        status |= gr_zero(norm, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_set_zero(s, 1);
+            status |= gr_zero(s, ctx_rnd_ceil);
             for (j = 0; j < n; j++)
             {
-                mpfr_abs(tmp, mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                mpfr_add(s, s, tmp, MPFR_RNDU);
+                status |= gr_abs(tmp, MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
+                status |= gr_add(s, s, tmp, ctx_rnd_ceil);
             }
-            mpfr_max(norm, norm, s, MPFR_RNDU);
+            status |= gr_max(norm, norm, s, ctx_rnd_ceil);
         }
-        if (mpfr_cmp_ui(norm, 1) >= 0)
+        if (status != GR_SUCCESS || gr_lt(norm, one, ctx) != T_TRUE)
             goto fail_clear_R_bound_bla;
 
-        mpfr_mat_init(absR, n, n, prec);
+        gr_mat_init(absR, n, n, ctx);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
                 if (j >= i)
                 {
-                    mpfr_mul(ti, norm, norm, MPFR_RNDU);
-                    mpfr_ui_sub(tj, 1, norm, MPFR_RNDU);
-                    mpfr_div(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(mpfr_mat_entry(bound, i, j),
-                             mpfr_mat_entry(bound, i, j), tmp, MPFR_RNDU);
+                    status |= gr_mul(ti, norm, norm, ctx_rnd_ceil);
+                    status |= gr_sub(tj, one, norm, ctx_rnd_ceil);
+                    status |= gr_div(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(MAT_ENTRY(bound, i, j), MAT_ENTRY(bound, i, j), tmp, ctx_rnd_ceil);
                 }
                 else
                 {
-                    mpfr_set_zero(mpfr_mat_entry(bound, i, j), 1);
+                    status |= gr_zero(MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
                 }
-                mpfr_abs(mpfr_mat_entry(absR, i, j), mpfr_mat_entry(R, i, j),
-                         MPFR_RNDU);
+                status |= gr_abs(MAT_ENTRY(absR, i, j), MAT_ENTRY(R, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(bound, bound, absR, MPFR_RNDU);
+        status |= gr_mat_mul(bound, bound, absR, ctx_rnd_ceil);
 
-        mpfr_mat_clear(absR);
+        gr_mat_clear(absR, ctx);
 
         for (i = 0; i < n - 1; i++)
         {
-            mpfr_sub(tmp, mpfr_mat_entry(R, i, i), mpfr_mat_entry(bound, i, i),
-                     MPFR_RNDD);
-            mpfr_mul_d(ti, tmp, fl->eta, MPFR_RNDD);
+            status |= gr_sub(tmp, MAT_ENTRY(R, i, i), MAT_ENTRY(bound, i, i), ctx_rnd_floor);
+
+            /* want  status |= gr_mul_d(ti, tmp, fl->eta, ctx_rnd_floor); */
+            status |= gr_set_d(ti, fl->eta, ctx_rnd_ceil);  /* actually exact; rnd does not matter */
+            status |= gr_mul(ti, tmp, ti, ctx_rnd_floor);
+
             for (j = i + 1; j < n; j++)
             {
-                mpfr_abs(tmp, mpfr_mat_entry(R, i, j), MPFR_RNDU);
-                mpfr_add(tj, tmp, mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                if (!mpfr_lessequal_p(tj, ti))
+                status |= gr_abs(tmp, MAT_ENTRY(R, i, j), ctx_rnd_ceil);
+                status |= gr_add(tj, tmp, MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
+
+                if (status != GR_SUCCESS || gr_le(tj, ti, ctx) != T_TRUE)
                     goto fail_clear_R_bound_bla;
             }
-            mpfr_add(ti, mpfr_mat_entry(R, i, i), mpfr_mat_entry(bound, i, i),
-                     MPFR_RNDU);
-            mpfr_sub(tj, mpfr_mat_entry(R, i + 1, i + 1),
-                     mpfr_mat_entry(bound, i + 1, i + 1), MPFR_RNDD);
-            mpfr_abs(tmp, mpfr_mat_entry(R, i, i + 1), MPFR_RNDD);
-            mpfr_sub(norm, tmp, mpfr_mat_entry(bound, i, i + 1), MPFR_RNDD);
-            mpfr_div(tmp, norm, ti, MPFR_RNDD);
-            mpfr_sqr(norm, tmp, MPFR_RNDD);
-            mpfr_sub_d(s, norm, fl->delta, MPFR_RNDD);
-            mpfr_neg(s, s, MPFR_RNDD);
-            mpfr_sqrt(tmp, s, MPFR_RNDU);
-            mpfr_mul(s, tmp, ti, MPFR_RNDU);
-            if (!mpfr_lessequal_p(s, tj))
+            status |= gr_add(ti, MAT_ENTRY(R, i, i), MAT_ENTRY(bound, i, i), ctx_rnd_ceil);
+            status |= gr_sub(tj, MAT_ENTRY(R, i + 1, i + 1), MAT_ENTRY(bound, i + 1, i + 1), ctx_rnd_floor);
+            status |= gr_abs(tmp, MAT_ENTRY(R, i, i + 1), ctx_rnd_floor);
+            status |= gr_sub(norm, tmp, MAT_ENTRY(bound, i, i + 1), ctx_rnd_floor);
+            status |= gr_div(tmp, norm, ti, ctx_rnd_floor);
+            status |= gr_sqr(norm, tmp, ctx_rnd_floor);
+
+            /* want status |= gr_sub_d(s, norm, fl->delta, ctx_rnd_floor); */
+            status |= gr_set_d(tmp, fl->delta, ctx_rnd_ceil);  /* actually exact; rnd does not matter */
+            status |= gr_sub(s, norm, tmp, ctx_rnd_floor);
+
+            status |= gr_neg(s, s, ctx_rnd_floor);
+            status |= gr_sqrt(tmp, s, ctx_rnd_ceil);
+            status |= gr_mul(s, tmp, ti, ctx_rnd_ceil);
+
+            if (status != GR_SUCCESS || gr_le(s, tj, ctx) != T_TRUE)
                 goto fail_clear_R_bound_bla;
         }
 
-        mpfr_mat_clear(R);
-        mpfr_mat_clear(bound);
-        mpfr_clears(s, norm, ti, tj, tmp, NULL);
+        gr_mat_clear(R, ctx);
+        gr_mat_clear(bound, ctx);
+        GR_TMP_CLEAR5(s, norm, ti, tj, tmp, ctx);
     }
     else
     {
         slong i, j, k, m;
-        mpfr_mat_t bound2, bound3, boundt, mm, rm, mn, rn, absR;
+        gr_mat_t bound2, bound3, boundt, mm, rm, mn, rn, absR;
 
         if (B->r == 0 || B->r == 1)
+        {
+            GR_TMP_CLEAR2(zero, one, ctx);
             return 1;
+        }
 
         m = B->c;
         n = B->r;
 
-        mpfr_mat_init(A, m, n, prec);
-        mpfr_mat_init(R, n, n, prec);
-        mpfr_mat_init(V, n, n, prec);
-        mpfr_mat_zero(R);
-        mpfr_mat_zero(V);
+        gr_mat_init(A, m, n, ctx);
+        gr_mat_init(R, n, n, ctx);
+        gr_mat_init(V, n, n, ctx);
 
-        mpfr_inits2(prec, s, norm, ti, tj, tmp, NULL);
+        GR_TMP_INIT5(s, norm, ti, tj, tmp, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < m; j++)
             {
-                fmpz_get_mpfr(mpfr_mat_entry(A, j, i), fmpz_mat_entry(B, i, j),
-                              MPFR_RNDN);
+                status |= gr_set_fmpz(MAT_ENTRY(A, j, i), fmpz_mat_entry(B, i, j), ctx);
             }
         }
 
+        /* Todo: implement using dot products */
         for (j = 0; j < n; j++)
         {
-            mpfr_set(mpfr_mat_entry(R, j, j), mpfr_mat_entry(A, j, j),
-                     MPFR_RNDN);
+            status |= gr_set(MAT_ENTRY(R, j, j), MAT_ENTRY(A, j, j), ctx);
             for (i = 0; i <= j - 1; i++)
             {
-                mpfr_set(mpfr_mat_entry(R, i, j), mpfr_mat_entry(A, j, i),
-                         MPFR_RNDN);
+                status |= gr_set(MAT_ENTRY(R, i, j), MAT_ENTRY(A, j, i), ctx);
                 for (k = 0; k <= i - 1; k++)
                 {
-                    mpfr_mul(tmp, mpfr_mat_entry(R, k, i),
-                             mpfr_mat_entry(R, k, j), MPFR_RNDN);
-                    mpfr_sub(mpfr_mat_entry(R, i, j), mpfr_mat_entry(R, i, j),
-                             tmp, MPFR_RNDN);
+                    status |= gr_mul(tmp, MAT_ENTRY(R, k, i), MAT_ENTRY(R, k, j), ctx);
+                    status |= gr_sub(MAT_ENTRY(R, i, j), MAT_ENTRY(R, i, j), tmp, ctx);
                 }
-                if (!mpfr_zero_p(mpfr_mat_entry(R, i, i)))
+
+                if (gr_is_zero(MAT_ENTRY(R, i, i), ctx) != T_TRUE)
                 {
-                    mpfr_div(mpfr_mat_entry(R, i, j), mpfr_mat_entry(R, i, j),
-                             mpfr_mat_entry(R, i, i), MPFR_RNDN);
-                    mpfr_mul(tmp, mpfr_mat_entry(R, i, j),
-                             mpfr_mat_entry(R, i, j), MPFR_RNDN);
-                    mpfr_sub(mpfr_mat_entry(R, j, j), mpfr_mat_entry(R, j, j),
-                             tmp, MPFR_RNDN);
+                    status |= gr_div(MAT_ENTRY(R, i, j), MAT_ENTRY(R, i, j), MAT_ENTRY(R, i, i), ctx);
+                    status |= gr_mul(tmp, MAT_ENTRY(R, i, j), MAT_ENTRY(R, i, j), ctx);
+                    status |= gr_sub(MAT_ENTRY(R, j, j), MAT_ENTRY(R, j, j), tmp, ctx);
                 }
             }
 
-            if (mpfr_sgn(mpfr_mat_entry(R, j, j)) <= 0)
+            if (status != GR_SUCCESS || gr_gt(MAT_ENTRY(R, j, j), zero, ctx) != T_TRUE)
             {
                 /* going to take sqrt and then divide by it */
                 goto fail_clear_A_R_V;
             }
 
-            mpfr_sqrt(mpfr_mat_entry(R, j, j), mpfr_mat_entry(R, j, j),
-                      MPFR_RNDN);
+            status |= gr_sqrt(MAT_ENTRY(R, j, j), MAT_ENTRY(R, j, j), ctx);
         }
 
         for (j = n - 1; j >= 0; j--)
         {
-            mpfr_ui_div(mpfr_mat_entry(V, j, j), 1, mpfr_mat_entry(R, j, j),
-                        MPFR_RNDN);
+            status |= gr_inv(MAT_ENTRY(V, j, j), MAT_ENTRY(R, j, j), ctx);
             for (i = j + 1; i < n; i++)
             {
                 for (k = j + 1; k < n; k++)
                 {
-                    mpfr_mul(norm, mpfr_mat_entry(V, k, i),
-                             mpfr_mat_entry(R, j, k), MPFR_RNDN);
-                    mpfr_add(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                             norm, MPFR_RNDN);
+                    status |= gr_mul(norm, MAT_ENTRY(V, k, i), MAT_ENTRY(R, j, k), ctx);
+                    status |= gr_add(MAT_ENTRY(V, j, i), MAT_ENTRY(V, j, i), norm, ctx);
                 }
-                mpfr_mul_si(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                            -WORD(1), MPFR_RNDN);
-                mpfr_mul(mpfr_mat_entry(V, j, i), mpfr_mat_entry(V, j, i),
-                         mpfr_mat_entry(V, j, j), MPFR_RNDN);
+                status |= gr_neg(MAT_ENTRY(V, j, i), MAT_ENTRY(V, j, i), ctx);
+                status |= gr_mul(MAT_ENTRY(V, j, i), MAT_ENTRY(V, j, i), MAT_ENTRY(V, j, j), ctx);
             }
         }
 
-        mpfr_mat_init(Wu, n, n, prec);
-        mpfr_mat_init(Wd, n, n, prec);
-        du = _mpfr_vec_init(n, prec);
-        dd = _mpfr_vec_init(n, prec);
+        gr_mat_init(Wu, n, n, ctx);
+        gr_mat_init(Wd, n, n, ctx);
+        du = gr_heap_init_vec(n, ctx);
+        dd = gr_heap_init_vec(n, ctx);
 
-        mpfr_mat_mul_classical(Wd, R, V, MPFR_RNDD);
+        status |= gr_mat_mul(Wd, R, V, ctx_rnd_floor);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(dd + i, mpfr_mat_entry(Wd, i, i), 1, MPFR_RNDD);
+            status |= gr_sub_ui(ENTRY(dd, i), MAT_ENTRY(Wd, i, i), 1, ctx_rnd_floor);
         }
-        mpfr_mat_mul_classical(Wu, R, V, MPFR_RNDU);
+        status |= gr_mat_mul(Wu, R, V, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(du + i, mpfr_mat_entry(Wu, i, i), 1, MPFR_RNDU);
+            status |= gr_sub_ui(ENTRY(du, i), MAT_ENTRY(Wu, i, i), 1, ctx_rnd_ceil);
         }
-        mpfr_set_zero(norm, 1);
+        status |= gr_zero(norm, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_set_zero(s, 1);
+            status |= gr_zero(s, ctx_rnd_ceil);
             for (j = 0; j < n; j++)
             {
                 if (i != j)
                 {
-                    mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                    mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                    mpfr_max(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(s, s, tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                    status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                    status |= gr_max(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(s, s, tmp, ctx_rnd_ceil);
                 }
                 else
                 {
-                    mpfr_abs(ti, dd + i, MPFR_RNDU);
-                    mpfr_abs(tj, du + i, MPFR_RNDU);
-                    mpfr_max(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(s, s, tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, ENTRY(dd, i), ctx_rnd_ceil);
+                    status |= gr_abs(tj, ENTRY(du, i), ctx_rnd_ceil);
+                    status |= gr_max(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(s, s, tmp, ctx_rnd_ceil);
                 }
             }
-            mpfr_max(norm, norm, s, MPFR_RNDU);
+            status |= gr_max(norm, norm, s, ctx_rnd_ceil);
         }
-        if (mpfr_cmp_ui(norm, 1) >= 0)
+
+        if (status != GR_SUCCESS || gr_lt(norm, one, ctx) != T_TRUE)
         {
 fail_clear_all:
-            mpfr_mat_clear(Wu);
-            mpfr_mat_clear(Wd);
-            _mpfr_vec_clear(du, n);
-            _mpfr_vec_clear(dd, n);
-            mpfr_clears(s, norm, ti, tj, tmp, NULL);
+            gr_mat_clear(Wu, ctx);
+            gr_mat_clear(Wd, ctx);
+            gr_heap_clear_vec(du, n, ctx);
+            gr_heap_clear_vec(dd, n, ctx);
+            GR_TMP_CLEAR5(s, norm, ti, tj, tmp, ctx);
 fail_clear_A_R_V:
-            mpfr_mat_clear(A);
-            mpfr_mat_clear(R);
-            mpfr_mat_clear(V);
+            gr_mat_clear(A, ctx);
+            gr_mat_clear(R, ctx);
+            gr_mat_clear(V, ctx);
+
+            GR_TMP_CLEAR2(zero, one, ctx);
             return 0;
         }
 
-        mpfr_mat_init(bound, n, n, prec);
+        gr_mat_init(bound, n, n, ctx);
 
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(dd + i, mpfr_mat_entry(Wd, i, i), 2, MPFR_RNDD);
+            status |= gr_sub_ui(ENTRY(dd, i), MAT_ENTRY(Wd, i, i), 2, ctx_rnd_floor);
         }
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(du + i, mpfr_mat_entry(Wu, i, i), 2, MPFR_RNDU);
+            status |= gr_sub_ui(ENTRY(du, i), MAT_ENTRY(Wu, i, i), 2, ctx_rnd_ceil);
         }
         for (i = 0; i < n; i++)
         {
@@ -636,292 +604,278 @@ fail_clear_A_R_V:
             {
                 if (j > i)
                 {
-                    mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                    mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                    mpfr_max(mpfr_mat_entry(bound, i, j), ti, tj, MPFR_RNDU);
-                    mpfr_mul(ti, norm, norm, MPFR_RNDU);
-                    mpfr_ui_sub(tj, 1, norm, MPFR_RNDU);
-                    mpfr_div(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(mpfr_mat_entry(bound, i, j),
-                             mpfr_mat_entry(bound, i, j), tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                    status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                    status |= gr_max(MAT_ENTRY(bound, i, j), ti, tj, ctx_rnd_ceil);
+                    status |= gr_mul(ti, norm, norm, ctx_rnd_ceil);
+                    status |= gr_sub(tj, one, norm, ctx_rnd_ceil);
+                    status |= gr_div(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(MAT_ENTRY(bound, i, j), MAT_ENTRY(bound, i, j), tmp, ctx_rnd_ceil);
                 }
                 else if (j < i)
                 {
-                    mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                    mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                    mpfr_max(mpfr_mat_entry(bound, i, j), ti, tj, MPFR_RNDU);
+                    status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                    status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                    status |= gr_max(MAT_ENTRY(bound, i, j), ti, tj, ctx_rnd_ceil);
                 }
                 else
                 {
-                    mpfr_abs(ti, dd + i, MPFR_RNDU);
-                    mpfr_abs(tj, du + i, MPFR_RNDU);
-                    mpfr_max(mpfr_mat_entry(bound, i, j), ti, tj, MPFR_RNDU);
-                    mpfr_mul(ti, norm, norm, MPFR_RNDU);
-                    mpfr_ui_sub(tj, 1, norm, MPFR_RNDU);
-                    mpfr_div(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(mpfr_mat_entry(bound, i, j),
-                             mpfr_mat_entry(bound, i, j), tmp, MPFR_RNDU);
+                    status |= gr_abs(ti, ENTRY(dd, i), ctx_rnd_ceil);
+                    status |= gr_abs(tj, ENTRY(du, i), ctx_rnd_ceil);
+                    status |= gr_max(MAT_ENTRY(bound, i, j), ti, tj, ctx_rnd_ceil);
+                    status |= gr_mul(ti, norm, norm, ctx_rnd_ceil);
+                    status |= gr_sub(tj, one, norm, ctx_rnd_ceil);
+                    status |= gr_div(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(MAT_ENTRY(bound, i, j), MAT_ENTRY(bound, i, j), tmp, ctx_rnd_ceil);
                 }
             }
         }
-        _mpfr_vec_clear(dd, n);
-        _mpfr_vec_clear(du, n);
+        gr_heap_clear_vec(dd, n, ctx);
+        gr_heap_clear_vec(du, n, ctx);
 
-        mpfr_mat_init(mm, n, n, prec);
-        mpfr_mat_init(rm, n, n, prec);
-        mpfr_mat_init(mn, n, n, prec);
-        mpfr_mat_init(rn, n, n, prec);
-        mpfr_mat_init(bound2, n, n, prec);
+        gr_mat_init(mm, n, n, ctx);
+        gr_mat_init(rm, n, n, ctx);
+        gr_mat_init(mn, n, n, ctx);
+        gr_mat_init(rn, n, n, ctx);
+        gr_mat_init(bound2, n, n, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(tmp, mpfr_mat_entry(Wu, i, j),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_div_ui(mpfr_mat_entry(mm, j, i), tmp, 2, MPFR_RNDU);
-                mpfr_sub(mpfr_mat_entry(rm, j, i), mpfr_mat_entry(mm, j, i),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_div_ui(mpfr_mat_entry(mn, i, j), tmp, 2, MPFR_RNDU);
-                mpfr_sub(mpfr_mat_entry(rn, i, j), mpfr_mat_entry(mn, i, j),
-                         mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
+                status |= gr_add(tmp, MAT_ENTRY(Wu, i, j), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_mul_2exp_si(MAT_ENTRY(mm, j, i), tmp, -1, ctx_rnd_ceil);
+                status |= gr_sub(MAT_ENTRY(rm, j, i), MAT_ENTRY(mm, j, i), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_mul_2exp_si(MAT_ENTRY(mn, i, j), tmp, -1, ctx_rnd_ceil);
+                status |= gr_sub(MAT_ENTRY(rn, i, j), MAT_ENTRY(mn, i, j), MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(Wd, mm, mn, MPFR_RNDD);
+        status |= gr_mat_mul(Wd, mm, mn, ctx_rnd_floor);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(Wd, i, i), mpfr_mat_entry(Wd, i, i), 1,
-                        MPFR_RNDD);
+            status |= gr_sub_ui(MAT_ENTRY(Wd, i, i), MAT_ENTRY(Wd, i, i), 1, ctx_rnd_floor);
         }
-        mpfr_mat_mul_classical(Wu, mm, mn, MPFR_RNDU);
+        status |= gr_mat_mul(Wu, mm, mn, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(Wu, i, i), mpfr_mat_entry(Wu, i, i), 1,
-                        MPFR_RNDU);
+            status |= gr_sub_ui(MAT_ENTRY(Wu, i, i), MAT_ENTRY(Wu, i, i), 1, ctx_rnd_ceil);
             for (j = 0; j < n; j++)
             {
-                mpfr_abs(ti, mpfr_mat_entry(Wd, i, j), MPFR_RNDU);
-                mpfr_abs(tj, mpfr_mat_entry(Wu, i, j), MPFR_RNDU);
-                mpfr_max(mpfr_mat_entry(Wu, i, j), ti, tj, MPFR_RNDU);
-                mpfr_abs(mpfr_mat_entry(mm, i, j), mpfr_mat_entry(mm, i, j),
-                         MPFR_RNDU);
-                mpfr_abs(mpfr_mat_entry(mn, i, j), mpfr_mat_entry(mn, i, j),
-                         MPFR_RNDU);
+                status |= gr_abs(ti, MAT_ENTRY(Wd, i, j), ctx_rnd_ceil);
+                status |= gr_abs(tj, MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
+                status |= gr_max(MAT_ENTRY(Wu, i, j), ti, tj, ctx_rnd_ceil);
+                status |= gr_abs(MAT_ENTRY(mm, i, j), MAT_ENTRY(mm, i, j), ctx_rnd_ceil);
+                status |= gr_abs(MAT_ENTRY(mn, i, j), MAT_ENTRY(mn, i, j), ctx_rnd_ceil);
             }
         }
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound2, i, j),
-                         mpfr_mat_entry(mn, i, j), mpfr_mat_entry(rn, i, j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), MAT_ENTRY(mn, i, j), MAT_ENTRY(rn, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(bound2, rm, bound2, MPFR_RNDU);
+        status |= gr_mat_mul(bound2, rm, bound2, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound2, i, j),
-                         mpfr_mat_entry(bound2, i, j), mpfr_mat_entry(Wu, i,
-                                                                      j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), MAT_ENTRY(bound2, i, j), MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(Wu, mm, rn, MPFR_RNDU);
+        status |= gr_mat_mul(Wu, mm, rn, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_add(mpfr_mat_entry(bound2, i, j),
-                         mpfr_mat_entry(bound2, i, j), mpfr_mat_entry(Wu, i,
-                                                                      j),
-                         MPFR_RNDU);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), MAT_ENTRY(bound2, i, j), MAT_ENTRY(Wu, i, j), ctx_rnd_ceil);
             }
         }
 
-        mpfr_mat_clear(Wu);
-        mpfr_mat_clear(Wd);
-        mpfr_mat_clear(mm);
-        mpfr_mat_clear(mn);
-        mpfr_mat_clear(rm);
-        mpfr_mat_clear(rn);
+        gr_mat_clear(Wu, ctx);
+        gr_mat_clear(Wd, ctx);
+        gr_mat_clear(mm, ctx);
+        gr_mat_clear(mn, ctx);
+        gr_mat_clear(rm, ctx);
+        gr_mat_clear(rn, ctx);
 
-        mpfr_mat_init(Wu, m, n, prec);
-        mpfr_mat_init(Wd, m, n, prec);
-        mpfr_mat_init(mm, n, m, prec);
-        mpfr_mat_init(mn, m, n, prec);
-        mpfr_mat_init(rm, n, m, prec);
-        mpfr_mat_init(rn, m, n, prec);
+        gr_mat_init(Wu, m, n, ctx);
+        gr_mat_init(Wd, m, n, ctx);
+        gr_mat_init(mm, n, m, ctx);
+        gr_mat_init(mn, m, n, ctx);
+        gr_mat_init(rm, n, m, ctx);
+        gr_mat_init(rn, m, n, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_set(mpfr_mat_entry(mm, j, i), mpfr_mat_entry(V, i, j),
-                         MPFR_RNDU);
+                status |= gr_set(MAT_ENTRY(mm, j, i), MAT_ENTRY(V, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(Wd, mm, A, MPFR_RNDD);
-        mpfr_mat_mul_classical(Wu, mm, A, MPFR_RNDU);
+        status |= gr_mat_mul(Wd, mm, A, ctx_rnd_floor);
+        status |= gr_mat_mul(Wu, mm, A, ctx_rnd_ceil);
 
-        mpfr_mat_clear(A);
+        gr_mat_clear(A, ctx);
 
-        mpfr_mat_init(bound3, n, n, prec);
+        gr_mat_init(bound3, n, n, ctx);
 
-        mpfr_mat_mul_classical(mm, Wd, V, MPFR_RNDD);
+        status |= gr_mat_mul(mm, Wd, V, ctx_rnd_floor);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(mm, i, i), mpfr_mat_entry(mm, i, i), 1,
-                        MPFR_RNDD);
+            status |= gr_sub_ui(MAT_ENTRY(mm, i, i), MAT_ENTRY(mm, i, i), 1, ctx_rnd_floor);
         }
-        mpfr_mat_mul_classical(rm, Wd, V, MPFR_RNDU);
+        status |= gr_mat_mul(rm, Wd, V, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(rm, i, i), mpfr_mat_entry(rm, i, i), 1,
-                        MPFR_RNDU);
+            status |= gr_sub_ui(MAT_ENTRY(rm, i, i), MAT_ENTRY(rm, i, i), 1, ctx_rnd_ceil);
         }
 
-        mpfr_mat_mul_classical(mn, Wu, V, MPFR_RNDD);
+        status |= gr_mat_mul(mn, Wu, V, ctx_rnd_floor);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(mn, i, i), mpfr_mat_entry(mn, i, i), 1,
-                        MPFR_RNDD);
+            status |= gr_sub_ui(MAT_ENTRY(mn, i, i), MAT_ENTRY(mn, i, i), 1, ctx_rnd_floor);
         }
-        mpfr_mat_mul_classical(rn, Wu, V, MPFR_RNDU);
+        status |= gr_mat_mul(rn, Wu, V, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_sub_ui(mpfr_mat_entry(rn, i, i), mpfr_mat_entry(rn, i, i), 1,
-                        MPFR_RNDU);
+            status |= gr_sub_ui(MAT_ENTRY(rn, i, i), MAT_ENTRY(rn, i, i), 1, ctx_rnd_ceil);
         }
 
-        mpfr_mat_clear(Wd);
-        mpfr_mat_clear(Wu);
-        mpfr_mat_clear(V);
+        gr_mat_clear(Wd, ctx);
+        gr_mat_clear(Wu, ctx);
+        gr_mat_clear(V, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_abs(ti, mpfr_mat_entry(mm, i, j), MPFR_RNDU);
-                mpfr_abs(tj, mpfr_mat_entry(mn, i, j), MPFR_RNDU);
-                mpfr_max(mpfr_mat_entry(bound3, i, j), ti, tj, MPFR_RNDU);
-                mpfr_abs(tmp, mpfr_mat_entry(rm, i, j), MPFR_RNDU);
-                mpfr_max(mpfr_mat_entry(bound3, i, j),
-                         mpfr_mat_entry(bound3, i, j), tmp, MPFR_RNDU);
-                mpfr_abs(tmp, mpfr_mat_entry(rn, i, j), MPFR_RNDU);
-                mpfr_max(mpfr_mat_entry(bound3, i, j),
-                         mpfr_mat_entry(bound3, i, j), tmp, MPFR_RNDU);
+                status |= gr_abs(ti, MAT_ENTRY(mm, i, j), ctx_rnd_ceil);
+                status |= gr_abs(tj, MAT_ENTRY(mn, i, j), ctx_rnd_ceil);
+                status |= gr_max(MAT_ENTRY(bound3, i, j), ti, tj, ctx_rnd_ceil);
+                status |= gr_abs(tmp, MAT_ENTRY(rm, i, j), ctx_rnd_ceil);
+                status |= gr_max(MAT_ENTRY(bound3, i, j), MAT_ENTRY(bound3, i, j), tmp, ctx_rnd_ceil);
+                status |= gr_abs(tmp, MAT_ENTRY(rn, i, j), ctx_rnd_ceil);
+                status |= gr_max(MAT_ENTRY(bound3, i, j), MAT_ENTRY(bound3, i, j), tmp, ctx_rnd_ceil);
             }
         }
 
-        mpfr_mat_clear(mm);
-        mpfr_mat_clear(mn);
-        mpfr_mat_clear(rm);
-        mpfr_mat_clear(rn);
+        gr_mat_clear(mm, ctx);
+        gr_mat_clear(mn, ctx);
+        gr_mat_clear(rm, ctx);
+        gr_mat_clear(rn, ctx);
 
-        mpfr_mat_init(boundt, n, n, prec);
+        gr_mat_init(boundt, n, n, ctx);
 
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
-                mpfr_set(mpfr_mat_entry(boundt, j, i),
-                         mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                mpfr_set(ti, mpfr_mat_entry(bound2, i, j), MPFR_RNDU);
-                mpfr_set(tj, mpfr_mat_entry(bound3, i, j), MPFR_RNDU);
-                mpfr_add(mpfr_mat_entry(bound2, i, j), ti, tj, MPFR_RNDU);
+                status |= gr_set(MAT_ENTRY(boundt, j, i), MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
+                status |= gr_set(ti, MAT_ENTRY(bound2, i, j), ctx_rnd_ceil);
+                status |= gr_set(tj, MAT_ENTRY(bound3, i, j), ctx_rnd_ceil);
+                status |= gr_add(MAT_ENTRY(bound2, i, j), ti, tj, ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(bound, bound2, bound, MPFR_RNDU);
-        mpfr_mat_mul_classical(bound, boundt, bound, MPFR_RNDU);
+        status |= gr_mat_mul(bound, bound2, bound, ctx_rnd_ceil);
+        status |= gr_mat_mul(bound, boundt, bound, ctx_rnd_ceil);
 
-        mpfr_mat_clear(bound2);
-        mpfr_mat_clear(bound3);
-        mpfr_mat_clear(boundt);
+        gr_mat_clear(bound2, ctx);
+        gr_mat_clear(bound3, ctx);
+        gr_mat_clear(boundt, ctx);
 
-        mpfr_set_zero(norm, 1);
+        status |= gr_zero(norm, ctx_rnd_ceil);
         for (i = 0; i < n; i++)
         {
-            mpfr_set_zero(s, 1);
+            status |= gr_zero(s, ctx_rnd_ceil);
             for (j = 0; j < n; j++)
             {
-                mpfr_abs(tmp, mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                mpfr_add(s, s, tmp, MPFR_RNDU);
+                status |= gr_abs(tmp, MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
+                status |= gr_add(s, s, tmp, ctx_rnd_ceil);
             }
-            mpfr_max(norm, norm, s, MPFR_RNDU);
+            status |= gr_max(norm, norm, s, ctx_rnd_ceil);
         }
-        if (mpfr_cmp_ui(norm, 1) >= 0)
+        if (status != GR_SUCCESS || gr_lt(norm, one, ctx) != T_TRUE)
             goto fail_clear_R_bound_bla;
 
-        mpfr_mat_init(absR, n, n, prec);
+
+        gr_mat_init(absR, n, n, ctx);
         for (i = 0; i < n; i++)
         {
             for (j = 0; j < n; j++)
             {
                 if (j >= i)
                 {
-                    mpfr_mul(ti, norm, norm, MPFR_RNDU);
-                    mpfr_ui_sub(tj, 1, norm, MPFR_RNDU);
-                    mpfr_div(tmp, ti, tj, MPFR_RNDU);
-                    mpfr_add(mpfr_mat_entry(bound, i, j),
-                             mpfr_mat_entry(bound, i, j), tmp, MPFR_RNDU);
+                    status |= gr_mul(ti, norm, norm, ctx_rnd_ceil);
+                    status |= gr_sub(tj, one, norm, ctx_rnd_ceil);
+                    status |= gr_div(tmp, ti, tj, ctx_rnd_ceil);
+                    status |= gr_add(MAT_ENTRY(bound, i, j), MAT_ENTRY(bound, i, j), tmp, ctx_rnd_ceil);
                 }
                 else
                 {
-                    mpfr_set_zero(mpfr_mat_entry(bound, i, j), 1);
+                    status |= gr_zero(MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
                 }
-                mpfr_abs(mpfr_mat_entry(absR, i, j), mpfr_mat_entry(R, i, j),
-                         MPFR_RNDU);
+                status |= gr_abs(MAT_ENTRY(absR, i, j), MAT_ENTRY(R, i, j), ctx_rnd_ceil);
             }
         }
-        mpfr_mat_mul_classical(bound, bound, absR, MPFR_RNDU);
+        status |= gr_mat_mul(bound, bound, absR, ctx_rnd_ceil);
 
-        mpfr_mat_clear(absR);
+        gr_mat_clear(absR, ctx);
 
         for (i = 0; i < n - 1; i++)
         {
-            mpfr_sub(tmp, mpfr_mat_entry(R, i, i), mpfr_mat_entry(bound, i, i),
-                     MPFR_RNDD);
-            mpfr_mul_d(ti, tmp, fl->eta, MPFR_RNDD);
+            status |= gr_sub(tmp, MAT_ENTRY(R, i, i), MAT_ENTRY(bound, i, i), ctx_rnd_floor);
+
+            /* want  status |= gr_mul_d(ti, tmp, fl->eta, ctx_rnd_floor); */
+            status |= gr_set_d(ti, fl->eta, ctx_rnd_ceil);  /* actually exact; rnd does not matter */
+            status |= gr_mul(ti, tmp, ti, ctx_rnd_floor);
+
             for (j = i + 1; j < n; j++)
             {
-                mpfr_abs(tmp, mpfr_mat_entry(R, i, j), MPFR_RNDU);
-                mpfr_add(tj, tmp, mpfr_mat_entry(bound, i, j), MPFR_RNDU);
-                if (!mpfr_lessequal_p(tj, ti))
+                status |= gr_abs(tmp, MAT_ENTRY(R, i, j), ctx_rnd_ceil);
+                status |= gr_add(tj, tmp, MAT_ENTRY(bound, i, j), ctx_rnd_ceil);
+
+                if (status != GR_SUCCESS || gr_le(tj, ti, ctx) != T_TRUE)
                     goto fail_clear_R_bound_bla;
             }
-            mpfr_add(ti, mpfr_mat_entry(R, i, i), mpfr_mat_entry(bound, i, i),
-                     MPFR_RNDU);
-            mpfr_sub(tj, mpfr_mat_entry(R, i + 1, i + 1),
-                     mpfr_mat_entry(bound, i + 1, i + 1), MPFR_RNDD);
-            mpfr_abs(tmp, mpfr_mat_entry(R, i, i + 1), MPFR_RNDD);
-            mpfr_sub(norm, tmp, mpfr_mat_entry(bound, i, i + 1), MPFR_RNDD);
-            mpfr_div(tmp, norm, ti, MPFR_RNDD);
-            mpfr_sqr(norm, tmp, MPFR_RNDD);
-            mpfr_sub_d(s, norm, fl->delta, MPFR_RNDD);
-            mpfr_neg(s, s, MPFR_RNDD);
-            mpfr_sqrt(tmp, s, MPFR_RNDU);
-            mpfr_mul(s, tmp, ti, MPFR_RNDU);
-            if (!mpfr_lessequal_p(s, tj))
+            status |= gr_add(ti, MAT_ENTRY(R, i, i), MAT_ENTRY(bound, i, i), ctx_rnd_ceil);
+            status |= gr_sub(tj, MAT_ENTRY(R, i + 1, i + 1), MAT_ENTRY(bound, i + 1, i + 1), ctx_rnd_floor);
+            status |= gr_abs(tmp, MAT_ENTRY(R, i, i + 1), ctx_rnd_floor);
+            status |= gr_sub(norm, tmp, MAT_ENTRY(bound, i, i + 1), ctx_rnd_floor);
+            status |= gr_div(tmp, norm, ti, ctx_rnd_floor);
+            status |= gr_sqr(norm, tmp, ctx_rnd_floor);
+
+            /* want status |= gr_sub_d(s, norm, fl->delta, ctx_rnd_floor); */
+            status |= gr_set_d(tmp, fl->delta, ctx_rnd_ceil);  /* actually exact; rnd does not matter */
+            status |= gr_sub(s, norm, tmp, ctx_rnd_floor);
+
+            status |= gr_neg(s, s, ctx_rnd_floor);
+            status |= gr_sqrt(tmp, s, ctx_rnd_ceil);
+            status |= gr_mul(s, tmp, ti, ctx_rnd_ceil);
+
+            if (status != GR_SUCCESS || gr_le(s, tj, ctx) != T_TRUE)
             {
 fail_clear_R_bound_bla:
-                mpfr_mat_clear(R);
-                mpfr_mat_clear(bound);
-                mpfr_clears(s, norm, ti, tj, tmp, NULL);
+                gr_mat_clear(R, ctx);
+                gr_mat_clear(bound, ctx);
+                GR_TMP_CLEAR5(s, norm, ti, tj, tmp, ctx);
+
+                GR_TMP_CLEAR2(zero, one, ctx);
                 return 0;
             }
         }
 
-        mpfr_mat_clear(R);
-        mpfr_mat_clear(bound);
-        mpfr_clears(s, norm, ti, tj, tmp, NULL);
+        gr_mat_clear(R, ctx);
+        gr_mat_clear(bound, ctx);
+        GR_TMP_CLEAR5(s, norm, ti, tj, tmp, ctx);
     }
 
     FLINT_ASSERT((fl->rt == Z_BASIS
                         ? fmpz_mat_is_reduced(B, fl->delta, fl->eta)
                         : fmpz_mat_is_reduced_gram(B, fl->delta, fl->eta)));
 
+    GR_TMP_CLEAR2(zero, one, ctx);
+
     return 1;
 }
+

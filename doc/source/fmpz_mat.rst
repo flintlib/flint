@@ -810,6 +810,16 @@ Determinant
     such that `|\det(A)| / d` is tiny with very high probability.
 
 
+Permanent
+--------------------------------------------------------------------------------
+
+
+.. function:: int fmpz_mat_permanent(fmpz_t res, const fmpz_mat_t A)
+
+    Sets ``res`` to the permanent of the square matrix *A*, returning 1
+    on success. If the matrix is too large, returns 0.
+
+
 Transforms
 --------------------------------------------------------------------------------
 

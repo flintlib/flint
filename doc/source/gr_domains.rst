@@ -24,6 +24,9 @@ Domain properties
               truth_t gr_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
               truth_t gr_ctx_is_field(gr_ctx_t ctx)
               truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)
+              truth_t gr_ctx_is_rational_vector_space(gr_ctx_t ctx)
+              truth_t gr_ctx_is_real_vector_space(gr_ctx_t ctx)
+              truth_t gr_ctx_is_complex_vector_space(gr_ctx_t ctx)
               truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx)
               truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx)
               truth_t gr_ctx_is_zero_ring(gr_ctx_t ctx)
@@ -318,21 +321,8 @@ Polynomial rings
 Power series
 -------------------------------------------------------------------------------
 
-.. function:: void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
-
-    Initializes *ctx* to a ring of truncated power series `R[[x]] / \langle x^n \rangle`
-    over the given *base_ring*.
-    Elements have type :type:`gr_poly_struct`.
-    It is assumed that all inputs are already truncated to length *n*,
-    and this invariant is enforced for all outputs.
-
-.. function:: void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
-
-    Initializes *ctx* to a ring of power series `R[[x]]` over the given *base_ring*.
-    Elements are generally inexact, having an error term `O(x^n)`.
-    The parameter *prec* defines the default precision.
-    Elements have type ``gr_series_struct`` (this type is currently internal).
-
+See :func:`gr_series_ctx_init` and :func:`gr_series_mod_ctx_init`
+in :ref:`gr-series`.
 
 Fraction fields
 -------------------------------------------------------------------------------
@@ -377,6 +367,16 @@ Fraction fields
     fractions in *nvars* variables over the integers (equivalently, rationals),
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_q_struct`.
+
+.. function:: void gr_ctx_init_fmpz_mod_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord, const fmpz_t mod)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    fractions in *nvars* variables over the `\mathbb{F}_mod` field,
+    with monomial ordering *ord*, and *mod* being a prime number.
+    The user is responsible
+    for verifying that *mod* is a prime number;
+    if *mod* is composite, undefined behaviour may occur.
+    Elements have type :type:`fmpz_mod_mpoly_q_struct`.
 
 Symbolic expressions
 -------------------------------------------------------------------------------

@@ -59,6 +59,24 @@ truth_t _gr_fraction_ctx_is_certainly_field_else_unknown(gr_fraction_ctx_t ctx)
     return gr_ctx_is_integral_domain(GR_FRACTION_DOMAIN_CTX(ctx)) == T_TRUE ? T_TRUE : T_UNKNOWN;
 }
 
+truth_t _gr_fraction_ctx_is_rational_vector_space(gr_fraction_ctx_t ctx)
+{
+    return truth_and(_gr_fraction_ctx_is_certainly_field_else_unknown(ctx),
+                truth_not(gr_ctx_is_finite_characteristic(GR_FRACTION_DOMAIN_CTX(ctx))));
+}
+
+truth_t _gr_fraction_ctx_is_real_vector_space(gr_fraction_ctx_t ctx)
+{
+    return truth_and(_gr_fraction_ctx_is_certainly_field_else_unknown(ctx),
+            gr_ctx_is_real_vector_space(GR_FRACTION_DOMAIN_CTX(ctx)));
+}
+
+truth_t _gr_fraction_ctx_is_complex_vector_space(gr_fraction_ctx_t ctx)
+{
+    return truth_and(_gr_fraction_ctx_is_certainly_field_else_unknown(ctx),
+            gr_ctx_is_complex_vector_space(GR_FRACTION_DOMAIN_CTX(ctx)));
+}
+
 truth_t _gr_fraction_ctx_is_threadsafe(gr_ctx_t ctx) { return gr_ctx_is_threadsafe(GR_FRACTION_DOMAIN_CTX(ctx)); }
 truth_t _gr_fraction_ctx_is_finite(gr_ctx_t ctx) { return gr_ctx_is_finite(GR_FRACTION_DOMAIN_CTX(ctx)); }
 truth_t _gr_fraction_ctx_is_finite_characteristic(gr_ctx_t ctx) { return gr_ctx_is_finite_characteristic(GR_FRACTION_DOMAIN_CTX(ctx)); }
@@ -1120,9 +1138,13 @@ gr_method_tab_input _gr_fraction_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr)  _gr_fraction_ctx_is_certainly_field_else_unknown},
     {GR_METHOD_CTX_IS_UNIQUE_FACTORIZATION_DOMAIN,  (gr_funcptr)  _gr_fraction_ctx_is_certainly_field_else_unknown},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr)  _gr_fraction_ctx_is_certainly_field_else_unknown},
+    {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) _gr_fraction_ctx_is_rational_vector_space},
+    {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) _gr_fraction_ctx_is_real_vector_space},
+    {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) _gr_fraction_ctx_is_complex_vector_space},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr)  _gr_fraction_ctx_is_threadsafe},
     {GR_METHOD_CTX_IS_FINITE,           (gr_funcptr) _gr_fraction_ctx_is_finite},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,    (gr_funcptr) _gr_fraction_ctx_is_finite_characteristic},
+
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) _gr_fraction_ctx_is_exact},
 
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fraction_init},

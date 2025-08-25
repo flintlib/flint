@@ -201,6 +201,16 @@ Basic row, column and entry operations
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
+.. function:: int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
+
+    Moves row ``i`` to the new position ``new_i``, displacing all intervening
+    rows. For example, with ``i = 4`` and ``new_i = 7`` this replaces the
+    block of rows ``A4, A5, A6, A7`` by ``A5, A6, A7, A4``.
+    With ``i = 7`` and ``new_i = 4`` replaces ``A4, A5, A6, A7``
+    by ``A7, A4, A5, A6``.
+    Returns ``GR_DOMAIN`` if either index is not in bounds, otherwise is
+    guaranteed to succeed.
+
 .. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
 
     Returns whether *mat* is an empty matrix, having either zero
@@ -571,6 +581,39 @@ Determinant and trace
     the square matrix *mat*.
     If the matrix is not square, ``GR_DOMAIN`` is returned.
 
+Permanent
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_permanent_cofactor(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_ryser(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_glynn(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent_glynn_threaded(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_permanent(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+
+    Sets *res* to the permanent of the square matrix *A*,
+    The permanent `\operatorname{perm}(A)` is a polynomial expression
+    in the entries of `A` equivalent to that for the determinant
+    but with all subtractions replaced by additions.
+    Several algorithms are implemented:
+
+    * The *cofactor* version uses recursive cofactor expansion, requiring
+      `O(n!)` additions and multiplications.
+
+    * The *ryser* version uses Ryser's formula [Rys1963]_ with Gray code traversal,
+      requiring `O(2^n n)` additions, subtractions and multiplications.
+
+    * The *glynn* version uses Glynn's formula [Gly2010]_ (actually equivalent
+      to a method described earlier by Nijenhuis and Wilf [NW1978]_). This
+      requires about half as many operations as *ryser* but requires (exact)
+      division by 2.
+
+    * The *glynn_threaded* version is a multithreaded implementation
+      of Glynn's formula.
+
+    The *generic* method chooses cofactor expansion for `n \le 4` and otherwise
+    chooses *ryser*, *glynn* or *glynn_threaded* depending on whether the ring
+    supports division by 2. The default method can be overloaded.
 
 Rank
 -------------------------------------------------------------------------------
@@ -929,6 +972,22 @@ Random matrices
     operations. More precisely, at most *opcount* conjugations by random
     elementary row/column operations will be performed.
 
+Orthogonal matrices
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_mat_is_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
+
+    Returns whether *A* is an orthogonal matrix, i.e. a square matrix
+    satisfying `A A^T = A^T A = I`. It is assumed (not checked) that the
+    scalar ring is commutative.
+
+.. function:: int gr_mat_randtest_orthogonal(gr_mat_t A, flint_rand_t state, gr_ctx_t ctx)
+
+    Generates a random orthogonal matrix. Uses Cayley's construction
+    with a permutation matrix is a fallback. It is assumed (not checked) that
+    the scalar ring is commutative.
+    Fails with ``GR_DOMAIN`` if *A* is not square.
+
 Special matrices
 -------------------------------------------------------------------------------
 
@@ -1001,6 +1060,55 @@ Helper functions for reduction
     By default the *generic* version is called; specific rings
     can overload this (typically to implement delayed canonicalisation).
 
+LLL
+-------------------------------------------------------------------------------
+
+Let `A = (a_0, \ldots, a_{n-1})` be a set of linearly independent vectors over `\mathbb{R}`
+with Gram-Schmidt orthogonalization `(b_0, \ldots, b_{n-1})`
+and Gram-Schmidt coefficients `\mu_{i,j} = \langle a_i, b_i \rangle / \| b_j \|^2`.
+The basis `A` is said to be LLL-reduced with parameter (`\delta`, `\eta`)
+where `0.25 < \delta \le 1` and `0.5 \le \eta < \sqrt{\delta}` if they satisfy
+the size reduction condition
+
+.. math ::
+
+    |\mu_{i,j}| \le \eta, \quad 0 \le j < i < n
+
+and the Lovász condition
+
+.. math ::
+
+    (\delta - \mu_{i,i-1}^2) \| b_{i-1} \|_2^2 \le \| b_i \|_2^2, \quad 1 \le i \le n - 1.
+
+.. function:: truth_t gr_mat_is_row_lll_reduced_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_ctx_t ctx)
+              truth_t gr_mat_is_row_lll_reduced_with_removal_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_srcptr gs_B, slong newd, gr_ctx_t ctx)
+
+    Check if the rows of *A* are LLL-reduced by naively performing the
+    Gram-Schmidt orthogonalization and checking the conditions one row
+    at a time.
+
+    In interval arithmetic, these functions terminate eagerly: ``T_UNKNOWN``
+    is returned if the tests are inconclusive for one row, even if there is a
+    possibility that a later row could prove that the result should be ``T_FALSE``.
+
+Linear ODEs
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_mat_gr_poly_solve_lode_newton_start(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denominator_inv, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, gr_ctx_t sol_poly_ctx)
+              int _gr_mat_gr_poly_solve_lode_newton_step(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denominator_inv, slong *len, const gr_mat_t A_numerator, const gr_poly_t A_denominator, int A_is_companion, gr_ctx_t sol_poly_ctx)
+              int _gr_mat_gr_poly_solve_lode_newton(gr_mat_t Y, gr_mat_t Z, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, slong len, gr_ctx_t A_poly_ctx, gr_ctx_t sol_poly_ctx)
+              int gr_mat_gr_poly_solve_lode_newton(gr_mat_t Y, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, slong len, gr_ctx_t A_poly_ctx, gr_ctx_t sol_poly_ctx)
+
+    Solves the system of linear ordinary differential
+    equations `Y'(t) = A(t)Y(t)` with rational function coefficients `A(t)`
+    and initial condition `Y(0) = Y_0`. Sets *Y* to the power series solution
+    truncated to length *len*.
+    The algorithm is a Newton iteration as described in [BCOSSS2007]_,
+    but using an iteration for the power series inverse of *A_denominator*,
+    and using a specialized implementation of multiplication by `A(t)` mod `t^m`
+    in the case where `A(t)` is a companion matrix.
+    An optimal sequence of precisions is used to reach the target *len*, even
+    when it is not a power of two.
 
 Test functions
 -------------------------------------------------------------------------------

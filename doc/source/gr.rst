@@ -459,6 +459,10 @@ Assignment and conversions
 
     Set or retrieve a dyadic number `a \cdot 2^b`.
 
+.. function:: int gr_get_d_2exp_si(double * res, slong * exp, gr_srcptr x, gr_ctx_t ctx)
+
+    Returns `m 2^e \approx x` with `0.5 \le |m| < 1` if *x* is nonzero.
+
 .. function:: int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t a, const fmpz_t b, gr_ctx_t ctx)
 
     Set to a decimal number `a \cdot 10^b`.

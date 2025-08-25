@@ -16,4 +16,5 @@
        gr_mat.rst
        gr_poly.rst
        gr_mpoly.rst
+       gr_series.rst
 

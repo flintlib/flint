@@ -1811,7 +1811,7 @@ Euclidean division
     the division is exact, this is the same as division over `\mathbb{Q}`.  An
     exception is raised if `B` is zero.
 
-.. function:: void _fmpz_poly_div_root(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
+.. function:: void _fmpz_poly_div_root_fmpz(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
     division by `x - c`.
@@ -1819,7 +1819,7 @@ Euclidean division
     Supports aliasing of ``Q`` and ``A``, but the result is
     undefined in case of partial overlap.
 
-.. function:: void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
+.. function:: void fmpz_poly_div_root_fmpz(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
     division by `x - c`.
@@ -1828,6 +1828,19 @@ Euclidean division
               void fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Like :func:`fmpz_poly_div`, but assumes that the division is exact.
+
+.. function:: void _fmpz_poly_divexact_root_fmpq(fmpz * Q, const fmpz * A, slong len, const fmpq_t c)
+
+    Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
+    division by `q x - p` where `c = p/q`. Assumes the division is exact.
+
+    Supports aliasing of ``Q`` and ``A``, but the result is
+    undefined in case of partial overlap.
+
+.. function:: void fmpz_poly_divexact_root_fmpq(fmpz_poly_t Q, const fmpz_poly_t A, const fmpq_t c)
+
+    Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
+    division by `q x - p` where `c = p/q`. Assumes the division is exact.
 
 Division with precomputed inverse
 --------------------------------------------------------------------------------
@@ -2365,18 +2378,45 @@ Newton basis
 Interpolation
 --------------------------------------------------------------------------------
 
+.. function:: int _fmpz_poly_interpolate_newton(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              int fmpz_poly_interpolate_newton(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+              int _fmpz_poly_interpolate_multi_mod(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              int fmpz_poly_interpolate_multi_mod(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+              int _fmpz_poly_interpolate(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              int fmpz_poly_interpolate(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+
+    Sets ``poly`` to the unique interpolating polynomial of
+    degree at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i` in
+    ``xs`` and ``ys``, assuming that this polynomial has integer
+    coefficients and that the evaluation points `x_i` are distinct.
+
+    If the `x_i` are not distinct or if the interpolating polynomial does
+    not have integer coefficients, returns 0 indicating failure.
+    Otherwise returns 1 indicating success.
+
+    The *newton* algorithm first interpolates in the Newton basis
+    and then converts to the monomial basis.
+    The *multi_mod* algorithm interpolates modulo one or more prime numbers
+    and combines the results using CRT, using adaptive termination.
+    The default implementation chooses automatically between the *newton* and
+    *multi_mod* algorithms.
+
+.. function:: void _fmpz_poly_interpolate_exact_newton(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              void fmpz_poly_interpolate_exact_newton(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+              void _fmpz_poly_interpolate_exact(fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
+              void fmpz_poly_interpolate_exact(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+
+    Like :func:`fmpz_poly_interpolate` etc., but optimized by omitting
+    error handling. If the `x_i` are not distinct or if the interpolating
+    polynomial does not have integer coefficients, the behavior is undefined.
+    The default implementation chooses automatically between the *exact_newton* and
+    *multi_mod* algorithms.
 
 .. function:: void fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
 
-    Sets ``poly`` to the unique interpolating polynomial of degree at
-    most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_u` in
-    ``xs`` and ``ys``, assuming that this polynomial has integer
-    coefficients.
-
-    If an interpolating polynomial with integer coefficients does not
-    exist, a ``FLINT_INEXACT`` exception is thrown.
-
-    It is assumed that the `x` values are distinct.
+    Like :func:`fmpz_poly_interpolate`, but if the `x_i` values are not distinct
+    or if the interpolating polynomial does not have integer coefficients,
+    a ``FLINT_INEXACT`` exception is thrown.
 
 
 Composition
@@ -3147,6 +3187,40 @@ Products
     Sets ``poly`` to the polynomial which is the product
     of `(q_0 x - p_0)(q_1 x - p_1) \cdots (q_{n-1} x - p_{n-1})`, the roots
     `p_i/q_i` being given by ``xs``.
+
+
+Subproduct trees
+--------------------------------------------------------------------------------
+
+
+.. function:: fmpz ** _fmpz_poly_tree_alloc(slong len)
+
+    Allocates space for a subproduct tree of the given length, having
+    linear factors at the lowest level.
+
+    Entry `i` in the tree is a pointer to a single array of limbs,
+    capable of storing `\lfloor n / 2^i \rfloor` subproducts of
+    degree `2^i` adjacently, plus a trailing entry if `n / 2^i` is
+    not an integer.
+
+    For example, a tree of length 7 built from monic linear factors has
+    the following structure, where spaces have been inserted
+    for illustrative purposes::
+
+        X1 X1 X1 X1 X1 X1 X1
+        XX1   XX1   XX1   X1
+        XXXX1       XX1   X1
+        XXXXXXX1
+
+.. function:: void _fmpz_poly_tree_free(fmpz ** tree, slong len)
+
+    Free the allocated space for the subproduct.
+
+.. function:: void _fmpz_poly_tree_build_fmpq_vec(fmpz ** tree, const fmpq * roots, slong len)
+
+    Builds a subproduct tree in the preallocated space from
+    the ``len`` monic linear factors `(q_i x-p_i)` the roots `p_i/q_i`
+    being given by ``xs``. The top level product is not computed.
 
 
 Roots

@@ -12,7 +12,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#define flint_set_abort gurkmacka1
+#define flint_set_throw gurkmacka2
 #include "flint.h"
+#undef flint_set_abort
+#undef flint_set_throw
 
 #undef FLINT_NORETURN
 #if defined(__GNUC__)
@@ -20,6 +24,9 @@
 #else
 # define FLINT_NORETURN
 #endif
+
+void flint_set_abort(void (* func)(void) FLINT_NORETURN);
+void flint_set_throw(void (* func)(flint_err_t, const char *, va_list) FLINT_NORETURN);
 
 FLINT_NORETURN static void __flint_throw(flint_err_t, const char *, va_list);
 
@@ -44,37 +51,25 @@ void __flint_set_throw_init(void)
 FLINT_NORETURN void (* abort_func)(void) = abort;
 FLINT_NORETURN void (* throw_func)(flint_err_t, const char *, va_list) = __flint_throw;
 
-void flint_set_abort(void (* func)(void))
+void flint_set_abort(void (* func)(void) FLINT_NORETURN)
 {
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_once(&abort_func_init, __flint_set_abort_init);
     pthread_mutex_lock(&abort_func_lock);
 #endif
-
-DIAGNOSTIC_PUSH
-DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
-DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
     abort_func = func;
-DIAGNOSTIC_POP
-
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&abort_func_lock);
 #endif
 }
 
-void flint_set_throw(void (* func)(flint_err_t, const char *, va_list))
+void flint_set_throw(void (* func)(flint_err_t, const char *, va_list) FLINT_NORETURN)
 {
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_once(&throw_func_init, __flint_set_throw_init);
     pthread_mutex_lock(&throw_func_lock);
 #endif
-
-DIAGNOSTIC_PUSH
-DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
-DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
     throw_func = func;
-DIAGNOSTIC_POP
-
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&throw_func_lock);
 #endif

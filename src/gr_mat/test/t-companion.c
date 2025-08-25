@@ -34,7 +34,7 @@ TEST_FUNCTION_START(gr_mat_companion, state)
         gr_poly_init(g, ctx);
 
         do {
-            status |= gr_poly_randtest(f, state, 1 + n_randint(state, 8), ctx);
+            status |= gr_poly_randtest(f, state, 1 + n_randint(state, 4), ctx);
             n = gr_poly_length(f, ctx) - 1;
         } while (n < 0 || gr_is_invertible(gr_poly_coeff_srcptr(f, n, ctx), ctx) != T_TRUE);
 

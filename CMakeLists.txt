@@ -213,7 +213,6 @@ set(_BUILD_DIRS
     double_extras   d_vec           d_mat
     nfloat
     mpn_extras
-    mpfr_vec                        mpfr_mat
     nmod            nmod_vec        nmod_mat        nmod_poly
     mpn_mod
     fmpz            fmpz_vec        fmpz_mat        fmpz_poly
@@ -238,7 +237,7 @@ set(_BUILD_DIRS
     nmod_poly_mat                   fmpz_poly_mat
 
     mpoly           nmod_mpoly      fmpz_mpoly      fmpz_mod_mpoly
-    fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly
+    fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly   fmpz_mod_mpoly_q
 
     nmod_mpoly_factor               fmpz_mpoly_factor
     fmpz_mod_mpoly_factor           fmpq_mpoly_factor
@@ -261,7 +260,7 @@ set(_BUILD_DIRS
     acb_theta       dirichlet       bernoulli       hypgeom
 
     gr              gr_generic      gr_vec          gr_mat
-    gr_poly         gr_mpoly        gr_special
+    gr_poly         gr_mpoly        gr_series       gr_special
 
     calcium
     fmpz_mpoly_q
@@ -277,7 +276,7 @@ string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "$
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h flint-mparam.h
-    profiler.h templates.h mpf-impl.h
+    profiler.h templates.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 

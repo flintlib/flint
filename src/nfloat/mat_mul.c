@@ -1745,7 +1745,8 @@ nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
     dim = FLINT_MIN(n, FLINT_MIN(m, p));
 
-    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
+    /* To do: fast matrix mul with inf/nan or directed rounding */
+    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
         return gr_mat_mul_classical(C, A, B, ctx);
 
     prec = NFLOAT_CTX_PREC(ctx);
