@@ -28,7 +28,7 @@ void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, sl
 
     if (n == 0 || h->length == 0 || fmpz_is_zero(h->coeffs + 0))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_invsqrt). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_mod_poly_invsqrt). Division by zero.\n");
     }
 
     if (!fmpz_is_one(h->coeffs + 0))

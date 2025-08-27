@@ -21,7 +21,7 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_divexact). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))  /* g is small, h must be also or division isn't exact */
@@ -70,7 +70,7 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
 
     if (h == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact_si). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_divexact_si). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))  /* g is small */
@@ -101,7 +101,7 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (h == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact_ui). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_divexact_ui). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))  /* g is small */

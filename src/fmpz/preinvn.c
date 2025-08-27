@@ -20,7 +20,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 
    if (c == 0)
    {
-      flint_throw(FLINT_ERROR, "Exception (fmpz_preinvn_init). Division by zero.\n");
+      flint_throw(FLINT_DIVZERO, "Exception (fmpz_preinvn_init). Division by zero.\n");
    } else if (!COEFF_IS_MPZ(c)) /* c is small */
    {
       ulong cc;

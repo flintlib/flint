@@ -31,7 +31,7 @@ void fmpz_mod_poly_inv_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong 
 
     if (n == 0 || h->length == 0 || fmpz_is_zero(h->coeffs + 0))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_inv). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_mod_poly_inv). Division by zero.\n");
     }
 
     if (hlen == 1)

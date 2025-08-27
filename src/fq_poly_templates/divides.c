@@ -43,7 +43,7 @@ TEMPLATE(T, poly_divides) (TEMPLATE(T, poly_t) Q,
 {
     if (TEMPLATE(T, poly_is_zero) (B, ctx))
     {
-        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
+        flint_throw(FLINT_DIVZERO, "(%s): Division by zero\n", __func__);
     }
 
     if (TEMPLATE(T, poly_is_zero) (A, ctx))

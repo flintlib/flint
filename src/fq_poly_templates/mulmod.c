@@ -62,7 +62,7 @@ TEMPLATE(T, poly_mulmod) (TEMPLATE(T, poly_t) res,
 
     if (lenf == 0)
     {
-        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
+        flint_throw(FLINT_DIVZERO, "(%s): Division by zero\n", __func__);
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)

@@ -92,7 +92,7 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
 
     if (n == 0 || h->length == 0 || TEMPLATE(T, is_zero)(h->coeffs + 0, ctx))
     {
-        flint_throw(FLINT_ERROR, "Exception (fq_poly_invsqrt). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fq_poly_invsqrt). Division by zero.\n");
     }
 
     if (!TEMPLATE(T, is_one)(h->coeffs + 0, ctx))

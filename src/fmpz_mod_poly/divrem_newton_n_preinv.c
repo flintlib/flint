@@ -52,7 +52,7 @@ void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         }
         else
         {
-            flint_throw(FLINT_ERROR, "(fmpz_mod_poly_divrem_newton_n_preinv): Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "(fmpz_mod_poly_divrem_newton_n_preinv): Division by zero.\n");
         }
     }
 
