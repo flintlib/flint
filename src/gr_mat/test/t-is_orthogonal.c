@@ -18,7 +18,7 @@ gr_mat_is_orthogonal_naive(const gr_mat_t A, gr_ctx_t ctx)
 {
     gr_mat_t T, U;
     slong n = A->r;
-    truth_t res;
+    truth_t res, res2;
 
     gr_mat_init(T, n, n, ctx);
     gr_mat_init(U, n, n, ctx);
@@ -27,15 +27,125 @@ gr_mat_is_orthogonal_naive(const gr_mat_t A, gr_ctx_t ctx)
     GR_MUST_SUCCEED(gr_mat_mul(U, A, T, ctx));
     res = gr_mat_is_one(U, ctx);
 
+    GR_MUST_SUCCEED(gr_mat_mul(U, T, A, ctx));
+    res2 = gr_mat_is_one(U, ctx);
+    res = truth_and(res, res2);
+
     gr_mat_clear(T, ctx);
     gr_mat_clear(U, ctx);
 
     return res;
 }
 
+static truth_t
+gr_mat_is_orthogonal2_naive(const gr_mat_t A, int cols, int unit, gr_ctx_t ctx)
+{
+    gr_mat_t AT, P;
+    slong r = A->r;
+    slong c = A->c;
+    truth_t res;
+    gr_mat_init(AT, c, r, ctx);
+    GR_MUST_SUCCEED(gr_mat_transpose(AT, A, ctx));
+
+    if (cols)
+    {
+        gr_mat_init(P, c, c, ctx);
+        GR_MUST_SUCCEED(gr_mat_mul(P, AT, A, ctx));
+    }
+    else
+    {
+        gr_mat_init(P, r, r, ctx);
+        GR_MUST_SUCCEED(gr_mat_mul(P, A, AT, ctx));
+    }
+
+    if (unit)
+        res = gr_mat_is_one(P, ctx);
+    else
+        res = gr_mat_is_diagonal(P, ctx);
+
+    gr_mat_clear(AT, ctx);
+    gr_mat_clear(P, ctx);
+    return res;
+}
+
 TEST_FUNCTION_START(gr_mat_is_orthogonal, state)
 {
     slong iter;
+
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        slong r, c;
+        gr_ctx_t ctx;
+        gr_mat_t A;
+        truth_t r1, r2;
+
+        gr_ctx_init_nmod(ctx, n_randtest_not_zero(state));
+
+        r = n_randint(state, 10);
+        c = n_randint(state, 10);
+
+        gr_mat_init(A, r, c, ctx);
+        GR_MUST_SUCCEED(gr_mat_randtest(A, state, ctx));
+
+        r1 = gr_mat_is_row_orthogonal(A, ctx);
+        r2 = gr_mat_is_orthogonal2_naive(A, 0, 0, ctx);
+
+        if ((r1 == T_FALSE && r2 == T_TRUE) || (r1 == T_TRUE && r2 == T_FALSE))
+        {
+            flint_printf("FAIL\n");
+            gr_ctx_println(ctx);
+            flint_printf("is_row_orthogonal\n");
+            flint_printf("A = "), gr_mat_print(A, ctx); flint_printf("\n");
+            flint_printf("r1 = %{truth}\n", r1);
+            flint_printf("r2 = %{truth}\n", r2);
+            flint_abort();
+        }
+
+        r1 = gr_mat_is_row_orthonormal(A, ctx);
+        r2 = gr_mat_is_orthogonal2_naive(A, 0, 1, ctx);
+
+        if ((r1 == T_FALSE && r2 == T_TRUE) || (r1 == T_TRUE && r2 == T_FALSE))
+        {
+            flint_printf("FAIL\n");
+            gr_ctx_println(ctx);
+            flint_printf("is_row_orthonormal\n");
+            flint_printf("A = "), gr_mat_print(A, ctx); flint_printf("\n");
+            flint_printf("r1 = %{truth}\n", r1);
+            flint_printf("r2 = %{truth}\n", r2);
+            flint_abort();
+        }
+
+        r1 = gr_mat_is_col_orthogonal(A, ctx);
+        r2 = gr_mat_is_orthogonal2_naive(A, 1, 0, ctx);
+
+        if ((r1 == T_FALSE && r2 == T_TRUE) || (r1 == T_TRUE && r2 == T_FALSE))
+        {
+            flint_printf("FAIL\n");
+            gr_ctx_println(ctx);
+            flint_printf("is_col_orthonormal\n");
+            flint_printf("A = "), gr_mat_print(A, ctx); flint_printf("\n");
+            flint_printf("r1 = %{truth}\n", r1);
+            flint_printf("r2 = %{truth}\n", r2);
+            flint_abort();
+        }
+
+        r1 = gr_mat_is_col_orthonormal(A, ctx);
+        r2 = gr_mat_is_orthogonal2_naive(A, 1, 1, ctx);
+
+        if ((r1 == T_FALSE && r2 == T_TRUE) || (r1 == T_TRUE && r2 == T_FALSE))
+        {
+            flint_printf("FAIL\n");
+            gr_ctx_println(ctx);
+            flint_printf("is_col_orthonormal\n");
+            flint_printf("A = "), gr_mat_print(A, ctx); flint_printf("\n");
+            flint_printf("r1 = %{truth}\n", r1);
+            flint_printf("r2 = %{truth}\n", r2);
+            flint_abort();
+        }
+
+        gr_mat_clear(A, ctx);
+        gr_ctx_clear(ctx);
+    }
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
@@ -95,6 +205,21 @@ TEST_FUNCTION_START(gr_mat_is_orthogonal, state)
                 flint_printf("r2 = %{truth}\n", r2);
                 flint_abort();
             }
+        }
+
+        GR_IGNORE(gr_mat_randtest(A, state, ctx));
+
+        r1 = gr_mat_is_orthogonal(A, ctx);
+        r2 = gr_mat_is_orthogonal_naive(A, ctx);
+
+        if ((r1 == T_FALSE && r2 == T_TRUE) || (r1 == T_TRUE && r2 == T_FALSE))
+        {
+            flint_printf("FAIL\n");
+            gr_ctx_println(ctx);
+            flint_printf("A = "), gr_mat_print(A, ctx); flint_printf("\n");
+            flint_printf("r1 = %{truth}\n", r1);
+            flint_printf("r2 = %{truth}\n", r2);
+            flint_abort();
         }
 
         gr_mat_clear(A, ctx);
