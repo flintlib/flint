@@ -109,6 +109,25 @@ Window matrices
 
     Frees the window matrix.
 
+.. macro:: GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(AT, A, ctx)
+
+    Initialize *AT* to a shallow transpose of *A* for temporary use.
+    This macro uses stack allocation if *A* is sufficiently small.
+    The matrix *AT* can be used similarly to a window matrix for reading.
+    It can also be used for writing, provided that one finishes the
+    operation by performing ``GR_MAT_SHALLOW_TRANSPOSE(A, AT, ctx)``
+    to write back any changes to the shallow data.
+
+.. macro:: GR_MAT_SHALLOW_TRANSPOSE(AT, A, ctx)
+
+    Sets *AT* to the transpose of *A*, copying entries shallowly.
+    Assumes that *AT* and *A* are not aliased (if aliased, the normal
+    :func:`gr_mat_transpose` already uses shallow operations).
+
+.. macro:: GR_MAT_TMP_CLEAR_SHALLOW_TRANSPOSE(AT, ctx)
+
+    Free the shallow transpose allocated by :macro:`GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE`.
+
 Input and output
 -------------------------------------------------------------------------------
 
@@ -977,16 +996,84 @@ Orthogonal matrices
 
 .. function:: truth_t gr_mat_is_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
 
-    Returns whether *A* is an orthogonal matrix, i.e. a square matrix
-    satisfying `A A^T = A^T A = I`. It is assumed (not checked) that the
-    scalar ring is commutative.
+    Returns whether *A* is an orthogonal matrix (orthonormal matrix),
+    i.e. a square matrix satisfying `A A^T = A^T A = I`. It is assumed
+    (not checked) that the scalar ring is commutative.
+
+.. function:: truth_t gr_mat_is_row_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
+              truth_t gr_mat_is_col_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
+              truth_t gr_mat_is_row_orthonormal(const gr_mat_t A, gr_ctx_t ctx)
+              truth_t gr_mat_is_col_orthonormal(const gr_mat_t A, gr_ctx_t ctx)
+
+    Returns whether *A* is of the following type:
+
+    * Row-orthogonal: `A A^T = D` for some diagonal matrix *D*.
+
+    * Column-orthogonal: `A^T A = D` for some diagonal matrix *D*.
+
+    * Row-orthonormal: `A A^T = I`.
+
+    * Column-orthonormal: `A^T A = I`.
 
 .. function:: int gr_mat_randtest_orthogonal(gr_mat_t A, flint_rand_t state, gr_ctx_t ctx)
 
-    Generates a random orthogonal matrix. Uses Cayley's construction
-    with a permutation matrix is a fallback. It is assumed (not checked) that
+    Generates a random orthogonal matrix. Uses Cayley's construction,
+    with a permutation matrix as a fallback. It is assumed (not checked) that
     the scalar ring is commutative.
     Fails with ``GR_DOMAIN`` if *A* is not square.
+
+QR decomposition
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_lq_gso(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_lq_recursive(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_qr(gr_mat_t Q, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
+
+    Computes a QR or LQ decomposition.
+    The `A = QR` decomposition orthogonalizes the columns of `A`:
+
+    * `A` is `m \times n` with `m \ge n` and full rank (`A` has `n` linearly independent columns)
+
+    * `Q` is `m \times n` and column-orthonormal
+
+    * `R` is `n \times n` and upper triangular
+
+    The `A = LQ` decomposition is the transposed operation, which
+    orthogonalizes the rows of `A`:
+
+    * `A` is `m \times n` with `m \le n` and full rank (`A` has `m` linearly independent rows)
+
+    * `L` is `m \times m` and lower triangular
+
+    * `Q` is `m \times n` and row-orthonormal
+
+    For rectangular matrices, these definitions correspond to
+    the "reduced", "compact" or "economy-sized" QR or LQ decomposition.
+    To construct a "full" QR decomposition where `Q` is a square, orthogonal
+    matrix, one can compute the reduced QR decomposition, extend
+    `Q` with its orthogonal complement, and pad `R` or `L` with zeros.
+
+    The input matrix `A` should have elements in a
+    subfield of `\mathbb{R}` or real floating-point entries. These functions
+    may succeed for other types, but the Euclidean norm normalizations will
+    not necessarily be meaningful.
+
+    The *gso* algorithm uses Gram-Schmidt orthogonalization.
+    The *recursive* algorithm uses block recursion.
+    The QR decomposition is a simple wrapper around the LQ decomposition.
+    We use the LQ decomposition internally as row operations are
+    more efficient than column operations in the row-major format
+    of :type:`gr_mat_t`.
+
+    Aliasing of `A` and `Q` is handled efficiently in-place.
+    Aliasing of `A` and `R` or `L` is allowed, but requires a temporary
+    internal copy.
+
+    These methods return ``GR_DOMAIN`` if the matrix dimensions are not
+    compatible, if `A` does not have full rank, or if the base ring does
+    not support the necessary divisions or square roots to normalize
+    vectors.
 
 Special matrices
 -------------------------------------------------------------------------------

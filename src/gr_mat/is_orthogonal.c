@@ -86,37 +86,6 @@ gr_mat_is_orthogonal_recursive(const gr_mat_t A, gr_ptr tmp, slong a, slong b, i
     return res;
 }
 
-#define GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(AT, A, ctx) \
-    do { \
-        gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW); \
-        slong r = (A)->r; \
-        slong c = (A)->c; \
-        slong sz = (ctx)->sizeof_elem; \
-        slong i, j; \
-        AT->entries = GR_TMP_ALLOC(r * c * sz); \
-        AT->r = c; \
-        AT->c = r; \
-        AT->stride = r; \
-        for (i = 0; i < r; i++) \
-            for (j = 0; j < c; j++) \
-                set_shallow(GR_MAT_ENTRY(AT, j, i, sz), GR_MAT_ENTRY(A, i, j, sz), ctx); \
-    } while (0)
-
-#define GR_MAT_SHALLOW_TRANSPOSE(AT, A, ctx) \
-    do { \
-        gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW); \
-        slong r = (A)->r; \
-        slong c = (A)->c; \
-        slong sz = (ctx)->sizeof_elem; \
-        slong i, j; \
-        for (i = 0; i < r; i++) \
-            for (j = 0; j < c; j++) \
-                set_shallow(GR_MAT_ENTRY(AT, j, i, sz), GR_MAT_ENTRY(A, i, j, sz), ctx); \
-    } while (0)
-
-#define GR_MAT_TMP_CLEAR_SHALLOW_TRANSPOSE(AT, ctx) \
-    GR_TMP_FREE((AT)->entries, (AT)->r * (AT)->c * (ctx)->sizeof_elem)
-
 static truth_t
 _gr_mat_is_row_orthogonal(const gr_mat_t A, int unit, gr_ctx_t ctx)
 {
