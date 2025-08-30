@@ -74,7 +74,7 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
 
     if (len2 == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_precompute_matrix). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_precompute_matrix). Division by zero.\n");
     }
 
     if (A->r != m || A->c != len)
@@ -179,7 +179,7 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_precomp_preinv): Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "(nmod_poly_compose_mod_brent_kung_precomp_preinv): Division by zero.\n");
     }
 
     if (len1 >= len3)

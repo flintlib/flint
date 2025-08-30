@@ -16,7 +16,7 @@ fmpz_mpoly_q_inv(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ct
 {
     if (fmpz_mpoly_is_zero(fmpz_mpoly_q_numref(x), ctx))
     {
-        flint_throw(FLINT_ERROR, "fmpz_mpoly_q_inv: division by zero\n");
+        flint_throw(FLINT_DIVZERO, "fmpz_mpoly_q_inv: division by zero\n");
     }
 
     if (res != x)

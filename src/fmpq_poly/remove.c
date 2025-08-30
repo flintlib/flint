@@ -25,7 +25,7 @@ slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
 
     if (len2 == 0)
     {
-        flint_throw(FLINT_ERROR, "(fmpq_poly_remove): Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "(fmpq_poly_remove): Division by zero.\n");
     }
 
     if (len2 == 1)

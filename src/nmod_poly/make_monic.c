@@ -27,7 +27,7 @@ void nmod_poly_make_monic(nmod_poly_t res, const nmod_poly_t poly)
 {
     if (poly->length == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_make_monic). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_make_monic). Division by zero.\n");
     }
 
     nmod_poly_fit_length(res, poly->length);

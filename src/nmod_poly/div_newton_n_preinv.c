@@ -47,7 +47,7 @@ void nmod_poly_div_newton_n_preinv(nmod_poly_t Q, const nmod_poly_t A,
             return;
         } else
         {
-            flint_throw(FLINT_ERROR, "Exception (nmod_poly_div_newton_n_preinv). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_div_newton_n_preinv). Division by zero.\n");
         }
     }
 

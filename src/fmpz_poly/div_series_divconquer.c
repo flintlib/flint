@@ -46,7 +46,7 @@ void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A,
 
     if (Blen == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_div_series_divconquer). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_poly_div_series_divconquer). Division by zero.\n");
     }
 
     if (Alen == 0)

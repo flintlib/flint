@@ -61,7 +61,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
             return;
         } else
         {
-            flint_throw(FLINT_ERROR, "Exception (nmod_poly_divrem). Division by zero.");
+            flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_divrem). Division by zero.");
         }
     }
 

@@ -20,7 +20,7 @@ qqbar_inv(qqbar_t res, const qqbar_t x)
 
     if (qqbar_is_zero(x))
     {
-        flint_throw(FLINT_ERROR, "qqbar_inv: division by zero\n");
+        flint_throw(FLINT_DIVZERO, "qqbar_inv: division by zero\n");
     }
 
     if (qqbar_is_one(x) || qqbar_is_neg_one(x))

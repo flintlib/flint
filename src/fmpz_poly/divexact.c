@@ -78,7 +78,7 @@ fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     if (lenB == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_divexact). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_poly_divexact). Division by zero.\n");
     }
 
     if (lenA < lenB)

@@ -212,7 +212,7 @@ qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
     {
         if (fmpq_sgn(y) <= 0)
         {
-            flint_throw(FLINT_ERROR, "qqbar_pow_fmpq: division by zero\n");
+            flint_throw(FLINT_DIVZERO, "qqbar_pow_fmpq: division by zero\n");
         }
 
         qqbar_zero(res);

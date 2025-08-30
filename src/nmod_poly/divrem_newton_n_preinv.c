@@ -55,7 +55,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
             return;
         } else
         {
-            flint_throw(FLINT_ERROR, "Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
         }
     }
 

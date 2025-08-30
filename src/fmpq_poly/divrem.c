@@ -90,7 +90,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_divrem). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpq_poly_divrem). Division by zero.\n");
     }
     if (Q == R)
     {

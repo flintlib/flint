@@ -108,7 +108,7 @@ nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_preinv): Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "(nmod_poly_compose_mod_brent_kung_preinv): Division by zero.\n");
     }
 
     if (len1 >= len3)

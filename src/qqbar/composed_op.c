@@ -138,7 +138,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
     {
         if (fmpz_is_zero(P2->coeffs))
         {
-            flint_throw(FLINT_ERROR, "composed_op: division by zero\n");
+            flint_throw(FLINT_DIVZERO, "composed_op: division by zero\n");
         }
 
         fmpq_poly_reverse(P2, P2, d2 + 1);
