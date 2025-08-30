@@ -123,7 +123,7 @@ gr_mat_lq_recursive(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
 
     status |= gr_mat_zero(L12, ctx);
 
-    /* L21 = A2 Q1^T */
+    /* L21 = A2 Q1^T -- todo: mul_transpose */
     GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(QT, Q1, ctx);
     status |= gr_mat_mul(L21, A2, QT, ctx);
     GR_MAT_TMP_CLEAR_SHALLOW_TRANSPOSE(QT, ctx);
@@ -141,13 +141,18 @@ gr_mat_lq_recursive(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
 }
 
 int
-gr_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+gr_mat_lq_generic(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
 {
-    /* To do: allow overriding by specific rings */
     if (A->r <= 4)
         return gr_mat_lq_gso(L, Q, A, ctx);
     else
         return gr_mat_lq_recursive(L, Q, A, ctx);
+}
+
+int
+gr_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+{
+    return GR_MAT_BINARY_UNARY_OP(ctx, MAT_LQ)(L, Q, A, ctx);
 }
 
 int

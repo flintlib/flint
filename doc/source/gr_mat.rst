@@ -1027,6 +1027,7 @@ QR decomposition
 
 .. function:: int gr_mat_lq_gso(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_lq_recursive(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_lq_generic(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
               int gr_mat_qr(gr_mat_t Q, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
 
