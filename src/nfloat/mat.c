@@ -148,3 +148,24 @@ nfloat_complex_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, in
     else
         return gr_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
 }
+
+int
+nfloat_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+{
+    slong cutoff, prec = NFLOAT_CTX_PREC(ctx);
+
+    if (prec <= 256)
+        cutoff = 24;
+    else if (prec <= 832)
+        cutoff = 12;
+    else if (prec <= 1600)
+        cutoff = 8;
+    else
+        cutoff = 6;
+
+    if (A->r < cutoff)
+        return gr_mat_lq_gso(L, Q, A, ctx);
+    else
+        return gr_mat_lq_recursive(L, Q, A, ctx);
+}
+

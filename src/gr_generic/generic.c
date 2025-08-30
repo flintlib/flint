@@ -3010,6 +3010,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,                 (gr_funcptr) gr_mat_nonsingular_solve_tril_generic},
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,                 (gr_funcptr) gr_mat_nonsingular_solve_triu_generic},
     {GR_METHOD_MAT_LU,                  (gr_funcptr) gr_mat_lu_generic},
+    {GR_METHOD_MAT_LQ,                  (gr_funcptr) gr_mat_lq_generic},
     {GR_METHOD_MAT_DET,                 (gr_funcptr) gr_mat_det_generic},
     {GR_METHOD_MAT_EXP,                 (gr_funcptr) gr_mat_exp_jordan},
     {GR_METHOD_MAT_LOG,                 (gr_funcptr) gr_mat_log_jordan},
