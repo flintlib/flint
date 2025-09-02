@@ -317,9 +317,9 @@ slong arb_mat_allocated_bytes(const arb_mat_t x);
 
 int arb_mat_spd_get_fmpz_mat(fmpz_mat_t B, const arb_mat_t A, slong prec);
 
-void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec);
+void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, double delta, double eta, slong prec);
 
-int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec);
+int arb_mat_spd_is_lll_reduced(const arb_mat_t A, double delta, double eta, slong prec);
 
 #ifdef __cplusplus
 }

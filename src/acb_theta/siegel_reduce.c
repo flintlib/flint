@@ -105,7 +105,7 @@ acb_siegel_reduce_imag(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
     fmpz_mat_init(U, g, g);
 
     acb_mat_get_imag(im, tau);
-    arb_mat_spd_lll_reduce(U, im, prec);
+    arb_mat_spd_lll_reduce(U, im, 0.99, 0.51, prec);
     sp2gz_block_diag(mat, U);
 
     arb_mat_clear(im);
@@ -164,7 +164,7 @@ acb_siegel_reduce(fmpz_mat_t mat, const acb_mat_t tau, slong prec)
         lp = acb_siegel_reduce_real_lowprec(ntau, nmat, g, prec);
         acb_siegel_transform(w, m, w, lp);
         acb_mat_get_imag(im, w);
-        if (!arb_mat_spd_is_lll_reduced(im, -10, lp))
+        if (!arb_mat_spd_is_lll_reduced(im, 0.989, 0.511, lp))
         {
             stop = 1;
             break;
