@@ -24,7 +24,6 @@ TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
         slong g = 1 + n_randint(state, 4);
         slong prec = 200 + n_randint(state, 500);
         slong mag_bits = 1 + n_randint(state, 5);
-        slong tol_exp = -10 - n_randint(state, 20);
         arb_mat_t M;
         arb_mat_t R;
         arb_mat_t T;
@@ -36,14 +35,14 @@ TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
         fmpz_mat_init(U, g, g);
 
         arb_mat_randtest_spd(M, state, prec, mag_bits);
-        arb_mat_spd_lll_reduce(U, M, prec);
+        arb_mat_spd_lll_reduce(U, M, 0.99, 0.51, prec);
 
         arb_mat_set_fmpz_mat(T, U);
         arb_mat_mul(R, T, M, prec);
         arb_mat_transpose(T, T);
         arb_mat_mul(R, R, T, prec);
 
-        if (!arb_mat_spd_is_lll_reduced(R, tol_exp, prec))
+        if (!arb_mat_spd_is_lll_reduced(R, 0.989, 0.511, prec))
         {
             flint_printf("FAIL (reduction)\n");
             arb_mat_printd(M, 10);
@@ -53,7 +52,7 @@ TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
             flint_abort();
         }
 
-        if (arb_mat_spd_is_lll_reduced(M, tol_exp, prec)
+        if (arb_mat_spd_is_lll_reduced(M, 1.01, 0.499, prec)
             && !fmpz_mat_is_one(U))
         {
             flint_printf("FAIL (identity)\n");
