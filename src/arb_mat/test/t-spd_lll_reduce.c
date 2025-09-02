@@ -60,6 +60,7 @@ TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
             arb_mat_printd(M, 10);
             fmpz_mat_print_pretty(U);
             flint_printf("\n");
+            flint_abort();
         }
 
         arb_mat_clear(M);
