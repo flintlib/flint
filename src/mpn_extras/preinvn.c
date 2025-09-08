@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 William Hart
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,26 +14,27 @@
 
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
 {
-   mp_ptr q, r, d1;
+    mp_ptr q, r, d1, tmp;
+    TMP_INIT;
+    TMP_START;
 
-   d1 = flint_malloc(n*sizeof(mp_limb_t));
-   if (mpn_add_1(d1, d, n, 1)) /* check for d + 1 == 0 */
-   {
-      mpn_zero(dinv, n);
-      flint_free(d1);
-      return;
-   }
+    tmp = TMP_ALLOC((n + (2 * n + 1) + (n + 2)) * sizeof(mp_limb_t));
+    d1 = tmp;
+    r = d1 + n;
+    q = r + (2 * n + 1);
 
-   r = flint_malloc((2*n + 1)*sizeof(mp_limb_t));
-   q = flint_malloc((n + 2)*sizeof(mp_limb_t));
+    if (mpn_add_1(d1, d, n, 1)) /* check for d + 1 == 0 */
+    {
+        flint_mpn_zero(dinv, n);
+    }
+    else
+    {
+        flint_mpn_zero(r, 2 * n);
+        r[2*n] = 1;
 
-   mpn_zero(r, 2*n);
-   r[2*n] = 1;
+        mpn_tdiv_qr(q, r, 0, r, 2 * n + 1, d1, n);
+        flint_mpn_copyi(dinv, q, n);
+    }
 
-   mpn_tdiv_qr(q, r, 0, r, 2*n + 1, d1, n);
-   mpn_copyi(dinv, q, n);
-
-   flint_free(r);
-   flint_free(q);
-   flint_free(d1);
+    TMP_END;
 }
