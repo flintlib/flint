@@ -1006,6 +1006,25 @@ Greatest common divisor
     be an integer.
 
 
+Discriminant
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpq_poly_discriminant(fmpq_t res, const fmpz * poly, const fmpz_t den, slong len)
+
+    Set ``res`` to the discriminant of ``(poly, den, len)``. Assumes
+    ``len > 1``.
+
+.. function:: void fmpq_poly_discriminant(fmpq_t res, const fmpq_poly_t poly)
+
+    Set ``res`` to the discriminant of ``poly``. We normalise the
+    discriminant so that `\operatorname{disc}(f) = (-1)^{(n(n-1)/2)}
+    \operatorname{res}(f, f')/\operatorname{lc}(f)`, thus
+    `\operatorname{disc}(f) = \operatorname{lc}(f)^{(2n - 2)} \prod_{i < j} (r_i
+    - r_j)^2`, where `\operatorname{lc}(f)` is the leading coefficient of `f`,
+    `n` is the degree of `f` and `r_i` are the roots of `f`.
+
+
 Derivative and integral
 --------------------------------------------------------------------------------
 

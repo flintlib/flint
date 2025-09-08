@@ -741,6 +741,10 @@ void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly);
 
 int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
+/* Discriminant **************************************************************/
+void _fmpq_poly_discriminant(fmpq_t res, const fmpz* poly, const fmpz_t den, slong len);
+void fmpq_poly_discriminant(fmpq_t res, const fmpq_poly_t poly);
+
 /*  Input and output *********************************************************/
 
 #ifdef FLINT_HAVE_FILE
