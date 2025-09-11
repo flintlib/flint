@@ -58,8 +58,7 @@ flint_mpn_mulmod_precond_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_sr
 {
     slong i;
 
-    FLINT_ASSERT(an <= n);
-    FLINT_ASSERT(an >= 2);
+    FLINT_ASSERT(n >= 2);
 
     if (norm == 0)
         flint_mpn_copyi(apre, a, n);
