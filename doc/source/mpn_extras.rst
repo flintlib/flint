@@ -280,6 +280,9 @@ Division
 
     Assumes ``limbs1 >= limbsg > 0``.
 
+Division and modular arithmetic with precomputed inverses
+--------------------------------------------------------------------------------
+
 .. function:: mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2)
 
     Computes a precomputed inverse from the leading two limbs of the
@@ -355,7 +358,7 @@ Division
     normalised, then `r` will be shifted right by ``norm`` bits
     so that it has the same shift as all the inputs.
 
-    We require `a` and `b` to be reduced modulo `n` before calling the
+    We require `a` and `b` to be reduced modulo `d` before calling the
     function. 
 
 .. function:: void flint_mpn_mulmod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr d, mp_srcptr dinv, ulong norm)
@@ -364,7 +367,43 @@ Division
     The behavior is not exactly the same: `a` and `b` are assumed to
     be unshifted, and the output is unshifted.
 
+.. function:: void flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
 
+    Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
+    provided by ``flint_mpn_preinvn``, computes `ab \pmod{d}`. We require
+    `b` to be reduced modulo `d` before calling the function.
+    The user provides the operand `a` via the ``apre`` argument in the
+    pretransformed representation returned by :func:`flint_mpn_mulmod_precond_precompute`.
+    The complexity of this function is currently `O(n^2)`. To determine if
+    this function should be used instead of :func:`flint_mpn_mulmod_preinvn`,
+    use :func:`flint_mpn_mulmod_want_precond`.
+    Requires `n \ge 2`.
+
+.. function:: int flint_mpn_mulmod_want_precond(mp_size_t n, slong num)
+
+    Assuming a precision of `n` limbs and that one wants to perform `num`
+    multiplications with a fixed (preconditioned) operand, return
+    whether :func:`flint_mpn_mulmod_precond` should be used instead
+    of :func:`flint_mpn_mulmod_preinvn`, accounting for the cost of
+    pretransforming the operand.
+
+.. function:: void flint_mpn_mulmod_precond_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
+    and an integer `a` which is reduced modulo `d`,
+    write to ``apre`` a pretransformed representation of `a`
+    for use with :func:`flint_mpn_mulmod_precond`.
+    Currently, the output consists of `n \times n` limbs storing
+    `a \beta^i d^{norm}` for `0 \le i < n` where `\beta` is the limb
+    radix, plus one junk limb.
+    In the future, this may change to use a different representation
+    (e.g. FFT format) depending on `n`.
+
+.. function:: mp_size_t flint_mpn_mulmod_precond_alloc(mp_size_t n)
+
+    The *alloc* function returns the number of limbs of space required for
+    :func:`flint_mpn_mulmod_precond_precompute`
+    given a modulus with `n` limbs.
 
 GCD
 --------------------------------------------------------------------------------
