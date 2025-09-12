@@ -44,6 +44,7 @@
 #include "t-divides.c"
 #include "t-divrem.c"
 #include "t-div_series.c"
+#include "t-discriminant.c"
 #include "t-equal_trunc.c"
 #include "t-evaluate_fmpq.c"
 #include "t-evaluate_fmpz.c"
@@ -143,6 +144,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_poly_divides),
     TEST_FUNCTION(fmpq_poly_divrem),
     TEST_FUNCTION(fmpq_poly_div_series),
+    TEST_FUNCTION(fmpq_poly_discriminant),
     TEST_FUNCTION(fmpq_poly_equal_trunc),
     TEST_FUNCTION(fmpq_poly_evaluate_fmpq),
     TEST_FUNCTION(fmpq_poly_evaluate_fmpz),
