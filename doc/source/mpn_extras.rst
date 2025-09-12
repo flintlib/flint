@@ -394,7 +394,7 @@ Division and modular arithmetic with precomputed inverses
     write to ``apre`` a pretransformed representation of `a`
     for use with :func:`flint_mpn_mulmod_precond`.
     Currently, the output consists of `n \times n` limbs storing
-    `a \beta^i d^{norm}` for `0 \le i < n` where `\beta` is the limb
+    `a 2^{norm} \beta^i \mod {d 2^{norm}}` for `0 \le i < n` where `\beta` is the limb
     radix, plus one junk limb.
     In the future, this may change to use a different representation
     (e.g. FFT format) depending on `n`.
