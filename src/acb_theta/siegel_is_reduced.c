@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "math.h"
 #include "fmpz_mat.h"
 #include "arb_mat.h"
 #include "acb.h"
@@ -24,6 +25,7 @@ acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec)
     arb_mat_t im;
     acb_t det;
     arb_t abs, t, u;
+    double v;
     slong j, k;
     int res = 1;
 
@@ -55,8 +57,10 @@ acb_siegel_is_reduced(const acb_mat_t tau, slong tol_exp, slong prec)
 
     if (res)
     {
+        v = pow((double) 2, (double) tol_exp);
         acb_mat_get_imag(im, tau);
-        res = arb_mat_spd_is_lll_reduced(im, tol_exp, prec);
+        /* cf. choice of LLL parameters in siegel_reduce.c */
+        res = arb_mat_spd_is_lll_reduced(im, 0.99 - v, 0.51 + v, prec);
     }
 
     arb_one(t);
