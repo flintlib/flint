@@ -460,6 +460,21 @@ mpn_mod_mul(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* for when there is gr_fmma:
+int
+mpn_mod_fmma(nn_ptr res, nn_srcptr x, nn_srcptr y, nn_srcptr x2, nn_srcptr y2, gr_ctx_t ctx)
+{
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+
+    if (n == 2)
+        flint_mpn_fmmamod_preinvn_2(res, x, y, x2, y2, MPN_MOD_CTX_MODULUS_NORMED(ctx), MPN_MOD_CTX_MODULUS_PREINV(ctx), MPN_MOD_CTX_NORM(ctx));
+    else
+        flint_mpn_fmmamod_preinvn(res, x, y, x2, y2, n, MPN_MOD_CTX_MODULUS_NORMED(ctx), MPN_MOD_CTX_MODULUS_PREINV(ctx), MPN_MOD_CTX_NORM(ctx));
+
+    return GR_SUCCESS;
+}
+*/
+
 /* todo: check for 0? */
 int
 mpn_mod_mul_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)

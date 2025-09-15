@@ -895,6 +895,10 @@ int flint_mpn_mulmod_want_precond(mp_size_t n, slong num);
 void flint_mpn_mulmod_precond_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
 void flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
 
+void flint_mpn_fmmamod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr e, mp_srcptr f, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+void flint_mpn_fmmamod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr e, mp_srcptr f, mp_srcptr d, mp_srcptr dinv, ulong norm);
+void flint_mpn_fmmamod_precond(mp_ptr rp, mp_srcptr apre1, mp_srcptr b1, mp_srcptr apre2, mp_srcptr b2, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+
 int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c, flint_bitcnt_t b, mp_ptr tp);
 
 /* miscellaneous *************************************************************/
