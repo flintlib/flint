@@ -289,7 +289,8 @@ _mpn_mod_vec_submul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_c
     return GR_SUCCESS;
 }
 
-/* todo: optimize for length 1, 2 */
+#include "gr.h"
+
 /* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
 _mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
@@ -300,12 +301,40 @@ _mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn
     slong sn;
     slong i;
 
-    if (len <= 0)
+    if (len <= 2)
     {
-        if (initial == NULL)
-            flint_mpn_zero(res, n);
+        if (len == 0)
+        {
+            if (initial == NULL)
+                flint_mpn_zero(res, n);
+            else
+                flint_mpn_copyi(res, initial, n);
+        }
         else
-            flint_mpn_copyi(res, initial, n);
+        {
+            if (initial == NULL)
+            {
+                if (len == 1)
+                    mpn_mod_mul(res, vec1, vec2, ctx);
+                else
+                    mpn_mod_fmma(res, vec1, vec2, vec1 + n, vec2 + n, ctx);
+
+                if (subtract)
+                    mpn_mod_neg(res, res, ctx);
+            }
+            else
+            {
+                if (len == 1)
+                    mpn_mod_mul(t, vec1, vec2, ctx);
+                else
+                    mpn_mod_fmma(t, vec1, vec2, vec1 + n, vec2 + n, ctx);
+
+                if (subtract)
+                    mpn_mod_sub(res, initial, t, ctx);
+                else
+                    mpn_mod_add(res, initial, t, ctx);
+            }
+        }
         return GR_SUCCESS;
     }
 
@@ -398,12 +427,40 @@ _mpn_mod_vec_dot_rev(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1
     slong sn;
     slong i;
 
-    if (len <= 0)
+    if (len <= 2)
     {
-        if (initial == NULL)
-            flint_mpn_zero(res, n);
+        if (len == 0)
+        {
+            if (initial == NULL)
+                flint_mpn_zero(res, n);
+            else
+                flint_mpn_copyi(res, initial, n);
+        }
         else
-            flint_mpn_copyi(res, initial, n);
+        {
+            if (initial == NULL)
+            {
+                if (len == 1)
+                    mpn_mod_mul(res, vec1, vec2, ctx);
+                else
+                    mpn_mod_fmma(res, vec1, vec2 + n, vec1 + n, vec2, ctx);
+
+                if (subtract)
+                    mpn_mod_neg(res, res, ctx);
+            }
+            else
+            {
+                if (len == 1)
+                    mpn_mod_mul(t, vec1, vec2, ctx);
+                else
+                    mpn_mod_fmma(t, vec1, vec2 + n, vec1 + n, vec2, ctx);
+
+                if (subtract)
+                    mpn_mod_sub(res, initial, t, ctx);
+                else
+                    mpn_mod_add(res, initial, t, ctx);
+            }
+        }
         return GR_SUCCESS;
     }
 

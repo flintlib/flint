@@ -137,6 +137,7 @@ Basic operations and arithmetic
               int mpn_mod_submul_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)
               int mpn_mod_submul_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
               int mpn_mod_submul_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int mpn_mod_fmma(nn_ptr res, nn_srcptr x1, nn_srcptr y1, nn_srcptr x2, nn_srcptr y2, gr_ctx_t ctx)
               int mpn_mod_sqr(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)

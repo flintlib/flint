@@ -460,7 +460,6 @@ mpn_mod_mul(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* for when there is gr_fmma:
 int
 mpn_mod_fmma(nn_ptr res, nn_srcptr x, nn_srcptr y, nn_srcptr x2, nn_srcptr y2, gr_ctx_t ctx)
 {
@@ -473,7 +472,6 @@ mpn_mod_fmma(nn_ptr res, nn_srcptr x, nn_srcptr y, nn_srcptr x2, nn_srcptr y2, g
 
     return GR_SUCCESS;
 }
-*/
 
 /* todo: check for 0? */
 int
