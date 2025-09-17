@@ -1390,6 +1390,9 @@ void gr_ctx_uninitialized(gr_ctx_t ctx);
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state);
 
 void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
