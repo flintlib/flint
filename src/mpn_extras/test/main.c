@@ -15,6 +15,8 @@
 #include "t-divides.c"
 #include "t-divrem_preinv1.c"
 #include "t-divrem_preinvn.c"
+#include "t-fmmamod_precond.c"
+#include "t-fmmamod_preinvn.c"
 #include "t-fmms1.c"
 #include "t-gcd_full.c"
 #include "t-mod_preinvn.c"
@@ -44,6 +46,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_divides),
     TEST_FUNCTION(flint_mpn_divrem_preinv1),
     TEST_FUNCTION(flint_mpn_divrem_preinvn),
+    TEST_FUNCTION(flint_mpn_fmmamod_precond),
+    TEST_FUNCTION(flint_mpn_fmmamod_preinvn),
     TEST_FUNCTION(flint_mpn_fmms1),
     TEST_FUNCTION(flint_mpn_gcd_full),
     TEST_FUNCTION(flint_mpn_mod_preinvn),

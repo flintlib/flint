@@ -111,6 +111,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_VEC_MUL,         (gr_funcptr) _mpn_mod_vec_mul},
     {GR_METHOD_VEC_MUL_SCALAR,  (gr_funcptr) _mpn_mod_vec_mul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR,    (gr_funcptr) _mpn_mod_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,    (gr_funcptr) _mpn_mod_vec_submul_scalar},
     {GR_METHOD_SCALAR_MUL_VEC,  (gr_funcptr) _mpn_mod_scalar_mul_vec},
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _mpn_mod_vec_dot},

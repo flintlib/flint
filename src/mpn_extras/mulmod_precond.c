@@ -112,21 +112,23 @@ flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp
     */
 
     mp_ptr tmp;
-    mp_limb_t cy;
+    mp_limb_t cy, cy1, cy2;
     slong i, rn;
     TMP_INIT;
 
     TMP_START;
     tmp = TMP_ALLOC((n + 2) * sizeof(mp_limb_t));
 
-    tmp[n] = mpn_mul_1(tmp, apre, n, b[0]);
-    tmp[n + 1] = 0;
+    cy1 = mpn_mul_1(tmp, apre, n, b[0]);
+    cy2 = 0;
     for (i = 1; i < n; i++)
     {
         cy = mpn_addmul_1(tmp, apre + i * n, n, b[i]);
-        add_ssaaaa(tmp[n + 1], tmp[n], tmp[n + 1], tmp[n], 0, cy);
+        add_ssaaaa(cy2, cy1, cy2, cy1, 0, cy);
     }
 
+    tmp[n] = cy1;
+    tmp[n + 1] = cy2;
     rn = (n + 2) - (tmp[n + 1] == 0);
 
 #if 0
@@ -143,3 +145,77 @@ flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp
     TMP_END;
 }
 
+void
+flint_mpn_fmmamod_precond(mp_ptr rp, mp_srcptr apre1, mp_srcptr b1, mp_srcptr apre2, mp_srcptr b2, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
+{
+    mp_ptr tmp;
+    mp_limb_t cy, cy1, cy2;
+    slong i, rn;
+    TMP_INIT;
+
+    /* Something like this if we want a special case for n = 2 */
+    /*
+    if (n == 2)
+    {
+        ulong tmp[4];
+        ulong ump[4];
+
+        FLINT_MPN_MUL_2X1(tmp[2], tmp[1], tmp[0], apre1[1], apre1[0], b1[0]);
+        FLINT_MPN_MUL_2X1(ump[2], ump[1], ump[0], apre1[3], apre1[2], b1[1]);
+        add_ssssaaaaaaaa(tmp[3], tmp[2], tmp[1], tmp[0], tmp[3], tmp[2], tmp[1], tmp[0], 0, ump[2], ump[1], ump[0]);
+        FLINT_MPN_MUL_2X1(ump[2], ump[1], ump[0], apre2[3], apre2[2], b2[0]);
+        add_ssssaaaaaaaa(tmp[3], tmp[2], tmp[1], tmp[0], tmp[3], tmp[2], tmp[1], tmp[0], 0, ump[2], ump[1], ump[0]);
+        FLINT_MPN_MUL_2X1(ump[2], ump[1], ump[0], apre2[3], apre2[2], b2[1]);
+        add_ssssaaaaaaaa(tmp[3], tmp[2], tmp[1], tmp[0], tmp[3], tmp[2], tmp[1], tmp[0], 0, ump[2], ump[1], ump[0]);
+
+        rn = (n + 2) - (tmp[n + 1] == 0);
+        flint_mpn_mod_preinv1(tmp, rn, d, n, dinv[n - 1]);
+
+        if (norm)
+        {
+            rp[0] = (tmp[0] >> norm) | (tmp[1] << (FLINT_BITS - norm));
+            rp[1] = (tmp[1] >> norm);
+        }
+        else
+        {
+            rp[0] = tmp[0];
+            rp[1] = tmp[1];
+        }
+
+        return;
+    }
+    */
+
+    TMP_START;
+    tmp = TMP_ALLOC((n + 2) * sizeof(mp_limb_t));
+
+    cy1 = mpn_mul_1(tmp, apre1, n, b1[0]);
+    cy2 = 0;
+    for (i = 1; i < n; i++)
+    {
+        cy = mpn_addmul_1(tmp, apre1 + i * n, n, b1[i]);
+        add_ssaaaa(cy2, cy1, cy2, cy1, 0, cy);
+    }
+    for (i = 0; i < n; i++)
+    {
+        cy = mpn_addmul_1(tmp, apre2 + i * n, n, b2[i]);
+        add_ssaaaa(cy2, cy1, cy2, cy1, 0, cy);
+    }
+
+    tmp[n] = cy1;
+    tmp[n + 1] = cy2;
+    rn = (n + 2) - (tmp[n + 1] == 0);
+
+#if 0
+    flint_mpn_mod_preinvn(tmp, tmp, rn, d, n, dinv);
+#else
+    flint_mpn_mod_preinv1(tmp, rn, d, n, dinv[n - 1]);
+#endif
+
+    if (norm == 0)
+        flint_mpn_copyi(rp, tmp, n);
+    else
+        mpn_rshift(rp, tmp, n, norm);
+
+    TMP_END;
+}

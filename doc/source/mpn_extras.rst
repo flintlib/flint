@@ -367,6 +367,13 @@ Division and modular arithmetic with precomputed inverses
     The behavior is not exactly the same: `a` and `b` are assumed to
     be unshifted, and the output is unshifted.
 
+.. function:: void flint_mpn_fmmamod_preinvn(mp_ptr r, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+              void flint_mpn_fmmamod_preinvn_2(mp_ptr r, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
+    provided by ``flint_mpn_preinvn``, computes `a_1 b_1 + a_2 b_2 \pmod{d}`. We require
+    all operands to be reduced modulo `d`.
+
 .. function:: void flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
 
     Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
@@ -404,6 +411,10 @@ Division and modular arithmetic with precomputed inverses
     The *alloc* function returns the number of limbs of space required for
     :func:`flint_mpn_mulmod_precond_precompute`
     given a modulus with `n` limbs.
+
+.. function:: void flint_mpn_fmmamod_precond(mp_ptr rp, mp_srcptr a1pre, mp_srcptr b1, mp_srcptr a2pre, mp_srcptr b2, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Analogous to :func:`flint_mpn_mulmod_precond`, but computes `a_1 b_1 + a_2 b_2` modulo `d`.
 
 GCD
 --------------------------------------------------------------------------------
