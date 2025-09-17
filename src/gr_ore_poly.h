@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2025 Ricardo Buring
+    Copyright (C) 2025 Marc Mezzarobba
 
     This file is part of FLINT.
 
@@ -24,21 +25,27 @@
 extern "C" {
 #endif
 
+/* Ore polynomial rings */
+
 typedef enum {
+    ORE_ALGEBRA_CUSTOM,
+    ORE_ALGEBRA_COMMUTATIVE,
     ORE_ALGEBRA_DERIVATIVE,
     ORE_ALGEBRA_EULER_DERIVATIVE,
     ORE_ALGEBRA_FORWARD_SHIFT,
     ORE_ALGEBRA_FORWARD_DIFFERENCE,
+    ORE_ALGEBRA_BACKWARD_SHIFT,
+    ORE_ALGEBRA_BACKWARD_DIFFERENCE,
+    ORE_ALGEBRA_Q_SHIFT,
+    ORE_ALGEBRA_MAHLER,
+    /* todo: q-derivative? general substitution?... */
+    ORE_ALGEBRA_FROBENIUS,
+
+    ORE_POLY_NUM_ALGEBRAS
 }
 ore_algebra_t;
 
-#define ORE_POLY_NUM_ALGEBRAS 2
-
-GR_ORE_POLY_INLINE
-ore_algebra_t ore_algebra_randtest(flint_rand_t state)
-{
-   return (ore_algebra_t) n_randint(state, ORE_POLY_NUM_ALGEBRAS);
-}
+ore_algebra_t ore_algebra_randtest(flint_rand_t state);
 
 /* Compatible with gr_poly_struct */
 typedef struct
@@ -51,6 +58,23 @@ gr_ore_poly_struct;
 
 typedef gr_ore_poly_struct gr_ore_poly_t[1];
 
+typedef gr_ctx_struct gr_ore_poly_ctx_struct;
+
+typedef gr_ore_poly_ctx_struct gr_ore_poly_ctx_t[1];
+
+typedef int (* gr_ore_poly_sigma_delta_t) (gr_ptr, gr_ptr, gr_srcptr, gr_ore_poly_ctx_struct *);
+
+typedef struct
+{
+    slong base_var;
+    gr_ptr sigma_x;
+    union {
+        gr_ptr q;
+        slong mahler_base;
+    };
+}
+gr_ore_poly_ore_data_t;
+
 /* Compatible with polynomial_ctx_t */
 typedef struct
 {
@@ -58,17 +82,20 @@ typedef struct
     slong degree_limit;
     char * var;
     ore_algebra_t which_algebra;
-    slong base_var;
-    /* TODO: Function pointers to \sigma, \delta. */
+    gr_ore_poly_sigma_delta_t sigma_delta;
+    void * ore_data;
 }
 _gr_ore_poly_ctx_struct;
 
-typedef gr_ctx_struct gr_ore_poly_ctx_struct;
-
-typedef gr_ore_poly_ctx_struct gr_ore_poly_ctx_t[1];
-
 #define GR_ORE_POLY_CTX(ring_ctx) ((_gr_ore_poly_ctx_struct *)((ring_ctx)))
 #define GR_ORE_POLY_ELEM_CTX(ring_ctx) (GR_ORE_POLY_CTX(ring_ctx)->base_ring)
+#define GR_ORE_POLY_ORE_DATA(ring_ctx) ((gr_ore_poly_ore_data_t *)(GR_ORE_POLY_CTX(ring_ctx)->ore_data))
+
+GR_ORE_POLY_INLINE void *
+gr_ore_poly_ctx_data_ptr(gr_ore_poly_ctx_t ctx)
+{
+    return GR_ORE_POLY_CTX(ctx)->ore_data;
+}
 
 /* Context object */
 
@@ -77,7 +104,8 @@ void gr_ctx_init_gr_ore_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong base_var, c
 void gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra);
 void gr_ore_poly_ctx_clear(gr_ore_poly_ctx_t ctx);
 
-void gr_ore_poly_ctx_init_rand(gr_ore_poly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring);
+void gr_ore_poly_ctx_init_randtest(gr_ore_poly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring);
+void gr_ore_poly_ctx_init_randtest2(gr_ctx_t base_ring, gr_ore_poly_ctx_t ctx, flint_rand_t state);
 
 WARN_UNUSED_RESULT int _gr_ore_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s);
 WARN_UNUSED_RESULT int _gr_ore_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
@@ -181,6 +209,40 @@ WARN_UNUSED_RESULT int gr_ore_poly_set_ui(gr_ore_poly_t poly, ulong x, gr_ore_po
 WARN_UNUSED_RESULT int gr_ore_poly_set_fmpz(gr_ore_poly_t poly, const fmpz_t x, gr_ore_poly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ore_poly_set_fmpq(gr_ore_poly_t poly, const fmpq_t x, gr_ore_poly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ore_poly_set_other(gr_ore_poly_t poly, gr_srcptr x, gr_ctx_t x_ctx, gr_ore_poly_ctx_t ctx);
+
+/* Action on the base ring */
+
+WARN_UNUSED_RESULT int sigma_delta_unable(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_commutative(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_derivative(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_euler_derivative(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_forward_shift(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_backward_shift(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_forward_difference(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_backward_difference(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_q_shift(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_mahler(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+WARN_UNUSED_RESULT int sigma_delta_frobenius(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_struct * ctx);
+
+GR_ORE_POLY_INLINE WARN_UNUSED_RESULT int
+gr_ore_poly_sigma_delta(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_t ctx)
+{
+    return GR_ORE_POLY_CTX(ctx)->sigma_delta(sigma, delta, a, ctx);
+}
+
+GR_ORE_POLY_INLINE WARN_UNUSED_RESULT int
+gr_ore_poly_sigma(gr_ptr res, gr_srcptr a, gr_ore_poly_ctx_t ctx)
+{
+    return GR_ORE_POLY_CTX(ctx)->sigma_delta(res, NULL, a, ctx);
+}
+
+GR_ORE_POLY_INLINE WARN_UNUSED_RESULT int
+gr_ore_poly_delta(gr_ptr res, gr_srcptr a, gr_ore_poly_ctx_t ctx)
+{
+    return GR_ORE_POLY_CTX(ctx)->sigma_delta(NULL, res, a, ctx);
+}
+
+extern const gr_ore_poly_sigma_delta_t _gr_ore_poly_default_sigma_delta[];
 
 /* Arithmetic */
 

@@ -14,16 +14,31 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+int
+_gr_poly_inflate(gr_ptr poly, slong len, slong n, gr_ctx_t ctx)
+{
+    slong i, sz = ctx->sizeof_elem;
+    int status = GR_SUCCESS;
+
+    for (i = len - 1; i >= 1 && n > 1; i--)
+    {
+        gr_swap(GR_ENTRY(poly, i * n, sz), GR_ENTRY(poly, i, sz), ctx);
+        status |= _gr_vec_zero(GR_ENTRY(poly, (i - 1) * n + 1, sz), n - 1, ctx);
+    }
+
+    return status;
+}
+
 /* compose by poly2 = a*x^n + c, no aliasing; n >= 1 */
 int
 _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
         gr_srcptr c, gr_srcptr a, slong n, gr_ctx_t ctx)
 {
     slong i, sz = ctx->sizeof_elem;
-    int status;
+    int status = GR_SUCCESS;
 
     /* shift by c (c = 0 case will be fast) */
-    status = _gr_poly_taylor_shift(res, poly1, len1, c, ctx);
+    status |= _gr_poly_taylor_shift(res, poly1, len1, c, ctx);
 
     /* multiply by powers of a */
     if (gr_is_one(a, ctx) != T_TRUE)
@@ -56,11 +71,7 @@ _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
     }
 
     /* stretch */
-    for (i = len1 - 1; i >= 1 && n > 1; i--)
-    {
-        gr_swap(GR_ENTRY(res, i * n, sz), GR_ENTRY(res, i, sz), ctx);
-        status |= _gr_vec_zero(GR_ENTRY(res, (i - 1) * n + 1, sz), n - 1, ctx);
-    }
+    status |= _gr_poly_inflate(res, len1, n, ctx);
 
     return status;
 }

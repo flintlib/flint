@@ -10,7 +10,6 @@
 */
 
 #include <stdio.h>
-#include "fmpq.h"
 #include "gr_poly.h"
 #include "gr_ore_poly.h"
 
