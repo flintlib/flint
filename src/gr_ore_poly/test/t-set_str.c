@@ -10,8 +10,6 @@
 */
 
 #include "test_helpers.h"
-#include "fmpz.h"
-#include "gr_vec.h"
 #include "gr_ore_poly.h"
 
 /* This is mostly a copy of src/gr_poly/test/t-set_str.c */
@@ -29,9 +27,7 @@ TEST_FUNCTION_START(gr_ore_poly_set_str, state)
         slong glen;
         char * s;
 
-        gr_ctx_init_random(ctx, state);
-        /* TODO: ensure ctx has a generator */
-        gr_ore_poly_ctx_init_rand(ore_ctx, state, ctx);
+        gr_ore_poly_ctx_init_randtest2(ctx, ore_ctx, state);
         gr_ore_poly_init(f, ore_ctx);
         gr_ore_poly_init(g, ore_ctx);
 

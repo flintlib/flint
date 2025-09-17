@@ -27,9 +27,7 @@ TEST_FUNCTION_START(gr_ore_poly_ring, state)
         gr_ore_poly_ctx_t ore_ctx;
         slong reps;
 
-        gr_ctx_init_random(ctx, state);
-        /* TODO: ensure ctx has a generator */
-        gr_ore_poly_ctx_init_rand(ore_ctx, state, ctx);
+        gr_ore_poly_ctx_init_randtest2(ctx, ore_ctx, state);
 
         if (gr_ctx_is_finite(ctx) == T_TRUE ||
             gr_ctx_has_real_prec(ctx) == T_TRUE)
