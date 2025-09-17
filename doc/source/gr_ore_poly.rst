@@ -24,11 +24,22 @@ management and handles degenerate cases.
 
 Ore algebra types
 --------------------------------------------------------------------------------
+
 .. type:: ore_algebra_t
 
     Represents one of the following supported Ore algebra types:
 
+    .. macro:: ORE_ALGEBRA_CUSTOM
+
+        Custom Ore polynomials.
+
+    .. macro:: ORE_ALGEBRA_COMMUTATIVE
+
+        Standard polynomials.
+
     .. macro:: ORE_ALGEBRA_DERIVATIVE
+
+        Linear differential operators in the standard derivative.
 
         The endomorphism `\sigma` is the identity, and the `\sigma`-derivation
         `\delta` is the derivative `\frac{d}{dx}` with respect to a generator
@@ -36,11 +47,15 @@ Ore algebra types
 
     .. macro:: ORE_ALGEBRA_EULER_DERIVATIVE
 
+        Linear differential operators in the Euler derivative.
+
         The endomorphism `\sigma` is the identity, and the `\sigma`-derivation
         `\delta` is the Euler derivative `x\cdot\frac{d}{dx}` with respect to a
         generator `x` of the base ring.
 
     .. macro:: ORE_ALGEBRA_FORWARD_SHIFT
+
+        Linear difference operators in the standard forward shift.
 
         The endomorphism `\sigma` is the shift `x \mapsto x + 1` with respect
         to a generator `x` of the base ring, and the `\sigma`-derivation
@@ -48,9 +63,31 @@ Ore algebra types
 
     .. macro:: ORE_ALGEBRA_FORWARD_DIFFERENCE
 
+        Linear difference operator in the forward finite difference operator.
+
         The endomorphism `\sigma` is the shift `x \mapsto x + 1` with respect
         to a generator `x` of the base ring, and the `\sigma`-derivation
         `\delta` maps `x \mapsto 1`.
+
+    .. macro:: ORE_ALGEBRA_BACKWARD_SHIFT
+
+        Linear difference operators in the standard backward shift.
+
+    .. macro:: ORE_ALGEBRA_BACKWARD_DIFFERENCE
+
+        Linear difference operator in the backward finite difference operator.
+
+    .. macro:: ORE_ALGEBRA_Q_SHIFT
+
+        Linear q-difference operators.
+
+    .. macro:: ORE_ALGEBRA_MAHLER
+
+        Linear Mahler operators.
+
+    .. macro:: ORE_ALGEBRA_FROBENIUS
+
+        Ore polynomials over a field twisted by the Frobenius endomorphism.
 
 .. function:: ore_algebra_t ore_algebra_randtest(flint_rand_t state)
 
@@ -101,13 +138,39 @@ Context object methods
     generator of ``base_ring``; this will be the generator of index
     ``base_var``.
 
+    This function can be used with all Ore algebra types for which no more
+    specific initialization function is listed below.
+
+.. function:: int gr_ore_poly_ctx_init_q_shift(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, gr_srcptr q)
+              int gr_ore_poly_ctx_init_q_difference(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, gr_srcptr q)
+              int gr_ore_poly_ctx_init_mahler(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, long mahler_base)
+
+    Like :func:`gr_ore_poly_ctx_init` for predefined Ore polynomial types where
+    `\sigma` and `\delta` depend on parameters.
+
+.. function:: void * gr_ore_poly_ctx_data_ptr(gr_ore_poly_ctx_t ctx)
+
+.. function:: void gr_ore_poly_ctx_init_custom(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, const gr_ore_poly_sigma_delta_t sigma_delta, void * ore_data)
+
+    Initializes ``ctx`` to a ring of densely represented Ore polynomials over
+    the given ``base_ring``, with a custom Ore algebra structure specified by a
+    pointer ``sigma_delta`` to an implementation of
+    :func:`gr_ore_poly_sigma_delta`.
+    The ``ore_data`` argument is accessible to ``sigma_delta`` as
+    ``gr_ore_poly_ctx_data_ptr(ctx)``.
+
+.. function:: void gr_ore_poly_ctx_init_randtest(gr_ore_poly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring)
+
+    Initializes ``ctx`` with a random Ore algebra structure.
+
+.. function:: void gr_ore_poly_ctx_init_randtest2(gr_ctx_t base_ring, gr_ore_poly_ctx_t ctx, flint_rand_t state)
+
+    Initializes ``ctx`` with a random Ore algebra structure over a random base
+    ring.
+
 .. function:: void gr_ore_poly_ctx_clear(gr_ore_poly_ctx_t ctx)
 
     Clears the context object ``ctx``.
-
-.. function:: void gr_ore_poly_ctx_init_rand(gr_ore_poly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring)
-
-    Initializes ``ctx`` with a random Ore algebra structure.
 
 The following methods implement parts of the standard interface
 for ``gr`` context objects.
@@ -188,6 +251,22 @@ Basic manipulation
               int gr_ore_poly_set_fmpz(gr_ore_poly_t poly, const fmpz_t c, gr_ore_poly_ctx_t ctx)
               int gr_ore_poly_set_fmpq(gr_ore_poly_t poly, const fmpq_t c, gr_ore_poly_ctx_t ctx)
               int gr_ore_poly_set_other(gr_ore_poly_t poly, gr_srcptr x, gr_ctx_t x_ctx, gr_ore_poly_ctx_t ctx)
+
+Action
+-------------------------------------------------------------------------------
+
+.. function:: int gr_ore_poly_sigma(gr_ptr res, gr_srcptr a, gr_ore_poly_ctx_t ctx)
+              int gr_ore_poly_delta(gr_ptr res, gr_srcptr a, gr_ore_poly_ctx_t ctx)
+              int gr_ore_poly_sigma_delta(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_t ctx)
+
+    Compute *σ(a)*,  *δ(a)*, or both, where *a* is an element of the base ring.
+    In the *sigma_delta* variant, the output variables *sigma* or *delta* can be
+    `NULL`.
+
+.. type:: gr_ore_poly_sigma_delta_t
+
+    A pointer to a function with the same specification as
+    :func:`gr_ore_poly_sigma_delta`.
 
 Arithmetic
 -------------------------------------------------------------------------------

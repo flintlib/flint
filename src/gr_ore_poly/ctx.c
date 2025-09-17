@@ -13,15 +13,60 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "fmpz_mpoly_q.h"
+#include "fmpz_mod_mpoly_q.h"
 #include "gr_vec.h"
 #include "gr_ore_poly.h"
+#include "gr_poly.h"
 #include "gr_generic.h"
+#include "long_extras.h"
+#include "mpoly.h"
+#include "ulong_extras.h"
 
 static const char * default_var = "D";
 
 int gr_ore_poly_ctx_write(gr_stream_t out, gr_ore_poly_ctx_t ctx)
 {
-    gr_stream_write(out, "Ring of Ore polynomials over ");
+    switch (GR_ORE_POLY_CTX(ctx)->which_algebra)
+    {
+        case ORE_ALGEBRA_CUSTOM:
+            gr_stream_write(out, "Custom Ore polynomials");
+            break;
+        case ORE_ALGEBRA_COMMUTATIVE:
+            gr_stream_write(out, "Commutative Ore polynomials");
+            break;
+        case ORE_ALGEBRA_DERIVATIVE:
+            gr_stream_write(out, "Differential operators");
+            break;
+        case ORE_ALGEBRA_EULER_DERIVATIVE:
+            gr_stream_write(out, "Differential operators (Euler derivative)");
+            break;
+        case ORE_ALGEBRA_FORWARD_SHIFT:
+            gr_stream_write(out, "Difference operators (forward shift)");
+            break;
+        case ORE_ALGEBRA_FORWARD_DIFFERENCE:
+            gr_stream_write(out, "Difference operators (forward differences)");
+            break;
+        case ORE_ALGEBRA_BACKWARD_SHIFT:
+            gr_stream_write(out, "Difference operators (backward shift)");
+            break;
+        case ORE_ALGEBRA_BACKWARD_DIFFERENCE:
+            gr_stream_write(out, "Difference operators (backward differences)");
+            break;
+        case ORE_ALGEBRA_Q_SHIFT:
+            gr_stream_write(out, "q-difference operators (q-shift)");
+            break;
+        case ORE_ALGEBRA_MAHLER:
+            gr_stream_write(out, "Mahler operators");
+            break;
+        case ORE_ALGEBRA_FROBENIUS:
+            gr_stream_write(out, "Ore-Frobenius polynomials");
+            break;
+        default:
+            gr_stream_write(out, "Ore polynomials");
+            break;
+    }
+    gr_stream_write(out, " over ");
     gr_ctx_write(out, GR_ORE_POLY_ELEM_CTX(ctx));
     return GR_SUCCESS;
 }
@@ -47,10 +92,23 @@ int _gr_ore_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 void
 gr_ore_poly_ctx_clear(gr_ore_poly_ctx_t ctx)
 {
-    if (GR_ORE_POLY_CTX(ctx)->var != default_var)
+    switch (GR_ORE_POLY_CTX(ctx)->which_algebra)
     {
-        flint_free(GR_ORE_POLY_CTX(ctx)->var);
+        case ORE_ALGEBRA_Q_SHIFT:
+            gr_heap_clear(GR_ORE_POLY_ORE_DATA(ctx)->q,
+                          GR_ORE_POLY_ELEM_CTX(ctx));
+            gr_heap_clear(GR_ORE_POLY_ORE_DATA(ctx)->sigma_x,
+                          GR_ORE_POLY_ELEM_CTX(ctx));
+            break;
+        default:
+            ;
     }
+
+    if (GR_ORE_POLY_CTX(ctx)->which_algebra != ORE_ALGEBRA_CUSTOM)
+        flint_free(GR_ORE_POLY_CTX(ctx)->ore_data);
+
+    if (GR_ORE_POLY_CTX(ctx)->var != default_var)
+        flint_free(GR_ORE_POLY_CTX(ctx)->var);
 }
 
 truth_t
@@ -233,7 +291,7 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
 };
 
 void
-gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
+_gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, const ore_algebra_t which_algebra)
 {
     ctx->which_ring = GR_CTX_GR_ORE_POLY;
     ctx->sizeof_elem = sizeof(gr_ore_poly_struct);
@@ -243,7 +301,7 @@ gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, 
     GR_ORE_POLY_CTX(ctx)->degree_limit = WORD_MAX;
     GR_ORE_POLY_CTX(ctx)->var = (char *) default_var;
     GR_ORE_POLY_CTX(ctx)->which_algebra = which_algebra;
-    GR_ORE_POLY_CTX(ctx)->base_var = base_var;
+    GR_ORE_POLY_CTX(ctx)->sigma_delta = _gr_ore_poly_default_sigma_delta[which_algebra];
 
     ctx->methods = _gr_ore_poly_methods;
 
@@ -255,7 +313,159 @@ gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, 
 }
 
 void
-gr_ore_poly_ctx_init_rand(gr_ore_poly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring)
+gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
 {
-    gr_ore_poly_ctx_init(ctx, base_ring, 0, ore_algebra_randtest(state));
+    _gr_ore_poly_ctx_init(ctx, base_ring, which_algebra);
+
+    /* todo: FLINT_ASSERT(base_var < gr_ctx_ngens(base_ring)) */
+
+    GR_ORE_POLY_CTX(ctx)->ore_data = flint_malloc(sizeof(gr_ore_poly_ore_data_t));
+    GR_ORE_POLY_ORE_DATA(ctx)->base_var = base_var;
+}
+
+void
+gr_ore_poly_ctx_init_custom(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring,
+                            const gr_ore_poly_sigma_delta_t sigma_delta,
+                            void * ore_data)
+{
+    _gr_ore_poly_ctx_init(ctx, base_ring, ORE_ALGEBRA_CUSTOM);
+    GR_ORE_POLY_CTX(ctx)->sigma_delta = sigma_delta;
+    GR_ORE_POLY_CTX(ctx)->ore_data = ore_data;
+}
+
+/* although we currently require base_ring to be a univariate polynomial ring
+ * and in this case q will typically be a constant, for multivariate polynomial
+ * rings one typically wants q to be an element of the polynomial ring, not its
+ * base ring */
+int
+gr_ore_poly_ctx_init_q_shift(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring,
+                             slong base_var, gr_srcptr q)
+{
+    if (base_ring->which_ring != GR_CTX_GR_POLY)
+        return GR_UNABLE;
+
+    int status = GR_SUCCESS;
+
+    gr_ore_poly_ctx_init(ctx, base_ring, base_var, ORE_ALGEBRA_Q_SHIFT);
+    GR_ORE_POLY_ORE_DATA(ctx)->q = gr_heap_init(base_ring);
+    gr_ptr sigma_x = gr_heap_init(base_ring);
+    GR_ORE_POLY_ORE_DATA(ctx)->sigma_x = sigma_x;
+
+    status |= gr_set(GR_ORE_POLY_ORE_DATA(ctx)->q, q, base_ring);
+    status |= gr_gen(sigma_x, base_ring);
+    status |= gr_mul(sigma_x, q, sigma_x, base_ring);
+
+    return status;
+}
+
+int
+gr_ore_poly_ctx_init_mahler(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring,
+                            slong base_var, long mahler_base)
+{
+    if (mahler_base == 0)
+        return GR_DOMAIN;
+
+    gr_ore_poly_ctx_init(ctx, base_ring, base_var, ORE_ALGEBRA_MAHLER);
+    GR_ORE_POLY_ORE_DATA(ctx)->mahler_base = mahler_base;
+
+    return GR_SUCCESS;
+}
+
+ore_algebra_t
+ore_algebra_randtest(flint_rand_t state)
+{
+    switch (n_randint(state, 3))
+    {
+        case 0:
+            return ORE_ALGEBRA_DERIVATIVE;
+        case 1:
+            return ORE_ALGEBRA_FORWARD_SHIFT;
+        default:
+            return (ore_algebra_t) n_randint(state, ORE_POLY_NUM_ALGEBRAS);
+    }
+}
+
+void
+gr_ore_poly_ctx_init_randtest(gr_ore_poly_ctx_t ctx, flint_rand_t state,
+                              gr_ctx_t base_ring)
+{
+    ore_algebra_t alg = ore_algebra_randtest(state);
+    /* todo: base_var = n_randint(gr_ctx_ngens(base_ring)) */
+    slong base_var = 0;
+
+    int status = GR_SUCCESS;
+
+    if (alg == ORE_ALGEBRA_CUSTOM)
+    {
+        /* sigma_delta_commutative does not use ore_data */
+        gr_ore_poly_ctx_init_custom(ctx, base_ring, sigma_delta_commutative, NULL);
+    }
+    else if (alg == ORE_ALGEBRA_Q_SHIFT)
+    {
+        if (base_ring->which_ring == GR_CTX_GR_POLY)
+        {
+            gr_ptr q;
+            GR_TMP_INIT(q, base_ring);
+            status |= gr_randtest_not_zero(q, state, base_ring);
+            if (status == GR_SUCCESS)
+                status |= gr_ore_poly_ctx_init_q_shift(ctx, base_ring, base_var, q);
+            GR_TMP_CLEAR(q, base_ring);
+        }
+        else
+        {
+            status = GR_UNABLE;
+        }
+    }
+    else if (alg == ORE_ALGEBRA_MAHLER)
+    {
+        slong b = 2 + n_randint(state, 3);
+        status |= gr_ore_poly_ctx_init_mahler(ctx, base_ring, base_var, b);
+    }
+    else
+    {
+        gr_ore_poly_ctx_init(ctx, base_ring, base_var, alg);
+    }
+
+    if (status != GR_SUCCESS)
+        gr_ore_poly_ctx_init_custom(ctx, base_ring, sigma_delta_unable, NULL);
+}
+
+void
+gr_ore_poly_ctx_init_randtest2(gr_ctx_t base_ring, gr_ore_poly_ctx_t ctx, flint_rand_t state)
+{
+    fmpz_t mod;
+
+    switch (n_randint(state, 10))
+    {
+        case 0:
+            gr_ctx_init_random_mpoly(base_ring, state);
+            break;
+        case 1:
+            gr_ctx_init_random_series(base_ring, state);
+            break;
+        case 2:
+            gr_ctx_init_fmpz_mpoly_q(base_ring, n_randint(state, 3),
+                                     mpoly_ordering_randtest(state));
+            break;
+        case 3:
+            fmpz_init(mod);
+            fmpz_set_ui(mod, n_randtest_prime(state, 1));
+            gr_ctx_init_fmpz_mod_mpoly_q(base_ring, n_randint(state, 3),
+                                         mpoly_ordering_randtest(state),
+                                         mod);
+            fmpz_clear(mod);
+            break;
+        case 4:
+            fmpz_init(mod);
+            fmpz_set_ui(mod, n_randtest_prime(state, 1));
+            gr_ctx_init_fq(base_ring, mod, 1 + n_randint(state, 3), NULL);
+            gr_ore_poly_ctx_init(ctx, base_ring, 0, ORE_ALGEBRA_FROBENIUS);
+            fmpz_clear(mod);
+            return;
+        default:
+            gr_ctx_init_random_poly(base_ring, state);
+            break;
+    }
+
+    gr_ore_poly_ctx_init_randtest(ctx, state, base_ring);
 }
