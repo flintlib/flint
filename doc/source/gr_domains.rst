@@ -304,6 +304,10 @@ Polynomial rings
     over the given *base_ring*.
     Elements have type :type:`gr_poly_struct`.
 
+.. function:: void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random univariate polynomial ring.
+
 .. function:: void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate
@@ -317,6 +321,10 @@ Polynomial rings
     polynomials in *nvars* variables over the given *base_ring*,
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
+
+.. function:: void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random multivariate polynomial ring.
 
 Ore polynomials
 -------------------------------------------------------------------------------
@@ -334,6 +342,10 @@ Power series
 
 See :func:`gr_series_ctx_init` and :func:`gr_series_mod_ctx_init`
 in :ref:`gr-series`.
+
+.. function:: void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random power series ring.
 
 Fraction fields
 -------------------------------------------------------------------------------

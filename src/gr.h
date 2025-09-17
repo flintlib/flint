@@ -1355,6 +1355,9 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 /* Some base rings */
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state);
 
 void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);
