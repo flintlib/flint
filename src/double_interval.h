@@ -13,7 +13,7 @@
 #define DOUBLE_INTERVAL_H
 
 #ifdef DOUBLE_INTERVAL_INLINES_C
-#define DOUBLE_INTERVAL_INLINE
+#define DOUBLE_INTERVAL_INLINE static
 #else
 #define DOUBLE_INTERVAL_INLINE static inline
 #endif
