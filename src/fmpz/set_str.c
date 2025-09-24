@@ -202,10 +202,6 @@ fmpz_set_str(fmpz_t res, const char * str, int base)
     slong slen, i;
     int neg = 0;
 
-    /* Let GMP handle unusual bases. */
-    if (base != 10)
-        return fmpz_set_str_fallback(res, str, base, 0);
-
     /* Allow leading whitespace. */
     while (isspace(str[0]))
         str++;
@@ -214,7 +210,17 @@ fmpz_set_str(fmpz_t res, const char * str, int base)
     {
         str++;
         neg = 1;
+
+        while (isspace(str[0]))
+            str++;
+        /* Checked specially, otherwise GMP might handle the second minus */
+        if (str[0] == '-')
+            return -1;
     }
+
+    /* Let GMP handle unusual bases. */
+    if (base != 10)
+        return fmpz_set_str_fallback(res, str, base, neg);
 
     slen = strlen(str);
 
