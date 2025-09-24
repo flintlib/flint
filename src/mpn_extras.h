@@ -460,27 +460,89 @@ mp_limb_t mpn_rsh1add_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 mp_limb_t mpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
 
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+# define FLINT_MPN_AORSRSH_FUNC_TAB_WIDTH 17
+
+# define FLINT_HAVE_AORSRSH_FUNC(n) ((n) < FLINT_MPN_AORSRSH_FUNC_TAB_WIDTH)
+
+# define FLINT_MPN_ADDRSH_HARD(rp, xp, yp, n, cnt) (flint_mpn_addrsh_func_tab[n](rp, xp, yp, cnt))
+# define FLINT_MPN_SUBRSH_HARD(rp, xp, yp, n, cnt) (flint_mpn_subrsh_func_tab[n](rp, xp, yp, cnt))
+#endif
+
+typedef mp_limb_t (* flint_mpn_aorssh_func_t)(mp_ptr, mp_srcptr, mp_srcptr, unsigned int);
+
+#ifdef FLINT_MPN_AORSRSH_FUNC_TAB_WIDTH
+# define FLINT_USE_AORSRSH_FUNC_TAB 1
+FLINT_DLL extern const flint_mpn_aorssh_func_t flint_mpn_addrsh_func_tab[];
+FLINT_DLL extern const flint_mpn_aorssh_func_t flint_mpn_subrsh_func_tab[];
+#else
+# define FLINT_HAVE_AORSRSH_FUNC(n) 0
+# define FLINT_MPN_ADDRSH_HARD(rp, xp, yp, n, cnt) 0
+# define FLINT_MPN_SUBRSH_HARD(rp, xp, yp, n, cnt) 0
+#endif
+
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_addrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n, unsigned int cnt)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(1 <= cnt && cnt < FLINT_BITS);
+
+    if (FLINT_HAVE_AORSRSH_FUNC(n))
+        return FLINT_MPN_ADDRSH_HARD(rp, xp, yp, n, cnt);
+    else
+    {
+        FLINT_ASSERT(rp != xp);
+        mpn_rshift(rp, yp, n, cnt);
+        return mpn_add_n(rp, rp, xp, n);
+    }
+}
+
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_subrsh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n, unsigned int cnt)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(1 <= cnt && cnt < FLINT_BITS);
+
+    if (FLINT_HAVE_AORSRSH_FUNC(n))
+        return FLINT_MPN_SUBRSH_HARD(rp, xp, yp, n, cnt);
+    else
+    {
+        FLINT_ASSERT(rp != xp);
+        mpn_rshift(rp, yp, n, cnt);
+        return mpn_sub_n(rp, xp, rp, n);
+    }
+}
+
 /* multiplication (general) **************************************************/
 
+/* NOTE: This is getting a bit messy.  How can we clean this up? */
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
+# define FLINT_MPN_AORS_FUNC_TAB_WIDTH 17
 # define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
 # define FLINT_MPN_SQR_FUNC_TAB_WIDTH 14
 
+# define FLINT_HAVE_AORS_FUNC(n) ((n) < FLINT_MPN_AORS_FUNC_TAB_WIDTH)
 # define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 16)
 # define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 16)
 # define FLINT_HAVE_SQR_FUNC(n) ((n) <= FLINT_MPN_SQR_FUNC_TAB_WIDTH)
 
+# define FLINT_MPN_ADD_HARD(rp, xp, yp, n) (flint_mpn_add_func_tab[n](rp, xp, yp))
+# define FLINT_MPN_SUB_HARD(rp, xp, yp, n) (flint_mpn_sub_func_tab[n](rp, xp, yp))
 # define FLINT_MPN_MUL_HARD(rp, xp, xn, yp, yn) (flint_mpn_mul_func_tab[xn][yn](rp, xp, yp))
 # define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_n_func_tab[n](rp, xp, yp))
 # define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
 #elif FLINT_HAVE_ASSEMBLY_armv8
+# define FLINT_MPN_AORS_FUNC_TAB_WIDTH 17
 # define FLINT_MPN_MUL_FUNC_N_TAB_WIDTH 15
 # define FLINT_MPN_SQR_FUNC_TAB_WIDTH 9
 
+# define FLINT_HAVE_AORS_FUNC(n) ((n) < FLINT_MPN_AORS_FUNC_TAB_WIDTH)
 # define FLINT_HAVE_MUL_FUNC(n, m) FLINT_HAVE_MUL_N_FUNC(n)
 # define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= FLINT_MPN_MUL_FUNC_N_TAB_WIDTH)
 # define FLINT_HAVE_SQR_FUNC(n) ((n) <= FLINT_MPN_SQR_FUNC_TAB_WIDTH)
 
+# define FLINT_MPN_ADD_HARD(rp, xp, yp, n) (flint_mpn_add_func_tab[n](rp, xp, yp))
+# define FLINT_MPN_SUB_HARD(rp, xp, yp, n) (flint_mpn_sub_func_tab[n](rp, xp, yp))
 # define FLINT_MPN_MUL_HARD(rp, xp, xn, yp, yn) (flint_mpn_mul_func_n_tab[xn](rp, xp, yp, yn))
 # define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_func_n_tab[n](rp, xp, yp, n))
 # define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
@@ -506,6 +568,16 @@ typedef mp_limb_t (* flint_mpn_mul_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
 typedef mp_limb_t (* flint_mpn_mul_func_n_t)(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 typedef mp_limb_t (* flint_mpn_sqr_func_t)(mp_ptr, mp_srcptr);
 
+#ifdef FLINT_MPN_AORS_FUNC_TAB_WIDTH
+# define FLINT_USE_AORS_FUNC_TAB 1
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_add_func_tab[];
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_sub_func_tab[];
+#else
+# define FLINT_HAVE_AORS_FUNC(n) 0
+# define FLINT_MPN_ADD_HARD(rp, xp, yp, n) 0
+# define FLINT_MPN_SUB_HARD(rp, xp, yp, n) 0
+#endif
+
 #ifdef FLINT_MPN_MUL_FUNC_N_TAB_WIDTH
 FLINT_DLL extern const flint_mpn_mul_func_n_t flint_mpn_mul_func_n_tab[];
 #else
@@ -521,6 +593,29 @@ void flint_mpn_mul_toom32(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp
 mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn);
 void _flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n);
 mp_limb_t _flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n);
+
+/* FIXME: This should be under addition */
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_add_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_AORS_FUNC(n))
+        return FLINT_MPN_ADD_HARD(rp, xp, yp, n);
+    else
+        return mpn_add_n(rp, xp, yp, n);
+}
+
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_sub_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_AORS_FUNC(n))
+        return FLINT_MPN_SUB_HARD(rp, xp, yp, n);
+    else
+        return mpn_sub_n(rp, xp, yp, n);
+}
 
 MPN_EXTRAS_INLINE mp_limb_t
 flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
