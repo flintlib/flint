@@ -113,12 +113,9 @@ flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp
 
     if (n == 2)
     {
-        mp_limb_t cy, b0, b1, r0, r1;
+        mp_limb_t cy, r0, r1;
         mp_limb_t t[10];
         mp_limb_t u[3];
-
-        b0 = b[0];
-        b1 = b[1];
 
         /* mpn_mul_n(t, a, b, n) */
         FLINT_MPN_MUL_2X1(t[2], t[1], t[0], apre[1], apre[0], b[0]);

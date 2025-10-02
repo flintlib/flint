@@ -1,7 +1,7 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-slong ns[] = { 2, 3, 4, 6, 8, 9, 10, 12, 16, 20, 24, 32, 48, 64, 96, 128, 192, 256, 320, 384, 0 };
+slong ns[] = { 2, 3, 4, 6, 8, 9, 10, 12, 16, 20, 24, 32, 48, 64, 96, 128, 192, 256, 320, 384, 512, 768, 1024, 0 };
 
 int main()
 {
@@ -38,15 +38,15 @@ int main()
             r2 = flint_malloc(sizeof(mp_limb_t) * (num * n));
 
             flint_mpn_rrandom(d, state, n);
-            while (d[n - 1] == 0)
+            do
+            {
                 flint_mpn_rrandom(d + n - 1, state, 1);
-
-            /* limit to norm == 0 */
-            d[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
+                d[n - 1] >>= 1;
+            }
+            while (d[n - 1] == 0);
 
             norm = flint_clz(d[n - 1]);
             mpn_lshift(dnormed, d, n, norm);
-
             flint_mpn_preinvn(dinv, dnormed, n);
 
             /* reduce a, b mod d */
@@ -77,9 +77,9 @@ int main()
             TIMEIT_STOP_VALUES(tcpu, t1)
 
             TIMEIT_START
-            flint_mpn_mulmod_precond_precompute(apre, a, n, dnormed, dinv, norm);
+            flint_mpn_mulmod_precond_shoup_precompute(apre, a, n, dnormed, dinv, norm);
             for (i = 0; i < num; i++)
-                flint_mpn_mulmod_precond(r2 + i * n, apre, b + i * n, n, dnormed, dinv, norm);
+                flint_mpn_mulmod_precond_shoup(r2 + i * n, a, apre, b + i * n, n, d);
             TIMEIT_STOP_VALUES(tcpu, t2)
 
             flint_printf("  %.3f", n, num, t1 / t2);

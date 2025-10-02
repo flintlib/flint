@@ -30,6 +30,7 @@
 #include "t-mulhigh_normalised.c"
 #include "t-mulmod_2expp1.c"
 #include "t-mulmod_precond.c"
+#include "t-mulmod_precond_shoup.c"
 #include "t-mulmod_preinv1.c"
 #include "t-mulmod_preinvn.c"
 #include "t-remove_2exp.c"
@@ -61,6 +62,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mulhigh_normalised),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
     TEST_FUNCTION(flint_mpn_mulmod_precond),
+    TEST_FUNCTION(flint_mpn_mulmod_precond_shoup),
     TEST_FUNCTION(flint_mpn_mulmod_preinv1),
     TEST_FUNCTION(flint_mpn_mulmod_preinvn),
     TEST_FUNCTION(flint_mpn_remove_2exp),

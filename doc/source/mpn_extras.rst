@@ -416,6 +416,22 @@ Division and modular arithmetic with precomputed inverses
 
     Analogous to :func:`flint_mpn_mulmod_precond`, but computes `a_1 b_1 + a_2 b_2` modulo `d`.
 
+.. function:: void flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Given `d` in the range `\beta^{n-1} \le d < \beta^n / 2` where `\beta`
+    is the limb radix, and `0 \le a < d`, precompute data for
+    multiplication by `a` modulo `d` using Shoup's method.
+    The modulus is given as ``dnormed`` containing `d 2^{norm}` together
+    with precomputed inverse ``dinv``.
+    The destination ``apre`` must have space for ``n + 1`` limbs.
+
+.. function:: void flint_mpn_mulmod_precond_shoup(mp_ptr res, mp_srcptr a, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d)
+
+    Compute `ab \pmod{d}` given precomputed data for ``apre``
+    generated with :func:`flint_mpn_mulmod_precond_shoup_precompute`.
+    We require that `b` is reduced modulo `d`.
+
+
 GCD
 --------------------------------------------------------------------------------
 
