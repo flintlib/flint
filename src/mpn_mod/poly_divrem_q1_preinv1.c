@@ -131,8 +131,8 @@ int _mpn_mod_poly_divrem_q1_preinv1_fmma_precond(nn_ptr Q, nn_ptr R,
     nn_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
     nn_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
 
-    flint_mpn_mulmod_precond_precompute(tq1, q1, nlimbs, dnormed, dinv, norm);
-    flint_mpn_mulmod_precond(t, tq1, B + (lenB - 2) * nlimbs, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix_precompute(tq1, q1, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix(t, tq1, B + (lenB - 2) * nlimbs, nlimbs, dnormed, dinv, norm);
     mpn_mod_add(t, t, A + (lenA - 2) * nlimbs, ctx);
 
     if (monic)
@@ -145,14 +145,14 @@ int _mpn_mod_poly_divrem_q1_preinv1_fmma_precond(nn_ptr Q, nn_ptr R,
         mpn_mod_neg(q0, q0, ctx);
     }
 
-    flint_mpn_mulmod_precond_precompute(tq0, q0, nlimbs, dnormed, dinv, norm);
-    flint_mpn_mulmod_precond(t, tq0, B, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix_precompute(tq0, q0, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix(t, tq0, B, nlimbs, dnormed, dinv, norm);
     mpn_mod_add(R, A, t, ctx);
     mpn_mod_neg(Q, q0, ctx);
 
     for (i = 1; i < lenB - 1; i++)
     {
-        flint_mpn_fmmamod_precond(t, tq1, B + (i - 1) * nlimbs, tq0, B + i * nlimbs, nlimbs, dnormed, dinv, norm);
+        flint_mpn_fmmamod_precond_matrix(t, tq1, B + (i - 1) * nlimbs, tq0, B + i * nlimbs, nlimbs, dnormed, dinv, norm);
         flint_mpn_addmod_n(R + i * nlimbs, A + i * nlimbs, t, d, nlimbs);
     }
 
@@ -188,8 +188,8 @@ int _mpn_mod_poly_divrem_q1_preinv1_karatsuba_precond(nn_ptr Q, nn_ptr R,
     nn_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
     nn_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
 
-    flint_mpn_mulmod_precond_precompute(tq1, q1, nlimbs, dnormed, dinv, norm);
-    flint_mpn_mulmod_precond(t, tq1, B + (lenB - 2) * nlimbs, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix_precompute(tq1, q1, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix(t, tq1, B + (lenB - 2) * nlimbs, nlimbs, dnormed, dinv, norm);
 
     mpn_mod_add(t, t, A + (lenA - 2) * nlimbs, ctx);
 
@@ -204,8 +204,8 @@ int _mpn_mod_poly_divrem_q1_preinv1_karatsuba_precond(nn_ptr Q, nn_ptr R,
     }
 
     /* mpn_mod_mul(t, q0, B, ctx); */
-    flint_mpn_mulmod_precond_precompute(tq0, q0, nlimbs, dnormed, dinv, norm);
-    flint_mpn_mulmod_precond(t, tq0, B, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix_precompute(tq0, q0, nlimbs, dnormed, dinv, norm);
+    flint_mpn_mulmod_precond_matrix(t, tq0, B, nlimbs, dnormed, dinv, norm);
 
     mpn_mod_add(R, A, t, ctx);
     mpn_mod_neg(Q, q0, ctx);
@@ -223,15 +223,15 @@ int _mpn_mod_poly_divrem_q1_preinv1_karatsuba_precond(nn_ptr Q, nn_ptr R,
         {
             flint_mpn_submod_n(R + i * nlimbs, A + i * nlimbs, t, d, nlimbs);
             flint_mpn_addmod_n(u, B + (i - 1) * nlimbs, B + i * nlimbs, d, nlimbs);
-            flint_mpn_mulmod_precond(t, tq0q1, u, nlimbs, dnormed, dinv, norm);
+            flint_mpn_mulmod_precond_matrix(t, tq0q1, u, nlimbs, dnormed, dinv, norm);
             flint_mpn_addmod_n(R + i * nlimbs, R + i * nlimbs, t, d, nlimbs);
-            flint_mpn_mulmod_precond(t, tq1, B + i * nlimbs, nlimbs, dnormed, dinv, norm);
+            flint_mpn_mulmod_precond_matrix(t, tq1, B + i * nlimbs, nlimbs, dnormed, dinv, norm);
             flint_mpn_submod_n(R + i * nlimbs, R + i * nlimbs, t, d, nlimbs);
         }
         else
         {
             flint_mpn_addmod_n(R + i * nlimbs, A + i * nlimbs, t, d, nlimbs);
-            flint_mpn_mulmod_precond(t, tq0, B + i * nlimbs, nlimbs, dnormed, dinv, norm);
+            flint_mpn_mulmod_precond_matrix(t, tq0, B + i * nlimbs, nlimbs, dnormed, dinv, norm);
             flint_mpn_addmod_n(R + i * nlimbs, R + i * nlimbs, t, d, nlimbs);
         }
     }

@@ -13,30 +13,27 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
-TEST_FUNCTION_START(flint_mpn_fmmamod_precond, state)
+TEST_FUNCTION_START(flint_mpn_mulmod_precond_matrix, state)
 {
     int i;
     slong n, npre;
 
-    mp_ptr a, apre, b, a2, a2pre, b2, d, dnormed, dinv, r1, r2, t, u;
+    mp_ptr a, apre, b, d, dnormed, dinv, r1, r2, t, u;
     ulong norm;
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         n = 2 + n_randint(state, 10);
-        npre = flint_mpn_mulmod_precond_alloc(n);
+        npre = flint_mpn_mulmod_precond_matrix_alloc(n);
 
         a = flint_malloc(sizeof(mp_limb_t) * n);
         apre = flint_malloc(sizeof(mp_limb_t) * npre);
         b = flint_malloc(sizeof(mp_limb_t) * n);
-        a2 = flint_malloc(sizeof(mp_limb_t) * n);
-        a2pre = flint_malloc(sizeof(mp_limb_t) * npre);
-        b2 = flint_malloc(sizeof(mp_limb_t) * n);
         d = flint_malloc(sizeof(mp_limb_t) * n);
         dnormed = flint_malloc(sizeof(mp_limb_t) * n);
         dinv = flint_malloc(sizeof(mp_limb_t) * n);
-        t = flint_malloc(sizeof(mp_limb_t) * (2 * n + 1));
-        u = flint_malloc(sizeof(mp_limb_t) * (2 * n));
+        t = flint_malloc(sizeof(mp_limb_t) * 2 * n);
+        u = flint_malloc(sizeof(mp_limb_t) * (n + 1));
         r1 = flint_malloc(sizeof(mp_limb_t) * n);
         r2 = flint_malloc(sizeof(mp_limb_t) * n);
 
@@ -60,19 +57,12 @@ TEST_FUNCTION_START(flint_mpn_fmmamod_precond, state)
         mpn_tdiv_qr(t, a, 0, a, n, d, n);
         flint_mpn_rrandom(b, state, n);
         mpn_tdiv_qr(t, b, 0, b, n, d, n);
-        flint_mpn_rrandom(a2, state, n);
-        mpn_tdiv_qr(t, a2, 0, a2, n, d, n);
-        flint_mpn_rrandom(b2, state, n);
-        mpn_tdiv_qr(t, b2, 0, b2, n, d, n);
 
         mpn_mul_n(t, a, b, n);
-        mpn_mul_n(u, a2, b2, n);
-        t[2 * n] = mpn_add_n(t, t, u, 2 * n);
-        mpn_tdiv_qr(u, r1, 0, t, 2 * n + 1, d, n);
+        mpn_tdiv_qr(u, r1, 0, t, 2 * n, d, n);
 
-        flint_mpn_mulmod_precond_precompute(apre, a, n, dnormed, dinv, norm);
-        flint_mpn_mulmod_precond_precompute(a2pre, a2, n, dnormed, dinv, norm);
-        flint_mpn_fmmamod_precond(r2, apre, b, a2pre, b2, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_precond_matrix_precompute(apre, a, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_precond_matrix(r2, apre, b, n, dnormed, dinv, norm);
 
         if (mpn_cmp(r1, r2, n))
         {
@@ -82,9 +72,6 @@ TEST_FUNCTION_START(flint_mpn_fmmamod_precond, state)
             flint_printf("a = "); flint_mpn_debug(a, n);
             flint_printf("apre = "); flint_mpn_debug(apre, npre);
             flint_printf("b = "); flint_mpn_debug(b, n);
-            flint_printf("a2 = "); flint_mpn_debug(a2, n);
-            flint_printf("a2pre = "); flint_mpn_debug(a2pre, npre);
-            flint_printf("b2 = "); flint_mpn_debug(b2, n);
             flint_printf("r1 = "); flint_mpn_debug(r1, n);
             flint_printf("r2 = "); flint_mpn_debug(r2, n);
             flint_abort();
@@ -93,9 +80,6 @@ TEST_FUNCTION_START(flint_mpn_fmmamod_precond, state)
         flint_free(a);
         flint_free(apre);
         flint_free(b);
-        flint_free(a2);
-        flint_free(a2pre);
-        flint_free(b2);
         flint_free(d);
         flint_free(dnormed);
         flint_free(dinv);

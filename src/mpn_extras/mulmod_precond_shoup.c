@@ -91,13 +91,6 @@ flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n,
     }
 }
 
-/* Low two words of 2x2 product */
-#define FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0) \
-    do { \
-        umul_ppmm(r1, r0, a0, b0); \
-        (r1) += (a0) * (b1) + (a1) * (b0); \
-    } while (0)
-
 /*
    The original version of Shoup's algorithm uses the exact high
    product, for which we would need to inspect the return limb

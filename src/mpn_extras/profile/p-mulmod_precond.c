@@ -1,18 +1,28 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-slong ns[] = { 2, 3, 4, 6, 8, 9, 10, 11, 12, 16, 20, 24, 32, 48, 64, 96, 128, 192, 256, 320, 384, 0 };
+slong ns[] = { 2, 3, 4, 6, 8, 9, 10, 11, 12, 16, 20, 24, 32, 48, 64, 96, 128, 160, 192, 224, 256, 320, 384, 512, 768, 1024, 0 };
+
+#define CHECK_NONE_VS_BEST 0
+#define CHECK_SHOUP 1
+#define CHECK_MATRIX 2
+#define CHECK_TUNING_VS_BEST 3
 
 int main()
 {
     slong i, ni, n, npre, num, numi;
     flint_rand_t state;
     flint_rand_init(state);
+    int which = CHECK_TUNING_VS_BEST;
+
+    double tstandard[50][50];
+    double tmatrix[50][50];
+    double tshoup[50][50];
 
     mp_ptr a, apre, b, d, dnormed, dinv, r1, r2, t, u;
     ulong norm;
     int normed;
-    double t1, t2, FLINT_SET_BUT_UNUSED(tcpu);
+    double tprint, t1, t2, t3, tbest, FLINT_SET_BUT_UNUSED(tcpu);
 
     flint_printf("        ");
     for (numi = 0; (num = ns[numi]) != 0 && num <= 128; numi++)
@@ -29,7 +39,7 @@ int main()
 
             for (numi = 0; (num = ns[numi]) != 0 && num <= 128; numi++)
             {
-                npre = flint_mpn_mulmod_precond_alloc(n);
+                npre = flint_mpn_mulmod_precond_matrix_alloc(n);
 
                 a = flint_malloc(sizeof(mp_limb_t) * n);
                 apre = flint_malloc(sizeof(mp_limb_t) * npre);
@@ -88,12 +98,44 @@ int main()
                 TIMEIT_STOP_VALUES(tcpu, t1)
 
                 TIMEIT_START
-                flint_mpn_mulmod_precond_precompute(apre, a, n, dnormed, dinv, norm);
+                flint_mpn_mulmod_precond_matrix_precompute(apre, a, n, dnormed, dinv, norm);
                 for (i = 0; i < num; i++)
-                    flint_mpn_mulmod_precond(r2 + i * n, apre, b + i * n, n, dnormed, dinv, norm);
+                    flint_mpn_mulmod_precond_matrix(r2 + i * n, apre, b + i * n, n, dnormed, dinv, norm);
                 TIMEIT_STOP_VALUES(tcpu, t2)
 
-                flint_printf("  %.3f", n, num, t1 / t2);
+                TIMEIT_START
+                flint_mpn_mulmod_precond_shoup_precompute(apre, a, n, dnormed, dinv, norm);
+                for (i = 0; i < num; i++)
+                    flint_mpn_mulmod_precond_shoup(r2 + i * n, a, apre, b + i * n, n, d, norm);
+                TIMEIT_STOP_VALUES(tcpu, t3)
+
+                tstandard[ni][numi] = t1;
+                tmatrix[ni][numi] = t2;
+                tshoup[ni][numi] = t3;
+
+                tprint = 0.0;
+                if (which == CHECK_NONE_VS_BEST)
+                    tprint = FLINT_MAX(t1 / t2, t1 / t3);
+                else if (which == CHECK_MATRIX)
+                    tprint = t1 / t2;
+                else if (which == CHECK_SHOUP)
+                    tprint = t1 / t3;
+                else if (which == CHECK_TUNING_VS_BEST)
+                {
+                    int precond = flint_mpn_mulmod_want_precond(n, num, norm);
+
+                    tbest = FLINT_MIN(t1, FLINT_MIN(t2, t3));
+
+                    if (precond == MPN_MULMOD_PRECOND_NONE)
+                        tprint = tbest / t1;
+                    else if (precond == MPN_MULMOD_PRECOND_MATRIX)
+                        tprint = tbest / t2;
+                    else
+                        tprint = tbest / t3;
+                }
+
+                flint_printf("  %.3f", n, num, tprint);
+
                 fflush(stdout);
 
                 if (mpn_cmp(r1, r2, n * num))
@@ -112,6 +154,28 @@ int main()
                 flint_free(u);
                 flint_free(r1);
                 flint_free(r2);
+            }
+
+            flint_printf("\n");
+        }
+
+        for (ni = 0; (n = ns[ni]) != 0; ni++)
+        {
+            flint_printf("%8wd", n);
+
+            for (numi = 0; (num = ns[numi]) != 0 && num <= 128; numi++)
+            {
+                t1 = tstandard[ni][numi];
+                t2 = tmatrix[ni][numi];
+                t3 = tshoup[ni][numi];
+                tbest = FLINT_MIN(t1, FLINT_MIN(t2, t3));
+
+                if (tbest == t1)
+                    flint_printf("%7s", "-");
+                else if (tbest == t2)
+                    flint_printf("%7s", "M");
+                else
+                    flint_printf("%7s", "S");
             }
 
             flint_printf("\n");
