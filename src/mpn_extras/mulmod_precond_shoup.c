@@ -60,8 +60,16 @@ flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n,
         mp_limb_t t[4];
         t[0] = 0;
         t[1] = 0;
-        t[2] = a[0] << norm;
-        t[3] = (a[1] << norm) | (a[0] >> (FLINT_BITS - norm));
+        if (norm == 0)
+        {
+            t[2] = a[0];
+            t[3] = a[1];
+        }
+        else
+        {
+            t[2] = a[0] << norm;
+            t[3] = (a[1] << norm) | (a[0] >> (FLINT_BITS - norm));
+        }
         flint_mpn_div_preinvn_4_2(apre, t, dnormed, dinv);
     }
     else
@@ -73,7 +81,10 @@ flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n,
         t = TMP_ALLOC(sizeof(mp_limb_t) * (2 * n));
 
         flint_mpn_zero(t, n);
-        mpn_lshift(t + n, a, n, norm);
+        if (norm == 0)
+            mpn_copyi(t + n, a, n);
+        else
+            mpn_lshift(t + n, a, n, norm);
         flint_mpn_divrem_preinvn(apre, t, t, 2 * n, dnormed, n, dinv);
 
         TMP_END;
@@ -84,44 +95,82 @@ flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n,
 #define FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0) \
     do { \
         umul_ppmm(r1, r0, a0, b0); \
-        r1 += (a0) * (b1) + (a1) * (b0); \
+        (r1) += (a0) * (b1) + (a1) * (b0); \
     } while (0)
 
+/*
+   The original version of Shoup's algorithm uses the exact high
+   product, for which we would need to inspect the return limb
+   and recompute the low part when rounding cannot be guaranteed.
+   However, it can be shown that the approximation computed by
+   flint_mpn_mulhigh_n suffices when norm != 0.
 
+   When norm == 0, we can either do an exact mulhigh OR do
+   two adjustments (warning: the second adjustment may be too rare to be
+   reached by test code).
+*/
 void
-flint_mpn_mulmod_precond_shoup(mp_ptr res, mp_srcptr a, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d)
+flint_mpn_mulmod_precond_shoup(mp_ptr res, mp_srcptr a, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, ulong norm)
 {
     if (n == 2)
     {
-        mp_limb_t t3, t2, t1, t0;
+        if (norm != 0)
+        {
+            mp_limb_t t3, t2, t1, t0;
 
-        FLINT_MPN_MUL_2X2(t3, t2, t1, t0, apre[1], apre[0], b[1], b[0]);
-        FLINT_MPN_MULLOW_2X2(t1, t0, t3, t2, d[1], d[0]);
-        FLINT_MPN_MULLOW_2X2(t3, t2, a[1], a[0], b[1], b[0]);
-        sub_ddmmss(t3, t2, t3, t2, t1, t0);
-        if (t3 > d[1] || (t3 == d[1] && t3 >= d[0]))
-            sub_ddmmss(t3, t2, t3, t2, d[1], d[0]);
-        res[0] = t2;
-        res[1] = t3;
+            FLINT_MPN_MUL_2X2(t3, t2, t1, t0, apre[1], apre[0], b[1], b[0]);
+            FLINT_MPN_MULLOW_2X2(t1, t0, t3, t2, d[1], d[0]);
+            FLINT_MPN_MULLOW_2X2(t3, t2, a[1], a[0], b[1], b[0]);
+            sub_ddmmss(t3, t2, t3, t2, t1, t0);
+            if (t3 > d[1] || (t3 == d[1] && t2 >= d[0]))
+                sub_ddmmss(t3, t2, t3, t2, d[1], d[0]);
+            res[0] = t2;
+            res[1] = t3;
+        }
+        else
+        {
+            mp_limb_t cy, tcy, ucy, t3, t2, t1, t0;
+
+            FLINT_MPN_MUL_2X2(t3, t2, t1, t0, apre[1], apre[0], b[1], b[0]);
+            FLINT_MPN_MUL_3P2X2(ucy, t1, t0, t3, t2, d[1], d[0]);
+            FLINT_MPN_MUL_3P2X2(tcy, t3, t2, a[1], a[0], b[1], b[0]);
+            sub_dddmmmsss(cy, t3, t2, tcy, t3, t2, ucy, t1, t0);
+            /* We did an exact mulhigh, so one adjustment suffices. */
+            if (cy || (t3 > d[1] || (t3 == d[1] && t2 >= d[0])))
+                sub_ddmmss(t3, t2, t3, t2, d[1], d[0]);
+            res[0] = t2;
+            res[1] = t3;
+        }
     }
     else
     {
         mp_ptr t, u;
+        ulong tcy, ucy, cy;
         TMP_INIT;
         TMP_START;
         t = TMP_ALLOC(sizeof(mp_limb_t) * (2 * n));
         u = t + n;
-        /* The original version of Shoup's algorithm uses the exact high
-           product, for which we would need to inspect the return limb
-           and recompute the low part when rounding cannot be guaranteed.
-           However, it can be shown that the approximation computed by
-           flint_mpn_mulhigh_n suffices. */
         flint_mpn_mulhigh_n(t, apre, b, n);
-        flint_mpn_mullow_n(u, t, d, n);
-        flint_mpn_mullow_n(t, a, b, n);
-        mpn_sub_n(res, t, u, n);
-        if (mpn_cmp(res, d, n) >= 0)
-            mpn_sub_n(res, res, d, n);
+
+        if (norm != 0)
+        {
+            flint_mpn_mullow_n(u, t, d, n);
+            flint_mpn_mullow_n(t, a, b, n);
+            mpn_sub_n(res, t, u, n);
+            if (mpn_cmp(res, d, n) >= 0)
+                mpn_sub_n(res, res, d, n);
+        }
+        else
+        {
+            /* Compute mod beta^(n+1) */
+            ucy = flint_mpn_mullow_n(u, t, d, n);
+            tcy = flint_mpn_mullow_n(t, a, b, n);
+            cy = tcy - ucy - mpn_sub_n(res, t, u, n);
+            /* We didn't do an exact mulhigh, so may need two adjustments */
+            while (cy || mpn_cmp(res, d, n) >= 0)
+                cy -= mpn_sub_n(res, res, d, n);
+        }
+
 
         TMP_END;
     }

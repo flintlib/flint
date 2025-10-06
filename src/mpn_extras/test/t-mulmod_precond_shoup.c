@@ -24,6 +24,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_precond_shoup, state)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         n = 1 + n_randint(state, 10);
+        norm = n_randint(state, 2);
 
         a = flint_malloc(sizeof(mp_limb_t) * n);
         apre = flint_malloc(sizeof(mp_limb_t) * n);
@@ -40,7 +41,10 @@ TEST_FUNCTION_START(flint_mpn_mulmod_precond_shoup, state)
         do
         {
             flint_mpn_rrandom(d + n - 1, state, 1);
-            d[n - 1] >>= 1;
+            if (norm == 0)
+                d[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
+            else
+                d[n - 1] >>= 1;
         }
         while (d[n - 1] == 0);
 
@@ -58,15 +62,15 @@ TEST_FUNCTION_START(flint_mpn_mulmod_precond_shoup, state)
         mpn_tdiv_qr(u, r1, 0, t, 2 * n, d, n);
 
         flint_mpn_mulmod_precond_shoup_precompute(apre, a, n, dnormed, dinv, norm);
-        flint_mpn_mulmod_precond_shoup(r2, a, apre, b, n, d);
+        flint_mpn_mulmod_precond_shoup(r2, a, apre, b, n, d, norm);
 
         if (mpn_cmp(r1, r2, n))
         {
             flint_printf("FAIL\n");
-            flint_printf("n = %wd\n", n);
+            flint_printf("n = %wd, norm = %wu\n", n, norm);
             flint_printf("d = "); flint_mpn_debug(d, n);
             flint_printf("a = "); flint_mpn_debug(a, n);
-            flint_printf("apre = "); flint_mpn_debug(apre, n);
+            flint_printf("apre = "); flint_mpn_debug(apre, n + (norm == 0));
             flint_printf("b = "); flint_mpn_debug(b, n);
             flint_printf("r1 = "); flint_mpn_debug(r1, n);
             flint_printf("r2 = "); flint_mpn_debug(r2, n);
