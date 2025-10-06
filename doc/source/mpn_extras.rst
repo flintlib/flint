@@ -378,7 +378,7 @@ Preconditioned modular multiplication
 --------------------------------------------------------------------------------
 
 Currently two algorithms are implemented for preconditioned multiplication:
-Shoup and a matrix algorithm. An FFT variant may be added in the future.
+Shoup multiplication and the matrix algorithm. An FFT variant may be added in the future.
 
 .. function:: int flint_mpn_mulmod_want_precond(mp_size_t n, slong num, ulong norm)
 
@@ -388,11 +388,11 @@ Shoup and a matrix algorithm. An FFT variant may be added in the future.
     which algorithm is better (accounting for the cost of pretransforming
     the operand).
 
-    ``MPN_MULMOD_PRECOND_NONE`` - no preconditioning (use :func:`flint_mpn_mulmod_preinvn`)
+    * ``MPN_MULMOD_PRECOND_NONE`` - should use :func:`flint_mpn_mulmod_preinvn` (no precomputation)
 
-    ``MPN_MULMOD_PRECOND_SHOUP`` - should use :func:`flint_mpn_mulmod_precond_shoup`
+    * ``MPN_MULMOD_PRECOND_SHOUP`` - should use :func:`flint_mpn_mulmod_precond_shoup`
 
-    ``MPN_MULMOD_PRECOND_MATRIX`` - should use :func:`flint_mpn_mulmod_precond`
+    * ``MPN_MULMOD_PRECOND_MATRIX`` - should use :func:`flint_mpn_mulmod_precond_matrix`
 
 .. function:: void flint_mpn_mulmod_precond_shoup(mp_ptr res, mp_srcptr a, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, ulong norm)
 
@@ -411,7 +411,7 @@ Shoup and a matrix algorithm. An FFT variant may be added in the future.
 .. function:: void flint_mpn_mulmod_precond_matrix(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
 
     Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
-    provided by ``flint_mpn_preinvn``, computes `ab \pmod{d}`. We require
+    provided by :func:`flint_mpn_preinvn`, computes `ab \pmod{d}`. We require
     `b` to be reduced modulo `d`.
     The user provides the operand `a` via the ``apre`` argument in the
     pretransformed representation returned by :func:`flint_mpn_mulmod_precond_matrix_precompute`.
@@ -422,7 +422,7 @@ Shoup and a matrix algorithm. An FFT variant may be added in the future.
     Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
     and an integer `a` which is reduced modulo `d`,
     write to ``apre`` a pretransformed representation of `a`
-    for use with :func:`flint_mpn_mulmod_precond`.
+    for use with :func:`flint_mpn_mulmod_precond_matrix`.
     Currently, the output consists of `n \times n` limbs storing
     `a 2^{norm} \beta^i \mod {d 2^{norm}}` for `0 \le i < n` where `\beta` is the limb
     radix, plus one junk limb.
