@@ -45,7 +45,7 @@ void flint_mpn_mod_preinv1(mp_ptr a, mp_size_t m,
     }
 }
 
-mp_size_t flint_mpn_mulmod_precond_alloc(mp_size_t n)
+mp_size_t flint_mpn_mulmod_precond_matrix_alloc(mp_size_t n)
 {
     /* We only need n^2 limbs for the result, but allocate one extra limb
        which flint_mpn_mulmod_precond_precompute can use as scratch space
@@ -54,7 +54,7 @@ mp_size_t flint_mpn_mulmod_precond_alloc(mp_size_t n)
 }
 
 void
-flint_mpn_mulmod_precond_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
+flint_mpn_mulmod_precond_matrix_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
     slong i;
 
@@ -79,22 +79,21 @@ flint_mpn_mulmod_precond_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_sr
 
 /* p-mulmod_precond */
 int
-flint_mpn_mulmod_want_precond(mp_size_t n, slong num)
+flint_mpn_mulmod_want_precond(mp_size_t n, slong num, ulong norm)
 {
-    if (n <= 7 || num <= 3) return 0;
-    if (n == 8) return num >= 48;
-    if (n == 9) return num >= 16;
-    if (n <= 12) return num >= 8;
-    if (n <= 64) return num >= 4;
-    if (n <= 128) return num >= 6;
-    if (n <= 192) return num >= 10;
-    if (n <= 256) return num >= 24;
-    if (n <= 320) return num >= 48;
-    return  0;
+    if (num < 4 || (n == 2 && norm == 0))
+        return MPN_MULMOD_PRECOND_NONE;
+    if (n <= 10 || (n <= 12 && num <= 12))
+        return MPN_MULMOD_PRECOND_SHOUP;
+    if (n <= 64 || (n <= 128 && num >= 6) || (n <= 192 && num >= 20))
+        return MPN_MULMOD_PRECOND_MATRIX;
+    if ((n <= 320 && num >= 9) || (n <= 768 && num >= 20))
+        return MPN_MULMOD_PRECOND_SHOUP;
+    return MPN_MULMOD_PRECOND_NONE;
 }
 
 void
-flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
+flint_mpn_mulmod_precond_matrix(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
     /*
     Note: it is possible to add a special case for n = 2.
@@ -110,6 +109,55 @@ flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp
     We omit this special case as the resulting code does not run
     appreciable faster than flint_mpn_mulmod_preinvn_2.
     */
+
+    if (n == 2)
+    {
+        mp_limb_t cy, r0, r1;
+        mp_limb_t t[10];
+        mp_limb_t u[3];
+
+        /* mpn_mul_n(t, a, b, n) */
+        FLINT_MPN_MUL_2X1(t[2], t[1], t[0], apre[1], apre[0], b[0]);
+        FLINT_MPN_MUL_2X1(u[2], u[1], u[0], apre[3], apre[2], b[1]);
+        add_ssssaaaaaaaa(t[3], t[2], t[1], t[0], 0, t[2], t[1], t[0], 0, u[2], u[1], u[0]);
+
+        /* mpn_mul_n(t + 3*n, t + n, dinv, n) */
+        FLINT_MPN_MUL_2X2(t[9], t[8], t[7], t[6], t[3], t[2], dinv[1], dinv[0]);
+
+        /* mpn_add_n(t + 4*n, t + 4*n, t + n, n) */
+        add_ssaaaa(t[9], t[8], t[9], t[8], t[3], t[2]);
+
+        /* mpn_mul_n(t + 2*n, t + 4*n, d, n) */
+        FLINT_MPN_MUL_3P2X2(t[6], t[5], t[4], t[9], t[8], d[1], d[0]);
+
+        /* cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n) */
+        sub_dddmmmsss(cy, r1, r0, t[2], t[1], t[0], t[6], t[5], t[4]);
+
+        while (cy > 0)
+        {
+            /* cy -= mpn_sub_n(r, r, d, n) */
+            sub_dddmmmsss(cy, r1, r0, cy, r1, r0, 0, d[1], d[0]);
+        }
+
+        if ((r1 > d[1]) || (r1 == d[1] && r0 >= d[0]))
+        {
+            /* mpn_sub_n(r, r, d, n) */
+            sub_ddmmss(r1, r0, r1, r0, d[1], d[0]);
+        }
+
+        if (norm)
+        {
+            rp[0] = (r0 >> norm) | (r1 << (FLINT_BITS - norm));
+            rp[1] = (r1 >> norm);
+        }
+        else
+        {
+            rp[0] = r0;
+            rp[1] = r1;
+        }
+
+        return;
+    }
 
     mp_ptr tmp;
     mp_limb_t cy, cy1, cy2;
@@ -146,7 +194,7 @@ flint_mpn_mulmod_precond(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp
 }
 
 void
-flint_mpn_fmmamod_precond(mp_ptr rp, mp_srcptr apre1, mp_srcptr b1, mp_srcptr apre2, mp_srcptr b2, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
+flint_mpn_fmmamod_precond_matrix(mp_ptr rp, mp_srcptr apre1, mp_srcptr b1, mp_srcptr apre2, mp_srcptr b2, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
     mp_ptr tmp;
     mp_limb_t cy, cy1, cy2;

@@ -13,21 +13,21 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
-TEST_FUNCTION_START(flint_mpn_mulmod_precond, state)
+TEST_FUNCTION_START(flint_mpn_mulmod_precond_shoup, state)
 {
     int i;
-    slong n, npre;
+    slong n;
+    ulong norm;
 
     mp_ptr a, apre, b, d, dnormed, dinv, r1, r2, t, u;
-    ulong norm;
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        n = 2 + n_randint(state, 10);
-        npre = flint_mpn_mulmod_precond_alloc(n);
+        n = 1 + n_randint(state, 10);
+        norm = n_randint(state, 2);
 
         a = flint_malloc(sizeof(mp_limb_t) * n);
-        apre = flint_malloc(sizeof(mp_limb_t) * npre);
+        apre = flint_malloc(sizeof(mp_limb_t) * n);
         b = flint_malloc(sizeof(mp_limb_t) * n);
         d = flint_malloc(sizeof(mp_limb_t) * n);
         dnormed = flint_malloc(sizeof(mp_limb_t) * n);
@@ -38,18 +38,21 @@ TEST_FUNCTION_START(flint_mpn_mulmod_precond, state)
         r2 = flint_malloc(sizeof(mp_limb_t) * n);
 
         flint_mpn_rrandom(d, state, n);
-        while (d[n - 1] == 0)
+        do
+        {
             flint_mpn_rrandom(d + n - 1, state, 1);
-
-        if (n_randint(state, 2))
-            d[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
+            if (norm == 0)
+                d[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
+            else
+                d[n - 1] >>= 1;
+        }
+        while (d[n - 1] == 0);
 
         norm = flint_clz(d[n - 1]);
         if (norm == 0)
             mpn_copyi(dnormed, d, n);
         else
             mpn_lshift(dnormed, d, n, norm);
-
         flint_mpn_preinvn(dinv, dnormed, n);
 
         /* reduce a, b mod d */
@@ -61,8 +64,8 @@ TEST_FUNCTION_START(flint_mpn_mulmod_precond, state)
         mpn_mul_n(t, a, b, n);
         mpn_tdiv_qr(u, r1, 0, t, 2 * n, d, n);
 
-        flint_mpn_mulmod_precond_precompute(apre, a, n, dnormed, dinv, norm);
-        flint_mpn_mulmod_precond(r2, apre, b, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_precond_shoup_precompute(apre, a, n, dnormed, dinv, norm);
+        flint_mpn_mulmod_precond_shoup(r2, a, apre, b, n, d, norm);
 
         if (mpn_cmp(r1, r2, n))
         {
@@ -70,7 +73,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_precond, state)
             flint_printf("n = %wd, norm = %wu\n", n, norm);
             flint_printf("d = "); flint_mpn_debug(d, n);
             flint_printf("a = "); flint_mpn_debug(a, n);
-            flint_printf("apre = "); flint_mpn_debug(apre, npre);
+            flint_printf("apre = "); flint_mpn_debug(apre, n + (norm == 0));
             flint_printf("b = "); flint_mpn_debug(b, n);
             flint_printf("r1 = "); flint_mpn_debug(r1, n);
             flint_printf("r2 = "); flint_mpn_debug(r2, n);
