@@ -52,7 +52,10 @@ int main()
                 while (d[n - 1] == 0);
 
                 norm = flint_clz(d[n - 1]);
-                mpn_lshift(dnormed, d, n, norm);
+                if (norm == 0)
+                    mpn_copyi(dnormed, d, n);
+                else
+                    mpn_lshift(dnormed, d, n, norm);
                 flint_mpn_preinvn(dinv, dnormed, n);
 
                 /* reduce a, b mod d */
