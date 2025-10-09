@@ -20,15 +20,14 @@ void _nmod_poly_div_newton_n_preinv(nn_ptr Q, nn_srcptr A, slong lenA,
 {
     const slong lenQ = lenA - lenB + 1;
     nn_ptr Arev;
+    TMP_INIT;
 
-    Arev = _nmod_vec_init(lenQ);
+    TMP_START;
+    Arev = TMP_ALLOC(lenQ * sizeof(ulong));
     _nmod_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
-
     _nmod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ,lenBinv), lenQ, mod);
-
     _nmod_poly_reverse(Q, Q, lenQ, lenQ);
-
-    _nmod_vec_clear(Arev);
+    TMP_END;
 }
 
 void nmod_poly_div_newton_n_preinv(nmod_poly_t Q, const nmod_poly_t A,

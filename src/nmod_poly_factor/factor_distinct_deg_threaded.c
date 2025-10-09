@@ -45,9 +45,11 @@ _nmod_poly_precompute_matrix_worker(void * arg_ptr)
     _nmod_vec_set(nmod_mat_entry_ptr(A, 1, 0), poly1->coeffs, n);
 
     for (i = 2; i < m; i++)
-        _nmod_poly_mulmod_preinv(nmod_mat_entry_ptr(A, i, 0), nmod_mat_entry_ptr(A, i - 1, 0), n,
-                                 poly1->coeffs, n, poly2->coeffs, n + 1,
+    {
+        _nmod_poly_mulmod_preinv(nmod_mat_entry_ptr(A, i, 0), nmod_mat_entry_ptr(A, i / 2, 0), n,
+                                 nmod_mat_entry_ptr(A, (i + 1) / 2, 0), n, poly2->coeffs, n + 1,
                                  poly2inv->coeffs, n + 1, mod);
+    }
 }
 
 void
@@ -56,7 +58,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     nmod_poly_compose_mod_precomp_preinv_arg_t arg =
                    *((nmod_poly_compose_mod_precomp_preinv_arg_t*) arg_ptr);
     nmod_mat_t B, C;
-    nn_ptr t, h;
+    nn_ptr h;
     slong i, n, m;
     nmod_poly_struct * res = arg.res;
     nmod_poly_struct * poly1 = arg.poly1;
@@ -88,7 +90,6 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     nmod_mat_init(C, m, n, mod.n);
 
     h = _nmod_vec_init(n);
-    t = _nmod_vec_init(n);
 
     /* Set rows of B to the segments of poly1 */
     for (i = 0; i < poly1->length/m; i++)
@@ -98,20 +99,13 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
 
     nmod_mat_mul(C, B, A);
 
-    /* Evaluate block composition using the Horner scheme */
-    _nmod_vec_set(res->coeffs, nmod_mat_entry_ptr(C, m - 1, 0), n);
+    /* Evaluate block composition */
     _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, nmod_mat_entry_ptr(A, 1, 0), n,
         poly3->coeffs, poly3->length, poly3inv->coeffs, poly3inv->length, mod);
 
-    for (i = m - 2; i >= 0; i--)
-    {
-        _nmod_poly_mulmod_preinv(t, res->coeffs, n, h, n, poly3->coeffs,
-                          poly3->length, poly3inv->coeffs, poly3->length, mod);
-        _nmod_poly_add(res->coeffs, t, n, nmod_mat_entry_ptr(C, i, 0), n, mod);
-    }
+    _nmod_poly_mod_matrix_rows_evaluate(res->coeffs, C, h, n, poly3->coeffs, poly3->length, poly3inv->coeffs, poly3inv->length, mod);
 
     _nmod_vec_clear(h);
-    _nmod_vec_clear(t);
 
     nmod_mat_clear(B);
     nmod_mat_clear(C);

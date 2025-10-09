@@ -18,11 +18,21 @@ void _nmod_poly_mulmod(nn_ptr res, nn_srcptr poly1, slong len1,
 {
     nn_ptr T, Q;
     slong lenT, lenQ;
+    TMP_INIT;
+
+    if (lenf == 2 && len1 == 1 && len2 == 1)
+    {
+        res[0] = nmod_mul(poly1[0], poly2[0], mod);
+        return;
+    }
 
     lenT = len1 + len2 - 1;
     lenQ = lenT - lenf + 1;
 
-    T = _nmod_vec_init(lenT + lenQ);
+    FLINT_ASSERT(lenQ >= 1);
+
+    TMP_START;
+    T = TMP_ALLOC(sizeof(ulong) * (lenT + lenQ));
     Q = T + lenT;
 
     if (len1 >= len2)
@@ -31,7 +41,8 @@ void _nmod_poly_mulmod(nn_ptr res, nn_srcptr poly1, slong len1,
         _nmod_poly_mul(T, poly2, len2, poly1, len1, mod);
 
     _nmod_poly_divrem(Q, res, T, lenT, f, lenf, mod);
-    _nmod_vec_clear(T);
+
+    TMP_END;
 }
 
 void
