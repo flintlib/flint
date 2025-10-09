@@ -1562,7 +1562,7 @@ Modular composition
 .. function:: void _nmod_poly_mod_matrix_rows_evaluate(nn_ptr res, const nmod_mat_t A, nn_srcptr h, slong n, nn_srcptr poly3, slong len3, nn_srcptr poly3inv, slong len3inv, nmod_t mod)
 
     Set ``res`` to the polynomial `\sum_{i=0}^{d-1} A_i h^i` modulo ``poly3`` where `A_i`
-    denotes the `i`-th row of the `n \times d` matrix ``A``
+    denotes the `i`-th row of the `d \times n` matrix ``A``
     and ``res`` and ``h`` have length ``n``. The length of ``poly3`` must
     be equal to ``n + 1``.
 
