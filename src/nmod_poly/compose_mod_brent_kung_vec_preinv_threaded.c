@@ -43,9 +43,8 @@ void
 _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 {
     compose_vec_arg_t arg = *((compose_vec_arg_t *) arg_ptr);
-    slong i, j, k = arg.k, n = arg.len - 1;
+    slong j, k = arg.k, n = arg.len - 1;
     slong len = arg.len, leninv = arg.leninv;
-    nn_ptr t = arg.t;
     nn_srcptr h = arg.h;
     nn_srcptr poly = arg.poly;
     nn_srcptr polyinv = arg.polyinv;
@@ -67,15 +66,9 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
         if (j >= arg.len2)
             return;
 
-        _nmod_vec_set(res[j].coeffs, nmod_mat_entry_ptr(C, (j + 1)*k - 1, 0), n);
-
-        for (i = 2; i <= k; i++)
-        {
-            _nmod_poly_mulmod_preinv(t, res[j].coeffs, n, h, n, poly,
-                                                  len, polyinv, leninv, p);
-            _nmod_poly_add(res[j].coeffs, t, n,
-                                             nmod_mat_entry_ptr(C, (j + 1)*k - i, 0), n, p);
-        }
+        nmod_mat_t Cw;
+        nmod_mat_window_init(Cw, C, j * k, 0, (j + 1) * k, C->c);
+        _nmod_poly_mod_matrix_rows_evaluate(res[j].coeffs, Cw, h, n, poly, len, polyinv, leninv, p);
     }
 }
 
@@ -138,17 +131,10 @@ void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
     _nmod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,
                                                          threads, num_threads);
 
-    /* Evaluate block composition using the Horner scheme */
-    if (n == 1)
-    {
-        h[0] = n_mulmod2_preinv(nmod_mat_entry(A, m - 1, 0),
-                                               nmod_mat_entry(A, 1, 0), mod.n, mod.ninv);
-    } else
-    {
-
-        _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, nmod_mat_entry_ptr(A, 1, 0), n, poly,
-                             len, polyinv, leninv, mod);
-    }
+    /* Evaluate block composition */
+    /* Todo: precompute powers of h for repeated rectangular splitting */
+    _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, nmod_mat_entry_ptr(A, 1, 0), n, poly,
+                         len, polyinv, leninv, mod);
 
     args = (compose_vec_arg_t *)
                    flint_malloc(sizeof(compose_vec_arg_t) * (num_threads + 1));

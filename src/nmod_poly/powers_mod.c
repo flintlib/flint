@@ -260,16 +260,10 @@ _nmod_poly_powers_mod_preinv_naive(nn_ptr * res, nn_srcptr f, slong flen, slong 
        return;
 
     /* f^i = f^(i - 1)*f */
-    if (glen == 2) /* special case, constant polys */
+    for (i = 2; i < n; i++)
     {
-        for (i = 2; i < n; i++)
-            res[i][0] = n_mulmod2_preinv(res[i - 1][0], res[1][0],
-                                                              mod.n, mod.ninv);
-    } else
-    {
-        for (i = 2; i < n; i++)
-            _nmod_poly_mulmod_preinv(res[i], res[i - 1], glen - 1, res[1],
-                                        glen - 1, g, glen, ginv, ginvlen, mod);
+        _nmod_poly_mulmod_preinv(res[i], res[i / 2], glen - 1, res[(i + 1) / 2],
+                                    glen - 1, g, glen, ginv, ginvlen, mod);
     }
 }
 

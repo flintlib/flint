@@ -568,6 +568,9 @@ void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, ulong c);
 
 /* Modular composition  ******************************************************/
 
+void _nmod_poly_mod_matrix_rows_evaluate(nn_ptr res, const nmod_mat_t A, nn_srcptr h, slong n, nn_srcptr poly3, slong len3,
+    nn_srcptr poly3inv, slong len3inv, nmod_t mod);
+
 void _nmod_poly_compose_mod_brent_kung(nn_ptr res, nn_srcptr f, slong lenf, nn_srcptr g, nn_srcptr h, slong lenh, nmod_t mod);
 void nmod_poly_compose_mod_brent_kung(nmod_poly_t res, const nmod_poly_t f, const nmod_poly_t g, const nmod_poly_t h);
 
