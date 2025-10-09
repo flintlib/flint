@@ -19,11 +19,24 @@ void _nmod_poly_mulmod_preinv(nn_ptr res, nn_srcptr poly1, slong len1,
 {
     nn_ptr T, Q;
     slong lenT, lenQ;
+    TMP_INIT;
+
+    if (lenf == 2)
+    {
+        FLINT_ASSERT(len1 == 1);
+        FLINT_ASSERT(len2 == 1);
+
+        res[0] = nmod_mul(poly1[0], poly2[0], mod);
+        return;
+    }
 
     lenT = len1 + len2 - 1;
     lenQ = lenT - lenf + 1;
 
-    T = _nmod_vec_init(lenT + lenQ);
+    FLINT_ASSERT(lenQ >= 1);
+
+    TMP_START;
+    T = TMP_ALLOC(sizeof(ulong) * (lenT + lenQ));
     Q = T + lenT;
 
     if (len1 >= len2)
@@ -33,7 +46,8 @@ void _nmod_poly_mulmod_preinv(nn_ptr res, nn_srcptr poly1, slong len1,
 
     _nmod_poly_divrem_newton_n_preinv(Q, res, T, lenT, f, lenf,
                                       finv, lenfinv, mod);
-    _nmod_vec_clear(T);
+
+    TMP_END;
 }
 
 void
