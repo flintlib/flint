@@ -25,7 +25,7 @@
 int
 _nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
                                         slong lenA, nn_srcptr B, slong lenB,
-                                       nn_srcptr Binv, slong lenBinv, nmod_t mod)
+                                       nn_srcptr Binv, slong FLINT_UNUSED(lenBinv), nmod_t mod)
 {
     slong nz, i, j, k;
     slong exps[MAX_NZ];
