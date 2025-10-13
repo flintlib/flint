@@ -20,6 +20,27 @@
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
+/* Return 1 if poly has a trivial factor, otherwise return 0. For small p,
+   this quickly filters out many candidates when testing random polynomials
+   for irreducibility. */
+int nmod_poly_is_reducible_trial_div(const nmod_poly_t poly)
+{
+    ulong x, p = poly->mod.n;
+
+    if (poly->mod.n > FLINT_MAX(200, 2 * poly->length))
+        return 0;
+
+    /* Try all linear factors. To do: check if it is worthwhile to eliminate
+       other low-degree factors too. */
+    /* To do: use multipoint evaluation when p is large enough. */
+    /* To do: use sparse algorithm when poly is sparse. */
+    for (x = 1; x < p; x++)
+        if (nmod_poly_evaluate_nmod(poly, x) == 0)
+            return 1;
+
+    return 0;
+}
+
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 {
 
@@ -142,10 +163,13 @@ int nmod_poly_is_irreducible_ddf(const nmod_poly_t poly)
 int
 nmod_poly_is_irreducible(const nmod_poly_t f)
 {
-    if (nmod_poly_length(f) > 2)
-        return nmod_poly_is_irreducible_ddf(f);
+    if (nmod_poly_length(f) <= 1)
+        return 1;
 
-    return 1;
+    if (nmod_poly_is_reducible_trial_div(f))
+        return 0;
+
+    return nmod_poly_is_irreducible_ddf(f);
 }
 
 void
