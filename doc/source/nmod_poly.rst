@@ -222,13 +222,42 @@ Randomization
 
     Generates a random polynomial with length up to ``len``.
 
-.. function:: void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
-
-    Generates a random irreducible polynomial with length up to ``len``.
-
 .. function:: void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
 
     Generates a random monic polynomial with length ``len``.
+
+.. function:: void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic trinomial of length ``len``.
+
+.. function:: void nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic pentomial of length ``len``.
+
+Construction of irreducible polynomials
+--------------------------------------------------------------------------------
+
+The following functions assume a prime modulus.
+
+.. function:: void nmod_poly_minimal_irreducible(nmod_poly_t res, ulong n)
+
+    Generates the monic irreducible polynomial of degree ``n`` which is minimal
+    in the following sense:
+
+    * The number of nonzero terms is minimal: we generate a binomial
+      if possible, otherwise a trinomial, tetranomial or finally a pentanomial.
+      It is conjectured that pentanomial always suffices modulo `p = 2`
+      and that a tetranomial always suffices modulo `p > 2`.
+    * Writing the polynomial as `x^n + a_1 x^{k_1} + a_2 x^{k_2} + \ldots + a_t x^{k_t}`
+      with `n > k_1 > k_2 \ldots > k_t`,
+      the tuple `(a_1, \ldots, a_{t}, k_1, \ldots, k_t)` is lexicographically
+      minimal. We thus favor polynomials with smaller coefficients
+      (all 1 if possible), and secondly with smaller degrees for the
+      middle terms.
+
+.. function:: void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random irreducible polynomial with length up to ``len``.
 
 .. function:: void nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
 
@@ -239,11 +268,6 @@ Randomization
     Generates a random monic irreducible primitive polynomial with
     length ``len``.
 
-
-.. function:: void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
-
-    Generates a random monic trinomial of length ``len``.
-
 .. function:: int nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state, slong len, slong max_attempts)
 
     Attempts to set ``poly`` to a monic irreducible trinomial of
@@ -252,10 +276,6 @@ Randomization
     ``max_attempts`` is ``0``, then it will keep generating
     trinomials until an irreducible one is found.  Returns `1` if one
     is found and `0` otherwise.
-
-.. function:: void nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
-
-    Generates a random monic pentomial of length ``len``.
 
 .. function:: int nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state, slong len, slong max_attempts)
 
