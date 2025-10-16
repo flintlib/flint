@@ -465,8 +465,8 @@ cleanup:
     if (want_pruning)
     {
         _nmod_vec_clear(invctab);
-        for (k = 0; k < num_sieve; k++)
-            nmod_poly_clear(sieve[k]);
+        for (i = 0; i < num_sieve; i++)
+            nmod_poly_clear(sieve[i]);
         nmod_poly_clear(h);
     }
 
@@ -591,8 +591,8 @@ nmod_poly_irreducible_tetranomial(nmod_poly_t res, ulong n)
 cleanup:
     if (want_pruning)
     {
-        for (k = 0; k < num_sieve; k++)
-            nmod_poly_clear(sieve[k]);
+        for (i = 0; i < num_sieve; i++)
+            nmod_poly_clear(sieve[i]);
         nmod_poly_clear(h);
     }
 
@@ -681,8 +681,8 @@ nmod_poly_irreducible_pentanomial(nmod_poly_t res, ulong n)
 cleanup:
     if (want_pruning)
     {
-        for (k = 0; k < num_sieve; k++)
-            nmod_poly_clear(sieve[k]);
+        for (i = 0; i < num_sieve; i++)
+            nmod_poly_clear(sieve[i]);
         nmod_poly_clear(h);
     }
 
