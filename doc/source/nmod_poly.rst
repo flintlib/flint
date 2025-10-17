@@ -241,19 +241,23 @@ The following functions assume a prime modulus.
 
 .. function:: void nmod_poly_minimal_irreducible(nmod_poly_t res, ulong n)
 
-    Generates the monic irreducible polynomial of degree ``n`` which is minimal
-    in the following sense:
+    Generates a monic irreducible polynomial of degree ``n`` with minimal
+    weight (minimal number of nonzero terms). We generate a binomial
+    if possible, otherwise a trinomial, etc.
+    It is conjectured that one never needs more than a pentanomial
+    modulo `p = 2` and a tetranomial modulo `p > 2`.
 
-    * The number of nonzero terms is minimal: we generate a binomial
-      if possible, otherwise a trinomial, tetranomial or finally a pentanomial.
-      It is conjectured that pentanomial always suffices modulo `p = 2`
-      and that a tetranomial always suffices modulo `p > 2`.
-    * Writing the polynomial as `x^n + a_1 x^{k_1} + a_2 x^{k_2} + \ldots + a_t x^{k_t}`
-      with `n > k_1 > k_2 \ldots > k_t`,
-      the tuple `(a_1, \ldots, a_{t}, k_1, \ldots, k_t)` is lexicographically
-      minimal. We thus favor polynomials with smaller coefficients
-      (all 1 if possible), and secondly with smaller degrees for the
-      middle terms.
+    More specifically, this function returns the first among all minimal-weight
+    polynomials in the following ordering.
+    Firstly, for trinomials, `x^n + a x^k + b` comes before
+    its monic reversal `x^n + a' x^{n-k} + b'` if `k < n - k`.
+    Secondly, writing
+    `f = x^n + a_1 x^{k_1} + a_2 x^{k_2} + \ldots + a_t x^{k_t}`
+    with `n > k_1 > k_2 \ldots > k_t`, we order tuples
+    `(a_1, \ldots, a_{t}, k_1, \ldots, k_t)` lexicographically.
+    We thus favor polynomials with smaller coefficients
+    (all 1 if possible), and secondly with smaller degrees for the
+    middle terms.
 
 .. function:: void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
 
