@@ -34,8 +34,19 @@ Context Management
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
-    use a Conway polynomial; if one is not available, a random
+    use a Conway polynomial; if one is not available, a minimal weight
     irreducible polynomial will be used.
+
+    Assumes that `p` is a prime.
+
+    Assumes that the string ``var`` is a null-terminated string
+    of length at least one.
+
+.. function:: fq_nmod_ctx_init_minimal_weight_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
+
+    Initialises the context for prime `p` and extension degree `d`,
+    with name ``var`` for the generator, choosing a modulus polynomial
+    with minimal number of nonzero terms for efficient arithmetic.
 
     Assumes that `p` is a prime.
 
