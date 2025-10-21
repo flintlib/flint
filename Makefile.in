@@ -74,6 +74,8 @@ WANT_DEPS:=@WANT_DEPS@
 WANT_ASSEMBLY:=@WANT_ASSEMBLY@
 ASM_PATH:=$(ABS_SRC_DIR)/mpn_extras/@ASM_PATH@
 
+WANT_LTO:=@WANT_LTO@
+
 GMP_LIB_PATH:=@GMP_LIB_PATH@
 MPFR_LIB_PATH:=@MPFR_LIB_PATH@
 BLAS_LIB_PATH:=@BLAS_LIB_PATH@
@@ -431,9 +433,15 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
 
-$(FLINT_DIR)/$(FLINT_LIB_FULL): $(MERGED_LOBJS)
+ifeq ($(WANT_LTO),1)
+	LIB_DEPS = $(LOBJS)
+else
+	LIB_DEPS = $(MERGED_LOBJS)
+endif
+
+$(FLINT_DIR)/$(FLINT_LIB_FULL): $(LIB_DEPS)
 	@echo "Building $(FLINT_LIB_FULL)"
-	$(CMD) $(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
+	$(CMD) $(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(LIB_DEPS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
 	@$(RM_F) $(FLINT_LIB)
 	@$(RM_F) $(FLINT_LIB_MAJOR)
 	@$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB)
@@ -452,9 +460,15 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_obj_rule,$(dir))))
 MERGED_OBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.o)
 
-$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(MERGED_OBJS)
+ifeq ($(WANT_LTO),1)
+	LIB_DEPS = $(OBJS)
+else
+	LIB_DEPS = $(MERGED_OBJS)
+endif
+
+$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(LIB_DEPS)
 	@echo "Building $(FLINT_LIB_STATIC)"
-	@$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(MERGED_OBJS)
+	@$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIB_DEPS)
 endif
 
 ################################################################################
