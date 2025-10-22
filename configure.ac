@@ -340,6 +340,17 @@ yes|no)
 esac],
 enable_fast_build="no")
 
+AC_ARG_ENABLE(lto,
+[AS_HELP_STRING([--enable-lto],[Enable link-time optimization [default=no]])],
+[case $enableval in
+yes|no)
+  ;;
+*)
+  AC_MSG_ERROR([Bad value $enableval for --enable-lto. Need yes or no.])
+  ;;
+esac],
+enable_lto="no")
+
 ################################################################################
 # packages
 ################################################################################
@@ -1274,6 +1285,13 @@ then
     [AC_MSG_ERROR([$CC does not support the flag -mavx512f needed for AVX512 instructions])])
 fi
 
+if test "$enable_lto" = "yes";
+then
+    AX_CHECK_COMPILE_FLAG([-flto],
+    [save_CFLAGS="-flto $save_CFLAGS"],
+    [AC_MSG_ERROR([$CC does not support the flag -flto needed for link-time optimization])])
+fi
+
 if test "$cflags_set" = "no";
 then
     for flag in $gcc_cflags $gcc_warnings;
@@ -1425,6 +1443,13 @@ then
 else
     AC_SUBST(WANT_ASSEMBLY,0)
     AC_SUBST(ASM_PATH,)
+fi
+
+if test "$enable_lto" = "yes";
+then
+    AC_SUBST(WANT_LTO,1)
+else
+    AC_SUBST(WANT_LTO,0)
 fi
 
 ################################################################################
