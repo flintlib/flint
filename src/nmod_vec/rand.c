@@ -11,7 +11,7 @@
 
 #include "nmod_vec.h"
 
-void _nmod_vec_randunif(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
+void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 {
     slong i;
     for (i = 0; i < len; i++)

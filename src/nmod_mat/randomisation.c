@@ -25,7 +25,7 @@ nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 }
 
 void
-nmod_mat_randunif(nmod_mat_t mat, flint_rand_t state)
+nmod_mat_rand(nmod_mat_t mat, flint_rand_t state)
 {
     slong i, j;
 
