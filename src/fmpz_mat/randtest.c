@@ -15,12 +15,29 @@
 void
 fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
 {
-    slong r, c, i, j;
+    // Adapted from nmod_vec_randtest
+    slong r, c, i, j=0, len;
+    slong sparseness;
 
     r = mat->r;
     c = mat->c;
+    len = r*c;
 
-    for (i = 0; i < r; i++)
-        for (j = 0; j < c; j++)
-            fmpz_randtest(fmpz_mat_entry(mat, i, j), state, bits);
+    if (n_randint(state, 2))
+    {
+      for (i = 0; i < r; i++)
+          for (j = 0; j < c; j++)
+              fmpz_randtest(fmpz_mat_entry(mat, i, j), state, bits);
+    }
+    else
+    {
+        sparseness = 1 + n_randint(state, FLINT_MAX(2, len));
+        for (i = 0; i < len; i++)
+        {
+            if (n_randint(state, sparseness))
+                *fmpz_mat_entry(mat, i, j) = 0;
+            else
+                fmpz_randtest(fmpz_mat_entry(mat, i, j), state, bits);
+        }
+    }
 }

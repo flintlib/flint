@@ -25,6 +25,16 @@ nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 }
 
 void
+nmod_mat_randunif(nmod_mat_t mat, flint_rand_t state)
+{
+    slong i, j;
+
+    for (i = 0; i < mat->r; i++)
+        for (j = 0; j < mat->c; j++)
+            nmod_mat_entry(mat, i, j) = n_randint(state, mat->mod.n);
+}
+
+void
 nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count)
 {
     slong c, i, j, k;

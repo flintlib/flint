@@ -95,7 +95,18 @@ Random generation
 .. function:: void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 
     Generate a random matrix with the existing dimensions and entries in
-    `[0, n)` where ``n`` is the modulus.
+    `[0, n)` where ``n`` is the modulus. A sparse matrix is
+    generated with increased probability.
+
+.. function:: void fmpz_mod_mat_randfull(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+
+    Sets the element to random numbers between `1` and `m-1` likely to be close to the modulus
+    of the matrix. This is used to test potential overflow-related bugs.
+
+.. function:: void fmpz_mod_mat_randunif(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+
+    Sets the element to random numbers between `0` and `m-1` likely to be close to the modulus
+    of the matrix. This is used to write benchmarks.
 
 
 Windows and concatenation
