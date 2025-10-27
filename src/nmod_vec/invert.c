@@ -100,7 +100,6 @@ void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
 
 void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod)
 {
-    /* FIXME add len threshold for naive version */
     if (NMOD_CAN_USE_SHOUP(mod))
         _nmod_vec_invert_shoup(res, vec, len, mod);
     else
