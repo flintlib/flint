@@ -92,11 +92,6 @@ Basic manipulation                                                              
 Random generation
 --------------------------------------------------------------------------------
 
-.. function:: void fmpz_mod_mat_randfull(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
-
-    Generate a random matrix with the existing dimensions and entries in
-    `[0, n)` where ``n`` is the modulus.
-
 .. function:: void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 
     Generate a random matrix with the existing dimensions and entries in
