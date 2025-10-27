@@ -1559,6 +1559,13 @@ Modular composition
     we require ``hinv`` to be the inverse of the reverse of ``h``.
     The algorithm used is the Brent-Kung matrix algorithm.
 
+.. function:: void _nmod_poly_mod_matrix_rows_evaluate(nn_ptr res, const nmod_mat_t A, nn_srcptr h, slong n, nn_srcptr poly3, slong len3, nn_srcptr poly3inv, slong len3inv, nmod_t mod)
+
+    Set ``res`` to the polynomial `\sum_{i=0}^{d-1} A_i h^i` modulo ``poly3`` where `A_i`
+    denotes the `i`-th row of the `d \times n` matrix ``A``
+    and ``res`` and ``h`` have length ``n``. The length of ``poly3`` must
+    be equal to ``n + 1``.
+
 .. function:: void _nmod_poly_reduce_matrix_mod_poly (nmod_mat_t A, const nmod_mat_t B, const nmod_poly_t f)
 
     Sets the ith row of ``A`` to the reduction of the ith row of `B` modulo

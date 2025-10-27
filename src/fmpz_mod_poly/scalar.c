@@ -77,7 +77,7 @@ void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res,
         }
         else
         {
-            flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_scalar_div_fmpz). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (fmpz_mod_poly_scalar_div_fmpz). Division by zero.\n");
         }
     }
 

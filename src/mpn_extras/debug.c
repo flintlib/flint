@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpn_extras.h"
 
 
@@ -17,6 +18,14 @@ void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
     int i, j;
     char byte[9];
     byte[8] = 0;
+
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_set_ui_array(t, x, xsize);
+        flint_printf("%{fmpz}", t);
+        fmpz_clear(t);
+    }
 
     flint_printf("\n");
     for (i = 0; i < xsize; i++)

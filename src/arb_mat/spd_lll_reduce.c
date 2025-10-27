@@ -14,7 +14,7 @@
 #include "arb_mat.h"
 
 void
-arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
+arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, double delta, double eta, slong prec)
 {
     fmpz_lll_t fl;
     fmpz_mat_t N;
@@ -33,7 +33,7 @@ arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
     if (r)
     {
         /* Default Flint LLL values, except Gram */
-        fmpz_lll_context_init(fl, 0.99, 0.51, GRAM, EXACT);
+        fmpz_lll_context_init(fl, delta, eta, GRAM, EXACT);
         fmpz_lll(N, U, fl);
     }
 

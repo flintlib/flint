@@ -55,7 +55,7 @@ fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         }
         else
         {
-            flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_divrem). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (fmpz_mod_poly_divrem). Division by zero.\n");
         }
     }
 

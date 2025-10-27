@@ -45,7 +45,7 @@ void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mo
         }
         else
         {
-            flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_div_basecase). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (fmpz_mod_poly_div_basecase). Division by zero.\n");
         }
     }
 

@@ -54,7 +54,7 @@ nmod_poly_divexact(nmod_poly_t Q,
         }
         else
         {
-            flint_throw(FLINT_ERROR, "Exception (nmod_poly_divexact). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_divexact). Division by zero.\n");
         }
     }
 

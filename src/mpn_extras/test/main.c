@@ -15,6 +15,8 @@
 #include "t-divides.c"
 #include "t-divrem_preinv1.c"
 #include "t-divrem_preinvn.c"
+#include "t-fmmamod_precond_matrix.c"
+#include "t-fmmamod_preinvn.c"
 #include "t-fmms1.c"
 #include "t-gcd_full.c"
 #include "t-mod_preinvn.c"
@@ -27,6 +29,8 @@
 #include "t-mulhigh_n_recursive.c"
 #include "t-mulhigh_normalised.c"
 #include "t-mulmod_2expp1.c"
+#include "t-mulmod_precond_matrix.c"
+#include "t-mulmod_precond_shoup.c"
 #include "t-mulmod_preinv1.c"
 #include "t-mulmod_preinvn.c"
 #include "t-remove_2exp.c"
@@ -43,6 +47,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_divides),
     TEST_FUNCTION(flint_mpn_divrem_preinv1),
     TEST_FUNCTION(flint_mpn_divrem_preinvn),
+    TEST_FUNCTION(flint_mpn_fmmamod_precond_matrix),
+    TEST_FUNCTION(flint_mpn_fmmamod_preinvn),
     TEST_FUNCTION(flint_mpn_fmms1),
     TEST_FUNCTION(flint_mpn_gcd_full),
     TEST_FUNCTION(flint_mpn_mod_preinvn),
@@ -55,6 +61,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mulhigh_n_recursive),
     TEST_FUNCTION(flint_mpn_mulhigh_normalised),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
+    TEST_FUNCTION(flint_mpn_mulmod_precond_matrix),
+    TEST_FUNCTION(flint_mpn_mulmod_precond_shoup),
     TEST_FUNCTION(flint_mpn_mulmod_preinv1),
     TEST_FUNCTION(flint_mpn_mulmod_preinvn),
     TEST_FUNCTION(flint_mpn_remove_2exp),

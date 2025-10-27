@@ -44,6 +44,7 @@ typedef int ((*gr_method_mat_unary_op_get_scalar)(gr_ptr, const gr_mat_t, gr_ctx
 typedef int ((*gr_method_mat_unary_op)(gr_mat_t, const gr_mat_t, gr_ctx_ptr));
 typedef int ((*gr_method_mat_binary_op)(gr_mat_t, const gr_mat_t, const gr_mat_t, gr_ctx_ptr));
 typedef int ((*gr_method_mat_binary_op_with_flag)(gr_mat_t, const gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
+typedef int ((*gr_method_mat_binary_unary_op)(gr_mat_t, gr_mat_t, const gr_mat_t, gr_ctx_ptr));
 typedef int ((*gr_method_mat_pivot_op)(slong *, gr_mat_t, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_mat_diagonalization_op)(gr_vec_t, gr_mat_t, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
 typedef int ((*gr_method_mat_lu_op)(slong *, slong *, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
@@ -53,6 +54,7 @@ typedef int ((*gr_method_mat_reduce_row_op)(slong *, gr_mat_t, slong *, slong *,
 #define GR_MAT_UNARY_OP(ctx, NAME) (((gr_method_mat_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_BINARY_OP(ctx, NAME) (((gr_method_mat_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_BINARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_mat_binary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_MAT_BINARY_UNARY_OP(ctx, NAME) (((gr_method_mat_binary_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_PIVOT_OP(ctx, NAME) (((gr_method_mat_pivot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_DIAGONALIZATION_OP(ctx, NAME) (((gr_method_mat_diagonalization_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_LU_OP(ctx, NAME) (((gr_method_mat_lu_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -94,6 +96,37 @@ GR_MAT_INLINE void
 gr_mat_window_clear(gr_mat_t FLINT_UNUSED(window), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
+
+#define GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(AT, A, ctx) \
+    do { \
+        gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW); \
+        slong r = (A)->r; \
+        slong c = (A)->c; \
+        slong sz = (ctx)->sizeof_elem; \
+        slong i, j; \
+        AT->entries = GR_TMP_ALLOC(r * c * sz); \
+        AT->r = c; \
+        AT->c = r; \
+        AT->stride = r; \
+        for (i = 0; i < r; i++) \
+            for (j = 0; j < c; j++) \
+                set_shallow(GR_MAT_ENTRY(AT, j, i, sz), GR_MAT_ENTRY(A, i, j, sz), ctx); \
+    } while (0)
+
+#define GR_MAT_SHALLOW_TRANSPOSE(AT, A, ctx) \
+    do { \
+        gr_method_void_unary_op set_shallow = GR_VOID_UNARY_OP(ctx, SET_SHALLOW); \
+        slong r = (A)->r; \
+        slong c = (A)->c; \
+        slong sz = (ctx)->sizeof_elem; \
+        slong i, j; \
+        for (i = 0; i < r; i++) \
+            for (j = 0; j < c; j++) \
+                set_shallow(GR_MAT_ENTRY(AT, j, i, sz), GR_MAT_ENTRY(A, i, j, sz), ctx); \
+    } while (0)
+
+#define GR_MAT_TMP_CLEAR_SHALLOW_TRANSPOSE(AT, ctx) \
+    GR_TMP_FREE((AT)->entries, (AT)->r * (AT)->c * (ctx)->sizeof_elem)
 
 WARN_UNUSED_RESULT int gr_mat_concat_horizontal(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
@@ -381,7 +414,19 @@ WARN_UNUSED_RESULT int gr_mat_norm_frobenius(gr_ptr res, const gr_mat_t mat, gr_
 
 /* Orthogonal matrices */
 truth_t gr_mat_is_orthogonal(const gr_mat_t A, gr_ctx_t ctx);
+truth_t gr_mat_is_row_orthogonal(const gr_mat_t A, gr_ctx_t ctx);
+truth_t gr_mat_is_row_orthonormal(const gr_mat_t A, gr_ctx_t ctx);
+truth_t gr_mat_is_col_orthogonal(const gr_mat_t A, gr_ctx_t ctx);
+truth_t gr_mat_is_col_orthonormal(const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randtest_orthogonal(gr_mat_t A, flint_rand_t state, gr_ctx_t ctx);
+
+/* QR decomposition */
+
+WARN_UNUSED_RESULT int gr_mat_lq_gso(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_lq_recursive(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_lq_generic(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_qr(gr_mat_t Q, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx);
 
 /* LLL */
 

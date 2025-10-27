@@ -68,39 +68,15 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
     nmod_mat_mul(C, B, A);
 
     /* Evaluate block composition using the Horner scheme */
-    if (n == 1)
-    {
-        h[0] = n_mulmod2_preinv(nmod_mat_entry(A, m - 1, 0),
-                                               nmod_mat_entry(A, 1, 0), mod.n, mod.ninv);
-    } else
-    {
-        _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, nmod_mat_entry_ptr(A, 1, 0), n, poly,
+    _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, nmod_mat_entry_ptr(A, 1, 0), n, poly,
                                                     len, polyinv, leninv, mod);
-    }
 
+    /* Todo: precompute powers of h for repeated rectangular splitting */
     for (j = 0; j < len2; j++)
     {
-        _nmod_vec_set((res + j)->coeffs, nmod_mat_entry_ptr(C, (j + 1)*k - 1, 0), n);
-
-        if (n == 1)
-        {
-            for (i = 2; i <= k; i++)
-            {
-                t[0] = n_mulmod2_preinv(res[j].coeffs[0],
-                                                        h[0], mod.n, mod.ninv);
-                res[j].coeffs[0] = n_addmod(t[0],
-                                             nmod_mat_entry(C, (j + 1)*k - i, 0), mod.n);
-            }
-        } else
-        {
-            for (i = 2; i <= k; i++)
-            {
-                _nmod_poly_mulmod_preinv(t, res[j].coeffs,
-                                     n, h, n, poly, len, polyinv, leninv, mod);
-                _nmod_poly_add(res[j].coeffs, t, n,
-                                               nmod_mat_entry_ptr(C, (j + 1)*k - i, 0), n, mod);
-            }
-        }
+        nmod_mat_t Cw;
+        nmod_mat_window_init(Cw, C, j * k, 0, (j + 1) * k, C->c);
+        _nmod_poly_mod_matrix_rows_evaluate(res[j].coeffs, Cw, h, n, poly, len, polyinv, leninv, mod);
     }
 
     _nmod_vec_clear(h);

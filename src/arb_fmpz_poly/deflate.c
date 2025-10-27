@@ -20,7 +20,7 @@ arb_fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong deflati
 
     if (deflation == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_deflate). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_poly_deflate). Division by zero.\n");
     }
 
     if (input->length <= 1 || deflation == 1)

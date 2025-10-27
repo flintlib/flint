@@ -38,7 +38,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_invmod). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_invmod). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */

@@ -289,7 +289,7 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (B->length == 0)
     {
-        flint_throw(FLINT_ERROR, "(fmpz_poly_pseudo_divrem_divconquer): Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "(fmpz_poly_pseudo_divrem_divconquer): Division by zero.\n");
     }
     if (Q == R)
     {

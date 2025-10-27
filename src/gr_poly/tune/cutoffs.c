@@ -61,7 +61,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #endif
 
 #if 1
-#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_add_ui(t, t, 1); fmpz_nextprime(t, t, 0); GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ctx, t)); fmpz_clear(t);
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_add_ui(t, t, 1); fmpz_nextprime(t, t, 0); GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ctx, t)); mpn_mod_ctx_set_is_field(ctx, T_TRUE); fmpz_clear(t);
 #define RANDCOEFF(t, ctx) fmpz_mod_rand(t, state, gr_ctx_data_as_ptr(ctx));
 #define STEP_BITS for (bits = 80, j = 0; bits <= 1024; bits = bits + 16, j++)
 #endif
@@ -212,7 +212,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
                _nmod_poly_mul_mid_default_mpn_ctx(C->coeffs, 0, B->length, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
 #endif
 
-#if 1
+#if 0
 #define INFO "divexact (basecase -> bidirectional)"
 #define SETUP random_input(C, state, len, ctx); \
               random_input(B, state, len, ctx); \
@@ -221,7 +221,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #define CASE_B GR_IGNORE(gr_poly_divexact_bidirectional(C, A, B, ctx));
 #endif
 
-#if 0
+#if 1
 #define INFO "gcd"
 #define SETUP random_input(A, state, len, ctx); \
               random_input(B, state, len, ctx);

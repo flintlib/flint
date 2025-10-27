@@ -74,6 +74,8 @@ WANT_DEPS:=@WANT_DEPS@
 WANT_ASSEMBLY:=@WANT_ASSEMBLY@
 ASM_PATH:=$(ABS_SRC_DIR)/mpn_extras/@ASM_PATH@
 
+WANT_LTO:=@WANT_LTO@
+
 GMP_LIB_PATH:=@GMP_LIB_PATH@
 MPFR_LIB_PATH:=@MPFR_LIB_PATH@
 BLAS_LIB_PATH:=@BLAS_LIB_PATH@
@@ -123,6 +125,16 @@ ifeq ($(NJOBS),)
 # cores when -j is specified without any number attached, such as `nproc`.
 NJOBS:=8
 endif
+endif
+
+V ?= 0 # verbosity (0 = quiet, 1 = verbose)
+
+ifeq ($(V),1)
+  MSG = @:
+  CMD =
+else
+  MSG = @echo
+  CMD = @
 endif
 
 ################################################################################
@@ -422,9 +434,15 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
 
-$(FLINT_DIR)/$(FLINT_LIB_FULL): $(MERGED_LOBJS)
+ifeq ($(WANT_LTO),1)
+	LIB_DEPS = $(LOBJS)
+else
+	LIB_DEPS = $(MERGED_LOBJS)
+endif
+
+$(FLINT_DIR)/$(FLINT_LIB_FULL): $(LIB_DEPS)
 	@echo "Building $(FLINT_LIB_FULL)"
-	@$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
+	$(CMD) $(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(LIB_DEPS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
 	@$(RM_F) $(FLINT_LIB)
 	@$(RM_F) $(FLINT_LIB_MAJOR)
 	@$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB)
@@ -443,9 +461,15 @@ endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_obj_rule,$(dir))))
 MERGED_OBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.o)
 
-$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(MERGED_OBJS)
+ifeq ($(WANT_LTO),1)
+	LIB_DEPS = $(OBJS)
+else
+	LIB_DEPS = $(MERGED_OBJS)
+endif
+
+$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(LIB_DEPS)
 	@echo "Building $(FLINT_LIB_STATIC)"
-	@$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(MERGED_OBJS)
+	@$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIB_DEPS)
 endif
 
 ################################################################################
@@ -592,20 +616,20 @@ endif
 ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
 $(BUILD_DIR)/$(1)/%.o: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(IS_OUT_OF_TREE),1)
 $(BUILD_DIR)/fmpz/fmpz.o: $(SRC_DIR)/fmpz/fmpz.c | $(BUILD_DIR)/fmpz
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(fmpz_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(CFLAGS) $(fmpz_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
 endif
 
 ifeq ($(WANT_ASSEMBLY),1)
 %.o: %.s
-	@echo "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
-	@$(CC) $(ASMFLAGS) -c $< -o $@
+	$(MSG) "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
+	$(CMD) $(CC) $(ASMFLAGS) -c $< -o $@
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
@@ -618,20 +642,20 @@ endif
 ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
 $(BUILD_DIR)/$(1)/%.lo: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(PIC_FLAG) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(PIC_FLAG) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(IS_OUT_OF_TREE),1)
 $(BUILD_DIR)/fmpz/fmpz.lo: $(SRC_DIR)/fmpz/fmpz.c | $(BUILD_DIR)/fmpz
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(PIC_FLAG) $(CFLAGS) $(fmpz_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(PIC_FLAG) $(CFLAGS) $(fmpz_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
 endif
 
 ifeq ($(WANT_ASSEMBLY),1)
 %.lo: %_pic.s
-	@echo "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
-	@$(CC) $(ASMFLAGS) $(ASM_PIC_FLAG) -c $< -o $@
+	$(MSG) "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
+	$(CMD) $(CC) $(ASMFLAGS) $(ASM_PIC_FLAG) -c $< -o $@
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
@@ -643,25 +667,25 @@ endif
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
-	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/profile
-	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_PROFS_rule
 $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/profile
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_PROFS_rule
 $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/profile
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
 
@@ -669,25 +693,25 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS_rule,$(dir))))
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/test/%$(EXEEXT): $(ABS_SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/test
-	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/test/%$(EXEEXT): $(ABS_SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/test
-	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/test
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/test
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
 
@@ -696,36 +720,36 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_TESTS_rule,$(dir))))
 ifneq ($(WANT_NTL), 0)
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(ABS_SRC_DIR)/interfaces/test/t-NTL-interface.cpp $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/interfaces/test
-	@echo "  CXX $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CXX $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(ABS_SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/interfaces/test
-	@echo "  CXX $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CXX $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 endif
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/tune
-	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/tune
-	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	$(MSG) "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/tune
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/tune
-	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
+	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
 
@@ -733,12 +757,12 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/examples/%$(EXEEXT): $(ABS_FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples $(BUILD_DIR)/include
-	@echo "  CC  $(<:$(ABS_FLINT_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
+	$(MSG) "  CC  $(<:$(ABS_FLINT_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
 else
 $(BUILD_DIR)/examples/%$(EXEEXT): $(ABS_FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/examples $(BUILD_DIR)/include
-	@echo "  CC  $(<:$(ABS_FLINT_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
+	$(MSG) "  CC  $(<:$(ABS_FLINT_DIR)/%=%)"
+	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
 endif
 
 ################################################################################

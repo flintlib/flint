@@ -290,6 +290,13 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
         (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
     } while (0)
 
+/* Low two words of 2x2 product */
+#define FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0) \
+    do { \
+        umul_ppmm(r1, r0, a0, b0); \
+        (r1) += (a0) * (b1) + (a1) * (b0); \
+    } while (0)
+
 /* Low three words of 2x2 product */
 #define FLINT_MPN_MUL_3P2X2(r2, r1, r0, a1, a0, b1, b0)                \
     do {                                                               \
@@ -889,6 +896,23 @@ mp_size_t flint_mpn_gcd_full(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp
 
 void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm);
 void flint_mpn_mulmod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+
+#define MPN_MULMOD_PRECOND_NONE 0
+#define MPN_MULMOD_PRECOND_SHOUP 1
+#define MPN_MULMOD_PRECOND_MATRIX 2
+
+int flint_mpn_mulmod_want_precond(mp_size_t n, slong num, ulong norm);
+
+void flint_mpn_mulmod_precond_matrix_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+mp_size_t flint_mpn_mulmod_precond_matrix_alloc(mp_size_t n);
+void flint_mpn_mulmod_precond_matrix(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+
+void flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm);
+void flint_mpn_mulmod_precond_shoup(mp_ptr res, mp_srcptr a, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, ulong norm);
+
+void flint_mpn_fmmamod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr e, mp_srcptr f, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+void flint_mpn_fmmamod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr e, mp_srcptr f, mp_srcptr d, mp_srcptr dinv, ulong norm);
+void flint_mpn_fmmamod_precond_matrix(mp_ptr rp, mp_srcptr apre1, mp_srcptr b1, mp_srcptr apre2, mp_srcptr b2, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
 
 int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c, flint_bitcnt_t b, mp_ptr tp);
 

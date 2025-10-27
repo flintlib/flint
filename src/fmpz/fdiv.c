@@ -40,7 +40,7 @@ fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -107,7 +107,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -306,7 +306,7 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -371,7 +371,7 @@ fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
     if (h == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpq_fdiv_q_si). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpq_fdiv_q_si). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -409,7 +409,7 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (h == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q_ui). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q_ui). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -480,7 +480,7 @@ fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_r). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_r). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */

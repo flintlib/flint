@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 William Hart
     Copyright (C) 2013 Martin Lee
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,6 +13,73 @@
 
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+
+/* Hack for finite field arithmetic: for sparse B, direct division is faster
+   than doing the multiplications. This should properly be done as a B-dependent
+   precomputation, but we can afford O(1) overhead in the general case
+   to at least make sparse moduli asymptotically efficient. */
+
+/* Todo: tune this (should depend on the lengths and on the modulus. */
+#define MAX_NZ 6
+
+int
+_nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
+                                        slong lenA, nn_srcptr B, slong lenB,
+                                       nn_srcptr Binv, slong FLINT_UNUSED(lenBinv), nmod_t mod)
+{
+    slong nz, i, j, k;
+    slong exps[MAX_NZ];
+    ulong coeffs[MAX_NZ];
+    slong n = lenB - 1;
+    ulong c, leadB;
+    nn_ptr r;
+
+    nz = 1;
+    for (i = 0; i < lenB - 1; i++)
+    {
+        if (B[i] != 0)
+        {
+            exps[nz - 1] = i;
+            coeffs[nz - 1] = B[i];
+            nz++;
+            if (nz > MAX_NZ)
+                return 0;
+        }
+    }
+
+    leadB = B[lenB - 1];
+
+    if (leadB != 1)
+        _nmod_vec_scalar_mul_nmod(coeffs, coeffs, nz - 1, Binv[0], mod);
+
+    TMP_INIT;
+    TMP_START;
+
+    /* Todo: try to work in-place */
+    r = TMP_ALLOC((lenA) * sizeof(ulong));
+    _nmod_vec_set(r, A, lenA);
+
+    for (i = lenA - 1; i >= n; i--)
+    {
+        Q[i - n] = c = r[i];
+
+        /* Todo: incorporate delayed reduction, specialize for coeffs +/- 1, ... */
+        for (k = nz - 2; k >= 0; k--)
+        {
+            j = exps[k];
+            r[j + i - n] = nmod_sub(r[j + i - n], nmod_mul(c, coeffs[k], mod), mod);
+        }
+    }
+
+    if (leadB != 1)
+        _nmod_vec_scalar_mul_nmod(Q, Q, lenA - lenB + 1, Binv[0], mod);
+
+    _nmod_vec_set(R, r, n);
+    TMP_END;
+
+    return 1;
+
+}
 
 void _nmod_poly_divrem_newton_n_preinv(nn_ptr Q, nn_ptr R, nn_srcptr A,
                                         slong lenA, nn_srcptr B, slong lenB,
@@ -25,6 +93,9 @@ void _nmod_poly_divrem_newton_n_preinv(nn_ptr Q, nn_ptr R, nn_srcptr A,
         _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, Binv[0], mod);
         return;
     }
+
+    if (lenB > 20 && _nmod_poly_divrem_try_sparse(Q, R, A, lenA, B, lenB, Binv, lenBinv, mod))
+        return;
 
     _nmod_poly_div_newton_n_preinv(Q, A, lenA, B, lenB, Binv, lenBinv, mod);
 
@@ -55,7 +126,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
             return;
         } else
         {
-            flint_throw(FLINT_ERROR, "Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
         }
     }
 
