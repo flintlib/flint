@@ -1,13 +1,12 @@
 /*
     Copyright (C) 2025 Vincent Neiger
 
-    This file is part of PML.
+    This file is part of FLINT.
 
-    PML is free software: you can redistribute it and/or modify it under
-    the terms of the GNU General Public License version 2.0 (GPL-2.0-or-later)
-    as published by the Free Software Foundation; either version 2 of the
-    License, or (at your option) any later version. See
-    <https://www.gnu.org/licenses/>.
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_vec.h"
