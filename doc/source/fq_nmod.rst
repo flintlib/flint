@@ -42,7 +42,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: fq_nmod_ctx_init_minimal_weight_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
+.. function:: void fq_nmod_ctx_init_minimal_weight_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator, choosing a modulus polynomial
