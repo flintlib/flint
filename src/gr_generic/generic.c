@@ -91,6 +91,20 @@ truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_generic_ctx_is_rational_vector_space(ctx);
 }
 
+slong
+gr_generic_ctx_ngens_0(slong * ngens, gr_ctx_t ctx)
+{
+    * ngens = 0;
+    return GR_SUCCESS;
+}
+
+slong
+gr_generic_ctx_ngens_1(slong * ngens, gr_ctx_t ctx)
+{
+    * ngens = 1;
+    return GR_SUCCESS;
+}
+
 void
 gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
 {
@@ -2659,6 +2673,8 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_CTX_IS_EXACT,            (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_CANONICAL,        (gr_funcptr) gr_generic_ctx_predicate},
+
+    {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_0},
 
     {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},

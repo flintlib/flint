@@ -43,9 +43,13 @@ int _gr_fmpz_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 /* Some methods are identical to their fmpz_mpoly counterparts */
 void _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx);
 int _gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
+slong _gr_fmpz_mpoly_ctx_ngens(gr_ctx_t ctx);
+char const * const _gr_fmpz_mpoly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx);
 
 #define _gr_fmpz_mpoly_q_ctx_clear _gr_fmpz_mpoly_ctx_clear
 #define _gr_fmpz_mpoly_q_ctx_set_gen_names _gr_fmpz_mpoly_ctx_set_gen_names
+#define _gr_fmpz_mpoly_q_ctx_ngens _gr_fmpz_mpoly_ctx_ngens
+#define _gr_fmpz_mpoly_q_ctx_gen_name _gr_fmpz_mpoly_ctx_gen_name
 
 void
 _gr_fmpz_mpoly_q_init(fmpz_mpoly_q_t res, gr_ctx_t ctx)
@@ -535,6 +539,8 @@ gr_method_tab_input _gr_fmpz_mpoly_q_methods_input[] =
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_THREADSAFE,               (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_GEN_NAMES,               (gr_funcptr) _gr_fmpz_mpoly_q_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,   (gr_funcptr) _gr_fmpz_mpoly_q_ctx_ngens},
+    {GR_METHOD_CTX_GEN_NAME, (gr_funcptr) _gr_fmpz_mpoly_q_ctx_gen_name},
     {GR_METHOD_INIT,        (gr_funcptr) _gr_fmpz_mpoly_q_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_fmpz_mpoly_q_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_fmpz_mpoly_q_swap},
