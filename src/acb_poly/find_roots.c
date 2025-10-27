@@ -123,10 +123,17 @@ _acb_poly_roots_initial_values(acb_ptr roots, acb_srcptr poly, slong deg, slong 
         flint_printf("initial values: radius %{mag} multiplicity %wd\n", r, m);
 #endif
 
-        /* pick m points on the circle with radius r */
+        /* Pick m points on the circle with radius r */
         for (j = 0; j < m; j++)
         {
-            theta = 6.283185307179586 * ((j + 1.0) / m + (double) i / deg) + 0.577216;
+            /* Hack: the angle 2pi * ((j+1)/m + i/deg) distributes points uniformly
+               when there are many radii. However, if two radii are
+               very close, points can end up overlapping if (j+1)/m + i/deg
+               happens to give the same fraction for two different i. Ensure
+               that this doesn't happen. */
+            double irrational_factor = 0.99071828182845905;
+
+            theta = 6.283185307179586 * (irrational_factor * (j + 1.0) / m + (double) i / deg) + 0.577216;
 
             ri = roots + total;
             acb_zero(ri);

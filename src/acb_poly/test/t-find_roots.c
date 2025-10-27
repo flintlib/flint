@@ -85,5 +85,34 @@ TEST_FUNCTION_START(acb_poly_find_roots, state)
         acb_poly_clear(C);
     }
 
+    /* Check that #2421 is fixed */
+    {
+        acb_poly_t f;
+        acb_ptr roots;
+        acb_t c;
+
+        acb_poly_init(f);
+        acb_init(c);
+        roots = _acb_vec_init(4);
+
+        acb_poly_set_coeff_si(f, 0, 10);
+        acb_poly_set_coeff_si(f, 1, -170);
+        acb_poly_set_coeff_si(f, 2, 2890);
+        acb_poly_set_coeff_si(f, 3, -49130);
+        acb_poly_set_coeff_si(f, 4, 835210);
+        acb_set_ui(c, 83521);
+        acb_poly_scalar_div(f, f, c, 64);
+
+        if (acb_poly_find_roots(roots, f, NULL, 40, 64) != 4)
+        {
+            flint_printf("FAIL: geometric example\n");
+            flint_abort();
+        }
+
+        _acb_vec_clear(roots, 4);
+        acb_poly_clear(f);
+        acb_clear(c);
+    }
+
     TEST_FUNCTION_END(state);
 }
