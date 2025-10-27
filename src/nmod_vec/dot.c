@@ -203,7 +203,6 @@ ulong _nmod_vec_dot2_half(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod,
     return res;
 }
 #else  // FLINT_BITS == 64 && defined(__AVX2__)
-ulong _nmod_vec_dot2_half(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
     ulong res; slong i;
     _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[i], mod)
