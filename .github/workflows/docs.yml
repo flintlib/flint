@@ -1,26 +1,27 @@
-# Workflow to push documentation to website
-#
-# To work on the wheel building infrastructure on a fork, comment out:
-#
-# if: github.repository == 'flintlib/flint'
-
-name: Deploy
+name: Documentation
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
     paths:
       - 'doc/**'
       - '.github/workflows/docs.yml'
+  push:
+    paths:
+      - 'doc/**'
+      - '.github/workflows/docs.yml'
+
+concurrency:
+  # Group by workflow and ref, and to limit to 1 concurrent job except for main
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+  # Cancel intermediate builds for pull requests
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
   #############################################################################
   # build documentation
   #############################################################################
   build-doc:
-    name: Push documentation to website
-    if: github.repository == 'flintlib/flint'
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,6 +47,7 @@ jobs:
           make latexpdf SPHINXOPTS="-W -j auto"
 
       - name: "Create a tarball of the documentation"
+        if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd doc/build
           mv html doc
@@ -53,6 +55,7 @@ jobs:
           tar -czvf doc.tar.gz doc
 
       - name: "Setup SSH key"
+        if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: shimataro/ssh-key-action@v2.7.0
         with:
           key: ${{ secrets.SSH_KEY }}
@@ -60,6 +63,7 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: "Push documentation to server"
+        if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd doc/build
           ssh -t wbhart@opal6.opalstack.com 'mkdir ~/tmp'
