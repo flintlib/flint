@@ -297,6 +297,17 @@ Arithmetic
 
 .. function:: int gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t src, gr_mpoly_ctx_t ctx)
 
+Derivative and integral
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mpoly_derivative(gr_mpoly_t A, const gr_mpoly_t B, slong var, gr_mpoly_ctx_t ctx)
+
+    Set *A* to the derivative of *B* with respect to the variable of index *var*.
+
+.. function:: int gr_mpoly_integral(gr_mpoly_t A, const gr_mpoly_t B, slong var, gr_mpoly_ctx_t ctx)
+
+    Set *A* to the integral of *B* with respect to the variable of index *var*.
+
 Other operations
 -------------------------------------------------------------------------------
 
