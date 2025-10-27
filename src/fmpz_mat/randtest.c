@@ -35,7 +35,7 @@ fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, flint_bitcnt_t bits)
         for (i = 0; i < len; i++)
         {
             if (n_randint(state, sparseness))
-                *fmpz_mat_entry(mat, i, j) = 0;
+                fmpz_zero(fmpz_mat_entry(mat, i, j));
             else
                 fmpz_randtest(fmpz_mat_entry(mat, i, j), state, bits);
         }
