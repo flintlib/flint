@@ -10,8 +10,8 @@
     <https://www.gnu.org/licenses/>.
 */
 
-#include "flint/nmod_vec.h"
-#include "flint/test_helpers.h"
+#include "nmod_vec.h"
+#include "test_helpers.h"
 
 void _nmod_vec_randtest_not_zero(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 {
