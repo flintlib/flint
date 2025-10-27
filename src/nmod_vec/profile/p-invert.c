@@ -121,7 +121,7 @@ int main(void)
     flint_printf("1024\t\t");
     flint_printf("65536\n");
 
-    for (i = 2; i <= FLINT_BITS; i++)
+    for (i = 2; i <= FLINT_BITS; i+=10)
     {
         info.prime = n_randprime(state, i, 1);
 
