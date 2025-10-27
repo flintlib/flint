@@ -1,7 +1,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_randfull(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mat_randunif(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 {
     fmpz* e;
     slong i, j, r, c;

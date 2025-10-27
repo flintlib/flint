@@ -106,6 +106,7 @@ void nmod_mat_concat_vertical(nmod_mat_t res,
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
+void nmod_mat_randunif(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  nn_srcptr diag, slong n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);

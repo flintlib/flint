@@ -118,6 +118,10 @@ FMPZ_MOD_MAT_INLINE void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat, const fmpz_mod
 
 void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx);
 
+void fmpz_mod_mat_randfull(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx);
+
+void fmpz_mod_mat_randunif(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx);
+
 void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state, int unit, const fmpz_mod_ctx_t ctx);
