@@ -223,6 +223,10 @@ void nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, slong len
     } while (nmod_poly_is_zero(poly));
 }
 
+/* Construction of irreducibles *********************************************/
+
+void nmod_poly_minimal_irreducible(nmod_poly_t res, ulong n);
+
 void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
 
 void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len);

@@ -239,6 +239,9 @@ then
     echo "PASS"
     exit 0
 
+elif test "$1" = "minimal_irreducibles";
+then
+    echo "minimal_irreducibles....SKIPPED"
 elif test "$1" = "multi_crt";
 then
     echo "multi_crt....SKIPPED"
