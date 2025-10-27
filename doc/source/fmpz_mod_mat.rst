@@ -144,6 +144,11 @@ Input and output
 Comparison
 --------------------------------------------------------------------------------
 
+.. function:: int fmpz_mod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
+
+    Returns nonzero if ``mat1`` and ``mat2`` have the same dimensions and elements,
+    and zero otherwise. The moduli are ignored. Coefficients are assumed to be reduced.
+
 
 .. function:: int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 
