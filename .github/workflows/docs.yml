@@ -32,8 +32,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-sphinx
-          # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
-          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk
           sphinx-build --version
 
       - name: "Build documentation"
@@ -41,7 +39,14 @@ jobs:
           cd doc
           make html SPHINXOPTS="-W -j auto"
 
+      - name: "Setup LaTeX"
+        if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
+          sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk
+
       - name: "Build PDF documentation"
+        if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           cd doc
           make latexpdf SPHINXOPTS="-W -j auto"
