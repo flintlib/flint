@@ -107,7 +107,7 @@ Arithmetic operations
 .. function:: void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 
     Sets each entry of ``(res, len)`` to the modular inverse of the
-    corresponding entry in ``(vec, len)``. Assumes all of the entries of
+    corresponding entry in ``(vec, len)``. Assumes all entries in
     ``vec`` are invertible modulo `mod.n`. Aliasing of ``res`` and ``vec`` is
     allowed.
 
