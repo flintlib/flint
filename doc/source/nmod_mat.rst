@@ -203,7 +203,7 @@ Random matrix generation
     Sets the element to random numbers in `[0, n)`, likely to be close to the modulus ``n``
     of the matrix. This is used to test potential overflow-related bugs.
 
-.. function:: void nmod_mat_randunif(nmod_mat_t mat, flint_rand_t state)
+.. function:: void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state)
 
     Sets the element to uniformly generated random numbers in `[0, n)`, where `n` is the modulus of the matrix.
 
