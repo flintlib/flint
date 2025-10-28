@@ -123,6 +123,11 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
+/* invert each coefficient */
+void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
+void _nmod_vec_invert_naive(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
+void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
+void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
 
 /* ---- compute dot parameters ---- */
 

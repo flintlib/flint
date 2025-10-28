@@ -104,6 +104,13 @@ Arithmetic operations
 
     Sets ``(res, len)`` to the negation of ``(vec, len)``.
 
+.. function:: void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+
+    Sets each entry of ``(res, len)`` to the modular inverse of the
+    corresponding entry in ``(vec, len)``. Assumes all entries in
+    ``vec`` are invertible modulo `mod.n`. Aliasing of ``res`` and ``vec`` is
+    allowed.
+
 .. function:: void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c`. The element
