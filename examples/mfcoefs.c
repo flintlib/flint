@@ -14,6 +14,10 @@
 */
 
 #include <stdlib.h>
+#include <flint.h>
+
+#if FLINT_HAVE_FFT_SMALL
+
 #include <stdio.h>
 #include <string.h>
 #include "ulong_extras.h"
@@ -702,3 +706,13 @@ int main(int argc, char * argv[])
         }
     }
 }
+
+#else
+
+int main(int argc, char * argv[])
+{
+    flint_printf("mfcoefs requires the fft_small module.\n");
+    return EXIT_FAILURE;
+}
+
+#endif
