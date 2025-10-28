@@ -192,6 +192,21 @@ Multiplication algorithms
     Multiply using the classical (schoolbook) algorithm, performing
     a sequence of dot products.
 
+.. function:: int _gr_poly_mullow_complex_reorder(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
+              int gr_poly_mullow_complex_reorder(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
+
+    Assuming that the coefficients of the polynomials of type ``ctx`` are
+    complex numbers represented in Cartesian form as pairs of elements
+    of type ``real_ctx``, multiply by reordering to obtain a set of
+    real polynomial products.
+
+    If at least one polynomial is detected to be purely real or imaginary, one or two
+    real multiplications are used. Otherwise, four real multiplications
+    are used unless the *karatsuba* flag is set in which three
+    multiplications are used.
+    When squaring, two real squarings and one real multiplication are used
+    unless the *karatsuba* flag is set in which case three real squarings are used.
+
 .. function:: int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 
