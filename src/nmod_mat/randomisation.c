@@ -17,11 +17,10 @@
 void
 nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 {
-    slong i, j;
+    slong i;
 
     for (i = 0; i < mat->r; i++)
-        for (j = 0; j < mat->c; j++)
-            nmod_mat_entry(mat, i, j) = FLINT_MAX(1, n_randint(state, mat->mod.n));
+        _nmod_vec_rand(nmod_mat_row_ptr(mat, i), state, mat->c, mat->mod);
 }
 
 void
