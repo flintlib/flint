@@ -192,6 +192,14 @@ Multiplication algorithms
     Multiply using the classical (schoolbook) algorithm, performing
     a sequence of dot products.
 
+.. function:: int _gr_poly_mullow_bivariate_KS(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+              int gr_poly_mullow_bivariate_KS(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
+
+    Assuming that the coefficients are polynomials of type ``gr_poly``,
+    reduce the bivariate product to a single univariate product using
+    Kronecker substitution. Returns ``GR_UNABLE`` if the elements are not
+    of type ``gr_poly``.
+
 .. function:: int _gr_poly_mullow_complex_reorder(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
               int gr_poly_mullow_complex_reorder(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
 
