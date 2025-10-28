@@ -162,7 +162,7 @@ fmpz_mod_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mod_mpoly_vec_t G, cons
 }
 
 static int
-within_limits(const fmpz_mod_mpoly_t poly, slong poly_len_limit, slong poly_bits_limit, const fmpz_mod_mpoly_ctx_t ctx)
+within_limits(const fmpz_mod_mpoly_t poly, slong poly_len_limit, const fmpz_mod_mpoly_ctx_t ctx)
 {
     slong bits;
 
@@ -171,9 +171,6 @@ within_limits(const fmpz_mod_mpoly_t poly, slong poly_len_limit, slong poly_bits
 
     bits = _fmpz_vec_max_bits(poly->coeffs, poly->length);
     bits = FLINT_ABS(bits);
-
-    if (bits > poly_bits_limit)
-        return 0;
 
     return 1;
 }
@@ -204,7 +201,7 @@ fmpz_mod_mpoly_disjoint_lt(const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_t g, c
 
 int
 fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F,
-    slong ideal_len_limit, slong poly_len_limit, slong poly_bits_limit, const fmpz_mod_mpoly_ctx_t ctx)
+    slong ideal_len_limit, slong poly_len_limit, const fmpz_mod_mpoly_ctx_t ctx)
 {
     pairs_t B;
     fmpz_mod_mpoly_t h;
@@ -221,7 +218,7 @@ fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_m
         return 0;
 
     for (i = 0; i < G->length; i++)
-        if (!within_limits(fmpz_mod_mpoly_vec_entry(G, i), poly_len_limit, poly_bits_limit, ctx))
+        if (!within_limits(fmpz_mod_mpoly_vec_entry(G, i), poly_len_limit, ctx))
             return 0;
 
     pairs_init(B);
@@ -244,7 +241,7 @@ fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_m
         {
             /* printf("h stats %ld, %ld, %ld\n", h->length, h->bits, G->length); */
 
-            if (G->length >= ideal_len_limit || !within_limits(h, poly_len_limit, poly_bits_limit, ctx))
+            if (G->length >= ideal_len_limit || !within_limits(h, poly_len_limit, ctx))
             {
                 success = 0;
                 break;
@@ -268,5 +265,5 @@ fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_m
 void
 fmpz_mod_mpoly_buchberger_naive(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx)
 {
-    fmpz_mod_mpoly_buchberger_naive_with_limits(G, F, WORD_MAX, WORD_MAX, WORD_MAX, ctx);
+    fmpz_mod_mpoly_buchberger_naive_with_limits(G, F, WORD_MAX, WORD_MAX, ctx);
 }

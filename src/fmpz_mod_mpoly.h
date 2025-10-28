@@ -998,7 +998,7 @@ void fmpz_mod_mpoly_buchberger_naive(fmpz_mod_mpoly_vec_t G,
     const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx);
 
 int fmpz_mod_mpoly_buchberger_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F,
-    slong ideal_len_limit, slong poly_len_limit, slong poly_bits_limit, int (*solver)(fmpz_mod_mpoly_vec_t, const fmpz_mod_mpoly_vec_t,
+    slong ideal_len_limit, slong poly_len_limit, int (*solver)(fmpz_mod_mpoly_vec_t, const fmpz_mod_mpoly_vec_t,
     slong, slong, slong), const fmpz_mod_mpoly_ctx_t ctx);
 
 int fmpz_mod_mpoly_vec_is_autoreduced(const fmpz_mod_mpoly_vec_t G, 
