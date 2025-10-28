@@ -2,22 +2,41 @@ name: CI
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/CI.yml'
+      - 'src/**'
+      - 'examples/**'
+      - 'acinclude.m4'
+      - 'bootstrap.sh'
+      - 'CMakeLists.txt'
+      - 'config/**'
+      - 'configure.ac'
+      - 'Makefile.in'
   push:
+    paths:
+      - '.github/workflows/CI.yml'
+      - 'src/**'
+      - 'examples/**'
+      - 'acinclude.m4'
+      - 'bootstrap.sh'
+      - 'CMakeLists.txt'
+      - 'config/**'
+      - 'configure.ac'
+      - 'Makefile.in'
 
 env:
   GLOBAL_MULTIPLIER: 1
 
 concurrency:
-  # group by workflow and ref; the last slightly strange component ensures that for pull
-  # requests, we limit to 1 concurrent job, but for the main branch we don't
+  # Group by workflow and ref, and to limit to 1 concurrent job except for main
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
-  # Cancel intermediate builds, but only if it is a pull request build.
+  # Cancel intermediate builds for pull requests
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  ##############################################################################
+  #############################################################################
   # ubuntu, gcc, code coverage
-  ##############################################################################
+  #############################################################################
   ubuntu-codecoverage:
     name: Ubuntu GCC, Code Coverage (x10)
 
@@ -92,9 +111,9 @@ jobs:
 
 
 
-  ##############################################################################
+  #############################################################################
   # gcc build check no regressions
-  ##############################################################################
+  #############################################################################
   gcc-build-regression-check:
     name: GCC build regression check (no tests)
 
@@ -132,9 +151,9 @@ jobs:
 
 
 
-  ##############################################################################
+  #############################################################################
   # ubuntu gcc with assert
-  ##############################################################################
+  #############################################################################
   ubuntu-gcc-assert:
     name: Ubuntu GCC with NTL and checking msolve (assert, x2)
 
@@ -210,9 +229,9 @@ jobs:
           $MAKE check
 
 
-  ##############################################################################
+  #############################################################################
   # ubuntu arm
-  ##############################################################################
+  #############################################################################
   ubuntu-arm:
     name: Ubuntu ARM (x5)
 
@@ -268,9 +287,9 @@ jobs:
 
 
 
-  ##############################################################################
+  #############################################################################
   # macos (M1) with clang
-  ##############################################################################
+  #############################################################################
   macos-m1:
     name: macOS-M1, Clang (x3)
 
@@ -450,9 +469,9 @@ jobs:
 
 
 
-  ##############################################################################
+  #############################################################################
   # msvc
-  ##############################################################################
+  #############################################################################
   msvc:
     name: MSVC (x1)
 
@@ -516,9 +535,9 @@ jobs:
 
 
 
-  ##############################################################################
+  #############################################################################
   # alpine linux, musl, 32-bit (assert)
-  ##############################################################################
+  #############################################################################
   alpine-32bit:
     name: Alpine Linux, musl, 32-bit (assert, x1.5)
 
@@ -587,9 +606,9 @@ jobs:
 
 
 
-  ##############################################################################
+  #############################################################################
   # nemo
-  ##############################################################################
+  #############################################################################
   nemo:
     name: Nemo.jl
 
@@ -635,8 +654,8 @@ jobs:
           sed -i "s/^\(FLINT_MINOR_SO=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure.ac
           sed -i "s/^\(FLINT_PATCH_SO=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure.ac
 
-          # Now we can configure FLINT. However, recent versions of MPFR_jll has
-          # memory sanitation which messes with finding mpfr_init in the
+          # Now we can configure FLINT. However, recent versions of MPFR_jll
+          # has memory sanitation which messes with finding mpfr_init in the
           # configure-script. Hence, we also omit the check for finding MPFR.
           # FIXME: Probably want to fix this.
           ./bootstrap.sh

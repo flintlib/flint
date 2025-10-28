@@ -15,6 +15,7 @@
 #include "qqbar.h"
 #include "fmpzi.h"
 #include "gr.h"
+#include "gr_poly.h"
 #include "gr_generic.h"
 
 int
@@ -909,6 +910,25 @@ _gr_fmpzi_canonical_associate(fmpzi_t ux, fmpzi_t u, const fmpzi_t x, const gr_c
     }
 }
 
+#define MUL_REORDER_CUTOFF 30
+
+int
+_gr_fmpzi_poly_mullow(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    if (len1 < MUL_REORDER_CUTOFF || len2 < MUL_REORDER_CUTOFF || n < MUL_REORDER_CUTOFF)
+    {
+        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+    }
+    else
+    {
+        gr_ctx_t fmpz_ctx;
+        gr_ctx_init_fmpz(fmpz_ctx);
+        /* Not currently using Karatsuba because it's often worse if the real
+           and imaginary parts are even slightly unbalanced */
+        return _gr_poly_mullow_complex_reorder(res, poly1, len1, poly2, len2, n, 0, ctx, fmpz_ctx);
+    }
+}
+
 /*
 int
 _gr_fmpzi_sgn(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
@@ -1043,11 +1063,13 @@ gr_method_tab_input _fmpzi_methods_input[] =
 /*
     {GR_METHOD_SGN,             (gr_funcptr) _gr_fmpzi_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_fmpzi_csgn},
-    {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpzi_cmp},
+    {GR_METHOD_CMP,             (gr_funcptr) _gr_fmpzi_cmp},'
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_fmpzi_cmpabs},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpzi_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpzi_vec_dot_rev},
+*/
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpzi_poly_mullow},
+/*
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpzi_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpzi_mat_det},
 */

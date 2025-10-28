@@ -134,6 +134,12 @@ Memory management
 Basic manipulation
 -------------------------------------------------------------------------------
 
+.. function:: void _gr_mpoly_normalise(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
+
+    Removes provably zero coefficients from ``A`` and updates the length.
+    If all coefficients are zero, the length is set to zero.  This function
+    is mainly used internally, as all functions guarantee normalisation.
+
 .. function:: void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 
     Swaps *A* and *B* efficiently.

@@ -31,8 +31,7 @@ perform some kind of division, solving, or Gaussian elimination
 in functions that only perform basic manipulation and ring operations
 (e.g. transpose and matrix multiplication).
 
-The user can manipulate matrix entries directly, but must assume
-responsibility for normalising all values to the range `[0, n)`.
+Unless indicated, functions may assume that the stored values are in the range `[0, n)`. The user can manipulate matrix entries directly, but must assume responsibility for normalising all values to the range `[0, n)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------

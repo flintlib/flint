@@ -2,6 +2,7 @@
 
 **fmpz_mod_mat.h** -- matrices over integers mod n
 ===============================================================================
+Unless indicated, functions may assume that the stored values are in the range `[0, n)`. The user can manipulate matrix entries directly, but must assume responsibility for normalising all values to the range `[0, n)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -143,6 +144,11 @@ Input and output
 
 Comparison
 --------------------------------------------------------------------------------
+
+.. function:: int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx)
+
+    Returns nonzero if ``mat1`` and ``mat2`` have the same dimensions and elements,
+    and zero otherwise. The moduli are ignored.
 
 
 .. function:: int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
