@@ -19,7 +19,7 @@ _gr_poly_mullow_bivariate_KS(gr_ptr res,
     gr_srcptr poly1, slong len1,
     gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
 {
-    slong i, j, l, max_len1, max_len2, inner_len;
+    slong i, l, max_len1, max_len2, inner_len;
     gr_ctx_struct * cctx;
     gr_ctx_t tmp_ctx;
     const gr_poly_struct * ppoly1, * ppoly2;

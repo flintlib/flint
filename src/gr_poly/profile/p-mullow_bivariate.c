@@ -9,15 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "profiler.h"
+#include "fmpz_poly.h"
 
 int main()
 {
     gr_poly_t f, g, u, v, c, d, e;
     gr_ctx_t R, Rx, Rxy, R1;
+    fmpz_poly_t F;
     double t1, t2, FLINT_SET_BUT_UNUSED(tt);
 
     flint_rand_t state;
@@ -29,7 +33,7 @@ int main()
 
     int ring;
 
-    flint_printf("   N     M       fmpz  fmpz_poly      fmpzi       nmod        arb     gr_poly(nmod)\n");
+    flint_printf("   N     M       fmpz  fmpz_poly      fmpzi       nmod        arb    fq_nmod         nf     gr_poly(nmod)\n");
 
     /* Outer length */
     for (N = 8; N <= 256; N = (N < 4 ? N + 1 : N * 2))
@@ -40,7 +44,7 @@ int main()
             flint_printf("%4wd  %4wd  ", N, M);
             fflush(stdout);
 
-            for (ring = 0; ring < 6; ring++)
+            for (ring = 0; ring < 8; ring++)
             {
                 switch (ring)
                 {
@@ -60,6 +64,17 @@ int main()
                         gr_ctx_init_real_arb(R, 512);
                         break;
                     case 5:
+                        gr_ctx_init_fq_nmod(R, 17, 10, "a");
+                        break;
+                    case 6:
+                        fmpz_poly_init(F);
+                        fmpz_poly_set_coeff_si(F, 0, 1);
+                        fmpz_poly_set_coeff_si(F, 1, 1);
+                        fmpz_poly_set_coeff_si(F, 2, 1);
+                        gr_ctx_init_nf_fmpz_poly(R, F);
+                        fmpz_poly_clear(F);
+                        break;
+                    case 7:
                         gr_ctx_init_gr_poly(R, R1);
                         break;
                 }
