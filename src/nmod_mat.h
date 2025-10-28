@@ -40,6 +40,11 @@ ulong * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
    return &nmod_mat_entry(mat, i, j);
 }
 
+NMOD_MAT_INLINE
+ulong * nmod_mat_row_ptr(const nmod_mat_t mat, slong i)
+{
+   return &nmod_mat_entry(mat, i, 0);
+}
 /* See inlines.c */
 
 NMOD_MAT_INLINE
@@ -55,6 +60,12 @@ slong nmod_mat_ncols(const nmod_mat_t mat)
 }
 
 void nmod_mat_set_mod(nmod_mat_t mat, ulong n);
+
+NMOD_MAT_INLINE
+nmod_t nmod_mat_mod(const nmod_mat_t mat)
+{
+   return mat->mod;
+}
 
 /* Memory management */
 void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n);
