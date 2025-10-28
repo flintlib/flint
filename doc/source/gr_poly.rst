@@ -179,6 +179,19 @@ Arithmetic
               int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
               int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong len, gr_ctx_t ctx)
 
+    Note: multiplication and low multiplication call :func:`_gr_poly_mullow_generic`
+    by default, which currently always delegates to :func:`_gr_poly_mullow_classical`.
+    This can be overridden by specific rings.
+
+Multiplication algorithms
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_poly_mullow_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+              int gr_poly_mullow_classical(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
+
+    Multiply using the classical (schoolbook) algorithm, performing
+    a sequence of dot products.
+
 .. function:: int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 
