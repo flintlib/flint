@@ -965,7 +965,7 @@ _gr_acf_poly_mullow(acf_ptr res,
     /* todo: tuning */
     if (len1 <= 10 || len2 <= 10)
     {
-        return _gr_poly_mullow_generic(res, poly1, len1, poly2, len2, n, ctx);
+        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
     }
     else
     {

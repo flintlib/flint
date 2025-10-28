@@ -28,9 +28,8 @@ _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong g
     FLINT_ASSERT(res != f);
     FLINT_ASSERT(res != g);
 
-    /* TODO: should explicitly call basecase mul. */
     if (flen == 1 || glen == 1)
-        return _gr_poly_mullow_generic(res, f, flen, g, glen, flen + glen - 1, ctx);
+        return _gr_poly_mullow_classical(res, f, flen, g, glen, flen + glen - 1, ctx);
 
     /* Split at X = x^m */
     /* res = f0 g0 + (f0 g1 + f1 g0) X + f1 g1 X^2
