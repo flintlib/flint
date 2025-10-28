@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "calcium.h"
 #include "fmpz_mpoly.h"
+#include "mpoly.h"
 
 TEST_FUNCTION_START(fmpz_mpoly_buchberger_naive, state)
 {
@@ -30,10 +31,10 @@ TEST_FUNCTION_START(fmpz_mpoly_buchberger_naive, state)
         fmpz_mpoly_vec_init(G, 0, ctx);
         fmpz_mpoly_vec_init(H, 0, ctx);
 
-        /*
+        
         flint_printf("iter %ld   %ld  %d\n\n", iter, nvars, ctx->minfo->ord);
         printf("--------------------------------------------------------------------\n");
-        */
+        
 
         if (nvars == 4)
             fmpz_mpoly_vec_randtest_not_zero(F, state, 1 + n_randint(state, 3), 1 + n_randint(state, 3), 1 + n_randint(state, 3), 1 + n_randint(state, 2), ctx);
@@ -42,11 +43,11 @@ TEST_FUNCTION_START(fmpz_mpoly_buchberger_naive, state)
         else
             fmpz_mpoly_vec_randtest_not_zero(F, state, 1 + n_randint(state, 5), 1 + n_randint(state, 5), 1 + n_randint(state, 5), 1 + n_randint(state, 3), ctx);
 
-        /* flint_printf("F = "); fmpz_mpoly_vec_print(F, ctx); flint_printf("\n"); */
+        flint_printf("F = "); fmpz_mpoly_vec_print(F, ctx); flint_printf("\n");
 
         fmpz_mpoly_buchberger_naive(G, F, ctx);
 
-        /* flint_printf("G = "); fmpz_mpoly_vec_print(G, ctx); flint_printf("\n"); */
+        flint_printf("G = "); fmpz_mpoly_vec_print(G, ctx); flint_printf("\n");
 
         if (!fmpz_mpoly_vec_is_groebner(G, F, ctx))
         {
