@@ -12,9 +12,7 @@
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
-
-void _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
-
+#include "ca_field/impl.h"
 
 /* todo: optimize */
 truth_t ca_check_equal_neg(const ca_t x, const ca_t y, ca_ctx_t ctx)

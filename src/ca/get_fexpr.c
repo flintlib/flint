@@ -12,6 +12,7 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 #include "ca.h"
+#include "ca/impl.h"
 #include "ca_ext.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
@@ -144,9 +145,6 @@ fexpr_set_nf_elem(fexpr_t res, const nf_elem_t a, const nf_t nf, const fexpr_t v
         fexpr_clear(q);
     }
 }
-
-void
-ca_all_extensions(ca_ext_ptr ** extensions, slong * len, const ca_t x, ca_ctx_t ctx);
 
 void
 _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,

@@ -56,7 +56,7 @@ static void n_fq_bpoly_divexact_poly_var1(
 }
 
 
-void n_fq_bpoly_mul_last(n_bpoly_t A, const n_poly_t b, const fq_nmod_ctx_t ctx)
+static void n_fq_bpoly_mul_last(n_bpoly_t A, const n_poly_t b, const fq_nmod_ctx_t ctx)
 {
     slong i;
     n_fq_poly_t t;
@@ -77,7 +77,7 @@ void n_fq_bpoly_mul_last(n_bpoly_t A, const n_poly_t b, const fq_nmod_ctx_t ctx)
 
 /*****************************************************************************/
 
-void n_fq_poly_eval2p_pow(
+static void n_fq_poly_eval2p_pow(
     ulong * vp,
     ulong * vm,
     const n_fq_poly_t P,
@@ -137,7 +137,7 @@ void n_fq_poly_eval2p_pow(
     }
 }
 
-void n_fq_bpoly_interp_reduce_2psm_poly(
+static void n_fq_bpoly_interp_reduce_2psm_poly(
     n_fq_poly_t Ap,
     n_fq_poly_t Am,
     const n_fq_bpoly_t A,
@@ -166,7 +166,7 @@ void n_fq_bpoly_interp_reduce_2psm_poly(
 
 }
 
-void n_fq_bpoly_interp_lift_2psm_poly(
+static void n_fq_bpoly_interp_lift_2psm_poly(
     slong * deg1,
     n_fq_bpoly_t T,
     const n_fq_poly_t A,
@@ -267,7 +267,7 @@ void n_fq_bpoly_interp_lift_2psm_poly(
     FLINT_ASSERT(n_fq_bpoly_is_canonical(T, ctx));
 }
 
-void _n_fq_poly_addmul_plinear(
+static void _n_fq_poly_addmul_plinear(
     n_fq_poly_t A,
     ulong * Bcoeffs, slong Blen,
     const n_poly_t C,
@@ -312,7 +312,7 @@ void _n_fq_poly_addmul_plinear(
     _n_fq_poly_normalise(A, d);
 }
 
-int n_fq_bpoly_interp_crt_2psm_poly(
+static int n_fq_bpoly_interp_crt_2psm_poly(
     slong * deg1,
     n_fq_bpoly_t F,
     n_fq_bpoly_t T,
@@ -403,7 +403,7 @@ int n_fq_bpoly_interp_crt_2psm_poly(
 }
 
 
-int n_fq_bpoly_gcd_brown_smprime2p(
+static int n_fq_bpoly_gcd_brown_smprime2p(
     n_fq_bpoly_t G,
     n_fq_bpoly_t Abar,
     n_fq_bpoly_t Bbar,
@@ -659,7 +659,7 @@ cleanup:
 
 /*****************************************************************************/
 
-void n_fq_bpoly_interp_reduce_sm_poly(
+static void n_fq_bpoly_interp_reduce_sm_poly(
     n_fq_poly_t E,
     const n_fq_bpoly_t A,
     n_fq_poly_t alphapow,
@@ -680,7 +680,7 @@ void n_fq_bpoly_interp_reduce_sm_poly(
     _n_fq_poly_normalise(E, d);
 }
 
-void n_fq_bpoly_interp_lift_sm_poly(
+static void n_fq_bpoly_interp_lift_sm_poly(
     n_fq_bpoly_t T,
     const n_fq_poly_t A,
     const fq_nmod_ctx_t ctx)
@@ -705,7 +705,7 @@ void n_fq_bpoly_interp_lift_sm_poly(
 }
 
 
-int n_fq_bpoly_interp_crt_sm_poly(
+static int n_fq_bpoly_interp_crt_sm_poly(
     slong * deg1,
     n_fq_bpoly_t F,
     n_fq_bpoly_t T,

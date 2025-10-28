@@ -18,8 +18,8 @@
 PUSH_OPTIONS
 OPTIMIZE_OSIZE
 
-void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
-int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr);
+static void fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags);
+static int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr);
 
 const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
 {
@@ -55,7 +55,7 @@ const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
     }
 }
 
-int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr)
+static int _fexpr_is_symbol_with_trailing_underscore(const fexpr_t expr)
 {
     const char *s;
     char tmp[FEXPR_SMALL_SYMBOL_LEN + 1];
@@ -3592,7 +3592,7 @@ _fexpr_all_arguments_small(const fexpr_t expr)
     return 1;
 }
 
-void
+static void
 fexpr_write_latex_symbol(int * subscript, calcium_stream_t out, const fexpr_t expr, ulong flags)
 {
     if (fexpr_is_any_builtin_symbol(expr))

@@ -16,6 +16,7 @@
 #include "fmpq_vec.h"
 #include "fmpq_poly.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_poly.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
@@ -50,7 +51,6 @@ int _gr_fmpq_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return _gr_fmpq_poly_ctx_set_gen_name(ctx, s[0]);
 }
 
-int _gr_gr_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx);
 #define _gr_fmpq_poly_ctx_gen_name _gr_gr_poly_ctx_gen_name
 
 int

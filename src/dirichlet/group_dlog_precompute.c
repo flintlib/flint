@@ -11,7 +11,7 @@
 
 #include "dirichlet.h"
 
-void
+static void
 dirichlet_prime_group_dlog_precompute(dirichlet_prime_group_struct * P, ulong num)
 {
     P->dlog = flint_malloc(sizeof(dlog_precomp_t));

@@ -15,6 +15,7 @@
 #include "arb_fmpz_poly.h"
 #include "acb.h"
 #include "acb_poly.h"
+#include "acb_poly/impl.h"
 #include "acb_mat.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
@@ -24,6 +25,7 @@
 #include "acf.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -227,9 +229,6 @@ _gr_acb_set_d(acb_t res, double x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ca_get_acb_with_prec(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
-
-int
 _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -322,11 +321,6 @@ _gr_acb_set_interval_mid_rad(acb_t res, const acb_t m, const acb_t r, const gr_c
     mag_clear(rad2);
     return GR_SUCCESS;
 }
-
-/* xxx: assumes that ctx are not read */
-int _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
 
 int
 _gr_acb_get_fmpz(fmpz_t res, const acb_t x, const gr_ctx_t ctx)
@@ -989,9 +983,6 @@ _gr_acb_cmp(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
         return GR_UNABLE;
     }
 }
-
-int
-_gr_arb_cmpabs(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx);
 
 int
 _gr_acb_cmpabs(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
@@ -1965,8 +1956,6 @@ _gr_acb_poly_mullow(acb_ptr res,
     _acb_poly_mullow(res, poly1, len1, poly2, len2, n, ACB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
-
-int _gr_acb_poly_taylor_shift(acb_ptr res, acb_srcptr poly, slong len, const acb_t c, gr_ctx_t ctx);
 
 /* xxx */
 static int

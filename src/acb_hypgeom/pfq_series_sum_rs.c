@@ -12,10 +12,9 @@
 #include "ulong_extras.h"
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
+#include "acb_hypgeom/impl.h"
 
 #define FAST_T 0
-
-void acb_poly_reciprocal_majorant(arb_poly_t res, const acb_poly_t poly, slong prec);
 
 static void
 rsplit(acb_poly_t res, acb_poly_t term,

@@ -255,7 +255,7 @@ again:
 }
 
 
-int _fmpq_reconstruct_fmpz_2_ui(fmpz_t n, fmpz_t d,
+static int _fmpq_reconstruct_fmpz_2_ui(fmpz_t n, fmpz_t d,
               const fmpz_t a, const fmpz_t m, const fmpz_t NN, const fmpz_t DD)
 {
     ulong Q, R, A, B, N;
@@ -307,7 +307,7 @@ gauss:
         return 0;
 }
 
-int _fmpq_reconstruct_fmpz_2_uiui(fmpz_t n, fmpz_t d,
+static int _fmpq_reconstruct_fmpz_2_uiui(fmpz_t n, fmpz_t d,
               const fmpz_t a, const fmpz_t m, const fmpz_t NN, const fmpz_t DD)
 {
     ulong extra;
@@ -379,7 +379,7 @@ gauss:
         return 0;
 }
 
-int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
+static int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
               const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 {
     ulong ex0, ex1, ex2, ex3, A1, A0, B1, B0;

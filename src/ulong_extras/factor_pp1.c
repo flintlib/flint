@@ -66,7 +66,7 @@ void n_pp1_print(ulong x, ulong y, ulong norm)
       y = n_submod(y, two, n);                  \
    } while (0)
 
-void n_pp1_pow_ui(ulong * x, ulong * y, ulong exp,
+static void n_pp1_pow_ui(ulong * x, ulong * y, ulong exp,
                     ulong n, ulong ninv, ulong norm)
 {
    const ulong x0 = *x;
@@ -87,7 +87,7 @@ void n_pp1_pow_ui(ulong * x, ulong * y, ulong exp,
    }
 }
 
-ulong n_pp1_factor(ulong n, ulong x, ulong norm)
+static ulong n_pp1_factor(ulong n, ulong x, ulong norm)
 {
    if (norm)
    {
@@ -102,7 +102,7 @@ ulong n_pp1_factor(ulong n, ulong x, ulong norm)
    return n_gcd(n, x);
 }
 
-ulong n_pp1_find_power(ulong * x, ulong * y,
+static ulong n_pp1_find_power(ulong * x, ulong * y,
                   ulong p, ulong n, ulong ninv, ulong norm)
 {
    ulong factor;

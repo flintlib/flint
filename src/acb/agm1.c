@@ -9,10 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb/impl.h"
 #include "acb.h"
 #include "acb_poly.h"
-
-void mag_agm(mag_t res, const mag_t x, const mag_t y);
 
 /* Checks that |arg(z)| <= 3 pi / 4 */
 static int
@@ -113,7 +112,7 @@ acb_agm1_around_zero(acb_t res, const acb_t z, slong prec)
     mag_clear(b);
 }
 
-void
+static void
 acb_agm1_basecase(acb_t res, const acb_t z, slong prec)
 {
     acb_t a, b, t, u;
@@ -207,7 +206,7 @@ acb_agm1_basecase(acb_t res, const acb_t z, slong prec)
     Computes (M(z), M'(z)) using a finite difference.
     Assumes z exact, |arg(z)| <= 3 pi / 4.
 */
-void
+static void
 acb_agm1_deriv_diff(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
 {
     mag_t err, t, C;
@@ -341,7 +340,7 @@ This is assuming that the circle at z with radius |eps| + r
 does not cross the negative half axis, which we check.
 */
 
-void
+static void
 acb_agm1_deriv_right(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
 {
     if (acb_is_exact(z))
@@ -496,7 +495,7 @@ acb_agm1(acb_t res, const acb_t z, slong prec)
     }
 }
 
-void
+static void
 acb_agm1_deriv(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
 {
     /*

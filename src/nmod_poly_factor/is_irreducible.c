@@ -23,7 +23,7 @@
 /* Return 1 if poly has a trivial factor, otherwise return 0. For small p,
    this quickly filters out many candidates when testing random polynomials
    for irreducibility. */
-int nmod_poly_is_reducible_trial_div(const nmod_poly_t poly)
+static int nmod_poly_is_reducible_trial_div(const nmod_poly_t poly)
 {
     ulong x, p = poly->mod.n;
 
@@ -172,7 +172,7 @@ nmod_poly_is_irreducible(const nmod_poly_t f)
     return nmod_poly_is_irreducible_ddf(f);
 }
 
-void
+static void
 nmod_poly_powpowmod(nmod_poly_t res, const nmod_poly_t pol,
                                     ulong exp, ulong exp2, const nmod_poly_t f)
 {

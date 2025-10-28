@@ -10,6 +10,7 @@
 */
 
 #include "ca_ext.h"
+#include "ca_field/impl.h"
 #include "ca_vec.h"
 
 static ulong hash_func(calcium_func_code func, ca_srcptr args, slong nargs, ca_ctx_t ctx)
@@ -49,8 +50,6 @@ ca_ext_init_qqbar(ca_ext_t res, const qqbar_t x, ca_ctx_t ctx)
     res->hash = qqbar_hash(CA_EXT_QQBAR(res));
     res->depth = 0;
 }
-
-slong ca_depth(const ca_t x, ca_ctx_t ctx);
 
 static void _ca_ext_init_func(ca_ext_t res, ca_ctx_t ctx)
 {

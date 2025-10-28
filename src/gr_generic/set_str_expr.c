@@ -109,11 +109,6 @@ typedef struct {
 
 typedef gr_parse_struct gr_parse_t[1];
 
-void _gr_parse_init(gr_parse_t E);
-void _gr_parse_clear(gr_parse_t E);
-void _gr_parse_add_terminal(gr_parse_t E, const char * s, const void * v);
-int _gr_parse_parse(gr_parse_t E, void * res, const char * s, slong len);
-
 FLINT_FORCE_INLINE int _is_op(slong a)
 {
     return a >= 0;

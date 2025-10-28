@@ -34,7 +34,7 @@
    The quotient and remainder terms are appended to the existing terms in
    those polys.
 */
-slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
+static slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
  fmpz ** polyq, ulong ** expq, slong * allocq, slong len0,
        fmpz ** polyr, ulong ** expr, slong * allocr, slong len1,
                   const fmpz * poly2, const ulong * exp2, slong len2,
@@ -432,7 +432,7 @@ big:
    of the quotient poly. It is assumed that poly2 is not zero. The
    quotient and remainder are written in reverse order.
 */
-slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
+static slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
             fmpz ** polyq, ulong ** expq, slong * allocq,
                  fmpz ** polyr, ulong ** expr, slong * allocr,
                 const fmpz * poly2, const ulong * exp2, slong len2,

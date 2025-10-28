@@ -11,6 +11,7 @@
 
 #include "calcium.h"
 #include "ca.h"
+#include "ca/impl.h"
 
 truth_t
 _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
@@ -27,9 +28,6 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     qqbar_clear(t);
     return res;
 }
-
-void
-ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx);
 
 truth_t
 ca_is_zero_check_fast(const ca_t x, ca_ctx_t ctx)

@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca/impl.h"
 
 int
 ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx)

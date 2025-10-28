@@ -10,10 +10,10 @@
 */
 
 #include "acb_dft.h"
+#include "acb_dft/impl.h"
 
 /* swap each element with one with bit-reversed index */
-void
-acb_dft_rad2_reorder(acb_ptr v, slong n)
+void acb_dft_rad2_reorder(acb_ptr v, slong n)
 {
     slong i, j, k, l;
 

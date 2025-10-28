@@ -10,6 +10,7 @@
 */
 
 #include "mpn_mod.h"
+#include "mpn_mod/impl.h"
 
 void _mpn_dot_rev_2x2_3(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len)
 {

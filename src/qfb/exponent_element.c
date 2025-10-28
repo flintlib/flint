@@ -15,7 +15,7 @@
 /*
    find which power of the base is the exponent of f
 */
-ulong find_power(qfb_t f, fmpz_t n, ulong base)
+static ulong find_power(qfb_t f, fmpz_t n, ulong base)
 {
    ulong s = 1;
 
@@ -28,7 +28,7 @@ ulong find_power(qfb_t f, fmpz_t n, ulong base)
    return s;
 }
 
-ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, ulong B2_sqrt)
+static ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, ulong B2_sqrt)
 {
    qfb_t pow, pow2, f2;
    fmpz_t L, r;

@@ -90,7 +90,7 @@ void fq_nmod_mpoly_geobucket_set(fq_nmod_mpoly_geobucket_t B, fq_nmod_mpoly_t p,
 }
 
 /* internal function for fixing overflows */
-void _fq_nmod_mpoly_geobucket_fix(fq_nmod_mpoly_geobucket_t B, slong i,
+static void _fq_nmod_mpoly_geobucket_fix(fq_nmod_mpoly_geobucket_t B, slong i,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     while (clog4((B->polys + i)->length) > i)

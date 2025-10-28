@@ -12,10 +12,7 @@
 
 #include "gr_vec.h"
 #include "gr_poly.h"
-
-int
-_gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,
-    gr_srcptr A, gr_srcptr B, slong lenB, gr_srcptr invB, slong cutoff, gr_ctx_t ctx);
+#include "gr_poly/impl.h"
 
 int
 _gr_poly_div_divconquer_recursive(gr_ptr Q, gr_ptr W,

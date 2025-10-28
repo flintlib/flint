@@ -12,6 +12,7 @@
 #include "fmpq.h"
 #include "fmpz_mpoly_q.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 
@@ -41,11 +42,6 @@ int _gr_fmpz_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 }
 
 /* Some methods are identical to their fmpz_mpoly counterparts */
-void _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx);
-int _gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
-slong _gr_fmpz_mpoly_ctx_ngens(gr_ctx_t ctx);
-char const * const _gr_fmpz_mpoly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx);
-
 #define _gr_fmpz_mpoly_q_ctx_clear _gr_fmpz_mpoly_ctx_clear
 #define _gr_fmpz_mpoly_q_ctx_set_gen_names _gr_fmpz_mpoly_ctx_set_gen_names
 #define _gr_fmpz_mpoly_q_ctx_ngens _gr_fmpz_mpoly_ctx_ngens

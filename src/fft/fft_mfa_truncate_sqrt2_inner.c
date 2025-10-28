@@ -35,7 +35,7 @@ typedef struct
 }
 fft_inner_arg_t;
 
-void
+static void
 _fft_inner1_worker(void * arg_ptr)
 {
     fft_inner_arg_t arg = *((fft_inner_arg_t *) arg_ptr);
@@ -86,7 +86,7 @@ _fft_inner1_worker(void * arg_ptr)
     }
 }
 
-void
+static void
 _fft_inner2_worker(void * arg_ptr)
 {
     fft_inner_arg_t arg = *((fft_inner_arg_t *) arg_ptr);

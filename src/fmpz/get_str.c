@@ -13,6 +13,7 @@
 #include <string.h>
 #include "gmpcompat.h"
 #include "fmpz.h"
+#include "fmpz/impl.h"
 #include "fmpz_vec.h"
 #include "thread_pool.h"
 #include "thread_support.h"
@@ -67,10 +68,7 @@ typedef struct
 }
 worker_args_struct;
 
-static void
-_fmpz_get_str_recursive(char * s, slong num_digits, const fmpz_t f,
-    const slong * exps, slong cur_depth, slong depth,
-    const fmpz * pows, const fmpz_preinvn_struct * preinv);
+static void _fmpz_get_str_recursive(char * s, slong num_digits, const fmpz_t f, const slong * exps, slong cur_depth, slong depth, const fmpz * pows, const fmpz_preinvn_struct * preinv);
 
 static void
 worker(void * arg)
@@ -152,8 +150,7 @@ _fmpz_get_str_recursive(char * s, slong num_digits, const fmpz_t f, const slong 
     }
 }
 
-char *
-fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f)
+char * fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f)
 {
     slong n, k, depth, leading_zeros;
     slong exps[FLINT_BITS];

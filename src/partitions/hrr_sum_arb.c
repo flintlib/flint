@@ -15,6 +15,7 @@
 #include "arb.h"
 #include "arith.h"
 #include "partitions.h"
+#include "partitions/impl.h"
 
 #define VERBOSE 0
 

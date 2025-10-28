@@ -40,7 +40,7 @@ void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R, const fmpz_mpoly_t A,
    [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf
 */
 
-slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
+static slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
    fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
   ulong ** expr, slong * allocr, const fmpz * poly2, const ulong * exp2,
             slong len2, const fmpz * poly3, const ulong * exp3, slong len3,

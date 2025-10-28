@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
+static slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
                        const fmpz * coeff2, const ulong * exp2, slong len2,
           flint_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp)
 {
@@ -37,7 +37,7 @@ slong _fmpz_mpoly_derivative(fmpz * coeff1, ulong * exp1,
 }
 
 
-slong _fmpz_mpoly_derivative_mp(fmpz * coeff1, ulong * exp1,
+static slong _fmpz_mpoly_derivative_mp(fmpz * coeff1, ulong * exp1,
                        const fmpz * coeff2, const ulong * exp2, slong len2,
           flint_bitcnt_t bits, slong N, slong offset,              ulong * oneexp)
 {

@@ -14,10 +14,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
-                                       const fmpz * pol2, fmpz * temp,
-                                       slong length);
-
 /*
    Multiplication using truncated karatsuba. Below length 7, classical
    truncated multiplication is always theoretically faster, so we switch
@@ -28,7 +24,7 @@ void _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
    karatsuba multiplications.
 */
 
-void
+static void
 _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
                                   const fmpz * pol2, fmpz * temp, slong length)
 {

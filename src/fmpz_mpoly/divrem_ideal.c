@@ -42,7 +42,7 @@ void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** Q,
    passed and an array of quotient polynomials is returned. These are not in
    low level format.
 */
-slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
+static slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
        ulong * const * exp3, slong len, slong bits, const fmpz_mpoly_ctx_t ctx,

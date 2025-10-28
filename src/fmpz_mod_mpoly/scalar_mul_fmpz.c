@@ -38,7 +38,7 @@ void fmpz_mod_mpoly_scalar_mul_fmpz_mod_invertible(
 }
 
 /* c is assumed to be reduced mod n */
-void fmpz_mod_mpoly_scalar_mul_fmpz_mod(
+static void fmpz_mod_mpoly_scalar_mul_fmpz_mod(
     fmpz_mod_mpoly_t A,
     const fmpz_mod_mpoly_t B,
     const fmpz_t c,

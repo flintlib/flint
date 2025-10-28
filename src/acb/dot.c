@@ -9,12 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
-#include "mpn_extras.h"
-
 /* We need uint64_t instead of ulong on 32-bit systems for
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
+#include "mpn_extras.h"
+#include "arb/impl.h"
+#include "acb.h"
 
 /* Add ((a * b) / 2^MAG_BITS) * 2^exp into srad*2^srad_exp.
    Assumes that srad_exp >= exp and that overflow cannot occur.  */
@@ -30,8 +30,6 @@
         else \
             (srad) += 1; \
     } while (0)
-
-void mag_set_ui_2exp_small(mag_t z, ulong x, slong e);
 
 static void
 add_errors(mag_t rad, uint64_t Aerr, slong Aexp, uint64_t Berr, slong Bexp, uint64_t Cerr, slong Cexp)
@@ -97,16 +95,6 @@ add_errors(mag_t rad, uint64_t Aerr, slong Aexp, uint64_t Berr, slong Bexp, uint
     mag_mul_2exp_si(rad, rad, Aexp - MAG_BITS);
 #endif
 }
-
-void
-_arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
-    nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn,
-    int negative, flint_bitcnt_t shift);
-
-void
-_arb_dot_add_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
-    nn_srcptr xptr, slong xn,
-    int negative, flint_bitcnt_t shift);
 
 static void
 _arb_dot_output(arb_t res, nn_ptr sum, slong sn, int negative,

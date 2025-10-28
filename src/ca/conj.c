@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca/impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
 #include "ca_vec.h"
@@ -36,9 +37,6 @@ ca_conj_shallow(ca_t res, const ca_t x, ca_ctx_t ctx)
         fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_MCTX_1(ctx));
     }
 }
-
-/* todo */
-ca_field_ptr ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x);
 
 /* Set res to the generator of Q(ext). */
 void

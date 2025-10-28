@@ -12,7 +12,7 @@
 #include "fmpq.h"
 #include "arb.h"
 
-void
+static void
 _arb_get_rand_fmpq(fmpz_t num, fmpz_t den, flint_rand_t state,
     const fmpz_t den_mult, const arb_t x)
 {

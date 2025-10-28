@@ -13,7 +13,7 @@
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
 
-void
+static void
 _acb_dirichlet_zeta_jet(acb_t t, const acb_t h, int deflate, slong len, slong prec)
 {
     acb_t a;

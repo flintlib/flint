@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "acb_dirichlet.h"
 
-void
+static void
 acb_dirichlet_zeta_rs_mid(acb_t res, const acb_t s, slong K, slong prec)
 {
     acb_t R1, R2, X, t;

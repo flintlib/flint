@@ -17,6 +17,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "fq.h"
 #include "fq_poly.h"
 #include "fq_mat.h"

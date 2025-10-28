@@ -17,6 +17,7 @@
 #include "fexpr_builtin.h"
 #include "ulong_extras.h"
 #include "qqbar.h"
+#include "qqbar/impl.h"
 
 static ulong _deflation(const fmpz * poly, slong len)
 {

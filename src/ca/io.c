@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "calcium.h"
 #include "ca.h"
+#include "ca/impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
 
@@ -26,12 +27,10 @@ typedef struct
 }
 ca_print_info_t;
 
-void _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t ctx);
-void _ca_ext_print(calcium_stream_t out, ca_ext_t x, const char * var, ca_print_info_t * info, ca_ctx_t ctx);
+static void _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t ctx);
+static void _ca_ext_print(calcium_stream_t out, ca_ext_t x, const char * var, ca_print_info_t * info, ca_ctx_t ctx);
 
-void ca_write(calcium_stream_t out, const ca_t x, ca_ctx_t ctx);
-
-void _ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
+static void ca_write(calcium_stream_t out, const ca_t x, ca_ctx_t ctx);
 
 /* strings ********************************************************************/
 
@@ -229,7 +228,7 @@ _ca_field_print(calcium_stream_t out, const ca_field_t K, ca_print_info_t * info
     flint_free(field_vars);
 }
 
-void
+static void
 _ca_ext_print(calcium_stream_t out, ca_ext_t x, const char * var, ca_print_info_t * info, ca_ctx_t ctx)
 {
     if (x->head == CA_QQBar)
@@ -287,7 +286,7 @@ _ca_ext_print(calcium_stream_t out, ca_ext_t x, const char * var, ca_print_info_
     }
 }
 
-void
+static void
 _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t ctx)
 {
     ca_field_srcptr xfield;
@@ -539,7 +538,7 @@ ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx
     _ca_all_extensions(extensions, length, x, ctx);
 }
 
-void
+static void
 ca_write(calcium_stream_t out, const ca_t x, ca_ctx_t ctx)
 {
     ca_print_info_t info;

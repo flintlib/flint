@@ -12,11 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#define flint_set_abort gurkmacka1
-#define flint_set_throw gurkmacka2
 #include "flint.h"
-#undef flint_set_abort
-#undef flint_set_throw
 
 #undef FLINT_NORETURN
 #if defined(__GNUC__)
@@ -24,9 +20,6 @@
 #else
 # define FLINT_NORETURN
 #endif
-
-void flint_set_abort(void (* func)(void) FLINT_NORETURN);
-void flint_set_throw(void (* func)(flint_err_t, const char *, va_list) FLINT_NORETURN);
 
 FLINT_NORETURN static void __flint_throw(flint_err_t, const char *, va_list);
 

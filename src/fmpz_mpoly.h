@@ -750,13 +750,10 @@ void fmpz_mpolyl_lead_coeff(fmpz_mpoly_t c, const fmpz_mpoly_t A, slong num_vars
 
 int fmpz_mpolyl_content(fmpz_mpoly_t g, const fmpz_mpoly_t A, slong num_vars, const fmpz_mpoly_ctx_t ctx);
 
-void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
-        const fmpz_mpoly_t B, slong var, const ulong * Bshift,
-        const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
-
-void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
-        flint_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
-        const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A, const fmpz_mpoly_t B, slong var, const ulong * Bshift, const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift, const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift, const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2, slong shift2, slong var, const fmpz_mpoly_ctx_t ctx);
 
 int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
 int fmpz_mpoly_repack_bits_inplace(fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);

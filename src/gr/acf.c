@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "double_extras.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "arb_fmpz_poly.h"
 #include "acf.h"
 #include "acb.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -665,12 +667,6 @@ _gr_acf_cmp(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
     *res = arf_cmp(acf_realref(x), acf_realref(y));
     return GR_SUCCESS;
 }
-
-/* ignores ctx, so we can pass in the acf context */
-int
-_gr_arf_cmpabs(int * res, const arf_t x, const arf_t y, const gr_ctx_t ctx);
-
-#include "double_extras.h"
 
 int
 _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)

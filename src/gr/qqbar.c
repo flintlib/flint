@@ -16,7 +16,9 @@
 #include "fmpzi.h"
 #include "fexpr.h"
 #include "qqbar.h"
+#include "qqbar/impl.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -125,9 +127,6 @@ _gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const gr_ctx_t ctx)
 
 /* todo: different styles */
 
-
-void
-qqbar_get_decimal_root_nearest(char ** re_s, char ** im_s, const qqbar_t x, slong default_digits);
 
 int
 _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
