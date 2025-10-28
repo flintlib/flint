@@ -13,13 +13,6 @@
 #include "acb_dirichlet.h"
 
 void
-arb_zeta_inv_ui_euler_product(arb_t z, ulong s, slong prec)
-{
-    const signed char chi[1] = {1};
-    _acb_dirichlet_euler_product_real_ui(z, s, chi, 1, 1, prec);
-}
-
-void
 arb_zeta_ui_euler_product(arb_t z, ulong s, slong prec)
 {
     const signed char chi[1] = {1};

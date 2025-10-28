@@ -215,7 +215,7 @@ _acb_hypgeom_bessel_j_is_imag(const acb_t nu, const acb_t z)
 }
 
 /* Bound propagated error for |J_n(z)| when evaluating at mid(z). */
-void
+static void
 _acb_hypgeom_bessel_j_prop_error(mag_t re, mag_t im, const acb_t nu, const acb_t z)
 {
     mag_t err, rad;
@@ -258,7 +258,7 @@ _acb_hypgeom_bessel_j_prop_error(mag_t re, mag_t im, const acb_t nu, const acb_t
 
 /* assumes no aliasing */
 /* (+/- iz)^(-1/2-v) * z^v * exp(+/- iz) */
-void
+static void
 acb_hypgeom_bessel_j_asymp_prefactors_fallback(acb_t Ap, acb_t Am, acb_t C,
     const acb_t nu, const acb_t z, slong prec)
 {
@@ -301,7 +301,7 @@ acb_hypgeom_bessel_j_asymp_prefactors_fallback(acb_t Ap, acb_t Am, acb_t C,
     acb_clear(v);
 }
 
-void
+static void
 acb_hypgeom_bessel_j_asymp_prefactors(acb_t Ap, acb_t Am, acb_t C,
     const acb_t nu, const acb_t z, slong prec)
 {
@@ -477,7 +477,7 @@ acb_hypgeom_bessel_j_0f1(acb_t res, const acb_t nu, const acb_t z, slong prec)
     _acb_hypgeom_bessel_j_0f1(res, nu, z, prec, prec);
 }
 
-void
+static void
 acb_hypgeom_bessel_j_transition(acb_t res, const acb_t nu, const acb_t z, slong prec)
 {
     slong prec2;

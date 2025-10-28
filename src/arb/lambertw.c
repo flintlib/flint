@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
 #include "double_extras.h"
+#include "arb.h"
+#include "arb/impl.h"
 
 /* Helper functions to compute W_{-1}(x) on (-1/e,0) in double precision --
    just to get a good starting value for the multiprecision code, and
@@ -63,8 +64,7 @@ static const double pol7[5] = {
     1.0,-3556.4306263369027831,1.4761527435056145298e6,
     -9.8425904825010893103e7,7.0373606710750560344e8 };
 
-double
-d_lambertw_branch1(double x)
+double d_lambertw_branch1(double x)
 {
     double w, u;
 
@@ -109,7 +109,7 @@ d_lambertw_branch1(double x)
     For the -1 branch:
         |W'(x)| <= 2 / sqrt(1+e*x) + 2/|x|.
 */
-void
+static void
 arb_lambertw_bound_prime(mag_t w, const arb_t x, int branch, slong prec)
 {
     arb_t t;
@@ -158,7 +158,7 @@ arb_lambertw_bound_prime(mag_t w, const arb_t x, int branch, slong prec)
 
 /* Given an approximation w for W(x), compute a rigorous error bound.
    The precomputed value ew = e^w is optional. */
-void
+static void
 arb_lambertw_bound_error(mag_t res, const arb_t x, const arf_t w,
         const arb_t ew, int branch, slong prec)
 {
@@ -279,7 +279,7 @@ arb_lambertw_halley_step(arb_t res, const arb_t x, const arf_t w,
 
 /* Double precision approximation good for x >= 2^1000, or
    roughly |x| <= 2^(1000-60) for the -1 branch. */
-slong
+static slong
 arb_lambertw_initial_asymp1(arf_t res, const arf_t x, int branch, slong prec)
 {
     fmpz_t e;
@@ -324,7 +324,7 @@ _arf_log(arf_t res, const arf_t x, slong prec)
     arb_clear(t);
 }
 
-slong
+static slong
 arb_lambertw_initial_asymp2(arf_t res, const arf_t x, int branch, slong prec)
 {
     arf_t l, ll;
@@ -366,7 +366,7 @@ in bits, clamped between 0 and a reasonable value related to
 the bit length of the exponent of x; thus the return value plus 2
 can be used as a precision.
 */
-slong
+static slong
 arb_lambertw_initial(arf_t res, const arf_t x, int branch, slong prec)
 {
     if (arf_cmp_d(x, -ONE_OVER_E + 0.001) >= 0)

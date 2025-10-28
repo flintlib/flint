@@ -12,12 +12,13 @@
 #include "mpn_extras.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "n_poly/impl.h"
 
 #if FLINT_WANT_ASSERT
 # include "fq_nmod_poly.h"
 #endif
 
-void _n_fq_poly_mullow_(
+static void _n_fq_poly_mullow_(
     ulong * rop,
     const ulong * op1, slong len1,
     const ulong * op2, slong len2,

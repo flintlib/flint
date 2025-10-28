@@ -1602,8 +1602,6 @@ gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
     }
 }
 
-void arb_fmpz_euler_number_ui(fmpz_t res, ulong n);
-
 int
 gr_generic_eulernum_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
 {

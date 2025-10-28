@@ -11,6 +11,7 @@
 
 #include "fmpz_poly_mat.h"
 #include "ca_mat.h"
+#include "ca_mat/impl.h"
 
 static const fmpz * _nf_denref(const nf_elem_t a, const nf_t nf)
 {

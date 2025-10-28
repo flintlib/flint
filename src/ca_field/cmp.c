@@ -12,6 +12,7 @@
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+#include "ca_field/impl.h"
 
 static int
 _fmpz_poly_compare_abslex(const fmpz * a, const fmpz * b, slong len)
@@ -155,18 +156,6 @@ ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
     }
 }
 
-slong
-ca_field_depth(const ca_field_t K, ca_ctx_t ctx);
-
-slong
-ca_depth(const ca_t x, ca_ctx_t ctx)
-{
-    if (CA_IS_SPECIAL(x))
-        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
-
-    return ca_field_depth(CA_FIELD(x, ctx), ctx);
-}
-
 static slong
 ca_ext_depth(const ca_ext_t x, ca_ctx_t ctx)
 {
@@ -192,6 +181,15 @@ ca_field_depth(const ca_field_t K, ca_ctx_t ctx)
     }
 
     return 0;
+}
+
+slong
+ca_depth(const ca_t x, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x))
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
+
+    return ca_field_depth(CA_FIELD(x, ctx), ctx);
 }
 
 /* todo: sort on depth? */

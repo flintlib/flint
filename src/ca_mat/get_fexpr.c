@@ -12,19 +12,9 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 #include "ca.h"
+#include "ca/impl.h"
 #include "ca_ext.h"
 #include "ca_mat.h"
-
-void _ca_default_variables(fexpr_ptr ext_vars, slong num_ext);
-
-void _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,
-        ca_ext_ptr * ext, slong num_ext, const fexpr_struct * ext_vars, ca_ctx_t ctx);
-
-void _ca_all_extensions(ca_ext_ptr ** extensions, slong * length, const ca_t x, ca_ctx_t ctx);
-
-void
-_ca_ext_get_fexpr_given_ext(fexpr_t res, const ca_ext_t x, ulong flags,
-        ca_ext_ptr * ext, slong num_ext, const fexpr_struct * ext_vars, ca_ctx_t ctx);
 
 void
 ca_mat_get_fexpr(fexpr_t res, const ca_mat_t A, ulong flags, ca_ctx_t ctx)

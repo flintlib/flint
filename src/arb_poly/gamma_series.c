@@ -9,17 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb/impl.h"
 #include "arb_poly.h"
+#include "arb_poly/impl.h"
+#include "arb_hypgeom/impl.h"
 
-void arb_gamma_stirling_bound(mag_ptr err, const arb_t x, slong k0, slong knum, slong n);
-
-void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const arb_t x, int use_reflect, int digamma, slong prec);
-
-void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);
-
-void
-_arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec)
+void _arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec)
 {
     slong i;
 
@@ -88,7 +83,7 @@ bsplit(arb_ptr Q, arb_ptr T, const arb_t z, slong a, slong b, slong num, slong p
     }
 }
 
-void
+static void
 _arb_poly_mullow_cpx(arb_ptr res, arb_srcptr src, slong len, const arb_t c, slong trunc, slong prec)
 {
     slong i;
@@ -105,7 +100,7 @@ _arb_poly_mullow_cpx(arb_ptr res, arb_srcptr src, slong len, const arb_t c, slon
     arb_mul(res, src, c, prec);
 }
 
-void
+static void
 _arb_poly_log_cpx_series(arb_ptr res, const arb_t c, slong num, slong prec)
 {
     slong i;
@@ -216,8 +211,7 @@ _arb_poly_gamma_stirling_eval2(arb_ptr res, const arb_t z, slong n, slong num, i
     arb_clear(c);
 }
 
-void
-_arb_poly_gamma_stirling_eval(arb_ptr res, const arb_t z, slong n, slong num, slong prec)
+void _arb_poly_gamma_stirling_eval(arb_ptr res, const arb_t z, slong n, slong num, slong prec)
 {
     _arb_poly_gamma_stirling_eval2(res, z, n, num, 0, prec);
 }

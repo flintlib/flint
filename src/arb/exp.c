@@ -14,7 +14,7 @@
 #define MAGLIM(prec) FLINT_MAX(128, 2 * (prec))
 
 /* todo: min prec by MAG_BITS everywhere? */
-void
+static void
 arb_exp_wide(arb_t res, const arb_t x, slong prec, slong maglim)
 {
     mag_t t, u;

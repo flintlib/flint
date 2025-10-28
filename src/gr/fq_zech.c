@@ -21,6 +21,7 @@
 #include "nmod_poly.h"
 #include "fmpz_mod_poly.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_generic.h"

@@ -29,7 +29,7 @@ use_recurrence(const acb_t n, const acb_t a, const acb_t b, slong prec)
     return 1;
 }
 
-void
+static void
 acb_hypgeom_jacobi_p_ui_direct(acb_t res, ulong n,
     const acb_t a, const acb_t b, const acb_t z, slong prec)
 {

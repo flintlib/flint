@@ -110,6 +110,7 @@ ulong acb_dirichlet_theta_length(ulong q, const arb_t x, slong prec);
 void mag_tail_kexpk2_arb(mag_t res, const arb_t a, ulong n);
 
 void _acb_dirichlet_theta_argument_at_arb(arb_t xt, ulong q, const arb_t t, slong prec);
+void _acb_dirichlet_theta_arb_series(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const arb_t xt, slong len, slong prec);
 void acb_dirichlet_theta_arb(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const arb_t t, slong prec);
 void acb_dirichlet_ui_theta_arb(acb_t res, const dirichlet_group_t G, ulong a, const arb_t t, slong prec);
 
@@ -195,6 +196,8 @@ acb_dirichlet_zeta_zero(acb_t res, const fmpz_t n, slong prec)
 {
     acb_dirichlet_zeta_zeros(res, n, 1, prec);
 }
+
+void acb_dirichlet_vec_mellin_arb(acb_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, const arb_t t, slong n, slong prec);
 
 /* Platt zeta zeros */
 
@@ -295,6 +298,13 @@ void acb_dirichlet_platt_multieval_threaded(arb_ptr out, const fmpz_t T,
 
 /* Platt Hardy Z zeros */
 
+slong _acb_dirichlet_platt_isolate_local_hardy_z_zeros(
+    arf_interval_ptr res, const fmpz_t n, slong len,
+    const fmpz_t T, slong A, slong B,
+    const arb_t h, const fmpz_t J, slong K, slong sigma_grid,
+    slong Ns_max, const arb_t H, slong sigma_interp, slong prec);
+slong acb_dirichlet_platt_isolate_local_hardy_z_zeros(
+    arf_interval_ptr res, const fmpz_t n, slong len, slong prec);
 slong _acb_dirichlet_platt_local_hardy_z_zeros(
     arb_ptr res, const fmpz_t n, slong len,
     const fmpz_t T, slong A, slong B,

@@ -17,6 +17,7 @@
 #include "fexpr.h"
 #include "fmpq.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
@@ -3699,8 +3700,6 @@ gr_test_vec_binary_op_scalar(gr_ctx_t R, const char * opname, int (*gr_op)(gr_pt
 }
 
 int gr_test_vec_mul_scalar(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op_scalar(R, "vec_mul_scalar", gr_mul, _gr_vec_mul_scalar, state, test_flags); }
-
-int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 
 int
 gr_test_vec_dot(gr_ctx_t R, flint_rand_t state, int test_flags)

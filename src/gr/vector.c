@@ -162,9 +162,6 @@ vector_gr_vec_randtest(gr_vec_t res, flint_rand_t state, gr_ctx_t ctx)
 }
 
 truth_t
-gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
-
-truth_t
 vector_gr_vec_equal(const gr_vec_t vec1, const gr_vec_t vec2, gr_ctx_t ctx)
 {
     slong len1, len2;

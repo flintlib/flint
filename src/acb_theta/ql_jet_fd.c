@@ -17,7 +17,7 @@
 #include "acb_dft.h"
 #include "acb_theta.h"
 
-void
+static void
 acb_theta_ql_inexact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     acb_srcptr dth, int all, slong prec)
 {

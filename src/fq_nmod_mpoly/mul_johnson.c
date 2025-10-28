@@ -16,7 +16,7 @@
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-void _fq_nmod_mpoly_mul_johnson1(
+static void _fq_nmod_mpoly_mul_johnson1(
     fq_nmod_mpoly_t A,
     const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     const ulong * Ccoeffs, const ulong * Cexps, slong Clen,

@@ -20,7 +20,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 
-slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
+static slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
 {
     slong len = 0;
 
@@ -39,7 +39,7 @@ slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
     return len;
 }
 
-void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
+static void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
 {
    slong n = op->r, i, j;
    fmpz * v1;
@@ -117,7 +117,7 @@ static inline double _log2e(const double x, slong exp)
     See Lemma 3.1 in Dumas, "Bounds on the coefficients of the
     characteristic and minimal polynomials", 2007.
 */
-slong
+static slong
 _fmpz_mat_minpoly_bound_bits(const fmpz_mat_t op)
 {
     const slong n = op->r;

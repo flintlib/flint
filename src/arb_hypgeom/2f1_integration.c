@@ -376,7 +376,7 @@ estimate_magnitude(mag_t res, const arb_t ra, const arb_t rb, const arb_t rc, co
     }
 }
 
-int
+static int
 _arb_hypgeom_2f1_integration(arb_t res, const arb_t a, const arb_t b, const arb_t c, const arb_t z, int regularized, slong prec)
 {
     acb_calc_integrate_opt_t opt;

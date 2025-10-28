@@ -12,6 +12,7 @@
 #include "double_extras.h"
 #include "arb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom/impl.h"
 
 #define DEBUG 0
 
@@ -152,7 +153,7 @@ const double arb_hypgeom_rgamma_d_tab[128] = {
 
 /* Crude upper bound for psi(x) for x > 0, adequate for perturbation bounds
    for gamma. */
-double
+static double
 d_abs_digamma_ubound(double x)
 {
     if (x <= 1.0)
@@ -184,7 +185,7 @@ d_abs_digamma_ubound(double x)
 
 /* Upper or lower bound (depending on direction) for gamma(x),
    assuming x > 0, no overflow. */
-double
+static double
 _arb_hypgeom_d_gamma(double x, int direction)
 {
     double s, t, p;
@@ -221,7 +222,7 @@ _arb_hypgeom_d_gamma(double x, int direction)
 }
 
 /* Set res = [a, b]; not checking overflow or underflow. */
-void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
+static void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
 {
     double mid, rad;
 
@@ -236,10 +237,6 @@ void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
     mag_set_d(arb_radref(res), rad);
     arb_set_round(res, res, prec);
 }
-
-int _arf_increment_fast(arf_t x, slong prec);
-
-
 
 /* Try to compute gamma(x) using Taylor series. Returns 1 on success, 0 on
    failure (x too large or precision too large). */

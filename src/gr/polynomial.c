@@ -15,6 +15,7 @@
 #include <string.h>
 #include "fmpz.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"

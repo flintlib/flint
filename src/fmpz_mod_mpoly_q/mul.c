@@ -150,7 +150,7 @@ _fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
     }
 }
 
-void
+static void
 _fmpz_mod_mpoly_q_mul_fmpz_mod(fmpz_mod_mpoly_t res_num, fmpz_mod_mpoly_t res_den,
             const fmpz_mod_mpoly_t x_num, const fmpz_mod_mpoly_t x_den,
             const fmpz_t y,

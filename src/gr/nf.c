@@ -15,6 +15,7 @@
 #include "fmpz.h"
 #include "nf.h"
 #include "nf_elem.h"
+#include "ca/impl.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -182,8 +183,6 @@ _gr_nf_set_fmpq(nf_elem_t res, const fmpq_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx);
-
 int
 _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 {
@@ -212,8 +211,6 @@ _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 
     return gr_generic_set_other(res, v, v_ctx, ctx);
 }
-
-void fexpr_set_nf_elem(fexpr_t res, const nf_elem_t a, const nf_t nf, const fexpr_t var);
 
 int
 _gr_nf_get_fexpr(fexpr_t res, const nf_elem_t a, const gr_ctx_t ctx)

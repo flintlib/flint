@@ -209,7 +209,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_LEX(void * varg)
     TMP_END;
 }
 
-void _nmod_mpoly_mul_array_chunked_threaded_LEX(
+static void _nmod_mpoly_mul_array_chunked_threaded_LEX(
     nmod_mpoly_t P,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
@@ -590,7 +590,7 @@ static void _nmod_mpoly_mul_array_threaded_worker_DEG(void * varg)
 
 
 
-void _nmod_mpoly_mul_array_chunked_threaded_DEG(
+static void _nmod_mpoly_mul_array_chunked_threaded_DEG(
     nmod_mpoly_t P,
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,

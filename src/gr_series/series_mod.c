@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 #include "gr_series.h"
-
+#include "gr_series/impl.h"
 
 static const char * default_var = "x";
 
@@ -118,7 +118,6 @@ int gr_series_mod_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 }
 
 
-int _gr_series_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx);
 #define _gr_series_mod_ctx_gen_name _gr_series_ctx_gen_name
 
 int

@@ -9,12 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
-#include "mpn_extras.h"
-
 /* We need uint64_t instead of ulong on 32-bit systems for
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
+#include "mpn_extras.h"
+#include "arb.h"
+#include "arb/impl.h"
 
 void mpfr_mulhigh_n(nn_ptr rp, nn_srcptr np, nn_srcptr mp, slong n);
 void mpfr_sqrhigh_n(nn_ptr rp, nn_srcptr np, slong n);
@@ -36,8 +36,7 @@ void mpfr_sqrhigh_n(nn_ptr rp, nn_srcptr np, slong n);
 
 /* mag_set_ui_2exp_si but assumes no promotion can occur.
    Do we need this? */
-void
-mag_set_ui_2exp_small(mag_t z, ulong x, slong e)
+void mag_set_ui_2exp_small(mag_t z, ulong x, slong e)
 {
     _fmpz_demote(MAG_EXPREF(z));
 

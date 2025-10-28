@@ -102,10 +102,6 @@ acb_hypgeom_chi_asymp(acb_t res, const acb_t z, slong prec)
     acb_clear(one);
 }
 
-/* defined in ci.c */
-void
-acb_hypgeom_chi_2f3(acb_t res, const acb_t z, slong prec);
-
 /* Bound propagated error |chi(z)-chi(mid(z))| assuming that we
    are off the branch cut (not checked here).
    Uses |chi'(z)| = |cosh(z)/z| <= cosh(|re(z)|)/|z|.

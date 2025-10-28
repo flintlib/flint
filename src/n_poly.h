@@ -1167,6 +1167,15 @@ ulong n_fq_poly_remove(
     const n_poly_t g,
     const fq_nmod_ctx_t ctx);
 
+void _n_fq_poly_divrem_basecase_(
+    ulong * Q,
+    ulong * A,
+    const ulong * AA, slong Alen,
+    const ulong * B, slong Blen,
+    const ulong * invB,
+    const fq_nmod_ctx_t ctx,
+    n_poly_stack_t St);
+
 void n_fq_poly_divrem_divconquer_(
     n_poly_t Q,
     n_poly_t R,
@@ -1221,6 +1230,15 @@ void n_fq_poly_mulmod(
     const n_poly_t C,
     const n_poly_t M,
     const fq_nmod_ctx_t ctx);
+
+void _n_fq_poly_rem_basecase_(
+    ulong * Q,
+    ulong * A,
+    const ulong * AA, slong Alen,
+    const ulong * B, slong Blen,
+    const ulong * invB,
+    const fq_nmod_ctx_t ctx,
+    n_poly_stack_t St);
 
 void n_fq_poly_rem(
     n_poly_t R,

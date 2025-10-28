@@ -10,18 +10,11 @@
 */
 
 #include "ca.h"
+#include "ca/impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+#include "ca_field/impl.h"
 #include "fmpz_mpoly.h"
-
-void _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
-void _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_elem_t a, const nf_t nf);
-
-void
-fmpz_mpoly_set_coeff_si_x(fmpz_mpoly_t poly,
-        slong c,
-        slong x_var, slong x_exp,
-        const fmpz_mpoly_ctx_t ctx);
 
 void
 ca_field_build_ideal_gamma(ca_field_t K, ca_ctx_t ctx)

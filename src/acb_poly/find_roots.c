@@ -19,33 +19,13 @@
 #include "gr_poly.h"
 #include "nfloat.h"
 
-slong
+static slong
 _acb_get_mid_mag(const acb_t z)
 {
     slong rm, im;
 
     rm = arf_abs_bound_lt_2exp_si(arb_midref(acb_realref(z)));
     im = arf_abs_bound_lt_2exp_si(arb_midref(acb_imagref(z)));
-
-    return FLINT_MAX(rm, im);
-}
-
-slong
-_acb_get_rad_mag(const acb_t z)
-{
-    slong rm, im;
-
-    /* TODO: write mag function */
-    arf_t t;
-    arf_init(t);
-
-    arf_set_mag(t, arb_radref(acb_realref(z)));
-    rm = arf_abs_bound_lt_2exp_si(t);
-
-    arf_set_mag(t, arb_radref(acb_imagref(z)));
-    im = arf_abs_bound_lt_2exp_si(t);
-
-    arf_clear(t);
 
     return FLINT_MAX(rm, im);
 }
@@ -68,7 +48,7 @@ static slong convex_hull(slong * res, const double * y, slong len)
     return n;
 }
 
-void
+static void
 _acb_poly_roots_initial_values(acb_ptr roots, acb_srcptr poly, slong deg, slong prec)
 {
     double * alog;
@@ -159,7 +139,7 @@ _acb_poly_roots_initial_values(acb_ptr roots, acb_srcptr poly, slong deg, slong 
 
 /* todo: this method often gets called with degree 2 or 3 polynomials;
    consider doing something direct there */
-int
+static int
 _acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr f_prime, slong deg, slong maxiter, gr_ctx_t fp_ctx, gr_ctx_t acb_ctx, slong prec)
 {
     slong iter, i;

@@ -48,7 +48,7 @@ static const unsigned short den_ratio_tab[512] = {
     16,1,1994,1,4,1,2,1,8072,1,2026,1,4,1019,2042,1,
 };
 
-void
+static void
 acb_elliptic_rf_taylor_sum(acb_t res, const acb_t E2, const acb_t E3, slong nterms, slong prec)
 {
     fmpz_t den, c, d, e;

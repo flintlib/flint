@@ -13,7 +13,7 @@
 #include "n_poly.h"
 #include "nmod_mpoly_factor.h"
 
-int n_bpoly_mod_pfrac2(
+static int n_bpoly_mod_pfrac2(
     n_bpoly_t C1, n_bpoly_t C2,
     slong C1_deg1_bound, slong C2_deg1_bound,
     n_bpoly_t A,

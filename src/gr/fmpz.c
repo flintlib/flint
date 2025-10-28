@@ -20,6 +20,7 @@
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_special.h"
@@ -978,9 +979,6 @@ _gr_fmpz_poly_divexact2(fmpz * res,
     _fmpz_poly_divexact(res, poly1, len1, poly2, len2);
     return GR_SUCCESS;
 }
-
-/* defined in gr/fmpz_poly.c */
-int _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx);
 
 /* integer roots of integer polynomial */
 int

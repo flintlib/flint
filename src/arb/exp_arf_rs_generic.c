@@ -12,6 +12,7 @@
 #include <math.h>
 #include "ulong_extras.h"
 #include "arb.h"
+#include "arb/impl.h"
 
 void
 arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec)

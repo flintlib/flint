@@ -13,7 +13,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _quadratic(fmpz_poly_t p, flint_rand_t state, flint_bitcnt_t bits)
+static void _quadratic(fmpz_poly_t p, flint_rand_t state, flint_bitcnt_t bits)
 {
     fmpz *a, *b, *c;
 
@@ -35,7 +35,7 @@ void _quadratic(fmpz_poly_t p, flint_rand_t state, flint_bitcnt_t bits)
     _fmpz_poly_set_length(p, 3);
 }
 
-void _even(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
+static void _even(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     slong n, i;
 

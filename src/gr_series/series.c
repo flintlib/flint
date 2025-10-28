@@ -16,6 +16,7 @@
 #include "gr_generic.h"
 #include "gr_special.h"
 #include "gr_series.h"
+#include "gr_series/impl.h"
 
 
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */

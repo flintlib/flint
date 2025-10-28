@@ -10,15 +10,15 @@
 */
 
 #include <stdio.h>
-#include "ca.h"
-#include "ca_ext.h"
-#include "ca_field.h"
-
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "qqbar.h"
 #include "fmpz_mpoly.h"
-
+#include "ca.h"
+#include "ca/impl.h"
+#include "ca_ext.h"
+#include "ca_field.h"
+#include "ca_field/impl.h"
 #include "gr.h"
 
 slong
@@ -180,8 +180,6 @@ acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong pre
     /* fixme: bogus */
     return found;
 }
-
-void _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_elem_t a, const nf_t nf);
 
 void
 _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
@@ -890,13 +888,6 @@ ca_field_build_ideal_multiplicative(ca_field_t K, ca_ctx_t ctx)
 
     flint_free(powers);
 }
-
-/* todo: move to utils */
-void
-fmpz_mpoly_set_coeff_si_x(fmpz_mpoly_t poly,
-        slong c,
-        slong x_var, slong x_exp,
-        const fmpz_mpoly_ctx_t ctx);
 
 void
 ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)

@@ -600,7 +600,7 @@ static void n_bpoly_mod_lift_start(
         combine the factors in L according to the rows of N
         and then replace N by an identity matrix
 */
-void n_bpoly_mod_lift_combine(
+static void n_bpoly_mod_lift_combine(
     n_bpoly_mod_lift_t L,
     nmod_mat_t N,
     const n_bpoly_t monicA,

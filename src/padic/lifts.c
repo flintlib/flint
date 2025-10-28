@@ -10,7 +10,7 @@
 */
 
 #include "longlong.h"
-#include "fmpz.h"
+#include "padic.h"
 
 slong * _padic_lifts_exps(slong *n, slong N)
 {

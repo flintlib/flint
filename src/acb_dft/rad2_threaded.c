@@ -14,8 +14,7 @@
 #include "thread_pool.h"
 #include "thread_support.h"
 #include "acb_dft.h"
-
-void acb_dft_rad2_reorder(acb_ptr v, slong n);
+#include "acb_dft/impl.h"
 
 typedef struct
 {
@@ -30,7 +29,7 @@ typedef struct
 }
 _worker_arg;
 
-void
+static void
 _acb_dft_rad2_thread(void * arg_ptr)
 {
     _worker_arg arg = *((_worker_arg *) arg_ptr);

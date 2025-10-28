@@ -13,11 +13,9 @@
 #include <math.h>
 #include "fmpq.h"
 #include "fmpz_poly.h"
-#include "qqbar.h"
 #include "fexpr.h"
+#include "qqbar.h"
 #include "fexpr_builtin.h"
-
-int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 
 int
 _fexpr_parse_arf(arf_t res, const fexpr_t expr)

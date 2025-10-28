@@ -167,7 +167,7 @@ _arb_bell_mag(fmpz_t mmag, const fmpz_t n, const fmpz_t k)
     }
 }
 
-void
+static void
 arb_bell_find_cutoffs(fmpz_t A, fmpz_t B, fmpz_t M, fmpz_t Mmag, const fmpz_t n, slong prec)
 {
     fmpz_t a, amag, b, bmag, m, mmag, w, wmag, Amag, Bmag;
