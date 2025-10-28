@@ -88,6 +88,31 @@ nmod_mpoly_factor_struct;
 
 typedef nmod_mpoly_factor_struct nmod_mpoly_factor_t[1];
 
+typedef enum
+{
+    _DOT0 = 0,           /* len == 0 || mod.n == 1 */
+    _DOT1 = 1,           /* 1 limb */
+#if (FLINT_BITS == 64)
+    _DOT2_SPLIT = 2,     /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
+#endif  // FLINT_BITS == 64
+    _DOT2_HALF = 3,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
+    _DOT2 = 4,           /* 2 limbs */
+    _DOT3_ACC = 5,       /* 3 limbs, modulus allowing some accumulation in 2 limbs */
+    _DOT3 = 6,           /* 3 limbs */
+    _DOT_POW2 = 7,       /* mod.n is a power of 2 */
+} dot_method_t;
+// if mod.n is a power of 2, we use _DOT_POW2 in all cases
+// otherwise, number of limbs of unreduced dot product can be deduced:
+// 1 limb  <=>  method <= _DOT1
+// 2 limbs <=>  _DOT1 < method <= _DOT2
+// 3 limbs <=>  _DOT2 < method
+
+typedef struct
+{
+    dot_method_t method;
+    ulong pow2_precomp;  /* for splitting: (1L << 56) % mod.n */
+} dot_params_t;
+
 #ifdef __cplusplus
 }
 #endif
