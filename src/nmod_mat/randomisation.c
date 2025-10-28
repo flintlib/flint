@@ -25,6 +25,14 @@ nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 }
 
 void
+nmod_mat_rand(nmod_mat_t mat, flint_rand_t state)
+{
+    slong i;
+    for (i = 0; i < mat->r; i++)
+        _nmod_vec_rand(nmod_mat_row_ptr(mat, i), state, mat->c, mat->mod);
+}
+
+void
 nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count)
 {
     slong c, i, j, k;
@@ -123,7 +131,9 @@ nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
 void
 nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state)
 {
-    _nmod_vec_randtest(mat->entries, state, mat->r * mat->c, mat->mod);
+    slong i;
+    for (i = 0; i < mat->r; i++)
+        _nmod_vec_randtest(nmod_mat_row_ptr(mat, i), state, mat->c, mat->mod);
 }
 
 void

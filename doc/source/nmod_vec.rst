@@ -26,6 +26,10 @@ Random functions
     Sets ``vec`` to a random vector of the given length with entries
     reduced modulo ``mod.n``.
 
+.. function:: void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
+
+    Sets ``vec`` to a vector of the given length with entries picked uniformly at random in `[0, mod.n)`.
+
 
 Basic manipulation and comparison
 --------------------------------------------------------------------------------
@@ -231,4 +235,3 @@ performed at the very end of the computation.
     Same specification as ``_nmod_vec_dot_bound_limbs``, but uses the additional
     input ``params`` to reduce the amount of computations; for correctness
     ``params`` must have been computed for the specified ``len`` and ``mod``.
-
