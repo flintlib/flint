@@ -151,6 +151,8 @@ gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
 
 /* Basic manipulation */
 
+void _gr_mpoly_normalise(gr_mpoly_t A, gr_mpoly_ctx_t ctx);
+
 GR_MPOLY_INLINE
 void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 {
