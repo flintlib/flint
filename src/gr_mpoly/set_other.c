@@ -99,7 +99,7 @@ _gr_mpoly_set_gr_mpoly_other(gr_mpoly_t res, const gr_mpoly_t A, gr_mpoly_ctx_t 
             /* there may be zero coefficients; remove them
                (todo: do inline in first loop) */
             /* if (cctx != A_cctx) */
-            status = gr_mpoly_combine_like_terms(res, ctx);
+            _gr_mpoly_normalise(res, ctx);
         }
         else
         {
@@ -188,7 +188,7 @@ _gr_mpoly_set_gr_mpoly_other(gr_mpoly_t res, const gr_mpoly_t A, gr_mpoly_ctx_t 
                     /* term order may be different */
                     gr_mpoly_sort_terms(res, ctx);
                     /* todo: combine zero checks with main loop */
-                    status |= gr_mpoly_combine_like_terms(res, ctx);
+                    _gr_mpoly_normalise(res, ctx);
 
                     flint_free(A_exps);
                     flint_free(exps);
