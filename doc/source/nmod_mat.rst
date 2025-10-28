@@ -196,12 +196,12 @@ Random matrix generation
 
 .. function:: void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 
-    Sets the element to random numbers between `1` and `m-1` likely to be close to the modulus
+    Sets the element to random numbers in `[0, n)`, likely to be close to the modulus ``n``
     of the matrix. This is used to test potential overflow-related bugs.
 
 .. function:: void nmod_mat_randunif(nmod_mat_t mat, flint_rand_t state)
 
-    Sets the element to uniformly generated random numbers between `0` and `m-1`. This is used for benchmarks.
+    Sets the element to uniformly generated random numbers in `[0, n)`, where `n` is the modulus of the matrix.
 
 .. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, nn_srcptr diag, slong n)
 

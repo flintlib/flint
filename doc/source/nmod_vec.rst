@@ -28,7 +28,7 @@ Random functions
 
 .. function:: void _nmod_vec_randunif(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 
-    Sets ``vec`` to a random vector of the given length with entries uniformly generated between ``0`` and ``mod.n-1`` included.
+    Sets ``vec`` to a vector of the given length with entries picked uniformly at random in `[0, mod.n)`.
 
 
 Basic manipulation and comparison

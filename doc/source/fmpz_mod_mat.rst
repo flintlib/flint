@@ -100,13 +100,13 @@ Random generation
 
 .. function:: void fmpz_mod_mat_randfull(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 
-    Sets the element to random numbers between `1` and `m-1` likely to be close to the modulus
+    Sets the element to random numbers in `[0, n)`, likely to be close to the modulus ``n``
     of the matrix. This is used to test potential overflow-related bugs.
 
-.. function:: void fmpz_mod_mat_randunif(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+.. function:: void fmpz_mod_mat_rand(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 
-    Sets the element to random numbers between `0` and `m-1` likely to be close to the modulus
-    of the matrix. This is used to write benchmarks.
+    Sets the element to random numbers in `[0, n)`, likely to be close to the modulus ``n``
+    of the matrix.
 
 
 Windows and concatenation
