@@ -32,6 +32,19 @@ _mpn_mod_vec_set(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_mpn_mod_vec_rand(nn_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx)
+{
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong i;
+
+    for (i = 0; i < len; i++)
+        if (mpn_mod_rand(res + i * n, state, ctx) != GR_SUCCESS)
+            return GR_UNABLE;
+
+    return GR_SUCCESS;
+}
+
 void
 _mpn_mod_vec_swap(nn_ptr vec1, nn_ptr vec2, slong len, gr_ctx_t ctx)
 {
