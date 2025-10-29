@@ -974,8 +974,6 @@ slong fmpz_mod_mpoly_vec_insert_unique(fmpz_mod_mpoly_vec_t vec, const fmpz_mod_
 void fmpz_mod_mpoly_vec_set_length(fmpz_mod_mpoly_vec_t vec, slong len, const fmpz_mod_mpoly_ctx_t ctx);
 void fmpz_mod_mpoly_vec_randtest_not_zero(fmpz_mod_mpoly_vec_t vec, flint_rand_t state, slong len, slong poly_len, ulong exp_bound, fmpz_mod_mpoly_ctx_t ctx);
 
-void _fmpz_mod_mpoly_vec_fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_vec_t ret, fmpz_mod_mpoly_vec_t src, fmpz_mod_mpoly_ctx_t ctx);
-void _fmpz_mod_mpoly_vec_fmpz_mpoly_to_fmpz_mod_mpoly(fmpz_mod_mpoly_vec_t ret, fmpz_mpoly_vec_t src, fmpz_mod_mpoly_ctx_t ctx);
 
 /* Ideals and Groenber bases */
 

@@ -628,6 +628,115 @@ Univariate Functions
     Try to set *D* to the discriminant of *Ax*.
 
 
+Vectors
+--------------------------------------------------------------------------------
+
+.. type:: fmpz_mod_mpoly_vec_struct
+
+.. type:: fmpz_mod_mpoly_vec_t
+
+    A type holding a vector of :type:`fmpz_mod_mpoly_t`.
+
+.. macro:: fmpz_mod_mpoly_vec_entry(vec, i)
+
+    Macro for accessing the entry at position *i* in *vec*.
+
+.. function:: void fmpz_mod_mpoly_vec_init(fmpz_mod_mpoly_vec_t vec, slong len, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Initializes *vec* to a vector of length *len*, setting all entries to the zero polynomial.
+
+.. function:: void fmpz_mod_mpoly_vec_clear(fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Clears *vec*, freeing its allocated memory.
+
+.. function:: void fmpz_mod_mpoly_vec_print(const fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Prints *vec* to standard output.
+
+.. function:: void fmpz_mod_mpoly_vec_swap(fmpz_mod_mpoly_vec_t x, fmpz_mod_mpoly_vec_t y, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Swaps *x* and *y* efficiently.
+
+.. function:: void fmpz_mod_mpoly_vec_fit_length(fmpz_mod_mpoly_vec_t vec, slong len, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Allocates room for *len* entries in *vec*.
+
+.. function:: void fmpz_mod_mpoly_vec_set(fmpz_mod_mpoly_vec_t dest, const fmpz_mod_mpoly_vec_t src, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets *dest* to a copy of *src*.
+
+.. function:: void fmpz_mod_mpoly_vec_append(fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Appends *f* to the end of *vec*.
+
+.. function:: slong fmpz_mod_mpoly_vec_insert_unique(fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Inserts *f* without duplication into *vec* and returns its index.
+    If this polynomial already exists, *vec* is unchanged. If this
+    polynomial does not exist in *vec*, it is appended.
+
+.. function:: void fmpz_mod_mpoly_vec_set_length(fmpz_mod_mpoly_vec_t vec, slong len, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets the length of *vec* to *len*, truncating or zero-extending
+    as needed.
+
+.. function:: void fmpz_mod_mpoly_vec_randtest_not_zero(fmpz_mod_mpoly_vec_t vec, flint_rand_t state, slong len, slong poly_len, ulong exp_bound, fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets *vec* to a random vector with exactly *len* entries, all nonzero,
+    with random parameters defined by *poly_len* and *exp_bound*.
+
+
+Ideals and Gröbner bases
+-------------------------------------------------------------------------------
+
+The following methods deal with ideals in `\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_m]`.
+We use primitive integer polynomials as normalised generators
+in place of monic rational polynomials.
+
+.. function:: void fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_t g, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets *res* to the *S*-polynomial of *f* and *g*, scaled by making *f* and *g* monic first.
+
+.. function:: void fmpz_mod_mpoly_reduction_monic_part(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets *res* to the monic remainder of multivariate
+    division with remainder with respect to the polynomials *vec*.
+
+.. function:: int fmpz_mod_mpoly_vec_is_groebner(const fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx)
+
+    If *F* is *NULL*, checks if *G* is a Gröbner basis. If *F* is not *NULL*,
+    checks if *G* is a Gröbner basis for *F*.
+
+.. function:: int fmpz_mod_mpoly_vec_is_autoreduced(const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Checks whether the vector *F* is autoreduced (or inter-reduced).
+
+.. function:: void fmpz_mod_mpoly_vec_autoreduction(fmpz_mod_mpoly_vec_t H, const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets *H* to the autoreduction (inter-reduction) of *F*.
+
+.. function:: void fmpz_mod_mpoly_vec_autoreduction_groebner(fmpz_mod_mpoly_vec_t H, const fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets *H* to the autoreduction (inter-reduction) of *G*.
+    Assumes that *G* is a Gröbner basis.
+    This produces a reduced Gröbner basis, which is unique
+    (up to the sort order of the entries in the vector).
+
+.. function:: void fmpz_mod_mpoly_buchberger_naive(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx)
+
+    Sets *G* to a Gröbner basis for *F*, computed using
+    a naive implementation of Buchberger's algorithm.
+
+.. function:: int fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F, slong ideal_len_limit, slong poly_len_limit, const fmpz_mod_mpoly_ctx_t ctx)
+
+    As :func:`fmpz_mod_mpoly_buchberger_naive`, but halts if during the
+    execution of Buchberger's algorithm the length of the
+    ideal basis set exceeds *ideal_len_limit*, or the length of any
+    polynomial exceeds *poly_len_limit*.
+    Returns 1 for success and 0 for failure. On failure, *G* is
+    a valid basis for *F* but it might not be a Gröbner basis.
+
+
 Internal Functions
 --------------------------------------------------------------------------------
 
