@@ -284,12 +284,28 @@ Assignment and basic manipulation
 Randomisation
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_mod_poly_rand(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Sets `f` to a random polynomial with up to the given length and where
+    each coefficient has up to the given number of bits. The coefficients
+    are uniformly generated random numbers in `[0, n)`, where `n` is the modulus given by the context `ctx`.
+
+.. function:: void fmpz_mod_poly_rand_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Sets `f` to a random monic polynomial with up to the given length and where
+    each coefficient has up to the given number of bits. The coefficients
+    are uniformly generated random numbers in `[0, n)`, where `n` is the modulus given by the context `ctx`.
+
+.. function:: void fmpz_mod_poly_rand_irreducible(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Sets `f` to a random irreducible polynomial with up to the given length and where each coefficient has up to the given number of bits. The coefficients
+    are uniformly generated random numbers in `[0, n)`, where `n` is the modulus given by the context `ctx`.
 
 .. function:: void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets `f` to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. The coefficients
-    are signed randomly.
+    are random numbers in `[1, n)`, where `n` is the modulus given by the context `ctx`.
 
 .. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
