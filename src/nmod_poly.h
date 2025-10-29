@@ -213,6 +213,10 @@ int nmod_poly_is_monic(const nmod_poly_t poly)
 
 /* Randomisation  ************************************************************/
 
+void nmod_poly_rand(nmod_poly_t poly, flint_rand_t state, slong len);
+void nmod_poly_rand_monic(nmod_poly_t poly, flint_rand_t state, slong len);
+void nmod_poly_rand_irreducible(nmod_poly_t poly, flint_rand_t state, slong len);
+
 void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len);
 
 NMOD_POLY_INLINE
