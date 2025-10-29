@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
-
+    Copyright (C) 2025 Andrii Yanovets
+    
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under

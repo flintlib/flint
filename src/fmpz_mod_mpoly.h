@@ -19,7 +19,6 @@
 #endif
 
 #include "fmpz.h"
-#include "fmpz_mpoly.h"
 #include "mpoly_types.h"
 
 #if FLINT_WANT_ASSERT
@@ -994,10 +993,6 @@ int fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fm
 
 void fmpz_mod_mpoly_buchberger_naive(fmpz_mod_mpoly_vec_t G, 
     const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx);
-
-// int fmpz_mod_mpoly_buchberger_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F,
-//     slong ideal_len_limit, slong poly_len_limit, int (*solver)(fmpz_mod_mpoly_vec_t, const fmpz_mod_mpoly_vec_t,
-//     slong, slong, const fmpz_mod_mpoly_ctx_t), const fmpz_mod_mpoly_ctx_t ctx);
 
 int fmpz_mod_mpoly_vec_is_autoreduced(const fmpz_mod_mpoly_vec_t G, 
     const fmpz_mod_mpoly_ctx_t ctx);

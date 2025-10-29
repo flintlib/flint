@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
-
+    Copyright (C) 2025 Andrii Yanovets
+    
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -30,7 +31,7 @@ fmpz_mod_mpoly_vec_is_groebner(const fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpol
     {
         for (j = i + 1; j < len && result; j++)
         {
-            fmpz_mod_mpoly_spoly(h, fmpz_mpoly_vec_entry(G, i), fmpz_mpoly_vec_entry(G, j), ctx);
+            fmpz_mod_mpoly_spoly(h, fmpz_mod_mpoly_vec_entry(G, i), fmpz_mod_mpoly_vec_entry(G, j), ctx);
 
             fmpz_mod_mpoly_reduction_monic_part(h, h, G, ctx);
             if (!fmpz_mod_mpoly_is_zero(h, ctx))
@@ -42,7 +43,7 @@ fmpz_mod_mpoly_vec_is_groebner(const fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpol
     {
         for (i = 0; i < F->length && result; i++)
         {
-            fmpz_mod_mpoly_reduction_monic_part(h, fmpz_mpoly_vec_entry(F, i), G, ctx);
+            fmpz_mod_mpoly_reduction_monic_part(h, fmpz_mod_mpoly_vec_entry(F, i), G, ctx);
             if (!fmpz_mod_mpoly_is_zero(h, ctx))
                 result = 0;
         }
