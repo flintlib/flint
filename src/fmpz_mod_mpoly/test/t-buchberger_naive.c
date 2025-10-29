@@ -37,8 +37,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_buchberger_naive, state)
         fmpz_mod_mpoly_vec_init(H, 0, ctx);
 
         
-        flint_printf("iter %wd   %wd  %d    %{fmpz}\n\n", iter, nvars, ctx->minfo->ord, m);
-        printf("--------------------------------------------------------------------\n");
+        // flint_printf("iter %wd   %wd  %d    %{fmpz}\n\n", iter, nvars, ctx->minfo->ord, m);
+        // printf("--------------------------------------------------------------------\n");
         
 
         if (nvars == 4)
