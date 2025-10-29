@@ -71,6 +71,12 @@ fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
     }
 }
 
+void fmpz_randm_nonzero(fmpz_t f, flint_rand_t state, const fmpz_t m) {
+    fmpz_randm(f, state, m);
+    if (fmpz_is_zero(f))
+        fmpz_one(f);
+}
+
 void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)
 {
     if (bits <= FLINT_BITS)
