@@ -109,6 +109,7 @@ Basic operations and arithmetic
               int mpn_mod_set_mpn(nn_ptr res, nn_srcptr x, slong xn, gr_ctx_t ctx)
               int mpn_mod_set_fmpz(nn_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int mpn_mod_set_other(nn_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
+              int mpn_mod_rand(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
               int mpn_mod_randtest(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
               int mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_get_fmpz(fmpz_t res, nn_srcptr x, gr_ctx_t ctx)
