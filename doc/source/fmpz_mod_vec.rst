@@ -8,7 +8,7 @@ Conversions
 
 .. function:: void _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len, const fmpz_mod_ctx_t ctx)
 
-    Set the `fmpz_mod_vec` `(A, len)` to the `fmpz_vec` `(B, len)` after
+    Set the `fmpz_{mod}_{vec}` `(A, len)` to the `fmpz_{vec}` `(B, len)` after
     reduction of each entry modulo the modulus..
 
 Arithmetic
@@ -61,3 +61,10 @@ Multiplication
 .. function:: void _fmpz_mod_vec_mul(fmpz * A, const fmpz * B, const fmpz * C, slong len, const fmpz_mod_ctx_t ctx)
 
     Set `(A, len)` the pointwise multiplication of `(B, len)` and `(C, len)`.
+
+Random functions
+--------------------------------------------------------------------------------
+
+.. function:: void _fmpz_mod_vec_rand(fmpz * A, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Sets ``vec`` to a vector of the given length with entries picked uniformly at random in `[0, mod.n)`.
