@@ -53,6 +53,9 @@ int _gr_fmpz_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return _gr_fmpz_poly_ctx_set_gen_name(ctx, s[0]);
 }
 
+int _gr_gr_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx);
+#define _gr_fmpz_poly_ctx_gen_name _gr_gr_poly_ctx_gen_name
+
 int
 _gr_fmpz_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -843,6 +846,8 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
 
     {GR_METHOD_CTX_SET_GEN_NAME,  (gr_funcptr) _gr_fmpz_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES, (gr_funcptr) _gr_fmpz_poly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,    (gr_funcptr) _gr_fmpz_poly_ctx_gen_name},
 
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_poly_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpz_poly_clear},

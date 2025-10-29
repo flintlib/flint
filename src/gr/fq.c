@@ -58,6 +58,22 @@ int _gr_fq_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return _gr_fq_ctx_set_gen_name(ctx, s[0]);
 }
 
+int
+_gr_fq_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+{
+    if (i != 0)
+        return GR_DOMAIN;
+
+    char * var = FQ_CTX(ctx)->var;
+    size_t len = strlen(var);
+    * name = flint_malloc(len + 1);
+    if (* name == NULL)
+        return GR_UNABLE;
+    strncpy(* name, var, len + 1);
+
+    return GR_SUCCESS;
+}
+
 void
 _gr_fq_init(fq_t x, const gr_ctx_t ctx)
 {
@@ -716,6 +732,8 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fq_ctx_write},
     {GR_METHOD_CTX_SET_GEN_NAME,    (gr_funcptr) _gr_fq_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,   (gr_funcptr) _gr_fq_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,    (gr_funcptr) _gr_fq_ctx_gen_name},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
