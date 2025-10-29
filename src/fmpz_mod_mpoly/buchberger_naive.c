@@ -164,14 +164,9 @@ fmpz_mod_mpoly_select_pop_pair(pairs_t pairs, const fmpz_mod_mpoly_vec_t G, cons
 static int
 within_limits(const fmpz_mod_mpoly_t poly, slong poly_len_limit, const fmpz_mod_mpoly_ctx_t ctx)
 {
-    slong bits;
-
     if (fmpz_mod_mpoly_length(poly, ctx) > poly_len_limit)
         return 0;
-
-    bits = _fmpz_vec_max_bits(poly->coeffs, poly->length);
-    bits = FLINT_ABS(bits);
-
+        
     return 1;
 }
 

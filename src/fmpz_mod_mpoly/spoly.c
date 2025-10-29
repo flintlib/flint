@@ -19,7 +19,6 @@ fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_
 {
     slong n, i;
     ulong * exp, * expf, * expg;
-    fmpz_t c, d;
     fmpz_mod_mpoly_t T, U;
 
     if (f->length == 0 || g->length == 0)
@@ -33,8 +32,7 @@ fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_
     exp = flint_malloc(sizeof(ulong) * n);
     expf = flint_malloc(sizeof(ulong) * n);
     expg = flint_malloc(sizeof(ulong) * n);
-    fmpz_init(c);
-    fmpz_init(d);
+    
     fmpz_mod_mpoly_init(T, ctx);
     fmpz_mod_mpoly_init(U, ctx);
 
@@ -44,18 +42,36 @@ fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_
     for (i = 0; i < n; i++)
         exp[i] = FLINT_MAX(expf[i], expg[i]);
 
-    fmpz_mod_inv(c, f->coeffs, ctx->ffinfo);
-    fmpz_mod_inv(d, g->coeffs, ctx->ffinfo);
-
     for (i = 0; i < n; i++)
     {
         expf[i] = exp[i] - expf[i];
         expg[i] = exp[i] - expg[i];
     }
 
-    fmpz_mod_mpoly_set_coeff_fmpz_ui(T, c, expf, ctx);
+    if (fmpz_is_one(f->coeffs))
+        fmpz_mod_mpoly_set_coeff_ui_ui(T, 1, expf, ctx);
+    else
+    {
+        fmpz_t c;
+        fmpz_mod_inv(c, f->coeffs, ctx->ffinfo);
+        fmpz_init(c);
+        fmpz_mod_mpoly_set_coeff_fmpz_ui(T, c, expf, ctx);
+        fmpz_clear(c);
+    }
+
     fmpz_mod_mpoly_mul(T, T, f, ctx);
-    fmpz_mod_mpoly_set_coeff_fmpz_ui(U, d, expg, ctx);
+    
+    if (fmpz_is_one(g->coeffs))
+        fmpz_mod_mpoly_set_coeff_ui_ui(U, 1, expg, ctx);
+    else
+    {
+        fmpz_t d;
+        fmpz_init(d);
+        fmpz_mod_inv(d, g->coeffs, ctx->ffinfo);
+        fmpz_mod_mpoly_set_coeff_fmpz_ui(U, d, expg, ctx);
+        fmpz_clear(d);
+    }
+
     fmpz_mod_mpoly_mul(U, U, g, ctx);
 
     fmpz_mod_mpoly_sub(res, T, U, ctx);
@@ -63,8 +79,6 @@ fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_
     flint_free(exp);
     flint_free(expf);
     flint_free(expg);
-    fmpz_clear(c);
-    fmpz_clear(d);
     fmpz_mod_mpoly_clear(T, ctx);
     fmpz_mod_mpoly_clear(U, ctx);
 }

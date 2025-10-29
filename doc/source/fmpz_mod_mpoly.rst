@@ -690,8 +690,7 @@ Ideals and Gröbner bases
 -------------------------------------------------------------------------------
 
 The following methods deal with ideals in `\mathbb{Z}/n\mathbb{Z}[x_1, \dots, x_m]`.
-We use primitive integer polynomials as normalised generators
-in place of monic rational polynomials.
+We use monic polynomials as normalised generators.
 
 .. function:: void fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_t g, const fmpz_mod_mpoly_ctx_t ctx)
 
