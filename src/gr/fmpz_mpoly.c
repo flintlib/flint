@@ -85,6 +85,32 @@ _gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return GR_SUCCESS;
 }
 
+slong
+_gr_fmpz_mpoly_ctx_ngens(slong * ngens, gr_ctx_t ctx)
+{
+    * ngens = MPOLYNOMIAL_MCTX(ctx)->minfo->nvars;
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mpoly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+{
+    if (i < 0 || i >= MPOLYNOMIAL_MCTX(ctx)->minfo->nvars)
+        return GR_DOMAIN;
+
+    if (MPOLYNOMIAL_CTX(ctx)->vars == NULL)
+        return GR_UNABLE;
+
+    char * var = MPOLYNOMIAL_CTX(ctx)->vars[i];
+    size_t len = strlen(var);
+    * name = flint_malloc(len + 1);
+    if (* name == NULL)
+        return GR_UNABLE;
+    strncpy(* name, var, len + 1);
+
+    return GR_SUCCESS;
+}
+
 void
 _gr_fmpz_mpoly_init(fmpz_mpoly_t res, gr_ctx_t ctx)
 {
@@ -572,6 +598,8 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_THREADSAFE,               (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_GEN_NAMES,               (gr_funcptr) _gr_fmpz_mpoly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,   (gr_funcptr) _gr_fmpz_mpoly_ctx_ngens},
+    {GR_METHOD_CTX_GEN_NAME, (gr_funcptr) _gr_fmpz_mpoly_ctx_gen_name},
     {GR_METHOD_INIT,        (gr_funcptr) _gr_fmpz_mpoly_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_fmpz_mpoly_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_fmpz_mpoly_swap},

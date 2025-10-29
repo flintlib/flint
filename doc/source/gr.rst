@@ -278,6 +278,15 @@ Context operations
     The name is used when printing and may be used to choose
     coercions.
 
+.. function:: int gr_ctx_ngens(slong * ngens, gr_ctx_t ctx)
+
+    Get the number of generators.
+
+.. function:: int gr_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+
+    Get the name of the generator of index *i*.
+    The returned buffer must be freed with :func:`flint_free`.
+
 Element operations
 --------------------------------------------------------------------------------
 
