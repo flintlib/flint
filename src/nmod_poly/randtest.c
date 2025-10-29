@@ -14,6 +14,34 @@
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
+// Rand functions -> random dense polynomials with high probability
+void
+nmod_poly_rand(nmod_poly_t poly, flint_rand_t state, slong len)
+{
+    nmod_poly_fit_length(poly, len);
+    _nmod_vec_rand(poly->coeffs, state, len, poly->mod);
+    poly->length = len;
+    _nmod_poly_normalise(poly);
+}
+
+void
+nmod_poly_rand_monic(nmod_poly_t poly, flint_rand_t state, slong len)
+{
+    nmod_poly_fit_length(poly, len);
+    _nmod_vec_rand(poly->coeffs, state, len - 1, poly->mod);
+    poly->coeffs[len - 1] = 1;
+    poly->length = len;
+}
+
+void
+nmod_poly_rand_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+{
+    do {
+        nmod_poly_rand(poly, state, len);
+    } while (nmod_poly_is_zero(poly) || !(nmod_poly_is_irreducible(poly)));
+}
+
+// Randtest functions -> dense/sparse polynomials
 void
 nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
 {
