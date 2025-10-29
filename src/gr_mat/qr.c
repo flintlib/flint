@@ -74,8 +74,7 @@ int
 gr_mat_lq_recursive(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
-    slong sz = ctx->sizeof_elem;
-    slong m, n, d, i, k;
+    slong m, n, d;
     gr_mat_t A1, A2, Q1, Q2, L11, L12, L21, L22, QT, T;
 
     m = gr_mat_nrows(A, ctx);
