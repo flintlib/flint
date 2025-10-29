@@ -739,6 +739,14 @@ Powering
     should override these methods with faster versions or
     to support more general notions of exponentiation when possible.
 
+Derivative
+........................................................................
+
+.. function:: int gr_derivative_gen(gr_ptr res, gr_srcptr x, slong var, gr_ctx_t ctx)
+
+    Sets *res* to the derivative of *x* with respect to the variable of index *var*.
+    The variables here are the generators of *ctx*.
+
 Square roots
 ........................................................................
 

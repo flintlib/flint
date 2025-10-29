@@ -707,6 +707,17 @@ _gr_fmpz_poly_pow_fmpz(fmpz_poly_t res, const fmpz_poly_t x, const fmpz_t exp, c
     }
 }
 
+int
+_gr_fmpz_poly_derivative_gen(fmpz_poly_t res, const fmpz_poly_t x, slong var, const gr_ctx_t ctx)
+{
+    if (var == 0)
+    {
+        fmpz_poly_derivative(res, x);
+        return GR_SUCCESS;
+    }
+    return GR_DOMAIN;
+}
+
 truth_t
 _gr_fmpz_poly_is_square(const fmpz_poly_t x, const gr_ctx_t ctx)
 {
@@ -904,6 +915,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_poly_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpz_poly_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_poly_pow_fmpz},
+    {GR_METHOD_DERIVATIVE_GEN,  (gr_funcptr) _gr_fmpz_poly_derivative_gen},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_poly_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_poly_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_poly_rsqrt},
