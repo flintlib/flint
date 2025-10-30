@@ -16,6 +16,23 @@ arb_minmax(arb_t z1, arb_t z2, const arb_t x, const arb_t y, slong prec)
 {
     arf_t xleft, xright, yleft, yright, xr, yr;
 
+    if (!arb_overlaps(x, y))
+    {
+        arb_t t; /* For handling aliasing */
+        arb_init(t);
+        if (arf_cmp(arb_midref(x), arb_midref(y)) < 0) {
+            arb_set(t, y);
+            arb_set(z1, x);
+            arb_set(z2, t);
+        } else {
+            arb_set(t, x);
+            arb_set(z1, y);
+            arb_set(z2, t);
+        }
+        arb_clear(t);
+        return;
+    }
+
     if (arf_is_nan(arb_midref(x)) || arf_is_nan(arb_midref(y)))
     {
         arb_indeterminate(z1);
