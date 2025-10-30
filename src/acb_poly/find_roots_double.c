@@ -1,11 +1,16 @@
 #include "ulong_extras.h"
+#include <math.h>
+#include <string.h> /* for memcpy */
 
+/* This field contains 13 array pointers */
 typedef struct {
     /* arrays storing the input with real and imaginary parts separated */
     double *z_r;
     double *z_i;
     double *p_r;
     double *p_i;
+    /* for the newton polygon, -log(|coeff|) of p */
+    double *malp;
     /* arrays for the intermediate numerator (vp) and denominator (dk) used
      * in the Durand-Kerner iterator */
     double *vp_r;
@@ -15,57 +20,244 @@ typedef struct {
     /* arrays for the inverses of points with magnitude >=1 */
     double *iz_r;
     double *iz_i;
-    double *Rp_r;
-    double *Rp_i;
+    double *rp_r;
+    double *rp_i;
 } double_field;
 
 
-static void reciprocal(double* Rp_r, double* Rp_i, const double* p_r, const double* p_i, slong n)
-{
-    for(int i=0; i<n; i++) {
-        Rp_r[i] = p_r[n-1-i];
-        Rp_i[i] = p_i[n-1-i];
-    }
-}
-
 /* Remove the leading and trailing zero coeffs of the input polynomial */
-static slong trim_zeros(double* z, slong* fz, slong* bz, const double* p, slong n)
+static slong trim_zeros(double * z, slong * fz, const double * p, slong n)
 {
-    int i;
-    double bc = INFINITY,
-           br = 0.0;
+    int i, j;
 
-    for(i=0; i<n-1 && p[2*i] == 0.0 && p[2*i+1] == 0.0 && in_rads[i] == 0.0; i++) {
-        z[2*i] = 0.0;
-        z[2*i+1] = 0.0;
-        rad[i] = 0.0;
-    }
-    *fz = i;
-
-    if(*fz == n-1 && p[2*(n-1)] == 0.0 && p[2*(n-1)+1] == 0.0 && in_rads[n-1] == 0.0) {
-        bc = 0;
-        br = INFINITY;
-        *fz = 1;
+    /* trailing terms with zero coefficients add roots at infinity*/
+    for(i=n-1; i>=1 && p[2*i] == 0.0 && p[2*i+1] == 0.0; i--) {
+        z[2*(i-1)] = INFINITY;
+        z[2*(i-1)+1] = 0.0;
     }
 
-    for(i=0; i<n-1 && p[2*(n-1-i)] == 0.0 && p[2*(n-1-i)+1] == 0 && in_rads[n-1-i] == 0.0; i++) {
-        z[2*(n-2-i)] = bc;
-        z[2*(n-2-i)+1] = 0.0;
-        rad[n-2-i] = br;
+    /* leading terms with zero coefficients add roots at zero*/
+    for(int j=0; j<i && p[2*j] == 0.0 && p[2*j+1] == 0.0; j++) {
+        z[2*j] = 0.0;
+        z[2*j+1] = 0.0;
     }
-    *bz = i;
-    return n-*fz-*bz;
+    *fz = j;
+
+    return i-j+1;
 }
                   
-
-static void _double_poly_init(double_field* v, slong n)
+static int is_not_counter_clockwise(double a, double b, double x, double y, double u, double v)
 {
-    reciprocal(v->Rp_r, v->Rp_i, n, v->p_r, v->p_i, slong n);
+    return v*(x-a) + y*(a-u) + b*(u-x) <= 0;
+}
+
+/* Computes the lower convex hull of the points (i, y[i]) */
+static slong lower_convex_hull(slong* result, const double* y, slong n)
+{
+    int i, k=0;
+    for (i=0; i<n; i++) {
+        if(isfinite(y[i])) {
+            while(k>1 && is_not_counter_clockwise(result[k-2], y[result[k-2]],
+                                                  result[k-1], y[result[k-1]],
+                                                  i, y[i])) {
+                k--;
+            }
+            result[k] = i;
+            k++;
+        }
+    }
+    return k;
+}
+
+static void initial_values(double* z_r, double* z_i, const double* p_r, const double* p_i,
+                           const slong* np, int m)
+{           
+    int q, p = 0;
+    double d, invd, magp, argp, magq, argq, magz, theta,
+           pi = acos(-1),
+           epsilon = ldexp(1,-50);
+    for(int i=1; i<m; i++) {
+        q = np[i];
+        d = q-p;
+        invd = 1/d;
+        magp = hypot(p_r[p], p_i[p]);
+        argp = atan2(p_i[p], p_r[p]);
+        magq = hypot(p_r[q], p_i[q]);
+        argq = atan2(p_i[q], p_r[q]);
+        magz = pow(magp/magq, invd);
+        if(magz == 0.0) {
+            magz = ldexp(1, -500/(q-p));
+        }
+        for(int j=0; j<q-p; j++) {
+            /* theta = arg of solutions of x^d = -p[p]/p[q] 
+             *       = arg(-p[p]/p[q])/d + 2 pi j/d */
+            theta = (2*pi*(j+0.5)+argp-argq)/d;
+            z_r[p+j] = magz * cos(theta);
+            /* epsilon is used to avoid initial values being symmetrical to the
+             * real axis (see Section 4 of Aberth's paper) */
+            z_i[p+j] = magz * (sin(theta) + epsilon);
+        }
+        p = q;
+    }
 }
 
 
-int double_poly_find_roots_iter()
+/* Initialize the members of the double_field */
+static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
 {
+    double pivot;
+    slong n_np;
+
+    /* Set the memory addresses */
+    v->z_r  = mem_v+0*n;
+    v->z_i  = mem_v+1*n;
+    v->p_r  = mem_v+2*n;
+    v->p_i  = mem_v+3*n;
+    v->malp = mem_v+4*n;
+    v->vp_r = mem_v+5*n;
+    v->vp_i = mem_v+6*n;
+    v->dk_r = mem_v+7*n;
+    v->dk_i = mem_v+8*n;
+    v->iz_r = mem_v+9*n;
+    v->iz_i = mem_v+10*n;
+    v->rp_r = mem_v+11*n;
+    v->rp_i = mem_v+12*n;
+
+    /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
+    for(int i=0; i<n; i++) {
+        v->p_r[i] = p[2*(fz+i)];
+        v->p_i[i] = p[2*(fz+i)+1];
+        v->rp_r[i] = p[2*(fz+n-1-i)];   
+        v->rp_i[i] = p[2*(fz+n-1-i)+1]; 
+        v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i]));
+    }
+
+    /* Computes the Newton polygon as indices in np of length n_np */
+    n_np = lower_convex_hull(np, v->malp, n);
+    
+    /* Computes a first estimation of the roots */
+    initial_values(v->z_r, v->z_i, v->p_r, v->p_i, np, n_np);
+}                         
+
+
+static void d_swap(double* a, double* b)
+{
+    double t = *a;
+    *a = *b;
+    *b = t;
+}
+
+/* Reorder the z : the values at index < n-c satisfy |z| <= 1, and at index >= n-c they satisfy |z|>1 */
+slong double_cpoly_partition_pivot(double* z_r, double* z_i, slong n)
+{
+    int c = 0;
+    for(int i=0; i<n; i++) {
+        if(z_r[i]*z_r[i] + z_i[i]*z_i[i] > 1) {
+            c++;
+        } else if(c>0) {
+            d_swap(z_r + i-c, z_r + i);
+            d_swap(z_i + i-c, z_i + i);
+        }
+    }             
+    return n-c;
+}
+
+static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const double* z_i, slong n)
+{
+    for(int i=0; i<n; i++) {
+        double s;
+        s = 1/(z_r[i]*z_r[i] + z_i[i]*z_i[i]); 
+        iz_r[i] = z_r[i]*s;
+        iz_i[i] = -z_i[i]*s;
+    }
+}
+
+/* simd parameters for Horner optimization
+ *   Rbits size of registers
+ *   Nr number of registers */
+#ifdef __AVX512CD__
+#define Rbits 512
+#define Nr 32
+#elif __AVX__
+#define Rbits 256
+#define Nr 16
+#elif __SSE__
+#define Rbits 128
+#define Nr 16
+#else
+#define Rbits 64
+#define Nr 16
+#endif
+#define Rbytes (Rbits/8)
+#define Nd (Rbytes/8)
+#define DBlock (Nd*Nr/2)
+#define CSBlock (Nd*Nr/2)
+#define CDBlock (Nd*Nr/4)
+
+
+void double_cpoly_horner(double* results_r, double* results_i,
+                         const double* values_r, const double* values_i, int m,
+                         const double* coefficients_r, const double* coefficients_i, int n)
+{
+    for(int i=0; i < m; i+=CDBlock) {
+        double x[CDBlock] = {0};
+        double y[CDBlock] = {0};
+        double u[CDBlock] = {0};
+        double v[CDBlock] = {0};
+        int p = (i+CDBlock<=m) ? CDBlock : (m%CDBlock);
+        memcpy(u, values_r+i, p*sizeof(double));
+        memcpy(v, values_i+i, p*sizeof(double));
+        for(int j=0; j<n; j++) {
+            double a = coefficients_r[n-1-j];
+            double b = coefficients_i[n-1-j];
+            for(int k=0; k<CDBlock; k++) {
+                #pragma STDC FP_CONTRACT ON
+                double s,t;
+                s = a + u[k]*x[k] - v[k]*y[k];
+                t = b + u[k]*y[k] + v[k]*x[k];
+                x[k] = s;
+                y[k] = t;
+            }
+        }
+        memcpy(results_r+i, x, p*sizeof(double));
+        memcpy(results_i+i, y, p*sizeof(double));
+    }
+}
+
+static void double_cpoly_refine_roots(double_field * v, slong n)
+{
+    slong n_piv;
+    double_cpoly_partition_pivot(v->z_r, v->z_i, n);
+    vector_inverse(v->iz_r + n_piv, v->iz_i + n_piv, v->z_r + n_piv, v->z_i + n_piv, n - n_piv);
+    /* Dominant computation time */
+    double_cpoly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, n_piv, v->p_r, v->p_i, n);
+}
+
+
+void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_iter, int verbose)
+{
+    slong nt, fz, i, status;
+    double_field v[1];
+    double * mem_v;
+    slong * np;
+
+    nt = trim_zeros(z, &fz, p, n); 
+    if(nt > 1) {
+        mem_v = flint_malloc(13*nt*sizeof(double));
+        np = flint_malloc(nt*sizeof(slong));
+        _double_cpoly_init(v, np, mem_v, p, fz, nt);
+        /* Main solve function */
+        for(i=0; i<max_iter; i++) {
+            double_cpoly_refine_roots(v, nt);
+        }
+        for(int i=0; i<nt-1; i++) {
+            z[2*(i+fz)] = v->z_r[i];
+            z[2*(i+fz)+1] = v->z_i[i];
+        }
+
+        flint_free(np);
+        flint_free(mem_v);
+    }
 }
 
 
