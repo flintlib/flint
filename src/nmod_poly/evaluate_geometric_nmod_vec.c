@@ -11,7 +11,6 @@
 */
 
 #include "nmod.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
