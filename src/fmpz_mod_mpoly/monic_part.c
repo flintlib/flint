@@ -33,10 +33,10 @@ fmpz_mod_mpoly_monic_part(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const 
 
         _fmpz_vec_content(c, res->coeffs, res->length);
         if (!fmpz_is_one(c))
-        
+        {
             fmpz_mod_inv(c, c, ctx->ffinfo);
             fmpz_mod_mpoly_scalar_mul_fmpz(res, res, c, ctx);
-
+        }
         fmpz_clear(c);
     }
 }
