@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2025, Vincent Neiger
+    Copyright (C) 2025, Vincent Neiger, Éric Schost
     Copyright (C) 2025, Mael Hostettler
 
     This file is part of FLINT.
