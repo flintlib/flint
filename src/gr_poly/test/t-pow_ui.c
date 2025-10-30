@@ -55,7 +55,7 @@ test(flint_rand_t state, int which)
         status |= gr_poly_pow_ui_binexp(Anm, A, n + m, ctx);
     }
 
-    if (gr_poly_equal(AnAm, Anm, ctx) == T_FALSE)
+    if (status == GR_SUCCESS && gr_poly_equal(AnAm, Anm, ctx) == T_FALSE)
     {
         flint_printf("FAIL\n\n");
         gr_ctx_println(ctx);
