@@ -739,11 +739,11 @@ We use monic polynomials as normalised generators.
 Converting to/from other polynomial types
 -------------------------------------------------------------------------------
 
-.. function:: void fmpz_mod_mpoly_from_fmpz_mpoly(fmpz_mod_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctxm, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mod_mpoly_set_fmpz_mpoly(fmpz_mod_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctxm, const fmpz_mpoly_ctx_t ctx)
 
     Sets :type:`fmpz_mod_mpoly_t` *A* to :type:`fmpz_mpoly_t` *B* with coefficients modulo the modulus in *ctxm*.
 
-.. function:: void fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mod_mpoly_get_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Sets :type:`fmpz_mpoly_t` *A* to the :type:`fmpz_mod_mpoly_t` *B*.
 

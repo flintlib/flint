@@ -15,7 +15,7 @@
 #include "fmpz_mpoly.h"
 #include "mpoly.h"
 
-TEST_FUNCTION_START(fmpz_mod_mpoly_from_fmpz_mpoly, state)
+TEST_FUNCTION_START(fmpz_mod_mpoly_get_fmpz_mpoly, state)
 {
     slong iter;
 
@@ -67,7 +67,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_from_fmpz_mpoly, state)
         }
 
         fmpz_mod_mpoly_combine_like_terms(B, ctxm);
-        fmpz_mod_mpoly_from_fmpz_mpoly(A, C, ctxm, ctx);
+        fmpz_mod_mpoly_set_fmpz_mpoly(A, C, ctxm, ctx);
 
         if (!fmpz_mod_mpoly_equal(A, B, ctxm))
         {
@@ -90,7 +90,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_from_fmpz_mpoly, state)
             fmpz_mpoly_set_term_coeff_fmpz(C, i, c, ctx);
         }
 
-        fmpz_mod_mpoly_to_fmpz_mpoly(D, A, ctx);  
+        fmpz_mod_mpoly_get_fmpz_mpoly(D, A, ctx);  
 
         if (!fmpz_mpoly_equal(C, D, ctx))
         {

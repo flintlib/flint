@@ -80,7 +80,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mpoly_div_monagan_pearce),
     TEST_FUNCTION(fmpz_mod_mpoly_divrem),
     TEST_FUNCTION(fmpz_mod_mpoly_divrem_ideal_monagan_pearce),
-    TEST_FUNCTION(fmpz_mod_mpoly_from_fmpz_mpoly),
+    TEST_FUNCTION(fmpz_mod_mpoly_get_fmpz_mpoly),
     TEST_FUNCTION(fmpz_mod_mpoly_evaluate),
     TEST_FUNCTION(fmpz_mod_mpoly_gcd_brown),
     TEST_FUNCTION(fmpz_mod_mpoly_gcd_cofactors),
