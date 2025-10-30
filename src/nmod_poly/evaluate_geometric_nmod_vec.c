@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "nmod_vec.h"
 
 void
 _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, 
@@ -44,6 +45,8 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     {
         nmod_poly_set_coeff_ui(a, d - 1 - i, 0);
     }
+
+    _nmod_vec_zero(a->coeffs, d - plen + 1); // TODO: better approch mentionned in https://github.com/flintlib/flint/pull/2449#discussion_r2476772717
 
     nmod_poly_mul(b, a, G->f);
 
