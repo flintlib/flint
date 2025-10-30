@@ -41,13 +41,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
         nmod_poly_set_coeff_ui(a, d - 1 - i, nmod_mul(G->x[i], poly[i], G->mod));
     }
 
-    for (i = plen + 1; i < d; i++)
-    {
-        nmod_poly_set_coeff_ui(a, d - 1 - i, 0);
-    }
-
     _nmod_vec_zero(a->coeffs, d - plen + 1); // TODO: better approch mentionned in https://github.com/flintlib/flint/pull/2449#discussion_r2476772717
-
     nmod_poly_mul(b, a, G->f);
 
     for (i = 0; i < len; i++)
@@ -77,3 +71,27 @@ nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys,
     _nmod_poly_evaluate_geometric_nmod_vec_fast(ys, poly->coeffs,
                                                 poly->length, r, n, poly->mod);
 }
+
+void
+_nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len,
+    ulong r, slong n, nmod_t mod)
+{
+    slong i;
+    ulong rpow = 1;
+    ulong r2 = nmod_mul(r, r, mod);
+
+    for (i = 0; i < n; i++)
+    {
+        ys[i] = _nmod_poly_evaluate_nmod(coeffs, len, rpow, mod);
+        rpow = nmod_mul(rpow, r2, mod);
+    }
+}
+
+void
+nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys,
+    const nmod_poly_t poly, ulong r, slong n)
+{
+    _nmod_poly_evaluate_geometric_nmod_vec_iter(ys, poly->coeffs,
+                                        poly->length, r, n, poly->mod);
+}
+
