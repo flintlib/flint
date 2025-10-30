@@ -48,7 +48,7 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
 {
     gr_ctx_struct * base_ring = _gr_random_base_ring(state);
 
-    switch (n_randint(state, 5))
+    switch (n_randint(state, 6))
     {
         case 0:
             gr_ctx_init_gr_poly(ctx, base_ring);
@@ -64,6 +64,15 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
             break;
         case 4:
             gr_ctx_init_vector_space_gr_vec(ctx, base_ring, n_randint(state, 4));
+            break;
+        case 5:
+            {
+                int flags = 0;
+                flags |= n_randint(state, 2) ? GR_DEBUG_WRAP : 0;
+                /* flags |= GR_DEBUG_VERBOSE; */
+                double unable_probability = n_randint(state, 2) ? 0 : 0.1;
+                gr_ctx_init_debug(ctx, base_ring, flags, unable_probability);
+            }
             break;
 /*
     this will break tests that currently assume commutativity

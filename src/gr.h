@@ -725,6 +725,7 @@ typedef enum
     GR_CTX_GR_VEC,
     GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
     GR_CTX_FEXPR,
+    GR_CTX_DEBUG,
     GR_CTX_UNKNOWN_DOMAIN,
     GR_CTX_WHICH_STRUCTURE_TAB_SIZE
 }
@@ -1515,6 +1516,13 @@ void gr_ctx_init_fexpr(gr_ctx_t ctx);
 int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2);
 
 /* Testing */
+
+#define GR_DEBUG_WRAP                     1
+#define GR_DEBUG_VERBOSE                  2
+#define GR_DEBUG_CHECK_ALWAYS_ABLE        4
+#define GR_DEBUG_TIMING                   8
+
+void gr_ctx_init_debug(gr_ctx_t ctx, gr_ctx_t elem_ctx, int flags, double unable_probability);
 
 #define GR_TEST_VERBOSE 8
 #define GR_TEST_ALWAYS_ABLE 16
