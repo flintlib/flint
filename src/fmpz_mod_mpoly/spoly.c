@@ -32,7 +32,6 @@ fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_
     exp = flint_malloc(sizeof(ulong) * n);
     expf = flint_malloc(sizeof(ulong) * n);
     expg = flint_malloc(sizeof(ulong) * n);
-    
     fmpz_mod_mpoly_init(T, ctx);
     fmpz_mod_mpoly_init(U, ctx);
 
@@ -53,8 +52,8 @@ fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, const fmpz_mod_mpoly_t f, const fmpz_
     else
     {
         fmpz_t c;
-        fmpz_mod_inv(c, f->coeffs, ctx->ffinfo);
         fmpz_init(c);
+        fmpz_mod_inv(c, f->coeffs, ctx->ffinfo);
         fmpz_mod_mpoly_set_coeff_fmpz_ui(T, c, expf, ctx);
         fmpz_clear(c);
     }

@@ -56,6 +56,7 @@
 #include "t-scalar_addmul_fmpz.c"
 #include "t-scalar_mul_fmpz.c"
 #include "t-sqrt.c"
+#include "t-to_from_fmpz_mpoly.c"
 #include "t-total_degree.c"
 #include "t-univar_resultant.c"
 #include "t-used_vars.c"
@@ -79,6 +80,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mpoly_div_monagan_pearce),
     TEST_FUNCTION(fmpz_mod_mpoly_divrem),
     TEST_FUNCTION(fmpz_mod_mpoly_divrem_ideal_monagan_pearce),
+    TEST_FUNCTION(fmpz_mod_mpoly_from_fmpz_mpoly),
     TEST_FUNCTION(fmpz_mod_mpoly_evaluate),
     TEST_FUNCTION(fmpz_mod_mpoly_gcd_brown),
     TEST_FUNCTION(fmpz_mod_mpoly_gcd_cofactors),

@@ -166,7 +166,7 @@ within_limits(const fmpz_mod_mpoly_t poly, slong poly_len_limit, const fmpz_mod_
 {
     if (fmpz_mod_mpoly_length(poly, ctx) > poly_len_limit)
         return 0;
-        
+
     return 1;
 }
 

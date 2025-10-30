@@ -46,7 +46,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_buchberger_naive, state)
         else if (nvars == 3)
             fmpz_mod_mpoly_vec_randtest_not_zero(F, state, 1 + n_randint(state, 4), 1 + n_randint(state, 4), 1 + n_randint(state, 2), ctx);
         else
-            fmpz_mod_mpoly_vec_randtest_not_zero(F, state, 1 + n_randint(state, 5), 1 + n_randint(state, 5), 1 + n_randint(state, 3), ctx);
+            fmpz_mod_mpoly_vec_randtest_not_zero(F, state, 1 + n_randint(state, 5), 10+fmpz_bits(m), 1 + n_randint(state, 3), ctx);
 
         // flint_printf("F = "); fmpz_mod_mpoly_vec_print(F, ctx); flint_printf("\n");
 

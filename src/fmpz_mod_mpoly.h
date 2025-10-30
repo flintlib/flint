@@ -712,6 +712,9 @@ int fmpz_mod_mpoly_quadratic_root(fmpz_mod_mpoly_t Q,
 void fmpz_mod_mpoly_term_content(fmpz_mod_mpoly_t M,
                      const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
+void fmpz_mod_mpoly_monic_part(fmpz_mod_mpoly_t res, 
+    const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx);
+
 int fmpz_mod_mpoly_content_vars(fmpz_mod_mpoly_t g,
                     const fmpz_mod_mpoly_t A, slong * vars, slong vars_length,
                                                const fmpz_mod_mpoly_ctx_t ctx);
@@ -1000,6 +1003,13 @@ int fmpz_mod_mpoly_vec_is_autoreduced(const fmpz_mod_mpoly_vec_t G,
 void fmpz_mod_mpoly_vec_autoreduction_groebner(fmpz_mod_mpoly_vec_t H, 
     const fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_ctx_t ctx);
 
+/* Convert to/from fmpz_mpoly */
+
+void fmpz_mod_mpoly_from_fmpz_mpoly(fmpz_mod_mpoly_t res, 
+    const fmpz_mpoly_t f, fmpz_mod_mpoly_ctx_t ctxm, fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_t res, 
+    const fmpz_mod_mpoly_t f, fmpz_mpoly_ctx_t ctx, fmpz_mod_mpoly_ctx_t ctxm);
 
 
 /******************************************************************************
