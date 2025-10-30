@@ -1009,7 +1009,7 @@ void fmpz_mod_mpoly_from_fmpz_mpoly(fmpz_mod_mpoly_t res,
     const fmpz_mpoly_t f, fmpz_mod_mpoly_ctx_t ctxm, fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_t res, 
-    const fmpz_mod_mpoly_t f, fmpz_mpoly_ctx_t ctx, fmpz_mod_mpoly_ctx_t ctxm);
+    const fmpz_mod_mpoly_t f, fmpz_mpoly_ctx_t ctx);
 
 
 /******************************************************************************

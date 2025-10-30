@@ -743,7 +743,7 @@ Converting to/from other polynomial types
 
     Sets :type:`fmpz_mod_mpoly_t` *A* to :type:`fmpz_mpoly_t` *B* with coefficients modulo the modulus in *ctxm*.
 
-.. function:: void fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mpoly_ctx_t ctx, const fmpz_mod_mpoly_ctx_t ctxm)
+.. function:: void fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
     Sets :type:`fmpz_mpoly_t` *A* to the :type:`fmpz_mod_mpoly_t` *B*.
 

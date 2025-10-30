@@ -38,7 +38,7 @@ fmpz_mod_mpoly_from_fmpz_mpoly(fmpz_mod_mpoly_t res, const fmpz_mpoly_t f, fmpz_
 }
 
 void
-fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_t res, const fmpz_mod_mpoly_t f, fmpz_mpoly_ctx_t ctx, fmpz_mod_mpoly_ctx_t ctxm)
+fmpz_mod_mpoly_to_fmpz_mpoly(fmpz_mpoly_t res, const fmpz_mod_mpoly_t f, fmpz_mpoly_ctx_t ctx)
 {
     slong N = mpoly_words_per_exp(f->bits, ctx->minfo);
     slong res_len, i;

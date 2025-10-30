@@ -90,7 +90,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_from_fmpz_mpoly, state)
             fmpz_mpoly_set_term_coeff_fmpz(C, i, c, ctx);
         }
 
-        fmpz_mod_mpoly_to_fmpz_mpoly(D, A, ctx, ctxm);  
+        fmpz_mod_mpoly_to_fmpz_mpoly(D, A, ctx);  
 
         if (!fmpz_mpoly_equal(C, D, ctx))
         {
