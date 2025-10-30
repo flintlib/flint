@@ -542,6 +542,11 @@ void _nmod_poly_evaluate_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong 
 void _nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, nn_srcptr xs, slong n, nmod_t mod);
 void nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong n);
 
+void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len);
+
+void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod);
+void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n);
+
 void nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, ulong c);
 
 void nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c);
@@ -569,6 +574,12 @@ void _nmod_poly_tree_free(nn_ptr * tree, slong len);
 
 void _nmod_poly_tree_build(nn_ptr * tree, nn_srcptr roots, slong len, nmod_t mod);
 
+/* Geometric evaluation / interpolation  *************************************/
+
+void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong n, nmod_t mod);
+
+void nmod_geometric_progression_clear(nmod_geometric_progression_t G);
+
 /* Interpolation  ************************************************************/
 
 void _nmod_poly_interpolate_nmod_vec_newton(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong n, nmod_t mod);
@@ -585,6 +596,11 @@ void nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly, nn_srcptr xs, nn_srcp
 
 void _nmod_poly_interpolate_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr ys,
     const nn_ptr * tree, nn_srcptr weights, slong len, nmod_t mod);
+
+void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly, ulong r, nn_srcptr ys, slong n);
+
+void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
+    const nmod_geometric_progression_t G, slong len);
 
 void _nmod_poly_interpolation_weights(nn_ptr w, const nn_ptr * tree, slong len, nmod_t mod);
 
