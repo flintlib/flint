@@ -182,7 +182,8 @@ TEST_FUNCTION_START(fmpz_set_str, state)
         fmpz_init(a);
         ret = fmpz_set_str(a, cases[i].input, cases[i].base);
 
-        if (ret != cases[i].rv || ret == 0 && fmpz_get_si(a) != cases[i].result)
+        if (ret != cases[i].rv
+                || (ret == 0 && fmpz_get_si(a) != cases[i].result))
         {
             flint_printf("FAIL:\n");
             flint_printf("case = %d\n", i);
