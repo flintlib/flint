@@ -293,7 +293,7 @@ jobs:
   macos-m1:
     name: macOS-M1, Clang (x3)
 
-    runs-on: macos-15
+    runs-on: macos-26
 
     env:
       FLINT_TEST_MULTIPLIER: "3"
