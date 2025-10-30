@@ -57,12 +57,20 @@ jobs:
 
       - name: "Setup"
         run: |
+          # FIXME: Remove manual lcov installation when version is high enough
           sudo apt-get install -y \
             libgmp-dev \
             libmpfr-dev \
             autoconf \
             libtool-bin \
             lcov
+          sudo rm -f $(which lcov)
+
+          wget https://github.com/linux-test-project/lcov/releases/download/v2.3.2/lcov-2.3.2.tar.gz
+          tar -xf lcov-2.3.2.tar.gz
+          rm lcov-2.3.2.tar.gz
+          cd lcov-2.3.2/
+          sudo make PREFIX=/usr install
 
           # Check versions
           gcc --version
