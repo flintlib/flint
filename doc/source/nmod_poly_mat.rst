@@ -144,7 +144,7 @@ Random matrix generation
 
 .. function:: void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state, slong len)
 
-    Generates a matrix of polynomials sparse with an increased probability. It is equivalent to apply ``nmod_poly_randtest`` to all entries in the matrix.
+    Generates a matrix of polynomials randomly, with special values increased for each coefficient. This is intended for use in test code and is equivalent to applying ``nmod_poly_randtest`` to all entries in the matrix.
 
 .. function:: void nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state, slong len, float density)
 

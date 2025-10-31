@@ -231,11 +231,11 @@ Randomization
 
 .. function:: void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
 
-    Generates a random and sparse with increased probability polynomial with length up to ``len``.
+    Generates a random polynomial with length up to ``len``, with for each coefficient the probability of some special values increased (see :func:`n_randtest`). This function is intended for use in test code.
 
 .. function:: void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
 
-    Generates a random and sparse with increased probability monic polynomial with length ``len``.
+    Generates a random monic polynomial with length ``len``. For each coefficient the probability of some special values is increased (see :func:`n_randtest`). This function is intended for use in test code.
 
 .. function:: void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
 
