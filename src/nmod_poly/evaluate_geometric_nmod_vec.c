@@ -35,7 +35,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr v, nn_srcptr poly,
 
     for (i = 0; i < plen; i++)
     {
-        a->coeffs[d-1-i] = nmod_mul(G->x[i], poly[i], G->mod);
+        a->coeffs[d - 1 - i] = nmod_mul(G->x[i], poly[i], G->mod);
     }
 
     _nmod_vec_zero(a->coeffs, d - plen);
@@ -44,7 +44,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr v, nn_srcptr poly,
 
     for (i = 0; i < len; i++)
     {
-        v[i] = nmod_mul(G->x[i], nmod_poly_get_coeff_ui(b, i+d-1), G->mod);
+        v[i] = nmod_mul(G->x[i], nmod_poly_get_coeff_ui(b, i + d - 1), G->mod);
     }
 
     nmod_poly_clear(b);

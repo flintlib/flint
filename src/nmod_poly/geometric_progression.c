@@ -23,12 +23,13 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
     G->d = d;
     G->mod = mod;
 
-    nmod_poly_init2(G->f, mod.n, 2*d-1);
-    nmod_poly_init(G->g1, mod.n);
-    nmod_poly_init(G->g2, mod.n);
-    nmod_poly_set_coeff_ui(G->g1, 0, 1);
-    nmod_poly_set_coeff_ui(G->g2, 0, 1);
-    
+    nmod_poly_init2(G->f, mod.n, 2*d - 1); G->f->length = 2*d - 1;
+    nmod_poly_init2(G->g1, mod.n, d); G->g1->length = d;
+    nmod_poly_init2(G->g2, mod.n, d); G->g2->length = d;
+    G->g1->coeffs[0] = 1;
+    G->g2->coeffs[0] = 1;
+    G->f->coeffs[0] = 1;
+
     G->x = _nmod_vec_init(d);
     G->w = _nmod_vec_init(d);
     G->z = _nmod_vec_init(d);
@@ -43,18 +44,19 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
     inv_r = nmod_inv(r, mod);
     inv_q = nmod_mul(inv_r, inv_r, mod);
 
-    nmod_poly_set_coeff_ui(G->f, 0, 1);
     tmp = r;
-    for (i = 1; i < 2*d-1; i++)
+    for (i = 1; i < 2*d - 1; i++)
     {
-        nmod_poly_set_coeff_ui(G->f, i, nmod_mul(nmod_poly_get_coeff_ui(G->f, i-1), tmp, mod));
+        G->f->coeffs[i] = nmod_mul(G->f->coeffs[i - 1], tmp, mod);
         tmp = nmod_mul(tmp, q, mod);
     }
+    // If we had to normalize G->f than that means r is of low order and following
+    // inversion will fail
 
     tmp = inv_r;
     for (i = 1; i < d; i++)
     {
-        G->x[i] = nmod_mul(G->x[i-1], tmp, mod);
+        G->x[i] = nmod_mul(G->x[i - 1], tmp, mod);
         tmp = nmod_mul(tmp, inv_q, mod);
     }
     
@@ -93,19 +95,19 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
     {
         qq = nmod_mul(qq, qk, mod);   // prod q^i
         s = nmod_mul(s, inv_qk, mod); // prod 1/q^i
-        G->w[i] = nmod_mul(G->w[i-1], inv_diff[i], mod); // prod 1/(q^i-1)
+        G->w[i] = nmod_mul(G->w[i - 1], inv_diff[i], mod); // prod 1/(q^i-1)
         tmp = nmod_mul(qq, G->w[i], mod); // prod q^i/(q^i-1)
-        nmod_poly_set_coeff_ui(G->g2, i, tmp);
+        G->g2->coeffs[i] = tmp;
 
         if ((i & 1) == 1)
         {
-            nmod_poly_set_coeff_ui(G->g1, i, nmod_neg(tmp, mod));
+            G->g1->coeffs[i] = nmod_neg(tmp, mod);
             G->y[i] = nmod_neg(prod_diff[i], mod);
             G->z[i] = nmod_neg(G->w[i], mod);
         }
         else
         {
-            nmod_poly_set_coeff_ui(G->g1, i, tmp);
+            G->g1->coeffs[i] = tmp;
             G->y[i] = prod_diff[i];
             G->z[i] = G->w[i];
         }
@@ -114,6 +116,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
         qk = nmod_mul(qk, q, mod);
         inv_qk = nmod_mul(inv_qk, inv_q, mod);
     }
+    // similarly, if either g1 or g2 have leading 0 coefficient, something is wrong 
 
     _nmod_vec_clear(prod_diff);
     _nmod_vec_clear(inv_diff);
