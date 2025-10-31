@@ -128,7 +128,9 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     (s0) = (a0) - (b0); \
     (s1) = (a1) - (b1) - ((ulong) (s0) > __t0); \
   } while (0)
+#endif
 
+#if !defined(add_sssaaaaaa)
 # define add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0) \
   do { \
     ulong __t1, __t2; \
@@ -162,7 +164,9 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     sub_ddmmss(__t4, s2, (ulong) 0, a2, (ulong) 0, b2); \
     sub_ddmmss(s3, s2, (a3) - (b3), s2, -__t4, -__t3); \
   } while (0)
+#endif
 
+#if !defined(add_sssssaaaaaaaaaa)
 # define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0) \
   do { \
     ulong __t4 = 0; \
@@ -178,7 +182,9 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     sub_ddmmss(__t6, s3, (ulong) 0, a3, (ulong) 0, b3); \
     sub_ddmmss(s4, s3, (a4) - (b4), s3, -__t6, -__t5); \
   } while (0)
+#endif
 
+#if !defined(add_ssssssaaaaaaaaaaaa)
 # define add_ssssssaaaaaaaaaaaa(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0) \
   do { \
     ulong __t5 = 0; \
@@ -196,7 +202,6 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
   } while (0)
 #endif
 
-/* extra wide variants might not have inline asm if there are not enough registers */
 #if !defined(add_sssssssaaaaaaaaaaaaaa)
 # define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
   do { \
@@ -206,20 +211,22 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     add_ssaaaa(s6, s5, s6, s5, (ulong) 0, __t6); \
   } while (0)
 
-# define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
-  do { \
-    ulong __t7 = 0; \
-    add_sssssssaaaaaaaaaaaaaa(__t7, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0); \
-    add_ssaaaa(s7, s6, a7, a6, b7, b6); \
-    add_ssaaaa(s7, s6, s7, s6, (ulong) 0, __t7); \
-  } while (0)
-
 # define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
   do { \
     ulong __t9, __t10; \
     sub_ddddddmmmmmmssssss(__t9, s4, s3, s2, s1, s0, (ulong) 0, a4, a3, a2, a1, a0, (ulong) 0, b4, b3, b2, b1, b0); \
     sub_ddmmss(__t10, s5, (ulong) 0, a5, (ulong) 0, b5); \
     sub_ddmmss(s6, s5, (a6) - (b6), s5, -__t10, -__t9); \
+  } while (0)
+#endif
+
+#if !defined(add_ssssssssaaaaaaaaaaaaaaaa)
+# define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t7 = 0; \
+    add_sssssssaaaaaaaaaaaaaa(__t7, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0); \
+    add_ssaaaa(s7, s6, a7, a6, b7, b6); \
+    add_ssaaaa(s7, s6, s7, s6, (ulong) 0, __t7); \
   } while (0)
 
 # define sub_ddddddddmmmmmmmmssssssss(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
@@ -230,7 +237,6 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     sub_ddmmss(s7, s6, (a7) - (b7), s6, -__t12, -__t11); \
   } while (0)
 #endif
-
 
 #if !defined(MPN_INCR_U)
 # if FLINT_WANT_ASSERT
