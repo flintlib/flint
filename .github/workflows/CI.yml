@@ -491,9 +491,17 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: "Install dependencies"
+      - name: "Cache vcpkg packages"
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}\vcpkg\archives
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      - name: "Install vcpkg packages"
         run: |
-          vcpkg install gmp mpfr pthreads --binarysource="clear;x-gha,readwrite"
+          vcpkg install gmp mpfr pthreads --binarysource="clear;files,${{ runner.temp }}\vcpkg\archives,readwrite"
 
       - name: "Setup MSVC"
         uses: ilammy/msvc-dev-cmd@v1.13.0
