@@ -134,9 +134,10 @@ nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
             ulong val = _nmod_poly_evaluate_nmod_precomp_lazy(poly->coeffs, poly->length, c, c_precomp, modn);
             // correct excess
             if (val >= 2*modn)
-                return val - 2*modn;
-            if (val >= modn)
-                return val - modn;
+                val -= 2*modn;
+            else if (val >= modn)
+                val -= modn;
+            return val;
         }
 
         // use n_mulmod_shoup, non-lazy variant
