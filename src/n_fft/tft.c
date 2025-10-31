@@ -10,7 +10,9 @@
 */
 
 #include "n_fft.h"
+#include "dft.c" // TODO put dft_node and others in n_fft.h
 #include "n_fft_macros.h"
+#include "nmod_poly.h"
 
 /** Structure.
  * - The main interface is n_fft_tft, it solves the problem at node 0
@@ -71,42 +73,50 @@ void n_fft_tft_draft(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong node, 
 
     /* -> in what follows, len/2 < olen <= len */
 
-    /* if olen == 1 (which also means len == 1), single point evaluation */
-    if (olen == 1)
+    if (olen == 1)  /* also means len == 1: single point evaluation */
     {
-        ulong ww = F->tab_w[2*node];
-        /* f[0] = scale * sum([f[k] * ww**k for k in range(ilen)]); */
+        /* FIXME as such, this requires max(p) + 2n - 1 < 2**FLINT_BITS */
+        /* FIXME efficiency: this evaluation should be done faster for point 1 or -1 */
+        ulong val = _nmod_poly_evaluate_nmod_precomp_lazy(p, ilen, F->tab_w[2*node], F->tab_w[2*node+1], F->mod);
         return;
     }
-    /* FIXME do olen == 2 similarly? (point is -tab_w[2*node] ?) */
+    /* FIXME do olen == 2 similarly? or more base cases here for small olen? */
+    /* or will none of these small olen be used anyway, due to some roundup? */
+
     if (ilen == 1)  /* this case is not necessary (the above one is) */
     {
-        /* f[:olen] = scale * f[0]; */
+        for (ulong k = 1; k < olen; k++)
+            p[k] = p[0];
         return;
     }
 
-    /* # efficiency: the above evaluation for olen == 1 should be done faster for ww == 1 or ww == -1 */
-    /* # efficiency: could insert more base cases here for small olen */
+    /* now len >= 2, use two recursive calls in length len/2 */
+    const ulong len_rec = len >> 1;  // just use len/2 everywhere?
+    const ulong olen_rec = olen - len_rec;
 
-    /* # now len >= 2, use two recursive calls in length len/2 */
-    /* len_rec = len >> 1 */
-    /* olen_rec = olen - len_rec */
+    /* if ilen <= len/2, directly do recursive calls */
+    /* (this is a simplification of the general case below, and also */
+    /* allows to do both calls with ilen again instead of len_rec) */
+    /* TODO think about changing this into a loop beforehand,
+     * which would ensures we have len/2 < ilen < len,
+     * and then apply one butterfly which implies ilen == (o?)len?! */
+    if (2*ilen <= len)
+    {
+        for (ulong k = 0; k < ilen; k++)
+            p[len_rec+k] = p[k];
+        n_fft_tft_draft(p        , ilen, len_rec , depth-1, 2*node  , F);
+        n_fft_tft_draft(p+len_rec, ilen, olen_rec, depth-1, 2*node+1, F);
+        return;
+    }
 
-    /* # if f has ilen <= len/2, directly do recursive calls */
-    /* # (this is a simplification of the general case below, and also */
-    /* # allows to do both calls with ilen again instead of len_rec) */
-    /* if 2*ilen <= len: */
-    /*     f[len_rec:len_rec+ilen] = f[:ilen] */
-    /*     tft(f, ilen, len_rec, depth-1, 2*node, ws_br, scale) */
-    /*     tft(f[len_rec:], ilen, olen_rec, depth-1, 2*node+1, ws_br, scale) */
-    /*     return */
+    /* if ilen > len, reduce f mod x**len - root, and continue */
+    if (ilen > len)
+    {
+        reduce_mod_xnma(p, ilen, len, F->tab_w[2*node]);
+        ilen = len;
+    }
 
-    /* # if f has ilen > len, reduce f mod x**len - a and continue */
-    /* if ilen > len: */
-    /*     reduce_mod_xnma(f, ilen, len, ws_br[node]) */
-    /*     ilen = len */
-
-    /* # now f has ilen in [len/2+1...len], do butterfly and then recursive calls */
+    /* now len/2 < ilen <= len, do butterfly and then recursive calls */
     /* ww = ws_br[2*node] */
     /* for k in range(ilen - len_rec): */
     /*     tmp = ww * f[len_rec + k] */
@@ -114,9 +124,22 @@ void n_fft_tft_draft(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong node, 
     /*     f[k] = f[k] + tmp */
     /* for k in range(ilen - len_rec, len_rec): */
     /*     f[len_rec + k] = f[k] */
-    /* tft(f, len_rec, len_rec, depth-1, 2*node, ws_br, scale) */
-    /* tft(f[len_rec:], len_rec, olen_rec, depth-1, 2*node+1, ws_br, scale) */
-    /* return */
+
+    // in: [0..4n), out: [0..4n)
+    const nn_ptr p0 = p;
+    const nn_ptr p1 = p + len_rec;
+    const ulong w = F->tab_w[2*node];
+    const ulong wpre = F->tab_w[2*node+1];
+    for (ulong k = 0; k < len/2; k+=4)
+    {
+        DFT2_NODE_LAZY_4_4(p0[k+0], p1[k+0], w, wpre, F->mod, F->mod2);
+        DFT2_NODE_LAZY_4_4(p0[k+1], p1[k+1], w, wpre, F->mod, F->mod2);
+        DFT2_NODE_LAZY_4_4(p0[k+2], p1[k+2], w, wpre, F->mod, F->mod2);
+        DFT2_NODE_LAZY_4_4(p0[k+3], p1[k+3], w, wpre, F->mod, F->mod2);
+    }
+
+    dft_node_lazy_4_4(p, depth-1, 2*node, F);
+    n_fft_tft_draft(p1, len_rec, olen_rec, depth-1, 2*node+1, F);
 }
 
 
