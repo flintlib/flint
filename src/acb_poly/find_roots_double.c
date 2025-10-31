@@ -2,27 +2,72 @@
 #include <math.h>
 #include <string.h> /* for memcpy */
 
-/* This field contains 13 array pointers */
+/* This field contains 17 array pointers */
 typedef struct {
     /* arrays storing the input with real and imaginary parts separated */
     double *z_r;
+    double *rz_r;
     double *z_i;
+    double *rz_i;
     double *p_r;
     double *p_i;
     /* for the newton polygon, -log(|coeff|) of p */
     double *malp;
     /* arrays for the intermediate numerator (vp) and denominator (dk) used
-     * in the Durand-Kerner iterator */
+     * in the Weierstrass-Durand-Kerner iterator */
     double *vp_r;
     double *vp_i;
-    double *dk_r;
-    double *dk_i;
+    double *wdk_r;
+    double *wdk_i;
     /* arrays for the inverses of points with magnitude >=1 */
     double *iz_r;
+    double *riz_r;
     double *iz_i;
+    double *riz_i;
     double *rp_r;
     double *rp_i;
 } double_field;
+
+/* Initialize the members of the double_field */
+static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
+{
+    double pivot;
+    slong n_np;
+
+    /* Set the memory addresses */
+    v->z_r   = mem_v+0*n;
+    v->rz_r  = mem_v+1*n;
+    v->z_i   = mem_v+2*n;
+    v->rz_i  = mem_v+3*n;
+    v->p_r   = mem_v+4*n;
+    v->p_i   = mem_v+5*n;
+    v->malp  = mem_v+6*n;
+    v->vp_r  = mem_v+7*n;
+    v->vp_i  = mem_v+8*n;
+    v->wdk_r  = mem_v+9*n;
+    v->wdk_i  = mem_v+10*n;
+    v->iz_r  = mem_v+11*n;
+    v->riz_r = mem_v+12*n;
+    v->iz_i  = mem_v+13*n;
+    v->riz_i = mem_v+14*n;
+    v->rp_r  = mem_v+15*n;
+    v->rp_i  = mem_v+16*n;
+
+    /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
+    for(int i=0; i<n; i++) {
+        v->p_r[i] = p[2*(fz+i)];
+        v->p_i[i] = p[2*(fz+i)+1];
+        v->rp_r[i] = p[2*(fz+n-1-i)];   
+        v->rp_i[i] = p[2*(fz+n-1-i)+1]; 
+        v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i]));
+    }
+
+    /* Computes the Newton polygon as indices in np of length n_np */
+    n_np = lower_convex_hull(np, v->malp, n);
+    
+    /* Computes a first estimation of the roots */
+    initial_values(v->z_r, v->z_i, v->p_r, v->p_i, np, n_np);
+}                         
 
 
 /* Remove the leading and trailing zero coeffs of the input polynomial */
@@ -102,43 +147,6 @@ static void initial_values(double* z_r, double* z_i, const double* p_r, const do
 }
 
 
-/* Initialize the members of the double_field */
-static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
-{
-    double pivot;
-    slong n_np;
-
-    /* Set the memory addresses */
-    v->z_r  = mem_v+0*n;
-    v->z_i  = mem_v+1*n;
-    v->p_r  = mem_v+2*n;
-    v->p_i  = mem_v+3*n;
-    v->malp = mem_v+4*n;
-    v->vp_r = mem_v+5*n;
-    v->vp_i = mem_v+6*n;
-    v->dk_r = mem_v+7*n;
-    v->dk_i = mem_v+8*n;
-    v->iz_r = mem_v+9*n;
-    v->iz_i = mem_v+10*n;
-    v->rp_r = mem_v+11*n;
-    v->rp_i = mem_v+12*n;
-
-    /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
-    for(int i=0; i<n; i++) {
-        v->p_r[i] = p[2*(fz+i)];
-        v->p_i[i] = p[2*(fz+i)+1];
-        v->rp_r[i] = p[2*(fz+n-1-i)];   
-        v->rp_i[i] = p[2*(fz+n-1-i)+1]; 
-        v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i]));
-    }
-
-    /* Computes the Newton polygon as indices in np of length n_np */
-    n_np = lower_convex_hull(np, v->malp, n);
-    
-    /* Computes a first estimation of the roots */
-    initial_values(v->z_r, v->z_i, v->p_r, v->p_i, np, n_np);
-}                         
-
 
 static void d_swap(double* a, double* b)
 {
@@ -172,7 +180,7 @@ static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const 
     }
 }
 
-/* simd parameters for Horner optimization
+/* simd parameters for speeding up Horner and Weirstrass weight computation
  *   Rbits size of registers
  *   Nr number of registers */
 #ifdef __AVX512CD__
@@ -192,29 +200,69 @@ static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const 
 #define Nd (Rbytes/8)
 #define DBlock (Nd*Nr/2)
 #define CSBlock (Nd*Nr/2)
-#define CDBlock (Nd*Nr/4)
+#define CDHBlock (Nd*Nr/4)
+#define CDWBlock (Nd*Nr/6)
 
-
+/* Horner evaluation */
 void double_cpoly_horner(double* results_r, double* results_i,
-                         const double* values_r, const double* values_i, int m,
-                         const double* coefficients_r, const double* coefficients_i, int n)
+                         const double* values_r, const double* values_i, slong n_start, slong n_end,
+                         const double* coefficients_r, const double* coefficients_i, slong n)
 {
-    for(int i=0; i < m; i+=CDBlock) {
-        double x[CDBlock] = {0};
-        double y[CDBlock] = {0};
-        double u[CDBlock] = {0};
-        double v[CDBlock] = {0};
-        int p = (i+CDBlock<=m) ? CDBlock : (m%CDBlock);
+    for(int i=n_start; i < n_end; i+=CDHBlock) {
+        double x[CDHBlock] = {0};
+        double y[CDHBlock] = {0};
+        double u[CDHBlock] = {0};
+        double v[CDHBlock] = {0};
+        int p = (i+CDHBlock<=n_end) ? CDHBlock : ((n_end-n_start)%CDHBlock);
         memcpy(u, values_r+i, p*sizeof(double));
         memcpy(v, values_i+i, p*sizeof(double));
         for(int j=0; j<n; j++) {
             double a = coefficients_r[n-1-j];
             double b = coefficients_i[n-1-j];
-            for(int k=0; k<CDBlock; k++) {
+            for(int k=0; k<CDHBlock; k++) {
                 #pragma STDC FP_CONTRACT ON
                 double s,t;
                 s = a + u[k]*x[k] - v[k]*y[k];
                 t = b + u[k]*y[k] + v[k]*x[k];
+                x[k] = s;
+                y[k] = t;
+            }
+        }
+        memcpy(results_r+i, x, p*sizeof(double));
+        memcpy(results_i+i, y, p*sizeof(double));
+    }
+}
+
+
+/* Weights for the Durand-Kerner or Weierstrass iteration */
+/* twice_values_r and twice_values_i have size 2n,
+ * the second half of each array is a copy of the first half */
+void double_cpoly_weierstrass(double* results_r, double* results_i,
+                              const double* twice_values_r, const double* twice_values_i,
+                              slong n_start, slong n_end, slong n)
+{
+    for(int i=n_start; i < n_end; i+=CDWBlock) {
+        double x[CDWBlock] = {1};
+        double y[CDWBlock] = {1};
+        double u[CDWBlock] = {0};
+        double v[CDWBlock] = {0};
+        double a[CDWBlock] = {0};
+        double b[CDWBlock] = {0};
+
+        slong p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
+        memcpy(u, twice_values_r+i, p*sizeof(double));
+        memcpy(v, twice_values_i+i, p*sizeof(double));
+        /* starts product after diagonal and continues periodically horizontally */
+        for(int j=0; j<n; j++) {
+            memcpy(a, twice_values_r+i+j+1, CDWBlock);
+            memcpy(b, twice_values_i+i+j+1, CDWBlock);
+            for(int k=0; k<CDWBlock; k++) {
+                #pragma STDC FP_CONTRACT ON
+                double s,t;
+                s = u[k]-a[k];
+                t = v[k]-b[k];
+                s = s*x[k] - t*y[k];
+                t = s*y[k] + t*x[k];
                 x[k] = s;
                 y[k] = t;
             }
@@ -229,8 +277,15 @@ static void double_cpoly_refine_roots(double_field * v, slong n)
     slong n_piv;
     double_cpoly_partition_pivot(v->z_r, v->z_i, n);
     vector_inverse(v->iz_r + n_piv, v->iz_i + n_piv, v->z_r + n_piv, v->z_i + n_piv, n - n_piv);
+    memcpy(v->rz_r, v->z_r, n);
+    memcpy(v->rz_i, v->z_i, n);
+    memcpy(v->riz_r, v->iz_r, n);
+    memcpy(v->riz_i, v->iz_i, n);
     /* Dominant computation time */
-    double_cpoly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, n_piv, v->p_r, v->p_i, n);
+    /* Direct case */
+    double_cpoly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
+    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, v->z_r, v->z_i, 0, n_piv, n);
+    
 }
 
 
@@ -243,7 +298,7 @@ void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_it
 
     nt = trim_zeros(z, &fz, p, n); 
     if(nt > 1) {
-        mem_v = flint_malloc(13*nt*sizeof(double));
+        mem_v = flint_malloc(17*nt*sizeof(double));
         np = flint_malloc(nt*sizeof(slong));
         _double_cpoly_init(v, np, mem_v, p, fz, nt);
         /* Main solve function */
