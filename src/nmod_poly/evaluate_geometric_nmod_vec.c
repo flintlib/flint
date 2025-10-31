@@ -55,8 +55,11 @@ void
 _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, 
     slong plen, ulong r, slong n, nmod_t mod)
 {
-    FLINT_ASSERT(n > 0);
-    r = nmod_set_ui(r, mod);
+    if (n == 0)
+    {
+        return;
+    }
+    
     if (r == 1)
     {
         ulong v = _nmod_poly_evaluate_nmod(poly, plen, 1, mod);

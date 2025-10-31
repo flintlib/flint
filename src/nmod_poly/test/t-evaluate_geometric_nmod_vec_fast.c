@@ -26,7 +26,7 @@ TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
         ulong mod, r;
         slong n, npoints;
 
-        npoints = 1 + n_randint(state, 100);
+        npoints = (i < 10) ? i : n_randint(state, 100);
         do 
         { 
             mod = n_randtest_prime(state, 0); 
