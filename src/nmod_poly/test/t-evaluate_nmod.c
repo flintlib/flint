@@ -35,14 +35,18 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         if ((n > UWORD(1)) && (a->mod.norm > 0))
         {
             ulong one_precomp = n_mulmod_precomp_shoup(UWORD(1), n);
-            eval_v2 = _nmod_poly_evaluate_nmod_precomp(a->coeffs, a->length, UWORD(1), one_precomp, a->mod);
+            eval_v2 = _nmod_poly_evaluate_nmod_precomp(a->coeffs, a->length, UWORD(1), one_precomp, n);
 #if FLINT_BITS == 64
             if (n <= UWORD(6148914691236517205))
 #else // FLINT_BITS == 32
             if (n <= UWORD(1431655765))
 #endif
             {
-                eval_v3 = _nmod_poly_evaluate_nmod_precomp_lazy(a->coeffs, a->length, UWORD(1), one_precomp, a->mod);
+                eval_v3 = _nmod_poly_evaluate_nmod_precomp_lazy(a->coeffs, a->length, UWORD(1), one_precomp, n);
+                if (eval_v3 >= 2*n)
+                    eval_v3 -= 2*n;
+                else if (eval_v3 >= n)
+                    eval_v3 -= n;
             }
             else
             {
@@ -106,10 +110,10 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         if (a->mod.norm > 0)
         {
             ulong c_precomp = n_mulmod_precomp_shoup(c, n);
-            eval1_v2 = _nmod_poly_evaluate_nmod_precomp(a->coeffs, a->length, c, c_precomp, a->mod);
+            eval1_v2 = _nmod_poly_evaluate_nmod_precomp(a->coeffs, a->length, c, c_precomp, n);
             eval1_v2 = n_addmod(eval1_v2, 
                                 _nmod_poly_evaluate_nmod_precomp(b->coeffs, b->length,
-                                                               c, c_precomp, b->mod),
+                                                               c, c_precomp, n),
                                 n);
 #if FLINT_BITS == 64
             if (n <= UWORD(6148914691236517205))
@@ -118,11 +122,18 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
 #endif
             {
                 eval1_v3 = _nmod_poly_evaluate_nmod_precomp_lazy(a->coeffs,
-                                          a->length, c, c_precomp, a->mod);
-                eval1_v3 = n_addmod(eval1_v3, 
-                                    _nmod_poly_evaluate_nmod_precomp_lazy(b->coeffs,
-                                                  b->length, c, c_precomp, b->mod),
-                                    n);
+                                          a->length, c, c_precomp, n);
+                if (eval1_v3 >= 2*n)
+                    eval1_v3 -= 2*n;
+                else if (eval1_v3 >= n)
+                    eval1_v3 -= n;
+                ulong tmp = _nmod_poly_evaluate_nmod_precomp_lazy(b->coeffs,
+                                                  b->length, c, c_precomp, n);
+                if (tmp >= 2*n)
+                    tmp -= 2*n;
+                else if (tmp >= n)
+                    tmp -= n;
+                eval1_v3 = n_addmod(eval1_v3, tmp, n);
             }
             else
                 eval1_v3 = eval1_v1;
@@ -138,13 +149,19 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         if (a->mod.norm > 0)
         {
             ulong c_precomp = n_mulmod_precomp_shoup(c, n);
-            eval2_v2 = _nmod_poly_evaluate_nmod_precomp(a->coeffs, a->length, c, c_precomp, a->mod);
+            eval2_v2 = _nmod_poly_evaluate_nmod_precomp(a->coeffs, a->length, c, c_precomp, n);
 #if FLINT_BITS == 64
             if (n <= UWORD(6148914691236517205))
 #else // FLINT_BITS == 32
             if (n <= UWORD(1431655765))
 #endif
-                eval2_v3 = _nmod_poly_evaluate_nmod_precomp_lazy(a->coeffs, a->length, c, c_precomp, a->mod);
+            {
+                eval2_v3 = _nmod_poly_evaluate_nmod_precomp_lazy(a->coeffs, a->length, c, c_precomp, n);
+                if (eval2_v3 >= 2*n)
+                    eval2_v3 -= 2*n;
+                else if (eval2_v3 >= n)
+                    eval2_v3 -= n;
+            }
             else
                 eval2_v3 = eval2_v1;
         }
