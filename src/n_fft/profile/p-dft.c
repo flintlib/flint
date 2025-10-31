@@ -4,6 +4,10 @@
 #include "fft_small.h"
 #include "n_fft.h"
 
+/* TODO
+ * - add profiling for lazy variants that do not reduce to [0,n)
+ **/
+
 #define NUM_PRIMES 7
 
 typedef struct
