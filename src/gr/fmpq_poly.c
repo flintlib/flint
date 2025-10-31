@@ -640,6 +640,17 @@ _gr_fmpq_poly_pow_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t exp, g
 }
 
 int
+_gr_fmpq_poly_derivative_gen(fmpq_poly_t res, const fmpq_poly_t x, slong var, const gr_ctx_t ctx)
+{
+    if (var == 0)
+    {
+        fmpq_poly_derivative(res, x);
+        return GR_SUCCESS;
+    }
+    return GR_DOMAIN;
+}
+
+int
 _gr_fmpq_poly_numerator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
 {
     fmpq_poly_set(res, x);
@@ -799,6 +810,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpq_poly_pow_ui},
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_fmpq_poly_pow_si},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpq_poly_pow_fmpz},
+    {GR_METHOD_DERIVATIVE_GEN,  (gr_funcptr) _gr_fmpq_poly_derivative_gen},
     {GR_METHOD_NUMERATOR,       (gr_funcptr) _gr_fmpq_poly_numerator},
     {GR_METHOD_DENOMINATOR,     (gr_funcptr) _gr_fmpq_poly_denominator},
     {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpq_poly_canonical_associate},

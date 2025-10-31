@@ -670,6 +670,12 @@ polynomial_pow_si(gr_poly_t res, const gr_poly_t poly, slong exp, gr_ctx_t ctx)
 }
 
 int
+polynomial_derivative_gen(gr_poly_t res, const gr_poly_t poly, slong var, gr_ctx_t ctx)
+{
+    return (var == 0) ? gr_poly_derivative(res, poly, POLYNOMIAL_ELEM_CTX(ctx)) : GR_DOMAIN;
+}
+
+int
 polynomial_gcd(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     return gr_poly_gcd(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
@@ -807,6 +813,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_DIV,         (gr_funcptr) polynomial_div},
     {GR_METHOD_DIVEXACT,    (gr_funcptr) polynomial_divexact},
     {GR_METHOD_INV,         (gr_funcptr) polynomial_inv},
+
+    {GR_METHOD_DERIVATIVE_GEN,        (gr_funcptr) polynomial_derivative_gen},
 
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
     {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},

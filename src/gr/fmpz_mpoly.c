@@ -492,6 +492,17 @@ _gr_fmpz_mpoly_pow_fmpz(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_t
         return GR_UNABLE;
 }
 
+int
+_gr_fmpz_mpoly_derivative_gen(fmpz_mpoly_t res, const fmpz_mpoly_t poly, slong var, gr_ctx_t ctx)
+{
+    if (var >= 0 && var < MPOLYNOMIAL_MCTX(ctx)->minfo->nvars)
+    {
+        fmpz_mpoly_derivative(res, poly, var, MPOLYNOMIAL_MCTX(ctx));
+        return GR_SUCCESS;
+    }
+    return GR_DOMAIN;
+}
+
 truth_t
 _gr_fmpz_mpoly_is_square(const fmpz_mpoly_t poly, gr_ctx_t ctx)
 {
@@ -643,6 +654,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpz_mpoly_is_invertible},
     {GR_METHOD_POW_UI,      (gr_funcptr) _gr_fmpz_mpoly_pow_ui},
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) _gr_fmpz_mpoly_pow_fmpz},
+    {GR_METHOD_DERIVATIVE_GEN,  (gr_funcptr) _gr_fmpz_mpoly_derivative_gen},
     {GR_METHOD_SQRT,        (gr_funcptr) _gr_fmpz_mpoly_sqrt},
     {GR_METHOD_IS_SQUARE,   (gr_funcptr) _gr_fmpz_mpoly_is_square},
     {GR_METHOD_CANONICAL_ASSOCIATE,   (gr_funcptr) _gr_fmpz_mpoly_canonical_associate},

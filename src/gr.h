@@ -265,6 +265,8 @@ typedef enum
     GR_METHOD_POW_OTHER,
     GR_METHOD_OTHER_POW,
 
+    GR_METHOD_DERIVATIVE_GEN,
+
     GR_METHOD_IS_SQUARE,
     GR_METHOD_SQRT,
     GR_METHOD_RSQRT,
@@ -1130,6 +1132,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz
 GR_INLINE WARN_UNUSED_RESULT int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, POW_FMPQ)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, POW_OTHER)(res, x, y, y_ctx, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_POW)(res, x, x_ctx, y, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_derivative_gen(gr_ptr res, gr_srcptr x, slong var, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DERIVATIVE_GEN)(res, x, var, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQRT)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RSQRT)(res, x, ctx); }
