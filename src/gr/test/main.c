@@ -22,6 +22,7 @@
 #include "t-arb.c"
 #include "t-arf.c"
 #include "t-ca.c"
+#include "t-debug.c"
 #include "t-dirichlet.c"
 #include "t-fmpq.c"
 #include "t-fmpq_poly.c"
@@ -72,6 +73,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_arb),
     TEST_FUNCTION(gr_arf),
     TEST_FUNCTION(gr_ca),
+    TEST_FUNCTION(gr_debug),
     TEST_FUNCTION(gr_dirichlet),
     TEST_FUNCTION(gr_fmpq),
     TEST_FUNCTION(gr_fmpq_poly),

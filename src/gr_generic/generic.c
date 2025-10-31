@@ -196,6 +196,9 @@ int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     if (status != GR_SUCCESS)
         status = gr_set_si(x, -3 + (slong) n_randint(state, 7), ctx);
 
+    if (status != GR_SUCCESS)
+        return gr_zero(x, ctx);
+
     return status;
 }
 

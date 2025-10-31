@@ -167,7 +167,6 @@ gr_test_set_si(gr_ctx_t R, flint_rand_t state, int test_flags)
     while (z_add_checked(&c, a, b));
 
     GR_TMP_INIT4(xa, xb, xc, xa_xb, R);
-
     GR_MUST_SUCCEED(gr_randtest(xa, state, R));
 
     status = GR_SUCCESS;
@@ -1931,7 +1930,6 @@ gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
     gr_ptr x, x_inv;
 
     GR_TMP_INIT2(x, x_inv, R);
-
     GR_MUST_SUCCEED(gr_randtest(x, state, R));
 
     status = GR_SUCCESS;
@@ -1955,7 +1953,7 @@ gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
         flint_printf("is_invertible\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("x ^ -1 = \n"); gr_println(x_inv, R);
-        flint_printf("status = %d, invertible = %d\n", status, invertible);
+        flint_printf("status = %d, invertible = %{truth}\n", status, invertible);
         flint_printf("\n");
     }
 
@@ -2696,7 +2694,7 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flag
     {
         if (gr_set_si(x, -1 + (slong) n_randint(state, 3), R) != GR_SUCCESS)
             /* allow using for groups */
-            GR_MUST_SUCCEED(gr_one(x, R));
+            GR_IGNORE(gr_one(x, R));
         fmpz_randtest(a, state, 100);
         fmpz_randtest(b, state, 100);
     }
@@ -3373,7 +3371,7 @@ gr_test_canonical_associate(gr_ctx_t R, flint_rand_t state, int test_flags)
 
             if (i == 5)
             {
-                GR_MUST_SUCCEED(n_randint(state, 2) ? gr_one(v, R) : gr_neg_one(v, R));
+                GR_IGNORE(n_randint(state, 2) ? gr_one(v, R) : gr_neg_one(v, R));
                 break;
             }
         }

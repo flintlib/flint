@@ -55,6 +55,31 @@ Domain properties
 
     Sets or retrieves the floating-point precision in bits.
 
+Debugging
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_debug(gr_ctx_t ctx, gr_ctx_t elem_ctx, int flags, double unable_probability)
+
+    Initialize *ctx* to a wrapper around *elem_ctx* for debugging.
+    This will execute supported methods (currently only a handful
+    of methods are supported, e.g. ``gr_add``) as if one is computing
+    directly over *elem_ctx*, but with added debugging features.
+
+    If *unable_probability* is positive, some methods will randomly return
+    ``GR_UNABLE`` and predicates will randomly return ``T_UNKNOWN``.
+
+    The following flags are supported:
+
+    * ``GR_DEBUG_WRAP`` - wrap elements in a box with a pointer. This allows
+      performing extra checks such as whether a variable is being cleared
+      twice or whether the wrong context object is passed as input. It can
+      also help catch some bugs that are not revealed when entries are
+      stored shallowly.
+
+    * ``GR_DEBUG_VERBOSE`` - print debugging information for each operation.
+
+    * ``GR_DEBUG_TIMING`` - print elapsed time for each operation.
+
 
 Groups
 -------------------------------------------------------------------------------

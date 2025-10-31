@@ -50,6 +50,7 @@ test_sum(flint_rand_t state, int which)
     if (status == GR_SUCCESS && gr_equal(x1, x2, ctx) == T_FALSE)
     {
         flint_printf("FAIL\n");
+        gr_ctx_println(ctx);
         printf("which = %d\n", which);
         printf("vec = "); _gr_vec_print(vec, len, ctx); printf("\n");
         printf("x1 = "); gr_println(x1, ctx); printf("\n");
