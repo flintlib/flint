@@ -74,7 +74,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
         prod_diff[i] = nmod_mul(diff[i], prod_diff[i-1], mod);
     }
     
-    tmp = n_invmod(prod_diff[d-1], mod.n);
+    tmp = nmod_inv(prod_diff[d-1], mod);
     for (i = d-1; i > 0; i--)
     {
         inv_diff[i] = nmod_mul(prod_diff[i-1], tmp, mod);

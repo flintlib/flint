@@ -15,7 +15,7 @@
 #include "nmod_vec.h"
 
 void
-_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, 
+_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr v, nn_srcptr poly, 
     slong plen, const nmod_geometric_progression_t G, slong len)
 {
     nmod_poly_t a, b;
@@ -28,7 +28,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     {
         for (i = 0; i < d; i++)
         {
-            vs[i] = 0;
+            v[i] = 0;
         }
         return;
     }
@@ -38,15 +38,16 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
 
     for (i = 0; i < plen; i++)
     {
-        nmod_poly_set_coeff_ui(a, d - 1 - i, nmod_mul(G->x[i], poly[i], G->mod));
+        a->coeffs[d-1-i] = nmod_mul(G->x[i], poly[i], G->mod);
     }
 
-    _nmod_vec_zero(a->coeffs, d - plen + 1); // TODO: better approch mentionned in https://github.com/flintlib/flint/pull/2449#discussion_r2476772717
+    _nmod_vec_zero(a->coeffs, d - plen);
+    a->length = d; _nmod_poly_normalise(a);
     nmod_poly_mul(b, a, G->f);
 
     for (i = 0; i < len; i++)
     {
-        vs[i] = nmod_mul(G->x[i], nmod_poly_get_coeff_ui(b, i+d-1), G->mod);
+        v[i] = nmod_mul(G->x[i], nmod_poly_get_coeff_ui(b, i+d-1), G->mod);
     }
 
     nmod_poly_clear(b);
@@ -57,9 +58,20 @@ void
 _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, 
     slong plen, ulong r, slong n, nmod_t mod)
 {
-    nmod_geometric_progression_t G;
-    nmod_geometric_progression_init(G, r, n, mod);
+    FLINT_ASSERT(n > 0);
+    r = nmod_set_ui(r, mod);
+    if (r == 1)
+    {
+        ulong v = _nmod_poly_evaluate_nmod(poly, plen, 1, mod);
+        for (ulong i = 0; i < n; i++)
+        {
+            ys[i] = v;
+        }
+        return;
+    }
 
+    nmod_geometric_progression_t G;
+    nmod_geometric_progression_init(G, r, FLINT_MAX(n, plen), mod);
     _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(ys, poly, plen, G, n);
     nmod_geometric_progression_clear(G);
 }
@@ -78,6 +90,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong l
 {
     slong i;
     ulong rpow = 1;
+    
     ulong r2 = nmod_mul(r, r, mod);
 
     for (i = 0; i < n; i++)

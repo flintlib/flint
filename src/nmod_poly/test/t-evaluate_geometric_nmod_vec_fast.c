@@ -20,18 +20,20 @@ TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        nmod_poly_t P, Q;
+        nmod_poly_t P;
         nn_ptr y, z;
         ulong mod, r;
         slong n, npoints;
 
-        r = n_randtest_not_zero(state);
-        mod = n_randtest_prime(state, 0);
-        npoints = n_randint(state, 100);
-        n = n_randint(state, 100);
+        npoints = 1 + n_randint(state, 100); // 0 points not allowed
+        do { mod = n_randtest_prime(state, 0); }
+        while (mod < (1ULL << 32)); // arbitrary limit
+        r = n_randtest_not_zero(state) % mod;
+        r = (r < 0 ? mod + r : r);
+
+        n = n_randint(state, 1000);
 
         nmod_poly_init(P, mod);
-        nmod_poly_init(Q, mod);
         y = _nmod_vec_init(npoints);
         z = _nmod_vec_init(npoints);
 
@@ -54,7 +56,6 @@ TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
         }
 
         nmod_poly_clear(P);
-        nmod_poly_clear(Q);
         _nmod_vec_clear(y);
         _nmod_vec_clear(z);
     }
