@@ -90,8 +90,8 @@ _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong 
         // see documentation of ulong_extras / n_mulmod_shoup for details
         umul_ppmm(p_hi, p_lo, c_precomp, val);
         val = c * val - p_hi * modn;
-        // lazy addition, yields val in [0..3n-1)
-        // --> requires 3n-2 < 2**FLINT_BITS
+        // lazy addition, yields val in [0..k+2n-1), where max(poly) < k
+        // --> if k == n (poly is reduced mod n), constraint: 3n-1 <= 2**FLINT_BITS
         val += poly[m];
     }
 
@@ -119,7 +119,7 @@ nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
         return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, poly->mod);
     }
 
-    // if 3*mod.n - 2 < 2**FLINT_BITS, use n_mulmod_shoup, lazy variant
+    // if 3*mod.n - 1 <= 2**FLINT_BITS, use n_mulmod_shoup, lazy variant
     else
     {
         const ulong modn = poly->mod.n;
