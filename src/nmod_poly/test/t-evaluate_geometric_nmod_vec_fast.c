@@ -27,16 +27,16 @@ TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
         slong n, npoints;
 
         npoints = (i < 10) ? i : n_randint(state, 100);
+        n = n_randint(state, 1000);
         do 
         { 
             mod = n_randtest_prime(state, 0); 
         }
-        while (mod < (1ULL << 32)); // arbitrary limit
+        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maxiimum order r
 
-        n = n_randint(state, 1000);
 
         nmod_poly_init(P, mod);
-        r = nmod_set_si(n_randtest_not_zero(state), P->mod);
+        r = n_primitive_root_prime(mod);
         y = _nmod_vec_init(npoints);
         z = _nmod_vec_init(npoints);
 

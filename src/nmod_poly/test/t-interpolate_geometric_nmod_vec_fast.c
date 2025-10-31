@@ -26,21 +26,17 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
         slong n, npoints;
 
         npoints = 1 + n_randint(state, 100);
+        n = n_randint(state, npoints + 1);
         do 
         { 
             mod = n_randtest_prime(state, 0); 
         }
-        while (mod < (1ULL << 32)); // arbitrary limit
-
-        n = n_randint(state, npoints + 1);
+        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maxiimum order r
 
         nmod_poly_init(P, mod);
         nmod_poly_init(Q, mod);
 
-        do 
-        {
-            r = nmod_set_si(n_randtest_not_zero(state), P->mod);
-        } while (r == 1 || r == mod - 1);
+        r = n_primitive_root_prime(mod);
         y = _nmod_vec_init(npoints);
 
         nmod_poly_randtest(P, state, n);
