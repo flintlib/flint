@@ -19,21 +19,6 @@
 #include "nmod_poly.h"
 #include "gr_poly.h"
 
-// utility (nmod vec uniform random)
-static inline
-void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
-{
-    for (slong i = 0; i < len; i++)
-        vec[i] = n_randint(state, mod.n);
-}
-
-// uniform (nmod mat uniform random)
-static inline
-void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state)
-{
-    _nmod_vec_rand(mat->entries, state, mat->r * mat->c, mat->mod);
-}
-
 /*------------------------------------*/
 /* direct: dot / dot_rev / dot expr   */
 /*------------------------------------*/
