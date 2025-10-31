@@ -26,10 +26,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr v, nn_srcptr poly,
 
     if (plen == 0)
     {
-        for (i = 0; i < d; i++)
-        {
-            v[i] = 0;
-        }
+        _nmod_vec_zero(v, d);
         return;
     }
 
