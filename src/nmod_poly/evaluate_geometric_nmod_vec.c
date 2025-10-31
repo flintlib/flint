@@ -60,7 +60,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly,
     if (r == 1)
     {
         ulong v = _nmod_poly_evaluate_nmod(poly, plen, 1, mod);
-        for (ulong i = 0; i < n; i++)
+        for (slong i = 0; i < n; i++)
         {
             ys[i] = v;
         }
