@@ -34,6 +34,7 @@ extern "C" {
 void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
 int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
 void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
+void fq_nmod_ctx_init_minimal_weight_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
 void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
 void fq_nmod_ctx_init_randtest(fq_nmod_ctx_t ctx, flint_rand_t state, int type);

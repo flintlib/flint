@@ -58,7 +58,7 @@ ulong nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
     TMP_INIT;
 
     TMP_START;
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
+    newexp = (nvars > 0) ? TMP_ALLOC(nvars*sizeof(fmpz)) : NULL;
     for (i = 0; i < nvars; i++)
     {
         fmpz_init(newexp + i);

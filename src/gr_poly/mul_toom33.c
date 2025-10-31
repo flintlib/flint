@@ -33,9 +33,8 @@ _gr_poly_mul_toom33(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong glen
     slong alloc;
     int status = GR_SUCCESS;
 
-    /* TODO: should explicitly call basecase mul. */
     if (flen <= 1 || glen <= 1)
-        return _gr_poly_mullow_generic(res, f, flen, g, glen, flen + glen - 1, ctx);
+        return _gr_poly_mullow_classical(res, f, flen, g, glen, flen + glen - 1, ctx);
 
     /* U = U2*x^(2m) + U1*x^m + U0 */
     /* V = V2*x^(2m) + V1*x^m + V0 */

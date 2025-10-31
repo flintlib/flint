@@ -222,13 +222,46 @@ Randomization
 
     Generates a random polynomial with length up to ``len``.
 
-.. function:: void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
-
-    Generates a random irreducible polynomial with length up to ``len``.
-
 .. function:: void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
 
     Generates a random monic polynomial with length ``len``.
+
+.. function:: void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic trinomial of length ``len``.
+
+.. function:: void nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic pentomial of length ``len``.
+
+Construction of irreducible polynomials
+--------------------------------------------------------------------------------
+
+The following functions assume a prime modulus.
+
+.. function:: void nmod_poly_minimal_irreducible(nmod_poly_t res, ulong n)
+
+    Generates a monic irreducible polynomial of degree ``n`` with minimal
+    weight (minimal number of nonzero terms). We generate a binomial
+    if possible, otherwise a trinomial, etc.
+    It is conjectured that one never needs more than a pentanomial
+    modulo `p = 2` and a tetranomial modulo `p > 2`.
+
+    More specifically, this function returns the first among all minimal-weight
+    polynomials in the following ordering.
+    Firstly, for trinomials, `x^n + a x^k + b` comes before
+    its monic reversal `x^n + a' x^{n-k} + b'` if `k < n - k`.
+    Secondly, writing
+    `f = x^n + a_1 x^{k_1} + a_2 x^{k_2} + \ldots + a_t x^{k_t}`
+    with `n > k_1 > k_2 \ldots > k_t`, we order tuples
+    `(a_1, \ldots, a_{t}, k_1, \ldots, k_t)` lexicographically.
+    We thus favor polynomials with smaller coefficients
+    (all 1 if possible), and secondly with smaller degrees for the
+    middle terms.
+
+.. function:: void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random irreducible polynomial with length up to ``len``.
 
 .. function:: void nmod_poly_randtest_monic_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
 
@@ -239,11 +272,6 @@ Randomization
     Generates a random monic irreducible primitive polynomial with
     length ``len``.
 
-
-.. function:: void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
-
-    Generates a random monic trinomial of length ``len``.
-
 .. function:: int nmod_poly_randtest_trinomial_irreducible(nmod_poly_t poly, flint_rand_t state, slong len, slong max_attempts)
 
     Attempts to set ``poly`` to a monic irreducible trinomial of
@@ -252,10 +280,6 @@ Randomization
     ``max_attempts`` is ``0``, then it will keep generating
     trinomials until an irreducible one is found.  Returns `1` if one
     is found and `0` otherwise.
-
-.. function:: void nmod_poly_randtest_pentomial(nmod_poly_t poly, flint_rand_t state, slong len)
-
-    Generates a random monic pentomial of length ``len``.
 
 .. function:: int nmod_poly_randtest_pentomial_irreducible(nmod_poly_t poly, flint_rand_t state, slong len, slong max_attempts)
 
@@ -772,6 +796,53 @@ Multiplication
     ``poly2`` upon polynomial division by ``f``. ``finv`` is the
     inverse of the reverse of ``f``. It is required that ``poly1`` and
     ``poly2`` are reduced modulo ``f``.
+
+Preconditioned modular multiplication
+--------------------------------------------------------------------------------
+
+.. type:: nmod_poly_mulmod_precond_struct
+          nmod_poly_mulmod_precond_t
+
+    Stores precomputed data for evaluating `ab \bmod d` where both `a`
+    and `d` are fixed.
+
+.. function:: void _nmod_poly_mulmod_precond_init_method(nmod_poly_mulmod_precond_t precond, nn_srcptr a, slong alen, nn_srcptr d, slong dlen, nn_srcptr dinv, slong lendinv, int method, nmod_t mod)
+              void nmod_poly_mulmod_precond_init_method(nmod_poly_mulmod_precond_t precond, const nmod_poly_t a, const nmod_poly_t d, const nmod_poly_t dinv, int method)
+              void _nmod_poly_mulmod_precond_init_num(nmod_poly_mulmod_precond_t precond, nn_srcptr a, slong alen, nn_srcptr d, slong dlen, nn_srcptr dinv, slong lendinv, slong num, nmod_t mod)
+              void nmod_poly_mulmod_precond_init_num(nmod_poly_mulmod_precond_t precond, const nmod_poly_t a, const nmod_poly_t d, const nmod_poly_t dinv, slong num)
+
+    Initialize ``precond`` for computing  `ab \bmod d`.
+    It is assumed that `a` is already reduced modulo `d`.
+    The *method* parameter must be one of the following:
+
+    * ``NMOD_POLY_MULMOD_PRECOND_NONE`` (no precomputation; multiplication will simply delegate to :func:`_nmod_poly_mulmod_preinv`)
+
+    * ``NMOD_POLY_MULMOD_PRECOND_SHOUP`` (use Shoup multiplication)
+
+    * ``NMOD_POLY_MULMOD_PRECOND_MATRIX`` (use the matrix algorithm)
+
+    The *num* versions of these functions attempt to choose the optimal
+    method automatically assuming that one intends to perform *num*
+    multiplications.
+
+    Shallow references to ``a``, ``d`` and ``dinv`` may be stored
+    in ``precond``; the original objects must therefore be kept alive
+    without modification as long as ``precond`` is used.
+    The user must supply the precomputed inverse of ``d``, with the same
+    meaning as in :func:`_nmod_poly_mulmod_preinv` and :func:`nmod_poly_mulmod_preinv`.
+
+.. function:: void nmod_poly_mulmod_precond_clear(nmod_poly_mulmod_precond_t precond)
+
+    Clears ``precond``, freeing any allocated memory.
+
+.. function:: void _nmod_poly_mulmod_precond(nn_ptr res, const nmod_poly_mulmod_precond_t precond, nn_srcptr b, slong blen, nmod_t mod)
+              void nmod_poly_mulmod_precond(nmod_poly_t res, const nmod_poly_mulmod_precond_t precond, const nmod_poly_t b)
+
+    Compute `ab \bmod d` where both `a` and `d` are fixed and represented by
+    the ``precond`` object. We require that `b` is already reduced modulo `d`.
+    The underscore method requires nonzero lengths and does not allow aliasing
+    between the output and any inputs (including ``a`` and ``d``).
+    The non-underscore method allows aliasing between ``b`` and ``res``.
 
 
 Powering

@@ -75,6 +75,7 @@
 #include "t-invsqrt_series.c"
 #include "t-log_series.c"
 #include "t-make_monic.c"
+#include "t-minimal_irreducible.c"
 #include "t-mul.c"
 #include "t-mul_classical.c"
 #include "t-mulhigh.c"
@@ -86,6 +87,7 @@
 #include "t-mullow_classical.c"
 #include "t-mullow_KS.c"
 #include "t-mulmod.c"
+#include "t-mulmod_precond.c"
 #include "t-mulmod_preinv.c"
 #include "t-multi_crt.c"
 #include "t-neg.c"
@@ -199,6 +201,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_invsqrt_series),
     TEST_FUNCTION(nmod_poly_log_series),
     TEST_FUNCTION(nmod_poly_make_monic),
+    TEST_FUNCTION(nmod_poly_minimal_irreducible),
     TEST_FUNCTION(nmod_poly_mul),
     TEST_FUNCTION(nmod_poly_mul_classical),
     TEST_FUNCTION(nmod_poly_mulhigh),
@@ -210,6 +213,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mullow_classical),
     TEST_FUNCTION(nmod_poly_mullow_KS),
     TEST_FUNCTION(nmod_poly_mulmod),
+    TEST_FUNCTION(nmod_poly_mulmod_precond),
     TEST_FUNCTION(nmod_poly_mulmod_preinv),
     TEST_FUNCTION(nmod_poly_multi_crt),
     TEST_FUNCTION(nmod_poly_neg),

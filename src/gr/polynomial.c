@@ -53,6 +53,22 @@ int _gr_gr_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return _gr_gr_poly_ctx_set_gen_name(ctx, s[0]);
 }
 
+int
+_gr_gr_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+{
+    if (i != 0)
+        return GR_DOMAIN;
+
+    char * var = POLYNOMIAL_CTX(ctx)->var;
+    size_t len = strlen(var);
+    * name = flint_malloc(len + 1);
+    if (* name == NULL)
+        return GR_UNABLE;
+    strncpy(* name, var, len + 1);
+
+    return GR_SUCCESS;
+}
+
 void
 polynomial_ctx_clear(gr_ctx_t ctx)
 {
@@ -673,6 +689,47 @@ polynomial_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, const gr_poly_t pol, in
     return GR_FACTOR_OP(cctx, POLY_FACTOR)(c, fac, mult, pol, flags, cctx);
 }
 
+/* TODO: account for sparsity */
+#define MUL_KS_CUTOFF 5
+
+/* Don't do extremely deep recursive KS; the polynomials will
+   typically be too sparse, and we risk blowing up memory too. */
+#define MUL_KS_DEPTH_LIMIT 3
+
+/* Assume that the underlying polynomial ring has asymptotically
+   fast univariate multiplication if it overrides the default
+   multiplication routine. */
+
+static int
+want_KS(gr_ctx_t cctx, slong depth)
+{
+    if (cctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
+        return 0;
+
+    /* If the coefficients are polynomials, check the ground ring. */
+    if (depth > MUL_KS_DEPTH_LIMIT)
+        return 0;
+
+    if (cctx->which_ring == GR_CTX_GR_POLY)
+        return want_KS(POLYNOMIAL_ELEM_CTX(cctx), depth + 1);
+
+    return 1;
+}
+
+int
+_polynomial_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+
+    if (len1 < MUL_KS_CUTOFF || len2 < MUL_KS_CUTOFF || n < MUL_KS_CUTOFF)
+        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+
+    if (!want_KS(cctx, 0))
+        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+
+    return _gr_poly_mullow_bivariate_KS(res, poly1, len1, poly2, len2, n, ctx);
+}
+
 
 int _gr_poly_methods_initialized = 0;
 
@@ -694,6 +751,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_poly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_gr_poly_ctx_gen_name},
 
     {GR_METHOD_INIT,        (gr_funcptr) polynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) polynomial_clear},
@@ -760,6 +819,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_GCD,         (gr_funcptr) polynomial_gcd},
 
     {GR_METHOD_FACTOR,      (gr_funcptr) polynomial_factor},
+    {GR_METHOD_POLY_MULLOW, (gr_funcptr) _polynomial_gr_poly_mullow},
 
     {0,                     (gr_funcptr) NULL},
 };

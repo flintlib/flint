@@ -82,7 +82,8 @@ BLAS_LIB_PATH:=@BLAS_LIB_PATH@
 GC_LIB_PATH:=@GC_LIB_PATH@
 NTL_LIB_PATH:=@NTL_LIB_PATH@
 
-CFLAGS:=@CFLAGS@
+_CFLAGS:=@CFLAGS@
+CFLAGS=$(if $(filter inlines.c,$(notdir $<)),$(filter-out -Wmissing-prototypes,$(_CFLAGS)),$(_CFLAGS))
 TESTCFLAGS:=@TESTCFLAGS@
 CPPFLAGS:=-I$(ABS_SRC_DIR) -I$(SRC_DIR) @CPPFLAGS@ -DBUILDING_FLINT
 CPPFLAGS2:=-L$(ABS_FLINT_DIR) $(CPPFLAGS)
@@ -617,7 +618,7 @@ ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
 $(BUILD_DIR)/$(1)/%.o: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	$(CMD) $(CC) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+	$(CMD) $(CC) $$(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(IS_OUT_OF_TREE),1)
@@ -643,7 +644,7 @@ ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
 $(BUILD_DIR)/$(1)/%.lo: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	$(MSG) "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
-	$(CMD) $(CC) $(PIC_FLAG) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+	$(CMD) $(CC) $(PIC_FLAG) $$(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(IS_OUT_OF_TREE),1)

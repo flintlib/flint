@@ -14,6 +14,15 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+typedef struct
+{
+    int base;
+    const char* input;
+    int rv;
+    slong result;
+}
+testcases_t;
+
 TEST_FUNCTION_START(fmpz_set_str, state)
 {
     int i;
@@ -117,6 +126,75 @@ TEST_FUNCTION_START(fmpz_set_str, state)
         fmpz_clear(a);
         fmpz_clear(c);
         mpz_clear(b);
+    }
+
+    /* Test specific cases to ensure proper edge-case handling */
+    testcases_t cases[] =
+    {
+        {10, "", -1, 0},
+        { 0, "", -1, 0},
+        {10, "0", 0, 0},
+        { 0, "0", 0, 0},
+        {10, "-", -1, 0},
+        { 0, "-", -1, 0},
+        {10, "-0", 0, 0},
+        { 0, "-0", 0, 0},
+        {10, "- 2", 0, -2},
+        { 0, "- 2", 0, -2},
+        {10, " -2", 0, -2},
+        { 0, " -2", 0, -2},
+        {10, " - 2", 0, -2},
+        { 0, " - 2", 0, -2},
+        {10, "-  2", 0, -2},
+        { 0, "-  2", 0, -2},
+        {10, "- 2 ", 0, -2},
+        { 0, "- 2 ", 0, -2},
+        {10, "--2", -1, 0},
+        { 0, "--2", -1, 0},
+        {10, "1 2 3", 0, 123},
+        { 0, "1 2 3", 0, 123},
+        {10, "1-2", -1, 0},
+        { 0, "1-2", -1, 0},
+        {10, "f", -1, 0},
+        { 0, "f", -1, 0},
+        { 0, "0x0", 0, 0},
+        { 0, "-0x0", 0, 0},
+        { 0, "0xf", 0, 15},
+        { 0, "-0xf", 0, -15},
+        { 0, "--0xf", -1, 0},
+        { 0, "0x f", 0, 15},
+        { 0, "-0x f", 0, -15},
+        { 0, "- 0x f", 0, -15},
+        { 0, "0 xf", -1, 0},
+        {16, "0x10", -1, 0},
+        { 0, "0x10", 0, 16},
+        { 2, "0b10", -1, 0},
+        { 0, "0b10", 0,  2},
+        { 8, "010", 0, 8},
+        { 0, "010", 0, 8},
+        {10, "010", 0, 10},
+    };
+    for (i = 0; i < sizeof(cases) / sizeof(cases[0]); i++)
+    {
+        fmpz_t a;
+        int ret;
+
+        fmpz_init(a);
+        ret = fmpz_set_str(a, cases[i].input, cases[i].base);
+
+        if (ret != cases[i].rv || ret == 0 && fmpz_get_si(a) != cases[i].result)
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("case = %d\n", i);
+            flint_printf("base = %d, str = %s\n", cases[i].base, cases[i].input);
+            flint_printf("rv = %d, expected = %d\n", ret, cases[i].rv);
+            flint_printf("result = "); fmpz_print(a);
+            flint_printf(", expected = %ld\n", cases[i].result);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_clear(a);
     }
 
     TEST_FUNCTION_END(state);
