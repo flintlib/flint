@@ -73,13 +73,13 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
         diff[i] = qk - 1;
         inv_diff[i] = diff[i];
         qk = nmod_mul(qk, q, mod);
-        prod_diff[i] = nmod_mul(diff[i], prod_diff[i-1], mod);
+        prod_diff[i] = nmod_mul(diff[i], prod_diff[i - 1], mod);
     }
     
     tmp = nmod_inv(prod_diff[d-1], mod);
-    for (i = d-1; i > 0; i--)
+    for (i = d - 1; i > 0; i--)
     {
-        inv_diff[i] = nmod_mul(prod_diff[i-1], tmp, mod);
+        inv_diff[i] = nmod_mul(prod_diff[i - 1], tmp, mod);
         tmp = nmod_mul(tmp, diff[i], mod);
     }
     inv_diff[0] = tmp;

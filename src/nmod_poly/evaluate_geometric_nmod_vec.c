@@ -104,4 +104,3 @@ nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys,
     _nmod_poly_evaluate_geometric_nmod_vec_iter(ys, poly->coeffs,
                                         poly->length, r, n, poly->mod);
 }
-

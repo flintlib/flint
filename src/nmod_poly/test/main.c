@@ -69,6 +69,7 @@
 #include "t-interpolate_nmod_vec_barycentric.c"
 #include "t-interpolate_nmod_vec.c"
 #include "t-interpolate_nmod_vec_fast.c"
+#include "t-interpolate_geometric_nmod_vec_fast.c"
 #include "t-interpolate_nmod_vec_newton.c"
 #include "t-invmod.c"
 #include "t-inv_series_basecase.c"
@@ -196,6 +197,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_barycentric),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_fast),
+    TEST_FUNCTION(nmod_poly_interpolate_geometric_nmod_vec_fast),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_newton),
     TEST_FUNCTION(nmod_poly_invmod),
     TEST_FUNCTION(nmod_poly_inv_series_basecase),

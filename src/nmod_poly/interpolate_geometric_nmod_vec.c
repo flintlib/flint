@@ -22,11 +22,16 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
     nmod_t mod;
 
     N = G->d;
-    FLINT_ASSERT(len == N);
-    nmod_poly_fit_length(poly, N);
-    nmod_poly_zero(poly);
+
+    if (len > N) 
+    {
+        flint_abort();
+    }
+
+    nmod_poly_fit_length(poly, len);
+    poly->length = len;
     
-    if (N == 1)
+    if (len == 1)
     {
         nmod_poly_set_coeff_ui(poly, 0, v[0]);
         return;
@@ -50,10 +55,12 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
 
     nmod_poly_mullow(h, f, G->g2, N);
 
-    for (i = 0; i < N; i++)
+    for (i = 0; i < len; i++)
     {
-        nmod_poly_set_coeff_ui(poly, i, nmod_mul(nmod_poly_get_coeff_ui(h, N - 1 - i), G->z[i], mod));
+        poly->coeffs[i] = nmod_mul(nmod_poly_get_coeff_ui(h, N - 1 - i), G->z[i], mod);
     }
+
+    _nmod_poly_normalise(poly);
 
     nmod_poly_clear(f);
     nmod_poly_clear(h);
