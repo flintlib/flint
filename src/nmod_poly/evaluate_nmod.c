@@ -42,7 +42,7 @@ _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 }
 
 ulong
-_nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod)
+_nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong modn)
 {
     slong m;
     ulong val;
@@ -60,15 +60,15 @@ _nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_pre
 
     for ( ; m >= 0; m--)
     {
-        val = n_mulmod_shoup(c, val, c_precomp, mod.n);
-        val = n_addmod(val, poly[m], mod.n);
+        val = n_mulmod_shoup(c, val, c_precomp, modn);
+        val = n_addmod(val, poly[m], modn);
     }
 
     return val;
 }
 
 ulong
-_nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod)
+_nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong modn)
 {
     slong m;
     ulong val, p_hi, p_lo;
@@ -89,17 +89,12 @@ _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong 
         // computes either val = (c*val mod n) or val = (c*val mod n) + n
         // see documentation of ulong_extras / n_mulmod_shoup for details
         umul_ppmm(p_hi, p_lo, c_precomp, val);
-        val = c * val - p_hi * mod.n;
+        val = c * val - p_hi * modn;
         // lazy addition, yields val in [0..3n-1)
         // --> requires 3n-2 < 2**FLINT_BITS
         val += poly[m];
     }
 
-    // correct excess
-    if (val >= 2*mod.n)
-        return val - 2*mod.n;
-    if (val >= mod.n)
-        return val - mod.n;
     return val;
 }
 
@@ -126,20 +121,29 @@ nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
 
     // if 3*mod.n - 2 < 2**FLINT_BITS, use n_mulmod_shoup, lazy variant
     else
-#if FLINT_BITS == 64
-    if (poly->mod.n <= UWORD(6148914691236517205))
-#else // FLINT_BITS == 32
-    if (poly->mod.n <= UWORD(1431655765))
-#endif
     {
-        const ulong c_precomp = n_mulmod_precomp_shoup(c, poly->mod.n);
-        return _nmod_poly_evaluate_nmod_precomp_lazy(poly->coeffs, poly->length, c, c_precomp, poly->mod);
-    }
+        const ulong modn = poly->mod.n;
 
-    // use n_mulmod_shoup, non-lazy variant
-    else
-    {
-        const ulong c_precomp = n_mulmod_precomp_shoup(c, poly->mod.n);
-        return _nmod_poly_evaluate_nmod_precomp(poly->coeffs, poly->length, c, c_precomp, poly->mod);
+#if FLINT_BITS == 64
+        if (modn <= UWORD(6148914691236517205))
+#else // FLINT_BITS == 32
+        if (modn <= UWORD(1431655765))
+#endif
+        {
+            const ulong c_precomp = n_mulmod_precomp_shoup(c, modn);
+            ulong val = _nmod_poly_evaluate_nmod_precomp_lazy(poly->coeffs, poly->length, c, c_precomp, modn);
+            // correct excess
+            if (val >= 2*modn)
+                return val - 2*modn;
+            if (val >= modn)
+                return val - modn;
+        }
+
+        // use n_mulmod_shoup, non-lazy variant
+        else
+        {
+            const ulong c_precomp = n_mulmod_precomp_shoup(c, modn);
+            return _nmod_poly_evaluate_nmod_precomp(poly->coeffs, poly->length, c, c_precomp, modn);
+        }
     }
 }
