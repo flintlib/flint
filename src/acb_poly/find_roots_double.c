@@ -91,8 +91,8 @@ static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const 
     for(int i=n_start; i<n_end; i++) {
         double s, t;
         /* these formula reduces the risk of overflow */
-        s = z_r[i] == 0 ? 0 : 1/(z_i[i] + z_i[i]*(z_i[i]/z_r[i]));
-        t = z_i[i] == 0 ? 0 : -1/(z_r[i]*(z_r[i]/z_i[i]) + z_i[i]); 
+        s = (z_r[i] == 0) ? 0 : 1/(z_r[i] + z_i[i]*(z_i[i]/z_r[i]));
+        t = (z_i[i] == 0) ? 0 : -1/(z_r[i]*(z_r[i]/z_i[i]) + z_i[i]); 
         iz_r[i] = s;
         iz_i[i] = t;
     }
@@ -256,8 +256,8 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
          * until the next diagonal \:::\:
          *                         :\:::\ */
         for(int j=1; j<d; j++) {
-            memcpy(a, twice_values_r+i+j, CDWBlock*sizeof(double));
-            memcpy(b, twice_values_i+i+j, CDWBlock*sizeof(double));
+            memcpy(a, twice_values_r+i+j, p*sizeof(double));
+            memcpy(b, twice_values_i+i+j, p*sizeof(double));
             for(int k=0; k<CDWBlock; k++) {
                 #pragma STDC FP_CONTRACT ON
                 double q, r, s,t;
