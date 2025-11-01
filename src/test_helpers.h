@@ -59,7 +59,7 @@ test_struct;
 #define TEST_FUNCTION(label) { CAT(test, label), #label }
 
 #define TEST_FUNCTION_START(label, state)               \
-int CAT(test, label)(void)                              \
+static int CAT(test, label)(void)                       \
 {                                                       \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
     char _test_io_string_[128] = #label "                                                        "; \
@@ -69,7 +69,7 @@ int CAT(test, label)(void)                              \
     _start_time_ = clock();
 
 #define TEST_GR_FUNCTION_START(label, state, count_success, count_domain, count_unable) \
-int CAT(test, label)(void)                              \
+static int CAT(test, label)(void)                       \
 {                                                       \
     slong count_success = 0, count_unable = 0, count_domain = 0; \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
@@ -80,7 +80,7 @@ int CAT(test, label)(void)                              \
     _start_time_ = clock();
 
 #define TEST_TEMPLATE_FUNCTION_START(T, label, state)   \
-int TEMPLATE3(test, T, label)(void)                     \
+static int TEMPLATE3(test, T, label)(void)              \
 {                                                       \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
     char _test_io_string_[128] = TEMPLATE_STR(T) "_" #label "                                                      "; \
@@ -90,7 +90,7 @@ int TEMPLATE3(test, T, label)(void)                     \
     _start_time_ = clock();
 
 #define TEST_TEMPLATE2_FUNCTION_START(T, label1, label2, state)\
-int TEMPLATE5(test, T, label1, T, label2)(void)         \
+static int TEMPLATE5(test, T, label1, T, label2)(void)  \
 {                                                       \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
     char _test_io_string_[128] = TEMPLATE_STR(T) "_" #label1 "_" TEMPLATE_STR(T) "_" #label2 "                                                  "; \
