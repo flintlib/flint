@@ -13,6 +13,57 @@
 #include "nmod_poly.h"
 #include "nmod_vec.h"
 #include "stdio.h"
+#include "ulong_extras.h"
+
+void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod)
+{
+    /* assumes len >= n */
+    slong i;
+    ulong j, r;
+
+    if (RQ != A)
+        for (j = 0; j < n; j++)
+            RQ[len-n+j] = A[len-n+j];
+
+    r = len % n;
+    i = len - r - n;  /* multiple of n, >= 0 by assumption */
+
+    for (j = 0; j < r; j++)
+        RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], mod.n);
+
+    i -= n;
+    while (i >= 0)
+    {
+        for (j = 0; j < n; j++)
+            RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], mod.n);
+        i -= n;
+    }
+}
+
+void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod)
+{
+    /* assumes len >= n */
+    slong i;
+    ulong j, r;
+
+    if (RQ != A)
+        for (j = 0; j < n; j++)
+            RQ[len-n+j] = A[len-n+j];
+
+    r = len % n;
+    i = len - r - n;  /* multiple of n, >= 0 by assumption */
+
+    for (j = 0; j < r; j++)
+        RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], mod.n);
+
+    i -= n;
+    while (i >= 0)
+    {
+        for (j = 0; j < n; j++)
+            RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], mod.n);
+        i -= n;
+    }
+}
 
 void _nmod_poly_divrem_xnmc(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod)
 {
@@ -56,10 +107,22 @@ void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n,
         return;
     }
 
+    if (c == 0)
+    {
+        nmod_poly_set_trunc(R, A, n);
+        nmod_poly_shift_right(Q, A, n);
+        return;
+    }
+
     nn_ptr RQ = _nmod_vec_init(len);
 
     /* perform division */
-    _nmod_poly_divrem_xnmc(RQ, A->coeffs, len, n, c, A->mod);
+    if (c == 1)
+        _nmod_poly_divrem_xnm1(RQ, A->coeffs, len, n, A->mod);
+    else if (c == A->mod.n - 1)
+        _nmod_poly_divrem_xnp1(RQ, A->coeffs, len, n, A->mod);
+    else
+        _nmod_poly_divrem_xnmc(RQ, A->coeffs, len, n, c, A->mod);
 
     /* copy remainder R */
     nmod_poly_fit_length(R, n);
