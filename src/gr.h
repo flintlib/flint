@@ -1505,6 +1505,7 @@ matrix_ctx_t;
 
 void gr_ctx_init_matrix_domain(gr_ctx_t ctx, gr_ctx_t base_ring);
 void gr_ctx_init_matrix_space(gr_ctx_t ctx, gr_ctx_t base_ring, slong nrows, slong ncols);
+truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx);
 
 GR_INLINE void gr_ctx_init_matrix_ring(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
