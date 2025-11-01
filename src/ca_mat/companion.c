@@ -11,7 +11,7 @@
 
 #include "ca_mat.h"
 
-void
+static void
 _ca_mat_companion(ca_mat_t A, ca_srcptr poly, const ca_t c, ca_ctx_t ctx)
 {
     slong i, j, n;

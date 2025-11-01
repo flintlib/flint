@@ -10,8 +10,9 @@
 */
 
 #include "fmpz.h"
-#include "gr_poly.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
+#include "gr_poly.h"
 
 int
 gr_generic_poly_factor_roots(
@@ -75,4 +76,3 @@ cleanup:
 
     return status;
 }
-

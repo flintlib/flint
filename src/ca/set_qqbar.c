@@ -138,7 +138,7 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 
 #else
 
-ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
+static ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 {
     ca_field_srcptr res;
     qqbar_t x;
@@ -163,7 +163,7 @@ ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 
 #endif
 
-ca_field_srcptr ca_ctx_get_cyclotomic_field(ca_ctx_t ctx, ulong n)
+static ca_field_srcptr ca_ctx_get_cyclotomic_field(ca_ctx_t ctx, ulong n)
 {
     ca_field_srcptr res;
     qqbar_t x;

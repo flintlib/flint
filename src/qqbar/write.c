@@ -16,7 +16,7 @@
    used for the Python interface, but other wrappers will want
    good printing code too. */
 
-void
+static void
 qqbar_writen(calcium_stream_t out, const qqbar_t x, slong n)
 {
     acb_t t;
@@ -32,7 +32,7 @@ qqbar_writen(calcium_stream_t out, const qqbar_t x, slong n)
     acb_clear(t);
 }
 
-void
+static void
 qqbar_writend(calcium_stream_t out, const qqbar_t x, slong n)
 {
     qqbar_writen(out, x, n);

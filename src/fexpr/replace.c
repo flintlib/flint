@@ -24,7 +24,7 @@
    Otherwise, expr will be initialized to a new expression, with a nonzero
    alloc field.
  */
-int
+static int
 _fexpr_replace_vec(fexpr_t res_view, const fexpr_t expr, fexpr_srcptr xs, fexpr_srcptr ys, slong len)
 {
     slong i, nargs;
