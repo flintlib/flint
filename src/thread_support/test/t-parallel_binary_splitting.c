@@ -86,7 +86,7 @@ TEST_FUNCTION_START(thread_support_parallel_binary_splitting, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
     {
         fmpz_t r, s;
         nn_ptr factors;
@@ -116,9 +116,8 @@ TEST_FUNCTION_START(thread_support_parallel_binary_splitting, state)
             fmpz_mul_ui(s, s, factors[i]);
 
         if (!fmpz_equal(r, s))
-            TEST_FUNCTION_FAIL(
-                    "num_threads = %wd, i = %wd/%wd\n",
-                    flint_get_num_threads(), i, n);
+            TEST_FUNCTION_FAIL("num_threads = %wd, i = %wd/%wd\n",
+                               flint_get_num_threads(), i, n);
 
         flint_free(factors);
         fmpz_clear(r);

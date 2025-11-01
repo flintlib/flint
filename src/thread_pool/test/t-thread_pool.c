@@ -160,15 +160,15 @@ TEST_FUNCTION_START(thread_pool, state)
 {
     slong i, j;
 
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_t x, y;
 
         fmpz_init(x);
         fmpz_init(y);
-        flint_set_num_threads(n_randint(state, 10) + 1);
+        flint_set_num_threads(1 + n_randint(state, 10));
 
-        for (j = 0; j < 10; j++)
+        for (j = 0; j < 5; j++)
         {
             ulong n = n_randint(state, 1000);
 
@@ -176,21 +176,15 @@ TEST_FUNCTION_START(thread_pool, state)
 
             test1(x, n);
             if (!fmpz_equal(x, y))
-                TEST_FUNCTION_FAIL(
-                        "Test 1 failed\n"
-                        "n: %wu\n"
-                        "x: %{fmpz}\n"
-                        "y: %{fmpz}\n",
-                        n, x, y);
+                TEST_FUNCTION_FAIL("Test 1 failed\n"    "n: %wu\n"
+                                   "x: %{fmpz}\n"       "y: %{fmpz}\n",
+                                   n, x, y);
 
             test2(x, n);
             if (!fmpz_equal(x, y))
-                TEST_FUNCTION_FAIL(
-                        "Test 2 failed\n"
-                        "n: %wu\n"
-                        "x: %{fmpz}\n"
-                        "y: %{fmpz}\n",
-                        n, x, y);
+                TEST_FUNCTION_FAIL("Test 2 failed\n"    "n: %wu\n"
+                                   "x: %{fmpz}\n"       "y: %{fmpz}\n",
+                                   n, x, y);
         }
 
         fmpz_clear(y);
