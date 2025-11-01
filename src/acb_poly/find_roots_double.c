@@ -5,7 +5,7 @@
 /* Remove the leading and trailing zero coeffs of the input polynomial */
 static slong trim_zeros(double * z, slong * fz, const double * p, slong n)
 {
-    int i, j;
+    slong i, j;
 
     /* trailing terms with zero coefficients add roots at infinity*/
     for(i=n-1; i>=1 && p[2*i] == 0.0 && p[2*i+1] == 0.0; i--) {
@@ -14,7 +14,7 @@ static slong trim_zeros(double * z, slong * fz, const double * p, slong n)
     }
 
     /* leading terms with zero coefficients add roots at zero*/
-    for(int j=0; j<i && p[2*j] == 0.0 && p[2*j+1] == 0.0; j++) {
+    for(j=0; j<i && p[2*j] == 0.0 && p[2*j+1] == 0.0; j++) {
         z[2*j] = 0.0;
         z[2*j+1] = 0.0;
     }
@@ -31,7 +31,7 @@ static int is_not_counter_clockwise(double a, double b, double x, double y, doub
 /* Computes the lower convex hull of the points (i, y[i]) */
 static slong lower_convex_hull(slong* result, const double* y, slong n)
 {
-    int i, k=0;
+    slong i, k=0;
     for (i=0; i<n; i++) {
         if(isfinite(y[i])) {
             while(k>1 && is_not_counter_clockwise(result[k-2], y[result[k-2]],
@@ -47,13 +47,13 @@ static slong lower_convex_hull(slong* result, const double* y, slong n)
 }
 
 static void initial_values(double* z_r, double* z_i, const double* p_r, const double* p_i,
-                           const slong* np, int m)
+                           const slong* np, slong m)
 {           
-    int q, p = 0;
+    slong i, j, q, p = 0;
     double d, invd, magp, argp, magq, argq, magz, theta,
            pi = acos(-1),
            epsilon = ldexp(1,-50);
-    for(int i=1; i<m; i++) {
+    for(i=1; i<m; i++) {
         q = np[i];
         d = q-p;
         invd = 1/d;
@@ -65,7 +65,7 @@ static void initial_values(double* z_r, double* z_i, const double* p_r, const do
         if(magz == 0.0) {
             magz = ldexp(1, -500/(q-p));
         }
-        for(int j=0; j<q-p; j++) {
+        for(j=0; j<q-p; j++) {
             /* theta = arg of solutions of x^d = -p[p]/p[q] 
              *       = arg(-p[p]/p[q])/d + 2 pi j/d */
             theta = (2*pi*(j+0.5)+argp-argq)/d;
@@ -88,7 +88,7 @@ static void d_swap(double* a, double* b)
 static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const double* z_i,
                            slong n_start, slong n_end)
 {
-    for(int i=n_start; i<n_end; i++) {
+    for(slong i=n_start; i<n_end; i++) {
         double s, t;
         /* these formula reduces the risk of overflow */
         s = (z_r[i] == 0) ? 0 : 1/(z_r[i] + z_i[i]*(z_i[i]/z_r[i]));
@@ -125,7 +125,7 @@ typedef struct {
 static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
 {
     double pivot;
-    slong n_np;
+    slong i, n_np;
 
     /* Set the memory addresses */
     /* z_r and z_i will hold 2(n-1) double each */
@@ -145,7 +145,7 @@ static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const
     v->rp_i  = mem_v+16*n;
 
     /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
-    for(int i=0; i<n; i++) {
+    for(i=0; i<n; i++) {
         v->p_r[i] = p[2*(fz+i)];
         v->p_i[i] = p[2*(fz+i)+1];
         v->rp_r[i] = p[2*(fz+n-1-i)];   
@@ -163,8 +163,8 @@ static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const
 /* Reorder the z : the values at index < n-c satisfy |z| <= 1, and at index >= n-c they satisfy |z|>1 */
 slong double_cpoly_partition_pivot(double* z_r, double* z_i, slong n)
 {
-    int c = 0;
-    for(int i=0; i<n; i++) {
+    slong i, c = 0;
+    for(i=0; i<n; i++) {
         if(z_r[i]*z_r[i] + z_i[i]*z_i[i] > 1) {
             c++;
         } else if(c>0) {
@@ -203,18 +203,20 @@ void double_cpoly_horner(double* results_r, double* results_i,
                          const double* values_r, const double* values_i, slong n_start, slong n_end,
                          const double* coefficients_r, const double* coefficients_i, slong n)
 {
-    for(int i=n_start; i < n_end; i+=CDHBlock) {
+    int p, k;
+    slong i, j;
+    for(i=n_start; i < n_end; i+=CDHBlock) {
         double x[CDHBlock] = {0};
         double y[CDHBlock] = {0};
         double u[CDHBlock] = {0};
         double v[CDHBlock] = {0};
-        int p = (i+CDHBlock<=n_end) ? CDHBlock : ((n_end-n_start)%CDHBlock);
+        p = (i+CDHBlock<=n_end) ? CDHBlock : ((n_end-n_start)%CDHBlock);
         memcpy(u, values_r+i, p*sizeof(double));
         memcpy(v, values_i+i, p*sizeof(double));
-        for(int j=0; j<n; j++) {
+        for(j=0; j<n; j++) {
             double a = coefficients_r[n-1-j];
             double b = coefficients_i[n-1-j];
-            for(int k=0; k<CDHBlock; k++) {
+            for(k=0; k<CDHBlock; k++) {
                 #pragma STDC FP_CONTRACT ON
                 double s,t;
                 s = a + u[k]*x[k] - v[k]*y[k];
@@ -237,7 +239,9 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
 {
-    for(int i=n_start; i < n_end; i+=CDWBlock) {
+    int p, k;
+    slong i, j;
+    for(i=n_start; i < n_end; i+=CDWBlock) {
         double x[CDWBlock] = {0};
         double y[CDWBlock] = {0};
         double u[CDWBlock] = {0};
@@ -255,10 +259,10 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
         /* starts product after diagonal and continues periodically horizontally
          * until the next diagonal \:::\:
          *                         :\:::\ */
-        for(int j=1; j<d; j++) {
+        for(j=1; j<d; j++) {
             memcpy(a, twice_values_r+i+j, p*sizeof(double));
             memcpy(b, twice_values_i+i+j, p*sizeof(double));
-            for(int k=0; k<CDWBlock; k++) {
+            for(k=0; k<CDWBlock; k++) {
                 #pragma STDC FP_CONTRACT ON
                 double q, r, s,t;
                 q = u[k]-a[k];
@@ -279,8 +283,9 @@ static void double_cpoly_wdk_update(double* z_r, double* z_i,
                              const double* wdk_r, const double* wdk_i,
                              slong n_start, slong n_end)
 {
+    slong i;
     double mag_vp, arg_vp, mag_wdk, arg_wdk, pi = acos(-1);
-    for(int i=n_start; i<n_end; i++) {
+    for(i=n_start; i<n_end; i++) {
         if(isfinite(vp_r[i]) && isfinite(vp_i[i]) && ((wdk_r[i]) != 0 || (wdk_i[i] != 0))) {
             mag_vp = hypot(vp_r[i], vp_i[i]);
             arg_vp = atan2(vp_i[i], vp_r[i]);
@@ -336,7 +341,7 @@ void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_it
         for(i=0; i<max_iter; i++) {
             double_cpoly_refine_roots(v, nt);
         }
-        for(int i=0; i<nt-1; i++) {
+        for(i=0; i<nt-1; i++) {
             z[2*(i+fz)] = v->z_r[i];
             z[2*(i+fz)+1] = v->z_i[i];
         }
