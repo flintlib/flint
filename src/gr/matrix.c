@@ -26,7 +26,7 @@ _gr_mat_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
     gr_mat_init(mat, r, c, ctx);
 }
 
-static int
+int
 _gr_mat_check_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
