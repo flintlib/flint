@@ -502,9 +502,13 @@ void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A, const nm
 void _nmod_poly_divrem_newton_n_preinv (nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr Binv, slong lenBinv, nmod_t mod);
 void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv);
 
-ulong _nmod_poly_div_root(nn_ptr Q, nn_srcptr A, slong len, ulong c, nmod_t mod);
+/* Division with special divisors  *******************************************/
 
+ulong _nmod_poly_div_root(nn_ptr Q, nn_srcptr A, slong len, ulong c, nmod_t mod);
 ulong nmod_poly_div_root(nmod_poly_t Q, const nmod_poly_t A, ulong c);
+
+void _nmod_poly_divrem_xnmc(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod);
+void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n, ulong c);
 
 /* Divisibility testing  *****************************************************/
 

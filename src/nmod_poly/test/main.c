@@ -45,6 +45,7 @@
 #include "t-divrem.c"
 #include "t-divrem_newton_n_preinv.c"
 #include "t-div_root.c"
+#include "t-divrem_xnmc.c"
 #include "t-div_series_basecase.c"
 #include "t-div_series.c"
 #include "t-equal_trunc.c"
@@ -171,6 +172,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_divrem),
     TEST_FUNCTION(nmod_poly_divrem_newton_n_preinv),
     TEST_FUNCTION(nmod_poly_div_root),
+    TEST_FUNCTION(nmod_poly_divrem_xnmc),
     TEST_FUNCTION(nmod_poly_div_series_basecase),
     TEST_FUNCTION(nmod_poly_div_series),
     TEST_FUNCTION(nmod_poly_equal_trunc),

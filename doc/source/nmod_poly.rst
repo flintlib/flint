@@ -1225,6 +1225,11 @@ Division
     The algorithm used is to call :func:`div_newton_n` and then multiply out
     and compute the remainder.
 
+
+Division with special divisors
+--------------------------------------------------------------------------------
+
+
 .. function:: ulong _nmod_poly_div_root(nn_ptr Q, nn_srcptr A, slong len, ulong c, nmod_t mod)
 
     Sets ``(Q, len-1)`` to the quotient of ``(A, len)`` on division
@@ -1236,6 +1241,22 @@ Division
 
     Sets `Q` to the quotient of `A` on division by `(x - c)`, and returns
     the remainder, equal to the value of `A` evaluated at `c`.
+
+.. function:: void _nmod_poly_divrem_xnmc(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod);
+
+    Sets the first `n` coefficients of ``RQ`` to the remainder of
+    ``(A, len)`` on division by `x^n - c`, and the next ``len - n``
+    coefficients (from index `n` to index ``len-1``) to the
+    quotient of this division. `A` and `RQ` are allowed to be the
+    same, but may not overlap partially in any other way.
+    Constraints: `len \ge n > 0`, and `c` is reduced modulo
+    ``mod.n``.
+
+.. function:: void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, ulong n, ulong c)
+
+    Sets `Q` and `R` to the quotient and remainder of `A` on division by `x^n -
+    c`. Constraints: `n` is nonzero and ``c`` is reduced modulo the modulus of
+    `A`.
 
 
 Divisibility testing

@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2024 Vincent Neiger
+   Copyright (C) 2025 Vincent Neiger
 
    This file is part of FLINT.
 
@@ -9,49 +9,118 @@
    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "nmod.h"
 #include "profiler.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_vec.h"
 
+static inline ulong
+_get_c_from_ctype(int ctype, flint_rand_t state, ulong modn)
+{
+    if (ctype == 1)
+        return 1;
+    else if (ctype == -1)
+        return -1;
+    else if (ctype == 0)
+        return 0;
+    else
+        return n_randint(state, modn);
+}
+
 typedef struct
 {
     flint_bitcnt_t bits;
     slong length;
+    ulong n;
+    int ctype;  /* 0: c == 0; 1: c == 1; -1: c == -1; else: general*/
 } info_t;
 
-void sample_interface(void * arg, ulong count)
+void sample_divrem(void * arg, ulong count)
 {
-    ulong n;
+    ulong modn;
     info_t * info = (info_t *) arg;
     flint_bitcnt_t bits = info->bits;
     slong length = info->length;
+    ulong n = info->n;
+    ulong c;
+
     slong i, j;
 
-    nmod_poly_t poly;
-    ulong pt;
+    nmod_poly_t poly, div, quo, rem;
 
     FLINT_TEST_INIT(state);
 
-    for (i = 0; i < count; i++)
+    for (i = 0; i < (slong)count; i++)
     {
-        n = n_randbits(state, bits);
-        if (n == UWORD(0)) n++;
+        modn = n_randprime(state, bits, 1);
 
-        nmod_poly_init2(poly, n, length);
+        nmod_poly_init2(poly, modn, length);
         _nmod_poly_set_length(poly, length);
         for (j = 0; j < length; j++)
-            poly->coeffs[j] = n_randint(state, n);
+            poly->coeffs[j] = n_randint(state, modn);
         _nmod_poly_normalise(poly);
 
-        pt = n_randint(state, n);
+        c = _get_c_from_ctype(info->ctype, state, modn);
+
+        nmod_poly_init_mod(quo, poly->mod);
+        nmod_poly_init_mod(rem, poly->mod);
+        nmod_poly_init_mod(div, poly->mod);
+
+        /* divisor xnmc:  b == x**n - c */
+        nmod_poly_set_coeff_ui(div, n, 1);
+        nmod_poly_set_coeff_ui(div, 0, n_negmod(c, modn));
 
         prof_start();
-        for (j = 0; j < 100; j++)
-            nmod_poly_evaluate_nmod(poly, pt);
+        nmod_poly_divrem(quo, rem, poly, div);
         prof_stop();
 
+        nmod_poly_clear(quo);
+        nmod_poly_clear(rem);
+        nmod_poly_clear(poly);
+        nmod_poly_clear(div);
+    }
+
+    FLINT_TEST_CLEAR(state);
+}
+
+void sample_interface(void * arg, ulong count)
+{
+    ulong modn;
+    info_t * info = (info_t *) arg;
+    flint_bitcnt_t bits = info->bits;
+    slong length = info->length;
+    ulong n = info->n;
+    ulong c;
+
+    slong i, j;
+
+    nmod_poly_t poly, quo, rem;
+
+    FLINT_TEST_INIT(state);
+
+    for (i = 0; i < (slong)count; i++)
+    {
+        modn = n_randprime(state, bits, 1);
+
+        nmod_poly_init2(poly, modn, length);
+        _nmod_poly_set_length(poly, length);
+        for (j = 0; j < length; j++)
+            poly->coeffs[j] = n_randint(state, modn);
+        _nmod_poly_normalise(poly);
+
+        c = _get_c_from_ctype(info->ctype, state, modn);
+
+        nmod_poly_init_mod(quo, poly->mod);
+        nmod_poly_init_mod(rem, poly->mod);
+
+        prof_start();
+        nmod_poly_divrem_xnmc(quo, rem, poly, n, c);
+        prof_stop();
+
+        nmod_poly_clear(quo);
+        nmod_poly_clear(rem);
         nmod_poly_clear(poly);
     }
 
@@ -187,74 +256,83 @@ void sample_precomp_lazy(void * arg, ulong count)
 
 int main(void)
 {
-    slong lengths[18] = {1, 2, 3, 4, 6, 8,
-                         10, 12, 16, 20, 32, 45,
-                         64, 128, 256, 1024, 8192, 65536};
+    const int nblengths = 17;
+    slong lengths[17] = {5, 10, 20, 40, 80,
+                        160, 320, 640, 1280, 2560,
+                        5120, 10240, 20480, 40960, 81920,
+                        163840, 327680};
 
     double min, max;
-    double mins[18]; // note: max seems to be consistently identical or extremely close to min
-    double mins_generic[18];
-    double mins_precomp[18];
-    double mins_precomp_lazy[18];
+    double mins_divrem[nblengths];
+    double mins_interface[nblengths];
+    double mins_generic[nblengths];
+    double mins_precomp[nblengths];
+    double mins_precomp_lazy[nblengths];
     info_t info;
     flint_bitcnt_t i;
 
     flint_printf("unit: all measurements in c/l\n");
-    flint_printf("profiled: interface | generic | precomp | precomp_lazy\n");
+    flint_printf("profiled: divrem | interface | generic | precomp | precomp_lazy\n");
 
     for (i = 62; i <= FLINT_BITS; i++)
     {
         info.bits = i;
 
         printf("nbits = %ld\n", i);
-        for (int len = 0; len < 18; ++len)
+        for (int len = 0; len < nblengths; ++len)
         {
             info.length = lengths[len];
+            info.n = FLINT_MAX(1, lengths[len] / 5);
+            info.ctype = 2;
 
+            prof_repeat(&min, &max, sample_divrem, (void *) &info);
+            mins_divrem[len-1] = min;
             prof_repeat(&min, &max, sample_interface, (void *) &info);
-            mins[len-1] = min;
-            prof_repeat(&min, &max, sample_generic, (void *) &info);
+            mins_interface[len-1] = min;
+            /* prof_repeat(&min, &max, sample_generic, (void *) &info); */
             mins_generic[len-1] = min;
-            prof_repeat(&min, &max, sample_precomp, (void *) &info);
+            /* prof_repeat(&min, &max, sample_precomp, (void *) &info); */
             mins_precomp[len-1] = min;
-            prof_repeat(&min, &max, sample_precomp_lazy, (void *) &info);
+            /* prof_repeat(&min, &max, sample_precomp_lazy, (void *) &info); */
             mins_precomp_lazy[len-1] = min;
         }
 
         if (i < FLINT_BITS-1)
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < nblengths; ++len)
             {
-                flint_printf("   len %ld\t%.2lf\t%.2lf\t%.2lf\t%.2lf",
+                flint_printf("   len %ld\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        mins_divrem[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_interface[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR);
                 flint_printf("\n");
             }
         }
         else if (i < FLINT_BITS)
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < nblengths; ++len)
             {
-                flint_printf("   len %ld\t%.2lf\t%.2lf\t%.2lf\t na",
+                flint_printf("   len %ld\t%.1e\t%.1e\t%.1e\t%.1e\t na",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        mins_divrem[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_interface[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR);
                 flint_printf("\n");
             }
         }
         else  // i == FLINT_BITS
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < nblengths; ++len)
             {
-                flint_printf("   len %ld\t%.2lf\t%.2lf\t na \t na",
+                flint_printf("   len %ld\t%.1e\t%.1e\t%.1e\t na \t na",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        mins_divrem[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_interface[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR,
+                        mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR);
                 flint_printf("\n");
             }
         }
