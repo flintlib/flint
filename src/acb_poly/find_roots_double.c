@@ -272,10 +272,26 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
     }
 }
 
+static void double_cpoly_wdk_update(double* z_r, double* z_i,
+                             const double* vp_r, const double* vp_i,
+                             const double* wdk_r, const double* wdk_i, int n)
+{
+    double mag_vp, arg_vp, mag_wdk, arg_wdk, pi = acos(-1);
+    for(int i=0; i<n; i++) {
+        if(isfinite(vp_r[i]) && isfinite(vp_i[i]) && ((wdk_r[i]) != 0 || (wdk_i[i] != 0))) {
+            mag_vp = hypot(vp_r[i], vp_i[i]);
+            arg_vp = atan2(vp_i[i], vp_r[i]);
+            mag_wdk = hypot(wdk_r[i], wdk_i[i]);
+            arg_wdk = atan2(wdk_i[i], wdk_r[i]);
+            z_r[i] = z_r[i] - ( mag_vp / mag_wdk * cos(arg_vp - arg_wdk) );
+            z_i[i] = z_i[i] - ( mag_vp / mag_wdk * sin(arg_vp - arg_wdk) );
+        }
+}
+
 static void double_cpoly_refine_roots(double_field * v, slong n)
 {
     slong n_piv;
-    double_cpoly_partition_pivot(v->z_r, v->z_i, n);
+    n_piv = double_cpoly_partition_pivot(v->z_r, v->z_i, n);
     vector_inverse(v->iz_r + n_piv, v->iz_i + n_piv, v->z_r + n_piv, v->z_i + n_piv, n - n_piv);
     memcpy(v->rz_r, v->z_r, n);
     memcpy(v->rz_i, v->z_i, n);
@@ -285,6 +301,11 @@ static void double_cpoly_refine_roots(double_field * v, slong n)
     /* Direct case */
     double_cpoly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
     double_cpoly_weierstrass(v->wdk_r, v->wdk_i, v->z_r, v->z_i, 0, n_piv, n);
+    /* Inverse case */
+
+    /* Updating the approximations */
+    double_cpoly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv);
+
     
 }
 
