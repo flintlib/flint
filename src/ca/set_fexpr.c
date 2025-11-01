@@ -44,7 +44,7 @@
     } \
     return 0; \
 
-int
+static int
 _ca_set_fexpr(ca_t res, fexpr_vec_t inputs, ca_vec_t outputs, const fexpr_t expr, ca_ctx_t ctx)
 {
     if (fexpr_is_integer(expr))

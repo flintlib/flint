@@ -25,7 +25,7 @@ ca_sqrt_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
     }
 }
 
-void
+static void
 _ca_sqrt_nofactor(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     ca_t y, tmp;

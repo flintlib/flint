@@ -198,6 +198,7 @@ void gr_mpoly_assert_canonical(const gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 /* Random generation */
 
 int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state, slong length, flint_bitcnt_t exp_bits, gr_mpoly_ctx_t ctx);
+int gr_mpoly_randtest_bound(gr_mpoly_t A, flint_rand_t state, slong length, ulong exp_bound, gr_mpoly_ctx_t ctx);
 
 GR_MPOLY_INLINE WARN_UNUSED_RESULT int
 _gr_mpoly_randtest_default(gr_mpoly_t res, flint_rand_t state, gr_mpoly_ctx_t ctx)

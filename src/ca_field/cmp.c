@@ -106,7 +106,7 @@ _fmpz_mpoly_cmp2(const fmpz_mpoly_t x, const fmpz_mpoly_t y, fmpz_mpoly_ctx_t ct
     return 0;
 }
 
-int
+static int
 _fmpz_mpoly_q_cmp(const fmpz_mpoly_q_t x, const fmpz_mpoly_q_t y, fmpz_mpoly_ctx_t ctx)
 {
     int c;
@@ -162,7 +162,7 @@ ca_ext_depth(const ca_ext_t x, ca_ctx_t ctx)
     return CA_EXT_DEPTH(x);
 }
 
-slong
+static slong
 ca_field_depth(const ca_field_t K, ca_ctx_t ctx)
 {
     if (CA_FIELD_LENGTH(K) >= 1)

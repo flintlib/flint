@@ -35,7 +35,7 @@
  * [ 0 0 0 1 ]   [ b20 b21 b22 b23 ]   [ b30 b31 b32 b33 ]
  * [ a b c d ]   [ b30 b31 b32 b33 ]   [ ... ... ... ... ]
  */
-int
+static int
 gr_mat_gr_poly_mullow_companion(gr_mat_t res, gr_mat_t A, gr_mat_t B, slong len, gr_ctx_t poly_ctx)
 {
     gr_ctx_struct *coeff_ctx = POLYNOMIAL_CTX(poly_ctx)->base_ring;

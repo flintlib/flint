@@ -13,6 +13,7 @@
 #include "fexpr_builtin.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_special.h"
 

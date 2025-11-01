@@ -13,7 +13,7 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-void
+static void
 _ca_ctx_init_mctx(ca_ctx_t ctx, slong len)
 {
     while (ctx->mctx_len < len)

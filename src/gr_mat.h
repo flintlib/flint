@@ -63,6 +63,7 @@ typedef int ((*gr_method_mat_reduce_row_op)(slong *, gr_mat_t, slong *, slong *,
 void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
+int _gr_mat_check_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
 gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t FLINT_UNUSED(ctx))

@@ -19,7 +19,7 @@
 /* todo: for matrix "ring", verify that element domain is a ring */
 
 /* todo: recycle storage? */
-void
+static void
 _gr_mat_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
 {
     gr_mat_clear(mat, ctx);
@@ -638,7 +638,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-void
+static void
 _gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong nrows, slong ncols)
 {
     ctx->which_ring = GR_CTX_GR_MAT;
