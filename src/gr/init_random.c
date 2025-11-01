@@ -277,3 +277,52 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
     gr_ctx_println(ctx);
 */
 }
+
+void
+gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state)
+{
+    switch (n_randint(state, 8))
+    {
+        case 0:
+            gr_ctx_init_fmpz_poly(ctx);
+            break;
+        case 1:
+            gr_ctx_init_fmpq_poly(ctx);
+            break;
+        default:
+            gr_ctx_init_gr_poly(ctx, _gr_random_base_ring(state));
+            break;
+    }
+}
+
+void
+gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state)
+{
+    ordering_t ordering = mpoly_ordering_randtest(state);
+
+    switch (n_randint(state, 2))
+    {
+        case 0:
+            gr_ctx_init_gr_mpoly(ctx, _gr_random_base_ring(state), n_randint(state, 3), ordering);
+            break;
+        case 1:
+            gr_ctx_init_fmpz_mpoly(ctx, n_randint(state, 3), mpoly_ordering_randtest(state));
+            break;
+    }
+}
+
+void
+gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
+{
+    gr_ctx_struct * base_ring = _gr_random_base_ring(state);
+
+    switch (n_randint(state, 2))
+    {
+        case 0:
+            gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
+            break;
+        case 1:
+            gr_series_mod_ctx_init(ctx, base_ring, n_randint(state, 6));
+            break;
+    }
+}
