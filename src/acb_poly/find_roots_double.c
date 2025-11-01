@@ -2,74 +2,6 @@
 #include <math.h>
 #include <string.h> /* for memcpy */
 
-/* This field contains 17 array pointers */
-typedef struct {
-    /* arrays storing the input with real and imaginary parts separated */
-    double *z_r;
-    double *rz_r;
-    double *z_i;
-    double *rz_i;
-    double *p_r;
-    double *p_i;
-    /* for the newton polygon, -log(|coeff|) of p */
-    double *malp;
-    /* arrays for the intermediate numerator (vp) and denominator (dk) used
-     * in the Weierstrass-Durand-Kerner iterator */
-    double *vp_r;
-    double *vp_i;
-    double *wdk_r;
-    double *wdk_i;
-    /* arrays for the inverses of points with magnitude >=1 */
-    double *iz_r;
-    double *riz_r;
-    double *iz_i;
-    double *riz_i;
-    double *rp_r;
-    double *rp_i;
-} double_field;
-
-/* Initialize the members of the double_field */
-static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
-{
-    double pivot;
-    slong n_np;
-
-    /* Set the memory addresses */
-    v->z_r   = mem_v+0*n;
-    v->rz_r  = mem_v+1*n;
-    v->z_i   = mem_v+2*n;
-    v->rz_i  = mem_v+3*n;
-    v->p_r   = mem_v+4*n;
-    v->p_i   = mem_v+5*n;
-    v->malp  = mem_v+6*n;
-    v->vp_r  = mem_v+7*n;
-    v->vp_i  = mem_v+8*n;
-    v->wdk_r  = mem_v+9*n;
-    v->wdk_i  = mem_v+10*n;
-    v->iz_r  = mem_v+11*n;
-    v->riz_r = mem_v+12*n;
-    v->iz_i  = mem_v+13*n;
-    v->riz_i = mem_v+14*n;
-    v->rp_r  = mem_v+15*n;
-    v->rp_i  = mem_v+16*n;
-
-    /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
-    for(int i=0; i<n; i++) {
-        v->p_r[i] = p[2*(fz+i)];
-        v->p_i[i] = p[2*(fz+i)+1];
-        v->rp_r[i] = p[2*(fz+n-1-i)];   
-        v->rp_i[i] = p[2*(fz+n-1-i)+1]; 
-        v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i]));
-    }
-
-    /* Computes the Newton polygon as indices in np of length n_np */
-    n_np = lower_convex_hull(np, v->malp, n);
-    
-    /* Computes a first estimation of the roots */
-    initial_values(v->z_r, v->z_i, v->p_r, v->p_i, np, n_np);
-}                         
-
-
 /* Remove the leading and trailing zero coeffs of the input polynomial */
 static slong trim_zeros(double * z, slong * fz, const double * p, slong n)
 {
@@ -146,14 +78,87 @@ static void initial_values(double* z_r, double* z_i, const double* p_r, const do
     }
 }
 
-
-
 static void d_swap(double* a, double* b)
 {
     double t = *a;
     *a = *b;
     *b = t;
 }
+
+static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const double* z_i,
+                           slong n_start, slong n_end)
+{
+    for(int i=n_start; i<n_end; i++) {
+        double s, t;
+        /* these formula reduces the risk of overflow */
+        s = z_r[i] == 0 ? 0 : 1/(z_i[i] + z_i[i]*(z_i[i]/z_r[i]));
+        t = z_i[i] == 0 ? 0 : -1/(z_r[i]*(z_r[i]/z_i[i]) + z_i[i]); 
+        iz_r[i] = s;
+        iz_i[i] = t;
+    }
+}
+
+/* This field contains 13 array pointers, and 4 of them are twice larger
+ * than the others */
+typedef struct {
+    /* arrays storing the input with real and imaginary parts separated */
+    double *z_r;
+    double *z_i;
+    double *p_r;
+    double *p_i;
+    /* for the newton polygon, -log(|coeff|) of p */
+    double *malp;
+    /* arrays for the intermediate numerator (vp) and denominator (dk) used
+     * in the Weierstrass-Durand-Kerner iterator */
+    double *vp_r;
+    double *vp_i;
+    double *wdk_r;
+    double *wdk_i;
+    /* arrays for the inverses of points with magnitude >=1 */
+    double *iz_r;
+    double *iz_i;
+    double *rp_r;
+    double *rp_i;
+} double_field;
+
+/* Initialize the members of the double_field */
+static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
+{
+    double pivot;
+    slong n_np;
+
+    /* Set the memory addresses */
+    /* z_r and z_i will hold 2(n-1) double each */
+    v->z_r   = mem_v+0*n; 
+    v->z_i   = mem_v+2*n;
+    v->p_r   = mem_v+4*n;
+    v->p_i   = mem_v+5*n;
+    v->malp  = mem_v+6*n;
+    v->vp_r  = mem_v+7*n;
+    v->vp_i  = mem_v+8*n;
+    v->wdk_r  = mem_v+9*n;
+    v->wdk_i  = mem_v+10*n;
+    /* iz_r and iz_i will hold 2(n-1) double each */
+    v->iz_r  = mem_v+11*n;
+    v->iz_i  = mem_v+13*n;
+    v->rp_r  = mem_v+15*n;
+    v->rp_i  = mem_v+16*n;
+
+    /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
+    for(int i=0; i<n; i++) {
+        v->p_r[i] = p[2*(fz+i)];
+        v->p_i[i] = p[2*(fz+i)+1];
+        v->rp_r[i] = p[2*(fz+n-1-i)];   
+        v->rp_i[i] = p[2*(fz+n-1-i)+1]; 
+        v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i]));
+    }
+
+    /* Computes the Newton polygon as indices in np of length n_np */
+    n_np = lower_convex_hull(np, v->malp, n);
+    
+    /* Computes a first estimation of the roots */
+    initial_values(v->z_r, v->z_i, v->p_r, v->p_i, np, n_np);
+}                         
 
 /* Reorder the z : the values at index < n-c satisfy |z| <= 1, and at index >= n-c they satisfy |z|>1 */
 slong double_cpoly_partition_pivot(double* z_r, double* z_i, slong n)
@@ -168,19 +173,6 @@ slong double_cpoly_partition_pivot(double* z_r, double* z_i, slong n)
         }
     }             
     return n-c;
-}
-
-static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const double* z_i,
-                           slong n_start, slong n_end)
-{
-    for(int i=n_start; i<n_end; i++) {
-        double s, t;
-        /* these formula reduces the risk of overflow */
-        s = z_r[i] == 0 ? 0 : 1/(z_i[i] + z_i[i]*(z_i[i]/z_r[i]));
-        t = z_i[i] == 0 ? 0 : -1/(z_r[i]*(z_r[i]/z_i[i]) + z_i[i]); 
-        iz_r[i] = s;
-        iz_i[i] = t;
-    }
 }
 
 /* simd parameters for speeding up Horner and Weirstrass weight computation
@@ -243,32 +235,36 @@ void double_cpoly_horner(double* results_r, double* results_i,
 void double_cpoly_weierstrass(double* results_r, double* results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
-                              slong n_start, slong n_end, slong n)
+                              slong n_start, slong n_end, slong d)
 {
     for(int i=n_start; i < n_end; i+=CDWBlock) {
-        double x[CDWBlock] = {lc_r};
-        double y[CDWBlock] = {lc_i};
+        double x[CDWBlock] = {0};
+        double y[CDWBlock] = {0};
         double u[CDWBlock] = {0};
         double v[CDWBlock] = {0};
         double a[CDWBlock] = {0};
         double b[CDWBlock] = {0};
 
         slong p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
+        for(int j=0; j<CDWBlock; j++){
+            x[j] = lc_r;
+            y[j] = lc_i;
+        }
         memcpy(u, twice_values_r+i, p*sizeof(double));
         memcpy(v, twice_values_i+i, p*sizeof(double));
         /* starts product after diagonal and continues periodically horizontally
          * until the next diagonal \:::\:
          *                         :\:::\ */
-        for(int j=0; j<n; j++) {
-            memcpy(a, twice_values_r+i+j+1, CDWBlock);
-            memcpy(b, twice_values_i+i+j+1, CDWBlock);
+        for(int j=1; j<d; j++) {
+            memcpy(a, twice_values_r+i+j, CDWBlock*sizeof(double));
+            memcpy(b, twice_values_i+i+j, CDWBlock*sizeof(double));
             for(int k=0; k<CDWBlock; k++) {
                 #pragma STDC FP_CONTRACT ON
-                double s,t;
-                s = u[k]-a[k];
-                t = v[k]-b[k];
-                s = s*x[k] - t*y[k];
-                t = s*y[k] + t*x[k];
+                double q, r, s,t;
+                q = u[k]-a[k];
+                r = v[k]-b[k];
+                s = q*x[k] - r*y[k];
+                t = q*y[k] + r*x[k];
                 x[k] = s;
                 y[k] = t;
             }
@@ -298,29 +294,30 @@ static void double_cpoly_wdk_update(double* z_r, double* z_i,
 
 static void double_cpoly_refine_roots(double_field * v, slong n)
 {
-    slong n_piv;
+    slong d, n_piv;
     double lc_r, lc_i;
-    n_piv = double_cpoly_partition_pivot(v->z_r, v->z_i, n);
-    vector_inverse(v->iz_r, v->iz_i, v->z_r, v->z_i, 0, n);
+    d = n-1;
+    n_piv = double_cpoly_partition_pivot(v->z_r, v->z_i, d);
+    vector_inverse(v->iz_r, v->iz_i, v->z_r, v->z_i, 0, d);
     /* the vectors are repeated for the function `double_cpoly_weierstrass` */
-    memcpy(v->rz_r, v->z_r, n);
-    memcpy(v->rz_i, v->z_i, n);
-    memcpy(v->riz_r, v->iz_r, n);
-    memcpy(v->riz_i, v->iz_i, n);
+    memcpy(v->z_r+d, v->z_r, d*sizeof(double));
+    memcpy(v->z_i+d, v->z_i, d*sizeof(double));
+    memcpy(v->iz_r+d, v->iz_r, d*sizeof(double));
+    memcpy(v->iz_i+d, v->iz_i, d*sizeof(double));
     /* Dominant computation time */
     /* Direct case */
     lc_r = v->p_r[n-1];
     lc_i = v->p_i[n-1];
     double_cpoly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
-    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, n);
+    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, d);
     double_cpoly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv);
     /* Inverse case */
     lc_r = v->p_r[0];
     lc_i = v->p_i[0];
-    double_cpoly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, n, v->rp_r, v->rp_i, n);
-    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, n, n);
-    double_cpoly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, n);
-    vector_inverse(v->z_r, v->z_i, v->iz_r, v->iz_i, n_piv, n);
+    double_cpoly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, d, v->rp_r, v->rp_i, n);
+    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, d, d);
+    double_cpoly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d);
+    vector_inverse(v->z_r, v->z_i, v->iz_r, v->iz_i, n_piv, d);
 }
 
 void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_iter, int verbose)
