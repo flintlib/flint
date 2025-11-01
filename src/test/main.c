@@ -12,15 +12,15 @@
 /* Include functions *********************************************************/
 
 #include "t-add_ssaaaa.c"
-#include "t-add_sssaaaaaa.c"
 #include "t-flint_clz.c"
 #include "t-flint_ctz.c"
 #include "t-io.c"
 #include "t-memory_manager.c"
+#include "t-nn_add.c"
+#include "t-nn_sub.c"
 #include "t-sdiv_qrnnd.c"
 #include "t-smul_ppmm.c"
 #include "t-sort.c"
-#include "t-sub_dddmmmsss.c"
 #include "t-sub_ddmmss.c"
 #include "t-udiv_qrnnd.c"
 #include "t-udiv_qrnnd_preinv.c"
@@ -31,16 +31,16 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(add_ssaaaa),
-    TEST_FUNCTION(add_sssaaaaaa),
     TEST_FUNCTION(flint_clz),
     TEST_FUNCTION(flint_ctz),
     TEST_FUNCTION(flint_fprintf),
     TEST_FUNCTION(flint_printf),
     TEST_FUNCTION(memory_manager),
+    TEST_FUNCTION(nn_add),
+    TEST_FUNCTION(nn_sub),
     TEST_FUNCTION(sdiv_qrnnd),
     TEST_FUNCTION(smul_ppmm),
     TEST_FUNCTION(flint_sort),
-    TEST_FUNCTION(sub_dddmmmsss),
     TEST_FUNCTION(sub_ddmmss),
     TEST_FUNCTION(udiv_qrnnd),
     TEST_FUNCTION(udiv_qrnnd_preinv),
