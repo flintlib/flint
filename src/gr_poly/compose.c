@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 
 /* compose by poly2 = a*x^n + c, no aliasing; n >= 1 */
-int
+static int
 _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
         gr_srcptr c, gr_srcptr a, slong n, gr_ctx_t ctx)
 {

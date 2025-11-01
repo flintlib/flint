@@ -12,7 +12,7 @@
 #include "mpoly.h"
 #include "gr_mpoly.h"
 
-slong _gr_mpoly_sub(
+static slong _gr_mpoly_sub(
     slong * Alen,
     gr_ptr Acoeffs, ulong * Aexps,
     gr_srcptr Bcoeffs, const ulong * Bexps, slong Blen,

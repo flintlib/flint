@@ -10,8 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "longlong.h"
-#include "fmpz.h"
 #include "fmpq.h"
 #include "gr.h"
 #include "gr_generic.h"
@@ -127,7 +125,7 @@ gr_mat_pow_si(gr_mat_t res, const gr_mat_t mat, slong exp, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 gr_pow_jet(gr_ptr res, gr_srcptr x, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     slong i;
@@ -188,7 +186,7 @@ gr_mat_pow_scalar(gr_mat_t res, const gr_mat_t A, gr_srcptr c, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 gr_pow_fmpq_jet(gr_ptr res, gr_srcptr x, slong len, const fmpq_t c, gr_ctx_t ctx)
 {
     slong i;

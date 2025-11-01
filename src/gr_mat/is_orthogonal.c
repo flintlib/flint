@@ -106,7 +106,7 @@ _gr_mat_is_row_orthogonal(const gr_mat_t A, int unit, gr_ctx_t ctx)
     return res;
 }
 
-truth_t
+static truth_t
 _gr_mat_is_col_orthogonal(const gr_mat_t A, int unit, gr_ctx_t ctx)
 {
     slong n = gr_mat_ncols(A, ctx);

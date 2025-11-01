@@ -13,33 +13,33 @@
 #include "acb_modular.h"
 #include "gr.h"
 
-int _gr_psl2z_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+static int _gr_psl2z_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Modular group (psl2z)");
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_psl2z_init(psl2z_t res, gr_ctx_t ctx)
 {
     psl2z_init(res);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_psl2z_clear(psl2z_t res, gr_ctx_t ctx)
 {
     psl2z_clear(res);
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_psl2z_swap(psl2z_t x, psl2z_t y, gr_ctx_t ctx)
 {
     psl2z_swap(x, y);
 }
 
-int
+static int
 _gr_psl2z_write(gr_stream_t out, psl2z_t x, gr_ctx_t ctx)
 {
     gr_stream_write(out, "[[");
@@ -54,7 +54,7 @@ _gr_psl2z_write(gr_stream_t out, psl2z_t x, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_psl2z_randtest(psl2z_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     if (n_randint(state, 4))
@@ -64,20 +64,20 @@ _gr_psl2z_randtest(psl2z_t res, flint_rand_t state, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_psl2z_equal(const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
 {
     return psl2z_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_psl2z_set(psl2z_t res, const psl2z_t x, gr_ctx_t ctx)
 {
     psl2z_set(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_psl2z_set_other(psl2z_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx->which_ring == GR_CTX_PSL2Z)
@@ -123,20 +123,22 @@ _gr_psl2z_set_other(psl2z_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_psl2z_one(psl2z_t res, gr_ctx_t ctx)
 {
     psl2z_one(res);
     return GR_SUCCESS;
 }
 
-truth_t
+#if 0
+static truth_t
 _gr_psl2z_is_one(const psl2z_t x, gr_ctx_t ctx)
 {
     return psl2z_is_one(x) ? T_TRUE : T_FALSE;
 }
+#endif
 
-int
+static int
 _gr_psl2z_mul(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
 {
     psl2z_mul(res, x, y);
@@ -144,7 +146,7 @@ _gr_psl2z_mul(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
 }
 
 /* todo: should be generic. also want left division */
-int
+static int
 _gr_psl2z_div(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
 {
     psl2z_t t;
@@ -155,7 +157,7 @@ _gr_psl2z_div(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_psl2z_inv(psl2z_t res, const psl2z_t x, gr_ctx_t ctx)
 {
     psl2z_inv(res, x);

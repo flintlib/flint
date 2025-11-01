@@ -14,7 +14,7 @@
 #include "gr_poly.h"
 
 /* evaluate given precomputed powers up to x^m inclusive */
-int
+static int
 _gr_poly_evaluate_rectangular_precomp(gr_ptr res, gr_srcptr poly, slong len, gr_srcptr xpow, slong m, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;

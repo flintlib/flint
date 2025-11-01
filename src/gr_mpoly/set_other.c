@@ -33,7 +33,7 @@ _same_vars(char ** v1, char ** v2, slong n)
     return 1;
 }
 
-int
+static int
 _gr_mpoly_set_gr_mpoly_other(gr_mpoly_t res, const gr_mpoly_t A, gr_mpoly_ctx_t A_ctx, gr_mpoly_ctx_t ctx)
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
@@ -230,7 +230,7 @@ _gr_fmpz_mpoly_ctx_t;
 #define _FMPZ_MPOLY_CTX(ring_ctx) ((_gr_fmpz_mpoly_ctx_t *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 #define _FMPZ_MPOLY_MCTX(ring_ctx) (_FMPZ_MPOLY_CTX(ring_ctx)->mctx)
 
-int
+static int
 _gr_mpoly_set_fmpz_mpoly(gr_mpoly_t res, const fmpz_mpoly_t A, gr_ctx_t A_ctx, gr_mpoly_ctx_t ctx)
 {
     int status;

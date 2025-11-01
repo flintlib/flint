@@ -193,6 +193,7 @@ void qqbar_randtest_nonreal(qqbar_t res, flint_rand_t state, slong deg, slong bi
 void qqbar_print(const qqbar_t x);
 void qqbar_printn(const qqbar_t x, slong n);
 void qqbar_printnd(const qqbar_t x, slong n);
+char * qqbar_get_str_nd(const qqbar_t x, slong n);
 
 /* Comparisons */
 int qqbar_equal(const qqbar_t x, const qqbar_t y);

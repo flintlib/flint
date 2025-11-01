@@ -13,7 +13,7 @@
 #include "gr_vec.h"
 #include "gr_mat.h"
 
-int
+static int
 gr_exp_jet(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
 {
     slong i;

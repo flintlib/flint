@@ -1549,7 +1549,12 @@ int gr_test_approx_binary_op_type_variants(gr_ctx_t R, const char * opname,
     int small_test_values,
     gr_srcptr rel_tol, flint_rand_t state, int test_flags);
 int gr_test_approx_dot(gr_ctx_t R, gr_ctx_t R_ref, slong maxlen, gr_srcptr rel_tol, flint_rand_t state, int test_flags);
-
+int gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
 
 #ifdef __cplusplus
 }

@@ -19,14 +19,14 @@
 /* todo: for matrix "ring", verify that element domain is a ring */
 
 /* todo: recycle storage? */
-void
+static void
 _gr_mat_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
 {
     gr_mat_clear(mat, ctx);
     gr_mat_init(mat, r, c, ctx);
 }
 
-int
+static int
 _gr_mat_check_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -136,11 +136,13 @@ static truth_t matrix_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_ctx_is_complex_vector_space(MATRIX_CTX(ctx)->base_ring);
 }
 
+#if 0
 /* todo: public */
-truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
+static truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
 {
     return (MATRIX_CTX(ctx)->all_sizes) ? T_FALSE : T_TRUE;
 }
+#endif
 
 static truth_t
 matrix_ctx_is_threadsafe(gr_ctx_t ctx)
@@ -638,7 +640,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-void
+static void
 _gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong nrows, slong ncols)
 {
     ctx->which_ring = GR_CTX_GR_MAT;

@@ -98,7 +98,7 @@ cleanup:
     return status;
 }
 
-int
+static int
 _gr_mat_nullspace(slong * _nullity, gr_mat_t X, const gr_mat_t A, int resize, gr_ctx_t ctx)
 {
     slong m, n, rank, nullity;

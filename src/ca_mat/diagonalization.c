@@ -12,7 +12,7 @@
 #include "ca_vec.h"
 #include "ca_mat.h"
 
-truth_t
+static truth_t
 ca_mat_diagonalization_precomp(ca_mat_t D, ca_mat_t P, const ca_mat_t A, const ca_vec_t eigenvalues, const ulong * am, ca_ctx_t ctx)
 {
     int success;

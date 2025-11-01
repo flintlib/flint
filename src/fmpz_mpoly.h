@@ -20,6 +20,7 @@
 #endif
 
 #include "longlong.h"
+#include "acb_types.h"
 #include "mpoly_types.h"
 
 #ifdef __cplusplus
@@ -398,6 +399,8 @@ int _fmpz_pow_fmpz_is_not_feasible(flint_bitcnt_t bbits, const fmpz_t e);
 int fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A, fmpz * const * vals, const fmpz_mpoly_ctx_t ctx);
 ulong fmpz_mpoly_evaluate_all_nmod(const fmpz_mpoly_t A, const ulong * alphas, const fmpz_mpoly_ctx_t ctx, nmod_t fpctx);
 void fmpz_mpoly_evaluate_all_fmpz_mod(fmpz_t ev, const fmpz_mpoly_t A, const fmpz * alphas, const fmpz_mpoly_ctx_t ctx, const fmpz_mod_ctx_t fpctx);
+
+void fmpz_mpoly_evaluate_acb(acb_t res, const fmpz_mpoly_t pol, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx);
 
 int fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx);
 

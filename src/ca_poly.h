@@ -94,6 +94,10 @@ void ca_poly_transfer(ca_poly_t res, ca_ctx_t res_ctx, const ca_poly_t src, ca_c
 
 void ca_poly_set_coeff_ca(ca_poly_t poly, slong n, const ca_t x, ca_ctx_t ctx);
 
+/* Conversions */
+
+void ca_poly_get_fexpr(fexpr_t res, const ca_poly_t A, ulong flags, ca_ctx_t ctx);
+
 /* Random generation */
 
 void ca_poly_randtest(ca_poly_t poly, flint_rand_t state, slong len, slong depth, slong bits, ca_ctx_t ctx);
