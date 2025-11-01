@@ -3,7 +3,10 @@ import ctypes.util
 import sys
 import functools
 
-libflint = ctypes.CDLL("libflint.so")
+if sys.platform == "darwin":
+    libflint = ctypes.CDLL("libflint.dylib")
+else:
+    libflint = ctypes.CDLL("libflint.so")
 libcalcium = libarb = libgr = libflint
 
 T_TRUE = 0
