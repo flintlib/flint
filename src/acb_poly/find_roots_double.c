@@ -170,13 +170,16 @@ slong double_cpoly_partition_pivot(double* z_r, double* z_i, slong n)
     return n-c;
 }
 
-static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const double* z_i, slong n)
+static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const double* z_i,
+                           slong n_start, slong n_end)
 {
-    for(int i=0; i<n; i++) {
-        double s;
-        s = 1/(z_r[i]*z_r[i] + z_i[i]*z_i[i]); 
-        iz_r[i] = z_r[i]*s;
-        iz_i[i] = -z_i[i]*s;
+    for(int i=n_start; i<n_end; i++) {
+        double s, t;
+        /* these formula reduces the risk of overflow */
+        s = z_r[i] == 0 ? 0 : 1/(z_i[i] + z_i[i]*(z_i[i]/z_r[i]));
+        t = z_i[i] == 0 ? 0 : -1/(z_r[i]*(z_r[i]/z_i[i]) + z_i[i]); 
+        iz_r[i] = s;
+        iz_i[i] = t;
     }
 }
 
@@ -238,12 +241,13 @@ void double_cpoly_horner(double* results_r, double* results_i,
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
 void double_cpoly_weierstrass(double* results_r, double* results_i,
+                              double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong n)
 {
     for(int i=n_start; i < n_end; i+=CDWBlock) {
-        double x[CDWBlock] = {1};
-        double y[CDWBlock] = {1};
+        double x[CDWBlock] = {lc_r};
+        double y[CDWBlock] = {lc_i};
         double u[CDWBlock] = {0};
         double v[CDWBlock] = {0};
         double a[CDWBlock] = {0};
@@ -252,7 +256,9 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
         slong p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
         memcpy(u, twice_values_r+i, p*sizeof(double));
         memcpy(v, twice_values_i+i, p*sizeof(double));
-        /* starts product after diagonal and continues periodically horizontally */
+        /* starts product after diagonal and continues periodically horizontally
+         * until the next diagonal \:::\:
+         *                         :\:::\ */
         for(int j=0; j<n; j++) {
             memcpy(a, twice_values_r+i+j+1, CDWBlock);
             memcpy(b, twice_values_i+i+j+1, CDWBlock);
@@ -274,10 +280,11 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
 
 static void double_cpoly_wdk_update(double* z_r, double* z_i,
                              const double* vp_r, const double* vp_i,
-                             const double* wdk_r, const double* wdk_i, int n)
+                             const double* wdk_r, const double* wdk_i,
+                             slong n_start, slong n_end)
 {
     double mag_vp, arg_vp, mag_wdk, arg_wdk, pi = acos(-1);
-    for(int i=0; i<n; i++) {
+    for(int i=n_start; i<n_end; i++) {
         if(isfinite(vp_r[i]) && isfinite(vp_i[i]) && ((wdk_r[i]) != 0 || (wdk_i[i] != 0))) {
             mag_vp = hypot(vp_r[i], vp_i[i]);
             arg_vp = atan2(vp_i[i], vp_r[i]);
@@ -286,29 +293,35 @@ static void double_cpoly_wdk_update(double* z_r, double* z_i,
             z_r[i] = z_r[i] - ( mag_vp / mag_wdk * cos(arg_vp - arg_wdk) );
             z_i[i] = z_i[i] - ( mag_vp / mag_wdk * sin(arg_vp - arg_wdk) );
         }
+    }
 }
 
 static void double_cpoly_refine_roots(double_field * v, slong n)
 {
     slong n_piv;
+    double lc_r, lc_i;
     n_piv = double_cpoly_partition_pivot(v->z_r, v->z_i, n);
-    vector_inverse(v->iz_r + n_piv, v->iz_i + n_piv, v->z_r + n_piv, v->z_i + n_piv, n - n_piv);
+    vector_inverse(v->iz_r, v->iz_i, v->z_r, v->z_i, 0, n);
+    /* the vectors are repeated for the function `double_cpoly_weierstrass` */
     memcpy(v->rz_r, v->z_r, n);
     memcpy(v->rz_i, v->z_i, n);
     memcpy(v->riz_r, v->iz_r, n);
     memcpy(v->riz_i, v->iz_i, n);
     /* Dominant computation time */
     /* Direct case */
+    lc_r = v->p_r[n-1];
+    lc_i = v->p_i[n-1];
     double_cpoly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
-    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, v->z_r, v->z_i, 0, n_piv, n);
+    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, n);
+    double_cpoly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv);
     /* Inverse case */
-
-    /* Updating the approximations */
-    double_cpoly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv);
-
-    
+    lc_r = v->p_r[0];
+    lc_i = v->p_i[0];
+    double_cpoly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, n, v->rp_r, v->rp_i, n);
+    double_cpoly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, n, n);
+    double_cpoly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, n);
+    vector_inverse(v->z_r, v->z_i, v->iz_r, v->iz_i, n_piv, n);
 }
-
 
 void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_iter, int verbose)
 {
