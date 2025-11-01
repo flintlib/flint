@@ -17,7 +17,7 @@
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
-void
+static void
 _fexpr_set_fmpz_poly_decreasing(fexpr_t res, const fmpz * coeffs, slong len, const fexpr_t var)
 {
     slong i, j, num_terms;

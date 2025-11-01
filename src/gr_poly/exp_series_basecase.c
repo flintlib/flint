@@ -18,7 +18,7 @@ Assumes:
     f[0] = exp(h[0])
     hprime[k] = (k+1) * h[k+1]
 */
-int
+static int
 _gr_poly_exp_series_basecase_rec_precomp1(gr_ptr f, gr_srcptr hprime, slong hlen, slong n, gr_ctx_t ctx)
 {
     slong k, l;
@@ -45,7 +45,7 @@ Assumes:
     f[k-1] = 1/k, k >= 2
     hprime[k] = (k+1) * h[k+1]
 */
-int
+static int
 _gr_poly_exp_series_basecase_rec_precomp2(gr_ptr f, gr_srcptr hprime, slong hlen, slong n, gr_ctx_t ctx)
 {
     slong k, l;

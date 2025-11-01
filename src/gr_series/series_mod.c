@@ -306,7 +306,7 @@ int gr_series_mod_sqrt(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 }
 
 
-int
+static int
 _set_truncate_poly(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_elem_ctx, slong n, gr_ctx_t elem_ctx)
 {
     if (x_elem_ctx == elem_ctx)
