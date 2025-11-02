@@ -130,13 +130,15 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
             if (NMOD_CAN_USE_SHOUP(mod))
             {
                 ulong c_precomp = n_mulmod_precomp_shoup(c, modn);
+                int lazy = 0;
 
 #if FLINT_BITS == 64
-                if (n <= UWORD(6148914691236517205))
+                if (modn <= UWORD(6148914691236517205))
 #else // FLINT_BITS == 32
-                if (n <= UWORD(1431655765))
+                if (modn <= UWORD(1431655765))
 #endif
                 {
+                    lazy = 1;
                     _nmod_poly_divrem_xnmc_precomp_lazy(qr1, qr1, a->length, n, c, c_precomp, modn);
                     for (long ii = 0; ii < a->length; ii++)
                     {
@@ -153,7 +155,10 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
                         && _nmod_vec_equal(qr1+n, qok->coeffs, qok->length));
                 if (!result)
                 {
-                    flint_printf("FAIL (vec, precomp):\n");
+                    if (lazy)
+                        flint_printf("FAIL (vec, precomp lazy):\n");
+                    else
+                        flint_printf("FAIL (vec, precomp):\n");
                     flint_printf("a->length = %wd, len = %wu, modn = %wu\n", a->length, len, a->mod.n);
                     flint_printf("n = %wu, c = %wu, input vec qr :\n", n, c);
                     _nmod_vec_print(a->coeffs, a->length, mod), flint_printf("\n\n");
