@@ -254,4 +254,9 @@ main(int argc, char ** argv)                                                \
     return 0;                                                               \
 }
 
+/* macros ********************************************************************/
+
+#define RND(bnd) n_randint(state, bnd)
+#define RNDBITS(bits) n_randtest_bits(state, bits)
+
 #endif

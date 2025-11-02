@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+                  2025 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,42 +13,58 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
+#define ITER_SMALL   1000
+#define ITER_BIG    10000
+#if FLINT64
+# define BITS_SMALL    28
+# define BITS_BIG      48
+#else
+# define BITS_SMALL    28
+# define BITS_BIG      31
+#endif
+
 TEST_FUNCTION_START(n_factor_one_line, state)
 {
     int i, result;
-    slong num_iter;
-    ulong count = UWORD(0);
+    slong nr_tests = 5000 * FLINT_MAX(1, flint_test_multiplier()),
+          nr_success = 0;
 
-    num_iter = 500 * FLINT_MAX(1, flint_test_multiplier());
-
-    for (i = 0; i < num_iter; i++) /* Test random numbers */
+    for (i = 0; i < nr_tests; i++)
     {
-        ulong n1, n2, bits;
+        ulong num, fac;
 
-        do
+        if (n_randint(state, 8))
         {
-#if FLINT64
-            bits = n_randint(state, 44);
-#else
-            bits = n_randint(state, 20);
-#endif
-            n1 = n_randtest_bits(state, bits + 1);
-        } while (n_is_prime(n1) || (n1 == UWORD(1)));
-
-        n2 = n_factor_one_line(n1, 50000);
-
-        if (n2)
+            do num = RNDBITS(RND(BITS_SMALL - 1) + 2);
+            while (n_is_prime(num));
+            fac = n_factor_one_line(num, ITER_SMALL);
+        }
+        else
         {
-            count++;
-            result = ((n1 % n2) == UWORD(0));
+            do num = RNDBITS(RND(BITS_BIG - 1) + 2);
+            while (n_is_prime(num));
+            fac = n_factor_one_line(num, ITER_BIG);
+        }
+
+        if (fac)
+        {
+            nr_success++;
+            result = (num % fac == 0);
 
             if (!result)
-                TEST_FUNCTION_FAIL("n1 = %wu, n2 = %wu\n", n1, n2);
+                TEST_FUNCTION_FAIL("num = %wu, fac = %wu\n", num, fac);
         }
     }
 
-    if (count < 0.9 * num_iter)
-        TEST_FUNCTION_FAIL("Only %wu numbers factored\n", count);
+    if (nr_success < 0.925 * nr_tests)
+        TEST_FUNCTION_FAIL("Only %wu / %wd = %f worked\n",
+                           nr_success, nr_tests,
+                           (double) nr_success / nr_tests);
 
     TEST_FUNCTION_END(state);
 }
+
+#undef ITER_SMALL
+#undef ITER_BIG
+#undef BITS_SMALL
+#undef BITS_BIG

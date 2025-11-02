@@ -14,8 +14,6 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-#ifndef n_factorial_mod2_foolproof
-#define n_factorial_mod2_foolproof n_factorial_mod2_foolproof
 static ulong
 n_factorial_mod2_foolproof(ulong n, ulong p, ulong pinv)
 {
@@ -29,7 +27,6 @@ n_factorial_mod2_foolproof(ulong n, ulong p, ulong pinv)
 
     return prod;
 }
-#endif
 
 TEST_FUNCTION_START(n_factorial_mod2_preinv, state)
 {
@@ -38,21 +35,9 @@ TEST_FUNCTION_START(n_factorial_mod2_preinv, state)
     for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         ulong n, p, pinv, x, y;
-        int type;
 
-        type = n_randint(state, 100);
-
-        if (type == 0)
-        {
-            /* n is big */
-            n = n_randint(state, 1000000);
-        }
-        else
-        {
-            /* n is small */
-            n = n_randint(state, 1000);
-        }
-
+        n = n_randint(state, 256) ? n_randint(state, 1 << 10)
+                                  : n_randint(state, 1 << 19);
         p = n_randtest_not_zero(state);
         pinv = n_preinvert_limb(p);
 
@@ -60,12 +45,9 @@ TEST_FUNCTION_START(n_factorial_mod2_preinv, state)
         y = n_factorial_mod2_foolproof(n, p, pinv);
 
         if (x != y)
-            TEST_FUNCTION_FAIL(
-                    "n = %wu\n"
-                    "p = %wu\n"
-                    "x = %wu\n"
-                    "y = %wu\n",
-                    n, p, x, y);
+            TEST_FUNCTION_FAIL("n = %wu\n"  "p = %wu\n"
+                               "x = %wu\n"  "y = %wu\n",
+                               n, p, x, y);
     }
 
     TEST_FUNCTION_END(state);

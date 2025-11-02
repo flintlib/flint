@@ -12,47 +12,23 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-#ifndef n_factorial_mod2_foolproof
-#define n_factorial_mod2_foolproof n_factorial_mod2_foolproof
-static ulong
-n_factorial_mod2_foolproof(ulong n, ulong p, ulong pinv)
-{
-    ulong prod = UWORD(1) % p;
-
-    while (n)
-    {
-        prod = n_mulmod2_preinv(prod, n, p, pinv);
-        n--;
-    }
-
-    return prod;
-}
-#endif
-
 TEST_FUNCTION_START(n_factorial_fast_mod2_preinv, state)
 {
-    ulong n;
-    int j;
+    slong ix;
 
-    for (n = 0; n < 500 * flint_test_multiplier(); n++)
+    for (ix = 0; ix < 1500 * flint_test_multiplier(); ix++)
     {
-        ulong p, pinv, x, y;
+        ulong n = n_randint(state, 256) ? n_randint(state, 1 << 12)
+                                        : n_randint(state, 1 << 19),
+              p = n_randtest_not_zero(state),
+              pinv = n_preinvert_limb(p),
+              x = n_factorial_fast_mod2_preinv(n, p, pinv),
+              y = n_factorial_mod2_preinv(n, p, pinv);
 
-        for (j = 0; j < 5; j++)
-        {
-            p = n_randtest_not_zero(state);
-            pinv = n_preinvert_limb(p);
-            x = n_factorial_fast_mod2_preinv(n, p, pinv);
-            y = n_factorial_mod2_foolproof(n, p, pinv);
-
-            if (x != y)
-                TEST_FUNCTION_FAIL(
-                        "n = %wu\n"
-                        "p = %wu\n"
-                        "x = %wu\n"
-                        "y = %wu\n",
-                        n, p, x, y);
-        }
+        if (x != y)
+            TEST_FUNCTION_FAIL("n = %wu\n"  "p = %wu\n"
+                               "x = %wu\n"  "y = %wu\n",
+                               n, p, x, y);
     }
 
     TEST_FUNCTION_END(state);

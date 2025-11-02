@@ -15,7 +15,7 @@
 
 TEST_FUNCTION_START(compute_primes, state)
 {
-    slong i, lim = 1000000;
+    slong i, lim = 1 << 19;
     n_primes_t pg;
     ulong * ref_primes;
     double * ref_inverses;
