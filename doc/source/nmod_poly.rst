@@ -1338,14 +1338,14 @@ Evaluation
 .. function:: ulong _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong n)
 
     Evaluates ``poly`` at the value ``c`` modulo ``n``, with lazy reductions
-    modulo `n`. Precisely, if all coefficients of ``poly`` are less than `m`,
-    the input requirement is `m \le 2^{\mathtt{FLINT\_BITS}} - 2n + 1`, and the
-    output value is in `[0, m+2n-1)` and equal to the sought evaluation modulo
-    `n`. In particular the coefficients of ``poly`` need not be reduced modulo
-    ``n``, and the output may not be either. However, the value ``c`` should be
-    reduced modulo `n`.
+    modulo `n`. Precisely, if all coefficients of ``poly`` are less than or
+    equal to `m`, the input requirement is `m + 2n \le
+    2^{\mathtt{FLINT\_BITS}}`, and the output value is in `[0, m+2n)` and equal
+    to the sought evaluation modulo `n`. In particular the coefficients of
+    ``poly`` need not be reduced modulo ``n``, and the output may not be
+    either. However, the value ``c`` should be reduced modulo `n`.
 
-    In the case where `m = n` (coefficients of ``poly`` are reduced modulo
+    In the case where `m = n-1` (coefficients of ``poly`` are reduced modulo
     `n`), then the above leads to the requirement `3n-1 \le
     2^{\mathtt{FLINT\_BITS}}` (this is `n \le 6148914691236517205` for 64 bits,
     and `n \le 1431655765` for 32 bits), and reducing the output just amounts
