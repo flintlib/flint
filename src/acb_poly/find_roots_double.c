@@ -93,6 +93,7 @@ static void vector_inverse(double* iz_r, double* iz_i, const double* z_r, const 
         /* these formula reduces the risk of overflow */
         s = (z_r[i] == 0) ? 0 : 1/(z_r[i] + z_i[i]*(z_i[i]/z_r[i]));
         t = (z_i[i] == 0) ? 0 : -1/(z_r[i]*(z_r[i]/z_i[i]) + z_i[i]); 
+        s = (s==0 && t==0) ? ldexp(1,500) : s;
         iz_r[i] = s;
         iz_i[i] = t;
     }
@@ -125,7 +126,7 @@ typedef struct {
 static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
 {
     double pivot;
-    slong i, n_np;
+    slong i, n_np, k=10;
 
     /* Set the memory addresses */
     /* z_r and z_i will hold 2(n-1) double each */
@@ -151,6 +152,8 @@ static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const
         v->rp_r[i] = p[2*(fz+n-1-i)];   
         v->rp_i[i] = p[2*(fz+n-1-i)+1]; 
         v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i]));
+        /* rounding the valuation helps avoiding nearby initial points */
+        v->malp[i] = round(v->malp[i]/k)*k;
     }
 
     /* Computes the Newton polygon as indices in np of length n_np */
@@ -174,6 +177,30 @@ slong double_cpoly_partition_pivot(double* z_r, double* z_i, slong n)
     }             
     return n-c;
 }
+
+static int compare(const void * first, const void * second)
+{
+    double left[2], right[2], magl, argl, magr, argr, compmag, comparg,epsilon=ldexp(1,-25);
+    int res;
+    memcpy(left, first, 2*sizeof(double));
+    memcpy(right, second, 2*sizeof(double));
+    magl = hypot(left[0], left[1]);
+    argl = atan2(left[1], left[0]);
+    magr = hypot(right[0], right[1]);
+    argr = atan2(right[1], right[0]);
+    compmag = magr/magl - 1;
+    if(compmag < -epsilon){
+        res = -1;
+    } else if(compmag > epsilon) {
+        res = 1;
+    } else {
+        /* returns the -1, 0 or 1 whether argl is lower, equal or greater
+         * than argr */
+        res = (argl < argr) - (argr < argl);
+    }
+    return res;
+}
+
 
 /* simd parameters for speeding up Horner and Weirstrass weight computation
  *   Rbits size of registers
@@ -250,7 +277,7 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
         double b[CDWBlock] = {0};
 
         slong p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
-        for(int j=0; j<CDWBlock; j++){
+        for(j=0; j<CDWBlock; j++){
             x[j] = lc_r;
             y[j] = lc_i;
         }
@@ -345,6 +372,7 @@ void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_it
             z[2*(i+fz)] = v->z_r[i];
             z[2*(i+fz)+1] = v->z_i[i];
         }
+        qsort(z, n, 2*sizeof(double), compare);
 
         flint_free(np);
         flint_free(mem_v);
