@@ -649,18 +649,22 @@ case $host in
       applem1*)
         gcc_cflags_arch="-march=armv8.5-a"
         gcc_cflags_tune=""
+        param_path="arm64/applem1"
         ;;
       applem2*)
         gcc_cflags_arch="-march=armv8.6-a"
         gcc_cflags_tune=""
+        param_path="arm64/applem1"
         ;;
       applem3*)
         gcc_cflags_arch="-march=armv8.6-a"
         gcc_cflags_tune=""
+        param_path="arm64/applem1"
         ;;
       applem4*)
         gcc_cflags_arch="-march=armv8.7-a"
         gcc_cflags_tune=""
+        param_path="arm64/applem1"
         ;;
       aarch64* | armv8*)
         gcc_cflags_arch="-march=armv8-a"
