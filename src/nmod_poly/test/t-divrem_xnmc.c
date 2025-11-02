@@ -108,9 +108,9 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
             if (c == 1 || c == modn - 1)
             {
                 if (c == 1)
-                    _nmod_poly_divrem_xnm1(qr1, qr1, a->length, n, a->mod);
+                    _nmod_poly_divrem_xnm1(qr1, qr1, a->length, n, a->mod.n);
                 else if (c == modn-1)
-                    _nmod_poly_divrem_xnp1(qr1, qr1, a->length, n, a->mod);
+                    _nmod_poly_divrem_xnp1(qr1, qr1, a->length, n, a->mod.n);
 
                 result = (_nmod_vec_equal(qr1, rok->coeffs, rok->length) && _nmod_vec_is_zero(qr1 + rok->length, n - rok->length)
                         && _nmod_vec_equal(qr1+n, qok->coeffs, qok->length));

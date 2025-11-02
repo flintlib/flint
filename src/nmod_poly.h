@@ -507,9 +507,9 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R, const nmod_p
 ulong _nmod_poly_div_root(nn_ptr Q, nn_srcptr A, slong len, ulong c, nmod_t mod);
 ulong nmod_poly_div_root(nmod_poly_t Q, const nmod_poly_t A, ulong c);
 
-void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod);
-void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod);
 void _nmod_poly_divrem_xnmc(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod);
+void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong modn);
+void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong modn);
 void _nmod_poly_divrem_xnmc_precomp(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn);
 void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn);
 void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n, ulong c);

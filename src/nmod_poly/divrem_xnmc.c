@@ -15,7 +15,7 @@
 #include "ulong_extras.h"
 
 /* division by x**n - 1 */
-void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod)
+void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong modn)
 {
     /* assumes len >= n */
     slong i;
@@ -29,19 +29,19 @@ void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t m
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
 
     for (j = 0; j < r; j++)
-        RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], mod.n);
+        RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], modn);
 
     i -= n;
     while (i >= 0)
     {
         for (j = 0; j < n; j++)
-            RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], mod.n);
+            RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], modn);
         i -= n;
     }
 }
 
 /* division by x**n + 1 */
-void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod)
+void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong modn)
 {
     /* assumes len >= n */
     slong i;
@@ -55,13 +55,13 @@ void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t m
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
 
     for (j = 0; j < r; j++)
-        RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], mod.n);
+        RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], modn);
 
     i -= n;
     while (i >= 0)
     {
         for (j = 0; j < n; j++)
-            RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], mod.n);
+            RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], modn);
         i -= n;
     }
 }
@@ -196,10 +196,10 @@ void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n,
 
     /* perform division */
     if (c == 1)
-        _nmod_poly_divrem_xnm1(RQ, A->coeffs, len, n, A->mod);
+        _nmod_poly_divrem_xnm1(RQ, A->coeffs, len, n, A->mod.n);
 
     else if (c == A->mod.n - 1)
-        _nmod_poly_divrem_xnp1(RQ, A->coeffs, len, n, A->mod);
+        _nmod_poly_divrem_xnp1(RQ, A->coeffs, len, n, A->mod.n);
 
     /* if degree below the n_mulmod_shoup threshold, */
     /* or if modulus forbids n_mulmod_shoup usage, use general */
