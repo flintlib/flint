@@ -185,15 +185,15 @@ static int compare(const void * first, const void * second)
     memcpy(left, first, 2*sizeof(double));
     memcpy(right, second, 2*sizeof(double));
     magl = hypot(left[0], left[1]);
-    argl = atan2(left[1], left[0]);
     magr = hypot(right[0], right[1]);
-    argr = atan2(right[1], right[0]);
     compmag = magr/magl - 1;
     if(compmag < -epsilon){
         res = -1;
     } else if(compmag > epsilon) {
         res = 1;
     } else {
+        argl = atan2(left[1], left[0]);
+        argr = atan2(right[1], right[0]);
         /* returns the -1, 0 or 1 whether argl is lower, equal or greater
          * than argr */
         res = (argl < argr) - (argr < argl);
@@ -223,7 +223,7 @@ static int compare(const void * first, const void * second)
 #define DBlock (Nd*Nr/2)
 #define CSBlock (Nd*Nr/2)
 #define CDHBlock (Nd*Nr/4)
-#define CDWBlock (Nd*Nr/6)
+#define CDWBlock (Nd*Nr*8)
 
 /* Horner evaluation */
 void double_cpoly_horner(double* results_r, double* results_i,
@@ -261,7 +261,7 @@ void double_cpoly_horner(double* results_r, double* results_i,
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass(double* results_r, double* results_i,
+void double_cpoly_weierstrass_a(double* results_r, double* results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
@@ -283,13 +283,17 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
         }
         memcpy(u, twice_values_r+i, p*sizeof(double));
         memcpy(v, twice_values_i+i, p*sizeof(double));
+        memcpy(a, u, p*sizeof(double));
+        memcpy(b, v, p*sizeof(double));
         /* starts product after diagonal and continues periodically horizontally
          * until the next diagonal \:::\:
          *                         :\:::\ */
         for(j=1; j<d; j++) {
-            memcpy(a, twice_values_r+i+j, p*sizeof(double));
-            memcpy(b, twice_values_i+i+j, p*sizeof(double));
-            for(k=0; k<CDWBlock; k++) {
+            memmove(a, a + 1, (p-1)*sizeof(double));
+            memmove(b, b + 1, (p-1)*sizeof(double));
+            a[p-1] = twice_values_r[i+j+p-1];
+            b[p-1] = twice_values_i[i+j+p-1];
+            for(k=0; k<p; k++) {
                 #pragma STDC FP_CONTRACT ON
                 double q, r, s,t;
                 q = u[k]-a[k];
@@ -302,6 +306,34 @@ void double_cpoly_weierstrass(double* results_r, double* results_i,
         }
         memcpy(results_r+i, x, p*sizeof(double));
         memcpy(results_i+i, y, p*sizeof(double));
+    }
+}
+
+/* Weights for the Durand-Kerner or Weierstrass iteration */
+/* twice_values_r and twice_values_i have size 2n,
+ * the second half of each array is a copy of the first half */
+void double_cpoly_weierstrass(double* results_r, double* results_i,
+                              double lc_r, double lc_i,
+                              const double* twice_values_r, const double* twice_values_i,
+                              slong n_start, slong n_end, slong d)
+{
+    int p, k;
+    slong i, j;
+    for(i=n_start; i<n_end; i++){
+        results_r[i] = lc_r;
+        results_i[i] = lc_i;
+    }
+    for(j=1; j<d; j++) {
+        for(i=n_start; i < n_end; i++) {
+            double q, r, s, t;
+            q = twice_values_r[i] - twice_values_r[i+j];
+            r = twice_values_i[i] - twice_values_i[i+j];
+            #pragma STDC FP_CONTRACT ON
+            s = q*results_r[i] - r*results_i[i];
+            t = q*results_i[i] + r*results_r[i];
+            results_r[i] = s;
+            results_i[i] = t;
+        }
     }
 }
 
