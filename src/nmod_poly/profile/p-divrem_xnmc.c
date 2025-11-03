@@ -16,6 +16,11 @@
 #include "nmod_poly.h"
 #include "nmod_vec.h"
 
+int
+_nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
+                                        slong lenA, nn_srcptr B, slong lenB,
+                                       nn_srcptr Binv, slong FLINT_UNUSED(lenBinv), nmod_t mod);
+
 static inline ulong
 _get_c_from_ctype(int ctype, flint_rand_t state, ulong modn)
 {
@@ -78,6 +83,51 @@ void sample_divrem(void * arg, ulong count)
         nmod_poly_clear(rem);
         nmod_poly_clear(poly);
         nmod_poly_clear(div);
+    }
+
+    FLINT_TEST_CLEAR(state);
+}
+
+void sample_divrem_sparse(void * arg, ulong count)
+{
+    ulong modn;
+    nmod_t mod;
+    info_t * info = (info_t *) arg;
+    flint_bitcnt_t bits = info->bits;
+    slong length = info->length;
+    ulong n = info->n;
+    ulong c;
+
+    slong i;
+
+    nn_ptr Q, R, A, B;
+
+    FLINT_TEST_INIT(state);
+
+    for (i = 0; i < (slong)count; i++)
+    {
+        modn = n_randprime(state, bits, 1);
+        nmod_init(&mod, modn);
+
+        Q = _nmod_vec_init(length - n);
+        R = _nmod_vec_init(n);
+        A = _nmod_vec_init(length);
+        _nmod_vec_rand(A, state, length, mod);
+        B = _nmod_vec_init(n+1);
+        _nmod_vec_zero(B, n+1);
+
+        c = _get_c_from_ctype(info->ctype, state, modn);
+        B[0] = modn - c;
+        B[n] = 1;
+
+        prof_start();
+        _nmod_poly_divrem_try_sparse(Q, R, A, length, B, n+1, NULL, 0, mod);
+        prof_stop();
+
+        _nmod_vec_clear(Q);
+        _nmod_vec_clear(R);
+        _nmod_vec_clear(A);
+        _nmod_vec_clear(B);
     }
 
     FLINT_TEST_CLEAR(state);
@@ -243,6 +293,7 @@ int main(void)
 
     double min, max;
     double mins_divrem;
+    double mins_divrem_sparse;
     double mins_interface;
     double mins_generic;
     double mins_precomp;
@@ -251,11 +302,11 @@ int main(void)
     flint_bitcnt_t i;
 
     flint_printf("profiled:\n");
-    flint_printf("\t1. divrem\n\t2. poly interface\n\t3. vec general\n");
+    flint_printf("\t1. divrem\n\t1bis. divrem sparse\n\t2. poly interface\n\t3. vec general\n");
     flint_printf("\t4. vec precomp\n\t5. precomp_lazy (no excess correction)\n");
     flint_printf("column c: 0 -> c == -1, 1 -> c == 1, 2 -> c general\n");
     flint_printf("note: variant 2. expected to be faster than variants 3.4.5. when c == 1 or c == -1\n\n");
-    flint_printf("bit c len    n      1.      2.      3.      4.      5.\n");
+    flint_printf("bit c len    n      1.      1bis.   2.      3.      4.      5.\n");
 
     for (i = 62; i <= FLINT_BITS; i++)
     {
@@ -273,6 +324,8 @@ int main(void)
                 {
                     prof_repeat(&min, &max, sample_divrem, (void *) &info);
                     mins_divrem = min/(double)FLINT_CLOCK_SCALE_FACTOR;
+                    prof_repeat(&min, &max, sample_divrem_sparse, (void *) &info);
+                    mins_divrem_sparse = min/(double)FLINT_CLOCK_SCALE_FACTOR;
                     prof_repeat(&min, &max, sample_interface, (void *) &info);
                     mins_interface = min/(double)FLINT_CLOCK_SCALE_FACTOR;
                     prof_repeat(&min, &max, sample_generic, (void *) &info);
@@ -284,23 +337,23 @@ int main(void)
 
                     if (i < FLINT_BITS-1)
                     {
-                        flint_printf("%-4d%-2d%-7d%-7d%.1e %.1e %.1e %.1e %.1e",
+                        flint_printf("%-4d%-2d%-7d%-7d%.1e %.1e %.1e %.1e %.1e %.1e",
                                     info.bits, info.ctype, info.length, info.n,
-                                    mins_divrem, mins_interface, mins_generic, mins_precomp, mins_precomp_lazy);
+                                    mins_divrem, mins_divrem_sparse, mins_interface, mins_generic, mins_precomp, mins_precomp_lazy);
                         flint_printf("\n");
                     }
                     else if (i < FLINT_BITS)
                     {
-                        flint_printf("%-4d%-2d%-7d%-7d%.1e %.1e %.1e %.1e  na",
+                        flint_printf("%-4d%-2d%-7d%-7d%.1e %.1e %.1e %.1e %.1e  na",
                                     info.bits, info.ctype, info.length, info.n,
-                                    mins_divrem, mins_interface, mins_generic, mins_precomp);
+                                    mins_divrem, mins_divrem_sparse, mins_interface, mins_generic, mins_precomp);
                         flint_printf("\n");
                     }
                     else  /* i == FLINT_BITS */
                     {
-                        flint_printf("%-4d%-2d%-7d%-7d%.1e %.1e %.1e  na     na",
+                        flint_printf("%-4d%-2d%-7d%-7d%.1e %.1e %.1e %.1e  na     na",
                                     info.bits, info.ctype, info.length, info.n,
-                                    mins_divrem, mins_interface, mins_generic);
+                                    mins_divrem, mins_divrem_sparse, mins_interface, mins_generic);
                         flint_printf("\n");
                     }
 
