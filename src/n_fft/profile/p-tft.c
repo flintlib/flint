@@ -45,7 +45,7 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     {                                                                            \
         prof_start();                                                            \
         for (ulong j = 0; j < rep; j++)                                          \
-            n_fft_##fun##_variant(coeffs, ilen, olen, depth, 0, Fargs);          \
+            fun##_variant(coeffs, ilen, olen, depth, 0, Fargs);                  \
         prof_stop();                                                             \
     }                                                                            \
                                                                                  \
@@ -54,7 +54,7 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     FLINT_TEST_CLEAR(state);                                                     \
 }                                                                                \
 
-SAMPLE(tft, _draft)
+SAMPLE(tft_node_lazy_4_4, _v1)
 
 void sample_sd_fft(void * arg, ulong count)
 {
@@ -140,7 +140,7 @@ int main()
                 {
                     info.olen = olens[oli];
                     if (k < 5) prof_repeat(min_sd+oli, &max, sample_sd_fft, (void *) &info);
-                    prof_repeat(min+oli, &max, sample_tft_draft, (void *) &info);
+                    prof_repeat(min+oli, &max, sample_tft_node_lazy_4_4_v1, (void *) &info);
                 }
 
                 flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",

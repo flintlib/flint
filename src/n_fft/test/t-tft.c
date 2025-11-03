@@ -28,7 +28,7 @@ TEST_FUNCTION_START(n_fft_tft, state)
     flint_rand_set_seed(state, 846930886L, 1804289395L);
     flint_printf("seeds: %wu, %wu\n", seed1, seed2);
 
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         // take some FFT prime p with max_depth >= 10
         ulong max_depth, prime;
@@ -66,13 +66,19 @@ TEST_FUNCTION_START(n_fft_tft, state)
             roots[2*k+1] = prime - F->tab_w[2*k];  // < prime since F->tab_w[2*k] != 0
         }
 
-        for (ulong depth = 3; depth <= MAX_EVAL_DEPTH; depth++)
+        for (ulong depth = 4; depth <= MAX_EVAL_DEPTH; depth++)
         {
             const ulong len = (UWORD(1) << depth);
-            /* const ulong ilen = 1 + n_randint(state, len); */
-            const ulong ilen = 8 + n_randint(state, len);
-            const ulong olen = 8 * ((8 + n_randint(state, len)) / 8);
-            flint_printf("prime = %wu\n"
+            /* FOR V1: */
+            /* const ulong ilen = 8 + n_randint(state, len); */
+            /* const ulong olen = 8 * ((8 + n_randint(state, len)) / 8); */
+            /* FOR V2: */
+            const ulong ilen = len;
+            ulong olen = len/2 + 8 * (n_randint(state, len/2) / 8);  /* (len/2, len) */
+            if (olen == len/2) olen += 8;
+
+            flint_printf("---\n"
+                    "prime = %wu\n"
                     "ilen = %wu\n"
                     "olen = %wu\n"
                     "root of unity = %wu\n"
@@ -96,7 +102,8 @@ TEST_FUNCTION_START(n_fft_tft, state)
             // evals by TFT
             n_fft_args_t Fargs;
             n_fft_set_args(Fargs, F->mod, F->tab_w);
-            n_fft_tft_draft(p, ilen, olen, depth, 0, Fargs);
+            /* tft_node_lazy_4_4_v1(p, ilen, olen, depth, 0, Fargs); */
+            tft_node_lazy_4_4_v2_olen(p, olen, depth, 0, Fargs);
 
             for (ulong k = 0; k < olen; k++)
             {
