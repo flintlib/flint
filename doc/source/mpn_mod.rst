@@ -94,6 +94,11 @@ Context objects
 Basic operations and arithmetic
 -------------------------------------------------------------------------------
 
+
+.. function:: int mpn_mod_rand(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
+
+   Generates a coefficient uniformly between `0` and `MPN_MOD_CTX_MODULUS(ctx)` exclusive.
+
 .. function:: int mpn_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
               void mpn_mod_ctx_clear(gr_ctx_t ctx)
               truth_t mpn_mod_ctx_is_field(gr_ctx_t ctx)
@@ -109,7 +114,6 @@ Basic operations and arithmetic
               int mpn_mod_set_mpn(nn_ptr res, nn_srcptr x, slong xn, gr_ctx_t ctx)
               int mpn_mod_set_fmpz(nn_ptr res, const fmpz_t x, gr_ctx_t ctx)
               int mpn_mod_set_other(nn_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
-              int mpn_mod_rand(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
               int mpn_mod_randtest(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
               int mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx)
               int mpn_mod_get_fmpz(fmpz_t res, nn_srcptr x, gr_ctx_t ctx)
