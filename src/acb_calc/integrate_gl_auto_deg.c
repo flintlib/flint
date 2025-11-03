@@ -39,7 +39,7 @@ gl_cache_struct;
 
 FLINT_TLS_PREFIX gl_cache_struct * gl_cache = NULL;
 
-void gl_cleanup(void)
+static void gl_cleanup(void)
 {
     slong i;
 
@@ -59,7 +59,7 @@ void gl_cleanup(void)
     gl_cache = NULL;
 }
 
-void gl_init(void)
+static void gl_init(void)
 {
     gl_cache = flint_calloc(1, sizeof(gl_cache_struct));
     flint_register_cleanup_function(gl_cleanup);
@@ -83,7 +83,7 @@ nodes_worker(slong jj, nodes_work_t * work)
 
 /* if k >= 0, compute the node and weight of index k */
 /* if k < 0, compute the first (n+1)/2 nodes and weights (the others are given by symmetry) */
-void
+static void
 acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
 {
     slong n, kk, wp;

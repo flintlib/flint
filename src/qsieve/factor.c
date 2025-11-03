@@ -38,7 +38,7 @@
 # include <windows.h>
 #endif
 
-int compare_facs(const void * a, const void * b)
+static int compare_facs(const void * a, const void * b)
 {
    fmpz * x = (fmpz *) a;
    fmpz * y = (fmpz *) b;

@@ -13,13 +13,11 @@
 #include <math.h>
 #include "fmpq.h"
 #include "fmpz_poly.h"
-#include "qqbar.h"
 #include "fexpr.h"
+#include "qqbar.h"
 #include "fexpr_builtin.h"
 
-int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
-
-int
+static int
 _fexpr_parse_arf(arf_t res, const fexpr_t expr)
 {
     if (fexpr_is_integer(expr))
@@ -141,7 +139,7 @@ _fexpr_parse_arf(arf_t res, const fexpr_t expr)
     return 0;
 }
 
-int
+static int
 _fexpr_parse_mag(mag_t res, const fexpr_t expr)
 {
     int success;
@@ -172,7 +170,7 @@ _fexpr_parse_mag(mag_t res, const fexpr_t expr)
 }
 
 
-int
+static int
 _fexpr_parse_arb(arb_t res, const fexpr_t expr)
 {
     if (fexpr_is_builtin_call(expr, FEXPR_RealBall) && fexpr_nargs(expr) == 2)
@@ -188,7 +186,7 @@ _fexpr_parse_arb(arb_t res, const fexpr_t expr)
     return 0;
 }
 
-int
+static int
 _fexpr_parse_acb(acb_t res, const fexpr_t expr)
 {
     fexpr_t t, u;
@@ -222,7 +220,7 @@ _fexpr_parse_acb(acb_t res, const fexpr_t expr)
     return 0;
 }
 
-int
+static int
 fmpq_set_decimal(fmpq_t res, const char * inp, slong max_bits)
 {
     char * emarker;
@@ -473,7 +471,7 @@ _fexpr_get_rational_arg_pi(fmpq_t res, const fexpr_t expr, int times_i)
     return 0;
 }
 
-void
+static void
 qqbar_set_fmpz_poly_root_indexed(qqbar_t res, const fmpz_poly_t poly, slong root_index)
 {
     qqbar_ptr roots;
@@ -485,7 +483,7 @@ qqbar_set_fmpz_poly_root_indexed(qqbar_t res, const fmpz_poly_t poly, slong root
     _qqbar_vec_clear(roots, d);
 }
 
-void
+static void
 qqbar_set_fmpz_poly_root_nearest(qqbar_t res, const fmpz_poly_t poly, const qqbar_t point)
 {
     qqbar_ptr roots;

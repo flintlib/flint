@@ -17,7 +17,7 @@
 #include "fmpz_mat.h"
 
 /* todo: proper inplace realloc */
-void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
+static void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
 {
     slong i;
     fmpz_mat_t T;

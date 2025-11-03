@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <mpfr.h>
 #include "thread_pool.h"
+#include "fmpz.h"
 
 #if FLINT_USES_GC
 # include <gc.h>
@@ -367,9 +368,7 @@ void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function)
 #endif
 }
 
-void _fmpz_cleanup(void);
-
-void _flint_cleanup(void)
+static void _flint_cleanup(void)
 {
     size_t i;
 

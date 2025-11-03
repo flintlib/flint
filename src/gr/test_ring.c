@@ -17,6 +17,7 @@
 #include "fexpr.h"
 #include "fmpq.h"
 #include "gr.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
@@ -26,7 +27,7 @@ OPTIMIZE_OSIZE
 
 typedef int ((*gr_test_function)(gr_ctx_t, flint_rand_t, int));
 
-int
+static int
 gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t), flint_rand_t state, int test_flags)
 {
     int status, alias;
@@ -96,7 +97,7 @@ gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr
     return status;
 }
 
-int
+static int
 gr_test_set_ui(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -153,7 +154,7 @@ gr_test_set_ui(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_set_si(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -210,7 +211,7 @@ gr_test_set_si(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_set_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -274,7 +275,7 @@ gr_test_set_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_set_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -338,7 +339,7 @@ gr_test_set_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_ui(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -384,7 +385,7 @@ gr_test_get_ui(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_si(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -430,7 +431,7 @@ gr_test_get_si(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -492,7 +493,7 @@ gr_test_get_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -540,7 +541,7 @@ gr_test_get_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_fmpz_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -593,7 +594,7 @@ gr_test_get_fmpz_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_set_d(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -649,7 +650,7 @@ gr_test_get_set_d(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_set_d_2exp_si(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -707,7 +708,7 @@ gr_test_get_set_d_2exp_si(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_set_fexpr(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -759,7 +760,7 @@ gr_test_get_set_fexpr(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_ctx_get_str(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -778,7 +779,7 @@ gr_test_ctx_get_str(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_ctx_gen_names(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -819,7 +820,7 @@ gr_test_ctx_gen_names(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_get_set_str(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -867,7 +868,7 @@ gr_test_get_set_str(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_set_other(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -925,7 +926,7 @@ gr_test_set_other(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_mul_2exp_si(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -981,7 +982,7 @@ gr_test_mul_2exp_si(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_mul_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1045,7 +1046,7 @@ gr_test_mul_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_binary_op_type_variants(gr_ctx_t R,
     const char * opname,
     int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
@@ -1191,7 +1192,7 @@ gr_test_binary_op_type_variants(gr_ctx_t R,
     return status;
 }
 
-int
+static int
 gr_test_binary_op_associative(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t), flint_rand_t state, int test_flags)
 {
     int status;
@@ -1241,7 +1242,7 @@ gr_test_binary_op_associative(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_src
     return status;
 }
 
-int
+static int
 gr_test_binary_op_commutative(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t), flint_rand_t state, int test_flags)
 {
     int status;
@@ -1282,7 +1283,7 @@ gr_test_binary_op_commutative(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_src
 /*
 test x op (y op2 z) = (x op y) op2 (x op z)
 */
-int
+static int
 gr_test_binary_op_left_distributive(gr_ctx_t R,
     int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
     int (*gr_op2)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
@@ -1335,7 +1336,7 @@ gr_test_binary_op_left_distributive(gr_ctx_t R,
 /*
 test (y op2 z) op x = (y op x) op2 (z op x)
 */
-int
+static int
 gr_test_binary_op_right_distributive(gr_ctx_t R,
     int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
     int (*gr_op2)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
@@ -1385,7 +1386,7 @@ gr_test_binary_op_right_distributive(gr_ctx_t R,
     return status;
 }
 
-int
+static int
 gr_test_init_clear(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1429,7 +1430,7 @@ gr_test_init_clear(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_equal(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1469,7 +1470,7 @@ gr_test_equal(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_swap(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1512,7 +1513,7 @@ gr_test_swap(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1559,7 +1560,7 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_randtest_not_zero(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1586,7 +1587,7 @@ gr_test_randtest_not_zero(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 
-int
+static int
 gr_test_one(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1617,13 +1618,13 @@ gr_test_one(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_add_associative(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_associative(R, gr_add, state, test_flags);
 }
 
-int
+static int
 gr_test_neg(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1678,19 +1679,19 @@ gr_test_neg(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_add_commutative(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_commutative(R, gr_add, state, test_flags);
 }
 
-int
+static int
 gr_test_add_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_aliasing(R, gr_add, state, test_flags);
 }
 
-int
+static int
 gr_test_add_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "add",
@@ -1698,7 +1699,7 @@ gr_test_add_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             0, 0, state, test_flags);
 }
 
-int
+static int
 gr_test_sub_equal_neg_add(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1741,13 +1742,13 @@ gr_test_sub_equal_neg_add(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_sub_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_aliasing(R, gr_sub, state, test_flags);
 }
 
-int
+static int
 gr_test_sub_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "sub",
@@ -1755,38 +1756,38 @@ gr_test_sub_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             0, 0, state, test_flags);
 }
 
-int
+static int
 gr_test_mul_associative(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_associative(R, gr_mul, state, test_flags);
 }
 
-int
+static int
 gr_test_mul_commutative(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_commutative(R, gr_mul, state, test_flags);
 }
 
-int
+static int
 gr_test_mul_left_distributive(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_left_distributive(R, gr_mul, gr_add, state, test_flags);
 }
 
-int
+static int
 gr_test_mul_right_distributive(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_right_distributive(R, gr_mul, gr_add, state, test_flags);
 }
 
 
-int
+static int
 gr_test_mul_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_aliasing(R, gr_mul, state, test_flags);
 }
 
-int
+static int
 gr_test_mul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "mul",
@@ -1794,7 +1795,7 @@ gr_test_mul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             0, 0, state, test_flags);
 }
 
-int
+static int
 gr_test_addmul_submul(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1892,7 +1893,7 @@ gr_test_addmul_submul(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_addmul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "addmul",
@@ -1900,7 +1901,7 @@ gr_test_addmul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             1, 0, state, test_flags);
 }
 
-int
+static int
 gr_test_submul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "submul",
@@ -1908,13 +1909,13 @@ gr_test_submul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             1, 0, state, test_flags);
 }
 
-int
+static int
 gr_test_div_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_aliasing(R, gr_div, state, test_flags);
 }
 
-int
+static int
 gr_test_div_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "div",
@@ -1922,7 +1923,7 @@ gr_test_div_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             0, 0, state, test_flags);
 }
 
-int
+static int
 gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -1962,7 +1963,7 @@ gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_inv_involution(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2000,7 +2001,7 @@ gr_test_inv_involution(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_inv_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2045,13 +2046,13 @@ gr_test_inv_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_div_right_distributive(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_right_distributive(R, gr_div, gr_add, state, test_flags);
 }
 
-int
+static int
 gr_test_div_then_mul(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2092,7 +2093,7 @@ gr_test_div_then_mul(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2133,7 +2134,7 @@ gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2191,7 +2192,7 @@ gr_test_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 /* todo: fmpq */
-int
+static int
 gr_test_divexact_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status, alias, which;
@@ -2288,7 +2289,7 @@ gr_test_divexact_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_div_nonunique(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -2362,13 +2363,13 @@ gr_test_div_nonunique(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_div_nonunique_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_aliasing(R, gr_div_nonunique, state, test_flags);
 }
 
-int
+static int
 gr_test_divides(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -2744,7 +2745,7 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flag
     return status;
 }
 
-int
+static int
 gr_test_pow_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2799,7 +2800,7 @@ gr_test_pow_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_pow_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -2855,7 +2856,7 @@ gr_test_pow_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_pow_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "pow",
@@ -2863,7 +2864,7 @@ gr_test_pow_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
             0, 1, state, test_flags);
 }
 
-int
+static int
 gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -2930,7 +2931,7 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_rsqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -2983,7 +2984,7 @@ gr_test_rsqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_ordered_ring_cmp(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -3053,7 +3054,7 @@ gr_test_ordered_ring_cmp(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_ordered_ring_cmpabs(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -3097,7 +3098,7 @@ gr_test_ordered_ring_cmpabs(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_complex_parts(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -3162,7 +3163,7 @@ gr_test_complex_parts(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 
-int
+static int
 gr_test_gcd(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -3221,7 +3222,7 @@ gr_test_gcd(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 /* verify that LCM(a, b) GCD(a, b) ~ a b */
-int
+static int
 gr_test_lcm(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -3287,7 +3288,7 @@ gr_test_lcm(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_numerator_denominator(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -3328,7 +3329,7 @@ gr_test_numerator_denominator(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_canonical_associate(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -3529,7 +3530,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+static int
 gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
     int (*_gr_vec_op)(gr_ptr, gr_srcptr, gr_srcptr, slong, gr_ctx_t), flint_rand_t state, int test_flags)
 {
@@ -3622,13 +3623,15 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
     return status;
 }
 
-int gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_add", gr_add, _gr_vec_add, state, test_flags); }
-int gr_test_vec_sub(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_sub", gr_sub, _gr_vec_sub, state, test_flags); }
-int gr_test_vec_mul(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_mul", gr_mul, _gr_vec_mul, state, test_flags); }
-int gr_test_vec_div(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_div", gr_div, _gr_vec_div, state, test_flags); }
-int gr_test_vec_pow(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_pow", gr_pow, _gr_vec_pow, state, test_flags); }
+static int gr_test_vec_add(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_add", gr_add, _gr_vec_add, state, test_flags); }
+static int gr_test_vec_sub(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_sub", gr_sub, _gr_vec_sub, state, test_flags); }
+static int gr_test_vec_mul(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_mul", gr_mul, _gr_vec_mul, state, test_flags); }
+static int gr_test_vec_div(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_div", gr_div, _gr_vec_div, state, test_flags); }
+#if 0
+static int gr_test_vec_pow(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_pow", gr_pow, _gr_vec_pow, state, test_flags); }
+#endif
 
-int gr_test_vec_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
+static int gr_test_vec_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status, aliasing, ref_aliasing;
     slong i, len;
@@ -3725,7 +3728,7 @@ int gr_test_vec_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 
-int
+static int
 gr_test_vec_binary_op_scalar(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
     int (*_gr_vec_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_t), flint_rand_t state, int test_flags)
 {
@@ -3792,11 +3795,9 @@ gr_test_vec_binary_op_scalar(gr_ctx_t R, const char * opname, int (*gr_op)(gr_pt
     return status;
 }
 
-int gr_test_vec_mul_scalar(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op_scalar(R, "vec_mul_scalar", gr_mul, _gr_vec_mul_scalar, state, test_flags); }
+static int gr_test_vec_mul_scalar(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op_scalar(R, "vec_mul_scalar", gr_mul, _gr_vec_mul_scalar, state, test_flags); }
 
-int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
-
-int
+static int
 gr_test_vec_dot(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -3873,7 +3874,7 @@ gr_test_vec_dot(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 /* (AB)C = A(BC) */
-int
+static int
 gr_test_mat_mul_classical_associative(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
@@ -3950,7 +3951,7 @@ gr_test_mat_mul_classical_associative(gr_ctx_t R, flint_rand_t state, int test_f
     return status;
 }
 
-int
+static int
 gr_test_integral_domain(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -3991,7 +3992,8 @@ gr_test_integral_domain(gr_ctx_t R, flint_rand_t state, int test_flags)
     return status;
 }
 
-int
+#if 0
+static int
 gr_test_field(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -4046,6 +4048,7 @@ gr_test_field(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     return status;
 }
+#endif
 
 int
 gr_test_cmp_fun(gr_ctx_t R, gr_method_binary_op_get_int op, gr_ctx_t R_ref, flint_rand_t state, int test_flags)
@@ -4552,7 +4555,7 @@ gr_test_approx_dot(gr_ctx_t R, gr_ctx_t R_ref, slong maxlen, gr_srcptr rel_tol, 
     return status;
 }
 
-void
+static void
 gr_test_iter(gr_ctx_t R, flint_rand_t state, const char * descr, gr_test_function func, slong iters, int test_flags)
 {
     slong iter, count_success, count_unable, count_domain;

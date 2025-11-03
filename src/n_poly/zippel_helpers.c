@@ -13,14 +13,9 @@
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
 #include "n_poly.h"
+#include "fq_nmod_mpoly/impl.h"
 
 /**************** product of roots *******************************************/
-
-void fq_nmod_poly_product_roots(
-    fq_nmod_poly_t master,
-    const fq_nmod_struct * monomials,
-    slong mlength,
-    const fq_nmod_ctx_t ctx);
 
 void n_fq_poly_product_roots_n_fq(
     n_poly_t master,

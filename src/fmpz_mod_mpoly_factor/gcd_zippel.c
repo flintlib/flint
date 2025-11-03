@@ -116,7 +116,7 @@ static int fmpz_mod_poly_add_zip_must_match(
         sum_j c_ij alpha^((k+1)e_j) = s_k g_ik  for 0 <= i <= degree(gcd)
 
 */
-int fmpz_mod_mpolyl_gcds_zippel(
+static int fmpz_mod_mpolyl_gcds_zippel(
     fmpz_mod_mpoly_t G, const ulong * Gmarks, slong Gmarkslen,
     fmpz_mod_mpoly_t A,
     fmpz_mod_mpoly_t B,

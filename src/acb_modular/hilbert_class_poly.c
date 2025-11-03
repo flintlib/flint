@@ -101,7 +101,7 @@ clear(arb_poly_t x, void * args)
     arb_poly_clear(x);
 }
 
-int
+static int
 _acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D,
         const slong * qbf, slong qbf_len, slong prec)
 {

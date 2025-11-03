@@ -13,7 +13,7 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-void
+static void
 _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
                         const fmpq_mat_struct ** mat, slong n)
 {

@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-int _nmod_mpoly_equal(const ulong * coeff1, const ulong * exp1,
+static int _nmod_mpoly_equal(const ulong * coeff1, const ulong * exp1,
                       const ulong * coeff2, const ulong * exp2,
                                                             slong len, slong N)
 {

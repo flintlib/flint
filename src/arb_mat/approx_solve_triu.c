@@ -18,7 +18,7 @@ arb_approx_div(arb_t z, const arb_t x, const arb_t y, slong prec)
     arf_div(arb_midref(z), arb_midref(x), arb_midref(y), prec, ARB_RND);
 }
 
-void
+static void
 arb_mat_approx_solve_triu_classical(arb_mat_t X, const arb_mat_t U,
     const arb_mat_t B, int unit, slong prec)
 {
@@ -55,7 +55,7 @@ arb_mat_approx_solve_triu_classical(arb_mat_t X, const arb_mat_t U,
     arb_clear(s);
 }
 
-void
+static void
 arb_mat_approx_solve_triu_recursive(arb_mat_t X,
         const arb_mat_t U, const arb_mat_t B, int unit, slong prec)
 {

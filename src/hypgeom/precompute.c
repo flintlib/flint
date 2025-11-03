@@ -15,7 +15,7 @@
 
 /* Compute a pure ratio P2(k)/Q2(k) for the term
    A(k)/B(k) * [P(1)P(2)...P(k)] / [Q(1)Q(2)...Q(k)] */
-void
+static void
 hypgeom_standardize(fmpz_poly_t P2, fmpz_poly_t Q2,
     const fmpz_poly_t A, const fmpz_poly_t B,
     const fmpz_poly_t P, const fmpz_poly_t Q)
@@ -58,7 +58,7 @@ fmpz_cdiv_abs_q(fmpz_t q, const fmpz_t x, const fmpz_t y)
     }
 }
 
-slong
+static slong
 hypgeom_root_norm(const fmpz_poly_t P)
 {
     slong res, i, p;
@@ -100,7 +100,7 @@ fmpz_poly_evaluate_si(fmpz_t y, const fmpz_poly_t poly, slong x)
     fmpz_poly_evaluate_fmpz(y, poly, y);
 }
 
-void
+static void
 _hypgeom_precompute(hypgeom_t hyp, const fmpz_poly_t P, const fmpz_poly_t Q)
 {
     slong k;

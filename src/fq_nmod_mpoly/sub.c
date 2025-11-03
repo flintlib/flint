@@ -14,7 +14,7 @@
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-slong _fq_nmod_mpoly_sub(
+static slong _fq_nmod_mpoly_sub(
     ulong * Acoeffs, ulong * Aexps,
     ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     ulong * Ccoeffs, const ulong * Cexps, slong Clen,

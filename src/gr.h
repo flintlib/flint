@@ -265,6 +265,8 @@ typedef enum
     GR_METHOD_POW_OTHER,
     GR_METHOD_OTHER_POW,
 
+    GR_METHOD_DERIVATIVE_GEN,
+
     GR_METHOD_IS_SQUARE,
     GR_METHOD_SQRT,
     GR_METHOD_RSQRT,
@@ -1131,6 +1133,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq
 GR_INLINE WARN_UNUSED_RESULT int gr_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, POW_OTHER)(res, x, y, y_ctx, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_POW)(res, x, x_ctx, y, ctx); }
 
+GR_INLINE WARN_UNUSED_RESULT int gr_derivative_gen(gr_ptr res, gr_srcptr x, slong var, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DERIVATIVE_GEN)(res, x, var, ctx); }
+
 GR_INLINE WARN_UNUSED_RESULT int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQRT)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RSQRT)(res, x, ctx); }
 GR_INLINE truth_t gr_is_square(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_SQUARE)(x, ctx); }
@@ -1501,6 +1505,7 @@ matrix_ctx_t;
 
 void gr_ctx_init_matrix_domain(gr_ctx_t ctx, gr_ctx_t base_ring);
 void gr_ctx_init_matrix_space(gr_ctx_t ctx, gr_ctx_t base_ring, slong nrows, slong ncols);
+truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx);
 
 GR_INLINE void gr_ctx_init_matrix_ring(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {
@@ -1545,7 +1550,12 @@ int gr_test_approx_binary_op_type_variants(gr_ctx_t R, const char * opname,
     int small_test_values,
     gr_srcptr rel_tol, flint_rand_t state, int test_flags);
 int gr_test_approx_dot(gr_ctx_t R, gr_ctx_t R_ref, slong maxlen, gr_srcptr rel_tol, flint_rand_t state, int test_flags);
-
+int gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags);
+int gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags);
 
 #ifdef __cplusplus
 }

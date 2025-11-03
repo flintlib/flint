@@ -11,6 +11,7 @@
 
 #include "ca_ext.h"
 #include "ca_field.h"
+#include "ca_field/impl.h"
 
 ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x, ca_ctx_t ctx)
 {
@@ -42,7 +43,7 @@ ca_field_ptr ca_field_cache_lookup_qqbar(ca_field_cache_t cache, const qqbar_t x
     flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 }
 
-ulong
+static ulong
 _ca_field_hash(ca_ext_struct ** ext, slong len, ca_ctx_t ctx)
 {
     ulong s;
@@ -55,7 +56,7 @@ _ca_field_hash(ca_ext_struct ** ext, slong len, ca_ctx_t ctx)
     return s;
 }
 
-ulong
+static ulong
 ca_field_hash(const ca_field_t K, ca_ctx_t ctx)
 {
     return _ca_field_hash(K->ext, K->length, ctx);
@@ -75,7 +76,7 @@ static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len
     return 1;
 }
 
-void
+static void
 ca_field_init_set_ext(ca_field_t K, ca_ext_struct ** ext, slong len, ca_ctx_t ctx)
 {
     if (len == 0)

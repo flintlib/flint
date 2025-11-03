@@ -99,7 +99,7 @@ static void _fmpz_mat_charpoly_small_3x3(fmpz *rop, const fmpz_mat_t x)
     fmpz_clear(a + 1);
 }
 
-void _fmpz_mat_charpoly_small(fmpz * rop, const fmpz_mat_t op)
+static void _fmpz_mat_charpoly_small(fmpz * rop, const fmpz_mat_t op)
 {
     if (op->r == 0)
     {

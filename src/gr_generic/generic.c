@@ -42,7 +42,7 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx)
     return T_FALSE;
 }
 
-truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
 {
     gr_ptr t;
     int status;
@@ -71,7 +71,7 @@ truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
     return res;
 }
 
-truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
 {
     if (gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
         return gr_ctx_is_zero_ring(ctx);
@@ -79,13 +79,13 @@ truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
         return T_UNKNOWN;
 }
 
-truth_t gr_generic_ctx_is_real_vector_space(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_real_vector_space(gr_ctx_t ctx)
 {
     /* currently this does the same thing */
     return gr_generic_ctx_is_rational_vector_space(ctx);
 }
 
-truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
 {
     /* currently this does the same thing */
     return gr_generic_ctx_is_rational_vector_space(ctx);
@@ -150,7 +150,7 @@ int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int gr_generic_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
+static int gr_generic_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
 {
     slong i;
     truth_t is_invertible;
@@ -202,7 +202,7 @@ int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return status;
 }
 
-slong _gr_generic_length(gr_srcptr x, gr_ctx_t ctx)
+static slong _gr_generic_length(gr_srcptr x, gr_ctx_t ctx)
 {
     return 0;
 }
@@ -965,7 +965,7 @@ int gr_generic_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, g
     }
 }
 
-int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
+static int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
 {
     return gr_get_fexpr(res, x, ctx);
 }
@@ -1108,7 +1108,7 @@ int gr_generic_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return gr_div(res, x, y, ctx);
 }
 
-truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+static truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     truth_t zero;
     int status;
@@ -1135,7 +1135,7 @@ truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t 
     return GR_UNABLE;
 }
 
-truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+static truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     gr_ptr t;
     truth_t zero;
@@ -1329,7 +1329,7 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int
+static int
 gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_ctx_is_field(ctx) == T_TRUE)
@@ -1356,7 +1356,7 @@ gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int
+static int
 gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     if (gr_ctx_is_field(ctx) == T_TRUE)
@@ -1427,7 +1427,7 @@ gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_
     return status;
 }
 
-int
+static int
 gr_generic_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     int cmp;
@@ -1441,7 +1441,7 @@ gr_generic_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
         return gr_set(res, y, ctx);
 }
 
-int
+static int
 gr_generic_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     int cmp;
@@ -1604,8 +1604,6 @@ gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
         return status;
     }
 }
-
-void arb_fmpz_euler_number_ui(fmpz_t res, ulong n);
 
 int
 gr_generic_eulernum_ui(gr_ptr res, ulong n, gr_ctx_t ctx)

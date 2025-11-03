@@ -32,7 +32,7 @@ worker(slong i, void * args)
     fmpz_mod_set_fmpz(w->res + i, w->vec + i, w->ctx);
 }
 
-void
+static void
 _fmpz_mod_vec_set_fmpz_vec_threaded(fmpz * A, const fmpz * B, slong len,
                                                      const fmpz_mod_ctx_t ctx)
 {

@@ -387,7 +387,7 @@ void fq_nmod_mpoly_from_mpolyu_perm_inflate(
     fq_nmod_mpoly_sort_terms(A, ctx);
 }
 
-
+#if 0
 /*
     Convert B to A using the variable permutation perm.
     The uctx should be the context of the coefficients of A.
@@ -469,7 +469,6 @@ void fq_nmod_mpoly_to_mpolyuu_perm_deflate(
 
     TMP_END;
 }
-
 
 /*
     Convert B to A using the variable permutation vector perm.
@@ -557,12 +556,9 @@ void fq_nmod_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     fq_nmod_mpoly_sort_terms(A, ctx);
     TMP_END;
 }
-
-
-
+#endif
 
 /** 0 variables *************************************/
-
 
 void fq_nmod_mpoly_to_mpolyl_perm_deflate(
     fq_nmod_mpoly_t A,

@@ -25,7 +25,7 @@ bit of a hack, and it would be better to somehow pass z^2 directly to the erf
 evaluation code).
 */
 
-void
+static void
 acb_hypgeom_fresnel_erf(acb_t res1, acb_t res2, const acb_t z, slong prec)
 {
     acb_t t, u, v, w1, w2;
@@ -98,7 +98,7 @@ acb_hypgeom_fresnel_erf(acb_t res1, acb_t res2, const acb_t z, slong prec)
 }
 
 /* derivatives: |8/sqrt(pi) sin(2z^2)|, |8/sqrt(pi) cos(2z^2)| <= 5 exp(4|xy|) */
-void
+static void
 acb_hypgeom_fresnel_erf_error(acb_t res1, acb_t res2, const acb_t z, slong prec)
 {
     mag_t re;

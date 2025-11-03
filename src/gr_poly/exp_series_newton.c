@@ -14,7 +14,7 @@
 
 /* c_k x^k -> c_k x^k / (m+k) */
 /* todo: optimize */
-int
+static int
 _gr_poly_integral_offset(gr_ptr res, gr_srcptr poly, slong len, slong m, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;

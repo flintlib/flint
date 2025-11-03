@@ -10,11 +10,8 @@
 */
 
 #include "acb.h"
-
-void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const acb_t x, int use_reflect, int digamma, slong prec);
-
-void acb_gamma_stirling_eval(acb_t s, const acb_t z, slong nterms, int digamma, slong prec);
+#include "acb_hypgeom/impl.h"
+#include "acb/impl.h"
 
 void
 acb_digamma(acb_t y, const acb_t x, slong prec)

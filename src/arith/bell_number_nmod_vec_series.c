@@ -13,6 +13,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "arith.h"
+#include "arith/impl.h"
 
 ulong nmod_inv_check(ulong x, nmod_t mod)
 {

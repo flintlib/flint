@@ -481,6 +481,7 @@ void arb_div_2expm1_ui(arb_t z, const arb_t x, ulong n, slong prec);
 void arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_root_ui(arb_t z, const arb_t x, ulong k, slong prec);
 void arb_root(arb_t z, const arb_t x, ulong k, slong prec); /* back compat */
+void _arb_log_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slong n, slong max_rel, double C);
 void arb_log(arb_t z, const arb_t x, slong prec);
 void arb_log_arf(arb_t z, const arf_t x, slong prec);
 void arb_log_ui(arb_t z, ulong x, slong prec);
@@ -613,15 +614,15 @@ arb_sqr(arb_t res, const arb_t val, slong prec)
     arb_mul(res, val, val, prec);
 }
 
-#define ARB_DEF_CACHED_CONSTANT(name, comp_func) \
+#define _ARB_DEF_CACHED_CONSTANT(dcl, name, comp_func) \
     FLINT_TLS_PREFIX slong name ## _cached_prec = 0; \
     FLINT_TLS_PREFIX arb_t name ## _cached_value; \
-    void name ## _cleanup(void) \
+    static void name ## _cleanup(void) \
     { \
         arb_clear(name ## _cached_value); \
         name ## _cached_prec = 0; \
     } \
-    void name(arb_t x, slong prec) \
+    dcl void name(arb_t x, slong prec) \
     { \
         if (name ## _cached_prec < prec) \
         { \
@@ -635,6 +636,7 @@ arb_sqr(arb_t res, const arb_t val, slong prec)
         } \
         arb_set_round(x, name ## _cached_value, prec); \
     }
+#define ARB_DEF_CACHED_CONSTANT(name, comp_func) _ARB_DEF_CACHED_CONSTANT(, name, comp_func)
 
 /* vector functions */
 

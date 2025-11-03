@@ -39,19 +39,6 @@ crt_init(crt_t c, ulong n)
     }
 }
 
-void
-crt_print(const crt_t c)
-{
-    slong k;
-    if (c->num == 0)
-    {
-        flint_throw(FLINT_ERROR, "trivial group\n");
-    }
-    for (k = 0; k < c->num; k++)
-        flint_printf("Z/%wuZ ", c->m[k]);
-    flint_printf("\n");
-}
-
 #if 0
 /* lexicographic index of crt elt j */
 static ulong
