@@ -35,15 +35,13 @@ static slong lower_convex_hull(slong* result, const double* y, slong n)
 {
     slong i, k=0;
     for (i=0; i<n; i++) {
-        if(isfinite(y[i])) {
-            while(k>1 && is_not_counter_clockwise(result[k-2], y[result[k-2]],
-                                                  result[k-1], y[result[k-1]],
-                                                  i, y[i])) {
-                k--;
-            }
-            result[k] = i;
-            k++;
+        while(k>1 && is_not_counter_clockwise(result[k-2], y[result[k-2]],
+                                              result[k-1], y[result[k-1]],
+                                              i, y[i])) {
+            k--;
         }
+        result[k] = i;
+        k++;
     }
     return k;
 }
@@ -131,7 +129,7 @@ typedef struct {
 /* Initialize the members of the double_field */
 static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
 {
-    double pivot;
+    double pivot, epsilon=ldexp(1,-1000);
     slong i, n_np, k=LOG_ROUNDING;
 
     /* Set the memory addresses */
@@ -157,7 +155,9 @@ static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const
         v->p_i[i] = p[2*(fz+i)+1];
         v->rp_r[i] = p[2*(fz+n-1-i)];   
         v->rp_i[i] = p[2*(fz+n-1-i)+1]; 
-        v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i]));
+        /* We avoid infinite values so that the code is compatible with
+         * unsafe math optimizations */
+        v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i])+epsilon);
         /* rounding the valuation helps avoiding nearby initial points */
         v->malp[i] = round(v->malp[i]/k)*k;
     }
@@ -268,7 +268,7 @@ void double_cpoly_horner(double* results_r, double* results_i,
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass_a(double* restrict results_r, double* restrict results_i,
+void double_cpoly_weierstrass(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
@@ -293,62 +293,10 @@ void double_cpoly_weierstrass_a(double* restrict results_r, double* restrict res
     }
 }
 
-
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass_b(double* results_r, double* results_i,
-                              double lc_r, double lc_i,
-                              const double* twice_values_r, const double* twice_values_i,
-                              slong n_start, slong n_end, slong d)
-{
-    int p, k;
-    slong i, j;
-    for(i=n_start; i < n_end; i+=CDWBlock) {
-        double x[CDWBlock] = {0};
-        double y[CDWBlock] = {0};
-        double u[CDWBlock] = {0};
-        double v[CDWBlock] = {0};
-        double a[CDWBlock] = {0};
-        double b[CDWBlock] = {0};
-
-        slong p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
-        for(j=0; j<CDWBlock; j++){
-            x[j] = lc_r;
-            y[j] = lc_i;
-        }
-        memcpy(u, twice_values_r+i, p*sizeof(double));
-        memcpy(v, twice_values_i+i, p*sizeof(double));
-        memcpy(a, u, p*sizeof(double));
-        memcpy(b, v, p*sizeof(double));
-        /* starts product after diagonal and continues periodically horizontally
-         * until the next diagonal \:::\:
-         *                         :\:::\ */
-        for(j=1; j<d; j++) {
-            memmove(a, a + 1, (p-1)*sizeof(double));
-            memmove(b, b + 1, (p-1)*sizeof(double));
-            a[p-1] = twice_values_r[i+j+p-1];
-            b[p-1] = twice_values_i[i+j+p-1];
-            for(k=0; k<p; k++) {
-                #pragma STDC FP_CONTRACT ON
-                double q, r, s,t;
-                q = u[k]-a[k];
-                r = v[k]-b[k];
-                s = q*x[k] - r*y[k];
-                t = q*y[k] + r*x[k];
-                x[k] = s;
-                y[k] = t;
-            }
-        }
-        memcpy(results_r+i, x, p*sizeof(double));
-        memcpy(results_i+i, y, p*sizeof(double));
-    }
-}
-
-/* Weights for the Durand-Kerner or Weierstrass iteration */
-/* twice_values_r and twice_values_i have size 2n,
- * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass(double* restrict results_r, double* restrict results_i,
+void double_cpoly_weierstrass_b(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
@@ -451,121 +399,22 @@ void double_cpoly_weierstrass(double* restrict results_r, double* restrict resul
     }
 }
 
-/* Weights for the Durand-Kerner or Weierstrass iteration */
-/* twice_values_r and twice_values_i have size 2n,
- * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass_d(double* restrict results_r, double* restrict results_i,
-                              double lc_r, double lc_i,
-                              const double* twice_values_r, const double* twice_values_i,
-                              slong n_start, slong n_end, slong d)
-{
-    int p, q, k, m;
-    slong i, j;
-    for(i=n_start; i<n_end; i++){
-        results_r[i] = lc_r;
-        results_i[i] = lc_i;
-    }
-    for(i=n_start; i < n_end; i+=CDWBlock) {
-        double xr[CDWBlock]  = {0};
-        double yr[CDWBlock]  = {0};
-        double xc[CDWBlock]  = {0};
-        double yc[CDWBlock]  = {0};
-        double u[CDWBlock]   = {0};
-        double v[CDWBlock]   = {0};
-        double a[2*CDWBlock] = {0};
-        double b[2*CDWBlock] = {0};
-
-        p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
-        memcpy(xr, results_r+i, p*sizeof(double));
-        memcpy(yr, results_i+i, p*sizeof(double));
-        memcpy(u, twice_values_r+i, p*sizeof(double));
-        memcpy(v, twice_values_i+i, p*sizeof(double));
-        /* Symmetric part of the matrix with the diagonal */
-        memcpy(a, u, p*sizeof(double));
-        memcpy(b, v, p*sizeof(double));
-        memcpy(a+p, u, p*sizeof(double));
-        memcpy(b+p, v, p*sizeof(double));
-        for(m=1; m<p; m++) {
-            for(k=0; k<p; k++) {
-                #pragma STDC FP_CONTRACT ON
-                double e, f, s,t;
-                e = u[k] - a[k+m];
-                f = v[k] - b[k+m];
-                s = e*xr[k] - f*yr[k];
-                t = e*yr[k] + f*xr[k];
-                xr[k] = s;
-                yr[k] = t;
-            }
-        }
-        /* Symmetric part of the matrix without the diagonal */
-        for(j=i+p; j<n_end; j+=CDWBlock){
-            /* In this loop, p is always CDWBlock */
-            q = (j+CDWBlock<=n_end) ? CDWBlock : ((n_end-i-p) % CDWBlock);
-            memcpy(a, twice_values_r+j, q*sizeof(double));
-            memcpy(b, twice_values_i+j, q*sizeof(double));
-            memcpy(xc, results_r+j, q*sizeof(double));
-            memcpy(yc, results_i+j, q*sizeof(double));
-            for(m=0; m<q+CDWBlock; m++) {
-                int sr = (m<=CDWBlock) ? CDWBlock - m : 0;
-                int sc = (m<=CDWBlock) ? 0 : m - CDWBlock;
-                int end = fmin(q, fmin(m, CDWBlock+q-m));
-                for(k=0; k<end; k++) {
-                    #pragma STDC FP_CONTRACT ON
-                    double e, f, g, h, s, t;
-                    e = u[sr+k]-a[sc+k];
-                    f = v[sr+k]-b[sc+k];
-                    g = e*xc[sc+k] - f*yc[sc+k];
-                    h = e*yc[sc+k] + f*xc[sc+k];
-                    s = e*xr[sr+k] - f*yr[sr+k];
-                    t = e*yr[sr+k] + f*xr[sr+k];
-                    xc[sc+k] = -g;
-                    yc[sc+k] = -h;
-                    xr[sr+k] = s;
-                    yr[sr+k] = t;
-                }
-            }
-            memcpy(results_r+j, xc, q*sizeof(double));
-            memcpy(results_i+j, yc, q*sizeof(double));
-        }
-        /* Non symmetric part of the matrix */
-        slong start = (n_start != 0) ? 0 : n_end;
-        slong end = (n_end == d) ? n_start : d ;
-        for(j = start; j < end; j += CDWBlock){
-            q = (j+CDWBlock<=end) ? CDWBlock : ((end-start) % CDWBlock);
-            memcpy(a, twice_values_r+j, q*sizeof(double));
-            memcpy(b, twice_values_i+j, q*sizeof(double));
-            for(m=0; m<q; m++) {
-                for(k=0; k<p; k++) {
-                    double e, f, s,t;
-                    e = u[k]-a[m];
-                    f = v[k]-b[m];
-                    s = e*xr[k] - f*yr[k];
-                    t = e*yr[k] + f*xr[k];
-                    xr[k] = s;
-                    yr[k] = t;
-                }
-            }
-        }
-        memcpy(results_r+i, xr, p*sizeof(double));
-        memcpy(results_i+i, yr, p*sizeof(double));
-    }
-}
-
 static void double_cpoly_wdk_update(double* z_r, double* z_i,
                              const double* vp_r, const double* vp_i,
                              const double* wdk_r, const double* wdk_i,
                              slong n_start, slong n_end)
 {
     slong i;
-    double mag_vp, arg_vp, mag_wdk, arg_wdk, pi = acos(-1);
+    double mag_vp, arg_vp, mag_wdk, arg_wdk, ratio, pi = acos(-1);
     for(i=n_start; i<n_end; i++) {
-        if(isfinite(vp_r[i]) && isfinite(vp_i[i]) && ((wdk_r[i]) != 0 || (wdk_i[i] != 0))) {
+        if((wdk_r[i] != 0) || (wdk_i[i] != 0)) {
             mag_vp = hypot(vp_r[i], vp_i[i]);
             arg_vp = atan2(vp_i[i], vp_r[i]);
             mag_wdk = hypot(wdk_r[i], wdk_i[i]);
             arg_wdk = atan2(wdk_i[i], wdk_r[i]);
-            z_r[i] = z_r[i] - ( mag_vp / mag_wdk * cos(arg_vp - arg_wdk) );
-            z_i[i] = z_i[i] - ( mag_vp / mag_wdk * sin(arg_vp - arg_wdk) );
+            ratio = mag_vp / mag_wdk;
+            z_r[i] = z_r[i] - ( ratio * cos(arg_vp - arg_wdk) );
+            z_i[i] = z_i[i] - ( ratio * sin(arg_vp - arg_wdk) );
         }
     }
 }
