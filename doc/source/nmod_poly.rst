@@ -1422,7 +1422,6 @@ Multipoint evaluation
     Evaluates ``poly`` at the ``n`` values given in the vector
     ``xs``, writing the output values to ``ys``. The values in
     ``xs`` should be reduced modulo the modulus.
-    //////////////////////////////////////////////
 
 .. function:: void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
 
