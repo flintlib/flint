@@ -69,8 +69,10 @@ void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len,
 
     fmpz_mod_poly_fit_length(f, len, ctx);
 
-    for (i = 0; i < len; i++)
-        fmpz_randm_nonzero(f->coeffs + i, state, fmpz_mod_ctx_modulus(ctx));
+    for (i = 0; i < len; i++) {
+        fmpz_randtest_unsigned(f->coeffs + i, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+        fmpz_mod(f->coeffs + i, f->coeffs + i, fmpz_mod_ctx_modulus(ctx));
+    }
 
     _fmpz_mod_poly_set_length(f, len);
     _fmpz_mod_poly_normalise(f);
@@ -85,8 +87,10 @@ void fmpz_mod_poly_randtest_monic(fmpz_mod_poly_t f, flint_rand_t state,
 
     fmpz_mod_poly_fit_length(f, len, ctx);
 
-    for (i = 0; i < len - 1; i++)
-        fmpz_randm_nonzero(f->coeffs + i, state, fmpz_mod_ctx_modulus(ctx));
+    for (i = 0; i < len - 1; i++) {
+        fmpz_randtest_unsigned(f->coeffs + i, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+        fmpz_mod(f->coeffs + i, f->coeffs + i, fmpz_mod_ctx_modulus(ctx));
+    }
 
     fmpz_one(f->coeffs + len - 1);
 
@@ -101,10 +105,13 @@ fmpz_mod_poly_randtest_monic_sparse(fmpz_mod_poly_t poly, flint_rand_t state,
 
     fmpz_mod_poly_fit_length(poly, len, ctx);
     _fmpz_vec_zero(poly->coeffs, len);
-    fmpz_randm_nonzero(poly->coeffs + 0, state, fmpz_mod_ctx_modulus(ctx));
-    for (i = 1; i < nonzero; i++)
-       fmpz_randm_nonzero(poly->coeffs + n_randint(state, len - 1) + 1,
-                                             state, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randtest_unsigned(poly->coeffs + 0, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+    fmpz_mod(poly->coeffs + 0, poly->coeffs + 0, fmpz_mod_ctx_modulus(ctx));
+    for (i = 1; i < nonzero; i++) {
+       ulong random_idx = n_randint(state, len - 1);
+       fmpz_randtest_unsigned(poly->coeffs + random_idx + 1, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+       fmpz_mod(poly->coeffs + random_idx + 1, poly->coeffs + random_idx + 1, fmpz_bits(fmpz_mod_ctx_modulus(ctx)));
+    }
     fmpz_set_ui(poly->coeffs + len - 1, 1);
     _fmpz_mod_poly_set_length(poly, len);
 }
@@ -172,9 +179,11 @@ void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly,
     ulong k;
     fmpz_mod_poly_fit_length(poly, len, ctx);
     _fmpz_vec_zero(poly->coeffs, len);
-    fmpz_randm_nonzero(poly->coeffs, state, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randtest_unsigned(poly->coeffs, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+    fmpz_mod(poly->coeffs, poly->coeffs, fmpz_mod_ctx_modulus(ctx));
     k = (n_randtest(state) % (len - 2)) + 1;
-    fmpz_randm_nonzero(poly->coeffs + k, state, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randtest_unsigned(poly->coeffs + k, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+    fmpz_mod(poly->coeffs + k, poly->coeffs + k, fmpz_mod_ctx_modulus(ctx));
     fmpz_one(poly->coeffs + len - 1);
     _fmpz_mod_poly_set_length(poly, len);
 }
@@ -184,10 +193,14 @@ void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly,
 {
     fmpz_mod_poly_fit_length(poly, len, ctx);
     _fmpz_vec_zero(poly->coeffs, len);
-    fmpz_randm_nonzero(poly->coeffs, state, fmpz_mod_ctx_modulus(ctx));
-    fmpz_randm_nonzero(poly->coeffs + 1, state, fmpz_mod_ctx_modulus(ctx));
-    fmpz_randm_nonzero(poly->coeffs + 2, state, fmpz_mod_ctx_modulus(ctx));
-    fmpz_randm_nonzero(poly->coeffs + 3, state, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randtest_unsigned(poly->coeffs, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+    fmpz_mod(poly->coeffs, poly->coeffs, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randtest_unsigned(poly->coeffs + 1, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+    fmpz_mod(poly->coeffs + 1, poly->coeffs + 1, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randtest_unsigned(poly->coeffs + 2, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+    fmpz_mod(poly->coeffs + 2, poly->coeffs + 2, fmpz_mod_ctx_modulus(ctx));
+    fmpz_randtest_unsigned(poly->coeffs + 3, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx) + 1));
+    fmpz_mod(poly->coeffs + 3, poly->coeffs + 3, fmpz_mod_ctx_modulus(ctx));
     fmpz_one(poly->coeffs + len - 1);
     _fmpz_mod_poly_set_length(poly, len);
 }
