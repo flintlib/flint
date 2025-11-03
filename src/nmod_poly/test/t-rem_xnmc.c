@@ -15,15 +15,15 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
+TEST_FUNCTION_START(nmod_poly_rem_xnmc, state)
 {
     int i, result = 1;
 
     for (i = 0; i < 5000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        nmod_poly_t qok, rok, q1, r1;
-        nn_ptr qr1;
+        nmod_poly_t rok, r1;
+        nn_ptr rvec1;
         ulong modn, len, n, c;
         nmod_t mod;
 
@@ -41,9 +41,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
         /* initialize polynomials */
         nmod_poly_init_mod(a, mod);
         nmod_poly_init_mod(b, mod);
-        nmod_poly_init_mod(qok, mod);
         nmod_poly_init_mod(rok, mod);
-        nmod_poly_init_mod(q1, mod);
         nmod_poly_init_mod(r1, mod);
 
         /* pick parameters */
@@ -59,10 +57,9 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
         else
             c = n_randint(state, modn);
 
-        /* random a of length <= len; qr1 with same coefficients */
+        /* random a of length <= len; rvec1 of length == n */
         nmod_poly_randtest(a, state, len);
-        qr1 = _nmod_vec_init(a->length);
-        _nmod_vec_set(qr1, a->coeffs, a->length);
+        rvec1 = _nmod_vec_init(n);
 
         /* divisor xnmc:  b == x**n - c */
         nmod_poly_set_coeff_ui(b, n, 1);
@@ -70,17 +67,14 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
 
         // correct quotient/remainder
         if (modn == 1)
-        {
             nmod_poly_zero(rok);
-            nmod_poly_zero(qok);
-        }
         else
-            nmod_poly_divrem(qok, rok, a, b);
+            nmod_poly_rem(rok, a, b);
 
         // general interface
-        nmod_poly_divrem_xnmc(q1, r1, a, n, c);
+        nmod_poly_rem_xnmc(r1, a, n, c);
 
-        result = (nmod_poly_equal(qok, q1) && nmod_poly_equal(rok, r1));
+        result = (nmod_poly_equal(rok, r1));
         if (!result)
         {
             flint_printf("FAIL (poly 1):\n");
@@ -95,36 +89,33 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
         if (a->length >= (slong)n)
         {
             /* general function */
-            _nmod_poly_divrem_xnmc(qr1, qr1, a->length, n, c, a->mod);
+            _nmod_poly_rem_xnmc(rvec1, a->coeffs, a->length, n, c, a->mod);
 
-            result = (_nmod_vec_equal(qr1, rok->coeffs, rok->length) && _nmod_vec_is_zero(qr1 + rok->length, n - rok->length)
-                      && _nmod_vec_equal(qr1+n, qok->coeffs, qok->length));
+            result = (_nmod_vec_equal(rvec1, rok->coeffs, rok->length) && _nmod_vec_is_zero(rvec1 + rok->length, n - rok->length));
             if (!result)
             {
                 flint_printf("FAIL (vec):\n");
                 flint_printf("a->length = %wd, len = %wu, modn = %wu\n", a->length, len, a->mod.n);
-                flint_printf("n = %wu, c = %wu, input vec qr :\n", n, c);
+                flint_printf("n = %wu, c = %wu, input vec rvec :\n", n, c);
                 _nmod_vec_print(a->coeffs, a->length, mod), flint_printf("\n\n");
                 fflush(stdout);
                 flint_abort();
             }
 
             /* special cases 1, -1 */
-            _nmod_vec_set(qr1, a->coeffs, a->length);
             if (c == 1 || c == modn - 1)
             {
                 if (c == 1)
-                    _nmod_poly_divrem_xnm1(qr1, qr1, a->length, n, a->mod.n);
+                    _nmod_poly_rem_xnm1(rvec1, a->coeffs, a->length, n, a->mod.n);
                 else if (c == modn-1)
-                    _nmod_poly_divrem_xnp1(qr1, qr1, a->length, n, a->mod.n);
+                    _nmod_poly_rem_xnp1(rvec1, a->coeffs, a->length, n, a->mod.n);
 
-                result = (_nmod_vec_equal(qr1, rok->coeffs, rok->length) && _nmod_vec_is_zero(qr1 + rok->length, n - rok->length)
-                        && _nmod_vec_equal(qr1+n, qok->coeffs, qok->length));
+                result = (_nmod_vec_equal(rvec1, rok->coeffs, rok->length) && _nmod_vec_is_zero(rvec1 + rok->length, n - rok->length));
                 if (!result)
                 {
                     flint_printf("FAIL (vec, +1 / - 1):\n");
                     flint_printf("a->length = %wd, len = %wu, modn = %wu\n", a->length, len, a->mod.n);
-                    flint_printf("n = %wu, c = %wu, input vec qr :\n", n, c);
+                    flint_printf("n = %wu, c = %wu, input vec rvec :\n", n, c);
                     _nmod_vec_print(a->coeffs, a->length, mod), flint_printf("\n\n");
                     fflush(stdout);
                     flint_abort();
@@ -132,7 +123,6 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
             }
 
             /* cases using precomp */
-            _nmod_vec_set(qr1, a->coeffs, a->length);
             if (NMOD_CAN_USE_SHOUP(mod))
             {
                 ulong c_precomp = n_mulmod_precomp_shoup(c, modn);
@@ -145,20 +135,19 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
 #endif
                 {
                     lazy = 1;
-                    _nmod_poly_divrem_xnmc_precomp_lazy(qr1, qr1, a->length, n, c, c_precomp, modn);
-                    for (long ii = 0; ii < a->length; ii++)
+                    _nmod_poly_rem_xnmc_precomp_lazy(rvec1, a->coeffs, a->length, n, c, c_precomp, modn);
+                    for (ulong ii = 0; ii < n; ii++)
                     {
-                        if (qr1[ii] >= 2*modn)
-                            qr1[ii] -= 2*modn;
-                        else if (qr1[ii] >= modn)
-                            qr1[ii] -= modn;
+                        if (rvec1[ii] >= 2*modn)
+                            rvec1[ii] -= 2*modn;
+                        else if (rvec1[ii] >= modn)
+                            rvec1[ii] -= modn;
                     }
                 }
                 else
-                    _nmod_poly_divrem_xnmc_precomp(qr1, qr1, a->length, n, c, c_precomp, modn);
+                    _nmod_poly_rem_xnmc_precomp(rvec1, a->coeffs, a->length, n, c, c_precomp, modn);
 
-                result = (_nmod_vec_equal(qr1, rok->coeffs, rok->length) && _nmod_vec_is_zero(qr1 + rok->length, n - rok->length)
-                        && _nmod_vec_equal(qr1+n, qok->coeffs, qok->length));
+                result = (_nmod_vec_equal(rvec1, rok->coeffs, rok->length) && _nmod_vec_is_zero(rvec1 + rok->length, n - rok->length));
                 if (!result)
                 {
                     if (lazy)
@@ -166,7 +155,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
                     else
                         flint_printf("FAIL (vec, precomp):\n");
                     flint_printf("a->length = %wd, len = %wu, modn = %wu\n", a->length, len, a->mod.n);
-                    flint_printf("n = %wu, c = %wu, input vec qr :\n", n, c);
+                    flint_printf("n = %wu, c = %wu, input vec rvec :\n", n, c);
                     _nmod_vec_print(a->coeffs, a->length, mod), flint_printf("\n\n");
                     fflush(stdout);
                     flint_abort();
@@ -176,11 +165,9 @@ TEST_FUNCTION_START(nmod_poly_divrem_xnmc, state)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
-        nmod_poly_clear(qok);
         nmod_poly_clear(rok);
-        nmod_poly_clear(q1);
         nmod_poly_clear(r1);
-        _nmod_vec_clear(qr1);
+        _nmod_vec_clear(rvec1);
     }
 
     TEST_FUNCTION_END(state);

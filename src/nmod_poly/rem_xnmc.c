@@ -14,84 +14,78 @@
 #include "ulong_extras.h"
 
 /* division by x**n - 1 */
-void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong modn)
+void _nmod_poly_rem_xnm1(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong modn)
 {
     /* assumes len >= n */
     slong i;
     ulong j, r;
 
-    if (RQ != A)
-        for (j = 0; j < n; j++)
-            RQ[len-n+j] = A[len-n+j];
-
     r = len % n;
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
 
     for (j = 0; j < r; j++)
-        RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], modn);
+        R[j] = n_addmod(A[i+n+j], A[i+j], modn);
+    for (j = r; j < n; j++)
+        R[j] = A[i+j];
 
     i -= n;
     while (i >= 0)
     {
         for (j = 0; j < n; j++)
-            RQ[i+j] = n_addmod(RQ[i+n+j], A[i+j], modn);
+            R[j] = n_addmod(R[j], A[i+j], modn);
         i -= n;
     }
 }
 
 /* division by x**n + 1 */
-void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong modn)
+void _nmod_poly_rem_xnp1(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong modn)
 {
     /* assumes len >= n */
     slong i;
     ulong j, r;
 
-    if (RQ != A)
-        for (j = 0; j < n; j++)
-            RQ[len-n+j] = A[len-n+j];
-
     r = len % n;
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
 
     for (j = 0; j < r; j++)
-        RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], modn);
+        R[j] = n_submod(A[i+j], A[i+n+j], modn);
+    for (j = r; j < n; j++)
+        R[j] = A[i+j];
 
     i -= n;
     while (i >= 0)
     {
         for (j = 0; j < n; j++)
-            RQ[i+j] = n_submod(A[i+j], RQ[i+n+j], modn);
+            R[j] = n_submod(A[i+j], R[j], modn);
         i -= n;
     }
 }
 
 /* division by x**n - c, general variant */
-void _nmod_poly_divrem_xnmc(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod)
+void _nmod_poly_rem_xnmc(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod)
 {
     /* assumes len >= n */
     slong i;
     ulong j, r, val;
-
-    if (RQ != A)
-        for (j = 0; j < n; j++)
-            RQ[len-n+j] = A[len-n+j];
 
     r = len % n;
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
 
     for (j = 0; j < r; j++)
     {
-        val = nmod_mul(RQ[i+n+j], c, mod);
-        RQ[i+j] = n_addmod(val, A[i+j], mod.n);
+        val = nmod_mul(A[i+n+j], c, mod);
+        R[j] = n_addmod(val, A[i+j], mod.n);
     }
+    for (j = r; j < n; j++)
+        R[j] = A[i+j];
 
     i -= n;
     while (i >= 0)
     {
         for (j = 0; j < n; j++)
         {
-            val = nmod_mul(RQ[i+n+j], c, mod);
-            RQ[i+j] = n_addmod(val, A[i+j], mod.n);
+            val = nmod_mul(R[j], c, mod);
+            R[j] = n_addmod(val, A[i+j], mod.n);
         }
         i -= n;
     }
@@ -99,32 +93,30 @@ void _nmod_poly_divrem_xnmc(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c,
 
 /* division by x**n - c, with precomputation on c */
 /* constraint: modn < 2**(FLINT_BITS-1) */
-void _nmod_poly_divrem_xnmc_precomp(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
+void _nmod_poly_rem_xnmc_precomp(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
 {
     /* assumes len >= n */
     slong i;
     ulong j, r, val;
-
-    if (RQ != A)
-        for (j = 0; j < n; j++)
-            RQ[len-n+j] = A[len-n+j];
 
     r = len % n;
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
 
     for (j = 0; j < r; j++)
     {
-        val = n_mulmod_shoup(c, RQ[i+n+j], c_precomp, modn);
-        RQ[i+j] = n_addmod(val, A[i+j], modn);
+        val = n_mulmod_shoup(c, A[i+n+j], c_precomp, modn);
+        R[j] = n_addmod(val, A[i+j], modn);
     }
+    for (j = r; j < n; j++)
+        R[j] = A[i+j];
 
     i -= n;
     while (i >= 0)
     {
         for (j = 0; j < n; j++)
         {
-            val = n_mulmod_shoup(c, RQ[i+n+j], c_precomp, modn);
-            RQ[i+j] = n_addmod(val, A[i+j], modn);
+            val = n_mulmod_shoup(c, R[j], c_precomp, modn);
+            R[j] = n_addmod(val, A[i+j], modn);
         }
         i -= n;
     }
@@ -133,15 +125,11 @@ void _nmod_poly_divrem_xnmc_precomp(nn_ptr RQ, nn_srcptr A, slong len, ulong n, 
 /* division by x**n - c, lazy with precomputation */
 /* constraint: max(A) + 2*modn <= 2**FLINT_BITS */
 /* coeff bounds: in [0, max(A)] | out [0, max(A) + 2*modn) */
-void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
+void _nmod_poly_rem_xnmc_precomp_lazy(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
 {
     /* assumes len >= n */
     slong i;
     ulong j, r, val, p_hi, p_lo;
-
-    if (RQ != A)
-        for (j = 0; j < n; j++)
-            RQ[len-n+j] = A[len-n+j];
 
     r = len % n;
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
@@ -149,12 +137,14 @@ void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulon
     for (j = 0; j < r; j++)
     {
         /* computes either val = (c*val mod n) or val = (c*val mod n) + n */
-        val = RQ[i+n+j];
+        val = A[i+n+j];
         umul_ppmm(p_hi, p_lo, c_precomp, val);
         val = c * val - p_hi * modn;
-        /* lazy addition, yields RQ[i+j] in [0..k+2n), where max(RQ) <= k */
-        RQ[i+j] = val + A[i+j];
+        /* lazy addition, yields R[i+j] in [0..k+2n), where max(R) <= k */
+        R[j] = val + A[i+j];
     }
+    for (j = r; j < n; j++)
+        R[j] = A[i+j];
 
     i -= n;
     while (i >= 0)
@@ -162,23 +152,22 @@ void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulon
         for (j = 0; j < n; j++)
         {
             /* computes either val = (c*val mod n) or val = (c*val mod n) + n */
-            val = RQ[i+n+j];
+            val = R[j];
             umul_ppmm(p_hi, p_lo, c_precomp, val);
             val = c * val - p_hi * modn;
-            /* lazy addition, yields RQ[i+j] in [0..k+2n), where max(RQ) <= k */
-            RQ[i+j] = val + A[i+j];
+            /* lazy addition, yields R[i+j] in [0..k+2n), where max(R) <= k */
+            R[j] = val + A[i+j];
         }
         i -= n;
     }
 }
 
-void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n, ulong c)
+void nmod_poly_rem_xnmc(nmod_poly_t R, nmod_poly_t A, ulong n, ulong c)
 {
     const ulong len = A->length;
 
     if (len <= n)
     {
-        nmod_poly_zero(Q);
         nmod_poly_set(R, A);
         return;
     }
@@ -186,19 +175,18 @@ void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n,
     if (c == 0)
     {
         nmod_poly_set_trunc(R, A, n);
-        nmod_poly_shift_right(Q, A, n);
         return;
     }
 
     int lazy = 0;
-    nn_ptr RQ = _nmod_vec_init(len);
+    nn_ptr Rvec = _nmod_vec_init(n);
 
     /* perform division */
     if (c == 1)
-        _nmod_poly_divrem_xnm1(RQ, A->coeffs, len, n, A->mod.n);
+        _nmod_poly_rem_xnm1(Rvec, A->coeffs, len, n, A->mod.n);
 
     else if (c == A->mod.n - 1)
-        _nmod_poly_divrem_xnp1(RQ, A->coeffs, len, n, A->mod.n);
+        _nmod_poly_rem_xnp1(Rvec, A->coeffs, len, n, A->mod.n);
 
     /* if degree below the n_mulmod_shoup threshold, */
     /* or if modulus forbids n_mulmod_shoup usage, use general */
@@ -209,7 +197,7 @@ void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n,
            || (A->mod.norm == 0))
 #endif
     {
-        _nmod_poly_divrem_xnmc(RQ, A->coeffs, len, n, c, A->mod);
+        _nmod_poly_rem_xnmc(Rvec, A->coeffs, len, n, c, A->mod);
     }
 
     else
@@ -225,13 +213,13 @@ void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n,
 #endif
         {
             lazy = 1;
-            _nmod_poly_divrem_xnmc_precomp_lazy(RQ, A->coeffs, len, n, c, c_precomp, modn);
+            _nmod_poly_rem_xnmc_precomp_lazy(Rvec, A->coeffs, len, n, c, c_precomp, modn);
         }
 
         /* use n_mulmod_shoup, non-lazy variant */
         else
         {
-            _nmod_poly_divrem_xnmc_precomp(RQ, A->coeffs, len, n, c, c_precomp, modn);
+            _nmod_poly_rem_xnmc_precomp(Rvec, A->coeffs, len, n, c, c_precomp, modn);
         }
     }
 
@@ -243,7 +231,7 @@ void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n,
         const ulong modn = A->mod.n;
         for (ulong i = 0; i < n; i++)
         {
-            ulong v = RQ[i];
+            ulong v = Rvec[i];
             if (v >= 2*modn)
                 v -= 2*modn;
             else if (v >= modn)
@@ -253,32 +241,10 @@ void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n,
     }
     else
     {
-        _nmod_vec_set(R->coeffs, RQ, n);
+        _nmod_vec_set(R->coeffs, Rvec, n);
     }
     _nmod_poly_set_length(R, n);
     _nmod_poly_normalise(R);
 
-    /* copy quotient Q */
-    nmod_poly_fit_length(Q, len - n);
-    if (lazy)
-    {
-        /* correct excess */
-        const ulong modn = A->mod.n;
-        for (ulong i = 0; i < len - n; i++)
-        {
-            ulong v = RQ[n+i];
-            if (v >= 2*modn)
-                v -= 2*modn;
-            else if (v >= modn)
-                v -= modn;
-            Q->coeffs[i] = v;
-        }
-    }
-    else
-    {
-        _nmod_vec_set(Q->coeffs, RQ + n, len - n);
-    }
-    _nmod_poly_set_length(Q, len - n);
-
-    _nmod_vec_clear(RQ);
+    _nmod_vec_clear(Rvec);
 }

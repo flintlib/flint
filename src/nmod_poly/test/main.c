@@ -109,6 +109,7 @@
 #include "t-pow_trunc.c"
 #include "t-product_roots_nmod_vec.c"
 #include "t-rem.c"
+#include "t-rem_xnmc.c"
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
@@ -236,6 +237,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_pow_trunc),
     TEST_FUNCTION(nmod_poly_product_roots_nmod_vec),
     TEST_FUNCTION(nmod_poly_rem),
+    TEST_FUNCTION(nmod_poly_rem_xnmc),
     TEST_FUNCTION(nmod_poly_resultant),
     TEST_FUNCTION(nmod_poly_resultant_euclidean),
     TEST_FUNCTION(nmod_poly_resultant_hgcd),

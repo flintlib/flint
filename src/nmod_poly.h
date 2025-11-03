@@ -514,6 +514,13 @@ void _nmod_poly_divrem_xnmc_precomp(nn_ptr RQ, nn_srcptr A, slong len, ulong n, 
 void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn);
 void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, ulong n, ulong c);
 
+void _nmod_poly_rem_xnmc(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod);
+void _nmod_poly_rem_xnm1(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong modn);
+void _nmod_poly_rem_xnp1(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong modn);
+void _nmod_poly_rem_xnmc_precomp(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn);
+void _nmod_poly_rem_xnmc_precomp_lazy(nn_ptr R, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn);
+void nmod_poly_rem_xnmc(nmod_poly_t R, nmod_poly_t A, ulong n, ulong c);
+
 /* Divisibility testing  *****************************************************/
 
 int _nmod_poly_divides_classical(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
