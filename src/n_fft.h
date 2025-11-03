@@ -227,6 +227,14 @@ void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
 void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
+/************************
+*  helpers / internal  *
+************************/
+/* FIXME see what of this would as well be made public */
+void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
+
+void n_fft_tft_draft(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong node, n_fft_args_t F);
+
 #ifdef __cplusplus
 }
 #endif

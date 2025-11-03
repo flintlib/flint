@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Vincent Neiger
+    Copyright (C) 2025 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -16,6 +16,7 @@
 #include "t-idft.c"
 #include "t-dft_t.c"
 #include "t-idft_t.c"
+#include "t-tft.c"
 
 /* Array of test functions ***************************************************/
 
@@ -26,6 +27,10 @@ test_struct tests[] =
     TEST_FUNCTION(n_fft_idft),
     TEST_FUNCTION(n_fft_dft_t),
     TEST_FUNCTION(n_fft_idft_t),
+    TEST_FUNCTION(n_fft_tft),
+    /* TEST_FUNCTION(n_fft_idft), */
+    /* TEST_FUNCTION(n_fft_dft_t), */
+    /* TEST_FUNCTION(n_fft_idft_t), */
 };
 
 /* main function *************************************************************/
