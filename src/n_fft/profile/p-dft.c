@@ -1,4 +1,3 @@
-#include "nmod_poly.h"
 #include "profiler.h"
 #include "nmod_vec.h"
 #include "fft_small.h"
@@ -113,7 +112,7 @@ int main()
     {
         for (ulong depth = 3; depth <= max_depths[k]; depth++)
         {
-            printf("%ld\t", depth);
+            flint_printf("%ld\t", depth);
 
             info_t info;
             info.prime = primes[k];

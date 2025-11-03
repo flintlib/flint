@@ -71,7 +71,7 @@ void n_fft_tft_draft(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong node, 
     /* if olen <= len/2, go down the tree */
     if (2*olen <= len)
     {
-        flint_printf("HERE! 2*olen <= len, %wu, %wu\n", olen, len);
+        /* flint_printf("HERE! 2*olen <= len, %wu, %wu\n", olen, len); */
         n_fft_tft_draft(p, ilen, olen, depth-1, 2*node, F);
         return;
     }
@@ -140,7 +140,7 @@ void n_fft_tft_draft(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong node, 
     /* TODO base cases to fix !! */
     if (len == olen)
     {
-        flint_printf("base case len == olen, %wu, %wu, %wu\n", ilen, olen, len);
+        /* flint_printf("base case len == olen, %wu, %wu, %wu\n", ilen, olen, len); */
         _nmod_vec_zero(p + ilen, len - ilen);
         dft_node_lazy_4_4(p, depth, node, F);
         return;
