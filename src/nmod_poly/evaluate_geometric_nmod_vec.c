@@ -15,7 +15,7 @@
 #include "nmod_vec.h"
 
 void
-_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr v, nn_srcptr poly, 
+_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, 
     slong plen, const nmod_geometric_progression_t G, slong len)
 {
     nmod_poly_t a, b;
@@ -26,7 +26,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr v, nn_srcptr poly,
 
     if (plen == 0)
     {
-        _nmod_vec_zero(v, d);
+        _nmod_vec_zero(vs, d);
         return;
     }
 
@@ -44,7 +44,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr v, nn_srcptr poly,
 
     for (i = 0; i < len; i++)
     {
-        v[i] = nmod_mul(G->x[i], nmod_poly_get_coeff_ui(b, i + d - 1), G->mod);
+        vs[i] = nmod_mul(G->x[i], nmod_poly_get_coeff_ui(b, i + d - 1), G->mod);
     }
 
     nmod_poly_clear(b);
