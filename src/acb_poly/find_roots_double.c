@@ -422,7 +422,7 @@ static void double_cpoly_wdk_update(double* z_r, double* z_i,
     }
 }
 
-static void double_cpoly_refine_roots(double_field * v, slong n)
+static void _double_cpoly_refine_roots(double_field * v, slong n)
 {
     slong d, n_piv;
     double lc_r, lc_i;
@@ -464,7 +464,7 @@ void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_it
         _double_cpoly_init(v, np, mem_v, p, fz, nt);
         /* Main solve function */
         for(i=0; i<max_iter; i++) {
-            double_cpoly_refine_roots(v, nt);
+            _double_cpoly_refine_roots(v, nt);
         }
         for(i=0; i<nt-1; i++) {
             z[2*(i+fz)] = v->z_r[i];
