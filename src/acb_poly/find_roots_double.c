@@ -71,9 +71,8 @@ static void initial_values(double* z_r, double* z_i, const double* p_r, const do
             theta = (2*pi*(j+0.5)+argp-argq)/d;
             /* epsilon is used to avoid initial values being symmetrical to the
              * real axis (see Section 4 of Aberth's paper) */
-            z_r[p+j] = magz * (cos(theta+epsilon)) ;
-            z_i[p+j] = magz * (sin(theta+epsilon));
-            //printf("(%.3g, %.3g)\n", z_r[p+j], z_i[p+j]);
+            z_r[p+j] = magz * (cos(theta)+(1+j)*epsilon) ;
+            z_i[p+j] = magz * (sin(theta)+(1+j)*epsilon);
         }
         p = q;
     }
@@ -124,13 +123,14 @@ typedef struct {
     double *rp_i;
 } double_field;
 
-#define LOG_ROUNDING 1
+#define LOG_ROUNDING 3
 
 /* Initialize the members of the double_field */
 static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
 {
     double pivot, epsilon=ldexp(1,-1000);
-    slong i, n_np, k=LOG_ROUNDING;
+    slong i, n_np;
+    int k=LOG_ROUNDING;
 
     /* Set the memory addresses */
     /* z_r and z_i will hold 2(n-1) double each */
@@ -158,8 +158,8 @@ static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const
         /* We avoid infinite values so that the code is compatible with
          * unsafe math optimizations */
         v->malp[i] = -log(hypot(v->p_r[i],v->p_i[i])+epsilon);
-        /* rounding the valuation helps avoiding nearby initial points */
-        v->malp[i] = round(v->malp[i]/k)*k;
+        /* rounding the valuation helps avoiding nearby initial radii */
+        v->malp[i] = ldexp(round(ldexp(v->malp[i],k)),-k);
     }
 
     /* Computes the Newton polygon as indices in np of length n_np */
@@ -194,7 +194,7 @@ static int compare(const void * first, const void * second)
     memcpy(right, second, 2*sizeof(double));
     magl = hypot(left[0], left[1]);
     magr = hypot(right[0], right[1]);
-    compmag = magr/magl - 1;
+    compmag = magl/magr - 1;
     if(compmag < -epsilon){
         res = -1;
     } else if(compmag > epsilon) {
@@ -204,7 +204,7 @@ static int compare(const void * first, const void * second)
         argr = atan2(right[1], right[0]);
         /* returns the -1, 0 or 1 whether argl is lower, equal or greater
          * than argr */
-        res = (argl < argr) - (argr < argl);
+        res = (argr < argl) - (argl < argr);
     }
     return res;
 }
@@ -405,14 +405,17 @@ static void double_cpoly_wdk_update(double* z_r, double* z_i,
                              slong n_start, slong n_end)
 {
     slong i;
-    double mag_vp, arg_vp, mag_wdk, arg_wdk, ratio, pi = acos(-1);
+    double mag_vp, arg_vp, mag_wdk, arg_wdk, mag_z, ratio,
+           pi = acos(-1);
     for(i=n_start; i<n_end; i++) {
         if((wdk_r[i] != 0) || (wdk_i[i] != 0)) {
             mag_vp = hypot(vp_r[i], vp_i[i]);
             arg_vp = atan2(vp_i[i], vp_r[i]);
             mag_wdk = hypot(wdk_r[i], wdk_i[i]);
             arg_wdk = atan2(wdk_i[i], wdk_r[i]);
-            ratio = mag_vp / mag_wdk;
+            mag_z = hypot(z_r[i], z_i[i]);
+            /* The min expression avoids spurious large step */
+            ratio = fmin(mag_vp / mag_wdk, 0.5*mag_z);
             z_r[i] = z_r[i] - ( ratio * cos(arg_vp - arg_wdk) );
             z_i[i] = z_i[i] - ( ratio * sin(arg_vp - arg_wdk) );
         }
