@@ -808,6 +808,53 @@ Multiplication
     inverse of the reverse of ``f``. It is required that ``poly1`` and
     ``poly2`` are reduced modulo ``f``.
 
+Preconditioned modular multiplication
+--------------------------------------------------------------------------------
+
+.. type:: nmod_poly_mulmod_precond_struct
+          nmod_poly_mulmod_precond_t
+
+    Stores precomputed data for evaluating `ab \bmod d` where both `a`
+    and `d` are fixed.
+
+.. function:: void _nmod_poly_mulmod_precond_init_method(nmod_poly_mulmod_precond_t precond, nn_srcptr a, slong alen, nn_srcptr d, slong dlen, nn_srcptr dinv, slong lendinv, int method, nmod_t mod)
+              void nmod_poly_mulmod_precond_init_method(nmod_poly_mulmod_precond_t precond, const nmod_poly_t a, const nmod_poly_t d, const nmod_poly_t dinv, int method)
+              void _nmod_poly_mulmod_precond_init_num(nmod_poly_mulmod_precond_t precond, nn_srcptr a, slong alen, nn_srcptr d, slong dlen, nn_srcptr dinv, slong lendinv, slong num, nmod_t mod)
+              void nmod_poly_mulmod_precond_init_num(nmod_poly_mulmod_precond_t precond, const nmod_poly_t a, const nmod_poly_t d, const nmod_poly_t dinv, slong num)
+
+    Initialize ``precond`` for computing  `ab \bmod d`.
+    It is assumed that `a` is already reduced modulo `d`.
+    The *method* parameter must be one of the following:
+
+    * ``NMOD_POLY_MULMOD_PRECOND_NONE`` (no precomputation; multiplication will simply delegate to :func:`_nmod_poly_mulmod_preinv`)
+
+    * ``NMOD_POLY_MULMOD_PRECOND_SHOUP`` (use Shoup multiplication)
+
+    * ``NMOD_POLY_MULMOD_PRECOND_MATRIX`` (use the matrix algorithm)
+
+    The *num* versions of these functions attempt to choose the optimal
+    method automatically assuming that one intends to perform *num*
+    multiplications.
+
+    Shallow references to ``a``, ``d`` and ``dinv`` may be stored
+    in ``precond``; the original objects must therefore be kept alive
+    without modification as long as ``precond`` is used.
+    The user must supply the precomputed inverse of ``d``, with the same
+    meaning as in :func:`_nmod_poly_mulmod_preinv` and :func:`nmod_poly_mulmod_preinv`.
+
+.. function:: void nmod_poly_mulmod_precond_clear(nmod_poly_mulmod_precond_t precond)
+
+    Clears ``precond``, freeing any allocated memory.
+
+.. function:: void _nmod_poly_mulmod_precond(nn_ptr res, const nmod_poly_mulmod_precond_t precond, nn_srcptr b, slong blen, nmod_t mod)
+              void nmod_poly_mulmod_precond(nmod_poly_t res, const nmod_poly_mulmod_precond_t precond, const nmod_poly_t b)
+
+    Compute `ab \bmod d` where both `a` and `d` are fixed and represented by
+    the ``precond`` object. We require that `b` is already reduced modulo `d`.
+    The underscore method requires nonzero lengths and does not allow aliasing
+    between the output and any inputs (including ``a`` and ``d``).
+    The non-underscore method allows aliasing between ``b`` and ``res``.
+
 
 Powering
 --------------------------------------------------------------------------------

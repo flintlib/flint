@@ -49,6 +49,8 @@ void _nmod_vec_randtest(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 
 
+void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod);
+
 NMOD_VEC_INLINE
 void _nmod_vec_zero(nn_ptr vec, slong len)
 {
@@ -125,33 +127,13 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
+/* invert each coefficient */
+void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
+void _nmod_vec_invert_naive(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
+void _nmod_vec_invert_generic(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
+void _nmod_vec_invert_shoup(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
 
 /* ---- compute dot parameters ---- */
-
-typedef enum
-{
-    _DOT0 = 0,           /* len == 0 || mod.n == 1 */
-    _DOT1 = 1,           /* 1 limb */
-#if (FLINT_BITS == 64)
-    _DOT2_SPLIT = 2,     /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
-#endif  // FLINT_BITS == 64
-    _DOT2_HALF = 3,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
-    _DOT2 = 4,           /* 2 limbs */
-    _DOT3_ACC = 5,       /* 3 limbs, modulus allowing some accumulation in 2 limbs */
-    _DOT3 = 6,           /* 3 limbs */
-    _DOT_POW2 = 7,       /* mod.n is a power of 2 */
-} dot_method_t;
-// if mod.n is a power of 2, we use _DOT_POW2 in all cases
-// otherwise, number of limbs of unreduced dot product can be deduced:
-// 1 limb  <=>  method <= _DOT1
-// 2 limbs <=>  _DOT1 < method <= _DOT2
-// 3 limbs <=>  _DOT2 < method
-
-typedef struct
-{
-    dot_method_t method;
-    ulong pow2_precomp;  /* for splitting: (1L << 56) % mod.n */
-} dot_params_t;
 
 // for _DOT2_SPLIT
 #if (FLINT_BITS == 64)
@@ -248,9 +230,16 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
             dot_params_t params = {_DOT2_SPLIT, pow2_precomp};
             return params;
         }
-#endif
+#endif // FLINT_BITS == 64
+#if (FLINT_BITS == 64) && defined(__AVX2__)
+        ulong pow2_precomp;
+        NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+        dot_params_t params = {_DOT2_HALF, pow2_precomp};
+        return params;
+#else // (FLINT_BITS == 64) && defined(__AVX2__)
         dot_params_t params = {_DOT2_HALF, UWORD(0)};
         return params;
+#endif // (FLINT_BITS == 64) && defined(__AVX2__)
     }
     // from here on, mod.n > 2**(FLINT_BITS / 2)
     // --> unreduced dot cannot fit in 1 limb
@@ -293,7 +282,7 @@ int _nmod_vec_dot_bound_limbs_from_params(slong len, nmod_t mod, dot_params_t pa
 /* vec1[i] * vec2[i] */
 ulong _nmod_vec_dot_pow2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot1(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
-ulong _nmod_vec_dot2_half(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot2_half(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, ulong pow2_precomp);
 ulong _nmod_vec_dot2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot3_acc(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot3(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
@@ -450,7 +439,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
         return _nmod_vec_dot3(vec1, vec2, len, mod);
 
     if (params.method == _DOT2_HALF)
-        return _nmod_vec_dot2_half(vec1, vec2, len, mod);
+        return _nmod_vec_dot2_half(vec1, vec2, len, mod, params.pow2_precomp);
 
     if (params.method == _DOT_POW2)
     {

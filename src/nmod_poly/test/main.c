@@ -87,6 +87,7 @@
 #include "t-mullow_classical.c"
 #include "t-mullow_KS.c"
 #include "t-mulmod.c"
+#include "t-mulmod_precond.c"
 #include "t-mulmod_preinv.c"
 #include "t-multi_crt.c"
 #include "t-neg.c"
@@ -212,6 +213,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mullow_classical),
     TEST_FUNCTION(nmod_poly_mullow_KS),
     TEST_FUNCTION(nmod_poly_mulmod),
+    TEST_FUNCTION(nmod_poly_mulmod_precond),
     TEST_FUNCTION(nmod_poly_mulmod_preinv),
     TEST_FUNCTION(nmod_poly_multi_crt),
     TEST_FUNCTION(nmod_poly_neg),

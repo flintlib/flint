@@ -373,6 +373,47 @@ void nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1, const nmo
 int _nmod_poly_invmod(ulong *A, const ulong *B, slong lenB, const ulong *P, slong lenP, const nmod_t mod);
 int nmod_poly_invmod(nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t P);
 
+/* Preconditioned modular multiplication *************************************/
+
+#define NMOD_POLY_MULMOD_PRECOND_NONE 0
+#define NMOD_POLY_MULMOD_PRECOND_SHOUP 1
+#define NMOD_POLY_MULMOD_PRECOND_MATRIX 2
+/* TODO
+#define NMOD_POLY_MULMOD_PRECOND_SPARSE 3
+#define NMOD_POLY_MULMOD_PRECOND_FFT 4
+*/
+
+typedef struct
+{
+    int method;
+    slong n;          /* Degree of modulus */
+
+    nn_srcptr a;      /* Operand (important: shallow reference) */
+    slong alen;
+
+    nn_srcptr d;      /* Modulus (important: shallow reference) */
+    nn_srcptr dinv;   /* Modulus inverse (important: shallow reference) */
+    slong lendinv;    /* Length of modulus inverse */
+
+    nn_ptr adivd;     /* Precomputed quotient a * x^n / d for Shoup. */
+
+    nn_ptr matrix;    /* Array of size ceil(n / packing) * n storing multiplication matrix */
+    int packing;      /* Matrix entries per word: 1, 2, 3 or 4 */
+    dot_params_t dot_params;
+}
+nmod_poly_mulmod_precond_struct;
+
+typedef nmod_poly_mulmod_precond_struct nmod_poly_mulmod_precond_t[1];
+
+void _nmod_poly_mulmod_precond_init_method(nmod_poly_mulmod_precond_t precond, nn_srcptr a, slong alen, nn_srcptr d, slong dlen, nn_srcptr dinv, slong lendinv, int method, nmod_t mod);
+void nmod_poly_mulmod_precond_init_method(nmod_poly_mulmod_precond_t precond, const nmod_poly_t a, const nmod_poly_t d, const nmod_poly_t dinv, int method);
+void _nmod_poly_mulmod_precond_init_num(nmod_poly_mulmod_precond_t precond, nn_srcptr a, slong alen, nn_srcptr d, slong dlen, nn_srcptr dinv, slong lendinv, slong num, nmod_t mod);
+void nmod_poly_mulmod_precond_init_num(nmod_poly_mulmod_precond_t precond, const nmod_poly_t a, const nmod_poly_t d, const nmod_poly_t dinv, slong num);
+void nmod_poly_mulmod_precond_clear(nmod_poly_mulmod_precond_t precond);
+
+void _nmod_poly_mulmod_precond(nn_ptr res, const nmod_poly_mulmod_precond_t precond, nn_srcptr b, slong blen, nmod_t mod);
+void nmod_poly_mulmod_precond(nmod_poly_t res, const nmod_poly_mulmod_precond_t precond, const nmod_poly_t b);
+
 /* Powering  *****************************************************************/
 
 void _nmod_poly_pow_binexp(nn_ptr res, nn_srcptr poly, slong len, ulong e, nmod_t mod);

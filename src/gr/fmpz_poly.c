@@ -53,6 +53,9 @@ int _gr_fmpz_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return _gr_fmpz_poly_ctx_set_gen_name(ctx, s[0]);
 }
 
+int _gr_gr_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx);
+#define _gr_fmpz_poly_ctx_gen_name _gr_gr_poly_ctx_gen_name
+
 int
 _gr_fmpz_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -801,6 +804,18 @@ _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_src
     return GR_SUCCESS;
 }
 
+#define MUL_KS_CUTOFF 5
+
+int
+_gr_fmpz_poly_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    if (len1 < MUL_KS_CUTOFF || len2 < MUL_KS_CUTOFF || n < MUL_KS_CUTOFF)
+        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+    else
+        return _gr_poly_mullow_bivariate_KS(res, poly1, len1, poly2, len2, n, ctx);
+}
+
+
 int _fmpz_poly_methods_initialized = 0;
 
 gr_static_method_table _fmpz_poly_methods;
@@ -831,6 +846,8 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
 
     {GR_METHOD_CTX_SET_GEN_NAME,  (gr_funcptr) _gr_fmpz_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES, (gr_funcptr) _gr_fmpz_poly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,    (gr_funcptr) _gr_fmpz_poly_ctx_gen_name},
 
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_poly_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpz_poly_clear},
@@ -892,6 +909,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_RSQRT,           (gr_funcptr) _gr_fmpz_poly_rsqrt},
     {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpz_poly_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
+    {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_gr_poly_mullow},
     {0,                         (gr_funcptr) NULL},
 };
 

@@ -400,10 +400,7 @@ acb_theta_ql_perform_steps(acb_ptr th, acb_ptr th_init, acb_srcptr rts,
     th_next = _acb_vec_init(3 * n * nb);
     d = _arb_vec_init(n);
     d0 = _arb_vec_init(n);
-    if (all)
-    {
-        aux = _acb_vec_init(n * n);
-    }
+    aux = (all) ? _acb_vec_init(n * n) : NULL;
 
     for (k = nb_steps - 1; k >= 0; k--)
     {
@@ -519,10 +516,7 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
     th_init = _acb_vec_init(3 * n * nb);
     easy_steps = flint_malloc(nb * sizeof(slong));
     acb_mat_init(new_tau, g, g);
-    if (all)
-    {
-        rts_all = _acb_vec_init(nb * n * n);
-    }
+    rts_all = (all) ? _acb_vec_init(nb * n * n) : NULL;
 
     res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps, zs, nb, tau, distances,
         nb_steps, all, prec);
