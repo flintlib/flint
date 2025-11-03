@@ -1,4 +1,5 @@
 #include "find_roots_double.h"
+#include <stdlib.h>
 #include <math.h>
 #include <string.h> /* for memcpy */
 
@@ -122,11 +123,13 @@ typedef struct {
     double *rp_i;
 } double_field;
 
+#define LOG_ROUNDING 10
+
 /* Initialize the members of the double_field */
 static void _double_cpoly_init(double_field * v, slong* np, double* mem_v, const double * p, slong fz, slong n)
 {
     double pivot;
-    slong i, n_np, k=10;
+    slong i, n_np, k=LOG_ROUNDING;
 
     /* Set the memory addresses */
     /* z_r and z_i will hold 2(n-1) double each */
@@ -180,7 +183,9 @@ slong double_cpoly_partition_pivot(double* z_r, double* z_i, slong n)
 
 static int compare(const void * first, const void * second)
 {
-    double left[2], right[2], magl, argl, magr, argr, compmag, comparg,epsilon=ldexp(1,-25);
+    double magl, argl, magr, argr, compmag, comparg,epsilon=ldexp(1,-25);
+    double left[2];
+    double right[2];
     int res;
     memcpy(left, first, 2*sizeof(double));
     memcpy(right, second, 2*sizeof(double));
@@ -223,7 +228,7 @@ static int compare(const void * first, const void * second)
 #define DBlock (Nd*Nr/2)
 #define CSBlock (Nd*Nr/2)
 #define CDHBlock (Nd*Nr/4)
-#define CDWBlock (Nd*Nr*8)
+#define CDWBlock (Nd*Nr)
 
 /* Horner evaluation */
 void double_cpoly_horner(double* results_r, double* results_i,
@@ -257,11 +262,39 @@ void double_cpoly_horner(double* results_r, double* results_i,
     }
 }
 
+/* Weights for the Durand-Kerner or Weierstrass iteration */
+/* twice_values_r and twice_values_i have size 2n,
+ * the second half of each array is a copy of the first half */
+void double_cpoly_weierstrass_a(double* restrict results_r, double* restrict results_i,
+                              double lc_r, double lc_i,
+                              const double* twice_values_r, const double* twice_values_i,
+                              slong n_start, slong n_end, slong d)
+{
+    int p, k;
+    slong i, j;
+    for(i=n_start; i<n_end; i++){
+        results_r[i] = lc_r;
+        results_i[i] = lc_i;
+    }
+    for(j=1; j<d; j++) {
+        for(i=n_start; i < n_end; i++) {
+            double q, r, s, t;
+            q = twice_values_r[i] - twice_values_r[i+j];
+            r = twice_values_i[i] - twice_values_i[i+j];
+            #pragma STDC FP_CONTRACT ON
+            s = q*results_r[i] - r*results_i[i];
+            t = q*results_i[i] + r*results_r[i];
+            results_r[i] = s;
+            results_i[i] = t;
+        }
+    }
+}
+
 
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass_a(double* results_r, double* results_i,
+void double_cpoly_weierstrass_b(double* results_r, double* results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
@@ -312,28 +345,103 @@ void double_cpoly_weierstrass_a(double* results_r, double* results_i,
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass(double* results_r, double* results_i,
+void double_cpoly_weierstrass(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
 {
-    int p, k;
+    int p, q, k, m;
     slong i, j;
     for(i=n_start; i<n_end; i++){
         results_r[i] = lc_r;
         results_i[i] = lc_i;
     }
-    for(j=1; j<d; j++) {
-        for(i=n_start; i < n_end; i++) {
-            double q, r, s, t;
-            q = twice_values_r[i] - twice_values_r[i+j];
-            r = twice_values_i[i] - twice_values_i[i+j];
-            #pragma STDC FP_CONTRACT ON
-            s = q*results_r[i] - r*results_i[i];
-            t = q*results_i[i] + r*results_r[i];
-            results_r[i] = s;
-            results_i[i] = t;
+    for(i=n_start; i < n_end; i+=CDWBlock) {
+        double xr[CDWBlock]  = {0};
+        double yr[CDWBlock]  = {0};
+        double xc[CDWBlock]  = {0};
+        double yc[CDWBlock]  = {0};
+        double u[CDWBlock]   = {0};
+        double v[CDWBlock]   = {0};
+        double a[2*CDWBlock] = {0};
+        double b[2*CDWBlock] = {0};
+
+        p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
+        memcpy(xr, results_r+i, p*sizeof(double));
+        memcpy(yr, results_i+i, p*sizeof(double));
+        memcpy(u, twice_values_r+i, p*sizeof(double));
+        memcpy(v, twice_values_i+i, p*sizeof(double));
+        /* Symmetric part of the matrix with the diagonal */
+        memcpy(a, u, p*sizeof(double));
+        memcpy(b, v, p*sizeof(double));
+        memcpy(a+p, u, p*sizeof(double));
+        memcpy(b+p, v, p*sizeof(double));
+        for(m=1; m<p; m++) {
+            for(k=0; k<p; k++) {
+                #pragma STDC FP_CONTRACT ON
+                double e, f, s,t;
+                e = u[k] - a[k+m];
+                f = v[k] - b[k+m];
+                s = e*xr[k] - f*yr[k];
+                t = e*yr[k] + f*xr[k];
+                xr[k] = s;
+                yr[k] = t;
+            }
         }
+        /* Symmetric part of the matrix without the diagonal */
+        for(j=i+p; j<n_end; j+=CDWBlock){
+            /* In this loop, p is always CDWBlock */
+            q = (j+CDWBlock<=n_end) ? CDWBlock : ((n_end-i-p) % CDWBlock);
+            memcpy(a, twice_values_r+j, q*sizeof(double));
+            memcpy(b, twice_values_i+j, q*sizeof(double));
+            for(m=0; m<q; m++) {
+                for(k=0; k<CDWBlock; k++) {
+                    double e, f, s,t;
+                    e = u[k]-a[m];
+                    f = v[k]-b[m];
+                    s = e*xr[k] - f*yr[k];
+                    t = e*yr[k] + f*xr[k];
+                    xr[k] = s;
+                    yr[k] = t;
+                }
+            }
+            memcpy(xc, results_r+j, q*sizeof(double));
+            memcpy(yc, results_i+j, q*sizeof(double));
+            for(k=0; k<CDWBlock; k++) {
+                for(m=0; m<q; m++) {
+                    double e, f, s,t;
+                    e = a[m]-u[k];
+                    f = b[m]-v[k];
+                    s = e*xc[m] - f*yc[m];
+                    t = e*yc[m] + f*xc[m];
+                    xc[m] = s;
+                    yc[m] = t;
+                }
+            }
+            memcpy(results_r+j, xc, q*sizeof(double));
+            memcpy(results_i+j, yc, q*sizeof(double));
+        }
+        /* Non symmetric part of the matrix */
+        slong start = (n_start != 0) ? 0 : n_end;
+        slong end = (n_end == d) ? n_start : d ;
+        for(j = start; j < end; j += CDWBlock){
+            q = (j+CDWBlock<=end) ? CDWBlock : ((end-start) % CDWBlock);
+            memcpy(a, twice_values_r+j, q*sizeof(double));
+            memcpy(b, twice_values_i+j, q*sizeof(double));
+            for(m=0; m<q; m++) {
+                for(k=0; k<p; k++) {
+                    double e, f, s,t;
+                    e = u[k]-a[m];
+                    f = v[k]-b[m];
+                    s = e*xr[k] - f*yr[k];
+                    t = e*yr[k] + f*xr[k];
+                    xr[k] = s;
+                    yr[k] = t;
+                }
+            }
+        }
+        memcpy(results_r+i, xr, p*sizeof(double));
+        memcpy(results_i+i, yr, p*sizeof(double));
     }
 }
 
@@ -404,7 +512,7 @@ void double_cpoly_find_roots(double * z, const double * p, slong n, slong max_it
             z[2*(i+fz)] = v->z_r[i];
             z[2*(i+fz)+1] = v->z_i[i];
         }
-        qsort(z, n, 2*sizeof(double), compare);
+        qsort(z, n-1, 2*sizeof(double), compare);
 
         flint_free(np);
         flint_free(mem_v);
