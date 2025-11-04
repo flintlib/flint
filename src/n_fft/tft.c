@@ -20,15 +20,13 @@
 /* division by x**n - c, lazy with precomputation */
 /* constraint: max(A) + 2*modn <= 2**FLINT_BITS */
 /* coeff bounds: in [0, max(A)] | out [0, max(A) + 2*modn) */
-static void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
+/* TODO make faster by using ideas from try_sparse */
+static inline void
+_nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr p, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
 {
     /* assumes len >= n */
     slong i;
     ulong j, r, val, p_hi, p_lo;
-
-    if (RQ != A)
-        for (j = 0; j < n; j++)
-            RQ[len-n+j] = A[len-n+j];
 
     r = len % n;
     i = len - r - n;  /* multiple of n, >= 0 by assumption */
@@ -36,11 +34,11 @@ static void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong le
     for (j = 0; j < r; j++)
     {
         /* computes either val = (c*val mod n) or val = (c*val mod n) + n */
-        val = RQ[i+n+j];
+        val = p[i+n+j];
         umul_ppmm(p_hi, p_lo, c_precomp, val);
         val = c * val - p_hi * modn;
         /* lazy addition, yields RQ[i+j] in [0..k+2n), where max(RQ) <= k */
-        RQ[i+j] = val + A[i+j];
+        p[i+j] = val + p[i+j];
     }
 
     i -= n;
@@ -49,11 +47,11 @@ static void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong le
         for (j = 0; j < n; j++)
         {
             /* computes either val = (c*val mod n) or val = (c*val mod n) + n */
-            val = RQ[i+n+j];
+            val = p[i+n+j];
             umul_ppmm(p_hi, p_lo, c_precomp, val);
             val = c * val - p_hi * modn;
             /* lazy addition, yields RQ[i+j] in [0..k+2n), where max(RQ) <= k */
-            RQ[i+j] = val + A[i+j];
+            p[i+j] = val + p[i+j];
         }
         i -= n;
     }
@@ -281,25 +279,16 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
         ulong len_rec = UWORD(1) << depth;
         if (len_rec < len/2)
         {
+            /* FIXME explain why this suffices; see if can be integrated in divrem */
             for (ulong k = 0; k < len/2; k++)
             {
                 if (p1[k] >= F->mod2)
                     p1[k] -= F->mod2;
-                if (p1[k] >= F->mod)
-                    p1[k] -= F->mod;
             }
-            ulong c, cpre;
             if (node % 2 == 0)
-            {
-                c = F->tab_w[node];
-                cpre = F->tab_w[node+1];
-            }
+                _nmod_poly_divrem_xnmc_precomp_lazy(p1, len/2, len_rec, F->tab_w[node], F->tab_w[node+1], F->mod);
             else  /* node % 2 == 1 */
-            {
-                c = F->tab_w[node-1];
-                cpre = F->tab_w[node];
-            }
-            _nmod_poly_divrem_xnmc_precomp_lazy(p1, p1, len/2, len_rec, c, cpre, F->mod);
+                _nmod_poly_divrem_xnmc_precomp_lazy(p1, len/2, len_rec, F->tab_w[node-1], F->tab_w[node], F->mod);
             /* nn_ptr R = flint_malloc(len_rec * sizeof(ulong)); */
             /* nn_ptr B = flint_calloc(len_rec+1, sizeof(ulong)); */
             /* B[len_rec] = 1; */
