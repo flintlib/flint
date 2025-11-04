@@ -59,16 +59,6 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly,
     {
         return;
     }
-    
-    if (r == 1)
-    {
-        ulong v = _nmod_poly_evaluate_nmod(poly, plen, 1, mod);
-        for (slong i = 0; i < n; i++)
-        {
-            ys[i] = v;
-        }
-        return;
-    }
 
     nmod_geometric_progression_t G;
     nmod_geometric_progression_init(G, r, FLINT_MAX(n, plen), mod);
