@@ -8,7 +8,7 @@ slong ns[] = { 2, 3, 4, 6, 8, 9, 10, 11, 12, 16, 20, 24, 32, 48, 64, 96, 128, 16
 #define CHECK_MATRIX 2
 #define CHECK_TUNING_VS_BEST 3
 
-int main()
+int main(void)
 {
     slong i, ni, n, npre, num, numi;
     flint_rand_t state;
@@ -80,7 +80,7 @@ int main()
                     mpn_tdiv_qr(t, b + i * n, 0, b + i * n, n, d, n);
                 }
 
-                TIMEIT_START
+                TIMEIT_START;
                 if (norm == 0)
                 {
                     for (i = 0; i < num; i++)
@@ -95,19 +95,19 @@ int main()
                         mpn_rshift(r1 + i * n, r1 + i * n, n, norm);
                     }
                 }
-                TIMEIT_STOP_VALUES(tcpu, t1)
+                TIMEIT_STOP_VALUES(tcpu, t1);
 
-                TIMEIT_START
+                TIMEIT_START;
                 flint_mpn_mulmod_precond_matrix_precompute(apre, a, n, dnormed, dinv, norm);
                 for (i = 0; i < num; i++)
                     flint_mpn_mulmod_precond_matrix(r2 + i * n, apre, b + i * n, n, dnormed, dinv, norm);
-                TIMEIT_STOP_VALUES(tcpu, t2)
+                TIMEIT_STOP_VALUES(tcpu, t2);
 
-                TIMEIT_START
+                TIMEIT_START;
                 flint_mpn_mulmod_precond_shoup_precompute(apre, a, n, dnormed, dinv, norm);
                 for (i = 0; i < num; i++)
                     flint_mpn_mulmod_precond_shoup(r2 + i * n, a, apre, b + i * n, n, d, norm);
-                TIMEIT_STOP_VALUES(tcpu, t3)
+                TIMEIT_STOP_VALUES(tcpu, t3);
 
                 tstandard[ni][numi] = t1;
                 tmatrix[ni][numi] = t2;

@@ -70,14 +70,14 @@ int main(void)
         mpn_random2(yp, n);
         flint_mpn_copyi(rg, rf, n);
 
-        TIMEIT_START
+        TIMEIT_START;
         flint_mpn_2add_n_inplace(rf, xp, yp, n);
-        TIMEIT_STOP_VALUES(__, t1)
+        TIMEIT_STOP_VALUES(__, t1);
 
-        TIMEIT_START
+        TIMEIT_START;
         mpn_add_n(rg, rg, xp, n);
         mpn_add_n(rg, rg, yp, n);
-        TIMEIT_STOP_VALUES(__, t2)
+        TIMEIT_STOP_VALUES(__, t2);
 
         flint_printf("%7.2fx\n", t2 / t1);
     }

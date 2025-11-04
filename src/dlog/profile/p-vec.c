@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
                             n[l],bits[i],nv[j],np);
                 }
 
-                TIMEIT_ONCE_START
+                TIMEIT_ONCE_START;
 
                 for (k = 0; k < np; k++)
                 {
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
                     (func[l])(v, nv[j], a[k], 1, p[k], p[k].n - 1, order);
                 }
 
-                TIMEIT_ONCE_STOP
+                TIMEIT_ONCE_STOP;
 
                 if (out == JSON)
                     flint_printf("}\n");

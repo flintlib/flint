@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     flint_printf("precision = %wd bits... ", prec);
     fflush(stdout);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     if (constant == 0)
         arb_const_pi(x, prec);
     else if (constant == 1)
@@ -83,9 +83,9 @@ int main(int argc, char *argv[])
         arb_zeta_ui(x, 3, prec);
     else if (constant == 7)
         arb_const_reciprocal_fibonacci(x, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
 
     arb_printn(x, digits, ARB_STR_CONDENSE * condense);
 

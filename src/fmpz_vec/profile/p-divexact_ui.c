@@ -12,7 +12,7 @@ _fmpz_vec_scalar_divexact_ui_naive(fmpz * vec1, const fmpz * vec2,
         fmpz_divexact_ui(vec1 + i, vec2 + i, c);
 }
 
-int main()
+int main(void)
 {
     slong len, bits;
 
@@ -38,12 +38,12 @@ int main()
             c = n_randtest_not_zero(state);
             _fmpz_vec_scalar_mul_ui(Ac, A, len, c);
 
-            TIMEIT_START
+            TIMEIT_START;
             _fmpz_vec_scalar_divexact_ui_naive(B, Ac, len, c);
-            TIMEIT_STOP_VALUES(__, t1)
-            TIMEIT_START
+            TIMEIT_STOP_VALUES(__, t1);
+            TIMEIT_START;
             _fmpz_vec_scalar_divexact_ui(B, Ac, len, c);
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%6wd    %6wd   %6wd    %8g   %8g   %.3f\n",
                     len, _fmpz_vec_max_bits(Ac, len), FLINT_BIT_COUNT(c),
