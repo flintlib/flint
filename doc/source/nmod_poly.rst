@@ -2550,7 +2550,7 @@ Geometric progression
     the powers of ``r`` squared up to ``d`` are one.
 
     The value of ``d`` should be greater or equal to the degree of the polynomials one
-    whishes to evaluate / interpolate plus one and greater than ``n`` the modulus.
+    whishes to evaluate / interpolate plus one and greater than the number of points one whises to use.
 
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 
