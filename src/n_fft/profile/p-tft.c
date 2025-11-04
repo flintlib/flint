@@ -54,7 +54,45 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     FLINT_TEST_CLEAR(state);                                                     \
 }                                                                                \
 
+#define SAMPLE_OLEN(fun, _variant)                                               \
+void sample_##fun##_variant(void * arg, ulong count)                             \
+{                                                                                \
+    info_t * info = (info_t *) arg;                                              \
+    const ulong p = info->prime;                                                 \
+    const ulong depth = info->depth;                                             \
+    const ulong olen = info->olen;                                               \
+                                                                                 \
+    const ulong len = (UWORD(1) << depth);                                       \
+    const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));                \
+                                                                                 \
+    /* modulus, roots of unity */                                                \
+    n_fft_ctx_t F;                                                               \
+    n_fft_ctx_init2(F, depth, p);                                                \
+    n_fft_args_t Fargs;                                                          \
+    n_fft_set_args(Fargs, F->mod, F->tab_w);                                     \
+                                                                                 \
+    FLINT_TEST_INIT(state);                                                      \
+                                                                                 \
+    ulong * coeffs = _nmod_vec_init(len);                                        \
+    for (ulong k = 0; k < len; k++)                                              \
+        coeffs[k] = n_randint(state, p);                                         \
+                                                                                 \
+    for (ulong i = 0; i < count; i++)                                            \
+    {                                                                            \
+        prof_start();                                                            \
+        for (ulong j = 0; j < rep; j++)                                          \
+            fun##_variant(coeffs, olen, depth, 0, Fargs);                        \
+        prof_stop();                                                             \
+    }                                                                            \
+                                                                                 \
+    _nmod_vec_clear(coeffs);                                                     \
+    n_fft_ctx_clear(F);                                                          \
+    FLINT_TEST_CLEAR(state);                                                     \
+}                                                                                \
+
 SAMPLE(tft_node_lazy_4_4, _v1)
+
+SAMPLE_OLEN(tft_node_lazy_4_4, _v2_olen)
 
 void sample_sd_fft(void * arg, ulong count)
 {
@@ -126,12 +164,13 @@ int main()
 
             double min_sd[5];
             double min[5];
+            double min_olen[5];
             double max;
 
             /* olen in {len/2 + 8, len/2 + len/4, len} */
             ulong ilens[4] = {len/4, len/2, 3*len/4, len};
             ulong olens[4] = {len/2 + 8, 3*len/4, len - 8, len};
-            for (ulong ili = 0; ili < 4; ili++)
+            for (ulong ili = 3; ili < 4; ili++)
             {
                 info.ilen = ilens[ili];
                 flint_printf("%ld\t%ld\t", info.depth, info.ilen);
@@ -141,9 +180,10 @@ int main()
                     info.olen = olens[oli];
                     if (k < 5) prof_repeat(min_sd+oli, &max, sample_sd_fft, (void *) &info);
                     prof_repeat(min+oli, &max, sample_tft_node_lazy_4_4_v1, (void *) &info);
+                    prof_repeat(min_olen+oli, &max, sample_tft_node_lazy_4_4_v2_olen, (void *) &info);
                 }
 
-                flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",
+                flint_printf("%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\t%.1e\n",
                         min_sd[0]/(double)1000000/rep,
                         min_sd[1]/(double)1000000/rep,
                         min_sd[2]/(double)1000000/rep,
@@ -151,7 +191,11 @@ int main()
                         min[0]/(double)1000000/rep,
                         min[1]/(double)1000000/rep,
                         min[2]/(double)1000000/rep,
-                        min[3]/(double)1000000/rep
+                        min[3]/(double)1000000/rep,
+                        min_olen[0]/(double)1000000/rep,
+                        min_olen[1]/(double)1000000/rep,
+                        min_olen[2]/(double)1000000/rep,
+                        min_olen[3]/(double)1000000/rep
                         );
             }
         }

@@ -15,6 +15,50 @@
 #include "nmod.h"  // TODO remove when poly_rem removed
 #include "nmod_vec.h"
 
+/* TODO temporary until something of this kind gets merged in */
+/* (unless this version becomes too n_fft-specific and it will stay here) */
+/* division by x**n - c, lazy with precomputation */
+/* constraint: max(A) + 2*modn <= 2**FLINT_BITS */
+/* coeff bounds: in [0, max(A)] | out [0, max(A) + 2*modn) */
+static void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
+{
+    /* assumes len >= n */
+    slong i;
+    ulong j, r, val, p_hi, p_lo;
+
+    if (RQ != A)
+        for (j = 0; j < n; j++)
+            RQ[len-n+j] = A[len-n+j];
+
+    r = len % n;
+    i = len - r - n;  /* multiple of n, >= 0 by assumption */
+
+    for (j = 0; j < r; j++)
+    {
+        /* computes either val = (c*val mod n) or val = (c*val mod n) + n */
+        val = RQ[i+n+j];
+        umul_ppmm(p_hi, p_lo, c_precomp, val);
+        val = c * val - p_hi * modn;
+        /* lazy addition, yields RQ[i+j] in [0..k+2n), where max(RQ) <= k */
+        RQ[i+j] = val + A[i+j];
+    }
+
+    i -= n;
+    while (i >= 0)
+    {
+        for (j = 0; j < n; j++)
+        {
+            /* computes either val = (c*val mod n) or val = (c*val mod n) + n */
+            val = RQ[i+n+j];
+            umul_ppmm(p_hi, p_lo, c_precomp, val);
+            val = c * val - p_hi * modn;
+            /* lazy addition, yields RQ[i+j] in [0..k+2n), where max(RQ) <= k */
+            RQ[i+j] = val + A[i+j];
+        }
+        i -= n;
+    }
+}
+
 /** Structure.
  * - The main interface is n_fft_tft, it solves the problem at node 0
  *   (evaluating at roots of unity of order 2**depth), as documented
@@ -187,12 +231,8 @@ void tft_node_lazy_4_4_v1(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong n
 /* minimum len == 16, in which case olen == 12 */
 void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F)
 {
-    flint_printf("olen = %wu, len = %wu, node = %wu\n", olen, 1L<<depth, node);
-    if (olen == (UWORD(1) << depth))
-    {
-        dft_node_lazy_4_4(p, depth, node, F);
-    }
-    else if (depth == 4) /* FIXME smaller base cases? */
+    /* flint_printf("olen = %wu, len = %wu, node = %wu\n", olen, 1L<<depth, node); */
+    if (depth == 4) /* FIXME smaller base cases? */
     {
         /* FIXME for the moment, not truncated... pretending olen==16 */
         DFT16_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
@@ -241,9 +281,6 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
         ulong len_rec = UWORD(1) << depth;
         if (len_rec < len/2)
         {
-            /* once new function finalized, replace by:
-             * _nmod_poly_divrem_xnmc_precomp_lazy(p, p, len/2, 1<<depth, F->tab_w[2*node], F->tab_w[2*node+1], F->mod);
-             * careful with lazy!! what guarantee on input? */
             for (ulong k = 0; k < len/2; k++)
             {
                 if (p1[k] >= F->mod2)
@@ -251,23 +288,35 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
                 if (p1[k] >= F->mod)
                     p1[k] -= F->mod;
             }
-            nn_ptr R = flint_malloc(len_rec * sizeof(ulong));
-            nn_ptr B = flint_calloc(len_rec+1, sizeof(ulong));
-            B[len_rec] = 1;
+            ulong c, cpre;
             if (node % 2 == 0)
-                B[0] = F->mod - F->tab_w[node];
+            {
+                c = F->tab_w[node];
+                cpre = F->tab_w[node+1];
+            }
             else  /* node % 2 == 1 */
-                B[0] = F->mod - F->tab_w[node-1];
-            nmod_t mod;
-            nmod_init(&mod, F->mod);
-            _nmod_poly_rem(R, p1, len/2, B, len_rec+1, mod);
-            for (ulong k = 0; k < len_rec; k++)
-                p1[k] = R[k];
-            flint_free(R);
-            flint_free(B);
+            {
+                c = F->tab_w[node-1];
+                cpre = F->tab_w[node];
+            }
+            _nmod_poly_divrem_xnmc_precomp_lazy(p1, p1, len/2, len_rec, c, cpre, F->mod);
+            /* nn_ptr R = flint_malloc(len_rec * sizeof(ulong)); */
+            /* nn_ptr B = flint_calloc(len_rec+1, sizeof(ulong)); */
+            /* B[len_rec] = 1; */
+            /* B[0] = F->mod - c; */
+            /* nmod_t mod; */
+            /* nmod_init(&mod, F->mod); */
+            /* _nmod_poly_rem(R, p1, len/2, B, len_rec+1, mod); */
+            /* for (ulong k = 0; k < len_rec; k++) */
+            /*     p1[k] = R[k]; */
+            /* flint_free(R); */
+            /* flint_free(B); */
         }
 
-        tft_node_lazy_4_4_v2_olen(p1, olen_rec, depth, node, F);
+        if (olen_rec == (UWORD(1) << depth))
+            dft_node_lazy_4_4(p1, depth, node, F);
+        else
+            tft_node_lazy_4_4_v2_olen(p1, olen_rec, depth, node, F);
     }
 }
 
