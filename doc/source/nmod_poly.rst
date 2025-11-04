@@ -2535,6 +2535,28 @@ Subproduct trees
     product is not computed.
 
 
+
+Geometric progression
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d, nmod_t mod)
+
+
+    Builds a geometric progression multipoint evaluation / interpolation structure.
+
+    The value of ``r`` should be reduced modulo the modulus ``mod``
+    and of sufficient multiplicative order such that none of 
+    the powers of ``r`` squared up to ``d`` are one.
+
+    The value of ``d`` should be greater or equal to the degree of the polynomials one
+    whishes to evaluate / interpolate plus one and greater than ``n`` the modulus.
+
+.. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
+
+    Clears the allocated polynomials and vectors used in the geometric progression precomputation ``G``.
+
+
 Inflation and deflation
 --------------------------------------------------------------------------------
 
