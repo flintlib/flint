@@ -268,7 +268,7 @@ void double_cpoly_horner(double* results_r, double* results_i,
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass(double* restrict results_r, double* restrict results_i,
+void double_cpoly_weierstrass_a(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
@@ -293,10 +293,10 @@ void double_cpoly_weierstrass(double* restrict results_r, double* restrict resul
     }
 }
 
-/* Not working yet */
-/* Weights for the Durand-Kerner or Weierstrass iteration */
-/* twice_values_r and twice_values_i have size 2n,
- * the second half of each array is a copy of the first half */
+/* Weights for the Durand-Kerner or Weierstrass iteration
+ * twice_values_r and twice_values_i have size 2n,
+ * the second half of each array is a copy of the first half
+ * A variant of this version could be usefull for the Borsh Supan weights*/                                                         
 void double_cpoly_weierstrass_b(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
@@ -308,7 +308,7 @@ void double_cpoly_weierstrass_b(double* restrict results_r, double* restrict res
         results_r[i] = lc_r;
         results_i[i] = lc_i;
     }
-    for(j=1; j<d; j++) {
+    for(j=1; j<n_end-n_start; j++) {
         for(i=n_start; i < n_end-j; i++) {
             double q, r, s, t;
             q = twice_values_r[i] - twice_values_r[i+j];
@@ -324,7 +324,7 @@ void double_cpoly_weierstrass_b(double* restrict results_r, double* restrict res
             results_i[i+j] = t;
         }
     }
-    for(j=n_end % d; j<n_start; j = (j + 1) % d) {
+    for(j=n_end % d; ((j<n_start) || (j>= n_end)) && (n_start < n_end); j = (j + 1) % d) {
         for(i=n_start; i < n_end; i++) {
             double q, r, s, t;
             q = twice_values_r[i] - twice_values_r[j];
@@ -341,7 +341,7 @@ void double_cpoly_weierstrass_b(double* restrict results_r, double* restrict res
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
-void double_cpoly_weierstrass_c(double* restrict results_r, double* restrict results_i,
+void double_cpoly_weierstrass(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
