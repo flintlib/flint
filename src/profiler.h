@@ -27,7 +27,7 @@
 #if defined(_MSC_VER) || defined(__x86_64__) || defined(__aarch64__)
 # define FLINT_HAVE_get_cycle_counter  1
 #endif
-#if defined(__unix__) || defined(__APPLE__)
+#if (defined(__unix__) && !defined(__CYGWIN__)) || defined(__APPLE__)
 # define FLINT_HAVE_getrusage   1
 #endif
 
