@@ -293,10 +293,55 @@ void double_cpoly_weierstrass(double* restrict results_r, double* restrict resul
     }
 }
 
+/* Not working yet */
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* twice_values_r and twice_values_i have size 2n,
  * the second half of each array is a copy of the first half */
 void double_cpoly_weierstrass_b(double* restrict results_r, double* restrict results_i,
+                              double lc_r, double lc_i,
+                              const double* twice_values_r, const double* twice_values_i,
+                              slong n_start, slong n_end, slong d)
+{
+    int p, k;
+    slong i, j;
+    for(i=n_start; i<n_end; i++){
+        results_r[i] = lc_r;
+        results_i[i] = lc_i;
+    }
+    for(j=1; j<d; j++) {
+        for(i=n_start; i < n_end-j; i++) {
+            double q, r, s, t;
+            q = twice_values_r[i] - twice_values_r[i+j];
+            r = twice_values_i[i] - twice_values_i[i+j];
+            #pragma STDC FP_CONTRACT ON
+            s = q*results_r[i] - r*results_i[i];
+            t = q*results_i[i] + r*results_r[i];
+            results_r[i] = s;
+            results_i[i] = t;
+            s = -q*results_r[i+j] + r*results_i[i+j];
+            t = -q*results_i[i+j] - r*results_r[i+j];
+            results_r[i+j] = s;
+            results_i[i+j] = t;
+        }
+    }
+    for(j=n_end % d; j<n_start; j = (j + 1) % d) {
+        for(i=n_start; i < n_end; i++) {
+            double q, r, s, t;
+            q = twice_values_r[i] - twice_values_r[j];
+            r = twice_values_i[i] - twice_values_i[j];
+            #pragma STDC FP_CONTRACT ON
+            s = q*results_r[i] - r*results_i[i];
+            t = q*results_i[i] + r*results_r[i];
+            results_r[i] = s;
+            results_i[i] = t;
+        }
+    }
+}
+
+/* Weights for the Durand-Kerner or Weierstrass iteration */
+/* twice_values_r and twice_values_i have size 2n,
+ * the second half of each array is a copy of the first half */
+void double_cpoly_weierstrass_c(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
