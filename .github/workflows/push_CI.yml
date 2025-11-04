@@ -14,19 +14,13 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  #############################################################################
-  # freebsd with clang
-  #############################################################################
-  freebsd-gcc:
-    name: FreeBSD Clang (x0.5)
-
+  freebsd:
+    name: FreeBSD (x0.5)
     runs-on: ubuntu-latest
     env:
       FLINT_TEST_MULTIPLIER: "0.5"
-
     steps:
       - uses: actions/checkout@v4
-
       - name: "Run tests on FreeBSD"
         uses: cross-platform-actions/action@v0.26.0
         timeout-minutes: 15
@@ -97,39 +91,27 @@ jobs:
           fi
           echo "All good!"
 
-
-
-  #############################################################################
-  # cygwin with gcc
-  #############################################################################
-  cygwin-gcc:
-    name: Cygwin GCC (x0.5)
-
+  cygwin:
+    name: Cygwin (x0.5)
     runs-on: windows-latest
-
     defaults:
       run:
         shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
-
     env:
-      REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
+      REPO: /cygdrive/d/a/flint/flint
       CC: "gcc"
       FLINT_TEST_MULTIPLIER: "0.5"
-
     steps:
       - name: Make Git to use LF
         shell: pwsh
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-
       - uses: actions/checkout@v4
-
       - name: "Set up Cygwin"
         uses: gap-actions/setup-cygwin@v1
         with:
           PKGS_TO_INSTALL: "gcc-core,make,libgmp-devel,libmpfr-devel,libtool,autoconf,automake"
-
       - name: "Setup"
         run: |
           gcc --version
@@ -137,27 +119,12 @@ jobs:
           autoconf --version
           libtool --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
       - name: "Configure"
         run: |
-          cd ${REPO}
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --enable-fast-build \
-            --disable-debug
-
+          cd ${REPO} && ./bootstrap.sh && ./configure CC=${CC} --enable-fast-build --disable-debug
       - name: "Compile library"
-        run: |
-          cd ${REPO}
-          ${MAKE}
-
+        run: cd ${REPO} && ${MAKE}
       - name: "Compile tests"
-        run: |
-          cd ${REPO}
-          $MAKE tests
-
+        run: cd ${REPO} && ${MAKE} tests
       - name: "Check"
-        run: |
-          cd ${REPO}
-          $MAKE check
+        run: cd ${REPO} && ${MAKE} check
