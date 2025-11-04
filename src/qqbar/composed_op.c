@@ -219,14 +219,14 @@ qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int
 #if TIMING
     {
         flint_printf("composed op: ");
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
 
         flint_printf("factoring: ");
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         fmpz_poly_factor(fac, H);
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
     }
 #else
     qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);

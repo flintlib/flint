@@ -167,15 +167,15 @@ int main(int argc, char * argv[])
 
         gr_ctx_clear(ZZ);
 
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         flint_printf("%{fmpz} : %s\n", n, fmpz_is_prime_AKS(n, 1) ? "PRIME" : "COMPOSITE");
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
 
         flint_printf("\nfmpz_is_prime for comparison:\n");
         int is_prime;
-        TIMEIT_START
+        TIMEIT_START;
         is_prime = fmpz_is_prime(n);
-        TIMEIT_STOP
+        TIMEIT_STOP;
         flint_printf("%{fmpz} : %s\n", n, is_prime ? "PRIME" : "COMPOSITE");
     }
     else
@@ -183,7 +183,7 @@ int main(int argc, char * argv[])
         flint_printf("No input given, running examples:\n");
 
         flint_printf("\nVerifying the algorithm up to n = 1000...\n");
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         for (fmpz_one(n); fmpz_cmp_ui(n, 1000) <= 0; fmpz_add_ui(n, n, 1))
         {
             if (fmpz_fdiv_ui(n, 100) == 0)
@@ -193,19 +193,19 @@ int main(int argc, char * argv[])
                 flint_printf("FAIL: wrong result for n = %{fmpz}\n", n);
         }
         flint_printf("OK\n");
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
 
         flint_printf("\nTesting a 10-digit prime\n");
         fmpz_set_str(n, "6772298791", 10);
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         flint_printf("%{fmpz} : %s\n", n, fmpz_is_prime_AKS(n, 1) ? "PRIME" : "COMPOSITE");
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
 
         flint_printf("\nTesting a 50-digit semiprime\n");
         fmpz_set_str(n, "6792336996936278623737332130584104553341324999517", 10);
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         flint_printf("%{fmpz} : %s\n", n, fmpz_is_prime_AKS(n, 1) ? "PRIME" : "COMPOSITE");
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
     }
 
     fmpz_clear(n);

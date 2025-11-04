@@ -26,7 +26,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
 slong parameters[] = { 4, 5, 6, 8, 10, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 88, 96, 104, 112, 128, 144, 160, 192, 224, 256, 0 };
@@ -86,23 +86,23 @@ cutoffs(int operation, flint_rand_t state, gr_ctx_t ctx)
         randvec(A, state, lenA, ctx);
         randvec(B, state, lenB, ctx);
 
-        TIMEIT_START
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_mullow_classical(C, A, lenA, squaring ? A : B, lenB, len, ctx));
-        TIMEIT_STOP_VALUES(t_classical, __)
+        TIMEIT_STOP_VALUES(t_classical, __);
 
-        TIMEIT_START
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_mullow_karatsuba(C, A, lenA, squaring ? A : B, lenB, len, -1, ctx));
-        TIMEIT_STOP_VALUES(t_karatsuba, __)
+        TIMEIT_STOP_VALUES(t_karatsuba, __);
 
-        TIMEIT_START
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_mullow_KS(C, A, lenA, squaring ? A : B, lenB, len, ctx));
-        TIMEIT_STOP_VALUES(t_KS, __)
+        TIMEIT_STOP_VALUES(t_KS, __);
 
         if (_mpn_mod_poly_mullow_fft_small(C, A, lenA, squaring ? A : B, lenB, len, ctx) == GR_SUCCESS)
         {
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(_mpn_mod_poly_mullow_fft_small(C, A, lenA, squaring ? A : B, lenB, len, ctx));
-            TIMEIT_STOP_VALUES(t_fft_small, __)
+            TIMEIT_STOP_VALUES(t_fft_small, __);
         }
         else
         {
@@ -170,27 +170,27 @@ compare(int operation, slong nmax, flint_rand_t state, gr_ctx_t ctx)
     randvec(A, state, lenA, ctx);
     randvec(B, state, lenB, ctx);
 
-    TIMEIT_START
+    TIMEIT_START;
     GR_MUST_SUCCEED(_mpn_mod_poly_mullow(C, A, lenA, squaring ? A : B, lenB, len, ctx));
-    TIMEIT_STOP_VALUES(t_default, __)
+    TIMEIT_STOP_VALUES(t_default, __);
 
-    TIMEIT_START
+    TIMEIT_START;
     GR_MUST_SUCCEED(_mpn_mod_poly_mullow_classical(C, A, lenA, squaring ? A : B, lenB, len, ctx));
-    TIMEIT_STOP_VALUES(t_classical, __)
+    TIMEIT_STOP_VALUES(t_classical, __);
 
-    TIMEIT_START
+    TIMEIT_START;
     GR_MUST_SUCCEED(_mpn_mod_poly_mullow_karatsuba(C, A, lenA, squaring ? A : B, lenB, len, -1, ctx));
-    TIMEIT_STOP_VALUES(t_karatsuba, __)
+    TIMEIT_STOP_VALUES(t_karatsuba, __);
 
-    TIMEIT_START
+    TIMEIT_START;
     GR_MUST_SUCCEED(_mpn_mod_poly_mullow_KS(C, A, lenA, squaring ? A : B, lenB, len, ctx));
-    TIMEIT_STOP_VALUES(t_KS, __)
+    TIMEIT_STOP_VALUES(t_KS, __);
 
     if (_mpn_mod_poly_mullow_fft_small(C, A, lenA, squaring ? A : B, lenB, len, ctx) == GR_SUCCESS)
     {
-        TIMEIT_START
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_mullow_fft_small(C, A, lenA, squaring ? A : B, lenB, len, ctx));
-        TIMEIT_STOP_VALUES(t_fft_small, __)
+        TIMEIT_STOP_VALUES(t_fft_small, __);
     }
     else
     {
@@ -217,7 +217,7 @@ compare(int operation, slong nmax, flint_rand_t state, gr_ctx_t ctx)
 
 }
 
-int main()
+int main(void)
 {
     fmpz_t p;
     gr_ctx_t ctx;
