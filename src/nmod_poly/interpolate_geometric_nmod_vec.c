@@ -12,6 +12,7 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "nmod_vec.h"
 
 void
 nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
@@ -33,33 +34,35 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
     
     if (len == 1)
     {
-        nmod_poly_set_coeff_ui(poly, 0, v[0]);
+        poly->coeffs[0] = v[0];
+        _nmod_poly_normalise(poly);
         return;
     }
 
     mod = G->mod;
-    nmod_poly_init2(f, mod.n, N);
-    nmod_poly_init2(h, mod.n, N);
+    nmod_poly_init2(f, mod.n, N); f->length = N;
+    nmod_poly_init2(h, mod.n, N); //h->length = N;
     
     for(i = 0; i < N; i++)
     {
-        nmod_poly_set_coeff_ui(f, i, nmod_mul(v[i], G->w[i], mod));
+        f->coeffs[i] = nmod_mul(v[i], G->w[i], mod);
     }
-
+    _nmod_poly_normalise(f);
     nmod_poly_mullow(h, f, G->g1, N);
 
-    for (i = 0; i < N; i++)
+    f->length = N;
+    for (i = 0; i < h->length; i++)
     {
-        nmod_poly_set_coeff_ui(f, N - 1 - i, nmod_mul(nmod_poly_get_coeff_ui(h, i), G->y[i], mod));
+       f->coeffs[N - 1 - i] = nmod_mul(h->coeffs[i], G->y[i], mod);
     }
-
+    _nmod_vec_zero(f->coeffs, N - h->length);
+    _nmod_poly_normalise(f);
     nmod_poly_mullow(h, f, G->g2, N);
 
     for (i = 0; i < len; i++)
     {
         poly->coeffs[i] = nmod_mul(nmod_poly_get_coeff_ui(h, N - 1 - i), G->z[i], mod);
     }
-
     _nmod_poly_normalise(poly);
 
     nmod_poly_clear(f);
