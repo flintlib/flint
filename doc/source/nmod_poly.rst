@@ -1444,7 +1444,7 @@ Multipoint evaluation
 
     Evaluates (``poly``, ``plen``) at the ``len`` values given
     by the precomputed geometric progression ``G``. The value of
-    ``len`` should be less than or equal to the precomputation size parameter.
+    ``len`` should be less than or equal to the precomputation size parameter ``G->d``.
 
 .. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
 
