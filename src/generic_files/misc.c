@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 William Hart
+    Copyright (C) 2025 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -9,6 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdarg.h>
 #include "flint.h"
 
-char flint_version[]=FLINT_VERSION;
+char flint_version[] = FLINT_VERSION;
+
+void flint_va_end(va_list vlist) { va_end(vlist); }
