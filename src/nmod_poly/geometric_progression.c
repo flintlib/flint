@@ -14,26 +14,26 @@
 #include "nmod_poly.h"
 
 void 
-nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d, nmod_t mod)
+nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong len, nmod_t mod)
 {
     ulong q, inv_r, inv_q, tmp, qk, inv_qk, qq, s;
     nn_ptr diff, inv_diff, prod_diff;
     slong i;
     
-    G->d = d;
+    G->len = len;
     G->mod = mod;
 
-    nmod_poly_init2(G->f, mod.n, 2*d - 1); G->f->length = 2*d - 1;
-    nmod_poly_init2(G->g1, mod.n, d); G->g1->length = d;
-    nmod_poly_init2(G->g2, mod.n, d); G->g2->length = d;
+    nmod_poly_init2(G->f, mod.n, 2*len - 1); G->f->length = 2*len - 1;
+    nmod_poly_init2(G->g1, mod.n, len); G->g1->length = len;
+    nmod_poly_init2(G->g2, mod.n, len); G->g2->length = len;
     G->g1->coeffs[0] = 1;
     G->g2->coeffs[0] = 1;
     G->f->coeffs[0] = 1;
 
-    G->x = _nmod_vec_init(d);
-    G->w = _nmod_vec_init(d);
-    G->z = _nmod_vec_init(d);
-    G->y = _nmod_vec_init(d);
+    G->x = _nmod_vec_init(len);
+    G->w = _nmod_vec_init(len);
+    G->z = _nmod_vec_init(len);
+    G->y = _nmod_vec_init(len);
 
     G->x[0] = 1;
     G->y[0] = 1;
@@ -45,7 +45,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
     inv_q = nmod_mul(inv_r, inv_r, mod);
 
     tmp = r;
-    for (i = 1; i < 2*d - 1; i++)
+    for (i = 1; i < 2*len - 1; i++)
     {
         G->f->coeffs[i] = nmod_mul(G->f->coeffs[i - 1], tmp, mod);
         tmp = nmod_mul(tmp, q, mod);
@@ -54,21 +54,21 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
     // inversion will fail
 
     tmp = inv_r;
-    for (i = 1; i < d; i++)
+    for (i = 1; i < len; i++)
     {
         G->x[i] = nmod_mul(G->x[i - 1], tmp, mod);
         tmp = nmod_mul(tmp, inv_q, mod);
     }
     
-    inv_diff = _nmod_vec_init(d);
-    diff = _nmod_vec_init(d);
-    prod_diff = _nmod_vec_init(d);
+    inv_diff  = _nmod_vec_init(len);
+    diff      = _nmod_vec_init(len);
+    prod_diff = _nmod_vec_init(len);
     inv_diff[0] = 1;
     diff[0] = 1;
     prod_diff[0] = 1;
  
     qk = q;  // montgomery inversion
-    for (i = 1; i < d; i++)
+    for (i = 1; i < len; i++)
     {
         diff[i] = qk - 1;
         inv_diff[i] = diff[i];
@@ -76,8 +76,8 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
         prod_diff[i] = nmod_mul(diff[i], prod_diff[i - 1], mod);
     }
     
-    tmp = nmod_inv(prod_diff[d-1], mod);
-    for (i = d - 1; i > 0; i--)
+    tmp = nmod_inv(prod_diff[len-1], mod);
+    for (i = len - 1; i > 0; i--)
     {
         inv_diff[i] = nmod_mul(prod_diff[i - 1], tmp, mod);
         tmp = nmod_mul(tmp, diff[i], mod);
@@ -91,7 +91,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
     qq = 1;
     s = 1;
 
-    for (i = 1; i < d; i++)
+    for (i = 1; i < len; i++)
     {
         qq = nmod_mul(qq, qk, mod);   // prod q^i
         s = nmod_mul(s, inv_qk, mod); // prod 1/q^i

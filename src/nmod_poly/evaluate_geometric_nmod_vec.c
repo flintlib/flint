@@ -19,14 +19,14 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     slong plen, const nmod_geometric_progression_t G, slong len)
 {
     nn_ptr a, b;
-    slong i, i_min, d, da;
+    slong i, i_min, G_len, a_len;
 
-    d = G->d;
-    FLINT_ASSERT(len <= d);
+    G_len = G->len;
+    FLINT_ASSERT(len <= G_len);
 
     if (plen == 0)
     {
-        _nmod_vec_zero(vs, d);
+        _nmod_vec_zero(vs, G_len);
         return;
     }
 
@@ -38,16 +38,16 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
         }
     }
     
-    da = plen - i_min;
-    a = _nmod_vec_init(da);
-    b = _nmod_vec_init(G->f->length + da - 1);
+    a_len = plen - i_min;
+    a = _nmod_vec_init(a_len);
+    b = _nmod_vec_init(G->f->length + a_len - 1);
     
     for (i = i_min; i < plen; i++)
     {
         a[plen - 1 - i] = nmod_mul(G->x[i], poly[i], G->mod);
     }
 
-    _nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, da, plen - 1, G->mod);
+    _nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, a_len, plen - 1, G->mod);
  
     for (i = 0; i < len; i++)
     {

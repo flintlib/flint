@@ -93,7 +93,7 @@ typedef struct
     nn_ptr x, t, w, y, z;       // five vectors of precomputed constants
     nmod_poly_t f, g1, g2;      // three precomputed polys
     nmod_t mod;
-    slong d;                    // number of points
+    slong len;                    // number of points
 
 } nmod_geometric_progression_struct;
 

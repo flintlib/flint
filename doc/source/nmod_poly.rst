@@ -1444,7 +1444,7 @@ Multipoint evaluation
 
     Evaluates (``poly``, ``plen``) at the ``len`` values given
     by the precomputed geometric progression ``G``. The value of
-    ``len`` should be less than or equal to the precomputation size parameter ``G->d``.
+    ``len`` should be less than or equal to the precomputation size parameter ``G->len``.
 
 .. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
 
@@ -1554,7 +1554,7 @@ Interpolation
 
     Sets ``poly`` to the unique polynomial of length at most ``len``
     that interpolates according to the parameter set of ``G``. 
-    The value of ``len`` should be less than or equal to the precomputation size parameter ``G->d``.
+    The value of ``len`` should be less than or equal to the precomputation size parameter ``G->len``.
 
     Uses fast geometric multipoint interpolation using a supplied geometric progression precomputation.
     
@@ -2541,18 +2541,18 @@ Geometric progression
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d, nmod_t mod)
+.. function:: void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong len, nmod_t mod)
 
 
     Builds a geometric progression multipoint evaluation / interpolation structure.
 
     The value of ``r`` should be reduced modulo the modulus ``mod``
     and of sufficient multiplicative order such that none of 
-    the powers `r^2, r^4, \ldots, r^{2d-2}` is one.
+    the powers `1, r^2, r^4, \ldots, r^{2(len-1)}` is one.
 
-    The value of ``d`` should be greater or equal to the degree of the polynomials one
+    The value of ``len`` should be greater or equal to the degree of the polynomials one
     whishes to evaluate / interpolate plus one and greater than the number of points one whises to use.
-    This allocates vectors and polynomials for a total space of `8 d - 1` coefficients.
+    This allocates vectors and polynomials for a total space of `8 len - 1` coefficients.
 
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 

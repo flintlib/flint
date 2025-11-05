@@ -22,7 +22,7 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
     nmod_poly_t f, h;
     nmod_t mod;
 
-    N = G->d;
+    N = G->len;
 
     if (len > N) 
     {
