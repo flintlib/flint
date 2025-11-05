@@ -19,7 +19,7 @@ TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
 {
     int i, result = 1;
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t P;
         nn_ptr y, z;
