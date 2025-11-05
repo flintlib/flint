@@ -81,7 +81,10 @@ void _fmpq_poly_resultant_div(fmpz_t rnum, fmpz_t rden,
             fmpz_gcd(div, l, divisor); /* div = gcd(c1^(len2-1), divisor) */
             fmpz_divexact(la, l, div); /* la = c1^(len2 -1)/gcd           */
             fmpz_divexact(div, divisor, div); /*div /= gcd                */
-            nbits = nbits - fmpz_bits(la) + 1;
+            /* res = a*b and we want to compute a only. nbits(a) is given */
+            /* div divides res, but we don't know if it is in a or b      */
+            /* so we "have to" remove it from b, but we cannot reduce the */
+            /* size of a...                                               */
         } else {
             fmpz_init_set(div, divisor);
         }
@@ -93,7 +96,6 @@ void _fmpq_poly_resultant_div(fmpz_t rnum, fmpz_t rden,
             fmpz_gcd(l, lb, div);
             fmpz_divexact(lb, lb, l);
             fmpz_divexact(div, div, l);
-            nbits = nbits - fmpz_bits(lb) + 1;
         }
 
         _fmpz_poly_resultant_modular_div(rnum, prim1, len1, prim2, len2, div, nbits);

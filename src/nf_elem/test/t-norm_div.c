@@ -24,16 +24,16 @@ TEST_FUNCTION_START(nf_elem_norm_div, state)
         nf_t nf;
         nf_elem_t a, b, c;
         fmpq_t anorm, bnorm, cnorm, cnorm2;
-        fmpz_t d;
+        fmpz_t d, e;
         slong nbits;
 
         fmpq_poly_init(pol);
         fmpz_poly_init(pol2);
         fmpz_init(d);
+        fmpz_init(e);
 
         do {
-            fmpz_poly_randtest_not_zero(pol2, state, 25, 200);
-            fmpz_one(fmpz_poly_lead(pol2));
+            fmpz_poly_randtest_irreducible(pol2, state, 25, 200);
         } while (fmpz_poly_degree(pol2) < 1);
 
         fmpq_poly_set_fmpz_poly(pol, pol2);
@@ -48,14 +48,19 @@ TEST_FUNCTION_START(nf_elem_norm_div, state)
         fmpq_init(cnorm);
         fmpq_init(cnorm2);
 
+        fmpz_pow_ui(e, fmpz_poly_lead(pol2), fmpz_poly_degree(pol2));
+
         do {
             nf_elem_randtest(a, state, 200, nf);
             nf_elem_get_den(d, a, nf);
             nf_elem_scalar_mul_fmpz(a, a, d, nf);
+            nf_elem_scalar_mul_fmpz(a, a, e, nf);
 
             nf_elem_randtest(b, state, 200, nf);
             nf_elem_get_den(d, b, nf);
             nf_elem_scalar_mul_fmpz(b, b, d, nf);
+            nf_elem_scalar_mul_fmpz(b, b, e, nf);
+            /*scaling by e makes the elements integral, the norm will be in Z*/
 
             nf_elem_mul(c, a, b, nf);
             nf_elem_norm(anorm, a, nf);
@@ -89,6 +94,7 @@ TEST_FUNCTION_START(nf_elem_norm_div, state)
         fmpq_clear(cnorm2);
 
         fmpz_clear(d);
+        fmpz_clear(e);
 
         nf_elem_clear(a, nf);
         nf_elem_clear(b, nf);
