@@ -486,14 +486,14 @@ void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
 #undef Nr
 #undef Rbits
 
-void cd_poly_wdk_update(double* z_r, double* z_i,
+double cd_poly_wdk_update(double* z_r, double* z_i,
                              const double* vp_r, const double* vp_i,
                              const double* wdk_r, const double* wdk_i,
                              slong n_start, slong n_end)
 {
     slong i;
     double mag_vp, arg_vp, mag_wdk, arg_wdk, mag_z, ratio,
-           pi = acos(-1);
+           maxstep = 0.5;
     for(i=n_start; i<n_end; i++) {
         if((wdk_r[i] != 0) || (wdk_i[i] != 0)) {
             mag_vp = hypot(vp_r[i], vp_i[i]);
@@ -505,14 +505,17 @@ void cd_poly_wdk_update(double* z_r, double* z_i,
             ratio = fmin(mag_vp / mag_wdk, 0.5*mag_z);
             z_r[i] = z_r[i] - ( ratio * cos(arg_vp - arg_wdk) );
             z_i[i] = z_i[i] - ( ratio * sin(arg_vp - arg_wdk) );
+            maxstep = fmax(maxstep, ratio/mag_z);
         }
     }
+    return maxstep;
 }
 
-static void _refine_roots(intermediate_variables * v, slong n)
+static double _refine_roots(intermediate_variables * v, slong n)
 {
     slong d, n_piv;
-    double lc_r, lc_i;
+    double lc_r, lc_i,
+           maxstep, imaxstep;
     d = n-1;
     n_piv = cd_poly_partition_pivot(v->z_r, v->z_i, d);
     _vector_inverse(v->iz_r, v->iz_i, v->z_r, v->z_i, 0, d);
@@ -522,21 +525,22 @@ static void _refine_roots(intermediate_variables * v, slong n)
     lc_i = v->p_i[n-1];
     cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
     cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, d);
-    cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv);
+    maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv);
     /* Inverse case */
     lc_r = v->p_r[0];
     lc_i = v->p_i[0];
     cd_poly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, d, v->rp_r, v->rp_i, n);
     cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, d, d);
-    cd_poly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d);
+    imaxstep = cd_poly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d);
     _vector_inverse(v->z_r, v->z_i, v->iz_r, v->iz_i, n_piv, d);
+    return fmax(maxstep, imaxstep);
 }
 
 /* One step refine function */
-void cd_poly_refine_roots(double * z, const double * p, slong n)
+double cd_poly_refine_roots(double * z, const double * p, slong n)
 {
     slong i;
-    double lc_r, lc_i;
+    double lc_r, lc_i, maxstep;
     intermediate_variables v[1];
     _intermediate_variables_init(v, n);
     _set_poly(v, p, n);
@@ -548,20 +552,22 @@ void cd_poly_refine_roots(double * z, const double * p, slong n)
     lc_i = v->p_i[n-1];
     cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n-1, v->p_r, v->p_i, n);
     cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n-1, n-1);
-    cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n-1);
+    maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n-1);
     _refine_roots(v, n);
     for(i=0; i<n-1; i++) {
         z[2*i]   = v->z_r[i];
         z[2*i+1] = v->z_i[i];
     }
     _intermediate_variables_clear(v);
+    return maxstep;
 }
 
 /* One step refine function using pivot to avoid overflow.
  * The order of the refined roots is not necessarily preserved */
-void cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
+double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
 {
     slong i;
+    double maxstep;
     intermediate_variables v[1];
     _intermediate_variables_init(v, n);
     _set_poly(v, p, n);
@@ -569,20 +575,22 @@ void cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
         v->z_r[i] = z[2*i];
         v->z_i[i] = z[2*i+1];
     }
-    _refine_roots(v, n);
+    maxstep = _refine_roots(v, n);
     for(i=0; i<n-1; i++) {
         z[2*i]   = v->z_r[i];
         z[2*i+1] = v->z_i[i];
     }
     _intermediate_variables_clear(v);
+    return maxstep;
 }
 
 /* Full resolution function */
-void cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, int verbose)
+double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, int verbose)
 {
     slong nt, fz, i, status;
     intermediate_variables v[1];
     slong * np;
+    double maxstep;
 
     nt = _trim_zeros(z, &fz, p, n); 
     if(nt > 1) {
@@ -591,7 +599,7 @@ void cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, i
         _set_initial_values(v, v->p_r, v->p_i, nt);
         /* Main solve function */
         for(i=0; i<num_iter; i++) {
-            _refine_roots(v, nt);
+            maxstep = _refine_roots(v, nt);
         }
         for(i=0; i<nt-1; i++) {
             z[2*(i+fz)] = v->z_r[i];
@@ -601,6 +609,7 @@ void cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, i
 
         _intermediate_variables_clear(v);
     }
+    return maxstep;
 }
 
 
