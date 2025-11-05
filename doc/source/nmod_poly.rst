@@ -1409,7 +1409,6 @@ Multipoint evaluation
 
     Uses fast multipoint evaluation, building a temporary subproduct tree.
 
-
 .. function:: void _nmod_poly_evaluate_nmod_vec(nn_ptr ys, nn_srcptr poly, slong len, nn_srcptr xs, slong n, nmod_t mod)
 
     Evaluates (``poly``, ``len``) at the ``n`` values
@@ -1433,6 +1432,7 @@ Multipoint evaluation
     Uses Horner's method iteratively.
 
 .. function:: void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
+
     Evaluates ``poly`` at the first ``n`` powers
     of the square of ``r``, writing the output values
     to ``ys``. The value of ``r`` should be reduced
@@ -1441,11 +1441,13 @@ Multipoint evaluation
     Uses Horner's method iteratively.
 
 .. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len)
+
     Evaluates (``poly``, ``plen``) at the ``len`` values given
     by the precomputed geometric progression ``G``. The value of
     ``len`` should be less than or equal to the precomputation size parameter.
 
-.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod);
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
+
     Evaluates (``coeffs``, ``len``) at the first ``n`` powers
     of the square of ``r``, writing the output values to ``ys``. 
     The value of ``r`` should be reduced modulo the modulus ``mod``
@@ -1454,7 +1456,7 @@ Multipoint evaluation
 
     Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
-.. function:: void nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong n)
+.. function:: void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
 
     Evaluates ``poly``  at the first ``n`` powers
     of the square of ``r``, writing the output values to ``ys``. 
@@ -1548,6 +1550,7 @@ Interpolation
     Uses fast geometric multipoint interpolation, building a temporary geometric progression precomputation.
 
 .. function:: void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len)
+
     Performs interpolation using the geometric progression precomputation ``G``.
 
     Sets ``poly`` to the unique polynomial of length at most ``n``
