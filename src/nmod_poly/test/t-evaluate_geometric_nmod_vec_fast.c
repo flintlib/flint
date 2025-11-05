@@ -26,13 +26,13 @@ TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
         ulong mod, r;
         slong n, npoints;
 
-        npoints = (i < 10) ? i : n_randint(state, 100);
+        npoints = (i < 10) ? i : n_randint(state, 500);
         n = n_randint(state, 1000);
         do 
         { 
-            mod = n_randtest_prime(state, 0); 
+            mod = n_randtest_prime(state, 1); 
         }
-        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maxiimum order r
+        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maximum order r
 
 
         nmod_poly_init(P, mod);

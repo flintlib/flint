@@ -29,9 +29,9 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
         n = n_randint(state, npoints + 1);
         do 
         { 
-            mod = n_randtest_prime(state, 0); 
+            mod = n_randtest_prime(state, 1); 
         }
-        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maxiimum order r
+        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maximum order r
 
         nmod_poly_init(P, mod);
         nmod_poly_init(Q, mod);
