@@ -1452,7 +1452,7 @@ Multipoint evaluation
     of the square of ``r``, writing the output values to ``ys``. 
     The value of ``r`` should be reduced modulo the modulus ``mod``
     and of sufficient multiplicative order such that none of 
-    the powers of ``r`` squared are one.
+    the first `n` powers of `r^2` is one.
 
     Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
@@ -1462,7 +1462,7 @@ Multipoint evaluation
     of the square of ``r``, writing the output values to ``ys``. 
     The value of ``r`` should be reduced modulo the modulus of the polynomial
     and of sufficient multiplicative order such that none of 
-    the powers of ``r`` squared are one.
+    the first `n` powers of `r^2` is one.
 
     Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
@@ -1539,12 +1539,11 @@ Interpolation
     
     Sets ``poly`` to the unique polynomial of length at most ``n``
     that interpolates the first ``n`` powers of ``r`` and
-    values ``ys``. If the interpolating polynomial is shorter than
-    length ``n``, the leading coefficients are set to zero.
-
+    values ``ys``.
+    
     The values ``ys`` and ``r`` should be reduced modulo the
     modulus, and all ``r`` should be of sufficient order such that
-    none of the powers of ``r`` squared are one. Aliasing between
+    none of the first `n` powers of `r^2` is one. Aliasing between
     ``poly`` and ``ys`` is not allowed.
 
     Uses fast geometric multipoint interpolation, building a temporary geometric progression precomputation.
