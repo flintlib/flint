@@ -65,7 +65,7 @@ FLINT_NORETURN static void __flint_throw(flint_err_t exc, const char * msg, va_l
 {
     if (exc != FLINT_TEST_FAIL)
     {
-        printf("Flint exception (");
+        printf("FLINT exception (");
         switch (exc)
         {
             case FLINT_ERROR:
