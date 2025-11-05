@@ -1438,7 +1438,7 @@ Multipoint evaluation
     to ``ys``. The value of ``r`` should be reduced
     modulo the modulus.
 
-    Uses Horner's method iterative
+    Uses Horner's method iteratively.
 
 .. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len)
     Evaluates (``poly``, ``plen``) at the ``len`` values given
