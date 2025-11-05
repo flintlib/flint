@@ -71,7 +71,7 @@ static void _d_swap(double* a, double* b)
 }
 
 /* Reorder the z : the values at index < n-c satisfy |z| <= 1, and at index >= n-c they satisfy |z|>1 */
-slong fdc_poly_partition_pivot(double* z_r, double* z_i, slong n)
+slong cd_poly_partition_pivot(double* z_r, double* z_i, slong n)
 {
     slong i, c = 0;
     for(i=0; i<n; i++) {
@@ -242,6 +242,7 @@ static void _set_initial_values(intermediate_variables * v, const double * p_r, 
     _initial_values_from_newton_polygon(v->z_r, v->z_i, p_r, p_i, v->np, n_np);
 }
 
+#undef LOG_ROUNDING
 
 /**********************************************
  * Weierstrass-Durand-Kerner update functions *
@@ -266,13 +267,11 @@ static void _set_initial_values(intermediate_variables * v, const double * p_r, 
 #endif
 #define Rbytes (Rbits/8)
 #define Nd (Rbytes/8)
-#define DBlock (Nd*Nr/2)
-#define CSBlock (Nd*Nr/2)
 #define CDHBlock (Nd*Nr/4)
 #define CDWBlock (Nd*Nr)
 
 /* Horner evaluation */
-void fdc_poly_horner(double* results_r, double* results_i,
+void cd_poly_horner(double* results_r, double* results_i,
                          const double* values_r, const double* values_i, slong n_start, slong n_end,
                          const double* coefficients_r, const double* coefficients_i, slong n)
 {
@@ -307,7 +306,7 @@ void fdc_poly_horner(double* results_r, double* results_i,
 /* Warning : twice_values_r and twice_values_i have size 2n,
  * the second half of each array should be a copy of the first half
  * Not compatible with the current calls */
-void fdc_poly_weierstrass_a(double* restrict results_r, double* restrict results_i,
+void cd_poly_weierstrass_a(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
@@ -334,7 +333,7 @@ void fdc_poly_weierstrass_a(double* restrict results_r, double* restrict results
 
 /* Weights for the Durand-Kerner or Weierstrass iteration
  * A variant of this version could be usefull for the Borsh Supan weights*/                                                         
-void fdc_poly_weierstrass_b(double* restrict results_r, double* restrict results_i,
+void cd_poly_weierstrass_b(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* values_r, const double* values_i,
                               slong n_start, slong n_end, slong d)
@@ -377,7 +376,7 @@ void fdc_poly_weierstrass_b(double* restrict results_r, double* restrict results
 
 /* Weights for the Durand-Kerner or Weierstrass iteration
  * Fastest than the _a variant by a small margin (less than 10%) */
-void fdc_poly_weierstrass(double* restrict results_r, double* restrict results_i,
+void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* values_r, const double* values_i,
                               slong n_start, slong n_end, slong d)
@@ -480,7 +479,14 @@ void fdc_poly_weierstrass(double* restrict results_r, double* restrict results_i
     }
 }
 
-void fdc_poly_wdk_update(double* z_r, double* z_i,
+#undef CDWBlock
+#undef CDHBlock
+#undef Nd
+#undef Rbytes
+#undef Nr
+#undef Rbits
+
+void cd_poly_wdk_update(double* z_r, double* z_i,
                              const double* vp_r, const double* vp_i,
                              const double* wdk_r, const double* wdk_i,
                              slong n_start, slong n_end)
@@ -508,26 +514,26 @@ static void _refine_roots(intermediate_variables * v, slong n)
     slong d, n_piv;
     double lc_r, lc_i;
     d = n-1;
-    n_piv = fdc_poly_partition_pivot(v->z_r, v->z_i, d);
+    n_piv = cd_poly_partition_pivot(v->z_r, v->z_i, d);
     _vector_inverse(v->iz_r, v->iz_i, v->z_r, v->z_i, 0, d);
     /* Dominant computation time */
     /* Direct case */
     lc_r = v->p_r[n-1];
     lc_i = v->p_i[n-1];
-    fdc_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
-    fdc_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, d);
-    fdc_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv);
+    cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
+    cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, d);
+    cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv);
     /* Inverse case */
     lc_r = v->p_r[0];
     lc_i = v->p_i[0];
-    fdc_poly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, d, v->rp_r, v->rp_i, n);
-    fdc_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, d, d);
-    fdc_poly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d);
+    cd_poly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, d, v->rp_r, v->rp_i, n);
+    cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, d, d);
+    cd_poly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d);
     _vector_inverse(v->z_r, v->z_i, v->iz_r, v->iz_i, n_piv, d);
 }
 
 /* One step refine function */
-void fdc_poly_refine_roots(double * z, const double * p, slong n)
+void cd_poly_refine_roots(double * z, const double * p, slong n)
 {
     slong i;
     double lc_r, lc_i;
@@ -540,9 +546,9 @@ void fdc_poly_refine_roots(double * z, const double * p, slong n)
     }
     lc_r = v->p_r[n-1];
     lc_i = v->p_i[n-1];
-    fdc_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n-1, v->p_r, v->p_i, n);
-    fdc_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n-1, n-1);
-    fdc_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n-1);
+    cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n-1, v->p_r, v->p_i, n);
+    cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n-1, n-1);
+    cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n-1);
     _refine_roots(v, n);
     for(i=0; i<n-1; i++) {
         z[2*i]   = v->z_r[i];
@@ -553,7 +559,7 @@ void fdc_poly_refine_roots(double * z, const double * p, slong n)
 
 /* One step refine function using pivot to avoid overflow.
  * The order of the refined roots is not necessarily preserved */
-void fdc_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
+void cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
 {
     slong i;
     intermediate_variables v[1];
@@ -572,7 +578,7 @@ void fdc_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
 }
 
 /* Full resolution function */
-void fdc_poly_find_roots(double * z, const double * p, slong n, slong num_iter, int verbose)
+void cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, int verbose)
 {
     slong nt, fz, i, status;
     intermediate_variables v[1];
