@@ -99,7 +99,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
         tmp = nmod_mul(qq, G->w[i], mod); // prod q^i/(q^i-1)
         G->g2->coeffs[i] = tmp;
 
-        if ((i & 1) == 1)
+        if ((i & 1) == 1)   /* i is odd */
         {
             G->g1->coeffs[i] = nmod_neg(tmp, mod);
             G->y[i] = nmod_neg(prod_diff[i], mod);
