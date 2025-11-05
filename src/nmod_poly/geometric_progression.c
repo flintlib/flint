@@ -105,7 +105,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong d
             G->y[i] = nmod_neg(prod_diff[i], mod);
             G->z[i] = nmod_neg(G->w[i], mod);
         }
-        else
+        else   /* i is even */
         {
             G->g1->coeffs[i] = tmp;
             G->y[i] = prod_diff[i];
