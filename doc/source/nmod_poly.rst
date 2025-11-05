@@ -1540,7 +1540,7 @@ Interpolation
     Sets ``poly`` to the unique polynomial of length at most ``n``
     that interpolates the first ``n`` powers of ``r`` and
     values ``ys``.
-    
+
     The values ``ys`` and ``r`` should be reduced modulo the
     modulus, and all ``r`` should be of sufficient order such that
     none of the first `n` powers of `r^2` is one. Aliasing between
@@ -1552,7 +1552,7 @@ Interpolation
 
     Performs interpolation using the geometric progression precomputation ``G``.
 
-    Sets ``poly`` to the unique polynomial of length at most ``n``
+    Sets ``poly`` to the unique polynomial of length at most ``len``
     that interpolates according to the parameter set of ``G``. 
     The value of ``len`` should be less than or equal to the precomputation size parameter ``G->d``.
 
