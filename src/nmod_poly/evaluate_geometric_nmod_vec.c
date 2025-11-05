@@ -38,21 +38,20 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
         }
     }
     
-    da = d - i_min;
+    da = plen - i_min;
     a = _nmod_vec_init(da);
     b = _nmod_vec_init(G->f->length + da - 1);
     
     for (i = i_min; i < plen; i++)
     {
-        a[d - 1 - i] = nmod_mul(G->x[i], poly[i], G->mod);
+        a[plen - 1 - i] = nmod_mul(G->x[i], poly[i], G->mod);
     }
 
-    _nmod_vec_zero(a, d - plen);
-    _nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, da, d - 1, G->mod);
+    _nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, da, plen - 1, G->mod);
  
     for (i = 0; i < len; i++)
     {
-        vs[i] = nmod_mul(G->x[i], b[d - 1 + i], G->mod);
+        vs[i] = nmod_mul(G->x[i], b[plen - 1 + i], G->mod);
     }
 
     _nmod_vec_clear(a);
