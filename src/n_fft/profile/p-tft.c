@@ -153,7 +153,7 @@ int main()
 
     for (ulong k = 4; k < 6; k++)
     {
-        for (ulong depth = 5; depth <= max_depths[k]; depth++)
+        for (ulong depth = 4; depth <= max_depths[k]; depth++)
         {
             const ulong len = UWORD(1) << depth;
             const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));
@@ -169,7 +169,7 @@ int main()
 
             /* olen in {len/2 + 8, len/2 + len/4, len} */
             ulong ilens[4] = {len/4, len/2, 3*len/4, len};
-            ulong olens[4] = {len/2 + 8, 3*len/4, len - 8, len};
+            ulong olens[4] = {len/2 + 4, 3*len/4, len - 4, len};
             for (ulong ili = 3; ili < 4; ili++)
             {
                 info.ilen = ilens[ili];
@@ -179,7 +179,8 @@ int main()
                 {
                     info.olen = olens[oli];
                     if (k < 5) prof_repeat(min_sd+oli, &max, sample_sd_fft, (void *) &info);
-                    prof_repeat(min+oli, &max, sample_tft_node_lazy_4_4_v1, (void *) &info);
+                    /* prof_repeat(min+oli, &max, sample_tft_node_lazy_4_4_v1, (void *) &info); */
+                    min[oli] = 0.;
                     prof_repeat(min_olen+oli, &max, sample_tft_node_lazy_4_4_v2_olen, (void *) &info);
                 }
 
