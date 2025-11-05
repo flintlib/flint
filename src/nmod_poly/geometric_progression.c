@@ -101,9 +101,9 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong l
 
         if ((i & 1) == 1)   /* i is odd */
         {
-            G->g1->coeffs[i] = nmod_neg(tmp, mod);
-            G->y[i] = nmod_neg(prod_diff[i], mod);
-            G->z[i] = nmod_neg(G->w[i], mod);
+            G->g1->coeffs[i] = mod.n - tmp;
+            G->y[i] = mod.n - prod_diff[i];
+            G->z[i] = mod.n - G->w[i];
         }
         else   /* i is even */
         {
