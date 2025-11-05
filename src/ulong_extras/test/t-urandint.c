@@ -19,9 +19,7 @@ TEST_FUNCTION_START(n_urandint, state)
     int i, j, result;
     int * count;
     int * count_in_subrange;
-    slong test_multiplier;
-
-    test_multiplier = FLINT_MAX(1, flint_test_multiplier());
+    double test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
     /* Test for limit <= 1000 */
     count = flint_malloc(sizeof(int) * 1000);
