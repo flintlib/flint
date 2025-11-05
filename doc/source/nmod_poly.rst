@@ -1432,7 +1432,7 @@ Multipoint evaluation
 
     Uses Horner's method iteratively.
 
-.. function:: nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
+.. function:: void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
     Evaluates ``poly`` at the first ``n`` powers
     of the square of ``r``, writing the output values
     to ``ys``. The value of ``r`` should be reduced
