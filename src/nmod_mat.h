@@ -165,10 +165,13 @@ void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 
 /* Matrix-scalar arithmetic */
 
+void _nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c);
+void _nmod_mat_scalar_mul_precomp(nmod_mat_t B, const nmod_mat_t A, ulong c, ulong c_pr);
 void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c);
 void nmod_mat_scalar_mul_fmpz(nmod_mat_t B, const nmod_mat_t A, const fmpz_t c);
-void nmod_mat_scalar_addmul_ui(nmod_mat_t C,
-                       const nmod_mat_t A, const nmod_mat_t B, const ulong c);
+void _nmod_mat_scalar_addmul_ui_generic(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c);
+void _nmod_mat_scalar_addmul_ui_precomp(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c, const ulong c_pr);
+void nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c);
 
 /* Matrix multiplication */
 

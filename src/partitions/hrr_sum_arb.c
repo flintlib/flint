@@ -306,9 +306,9 @@ partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubl
 
     /* C = (pi/6) sqrt(24n-1) */
 #if VERBOSE
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_const_pi(C, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 #else
     arb_const_pi(C, prec);
 #endif
@@ -322,9 +322,9 @@ partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubl
 
     /* exp1 = exp(C) */
 #if VERBOSE
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_exp(exp1, C, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 #else
     arb_exp(exp1, C, prec);
 #endif

@@ -294,9 +294,9 @@ _gr_debug_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
     CHECK_WRAPPER(x) \
     if (GR_DEBUG_CTX_FLAGS(ctx) & GR_DEBUG_TIMING) \
     { \
-        TIMEIT_ONCE_START \
+        TIMEIT_ONCE_START; \
         status = name(GR_DEBUG_ELEM(res), GR_DEBUG_ELEM(x), GR_DEBUG_ELEM_CTX(ctx)); \
-        TIMEIT_ONCE_STOP \
+        TIMEIT_ONCE_STOP; \
     } \
     else \
     { \
@@ -320,9 +320,9 @@ _gr_debug_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
     RANDOMLY_UNABLE \
     if (GR_DEBUG_CTX_FLAGS(ctx) & GR_DEBUG_TIMING) \
     { \
-        TIMEIT_ONCE_START \
+        TIMEIT_ONCE_START; \
         status = name(GR_DEBUG_ELEM(res), GR_DEBUG_ELEM(x), GR_DEBUG_ELEM_CTX(ctx)); \
-        TIMEIT_ONCE_STOP \
+        TIMEIT_ONCE_STOP; \
     } \
     else \
     { \
@@ -349,9 +349,9 @@ _gr_debug_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
     RANDOMLY_UNABLE \
     if (GR_DEBUG_CTX_FLAGS(ctx) & GR_DEBUG_TIMING) \
     { \
-        TIMEIT_ONCE_START \
+        TIMEIT_ONCE_START; \
         status = name(GR_DEBUG_ELEM(res), GR_DEBUG_ELEM(x), GR_DEBUG_ELEM(y), GR_DEBUG_ELEM_CTX(ctx)); \
-        TIMEIT_ONCE_STOP \
+        TIMEIT_ONCE_STOP; \
     } \
     else \
     { \

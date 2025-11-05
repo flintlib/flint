@@ -41,9 +41,9 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     res = _nmod_vec_dot(v1, v2, len, mod, params);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -68,9 +68,9 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     res = _nmod_vec_dot_rev(v1, v2, len, mod, params);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -100,9 +100,9 @@ void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     res = _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -128,10 +128,10 @@ void time_dot_incparams(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     const dot_params_t params = _nmod_vec_dot_params(len, mod);
     res = _nmod_vec_dot(v1, v2, len, mod, params);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -155,10 +155,10 @@ void time_dot_rev_incparams(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     const dot_params_t params = _nmod_vec_dot_params(len, mod);
     res = _nmod_vec_dot_rev(v1, v2, len, mod, params);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -187,10 +187,10 @@ void time_dot_ptr_incparams(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     const dot_params_t params = _nmod_vec_dot_params(len, mod);
     res = _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -222,9 +222,9 @@ void time_dot_poly_mul(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     _nmod_poly_mul_classical(res, p1, len, p2, len, mod);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -250,9 +250,9 @@ void time_dot_poly_inv_series(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     _nmod_poly_inv_series_basecase(res, p, len, len, mod);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -281,9 +281,9 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     status |= gr_poly_exp_series_basecase(res, p, len, ctx);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -309,9 +309,9 @@ void time_dot_mat_mul(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     _nmod_mat_mul_classical_op(mat, mat, mat1, mat2, 1);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -337,9 +337,9 @@ void time_dot_mat_mul_vec(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     nmod_mat_mul_nmod_vec(u, mat, v, len);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -362,9 +362,9 @@ void time_dot_mat_solve_tril(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     nmod_mat_solve_tril_classical(mat, mat1, mat2, 0);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -387,9 +387,9 @@ void time_dot_mat_solve_tril_vec(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     nmod_mat_solve_tril_classical(mat, mat1, mat2, 0);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -412,9 +412,9 @@ void time_dot_mat_solve_triu(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     nmod_mat_solve_triu_classical(mat, mat1, mat2, 0);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
@@ -437,9 +437,9 @@ void time_dot_mat_solve_triu_vec(ulong len, ulong n, flint_rand_t state)
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     nmod_mat_solve_triu_classical(mat, mat1, mat2, 0);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     printf("%.2e", twall);
 
