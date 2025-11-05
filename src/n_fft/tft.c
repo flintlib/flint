@@ -10,7 +10,8 @@
 */
 
 #include "n_fft.h"
-#include "n_fft_macros.h"
+#include "n_fft/impl.h"
+#include "impl_macros_tft.h"
 #include "nmod_poly.h"  // TODO probably not needed in the end
 #include "nmod.h"  // TODO remove when poly_rem removed
 #include "nmod_vec.h"
@@ -80,6 +81,9 @@ _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr p, slong len, ulong n, ulong c, ulong
 
 
 
+/*-----------------------*/
+/*  auxiliary functions  */
+/*-----------------------*/
 
 /** truncated Fourier transform
 Input:
@@ -319,202 +323,9 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
 
 
 
-/*-----------------------*/
-/*  auxiliary functions  */
-/*-----------------------*/
-
-/** 2**depth-point DFT, general node
- * * In-place transform p of length len == 2**depth, seen as a polynomial of
- * degree < len, into the concatenation of all polynomial evaluations
- *          [p(w_k), p(-w_k)] for k in range(len),
- * where w_k = F->tab_w[2**depth * node + 2*k] for 0 <= k < 2**(depth-1)
- * * By construction these evaluation points are the len roots of the
- * polynomial x**len - F->tab_w[2*node] (for example, if depth=
- * * Requirements (not checked):
- *        3 <= depth
- *        (node+1) * 2**depth < 2**F.depth (length of F->tab_w)
- * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
- */
-void tft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
-{
-    if (depth == 3)
-    {
-        DFT8_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], node, F->mod, F->mod2, F->tab_w);
-    }
-    else if (depth == 4)
-    {
-        DFT16_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                            node, F->mod, F->mod2, F->tab_w);
-    }
-    else if (depth == 5)
-    {
-        DFT32_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                            p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                            p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
-                            p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
-                            node, F->mod, F->mod2, F->tab_w);
-    }
-    else
-    {
-        const ulong len = UWORD(1) << depth;
-
-        // 4-point butterflies
-        // in: [0..4n), out: [0..4n)
-        const nn_ptr p0 = p;
-        const nn_ptr p1 = p+len/4;
-        const nn_ptr p2 = p+2*len/4;
-        const nn_ptr p3 = p+3*len/4;
-        const ulong w2 = F->tab_w[2*node];
-        const ulong w2pre = F->tab_w[2*node+1];
-        const ulong w = F->tab_w[4*node];
-        const ulong wpre = F->tab_w[4*node+1];
-        const ulong Iw = F->tab_w[4*node+2];
-        const ulong Iwpre = F->tab_w[4*node+3];
-
-        for (ulong k = 0; k < len/4; k+=4)
-        {
-            DFT4_NODE_LAZY_4_4(p0[k+0], p1[k+0], p2[k+0], p3[k+0], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
-            DFT4_NODE_LAZY_4_4(p0[k+1], p1[k+1], p2[k+1], p3[k+1], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
-            DFT4_NODE_LAZY_4_4(p0[k+2], p1[k+2], p2[k+2], p3[k+2], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
-            DFT4_NODE_LAZY_4_4(p0[k+3], p1[k+3], p2[k+3], p3[k+3], w2, w2pre, w, wpre, Iw, Iwpre, F->mod, F->mod2);
-        }
-
-        // 4 recursive calls with depth-2
-        tft_node_lazy_4_4(p0, depth-2, 4*node, F);
-        tft_node_lazy_4_4(p1, depth-2, 4*node+1, F);
-        tft_node_lazy_4_4(p2, depth-2, 4*node+2, F);
-        tft_node_lazy_4_4(p3, depth-2, 4*node+3, F);
-    }
-}
-
-/** 2**depth-point DFT
- * Same specification as n_fft_tft, except for:
- * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
- *             requirement (not checked): depth <= F.depth
- * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
- *             requirement (not checked): 3 <= depth <= F.depth
- */
-void tft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
-{
-    if (depth == 3)
-    {
-        DFT8_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
-    }
-    else if (depth == 4)
-    {
-        DFT16_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                       F->mod, F->mod2, F->tab_w);
-    }
-    else if (depth == 5)
-    {
-        DFT32_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                       p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
-                       p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
-                       F->mod, F->mod2, F->tab_w);
-    }
-    else
-    {
-        const ulong len = UWORD(1) << depth;
-
-        // 4-point butterflies
-        // input p0,p1,p2,p3 in [0..2n) x [0..2n) x [0..2n) x [0..2n)
-        // output p0,p1,p2,p3 in [0..2n) x [0..4n) x [0..4n) x [0..4n)
-        const nn_ptr p0 = p;
-        const nn_ptr p1 = p + len/4;
-        const nn_ptr p2 = p + 2*len/4;
-        const nn_ptr p3 = p + 3*len/4;
-        for (ulong k = 0; k < len/4; k++)
-        {
-            DFT4_LAZY_2_4(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
-            if (p0[k] >= F->mod2)
-                p0[k] -= F->mod2;
-        }
-
-        // 4 recursive calls with depth-2
-        tft_lazy_2_4(p0, depth-2, F);
-        tft_node_lazy_4_4(p1, depth-2, 1, F);
-        tft_node_lazy_4_4(p2, depth-2, 2, F);
-        tft_node_lazy_4_4(p3, depth-2, 3, F);
-    }
-}
-
-void tft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
-{
-    if (depth == 4)
-    {
-        DFT16_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                       F->mod, F->mod2, F->tab_w);
-    }
-    else if (depth == 5)
-    {
-        DFT32_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                       p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
-                       p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
-                       p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
-                       F->mod, F->mod2, F->tab_w);
-    }
-    else if (depth > 5)
-    {
-        const ulong len = UWORD(1) << depth;
-
-        // 4-point butterflies
-        // input p0,p1,p2,p3 in [0..n) x [0..n) x [0..n) x [0..n)
-        // output p0,p1,p2,p3 in [0..2n) x [0..4n) x [0..4n) x [0..4n)
-        const nn_ptr p0 = p;
-        const nn_ptr p1 = p + len/4;
-        const nn_ptr p2 = p + 2*len/4;
-        const nn_ptr p3 = p + 3*len/4;
-        for (ulong k = 0; k < len/4; k++)
-        {
-            DFT4_LAZY_1_4(p0[k], p1[k], p2[k], p3[k], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
-            if (p0[k] >= F->mod2)
-                p0[k] -= F->mod2;
-        }
-
-        // 4 recursive calls with depth-2
-        tft_lazy_2_4(p0, depth-2, F);
-        tft_node_lazy_4_4(p1, depth-2, 1, F);
-        tft_node_lazy_4_4(p2, depth-2, 2, F);
-        tft_node_lazy_4_4(p3, depth-2, 3, F);
-    }
-    else if (depth == 3)
-    {
-        DFT8_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
-    }
-    else if (depth == 2)
-    {
-        DFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
-    }
-    else if (depth == 1)
-    {
-        DFT2_LAZY_1_2(p[0], p[1], F->mod);
-    }
-}
-
 /*-------------------*/
 /*  main interfaces  */
 /*-------------------*/
-
-void n_fft_tft(nn_ptr p, ulong depth, n_fft_ctx_t F)
-{
-    if (depth > 0)
-    {
-        n_fft_args_t Fargs;
-        n_fft_set_args(Fargs, F->mod, F->tab_w);
-        tft_lazy_1_4(p, depth, Fargs);
-        for (ulong k = 0; k < (UWORD(1) << depth); k++)
-        {
-            if (p[k] >= Fargs->mod2)
-                p[k] -= Fargs->mod2;
-            if (p[k] >= Fargs->mod)
-                p[k] -= Fargs->mod;
-        }
-    }
-}
 
 /*---------------*/
 /* some comments */

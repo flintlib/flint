@@ -10,7 +10,8 @@
 */
 
 #include "n_fft.h"
-#include "n_fft_macros.h"
+#include "n_fft/impl.h"
+#include "impl_macros_dft.h"
 
 /** Structure.
  * - The main interface is n_fft_idft, it solves the problem at node 0

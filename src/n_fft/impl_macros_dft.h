@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#ifndef N_FFT_MACROS_H
-#define N_FFT_MACROS_H
+#ifndef N_FFT_MACROS_DFT_H
+#define N_FFT_MACROS_DFT_H
 
 #include "longlong.h"      /* for umul_ppmm */
 #include "ulong_extras.h"  /* for mulmod_shoup* functions */
@@ -255,7 +255,7 @@ do {                                                              \
 /* length 4, general node */
 /*------------------------*/
 
-/** 4-point FFT, evaluation, from general node
+/** 4-point FFT, evaluation, general node
  * * In-place transform
  *                              [ 1          1       1       1]
  *                              [w2        -w2      w3     -w3]
@@ -994,4 +994,4 @@ do {                                                                            
     IDFT4_NODE_LAZY_2_2(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);         \
 } while(0)
 
-#endif  /* N_FFT_MACROS_H */
+#endif  /* N_FFT_MACROS_DFT_H */
