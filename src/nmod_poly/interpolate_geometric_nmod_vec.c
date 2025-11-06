@@ -24,10 +24,7 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
 
     N = G->len;
 
-    if (len > N) 
-    {
-        flint_abort();
-    }
+    FLINT_ASSERT(len <= N) 
 
     nmod_poly_fit_length(poly, len);
     poly->length = len;
