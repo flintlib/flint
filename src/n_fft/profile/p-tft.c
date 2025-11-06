@@ -90,7 +90,7 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     FLINT_TEST_CLEAR(state);                                                     \
 }                                                                                \
 
-SAMPLE(tft_node_lazy_4_4, _v1)
+/* SAMPLE(tft_node_lazy_4_4, _v1) */
 
 SAMPLE_OLEN(tft_node_lazy_4_4, _v2_olen)
 
