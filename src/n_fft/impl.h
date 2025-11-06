@@ -21,5 +21,8 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
 void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 
+void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F);
+void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, ulong depth, n_fft_args_t F);
+
 #endif  /* N_FFT_IMPL_H */
 

@@ -14,11 +14,20 @@
 #include "n_fft.h"
 #include "n_fft/impl.h"
 #include "impl_macros_tft.h"
+#include "ulong_extras.h"
+
+/* exponent of next power of 2 for x > 2 */
+FLINT_FORCE_INLINE
+ulong n_clog2_gt2(ulong x)
+{
+    return FLINT_BITS - flint_clz(x - 1);
+}
 
 /* division by x**d - c, lazy with precomputation */
 /* coeff bounds: in [0, 4*n) | out [0, 4*n) */
 /* TODO see if can be faster by using ideas from try_sparse */
-FLINT_FORCE_INLINE void
+FLINT_FORCE_INLINE
+void
 _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2)
 {
     /* assumes len >= d */
@@ -229,7 +238,7 @@ Algo:
 
 /* here ilen == len, len/2 < olen < len, olen multiple of 4 */
 /* TODO TBD minimum len == 16, in which case olen == 12 */
-void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F)
+void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F)
 {
     /* flint_printf("olen = %wu, len = %wu, node = %wu\n", olen, 1L<<depth, node); */
     if (depth == 2)
@@ -361,6 +370,18 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
     {
         dft_node_lazy_4_4(p, depth, node, F);
     }
+    else if (olen <= (UWORD(1) << (depth - 1)))
+    {
+        const ulong len = UWORD(1) << depth;
+        ulong new_depth = n_clog2_gt2(olen);
+        node = node << (depth - new_depth);
+        depth = new_depth;
+
+        /* reduce p1 mod x**(len_rec) - root */
+        ulong len_rec = UWORD(1) << depth;
+        _nmod_poly_divrem_circulant_lazy_4_4(p, len, len_rec, F->tab_w[node], F->tab_w[node+1], F->mod, F->mod2);
+        tft_node_lazy_4_4(p, olen, depth, node, F);
+    }
     else
     {
         /* current full length */
@@ -381,47 +402,61 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
             DFT2_NODE_LAZY_4_4(p0[k+3], p1[k+3], w, wpre, F->mod, F->mod2);
         }
 
-        /* first recursive call in full length len/2 */
         dft_node_lazy_4_4(p0, depth-1, 2*node, F);
-
-        const ulong olen_rec = olen - len/2;
-        /* find out depth of second rec call */
-        /* 1<<(new_depth - 1) < olen_rec < 1<<new_depth, */
-        ulong new_depth = FLINT_BITS - flint_clz(olen_rec-1);
-        node = (2*node+1) << (depth - 1 - new_depth);
-        depth = new_depth;
-
-        /* reduce p1 mod x**(len_rec) - root */
-        ulong len_rec = UWORD(1) << depth;
-        if (len_rec < len/2)
-        {
-            if (node % 2 == 0)
-                _nmod_poly_divrem_circulant_lazy_4_4(p1, len/2, len_rec, F->tab_w[node], F->tab_w[node+1], F->mod, F->mod2);
-            else  /* node % 2 == 1 */
-                _nmod_poly_divrem_circulant_lazy_4_4(p1, len/2, len_rec, F->tab_w[node-1], F->tab_w[node], F->mod, F->mod2);
-        }
-
-        tft_node_lazy_4_4_v2_olen(p1, olen_rec, depth, node, F);
+        tft_node_lazy_4_4(p1, olen - len/2, depth-1, 2*node+1, F);
     }
 }
 
 /* ilen is arbitrary, > 0, multiple of 4 */
 /* olen has len/2 < olen <= len, multiple of 4 */
 /* node == 0 */
-void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong node, n_fft_args_t F)
+/* p has length 1<<depth */
+/* TODO remove input depth? redundant with olen */
+void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, ulong depth, n_fft_args_t F)
 {
-    /* TODO do this in base case if depth is small */
-    if (ilen < (UWORD(1) << depth))
+    const ulong ilen_depth = n_clog2_gt2(ilen);
+    if (ilen_depth < depth)  /* TODO special case for depth - 1? */
     {
-        const ulong len = UWORD(1) << depth;
-        
+        const ulong ilen2 = UWORD(1) << ilen_depth;
+        const ulong nb_subcalls = UWORD(1) << (depth - ilen_depth);
+        flint_printf("here %wu, %wu, %wu, %wu\n", olen, ilen_depth, depth, ilen2);
+        for (ulong k = ilen; k < ilen2; k++)
+            p[k] = 0;
+        for (ulong i = 1; i < nb_subcalls; i++)  /* TODO stop around olen */
+        {
+            for (ulong k = 0; k < ilen; k++)
+                p[i * ilen2 + k] = p[k];
+            for (ulong k = ilen; k < ilen2; k++)
+                p[i * ilen2 + k] = 0;
+        }
+        ulong i;
+        for (i = 0; olen >= ilen2 && i < nb_subcalls - 1; i++)
+        {
+            flint_printf("starting %wu, %wu, %wu, %wu --> %wu\n", olen, ilen_depth, depth, ilen2, i);
+            dft_node_lazy_4_4(p, ilen_depth, i, F);
+            flint_printf("end of %wu, %wu, %wu, %wu --> %wu\n", olen, ilen_depth, depth, ilen2, i);
+            p = p + ilen2;
+            olen -= ilen2;
+        }
+        flint_printf("here %wu, %wu, %wu, %wu --> %wu\n", olen, ilen_depth, depth, ilen2, depth - ilen_depth);
+        if (olen > 0)
+            tft_node_lazy_4_4(p, olen, ilen_depth, i, F);
+        flint_printf("alright %wu, %wu, %wu, %wu\n", olen, ilen_depth, depth, ilen2);
     }
-    /* TODO for the moment, pretend depth >= 3 */
-    if (depth == 3)
+    else if (ilen_depth == depth)
     {
-        return;
+        const ulong len = UWORD(1) << ilen_depth;
+        for (ulong k = ilen; k < len; k++)
+            p[k] = 0;
+        tft_node_lazy_4_4(p, olen, depth, 0, F);
     }
-    return;
+    else  /* ilen_depth > depth */
+    {
+        ulong one_precomp = n_mulmod_precomp_shoup(1, F->mod);
+        /* TODO faster with 1!! */
+        _nmod_poly_divrem_circulant_lazy_4_4(p, ilen, UWORD(1) << depth, 1, one_precomp, F->mod, F->mod2);
+        tft_node_lazy_4_4(p, olen, depth, 0, F);
+    }
 }
 
 

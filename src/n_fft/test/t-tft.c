@@ -16,6 +16,7 @@
 #include "nmod_poly.h"
 #include "nmod_vec.h"
 #include "n_fft.h"
+#include "n_fft/impl.h"
 
 #define MAX_EVAL_DEPTH 11
 
@@ -23,10 +24,10 @@ TEST_FUNCTION_START(n_fft_tft, state)
 {
     int i;
     flint_rand_set_seed(state, rand(), rand()+12);
-    ulong seed1, seed2;
-    flint_rand_get_seed(&seed1, &seed2, state);
-    flint_rand_set_seed(state, 846930886L, 1804289395L);
-    flint_printf("seeds: %wu, %wu\n", seed1, seed2);
+    /* ulong seed1, seed2; */
+    /* flint_rand_get_seed(&seed1, &seed2, state); */
+    /* flint_rand_set_seed(state, 846930886L, 1804289395L); */
+    /* flint_printf("seeds: %wu, %wu\n", seed1, seed2); */
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -69,13 +70,12 @@ TEST_FUNCTION_START(n_fft_tft, state)
         for (ulong depth = 4; depth <= MAX_EVAL_DEPTH; depth++)
         {
             const ulong len = (UWORD(1) << depth);
-            /* FOR V1: */
-            /* const ulong ilen = 8 + n_randint(state, len); */
-            /* const ulong olen = 8 * ((8 + n_randint(state, len)) / 8); */
-            /* FOR V2: */
-            const ulong ilen = len;
-            ulong olen = len/2 + 4 * (n_randint(state, len/2) / 4);  /* (len/2, len) */
-            if (olen == len/2) olen += 4;
+            /* FOR node_lazy_4_4: */
+            /* const ulong ilen = len; */
+            /* FOR node==0 lazy_1_4: */
+            const ulong ilen = 4 + 4 * (n_randint(state, len) / 4);
+            /* ulong olen = len/2 + 4 * (n_randint(state, len/2) / 4);  /1* (len/2, len) *1/ */
+            ulong olen = 4 + 4 * (n_randint(state, len) / 4);  /* (4, len] */
 
             flint_printf("---\n"
                     "prime = %wu\n"
@@ -93,7 +93,6 @@ TEST_FUNCTION_START(n_fft_tft, state)
             // copy it for DFT
             nn_ptr p = _nmod_vec_init(FLINT_MAX(len, ilen));
             _nmod_vec_set(p, pol->coeffs, ilen);
-            /* TODO need to fill ilen..len with zeros? */
 
             // evals via general multipoint evaluation
             nn_ptr evals_br = _nmod_vec_init(olen);
@@ -102,8 +101,8 @@ TEST_FUNCTION_START(n_fft_tft, state)
             // evals by TFT
             n_fft_args_t Fargs;
             n_fft_set_args(Fargs, F->mod, F->tab_w);
-            /* tft_node_lazy_4_4_v1(p, ilen, olen, depth, 0, Fargs); */
-            tft_node_lazy_4_4_v2_olen(p, olen, depth, 0, Fargs);
+            tft_lazy_1_4(p, ilen, olen, depth, Fargs);
+            /* tft_node_lazy_4_4(p, olen, depth, 0, Fargs); */
 
             for (ulong k = 0; k < olen; k++)
             {
