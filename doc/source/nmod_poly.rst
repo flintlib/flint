@@ -2550,8 +2550,8 @@ Geometric progression
     and of sufficient multiplicative order such that none of 
     the powers `1, r^2, r^4, \ldots, r^{2(len-1)}` is one.
 
-    The value of ``len`` should be greater or equal to the degree of the polynomials one
-    whishes to evaluate / interpolate plus one and greater than the number of points one whises to use.
+    The value of ``len`` should be both greater than or equal to the number of evaluation points to be
+    considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.
     This allocates vectors and polynomials for a total space of `8 len - 1` coefficients.
 
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
