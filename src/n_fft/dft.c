@@ -146,7 +146,11 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
  */
 void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {
-    if (depth == 3)
+    if (depth == 2)  /* TODO added base case, check it does not impact performance */
+    {
+        DFT4_LAZY_2_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
+    }
+    else if (depth == 3)
     {
         DFT8_LAZY_2_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], F->mod, F->mod2, F->tab_w);
     }

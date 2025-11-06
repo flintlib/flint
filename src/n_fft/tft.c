@@ -12,6 +12,7 @@
 #include "n_fft.h"
 #include "n_fft/impl.h"
 #include "impl_macros_tft.h"
+#include "n_fft/impl_macros_dft.h"
 #include "ulong_extras.h"
 
 /* division by x**d - c, lazy with precomputation */
@@ -301,56 +302,138 @@ void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args
     }
 }
 
-/* ilen is arbitrary, > 0, multiple of 4 */
-/* olen is arbitrary, > 0, multiple of 4 */
+/* ilen is >= 8, multiple of 4 */
+/* olen is >= 4, multiple of 4 */
+/* exception: ilen==4 is accepted when olen==4 */
 /* node == 0 */
 /* p has space for max(ilen, len) coeffs where len is next power of 2 of olen */
+/** NOTE: some calls could be lazier, but gain should be quite modest:
+ *     [comment**]  DFT2_NODE_LAZY_4_4 -> LAZY_1_4
+ *     [comment*]   dft_node_lazy_4_4 -> 2_4
+ */
 void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
 {
-    const ulong depth = n_clog2_gt2(olen);
-    const ulong ilen_depth = n_clog2_gt2(ilen);
-    if (ilen_depth < depth)  /* TODO special case for depth - 1? */
+    /* base case */
+    if (olen == 4 && ilen == 4)
     {
-        const ulong ilen2 = UWORD(1) << ilen_depth;
-        const ulong nb_subcalls = UWORD(1) << (depth - ilen_depth);
-        /* flint_printf("here %wu, %wu, %wu, %wu\n", olen, ilen_depth, depth, ilen2); */
-        nn_ptr pp = p + ilen2;
-        olen -= ilen2;  /* for first dft on p+0, done later */
-        ulong i;
-        for (i = 1; olen >= ilen2 && i < nb_subcalls - 1; i++)
-        {
-            for (ulong k = 0; k < ilen; k++)
-                pp[k] = p[k];
-            for (ulong k = ilen; k < ilen2; k++)
-                pp[k] = 0;
-            dft_node_lazy_4_4(pp, ilen_depth, i, F);
-            pp = pp + ilen2;
-            olen -= ilen2;
-        }
-        if (olen > 0)
-        {
-            for (ulong k = 0; k < ilen; k++)
-                pp[k] = p[k];
-            for (ulong k = ilen; k < ilen2; k++)
-                pp[k] = 0;
-            tft_node_lazy_4_4(pp, olen, ilen_depth, i, F);
-        }
-        for (ulong k = ilen; k < ilen2; k++)
-            p[k] = 0;
-        dft_node_lazy_4_4(p, ilen_depth, 0, F);
+        DFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_w[2], F->tab_w[3], F->mod, F->mod2);
+        return;
     }
-    else if (ilen_depth == depth)
+
+    const ulong odepth = n_clog2_gt2(olen);
+    const ulong idepth = n_clog2_gt2(ilen);
+
+    /* ilen >> olen: reduce mod x**len - 1 and call again */
+    if (idepth > odepth)
     {
-        const ulong len = UWORD(1) << ilen_depth;
-        for (ulong k = ilen; k < len; k++)
-            p[k] = 0;
-        tft_node_lazy_4_4(p, olen, depth, 0, F);
-    }
-    else  /* ilen_depth > depth */
-    {
-        const ulong len = UWORD(1) << depth;
+        const ulong len = UWORD(1) << odepth;
         _nmod_poly_divrem_circulant1(p, ilen, len, F->mod);
         tft_lazy_1_4(p, len, olen, F);
+    }
+
+    /* ilen ~ olen: recurse into dft + tft at half length */
+    else if (idepth == odepth)
+    {
+        /* flint_printf("===equal=== %wu\n", odepth); */
+        const ulong len = UWORD(1) << odepth;
+        const nn_ptr p0 = p;
+        const nn_ptr p1 = p + len/2;
+        ulong k;
+        for (k = 0; k < ilen - len/2; k++)  /* FIXME try unrolling? */
+            DFT2_LAZY_1_2(p0[k], p1[k], F->mod);
+        for (; k < len/2; k++)
+            p1[k] = p0[k];
+        dft_lazy_2_4(p0, odepth - 1, F);
+        tft_node_lazy_4_4(p1, olen - len/2, odepth - 1, 1, F);
+    }
+
+    /* if ilen ~ olen/2, do special butterfly and recurse */
+    /* this is not necessary: it is covered by the next (convoluted) "if"; but */
+    /* since this case is frequent, let's write it in a simple way */
+    /* else if (idepth == odepth - 1) */
+    /* { */
+
+    /* } */
+
+    else  /* idepth < odepth - 1 */
+    {
+        const ulong ilen2 = UWORD(1) << idepth;
+        ulong i, k;
+        ulong val;
+        nn_ptr pp = p + ilen2;
+        const ulong len_rec = ilen2 / 2;
+        /* flint_printf("here %wu, %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2, len_rec); */
+
+        /* first DFT round with node == 0 */
+        /* save values and perform butterflies */
+        for (k = 0; k < ilen - len_rec; k++)  /* FIXME try unrolling? */
+        {
+            pp[k] = p[k];
+            pp[len_rec + k] = p[len_rec + k];
+            DFT2_LAZY_1_2(p[k], p[len_rec + k], F->mod);
+        }
+        for (; k < len_rec; k++)
+        {
+            /* butterfly with input p[len_rec + k]: p[k] unchanged, p[len_rec + k] = p[k] */
+            val = p[k];
+            p[len_rec + k] = val;
+            pp[k] = val;
+        }
+        /* flint_printf("before 2_4 %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2); */
+        dft_lazy_2_4(p, idepth - 1, F);
+        /* flint_printf("before 4_4 %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2); */
+        dft_node_lazy_4_4(p+len_rec, idepth - 1, 1, F);  /* [comment*] */
+        /* flint_printf("ok %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2); */
+
+        /* update */
+        p += ilen2;
+        pp += ilen2;
+        olen -= ilen2;
+        /* flint_printf("here %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2); */
+
+        /* next DFT rounds */
+        for (i = 1; olen > ilen2; i++)  /* remove nb_subcalls? */
+        {
+            /* flint_printf("DFT rounds %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2); */
+            /* save values and perform butterflies */
+            for (k = 0; k < ilen - len_rec; k++)  /* FIXME try unrolling? */
+            {
+                pp[k] = p[k];
+                pp[len_rec + k] = p[len_rec + k];
+                DFT2_NODE_LAZY_4_4(p[k], p[len_rec + k],  /* [comment**] */
+                                   F->tab_w[2*i], F->tab_w[2*i+1],
+                                   F->mod, F->mod2);
+            }
+            for (; k < len_rec; k++)
+            {
+                /* butterfly with input p[len_rec + k]: p[k] unchanged, p[len_rec + k] = p[k] */
+                val = p[k];
+                p[len_rec + k] = val;
+                pp[k] = val;
+            }
+            dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
+            dft_node_lazy_4_4(p+len_rec, idepth - 1, 2*i+1, F);
+
+            p += ilen2;
+            pp += ilen2;
+            olen -= ilen2;
+        }
+
+        /* flint_printf("final TFT round: %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2); */
+        /* perform butterflies */
+        for (k = 0; k < ilen - len_rec; k++)  /* FIXME try unrolling? */
+        {
+            DFT2_NODE_LAZY_4_4(p[k], p[len_rec + k],  /* [comment**] */
+                               F->tab_w[2*i], F->tab_w[2*i+1],
+                               F->mod, F->mod2);
+        }
+        for (; k < len_rec; k++)
+            p[len_rec + k] = p[k];
+        dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
+        /* flint_printf("arriving just before TFT\n"); */
+        olen -= len_rec;
+        if (olen > 0)
+            tft_node_lazy_4_4(p+len_rec, olen, idepth - 1, 2*i+1, F);
     }
 }
 
