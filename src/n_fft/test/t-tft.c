@@ -80,14 +80,14 @@ TEST_FUNCTION_START(n_fft_tft, state)
             if (olen_depth == 2)  /* FIXME support small lengths.. how small? */
                 olen_depth = 3;
 
-            flint_printf("---\n"
-                    "prime = %wu\n"
-                    "ilen = %wu\n"
-                    "olen = %wu\n"
-                    "root of unity = %wu\n"
-                    "max_depth = %wu\n"
-                    "depth = %wu\n",
-                    prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, olen_depth);
+            /* flint_printf("---\n" */
+            /*         "prime = %wu\n" */
+            /*         "ilen = %wu\n" */
+            /*         "olen = %wu\n" */
+            /*         "root of unity = %wu\n" */
+            /*         "max_depth = %wu\n" */
+            /*         "depth = %wu\n", */
+            /*         prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, olen_depth); */
 
             // choose random poly of degree < ilen
             nmod_poly_t pol;

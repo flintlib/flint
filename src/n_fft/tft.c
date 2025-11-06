@@ -350,10 +350,50 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
     /* if ilen ~ olen/2, do special butterfly and recurse */
     /* this is not necessary: it is covered by the next (convoluted) "if"; but */
     /* since this case is frequent, let's write it in a simple way */
-    /* else if (idepth == odepth - 1) */
-    /* { */
+    else if (idepth == odepth - 1)
+    {
+        const ulong ilen2 = UWORD(1) << idepth;
+        const ulong len_rec = ilen2 / 2;
+        const nn_ptr p0 = p + 0*len_rec;
+        const nn_ptr p1 = p + 1*len_rec;
+        const nn_ptr p2 = p + 2*len_rec;
+        const nn_ptr p3 = p + 3*len_rec;
+        ulong k, tmp0, tmp1;
 
-    /* } */
+        /* perform butterflies */
+        for (k = 0; k < ilen - len_rec; k++)  /* FIXME try unrolling? */
+        {
+            tmp0 = p0[k];
+            tmp1 = p1[k];
+            DFT2_LAZY_1_2(p0[k], p1[k], F->mod);
+            DFT2_NODE_LAZY_4_4(tmp0, tmp1, F->tab_w[2], F->tab_w[3], F->mod, F->mod2);  /* [comment**] */
+            /* TODO if olen is small (olen < ilen2 + len_rec), we probably want this to be a TFT */
+            /* same remark in more general version below */
+            p2[k] = tmp0;
+            p3[k] = tmp1;
+        }
+        for (; k < len_rec; k++)
+        {
+            /* butterfly with input p1[k] == 0: p0[k] unchanged, p1[k] <- p[k] */
+            tmp0 = p0[k];
+            p1[k] = tmp0;
+            p2[k] = tmp0;
+            p3[k] = tmp0;
+        }
+        /* flint_printf("before 2_4 %wu, %wu, %wu, %wu\n", olen, idepth, odepth, ilen2); */
+        dft_lazy_2_4(p0, idepth - 1, F);
+        dft_node_lazy_4_4(p1, idepth - 1, 1, F);
+        olen -= ilen2;
+        if (olen > len_rec)
+        {
+            dft_node_lazy_4_4(p2, idepth - 1, 2, F);
+            tft_node_lazy_4_4(p3, olen - len_rec, idepth - 1, 3, F);
+        }
+        else
+        {
+            tft_node_lazy_4_4(p2, olen, idepth - 1, 2, F);
+        }
+    }
 
     else  /* idepth < odepth - 1 */
     {
@@ -374,7 +414,7 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
         }
         for (; k < len_rec; k++)
         {
-            /* butterfly with input p[len_rec + k]: p[k] unchanged, p[len_rec + k] = p[k] */
+            /* butterfly with input p[len_rec + k] == 0: p[k] unchanged, p[len_rec + k] = p[k] */
             val = p[k];
             p[len_rec + k] = val;
             pp[k] = val;
@@ -406,7 +446,7 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
             }
             for (; k < len_rec; k++)
             {
-                /* butterfly with input p[len_rec + k]: p[k] unchanged, p[len_rec + k] = p[k] */
+                /* butterfly with input p[len_rec + k] == 0: p[k] unchanged, p[len_rec + k] = p[k] */
                 val = p[k];
                 p[len_rec + k] = val;
                 pp[k] = val;
@@ -427,13 +467,16 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
                                F->tab_w[2*i], F->tab_w[2*i+1],
                                F->mod, F->mod2);
         }
-        for (; k < len_rec; k++)
-            p[len_rec + k] = p[k];
-        dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
-        /* flint_printf("arriving just before TFT\n"); */
-        olen -= len_rec;
-        if (olen > 0)
-            tft_node_lazy_4_4(p+len_rec, olen, idepth - 1, 2*i+1, F);
+        if (olen > len_rec)
+        {
+            for (; k < len_rec; k++)
+                p[len_rec + k] = p[k];
+            dft_node_lazy_4_4(p, idepth - 1, 2*i, F);
+            /* flint_printf("arriving just before TFT\n"); */
+            tft_node_lazy_4_4(p+len_rec, olen - len_rec, idepth - 1, 2*i+1, F);
+        }
+        else
+            tft_node_lazy_4_4(p, olen, idepth - 1, 2*i, F);
     }
 }
 
