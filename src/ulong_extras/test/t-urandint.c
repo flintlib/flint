@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 Apoorv Mishra
+    Copyright (C) 2025 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,101 +10,112 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
+#define N               8
+#define NR_SAMPLES      N * (1 << 8)
+#define NR_SAMPLES_MAX  NR_SAMPLES
+#define LIMIT_SMALL     (2 + n_randint(state, 1 << 14))
+#define LIMIT_BIG \
+    (UWORD_MAX / 2 + n_randint(state, UWORD(1) << FLINT_BITS / 2))
+#define SQR(x)          ((x) * (x))
+#define ABS(x)          ((x) > 0 ? (x) : -(x))
+#define MU(limit)       (((double) (limit) - 1) / 2)
+#define VAR(limit)      ((SQR((double) (limit)) - 1) / 12)
+#if FLINT64
+# define FMT_LIM        "0x%016" _WORD_FMT "x"
+#else
+# define FMT_LIM        "0x%08" _WORD_FMT "x"
+#endif
+
+static inline int check_mu(double mu, ulong lim, slong nr_samples)
+{
+    double z = (mu - MU(lim)) / sqrt(VAR(lim) / nr_samples);
+    return fabs(z) <= 4.475328424654207; /* alpha = 2^{-16} */
+}
+
+static inline int check_var(double var, ulong lim, slong nr_samples)
+{
+    /* Approximate chi-squared through normal distribution */
+    double chi2 = nr_samples * var / VAR(lim);
+    double mu_chi = nr_samples - 1;
+    double z_chi = (chi2 - mu_chi) / sqrt(2 * mu_chi);
+    return fabs(z_chi) <= 4.475328424654207; /* alpha = 2^{-16} */
+}
+
 TEST_FUNCTION_START(n_urandint, state)
 {
-    ulong limit, rand_num;
-    slong deviation;
-    int i, j, result;
-    int * count;
-    int * count_in_subrange;
-    double test_multiplier = FLINT_MAX(1, flint_test_multiplier());
+    int result;
+    ulong * ts = flint_malloc(NR_SAMPLES_MAX * sizeof(ulong));
 
-    /* Test for limit <= 1000 */
-    count = flint_malloc(sizeof(int) * 1000);
-    for (limit = 1; limit <= 1000; limit+=10)
+    for (slong ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
-        for (i = 0; i < limit; i++)
-        {
-            count[i] = 0;
-        }
+            int is_big = n_randint(state, 2) == 0;
+        ulong lim = is_big ? LIMIT_BIG : LIMIT_SMALL;
+        slong nr_samples = NR_SAMPLES;
+        double mu, var = 0;
+        double up[N] = {0.0};
 
-        for (i = 0; i < 1000 * test_multiplier; i++)
+        if (is_big)
         {
-            rand_num = n_urandint(state, limit);
-            count[rand_num]++;
-        }
-
-        result = 1;
-        for (i = 0; i < limit; i++)
-        {
-            deviation = count[i] - (1000 * (int) test_multiplier)/limit;
-            if (deviation >= WORD(100) * test_multiplier ||
-                deviation <= WORD(-100) * test_multiplier)
+            ulong t0 = 0, t1 = 0;
+            for (slong ix = 0; ix < nr_samples; ix++)
             {
-                result = 0;
-                break;
+                ts[ix] = n_urandint(state, lim);
+                add_ssaaaa(t1, t0, t1, t0, 0, ts[ix]);
             }
+#if FLINT64
+            mu = (t0 + 0x1.0p64 * t1) / nr_samples;
+#else
+            mu = (t0 + 0x1.0p32 * t1) / nr_samples;
+#endif
+        }
+        else
+        {
+            ulong t0 = 0;
+            for (slong ix = 0; ix < nr_samples; ix++)
+            {
+                ts[ix] = n_urandint(state, lim);
+                t0 += ts[ix];
+            }
+            mu = (double) t0 / nr_samples;
         }
 
+        for (slong ix = 0; ix < nr_samples / N; ix++)
+            for (slong jx = 0; jx < N; jx++)
+                up[jx] += SQR(ts[N * ix + jx] - mu);
+
+        for (slong jx = 0; jx < N; jx++) var += up[jx];
+        var /= nr_samples;
+
+        result = check_mu(mu, lim, nr_samples)
+            && check_var(var, lim, nr_samples);
         if (!result)
-            TEST_FUNCTION_FAIL("limit = %wu, deviation = %wd\n", limit, deviation);
+            TEST_FUNCTION_FAIL("ix = %wd\n"
+                               "lim = " FMT_LIM "\n"
+                               "nr_samples = %wd\n"
+                               "mu fail: %d, var fail: %d\n"
+                               "MU = %10e, VAR = %10e\n"
+                               "mu = %10e, var = %10e\n",
+                               ix, lim, nr_samples,
+                               !check_mu(mu, lim, nr_samples),
+                               !check_var(var, lim, nr_samples),
+                               MU(lim), VAR(lim), mu, var);
     }
-
-    flint_free(count);
-
-    /* Test for larger values of limit */
-    count_in_subrange = flint_malloc(sizeof(int) * 4);
-    for (i = 0; i < 1000; i+=10)
-    {
-        for (j = 0; j < 4; j++)
-        {
-            count_in_subrange[j] = 0;
-        }
-
-        limit = UWORD_MAX/(i + 2)*(i + 1);
-
-        for (j = 0; j < 1000 * test_multiplier; j++)
-        {
-            rand_num = n_urandint(state, limit);
-
-            if (rand_num >= 3*(limit >> 2))
-            {
-                count_in_subrange[3]++;
-            }
-            else if (rand_num >= 2*(limit >> 2))
-            {
-                count_in_subrange[2]++;
-            }
-            else if (rand_num >= (limit >> 2))
-            {
-                count_in_subrange[1]++;
-            }
-            else
-            {
-                count_in_subrange[0]++;
-            }
-        }
-
-        result = 1;
-        for (j = 0; j < 4; j++)
-        {
-            deviation = count_in_subrange[j] - ((1000 * (int) test_multiplier) >> 2);
-            if (deviation >= WORD(100) * test_multiplier ||
-                deviation <= WORD(-100) * test_multiplier)
-            {
-                result = 0;
-                break;
-            }
-        }
-
-        if (!result)
-            TEST_FUNCTION_FAIL("limit = %wu, deviation = %wd\n", limit, deviation);
-    }
-
-    flint_free(count_in_subrange);
+    flint_free(ts);
 
     TEST_FUNCTION_END(state);
 }
+
+#undef N
+#undef NR_SAMPLES
+#undef NR_SAMPLES_MAX
+#undef LIMIT_SMALL
+#undef LIMIT_BIG
+#undef SQR
+#undef ABS
+#undef MU
+#undef VAR
+#undef FMT_LIM
