@@ -74,8 +74,8 @@ TEST_FUNCTION_START(n_fft_tft, state)
             /* const ulong olen = 8 * ((8 + n_randint(state, len)) / 8); */
             /* FOR V2: */
             const ulong ilen = len;
-            ulong olen = len/2 + 8 * (n_randint(state, len/2) / 8);  /* (len/2, len) */
-            if (olen == len/2) olen += 8;
+            ulong olen = len/2 + 4 * (n_randint(state, len/2) / 4);  /* (len/2, len) */
+            if (olen == len/2) olen += 4;
 
             flint_printf("---\n"
                     "prime = %wu\n"

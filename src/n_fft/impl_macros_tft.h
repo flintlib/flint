@@ -364,10 +364,10 @@ do {                                                                            
     DFT4_NODE_LAZY_4_4(p1, p9, p17, p25, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);            \
     DFT4_NODE_LAZY_4_4(p2, p10, p18, p26, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
     DFT4_NODE_LAZY_4_4(p3, p11, p19, p27, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
-    TFT4_2_NODE_LAZY_4_4(p4, p12, p20, p28, w2, w2pre, w, wpre, n, n2);                    \
-    TFT4_2_NODE_LAZY_4_4(p5, p13, p21, p29, w2, w2pre, w, wpre, n, n2);                    \
-    TFT4_2_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, n, n2);                    \
-    TFT4_2_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, n, n2);                    \
+    DFT4_NODE_LAZY_4_4(p4, p12, p20, p28, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
+    DFT4_NODE_LAZY_4_4(p5, p13, p21, p29, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
+    DFT4_NODE_LAZY_4_4(p6, p14, p22, p30, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
+    DFT4_NODE_LAZY_4_4(p7, p15, p23, p31, w2, w2pre, w, wpre, Iw, Iwpre, n, n2);           \
                                                                                            \
     DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);              \
     DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);      \
@@ -423,7 +423,8 @@ do {                                                                            
                                                                                            \
     DFT8_NODE_LAZY_4_4(p0, p1, p2, p3, p4, p5, p6, p7, 4*node, n, n2, tab_w);              \
     DFT8_NODE_LAZY_4_4(p8, p9, p10, p11, p12, p13, p14, p15, 4*node+1, n, n2, tab_w);      \
-    TFT8_4_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);  \
+    DFT8_NODE_LAZY_4_4(p16, p17, p18, p19, p20, p21, p22, p23, 4*node+2, n, n2, tab_w);  \
+    TFT8_4_NODE_LAZY_4_4(p24, p25, p26, p27, p28, p29, p30, p31, 4*node+3, n, n2, tab_w);  \
 } while(0)
 
 

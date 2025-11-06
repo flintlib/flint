@@ -236,19 +236,44 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
     /* flint_printf("olen = %wu, len = %wu, node = %wu\n", olen, 1L<<depth, node); */
     if (depth == 2)
     {
-        TFT4_2_NODE_LAZY_4_4(p[0], p[1], p[2], p[3],
-                             F->tab_w[2*node], F->tab_w[2*node+1],
-                             F->tab_w[4*node], F->tab_w[4*node+1],
-                             F->mod, F->mod2);
+        if (olen == 4)
+        {
+            DFT4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3],
+                               F->tab_w[2*node], F->tab_w[2*node+1],
+                               F->tab_w[4*node], F->tab_w[4*node+1],
+                               F->tab_w[4*node+2], F->tab_w[4*node+3],
+                               F->mod, F->mod2);
+        }
+        else
+        {
+            TFT4_2_NODE_LAZY_4_4(p[0], p[1], p[2], p[3],
+                                 F->tab_w[2*node], F->tab_w[2*node+1],
+                                 F->tab_w[4*node], F->tab_w[4*node+1],
+                                 F->mod, F->mod2);
+        }
     }
     else if (depth == 3)
     {
-        TFT8_4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
-                             node, F->mod, F->mod2, F->tab_w);
+        if (olen == 8)
+        {
+            DFT8_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                               node, F->mod, F->mod2, F->tab_w);
+        }
+        else
+        {
+            TFT8_4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                                 node, F->mod, F->mod2, F->tab_w);
+        }
     }
     else if (depth == 4)
     {
-        if (olen == 4)
+        if (olen == 16)
+        {
+            DFT16_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                                p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                                node, F->mod, F->mod2, F->tab_w);
+        }
+        else if (olen == 4)
         {
             TFT16_4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                                   p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
@@ -260,7 +285,7 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
                                   p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
                                   node, F->mod, F->mod2, F->tab_w);
         }
-        else  /* olen == 16 */
+        else  /* olen == 12 */
         {
             TFT16_12_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                                    p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
@@ -269,7 +294,15 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
     }
     else if (depth == 5)
     {
-        if (olen == 4)
+        if (olen == 32)
+        {
+            DFT32_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                                p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
+                                p[16], p[17], p[18], p[19], p[20], p[21], p[22], p[23],
+                                p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
+                                node, F->mod, F->mod2, F->tab_w);
+        }
+        else if (olen == 4)
         {
             TFT32_4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
                                   p[8], p[9], p[10], p[11], p[12], p[13], p[14], p[15],
@@ -325,6 +358,10 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
                                    p[24], p[25], p[26], p[27], p[28], p[29], p[30], p[31],
                                    node, F->mod, F->mod2, F->tab_w);
         }
+    }
+    else if (olen == (UWORD(1) << depth))
+    {
+        dft_node_lazy_4_4(p, depth, node, F);
     }
     else
     {
@@ -382,21 +419,7 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
                 _nmod_poly_divrem_xnmc_precomp_lazy(p1, len/2, len_rec, F->tab_w[node-1], F->tab_w[node], F->mod);
         }
 
-        if (olen_rec == (UWORD(1) << depth))
-        {
-            if (olen_rec == 4)
-            {
-                DFT4_NODE_LAZY_4_4(p[0], p[1], p[2], p[3],
-                                   F->tab_w[2*node], F->tab_w[2*node+1],
-                                   F->tab_w[4*node], F->tab_w[4*node+1],
-                                   F->tab_w[4*node+2], F->tab_w[4*node+3],
-                                   F->mod, F->mod2);
-            }
-            else
-                dft_node_lazy_4_4(p1, depth, node, F);
-        }
-        else
-            tft_node_lazy_4_4_v2_olen(p1, olen_rec, depth, node, F);
+        tft_node_lazy_4_4_v2_olen(p1, olen_rec, depth, node, F);
     }
 }
 
