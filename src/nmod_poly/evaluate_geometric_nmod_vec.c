@@ -19,7 +19,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     slong plen, const nmod_geometric_progression_t G, slong len)
 {
     nn_ptr a, b;
-    slong i, i_min, G_len, a_len;
+    slong i, i_min, G_len, a_len, b_len;
 
     G_len = G->len;
     FLINT_ASSERT(len <= G_len);
@@ -39,15 +39,23 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     }
     
     a_len = plen - i_min;
+    b_len = G->f->length + a_len - 1;
     a = _nmod_vec_init(a_len);
-    b = _nmod_vec_init(G->f->length + a_len - 1);
+    b = _nmod_vec_init(b_len);
     
     for (i = i_min; i < plen; i++)
     {
         a[plen - 1 - i] = nmod_mul(G->x[i], poly[i], G->mod);
     }
 
-    _nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, a_len, plen - 1, G->mod);
+    // this is a temporary replacement to _nmod_poly_mulhigh which is not yet optimised
+    nn_ptr Gfr;
+    Gfr = _nmod_vec_init(G->f->length);
+    _nmod_poly_reverse(Gfr, G->f->coeffs, G->f->length, G->f->length);
+    _nmod_poly_reverse(a, a, a_len, a_len);
+    _nmod_poly_mullow(b, Gfr, G->f->length, a, a_len, G->f->length - i_min, G->mod);
+    _nmod_poly_reverse(b, b, b_len, b_len);
+    //_nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, a_len, plen - 1, G->mod);
  
     for (i = 0; i < len; i++)
     {
