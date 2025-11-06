@@ -167,7 +167,7 @@ uint32_t u32_mod_preinv(uint32_t x, uint32_t d, uint64_t dinv)
 {
     uint64_t l = dinv * x;
 
-#if (defined(_MSC_VER))
+#if !defined(__GNUC__)
     uint64_t hi, lo;
     umul_ppmm(hi, lo, l, d);
     return hi;
