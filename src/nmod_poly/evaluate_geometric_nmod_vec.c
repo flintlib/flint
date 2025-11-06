@@ -55,6 +55,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     _nmod_poly_reverse(a, a, a_len, a_len);
     _nmod_poly_mullow(b, Gfr, G->f->length, a, a_len, G->f->length - i_min, G->mod);
     _nmod_poly_reverse(b, b, b_len, b_len);
+    _nmod_vec_clear(Gfr);
     //_nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, a_len, plen - 1, G->mod);
  
     for (i = 0; i < len; i++)
