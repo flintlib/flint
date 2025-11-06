@@ -85,6 +85,7 @@
 #include "t-mul_KS.c"
 #include "t-mullow.c"
 #include "t-mullow_classical.c"
+#include "t-mullow_fft_small_repack.c"
 #include "t-mullow_KS.c"
 #include "t-mulmod.c"
 #include "t-mulmod_precond.c"
@@ -211,6 +212,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mul_KS),
     TEST_FUNCTION(nmod_poly_mullow),
     TEST_FUNCTION(nmod_poly_mullow_classical),
+    TEST_FUNCTION(nmod_poly_mullow_fft_small_repack),
     TEST_FUNCTION(nmod_poly_mullow_KS),
     TEST_FUNCTION(nmod_poly_mulmod),
     TEST_FUNCTION(nmod_poly_mulmod_precond),
