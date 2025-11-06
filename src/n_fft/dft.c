@@ -67,7 +67,7 @@
 /** 2**depth-point DFT, general node
  * * In-place transform p of length len == 2**depth, seen as a polynomial of
  * degree < len, into the concatenation of all polynomial evaluations
- *          [p(w_k), p(-w_k)] for k in range(len),
+ *          [p(w_k), p(-w_k)] for k in range(len/2),
  * where w_k = F->tab_w[2**depth * node + 2*k] for 0 <= k < 2**(depth-1)
  * * By construction these evaluation points are the len roots of the
  * polynomial x**len - F->tab_w[2*node] (for example, if depth=
