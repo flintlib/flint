@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fft_small.h"
 #include "flint.h"
 #include "n_fft.h"
 #include "n_fft/impl.h"
@@ -227,7 +228,7 @@ Algo:
 /* } */
 
 /* here ilen == len, len/2 < olen < len, olen multiple of 4 */
-/* minimum len == 16, in which case olen == 12 */
+/* TODO TBD minimum len == 16, in which case olen == 12 */
 void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F)
 {
     /* flint_printf("olen = %wu, len = %wu, node = %wu\n", olen, 1L<<depth, node); */
@@ -384,20 +385,11 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
         dft_node_lazy_4_4(p0, depth-1, 2*node, F);
 
         const ulong olen_rec = olen - len/2;
-        /* find out depth of call */
-        /* e.g.: olen_rec == len/4+4 -> use (depth-1, 2*node+1) */
-        /* e.g.: olen_rec == len/4-4 -> use (depth-2, 2*(2*node+1)) */
-        depth -= 1;
-        node = 2 * node + 1;
-        while (olen_rec <= (UWORD(1) << (depth-1)))  /* computation to improve */
-        {
-            /* flint_printf("%wu ---- %wu, %wu\n", len/2, depth, node); */
-            depth -= 1;
-            node = 2 * node;
-        }
-        /* flint_printf("exiting loop with: %wu, %wu\n", depth, node); */
-        /* now 1<<(depth - 1) < olen_rec < 1<<depth, */
-        /* and newnode == (2 * oldnode + 1) << nb of while loop iterations */
+        /* find out depth of second rec call */
+        /* 1<<(new_depth - 1) < olen_rec < 1<<new_depth, */
+        ulong new_depth = FLINT_BITS - flint_clz(olen_rec-1);
+        node = (2*node+1) << (depth - 1 - new_depth);
+        depth = new_depth;
 
         /* reduce p1 mod x**(len_rec) - root */
         ulong len_rec = UWORD(1) << depth;
@@ -413,6 +405,24 @@ void tft_node_lazy_4_4_v2_olen(nn_ptr p, ulong olen, ulong depth, ulong node, n_
     }
 }
 
+/* ilen is arbitrary, > 0, multiple of 4 */
+/* olen has len/2 < olen <= len, multiple of 4 */
+/* node == 0 */
+void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, ulong depth, ulong node, n_fft_args_t F)
+{
+    /* TODO do this in base case if depth is small */
+    if (ilen < (UWORD(1) << depth))
+    {
+        const ulong len = UWORD(1) << depth;
+        
+    }
+    /* TODO for the moment, pretend depth >= 3 */
+    if (depth == 3)
+    {
+        return;
+    }
+    return;
+}
 
 
 
