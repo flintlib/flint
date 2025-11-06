@@ -18,42 +18,42 @@ typedef struct
    ulong olen;
 } info_t;
 
-#define SAMPLE(fun, _variant)                                                    \
-void sample_##fun##_variant(void * arg, ulong count)                             \
-{                                                                                \
-    info_t * info = (info_t *) arg;                                              \
-    const ulong p = info->prime;                                                 \
-    const ulong depth = info->depth;                                             \
-    const ulong ilen = info->ilen;                                               \
-    const ulong olen = info->olen;                                               \
-                                                                                 \
-    const ulong len = (UWORD(1) << depth);                                       \
-    const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));                \
-                                                                                 \
-    /* modulus, roots of unity */                                                \
-    n_fft_ctx_t F;                                                               \
-    n_fft_ctx_init2(F, depth, p);                                                \
-    n_fft_args_t Fargs;                                                          \
-    n_fft_set_args(Fargs, F->mod, F->tab_w);                                     \
-                                                                                 \
-    FLINT_TEST_INIT(state);                                                      \
-                                                                                 \
-    ulong * coeffs = _nmod_vec_init(FLINT_MAX(ilen, len));                       \
-    for (ulong k = 0; k < ilen; k++)                                             \
-        coeffs[k] = n_randint(state, p);                                         \
-                                                                                 \
-    for (ulong i = 0; i < count; i++)                                            \
-    {                                                                            \
-        prof_start();                                                            \
-        for (ulong j = 0; j < rep; j++)                                          \
-            fun##_variant(coeffs, ilen, olen, depth, 0, Fargs);                  \
-        prof_stop();                                                             \
-    }                                                                            \
-                                                                                 \
-    _nmod_vec_clear(coeffs);                                                     \
-    n_fft_ctx_clear(F);                                                          \
-    FLINT_TEST_CLEAR(state);                                                     \
-}                                                                                \
+#define SAMPLE(fun, _variant)                                      \
+void sample_##fun##_variant(void * arg, ulong count)               \
+{                                                                  \
+    info_t * info = (info_t *) arg;                                \
+    const ulong p = info->prime;                                   \
+    const ulong depth = info->depth;                               \
+    const ulong ilen = info->ilen;                                 \
+    const ulong olen = info->olen;                                 \
+                                                                   \
+    const ulong len = (UWORD(1) << depth);                         \
+    const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));  \
+                                                                   \
+    /* modulus, roots of unity */                                  \
+    n_fft_ctx_t F;                                                 \
+    n_fft_ctx_init2(F, depth, p);                                  \
+    n_fft_args_t Fargs;                                            \
+    n_fft_set_args(Fargs, F->mod, F->tab_w);                       \
+                                                                   \
+    FLINT_TEST_INIT(state);                                        \
+                                                                   \
+    ulong * coeffs = _nmod_vec_init(FLINT_MAX(ilen, len));         \
+    for (ulong k = 0; k < ilen; k++)                               \
+        coeffs[k] = n_randint(state, p);                           \
+                                                                   \
+    for (ulong i = 0; i < count; i++)                              \
+    {                                                              \
+        prof_start();                                              \
+        for (ulong j = 0; j < rep; j++)                            \
+            fun##_variant(coeffs, ilen, olen, Fargs);              \
+        prof_stop();                                               \
+    }                                                              \
+                                                                   \
+    _nmod_vec_clear(coeffs);                                       \
+    n_fft_ctx_clear(F);                                            \
+    FLINT_TEST_CLEAR(state);                                       \
+}                                                                  \
 
 #define SAMPLE_OLEN(fun, _variant)                                               \
 void sample_##fun##_variant(void * arg, ulong count)                             \
@@ -91,7 +91,7 @@ void sample_##fun##_variant(void * arg, ulong count)                            
     FLINT_TEST_CLEAR(state);                                                     \
 }                                                                                \
 
-/* SAMPLE(tft_node_lazy_4_4, _v1) */
+SAMPLE(tft_lazy_1_4, )
 
 SAMPLE_OLEN(tft_node_lazy_4_4, )
 
@@ -100,11 +100,14 @@ void sample_sd_fft(void * arg, ulong count)
     info_t * info = (info_t *) arg;
     const ulong p = info->prime;
     const ulong depth = info->depth;
-    const ulong ilen = info->ilen;
+    ulong ilen = info->ilen;
     const ulong olen = info->olen;
 
     const ulong len = UWORD(1) << depth;
     const ulong rep = FLINT_MAX(1, FLINT_MIN(1000, 1000000/len));
+
+    if (ilen > len)
+        ilen = len;
 
     sd_fft_ctx_t Q;
     sd_fft_ctx_init_prime(Q, p);
@@ -169,9 +172,9 @@ int main()
             double max;
 
             /* olen in {len/2 + 8, len/2 + len/4, len} */
-            ulong ilens[4] = {len/4, len/2, 3*len/4, len};
+            ulong ilens[5] = {len/4, len/2, 3*len/4, len, 3*len};
             ulong olens[4] = {len/2 + 4, 3*len/4, len - 4, len};
-            for (ulong ili = 3; ili < 4; ili++)
+            for (ulong ili = 0; ili < 5; ili++)
             {
                 info.ilen = ilens[ili];
                 flint_printf("%ld\t%ld\t", info.depth, info.ilen);
@@ -180,8 +183,7 @@ int main()
                 {
                     info.olen = olens[oli];
                     if (k < 5) prof_repeat(min_sd+oli, &max, sample_sd_fft, (void *) &info);
-                    /* prof_repeat(min+oli, &max, sample_tft_node_lazy_4_4_v1, (void *) &info); */
-                    min[oli] = 0.;
+                    prof_repeat(min+oli, &max, sample_tft_lazy_1_4, (void *) &info);
                     prof_repeat(min_olen+oli, &max, sample_tft_node_lazy_4_4, (void *) &info);
                 }
 
@@ -229,6 +231,75 @@ int main()
  * 20      1048576 1.4e-03 2.0e-03 2.5e-03 2.5e-03 0.0e+00 0.0e+00 0.0e+00 0.0e+00 6.2e-03 8.0e-03 1.0e-02 1.0e-02
  * 21      2097152 3.8e-03 4.6e-03 6.2e-03 6.0e-03 0.0e+00 0.0e+00 0.0e+00 0.0e+00 1.3e-02 1.7e-02 2.2e-02 2.2e-02
  * 
+ *
+ * depth   ilen    sd_fft  sd_fft  sd_fft  sd_fft  tft     tft     tft     tft
+ * 4       4       1.7e-08 1.6e-08 1.6e-08 1.6e-08 2.4e-08 2.4e-08 2.4e-08 3.1e-08 3.1e-08 3.1e-08 3.1e-08 3.5e-08
+ * 4       8       1.8e-08 1.7e-08 1.7e-08 1.8e-08 3.0e-08 3.0e-08 2.9e-08 3.3e-08 3.1e-08 3.1e-08 3.1e-08 3.5e-08
+ * 4       12      2.5e-08 2.3e-08 2.5e-08 2.3e-08 3.5e-08 3.3e-08 3.5e-08 3.8e-08 3.0e-08 3.1e-08 3.1e-08 3.5e-08
+ * 4       16      2.1e-08 2.0e-08 2.0e-08 2.0e-08 3.3e-08 3.4e-08 3.3e-08 3.9e-08 3.0e-08 3.1e-08 3.2e-08 3.6e-08
+ * 4       48      2.0e-08 2.0e-08 2.0e-08 2.0e-08 6.5e-08 6.5e-08 6.6e-08 6.9e-08 3.1e-08 3.1e-08 3.1e-08 3.5e-08
+ * 5       8       2.3e-08 2.2e-08 2.2e-08 2.2e-08 4.6e-08 4.8e-08 5.8e-08 6.2e-08 6.5e-08 7.1e-08 7.8e-08 8.5e-08
+ * 5       16      2.4e-08 2.3e-08 2.4e-08 2.4e-08 5.5e-08 6.1e-08 7.7e-08 7.7e-08 6.5e-08 7.3e-08 8.1e-08 8.4e-08
+ * 5       24      2.5e-08 2.4e-08 2.5e-08 2.5e-08 6.9e-08 7.4e-08 8.2e-08 8.8e-08 6.6e-08 7.1e-08 7.9e-08 8.4e-08
+ * 5       32      2.7e-08 2.6e-08 2.6e-08 2.6e-08 6.8e-08 7.6e-08 8.1e-08 8.6e-08 6.5e-08 7.2e-08 7.8e-08 8.4e-08
+ * 5       96      2.7e-08 2.7e-08 2.7e-08 2.6e-08 1.3e-07 1.4e-07 1.5e-07 1.5e-07 6.5e-08 7.5e-08 7.9e-08 8.5e-08
+ * 6       16      5.9e-08 5.6e-08 5.6e-08 5.6e-08 9.6e-08 1.1e-07 1.4e-07 1.5e-07 1.4e-07 1.6e-07 1.9e-07 2.0e-07
+ * 6       32      5.8e-08 5.6e-08 5.6e-08 5.6e-08 1.2e-07 1.4e-07 1.7e-07 1.8e-07 1.4e-07 1.6e-07 1.9e-07 2.0e-07
+ * 6       48      5.7e-08 5.7e-08 5.5e-08 5.6e-08 1.5e-07 1.8e-07 2.0e-07 2.0e-07 1.4e-07 1.6e-07 2.0e-07 2.0e-07
+ * 6       64      6.2e-08 6.0e-08 6.0e-08 5.9e-08 1.4e-07 1.6e-07 2.0e-07 2.0e-07 1.4e-07 1.6e-07 1.9e-07 2.0e-07
+ * 6       192     6.2e-08 6.0e-08 6.1e-08 6.0e-08 2.7e-07 2.8e-07 3.2e-07 3.2e-07 1.4e-07 1.6e-07 1.9e-07 2.0e-07
+ * 7       32      1.2e-07 1.2e-07 1.1e-07 1.1e-07 2.0e-07 2.5e-07 3.3e-07 3.3e-07 3.4e-07 3.9e-07 4.6e-07 4.4e-07
+ * 7       64      1.1e-07 1.1e-07 1.1e-07 1.1e-07 2.9e-07 3.4e-07 4.1e-07 4.0e-07 3.4e-07 3.9e-07 4.6e-07 4.4e-07
+ * 7       96      1.1e-07 1.1e-07 1.1e-07 1.1e-07 3.5e-07 4.0e-07 4.6e-07 4.5e-07 3.4e-07 3.9e-07 4.5e-07 4.5e-07
+ * 7       128     1.2e-07 1.2e-07 1.1e-07 1.1e-07 3.6e-07 4.1e-07 4.7e-07 4.7e-07 3.6e-07 4.1e-07 4.7e-07 4.6e-07
+ * 7       384     1.2e-07 1.1e-07 1.1e-07 1.1e-07 6.0e-07 6.4e-07 7.2e-07 7.2e-07 3.4e-07 3.9e-07 4.7e-07 4.5e-07
+ * 8       64      2.9e-07 2.8e-07 2.8e-07 2.8e-07 5.2e-07 6.2e-07 8.3e-07 8.4e-07 7.4e-07 8.5e-07 1.0e-06 1.1e-06
+ * 8       128     2.9e-07 2.8e-07 2.8e-07 2.8e-07 6.3e-07 7.4e-07 9.5e-07 9.4e-07 7.3e-07 8.9e-07 1.1e-06 1.0e-06
+ * 8       192     2.9e-07 2.8e-07 2.8e-07 2.8e-07 7.5e-07 8.6e-07 1.1e-06 1.1e-06 7.3e-07 8.5e-07 1.0e-06 1.1e-06
+ * 8       256     2.8e-07 2.8e-07 2.7e-07 2.8e-07 7.4e-07 8.5e-07 1.0e-06 1.1e-06 7.3e-07 8.5e-07 1.0e-06 1.1e-06
+ * 8       768     2.9e-07 2.7e-07 2.7e-07 2.7e-07 1.3e-06 1.3e-06 1.5e-06 1.5e-06 7.3e-07 8.5e-07 1.0e-06 1.1e-06
+ * 9       128     6.3e-07 6.2e-07 6.1e-07 6.0e-07 1.1e-06 1.4e-06 1.9e-06 1.8e-06 1.7e-06 1.9e-06 2.4e-06 2.3e-06
+ * 9       256     6.2e-07 6.0e-07 5.9e-07 5.9e-07 1.4e-06 1.6e-06 2.1e-06 2.1e-06 1.6e-06 1.9e-06 2.3e-06 2.2e-06
+ * 9       384     5.6e-07 5.5e-07 5.5e-07 5.5e-07 1.7e-06 1.9e-06 2.3e-06 2.3e-06 1.6e-06 1.9e-06 2.3e-06 2.3e-06
+ * 9       512     5.6e-07 5.6e-07 5.7e-07 5.4e-07 1.6e-06 2.0e-06 2.4e-06 2.3e-06 1.6e-06 2.0e-06 2.4e-06 2.3e-06
+ * 9       1536    5.6e-07 5.4e-07 5.4e-07 5.4e-07 2.6e-06 2.9e-06 3.3e-06 3.3e-06 1.6e-06 1.9e-06 2.4e-06 2.3e-06
+ * 10      256     9.4e-07 9.1e-07 1.2e-06 1.2e-06 2.5e-06 3.2e-06 4.3e-06 4.4e-06 3.4e-06 4.1e-06 5.1e-06 5.2e-06
+ * 10      512     9.8e-07 9.5e-07 1.4e-06 1.3e-06 3.0e-06 3.7e-06 4.8e-06 4.6e-06 3.4e-06 4.2e-06 5.2e-06 5.2e-06
+ * 10      768     1.0e-06 9.6e-07 1.3e-06 1.3e-06 3.5e-06 4.1e-06 5.2e-06 5.2e-06 3.4e-06 4.1e-06 5.1e-06 5.2e-06
+ * 10      1024    1.0e-06 9.9e-07 1.3e-06 1.3e-06 3.4e-06 4.2e-06 5.1e-06 5.2e-06 3.4e-06 4.1e-06 5.1e-06 5.2e-06
+ * 10      3072    1.1e-06 1.1e-06 1.3e-06 1.4e-06 5.5e-06 6.1e-06 7.1e-06 7.1e-06 3.5e-06 4.2e-06 5.1e-06 5.2e-06
+ * 11      512     1.7e-06 1.9e-06 2.6e-06 2.6e-06 5.4e-06 7.0e-06 9.5e-06 9.3e-06 7.4e-06 9.0e-06 1.1e-05 1.1e-05
+ * 11      1024    1.9e-06 2.1e-06 2.8e-06 2.8e-06 6.6e-06 8.0e-06 1.0e-05 1.1e-05 7.3e-06 9.2e-06 1.2e-05 1.1e-05
+ * 11      1536    1.9e-06 2.2e-06 2.8e-06 2.8e-06 7.6e-06 9.2e-06 1.1e-05 1.1e-05 7.6e-06 9.1e-06 1.1e-05 1.1e-05
+ * 11      2048    2.0e-06 2.2e-06 2.8e-06 2.9e-06 7.5e-06 9.2e-06 1.1e-05 1.1e-05 7.4e-06 9.2e-06 1.1e-05 1.1e-05
+ * 11      6144    2.0e-06 2.4e-06 3.0e-06 2.8e-06 1.1e-05 1.4e-05 1.5e-05 1.5e-05 7.5e-06 9.9e-06 1.1e-05 1.1e-05
+ * 12      1024    3.3e-06 4.3e-06 5.7e-06 5.7e-06 1.2e-05 1.6e-05 2.1e-05 2.1e-05 1.6e-05 1.9e-05 2.5e-05 2.5e-05
+ * 12      2048    3.5e-06 4.4e-06 5.8e-06 6.2e-06 1.4e-05 1.8e-05 2.3e-05 2.3e-05 1.5e-05 1.9e-05 2.4e-05 2.5e-05
+ * 12      3072    3.6e-06 4.4e-06 6.1e-06 5.9e-06 1.6e-05 2.0e-05 2.4e-05 2.5e-05 1.6e-05 1.9e-05 2.4e-05 2.5e-05
+ * 12      4096    3.7e-06 4.7e-06 6.0e-06 6.0e-06 1.6e-05 1.9e-05 2.4e-05 2.5e-05 1.6e-05 1.9e-05 2.4e-05 2.5e-05
+ * 12      12288   3.7e-06 4.6e-06 6.0e-06 6.0e-06 2.4e-05 2.8e-05 3.2e-05 3.3e-05 1.6e-05 2.0e-05 2.4e-05 2.5e-05
+ * 13      2048    6.9e-06 9.5e-06 1.2e-05 1.2e-05 2.6e-05 3.4e-05 4.5e-05 4.5e-05 3.4e-05 4.2e-05 5.3e-05 5.2e-05
+ * 13      4096    7.3e-06 9.4e-06 1.3e-05 1.3e-05 3.1e-05 3.9e-05 5.2e-05 5.1e-05 3.4e-05 4.2e-05 5.4e-05 5.3e-05
+ * 13      6144    7.3e-06 9.6e-06 1.3e-05 1.3e-05 3.4e-05 4.3e-05 5.4e-05 5.3e-05 3.4e-05 4.2e-05 5.3e-05 5.2e-05
+ * 13      8192    7.8e-06 9.8e-06 1.3e-05 1.4e-05 3.4e-05 4.3e-05 5.3e-05 5.4e-05 3.4e-05 4.3e-05 5.3e-05 5.3e-05
+ * 13      24576   7.8e-06 9.8e-06 1.3e-05 1.3e-05 5.0e-05 5.9e-05 6.9e-05 6.8e-05 3.4e-05 4.3e-05 5.3e-05 5.3e-05
+ * 14      4096    1.4e-05 1.9e-05 2.6e-05 2.6e-05 5.7e-05 7.6e-05 1.0e-04 1.0e-04 7.0e-05 9.0e-05 1.2e-04 1.2e-04
+ * 14      8192    1.7e-05 2.1e-05 2.7e-05 2.7e-05 6.7e-05 8.4e-05 1.1e-04 1.1e-04 7.2e-05 8.9e-05 1.1e-04 1.1e-04
+ * 14      12288   1.6e-05 2.1e-05 2.8e-05 2.8e-05 7.3e-05 9.0e-05 1.1e-04 1.1e-04 7.0e-05 9.0e-05 1.1e-04 1.1e-04
+ * 14      16384   1.7e-05 2.2e-05 2.7e-05 2.7e-05 7.3e-05 9.2e-05 1.1e-04 1.1e-04 7.2e-05 8.9e-05 1.1e-04 1.1e-04
+ * 14      49152   1.6e-05 2.1e-05 2.7e-05 2.7e-05 1.0e-04 1.2e-04 1.4e-04 1.5e-04 6.9e-05 8.9e-05 1.1e-04 1.2e-04
+ * 15      8192    3.0e-05 4.4e-05 5.5e-05 5.5e-05 1.2e-04 1.6e-04 2.1e-04 2.2e-04 1.5e-04 2.0e-04 2.5e-04 2.4e-04
+ * 15      16384   3.3e-05 4.4e-05 5.8e-05 5.8e-05 1.4e-04 1.8e-04 2.3e-04 2.3e-04 1.5e-04 1.9e-04 2.4e-04 2.4e-04
+ * 15      24576   3.4e-05 4.5e-05 6.2e-05 6.1e-05 1.6e-04 1.9e-04 2.5e-04 2.4e-04 1.5e-04 2.0e-04 2.5e-04 2.4e-04
+ * 15      32768   3.5e-05 4.5e-05 5.8e-05 5.8e-05 1.5e-04 1.9e-04 2.4e-04 2.4e-04 1.5e-04 1.9e-04 2.5e-04 2.4e-04
+ * 15      98304   3.4e-05 4.5e-05 5.9e-05 5.8e-05 2.1e-04 2.6e-04 3.1e-04 3.1e-04 1.5e-04 2.0e-04 2.5e-04 2.4e-04
+ * 16      16384   6.5e-05 8.8e-05 1.2e-04 1.2e-04 3.3e-04 3.5e-04 4.7e-04 4.7e-04 3.4e-04 4.1e-04 5.2e-04 5.2e-04
+ * 16      32768   6.7e-05 9.0e-05 1.3e-04 1.2e-04 2.9e-04 3.9e-04 5.0e-04 5.0e-04 3.1e-04 4.1e-04 5.2e-04 5.2e-04
+ * 16      49152   6.8e-05 9.1e-05 1.2e-04 1.2e-04 3.5e-04 4.1e-04 5.2e-04 5.2e-04 3.4e-04 4.1e-04 5.2e-04 5.2e-04
+ * 16      65536   7.0e-05 9.4e-05 1.3e-04 1.2e-04 3.2e-04 4.2e-04 5.3e-04 5.2e-04 3.1e-04 4.2e-04 5.2e-04 5.2e-04
+ * 16      196608  6.8e-05 9.3e-05 1.2e-04 1.2e-04 4.5e-04 5.3e-04 6.5e-04 6.5e-04 3.1e-04 4.1e-04 5.2e-04 5.2e-04
+ * 17      32768   1.4e-04 2.0e-04 2.6e-04 2.6e-04 5.7e-04 7.6e-04 1.0e-03 1.0e-03 6.9e-04 8.7e-04 1.1e-03 1.1e-03
+ * 17      65536   1.4e-04 1.9e-04 2.6e-04 2.6e-04 6.2e-04 8.2e-04 1.1e-03 1.1e-03 6.6e-04 8.7e-04 1.1e-03 1.1e-03
  *
  * Output on meteorlake (Intel(R) Core(TM) Ultra 7 165H)
  *

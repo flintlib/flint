@@ -72,10 +72,11 @@ TEST_FUNCTION_START(n_fft_tft, state)
             const ulong len = (UWORD(1) << depth);
             /* FOR node_lazy_4_4: */
             /* const ulong ilen = len; */
+            /* ulong olen = 4 + 4 * (n_randint(state, len) / 4); */
             /* FOR node==0 lazy_1_4: */
-            const ulong ilen = 4 + 4 * (n_randint(state, len) / 4);
-            /* ulong olen = len/2 + 4 * (n_randint(state, len/2) / 4);  /1* (len/2, len) *1/ */
-            ulong olen = 4 + 4 * (n_randint(state, len) / 4);  /* (4, len] */
+            const ulong ilen = 4 + 4 * n_randint(state, len);  /* [4, 4*len] */
+            const ulong olen = 4 + 4 * (n_randint(state, len) / 4);  /* [4, len] */
+            const ulong olen_depth = n_clog2_gt2(olen);
 
             flint_printf("---\n"
                     "prime = %wu\n"
@@ -84,7 +85,7 @@ TEST_FUNCTION_START(n_fft_tft, state)
                     "root of unity = %wu\n"
                     "max_depth = %wu\n"
                     "depth = %wu\n",
-                    prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+                    prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, olen_depth);
 
             // choose random poly of degree < ilen
             nmod_poly_t pol;
@@ -101,8 +102,8 @@ TEST_FUNCTION_START(n_fft_tft, state)
             // evals by TFT
             n_fft_args_t Fargs;
             n_fft_set_args(Fargs, F->mod, F->tab_w);
-            tft_lazy_1_4(p, ilen, olen, depth, Fargs);
-            /* tft_node_lazy_4_4(p, olen, depth, 0, Fargs); */
+            tft_lazy_1_4(p, ilen, olen, Fargs);
+            /* tft_node_lazy_4_4(p, olen, olen_depth, 0, Fargs); */
 
             for (ulong k = 0; k < olen; k++)
             {
@@ -124,8 +125,9 @@ TEST_FUNCTION_START(n_fft_tft, state)
                     "root of unity = %wu\n"
                     "max_depth = %wu\n"
                     "depth = %wu\n"
+                    "olen_depth = %wu\n"
                     "failed equality test\n",
-                    prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, depth);
+                    prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, depth, olen_depth);
             }
 
             _nmod_vec_clear(p);
