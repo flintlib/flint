@@ -314,28 +314,30 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
         const ulong ilen2 = UWORD(1) << ilen_depth;
         const ulong nb_subcalls = UWORD(1) << (depth - ilen_depth);
         /* flint_printf("here %wu, %wu, %wu, %wu\n", olen, ilen_depth, depth, ilen2); */
-        for (ulong k = ilen; k < ilen2; k++)
-            p[k] = 0;
-        for (ulong i = 1; i < nb_subcalls; i++)  /* TODO stop around olen */
+        nn_ptr pp = p + ilen2;
+        olen -= ilen2;  /* for first dft on p+0, done later */
+        ulong i;
+        for (i = 1; olen >= ilen2 && i < nb_subcalls - 1; i++)
         {
             for (ulong k = 0; k < ilen; k++)
-                p[i * ilen2 + k] = p[k];
+                pp[k] = p[k];
             for (ulong k = ilen; k < ilen2; k++)
-                p[i * ilen2 + k] = 0;
-        }
-        ulong i;
-        for (i = 0; olen >= ilen2 && i < nb_subcalls - 1; i++)
-        {
-            /* flint_printf("starting %wu, %wu, %wu, %wu --> %wu\n", olen, ilen_depth, depth, ilen2, i); */
-            dft_node_lazy_4_4(p, ilen_depth, i, F);
-            /* flint_printf("end of %wu, %wu, %wu, %wu --> %wu\n", olen, ilen_depth, depth, ilen2, i); */
-            p = p + ilen2;
+                pp[k] = 0;
+            dft_node_lazy_4_4(pp, ilen_depth, i, F);
+            pp = pp + ilen2;
             olen -= ilen2;
         }
-        /* flint_printf("here %wu, %wu, %wu, %wu --> %wu\n", olen, ilen_depth, depth, ilen2, depth - ilen_depth); */
         if (olen > 0)
-            tft_node_lazy_4_4(p, olen, ilen_depth, i, F);
-        /* flint_printf("alright %wu, %wu, %wu, %wu\n", olen, ilen_depth, depth, ilen2); */
+        {
+            for (ulong k = 0; k < ilen; k++)
+                pp[k] = p[k];
+            for (ulong k = ilen; k < ilen2; k++)
+                pp[k] = 0;
+            tft_node_lazy_4_4(pp, olen, ilen_depth, i, F);
+        }
+        for (ulong k = ilen; k < ilen2; k++)
+            p[k] = 0;
+        dft_node_lazy_4_4(p, ilen_depth, 0, F);
     }
     else if (ilen_depth == depth)
     {
