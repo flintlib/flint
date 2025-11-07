@@ -684,7 +684,21 @@ acb_poly_allocated_bytes(const acb_poly_t x)
     return _acb_vec_allocated_bytes(x->coeffs, x->alloc);
 }
 
-/* Root finder using Weierstrass-Durand-Kerner algorithm with complex double arithmetic */
+/* Functions related to root finder using Weierstrass-Durand-Kerner algorithm with complex double arithmetic */
+void cd_poly_weierstrass(double* results_r, double* results_i,
+                              double lc_r, double lc_i,
+                              const double* values_r, const double* values_i,
+                              slong n_start, slong n_end, slong d);
+double cd_poly_wdk_update(double* z_r, double* z_i,
+                             const double* vp_r, const double* vp_i,
+                             const double* wdk_r, const double* wdk_i,
+                             slong n_start, slong n_end);
+double cd_poly_refine_roots(double * z, const double * p, slong n);
+double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n);
+/* Main high-level function for evaluating and finding roots in machine precision */
+void cd_poly_horner(double* results_r, double* results_i,
+                    const double* values_r, const double* values_i, slong n_start, slong n_end,
+                    const double* coefficients_r, const double* coefficients_i, slong n);
 double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, double reltol);
 
 #ifdef __cplusplus

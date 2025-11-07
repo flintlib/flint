@@ -272,8 +272,8 @@ static void _set_initial_values(intermediate_variables * v, const double * p_r, 
 
 /* Horner evaluation */
 void cd_poly_horner(double* results_r, double* results_i,
-                         const double* values_r, const double* values_i, slong n_start, slong n_end,
-                         const double* coefficients_r, const double* coefficients_i, slong n)
+                    const double* values_r, const double* values_i, slong n_start, slong n_end,
+                    const double* coefficients_r, const double* coefficients_i, slong n)
 {
     int p, k;
     slong i, j;
@@ -306,7 +306,7 @@ void cd_poly_horner(double* results_r, double* results_i,
 /* Warning : twice_values_r and twice_values_i have size 2n,
  * the second half of each array should be a copy of the first half
  * Not compatible with the current calls */
-void cd_poly_weierstrass_a(double* restrict results_r, double* restrict results_i,
+static void cd_poly_weierstrass_a(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
@@ -332,7 +332,7 @@ void cd_poly_weierstrass_a(double* restrict results_r, double* restrict results_
 
 /* Weights for the Durand-Kerner or Weierstrass iteration
  * A variant of this version could be usefull for the Borsh Supan weights*/                                                         
-void cd_poly_weierstrass_b(double* restrict results_r, double* restrict results_i,
+static void cd_poly_weierstrass_b(double* restrict results_r, double* restrict results_i,
                               double lc_r, double lc_i,
                               const double* values_r, const double* values_i,
                               slong n_start, slong n_end, slong d)
