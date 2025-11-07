@@ -217,6 +217,27 @@ _acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr f_prime, sl
     return status;
 }
 
+static int _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, slong len, slong maxiter, slong prec)
+{
+    double *cdz, *cdp;
+    slong i;
+    int status;
+    cdp = flint_malloc(2*len*sizeof(double));
+    cdz = flint_malloc(2*(len - 1)*sizeof(double));
+    for(i=0; i<len; i++) {
+        /* Possible improvement : rescale using linear regression on points (i,-log(|poly[i]|)) */
+        cdp[2*i]   = arf_get_d(arb_midref(acb_realref(poly+i)), ARF_RND_NEAR);
+        cdp[2*i+1] = arf_get_d(arb_midref(acb_imagref(poly+i)), ARF_RND_NEAR);
+    }
+    double max_correction = cd_poly_find_roots(cdz, cdp, len, maxiter, ldexp(1,-prec));
+    for(i=0; i<len-1; i++) {
+        acb_set_d_d(roots + i, cdz[2*i], cdz[2*i+1]);
+    }
+    status = (max_correction < ldexp(1, -prec/2)) ? GR_SUCCESS : GR_UNABLE ;
+    flint_free(cdz);
+    flint_free(cdp);
+    return status;
+}
 
 slong
 _acb_poly_find_roots(acb_ptr roots,
@@ -271,6 +292,12 @@ _acb_poly_find_roots(acb_ptr roots,
         /* First try with nfloat if possible, otherwise fall back to acf */
         if (attempt == 0)
         {
+            if (prec <= 53) {
+                slong fmaxiter = (maxiter < 150) ? 150 : maxiter;
+                status = _acb_poly_find_roots_double(roots, poly, len, fmaxiter, prec);
+                if(status == GR_SUCCESS)
+                    break;
+            }
             if (nfloat_complex_ctx_init(fp_ctx, prec, 0) != GR_SUCCESS)
                 continue;
         }

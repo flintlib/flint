@@ -1,4 +1,4 @@
-#include "find_roots_double.h"
+#include "acb_poly.h"
 #include <stdlib.h>
 #include <math.h>
 #include <string.h> /* for memcpy */
@@ -87,7 +87,7 @@ slong cd_poly_partition_pivot(double* z_r, double* z_i, slong n)
 
 static int _compare(const void * first, const void * second)
 {
-    double magl, argl, magr, argr, compmag, comparg,epsilon=ldexp(1,-25);
+    double magl, argl, magr, argr, compmag, epsilon=ldexp(1,-25);
     double left[2];
     double right[2];
     int res;
@@ -311,7 +311,6 @@ void cd_poly_weierstrass_a(double* restrict results_r, double* restrict results_
                               const double* twice_values_r, const double* twice_values_i,
                               slong n_start, slong n_end, slong d)
 {
-    int p, k;
     slong i, j;
     for(i=n_start; i<n_end; i++){
         results_r[i] = lc_r;
@@ -338,7 +337,6 @@ void cd_poly_weierstrass_b(double* restrict results_r, double* restrict results_
                               const double* values_r, const double* values_i,
                               slong n_start, slong n_end, slong d)
 {
-    int p, k;
     slong i, j;
     for(i=n_start; i<n_end; i++){
         results_r[i] = lc_r;
@@ -493,7 +491,7 @@ double cd_poly_wdk_update(double* z_r, double* z_i,
 {
     slong i;
     double mag_vp, arg_vp, mag_wdk, arg_wdk, mag_z, ratio,
-           maxstep = 0.5;
+           maxstep = 0;
     for(i=n_start; i<n_end; i++) {
         if((wdk_r[i] != 0) || (wdk_i[i] != 0)) {
             mag_vp = hypot(vp_r[i], vp_i[i]);
@@ -553,7 +551,6 @@ double cd_poly_refine_roots(double * z, const double * p, slong n)
     cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n-1, v->p_r, v->p_i, n);
     cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n-1, n-1);
     maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n-1);
-    _refine_roots(v, n);
     for(i=0; i<n-1; i++) {
         z[2*i]   = v->z_r[i];
         z[2*i+1] = v->z_i[i];
@@ -585,12 +582,11 @@ double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
 }
 
 /* Full resolution function */
-double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, int verbose)
+double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, double reltol)
 {
-    slong nt, fz, i, status;
+    slong nt, fz, i;
     intermediate_variables v[1];
-    slong * np;
-    double maxstep;
+    double maxstep=0;
 
     nt = _trim_zeros(z, &fz, p, n); 
     if(nt > 1) {
@@ -600,6 +596,9 @@ double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter,
         /* Main solve function */
         for(i=0; i<num_iter; i++) {
             maxstep = _refine_roots(v, nt);
+            if((n-2)*maxstep < reltol) {
+                break;
+            }
         }
         for(i=0; i<nt-1; i++) {
             z[2*(i+fz)] = v->z_r[i];
