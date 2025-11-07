@@ -19,6 +19,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
+#include <stdio.h>
 
 static slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
 {
@@ -63,13 +64,24 @@ static void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
             fmpz_sub(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
       }
    }
+   /* |A|^t * |A| * [1,1,...,1]^T */
+   for (i = 0; i < n; i++)
+   {
+      for (j = 0; j < n; j++)
+      {
+         if (fmpz_sgn(fmpz_mat_entry(op, j, i)) >= 0)
+            fmpz_addmul(v1 + i, v1 + i, fmpz_mat_entry(op, j, i));
+         else
+            fmpz_submul(v1 + i, v1 + i, fmpz_mat_entry(op, j, i));
+      }
+   }
 
    for (i = 0; i < n; i++)
    {
       fmpz_zero(t);
-
       /* q_i */
-      fmpz_abs(t, fmpz_mat_entry(op, i, i));
+      for (j = 1; j < n; j++)
+         fmpz_addmul(t, fmpz_mat_entry(op, i, j), fmpz_mat_entry(op, i, j));
 
       if (fmpz_cmp(t, q) > 0)
          fmpz_set(q, t);
@@ -194,6 +206,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
         bound = _fmpz_mat_minpoly_bound_bits(op);
         /* Allow for signs */
         bound += 1;
+        printf("%s%d: bound %ld\b", __FILE__, __LINE__, bound);
 
         P = (ulong *) flint_calloc(n, sizeof(ulong));
         Q = (ulong *) flint_calloc(n, sizeof(ulong));
@@ -214,6 +227,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 
             p = n_nextprime(p, 0);
 
+        printf("%s%d: m %ld, prime %lu\n", __FILE__, __LINE__, fmpz_bits(m), p);
             nmod_mat_init(mat, n, n, p);
             nmod_poly_init(poly, p);
 
@@ -267,6 +281,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
 
             if (i == len) /* stabilised */
             {
+              printf("%s%d: stabe\n", __FILE__, __LINE__);
                for (i = 0; i < n; i++)
                {
                   if (Q[i] == 1)
@@ -305,6 +320,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
                {
                   nmod_mat_clear(mat);
                   nmod_poly_clear(poly);
+                  printf("%s%d: test ok\n", __FILE__, __LINE__);
                   break;
                }
             }
