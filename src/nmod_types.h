@@ -88,17 +88,6 @@ nmod_mpoly_factor_struct;
 
 typedef nmod_mpoly_factor_struct nmod_mpoly_factor_t[1];
 
-typedef struct
-{
-    nn_ptr x, t, w, y, z;       // five vectors of precomputed constants
-    nmod_poly_t f, g1, g2;      // three precomputed polys
-    nmod_t mod;
-    slong len;                    // number of points
-
-} nmod_geometric_progression_struct;
-
-typedef nmod_geometric_progression_struct nmod_geometric_progression_t[1];
-
 typedef enum
 {
     _DOT0 = 0,           /* len == 0 || mod.n == 1 */

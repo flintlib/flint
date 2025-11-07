@@ -62,6 +62,17 @@ typedef struct
 }
 nmod_poly_compose_mod_precomp_preinv_arg_t;
 
+typedef struct
+{
+    nn_ptr x, t, w, y, z;       // five vectors of precomputed constants
+    nmod_poly_t f, g1, g2;      // three precomputed polys
+    nmod_t mod;
+    slong len;                    // number of points
+
+} nmod_geometric_progression_struct;
+
+typedef nmod_geometric_progression_struct nmod_geometric_progression_t[1];
+
 /* Memory management  ********************************************************/
 
 void nmod_poly_init(nmod_poly_t poly, ulong n);
