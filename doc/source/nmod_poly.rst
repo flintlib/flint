@@ -1554,7 +1554,7 @@ Interpolation
 
     Sets ``poly`` to the unique polynomial of length at most ``len``
     that interpolates according to the parameter set of ``G``. 
-    The value of ``len`` should be less than or equal to the precomputation size parameter ``G->len``.
+    The value of ``len`` should be equal to the precomputation size parameter ``G->len``.
 
     Uses fast geometric multipoint interpolation using a supplied geometric progression precomputation.
     

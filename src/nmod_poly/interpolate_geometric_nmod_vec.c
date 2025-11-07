@@ -18,13 +18,13 @@ void
 nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
     const nmod_geometric_progression_t G, slong len)
 {
-    slong i, N;
-    nmod_poly_t f, h;
+    slong i, N, f1_len, f2_len, h1_len, h2_min;
+    nn_ptr f, h;
     nmod_t mod;
 
     N = G->len;
 
-    FLINT_ASSERT(len <= N);
+    FLINT_ASSERT(len == N);
 
     nmod_poly_fit_length(poly, len);
     poly->length = len;
@@ -32,38 +32,62 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
     if (len == 1)
     {
         poly->coeffs[0] = v[0];
-        _nmod_poly_normalise(poly);
+        _nmod_poly_normalise(poly); // required ov v[0] == 0
         return;
     }
 
     mod = G->mod;
-    nmod_poly_init2(f, mod.n, N); f->length = N;
-    nmod_poly_init2(h, mod.n, N); //h->length = N;
-    
-    for(i = 0; i < N; i++)
-    {
-        f->coeffs[i] = nmod_mul(v[i], G->w[i], mod);
-    }
-    _nmod_poly_normalise(f);
-    nmod_poly_mullow(h, f, G->g1, N);
+    f = _nmod_vec_init(N);
+    h = _nmod_vec_init(N);
 
-    f->length = N;
-    for (i = 0; i < h->length; i++)
+    for (i = 0; i < N; i++)
     {
-       f->coeffs[N - 1 - i] = nmod_mul(h->coeffs[i], G->y[i], mod);
+        if (v[N - i - 1] != 0)
+        {
+            break;
+        }
     }
-    _nmod_vec_zero(f->coeffs, N - h->length);
-    _nmod_poly_normalise(f);
-    nmod_poly_mullow(h, f, G->g2, N);
+
+    f1_len = N - i;
+    h1_len = FLINT_MIN(G->g1->length + f1_len - 1, N);
+
+    for (i = 0; i < f1_len; i++)
+    {
+        f[i] = nmod_mul(v[i], G->w[i], mod);
+    }
+    _nmod_poly_mullow(h, G->g1->coeffs, G->g1->length, f, f1_len, N, mod);
+
+    while (h[h1_len - 1] == 0)
+    {
+        h1_len--;
+    }
+
+    for (i = 0; i < h1_len; i++)
+    {
+        if (h[i] != 0)
+        {
+            break;
+        }
+    }
+    h2_min = i;
+
+    for (i = h2_min; i < h1_len; i++)
+    {
+       f[N - 1 - i] = nmod_mul(h[i], G->y[i], mod);
+    }
+
+    f2_len = N - h2_min;
+    _nmod_vec_zero(f, N - h1_len);
+    _nmod_poly_mullow(h, G->g2->coeffs, G->g2->length, f, f2_len, N, mod);
 
     for (i = 0; i < len; i++)
     {
-        poly->coeffs[i] = nmod_mul(nmod_poly_get_coeff_ui(h, N - 1 - i), G->z[i], mod);
+        poly->coeffs[i] = nmod_mul(h[N - 1 - i], G->z[i], mod);
     }
     _nmod_poly_normalise(poly);
 
-    nmod_poly_clear(f);
-    nmod_poly_clear(h);
+    _nmod_vec_clear(f);
+    _nmod_vec_clear(h);
 }
 
 void

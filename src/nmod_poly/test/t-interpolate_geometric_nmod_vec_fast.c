@@ -26,7 +26,7 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
         slong n, npoints;
 
         npoints = 1 + (i == 0 ? 1 : n_randint(state, 100));
-        n = n_randint(state, npoints + 1);
+        n = 1 + n_randint(state, npoints);
         do 
         { 
             mod = n_randtest_prime(state, 1); 
@@ -49,8 +49,8 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
         {
             flint_printf("FAIL:\n");
             flint_printf("mod=%wu, n=%wd, npoints=%wd\n\n", mod, n, npoints);
-            nmod_poly_print(P), flint_printf("\n\n");
-            nmod_poly_print(Q), flint_printf("\n\n");
+            nmod_poly_print_pretty(P, "x"), flint_printf("\n\n");
+            nmod_poly_print_pretty(Q, "x"), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
