@@ -62,7 +62,7 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
     if (fmpz_poly_degree(poly) < 1)
         return;
 
-    initial_prec = 32;
+    initial_prec = 53;
 
     fmpz_poly_init(poly_deflated);
     acb_poly_init(cpoly);
@@ -187,6 +187,8 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
 
             break;
         }
+        if (prec == 53)
+            prec = 64;
     }
 
     _acb_vec_sort_pretty(roots, deg);
