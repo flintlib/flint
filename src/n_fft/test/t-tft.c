@@ -24,10 +24,6 @@ TEST_FUNCTION_START(n_fft_tft, state)
 {
     int i;
     flint_rand_set_seed(state, rand(), rand()+12);
-    /* ulong seed1, seed2; */
-    /* flint_rand_get_seed(&seed1, &seed2, state); */
-    /* flint_rand_set_seed(state, 846930886L, 1804289395L); */
-    /* flint_printf("seeds: %wu, %wu\n", seed1, seed2); */
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -70,32 +66,34 @@ TEST_FUNCTION_START(n_fft_tft, state)
         for (ulong depth = 4; depth <= MAX_EVAL_DEPTH; depth++)
         {
             const ulong len = (UWORD(1) << depth);
-            /* FOR node_lazy_4_4: */
-            /* const ulong ilen = len; */
-            /* ulong olen = 4 + 4 * (n_randint(state, len) / 4); */
-            /* FOR node==0 lazy_1_4: */
-            const ulong ilen = 8 + 4 * n_randint(state, len-1);  /* [8, 4*len] */
-            const ulong olen = 4 + 4 * (n_randint(state, len) / 4);  /* [4, len] */
-            ulong olen_depth = n_clog2_gt2(olen);
-            if (olen_depth == 2)  /* FIXME support small lengths.. how small? */
-                olen_depth = 3;
+            ulong plen, ilen, ilen4, olen, olen4;
+            ilen = 5 + n_randint(state, 4*len);  /* [5, 4*len] */
+            /* FIXME handle smaller ilen */
+            olen = 1+len/2 + n_randint(state, len/2);  /* (len/2, len] */
+            plen = n_fft_tft_prepare(&ilen4, &olen4, ilen, olen, F);
 
             /* flint_printf("---\n" */
             /*         "prime = %wu\n" */
             /*         "ilen = %wu\n" */
             /*         "olen = %wu\n" */
+            /*         "ilen4 = %wu\n" */
+            /*         "olen4 = %wu\n" */
+            /*         "plen = %wu\n" */
             /*         "root of unity = %wu\n" */
             /*         "max_depth = %wu\n" */
             /*         "depth = %wu\n", */
-            /*         prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, olen_depth); */
+            /*         prime, ilen, olen, */
+            /*         ilen4, olen4, plen, */
+            /*         F->tab_w2[2*(max_depth-2)], max_depth, depth); */
 
             // choose random poly of degree < ilen
             nmod_poly_t pol;
             nmod_poly_init(pol, mod.n);
             nmod_poly_randtest(pol, state, ilen);
             // copy it for DFT
-            nn_ptr p = _nmod_vec_init(FLINT_MAX(len, ilen));
-            _nmod_vec_set(p, pol->coeffs, ilen);
+            nn_ptr p = _nmod_vec_init(plen);
+            _nmod_vec_set(p, pol->coeffs, pol->length);
+            _nmod_vec_zero(p + pol->length, ilen4 - pol->length);
 
             // evals via general multipoint evaluation
             nn_ptr evals_br = _nmod_vec_init(olen);
@@ -104,8 +102,8 @@ TEST_FUNCTION_START(n_fft_tft, state)
             // evals by TFT
             n_fft_args_t Fargs;
             n_fft_set_args(Fargs, F->mod, F->tab_w);
-            tft_lazy_1_4(p, ilen, olen, Fargs);
-            /* tft_node_lazy_4_4(p, olen, olen_depth, 0, Fargs); */
+            tft_lazy_1_4(p, ilen4, olen4, Fargs);
+            /* n_fft_tft(p, ilen, olen, F); */
 
             for (ulong k = 0; k < olen; k++)
             {
@@ -127,9 +125,8 @@ TEST_FUNCTION_START(n_fft_tft, state)
                     "root of unity = %wu\n"
                     "max_depth = %wu\n"
                     "depth = %wu\n"
-                    "olen_depth = %wu\n"
                     "failed equality test\n",
-                    prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, depth, olen_depth);
+                    prime, ilen, olen, F->tab_w2[2*(max_depth-2)], max_depth, depth);
             }
 
             _nmod_vec_clear(p);

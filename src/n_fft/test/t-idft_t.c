@@ -52,7 +52,7 @@ TEST_FUNCTION_START(n_fft_idft_t, state)
         n_fft_ctx_t F;
         n_fft_ctx_init2(F, MAX_EVAL_DEPTH, prime);
 
-        for (ulong depth = 0; depth <= MAX_EVAL_DEPTH; depth++)
+        for (ulong depth = 1; depth <= MAX_EVAL_DEPTH; depth++)
         {
             const ulong len = (UWORD(1) << depth);
 

@@ -67,24 +67,6 @@ typedef struct
 typedef n_fft_ctx_struct n_fft_ctx_t[1];
 
 
-/** n_fft arguments:
- *     - modulus mod
- *     - its double 2*mod (storing helps for speed)
- *     - precomputed powers of w
- * To be used as an argument in FFT functions. In some parts, providing this
- * instead of the whole context increased performance. Also, this facilitate
- * using the same function with both tab_w and tab_iw (by forming an fft_args
- * with Fargs->tab_w = F->tab_iw.
- **/
-typedef struct
-{
-    ulong mod;                 // modulus, odd prime
-    ulong mod2;                // 2*mod
-    nn_srcptr tab_w;           // tabulated powers of w, see below
-} n_fft_args_struct;
-typedef n_fft_args_struct n_fft_args_t[1];
-
-
 /** tab_w2:
  *    - length 2*FLINT_BITS, with undefined entries at index 2*(max_depth-1) and beyond
  *    - contains powers w**d for d a power of 2, and corresponding
@@ -164,14 +146,6 @@ void n_fft_ctx_fit_depth(n_fft_ctx_t F, ulong depth);
 
 void n_fft_ctx_clear(n_fft_ctx_t F);
 
-FLINT_FORCE_INLINE
-void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
-{
-    F->mod = mod;
-    F->mod2 = 2*mod;
-    F->tab_w = tab_w;
-}
-
 /*-----------------------------*/
 /* DFT / IDFT / DFT_t / IDFT_t */
 /*-----------------------------*/
@@ -226,6 +200,14 @@ void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F);
 void n_fft_dft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 
 void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
+
+/*-----------------------------*/
+/* TFT / ITFT / TFT_t / ITFT_t */
+/*-----------------------------*/
+
+/* doc TODO */
+
+void n_fft_tft(nn_ptr p, ulong ilen, ulong olen, n_fft_ctx_t F);
 
 #ifdef __cplusplus
 }

@@ -87,7 +87,7 @@ TEST_FUNCTION_START(n_fft_dft_t, state)
             roots[2*k+1] = prime - F->tab_w[2*k];  // < prime since F->tab_w[2*k] != 0
         }
 
-        for (ulong depth = 0; depth <= MAX_EVAL_DEPTH; depth++)
+        for (ulong depth = 1; depth <= MAX_EVAL_DEPTH; depth++)
         {
             const ulong len = (UWORD(1) << depth);
 

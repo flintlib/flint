@@ -288,6 +288,8 @@ void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 /*  TFT: auxiliary functions  */
 /*----------------------------*/
 
+/* TODO fewer base cases in node_lazy_4_4, more base cases in lazy_1_4 */
+
 /** truncated Fourier transform, ilen == len, general node
  * * same as dft_node_lazy_4_4, also with its requirements on depth and node,
  * but only computes the first olen evaluations
@@ -678,36 +680,55 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
 /*  main interfaces  */
 /*-------------------*/
 
+/* depth > 0, p has length 1<<depth */
 void n_fft_dft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
-    if (depth > 0)
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_w);
+    dft_lazy_1_4(p, depth, Fargs);
+    for (ulong k = 0; k < (UWORD(1) << depth); k++)
     {
-        n_fft_args_t Fargs;
-        n_fft_set_args(Fargs, F->mod, F->tab_w);
-        dft_lazy_1_4(p, depth, Fargs);
-        for (ulong k = 0; k < (UWORD(1) << depth); k++)
-        {
-            if (p[k] >= Fargs->mod2)
-                p[k] -= Fargs->mod2;
-            if (p[k] >= Fargs->mod)
-                p[k] -= Fargs->mod;
-        }
+        if (p[k] >= Fargs->mod2)
+            p[k] -= Fargs->mod2;
+        if (p[k] >= Fargs->mod)
+            p[k] -= Fargs->mod;
     }
 }
 
+/* depth > 0, p has length 1<<depth */
 void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F)
 {
-    if (depth > 0)
-    {
-        n_fft_args_t Fargs;
-        n_fft_set_args(Fargs, F->mod, F->tab_iw);
-        dft_lazy_1_4(p, depth, Fargs);
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_iw);
+    dft_lazy_1_4(p, depth, Fargs);
 
-        // see comments in idft concerning this loop
-        const ulong inv2 = F->tab_inv2[2*depth-2];
-        const ulong inv2_pr = F->tab_inv2[2*depth-1];
-        for (ulong k = 0; k < (UWORD(1) << depth); k++)
-            p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
+    // see comments in idft concerning this loop
+    const ulong inv2 = F->tab_inv2[2*depth-2];
+    const ulong inv2_pr = F->tab_inv2[2*depth-1];
+    for (ulong k = 0; k < (UWORD(1) << depth); k++)
+        p[k] = n_mulmod_shoup(inv2, p[k], inv2_pr, F->mod);
+}
+
+/* olen > 0, ilen >= 0, both multiples of 4 */
+/* p has length max(ilen, next_power_of_two(olen)) */
+void n_fft_tft(nn_ptr p, ulong ilen, ulong olen, n_fft_ctx_t F)
+{
+    if (ilen == 0)
+    {
+        for (ulong k = 0; k < olen; k++)
+            p[k] = 0;
+        return;
+    }
+
+    n_fft_args_t Fargs;
+    n_fft_set_args(Fargs, F->mod, F->tab_w);
+    tft_lazy_1_4(p, ilen, olen, Fargs);
+    for (ulong k = 0; k < olen; k++)
+    {
+        if (p[k] >= Fargs->mod2)
+            p[k] -= Fargs->mod2;
+        if (p[k] >= Fargs->mod)
+            p[k] -= Fargs->mod;
     }
 }
 

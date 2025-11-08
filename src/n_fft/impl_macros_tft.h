@@ -18,11 +18,12 @@
 /* "c-circulant" division with remainder */
 /*---------------------------------------*/
 
+/* TODO bench different variants and choose fastest */
+
 /* division by x**d - c, lazy_4_4 with precomputation */
 /* in [0, 4*n) | out [0, 4*n) | max < 4n */
-/* TODO see if can be faster by using ideas from try_sparse */
 FLINT_FORCE_INLINE
-void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2)
+void _nmod_poly_divrem_circulant_lazy_4_4_v0(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2)
 {
     /* assumes len >= d */
     slong i;
@@ -59,6 +60,25 @@ void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c,
     }
 }
 
+/* assumes len > 0 and d > 0 */
+FLINT_FORCE_INLINE
+void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2)
+{
+    ulong i, val0, val1, p_hi, p_lo;
+
+    for (i = len - 1; i >= d; i--)
+    {
+        /* p[i-d] = p[i-d] + c * p[i] */
+        val0 = p[i-d];
+        val1 = p[i];
+        if (val0 >= n2)
+            val0 -= n2;              /* [0, 2n) */
+        umul_ppmm(p_hi, p_lo, c_precomp, val1);
+        val1 = c * val1 - p_hi * n;  /* [0, 2n) */
+        p[i-d] = val0 + val1;        /* [0, 4n) */
+    }
+}
+
 /* division by x**d - 1 (not lazy: [0, n) -> [0, n)) */
 FLINT_FORCE_INLINE
 void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n)
@@ -79,6 +99,31 @@ void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n)
         for (j = 0; j < d; j++)
             p[i+j] = n_addmod(p[i+j], p[d+i+j], n);
         i -= d;
+    }
+}
+
+/* assumes len > 0 and d > 0, multiples of 4 */
+FLINT_FORCE_INLINE
+void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n)
+{
+    ulong i, j;
+
+    for (j = d; j+d-1 < (ulong)len; j+=d)
+    {
+        for (i = 0; i < d; i+=4)
+        {
+            p[i+0] = n_addmod(p[i+0], p[j+i+0], n);
+            p[i+1] = n_addmod(p[i+1], p[j+i+1], n);
+            p[i+2] = n_addmod(p[i+2], p[j+i+2], n);
+            p[i+3] = n_addmod(p[i+3], p[j+i+3], n);
+        }
+    }
+    for (i = 0; i+j < (ulong)len; i+=4)
+    {
+        p[i+0] = n_addmod(p[i+0], p[j+i+0], n);
+        p[i+1] = n_addmod(p[i+1], p[j+i+1], n);
+        p[i+2] = n_addmod(p[i+2], p[j+i+2], n);
+        p[i+3] = n_addmod(p[i+3], p[j+i+3], n);
     }
 }
 

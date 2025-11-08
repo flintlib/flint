@@ -15,22 +15,95 @@
 #include "longlong.h"  /* provides flint_clz */
 #include "n_fft.h"
 
+/** n_fft arguments:
+ *     - modulus mod
+ *     - its double 2*mod (storing helps for speed)
+ *     - precomputed powers of w
+ * To be used as an argument in internal FFT functions. In some parts,
+ * providing this instead of the whole context increased performance. Also,
+ * this facilitate using the same function with both tab_w and tab_iw (by
+ * forming an fft_args with Fargs->tab_w = F->tab_iw), see e.g. the
+ * implementation of n_fft_idft.
+ **/
+typedef struct
+{
+    ulong mod;                 // modulus, odd prime
+    ulong mod2;                // 2*mod
+    nn_srcptr tab_w;           // tabulated powers of w, see below
+} n_fft_args_struct;
+typedef n_fft_args_struct n_fft_args_t[1];
+
+
+FLINT_FORCE_INLINE
+void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
+{
+    F->mod = mod;
+    F->mod2 = 2*mod;
+    F->tab_w = tab_w;
+}
+
+
+/* dft internals */
 void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
 void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F);
 void dft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 
+/* idft internals */
 void idft_node_lazy_1_2(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
 void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 
+/* tft internals */
 void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F);
 void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F);
 
+
+/* some functions to get the right parameters (FIXME work in progress) */
 
 /* exponent of next power of 2 for x > 2 */
 FLINT_FORCE_INLINE
 ulong n_clog2_gt2(ulong x)
 {
     return FLINT_BITS - flint_clz(x - 1);
+}
+
+FLINT_FORCE_INLINE
+ulong _next_multiple_of_4(ulong x)
+{
+    return (x + 3) & UWORD(0xFFFFFFFFFFFFFFFC);
+}
+
+/* FIXME doc: get parameters for tft functions and ensure F "long enough" */
+/* in: olen > 0, ilen >= 0 */
+/* out: stores actual _ilen and _olen parameters to be used in tft calls, */
+/*      and returns the required length for the input array */
+FLINT_FORCE_INLINE
+ulong n_fft_tft_prepare(ulong * _ilen, ulong * _olen, ulong ilen, ulong olen, n_fft_ctx_t F)
+{
+    /* FIXME check: no function should do anything nontrivial when ilen==0 */
+    if (ilen == 0)
+    {
+        *_ilen = 0;
+        *_olen = olen;
+        return olen;
+    }
+
+    /* FIXME support this kind of base case or go directly to 4? */
+    if (ilen <= 2 && olen <= 2)
+    {
+        *_ilen = 2;
+        *_olen = 2;
+        return 2;
+    }
+
+    const ulong odepth = n_clog2_gt2(olen);
+    const ulong len = UWORD(1) << odepth;
+
+    *_ilen = _next_multiple_of_4(ilen);
+    *_olen = _next_multiple_of_4(olen);
+
+    n_fft_ctx_fit_depth(F, odepth);
+
+    return FLINT_MAX(*_ilen, len);
 }
 
 #endif  /* N_FFT_IMPL_H */
