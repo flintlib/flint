@@ -62,6 +62,17 @@ typedef struct
 }
 nmod_poly_compose_mod_precomp_preinv_arg_t;
 
+typedef struct
+{
+    nn_ptr x, t, w, y, z;       // five vectors of precomputed constants
+    nmod_poly_t f, g1, g2;      // three precomputed polys
+    nmod_t mod;
+    slong len;                    // number of points
+
+} nmod_geometric_progression_struct;
+
+typedef nmod_geometric_progression_struct nmod_geometric_progression_t[1];
+
 /* Memory management  ********************************************************/
 
 void nmod_poly_init(nmod_poly_t poly, ulong n);
@@ -568,6 +579,24 @@ nn_ptr * _nmod_poly_tree_alloc(slong len);
 void _nmod_poly_tree_free(nn_ptr * tree, slong len);
 
 void _nmod_poly_tree_build(nn_ptr * tree, nn_srcptr roots, slong len, nmod_t mod);
+
+/* Geometric evaluation / interpolation  *************************************/
+
+void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong len, nmod_t mod);
+
+void nmod_geometric_progression_clear(nmod_geometric_progression_t G);
+
+void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod);
+void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n);
+
+void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len);
+
+void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod);
+void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n);
+
+void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly, ulong r, nn_srcptr ys, slong n);
+void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
+    const nmod_geometric_progression_t G, slong len);
 
 /* Interpolation  ************************************************************/
 

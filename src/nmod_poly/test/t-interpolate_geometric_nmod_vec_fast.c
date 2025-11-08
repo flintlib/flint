@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2011, 2012 Fredrik Johansson
+    Copyright (C) 2025, Vincent Neiger, Éric Schost
+    Copyright (C) 2025, Mael Hostettler
 
     This file is part of FLINT.
 
@@ -14,51 +14,50 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-TEST_FUNCTION_START(nmod_poly_evaluate_nmod_vec_fast, state)
+TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
 {
     int i, result = 1;
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t P, Q;
-        nn_ptr x, y, z;
-        ulong mod;
-        slong j, n, npoints;
+        nn_ptr y;
+        ulong mod, r;
+        slong n, npoints;
 
-        mod = n_randtest_prime(state, 0);
-        npoints = n_randint(state, 100);
-        n = n_randint(state, 100);
+        npoints = 1 + (i == 0 ? 1 : n_randint(state, 100));
+        n = 1 + n_randint(state, npoints);
+        do 
+        { 
+            mod = n_randtest_prime(state, 1); 
+        }
+        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maximum order r
 
         nmod_poly_init(P, mod);
         nmod_poly_init(Q, mod);
-        x = _nmod_vec_init(npoints);
+
+        r = n_primitive_root_prime(mod);
         y = _nmod_vec_init(npoints);
-        z = _nmod_vec_init(npoints);
 
         nmod_poly_randtest(P, state, n);
 
-        for (j = 0; j < npoints; j++)
-            x[j] = n_randint(state, mod);
+        nmod_poly_evaluate_geometric_nmod_vec_fast(y, P, r, npoints);
+        nmod_poly_interpolate_geometric_nmod_vec_fast(Q, r, y, npoints);
 
-        nmod_poly_evaluate_nmod_vec_iter(y, P, x, npoints);
-        nmod_poly_evaluate_nmod_vec_fast(z, P, x, npoints);
-
-        result = _nmod_vec_equal(y, z, npoints);
-
+        result = nmod_poly_equal(P, Q);
         if (!result)
         {
             flint_printf("FAIL:\n");
             flint_printf("mod=%wu, n=%wd, npoints=%wd\n\n", mod, n, npoints);
-            flint_printf("P: "); nmod_poly_print(P); flint_printf("\n\n");
+            nmod_poly_print_pretty(P, "x"), flint_printf("\n\n");
+            nmod_poly_print_pretty(Q, "x"), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
 
         nmod_poly_clear(P);
         nmod_poly_clear(Q);
-        _nmod_vec_clear(x);
         _nmod_vec_clear(y);
-        _nmod_vec_clear(z);
     }
 
     TEST_FUNCTION_END(state);

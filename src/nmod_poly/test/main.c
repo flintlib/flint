@@ -52,6 +52,7 @@
 #include "t-evaluate_mat_paterson_stockmeyer.c"
 #include "t-evaluate_nmod.c"
 #include "t-evaluate_nmod_vec_fast.c"
+#include "t-evaluate_geometric_nmod_vec_fast.c"
 #include "t-exp_series.c"
 #include "t-find_distinct_nonzero_roots.c"
 #include "t-fread_print.c"
@@ -68,6 +69,7 @@
 #include "t-interpolate_nmod_vec_barycentric.c"
 #include "t-interpolate_nmod_vec.c"
 #include "t-interpolate_nmod_vec_fast.c"
+#include "t-interpolate_geometric_nmod_vec_fast.c"
 #include "t-interpolate_nmod_vec_newton.c"
 #include "t-invmod.c"
 #include "t-inv_series_basecase.c"
@@ -178,6 +180,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_evaluate_mat_paterson_stockmeyer),
     TEST_FUNCTION(nmod_poly_evaluate_nmod),
     TEST_FUNCTION(nmod_poly_evaluate_nmod_vec_fast),
+    TEST_FUNCTION(nmod_poly_evaluate_geometric_nmod_vec_fast),
     TEST_FUNCTION(nmod_poly_exp_series),
     TEST_FUNCTION(nmod_poly_find_distinct_nonzero_roots),
     TEST_FUNCTION(nmod_poly_fread_print),
@@ -194,6 +197,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_barycentric),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_fast),
+    TEST_FUNCTION(nmod_poly_interpolate_geometric_nmod_vec_fast),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_newton),
     TEST_FUNCTION(nmod_poly_invmod),
     TEST_FUNCTION(nmod_poly_inv_series_basecase),
