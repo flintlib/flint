@@ -14,6 +14,93 @@
 
 #include "impl_macros_dft.h"
 
+/*---------------------------------------*/
+/* "c-circulant" division with remainder */
+/*---------------------------------------*/
+
+/* division by x**d - c, lazy_4_4 with precomputation */
+/* in [0, 4*n) | out [0, 4*n) | max < 4n */
+/* TODO see if can be faster by using ideas from try_sparse */
+FLINT_FORCE_INLINE
+void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2)
+{
+    /* assumes len >= d */
+    slong i;
+    ulong j, r, val, p_hi, p_lo;
+
+    r = len % d;
+    i = len - r - d;  /* multiple of d, >= 0 by assumption */
+
+    for (j = 0; j < r; j++)
+    {
+        /* p[i+j] = p[i+j] + c * p[i+d+j] */
+        val = p[d+i+j];
+        umul_ppmm(p_hi, p_lo, c_precomp, val);
+        val = c * val - p_hi * n;  /* [0, 2n) */
+        if (p[i+j] >= n2)
+            p[i+j] -= n2;          /* [0, 2n) */
+        p[i+j] = val + p[i+j];     /* [0, 4n) */
+    }
+
+    i -= d;
+    while (i >= 0)
+    {
+        for (j = 0; j < d; j++)
+        {
+            /* p[i+j] = p[i+j] + c * p[i+d+j] */
+            val = p[d+i+j];
+            umul_ppmm(p_hi, p_lo, c_precomp, val);
+            val = c * val - p_hi * n;  /* [0, 2n) */
+            if (p[i+j] >= n2)
+                p[i+j] -= n2;          /* [0, 2n) */
+            p[i+j] = val + p[i+j];     /* [0, 4n) */
+        }
+        i -= d;
+    }
+}
+
+/* division by x**d - 1 (not lazy: [0, n) -> [0, n)) */
+FLINT_FORCE_INLINE
+void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n)
+{
+    /* assumes len >= d */
+    slong i;
+    ulong j, r;
+
+    r = len % d;
+    i = len - r - d;  /* multiple of d, >= 0 by assumption */
+
+    for (j = 0; j < r; j++)
+        p[i+j] = n_addmod(p[i+j], p[d+i+j], n);
+
+    i -= d;
+    while (i >= 0)
+    {
+        for (j = 0; j < d; j++)
+            p[i+j] = n_addmod(p[i+j], p[d+i+j], n);
+        i -= d;
+    }
+}
+
+/*---------------------------------------------------*/
+/* "c-circulant" division with remainder, transposed */
+/*   -> expand sequence mod x**d - c                 */
+/*---------------------------------------------------*/
+
+// TODO
+
+
+/*---------------------------------------------------*/
+/* division with remainder mod product */
+/*   TODO                 */
+/*---------------------------------------------------*/
+
+/*---------------------------------------------------*/
+/* division with remainder mod product, transposed */
+/*   TODO                 */
+/*---------------------------------------------------*/
+
+
 /*----------------------------------------------*/
 /* length 2, general node                       */
 /* (Cooley-Tukey & Gentleman-Sande butterflies) */
