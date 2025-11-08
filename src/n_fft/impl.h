@@ -32,7 +32,6 @@ FLINT_FORCE_INLINE ulong n_mulmod_precomp_shoup_negate(ulong a_pr)
     return UWORD_MAX - a_pr;
 }
 
-
 /** n_fft arguments:
  *     - modulus mod
  *     - its double 2*mod (storing helps for speed)
@@ -51,7 +50,6 @@ typedef struct
 } n_fft_args_struct;
 typedef n_fft_args_struct n_fft_args_t[1];
 
-
 FLINT_FORCE_INLINE
 void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
 {
@@ -60,6 +58,19 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
     F->tab_w = tab_w;
 }
 
+
+/* special divrems */
+void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
+void _nmod_poly_divrem_circulant_lazy_4_4_v0(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
+void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n);
+void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n);
+void _nmod_poly_rem_circulant1(nn_ptr p, slong len, ulong d, ulong n);
+void _nmod_poly_divrem_circulant_lazy_4_2_t(nn_ptr p, ulong len, ulong d, ulong c, ulong c_precomp, ulong n);
+void _nmod_poly_divrem_circulant1_t(nn_ptr p, ulong len, ulong d);
+void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
+                                        ulong depth, ulong node, n_fft_args_t F);
+void _nmod_poly_rem_prod_root1_t_lazy_4_4(nn_ptr p, ulong len, ulong d,
+                                          ulong depth, ulong node, n_fft_args_t F);
 
 /* dft internals */
 void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F);
