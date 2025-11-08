@@ -432,7 +432,7 @@ void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args
     else if (olen <= (UWORD(1) << (depth - 1)))
     {
         const ulong len = UWORD(1) << depth;
-        ulong new_depth = n_clog2_gt2(olen);
+        ulong new_depth = n_clog2_ge2(olen);
         node = node << (depth - new_depth);
         depth = new_depth;
 
@@ -493,8 +493,8 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F)
         return;
     }
 
-    const ulong odepth = n_clog2_gt2(olen);
-    const ulong idepth = n_clog2_gt2(ilen);
+    const ulong odepth = n_clog2_ge2(olen);
+    const ulong idepth = n_clog2_ge2(ilen);
 
     /* ilen > len: reduce mod x**len - 1 and call again */
     if (idepth > odepth)

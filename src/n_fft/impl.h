@@ -59,9 +59,9 @@ void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F);
 
 /* some functions to get the right parameters (FIXME work in progress) */
 
-/* exponent of next power of 2 for x > 2 */
+/* exponent of next power of 2 for x >= 2 */
 FLINT_FORCE_INLINE
-ulong n_clog2_gt2(ulong x)
+ulong n_clog2_ge2(ulong x)
 {
     return FLINT_BITS - flint_clz(x - 1);
 }
@@ -95,7 +95,7 @@ ulong n_fft_tft_prepare(ulong * _ilen, ulong * _olen, ulong ilen, ulong olen, n_
         return 2;
     }
 
-    const ulong odepth = n_clog2_gt2(olen);
+    const ulong odepth = n_clog2_ge2(olen);
     const ulong len = UWORD(1) << odepth;
 
     *_ilen = _next_multiple_of_4(ilen);

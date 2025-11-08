@@ -13,6 +13,7 @@
 #define N_FFT_MACROS_TFT_H
 
 #include "impl_macros_dft.h"
+#include "n_fft/impl.h"
 
 /*---------------------------------------*/
 /* "c-circulant" division with remainder */
@@ -132,7 +133,41 @@ void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n)
 /*   -> expand sequence mod x**d - c                 */
 /*---------------------------------------------------*/
 
-// TODO
+/* transposed version of above function: 
+ *    Input:
+ *        :p: vector of length >= len
+ *        :len: target length of expansion
+ *        :d: positive integer
+ *        :c: element of base field
+ *    Effect:
+ *    find coefficients d...len-1 of p by unrolling the recurrence with
+ *    charpoly x**d - c
+ *    -> explicitly: for all d*i+j with j < d such that d*i+j < len,
+ *        p_{d*i+j} == p_j * c**i
+ *   (in particular, first d entries are unchanged)
+ **/
+/* FIXME be more clear on what laziness is needed
+ * in can be whatever
+ * out is [0..2n) for new values; old values unchanged (needs reduction?)  */
+void _nmod_poly_divrem_circulant_lazy_4_2_t(nn_ptr p, ulong len, ulong d, ulong c, ulong c_precomp, ulong n)
+{
+    ulong i, val, p_hi, p_lo;
+
+    for (i = 0; i+d < len; i++)
+    {
+        /* p[i+d] = c * p[i] */
+        val = p[i];
+        umul_ppmm(p_hi, p_lo, c_precomp, val);
+        p[i+d] = c * val - p_hi * n;  /* [0, 2n) */
+    }
+}
+
+void _nmod_poly_divrem_circulant1_t(nn_ptr p, ulong len, ulong d)
+{
+    ulong i;
+    for (i = 0; i+d < len; i++)
+        p[i+d] = p[i];
+}
 
 
 /*---------------------------------------------------*/
@@ -142,8 +177,85 @@ void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n)
 
 /*---------------------------------------------------*/
 /* division with remainder mod product, transposed */
-/*   TODO                 */
 /*---------------------------------------------------*/
+
+/** Division mod product of x**d - w, transposed
+ *     Input:
+ *         :p: array
+ *         :len: positive integer (length of p)
+ *         :d: positive integer
+ *         :depth: nonnegative integer, current depth in root tree
+ *         :node: nonnegative integer, current node in root tree
+ *         :F: n_fft_args_t
+ *     Requirements: d <= 2**depth, number of roots in F->tab_w at least 2**depth * node + d
+ *     Action:
+ *         store in p[d:len] the coefficients obtained by unrolling the
+ *         length-d recurrence provided by
+ *            F->prod(x - tab_w[2 * (node * 2**depth + k)] for k in range(d))
+ *         on the initial d coefficients p[:d]
+ *         (note that the input coefficients p[d:len] are ignored and overwritten)
+ *     Algorithm:
+ *     one could derive explanations similar to the comments at the beginning
+ *     of TODO (name) reduce_mod_prod, or simply see it as its direct transpose
+ */
+
+void _nmod_poly_divrem_prod_roots_unity_t_lazy_x_x(nn_ptr p, ulong len, ulong d,
+                                                   ulong depth, ulong node, n_fft_args_t F)
+{
+    /* base case: if len <= d, all requested terms are known */
+    if (len <= d)
+        return;
+
+    /* currently, d <= 2**depth --> ensure 2**(depth-1) < d <= 2**depth */
+    ulong depth_d = (d == 1) ? 0 : n_clog2_ge2(d);
+    node = node << (depth - depth_d);
+    depth = depth_d;
+    ulong e = UWORD(1) << depth;
+
+    /* if d is a power of 2, i.e. d == e (which covers the case d == 1 <=> depth == 0), */
+    /* we are just unrolling with charpoly x**d - tab_w[2*node] */
+    if (d == e)
+    {
+        _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, d, F->tab_w[2*node], F->tab_w[2*node+1], F->mod);
+        return;
+    }
+
+    ulong llen = FLINT_MIN(e, len);
+    e = e/2;
+    /* from here on, 1 <= e == 2**(depth-1) < d < llen <= 2**depth */
+
+    const ulong w = F->tab_w[4*node];
+    const ulong wpre = F->tab_w[4*node+1];
+    ulong val0, val1, p_hi, p_lo;
+    for (ulong i = 0; i < d - e; i++)
+    {
+        /* p[e + i] -= w * p[i] */
+        val0 = p[i];
+        val1 = p[e+i];
+        if (val1 >= F->mod2)
+            val1 -= F->mod2;              /* [0, 2n) */
+        umul_ppmm(p_hi, p_lo, wpre, val0);
+        val0 = w * val0 - p_hi * F->mod;  /* [0, 2n) */
+        p[e+i] = val1 + F->mod2 - val0;   /* [0, 4n) */
+    }
+
+    _nmod_poly_divrem_prod_roots_unity_t_lazy_x_x(p + e, llen-e, d-e, depth-1, 2*node+1, F);
+
+    for (ulong i = 0; i < llen - e; i++)
+    {
+        /* p[e + i] += w * p[i] */
+        val0 = p[i];
+        val1 = p[e+i];
+        if (val1 >= F->mod2)
+            val1 -= F->mod2;              /* [0, 2n) */
+        umul_ppmm(p_hi, p_lo, wpre, val0);
+        val0 = w * val0 - p_hi * F->mod;  /* [0, 2n) */
+        p[e+i] = val0 + val1;             /* [0, 4n) */
+    }
+
+    if (len > 2*e)
+        _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, 2*e, F->tab_w[2*node], F->tab_w[2*node+1], F->mod);
+}
 
 
 /*----------------------------------------------*/
