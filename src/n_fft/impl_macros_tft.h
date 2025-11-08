@@ -103,9 +103,18 @@ void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n)
     }
 }
 
-/* assumes len > 0 and d > 0, multiples of 4 */
+/* assumes len > 0 and d > 0 */
 FLINT_FORCE_INLINE
 void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n)
+{
+    for (ulong i = len - 1; i >= d; i--)
+        p[i-d] = n_addmod(p[i-d], p[i], n);
+}
+
+/* assumes len > 0 and d > 0, multiples of 4 */
+/* warning: rem only */
+FLINT_FORCE_INLINE
+void _nmod_poly_rem_circulant1(nn_ptr p, slong len, ulong d, ulong n)
 {
     ulong i, j;
 
@@ -184,7 +193,7 @@ void _nmod_poly_divrem_circulant1_t(nn_ptr p, ulong len, ulong d)
  *         :depth: nonnegative integer, current depth in root tree
  *         :node: nonnegative integer, current node in root tree
  *         :F: n_fft_args_t
- *     Requirements: d <= 2**depth, number of roots in F->tab_w at least 2**depth * node + d
+ *     Requirements: d <= 2**depth, d even, 2**depth * node + d < 2**F->depth
  *     Action:
  *         store in p[0:d] the coefficients of the remainder in the division
  *         of p by prod(x - F->tab_w[2 * (node * 2**depth + k)] for k in range(d))
@@ -243,17 +252,26 @@ void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
     if (len <= d)
         return;
 
-    /* currently, d <= 2**depth --> ensure 2**(depth-1) < d <= 2**depth */
-    ulong depth_d = (d == 1) ? 0 : n_clog2_ge2(d);
+    /* currently, 2 <= d <= 2**depth --> ensure 2**(depth-1) < d <= 2**depth */
+    ulong depth_d = n_clog2_ge2(d);
     node = node << (depth - depth_d);
     depth = depth_d;
     ulong e = UWORD(1) << depth;
 
-    /* if d is a power of 2, i.e. d == e (which covers the case d == 1 <=> depth == 0), */
-    /* we are just reducing modulo x**d - tab_w[2*node] */
+    /* if d is a power of 2, i.e. d == e, */
+    /* we are just reducing modulo x**d - tab_w[node] */
     if (d == e)
     {
-        _nmod_poly_divrem_circulant_lazy_4_4(p, len, d, F->tab_w[2*node], F->tab_w[2*node+1], F->mod, F->mod2);
+        if (node % 2 == 0)
+            _nmod_poly_divrem_circulant_lazy_4_4(p, len, d,
+                                                 F->tab_w[node],
+                                                 F->tab_w[node+1],
+                                                 F->mod, F->mod2);
+        else
+            _nmod_poly_divrem_circulant_lazy_4_4(p, len, d,
+                                                 F->mod - F->tab_w[node-1],
+                                                 n_mulmod_precomp_shoup_negate(F->tab_w[node]),
+                                                 F->mod, F->mod2);
         return;
     }
 
@@ -262,12 +280,20 @@ void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
 
     if (len > 2*e)
     {
-        _nmod_poly_divrem_circulant_lazy_4_4(p, len, 2*e, F->tab_w[2*node], F->tab_w[2*node+1], F->mod, F->mod2);
+        if (node % 2 == 0)
+            _nmod_poly_divrem_circulant_lazy_4_4(p, len, 2*e,
+                                                 F->tab_w[node], F->tab_w[node+1],
+                                                 F->mod, F->mod2);
+        else
+            _nmod_poly_divrem_circulant_lazy_4_4(p, len, 2*e,
+                                                 F->mod - F->tab_w[node-1],
+                                                 n_mulmod_precomp_shoup_negate(F->tab_w[node]),
+                                                 F->mod, F->mod2);
         len = 2*e;
     }
 
-    const ulong w = F->tab_w[4*node];
-    const ulong wpre = F->tab_w[4*node+1];
+    const ulong w = F->tab_w[2*node];
+    const ulong wpre = F->tab_w[2*node+1];
     ulong val0, val1, m_hi, m_lo;
 
     for (ulong i = 0; i < len - e; i++)
@@ -293,7 +319,7 @@ void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
             val0 -= F->mod2;              /* [0, 2n) */
         umul_ppmm(m_hi, m_lo, wpre, val1);
         val1 = w * val1 - m_hi * F->mod;  /* [0, 2n) */
-        p[e+i] = val0 + F->mod2 - val1;   /* [0, 4n) */
+        p[i] = val0 + F->mod2 - val1;     /* [0, 4n) */
     }
 }
 
@@ -307,15 +333,16 @@ void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
  *     Input:
  *         :p: array
  *         :len: positive integer (length of p)
- *         :d: positive integer
+ *         :d: positive integer, multiple of 2
  *         :depth: nonnegative integer, current depth in root tree
  *         :node: nonnegative integer, current node in root tree
  *         :F: n_fft_args_t
- *     Requirements: d <= 2**depth, number of roots in F->tab_w at least 2**depth * node + d
+ *     Requirements: d <= 2**depth, d even, 2**depth * node + d < 2**F->depth
  *     Action:
  *         store in p[d:len] the coefficients obtained by unrolling the
  *         length-d recurrence provided by
- *            prod(x - F->tab_w[2 * (node * 2**depth + k)] for k in range(d))
+ *            prod(x**2 - w_k**2) == prod((x-w_k)(x+w_k))
+ *            for all w_k = F->tab_w[2**depth * node + 2*k], 0 <= k < d/2
  *         on the initial d coefficients p[:d]
  *         (note that the input coefficients p[d:len] are ignored and overwritten)
  *     Algorithm:
@@ -331,17 +358,24 @@ void _nmod_poly_rem_prod_root1_t_lazy_4_4(nn_ptr p, ulong len, ulong d,
     if (len <= d)
         return;
 
-    /* currently, d <= 2**depth --> ensure 2**(depth-1) < d <= 2**depth */
-    ulong depth_d = (d == 1) ? 0 : n_clog2_ge2(d);
+    /* currently, 2 <= d <= 2**depth --> ensure 2**(depth-1) < d <= 2**depth */
+    ulong depth_d = n_clog2_ge2(d);
     node = node << (depth - depth_d);
     depth = depth_d;
     ulong e = UWORD(1) << depth;
 
-    /* if d is a power of 2, i.e. d == e (which covers the case d == 1 <=> depth == 0), */
-    /* we are just unrolling with charpoly x**d - tab_w[2*node] */
+    /* if d is a power of 2, i.e. d == e, we are just unrolling the recurrence */
+    /* with charpoly x**d - tab_w[node] */
     if (d == e)
     {
-        _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, d, F->tab_w[2*node], F->tab_w[2*node+1], F->mod);
+        if (node % 2 == 0)
+            _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, d,
+                                                   F->tab_w[node], F->tab_w[node+1], F->mod);
+        else
+            _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, d,
+                                                   F->mod - F->tab_w[node-1],
+                                                   n_mulmod_precomp_shoup_negate(F->tab_w[node]),
+                                                   F->mod);
         return;
     }
 
@@ -349,9 +383,10 @@ void _nmod_poly_rem_prod_root1_t_lazy_4_4(nn_ptr p, ulong len, ulong d,
     e = e/2;
     /* from here on, 1 <= e == 2**(depth-1) < d < llen <= 2**depth */
 
-    const ulong w = F->tab_w[4*node];
-    const ulong wpre = F->tab_w[4*node+1];
+    const ulong w = F->tab_w[2*node];
+    const ulong wpre = F->tab_w[2*node+1];
     ulong val0, val1, m_hi, m_lo;
+
     for (ulong i = 0; i < d - e; i++)
     {
         /* p[e + i] -= w * p[i] */
@@ -379,7 +414,16 @@ void _nmod_poly_rem_prod_root1_t_lazy_4_4(nn_ptr p, ulong len, ulong d,
     }
 
     if (len > 2*e)
-        _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, 2*e, F->tab_w[2*node], F->tab_w[2*node+1], F->mod);
+    {
+        if (node % 2 == 0)
+            _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, 2*e,
+                                                   F->tab_w[node], F->tab_w[node+1], F->mod);
+        else
+            _nmod_poly_divrem_circulant_lazy_4_2_t(p, len, 2*e,
+                                                   F->mod - F->tab_w[node-1],
+                                                   n_mulmod_precomp_shoup_negate(F->tab_w[node]),
+                                                   F->mod);
+    }
 }
 
 

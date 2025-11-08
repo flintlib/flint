@@ -10,24 +10,8 @@
 */
 
 #include "n_fft.h"
+#include "n_fft/impl.h"
 #include "ulong_extras.h"  /* for mulmod_shoup* functions */
-
-/** Given the precomputed quotient a_pr for modular multiplication by a mod n,
- *          a_pr == floor(a * 2**FLINT_BITS / n)
- * where we assume 0 < a < n and n does not divide a * 2**FLINT_BITS,
- * this returns the quotient for mulmod by -a mod n,
- *          floor( (n-a) * 2**FLINT_BITS / n)
- *          == 2**FLINT_BITS - ceil(a * 2**FLINT_BITS / n)
- *          == 2**FLINT_BITS - a_pr
- *
- * Note: the requirement "n does not divide a * 2**FLINT_BITS" follows
- * from the other requirement 0 < a < n as soon as n is odd; in n_fft.h
- * we will only use this for odd primes
- */
-FLINT_FORCE_INLINE ulong n_mulmod_precomp_shoup_negate(ulong a_pr)
-{
-    return UWORD_MAX - a_pr;
-}
 
 void n_fft_ctx_init2_root(n_fft_ctx_t F, ulong w, ulong max_depth, ulong cofactor, ulong depth, ulong p)
 {

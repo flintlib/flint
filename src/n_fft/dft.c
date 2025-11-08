@@ -67,7 +67,7 @@
  */
 
 /** Example for nodes/depth:
- *   if F.depth is 3, the tree of roots of unity in F->tab_w is
+ *   if F->depth is 3, the tree of roots of unity in F->tab_w is
  *                    1                               d3n0                <-- depth 3 
  *               /        \                        /        \
  *             1            -1                 d2n0          d2n1         <-- depth 2
@@ -109,7 +109,7 @@
  * polynomial x**len - F->tab_w[2*node] (for example, if depth=
  * * Requirements (not checked):
  *        3 <= depth
- *        (node+1) * 2**depth < 2**F.depth (length of F->tab_w)
+ *        (node+1) * 2**depth < 2**F->depth (length of F->tab_w)
  * * lazy_4_4: in [0..4n) / out [0..4n) / max < 4n
  */
 void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
@@ -176,9 +176,9 @@ void dft_node_lazy_4_4(nn_ptr p, ulong depth, ulong node, n_fft_args_t F)
 /** 2**depth-point DFT
  * Same specification as n_fft_dft, except for:
  * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
- *             requirement (not checked): depth <= F.depth
+ *             requirement (not checked): depth <= F->depth
  * * lazy_2_4: in [0..2n) / out [0..4n) / max < 4n
- *             requirement (not checked): 3 <= depth <= F.depth
+ *             requirement (not checked): 3 <= depth <= F->depth
  */
 void dft_lazy_2_4(nn_ptr p, ulong depth, n_fft_args_t F)
 {

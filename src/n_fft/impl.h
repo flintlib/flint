@@ -15,6 +15,24 @@
 #include "longlong.h"  /* provides flint_clz */
 #include "n_fft.h"
 
+/** Given the precomputed quotient a_pr for modular multiplication by a mod n,
+ *          a_pr == floor(a * 2**FLINT_BITS / n)
+ * where we assume 0 < a < n and n does not divide a * 2**FLINT_BITS,
+ * this returns the quotient for mulmod by -a mod n,
+ *          floor( (n-a) * 2**FLINT_BITS / n)
+ *          == 2**FLINT_BITS - ceil(a * 2**FLINT_BITS / n)
+ *          == 2**FLINT_BITS - a_pr
+ *
+ * Note: the requirement "n does not divide a * 2**FLINT_BITS" follows
+ * from the other requirement 0 < a < n as soon as n is odd; in n_fft.h
+ * we will only use this for odd primes
+ */
+FLINT_FORCE_INLINE ulong n_mulmod_precomp_shoup_negate(ulong a_pr)
+{
+    return UWORD_MAX - a_pr;
+}
+
+
 /** n_fft arguments:
  *     - modulus mod
  *     - its double 2*mod (storing helps for speed)
@@ -71,6 +89,7 @@ ulong _next_multiple_of_4(ulong x)
 {
     return (x + 3) & UWORD(0xFFFFFFFFFFFFFFFC);
 }
+
 
 /* FIXME doc: get parameters for tft functions and ensure F "long enough" */
 /* in: olen > 0, ilen >= 0 */
