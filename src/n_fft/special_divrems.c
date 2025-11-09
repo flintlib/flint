@@ -65,6 +65,25 @@ void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c,
     }
 }
 
+/* assumes len > 0 and d > 0 */
+void _nmod_poly_divrem_circulant_lazy_2_2(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2)
+{
+    ulong i, val0, val1, p_hi, p_lo;
+
+    for (i = len - 1; i >= d; i--)
+    {
+        /* p[i-d] = p[i-d] + c * p[i] */
+        val0 = p[i-d];
+        val1 = p[i];
+        umul_ppmm(p_hi, p_lo, c_precomp, val1);
+        val1 = c * val1 - p_hi * n;  /* [0, 2n) */
+        val1 += val0;                /* [0, 4n) */
+        if (val1 >= n2)
+            val1 -= n2;              /* [0, 2n) */
+        p[i-d] = val1;
+    }
+}
+
 /* division by x**d - 1 (not lazy: [0, n) -> [0, n)) */
 void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n)
 {
@@ -92,6 +111,25 @@ void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n)
 {
     for (ulong i = len - 1; i >= d; i--)
         p[i-d] = n_addmod(p[i-d], p[i], n);
+}
+
+/* assumes len > 0 and d > 0 */
+/* in fact "lazy_double" */
+void _nmod_poly_divrem_circulant1_lazy_2_4(nn_ptr p, slong len, ulong d)
+{
+    for (ulong i = len - 1; i >= d; i--)
+        p[i-d] = p[i-d] + p[i];
+}
+
+/* assumes len > 0 and d > 0 */
+void _nmod_poly_divrem_circulant1_lazy_2_2(nn_ptr p, slong len, ulong d, ulong n2)
+{
+    for (ulong i = len - 1; i >= d; i--)
+    {
+        p[i-d] = p[i-d] + p[i];
+        if (p[i-d] >= n2)
+            p[i-d] -= n2;
+    }
 }
 
 /* assumes len > 0 and d > 0, multiples of 4 */
@@ -124,7 +162,7 @@ void _nmod_poly_rem_circulant1(nn_ptr p, slong len, ulong d, ulong n)
 /*   -> expand sequence mod x**d - c                 */
 /*---------------------------------------------------*/
 
-/* transposed version of above function: 
+/* transposed version of above function:
  *    Input:
  *        :p: vector of length >= len
  *        :len: target length of expansion
@@ -303,6 +341,129 @@ void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
         val1 = w * val1 - m_hi * F->mod;  /* [0, 2n) */
         p[i] = val0 + F->mod2 - val1;     /* [0, 4n) */
     }
+}
+
+void _nmod_poly_rem_prod_root1_lazy_2_2(nn_ptr p, ulong len, ulong d,
+                                        ulong depth, ulong node, n_fft_args_t F)
+{
+    /* base case: if len <= d, polynomial is already reduced */
+    if (len <= d)
+        return;
+
+    /* currently, 2 <= d <= 2**depth --> ensure 2**(depth-1) < d <= 2**depth */
+    ulong depth_d = n_clog2_ge2(d);
+    node = node << (depth - depth_d);
+    depth = depth_d;
+    ulong e = UWORD(1) << depth;
+
+    /* if d is a power of 2, i.e. d == e, */
+    /* we are just reducing modulo x**d - tab_w[node] */
+    if (d == e)
+    {
+        if (node % 2 == 0)
+            _nmod_poly_divrem_circulant_lazy_2_2(p, len, d,
+                                                 F->tab_w[node],
+                                                 F->tab_w[node+1],
+                                                 F->mod, F->mod2);
+        else
+            _nmod_poly_divrem_circulant_lazy_2_2(p, len, d,
+                                                 F->mod - F->tab_w[node-1],
+                                                 n_mulmod_precomp_shoup_negate(F->tab_w[node]),
+                                                 F->mod, F->mod2);
+        return;
+    }
+
+    e = e/2;
+    /* from here on, 1 <= e == 2**(depth-1) < d <= 2**depth */
+
+    if (len > 2*e)
+    {
+        if (node % 2 == 0)
+            _nmod_poly_divrem_circulant_lazy_2_2(p, len, 2*e,
+                                                 F->tab_w[node], F->tab_w[node+1],
+                                                 F->mod, F->mod2);
+        else
+            _nmod_poly_divrem_circulant_lazy_2_2(p, len, 2*e,
+                                                 F->mod - F->tab_w[node-1],
+                                                 n_mulmod_precomp_shoup_negate(F->tab_w[node]),
+                                                 F->mod, F->mod2);
+        len = 2*e;
+    }
+
+    const ulong w = F->tab_w[2*node];
+    const ulong wpre = F->tab_w[2*node+1];
+    ulong val0, val1, m_hi, m_lo;
+
+    for (ulong i = 0; i < len - e; i++)
+    {
+        /* p[i] += w * p[e + i] */
+        val0 = p[i];
+        val1 = p[e+i];
+        umul_ppmm(m_hi, m_lo, wpre, val1);
+        val1 = w * val1 - m_hi * F->mod;  /* [0, 2n) */
+        val1 += val0;                     /* [0, 4n) */
+        if (val1 >= F->mod2)
+            val1 -= F->mod2;              /* [0, 2n) */
+        p[i] = val1;
+    }
+
+    _nmod_poly_rem_prod_root1_lazy_2_2(p + e, len-e, d-e, depth-1, 2*node+1, F);
+
+    for (ulong i = 0; i < d - e; i++)
+    {
+        /* p[i] -= w * p[e + i] */
+        val0 = p[i];
+        val1 = p[e+i];
+        umul_ppmm(m_hi, m_lo, wpre, val1);
+        val1 = w * val1 - m_hi * F->mod;  /* [0, 2n) */
+        val1 = val0 + F->mod2 - val1;     /* [0, 4n) */
+        if (val1 >= F->mod2)
+            val1 -= F->mod2;              /* [0, 2n) */
+        p[i] = val1;
+    }
+}
+
+/* TODO like elsewhere, put no node in name if node == 0; and put node in others */
+void _nmod_poly_rem_prod_root1_node0_lazy_2_4(nn_ptr p, ulong len, ulong d,
+                                             ulong depth, n_fft_args_t F)
+{
+    /* base case: if len <= d, polynomial is already reduced */
+    if (len <= d)
+        return;
+
+    /* currently, 2 <= d <= 2**depth --> ensure 2**(depth-1) < d <= 2**depth */
+    ulong depth_d = n_clog2_ge2(d);
+    depth = depth_d;
+    ulong e = UWORD(1) << depth;
+
+    /* if d is a power of 2, i.e. d == e, */
+    /* we are just reducing modulo x**d - tab_w[node] */
+    if (d == e)
+    {
+        _nmod_poly_divrem_circulant1_lazy_2_4(p, len, d);
+        return;
+    }
+
+    e = e/2;
+    /* from here on, 1 <= e == 2**(depth-1) < d <= 2**depth */
+
+    if (len > 2*e)
+    {
+        _nmod_poly_divrem_circulant1_lazy_2_2(p, len, 2*e, F->mod2);
+        len = 2*e;
+    }
+
+    for (ulong i = 0; i < len - e; i++)
+    {
+        p[i] += p[e+i];  /* [0, 4n) */
+        if (p[i] >= F->mod2)
+            p[i] -= F->mod2;
+    }
+
+    _nmod_poly_rem_prod_root1_lazy_2_2(p + e, len-e, d-e, depth-1, 1, F);
+
+    for (ulong i = 0; i < d - e; i++)
+        p[i] += F->mod2 - p[e+i];  /* [0, 4n) */
 }
 
 /*---------------------------------------------*/

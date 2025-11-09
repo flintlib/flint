@@ -76,14 +76,21 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
 
 /* special divrems */
 void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
+void _nmod_poly_divrem_circulant_lazy_2_2(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
 void _nmod_poly_divrem_circulant_lazy_4_4_v0(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
 void _nmod_poly_divrem_circulant1(nn_ptr p, slong len, ulong d, ulong n);
 void _nmod_poly_divrem_circulant1_v1(nn_ptr p, slong len, ulong d, ulong n);
 void _nmod_poly_rem_circulant1(nn_ptr p, slong len, ulong d, ulong n);
 void _nmod_poly_divrem_circulant_lazy_4_2_t(nn_ptr p, ulong len, ulong d, ulong c, ulong c_precomp, ulong n);
 void _nmod_poly_divrem_circulant1_t(nn_ptr p, ulong len, ulong d);
+
 void _nmod_poly_rem_prod_root1_lazy_4_4(nn_ptr p, ulong len, ulong d,
                                         ulong depth, ulong node, n_fft_args_t F);
+void _nmod_poly_rem_prod_root1_lazy_2_2(nn_ptr p, ulong len, ulong d,
+                                        ulong depth, ulong node, n_fft_args_t F);
+void _nmod_poly_rem_prod_root1_node0_lazy_2_4(nn_ptr p, ulong len, ulong d,
+                                             ulong depth, n_fft_args_t F);
+
 void _nmod_poly_rem_prod_root1_t_lazy_4_4(nn_ptr p, ulong len, ulong d,
                                           ulong depth, ulong node, n_fft_args_t F);
 
@@ -101,7 +108,7 @@ void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args
 void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F);
 
 /* itft internals */
-void itft_node_lazy_x_x(nn_ptr p, ulong iolen, ulong depth, ulong node, n_fft_ctx_t F);
+void itft_node_lazy_1_2(nn_ptr p, ulong iolen, ulong node, n_fft_ctx_t F);
 /* FIXME see how to handle args! needs tab_w, tab_iw, tab_w2 */
 
 /* some functions to get the right parameters (FIXME work in progress) */

@@ -171,106 +171,30 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F)
 /* ITFT: auxiliary functions */
 /*---------------------------*/
 
-//def itft2(f, iolen, depth, node, tab_w, tab_iw, scale=1, verbose=False):
-//    """ inverse truncated Fourier transform
-//    Input:
-//        :p: coefficients [p_0,...,p_{iolen-1},xx,...,xx];  iolen <= 2**depth, 
-//            xx,...,xx are any values to reach length NextPowerOfTwo(iolen)
-//             (these values may be overwritten)
-//        :iolen: nonnegative integer, number of total evaluations in input
-//               and number of sought coefficients in output
-//        :depth: nonnegative integer, current depth in recursive tree
-//        :node: nonnegative integer, current root in recursive tree
-//        :tab_w: powers [1,w**(d/2),w**(d/4),w**(3d/4),...] of all principal d-th
-//                root of unity w, in bit reversed order, for some d power of 2
-//                such that 2**depth <= d
-//        :tab_iw: same list for the inverse 1/w
-//    Requirements:
-//        iolen <=  2**depth
-//        (node+1) * 2**depth <= 2**F->depth (the length of tab_w and tab_iw)
-//    Output:
-//        in-place modify p so that the first iolen output coefficients p[:iolen]
-//        are those of the unique polynomial p(x) of degree < iolen such that the
-//        evaluation p(w_i) is equal to the input p[i]
-//        where w_i = ...   (something close to tab_w[node * 2**depth + i] and its opposite)
-//    Algo:
-//        uses a direct reduction-tree approach
-//        --> we are currently at node x**d - tab_w[node], where d = 2**depth
-//        --> subtrees have as roots the nodes x**(d/2) - tab_w[2*node] and x**(d/2) - tab_w[2*node+1]
-//    """
-//    # iolen == 0: nothing to do
-//    if iolen == 0:
-//        return
-//
-//    # depth == 0 --> whatever f[0] is, keep it
-//    if depth == 0:
-//        f[0] *= scale
-//        return
-//
-//    # now depth >= 1, d >= 2
-//    d = 1 << depth
-//
-//    # if iolen <= d/2, go down the tree
-//    if 2*iolen <= d:
-//        # find NextPower2(iolen)
-//        depth_rec = ceil(log(iolen, 2))
-//        d_rec = 1 << depth_rec
-//        d_quo = 1 << (depth - depth_rec)  # == d / d_rec
-//        itft2(f[:d_rec], iolen, depth_rec, d_quo * node, tab_w, tab_iw, scale, verbose)
-//        for k in range(iolen):
-//            f[k] = d_quo * f[k]
-//        return
-//
-//    # from here on, 1 <= d/2 < iolen <= d
-//    d_rec = 1 << (depth-1)
-//    iolen_rec = iolen - d_rec
-//
-//    # 1st call
-//    itft2(f[:d_rec], d_rec, depth-1, 2*node, tab_w, tab_iw, scale, verbose)
-//
-//    # 2nd call
-//    itft2(f[d_rec:], iolen_rec, depth-1, 2*node+1, tab_w, tab_iw, scale, verbose)
-//
-//    # deduce low and high parts
-//    for k in range(iolen_rec):
-//        tmp = f[k]
-//        f[k] = tmp + f[d_rec+k]
-//        f[d_rec+k] = tab_iw[2*node] * (tmp - f[d_rec+k])
-//    for k in range(iolen_rec, d_rec):
-//        # here f[d_rec + k] == 0
-//        f[d_rec+k] = tab_iw[2*node] * f[k]
-//    # efficiency: in the above loops, could we avoid/limit the multiplications by
-//    # tab_iw[2*node] depending on what happens next in the reduction?
-//    # OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?)
-//
-//    reduce_mod_prod_xnma(iolen, tab_w, node, depth, f, d)
-//
-//    return
-
-/* TODO determine and explain lazy_x_x */
 /* TODO think about base cases to support */
 /* FIXME depth is useless? assumes len/2 < iolen <= len */
-/* assumes iolen > 0 */
-/* FIXME for the moment, assumes iolen multiple of 4. Think about it (more problematic for interpolation than for evaluation) */
-void itft_node_lazy_x_x(nn_ptr p, ulong iolen, ulong depth, ulong node, n_fft_ctx_t F)
+/* assumes iolen > 0, multiple of 4 */
+void itft_node_lazy_1_2(nn_ptr p, ulong iolen, ulong node, n_fft_ctx_t F)
 {
-    if (depth == 1)
+    if (iolen == 4)
     {
-        IDFT2_NODE_LAZY_2_2(p[0], p[1], F->tab_iw[2], F->tab_iw[3], F->mod, 2*F->mod);
-    }
-
-    else if (depth == 2)
-    {
-        IDFT4_NODE_LAZY_2_2(p[0], p[1], p[2], p[3],
+        IDFT4_NODE_LAZY_1_2(p[0], p[1], p[2], p[3],
                             F->tab_iw[2*node+0], F->tab_iw[2*node+1],    
                             F->tab_iw[4*node+0], F->tab_iw[4*node+1],   
                             F->tab_iw[4*node+2], F->tab_iw[4*node+3],
                             F->mod, 2*F->mod);
     }
 
-    /* now depth >= 3, iolen >= 4 multiple of 4 */
+    else if (iolen == 8)
+    {
+        IDFT8_NODE_LAZY_1_2(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                            node, F->mod, 2*F->mod, F->tab_iw);
+    }
+
+    /* now depth >= 4, iolen >= 12 multiple of 4 */
     else
     {
+        const ulong depth = n_clog2_ge2(iolen);
         const ulong len = UWORD(1) << depth;
 
         /* iolen == len : call idft */
@@ -282,62 +206,57 @@ void itft_node_lazy_x_x(nn_ptr p, ulong iolen, ulong depth, ulong node, n_fft_ct
             return;
         }
 
-        /* iolen <= len/2 : go down the tree */
-        /* FIXME move this at the end for 2nd rec call; and here assume depth is the right one */
-        if (2*iolen <= len)
-        {
-            ulong new_depth = n_clog2_ge2(iolen);  /* FIXME careful with iolen==1 */
-            node = node << (depth - new_depth);
-            ulong pow2 = UWORD(1) << (depth - new_depth);
-            depth = new_depth;
-            itft_node_lazy_x_x(p, iolen, depth, node, F);
-            // FIXME pow2 = 1 << (depth - new_depth), computed above,
-            // with precomputation -> store it in F?
-            ulong pow2_pr = n_mulmod_precomp_shoup(pow2, F->mod);
-            for (ulong k = 0; k < iolen; k++)  /* FIXME could unroll if iolen multiple of 4 */
-            {
-                /* p[k] = pow2 * p[k]; */
-                /* FIXME lazy how, 1_2 ? */
-                N_MULMOD_PRECOMP_LAZY(p[k], pow2, p[k], pow2_pr, F->mod);
-            }
-            return;
-        }
-
         /* from here on, 1 <= len/2 < iolen <= len */
-        /* full idft */
+        /* 1st rec call: full idft at length len/2 */
+        /* 2nd rec call: itft at trunc iolen - len/2 */
         const nn_ptr p0 = p;
         const nn_ptr p1 = p + len/2;
         n_fft_args_t Fargs;
         n_fft_set_args(Fargs, F->mod, F->tab_iw);
         idft_node_lazy_1_2(p0, depth-1, 2*node, Fargs);
-        itft_node_lazy_x_x(p1, iolen - len/2, depth-1, 2*node+1, F);
+
+        ulong new_iolen = iolen - len/2;
+        ulong new_depth = n_clog2_ge2(new_iolen);
+        ulong new_node = (2*node+1) << (depth - 1 - new_depth);
+
+        itft_node_lazy_1_2(p1, new_iolen, new_node, F);
+
+        /* make sure this is not performed when pow2 == 1, and try to integrate in loops below? */
+        if (new_depth != depth - 1)
+        {
+            ulong pow2 = UWORD(1) << (depth - 1 - new_depth);
+            // FIXME pow2 = 1 << (depth - new_depth), computed above,
+            // with precomputation -> store it in F?
+            ulong pow2_pr = n_mulmod_precomp_shoup(pow2, F->mod);
+            for (ulong k = 0; k < new_iolen; k++)  /* FIXME try unrolling since new_iolen is multiple of 4 */
+            {
+                /* p1[k] = pow2 * p1[k], lazy_x_2 */
+                N_MULMOD_PRECOMP_LAZY(p1[k], pow2, p1[k], pow2_pr, F->mod);
+            }
+        }
 
         /* butterflies */
         ulong k = 0;
-        for ( ; k < iolen - len/2; k++)
+        const ulong iw = Fargs->tab_w[2*node];
+        const ulong iwpre = Fargs->tab_w[2*node+1];
+        for ( ; k < new_iolen; k++)
         {
-            /* FIXME might benefit from more tmp? measure and see */
-            IDFT2_NODE_LAZY_2_2(p0[k], p1[k],
-                                Fargs->tab_w[2*node], Fargs->tab_w[2*node+1],
-                                Fargs->mod, Fargs->mod2);
+            IDFT2_NODE_LAZY_2_2(p0[k], p1[k], iw, iwpre, Fargs->mod, Fargs->mod2);
         }
         for ( ; k < len/2; k++)
         {
-            /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k] */
-            /* FIXME lazy how, x_2 ? */
-            N_MULMOD_PRECOMP_LAZY(p1[k], F->tab_iw[2*node], p0[k], F->tab_iw[2*node+1], F->mod);
+            /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k]; lazy_x_2 */
+            N_MULMOD_PRECOMP_LAZY(p1[k], iw, p0[k], iwpre, F->mod);
         }
         /* notes for possible better performance: in the above loops, could we avoid/limit the multiplications by */
         /* tab_iw[2*node] depending on what happens next in the reduction? */
         /* OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?) */
 
         n_fft_set_args(Fargs, F->mod, F->tab_w);
-        _nmod_poly_rem_prod_root1_lazy_4_4(p, len, iolen, depth, node, Fargs);
-        for (ulong k = 0; k < iolen; k++)  /* TODO understand why this is necessary */
-        {
-            if (p[k] >= Fargs->mod2)
-                p[k] -= Fargs->mod2;
-        }
+        if (node == 0)
+            _nmod_poly_rem_prod_root1_node0_lazy_2_4(p, len, iolen, depth, Fargs);
+        else
+            _nmod_poly_rem_prod_root1_lazy_2_2(p, len, iolen, depth, node, Fargs);
     }
 }
 
@@ -385,7 +304,7 @@ void n_fft_itft(nn_ptr p, ulong iolen, n_fft_ctx_t F)
         ulong depth = n_clog2_ge2(iolen);
         /* n_fft_args_t Fargs; */
         /* n_fft_set_args(Fargs, F->mod, F->tab_w); */
-        itft_node_lazy_x_x(p, iolen, depth, 0, F);
+        itft_node_lazy_1_2(p, iolen, 0, F);
         const ulong inv2 = F->tab_inv2[2*depth-2];
         const ulong inv2_pr = F->tab_inv2[2*depth-1];
         for (ulong k = 0; k < iolen; k++)
