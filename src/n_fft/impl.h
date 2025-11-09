@@ -15,6 +15,22 @@
 #include "longlong.h"  /* provides flint_clz */
 #include "n_fft.h"
 
+/*---------*/
+/* helpers */
+/*---------*/
+
+/** Shoup's modular multiplication with precomputation, lazy
+ * (does not perform the excess correction step)
+ *  --> computes either r or r+n and store it is res, where r = (a*b) % n
+ *  --> a_pr is the precomputation for n, p_hi and p_lo are temporaries
+ */
+#define N_MULMOD_PRECOMP_LAZY(res, a, b, a_pr, n)             \
+do {                                                          \
+    ulong p_hi, p_lo;                                         \
+    umul_ppmm(p_hi, p_lo, (a_pr), (b));                       \
+    res = (a) * (b) - p_hi * (n);                             \
+} while(0)
+
 /** Given the precomputed quotient a_pr for modular multiplication by a mod n,
  *          a_pr == floor(a * 2**FLINT_BITS / n)
  * where we assume 0 < a < n and n does not divide a * 2**FLINT_BITS,
@@ -58,7 +74,6 @@ void n_fft_set_args(n_fft_args_t F, ulong mod, nn_srcptr tab_w)
     F->tab_w = tab_w;
 }
 
-
 /* special divrems */
 void _nmod_poly_divrem_circulant_lazy_4_4(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
 void _nmod_poly_divrem_circulant_lazy_4_4_v0(nn_ptr p, slong len, ulong d, ulong c, ulong c_precomp, ulong n, ulong n2);
@@ -85,6 +100,9 @@ void idft_lazy_1_4(nn_ptr p, ulong depth, n_fft_args_t F);
 void tft_node_lazy_4_4(nn_ptr p, ulong olen, ulong depth, ulong node, n_fft_args_t F);
 void tft_lazy_1_4(nn_ptr p, ulong ilen, ulong olen, n_fft_args_t F);
 
+/* itft internals */
+void itft_node_lazy_x_x(nn_ptr p, ulong iolen, ulong depth, ulong node, n_fft_ctx_t F);
+/* FIXME see how to handle args! needs tab_w, tab_iw, tab_w2 */
 
 /* some functions to get the right parameters (FIXME work in progress) */
 
@@ -134,6 +152,33 @@ ulong n_fft_tft_prepare(ulong * _ilen, ulong * _olen, ulong ilen, ulong olen, n_
     n_fft_ctx_fit_depth(F, odepth);
 
     return FLINT_MAX(*_ilen, len);
+}
+
+FLINT_FORCE_INLINE
+ulong n_fft_itft_prepare(ulong * _iolen, ulong iolen, n_fft_ctx_t F)
+{
+    /* FIXME check: no function should do anything nontrivial when ilen==0 */
+    if (iolen == 0)
+    {
+        *_iolen = 0;
+        return iolen;
+    }
+
+    /* FIXME support this kind of base case or go directly to 4? */
+    if (iolen <= 2)
+    {
+        *_iolen = 2;
+        return 2;
+    }
+
+    const ulong iodepth = n_clog2_ge2(iolen);
+    const ulong len = UWORD(1) << iodepth;
+
+    *_iolen = _next_multiple_of_4(iolen);
+
+    n_fft_ctx_fit_depth(F, iodepth);
+
+    return len;
 }
 
 #endif  /* N_FFT_IMPL_H */

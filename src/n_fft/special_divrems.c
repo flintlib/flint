@@ -6,6 +6,7 @@
 /*---------------------------------------*/
 
 /* TODO bench different variants and choose fastest */
+/* TODO use N_MULMOD_PRECOMP_LAZY to make code more readable? */
 
 /* division by x**d - c, lazy_4_4 with precomputation */
 /* in [0, 4*n) | out [0, 4*n) | max < 4n */

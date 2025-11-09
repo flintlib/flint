@@ -208,6 +208,7 @@ void n_fft_idft_t(nn_ptr p, ulong depth, n_fft_ctx_t F);
 /* doc TODO */
 
 void n_fft_tft(nn_ptr p, ulong ilen, ulong olen, n_fft_ctx_t F);
+void n_fft_itft(nn_ptr p, ulong iolen, n_fft_ctx_t F);
 
 #ifdef __cplusplus
 }

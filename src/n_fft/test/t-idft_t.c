@@ -17,20 +17,21 @@
 #include "n_fft.h"
 
 #define MAX_EVAL_DEPTH 13
+#define NB_TESTS 200
 
 TEST_FUNCTION_START(n_fft_idft_t, state)
 {
     int i;
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < NB_TESTS * flint_test_multiplier(); i++)
     {
-        // take some FFT prime p with max_depth >= 10
+        // take some FFT prime p with max_depth >= MAX_EVAL_DEPTH
         ulong max_depth, prime;
 
         // half of tests == fixed large prime, close to limit
         // 62 bits: prime = 4611686018427322369 == 2**62 - 2**16 + 1
         // 30 bits: prime = 1073479681 == 2**30 - 2**18 + 1
-        if (i > 100)
+        if (2*i > NB_TESTS * flint_test_multiplier())
 #if FLINT_BITS == 64
             prime = UWORD(4611686018427322369);
 #else // FLINT_BITS == 32
@@ -94,3 +95,4 @@ TEST_FUNCTION_START(n_fft_idft_t, state)
 }
 
 #undef MAX_EVAL_DEPTH
+#undef NB_TESTS

@@ -12,24 +12,7 @@
 #ifndef N_FFT_MACROS_DFT_H
 #define N_FFT_MACROS_DFT_H
 
-#include "longlong.h"      /* for umul_ppmm */
-#include "ulong_extras.h"  /* for mulmod_shoup* functions */
-
-/*---------*/
-/* helpers */
-/*---------*/
-
-/** Shoup's modular multiplication with precomputation, lazy
- * (does not perform the excess correction step)
- *  --> computes either r or r+n and store it is res, where r = (a*b) % n
- *  --> a_pr is the precomputation for n, p_hi and p_lo are temporaries
- */
-#define N_MULMOD_PRECOMP_LAZY(res, a, b, a_pr, n)             \
-do {                                                          \
-    ulong p_hi, p_lo;                                         \
-    umul_ppmm(p_hi, p_lo, (a_pr), (b));                       \
-    res = (a) * (b) - p_hi * (n);                             \
-} while(0)
+#include "n_fft/impl.h"  /* for helper functions */
 
 /*------------------*/
 /* length 2, node 0 */

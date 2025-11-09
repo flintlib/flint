@@ -18,6 +18,9 @@
 #include "t-dft_t.c"
 #include "t-idft_t.c"
 #include "t-tft.c"
+#include "t-itft.c"
+/* #include "t-tft_t.c" */
+/* #include "t-itft_t.c" */
 
 /* Array of test functions ***************************************************/
 
@@ -30,7 +33,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_fft_dft_t),
     TEST_FUNCTION(n_fft_idft_t),
     TEST_FUNCTION(n_fft_tft),
-    /* TEST_FUNCTION(n_fft_itft), */
+    TEST_FUNCTION(n_fft_itft),
     /* TEST_FUNCTION(n_fft_tft_t), */
     /* TEST_FUNCTION(n_fft_itft_t), */
 };
