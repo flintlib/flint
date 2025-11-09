@@ -2612,23 +2612,32 @@ gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr v
 int
 gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+    if (len <= 0) return status;
+    status |= gr_one(GR_ENTRY(res, 0, sz), ctx);
+    if (len <= 1) return status;
+    status |= gr_set(GR_ENTRY(res, 1, sz), x, ctx);
+    if (len <= 2) return status;
+
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     gr_method_unary_op sqr = GR_UNARY_OP(ctx, SQR);
-    int status = GR_SUCCESS;
     slong i;
-    slong sz = ctx->sizeof_elem;;
 
-    for (i = 0; i < len; i++)
+    /* Prefer squaring for powers? */
+    if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_has_real_prec(ctx) == T_TRUE)
     {
-        if (i == 0)
-            status |= gr_one(GR_ENTRY(res, i, sz), ctx);
-        else if (i == 1)
-            status |= gr_set(GR_ENTRY(res, i, sz), x, ctx);
-        else if (i % 2 == 0)
-            status |= sqr(GR_ENTRY(res, i, sz), GR_ENTRY(res, i / 2, sz), ctx);
-        else
-            status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - 1, sz), x, ctx);
+        for (i = 2; i < len; i++)
+        {
+            if (i % 2 == 0)
+                status |= sqr(GR_ENTRY(res, i, sz), GR_ENTRY(res, i / 2, sz), ctx);
+            else
+                status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - 1, sz), x, ctx);
+        }
     }
+    else
+        for (i = 2; i < len; i++)
+            status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - 1, sz), x, ctx);
 
     return status;
 }
