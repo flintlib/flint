@@ -548,6 +548,7 @@ void fmpz_mod_mpoly_from_univar(
     _fmpz_mod_mpoly_from_univar(A, bits, B, var, ctx);
 }
 
+#if 0
 void fmpz_mod_mpoly_univar_set(
     fmpz_mod_mpoly_univar_t A,
     const fmpz_mod_mpoly_univar_t B,
@@ -565,6 +566,7 @@ void fmpz_mod_mpoly_univar_set(
 
     A->length = B->length;
 }
+#endif
 
 #define COEFF(A, i) ((void*)(A->coeffs + (i)*R->elem_size))
 

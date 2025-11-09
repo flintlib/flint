@@ -34,26 +34,26 @@ main(void)
         mpn_random2(xp, n);
         mpn_random2(yp, n);
 
-        TIMEIT_START
+        TIMEIT_START;
         __gmpn_mullo_n(rp, xp, yp, n);
-        TIMEIT_STOP_VALUES(__, t1)
+        TIMEIT_STOP_VALUES(__, t1);
 
-        TIMEIT_START
+        TIMEIT_START;
         flint_mpn_mul_n(rp, xp, yp, n);
-        TIMEIT_STOP_VALUES(__, t2)
+        TIMEIT_STOP_VALUES(__, t2);
 
         if (n >= 9)
         {
-            TIMEIT_START
+            TIMEIT_START;
             flint_mpn_mullow_basecase(rp, xp, yp, n);
-            TIMEIT_STOP_VALUES(__, t3)
+            TIMEIT_STOP_VALUES(__, t3);
         }
         else
             t3 = 0.0;
 
-        TIMEIT_START
+        TIMEIT_START;
         flint_mpn_mullow_n(rp, xp, yp, n);
-        TIMEIT_STOP_VALUES(__, t4)
+        TIMEIT_STOP_VALUES(__, t4);
 
         flint_printf("      %7.2fx       %7.2f       %7.2f\n", t1 / t4, t2 / t4, t3 / t4);
     }

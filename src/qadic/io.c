@@ -16,7 +16,7 @@
 
 /* printing *******************************************************************/
 
-int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const qadic_ctx_t ctx)
+static int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const qadic_ctx_t ctx)
 {
     const fmpz *p = (&ctx->pctx)->p;
 

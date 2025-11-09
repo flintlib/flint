@@ -11,11 +11,7 @@
 
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-slong
-acb_hypgeom_pfq_choose_n_max(acb_srcptr a, slong p,
-                         acb_srcptr b, slong q, const acb_t z,
-                         slong prec, slong n_max);
+#include "acb_hypgeom/impl.h"
 
 int
 acb_hypgeom_u_asymp_determine_region(const mag_t r,
@@ -62,7 +58,7 @@ acb_hypgeom_u_asymp_determine_region(const mag_t r,
 }
 
 /* computes the factors that are independent of n (all are upper bounds) */
-void
+static void
 acb_hypgeom_u_asymp_bound_factors(int * R, mag_t alpha,
     mag_t nu, mag_t sigma, mag_t rho, mag_t zinv,
     const acb_t a, const acb_t b, const acb_t z)
@@ -148,8 +144,7 @@ acb_hypgeom_u_asymp_bound_factors(int * R, mag_t alpha,
     acb_clear(t);
 }
 
-void
-acb_hypgeom_mag_chi(mag_t chi, ulong n)
+void acb_hypgeom_mag_chi(mag_t chi, ulong n)
 {
     mag_t p, q;
     ulong k;

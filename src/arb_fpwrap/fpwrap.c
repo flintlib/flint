@@ -21,7 +21,7 @@
 PUSH_OPTIONS
 OPTIMIZE_OSIZE
 
-int
+static int
 arb_accurate_enough_d(const arb_t x, int flags)
 {
     if (flags & FPWRAP_CORRECT_ROUNDING)
@@ -49,7 +49,7 @@ arb_accurate_enough_d(const arb_t x, int flags)
     return 0;
 }
 
-int
+static int
 acb_accurate_enough_d(const acb_t x, int flags)
 {
     if (flags & FPWRAP_CORRECT_ROUNDING)
@@ -174,7 +174,7 @@ typedef void (*acb_func_3_int)(acb_t, const acb_t, const acb_t, const acb_t, int
 typedef void (*acb_func_4_int)(acb_t, const acb_t, const acb_t, const acb_t, const acb_t, int, slong prec);
 
 
-int arb_fpwrap_double_1(double * res, arb_func_1 func, double x, int flags)
+static int arb_fpwrap_double_1(double * res, arb_func_1 func, double x, int flags)
 {
     arb_t arb_res, arb_x;
     slong wp;
@@ -205,7 +205,7 @@ int arb_fpwrap_double_1(double * res, arb_func_1 func, double x, int flags)
     return status;
 }
 
-int arb_fpwrap_double_2(double * res, arb_func_2 func, double x1, double x2, int flags)
+static int arb_fpwrap_double_2(double * res, arb_func_2 func, double x1, double x2, int flags)
 {
     arb_t arb_res, arb_x1, arb_x2;
     slong wp;
@@ -239,7 +239,7 @@ int arb_fpwrap_double_2(double * res, arb_func_2 func, double x1, double x2, int
     return status;
 }
 
-int arb_fpwrap_double_3(double * res, arb_func_3 func, double x1, double x2, double x3, int flags)
+static int arb_fpwrap_double_3(double * res, arb_func_3 func, double x1, double x2, double x3, int flags)
 {
     arb_t arb_res, arb_x1, arb_x2, arb_x3;
     slong wp;
@@ -276,7 +276,7 @@ int arb_fpwrap_double_3(double * res, arb_func_3 func, double x1, double x2, dou
     return status;
 }
 
-int arb_fpwrap_double_4(double * res, arb_func_4 func, double x1, double x2, double x3, double x4, int flags)
+static int arb_fpwrap_double_4(double * res, arb_func_4 func, double x1, double x2, double x3, double x4, int flags)
 {
     arb_t arb_res, arb_x1, arb_x2, arb_x3, arb_x4;
     slong wp;
@@ -316,7 +316,7 @@ int arb_fpwrap_double_4(double * res, arb_func_4 func, double x1, double x2, dou
     return status;
 }
 
-int arb_fpwrap_cdouble_1(complex_double * res, acb_func_1 func, complex_double x, int flags)
+static int arb_fpwrap_cdouble_1(complex_double * res, acb_func_1 func, complex_double x, int flags)
 {
     acb_t acb_res, acb_x;
     slong wp;
@@ -348,7 +348,7 @@ int arb_fpwrap_cdouble_1(complex_double * res, acb_func_1 func, complex_double x
     return status;
 }
 
-int arb_fpwrap_cdouble_2(complex_double * res, acb_func_2 func, complex_double x1, complex_double x2, int flags)
+static int arb_fpwrap_cdouble_2(complex_double * res, acb_func_2 func, complex_double x1, complex_double x2, int flags)
 {
     acb_t acb_res, acb_x1, acb_x2;
     slong wp;
@@ -383,7 +383,7 @@ int arb_fpwrap_cdouble_2(complex_double * res, acb_func_2 func, complex_double x
     return status;
 }
 
-int arb_fpwrap_cdouble_3(complex_double * res, acb_func_3 func, complex_double x1, complex_double x2, complex_double x3, int flags)
+static int arb_fpwrap_cdouble_3(complex_double * res, acb_func_3 func, complex_double x1, complex_double x2, complex_double x3, int flags)
 {
     acb_t acb_res, acb_x1, acb_x2, acb_x3;
     slong wp;
@@ -421,7 +421,7 @@ int arb_fpwrap_cdouble_3(complex_double * res, acb_func_3 func, complex_double x
     return status;
 }
 
-int arb_fpwrap_cdouble_4(complex_double * res, acb_func_4 func, complex_double x1, complex_double x2, complex_double x3, complex_double x4, int flags)
+static int arb_fpwrap_cdouble_4(complex_double * res, acb_func_4 func, complex_double x1, complex_double x2, complex_double x3, complex_double x4, int flags)
 {
     acb_t acb_res, acb_x1, acb_x2, acb_x3, acb_x4;
     slong wp;
@@ -462,7 +462,7 @@ int arb_fpwrap_cdouble_4(complex_double * res, acb_func_4 func, complex_double x
     return status;
 }
 
-int arb_fpwrap_double_1_int(double * res, arb_func_1_int func, double x, int intx, int flags)
+static int arb_fpwrap_double_1_int(double * res, arb_func_1_int func, double x, int intx, int flags)
 {
     arb_t arb_res, arb_x;
     slong wp;
@@ -493,7 +493,7 @@ int arb_fpwrap_double_1_int(double * res, arb_func_1_int func, double x, int int
     return status;
 }
 
-int arb_fpwrap_double_2_int(double * res, arb_func_2_int func, double x1, double x2, int intx, int flags)
+static int arb_fpwrap_double_2_int(double * res, arb_func_2_int func, double x1, double x2, int intx, int flags)
 {
     arb_t arb_res, arb_x1, arb_x2;
     slong wp;
@@ -527,7 +527,7 @@ int arb_fpwrap_double_2_int(double * res, arb_func_2_int func, double x1, double
     return status;
 }
 
-int arb_fpwrap_double_3_int(double * res, arb_func_3_int func, double x1, double x2, double x3, int intx, int flags)
+static int arb_fpwrap_double_3_int(double * res, arb_func_3_int func, double x1, double x2, double x3, int intx, int flags)
 {
     arb_t arb_res, arb_x1, arb_x2, arb_x3;
     slong wp;
@@ -564,7 +564,7 @@ int arb_fpwrap_double_3_int(double * res, arb_func_3_int func, double x1, double
     return status;
 }
 
-int arb_fpwrap_double_4_int(double * res, arb_func_4_int func, double x1, double x2, double x3, double x4, int intx, int flags)
+static int arb_fpwrap_double_4_int(double * res, arb_func_4_int func, double x1, double x2, double x3, double x4, int intx, int flags)
 {
     arb_t arb_res, arb_x1, arb_x2, arb_x3, arb_x4;
     slong wp;
@@ -604,7 +604,7 @@ int arb_fpwrap_double_4_int(double * res, arb_func_4_int func, double x1, double
     return status;
 }
 
-int arb_fpwrap_cdouble_1_int(complex_double * res, acb_func_1_int func, complex_double x, int intx, int flags)
+static int arb_fpwrap_cdouble_1_int(complex_double * res, acb_func_1_int func, complex_double x, int intx, int flags)
 {
     acb_t acb_res, acb_x;
     slong wp;
@@ -636,7 +636,7 @@ int arb_fpwrap_cdouble_1_int(complex_double * res, acb_func_1_int func, complex_
     return status;
 }
 
-int arb_fpwrap_cdouble_2_int(complex_double * res, acb_func_2_int func, complex_double x1, complex_double x2, int intx, int flags)
+static int arb_fpwrap_cdouble_2_int(complex_double * res, acb_func_2_int func, complex_double x1, complex_double x2, int intx, int flags)
 {
     acb_t acb_res, acb_x1, acb_x2;
     slong wp;
@@ -671,7 +671,7 @@ int arb_fpwrap_cdouble_2_int(complex_double * res, acb_func_2_int func, complex_
     return status;
 }
 
-int arb_fpwrap_cdouble_3_int(complex_double * res, acb_func_3_int func, complex_double x1, complex_double x2, complex_double x3, int intx, int flags)
+static int arb_fpwrap_cdouble_3_int(complex_double * res, acb_func_3_int func, complex_double x1, complex_double x2, complex_double x3, int intx, int flags)
 {
     acb_t acb_res, acb_x1, acb_x2, acb_x3;
     slong wp;
@@ -709,7 +709,7 @@ int arb_fpwrap_cdouble_3_int(complex_double * res, acb_func_3_int func, complex_
     return status;
 }
 
-int arb_fpwrap_cdouble_4_int(complex_double * res, acb_func_4_int func, complex_double x1, complex_double x2, complex_double x3, complex_double x4, int intx, int flags)
+static int arb_fpwrap_cdouble_4_int(complex_double * res, acb_func_4_int func, complex_double x1, complex_double x2, complex_double x3, complex_double x4, int intx, int flags)
 {
     acb_t acb_res, acb_x1, acb_x2, acb_x3, acb_x4;
     slong wp;
@@ -1436,7 +1436,7 @@ int arb_fpwrap_double_legendre_root(double * res1, double * res2, ulong n, ulong
     return status;
 }
 
-int _arb_fpwrap_double_airy_zero(double * res, ulong n, int which, int flags)
+static int _arb_fpwrap_double_airy_zero(double * res, ulong n, int which, int flags)
 {
     fmpz_t t;
     arb_t arb_res;

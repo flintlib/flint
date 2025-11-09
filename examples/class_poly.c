@@ -33,11 +33,11 @@ int main(int argc, char *argv[])
 
     fmpz_poly_init(res);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     acb_modular_hilbert_class_poly(res, D);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
 
     if (FLINT_ABS(D) <= 100)
     {

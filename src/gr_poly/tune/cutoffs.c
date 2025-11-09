@@ -266,15 +266,15 @@ get_profile(gr_ctx_t ctx, slong len)
 
     SETUP
 
-    TIMEIT_START
+    TIMEIT_START;
     CASE_A
-    TIMEIT_STOP_VALUES3(tcpu, twall, 10.0)
+    TIMEIT_STOP_VALUES3(tcpu, twall, 10.0);
     (void) tcpu;
     tbase = twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     CASE_B
-    TIMEIT_STOP_VALUES3(tcpu, twall, 10.0)
+    TIMEIT_STOP_VALUES3(tcpu, twall, 10.0);
     (void) tcpu;
     tnew = twall;
 

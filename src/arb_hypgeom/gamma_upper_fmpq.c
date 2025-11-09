@@ -45,7 +45,7 @@ mag_pow_fmpq_fast(mag_t res, const mag_t x, const fmpq_t e)
     fmpz_clear(b);
 }
 
-slong
+static slong
 _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_1(mag_t err, const fmpq_t a, const arb_t z, int prefactor, const mag_t abs_tol)
 {
     slong N, aa, ab;
@@ -134,18 +134,6 @@ slong
 _arb_hypgeom_gamma_upper_fmpq_inf_choose_N(mag_t err, const fmpq_t a, const arb_t z, const mag_t abs_tol)
 {
     return _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_1(err, a, z, 1, abs_tol);
-}
-
-slong
-_arb_hypgeom_gamma_upper_fmpq_inf_choose_N_rel(mag_t err, const fmpq_t a, const arb_t z, slong prec)
-{
-    mag_t tol;
-    slong N;
-    mag_init(tol);
-    mag_set_ui_2exp_si(tol, 1, -prec);
-    N = _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_1(err, a, z, 0, tol);
-    mag_clear(tol);
-    return N;
 }
 
 static void

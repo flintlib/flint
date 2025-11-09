@@ -14,6 +14,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 #include "nmod_poly_factor.h"
 
 static ulong
@@ -39,8 +40,7 @@ n_multiplicative_order(ulong x, ulong p, ulong pinv, n_factor_t * p1fac)
     return m;
 }
 
-int
-nmod_poly_irreducible_binomial(nmod_poly_t res, ulong n)
+int nmod_poly_irreducible_binomial(nmod_poly_t res, ulong n)
 {
     ulong q = res->mod.n;
     ulong e, a, qinv;
@@ -184,7 +184,7 @@ static ulong trinomial_sieve_limit(ulong p, ulong n)
 /* Return the product of all irreducible polynomial of degree r. */
 /* Well-known fact: x^(p^r) - x contains all factors of degree dividing r,
    so we just need to divide out the smaller products. */
-void
+static void
 nmod_poly_product_all_irreducibles_deg(nmod_poly_t res, ulong r)
 {
     ulong k, d, step, p = res->mod.n;
@@ -231,7 +231,7 @@ nmod_poly_product_all_irreducibles_deg(nmod_poly_t res, ulong r)
 
 /* Hack: nmod_poly_gcd is not optimised for unbalanced GCD with the smaller
    operand sparse, so we deal with this here. */
-void
+static void
 _nmod_poly_inplace_rem_sparse_monic(nn_ptr R,
         slong lenA, nn_srcptr Bcoeffs, const slong * Bexps, slong nzB, slong lenB, nmod_t mod)
 {
@@ -251,7 +251,7 @@ _nmod_poly_inplace_rem_sparse_monic(nn_ptr R,
     }
 }
 
-void
+static void
 nmod_poly_gcd_with_sparse(nmod_poly_t res, const nmod_poly_t A, const nmod_poly_t B,
         nn_srcptr Bcoeffs, const slong * Bexps, slong nzB)
 {
@@ -279,7 +279,7 @@ nmod_poly_gcd_with_sparse(nmod_poly_t res, const nmod_poly_t A, const nmod_poly_
 }
 
 /* Discriminant of x^n + ax^k + b  mod p > 2 (Swan's formula). */
-ulong
+static ulong
 _nmod_poly_trinomial_discriminant(ulong n, ulong k, ulong a, ulong b, nmod_t mod)
 {
     ulong d, n1, k1;
@@ -488,8 +488,7 @@ static const uint16_t no_trinomial_mod17[] = {
     231, 375, 675, 717, 1941, 0
 }; */
 
-int
-nmod_poly_irreducible_trinomial(nmod_poly_t res, ulong n)
+int nmod_poly_irreducible_trinomial(nmod_poly_t res, ulong n)
 {
     ulong p = res->mod.n;
     nmod_t mod = res->mod;
@@ -675,8 +674,7 @@ cleanup:
     return found;
 }
 
-int
-nmod_poly_irreducible_tetranomial(nmod_poly_t res, ulong n)
+int nmod_poly_irreducible_tetranomial(nmod_poly_t res, ulong n)
 {
     ulong p = res->mod.n;
     nmod_t mod = res->mod;
@@ -802,8 +800,7 @@ cleanup:
 }
 
 /* Only intended for GF(2), so we only bother with coefficients 1 */
-int
-nmod_poly_irreducible_pentanomial(nmod_poly_t res, ulong n)
+int nmod_poly_irreducible_pentanomial(nmod_poly_t res, ulong n)
 {
     ulong p = res->mod.n;
     nmod_t mod = res->mod;

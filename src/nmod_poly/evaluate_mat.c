@@ -39,7 +39,7 @@ nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, ulong c)
         }
 }
 
-void
+static void
 _nmod_poly_evaluate_mat_horner(nmod_mat_t dest, nn_srcptr poly, slong len, const nmod_mat_t c)
 {
     slong m = len-1;

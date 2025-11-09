@@ -18,7 +18,7 @@
 #define EXP1 2.7182818284590452354
 #define INV_LOG2 1.4426950408889634074
 
-void
+static void
 arb_hypgeom_erf_one_eps(arb_t res, const arb_t z)
 {
     mag_t t, u;
@@ -52,7 +52,7 @@ arb_hypgeom_erf_one_eps(arb_t res, const arb_t z)
     mag_clear(u);
 }
 
-void
+static void
 arb_hypgeom_erf_propagated_error(mag_t err, const arb_t z)
 {
     mag_t x;
@@ -75,7 +75,7 @@ arb_hypgeom_erf_propagated_error(mag_t err, const arb_t z)
     mag_clear(x);
 }
 
-void
+static void
 arb_hypgeom_erf_1f1b(arb_t res, const arb_t z, slong prec)
 {
     arb_t t, u;
@@ -128,7 +128,7 @@ arb_hypgeom_erf_1f1b(arb_t res, const arb_t z, slong prec)
     mag_clear(err);
 }
 
-void
+static void
 arb_hypgeom_erf_asymp(arb_t res, const arb_t z, slong N, int complementary, slong prec, slong prec2)
 {
     arb_t t, u;
@@ -195,7 +195,7 @@ arb_hypgeom_erf_asymp(arb_t res, const arb_t z, slong N, int complementary, slon
     mag_clear(tm);
 }
 
-void
+static void
 arb_hypgeom_erf_1f1(arb_t res, const arb_t z, slong prec, slong wp)
 {
     if (arb_rel_accuracy_bits(z) >= wp)
@@ -243,7 +243,7 @@ arb_extract_bits(arb_t t, const arb_t z, slong b)
 
 /* Compute Gamma(a,z) using the bit-burst algorithm.
    Todo: allow passing precomputed Gamma(a) as input. */
-void
+static void
 _arb_gamma_upper_fmpq_bb(arb_t res, const fmpq_t a, const arb_t z, const mag_t abs_tol, slong prec_lower, slong prec_upper)
 {
     slong start_bits, bits, wp, NN;

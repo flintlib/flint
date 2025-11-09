@@ -11,7 +11,7 @@
 
 #include "acb.h"
 
-int
+static int
 _acb_lambertw_check_branch(const acb_t w, const fmpz_t k, slong prec)
 {
     arb_t t, u, v, a, b;

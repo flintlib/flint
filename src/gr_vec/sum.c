@@ -12,6 +12,7 @@
 #include "thread_pool.h"
 #include "thread_support.h"
 #include "gr_vec.h"
+#include "gr_vec/impl.h"
 
 typedef struct
 {

@@ -16,17 +16,18 @@
 #include "qqbar.h"
 #include "fmpzi.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
 
-int
+static int
 _gr_fmpzi_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Gaussian integer ring (fmpzi)");
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
 {
     if (i != 0)
@@ -40,19 +41,19 @@ _gr_fmpzi_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_fmpzi_init(fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_init(x);
 }
 
-void
+static void
 _gr_fmpzi_clear(fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_clear(x);
 }
 
-void
+static void
 _gr_fmpzi_swap(fmpzi_t x, fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_t t;
@@ -61,14 +62,14 @@ _gr_fmpzi_swap(fmpzi_t x, fmpzi_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 _gr_fmpzi_set_shallow(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
 /* todo: limits */
-int
+static int
 _gr_fmpzi_randtest(fmpzi_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     switch (n_randint(state, 4))
@@ -83,7 +84,7 @@ _gr_fmpzi_randtest(fmpzi_t res, flint_rand_t state, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_write(gr_stream_t out, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(fmpzi_imagref(x)))
@@ -123,21 +124,21 @@ _gr_fmpzi_write(gr_stream_t out, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_zero(fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_zero(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_one(fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_one(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_set_si(fmpzi_t res, slong v, const gr_ctx_t ctx)
 {
     fmpz_set_si(fmpzi_realref(res), v);
@@ -145,7 +146,7 @@ _gr_fmpzi_set_si(fmpzi_t res, slong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_set_ui(fmpzi_t res, ulong v, const gr_ctx_t ctx)
 {
     fmpz_set_ui(fmpzi_realref(res), v);
@@ -153,7 +154,7 @@ _gr_fmpzi_set_ui(fmpzi_t res, ulong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_set_fmpz(fmpzi_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     fmpz_set(fmpzi_realref(res), v);
@@ -161,7 +162,7 @@ _gr_fmpzi_set_fmpz(fmpzi_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_set_fmpq(fmpzi_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     if (fmpz_is_one(fmpq_denref(v)))
@@ -176,7 +177,7 @@ _gr_fmpzi_set_fmpq(fmpzi_t res, const fmpq_t v, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpzi_set(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_set(res, x);
@@ -184,7 +185,7 @@ _gr_fmpzi_set(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 }
 
 /* todo: move */
-int
+static int
 fmpzi_set_qqbar(fmpzi_t res, const qqbar_t x)
 {
     if (qqbar_is_integer(x))
@@ -220,7 +221,7 @@ fmpzi_set_qqbar(fmpzi_t res, const qqbar_t x)
     }
 }
 
-int
+static int
 _gr_fmpzi_set_d(fmpzi_t res, double x, const gr_ctx_t ctx)
 {
     if (x != x || x == HUGE_VAL || x == -HUGE_VAL)
@@ -234,7 +235,7 @@ _gr_fmpzi_set_d(fmpzi_t res, double x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_set_other(fmpzi_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -256,7 +257,7 @@ _gr_fmpzi_set_other(fmpzi_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx
     return GR_UNABLE;
 }
 
-int
+static int
 _gr_fmpzi_get_fmpz(fmpz_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_is_zero(fmpzi_imagref(x)))
@@ -266,7 +267,7 @@ _gr_fmpzi_get_fmpz(fmpz_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_get_fmpq(fmpq_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_is_zero(fmpzi_imagref(x)))
@@ -276,10 +277,7 @@ _gr_fmpzi_get_fmpq(fmpq_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* todo: qqbar should call an fmpzi method rather than vice versa */
-void qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x);
-
-int
+static int
 _gr_fmpzi_get_fexpr(fexpr_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     qqbar_t t;
@@ -291,7 +289,7 @@ _gr_fmpzi_get_fexpr(fexpr_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fmpzi_get_ui(ulong * res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_is_zero(fmpzi_imagref(x)))
@@ -304,7 +302,7 @@ _gr_fmpzi_get_ui(ulong * res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_get_si(slong * res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_is_zero(fmpzi_imagref(x)))
@@ -317,7 +315,7 @@ _gr_fmpzi_get_si(slong * res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_get_d(double * res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_is_zero(fmpzi_imagref(x)))
@@ -327,45 +325,45 @@ _gr_fmpzi_get_d(double * res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_fmpzi_is_zero(const fmpzi_t x, const gr_ctx_t ctx)
 {
     return fmpzi_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpzi_is_one(const fmpzi_t x, const gr_ctx_t ctx)
 {
     return fmpzi_is_one(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpzi_is_neg_one(const fmpzi_t x, const gr_ctx_t ctx)
 {
     return (fmpz_is_zero(fmpzi_imagref(x)) && *fmpzi_realref(x) == -1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpzi_equal(const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     return fmpzi_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fmpzi_neg(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_neg(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_add(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_add(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_add_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_add_si(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -373,7 +371,7 @@ _gr_fmpzi_add_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_add_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_add_ui(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -381,7 +379,7 @@ _gr_fmpzi_add_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_add_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_add(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -389,14 +387,14 @@ _gr_fmpzi_add_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t 
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_sub(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_sub(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_sub_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_sub_si(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -404,7 +402,7 @@ _gr_fmpzi_sub_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_sub_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_sub_ui(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -412,7 +410,7 @@ _gr_fmpzi_sub_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_sub_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_sub(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -420,14 +418,14 @@ _gr_fmpzi_sub_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t 
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_mul(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_mul(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_mul_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_mul_ui(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -435,7 +433,7 @@ _gr_fmpzi_mul_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_mul_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_mul_si(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -443,7 +441,7 @@ _gr_fmpzi_mul_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_mul_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_mul(fmpzi_realref(res), fmpzi_realref(x), y);
@@ -454,7 +452,7 @@ _gr_fmpzi_mul_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t 
 
 /* todo: addmul, submul */
 
-int
+static int
 _gr_fmpzi_mul_two(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpz_mul_2exp(fmpzi_realref(res), fmpzi_realref(x), 1);
@@ -462,14 +460,14 @@ _gr_fmpzi_mul_two(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_sqr(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpzi_mul(res, x, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_mul_2exp_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
 {
     if (y >= 0)
@@ -508,7 +506,7 @@ _gr_fmpzi_mul_2exp_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpzi_mul_2exp_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(x))
@@ -523,7 +521,7 @@ _gr_fmpzi_mul_2exp_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_c
     return _gr_fmpzi_mul_2exp_si(res, x, *y, ctx);
 }
 
-int
+static int
 _gr_fmpzi_inv(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (fmpzi_is_unit(x))
@@ -543,7 +541,7 @@ _gr_fmpzi_inv(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 
 /* todo: division optimizations (real/imag values, divexact, divisibility checking...) */
 
-int
+static int
 _gr_fmpzi_div(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(y))
@@ -564,7 +562,7 @@ _gr_fmpzi_div(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpzi_divexact(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(y))
@@ -578,7 +576,7 @@ _gr_fmpzi_divexact(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t
     }
 }
 
-int
+static int
 _gr_fmpzi_divexact_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -593,7 +591,7 @@ _gr_fmpzi_divexact_ui(fmpzi_t res, const fmpzi_t x, ulong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpzi_divexact_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -608,7 +606,7 @@ _gr_fmpzi_divexact_si(fmpzi_t res, const fmpzi_t x, slong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpzi_divexact_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -623,13 +621,13 @@ _gr_fmpzi_divexact_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t y, const gr_c
     }
 }
 
-truth_t
+static truth_t
 _gr_fmpzi_is_invertible(const fmpzi_t x, const gr_ctx_t ctx)
 {
     return fmpzi_is_unit(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpzi_divides(const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_t q, r;
@@ -652,7 +650,7 @@ _gr_fmpzi_divides(const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
     return result;
 }
 
-int
+static int
 _gr_fmpzi_euclidean_div(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(y))
@@ -669,7 +667,7 @@ _gr_fmpzi_euclidean_div(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_
     }
 }
 
-int
+static int
 _gr_fmpzi_euclidean_rem(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(y))
@@ -686,7 +684,7 @@ _gr_fmpzi_euclidean_rem(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_
     }
 }
 
-int
+static int
 _gr_fmpzi_euclidean_divrem(fmpzi_t res1, fmpzi_t res2, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(y))
@@ -700,14 +698,14 @@ _gr_fmpzi_euclidean_divrem(fmpzi_t res1, fmpzi_t res2, const fmpzi_t x, const fm
     }
 }
 
-int
+static int
 _gr_fmpzi_gcd(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_gcd(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_lcm(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(x) || fmpzi_is_zero(y))
@@ -734,14 +732,14 @@ _gr_fmpzi_lcm(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_pow_ui(fmpzi_t res, const fmpzi_t x, ulong exp, const gr_ctx_t ctx)
 {
     fmpzi_pow_ui(res, x, exp);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_pow_si(fmpzi_t res, const fmpzi_t x, slong exp, const gr_ctx_t ctx)
 {
     if (exp < 0)
@@ -755,7 +753,7 @@ _gr_fmpzi_pow_si(fmpzi_t res, const fmpzi_t x, slong exp, const gr_ctx_t ctx)
     return _gr_fmpzi_pow_ui(res, x, exp, ctx);
 }
 
-int
+static int
 _gr_fmpzi_pow_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t exp, const gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*exp))
@@ -787,7 +785,7 @@ _gr_fmpzi_pow_fmpz(fmpzi_t res, const fmpzi_t x, const fmpz_t exp, const gr_ctx_
     }
 }
 
-int
+static int
 _gr_fmpzi_pow(fmpzi_t res, const fmpzi_t x, const fmpzi_t exp, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(fmpzi_imagref(exp)))
@@ -818,7 +816,7 @@ _gr_fmpzi_pow(fmpzi_t res, const fmpzi_t x, const fmpzi_t exp, const gr_ctx_t ct
 }
 
 /*
-int
+static int
 _gr_fmpzi_pow_fmpq(fmpzi_t res, const fmpzi_t x, const fmpq_t exp, const gr_ctx_t ctx)
 {
     if (fmpz_is_one(fmpq_denref(exp)))
@@ -843,7 +841,7 @@ _gr_fmpzi_pow_fmpq(fmpzi_t res, const fmpzi_t x, const fmpq_t exp, const gr_ctx_
 */
 
 /*
-truth_t
+static truth_t
 _gr_fmpzi_is_square(const fmpzi_t x, const gr_ctx_t ctx)
 {
     return fmpzi_is_square(x) ? T_TRUE : T_FALSE;
@@ -865,7 +863,7 @@ _gr_fmpzi_abs(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 }
 */
 
-int
+static int
 _gr_fmpzi_i(fmpzi_t res, const gr_ctx_t ctx)
 {
     fmpz_zero(fmpzi_realref(res));
@@ -873,7 +871,7 @@ _gr_fmpzi_i(fmpzi_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_conj(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpz_set(fmpzi_realref(res), fmpzi_realref(x));
@@ -881,7 +879,7 @@ _gr_fmpzi_conj(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_re(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpz_set(fmpzi_realref(res), fmpzi_realref(x));
@@ -889,7 +887,7 @@ _gr_fmpzi_re(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_im(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
 {
     fmpz_set(fmpzi_realref(res), fmpzi_imagref(x));
@@ -897,7 +895,7 @@ _gr_fmpzi_im(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpzi_canonical_associate(fmpzi_t ux, fmpzi_t u, const fmpzi_t x, const gr_ctx_t ctx)
 {
     if (fmpzi_is_zero(x))
@@ -927,7 +925,7 @@ _gr_fmpzi_canonical_associate(fmpzi_t ux, fmpzi_t u, const fmpzi_t x, const gr_c
 
 #define MUL_REORDER_CUTOFF 30
 
-int
+static int
 _gr_fmpzi_poly_mullow(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong n, gr_ctx_t ctx)
 {
     if (len1 < MUL_REORDER_CUTOFF || len2 < MUL_REORDER_CUTOFF || n < MUL_REORDER_CUTOFF)

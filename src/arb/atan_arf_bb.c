@@ -54,7 +54,7 @@ bs_num_terms(slong mag, slong prec)
    together with absolute error err. With an initial inversion
    if xmag > 0.
 */
-void
+static void
 arb_atan_bb_reduce(fmpz_t res, mag_t err, const arf_t x, slong xmag, slong r, slong prec)
 {
     int inexact;

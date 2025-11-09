@@ -17,6 +17,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 #include "nmod_mpoly_factor.h"
+#include "fmpz_mpoly_factor.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 typedef struct {
@@ -250,7 +251,7 @@ static void fmpz_mpoly_fmpz_mod_coeffs(
     _fmpz_mod_vec_set_fmpz_vec(EH->coeffs, Acoeffs, Alen, fpctx);
 }
 
-ulong n_poly_mod_zip_eval_cur_inc_coeff(
+static ulong n_poly_mod_zip_eval_cur_inc_coeff(
     n_poly_t Acur,
     n_poly_t Ainc,
     n_poly_t Acoeff,
@@ -260,7 +261,7 @@ ulong n_poly_mod_zip_eval_cur_inc_coeff(
                                                             Acur->length, ctx);
 }
 
-void fmpz_mod_poly_zip_eval_cur_inc_coeff(
+static void fmpz_mod_poly_zip_eval_cur_inc_coeff(
     fmpz_t e,
     fmpz_mod_poly_t Acur,
     fmpz_mod_poly_t Ainc,
@@ -375,7 +376,7 @@ static void fmpz_mpoly2_eval_fmpz_mod(
     secret: subdegs[0] is not used
 */
 
-void nmod_mpoly_bma_interpolate_alpha_powers(
+static void nmod_mpoly_bma_interpolate_alpha_powers(
     ulong * out,
     ulong w,
     slong m,
@@ -389,7 +390,7 @@ void nmod_mpoly_bma_interpolate_alpha_powers(
         out[j - 1] = nmod_pow_ui(out[j], Ictx->subdegs[j], fpctx);
 }
 
-void fmpz_mod_mpoly_bma_interpolate_alpha_powers(
+static void fmpz_mod_mpoly_bma_interpolate_alpha_powers(
     fmpz * out,
     const fmpz_t w,
     slong m,
@@ -404,7 +405,7 @@ void fmpz_mod_mpoly_bma_interpolate_alpha_powers(
 }
 
 
-void nmod_bma_mpoly_init(nmod_bma_mpoly_t A)
+static void nmod_bma_mpoly_init(nmod_bma_mpoly_t A)
 {
     A->length = 0;
     A->alloc = 0;
@@ -413,7 +414,7 @@ void nmod_bma_mpoly_init(nmod_bma_mpoly_t A)
     A->pointcount = 0;
 }
 
-void nmod_bma_mpoly_reset_prime(
+static void nmod_bma_mpoly_reset_prime(
     nmod_bma_mpoly_t A,
     nmod_t fpctx)
 {
@@ -423,7 +424,7 @@ void nmod_bma_mpoly_reset_prime(
 }
 
 
-void nmod_bma_mpoly_clear(nmod_bma_mpoly_t A)
+static void nmod_bma_mpoly_clear(nmod_bma_mpoly_t A)
 {
     slong i;
     for (i = 0; i < A->alloc; i++)
@@ -438,7 +439,7 @@ void nmod_bma_mpoly_clear(nmod_bma_mpoly_t A)
 }
 
 
-void nmod_bma_mpoly_fit_length(
+static void nmod_bma_mpoly_fit_length(
     nmod_bma_mpoly_t A,
     slong length,
     nmod_t fpctx)
@@ -459,14 +460,14 @@ void nmod_bma_mpoly_fit_length(
     }
 }
 
-void nmod_bma_mpoly_zero(nmod_bma_mpoly_t L)
+static void nmod_bma_mpoly_zero(nmod_bma_mpoly_t L)
 {
     L->length = 0;
     L->pointcount = 0;
 }
 
 
-int nmod_bma_mpoly_reduce(nmod_bma_mpoly_t L)
+static int nmod_bma_mpoly_reduce(nmod_bma_mpoly_t L)
 {
     slong i;
     int changed;
@@ -483,7 +484,7 @@ int nmod_bma_mpoly_reduce(nmod_bma_mpoly_t L)
 }
 
 
-void nmod_bma_mpoly_add_point(
+static void nmod_bma_mpoly_add_point(
     nmod_bma_mpoly_t L,
     const n_polyun_t A,
     nmod_t fpctx)
@@ -858,7 +859,7 @@ cleanup:
 
 
 
-int nmod_bma_mpoly_get_fmpz_mpoly2(
+static int nmod_bma_mpoly_get_fmpz_mpoly2(
     fmpz_mpoly_t A,
     n_poly_t Amarks,
     const fmpz_mpoly_ctx_t ctx,
@@ -924,7 +925,7 @@ cleanup:
 }
 
 
-int fmpz_mod_bma_mpoly_get_fmpz_mpoly2(
+static int fmpz_mod_bma_mpoly_get_fmpz_mpoly2(
     fmpz_mpoly_t A,
     n_poly_t Amarks,
     const fmpz_mpoly_ctx_t ctx,
@@ -992,7 +993,7 @@ cleanup:
 
 
 
-void fmpz_mod_bma_mpoly_init(fmpz_mod_bma_mpoly_t A)
+static void fmpz_mod_bma_mpoly_init(fmpz_mod_bma_mpoly_t A)
 {
     A->length = 0;
     A->alloc = 0;
@@ -1002,7 +1003,7 @@ void fmpz_mod_bma_mpoly_init(fmpz_mod_bma_mpoly_t A)
 }
 
 
-void fmpz_mod_bma_mpoly_clear(
+static void fmpz_mod_bma_mpoly_clear(
     fmpz_mod_bma_mpoly_t A,
     const fmpz_mod_ctx_t fpctx)
 {
@@ -1016,7 +1017,7 @@ void fmpz_mod_bma_mpoly_clear(
 }
 
 
-void fmpz_mod_bma_mpoly_fit_length(
+static void fmpz_mod_bma_mpoly_fit_length(
     fmpz_mod_bma_mpoly_t A,
     slong length,
     const fmpz_mod_ctx_t fpctx)
@@ -1038,13 +1039,13 @@ void fmpz_mod_bma_mpoly_fit_length(
     }
 }
 
-void fmpz_mod_bma_mpoly_zero(fmpz_mod_bma_mpoly_t L)
+static void fmpz_mod_bma_mpoly_zero(fmpz_mod_bma_mpoly_t L)
 {
     L->length = 0;
     L->pointcount = 0;
 }
 
-int fmpz_mod_bma_mpoly_reduce(fmpz_mod_bma_mpoly_t L, const fmpz_mod_ctx_t fpctx)
+static int fmpz_mod_bma_mpoly_reduce(fmpz_mod_bma_mpoly_t L, const fmpz_mod_ctx_t fpctx)
 {
     slong i;
     int changed;
@@ -1176,7 +1177,7 @@ add_same_exp:
         x_(n-1) = x ^ (1)
     a univariate in ZZ[x] remains. Return the content of this poly.
 */
-void _fmpz_mpoly_ksub_content(
+static void _fmpz_mpoly_ksub_content(
     fmpz_t content,
     const fmpz * Acoeffs,
     const ulong * Aexps,
@@ -1461,7 +1462,7 @@ static int zip_solve(
 }
 
 
-int _fmpz_vec_crt_nmod(
+static int _fmpz_vec_crt_nmod(
     flint_bitcnt_t * maxbits_,
     fmpz * a,
     fmpz_t am,

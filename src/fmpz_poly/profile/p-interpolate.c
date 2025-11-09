@@ -16,7 +16,6 @@
 #include "fmpz_poly.h"
 #include "profiler.h"
 
-
 #undef TIMEIT_END_REPEAT
 #define TIMEIT_END_REPEAT(__timer, __reps) \
             } \
@@ -25,9 +24,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
-
-
+    } while (0)
 
 typedef void (*interpolate)(fmpz_poly_t, const fmpz *, const fmpz *, slong);
 
@@ -125,15 +122,15 @@ sample(double * t_newton, double * t_multi_mod, slong fbits, slong n, interpolat
 
     fmpz_poly_evaluate_fmpz_vec(y, f, x, n);
 
-    TIMEIT_START
+    TIMEIT_START;
     f1(f, x, y, n);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
     (void) tcpu;
     *t_newton = twall;
 
-    TIMEIT_START
+    TIMEIT_START;
     f2(g, x, y, n);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
     (void) tcpu;
     *t_multi_mod = twall;
 
@@ -146,7 +143,7 @@ sample(double * t_newton, double * t_multi_mod, slong fbits, slong n, interpolat
     flint_rand_clear(state);
 }
 
-int main()
+int main(void)
 {
     double t1, t2;
     slong fbits, n;

@@ -550,11 +550,12 @@ fi
 # architecture specifics
 ################################################################################
 
-if test "$enable_fast_build" = "no";
+gcc_cflags="-O3"
+if test "$enable_fast_build" = "yes";
 then
-    gcc_cflags="-O3 "
+    gcc_cflags="-O1"
 fi
-gcc_cflags="$gcc_cflags-pedantic -std=c11"
+gcc_cflags="$gcc_cflags -pedantic -std=c11"
 gcc_warnings="-Wall -Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wmissing-prototypes"
 
 dnl We only try to provide specifics for those systems that currently supports

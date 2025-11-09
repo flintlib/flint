@@ -11,7 +11,7 @@
 
 #include "arb.h"
 
-void
+static void
 arb_sinh_cosh_wide(arb_t s, arb_t c, const arb_t x, slong prec)
 {
     mag_t t, u, v, w;

@@ -10,11 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
-
-int gr_generic_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx);
 
 /* todo: use dot products */
 int

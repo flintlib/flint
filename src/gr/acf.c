@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "double_extras.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "arb_fmpz_poly.h"
 #include "acf.h"
 #include "acb.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -29,7 +31,7 @@ gr_acf_ctx;
 #define ACF_CTX_PREC(ring_ctx) (((gr_acf_ctx *)((ring_ctx)))->prec)
 #define ACF_CTX_RND(ring_ctx) (((gr_acf_ctx *)((ring_ctx)))->rnd)
 
-int _gr_acf_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+static int _gr_acf_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
     prec = FLINT_MAX(prec, 2);
     prec = FLINT_MIN(prec, WORD_MAX / 8);
@@ -38,13 +40,13 @@ int _gr_acf_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
     return GR_SUCCESS;
 }
 
-int _gr_acf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
+static int _gr_acf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 {
     *res = ACF_CTX_PREC(ctx);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Complex floating-point numbers (acf, prec = ");
@@ -53,19 +55,19 @@ _gr_acf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_acf_init(acf_t x, const gr_ctx_t ctx)
 {
     acf_init(x);
 }
 
-void
+static void
 _gr_acf_clear(acf_t x, const gr_ctx_t ctx)
 {
     acf_clear(x);
 }
 
-void
+static void
 _gr_acf_swap(acf_t x, acf_t y, const gr_ctx_t ctx)
 {
     acf_t t;
@@ -74,14 +76,14 @@ _gr_acf_swap(acf_t x, acf_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 _gr_acf_set_shallow(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
 /* todo: limits */
-int
+static int
 _gr_acf_randtest(acf_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     arf_randtest(acf_realref(res), state, ACF_CTX_PREC(ctx), 10);
@@ -90,7 +92,7 @@ _gr_acf_randtest(acf_t res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 /* todo */
-int
+static int
 _gr_acf_write(gr_stream_t out, const acf_t x, const gr_ctx_t ctx)
 {
     slong digits = ACF_CTX_PREC(ctx) * 0.30102999566398 + 1;
@@ -128,7 +130,7 @@ _gr_acf_write(gr_stream_t out, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_zero(acf_t x, const gr_ctx_t ctx)
 {
     arf_zero(acf_realref(x));
@@ -136,7 +138,7 @@ _gr_acf_zero(acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_one(acf_t x, const gr_ctx_t ctx)
 {
     arf_one(acf_realref(x));
@@ -144,7 +146,7 @@ _gr_acf_one(acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_set_si(acf_t res, slong v, const gr_ctx_t ctx)
 {
     arf_set_round_si(acf_realref(res), v, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -152,7 +154,7 @@ _gr_acf_set_si(acf_t res, slong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_set_ui(acf_t res, ulong v, const gr_ctx_t ctx)
 {
     arf_set_round_ui(acf_realref(res), v, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -160,7 +162,7 @@ _gr_acf_set_ui(acf_t res, ulong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_set_fmpz(acf_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     arf_set_round_fmpz(acf_realref(res), v, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -168,7 +170,7 @@ _gr_acf_set_fmpz(acf_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_set_fmpq(acf_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     arf_set_fmpq(acf_realref(res), v, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -176,7 +178,7 @@ _gr_acf_set_fmpq(acf_t res, const fmpq_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_set_d(acf_t res, double x, const gr_ctx_t ctx)
 {
     arf_set_d(acf_realref(res), x);
@@ -185,7 +187,7 @@ _gr_acf_set_d(acf_t res, double x, const gr_ctx_t ctx)
 }
 
 /* todo: set_round? */
-int
+static int
 _gr_acf_set(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     acf_set(res, x);
@@ -193,13 +195,13 @@ _gr_acf_set(acf_t res, const acf_t x, const gr_ctx_t ctx)
 }
 
 /* todo
-int
+static int
 _gr_acf_set_str(acf_t res, const char * x, const gr_ctx_t ctx)
 {
 }
 */
 
-int
+static int
 _gr_acf_set_other(acf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -253,7 +255,7 @@ _gr_acf_set_other(acf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_acf_get_fmpz(fmpz_t res, const acf_t x, const gr_ctx_t ctx)
 {
     if (!arf_is_zero(acf_imagref(x)))
@@ -270,7 +272,7 @@ _gr_acf_get_fmpz(fmpz_t res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_get_si(slong * res, const acf_t x, const gr_ctx_t ctx)
 {
     fmpz_t t;
@@ -291,7 +293,7 @@ _gr_acf_get_si(slong * res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_get_ui(ulong * res, const acf_t x, const gr_ctx_t ctx)
 {
     fmpz_t t;
@@ -313,7 +315,7 @@ _gr_acf_get_ui(ulong * res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_get_d(double * res, const acf_t x, const gr_ctx_t ctx)
 {
     if (!arf_is_zero(acf_imagref(x)))
@@ -323,25 +325,25 @@ _gr_acf_get_d(double * res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_acf_is_zero(const acf_t x, const gr_ctx_t ctx)
 {
     return (arf_is_zero(acf_realref(x)) && arf_is_zero(acf_imagref(x))) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_acf_is_one(const acf_t x, const gr_ctx_t ctx)
 {
     return (arf_is_one(acf_realref(x)) && arf_is_zero(acf_imagref(x))) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_acf_is_neg_one(const acf_t x, const gr_ctx_t ctx)
 {
     return (arf_equal_si(acf_realref(x), -1) && arf_is_zero(acf_imagref(x))) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_acf_equal(const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(acf_realref(x)) || arf_is_nan(acf_imagref(x)) ||
@@ -352,7 +354,7 @@ _gr_acf_equal(const acf_t x, const acf_t y, const gr_ctx_t ctx)
 }
 
 /* todo: neg_round? */
-int
+static int
 _gr_acf_neg(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     arf_neg(acf_realref(res), acf_realref(x));
@@ -360,14 +362,14 @@ _gr_acf_neg(acf_t res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_add(acf_t res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     acf_add(res, x, y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_add_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_add_si(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -375,7 +377,7 @@ _gr_acf_add_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_add_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_add_ui(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -383,7 +385,7 @@ _gr_acf_add_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_add_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_add_fmpz(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -391,14 +393,14 @@ _gr_acf_add_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_sub(acf_t res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     acf_sub(res, x, y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_sub_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_sub_si(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -406,7 +408,7 @@ _gr_acf_sub_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_sub_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_sub_ui(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -414,7 +416,7 @@ _gr_acf_sub_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_sub_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_sub_fmpz(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -422,14 +424,14 @@ _gr_acf_sub_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_mul(acf_t res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     acf_mul(res, x, y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_mul_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_mul_si(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -437,7 +439,7 @@ _gr_acf_mul_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_mul_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_mul_ui(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -445,7 +447,7 @@ _gr_acf_mul_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_mul_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_mul_fmpz(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -453,7 +455,7 @@ _gr_acf_mul_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_mul_two(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     arf_mul_2exp_si(acf_realref(res), acf_realref(x), 1);
@@ -461,14 +463,14 @@ _gr_acf_mul_two(acf_t res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_sqr(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     acf_mul(res, x, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_mul_2exp_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_mul_2exp_si(acf_realref(res), acf_realref(x), y);
@@ -476,7 +478,7 @@ _gr_acf_mul_2exp_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_mul_2exp_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_mul_2exp_fmpz(acf_realref(res), acf_realref(x), y);
@@ -484,7 +486,7 @@ _gr_acf_mul_2exp_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t c
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_set_fmpz_2exp_fmpz(acf_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_set_fmpz_2exp(acf_realref(res), x, y);
@@ -492,7 +494,7 @@ _gr_acf_set_fmpz_2exp_fmpz(acf_t res, const fmpz_t x, const fmpz_t y, const gr_c
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const acf_t x, const gr_ctx_t ctx)
 {
     if (!arf_is_zero(acf_imagref(x)) || !arf_is_finite(acf_realref(x)))
@@ -502,21 +504,21 @@ _gr_acf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const acf_t x, const gr_ctx
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_inv(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     acf_approx_inv(res, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_div(acf_t res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     acf_approx_div(res, x, y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_div_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_div_si(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -524,7 +526,7 @@ _gr_acf_div_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_div_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_div_ui(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -532,7 +534,7 @@ _gr_acf_div_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_div_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_div_fmpz(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -540,14 +542,14 @@ _gr_acf_div_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_sqrt(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     acf_approx_sqrt(res, x, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_pos_inf(acf_t res, const gr_ctx_t ctx)
 {
     arf_pos_inf(acf_realref(res));
@@ -555,7 +557,7 @@ _gr_acf_pos_inf(acf_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_neg_inf(acf_t res, const gr_ctx_t ctx)
 {
     arf_neg_inf(acf_realref(res));
@@ -563,7 +565,7 @@ _gr_acf_neg_inf(acf_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_nan(acf_t res, const gr_ctx_t ctx)
 {
     arf_nan(acf_realref(res));
@@ -571,7 +573,7 @@ _gr_acf_nan(acf_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_abs(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_zero(acf_imagref(x)))
@@ -592,7 +594,7 @@ _gr_acf_abs(acf_t res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_conj(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     arf_set(acf_realref(res), acf_realref(x));
@@ -600,7 +602,7 @@ _gr_acf_conj(acf_t res, const acf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_re(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     arf_set(acf_realref(res), acf_realref(x));
@@ -609,7 +611,7 @@ _gr_acf_re(acf_t res, const acf_t x, const gr_ctx_t ctx)
 }
 
 
-int
+static int
 _gr_acf_im(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     arf_set(acf_realref(res), acf_imagref(x));
@@ -656,7 +658,7 @@ _gr_acf_nint(acf_t res, const acf_t x, const gr_ctx_t ctx)
 */
 
 /* todo: handling nan */
-int
+static int
 _gr_acf_cmp(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     if (!arf_is_zero(acf_imagref(x)) || !arf_is_zero(acf_imagref(y)))
@@ -666,13 +668,7 @@ _gr_acf_cmp(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* ignores ctx, so we can pass in the acf context */
-int
-_gr_arf_cmpabs(int * res, const arf_t x, const arf_t y, const gr_ctx_t ctx);
-
-#include "double_extras.h"
-
-int
+static int
 _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     arf_srcptr a = acf_realref(x);
@@ -874,13 +870,13 @@ _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
     return status; \
 
 /* todo: lots of special cases */
-int
+static int
 _gr_acf_pow(acf_t res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     ACF_FUNC2_VIA_ACB(res, acb_pow, x, y)
 }
 
-int
+static int
 _gr_acf_i(acf_t res, const gr_ctx_t ctx)
 {
     arf_zero(acf_realref(res));
@@ -888,7 +884,7 @@ _gr_acf_i(acf_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_pi(acf_t res, const gr_ctx_t ctx)
 {
     arb_t t;
@@ -900,50 +896,50 @@ _gr_acf_pi(acf_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_exp(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_exp, x)
 }
 
-int
+static int
 _gr_acf_expm1(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_expm1, x)
 }
 
-int
+static int
 _gr_acf_log(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_log, x)
 }
 
-int
+static int
 _gr_acf_log1p(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_log1p, x)
 }
 
-int
+static int
 _gr_acf_sin(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_sin, x)
 }
 
-int
+static int
 _gr_acf_cos(acf_t res, const acf_t x, const gr_ctx_t ctx)
 {
     ACF_FUNC_VIA_ACB(res, acb_cos, x)
 }
 
-int
+static int
 _gr_acf_vec_dot(acf_t res, const acf_t initial, int subtract, acf_srcptr vec1, acf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     acf_approx_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_acf_vec_dot_rev(acf_t res, const acf_t initial, int subtract, acf_srcptr vec1, acf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     acf_approx_dot(res, initial, subtract, vec1, 1, vec2 + len - 1, -1, len, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
@@ -954,7 +950,7 @@ _gr_acf_vec_dot_rev(acf_t res, const acf_t initial, int subtract, acf_srcptr vec
 #include "acb_poly.h"
 
 /* todo: test */
-int
+static int
 _gr_acf_poly_mullow(acf_ptr res,
     acf_srcptr poly1, slong len1,
     acf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -1031,7 +1027,7 @@ _gr_acf_poly_mullow(acf_ptr res,
     }
 }
 
-int
+static int
 _gr_acf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
@@ -1094,7 +1090,7 @@ _gr_acf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 #define ACF_MAT_ENTRY(mat, ii, jj) (((acf_ptr) (mat)->entries) + (ii) * (mat)->stride + (jj))
 
 /* todo: test */
-int
+static int
 _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     slong prec;
@@ -1183,7 +1179,7 @@ _gr_acf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 }
 
 /* todo: port the qr algorithm to generics; test */
-int
+static int
 _gr_acf_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
 {
     int status;

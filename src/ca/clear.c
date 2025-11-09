@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca/impl.h"
 
 #define CHECK_DATA 0
 

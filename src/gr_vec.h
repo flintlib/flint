@@ -26,6 +26,7 @@ extern "C" {
 
 void gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_vec_clear(gr_vec_t vec, gr_ctx_t ctx);
+int _gr_vec_check_resize(gr_vec_t res, slong n, gr_ctx_t ctx);
 
 #define GR_VEC_ENTRY(vec, i, sz) GR_ENTRY((vec)->entries, i, sz)
 

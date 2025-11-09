@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
 
-void
+static void
 _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, const ulong * e, slong len)
 {
     slong i, j;

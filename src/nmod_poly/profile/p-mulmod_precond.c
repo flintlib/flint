@@ -18,7 +18,7 @@
 slong bitss[] = { 3, 8, 16, 32, 48, 60, 64, 0 };
 slong ns[] = { 1, 2, 4, 8, 16, 32, 64, 128, 192, 224, 256, 320, 384, 512, 1024, 2048, 4096, 0, };
 
-int main()
+int main(void)
 {
     slong i, ni, bits, bitsi, n, num, numi, kk;
 
@@ -88,19 +88,19 @@ int main()
 
                         t1 = t2 = 1.0;
 
-                        TIMEIT_START
+                        TIMEIT_START;
                         for (i = 0; i < num; i++)
                             _nmod_poly_mulmod_preinv(R1, A, n, B, n, D, n + 1, Dinv, n + 1, mod);
-                        TIMEIT_STOP_VALUES(tcpu, t1)
+                        TIMEIT_STOP_VALUES(tcpu, t1);
 
                         nmod_poly_mulmod_precond_t precond;
 
-                        TIMEIT_START
+                        TIMEIT_START;
                         _nmod_poly_mulmod_precond_init_method(precond, A, n, D, n + 1, Dinv, n + 1, method, mod);
                         for (i = 0; i < num; i++)
                             _nmod_poly_mulmod_precond(R2, precond, B, n, mod);
                         nmod_poly_mulmod_precond_clear(precond);
-                        TIMEIT_STOP_VALUES(tcpu, t2)
+                        TIMEIT_STOP_VALUES(tcpu, t2);
 
                         if (!_nmod_vec_equal(R1, R2, n))
                         {

@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca/impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
 #include "fmpz_mpoly.h"

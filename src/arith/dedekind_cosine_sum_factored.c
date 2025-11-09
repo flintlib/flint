@@ -73,7 +73,7 @@ n_sqrtmod_ppow(ulong a, ulong p, int k, ulong pk, ulong pkinv)
     return r;
 }
 
-void
+static void
 trigprod_mul_prime_power(trig_prod_t prod, ulong k, ulong n,
                                                 ulong p, int exp)
 {

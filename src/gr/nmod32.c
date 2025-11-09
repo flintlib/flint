@@ -22,7 +22,7 @@
 typedef unsigned int nmod32_struct;
 typedef nmod32_struct nmod32_t[1];
 
-void
+static void
 nmod32_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Integers mod ");
@@ -32,24 +32,24 @@ nmod32_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 
 /* we don't want to call n_is_prime because this predicate should
    be fast. allow storing a flag in the context object? */
-truth_t
+static truth_t
 nmod32_ctx_is_field(const gr_ctx_t ctx)
 {
     return T_UNKNOWN;
 }
 
-void
+static void
 nmod32_init(nmod32_t x, const gr_ctx_t ctx)
 {
     x[0] = 0;
 }
 
-void
+static void
 nmod32_clear(nmod32_t x, const gr_ctx_t ctx)
 {
 }
 
-void
+static void
 nmod32_swap(nmod32_t x, nmod32_t y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -58,41 +58,41 @@ nmod32_swap(nmod32_t x, nmod32_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 nmod32_set_shallow(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
-int
+static int
 nmod32_randtest(nmod32_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     res[0] = n_randtest(state) % NMOD32_CTX(ctx).n;
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_write(gr_stream_t out, const nmod32_t x, const gr_ctx_t ctx)
 {
     gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_zero(nmod32_t x, const gr_ctx_t ctx)
 {
     x[0] = 0;
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_one(nmod32_t x, const gr_ctx_t ctx)
 {
     x[0] = (NMOD32_CTX(ctx).n != 1);
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_set_si(nmod32_t res, slong v, const gr_ctx_t ctx)
 {
     ulong t;
@@ -105,7 +105,7 @@ nmod32_set_si(nmod32_t res, slong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_set_ui(nmod32_t res, ulong v, const gr_ctx_t ctx)
 {
     ulong t;
@@ -115,7 +115,7 @@ nmod32_set_ui(nmod32_t res, ulong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_set_fmpz(nmod32_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     nmod_t mod = NMOD32_CTX(ctx);
@@ -123,52 +123,52 @@ nmod32_set_fmpz(nmod32_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 nmod32_is_zero(const nmod32_t x, const gr_ctx_t ctx)
 {
     return (x[0] == 0) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod32_is_one(const nmod32_t x, const gr_ctx_t ctx)
 {
     return (x[0] == (NMOD32_CTX(ctx).n != 1)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod32_is_neg_one(const nmod32_t x, const gr_ctx_t ctx)
 {
     return (x[0] == NMOD32_CTX(ctx).n - 1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod32_equal(const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     return (x[0] == y[0]) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 nmod32_set(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
 {
     res[0] = x[0];
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_neg(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
 {
     res[0] = nmod_neg(x[0], NMOD32_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_add(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     res[0] = nmod_add(x[0], y[0], NMOD32_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_add_si(nmod32_t res, const nmod32_t x, slong y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -176,21 +176,21 @@ nmod32_add_si(nmod32_t res, const nmod32_t x, slong y, const gr_ctx_t ctx)
     return nmod32_add(res, x, t, ctx);
 }
 
-int
+static int
 nmod32_sub(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     res[0] = nmod_sub(x[0], y[0], NMOD32_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_mul(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     res[0] = nmod_mul(x[0], y[0], NMOD32_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_mul_si(nmod32_t res, const nmod32_t x, slong y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -198,7 +198,7 @@ nmod32_mul_si(nmod32_t res, const nmod32_t x, slong y, const gr_ctx_t ctx)
     return nmod32_mul(res, x, t, ctx);
 }
 
-int
+static int
 nmod32_addmul(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     ulong r = res[0];
@@ -207,7 +207,7 @@ nmod32_addmul(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t c
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_submul(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     ulong r = res[0];
@@ -217,19 +217,19 @@ nmod32_submul(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t c
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod32_mul_two(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
 {
     return nmod32_add(res, x, x, ctx);
 }
 
-int
+static int
 nmod32_sqr(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
 {
     return nmod32_mul(res, x, x, ctx);
 }
 
-int
+static int
 nmod32_inv(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
@@ -254,7 +254,7 @@ nmod32_inv(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 nmod32_div(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -268,7 +268,7 @@ nmod32_div(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 nmod32_div_si(nmod32_t res, const nmod32_t x, slong y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -276,7 +276,7 @@ nmod32_div_si(nmod32_t res, const nmod32_t x, slong y, const gr_ctx_t ctx)
     return nmod32_div(res, x, t, ctx);
 }
 
-int
+static int
 nmod32_div_ui(nmod32_t res, const nmod32_t x, ulong y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -284,7 +284,7 @@ nmod32_div_ui(nmod32_t res, const nmod32_t x, ulong y, const gr_ctx_t ctx)
     return nmod32_div(res, x, t, ctx);
 }
 
-int
+static int
 nmod32_div_fmpz(nmod32_t res, const nmod32_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -292,7 +292,7 @@ nmod32_div_fmpz(nmod32_t res, const nmod32_t x, const fmpz_t y, const gr_ctx_t c
     return nmod32_div(res, x, t, ctx);
 }
 
-truth_t
+static truth_t
 nmod32_is_invertible(const nmod32_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
@@ -300,14 +300,14 @@ nmod32_is_invertible(const nmod32_t x, const gr_ctx_t ctx)
     return (g == 1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod32_divides(const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     ulong t;
     return nmod_divides(&t, y[0], x[0], NMOD32_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
 {
     nmod32_t t;
@@ -329,7 +329,7 @@ nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_
     return status;
 }
 
-void
+static void
 _nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -338,12 +338,12 @@ _nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t ctx)
         res[i] = 0;
 }
 
-void
+static void
 _nmod32_vec_clear(nmod32_struct * res, slong len, gr_ctx_t ctx)
 {
 }
 
-int
+static int
 _nmod32_vec_set(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -354,7 +354,7 @@ _nmod32_vec_set(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ct
     return GR_SUCCESS;
 }
 
-int
+static int
 _nmod32_vec_neg(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -366,7 +366,7 @@ _nmod32_vec_neg(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ct
     return GR_SUCCESS;
 }
 
-int
+static int
 _nmod32_vec_add(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -382,7 +382,7 @@ _nmod32_vec_add(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
     return GR_SUCCESS;
 }
 
-int
+static int
 _nmod32_vec_sub(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -398,7 +398,7 @@ _nmod32_vec_sub(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
     return GR_SUCCESS;
 }
 
-int
+static int
 _nmod32_vec_mul(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -411,7 +411,7 @@ _nmod32_vec_mul(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
 }
 
 /* todo: overflow checks */
-int
+static int
 _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -456,7 +456,7 @@ _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32
 }
 
 /* todo: overflow checks */
-int
+static int
 _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -502,7 +502,7 @@ _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const nm
 }
 
 /* todo: tuning for rectangular matrices */
-int
+static int
 _nmod32_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     if (A->r >= 256 && A->c >= 256 && B->c >= 256)

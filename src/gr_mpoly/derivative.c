@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "gr_mpoly.h"
 
-int
+static int
 _gr_mpoly_derivative_sp(gr_ptr coeff1, ulong * exp1, slong * len1,
                         gr_srcptr coeff2, const ulong * exp2, slong len2,
                         flint_bitcnt_t bits, slong N, slong offset, slong shift,
@@ -43,7 +43,7 @@ _gr_mpoly_derivative_sp(gr_ptr coeff1, ulong * exp1, slong * len1,
 }
 
 
-int
+static int
 _gr_mpoly_derivative_mp(gr_ptr coeff1, ulong * exp1, slong * len1,
                         gr_srcptr coeff2, const ulong * exp2, slong len2,
                         flint_bitcnt_t bits, slong N, slong offset,

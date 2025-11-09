@@ -133,7 +133,7 @@ static void fq_zech_polyu_mul(
 
 
 
-void fq_zech_polyu3_interp_reduce_bpoly(
+static void fq_zech_polyu3_interp_reduce_bpoly(
     fq_zech_bpoly_t Ap,
     const fq_zech_polyu_t A,
     const fq_zech_t alpha,
@@ -204,7 +204,7 @@ void fq_zech_polyu3_interp_reduce_bpoly(
         T(x0, x1, x2) == B(x0, x1) mod (x2 + alpha)
 */
 
-void fq_zech_polyu3n_interp_lift_sm_bpoly(
+static void fq_zech_polyu3n_interp_lift_sm_bpoly(
     slong * lastdeg,
     fq_zech_polyun_t T,
     const fq_zech_bpoly_t A,
@@ -240,7 +240,7 @@ void fq_zech_polyu3n_interp_lift_sm_bpoly(
     F is in Fq[x2][x0, x1]
     A is in Fq[x0, x1]
 */
-int fq_zech_polyu3n_interp_crt_sm_bpoly(
+static int fq_zech_polyu3n_interp_crt_sm_bpoly(
     slong * lastdeg,
     fq_zech_polyun_t F,
     fq_zech_polyun_t T,
@@ -380,7 +380,7 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
     return changed;
 }
 
-void fq_zech_poly_shift_left_scalar_submul(
+static void fq_zech_poly_shift_left_scalar_submul(
     fq_zech_poly_t modulus,
     slong k,
     const fq_zech_t alpha,

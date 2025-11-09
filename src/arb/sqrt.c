@@ -16,7 +16,7 @@
 #define RSQRT_NEWTON_CUTOFF 4000
 #define SQRT_NEWTON_CUTOFF 200000
 
-void
+static void
 _arf_rsqrt_newton(arf_t res, const arf_t x, slong prec)
 {
     slong wp = prec + GUARD_BITS;
@@ -63,7 +63,7 @@ _arf_rsqrt_newton(arf_t res, const arf_t x, slong prec)
     }
 }
 
-void
+static void
 _arf_sqrt_newton(arf_t res, const arf_t x, slong prec)
 {
     arf_t t, u, v;
@@ -120,7 +120,7 @@ arb_rsqrt_arf_newton(arb_t res, const arf_t x, slong prec)
     arb_set_round(res, res, prec);
 }
 
-void
+static void
 arb_rsqrt_arf(arb_t res, const arf_t x, slong prec)
 {
     if (arf_is_special(x) || arf_sgn(x) < 0)
