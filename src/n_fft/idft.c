@@ -14,6 +14,19 @@
 #include "n_fft/impl.h"
 #include "impl_macros_dft.h"
 
+/* TODO if confirmed use, put in impl_macros */
+#define DFT2_LAZY_2_2(a, b, n2)   \
+do {                              \
+    ulong tmp;                    \
+    tmp = (b);                    \
+    (b) = (a) + (n2) - tmp;       \
+    (a) = (a) + tmp;              \
+    if ((a) >= (n2))              \
+        (a) -= (n2);              \
+    if ((b) >= (n2))              \
+        (b) -= (n2);              \
+} while(0)
+
 /** Structure.
  * - The main interface is n_fft_idft, it solves the problem at node 0
  *   (interpolating at all roots of unity of order 2**depth), as documented in
@@ -235,28 +248,49 @@ void itft_node_lazy_1_2(nn_ptr p, ulong iolen, ulong node, n_fft_ctx_t F)
             }
         }
 
-        /* butterflies */
-        ulong k = 0;
-        const ulong iw = Fargs->tab_w[2*node];
-        const ulong iwpre = Fargs->tab_w[2*node+1];
-        for ( ; k < new_iolen; k++)
-        {
-            IDFT2_NODE_LAZY_2_2(p0[k], p1[k], iw, iwpre, Fargs->mod, Fargs->mod2);
-        }
-        for ( ; k < len/2; k++)
-        {
-            /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k]; lazy_x_2 */
-            N_MULMOD_PRECOMP_LAZY(p1[k], iw, p0[k], iwpre, F->mod);
-        }
-        /* notes for possible better performance: in the above loops, could we avoid/limit the multiplications by */
-        /* tab_iw[2*node] depending on what happens next in the reduction? */
-        /* OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?) */
-
-        n_fft_set_args(Fargs, F->mod, F->tab_w);
+        /* FIXME case to discard once a node0 version is made */
         if (node == 0)
+        {
+            /* butterflies */
+            ulong k = 0;
+            for ( ; k < new_iolen; k++)
+            {
+                DFT2_LAZY_2_2(p0[k], p1[k], Fargs->mod2);
+            }
+            for ( ; k < len/2; k++)
+            {
+                /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k]; lazy_x_2 */
+                p1[k] = p0[k];
+            }
+            /* notes for possible better performance: in the above loops, could we avoid/limit the copies */
+            /* depending on what happens next in the reduction? */
+            /* OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?) */
+
+            n_fft_set_args(Fargs, F->mod, F->tab_w);
             _nmod_poly_rem_prod_root1_node0_lazy_2_4(p, len, iolen, depth, Fargs);
+        }
         else
+        {
+            /* butterflies */
+            ulong k = 0;
+            const ulong iw = Fargs->tab_w[2*node];
+            const ulong iwpre = Fargs->tab_w[2*node+1];
+            for ( ; k < new_iolen; k++)
+            {
+                IDFT2_NODE_LAZY_2_2(p0[k], p1[k], iw, iwpre, Fargs->mod, Fargs->mod2);
+            }
+            for ( ; k < len/2; k++)
+            {
+                /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k]; lazy_x_2 */
+                N_MULMOD_PRECOMP_LAZY(p1[k], iw, p0[k], iwpre, F->mod);
+            }
+            /* notes for possible better performance: in the above loops, could we avoid/limit the multiplications by */
+            /* tab_iw[2*node] depending on what happens next in the reduction? */
+            /* OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?) */
+
+            n_fft_set_args(Fargs, F->mod, F->tab_w);
             _nmod_poly_rem_prod_root1_lazy_2_2(p, len, iolen, depth, node, Fargs);
+        }
     }
 }
 
