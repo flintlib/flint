@@ -101,6 +101,94 @@ do {                                                            \
                        n, n2);                                  \
 } while(0)
 
+/*-------------------*/
+/* length 16, node 0 */
+/*-------------------*/
+
+
+/* TODO comment, and place where appropriate */
+#define ITFT4_3_LAZY_422_2(a, b, c, d, I, I_pr, n, n2)            \
+do {                                                              \
+    ulong v0 = (a);                                               \
+    ulong v1 = (b);                                               \
+    ulong v2 = (c);                                               \
+    if (v0 >= (n2))                                               \
+        v0 -= (n2);                             /* < 2*n */       \
+    ulong v4 = v0 + v1;                         /* < 4*n */       \
+    if (v4 >= (n2))                                               \
+        v4 -= (n2);                             /* < 2*n */       \
+    ulong v5 = v0 + (n2) - v1;                  /* < 4*n */       \
+    if (v5 >= (n2))                                               \
+        v5 -= (n2);                             /* < 2*n */       \
+    ulong v7;                                                     \
+    N_MULMOD_PRECOMP_LAZY(v7, (I), v2, (I_pr), (n));              \
+    v0 = v4 + v2;                                                 \
+    v1 = v5 + v7;                                                 \
+    v4 = v4 + (n2) - v2;                                          \
+    v5 = v5 + (n2) - v7;                                          \
+    if (v0 >= (n2))                                               \
+        v0 -= (n2);                                               \
+    if (v1 >= (n2))                                               \
+        v1 -= (n2);                                               \
+    if (v4 >= (n2))                                               \
+        v4 -= (n2);                                               \
+    if (v5 >= (n2))                                               \
+        v5 -= (n2);                                               \
+    (a) = v0;                              /* < 2*n */            \
+    (b) = v1;                              /* < 2*n */            \
+    (c) = v4;                              /* < 2*n */            \
+    (d) = v5;                              /* < 2*n */            \
+} while(0)
+
+/** 16-point FFT, interpolation, truncated at 12
+ * * same as IDFT16_LAZY_1_4 but only considers first 12 evaluations,
+ * other 4 elements p12,p13,p14,p15 may be modified
+ * * typically I and I_pr are the forward roots; tab_w the inverse roots
+ * * lazy_1_4: in [0..n) / out [0..4n) / max < 4n
+ */
+#define ITFT16_12_LAZY_1_4(p0, p1, p2, p3, p4, p5, p6, p7,              \
+                           p8, p9, p10, p11, p12, p13, p14, p15,        \
+                           I, I_pr, n, n2, tab_w)                       \
+do {                                                                 \
+    IDFT4_LAZY_1_4(p0, p1, p2, p3, tab_w[2], tab_w[3], n, n2);       \
+    IDFT4_NODE_LAZY_1_2(p4, p5, p6, p7,                              \
+                        tab_w[2], tab_w[3],                          \
+                        tab_w[4], tab_w[5],                          \
+                        tab_w[6], tab_w[7],                          \
+                        n, n2);                                      \
+    IDFT4_NODE_LAZY_1_2(p8, p9, p10, p11,                            \
+                        tab_w[4], tab_w[5],                          \
+                        tab_w[8], tab_w[9],                          \
+                        tab_w[10], tab_w[11],                        \
+                        n, n2);                                      \
+                                                                     \
+    ITFT4_3_LAZY_422_2(p0, p4, p8, p12, tab_w[2], tab_w[3], n, n2);   \
+    ITFT4_3_LAZY_422_2(p1, p5, p9, p13, tab_w[2], tab_w[3], n, n2);   \
+    ITFT4_3_LAZY_422_2(p2, p6, p10, p14, tab_w[2], tab_w[3], n, n2);  \
+    ITFT4_3_LAZY_422_2(p3, p7, p11, p15, tab_w[2], tab_w[3], n, n2);  \
+                                                                      \
+    /* reduce by (x**8 - 1) * (x**4 - I): */ \
+    /* (p15*I + p11)*x^11 + (p14*I + p10)*x^10 + (p13*I + p9)*x^9 + (p12*I + p8)*x^8 */ \
+    /* + (p7 + p15)*x^7 + (p6 + p14)*x^6 + (p5 + p13)*x^5 + (p4 + p12)*x^4           */ \
+    /* + (-p15*I + p3)*x^3 + (-p14*I + p2)*x^2 + (-p13*I + p1)*x - p12*I + p0        */ \
+    p4 += p12;                                                      \
+    p5 += p13;                                                      \
+    p6 += p14;                                                      \
+    p7 += p15;                                                      \
+    N_MULMOD_PRECOMP_LAZY(p12, (I), p12, (I_pr), (n));              \
+    N_MULMOD_PRECOMP_LAZY(p13, (I), p13, (I_pr), (n));              \
+    N_MULMOD_PRECOMP_LAZY(p14, (I), p14, (I_pr), (n));              \
+    N_MULMOD_PRECOMP_LAZY(p15, (I), p15, (I_pr), (n));              \
+    p0 = p0 + (n2) - p12;                                           \
+    p1 = p1 + (n2) - p13;                                           \
+    p2 = p2 + (n2) - p14;                                           \
+    p3 = p3 + (n2) - p15;                                           \
+    p8 += p12;                                                      \
+    p9 += p13;                                                      \
+    p10 += p14;                                                     \
+    p11 += p15;                                                     \
+} while(0)
+
 /*-------------------------*/
 /* length 16, general node */
 /*-------------------------*/

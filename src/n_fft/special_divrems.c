@@ -230,12 +230,12 @@ void _nmod_poly_divrem_circulant1_t(nn_ptr p, ulong len, ulong d)
  * Assume now d is not a power of 2, and suppose we have updated node and depth
  * so that 2**(depth-1) < d <= 2**depth.
  *
- * Write w2 = F->tab_w[2*node], w = F->tab_w[4*node],
+ * Write w2 = F->tab_w[2*node], w = F->tab_w[4*node],  [FIXME probably node and 2*node]
  * and e = 2**depth / 2 (largest power of 2 strictly less than d).
  *
  * The computation has two main parts:
  *
- *  1/ If deg(f) >= 2*e, then start by reducing p mod x**(2*e) - w2
+ *  1/ If deg(p) >= 2*e, then start by reducing p mod x**(2*e) - w2
  * indeed, x**(2*e) - w2 == (x**e - w) * (x**e + w) is a multiple of the target modulus
  *     prod(x - F->tab_w[2 * (2**depth * node + k)] for k in range(d))
  * since the product of terms for 0 <= k < e is x**e - w,
