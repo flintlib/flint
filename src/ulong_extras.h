@@ -343,7 +343,6 @@ ulong n_euler_phi(ulong n);
 
 /* Primality *****************************************************************/
 
-#define FLINT_ODDPRIME_SMALL_CUTOFF 4096
 #define FLINT_NUM_PRIMES_SMALL 172
 #define FLINT_PRIMES_SMALL_CUTOFF 1030
 #define FLINT_PSEUDOSQUARES_CUTOFF 1000
@@ -391,6 +390,7 @@ int n_is_strong_probabprime_precomp(ulong n, double npre, ulong a, ulong d);
 int n_is_strong_probabprime2_preinv(ulong n, ulong ninv, ulong a, ulong d);
 
 int n_is_prime(ulong n);
+int n_is_prime_odd_no_trial(ulong n);
 int n_is_prime_pseudosquare(ulong n);
 int n_is_prime_pocklington(ulong n, ulong iterations);
 
@@ -404,6 +404,7 @@ ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 
 /* Factorisation *************************************************************/
 
+#define FLINT_ODDPRIME_SMALL_CUTOFF 4096
 #define FLINT_FACTOR_TRIAL_PRIMES 3000
 #define FLINT_FACTOR_TRIAL_PRIMES_PRIME UWORD(27449)
 #define FLINT_FACTOR_TRIAL_CUTOFF (UWORD(27449) * UWORD(27449))

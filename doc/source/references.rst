@@ -111,11 +111,15 @@ References
 
 .. [EK2025] \N. D. Elkies and J. Kieffer, "A uniform quasi-linear time algorithm for evaluating theta functions in any dimension", in preparation.
 
+.. [FeiGal2013] \J. Feitsma and W. Galway, "Tables of pseudoprimes and related data", http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html
+
 .. [Fie2007] \C. Fieker, "Sparse representation for cyclotomic fields". Experiment. Math. Volume 16, Issue 4 (2007), 493-500. https://doi.org/10.1080/10586458.2007.10129012
 
 .. [FieHof2014] \Fieker C. and Hofmann T.: "Computing in quotients of rings of integers" LMS Journal of Computation and Mathematics, 17(A), 349-365
 
 .. [Fil1992] \S. Fillebrown, "Faster Computation of Bernoulli Numbers", Journal of Algorithms 13 (1992) 431-445
+
+.. [ForJan2015] M. Forisek and J. Jancina, "Fast Primality Testing for Integers That Fit into a Machine Word", SOFSEM 2015, https://ceur-ws.org/Vol-1326/020-Forisek.pdf
 
 .. [GCL1992] \K. O. Geddes, S. R. Czapor and G. Labahn. *Algorithms for computer algebra*. Springer, 1992. https://doi.org/10.1007/b102438
 

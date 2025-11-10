@@ -13,9 +13,19 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 
-#if FLINT64
-/* n < 10^16 that pass base 2, 3, 7, 61 and 24251 sprp test */
 ulong composites[] = {
+    /* subset of n < 2^32 that pass base 2 sprp test */
+    2047u, 3277u, 4033u, 4681u, 8321u, 15841u, 29341u, 42799u,
+    49141u, 52633u, 65281u, 74665u, 80581u, 85489u, 88357u, 90751u,
+    104653u, 130561u, 196093u, 220729u, 233017u, 252601u, 253241u, 256999u,
+    271951u, 280601u, 314821u, 357761u, 390937u, 458989u, 476971u, 486737u,
+    489997u, 514447u, 580337u, 635401u, 647089u, 741751u, 800605u, 818201u,
+    100463443u, 100618933u, 100943201u, 101270251u, 101276579u, 101649241u, 102004421u, 102678031u,
+    2372976563u, 2375415841u, 2381782597u, 2382364601u, 2382678101u, 2385574201u, 2389544977u, 2394311233u,
+    3672754633u, 3673078513u, 3679657997u, 3685775741u, 3692307161u, 3695628133u, 3697278427u, 3697673959u,
+    4282867213u, 4294901761u,
+/* n < 10^16 that pass base 2, 3, 7, 61 and 24251 sprp test */
+#if FLINT64
     UWORD(669094855201), UWORD(1052516956501), UWORD(2007193456621),
     UWORD(2744715551581), UWORD(9542968210729), UWORD(17699592963781),
     UWORD(19671510288601), UWORD(24983920772821), UWORD(24984938689453),
@@ -57,8 +67,8 @@ ulong composites[] = {
     UWORD(8509654470665701), UWORD(8757647355282841), UWORD(8903933671696381),
     UWORD(8996133652295653), UWORD(9074421465661261), UWORD(9157536631454221),
     UWORD(9188353522314541)
-};
 #endif
+};
 
 TEST_FUNCTION_START(n_is_prime, state)
 {
@@ -85,6 +95,13 @@ TEST_FUNCTION_START(n_is_prime, state)
         if (!result)
             TEST_FUNCTION_FAIL("d = %wu is declared composite\n", d);
 
+        if (d % 2 != 0)
+        {
+            result = n_is_prime_odd_no_trial(d);
+            if (!result)
+                TEST_FUNCTION_FAIL("d = %wu is declared composite (no trial)\n", d);
+        }
+
         mpz_clear(d_m);
     }
 
@@ -104,6 +121,13 @@ TEST_FUNCTION_START(n_is_prime, state)
         if (!result)
             TEST_FUNCTION_FAIL("d = %wu is declared prime\n", d);
 
+        if (d % 2 != 0)
+        {
+            result = !n_is_prime_odd_no_trial(d);
+            if (!result)
+                TEST_FUNCTION_FAIL("d = %wu is declared prime (no trial)\n", d);
+        }
+
         mpz_clear(d_m);
     }
 
@@ -120,18 +144,27 @@ TEST_FUNCTION_START(n_is_prime, state)
         result = !n_is_prime(d);
         if (!result)
             TEST_FUNCTION_FAIL("Perfect power d = %wu is declared prime\n", d);
+
+        if (d % 2 != 0)
+        {
+            result = !n_is_prime_odd_no_trial(d);
+            if (!result)
+                TEST_FUNCTION_FAIL("Perfect power d = %wu is declared prime (no trial)\n", d);
+        }
     }
 
-#if FLINT64
     for (i = 0; i < sizeof(composites) / sizeof(ulong); i++)
     {
         d = composites[i];
 
         result = !n_is_prime(d);
         if (!result)
-            TEST_FUNCTION_FAIL("Known composite d = %wu is declared prime\n", d);
+            TEST_FUNCTION_FAIL("Known composite d = %wu is declared prime (no trial)\n", d);
+
+        result = !n_is_prime_odd_no_trial(d);
+        if (!result)
+            TEST_FUNCTION_FAIL("Known composite d = %wu is declared prime (no trial)\n", d);
     }
-#endif
 
     TEST_FUNCTION_END(state);
 }

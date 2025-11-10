@@ -894,6 +894,43 @@ Prime number generation and counting
 Primality testing
 --------------------------------------------------------------------------------
 
+.. function:: int n_is_prime(ulong n)
+
+    Returns 1 if `n` is prime and 0 otherwise. This function is intended
+    for general input.
+
+    For integers up to 15 bits, we look up the result in a bit array.
+    For integers between 16 and 64 bits, we do some trial division and then
+    perform a single base-2 strong probable prime test to detect most
+    composites. For numbers that pass this test, primality is certified
+    by checking that `n` is not one of the 31894014 base-2 strong pseudoprimes
+    `n < 2^{64}` which have been tabulated exhaustively by Feitsma [FeiGal2013]_.
+
+    For the 2314 pseudoprimes up to 32 bits, we simply store all
+    pseudoprimes in a table and do a lookup using binary search.
+    For the pseudoprimes up to 64 bits, we use a hash table following the
+    idea of Forisek and Jancina [ForJan2015]_. We precompute a function `T` such
+    that for pseudoprime `n < 2^{64}`, a probable prime test with base `T(n)`
+    certifies compositeness of `n`. Our `T` is represented as a hash table
+    with 131072 entries most of which are 21-bit or 22-bit integers bit-packed
+    into an array of 43691 64-bit words, three entries per word. A small
+    number of oversize bases (up to 32-bit integers) are stored in a separate
+    binary search table. The probability of falling back on the binary
+    search table is only 0.17%, and this fallback is itself cheap. In total
+    the tables for 64-bit pseudoprimes require 343 KB, which is just 2/3 the
+    size of the 512 KB Forisek-Jancina table of 262144 16-bit bases, while
+    the test is as efficient.
+
+    To check this implementation against Feitsma's table, one can run the
+    ``examples/check_n_is_prime`` program.
+
+.. function:: int n_is_prime_odd_no_trial(ulong n)
+
+    As :func:`n_is_prime`, but does not perform trial division. Requires
+    that `n` is odd. This function is much slower than :func:`n_is_prime`
+    for random input but slightly faster for certifying primality or
+    compositeness if `n` has already
+    passed preliminary trial division or sieving done by the user.
 
 .. function:: int n_is_oddprime_small(ulong n)
 
@@ -972,19 +1009,6 @@ Primality testing
     The possibility exists that the probable prime test declares a
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
-
-.. function:: int n_is_prime(ulong n)
-
-    Tests if `n` is a prime. This first sieves for small prime factors,
-    then simply calls :func:`n_is_probabprime`. This has been checked
-    against the tables of Feitsma and Galway
-    http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html and thus
-    constitutes a check for primality (rather than just pseudoprimality)
-    up to `2^{64}`.
-
-    In future, this test may produce and check a certificate of
-    primality. This is likely to be significantly slower for prime
-    inputs.
 
 .. function:: int n_is_strong_probabprime_precomp(ulong n, double npre, ulong a, ulong d)
 
