@@ -57,7 +57,7 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
     }
     _nmod_poly_mullow(h, G->g1->coeffs, G->g1->length, f, f1_len, N, mod);
 
-    while (h[h1_len - 1] == 0)
+    while (h1_len > 0 && h[h1_len - 1] == 0)
     {
         h1_len--;
     }
