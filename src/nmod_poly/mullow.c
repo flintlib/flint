@@ -13,22 +13,6 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-#if FLINT_HAVE_FFT_SMALL
-
-#include "fft_small.h"
-
-/* todo: separate squaring table */
-/* todo: check unbalanced cutoffs */
-
-static const short fft_mullow_tab[] = {1115, 1115, 597, 569, 407, 321, 306, 279, 191,
-182, 166, 159, 152, 145, 139, 89, 85, 78, 75, 75, 69, 174, 174, 166, 159,
-152, 152, 152, 97, 101, 106, 111, 101, 101, 101, 139, 145, 145, 139, 145,
-145, 139, 145, 145, 145, 182, 182, 182, 182, 182, 182, 191, 200, 220, 210,
-200, 210, 210, 210, 210, 191, 182, 182, 174, };
-
-#endif
-
-
 void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
                              nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
@@ -49,17 +33,13 @@ void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
         return;
     }
 
-    bits = NMOD_BITS(mod);
-
-#if FLINT_HAVE_FFT_SMALL
-
-    if (len2 >= fft_mullow_tab[bits - 1])
+    if (_nmod_poly_mullow_want_fft_small(len1, len2, n, (poly1 == poly2 && len1 == len2), mod))
     {
-        _nmod_poly_mul_mid_default_mpn_ctx(res, 0, n, poly1, len1, poly2, len2, mod);
+        _nmod_poly_mullow_fft_small(res, poly1, len1, poly2, len2, n, mod);
         return;
     }
 
-#endif
+    bits = NMOD_BITS(mod);
 
     if (n < 10 + bits * bits / 10)
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);

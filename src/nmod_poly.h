@@ -365,6 +365,10 @@ void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_po
 void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, nmod_t mod);
 void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2);
 
+int _nmod_poly_mullow_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod);
+int _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, nmod_t mod);
+void _nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod);
+
 void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong trunc, nmod_t mod);
 void nmod_poly_mullow(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong trunc);
 

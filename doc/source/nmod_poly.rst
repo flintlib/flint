@@ -761,6 +761,25 @@ Multiplication
     corresponding coefficients of the product of ``poly1`` and
     ``poly2``, the remaining coefficients being arbitrary.
 
+.. function:: int _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, nmod_t mod)
+
+    Estimate whether *fft_small* multiplication should be used instead of
+    other multiplication algorithms, given inputs of length *len1* and *len2*
+    and output truncation to length *n*.
+
+.. function:: int _nmod_poly_mullow_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+
+    Internal helper function for :func:`_nmod_poly_mullow_fft_small`: if the
+    inputs are small enough to perform a repacked convolution of half the
+    length, multiply and return 1, otherwise do nothing and return 0.
+    The conditions on the arguments are the same as for :func:`_nmod_poly_mullow`.
+
+.. function:: void _nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+
+    Low multiplication via the *fft_small* module. Throws an error
+    if *fft_small* is not available. The conditions on the arguments
+    are the same as for :func:`_nmod_poly_mullow`.
+
 .. function:: void _nmod_poly_mulmod(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, nn_srcptr f, slong lenf, nmod_t mod)
 
     Sets ``res`` to the remainder of the product of ``poly1`` and
