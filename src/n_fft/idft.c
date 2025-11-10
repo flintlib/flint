@@ -15,16 +15,18 @@
 #include "impl_macros_dft.h"
 
 /* TODO if confirmed use, put in impl_macros */
-#define DFT2_LAZY_2_2(a, b, n2)   \
-do {                              \
-    ulong tmp;                    \
-    tmp = (b);                    \
-    (b) = (a) + (n2) - tmp;       \
-    (a) = (a) + tmp;              \
-    if ((a) >= (n2))              \
-        (a) -= (n2);              \
-    if ((b) >= (n2))              \
-        (b) -= (n2);              \
+#define DFT2_LAZY_42_22(a, b, n2)          \
+do {                                       \
+    ulong tmp;                             \
+    tmp = (a);                             \
+    if (tmp >= (n2))                       \
+        tmp -= (n2);         /* [0..2n) */ \
+    (a) = tmp + (b);         /* [0..4n) */ \
+    if ((a) >= (n2))                       \
+        (a) -= (n2);         /* [0..2n) */ \
+    (b) = tmp + (n2) - (b);  /* [0..4n) */ \
+    if ((b) >= (n2))                       \
+        (b) -= (n2);         /* [0..2n) */ \
 } while(0)
 
 /** Structure.
@@ -248,52 +250,110 @@ void itft_node_lazy_1_2(nn_ptr p, ulong iolen, ulong node, n_fft_ctx_t F)
             }
         }
 
-        /* FIXME case to discard once a node0 version is made */
-        if (node == 0)
+        /* butterflies */
+        ulong k = 0;
+        const ulong iw = Fargs->tab_w[2*node];
+        const ulong iwpre = Fargs->tab_w[2*node+1];
+        for ( ; k < new_iolen; k++)
         {
-            /* butterflies */
-            ulong k = 0;
-            for ( ; k < new_iolen; k++)
-            {
-                DFT2_LAZY_2_2(p0[k], p1[k], Fargs->mod2);
-            }
-            for ( ; k < len/2; k++)
-            {
-                /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k]; lazy_x_2 */
-                p1[k] = p0[k];
-            }
-            /* notes for possible better performance: in the above loops, could we avoid/limit the copies */
-            /* depending on what happens next in the reduction? */
-            /* OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?) */
-
-            n_fft_set_args(Fargs, F->mod, F->tab_w);
-            _nmod_poly_rem_prod_root1_node0_lazy_2_4(p, len, iolen, depth, Fargs);
+            IDFT2_NODE_LAZY_2_2(p0[k], p1[k], iw, iwpre, Fargs->mod, Fargs->mod2);
         }
-        else
+        for ( ; k < len/2; k++)
         {
-            /* butterflies */
-            ulong k = 0;
-            const ulong iw = Fargs->tab_w[2*node];
-            const ulong iwpre = Fargs->tab_w[2*node+1];
-            for ( ; k < new_iolen; k++)
-            {
-                IDFT2_NODE_LAZY_2_2(p0[k], p1[k], iw, iwpre, Fargs->mod, Fargs->mod2);
-            }
-            for ( ; k < len/2; k++)
-            {
-                /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k]; lazy_x_2 */
-                N_MULMOD_PRECOMP_LAZY(p1[k], iw, p0[k], iwpre, F->mod);
-            }
-            /* notes for possible better performance: in the above loops, could we avoid/limit the multiplications by */
-            /* tab_iw[2*node] depending on what happens next in the reduction? */
-            /* OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?) */
-
-            n_fft_set_args(Fargs, F->mod, F->tab_w);
-            _nmod_poly_rem_prod_root1_lazy_2_2(p, len, iolen, depth, node, Fargs);
+            /* here virtually p1[k] == 0 --> p1[k] = tab_iw[2*node] * p0[k]; lazy_x_2 */
+            N_MULMOD_PRECOMP_LAZY(p1[k], iw, p0[k], iwpre, F->mod);
         }
+        /* notes for possible better performance: in the above loops, could we avoid/limit the multiplications by */
+        /* tab_iw[2*node] depending on what happens next in the reduction? */
+        /* OR reduce first a copy of the low part, before gathering both parts? (seems feasible but requiring a buffer?) */
+
+        n_fft_set_args(Fargs, F->mod, F->tab_w);
+        _nmod_poly_rem_prod_root1_lazy_2_2(p, len, iolen, depth, node, Fargs);
     }
 }
 
+void itft_lazy_1_4(nn_ptr p, ulong iolen, n_fft_ctx_t F)
+{
+    if (iolen == 4)
+    {
+        const ulong mod2 = 2*F->mod;
+        IDFT4_LAZY_1_4(p[0], p[1], p[2], p[3], F->tab_iw[2], F->tab_iw[3],
+                           F->mod, mod2);
+    }
+    else if (iolen == 8)
+    {
+        const ulong mod2 = 2*F->mod;
+        IDFT8_LAZY_1_4(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7],
+                       F->mod, mod2, F->tab_iw);
+    }
+
+    /* now depth >= 4, iolen >= 12 multiple of 4 */
+    else
+    {
+        const ulong depth = n_clog2_ge2(iolen);
+        const ulong len = UWORD(1) << depth;
+
+        /* iolen == len : call idft */
+        if (iolen == len)
+        {
+            n_fft_args_t Fargs;
+            n_fft_set_args(Fargs, F->mod, F->tab_iw);
+            idft_lazy_1_4(p, depth, Fargs);
+            return;
+        }
+
+        /* from here on, 1 <= len/2 < iolen <= len */
+        /* 1st rec call: full idft at length len/2 */
+        /* 2nd rec call: itft at trunc iolen - len/2 */
+        const nn_ptr p0 = p;
+        const nn_ptr p1 = p + len/2;
+        n_fft_args_t Fargs;
+        n_fft_set_args(Fargs, F->mod, F->tab_iw);
+        idft_lazy_1_4(p0, depth-1, Fargs);
+
+        ulong new_iolen = iolen - len/2;
+        ulong new_depth = n_clog2_ge2(new_iolen);
+        ulong new_node = UWORD(1) << (depth - 1 - new_depth);
+
+        itft_node_lazy_1_2(p1, new_iolen, new_node, F);
+
+        /* butterflies */
+        ulong k = 0;
+        if (new_depth == depth - 1)
+        {
+            for ( ; k < new_iolen; k++)  /* FIXME try unrolling since new_iolen is multiple of 4 */
+            {
+                DFT2_LAZY_42_22(p0[k], p1[k], Fargs->mod2);
+            }
+        }
+        else  /* new_depth != depth - 1 */
+        {
+            // FIXME pow2 with precomputation -> store it in F?
+            // FIXME check that pow2 < mod is ok
+            ulong pow2 = UWORD(1) << (depth - 1 - new_depth);
+            ulong pow2_pr = n_mulmod_precomp_shoup(pow2, Fargs->mod);
+            for ( ; k < new_iolen; k++)
+            {
+                DFT2_NODE_LAZY_4_4(p0[k], p1[k], pow2, pow2_pr, Fargs->mod, Fargs->mod2);
+                if (p0[k] >= Fargs->mod2)
+                    p0[k] -= Fargs->mod2;
+                if (p1[k] >= Fargs->mod2)
+                    p1[k] -= Fargs->mod2;
+            }
+        }
+
+        for ( ; k < len/2; k++)
+        {
+            /* here virtually p1[k] == 0 --> p1[k] = p0[k] */
+            if (p0[k] >= Fargs->mod2)
+                p0[k] -= Fargs->mod2;
+            p1[k] = p0[k];
+        }
+
+        n_fft_set_args(Fargs, F->mod, F->tab_w);
+        _nmod_poly_rem_prod_root1_node0_lazy_2_4(p, len, iolen, depth, Fargs);
+    }
+}
 
 /*-------------------*/
 /*  main interfaces  */
@@ -333,12 +393,13 @@ void n_fft_idft(nn_ptr p, ulong depth, n_fft_ctx_t F)
 
 void n_fft_itft(nn_ptr p, ulong iolen, n_fft_ctx_t F)
 {
-    if (iolen > 1)
+    if (iolen > 1)  /* FIXME currently restricted to multiples of 4 */
     {
         ulong depth = n_clog2_ge2(iolen);
         /* n_fft_args_t Fargs; */
         /* n_fft_set_args(Fargs, F->mod, F->tab_w); */
-        itft_node_lazy_1_2(p, iolen, 0, F);
+        itft_lazy_1_4(p, iolen, F);
+        /* itft_node_lazy_1_2(p, iolen, 0, F); */
         const ulong inv2 = F->tab_inv2[2*depth-2];
         const ulong inv2_pr = F->tab_inv2[2*depth-1];
         for (ulong k = 0; k < iolen; k++)
