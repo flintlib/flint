@@ -2632,7 +2632,7 @@ gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
             if (i % 2 == 0)
                 status |= sqr(GR_ENTRY(res, i, sz), GR_ENTRY(res, i / 2, sz), ctx);
             else
-                status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - 1, sz), x, ctx);
+                status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, (i + 1) / 2, sz), GR_ENTRY(res, i / 2, sz), ctx);
         }
     }
     else
