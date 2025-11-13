@@ -3,6 +3,7 @@
     Copyright (C) 2009 William Hart
     Copyright (C) 2014, 2015 Dana Jacobsen
     Copyright (C) 2015 Kushagra Singh
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,221 +13,315 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
+#include <stdint.h>
 #include "ulong_extras.h"
+#include "nmod.h"
 
-int n_is_prime(ulong n)
+#define SMALL_ODDPRIME_LIMIT 32768
+#define NUM_32BIT_PSEUDOPRIMES 2314
+#define NUM_OVERSIZE_BASES 221
+#define WITNESS_BASE_HASH_SIZE 131072
+#define WITNESS_BASE_COMPRESSED_LEN 43691
+
+/* To keep this file readable, the lookup tables have been
+   placed in a seprate header file. */
+#include "is_prime_tables.h"
+
+static int u32_is_base2_pseudoprime(uint32_t x)
 {
-    /* flint's "BPSW" checked against Feitsma and Galway's database [1, 2]
-       up to 2^64 by Dana Jacobsen.
-       [1]  http://www.janfeitsma.nl/math/psp2/database
-       [2]  http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html
-    */
+    const uint32_t * arr = base2_32bit_pseudoprimes;
 
-    if (n < 11) {
-        if (n == 2 || n == 3 || n == 5 || n == 7)   return 1;
-        else                                        return 0;
-    }
-    if (!(n%2) || !(n%3) || !(n%5) || !(n%7))       return 0;
-    if (n <  121) /* 11*11 */                       return 1;
-    if (!(n%11) || !(n%13) || !(n%17) || !(n%19) ||
-        !(n%23) || !(n%29) || !(n%31) || !(n%37) ||
-        !(n%41) || !(n%43) || !(n%47) || !(n%53))   return 0;
-    if (n < 3481) /* 59*59 */                       return 1;
-    if (n > 1000000 &&
-        (!(n% 59) || !(n% 61) || !(n% 67) || !(n% 71) || !(n% 73) ||
-         !(n% 79) || !(n% 83) || !(n% 89) || !(n% 97) || !(n%101) ||
-         !(n%103) || !(n%107) || !(n%109) || !(n%113) || !(n%127) ||
-         !(n%131) || !(n%137) || !(n%139) || !(n%149)))  return 0;
+    int a, b;
+    unsigned int bc = FLINT_BITS - flint_clz(x);
 
-    return n_is_probabprime(n);
-}
+    a = base2_32bit_pseudoprimes_start[bc - 1];
+    b = base2_32bit_pseudoprimes_start[bc];
 
-int
-n_is_prime_pocklington(ulong n, ulong iterations)
-{
-    int pass;
-    slong i;
-    ulong j;
-    ulong n1, cofactor, b, c, ninv, limit, F, Fsq, det, rootn, val, c1, c2, upper_limit;
-    n_factor_t factors;
-    c = 0;
-
-#if FLINT64
-    upper_limit = 2642246;                  /* 2642246^3 is approximately 2^64 */
-#else
-    upper_limit = 1626;                     /* 1626^3 is approximately 2^32 */
-#endif
-
-    if (n == 1)
-        return 0;
-    else if (n % 2 == 0)
-        return (n == UWORD(2));
-
-    rootn = n_sqrt(n);                      /* floor(sqrt(n)) */
-
-    if (n == rootn*rootn)
-        return 0;
-
-    n1 = n - 1;
-    n_factor_init(&factors);
-    limit = (ulong) pow((double)n1, 1.0/3);
-
-    val = n_pow(limit, 3);
-
-    while (val < n1 && limit < upper_limit)    /* ensuring that limit >= n1^(1/3) */
+    while (a < b)
     {
-        limit++;
-        val = n_pow(limit, 3);
-    }
+        int m = a + (b - a) / 2;
+        uint32_t mid_val = arr[m];
 
-
-    cofactor = n_factor_partial(&factors, n1, limit, 1);
-
-    if (cofactor != 1)                      /* check that cofactor is coprime to factors found */
-    {
-        for (i = 0; i < factors.num; i++)
-        {
-            if (factors.p[i] > FLINT_FACTOR_TRIAL_PRIMES_PRIME)
-            {
-                while (cofactor >= factors.p[i] && (cofactor % factors.p[i]) == 0)
-                {
-                    factors.exp[i]++;
-                    cofactor /= factors.p[i];
-                }
-            }
-        }
-    }
-    F = n1/cofactor;                        /* n1 = F*cofactor */
-    Fsq = F*F;
-
-    if (F <= rootn)                         /* cube root method applicable only if n^1/3 <= F < n^1/2 */
-    {
-        c2 = n1/(Fsq);                      /* expressing n as c2*F^2 + c1*F + 1  */
-        c1 = (n1 - c2*Fsq )/F;
-        det = c1*c1 - 4*c2;
-        if (n_is_square(det))               /* BSL's test for (n^1/3 <= F < n^1/2) */
-            return 0;
-    }
-    ninv = n_preinvert_limb(n);
-    c = 1;
-    for (i = factors.num - 1; i >= 0; i--)
-    {
-        ulong exp = n1 / factors.p[i];
-        pass = 0;
-
-        for (j = 2; j < iterations && pass == 0; j++)
-        {
-            b = n_powmod2_preinv(j, exp, n, ninv);
-            if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != UWORD(1))
-                return 0;
-
-            b = n_submod(b, UWORD(1), n);
-            if (b != UWORD(0))
-            {
-                c = n_mulmod2_preinv(c, b, n, ninv);
-                pass = 1;
-            }
-            else if (c == 0)
-                return 0;
-        }
-        if (j == iterations)
-            return -1;
-    }
-    return (n_gcd(n, c) == UWORD(1));
-}
-
-ulong flint_pseudosquares[] = {17, 73, 241, 1009, 2641, 8089, 18001,
-          53881, 87481, 117049, 515761, 1083289, 3206641, 3818929, 9257329,
-          22000801, 48473881, 48473881, 175244281, 427733329, 427733329,
-          898716289u, 2805544681u, 2805544681u, 2805544681u
-#ifndef FLINT64
-          };
-#else
-          , 10310263441u, 23616331489u, 85157610409u, 85157610409u,
-          196265095009u, 196265095009u, 2871842842801u, 2871842842801u,
-          2871842842801u, 26250887023729u, 26250887023729u, 112434732901969u,
-          112434732901969u, 112434732901969u, 178936222537081u,
-          178936222537081u, 696161110209049u, 696161110209049u,
-          2854909648103881u, 6450045516630769u, 6450045516630769u,
-          11641399247947921u, 11641399247947921u, 190621428905186449u,
-          196640248121928601u, 712624335095093521u, 1773855791877850321u };
-#endif
-
-#if FLINT64
-#define FLINT_NUM_PSEUDOSQUARES 52
-#else
-#define FLINT_NUM_PSEUDOSQUARES 25
-#endif
-
-int n_is_prime_pseudosquare(ulong n)
-{
-    unsigned int i, j, m1;
-    ulong p, B, NB, exp, mod8;
-    const ulong * primes;
-    const double * inverses;
-
-    if (n < UWORD(2))
-        return 0;
-    else if ((n & UWORD(1)) == UWORD(0))
-        return (n == UWORD(2));
-
-    primes = n_primes_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF+1);
-    inverses = n_prime_inverses_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF+1);
-
-    for (i = 0; i < FLINT_PSEUDOSQUARES_CUTOFF; i++)
-    {
-        double ppre;
-        p = primes[i];
-        if (p*p > n)
+        if (mid_val == x)
             return 1;
-        ppre = inverses[i];
-        if (!n_mod2_precomp(n, p, ppre))
-            return 0;
-    }
-
-    B  = primes[FLINT_PSEUDOSQUARES_CUTOFF];
-    NB = (n - 1)/B + 1;
-    m1 = 0;
-
-    for (i = 0; i < FLINT_NUM_PSEUDOSQUARES; i++)
-        if (flint_pseudosquares[i] > NB)
-            break;
-
-    exp = (n - 1)/2;
-
-    for (j = 0; j <= i; j++)
-    {
-        ulong mod = n_powmod2(primes[j], exp, n);
-        if ((mod != UWORD(1)) && (mod != n - 1))
-            return 0;
-        else if (mod == n - 1)
-            m1 = 1;
-    }
-
-    mod8 = n % 8;
-
-    if ((mod8 == 3) || (mod8 == 7))
-        return 1;
-    else if (mod8 == 5)
-    {
-        ulong mod = n_powmod2(UWORD(2), exp, n);
-        if (mod == n - 1)
-            return 1;
+        else if (mid_val < x)
+            a = m + 1;
         else
-            flint_throw(FLINT_ERROR, "Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
+            b = m;
+    }
+
+    return 0;
+}
+
+/* Faster arithmetic for 32-bit probable prime test on 64-bit machines. */
+#if FLINT_BITS == 64
+
+static uint32_t
+u32_addmod(uint32_t x, uint32_t y, uint32_t n)
+{
+    return (n - y > x ? x + y : x + y - n);
+}
+
+static uint32_t
+u32_rem_u64_shoup(uint64_t x, uint32_t n, uint64_t ninv)
+{
+    return n_mulmod_shoup(1, x, ninv, n);
+}
+
+static uint32_t
+u32_2_powmod(uint32_t exp, uint32_t n, uint64_t ninv)
+{
+    uint32_t x, bit;
+    unsigned int ebits;
+
+    if (exp < FLINT_BITS)
+        return u32_rem_u64_shoup(UWORD(1) << exp, n, ninv);
+
+    ebits = FLINT_BITS - flint_clz(exp);
+    bit = UWORD(1) << (ebits - 6);
+
+    x = u32_rem_u64_shoup(((uint64_t) 1) << (exp >> (ebits - 6)), n, ninv);
+
+    while (bit >>= 1)
+    {
+        x = u32_rem_u64_shoup((uint64_t) x * x, n, ninv);
+
+        if (bit & exp)
+            x = u32_addmod(x, x, n);
+    }
+
+    return x;
+}
+
+static int u32_is_base2_probabprime(uint32_t n)
+{
+    uint32_t d = n-1, s = 0;
+    uint64_t ninv = n_mulmod_precomp_shoup(UWORD(1), n);
+
+    s = flint_ctz(d);
+    d >>= s;
+
+    uint64_t t = d;
+    uint64_t y;
+
+    y = u32_2_powmod(t, n, ninv);
+    if (y == 1)
+        return 1;
+
+    t <<= 1;
+    while ((t != n - 1) && (y != n - 1))
+    {
+        y = u32_rem_u64_shoup(y * y, n, ninv);
+        t <<= 1;
+    }
+
+    return y == n - 1;
+}
+
+#else
+
+static int u32_is_base2_probabprime(uint32_t n)
+{
+    return n_is_strong_probabprime2_preinv(n, n_preinvert_limb(n), 2, (n - 1) >> flint_ctz(n - 1));
+}
+
+#endif
+
+static uint32_t get_witness_base(uint64_t n)
+{
+    uint32_t hash, base;
+    uint64_t lookup;
+
+    /* The specific hash function used to generate the table. */
+    hash = ((uint32_t) (n * 314159265)) >> 15;
+
+    FLINT_ASSERT(hash < WITNESS_BASE_HASH_SIZE);
+    FLINT_ASSERT(hash / 3 < WITNESS_BASE_COMPRESSED_LEN);
+
+    /* Unpack bits from the hash table word. */
+    lookup = witness_base_tab[hash / 3];
+    base = lookup >> ((hash % 3) * 21);
+    base &= ((UWORD(1) << (21 + ((hash % 3) == 2))) - 1);
+
+    if (base != 0)
+        return base;
+
+    /* If needed, binary search lookup in the oversize table. */
+    int a = 0, b = NUM_OVERSIZE_BASES - 1, mid;
+
+    while (a < b)
+    {
+        mid = (a + b) >> 1;
+        if (oversize_index[mid] < hash)
+            a = mid + 1;
+        else
+            b = mid;
+    }
+
+    return oversize_base[a];
+}
+
+#if FLINT_BITS == 64
+#define LG_FLINT_BITS 6
+#else
+#define LG_FLINT_BITS 5
+#endif
+
+static ulong
+_nmod_2_pow_fullword(ulong exp, nmod_t mod)
+{
+    ulong x, bit;
+    unsigned int ebits;
+
+    if (exp < FLINT_BITS)
+        return nmod_set_ui(UWORD(1) << exp, mod);
+
+    ebits = FLINT_BITS - flint_clz(exp);
+    bit = UWORD(1) << (ebits - LG_FLINT_BITS);
+
+    x = nmod_set_ui(UWORD(1) << (exp >> (ebits - LG_FLINT_BITS)), mod);
+
+    while (bit >>= 1)
+    {
+        x = _nmod_mul_fullword(x, x, mod);
+        if (bit & exp)
+            x = nmod_add(x, x, mod);
+    }
+
+    return x;
+}
+
+static ulong
+_nmod_2_pow_nonfullword(ulong exp, nmod_t mod)
+{
+    ulong x, bit;
+    unsigned int ebits;
+
+    if (exp < FLINT_BITS)
+        return nmod_set_ui(UWORD(1) << exp, mod);
+
+    ebits = FLINT_BITS - flint_clz(exp);
+    bit = UWORD(1) << (ebits - LG_FLINT_BITS);
+
+    x = nmod_set_ui(UWORD(1) << (exp >> (ebits - LG_FLINT_BITS)), mod);
+
+    while (bit >>= 1)
+    {
+        x = nmod_mul(x, x, mod);
+        if (bit & exp)
+            x = nmod_add(x, x, mod);
+    }
+
+    return x;
+}
+
+static int
+_n_is_strong_probabprime_nmod(ulong a, ulong d, nmod_t mod)
+{
+    ulong t = d;
+    ulong n = mod.n;
+    ulong y;
+
+    FLINT_ASSERT(a < n);
+    FLINT_ASSERT(a >= 2);
+    FLINT_ASSERT(a != n - 1);
+
+    if (mod.norm == 0)
+    {
+        if (a == 2)
+            y = _nmod_2_pow_fullword(t, mod);
+        else
+            y = n_powmod2_ui_preinv(a, t, mod.n, mod.ninv);
+
+        if (y == 1)
+            return 1;
+        t <<= 1;
+
+        while ((t != n - 1) && (y != n - 1))
+        {
+            y = _nmod_mul_fullword(y, y, mod);
+            t <<= 1;
+        }
+
+        return (y == n - 1);
+    }
+    else if (a == 2)
+    {
+        y = _nmod_2_pow_nonfullword(t, mod);
+
+        if (y == 1)
+            return 1;
+        t <<= 1;
+
+        while ((t != n - 1) && (y != n - 1))
+        {
+            y = nmod_mul(y, y, mod);
+            t <<= 1;
+        }
+
+        return (y == n - 1);
     }
     else
     {
-        if (m1) return 1;
-        for (j = i + 1; j < FLINT_NUM_PSEUDOSQUARES + 1; j++)
-        {
-            ulong mod = n_powmod2(primes[j], exp, n);
-            if (mod == n - 1)
-                return 1;
-            else if (mod != 1)
-                flint_throw(FLINT_ERROR, "Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
-        }
-        flint_throw(FLINT_ERROR, "Whoah, %wu is a probable prime, but not prime, please report!!\n", n);
+        return n_is_strong_probabprime2_preinv(mod.n, mod.ninv, a, d);
     }
 }
+
+static int n_is_oddprime_small2(ulong n)
+{
+    ulong q = n / 2;
+    ulong x = (q & 63);
+    return (flint_odd_prime_lookup[q / 64] & (((uint64_t) 1) << x)) >> x;
+}
+
+int
+n_is_prime_odd_no_trial(ulong n)
+{
+    FLINT_ASSERT(n % 2 != 0);
+
+    if (n <= UINT32_MAX)
+    {
+        if (n < SMALL_ODDPRIME_LIMIT)
+            return n_is_oddprime_small2(n);
+
+        return u32_is_base2_probabprime(n) && !u32_is_base2_pseudoprime(n);
+    }
+    else
+    {
+        ulong d, norm;
+        nmod_t mod;
+
+        d = n - 1;
+        norm = flint_ctz(d);
+        d >>= norm;
+        nmod_init(&mod, n);
+
+        if (!_n_is_strong_probabprime_nmod(2, d, mod))
+            return 0;
+
+        return _n_is_strong_probabprime_nmod(get_witness_base(n), d, mod);
+    }
+}
+
+int
+n_is_prime(ulong n)
+{
+    if (n < SMALL_ODDPRIME_LIMIT)
+        return (n % 2 ? n_is_oddprime_small2(n) : n == 2);
+
+    if (!(n % 2) || !(n % 3) || !(n % 5) || !(n % 7))       return 0;
+
+    if (!(n % 11) || !(n % 13) || !(n % 17) || !(n % 19) ||
+        !(n % 23) || !(n % 29) || !(n % 31) || !(n % 37) ||
+        !(n % 41) || !(n % 43) || !(n % 47) || !(n % 53))   return 0;
+
+    if (n > UINT32_MAX &&
+        (!(n % 59) || !(n % 61) || !(n % 67) || !(n % 71) || !(n % 73) ||
+         !(n % 79) || !(n % 83) || !(n % 89) || !(n % 97) || !(n %101) ||
+         !(n %103) || !(n % 107) || !(n %109) || !(n %113) || !(n % 127) ||
+         !(n %131) || !(n % 137) || !(n %139) || !(n %149)))
+        return 0;
+
+    return n_is_prime_odd_no_trial(n);
+}
+
