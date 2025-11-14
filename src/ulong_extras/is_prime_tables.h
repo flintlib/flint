@@ -17,7 +17,7 @@
 #define C UINT64_C
 
 /* Bit table for 15-bit odd primes */
-uint64_t flint_odd_prime_lookup[] =
+const uint64_t flint_odd_prime_lookup[] =
 {
     C(0x816d129a64b4cb6e), C(0x2196820d864a4c32), C(0xa48961205a0434c9), C(0x4a2882d129861144), 
     C(0x0834992132424030), C(0x148a48844225064b), C(0x0b40b4086c304205), C(0x65048928125108a0), 

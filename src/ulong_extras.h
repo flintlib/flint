@@ -46,6 +46,14 @@ ulong n_randtest_prime(flint_rand_t state, int proved);
 ulong n_revbin(ulong in, ulong bits);
 
 int n_divides(ulong * q, ulong n, ulong p);
+
+/* Check d | n for odd d using Granlund-Montgomery, given
+   inv1 = 1/d mod 2^FLINT_BITS, inv2 = floor(UWORD_MAX / d) */
+ULONG_EXTRAS_INLINE int n_divisible_odd_gm(ulong n, ulong inv1, ulong inv2)
+{
+    return n * inv1 <= inv2;
+}
+
 ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, double npre);
 ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
 ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
@@ -405,15 +413,25 @@ ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 /* Factorisation *************************************************************/
 
 #define FLINT_ODDPRIME_SMALL_CUTOFF 4096
-#define FLINT_FACTOR_TRIAL_PRIMES 3000
-#define FLINT_FACTOR_TRIAL_PRIMES_PRIME UWORD(27449)
-#define FLINT_FACTOR_TRIAL_CUTOFF (UWORD(27449) * UWORD(27449))
+
+#define FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST 64
+
+/* This happens to be exactly the 16-bit primes. */
+#define FLINT_FACTOR_TRIAL_PRIMES 6542
+/* First omitted prime p. Factors < p^2 after trial division are guaranteed
+   to be prime. */
+#define FLINT_FACTOR_TRIAL_PRIMES_PRIME UWORD(65537)
+#if FLINT_BITS == 64
+#define FLINT_FACTOR_TRIAL_CUTOFF (FLINT_FACTOR_TRIAL_PRIMES_PRIME * FLINT_FACTOR_TRIAL_PRIMES_PRIME)
+#else
+#define FLINT_FACTOR_TRIAL_CUTOFF UWORD_MAX
+#endif
 
 #define FLINT_FACTOR_SQUFOF_ITERS 50000
-#define FLINT_FACTOR_ONE_LINE_MAX (UWORD(1)<<39)
+#define FLINT_FACTOR_ONE_LINE_MAX (UWORD(1)<<50)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
 
-ULONG_EXTRAS_INLINE void n_factor_init(n_factor_t * factors) { factors->num = UWORD(0); }
+ULONG_EXTRAS_INLINE void n_factor_init(n_factor_t * factors) { factors->num = 0; }
 
 ulong n_factor_evaluate(const n_factor_t * fac);
 
