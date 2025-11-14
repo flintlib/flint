@@ -96,13 +96,11 @@ static inline void timeit_stop_us(timeit_t t)
     t->wall += tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-#if FLINT_HAVE_FILE
 static inline void timeit_print(timeit_t timer, ulong reps)
 {
-    printf("cpu/wall(s): %g %g\n", timer->cpu * 0.001 / reps,
+    flint_printf("cpu/wall(s): %g %g\n", timer->cpu * 0.001 / reps,
                                    timer->wall * 0.001 / reps);
 }
-#endif
 
 #define TIMEIT_REPEAT(__timer, __reps) \
     do \

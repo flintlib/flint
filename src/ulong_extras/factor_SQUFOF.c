@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,14 +11,24 @@
 */
 
 #include <gmp.h>
+#include <math.h>
 #include "ulong_extras.h"
+
+static int n_is_square_and_get_sqrt(ulong * s, ulong x)
+{
+    ulong sq = sqrt((double) x) + 0.5;
+
+    *s = sq;
+    return x == sq * sq;
+}
+
 
 #define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
 
 static ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)
 {
     ulong n[2];
-    ulong sqrt[2];
+    ulong nsqrt[2];
     ulong rem[2];
     slong num, sqroot;
 
@@ -31,10 +42,10 @@ static ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)
     n[0] = n_lo;
     n[1] = n_hi;
 
-    if (n_hi) num = mpn_sqrtrem(sqrt, rem, n, 2);
-    else num = ((sqrt[0] = n_sqrtrem(rem, n_lo)) != UWORD(0));
+    if (n_hi) num = mpn_sqrtrem(nsqrt, rem, n, 2);
+    else num = ((nsqrt[0] = n_sqrtrem(rem, n_lo)) != UWORD(0));
 
-    sqroot = sqrt[0];
+    sqroot = nsqrt[0];
     p = sqroot;
     q = rem[0];
 
@@ -72,8 +83,8 @@ static ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)
         q = t;
         p = pnext;
         if ((i & 1) == 1) continue;
-        if (!n_is_square(q)) continue;
-        r = n_sqrt(q);
+        if (!n_is_square_and_get_sqrt(&r, q))
+            continue;
         if (qupto == UWORD(0)) break;
         for (j = 0; j < qupto; j++)
             if (r == qarr[j]) goto cont;
@@ -88,17 +99,17 @@ cont: ;
     p = p + r*((sqroot - p)/r);
 
     umul_ppmm(rem[1], rem[0], p, p);
-    sub_ddmmss(sqrt[1], sqrt[0], n[1], n[0], rem[1], rem[0]);
-    if (sqrt[1])
+    sub_ddmmss(nsqrt[1], nsqrt[0], n[1], n[0], rem[1], rem[0]);
+    if (nsqrt[1])
     {
         int norm;
         norm = flint_clz(qlast);
-        udiv_qrnnd(q, rem[0], (sqrt[1] << norm) + r_shift(sqrt[0], FLINT_BITS - norm), sqrt[0] << norm, qlast << norm);
+        udiv_qrnnd(q, rem[0], (nsqrt[1] << norm) + r_shift(nsqrt[0], FLINT_BITS - norm), nsqrt[0] << norm, qlast << norm);
         rem[0] >>= norm;
     }
     else
     {
-        q = sqrt[0]/qlast;
+        q = nsqrt[0]/qlast;
     }
 
     for (j = 0; j < max_iters; j++)
@@ -146,3 +157,4 @@ ulong n_factor_SQUFOF(ulong n, ulong iters)
 
     return factor;
 }
+
