@@ -127,7 +127,7 @@ static void n_factor_after_trial(n_factor_t * factors, ulong n, ulong cutoff)
 }
 
 void
-n_factor(n_factor_t * fac, ulong x, int proved)
+n_factor(n_factor_t * fac, ulong x, int FLINT_UNUSED(proved))
 {
     slong i, exp;
 

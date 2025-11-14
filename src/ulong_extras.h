@@ -435,7 +435,7 @@ ULONG_EXTRAS_INLINE void n_factor_init(n_factor_t * factors) { factors->num = 0;
 
 ulong n_factor_evaluate(const n_factor_t * fac);
 
-void n_factor(n_factor_t * factors, ulong n, int proved);
+void n_factor(n_factor_t * factors, ulong n, int FLINT_UNUSED(proved));
 
 void n_factor_insert(n_factor_t * factors, ulong p, ulong exp);
 
