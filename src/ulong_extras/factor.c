@@ -152,8 +152,8 @@ n_factor(n_factor_t * fac, ulong x, int FLINT_UNUSED(proved))
     }
 
     /* Simplify unrolling by 2 */
-    FLINT_ASSERT(FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST % 2 == 0)
-    FLINT_ASSERT(FLINT_FACTOR_TRIAL_PRIMES % 2 == 0)
+    FLINT_ASSERT(FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST % 2 == 0);
+    FLINT_ASSERT(FLINT_FACTOR_TRIAL_PRIMES % 2 == 0);
 
     i = 1;
     if (x % 3 == 0)
