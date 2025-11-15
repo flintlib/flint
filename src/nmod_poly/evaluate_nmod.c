@@ -18,84 +18,217 @@
 ulong
 _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 {
-    slong m;
-    ulong val;
-
     if (len == 0)
         return 0;
 
     if (len == 1 || c == 0)
         return poly[0];
 
-    m = len - 1;
-
-    val = poly[m];
-    m--;
-
-    for ( ; m >= 0; m--)
+    if (len <= 11)
     {
-        val = nmod_mul(val, c, mod);
-        val = n_addmod(val, poly[m], mod.n);
+        slong m = len - 1;
+        ulong val = poly[m];
+        m -= 1;
+        for (; m >= 0; m--)
+        {
+            val = nmod_mul(val, c, mod);
+            val = n_addmod(val, poly[m], mod.n);
+        }
+        return val;
     }
 
-    return val;
+    ulong c4, val0, val1, val2, val3;
+    slong m;
+
+    c4 = nmod_mul(c, c, mod);
+    c4 = nmod_mul(c4, c4, mod);
+
+    m = len - 1;
+    val0 = poly[m-3];
+    val1 = poly[m-2];
+    val2 = poly[m-1];
+    val3 = poly[m-0];
+    m -= 4;
+
+    for (; m-3 >= 0; m-=4)
+    {
+        val0 = nmod_mul(val0, c4, mod);
+        val0 = n_addmod(val0, poly[m-3], mod.n);
+        val1 = nmod_mul(val1, c4, mod);
+        val1 = n_addmod(val1, poly[m-2], mod.n);
+        val2 = nmod_mul(val2, c4, mod);
+        val2 = n_addmod(val2, poly[m-1], mod.n);
+        val3 = nmod_mul(val3, c4, mod);
+        val3 = n_addmod(val3, poly[m-0], mod.n);
+    }
+
+    /* gather results with Horner */
+    val2 = n_addmod(val2, nmod_mul(val3, c, mod), mod.n);
+    val1 = n_addmod(val1, nmod_mul(val2, c, mod), mod.n);
+    val0 = n_addmod(val0, nmod_mul(val1, c, mod), mod.n);
+
+    /* last few terms */
+    for (; m >= 0; m--)
+    {
+        val0 = nmod_mul(val0, c, mod);
+        val0 = n_addmod(val0, poly[m], mod.n);
+    }
+
+    return val0;
 }
 
 ulong
 _nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong modn)
 {
-    slong m;
-    ulong val;
-
     if (len == 0)
         return 0;
 
     if (len == 1 || c == 0)
         return poly[0];
 
-    m = len - 1;
-
-    val = poly[m];
-    m--;
-
-    for ( ; m >= 0; m--)
+    if (len <= 11)
     {
-        val = n_mulmod_shoup(c, val, c_precomp, modn);
-        val = n_addmod(val, poly[m], modn);
+        slong m = len - 1;
+        ulong val = poly[m];
+        m -= 1;
+        for (; m >= 0; m--)
+        {
+            val = n_mulmod_shoup(c, val, c_precomp, modn);
+            val = n_addmod(val, poly[m], modn);
+        }
+        return val;
     }
 
-    return val;
+    ulong val0, val1, val2, val3;
+    slong m;
+
+    /* precomputations for c**4 */
+    ulong c4, c4_precomp;
+    val0 = n_mulmod_precomp_shoup_rem_from_quo(c_precomp, modn);
+    n_mulmod_and_precomp_shoup(&c4, &c4_precomp, c, c, c_precomp, val0, c_precomp, modn);
+    val0 = n_mulmod_precomp_shoup_rem_from_quo(c4_precomp, modn);
+    n_mulmod_and_precomp_shoup(&c4, &c4_precomp, c4, c4, c4_precomp, val0, c4_precomp, modn);
+
+    m = len - 1;
+    val0 = poly[m-3];
+    val1 = poly[m-2];
+    val2 = poly[m-1];
+    val3 = poly[m-0];
+    m -= 4;
+
+    for (; m-3 >= 0; m-=4)
+    {
+        val0 = n_mulmod_shoup(c4, val0, c4_precomp, modn);
+        val0 = n_addmod(val0, poly[m-3], modn);
+        val1 = n_mulmod_shoup(c4, val1, c4_precomp, modn);
+        val1 = n_addmod(val1, poly[m-2], modn);
+        val2 = n_mulmod_shoup(c4, val2, c4_precomp, modn);
+        val2 = n_addmod(val2, poly[m-1], modn);
+        val3 = n_mulmod_shoup(c4, val3, c4_precomp, modn);
+        val3 = n_addmod(val3, poly[m-0], modn);
+    }
+
+    /* gather results with Horner */
+    val3 = n_mulmod_shoup(c, val3, c_precomp, modn);
+    val2 = n_addmod(val2, val3, modn);
+    val2 = n_mulmod_shoup(c, val2, c_precomp, modn);
+    val1 = n_addmod(val1, val2, modn);
+    val1 = n_mulmod_shoup(c, val1, c_precomp, modn);
+    val0 = n_addmod(val0, val1, modn);
+
+    /* last few terms */
+    for (; m >= 0; m--)
+    {
+        val0 = n_mulmod_shoup(c, val0, c_precomp, modn);
+        val0 = n_addmod(val0, poly[m], modn);
+    }
+
+    return val0;
 }
 
 ulong
 _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong modn)
 {
-    slong m;
-    ulong val, p_hi, p_lo;
-
     if (len == 0)
         return 0;
 
     if (len == 1 || c == 0)
         return poly[0];
 
-    m = len - 1;
-
-    val = poly[m];
-    m--;
-
-    for ( ; m >= 0; m--)
+    if (len <= 15)
     {
-        // computes either val = (c*val mod n) or val = (c*val mod n) + n
-        // see documentation of ulong_extras / n_mulmod_shoup for details
-        umul_ppmm(p_hi, p_lo, c_precomp, val);
-        val = c * val - p_hi * modn;
-        // lazy addition, yields val in [0..k+2n-1), where max(poly) < k
-        // --> if k == n (poly is reduced mod n), constraint: 3n-1 <= 2**FLINT_BITS
-        val += poly[m];
+        ulong p_hi, p_lo;
+        slong m = len - 1;
+        ulong val = poly[m];
+        m -= 1;
+        for (; m >= 0; m--)
+        {
+            umul_ppmm(p_hi, p_lo, c_precomp, val);
+            val = poly[m] + c * val - p_hi * modn;
+        }
+        return val;
     }
 
-    return val;
+    ulong p_hi, p_lo;
+    ulong val0, val1, val2, val3;
+    slong m;
+
+    /* precomputations for c**4 */
+    ulong c4, c4_precomp;
+    val0 = n_mulmod_precomp_shoup_rem_from_quo(c_precomp, modn);
+    n_mulmod_and_precomp_shoup(&c4, &c4_precomp, c, c, c_precomp, val0, c_precomp, modn);
+    val0 = n_mulmod_precomp_shoup_rem_from_quo(c4_precomp, modn);
+    n_mulmod_and_precomp_shoup(&c4, &c4_precomp, c4, c4, c4_precomp, val0, c4_precomp, modn);
+
+    m = len - 1;
+    val0 = poly[m-3];
+    val1 = poly[m-2];
+    val2 = poly[m-1];
+    val3 = poly[m-0];
+    m -= 4;
+
+    for (; m-3 >= 0; m-=4)
+    {
+        umul_ppmm(p_hi, p_lo, c4_precomp, val0);
+        val0 = poly[m-3] + c4 * val0 - p_hi * modn;
+        umul_ppmm(p_hi, p_lo, c4_precomp, val1);
+        val1 = poly[m-2] + c4 * val1 - p_hi * modn;
+        umul_ppmm(p_hi, p_lo, c4_precomp, val2);
+        val2 = poly[m-1] + c4 * val2 - p_hi * modn;
+        umul_ppmm(p_hi, p_lo, c4_precomp, val3);
+        val3 = poly[m-0] + c4 * val3 - p_hi * modn;
+    }
+
+    /* each val is in [0, max(poly) + 2*modn) */
+    /*  --> reduce to [0, max(poly)] */
+    if (val2 >= 2*modn)
+        val2 -= 2*modn;
+    else if (val2 >= modn)
+        val2 -= modn;
+    if (val1 >= 2*modn)
+        val1 -= 2*modn;
+    else if (val1 >= modn)
+        val1 -= modn;
+    if (val0 >= 2*modn)
+        val0 -= 2*modn;
+    else if (val0 >= modn)
+        val0 -= modn;
+    /* gather results with Horner */
+    umul_ppmm(p_hi, p_lo, c_precomp, val3);
+    val2 = val2 + c * val3 - p_hi * modn;
+    umul_ppmm(p_hi, p_lo, c_precomp, val2);
+    val1 = val1 + c * val2 - p_hi * modn;
+    umul_ppmm(p_hi, p_lo, c_precomp, val1);
+    val0 = val0 + c * val1 - p_hi * modn;
+
+    /* last few terms */
+    for (; m >= 0; m--)
+    {
+        umul_ppmm(p_hi, p_lo, c_precomp, val0);
+        val0 = poly[m] + c * val0 - p_hi * modn;
+    }
+
+    return val0;
 }
 
 ulong

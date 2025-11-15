@@ -18,14 +18,28 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
     int i, j, result = 1;
 
     /* Check evaluation at 1 gives sum of coeffs */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5000 * flint_test_multiplier(); i++)
     {
+        ulong n;
         nmod_poly_t a;
-        ulong n = n_randtest_not_zero(state);
         ulong sum, eval, eval_v1, eval_v2, eval_v3;
 
+        /* 50% tests with random modulus; 50% with large ones */
+        if (i < 2500 * flint_test_multiplier())
+            n = n_randtest_not_zero(state);
+        else if (i < 3500 * flint_test_multiplier())
+            n = n_randbits(state, 62);
+        else if (i < 4500 * flint_test_multiplier())
+            n = n_randbits(state, 63);
+        else
+#if FLINT_BITS == 64
+            n = UWORD(6148914691236517205);
+#else // FLINT_BITS == 32
+            n = UWORD(1431655765);
+#endif
+
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, state, n_randint(state, 100));
+        nmod_poly_randtest(a, state, n_randint(state, 150));
 
         // main function
         eval = nmod_poly_evaluate_nmod(a, UWORD(1));
@@ -80,17 +94,42 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
     }
 
     /* Check a(c) + b(c) = (a + b)(c) */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5000 * flint_test_multiplier(); i++)
     {
+        ulong n;
         nmod_poly_t a, b, acopy;
-        ulong n = n_randtest_not_zero(state);
         ulong eval1, eval2, c, eval1_v1, eval1_v2, eval1_v3, eval2_v1, eval2_v2, eval2_v3;
+
+        if (i < 2500 * flint_test_multiplier())
+            n = n_randtest_not_zero(state);
+        else if (i < 3500 * flint_test_multiplier())
+            n = n_randbits(state, 62);
+        else if (i < 4500 * flint_test_multiplier())
+            n = n_randbits(state, 63);
+        else
+#if FLINT_BITS == 64
+            n = UWORD(6148914691236517205);
+#else // FLINT_BITS == 32
+            n = UWORD(1431655765);
+#endif
+
 
         nmod_poly_init(a, n);
         nmod_poly_init(acopy, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, state, n_randint(state, 100));
-        nmod_poly_randtest(b, state, n_randint(state, 100));
+
+        if (i % 8 != 0)
+            nmod_poly_randtest(a, state, n_randint(state, 150));
+        else
+        {
+            /* really stress the overflow-related issues for lazy variant */
+            nmod_poly_fit_length(a, n_randint(state, 150));
+            _nmod_poly_set_length(a, a->alloc);
+            for (slong kk = 0; kk < a->length; kk++)
+                a->coeffs[kk] = n-1;
+            _nmod_poly_normalise(a);
+        }
+        nmod_poly_randtest(b, state, n_randint(state, 150));
         nmod_poly_set(acopy, a);
 
         c = n_randint(state, n);
@@ -178,11 +217,12 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("modulus: %wu, alength: %wu, blength: %wu\n", n, acopy->length, b->length);
             flint_printf("eval1 = %wu, eval2 = %wu\n", eval1, eval2);
             flint_printf("eval1_v1 = %wu, eval2_v1 = %wu\n", eval1_v1, eval2_v1);
             flint_printf("eval1_v2 = %wu, eval2_v2 = %wu\n", eval1_v2, eval2_v2);
             flint_printf("eval1_v3 = %wu, eval2_v3 = %wu\n", eval1_v3, eval2_v3);
-            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(acopy), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();

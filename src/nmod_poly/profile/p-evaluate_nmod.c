@@ -15,6 +15,9 @@
 #include "nmod_poly.h"
 #include "nmod_vec.h"
 
+#define NB_LENS 20
+#define NB_REPS 100
+
 typedef struct
 {
     flint_bitcnt_t bits;
@@ -47,7 +50,7 @@ void sample_interface(void * arg, ulong count)
         pt = n_randint(state, n);
 
         prof_start();
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < NB_REPS; j++)
             nmod_poly_evaluate_nmod(poly, pt);
         prof_stop();
 
@@ -86,7 +89,7 @@ void sample_generic(void * arg, ulong count)
         pt = n_randint(state, n);
 
         prof_start();
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < NB_REPS; j++)
             _nmod_poly_evaluate_nmod(poly, length, pt, mod);
         prof_stop();
     }
@@ -125,7 +128,7 @@ void sample_precomp(void * arg, ulong count)
         pt = n_randint(state, n);
 
         prof_start();
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < NB_REPS; j++)
         {
             const ulong pt_precomp = n_mulmod_precomp_shoup(pt, n);
             _nmod_poly_evaluate_nmod_precomp(poly, length, pt, pt_precomp, n);
@@ -167,7 +170,7 @@ void sample_precomp_lazy(void * arg, ulong count)
         pt = n_randint(state, n);
 
         prof_start();
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < NB_REPS; j++)
         {
             const ulong pt_precomp = n_mulmod_precomp_shoup(pt, n);
             ulong val = _nmod_poly_evaluate_nmod_precomp_lazy(poly, length, pt, pt_precomp, n);
@@ -186,15 +189,17 @@ void sample_precomp_lazy(void * arg, ulong count)
 
 int main(void)
 {
-    slong lengths[18] = {1, 2, 3, 4, 6, 8,
-                         10, 12, 16, 20, 32, 45,
-                         64, 128, 256, 1024, 8192, 65536};
+    slong lengths[NB_LENS] = 
+        { 1, 2, 3, 4, 6, 8,
+          10, 12, 16, 20, 32, 45,
+          64, 128, 256, 1024,
+          8192, 65536, 200000, 1000000};
 
     double min, max;
-    double mins[18]; // note: max seems to be consistently identical or extremely close to min
-    double mins_generic[18];
-    double mins_precomp[18];
-    double mins_precomp_lazy[18];
+    double mins[NB_LENS]; // note: max seems to be consistently identical or extremely close to min
+    double mins_generic[NB_LENS];
+    double mins_precomp[NB_LENS];
+    double mins_precomp_lazy[NB_LENS];
     info_t info;
     flint_bitcnt_t i;
 
@@ -206,7 +211,7 @@ int main(void)
         info.bits = i;
 
         printf("nbits = %ld\n", i);
-        for (int len = 0; len < 18; ++len)
+        for (int len = 0; len < NB_LENS; ++len)
         {
             info.length = lengths[len];
 
@@ -222,38 +227,40 @@ int main(void)
 
         if (i < FLINT_BITS-1)
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < NB_LENS; ++len)
             {
-                flint_printf("   len %ld\t%.2lf\t%.2lf\t%.2lf\t%.2lf",
+                double fac = NB_REPS * (double)lengths[len] * (double)FLINT_CLOCK_SCALE_FACTOR;
+                flint_printf("   len %ld\t\t%.2lf\t%.2lf\t%.2lf\t%.2lf",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        mins[len-1]/fac,
+                        mins_generic[len-1]/fac,
+                        mins_precomp[len-1]/fac,
+                        mins_precomp_lazy[len-1]/fac);
                 flint_printf("\n");
             }
         }
         else if (i < FLINT_BITS)
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < NB_LENS; ++len)
             {
+                double fac = NB_REPS * (double)lengths[len] * (double)FLINT_CLOCK_SCALE_FACTOR;
                 flint_printf("   len %ld\t%.2lf\t%.2lf\t%.2lf\t na",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        mins[len-1]/fac,
+                        mins_generic[len-1]/fac,
+                        mins_precomp[len-1]/fac);
                 flint_printf("\n");
             }
         }
         else  // i == FLINT_BITS
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < NB_LENS; ++len)
             {
+                double fac = NB_REPS * (double)lengths[len] * (double)FLINT_CLOCK_SCALE_FACTOR;
                 flint_printf("   len %ld\t%.2lf\t%.2lf\t na \t na",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        mins[len-1]/fac,
+                        mins_generic[len-1]/fac);
                 flint_printf("\n");
             }
         }
