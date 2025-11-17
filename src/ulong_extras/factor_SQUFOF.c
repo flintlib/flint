@@ -130,18 +130,27 @@ cont: ;
     return q;
 }
 
-ulong n_factor_SQUFOF(ulong n, ulong iters)
+/* Make sure multiplier does not overflow */
+#define MAX_MULTIPLIER_BITS 16
+
+ulong n_ll_factor_SQUFOF(ulong nhi, ulong nlo, ulong iters)
 {
-    ulong factor = _ll_factor_SQUFOF(UWORD(0), n, iters);
+    ulong factor = _ll_factor_SQUFOF(nhi, nlo, iters);
     ulong multiplier;
     ulong quot, rem;
     ulong i;
+
+    if (nhi >= UWORD(1) << (FLINT_BITS - MAX_MULTIPLIER_BITS))
+        return 0;
 
     for (i = 1; (i < FLINT_NUM_PRIMES_SMALL) && !factor; i++)
     {
         ulong multn[2];
         multiplier = flint_primes_small[i];
-        umul_ppmm(multn[1], multn[0], multiplier, n);
+        FLINT_ASSERT(multiplier < (UWORD(1) << MAX_MULTIPLIER_BITS));
+
+        umul_ppmm(multn[1], multn[0], multiplier, nlo);
+        multn[1] += multiplier * nhi;
         factor = _ll_factor_SQUFOF(multn[1], multn[0], iters);
 
         if (factor)
@@ -149,12 +158,19 @@ ulong n_factor_SQUFOF(ulong n, ulong iters)
             quot = factor/multiplier;
             rem = factor - quot*multiplier;
             if (!rem) factor = quot;
-            if ((factor == UWORD(1)) || (factor == n)) factor = UWORD(0);
+            /* The factor is trivial */
+            if ((factor == UWORD(1)) || (factor == nlo && nhi == 0))
+                factor = UWORD(0);
         }
     }
 
     if (i == FLINT_NUM_PRIMES_SMALL) return UWORD(0);
 
     return factor;
+}
+
+ulong n_factor_SQUFOF(ulong n, ulong iters)
+{
+    return n_ll_factor_SQUFOF(0, n, iters);
 }
 
