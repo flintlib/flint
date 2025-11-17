@@ -448,6 +448,7 @@ ulong n_factor_power235(ulong *exp, ulong n);
 ulong n_factor_one_line(ulong n, ulong iters);
 ulong n_factor_lehman(ulong n);
 
+ulong n_ll_factor_SQUFOF(ulong nhi, ulong nlo, ulong iters);
 ulong n_factor_SQUFOF(ulong n, ulong iters);
 
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);
