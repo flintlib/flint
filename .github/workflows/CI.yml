@@ -49,45 +49,30 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          julia --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-      - name: "Configure"
-        run: ./bootstrap.sh && ./configure CC=${CC} --with-ntl --enable-assert
-      - name: "Compile library"
-        run: $MAKE && ldd libflint.so
-      - name: "Compile tests"
-        run: $MAKE tests
-      - name: "Rescale multiplier"
-        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
-      - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
-      - name: "Install"
-        run: sudo make install && sudo ldconfig
+      - name: "Build FLINT for msolve"
+        run: |
+          ./bootstrap.sh && ./configure CC=${CC} --with-ntl --enable-assert
+          $MAKE && sudo make install && sudo ldconfig
       - name: "Test msolve"
         run: |
           git clone --depth=1 https://github.com/algebraic-solving/msolve
-          cd msolve/
-          ./autogen.sh && ./configure
-          $MAKE check
-      - name: "Test Nemo.jl"
+          cd msolve/ && ./autogen.sh && ./configure && $MAKE && make check
+      - name: "Build FLINT for Nemo"
         run: |
-          git clone --depth 1 https://github.com/Nemocas/Nemo.jl.git
-          julia --version
-          julia -e 'println(Base.BinaryPlatforms.HostPlatform())'
           gmp_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(gmp_artifact_dir())')
           mpfr_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(mpfr_artifact_dir())')
           echo "Path to GMP and MPFR: ${gmp_path}, ${mpfr_path}"
-          wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
-          VERSION=$(grep "upstream_version =" build_tarballs.jl | sed "s/upstream_version = v\"\([0-9\.]*\)\"/\1/")
-          SONAME=$(grep "$VERSION => " configure.ac | sed "s/# $VERSION \+=> \([0-9\.]\+\)/\1/")
-          MAJOR=$(echo "$SONAME" | sed 's/\(\d\+\)\..*/\1/')
+          ./bootstrap.sh && ./configure CC=${CC} --with-gmp=$gmp_path --with-mpfr=$mpfr_path && $MAKE
           mkdir lib
           cp libflint.so* lib/
-          patchelf --set-soname libflint.so.$MAJOR lib/$(ls libflint.so.*.*.*)
-          julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\");"
+      - name: "Test Nemo.jl"
+        run: |
+          git clone --depth 1 https://github.com/Nemocas/Nemo.jl.git
+          mkdir -p ~/.julia/artifacts
           echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"$(pwd)\"" > ~/.julia/artifacts/Overrides.toml
-          touch Nemo.jl/src/Nemo.jl
-          julia -e "using Nemo; println(\"Path to Nemo's libflint:\", Nemo.libflint)"
-          julia -e "import Pkg; Pkg.test(\"Nemo\")"
+          julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\"); Pkg.test(\"Nemo\")"
 
   ubuntu-codecov:
     name: codecov (x10)
