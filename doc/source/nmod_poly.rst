@@ -1561,8 +1561,19 @@ Interpolation
     Forms the interpolating polynomial using a naive implementation
     of the barycentric form of Lagrange interpolation.
 
+.. function:: void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len, nmod_t mod)
+              void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len)
+
+    Performs interpolation using the geometric progression precomputation ``G``.
+
+    Sets ``poly`` to the unique polynomial of length at most ``len``
+    that interpolates according to the parameter set of ``G``.
+    The value of ``len`` should be equal to the precomputation size parameter ``G->len``.
+
+    Uses fast geometric multipoint interpolation using a supplied geometric progression precomputation.
+
 .. function:: void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly, ulong r, nn_srcptr ys, slong n)
-    
+
     Sets ``poly`` to the unique polynomial of length at most ``n``
     that interpolates the first ``n`` powers of ``r`` and
     values ``ys``.
@@ -1574,15 +1585,6 @@ Interpolation
 
     Uses fast geometric multipoint interpolation, building a temporary geometric progression precomputation.
 
-.. function:: void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len)
-
-    Performs interpolation using the geometric progression precomputation ``G``.
-
-    Sets ``poly`` to the unique polynomial of length at most ``len``
-    that interpolates according to the parameter set of ``G``. 
-    The value of ``len`` should be equal to the precomputation size parameter ``G->len``.
-
-    Uses fast geometric multipoint interpolation using a supplied geometric progression precomputation.
     
 Composition
 --------------------------------------------------------------------------------
@@ -2569,12 +2571,13 @@ Geometric progression
 
 .. function:: void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong len, nmod_t mod)
 
-
     Builds a geometric progression multipoint evaluation / interpolation structure.
 
+    The set of points used will be `1, r^2, r^4, \ldots, r^{2(len-1)}`.
+
     The value of ``r`` should be reduced modulo the modulus ``mod``
-    and of sufficient multiplicative order such that none of 
-    the powers `1, r^2, r^4, \ldots, r^{2(len-1)}` is one.
+    and of sufficient multiplicative order such that none of
+    the powers `r^2, r^4, \ldots, r^{2(len-1)}` is one.
 
     The value of ``len`` should be both greater than or equal to the number of evaluation points to be
     considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.

@@ -15,28 +15,22 @@
 #include "nmod_vec.h"
 
 void
-nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
-    const nmod_geometric_progression_t G, slong len)
+_nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
+    const nmod_geometric_progression_t G, slong len, nmod_t mod)
 {
     slong i, N, f1_len, f2_len, h1_len, h2_min;
     nn_ptr f, h;
-    nmod_t mod;
 
     N = G->len;
 
     FLINT_ASSERT(len == N);
 
-    nmod_poly_fit_length(poly, len);
-    poly->length = len;
-    
     if (len == 1)
     {
-        poly->coeffs[0] = v[0];
-        _nmod_poly_normalise(poly); // required ov v[0] == 0
+        poly[0] = v[0];
         return;
     }
 
-    mod = G->mod;
     f = _nmod_vec_init(N);
     h = _nmod_vec_init(N);
 
@@ -82,12 +76,21 @@ nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcpt
 
     for (i = 0; i < len; i++)
     {
-        poly->coeffs[i] = nmod_mul(h[N - 1 - i], G->z[i], mod);
+        poly[i] = nmod_mul(h[N - 1 - i], G->z[i], mod);
     }
-    _nmod_poly_normalise(poly);
 
     _nmod_vec_clear(f);
     _nmod_vec_clear(h);
+}
+
+void
+nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
+    const nmod_geometric_progression_t G, slong len)
+{
+    nmod_poly_fit_length(poly, len);
+    _nmod_poly_set_length(poly, len);
+    _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(poly->coeffs, v, G, len, G->mod);
+    _nmod_poly_normalise(poly);
 }
 
 void

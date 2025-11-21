@@ -593,14 +593,13 @@ void nmod_geometric_progression_clear(nmod_geometric_progression_t G);
 void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod);
 void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n);
 
-void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len);
-
+void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod);
 void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod);
 void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n);
 
+void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len, nmod_t mod);
+void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len);
 void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly, ulong r, nn_srcptr ys, slong n);
-void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
-    const nmod_geometric_progression_t G, slong len);
 
 /* Interpolation  ************************************************************/
 

@@ -70,7 +70,7 @@ user202729 (U2), Vincent Neiger (VN).
   * Fix bug in ``gr_poly_div_series_basecase``: this would previously return ``GR_DOMAIN`` in some cases where the quotient actually exists (FJ).
   * Correct semantics for generic series: operations on ``gr_series`` should no longer create enclosures for elements that don't exist (FJ).
   * Fix ``gr_poly_shift_equivalent`` in positive characteristic (MM).
-  * Fix a memory leak in nmod_mpoly_gcd and improve test coverage of this function (FJ).
+  * Fix a memory leak in ``nmod_mpoly_gcd`` and improve test coverage of this function (FJ).
 
 * Performance
 
