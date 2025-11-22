@@ -126,6 +126,7 @@ int mpn_mod_neg_one(nn_ptr res, gr_ctx_t ctx);
 int mpn_mod_set_mpn(nn_ptr res, nn_srcptr x, slong xn, gr_ctx_t ctx);
 int mpn_mod_set_fmpz(nn_ptr res, const fmpz_t x, gr_ctx_t ctx);
 int mpn_mod_set_other(nn_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx);
+int mpn_mod_rand(nn_ptr res, flint_rand_t state, gr_ctx_t ctx);
 int mpn_mod_randtest(nn_ptr res, flint_rand_t state, gr_ctx_t ctx);
 int mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx);
 
@@ -191,6 +192,7 @@ int mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx);
 int _mpn_mod_vec_zero(nn_ptr res, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_clear(nn_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx));
 int _mpn_mod_vec_set(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);
+int _mpn_mod_vec_rand(nn_ptr res, flint_rand_t state, slong len, gr_ctx_t ctx);
 void _mpn_mod_vec_swap(nn_ptr vec1, nn_ptr vec2, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_neg(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_add(nn_ptr res, nn_srcptr x, nn_srcptr y, slong len, gr_ctx_t ctx);
