@@ -2583,6 +2583,10 @@ Geometric progression
     considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.
     This allocates vectors and polynomials for a total space of `8 len - 1` coefficients.
 
+    If the modulus is not prime, this function will work under the additional
+    assumption that all the used points `r^{2k}` as well as the axuiliary
+    values `r^{2k} - 1` are invertible.
+
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 
     Clears the allocated polynomials and vectors used in the geometric progression precomputation ``G``.
