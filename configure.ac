@@ -101,9 +101,10 @@ AC_LANG(C)
 # 3.2.0    => 20.0.0
 # 3.2.1    => 20.0.1
 # 3.3.0    => 21.0.0
+# 3.4.0    => 22.0.0
 
 # NOTE: This must be after AC_INIT
-FLINT_MAJOR_SO=21
+FLINT_MAJOR_SO=22
 FLINT_MINOR_SO=0
 FLINT_PATCH_SO=0
 
