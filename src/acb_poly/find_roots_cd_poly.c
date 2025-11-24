@@ -3,6 +3,9 @@
 #include <math.h>
 #include <string.h> /* for memcpy */
 
+#pragma GCC optimize("Ofast,unroll-loops") 
+#pragma float_control(precise, off)
+
 /*****************************************
  * Intermediate variables data structure *
  * ***************************************/
@@ -71,7 +74,7 @@ static void _d_swap(double* a, double* b)
 }
 
 /* Reorder the z : the values at index < n-c satisfy |z| <= 1, and at index >= n-c they satisfy |z|>1 */
-slong cd_poly_partition_pivot(double* z_r, double* z_i, slong n)
+static slong cd_poly_partition_pivot(double* z_r, double* z_i, slong n)
 {
     slong i, c = 0;
     for(i=0; i<n; i++) {
@@ -85,27 +88,21 @@ slong cd_poly_partition_pivot(double* z_r, double* z_i, slong n)
     return n-c;
 }
 
+/* Order that maximizes the chance of concluding with the first comparison */
 static int _compare(const void * first, const void * second)
 {
-    double magl, argl, magr, argr, compmag, epsilon=ldexp(1,-25);
-    double left[2];
-    double right[2];
+    double f, s, irr = sqrt(2), epsilon=ldexp(1,-25);
     int res;
-    memcpy(left, first, 2*sizeof(double));
-    memcpy(right, second, 2*sizeof(double));
-    magl = hypot(left[0], left[1]);
-    magr = hypot(right[0], right[1]);
-    compmag = magl/magr - 1;
-    if(compmag < -epsilon){
+    f = (*(double*)first)  * irr + (*((double*)first+1));
+    s = (*(double*)second) * irr + (*((double*)second+1));
+    if(f < s - epsilon) {
         res = -1;
-    } else if(compmag > epsilon) {
+    } else if (f > s + epsilon) {
         res = 1;
     } else {
-        argl = atan2(left[1], left[0]);
-        argr = atan2(right[1], right[0]);
-        /* returns the -1, 0 or 1 whether argl is lower, equal or greater
-         * than argr */
-        res = (argr < argl) - (argl < argr);
+        f = (*(double*)first)  - irr * (*((double*)first+1));
+        s = (*(double*)second) - irr * (*((double*)second+1));
+        res = (f > s + epsilon) - (f < s - epsilon);
     }
     return res;
 }
@@ -117,8 +114,8 @@ static slong _trim_zeros(double * z, slong * fz, const double * p, slong n)
 
     /* trailing terms with zero coefficients add roots at infinity*/
     for(i=n-1; i>=1 && p[2*i] == 0.0 && p[2*i+1] == 0.0; i--) {
-        z[2*(i-1)] = INFINITY;
-        z[2*(i-1)+1] = 0.0;
+        z[2*(i-1)] = ldexp(1,1023);
+        z[2*(i-1)+1] = ldexp(1,1023);
     }
 
     /* leading terms with zero coefficients add roots at zero*/
@@ -136,12 +133,18 @@ static void _vector_inverse(double* iz_r, double* iz_i, const double* z_r, const
 {
     for(slong i=n_start; i<n_end; i++) {
         double s, t;
-        /* these formula reduces the risk of overflow */
-        s = (z_r[i] == 0) ? 0 : 1/(z_r[i] + z_i[i]*(z_i[i]/z_r[i]));
-        t = (z_i[i] == 0) ? 0 : -1/(z_r[i]*(z_r[i]/z_i[i]) + z_i[i]); 
-        s = (s==0 && t==0) ? ldexp(1,500) : s;
-        iz_r[i] = s;
-        iz_i[i] = t;
+        /* use Smith's algorithm to reduce the risk of overflow */
+        if(fabs(z_r[i]) >= fabs(z_i[i]) ) {
+            s = z_i[i]/z_r[i];
+            t = 1/(z_r[i] + z_i[i] * s);
+            iz_r[i] = t;
+            iz_i[i] = -s*t;
+        } else {
+            s = z_r[i]/z_i[i];
+            t = 1/(z_r[i] * s + z_i[i]);
+            iz_r[i] = s*t;
+            iz_i[i] = -t;
+        }
     }
 }
 
@@ -289,7 +292,6 @@ void cd_poly_horner(double* results_r, double* results_i,
             double a = coefficients_r[n-1-j];
             double b = coefficients_i[n-1-j];
             for(k=0; k<CDHBlock; k++) {
-                #pragma STDC FP_CONTRACT ON
                 double s,t;
                 s = a + u[k]*x[k] - v[k]*y[k];
                 t = b + u[k]*y[k] + v[k]*x[k];
@@ -318,7 +320,6 @@ static void cd_poly_weierstrass_a(double* restrict results_r, double* restrict r
     }
     for(j=1; j<d; j++) {
         for(i=n_start; i < n_end; i++) {
-            #pragma STDC FP_CONTRACT ON
             double q, r, s, t;
             q = twice_values_r[i] - twice_values_r[i+j];
             r = twice_values_i[i] - twice_values_i[i+j];
@@ -344,7 +345,6 @@ static void cd_poly_weierstrass_b(double* restrict results_r, double* restrict r
     }
     for(j=1; j<n_end-n_start; j++) {
         for(i=n_start; i < n_end-j; i++) {
-            #pragma STDC FP_CONTRACT ON
             double q, r, s, t;
             q = values_r[i] - values_r[i+j];
             r = values_i[i] - values_i[i+j];
@@ -360,7 +360,6 @@ static void cd_poly_weierstrass_b(double* restrict results_r, double* restrict r
     }
     for(j=n_end % d; ((j<n_start) || (j>= n_end)) && (n_start < n_end); j = (j + 1) % d) {
         for(i=n_start; i < n_end; i++) {
-            #pragma STDC FP_CONTRACT ON
             double q, r, s, t;
             q = values_r[i] - values_r[j];
             r = values_i[i] - values_i[j];
@@ -407,7 +406,6 @@ void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
         memcpy(b+p, v, p*sizeof(double));
         for(m=1; m<p; m++) {
             for(k=0; k<p; k++) {
-                #pragma STDC FP_CONTRACT ON
                 double e, f, s,t;
                 e = u[k] - a[k+m];
                 f = v[k] - b[k+m];
@@ -425,7 +423,6 @@ void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
             memcpy(b, values_i+j, q*sizeof(double));
             for(m=0; m<q; m++) {
                 for(k=0; k<CDWBlock; k++) {
-                    #pragma STDC FP_CONTRACT ON
                     double e, f, s,t;
                     e = u[k]-a[m];
                     f = v[k]-b[m];
@@ -439,7 +436,6 @@ void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
             memcpy(yc, results_i+j, q*sizeof(double));
             for(k=0; k<CDWBlock; k++) {
                 for(m=0; m<q; m++) {
-                    #pragma STDC FP_CONTRACT ON
                     double e, f, s,t;
                     e = a[m]-u[k];
                     f = b[m]-v[k];
@@ -461,7 +457,6 @@ void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
             memcpy(b, values_i+j, q*sizeof(double));
             for(m=0; m<q; m++) {
                 for(k=0; k<p; k++) {
-                    #pragma STDC FP_CONTRACT ON
                     double e, f, s,t;
                     e = u[k]-a[m];
                     f = v[k]-b[m];

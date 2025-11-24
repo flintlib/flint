@@ -700,6 +700,8 @@ void cd_poly_horner(double* results_r, double* results_i,
                     const double* values_r, const double* values_i, slong n_start, slong n_end,
                     const double* coefficients_r, const double* coefficients_i, slong n);
 double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, double reltol);
+int _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, slong len, slong maxiter, slong prec);
+
 
 #ifdef __cplusplus
 }

@@ -50,7 +50,7 @@ _acb_get_rad_mag(const acb_t z)
     return FLINT_MAX(rm, im);
 }
 
-/* Compute res[0, ..., n-1] = {i} indexing the convex hull of {i, y[i]}. */
+/* Compute res[0, ..., n-1] = {i} indexing the upper convex hull of {i, y[i]}. */
 static slong convex_hull(slong * res, const double * y, slong len)
 {
     slong i, n = 0;
@@ -217,25 +217,211 @@ _acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr f_prime, sl
     return status;
 }
 
-static int _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, slong len, slong maxiter, slong prec)
+ /* Compute res[0, ..., n-1] = {i} indexing the upper convex hull of {(x[i], y[i])}. */
+static slong convex_hull_upper(slong * res, const double * y, const slong * x, slong len)
+{
+    slong i, n = 0;
+
+    for (i = 0; i < len; i++)
+    {
+        while (n >= 2 && (x[res[n - 2]] - x[res[n - 1]]) * (y[i] - y[res[n - 1]])
+                <= (x[i] - x[res[n - 1]]) * (y[res[n - 2]] - y[res[n - 1]]))
+            n--;
+
+        res[n] = i;
+        n++;
+    }
+
+    return n;
+}
+
+/* Compute res[0, ..., n-1] = {i} indexing the lower convex hull of {(x[i], y[i])}. */
+static slong convex_hull_lower(slong * res, const double * y, const slong * x, slong len)
+{
+    slong i, n = 0;
+
+    for (i = 0; i < len; i++)
+    {
+        while (n >= 2 && (x[res[n - 2]] - x[res[n - 1]]) * (y[i] - y[res[n - 1]])
+                >= (x[i] - x[res[n - 1]]) * (y[res[n - 2]] - y[res[n - 1]]))
+            n--;
+
+        res[n] = i;
+        n++;
+    }
+
+    return n;
+}
+
+/* Computes the line y = ax + b that minimizes max_i |y[i] - (a*x[i] + b)|.
+   Returns the maximal vertical distance. 
+   Requires x to be sorted. */
+static double
+_minimax_line(double * res_a, double * res_b, const double * y, const slong * x, slong len)
+{
+    slong * hL, * hU;
+    slong nL, nU, pL, pU;
+    slong i, j;
+    double dyL, dyU;
+    slong dxL, dxU;
+    double a, b, rL, rU;
+    int last_side = 0; /* 0: Lower hull updated, 1: Upper hull updated */
+
+    if (len < 2)
+    {
+        *res_a = 0.0;
+        *res_b = (len == 1) ? y[0] : 0.0;
+        return 0.0;
+    }
+
+    hL = flint_malloc((len + 1) * sizeof(slong));
+    hU = flint_malloc((len + 1) * sizeof(slong));
+
+    nL = convex_hull_lower(hL, y, x, len);
+    /* Compute upper hull into hU + 1 so hU[0] is available as a sentinel */
+    nU = convex_hull_upper(hU + 1, y, x, len);
+
+    /* Set sentinels to 0. Loop condition handles termination. */
+    hL[nL] = 0;
+    hU[0] = 0;
+
+    pL = 0;
+    pU = nU;
+
+    /* Initialize edge differences. */
+    dyL = y[hL[1]] - y[hL[0]];
+    dxL = x[hL[1]] - x[hL[0]];
+
+    /* Upper hull edge (backward) */
+    dyU = y[hU[pU]] - y[hU[pU - 1]];
+    dxU = x[hU[pU]] - x[hU[pU - 1]];
+
+    /* Loop until the x-coordinate of the lower hull catches up to the upper hull */
+    while (x[hL[pL]] < x[hU[pU]])
+    {
+        /* Compare slopes */
+        if (dyL * dxU < dyU * dxL)
+        {
+            pL++;
+            dyL = y[hL[pL + 1]] - y[hL[pL]];
+            dxL = x[hL[pL + 1]] - x[hL[pL]];
+            last_side = 0;
+        }
+        else
+        {
+            pU--;
+            dyU = y[hU[pU]] - y[hU[pU - 1]];
+            dxU = x[hU[pU]] - x[hU[pU - 1]];
+            last_side = 1;
+        }
+    }
+
+    i = last_side ? hU[pU + 1] : hL[pL - 1];
+    j = last_side ? hU[pU]     : hL[pL];
+
+    /* Compute slope a. */
+    a = (y[j] - y[i]) / (x[j] - x[i]);
+
+    /* Compute residuals at the support vertices using slope a */
+    rL = y[hL[pL]] - a * x[hL[pL]];
+    rU = y[hU[pU]] - a * x[hU[pU]];
+
+    /* Compute b and return max distance */
+    b = (rU + rL) * 0.5;
+
+    *res_a = a;
+    *res_b = b;
+
+    flint_free(hL);
+    flint_free(hU);
+
+    return (rU - rL) * 0.5;
+}
+
+/* Rescale using rotating calipers on the points (i,-log(|poly[i]|)) */
+static double
+_best_fit(arb_t scale, double * cdp, const acb_srcptr poly, slong len, slong prec)
+{
+    double *alog;
+    double a, b, mdist;
+    slong * nonzero;
+    slong i, j, prec2;
+    mag_t m;
+    acb_t cmid, cscale;
+    arb_t c, log2;
+    
+    arb_init(log2);
+    arb_init(c);
+    acb_init(cmid); /* shallow copies, not cleared */
+    acb_init(cscale);
+    mag_init(m);
+    arb_log_ui(log2, 2, prec);
+    prec2 = prec + ceil(log(len)/log(2));
+    alog = flint_malloc(sizeof(double) * len);
+    nonzero = flint_malloc(sizeof(slong) * len);
+    j = 0;
+    for (i = 0; i < len; i++)
+    {
+        *arb_midref(acb_realref(cmid)) = *arb_midref(acb_realref(poly + i));
+        *arb_midref(acb_imagref(cmid)) = *arb_midref(acb_imagref(poly + i));
+        acb_get_mag(m, cmid);
+        if( !mag_is_zero(m) ) {
+            alog[j] = mag_get_d_log2_approx(m);
+            nonzero[j] = i;
+            j++;
+        }
+    }
+    
+    mdist =  _minimax_line(&a, &b, alog, nonzero, j);  
+
+    if(mdist > 1022) {
+        b += mdist - 1022;
+    }
+    
+    arb_set_d(scale, -a);
+    arb_mul  (scale, scale, log2, prec);
+    arb_exp  (scale, scale, prec);
+    arb_set_d(c, -b);
+    arb_mul  (c, c, log2, prec);
+    arb_exp  (c, c, prec);
+    for(i=0; i<len; i++) {
+        acb_mul_arb(cscale, poly+i, c, prec);
+        cdp[2*i]   = arf_get_d(arb_midref(acb_realref(cscale)), ARF_RND_NEAR);
+        cdp[2*i+1] = arf_get_d(arb_midref(acb_imagref(cscale)), ARF_RND_NEAR);
+        arb_mul(c, c, scale, prec2);
+    }
+   
+    flint_free(alog);
+    flint_free(nonzero);
+    mag_clear(m);
+    acb_clear(cscale);
+    arb_clear(c);
+    arb_clear(log2);
+    return mdist;
+}
+
+int _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, slong len, slong maxiter, slong prec)
 {
     double *cdz, *cdp;
+    double max_correction, max_distance;
+    arb_t scale;
     slong i;
     int status;
+    
+    arb_init(scale);
     cdp = flint_malloc(2*len*sizeof(double));
     cdz = flint_malloc(2*(len - 1)*sizeof(double));
-    for(i=0; i<len; i++) {
-        /* Possible improvement : rescale using linear regression on points (i,-log(|poly[i]|)) */
-        cdp[2*i]   = arf_get_d(arb_midref(acb_realref(poly+i)), ARF_RND_NEAR);
-        cdp[2*i+1] = arf_get_d(arb_midref(acb_imagref(poly+i)), ARF_RND_NEAR);
-    }
-    double max_correction = cd_poly_find_roots(cdz, cdp, len, maxiter, ldexp(1,-prec));
+
+    max_distance = _best_fit(scale, cdp, poly, len, prec);
+    max_correction = cd_poly_find_roots(cdz, cdp, len, maxiter, ldexp(1,-prec));
     for(i=0; i<len-1; i++) {
         acb_set_d_d(roots + i, cdz[2*i], cdz[2*i+1]);
+        acb_mul_arb(roots + i, roots + i, scale, prec);
     }
     status = (max_correction < ldexp(1, -prec/2)) ? GR_SUCCESS : GR_UNABLE ;
     flint_free(cdz);
     flint_free(cdp);
+    arb_clear(scale);
     return status;
 }
 
@@ -293,7 +479,7 @@ _acb_poly_find_roots(acb_ptr roots,
         if (attempt == 0)
         {
             if (prec <= 53) {
-                slong fmaxiter = (maxiter < 150) ? 150 : maxiter;
+                slong fmaxiter = FLINT_MAX(150,maxiter);
                 status = _acb_poly_find_roots_double(roots, poly, len, fmaxiter, prec);
                 if(status == GR_SUCCESS)
                     break;
