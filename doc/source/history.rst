@@ -6,7 +6,7 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-2025-??-?? -- FLINT 3.4.0-dev
+2025-11-25 -- FLINT 3.4.0
 -------------------------------------------------------------------------------
 
 Contributors: Albin Ahlbäck (AA), Andrii Yanovets (AY), Claus Fieker (CF),
