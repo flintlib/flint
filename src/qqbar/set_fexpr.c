@@ -223,7 +223,7 @@ _fexpr_parse_acb(acb_t res, const fexpr_t expr)
 static int
 fmpq_set_decimal(fmpq_t res, const char * inp, slong max_bits)
 {
-    char * emarker;
+    const char * emarker;
     char * buf;
     int success;
     slong i;
