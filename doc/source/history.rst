@@ -6,6 +6,13 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+FLINT 3.5.0-dev
+-------------------------------------------------------------------------------
+
+Contributors: David Sparks (DS), Fredrik Johansson (FJ), Mathieu Gouttenoire (MG)
+
+* Smaller hash table for ``n_is_prime`` (FJ, DS, MG).
+
 2025-11-25 -- FLINT 3.4.0
 -------------------------------------------------------------------------------
 
