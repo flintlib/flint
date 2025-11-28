@@ -906,10 +906,10 @@ Primality testing
     by checking that `n` is not one of the 31894014 base-2 strong pseudoprimes
     `n < 2^{64}` which have been tabulated exhaustively by Feitsma [FeiGal2013]_.
 
-    For the 2314 pseudoprimes up to 32 bits, we simply store all
-    pseudoprimes in a table and do a lookup using binary search.
-    For the pseudoprimes up to 64 bits, we use a hash table following the
-    idea of Forisek and Jancina [ForJan2015]_. We precompute a function `T` such
+    The 2314 pseudoprimes up to 32 bits are simply looked up in a hash table.
+
+    For the pseudoprimes up to 64 bits, we follow the idea of Forisek and
+    Jancina [ForJan2015]_. We precompute a function `T` such
     that for pseudoprime `n < 2^{64}`, a probable prime test with base `T(n)`
     certifies compositeness of `n`. Our `T` is represented as a hash table
     with 98304 entries stored in an array of 24-bit integers. A small number

@@ -18,7 +18,6 @@
 #include "nmod.h"
 
 #define SMALL_ODDPRIME_LIMIT 32768
-#define NUM_32BIT_PSEUDOPRIMES 2314
 #define WITNESS_BASE_HASH_SIZE 98304
 #define NUM_OVERSIZE_BASES 4903
 
@@ -26,30 +25,14 @@
    placed in a seprate header file. */
 #include "is_prime_tables.h"
 
+/* Branch-free hash table lookup */
 static int u32_is_base2_pseudoprime(uint32_t x)
 {
-    const uint32_t * arr = base2_32bit_pseudoprimes;
+    uint32_t c = base2_32bit_pseudoprimes_hash_keys[x >> 25];
+    uint32_t h = (x ^ c) % 2560;
 
-    int a, b;
-    unsigned int bc = FLINT_BITS - flint_clz(x);
-
-    a = base2_32bit_pseudoprimes_start[bc - 1];
-    b = base2_32bit_pseudoprimes_start[bc];
-
-    while (a < b)
-    {
-        int m = a + (b - a) / 2;
-        uint32_t mid_val = arr[m];
-
-        if (mid_val == x)
-            return 1;
-        else if (mid_val < x)
-            a = m + 1;
-        else
-            b = m;
-    }
-
-    return 0;
+    /* Linear probing */
+    return (base2_32bit_pseudoprimes[h] == x) | (base2_32bit_pseudoprimes[h + 1] == x);
 }
 
 /* Faster arithmetic for 32-bit probable prime test on 64-bit machines. */
