@@ -176,6 +176,35 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
 
+Utility
+--------------------------------------------------------------------------------
+
+.. function:: void fmpz_factor_sort(fmpz_factor_t factor)
+
+    Sorts ``factor`` in-place such that the factors are in ascending order.
+
+Arithmetic
+--------------------------------------------------------------------------------
+
+.. function:: void _fmpz_factor_mul(fmpz_factor_t factor, const fmpz_factor_t a, const fmpz_factor_t b)
+
+    Sets ``factor`` to the factored representation of `a \times b` assuming ``a`` and ``b``
+    are sorted.
+
+.. function:: void fmpz_factor_mul(fmpz_factor_t factor, const fmpz_factor_t a, const fmpz_factor_t b)
+
+    Sets ``factor`` to the factored representation of `a \times b` by first sorting ``a`` and ``b``.
+
+.. function:: void _fmpz_factor_gcd(fmpz_factor_t factor, const fmpz_factor_t a, const fmpz_factor_t b)
+
+    Sets ``factor`` to the factored representation of `\gcd(a, b)` assuming ``a`` and ``b``
+    are sorted.
+
+.. function:: void fmpz_factor_gcd(fmpz_factor_t factor, const fmpz_factor_t a, const fmpz_factor_t b)
+
+    Sets ``factor`` to the factored representation of `\gcd(a, b)` by first sorting ``a`` and ``b``.
+
+
 Input and output
 --------------------------------------------------------------------------------
 

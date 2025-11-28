@@ -38,6 +38,16 @@ void _fmpz_factor_append_ui(fmpz_factor_t factor, ulong p, ulong exp);
 
 void _fmpz_factor_concat(fmpz_factor_t factor1, fmpz_factor_t factor2, ulong exp);
 
+void fmpz_factor_sort(fmpz_factor_t factor);
+
+/* Arithmetic ****************************************************************/
+
+void _fmpz_factor_mul(fmpz_factor_t factor, const fmpz_factor_t a, const fmpz_factor_t b);
+void fmpz_factor_gcd(fmpz_factor_t factor, fmpz_factor_t a, fmpz_factor_t b);
+
+void _fmpz_factor_gcd(fmpz_factor_t factor, const fmpz_factor_t a, const fmpz_factor_t b);
+void fmpz_factor_mul(fmpz_factor_t factor, fmpz_factor_t a, fmpz_factor_t b);
+
 /* I/O ***********************************************************************/
 
 #ifdef FLINT_HAVE_FILE
