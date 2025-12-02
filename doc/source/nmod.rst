@@ -134,6 +134,95 @@ Modular reduction and arithmetic
     ``mod.n``. It is assumed that `a` is already reduced
     modulo ``mod.n`` and that `e` is not negative.
 
+Montgomery arithmetic
+--------------------------------------------------------------------------------
+
+Let `n` be an odd integer smaller than the machine word modulus
+`R = 2^{32}` or `R = 2^{64}`.
+The Montgomery representation of an integer `x` is the residue `x R \bmod n`.
+We can use Montgomery representations
+for doing arithmetic in `\mathbb{Z} / n \mathbb{Z}`,
+following the rules
+
+.. math ::
+
+    (x + y) R \bmod n = x R + y R \bmod n,
+
+.. math ::
+
+    (x y) R \bmod n = (x R) (y R) / R \bmod n.
+
+The advantage of using the Montgomery representation instead of
+the standard representation `x \bmod n` is that it allows
+for faster multiplication. Montgomery arithmetic is also known as
+REDC arithmetic.
+
+For `n < 2^{30}` or `n < 2^{62}`, we support an optional "fast"
+version of Montgomery arithmetic. Functions with the "fast" signature accept
+non-canonical residues in `[0, 2n)` and return non-canonical residues
+in `[0, 2n)`. The user must convert back to the canonical range `[0, n)`
+before using any non-"fast" functions.
+
+
+.. type:: nmod_redc_ctx_struct
+          nmod_redc_ctx_t
+
+    A context object for Montgomery arithmetic. This holds the same content
+    as an ``nmod_t`` context, plus the precomputed constant `-1/n` modulo `R`.
+
+.. function:: void nmod_redc_ctx_init_nmod(nmod_redc_ctx_t ctx, nmod_t mod)
+              void nmod_redc_ctx_init_ui(nmod_redc_ctx_t ctx, ulong n)
+
+    Initialize ``ctx`` for Montgomery arithmetic modulo the given modulus
+    `n` which is required to be odd.
+
+.. function:: ulong nmod_redc_set_nmod(ulong x, const nmod_redc_ctx_t ctx)
+
+    Convert `x` from the standard representation to Montgomery representation.
+    If `x` is viewed a residue in the standard representation,
+    this returns `x R \bmod n`.
+
+.. function:: ulong nmod_redc_set_ui(ulong x, const nmod_redc_ctx_t ctx)
+
+    Convert `x` which is not necessarily reduced modulo `n`
+    to Montgomery representation.
+
+.. function:: ulong nmod_redc_get_nmod(ulong x, const nmod_redc_ctx_t ctx)
+
+    Convert `x` back from Montgomery representation to standard representation.
+    If `x` is viewed as a residue in the standard representation,
+    this returns `x / R \bmod n`. This function allows `x \in [0, 2n)`.
+
+.. function:: ulong nmod_redc_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+
+    Arithmetic in the Montgomery representation.
+
+.. function:: int nmod_redc_can_use_fast(const nmod_redc_ctx_t ctx)
+
+    Return whether the modulus is small enough to safely use fast operations.
+
+.. function:: ulong nmod_redc_fast_normalise(ulong x, const nmod_redc_ctx_t ctx)
+
+    Convert a non-canonical residue in `[0, 2n)` to a canonical
+    residue in `[0, n)`.
+
+.. function:: ulong nmod_redc_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_fast_mul_two(ulong x, const nmod_redc_ctx_t ctx)
+
+    Arithmetic in Montgomery representation, using non-canonical residues.
+
+.. function:: ulong _nmod_redc_pow_ui(ulong a, ulong exp, const nmod_redc_ctx_t ctx)
+              ulong _nmod_redc_fast_pow_ui(ulong a, ulong exp, const nmod_redc_ctx_t ctx)
+
+    Return `a^{exp}`. The exponent is required to be positive.
+
+.. function:: ulong _nmod_redc_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx)
+              ulong _nmod_redc_fast_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx)
+
+    Return `2^{exp}`. The exponent must be at least ``FLINT_BITS``.
 
 Discrete Logarithms via Pohlig-Hellman
 --------------------------------------------------------------------------------

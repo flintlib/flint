@@ -278,6 +278,12 @@ nmod_poly_gcd_with_sparse(nmod_poly_t res, const nmod_poly_t A, const nmod_poly_
     }
 }
 
+static ulong
+nmod_ui_pow_ui(ulong a, ulong exp, nmod_t mod)
+{
+    return nmod_pow_ui(nmod_set_ui(a, mod), exp, mod);
+}
+
 /* Discriminant of x^n + ax^k + b  mod p > 2 (Swan's formula). */
 static ulong
 _nmod_poly_trinomial_discriminant(ulong n, ulong k, ulong a, ulong b, nmod_t mod)
@@ -290,8 +296,8 @@ _nmod_poly_trinomial_discriminant(ulong n, ulong k, ulong a, ulong b, nmod_t mod
     k1 = k / d;
 
     D1 = nmod_pow_ui(b, k - 1, mod);
-    D2 = nmod_mul(nmod_pow_ui(n, n1, mod), nmod_pow_ui(b, n1 - k1, mod), mod);
-    D3 = nmod_mul(nmod_pow_ui(n - k, n1 - k1, mod), nmod_pow_ui(k, k1, mod), mod);
+    D2 = nmod_mul(nmod_ui_pow_ui(n, n1, mod), nmod_pow_ui(b, n1 - k1, mod), mod);
+    D3 = nmod_mul(nmod_ui_pow_ui(n - k, n1 - k1, mod), nmod_ui_pow_ui(k, k1, mod), mod);
     D3 = nmod_mul(D3, nmod_pow_ui(a, n1, mod), mod);
     if (n1 % 2)
         D3 = nmod_neg(D3, mod);
