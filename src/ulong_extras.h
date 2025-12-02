@@ -274,6 +274,8 @@ ulong n_invmod(ulong x, ulong y)
    return r;
 }
 
+ulong n_binvert(ulong a);
+
 /* Modular multiplication with fixed operand **********************************/
 
 ULONG_EXTRAS_INLINE

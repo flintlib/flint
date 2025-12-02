@@ -228,7 +228,11 @@ void nmod_init(nmod_t * mod, ulong n)
     mod->ninv = n_preinvert_limb_prenorm(n << (mod->norm));
 }
 
-/* discrete logs a la Pohlig - Hellman ***************************************/
+/* Montgomery arithmetic */
+
+
+
+/* Discrete logs a la Pohlig - Hellman ***************************************/
 
 typedef struct {
     ulong gammapow;
