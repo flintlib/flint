@@ -461,7 +461,7 @@ Jacobi and Kronecker symbols
     Computes the Jacobi symbol, allowing `x` to go up to a full limb.
 
 
-Modular Arithmetic
+Modular arithmetic
 --------------------------------------------------------------------------------
 
 
@@ -480,6 +480,12 @@ Modular Arithmetic
 
     This is merely an adaption of the extended Euclidean algorithm
     with appropriate normalisation.
+
+.. function:: ulong n_binvert(ulong n)
+
+    Assuming that `n` is odd, returns the multiplicative inverse modulo
+    `2^{\mathtt{FLINT\_BITS}}`. If `n` is even, some arbitrary
+    value is returned.
 
 .. function:: ulong n_powmod_precomp(ulong a, slong exp, ulong n, double npre)
 
@@ -597,7 +603,7 @@ Modular Arithmetic
     points to is set to NULL.
 
 
-Modular Arithmetic with Fixed Operand
+Modular arithmetic with fixed operand
 --------------------------------------------------------------------------------
 
 This is about computing several modular multiplications where one operand and
@@ -1570,7 +1576,7 @@ Factorials
     large `n`.
 
 
-Primitive Roots and Discrete Logarithms
+Primitive roots and discrete logarithms
 --------------------------------------------------------------------------------
 
 

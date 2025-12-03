@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-addmod.c"
+#include "t-binvert.c"
 #include "t-cbrt_binary_search.c"
 #include "t-cbrt.c"
 #include "t-cbrt_chebyshev_approx.c"
@@ -110,6 +111,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(n_addmod),
+    TEST_FUNCTION(n_binvert),
     TEST_FUNCTION(n_cbrt_binary_search),
     TEST_FUNCTION(n_cbrt),
     TEST_FUNCTION(n_cbrt_chebyshev_approx),

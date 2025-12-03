@@ -131,22 +131,31 @@ ulong _nmod_sub(ulong a, ulong b, nmod_t mod)
 NMOD_INLINE
 ulong nmod_add(ulong a, ulong b, nmod_t mod)
 {
-   const ulong neg = mod.n - a;
-   if (neg > b)
-      return a + b;
-   else
-      return b - neg;
+    const ulong neg = mod.n - a;
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    if (neg > b)
+        return a + b;
+    else
+        return b - neg;
+}
+
+NMOD_INLINE
+ulong nmod_ui_add_ui(ulong a, ulong b, nmod_t mod)
+{
+    return nmod_add(nmod_set_ui(a, mod), nmod_set_ui(b, mod), mod);
 }
 
 NMOD_INLINE
 ulong nmod_sub(ulong a, ulong b, nmod_t mod)
 {
-   const ulong diff = a - b;
-
-   if (a < b)
-      return mod.n + diff;
-   else
-      return diff;
+    const ulong diff = a - b;
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    if (a < b)
+        return mod.n + diff;
+    else
+        return diff;
 }
 
 NMOD_INLINE
@@ -162,8 +171,16 @@ NMOD_INLINE
 ulong nmod_mul(ulong a, ulong b, nmod_t mod)
 {
     ulong res;
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
     NMOD_MUL_PRENORM(res, a, b << mod.norm, mod);
     return res;
+}
+
+NMOD_INLINE ulong
+nmod_ui_mul_ui(ulong a, ulong b, nmod_t mod)
+{
+    return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
 }
 
 NMOD_INLINE
@@ -177,6 +194,9 @@ ulong _nmod_mul_fullword(ulong a, ulong b, nmod_t mod)
 NMOD_INLINE
 ulong nmod_addmul(ulong a, ulong b, ulong c, nmod_t mod)
 {
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    FLINT_ASSERT(c < mod.n);
     return nmod_add(a, nmod_mul(b, c, mod), mod);
 }
 
@@ -208,11 +228,18 @@ ulong nmod_div(ulong a, ulong b, nmod_t mod)
 
 int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod);
 
-NMOD_INLINE
-ulong nmod_pow_ui(ulong a, ulong exp, nmod_t mod)
+ulong _nmod_pow_ui_redc(ulong a, ulong exp, nmod_t mod);
+ulong _nmod_pow_ui_binexp(ulong a, ulong exp, nmod_t mod);
+ulong nmod_pow_ui(ulong a, ulong exp, nmod_t mod);
+
+NMOD_INLINE ulong
+nmod_ui_pow_ui(ulong a, ulong exp, nmod_t mod)
 {
-    return n_powmod2_ui_preinv(a, exp, mod.n, mod.ninv);
+    return nmod_pow_ui(nmod_set_ui(a, mod), exp, mod);
 }
+
+ulong _nmod_2_pow_ui_binexp(ulong exp, nmod_t mod);
+ulong nmod_2_pow_ui(ulong exp, nmod_t mod);
 
 NMOD_INLINE
 ulong nmod_pow_fmpz(ulong a, const fmpz_t exp, nmod_t mod)
@@ -228,7 +255,327 @@ void nmod_init(nmod_t * mod, ulong n)
     mod->ninv = n_preinvert_limb_prenorm(n << (mod->norm));
 }
 
-/* discrete logs a la Pohlig - Hellman ***************************************/
+/* Montgomery arithmetic *****************************************************/
+
+/* Internal helpers for Montgomery arithmetic ********************************/
+/* Some of these functions could be moved to ulong_extras in the future. */
+
+/* Experimental: see if the compiler generates better code than inline assembly */
+#if FLINT_BITS == 64 && defined(__GNUC__)
+
+typedef __uint128_t ull_t;
+
+NMOD_INLINE ulong ull_hi(ull_t x) { return x >> FLINT_BITS; }
+NMOD_INLINE ulong ull_lo(ull_t x) { return (ulong) x; }
+NMOD_INLINE ull_t ull_add(ull_t x, ull_t y) { return x + y; }
+NMOD_INLINE ull_t ull_add_u(ull_t x, ulong y) { return x + (ull_t) y; }
+NMOD_INLINE ull_t ull_u_mul_u(ulong x, ulong y) { return (ull_t) x * (ull_t) y; }
+
+#else
+
+typedef struct { ulong lo; ulong hi; } ull_t;
+
+NMOD_INLINE ulong ull_hi(ull_t x) { return x.hi; }
+NMOD_INLINE ulong ull_lo(ull_t x) { return x.lo; }
+NMOD_INLINE ull_t ull_add(ull_t x, ull_t y) { ull_t t; add_ssaaaa(t.hi, t.lo, x.hi, x.lo, y.hi, y.lo); return t; }
+NMOD_INLINE ull_t ull_add_u(ull_t x, ulong y) { ull_t t; add_ssaaaa(t.hi, t.lo, x.hi, x.lo, 0, y); return t; }
+NMOD_INLINE ull_t ull_u_mul_u(ulong x, ulong y) { ull_t t; umul_ppmm(t.hi, t.lo, x, y); return t; }
+
+#endif
+
+FLINT_FORCE_INLINE ulong n_mulhi(ulong a, ulong b)
+{
+    return ull_hi(ull_u_mul_u(a, b));
+}
+
+FLINT_FORCE_INLINE void n_mul2(ulong * hi, ulong * lo, ulong a, ulong b)
+{
+    ull_t t = ull_u_mul_u(a, b);
+    *hi = ull_hi(t);
+    *lo = ull_lo(t);
+}
+
+/* Assumes a already reduced mod n. */
+FLINT_FORCE_INLINE ulong
+n_to_redc_preinv(ulong a, ulong n, ulong ninv, ulong norm)
+{
+    ulong q0, q1, r;
+    FLINT_ASSERT(a < n);
+    n <<= norm;
+    a <<= norm;
+    ull_t t = ull_u_mul_u(ninv, a);
+    q1 = ull_hi(t);
+    q0 = ull_lo(t);
+    q1 += a;
+    r = -(q1 + 1) * n;
+    if (r > q0)
+        r += n;
+    return (r < n) ? (r >> norm) : ((r - n) >> norm);
+}
+
+/* Computes x/R, reducing to [0,2n). */
+/* nred = -1/n mod R, R = 2^FLINT_BITS */
+FLINT_FORCE_INLINE
+ulong n_redc_fast(ulong x, ulong n, ulong nred)
+{
+    return ull_hi(ull_add_u(ull_u_mul_u(n, x * nred), x));
+}
+
+FLINT_FORCE_INLINE
+ulong n_ll_redc_fast(ull_t x, ulong n, ulong nred)
+{
+    return ull_hi(ull_add(ull_u_mul_u(n, ull_lo(x) * nred), x));
+}
+
+/* Computes x/R mod n, reducing to [0,n). */
+FLINT_FORCE_INLINE
+ulong n_redc(ulong x, ulong n, ulong nred)
+{
+    ulong y = n_redc_fast(x, n, nred);
+    if (y >= n)
+        y -= n;
+    return y;
+}
+
+/* Computes x/R, reducing to [0,n). Assumes x < n * 2^FLINT_BITS. */
+FLINT_FORCE_INLINE
+ulong n_ll_redc(ull_t x, ulong n, ulong nred)
+{
+    ulong lo, hi;
+
+    lo = n_mulhi(ull_lo(x) * (-nred), n);
+    hi = ull_hi(x);
+
+    if (hi < lo)
+        return hi - lo + n;
+    else
+        return hi - lo;
+}
+
+/* Computes (ab)/R mod n, reducing to [0,n). */
+FLINT_FORCE_INLINE
+ulong n_mulmod_redc(ulong a, ulong b, ulong n, ulong nred)
+{
+    return n_ll_redc(ull_u_mul_u(a, b), n, nred);
+}
+
+/* Computes (ab)/R mod n, reducing to [0,2n). */
+FLINT_FORCE_INLINE
+ulong n_mulmod_redc_fast(ulong a, ulong b, ulong n, ulong nred)
+{
+    return n_ll_redc_fast(ull_u_mul_u(a, b), n, nred);
+}
+
+/* User-friendly functions for Montgomery arithmetic *************************/
+
+typedef struct
+{
+    /* Standard nmod data for odd n. The precomputed inverse is not required
+       for Montgomery arithmetic itself, but it is useful for conversion
+       into Montgomery form. */
+    /* nred = -1/n mod R, R = 2^FLINT_BITS */
+    nmod_t mod;
+    ulong nred;
+    /* Todo: should we store the constant 1? This would slow down
+       creating the context when we don't need it.
+    ulong one;
+    */
+}
+nmod_redc_ctx_struct;
+
+typedef nmod_redc_ctx_struct nmod_redc_ctx_t[1];
+
+NMOD_INLINE void nmod_redc_ctx_init_nmod(nmod_redc_ctx_t ctx, nmod_t mod)
+{
+    FLINT_ASSERT(mod.n & 1);
+
+    ctx->mod = mod;
+    ctx->nred = n_binvert(-mod.n);
+}
+
+NMOD_INLINE void nmod_redc_ctx_init_ui(nmod_redc_ctx_t ctx, ulong n)
+{
+    FLINT_ASSERT(n & 1);
+
+    nmod_init(&ctx->mod, n);
+    ctx->nred = n_binvert(-n);
+}
+
+NMOD_INLINE ulong nmod_redc_set_nmod(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return n_to_redc_preinv(x, ctx->mod.n, ctx->mod.ninv, ctx->mod.norm);
+}
+
+NMOD_INLINE ulong nmod_redc_set_ui(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return nmod_redc_set_nmod(nmod_set_ui(x, ctx->mod), ctx);
+}
+
+NMOD_INLINE ulong nmod_redc_get_nmod(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return n_redc(x, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE ulong nmod_redc_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return nmod_add(x, y, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return nmod_sub(x, y, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_mulmod_redc(x, y, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE int nmod_redc_can_use_fast(const nmod_redc_ctx_t ctx)
+{
+    return ctx->mod.norm >= 2;
+}
+
+NMOD_INLINE ulong nmod_redc_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_mulmod_redc_fast(x, y, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE ulong nmod_redc_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_addmod(x, y, 2 * ctx->mod.n);
+}
+
+NMOD_INLINE ulong nmod_redc_fast_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_submod(x, y, 2 * ctx->mod.n);
+}
+
+NMOD_INLINE ulong nmod_redc_fast_normalise(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return x < ctx->mod.n ? x : x - ctx->mod.n;
+}
+
+NMOD_INLINE
+ulong nmod_redc_fast_mul_two(ulong x, const nmod_redc_ctx_t ctx)
+{
+    ulong n = ctx->mod.n;
+
+    if (x >= n)
+        x -= n;
+
+    return 2 * x;
+}
+
+ulong _nmod_redc_pow_ui(ulong a, ulong exp, const nmod_redc_ctx_t ctx);
+ulong _nmod_redc_fast_pow_ui(ulong a, ulong exp, const nmod_redc_ctx_t ctx);
+
+ulong _nmod_redc_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx);
+ulong _nmod_redc_fast_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx);
+
+/* Half-limb versions of Montgomery arithmetic */
+
+FLINT_FORCE_INLINE ulong
+n_to_redc_half_preinv(ulong a, ulong n, ulong ninv, ulong FLINT_UNUSED(norm))
+{
+    return n_mod2_preinv(((ulong) a) << (FLINT_BITS / 2), n, ninv);
+}
+
+FLINT_FORCE_INLINE
+ulong n_redc_half_fast(ulong x, ulong n, ulong nred)
+{
+    ulong y = (x * nred) % (UWORD(1) << (FLINT_BITS / 2));
+    ulong z = x + n * y;
+    return z >> (FLINT_BITS / 2);
+}
+
+FLINT_FORCE_INLINE
+ulong n_redc_half(ulong x, ulong n, ulong nred)
+{
+    ulong y = n_redc_half_fast(x, n, nred);
+    if (y >= n)
+        y -= n;
+    return y;
+}
+
+FLINT_FORCE_INLINE
+ulong n_mulmod_redc_half(ulong a, ulong b, ulong n, ulong nred)
+{
+    return n_redc_half(a * b, n, nred);
+}
+
+FLINT_FORCE_INLINE
+ulong n_mulmod_redc_half_fast(ulong a, ulong b, ulong n, ulong nred)
+{
+    return n_redc_half_fast(a * b, n, nred);
+}
+
+NMOD_INLINE void nmod_redc_half_ctx_init_nmod(nmod_redc_ctx_t ctx, nmod_t mod)
+{
+    FLINT_ASSERT(mod.n & 1);
+    FLINT_ASSERT(mod.norm >= FLINT_BITS / 2 + 1);
+    ctx->mod = mod;
+    /* todo: skip one iteration */
+    ctx->nred = n_binvert(-mod.n) % (UWORD(1) << (FLINT_BITS / 2));
+}
+
+NMOD_INLINE void nmod_redc_half_ctx_init_ui(nmod_redc_ctx_t ctx, ulong n)
+{
+    nmod_init(&ctx->mod, n);
+    nmod_redc_half_ctx_init_nmod(ctx, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_half_set_nmod(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return n_to_redc_half_preinv(x, ctx->mod.n, ctx->mod.ninv, ctx->mod.norm);
+}
+
+NMOD_INLINE ulong nmod_redc_half_set_ui(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return nmod_redc_half_set_nmod(nmod_set_ui(x, ctx->mod), ctx);
+}
+
+NMOD_INLINE ulong nmod_redc_half_get_nmod(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return n_redc_half(x, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE ulong nmod_redc_half_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return nmod_add(x, y, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_half_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return nmod_sub(x, y, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_half_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_mulmod_redc_half(x, y, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE int nmod_redc_half_can_use_fast(const nmod_redc_ctx_t ctx)
+{
+    return ctx->mod.norm >= (FLINT_BITS / 2 + 2);
+}
+
+NMOD_INLINE ulong nmod_redc_half_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_mulmod_redc_half_fast(x, y, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE ulong nmod_redc_half_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_addmod(x, y, 2 * ctx->mod.n);
+}
+
+NMOD_INLINE ulong nmod_redc_half_fast_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_submod(x, y, 2 * ctx->mod.n);
+}
+
+/* Discrete logs a la Pohlig - Hellman ***************************************/
 
 typedef struct {
     ulong gammapow;

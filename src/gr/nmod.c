@@ -477,38 +477,34 @@ _gr_nmod_mul_2exp_si(ulong * res, ulong * x, slong y, const gr_ctx_t ctx)
 
     if (y >= 0)
     {
-        if (y < FLINT_BITS)
+        if ((ulong) y <= NMOD_CTX(ctx).norm)
         {
-            c = UWORD(1) << y;
-            if (c >= m)
-                NMOD_RED(c, c, NMOD_CTX(ctx));
+            res[0] = nmod_set_ui(x[0] << (ulong) y, NMOD_CTX(ctx));
         }
         else
         {
-            /* accidentally also works when mod <= 2 */
-            c = nmod_pow_ui(2, y, NMOD_CTX(ctx));
+            c = nmod_2_pow_ui(y, NMOD_CTX(ctx));
+            res[0] = nmod_mul(x[0], c, NMOD_CTX(ctx));
         }
     }
     else
     {
-        if (m % 2 == 0)
+        if (m == 1)
         {
-            if (m == 1)
-            {
-                res[0] = 0;
-                return GR_SUCCESS;
-            }
-
-            return GR_DOMAIN;
+            res[0] = 0;
+            return GR_SUCCESS;
         }
+
+        if (m % 2 == 0)
+            return GR_DOMAIN;
 
         /* quickly construct 1/2 */
         c = (m - 1) / 2 + 1;
 
         c = nmod_pow_ui(c, -y, NMOD_CTX(ctx));
+        res[0] = nmod_mul(x[0], c, NMOD_CTX(ctx));
     }
 
-    res[0] = nmod_mul(x[0], c, NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
