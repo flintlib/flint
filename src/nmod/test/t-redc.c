@@ -31,7 +31,7 @@ TEST_FUNCTION_START(nmod_redc, state)
         else
             nmod_redc_ctx_init_ui(ctx, n);
 
-        x = n_randtest(state) % n;  
+        x = n_randtest(state) % n;
         y = n_randtest(state) % n;
         e = n_randtest_not_zero(state);
 
@@ -68,50 +68,131 @@ TEST_FUNCTION_START(nmod_redc, state)
                 n, ctx->nred, x, e, z, x_red, z_red, z_back);
         }
 
-        if (!nmod_redc_can_use_fast(ctx))
-            continue;
-
-        if (n_randint(state, 2)) x_red += n;
-        if (n_randint(state, 2)) y_red += n;
-
-        z = nmod_add(x, y, mod);
-        z_red = nmod_redc_fast_add(x_red, y_red, ctx);
-        z_back = nmod_redc_get_nmod(z_red, ctx);
-
-        if (z_back != z)
+        if (nmod_redc_can_use_fast(ctx))
         {
-            TEST_FUNCTION_FAIL("nmod_redc_fast_add\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
-                n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+            if (n_randint(state, 2)) x_red += n;
+            if (n_randint(state, 2)) y_red += n;
+
+            z = nmod_add(x, y, mod);
+            z_red = nmod_redc_fast_add(x_red, y_red, ctx);
+            z_back = nmod_redc_get_nmod(z_red, ctx);
+
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("nmod_redc_fast_add\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+            }
+
+            z = nmod_mul(x, y, mod);
+            z_red = nmod_redc_fast_mul(x_red, y_red, ctx);
+            z_back = nmod_redc_get_nmod(z_red, ctx);
+
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("nmod_redc_fast_mul\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+            }
+
+            z = nmod_add(x, x, mod);
+            z_red = nmod_redc_fast_mul_two(x_red, ctx);
+            z_back = nmod_redc_get_nmod(z_red, ctx);
+
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("nmod_redc_fast_mul_two\nn = %wu\nnred = %wu\nx = %wu\nz = %wu\nx_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, x, z, x_red, z_red, z_back);
+            }
+
+            z = _nmod_pow_ui_binexp(x, e, mod);
+            z_red = _nmod_redc_fast_pow_ui(x_red, e, ctx);
+            z_back = nmod_redc_get_nmod(z_red, ctx);
+
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("_nmod_redc_fast_pow_ui\nn = %wu\nnred = %wu\nx = %wu\ne = %wu\nz = %wu\nx_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, x, e, z, x_red, z_red, z_back);
+            }
         }
 
-        z = nmod_mul(x, y, mod);
-        z_red = nmod_redc_fast_mul(x_red, y_red, ctx);
-        z_back = nmod_redc_get_nmod(z_red, ctx);
-
-        if (z_back != z)
+        if (n < UWORD(1) << (FLINT_BITS / 2 - 1))
         {
-            TEST_FUNCTION_FAIL("nmod_redc_fast_mul\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
-                n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
-        }
+            if (n_randint(state, 2))
+                nmod_redc_half_ctx_init_nmod(ctx, mod);
+            else
+                nmod_redc_half_ctx_init_ui(ctx, n);
 
-        z = nmod_add(x, x, mod);
-        z_red = nmod_redc_fast_mul_two(x_red, ctx);
-        z_back = nmod_redc_get_nmod(z_red, ctx);
+            x = n_randtest(state) % n;
+            y = n_randtest(state) % n;
+            e = n_randtest_not_zero(state);
 
-        if (z_back != z)
-        {
-            TEST_FUNCTION_FAIL("nmod_redc_fast_mul_two\nn = %wu\nnred = %wu\nx = %wu\nz = %wu\nx_red = %wu\nz_red = %wu\nz_back = %wu\n",
-                n, ctx->nred, x, z, x_red, z_red, z_back);
-        }
+            x_red = nmod_redc_half_set_nmod(x, ctx);
+            y_red = nmod_redc_half_set_nmod(y, ctx);
 
-        z = _nmod_pow_ui_binexp(x, e, mod);
-        z_red = _nmod_redc_fast_pow_ui(x_red, e, ctx);
-        z_back = nmod_redc_get_nmod(z_red, ctx);
+            z = nmod_add(x, y, mod);
+            z_red = nmod_redc_half_add(x_red, y_red, ctx);
+            z_back = nmod_redc_half_get_nmod(z_red, ctx);
 
-        if (z_back != z)
-        {
-            TEST_FUNCTION_FAIL("_nmod_redc_fast_pow_ui\nn = %wu\nnred = %wu\nx = %wu\ne = %wu\nz = %wu\nx_red = %wu\nz_red = %wu\nz_back = %wu\n",
-                n, ctx->nred, x, e, z, x_red, z_red, z_back);
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("nmod_redc_half_add\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+            }
+
+            z = nmod_sub(x, y, mod);
+            z_red = nmod_redc_half_sub(x_red, y_red, ctx);
+            z_back = nmod_redc_half_get_nmod(z_red, ctx);
+
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("nmod_redc_half_sub\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+            }
+
+            z = nmod_mul(x, y, mod);
+            z_red = nmod_redc_half_mul(x_red, y_red, ctx);
+            z_back = nmod_redc_half_get_nmod(z_red, ctx);
+
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("nmod_redc_half_mul\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+            }
+
+            if (n < UWORD(1) << (FLINT_BITS / 2 - 2))
+            {
+                if (n_randint(state, 2)) x_red += n;
+                if (n_randint(state, 2)) y_red += n;
+
+                z = nmod_add(x, y, mod);
+                z_red = nmod_redc_half_fast_add(x_red, y_red, ctx);
+                z_back = nmod_redc_half_get_nmod(z_red, ctx);
+
+                if (z_back != z)
+                {
+                    TEST_FUNCTION_FAIL("nmod_redc_half_fast_add\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                        n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+                }
+
+                z = nmod_sub(x, y, mod);
+                z_red = nmod_redc_half_fast_sub(x_red, y_red, ctx);
+                z_back = nmod_redc_half_get_nmod(z_red, ctx);
+
+                if (z_back != z)
+                {
+                    TEST_FUNCTION_FAIL("nmod_redc_half_fast_sub\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                        n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+                }
+
+                z = nmod_mul(x, y, mod);
+                z_red = nmod_redc_half_fast_mul(x_red, y_red, ctx);
+                z_back = nmod_redc_half_get_nmod(z_red, ctx);
+
+                if (z_back != z)
+                {
+                    TEST_FUNCTION_FAIL("nmod_redc_half_fast_mul\nn = %wu\nnred = %wu\nx = %wu\ny = %wu\nz = %wu\nx_red = %wu\ny_red = %wu\nz_red = %wu\nz_back = %wu\n",
+                        n, ctx->nred, x, y, z, x_red, y_red, z_red, z_back);
+                }
+            }
         }
     }
 

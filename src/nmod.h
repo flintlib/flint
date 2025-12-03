@@ -446,6 +446,11 @@ NMOD_INLINE ulong nmod_redc_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx
     return n_addmod(x, y, 2 * ctx->mod.n);
 }
 
+NMOD_INLINE ulong nmod_redc_fast_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_submod(x, y, 2 * ctx->mod.n);
+}
+
 NMOD_INLINE ulong nmod_redc_fast_normalise(ulong x, const nmod_redc_ctx_t ctx)
 {
     return x < ctx->mod.n ? x : x - ctx->mod.n;
@@ -467,6 +472,108 @@ ulong _nmod_redc_fast_pow_ui(ulong a, ulong exp, const nmod_redc_ctx_t ctx);
 
 ulong _nmod_redc_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx);
 ulong _nmod_redc_fast_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx);
+
+/* Half-limb versions of Montgomery arithmetic */
+
+FLINT_FORCE_INLINE ulong
+n_to_redc_half_preinv(ulong a, ulong n, ulong ninv, ulong FLINT_UNUSED(norm))
+{
+    return n_mod2_preinv(((ulong) a) << (FLINT_BITS / 2), n, ninv);
+}
+
+FLINT_FORCE_INLINE
+ulong n_redc_half_fast(ulong x, ulong n, ulong nred)
+{
+    ulong y = (x * nred) % (UWORD(1) << (FLINT_BITS / 2));
+    ulong z = x + n * y;
+    return z >> (FLINT_BITS / 2);
+}
+
+FLINT_FORCE_INLINE
+ulong n_redc_half(ulong x, ulong n, ulong nred)
+{
+    ulong y = n_redc_half_fast(x, n, nred);
+    if (y >= n)
+        y -= n;
+    return y;
+}
+
+FLINT_FORCE_INLINE
+ulong n_mulmod_redc_half(ulong a, ulong b, ulong n, ulong nred)
+{
+    return n_redc_half(a * b, n, nred);
+}
+
+FLINT_FORCE_INLINE
+ulong n_mulmod_redc_half_fast(ulong a, ulong b, ulong n, ulong nred)
+{
+    return n_redc_half_fast(a * b, n, nred);
+}
+
+NMOD_INLINE void nmod_redc_half_ctx_init_nmod(nmod_redc_ctx_t ctx, nmod_t mod)
+{
+    FLINT_ASSERT(mod.n & 1);
+    FLINT_ASSERT(mod.norm >= FLINT_BITS / 2 + 1);
+    ctx->mod = mod;
+    /* todo: skip one iteration */
+    ctx->nred = n_binvert(-mod.n) % (UWORD(1) << (FLINT_BITS / 2));
+}
+
+NMOD_INLINE void nmod_redc_half_ctx_init_ui(nmod_redc_ctx_t ctx, ulong n)
+{
+    nmod_init(&ctx->mod, n);
+    nmod_redc_half_ctx_init_nmod(ctx, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_half_set_nmod(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return n_to_redc_half_preinv(x, ctx->mod.n, ctx->mod.ninv, ctx->mod.norm);
+}
+
+NMOD_INLINE ulong nmod_redc_half_set_ui(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return nmod_redc_half_set_nmod(nmod_set_ui(x, ctx->mod), ctx);
+}
+
+NMOD_INLINE ulong nmod_redc_half_get_nmod(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return n_redc_half(x, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE ulong nmod_redc_half_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return nmod_add(x, y, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_half_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return nmod_sub(x, y, ctx->mod);
+}
+
+NMOD_INLINE ulong nmod_redc_half_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_mulmod_redc_half(x, y, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE int nmod_redc_half_can_use_fast(const nmod_redc_ctx_t ctx)
+{
+    return ctx->mod.norm >= (FLINT_BITS / 2 + 2);
+}
+
+NMOD_INLINE ulong nmod_redc_half_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_mulmod_redc_half_fast(x, y, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE ulong nmod_redc_half_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_addmod(x, y, 2 * ctx->mod.n);
+}
+
+NMOD_INLINE ulong nmod_redc_half_fast_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+{
+    return n_submod(x, y, 2 * ctx->mod.n);
+}
 
 /* Discrete logs a la Pohlig - Hellman ***************************************/
 

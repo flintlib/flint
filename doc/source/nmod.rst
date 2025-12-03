@@ -176,12 +176,39 @@ the standard representation `x \bmod n` is that it allows
 for faster multiplication. Montgomery arithmetic is also known as
 REDC arithmetic.
 
-For `n < 2^{30}` or `n < 2^{62}`, we support an optional "fast"
-version of Montgomery arithmetic. Functions with the "fast" signature accept
-non-canonical residues in `[0, 2n)` and return non-canonical residues
-in `[0, 2n)`. The user must convert back to the canonical range `[0, n)`
-before using any non-"fast" functions.
+By default moduli up `R` the full word size are allowed and residues are
+strictly canonicalised to `[0, n)`. We provide sets of alternative
+methods for restricted moduli which, depending on the machine,
+can speed up arithmetic:
 
+* The ``half`` (and ``half_fast``) methods work with half-length
+  `R`, avoiding the need for double-word operations in the internal
+  arithmetic. They are not necessarily faster than the non-``half`` versions.
+  Mixing ``half`` and non-``half`` methods and context objects
+  is not allowed.
+
+* The ``fast`` (and ``half_fast``) accept non-canonical residues in `[0, 2n)`
+  and return non-canonical residues in `[0, 2n)`. The user must convert back
+  to the canonical range `[0, n)` before using any non-``fast`` functions.
+  The ``fast`` methods are generally faster than the non-``fast`` methods.
+
+The restrictions are summarized in the following table, assuming a
+64-bit word size:
+
++--------------------+-----------------+----------+----------------------+
+| Prefix             |   Maximum `n`   |   `R`    |   Canonicalisation   |
++====================+=================+==========+======================+
+| ``redc``           |  `2^{64} - 1`   | `2^{64}` |  `[0, n)`            |
++--------------------+-----------------+----------+----------------------+
+| ``redc_fast``      |  `2^{62} - 1`   | `2^{64}` |  `[0, 2n)`           |
++--------------------+-----------------+----------+----------------------+
+| ``redc_half``      |  `2^{31} - 1`   | `2^{32}` |  `[0, n)`            |
++--------------------+-----------------+----------+----------------------+
+| ``redc_half_fast`` |  `2^{30} - 1`   | `2^{32}` |  `[0, 2n)`           |
++--------------------+-----------------+----------+----------------------+
+
+For 32-bit machines, the maximum `n` become `2^{32} - 1`,
+`2^{30} - 1`, `2^{15} - 1`, and `2^{14} - 1` respectively.
 
 .. type:: nmod_redc_ctx_struct
           nmod_redc_ctx_t
@@ -242,6 +269,24 @@ before using any non-"fast" functions.
               ulong _nmod_redc_fast_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx)
 
     Return `2^{exp}`. The exponent must be at least ``FLINT_BITS``.
+
+.. function:: void nmod_redc_half_ctx_init_nmod(nmod_redc_ctx_t ctx, nmod_t mod)
+              void nmod_redc_half_ctx_init_ui(nmod_redc_ctx_t ctx, ulong n)
+
+    Initialize context for use with ``half`` or ``half_fast`` methods.
+
+.. function:: ulong nmod_redc_half_set_nmod(ulong x, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_set_ui(ulong x, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_get_nmod(ulong x, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              int nmod_redc_half_can_use_fast(const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_half_fast_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+
+    Methods analogous to their non-``half`` counterparts.
 
 Discrete Logarithms via Pohlig-Hellman
 --------------------------------------------------------------------------------
