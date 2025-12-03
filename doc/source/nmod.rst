@@ -176,7 +176,7 @@ the standard representation `x \bmod n` is that it allows
 for faster multiplication. Montgomery arithmetic is also known as
 REDC arithmetic.
 
-By default moduli up `R` the full word size are allowed and residues are
+By default moduli up to the full word size are allowed and residues are
 strictly canonicalised to `[0, n)`. We provide sets of alternative
 methods for restricted moduli which, depending on the machine,
 can speed up arithmetic:
