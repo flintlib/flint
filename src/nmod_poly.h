@@ -64,11 +64,12 @@ nmod_poly_compose_mod_precomp_preinv_arg_t;
 
 typedef struct
 {
-    nn_ptr x, t, w, y, z;       // five vectors of precomputed constants
+    nn_ptr x, w, y, z;          // four vectors of precomputed constants
+    nn_ptr xs, ws, ys, zs;      // and their respective shoup-precomputation if possible
     nmod_poly_t f, g1, g2;      // three precomputed polys
     nmod_t mod;
-    slong len;                    // number of points
-
+    slong len;                  // number of points
+    ulong small_mod;            // whether or not we can use Shoup-precomp 
 } nmod_geometric_progression_struct;
 
 typedef nmod_geometric_progression_struct nmod_geometric_progression_t[1];

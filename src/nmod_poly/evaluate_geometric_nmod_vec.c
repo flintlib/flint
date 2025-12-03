@@ -14,8 +14,8 @@
 #include "nmod_poly.h"
 #include "nmod_vec.h"
 
-void
-_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, 
+static inline void
+_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_big(nn_ptr vs, nn_srcptr poly, 
     slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod)
 {
     nn_ptr a, b;
@@ -44,7 +44,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     b = _nmod_vec_init(b_len);
     
     for (i = i_min; i < plen; i++)
-    {
+    {   
         a[plen - 1 - i] = nmod_mul(G->x[i], poly[i], mod);
     }
 
@@ -65,6 +65,73 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
 
     _nmod_vec_clear(a);
     _nmod_vec_clear(b);
+}
+
+static inline void
+_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_shoup(nn_ptr vs, nn_srcptr poly, 
+    slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod)
+{
+    nn_ptr a, b;
+    slong i, i_min, G_len, a_len, b_len;
+
+    G_len = G->len;
+    FLINT_ASSERT(len <= G_len);
+
+    if (plen == 0)
+    {
+        _nmod_vec_zero(vs, G_len);
+        return;
+    }
+
+    for (i_min = 0; i_min < plen; i_min++)
+    {
+        if (poly[i_min] != 0) 
+        {
+            break;
+        }
+    }
+    
+    a_len = plen - i_min;
+    b_len = G->f->length + a_len - 1;
+    a = _nmod_vec_init(a_len);
+    b = _nmod_vec_init(b_len);
+    
+    for (i = i_min; i < plen; i++)
+    {   
+        a[plen - 1 - i] =  n_mulmod_shoup(G->x[i], poly[i], G->xs[i], mod.n);
+    }
+
+    // this is a temporary replacement to _nmod_poly_mulhigh which is not yet optimised
+    nn_ptr Gfr;
+    Gfr = _nmod_vec_init(G->f->length);
+    _nmod_poly_reverse(Gfr, G->f->coeffs, G->f->length, G->f->length);
+    _nmod_poly_reverse(a, a, a_len, a_len);
+    _nmod_poly_mullow(b, Gfr, G->f->length, a, a_len, G->f->length - i_min, mod);
+    _nmod_poly_reverse(b, b, b_len, b_len);
+    _nmod_vec_clear(Gfr);
+    //_nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, a_len, plen - 1, mod);
+ 
+    for (i = 0; i < len; i++)
+    {
+        vs[i] = n_mulmod_shoup(G->x[i], b[plen - 1 + i], G->xs[i], mod.n);
+    }
+
+    _nmod_vec_clear(a);
+    _nmod_vec_clear(b);
+}
+
+void
+_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, 
+    slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod)
+{
+    if (G->small_mod)
+    {
+        _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_shoup(vs, poly, plen, G, len, mod);
+    }
+    else
+    {
+        _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_big(vs, poly, plen, G, len, mod);
+    }
 }
 
 void 

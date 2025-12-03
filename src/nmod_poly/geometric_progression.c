@@ -39,7 +39,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong l
     G->y[0] = 1;
     G->w[0] = 1;
     G->z[0] = 1;
-
+    
     q = nmod_mul(r, r, mod);
     inv_r = nmod_inv(r, mod);
     inv_q = nmod_mul(inv_r, inv_r, mod);
@@ -118,6 +118,31 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong l
     }
     // similarly, if either g1 or g2 have leading 0 coefficient, something is wrong 
 
+    // do the shoup precomp if possible
+    ulong condition = (FLINT_BIT_COUNT(mod.n) < FLINT_BITS);
+    G->small_mod = condition;
+    if (condition)
+    {
+        G->xs = _nmod_vec_init(len);
+        G->ws = _nmod_vec_init(len);
+        G->zs = _nmod_vec_init(len);
+        G->ys = _nmod_vec_init(len);
+
+        tmp = n_mulmod_precomp_shoup(1, mod.n);
+        G->xs[0] = tmp;
+        G->ws[0] = tmp;
+        G->zs[0] = tmp;
+        G->ys[0] = tmp;
+
+        for (i = 1; i < len; i++)
+        {
+            G->xs[i] = n_mulmod_precomp_shoup(G->x[i], mod.n);
+            G->ys[i] = n_mulmod_precomp_shoup(G->y[i], mod.n);
+            G->zs[i] = n_mulmod_precomp_shoup(G->z[i], mod.n);
+            G->ws[i] = n_mulmod_precomp_shoup(G->w[i], mod.n);
+        }
+    }
+
     _nmod_vec_clear(prod_diff);
     _nmod_vec_clear(inv_diff);
     _nmod_vec_clear(diff);
@@ -129,8 +154,17 @@ nmod_geometric_progression_clear(nmod_geometric_progression_t G)
     nmod_poly_clear(G->f);
     nmod_poly_clear(G->g2);
     nmod_poly_clear(G->g1);
+    
     _nmod_vec_clear(G->x);
     _nmod_vec_clear(G->z);
     _nmod_vec_clear(G->y);
     _nmod_vec_clear(G->w);
+
+    if (G->small_mod)
+    {
+        _nmod_vec_clear(G->xs);
+        _nmod_vec_clear(G->zs);
+        _nmod_vec_clear(G->ys);
+        _nmod_vec_clear(G->ws);
+    }
 }
