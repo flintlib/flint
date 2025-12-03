@@ -55,7 +55,7 @@ fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta)
 
         gr_ctx_clear(ctx);
 
-        if (is_reduced != T_UNKNOWN || prec >= exact_cutoff)
+        if (is_reduced != T_UNKNOWN)
             break;
         /* Failure with the fmpq context implied that we attempted to divide
            by an exactly zero GS norm; by the current definition, this

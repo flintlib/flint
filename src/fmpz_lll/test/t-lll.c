@@ -442,7 +442,7 @@ TEST_FUNCTION_START(fmpz_lll, state)
           2, -1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0 };
         slong i, j;
 
-        fmpz_mat_t A;
+        fmpz_mat_t A, Atop, Abot;
         fmpz_mat_init(A, 9, 6);
         for (i = 0; i < 9; i++)
             for (j = 0; j < 6; j++)
@@ -453,10 +453,18 @@ TEST_FUNCTION_START(fmpz_lll, state)
         /* This used to crash. */
         fmpz_lll(A, NULL, fl);
 
+        fmpz_mat_window_init(Atop, A, 0, 0, 5, 6);
+        fmpz_mat_window_init(Abot, A, 5, 0, 9, 6);
+
         /* By the current definition of fmpz_mat_is_reduced,
            A is not reduced. Fixme? */
-        if (fmpz_mat_is_reduced(A, fl->delta, fl->eta))
+        if (fmpz_mat_is_reduced(A, fl->delta, fl->eta) ||
+            !fmpz_mat_is_zero(Atop) ||
+            !fmpz_mat_is_reduced(Abot, fl->delta, fl->eta))
+        {
+            flint_printf("FAIL: rank-deficient example\n");
             flint_abort();
+        }
 
         fmpz_mat_clear(A);
     }
