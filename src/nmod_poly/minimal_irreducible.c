@@ -278,12 +278,6 @@ nmod_poly_gcd_with_sparse(nmod_poly_t res, const nmod_poly_t A, const nmod_poly_
     }
 }
 
-static ulong
-nmod_ui_pow_ui(ulong a, ulong exp, nmod_t mod)
-{
-    return nmod_pow_ui(nmod_set_ui(a, mod), exp, mod);
-}
-
 /* Discriminant of x^n + ax^k + b  mod p > 2 (Swan's formula). */
 static ulong
 _nmod_poly_trinomial_discriminant(ulong n, ulong k, ulong a, ulong b, nmod_t mod)

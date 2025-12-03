@@ -131,22 +131,31 @@ ulong _nmod_sub(ulong a, ulong b, nmod_t mod)
 NMOD_INLINE
 ulong nmod_add(ulong a, ulong b, nmod_t mod)
 {
-   const ulong neg = mod.n - a;
-   if (neg > b)
-      return a + b;
-   else
-      return b - neg;
+    const ulong neg = mod.n - a;
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    if (neg > b)
+        return a + b;
+    else
+        return b - neg;
+}
+
+NMOD_INLINE
+ulong nmod_ui_add_ui(ulong a, ulong b, nmod_t mod)
+{
+    return nmod_add(nmod_set_ui(a, mod), nmod_set_ui(b, mod), mod);
 }
 
 NMOD_INLINE
 ulong nmod_sub(ulong a, ulong b, nmod_t mod)
 {
-   const ulong diff = a - b;
-
-   if (a < b)
-      return mod.n + diff;
-   else
-      return diff;
+    const ulong diff = a - b;
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    if (a < b)
+        return mod.n + diff;
+    else
+        return diff;
 }
 
 NMOD_INLINE
@@ -162,8 +171,16 @@ NMOD_INLINE
 ulong nmod_mul(ulong a, ulong b, nmod_t mod)
 {
     ulong res;
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
     NMOD_MUL_PRENORM(res, a, b << mod.norm, mod);
     return res;
+}
+
+NMOD_INLINE ulong
+nmod_ui_mul_ui(ulong a, ulong b, nmod_t mod)
+{
+    return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
 }
 
 NMOD_INLINE
@@ -177,6 +194,9 @@ ulong _nmod_mul_fullword(ulong a, ulong b, nmod_t mod)
 NMOD_INLINE
 ulong nmod_addmul(ulong a, ulong b, ulong c, nmod_t mod)
 {
+    FLINT_ASSERT(a < mod.n);
+    FLINT_ASSERT(b < mod.n);
+    FLINT_ASSERT(c < mod.n);
     return nmod_add(a, nmod_mul(b, c, mod), mod);
 }
 
@@ -211,6 +231,12 @@ int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod);
 ulong _nmod_pow_ui_redc(ulong a, ulong exp, nmod_t mod);
 ulong _nmod_pow_ui_binexp(ulong a, ulong exp, nmod_t mod);
 ulong nmod_pow_ui(ulong a, ulong exp, nmod_t mod);
+
+NMOD_INLINE ulong
+nmod_ui_pow_ui(ulong a, ulong exp, nmod_t mod)
+{
+    return nmod_pow_ui(nmod_set_ui(a, mod), exp, mod);
+}
 
 ulong _nmod_2_pow_ui_binexp(ulong exp, nmod_t mod);
 ulong nmod_2_pow_ui(ulong exp, nmod_t mod);

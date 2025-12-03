@@ -79,6 +79,11 @@ Modular reduction and arithmetic
     ``mod.n``. It is assumed that `a` and `b` are already reduced 
     modulo ``mod.n``.
 
+.. function:: ulong nmod_ui_add_ui(ulong a, ulong b, nmod_t mod)
+
+    Returns `a + b` modulo ``mod.n``. Does not require that `a` and `b` are
+    already reduced modulo ``mod.n``.
+
 .. function:: ulong _nmod_sub(ulong a, ulong b, nmod_t mod)
 
     Returns `a - b` modulo ``mod.n``. It is assumed that ``mod`` 
@@ -109,6 +114,11 @@ Modular reduction and arithmetic
     ``FLINT_BITS`` large. It is assumed that `a` and `b` are already
     reduced modulo ``mod.n``.
 
+.. function:: ulong nmod_ui_mul_ui(ulong a, ulong b, nmod_t mod)
+
+    Returns `ab` modulo ``mod.n``. Does not require that `a` and `b` are
+    already reduced modulo ``mod.n``.
+
 .. function:: ulong nmod_inv(ulong a, nmod_t mod)
 
     Returns `a^{-1}` modulo ``mod.n``. The inverse is assumed to exist.
@@ -133,6 +143,15 @@ Modular reduction and arithmetic
     Returns `a^e` modulo ``mod.n``. No assumptions are made about 
     ``mod.n``. It is assumed that `a` is already reduced
     modulo ``mod.n`` and that `e` is not negative.
+
+.. function:: ulong nmod_ui_pow_ui(ulong a, ulong e, nmod_t mod)
+
+    Returns `a^e` modulo ``mod.n``. Does not require that `a` is already reduced
+    modulo ``mod.n``.
+
+.. function:: ulong nmod_2_pow_ui(ulong e, nmod_t mod)
+
+    Returns `2^e` modulo ``mod.n``.
 
 Montgomery arithmetic
 --------------------------------------------------------------------------------
