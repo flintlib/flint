@@ -39,7 +39,6 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong l
     G->y[0] = 1;
     G->w[0] = 1;
     G->z[0] = 1;
-    
     q = nmod_mul(r, r, mod);
     inv_r = nmod_inv(r, mod);
     inv_q = nmod_mul(inv_r, inv_r, mod);
