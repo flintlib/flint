@@ -163,7 +163,7 @@ _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
     }
     else
     {
-        _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp_big(poly, v, G, len, mod);
+        _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp_fullword(poly, v, G, len, mod);
     }
 }
 
