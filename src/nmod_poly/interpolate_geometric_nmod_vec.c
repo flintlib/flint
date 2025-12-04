@@ -116,7 +116,7 @@ _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp_shoup(nn_ptr poly, nn_src
 
     for (i = 0; i < f1_len; i++)
     {
-        f[i] = n_mulmod_shoup(G->w[i],v[i], G->ws[i], mod.n);
+        f[i] = n_mulmod_shoup(G->w[i], v[i], G->ws[i], mod.n);
     }
     _nmod_poly_mullow(h, G->g1->coeffs, G->g1->length, f, f1_len, N, mod);
 
