@@ -44,7 +44,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_big(nn_ptr vs, nn_srcptr pol
     b = _nmod_vec_init(b_len);
     
     for (i = i_min; i < plen; i++)
-    {   
+    {
         a[plen - 1 - i] = nmod_mul(G->x[i], poly[i], mod);
     }
 
