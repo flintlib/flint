@@ -48,7 +48,7 @@ n_factor_pollard_brent_single(ulong *factor, ulong n,
     int ret;
     int fast;
 
-    if (n < 4)
+    if (n < 4 || n % 2 == 0)
         return 0;
 
     nmod_redc_ctx_t ctx;
