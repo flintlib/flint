@@ -15,7 +15,7 @@
 #include "nmod_vec.h"
 
 static inline void
-_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_big(nn_ptr vs, nn_srcptr poly, 
+_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_fullword(nn_ptr vs, nn_srcptr poly, 
     slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod)
 {
     nn_ptr a, b;
