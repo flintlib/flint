@@ -130,7 +130,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     }
     else
     {
-        _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_big(vs, poly, plen, G, len, mod);
+        _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp_fullword(vs, poly, plen, G, len, mod);
     }
 }
 
