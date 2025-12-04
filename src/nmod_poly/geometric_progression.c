@@ -128,7 +128,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong l
         G->zs = _nmod_vec_init(len);
         G->ys = _nmod_vec_init(len);
 
-        tmp = n_mulmod_precomp_shoup(1, mod.n);
+        tmp = n_mulmod_precomp_shoup(UWORD(1), mod.n);
         G->xs[0] = tmp;
         G->ws[0] = tmp;
         G->zs[0] = tmp;
