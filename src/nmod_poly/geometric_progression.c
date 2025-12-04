@@ -157,7 +157,7 @@ nmod_geometric_progression_clear(nmod_geometric_progression_t G)
     _nmod_vec_clear(G->y);
     _nmod_vec_clear(G->w);
 
-    if (G->small_mod)
+    if (NMOD_CAN_USE_SHOUP(G->mod))
     {
         _nmod_vec_clear(G->xs);
         _nmod_vec_clear(G->zs);

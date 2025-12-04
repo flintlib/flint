@@ -157,7 +157,7 @@ void
 _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
     const nmod_geometric_progression_t G, slong len, nmod_t mod)
 {
-    if (G->small_mod)
+    if (NMOD_CAN_USE_SHOUP(mod))
     {
         _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp_shoup(poly, v, G, len, mod);
     }
