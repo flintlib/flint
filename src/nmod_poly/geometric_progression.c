@@ -118,9 +118,7 @@ nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong l
     // similarly, if either g1 or g2 have leading 0 coefficient, something is wrong 
 
     // do the shoup precomp if possible
-    ulong condition = (FLINT_BIT_COUNT(mod.n) < FLINT_BITS);
-    G->small_mod = condition;
-    if (condition)
+    if (NMOD_CAN_USE_SHOUP(G->mod))
     {
         G->xs = _nmod_vec_init(len);
         G->ws = _nmod_vec_init(len);
