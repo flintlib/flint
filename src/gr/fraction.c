@@ -105,9 +105,9 @@ _gr_fraction_clear(gr_ptr x, gr_fraction_ctx_t ctx)
 }
 
 static int
-_gr_fraction_write(gr_stream_t out, gr_ptr x, gr_fraction_ctx_t ctx)
+_gr_fraction_write(gr_stream_t out, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
-    gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
+    gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
     gr_ctx_struct * domain_ctx = DOMAIN(ctx);
     int status = GR_SUCCESS;
 
@@ -117,7 +117,7 @@ _gr_fraction_write(gr_stream_t out, gr_ptr x, gr_fraction_ctx_t ctx)
     status |= gr_write(out, b, domain_ctx);
     status |= gr_stream_write(out, ")");
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static void
