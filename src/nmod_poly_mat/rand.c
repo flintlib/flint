@@ -13,6 +13,17 @@
 #include "nmod_poly_mat.h"
 
 void
+nmod_poly_mat_rand(nmod_poly_mat_t A, flint_rand_t state, slong len)
+{
+    slong i, j;
+
+    for (i = 0; i < A->r; i++)
+        for (j = 0; j < A->c; j++)
+            nmod_poly_rand(nmod_poly_mat_entry(A, i, j), state, len);
+}
+
+
+void
 nmod_poly_mat_randtest(nmod_poly_mat_t A, flint_rand_t state, slong len)
 {
     slong i, j;
