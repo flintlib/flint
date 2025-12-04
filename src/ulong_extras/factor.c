@@ -55,6 +55,32 @@ static int n_is_oddprime_small2(ulong n)
 /* Currently P+1 does not seem to save anything. */
 #define USE_PP1 0
 
+static
+ulong n_factor_composite_after_trial(ulong n)
+{
+    ulong f;
+
+    if (n > FLINT_FACTOR_POLLARD_BRENT_MIN)
+        if (n_factor_pollard_brent_single(&f, n, 1, 1, FLINT_FACTOR_POLLARD_BRENT_ITERS) == 1)
+            return f;
+
+#if FLINT64
+    if (n < FLINT_FACTOR_ONE_LINE_MAX)
+        if ((f = n_factor_one_line(n, FLINT_FACTOR_ONE_LINE_ITERS)))
+            return f;
+#endif
+
+#if USE_PP1
+    if ((f = n_factor_pp1_wrapper2(n)))
+        return f;
+#endif
+
+    if ((f = n_factor_SQUFOF(n, FLINT_FACTOR_SQUFOF_ITERS)))
+        return f;
+
+    flint_throw(FLINT_ERROR, "Exception (n_factor). Failed to factor %wu.\n", n);
+}
+
 static void n_factor_after_trial(n_factor_t * factors, ulong n, ulong cutoff)
 {
     ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
@@ -90,32 +116,19 @@ static void n_factor_after_trial(n_factor_t * factors, ulong n, ulong cutoff)
                 factor_arr[factors_left - 1] = factor = cofactor;
             }
 
-            if ((factor >= cutoff) && !n_is_prime_odd_no_trial(factor))
-            {
-                if ((
-#if FLINT64
-                    (factor < FLINT_FACTOR_ONE_LINE_MAX) &&
-#endif
-                     (cofactor = n_factor_one_line(factor, FLINT_FACTOR_ONE_LINE_ITERS)))
-#if USE_PP1
-                  || (cofactor = n_factor_pp1_wrapper2(factor))
-#endif
-                  || (cofactor = n_factor_SQUFOF(factor, FLINT_FACTOR_SQUFOF_ITERS)))
-                {
-                   exp_arr[factors_left] = exp_arr[factors_left - 1];
-                       factor_arr[factors_left] = cofactor;
-                       factor_arr[factors_left - 1] /= cofactor;
-                       factors_left++;
-                }
-                else
-                {
-                    flint_throw(FLINT_ERROR, "Exception (n_factor). Failed to factor %wd.\n", n);
-                }
-            }
-            else
+            if (factor < cutoff || (factor != n && n_is_prime_odd_no_trial(factor)))
             {
                 n_factor_insert(factors, factor, exp_arr[factors_left - 1]);
                 factors_left--;
+            }
+            else
+            {
+                cofactor = n_factor_composite_after_trial(factor);
+
+                exp_arr[factors_left] = exp_arr[factors_left - 1];
+                factor_arr[factors_left] = cofactor;
+                factor_arr[factors_left - 1] /= cofactor;
+                factors_left++;
             }
         }
         else
