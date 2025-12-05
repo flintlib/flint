@@ -13,58 +13,105 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 #include "nmod_vec.h"
+#if FLINT_HAVE_FFT_SMALL
+#  include "fft_small.h"
+#endif
 
 void
 _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, 
     slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod)
 {
-    nn_ptr a, b;
-    slong i, i_min, G_len, a_len, b_len;
-
-    G_len = G->len;
-    FLINT_ASSERT(len <= G_len);
+    FLINT_ASSERT(len <= G->len);
 
     if (plen == 0)
     {
-        _nmod_vec_zero(vs, G_len);
+        _nmod_vec_zero(vs, len);
         return;
     }
 
-    for (i_min = 0; i_min < plen; i_min++)
+    /* val = valuation of poly */
+    slong val;
+    for (val = 0; val < plen; val++)
     {
-        if (poly[i_min] != 0) 
+        if (poly[val] != 0)
         {
             break;
         }
     }
-    
-    a_len = plen - i_min;
-    b_len = G->f->length + a_len - 1;
-    a = _nmod_vec_init(a_len);
-    b = _nmod_vec_init(b_len);
-    
-    for (i = i_min; i < plen; i++)
-    {
-        a[plen - 1 - i] = nmod_mul(G->x[i], poly[i], mod);
-    }
 
-    // this is a temporary replacement to _nmod_poly_mulhigh which is not yet optimised
-    nn_ptr Gfr;
-    Gfr = _nmod_vec_init(G->f->length);
-    _nmod_poly_reverse(Gfr, G->f->coeffs, G->f->length, G->f->length);
-    _nmod_poly_reverse(a, a, a_len, a_len);
-    _nmod_poly_mullow(b, Gfr, G->f->length, a, a_len, G->f->length - i_min, mod);
-    _nmod_poly_reverse(b, b, b_len, b_len);
-    _nmod_vec_clear(Gfr);
-    //_nmod_poly_mulhigh(b, G->f->coeffs, G->f->length, a, a_len, plen - 1, mod);
- 
-    for (i = 0; i < len; i++)
-    {
-        vs[i] = nmod_mul(G->x[i], b[plen - 1 + i], G->mod);
-    }
+    /* FIXME below are 3 different versions (one requires fft_small) */
+    /** goal is to compute [rev(p) * G->f]_{plen - 1}^{len}  (that is, coeffs [plen - 1, plen - 1 + len))
+     * if p has valuation val, define a = p / x**val of length alen = plen - val, and this becomes
+     * [rev(a) * (G->f >> x**val)]_{alen - 1}^{len}  (i.e. coeffs [alen - 1, alen - 1 + len))
+     **/
+
+    /* version 1:  (2025-12-04: fastest in small lengths, waiting for optimized middle product) */
+    /** this uses a short product: write rev(a) = x**(alen-1) a(1/x), and write F = (G->f(x) >> x**val) rem x**(alen - 1 + len)
+     * rev(a) * F has length L = 2 * alen - 2 + len, reverse it: we get a * rev(F),
+     * we want its coefficients from L - 1 - (alen - 1) = alen - 1 + len - 1
+     * down to, included, L - 1 - (alen - 1 + len - 1) = alen - 1
+     **/
+#if 0
+    slong alen = plen - val;
+    slong blen = alen - 1 + len;
+    nn_ptr a = _nmod_vec_init(alen);
+    nn_ptr b = _nmod_vec_init(blen);
+
+    for (slong i = val; i < plen; i++)
+        /* a[i - val] = n_mulmod_shoup(G->x[i], poly[i], G->xs[i], mod.n); */
+        a[i - val] = nmod_mul(G->x[i], poly[i], mod);
+
+    nn_ptr Frev = _nmod_vec_init(blen);
+    _nmod_poly_reverse(Frev, G->f->coeffs + val, blen, blen);
+    _nmod_poly_mullow(b, Frev, blen, a, alen, blen, mod);
+
+    for (slong i = 0; i < len; i++)
+        /* vs[i] = n_mulmod_shoup(G->x[i], b[alen - 1 + len - 1 - i], G->xs[i], mod.n); */
+        vs[i] = nmod_mul(G->x[i], b[alen - 1 + len - 1 - i], mod);
+
+    _nmod_vec_clear(Frev);
+    _nmod_vec_clear(a);
+    _nmod_vec_clear(b);
+#endif
+
+    /* version 2 */
+    /* this uses a middle product to compute [rev(p) * G->f]_{plen - 1}^{len}  (i.e. coeffs [plen - 1, plen - 1 + len)) */
+#if FLINT_HAVE_FFT_SMALL
+#if 0
+    /* version 2.a uses fft_small  (2025-12-04: fastest in medium and large lengths, like 100 and more) */
+    nn_ptr b = _nmod_vec_init(plen + len - 1);
+
+    for (slong i = val; i < plen; i++)
+        /* b[plen - 1 - i] = n_mulmod_shoup(G->x[i], poly[i], G->xs[i], mod.n); */
+        b[plen - 1 - i] = nmod_mul(G->x[i], poly[i], mod);
+
+    _nmod_poly_mul_mid_default_mpn_ctx(b, plen - 1 - val, plen - 1 - val + len, G->f->coeffs + val, plen - 1 - val + len, b, plen - val, mod);
+
+    for (slong i = 0; i < len; i++)
+        /* vs[i] = n_mulmod_shoup(G->x[i], b[i], G->xs[i], mod.n); */
+        vs[i] = nmod_mul(G->x[i], b[i], mod);
+
+    _nmod_vec_clear(b);
+#else
+    /* version 2.b uses fft_small  (2025-12-04: fastest in medium and large lengths, like 100 and more) */
+    slong alen = plen - val;
+    nn_ptr a = _nmod_vec_init(alen);
+    nn_ptr b = _nmod_vec_init(alen + (alen - 1 + len));
+
+    for (slong i = val; i < plen; i++)
+        /* a[plen - 1 - i] = n_mulmod_shoup(G->x[i], poly[i], G->xs[i], mod.n); */
+        a[plen - 1 - i] = nmod_mul(G->x[i], poly[i], mod);
+
+    _nmod_poly_mulhigh(b, G->f->coeffs + val, alen - 1 + len, a, alen, alen - 1, mod);
+
+    for (slong i = 0; i < len; i++)
+        /* vs[i] = n_mulmod_shoup(G->x[i], b[alen - 1 + i], G->xs[i], mod.n); */
+        vs[i] = nmod_mul(G->x[i], b[alen - 1 + i], mod);
 
     _nmod_vec_clear(a);
     _nmod_vec_clear(b);
+#endif
+#endif
 }
 
 void 
