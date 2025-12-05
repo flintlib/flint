@@ -51,7 +51,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
      * we want its coefficients from L - 1 - (alen - 1) = alen - 1 + len - 1
      * down to, included, L - 1 - (alen - 1 + len - 1) = alen - 1
      **/
-#if 0
+#if 1
     slong alen = plen - val;
     slong blen = alen - 1 + len;
     nn_ptr a = _nmod_vec_init(alen);
