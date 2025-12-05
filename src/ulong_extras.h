@@ -432,6 +432,8 @@ ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 #define FLINT_FACTOR_SQUFOF_ITERS 50000
 #define FLINT_FACTOR_ONE_LINE_MAX (UWORD(1)<<50)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
+#define FLINT_FACTOR_POLLARD_BRENT_MIN (UWORD(1)<<38)
+#define FLINT_FACTOR_POLLARD_BRENT_ITERS 32768
 
 ULONG_EXTRAS_INLINE void n_factor_init(n_factor_t * factors) { factors->num = 0; }
 
@@ -456,7 +458,7 @@ ulong n_factor_SQUFOF(ulong n, ulong iters);
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);
 ulong n_factor_pp1_wrapper(ulong n);
 
-int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv, ulong ai, ulong xi, ulong normbits, ulong max_iters);
+int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ai, ulong xi, ulong max_iters);
 int n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in, ulong max_tries, ulong max_iters);
 
 int n_remove(ulong * n, ulong p);
