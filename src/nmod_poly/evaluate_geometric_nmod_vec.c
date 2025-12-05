@@ -39,10 +39,11 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
         }
     }
 
-    /* FIXME below are 3 different versions (one requires fft_small) */
+    /* below are 3 different versions (one requires fft_small) */
+    /* TODO once some optimized middle product is written, the "version 1" should probably be discarded */
     /** goal is to compute [rev(p) * G->f]_{plen - 1}^{len}  (that is, coeffs [plen - 1, plen - 1 + len))
      * if p has valuation val, define a = p / x**val of length alen = plen - val, and this becomes
-     * [rev(a) * (G->f >> x**val)]_{alen - 1}^{len}  (i.e. coeffs [alen - 1, alen - 1 + len))
+     * [rev(a) * (G->f >> x**val)]_{alen - 1}^{len}  (that is, coeffs [alen - 1, alen - 1 + len))
      **/
 
     const slong alen = plen - val;
@@ -53,7 +54,11 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
      * we want its coefficients from L - 1 - (alen - 1) = alen - 1 + len - 1
      * down to, included, L - 1 - (alen - 1 + len - 1) = alen - 1
      **/
-    if (2 * (plen - val) - 2 + len <= 192  || !FLINT_HAVE_FFT_SMALL)
+#ifdef FLINT_HAVE_FFT_SMALL
+    if (2 * (plen - val) - 2 + len <= 192)
+#else
+    if (1)
+#endif
     {
         slong blen = alen - 1 + len;
         nn_ptr a = _nmod_vec_init(alen);
@@ -77,7 +82,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
     {
     /* version 2 */
     /* this uses a middle product to compute [rev(p) * G->f]_{plen - 1}^{len}  (i.e. coeffs [plen - 1, plen - 1 + len)) */
-#if FLINT_HAVE_FFT_SMALL
+#ifdef FLINT_HAVE_FFT_SMALL
         /* version 2.a uses fft_small directly  (2025-12-04: fastest in medium and large lengths, like 100 and more) */
         nn_ptr b = _nmod_vec_init(alen + len - 1);
 
@@ -92,6 +97,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
         _nmod_vec_clear(b);
 #else
         /* version 2.b uses nmod_poly_mulhigh  (2025-12-04: tested correct, but disabled: nmod_poly_mulhigh not yet optimized) */
+        /* (currently, with the branching mechanism above, this should never be called) */
         nn_ptr a = _nmod_vec_init(alen);
         nn_ptr b = _nmod_vec_init(alen + (alen - 1 + len));
 
