@@ -9,13 +9,15 @@
    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* TODO profile when length << npoints */
-
+#include "stdlib.h"  /* for atoi */
 #include "nmod.h"
 #include "profiler.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_vec.h"
+#include <string.h>
+
+#define __NB_ITER 10
 
 /*------------------------------------------------------------*/
 /* finds an element of order at least n                       */
@@ -41,10 +43,8 @@ static long nmod_find_root(slong n, nmod_t mod)
         if (attempts >= 10)
             return 0;
     }
-    return 0; 
+    return 0;
 }
-
-
 
 typedef struct
 {
@@ -80,7 +80,8 @@ void sample_nmod_vec_iter(void * arg, ulong count)
         _nmod_vec_rand(pts, state, npoints, mod);
 
         prof_start();
-        _nmod_poly_evaluate_nmod_vec_iter(vals, poly, length, pts, npoints, mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            _nmod_poly_evaluate_nmod_vec_iter(vals, poly, length, pts, npoints, mod);
         prof_stop();
         _nmod_vec_clear(poly);
     }
@@ -118,7 +119,8 @@ void sample_nmod_vec_fast(void * arg, ulong count)
         _nmod_vec_rand(pts, state, npoints, mod);
 
         prof_start();
-        _nmod_poly_evaluate_nmod_vec_fast(vals, poly, length, pts, npoints, mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            _nmod_poly_evaluate_nmod_vec_fast(vals, poly, length, pts, npoints, mod);
         prof_stop();
         _nmod_vec_clear(poly);
     }
@@ -159,7 +161,8 @@ void sample_nmod_vec_fast_precomp(void * arg, ulong count)
         _nmod_poly_tree_build(tree, pts, npoints, mod);
 
         prof_start();
-        _nmod_poly_evaluate_nmod_vec_fast_precomp(vals, poly, length, tree, npoints, mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            _nmod_poly_evaluate_nmod_vec_fast_precomp(vals, poly, length, tree, npoints, mod);
         prof_stop();
 
         _nmod_poly_tree_free(tree, npoints);
@@ -197,7 +200,8 @@ void sample_nmod_vec_fast_onlyprecomp(void * arg, ulong count)
         nn_ptr * tree = _nmod_poly_tree_alloc(npoints);
 
         prof_start();
-        _nmod_poly_tree_build(tree, pts, npoints, mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            _nmod_poly_tree_build(tree, pts, npoints, mod);
         prof_stop();
 
         _nmod_poly_tree_free(tree, npoints);
@@ -234,7 +238,8 @@ void sample_nmod_vec_geom_iter(void * arg, ulong count)
         ulong r = nmod_find_root(2*npoints, mod);
 
         prof_start();
-        _nmod_poly_evaluate_geometric_nmod_vec_iter(vals, poly, length, r, npoints, mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            _nmod_poly_evaluate_geometric_nmod_vec_iter(vals, poly, length, r, npoints, mod);
         prof_stop();
         _nmod_vec_clear(poly);
     }
@@ -244,7 +249,7 @@ void sample_nmod_vec_geom_iter(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
-/* geometric: fast, tree */
+/* geometric: fast, with precomp */
 void sample_nmod_vec_geom_fast(void * arg, ulong count)
 {
     ulong n;
@@ -271,7 +276,8 @@ void sample_nmod_vec_geom_fast(void * arg, ulong count)
             flint_printf("\n...could not find element of suitable order for geometric progression...\n");
 
         prof_start();
-        _nmod_poly_evaluate_geometric_nmod_vec_fast(vals, poly, length, r, npoints, mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            _nmod_poly_evaluate_geometric_nmod_vec_fast(vals, poly, length, r, npoints, mod);
         prof_stop();
         _nmod_vec_clear(poly);
     }
@@ -311,7 +317,8 @@ void sample_nmod_vec_geom_fast_precomp(void * arg, ulong count)
         nmod_geometric_progression_init(G, r, FLINT_MAX(npoints, length), mod);
 
         prof_start();
-        _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(vals, poly, length, G, npoints, mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(vals, poly, length, G, npoints, mod);
         prof_stop();
 
         nmod_geometric_progression_clear(G);
@@ -348,7 +355,8 @@ void sample_nmod_vec_geom_fast_onlyprecomp(void * arg, ulong count)
         nmod_geometric_progression_t G;
 
         prof_start();
-        nmod_geometric_progression_init(G, r, FLINT_MAX(npoints, length), mod);
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            nmod_geometric_progression_init(G, r, FLINT_MAX(npoints, length), mod);
         prof_stop();
 
         nmod_geometric_progression_clear(G);
@@ -357,9 +365,25 @@ void sample_nmod_vec_geom_fast_onlyprecomp(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
-int main(void)
+int main(int argc, char * argv[])
 {
-    const slong nb_lens = 25;
+    if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))
+    {
+        flint_printf("Usage: %s [func] [short]\n"
+                     "       [func] is optional (default 0)\n"
+                     "              0 -> all\n"
+                     "              1 -> general points only\n"
+                     "              2 -> geometric points only\n"
+                     "       [short] is optional (default 0; [func] must be provided if [short] is)\n"
+                     "               0 -> short bench, 1 -> full bench\n",
+                     argv[0]);
+        return 0;
+    }
+
+    const slong func_bench = (argc >= 2) ? atoi(argv[1]) : 0;
+
+    /* number of lens differs: long test / short test */
+    const slong nb_lens = (argc >= 3 && atoi(argv[2]) != 0) ? 25 : 21;
     slong lengths[] = {1, 2, 3, 4, 6,
                        8, 10, 12, 16, 20,
                        30, 45, 70, 100, 200,
@@ -379,65 +403,106 @@ int main(void)
     info_t info;
     flint_bitcnt_t i;
 
-    flint_printf("unit: all measurements in c/l\n");
+    flint_printf("unit: measurements in ms\n");
 
     for (i = 62; i <= FLINT_BITS; i++)
     {
         info.bits = i;
 
         printf("==== nbits = %ld====\n", i);
-        flint_printf("len\tpoints |iter\tfast\tf-prcp\tf-tree |geom-it\tgeom-f\tgeom-pr\tgeom-precomp\n");
-        for (int len = 0; len < nb_lens; ++len)
+
+        for (int npoints_factor = 1; npoints_factor < 5; npoints_factor += 1)
         {
-            const double fac = lengths[len] * (double)FLINT_CLOCK_SCALE_FACTOR;
-            info.length = lengths[len];
-            info.npoints = lengths[len];
-
-            if (info.npoints <= 1024)
+            if (func_bench == 0)  /* bench all */
             {
-                prof_repeat(&time_iter, &tmp, sample_nmod_vec_iter, (void *) &info);
-                time_iter /= fac;
+                flint_printf("==== nb eval points == %d * (poly length) ====\n", npoints_factor);
+                flint_printf("len\tpoints |        GENERAL POINTS         |       GEOMETRIC PROGRESSION     \n");
+                flint_printf("len\tpoints |iter\tfast\tw/ tree\ttree   |iter\tfast\tw/ prec\tprecomp\n");
             }
-            else
-                time_iter = 0.0;
-
-            prof_repeat(&time_fast, &tmp, sample_nmod_vec_fast, (void *) &info);
-            time_fast /= fac;
-
-            prof_repeat(&time_fast_precomp, &tmp, sample_nmod_vec_fast_precomp, (void *) &info);
-            time_fast_precomp /= fac;
-
-            prof_repeat(&time_fast_onlyprecomp, &tmp, sample_nmod_vec_fast_onlyprecomp, (void *) &info);
-            time_fast_onlyprecomp /= fac;
-
-            if (info.npoints <= 1024)
+            else if (func_bench == 1)  /* general only */
             {
-                prof_repeat(&time_geom_iter, &tmp, sample_nmod_vec_geom_iter, (void *) &info);
-                time_geom_iter /= fac;
+                flint_printf("==== nb eval points == %d * (poly length) ====\n", npoints_factor);
+                flint_printf("len\tpoints |        GENERAL POINTS         |\n");
+                flint_printf("len\tpoints |iter\tfast\tw/ tree\ttree   |\n");
             }
-            else
-                time_geom_iter = 0.0;
+            else if (func_bench == 2)  /* geometric only */
+            {
+                flint_printf("==== nb eval points == %d * (poly length) ====\n", npoints_factor);
+                flint_printf("len\tpoints |       GEOMETRIC PROGRESSION     \n");
+                flint_printf("len\tpoints |iter\tfast\tw/ prec\tprecomp\n");
+            }
 
-            prof_repeat(&time_geom_fast, &tmp, sample_nmod_vec_geom_fast, (void *) &info);
-            time_geom_fast /= fac;
+            for (int len = 0; len < nb_lens; ++len)
+            {
+                /* cycles / limb (if CLOCK_SCALE_FACTOR set correctly) */
+                /* const double fac = npoints[len] * (double)FLINT_CLOCK_SCALE_FACTOR; */
+                /* time in s */
+                /* const double fac = 1000000. * __NB_ITER; */
+                /* time in ms */
+                const double fac = 1. * __NB_ITER;
+                info.npoints = npoints_factor * lengths[len];
+                info.length = lengths[len];
 
-            prof_repeat(&time_geom_fast_precomp, &tmp, sample_nmod_vec_geom_fast_precomp, (void *) &info);
-            time_geom_fast_precomp /= fac;
+                if (func_bench == 0 || func_bench == 1)
+                {
+                    if (info.npoints <= 1024)
+                    {
+                        prof_repeat(&time_iter, &tmp, sample_nmod_vec_iter, (void *) &info);
+                        time_iter /= fac;
+                    }
+                    else
+                        time_iter = 0.0;
 
-            prof_repeat(&time_geom_fast_onlyprecomp, &tmp, sample_nmod_vec_geom_fast_onlyprecomp, (void *) &info);
-            time_geom_fast_onlyprecomp /= fac;
+                    prof_repeat(&time_fast, &tmp, sample_nmod_vec_fast, (void *) &info);
+                    time_fast /= fac;
 
-            flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e|%.1e\t%.1e\t%.1e\t%.1e\n",
-                    info.length,
-                    info.npoints,
-                    time_iter,
-                    time_fast,
-                    time_fast_precomp,
-                    time_fast_onlyprecomp,
-                    time_geom_iter,
-                    time_geom_fast,
-                    time_geom_fast_precomp,
-                    time_geom_fast_onlyprecomp);
+                    prof_repeat(&time_fast_precomp, &tmp, sample_nmod_vec_fast_precomp, (void *) &info);
+                    time_fast_precomp /= fac;
+
+                    prof_repeat(&time_fast_onlyprecomp, &tmp, sample_nmod_vec_fast_onlyprecomp, (void *) &info);
+                    time_fast_onlyprecomp /= fac;
+                }
+
+                if (func_bench == 0 || func_bench == 2)
+                {
+                    if (info.npoints <= 1024)
+                    {
+                        prof_repeat(&time_geom_iter, &tmp, sample_nmod_vec_geom_iter, (void *) &info);
+                        time_geom_iter /= fac;
+                    }
+                    else
+                        time_geom_iter = 0.0;
+
+                    prof_repeat(&time_geom_fast, &tmp, sample_nmod_vec_geom_fast, (void *) &info);
+                    time_geom_fast /= fac;
+
+                    prof_repeat(&time_geom_fast_precomp, &tmp, sample_nmod_vec_geom_fast_precomp, (void *) &info);
+                    time_geom_fast_precomp /= fac;
+
+                    prof_repeat(&time_geom_fast_onlyprecomp, &tmp, sample_nmod_vec_geom_fast_onlyprecomp, (void *) &info);
+                    time_geom_fast_onlyprecomp /= fac;
+                }
+
+                if (func_bench == 0)
+                {
+                    flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e|%.1e\t%.1e\t%.1e\t%.1e\n",
+                                 info.length, info.npoints,
+                                 time_iter, time_fast, time_fast_precomp, time_fast_onlyprecomp,
+                                 time_geom_iter, time_geom_fast, time_geom_fast_precomp, time_geom_fast_onlyprecomp);
+                }
+                else if (func_bench == 1)
+                {
+                    flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e\n",
+                                 info.length, info.npoints,
+                                 time_iter, time_fast, time_fast_precomp, time_fast_onlyprecomp);
+                }
+                else if (func_bench == 2)
+                {
+                    flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e\n",
+                                 info.length, info.npoints,
+                                 time_geom_iter, time_geom_fast, time_geom_fast_precomp, time_geom_fast_onlyprecomp);
+                }
+            }
         }
 
         flint_printf("\n");
@@ -445,3 +510,5 @@ int main(void)
 
     return 0;
 }
+
+#undef __NB_ITER

@@ -17,9 +17,9 @@
 #  include "fft_small.h"
 #endif
 
-void
-_nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, 
-    slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod)
+void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen,
+                                                         const nmod_geometric_progression_t G, slong len,
+                                                         nmod_t mod)
 {
     FLINT_ASSERT(len <= G->len);
 
@@ -72,12 +72,10 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
     _nmod_vec_clear(Frev);
     _nmod_vec_clear(a);
     _nmod_vec_clear(b);
-#endif
-
+#else
     /* version 2 */
     /* this uses a middle product to compute [rev(p) * G->f]_{plen - 1}^{len}  (i.e. coeffs [plen - 1, plen - 1 + len)) */
 #if FLINT_HAVE_FFT_SMALL
-#if 0
     /* version 2.a uses fft_small  (2025-12-04: fastest in medium and large lengths, like 100 and more) */
     nn_ptr b = _nmod_vec_init(plen + len - 1);
 
@@ -114,9 +112,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
 #endif
 }
 
-void 
-_nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, 
-    slong plen, ulong r, slong n, nmod_t mod)
+void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, slong plen, ulong r, slong n, nmod_t mod)
 {
     if (n == 0)
         return;
@@ -127,21 +123,17 @@ _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly,
     nmod_geometric_progression_clear(G);
 }
 
-void
-nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys,
-        const nmod_poly_t poly, ulong r, slong n)
+void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
 {
     _nmod_poly_evaluate_geometric_nmod_vec_fast(ys, poly->coeffs,
                                                 poly->length, r, n, poly->mod);
 }
 
-void
-_nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len,
-    ulong r, slong n, nmod_t mod)
+void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
 {
     slong i;
     ulong rpow = 1;
-    
+
     ulong r2 = nmod_mul(r, r, mod);
 
     for (i = 0; i < n; i++)
@@ -151,9 +143,7 @@ _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong l
     }
 }
 
-void
-nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys,
-    const nmod_poly_t poly, ulong r, slong n)
+void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
 {
     _nmod_poly_evaluate_geometric_nmod_vec_iter(ys, poly->coeffs,
                                         poly->length, r, n, poly->mod);
