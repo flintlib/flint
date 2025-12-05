@@ -148,7 +148,8 @@ _nmod_2_pow_ui_binexp(ulong exp, nmod_t mod)
     ulong x, bit;
     unsigned int ebits;
 
-    FLINT_ASSERT(exp >= FLINT_BITS);
+    if (exp < FLINT_BITS)
+        return nmod_set_ui(UWORD(1) << exp, mod);
 
     ebits = FLINT_BITS - flint_clz(exp);
     bit = UWORD(1) << (ebits - LG_FLINT_BITS);
@@ -183,7 +184,8 @@ _nmod_redc_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx)
     ulong bit;
     unsigned int ebits;
 
-    FLINT_ASSERT(exp >= FLINT_BITS);
+    if (exp < FLINT_BITS)
+        return nmod_redc_set_ui(UWORD(1) << exp, ctx);
 
     ebits = FLINT_BITS - flint_clz(exp);
     bit = UWORD(1) << (ebits - LG_FLINT_BITS);
@@ -207,7 +209,8 @@ _nmod_redc_fast_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx)
     ulong bit;
     unsigned int ebits;
 
-    FLINT_ASSERT(exp >= FLINT_BITS);
+    if (exp < FLINT_BITS)
+        return nmod_redc_set_ui(UWORD(1) << exp, ctx);
 
     ebits = FLINT_BITS - flint_clz(exp);
     bit = UWORD(1) << (ebits - LG_FLINT_BITS);
@@ -231,10 +234,7 @@ ulong nmod_2_pow_ui(ulong exp, nmod_t mod)
 
     if (exp < (UWORD(1) << 20))
     {
-        if (exp < FLINT_BITS)
-            return nmod_set_ui(UWORD(1) << exp, mod);
-        else
-            return _nmod_2_pow_ui_binexp(exp, mod);
+        return _nmod_2_pow_ui_binexp(exp, mod);
     }
     else
     {

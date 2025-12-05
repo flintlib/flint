@@ -68,17 +68,14 @@ TEST_FUNCTION_START(nmod_redc, state)
                 n, ctx->nred, x, e, z, x_red, z_red, z_back);
         }
 
-        if (e >= FLINT_BITS)
-        {
-            z = _nmod_pow_ui_binexp(2 % mod.n, e, mod);
-            z_red = _nmod_redc_2_pow_ui(e, ctx);
-            z_back = nmod_redc_get_nmod(z_red, ctx);
+        z = (e == 0) ? nmod_set_ui(1, mod) : _nmod_pow_ui_binexp(2 % mod.n, e, mod);
+        z_red = _nmod_redc_2_pow_ui(e, ctx);
+        z_back = nmod_redc_get_nmod(z_red, ctx);
 
-            if (z_back != z)
-            {
-                TEST_FUNCTION_FAIL("_nmod_redc_2_pow_ui\nn = %wu\nnred = %wu\ne = %wu\nz = %wu\nz_red = %wu\nz_back = %wu\n",
-                    n, ctx->nred, e, z, z_red, z_back);
-            }
+        if (z_back != z)
+        {
+            TEST_FUNCTION_FAIL("_nmod_redc_2_pow_ui\nn = %wu\nnred = %wu\ne = %wu\nz = %wu\nz_red = %wu\nz_back = %wu\n",
+                n, ctx->nred, e, z, z_red, z_back);
         }
 
         if (nmod_redc_can_use_fast(ctx))
@@ -126,17 +123,14 @@ TEST_FUNCTION_START(nmod_redc, state)
                     n, ctx->nred, x, e, z, x_red, z_red, z_back);
             }
 
-            if (e >= FLINT_BITS)
-            {
-                z = _nmod_pow_ui_binexp(2 % mod.n, e, mod);
-                z_red = _nmod_redc_fast_2_pow_ui(e, ctx);
-                z_back = nmod_redc_get_nmod(z_red, ctx);
+            z = (e == 0) ? nmod_set_ui(1, mod) : _nmod_pow_ui_binexp(2 % mod.n, e, mod);
+            z_red = _nmod_redc_fast_2_pow_ui(e, ctx);
+            z_back = nmod_redc_get_nmod(z_red, ctx);
 
-                if (z_back != z)
-                {
-                    TEST_FUNCTION_FAIL("_nmod_redc_fast_2_pow_ui\nn = %wu\nnred = %wu\ne = %wu\nz = %wu\nz_red = %wu\nz_back = %wu\n",
-                        n, ctx->nred, e, z, z_red, z_back);
-                }
+            if (z_back != z)
+            {
+                TEST_FUNCTION_FAIL("_nmod_redc_fast_2_pow_ui\nn = %wu\nnred = %wu\ne = %wu\nz = %wu\nz_red = %wu\nz_back = %wu\n",
+                    n, ctx->nred, e, z, z_red, z_back);
             }
         }
 

@@ -268,7 +268,7 @@ For 32-bit machines, the maximum `n` become `2^{32} - 1`,
 .. function:: ulong _nmod_redc_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx)
               ulong _nmod_redc_fast_2_pow_ui(ulong exp, const nmod_redc_ctx_t ctx)
 
-    Return `2^{exp}`. The exponent must be at least ``FLINT_BITS``.
+    Return `2^{exp}`. There are no restrictions on the exponent.
 
 .. function:: void nmod_redc_half_ctx_init_nmod(nmod_redc_ctx_t ctx, nmod_t mod)
               void nmod_redc_half_ctx_init_ui(nmod_redc_ctx_t ctx, ulong n)

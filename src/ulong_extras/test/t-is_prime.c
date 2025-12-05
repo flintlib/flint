@@ -159,7 +159,7 @@ TEST_FUNCTION_START(n_is_prime, state)
 
         result = !n_is_prime(d);
         if (!result)
-            TEST_FUNCTION_FAIL("Known composite d = %wu is declared prime (no trial)\n", d);
+            TEST_FUNCTION_FAIL("Known composite d = %wu is declared prime\n", d);
 
         result = !n_is_prime_odd_no_trial(d);
         if (!result)
