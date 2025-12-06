@@ -126,109 +126,60 @@ static uint32_t get_witness_base(uint64_t n)
     return b;
 }
 
-#if FLINT_BITS == 64
-#define LG_FLINT_BITS 6
-#else
-#define LG_FLINT_BITS 5
-#endif
-
-static ulong
-_nmod_2_pow_fullword(ulong exp, nmod_t mod)
-{
-    ulong x, bit;
-    unsigned int ebits;
-
-    if (exp < FLINT_BITS)
-        return nmod_set_ui(UWORD(1) << exp, mod);
-
-    ebits = FLINT_BITS - flint_clz(exp);
-    bit = UWORD(1) << (ebits - LG_FLINT_BITS);
-
-    x = nmod_set_ui(UWORD(1) << (exp >> (ebits - LG_FLINT_BITS)), mod);
-
-    while (bit >>= 1)
-    {
-        x = _nmod_mul_fullword(x, x, mod);
-        if (bit & exp)
-            x = nmod_add(x, x, mod);
-    }
-
-    return x;
-}
-
-static ulong
-_nmod_2_pow_nonfullword(ulong exp, nmod_t mod)
-{
-    ulong x, bit;
-    unsigned int ebits;
-
-    if (exp < FLINT_BITS)
-        return nmod_set_ui(UWORD(1) << exp, mod);
-
-    ebits = FLINT_BITS - flint_clz(exp);
-    bit = UWORD(1) << (ebits - LG_FLINT_BITS);
-
-    x = nmod_set_ui(UWORD(1) << (exp >> (ebits - LG_FLINT_BITS)), mod);
-
-    while (bit >>= 1)
-    {
-        x = nmod_mul(x, x, mod);
-        if (bit & exp)
-            x = nmod_add(x, x, mod);
-    }
-
-    return x;
-}
-
 static int
-_n_is_strong_probabprime_nmod(ulong a, ulong d, nmod_t mod)
+redc_fast_equal_redc(ulong a, ulong b, nmod_redc_ctx_t ctx)
 {
-    ulong t = d;
-    ulong n = mod.n;
-    ulong y;
+    return (a == b) || (a == b + ctx->mod.n);
+}
+
+/* Assumes that a < n. In particular, this is fine with 32-bit bases
+   when used for n > 2^32. */
+static int
+_n_is_strong_probabprime_redc(ulong a, ulong d, ulong one_red, nmod_redc_ctx_t ctx)
+{
+    ulong t = d, n = ctx->mod.n, y, minus_one_red = n - one_red;
 
     FLINT_ASSERT(a < n);
     FLINT_ASSERT(a >= 2);
     FLINT_ASSERT(a != n - 1);
 
-    if (mod.norm == 0)
+    if (nmod_redc_can_use_fast(ctx))
     {
         if (a == 2)
-            y = _nmod_2_pow_fullword(t, mod);
+            y = _nmod_redc_fast_2_pow_ui(t, ctx);
         else
-            y = n_powmod2_ui_preinv(a, t, mod.n, mod.ninv);
+            y = _nmod_redc_fast_pow_ui(nmod_redc_set_nmod(a, ctx), t, ctx);
 
-        if (y == 1)
+        if (redc_fast_equal_redc(y, one_red, ctx))
             return 1;
         t <<= 1;
 
-        while ((t != n - 1) && (y != n - 1))
+        while ((t != n - 1) && !redc_fast_equal_redc(y, minus_one_red, ctx))
         {
-            y = _nmod_mul_fullword(y, y, mod);
+            y = nmod_redc_fast_mul(y, y, ctx);
             t <<= 1;
         }
 
-        return (y == n - 1);
-    }
-    else if (a == 2)
-    {
-        y = _nmod_2_pow_nonfullword(t, mod);
-
-        if (y == 1)
-            return 1;
-        t <<= 1;
-
-        while ((t != n - 1) && (y != n - 1))
-        {
-            y = nmod_mul(y, y, mod);
-            t <<= 1;
-        }
-
-        return (y == n - 1);
+        return redc_fast_equal_redc(y, minus_one_red, ctx);
     }
     else
     {
-        return n_is_strong_probabprime2_preinv(mod.n, mod.ninv, a, d);
+        if (a == 2)
+            y = _nmod_redc_2_pow_ui(t, ctx);
+        else
+            y = _nmod_redc_pow_ui(nmod_redc_set_nmod(a, ctx), t, ctx);
+
+        if (y == one_red)
+            return 1;
+        t <<= 1;
+
+        while ((t != n - 1) && (y != minus_one_red))
+        {
+            y = nmod_redc_mul(y, y, ctx);
+            t <<= 1;
+        }
+
+        return y == minus_one_red;
     }
 }
 
@@ -253,18 +204,20 @@ n_is_prime_odd_no_trial(ulong n)
     }
     else
     {
-        ulong d, norm;
-        nmod_t mod;
+        ulong d, norm, one_red;
+        nmod_redc_ctx_t ctx;
+
+        nmod_redc_ctx_init_ui(ctx, n);
+        one_red = nmod_redc_set_ui(1, ctx);
 
         d = n - 1;
         norm = flint_ctz(d);
         d >>= norm;
-        nmod_init(&mod, n);
 
-        if (!_n_is_strong_probabprime_nmod(2, d, mod))
+        if (!_n_is_strong_probabprime_redc(2, d, one_red, ctx))
             return 0;
 
-        return _n_is_strong_probabprime_nmod(get_witness_base(n), d, mod);
+        return _n_is_strong_probabprime_redc(get_witness_base(n), d, one_red, ctx);
     }
 }
 
