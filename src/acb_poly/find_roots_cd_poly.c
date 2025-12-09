@@ -3,14 +3,17 @@
 #include <math.h>
 #include <string.h> /* for memcpy */
 
-#pragma GCC optimize("Ofast,unroll-loops") 
+#if _MSC_VER
 #pragma float_control(precise, off)
+#else
+#pragma GCC optimize("Ofast,unroll-loops") 
+#endif
 
 /*****************************************
  * Intermediate variables data structure *
  * ***************************************/
 
-/* This field contains 13 array pointers */
+/* This field contains 13 double and 1 slong array pointers */
 typedef struct {
     /* arrays storing the input with real and imaginary parts separated */
     double *z_r;
@@ -148,6 +151,23 @@ static void _vector_inverse(double* iz_r, double* iz_i, const double* z_r, const
     }
 }
 
+static inline void divide(double* res_e, double* res_f, double a, double b, double c, double d)
+{
+    double r, den;
+    /* use Smith's algorithm to reduce the risk of overflow */
+    if(fabs(c) >= fabs(d) ) {
+        r = d/c;
+        den = c + r*d;
+        *res_e = (a+b*r)/den;
+        *res_f = (b-a*r)/den;
+    } else {
+        r = c/d;
+        den = d + r*c;
+        *res_e = (a*r+b)/den;
+        *res_f = (b*r-a)/den;
+    }
+}
+
 
 /* Initialize the members of the double_field */
 static void _set_poly(intermediate_variables * v, const double * p, slong n)
@@ -212,6 +232,7 @@ static void _initial_values_from_newton_polygon(double* z_r, double* z_i, const 
             /* theta = arg of solutions of x^d = -p[p]/p[q] 
              *       = arg(-p[p]/p[q])/d + 2 pi j/d */
             theta = (2*pi*(j+0.5)+argp-argq)/d;
+            //theta = 2*pi*j/d;
             /* epsilon is used to avoid initial values being symmetrical to the
              * real axis (see Section 4 of Aberth's paper) */
             z_r[p+j] = magz * (cos(theta)+(1+j)*epsilon) ;
@@ -221,28 +242,40 @@ static void _initial_values_from_newton_polygon(double* z_r, double* z_i, const 
     }
 }
 
-#define LOG_ROUNDING 3
+#define LOG_ROUNDING 0
 
-static void _set_initial_values(intermediate_variables * v, const double * p_r, const double * p_i, slong n)
+static void _set_initial_values(intermediate_variables * v, const double * p_r, const double * p_i, slong n, const double * z0, slong d)
 {
     double epsilon=ldexp(1,-1000);
-    slong i, n_np;
+    slong i=0, j, n_np;
     int k=LOG_ROUNDING;
-
-    /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
-    for(i=0; i<n; i++) {
-        /* We avoid infinite values so that the code is compatible with
-         * unsafe math optimizations */
-        v->malp[i] = -log(hypot(p_r[i],p_i[i])+epsilon);
-        /* rounding the valuation helps avoiding nearby initial radii */
-        v->malp[i] = ldexp(round(ldexp(v->malp[i],k)),-k);
+    
+    if(z0 != NULL) {
+        for(i=0, j=0; i<n-1 && j<d; j++) {
+            if (z0[2*j] != 0 || z0[2*j+1] != 0) {
+                v->z_r[i] = z0[2*j];
+                v->z_i[i] = z0[2*j+1];
+                i++;
+            }
+        }
     }
 
-    /* Computes the Newton polygon as indices in np of length n_np */
-    n_np = lower_convex_hull(v->np, v->malp, n);
-    
-    /* Computes a first estimation of the roots */
-    _initial_values_from_newton_polygon(v->z_r, v->z_i, p_r, p_i, v->np, n_np);
+    if(z0 == NULL || i < n-1) {
+        /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
+        for(i=0; i<n; i++) {
+            /* We avoid infinite values so that the code is compatible with
+             * unsafe math optimizations */
+            v->malp[i] = -log(hypot(p_r[i],p_i[i])+epsilon);
+            /* rounding the valuation helps avoiding nearby initial radii */
+            v->malp[i] = ldexp(round(ldexp(v->malp[i],k)),-k);
+        }
+
+        /* Computes the Newton polygon as indices in np of length n_np */
+        n_np = lower_convex_hull(v->np, v->malp, n);
+        
+        /* Computes a first estimation of the roots */
+        _initial_values_from_newton_polygon(v->z_r, v->z_i, p_r, p_i, v->np, n_np);
+    }
 }
 
 #undef LOG_ROUNDING
@@ -304,6 +337,7 @@ void cd_poly_horner(double* results_r, double* results_i,
     }
 }
 
+#if 0
 /* Weights for the Durand-Kerner or Weierstrass iteration */
 /* Warning : twice_values_r and twice_values_i have size 2n,
  * the second half of each array should be a copy of the first half
@@ -370,6 +404,7 @@ static void cd_poly_weierstrass_b(double* restrict results_r, double* restrict r
         }
     }
 }
+#endif
 
 /* Weights for the Durand-Kerner or Weierstrass iteration
  * Fastest than the _a variant by a small margin (less than 10%) */
@@ -482,29 +517,55 @@ void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
 double cd_poly_wdk_update(double* z_r, double* z_i,
                              const double* vp_r, const double* vp_i,
                              const double* wdk_r, const double* wdk_i,
-                             slong n_start, slong n_end)
+                             slong n_start, slong n_end, double stepsize_bound)
 {
     slong i;
-    double mag_vp, arg_vp, mag_wdk, arg_wdk, mag_z, ratio,
-           maxstep = 0;
+    double f_r, f_i, mag_ratio, damping, maxstep = 0;
     for(i=n_start; i<n_end; i++) {
         if((wdk_r[i] != 0) || (wdk_i[i] != 0)) {
-            mag_vp = hypot(vp_r[i], vp_i[i]);
-            arg_vp = atan2(vp_i[i], vp_r[i]);
-            mag_wdk = hypot(wdk_r[i], wdk_i[i]);
-            arg_wdk = atan2(wdk_i[i], wdk_r[i]);
-            mag_z = hypot(z_r[i], z_i[i]);
-            /* The min expression avoids spurious large step */
-            ratio = fmin(mag_vp / mag_wdk, 0.5*mag_z);
-            z_r[i] = z_r[i] - ( ratio * cos(arg_vp - arg_wdk) );
-            z_i[i] = z_i[i] - ( ratio * sin(arg_vp - arg_wdk) );
-            maxstep = fmax(maxstep, ratio/mag_z);
+            divide(&f_r, &f_i, vp_r[i], vp_i[i], wdk_r[i], wdk_i[i]);
+            mag_ratio =  hypot(f_r, f_i) / hypot(z_r[i], z_i[i]);
+            damping =  fmin(1, stepsize_bound/hypot(f_r, f_i));
+            z_r[i] = z_r[i] - damping * f_r;
+            z_i[i] = z_i[i] - damping * f_i;
+            maxstep = fmax(maxstep, mag_ratio);
         }
     }
     return maxstep;
 }
 
-static double _refine_roots(intermediate_variables * v, slong n)
+#if 0
+/* Rescale the roots for matching the geometric mean given by the constant
+ * coefficient. Not significant improvement. */
+static void cd_poly_geometric_rescale(double* z_r, double* z_i, double lc_r, double lc_i, double tc_r, double tc_i, slong n)
+{
+    slong i;
+    double a, b, mag, arg,
+           s_r = lc_r,
+           s_i = lc_i;
+    for(i=0; i<n; i++) {
+        a =   s_i * z_i[i] - s_r * z_r[i];
+        b = - s_i * z_r[i] - s_r * z_i[i];
+        s_r = a;
+        s_i = b;
+    }
+    divide(&a, &b, tc_r, tc_i, s_r, s_i);
+    mag = hypot(a, b);
+    mag = pow(mag, 1/(double) n);
+    arg = atan2(b, a);
+    arg = arg/n;
+    s_r = mag * cos(arg);
+    s_i = mag * sin(arg);
+    for(i=0; i<n; i++) {
+        a =  s_r * z_r[i] - s_i * z_i[i];
+        b =  s_i * z_r[i] + s_r * z_i[i];
+        z_r[i] = a;
+        z_i[i] = b;
+    }
+}
+#endif 
+
+static double _refine_roots(intermediate_variables * v, slong n, double stepsize_bound)
 {
     slong d, n_piv;
     double lc_r, lc_i,
@@ -518,19 +579,22 @@ static double _refine_roots(intermediate_variables * v, slong n)
     lc_i = v->p_i[n-1];
     cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
     cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, d);
-    maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv);
+    maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv, stepsize_bound);
     /* Inverse case */
     lc_r = v->p_r[0];
     lc_i = v->p_i[0];
     cd_poly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, d, v->rp_r, v->rp_i, n);
     cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, d, d);
-    imaxstep = cd_poly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d);
+    imaxstep = cd_poly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d, stepsize_bound);
     _vector_inverse(v->z_r, v->z_i, v->iz_r, v->iz_i, n_piv, d);
+    #if 0
+    flint_printf("direct %ld, correction %.3e, inverse %ld, correction %.3e\n", n_piv, maxstep, d-n_piv, imaxstep);
+    #endif
     return fmax(maxstep, imaxstep);
 }
 
 /* One step refine function */
-double cd_poly_refine_roots(double * z, const double * p, slong n)
+double cd_poly_refine_roots(double * z, const double * p, slong n, double stepsize_bound)
 {
     slong i;
     double lc_r, lc_i, maxstep;
@@ -545,7 +609,7 @@ double cd_poly_refine_roots(double * z, const double * p, slong n)
     lc_i = v->p_i[n-1];
     cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n-1, v->p_r, v->p_i, n);
     cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n-1, n-1);
-    maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n-1);
+    maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n-1, stepsize_bound);
     for(i=0; i<n-1; i++) {
         z[2*i]   = v->z_r[i];
         z[2*i+1] = v->z_i[i];
@@ -556,7 +620,7 @@ double cd_poly_refine_roots(double * z, const double * p, slong n)
 
 /* One step refine function using pivot to avoid overflow.
  * The order of the refined roots is not necessarily preserved */
-double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
+double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n, double stepsize_bound)
 {
     slong i;
     double maxstep;
@@ -567,7 +631,7 @@ double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
         v->z_r[i] = z[2*i];
         v->z_i[i] = z[2*i+1];
     }
-    maxstep = _refine_roots(v, n);
+    maxstep = _refine_roots(v, n, stepsize_bound);
     for(i=0; i<n-1; i++) {
         z[2*i]   = v->z_r[i];
         z[2*i+1] = v->z_i[i];
@@ -576,24 +640,36 @@ double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n)
     return maxstep;
 }
 
+#define MAX_STEPSIZE_BOUND 0x1p-3
+#define MIN_STEPSIZE_BOUND 0x1p-7
+
 /* Full resolution function */
-double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, double reltol)
+double cd_poly_find_roots(double * z, const double * p, const double * z0, slong n, slong num_iter, double reltol)
 {
     slong nt, fz, i;
     intermediate_variables v[1];
-    double maxstep=0;
+    double stepsize_bound,
+           correction=0,
+           old_correction=MAX_STEPSIZE_BOUND;
 
     nt = _trim_zeros(z, &fz, p, n); 
     if(nt > 1) {
         _intermediate_variables_init(v, nt);
         _set_poly(v, p + 2*fz, nt);
-        _set_initial_values(v, v->p_r, v->p_i, nt);
+        _set_initial_values(v, v->p_r, v->p_i, nt, z0, n-1);
         /* Main solve function */
+        stepsize_bound = MIN_STEPSIZE_BOUND;
         for(i=0; i<num_iter; i++) {
-            maxstep = _refine_roots(v, nt);
-            if((n-2)*maxstep < reltol) {
+            #if 0
+            flint_printf("step %ld: ", i);
+            #endif
+            correction = _refine_roots(v, nt, stepsize_bound);
+            stepsize_bound *= (correction > old_correction)? 0.5 : 2;
+            stepsize_bound = fmax(fmin(stepsize_bound, MAX_STEPSIZE_BOUND), MIN_STEPSIZE_BOUND);
+            if((n-2)*correction < reltol || correction < ldexp(1,-50)) {
                 break;
             }
+            old_correction = correction;
         }
         for(i=0; i<nt-1; i++) {
             z[2*(i+fz)] = v->z_r[i];
@@ -603,8 +679,10 @@ double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter,
 
         _intermediate_variables_clear(v);
     }
-    return maxstep;
+    return correction;
 }
 
+#undef MIN_STEPSIZE_BOUND
+#undef MAX_STEPSIZE_BOUND
 
 

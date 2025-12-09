@@ -692,15 +692,15 @@ void cd_poly_weierstrass(double* results_r, double* results_i,
 double cd_poly_wdk_update(double* z_r, double* z_i,
                              const double* vp_r, const double* vp_i,
                              const double* wdk_r, const double* wdk_i,
-                             slong n_start, slong n_end);
-double cd_poly_refine_roots(double * z, const double * p, slong n);
-double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n);
+                             slong n_start, slong n_end, double stepsize_bound);
+double cd_poly_refine_roots(double * z, const double * p, slong n, double stepsize_bound);
+double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n, double stepsize_bound);
 /* Main high-level function for evaluating and finding roots in machine precision */
 void cd_poly_horner(double* results_r, double* results_i,
                     const double* values_r, const double* values_i, slong n_start, slong n_end,
                     const double* coefficients_r, const double* coefficients_i, slong n);
-double cd_poly_find_roots(double * z, const double * p, slong n, slong num_iter, double reltol);
-int _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, slong len, slong maxiter, slong prec);
+double cd_poly_find_roots(double * z, const double * p, const double * z0, slong n, slong num_iter, double reltol);
+double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec);
 
 
 #ifdef __cplusplus

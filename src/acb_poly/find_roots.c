@@ -340,12 +340,12 @@ _minimax_line(double * res_a, double * res_b, const double * y, const slong * x,
 
 /* Rescale using rotating calipers on the points (i,-log(|poly[i]|)) */
 static double
-_best_fit(arb_t scale, double * cdp, const acb_srcptr poly, slong len, slong prec)
+_best_fit_double(arb_t scale, double * cdp, const acb_srcptr poly, slong len)
 {
     double *alog;
     double a, b, mdist;
     slong * nonzero;
-    slong i, j, prec2;
+    slong i, j, prec, prec2;
     mag_t m;
     acb_t cmid, cscale;
     arb_t c, log2;
@@ -355,8 +355,9 @@ _best_fit(arb_t scale, double * cdp, const acb_srcptr poly, slong len, slong pre
     acb_init(cmid); /* shallow copies, not cleared */
     acb_init(cscale);
     mag_init(m);
+    prec = 53;
     arb_log_ui(log2, 2, prec);
-    prec2 = prec + ceil(log(len)/log(2));
+    prec2 = prec + 2*ceil(log(len)/log(2));
     alog = flint_malloc(sizeof(double) * len);
     nonzero = flint_malloc(sizeof(slong) * len);
     j = 0;
@@ -400,29 +401,37 @@ _best_fit(arb_t scale, double * cdp, const acb_srcptr poly, slong len, slong pre
     return mdist;
 }
 
-int _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, slong len, slong maxiter, slong prec)
+double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec)
 {
-    double *cdz, *cdp;
-    double max_correction, max_distance;
+    double *cdz, *cdp, *cdi;
+    double max_correction;
     arb_t scale;
     slong i;
-    int status;
     
     arb_init(scale);
     cdp = flint_malloc(2*len*sizeof(double));
     cdz = flint_malloc(2*(len - 1)*sizeof(double));
 
-    max_distance = _best_fit(scale, cdp, poly, len, prec);
-    max_correction = cd_poly_find_roots(cdz, cdp, len, maxiter, ldexp(1,-prec));
+    _best_fit_double(scale, cdp, poly, len);
+    if(initial != NULL) {
+        cdi = cdz;
+        for(i=0; i<len-1; i++) {
+            acb_div_arb(roots + i, initial + i, scale, prec);
+            cdi[2*i]   = arf_get_d(arb_midref(acb_realref(roots + i)), ARF_RND_NEAR);
+            cdi[2*i+1] = arf_get_d(arb_midref(acb_imagref(roots + i)), ARF_RND_NEAR);
+        }
+    } else {
+        cdi = NULL;
+    }
+    max_correction = cd_poly_find_roots(cdz, cdp, cdi, len, maxiter, ldexp(1,-prec));
     for(i=0; i<len-1; i++) {
         acb_set_d_d(roots + i, cdz[2*i], cdz[2*i+1]);
         acb_mul_arb(roots + i, roots + i, scale, prec);
     }
-    status = (max_correction < ldexp(1, -prec/2)) ? GR_SUCCESS : GR_UNABLE ;
     flint_free(cdz);
     flint_free(cdp);
     arb_clear(scale);
-    return status;
+    return max_correction;
 }
 
 slong
@@ -462,10 +471,10 @@ _acb_poly_find_roots(acb_ptr roots,
         return 1;
     }
 
-    if (initial == NULL)
-        _acb_poly_roots_initial_values(roots, poly, deg, prec);
-    else
+    if (initial != NULL)
         _acb_vec_set(roots, initial, deg);
+    else if (prec > 53)
+        _acb_poly_roots_initial_values(roots, poly, deg, prec);
 
     if (maxiter == 0)
         maxiter = 2 * deg + n_sqrt(prec);
@@ -480,7 +489,8 @@ _acb_poly_find_roots(acb_ptr roots,
         {
             if (prec <= 53) {
                 slong fmaxiter = FLINT_MAX(150,maxiter);
-                status = _acb_poly_find_roots_double(roots, poly, len, fmaxiter, prec);
+                double max_correction = _acb_poly_find_roots_double(roots, poly, initial, len, fmaxiter, prec);
+                status = (max_correction < ldexp(1, -3)) ? GR_SUCCESS : GR_UNABLE ;
                 if(status == GR_SUCCESS)
                     break;
             }

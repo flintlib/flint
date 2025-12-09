@@ -91,6 +91,8 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
 
     for (prec = initial_prec; ; prec *= 2)
     {
+        if (prec == 106)
+            prec = 128;
         acb_poly_set_fmpz_poly(cpoly_deflated, poly_deflated, prec);
         maxiter = FLINT_MIN(4 * deg_deflated + 64, prec);
 
@@ -187,8 +189,6 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
 
             break;
         }
-        if (prec == 53)
-            prec = 64;
     }
 
     _acb_vec_sort_pretty(roots, deg);
