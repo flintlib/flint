@@ -23,6 +23,12 @@
 #include "fq_zech.h"
 #include "profiler.h"
 
+#if 0
+#define NEXT_LEN(n) ((n) < 4 ? (n + 1) : ((n) % 3 == 0) ? ((n) / 3 * 4) : ((n) / 2 * 3))
+#else
+#define NEXT_LEN(n) FLINT_MAX((n)+1, (n)*1.05)
+#endif
+
 slong next_powhalf2(slong n)
 {
     if ((n & (n - 1)) == 0)
@@ -48,7 +54,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
         (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
-#if 0
+#if 1
 #define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
 #define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
 #define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
@@ -60,7 +66,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #define STEP_BITS for (bits = 32, j = 0; bits <= 65536; bits = next_powhalf2(bits), j++)
 #endif
 
-#if 1
+#if 0
 #define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_add_ui(t, t, 1); fmpz_nextprime(t, t, 0); GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ctx, t)); mpn_mod_ctx_set_is_field(ctx, T_TRUE); fmpz_clear(t);
 #define RANDCOEFF(t, ctx) fmpz_mod_rand(t, state, gr_ctx_data_as_ptr(ctx));
 #define STEP_BITS for (bits = 80, j = 0; bits <= 1024; bits = bits + 16, j++)
@@ -221,12 +227,51 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #define CASE_B GR_IGNORE(gr_poly_divexact_bidirectional(C, A, B, ctx));
 #endif
 
-#if 1
+#if 0
 #define INFO "gcd"
 #define SETUP random_input(A, state, len, ctx); \
               random_input(B, state, len, ctx);
 #define CASE_A GR_MUST_SUCCEED(gr_poly_gcd_euclidean(C, A, B, ctx));
 #define CASE_B GR_MUST_SUCCEED(gr_poly_gcd_hgcd(C, A, B, len / 3, len, ctx));
+#endif
+
+#if 0
+#define INFO "gcd (nmod)"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx);
+#define CASE_A gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               (A->length >= B->length) ? _nmod_poly_gcd_euclidean(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]) : \
+                                          _nmod_poly_gcd_euclidean(C->coeffs, B->coeffs, B->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#define CASE_B gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               (A->length >= B->length) ? _nmod_poly_gcd_hgcd(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]) : \
+                                          _nmod_poly_gcd_hgcd(C->coeffs, B->coeffs, B->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#endif
+
+static slong _nmod_poly_xgcd_hgcd2(nn_ptr G, nn_ptr S, nn_ptr T,
+                     nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod)
+{
+    slong inner_cutoff = nmod_poly_gcd_hgcd_cutoff(mod);
+    slong lenG = 0;
+    gr_ctx_t ctx;
+    _gr_ctx_init_nmod(ctx, &mod);
+    GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, inner_cutoff, lenB, ctx));
+    return lenG;
+}
+
+#if 1
+#define INFO "xgcd (nmod)"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx);
+#define CASE_A gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               gr_poly_fit_length(D, A->length + B->length - 1, ctx); \
+               gr_poly_fit_length(E, A->length + B->length - 1, ctx); \
+               (A->length >= B->length) ? _nmod_poly_xgcd_euclidean(C->coeffs, D->coeffs, E->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]) : \
+                                          _nmod_poly_xgcd_euclidean(C->coeffs, D->coeffs, E->coeffs, B->coeffs, B->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+#define CASE_B gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               gr_poly_fit_length(D, A->length + B->length - 1, ctx); \
+               gr_poly_fit_length(E, A->length + B->length - 1, ctx); \
+               (A->length >= B->length) ? _nmod_poly_xgcd_hgcd2(C->coeffs, D->coeffs, E->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]) : \
+                                          _nmod_poly_xgcd_hgcd2(C->coeffs, D->coeffs, E->coeffs, B->coeffs, B->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
 #endif
 
 void random_input(gr_poly_t A, flint_rand_t state, slong len, gr_ctx_t ctx)
@@ -253,7 +298,7 @@ void random_input(gr_poly_t A, flint_rand_t state, slong len, gr_ctx_t ctx)
 double
 get_profile(gr_ctx_t ctx, slong len)
 {
-    gr_poly_t A, B, C, D;
+    gr_poly_t A, B, C, D, E, F;
     double tcpu, twall, tbase, tnew;
     flint_rand_t state;
 
@@ -261,6 +306,8 @@ get_profile(gr_ctx_t ctx, slong len)
     gr_poly_init(B, ctx);
     gr_poly_init(C, ctx);
     gr_poly_init(D, ctx);
+    gr_poly_init(E, ctx);
+    gr_poly_init(F, ctx);
 
     flint_rand_init(state);
 
@@ -278,7 +325,7 @@ get_profile(gr_ctx_t ctx, slong len)
     (void) tcpu;
     tnew = twall;
 
-    printf("len %ld : %f\n", len, tbase / tnew);
+    printf("len %ld : %f        (tA = %g,  tB = %g)\n", len, tbase / tnew, tbase, tnew);
 
     flint_rand_clear(state);
 
@@ -286,6 +333,8 @@ get_profile(gr_ctx_t ctx, slong len)
     gr_poly_clear(B, ctx);
     gr_poly_clear(C, ctx);
     gr_poly_clear(D, ctx);
+    gr_poly_clear(E, ctx);
+    gr_poly_clear(F, ctx);
 
     return tbase / tnew;
 }
@@ -303,7 +352,7 @@ get_tuning(gr_ctx_t ctx, slong from)
 
     do
     {
-        for (len = from; len <= 32767; len = FLINT_MAX(len+1, len*1.05))
+        for (len = from; len <= 32767; len = NEXT_LEN(len))
         {
             speedup = get_profile(ctx, len);
 

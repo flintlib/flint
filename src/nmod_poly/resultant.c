@@ -31,7 +31,8 @@ _nmod_poly_resultant(nn_srcptr poly1, slong len1,
     }
     else
     {
-        slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+        slong cutoff = nmod_poly_gcd_hgcd_cutoff(mod);
+        slong inner_cutoff = nmod_poly_hgcd_iter_recursive_cutoff(mod);
         ulong res;
         gr_ctx_t ctx;
 
@@ -42,7 +43,7 @@ _nmod_poly_resultant(nn_srcptr poly1, slong len1,
             if (len2 < cutoff)
                 res = _nmod_poly_resultant_euclidean(poly1, len1, poly2, len2, mod);
             else
-                GR_MUST_SUCCEED(_gr_poly_resultant_hgcd(&res, poly1, len1, poly2, len2, NMOD_POLY_HGCD_CUTOFF, cutoff, ctx));
+                GR_MUST_SUCCEED(_gr_poly_resultant_hgcd(&res, poly1, len1, poly2, len2, inner_cutoff, cutoff, ctx));
         }
 
         return res;
@@ -201,12 +202,11 @@ _nmod_poly_resultant_hgcd(nn_srcptr poly1, slong len1,
                                nn_srcptr poly2, slong len2, nmod_t mod)
 {
     gr_ctx_t ctx;
-    slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+    slong cutoff = nmod_poly_gcd_hgcd_cutoff(mod);
+    slong inner_cutoff = nmod_poly_hgcd_iter_recursive_cutoff(mod);
     ulong res;
-
     _gr_ctx_init_nmod(ctx, &mod);
-    GR_MUST_SUCCEED(_gr_poly_resultant_hgcd(&res, poly1, len1, poly2, len2, NMOD_POLY_HGCD_CUTOFF, cutoff, ctx));
-
+    GR_MUST_SUCCEED(_gr_poly_resultant_hgcd(&res, poly1, len1, poly2, len2, inner_cutoff, cutoff, ctx));
     return res;
 }
 

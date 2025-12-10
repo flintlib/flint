@@ -28,10 +28,6 @@
 extern "C" {
 #endif
 
-#define NMOD_POLY_HGCD_CUTOFF  100      /* HGCD: Basecase -> Recursion      */
-#define NMOD_POLY_GCD_CUTOFF  340       /* GCD:  Euclidean -> HGCD          */
-#define NMOD_POLY_SMALL_GCD_CUTOFF 200  /* GCD (small n): Euclidean -> HGCD */
-
 typedef struct
 {
    ulong res;
@@ -479,6 +475,7 @@ void nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
 
 /* Division  *****************************************************************/
 
+void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, ulong invL, nmod_t mod);
 void _nmod_poly_divrem_basecase_preinv1(nn_ptr Q, nn_ptr R, nn_srcptr A, slong A_len, nn_srcptr B, slong B_len, ulong invB, nmod_t mod);
 
 void _nmod_poly_divrem_basecase(nn_ptr Q, nn_ptr R, nn_srcptr A, slong A_len, nn_srcptr B, slong B_len, nmod_t mod);
@@ -748,6 +745,13 @@ NMOD_POLY_INLINE slong nmod_poly_hamming_weight(const nmod_poly_t A)
 }
 
 /* Greatest common divisor  **************************************************/
+
+/* HGCD: Basecase -> Recursion */
+slong nmod_poly_hgcd_iter_recursive_cutoff(nmod_t mod);
+/* GCD:  Euclidean -> HGCD */
+slong nmod_poly_gcd_hgcd_cutoff(nmod_t mod);
+/* XGCD:  Euclidean -> HGCD */
+slong nmod_poly_xgcd_hgcd_cutoff(nmod_t mod);
 
 slong _nmod_poly_gcd_euclidean(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
 void nmod_poly_gcd_euclidean(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
