@@ -17,10 +17,23 @@
 #include "nmod_poly.h"
 #include "gr_poly.h"
 
+static const short nmod_poly_xgcd_hgcd_cutoff_tab[64] = {
+    159, 89, 75, 85, 72, 78, 81, 89, 85, 89, 93, 97, 97, 93, 101, 97, 97,
+    106, 106, 121, 111, 101, 101, 101, 106, 106, 106, 101, 106, 182, 191, 191,
+    200, 231, 200, 191, 220, 210, 210, 231, 231, 220, 210, 220, 242, 210, 231,
+    220, 254, 254, 242, 242, 242, 254, 306, 306, 266, 306, 292, 306, 321, 306,
+    388, 166,
+};
+
+slong nmod_poly_xgcd_hgcd_cutoff(nmod_t mod)
+{
+    return nmod_poly_xgcd_hgcd_cutoff_tab[NMOD_BITS(mod) - 1];
+}
+
 slong _nmod_poly_xgcd(nn_ptr G, nn_ptr S, nn_ptr T,
                      nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod)
 {
-    slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+    slong cutoff = nmod_poly_xgcd_hgcd_cutoff(mod);
 
     if (lenB < cutoff)
     {
@@ -28,10 +41,11 @@ slong _nmod_poly_xgcd(nn_ptr G, nn_ptr S, nn_ptr T,
     }
     else
     {
+        slong inner_cutoff = nmod_poly_hgcd_iter_recursive_cutoff(mod);
         slong lenG = 0;
         gr_ctx_t ctx;
         _gr_ctx_init_nmod(ctx, &mod);
-        GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, NMOD_POLY_HGCD_CUTOFF, cutoff, ctx));
+        GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, inner_cutoff, cutoff, ctx));
         return lenG;
     }
 }
@@ -367,11 +381,12 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
 slong _nmod_poly_xgcd_hgcd(nn_ptr G, nn_ptr S, nn_ptr T,
                      nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod)
 {
-    slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+    slong cutoff = nmod_poly_xgcd_hgcd_cutoff(mod);
+    slong inner_cutoff = nmod_poly_hgcd_iter_recursive_cutoff(mod);
     slong lenG = 0;
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);
-    GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, NMOD_POLY_HGCD_CUTOFF, cutoff, ctx));
+    GR_MUST_SUCCEED(_gr_poly_xgcd_hgcd(&lenG, G, S, T, A, lenA, B, lenB, inner_cutoff, cutoff, ctx));
     return lenG;
 }
 
