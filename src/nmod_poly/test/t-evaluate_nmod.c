@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2025 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -13,19 +14,49 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
+/* only set to 1 if wanting the full test with static functions          */
+/* --> this implies temporarily making non-static in the relevant files, */
+/* and recompiling flint                                                 */
+#define __DO_TEST_STATIC 0
+#if __DO_TEST_STATIC  /* declare prototypes */
+ulong _nmod_poly_evaluate_one(nn_srcptr poly, slong len, ulong modn);
+ulong _nmod_poly_evaluate_one1(nn_srcptr poly, slong len, ulong modn);
+ulong _nmod_poly_evaluate_one2(nn_srcptr poly, slong len, ulong modn);
+ulong _nmod_poly_evaluate_mone(nn_srcptr poly, slong len, ulong modn);
+ulong _nmod_poly_evaluate_mone1(nn_srcptr poly, slong len, ulong modn);
+ulong _nmod_poly_evaluate_mone2(nn_srcptr poly, slong len, ulong modn);
+#endif
+
 TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
 {
     int i, j, result = 1;
 
     /* Check evaluation at 1 gives sum of coeffs */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5000 * flint_test_multiplier(); i++)
     {
+        ulong n;
         nmod_poly_t a;
-        ulong n = n_randtest_not_zero(state);
         ulong sum, eval, eval_v1, eval_v2, eval_v3;
+#if __DO_TEST_STATIC
+        ulong eval_one, eval_one1, eval_one2;
+#endif
+
+        /* 50% tests with random modulus; 50% with large ones */
+        if (i < 2500 * flint_test_multiplier())
+            n = n_randtest_not_zero(state);
+        else if (i < 3500 * flint_test_multiplier())
+            n = n_randbits(state, 62);
+        else if (i < 4500 * flint_test_multiplier())
+            n = n_randbits(state, 63);
+        else
+#if FLINT_BITS == 64
+            n = UWORD(6148914691236517205);
+#else // FLINT_BITS == 32
+            n = UWORD(1431655765);
+#endif
 
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, state, n_randint(state, 100));
+        nmod_poly_randtest(a, state, n_randint(state, 150));
 
         // main function
         eval = nmod_poly_evaluate_nmod(a, UWORD(1));
@@ -76,21 +107,78 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
             flint_abort();
         }
 
+#if __DO_TEST_STATIC
+        eval_one = _nmod_poly_evaluate_one(a->coeffs, a->length, a->mod.n);
+
+        if (FLINT_BIT_COUNT(a->mod.n) <= FLINT_BITS - 2)
+        {
+            eval_one1 = _nmod_poly_evaluate_one1(a->coeffs, a->length, a->mod.n);
+            eval_one2 = _nmod_poly_evaluate_one2(a->coeffs, a->length, a->mod.n);
+        }
+        else if (FLINT_BIT_COUNT(a->mod.n) == FLINT_BITS - 1)
+        {
+            eval_one1 = _nmod_poly_evaluate_one1(a->coeffs, a->length, a->mod.n);
+            eval_one2 = eval_one;
+        }
+        else
+        {
+            eval_one1 = eval_one;
+            eval_one2 = eval_one;
+        }
+
+        result = (sum == eval_one) && (eval_one == eval_one1) && (eval_one == eval_one2);
+        if (!result)
+        {
+            flint_printf("FAIL (one):\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            flint_printf("sum = %wu, eval_one = %wu, eval_one1 = %wu, eval_one2 = %wu\n",
+                         sum, eval_one, eval_one1, eval_one2);
+            nmod_poly_print(a), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+#endif
+
         nmod_poly_clear(a);
     }
 
     /* Check a(c) + b(c) = (a + b)(c) */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5000 * flint_test_multiplier(); i++)
     {
+        ulong n;
         nmod_poly_t a, b, acopy;
-        ulong n = n_randtest_not_zero(state);
         ulong eval1, eval2, c, eval1_v1, eval1_v2, eval1_v3, eval2_v1, eval2_v2, eval2_v3;
+
+        if (i < 2500 * flint_test_multiplier())
+            n = n_randtest_not_zero(state);
+        else if (i < 3500 * flint_test_multiplier())
+            n = n_randbits(state, 62);
+        else if (i < 4500 * flint_test_multiplier())
+            n = n_randbits(state, 63);
+        else
+#if FLINT_BITS == 64
+            n = UWORD(6148914691236517205);
+#else // FLINT_BITS == 32
+            n = UWORD(1431655765);
+#endif
+
 
         nmod_poly_init(a, n);
         nmod_poly_init(acopy, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, state, n_randint(state, 100));
-        nmod_poly_randtest(b, state, n_randint(state, 100));
+
+        if (i % 8 != 0)
+            nmod_poly_randtest(a, state, n_randint(state, 150));
+        else
+        {
+            /* really stress the overflow-related issues for lazy variant */
+            nmod_poly_fit_length(a, n_randint(state, 150));
+            _nmod_poly_set_length(a, a->alloc);
+            for (slong kk = 0; kk < a->length; kk++)
+                a->coeffs[kk] = n-1;
+            _nmod_poly_normalise(a);
+        }
+        nmod_poly_randtest(b, state, n_randint(state, 150));
         nmod_poly_set(acopy, a);
 
         c = n_randint(state, n);
@@ -111,7 +199,7 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         {
             ulong c_precomp = n_mulmod_precomp_shoup(c, n);
             eval1_v2 = _nmod_poly_evaluate_nmod_precomp(a->coeffs, a->length, c, c_precomp, n);
-            eval1_v2 = n_addmod(eval1_v2, 
+            eval1_v2 = n_addmod(eval1_v2,
                                 _nmod_poly_evaluate_nmod_precomp(b->coeffs, b->length,
                                                                c, c_precomp, n),
                                 n);
@@ -178,11 +266,12 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("modulus: %wu, alength: %wu, blength: %wu\n", n, acopy->length, b->length);
             flint_printf("eval1 = %wu, eval2 = %wu\n", eval1, eval2);
             flint_printf("eval1_v1 = %wu, eval2_v1 = %wu\n", eval1_v1, eval2_v1);
             flint_printf("eval1_v2 = %wu, eval2_v2 = %wu\n", eval1_v2, eval2_v2);
             flint_printf("eval1_v3 = %wu, eval2_v3 = %wu\n", eval1_v3, eval2_v3);
-            nmod_poly_print(a), flint_printf("\n\n");
+            nmod_poly_print(acopy), flint_printf("\n\n");
             nmod_poly_print(b), flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
@@ -193,5 +282,98 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
         nmod_poly_clear(b);
     }
 
+#if __DO_TEST_STATIC
+    /* Check evaluation at 1 and -1, specialized functions */
+    for (i = 0; i < 5000 * flint_test_multiplier(); i++)
+    {
+        ulong n;
+        nmod_poly_t a;
+        ulong eval;
+        ulong eval_one, eval_one1, eval_one2;
+        ulong eval_mone, eval_mone1, eval_mone2;
+
+        /* 50% tests with random modulus; 50% with large ones */
+        if (i < 2500 * flint_test_multiplier())
+            n = n_randtest_not_zero(state);
+        else if (i < 3500 * flint_test_multiplier())
+            n = n_randbits(state, 62);
+        else
+            n = n_randbits(state, 63);
+
+        nmod_poly_init(a, n);
+        nmod_poly_randtest(a, state, n_randint(state, 150));
+
+        // general function, not specialized
+        eval = _nmod_poly_evaluate_nmod(a->coeffs, a->length, UWORD(1), a->mod);
+
+        eval_one = _nmod_poly_evaluate_one(a->coeffs, a->length, a->mod.n);
+
+        if (FLINT_BIT_COUNT(a->mod.n) <= FLINT_BITS - 2)
+        {
+            eval_one1 = _nmod_poly_evaluate_one1(a->coeffs, a->length, a->mod.n);
+            eval_one2 = _nmod_poly_evaluate_one2(a->coeffs, a->length, a->mod.n);
+        }
+        else if (FLINT_BIT_COUNT(a->mod.n) == FLINT_BITS - 1)
+        {
+            eval_one1 = _nmod_poly_evaluate_one1(a->coeffs, a->length, a->mod.n);
+            eval_one2 = eval_one;
+        }
+        else
+        {
+            eval_one1 = eval_one;
+            eval_one2 = eval_one;
+        }
+
+        result = (eval == eval_one) && (eval_one == eval_one1) && (eval_one == eval_one2);
+        if (!result)
+        {
+            flint_printf("FAIL (one):\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            flint_printf("sum = %wu, eval_one = %wu, eval_one1 = %wu, eval_one2 = %wu\n",
+                         eval, eval_one, eval_one1, eval_one2);
+            nmod_poly_print(a), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        // general function, not specialized
+        eval = _nmod_poly_evaluate_nmod(a->coeffs, a->length, n - UWORD(1), a->mod);
+
+        eval_mone = _nmod_poly_evaluate_mone(a->coeffs, a->length, a->mod.n);
+
+        if (FLINT_BIT_COUNT(a->mod.n) <= FLINT_BITS - 2)
+        {
+            eval_mone1 = _nmod_poly_evaluate_mone1(a->coeffs, a->length, a->mod.n);
+            eval_mone2 = _nmod_poly_evaluate_mone2(a->coeffs, a->length, a->mod.n);
+        }
+        else if (FLINT_BIT_COUNT(a->mod.n) == FLINT_BITS - 1)
+        {
+            eval_mone1 = _nmod_poly_evaluate_mone1(a->coeffs, a->length, a->mod.n);
+            eval_mone2 = eval_mone;
+        }
+        else
+        {
+            eval_mone1 = eval_mone;
+            eval_mone2 = eval_mone;
+        }
+
+        result = (eval == eval_mone) && (eval_mone == eval_mone1) && (eval_mone == eval_mone2);
+        if (!result)
+        {
+            flint_printf("FAIL (mone):\n");
+            flint_printf("a->length = %wd, n = %wu\n", a->length, a->mod.n);
+            flint_printf("correct = %wu, eval_mone = %wu, eval_mone1 = %wu, eval_mone2 = %wu\n",
+                         eval, eval_mone, eval_mone1, eval_mone2);
+            nmod_poly_print(a), flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        nmod_poly_clear(a);
+    }
+#endif
+
     TEST_FUNCTION_END(state);
 }
+
+#undef __DO_TEST_STATIC
