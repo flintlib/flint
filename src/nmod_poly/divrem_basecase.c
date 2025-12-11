@@ -118,7 +118,7 @@ void _nmod_poly_divrem_q1_preinv1_fullword(nn_ptr Q, nn_ptr R,
                           ulong invL, nmod_t mod)
 {
     slong i;
-    ulong t, q0, q1, t2, t1, t0, s1, s0;
+    ulong t, q0, q1, t1, t0, s1, s0;
 
     FLINT_ASSERT(lenA == lenB + 1);
 
@@ -137,13 +137,10 @@ void _nmod_poly_divrem_q1_preinv1_fullword(nn_ptr Q, nn_ptr R,
     for (i = 1; i < lenB - 1; i++)
     {
         umul_ppmm(t1, t0, q1, B[i - 1]);
-        umul_ppmm(s1, s0, q0, B[i]);
         add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
-        add_sssaaaaaa(t2, t1, t0, 0, t1, t0, 0, s1, s0);
-        if (t2 != 0)
-            /* Hack: just doing t1 -= mod.n runs slower. */
-            sub_ddmmss(t2, t1, t2, t1, 0, mod.n);
-        t1 = FLINT_MIN(t1, t1 - mod.n);
+        umul_ppmm(s1, s0, q0, B[i]);
+        add_ssaaaa(t1, t0, t1, t0, 0, s0);
+        t1 = nmod_add(t1, s1, mod);
         FLINT_ASSERT(t1 < mod.n);
         NMOD_RED2(R[i], t1, t0, mod);
     }
