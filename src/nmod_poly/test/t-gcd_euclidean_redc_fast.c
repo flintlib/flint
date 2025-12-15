@@ -28,7 +28,7 @@ TEST_FUNCTION_START(nmod_poly_gcd_euclidean_redc_fast, state)
 
         ulong n;
         do n = n_randtest_not_zero(state);
-        while (!n_is_probabprime(n) || n == 2 || FLINT_BIT_COUNT(n) != FLINT_BITS - 2);
+        while (!n_is_probabprime(n) || n == 2 || FLINT_BIT_COUNT(n) > FLINT_BITS - 2);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

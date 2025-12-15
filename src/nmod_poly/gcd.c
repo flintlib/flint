@@ -305,7 +305,7 @@ slong _nmod_poly_gcd_euclidean_redc_fast(nn_ptr G, nn_srcptr A, slong lenA,
 
     FLINT_ASSERT(mod.n % 2);
     FLINT_ASSERT(mod.n != 1);
-    FLINT_ASSERT(NMOD_BITS(mod) > FLINT_BITS - 2);
+    FLINT_ASSERT(NMOD_BITS(mod) <= FLINT_BITS - 2);
 
     TMP_START;
     R = TMP_ALLOC((lenB - 1) * sizeof(ulong));
