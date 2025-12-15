@@ -1144,6 +1144,35 @@ Root-finding
     roots, the iteration is likely to find them (with low numerical accuracy),
     but the error bounds will not converge as the precision increases.
 
+.. function:: double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec)
+
+   Attempts to compute all the roots as above. The operations are performed
+   on double, and the precision *prec* is used only below `53` for
+   terminating if the estimated accuracy is below the working precision.
+
+   The function returns the last *correction*, that is the maximal step size computed at the last
+   iteration. In particular, if there was no overflow, and up to rounding
+   errors, the roots of the input polynomial are included in the disks centered at the
+   entries of *roots* and of radius `(len-2)` *correction*.
+
+.. function:: double cd_poly_find_roots(double * roots, const double * poly, const double * initial, slong len, slong maxiter, double reltol) 
+
+   Attempts to compute all the roots as above. The array *roots* should be
+   preallocated with the size of `2 len` *double*. The *poly* array
+   is an array of size `2 len` *double*, where the entries at indices `2 k`
+   and `2 k + 1` represent the real and the imaginary parts of the
+   coefficient of degree `k`. Similarly, *initial* can be *NULL* or an
+   array of size `2 (len-1)` *double*, where the real and imaginary parts of
+   the initial points are stored contiguously.
+
+.. function:: double cd_poly_refine_roots(double * z, const double * poly, slong len, double stepsize_bound)
+
+.. function:: double cd_poly_refine_roots_with_pivot(double * z, const double * poly, slong len, double stepsize_bound)
+
+   Updates the array of `len - 1` complex numbers in *z* with one step of the
+   Durand-Kerner method. The variant with pivot reorders the intermediate
+   operations to reduce the risk of overflow.
+
 .. function:: int _acb_poly_validate_real_roots(acb_srcptr roots, acb_srcptr poly, slong len, slong prec)
 
 .. function:: int acb_poly_validate_real_roots(acb_srcptr roots, const acb_poly_t poly, slong prec)
