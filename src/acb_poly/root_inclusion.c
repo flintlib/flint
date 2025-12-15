@@ -39,7 +39,9 @@ static void _acb_poly_evaluate_stable(acb_t y, acb_srcptr poly, slong len, const
             mag_add(f, arb_radref(acb_realref(y)),
                        arb_radref(acb_imagref(y)));
             mag_add(e, e, f);
-            acb_get_mid(y, y);
+
+            mag_zero(arb_radref(acb_realref(y)));
+            mag_zero(arb_radref(acb_imagref(y)));
         }
 
         mag_set(arb_radref(acb_realref(y)), e);

@@ -32,16 +32,11 @@ typedef struct {
     /* arrays for the reciprocal polynomial to evaluate on the inverse points of magnitude >= 1 */
     double *rp_r;
     double *rp_i;
-    /* for the newton polygon, -log(|coeff|) of p, and indices of the
-     * vertices of the convex hull */
-    double *malp;
-    slong  *np;
 } intermediate_variables;
 
 static void _intermediate_variables_init(intermediate_variables * v, slong n)
 {
-    double * mem_v = flint_malloc(13*n*sizeof(double));
-    slong * mem_np = flint_malloc(n*sizeof(slong));
+    double * mem_v = flint_malloc(12*n*sizeof(double));
 
     /* Set the memory addresses */
     v->z_r   = mem_v+0*n; 
@@ -56,13 +51,10 @@ static void _intermediate_variables_init(intermediate_variables * v, slong n)
     v->pz_i  = mem_v+9*n;
     v->rp_r  = mem_v+10*n;
     v->rp_i  = mem_v+11*n;
-    v->malp  = mem_v+12*n;
-    v->np    = mem_np;
 }
 
 static void _intermediate_variables_clear(intermediate_variables * v)
 {
-    flint_free(v->np);
     flint_free(v->z_r);
 }
 
@@ -255,37 +247,44 @@ static void _initial_values_from_newton_polygon(double* z_r, double* z_i, const 
 
 #define LOG_ROUNDING 0
 
-static void _set_initial_values(intermediate_variables * v, const double * p_r, const double * p_i, slong n, const double * z0, slong d)
+void cd_poly_roots_initial_values(double * z_r, double * z_i, const double * p_r, const double * p_i, slong n, const double * z0, slong d)
 {
     double epsilon=ldexp(1,-1000);
+    double * malp;
+    slong * np;
     slong i=0, j, n_np;
     int k=LOG_ROUNDING;
     
     if(z0 != NULL) {
         for(i=0, j=0; i<n-1 && j<d; j++) {
             if (z0[2*j] != 0 || z0[2*j+1] != 0) {
-                v->z_r[i] = z0[2*j];
-                v->z_i[i] = z0[2*j+1];
+                z_r[i] = z0[2*j];
+                z_i[i] = z0[2*j+1];
                 i++;
             }
         }
     }
 
     if(z0 == NULL || i < n-1) {
+        malp = flint_malloc(n*sizeof(double));
+        np = flint_malloc(n*sizeof(slong));
         /* Unzip the real, imaginary parts and numerical valuation of the input polynomial coefficients */
         for(i=0; i<n; i++) {
             /* We avoid infinite values so that the code is compatible with
              * unsafe math optimizations */
-            v->malp[i] = -log(hypot(p_r[i],p_i[i])+epsilon);
-            /* rounding the valuation helps avoiding nearby initial radii */
-            v->malp[i] = ldexp(round(ldexp(v->malp[i],k)),-k);
+            malp[i] = -log(hypot(p_r[i],p_i[i])+epsilon);
+            /* Rounding the valuation helps avoiding nearby initial radii */
+            malp[i] = ldexp(round(ldexp(malp[i],k)),-k);
         }
 
         /* Computes the Newton polygon as indices in np of length n_np */
-        n_np = lower_convex_hull(v->np, v->malp, n);
+        n_np = lower_convex_hull(np, malp, n);
         
         /* Computes a first estimation of the roots */
-        _initial_values_from_newton_polygon(v->z_r, v->z_i, p_r, p_i, v->np, n_np);
+        _initial_values_from_newton_polygon(z_r, z_i, p_r, p_i, np, n_np);
+
+        flint_free(malp);
+        flint_free(np);
     }
 }
 
@@ -651,7 +650,7 @@ double cd_poly_find_roots(double * z, const double * p, const double * z0, slong
     if(nt > 1) {
         _intermediate_variables_init(v, nt);
         _set_poly(v, p + 2*fz, nt);
-        _set_initial_values(v, v->p_r, v->p_i, nt, z0, n-1);
+        cd_poly_roots_initial_values(v->z_r, v->z_i, v->p_r, v->p_i, nt, z0, n-1);
         /* Main solve function */
         stepsize_bound = MIN_STEPSIZE_BOUND;
         for(i=0; i<num_iter; i++) {
@@ -661,7 +660,7 @@ double cd_poly_find_roots(double * z, const double * p, const double * z0, slong
             correction = _refine_roots(v, nt, stepsize_bound);
             stepsize_bound *= (correction > old_correction)? 0.5 : 2;
             stepsize_bound = fmax(fmin(stepsize_bound, MAX_STEPSIZE_BOUND), MIN_STEPSIZE_BOUND);
-            if((n-2)*correction < reltol || correction < ldexp(1,-50)) {
+            if((nt-2)*correction < reltol || correction < ldexp(1,-50)) {
                 break;
             }
             old_correction = correction;
