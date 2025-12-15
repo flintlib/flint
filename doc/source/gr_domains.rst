@@ -140,26 +140,13 @@ Residue rings and finite fields
     enable some functions to complete that otherwise would
     return ``GR_UNABLE``.
 
-.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+See:
 
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`ulong`. We require `n \ne 0`.
-
-.. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
-              void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
-
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`uint8` or :type:`uint32`. The modulus must be
-    nonzero.
-
-    .. note ::
-
-        Presently, many operations for these types are not as optimized
-        as those for full-word ``nmods``. It is currently recommended
-        to use :func:`gr_ctx_init_nmod` for best performance unless
-        one specifically wants to minimize memory usage.
+* :func:`gr_ctx_init_nmod`
+  :func:`gr_ctx_init_nmod8`
+  :func:`gr_ctx_init_nmod32`
+  :func:`gr_ctx_init_nmod_redc`
+  :func:`gr_ctx_init_nmod_redc_fast`
 
 .. function:: void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 

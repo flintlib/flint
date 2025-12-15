@@ -21,6 +21,7 @@
 
 #include "ulong_extras.h"
 #include "nmod_types.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -62,6 +63,20 @@ extern "C" {
 
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
 #define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
+
+#define NMOD_RED2_NONFULLWORD(r, a_hi, a_lo, mod) \
+  do { \
+    ulong q0xx, q1xx, r1xx; \
+    const ulong u1xx = ((a_hi)<<(mod).norm) + ((a_lo)>>(FLINT_BITS - (mod).norm)); \
+    const ulong u0xx = (a_lo)<<(mod).norm; \
+    const ulong nxx = (mod).n<<(mod).norm; \
+    umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx); \
+    add_ssaaaa(q1xx, q0xx, q1xx, q0xx, u1xx, u0xx); \
+    r1xx = (u0xx - (q1xx + 1)*nxx); \
+    if (r1xx > q0xx) r1xx += nxx; \
+    if (r1xx < nxx) r = (r1xx>>(mod).norm); \
+    else r = ((r1xx - nxx)>>(mod).norm); \
+  } while (0)
 
 #define NMOD_MUL_PRENORM(res, a, b, mod) \
   do { \
@@ -270,6 +285,7 @@ NMOD_INLINE ulong ull_lo(ull_t x) { return (ulong) x; }
 NMOD_INLINE ull_t ull_add(ull_t x, ull_t y) { return x + y; }
 NMOD_INLINE ull_t ull_add_u(ull_t x, ulong y) { return x + (ull_t) y; }
 NMOD_INLINE ull_t ull_u_mul_u(ulong x, ulong y) { return (ull_t) x * (ull_t) y; }
+NMOD_INLINE ull_t ull(ulong hi, ulong lo) { return ((ull_t) lo) | (((ull_t) hi) << FLINT_BITS); }
 
 #else
 
@@ -280,6 +296,7 @@ NMOD_INLINE ulong ull_lo(ull_t x) { return x.lo; }
 NMOD_INLINE ull_t ull_add(ull_t x, ull_t y) { ull_t t; add_ssaaaa(t.hi, t.lo, x.hi, x.lo, y.hi, y.lo); return t; }
 NMOD_INLINE ull_t ull_add_u(ull_t x, ulong y) { ull_t t; add_ssaaaa(t.hi, t.lo, x.hi, x.lo, 0, y); return t; }
 NMOD_INLINE ull_t ull_u_mul_u(ulong x, ulong y) { ull_t t; umul_ppmm(t.hi, t.lo, x, y); return t; }
+NMOD_INLINE ull_t ull(ulong hi, ulong lo) { ull_t t; t.lo = lo; t.hi = hi; return t; }
 
 #endif
 
@@ -416,6 +433,11 @@ NMOD_INLINE ulong nmod_redc_get_nmod(ulong x, const nmod_redc_ctx_t ctx)
     return n_redc(x, ctx->mod.n, ctx->nred);
 }
 
+NMOD_INLINE ulong nmod_redc_neg(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return nmod_neg(x, ctx->mod);
+}
+
 NMOD_INLINE ulong nmod_redc_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
 {
     return nmod_add(x, y, ctx->mod);
@@ -439,6 +461,11 @@ NMOD_INLINE int nmod_redc_can_use_fast(const nmod_redc_ctx_t ctx)
 NMOD_INLINE ulong nmod_redc_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
 {
     return n_mulmod_redc_fast(x, y, ctx->mod.n, ctx->nred);
+}
+
+NMOD_INLINE ulong nmod_redc_fast_neg(ulong x, const nmod_redc_ctx_t ctx)
+{
+    return n_negmod(x, 2 * ctx->mod.n);
 }
 
 NMOD_INLINE ulong nmod_redc_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
@@ -574,6 +601,42 @@ NMOD_INLINE ulong nmod_redc_half_fast_sub(ulong x, ulong y, const nmod_redc_ctx_
 {
     return n_submod(x, y, 2 * ctx->mod.n);
 }
+
+/* Rings */
+
+typedef struct
+{
+    nmod_t nmod;
+    ulong a;   /* when used as finite field with defining polynomial x - a */
+    truth_t is_prime;
+}
+_gr_nmod_ctx_struct;
+
+#define NMOD_CTX_REF(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->nmod)))
+#define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
+#define NMOD_IS_PRIME(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->is_prime)
+/* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
+#define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
+
+
+typedef struct
+{
+    nmod_redc_ctx_struct ctx;
+    ulong one;
+    truth_t is_prime;
+}
+_gr_nmod_redc_ctx_struct;
+
+#define GR_NMOD_REDC_CTX(ring_ctx) (&((((_gr_nmod_redc_ctx_struct *)(ring_ctx))->ctx)))
+#define GR_NMOD_REDC_MOD(ring_ctx) (((((_gr_nmod_redc_ctx_struct *)(ring_ctx))->ctx)).mod)
+#define GR_NMOD_REDC_N(ring_ctx) ((((((_gr_nmod_redc_ctx_struct *)(ring_ctx))->ctx)).mod).n)
+#define GR_NMOD_REDC_NRED(ring_ctx) (GR_NMOD_REDC_CTX(ring_ctx)->nred)
+#define GR_NMOD_REDC_ONE(ring_ctx) ((((_gr_nmod_redc_ctx_struct *)(ring_ctx))->one))
+#define GR_NMOD_REDC_IS_PRIME(ring_ctx) ((((_gr_nmod_redc_ctx_struct *)(ring_ctx))->is_prime))
+#define GR_NMOD_REDC_IS_FAST(ring_ctx) ((ring_ctx)->which_ring == GR_CTX_NMOD_REDC_FAST)
+
+int gr_ctx_init_nmod_redc(gr_ctx_t ctx, ulong n);
+int gr_ctx_init_nmod_redc_fast(gr_ctx_t ctx, ulong n);
 
 /* Discrete logs a la Pohlig - Hellman ***************************************/
 

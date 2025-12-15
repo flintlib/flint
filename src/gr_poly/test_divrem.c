@@ -100,6 +100,7 @@ void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
             if (status == GR_SUCCESS && gr_poly_equal(QBR, A, ctx) == T_FALSE)
             {
                 flint_printf("FAIL\n\n");
+                gr_ctx_println(ctx);
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
                 flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
                 flint_printf("Q = "); gr_poly_print(Q, ctx); flint_printf("\n");
