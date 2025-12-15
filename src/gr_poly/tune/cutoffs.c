@@ -58,7 +58,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #if 1
 #define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
 #define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
-#define STEP_BITS for (bits = 33, j = 0; bits <= 64; bits++, j++)
+#define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
 #endif
 
 #if 0

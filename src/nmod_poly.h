@@ -748,6 +748,8 @@ NMOD_POLY_INLINE slong nmod_poly_hamming_weight(const nmod_poly_t A)
 
 /* HGCD: Basecase -> Recursion */
 slong nmod_poly_hgcd_iter_recursive_cutoff(nmod_t mod);
+/* HGCD: Euclidean -> HGCD */
+slong nmod_poly_hgcd_outer_cutoff(nmod_t mod);
 /* GCD:  Euclidean -> HGCD */
 slong nmod_poly_gcd_hgcd_cutoff(nmod_t mod);
 /* XGCD:  Euclidean -> HGCD */

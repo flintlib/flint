@@ -25,18 +25,32 @@ static const short nmod_poly_hgcd_iter_recursive_cutoff_tab[64] =
     244, 180, 180, 200, 204, 192, 228, 212, 208, 168, 196, 188, 216, 208, 76,
 };
 
+static const short nmod_poly_hgcd_outer_cutoff_tab[64] =
+{
+    475, 432, 341, 412, 697, 697, 633, 633, 664, 603, 731, 931, 767, 845, 731,
+    731, 697, 697, 845, 887, 697, 1129, 931, 1025, 1185, 1025, 1185, 1244, 1371,
+    1585, 1585, 1510, 375, 498, 432, 375, 453, 412, 325, 412, 498, 475, 498,
+    393, 412, 310, 393, 432, 393, 575, 633, 633, 664, 548, 475, 845, 845, 548,
+    767, 522, 603, 575, 731, 1129,
+};
+
 static const short nmod_poly_gcd_hgcd_cutoff_tab[64] =
 {
-    493, 569, 542, 626, 626, 657, 657, 723, 759, 796, 796, 835, 835, 919, 919,
-    964, 835, 796, 876, 876, 1491, 1420, 1420, 1420, 1420, 1420, 1565, 1643,
-    1643, 1725, 1811, 1725, 1228, 1170, 1170, 1115, 1228, 1228, 1228, 1228,
-    1289, 1170, 1353, 1170, 1289, 1643, 1725, 1725, 1725, 1725, 1811, 1901,
-    1901, 1901, 1811, 1901, 1901, 1996, 1901, 1996, 1996, 1996, 1228, 1643,
+    470, 657, 626, 689, 689, 723, 796, 876, 835, 876, 919, 964, 964, 1012, 1170,
+    1228, 919, 1115, 1115, 1115, 1491, 1491, 1643, 1725, 1811, 1725, 1811, 1725,
+    1901, 1901, 1901, 1170, 1115, 1170, 1228, 1170, 1228, 1170, 1228, 1289,
+    1289, 1228, 1289, 1170, 1353, 1643, 1725, 1811, 1725, 1643, 1901, 1901,
+    1901, 1811, 1901, 1901, 1901, 1996, 1901, 1901, 1996, 2199, 1289, 1996,
 };
 
 slong nmod_poly_hgcd_iter_recursive_cutoff(nmod_t mod)
 {
     return nmod_poly_hgcd_iter_recursive_cutoff_tab[NMOD_BITS(mod) - 1];
+}
+
+slong nmod_poly_hgcd_outer_cutoff(nmod_t mod)
+{
+    return nmod_poly_hgcd_outer_cutoff_tab[NMOD_BITS(mod) - 1];
 }
 
 slong nmod_poly_gcd_hgcd_cutoff(nmod_t mod)
@@ -236,7 +250,7 @@ slong _nmod_poly_gcd_hgcd(nn_ptr G, nn_srcptr A, slong lenA,
                                    nn_srcptr B, slong lenB, nmod_t mod)
 {
     slong inner_cutoff = nmod_poly_hgcd_iter_recursive_cutoff(mod);
-    slong outer_cutoff = nmod_poly_gcd_hgcd_cutoff(mod);
+    slong outer_cutoff = nmod_poly_hgcd_outer_cutoff(mod);
     slong lenG = 0;
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);
