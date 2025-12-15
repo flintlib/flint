@@ -17,6 +17,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "mpn_mod.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 #include "fq.h"
 #include "fq_nmod.h"
@@ -57,7 +58,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #if 1
 #define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
 #define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
-#define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
+#define STEP_BITS for (bits = 33, j = 0; bits <= 64; bits++, j++)
 #endif
 
 #if 0
@@ -235,18 +236,34 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #define CASE_B GR_MUST_SUCCEED(gr_poly_gcd_hgcd(C, A, B, len / 3, len, ctx));
 #endif
 
-#if 0
+#if 1
+#define MOD ((nmod_t *) gr_ctx_data_ptr(ctx))[0]
+#define BASECASE (NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(FLINT_MIN(A->length, B->length), MOD) ? _nmod_poly_gcd_euclidean_redc_fast : _nmod_poly_gcd_euclidean)
+
 #define INFO "gcd (nmod)"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx);
+#define CASE_A gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               (A->length >= B->length) ? BASECASE(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, MOD) : \
+                                          BASECASE(C->coeffs, B->coeffs, B->length, A->coeffs, A->length, MOD);
+#define CASE_B gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
+               (A->length >= B->length) ? _nmod_poly_gcd_hgcd(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, MOD) : \
+                                          _nmod_poly_gcd_hgcd(C->coeffs, B->coeffs, B->length, A->coeffs, A->length, MOD);
+#endif
+
+#if 0
+#define INFO "gcd2 (nmod)"
 #define SETUP random_input(A, state, len, ctx); \
               random_input(B, state, len, ctx);
 #define CASE_A gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
                (A->length >= B->length) ? _nmod_poly_gcd_euclidean(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]) : \
                                           _nmod_poly_gcd_euclidean(C->coeffs, B->coeffs, B->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
 #define CASE_B gr_poly_fit_length(C, A->length + B->length - 1, ctx); \
-               (A->length >= B->length) ? _nmod_poly_gcd_hgcd(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]) : \
-                                          _nmod_poly_gcd_hgcd(C->coeffs, B->coeffs, B->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
+               (A->length >= B->length) ? _nmod_poly_gcd_euclidean_redc_fast(C->coeffs, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]) : \
+                                          _nmod_poly_gcd_euclidean_redc_fast(C->coeffs, B->coeffs, B->length, A->coeffs, A->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
 #endif
 
+#if 0
 static slong _nmod_poly_xgcd_hgcd2(nn_ptr G, nn_ptr S, nn_ptr T,
                      nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod)
 {
@@ -258,7 +275,6 @@ static slong _nmod_poly_xgcd_hgcd2(nn_ptr G, nn_ptr S, nn_ptr T,
     return lenG;
 }
 
-#if 1
 #define INFO "xgcd (nmod)"
 #define SETUP random_input(A, state, len, ctx); \
               random_input(B, state, len, ctx);

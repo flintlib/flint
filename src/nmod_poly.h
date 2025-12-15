@@ -753,8 +753,14 @@ slong nmod_poly_gcd_hgcd_cutoff(nmod_t mod);
 /* XGCD:  Euclidean -> HGCD */
 slong nmod_poly_xgcd_hgcd_cutoff(nmod_t mod);
 
+/* Euclidean GCD: normal -> redc_fast */
+#define NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(lenB, mod) (lenB >= 32 && NMOD_BITS(mod) >= FLINT_BITS / 2 && NMOD_BITS(mod) <= FLINT_BITS - 2)
+
 slong _nmod_poly_gcd_euclidean(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
 void nmod_poly_gcd_euclidean(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
+
+slong _nmod_poly_gcd_euclidean_redc_fast(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod);
+void nmod_poly_gcd_euclidean_redc_fast(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
 
 slong _nmod_poly_hgcd_recursive(nn_ptr *M, slong *lenM, nn_ptr A, slong *lenA, nn_ptr B, slong *lenB, nn_srcptr a, slong lena, nn_srcptr b, slong lenb, nn_ptr P, nmod_t mod, int flag, nmod_poly_res_t res);
 

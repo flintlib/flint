@@ -1524,6 +1524,9 @@ static void _nmod_redc_fast_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
     ulong n = GR_NMOD_REDC_CTX(ctx)->mod.n;
     ulong nred = GR_NMOD_REDC_CTX(ctx)->nred;
 
+    q0 = nmod_redc_fast_normalise(q0, ctx);
+    q1 = nmod_redc_fast_normalise(q1, ctx);
+
     for (i = 1; i < lenB - 1; i++)
     {
         ull_t s, v;
