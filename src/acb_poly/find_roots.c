@@ -235,32 +235,14 @@ static slong convex_hull_upper(slong * res, const double * y, const slong * x, s
     return n;
 }
 
-/* Compute res[0, ..., n-1] = {i} indexing the lower convex hull of {(x[i], y[i])}. */
-static slong convex_hull_lower(slong * res, const double * y, const slong * x, slong len)
-{
-    slong i, n = 0;
-
-    for (i = 0; i < len; i++)
-    {
-        while (n >= 2 && (x[res[n - 2]] - x[res[n - 1]]) * (y[i] - y[res[n - 1]])
-                >= (x[i] - x[res[n - 1]]) * (y[res[n - 2]] - y[res[n - 1]]))
-            n--;
-
-        res[n] = i;
-        n++;
-    }
-
-    return n;
-}
-
 /* Computes the line y = ax + b that minimizes max_i |y[i] - (a*x[i] + b)|.
    Returns the maximal vertical distance. 
    Requires x to be sorted. */
 static double
 _minimax_line(double * res_a, double * res_b, const double * y, const slong * x, slong len)
 {
-    slong * hL, * hU;
-    slong nL, nU, pL, pU;
+    slong * hU;
+    slong nU, pL, pU;
     slong i, j;
     double dyL, dyU;
     slong dxL, dxU;
@@ -274,16 +256,14 @@ _minimax_line(double * res_a, double * res_b, const double * y, const slong * x,
         return 0.0;
     }
 
-    hL = flint_malloc((len + 1) * sizeof(slong));
-    hU = flint_malloc((len + 1) * sizeof(slong));
-
-    nL = convex_hull_lower(hL, y, x, len);
     /* Compute upper hull into hU + 1 so hU[0] is available as a sentinel */
+    hU = flint_malloc((len + 1) * sizeof(slong));
     nU = convex_hull_upper(hU + 1, y, x, len);
-
-    /* Set sentinels to 0. Loop condition handles termination. */
-    hL[nL] = 0;
+    /* Set sentinel to 0. Loop condition handles termination. */
     hU[0] = 0;
+
+    /* The lower hull is reduced to the two extreme points and a sentinel at the end */
+    slong hL[3] = {0, len-1, 0};
 
     pL = 0;
     pU = nU;
@@ -332,7 +312,6 @@ _minimax_line(double * res_a, double * res_b, const double * y, const slong * x,
     *res_a = a;
     *res_b = b;
 
-    flint_free(hL);
     flint_free(hU);
 
     return (rU - rL) * 0.5;
@@ -406,9 +385,12 @@ double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr in
     double *cdz, *cdp, *cdi;
     double max_correction;
     arb_t scale;
+    mag_t rel_rad, abs_rad;
     slong i;
     
     arb_init(scale);
+    mag_init(rel_rad);
+    mag_init(abs_rad);
     cdp = flint_malloc(2*len*sizeof(double));
     cdz = flint_malloc(2*(len - 1)*sizeof(double));
 
@@ -424,13 +406,22 @@ double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr in
         cdi = NULL;
     }
     max_correction = cd_poly_find_roots(cdz, cdp, cdi, len, maxiter, ldexp(1,-prec));
+    slong num_ops = 100*len; //num_ops should be an upper bound on the number of arithmetic operations in a Newton step
+    
+    /* Gershgorin circle estimate for the radius of the roots */
+    mag_set_d(rel_rad, max_correction*(len-2)/(1-FLINT_MIN(0.5, num_ops*0x1p-53)));
     for(i=0; i<len-1; i++) {
         acb_set_d_d(roots + i, cdz[2*i], cdz[2*i+1]);
+        acb_get_mag(abs_rad, roots+i);
+        mag_mul(abs_rad, abs_rad, rel_rad);
+        acb_add_error_mag(roots+i, abs_rad);
         acb_mul_arb(roots + i, roots + i, scale, prec);
     }
     flint_free(cdz);
     flint_free(cdp);
     arb_clear(scale);
+    mag_clear(rel_rad);
+    mag_clear(abs_rad);
     return max_correction;
 }
 

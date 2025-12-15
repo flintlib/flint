@@ -26,9 +26,10 @@ typedef struct {
     double *vp_i;
     double *wdk_r;
     double *wdk_i;
-    /* arrays for the inverses of points with magnitude >=1 */
-    double *iz_r;
-    double *iz_i;
+    /* arrays for the permuted points such that intermediate products do not overflow */
+    double *pz_r;
+    double *pz_i;
+    /* arrays for the reciprocal polynomial to evaluate on the inverse points of magnitude >= 1 */
     double *rp_r;
     double *rp_i;
     /* for the newton polygon, -log(|coeff|) of p, and indices of the
@@ -51,8 +52,8 @@ static void _intermediate_variables_init(intermediate_variables * v, slong n)
     v->vp_i  = mem_v+5*n;
     v->wdk_r = mem_v+6*n;
     v->wdk_i = mem_v+7*n;
-    v->iz_r  = mem_v+8*n;
-    v->iz_i  = mem_v+9*n;
+    v->pz_r  = mem_v+8*n;
+    v->pz_i  = mem_v+9*n;
     v->rp_r  = mem_v+10*n;
     v->rp_i  = mem_v+11*n;
     v->malp  = mem_v+12*n;
@@ -154,17 +155,27 @@ static void _vector_inverse(double* iz_r, double* iz_i, const double* z_r, const
 static inline void divide(double* res_e, double* res_f, double a, double b, double c, double d)
 {
     double r, den;
-    /* use Smith's algorithm to reduce the risk of overflow */
+    /* use improved Smith's algorithm to reduce the risk of overflow */
     if(fabs(c) >= fabs(d) ) {
         r = d/c;
         den = c + r*d;
-        *res_e = (a+b*r)/den;
-        *res_f = (b-a*r)/den;
+        //if(r != 0) {
+            *res_e = (a+b*r)/den;
+            *res_f = (b-a*r)/den;
+        //} else {
+        //    *res_e = (a+d*(b/c))/den;
+        //    *res_f = (b-d*(a/c))/den;
+        //}
     } else {
         r = c/d;
         den = d + r*c;
-        *res_e = (a*r+b)/den;
-        *res_f = (b*r-a)/den;
+        //if(r != 0) {
+            *res_e = (a*r+b)/den;
+            *res_f = (b*r-a)/den;
+        //} else {
+        //    *res_e = (c*(a/d)+b)/den;
+        //    *res_f = (c*(b/d)-a)/den;
+        //}
     }
 }
 
@@ -224,7 +235,7 @@ static void _initial_values_from_newton_polygon(double* z_r, double* z_i, const 
         argp = atan2(p_i[p], p_r[p]);
         magq = hypot(p_r[q], p_i[q]);
         argq = atan2(p_i[q], p_r[q]);
-        magz = pow(magp/magq, invd);
+        magz = pow(magp,invd)/pow(magq, invd); //two pow to avoid magp/magq overflow
         if(magz == 0.0) {
             magz = ldexp(1, -500/(q-p));
         }
@@ -303,9 +314,8 @@ static void _set_initial_values(intermediate_variables * v, const double * p_r, 
 #endif
 #define Rbytes (Rbits/8)
 #define Nd (Rbytes/8)
-#define CDHBlock (Nd*Nr/4)
-#define CDWBlock (Nd*Nr)
 
+#define CDHBlock (Nd*Nr/4)
 /* Horner evaluation */
 void cd_poly_horner(double* results_r, double* results_i,
                     const double* values_r, const double* values_i, slong n_start, slong n_end,
@@ -336,86 +346,71 @@ void cd_poly_horner(double* results_r, double* results_i,
         memcpy(results_i+i, y, p*sizeof(double));
     }
 }
+#undef CDHBlock
 
-#if 0
-/* Weights for the Durand-Kerner or Weierstrass iteration */
-/* Warning : twice_values_r and twice_values_i have size 2n,
- * the second half of each array should be a copy of the first half
- * Not compatible with the current calls */
-static void cd_poly_weierstrass_a(double* restrict results_r, double* restrict results_i,
-                              double lc_r, double lc_i,
-                              const double* twice_values_r, const double* twice_values_i,
-                              slong n_start, slong n_end, slong d)
+#define CDWBlock (Nd*Nr/4)
+/* Weights for the Durand-Kerner or Weierstrass iteration
+ * Handles any order */
+void cd_poly_weierstrass_distinct_orders(double* restrict results_r, double* restrict results_i,
+                                         double lc_r, double lc_i,
+                                         const double* restrict col_values_r, const double* restrict col_values_i, slong d,
+                                         const double* restrict row_values_r, const double* restrict row_values_i, slong n_start, slong n_end)
 {
+    int p, k;
     slong i, j;
     for(i=n_start; i<n_end; i++){
-        results_r[i] = lc_r;
-        results_i[i] = lc_i;
+        results_r[i] = 1;
+        results_i[i] = 0;
     }
-    for(j=1; j<d; j++) {
-        for(i=n_start; i < n_end; i++) {
-            double q, r, s, t;
-            q = twice_values_r[i] - twice_values_r[i+j];
-            r = twice_values_i[i] - twice_values_i[i+j];
-            s = q*results_r[i] - r*results_i[i];
-            t = q*results_i[i] + r*results_r[i];
-            results_r[i] = s;
-            results_i[i] = t;
+    for(i=n_start; i < n_end; i+=CDWBlock) {
+        double xr[CDWBlock]  = {0};
+        double yr[CDWBlock]  = {0};
+        double u[CDWBlock]   = {0};
+        double v[CDWBlock]   = {0};
+
+        p = (i+CDWBlock<=n_end) ? CDWBlock : ((n_end-n_start) % CDWBlock);
+        memcpy(xr, results_r+i, p*sizeof(double));
+        memcpy(yr, results_i+i, p*sizeof(double));
+        memcpy(u, row_values_r+i, p*sizeof(double));
+        memcpy(v, row_values_i+i, p*sizeof(double));
+        for(j = 0; j < d; j++){
+            double a = col_values_r[j];
+            double b = col_values_i[j];
+            for(k=0; k<CDWBlock; k++) {
+                double e, f, s, t;
+                e = u[k] - a;
+                f = v[k] - b;
+                e = ((e==0) & (f==0))? 1 : e;
+                s = e*xr[k] - f*yr[k];
+                t = e*yr[k] + f*xr[k];
+                xr[k] = s;
+                yr[k] = t;
+            }
         }
+        memcpy(results_r+i, xr, p*sizeof(double));
+        memcpy(results_i+i, yr, p*sizeof(double));
+    }
+    for(i=n_start; i<n_end; i++) {
+        double s, t;
+        s = lc_r*results_r[i] - lc_i*results_i[i];
+        t = lc_r*results_i[i] + lc_i*results_r[i];
+        results_r[i] = s;
+        results_i[i] = t;
     }
 }
+#undef CDWBlock
 
+#define CDWBlock (Nd*Nr*4)
 /* Weights for the Durand-Kerner or Weierstrass iteration
- * A variant of this version could be usefull for the Borsh Supan weights*/                                                         
-static void cd_poly_weierstrass_b(double* restrict results_r, double* restrict results_i,
-                              double lc_r, double lc_i,
-                              const double* values_r, const double* values_i,
-                              slong n_start, slong n_end, slong d)
-{
-    slong i, j;
-    for(i=n_start; i<n_end; i++){
-        results_r[i] = lc_r;
-        results_i[i] = lc_i;
-    }
-    for(j=1; j<n_end-n_start; j++) {
-        for(i=n_start; i < n_end-j; i++) {
-            double q, r, s, t;
-            q = values_r[i] - values_r[i+j];
-            r = values_i[i] - values_i[i+j];
-            s = q*results_r[i] - r*results_i[i];
-            t = q*results_i[i] + r*results_r[i];
-            results_r[i] = s;
-            results_i[i] = t;
-            s = -q*results_r[i+j] + r*results_i[i+j];
-            t = -q*results_i[i+j] - r*results_r[i+j];
-            results_r[i+j] = s;
-            results_i[i+j] = t;
-        }
-    }
-    for(j=n_end % d; ((j<n_start) || (j>= n_end)) && (n_start < n_end); j = (j + 1) % d) {
-        for(i=n_start; i < n_end; i++) {
-            double q, r, s, t;
-            q = values_r[i] - values_r[j];
-            r = values_i[i] - values_i[j];
-            s = q*results_r[i] - r*results_i[i];
-            t = q*results_i[i] + r*results_r[i];
-            results_r[i] = s;
-            results_i[i] = t;
-        }
-    }
-}
-#endif
-
-/* Weights for the Durand-Kerner or Weierstrass iteration
- * Fastest than the _a variant by a small margin (less than 10%) */
+ * Faster by a small margin (less than 10%), but cannot be adapted to a permutation */
 void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
-                              double lc_r, double lc_i,
-                              const double* values_r, const double* values_i,
-                              slong n_start, slong n_end, slong d)
+                         double lc_r, double lc_i,
+                         const double* values_r, const double* values_i,
+                         slong n_start, slong n_end, slong d)
 {
     int p, q, k, m;
     slong i, j;
-    for(i=n_start; i<n_end; i++){
+    for(i=n_start; i<n_end; i++) {
         results_r[i] = lc_r;
         results_i[i] = lc_i;
     }
@@ -506,9 +501,8 @@ void cd_poly_weierstrass(double* restrict results_r, double* restrict results_i,
         memcpy(results_i+i, yr, p*sizeof(double));
     }
 }
-
 #undef CDWBlock
-#undef CDHBlock
+
 #undef Nd
 #undef Rbytes
 #undef Nr
@@ -521,6 +515,7 @@ double cd_poly_wdk_update(double* z_r, double* z_i,
 {
     slong i;
     double f_r, f_i, mag_ratio, damping, maxstep = 0;
+    //flint_printf("n_start: %ld, n_end: %ld, mag_w: %.3e\n", n_start, n_end, hypot(wdk_r[0], wdk_i[0]));
     for(i=n_start; i<n_end; i++) {
         if((wdk_r[i] != 0) || (wdk_i[i] != 0)) {
             divide(&f_r, &f_i, vp_r[i], vp_i[i], wdk_r[i], wdk_i[i]);
@@ -529,41 +524,39 @@ double cd_poly_wdk_update(double* z_r, double* z_i,
             z_r[i] = z_r[i] - damping * f_r;
             z_i[i] = z_i[i] - damping * f_i;
             maxstep = fmax(maxstep, mag_ratio);
+            #if 0
+            flint_printf("ratio=%.3e, |f|=%.3e, |w|=%.3e, |f/w|=%.3e, |z|=%.3e\n",
+                         mag_ratio, hypot(vp_r[i], vp_i[i]), hypot(wdk_r[i], wdk_i[i]),
+                         hypot(f_r, f_i), hypot(z_r[i], z_i[i]));
+            #endif
         }
     }
     return maxstep;
 }
 
-#if 0
-/* Rescale the roots for matching the geometric mean given by the constant
- * coefficient. Not significant improvement. */
-static void cd_poly_geometric_rescale(double* z_r, double* z_i, double lc_r, double lc_i, double tc_r, double tc_i, slong n)
+static void cd_poly_no_overflow_permute(double * pz_r, double * pz_i, const double * z_r, const double * z_i, slong n_piv, slong d)
 {
-    slong i;
-    double a, b, mag, arg,
-           s_r = lc_r,
-           s_i = lc_i;
-    for(i=0; i<n; i++) {
-        a =   s_i * z_i[i] - s_r * z_r[i];
-        b = - s_i * z_r[i] - s_r * z_i[i];
-        s_r = a;
-        s_i = b;
-    }
-    divide(&a, &b, tc_r, tc_i, s_r, s_i);
-    mag = hypot(a, b);
-    mag = pow(mag, 1/(double) n);
-    arg = atan2(b, a);
-    arg = arg/n;
-    s_r = mag * cos(arg);
-    s_i = mag * sin(arg);
-    for(i=0; i<n; i++) {
-        a =  s_r * z_r[i] - s_i * z_i[i];
-        b =  s_i * z_r[i] + s_r * z_i[i];
-        z_r[i] = a;
-        z_i[i] = b;
-    }
+    slong i, j=0, k=n_piv;
+    double prod_r=1,
+           prod_i=0;
+    for(i=0; i<d; i++) {
+        double s, t;
+        if((j >= n_piv) || (k<d && hypot(prod_r, prod_i) < 1)) {
+            pz_r[i] = z_r[k];
+            pz_i[i] = z_i[k];
+            k++;
+        } else {
+            pz_r[i] = z_r[j];
+            pz_i[i] = z_i[j];
+            j++;
+        }
+        s = prod_r*pz_r[i] - prod_i*pz_i[i];
+        t = prod_r*pz_i[i] + prod_i*pz_r[i];
+        prod_r = s;
+        prod_i = t;
+    }             
+    //flint_printf("%.3e\n", hypot(prod_r, prod_i));
 }
-#endif 
 
 static double _refine_roots(intermediate_variables * v, slong n, double stepsize_bound)
 {
@@ -572,21 +565,23 @@ static double _refine_roots(intermediate_variables * v, slong n, double stepsize
            maxstep, imaxstep;
     d = n-1;
     n_piv = cd_poly_partition_pivot(v->z_r, v->z_i, d);
-    _vector_inverse(v->iz_r, v->iz_i, v->z_r, v->z_i, 0, d);
+    cd_poly_no_overflow_permute(v->pz_r, v->pz_i, v->z_r, v->z_i, n_piv, d);
     /* Dominant computation time */
     /* Direct case */
     lc_r = v->p_r[n-1];
     lc_i = v->p_i[n-1];
     cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
-    cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->z_r, v->z_i, 0, n_piv, d);
+    cd_poly_weierstrass_distinct_orders(v->wdk_r, v->wdk_i, lc_r, lc_i, v->pz_r, v->pz_i, d, v->z_r, v->z_i, 0, n_piv);
     maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv, stepsize_bound);
     /* Inverse case */
+    _vector_inverse(v->z_r, v->z_i, v->z_r, v->z_i, n_piv, d);
+    _vector_inverse(v->pz_r, v->pz_i, v->pz_r, v->pz_i, 0, d);
     lc_r = v->p_r[0];
     lc_i = v->p_i[0];
-    cd_poly_horner(v->vp_r, v->vp_i, v->iz_r, v->iz_i, n_piv, d, v->rp_r, v->rp_i, n);
-    cd_poly_weierstrass(v->wdk_r, v->wdk_i, lc_r, lc_i, v->iz_r, v->iz_i, n_piv, d, d);
-    imaxstep = cd_poly_wdk_update(v->iz_r, v->iz_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d, stepsize_bound);
-    _vector_inverse(v->z_r, v->z_i, v->iz_r, v->iz_i, n_piv, d);
+    cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, n_piv, d, v->rp_r, v->rp_i, n);
+    cd_poly_weierstrass_distinct_orders(v->wdk_r, v->wdk_i, lc_r, lc_i, v->pz_r, v->pz_i, d, v->z_r, v->z_i, n_piv, d);
+    imaxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, n_piv, d, stepsize_bound);
+    _vector_inverse(v->z_r, v->z_i, v->z_r, v->z_i, n_piv, d);
     #if 0
     flint_printf("direct %ld, correction %.3e, inverse %ld, correction %.3e\n", n_piv, maxstep, d-n_piv, imaxstep);
     #endif
@@ -641,7 +636,7 @@ double cd_poly_refine_roots_with_pivot(double * z, const double * p, slong n, do
 }
 
 #define MAX_STEPSIZE_BOUND 0x1p-3
-#define MIN_STEPSIZE_BOUND 0x1p-7
+#define MIN_STEPSIZE_BOUND 0x1p-10
 
 /* Full resolution function */
 double cd_poly_find_roots(double * z, const double * p, const double * z0, slong n, slong num_iter, double reltol)
@@ -679,7 +674,7 @@ double cd_poly_find_roots(double * z, const double * p, const double * z0, slong
 
         _intermediate_variables_clear(v);
     }
-    return correction;
+    return fmax(correction, 0x1p-50);
 }
 
 #undef MIN_STEPSIZE_BOUND
