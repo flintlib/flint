@@ -437,10 +437,33 @@ _gr_nmod_redc_vec_normalise(slong * res, const ulong * vec, slong len, gr_ctx_t 
     return GR_SUCCESS;
 }
 
+static int
+_gr_nmod_redc_fast_vec_normalise(slong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    ulong n = GR_NMOD_REDC_N(ctx);
+
+    while (len > 0 && (vec[len - 1] == 0 || vec[len - 1] == n))
+        len--;
+
+    res[0] = len;
+    return GR_SUCCESS;
+}
+
 static slong
 _gr_nmod_redc_vec_normalise_weak(const ulong * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     while (len > 0 && vec[len - 1] == 0)
+        len--;
+
+    return len;
+}
+
+static slong
+_gr_nmod_redc_fast_vec_normalise_weak(const ulong * vec, slong len, gr_ctx_t ctx)
+{
+    ulong n = GR_NMOD_REDC_N(ctx);
+
+    while (len > 0 && (vec[len - 1] == 0 || vec[len - 1] == n))
         len--;
 
     return len;
@@ -1548,9 +1571,15 @@ static int _gr_nmod_redc_fast_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong
         /* todo: avoid some conversions? */
 
         for (i = 0; i < lenA; i++)
+        {
             tA[i] = nmod_redc_get_nmod(A[i], GR_NMOD_REDC_CTX(ctx));
+            FLINT_ASSERT(tA[i] < GR_NMOD_REDC_N(ctx));
+        }
         for (i = 0; i < lenB; i++)
+        {
             tB[i] = nmod_redc_get_nmod(B[i], GR_NMOD_REDC_CTX(ctx));
+            FLINT_ASSERT(tB[i] < GR_NMOD_REDC_N(ctx));
+        }
 
         gr_ctx_t modctx;
         _gr_ctx_init_nmod(modctx, &GR_NMOD_REDC_MOD(ctx));
@@ -1559,10 +1588,21 @@ static int _gr_nmod_redc_fast_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong
         lenQ = lenA - lenB + 1;
         lenR = lenB - 1;
 
-        for (i = 0; i < lenQ; i++)
-            Q[i] = nmod_redc_set_nmod(Q[i], GR_NMOD_REDC_CTX(ctx));
-        for (i = 0; i < lenR; i++)
-            R[i] = nmod_redc_set_nmod(R[i], GR_NMOD_REDC_CTX(ctx));
+        /* If unsuccessful, Q[i] or R[i] could contain invalid data for
+           nmod_redc_set_nmod. */
+        if (status == GR_SUCCESS)
+        {
+            for (i = 0; i < lenQ; i++)
+            {
+                FLINT_ASSERT(Q[i] < GR_NMOD_REDC_N(ctx));
+                Q[i] = nmod_redc_set_nmod(Q[i], GR_NMOD_REDC_CTX(ctx));
+            }
+            for (i = 0; i < lenR; i++)
+            {
+                FLINT_ASSERT(R[i] < GR_NMOD_REDC_N(ctx));
+                R[i] = nmod_redc_set_nmod(R[i], GR_NMOD_REDC_CTX(ctx));
+            }
+        }
 
         GR_TMP_FREE(tA, (lenA + lenB) * sizeof(ulong));
 
@@ -1582,161 +1622,166 @@ int __gr_nmod_redc_fast_methods_initialized = 0;
 gr_static_method_table __gr_nmod_redc_methods;
 gr_static_method_table __gr_nmod_redc_fast_methods;
 
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#define GR_FUNCPTR_CAST (gr_funcptr)
+
 gr_method_tab_input __gr_nmod_redc_methods_input[] =
 {
-    {GR_METHOD_CTX_WRITE,       (void *) _gr_nmod_redc_ctx_write},
-    {GR_METHOD_CTX_IS_RING,     (void *) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (void *) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (void *) _gr_nmod_redc_ctx_is_field},
-    {GR_METHOD_CTX_IS_FIELD,            (void *) _gr_nmod_redc_ctx_is_field},
+    {GR_METHOD_CTX_WRITE,       GR_FUNCPTR_CAST _gr_nmod_redc_ctx_write},
+    {GR_METHOD_CTX_IS_RING,     GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  GR_FUNCPTR_CAST _gr_nmod_redc_ctx_is_field},
+    {GR_METHOD_CTX_IS_FIELD,            GR_FUNCPTR_CAST _gr_nmod_redc_ctx_is_field},
     {GR_METHOD_CTX_IS_FINITE,
-                                (void *) gr_generic_ctx_predicate_true},
+                                GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
-                                (void *) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_IS_EXACT,    (void *) gr_generic_ctx_predicate_true},
+                                GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_EXACT,    GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
-                                (void *) gr_generic_ctx_predicate_true},
-    {GR_METHOD_CTX_SET_IS_FIELD,(void *) _gr_nmod_redc_ctx_set_is_field},
-    {GR_METHOD_INIT,            (void *) _gr_nmod_redc_init},
-    {GR_METHOD_CLEAR,           (void *) _gr_nmod_redc_clear},
-    {GR_METHOD_SWAP,            (void *) _gr_nmod_redc_swap},
-    {GR_METHOD_SET_SHALLOW,     (void *) _gr_nmod_redc_set_shallow},
-    {GR_METHOD_RANDTEST,        (void *) _gr_nmod_redc_randtest},
-    {GR_METHOD_WRITE,           (void *) _gr_nmod_redc_write},
-    {GR_METHOD_ZERO,            (void *) _gr_nmod_redc_zero},
-    {GR_METHOD_ONE,             (void *) _gr_nmod_redc_one},
-    {GR_METHOD_IS_ZERO,         (void *) _gr_nmod_redc_is_zero},
-    {GR_METHOD_IS_ONE,          (void *) _gr_nmod_redc_is_one},
-    {GR_METHOD_IS_NEG_ONE,      (void *) _gr_nmod_redc_is_neg_one},
-    {GR_METHOD_EQUAL,           (void *) _gr_nmod_redc_equal},
-    {GR_METHOD_SET,             (void *) _gr_nmod_redc_set},
-    {GR_METHOD_SET_SI,          (void *) _gr_nmod_redc_set_si},
-    {GR_METHOD_SET_UI,          (void *) _gr_nmod_redc_set_ui},
-    {GR_METHOD_SET_FMPZ,        (void *) _gr_nmod_redc_set_fmpz},
-    {GR_METHOD_SET_OTHER,       (void *) _gr_nmod_redc_set_other},
-    {GR_METHOD_GET_FMPZ,        (void *) _gr_nmod_redc_get_fmpz},
-    {GR_METHOD_NEG,             (void *) _gr_nmod_redc_neg},
-    {GR_METHOD_ADD,             (void *) _gr_nmod_redc_add},
+                                GR_FUNCPTR_CAST gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_IS_FIELD,GR_FUNCPTR_CAST _gr_nmod_redc_ctx_set_is_field},
+    {GR_METHOD_INIT,            GR_FUNCPTR_CAST _gr_nmod_redc_init},
+    {GR_METHOD_CLEAR,           GR_FUNCPTR_CAST _gr_nmod_redc_clear},
+    {GR_METHOD_SWAP,            GR_FUNCPTR_CAST _gr_nmod_redc_swap},
+    {GR_METHOD_SET_SHALLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_set_shallow},
+    {GR_METHOD_RANDTEST,        GR_FUNCPTR_CAST _gr_nmod_redc_randtest},
+    {GR_METHOD_WRITE,           GR_FUNCPTR_CAST _gr_nmod_redc_write},
+    {GR_METHOD_ZERO,            GR_FUNCPTR_CAST _gr_nmod_redc_zero},
+    {GR_METHOD_ONE,             GR_FUNCPTR_CAST _gr_nmod_redc_one},
+    {GR_METHOD_IS_ZERO,         GR_FUNCPTR_CAST _gr_nmod_redc_is_zero},
+    {GR_METHOD_IS_ONE,          GR_FUNCPTR_CAST _gr_nmod_redc_is_one},
+    {GR_METHOD_IS_NEG_ONE,      GR_FUNCPTR_CAST _gr_nmod_redc_is_neg_one},
+    {GR_METHOD_EQUAL,           GR_FUNCPTR_CAST _gr_nmod_redc_equal},
+    {GR_METHOD_SET,             GR_FUNCPTR_CAST _gr_nmod_redc_set},
+    {GR_METHOD_SET_SI,          GR_FUNCPTR_CAST _gr_nmod_redc_set_si},
+    {GR_METHOD_SET_UI,          GR_FUNCPTR_CAST _gr_nmod_redc_set_ui},
+    {GR_METHOD_SET_FMPZ,        GR_FUNCPTR_CAST _gr_nmod_redc_set_fmpz},
+    {GR_METHOD_SET_OTHER,       GR_FUNCPTR_CAST _gr_nmod_redc_set_other},
+    {GR_METHOD_GET_FMPZ,        GR_FUNCPTR_CAST _gr_nmod_redc_get_fmpz},
+    {GR_METHOD_NEG,             GR_FUNCPTR_CAST _gr_nmod_redc_neg},
+    {GR_METHOD_ADD,             GR_FUNCPTR_CAST _gr_nmod_redc_add},
 /*
-    {GR_METHOD_ADD_SI,          (void *) _gr_nmod_redc_add_si},
-    {GR_METHOD_ADD_UI,          (void *) _gr_nmod_redc_add_ui},
+    {GR_METHOD_ADD_SI,          GR_FUNCPTR_CAST _gr_nmod_redc_add_si},
+    {GR_METHOD_ADD_UI,          GR_FUNCPTR_CAST _gr_nmod_redc_add_ui},
 */
-    {GR_METHOD_SUB,             (void *) _gr_nmod_redc_sub},
+    {GR_METHOD_SUB,             GR_FUNCPTR_CAST _gr_nmod_redc_sub},
 /*
-    {GR_METHOD_SUB_SI,          (void *) _gr_nmod_redc_sub_si},
-    {GR_METHOD_SUB_UI,          (void *) _gr_nmod_redc_sub_ui},
+    {GR_METHOD_SUB_SI,          GR_FUNCPTR_CAST _gr_nmod_redc_sub_si},
+    {GR_METHOD_SUB_UI,          GR_FUNCPTR_CAST _gr_nmod_redc_sub_ui},
 */
-    {GR_METHOD_MUL,             (void *) _gr_nmod_redc_mul},
+    {GR_METHOD_MUL,             GR_FUNCPTR_CAST _gr_nmod_redc_mul},
 /*
-    {GR_METHOD_MUL_SI,          (void *) _gr_nmod_redc_mul_si},
-    {GR_METHOD_MUL_UI,          (void *) _gr_nmod_redc_mul_ui},
-    {GR_METHOD_MUL_FMPZ,        (void *) _gr_nmod_redc_mul_fmpz},
-    {GR_METHOD_ADDMUL,          (void *) _gr_nmod_redc_addmul},
-    {GR_METHOD_SUBMUL,          (void *) _gr_nmod_redc_submul},
-    {GR_METHOD_MUL_TWO,         (void *) _gr_nmod_redc_mul_two},
-    {GR_METHOD_MUL_2EXP_SI,     (void *) _gr_nmod_redc_mul_2exp_si},
+    {GR_METHOD_MUL_SI,          GR_FUNCPTR_CAST _gr_nmod_redc_mul_si},
+    {GR_METHOD_MUL_UI,          GR_FUNCPTR_CAST _gr_nmod_redc_mul_ui},
+    {GR_METHOD_MUL_FMPZ,        GR_FUNCPTR_CAST _gr_nmod_redc_mul_fmpz},
+    {GR_METHOD_ADDMUL,          GR_FUNCPTR_CAST _gr_nmod_redc_addmul},
+    {GR_METHOD_SUBMUL,          GR_FUNCPTR_CAST _gr_nmod_redc_submul},
+    {GR_METHOD_MUL_TWO,         GR_FUNCPTR_CAST _gr_nmod_redc_mul_two},
+    {GR_METHOD_MUL_2EXP_SI,     GR_FUNCPTR_CAST _gr_nmod_redc_mul_2exp_si},
 */
-    {GR_METHOD_SQR,             (void *) _gr_nmod_redc_sqr},
-    {GR_METHOD_DIV,             (void *) _gr_nmod_redc_div},
+    {GR_METHOD_SQR,             GR_FUNCPTR_CAST _gr_nmod_redc_sqr},
+    {GR_METHOD_DIV,             GR_FUNCPTR_CAST _gr_nmod_redc_div},
 /*
-    {GR_METHOD_DIV_SI,          (void *) _gr_nmod_redc_div_si},
-    {GR_METHOD_DIV_UI,          (void *) _gr_nmod_redc_div_ui},
-    {GR_METHOD_DIV_FMPZ,        (void *) _gr_nmod_redc_div_fmpz},
-    {GR_METHOD_DIV_NONUNIQUE,   (void *) _gr_nmod_redc_div_nonunique},
-    {GR_METHOD_DIVIDES,         (void *) _gr_nmod_redc_divides},
-    {GR_METHOD_IS_INVERTIBLE,   (void *) _gr_nmod_redc_is_invertible},
+    {GR_METHOD_DIV_SI,          GR_FUNCPTR_CAST _gr_nmod_redc_div_si},
+    {GR_METHOD_DIV_UI,          GR_FUNCPTR_CAST _gr_nmod_redc_div_ui},
+    {GR_METHOD_DIV_FMPZ,        GR_FUNCPTR_CAST _gr_nmod_redc_div_fmpz},
+    {GR_METHOD_DIV_NONUNIQUE,   GR_FUNCPTR_CAST _gr_nmod_redc_div_nonunique},
+    {GR_METHOD_DIVIDES,         GR_FUNCPTR_CAST _gr_nmod_redc_divides},
+    {GR_METHOD_IS_INVERTIBLE,   GR_FUNCPTR_CAST _gr_nmod_redc_is_invertible},
 */
-    {GR_METHOD_INV,             (void *) _gr_nmod_redc_inv},
-    {GR_METHOD_POW_UI,          (void *) _gr_nmod_redc_pow_ui},
+    {GR_METHOD_INV,             GR_FUNCPTR_CAST _gr_nmod_redc_inv},
+    {GR_METHOD_POW_UI,          GR_FUNCPTR_CAST _gr_nmod_redc_pow_ui},
 /*
-    {GR_METHOD_POW_SI,          (void *) _gr_nmod_redc_pow_si},
-    {GR_METHOD_POW_FMPZ,        (void *) _gr_nmod_redc_pow_fmpz},
-    {GR_METHOD_IS_SQUARE,       (void *) _gr_nmod_redc_is_square},
-    {GR_METHOD_SQRT,            (void *) _gr_nmod_redc_sqrt},
+    {GR_METHOD_POW_SI,          GR_FUNCPTR_CAST _gr_nmod_redc_pow_si},
+    {GR_METHOD_POW_FMPZ,        GR_FUNCPTR_CAST _gr_nmod_redc_pow_fmpz},
+    {GR_METHOD_IS_SQUARE,       GR_FUNCPTR_CAST _gr_nmod_redc_is_square},
+    {GR_METHOD_SQRT,            GR_FUNCPTR_CAST _gr_nmod_redc_sqrt},
 */
-    {GR_METHOD_VEC_INIT,        (void *) _gr_nmod_redc_vec_init},
-    {GR_METHOD_VEC_CLEAR,       (void *) _gr_nmod_redc_vec_clear},
-    {GR_METHOD_VEC_SET,         (void *) _gr_nmod_redc_vec_set},
-    {GR_METHOD_VEC_NORMALISE,   (void *) _gr_nmod_redc_vec_normalise},
-    {GR_METHOD_VEC_NORMALISE_WEAK,   (void *) _gr_nmod_redc_vec_normalise_weak},
-    {GR_METHOD_VEC_NEG,         (void *) _gr_nmod_redc_vec_neg},
-    {GR_METHOD_VEC_ADD,         (void *) _gr_nmod_redc_vec_add},
-    {GR_METHOD_VEC_SUB,         (void *) _gr_nmod_redc_vec_sub},
-    {GR_METHOD_VEC_MUL,         (void *) _gr_nmod_redc_vec_mul},
-    {GR_METHOD_VEC_MUL_SCALAR,      (void *) _gr_nmod_redc_vec_mul_scalar},
-    {GR_METHOD_VEC_MUL_SCALAR_SI,   (void *) _gr_nmod_redc_vec_mul_scalar_si},
-    {GR_METHOD_VEC_MUL_SCALAR_UI,   (void *) _gr_nmod_redc_vec_mul_scalar_ui},
-    {GR_METHOD_VEC_MUL_SCALAR_FMPZ, (void *) _gr_nmod_redc_vec_mul_scalar_fmpz},
+    {GR_METHOD_VEC_INIT,        GR_FUNCPTR_CAST _gr_nmod_redc_vec_init},
+    {GR_METHOD_VEC_CLEAR,       GR_FUNCPTR_CAST _gr_nmod_redc_vec_clear},
+    {GR_METHOD_VEC_SET,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_set},
+    {GR_METHOD_VEC_NORMALISE,   GR_FUNCPTR_CAST _gr_nmod_redc_vec_normalise},
+    {GR_METHOD_VEC_NORMALISE_WEAK,   GR_FUNCPTR_CAST _gr_nmod_redc_vec_normalise_weak},
+    {GR_METHOD_VEC_NEG,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_neg},
+    {GR_METHOD_VEC_ADD,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_add},
+    {GR_METHOD_VEC_SUB,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_sub},
+    {GR_METHOD_VEC_MUL,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_mul},
+    {GR_METHOD_VEC_MUL_SCALAR,      GR_FUNCPTR_CAST _gr_nmod_redc_vec_mul_scalar},
+    {GR_METHOD_VEC_MUL_SCALAR_SI,   GR_FUNCPTR_CAST _gr_nmod_redc_vec_mul_scalar_si},
+    {GR_METHOD_VEC_MUL_SCALAR_UI,   GR_FUNCPTR_CAST _gr_nmod_redc_vec_mul_scalar_ui},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPZ, GR_FUNCPTR_CAST _gr_nmod_redc_vec_mul_scalar_fmpz},
 /*
-    {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,   (void *) _gr_nmod_redc_vec_mul_scalar_2exp_si},
-*/
-
-    {GR_METHOD_SCALAR_MUL_VEC,      (void *) _gr_nmod_redc_scalar_mul_vec},
-    {GR_METHOD_VEC_ADDMUL_SCALAR,        (void *) _gr_nmod_redc_vec_addmul_scalar},
-    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,     (void *) _gr_nmod_redc_vec_addmul_scalar_si},
-    {GR_METHOD_VEC_SUBMUL_SCALAR,        (void *) _gr_nmod_redc_vec_submul_scalar},
-    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,     (void *) _gr_nmod_redc_vec_submul_scalar_si},
-/*
-    {GR_METHOD_VEC_SUM,         (void *) _gr_nmod_redc_vec_sum},
-*/
-    {GR_METHOD_VEC_PRODUCT,     (void *) _gr_nmod_redc_vec_product},
-    {GR_METHOD_VEC_DOT,         (void *) _gr_nmod_redc_vec_dot},
-    {GR_METHOD_VEC_DOT_REV,     (void *) _gr_nmod_redc_vec_dot_rev},
-/*
-    {GR_METHOD_VEC_RECIPROCALS, (void *) _gr_nmod_redc_vec_reciprocals},
-*/
-    {GR_METHOD_POLY_MULLOW,     (void *) _gr_nmod_redc_poly_mullow},
-/*
-    {GR_METHOD_POLY_DIVREM,     (void *) _gr_nmod_redc_poly_divrem},
-*/
-/*
-    {GR_METHOD_POLY_DIVEXACT,   (void *) _gr_nmod_redc_poly_divexact},
-    {GR_METHOD_POLY_INV_SERIES, (void *) _gr_nmod_redc_poly_inv_series},
-    {GR_METHOD_POLY_INV_SERIES_BASECASE, (void *) _gr_redc_nmod_poly_inv_series_basecase},
-    {GR_METHOD_POLY_DIV_SERIES, (void *) _gr_nmod_redc_poly_div_series},
-    {GR_METHOD_POLY_DIV_SERIES_BASECASE, (void *) _gr_nmod_redc_poly_div_series_basecase},
-    {GR_METHOD_POLY_RSQRT_SERIES, (void *) _gr_nmod_redc_poly_rsqrt_series},
-    {GR_METHOD_POLY_SQRT_SERIES,  (void *) _gr_nmod_redc_poly_sqrt_series},
-    {GR_METHOD_POLY_EXP_SERIES,  (void *) _gr_nmod_redc_poly_exp_series},
-    {GR_METHOD_POLY_ROOTS,      (void *) _gr_nmod_redc_roots_gr_poly},
-    {GR_METHOD_MAT_MUL,         (void *) _gr_nmod_redc_mat_mul},
+    {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,   GR_FUNCPTR_CAST _gr_nmod_redc_vec_mul_scalar_2exp_si},
 */
 
-    {0,                         (void *) NULL},
+    {GR_METHOD_SCALAR_MUL_VEC,      GR_FUNCPTR_CAST _gr_nmod_redc_scalar_mul_vec},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,        GR_FUNCPTR_CAST _gr_nmod_redc_vec_addmul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,     GR_FUNCPTR_CAST _gr_nmod_redc_vec_addmul_scalar_si},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,        GR_FUNCPTR_CAST _gr_nmod_redc_vec_submul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,     GR_FUNCPTR_CAST _gr_nmod_redc_vec_submul_scalar_si},
+/*
+    {GR_METHOD_VEC_SUM,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_sum},
+*/
+    {GR_METHOD_VEC_PRODUCT,     GR_FUNCPTR_CAST _gr_nmod_redc_vec_product},
+    {GR_METHOD_VEC_DOT,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_dot},
+    {GR_METHOD_VEC_DOT_REV,     GR_FUNCPTR_CAST _gr_nmod_redc_vec_dot_rev},
+/*
+    {GR_METHOD_VEC_RECIPROCALS, GR_FUNCPTR_CAST _gr_nmod_redc_vec_reciprocals},
+*/
+    {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_mullow},
+/*
+    {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_divrem},
+*/
+/*
+    {GR_METHOD_POLY_DIVEXACT,   GR_FUNCPTR_CAST _gr_nmod_redc_poly_divexact},
+    {GR_METHOD_POLY_INV_SERIES, GR_FUNCPTR_CAST _gr_nmod_redc_poly_inv_series},
+    {GR_METHOD_POLY_INV_SERIES_BASECASE, GR_FUNCPTR_CAST _gr_redc_nmod_poly_inv_series_basecase},
+    {GR_METHOD_POLY_DIV_SERIES, GR_FUNCPTR_CAST _gr_nmod_redc_poly_div_series},
+    {GR_METHOD_POLY_DIV_SERIES_BASECASE, GR_FUNCPTR_CAST _gr_nmod_redc_poly_div_series_basecase},
+    {GR_METHOD_POLY_RSQRT_SERIES, GR_FUNCPTR_CAST _gr_nmod_redc_poly_rsqrt_series},
+    {GR_METHOD_POLY_SQRT_SERIES,  GR_FUNCPTR_CAST _gr_nmod_redc_poly_sqrt_series},
+    {GR_METHOD_POLY_EXP_SERIES,  GR_FUNCPTR_CAST _gr_nmod_redc_poly_exp_series},
+    {GR_METHOD_POLY_ROOTS,      GR_FUNCPTR_CAST _gr_nmod_redc_roots_gr_poly},
+    {GR_METHOD_MAT_MUL,         GR_FUNCPTR_CAST _gr_nmod_redc_mat_mul},
+*/
+
+    {0,                         GR_FUNCPTR_CAST NULL},
 };
 
 gr_method_tab_input __gr_nmod_redc_fast_methods_input[] =
 {
-    {GR_METHOD_IS_ZERO,         (void *) _gr_nmod_redc_fast_is_zero},
-    {GR_METHOD_IS_ONE,          (void *) _gr_nmod_redc_fast_is_one},
-    {GR_METHOD_IS_NEG_ONE,      (void *) _gr_nmod_redc_fast_is_neg_one},
-    {GR_METHOD_EQUAL,           (void *) _gr_nmod_redc_fast_equal},
-    {GR_METHOD_NEG,             (void *) _gr_nmod_redc_fast_neg},
-    {GR_METHOD_ADD,             (void *) _gr_nmod_redc_fast_add},
-    {GR_METHOD_SUB,             (void *) _gr_nmod_redc_fast_sub},
-    {GR_METHOD_MUL,             (void *) _gr_nmod_redc_fast_mul},
-    {GR_METHOD_DIV,             (void *) _gr_nmod_redc_fast_div},
-    {GR_METHOD_SQR,             (void *) _gr_nmod_redc_fast_sqr},
-    {GR_METHOD_POW_UI,          (void *) _gr_nmod_redc_fast_pow_ui},
-    {GR_METHOD_VEC_NEG,         (void *) _gr_nmod_redc_fast_vec_neg},
-    {GR_METHOD_VEC_ADD,         (void *) _gr_nmod_redc_fast_vec_add},
-    {GR_METHOD_VEC_SUB,         (void *) _gr_nmod_redc_fast_vec_sub},
-    {GR_METHOD_VEC_MUL,         (void *) _gr_nmod_redc_fast_vec_mul},
-    {GR_METHOD_VEC_MUL_SCALAR,      (void *) _gr_nmod_redc_fast_vec_mul_scalar},
-    {GR_METHOD_SCALAR_MUL_VEC,      (void *) _gr_nmod_redc_fast_scalar_mul_vec},
-    {GR_METHOD_VEC_MUL_SCALAR_SI,   (void *) _gr_nmod_redc_fast_vec_mul_scalar_si},
-    {GR_METHOD_VEC_MUL_SCALAR_UI,   (void *) _gr_nmod_redc_fast_vec_mul_scalar_ui},
-    {GR_METHOD_VEC_MUL_SCALAR_FMPZ, (void *) _gr_nmod_redc_fast_vec_mul_scalar_fmpz},
-    {GR_METHOD_VEC_ADDMUL_SCALAR,        (void *) _gr_nmod_redc_fast_vec_addmul_scalar},
-    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,     (void *) _gr_nmod_redc_fast_vec_addmul_scalar_si},
-    {GR_METHOD_VEC_SUBMUL_SCALAR,        (void *) _gr_nmod_redc_fast_vec_submul_scalar},
-    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,     (void *) _gr_nmod_redc_fast_vec_submul_scalar_si},
-    {GR_METHOD_VEC_PRODUCT,     (void *) _gr_nmod_redc_fast_vec_product},
-    {GR_METHOD_VEC_DOT,         (void *) _gr_nmod_redc_fast_vec_dot},
-    {GR_METHOD_VEC_DOT_REV,     (void *) _gr_nmod_redc_fast_vec_dot_rev},
-    {GR_METHOD_POLY_MULLOW,     (void *) _gr_nmod_redc_fast_poly_mullow},
-    {GR_METHOD_POLY_DIVREM,     (void *) _gr_nmod_redc_fast_poly_divrem},
-    {0,                         (void *) NULL},
+    {GR_METHOD_IS_ZERO,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_is_zero},
+    {GR_METHOD_IS_ONE,          GR_FUNCPTR_CAST _gr_nmod_redc_fast_is_one},
+    {GR_METHOD_IS_NEG_ONE,      GR_FUNCPTR_CAST _gr_nmod_redc_fast_is_neg_one},
+    {GR_METHOD_EQUAL,           GR_FUNCPTR_CAST _gr_nmod_redc_fast_equal},
+    {GR_METHOD_NEG,             GR_FUNCPTR_CAST _gr_nmod_redc_fast_neg},
+    {GR_METHOD_ADD,             GR_FUNCPTR_CAST _gr_nmod_redc_fast_add},
+    {GR_METHOD_SUB,             GR_FUNCPTR_CAST _gr_nmod_redc_fast_sub},
+    {GR_METHOD_MUL,             GR_FUNCPTR_CAST _gr_nmod_redc_fast_mul},
+    {GR_METHOD_DIV,             GR_FUNCPTR_CAST _gr_nmod_redc_fast_div},
+    {GR_METHOD_SQR,             GR_FUNCPTR_CAST _gr_nmod_redc_fast_sqr},
+    {GR_METHOD_POW_UI,          GR_FUNCPTR_CAST _gr_nmod_redc_fast_pow_ui},
+    {GR_METHOD_VEC_NORMALISE,   GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_normalise},
+    {GR_METHOD_VEC_NORMALISE_WEAK,   GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_normalise_weak},
+    {GR_METHOD_VEC_NEG,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_neg},
+    {GR_METHOD_VEC_ADD,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_add},
+    {GR_METHOD_VEC_SUB,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_sub},
+    {GR_METHOD_VEC_MUL,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_mul},
+    {GR_METHOD_VEC_MUL_SCALAR,      GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_mul_scalar},
+    {GR_METHOD_SCALAR_MUL_VEC,      GR_FUNCPTR_CAST _gr_nmod_redc_fast_scalar_mul_vec},
+    {GR_METHOD_VEC_MUL_SCALAR_SI,   GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_mul_scalar_si},
+    {GR_METHOD_VEC_MUL_SCALAR_UI,   GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_mul_scalar_ui},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPZ, GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_mul_scalar_fmpz},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,        GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_addmul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_addmul_scalar_si},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,        GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_submul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_submul_scalar_si},
+    {GR_METHOD_VEC_PRODUCT,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_product},
+    {GR_METHOD_VEC_DOT,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot},
+    {GR_METHOD_VEC_DOT_REV,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_rev},
+    {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mullow},
+    {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_divrem},
+    {0,                         GR_FUNCPTR_CAST NULL},
 };
 
 int

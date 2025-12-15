@@ -1003,7 +1003,6 @@ _gr_nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
             return status;
 
         _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, NMOD_CTX(ctx));
-
         return status;
     }
     else

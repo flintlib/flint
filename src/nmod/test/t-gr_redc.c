@@ -25,11 +25,11 @@ TEST_FUNCTION_START(gr_nmod_redc, state)
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         if (n_randint(state, 2))
-            n = n_randlimb(state) | 1;
+            n = (n_randbits(state, FLINT_BITS - 2) | 1);
         else
             n = n_randtest(state);
 
-        if (gr_ctx_init_nmod_redc(ZZn, n) == GR_SUCCESS)
+        if (gr_ctx_init_nmod_redc_fast(ZZn, n) == GR_SUCCESS)
         {
             if (n_randint(state, 2))
                 GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, n_is_prime(n) ? T_TRUE : T_FALSE));
@@ -45,11 +45,11 @@ TEST_FUNCTION_START(gr_nmod_redc, state)
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         if (n_randint(state, 2))
-            n = (n_randbits(state, FLINT_BITS - 2) | 1);
+            n = n_randlimb(state) | 1;
         else
             n = n_randtest(state);
 
-        if (gr_ctx_init_nmod_redc_fast(ZZn, n) == GR_SUCCESS)
+        if (gr_ctx_init_nmod_redc(ZZn, n) == GR_SUCCESS)
         {
             if (n_randint(state, 2))
                 GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, n_is_prime(n) ? T_TRUE : T_FALSE));
