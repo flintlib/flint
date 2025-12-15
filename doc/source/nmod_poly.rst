@@ -1859,6 +1859,13 @@ Greatest common divisor
     polynomial `P` is defined to be `P`. Except in the case where
     the GCD is zero, the GCD `G` is made monic.
 
+.. function:: slong _nmod_poly_gcd_euclidean_redc_half(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod)
+              void nmod_poly_gcd_euclidean_redc_half(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
+
+    Analogous to the Euclidean GCD implementations, but uses ``nmod_redc_fast``
+    arithmetic internally. The modulus is required to be in range
+    for ``nmod_redc_fast``, i.e. odd and smaller than `2^{\mathtt{FLINT\_BITS} - 2}`.
+
 .. function:: slong _nmod_poly_hgcd(nn_ptr * M, slong * lenM, nn_ptr A, slong * lenA, nn_ptr B, slong * lenB, nn_srcptr a, slong lena, nn_srcptr b, slong lenb, nmod_t mod)
 
     Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
