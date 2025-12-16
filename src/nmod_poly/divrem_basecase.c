@@ -112,6 +112,7 @@ void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
    instruction in the main loop, makes it inline, etc. Just try to profile
    and do whatever works.
 */
+
 FLINT_STATIC_NOINLINE
 void _nmod_poly_divrem_q1_preinv1_fullword(nn_ptr Q, nn_ptr R,
                           nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
@@ -134,15 +135,36 @@ void _nmod_poly_divrem_q1_preinv1_fullword(nn_ptr Q, nn_ptr R,
     /* Hack: nmod_addmul is faster than _nmod_mull_fullword + nmod_add */
     R[0] = nmod_addmul(A[0], q0, B[0], mod);
 
-    for (i = 1; i < lenB - 1; i++)
+    /* We want to compute r = a + q0*b + q1*c where a, b, c, q0, q1 <= n - 1.
+       If (1 + q0 + q1) < 2^FLINT_BITS, then r < 2^FLINT_BITS * (n-1).
+       In this case, r fits in two limbs without overflow and the high limb is
+       already reduced mod n. This will almost always be the case when n is
+       close to 2^(FLINT_BITS-1), and happens with decent probability when
+       n is close to 2^FLINT_BITS too. */
+    if (q0 + q1 + 1 >= q0)  /* Checks that q0 + (q1 + 1) doesn't wrap around. */
     {
-        umul_ppmm(t1, t0, q1, B[i - 1]);
-        add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
-        umul_ppmm(s1, s0, q0, B[i]);
-        add_ssaaaa(t1, t0, t1, t0, 0, s0);
-        t1 = nmod_add(t1, s1, mod);
-        FLINT_ASSERT(t1 < mod.n);
-        NMOD_RED2(R[i], t1, t0, mod);
+        for (i = 1; i < lenB - 1; i++)
+        {
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, s1, s0);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2_FULLWORD(R[i], t1, t0, mod);
+        }
+    }
+    else
+    {
+        for (i = 1; i < lenB - 1; i++)
+        {
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, 0, s0);
+            t1 = nmod_add(t1, s1, mod);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2_FULLWORD(R[i], t1, t0, mod);
+        }
     }
 }
 

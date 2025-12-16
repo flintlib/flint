@@ -64,6 +64,20 @@ extern "C" {
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
 #define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
 
+#define NMOD_RED2_FULLWORD(r, a_hi, a_lo, mod) \
+  do { \
+    ulong q0xx, q1xx, r1xx; \
+    const ulong u1xx = (a_hi); \
+    const ulong u0xx = (a_lo); \
+    const ulong nxx = (mod).n; \
+    umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx); \
+    add_ssaaaa(q1xx, q0xx, q1xx, q0xx, u1xx, u0xx); \
+    r1xx = (u0xx - (q1xx + 1)*nxx); \
+    if (r1xx > q0xx) r1xx += nxx; \
+    if (r1xx < nxx) r = (r1xx); \
+    else r = ((r1xx - nxx)); \
+  } while (0)
+
 #define NMOD_RED2_NONFULLWORD(r, a_hi, a_lo, mod) \
   do { \
     ulong q0xx, q1xx, r1xx; \
