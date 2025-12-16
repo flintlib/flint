@@ -3,6 +3,49 @@
 **nmod.h** -- integers mod n (word-size n)
 ===============================================================================
 
+Generic rings
+--------------------------------------------------------------------------------
+
+.. function:: int gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+              int gr_ctx_init_nmod8(gr_ctx_t ctx, ulong n)
+              int gr_ctx_init_nmod32(gr_ctx_t ctx, ulong n)
+              int gr_ctx_init_nmod_redc(gr_ctx_t ctx, ulong n)
+              int gr_ctx_init_nmod_redc_fast(gr_ctx_t ctx, ulong n)
+
+    Initialize the context object ``ctx`` for generic arithmetic in the ring
+    `R = \mathbb{Z} / n \mathbb{Z}` for word-size `n`
+    using the respective representation.
+
+    The element datatype is :type:`ulong` for all representations
+    except for ``nmod8`` and ``nmod32`` where the type is
+    :type:`uint8` or :type:`uint32` respectively.
+
+    If the modulus is valid, returns ``GR_SUCCESS``. Otherwise, the context
+    object is not initialized and an error code is returned:
+
+    * ``GR_DOMAIN`` is returned if `n = 0`.
+    * ``GR_UNABLE`` is returned if `n` does not satisfy the technical
+      restrictions of a specific representation. For example, ``nmod8`` requires
+      `n \le 255` and ``nmod_redc`` requires that `n` is odd.
+
+.. note ::
+
+    Some generic algorithms need to check whether
+    `R` is a field, i.e. whether `n` is a prime number.
+    To avoid expensive on-the-fly primality tests, it is recommended
+    to call ``gr_ctx_set_is_field(ctx, T_TRUE)`` (if `n` is prime)
+    ``gr_ctx_set_is_field(ctx, T_FALSE)`` (if `n` is composite)
+    after constructing a context object.
+    This is not done automatically as it would slow down creating a context
+    object in the case where one is just interested in basic arithmetic.
+
+.. note ::
+
+    Presently, many operations for ``nmod8``, ``nmod32``, ``nmod_redc`` and
+    ``nmod_redc_fast`` are not as optimized as those for the general-purpose
+    ``nmod``. It is currently recommended to use ``nmod8`` and ``nmod32``
+    only if one specifically wants to minimize memory usage.
+
 Modular reduction and arithmetic
 --------------------------------------------------------------------------------
 
@@ -239,7 +282,8 @@ For 32-bit machines, the maximum `n` become `2^{32} - 1`,
     If `x` is viewed as a residue in the standard representation,
     this returns `x / R \bmod n`. This function allows `x \in [0, 2n)`.
 
-.. function:: ulong nmod_redc_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+.. function:: ulong nmod_redc_neg(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
               ulong nmod_redc_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
               ulong nmod_redc_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
 
@@ -254,8 +298,10 @@ For 32-bit machines, the maximum `n` become `2^{32} - 1`,
     Convert a non-canonical residue in `[0, 2n)` to a canonical
     residue in `[0, n)`.
 
-.. function:: ulong nmod_redc_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+.. function:: ulong nmod_redc_fast_neg(ulong x, ulong y, const nmod_redc_ctx_t ctx)
               ulong nmod_redc_fast_add(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_fast_sub(ulong x, ulong y, const nmod_redc_ctx_t ctx)
+              ulong nmod_redc_fast_mul(ulong x, ulong y, const nmod_redc_ctx_t ctx)
               ulong nmod_redc_fast_mul_two(ulong x, const nmod_redc_ctx_t ctx)
 
     Arithmetic in Montgomery representation, using non-canonical residues.

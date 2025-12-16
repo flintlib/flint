@@ -577,9 +577,14 @@ gr_method_tab_input _nmod32_methods_input[] =
     {0,                         (gr_funcptr) NULL},
 };
 
-void
-gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
+int
+gr_ctx_init_nmod32(gr_ctx_t ctx, ulong n)
 {
+    if (n == 0)
+        return GR_DOMAIN;
+    if (n > UWORD(4294967295))
+        return GR_UNABLE;
+
     ctx->which_ring = GR_CTX_NMOD32;
     ctx->sizeof_elem = sizeof(nmod32_struct);
     ctx->size_limit = WORD_MAX;
@@ -593,4 +598,7 @@ gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
         gr_method_tab_init(_nmod32_methods, _nmod32_methods_input);
         _nmod32_methods_initialized = 1;
     }
+
+    return GR_SUCCESS;
 }
+

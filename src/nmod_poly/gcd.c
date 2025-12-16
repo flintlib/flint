@@ -25,18 +25,32 @@ static const short nmod_poly_hgcd_iter_recursive_cutoff_tab[64] =
     244, 180, 180, 200, 204, 192, 228, 212, 208, 168, 196, 188, 216, 208, 76,
 };
 
+static const short nmod_poly_hgcd_outer_cutoff_tab[64] =
+{
+    475, 432, 341, 412, 697, 697, 633, 633, 664, 603, 731, 931, 767, 845, 731,
+    731, 697, 697, 845, 887, 697, 1129, 931, 1025, 1185, 1025, 1185, 1244, 1371,
+    1585, 1585, 1510, 375, 498, 432, 375, 453, 412, 325, 412, 498, 475, 498,
+    393, 412, 310, 393, 432, 393, 575, 633, 633, 664, 548, 475, 845, 845, 548,
+    767, 522, 603, 575, 731, 1129,
+};
+
 static const short nmod_poly_gcd_hgcd_cutoff_tab[64] =
 {
-    493, 569, 542, 626, 626, 657, 657, 723, 759, 796, 796, 835, 835, 919, 919,
-    964, 835, 796, 876, 876, 1491, 1420, 1420, 1420, 1420, 1420, 1565, 1643,
-    1643, 1725, 1811, 1725, 470, 569, 517, 517, 569, 542, 569, 493, 569, 569,
-    759, 542, 723, 796, 964, 835, 964, 1012, 919, 919, 964, 1062, 1062, 964,
-    1012, 1115, 1012, 1115, 1115, 1170, 1228, 1643,
+    470, 657, 626, 689, 689, 723, 796, 876, 835, 876, 919, 964, 964, 1012, 1170,
+    1228, 919, 1115, 1115, 1115, 1491, 1491, 1643, 1725, 1811, 1725, 1811, 1725,
+    1901, 1901, 1901, 1170, 1115, 1170, 1228, 1170, 1228, 1170, 1228, 1289,
+    1289, 1228, 1289, 1170, 1353, 1643, 1725, 1811, 1725, 1643, 1901, 1901,
+    1901, 1811, 1901, 1901, 1901, 1996, 1901, 1901, 1996, 2199, 1289, 1996,
 };
 
 slong nmod_poly_hgcd_iter_recursive_cutoff(nmod_t mod)
 {
     return nmod_poly_hgcd_iter_recursive_cutoff_tab[NMOD_BITS(mod) - 1];
+}
+
+slong nmod_poly_hgcd_outer_cutoff(nmod_t mod)
+{
+    return nmod_poly_hgcd_outer_cutoff_tab[NMOD_BITS(mod) - 1];
 }
 
 slong nmod_poly_gcd_hgcd_cutoff(nmod_t mod)
@@ -49,7 +63,12 @@ slong _nmod_poly_gcd(nn_ptr G, nn_srcptr A, slong lenA,
                               nn_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenB < nmod_poly_gcd_hgcd_cutoff(mod))
-        return _nmod_poly_gcd_euclidean(G, A, lenA, B, lenB, mod);
+    {
+        if (NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(lenB, mod))
+            return _nmod_poly_gcd_euclidean_redc_fast(G, A, lenA, B, lenB, mod);
+        else
+            return _nmod_poly_gcd_euclidean(G, A, lenA, B, lenB, mod);
+    }
     else
         return _nmod_poly_gcd_hgcd(G, A, lenA, B, lenB, mod);
 }
@@ -231,7 +250,7 @@ slong _nmod_poly_gcd_hgcd(nn_ptr G, nn_srcptr A, slong lenA,
                                    nn_srcptr B, slong lenB, nmod_t mod)
 {
     slong inner_cutoff = nmod_poly_hgcd_iter_recursive_cutoff(mod);
-    slong outer_cutoff = nmod_poly_gcd_hgcd_cutoff(mod);
+    slong outer_cutoff = nmod_poly_hgcd_outer_cutoff(mod);
     slong lenG = 0;
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);
@@ -274,6 +293,103 @@ void nmod_poly_gcd_hgcd(nmod_poly_t G,
             }
 
             lenG = _nmod_poly_gcd_hgcd(g, A->coeffs, lenA,
+                                               B->coeffs, lenB, A->mod);
+
+            if (G == A || G == B)
+            {
+                nmod_poly_swap(tG, G);
+                nmod_poly_clear(tG);
+            }
+            G->length = lenG;
+
+            if (G->length == 1)
+                G->coeffs[0] = 1;
+            else
+                nmod_poly_make_monic(G, G);
+        }
+    }
+}
+
+slong _nmod_poly_gcd_euclidean_redc_fast(nn_ptr G, nn_srcptr A, slong lenA,
+                                        nn_srcptr B, slong lenB, nmod_t mod)
+{
+    slong lenR, lenG, i;
+    nn_ptr R;
+    TMP_INIT;
+
+    FLINT_ASSERT(mod.n % 2);
+    FLINT_ASSERT(mod.n != 1);
+    FLINT_ASSERT(NMOD_BITS(mod) <= FLINT_BITS - 2);
+
+    TMP_START;
+    R = TMP_ALLOC((lenB - 1) * sizeof(ulong));
+
+    /* Do initial remainder in the original representation, mainly to deal
+       efficiently with unbalanced input. */
+    _nmod_poly_rem(R, A, lenA, B, lenB, mod);
+    lenR = lenB - 1;
+    MPN_NORM(R, lenR);
+
+    if (lenR == 0)
+    {
+        flint_mpn_copyi(G, B, lenB);
+        lenG = lenB;
+    }
+    else if (lenR == 1)
+    {
+        G[0] = R[0];
+        lenG = 1;
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        GR_MUST_SUCCEED(gr_ctx_init_nmod_redc_fast(ctx, mod.n));
+        GR_MUST_SUCCEED(_gr_poly_gcd_euclidean(G, &lenG, B, lenB, R, lenR, ctx));
+        /* The redc scaling factor does not matter for the GCD, but we need to
+           convert back to normalised residues.  */
+        for (i = 0; i < lenG; i++)
+            G[i] = nmod_redc_fast_normalise(G[i], GR_NMOD_REDC_CTX(ctx));
+    }
+
+    TMP_END;
+    return lenG;
+}
+
+void nmod_poly_gcd_euclidean_redc_fast(nmod_poly_t G,
+                             const nmod_poly_t A, const nmod_poly_t B)
+{
+    if (A->length < B->length)
+    {
+        nmod_poly_gcd_euclidean_redc_fast(G, B, A);
+    }
+    else /* lenA >= lenB >= 0 */
+    {
+        slong lenA = A->length, lenB = B->length, lenG;
+        nmod_poly_t tG;
+        nn_ptr g;
+
+        if (lenA == 0) /* lenA = lenB = 0 */
+        {
+            nmod_poly_zero(G);
+        }
+        else if (lenB == 0) /* lenA > lenB = 0 */
+        {
+            nmod_poly_make_monic(G, A);
+        }
+        else /* lenA >= lenB >= 1 */
+        {
+            if (G == A || G == B)
+            {
+                nmod_poly_init2(tG, A->mod.n, FLINT_MIN(lenA, lenB));
+                g = tG->coeffs;
+            }
+            else
+            {
+                nmod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
+                g = G->coeffs;
+            }
+
+            lenG = _nmod_poly_gcd_euclidean_redc_fast(g, A->coeffs, lenA,
                                                B->coeffs, lenB, A->mod);
 
             if (G == A || G == B)

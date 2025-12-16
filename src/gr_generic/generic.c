@@ -3086,3 +3086,21 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
 
     memcpy(methods, tmp, sizeof(gr_static_method_table));
 }
+
+void
+gr_method_tab_extend(gr_funcptr * methods, gr_method_tab_input * tab)
+{
+    slong i;
+
+    for (i = 0; ; i++)
+    {
+        if (tab[i].function == NULL)
+            break;
+
+        if (tab[i].index >= GR_METHOD_TAB_SIZE)
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
+
+        methods[tab[i].index] = tab[i].function;
+    }
+}
+

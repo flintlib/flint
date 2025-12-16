@@ -12,12 +12,14 @@
 /* Include functions *********************************************************/
 
 #include "t-divides.c"
+#include "t-gr_redc.c"
 #include "t-redc.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(gr_nmod_redc),
     TEST_FUNCTION(nmod_divides),
     TEST_FUNCTION(nmod_redc),
 };

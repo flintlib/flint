@@ -21,22 +21,6 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
-typedef struct
-{
-    nmod_t nmod;
-    ulong a;   /* when used as finite field with defining polynomial x - a */
-    truth_t is_prime;
-}
-_gr_nmod_ctx_struct;
-
-#define NMOD_CTX_REF(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->nmod)))
-#define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
-#define NMOD_IS_PRIME(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->is_prime)
-
-/* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
-#define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
-
-
 static void
 _gr_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -192,6 +176,15 @@ _gr_nmod_set_other(ulong * res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
             return GR_DOMAIN;
 
         *res = *((ulong *) v);
+        return GR_SUCCESS;
+    }
+
+    if (v_ctx->which_ring == GR_CTX_NMOD_REDC || v_ctx->which_ring == GR_CTX_NMOD_REDC_FAST)
+    {
+        if (NMOD_CTX(ctx).n != GR_NMOD_REDC_N(v_ctx))
+            return GR_DOMAIN;
+
+        res[0] = nmod_redc_get_nmod(((ulong *) v)[0], GR_NMOD_REDC_CTX(v_ctx));
         return GR_SUCCESS;
     }
 
@@ -1010,7 +1003,6 @@ _gr_nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
             return status;
 
         _nmod_poly_divrem_basecase_preinv1(Q, R, A, lenA, B, lenB, invB, NMOD_CTX(ctx));
-
         return status;
     }
     else
@@ -1487,9 +1479,12 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {0,                         (gr_funcptr) NULL},
 };
 
-void
+int
 gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
 {
+    if (n == 0)
+        return GR_DOMAIN;
+
     ctx->which_ring = GR_CTX_NMOD;
     ctx->sizeof_elem = sizeof(ulong);
     ctx->size_limit = WORD_MAX;
@@ -1504,6 +1499,8 @@ gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
         gr_method_tab_init(__gr_nmod_methods, __gr_nmod_methods_input);
         __gr_nmod_methods_initialized = 1;
     }
+
+    return GR_SUCCESS;
 }
 
 void

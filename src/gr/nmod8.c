@@ -605,9 +605,14 @@ gr_method_tab_input _nmod8_methods_input[] =
     {0,                         (gr_funcptr) NULL},
 };
 
-void
-gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
+int
+gr_ctx_init_nmod8(gr_ctx_t ctx, ulong n)
 {
+    if (n == 0)
+        return GR_DOMAIN;
+    if (n > 255)
+        return GR_UNABLE;
+
     ctx->which_ring = GR_CTX_NMOD8;
     ctx->sizeof_elem = sizeof(nmod8_struct);
     ctx->size_limit = WORD_MAX;
@@ -621,4 +626,6 @@ gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
         gr_method_tab_init(_nmod8_methods, _nmod8_methods_input);
         _nmod8_methods_initialized = 1;
     }
+
+    return GR_SUCCESS;
 }
