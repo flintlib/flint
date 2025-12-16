@@ -221,12 +221,16 @@ ulong _nmod_mul_fullword(ulong a, ulong b, nmod_t mod)
 }
 
 NMOD_INLINE
-ulong nmod_addmul(ulong a, ulong b, ulong c, nmod_t mod)
+ulong nmod_addmul(ulong s, ulong a, ulong b, nmod_t mod)
 {
+    ulong hi, lo;
+    FLINT_ASSERT(s < mod.n);
     FLINT_ASSERT(a < mod.n);
     FLINT_ASSERT(b < mod.n);
-    FLINT_ASSERT(c < mod.n);
-    return nmod_add(a, nmod_mul(b, c, mod), mod);
+    umul_ppmm(hi, lo, a, b);
+    add_ssaaaa(hi, lo, hi, lo, 0, s);
+    NMOD_RED2(lo, hi, lo, mod);
+    return lo;
 }
 
 #define NMOD_ADDMUL(r, a, b, mod) \

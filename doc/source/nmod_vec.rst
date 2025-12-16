@@ -128,6 +128,13 @@ Arithmetic operations
     `2^{\mathtt{FLINT\_BITS} - 1}`, and `c` should be less than ``mod.n``.
     There is no constraint on elements of ``vec``.
 
+.. function:: void _nmod_vec_scalar_mul_nmod_redc(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+
+    Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
+    Montgomery multiplication. Requires that ``mod.n`` is odd.
+    The element `c` and all elements of ``vec`` are assumed to be less
+    than ``mod.n``.
+
 .. function:: void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Adds ``(vec, len)`` times `c` to the vector ``(res, len)``. The element

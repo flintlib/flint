@@ -362,19 +362,14 @@ _gr_nmod_mul_fmpz(ulong * res, const ulong * x, const fmpz_t y, const gr_ctx_t c
 static int
 _gr_nmod_addmul(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 {
-    ulong r = res[0];
-    NMOD_ADDMUL(r, x[0], y[0], NMOD_CTX(ctx));
-    res[0] = r;
+    res[0] = nmod_addmul(res[0], x[0], y[0], NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
 static int
 _gr_nmod_submul(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 {
-    ulong r = res[0];
-    ulong t = nmod_neg(y[0], NMOD_CTX(ctx));
-    NMOD_ADDMUL(r, x[0], t, NMOD_CTX(ctx));
-    res[0] = r;
+    res[0] = nmod_addmul(res[0], x[0], nmod_neg(y[0], NMOD_CTX(ctx)), NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -656,48 +651,17 @@ _gr_nmod_vec_mul(ulong * res, const ulong * vec1, const ulong * vec2, slong len,
     return GR_SUCCESS;
 }
 
-static inline void _nmod_vec_scalar_mul_nmod_fullword_inline(nn_ptr res, nn_srcptr vec,
-                               slong len, ulong c, nmod_t mod)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        NMOD_MUL_FULLWORD(res[i], vec[i], c, mod);
-}
-
-static inline void _nmod_vec_scalar_mul_nmod_generic_inline(nn_ptr res, nn_srcptr vec,
-                               slong len, ulong c, nmod_t mod)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        NMOD_MUL_PRENORM(res[i], vec[i], c << mod.norm, mod);
-}
-
-static inline void _nmod_vec_scalar_mul_nmod_inline(nn_ptr res, nn_srcptr vec,
-                               slong len, ulong c, nmod_t mod)
-{
-    if (NMOD_BITS(mod) == FLINT_BITS)
-        _nmod_vec_scalar_mul_nmod_fullword_inline(res, vec, len, c, mod);
-    else if (len > 10)
-        _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
-    else
-        _nmod_vec_scalar_mul_nmod_generic_inline(res, vec, len, c, mod);
-}
-
 static int
 _gr_nmod_vec_mul_scalar(ulong * res, const ulong * vec1, slong len, const ulong * c, gr_ctx_t ctx)
 {
-    nmod_t mod = NMOD_CTX(ctx);
-    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, c[0], mod);
+    _nmod_vec_scalar_mul_nmod(res, vec1, len, c[0], NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
 static int
 _gr_nmod_scalar_mul_vec(ulong * res, ulong * c, const ulong * vec1, slong len, gr_ctx_t ctx)
 {
-    nmod_t mod = NMOD_CTX(ctx);
-    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, c[0], mod);
+    _nmod_vec_scalar_mul_nmod(res, vec1, len, c[0], NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -705,7 +669,7 @@ static int
 _gr_nmod_vec_mul_scalar_si(ulong * res, const ulong * vec1, slong len, slong c, gr_ctx_t ctx)
 {
     nmod_t mod = NMOD_CTX(ctx);
-    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, nmod_set_si(c, mod), NMOD_CTX(ctx));
+    _nmod_vec_scalar_mul_nmod(res, vec1, len, nmod_set_si(c, mod), NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -713,7 +677,7 @@ static int
 _gr_nmod_vec_mul_scalar_ui(ulong * res, const ulong * vec1, slong len, ulong c, gr_ctx_t ctx)
 {
     nmod_t mod = NMOD_CTX(ctx);
-    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, nmod_set_ui(c, mod), NMOD_CTX(ctx));
+    _nmod_vec_scalar_mul_nmod(res, vec1, len, nmod_set_ui(c, mod), NMOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
