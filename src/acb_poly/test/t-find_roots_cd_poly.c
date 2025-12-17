@@ -14,17 +14,31 @@
 #include "acb_poly.h"
 #include <math.h>
 
-void check_polynomial(const acb_poly_t A, acb_ptr roots, double correction, slong prec)
+//TODO: make function add radius
+
+static void set_radius(acb_ptr roots, slong len, double correction)
 {
-    acb_poly_t B;
-    acb_poly_t C;
+    slong i;
+    mag_t rad, mag;
+    mag_init(rad);
+    mag_init(mag);
+    for(i=0; i<len; i++) {
+        acb_get_mag(mag, roots+i);
+        mag_set_d(rad, (len-1)*correction);
+        mag_mul(rad, rad, mag);
+        acb_add_error_mag(roots+i, rad);
+    }
+    mag_clear(rad);
+    mag_clear(mag);
+}
+
+static void check_polynomial(const acb_poly_t A, acb_ptr roots, double correction, slong prec, acb_poly_t B, acb_poly_t C)
+{
     acb_t t;
     slong i, deg, prec2;
     deg = A->length - 1;
+    set_radius(roots, deg, correction);
 
-    acb_init(t);
-    acb_poly_init(B);
-    acb_poly_init(C);
     prec2 = 500;
     if (correction < ldexp(1,-prec/2))
     {
@@ -49,6 +63,7 @@ void check_polynomial(const acb_poly_t A, acb_ptr roots, double correction, slon
             flint_abort();
         }
 
+        acb_init(t);
         for (i = 0; i < deg; i++)
         {
             acb_poly_evaluate(t, A, roots + i, prec2);
@@ -61,6 +76,7 @@ void check_polynomial(const acb_poly_t A, acb_ptr roots, double correction, slon
                 flint_abort();
             }
         }
+        acb_clear(t);
     } else {
         flint_printf("FAIL: target precision was not reached by a large margin (%.3e >> %.3e)\n", correction, ldexp(1,-prec/2));
             acb_poly_printd(A, 15); flint_printf("\n\n");
@@ -77,22 +93,20 @@ void check_polynomial(const acb_poly_t A, acb_ptr roots, double correction, slon
             flint_printf("%ld isolated roots\n", isolated);
             flint_abort();
     }
-
-    acb_clear(t);
-    acb_poly_clear(B);
-    acb_poly_clear(C);
 }
 
 TEST_FUNCTION_START(acb_poly_find_roots_double, state)
 {
     slong iter;
 
-    acb_poly_t A;
+    acb_poly_t A, B, C;
     acb_ptr roots;
     slong i, deg, prec;
     double correction;
 
     acb_poly_init(A);
+    acb_poly_init(B);
+    acb_poly_init(C);
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
@@ -110,33 +124,47 @@ TEST_FUNCTION_START(acb_poly_find_roots_double, state)
         roots = _acb_vec_init(deg);
 
         correction = _acb_poly_find_roots_double(roots, A->coeffs, NULL, A->length, 150, prec);
-        check_polynomial(A, roots, correction, FLINT_MIN(53, prec));
+        check_polynomial(A, roots, correction, FLINT_MIN(53, prec), B, C);
 
         _acb_vec_clear(roots, deg);
     }
 
     /* Check rescaling in an extreme case */
-    slong hdeg = 90;
+    slong hdeg = 100;
     acb_poly_clear(A);
     acb_poly_init(A);
+    
     acb_poly_fit_length(A, 2*hdeg+1);
     acb_poly_set_coeff_si(A, 0, 1);
     acb_poly_set_coeff_si(A, 1, 1);
     acb_poly_set_coeff_si(A, hdeg, -1);
-    acb_mul_2exp_si(A->coeffs+hdeg, A->coeffs+hdeg, 1800);
+    acb_mul_2exp_si(A->coeffs+hdeg, A->coeffs+hdeg, 20*hdeg);
     acb_poly_set_coeff_si(A, 2*hdeg, 1);
     _acb_poly_set_length(A, 2*hdeg+1);
-
+    /*
+    acb_poly_fit_length(A, 2*hdeg+2);
+    acb_poly_set_coeff_si(A, 0, 1);
+    acb_poly_set_coeff_si(A, 2, -1);
+    acb_poly_set_coeff_si(A, hdeg, -1);
+    acb_poly_set_coeff_si(A, hdeg+1, 1);
+    acb_mul_2exp_si(A->coeffs+hdeg, A->coeffs+hdeg, 1800);
+    acb_mul_2exp_si(A->coeffs+hdeg, A->coeffs+hdeg+1, 1800);
+    acb_poly_set_coeff_si(A, 2*hdeg, 2);
+    acb_poly_set_coeff_si(A, 2*hdeg+1, -1);
+    _acb_poly_set_length(A, 2*hdeg+2);
+    */
     deg = A->length - 1;
 
     roots = _acb_vec_init(deg);
 
     correction = _acb_poly_find_roots_double(roots, A->coeffs, NULL, A->length, 150, 53);
-    check_polynomial(A, roots, correction, 53);
+    check_polynomial(A, roots, correction, 53, B, C);
     
     _acb_vec_clear(roots, deg);
 
     acb_poly_clear(A);
+    acb_poly_clear(B);
+    acb_poly_clear(C);
 
     TEST_FUNCTION_END(state);
 }
@@ -146,7 +174,7 @@ TEST_FUNCTION_START(cd_poly_refine_roots, state)
     slong iter;
 
     mag_t rad;
-    acb_poly_t A;
+    acb_poly_t A, B, C;
     acb_ptr roots;
     double *p_r, *p_i, *z_r, *z_i, *vp_r, *vp_i, *wdk_r, *wdk_i, *p, *z;
     slong i, deg, len, prec, max_deg;
@@ -155,6 +183,8 @@ TEST_FUNCTION_START(cd_poly_refine_roots, state)
     max_deg=100;
     mag_init(rad);
     acb_poly_init(A);
+    acb_poly_init(B);
+    acb_poly_init(C);
     roots = _acb_vec_init(max_deg);
 
     p_r = flint_malloc((max_deg+1)*sizeof(double));
@@ -205,15 +235,17 @@ TEST_FUNCTION_START(cd_poly_refine_roots, state)
             acb_add_error_mag(roots+i, rad);
         }
 
-        /* Check initial roots are correctly handled */
+        /* Check that initial roots are correctly handled */
         correction = cd_poly_find_roots(z, p, z, len, 1, 0x1p-53);
         correction = _acb_poly_find_roots_double(roots, A->coeffs, roots, A->length, 1, prec);
 
-        check_polynomial(A, roots, correction, FLINT_MIN(53, prec));
+        check_polynomial(A, roots, correction, FLINT_MIN(53, prec), B, C);
     }
     _acb_vec_clear(roots, max_deg);
  
     acb_poly_clear(A);
+    acb_poly_clear(B);
+    acb_poly_clear(C);
     mag_clear(rad);
     flint_free(p_r);
     flint_free(p_i);

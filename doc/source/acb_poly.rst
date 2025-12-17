@@ -1146,18 +1146,25 @@ Root-finding
 
 .. function:: double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec)
 
-   Attempts to compute all the roots as above. The operations are performed
-   on double, and the precision *prec* is used only below `53` for
-   terminating if the estimated accuracy is below the working precision.
+   Attempts to compute all the complex root approximations of the input
+   polynomial, using double precision floating-point arithmetic. In
+   particular, the radii of the entries in *roots* are set to zero.
 
-   The function returns the last *correction*, that is the maximal step size computed at the last
-   iteration. In particular, if there was no overflow, and up to rounding
-   errors, the roots of the input polynomial are included in the disks centered at the
-   entries of *roots* and of radius `(len-2)` *correction*.
+   The implementation is based on the Durand-Kerner method, with a special
+   attention to overflow issues. The precision *prec* is used
+   only below `53` for early termination if the estimated accuracy is below
+   the working precision.
 
-.. function:: double cd_poly_find_roots(double * roots, const double * poly, const double * initial, slong len, slong maxiter, double reltol) 
+   The function returns the last *correction*, that is the maximal step
+   size computed at the last iteration. In particular, if there was no
+   overflow, and up to rounding errors, the Gershgorin circle theorem
+   ensures that the roots of the input polynomial are included in the union
+   of the disks centered at the entries `z_k` of *roots* and of radius
+   `(len-2) |z_k|` *correction*.
 
-   Attempts to compute all the roots as above. The array *roots* should be
+.. function:: double cd_poly_find_roots(double * roots, const double * poly, const double * initial, slong len, slong maxiter, double reltol)
+
+   Attempts to compute all the root approximations as above. The array *roots* should be
    preallocated with the size of `2 len` *double*. The *poly* array
    is an array of size `2 len` *double*, where the entries at indices `2 k`
    and `2 k + 1` represent the real and the imaginary parts of the

@@ -236,7 +236,7 @@ static slong convex_hull_upper(slong * res, const double * y, const slong * x, s
 }
 
 /* Computes the line y = ax + b that minimizes max_i |y[i] - (a*x[i] + b)|.
-   Returns the maximal vertical distance. 
+   Returns the maximal vertical distance.
    Requires x to be sorted. */
 static double
 _minimax_line(double * res_a, double * res_b, const double * y, const slong * x, slong len)
@@ -328,7 +328,7 @@ _best_fit_double(arb_t scale, double * cdp, const acb_srcptr poly, slong len)
     mag_t m;
     acb_t cmid, cscale;
     arb_t c, log2;
-    
+
     arb_init(log2);
     arb_init(c);
     acb_init(cmid); /* shallow copies, not cleared */
@@ -351,13 +351,13 @@ _best_fit_double(arb_t scale, double * cdp, const acb_srcptr poly, slong len)
             j++;
         }
     }
-    
-    mdist =  _minimax_line(&a, &b, alog, nonzero, j);  
+
+    mdist =  _minimax_line(&a, &b, alog, nonzero, j);
 
     if(mdist > 1022) {
         b += mdist - 1022;
     }
-    
+
     arb_set_d(scale, -a);
     arb_mul  (scale, scale, log2, prec);
     arb_exp  (scale, scale, prec);
@@ -370,7 +370,7 @@ _best_fit_double(arb_t scale, double * cdp, const acb_srcptr poly, slong len)
         cdp[2*i+1] = arf_get_d(arb_midref(acb_imagref(cscale)), ARF_RND_NEAR);
         arb_mul(c, c, scale, prec2);
     }
-   
+
     flint_free(alog);
     flint_free(nonzero);
     mag_clear(m);
@@ -385,16 +385,14 @@ double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr in
     double *cdz, *cdp, *cdi;
     double max_correction;
     arb_t scale;
-    mag_t rel_rad, abs_rad;
     slong i;
-    
+
     arb_init(scale);
-    mag_init(rel_rad);
-    mag_init(abs_rad);
     cdp = flint_malloc(2*len*sizeof(double));
     cdz = flint_malloc(2*(len - 1)*sizeof(double));
 
     _best_fit_double(scale, cdp, poly, len);
+
     if(initial != NULL) {
         cdi = cdz;
         for(i=0; i<len-1; i++) {
@@ -405,23 +403,16 @@ double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr in
     } else {
         cdi = NULL;
     }
+
     max_correction = cd_poly_find_roots(cdz, cdp, cdi, len, maxiter, ldexp(1,-prec));
-    slong num_ops = 100*len; //num_ops should be an upper bound on the number of arithmetic operations in a Newton step
-    
-    /* Gershgorin circle estimate for the radius of the roots */
-    mag_set_d(rel_rad, max_correction*(len-2)/(1-FLINT_MIN(0.5, num_ops*0x1p-53)));
+
     for(i=0; i<len-1; i++) {
         acb_set_d_d(roots + i, cdz[2*i], cdz[2*i+1]);
-        acb_get_mag(abs_rad, roots+i);
-        mag_mul(abs_rad, abs_rad, rel_rad);
-        acb_add_error_mag(roots+i, abs_rad);
         acb_mul_arb(roots + i, roots + i, scale, prec);
     }
     flint_free(cdz);
     flint_free(cdp);
     arb_clear(scale);
-    mag_clear(rel_rad);
-    mag_clear(abs_rad);
     return max_correction;
 }
 
@@ -437,6 +428,7 @@ _acb_poly_find_roots(acb_ptr roots,
     acb_t t;
     int status = GR_SUCCESS;
     int attempt;
+    int success_double = 0;
 
     deg = len - 1;
 
@@ -462,80 +454,82 @@ _acb_poly_find_roots(acb_ptr roots,
         return 1;
     }
 
-    if (initial != NULL)
-        _acb_vec_set(roots, initial, deg);
-    else if (prec > 53)
-        _acb_poly_roots_initial_values(roots, poly, deg, prec);
-
-    if (maxiter == 0)
-        maxiter = 2 * deg + n_sqrt(prec);
-
-    gr_ctx_init_complex_acb(acb_ctx, prec + 64);
-    acb_init(t);
-
-    for (attempt = 0; attempt <= 1; attempt++)
-    {
-        /* First try with nfloat if possible, otherwise fall back to acf */
-        if (attempt == 0)
-        {
-            if (prec <= 53) {
-                slong fmaxiter = FLINT_MAX(150,maxiter);
-                double max_correction = _acb_poly_find_roots_double(roots, poly, initial, len, fmaxiter, prec);
-                status = (max_correction < ldexp(1, -3)) ? GR_SUCCESS : GR_UNABLE ;
-                if(status == GR_SUCCESS)
-                    break;
-            }
-            if (nfloat_complex_ctx_init(fp_ctx, prec, 0) != GR_SUCCESS)
-                continue;
-        }
-        else
-        {
-#if 0
-            flint_printf("second try: %wd\n", prec);
-#endif
-            gr_ctx_init_complex_float_acf(fp_ctx, prec);
-        }
-
-        status = GR_SUCCESS;
-
-        sz = fp_ctx->sizeof_elem;
-        z = gr_heap_init_vec(4 * deg + 1, fp_ctx);
-        w = GR_ENTRY(z, deg, sz);
-        fprime = GR_ENTRY(z, 2 * deg, sz);
-        f = GR_ENTRY(z, 3 * deg, sz);
-
-        for (i = 0; i <= deg; i++)
-            status |= gr_set_other(GR_ENTRY(f, i, sz), poly + i, acb_ctx, fp_ctx);
-        for (i = 0; i < deg; i++)
-            status |= gr_set_other(GR_ENTRY(z, i, sz), roots + i, acb_ctx, fp_ctx);
-
-#if USE_ABERTH
-        status |= _gr_poly_derivative(fprime, f, deg + 1, fp_ctx);
-#endif
-
-        if (status == GR_SUCCESS)
-            status = _acb_poly_find_roots_iter(w, z, f, fprime, deg, maxiter, fp_ctx, acb_ctx, prec);
-
-        if (status == GR_SUCCESS)
-        {
-            /* convert back to acb */
-            for (i = 0; i < deg; i++)
-            {
-                GR_MUST_SUCCEED(gr_set_other(roots + i, GR_ENTRY(z, i, sz), fp_ctx, acb_ctx));
-                mag_zero(arb_radref(acb_realref(roots + i)));
-                mag_zero(arb_radref(acb_imagref(roots + i)));
-            }
-        }
-
-        gr_heap_clear_vec(z, 4 * deg + 1, fp_ctx);
-        gr_ctx_clear(fp_ctx);
-
-        if (status == GR_SUCCESS)
-            break;
+    if (prec <= 53) {
+        slong fmaxiter = FLINT_MAX(150,maxiter);
+        double max_correction = _acb_poly_find_roots_double(roots, poly, initial, len, fmaxiter, prec);
+        success_double = (max_correction < ldexp(1, -3));
     }
 
-    acb_clear(t);
-    gr_ctx_clear(acb_ctx);
+
+    if(!success_double) {
+        if (initial == NULL)
+            _acb_poly_roots_initial_values(roots, poly, deg, prec);
+        else
+            _acb_vec_set(roots, initial, deg);
+
+        if (maxiter == 0)
+            maxiter = 2 * deg + n_sqrt(prec);
+
+        gr_ctx_init_complex_acb(acb_ctx, prec + 64);
+        acb_init(t);
+
+        for (attempt = 0; attempt <= 1; attempt++)
+        {
+            /* First try with nfloat if possible, otherwise fall back to acf */
+            if (attempt == 0)
+            {
+                if (nfloat_complex_ctx_init(fp_ctx, prec, 0) != GR_SUCCESS)
+                    continue;
+            }
+            else
+            {
+#if 0
+                flint_printf("second try: %wd\n", prec);
+#endif
+                gr_ctx_init_complex_float_acf(fp_ctx, prec);
+            }
+
+            status = GR_SUCCESS;
+
+            sz = fp_ctx->sizeof_elem;
+            z = gr_heap_init_vec(4 * deg + 1, fp_ctx);
+            w = GR_ENTRY(z, deg, sz);
+            fprime = GR_ENTRY(z, 2 * deg, sz);
+            f = GR_ENTRY(z, 3 * deg, sz);
+
+            for (i = 0; i <= deg; i++)
+                status |= gr_set_other(GR_ENTRY(f, i, sz), poly + i, acb_ctx, fp_ctx);
+            for (i = 0; i < deg; i++)
+                status |= gr_set_other(GR_ENTRY(z, i, sz), roots + i, acb_ctx, fp_ctx);
+
+#if USE_ABERTH
+            status |= _gr_poly_derivative(fprime, f, deg + 1, fp_ctx);
+#endif
+
+            if (status == GR_SUCCESS)
+                status = _acb_poly_find_roots_iter(w, z, f, fprime, deg, maxiter, fp_ctx, acb_ctx, prec);
+
+            if (status == GR_SUCCESS)
+            {
+                /* convert back to acb */
+                for (i = 0; i < deg; i++)
+                {
+                    GR_MUST_SUCCEED(gr_set_other(roots + i, GR_ENTRY(z, i, sz), fp_ctx, acb_ctx));
+                    mag_zero(arb_radref(acb_realref(roots + i)));
+                    mag_zero(arb_radref(acb_imagref(roots + i)));
+                }
+            }
+
+            gr_heap_clear_vec(z, 4 * deg + 1, fp_ctx);
+            gr_ctx_clear(fp_ctx);
+
+            if (status == GR_SUCCESS)
+                break;
+        }
+
+        acb_clear(t);
+        gr_ctx_clear(acb_ctx);
+    }
 
     return _acb_poly_validate_roots(roots, poly, len, prec);
 }

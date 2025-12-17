@@ -17,7 +17,7 @@
 #if _MSC_VER
 #pragma float_control(precise, off)
 #else
-#pragma GCC optimize("Ofast,unroll-loops") 
+#pragma GCC optimize("Ofast,unroll-loops")
 #endif
 
 /*****************************************
@@ -50,7 +50,7 @@ static void _intermediate_variables_init(intermediate_variables * v, slong n)
     double * mem_v = flint_malloc(12*n*sizeof(double));
 
     /* Set the memory addresses */
-    v->z_r   = mem_v+0*n; 
+    v->z_r   = mem_v+0*n;
     v->z_i   = mem_v+1*n;
     v->p_r   = mem_v+2*n;
     v->p_i   = mem_v+3*n;
@@ -91,7 +91,7 @@ static slong cd_poly_partition_pivot(double* z_r, double* z_i, slong n)
             _d_swap(z_r + i-c, z_r + i);
             _d_swap(z_i + i-c, z_i + i);
         }
-    }             
+    }
     return n-c;
 }
 
@@ -134,7 +134,7 @@ static slong _trim_zeros(double * z, slong * fz, const double * p, slong n)
 
     return i-j+1;
 }
-                  
+
 static void _vector_inverse(double* iz_r, double* iz_i, const double* z_r, const double* z_i,
                            slong n_start, slong n_end)
 {
@@ -192,10 +192,10 @@ static void _set_poly(intermediate_variables * v, const double * p, slong n)
     for(i=0; i<n; i++) {
         v->p_r[i] = p[2*i];
         v->p_i[i] = p[2*i+1];
-        v->rp_r[i] = p[2*(n-1-i)];   
-        v->rp_i[i] = p[2*(n-1-i)+1]; 
+        v->rp_r[i] = p[2*(n-1-i)];
+        v->rp_i[i] = p[2*(n-1-i)+1];
     }
-}                         
+}
 
 
 /***************************************************
@@ -225,7 +225,7 @@ static slong lower_convex_hull(slong* result, const double* y, slong n)
 
 static void _initial_values_from_newton_polygon(double* z_r, double* z_i, const double* p_r, const double* p_i,
                                                 const slong* np, slong m)
-{           
+{
     slong i, j, q, p = 0;
     double d, invd, magp, argp, magq, argq, magz, theta,
            pi = acos(-1),
@@ -243,7 +243,7 @@ static void _initial_values_from_newton_polygon(double* z_r, double* z_i, const 
             magz = ldexp(1, -500/(q-p));
         }
         for(j=0; j<q-p; j++) {
-            /* theta = arg of solutions of x^d = -p[p]/p[q] 
+            /* theta = arg of solutions of x^d = -p[p]/p[q]
              *       = arg(-p[p]/p[q])/d + 2 pi j/d */
             theta = (2*pi*(j+0.5)+argp-argq)/d;
             //theta = 2*pi*j/d;
@@ -265,7 +265,7 @@ void cd_poly_roots_initial_values(double * z_r, double * z_i, const double * p_r
     slong * np;
     slong i=0, j, n_np;
     int k=LOG_ROUNDING;
-    
+
     if(z0 != NULL) {
         for(i=0, j=0; i<n-1 && j<d; j++) {
             if (z0[2*j] != 0 || z0[2*j+1] != 0) {
@@ -290,7 +290,7 @@ void cd_poly_roots_initial_values(double * z_r, double * z_i, const double * p_r
 
         /* Computes the Newton polygon as indices in np of length n_np */
         n_np = lower_convex_hull(np, malp, n);
-        
+
         /* Computes a first estimation of the roots */
         _initial_values_from_newton_polygon(z_r, z_i, p_r, p_i, np, n_np);
 
@@ -360,7 +360,7 @@ void cd_poly_horner(double* results_r, double* results_i,
 
 #define CDWBlock (Nd*Nr/4)
 /* Weights for the Durand-Kerner or Weierstrass iteration
- * Handles any order */
+ * The multiplications are done according to the input order */
 void cd_poly_weierstrass_distinct_orders(double* restrict results_r, double* restrict results_i,
                                          double lc_r, double lc_i,
                                          const double* restrict col_values_r, const double* restrict col_values_i, slong d,
@@ -388,9 +388,12 @@ void cd_poly_weierstrass_distinct_orders(double* restrict results_r, double* res
             double b = col_values_i[j];
             for(k=0; k<CDWBlock; k++) {
                 double e, f, s, t;
+                // compute the difference e + i f = (u + i v) - (a + i b)
                 e = u[k] - a;
                 f = v[k] - b;
+                // when u + i v == a + i b, let e + i f = 1 instead
                 e = ((e==0) & (f==0))? 1 : e;
+                // accumulate the multiplications by e + i f = (u + i v) - (a + i b)
                 s = e*xr[k] - f*yr[k];
                 t = e*yr[k] + f*xr[k];
                 xr[k] = s;
@@ -544,11 +547,11 @@ double cd_poly_wdk_update(double* z_r, double* z_i,
     return maxstep;
 }
 
-static void cd_poly_no_overflow_permute(double * pz_r, double * pz_i, const double * z_r, const double * z_i, slong n_piv, slong d)
+static void cd_poly_no_overflow_permute(double * pz_r, double * pz_i, const double * z_r, const double * z_i, double lc_r, double lc_i, slong n_piv, slong d)
 {
     slong i, j=0, k=n_piv;
-    double prod_r=1,
-           prod_i=0;
+    double prod_r=lc_r,
+           prod_i=lc_i;
     for(i=0; i<d; i++) {
         double s, t;
         if((j >= n_piv) || (k<d && hypot(prod_r, prod_i) < 1)) {
@@ -564,7 +567,7 @@ static void cd_poly_no_overflow_permute(double * pz_r, double * pz_i, const doub
         t = prod_r*pz_i[i] + prod_i*pz_r[i];
         prod_r = s;
         prod_i = t;
-    }             
+    }
     //flint_printf("%.3e\n", hypot(prod_r, prod_i));
 }
 
@@ -575,15 +578,18 @@ static double _refine_roots(intermediate_variables * v, slong n, double stepsize
            maxstep, imaxstep;
     d = n-1;
     n_piv = cd_poly_partition_pivot(v->z_r, v->z_i, d);
-    cd_poly_no_overflow_permute(v->pz_r, v->pz_i, v->z_r, v->z_i, n_piv, d);
     /* Dominant computation time */
     /* Direct case */
     lc_r = v->p_r[n-1];
     lc_i = v->p_i[n-1];
+    cd_poly_no_overflow_permute(v->pz_r, v->pz_i, v->z_r, v->z_i, 1, 0, n_piv, d);
+    //cd_poly_no_overflow_permute(v->pz_r, v->pz_i, v->z_r, v->z_i, lc_r, lc_i, n_piv, d);
     cd_poly_horner(v->vp_r, v->vp_i, v->z_r, v->z_i, 0, n_piv, v->p_r, v->p_i, n);
     cd_poly_weierstrass_distinct_orders(v->wdk_r, v->wdk_i, lc_r, lc_i, v->pz_r, v->pz_i, d, v->z_r, v->z_i, 0, n_piv);
     maxstep = cd_poly_wdk_update(v->z_r, v->z_i, v->vp_r, v->vp_i, v->wdk_r, v->wdk_i, 0, n_piv, stepsize_bound);
     /* Inverse case */
+    //divide(&lc_r, &lc_i, 1, 0, v->p_r[0], v->p_i[0]);
+    //cd_poly_no_overflow_permute(v->pz_r, v->pz_i, v->z_r, v->z_i, lc_r, lc_i, n_piv, d);
     _vector_inverse(v->z_r, v->z_i, v->z_r, v->z_i, n_piv, d);
     _vector_inverse(v->pz_r, v->pz_i, v->pz_r, v->pz_i, 0, d);
     lc_r = v->p_r[0];
@@ -657,7 +663,7 @@ double cd_poly_find_roots(double * z, const double * p, const double * z0, slong
            correction=0,
            old_correction=MAX_STEPSIZE_BOUND;
 
-    nt = _trim_zeros(z, &fz, p, n); 
+    nt = _trim_zeros(z, &fz, p, n);
     if(nt > 1) {
         _intermediate_variables_init(v, nt);
         _set_poly(v, p + 2*fz, nt);
