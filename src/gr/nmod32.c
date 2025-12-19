@@ -9,18 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdint.h>
 #include "fmpz.h"
 //#include "fmpq.h"
 #include "nmod.h"
 #include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "gr.h"
+#include "gr_poly.h"
 #include "gr_mat.h"
 
 #define NMOD32_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD32_CTX(ring_ctx) (*NMOD32_CTX_REF(ring_ctx))
 
-typedef unsigned int nmod32_struct;
-typedef nmod32_struct nmod32_t[1];
+typedef uint32_t nmod32_t[1];
 
 static void
 nmod32_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -330,7 +332,7 @@ nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_
 }
 
 static void
-_nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t ctx)
+_nmod32_vec_init(uint32_t * res, slong len, gr_ctx_t ctx)
 {
     slong i;
 
@@ -339,12 +341,23 @@ _nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t ctx)
 }
 
 static void
-_nmod32_vec_clear(nmod32_struct * res, slong len, gr_ctx_t ctx)
+_nmod32_vec_clear(uint32_t * res, slong len, gr_ctx_t ctx)
 {
 }
 
 static int
-_nmod32_vec_set(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t ctx)
+_nmod32_vec_zero(uint32_t * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = 0;
+
+    return GR_SUCCESS;
+}
+
+static int
+_nmod32_vec_set(uint32_t * res, const uint32_t * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
 
@@ -355,7 +368,7 @@ _nmod32_vec_set(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ct
 }
 
 static int
-_nmod32_vec_neg(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t ctx)
+_nmod32_vec_neg(uint32_t * res, const uint32_t * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD32_CTX(ctx);
@@ -367,7 +380,7 @@ _nmod32_vec_neg(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ct
 }
 
 static int
-_nmod32_vec_add(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+_nmod32_vec_add(uint32_t * res, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD32_CTX(ctx);
@@ -383,7 +396,7 @@ _nmod32_vec_add(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
 }
 
 static int
-_nmod32_vec_sub(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+_nmod32_vec_sub(uint32_t * res, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD32_CTX(ctx);
@@ -399,7 +412,7 @@ _nmod32_vec_sub(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
 }
 
 static int
-_nmod32_vec_mul(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+_nmod32_vec_mul(uint32_t * res, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD32_CTX(ctx);
@@ -412,7 +425,7 @@ _nmod32_vec_mul(nmod32_struct * res, const nmod32_struct * vec1, const nmod32_st
 
 /* todo: overflow checks */
 static int
-_nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+_nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     ulong n, s;
@@ -457,7 +470,7 @@ _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32
 
 /* todo: overflow checks */
 static int
-_nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const nmod32_struct * vec1, const nmod32_struct * vec2, slong len, gr_ctx_t ctx)
+_nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     ulong n, s;
@@ -498,6 +511,86 @@ _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const nm
     if (subtract && res[0] != 0)
         res[0] = (n - res[0]);
 
+    return GR_SUCCESS;
+}
+
+static int
+_nmod32_vec_mul_scalar(uint32_t * res, const uint32_t * vec, slong len, const uint32_t * c, gr_ctx_t ctx)
+{
+    ulong d = *c;
+    slong i;
+
+    /* todo: Shoup */
+    for (i = 0; i < len; i++)
+        res[i] = nmod_mul(vec[i], d, NMOD32_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_nmod32_vec_addmul_scalar(uint32_t * res, const uint32_t * vec, slong len, const uint32_t * c, gr_ctx_t ctx)
+{
+    ulong d = *c;
+    slong i;
+
+    /* todo: Shoup */
+    for (i = 0; i < len; i++)
+        res[i] = nmod_addmul(res[i], vec[i], d, NMOD32_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+static int
+_nmod32_vec_submul_scalar(uint32_t * res, const uint32_t * vec, slong len, const uint32_t * c, gr_ctx_t ctx)
+{
+    uint32_t d;
+    d = nmod_neg(*c, NMOD32_CTX(ctx));
+    return _nmod32_vec_addmul_scalar(res, vec, len, &d, ctx);
+}
+
+static int
+_nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32_t * B, slong Blen, slong trunc, gr_ctx_t ctx)
+{
+    nn_ptr TR, TA, TB;
+    slong i, alloc;
+    int squaring;
+
+    Alen = FLINT_MIN(Alen, trunc);
+    Blen = FLINT_MIN(Blen, trunc);
+
+    /* todo: tune this */
+    if (Alen < 10 || Blen < 10)
+        return _gr_poly_mullow_classical(res, A, Alen, B, Blen, trunc, ctx);
+
+    squaring = (A == B) && (Alen == Blen);
+
+    alloc = squaring ? (Alen + trunc) : (Alen + Blen + trunc);
+    TR = GR_TMP_ALLOC(alloc * sizeof(ulong));
+    TA = TR + trunc;
+    TB = TA + Alen;
+
+    for (i = 0; i < Alen; i++)
+        TA[i] = A[i];
+
+    if (squaring)
+    {
+        _nmod_poly_mullow(TR, TA, Alen, TA, Alen, trunc, NMOD32_CTX(ctx));
+    }
+    else
+    {
+        for (i = 0; i < Blen; i++)
+            TB[i] = B[i];
+
+        if (Alen >= Blen)
+            _nmod_poly_mullow(TR, TA, Alen, TB, Blen, trunc, NMOD32_CTX(ctx));
+        else
+            _nmod_poly_mullow(TR, TB, Blen, TA, Alen, trunc, NMOD32_CTX(ctx));
+    }
+
+    for (i = 0; i < trunc; i++)
+        res[i] = TR[i];
+
+    GR_TMP_FREE(TR, alloc);
     return GR_SUCCESS;
 }
 
@@ -566,6 +659,7 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod32_vec_clear},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_zero},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_set},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod32_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod32_vec_add},
@@ -573,6 +667,10 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_VEC_MUL,         (gr_funcptr) _nmod32_vec_mul},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod32_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod32_vec_dot_rev},
+    {GR_METHOD_VEC_MUL_SCALAR,     (gr_funcptr) _nmod32_vec_mul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,  (gr_funcptr) _nmod32_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod32_vec_submul_scalar},
+    {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod32_poly_mullow},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},
     {0,                         (gr_funcptr) NULL},
 };
@@ -586,7 +684,7 @@ gr_ctx_init_nmod32(gr_ctx_t ctx, ulong n)
         return GR_UNABLE;
 
     ctx->which_ring = GR_CTX_NMOD32;
-    ctx->sizeof_elem = sizeof(nmod32_struct);
+    ctx->sizeof_elem = sizeof(uint32_t);
     ctx->size_limit = WORD_MAX;
 
     nmod_init(NMOD32_CTX_REF(ctx), n);
