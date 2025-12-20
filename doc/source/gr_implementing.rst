@@ -107,7 +107,7 @@ Placeholder and trivial methods
 
     This function does nothing and returns ``GR_DOMAIN``. It can be used
     for an operation that never makes sense in the present domain,
-    e.g.\ for the constant `\pi` in the rational numbers.
+    e.g. for the constant `\pi` in the rational numbers.
 
 .. function:: truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
 
