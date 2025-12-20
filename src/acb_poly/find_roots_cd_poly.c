@@ -528,7 +528,6 @@ double cd_poly_wdk_update(double* z_r, double* z_i,
 {
     slong i;
     double f_r, f_i, mag_ratio, damping, maxstep = 0;
-    //flint_printf("n_start: %ld, n_end: %ld, mag_w: %.3e\n", n_start, n_end, hypot(wdk_r[0], wdk_i[0]));
     for(i=n_start; i<n_end; i++) {
         if((wdk_r[i] != 0) || (wdk_i[i] != 0)) {
             divide(&f_r, &f_i, vp_r[i], vp_i[i], wdk_r[i], wdk_i[i]);
