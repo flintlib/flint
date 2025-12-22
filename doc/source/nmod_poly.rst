@@ -1244,6 +1244,11 @@ Division
     The algorithm used is to call :func:`div_newton_n` and then multiply out
     and compute the remainder.
 
+
+Division with special divisors
+--------------------------------------------------------------------------------
+
+
 .. function:: ulong _nmod_poly_div_root(nn_ptr Q, nn_srcptr A, slong len, ulong c, nmod_t mod)
 
     Sets ``(Q, len-1)`` to the quotient of ``(A, len)`` on division
@@ -1255,6 +1260,56 @@ Division
 
     Sets `Q` to the quotient of `A` on division by `(x - c)`, and returns
     the remainder, equal to the value of `A` evaluated at `c`.
+
+.. function:: void _nmod_poly_divrem_xnmc(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, nmod_t mod)
+
+    Sets the first `n` coefficients of ``RQ`` to the remainder of
+    ``(A, len)`` on division by `x^n - c`, and the next ``len - n``
+    coefficients (from index `n` to index ``len-1``) to the
+    quotient of this division. `A` and `RQ` are allowed to be the
+    same, but may not overlap partially in any other way.
+    Constraints: `len \ge n > 0`, and `c` is reduced modulo
+    ``mod.n``.
+
+.. function:: void _nmod_poly_divrem_xnm1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod)
+
+    Identical to :func:`_nmod_poly_divrem_xnmc` but specialized for `c = 1`,
+    that is, divisor is `x^n - 1`.
+
+.. function:: void _nmod_poly_divrem_xnp1(nn_ptr RQ, nn_srcptr A, slong len, ulong n, nmod_t mod)
+
+    Identical to :func:`_nmod_poly_divrem_xnmc` but specialized for `c = -1`,
+    that is, divisor is `x^n + 1`.
+
+.. function:: void _nmod_poly_divrem_xnmc_precomp(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
+
+    Identical to :func:`_nmod_poly_divrem_xnmc` but exploiting the precomputed
+    ``c_precomp`` obtained via :func:`n_mulmod_precomp_shoup` for faster
+    modular multiplications by `c`. Additional constraint: the modulus ``modn``
+    must be less than `2^{\mathtt{FLINT\_BITS} - 1}`. 
+
+.. function:: void _nmod_poly_divrem_xnmc_precomp_lazy(nn_ptr RQ, nn_srcptr A, slong len, ulong n, ulong c, ulong c_precomp, ulong modn)
+
+    Identical to :func:`_nmod_poly_divrem_xnmc_precomp` but handling modular
+    reductions lazily. Precisely, if all coefficients of `A` are less than or
+    equal to `m`, the input requirement is `m + 2n \le
+    2^{\mathtt{FLINT\_BITS}}`, and the output coefficients of ``RQ`` are in
+    `[0, m+2n)` and equal to the sought values modulo `n`. In particular the
+    coefficients of `A` need not be reduced modulo ``n``, and the output may
+    not be either. However, the value ``c`` should be reduced modulo `n`.
+
+    In the case where `m = n-1` (coefficients of `A` are reduced modulo
+    `n`), then the above leads to the requirement `3n-1 \le
+    2^{\mathtt{FLINT\_BITS}}` (this is `n \le 6148914691236517205` for 64 bits,
+    and `n \le 1431655765` for 32 bits), and reducing the output coefficients
+    just amounts to subtracting either `n` or `2n` to each of them.
+
+.. function:: void nmod_poly_divrem_xnmc(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A, ulong n, ulong c)
+
+    Sets `Q` and `R` to the quotient and remainder of `A` on division by `x^n -
+    c`. Constraints: `n` is nonzero and ``c`` is reduced modulo the modulus of
+    `A`. Incorporates specialized code for the cases `c \in \{-1,0,1\}`, and
+    calls variants with precomputation on `c` when possible.
 
 
 Divisibility testing
@@ -1336,14 +1391,14 @@ Evaluation
 .. function:: ulong _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong n)
 
     Evaluates ``poly`` at the value ``c`` modulo ``n``, with lazy reductions
-    modulo `n`. Precisely, if all coefficients of ``poly`` are less than `m`,
-    the input requirement is `m \le 2^{\mathtt{FLINT\_BITS}} - 2n + 1`, and the
-    output value is in `[0, m+2n-1)` and equal to the sought evaluation modulo
-    `n`. In particular the coefficients of ``poly`` need not be reduced modulo
-    ``n``, and the output may not be either. However, the value ``c`` should be
-    reduced modulo `n`.
+    modulo `n`. Precisely, if all coefficients of ``poly`` are less than or
+    equal to `m`, the input requirement is `m + 2n \le
+    2^{\mathtt{FLINT\_BITS}}`, and the output value is in `[0, m+2n)` and equal
+    to the sought evaluation modulo `n`. In particular the coefficients of
+    ``poly`` need not be reduced modulo ``n``, and the output may not be
+    either. However, the value ``c`` should be reduced modulo `n`.
 
-    In the case where `m = n` (coefficients of ``poly`` are reduced modulo
+    In the case where `m = n-1` (coefficients of ``poly`` are reduced modulo
     `n`), then the above leads to the requirement `3n-1 \le
     2^{\mathtt{FLINT\_BITS}}` (this is `n \le 6148914691236517205` for 64 bits,
     and `n \le 1431655765` for 32 bits), and reducing the output just amounts

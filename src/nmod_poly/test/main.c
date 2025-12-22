@@ -45,6 +45,7 @@
 #include "t-divrem.c"
 #include "t-divrem_newton_n_preinv.c"
 #include "t-div_root.c"
+#include "t-divrem_xnmc.c"
 #include "t-div_series_basecase.c"
 #include "t-div_series.c"
 #include "t-equal_trunc.c"
@@ -112,6 +113,7 @@
 #include "t-pow_trunc.c"
 #include "t-product_roots_nmod_vec.c"
 #include "t-rem.c"
+#include "t-rem_xnmc.c"
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
@@ -175,6 +177,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_divrem),
     TEST_FUNCTION(nmod_poly_divrem_newton_n_preinv),
     TEST_FUNCTION(nmod_poly_div_root),
+    TEST_FUNCTION(nmod_poly_divrem_xnmc),
     TEST_FUNCTION(nmod_poly_div_series_basecase),
     TEST_FUNCTION(nmod_poly_div_series),
     TEST_FUNCTION(nmod_poly_equal_trunc),
@@ -242,6 +245,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_pow_trunc),
     TEST_FUNCTION(nmod_poly_product_roots_nmod_vec),
     TEST_FUNCTION(nmod_poly_rem),
+    TEST_FUNCTION(nmod_poly_rem_xnmc),
     TEST_FUNCTION(nmod_poly_resultant),
     TEST_FUNCTION(nmod_poly_resultant_euclidean),
     TEST_FUNCTION(nmod_poly_resultant_hgcd),
