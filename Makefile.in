@@ -988,9 +988,9 @@ endif
 
 ifneq ($(MAINTAINER_MODE),no)  # disable this for releases?
 ifneq ($(shell command -v autoconf 2> /dev/null),)
-$(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac
-	@echo "Running autoconf"
-	@cd $(ABS_FLINT_DIR) && autoconf && cd - >/dev/null
+$(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac $(ABS_FLINT_DIR)/bootstrap.sh
+	@echo "Running bootstrap.sh!"
+	@cd $(ABS_FLINT_DIR) && ./bootstrap.sh && cd - >/dev/null
 else
 $(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac
 	$(warning autoconf not available, proceeding with stale configure)
