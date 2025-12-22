@@ -1783,7 +1783,7 @@ depends on~`r` and an upper bound on the degree of~`f`.
 
     where necessarily `N = \lfloor\deg(F) / \deg(R)\rfloor`.
 
-    Assumes that `R` is non-constant, i.e. `\deg(R) \geq 1`,
+    Assumes that `R` is non-constant, i.e., `\deg(R) \geq 1`,
     and that the leading coefficient is a unit.
 
 

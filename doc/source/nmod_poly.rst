@@ -23,7 +23,7 @@ In reality one never deals directly with the ``struct`` and simply
 deals with objects of type :type:`nmod_poly_t`. For simplicity we will
 think of an :type:`nmod_poly_t` as a ``struct``, though in practice to
 access fields of this ``struct``, one needs to dereference first,
-e.g. to access the ``length`` field of an :type:`nmod_poly_t` called
+e.g., to access the ``length`` field of an :type:`nmod_poly_t` called
 ``poly1`` one writes ``poly1->length``.
 
 An :type:`nmod_poly_t` is said to be *normalised* if either ``length``
