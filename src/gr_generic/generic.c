@@ -2211,8 +2211,9 @@ gr_generic_vec_mul_scalar_2exp_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong 
     return status;
 }
 
+/* todo: when to use ring addmul? */
 int
-gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
+gr_generic_vec_addmul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
@@ -2235,8 +2236,9 @@ gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
     return status;
 }
 
+/* todo: when to use ring submul? */
 int
-gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
+gr_generic_vec_submul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
@@ -2259,8 +2261,9 @@ gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
     return status;
 }
 
+/* todo: when to use ring addmul_si? */
 int
-gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
+gr_generic_vec_addmul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
     gr_method_binary_op_si mul_si = GR_BINARY_OP_SI(ctx, MUL_SI);
     gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
@@ -2283,8 +2286,9 @@ gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     return status;
 }
 
+/* todo: when to use ring submul_si? */
 int
-gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
+gr_generic_vec_submul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
     gr_method_binary_op_si mul_si = GR_BINARY_OP_SI(ctx, MUL_SI);
     gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
@@ -2301,6 +2305,31 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     {
         status |= mul_si(t, GR_ENTRY(vec2, i, sz), c, ctx);
         status |= sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
+    }
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+/* todo: when to use ring addmul_fmpz? */
+int
+gr_generic_vec_addmul_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    gr_method_binary_op_fmpz mul_fmpz = GR_BINARY_OP_FMPZ(ctx, MUL_FMPZ);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    int status;
+    slong i, sz;
+    gr_ptr t;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    for (i = 0; i < len; i++)
+    {
+        status |= mul_fmpz(t, GR_ENTRY(vec2, i, sz), c, ctx);
+        status |= add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
     GR_TMP_CLEAR(t, ctx);
@@ -2997,10 +3026,11 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,       (gr_funcptr) gr_generic_vec_mul_scalar_2exp_si},
 
-    {GR_METHOD_VEC_ADDMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_addmul},
-    {GR_METHOD_VEC_SUBMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_submul},
-    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_scalar_addmul_si},
-    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_scalar_submul_si},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,       (gr_funcptr) gr_generic_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,       (gr_funcptr) gr_generic_vec_submul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_addmul_scalar_si},
+    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_submul_scalar_si},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_FMPZ,  (gr_funcptr) gr_generic_vec_addmul_scalar_fmpz},
 
     {GR_METHOD_VEC_EQUAL,               (gr_funcptr) gr_generic_vec_equal},
     {GR_METHOD_VEC_IS_ZERO,             (gr_funcptr) gr_generic_vec_is_zero},
