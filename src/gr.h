@@ -725,6 +725,7 @@ typedef enum
     GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
     GR_CTX_FMPZ_MOD_MPOLY_Q,
+    GR_CTX_GR_ORE_POLY,
     GR_CTX_GR_FRACTION,
     GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
     GR_CTX_GR_MAT,
@@ -1377,6 +1378,9 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 /* Some base rings */
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state);
 
 void gr_ctx_init_fmpz(gr_ctx_t ctx);
 void gr_ctx_init_fmpq(gr_ctx_t ctx);

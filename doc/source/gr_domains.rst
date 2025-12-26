@@ -316,6 +316,10 @@ Polynomial rings
     over the given *base_ring*.
     Elements have type :type:`gr_poly_struct`.
 
+.. function:: void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random univariate polynomial ring.
+
 .. function:: void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate
@@ -330,11 +334,30 @@ Polynomial rings
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
 
+.. function:: void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random multivariate polynomial ring.
+
+Ore polynomials
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_gr_ore_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
+
+    Initializes *ctx* to a ring of densely represented Ore polynomials over the
+    given *base_ring*, with the choice of Ore algebra structure given by
+    *which_algebra*. The Ore algebra structure may refer to a distinguished
+    generator of *base_ring*; this will be the generator of index *base_var*.
+    Elements have type :type:`gr_ore_poly_struct`.
+
 Power series
 -------------------------------------------------------------------------------
 
 See :func:`gr_series_ctx_init` and :func:`gr_series_mod_ctx_init`
 in :ref:`gr-series`.
+
+.. function:: void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random power series ring.
 
 Fraction fields
 -------------------------------------------------------------------------------
