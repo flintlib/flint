@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
         flint_abort();
     N = (1 << n);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     ca_ctx_init(ctx);
     poly = _ca_vec_init(N + 1, ctx);
     swinnerton_dyer_poly(poly, n, N + 1, ctx);
@@ -116,8 +116,8 @@ int main(int argc, char *argv[])
     ca_ctx_clear(ctx);
 
     flint_printf("\n");
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     flint_cleanup();
     return 0;

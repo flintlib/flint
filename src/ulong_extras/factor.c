@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,75 +11,198 @@
 */
 
 #include "ulong_extras.h"
+#include "factor_tables.h"
 
-static int is_prime(ulong n, int proved)
+static int n_is_oddprime_small2(ulong n)
 {
-    return proved ? n_is_prime(n) : n_is_probabprime(n);
+    ulong q = n / 2;
+    ulong x = (q & 63);
+    return (flint_odd_prime_lookup[q / 64] & (((uint64_t) 1) << x)) >> x;
 }
 
-void n_factor(n_factor_t * factors, ulong n, int proved)
+#define APPEND_FACTOR(prime, exponent) \
+    do \
+    { \
+        fac->p[fac->num] = (prime); \
+        fac->exp[fac->num] = (exponent); \
+        fac->num++; \
+    } while (0)
+
+#define REMOVE_ODD_TRIAL_PRIME(i) \
+    do { \
+        ulong inv1 = flint_trial_primes_inv1[i]; \
+        ulong inv2 = flint_trial_primes_inv2[i]; \
+        if (n_divisible_odd_gm(x, inv1, inv2)) \
+        { \
+            exp = 1; \
+            x *= inv1; \
+            while ((n_divisible_odd_gm(x, inv1, inv2))) \
+            { \
+                exp++; \
+                x *= inv1; \
+            } \
+            APPEND_FACTOR(flint_trial_primes[i], exp); \
+            if (x == 1) \
+                return; \
+            if (x < SMALL_ODDPRIME_LIMIT && n_is_oddprime_small2(x)) \
+            { \
+                APPEND_FACTOR(x, 1); \
+                return; \
+            } \
+        } \
+    } while (0)
+
+/* Currently P+1 does not seem to save anything. */
+#define USE_PP1 0
+
+static
+ulong n_factor_composite_after_trial(ulong n)
 {
-   ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
-   ulong exp_arr[FLINT_MAX_FACTORS_IN_LIMB];
-   ulong factors_left;
-   ulong exp;
-   ulong cofactor, factor, cutoff;
+    ulong f;
 
-   factors->num = 0;
+    if (n > FLINT_FACTOR_POLLARD_BRENT_MIN)
+        if (n_factor_pollard_brent_single(&f, n, 1, 1, FLINT_FACTOR_POLLARD_BRENT_ITERS) == 1)
+            return f;
 
-   cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
-   if (cofactor == UWORD(1)) return;
-   if (is_prime(cofactor, proved))
-   {
-      n_factor_insert(factors, cofactor, UWORD(1));
-      return;
-   }
-
-   factor_arr[0] = cofactor;
-   factors_left = 1;
-   exp_arr[0] = 1;
-
-   cutoff = FLINT_FACTOR_TRIAL_CUTOFF;
-
-   while (factors_left > 0)
-   {
-      factor = factor_arr[factors_left - 1];
-
-      if (factor >= cutoff)
-      {
-     if ((cofactor = n_factor_power235(&exp, factor)))
-         {
-            exp_arr[factors_left - 1] *= exp;
-            factor_arr[factors_left - 1] = factor = cofactor;
-         }
-
-         if ((factor >= cutoff) && !is_prime(factor, proved))
-         {
-        if ((
 #if FLINT64
-                 (factor < FLINT_FACTOR_ONE_LINE_MAX) &&
+    if (n < FLINT_FACTOR_ONE_LINE_MAX)
+        if ((f = n_factor_one_line(n, FLINT_FACTOR_ONE_LINE_ITERS)))
+            return f;
 #endif
-                 (cofactor = n_factor_one_line(factor, FLINT_FACTOR_ONE_LINE_ITERS)))
-              || (cofactor = n_factor_pp1_wrapper(factor))
-              || (cofactor = n_factor_SQUFOF(factor, FLINT_FACTOR_SQUFOF_ITERS)))
-        {
-           exp_arr[factors_left] = exp_arr[factors_left - 1];
-               factor_arr[factors_left] = cofactor;
-               factor_arr[factors_left - 1] /= cofactor;
-               factors_left++;
-            } else
-        {
-               flint_throw(FLINT_ERROR, "Exception (n_factor). Failed to factor %wd.\n", n);
-        }
-         } else
-     {
-        n_factor_insert(factors, factor, exp_arr[factors_left - 1]);
-            factors_left--;
-     }
-      } else
-      {
-     n_factor_insert(factors, factor, exp_arr[factors_left - 1]);
-         factors_left--;
-      }
-   }
+
+#if USE_PP1
+    if ((f = n_factor_pp1_wrapper2(n)))
+        return f;
+#endif
+
+    if ((f = n_factor_SQUFOF(n, FLINT_FACTOR_SQUFOF_ITERS)))
+        return f;
+
+    flint_throw(FLINT_ERROR, "Exception (n_factor). Failed to factor %wu.\n", n);
 }
+
+static void n_factor_after_trial(n_factor_t * factors, ulong n, ulong cutoff)
+{
+    ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
+    ulong exp_arr[FLINT_MAX_FACTORS_IN_LIMB];
+    ulong factors_left;
+    ulong exp;
+    ulong cofactor, factor;
+
+    if (n == 1)
+        return;
+
+    if (n_is_prime_odd_no_trial(n))
+    {
+        n_factor_insert(factors, n, 1);
+        return;
+    }
+
+    cofactor = n;
+
+    factor_arr[0] = cofactor;
+    factors_left = 1;
+    exp_arr[0] = 1;
+
+    while (factors_left > 0)
+    {
+        factor = factor_arr[factors_left - 1];
+
+        if (factor >= cutoff)
+        {
+            if ((cofactor = n_factor_power235(&exp, factor)))
+            {
+                exp_arr[factors_left - 1] *= exp;
+                factor_arr[factors_left - 1] = factor = cofactor;
+            }
+
+            if (factor < cutoff || (factor != n && n_is_prime_odd_no_trial(factor)))
+            {
+                n_factor_insert(factors, factor, exp_arr[factors_left - 1]);
+                factors_left--;
+            }
+            else
+            {
+                cofactor = n_factor_composite_after_trial(factor);
+
+                exp_arr[factors_left] = exp_arr[factors_left - 1];
+                factor_arr[factors_left] = cofactor;
+                factor_arr[factors_left - 1] /= cofactor;
+                factors_left++;
+            }
+        }
+        else
+        {
+            n_factor_insert(factors, factor, exp_arr[factors_left - 1]);
+            factors_left--;
+        }
+    }
+}
+
+void
+n_factor(n_factor_t * fac, ulong x, int FLINT_UNUSED(proved))
+{
+    slong i, exp;
+
+    fac->num = 0;
+
+    if (x <= 1)
+        return;
+
+    if (x % 2 == 0)
+    {
+        exp = flint_ctz(x);
+        x >>= exp;
+        APPEND_FACTOR(2, exp);
+        if (x == 1)
+            return;
+    }
+
+    if (x < SMALL_ODDPRIME_LIMIT && n_is_oddprime_small2(x))
+    {
+        APPEND_FACTOR(x, 1);
+        return;
+    }
+
+    /* Simplify unrolling by 2 */
+    FLINT_ASSERT(FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST % 2 == 0);
+    FLINT_ASSERT(FLINT_FACTOR_TRIAL_PRIMES % 2 == 0);
+
+    i = 1;
+    if (x % 3 == 0)
+        REMOVE_ODD_TRIAL_PRIME(1);
+
+    for (i = 2; i < FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST; i += 2)
+    {
+        /* Manually unroll by two for performance */
+        REMOVE_ODD_TRIAL_PRIME(i);
+        REMOVE_ODD_TRIAL_PRIME(i + 1);
+
+        if (x <= (ulong) flint_trial_primes[i+1] * (ulong) flint_trial_primes[i+1])
+        {
+            APPEND_FACTOR(x, 1);
+            return;
+        }
+    }
+
+    if (n_is_prime_odd_no_trial(x))
+    {
+        APPEND_FACTOR(x, 1);
+        return;
+    }
+
+    for ( ; i < FLINT_FACTOR_TRIAL_PRIMES; i += 2)
+    {
+        REMOVE_ODD_TRIAL_PRIME(i);
+        REMOVE_ODD_TRIAL_PRIME(i + 1);
+
+        if (x <= (ulong) flint_trial_primes[i+1] * (ulong) flint_trial_primes[i+1])
+        {
+            APPEND_FACTOR(x, 1);
+            return;
+        }
+    }
+
+    n_factor_after_trial(fac, x, FLINT_FACTOR_TRIAL_CUTOFF);
+}
+

@@ -29,7 +29,7 @@ TEST_FUNCTION_START(n_factor_pollard_brent, state)
                     prime1 = n_randtest_bits(state, l);
                     prime2 = n_randtest_bits(state, i);
                     primeprod = prime1 * prime2;
-                } while (primeprod < 1);
+                } while (primeprod < 1 || primeprod % 2 == 0);
 
                 k = n_factor_pollard_brent(&fac, state, primeprod, 5, 2500);
 

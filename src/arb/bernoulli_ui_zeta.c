@@ -10,8 +10,14 @@
 */
 
 #include "arb.h"
+#include "acb_dirichlet.h"
 
-void arb_zeta_inv_ui_euler_product(arb_t z, ulong s, slong prec);
+static void
+arb_zeta_inv_ui_euler_product(arb_t z, ulong s, slong prec)
+{
+    const signed char chi[1] = {1};
+    _acb_dirichlet_euler_product_real_ui(z, s, chi, 1, 1, prec);
+}
 
 void
 arb_bernoulli_ui_zeta(arb_t b, ulong n, slong prec)

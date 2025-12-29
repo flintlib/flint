@@ -16,13 +16,13 @@
 
 void p_is_prime_repeat(fmpz_t n)
 {
-    TIMEIT_START
+    TIMEIT_START;
     if (aprcl_is_prime(n) == 0)
     {
         flint_printf("Primality test failed\n");
         flint_abort();
     }
-    TIMEIT_STOP
+    TIMEIT_STOP;
 }
 
 int main(void)

@@ -122,13 +122,13 @@ int main(void)
             flint_set_num_threads(1);
 
             flint_cleanup();
-            TIMEIT_ONCE_START
+            TIMEIT_ONCE_START;
             doit(res, x, n, function, prec);
             TIMEIT_ONCE_STOP_VALUES(tcpu, twall);
             printf("%12.3g", twall);
             fflush(stdout);
 
-            TIMEIT_START
+            TIMEIT_START;
             doit(res, x, n, function, prec);
             TIMEIT_STOP_VALUES(tcpu, twall);
             printf("%12.3g", twall);
@@ -137,13 +137,13 @@ int main(void)
             flint_set_num_threads(8);
 
             flint_cleanup();
-            TIMEIT_ONCE_START
+            TIMEIT_ONCE_START;
             doit(res, x, n, function, prec);
             TIMEIT_ONCE_STOP_VALUES(tcpu, twall);
             printf("%12.3g", twall);
             fflush(stdout);
 
-            TIMEIT_START
+            TIMEIT_START;
             doit(res, x, n, function, prec);
             TIMEIT_STOP_VALUES(tcpu, twall);
             printf("%12.3g", twall);

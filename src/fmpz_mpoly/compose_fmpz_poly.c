@@ -55,7 +55,7 @@ static int _fmpz_poly_pow_ui_is_not_feasible(const fmpz_poly_t b, ulong e)
     }
 }
 
-int _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
+static int _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
                       fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctx)
 {
     int success = 1;
@@ -150,7 +150,7 @@ cleanup_degrees:
 }
 
 
-int _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
+static int _fmpz_mpoly_compose_fmpz_poly_mp(fmpz_poly_t A, const fmpz_mpoly_t B,
                       fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctx)
 {
     int success = 1;

@@ -2,87 +2,110 @@ name: CI
 
 on:
   pull_request:
+    paths:
+      - '.github/workflows/CI.yml'
+      - 'src/**'
+      - 'examples/**'
+      - 'acinclude.m4'
+      - 'bootstrap.sh'
+      - 'CMakeLists.txt'
+      - 'config/**'
+      - 'configure.ac'
+      - 'Makefile.in'
   push:
+    paths:
+      - '.github/workflows/CI.yml'
+      - 'src/**'
+      - 'examples/**'
+      - 'acinclude.m4'
+      - 'bootstrap.sh'
+      - 'CMakeLists.txt'
+      - 'config/**'
+      - 'configure.ac'
+      - 'Makefile.in'
 
 env:
   GLOBAL_MULTIPLIER: 1
 
 concurrency:
-  # group by workflow and ref; the last slightly strange component ensures that for pull
-  # requests, we limit to 1 concurrent job, but for the main branch we don't
+  # Group by workflow and ref, and to limit to 1 concurrent job except for main
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
-  # Cancel intermediate builds, but only if it is a pull request build.
+  # Cancel intermediate builds for pull requests
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  ##############################################################################
-  # ubuntu, gcc, code coverage
-  ##############################################################################
-  ubuntu-codecoverage:
-    name: Ubuntu GCC, Code Coverage (x10)
-
+  assert-ntl-msolve-nemo:
+    name: NTL, msolve and Nemo.jl
     runs-on: ubuntu-24.04
-
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "10"
-
+      TESTCOEFF: "0.1"
     steps:
-      - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
       - name: "Setup"
         run: |
-          sudo apt-get install -y \
-            libgmp-dev \
-            libmpfr-dev \
-            autoconf \
-            libtool-bin \
-            lcov
+          sudo apt-get install -y libgmp-dev libmpfr-dev libntl-dev autoconf libtool-bin
+          $CC --version
+          make --version
+          autoconf --version
+          libtool --version
+          julia --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+      - name: "Build FLINT for msolve"
+        run: |
+          ./bootstrap.sh && ./configure CC=${CC} --with-ntl --enable-assert
+          $MAKE && sudo make install && sudo ldconfig
+      - name: "Test msolve"
+        run: |
+          git clone --depth=1 https://github.com/algebraic-solving/msolve
+          cd msolve/ && ./autogen.sh && ./configure && $MAKE && make check
+      - name: "Build FLINT for Nemo"
+        run: |
+          gmp_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(gmp_artifact_dir())')
+          mpfr_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(mpfr_artifact_dir())')
+          echo "Path to GMP and MPFR: ${gmp_path}, ${mpfr_path}"
+          ./bootstrap.sh && ./configure CC=${CC} --with-gmp=$gmp_path --with-mpfr=$mpfr_path && $MAKE
+          mkdir lib
+          cp libflint.so* lib/
+      - name: "Test Nemo.jl"
+        run: |
+          git clone --depth 1 https://github.com/Nemocas/Nemo.jl.git
+          mkdir -p ~/.julia/artifacts
+          echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"$(pwd)\"" > ~/.julia/artifacts/Overrides.toml
+          julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\"); Pkg.test(\"Nemo\")"
 
-          # Check versions
-          gcc --version
+  ubuntu-codecov:
+    name: codecov (x10)
+    runs-on: ubuntu-24.04
+    env:
+      CC: "gcc"
+      TESTCOEFF: "10"
+    steps:
+      - name: "Rescale multiplier"
+        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
+      - uses: actions/checkout@v5
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin lcov
+          $CC --version
           make --version
           autoconf --version
           libtool --version
           lcov --version
           python3 --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
       - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --enable-avx2 \
-            --enable-coverage
-
+        run: ./bootstrap.sh && ./configure CC=${CC} --enable-avx2 --enable-coverage
       - name: "Compile library"
-        run: |
-          $MAKE
-          ldd libflint.so
-
+        run: $MAKE && ldd libflint.so
       - name: "Compile tests"
-        run: |
-          $MAKE tests
-
+        run: $MAKE tests
       - name: "Check"
-        run: |
-          $MAKE check
-
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
       - name: "Check Python"
-        run: |
-          $MAKE check PYTHON=1
-
+        run: $MAKE check PYTHON=1
       - name: "Gather coverage data"
-        run: |
-          $MAKE coverage
-
+        run: $MAKE coverage
       - name: "Upload coverage data"
         uses: codecov/codecov-action@v5
         if: github.repository == 'flintlib/flint'
@@ -90,264 +113,93 @@ jobs:
           files: build/coverage/coverage.info
           token: ${{ secrets.CODECOV_TOKEN }}
 
-
-
-  ##############################################################################
-  # gcc build check no regressions
-  ##############################################################################
-  gcc-build-regression-check:
-    name: GCC build regression check (no tests)
-
+  regression-check:
+    name: Regression check
     runs-on: ubuntu-24.04
-
     env:
       CC: "gcc"
       CFLAGS: "-march=native -std=c11 -Wall -Wextra -Werror"
       MODULES: "build/thread_pool_merged.lo build/thread_support_merged.lo build/ulong_extras_merged.lo build/long_extras_merged.lo build/perm_merged.lo build/double_extras_merged.lo build/d_vec_merged.lo build/d_mat_merged.lo build/mpn_extras_merged.lo build/nmod_merged.lo build/nmod_vec_merged.lo build/nmod_mat_merged.lo build/nmod_poly_merged.lo build/mpn_mod_merged.lo build/fmpz_merged.lo build/fmpz_vec_merged.lo build/fmpz_mat_merged.lo build/fmpz_poly_merged.lo build/fmpz_mod_merged.lo build/fmpz_mod_vec_merged.lo build/fmpz_mod_mat_merged.lo build/fmpz_mod_poly_merged.lo build/fmpq_merged.lo build/fmpq_vec_merged.lo build/fmpq_mat_merged.lo build/fmpq_poly_merged.lo build/fq_merged.lo build/fq_vec_merged.lo build/fq_mat_merged.lo build/fq_poly_merged.lo build/fq_nmod_merged.lo build/fq_nmod_vec_merged.lo build/fq_nmod_mat_merged.lo build/fq_nmod_poly_merged.lo build/fq_zech_merged.lo build/fq_zech_mat_merged.lo build/fq_zech_poly_merged.lo build/fq_default_merged.lo build/fq_default_mat_merged.lo build/fq_default_poly_merged.lo build/fq_embed_merged.lo build/fq_nmod_embed_merged.lo build/fq_zech_embed_merged.lo build/padic_merged.lo build/padic_mat_merged.lo build/padic_poly_merged.lo build/qadic_merged.lo build/nmod_poly_factor_merged.lo build/fmpz_factor_merged.lo build/fmpz_poly_factor_merged.lo build/fmpz_mod_poly_factor_merged.lo build/fq_poly_factor_merged.lo build/fq_nmod_poly_factor_merged.lo build/fq_zech_poly_factor_merged.lo build/fq_default_poly_factor_merged.lo build/nmod_poly_mat_merged.lo build/fmpz_poly_mat_merged.lo build/mpoly_merged.lo build/nmod_mpoly_merged.lo build/fmpz_mpoly_merged.lo build/fmpz_mod_mpoly_merged.lo build/fmpq_mpoly_merged.lo build/fq_nmod_mpoly_merged.lo build/fq_zech_mpoly_merged.lo build/nmod_mpoly_factor_merged.lo build/fmpz_mpoly_factor_merged.lo build/fmpz_mod_mpoly_factor_merged.lo build/fmpq_mpoly_factor_merged.lo build/fq_nmod_mpoly_factor_merged.lo build/fq_zech_mpoly_factor_merged.lo build/fft_merged.lo build/fft_small_merged.lo"
       # Everything until fmpz_poly_q
-
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
       - name: "Setup"
         run: |
           sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin
-          gcc --version
+          $CC --version
           make --version
           autoconf --version
           libtool --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
       - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            CFLAGS="${CFLAGS}" \
-            --disable-debug
-
+        run: ./bootstrap.sh && ./configure CC=${CC} CFLAGS="${CFLAGS}" --disable-debug
       - name: "Check regression in a subset of modules"
-        run: |
-          $MAKE $MODULES
+        run: $MAKE $MODULES
 
-
-
-  ##############################################################################
-  # ubuntu gcc with assert
-  ##############################################################################
-  ubuntu-gcc-assert:
-    name: Ubuntu GCC with NTL and checking msolve (assert, x2)
-
-    runs-on: ubuntu-24.04
-
-    env:
-      CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "2"
-
-    steps:
-      - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-
-      - name: "Setup"
-        run: |
-          sudo apt-get install -y libgmp-dev libmpfr-dev libntl-dev autoconf libtool-bin
-          gcc --version
-          make --version
-          autoconf --version
-          libtool --version
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
-      - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --with-ntl \
-            --enable-assert \
-            --disable-debug
-
-      - name: "Compile library"
-        run: |
-          $MAKE
-          ldd libflint.so
-
-      - name: "Compile tests"
-        run: |
-          $MAKE tests
-
-      - name: "Check"
-        run: |
-          $MAKE check
-
-      - name: "Install"
-        run: |
-          sudo make install
-          sudo ldconfig
-
-      - name: "Fetch msolve"
-        run: |
-          git clone --depth=1 https://github.com/algebraic-solving/msolve
-
-      - name: "Configure msolve"
-        working-directory: ./msolve
-        run: |
-          ./autogen.sh
-          ./configure
-
-      - name: "Build msolve"
-        working-directory: ./msolve
-        run: |
-          $MAKE
-
-      - name: "Check msolve"
-        working-directory: ./msolve
-        run: |
-          $MAKE check
-
-
-  ##############################################################################
-  # ubuntu arm
-  ##############################################################################
   ubuntu-arm:
-    name: Ubuntu ARM (x5)
-
+    name: ARM (x0.5)
     runs-on: ubuntu-24.04-arm
-
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "5"
-
+      TESTCOEFF: "0.5"
     steps:
       - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-
+        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
+      - uses: actions/checkout@v5
       - name: "Setup"
         run: |
-          sudo apt-get install -y \
-            libgmp-dev \
-            libmpfr-dev \
-            autoconf \
-            libtool-bin
-
-          # Check versions
-          gcc --version
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin
+          $CC --version
           make --version
           autoconf --version
           libtool --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
       - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --disable-debug
-
+        run: ./bootstrap.sh && ./configure CC=${CC} --disable-debug
       - name: "Compile library"
-        run: |
-          $MAKE
-          ldd libflint.so
-
+        run: $MAKE && ldd libflint.so
       - name: "Compile tests"
-        run: |
-          $MAKE tests
-
+        run: $MAKE tests
       - name: "Check"
-        run: |
-          $MAKE check
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
 
-
-
-  ##############################################################################
-  # macos (M1) with clang
-  ##############################################################################
   macos-m1:
-    name: macOS-M1, Clang (x3)
-
-    runs-on: macos-15
-
+    name: M1 (x0.5)
+    runs-on: macos-26
     env:
-      FLINT_TEST_MULTIPLIER: "3"
-
+      TESTCOEFF: "0.5"
     steps:
       - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-
+        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
+      - uses: actions/checkout@v5
       - name: "Setup"
         run: |
-          # GMP and MPFR are already installed, and it complains if we try to
-          # install it.
-          #   brew install gmp
-          #   brew install mpfr
-          brew install make
-          brew install autoconf
-          brew install libtool
-          brew install automake
-          brew install llvm
+          brew install make autoconf libtool automake llvm
           $(brew --prefix llvm)/bin/clang --version
           gmake --version
           autoconf --version
           echo "MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target" >> $GITHUB_ENV
-
       - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=$(brew --prefix llvm)/bin/clang \
-            --with-gmp=$(brew --prefix) \
-            --with-mpfr=$(brew --prefix) \
-            --disable-debug
-
+        run: ./bootstrap.sh && ./configure CC=$(brew --prefix llvm)/bin/clang --with-gmp=$(brew --prefix) --with-mpfr=$(brew --prefix) --disable-debug
       - name: "Compile library"
-        run: |
-          $MAKE
-
+        run: $MAKE
       - name: "Compile tests"
-        run: |
-          $MAKE tests
-
+        run: $MAKE tests
+      - name: "Compile profiles"
+        run: $MAKE profile
       - name: "Check"
-        run: |
-          $MAKE check
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
 
-
-
-  #############################################################################
-  # ubuntu with clang and BLAS
-  #############################################################################
   ubuntu-clang:
-    name: Ubuntu Clang, BLAS and examples (x5)
-
+    name: BLAS, examples (x1)
     runs-on: ubuntu-24.04
-
     env:
       CC: "clang"
-      FLINT_TEST_MULTIPLIER: "5"
-
+      TESTCOEFF: "1"
     steps:
       - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-
+        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
+      - uses: actions/checkout@v5
       - name: "Setup"
         run: |
           sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin perl libopenblas-dev
@@ -355,72 +207,39 @@ jobs:
           make --version
           autoconf --version
           libtool --version
-          perl --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
       - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --with-blas \
-            --disable-debug
-
+        run: ./bootstrap.sh && ./configure CC=${CC} --with-blas --disable-debug
       - name: "Compile library"
-        run: |
-          $MAKE
-          ldd libflint.so
-
+        run: $MAKE && ldd libflint.so
       - name: "Compile tests"
-        run: |
-          $MAKE tests
-
+        run: $MAKE tests
       - name: "Check"
-        run: |
-          $MAKE check
-
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
       - name: "Compile examples"
-        run: |
-          $MAKE examples
-
+        run: $MAKE examples
       - name: "Check examples"
-        run: |
-          $MAKE checkexamples
+        run: $MAKE checkexamples
 
-
-
-  #############################################################################
-  # mingw with gcc
-  #############################################################################
   mingw64-gcc:
-    name: MinGW GCC (x0.5)
-
+    name: MinGW (x0.5)
     runs-on: windows-latest
-
     defaults:
       run:
         shell: msys2 {0}
-
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "0.5"
-
+      TESTCOEFF: "0.5"
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
       - name: "Setup MinGW"
         uses: msys2/setup-msys2@v2
         with:
           msystem: mingw64
           update: true
           install: bc mingw-w64-x86_64-gcc mingw-w64-x86_64-autotools
-
       - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
+        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
       - name: "Setup"
         run: |
           gcc --version
@@ -428,71 +247,42 @@ jobs:
           autoconf --version
           libtool --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
       - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --disable-debug
-
+        run: ./bootstrap.sh && ./configure CC=${CC} --enable-fast-build --disable-debug
       - name: "Compile library"
-        run: |
-          ${MAKE}
-
+        run: $MAKE
       - name: "Compile tests"
-        run: |
-          ${MAKE} tests
-
+        run: $MAKE tests
       - name: "Check"
-        run: |
-          ${MAKE} check
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
 
-
-
-  ##############################################################################
-  # msvc
-  ##############################################################################
   msvc:
-    name: MSVC (x1)
-
+    name: MSVC (x0.5)
     runs-on: windows-latest
     env:
-      FLINT_TEST_MULTIPLIER: 1
-      TIMEOUT: 150
-
+      TESTCOEFF: "0.5"
     steps:
-      - name: "Rescale multiplier (powershell)"
+      - name: "Rescale multiplier"
         run: |
-          $FLINT_TEST_MULTIPLIER = $env:FLINT_TEST_MULTIPLIER * $env:GLOBAL_MULTIPLIER
-          echo "FLINT_TEST_MULTIPLIER=$FLINT_TEST_MULTIPLIER | Out-File -Append -FilePath $env:GITHUB_ENV"
-          $TIMEOUT = $env:TIMEOUT * $env:GLOBAL_MULTIPLIER
-          echo "TIMEOUT=$TIMEOUT | Out-File -Append -FilePath $env:GITHUB_ENV"
-        shell: powershell
-
-      - uses: actions/checkout@v4
-
-      - name: "Setup cache for dependencies"
-        uses: actions/github-script@v7
+          $TESTCOEFF = $env:TESTCOEFF * $env:GLOBAL_MULTIPLIER
+          echo "FLINT_TEST_MULTIPLIER=$TESTCOEFF" | Out-File -Append -FilePath $env:GITHUB_ENV
+      - uses: actions/checkout@v5
+      - name: "Cache vcpkg packages"
+        uses: actions/cache@v4
         with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
-
-      - name: "Install dependencies"
-        run: |
-          vcpkg install gmp mpfr pthreads --binarysource="clear;x-gha,readwrite"
-
+          path: ${{ runner.temp }}\vcpkg\archives
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+      - name: "Install vcpkg packages"
+        run: vcpkg install gmp mpfr pthreads --binarysource="clear;files,${{ runner.temp }}\vcpkg\archives,readwrite"
       - name: "Setup MSVC"
         uses: ilammy/msvc-dev-cmd@v1.13.0
         with:
           arch: x86_64
-
       - name: "Configure"
         run: |
-          mkdir build
-          cd build
-          # For single build, we need atomics
+          mkdir build; cd build
           cmake `
             -G "Ninja" `
             -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
@@ -500,58 +290,33 @@ jobs:
             -DBUILD_TESTING=ON `
             -DCMAKE_BUILD_TYPE=Release `
             ..
-
       - name: "Build"
-        run: |
-          cd build
-          # NOTE: Number of threads for Github's CI runners are 4.
-          cmake --build . -j5
-
+        run: cd build; cmake --build . -j5
       - name: "Check"
         run: |
           cd build
           set "FLINT_TEST_MULTIPLIER=$env:FLINT_TEST_MULTIPLIER"
-          ctest -j5 --output-on-failure --timeout $env:TIMEOUT
-        shell: powershell
+          ctest -j5 --output-on-failure
 
-
-
-  ##############################################################################
-  # alpine linux, musl, 32-bit (assert)
-  ##############################################################################
   alpine-32bit:
-    name: Alpine Linux, musl, 32-bit (assert, x1.5)
-
+    name: 32-bit, musl, assert (x2.5)
     runs-on: ubuntu-24.04
-
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "1.5"
-
+      TESTCOEFF: "2.5"
+    defaults:
+      run:
+        shell: alpine.sh {0}
     steps:
-      - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
       - name: "Setup latest Alpine Linux"
         uses: jirutka/setup-alpine@v1
         with:
           arch: x86
           branch: edge
-          packages: >
-            gmp-dev
-            mpfr-dev
-            gcc
-            musl-dev
-            make
-            autoconf
-            automake
-            libtool
-
+          packages: gmp-dev mpfr-dev gcc musl-dev make autoconf automake libtool
+      - name: "Rescale multiplier"
+        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
       - name: "Setup"
         run: |
           gcc --version
@@ -559,114 +324,11 @@ jobs:
           autoconf --version
           libtool --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-        shell: alpine.sh {0}
-
       - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --enable-assert \
-            --disable-debug
-        shell: alpine.sh {0}
-
+        run: ./bootstrap.sh && ./configure CC=${CC} --enable-assert --disable-debug
       - name: "Compile library"
-        run: |
-          $MAKE
-        shell: alpine.sh {0}
-
+        run: $MAKE
       - name: "Compile tests"
-        run: |
-          $MAKE tests
-        shell: alpine.sh {0}
-
+        run: $MAKE tests
       - name: "Check"
-        run: |
-          $MAKE check
-        shell: alpine.sh {0}
-
-
-
-  ##############################################################################
-  # nemo
-  ##############################################################################
-  nemo:
-    name: Nemo.jl
-
-    runs-on: ubuntu-24.04
-
-    env:
-      LOCAL: ${{ github.workspace }}/local
-      CC: "gcc"
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: "Setup"
-        run: |
-          sudo apt-get install -y sed
-          sudo apt-get install -y autoconf
-          sudo apt-get install -y libtool-bin
-          gcc --version
-          make --version
-          autoconf --version
-          libtool --version
-          julia --version
-          julia -e 'println(Base.BinaryPlatforms.HostPlatform())'
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
-      - name: "Configure"
-        run: |
-          # Find path to GMP and MPFR
-          gmp_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(gmp_artifact_dir())')
-          echo "Path to GMP: ${gmp_path}"
-          mpfr_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(mpfr_artifact_dir())')
-          echo "Path to MPFR: ${mpfr_path}"
-
-          # Make sure that we output an soname which corresponds to FLINT_JLL's
-          # soname
-          wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
-          FLINT_JLL_VERSION=$(grep "upstream_version =" build_tarballs.jl | sed "s/upstream_version = v\"\([0-9\.]*\)\"/\1/")
-          FLINT_JLL_SONAME=$(grep "$FLINT_JLL_VERSION => " configure.ac | sed "s/# $FLINT_JLL_VERSION => \([0-9\.]\+\)/\1/")
-          FLINT_JLL_MAJOR=$(echo $FLINT_JLL_SONAME | sed "s/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/")
-          FLINT_JLL_MINOR=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.\([0-9]\+\)\.[0-9]\+/\1/")
-          FLINT_JLL_PATCH=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.[0-9]\+\.\([0-9]\+\)/\1/")
-          sed -i "s/^\(FLINT_MAJOR_SO=\)[0-9]\+/\1$FLINT_JLL_MAJOR/" configure.ac
-          sed -i "s/^\(FLINT_MINOR_SO=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure.ac
-          sed -i "s/^\(FLINT_PATCH_SO=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure.ac
-
-          # Now we can configure FLINT. However, recent versions of MPFR_jll has
-          # memory sanitation which messes with finding mpfr_init in the
-          # configure-script. Hence, we also omit the check for finding MPFR.
-          # FIXME: Probably want to fix this.
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --prefix=${LOCAL} \
-            --with-gmp=${gmp_path} \
-            --with-mpfr=${mpfr_path} \
-            --disable-mpfr-check \
-            --disable-debug
-
-      - name: "Compile and install"
-        run: |
-          $MAKE
-          $MAKE install
-
-      - name: "Set up Nemo.jl"
-        run: |
-          # # Use Nemo's master branch
-          # git clone https://github.com/Nemocas/Nemo.jl.git
-
-          # Use temporary branch
-          git clone -b flint_matrix_stride --depth 1 https://github.com/albinahlback/Nemo.jl.git
-
-          # Override FLINT_jll's libflint with ours
-          julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\");"
-          echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"${LOCAL}\"" > ~/.julia/artifacts/Overrides.toml
-          touch Nemo.jl/src/Nemo.jl
-          julia -e "using Nemo; println(\"Path to Nemo's libflint:\", Nemo.libflint)"
-
-      - name: "Check Nemo.jl"
-        run: |
-          julia -e "import Pkg; Pkg.test(\"Nemo\")"
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check

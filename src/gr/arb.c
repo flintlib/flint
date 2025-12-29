@@ -13,6 +13,7 @@
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "arb_poly.h"
+#include "arb_poly/impl.h"
 #include "acb_poly.h"
 #include "arb_mat.h"
 #include "arb_fmpz_poly.h"
@@ -20,6 +21,7 @@
 #include "fmpzi.h"
 #include "qqbar.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -34,7 +36,7 @@ gr_arb_ctx;
 #define ARB_CTX_PREC(ring_ctx) (((gr_arb_ctx *)((ring_ctx)))->prec)
 
 #define DEF_FUNC(fname) \
-int \
+static int \
 _gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
 { \
     arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
@@ -42,7 +44,7 @@ _gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
 } \
 
 #define DEF_FUNC_NOPREC(fname) \
-int \
+static int \
 _gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
 { \
     arb_ ## fname(res, x); \
@@ -51,7 +53,7 @@ _gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
 
 
 #define DEF_2FUNC(fname) \
-int \
+static int \
 _gr_arb_ ## fname(arb_t res1, arb_t res2, const arb_t x, const gr_ctx_t ctx) \
 { \
     arb_ ## fname(res1, res2, x, ARB_CTX_PREC(ctx)); \
@@ -59,7 +61,7 @@ _gr_arb_ ## fname(arb_t res1, arb_t res2, const arb_t x, const gr_ctx_t ctx) \
 } \
 
 #define DEF_FUNC2(fname) \
-int \
+static int \
 _gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
 { \
     arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
@@ -67,7 +69,7 @@ _gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
 } \
 
 #define DEF_FUNC_SING(fname) \
-int \
+static int \
 _gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
 { \
     arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
@@ -75,14 +77,14 @@ _gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
 } \
 
 #define DEF_FUNC2_SING(fname) \
-int \
+static int \
 _gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
 { \
     arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
 } \
 
-int _gr_arb_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+static int _gr_arb_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
     prec = FLINT_MAX(prec, 2);
     prec = FLINT_MIN(prec, WORD_MAX / 8);
@@ -91,13 +93,13 @@ int _gr_arb_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
     return GR_SUCCESS;
 }
 
-int _gr_arb_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
+static int _gr_arb_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 {
     *res = ARB_CTX_PREC(ctx);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Real numbers (arb, prec = ");
@@ -106,19 +108,19 @@ _gr_arb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_arb_init(arb_t x, const gr_ctx_t ctx)
 {
     arb_init(x);
 }
 
-void
+static void
 _gr_arb_clear(arb_t x, const gr_ctx_t ctx)
 {
     arb_clear(x);
 }
 
-void
+static void
 _gr_arb_swap(arb_t x, arb_t y, const gr_ctx_t ctx)
 {
     arb_t t;
@@ -127,14 +129,14 @@ _gr_arb_swap(arb_t x, arb_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 _gr_arb_set_shallow(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
 /* todo: limits */
-int
+static int
 _gr_arb_randtest(arb_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     arb_randtest(res, state, ARB_CTX_PREC(ctx), 10);
@@ -142,7 +144,7 @@ _gr_arb_randtest(arb_t res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 /* todo */
-int
+static int
 _gr_arb_write(gr_stream_t out, const arb_t x, const gr_ctx_t ctx)
 {
     /* used by polynomial printing */
@@ -169,7 +171,7 @@ _gr_arb_write(gr_stream_t out, const arb_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
 {
     n = FLINT_MAX(n, 1);
@@ -177,21 +179,21 @@ _gr_arb_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_zero(arb_t x, const gr_ctx_t ctx)
 {
     arb_zero(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_one(arb_t x, const gr_ctx_t ctx)
 {
     arb_one(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_set_si(arb_t res, slong v, const gr_ctx_t ctx)
 {
     arb_set_si(res, v);
@@ -199,7 +201,7 @@ _gr_arb_set_si(arb_t res, slong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_set_ui(arb_t res, ulong v, const gr_ctx_t ctx)
 {
     arb_set_ui(res, v);
@@ -207,21 +209,21 @@ _gr_arb_set_ui(arb_t res, ulong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_set_fmpz(arb_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     arb_set_round_fmpz(res, v, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_set_fmpq(arb_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     arb_set_fmpq(res, v, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_set_str(arb_t res, const char * x, gr_ctx_t ctx)
 {
     if (!arb_set_str(res, x, ARB_CTX_PREC(ctx)))
@@ -230,7 +232,7 @@ _gr_arb_set_str(arb_t res, const char * x, gr_ctx_t ctx)
     return gr_generic_set_str_ring_exponents(res, x, ctx);
 }
 
-int
+static int
 _gr_arb_set_d(arb_t res, double x, const gr_ctx_t ctx)
 {
     arb_set_d(res, x);
@@ -242,10 +244,7 @@ _gr_arb_set_d(arb_t res, double x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
-_gr_ca_get_arb_with_prec(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, slong prec);
-
-int
+static int
 _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -339,7 +338,7 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
-int
+static int
 _gr_arb_set_interval_mid_rad(arb_t res, const arb_t m, const arb_t r, const gr_ctx_t ctx)
 {
     mag_t rad;
@@ -351,12 +350,7 @@ _gr_arb_set_interval_mid_rad(arb_t res, const arb_t m, const arb_t r, const gr_c
     return GR_SUCCESS;
 }
 
-/* xxx: assumes that ctx are not read */
-int _gr_arf_get_fmpz(fmpz_t res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx);
-int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
-
-int
+static int
 _gr_arb_get_fmpz(fmpz_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (!arb_is_int(x))
@@ -370,7 +364,7 @@ _gr_arb_get_fmpz(fmpz_t res, const arb_t x, const gr_ctx_t ctx)
     return _gr_arf_get_fmpz(res, arb_midref(x), NULL);
 }
 
-int
+static int
 _gr_arb_get_si(slong * res, const arb_t x, const gr_ctx_t ctx)
 {
     if (!arb_is_int(x))
@@ -384,7 +378,7 @@ _gr_arb_get_si(slong * res, const arb_t x, const gr_ctx_t ctx)
     return _gr_arf_get_si(res, arb_midref(x), NULL);
 }
 
-int
+static int
 _gr_arb_get_ui(ulong * res, const arb_t x, const gr_ctx_t ctx)
 {
     if (!arb_is_int(x))
@@ -398,14 +392,14 @@ _gr_arb_get_ui(ulong * res, const arb_t x, const gr_ctx_t ctx)
     return _gr_arf_get_ui(res, arb_midref(x), NULL);
 }
 
-int
+static int
 _gr_arb_get_d(double * res, const arb_t x, const gr_ctx_t ctx)
 {
     *res = arf_get_d(arb_midref(x), ARF_RND_NEAR);
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_arb_is_zero(const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_zero(x))
@@ -417,7 +411,7 @@ _gr_arb_is_zero(const arb_t x, const gr_ctx_t ctx)
     return T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_arb_is_one(const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_one(x))
@@ -432,7 +426,7 @@ _gr_arb_is_one(const arb_t x, const gr_ctx_t ctx)
     return T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_arb_is_neg_one(const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_equal_si(x, -1))
@@ -444,7 +438,7 @@ _gr_arb_is_neg_one(const arb_t x, const gr_ctx_t ctx)
     return T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_arb_equal(const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     if (arb_is_exact(x) && arb_equal(x, y))
@@ -464,105 +458,105 @@ DEF_FUNC2(addmul)
 DEF_FUNC2(submul)
 DEF_FUNC(sqr)
 
-int
+static int
 _gr_arb_add_si(arb_t res, const arb_t x, slong y, const gr_ctx_t ctx)
 {
     arb_add_si(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_add_ui(arb_t res, const arb_t x, ulong y, const gr_ctx_t ctx)
 {
     arb_add_ui(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_add_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arb_add_fmpz(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_sub_si(arb_t res, const arb_t x, slong y, const gr_ctx_t ctx)
 {
     arb_sub_si(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_sub_ui(arb_t res, const arb_t x, ulong y, const gr_ctx_t ctx)
 {
     arb_sub_ui(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_sub_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arb_sub_fmpz(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mul(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     arb_mul(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mul_si(arb_t res, const arb_t x, slong y, const gr_ctx_t ctx)
 {
     arb_mul_si(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mul_ui(arb_t res, const arb_t x, ulong y, const gr_ctx_t ctx)
 {
     arb_mul_ui(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mul_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arb_mul_fmpz(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mul_two(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_mul_2exp_si(res, x, 1);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mul_2exp_si(arb_t res, const arb_t x, slong y, const gr_ctx_t ctx)
 {
     arb_mul_2exp_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mul_2exp_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arb_mul_2exp_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_set_fmpz_2exp_fmpz(arb_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arb_set_fmpz_2exp(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const arb_t x, const gr_ctx_t ctx)
 {
     if (!arb_is_exact(x))
@@ -576,7 +570,7 @@ _gr_arb_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const arb_t x, const gr_ctx
 }
 
 
-int
+static int
 _gr_arb_inv(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_zero(x))
@@ -593,7 +587,7 @@ _gr_arb_inv(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_div(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     if (arb_is_zero(y))
@@ -611,7 +605,7 @@ _gr_arb_div(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_div_si(arb_t res, const arb_t x, slong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -625,7 +619,7 @@ _gr_arb_div_si(arb_t res, const arb_t x, slong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_div_ui(arb_t res, const arb_t x, ulong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -639,7 +633,7 @@ _gr_arb_div_ui(arb_t res, const arb_t x, ulong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_div_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -653,7 +647,7 @@ _gr_arb_div_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
     }
 }
 
-truth_t
+static truth_t
 _gr_arb_is_invertible(const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_zero(x))
@@ -665,14 +659,14 @@ _gr_arb_is_invertible(const arb_t x, const gr_ctx_t ctx)
     return T_TRUE;
 }
 
-int
+static int
 _gr_arb_pow_ui(arb_t res, const arb_t x, ulong exp, const gr_ctx_t ctx)
 {
     arb_pow_ui(res, x, exp, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_pow_si(arb_t res, const arb_t x, slong exp, const gr_ctx_t ctx)
 {
     if (exp < 0 && arb_is_zero(x))
@@ -693,7 +687,7 @@ _gr_arb_pow_si(arb_t res, const arb_t x, slong exp, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_pow_fmpz(arb_t res, const arb_t x, const fmpz_t exp, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(exp) < 0 && arb_is_zero(x))
@@ -711,7 +705,7 @@ _gr_arb_pow_fmpz(arb_t res, const arb_t x, const fmpz_t exp, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_pow_fmpq(arb_t res, const arb_t x, const fmpq_t exp, const gr_ctx_t ctx)
 {
     if (fmpq_sgn(exp) < 0 && arb_is_zero(x))
@@ -740,7 +734,7 @@ _gr_arb_pow_fmpq(arb_t res, const arb_t x, const fmpq_t exp, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_pow(arb_t res, const arb_t x, const arb_t exp, const gr_ctx_t ctx)
 {
     if (arb_is_int(exp))
@@ -776,13 +770,13 @@ _gr_arb_pow(arb_t res, const arb_t x, const arb_t exp, const gr_ctx_t ctx)
     }
 }
 
-truth_t
+static truth_t
 _gr_arb_is_square(const arb_t x, const gr_ctx_t ctx)
 {
     return T_TRUE;
 }
 
-int
+static int
 _gr_arb_sqrt(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_nonnegative(x))
@@ -800,7 +794,7 @@ _gr_arb_sqrt(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_rsqrt(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -825,21 +819,21 @@ DEF_FUNC(nint)
 DEF_FUNC_NOPREC(abs)
 DEF_FUNC_NOPREC(sgn)
 
-int
+static int
 _gr_arb_conj(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_set(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_im(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_zero(res);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_arg(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_nonnegative(x))
@@ -862,7 +856,7 @@ _gr_arb_arg(arb_t res, const arb_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_cmp(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     if ((arb_is_exact(x) && arb_is_exact(y)) || !arb_overlaps(x, y))
@@ -894,35 +888,35 @@ _gr_arb_cmpabs(int * res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
     return _gr_arb_cmp(res, t, u, ctx);
 }
 
-int
+static int
 _gr_arb_pi(arb_t res, const gr_ctx_t ctx)
 {
     arb_const_pi(res, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_euler(arb_t res, const gr_ctx_t ctx)
 {
     arb_const_euler(res, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_catalan(arb_t res, const gr_ctx_t ctx)
 {
     arb_const_catalan(res, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_khinchin(arb_t res, const gr_ctx_t ctx)
 {
     arb_const_khinchin(res, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_glaisher(arb_t res, const gr_ctx_t ctx)
 {
     arb_const_glaisher(res, ARB_CTX_PREC(ctx));
@@ -933,7 +927,7 @@ DEF_FUNC(exp)
 DEF_FUNC(expm1)
 DEF_FUNC_SING(log1p)
 
-int
+static int
 _gr_arb_log(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -987,14 +981,14 @@ DEF_FUNC(asinh)
 DEF_FUNC_SING(acosh)
 DEF_FUNC_SING(atanh)
 
-int
+static int
 _gr_arb_lambertw(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_lambertw(res, x, 0, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_lambertw_fmpz(arb_t res, const arb_t x, const fmpz_t k, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(k))
@@ -1012,196 +1006,196 @@ _gr_arb_lambertw_fmpz(arb_t res, const arb_t x, const fmpz_t k, const gr_ctx_t c
 
 /* todo: caching, e.g. if (x <= 1000) bernoulli_cache_compute(x + 1); */
 
-int
+static int
 _gr_arb_bernoulli_ui(arb_t res, ulong x, const gr_ctx_t ctx)
 {
     arb_bernoulli_ui(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_bernoulli_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     arb_bernoulli_fmpz(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_eulernum_ui(arb_t res, ulong x, const gr_ctx_t ctx)
 {
     arb_euler_number_ui(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_eulernum_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     arb_euler_number_fmpz(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_bellnum_ui(arb_t res, ulong x, const gr_ctx_t ctx)
 {
     arb_bell_ui(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_bellnum_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     arb_bell_fmpz(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_partitions_ui(arb_t res, ulong x, const gr_ctx_t ctx)
 {
     arb_partitions_ui(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_partitions_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     arb_partitions_fmpz(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_erf(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_erf(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_erfc(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_erfc(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_erfi(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_erfi(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_erfinv(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_erfinv(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_erfcinv(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_erfcinv(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_fresnel_s(arb_t res, const arb_t x, int normalized, const gr_ctx_t ctx)
 {
     arb_hypgeom_fresnel(res, NULL, x, normalized, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_fresnel_c(arb_t res, const arb_t x, int normalized, const gr_ctx_t ctx)
 {
     arb_hypgeom_fresnel(NULL, res, x, normalized, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_fresnel(arb_t res1, arb_t res2, const arb_t x, int normalized, const gr_ctx_t ctx)
 {
     arb_hypgeom_fresnel(res1, res2, x, normalized, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_gamma_upper(arb_t res, const arb_t x, const arb_t y, int regularized, const gr_ctx_t ctx)
 {
     arb_hypgeom_gamma_upper(res, x, y, regularized, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_gamma_lower(arb_t res, const arb_t x, const arb_t y, int regularized, const gr_ctx_t ctx)
 {
     arb_hypgeom_gamma_lower(res, x, y, regularized, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_beta_lower(arb_t res, const arb_t x, const arb_t y, const arb_t z, int regularized, const gr_ctx_t ctx)
 {
     arb_hypgeom_beta_lower(res, x, y, z, regularized, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_exp_integral(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     arb_hypgeom_expint(res, x, y, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_exp_integral_ei(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_ei(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_sin_integral(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_si(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_cos_integral(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_ci(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_sinh_integral(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_shi(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_cosh_integral(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_chi(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_log_integral(arb_t res, const arb_t x, int offset, const gr_ctx_t ctx)
 {
     arb_hypgeom_li(res, x, offset, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_dilog(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_dilog(res, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_gamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -1220,7 +1214,7 @@ _gr_arb_gamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_gamma_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(x) > 0)
@@ -1234,7 +1228,7 @@ _gr_arb_gamma_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_gamma_fmpq(arb_t res, const fmpq_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_is_one(fmpq_denref(x)) || fmpz_sgn(fmpq_numref(x)) > 0)
@@ -1248,21 +1242,21 @@ _gr_arb_gamma_fmpq(arb_t res, const fmpq_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_rgamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_rgamma(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_fac_ui(arb_t res, ulong x, const gr_ctx_t ctx)
 {
     arb_fac_ui(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_fac_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     int status;
@@ -1274,14 +1268,14 @@ _gr_arb_fac_fmpz(arb_t res, const fmpz_t x, const gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_arb_rising_ui(arb_t res, const arb_t x, ulong y, const gr_ctx_t ctx)
 {
     arb_rising_ui(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_rising(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     arb_rising(res, x, y, ARB_CTX_PREC(ctx));
@@ -1292,7 +1286,7 @@ _gr_arb_rising(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
         return GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_lgamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -1307,7 +1301,7 @@ _gr_arb_lgamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_digamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -1326,7 +1320,7 @@ _gr_arb_digamma(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_int(x) && arb_is_nonpositive(x))
@@ -1347,7 +1341,7 @@ _gr_arb_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arb_log_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_is_positive(x))
@@ -1370,27 +1364,27 @@ _gr_arb_log_barnes_g(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
-int _gr_arb_bessel_j(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_j(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
-int _gr_arb_bessel_y(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_y(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
-int _gr_arb_bessel_i(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_i(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
-int _gr_arb_bessel_k(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_k(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_bessel_j(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_j(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_bessel_y(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_y(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_bessel_i(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_i(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_bessel_k(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_k(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
 
-int _gr_arb_bessel_j_y(arb_t res1, arb_t res2, const arb_t x, const arb_t y, const gr_ctx_t ctx)
+static int _gr_arb_bessel_j_y(arb_t res1, arb_t res2, const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     arb_hypgeom_bessel_jy(res1, res2, x, y, ARB_CTX_PREC(ctx));
     return (arb_is_finite(res1) && arb_is_finite(res2)) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_bessel_i_scaled(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_i_scaled(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
-int _gr_arb_bessel_k_scaled(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_k_scaled(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_bessel_i_scaled(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_i_scaled(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_bessel_k_scaled(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) { arb_hypgeom_bessel_k_scaled(res, x, y, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
 
-int _gr_arb_airy(arb_t res1, arb_t res2, arb_t res3, arb_t res4, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(res1, res2, res3, res4, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
-int _gr_arb_airy_ai(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(res, NULL, NULL, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
-int _gr_arb_airy_ai_prime(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, res, NULL, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
-int _gr_arb_airy_bi(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, NULL, res, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
-int _gr_arb_airy_bi_prime(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, NULL, NULL, res, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+static int _gr_arb_airy(arb_t res1, arb_t res2, arb_t res3, arb_t res4, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(res1, res2, res3, res4, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+static int _gr_arb_airy_ai(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(res, NULL, NULL, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+static int _gr_arb_airy_ai_prime(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, res, NULL, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+static int _gr_arb_airy_bi(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, NULL, res, NULL, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
+static int _gr_arb_airy_bi_prime(arb_t res, const arb_t x, const gr_ctx_t ctx) { arb_hypgeom_airy(NULL, NULL, NULL, res, x, ARB_CTX_PREC(ctx)); return GR_SUCCESS; }
 
-int _gr_arb_airy_ai_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+static int _gr_arb_airy_ai_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(n) <= 0)
         return GR_DOMAIN;
@@ -1398,7 +1392,7 @@ int _gr_arb_airy_ai_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _gr_arb_airy_ai_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+static int _gr_arb_airy_ai_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(n) <= 0)
         return GR_DOMAIN;
@@ -1406,7 +1400,7 @@ int _gr_arb_airy_ai_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _gr_arb_airy_bi_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+static int _gr_arb_airy_bi_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(n) <= 0)
         return GR_DOMAIN;
@@ -1414,7 +1408,7 @@ int _gr_arb_airy_bi_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _gr_arb_airy_bi_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
+static int _gr_arb_airy_bi_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(n) <= 0)
         return GR_DOMAIN;
@@ -1422,7 +1416,7 @@ int _gr_arb_airy_bi_prime_zero(arb_t res, const fmpz_t n, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int _gr_arb_coulomb(arb_t res1, arb_t res2, arb_t res3, arb_t res4, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx)
+static int _gr_arb_coulomb(arb_t res1, arb_t res2, arb_t res3, arb_t res4, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx)
 {
     /* H+, H- are typically complex */
     /* todo: document allowing NULL, or separate F+G method? */
@@ -1437,60 +1431,60 @@ int _gr_arb_coulomb(arb_t res1, arb_t res2, arb_t res3, arb_t res4, const arb_t 
     }
 }
 
-int _gr_arb_coulomb_f(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { arb_hypgeom_coulomb(res, NULL,  x, y, z, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
-int _gr_arb_coulomb_g(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { arb_hypgeom_coulomb(NULL, res, x, y, z, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
-int _gr_arb_coulomb_hpos(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
-int _gr_arb_coulomb_hneg(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
+static int _gr_arb_coulomb_f(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { arb_hypgeom_coulomb(res, NULL,  x, y, z, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_coulomb_g(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { arb_hypgeom_coulomb(NULL, res, x, y, z, ARB_CTX_PREC(ctx)); return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; }
+static int _gr_arb_coulomb_hpos(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
+static int _gr_arb_coulomb_hneg(arb_t res, const arb_t x, const arb_t y, const arb_t z, const gr_ctx_t ctx) { return GR_UNABLE; }
 
-int _gr_arb_chebyshev_t(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
+static int _gr_arb_chebyshev_t(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_chebyshev_t(res, n, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_chebyshev_u(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
+static int _gr_arb_chebyshev_u(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_chebyshev_u(res, n, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_jacobi_p(arb_t res, const arb_t n, const arb_t a, const arb_t b, const arb_t x, const gr_ctx_t ctx)
+static int _gr_arb_jacobi_p(arb_t res, const arb_t n, const arb_t a, const arb_t b, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_jacobi_p(res, n, a, b, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_gegenbauer_c(arb_t res, const arb_t n, const arb_t m, const arb_t x, const gr_ctx_t ctx)
+static int _gr_arb_gegenbauer_c(arb_t res, const arb_t n, const arb_t m, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_gegenbauer_c(res, n, m, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_laguerre_l(arb_t res, const arb_t n, const arb_t m, const arb_t x, const gr_ctx_t ctx)
+static int _gr_arb_laguerre_l(arb_t res, const arb_t n, const arb_t m, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_laguerre_l(res, n, m, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_hermite_h(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
+static int _gr_arb_hermite_h(arb_t res, const arb_t n, const arb_t x, const gr_ctx_t ctx)
 {
     arb_hypgeom_hermite_h(res, n, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_legendre_p(arb_t res, const arb_t n, const arb_t m, const arb_t x, int type, const gr_ctx_t ctx)
+static int _gr_arb_legendre_p(arb_t res, const arb_t n, const arb_t m, const arb_t x, int type, const gr_ctx_t ctx)
 {
     arb_hypgeom_legendre_p(res, n, m, x, type, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_legendre_q(arb_t res, const arb_t n, const arb_t m, const arb_t x, int type, const gr_ctx_t ctx)
+static int _gr_arb_legendre_q(arb_t res, const arb_t n, const arb_t m, const arb_t x, int type, const gr_ctx_t ctx)
 {
     arb_hypgeom_legendre_q(res, n, m, x, type, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_legendre_p_root_ui(arb_t res, arb_t res2, ulong n, ulong k, const gr_ctx_t ctx)
+static int _gr_arb_legendre_p_root_ui(arb_t res, arb_t res2, ulong n, ulong k, const gr_ctx_t ctx)
 {
     if (k >= n)
         return GR_DOMAIN;
@@ -1499,31 +1493,31 @@ int _gr_arb_legendre_p_root_ui(arb_t res, arb_t res2, ulong n, ulong k, const gr
     return GR_SUCCESS;
 }
 
-int _gr_arb_hypgeom_0f1(arb_t res, const arb_t a, const arb_t x, int flags, const gr_ctx_t ctx)
+static int _gr_arb_hypgeom_0f1(arb_t res, const arb_t a, const arb_t x, int flags, const gr_ctx_t ctx)
 {
     arb_hypgeom_0f1(res, a, x, flags, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_hypgeom_1f1(arb_t res, const arb_t a, const arb_t b, const arb_t x, int flags, const gr_ctx_t ctx)
+static int _gr_arb_hypgeom_1f1(arb_t res, const arb_t a, const arb_t b, const arb_t x, int flags, const gr_ctx_t ctx)
 {
     arb_hypgeom_1f1(res, a, b, x, flags, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_hypgeom_u(arb_t res, const arb_t a, const arb_t b, const arb_t x, int flags, const gr_ctx_t ctx)
+static int _gr_arb_hypgeom_u(arb_t res, const arb_t a, const arb_t b, const arb_t x, int flags, const gr_ctx_t ctx)
 {
     arb_hypgeom_u(res, a, b, x, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_hypgeom_2f1(arb_t res, const arb_t a, const arb_t b, const arb_t c, const arb_t x, int flags, const gr_ctx_t ctx)
+static int _gr_arb_hypgeom_2f1(arb_t res, const arb_t a, const arb_t b, const arb_t c, const arb_t x, int flags, const gr_ctx_t ctx)
 {
     arb_hypgeom_2f1(res, a, b, c, x, flags, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_arb_hypgeom_pfq(arb_t res, const gr_vec_t a, const gr_vec_t b, const arb_t x, int flags, const gr_ctx_t ctx)
+static int _gr_arb_hypgeom_pfq(arb_t res, const gr_vec_t a, const gr_vec_t b, const arb_t x, int flags, const gr_ctx_t ctx)
 {
     arb_hypgeom_pfq(res, a->entries, a->length, b->entries, b->length, x, flags, ARB_CTX_PREC(ctx));
     return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
@@ -1531,7 +1525,7 @@ int _gr_arb_hypgeom_pfq(arb_t res, const gr_vec_t a, const gr_vec_t b, const arb
 
 
 
-int
+static int
 _gr_arb_zeta(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     if (arb_contains_si(x, 1))
@@ -1565,21 +1559,21 @@ arb_agm1(arb_t res, const arb_t x, slong prec)
 
 DEF_FUNC_SING(agm1)
 
-int
+static int
 _gr_arb_vec_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr vec1, arb_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     arb_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_vec_dot_rev(arb_t res, const arb_t initial, int subtract, arb_srcptr vec1, arb_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     arb_dot(res, initial, subtract, vec1, 1, vec2 + len - 1, -1, len, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_poly_mullow(arb_ptr res,
     arb_srcptr poly1, slong len1,
     arb_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -1588,13 +1582,7 @@ _gr_arb_poly_mullow(arb_ptr res,
     return GR_SUCCESS;
 }
 
-int _gr_arb_poly_taylor_shift(arb_ptr res, arb_srcptr poly, slong len, const arb_t c, gr_ctx_t ctx);
-
-/* hidden feature: also works with arb ctx */
-int
-_gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx);
-
-int
+static int
 _gr_arb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     int status;
@@ -1610,7 +1598,7 @@ _gr_arb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flag
     return status;
 }
 
-int
+static int
 _gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
@@ -1672,21 +1660,21 @@ _gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
     return GR_UNABLE;
 }
 
-int
+static int
 _gr_arb_mat_mul(arb_mat_t res, const arb_mat_t x, const arb_mat_t y, gr_ctx_t ctx)
 {
     arb_mat_mul(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mat_det(arb_t res, const arb_mat_t x, gr_ctx_t ctx)
 {
     arb_mat_det(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arb_mat_exp(arb_mat_t res, const arb_mat_t x, gr_ctx_t ctx)
 {
     if (x->r != x->c)

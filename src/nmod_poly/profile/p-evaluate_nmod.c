@@ -128,7 +128,7 @@ void sample_precomp(void * arg, ulong count)
         for (j = 0; j < 100; j++)
         {
             const ulong pt_precomp = n_mulmod_precomp_shoup(pt, n);
-            _nmod_poly_evaluate_nmod_precomp(poly, length, pt, pt_precomp, mod);
+            _nmod_poly_evaluate_nmod_precomp(poly, length, pt, pt_precomp, n);
         }
         prof_stop();
     }
@@ -170,7 +170,11 @@ void sample_precomp_lazy(void * arg, ulong count)
         for (j = 0; j < 100; j++)
         {
             const ulong pt_precomp = n_mulmod_precomp_shoup(pt, n);
-            _nmod_poly_evaluate_nmod_precomp_lazy(poly, length, pt, pt_precomp, mod);
+            ulong val = _nmod_poly_evaluate_nmod_precomp_lazy(poly, length, pt, pt_precomp, n);
+            if (val >= 2*n)
+                val -= 2*n;
+            else if (val >= n)
+                val -= n;
         }
         prof_stop();
     }

@@ -31,7 +31,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
 void
@@ -87,13 +87,13 @@ void tune_classical_vs_fixed(int * cutoffs)
             randmat(A, state, ctx);
             randmat(B, state, ctx);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%wd  %wd   %e   %e   %.3f\n", prec, n, t1, t2, t1 / t2);
 
@@ -128,7 +128,7 @@ void tune_classical_vs_fixed(int * cutoffs)
 
 slong ns[] = { 2, 3, 4, 8, 16, 24, 32, 48, 64, 80, 96, 128, 144, 256, 512, 1024, 0 };
 
-void prof_classical_vs_fixed()
+void prof_classical_vs_fixed(void)
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
@@ -154,13 +154,13 @@ void prof_classical_vs_fixed()
             randmat(A, state, ctx);
             randmat(B, state, ctx);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%.3f  ", t1 / t2);
             fflush(stdout);
@@ -205,13 +205,13 @@ void tune_fixed_vs_block(int * cutoffs)
             randmat(A, state, ctx);
             randmat(B, state, ctx);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul_block(C, A, B, 1, ctx));
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%wd  %wd   %e   %e   %.3f\n", prec, n, t1, t2, t1 / t2);
 
@@ -236,7 +236,7 @@ void tune_fixed_vs_block(int * cutoffs)
     flint_rand_clear(state);
 }
 
-void prof_fixed_vs_block()
+void prof_fixed_vs_block(void)
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
@@ -267,13 +267,13 @@ void prof_fixed_vs_block()
             randmat(A, state, ctx);
             randmat(B, state, ctx);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul_block(C, A, B, 1, ctx));
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%.3f  ", t1 / t2);
             fflush(stdout);
@@ -318,13 +318,13 @@ void tune_classical_vs_block(int * cutoffs)
             randmat(A, state, ctx);
             randmat(B, state, ctx);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul_block(C, A, B, 1, ctx));
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%wd  %wd   %e   %e   %.3f\n", prec, n, t1, t2, t1 / t2);
 
@@ -349,7 +349,7 @@ void tune_classical_vs_block(int * cutoffs)
     flint_rand_clear(state);
 }
 
-void prof_mul()
+void prof_mul(void)
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
@@ -380,13 +380,13 @@ void prof_mul()
             randmat(A, state, ctx);
             randmat(B, state, ctx);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(nfloat_mat_mul(C, A, B, ctx));
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_printf("%.3f ", t1 / t2);
             fflush(stdout);
@@ -405,7 +405,7 @@ void prof_mul()
     flint_rand_clear(state);
 }
 
-int main()
+int main(void)
 {
     //int tab[TABN];
 

@@ -70,6 +70,29 @@ gr_mpoly_ctx_set_gen_names(gr_mpoly_ctx_t ctx, const char ** s)
     return GR_SUCCESS;
 }
 
+static slong
+_gr_mpoly_ctx_ngens(slong * ngens, gr_ctx_t ctx)
+{
+     * ngens = GR_MPOLY_NVARS(ctx);
+     return GR_SUCCESS;
+}
+
+static int
+_gr_mpoly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+{
+    if (i < 0 || i >= GR_MPOLY_NVARS(ctx))
+        return GR_DOMAIN;
+
+    char * var = GR_MPOLY_VARS(ctx)[i];
+    size_t len = strlen(var);
+    * name = flint_malloc(len + 1);
+    if (* name == NULL)
+        return GR_UNABLE;
+    strncpy(* name, var, len + 1);
+
+    return GR_SUCCESS;
+}
+
 truth_t
 gr_mpoly_ctx_is_ring(gr_mpoly_ctx_t ctx)
 {
@@ -103,19 +126,19 @@ gr_mpoly_ctx_is_field(gr_mpoly_ctx_t ctx)
         return T_FALSE;
 }
 
-truth_t
+static truth_t
 gr_mpoly_ctx_is_rational_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_rational_vector_space(GR_MPOLY_CCTX(ctx));
 }
 
-truth_t
+static truth_t
 gr_mpoly_ctx_is_real_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_real_vector_space(GR_MPOLY_CCTX(ctx));
 }
 
-truth_t
+static truth_t
 gr_mpoly_ctx_is_complex_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_complex_vector_space(GR_MPOLY_CCTX(ctx));
@@ -299,6 +322,8 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_complex_vector_space},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) gr_mpoly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,               (gr_funcptr) _gr_mpoly_ctx_ngens},
+    {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_mpoly_ctx_gen_name},
     {GR_METHOD_INIT,        (gr_funcptr) gr_mpoly_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_mpoly_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_mpoly_swap},
@@ -330,6 +355,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_MUL_FMPQ,    (gr_funcptr) gr_mpoly_mul_fmpq},
     {GR_METHOD_INV,         (gr_funcptr) gr_mpoly_inv},
     {GR_METHOD_CANONICAL_ASSOCIATE,         (gr_funcptr) gr_mpoly_canonical_associate},
+    {GR_METHOD_DERIVATIVE_GEN,              (gr_funcptr) gr_mpoly_derivative},
     {0,                     (gr_funcptr) NULL},
 };
 

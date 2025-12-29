@@ -17,7 +17,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
-int _compare_poly_lengths(const void * a, const void * b)
+static int _compare_poly_lengths(const void * a, const void * b)
 {
    const fmpz_poly_struct * p = (fmpz_poly_struct *) a;
    const fmpz_poly_struct * q = (fmpz_poly_struct *) b;

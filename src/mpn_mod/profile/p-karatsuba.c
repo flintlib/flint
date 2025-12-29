@@ -24,7 +24,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
 ulong parameter(slong i)
@@ -68,9 +68,9 @@ find_karatsuba_cutoff(slong n, flint_rand_t state, gr_ctx_t ctx)
     randvec(A, state, n, ctx);
     randvec(B, state, n, ctx);
 
-    TIMEIT_START
+    TIMEIT_START;
     GR_MUST_SUCCEED(_mpn_mod_poly_mullow_karatsuba(C, A, n, squaring ? A : B, n, 2 * n - 1, 2, ctx));
-    TIMEIT_STOP_VALUES(tbest, __)
+    TIMEIT_STOP_VALUES(tbest, __);
 
     for (i = 2; ; i++)
     {
@@ -79,9 +79,9 @@ find_karatsuba_cutoff(slong n, flint_rand_t state, gr_ctx_t ctx)
         if (m > n)
             break;
 
-        TIMEIT_START
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_mullow_karatsuba(C, A, n, squaring ? A : B, n, 2 * n - 1, m, ctx));
-        TIMEIT_STOP_VALUES(t2, __)
+        TIMEIT_STOP_VALUES(t2, __);
         (void) __;
 
         if (t2 < tbest)
@@ -99,7 +99,7 @@ find_karatsuba_cutoff(slong n, flint_rand_t state, gr_ctx_t ctx)
     return found;
 }
 
-int main()
+int main(void)
 {
     fmpz_t p;
     gr_ctx_t ctx;

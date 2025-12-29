@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
                     flint_printf("{ \"name\": \"%s\", \"prec\": %d, \"len\": %d, \"factor\": %s, \"time\": ",
                             name[l], prec[j], len[i], factor[i]);
 
-                TIMEIT_ONCE_START
+                TIMEIT_ONCE_START;
 
                 if (l < nf)
                 {
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
                     acb_dft_precomp_clear(t);
                 }
 
-                TIMEIT_ONCE_STOP
+                TIMEIT_ONCE_STOP;
 
                 if (out == JSON)
                     flint_printf("}\n");

@@ -52,9 +52,9 @@ main(int argc, char * argv[])
     flint_printf("p(%wu) = \n", n);
 
     fmpz_init(x);
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arith_number_of_partitions(x, n);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
     if (!quiet)
     {
         fmpz_print(x);

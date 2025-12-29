@@ -37,17 +37,17 @@ int main(void)
 
         flint_printf("%10wd", n); fflush(stdout);
 
-        TIMEIT_START
+        TIMEIT_START;
         mpn_mul(r, x, n, y, n);
-        TIMEIT_STOP_VALUES(_, t)
+        TIMEIT_STOP_VALUES(_, t);
         flint_printf("%12g", t); fflush(stdout);
 
         for (nt = 1; nt <= 8; nt *= 2)
         {
             flint_set_num_threads(nt);
-            TIMEIT_START
+            TIMEIT_START;
             flint_mpn_mul_fft_main(r, x, n, y, n);
-            TIMEIT_STOP_VALUES(_, t)
+            TIMEIT_STOP_VALUES(_, t);
             flint_printf("%12g", t); fflush(stdout);
         }
 

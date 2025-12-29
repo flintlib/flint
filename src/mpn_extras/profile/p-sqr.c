@@ -31,13 +31,13 @@ static void measure(mp_ptr rp1, mp_ptr rp2, mp_ptr ap, slong mx)
 
         mpn_random2(ap, mx);
 
-        TIMEIT_START
+        TIMEIT_START;
         mpn_sqr_basecase(rp1, ap, mx);
-        TIMEIT_STOP_VALUES(__, t1)
+        TIMEIT_STOP_VALUES(__, t1);
 
-        TIMEIT_START
+        TIMEIT_START;
         flint_mpn_sqr(rp2, ap, mx);
-        TIMEIT_STOP_VALUES(__, t2)
+        TIMEIT_STOP_VALUES(__, t2);
 
         flint_printf("%7.2fx\n", t1 / t2);
     }

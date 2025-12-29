@@ -55,6 +55,31 @@ Domain properties
 
     Sets or retrieves the floating-point precision in bits.
 
+Debugging
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_debug(gr_ctx_t ctx, gr_ctx_t elem_ctx, int flags, double unable_probability)
+
+    Initialize *ctx* to a wrapper around *elem_ctx* for debugging.
+    This will execute supported methods (currently only a handful
+    of methods are supported, e.g. ``gr_add``) as if one is computing
+    directly over *elem_ctx*, but with added debugging features.
+
+    If *unable_probability* is positive, some methods will randomly return
+    ``GR_UNABLE`` and predicates will randomly return ``T_UNKNOWN``.
+
+    The following flags are supported:
+
+    * ``GR_DEBUG_WRAP`` - wrap elements in a box with a pointer. This allows
+      performing extra checks such as whether a variable is being cleared
+      twice or whether the wrong context object is passed as input. It can
+      also help catch some bugs that are not revealed when entries are
+      stored shallowly.
+
+    * ``GR_DEBUG_VERBOSE`` - print debugging information for each operation.
+
+    * ``GR_DEBUG_TIMING`` - print elapsed time for each operation.
+
 
 Groups
 -------------------------------------------------------------------------------
@@ -115,26 +140,13 @@ Residue rings and finite fields
     enable some functions to complete that otherwise would
     return ``GR_UNABLE``.
 
-.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+See:
 
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`ulong`. We require `n \ne 0`.
-
-.. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
-              void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
-
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`uint8` or :type:`uint32`. The modulus must be
-    nonzero.
-
-    .. note ::
-
-        Presently, many operations for these types are not as optimized
-        as those for full-word ``nmods``. It is currently recommended
-        to use :func:`gr_ctx_init_nmod` for best performance unless
-        one specifically wants to minimize memory usage.
+* :func:`gr_ctx_init_nmod`
+  :func:`gr_ctx_init_nmod8`
+  :func:`gr_ctx_init_nmod32`
+  :func:`gr_ctx_init_nmod_redc`
+  :func:`gr_ctx_init_nmod_redc_fast`
 
 .. function:: void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 

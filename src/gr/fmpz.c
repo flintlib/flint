@@ -20,31 +20,32 @@
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_special.h"
 #include "gmpcompat.h"
 
-int
+static int
 _gr_fmpz_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Integer ring (fmpz)");
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_fmpz_init(fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_init(x);
 }
 
-void
+static void
 _gr_fmpz_clear(fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_clear(x);
 }
 
-void
+static void
 _gr_fmpz_swap(fmpz_t x, fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_t t;
@@ -53,14 +54,14 @@ _gr_fmpz_swap(fmpz_t x, fmpz_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 _gr_fmpz_set_shallow(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
 /* todo: limits */
-int
+static int
 _gr_fmpz_randtest(fmpz_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     switch (n_randint(state, 4))
@@ -75,49 +76,49 @@ _gr_fmpz_randtest(fmpz_t res, flint_rand_t state, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_write(gr_stream_t out, const fmpz_t x, const gr_ctx_t ctx)
 {
     gr_stream_write_fmpz(out, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_zero(fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_zero(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_one(fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_one(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_set_si(fmpz_t res, slong v, const gr_ctx_t ctx)
 {
     fmpz_set_si(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_set_ui(fmpz_t res, ulong v, const gr_ctx_t ctx)
 {
     fmpz_set_ui(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_set_fmpz(fmpz_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     fmpz_set(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_set_fmpq(fmpz_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     if (fmpz_is_one(fmpq_denref(v)))
@@ -131,7 +132,7 @@ _gr_fmpz_set_fmpq(fmpz_t res, const fmpq_t v, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_set_d(fmpz_t res, double x, const gr_ctx_t ctx)
 {
     if (x != x || x == HUGE_VAL || x == -HUGE_VAL)
@@ -144,7 +145,7 @@ _gr_fmpz_set_d(fmpz_t res, double x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -170,7 +171,7 @@ _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
-int
+static int
 _gr_fmpz_set_str(fmpz_t res, const char * x, gr_ctx_t ctx)
 {
     if (!fmpz_set_str(res, x, 10))
@@ -179,7 +180,7 @@ _gr_fmpz_set_str(fmpz_t res, const char * x, gr_ctx_t ctx)
     return gr_generic_set_str(res, x, ctx);
 }
 
-int
+static int
 _gr_fmpz_get_ui(ulong * res, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(x) < 0 || fmpz_cmp_ui(x, UWORD_MAX) > 0)
@@ -189,7 +190,7 @@ _gr_fmpz_get_ui(ulong * res, const fmpz_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_get_si(slong * res, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (!fmpz_fits_si(x))
@@ -199,52 +200,52 @@ _gr_fmpz_get_si(slong * res, const fmpz_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_get_d(double * res, const fmpz_t x, const gr_ctx_t ctx)
 {
     *res = fmpz_get_d(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_get_fmpq(fmpq_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpq_set_fmpz(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_get_fexpr(fexpr_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fexpr_set_fmpz(res, x);
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_is_zero(const fmpz_t x, const gr_ctx_t ctx)
 {
     return fmpz_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_is_one(const fmpz_t x, const gr_ctx_t ctx)
 {
     return fmpz_is_one(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_is_neg_one(const fmpz_t x, const gr_ctx_t ctx)
 {
     return (*x == -1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_equal(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     return fmpz_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fmpz_set(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (res == x)
@@ -261,133 +262,133 @@ _gr_fmpz_set(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_neg(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_neg(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_add(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_add(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_add_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_add_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_add_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_add_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_sub(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_sub(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_sub_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_sub_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_sub_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_mul(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mul_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_mul_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mul_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_mul_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_addmul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_addmul(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_addmul_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_addmul_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_addmul_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_addmul_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_submul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_submul(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_submul_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
 {
     fmpz_submul_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_submul_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_submul_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mul_two(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_mul_2exp(res, x, 1);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_sqr(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_mul(res, x, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mul_2exp_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     if (y >= 0)
@@ -419,7 +420,7 @@ _gr_fmpz_mul_2exp_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_mul_2exp_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(x))
@@ -434,7 +435,7 @@ _gr_fmpz_mul_2exp_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_
     return _gr_fmpz_mul_2exp_si(res, x, *y, ctx);
 }
 
-int
+static int
 _gr_fmpz_inv(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (fmpz_is_pm1(x))
@@ -448,7 +449,7 @@ _gr_fmpz_inv(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -464,7 +465,7 @@ _gr_fmpz_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_divexact(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -478,7 +479,7 @@ _gr_fmpz_divexact(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx
     }
 }
 
-int
+static int
 _gr_fmpz_divexact_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -492,7 +493,7 @@ _gr_fmpz_divexact_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_divexact_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -506,19 +507,19 @@ _gr_fmpz_divexact_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
     }
 }
 
-truth_t
+static truth_t
 _gr_fmpz_is_invertible(const fmpz_t x, const gr_ctx_t ctx)
 {
     return fmpz_is_pm1(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     return fmpz_divisible(y, x) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fmpz_euclidean_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -532,7 +533,7 @@ _gr_fmpz_euclidean_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_
     }
 }
 
-int
+static int
 _gr_fmpz_euclidean_rem(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -546,7 +547,7 @@ _gr_fmpz_euclidean_rem(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_
     }
 }
 
-int
+static int
 _gr_fmpz_euclidean_divrem(fmpz_t res1, fmpz_t res2, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -560,21 +561,21 @@ _gr_fmpz_euclidean_divrem(fmpz_t res1, fmpz_t res2, const fmpz_t x, const fmpz_t
     }
 }
 
-int
+static int
 _gr_fmpz_gcd(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_gcd(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_lcm(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     fmpz_lcm(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_canonical_associate(fmpz_t ux, fmpz_t u, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(x) < 0)
@@ -591,7 +592,7 @@ _gr_fmpz_canonical_associate(fmpz_t ux, fmpz_t u, const fmpz_t x, const gr_ctx_t
     return GR_SUCCESS;
 }
 
-int _gr_fmpz_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+static int _gr_fmpz_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_factor_t fac;
     slong i;
@@ -615,14 +616,14 @@ int _gr_fmpz_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x,
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_pow_ui(fmpz_t res, const fmpz_t x, ulong exp, const gr_ctx_t ctx)
 {
     fmpz_pow_ui(res, x, exp);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_pow_si(fmpz_t res, const fmpz_t x, slong exp, const gr_ctx_t ctx)
 {
     if (exp < 0)
@@ -645,7 +646,7 @@ _gr_fmpz_pow_si(fmpz_t res, const fmpz_t x, slong exp, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*exp))
@@ -675,13 +676,13 @@ _gr_fmpz_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx_t c
     }
 }
 
-truth_t
+static truth_t
 _gr_fmpz_is_square(const fmpz_t x, const gr_ctx_t ctx)
 {
     return fmpz_is_square(x) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fmpz_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(x) < 0)
@@ -697,7 +698,7 @@ _gr_fmpz_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_rsqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     if (fmpz_is_one(x))
@@ -711,28 +712,28 @@ _gr_fmpz_rsqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_abs(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_abs(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_im(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_zero(res);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_sgn(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
     fmpz_set_si(res, fmpz_sgn(x));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_cmp(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     int cmp = fmpz_cmp(x, y);
@@ -743,7 +744,7 @@ _gr_fmpz_cmp(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_cmpabs(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     int cmp = fmpz_cmpabs(x, y);
@@ -754,7 +755,7 @@ _gr_fmpz_cmpabs(int * res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_fib_ui(fmpz_t res, ulong n, gr_ctx_t ctx)
 {
     if (n <= 1000000)
@@ -768,7 +769,7 @@ _gr_fmpz_fib_ui(fmpz_t res, ulong n, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_fmpz_fib_fmpz(fmpz_t res, const fmpz_t n, gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*n))
@@ -822,7 +823,7 @@ _fmpz_sub_inline(fmpz_t z, const fmpz_t x, const fmpz_t y)
         fmpz_sub(z, x, y);
 }
 
-int
+static int
 _gr_fmpz_vec_is_zero(const fmpz * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -834,7 +835,7 @@ _gr_fmpz_vec_is_zero(const fmpz * vec, slong len, gr_ctx_t ctx)
     return T_TRUE;
 }
 
-int
+static int
 _gr_fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -856,7 +857,7 @@ _gr_fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx
     return T_TRUE;
 }
 
-int
+static int
 _gr_fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -867,7 +868,7 @@ _gr_fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -878,7 +879,48 @@ _gr_fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr
     return GR_SUCCESS;
 }
 
-int
+static int
+_gr_fmpz_vec_mul_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_mul_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_addmul_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_addmul_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_divexact_scalar_fmpz(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(c))
+        return GR_DOMAIN;
+    _fmpz_vec_scalar_divexact_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_divexact_scalar_ui(fmpz * res, const fmpz * vec1, slong len, ulong c, gr_ctx_t ctx)
+{
+    if (c == 0)
+        return GR_DOMAIN;
+    _fmpz_vec_scalar_divexact_ui(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_divexact_scalar_si(fmpz * res, const fmpz * vec1, slong len, slong c, gr_ctx_t ctx)
+{
+    if (c == 0)
+        return GR_DOMAIN;
+    _fmpz_vec_scalar_divexact_si(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
 _gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
 {
     if (len <= 2)
@@ -943,21 +985,21 @@ _gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 0, len);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
     _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 1, len);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_poly_mullow(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -970,7 +1012,7 @@ _gr_fmpz_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_poly_divexact2(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, gr_ctx_t ctx)
@@ -979,11 +1021,8 @@ _gr_fmpz_poly_divexact2(fmpz * res,
     return GR_SUCCESS;
 }
 
-/* defined in gr/fmpz_poly.c */
-int _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx);
-
 /* integer roots of integer polynomial */
-int
+static int
 _gr_fmpz_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_poly_t poly, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
@@ -1049,7 +1088,7 @@ _gr_fmpz_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_poly_t poly, in
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_roots_gr_poly_other(gr_vec_t roots, gr_vec_t mult, /* const gr_poly_t */ const void * poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (other_ctx->which_ring == GR_CTX_FMPZ)
@@ -1058,28 +1097,28 @@ _gr_fmpz_roots_gr_poly_other(gr_vec_t roots, gr_vec_t mult, /* const gr_poly_t *
     return GR_UNABLE;
 }
 
-int
+static int
 _gr_fmpz_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_ctx_t ctx)
 {
     fmpz_mat_mul(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mat_det(fmpz_t res, const fmpz_mat_t x, const gr_ctx_t ctx)
 {
     fmpz_mat_det(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mat_charpoly(fmpz * res, const fmpz_mat_t mat, const gr_ctx_t ctx)
 {
     _fmpz_mat_charpoly(res, mat);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mat_permanent(fmpz_t res, const fmpz_mat_t x, const gr_ctx_t ctx)
 {
     return fmpz_mat_permanent(res, x) ? GR_SUCCESS : GR_UNABLE;
@@ -1207,6 +1246,14 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpz_vec_equal},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_vec_sub},
+    {GR_METHOD_VEC_MUL_SCALAR,             (gr_funcptr) _gr_fmpz_vec_mul_scalar},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPZ,        (gr_funcptr) _gr_fmpz_vec_mul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,          (gr_funcptr) _gr_fmpz_vec_addmul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_FMPZ,     (gr_funcptr) _gr_fmpz_vec_addmul_scalar},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR,        (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_FMPZ,   (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_UI,     (gr_funcptr) _gr_fmpz_vec_divexact_scalar_ui},
+    {GR_METHOD_VEC_DIVEXACT_SCALAR_SI,     (gr_funcptr) _gr_fmpz_vec_divexact_scalar_si},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpz_vec_sum},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_vec_dot_rev},

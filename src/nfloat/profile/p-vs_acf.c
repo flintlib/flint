@@ -29,10 +29,10 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
-int main()
+int main(void)
 {
     gr_ptr vec1, vec2, vec3;
     gr_ptr x, I;
@@ -98,21 +98,21 @@ int main()
 */
                 }
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_add(vec3, vec1, vec2, n, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_tadd = t; else nfloat_tadd = t;
                 (void) __;
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_mul(vec3, vec1, vec2, n, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_tmul = t; else nfloat_tmul = t;
                 (void) __;
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_mul(vec3, vec1, vec1, n, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_tsqr = t; else nfloat_tsqr = t;
                 (void) __;
 
@@ -120,32 +120,32 @@ int main()
                 GR_MUST_SUCCEED(gr_add(x, x, I, ctx));
                 GR_MUST_SUCCEED(gr_inv(x, x, ctx));
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_mul_scalar(vec3, vec1, n, x, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_tmul_scalar = t; else nfloat_tmul_scalar = t;
                 (void) __;
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_addmul_scalar(vec3, vec1, n, x, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_taddmul_scalar = t; else nfloat_taddmul_scalar = t;
                 (void) __;
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_sum(x, vec1, n, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_tsum = t; else nfloat_tsum = t;
                 (void) __;
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_product(x, vec1, n, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_tprod = t; else nfloat_tprod = t;
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_vec_dot(x, NULL, 0, vec1, vec2, n, ctx));
-                TIMEIT_STOP_VALUES(__, t)
+                TIMEIT_STOP_VALUES(__, t);
                 if (which == 0) acf_tdot = t; else nfloat_tdot = t;
 
                 gr_heap_clear(x, ctx);

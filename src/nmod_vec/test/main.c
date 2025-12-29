@@ -16,6 +16,7 @@
 #include "t-dot_nlimbs.c"
 #include "t-dot.c"
 #include "t-dot_ptr.c"
+#include "t-invert.c"
 #include "t-nmod.c"
 #include "t-nmod_pow_fmpz.c"
 #include "t-reduce.c"
@@ -32,6 +33,7 @@ test_struct tests[] =
     TEST_FUNCTION(_nmod_vec_dot_params),
     TEST_FUNCTION(nmod_vec_dot),
     TEST_FUNCTION(nmod_vec_dot_ptr),
+    TEST_FUNCTION(nmod_vec_invert),
     TEST_FUNCTION(nmod_vec_nmod),
     TEST_FUNCTION(nmod_vec_nmod_pow_fmpz),
     TEST_FUNCTION(nmod_vec_reduce),

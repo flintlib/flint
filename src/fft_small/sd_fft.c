@@ -755,7 +755,7 @@ static void sd_fft_no_trunc_block(
 
 
 
-void sd_fft_no_trunc_internal(
+static void sd_fft_no_trunc_internal(
     const sd_fft_ctx_t Q,
     double* x,
     ulong S,    /* stride */

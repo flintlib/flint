@@ -56,6 +56,9 @@
 #include "t-make_monic.c"
 #include "t-mul_karatsuba.c"
 #include "t-mul_toom33.c"
+#include "t-mullow_bivariate_KS.c"
+#include "t-mullow_complex_reorder.c"
+#include "t-mullow_toom_serial.c"
 #include "t-mulmod.c"
 #include "t-mulmod_preinv.c"
 #include "t-newton_basis.c"
@@ -137,6 +140,9 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_make_monic),
     TEST_FUNCTION(gr_poly_mul_karatsuba),
     TEST_FUNCTION(gr_poly_mul_toom33),
+    TEST_FUNCTION(gr_poly_mullow_bivariate_KS),
+    TEST_FUNCTION(gr_poly_mullow_complex_reorder),
+    TEST_FUNCTION(gr_poly_mullow_toom_serial),
     TEST_FUNCTION(gr_poly_mulmod),
     TEST_FUNCTION(gr_poly_mulmod_preinv),
     TEST_FUNCTION(gr_poly_newton_basis),

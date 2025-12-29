@@ -12,7 +12,7 @@
 #include "acb_dft.h"
 
 /* assume np >= 2 * n - 1 */
-void
+static void
 acb_dft_convol_pad(acb_ptr fp, acb_ptr gp, acb_srcptr f, acb_srcptr g, slong n, slong np)
 {
     slong k;

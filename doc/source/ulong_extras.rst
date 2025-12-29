@@ -461,7 +461,7 @@ Jacobi and Kronecker symbols
     Computes the Jacobi symbol, allowing `x` to go up to a full limb.
 
 
-Modular Arithmetic
+Modular arithmetic
 --------------------------------------------------------------------------------
 
 
@@ -480,6 +480,12 @@ Modular Arithmetic
 
     This is merely an adaption of the extended Euclidean algorithm
     with appropriate normalisation.
+
+.. function:: ulong n_binvert(ulong n)
+
+    Assuming that `n` is odd, returns the multiplicative inverse modulo
+    `2^{\mathtt{FLINT\_BITS}}`. If `n` is even, some arbitrary
+    value is returned.
 
 .. function:: ulong n_powmod_precomp(ulong a, slong exp, ulong n, double npre)
 
@@ -597,7 +603,7 @@ Modular Arithmetic
     points to is set to NULL.
 
 
-Modular Arithmetic with Fixed Operand
+Modular arithmetic with fixed operand
 --------------------------------------------------------------------------------
 
 This is about computing several modular multiplications where one operand and
@@ -894,6 +900,41 @@ Prime number generation and counting
 Primality testing
 --------------------------------------------------------------------------------
 
+.. function:: int n_is_prime(ulong n)
+
+    Returns 1 if `n` is prime and 0 otherwise. This function is intended
+    for general input.
+
+    For integers up to 15 bits, we look up the result in a bit array.
+    For integers between 16 and 64 bits, we do some trial division and then
+    perform a single base-2 strong probable prime test to detect most
+    composites. For numbers that pass this test, primality is certified
+    by checking that `n` is not one of the 31894014 base-2 strong pseudoprimes
+    `n < 2^{64}` which have been tabulated exhaustively by Feitsma [FeiGal2013]_.
+
+    The 2314 pseudoprimes up to 32 bits are simply looked up in a hash table.
+
+    For the pseudoprimes up to 64 bits, we follow the idea of Forisek and
+    Jancina [ForJan2015]_. We precompute a function `T` such
+    that for pseudoprime `n < 2^{64}`, a probable prime test with base `T(n)`
+    certifies compositeness of `n`. Our `T` is represented as a hash table
+    with 98304 entries stored in an array of 24-bit integers. A small number
+    of bases (around 5%) are larger than 24 bits, triggering a secondary
+    lookup in an array of 4903 32-bit integers. In total
+    the tables for 64-bit pseudoprimes require 307 KB, which is just 60% the
+    size of the 512 KB Forisek-Jancina table of 262144 16-bit bases, while
+    the test is as efficient.
+
+    To check this implementation against Feitsma's table, one can run the
+    ``examples/check_n_is_prime`` program.
+
+.. function:: int n_is_prime_odd_no_trial(ulong n)
+
+    As :func:`n_is_prime`, but does not perform trial division. Requires
+    that `n` is odd. This function is much slower than :func:`n_is_prime`
+    for random input but slightly faster for certifying primality or
+    compositeness if `n` has already
+    passed preliminary trial division or sieving done by the user.
 
 .. function:: int n_is_oddprime_small(ulong n)
 
@@ -972,19 +1013,6 @@ Primality testing
     The possibility exists that the probable prime test declares a
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
-
-.. function:: int n_is_prime(ulong n)
-
-    Tests if `n` is a prime. This first sieves for small prime factors,
-    then simply calls :func:`n_is_probabprime`. This has been checked
-    against the tables of Feitsma and Galway
-    http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html and thus
-    constitutes a check for primality (rather than just pseudoprimality)
-    up to `2^{64}`.
-
-    In future, this test may produce and check a certificate of
-    primality. This is likely to be significantly slower for prime
-    inputs.
 
 .. function:: int n_is_strong_probabprime_precomp(ulong n, double npre, ulong a, ulong d)
 
@@ -1454,16 +1482,13 @@ Factorisation
     the time for ``n_factor`` on numbers that reach the ``n_factor_pp1``
     stage, i.e. after trial factoring and one line factoring.
 
-.. function:: int n_factor_pollard_brent_single(ulong * factor, ulong n, ulong ninv, ulong ai, ulong xi, ulong normbits, ulong max_iters)
+.. function:: int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ai, ulong xi, ulong max_iters)
 
     Pollard Rho algorithm (with Brent modification) for integer factorization.
     Assumes that the `n` is not prime. `factor` is set as the factor if found.
     It is not assured that the factor found will be prime. Does not compute the complete
     factorization, just one factor. Returns 1 if factorization is successful
-    (non trivial factor is found), else returns 0. Assumes `n` is normalized
-    (shifted by normbits bits), and takes as input a precomputed inverse of `n` as
-    computed by :func:`n_preinvert_limb`. `ai` and `xi` should also be shifted
-    left by `normbits`.
+    (non trivial factor is found), else returns 0.
 
     `ai` is the constant of the polynomial used, `xi` is the initial value.
     `max\_iters` is the number of iterations tried in process of finding the
@@ -1471,7 +1496,7 @@ Factorisation
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
     suggested by Richard Brent in the paper, available at
-    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
+    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf.
 
 .. function:: int n_factor_pollard_brent(ulong * factor, flint_rand_t state, ulong n_in, ulong max_tries, ulong max_iters)
 
@@ -1548,7 +1573,7 @@ Factorials
     large `n`.
 
 
-Primitive Roots and Discrete Logarithms
+Primitive roots and discrete logarithms
 --------------------------------------------------------------------------------
 
 

@@ -101,9 +101,10 @@ AC_LANG(C)
 # 3.2.0    => 20.0.0
 # 3.2.1    => 20.0.1
 # 3.3.0    => 21.0.0
+# 3.4.0    => 22.0.0
 
 # NOTE: This must be after AC_INIT
-FLINT_MAJOR_SO=21
+FLINT_MAJOR_SO=22
 FLINT_MINOR_SO=0
 FLINT_PATCH_SO=0
 
@@ -550,12 +551,13 @@ fi
 # architecture specifics
 ################################################################################
 
-if test "$enable_fast_build" = "no";
+gcc_cflags="-O3"
+if test "$enable_fast_build" = "yes";
 then
-    gcc_cflags="-O3 "
+    gcc_cflags="-O1"
 fi
-gcc_cflags="$gcc_cflags-pedantic -std=c11"
-gcc_warnings="-Werror=implicit-function-declaration -Werror=newline-eof -Wall -Wno-stringop-overread -Wno-stringop-overflow"
+gcc_cflags="$gcc_cflags -pedantic -std=c11"
+gcc_warnings="-Wall -Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wmissing-prototypes"
 
 dnl We only try to provide specifics for those systems that currently supports
 dnl our assembly routines. If more combinations are wished for than what is
@@ -1344,7 +1346,8 @@ fi
 
 if test "$testcflags_set" = "no";
 then
-    TESTCFLAGS="$CFLAGS"
+    # Remove -Wmissing-prototypes from test files
+    TESTCFLAGS=$(printf '%s\n' "$CFLAGS" | sed 's/-Wmissing-prototypes//g')
 else
     TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
 fi

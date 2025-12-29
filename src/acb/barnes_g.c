@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "acb_poly.h"
 
-void
+static void
 _arb_const_zeta_minus_one_eval(arb_t y, slong prec)
 {
     acb_struct z[2];
@@ -31,12 +31,12 @@ _arb_const_zeta_minus_one_eval(arb_t y, slong prec)
     acb_clear(a);
 }
 
-ARB_DEF_CACHED_CONSTANT(_arb_const_zeta_minus_one, _arb_const_zeta_minus_one_eval)
+_ARB_DEF_CACHED_CONSTANT(static, _arb_const_zeta_minus_one, _arb_const_zeta_minus_one_eval)
 
 /* LogG(z) = (z-1) LogGamma(z) - zeta'(-1,z) + zeta'(-1)
    LogG'(z) = (1/2)(-2z + 1 + log(2pi)) + (z-1) digamma(z) */
 
-void
+static void
 _acb_log_barnes_g_zeta(acb_t res, const acb_t z, slong prec)
 {
     acb_struct t[3];
@@ -62,7 +62,7 @@ _acb_log_barnes_g_zeta(acb_t res, const acb_t z, slong prec)
     acb_clear(t + 2);
 }
 
-void
+static void
 _acb_barnes_g_ui_rec(acb_t res, ulong n, slong prec)
 {
     acb_t t;

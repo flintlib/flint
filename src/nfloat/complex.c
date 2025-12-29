@@ -1446,7 +1446,7 @@ nfloat_complex_div(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
     return status;
 }
 
-int
+static int
 nfloat_complex_sqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     nfloat_srcptr a, b;
@@ -1533,7 +1533,7 @@ nfloat_complex_sqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ct
     return status;
 }
 
-int
+static int
 nfloat_complex_rsqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     nfloat_srcptr a, b;

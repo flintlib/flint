@@ -399,6 +399,12 @@ void flint_sort(void * buf, slong len, slong size, int (* cmp) (const void *, co
       __tmp_root = __tmp_root->next; \
    }
 
+/* downstream support ********************************************************/
+
+#ifdef FLINT_HAVE_VA_LIST
+void flint_va_end(va_list vlist);
+#endif
+
 /* I/O ***********************************************************************/
 
 int parse_fmt(int * floating, const char * fmt);

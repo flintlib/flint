@@ -1,0 +1,53 @@
+/*
+    Copyright (C) 2020 Fredrik Johansson
+    Copyright (C) 2025 Andrii Yanovets
+    
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include "fmpz_mod_mpoly.h"
+
+void
+fmpz_mod_mpoly_vec_set_monic_unique(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx)
+{
+    slong i, j, len;
+
+    fmpz_mod_mpoly_vec_set(G, F, ctx);
+
+    len = G->length;
+
+    for (i = 0; i < len; i++)
+    {
+        /* skip zero */
+        if (fmpz_mod_mpoly_is_zero(fmpz_mod_mpoly_vec_entry(G, i), ctx))
+        {
+            fmpz_mod_mpoly_swap(fmpz_mod_mpoly_vec_entry(G, i),
+                fmpz_mod_mpoly_vec_entry(G, len - 1), ctx);
+            G->length--;
+            len--;
+            i--;
+        }
+        else
+        {
+            fmpz_mod_mpoly_make_monic(fmpz_mod_mpoly_vec_entry(G, i), fmpz_mod_mpoly_vec_entry(G, i), ctx);
+
+            for (j = 0; j < i; j++)
+            {
+                if (fmpz_mod_mpoly_equal(fmpz_mod_mpoly_vec_entry(G, i), fmpz_mod_mpoly_vec_entry(G, j), ctx))
+                {
+                    fmpz_mod_mpoly_zero(fmpz_mod_mpoly_vec_entry(G, i), ctx);
+                    fmpz_mod_mpoly_swap(fmpz_mod_mpoly_vec_entry(G, i), fmpz_mod_mpoly_vec_entry(G, len - 1), ctx);
+                    G->length--;
+                    len--;
+                    i--;
+                    break;
+                }
+            }
+        }
+    }
+}

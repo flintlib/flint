@@ -33,7 +33,7 @@ _same_vars(char ** v1, char ** v2, slong n)
     return 1;
 }
 
-int
+static int
 _gr_mpoly_set_gr_mpoly_other(gr_mpoly_t res, const gr_mpoly_t A, gr_mpoly_ctx_t A_ctx, gr_mpoly_ctx_t ctx)
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
@@ -99,7 +99,7 @@ _gr_mpoly_set_gr_mpoly_other(gr_mpoly_t res, const gr_mpoly_t A, gr_mpoly_ctx_t 
             /* there may be zero coefficients; remove them
                (todo: do inline in first loop) */
             /* if (cctx != A_cctx) */
-            status = gr_mpoly_combine_like_terms(res, ctx);
+            _gr_mpoly_normalise(res, ctx);
         }
         else
         {
@@ -188,7 +188,7 @@ _gr_mpoly_set_gr_mpoly_other(gr_mpoly_t res, const gr_mpoly_t A, gr_mpoly_ctx_t 
                     /* term order may be different */
                     gr_mpoly_sort_terms(res, ctx);
                     /* todo: combine zero checks with main loop */
-                    status |= gr_mpoly_combine_like_terms(res, ctx);
+                    _gr_mpoly_normalise(res, ctx);
 
                     flint_free(A_exps);
                     flint_free(exps);
@@ -230,7 +230,7 @@ _gr_fmpz_mpoly_ctx_t;
 #define _FMPZ_MPOLY_CTX(ring_ctx) ((_gr_fmpz_mpoly_ctx_t *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 #define _FMPZ_MPOLY_MCTX(ring_ctx) (_FMPZ_MPOLY_CTX(ring_ctx)->mctx)
 
-int
+static int
 _gr_mpoly_set_fmpz_mpoly(gr_mpoly_t res, const fmpz_mpoly_t A, gr_ctx_t A_ctx, gr_mpoly_ctx_t ctx)
 {
     int status;

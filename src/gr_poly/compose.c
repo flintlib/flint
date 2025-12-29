@@ -13,9 +13,10 @@
 
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "longlong.h"
 
 /* compose by poly2 = a*x^n + c, no aliasing; n >= 1 */
-int
+static int
 _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
         gr_srcptr c, gr_srcptr a, slong n, gr_ctx_t ctx)
 {
@@ -39,19 +40,64 @@ _gr_poly_compose_axnc(gr_ptr res, gr_srcptr poly1, slong len1,
         }
         else
         {
+            int maxbit = FLINT_CLOG2(len1);
             gr_ptr t;
-            GR_TMP_INIT(t, ctx);
 
-            status |= gr_set(t, a, ctx);
-
-            for (i = 1; i < len1; i++)
+            /* Prefer squaring for powers? cf. _gr_vec_set_powers */
+            if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_has_real_prec(ctx) == T_TRUE)
             {
-                status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), t, ctx);
-                if (i + 1 < len1)
-                    status |= gr_mul(t, t, a, ctx);
-            }
+                GR_TMP_INIT_VEC(t, maxbit, ctx);
 
-            GR_TMP_CLEAR(t, ctx);
+                status |= gr_set(GR_ENTRY(t, 0, sz), a, ctx);
+                status |= gr_mul(GR_ENTRY(res, 1, sz), GR_ENTRY(res, 1, sz), a, ctx);
+                for (int j = 1; j < maxbit; ++j)
+                {
+                    status |= gr_sqr(GR_ENTRY(t, j, sz), GR_ENTRY(t, j-1, sz), ctx);
+                    status |= gr_mul(GR_ENTRY(res, 1<<j, sz), GR_ENTRY(res, 1<<j, sz), GR_ENTRY(t, j, sz), ctx);
+                }
+                for (i = ((slong) 1 << (maxbit-1)) + 1; i < len1; i++)
+                {
+                    int bit = flint_ctz(i);
+                    status |= gr_mul(GR_ENTRY(t, maxbit-1-bit, sz), GR_ENTRY(t, maxbit-1-bit, sz), a, ctx);
+                    status |= gr_mul(GR_ENTRY(res, i>>bit, sz), GR_ENTRY(res, i>>bit, sz), GR_ENTRY(t, maxbit-1-bit, sz), ctx);
+
+                    for (int j = bit; j > 0; --j)
+                    {
+                        status |= gr_sqr(GR_ENTRY(t, maxbit-j, sz), GR_ENTRY(t, maxbit-j-1, sz), ctx);
+                        status |= gr_mul(GR_ENTRY(res, i>>(j-1), sz), GR_ENTRY(res, i>>(j-1), sz), GR_ENTRY(t, maxbit-j, sz), ctx);
+                    }
+                }
+
+                for (i = (len1 + 1) >> 1; i < ((slong)1 << (maxbit-1)); i++)
+                {
+                    int bit = flint_ctz(i);
+                    status |= gr_mul(GR_ENTRY(t, maxbit-2-bit, sz), GR_ENTRY(t, maxbit-2-bit, sz), a, ctx);
+                    status |= gr_mul(GR_ENTRY(res, i>>bit, sz), GR_ENTRY(res, i>>bit, sz), GR_ENTRY(t, maxbit-2-bit, sz), ctx);
+
+                    for (int j = bit; j > 0; --j)
+                    {
+                        status |= gr_sqr(GR_ENTRY(t, maxbit-j-1, sz), GR_ENTRY(t, maxbit-j-2, sz), ctx);
+                        status |= gr_mul(GR_ENTRY(res, i>>(j-1), sz), GR_ENTRY(res, i>>(j-1), sz), GR_ENTRY(t, maxbit-j-1, sz), ctx);
+                    }
+                }
+
+                GR_TMP_CLEAR_VEC(t, maxbit, ctx);
+            }
+            else
+            {
+                GR_TMP_INIT(t, ctx);
+
+                status |= gr_set(t, a, ctx);
+
+                for (i = 1; i < len1; i++)
+                {
+                    status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), t, ctx);
+                    if (i + 1 < len1)
+                        status |= gr_mul(t, t, a, ctx);
+                }
+
+                GR_TMP_CLEAR(t, ctx);
+            }
         }
     }
 

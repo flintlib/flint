@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 William Hart
+    Copyright (C) 2025 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,6 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#ifndef ARB_MAT_IMPL_H
+#define ARB_MAT_IMPL_H
 
-char flint_version[]=FLINT_VERSION;
+#include "arb_types.h"
+
+slong _arb_mat_exp_choose_N(const mag_t norm, slong prec);
+
+#endif

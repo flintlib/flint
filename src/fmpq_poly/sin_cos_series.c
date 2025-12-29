@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
+#include "fmpq_poly/impl.h"
 
 void
 _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
@@ -82,14 +83,14 @@ _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
     fmpz_clear(v);
 }
 
-void
+static void
 _fmpq_poly_sin_cos_series_basecase(fmpz * S, fmpz_t Sden,
     fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n)
 {
     _fmpq_poly_sin_cos_series_basecase_can(S, Sden, C, Cden, A, Aden, Alen, n, 3);
 }
 
-void
+static void
 _fmpq_poly_sin_cos_series_tangent(fmpz * S, fmpz_t Sden,
     fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden,
     slong Alen, slong n)

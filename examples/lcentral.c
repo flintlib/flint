@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 
     acb_init(s);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     acb_one(s);
     acb_div_si(s, s, 2, prec);
@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
 
     acb_clear(s);
 
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     flint_cleanup();
     return 0;

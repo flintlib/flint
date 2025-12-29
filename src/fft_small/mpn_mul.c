@@ -192,7 +192,7 @@ static ulong crt_data_find_bits(const crt_data_t C, ulong bn)
 #define aindex(i) (a[i])
 
 #if 0
-void slow_mpn_to_fft_easy(
+static void slow_mpn_to_fft_easy(
     sd_fft_lctx_t Q,
     double* z,
     const uint32_t* a,
@@ -316,7 +316,7 @@ void slow_mpn_to_fft_easy(
 }
 
 #else
-void slow_mpn_to_fft_easy(
+static void slow_mpn_to_fft_easy(
     const sd_fft_ctx_t Q,
     double* z,
     const uint32_t* a,
@@ -393,7 +393,7 @@ void slow_mpn_to_fft_easy(
 #undef aindex
 
 
-void slow_mpn_to_fft(
+static void slow_mpn_to_fft(
     const sd_fft_ctx_t Q,
     double* z, ulong ztrunc,
     const ulong* a_, ulong an_,
@@ -896,7 +896,7 @@ DEFINE_IT(7, 6, 5)
 DEFINE_IT(8, 7, 6)
 #undef DEFINE_IT
 
-ulong next_fft_number(ulong p)
+static ulong next_fft_number(ulong p)
 {
     ulong bits, l, q;
     bits = n_nbits(p);
@@ -1312,7 +1312,7 @@ typedef struct {
     int squaring;
 } mod_worker_struct;
 
-void mod_worker_func(void* varg)
+static void mod_worker_func(void* varg)
 {
     mod_worker_struct* X = (mod_worker_struct*) varg;
 
@@ -1339,7 +1339,7 @@ typedef struct fft_worker_struct {
     int squaring;
 } fft_worker_struct;
 
-void fft_worker_func(void* varg)
+static void fft_worker_func(void* varg)
 {
     fft_worker_struct* X = (fft_worker_struct*) varg;
     ulong m;
@@ -1382,7 +1382,7 @@ typedef struct mod_fft_worker_struct {
     int squaring;
 } mod_fft_worker_struct;
 
-void mod_fft_worker_func(void* varg)
+static void mod_fft_worker_func(void* varg)
 {
     mod_fft_worker_struct* X = (mod_fft_worker_struct*) varg;
     ulong m;
@@ -1427,7 +1427,7 @@ typedef struct {
     ulong overhang_buffer[MPN_CTX_NCRTS];
 } crt_worker_struct;
 
-void crt_worker_func(void* varg)
+static void crt_worker_func(void* varg)
 {
     crt_worker_struct* X = (crt_worker_struct*) varg;
 

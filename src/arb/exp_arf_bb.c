@@ -143,7 +143,7 @@ pclear(arb_t x, void * args)
     arb_clear(x);
 }
 
-void
+static void
 _arb_vec_prod_bsplit_threaded(arb_t res, arb_srcptr vec, slong len, slong prec)
 {
     pwork_t work;

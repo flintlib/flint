@@ -10,6 +10,7 @@
 */
 
 #include "partitions.h"
+#include "arith.h"
 
 /* compatibility wrapper */
 void

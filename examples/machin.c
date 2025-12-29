@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     ca_t x, y, pi4;
     slong i, j, c, q;
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     ca_ctx_init(ctx);
     ca_init(x, ctx);
@@ -149,8 +149,8 @@ int main(int argc, char *argv[])
     ca_ctx_clear(ctx);
 
     flint_printf("\n");
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     flint_cleanup();
     return 0;

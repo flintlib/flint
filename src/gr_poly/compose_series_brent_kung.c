@@ -46,7 +46,7 @@ _gr_poly_compose_series_brent_kung(gr_ptr res, gr_srcptr poly1, slong len1,
         status |= _gr_vec_set(Brow(i), GR_ENTRY(poly1, i * m, sz), m, ctx);
     status |= _gr_vec_set(Brow(i), GR_ENTRY(poly1, i * m, sz), len1 % m, ctx);
 
-    /* Set rows of A to powers of poly2 */
+    /* Set rows of A to powers of poly2 (cf. _gr_vec_set_powers) */
     status |= gr_one(Arow(0), ctx);
     status |= _gr_vec_set(Arow(1), poly2, len2, ctx);
 
