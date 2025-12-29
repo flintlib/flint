@@ -14,11 +14,11 @@
 #include <math.h>
 #include <string.h> /* for memcpy */
 
-#if _MSC_VER
-#pragma float_control(precise, off)
-#else
-#pragma GCC optimize("Ofast,unroll-loops")
-#endif
+//#if _MSC_VER
+//#pragma float_control(precise, off)
+//#else
+//#pragma GCC optimize("Ofast,unroll-loops")
+//#endif
 
 /*****************************************
  * Intermediate variables data structure *
