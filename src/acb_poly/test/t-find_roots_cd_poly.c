@@ -133,6 +133,7 @@ TEST_FUNCTION_START(acb_poly_find_roots_double, state)
     slong hdeg = 100;
 
     acb_poly_fit_length(A, 2*hdeg+1);
+    _acb_vec_zero(A->coeffs, 2*hdeg+1);
     acb_poly_set_coeff_si(A, 0, 1);
     acb_poly_set_coeff_si(A, 1, 1);
     acb_poly_set_coeff_si(A, hdeg, -1);
