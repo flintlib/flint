@@ -275,6 +275,8 @@ Basic arithmetic with precomputed inverses
     out in either direction.
 
 .. function:: ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
+              ulong n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+              ulong n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
 
     Returns `a \bmod{n}` and sets `q` to the quotient of `a` by `n`, given a
     precomputed inverse of `n` computed by :func:`n_preinvert_limb()`. There are
@@ -284,6 +286,18 @@ Basic arithmetic with precomputed inverses
     This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the remainder shifted back.
+
+    The difference between the legacy :func:`n_divrem2_preinv` and
+    :func:`n_divrem_preinv` is that the latter accepts the ``norm``
+    parameter specifying the number of leading zero bits of ``n`` as input
+    and hence avoids computing this on the fly.
+    The version :func:`n_divrem_preinv_unnorm` requires positive ``norm``.
+
+.. function:: ulong n_divrem_norm(ulong * q, ulong a, ulong n)
+
+    Returns `a \bmod{n}` and sets `q` to the quotient of `a` by `n`, assuming
+    that `n` is normalised. This is a trivial operation as the quotient
+    is either 0 or 1.
 
 .. function:: ulong n_div2_preinv(ulong a, ulong n, ulong ninv)
 

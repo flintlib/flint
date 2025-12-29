@@ -58,6 +58,68 @@ ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, double npre);
 ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
 ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
 
+/*
+   Method of Niels Moller and Torbjorn Granlund see paper:
+   Improved Division by Invariant Integers: (algorithm 4)
+   https://gmplib.org/~tege/division-paper.pdf
+*/
+ULONG_EXTRAS_INLINE ulong
+n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+{
+    ulong q1, q0, r;
+    n <<= norm;
+    const ulong u1 = (norm == 0) ? 0 : a >> (FLINT_BITS - norm);
+    const ulong u0 = (a << norm);
+    umul_ppmm(q1, q0, ninv, u1);
+    add_ssaaaa(q1, q0, q1, q0, u1, u0);
+    (*q) = q1 + 1;
+    r = u0 - (*q) * n;
+    if (r > q0)
+    {
+        r += n;
+        (*q)--;
+    }
+    if (r >= n)
+    {
+        (*q)++;
+        r -= n;
+    }
+    return r >> norm;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+{
+    ulong q1, q0, r;
+    FLINT_ASSERT(norm >= 1);
+    n <<= norm;
+    const ulong u1 = a >> (FLINT_BITS - norm);
+    const ulong u0 = (a << norm);
+    umul_ppmm(q1, q0, ninv, u1);
+    add_ssaaaa(q1, q0, q1, q0, u1, u0);
+    (*q) = q1 + 1;
+    r = u0 - (*q) * n;
+    if (r > q0)
+    {
+        r += n;
+        (*q)--;
+    }
+    if (r >= n)
+    {
+        (*q)++;
+        r -= n;
+    }
+    return r >> norm;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_norm(ulong * q, ulong a, ulong n)
+{
+    ulong q0 = (a >= n);
+    *q = q0;
+    return a - (n & (-q0));
+}
+
 ulong n_factorial_mod2_preinv(ulong n, ulong p, ulong pinv);
 ulong n_factorial_fast_mod2_preinv(ulong n, ulong p, ulong pinv);
 
