@@ -18,24 +18,40 @@ TEST_FUNCTION_START(n_divrem2_preinv, state)
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        ulong d, dinv, n, q1, q2, r1, r2;
+        ulong d, dinv, n, q1, q2, r1, r2, norm;
 
         d = n_randtest_not_zero(state);
         n = n_randtest(state);
 
-        dinv = n_preinvert_limb(d);
+        norm = flint_clz(d);
+        dinv = n_preinvert_limb_prenorm(d << norm);
 
-        r1 = n_divrem2_preinv(&q1, n, d, dinv);
+        switch (i % 3)
+        {
+            case 0:
+                r1 = n_divrem2_preinv(&q1, n, d, dinv);
+                break;
+            case 1:
+                if (norm == 0)
+                    r1 = n_divrem_norm(&q1, n, d);
+                else
+                    r1 = n_divrem_preinv_unnorm(&q1, n, d, dinv, norm);
+                break;
+            default:
+                r1 = n_divrem_preinv(&q1, n, d, dinv, norm);
+                break;
+        }
+
         q2 = n / d;
         r2 = n % d;
 
         result = (q1 == q2 && r1 == r2);
         if (!result)
             TEST_FUNCTION_FAIL(
-                    "n = %wu, d = %wu, dinv = %wu\n"
+                    "i = %d, n = %wu, d = %wu, dinv = %wu\n"
                     "q1 = %wu, q2 = %wu\n"
                     "r1 = %wu, r2 = %wu\n",
-                    n, d, dinv, q1, q2, r1, r2);
+                    i, n, d, dinv, q1, q2, r1, r2);
     }
 
     TEST_FUNCTION_END(state);
