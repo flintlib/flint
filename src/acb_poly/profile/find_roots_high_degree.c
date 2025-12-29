@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
         flint_printf("- Easy polynomials 1 + 2x + ... + (d+1)x^d\n");
         flint_printf("- Hyperbolic polynomials: N_0 + ... + N_n x^d\n");
         flint_printf("- Flat polynomials:       N_0 + ... + 1/sqrt(d!) N_d x^d\n");
-        flint_printf("- Elliptic polynomials:   N_0 + ... + sqrt(binom(d,k)) x^k + ... + N_d x^d\n\n");
+        flint_printf("- Elliptic polynomials:   N_0 + ... + sqrt(binom(d,k)) N_k x^k + ... + N_d x^d\n\n");
         return 1;
     }
 
