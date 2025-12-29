@@ -64,7 +64,7 @@ ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
    https://gmplib.org/~tege/division-paper.pdf
 */
 ULONG_EXTRAS_INLINE ulong
-n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, ulong norm)
+n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
 {
     ulong q1, q0, r;
     n <<= norm;
@@ -88,7 +88,7 @@ n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, ulong norm)
 }
 
 ULONG_EXTRAS_INLINE ulong
-n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, ulong norm)
+n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
 {
     ulong q1, q0, r;
     FLINT_ASSERT(norm >= 1);

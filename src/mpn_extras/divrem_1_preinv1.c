@@ -64,7 +64,7 @@ flint_mpn_divrem_3_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t
 }
 
 mp_limb_t
-flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, mp_limb_t norm)
+flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
 {
     mp_limb_t u0, u1, r;
 
@@ -90,7 +90,7 @@ flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb
 }
 
 mp_limb_t
-flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, mp_limb_t norm)
+flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
 {
     mp_limb_t u0, u1, u2, r;
 
@@ -118,7 +118,7 @@ flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb
 }
 
 mp_limb_t
-flint_mpn_divrem_1_preinv(mp_ptr qp, mp_srcptr up, mp_size_t n, mp_limb_t d, mp_limb_t dinv, mp_limb_t norm)
+flint_mpn_divrem_1_preinv(mp_ptr qp, mp_srcptr up, mp_size_t n, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
 {
     mp_limb_t u2, u3, r;
     slong i;

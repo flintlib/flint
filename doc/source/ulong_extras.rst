@@ -275,8 +275,8 @@ Basic arithmetic with precomputed inverses
     out in either direction.
 
 .. function:: ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
-              ulong n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, ulong norm)
-              ulong n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, ulong norm)
+              ulong n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+              ulong n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
 
     Returns `a \bmod{n}` and sets `q` to the quotient of `a` by `n`, given a
     precomputed inverse of `n` computed by :func:`n_preinvert_limb()`. There are

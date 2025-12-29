@@ -298,7 +298,7 @@ Division and modular arithmetic with precomputed inverses
     ``dinv`` must be computed from ``b[n - 1]``, ``b[n - 2]`` by 
     ``flint_mpn_preinv1``. We also require ``m >= n >= 2``.
 
-.. function:: mp_limb_t flint_mpn_divrem_1_preinv(mp_ptr q, mp_srcptr a, mp_size_t n, mp_limb_t d, mp_limb_t dinv, mp_limb_t norm)
+.. function:: mp_limb_t flint_mpn_divrem_1_preinv(mp_ptr q, mp_srcptr a, mp_size_t n, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
 
     Divide ``a, n`` by the limb ``d``, writing the quotient to ``q, n``
     and returning the remainder. Requires ``n`` and ``d`` to be positive.
@@ -312,9 +312,9 @@ Division and modular arithmetic with precomputed inverses
     ``flint_mpn_divrem_1_preinv`` currently does not.
 
 .. function:: mp_limb_t flint_mpn_divrem_2_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv)
-              mp_limb_t flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, mp_limb_t norm)
+              mp_limb_t flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
               mp_limb_t flint_mpn_divrem_3_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv)
-              mp_limb_t flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, mp_limb_t norm)
+              mp_limb_t flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
 
     Versions of :func:`flint_mpn_divrem_1_preinv` specialized for length 2 and 3.
     The ``_norm`` functions require a normalised divisor while the ``_unnorm``
