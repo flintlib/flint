@@ -97,19 +97,22 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
         acb_poly_set_fmpz_poly(cpoly_deflated, poly_deflated, prec);
         maxiter = FLINT_MIN(4 * deg_deflated + 64, prec);
 
+        /* don't reuse the roots computed with double in case of failure */
+        int new_initial = (prec == initial_prec) || (prec  == 128);
+
         if (flags & ARB_FMPZ_POLY_ROOTS_VERBOSE)
         {
             TIMEIT_ONCE_START;
             flint_printf("prec=%wd: ", prec);
             isolated = acb_poly_find_roots(roots_deflated, cpoly_deflated,
-                prec == initial_prec ? NULL : roots_deflated, maxiter, prec);
+                new_initial ? NULL : roots_deflated, maxiter, prec);
             flint_printf("%wd isolated roots | ", isolated);
             TIMEIT_ONCE_STOP;
         }
         else
         {
             isolated = acb_poly_find_roots(roots_deflated, cpoly_deflated,
-                prec == initial_prec ? NULL : roots_deflated, maxiter, prec);
+                new_initial ? NULL : roots_deflated, maxiter, prec);
         }
 
         if (isolated == deg_deflated)
