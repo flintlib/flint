@@ -68,15 +68,49 @@ ulong timed_find_roots(acb_ptr roots, acb_srcptr coeffs, slong n, slong prec, ch
 {
     ulong elapsed;
     struct timespec start, stop;
-    flint_printf("%-10s ... ", name);
+    flint_printf("%-10s (scaled) ... ", name);
     fflush(stdout);
     clock_gettime(CLOCK_MONOTONIC, &start);
     _acb_poly_find_roots_double(roots, coeffs, NULL, n, 500, prec);
     clock_gettime(CLOCK_MONOTONIC, &stop);
     elapsed = (stop.tv_sec - start.tv_sec)*1000 + (stop.tv_nsec - start.tv_nsec) / 1000000;
-    flint_printf("%lu ms\n", elapsed);
+    flint_printf("%lu ms | ", elapsed);
     return elapsed;
 }
+
+ulong timed_find_roots_double(acb_ptr roots, acb_srcptr coeffs, slong n, slong prec, char* name)
+{
+    ulong elapsed;
+    struct timespec start, stop;
+    double *cdz, *cdp;
+    arb_t scale;
+    slong i;
+
+    arb_init(scale);
+    cdp = flint_malloc(2*n*sizeof(double));
+    cdz = flint_malloc(2*(n - 1)*sizeof(double));
+
+    for(i=0; i<n; i++) {
+        cdp[2*i]   = arf_get_d(arb_midref(acb_realref(coeffs + i)), ARF_RND_NEAR);
+        cdp[2*i+1] = arf_get_d(arb_midref(acb_imagref(coeffs + i)), ARF_RND_NEAR);
+    }
+
+    flint_printf("%-10s (direct) ... ", name);
+    fflush(stdout);
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    cd_poly_find_roots(cdz, cdp, NULL, n, 500, 1e-53);
+    clock_gettime(CLOCK_MONOTONIC, &stop);
+    elapsed = (stop.tv_sec - start.tv_sec)*1000 + (stop.tv_nsec - start.tv_nsec) / 1000000;
+    flint_printf("%lu ms | ", elapsed);
+    for(i=0; i<n-1; i++) {
+        acb_set_d_d(roots + i, cdz[2*i], cdz[2*i+1]);
+    }
+
+    flint_free(cdp);
+    flint_free(cdz);
+    return elapsed;
+}
+
 
 slong rel_accuracy(acb_srcptr roots, acb_srcptr coeffs, slong n, slong prec)
 {
@@ -126,17 +160,25 @@ int main(int argc, char *argv[])
     set_coeffs_easy(coeffs, n);
     timed_find_roots(roots, coeffs, n, prec, "Easy");
     rel_accuracy(roots, coeffs, n, prec);
+    timed_find_roots_double(roots, coeffs, n, prec, "Easy");
+    rel_accuracy(roots, coeffs, n, prec);
 
     set_coeffs_hyperbolic(coeffs, n, prec);
     timed_find_roots(roots, coeffs, n, prec, "Hyperbolic");
+    rel_accuracy(roots, coeffs, n, prec);
+    timed_find_roots_double(roots, coeffs, n, prec, "Hyperbolic");
     rel_accuracy(roots, coeffs, n, prec);
 
     set_coeffs_flat(coeffs, n, prec);
     timed_find_roots(roots, coeffs, n, prec, "Flat");
     rel_accuracy(roots, coeffs, n, prec);
+    timed_find_roots_double(roots, coeffs, n, prec, "Flat");
+    rel_accuracy(roots, coeffs, n, prec);
 
     set_coeffs_elliptic(coeffs, n, prec);
     timed_find_roots(roots, coeffs, n, prec, "Elliptic");
+    rel_accuracy(roots, coeffs, n, prec);
+    timed_find_roots_double(roots, coeffs, n, prec, "Elliptic");
     rel_accuracy(roots, coeffs, n, prec);
 
     _acb_vec_clear(coeffs, n);
