@@ -11,12 +11,9 @@
 
 #include "arb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom/impl.h"
 
-void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n, const arb_t x, int use_reflect, int digamma, slong prec);
-int arb_hypgeom_gamma_exact(arb_t res, const arb_t x, int reciprocal, slong prec);
-void arb_hypgeom_gamma_stirling_inner(arb_t s, const arb_t z, slong N, slong prec);
-
-void
+static void
 arb_hypgeom_lgamma_stirling(arb_t y, const arb_t x, slong prec)
 {
     int reflect;

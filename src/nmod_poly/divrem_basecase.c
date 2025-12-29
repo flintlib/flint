@@ -15,21 +15,74 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 
-static
-slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
+/* addmul_fits: a + b*c fits in 16/32/64 bits */
+/* addmul_addmul_fits: a + b*c + d*e fits in 16/32/64 bits */
+
+#if FLINT_BITS == 64
+
+#define NMOD_ADDMUL_FITS_HALFWORD(mod) ((mod.n) <= UWORD(65535))
+#define NMOD_ADDMUL_ADDMUL_FITS_HALFWORD(mod) ((mod.n) <= UWORD(46341))
+#define NMOD_ADDMUL_FITS_WORD(mod) ((mod.n) <= UWORD(4294967295))
+#define NMOD_ADDMUL_ADDMUL_FITS_WORD(mod) ((mod.n) <= UWORD(3037000500))
+
+#else
+
+#define NMOD_ADDMUL_FITS_HALFWORD(mod) ((mod.n) <= UWORD(255))
+#define NMOD_ADDMUL_ADDMUL_FITS_HALFWORD(mod) ((mod.n) <= UWORD(181))
+#define NMOD_ADDMUL_FITS_WORD(mod) ((mod.n) <= UWORD(65535))
+#define NMOD_ADDMUL_ADDMUL_FITS_WORD(mod) ((mod.n) <= UWORD(46341))
+
+#endif
+
+/* Lemire, Kaser & Kurz */
+static ulong _mod1_preinvert(ulong n)
 {
-    const flint_bitcnt_t bits =
-        2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
-
-    if (bits <= FLINT_BITS)
-        return lenA;
-    else if (bits <= 2 * FLINT_BITS)
-        return 2*(lenA + lenB - 1);
-    else
-        return 3*(lenA + lenB - 1);
+    return UWORD_MAX / n + 1;
 }
 
+/* Shoup */
+static ulong _mod2_preinvert(ulong n)
+{
+    return n_mulmod_precomp_shoup(1, n);
+}
+
+static ulong _mod1(ulong x, ulong n, ulong ninv)
+{
+    ulong l = ninv * x;
+
+#if FLINT_BITS != 64 || !defined(__GNUC__)
+    ulong hi, lo;
+    umul_ppmm(hi, lo, l, n);
+    return hi;
+#else
+    return ((__uint128_t) l * n ) >> 64;
+#endif
+}
+
+static ulong _mulmod1(ulong a, ulong b, ulong n, ulong ninv)
+{
+    return _mod1(a * b, n, ninv);
+}
+
+static ulong _mod2_fast(ulong x, ulong n, ulong ninv)
+{
+    return x - n_mulhi(ninv, x) * n;
+}
+
+static ulong _mod2(ulong x, ulong n, ulong ninv)
+{
+    ulong y = _mod2_fast(x, n, ninv);
+    if (y >= n)
+        y -= n;
+    return y;
+}
+
+static ulong _mulmod2(ulong a, ulong b, ulong n, ulong ninv)
+{
+    return _mod2(a * b, n, ninv);
+}
 
 void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
                           nn_srcptr A, nn_srcptr B, slong lenA, ulong invL, nmod_t mod)
@@ -54,38 +107,153 @@ void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
     }
 }
 
+/* For GCC and Zen 3, the performance of the following critical function is
+   extremely finicky, with an immediate 10% slowdown if one reorders some
+   instruction in the main loop, makes it inline, etc. Just try to profile
+   and do whatever works.
+*/
+
+FLINT_STATIC_NOINLINE
+void _nmod_poly_divrem_q1_preinv1_fullword(nn_ptr Q, nn_ptr R,
+                          nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
+                          ulong invL, nmod_t mod)
+{
+    slong i;
+    ulong t, q0, q1, t1, t0, s1, s0;
+
+    FLINT_ASSERT(lenA == lenB + 1);
+
+    q1 = _nmod_mul_fullword(A[lenA-1], invL, mod);
+    t  = _nmod_mul_fullword(q1, B[lenB-2], mod);
+    t  = nmod_sub(t, A[lenA-2], mod);
+    q0 = _nmod_mul_fullword(t, invL, mod);
+    Q[0] = nmod_neg(q0, mod);
+    Q[1] = q1;
+    q1 = nmod_neg(q1, mod);
+    /* R = A + (q1*x + q0)*B */
+
+    /* Hack: nmod_addmul is faster than _nmod_mull_fullword + nmod_add */
+    R[0] = nmod_addmul(A[0], q0, B[0], mod);
+
+    /* We want to compute r = a + q0*b + q1*c where a, b, c, q0, q1 <= n - 1.
+       If (1 + q0 + q1) < 2^FLINT_BITS, then r < 2^FLINT_BITS * (n-1).
+       In this case, r fits in two limbs without overflow and the high limb is
+       already reduced mod n. This will almost always be the case when n is
+       close to 2^(FLINT_BITS-1), and happens with decent probability when
+       n is close to 2^FLINT_BITS too. */
+    if (q0 + q1 + 1 >= q0)  /* Checks that q0 + (q1 + 1) doesn't wrap around. */
+    {
+        for (i = 1; i < lenB - 1; i++)
+        {
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, s1, s0);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2_FULLWORD(R[i], t1, t0, mod);
+        }
+    }
+    else
+    {
+        for (i = 1; i < lenB - 1; i++)
+        {
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, 0, s0);
+            t1 = nmod_add(t1, s1, mod);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2_FULLWORD(R[i], t1, t0, mod);
+        }
+    }
+}
+
 void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
                           nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                           ulong invL, nmod_t mod)
 {
+    slong i;
+    ulong t, q0, q1, t1, t0, s1, s0;
+
+    FLINT_ASSERT(lenA == lenB + 1);
+
     if (lenB == 1)
     {
         _nmod_vec_scalar_mul_nmod(Q, A, lenA, invL, mod);
+        return;
     }
-    else
+
+    if (NMOD_ADDMUL_FITS_HALFWORD(mod))
     {
-        ulong q0, q1, t, t0, t1, t2, s0, s1;
-        slong i;
+        ulong n = mod.n;
+        ulong ninv = _mod1_preinvert(n);
 
-        q1 = nmod_mul(A[lenA-1], invL, mod);
-        t = nmod_mul(q1, B[lenB-2], mod);
-        t = nmod_sub(t, A[lenA-2], mod);
-        q0 = nmod_mul(t, invL, mod);
-
-        R[0] = nmod_addmul(A[0], q0, B[0], mod);
-
+        q1 = _mulmod1(A[lenA-1], invL, n, ninv);
+        t  = _mulmod1(q1, B[lenB-2], n, ninv);
+        t  = nmod_sub(t, A[lenA-2], mod);
+        q0 = _mulmod1(t, invL, n, ninv);
         Q[0] = nmod_neg(q0, mod);
         Q[1] = q1;
         q1 = nmod_neg(q1, mod);
+        /* R = A + (q1*x + q0)*B */
 
-        if (mod.norm >= (FLINT_BITS + 1) / 2 + 1)
+        R[0] = _mod1(A[0] + q0 * B[0], n, ninv);
+
+        if (NMOD_ADDMUL_ADDMUL_FITS_HALFWORD(mod))
         {
             for (i = 1; i < lenB - 1; i++)
-            {
-                NMOD_RED2(R[i], UWORD(0), A[i] + q1*B[i - 1] + q0*B[i], mod);
-            }
+                R[i] = _mod1(A[i] + q1*B[i - 1] + q0*B[i], n, ninv);
         }
-        else if (mod.norm != 0)
+        else
+        {
+            for (i = 1; i < lenB - 1; i++)
+                R[i] = _mod1(_mod1(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
+        }
+    }
+    else if (NMOD_ADDMUL_FITS_WORD(mod))
+    {
+        ulong n = mod.n;
+        ulong ninv = _mod2_preinvert(n);
+
+        q1 = _mulmod2(A[lenA-1], invL, n, ninv);
+        t  = _mulmod2(q1, B[lenB-2], n, ninv);
+        t  = nmod_sub(t, A[lenA-2], mod);
+        q0 = _mulmod2(t, invL, n, ninv);
+        Q[0] = nmod_neg(q0, mod);
+        Q[1] = q1;
+        q1 = nmod_neg(q1, mod);
+        /* R = A + (q1*x + q0)*B */
+
+        R[0] = _mod2(A[0] + q0 * B[0], n, ninv);
+
+        /* In the second branch, the _mod2_fast maps
+               [0, ..., (n-1) + (n-1)^2] -> [0, 2n-1]
+           and the _mod2 maps
+                [0, 2n-1 + (n-1)^2] -> [0,n-1]. */
+
+        if (NMOD_ADDMUL_ADDMUL_FITS_WORD(mod))
+            for (i = 1; i < lenB - 1; i++)
+                R[i] = _mod2(A[i] + q1*B[i - 1] + q0*B[i], n, ninv);
+        else
+            for (i = 1; i < lenB - 1; i++)
+                R[i] = _mod2(_mod2_fast(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
+    }
+    else if (NMOD_BITS(mod) != FLINT_BITS)
+    {
+        FLINT_ASSERT(lenA == lenB + 1);
+
+        q1 = nmod_mul(A[lenA-1], invL, mod);
+        t  = nmod_mul(q1, B[lenB-2], mod);
+        t  = nmod_sub(t, A[lenA-2], mod);
+        q0 = nmod_mul(t, invL, mod);
+        Q[0] = nmod_neg(q0, mod);
+        Q[1] = q1;
+        q1 = nmod_neg(q1, mod);
+        /* R = A + (q1*x + q0)*B */
+
+        R[0] = nmod_addmul(A[0], q0, B[0], mod);
+
+        if (NMOD_BITS(mod) != FLINT_BITS)
         {
             for (i = 1; i < lenB - 1; i++)
             {
@@ -98,27 +266,14 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
                 NMOD_RED2(R[i], t1, t0, mod);
             }
         }
-        else
-        {
-            for (i = 1; i < lenB - 1; i++)
-            {
-                umul_ppmm(t1, t0, q1, B[i - 1]);
-                umul_ppmm(s1, s0, q0, B[i]);
-                add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
-                add_sssaaaaaa(t2, t1, t0, 0, t1, t0, 0, s1, s0);
-                if (t2 != 0)
-                    /* Note: should just be t1 -= mod.n, but with GCC
-                       on Zen3 that version runs noticeably slower. */
-                    sub_ddmmss(t2, t1, t2, t1, 0, mod.n);
-                t1 = FLINT_MIN(t1, t1 - mod.n);
-                FLINT_ASSERT(t1 < mod.n);
-                NMOD_RED2(R[i], t1, t0, mod);
-            }
-        }
+    }
+    else
+    {
+        _nmod_poly_divrem_q1_preinv1_fullword(Q, R, A, lenA, B, lenB, invL, mod);
     }
 }
 
-void
+static void
 _nmod_poly_divrem_basecase_preinv1_1(nn_ptr Q, nn_ptr R, nn_ptr W,
                              nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                              ulong invL,
@@ -152,7 +307,7 @@ _nmod_poly_divrem_basecase_preinv1_1(nn_ptr Q, nn_ptr R, nn_ptr W,
         _nmod_vec_reduce(R, R1, lenB - 1, mod);
 }
 
-void
+static void
 _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R, nn_ptr W,
                              nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                              ulong invL,
@@ -202,7 +357,7 @@ _nmod_poly_divrem_basecase_preinv1_2(nn_ptr Q, nn_ptr R, nn_ptr W,
         R[iR] = n_ll_mod_preinv(R2[2*iR+1], R2[2*iR], mod.n, mod.ninv);
 }
 
-void
+static void
 _nmod_poly_divrem_basecase_preinv1_3(nn_ptr Q, nn_ptr R, nn_ptr W,
                                      nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                                      ulong invL,
@@ -254,6 +409,20 @@ _nmod_poly_divrem_basecase_preinv1_3(nn_ptr Q, nn_ptr R, nn_ptr W,
     for (iR = 0; iR < lenB - 1; iR++)
         R[iR] = n_lll_mod_preinv(R3[3 * iR + 2], R3[3 * iR + 1],
                                  R3[3 * iR], mod.n, mod.ninv);
+}
+
+static
+slong NMOD_DIVREM_BC_ITCH(slong lenA, slong lenB, nmod_t mod)
+{
+    const flint_bitcnt_t bits =
+        2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
+
+    if (bits <= FLINT_BITS)
+        return lenA;
+    else if (bits <= 2 * FLINT_BITS)
+        return 2*(lenA + lenB - 1);
+    else
+        return 3*(lenA + lenB - 1);
 }
 
 void

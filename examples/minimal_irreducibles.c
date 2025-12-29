@@ -77,7 +77,7 @@ main(int argc, char * argv[])
     for (i = 0; i < batch_size; i++)
         nmod_poly_init(work.f + i, p);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     na = nmin;
     while (1)
     {
@@ -90,8 +90,8 @@ main(int argc, char * argv[])
         if (na > nmax)
             break;
     }
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     for (i = 0; i < batch_size; i++)
         nmod_poly_clear(work.f + i);

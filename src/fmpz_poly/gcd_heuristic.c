@@ -18,7 +18,7 @@
    Divide (arrayg, limbsg) by the positive value gc in-place and
    return the number of limbs written
 */
-slong flint_mpn_tdiv_q_fmpz_inplace(nn_ptr arrayg, slong limbsg, fmpz_t gc)
+static slong flint_mpn_tdiv_q_fmpz_inplace(nn_ptr arrayg, slong limbsg, fmpz_t gc)
 {
    if (fmpz_size(gc) == 1)
    {
@@ -46,7 +46,7 @@ slong flint_mpn_tdiv_q_fmpz_inplace(nn_ptr arrayg, slong limbsg, fmpz_t gc)
    Returns 1 if sign * (G, glen) * (Q, qlen) = (P, len), else returns 0.
    Temp requires space for glen + qlen - 1 coefficients
 */
-int multiplies_out(fmpz * P, slong len, const fmpz * Q, slong qlen,
+static int multiplies_out(fmpz * P, slong len, const fmpz * Q, slong qlen,
                    const fmpz * G, slong glen, slong sign, fmpz * temp)
 {
    int divides = 0;

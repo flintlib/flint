@@ -12,6 +12,7 @@
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
+#include "ca_field/impl.h"
 
 static int
 _fmpz_poly_compare_abslex(const fmpz * a, const fmpz * b, slong len)
@@ -105,7 +106,7 @@ _fmpz_mpoly_cmp2(const fmpz_mpoly_t x, const fmpz_mpoly_t y, fmpz_mpoly_ctx_t ct
     return 0;
 }
 
-int
+static int
 _fmpz_mpoly_q_cmp(const fmpz_mpoly_q_t x, const fmpz_mpoly_q_t y, fmpz_mpoly_ctx_t ctx)
 {
     int c;
@@ -155,25 +156,13 @@ ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
     }
 }
 
-slong
-ca_field_depth(const ca_field_t K, ca_ctx_t ctx);
-
-slong
-ca_depth(const ca_t x, ca_ctx_t ctx)
-{
-    if (CA_IS_SPECIAL(x))
-        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
-
-    return ca_field_depth(CA_FIELD(x, ctx), ctx);
-}
-
 static slong
 ca_ext_depth(const ca_ext_t x, ca_ctx_t ctx)
 {
     return CA_EXT_DEPTH(x);
 }
 
-slong
+static slong
 ca_field_depth(const ca_field_t K, ca_ctx_t ctx)
 {
     if (CA_FIELD_LENGTH(K) >= 1)
@@ -192,6 +181,15 @@ ca_field_depth(const ca_field_t K, ca_ctx_t ctx)
     }
 
     return 0;
+}
+
+slong
+ca_depth(const ca_t x, ca_ctx_t ctx)
+{
+    if (CA_IS_SPECIAL(x))
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
+
+    return ca_field_depth(CA_FIELD(x, ctx), ctx);
 }
 
 /* todo: sort on depth? */

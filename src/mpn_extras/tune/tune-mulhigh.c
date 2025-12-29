@@ -23,7 +23,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 
 short ktab[FLINT_MPN_MULHIGH_K_TAB_SIZE] = { 0 };
 
@@ -113,7 +113,7 @@ main()
         for (j = 0; j < 2; j++)
         {
             ktab[n] = 0;
-            TIMEIT_START
+            TIMEIT_START;
             mulhigh(Z, X, Y, n);
             TIMEIT_STOP_VALUES(tcpu, twall);
             tbase = FLINT_MIN(tbase, tcpu);
@@ -137,7 +137,7 @@ main()
 
                 ktab[n] = k;
 
-                TIMEIT_START
+                TIMEIT_START;
                 mulhigh(Z, X, Y, n);
                 TIMEIT_STOP_VALUES(tcpu, twall);
 

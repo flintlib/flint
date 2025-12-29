@@ -22,7 +22,7 @@
 /* Todo: tune this (should depend on the lengths and on the modulus. */
 #define MAX_NZ 6
 
-int
+static int
 _nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
                                         slong lenA, nn_srcptr B, slong lenB,
                                        nn_srcptr Binv, slong FLINT_UNUSED(lenBinv), nmod_t mod)

@@ -40,7 +40,7 @@ _apply_permutation(slong * AP, arb_mat_t A, const slong * P,
     }
 }
 
-void
+static void
 _arb_vec_approx_scalar_addmul(arb_ptr res, arb_srcptr vec,
     slong len, const arb_t c, slong prec)
 {
@@ -50,7 +50,7 @@ _arb_vec_approx_scalar_addmul(arb_ptr res, arb_srcptr vec,
                    arb_midref(vec + i), arb_midref(c), prec, ARF_RND_DOWN);
 }
 
-int
+static int
 arb_mat_approx_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
 {
     arf_t d;
@@ -109,7 +109,7 @@ arb_mat_approx_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong pr
     return result;
 }
 
-int
+static int
 arb_mat_approx_lu_recursive(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
 {
     slong i, m, n, r1, r2, n1;

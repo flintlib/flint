@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
-void _fq_zech_mpoly_set(fq_zech_struct * coeff1, ulong * exps1,
+static void _fq_zech_mpoly_set(fq_zech_struct * coeff1, ulong * exps1,
                 const fq_zech_struct * coeff2, const ulong * exps2, slong len2,
                                             slong N, const fq_zech_ctx_t fqctx)
 {

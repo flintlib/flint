@@ -67,7 +67,7 @@ n_is_prime_power(ulong * p, ulong n)
 
 /* Jacobsthal matrix of order q = p^d */
 /* Could speed up greatly for d = 1. */
-void
+static void
 fmpz_mat_jacobsthal(fmpz_mat_t Q)
 {
     int * quadratic;

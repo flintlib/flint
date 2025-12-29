@@ -11,7 +11,7 @@
 
 #include "acb.h"
 
-void
+static void
 acb_pow_fmpz_binexp(acb_t y, const acb_t b, const fmpz_t e, slong prec)
 {
     slong i, wp, bits;
@@ -128,7 +128,7 @@ acb_pow_si(acb_t y, const acb_t b, slong e, slong prec)
     fmpz_clear(f);
 }
 
-void
+static void
 _acb_pow_exp(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
     acb_t t;
@@ -139,7 +139,7 @@ _acb_pow_exp(acb_t z, const acb_t x, const acb_t y, slong prec)
     acb_clear(t);
 }
 
-void
+static void
 _acb_pow_arb_exp(acb_t z, const acb_t x, const arb_t y, slong prec)
 {
     acb_t t;

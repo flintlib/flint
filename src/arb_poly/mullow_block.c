@@ -14,7 +14,11 @@
 #include "fmpz_poly.h"
 #include "arb_poly.h"
 
-void
+/* Compute a heuristic scaling factor `c` (stored into ``scale``)
+   from the polynomials `A(x)` and `B(x)` (represented by vectors of
+   coefficients ``x`` and ``y``) such that `A(2^{-c} x)` and `B(2^{-c} x)`
+   have slowly varying coefficients. */
+static void
 _arb_poly_get_scale(fmpz_t scale, arb_srcptr x, slong xlen,
                                   arb_srcptr y, slong ylen)
 {
@@ -85,6 +89,20 @@ _arb_poly_get_scale(fmpz_t scale, arb_srcptr x, slong xlen,
 #define DOUBLE_BLOCK_SHIFT (DOUBLE_BLOCK_MAX_HEIGHT / 2)
 
 
+/* Given a vector of ``mag`` in ``xm`` with length ``len`` (or if ``x`` is not
+   ``NULL``, the ``mag`` are read from the radius of ``x``), compute a
+   decomposition of it into blocks of slowly-varying
+   (after scaling by ``scale``) coefficients.
+
+   Outputs are in the following format:
+
+   - if there are ``n`` blocks, the block boundaries are written to
+     ``0 = blocks[0] < blocks[1] < ... < blocks[n] = len``.
+   - then the exponents are written to ``exps[0], ..., exps[n-1]``.
+   - the shifted coefficients are simultaneously written to first ``len``
+     entries of ``coeffs`` and ``dblcoeffs``, the latter shifted by
+     ``DOUBLE_BLOCK_SHIFT`` --- in other words,
+     ``dblcoeffs[i] == coeffs[i] / 2^DOUBLE_BLOCK_SHIFT``. */
 static void
 _mag_vec_get_fmpz_2exp_blocks(fmpz * coeffs,
     double * dblcoeffs, fmpz * exps, slong * blocks, const fmpz_t scale,
@@ -216,6 +234,8 @@ _mag_vec_get_fmpz_2exp_blocks(fmpz * coeffs,
     fmpz_clear(block_bot);
 }
 
+/* Similar to ``_mag_vec_get_fmpz_2exp_blocks``, but takes as input the values
+   instead of the radii of ``x``. */
 static void
 _arb_vec_get_fmpz_2exp_blocks(fmpz * coeffs, fmpz * exps,
     slong * blocks, const fmpz_t scale, arb_srcptr x, slong len, slong prec)
@@ -327,6 +347,12 @@ _arb_vec_get_fmpz_2exp_blocks(fmpz * coeffs, fmpz * exps,
     fmpz_clear(block_bot);
 }
 
+/* For each ``0 <= ii < xlen``, ``0 <= jj < ylen``, if ``k = ii + jj < n``,
+   perform ``arb_radref(z + k) += xz[ii] * yz[jj] * 2^(xexps[i] + yexps[j])``,
+   where ``i`` is the block of ``ii`` i.e. ``xblocks[i] <= ii < xblocks[i+1]``,
+   similar for ``jj``.
+   ``xdbl`` must satisfy ``xdbl[ii] == xz[ii] / 2^DOUBLE_BLOCK_SHIFT``,
+   similar for ``ydbl``. */
 static void
 _arb_poly_addmullow_rad(arb_ptr z, fmpz * zz,
     const fmpz * xz, const double * xdbl, const fmpz * xexps,
@@ -401,6 +427,8 @@ _arb_poly_addmullow_rad(arb_ptr z, fmpz * zz,
     mag_clear(t);
 }
 
+/* Similar to ``_arb_poly_addmullow_rad``, but add to the value instead of the
+   radius of ``z``. */
 static void
 _arb_poly_addmullow_block(arb_ptr z, fmpz * zz,
     const fmpz * xz, const fmpz * xexps, const slong * xblocks, slong xlen,

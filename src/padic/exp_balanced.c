@@ -118,7 +118,7 @@ _padic_exp_bsplit(fmpz_t y, const fmpz_t x, slong v, const fmpz_t p, slong N)
     }
 }
 
-void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, slong xv, slong N)
+static void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, slong xv, slong N)
 {
     const fmpz_t p = {WORD(2)};
 
@@ -154,7 +154,7 @@ void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, slong xv, slong N)
     fmpz_clear(t);
 }
 
-void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv,
+static void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv,
                                        const fmpz_t p, slong N)
 {
     fmpz_t r, t, pw, pN;

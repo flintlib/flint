@@ -109,11 +109,6 @@ typedef struct {
 
 typedef gr_parse_struct gr_parse_t[1];
 
-void _gr_parse_init(gr_parse_t E);
-void _gr_parse_clear(gr_parse_t E);
-void _gr_parse_add_terminal(gr_parse_t E, const char * s, const void * v);
-int _gr_parse_parse(gr_parse_t E, void * res, const char * s, slong len);
-
 FLINT_FORCE_INLINE int _is_op(slong a)
 {
     return a >= 0;
@@ -140,7 +135,7 @@ FLINT_FORCE_INLINE slong _op_name(slong a)
 }
 
 /* initialize the R member first */
-void _gr_parse_init(gr_parse_t E)
+static void _gr_parse_init(gr_parse_t E)
 {
     slong i;
 
@@ -168,7 +163,7 @@ void _gr_parse_init(gr_parse_t E)
 
 }
 
-void _gr_parse_clear(gr_parse_t E)
+static void _gr_parse_clear(gr_parse_t E)
 {
     slong i;
 
@@ -183,7 +178,7 @@ void _gr_parse_clear(gr_parse_t E)
     flint_free(E->terminal_strings);
 }
 
-void _gr_parse_add_terminal(gr_parse_t E, const char * s, const void * val)
+static void _gr_parse_add_terminal(gr_parse_t E, const char * s, const void * val)
 {
     slong l, n = E->terminals_len;
     slong sz = E->R->sizeof_elem;
@@ -234,7 +229,7 @@ static int string_with_length_cmp(const void * _a, const void * _b)
     return strncmp(a->str, b->str, a->str_len);
 }
 
-int _gr_parse_check_duplicates(gr_parse_t E)
+static int _gr_parse_check_duplicates(gr_parse_t E)
 {
     size_t size = E->terminals_len * sizeof(string_with_length_struct);
     string_with_length_struct * names = (string_with_length_struct *) flint_malloc(size);
@@ -668,7 +663,7 @@ static const char * _parse_decimal(fmpz_t c, fmpz_t d, const char * s, const cha
     return s_exp + exp_digits;
 }
 
-int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
+static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
 {
     const char * send = s + slen;
     fmpz_t c, d;

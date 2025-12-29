@@ -40,6 +40,11 @@ ulong * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
    return &nmod_mat_entry(mat, i, j);
 }
 
+NMOD_MAT_INLINE
+ulong * nmod_mat_row_ptr(const nmod_mat_t mat, slong i)
+{
+   return &nmod_mat_entry(mat, i, 0);
+}
 /* See inlines.c */
 
 NMOD_MAT_INLINE
@@ -55,6 +60,12 @@ slong nmod_mat_ncols(const nmod_mat_t mat)
 }
 
 void nmod_mat_set_mod(nmod_mat_t mat, ulong n);
+
+NMOD_MAT_INLINE
+nmod_t nmod_mat_mod(const nmod_mat_t mat)
+{
+   return mat->mod;
+}
 
 /* Memory management */
 void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n);
@@ -106,6 +117,7 @@ void nmod_mat_concat_vertical(nmod_mat_t res,
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
+void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  nn_srcptr diag, slong n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
@@ -153,10 +165,13 @@ void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 
 /* Matrix-scalar arithmetic */
 
+void _nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c);
+void _nmod_mat_scalar_mul_precomp(nmod_mat_t B, const nmod_mat_t A, ulong c, ulong c_pr);
 void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c);
 void nmod_mat_scalar_mul_fmpz(nmod_mat_t B, const nmod_mat_t A, const fmpz_t c);
-void nmod_mat_scalar_addmul_ui(nmod_mat_t C,
-                       const nmod_mat_t A, const nmod_mat_t B, const ulong c);
+void _nmod_mat_scalar_addmul_ui_generic(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c);
+void _nmod_mat_scalar_addmul_ui_precomp(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c, const ulong c_pr);
+void nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c);
 
 /* Matrix multiplication */
 

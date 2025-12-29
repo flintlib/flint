@@ -41,7 +41,7 @@ int _ff_poly_pow_ui_is_not_feasible(slong length, ulong e)
     }
 }
 
-int _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
+static int _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
                       nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
 {
     int success = 1;
@@ -138,7 +138,7 @@ cleanup_degrees:
 }
 
 
-int _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
+static int _nmod_mpoly_compose_nmod_poly_mp(nmod_poly_t A, const nmod_mpoly_t B,
                       nmod_poly_struct * const * C, const nmod_mpoly_ctx_t ctx)
 {
     int success = 1;

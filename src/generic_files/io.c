@@ -27,8 +27,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
-
-int _gr_mat_write(gr_stream_t out, const gr_mat_t mat, int linebreaks, gr_ctx_t ctx);
+#include "gr_mat/impl.h"
 
 /* Helper functions **********************************************************/
 

@@ -37,7 +37,7 @@ int main(int argc, char ** argv)
         flint_printf("unable to open file\n");
         return 1;
     }
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     while (!feof(fp) && fscanf(fp, "%lu", &n) == 1)
     {
@@ -58,7 +58,7 @@ int main(int argc, char ** argv)
             break;
     }
 
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     slong expect_count = (FLINT_BITS == 64) ? 118968378 : 10403;
     ulong expect_sum = (FLINT_BITS == 64) ? UWORD(6235045495123121954) : UWORD(882877973);

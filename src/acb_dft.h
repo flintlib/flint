@@ -23,6 +23,7 @@ void _acb_dft_naive(acb_ptr w, acb_srcptr v, slong dv, acb_srcptr z, slong dz, s
 void acb_dft_naive(acb_ptr w, acb_srcptr v, slong len, slong prec);
 void acb_dft_crt(acb_ptr w, acb_srcptr v, slong len, slong prec);
 void acb_dft_cyc(acb_ptr w, acb_srcptr v, slong len, slong prec);
+void acb_dft_inverse_cyc(acb_ptr w, acb_srcptr v, slong len, slong prec);
 void acb_dft_rad2_inplace(acb_ptr v, int e, slong prec);
 void acb_dft_rad2(acb_ptr w, acb_srcptr v, int e, slong prec);
 void acb_dft_bluestein(acb_ptr w, acb_srcptr v, slong len, slong prec);

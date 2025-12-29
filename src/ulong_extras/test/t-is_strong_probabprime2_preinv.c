@@ -17,9 +17,7 @@ TEST_FUNCTION_START(n_is_strong_probabprime2_preinv, state)
 {
     int i, result;
     ulong count = UWORD(0);
-    slong test_multiplier;
-
-    test_multiplier = FLINT_MAX(1, flint_test_multiplier());
+    double test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
     for (i = 0; i < 100 * test_multiplier; i++) /* Test that primes pass the test */
     {

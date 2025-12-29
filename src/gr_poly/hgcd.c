@@ -276,7 +276,7 @@ __mat_mul(gr_ptr * C, slong * lenC,
  */
 
 
-int
+static int
 _gr_poly_hgcd_recursive_iter(
     slong * ans_sgn,
     gr_ptr * M, slong * lenM,
@@ -374,7 +374,7 @@ _gr_poly_hgcd_recursive_iter(
     the first two arguments are allowed to be NULL.
  */
 
-int _gr_poly_hgcd_recursive(
+static int _gr_poly_hgcd_recursive(
     slong * ans_sgn,
     gr_ptr * M, slong * lenM,
     gr_ptr A, slong * lenA,

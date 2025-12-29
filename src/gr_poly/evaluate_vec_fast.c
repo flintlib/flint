@@ -54,7 +54,7 @@ void _gr_poly_tree_free(gr_ptr * tree, slong len, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_poly_mul_monic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;

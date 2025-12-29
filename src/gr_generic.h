@@ -86,6 +86,9 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 
 void gr_generic_ctx_clear(gr_ctx_t ctx);
 
+slong gr_generic_ctx_ngens_0(slong * ngens, gr_ctx_t ctx);
+slong gr_generic_ctx_ngens_1(slong * ngens, gr_ctx_t ctx);
+
 void gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx);
@@ -225,10 +228,11 @@ WARN_UNUSED_RESULT int gr_generic_vec_neg(gr_ptr res, gr_srcptr src, slong len, 
 WARN_UNUSED_RESULT int gr_generic_vec_normalise(slong * res, gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT slong gr_generic_vec_normalise_weak(gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_mul_scalar_2exp_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_addmul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_submul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_addmul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_submul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_addmul_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);

@@ -79,6 +79,7 @@ void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
                 status |= gr_poly_set(A2, A, ctx);
                 status |= divrem_impl(Q->coeffs, A2->coeffs, A2->coeffs, A->length, B->coeffs, B->length, ctx);
                 status |= _gr_vec_set(R->coeffs, A2->coeffs, B->length - 1, ctx);
+                _gr_poly_normalise(A2, ctx);
                 gr_poly_clear(A2, ctx);
             }
 
@@ -100,6 +101,7 @@ void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
             if (status == GR_SUCCESS && gr_poly_equal(QBR, A, ctx) == T_FALSE)
             {
                 flint_printf("FAIL\n\n");
+                gr_ctx_println(ctx);
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
                 flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
                 flint_printf("Q = "); gr_poly_print(Q, ctx); flint_printf("\n");

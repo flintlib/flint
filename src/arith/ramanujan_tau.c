@@ -40,7 +40,7 @@ void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
     fmpz_clear(tmp);
 }
 
-void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
+static void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
 {
     fmpz_poly_t poly;
     fmpz_t tau_p, p_11, next, this, prev;

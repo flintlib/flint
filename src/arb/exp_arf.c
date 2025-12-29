@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "arb.h"
 #include "thread_support.h"
 #include "mpn_extras.h"
+#include "arb.h"
+#include "arb/impl.h"
 
 #define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(ulong))
 

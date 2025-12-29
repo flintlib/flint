@@ -360,7 +360,7 @@ arb_log_ui_smooth(arb_t s, ulong n, slong prec)
     arb_clear(t);
 }
 
-void
+static void
 arb_const_euler_eval(arb_t res, slong prec)
 {
     euler_bsplit_1_t sum;
@@ -461,7 +461,7 @@ arb_const_euler_eval(arb_t res, slong prec)
     euler_bsplit_1_clear(sum, NULL);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_const_euler_brent_mcmillan, arb_const_euler_eval)
+_ARB_DEF_CACHED_CONSTANT(static, arb_const_euler_brent_mcmillan, arb_const_euler_eval)
 
 FLINT_DLL extern const ulong arb_hypgeom_gamma_tab_limbs[];
 

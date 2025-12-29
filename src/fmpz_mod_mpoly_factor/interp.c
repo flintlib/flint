@@ -13,6 +13,7 @@
 #include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
+#if 0
 /*
     E = A(v = alpha)
     A is in R[v][x]
@@ -67,7 +68,6 @@ void fmpz_mod_polyu1n_intp_lift_sm_poly(
     }
     A->length = Ai;
 }
-
 
 /*
     F = F + modulus*(A - F(v = alpha))
@@ -176,7 +176,7 @@ int fmpz_mod_polyu1n_intp_crt_sm_poly(
     *lastdeg = lastlen - 1;
     return changed;
 }
-
+#endif
 
 void fmpz_mod_polyu1n_interp_reduce_2sm_poly(
     fmpz_mod_poly_t E,

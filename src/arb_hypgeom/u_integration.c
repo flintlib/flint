@@ -394,7 +394,7 @@ bound_tail(mag_t bound, const arb_t a1, const arb_t ba1, const arb_t z, const ar
     arb_clear(C);
 }
 
-int
+static int
 _arb_hypgeom_u_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z, slong prec)
 {
     acb_calc_integrate_opt_t opt;

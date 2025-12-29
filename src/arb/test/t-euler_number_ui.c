@@ -14,33 +14,7 @@
 #include "ulong_extras.h"
 #include "arith.h"
 #include "arb.h"
-
-ulong euler_mod_p_powsum_noredc(ulong n, ulong p, const unsigned int * divtab);
-ulong euler_mod_p_powsum(ulong n, ulong p, const unsigned int * divtab);
-ulong euler_mod_p_powsum_1(ulong n, ulong p);
-
-static void
-divisor_table_odd(unsigned int * tab, slong len)
-{
-    slong i, j;
-
-    tab[0] = 0;
-
-    for (i = 1; i < len; i += 2)
-    {
-        tab[i] = 1;
-        tab[i + 1] = i;
-    }
-
-    for (i = 3; i < len; i += 2)
-    {
-        for (j = 3; j <= i && i * j < len; j += 2)
-        {
-            tab[i * j]     = j;
-            tab[i * j + 1] = i;
-        }
-    }
-}
+#include "arb/impl.h"
 
 TEST_FUNCTION_START(arb_euler_number_ui, state)
 {

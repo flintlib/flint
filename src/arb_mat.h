@@ -297,10 +297,6 @@ void arb_mat_diag_prod(arb_t res, const arb_mat_t A, slong prec);
 
 /* Sparsity structure */
 
-void arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src);
-
-void arb_mat_entrywise_not_is_zero(fmpz_mat_t dest, const arb_mat_t src);
-
 slong arb_mat_count_is_zero(const arb_mat_t mat);
 
 ARB_MAT_INLINE slong

@@ -75,7 +75,7 @@ _n_unit(ulong a, nmod_t N)
     {
         l = N.n/g;
         d = _n_stab(s, l, N);
-        return nmod_add(s, nmod_mul(d, l, N), N);
+        return nmod_add(s, nmod_ui_mul_ui(d, l, N), N);
     }
 }
 
@@ -88,7 +88,7 @@ _n_is_divisible(nn_ptr q, ulong b, ulong a, nmod_t N)
 
     if (( b % g ) == 0)
     {
-        *q = nmod_mul(e, b/g, N);
+        *q = nmod_ui_mul_ui(e, b/g, N);
         return 1;
     }
 
@@ -173,6 +173,7 @@ nmod_mat_strong_echelon_form(nmod_mat_t A)
         if (nmod_mat_entry(A, col, col) != 0)
         {
             u = _n_unit(nmod_mat_entry(A, col, col), mod);
+
             for (k = col; k < m; k++)
             {
                 nmod_mat_entry(A, col, k) = nmod_mul(u, nmod_mat_entry(A, col, k), mod);

@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-int _nmod_mpolyn_divides(
+static int _nmod_mpolyn_divides(
     nmod_mpolyn_t Q,
     const nmod_mpolyn_t A,
     const nmod_mpolyn_t B,
@@ -258,7 +258,7 @@ int nmod_mpolyn_divides(
 
 /* The following functions are currently untested and unused. */
 
-void _nmod_mpolyn_add(
+static void _nmod_mpolyn_add(
     nmod_mpolyn_t A,
     const nmod_mpolyn_t B,
     const nmod_mpolyn_t C,
@@ -322,7 +322,7 @@ void _nmod_mpolyn_add(
 
 
 /* A = D - B*C, D may be modified if saveD == 0 */
-void _nmod_mpolyn_mulsub(
+static void _nmod_mpolyn_mulsub(
     nmod_mpolyn_t A,
     const nmod_mpolyn_t D, int saveD,
     const nmod_mpolyn_t B,

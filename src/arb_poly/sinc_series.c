@@ -11,10 +11,9 @@
 
 #include "arb_poly.h"
 #include "acb_poly.h"
+#include "acb_poly/impl.h"
 
-void _acb_sinc_jet_zero(acb_ptr res, const acb_t z, slong len, slong prec);
-
-void
+static void
 _arb_sinc_jet_zero(arb_ptr res, const arb_t z, slong len, slong prec)
 {
     acb_ptr t;

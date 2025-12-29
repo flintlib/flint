@@ -26,6 +26,11 @@ Random functions
     Sets ``vec`` to a random vector of the given length with entries
     reduced modulo ``mod.n``.
 
+.. function:: void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
+
+    Sets ``vec`` to a vector of the given length with entries picked uniformly
+    at random in ``[0, mod.n)``.
+
 
 Basic manipulation and comparison
 --------------------------------------------------------------------------------
@@ -104,6 +109,13 @@ Arithmetic operations
 
     Sets ``(res, len)`` to the negation of ``(vec, len)``.
 
+.. function:: void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
+
+    Sets each entry of ``(res, len)`` to the modular inverse of the
+    corresponding entry in ``(vec, len)``. Assumes all entries in
+    ``vec`` are invertible modulo `mod.n`. Aliasing of ``res`` and ``vec`` is
+    allowed.
+
 .. function:: void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c`. The element
@@ -115,6 +127,13 @@ Arithmetic operations
     :func:`n_mulmod_shoup`. ``mod.n`` should be less than
     `2^{\mathtt{FLINT\_BITS} - 1}`, and `c` should be less than ``mod.n``.
     There is no constraint on elements of ``vec``.
+
+.. function:: void _nmod_vec_scalar_mul_nmod_redc(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+
+    Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
+    Montgomery multiplication. Requires that ``mod.n`` is odd.
+    The element `c` and all elements of ``vec`` are assumed to be less
+    than ``mod.n``.
 
 .. function:: void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
@@ -224,4 +243,3 @@ performed at the very end of the computation.
     Same specification as ``_nmod_vec_dot_bound_limbs``, but uses the additional
     input ``params`` to reduce the amount of computations; for correctness
     ``params`` must have been computed for the specified ``len`` and ``mod``.
-

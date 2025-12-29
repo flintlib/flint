@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "arb_poly.h"
+#include "arb_poly/impl.h"
 #include "gr_poly.h"
 
 int
