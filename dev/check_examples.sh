@@ -280,7 +280,7 @@ then
         echo "FAIL"
         exit 1
     fi
-    echo "$res" | perl -0ne 'if (/\n10 roots with multiplicity 1\nsearching for 10 roots, 5 deflated\nprec=32: 5 isolated roots/) { $found=1; last } END { exit !$found }'
+    echo "$res" | perl -0ne 'if (/\n10 roots with multiplicity 1\nsearching for 10 roots, 5 deflated\nprec=53: 5 isolated roots/) { $found=1; last } END { exit !$found }'
     if test "$?" != "0";
     then
         echo "FAIL"

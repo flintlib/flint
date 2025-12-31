@@ -41,6 +41,7 @@
 #include "t-exp_series_basecase.c"
 #include "t-exp_series.c"
 #include "t-find_roots.c"
+#include "t-find_roots_cd_poly.c"
 #include "t-gamma_series.c"
 #include "t-get_coeff_ptr.c"
 #include "t-get_set_coeff_acb.c"
@@ -124,6 +125,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_exp_series_basecase),
     TEST_FUNCTION(acb_poly_exp_series),
     TEST_FUNCTION(acb_poly_find_roots),
+    TEST_FUNCTION(acb_poly_find_roots_double),
     TEST_FUNCTION(acb_poly_gamma_series),
     TEST_FUNCTION(acb_poly_get_coeff_ptr),
     TEST_FUNCTION(acb_poly_get_set_coeff_acb),
@@ -171,7 +173,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_taylor_shift),
     TEST_FUNCTION(acb_poly_zeta_cpx_series),
     TEST_FUNCTION(acb_poly_zeta_em_tail_bsplit),
-    TEST_FUNCTION(acb_poly_zeta_series)
+    TEST_FUNCTION(acb_poly_zeta_series),
+    TEST_FUNCTION(cd_poly_refine_roots)
 };
 
 /* main function *************************************************************/
