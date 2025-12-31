@@ -283,7 +283,7 @@ TEST_FUNCTION_START(cd_poly_refine_roots, state)
         for(i=0; i<1000 && (deg-1)*correction > ldexp(1,-prec) && correction > ldexp(1,-50); i++) {
             correction = cd_poly_refine_roots_with_pivot(z, p, len, 0x1p-10);
         }
-        for(i=0; i<10 && (deg-1)*correction > ldexp(1,-prec) && correction > ldexp(1,-50); i++) {
+        for(i=0; i<10; i++) {
             correction = cd_poly_refine_roots(z, p, len, 0x1p-10);
         }
         for(i=0; i<deg; i++) {
