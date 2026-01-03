@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "gr_poly.h"
 
@@ -17,6 +19,12 @@ void
 _nmod_poly_invsqrt_series(nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
+
+    /* Algorithm requires prime modulus */
+    if (!n_is_prime(mod.n))
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_invsqrt_series). "
+            "Modulus must be prime.\n");
+
     _gr_ctx_init_nmod(ctx, &mod);
     GR_MUST_SUCCEED(_gr_poly_rsqrt_series(g, h, hlen, n, ctx));
 }

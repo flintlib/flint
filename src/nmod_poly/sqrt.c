@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -38,6 +39,11 @@ _nmod_poly_sqrt(nn_ptr s, nn_srcptr p, slong len, nmod_t mod)
 
     if (len % 2 == 0)
         return len == 0;
+
+    /* Algorithm requires prime modulus */
+    if (!n_is_prime(mod.n))
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_sqrt). "
+            "Modulus must be prime.\n");
 
     if (mod.n == 2)
         return _nmod_poly_sqrt_2(s, p, len);
