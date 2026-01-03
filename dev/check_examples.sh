@@ -206,6 +206,9 @@ then
     fi
     echo "PASS"
     exit 0     
+elif test "$1" = "jet_poly";
+then
+    echo "jet_poly.....SKIPPED"
 elif test "$1" = "keiper_li";
 then
     echo "keiper_li....SKIPPED"
