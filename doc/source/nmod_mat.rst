@@ -126,6 +126,7 @@ Basic properties and manipulation
 
     Returns `1` if all entries of the matrix ``mat`` are zero.
 
+
 Window
 --------------------------------------------------------------------------------
 
@@ -140,9 +141,8 @@ Window
 .. function:: void nmod_mat_window_clear(nmod_mat_t window)
 
     Clears the matrix ``window`` and releases any memory that it
-    uses. Note that the memory to the underlying matrix that
+    uses. Note that the memory of the underlying matrix that
     ``window`` points to is not freed.
-
 
 
 Concatenate
