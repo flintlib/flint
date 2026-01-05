@@ -14,18 +14,38 @@
 void radix_init(radix_t radix, ulong b, unsigned int exp)
 {
     ulong B;
-    ulong hi;
+    ulong hi, lo;
     int i;
 
     if (b < 2 || exp >= FLINT_BITS)
         flint_throw(FLINT_ERROR, "radix_init: require b >= 2 and exp < FLINT_BITS");
 
     B = b;
-    for (i = 2; i <= exp; i++)
+
+    if (exp == 0)
     {
-        umul_ppmm(hi, B, B, b);
-        if (hi != 0)
-            flint_throw(FLINT_ERROR, "radix_init: require b^e < 2^FLINT_BITS");
+        for (i = 1; ; i++)
+        {
+            umul_ppmm(hi, lo, B, b);
+            if (hi != 0)
+            {
+                exp = i;
+                break;
+            }
+            else
+            {
+                B = lo;
+            }
+        }
+    }
+    else
+    {
+        for (i = 2; i <= exp; i++)
+        {
+            umul_ppmm(hi, B, B, b);
+            if (hi != 0)
+                flint_throw(FLINT_ERROR, "radix_init: require b^e < 2^FLINT_BITS");
+        }
     }
 
     nmod_init(&radix->b, b);

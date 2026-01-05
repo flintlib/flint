@@ -41,5 +41,6 @@ radix_divexact_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix
     ulong r;
     r = radix_divrem_1(res, a, an, d, radix);
     FLINT_ASSERT(r == 0);
+    (void) r;
 }
 
