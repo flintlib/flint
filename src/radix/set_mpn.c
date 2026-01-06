@@ -306,8 +306,32 @@ radix_set_mpn_divconquer(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
     slong abits, abits_limbs;
     slong rn;
     radix_powers_t powers;
+    ulong B = LIMB_RADIX(radix);
 
-    abits = FLINT_BIT_COUNT(LIMB_RADIX(radix)) - 1;
+    /* As a special case, the divide and conquer code will not work as intended
+       for radix B = 2. Should put in special-purpose code for all binary
+       radices; this is just a quick workaround. */
+    if (B == 2)
+    {
+        slong i, j;
+        while (an > 0 && a[an - 1] == 0)
+            an--;
+
+        for (i = 0; i < an; i++)
+        {
+            ulong c = a[i];
+
+            for (j = 0; j < FLINT_BITS; j++)
+                res[i * FLINT_BITS + j] = ((c >> j) & UWORD(1));
+        }
+
+        rn = an * FLINT_BITS;
+        while (rn > 0 && res[rn - 1] == 0)
+            rn--;
+        return rn;
+    }
+
+    abits = FLINT_BIT_COUNT(B - 1) - 1;
     abits_limbs = (an * FLINT_BITS + abits - 1) / abits;
 
     slong e = FLINT_MAX((abits_limbs + 1) / 2, 1);
