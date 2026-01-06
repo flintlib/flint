@@ -16,6 +16,49 @@ TEST_FUNCTION_START(radix_set_mpn, state)
 {
     slong iter;
 
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        radix_t radix;
+        nn_ptr a, b, c;
+        slong n, l1, n2;
+        ulong h1, h2, p = 1932735323;
+
+        radix_init_randtest(radix, state);
+
+        do {
+            n = n_randint(state, 4000);
+            n2 = radix_set_mpn_need_alloc(n, radix);
+        } while (n2 > 8000);
+
+        flint_set_num_threads(1 + n_randint(state, 8));
+        a = flint_malloc(n * sizeof(ulong));
+        b = flint_malloc(n2 * sizeof(ulong));
+        c = flint_malloc(n2 * sizeof(ulong));
+
+        if (n != 0)
+            flint_mpn_rrandom(a, state, n);
+
+        l1 = radix_set_mpn(b, a, n, radix);
+
+        h1 = (n == 0) ? 0 : mpn_divrem_1(c, 0, a, n, p);
+        h2 = (l1 == 0) ? 0 : radix_divrem_1(c, b, l1, p, radix);
+
+        if (h1 != h2)
+        {
+            flint_printf("FAIL (hash)\n");
+            flint_printf("%{ulong*}\n", a, n);
+            flint_printf("%{ulong*}\n", b, l1);
+            flint_printf("h1 = %wu, h2 = %wu\n", h1, h2);
+            flint_abort();
+        }
+
+        radix_clear(radix);
+
+        flint_free(a);
+        flint_free(b);
+        flint_free(c);
+    }
+
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         radix_t radix;

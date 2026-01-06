@@ -171,8 +171,8 @@ Radix conversion
               slong radix_get_mpn(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 
     Convert *(a, an)* to the machine word radix, writing the output limbs
-    to *res* and returning the exact number of limbs in the machine word radix.
-    Leading zeros are not written and are omitted from the count.
+    to *res* and returning the exact size of the result in the machine word radix.
+    Leading zero limbs are omitted from the output size and may or may not be written.
     Requires that *res* has enough space for the largest representable integer
     with *an* limbs in the given radix, plus one extra limb.
 
@@ -181,8 +181,8 @@ Radix conversion
               slong radix_set_mpn(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 
     Convert *(a, an)* from the machine word radix, writing the output limbs
-    to *res* and returning the exact number of limbs in the target radix.
-    Leading zeros are not written and are omitted from the count.
+    to *res* and returning the exact size of the result in the target radix.
+    Leading zero limbs are omitted from the output size and may or may not be written.
     Requires that *res* has space for at least ``radix_set_mpn_need_alloc(an, radix)``
     limbs.
 

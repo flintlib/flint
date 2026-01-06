@@ -10,6 +10,8 @@
 */
 
 #include "radix.h"
+#include "thread_pool.h"
+#include "thread_support.h"
 
 static void
 radix_powers_init_ui(radix_powers_t powers, ulong b, ulong max_exp)
@@ -126,6 +128,28 @@ radix_get_mpn_basecase(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 }
 
 static slong
+_radix_get_mpn_recursive(nn_ptr res, nn_srcptr a, slong an, const radix_powers_t powers, slong depth, const radix_t radix);
+
+typedef struct
+{
+    nn_ptr res;
+    nn_srcptr a;
+    slong an;
+    const radix_powers_struct * powers;
+    slong depth;
+    const radix_struct * radix;
+    slong out_len;
+}
+worker_args_struct;
+
+static void
+worker(void * arg)
+{
+    worker_args_struct * X = (worker_args_struct * ) arg;
+    X->out_len = _radix_get_mpn_recursive(X->res, X->a, X->an, X->powers, X->depth, X->radix);
+}
+
+static slong
 _radix_get_mpn_recursive(nn_ptr res, nn_srcptr a, slong an, const radix_powers_t powers, slong depth, const radix_t radix)
 {
     slong an_lo, an_hi;
@@ -151,8 +175,41 @@ _radix_get_mpn_recursive(nn_ptr res, nn_srcptr a, slong an, const radix_powers_t
     lo = TMP_ALLOC((an + 2) * sizeof(ulong));
     hi = lo + (an_lo + 1);
 
-    len_lo = _radix_get_mpn_recursive(lo, a, an_lo, powers, depth, radix);
-    len_hi = _radix_get_mpn_recursive(hi, a + an_lo, an_hi, powers, depth, radix);
+    slong nworkers, nthreads, nworkers_save;
+    int want_workers;
+    thread_pool_handle * threads;
+
+    nworkers = 0;
+    if (an > 500)
+    {
+        nthreads = flint_get_num_threads();
+        /* Prefer to let the multithreaded
+           multiplication do its things near the root. */
+        want_workers = nthreads >= 2 && (an_lo <= 100000000 || depth >= 2);
+        nworkers = flint_request_threads(&threads, want_workers ? 2 : 1);
+    }
+
+    if (nworkers == 1)
+    {
+        worker_args_struct work_lo = { lo, a, an_lo, powers, depth, radix, 0 };
+        worker_args_struct work_hi = { hi, a + an_lo, an_hi, powers, depth, radix, 0 };
+
+        nworkers_save = flint_set_num_workers(nthreads - nthreads / 2 - 1);
+        thread_pool_wake(global_thread_pool, threads[0], nthreads / 2 - 1, worker, &work_lo);
+        worker(&work_hi);
+
+        flint_reset_num_workers(nworkers_save);
+        thread_pool_wait(global_thread_pool, threads[0]);
+        flint_give_back_threads(threads, nworkers);
+
+        len_lo = work_lo.out_len;
+        len_hi = work_hi.out_len;
+    }
+    else
+    {
+        len_lo = _radix_get_mpn_recursive(lo, a, an_lo, powers, depth, radix);
+        len_hi = _radix_get_mpn_recursive(hi, a + an_lo, an_hi, powers, depth, radix);
+    }
 
     if (len_hi == 0)
     {
