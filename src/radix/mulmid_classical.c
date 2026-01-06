@@ -11,6 +11,16 @@
 
 #include "radix.h"
 
+FLINT_FORCE_INLINE mp_limb_t
+flint_mpn_divrem_3_1_preinv_norm_inline(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv)
+{
+    mp_limb_t r;
+    r = n_divrem_norm(&qp[2], up[2], d);
+    udiv_qrnnd_preinv(qp[1], r, r, up[1], d, dinv);
+    udiv_qrnnd_preinv(qp[0], r, r, up[0], d, dinv);
+    return r;
+}
+
 void
 radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)
 {
@@ -114,13 +124,33 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
                 n1 = FLINT_MIN(an - 1, i);
                 n2 = FLINT_MIN(bn - 1, i);
 
-                for (j = 0; j < n1 + n2 - i + 1; j++)
+#define cy0 cy[0]
+#define cy1 cy[1]
+#define cy2 cy[2]
+
+                for (j = 0; j + 3 < n1 + n2 - i + 1; j += 4)
                 {
                     umul_ppmm(hi, lo, a[i - n2 + j], b[n2 - j]);
-                    add_sssaaaaaa(cy[2], cy[1], cy[0], cy[2], cy[1], cy[0], 0, hi, lo);
+                    add_sssaaaaaa(cy2, cy1, cy0, cy2, cy1, cy0, 0, hi, lo);
+                    umul_ppmm(hi, lo, a[i - n2 + j + 1], b[n2 - j - 1]);
+                    add_sssaaaaaa(cy2, cy1, cy0, cy2, cy1, cy0, 0, hi, lo);
+                    umul_ppmm(hi, lo, a[i - n2 + j + 2], b[n2 - j - 2]);
+                    add_sssaaaaaa(cy2, cy1, cy0, cy2, cy1, cy0, 0, hi, lo);
+                    umul_ppmm(hi, lo, a[i - n2 + j + 3], b[n2 - j - 3]);
+                    add_sssaaaaaa(cy2, cy1, cy0, cy2, cy1, cy0, 0, hi, lo);
                 }
 
-                z[i - zlo] = flint_mpn_divrem_3_1_preinv_norm(cy, cy, mod.n, mod.ninv);
+                for ( ; j < n1 + n2 - i + 1; j++)
+                {
+                    umul_ppmm(hi, lo, a[i - n2 + j], b[n2 - j]);
+                    add_sssaaaaaa(cy2, cy1, cy0, cy2, cy1, cy0, 0, hi, lo);
+                }
+
+#undef cy0
+#undef cy1
+#undef cy2
+
+                z[i - zlo] = flint_mpn_divrem_3_1_preinv_norm_inline(cy, cy, mod.n, mod.ninv);
             }
         }
         else
