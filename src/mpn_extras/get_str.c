@@ -87,7 +87,7 @@ n_max_decimal_limb_get_str(char * s, ulong x)
     FLINT_ASSERT(x < 1000000000);
 
     s[0] = '0' + (x / 100000000);
-    n_to_str_8(s + 1, r % 100000000);
+    n_to_str_8(s + 1, x % 100000000);
 #endif
 }
 
