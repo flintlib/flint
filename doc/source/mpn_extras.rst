@@ -24,10 +24,14 @@ Utility functions
     Prints debug information about ``(x, xsize)`` to ``stdout``. 
     In particular, this will print binary representations of all the limbs.
 
-.. function:: char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n)
+.. function:: char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int negative)
 
-    Returns a string containing the decimal representation of 
-    ``(x, n)``.
+    Returns the string representation of ``(x, xn)`` (or its negation if
+    ``negative`` is set to 1) in base *base* which must be a base
+    supported by GMP. If ``res`` is ``NULL``, a new string will be allocated;
+    otherwise, the given pointer ``res`` will be used and is assumed
+    to have sufficient space to represent the full output, one extra
+    digit, minus sign (if negative), and null terminator.
 
 .. function:: int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 
