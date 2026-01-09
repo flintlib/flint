@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -17,8 +18,8 @@ TEST_FUNCTION_START(fmpz_get_mpz, state)
 {
     int i, result;
 
-    if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
-        _flint_rand_init_gmp_state(state);
+    gmp_randstate_t gmp_state;
+    gmp_randinit_default(gmp_state);
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -31,7 +32,7 @@ TEST_FUNCTION_START(fmpz_get_mpz, state)
 
         bits = n_randint(state, 200) + 1;
 
-        mpz_rrandomb(b, state->__gmp_state, bits);
+        mpz_rrandomb(b, gmp_state, bits);
 
         if (n_randint(state, 2))
             mpz_neg(b, b);
@@ -55,6 +56,8 @@ TEST_FUNCTION_START(fmpz_get_mpz, state)
         mpz_clear(b);
         mpz_clear(c);
     }
+
+    gmp_randclear(gmp_state);
 
     TEST_FUNCTION_END(state);
 }

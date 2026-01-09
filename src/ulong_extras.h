@@ -41,6 +41,38 @@ ulong n_randtest(flint_rand_t state);
 ulong n_randtest_not_zero(flint_rand_t state);
 ulong n_randtest_prime(flint_rand_t state, int proved);
 
+#if FLINT64
+ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
+{
+    state->__randval = (state->__randval*UWORD(13282407956253574709) + UWORD(286824421));
+    state->__randval2 = (state->__randval2*UWORD(7557322358563246341) + UWORD(286824421));
+
+    return (state->__randval>>32) + ((state->__randval2>>32) << 32);
+}
+#else
+ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
+{
+    state->__randval = (state->__randval*UWORD(1543932465) +  UWORD(1626832771));
+    state->__randval2 = (state->__randval2*UWORD(2495927737) +  UWORD(1626832771));
+
+    return (state->__randval>>16) + ((state->__randval2>>16) << 16);
+}
+#endif
+
+ULONG_EXTRAS_INLINE ulong _n_randint(flint_rand_t state, ulong limit)
+{
+    if ((limit & (limit - 1)) == 0)
+    {
+        return _n_randlimb(state) & (limit - 1);
+    }
+    else
+    {
+        ulong hi, lo;
+        umul_ppmm(hi, lo, _n_randlimb(state), limit);
+        return hi;
+    }
+}
+
 /* Basic arithmetic **********************************************************/
 
 ulong n_revbin(ulong in, ulong bits);
