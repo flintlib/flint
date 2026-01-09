@@ -124,6 +124,37 @@ Basic assignment and manipulation
     the contents of the structs.
 
 
+Window
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_poly_mat_window_init(nmod_poly_mat_t window, const nmod_poly_mat_t mat, slong r1, slong c1, slong r2, slong c2)
+
+    Initializes the matrix ``window`` to be an ``r2 - r1`` by
+    ``c2 - c1`` submatrix of ``mat`` whose ``(0,0)`` entry
+    is the ``(r1, c1)`` entry of ``mat``. The memory for the
+    elements of ``window`` is shared with ``mat``.
+
+.. function:: void nmod_poly_mat_window_clear(nmod_poly_mat_t window)
+
+    Clears the matrix ``window`` and releases any memory that it
+    uses. Note that the memory of the underlying matrix that
+    ``window`` points to is not freed.
+
+
+Concatenate
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_poly_mat_concat_vertical(nmod_poly_mat_t res, const nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2)
+
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
+
+.. function:: void nmod_poly_mat_concat_horizontal(nmod_poly_mat_t res, const nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
+
+
 Input and output
 --------------------------------------------------------------------------------
 
