@@ -162,10 +162,17 @@ void fprint_memory_usage(FILE * fs)
     ulong virt = 0, rss = 0, rsspeak = usage.ru_maxrss;
 
 # if defined(__APPLE__)
+#  ifdef MACH_TASK_BASIC_INFO
     mach_task_basic_info_data_t info;
     mach_msg_type_number_t count = MACH_TASK_BASIC_INFO_COUNT;
     task_info(mach_task_self(), MACH_TASK_BASIC_INFO,
             (task_info_t) &info, &count);
+#  else
+    task_basic_info_data_t info;
+    mach_msg_type_number_t count = TASK_BASIC_INFO_COUNT;
+    task_info(mach_task_self(), TASK_BASIC_INFO,
+            (task_info_t) &info, &count);
+#  endif
     virt = info.virtual_size;
     rss = info.resident_size;
 # else /* BSD */
