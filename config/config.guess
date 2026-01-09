@@ -1014,11 +1014,11 @@ main ()
           if (model <= 1)
             modelstr = "bulldozer";
           else if (model < 0x20)        /* really 2, [0x10-0x20) */
-            modelstr = "piledriver";
+            modelstr = "bd2";
           else if (model < 0x40)        /* really [0x30-0x40) */
-            modelstr = "steamroller";
+            modelstr = "bd3";
           else                                /* really [0x60-0x70) */
-            modelstr = "excavator";
+            modelstr = "bd4";
           break;
         case 22:                /* Jaguar, an improved bobcat */
           cpu_64bit = 1, cpu_avx = 1, modelstr = "jaguar";
