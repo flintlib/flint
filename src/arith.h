@@ -38,13 +38,6 @@ void arith_stirling_number_1u_vec(fmpz * row, ulong n, slong klen);
 void arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen);
 void arith_stirling_number_2_vec(fmpz * row, ulong n, slong klen);
 
-void arith_stirling_number_1u_vec_next(fmpz * row,
-        const fmpz * prev, slong n, slong klen);
-void arith_stirling_number_1_vec_next(fmpz * row,
-        const fmpz * prev, slong n, slong klen);
-void arith_stirling_number_2_vec_next(fmpz * row,
-        const fmpz * prev, slong n, slong klen);
-
 void arith_stirling_matrix_1u(fmpz_mat_t mat);
 void arith_stirling_matrix_1(fmpz_mat_t mat);
 void arith_stirling_matrix_2(fmpz_mat_t mat);
