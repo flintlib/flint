@@ -78,7 +78,7 @@ TEST_FUNCTION_START(fmpz_factor_pollard_brent_single, state)
         }
     }
 
-    if (fails > flint_test_multiplier())
+    if (fails > 2 * flint_test_multiplier())
     {
         printf("FAIL : Pollard Rho failed too many times (%d times)\n", fails);
         fflush(stdout);

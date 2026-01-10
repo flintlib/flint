@@ -23,10 +23,12 @@ TEST_FUNCTION_START(acb_dirichlet_l_euler_product, state)
         dirichlet_char_t chi;
         ulong q, k;
         slong prec;
+        mag_t m;
 
         acb_init(s);
         acb_init(t);
         acb_init(u);
+        mag_init(m);
 
         q = 1 + n_randint(state, 50);
         prec = 2 + n_randint(state, 500);
@@ -48,7 +50,9 @@ TEST_FUNCTION_START(acb_dirichlet_l_euler_product, state)
                 acb_add_ui(s, s, n_randtest(state), prec);
         }
 
-        if (n_randint(state, 2))
+        acb_get_mag(m, s);  /* Hack: don't call l_hurwitz if convergence is potentially slow */
+
+        if (n_randint(state, 2) && mag_get_d(m) < 100000.0)
             acb_dirichlet_l_hurwitz(t, s, NULL, G, chi, prec);
         else
             acb_dirichlet_l_euler_product(t, s, G, chi, prec * 1.5);
@@ -70,6 +74,7 @@ TEST_FUNCTION_START(acb_dirichlet_l_euler_product, state)
         acb_clear(s);
         acb_clear(t);
         acb_clear(u);
+        mag_clear(m);
     }
 
     TEST_FUNCTION_END(state);

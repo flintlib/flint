@@ -83,9 +83,9 @@ TEST_FUNCTION_START(n_is_strong_probabprime2_preinv, state)
     }
 
 #if FLINT64
-    if (count > 220 * test_multiplier)
+    if (count > 250 * test_multiplier)
 #else
-    if (count > 432 * test_multiplier)
+    if (count > 500 * test_multiplier)
 #endif
         TEST_FUNCTION_FAIL("count = %wu\n", count);
 

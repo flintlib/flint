@@ -492,18 +492,30 @@ GCD
 Random Number Generation
 --------------------------------------------------------------------------------
 
+.. function:: void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n)
+
+    Generates a uniform random number of ``n`` bits and stores
+    it on ``rp``.
+
+.. function:: void flint_mpn_urandomm(mp_ptr rp, flint_rand_t state, mp_srcptr xp, mp_size_t xn)
+
+    Generates a uniform random number between 0 inclusive and ``(xp, xn)``
+    exclusive`[0, x)` and stores it on ``rp``. The most significant limb of
+    ``xp`` is required to be nonzero. This function will write ``xn`` limbs to
+    ``rp`` even if the largest possible value has one fewer limb.
 
 .. function:: void flint_mpn_rrandom(mp_ptr rp, flint_rand_t state, mp_size_t n)
 
-    Generates a random number with ``n`` limbs and stores 
+    Generates a random number with ``n`` limbs and stores
     it on ``rp``. The number it generates will tend to have
     long strings of zeros and ones in the binary representation.
 
     Useful for testing functions and algorithms, since this kind of random
     numbers have proven to be more likely to trigger corner-case bugs.
 
-.. function:: void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n)
+.. function:: void flint_mpn_rrandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t nbits)
 
-    Generates a uniform random number of ``n`` bits and stores 
-    it on ``rp``.
+    Generates a random number with ``nbits`` bits and stores
+    it on ``rp``. The number it generates will tend to have
+    long strings of zeros and ones in the binary representation.
 

@@ -18,6 +18,7 @@
 #include "t-lll_d_heuristic_with_removal.c"
 #include "t-lll_d_with_removal.c"
 #include "t-lll_d_with_removal_knapsack.c"
+#include "t-lll_is_reduced.c"
 #include "t-lll_mpf.c"
 #include "t-lll_mpf_with_removal.c"
 #include "t-lll_with_removal.c"
@@ -36,6 +37,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_lll_d_heuristic_with_removal),
     TEST_FUNCTION(fmpz_lll_d_with_removal),
     TEST_FUNCTION(fmpz_lll_d_with_removal_knapsack),
+    TEST_FUNCTION(fmpz_lll_is_reduced),
     TEST_FUNCTION(fmpz_lll_mpf),
     TEST_FUNCTION(fmpz_lll_mpf_with_removal),
     TEST_FUNCTION(fmpz_lll_with_removal),

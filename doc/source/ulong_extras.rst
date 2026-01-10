@@ -66,6 +66,7 @@ Random functions
 
 
 .. function:: ulong n_randlimb(flint_rand_t state)
+              ulong _n_randlimb(flint_rand_t state)
 
     Returns a uniformly pseudo random limb.
 
@@ -75,6 +76,9 @@ Random functions
     ``p_0 = 4294967311 = nextprime(2^32)`` on a 64-bit machine
     and ``p_0 = nextprime(2^16)`` on a 32-bit machine and
     ``p_1 = nextprime(p_0)``.
+
+    The function ``_n_randlimb`` is defined inline, which can allow for
+    better performance when generating many random numbers.
 
 .. function:: ulong n_randbits(flint_rand_t state, unsigned int bits)
 
@@ -91,18 +95,16 @@ Random functions
     function is intended for use in test code.
 
 .. function:: ulong n_randint(flint_rand_t state, ulong limit)
+              ulong n_urandint(flint_rand_t state, ulong limit)
+              ulong _n_randint(flint_rand_t state, ulong limit)
 
     Returns a uniformly pseudo random number up to but not including
     the given limit. If zero is passed as a parameter, an entire random
     limb is returned.
 
-.. function:: ulong n_urandint(flint_rand_t state, ulong limit)
-
-    Returns a uniformly pseudo random number up to but not including
-    the given limit. If zero is passed as a parameter, an entire
-    random limb is returned. This function provides somewhat better
-    randomness as compared to :func:`n_randint`, especially for larger
-    values of limit.
+    The functions ``n_randint`` and ``n_urandint`` are identical.
+    The function ``_n_randint`` is defined inline, which can allow for
+    better performance when generating many random numbers.
 
 .. function:: ulong n_randtest(flint_rand_t state)
 

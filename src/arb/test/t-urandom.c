@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "arb.h"
 
-#define N 10000
+#define N 50000
 
 TEST_FUNCTION_START(arb_urandom, state)
 {

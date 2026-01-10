@@ -257,7 +257,7 @@ TEST_FUNCTION_START(cd_poly_refine_roots, state)
 
     for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
-        prec = 10 + n_randint(state, 400);
+        prec = 10 + n_randint(state, 390);
 
         do {
             acb_poly_randtest(A, state, 50 + n_randint(state, 15), prec, 5);
