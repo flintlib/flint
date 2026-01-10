@@ -138,6 +138,12 @@ TEST_FUNCTION_START(nmod_mpoly_factor, state)
                 "x*y^3*z+y*z^2+x^2*y*z^2+z^3+x^2*z^3+y^2*z^3+z^5)", vars, ctx);
         check_omega(3, 3, a, ctx, nmod_mpoly_factor); /* frobenius recombination */
 
+        nmod_mpoly_set_str_pretty(a, "x^4*y^6*z^2+x^4*y^5+x^3*y*z^2+x*y^6*z^6+x*y^5*z^4+x*y^5*z^2+x*y^4+y*z^6+z^2", vars, ctx);
+        check_omega(2, 2, a, ctx, nmod_mpoly_factor); /* deflate */
+
+        nmod_mpoly_set_str_pretty(a, "(x^4*y^6*z^2+x^4*y^5+x^3*y*z^2+x*y^6*z^6+x*y^5*z^4+x*y^5*z^2+x*y^4+y*z^6+z^2)*(x^5*y^6*z^2+x^5*y^3*z^2+x^4*y^6*z^6+x^4*y^3*z^6+x^3*y^3*z^2+x^3*z^2+x^2*y^6+x*y^6*z^4+y^3)", vars, ctx);
+        check_omega(4, 4, a, ctx, nmod_mpoly_factor); /* deflate */
+
         nmod_mpoly_clear(a, ctx);
         nmod_mpoly_ctx_clear(ctx);
     }
