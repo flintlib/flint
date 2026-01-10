@@ -509,7 +509,7 @@ Random Number Generation
     Useful for testing functions and algorithms, since this kind of random
     numbers have proven to be more likely to trigger corner-case bugs.
 
-.. function:: flint_mpn_rrandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t nbits)
+.. function:: void flint_mpn_rrandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t nbits)
 
     Generates a random number with ``nbits`` bits and stores
     it on ``rp``. The number it generates will tend to have
