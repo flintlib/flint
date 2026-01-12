@@ -46,8 +46,6 @@
 #include "t-gcd.c"
 #include "t-gcdinv.c"
 #include "t-invmod.c"
-#include "t-is_oddprime_binary.c"
-#include "t-is_oddprime_small.c"
 #include "t-is_perfect_power235.c"
 #include "t-is_perfect_power.c"
 #include "t-is_prime.c"
@@ -145,8 +143,6 @@ test_struct tests[] =
     TEST_FUNCTION(n_gcd),
     TEST_FUNCTION(n_gcdinv),
     TEST_FUNCTION(n_invmod),
-    TEST_FUNCTION(n_is_oddprime_binary),
-    TEST_FUNCTION(n_is_oddprime_small),
     TEST_FUNCTION(n_is_perfect_power235),
     TEST_FUNCTION(n_is_perfect_power),
     TEST_FUNCTION(n_is_prime),

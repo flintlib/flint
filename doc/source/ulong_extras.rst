@@ -952,27 +952,6 @@ Primality testing
     compositeness if `n` has already
     passed preliminary trial division or sieving done by the user.
 
-.. function:: int n_is_oddprime_small(ulong n)
-
-    Returns `1` if `n` is an odd prime smaller than
-    ``FLINT_ODDPRIME_SMALL_CUTOFF``. Expects `n`
-    to be odd and smaller than the cutoff.
-
-    This function merely uses a lookup table with one bit allocated for each
-    odd number up to the cutoff.
-
-.. function:: int n_is_oddprime_binary(ulong n)
-
-    This function performs a simple binary search through
-    the table of cached primes for `n`. If it exists in the array it returns
-    `1`, otherwise `0`. For the algorithm to operate correctly
-    `n` should be odd and at least `17`.
-
-    Lower and upper bounds are computed with :func:`n_prime_pi_bounds`.
-    Once we have bounds on where to look in the table, we
-    refine our search with a simple binary algorithm, taking
-    the top or bottom of the current interval as necessary.
-
 .. function:: int n_is_prime_pocklington(ulong n, ulong iterations)
 
     Tests if `n` is a prime using the Pocklington--Lehmer primality
@@ -1105,23 +1084,7 @@ Primality testing
 
 .. function:: int n_is_probabprime(ulong n)
 
-    Tests if `n` is a probable prime. Up to ``FLINT_ODDPRIME_SMALL_CUTOFF``
-    this algorithm uses :func:`n_is_oddprime_small` which uses a lookup table.
-
-    Next it calls :func:`n_compute_primes` with the maximum table size and
-    uses this table to perform a binary search for `n` up to the table limit.
-
-    Then up to `1050535501` it uses a number of strong probable prime tests,
-    :func:`n_is_strong_probabprime_preinv`, etc., for various bases. The
-    output of the algorithm is guaranteed to be correct up to this bound due
-    to exhaustive tables, described at
-    http://uucode.com/obf/dalbec/alg.html .
-
-    Beyond that point the BPSW probabilistic primality test is used, by
-    calling the function :func:`n_is_probabprime_BPSW`. There are no known
-    counterexamples, and it has been checked against the tables of Feitsma
-    and Galway and up to the accuracy of those tables, this is an exhaustive
-    check up to `2^{64}`, i.e. there are no counterexamples.
+    This function is obsolete and currently just wraps :func:`n_is_prime`.
 
 
 Chinese remaindering
