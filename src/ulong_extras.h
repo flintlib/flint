@@ -481,9 +481,6 @@ void n_cleanup_primes(void);
 const ulong * n_primes_arr_readonly(ulong n);
 const double * n_prime_inverses_arr_readonly(ulong n);
 
-int n_is_oddprime_small(ulong n);
-int n_is_oddprime_binary(ulong n);
-
 int n_is_probabprime(ulong n);
 int n_is_probabprime_fermat(ulong n, ulong i);
 int n_is_probabprime_fibonacci(ulong n);
@@ -507,8 +504,6 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
 ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 
 /* Factorisation *************************************************************/
-
-#define FLINT_ODDPRIME_SMALL_CUTOFF 4096
 
 #define FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST 64
 
