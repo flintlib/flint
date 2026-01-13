@@ -1168,13 +1168,8 @@ Square root and perfect power testing
     `1` are considered squares. No guarantees are made about `r` or `k`
     being the minimum possible value.
 
-.. function:: ulong n_rootrem(ulong * remainder, ulong n, ulong root)
-
-    This function uses the Newton iteration method to calculate the nth root of
-    a number.
-    First approximation is calculated by an algorithm mentioned in this
-    article:  https://en.wikipedia.org/wiki/Fast_inverse_square_root .
-    Instead of the inverse square root, the nth root is calculated.
+.. function:: ulong n_root(ulong n, ulong root)
+              ulong n_rootrem(ulong * remainder, ulong n, ulong root)
 
     Returns the integer part of ``n ^ 1/root``. Remainder is set as
     ``n - base^root``. In case `n < 1` or ``root < 1``, `0` is returned.

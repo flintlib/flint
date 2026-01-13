@@ -170,7 +170,6 @@ ulong n_pow(ulong n, ulong exp);
 ulong _n_pow_check(ulong n, ulong exp);
 ulong n_root(ulong n, ulong root);
 ulong n_rootrem(ulong* remainder, ulong n, ulong root);
-ulong n_root_estimate(double a, int n);
 int n_is_perfect_power235(ulong n);
 int n_is_perfect_power(ulong * root, ulong n);
 
