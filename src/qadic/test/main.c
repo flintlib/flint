@@ -16,6 +16,7 @@
 #include "t-exp.c"
 #include "t-exp_rectangular.c"
 #include "t-frobenius.c"
+#include "t-init.c"
 #include "t-inv.c"
 #include "t-log_balanced.c"
 #include "t-log.c"
@@ -41,6 +42,7 @@ test_struct tests[] =
     TEST_FUNCTION(qadic_exp_rectangular),
     TEST_FUNCTION(qadic_frobenius),
     TEST_FUNCTION(qadic_inv),
+    TEST_FUNCTION(qadic_init),
     TEST_FUNCTION(qadic_log_balanced),
     TEST_FUNCTION(qadic_log),
     TEST_FUNCTION(qadic_log_rectangular),
