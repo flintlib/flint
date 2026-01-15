@@ -271,6 +271,14 @@ yes|no) ;;
 esac],
 enable_fast_build="no")
 
+AC_ARG_ENABLE(asan,
+[AS_HELP_STRING([--enable-asan],[Enable address sanitizer [default=no]])],
+[case $enableval in
+yes|no) ;;
+*) AC_MSG_ERROR([Bad value $enableval for --enable-asan. Need yes or no.])
+esac],
+enable_asan="no")
+
 AC_ARG_ENABLE(lto,
 [AS_HELP_STRING([--enable-lto],[Enable link-time optimization [default=no]])],
 [case $enableval in
@@ -439,9 +447,8 @@ then with_ntl="yes"; fi
 # architecture specifics
 ################################################################################
 
-gcc_cflags="-O3"
 if test "$enable_fast_build" = "yes";
-then gcc_cflags="-O1"; fi
+then gcc_cflags="-O1"; else gcc_cflags="-O3"; fi
 gcc_cflags="$gcc_cflags -pedantic -std=c11"
 gcc_warnings="-Wall -Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wmissing-prototypes"
 
@@ -956,6 +963,12 @@ if test "$enable_avx512" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([-mavx512f],[save_CFLAGS="-mavx512f $save_CFLAGS"],
                           [AC_MSG_ERROR([$CC does not support -mavx512f])])
+fi
+
+if test "$enable_asan" = "yes";
+then
+    AX_CHECK_COMPILE_FLAG([-fsanitize=address],[save_CFLAGS="-fsanitize=address $save_CFLAGS"],
+                          [AC_MSG_ERROR([$CC does not support -fsanitize=address])])
 fi
 
 if test "$enable_lto" = "yes";
