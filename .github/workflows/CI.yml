@@ -191,7 +191,7 @@ jobs:
         run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
 
   ubuntu-clang:
-    name: BLAS, examples (x1)
+    name: ASan, BLAS, examples (x1)
     runs-on: ubuntu-24.04
     env:
       CC: "clang"
@@ -209,7 +209,7 @@ jobs:
           libtool --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
       - name: "Configure"
-        run: ./bootstrap.sh && ./configure CC=${CC} --with-blas --disable-debug
+        run: ./bootstrap.sh && ./configure CC=${CC} --with-blas --disable-debug --enable-asan
       - name: "Compile library"
         run: $MAKE && ldd libflint.so
       - name: "Compile tests"
