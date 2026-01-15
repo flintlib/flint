@@ -450,7 +450,7 @@ then with_ntl="yes"; fi
 if test "$enable_fast_build" = "yes";
 then gcc_cflags="-O1"; else gcc_cflags="-O3"; fi
 gcc_cflags="$gcc_cflags -pedantic -std=c11"
-gcc_warnings="-Wall -Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wmissing-prototypes"
+gcc_warnings="-Wall -Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wmissing-prototypes -Wno-deprecated-declarations"
 
 dnl We only try to provide specifics for those systems that currently supports
 dnl our assembly routines. If more combinations are wished for than what is
