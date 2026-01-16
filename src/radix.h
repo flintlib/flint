@@ -31,6 +31,9 @@ typedef struct
     nmod_t b;           /* Digit radix */
     unsigned int exp;   /* B = b^exp */
     nmod_t B;           /* Limb radix */
+    /* extended data which may be used by some ring contexts */
+    slong trunc_limbs;
+    slong trunc_digits;
 }
 radix_struct;
 
@@ -134,6 +137,9 @@ slong radix_set_mpn_divconquer(nn_ptr res, nn_srcptr a, slong an, const radix_t 
 slong radix_set_mpn(nn_ptr res, nn_srcptr a, slong an, const radix_t radix);
 
 slong radix_set_mpn_need_alloc(slong n, const radix_t radix);
+
+char * radix_get_str_decimal(char * res, nn_srcptr x, slong n, int negative, const radix_t radix);
+char * radix_get_str_sum(char * res, nn_srcptr x, slong n, int negative, int ascending, const radix_t radix);
 
 #ifdef __cplusplus
 }

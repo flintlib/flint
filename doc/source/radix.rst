@@ -191,3 +191,36 @@ Radix conversion
     Return a number of output limbs for which :func:`radix_set_mpn` is safe to call
     with input of length `n`.
 
+String conversion
+--------------------------------------------------------------------------------
+
+.. function:: char * radix_get_str_decimal(char * res, nn_srcptr x, slong n, int negative, const radix_t radix)
+
+    Returns a null-terminated string representing the integer *(x, n)*
+    in base 10 (e.g. ``-12345``). If `n = 0`, the string ``0`` is returned.
+    Otherwise, the most significant limb is assumed to be zero; a leading
+    minus sign will be inserted if the flag *negative* is 1.
+
+    If the input radix is of the form `10^e`, this function runs in `O(n)`.
+    Otherwise, a radix conversion to decimal will be performed internally,
+    which runs in `O(M(n) \log n)`.
+
+    If the given pointer *res* is *NULL*, a new string will be allocated
+    with :func:`flint_malloc` and returned. Otherwise, *res* will be used,
+    and is assumed to have sufficient space to store the result including
+    ter.
+
+.. function:: char * radix_get_str_sum(char * res, nn_srcptr x, slong n, int negative, int ascending, const radix_t radix)
+
+    Returns *(x, n)* represented in expression form as a sum over its limbs.
+    For example, 12345678 in radix `10^3` will be printed as
+    ``12 * 10^6 + 345 * 10^3 + 678`` if *negative* and *ascending*
+    flags are both set to 0,
+    and as ``-(678 + 345 * 10^3 + 12 * 10^6)`` if the *negative* and
+    *ascending* flags are both set to 1.
+
+    If the given pointer *res* is *NULL*, a new string will be allocated
+    with :func:`flint_malloc` and returned. Otherwise, *res* will be used,
+    and is assumed to have sufficient space to store the result including
+    null terminator.
+
