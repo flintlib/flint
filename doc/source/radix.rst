@@ -224,3 +224,49 @@ String conversion
     and is assumed to have sufficient space to store the result including
     null terminator.
 
+Memory-managed integers
+--------------------------------------------------------------------------------
+
+.. type :: radix_integer_struct
+           radix_integer_t
+
+    Represents a signed multi-limb integer (with respect to a separate radix
+    object), in a format similar to ``mpz``.
+    There are three slots: ``d`` (pointer to limbs), ``alloc``, and
+    ``size`` whose absolute value stores the normalized limb count (negated to
+    indicate a negative value).
+
+.. function:: void gr_ctx_init_radix_integer(gr_ctx_t ctx, ulong b, unsigned int e)
+
+    Initialize a generic ring for working with integers in radix `b^e`
+    (where `e = 0` can be provided to select the largest admissible limb radix
+    automatically). Elements have type :type:`radix_integer_t`.
+
+.. function:: void radix_integer_init(radix_integer_t res, const radix_t radix)
+              void radix_integer_clear(radix_integer_t res, const radix_t radix)
+              nn_ptr radix_integer_fit_limbs(radix_integer_t res, slong nlimbs, const radix_t radix)
+              void radix_integer_zero(radix_integer_t res, const radix_t radix)
+              void radix_integer_randtest_limbs(radix_integer_t res, flint_rand_t state, slong max_limbs, const radix_t radix)
+              void radix_integer_one(radix_integer_t res, const radix_t radix)
+              void radix_integer_neg_one(radix_integer_t res, const radix_t radix)
+              int radix_integer_is_zero(const radix_integer_t x, const radix_t radix)
+              int radix_integer_is_one(const radix_integer_t x, const radix_t radix)
+              int radix_integer_is_neg_one(const radix_integer_t x, const radix_t radix)
+              int radix_integer_equal(const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              int radix_integer_cmp(const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              int radix_integer_cmpabs(const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              void radix_integer_set(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+              void radix_integer_set_ui(radix_integer_t res, ulong x, const radix_t radix)
+              void radix_integer_set_si(radix_integer_t res, slong x, const radix_t radix)
+              void radix_integer_set_fmpz(radix_integer_t res, const fmpz_t x, const radix_t radix)
+              void radix_integer_get_fmpz(fmpz_t res, const radix_integer_t x, const radix_t radix)
+              void radix_integer_neg(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+              void radix_integer_abs(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+              int radix_integer_sgn(const radix_integer_t x, const radix_t radix)
+              void radix_integer_add(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              void radix_integer_sub(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              void radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+
+    Direct interface for working with :type:`radix_integer_t`. These can be used
+    as an alternative to the generic interface.
+

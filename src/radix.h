@@ -21,6 +21,7 @@
 #include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "nmod.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -138,8 +139,49 @@ slong radix_set_mpn(nn_ptr res, nn_srcptr a, slong an, const radix_t radix);
 
 slong radix_set_mpn_need_alloc(slong n, const radix_t radix);
 
+/* String conversion */
+
 char * radix_get_str_decimal(char * res, nn_srcptr x, slong n, int negative, const radix_t radix);
 char * radix_get_str_sum(char * res, nn_srcptr x, slong n, int negative, int ascending, const radix_t radix);
+
+/* Memory-managed integers */
+
+typedef struct
+{
+    nn_ptr d;
+    slong alloc;
+    slong size;
+}
+radix_integer_struct;
+
+typedef radix_integer_struct radix_integer_t[1];
+
+void gr_ctx_init_radix_integer(gr_ctx_t ctx, ulong b, unsigned int exp);
+
+void radix_integer_init(radix_integer_t res, const radix_t radix);
+void radix_integer_clear(radix_integer_t res, const radix_t radix);
+nn_ptr radix_integer_fit_limbs(radix_integer_t res, slong nlimbs, const radix_t radix);
+void radix_integer_zero(radix_integer_t res, const radix_t radix);
+void radix_integer_randtest_limbs(radix_integer_t res, flint_rand_t state, slong max_limbs, const radix_t radix);
+void radix_integer_one(radix_integer_t res, const radix_t radix);
+void radix_integer_neg_one(radix_integer_t res, const radix_t radix);
+int radix_integer_is_zero(const radix_integer_t x, const radix_t radix);
+int radix_integer_is_one(const radix_integer_t x, const radix_t radix);
+int radix_integer_is_neg_one(const radix_integer_t x, const radix_t radix);
+int radix_integer_equal(const radix_integer_t x, const radix_integer_t y, const radix_t radix);
+int radix_integer_cmp(const radix_integer_t x, const radix_integer_t y, const radix_t radix);
+int radix_integer_cmpabs(const radix_integer_t x, const radix_integer_t y, const radix_t radix);
+void radix_integer_set(radix_integer_t res, const radix_integer_t x, const radix_t radix);
+void radix_integer_set_ui(radix_integer_t res, ulong x, const radix_t radix);
+void radix_integer_set_si(radix_integer_t res, slong x, const radix_t radix);
+void radix_integer_set_fmpz(radix_integer_t res, const fmpz_t x, const radix_t radix);
+void radix_integer_get_fmpz(fmpz_t res, const radix_integer_t x, const radix_t radix);
+void radix_integer_neg(radix_integer_t res, const radix_integer_t x, const radix_t radix);
+void radix_integer_abs(radix_integer_t res, const radix_integer_t x, const radix_t radix);
+int radix_integer_sgn(const radix_integer_t x, const radix_t radix);
+void radix_integer_add(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix);
+void radix_integer_sub(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix);
+void radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix);
 
 #ifdef __cplusplus
 }

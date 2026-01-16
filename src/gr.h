@@ -707,7 +707,8 @@ void gr_method_tab_extend(gr_funcptr * methods, gr_method_tab_input * tab);
 
 typedef enum
 {
-    GR_CTX_FMPZ, GR_CTX_FMPQ, GR_CTX_FMPZI,
+    GR_CTX_FMPZ, GR_CTX_RADIX_INTEGER,
+    GR_CTX_FMPQ, GR_CTX_FMPZI,
     GR_CTX_FMPZ_MOD, GR_CTX_NMOD, GR_CTX_NMOD8, GR_CTX_NMOD32,
     GR_CTX_NMOD_REDC, GR_CTX_NMOD_REDC_FAST,
     GR_CTX_MPN_MOD,

@@ -117,6 +117,11 @@ libflint.flint_rand_init(ctypes.byref(_flint_rand))
 class fmpz_struct(ctypes.Structure):
     _fields_ = [('val', c_slong)]
 
+class radix_integer_struct(ctypes.Structure):
+    _fields_ = [('d', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('size', c_slong)]
+
 class fmpq_struct(ctypes.Structure):
     _fields_ = [('num', c_slong),
                 ('den', c_slong)]
@@ -4689,6 +4694,31 @@ class IntegerRing_fmpz(gr_ctx):
         libgr.gr_ctx_init_fmpz(self._ref)
         self._elem_type = fmpz
 
+class IntegerRing_radix_integer(gr_ctx):
+    """
+        >>> ZZdec = IntegerRing_radix_integer(10)
+        >>> ZZ(5)**100 + 123
+        7888609052210118054117285652827862296732064351090230047702789306640748
+        >>> ZZdec(5)**100 + 123
+        7888609052210118054117285652827862296732064351090230047702789306640748
+
+        >>> ZZ7 = IntegerRing_radix_integer(7, 10)
+        >>> ZZ7
+        Integers in radix 7^10 (radix_integer)
+        >>> ZZ7(5**100) + 123
+        194 * 7^80 + 171307382 * 7^70 + 127454085 * 7^60 + 241336803 * 7^50 + 220718973 * 7^40 + 16449109 * 7^30 + 123134395 * 7^20 + 38207260 * 7^10 + 51613155
+        >>> ZZ7(str(_)) == ZZ(str(_))
+        True
+    """
+
+    def __init__(self, base, exp=0):
+        assert base >= 2 and base <= UWORD_MAX
+        assert exp >= 0 and exp <= FLINT_BITS
+        assert base**exp <= UWORD_MAX
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_radix_integer(self._ref, base, exp)
+        self._elem_type = radix_integer
+
 class RationalField_fmpq(gr_ctx):
     def __init__(self):
         gr_ctx.__init__(self)
@@ -4905,6 +4935,13 @@ class fmpz(gr_elem):
 
     def is_prime(self):
         return bool(libflint.fmpz_is_prime(self._ref))
+
+
+class radix_integer(gr_elem):
+
+    _struct_type = radix_integer_struct
+
+
 
 class fmpq(gr_elem):
     _struct_type = fmpq_struct
