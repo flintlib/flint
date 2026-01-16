@@ -108,7 +108,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     {
         _fmpz_mod_poly_mulmod_preinv(t, res->coeffs, n, h, n,
                                      poly3->coeffs, poly3->length,
-                                     poly3inv->coeffs, poly3->length, ctx);
+                                     poly3inv->coeffs, poly3inv->length, ctx);
         _fmpz_mod_poly_add(res->coeffs, t, n, fmpz_mod_mat_row(C, i), n, ctx);
     }
 
