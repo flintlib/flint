@@ -937,9 +937,6 @@ Basic arithmetic
     As per :func:`fmpz_fdiv_qr`, but takes a precomputed inverse ``hinv``
     of `h` constructed using :func:`fmpz_preinvn`.
 
-    This function will be faster than :func:`fmpz_fdiv_qr_preinvn` when the
-    number of limbs of `h` is at least ``PREINVN_CUTOFF``.
-
 .. function:: void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
               void fmpz_ui_pow_ui(fmpz_t f, ulong g, ulong x)
 
