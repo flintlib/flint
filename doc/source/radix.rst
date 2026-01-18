@@ -191,3 +191,82 @@ Radix conversion
     Return a number of output limbs for which :func:`radix_set_mpn` is safe to call
     with input of length `n`.
 
+String conversion
+--------------------------------------------------------------------------------
+
+.. function:: char * radix_get_str_decimal(char * res, nn_srcptr x, slong n, int negative, const radix_t radix)
+
+    Returns a null-terminated string representing the integer *(x, n)*
+    in base 10 (e.g. ``-12345``). If `n = 0`, the string ``0`` is returned.
+    Otherwise, the most significant limb is assumed to be zero; a leading
+    minus sign will be inserted if the flag *negative* is 1.
+
+    If the input radix is of the form `10^e`, this function runs in `O(n)`.
+    Otherwise, a radix conversion to decimal will be performed internally,
+    which runs in `O(M(n) \log n)`.
+
+    If the given pointer *res* is *NULL*, a new string will be allocated
+    with :func:`flint_malloc` and returned. Otherwise, *res* will be used,
+    and is assumed to have sufficient space to store the result including
+    ter.
+
+.. function:: char * radix_get_str_sum(char * res, nn_srcptr x, slong n, int negative, int ascending, const radix_t radix)
+
+    Returns *(x, n)* represented in expression form as a sum over its limbs.
+    For example, 12345678 in radix `10^3` will be printed as
+    ``12 * 10^6 + 345 * 10^3 + 678`` if *negative* and *ascending*
+    flags are both set to 0,
+    and as ``-(678 + 345 * 10^3 + 12 * 10^6)`` if the *negative* and
+    *ascending* flags are both set to 1.
+
+    If the given pointer *res* is *NULL*, a new string will be allocated
+    with :func:`flint_malloc` and returned. Otherwise, *res* will be used,
+    and is assumed to have sufficient space to store the result including
+    null terminator.
+
+Memory-managed integers
+--------------------------------------------------------------------------------
+
+.. type :: radix_integer_struct
+           radix_integer_t
+
+    Represents a signed multi-limb integer (with respect to a separate radix
+    object), in a format similar to ``mpz``.
+    There are three slots: ``d`` (pointer to limbs), ``alloc``, and
+    ``size`` whose absolute value stores the normalized limb count (negated to
+    indicate a negative value).
+
+.. function:: void gr_ctx_init_radix_integer(gr_ctx_t ctx, ulong b, unsigned int e)
+
+    Initialize a generic ring for working with integers in radix `b^e`
+    (where `e = 0` can be provided to select the largest admissible limb radix
+    automatically). Elements have type :type:`radix_integer_t`.
+
+.. function:: void radix_integer_init(radix_integer_t res, const radix_t radix)
+              void radix_integer_clear(radix_integer_t res, const radix_t radix)
+              nn_ptr radix_integer_fit_limbs(radix_integer_t res, slong nlimbs, const radix_t radix)
+              void radix_integer_zero(radix_integer_t res, const radix_t radix)
+              void radix_integer_randtest_limbs(radix_integer_t res, flint_rand_t state, slong max_limbs, const radix_t radix)
+              void radix_integer_one(radix_integer_t res, const radix_t radix)
+              void radix_integer_neg_one(radix_integer_t res, const radix_t radix)
+              int radix_integer_is_zero(const radix_integer_t x, const radix_t radix)
+              int radix_integer_is_one(const radix_integer_t x, const radix_t radix)
+              int radix_integer_is_neg_one(const radix_integer_t x, const radix_t radix)
+              int radix_integer_equal(const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              int radix_integer_cmp(const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              int radix_integer_cmpabs(const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              void radix_integer_set(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+              void radix_integer_set_ui(radix_integer_t res, ulong x, const radix_t radix)
+              void radix_integer_set_si(radix_integer_t res, slong x, const radix_t radix)
+              void radix_integer_set_fmpz(radix_integer_t res, const fmpz_t x, const radix_t radix)
+              void radix_integer_get_fmpz(fmpz_t res, const radix_integer_t x, const radix_t radix)
+              void radix_integer_neg(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+              void radix_integer_abs(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+              int radix_integer_sgn(const radix_integer_t x, const radix_t radix)
+              void radix_integer_add(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              void radix_integer_sub(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+              void radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix)
+
+    Direct interface for working with :type:`radix_integer_t`. These can be used
+    as an alternative to the generic interface.
+
