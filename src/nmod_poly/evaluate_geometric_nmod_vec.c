@@ -54,7 +54,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
      * we want its coefficients from L - 1 - (alen - 1) = alen - 1 + len - 1
      * down to, included, L - 1 - (alen - 1 + len - 1) = alen - 1
      **/
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     if (2 * (plen - val) - 2 + len <= 192)
 #else
     if (1)
@@ -82,7 +82,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
     {
     /* version 2 */
     /* this uses a middle product to compute [rev(p) * G->f]_{plen - 1}^{len}  (i.e. coeffs [plen - 1, plen - 1 + len)) */
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
         /* version 2.a uses fft_small directly  (2025-12-04: fastest in medium and large lengths, like 100 and more) */
         nn_ptr b = _nmod_vec_init(alen + len - 1);
 

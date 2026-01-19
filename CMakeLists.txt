@@ -342,38 +342,36 @@ endif()
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-config.h
+    ${CMAKE_CURRENT_BINARY_DIR}/src/flint-config.h
 )
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h
+    ${CMAKE_CURRENT_BINARY_DIR}/src/flint.h
 )
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/link/fmpz_${MEMORY_MANAGER}.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
+    ${CMAKE_CURRENT_BINARY_DIR}/src/fmpz/fmpz.c
     COPYONLY
 )
 if(FLINT_LONG_LONG)
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat-longlong.h.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        ${CMAKE_CURRENT_BINARY_DIR}/src/gmpcompat.h
         COPYONLY
     )
 else()
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        ${CMAKE_CURRENT_BINARY_DIR}/src/gmpcompat.h
         COPYONLY
     )
 endif()
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpn_extras/generic/flint-mparam.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-mparam.h
-        COPYONLY
-    )   
-endif()
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mpn_extras/generic/flint-mparam.h
+    ${CMAKE_CURRENT_BINARY_DIR}/src/flint-mparam.h
+    COPYONLY
+)
 
 
 foreach (build_dir IN LISTS BUILD_DIRS)
@@ -382,6 +380,7 @@ foreach (build_dir IN LISTS BUILD_DIRS)
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
     list(APPEND HEADERS ${TEMP})
 endforeach ()
+list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/src/fmpz/fmpz.c)
 
 set(TEMP ${HEADERS})
 set(HEADERS )
@@ -414,7 +413,7 @@ endif()
 # Include directories
 
 target_include_directories(flint PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_BINARY_DIR}/src>"
     "$<INSTALL_INTERFACE:include/flint>"
     ${PThreads_INCLUDE_DIRS}
 )
