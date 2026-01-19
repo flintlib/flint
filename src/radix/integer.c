@@ -49,6 +49,15 @@ radix_integer_zero(radix_integer_t res, const radix_t radix)
 }
 
 void
+radix_integer_rand_limbs(radix_integer_t res, flint_rand_t state, slong n, const radix_t radix)
+{
+    nn_ptr d = radix_integer_fit_limbs(res, n, radix);
+    radix_rand_limbs(d, state, n, radix);
+    MPN_NORM(d, n);
+    res->size = (n_randlimb(state) & 1) ? n : -n;
+}
+
+void
 radix_integer_randtest_limbs(radix_integer_t res, flint_rand_t state, slong max_limbs, const radix_t radix)
 {
     slong n = n_randint(state, max_limbs + 1);
@@ -415,6 +424,256 @@ radix_integer_sub(radix_integer_t res, const radix_integer_t x, const radix_inte
     }
 
     res->size = rsgnbit ? -rn : rn;
+}
+
+int
+radix_integer_is_normalised(const radix_integer_t x, const radix_t radix)
+{
+    slong xn = FLINT_ABS(x->size);
+    slong i;
+
+    for (i = 0; i < xn; i++)
+        if (x->d[i] >= LIMB_RADIX(radix))
+            return 0;
+
+    if (xn != 0 && x->d[xn - 1] == 0)
+        return 0;
+
+    return 1;
+}
+
+void
+radix_integer_set_limb(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix)
+{
+    FLINT_ASSERT(index >= 0);
+    FLINT_ASSERT(c < LIMB_RADIX(radix));
+
+    slong xsize = x->size;
+    slong xn = FLINT_ABS(xsize);
+    slong rn = xn;
+
+    if (index < xn - 1 || (c != 0 && index == xn - 1))
+    {
+        radix_integer_set(res, x, radix);
+        res->d[index] = c;
+    }
+    else if (c == 0)
+    {
+        if (index == xn - 1)
+        {
+            rn = xn - 1;
+            MPN_NORM(x->d, rn);
+            if (res != x && rn != 0)
+                flint_mpn_copyi(radix_integer_fit_limbs(res, rn, radix), x->d, rn);
+            res->size = (xsize >= 0) ? rn : -rn;
+        }
+        else
+        {
+            radix_integer_set(res, x, radix);
+        }
+    }
+    else
+    {
+        rn = index + 1;
+        nn_ptr rd = radix_integer_fit_limbs(res, rn, radix);
+        if (res != x)
+            flint_mpn_copyi(rd, x->d, xn);
+        flint_mpn_zero(rd + xn, index - xn);
+        rd[index] = c;
+        res->size = (xsize >= 0) ? rn : -rn;
+    }
+}
+
+void
+radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    FLINT_ASSERT(n >= 0);
+
+    slong xsize = x->size;
+
+    if (xsize == 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    slong xn = FLINT_ABS(xsize);
+    slong rn = xn + n;
+
+    nn_ptr rd = radix_integer_fit_limbs(res, rn, radix);
+    flint_mpn_copyd(rd + n, x->d, xn);
+    flint_mpn_zero(rd, n);
+    res->size = (xsize > 0) ? rn : -rn;
+}
+
+void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    FLINT_ASSERT(n >= 0);
+
+    slong xsize = x->size;
+    slong xn = FLINT_ABS(xsize);
+    slong rn = xn - n;
+
+    if (rn <= 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    nn_ptr rd;
+    if (res == x)
+        rd = res->d;
+    else
+        rd = radix_integer_fit_limbs(res, rn, radix);
+
+    flint_mpn_copyi(rd, x->d + n, rn);
+    res->size = (xsize > 0) ? rn : -rn;
+}
+
+void
+radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong xsize = x->size;
+    slong xn = FLINT_ABS(xsize);
+
+    FLINT_ASSERT(n >= 0);
+
+    if (res == x)
+    {
+        if (n < xn)
+        {
+            MPN_NORM(res->d, n);
+            res->size = (xsize >= 0) ? n : -n;
+        }
+    }
+    else
+    {
+        if (n < xn)
+            MPN_NORM(x->d, n);
+        else
+            n = xn;
+
+        flint_mpn_copyi(radix_integer_fit_limbs(res, n, radix), x->d, n);
+        res->size = (xsize >= 0) ? n : -n;
+    }
+}
+
+/* todo: optimize */
+void
+radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    radix_integer_trunc_limbs(res, x, n, radix);
+
+    if (res->size < 0)
+    {
+        slong rn = FLINT_ABS(res->size);
+        radix_neg(res->d, res->d, rn, radix);
+        if (rn < n)
+        {
+            slong i;
+            radix_integer_fit_limbs(res, n, radix);
+            ulong B1 = LIMB_RADIX(radix) - 1;
+            for (i = rn; i < n; i++)
+                res->d[i] = B1;
+        }
+        MPN_NORM(res->d, n);
+        res->size = n;
+    }
+}
+
+void
+radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong xsize = x->size;
+    slong xn = FLINT_ABS(xsize);
+    slong rn;
+
+    FLINT_ASSERT(n >= 0);
+    rn = FLINT_MIN(n, xn);
+    MPN_NORM(x->d, rn);
+
+    if (rn > 0 && rn == n)
+    {
+        int cmp = radix_cmp_bn_half(x->d, n, radix);
+
+        if (cmp > 0 || (cmp == 0 && xsize > 0 && (LIMB_RADIX(radix) % 2 == 0)))
+        {
+            if (res == x)
+                radix_neg(res->d, res->d, rn, radix);
+            else
+                radix_neg(radix_integer_fit_limbs(res, n, radix), x->d, rn, radix);
+
+            MPN_NORM(res->d, rn);
+            res->size = (xsize > 0) ? -rn : rn;
+            return;
+        }
+    }
+
+    if (res != x)
+        flint_mpn_copyi(radix_integer_fit_limbs(res, rn, radix), x->d, rn);
+    res->size = (xsize >= 0) ? rn : -rn;
+}
+
+void
+radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix)
+{
+    slong xsize = x->size;
+    slong ysize = y->size;
+
+    if (xsize == 0 || ysize == 0 || n == 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    slong xn = FLINT_ABS(xsize);
+    slong yn = FLINT_ABS(ysize);
+
+    xn = FLINT_MIN(xn, n);
+    yn = FLINT_MIN(yn, n);
+    slong rn = FLINT_MIN(xn + yn, n);
+
+    slong sgn = xsize ^ ysize;
+    nn_ptr rd = radix_integer_fit_limbs(res, rn, radix);
+    nn_srcptr xd = x->d;
+    nn_srcptr yd = y->d;
+
+    if (res == x)
+    {
+        TMP_INIT;
+        TMP_START;
+        nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * xn);
+        flint_mpn_copyi(tmp, xd, xn);
+        if (x == y)
+            radix_mulmid(rd, tmp, xn, tmp, yn, 0, rn, radix);
+        else if (xn >= yn)
+            radix_mulmid(rd, tmp, xn, yd, yn, 0, rn, radix);
+        else
+            radix_mulmid(rd, yd, yn, tmp, xn, 0, rn, radix);
+        TMP_END;
+    }
+    else if (res == y)
+    {
+        TMP_INIT;
+        TMP_START;
+        nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * yn);
+        flint_mpn_copyi(tmp, yd, yn);
+        if (xn >= yn)
+            radix_mulmid(rd, xd, xn, tmp, yn, 0, rn, radix);
+        else
+            radix_mulmid(rd, tmp, yn, xd, xn, 0, rn, radix);
+        TMP_END;
+    }
+    else
+    {
+        if (xn >= yn)
+            radix_mulmid(rd, xd, xn, yd, yn, 0, rn, radix);
+        else
+            radix_mulmid(rd, yd, yn, xd, xn, 0, rn, radix);
+    }
+
+    MPN_NORM(rd, rn);
+    res->size = (sgn >= 0) ? rn : -rn;
 }
 
 

@@ -56,6 +56,12 @@ Radix objects
 
     Initializes to a randomly chosen radix.
 
+.. function:: ulong radix_digit_radix(const radix_t radix)
+              ulong radix_limb_radix(const radix_t radix)
+              ulong radix_limb_exponent(const radix_t radix)
+
+    Respectively returns `b`, `B` and `e`.
+
 Low-level natural number arithmetic
 --------------------------------------------------------------------------------
 
@@ -163,6 +169,11 @@ Except where otherwise noted, the following rules apply:
     *(x, xn)* is an exact multiple of *d*, with undefined behavior otherwise.
     Requires `1 \le d \le B - 1`.
 
+.. function:: int radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
+
+    Returns -1, 0 or 1 according to whether *(x, n)* is less, equal
+    or greater than `\lfloor B^n / 2 \rfloor`. We require *n* to be positive.
+
 Radix conversion
 --------------------------------------------------------------------------------
 
@@ -246,6 +257,7 @@ Memory-managed integers
               void radix_integer_clear(radix_integer_t res, const radix_t radix)
               nn_ptr radix_integer_fit_limbs(radix_integer_t res, slong nlimbs, const radix_t radix)
               void radix_integer_zero(radix_integer_t res, const radix_t radix)
+              void radix_integer_rand_limbs(radix_integer_t res, flint_rand_t state, slong n, const radix_t radix)
               void radix_integer_randtest_limbs(radix_integer_t res, flint_rand_t state, slong max_limbs, const radix_t radix)
               void radix_integer_one(radix_integer_t res, const radix_t radix)
               void radix_integer_neg_one(radix_integer_t res, const radix_t radix)
@@ -269,4 +281,61 @@ Memory-managed integers
 
     Direct interface for working with :type:`radix_integer_t`. These can be used
     as an alternative to the generic interface.
+
+.. function:: int radix_integer_is_normalised(const radix_integer_t x, const radix_t radix)
+
+    Returns whether all limbs of *x* are reduced modulo the limb radix
+    and the most significant limb is nonzero. If the result is 0,
+    operations on *x* have undefined behavior.
+
+.. function:: slong radix_integer_size(const radix_integer_t x, const radix_t radix)
+
+    Number of limbs in *x*, ignoring the sign.
+
+.. function:: ulong radix_integer_get_limb(const radix_integer_t x, slong index, const radix_t radix)
+
+    Returns the limb at position *index* in *x*.
+    The index must be nonnegative. The sign of *x* is ignored.
+
+.. function:: void radix_integer_set_limb(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix)
+
+    Sets *res* to *x* with the limb at position *index* replaced by the given
+    limb value *c*. The index must be nonnegative and *c* must be smaller
+    than the limb radix.
+    The sign of *x* is preserved. If *x* is zero and *c* is nonzero,
+    the sign of the result will be positive.
+
+.. function:: void radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    Sets *res* to *x* multiplied by `B^n`.
+
+.. function:: void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    Sets *res* to *x* divided by `B^n`, truncating the result (rounding to zero).
+
+.. function:: slong radix_integer_valuation_limbs(const radix_integer_t x, const radix_t radix)
+
+    Returns the largest *n* such that `B^n` divides *x* exactly.
+    In the special case `x = 0`, returns zero.
+
+.. function:: void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    Sets *res* to *x* with the absolute value reduced modulo `B^n`, preserving
+    the sign of *x*.
+
+.. function:: void radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    Sets *res* to *x* reduced modulo `B^n`, returning the unique
+    unsigned representative in `[0, B^n-1]`.
+
+.. function:: void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    Sets *res* to *x* reduced modulo `B^n`, returning the unique
+    signed representative in `[-\lfloor B^n/2 \rfloor, \lfloor B^n/2 \rfloor]`
+    if *B* is odd and in `[-B^n/2, B^n/2-1]` if *B* is even.
+
+.. function:: void radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix)
+
+    Sets *res* to the product of *x* and *y* with the absolute value
+    reduced modulo `B^n`.
 
