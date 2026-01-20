@@ -169,6 +169,11 @@ Except where otherwise noted, the following rules apply:
     *(x, xn)* is an exact multiple of *d*, with undefined behavior otherwise.
     Requires `1 \le d \le B - 1`.
 
+.. function:: int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
+
+    If *(x, xn)* is invertible modulo `B^n`, sets *(res, n)* to the inverse
+    and returns 1. If *(x, xn)* is not invertible, returns 0.
+
 .. function:: int radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
     Returns -1, 0 or 1 according to whether *(x, n)* is less, equal
@@ -338,4 +343,10 @@ Memory-managed integers
 
     Sets *res* to the product of *x* and *y* with the absolute value
     reduced modulo `B^n`.
+
+.. function:: int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    If *x* is invertible modulo `B^n`, sets *res* to the inverse
+    and returns 1. The sign of the input is preserved.
+    If *x* is not invertible, returns 0.
 

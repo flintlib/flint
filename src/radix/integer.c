@@ -676,7 +676,52 @@ radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const r
     res->size = (sgn >= 0) ? rn : -rn;
 }
 
+int
+radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    if (n == 0)
+    {
+        radix_integer_zero(res, radix);
+        return 1;
+    }
 
+    slong xsize = x->size;
+    if (xsize == 0)
+        return 0;
+
+    slong xn = FLINT_ABS(xsize);
+    xn = FLINT_MIN(xn, n);
+
+    if (xn == 1 && x->d[0] == 1)
+    {
+        /* preserve sign of x */
+        radix_integer_trunc_limbs(res, x, 1, radix);
+        return 1;
+    }
+
+    slong rn = n;
+    int invertible;
+    nn_ptr rd = radix_integer_fit_limbs(res, n, radix);
+    nn_srcptr xd = x->d;
+
+    if (res == x && xn != 1)
+    {
+        TMP_INIT;
+        TMP_START;
+        nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * xn);
+        flint_mpn_copyi(tmp, xd, xn);
+        invertible = radix_invmod_bn(rd, tmp, xn, n, radix);
+        TMP_END;
+    }
+    else
+    {
+        invertible = radix_invmod_bn(rd, xd, xn, n, radix);
+    }
+
+    MPN_NORM(rd, rn);
+    res->size = (xsize > 0) ? rn : -rn;
+    return invertible;
+}
 
 /* ------------------------------------------------------------------------- */
 /*    GR wrapper                                                             */

@@ -273,7 +273,7 @@ TEST_FUNCTION_START(radix_integer, state)
         if (zrn > n || !radix_integer_equal(w, z, radix) ||
             !radix_integer_is_normalised(w, radix))
         {
-            flint_printf("FAIL: mul_smod_limbs\n");
+            flint_printf("FAIL: mullow_limbs\n");
             flint_printf("radix %wu ^ %u = %wu\n", DIGIT_RADIX(radix), radix->exp, LIMB_RADIX(radix));
             flint_printf("x = (%wd %wd %{ulong*})\n", x->size, x->alloc, x->d, radix_integer_size(x, radix));
             flint_printf("y = (%wd %wd %{ulong*})\n", y->size, y->alloc, y->d, radix_integer_size(y, radix));
@@ -287,6 +287,61 @@ TEST_FUNCTION_START(radix_integer, state)
         radix_integer_clear(y, radix);
         radix_integer_clear(z, radix);
         radix_integer_clear(w, radix);
+        radix_clear(radix);
+    }
+
+    /* invmod */
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        radix_t radix;
+        radix_integer_t x, y, z;
+        slong n;
+        int invertible;
+
+        radix_init_randtest(radix, state);
+        radix_integer_init(x, radix);
+        radix_integer_init(y, radix);
+        radix_integer_init(z, radix);
+
+        radix_integer_randtest_limbs(x, state, 4, radix);
+        radix_integer_randtest_limbs(y, state, 4, radix);
+        radix_integer_randtest_limbs(z, state, 4, radix);
+
+        n = n_randint(state, 4);
+
+        if (n_randint(state, 2))
+        {
+            invertible = radix_integer_invmod_limbs(y, x, n, radix);
+        }
+        else
+        {
+            radix_integer_set(y, x, radix);
+            invertible = radix_integer_invmod_limbs(y, x, n, radix);
+        }
+
+        if (invertible)
+        {
+            radix_integer_mullow_limbs(z, x, y, n, radix);
+
+            if ((n == 0 && !radix_integer_is_zero(y, radix)) ||
+                (n != 0 && (
+                    !radix_integer_is_one(z, radix) ||
+                    !radix_integer_is_normalised(y, radix) ||
+                    radix_integer_sgn(y, radix) != radix_integer_sgn(x, radix))))
+            {
+                flint_printf("FAIL: invmod_limbs\n");
+                flint_printf("radix %wu ^ %u = %wu\n", DIGIT_RADIX(radix), radix->exp, LIMB_RADIX(radix));
+                flint_printf("x = (%wd %wd %{ulong*})\n", x->size, x->alloc, x->d, radix_integer_size(x, radix));
+                flint_printf("y = (%wd %wd %{ulong*})\n", y->size, y->alloc, y->d, radix_integer_size(y, radix));
+                flint_printf("z = (%wd %wd %{ulong*})\n", z->size, z->alloc, z->d, radix_integer_size(z, radix));
+                flint_printf("n = %wd\n", n);
+                flint_abort();
+            }
+        }
+
+        radix_integer_clear(x, radix);
+        radix_integer_clear(y, radix);
+        radix_integer_clear(z, radix);
         radix_clear(radix);
     }
 

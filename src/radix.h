@@ -116,6 +116,8 @@ radix_sqr(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 ulong radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
 void radix_divexact_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
 
+int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
+
 /* compare (x, n) with floor(B^n / 2) */
 RADIX_INLINE int
 radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
@@ -251,6 +253,7 @@ void radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong
 void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 
 void radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix);
+int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 
 #ifdef __cplusplus
 }
