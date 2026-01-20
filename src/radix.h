@@ -219,13 +219,13 @@ void radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix
 int radix_integer_is_normalised(const radix_integer_t x, const radix_t radix);
 
 RADIX_INLINE slong
-radix_integer_size(const radix_integer_t x, const radix_t radix)
+radix_integer_size(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
 {
     return FLINT_ABS(x->size);
 }
 
 RADIX_INLINE ulong
-radix_integer_get_limb(const radix_integer_t x, slong n, const radix_t radix)
+radix_integer_get_limb(const radix_integer_t x, slong n, const radix_t FLINT_UNUSED(radix))
 {
     FLINT_ASSERT(n >= 0);
     return (n >= FLINT_ABS(x->size)) ? 0 : x->d[n];
@@ -237,7 +237,7 @@ void radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, sl
 void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 
 RADIX_INLINE slong
-radix_integer_valuation_limbs(const radix_integer_t x, const radix_t radix)
+radix_integer_valuation_limbs(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
 {
     slong xn = FLINT_ABS(x->size);
     if (xn == 0)
