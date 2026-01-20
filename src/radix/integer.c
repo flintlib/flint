@@ -704,7 +704,7 @@ radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n
     nn_ptr rd = radix_integer_fit_limbs(res, n, radix);
     nn_srcptr xd = x->d;
 
-    if (res == x && xn != 1)
+    if (res == x && rn != 1)
     {
         TMP_INIT;
         TMP_START;

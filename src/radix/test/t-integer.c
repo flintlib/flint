@@ -316,7 +316,7 @@ TEST_FUNCTION_START(radix_integer, state)
         else
         {
             radix_integer_set(y, x, radix);
-            invertible = radix_integer_invmod_limbs(y, x, n, radix);
+            invertible = radix_integer_invmod_limbs(y, y, n, radix);
         }
 
         if (invertible)
