@@ -1889,7 +1889,7 @@ gr_series_ctx_is_commutative_ring(gr_ctx_t ctx)
 truth_t
 gr_series_ctx_is_integral_domain(gr_ctx_t ctx)
 {
-    return gr_ctx_is_integral_domain(GR_SERIES_ELEM_CTX(ctx));
+    return GR_SERIES_PREC(ctx) == 0 ? T_FALSE : gr_ctx_is_integral_domain(GR_SERIES_ELEM_CTX(ctx));
 }
 
 truth_t
