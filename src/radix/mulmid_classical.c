@@ -251,15 +251,40 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
     ulong sbits;
     nmod_t mod = radix->B;
 
+    FLINT_ASSERT(an >= 1);
+    FLINT_ASSERT(bn >= 1);
+    FLINT_ASSERT(an >= bn);
+
+    if (zhi <= 2 && zlo == 0)
+    {
+        if (zhi == 1)
+        {
+            z[0] = nmod_mul(a[0], b[0], radix->B);
+            return;
+        }
+        else
+        {
+            ulong t[2];
+            umul_ppmm(t[1], t[0], a[0], b[0]);
+            z[0] = flint_mpn_divrem_1_preinv(t, t, 2, radix->B.n, radix->B.ninv, radix->B.norm);
+            z[1] = t[0];
+            if (bn >= 2)
+            {
+                z[1] = nmod_add(z[1], nmod_fmma(a[0], b[1], a[1], b[0], radix->B), radix->B);
+            }
+            else if (an >= 2)
+            {
+                z[1] = nmod_addmul(z[1], a[1], b[0], radix->B);
+            }
+            return;
+        }
+    }
+
     if (a == b && an == bn)
     {
         radix_sqrmid_classical(z, a, an, zlo, zhi, radix);
         return;
     }
-
-    FLINT_ASSERT(an >= 1);
-    FLINT_ASSERT(bn >= 1);
-    FLINT_ASSERT(an >= bn);
 
     an = FLINT_MIN(an, zhi);
     bn = FLINT_MIN(bn, zhi);

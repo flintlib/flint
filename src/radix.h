@@ -47,6 +47,10 @@ void radix_init(radix_t radix, ulong b, unsigned int exp);
 void radix_clear(radix_t radix);
 void radix_init_randtest(radix_t radix, flint_rand_t state);
 
+RADIX_INLINE ulong radix_digit_radix(const radix_t radix) { return radix->b.n; }
+RADIX_INLINE ulong radix_limb_radix(const radix_t radix) { return radix->B.n; }
+RADIX_INLINE ulong radix_limb_exponent(const radix_t radix) { return radix->exp; }
+
 void radix_rand_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix);
 void radix_rand_digits(nn_ptr res, flint_rand_t state, slong n, const radix_t radix);
 void radix_randtest_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix);
@@ -112,6 +116,34 @@ radix_sqr(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
 ulong radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
 void radix_divexact_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
 
+int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
+
+/* compare (x, n) with floor(B^n / 2) */
+RADIX_INLINE int
+radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
+{
+    FLINT_ASSERT(n >= 1);
+
+    ulong B = LIMB_RADIX(radix);
+    ulong d, B2;
+    slong i;
+
+    d = x[n - 1];
+    B2 = B / 2;
+    if (d != B2)
+        return (d < B2 ? -1 : 1);
+
+    B2 = (B % 2) ? B2 : 0;
+    for (i = n - 2; i >= 0; i--)
+    {
+        d = x[i];
+        if (d != B2)
+            return (d < B2 ? -1 : 1);
+    }
+
+    return 0;
+}
+
 /* Radix conversion */
 
 typedef struct
@@ -162,6 +194,7 @@ void radix_integer_init(radix_integer_t res, const radix_t radix);
 void radix_integer_clear(radix_integer_t res, const radix_t radix);
 nn_ptr radix_integer_fit_limbs(radix_integer_t res, slong nlimbs, const radix_t radix);
 void radix_integer_zero(radix_integer_t res, const radix_t radix);
+void radix_integer_rand_limbs(radix_integer_t res, flint_rand_t state, slong max_limbs, const radix_t radix);
 void radix_integer_randtest_limbs(radix_integer_t res, flint_rand_t state, slong max_limbs, const radix_t radix);
 void radix_integer_one(radix_integer_t res, const radix_t radix);
 void radix_integer_neg_one(radix_integer_t res, const radix_t radix);
@@ -182,6 +215,45 @@ int radix_integer_sgn(const radix_integer_t x, const radix_t radix);
 void radix_integer_add(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix);
 void radix_integer_sub(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix);
 void radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, const radix_t radix);
+
+int radix_integer_is_normalised(const radix_integer_t x, const radix_t radix);
+
+RADIX_INLINE slong
+radix_integer_size(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
+{
+    return FLINT_ABS(x->size);
+}
+
+RADIX_INLINE ulong
+radix_integer_get_limb(const radix_integer_t x, slong n, const radix_t FLINT_UNUSED(radix))
+{
+    FLINT_ASSERT(n >= 0);
+    return (n >= FLINT_ABS(x->size)) ? 0 : x->d[n];
+}
+
+void radix_integer_set_limb(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix);
+
+void radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
+RADIX_INLINE slong
+radix_integer_valuation_limbs(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))
+{
+    slong xn = FLINT_ABS(x->size);
+    if (xn == 0)
+        return 0;
+    slong v = 0;
+    while (v < xn && x->d[v] == 0)
+        v++;
+    return v;
+}
+
+void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+void radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
+void radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix);
+int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 
 #ifdef __cplusplus
 }
