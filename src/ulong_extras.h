@@ -502,7 +502,6 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
 
 ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 
-int n_is_semiprime_k(ulong n);
 /* Factorisation *************************************************************/
 
 #define FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST 64
