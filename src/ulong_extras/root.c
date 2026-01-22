@@ -32,15 +32,15 @@ static const float inv_table[] = {
 };
 
 /* This table has the max possible base for a given root. For n >= 4,
-   1 + max_base[n-4] = UWORD_MAX^(1/n).*/
+   max_base[n-4] = floor(UWORD_MAX^(1/n)).*/
 static const uint16_t max_base[] = {
 #if FLINT_BITS == 64
-    65535, 7130, 1624, 564, 255, 137, 83, 55, 39, 29, 22, 18, 15, 12, 10, 9,
-    8, 7, 6, 5, 5, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    65535, 7131, 1625, 565, 255, 138, 84, 56, 40, 30, 23, 19, 15, 13, 11, 10,
+    9, 8, 7, 6, 6, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 #else
-    254, 83, 39, 22, 14, 10, 8, 6, 5, 4, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1,
+    255, 84, 40, 23, 15, 11, 9, 7, 6, 5, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2
 #endif
 };
 
@@ -65,7 +65,7 @@ n_root(ulong n, ulong root)
         return 1;
 
     /* n <= upper_limit^root */
-    upper_limit = (ulong) max_base[root - 4] + 1;
+    upper_limit = max_base[root - 4];
 
     /* We have already established above that n >= 2^root */
     if (upper_limit == 2)
@@ -132,7 +132,7 @@ n_rootrem(ulong* remainder, ulong n, ulong root)
     }
 
     /* n <= upper_limit^root */
-    upper_limit = (ulong) max_base[root - 4] + 1;
+    upper_limit = max_base[root - 4];
 
     /* We have already established above that n >= 2^root */
     if (upper_limit == 2)
