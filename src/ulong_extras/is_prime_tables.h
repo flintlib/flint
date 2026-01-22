@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2025 Fredrik Johansson
+    Copyright (C) 2026 Viorel Wegner
 
     This file is part of FLINT.
 
@@ -1859,15 +1860,12 @@ static const uint32_t base2_32bit_pseudoprimes[2561] = {
 2899294889u, 13421773, 0, 27808463, 868111597, 12327121, 41840809, 1776820033, 0, 0, 2528291341u,
 3926912669u, 0, 8534233, 508606771, 947878081, 482488393, 873181, 33704101, 1469960377, 189714193,
 0, };
+     /*
+      Hashtable constructed from the strong-2 pseudoprimes under 2^64, with semiprimes of the form
+      pq : q = k*(p-1)+1 where k is in {2,3,4,5,6,7,8,9,10,11,12} removed
 
-/* Hash table of bases for 64-bit primality test, 24 bits per base (stored as three
-   consecutive bytes). If an entry is smaller than NUM_OVERSIZE_BASES, it represents
-   an index into the oversize table. */
-
+      hash(x)  = (x*3707956744 mod 2^32)/131072 */
  static const uint16_t witness_base_tab[WITNESS_BASE_HASH_SIZE]={
-   // hash(x)  = (x*3707956744 mod 2^32)/131072 
-   //   Hashtable constructed from the strong-2 pseudoprimes under 2^64, with semiprimes of the form
-   //   pq : q = k*(p-1)+1 where k is in {2,3,4,5,6,7,8,9,10,11,12} are removed
    
          711, 1071, 917, 2969, 271, 1313, 4909, 153, 1737, 2211, 7, 687, 306, 518, 7881, 3182,
 	 1990, 2445, 4339, 555, 1159, 1914, 395, 7546, 898, 4445, 933, 1937, 2603, 183, 2989, 1005,

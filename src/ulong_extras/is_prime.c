@@ -4,6 +4,7 @@
     Copyright (C) 2014, 2015 Dana Jacobsen
     Copyright (C) 2015 Kushagra Singh
     Copyright (C) 2025 Fredrik Johansson
+    Copyright (C) 2026 Viorel Wegner
 
     This file is part of FLINT.
 
@@ -21,17 +22,20 @@
 #define SMALL_ODDPRIME_LIMIT 32768
 #define WITNESS_BASE_HASH_SIZE 32768
 /* To keep this file readable, the lookup tables have been
-   placed in a seperate header file. */
+   placed in a separate header file. */
 #include "is_prime_tables.h"
 
- int n_is_semiprime_k(ulong n)
+static int n_is_semiprime_k(ulong n)
 {
 // Precomputed multiplicative inverses of the sqrt of k
    const double SQRTINV[11] = {
-   0.7071067811865475,0.5773502691896258,0.5,
-   0.4472135954999579,0.4082482904638631,0.3779644730092272,
-   0.35355339059327373,0.3333333333333333, 0.31622776601683794,
-   0.30151134457776363,0.2886751345948129};
+     0x1.6a09e667f3bccp-1 , 0x1.279a74590331dp-1 ,
+     0x1p-1               , 0x1.c9f25c5bfedd9p-2 ,
+     0x1.a20bd700c2c3fp-2 , 0x1.83091e6a7f7e6p-2 ,
+     0x1.6a09e667f3bccp-2 , 0x1.5555555555555p-2 , 
+     0x1.43d136248490fp-2 , 0x1.34bf63d156826p-2 ,
+     0x1.279a74590331dp-2
+   };
   // Compute sqrt just once
    double sqrtn = sqrt(n);
   
