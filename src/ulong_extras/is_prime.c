@@ -14,16 +14,40 @@
 */
 
 #include <stdint.h>
+#include <math.h>
 #include "ulong_extras.h"
 #include "nmod.h"
 
 #define SMALL_ODDPRIME_LIMIT 32768
-#define WITNESS_BASE_HASH_SIZE 98304
-#define NUM_OVERSIZE_BASES 4903
-
+#define WITNESS_BASE_HASH_SIZE 32768
 /* To keep this file readable, the lookup tables have been
-   placed in a seprate header file. */
+   placed in a seperate header file. */
 #include "is_prime_tables.h"
+
+ int n_is_semiprime_k(ulong n)
+{
+// Precomputed multiplicative inverses of the sqrt of k
+   const double SQRTINV[11] = {
+   0.7071067811865475,0.5773502691896258,0.5,
+   0.4472135954999579,0.4082482904638631,0.3779644730092272,
+   0.35355339059327373,0.3333333333333333, 0.31622776601683794,
+   0.30151134457776363,0.2886751345948129};
+  // Compute sqrt just once
+   double sqrtn = sqrt(n);
+  
+   for (int idx=0;idx<11;idx++){
+    // This is equivalent to sqrt(n/a)
+      uint64_t k = sqrtn*SQRTINV[idx];
+      // increment the index to the offset
+      uint64_t a = idx+2;
+      
+      if ((k+1)*(a*k+1)==n){
+       // This is a semiprime so return true
+         return 1;
+     }
+   }
+  return 0;  
+}
 
 /* Branch-free hash table lookup */
 static int u32_is_base2_pseudoprime(uint32_t x)
@@ -110,20 +134,13 @@ static int u32_is_base2_probabprime(uint32_t n)
 #endif
 
 static uint32_t get_witness_base(uint64_t n)
-{
-    uint32_t hash, b;
-
-    /* The specific hash function used to generate the table. */
-    hash = ((uint32_t) ((n * 314159265) >> 15) % WITNESS_BASE_HASH_SIZE);
-
-    /* Read 3 bytes = 24 bits. */
-    b = witness_base_tab[3 * hash] | (witness_base_tab[3 * hash + 1] << 8) | (witness_base_tab[3 * hash + 2] << 16);
-
-    /* A small b value encodes an index into the oversize table for bases > 24 bits. */
-    if (b < NUM_OVERSIZE_BASES)
-        b = oversize[b];
-
-    return b;
+{    
+    
+   uint32_t hash, multiplier=3707956744,nsmall=n;
+    
+    hash = (nsmall*multiplier)>>17;
+    
+    return witness_base_tab[hash];
 }
 
 static int
@@ -235,7 +252,10 @@ n_is_prime_odd_no_trial(ulong n)
 
         if (!_n_is_strong_probabprime_redc(2, d, one_red, ctx))
             return 0;
-
+        
+        if (n_is_semiprime_k(n)){
+           return 0;
+        }
         return _n_is_strong_probabprime_redc(get_witness_base(n), d, one_red, ctx);
     }
 }
