@@ -25,6 +25,8 @@
    placed in a separate header file. */
 #include "is_prime_tables.h"
 
+// Detects if n is of the form pq where q = k*(p-1)+1
+// Here we use a slightly simpler equivalence of p=(a+1) q=(k*a+1)
 static int n_is_semiprime_k(ulong n)
 {
 // Precomputed multiplicative inverses of the sqrt of k
@@ -40,12 +42,12 @@ static int n_is_semiprime_k(ulong n)
    double sqrtn = sqrt(n);
   
    for (int idx=0;idx<11;idx++){
-    // This is equivalent to sqrt(n/a)
-      uint64_t k = sqrtn*SQRTINV[idx];
+    // This is equivalent to sqrt(n/k)
+      uint64_t a = sqrtn*SQRTINV[idx];
       // increment the index to the offset
-      uint64_t a = idx+2;
+      uint64_t k = idx+2;
       
-      if ((k+1)*(a*k+1)==n){
+      if ((a+1)*(k*a+1)==n){
        // This is a semiprime so return true
          return 1;
      }
