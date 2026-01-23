@@ -929,18 +929,22 @@ Primality testing
     `n < 2^{64}` which have been tabulated exhaustively by Feitsma [FeiGal2013]_.
 
     The 2314 pseudoprimes up to 32 bits are simply looked up in a hash table.
-
-    For the pseudoprimes up to 64 bits, we follow the idea of Forisek and
-    Jancina [ForJan2015]_. We precompute a function `T` such
-    that for pseudoprime `n < 2^{64}`, a probable prime test with base `T(n)`
-    certifies compositeness of `n`. Our `T` is represented as a hash table
-    with 98304 entries stored in an array of 24-bit integers. A small number
-    of bases (around 5%) are larger than 24 bits, triggering a secondary
-    lookup in an array of 4903 32-bit integers. In total
-    the tables for 64-bit pseudoprimes require 307 KB, which is just 60% the
-    size of the 512 KB Forisek-Jancina table of 262144 16-bit bases, while
-    the test is as efficient.
-
+    
+    For the pseudoprimes up to 64 bits we modify the approach of Forisek and
+    Jancina [ForJan2015]_. We first eliminate a class of pseudoprimes that
+    are difficult to find reliable witnesses to. These are of the form pq where 
+    p and q are primes and q = k*p(-1)+1 where k is in the interval [2,12]. 
+    A semiprime check algorithm using a single floating-point sqrt, and the 
+    multiplicative inverses of the sqrt of k eliminates this class in 
+    approximately 1/20 of the runtime of a fermat test. The remaining pseudoprimes
+    are parittioned into 32768 sets using a fast multiplicative hash, and then tested 
+    against a precomputed witness smaller than 16-bit that is reliable to each set. 
+    
+    The total witness table requires 64KiB or 1/8 of the Forisek-Jancina table
+    of 262144 16-bit bases. Due to the semiprime check this test is slightly 
+    less efficient in the case of primes, and equivalent in the average case 
+    but it's low memory usage means it performs better in memory intensive computations. 
+    
     To check this implementation against Feitsma's table, one can run the
     ``examples/check_n_is_prime`` program.
 
