@@ -14,10 +14,11 @@
 void
 acb_poly_set_coeff_si(acb_poly_t poly, slong n, slong x)
 {
-    acb_poly_fit_length(poly, n + 1);
-
     if (n + 1 > poly->length)
     {
+        if (x == 0)
+            return;
+        acb_poly_fit_length(poly, n + 1);
         _acb_vec_zero(poly->coeffs + poly->length, n - poly->length);
         poly->length = n + 1;
     }

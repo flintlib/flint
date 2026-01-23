@@ -17,8 +17,8 @@ TEST_FUNCTION_START(fmpz_set, state)
 {
     int i, result;
 
-    if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
-        _flint_rand_init_gmp_state(state);
+    gmp_randstate_t gmp_state;
+    gmp_randinit_default(gmp_state);
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -31,7 +31,7 @@ TEST_FUNCTION_START(fmpz_set, state)
 
         bits = n_randint(state, 200) + 1;
 
-        mpz_rrandomb(c, state->__gmp_state, bits);
+        mpz_rrandomb(c, gmp_state, bits);
 
         if (n_randint(state, 2))
             mpz_neg(c, c);
@@ -58,6 +58,8 @@ TEST_FUNCTION_START(fmpz_set, state)
         mpz_clear(c);
         mpz_clear(d);
     }
+
+    gmp_randclear(gmp_state);
 
     TEST_FUNCTION_END(state);
 }

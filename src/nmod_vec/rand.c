@@ -15,7 +15,7 @@ void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 {
     slong i;
     for (i = 0; i < len; i++)
-        vec[i] = n_randint(state, mod.n);
+        vec[i] = _n_randint(state, mod.n);
 }
 
 void _nmod_vec_randtest(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
@@ -33,7 +33,7 @@ void _nmod_vec_randtest(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 
         for (i = 0; i < len; i++)
         {
-            if (n_randint(state, sparseness))
+            if (_n_randint(state, sparseness))
                 vec[i] = 0;
             else
                 vec[i] = n_randtest(state) % mod.n;

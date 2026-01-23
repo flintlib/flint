@@ -27,7 +27,7 @@
 #if defined(_MSC_VER) || defined(__x86_64__) || defined(__aarch64__)
 # define FLINT_HAVE_get_cycle_counter  1
 #endif
-#if defined(__unix__) || defined(__APPLE__)
+#if (defined(__unix__) && !defined(__CYGWIN__)) || defined(__APPLE__)
 # define FLINT_HAVE_getrusage   1
 #endif
 
@@ -52,7 +52,7 @@ int gettimeofday(struct timeval * p, void * tz);
 void fprint_memory_usage(FILE *);
 #endif
 void print_memory_usage(void);
-#endif /* FLINT_HAVE_getrusage */
+#endif
 
 /* timeit ********************************************************************/
 
@@ -88,7 +88,6 @@ static inline void timeit_start_us(timeit_t t)
     t->wall = - tv.tv_sec * 1000000 - tv.tv_usec;
 }
 
-
 static inline void timeit_stop_us(timeit_t t)
 {
     struct timeval tv;
@@ -96,13 +95,11 @@ static inline void timeit_stop_us(timeit_t t)
     t->wall += tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-#if FLINT_HAVE_FILE
 static inline void timeit_print(timeit_t timer, ulong reps)
 {
-    printf("cpu/wall(s): %g %g\n", timer->cpu * 0.001 / reps,
+    flint_printf("cpu/wall(s): %g %g\n", timer->cpu * 0.001 / reps,
                                    timer->wall * 0.001 / reps);
 }
-#endif
 
 #define TIMEIT_REPEAT(__timer, __reps) \
     do \
@@ -145,7 +142,7 @@ static inline void timeit_print(timeit_t timer, ulong reps)
     { \
       timeit_t __timer; \
       timeit_start(__timer); \
-      do { \
+      do {
 
 #define TIMEIT_ONCE_STOP \
       } while (0); \
@@ -162,8 +159,8 @@ static inline double get_cycle_counter(void)
     return __rdtsc();
 #elif defined(__x86_64__)
     unsigned int hi, lo;
-    __asm__ ("rdtsc; movl %%edx,%0; movl %%eax,%1"
-          : "=r" (hi), "=r" (lo) : : "%edx", "%eax");
+    __asm__ volatile ("rdtsc; movl %%edx,%0; movl %%eax,%1"
+            : "=r" (hi), "=r" (lo) : : "%edx", "%eax");
     return hi * (double) (WORD(1) << 32) + lo;
 #elif defined(__aarch64__)
     ulong val;

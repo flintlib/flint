@@ -86,7 +86,7 @@ int
 arf_load_str(arf_t x, const char* data)
 {
     fmpz_t mantissa, exponent;
-    char * e_str;
+    const char * e_str;
     char * m_str;
     int err = 0;
 

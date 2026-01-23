@@ -169,6 +169,7 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_addmul_scalar(gr_ptr vec1, gr_srcpt
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_submul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP(ctx, VEC_SUBMUL_SCALAR)(vec1, vec2, len, c, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_addmul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_ADDMUL_SCALAR_SI)(vec1, vec2, len, c, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_submul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_SI(ctx, VEC_SUBMUL_SCALAR_SI)(vec1, vec2, len, c, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_addmul_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx) { return GR_VEC_SCALAR_OP_FMPZ(ctx, VEC_ADDMUL_SCALAR_FMPZ)(vec1, vec2, len, c, ctx); }
 
 GR_VEC_INLINE truth_t _gr_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_PREDICATE(ctx, VEC_EQUAL)(vec1, vec2, len, ctx); }
 GR_VEC_INLINE truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_IS_ZERO)(vec, len, ctx); }

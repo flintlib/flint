@@ -24,10 +24,14 @@ Utility functions
     Prints debug information about ``(x, xsize)`` to ``stdout``. 
     In particular, this will print binary representations of all the limbs.
 
-.. function:: char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n)
+.. function:: char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int negative)
 
-    Returns a string containing the decimal representation of 
-    ``(x, n)``.
+    Returns the string representation of ``(x, xn)`` (or its negation if
+    ``negative`` is set to 1) in base *base* which must be a base
+    supported by GMP. If ``res`` is ``NULL``, a new string will be allocated;
+    otherwise, the given pointer ``res`` will be used and is assumed
+    to have sufficient space to represent the full output, one extra
+    digit, minus sign (if negative), and null terminator.
 
 .. function:: int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 
@@ -298,6 +302,28 @@ Division and modular arithmetic with precomputed inverses
     ``dinv`` must be computed from ``b[n - 1]``, ``b[n - 2]`` by 
     ``flint_mpn_preinv1``. We also require ``m >= n >= 2``.
 
+.. function:: mp_limb_t flint_mpn_divrem_1_preinv(mp_ptr q, mp_srcptr a, mp_size_t n, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
+
+    Divide ``a, n`` by the limb ``d``, writing the quotient to ``q, n``
+    and returning the remainder. Requires ``n`` and ``d`` to be positive.
+    Allows ``a`` and ``q`` to be aliased. Requires a single-limb inverse ``dinv``
+    precomputed by :func:`n_preinvert_limb` and the
+    number of leading zero bits of ``d`` as ``norm``.
+
+    This is equivalent to ``mpn_divrem_1(q, 0, a, n, d)`` but faster for small
+    ``n``. Typically ``mpn_divrem_1`` will be faster for large ``n`` as it
+    has dedicated assembly code on many architectures whereas
+    ``flint_mpn_divrem_1_preinv`` currently does not.
+
+.. function:: mp_limb_t flint_mpn_divrem_2_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv)
+              mp_limb_t flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
+              mp_limb_t flint_mpn_divrem_3_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv)
+              mp_limb_t flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
+
+    Versions of :func:`flint_mpn_divrem_1_preinv` specialized for length 2 and 3.
+    The ``_norm`` functions require a normalised divisor while the ``_unnorm``
+    functions require an unnormalised divisor with positive ``norm``.
+
 .. function:: void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm)
 
     Given a normalised integer `d` with precomputed inverse ``dinv`` 
@@ -466,18 +492,30 @@ GCD
 Random Number Generation
 --------------------------------------------------------------------------------
 
+.. function:: void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n)
+
+    Generates a uniform random number of ``n`` bits and stores
+    it on ``rp``.
+
+.. function:: void flint_mpn_urandomm(mp_ptr rp, flint_rand_t state, mp_srcptr xp, mp_size_t xn)
+
+    Generates a uniform random number between 0 inclusive and ``(xp, xn)``
+    exclusive`[0, x)` and stores it on ``rp``. The most significant limb of
+    ``xp`` is required to be nonzero. This function will write ``xn`` limbs to
+    ``rp`` even if the largest possible value has one fewer limb.
 
 .. function:: void flint_mpn_rrandom(mp_ptr rp, flint_rand_t state, mp_size_t n)
 
-    Generates a random number with ``n`` limbs and stores 
+    Generates a random number with ``n`` limbs and stores
     it on ``rp``. The number it generates will tend to have
     long strings of zeros and ones in the binary representation.
 
     Useful for testing functions and algorithms, since this kind of random
     numbers have proven to be more likely to trigger corner-case bugs.
 
-.. function:: void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n)
+.. function:: void flint_mpn_rrandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t nbits)
 
-    Generates a uniform random number of ``n`` bits and stores 
-    it on ``rp``.
+    Generates a random number with ``nbits`` bits and stores
+    it on ``rp``. The number it generates will tend to have
+    long strings of zeros and ones in the binary representation.
 

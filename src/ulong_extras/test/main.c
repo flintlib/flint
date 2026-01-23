@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-addmod.c"
+#include "t-binvert.c"
 #include "t-cbrt_binary_search.c"
 #include "t-cbrt.c"
 #include "t-cbrt_chebyshev_approx.c"
@@ -45,8 +46,6 @@
 #include "t-gcd.c"
 #include "t-gcdinv.c"
 #include "t-invmod.c"
-#include "t-is_oddprime_binary.c"
-#include "t-is_oddprime_small.c"
 #include "t-is_perfect_power235.c"
 #include "t-is_perfect_power.c"
 #include "t-is_prime.c"
@@ -110,6 +109,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(n_addmod),
+    TEST_FUNCTION(n_binvert),
     TEST_FUNCTION(n_cbrt_binary_search),
     TEST_FUNCTION(n_cbrt),
     TEST_FUNCTION(n_cbrt_chebyshev_approx),
@@ -143,8 +143,6 @@ test_struct tests[] =
     TEST_FUNCTION(n_gcd),
     TEST_FUNCTION(n_gcdinv),
     TEST_FUNCTION(n_invmod),
-    TEST_FUNCTION(n_is_oddprime_binary),
-    TEST_FUNCTION(n_is_oddprime_small),
     TEST_FUNCTION(n_is_perfect_power235),
     TEST_FUNCTION(n_is_perfect_power),
     TEST_FUNCTION(n_is_prime),

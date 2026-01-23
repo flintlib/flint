@@ -69,7 +69,7 @@ SHARED:=@SHARED@
 COVERAGE:=@COVERAGE@
 WANT_NTL:=@WANT_NTL@
 
-WANT_DEPS:=@WANT_DEPS@
+WANT_DEPTRACK:=@WANT_DEPTRACK@
 
 WANT_ASSEMBLY:=@WANT_ASSEMBLY@
 ASM_PATH:=$(ABS_SRC_DIR)/mpn_extras/@ASM_PATH@
@@ -84,9 +84,9 @@ NTL_LIB_PATH:=@NTL_LIB_PATH@
 
 _CFLAGS:=@CFLAGS@
 CFLAGS=$(if $(filter inlines.c,$(notdir $<)),$(filter-out -Wmissing-prototypes,$(_CFLAGS)),$(_CFLAGS))
-TESTCFLAGS:=@TESTCFLAGS@
+TESTCFLAGS:=$(filter-out -Wmissing-prototypes,$(_CFLAGS))
 CPPFLAGS:=-I$(ABS_SRC_DIR) -I$(SRC_DIR) @CPPFLAGS@ -DBUILDING_FLINT
-CPPFLAGS2:=-L$(ABS_FLINT_DIR) $(CPPFLAGS)
+CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
 LIB_CPPFLAGS:=@LIB_CPPFLAGS@
 CXXFLAGS:=@CXXFLAGS@
 LIBS:=@LIBS@
@@ -138,115 +138,114 @@ else
   CMD = @
 endif
 
-################################################################################
-################################################################################
+###############################################################################
+###############################################################################
 # files and directories
-################################################################################
-################################################################################
+###############################################################################
+###############################################################################
 
-################################################################################
+###############################################################################
 # configuration files
-################################################################################
+###############################################################################
 
-CFG_HEADERS :=                                                              \
-        $(SRC_DIR)/config.h             $(SRC_DIR)/flint-config.h           \
-        $(SRC_DIR)/flint.h              $(SRC_DIR)/gmpcompat.h              \
-        $(SRC_DIR)/flint-mparam.h
+CFG_HEADERS := \
+		$(SRC_DIR)/config.h				$(SRC_DIR)/flint-config.h	\
+		$(SRC_DIR)/flint.h				$(SRC_DIR)/gmpcompat.h		\
+		$(SRC_DIR)/flint-mparam.h
 
-_CFG_FILES :=                                                                \
-        $(FLINT_DIR)/config.log         $(FLINT_DIR)/flint.pc               \
-        $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c              \
-        $(FLINT_DIR)/config.m4          $(FLINT_DIR)/config.status
+_CFG_FILES := \
+		$(FLINT_DIR)/config.log			$(FLINT_DIR)/flint.pc		\
+		$(FLINT_DIR)/Makefile			$(SRC_DIR)/fmpz/fmpz.c		\
+		$(FLINT_DIR)/config.m4			$(FLINT_DIR)/config.status
 
 CFG_FILES := $(_CFG_FILES) $(CFG_HEADERS)
 
-################################################################################
+###############################################################################
 # directories
-################################################################################
+###############################################################################
 
 HEADLESS_DIRS := generic_files
 
-HEADER_DIRS :=                                                              \
-        thread_pool                     thread_support                      \
-                                                                            \
-        ulong_extras                                                        \
-        long_extras                                                         \
-        perm                                                                \
-        double_extras   d_vec           d_mat                               \
-        nfloat                                                              \
-        mpn_extras                                                          \
-        nmod            nmod_vec        nmod_mat        nmod_poly           \
-        mpn_mod                                                             \
-        fmpz            fmpz_vec        fmpz_mat        fmpz_poly           \
-        fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly       \
-        fmpq            fmpq_vec        fmpq_mat        fmpq_poly           \
-                                                                            \
-        fq              fq_vec          fq_mat          fq_poly             \
-        fq_nmod         fq_nmod_vec     fq_nmod_mat     fq_nmod_poly        \
-        fq_zech                         fq_zech_mat     fq_zech_poly        \
-        fq_default                      fq_default_mat  fq_default_poly     \
-        fq_embed                                                            \
-        fq_nmod_embed                                                       \
-        fq_zech_embed                                                       \
-        padic                           padic_mat       padic_poly          \
-        qadic                                                               \
-                                                                            \
-        nmod_poly_factor                fmpz_factor                         \
-        fmpz_poly_factor                fmpz_mod_poly_factor                \
-        fq_poly_factor                  fq_nmod_poly_factor                 \
-        fq_zech_poly_factor             fq_default_poly_factor              \
-                                                                            \
-        nmod_poly_mat                   fmpz_poly_mat                       \
-                                                                            \
-        mpoly           nmod_mpoly      fmpz_mpoly      fmpz_mod_mpoly      \
-        fmpq_mpoly      fq_nmod_mpoly   fq_zech_mpoly   fmpz_mod_mpoly_q    \
-                                                                            \
-        nmod_mpoly_factor               fmpz_mpoly_factor                   \
-        fmpz_mod_mpoly_factor           fmpq_mpoly_factor                   \
-        fq_nmod_mpoly_factor            fq_zech_mpoly_factor                \
-                                                                            \
-        fft             n_fft		@FFT_SMALL@                         \
-	fmpz_poly_q     fmpz_lll            				    \
-        n_poly          arith           qsieve          aprcl               \
-                                                                            \
-        nf              nf_elem         qfb                                 \
-                                                                            \
-        double_interval dlog                                                \
-        fmpz_extras     fmpzi                                               \
-        bool_mat        partitions                                          \
-        mag                                                                 \
-        arf             acf             arb             acb                 \
-        arb_mat         arb_poly        arb_calc        arb_hypgeom         \
-        acb_mat         acb_poly        acb_calc        acb_hypgeom         \
-        arb_fmpz_poly   arb_fpwrap                                          \
-        acb_dft         acb_elliptic    acb_modular     acb_dirichlet       \
-        acb_theta       dirichlet       bernoulli       hypgeom             \
-                                                                            \
-        gr              gr_generic      gr_vec          gr_mat              \
-        gr_poly         gr_mpoly        gr_series       gr_special          \
-                                                                            \
-        calcium                                                             \
-        fmpz_mpoly_q                                                        \
-        fexpr           fexpr_builtin                                       \
-        qqbar                                                               \
-        ca              ca_ext          ca_field        ca_vec              \
-        ca_poly         ca_mat
+HEADER_DIRS	:=	\
+		thread_pool			thread_support					\
+															\
+		ulong_extras		long_extras			perm		\
+		double_extras		d_vec				d_mat		\
+															\
+		mpn_extras	radix   	mpn_mod		nfloat			\
+															\
+		nmod		nmod_vec	nmod_mat	nmod_poly		\
+		fmpz		fmpz_vec	fmpz_mat	fmpz_poly		\
+		fmpz_mod	fmpz_mod_vec fmpz_mod_mat fmpz_mod_poly	\
+		fmpq		fmpq_vec	fmpq_mat	fmpq_poly		\
+		fq_nmod		fq_nmod_vec	fq_nmod_mat	fq_nmod_poly	\
+		fq_zech					fq_zech_mat	fq_zech_poly	\
+											n_poly			\
+		fq			fq_vec		fq_mat		fq_poly			\
+		padic					padic_mat	padic_poly		\
+		qadic												\
+															\
+		fmpz_extras	fmpz_factor	fmpzi						\
+		fft			n_fft		@FFT_SMALL@								\
+		fmpz_lll											\
+		arith												\
+		qsieve		aprcl									\
+															\
+		fq_default		fq_default_mat	fq_default_poly		\
+		fq_nmod_embed	fq_zech_embed	fq_embed			\
+		nmod_poly_mat	fmpz_poly_mat						\
+															\
+		mpoly			nmod_mpoly		fmpz_mpoly			\
+		fmpz_mod_mpoly	fmpq_mpoly		fq_nmod_mpoly		\
+		fq_zech_mpoly										\
+															\
+		fmpz_poly_q		fmpz_mpoly_q	fmpz_mod_mpoly_q	\
+															\
+		nmod_poly_factor									\
+		fmpz_poly_factor		fmpz_mod_poly_factor		\
+		fq_poly_factor			fq_nmod_poly_factor			\
+		fq_zech_poly_factor		fq_default_poly_factor		\
+		nmod_mpoly_factor		fmpz_mpoly_factor			\
+		fmpz_mod_mpoly_factor	fmpq_mpoly_factor			\
+		fq_nmod_mpoly_factor	fq_zech_mpoly_factor		\
+															\
+		nf			nf_elem		qfb							\
+															\
+		mag			arf			acf			arb			acb	\
+		arb_mat		arb_poly	arb_calc	arb_hypgeom		\
+		acb_mat		acb_poly	acb_calc	acb_hypgeom		\
+		double_interval	dlog								\
+		arb_fmpz_poly	arb_fpwrap							\
+		acb_dft			acb_elliptic	acb_modular			\
+		acb_dirichlet	acb_theta							\
+		dirichlet		bernoulli		hypgeom				\
+		bool_mat		partitions							\
+															\
+		gr			gr_generic	gr_vec		gr_mat			\
+		gr_poly		gr_mpoly	gr_series	gr_special		\
+															\
+		calcium												\
+															\
+		fexpr		fexpr_builtin							\
+		qqbar												\
+		ca			ca_vec		ca_mat		ca_poly			\
+		ca_ext		ca_field
 
 DIRS := $(HEADLESS_DIRS) $(HEADER_DIRS)
 
-TEMPLATE_DIRS :=                                                            \
-        fq_vec_templates                fq_mat_templates                    \
-        fq_poly_templates               fq_poly_factor_templates            \
-        fq_embed_templates              fq_templates
+TEMPLATE_DIRS := \
+		fq_vec_templates		fq_mat_templates			\
+		fq_poly_templates		fq_poly_factor_templates	\
+		fq_embed_templates		fq_templates
 
-BUILD_DIRS :=                                                               \
-        $(BUILD_DIR)                                                        \
-        $(patsubst %, $(BUILD_DIR)/%, $(DIRS))                              \
-        $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
-        $(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))                         \
-        $(patsubst %, $(BUILD_DIR)/%/tune, $(DIRS))                         \
-        $(BUILD_DIR)/examples           $(BUILD_DIR)/profile                \
-        $(BUILD_DIR)/test               $(BUILD_DIR)/tune
+BUILD_DIRS := \
+		$(BUILD_DIR)										\
+		$(patsubst %, $(BUILD_DIR)/%, $(DIRS))				\
+		$(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))		\
+		$(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))			\
+		$(patsubst %, $(BUILD_DIR)/%/tune, $(DIRS))			\
+		$(BUILD_DIR)/examples	$(BUILD_DIR)/profile		\
+		$(BUILD_DIR)/test		$(BUILD_DIR)/tune
 ifneq ($(WANT_NTL), 0)
 BUILD_DIRS +=                                                               \
         $(BUILD_DIR)/interfaces         $(BUILD_DIR)/interfaces/test
@@ -267,15 +266,15 @@ ifneq ($(FLINT_DLLLIB),0)
 INSTALL_DIRS += $(DESTDIR)$(BINDIR)
 endif
 
-################################################################################
+###############################################################################
 # headers
-################################################################################
+###############################################################################
 
 HEADERS := $(wildcard $(ABS_SRC_DIR)/*.h) $(CFG_HEADERS)
 
-################################################################################
+###############################################################################
 # sources
-################################################################################
+###############################################################################
 
 define xxx_SOURCES
 $(1)_SOURCES := $(wildcard $(ABS_SRC_DIR)/$(1)/*.c)
@@ -330,9 +329,9 @@ TUNE_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TUNE_SOURCES)) $(_TUNE_SOURCES)
 
 EXMP_SOURCES := $(wildcard $(ABS_FLINT_DIR)/examples/*.c)
 
-################################################################################
+###############################################################################
 # objects
-################################################################################
+###############################################################################
 
 ifneq ($(STATIC), 0)
 define xxx_OBJS
@@ -350,9 +349,9 @@ endif
 OBJS := $(foreach dir, $(DIRS), $($(dir)_OBJS))
 endif
 
-################################################################################
+###############################################################################
 # library objects
-################################################################################
+###############################################################################
 
 ifneq ($(SHARED), 0)
 define xxx_LOBJS
@@ -370,9 +369,9 @@ endif
 LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
 endif
 
-################################################################################
+###############################################################################
 # executables
-################################################################################
+###############################################################################
 
 define xxx_PROFS
 $(1)_PROFS := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_PROF_SOURCES))
@@ -400,21 +399,21 @@ TUNES := $(foreach dir,$(DIRS),$($(dir)_TUNES)) $(_TUNES)
 
 EXMPS := $(patsubst $(ABS_FLINT_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(EXMP_SOURCES))
 
-################################################################################
-################################################################################
+###############################################################################
+###############################################################################
 # recipes
-################################################################################
-################################################################################
+###############################################################################
+###############################################################################
 
-################################################################################
+###############################################################################
 # main recipe
-################################################################################
+###############################################################################
 
 all: library
 
-################################################################################
+###############################################################################
 # library
-################################################################################
+###############################################################################
 
 ifneq ($(SHARED), 0)
 library: shared
@@ -425,7 +424,6 @@ endif
 
 ifneq ($(SHARED), 0)
 shared: $(FLINT_DIR)/$(FLINT_LIB_FULL)
-
 # The following is to avoid reaching the maximum length of command line
 # arguments, mainly present on MinGW.
 define xxx_merged_lobj_rule
@@ -434,16 +432,14 @@ $(BUILD_DIR)/$(1)_merged.lo: $($(1)_LOBJS) | $(BUILD_DIR)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
-
 ifeq ($(WANT_LTO),1)
-	LIB_DEPS = $(LOBJS)
+SHARED_LIB_DEPS:=$(LOBJS)
 else
-	LIB_DEPS = $(MERGED_LOBJS)
+SHARED_LIB_DEPS:=$(MERGED_LOBJS)
 endif
-
-$(FLINT_DIR)/$(FLINT_LIB_FULL): $(LIB_DEPS)
+$(FLINT_DIR)/$(FLINT_LIB_FULL): $(SHARED_LIB_DEPS)
 	@echo "Building $(FLINT_LIB_FULL)"
-	$(CMD) $(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(LIB_DEPS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
+	$(CMD) $(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(SHARED_LIB_DEPS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
 	@$(RM_F) $(FLINT_LIB)
 	@$(RM_F) $(FLINT_LIB_MAJOR)
 	@$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB)
@@ -452,7 +448,6 @@ endif
 
 ifneq ($(STATIC), 0)
 static: $(FLINT_DIR)/$(FLINT_LIB_STATIC)
-
 # The following is to avoid reaching the maximum length of command line
 # arguments, mainly present on MinGW.
 define xxx_merged_obj_rule
@@ -461,21 +456,19 @@ $(BUILD_DIR)/$(1)_merged.o: $($(1)_OBJS) | $(BUILD_DIR)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_merged_obj_rule,$(dir))))
 MERGED_OBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.o)
-
 ifeq ($(WANT_LTO),1)
-	LIB_DEPS = $(OBJS)
+STATIC_LIB_DEPS:=$(OBJS)
 else
-	LIB_DEPS = $(MERGED_OBJS)
+STATIC_LIB_DEPS:=$(MERGED_OBJS)
 endif
-
-$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(LIB_DEPS)
+$(FLINT_DIR)/$(FLINT_LIB_STATIC): $(STATIC_LIB_DEPS)
 	@echo "Building $(FLINT_LIB_STATIC)"
-	@$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIB_DEPS)
+	@$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(STATIC_LIB_DEPS)
 endif
 
-################################################################################
+###############################################################################
 # directories
-################################################################################
+###############################################################################
 
 $(BUILD_DIRS) $(INSTALL_DIRS):
 	$(MKDIR_P) $@
@@ -483,11 +476,11 @@ $(BUILD_DIRS) $(INSTALL_DIRS):
 $(BUILD_DIR)/include: $(HEADERS)
 	$(MKDIR_P) $@/flint && $(CP) $(HEADERS) $@/flint
 
-################################################################################
+###############################################################################
 # inclusions
-################################################################################
+###############################################################################
 
-ifneq ($(WANT_DEPS), 0)
+ifneq ($(WANT_DEPTRACK), 0)
 
 ifeq ($(words $(MAKECMDGOALS)), 0)
 
@@ -598,9 +591,9 @@ endif
 
 DEPFLAGS = -MMD -MP -MF $(@:%=%.d)
 
-################################################################################
+###############################################################################
 # generated sources
-################################################################################
+###############################################################################
 
 ifeq ($(WANT_ASSEMBLY),1)
 $(BUILD_DIR)/%.s: $(ABS_SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 | $(BUILD_DIR)/mpn_extras/@ASM_PATH@
@@ -610,9 +603,9 @@ $(BUILD_DIR)/%_pic.s: $(ABS_SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 | $(BUILD_DIR)
 	@$(M4) -DPIC $< > $@
 endif
 
-################################################################################
+###############################################################################
 # objects
-################################################################################
+###############################################################################
 
 ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
@@ -636,9 +629,9 @@ endif
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
 endif
 
-################################################################################
+###############################################################################
 # library objects
-################################################################################
+###############################################################################
 
 ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
@@ -662,9 +655,9 @@ endif
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
 endif
 
-################################################################################
+###############################################################################
 # executables
-################################################################################
+###############################################################################
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
@@ -766,9 +759,9 @@ $(BUILD_DIR)/examples/%$(EXEEXT): $(ABS_FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$
 	$(CMD) $(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
 endif
 
-################################################################################
+###############################################################################
 # examples
-################################################################################
+###############################################################################
 
 examples: library $(EXMPS)
 
@@ -777,9 +770,9 @@ examples: library $(EXMPS)
 
 checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
 
-################################################################################
+###############################################################################
 # profiling
-################################################################################
+###############################################################################
 
 ifdef MOD
 profile: library $(foreach dir, $(MOD), $($(dir)_PROFS))
@@ -787,9 +780,9 @@ else
 profile: library $(PROFS)
 endif
 
-################################################################################
+###############################################################################
 # tests
-################################################################################
+###############################################################################
 
 tests: library $(TESTS)
 
@@ -867,9 +860,9 @@ check: library $(TESTS:%=%_TEST_RUN)
 	@echo 'All tests passed.'
 endif
 
-################################################################################
+###############################################################################
 # debugging
-################################################################################
+###############################################################################
 
 %_TEST_DBG_RUN_ARGS: %
 	@$(GDB) --args $< $(ARGS)
@@ -886,15 +879,15 @@ debug:
 	$(error Can only run debugger with one module and one argument at a time)
 endif
 
-################################################################################
+###############################################################################
 # tuning
-################################################################################
+###############################################################################
 
 tune: library $(TUNES)
 
-################################################################################
+###############################################################################
 # valgrind
-################################################################################
+###############################################################################
 
 %_VALGRIND_RUN: %
 	valgrind --track-origins=yes --leak-check=full --show-reachable=yes --log-file="$*.valgrind" $<
@@ -905,9 +898,9 @@ else
 valgrind: library $(TESTS:%=%_VALGRIND_RUN)
 endif
 
-################################################################################
+###############################################################################
 # coverage
-################################################################################
+###############################################################################
 
 ifneq ($(COVERAGE), 0)
 # NOTE: Requires lcov v2.0
@@ -918,9 +911,9 @@ coverage_html: coverage
 	genhtml $(NJOBS) $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
 endif
 
-################################################################################
+###############################################################################
 # clean
-################################################################################
+###############################################################################
 
 clean:
 	$(RM_F) $(FLINT_DIR)/$(FLINT_LIB)
@@ -935,9 +928,9 @@ endif
 distclean: clean
 	$(RM_F) $(CFG_FILES)
 
-################################################################################
+###############################################################################
 # install and uninstall
-################################################################################
+###############################################################################
 
 install: library | $(INSTALL_DIRS)
 	$(CP) flint.pc $(DESTDIR)$(PKGCONFIGDIR)/flint.pc
@@ -989,15 +982,15 @@ endif
 	$(RM_F) $(DESTDIR)$(LIBDIR)/$(FLINT_LIB_STATIC)
 	$(RM_RF) $(DESTDIR)$(INCLUDEDIR)/flint
 
-################################################################################
+###############################################################################
 # regenerate part of the build system of needed
-################################################################################
+###############################################################################
 
 ifneq ($(MAINTAINER_MODE),no)  # disable this for releases?
 ifneq ($(shell command -v autoconf 2> /dev/null),)
-$(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac
-	@echo "Running autoconf"
-	@cd $(ABS_FLINT_DIR) && autoconf && cd - >/dev/null
+$(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac $(ABS_FLINT_DIR)/bootstrap.sh
+	@echo "Running bootstrap.sh!"
+	@cd $(ABS_FLINT_DIR) && ./bootstrap.sh && cd - >/dev/null
 else
 $(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac
 	$(warning autoconf not available, proceeding with stale configure)
@@ -1019,17 +1012,17 @@ $(SRC_DIR)/flint.h: $(ABS_SRC_DIR)/flint.h.in config.status
 libtool: config.status
 	./config.status $@
 
-################################################################################
+###############################################################################
 # maintainer stuff
-################################################################################
+###############################################################################
 
 # NOTE: Requires source directory is build directory
 dist:
 	$(FLINT_DIR)/dev/make_dist.sh $(FLINT_VERSION)
 
-################################################################################
+###############################################################################
 # makefile debugging
-################################################################################
+###############################################################################
 
 print-%:
 	@echo "$*=$($*)"

@@ -23,7 +23,7 @@ In reality one never deals directly with the ``struct`` and simply
 deals with objects of type :type:`nmod_poly_t`. For simplicity we will
 think of an :type:`nmod_poly_t` as a ``struct``, though in practice to
 access fields of this ``struct``, one needs to dereference first,
-e.g.\ to access the ``length`` field of an :type:`nmod_poly_t` called
+e.g., to access the ``length`` field of an :type:`nmod_poly_t` called
 ``poly1`` one writes ``poly1->length``.
 
 An :type:`nmod_poly_t` is said to be *normalised* if either ``length``
@@ -761,6 +761,25 @@ Multiplication
     corresponding coefficients of the product of ``poly1`` and
     ``poly2``, the remaining coefficients being arbitrary.
 
+.. function:: int _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, nmod_t mod)
+
+    Estimate whether *fft_small* multiplication should be used instead of
+    other multiplication algorithms, given inputs of length *len1* and *len2*
+    and output truncation to length *n*.
+
+.. function:: int _nmod_poly_mullow_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+
+    Internal helper function for :func:`_nmod_poly_mullow_fft_small`: if the
+    inputs are small enough to perform a repacked convolution of half the
+    length, multiply and return 1, otherwise do nothing and return 0.
+    The conditions on the arguments are the same as for :func:`_nmod_poly_mullow`.
+
+.. function:: void _nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+
+    Low multiplication via the *fft_small* module. Throws an error
+    if *fft_small* is not available. The conditions on the arguments
+    are the same as for :func:`_nmod_poly_mullow`.
+
 .. function:: void _nmod_poly_mulmod(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, nn_srcptr f, slong lenf, nmod_t mod)
 
     Sets ``res`` to the remainder of the product of ``poly1`` and
@@ -1416,7 +1435,6 @@ Multipoint evaluation
 
     Uses fast multipoint evaluation, building a temporary subproduct tree.
 
-
 .. function:: void _nmod_poly_evaluate_nmod_vec(nn_ptr ys, nn_srcptr poly, slong len, nn_srcptr xs, slong n, nmod_t mod)
 
     Evaluates (``poly``, ``len``) at the ``n`` values
@@ -1430,6 +1448,49 @@ Multipoint evaluation
     ``xs``, writing the output values to ``ys``. The values in
     ``xs`` should be reduced modulo the modulus.
 
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
+
+    Evaluates (``coeffs``, ``len``) at the first ``n`` powers
+    of the square of ``r``, writing the output values
+    to ``ys``. The value of ``r`` should be reduced
+    modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+.. function:: void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
+
+    Evaluates ``poly`` at the first ``n`` powers
+    of the square of ``r``, writing the output values
+    to ``ys``. The value of ``r`` should be reduced
+    modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len)
+
+    Evaluates (``poly``, ``plen``) at the ``len`` values given
+    by the precomputed geometric progression ``G``. The value of
+    ``len`` should be less than or equal to the precomputation size parameter ``G->len``.
+
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
+
+    Evaluates (``coeffs``, ``len``) at the first ``n`` powers
+    of the square of ``r``, writing the output values to ``ys``. 
+    The value of ``r`` should be reduced modulo the modulus ``mod``
+    and of sufficient multiplicative order such that none of 
+    the first `n` powers of `r^2` is one.
+
+    Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
+
+.. function:: void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
+
+    Evaluates ``poly``  at the first ``n`` powers
+    of the square of ``r``, writing the output values to ``ys``. 
+    The value of ``r`` should be reduced modulo the modulus of the polynomial
+    and of sufficient multiplicative order such that none of 
+    the first `n` powers of `r^2` is one.
+
+    Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
 Interpolation
 --------------------------------------------------------------------------------
@@ -1500,8 +1561,31 @@ Interpolation
     Forms the interpolating polynomial using a naive implementation
     of the barycentric form of Lagrange interpolation.
 
+.. function:: void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len, nmod_t mod)
+              void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len)
 
+    Performs interpolation using the geometric progression precomputation ``G``.
 
+    Sets ``poly`` to the unique polynomial of length at most ``len``
+    that interpolates according to the parameter set of ``G``.
+    The value of ``len`` should be equal to the precomputation size parameter ``G->len``.
+
+    Uses fast geometric multipoint interpolation using a supplied geometric progression precomputation.
+
+.. function:: void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly, ulong r, nn_srcptr ys, slong n)
+
+    Sets ``poly`` to the unique polynomial of length at most ``n``
+    that interpolates the first ``n`` powers of ``r`` and
+    values ``ys``.
+
+    The values ``ys`` and ``r`` should be reduced modulo the
+    modulus, and all ``r`` should be of sufficient order such that
+    none of the first `n` powers of `r^2` is one. Aliasing between
+    ``poly`` and ``ys`` is not allowed.
+
+    Uses fast geometric multipoint interpolation, building a temporary geometric progression precomputation.
+
+    
 Composition
 --------------------------------------------------------------------------------
 
@@ -1774,6 +1858,13 @@ Greatest common divisor
     defined to be zero, whereas the GCD of the zero polynomial and some other
     polynomial `P` is defined to be `P`. Except in the case where
     the GCD is zero, the GCD `G` is made monic.
+
+.. function:: slong _nmod_poly_gcd_euclidean_redc_half(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod)
+              void nmod_poly_gcd_euclidean_redc_half(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
+
+    Analogous to the Euclidean GCD implementations, but uses ``nmod_redc_fast``
+    arithmetic internally. The modulus is required to be in range
+    for ``nmod_redc_fast``, i.e. odd and smaller than `2^{\mathtt{FLINT\_BITS} - 2}`.
 
 .. function:: slong _nmod_poly_hgcd(nn_ptr * M, slong * lenM, nn_ptr A, slong * lenA, nn_ptr B, slong * lenB, nn_srcptr a, slong lena, nn_srcptr b, slong lenb, nmod_t mod)
 
@@ -2478,6 +2569,34 @@ Subproduct trees
     Builds a subproduct tree in the preallocated space from
     the ``len`` monic linear factors `(x-r_i)`. The top level
     product is not computed.
+
+
+
+Geometric progression
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong len, nmod_t mod)
+
+    Builds a geometric progression multipoint evaluation / interpolation structure.
+
+    The set of points used will be `1, r^2, r^4, \ldots, r^{2(len-1)}`.
+
+    The value of ``r`` should be reduced modulo the modulus ``mod``
+    and of sufficient multiplicative order such that none of
+    the powers `r^2, r^4, \ldots, r^{2(len-1)}` is one.
+
+    The value of ``len`` should be both greater than or equal to the number of evaluation points to be
+    considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.
+    This allocates vectors and polynomials for a total space of `8 len - 1` coefficients.
+
+    If the modulus is not prime, this function will work under the additional
+    assumption that all the used points `r^{2k}` as well as the axuiliary
+    values `r^{2k} - 1` are invertible.
+
+.. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
+
+    Clears the allocated polynomials and vectors used in the geometric progression precomputation ``G``.
 
 
 Inflation and deflation

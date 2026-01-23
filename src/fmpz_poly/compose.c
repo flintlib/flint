@@ -38,16 +38,19 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         }
         else if (!fmpz_is_one(poly2 + 1))
         {
+            fmpz_mul(res + 1, res + 1, poly2 + 1);
+
             fmpz_t temp;
             fmpz_init(temp);
-            fmpz_one(temp);
+            fmpz_mul(temp, poly2 + 1, poly2 + 1);
+            fmpz_mul(res + 2, res + 2, temp);
 
-            for (i = 0; i < len1; i++)
+            for (i = 3; i < len1; i++) // len1 > 4
             {
-                fmpz_mul(res + i, res + i, temp);
                 /* no need to reverse signs manually as if poly2 + 1 negative
                 then signs alternate automatically*/
                 fmpz_mul(temp, temp, poly2 + 1);
+                fmpz_mul(res + i, res + i, temp);
             }
             fmpz_clear(temp);
         }

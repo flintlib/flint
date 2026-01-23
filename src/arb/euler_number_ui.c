@@ -69,101 +69,6 @@ arb_euler_number_ui_beta(arb_t res, ulong n, slong prec)
     arb_clear(t);
 }
 
-#define LOW_MASK ((UWORD(1) << (FLINT_BITS / 2)) - 1)
-
-typedef struct
-{
-    ulong n;
-    ulong ninv;
-    ulong F;
-}
-nmod_redc_t;
-
-static void
-nmod_redc_init(nmod_redc_t * rmod, nmod_t mod)
-{
-    ulong n, ninv2;
-    int bits;
-
-    n = mod.n;
-    rmod->n = n;
-    rmod->F = (UWORD(1) << (FLINT_BITS / 2));
-    NMOD_RED(rmod->F, rmod->F, mod);
-
-    /* Newton's method for 2-adic inversion */
-    ninv2 = -n;   /* already correct mod 8 */
-    for (bits = 3; bits < FLINT_BITS / 2; bits *= 2)
-        ninv2 = 2*ninv2 + n * ninv2 * ninv2;
-
-    rmod->ninv = ninv2 & LOW_MASK;
-}
-
-static inline ulong
-nmod_redc_fast(ulong x, ulong n, ulong ninv2)
-{
-    ulong y = (x * ninv2) & LOW_MASK;
-    ulong z = x + (n * y);
-    return z >> (FLINT_BITS / 2);
-}
-
-static inline ulong
-nmod_redc(ulong x, ulong n, ulong ninv2)
-{
-    ulong y = nmod_redc_fast(x, n, ninv2);
-    if (y >= n)
-       y -= n;
-    return y;
-}
-
-static ulong
-nmod_redc_mul_fast(ulong a, ulong b, nmod_redc_t rmod)
-{
-    return nmod_redc_fast(a * b, rmod.n, rmod.ninv);
-}
-
-static ulong
-nmod_redc_mul(ulong a, ulong b, nmod_redc_t rmod)
-{
-    return nmod_redc(a * b, rmod.n, rmod.ninv);
-}
-
-
-static ulong
-nmod_to_redc(ulong x, nmod_t mod, nmod_redc_t rmod)
-{
-    return nmod_mul(x, rmod.F, mod);
-}
-
-static ulong
-nmod_from_redc(ulong x, nmod_redc_t rmod)
-{
-    return nmod_redc(x, rmod.n, rmod.ninv);
-}
-
-static ulong
-nmod_redc_pow_ui(ulong a, ulong exp, nmod_redc_t rmod)
-{
-    ulong x;
-
-    while ((exp & 1) == 0)
-    {
-        a = nmod_redc_mul(a, a, rmod);
-        exp >>= 1;
-    }
-
-    x = a;
-
-    while (exp >>= 1)
-    {
-        a = nmod_redc_mul(a, a, rmod);
-
-        if (exp & 1)
-            x = nmod_redc_mul(x, a, rmod);
-    }
-
-    return x;
-}
-
 ulong
 euler_mod_p_powsum_1(ulong n, ulong p)
 {
@@ -297,7 +202,7 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
     ulong s, t, z;
     ulong v2n, power_of_two;
     nmod_t mod;
-    nmod_redc_t rmod;
+    nmod_redc_ctx_t rmod;
     TMP_INIT;
 
     if (n % 2 == 1)
@@ -311,7 +216,7 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
     N = p / 4;
 
     nmod_init(&mod, p);
-    nmod_redc_init(&rmod, mod);
+    nmod_redc_ctx_init_nmod(rmod, mod);
 
     TMP_START;
     pows = TMP_ALLOC(sizeof(unsigned int) * (N / 3 + 1));
@@ -324,14 +229,14 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
         power_of_two *= 2;
 
     horner_point = 1;
-    v2n = nmod_redc_pow_ui(nmod_to_redc(2, mod, rmod), n, rmod);
+    v2n = _nmod_redc_fast_pow_ui(nmod_redc_set_nmod(2, rmod), n, rmod);
 
     for (i = 1; i <= N / 3; i += 2)
     {
         if (divtab[i] == 1)
-            t = nmod_redc_pow_ui(nmod_to_redc(i, mod, rmod), n, rmod);
+            t = _nmod_redc_fast_pow_ui(nmod_redc_set_nmod(i, rmod), n, rmod);
         else
-            t = nmod_redc_mul(pows[divtab[i]], pows[divtab[i + 1]], rmod);
+            t = nmod_redc_fast_mul(pows[divtab[i]], pows[divtab[i + 1]], rmod);
 
         pows[i] = t;
         s += t;
@@ -341,7 +246,7 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
             while (i == horner_point && power_of_two != 1)
             {
                 NMOD_RED(s, s, mod);
-                z = nmod_add(s, nmod_redc_mul(v2n, z, rmod), mod);
+                z = nmod_redc_fast_add(s, nmod_redc_fast_mul(v2n, z, rmod), rmod);
                 power_of_two /= 2;
                 horner_point = N / power_of_two;
                 if (horner_point % 2 == 0)
@@ -354,9 +259,9 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
     for ( ; i <= N; i += 2)
     {
         if (divtab[i] == 1)
-            t = nmod_redc_pow_ui(nmod_to_redc(i, mod, rmod), n, rmod);
+            t = _nmod_redc_fast_pow_ui(nmod_redc_set_nmod(i, rmod), n, rmod);
         else
-            t = nmod_redc_mul_fast(pows[divtab[i]], pows[divtab[i + 1]], rmod);
+            t = nmod_redc_fast_mul(pows[divtab[i]], pows[divtab[i + 1]], rmod);
 
         s += t;
 
@@ -365,7 +270,7 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
             while (i == horner_point && power_of_two != 1)
             {
                 NMOD_RED(s, s, mod);
-                z = nmod_add(s, nmod_redc_mul(v2n, z, rmod), mod);
+                z = nmod_redc_fast_add(s, nmod_redc_fast_mul(v2n, z, rmod), rmod);
                 power_of_two /= 2;
                 horner_point = N / power_of_two;
                 if (horner_point % 2 == 0)
@@ -375,8 +280,8 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
     }
 
     NMOD_RED(s, s, mod);
-    s = nmod_add(s, nmod_redc_mul(v2n, z, rmod), mod);
-    s = nmod_from_redc(s, rmod);
+    s = nmod_redc_fast_add(s, nmod_redc_fast_mul(v2n, z, rmod), rmod);
+    s = nmod_redc_get_nmod(s, rmod);
 
     if (p % 4 == 3)
         s = nmod_neg(s, mod);
@@ -392,7 +297,7 @@ euler_mod_p_powsum_redc(ulong n, ulong p, const unsigned int * divtab)
 ulong
 euler_mod_p_powsum(ulong n, ulong p, const unsigned int * divtab)
 {
-    if (p < (UWORD(1) << (FLINT_BITS / 2 - 1)))
+    if (p < (UWORD(1) << (FLINT_BITS - 2)))
         return euler_mod_p_powsum_redc(n, p, divtab);
     else
         return euler_mod_p_powsum_noredc(n, p, divtab);

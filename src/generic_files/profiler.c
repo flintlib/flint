@@ -12,18 +12,28 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "profiler.h"
-#if defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__NetBSD__) || defined(__OpenBSD__)
+# include <sys/types.h>
+# include <sys/resource.h>
+# include <sys/sysctl.h>
+# include <unistd.h>
+#elif defined(__APPLE__)
 # include <mach/mach.h>
-#endif
-#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
 # include <sys/resource.h>
 #endif
-#include <math.h>
+#if defined(__FreeBSD__) || defined(__DragonFly__)
+# include <sys/user.h>
+#elif defined(__NetBSD__) || defined(__OpenBSD__)
+# include <sys/param.h>
+#endif
 #include <float.h>
-#include <string.h>
+#include <math.h>
+#include <stdio.h>
+#if defined(__linux__)
+# include <stdlib.h>
+# include <string.h>
+#endif
+#include "profiler.h"
 #include "longlong.h"
 
 #if FLINT_HAVE_get_cycle_counter
@@ -152,10 +162,17 @@ void fprint_memory_usage(FILE * fs)
     ulong virt = 0, rss = 0, rsspeak = usage.ru_maxrss;
 
 # if defined(__APPLE__)
+#  ifdef MACH_TASK_BASIC_INFO
     mach_task_basic_info_data_t info;
     mach_msg_type_number_t count = MACH_TASK_BASIC_INFO_COUNT;
     task_info(mach_task_self(), MACH_TASK_BASIC_INFO,
             (task_info_t) &info, &count);
+#  else
+    task_basic_info_data_t info;
+    mach_msg_type_number_t count = TASK_BASIC_INFO_COUNT;
+    task_info(mach_task_self(), TASK_BASIC_INFO,
+            (task_info_t) &info, &count);
+#  endif
     virt = info.virtual_size;
     rss = info.resident_size;
 # else /* BSD */
@@ -163,7 +180,7 @@ void fprint_memory_usage(FILE * fs)
     struct kinfo_proc kp;
     size_t len = sizeof(struct kinfo_proc);
     int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()};
-
+    rsspeak *= 1024; /* given in kilobytes */
     if (sysctl(mib, 4, &kp, &len, NULL, 0) == -1)
         flint_throw(FLINT_ERROR, "report please\n");
 #  if defined(__FreeBSD__) || defined(__DragonFly__)
@@ -176,7 +193,6 @@ void fprint_memory_usage(FILE * fs)
     virt = kp.p_vmspace.vm_map.size;
     rss = kp.p_vmspace.vm_rssize * getpagesize();
 #  endif
-    rsspeak *= 1024; /* given in kilobytes */
 # endif /* non-Linux OS */
 
     sprint_size(line + 15, virt);

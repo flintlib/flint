@@ -41,14 +41,116 @@ ulong n_randtest(flint_rand_t state);
 ulong n_randtest_not_zero(flint_rand_t state);
 ulong n_randtest_prime(flint_rand_t state, int proved);
 
+#if FLINT64
+ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
+{
+    state->__randval = (state->__randval*UWORD(13282407956253574709) + UWORD(286824421));
+    state->__randval2 = (state->__randval2*UWORD(7557322358563246341) + UWORD(286824421));
+
+    return (state->__randval>>32) + ((state->__randval2>>32) << 32);
+}
+#else
+ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
+{
+    state->__randval = (state->__randval*UWORD(1543932465) +  UWORD(1626832771));
+    state->__randval2 = (state->__randval2*UWORD(2495927737) +  UWORD(1626832771));
+
+    return (state->__randval>>16) + ((state->__randval2>>16) << 16);
+}
+#endif
+
+ULONG_EXTRAS_INLINE ulong _n_randint(flint_rand_t state, ulong limit)
+{
+    if ((limit & (limit - 1)) == 0)
+    {
+        return _n_randlimb(state) & (limit - 1);
+    }
+    else
+    {
+        ulong hi, lo;
+        umul_ppmm(hi, lo, _n_randlimb(state), limit);
+        return hi;
+    }
+}
+
 /* Basic arithmetic **********************************************************/
 
 ulong n_revbin(ulong in, ulong bits);
 
 int n_divides(ulong * q, ulong n, ulong p);
+
+/* Check d | n for odd d using Granlund-Montgomery, given
+   inv1 = 1/d mod 2^FLINT_BITS, inv2 = floor(UWORD_MAX / d) */
+ULONG_EXTRAS_INLINE int n_divisible_odd_gm(ulong n, ulong inv1, ulong inv2)
+{
+    return n * inv1 <= inv2;
+}
+
 ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, double npre);
 ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
 ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
+
+/*
+   Method of Niels Moller and Torbjorn Granlund see paper:
+   Improved Division by Invariant Integers: (algorithm 4)
+   https://gmplib.org/~tege/division-paper.pdf
+*/
+ULONG_EXTRAS_INLINE ulong
+n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+{
+    ulong q1, q0, r;
+    n <<= norm;
+    const ulong u1 = (norm == 0) ? 0 : a >> (FLINT_BITS - norm);
+    const ulong u0 = (a << norm);
+    umul_ppmm(q1, q0, ninv, u1);
+    add_ssaaaa(q1, q0, q1, q0, u1, u0);
+    (*q) = q1 + 1;
+    r = u0 - (*q) * n;
+    if (r > q0)
+    {
+        r += n;
+        (*q)--;
+    }
+    if (r >= n)
+    {
+        (*q)++;
+        r -= n;
+    }
+    return r >> norm;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+{
+    ulong q1, q0, r;
+    FLINT_ASSERT(norm >= 1);
+    n <<= norm;
+    const ulong u1 = a >> (FLINT_BITS - norm);
+    const ulong u0 = (a << norm);
+    umul_ppmm(q1, q0, ninv, u1);
+    add_ssaaaa(q1, q0, q1, q0, u1, u0);
+    (*q) = q1 + 1;
+    r = u0 - (*q) * n;
+    if (r > q0)
+    {
+        r += n;
+        (*q)--;
+    }
+    if (r >= n)
+    {
+        (*q)++;
+        r -= n;
+    }
+    return r >> norm;
+}
+
+ULONG_EXTRAS_INLINE ulong
+n_divrem_norm(ulong * q, ulong a, ulong n)
+{
+    ulong q0 = (a >= n);
+    *q = q0;
+    return a - (n & (-q0));
+}
 
 ulong n_factorial_mod2_preinv(ulong n, ulong p, ulong pinv);
 ulong n_factorial_fast_mod2_preinv(ulong n, ulong p, ulong pinv);
@@ -68,7 +170,6 @@ ulong n_pow(ulong n, ulong exp);
 ulong _n_pow_check(ulong n, ulong exp);
 ulong n_root(ulong n, ulong root);
 ulong n_rootrem(ulong* remainder, ulong n, ulong root);
-ulong n_root_estimate(double a, int n);
 int n_is_perfect_power235(ulong n);
 int n_is_perfect_power(ulong * root, ulong n);
 
@@ -266,6 +367,8 @@ ulong n_invmod(ulong x, ulong y)
    return r;
 }
 
+ulong n_binvert(ulong a);
+
 /* Modular multiplication with fixed operand **********************************/
 
 ULONG_EXTRAS_INLINE
@@ -343,7 +446,6 @@ ulong n_euler_phi(ulong n);
 
 /* Primality *****************************************************************/
 
-#define FLINT_ODDPRIME_SMALL_CUTOFF 4096
 #define FLINT_NUM_PRIMES_SMALL 172
 #define FLINT_PRIMES_SMALL_CUTOFF 1030
 #define FLINT_PSEUDOSQUARES_CUTOFF 1000
@@ -378,9 +480,6 @@ void n_cleanup_primes(void);
 const ulong * n_primes_arr_readonly(ulong n);
 const double * n_prime_inverses_arr_readonly(ulong n);
 
-int n_is_oddprime_small(ulong n);
-int n_is_oddprime_binary(ulong n);
-
 int n_is_probabprime(ulong n);
 int n_is_probabprime_fermat(ulong n, ulong i);
 int n_is_probabprime_fibonacci(ulong n);
@@ -391,6 +490,7 @@ int n_is_strong_probabprime_precomp(ulong n, double npre, ulong a, ulong d);
 int n_is_strong_probabprime2_preinv(ulong n, ulong ninv, ulong a, ulong d);
 
 int n_is_prime(ulong n);
+int n_is_prime_odd_no_trial(ulong n);
 int n_is_prime_pseudosquare(ulong n);
 int n_is_prime_pocklington(ulong n, ulong iterations);
 
@@ -404,19 +504,30 @@ ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 
 /* Factorisation *************************************************************/
 
-#define FLINT_FACTOR_TRIAL_PRIMES 3000
-#define FLINT_FACTOR_TRIAL_PRIMES_PRIME UWORD(27449)
-#define FLINT_FACTOR_TRIAL_CUTOFF (UWORD(27449) * UWORD(27449))
+#define FLINT_FACTOR_TRIAL_PRIMES_BEFORE_PRIMALITY_TEST 64
+
+/* This happens to be exactly the 16-bit primes. */
+#define FLINT_FACTOR_TRIAL_PRIMES 6542
+/* First omitted prime p. Factors < p^2 after trial division are guaranteed
+   to be prime. */
+#define FLINT_FACTOR_TRIAL_PRIMES_PRIME UWORD(65537)
+#if FLINT_BITS == 64
+#define FLINT_FACTOR_TRIAL_CUTOFF (FLINT_FACTOR_TRIAL_PRIMES_PRIME * FLINT_FACTOR_TRIAL_PRIMES_PRIME)
+#else
+#define FLINT_FACTOR_TRIAL_CUTOFF UWORD_MAX
+#endif
 
 #define FLINT_FACTOR_SQUFOF_ITERS 50000
-#define FLINT_FACTOR_ONE_LINE_MAX (UWORD(1)<<39)
+#define FLINT_FACTOR_ONE_LINE_MAX (UWORD(1)<<50)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
+#define FLINT_FACTOR_POLLARD_BRENT_MIN (UWORD(1)<<38)
+#define FLINT_FACTOR_POLLARD_BRENT_ITERS 32768
 
-ULONG_EXTRAS_INLINE void n_factor_init(n_factor_t * factors) { factors->num = UWORD(0); }
+ULONG_EXTRAS_INLINE void n_factor_init(n_factor_t * factors) { factors->num = 0; }
 
 ulong n_factor_evaluate(const n_factor_t * fac);
 
-void n_factor(n_factor_t * factors, ulong n, int proved);
+void n_factor(n_factor_t * factors, ulong n, int FLINT_UNUSED(proved));
 
 void n_factor_insert(n_factor_t * factors, ulong p, ulong exp);
 
@@ -429,12 +540,13 @@ ulong n_factor_power235(ulong *exp, ulong n);
 ulong n_factor_one_line(ulong n, ulong iters);
 ulong n_factor_lehman(ulong n);
 
+ulong n_ll_factor_SQUFOF(ulong nhi, ulong nlo, ulong iters);
 ulong n_factor_SQUFOF(ulong n, ulong iters);
 
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);
 ulong n_factor_pp1_wrapper(ulong n);
 
-int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv, ulong ai, ulong xi, ulong normbits, ulong max_iters);
+int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ai, ulong xi, ulong max_iters);
 int n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in, ulong max_tries, ulong max_iters);
 
 int n_remove(ulong * n, ulong p);

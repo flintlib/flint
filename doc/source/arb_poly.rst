@@ -301,7 +301,7 @@ Arithmetic
     .. math::
 
         c = \left\lfloor
-            \frac{(e_2 - e_1) + (f_2 + f_1)}{(a_2 - a_1) + (b_2 - b_1)}
+            \frac{(e_2 - e_1) + (f_2 - f_1)}{(a_2 - a_1) + (b_2 - b_1)}
             + \frac{1}{2}
             \right \rfloor.
 

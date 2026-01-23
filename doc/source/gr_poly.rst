@@ -234,8 +234,47 @@ Multiplication algorithms
     Not optimized for squaring.
     The underscore method requires positive lengths and does not support aliasing.
     This function calls :func:`_gr_poly_mul` recursively rather than itself, so to get a recursive
-    algorithm with `O(n^{1.5})` complexity, the ring must overload :func:`_gr_poly_mul` to dispatch
+    algorithm with `O(n^{1.465})` complexity, the ring must overload :func:`_gr_poly_mul` to dispatch
     to :func:`_gr_poly_mul_toom33` above some cutoff.
+
+.. function:: int _gr_poly_mullow_toom_serial(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong trunc, slong num_points, slong splitting_degree, gr_ctx_t ctx)
+              int gr_poly_mullow_toom_serial(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, slong num_points, slong splitting_degree, gr_ctx_t ctx)
+
+    Toom-Cook multiplication of arbitrary order: the inputs are segmented as
+    polynomials in `t = x^m` for some splitting degree `m \ge 1` and the product
+    is computed by evaluation and interpolation at `r \ge 1` distinct
+    values of `t`.
+
+    For convenience, the user can specify either the number of interpolation
+    points `r` (``num_points``) or the splitting degree  `m` (``splitting_degree``).
+    The user must provide exactly one of these parameters, passing zero for the
+    other; the optimal value of the omitted parameter will be computed automatically.
+    For example, if ``len1`` and ``len2`` are roughly balanced, then providing
+    either `r = 3, m = 0` or `r = 0, m = \lceil \max(len1, len2) / 2 \rceil`
+    will result in Karatsuba multiplication with evaluation in `0`, `1` and `\infty`.
+    For balanced operands, an odd number of evaluation points `r = 2k-1`
+    corresponds to splitting both inputs into `k` segments; even values of `d`
+    typically only make sense for unbalanced products.
+
+    The evaluation and interpolation points are chosen as
+    `0, 1, -1, 2, -2, 3, -3, \ldots, \infty`. Evaluation and interpolation is
+    implicitly done by multiplying by the corresponding Vandermonde matrix
+    and its inverse. In too small finite characteristic where the Vandermonde
+    matrix cannot be inverted, ``GR_UNABLE`` is returned. In characteristic zero,
+    the interpolation matrix is computed with a common denominator and this
+    denominator is removed from the final result with an exact division.
+
+
+    The suffix "serial" indicates that the evaluations are done one point at a time
+    and that the output is constructed incrementally with the goal to minimize
+    memory allocation. This implementation is therefore well suited for huge
+    memory-constrained multiplications, in contrast to a typical Toom-Cook
+    implementation which will use several extra temporary buffers to
+    minimize scalar operations. In total this implementation requires `4m`
+    elements of temporary storage for intermediate polynomials and `2r^2`
+    ring elements or integers for the evaluation and interpolation matrices.
+
+    The underscore method requires positive lengths and does not support aliasing.
 
 .. function:: int gr_poly_add_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_add_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)

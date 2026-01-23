@@ -66,6 +66,7 @@ Random functions
 
 
 .. function:: ulong n_randlimb(flint_rand_t state)
+              ulong _n_randlimb(flint_rand_t state)
 
     Returns a uniformly pseudo random limb.
 
@@ -75,6 +76,9 @@ Random functions
     ``p_0 = 4294967311 = nextprime(2^32)`` on a 64-bit machine
     and ``p_0 = nextprime(2^16)`` on a 32-bit machine and
     ``p_1 = nextprime(p_0)``.
+
+    The function ``_n_randlimb`` is defined inline, which can allow for
+    better performance when generating many random numbers.
 
 .. function:: ulong n_randbits(flint_rand_t state, unsigned int bits)
 
@@ -91,18 +95,16 @@ Random functions
     function is intended for use in test code.
 
 .. function:: ulong n_randint(flint_rand_t state, ulong limit)
+              ulong n_urandint(flint_rand_t state, ulong limit)
+              ulong _n_randint(flint_rand_t state, ulong limit)
 
     Returns a uniformly pseudo random number up to but not including
     the given limit. If zero is passed as a parameter, an entire random
     limb is returned.
 
-.. function:: ulong n_urandint(flint_rand_t state, ulong limit)
-
-    Returns a uniformly pseudo random number up to but not including
-    the given limit. If zero is passed as a parameter, an entire
-    random limb is returned. This function provides somewhat better
-    randomness as compared to :func:`n_randint`, especially for larger
-    values of limit.
+    The functions ``n_randint`` and ``n_urandint`` are identical.
+    The function ``_n_randint`` is defined inline, which can allow for
+    better performance when generating many random numbers.
 
 .. function:: ulong n_randtest(flint_rand_t state)
 
@@ -275,6 +277,8 @@ Basic arithmetic with precomputed inverses
     out in either direction.
 
 .. function:: ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
+              ulong n_divrem_preinv(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
+              ulong n_divrem_preinv_unnorm(ulong * q, ulong a, ulong n, ulong ninv, unsigned int norm)
 
     Returns `a \bmod{n}` and sets `q` to the quotient of `a` by `n`, given a
     precomputed inverse of `n` computed by :func:`n_preinvert_limb()`. There are
@@ -284,6 +288,18 @@ Basic arithmetic with precomputed inverses
     This uses the algorithm of Granlund and Möller [GraMol2010]_. First
     `n` is normalised and `a` is shifted into two limbs to compensate. Then
     their algorithm is applied verbatim and the remainder shifted back.
+
+    The difference between the legacy :func:`n_divrem2_preinv` and
+    :func:`n_divrem_preinv` is that the latter accepts the ``norm``
+    parameter specifying the number of leading zero bits of ``n`` as input
+    and hence avoids computing this on the fly.
+    The version :func:`n_divrem_preinv_unnorm` requires positive ``norm``.
+
+.. function:: ulong n_divrem_norm(ulong * q, ulong a, ulong n)
+
+    Returns `a \bmod{n}` and sets `q` to the quotient of `a` by `n`, assuming
+    that `n` is normalised. This is a trivial operation as the quotient
+    is either 0 or 1.
 
 .. function:: ulong n_div2_preinv(ulong a, ulong n, ulong ninv)
 
@@ -461,7 +477,7 @@ Jacobi and Kronecker symbols
     Computes the Jacobi symbol, allowing `x` to go up to a full limb.
 
 
-Modular Arithmetic
+Modular arithmetic
 --------------------------------------------------------------------------------
 
 
@@ -480,6 +496,12 @@ Modular Arithmetic
 
     This is merely an adaption of the extended Euclidean algorithm
     with appropriate normalisation.
+
+.. function:: ulong n_binvert(ulong n)
+
+    Assuming that `n` is odd, returns the multiplicative inverse modulo
+    `2^{\mathtt{FLINT\_BITS}}`. If `n` is even, some arbitrary
+    value is returned.
 
 .. function:: ulong n_powmod_precomp(ulong a, slong exp, ulong n, double npre)
 
@@ -597,7 +619,7 @@ Modular Arithmetic
     points to is set to NULL.
 
 
-Modular Arithmetic with Fixed Operand
+Modular arithmetic with fixed operand
 --------------------------------------------------------------------------------
 
 This is about computing several modular multiplications where one operand and
@@ -894,27 +916,41 @@ Prime number generation and counting
 Primality testing
 --------------------------------------------------------------------------------
 
+.. function:: int n_is_prime(ulong n)
 
-.. function:: int n_is_oddprime_small(ulong n)
+    Returns 1 if `n` is prime and 0 otherwise. This function is intended
+    for general input.
 
-    Returns `1` if `n` is an odd prime smaller than
-    ``FLINT_ODDPRIME_SMALL_CUTOFF``. Expects `n`
-    to be odd and smaller than the cutoff.
+    For integers up to 15 bits, we look up the result in a bit array.
+    For integers between 16 and 64 bits, we do some trial division and then
+    perform a single base-2 strong probable prime test to detect most
+    composites. For numbers that pass this test, primality is certified
+    by checking that `n` is not one of the 31894014 base-2 strong pseudoprimes
+    `n < 2^{64}` which have been tabulated exhaustively by Feitsma [FeiGal2013]_.
 
-    This function merely uses a lookup table with one bit allocated for each
-    odd number up to the cutoff.
+    The 2314 pseudoprimes up to 32 bits are simply looked up in a hash table.
 
-.. function:: int n_is_oddprime_binary(ulong n)
+    For the pseudoprimes up to 64 bits, we follow the idea of Forisek and
+    Jancina [ForJan2015]_. We precompute a function `T` such
+    that for pseudoprime `n < 2^{64}`, a probable prime test with base `T(n)`
+    certifies compositeness of `n`. Our `T` is represented as a hash table
+    with 98304 entries stored in an array of 24-bit integers. A small number
+    of bases (around 5%) are larger than 24 bits, triggering a secondary
+    lookup in an array of 4903 32-bit integers. In total
+    the tables for 64-bit pseudoprimes require 307 KB, which is just 60% the
+    size of the 512 KB Forisek-Jancina table of 262144 16-bit bases, while
+    the test is as efficient.
 
-    This function performs a simple binary search through
-    the table of cached primes for `n`. If it exists in the array it returns
-    `1`, otherwise `0`. For the algorithm to operate correctly
-    `n` should be odd and at least `17`.
+    To check this implementation against Feitsma's table, one can run the
+    ``examples/check_n_is_prime`` program.
 
-    Lower and upper bounds are computed with :func:`n_prime_pi_bounds`.
-    Once we have bounds on where to look in the table, we
-    refine our search with a simple binary algorithm, taking
-    the top or bottom of the current interval as necessary.
+.. function:: int n_is_prime_odd_no_trial(ulong n)
+
+    As :func:`n_is_prime`, but does not perform trial division. Requires
+    that `n` is odd. This function is much slower than :func:`n_is_prime`
+    for random input but slightly faster for certifying primality or
+    compositeness if `n` has already
+    passed preliminary trial division or sieving done by the user.
 
 .. function:: int n_is_prime_pocklington(ulong n, ulong iterations)
 
@@ -972,19 +1008,6 @@ Primality testing
     The possibility exists that the probable prime test declares a
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
-
-.. function:: int n_is_prime(ulong n)
-
-    Tests if `n` is a prime. This first sieves for small prime factors,
-    then simply calls :func:`n_is_probabprime`. This has been checked
-    against the tables of Feitsma and Galway
-    http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html and thus
-    constitutes a check for primality (rather than just pseudoprimality)
-    up to `2^{64}`.
-
-    In future, this test may produce and check a certificate of
-    primality. This is likely to be significantly slower for prime
-    inputs.
 
 .. function:: int n_is_strong_probabprime_precomp(ulong n, double npre, ulong a, ulong d)
 
@@ -1061,23 +1084,7 @@ Primality testing
 
 .. function:: int n_is_probabprime(ulong n)
 
-    Tests if `n` is a probable prime. Up to ``FLINT_ODDPRIME_SMALL_CUTOFF``
-    this algorithm uses :func:`n_is_oddprime_small` which uses a lookup table.
-
-    Next it calls :func:`n_compute_primes` with the maximum table size and
-    uses this table to perform a binary search for `n` up to the table limit.
-
-    Then up to `1050535501` it uses a number of strong probable prime tests,
-    :func:`n_is_strong_probabprime_preinv`, etc., for various bases. The
-    output of the algorithm is guaranteed to be correct up to this bound due
-    to exhaustive tables, described at
-    http://uucode.com/obf/dalbec/alg.html .
-
-    Beyond that point the BPSW probabilistic primality test is used, by
-    calling the function :func:`n_is_probabprime_BPSW`. There are no known
-    counterexamples, and it has been checked against the tables of Feitsma
-    and Galway and up to the accuracy of those tables, this is an exhaustive
-    check up to `2^{64}`, i.e. there are no counterexamples.
+    This function is obsolete and currently just wraps :func:`n_is_prime`.
 
 
 Chinese remaindering
@@ -1161,13 +1168,8 @@ Square root and perfect power testing
     `1` are considered squares. No guarantees are made about `r` or `k`
     being the minimum possible value.
 
-.. function:: ulong n_rootrem(ulong * remainder, ulong n, ulong root)
-
-    This function uses the Newton iteration method to calculate the nth root of
-    a number.
-    First approximation is calculated by an algorithm mentioned in this
-    article:  https://en.wikipedia.org/wiki/Fast_inverse_square_root .
-    Instead of the inverse square root, the nth root is calculated.
+.. function:: ulong n_root(ulong n, ulong root)
+              ulong n_rootrem(ulong * remainder, ulong n, ulong root)
 
     Returns the integer part of ``n ^ 1/root``. Remainder is set as
     ``n - base^root``. In case `n < 1` or ``root < 1``, `0` is returned.
@@ -1454,16 +1456,13 @@ Factorisation
     the time for ``n_factor`` on numbers that reach the ``n_factor_pp1``
     stage, i.e. after trial factoring and one line factoring.
 
-.. function:: int n_factor_pollard_brent_single(ulong * factor, ulong n, ulong ninv, ulong ai, ulong xi, ulong normbits, ulong max_iters)
+.. function:: int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ai, ulong xi, ulong max_iters)
 
     Pollard Rho algorithm (with Brent modification) for integer factorization.
     Assumes that the `n` is not prime. `factor` is set as the factor if found.
     It is not assured that the factor found will be prime. Does not compute the complete
     factorization, just one factor. Returns 1 if factorization is successful
-    (non trivial factor is found), else returns 0. Assumes `n` is normalized
-    (shifted by normbits bits), and takes as input a precomputed inverse of `n` as
-    computed by :func:`n_preinvert_limb`. `ai` and `xi` should also be shifted
-    left by `normbits`.
+    (non trivial factor is found), else returns 0.
 
     `ai` is the constant of the polynomial used, `xi` is the initial value.
     `max\_iters` is the number of iterations tried in process of finding the
@@ -1471,7 +1470,7 @@ Factorisation
 
     The algorithm used is a modification of the original Pollard Rho algorithm,
     suggested by Richard Brent in the paper, available at
-    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
+    https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf.
 
 .. function:: int n_factor_pollard_brent(ulong * factor, flint_rand_t state, ulong n_in, ulong max_tries, ulong max_iters)
 
@@ -1548,7 +1547,7 @@ Factorials
     large `n`.
 
 
-Primitive Roots and Discrete Logarithms
+Primitive roots and discrete logarithms
 --------------------------------------------------------------------------------
 
 

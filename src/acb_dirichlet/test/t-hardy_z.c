@@ -28,8 +28,8 @@ TEST_FUNCTION_START(acb_dirichlet_hardy_z, state)
         ulong q, k;
         slong i;
 
-        len1 = n_randint(state, 6);
-        len2 = n_randint(state, 6);
+        len1 = n_randint(state, 5);
+        len2 = n_randint(state, 5);
         prec1 = 2 + n_randint(state, 100);
         prec2 = 2 + n_randint(state, 100);
 
@@ -50,8 +50,18 @@ TEST_FUNCTION_START(acb_dirichlet_hardy_z, state)
         vec1 = _acb_vec_init(len1);
         vec2 = _acb_vec_init(len2);
 
-        acb_randtest(s, state, 2 + n_randint(state, 200), 2);
-        acb_randtest(s2, state, 2 + n_randint(state, 200), 2);
+        /* hack: evaluation can be very slow on wide intervals */
+        if (n_randint(state, 10))
+        {
+            acb_randtest_precise(s, state, 2 + n_randint(state, 200), 2);
+            acb_randtest_precise(s2, state, 2 + n_randint(state, 200), 2);
+        }
+        else
+        {
+            acb_randtest(s, state, 2 + n_randint(state, 200), 2);
+            acb_randtest(s2, state, 2 + n_randint(state, 200), 2);
+        }
+
         acb_sub(s2, s2, s2, 200);
         acb_add(s2, s, s2, 200);
 

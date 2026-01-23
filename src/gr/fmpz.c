@@ -880,6 +880,20 @@ _gr_fmpz_vec_sub(fmpz * res, const fmpz * vec1, const fmpz * vec2, slong len, gr
 }
 
 static int
+_gr_fmpz_vec_mul_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_mul_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_fmpz_vec_addmul_scalar(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_vec_scalar_addmul_fmpz(res, vec1, len, c);
+    return GR_SUCCESS;
+}
+
+static int
 _gr_fmpz_vec_divexact_scalar_fmpz(fmpz * res, const fmpz * vec1, slong len, const fmpz_t c, gr_ctx_t ctx)
 {
     if (fmpz_is_zero(c))
@@ -1232,6 +1246,10 @@ gr_method_tab_input _fmpz_methods_input[] =
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpz_vec_equal},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _gr_fmpz_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _gr_fmpz_vec_sub},
+    {GR_METHOD_VEC_MUL_SCALAR,             (gr_funcptr) _gr_fmpz_vec_mul_scalar},
+    {GR_METHOD_VEC_MUL_SCALAR_FMPZ,        (gr_funcptr) _gr_fmpz_vec_mul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,          (gr_funcptr) _gr_fmpz_vec_addmul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_FMPZ,     (gr_funcptr) _gr_fmpz_vec_addmul_scalar},
     {GR_METHOD_VEC_DIVEXACT_SCALAR,        (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
     {GR_METHOD_VEC_DIVEXACT_SCALAR_FMPZ,   (gr_funcptr) _gr_fmpz_vec_divexact_scalar_fmpz},
     {GR_METHOD_VEC_DIVEXACT_SCALAR_UI,     (gr_funcptr) _gr_fmpz_vec_divexact_scalar_ui},

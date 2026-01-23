@@ -19,9 +19,7 @@ TEST_FUNCTION_START(n_is_probabprime_lucas, state)
     ulong count = UWORD(0);
     ulong d;
     mpz_t d_m;
-    slong test_multiplier;
-
-    test_multiplier = FLINT_MAX(1, flint_test_multiplier());
+    double test_multiplier = FLINT_MAX(1, flint_test_multiplier());
 
     {
         /* A selection of Lucas pseudoprimes. These are known composites for
