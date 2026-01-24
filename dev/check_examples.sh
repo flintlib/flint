@@ -223,7 +223,7 @@ then
     echo "machin....SKIPPED"
 elif test "$1" = "mfcoefs";
 then
-    echo "mfcoefs...."
+    echo -n "mfcoefs...."
     res=$($2/mfcoefs --tail 2 --raw 23 1000000)
     if test "$?" != "0";
     then
