@@ -27,28 +27,36 @@
 
 // Detects if n is of the form pq where q = k*(p-1)+1
 // Here we use a slightly simpler equivalence of p=(a+1) q=(k*a+1)
+// k is in {2,3,4,5,6,7,8,9,12} 10 and 11 are skipped for efficiency
 static int n_is_semiprime_k(ulong n)
 {
 // Precomputed multiplicative inverses of the sqrt of k
-   const double SQRTINV[11] = {
+   const double SQRTINV[8] = {
      0x1.6a09e667f3bccp-1 , 0x1.279a74590331dp-1 ,
      0x1p-1               , 0x1.c9f25c5bfedd9p-2 ,
      0x1.a20bd700c2c3fp-2 , 0x1.83091e6a7f7e6p-2 ,
-     0x1.6a09e667f3bccp-2 , 0x1.5555555555555p-2 , 
-     0x1.43d136248490fp-2 , 0x1.34bf63d156826p-2 ,
-     0x1.279a74590331dp-2
+     0x1.6a09e667f3bccp-2 , 0x1.5555555555555p-2 ,
    };
+
+    // 1/sqrt(12)
+  const double SQRTINV12 = 0x1.279a74590331dp-2;
+  // This is equivalent to sqrt(n/12)
+  uint64_t k = sqrtn*SQRTINV12;
+  // check that N is of the form 
+  if (((k+1)*(12*k+1))==n){
+      return 1;
+  } 
+    
   // Compute sqrt just once
    double sqrtn = sqrt(n);
   
-   for (int idx=0;idx<11;idx++){
+   for (int idx=0;idx<8;idx++){
     // This is equivalent to sqrt(n/k)
       uint64_t a = sqrtn*SQRTINV[idx];
       // increment the index to the offset
       uint64_t k = idx+2;
-      
+      // This is a composite so return true
       if ((a+1)*(k*a+1)==n){
-       // This is a semiprime so return true
          return 1;
      }
    }
@@ -142,7 +150,7 @@ static int u32_is_base2_probabprime(uint32_t n)
 static uint32_t get_witness_base(uint64_t n)
 {    
     
-   uint32_t hash, multiplier=3707956744,nsmall=n;
+   uint32_t hash, multiplier=541578969,nsmall=n;
     
     hash = (nsmall*multiplier)>>17;
     
