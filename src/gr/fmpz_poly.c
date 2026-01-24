@@ -29,14 +29,12 @@
 
 static const char * default_var = "x";
 
-#if 0
 static void
 _gr_fmpz_poly_ctx_clear(gr_ctx_t ctx)
 {
     if (FMPZ_POLY_CTX_VAR(ctx) != default_var)
         flint_free(FMPZ_POLY_CTX_VAR(ctx));
 }
-#endif
 
 static int _gr_fmpz_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
@@ -835,6 +833,7 @@ gr_static_method_table _fmpz_poly_methods;
 
 gr_method_tab_input _fmpz_poly_methods_input[] =
 {
+    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fmpz_poly_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpz_poly_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
