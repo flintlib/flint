@@ -55,6 +55,10 @@ jobs:
         run: |
           ./bootstrap.sh && ./configure CC=${CC} --with-ntl --enable-assert
           $MAKE && sudo make install && sudo ldconfig
+      - name: "Test FLINT for msolve"
+        run: |
+          $MAKE tests
+          $MAKE check
       - name: "Test msolve"
         run: |
           git clone --depth=1 https://github.com/algebraic-solving/msolve
