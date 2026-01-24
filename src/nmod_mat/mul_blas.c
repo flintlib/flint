@@ -98,7 +98,7 @@ typedef struct {
     slong Bstride;
 } _lift_sp_worker_arg_struct;
 
-void _lift_sp_worker(void * arg_ptr)
+static void _lift_sp_worker(void * arg_ptr)
 {
     _lift_sp_worker_arg_struct * arg = (_lift_sp_worker_arg_struct *) arg_ptr;
     slong n = arg->n;
@@ -134,7 +134,7 @@ typedef struct {
     slong Cstride;
 } _reduce_sp_worker_arg_struct;
 
-void _reduce_sp_worker(void * arg_ptr)
+static void _reduce_sp_worker(void * arg_ptr)
 {
     _reduce_sp_worker_arg_struct * arg = (_reduce_sp_worker_arg_struct *) arg_ptr;
     slong n = arg->n;
@@ -289,7 +289,7 @@ typedef struct {
     slong Bstride;
 } _lift_crt_worker_arg_struct;
 
-void _lift_crt_worker(void * arg_ptr)
+static void _lift_crt_worker(void * arg_ptr)
 {
     _lift_crt_worker_arg_struct * arg = (_lift_crt_worker_arg_struct *) arg_ptr;
     slong n = arg->n;
@@ -327,7 +327,7 @@ typedef struct {
     slong Cstride;
 } _reduce_crt_worker_arg_struct;
 
-void _reduce_crt_worker(void * arg_ptr)
+static void _reduce_crt_worker(void * arg_ptr)
 {
     _reduce_crt_worker_arg_struct * arg = (_reduce_crt_worker_arg_struct *) arg_ptr;
     slong Cstartrow = arg->Cstartrow;
@@ -565,7 +565,7 @@ typedef struct {
     slong Bstride;
 } _lift_dp_worker_arg_struct;
 
-void _lift_dp_worker(void * arg_ptr)
+static void _lift_dp_worker(void * arg_ptr)
 {
     _lift_dp_worker_arg_struct * arg = (_lift_dp_worker_arg_struct *) arg_ptr;
     slong n = arg->n;
@@ -601,7 +601,7 @@ typedef struct {
     slong Cstride;
 } _reduce_dp_worker_arg_struct;
 
-void _reduce_dp_worker(void * arg_ptr)
+static void _reduce_dp_worker(void * arg_ptr)
 {
     _reduce_dp_worker_arg_struct * arg = (_reduce_dp_worker_arg_struct *) arg_ptr;
     slong n = arg->n;
