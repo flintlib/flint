@@ -134,6 +134,7 @@ TEST_GR_FUNCTION_START(gr_mat_gr_poly_solve_lode_newton, state, count_success, c
         gr_mat_clear(Y, poly_ctx);
         gr_poly_clear(A_denominator, ctx);
         gr_mat_clear(A_numerator, poly_ctx);
+        gr_mat_clear(tmp_mat, poly_ctx);
         gr_ctx_clear(poly_ctx);
         gr_ctx_clear(ctx);
     }
