@@ -40,7 +40,7 @@ void _fmpz_poly_tree_free(fmpz ** tree, slong len)
         slong i, height = FLINT_CLOG2(len);
 
         for (i = 0; i <= height; i++)
-            flint_free(tree[i]);
+            _fmpz_vec_clear(tree[i], len + (len >> i) + 1);
 
         flint_free(tree);
     }
