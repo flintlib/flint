@@ -84,6 +84,8 @@ TEST_FUNCTION_START(nf_elem_equal_fmpz_fmpq, state)
         }
 
         fmpq_poly_clear(f);
+        fmpq_clear(q);
+        fmpz_clear(z);
         nf_elem_clear(a, nf);
         nf_clear(nf);
     }

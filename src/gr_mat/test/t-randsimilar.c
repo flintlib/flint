@@ -45,7 +45,7 @@ TEST_FUNCTION_START(gr_mat_randsimilar, state)
             status |= gr_mat_randsimilar(A, state, randsimilar_opcount, ctx);
             status |= gr_mat_charpoly(g, A, ctx);
 
-            if (gr_poly_equal(f, g, ctx) == T_FALSE)
+            if (status == GR_SUCCESS && gr_poly_equal(f, g, ctx) == T_FALSE)
             {
                 flint_printf("FAIL:\n");
                 gr_ctx_println(ctx);

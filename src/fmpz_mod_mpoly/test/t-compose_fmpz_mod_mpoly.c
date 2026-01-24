@@ -110,6 +110,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
             !fmpz_mod_mpoly_is_zero(A2, ctxAC))
             TEST_FUNCTION_FAIL("Check composition with zero poly\n");
 
+        flint_free(c);
+        fmpz_mod_mpoly_clear(B1, ctxB);
         fmpz_mod_mpoly_clear(B, ctxB);
         fmpz_mod_mpoly_clear(A, ctxAC);
         fmpz_mod_mpoly_clear(A1, ctxAC);
@@ -119,6 +121,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
 
         fmpz_mod_mpoly_ctx_clear(ctxB);
         fmpz_mod_mpoly_ctx_clear(ctxAC);
+        fmpz_clear(p);
     }
 
     /* check composition with generators */

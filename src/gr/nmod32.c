@@ -565,7 +565,8 @@ _nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32
     squaring = (A == B) && (Alen == Blen);
 
     alloc = squaring ? (Alen + trunc) : (Alen + Blen + trunc);
-    TR = GR_TMP_ALLOC(alloc * sizeof(ulong));
+    alloc *= sizeof(ulong);
+    TR = GR_TMP_ALLOC(alloc);
     TA = TR + trunc;
     TB = TA + Alen;
 
