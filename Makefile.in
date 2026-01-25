@@ -186,7 +186,7 @@ HEADER_DIRS	:=	\
 		qadic												\
 															\
 		fmpz_extras	fmpz_factor	fmpzi						\
-		fft			@FFT_SMALL@								\
+		fft			n_fft		@FFT_SMALL@								\
 		fmpz_lll											\
 		arith												\
 		qsieve		aprcl									\
