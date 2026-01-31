@@ -13,6 +13,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 #include "gr_poly.h"
 
 void
@@ -78,7 +79,7 @@ nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A,
 
     if (n == 0 || Blen == 0 || B->coeffs[0] == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_div_series_basecase). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_div_series_basecase). Division by zero.\n");
     }
 
     Alen = A->length;
@@ -135,7 +136,7 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
 
     if (n == 0 || Blen == 0 || B->coeffs[0] == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_div_series). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_div_series). Division by zero.\n");
     }
 
     Alen = A->length;

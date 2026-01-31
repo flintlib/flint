@@ -6,15 +6,124 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-Future -- FLINT 3.4.0-dev
+FLINT 3.5.0-dev
 -------------------------------------------------------------------------------
 
-Main contributors: Fredrik Johansson (FJ)
+Contributors: David Sparks (DS), Fredrik Johansson (FJ), Mathieu Gouttenoire (MG)
+
+* Smaller hash table for ``n_is_prime`` (FJ, DS, MG).
+
+2025-11-25 -- FLINT 3.4.0
+-------------------------------------------------------------------------------
+
+Contributors: Albin Ahlbäck (AA), Andrii Yanovets (AY), Claus Fieker (CF),
+David Lowry-Duda (DLD), Dimitri Lesnoff (DL), Daniel Schultz (DS),
+Doug Torrance (DT), David Walker (DW), Éric Schost (ES), Fredrik Johansson (FJ),
+Guillem Blanco (GB), Joel Dahne (JD), Jean Kieffer (JK), kac3pro (K3),
+Lars Göttgens (LG), Mathieu Gouttenoire (MG), Mael Hostettler (MH),
+Marc Mezzarobba (MM), Pascal Molin (PM), Ricardo Buring (RB), Remi Prebet (RP),
+user202729 (U2), Vincent Neiger (VN).
 
 * Features
 
-  * Matrix permanent (``gr_mat_permanent``) (FJ).
+  * Add ``gr_series`` as a public module (contains both the ``gr_series`` and ``gr_series_mod`` types) (FJ).
+  * Add directed rounding support for ``nfloat`` (FJ).
+  * Matrix permanents (``gr_mat_permanent``, ``fmpz_mat_permanent`` and ``fmpq_mat_permanent``) (FJ).
+  * Add the ``fmpz_mod_mpoly_q`` module for multivariate rational functions over a prime field (AY).
+  * Gröbner basis computation for ``fmpz_mod_mpoly`` (AY).
+  * Add ``nmod_poly_minimal_irreducible`` and ``fq_nmod_ctx_init_minimal_weight_ui``
+    for generating irreducible polynomials with minimal weight for any word-size prime
+    ``p`` and degree ``n``, and use these by default to construct a finite extension field when a Conway polynomial is not available (FJ).
+  * Fast multipoint evaluation and interpolation on geometrically spaced points for ``nmod_poly`` (ES, VN, MH).
+  * Add a debug context for generics (``gr_ctx_init_debug``) (FJ).
+  * Add ``_nmod_vec_invert`` (VN).
+  * Add ``gr_ctx_ngens`` and ``gr_ctx_gen_name`` (MM).
+  * Preconditioned modular multiplication for ``nmod_poly`` (FJ).
+  * Add uniformly random functions for various modular types (including ``_nmod_vec_rand``, ``nmod_mat_rand``, ``fmpz_mod_mat_rand``) (DL).
+  * Add Kronecker substitution multiplication for ``gr_poly`` (FJ).
+  * Add ``gr_poly_mullow_complex_reorder`` (FJ).
+  * Add ``_gr_mpoly_normalise`` to remove zero coefficients (RB).
+  * Add ``gr_mpoly_derivative`` and ``gr_mpoly_integral`` (RB).
+  * Add ``gr_derivative_gen``, with implementations for polynomial rings (RB).
+  * Add ``gr_poly_mullow_classical`` as a standalone function (FJ).
+  * Support ``truth_t`` in ``flint_printf`` (FJ).
+  * Add ``delta``, ``eta`` parameters to ``arb_mat_spd_lll_reduce`` and ``arb_mat_spd_is_lll_reduced`` (JK).
+  * QR and LQ factorization of matrices (``gr_mat_qr``, ``gr_mat_lq``) (FJ).
+  * Add ``gr_mat_is_orthogonal`` (FJ).
+  * Add ``gr_mat_randtest_orthogonal`` (FJ).
+  * Add ``fmpq_poly_discriminant`` (K3).
+  * Add ``gr_mat_is_row_lll_reduced_naive`` (FJ).
+  * Add generic Newton solver for series solutions of linear systems of ODEs with rational function coefficients (``gr_mat_gr_poly_solve_lode_newton``) (RB).
+  * Add ``nfloat_complex_sqrt`` and ``nfloat_complex_rsqrt`` (FJ).
+  * Generate power series contexts in ``gr_ctx_init_random`` (FJ).
+  * Functions for converting a ``gr_poly`` between the standard monomial basis and a Newton basis (FJ).
+  * Polynomial interpolation for ``gr_poly`` (Newton basis and asymptotically fast) (FJ).
+  * Add ``gr_poly_product_roots`` (FJ).
+  * Add ``fmpq_poly_interpolate_fmpq_vec`` (RP).
+  * Add error handling to ``fmpz_poly_interpolate_fmpz_vec`` (FJ).
+  * Add ``fmpz_poly_interpolate_exact`` for faster exact interpolation without error handling (FJ).
+  * Add ``gr_ctx_is_rational_vector_space``, ``gr_ctx_is_real_vector_space``, ``gr_ctx_is_complex_vector_space`` (FJ).
 
+* Bug fixes
+
+  * Fix erroneous bounds in ``_fmpz_mat_bound_ovals_of_cassini``, which would lead ``fmpz_mat_minpoly`` to compute wrong results for some matrices (CF).
+  * Fix ``fmpq_poly_resultant_modular_div``, ``fmpz_poly_resultant_modular_div`` and ``nf_elem_norm_div`` with non-monic polynomials (CF).
+  * Fix initial value selection in ``acb_poly_find_roots`` preventing convergence for certain polynomials with coefficients in geometric progression (FJ).
+  * Fix ``gr_re`` and ``gr_conj`` for ``nfloat_complex`` (FJ).
+  * Fix memory corruption bug in ``nmod_mpoly_divides_heap_threaded`` (FJ, DS).
+  * Fix and test edge cases in ``fmpz_set_str`` (DW).
+  * Enable accidently disabled ``gr_poly`` test (MM).
+  * Consistently throw ``FLINT_DIVZERO`` when trying to divide by zero (LG).
+  * Fix bug in ``gr_poly_div_series_basecase``: this would previously return ``GR_DOMAIN`` in some cases where the quotient actually exists (FJ).
+  * Correct semantics for generic series: operations on ``gr_series`` should no longer create enclosures for elements that don't exist (FJ).
+  * Fix ``gr_poly_shift_equivalent`` in positive characteristic (MM).
+  * Fix a memory leak in ``nmod_mpoly_gcd`` and improve test coverage of this function (FJ).
+
+* Performance
+
+  * Use ``nfloat``, ``arf`` and ``arb`` arithmetic instead of ``mpf``, ``mpfr`` and ``fmpq`` in ``fmpz_lll``, greatly speeding up multiprecision LLL (FJ).
+  * Use SQUFOF in ``fmpz_factor`` to speed up factorisations of cofactors in the 65-80 bit range (FJ).
+  * Reduce multiplication depth in ``_gr_poly_compose_axnc`` (U2).
+  * Improve precision in ``arb_set_str``, making it more likely to round to nearest (DW).
+  * Minor speedup for ``fmpz_poly_compose`` (U2).
+  * Speed up ``n_is_prime`` by replacing the BPSW test with smarter strong probable prime tests and other optimisations (FJ).
+  * Speed up ``n_factor_one_line`` and ``n_factor_SQUFOF`` by improving the square root computation (FJ).
+  * Speed up ``n_factor`` by optimising trial division, doing earlier primality testing, and using the one line factor algorithm for larger bit sizes (FJ).
+  * When possible speed up ``nmod_poly`` multiplication via ``fft_small`` by a factor two for tiny moduli by packing a linear polynomial into each coefficient (FJ).
+  * Add AVX2 version of ``nmod_vec_dot_half`` (VN).
+  * Improve speed and accuracy for ``arb_min`` and ``arb_max`` with non-overlapping input (JD).
+  * Speed up ``_fmpz_vec_scalar_divexact_si``, ``_fmpz_vec_scalar_divexact_ui`` and small-divisor ``_fmpz_vec_scalar_divexact_fmpz`` (FJ).
+  * Make multivariate polynomial multiplication via nested ``gr_poly`` over various ground types asymptotically fast (FJ).
+  * Speed up ``_nmod_poly_divrem_newton_n_preinv`` for sparse moduli by handling these specially (FJ).
+  * Incorporate trial division in ``nmod_poly_is_irreducible`` when the prime is small (FJ).
+  * Speed up ``nmod_poly`` modular composition by using rectangular splitting instead of Horner for the third step of Brent-Kung (FJ).
+  * Faster preconditioned multiplication and polynomial GCD for ``mpn_mod`` (FJ).
+  * Improve ``fmpq_poly_interpolate_fmpz_vec`` by incorporating an asymptotically fast multimodular algorithm and other improvements (RP).
+  * Improve ``fmpz_poly_interpolate_fmpz_vec`` by incorporating an asymptotically fast multimodular algorithm and other improvements (FJ).
+  * Make various ``gr_poly`` functions more robust or performant when dealing with inexact representations of zero (FJ).
+
+* Build system, general maintenance
+
+  * Fix issues with profiling code on Clang (AA).
+  * Mark many internal functions as ``static`` (AA).
+  * Compile with ``-Wmissing-prototypes`` by default (AA).
+  * Fix many compiler warnings (AA).
+  * Fix ``acb_theta_all`` and ``acb_theta_one`` disappearing from the shared library (AA).
+  * Add V Makefile variable for verbose builds (DT).
+  * Add link-time optimization configure option (MG).
+  * Fix situations where the compiler runs out of registers for inline assembly on x86 (AA).
+  * Fix static linkage of ``d_randtest`` (AA).
+  * Remove the obsolete ``mpfr_vec`` and ``mpfr_mat`` modules (FJ).
+  * Refactor ``fmpz_lll`` to reduce code size and improve clarity (FJ).
+  * Refactor power series code (FJ).
+  * Add ``FLINT_NORETURN`` to function pointer argument (AA).
+  * Test ``msolve`` in CI (VN).
+  * Corrections and improvements to the documentation (AA, DL, DLD, GB, LG, U2).
+
+* Example programs
+
+  * Add example program to compute pi using AGM iteration (FJ).
+  * Add example program for computing coefficients of modular forms (PM).
 
 2025-06-16 -- FLINT 3.3.1
 -------------------------------------------------------------------------------
@@ -2818,7 +2927,7 @@ Calcium version history
 
   * Vectors of multivariate polynomials.
   * Construction of elementary symmetric polynomials.
-  * GrÃ¶bner basis computation (naive Buchberger algorithm).
+  * Gröbner basis computation (naive Buchberger algorithm).
 
 * Documentation and presentation
 

@@ -108,6 +108,8 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_SET_FMPZ_2EXP_FMPZ, (gr_funcptr) nfloat_set_fmpz_2exp_fmpz},
     {GR_METHOD_GET_FMPZ_2EXP_FMPZ, (gr_funcptr) nfloat_get_fmpz_2exp_fmpz},
 */
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) nfloat_get_fmpz},
+    {GR_METHOD_GET_D_2EXP_SI,   (gr_funcptr) nfloat_get_d_2exp_si},
 
     {GR_METHOD_POW,             (gr_funcptr) nfloat_pow},
 
@@ -180,6 +182,7 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_MAT_LU,                      (gr_funcptr) nfloat_mat_lu},
     {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     {GR_METHOD_MAT_FIND_NONZERO_PIVOT,     (gr_funcptr) gr_mat_find_nonzero_pivot_large_abs},
+    {GR_METHOD_MAT_LQ,                      (gr_funcptr) nfloat_mat_lq},
 
     {0,                         (gr_funcptr) NULL},
 };

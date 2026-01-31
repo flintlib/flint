@@ -109,6 +109,25 @@ Window matrices
 
     Frees the window matrix.
 
+.. macro:: GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(AT, A, ctx)
+
+    Initialize *AT* to a shallow transpose of *A* for temporary use.
+    This macro uses stack allocation if *A* is sufficiently small.
+    The matrix *AT* can be used similarly to a window matrix for reading.
+    It can also be used for writing, provided that one finishes the
+    operation by performing ``GR_MAT_SHALLOW_TRANSPOSE(A, AT, ctx)``
+    to write back any changes to the shallow data.
+
+.. macro:: GR_MAT_SHALLOW_TRANSPOSE(AT, A, ctx)
+
+    Sets *AT* to the transpose of *A*, copying entries shallowly.
+    Assumes that *AT* and *A* are not aliased (if aliased, the normal
+    :func:`gr_mat_transpose` already uses shallow operations).
+
+.. macro:: GR_MAT_TMP_CLEAR_SHALLOW_TRANSPOSE(AT, ctx)
+
+    Free the shallow transpose allocated by :macro:`GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE`.
+
 Input and output
 -------------------------------------------------------------------------------
 
@@ -200,6 +219,16 @@ Basic row, column and entry operations
     Swaps columns ``i`` and ``c - i`` of ``mat`` for ``0 <= i < c/2``, where
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
+
+.. function:: int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
+
+    Moves row ``i`` to the new position ``new_i``, displacing all intervening
+    rows. For example, with ``i = 4`` and ``new_i = 7`` this replaces the
+    block of rows ``A4, A5, A6, A7`` by ``A5, A6, A7, A4``.
+    With ``i = 7`` and ``new_i = 4`` replaces ``A4, A5, A6, A7``
+    by ``A7, A4, A5, A6``.
+    Returns ``GR_DOMAIN`` if either index is not in bounds, otherwise is
+    guaranteed to succeed.
 
 .. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
 
@@ -962,6 +991,91 @@ Random matrices
     operations. More precisely, at most *opcount* conjugations by random
     elementary row/column operations will be performed.
 
+Orthogonal matrices
+-------------------------------------------------------------------------------
+
+.. function:: truth_t gr_mat_is_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
+
+    Returns whether *A* is an orthogonal matrix (orthonormal matrix),
+    i.e. a square matrix satisfying `A A^T = A^T A = I`. It is assumed
+    (not checked) that the scalar ring is commutative.
+
+.. function:: truth_t gr_mat_is_row_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
+              truth_t gr_mat_is_col_orthogonal(const gr_mat_t A, gr_ctx_t ctx)
+              truth_t gr_mat_is_row_orthonormal(const gr_mat_t A, gr_ctx_t ctx)
+              truth_t gr_mat_is_col_orthonormal(const gr_mat_t A, gr_ctx_t ctx)
+
+    Returns whether *A* is of the following type:
+
+    * Row-orthogonal: `A A^T = D` for some diagonal matrix *D*.
+
+    * Column-orthogonal: `A^T A = D` for some diagonal matrix *D*.
+
+    * Row-orthonormal: `A A^T = I`.
+
+    * Column-orthonormal: `A^T A = I`.
+
+.. function:: int gr_mat_randtest_orthogonal(gr_mat_t A, flint_rand_t state, gr_ctx_t ctx)
+
+    Generates a random orthogonal matrix. Uses Cayley's construction,
+    with a permutation matrix as a fallback. It is assumed (not checked) that
+    the scalar ring is commutative.
+    Fails with ``GR_DOMAIN`` if *A* is not square.
+
+QR decomposition
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_lq_gso(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_lq_recursive(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_lq_generic(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx)
+              int gr_mat_qr(gr_mat_t Q, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
+
+    Computes a QR or LQ decomposition.
+    The `A = QR` decomposition orthogonalizes the columns of `A`:
+
+    * `A` is `m \times n` with `m \ge n` and full rank (`A` has `n` linearly independent columns)
+
+    * `Q` is `m \times n` and column-orthonormal
+
+    * `R` is `n \times n` and upper triangular
+
+    The `A = LQ` decomposition is the transposed operation, which
+    orthogonalizes the rows of `A`:
+
+    * `A` is `m \times n` with `m \le n` and full rank (`A` has `m` linearly independent rows)
+
+    * `L` is `m \times m` and lower triangular
+
+    * `Q` is `m \times n` and row-orthonormal
+
+    For rectangular matrices, these definitions correspond to
+    the "reduced", "compact" or "economy-sized" QR or LQ decomposition.
+    To construct a "full" QR decomposition where `Q` is a square, orthogonal
+    matrix, one can compute the reduced QR decomposition, extend
+    `Q` with its orthogonal complement, and pad `R` or `L` with zeros.
+
+    The input matrix `A` should have elements in a
+    subfield of `\mathbb{R}` or real floating-point entries. These functions
+    may succeed for other types, but the Euclidean norm normalizations will
+    not necessarily be meaningful.
+
+    The *gso* algorithm uses Gram-Schmidt orthogonalization.
+    The *recursive* algorithm uses block recursion.
+    The QR decomposition is a simple wrapper around the LQ decomposition.
+    We use the LQ decomposition internally as row operations are
+    more efficient than column operations in the row-major format
+    of :type:`gr_mat_t`.
+
+    Aliasing of `A` and `Q` is handled efficiently in-place.
+    Aliasing of `A` and `R` or `L` is allowed, but requires a temporary
+    internal copy.
+
+    These methods return ``GR_DOMAIN`` if the matrix dimensions are not
+    compatible, if `A` does not have full rank, or if the base ring does
+    not support the necessary divisions or square roots to normalize
+    vectors.
+
 Special matrices
 -------------------------------------------------------------------------------
 
@@ -1034,6 +1148,55 @@ Helper functions for reduction
     By default the *generic* version is called; specific rings
     can overload this (typically to implement delayed canonicalisation).
 
+LLL
+-------------------------------------------------------------------------------
+
+Let `A = (a_0, \ldots, a_{n-1})` be a set of linearly independent vectors over `\mathbb{R}`
+with Gram-Schmidt orthogonalization `(b_0, \ldots, b_{n-1})`
+and Gram-Schmidt coefficients `\mu_{i,j} = \langle a_i, b_i \rangle / \| b_j \|^2`.
+The basis `A` is said to be LLL-reduced with parameter (`\delta`, `\eta`)
+where `0.25 < \delta \le 1` and `0.5 \le \eta < \sqrt{\delta}` if they satisfy
+the size reduction condition
+
+.. math ::
+
+    |\mu_{i,j}| \le \eta, \quad 0 \le j < i < n
+
+and the Lovász condition
+
+.. math ::
+
+    (\delta - \mu_{i,i-1}^2) \| b_{i-1} \|_2^2 \le \| b_i \|_2^2, \quad 1 \le i \le n - 1.
+
+.. function:: truth_t gr_mat_is_row_lll_reduced_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_ctx_t ctx)
+              truth_t gr_mat_is_row_lll_reduced_with_removal_naive(const gr_mat_t A, gr_srcptr delta, gr_srcptr eta, gr_srcptr gs_B, slong newd, gr_ctx_t ctx)
+
+    Check if the rows of *A* are LLL-reduced by naively performing the
+    Gram-Schmidt orthogonalization and checking the conditions one row
+    at a time.
+
+    In interval arithmetic, these functions terminate eagerly: ``T_UNKNOWN``
+    is returned if the tests are inconclusive for one row, even if there is a
+    possibility that a later row could prove that the result should be ``T_FALSE``.
+
+Linear ODEs
+-------------------------------------------------------------------------------
+
+.. function:: int _gr_mat_gr_poly_solve_lode_newton_start(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denominator_inv, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, gr_ctx_t sol_poly_ctx)
+              int _gr_mat_gr_poly_solve_lode_newton_step(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denominator_inv, slong *len, const gr_mat_t A_numerator, const gr_poly_t A_denominator, int A_is_companion, gr_ctx_t sol_poly_ctx)
+              int _gr_mat_gr_poly_solve_lode_newton(gr_mat_t Y, gr_mat_t Z, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, slong len, gr_ctx_t A_poly_ctx, gr_ctx_t sol_poly_ctx)
+              int gr_mat_gr_poly_solve_lode_newton(gr_mat_t Y, const gr_mat_t A_numerator, const gr_poly_t A_denominator, const gr_mat_t Y0, slong len, gr_ctx_t A_poly_ctx, gr_ctx_t sol_poly_ctx)
+
+    Solves the system of linear ordinary differential
+    equations `Y'(t) = A(t)Y(t)` with rational function coefficients `A(t)`
+    and initial condition `Y(0) = Y_0`. Sets *Y* to the power series solution
+    truncated to length *len*.
+    The algorithm is a Newton iteration as described in [BCOSSS2007]_,
+    but using an iteration for the power series inverse of *A_denominator*,
+    and using a specialized implementation of multiplication by `A(t)` mod `t^m`
+    in the case where `A(t)` is a companion matrix.
+    An optimal sequence of precisions is used to reach the target *len*, even
+    when it is not a power of two.
 
 Test functions
 -------------------------------------------------------------------------------

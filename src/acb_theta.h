@@ -12,6 +12,12 @@
 #ifndef ACB_THETA_H
 #define ACB_THETA_H
 
+#ifdef ACB_THETA_INLINES_C
+#define ACB_THETA_INLINE
+#else
+#define ACB_THETA_INLINE static inline
+#endif
+
 #include "fmpz_types.h"
 #include "acb_types.h"
 
@@ -298,13 +304,13 @@ int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
 void acb_theta_jet(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong ord, ulong ab, int all, int sqr, slong prec);
 
-FLINT_FORCE_INLINE void
+ACB_THETA_INLINE void
 acb_theta_one(acb_ptr th, acb_srcptr z, const acb_mat_t tau, ulong ab, slong prec)
 {
     acb_theta_jet(th, z, 1, tau, 0, ab, 0, 0, prec);
 }
 
-FLINT_FORCE_INLINE void
+ACB_THETA_INLINE void
 acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 {
     acb_theta_jet(th, z, 1, tau, 0, 0, 1, sqr, prec);

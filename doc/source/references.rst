@@ -27,6 +27,8 @@ References
 
 .. [BF2020] \F. Beukers and J. Forsgård. "Gamma-evaluations of hypergeometric series". Preprint, 2020. https://arxiv.org/abs/2004.08117
 
+.. [BCOSSS2007] \A. Bostan, F. Chyzak, F. Ollivier, B. Salvy, É. Schost, A. Sedoglavic. "Fast computation of power series solutions of systems of differential equations". Proceedings of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms (2007) 1012-1021
+
 .. [BFSS2006] \A. Bostan, P. Flajolet, B. Salvy and É. Schost. "Fast computation of special resultants". Journal of Symbolic Computation, 41(1):1–29, January 2006. https://doi.org/10.1016/j.jsc.2005.07.001
 
 .. [BJ2013] \R. P. Brent and F. Johansson, "A bound for the error term in the Brent-McMillan algorithm", preprint (2013), https://arxiv.org/abs/1312.0039
@@ -109,11 +111,15 @@ References
 
 .. [EK2025] \N. D. Elkies and J. Kieffer, "A uniform quasi-linear time algorithm for evaluating theta functions in any dimension", in preparation.
 
+.. [FeiGal2013] \J. Feitsma and W. Galway, "Tables of pseudoprimes and related data", http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html
+
 .. [Fie2007] \C. Fieker, "Sparse representation for cyclotomic fields". Experiment. Math. Volume 16, Issue 4 (2007), 493-500. https://doi.org/10.1080/10586458.2007.10129012
 
 .. [FieHof2014] \Fieker C. and Hofmann T.: "Computing in quotients of rings of integers" LMS Journal of Computation and Mathematics, 17(A), 349-365
 
 .. [Fil1992] \S. Fillebrown, "Faster Computation of Bernoulli Numbers", Journal of Algorithms 13 (1992) 431-445
+
+.. [ForJan2015] M. Forisek and J. Jancina, "Fast Primality Testing for Integers That Fit into a Machine Word", SOFSEM 2015, https://ceur-ws.org/Vol-1326/020-Forisek.pdf
 
 .. [GCL1992] \K. O. Geddes, S. R. Czapor and G. Labahn. *Algorithms for computer algebra*. Springer, 1992. https://doi.org/10.1007/b102438
 
@@ -352,7 +358,7 @@ References
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 
 All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [Arn2012]_, [ArnoldMonagan2011]_,
-[BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_,
+[BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BCOSSS2007]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_,
 [Bin1996]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bol1887]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_,
 [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_,
 [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_,

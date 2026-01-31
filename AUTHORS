@@ -140,7 +140,8 @@ Kushagra Singh
 Pascal Molin
 
   Arb discrete Fourier transform (DFT), Dirichlet characters,
-  Dirichlet L-functions, discrete logarithm computation.
+  Dirichlet L-functions, discrete logarithm computation,
+  modular form coefficients example program.
 
   web      https://webusers.imj-prg.fr/~pascal.molin/
   github   pascalmolin
@@ -194,9 +195,12 @@ Martin Lee
 Marc Mezzarobba
 
   Fast evaluation of Legendre polynomials, work on the Arb interface
-  in Sage, bug reports, feedback.
+  in Sage, functionality for generic polynomials; shift equivalence,
+  dispersion, and shiftless decomposition for polynomials; bug reports,
+  feedback.
 
   web      http://marc.mezzarobba.net/
+  github   mezzarobba
 
 Tom Boothby
 
@@ -433,7 +437,11 @@ Joel Dahne
 
 Vincent Neiger
 
-  Many utility functions for nmod_mat and associated modules.
+  Many utility functions for nmod_mat and associated modules,
+  dot product optimizations, modular multiplication with precomputed inverse,
+  fast geometric multipoint evaluation.
+
+  github vneiger
 
 Julian Rüth
 
@@ -464,7 +472,43 @@ Michael Abshoff
 
 Éric Schost
 
-  Waksman matrix multiplication.
+  Waksman matrix multiplication, fast geometric multipoint evaluation.
+
+Andrii Yanovets
+
+  Multivariate rational functions and Groebner bases over prime finite fields.
+
+  github   andrii302
+
+Ricardo Buring
+
+  Functionality for generic polynomials and matrices, series solutions of
+  linear systems of ODEs with rational function coefficients.
+
+  github   rburing
+
+Dimitri Lesnoff
+
+  Uniform random generation over finite rings.
+
+  github   dlesnoff
+
+Mael Hostettler
+
+  Fast geometric multipoint evaluation.
+
+  github   maelhos
+
+Remi Prebet
+
+  Fast polynomial interpolation over the rationals.
+
+  github   rprebet
+
+Hartmut Monien
+
+  Double exponential integration example program, bug reports and feedback.
+
 
 Other contributors
 -------------------------------------------------------------------------------
@@ -481,15 +525,15 @@ Robert Baillie
 Oscar Benjamin
 Francesco Biscani
 Francois Bissey
+Guillem Blanco
 Janko Boehm
 Andrew Booker
 Robert Bradshaw
 Volker Braun
 Eric Bray
-Ricardo Buring
 Ondřej Čertík
-Frederik Chapoton
-Frederic Chyzak
+Frédéric Chapoton
+Frédéric Chyzak
 Craig Citro
 Edgar Costa
 Gianfranco Costamagna
@@ -498,6 +542,7 @@ Jeroen Demeyer
 Didier Deshommes
 Tobias Diez
 David Einstein
+David Lowry-Duda
 Andreas Enge
 Jan Englehardt
 Daniel Fabian
@@ -505,6 +550,7 @@ Raphael Fourquet
 Peter Frentrep
 Srajan Garg
 Max Goldfar
+Lars Göttgens
 Dan Grayson
 Qingwen Guan
 Fabian Gundlach
@@ -512,15 +558,19 @@ Tobias Hansen
 Clemens Heuberger
 Pavel Holoborodko
 Max Horn
+Matthew House
+George Huebner
 Michael Jacobson Jr
 Jerry James
 Jan Jancar
+Marek Kaluba
 Lars Kastner
 Kiran Kedlaya
 Alexander Kobel
 Matthias Koeppe
 Denis Kryskov
 Dejan Latinovic
+Andrea Lesavourey
 Martin Lee
 Leif Lionhardy
 Ben Lorenz
@@ -555,18 +605,22 @@ William Stein
 Mike Stillman
 Tethys Svensson
 Gonzalo Tornaría
+Doug Torrance
 Serge Torres
 Ivan Tsybulin
 Debian User
 Gregory Vanuxem
 Antony Vennard
+David Walker
 Carl Witty
 Michiel de Wilde
 yuri@FreeBSD
+kac3pro
 Mgkurtz
 Vinklein
 Sourcekris
 Lzmths
+user202729
 
 Other credits
 -------------------------------------------------------------------------------

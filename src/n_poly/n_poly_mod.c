@@ -305,7 +305,7 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
         }
         else
         {
-            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_div). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (n_poly_mod_div). Division by zero.\n");
         }
     }
 
@@ -356,7 +356,7 @@ void n_poly_mod_divexact(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t 
         }
         else
         {
-            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divexact). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (n_poly_mod_divexact). Division by zero.\n");
         }
     }
 
@@ -398,7 +398,7 @@ void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t ctx)
 
     if (lenB == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_rem). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_rem). Division by zero.\n");
     }
     if (lenA < lenB)
     {
@@ -447,7 +447,7 @@ void n_poly_mod_divrem(n_poly_t Q, n_poly_t R,
         }
         else
         {
-            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divrem). Division by zero.");
+            flint_throw(FLINT_DIVZERO, "Exception (n_poly_mod_divrem). Division by zero.");
         }
     }
 
@@ -789,7 +789,7 @@ void n_poly_mod_inv_series(n_poly_t Qinv, const n_poly_t Q, slong n, nmod_t ctx)
 
     if (Qlen == 0)
     {
-        flint_throw(FLINT_ERROR, "n_poly_mod_inv_series_newton: Division by zero.");
+        flint_throw(FLINT_DIVZERO, "n_poly_mod_inv_series_newton: Division by zero.");
     }
 
     if (Qinv != Q)
@@ -819,7 +819,7 @@ void n_poly_mod_div_series(n_poly_t Q, const n_poly_t A, const n_poly_t B,
 
     if (order < 1 || Blen == 0 || B->coeffs[0] == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (n_poly_div_series). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (n_poly_div_series). Division by zero.\n");
     }
 
     if (Alen == 0)

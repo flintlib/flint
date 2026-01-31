@@ -27,9 +27,6 @@ Todo:
 */
 
 static int
-_gr_mat_permanent_cofactor_recursive(gr_ptr, const gr_mat_t, slong *, slong, gr_ctx_t);
-
-static int
 _gr_mat_permanent_cofactor_recursive(gr_ptr res, const gr_mat_t A, slong * rows, slong col, gr_ctx_t ctx)
 {
     slong n = A->r - col;
@@ -417,7 +414,7 @@ gr_mat_permanent_generic(gr_ptr res, const gr_mat_t A, gr_ctx_t ctx)
             int status;
 
             /* todo: cutoff could be lower if we have expensive entries */
-            if (n >= 11 && flint_get_num_available_threads() > 1)
+            if (n >= 11 && flint_get_num_available_threads() > 1 && gr_ctx_is_threadsafe(ctx) == T_TRUE)
                 status = gr_mat_permanent_glynn_threaded(res, A, ctx);
             else
                 status = gr_mat_permanent_glynn(res, A, ctx);

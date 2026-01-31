@@ -40,7 +40,7 @@ fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -107,7 +107,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -190,7 +190,7 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 }
 
 /* these functions were adapted from similar functions in an old version of GMP */
-void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
+static void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
                           mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
 {
     slong size1 = a->_mp_size, size2 = d->_mp_size;
@@ -267,7 +267,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     TMP_END;
 }
 
-void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
+static void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
                           mpz_srcptr a, mpz_srcptr d, const fmpz_preinvn_t inv)
 {
     slong size1 = a->_mp_size;
@@ -306,7 +306,7 @@ fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g,
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -371,7 +371,7 @@ fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
     if (h == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpq_fdiv_q_si). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpq_fdiv_q_si). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -409,7 +409,7 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (h == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_q_ui). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_q_ui). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
@@ -480,7 +480,7 @@ fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_r). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_fdiv_r). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */

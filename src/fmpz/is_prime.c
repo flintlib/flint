@@ -16,7 +16,7 @@
 #include "fmpz.h"
 #include "aprcl.h"
 
-int _fmpz_is_prime(const fmpz_t n, int proved)
+static int _fmpz_is_prime(const fmpz_t n, int proved)
 {
    double logd;
    ulong p, ppi, limit;

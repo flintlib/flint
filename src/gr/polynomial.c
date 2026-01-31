@@ -15,6 +15,7 @@
 #include <string.h>
 #include "fmpz.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
@@ -22,20 +23,20 @@
 
 static const char * default_var = "x";
 
-void
+static void
 polynomial_init(gr_poly_t res, gr_ctx_t ctx)
 {
     gr_poly_init(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+static int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Ring of polynomials over ");
     gr_ctx_write(out, POLYNOMIAL_ELEM_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int _gr_gr_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+static int _gr_gr_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
     len = strlen(s);
@@ -48,12 +49,28 @@ int _gr_gr_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
     return GR_SUCCESS;
 }
 
-int _gr_gr_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+static int _gr_gr_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 {
     return _gr_gr_poly_ctx_set_gen_name(ctx, s[0]);
 }
 
-void
+int
+_gr_gr_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+{
+    if (i != 0)
+        return GR_DOMAIN;
+
+    char * var = POLYNOMIAL_CTX(ctx)->var;
+    size_t len = strlen(var);
+    * name = flint_malloc(len + 1);
+    if (* name == NULL)
+        return GR_UNABLE;
+    strncpy(* name, var, len + 1);
+
+    return GR_SUCCESS;
+}
+
+static void
 polynomial_ctx_clear(gr_ctx_t ctx)
 {
     if (POLYNOMIAL_CTX(ctx)->var != default_var)
@@ -62,74 +79,74 @@ polynomial_ctx_clear(gr_ctx_t ctx)
     }
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_ring(gr_ctx_t ctx)
 {
     return gr_ctx_is_ring(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
     return gr_ctx_is_commutative_ring(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_integral_domain(gr_ctx_t ctx)
 {
     return gr_ctx_is_integral_domain(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_unique_factorization_domain(gr_ctx_t ctx)
 {
     return gr_ctx_is_unique_factorization_domain(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_rational_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_rational_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_real_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_real_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_complex_vector_space(gr_ctx_t ctx)
 {
     return gr_ctx_is_complex_vector_space(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 
-void
+static void
 polynomial_clear(gr_poly_t res, gr_ctx_t ctx)
 {
     gr_poly_clear(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-void
+static void
 polynomial_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
 {
     gr_poly_swap(poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-void
+static void
 polynomial_set_shallow(gr_poly_t res, const gr_poly_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
-int
+static int
 polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
 {
     /* todo */
@@ -142,43 +159,43 @@ polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
     return gr_poly_write(out, poly, POLYNOMIAL_CTX(ctx)->var, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_randtest(gr_poly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     return gr_poly_randtest(res, state, n_randint(state, 5), POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_equal(const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
     return gr_poly_equal(poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_set(gr_poly_t res, const gr_poly_t mat, gr_ctx_t ctx)
 {
     return gr_poly_set(res, mat, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_set_si(gr_poly_t res, slong v, gr_ctx_t ctx)
 {
     return gr_poly_set_si(res, v, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_set_ui(gr_poly_t res, ulong v, gr_ctx_t ctx)
 {
     return gr_poly_set_ui(res, v, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_set_fmpz(gr_poly_t res, const fmpz_t v, gr_ctx_t ctx)
 {
     return gr_poly_set_fmpz(res, v, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_set_fmpq(gr_poly_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     return gr_poly_set_fmpq(res, v, POLYNOMIAL_ELEM_CTX(ctx));
@@ -186,7 +203,7 @@ polynomial_set_fmpq(gr_poly_t res, const fmpq_t v, gr_ctx_t ctx)
 
 #include "fmpz_poly.h"
 
-int
+static int
 polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx == ctx)
@@ -234,7 +251,7 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 polynomial_set_interval_mid_rad(gr_poly_t res, const gr_poly_t m, const gr_poly_t r, gr_ctx_t ctx)
 {
     if (r->length == 0)
@@ -297,25 +314,25 @@ polynomial_set_interval_mid_rad(gr_poly_t res, const gr_poly_t m, const gr_poly_
     }
 }
 
-int
+static int
 polynomial_zero(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_zero(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_one(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_one(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_neg_one(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_neg_one(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_i(gr_poly_t res, gr_ctx_t ctx)
 {
     int status;
@@ -326,7 +343,7 @@ polynomial_i(gr_poly_t res, gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 polynomial_pi(gr_poly_t res, gr_ctx_t ctx)
 {
     int status;
@@ -337,13 +354,13 @@ polynomial_pi(gr_poly_t res, gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 polynomial_gen(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_gen(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
 {
     int status;
@@ -370,117 +387,117 @@ polynomial_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
-truth_t
+static truth_t
 polynomial_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
 {
     return gr_poly_is_zero(poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-truth_t
+static truth_t
 polynomial_is_one(const gr_poly_t poly, gr_ctx_t ctx)
 {
     return gr_poly_is_one(poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 /*
-truth_t
+static truth_t
 polynomial_is_neg_one(const gr_poly_t poly, gr_ctx_t ctx)
 {
     return gr_poly_is_neg_one(poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 */
 
-int
+static int
 polynomial_neg(gr_poly_t res, const gr_poly_t mat, gr_ctx_t ctx)
 {
     return gr_poly_neg(res, mat, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_add_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
 {
     return gr_poly_add_ui(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_add_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
 {
     return gr_poly_add_si(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_add_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
 {
     return gr_poly_add_fmpz(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_add_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
 {
     return gr_poly_add_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_add(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
     return gr_poly_add(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_sub_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
 {
     return gr_poly_sub_ui(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_sub_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
 {
     return gr_poly_sub_si(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_sub_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
 {
     return gr_poly_sub_fmpz(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_sub_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
 {
     return gr_poly_sub_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_sub(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
     return gr_poly_sub(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_mul_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
 {
     return gr_poly_mul_ui(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_mul_si(gr_poly_t res, const gr_poly_t poly, slong c, gr_ctx_t ctx)
 {
     return gr_poly_mul_si(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_mul_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t c, gr_ctx_t ctx)
 {
     return gr_poly_mul_fmpz(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_mul_fmpq(gr_poly_t res, const gr_poly_t poly, const fmpq_t c, gr_ctx_t ctx)
 {
     return gr_poly_mul_fmpq(res, poly, c, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 {
     if (POLYNOMIAL_CTX(ctx)->degree_limit != WORD_MAX)
@@ -493,7 +510,7 @@ polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
     return gr_poly_mul(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_mul_other(gr_poly_t res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     if (x_ctx == POLYNOMIAL_ELEM_CTX(ctx))
@@ -520,7 +537,7 @@ polynomial_mul_other(gr_poly_t res, const gr_poly_t poly, gr_srcptr x, gr_ctx_t 
     }
 }
 
-int
+static int
 polynomial_other_mul(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_poly_t poly, gr_ctx_t ctx)
 {
     if (x_ctx == POLYNOMIAL_ELEM_CTX(ctx))
@@ -547,7 +564,7 @@ polynomial_other_mul(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_poly_t
     }
 }
 
-int
+static int
 polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     if (y->length == 1)
@@ -590,13 +607,13 @@ polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx
     }
 }
 
-int
+static int
 polynomial_divexact(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     return gr_poly_divexact(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_euclidean_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     gr_poly_t r;
@@ -607,7 +624,7 @@ polynomial_euclidean_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, co
     return status;
 }
 
-int
+static int
 polynomial_euclidean_rem(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     gr_poly_t q;
@@ -618,31 +635,31 @@ polynomial_euclidean_rem(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, co
     return status;
 }
 
-int
+static int
 polynomial_euclidean_divrem(gr_poly_t res1, gr_poly_t res2, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     return gr_poly_divrem(res1, res2, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_inv(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 {
     return gr_poly_inv(res, poly, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_pow_ui(gr_poly_t res, const gr_poly_t poly, ulong exp, gr_ctx_t ctx)
 {
     return gr_poly_pow_ui(res, poly, exp, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_pow_fmpz(gr_poly_t res, const gr_poly_t poly, const fmpz_t exp, gr_ctx_t ctx)
 {
     return gr_poly_pow_fmpz(res, poly, exp, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_pow_si(gr_poly_t res, const gr_poly_t poly, slong exp, gr_ctx_t ctx)
 {
     int status;
@@ -653,24 +670,71 @@ polynomial_pow_si(gr_poly_t res, const gr_poly_t poly, slong exp, gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
+polynomial_derivative_gen(gr_poly_t res, const gr_poly_t poly, slong var, gr_ctx_t ctx)
+{
+    return (var == 0) ? gr_poly_derivative(res, poly, POLYNOMIAL_ELEM_CTX(ctx)) : GR_DOMAIN;
+}
+
+static int
 polynomial_gcd(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
     return gr_poly_gcd(res, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-int
+static int
 polynomial_canonical_associate(gr_poly_t ux, gr_poly_t u, const gr_poly_t x, gr_ctx_t ctx)
 {
     return gr_poly_canonical_associate(ux, u, x, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
 
-int
+static int
 polynomial_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
 {
     gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
     return GR_FACTOR_OP(cctx, POLY_FACTOR)(c, fac, mult, pol, flags, cctx);
+}
+
+/* TODO: account for sparsity */
+#define MUL_KS_CUTOFF 5
+
+/* Don't do extremely deep recursive KS; the polynomials will
+   typically be too sparse, and we risk blowing up memory too. */
+#define MUL_KS_DEPTH_LIMIT 3
+
+/* Assume that the underlying polynomial ring has asymptotically
+   fast univariate multiplication if it overrides the default
+   multiplication routine. */
+
+static int
+want_KS(gr_ctx_t cctx, slong depth)
+{
+    if (cctx->methods[GR_METHOD_POLY_MULLOW] == (gr_funcptr) _gr_poly_mullow_generic)
+        return 0;
+
+    /* If the coefficients are polynomials, check the ground ring. */
+    if (depth > MUL_KS_DEPTH_LIMIT)
+        return 0;
+
+    if (cctx->which_ring == GR_CTX_GR_POLY)
+        return want_KS(POLYNOMIAL_ELEM_CTX(cctx), depth + 1);
+
+    return 1;
+}
+
+static int
+_polynomial_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+
+    if (len1 < MUL_KS_CUTOFF || len2 < MUL_KS_CUTOFF || n < MUL_KS_CUTOFF)
+        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+
+    if (!want_KS(cctx, 0))
+        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+
+    return _gr_poly_mullow_bivariate_KS(res, poly1, len1, poly2, len2, n, ctx);
 }
 
 
@@ -694,6 +758,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_poly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_gr_poly_ctx_gen_name},
 
     {GR_METHOD_INIT,        (gr_funcptr) polynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) polynomial_clear},
@@ -749,6 +815,8 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_DIVEXACT,    (gr_funcptr) polynomial_divexact},
     {GR_METHOD_INV,         (gr_funcptr) polynomial_inv},
 
+    {GR_METHOD_DERIVATIVE_GEN,        (gr_funcptr) polynomial_derivative_gen},
+
     {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) polynomial_euclidean_div},
     {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) polynomial_euclidean_rem},
     {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) polynomial_euclidean_divrem},
@@ -760,6 +828,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_GCD,         (gr_funcptr) polynomial_gcd},
 
     {GR_METHOD_FACTOR,      (gr_funcptr) polynomial_factor},
+    {GR_METHOD_POLY_MULLOW, (gr_funcptr) _polynomial_gr_poly_mullow},
 
     {0,                     (gr_funcptr) NULL},
 };

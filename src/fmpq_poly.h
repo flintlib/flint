@@ -616,11 +616,41 @@ void fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a)
 
 /*  Interpolation ************************************************************/
 
-void _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
+int _fmpq_poly_interpolate_fmpq_vec(fmpz *coeffs, fmpz_t den,
+                                            const fmpq *xs, const fmpq *ys, slong n);
+
+int fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly,
+                                    const fmpq * xs, const fmpq * ys, slong n);
+
+int fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly,
+                                        const fmpz * xs, const fmpq * ys, slong n);
+
+int fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, slong n);
 
-void fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpz * ys, slong n);
+void _fmpq_poly_interpolation_weights(fmpz * w, fmpz_t wden,
+                                      const fmpq * xs, slong len);
+
+void _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den,
+    const fmpq * ys, fmpz * const * tree, const fmpz * weights, slong len);
+
+void _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den,
+                                const fmpq * xs, const fmpq * ys, slong len);
+
+void fmpq_poly_interpolate_fast(fmpq_poly_t poly,
+                                const fmpq * xs, const fmpq * ys, slong n);
+
+void _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,
+                                    const fmpq * xs, const fmpq * ys, slong n);
+
+void fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly,
+                                    const fmpq * xs, const fmpq * ys, slong n);
+
+void _fmpq_poly_interpolate_barycentric(fmpz * poly, fmpz_t den,
+                                    const fmpq * xs, const fmpq * ys, slong n);
+
+void fmpq_poly_interpolate_barycentric(fmpq_poly_t poly,
+                                    const fmpq * xs, const fmpq * ys, slong n);
 
 /*  Composition  *************************************************************/
 
@@ -710,6 +740,10 @@ void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly);
 /*  Square-free  *************************************************************/
 
 int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
+
+/* Discriminant **************************************************************/
+void _fmpq_poly_discriminant(fmpq_t res, const fmpz* poly, const fmpz_t den, slong len);
+void fmpq_poly_discriminant(fmpq_t res, const fmpq_poly_t poly);
 
 /*  Input and output *********************************************************/
 

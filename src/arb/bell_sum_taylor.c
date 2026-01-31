@@ -15,7 +15,7 @@
 /* tuning parameter */
 #define RADIUS_BITS 3
 
-void
+static void
 _arb_bell_sum_taylor(arb_t res, const fmpz_t n,
         const fmpz_t a, const fmpz_t b, const fmpz_t mmag, slong tol)
 {

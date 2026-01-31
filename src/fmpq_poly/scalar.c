@@ -87,7 +87,7 @@ void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq
 {
     if (fmpq_is_zero(c))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_scalar_div_fmpq). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpq_poly_scalar_div_fmpq). Division by zero.\n");
     }
 
     if (fmpq_poly_is_zero(op))
@@ -141,7 +141,7 @@ void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
 {
     if (*c == WORD(0))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_scalar_div_fmpz). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpq_poly_scalar_div_fmpz). Division by zero.\n");
     }
 
     if (fmpq_poly_is_zero(op))
@@ -206,7 +206,7 @@ void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
 {
     if (c == WORD(0))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_scalar_div_si). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpq_poly_scalar_div_si). Division by zero.\n");
     }
 
     if (fmpq_poly_is_zero(op))
@@ -254,7 +254,7 @@ void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 {
     if (c == UWORD(0))
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_scalar_div_ui). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpq_poly_scalar_div_ui). Division by zero.\n");
     }
 
     if (fmpq_poly_is_zero(op))

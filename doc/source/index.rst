@@ -94,6 +94,7 @@ Integers
    fft.rst
    fft_small.rst
    qsieve.rst
+   radix.rst
 
 
 .. only:: not latex
@@ -307,8 +308,6 @@ Floating-point support code
    double_interval.rst
    d_vec.rst
    d_mat.rst
-   mpfr_vec.rst
-   mpfr_mat.rst
 
 Interfaces
 -----------------------------------

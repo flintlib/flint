@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 #include "gr_series.h"
-
+#include "gr_series/impl.h"
 
 static const char * default_var = "x";
 
@@ -116,6 +116,9 @@ int gr_series_mod_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 {
     return gr_series_mod_ctx_set_gen_name(ctx, s[0]);
 }
+
+
+#define _gr_series_mod_ctx_gen_name _gr_series_ctx_gen_name
 
 int
 gr_series_mod_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
@@ -303,7 +306,7 @@ int gr_series_mod_sqrt(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 }
 
 
-int
+static int
 _set_truncate_poly(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_elem_ctx, slong n, gr_ctx_t elem_ctx)
 {
     if (x_elem_ctx == elem_ctx)
@@ -394,6 +397,8 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) gr_series_mod_ctx_write},
     {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) gr_series_mod_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES, (gr_funcptr) gr_series_mod_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,    (gr_funcptr) _gr_series_mod_ctx_gen_name},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) gr_series_mod_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_series_mod_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN, (gr_funcptr) gr_series_mod_ctx_is_integral_domain},

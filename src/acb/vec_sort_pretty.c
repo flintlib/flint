@@ -20,7 +20,7 @@ typedef int(*__compar_fn_t) (__const void *, __const void *);
 #endif
 #endif
 
-int acb_cmp_pretty(const acb_t a, const acb_t b)
+static int acb_cmp_pretty(const acb_t a, const acb_t b)
 {
     arb_t t, u, v;
     int res;

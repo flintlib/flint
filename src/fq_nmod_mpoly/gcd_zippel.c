@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-int fq_nmod_mpolyu_gcdm_zippel_bivar(
+static int fq_nmod_mpolyu_gcdm_zippel_bivar(
     fq_nmod_mpolyu_t G,
     fq_nmod_mpolyu_t Abar,
     fq_nmod_mpolyu_t Bbar,

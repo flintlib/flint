@@ -14,6 +14,7 @@
 #include <double_extras.h>
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 
 PUSH_OPTIONS
 DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED
@@ -108,7 +109,9 @@ dpe_mul(dpe_t x, dpe_t y)
     return res;
 }
 
-double _fmpz_poly_evaluate_horner_d_2exp2_precomp(slong * exp, const double * poly, const slong * poly_exp, slong n, double d, slong dexp)
+double
+_fmpz_poly_evaluate_horner_d_2exp2_precomp(slong * exp, const double * poly,
+        const slong * poly_exp, slong n, double d, slong dexp)
 {
     dpe_t s, t, x;
     slong i;

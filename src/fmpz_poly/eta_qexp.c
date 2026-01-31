@@ -34,7 +34,7 @@ _eta_one(fmpz * c, slong N)
     }
 }
 
-void
+static void
 _eta_two(fmpz * c, slong N)
 {
     slong k1, n1, k2, n2;

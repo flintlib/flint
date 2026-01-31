@@ -19,7 +19,7 @@ fmpz_poly_q_scalar_div_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmp
     fmpz_t num, den;
 
     if (fmpz_sgn(fmpq_numref(x)) == 0)
-        flint_throw(FLINT_ERROR, "Division by zero in %s\n", __func__);
+        flint_throw(FLINT_DIVZERO, "Division by zero in %s\n", __func__);
 
     fmpz_init(num);
     fmpz_init(den);
@@ -40,7 +40,7 @@ fmpz_poly_q_scalar_div_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmp
     fmpz_t y;
 
     if (fmpz_sgn(x) == 0)
-        flint_throw(FLINT_ERROR, "Division by zero in %s\n", __func__);
+        flint_throw(FLINT_DIVZERO, "Division by zero in %s\n", __func__);
 
     fmpz_init(y);
     fmpz_set(y, x);
@@ -60,7 +60,7 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong 
     {
         if (x == 0)
         {
-            flint_throw(FLINT_ERROR, "Exception (fmpz_poly_q_scalar_div_si). Division by zero.\n");
+            flint_throw(FLINT_DIVZERO, "Exception (fmpz_poly_q_scalar_div_si). Division by zero.\n");
         }
         if (x == 1)
             fmpz_poly_q_set(rop, op);

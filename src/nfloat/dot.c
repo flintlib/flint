@@ -35,7 +35,7 @@
         (r1) = __r1; (r2) = __r2; (r3) = __r3;                            \
     } while (0)
 
-void
+static void
 _nfloat_vec_dot_set_initial(ulong * s, slong sexp, nfloat_srcptr x, int subtract, slong nlimbs)
 {
     slong xexp, delta;
@@ -72,7 +72,7 @@ _nfloat_vec_dot_set_initial(ulong * s, slong sexp, nfloat_srcptr x, int subtract
 }
 
 /* n is the number of limbs of s and x */
-void
+static void
 _nfloat_vec_dot_add_limbs(ulong * s, slong sexp, mp_srcptr x, slong xexp, int subtract, slong n)
 {
     slong delta, delta_limbs, delta_bits;
@@ -121,7 +121,7 @@ _nfloat_vec_dot_add_limbs(ulong * s, slong sexp, mp_srcptr x, slong xexp, int su
 
 #include <math.h>
 
-void
+static void
 _nfloat_vec_dot_addmul(ulong * s, slong sexp, nfloat_srcptr xi, nfloat_srcptr yi, int subtract, slong nlimbs)
 {
     slong xexp, delta;
@@ -205,10 +205,10 @@ _nfloat_vec_dot_addmul(ulong * s, slong sexp, nfloat_srcptr xi, nfloat_srcptr yi
     }
 }
 
-int
+static int
 __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, slong sizeof_xstep, nfloat_srcptr y, slong sizeof_ystep, slong len, gr_ctx_t ctx)
 {
-    if (NFLOAT_CTX_NLIMBS(ctx) == 1 && !(NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)))
+    if (NFLOAT_CTX_NLIMBS(ctx) == 1 && !NFLOAT_CTX_HAS_INF_NAN(ctx))
     {
         slong i, xexp, delta, sexp, norm, pad_bits;
         int xsgnbit;
@@ -244,6 +244,11 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
 
         pad_bits = FLINT_BIT_COUNT(len + 1) + 1;
         sexp += pad_bits;
+
+        /* Final perturbation could require an extra bit. To do:
+           don't increase the exponent; check overflow when doing the
+           perturbation instead. */
+        sexp += NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx);
 
         if (initial != NULL && !NFLOAT_IS_ZERO(initial))
         {
@@ -330,6 +335,42 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
             }
         }
 
+        if (NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+        {
+            ulong err;
+            int round_up;
+
+            round_up = (NFLOAT_CTX_FLAGS(ctx) & NFLOAT_RND_CEIL) != 0;
+            round_up ^= subtract;
+
+            /* Theorem 7 in paper. TODO: improve for sparse or exact dot products. */
+            err = len * 4 + (initial != NULL);
+
+            if (round_up)
+                add_ssaaaa(s1, s0, s1, s0, 0, err);
+            else
+                sub_ddmmss(s1, s0, s1, s0, 0, err);
+
+            if (LIMB_MSB_IS_SET(s1))
+            {
+                sub_ddmmss(s1, s0, 0, 0, s1, s0);
+                xsgnbit = 1;
+            }
+            else
+            {
+                xsgnbit = 0;
+            }
+
+            xsgnbit ^= subtract;
+
+            ulong ss[2];
+
+            ss[0] = s0;
+            ss[1] = s1;
+
+            return nfloat_set_mpn_2exp(res, ss, 2, sexp, xsgnbit, ctx);
+        }
+
         if (LIMB_MSB_IS_SET(s1))
         {
             sub_ddmmss(s1, s0, 0, 0, s1, s0);
@@ -366,7 +407,7 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         return GR_SUCCESS;
     }
 
-    if (NFLOAT_CTX_NLIMBS(ctx) == 2 && !(NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)))
+    if (NFLOAT_CTX_NLIMBS(ctx) == 2 && !NFLOAT_CTX_HAS_INF_NAN(ctx))
     {
         slong i, xexp, delta, sexp, norm, pad_bits;
         int xsgnbit;
@@ -397,6 +438,11 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
 
         pad_bits = FLINT_BIT_COUNT(len + 1) + 1;
         sexp += pad_bits;
+
+        /* Final perturbation could require an extra bit. To do:
+           don't increase the exponent; check overflow when doing the
+           perturbation instead. */
+        sexp += NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx);
 
         if (initial != NULL && !NFLOAT_IS_ZERO(initial))
         {
@@ -503,6 +549,43 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
             }
         }
 
+        if (NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+        {
+            ulong err;
+            int round_up;
+
+            round_up = (NFLOAT_CTX_FLAGS(ctx) & NFLOAT_RND_CEIL) != 0;
+            round_up ^= subtract;
+
+            /* Theorem 7 in paper. TODO: improve for sparse or exact dot products. */
+            err = len * 4 + (initial != NULL);
+
+            if (round_up)
+                add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, 0, err);
+            else
+                sub_dddmmmsss(s2, s1, s0, s2, s1, s0, 0, 0, err);
+
+            if (LIMB_MSB_IS_SET(s2))
+            {
+                sub_dddmmmsss(s2, s1, s0, 0, 0, 0, s2, s1, s0);
+                xsgnbit = 1;
+            }
+            else
+            {
+                xsgnbit = 0;
+            }
+
+            xsgnbit ^= subtract;
+
+            ulong ss[3];
+
+            ss[0] = s0;
+            ss[1] = s1;
+            ss[2] = s2;
+
+            return nfloat_set_mpn_2exp(res, ss, 3, sexp, xsgnbit, ctx);
+        }
+
         if (LIMB_MSB_IS_SET(s2))
         {
             sub_dddmmmsss(s2, s1, s0, 0, 0, 0, s2, s1, s0);
@@ -561,7 +644,7 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         return GR_SUCCESS;
     }
 
-    if (!(NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)))
+    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
     {
         slong i, xexp, sexp, pad_bits;
         int xsgnbit;
@@ -592,6 +675,11 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         pad_bits = FLINT_BIT_COUNT(len + 1) + 1;
         sexp += pad_bits;
 
+        /* Final perturbation could require an extra bit. To do:
+           don't increase the exponent; check overflow when doing the
+           perturbation instead. */
+        sexp += NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx);
+
         if (initial != NULL && !NFLOAT_IS_ZERO(initial))
             _nfloat_vec_dot_set_initial(s, sexp, initial, subtract, nlimbs);
 
@@ -601,6 +689,25 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
                 continue;
 
             _nfloat_vec_dot_addmul(s, sexp, xi, yi, 0, nlimbs);
+        }
+
+        if (NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
+        {
+            ulong err;
+            int round_up;
+
+            round_up = (NFLOAT_CTX_FLAGS(ctx) & NFLOAT_RND_CEIL) != 0;
+            round_up ^= subtract;
+
+            /* Theorem 7 in paper. TODO: improve for sparse or exact dot products. */
+            /* Todo: on 32-bit, there is a chance of overflow if nlimbs and
+               len are both large; we should intercept this. */
+            err = len * (nlimbs + 2) + (initial != NULL);
+
+            if (round_up)
+                mpn_add_1(s, s, nlimbs + 1, err);
+            else
+                mpn_sub_1(s, s, nlimbs + 1, err);
         }
 
         if (LIMB_MSB_IS_SET(s[nlimbs]))
@@ -766,7 +873,7 @@ _flint_mpn_signed_add_n(nn_ptr res, nn_srcptr x, int xsgnbit, nn_srcptr y, int y
     return xsgnbit;
 }
 
-int
+static int
 __nfloat_complex_vec_dot(nfloat_complex_ptr res, nfloat_complex_srcptr initial, int subtract, nfloat_complex_srcptr x, slong xstep, nfloat_complex_srcptr y, slong ystep, slong len, gr_ctx_t ctx)
 {
     slong i, pad_bits;

@@ -23,7 +23,7 @@ fmpz_poly_remove(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     if (poly2->length == 0)
     {
-        flint_throw(FLINT_ERROR, "(fmpz_poly_remove): Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "(fmpz_poly_remove): Division by zero.\n");
     }
 
     if (poly2->length == 1 && fmpz_is_pm1(poly2->coeffs + 0))

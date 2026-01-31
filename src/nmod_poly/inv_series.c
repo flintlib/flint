@@ -14,6 +14,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 #include "gr_poly.h"
 
 void
@@ -84,7 +85,7 @@ nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_inv_series). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_inv_series). Division by zero.\n");
     }
 
     if (Qinv != Q)
@@ -114,7 +115,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_inv_series_basecase). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_inv_series_basecase). Division by zero.\n");
     }
 
     if (Qinv != Q)

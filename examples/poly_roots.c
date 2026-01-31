@@ -184,11 +184,11 @@ int main(int argc, char *argv[])
     fmpz_poly_factor_init(fac);
 
     flint_printf("computing squarefree factorization...\n");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     fmpz_poly_factor_squarefree(fac, f);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     for (i = 0; i < fac->num; i++)
     {
         deg = fmpz_poly_degree(fac->p + i);
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 
         _acb_vec_clear(roots, deg);
     }
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     fmpz_poly_factor_clear(fac);
     fmpz_poly_clear(f);

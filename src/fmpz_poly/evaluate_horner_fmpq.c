@@ -31,8 +31,6 @@ _fmpz_poly_evaluate_horner_fmpq(fmpz_t rnum, fmpz_t rden,
     else
     {
         slong i = len - 1;
-        fmpz_t d;
-        fmpz_init(d);
 
         fmpz_set(rnum, f + i);
         fmpz_one(rden);
@@ -47,12 +45,6 @@ _fmpz_poly_evaluate_horner_fmpq(fmpz_t rnum, fmpz_t rden,
                 fmpz_one(rden);
         }
         while (i);
-
-        fmpz_gcd(d, rnum, rden);
-        fmpz_divexact(rnum, rnum, d);
-        fmpz_divexact(rden, rden, d);
-
-        fmpz_clear(d);
     }
 }
 
@@ -71,5 +63,6 @@ fmpz_poly_evaluate_horner_fmpq(fmpq_t res, const fmpz_poly_t f, const fmpq_t a)
     {
         _fmpz_poly_evaluate_horner_fmpq(fmpq_numref(res), fmpq_denref(res),
             f->coeffs, f->length, fmpq_numref(a), fmpq_denref(a));
+        fmpq_canonicalise(res);
     }
 }

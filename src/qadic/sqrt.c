@@ -15,6 +15,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
+#include "qadic/impl.h"
 
 static int __fmpz_mod_poly_invmod(fmpz *A,
                           const fmpz *B, slong lenB,
@@ -795,7 +796,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
+static int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
                 const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N)
 {

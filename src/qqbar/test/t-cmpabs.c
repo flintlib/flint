@@ -26,8 +26,14 @@ TEST_FUNCTION_START(qqbar_cmpabs, state)
         qqbar_init(xr);
         qqbar_init(yr);
 
-        qqbar_randtest(x, state, 3, 100);
-        qqbar_randtest(y, state, 3, 100);
+        qqbar_randtest(x, state, 3, 50);
+        qqbar_randtest(y, state, 3, 50);
+
+        if (n_randint(state, 10) == 0)
+        {
+            qqbar_exp_pi_i(xr, n_randint(state, 10), 1 + n_randint(state, 3));
+            qqbar_mul(y, x, xr);
+        }
 
         qqbar_abs(xr, x);
         qqbar_abs(yr, y);

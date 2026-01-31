@@ -42,23 +42,27 @@ in `\mathbb{Z}/7\mathbb Z[x]`.
 
 .. code:: c
 
-   #include "fmpz_mod_poly.h"
-   int main()
+   #include "flint/fmpz_mod.h"
+   #include "flint/fmpz_mod_poly.h"
+   int main(void)
    {
-       fmpz_t n;
+       fmpz_mod_ctx_t ctx;
        fmpz_mod_poly_t x, y;
 
-       fmpz_init_set_ui(n, 7);
-       fmpz_mod_poly_init(x, n);
-       fmpz_mod_poly_init(y, n);
-       fmpz_mod_poly_set_coeff_ui(x, 3, 5);
-       fmpz_mod_poly_set_coeff_ui(x, 0, 6);
-       fmpz_mod_poly_sqr(y, x);
-       fmpz_mod_poly_print(x); flint_printf("\n");
-       fmpz_mod_poly_print(y); flint_printf("\n");
-       fmpz_mod_poly_clear(x);
-       fmpz_mod_poly_clear(y);
-       fmpz_clear(n);
+       fmpz_mod_ctx_init_ui(ctx, 7);
+       fmpz_mod_poly_init(x, ctx);
+       fmpz_mod_poly_init(y, ctx);
+       fmpz_mod_poly_set_coeff_ui(x, 3, 5, ctx);
+       fmpz_mod_poly_set_coeff_ui(x, 0, 6, ctx);
+       fmpz_mod_poly_sqr(y, x, ctx);
+
+       flint_printf("x = %{fmpz_mod_poly} (%{fmpz_mod_ctx})\n"
+                    "x^2 = %{fmpz_mod_poly} (%{fmpz_mod_ctx})\n",
+                    x, ctx, y, ctx);
+
+       fmpz_mod_poly_clear(x, ctx);
+       fmpz_mod_poly_clear(y, ctx);
+       fmpz_mod_ctx_clear(ctx);
    }
 
 The output is:
@@ -1779,7 +1783,7 @@ depends on~`r` and an upper bound on the degree of~`f`.
 
     where necessarily `N = \lfloor\deg(F) / \deg(R)\rfloor`.
 
-    Assumes that `R` is non-constant, i.e.\ `\deg(R) \geq 1`,
+    Assumes that `R` is non-constant, i.e., `\deg(R) \geq 1`,
     and that the leading coefficient is a unit.
 
 

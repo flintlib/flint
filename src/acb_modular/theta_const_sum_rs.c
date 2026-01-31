@@ -11,6 +11,7 @@
 
 #include "acb.h"
 #include "acb_modular.h"
+#include "acb_modular/impl.h"
 
 static const int square_best_m[] = {
   2, 3, 4, 8, 12, 16, 32, 48, 80, 96,

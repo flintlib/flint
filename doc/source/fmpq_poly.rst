@@ -1006,6 +1006,25 @@ Greatest common divisor
     be an integer.
 
 
+Discriminant
+--------------------------------------------------------------------------------
+
+
+.. function:: void _fmpq_poly_discriminant(fmpq_t res, const fmpz * poly, const fmpz_t den, slong len)
+
+    Set ``res`` to the discriminant of ``(poly, den, len)``. Assumes
+    ``len > 1``.
+
+.. function:: void fmpq_poly_discriminant(fmpq_t res, const fmpq_poly_t poly)
+
+    Set ``res`` to the discriminant of ``poly``. We normalise the
+    discriminant so that `\operatorname{disc}(f) = (-1)^{(n(n-1)/2)}
+    \operatorname{res}(f, f')/\operatorname{lc}(f)`, thus
+    `\operatorname{disc}(f) = \operatorname{lc}(f)^{(2n - 2)} \prod_{i < j} (r_i
+    - r_j)^2`, where `\operatorname{lc}(f)` is the leading coefficient of `f`,
+    `n` is the degree of `f` and `r_i` are the roots of `f`.
+
+
 Derivative and integral
 --------------------------------------------------------------------------------
 
@@ -1388,30 +1407,42 @@ Evaluation
 
 Interpolation
 --------------------------------------------------------------------------------
+.. function:: void _fmpq_poly_interpolation_weights(fmpz * w, fmpz_t wden, const fmpq * xs, slong len)
+              void _fmpq_poly_interpolate_fast_precomp(fmpz * poly, fmpz_t den, const fmpq * ys, fmpz * const * tree, const fmpz * weights, slong len)
+              void _fmpq_poly_interpolate_fast(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong len)
+              void fmpq_poly_interpolate_fast(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
 
+    Fast polynomial interpolation using a subproduct tree assuming the evaluation points `x_i` are distinct.
+    The *precomp* version requires a precomputed subproduct tree generated using
+    :func:`_fmpz_poly_tree_build_fmpq_vec` and precomputed interpolation weights
+    generated using :func:`_fmpq_poly_interpolation_weights`.
 
-.. function:: void _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den, const fmpz * xs, const fmpz * ys, slong n)
+.. function:: void _fmpq_poly_interpolate_barycentric(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
+              void fmpq_poly_interpolate_barycentric(fmpz_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
+              void _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
+              void fmpq_poly_interpolate_multi_mod(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
+              int _fmpq_poly_interpolate_fmpq_vec(fmpz * poly, fmpz_t den, const fmpq * xs, const fmpq * ys, slong n)
+              int fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
+              int fmpq_poly_interpolate_fmpz_fmpq_vec(fmpq_poly_t poly, const fmpz * xs, const fmpq * ys, slong n)
+              int fmpq_poly_interpolate_fmpq_vec(fmpq_poly_t poly, const fmpq * xs, const fmpq * ys, slong n)
 
-    Sets ``poly`` / ``den`` to the unique interpolating polynomial of
+    Sets ``poly`` (or ``poly`` / ``den``) to the unique interpolating polynomial of
     degree at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
     in ``xs`` and ``ys``.
 
-    The vector ``poly`` must have room for ``n+1`` coefficients,
-    even if the interpolating polynomial is shorter.
-    Aliasing of ``poly`` or ``den`` with any other argument is not
-    allowed.
+    The *barycentric* uses a naive implementation of Lagrange interpolation in its barycentric form,
+    clearing denominators to avoid working with fractions.
+    It assumes that the evaluation points `x_i` are distinct.
 
-    It is assumed that the `x` values are distinct.
+    The *multi_mod* algorithm performs interpolation modulo one or more prime numbers and combines
+    the results using the Chinese Remainder Theorem (CRT) with adaptive termination.
+    This function is particularly efficient when the interpolated polynomial is expected
+    to have small-bitsize coefficients.
+    It assumes that the evaluation points `x_i` are distinct.
 
-    This function uses a simple `O(n^2)` implementation of Lagrange
-    interpolation, clearing denominators to avoid working with fractions.
-    It is currently not designed to be efficient for large `n`.
-
-.. function:: void fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly, const fmpz * xs, const fmpz * ys, slong n)
-
-    Sets ``poly`` to the unique interpolating polynomial of degree
-    at most `n - 1` satisfying `f(x_i) = y_i` for every pair `x_i, y_i`
-    in ``xs`` and ``ys``. It is assumed that the `x` values are distinct.
+    The default implementation first checks that the `x_i` are distinct and, if so, automatically chooses
+    between the *barycentric*, *multi_mod* and *fast* algorithms.
+    It returns 1 if the `x_i` are distinct, otherwise 0.
 
 
 Composition

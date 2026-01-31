@@ -278,6 +278,15 @@ Context operations
     The name is used when printing and may be used to choose
     coercions.
 
+.. function:: int gr_ctx_ngens(slong * ngens, gr_ctx_t ctx)
+
+    Get the number of generators.
+
+.. function:: int gr_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+
+    Get the name of the generator of index *i*.
+    The returned buffer must be freed with :func:`flint_free`.
+
 Element operations
 --------------------------------------------------------------------------------
 
@@ -458,6 +467,10 @@ Assignment and conversions
               int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx)
 
     Set or retrieve a dyadic number `a \cdot 2^b`.
+
+.. function:: int gr_get_d_2exp_si(double * res, slong * exp, gr_srcptr x, gr_ctx_t ctx)
+
+    Returns `m 2^e \approx x` with `0.5 \le |m| < 1` if *x* is nonzero.
 
 .. function:: int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t a, const fmpz_t b, gr_ctx_t ctx)
 
@@ -726,6 +739,14 @@ Powering
     should override these methods with faster versions or
     to support more general notions of exponentiation when possible.
 
+Derivative
+........................................................................
+
+.. function:: int gr_derivative_gen(gr_ptr res, gr_srcptr x, slong var, gr_ctx_t ctx)
+
+    Sets *res* to the derivative of *x* with respect to the variable of index *var*.
+    The variables here are the generators of *ctx*.
+
 Square roots
 ........................................................................
 
@@ -784,7 +805,7 @@ Factorization
 
     where `f_k` will be irreducible or prime (depending on `R`).
 
-    The prefactor `c` stores a unit, sign, or coefficient, e.g.\ the
+    The prefactor `c` stores a unit, sign, or coefficient, e.g., the
     sign `-1`, `0` or `+1` in `\mathbb{Z}`, or a sign multiplied
     by the coefficient content in `\mathbb{Z}[x]`.
     Note that this function outputs `c` as an element of the

@@ -434,7 +434,7 @@ _nfloat_mat_exp_range(slong * _Amin, slong * _Amax, const gr_mat_t A, gr_ctx_t c
     _Amax[0] = Amax;
 }
 
-int
+static int
 _nfloat_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong Aexp, slong Bexp, slong fnlimbs, gr_ctx_t ctx)
 {
     nn_ptr T, TA, TB, TC;
@@ -575,7 +575,7 @@ _nfloat_2exp_get_fmpz(fmpz_t res, nfloat_srcptr x, slong fixexp, gr_ctx_t ctx)
     _fmpz_demote_val(res);
 }
 
-int
+static int
 nfloat_mat_addmul_block_fallback(gr_mat_t C,
     const gr_mat_t A, const gr_mat_t B,
     slong block_start,
@@ -618,7 +618,7 @@ nfloat_mat_addmul_block_fallback(gr_mat_t C,
     return status;
 }
 
-int
+static int
 nfloat_mat_addmul_block_prescaled(gr_mat_t C,
     const gr_mat_t A, const gr_mat_t B,
     slong block_start,
@@ -735,7 +735,7 @@ _nfloat_nbits(nfloat_srcptr x, slong nlimbs)
     return bits;
 }
 
-int
+static int
 nfloat_complex_mat_addmul_block_fallback(gr_mat_t C,
     const gr_mat_t A, const gr_mat_t B,
     slong block_start,
@@ -785,7 +785,7 @@ _nfloat_complex_2exp_get_fmpz_fmpz(fmpz_t res1, fmpz_t res2, nfloat_complex_srcp
     _nfloat_2exp_get_fmpz(res2, NFLOAT_COMPLEX_IM(x, ctx), fixexp, ctx);
 }
 
-int
+static int
 nfloat_complex_mat_addmul_block_prescaled(gr_mat_t C,
     const gr_mat_t A, const gr_mat_t B,
     slong block_start,
@@ -1305,7 +1305,7 @@ _nfloat_complex_mat_exp_range(slong * _Amin, slong * _Amax, const gr_mat_t A, gr
     _Amax[0] = Amax;
 }
 
-int
+static int
 _nfloat_complex_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong Aexp, slong Bexp, slong fnlimbs, gr_ctx_t ctx)
 {
     nn_ptr T, Aa, Ab, Ba, Bb, AaBa, AbBb, Cb;
@@ -1601,7 +1601,7 @@ _set_imag_part(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx)
                             ndlimbs);
 }
 
-int
+static int
 _nfloat_complex_mat_mul_reorder(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int Areal, int Breal, gr_ctx_t ctx)
 {
     gr_mat_t X, Y, Z, W;
@@ -1745,7 +1745,8 @@ nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
     dim = FLINT_MIN(n, FLINT_MIN(m, p));
 
-    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
+    /* To do: fast matrix mul with inf/nan or directed rounding */
+    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx) || NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx))
         return gr_mat_mul_classical(C, A, B, ctx);
 
     prec = NFLOAT_CTX_PREC(ctx);

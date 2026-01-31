@@ -42,8 +42,7 @@ typedef struct
 }
 worker_args_struct;
 
-static void
-_fmpz_get_str_recursive(fmpz_t res, const char * s, slong slen, const slong * exps, slong cur_depth, slong depth, const fmpz * pows);
+static void _fmpz_get_str_recursive(fmpz_t res, const char * s, slong slen, const slong * exps, slong cur_depth, slong depth, const fmpz * pows);
 
 static void
 worker(void * arg)
@@ -154,7 +153,7 @@ _fmpz_get_str_recursive(fmpz_t res, const char * s, slong slen, const slong * ex
     }
 }
 
-void
+static void
 fmpz_set_str_bsplit_threaded(fmpz_t res, const char * s, slong slen)
 {
     slong k, depth;
@@ -202,10 +201,6 @@ fmpz_set_str(fmpz_t res, const char * str, int base)
     slong slen, i;
     int neg = 0;
 
-    /* Let GMP handle unusual bases. */
-    if (base != 10)
-        return fmpz_set_str_fallback(res, str, base, 0);
-
     /* Allow leading whitespace. */
     while (isspace(str[0]))
         str++;
@@ -214,7 +209,17 @@ fmpz_set_str(fmpz_t res, const char * str, int base)
     {
         str++;
         neg = 1;
+
+        while (isspace(str[0]))
+            str++;
+        /* Checked specially, otherwise GMP might handle the second minus */
+        if (str[0] == '-')
+            return -1;
     }
+
+    /* Let GMP handle unusual bases. */
+    if (base != 10)
+        return fmpz_set_str_fallback(res, str, base, neg);
 
     slen = strlen(str);
 

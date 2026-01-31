@@ -744,20 +744,6 @@ Special functions
 Sparsity structure
 -------------------------------------------------------------------------------
 
-.. function:: void arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)
-
-    Sets each entry of *dest* to indicate whether the corresponding
-    entry of *src* is certainly zero.
-    If the entry of *src* at row `i` and column `j` is zero according to
-    :func:`arb_is_zero` then the entry of *dest* at that row and column
-    is set to one, otherwise that entry of *dest* is set to zero.
-
-.. function:: void arb_mat_entrywise_not_is_zero(fmpz_mat_t dest, const arb_mat_t src)
-
-    Sets each entry of *dest* to indicate whether the corresponding
-    entry of *src* is not certainly zero.
-    This the complement of :func:`arb_mat_entrywise_is_zero`.
-
 .. function:: slong arb_mat_count_is_zero(const arb_mat_t mat)
 
     Returns the number of entries of *mat* that are certainly zero
@@ -796,19 +782,18 @@ LLL reduction
     is not symmetric or the result of rounding is not a positive definite
     matrix. The warnings of :func:`arf_get_fmpz` apply.
 
-.. function:: void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
+.. function:: void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, double delta, double eta, slong prec)
 
     Given a symmetric positive definite matrix *A*, sets *U* to an invertible
-    matrix such that `U^T A U` is close to being LLL-reduced. If
-    :func:`arb_mat_spd_get_fmpz_mat` succeeds at the chosen precision, we call
-    :func:`fmpz_lll`, and otherwise set *U* to the identity matrix. The
-    warnings of :func:`arf_get_fmpz` apply.
+    matrix such that `U^T A U` is close to being LLL-reduced for the given
+    parameters `\delta,\eta`. If :func:`arb_mat_spd_get_fmpz_mat` succeeds at
+    the chosen precision, we call :func:`fmpz_lll`, and otherwise set *U* to
+    the identity matrix. The warnings of :func:`arf_get_fmpz` apply.
 
-.. function:: int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
+.. function:: int arb_mat_spd_is_lll_reduced(const arb_mat_t A, double delta, double eta, slong prec)
 
     Given a symmetric positive definite matrix *A*, returns nonzero iff *A* is
-    certainly LLL-reduced with a tolerance of `\varepsilon = 2^{tol\_exp}`,
-    meaning that it satisfies the inequalities `|\mu_{j,k}|\leq \eta +
-    \varepsilon` and `(\delta - \varepsilon) \lVert b_{k-1}^*\rVert^2 \leq
-    \lVert b_k^*\rVert^2 + \mu_{k,k-1}^2 \lVert b_{k-1}^*\rVert^2` (with the
-    usual notation) for the default parameters `\eta = 0.51`, `\delta = 0.99`.
+    certainly LLL-reduced for the given LLL parameters `\eta, \delta`, meaning
+    that it satisfies the inequalities `|\mu_{j,k}|\leq \eta` and `\delta
+    \lVert b_{k-1}^*\rVert^2 \leq \lVert b_k^*\rVert^2 + \mu_{k,k-1}^2 \lVert
+    b_{k-1}^*\rVert^2` (with the usual notation).

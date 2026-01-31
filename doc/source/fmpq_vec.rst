@@ -19,7 +19,6 @@ Memory management
     Frees an ``fmpq`` vector.
 
 
-
 Randomisation
 --------------------------------------------------------------------------------
 
@@ -34,6 +33,30 @@ Randomisation
     Sets the entries of a vector of the given length to random distinct
     rationals with numerator and denominator having up to the given number
     of bits per entry. The entries in the vector are sorted.
+
+
+Bit sizes and heights
+--------------------------------------------------------------------------------
+
+.. function:: void _fmpq_vec_max_height(fmpz_t height, const fmpq * vec, slong len);
+
+    Computes the maximum of the height of any coefficient of ``(vec, len)``,
+    each height being computed by :func:`fmpq_height`.
+
+.. function:: flint_bitcnt_t _fmpq_vec_max_height_bits(const fmpq * vec, slong len);
+
+    Computes the maximum number of bits of the height of any coefficient
+    of ``(vec, len)``, each one being computed by :func:`fmpq_height_bits`.
+
+
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: int _fmpq_vec_equal(const fmpq * vec1, const fmpq * vec2, slong len)
+
+    Compares two vectors of the given length and returns `1` if they are
+    equal, otherwise returns `0`.
 
 
 Sorting

@@ -73,6 +73,9 @@ extern "C" {
 #define NFLOAT_ALLOW_UNDERFLOW 1
 #define NFLOAT_ALLOW_INF       2
 #define NFLOAT_ALLOW_NAN       4
+/* Context flags for directed rounding (experimental) */
+#define NFLOAT_RND_FLOOR       8
+#define NFLOAT_RND_CEIL        16
 
 typedef struct
 {
@@ -92,6 +95,7 @@ typedef const void * nfloat_srcptr;
 #define NFLOAT_CTX_RND(ctx) (NFLOAT_CTX(ctx)->rnd)
 #define NFLOAT_CTX_DATA_NLIMBS(ctx) (NFLOAT_CTX_NLIMBS(ctx) + NFLOAT_HEADER_LIMBS)
 #define NFLOAT_CTX_HAS_INF_NAN(ctx) ((NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)) != 0)
+#define NFLOAT_CTX_HAS_DIRECTED_ROUNDING(ctx) ((NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_RND_FLOOR | NFLOAT_RND_CEIL)) != 0)
 
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[64 / FLINT_BITS]; } nfloat64_struct;
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[128 / FLINT_BITS]; } nfloat128_struct;
@@ -201,54 +205,7 @@ int nfloat_set_ui(nfloat_ptr res, ulong x, gr_ctx_t ctx);
 int nfloat_set_si(nfloat_ptr res, slong x, gr_ctx_t ctx);
 
 /* Here exp is understood such that {x, xn} is a fraction in [0, 1). */
-NFLOAT_INLINE int
-_nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
-{
-    ulong top;
-    slong norm;
-    slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
-
-    FLINT_ASSERT(xn >= 1);
-    FLINT_ASSERT(x[xn - 1] != 0);
-
-    top = x[xn - 1];
-
-    if (LIMB_MSB_IS_SET(top))
-    {
-        if (xn >= nlimbs)
-        {
-            flint_mpn_copyi(NFLOAT_D(res), x + xn - nlimbs, nlimbs);
-        }
-        else
-        {
-            flint_mpn_zero(NFLOAT_D(res), nlimbs - xn);
-            flint_mpn_copyi(NFLOAT_D(res) + nlimbs - xn, x, xn);
-        }
-    }
-    else
-    {
-        norm = flint_clz(top);
-
-        if (xn > nlimbs)
-        {
-            mpn_lshift(NFLOAT_D(res), x + xn - nlimbs, nlimbs, norm);
-            NFLOAT_D(res)[0] |= (x[xn - nlimbs - 1] >> (FLINT_BITS - norm));
-        }
-        else
-        {
-            flint_mpn_zero(NFLOAT_D(res), nlimbs - xn);
-            mpn_lshift(NFLOAT_D(res) + nlimbs - xn, x, xn, norm);
-        }
-
-        exp -= norm;
-    }
-
-    NFLOAT_SGNBIT(res) = xsgnbit;
-    NFLOAT_EXP(res) = exp;
-    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
-
-    return GR_SUCCESS;
-}
+int _nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx);
 
 NFLOAT_INLINE int
 nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
@@ -372,6 +329,9 @@ int nfloat_set_arf(nfloat_ptr res, const arf_t x, gr_ctx_t ctx);
 int nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx);
 #endif
 
+int nfloat_get_d_2exp_si(double * mant, slong * expo, nfloat_srcptr x, gr_ctx_t ctx);
+int nfloat_get_fmpz(fmpz_t res, nfloat_srcptr x, gr_ctx_t ctx);
+
 int nfloat_set_fmpq(nfloat_ptr res, const fmpq_t v, gr_ctx_t ctx);
 int nfloat_set_d(nfloat_ptr res, double x, gr_ctx_t ctx);
 int nfloat_set_str(nfloat_ptr res, const char * x, gr_ctx_t ctx);
@@ -460,7 +420,7 @@ int nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 int nfloat_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
 int nfloat_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
 int nfloat_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
-
+int nfloat_mat_lq(gr_mat_t L, gr_mat_t Q, const gr_mat_t A, gr_ctx_t ctx);
 
 /* Complex numbers */
 /* Note: we use the same context data for real and complex rings

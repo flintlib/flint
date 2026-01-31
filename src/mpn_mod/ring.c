@@ -25,7 +25,7 @@ int
 mpn_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Integers mod ");
-    gr_stream_write_free(out, _flint_mpn_get_str(MPN_MOD_CTX_MODULUS(ctx), MPN_MOD_CTX_NLIMBS(ctx)));
+    gr_stream_write_free(out, flint_mpn_get_str(NULL, 10, MPN_MOD_CTX_MODULUS(ctx), MPN_MOD_CTX_NLIMBS(ctx), 0));
     gr_stream_write(out, " (mpn)");
     return GR_SUCCESS;
 }
@@ -217,7 +217,7 @@ mpn_mod_randtest(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
 int
 mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, _flint_mpn_get_str(x, MPN_MOD_CTX_NLIMBS(ctx)));
+    gr_stream_write_free(out, flint_mpn_get_str(NULL, 10, x, MPN_MOD_CTX_NLIMBS(ctx), 0));
     return GR_SUCCESS;
 }
 
@@ -456,6 +456,19 @@ mpn_mod_mul(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
         if (norm)
             mpn_rshift(res, res, n, norm);
     }
+
+    return GR_SUCCESS;
+}
+
+int
+mpn_mod_fmma(nn_ptr res, nn_srcptr x, nn_srcptr y, nn_srcptr x2, nn_srcptr y2, gr_ctx_t ctx)
+{
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+
+    if (n == 2)
+        flint_mpn_fmmamod_preinvn_2(res, x, y, x2, y2, MPN_MOD_CTX_MODULUS_NORMED(ctx), MPN_MOD_CTX_MODULUS_PREINV(ctx), MPN_MOD_CTX_NORM(ctx));
+    else
+        flint_mpn_fmmamod_preinvn(res, x, y, x2, y2, n, MPN_MOD_CTX_MODULUS_NORMED(ctx), MPN_MOD_CTX_MODULUS_PREINV(ctx), MPN_MOD_CTX_NORM(ctx));
 
     return GR_SUCCESS;
 }

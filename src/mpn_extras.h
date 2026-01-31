@@ -243,7 +243,7 @@ void flint_mpn_mulmod_preinvn_2(mp_ptr r,
         mp_srcptr a, mp_srcptr b,
         mp_srcptr d, mp_srcptr dinv, ulong norm);
 
-char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
+char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int negative);
 
 
 #define MPN_NORM(a, an)                         \
@@ -288,6 +288,13 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
         umul_ppmm(__u2, __u1, __a1, __b0);                                \
         add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
         (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
+    } while (0)
+
+/* Low two words of 2x2 product */
+#define FLINT_MPN_MULLOW_2X2(r1, r0, a1, a0, b1, b0) \
+    do { \
+        umul_ppmm(r1, r0, a0, b0); \
+        (r1) += (a0) * (b1) + (a1) * (b0); \
     } while (0)
 
 /* Low three words of 2x2 product */
@@ -862,6 +869,12 @@ void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, mp_srcptr d, mp_s
 mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
 mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, mp_srcptr d, mp_size_t n, mp_srcptr dinv);
 
+mp_limb_t flint_mpn_divrem_1_preinv(mp_ptr qp, mp_srcptr up, mp_size_t n, mp_limb_t d, mp_limb_t dinv, unsigned int norm);
+mp_limb_t flint_mpn_divrem_2_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv);
+mp_limb_t flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm);
+mp_limb_t flint_mpn_divrem_3_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv);
+mp_limb_t flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm);
+
 /* composed arithmetic *******************************************************/
 
 mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n);
@@ -890,6 +903,23 @@ mp_size_t flint_mpn_gcd_full(mp_ptr gp, mp_srcptr ap, mp_size_t an, mp_srcptr bp
 void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm);
 void flint_mpn_mulmod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
 
+#define MPN_MULMOD_PRECOND_NONE 0
+#define MPN_MULMOD_PRECOND_SHOUP 1
+#define MPN_MULMOD_PRECOND_MATRIX 2
+
+int flint_mpn_mulmod_want_precond(mp_size_t n, slong num, ulong norm);
+
+void flint_mpn_mulmod_precond_matrix_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+mp_size_t flint_mpn_mulmod_precond_matrix_alloc(mp_size_t n);
+void flint_mpn_mulmod_precond_matrix(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+
+void flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm);
+void flint_mpn_mulmod_precond_shoup(mp_ptr res, mp_srcptr a, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, ulong norm);
+
+void flint_mpn_fmmamod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr e, mp_srcptr f, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+void flint_mpn_fmmamod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr e, mp_srcptr f, mp_srcptr d, mp_srcptr dinv, ulong norm);
+void flint_mpn_fmmamod_precond_matrix(mp_ptr rp, mp_srcptr apre1, mp_srcptr b1, mp_srcptr apre2, mp_srcptr b2, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
+
 int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c, flint_bitcnt_t b, mp_ptr tp);
 
 /* miscellaneous *************************************************************/
@@ -899,7 +929,9 @@ double flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 /* random ********************************************************************/
 
 void flint_mpn_rrandom(mp_ptr rp, flint_rand_t state, mp_size_t n);
+void flint_mpn_rrandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n);
 void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n);
+void flint_mpn_urandomm(mp_ptr rp, flint_rand_t state, mp_srcptr xp, mp_size_t xn);
 
 /******************************************************************************
     Divisions where the quotient is expected to be small. All function do:

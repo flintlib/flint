@@ -11,7 +11,7 @@
 
 #include "arf.h"
 
-int _arf_are_close(const arf_t x, const arf_t y, slong prec)
+static int _arf_are_close(const arf_t x, const arf_t y, slong prec)
 {
     fmpz_t xb, yb;
     fmpz_t delta;
@@ -39,7 +39,7 @@ int _arf_are_close(const arf_t x, const arf_t y, slong prec)
     return result;
 }
 
-int
+static int
 _arf_add_eps(arf_t s, const arf_t x, int sgn, slong prec, arf_rnd_t rnd)
 {
     arf_t t;

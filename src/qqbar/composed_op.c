@@ -138,7 +138,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
     {
         if (fmpz_is_zero(P2->coeffs))
         {
-            flint_throw(FLINT_ERROR, "composed_op: division by zero\n");
+            flint_throw(FLINT_DIVZERO, "composed_op: division by zero\n");
         }
 
         fmpq_poly_reverse(P2, P2, d2 + 1);
@@ -196,7 +196,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
 #include "profiler.h"
 #endif
 
-void
+static void
 qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 {
     slong i, prec, found;
@@ -219,14 +219,14 @@ qqbar_binary_op_without_guess(qqbar_t res, const qqbar_t x, const qqbar_t y, int
 #if TIMING
     {
         flint_printf("composed op: ");
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
 
         flint_printf("factoring: ");
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         fmpz_poly_factor(fac, H);
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
     }
 #else
     qqbar_fmpz_poly_composed_op(H, QQBAR_POLY(x), QQBAR_POLY(y), op);

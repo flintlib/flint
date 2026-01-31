@@ -34,6 +34,8 @@
 #include "t-hessenberg_householder.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
+#include "t-is_orthogonal.c"
+#include "t-lq.c"
 #include "t-lu.c"
 #include "t-lu_classical.c"
 #include "t-lu_recursive.c"
@@ -47,6 +49,7 @@
 #include "t-pow_fmpq.c"
 #include "t-pow_scalar.c"
 #include "t-properties.c"
+#include "t-qr.c"
 #include "t-randrank.c"
 #include "t-randsimilar.c"
 #include "t-rank.c"
@@ -65,6 +68,7 @@
 #include "t-solve_tril.c"
 #include "t-solve_triu.c"
 #include "t-window_init_clear.c"
+#include "t-gr_poly_solve_lode_newton.c"
 
 /* Array of test functions ***************************************************/
 
@@ -87,12 +91,15 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_diagonalization),
     TEST_FUNCTION(gr_mat_exp),
     TEST_FUNCTION(gr_mat_func_jordan),
+    TEST_FUNCTION(gr_mat_gr_poly_solve_lode_newton),
     TEST_FUNCTION(gr_mat_hadamard),
     TEST_FUNCTION(gr_mat_hessenberg),
     TEST_FUNCTION(gr_mat_hessenberg_gauss),
     TEST_FUNCTION(gr_mat_hessenberg_householder),
     TEST_FUNCTION(gr_mat_inv),
     TEST_FUNCTION(gr_mat_invert_rows_cols),
+    TEST_FUNCTION(gr_mat_is_orthogonal),
+    TEST_FUNCTION(gr_mat_lq),
     TEST_FUNCTION(gr_mat_lu),
     TEST_FUNCTION(gr_mat_lu_classical),
     TEST_FUNCTION(gr_mat_lu_recursive),
@@ -106,6 +113,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_pow_fmpq),
     TEST_FUNCTION(gr_mat_pow_scalar),
     TEST_FUNCTION(gr_mat_properties),
+    TEST_FUNCTION(gr_mat_qr),
     TEST_FUNCTION(gr_mat_randrank),
     TEST_FUNCTION(gr_mat_randsimilar),
     TEST_FUNCTION(gr_mat_rank),

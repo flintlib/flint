@@ -172,7 +172,7 @@ ulong flint_fmpz_pseudosquares[][2] =
 
 #define FLINT_NUM_FMPZ_PSEUDOSQUARES 74
 
-void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
+static void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
 {
 #ifndef FLINT64
    if (i < 25)

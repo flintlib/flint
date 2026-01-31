@@ -103,10 +103,6 @@ _fmpz_poly_evaluate_divconquer_fmpq(fmpz_t rnum, fmpz_t rden,
         }
     }
 
-    fmpz_gcd(d, rnum, rden);
-    fmpz_divexact(rnum, rnum, d);
-    fmpz_divexact(rden, rden, d);
-
     *ynum = WORD(0);
     *yden = WORD(0);
     _fmpz_vec_clear(ynum, 2 * h + 2);
@@ -136,5 +132,6 @@ fmpz_poly_evaluate_divconquer_fmpq(fmpq_t res, const fmpz_poly_t f,
     {
         _fmpz_poly_evaluate_divconquer_fmpq(fmpq_numref(res), fmpq_denref(res),
             f->coeffs, f->length, fmpq_numref(a), fmpq_denref(a));
+        fmpq_canonicalise(res);
     }
 }

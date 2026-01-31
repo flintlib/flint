@@ -31,8 +31,7 @@ perform some kind of division, solving, or Gaussian elimination
 in functions that only perform basic manipulation and ring operations
 (e.g. transpose and matrix multiplication).
 
-The user can manipulate matrix entries directly, but must assume
-responsibility for normalising all values to the range `[0, n)`.
+Unless indicated, functions may assume that the stored values are in the range `[0, n)`. The user can manipulate matrix entries directly, but must assume responsibility for normalising all values to the range `[0, n)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -76,7 +75,11 @@ Memory management
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
 
-.. function:: void nmod_mat_set_mod(nmod_mat_t mat, ulong n);
+.. function:: nmod_t nmod_mat_mod(const nmod_mat_t mat)
+
+    Returns the modulus of a matrix.
+
+.. function:: void nmod_mat_set_mod(nmod_mat_t mat, ulong n)
 
     Sets the modulus of an already initialized matrix ``mat`` to be `n`. Row
     and column dimensions are unchanged, and allocated memory is unaffected.
@@ -123,6 +126,7 @@ Basic properties and manipulation
 
     Returns `1` if all entries of the matrix ``mat`` are zero.
 
+
 Window
 --------------------------------------------------------------------------------
 
@@ -137,9 +141,8 @@ Window
 .. function:: void nmod_mat_window_clear(nmod_mat_t window)
 
     Clears the matrix ``window`` and releases any memory that it
-    uses. Note that the memory to the underlying matrix that
+    uses. Note that the memory of the underlying matrix that
     ``window`` points to is not freed.
-
 
 
 Concatenate
@@ -196,8 +199,12 @@ Random matrix generation
 
 .. function:: void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 
-    Sets the element to random numbers likely to be close to the modulus
+    Sets the element to random numbers in `[0, n)`, likely to be close to the modulus ``n``
     of the matrix. This is used to test potential overflow-related bugs.
+
+.. function:: void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state)
+
+    Sets the element to uniformly generated random numbers in `[0, n)`, where `n` is the modulus of the matrix.
 
 .. function:: int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, nn_srcptr diag, slong n)
 

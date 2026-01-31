@@ -32,7 +32,7 @@ typedef struct
 #endif
 } powers_preinv_arg_t;
 
-void
+static void
 _nmod_poly_powers_mod_preinv_worker(void * arg_ptr)
 {
     powers_preinv_arg_t arg = *((powers_preinv_arg_t *) arg_ptr);
@@ -56,17 +56,9 @@ _nmod_poly_powers_mod_preinv_worker(void * arg_ptr)
         if (j >= n)
             return;
 
-        if (glen == 2) /* special case, constant polynomials */
-        {
-            for (i = j + 1; i < j + k && i < n; i++)
-                res[i][0] = n_mulmod2_preinv(res[j][0], res[i - j][0],
-				                              mod.n, mod.ninv);
-        } else
-        {
-            for (i = j + 1; i < j + k && i < n; i++)
-                _nmod_poly_mulmod_preinv(res[i], res[j],
-                  glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, mod);
-        }
+        for (i = j + 1; i < j + k && i < n; i++)
+            _nmod_poly_mulmod_preinv(res[i], res[j],
+              glen - 1, res[i - j], glen - 1, g, glen, ginv, ginvlen, mod);
     }
 }
 
@@ -113,17 +105,9 @@ _nmod_poly_powers_mod_preinv_threaded_pool(nn_ptr * res, nn_srcptr f,
     /* compute giant steps */
 
     /* f^(k*i) = f^(k*(i - 1))*f^k */
-    if (glen == 2) /* special case, constant polys */
-    {
-        for (i = 2*k; i < n; i += k)
-            res[i][0] = n_mulmod2_preinv(res[i - k][0], res[k][0],
-                                                              mod.n, mod.ninv);
-    } else
-    {
-        for (i = 2*k; i < n; i += k)
-            _nmod_poly_mulmod_preinv(res[i], res[i - k], glen - 1,
-			        res[k], glen - 1, g, glen, ginv, ginvlen, mod);
-    }
+    for (i = 2*k; i < n; i += k)
+        _nmod_poly_mulmod_preinv(res[i], res[i - k], glen - 1,
+		        res[k], glen - 1, g, glen, ginv, ginvlen, mod);
 
     args = (powers_preinv_arg_t *)
                  flint_malloc(sizeof(powers_preinv_arg_t) * (num_threads + 1));
@@ -276,16 +260,10 @@ _nmod_poly_powers_mod_preinv_naive(nn_ptr * res, nn_srcptr f, slong flen, slong 
        return;
 
     /* f^i = f^(i - 1)*f */
-    if (glen == 2) /* special case, constant polys */
+    for (i = 2; i < n; i++)
     {
-        for (i = 2; i < n; i++)
-            res[i][0] = n_mulmod2_preinv(res[i - 1][0], res[1][0],
-                                                              mod.n, mod.ninv);
-    } else
-    {
-        for (i = 2; i < n; i++)
-            _nmod_poly_mulmod_preinv(res[i], res[i - 1], glen - 1, res[1],
-                                        glen - 1, g, glen, ginv, ginvlen, mod);
+        _nmod_poly_mulmod_preinv(res[i], res[i / 2], glen - 1, res[(i + 1) / 2],
+                                    glen - 1, g, glen, ginv, ginvlen, mod);
     }
 }
 

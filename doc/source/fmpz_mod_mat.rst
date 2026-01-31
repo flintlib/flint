@@ -2,6 +2,7 @@
 
 **fmpz_mod_mat.h** -- matrices over integers mod n
 ===============================================================================
+Unless indicated, functions may assume that the stored values are in the range `[0, n)`. The user can manipulate matrix entries directly, but must assume responsibility for normalising all values to the range `[0, n)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -95,7 +96,18 @@ Random generation
 .. function:: void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 
     Generate a random matrix with the existing dimensions and entries in
-    `[0, n)` where ``n`` is the modulus.
+    `[0, n)` where ``n`` is the modulus. A sparse matrix is
+    generated with increased probability.
+
+.. function:: void fmpz_mod_mat_randfull(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+
+    Sets the element to random numbers in `[0, n)`, likely to be close to the modulus ``n``
+    of the matrix. This is used to test potential overflow-related bugs.
+
+.. function:: void fmpz_mod_mat_rand(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+
+    Sets the element to random numbers in `[0, n)`, likely to be close to the modulus ``n``
+    of the matrix.
 
 
 Windows and concatenation
@@ -143,6 +155,11 @@ Input and output
 
 Comparison
 --------------------------------------------------------------------------------
+
+.. function:: int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx)
+
+    Returns nonzero if ``mat1`` and ``mat2`` have the same dimensions and elements,
+    and zero otherwise. The moduli are ignored.
 
 
 .. function:: int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)

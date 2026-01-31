@@ -14,13 +14,6 @@
 #include <stdarg.h>
 #include "flint.h"
 
-#undef FLINT_NORETURN
-#if defined(__GNUC__)
-# define FLINT_NORETURN __attribute__((noreturn))
-#else
-# define FLINT_NORETURN
-#endif
-
 FLINT_NORETURN static void __flint_throw(flint_err_t, const char *, va_list);
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
@@ -41,8 +34,8 @@ void __flint_set_throw_init(void)
 }
 #endif
 
-FLINT_NORETURN void (* abort_func)(void) = abort;
-FLINT_NORETURN void (* throw_func)(flint_err_t, const char *, va_list) = __flint_throw;
+void (* abort_func)(void) = abort;
+void (* throw_func)(flint_err_t, const char *, va_list) = __flint_throw;
 
 void flint_set_abort(void (* func)(void))
 {
@@ -50,13 +43,7 @@ void flint_set_abort(void (* func)(void))
     pthread_once(&abort_func_init, __flint_set_abort_init);
     pthread_mutex_lock(&abort_func_lock);
 #endif
-
-DIAGNOSTIC_PUSH
-DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
-DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
     abort_func = func;
-DIAGNOSTIC_POP
-
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&abort_func_lock);
 #endif
@@ -68,13 +55,7 @@ void flint_set_throw(void (* func)(flint_err_t, const char *, va_list))
     pthread_once(&throw_func_init, __flint_set_throw_init);
     pthread_mutex_lock(&throw_func_lock);
 #endif
-
-DIAGNOSTIC_PUSH
-DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES
-DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS
     throw_func = func;
-DIAGNOSTIC_POP
-
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&throw_func_lock);
 #endif
@@ -84,7 +65,7 @@ FLINT_NORETURN static void __flint_throw(flint_err_t exc, const char * msg, va_l
 {
     if (exc != FLINT_TEST_FAIL)
     {
-        printf("Flint exception (");
+        printf("FLINT exception (");
         switch (exc)
         {
             case FLINT_ERROR:
@@ -128,6 +109,7 @@ FLINT_NORETURN void flint_abort(void)
     fflush(stdout);
     fflush(stderr);
     (*abort_func)();
+    FLINT_UNREACHABLE;
 }
 
 FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...)
@@ -135,4 +117,5 @@ FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...)
     va_list ap;
     va_start(ap, msg);
     (*throw_func)(exc, msg, ap);
+    FLINT_UNREACHABLE;
 }

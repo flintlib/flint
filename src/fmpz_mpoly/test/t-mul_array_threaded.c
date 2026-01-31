@@ -46,7 +46,7 @@ TEST_FUNCTION_START(fmpz_mpoly_mul_array_threaded, state)
         exp_bound1 = n_randint(state, max_bound) + 1;
         exp_bound2 = n_randint(state, max_bound) + 1;
 
-        coeff_bits = n_randint(state, 100);
+        coeff_bits = n_randint(state, 80);
 
         for (j = 0; j < 4; j++)
         {

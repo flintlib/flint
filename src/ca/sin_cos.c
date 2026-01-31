@@ -13,7 +13,7 @@
 #include "ca_ext.h"
 #include "ca_vec.h"
 
-void
+static void
 ca_sin_cos_special(ca_t res1, ca_t res2, const ca_t x, ca_ctx_t ctx)
 {
     truth_t t1, t2;
@@ -304,7 +304,7 @@ ca_cos(ca_t res, const ca_t x, ca_ctx_t ctx)
     ca_sin_cos(NULL, res, x, ctx);
 }
 
-void
+static void
 ca_tan_special(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     if (ca_check_is_signed_inf(x, ctx) == T_TRUE)

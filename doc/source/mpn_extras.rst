@@ -24,10 +24,14 @@ Utility functions
     Prints debug information about ``(x, xsize)`` to ``stdout``. 
     In particular, this will print binary representations of all the limbs.
 
-.. function:: char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n)
+.. function:: char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int negative)
 
-    Returns a string containing the decimal representation of 
-    ``(x, n)``.
+    Returns the string representation of ``(x, xn)`` (or its negation if
+    ``negative`` is set to 1) in base *base* which must be a base
+    supported by GMP. If ``res`` is ``NULL``, a new string will be allocated;
+    otherwise, the given pointer ``res`` will be used and is assumed
+    to have sufficient space to represent the full output, one extra
+    digit, minus sign (if negative), and null terminator.
 
 .. function:: int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 
@@ -280,6 +284,9 @@ Division
 
     Assumes ``limbs1 >= limbsg > 0``.
 
+Division and modular arithmetic with precomputed inverses
+--------------------------------------------------------------------------------
+
 .. function:: mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2)
 
     Computes a precomputed inverse from the leading two limbs of the
@@ -294,6 +301,28 @@ Division
     We require the most significant bit of ``b, n`` to be 1.
     ``dinv`` must be computed from ``b[n - 1]``, ``b[n - 2]`` by 
     ``flint_mpn_preinv1``. We also require ``m >= n >= 2``.
+
+.. function:: mp_limb_t flint_mpn_divrem_1_preinv(mp_ptr q, mp_srcptr a, mp_size_t n, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
+
+    Divide ``a, n`` by the limb ``d``, writing the quotient to ``q, n``
+    and returning the remainder. Requires ``n`` and ``d`` to be positive.
+    Allows ``a`` and ``q`` to be aliased. Requires a single-limb inverse ``dinv``
+    precomputed by :func:`n_preinvert_limb` and the
+    number of leading zero bits of ``d`` as ``norm``.
+
+    This is equivalent to ``mpn_divrem_1(q, 0, a, n, d)`` but faster for small
+    ``n``. Typically ``mpn_divrem_1`` will be faster for large ``n`` as it
+    has dedicated assembly code on many architectures whereas
+    ``flint_mpn_divrem_1_preinv`` currently does not.
+
+.. function:: mp_limb_t flint_mpn_divrem_2_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv)
+              mp_limb_t flint_mpn_divrem_2_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
+              mp_limb_t flint_mpn_divrem_3_1_preinv_norm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv)
+              mp_limb_t flint_mpn_divrem_3_1_preinv_unnorm(mp_ptr qp, mp_srcptr up, mp_limb_t d, mp_limb_t dinv, unsigned int norm)
+
+    Versions of :func:`flint_mpn_divrem_1_preinv` specialized for length 2 and 3.
+    The ``_norm`` functions require a normalised divisor while the ``_unnorm``
+    functions require an unnormalised divisor with positive ``norm``.
 
 .. function:: void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm)
 
@@ -355,7 +384,7 @@ Division
     normalised, then `r` will be shifted right by ``norm`` bits
     so that it has the same shift as all the inputs.
 
-    We require `a` and `b` to be reduced modulo `n` before calling the
+    We require `a` and `b` to be reduced modulo `d` before calling the
     function. 
 
 .. function:: void flint_mpn_mulmod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr d, mp_srcptr dinv, ulong norm)
@@ -364,6 +393,75 @@ Division
     The behavior is not exactly the same: `a` and `b` are assumed to
     be unshifted, and the output is unshifted.
 
+.. function:: void flint_mpn_fmmamod_preinvn(mp_ptr r, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+              void flint_mpn_fmmamod_preinvn_2(mp_ptr r, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
+    provided by ``flint_mpn_preinvn``, computes `a_1 b_1 + a_2 b_2 \pmod{d}`. We require
+    all operands to be reduced modulo `d`.
+
+Preconditioned modular multiplication
+--------------------------------------------------------------------------------
+
+Currently two algorithms are implemented for preconditioned multiplication:
+Shoup multiplication and the matrix algorithm. An FFT variant may be added in the future.
+
+.. function:: int flint_mpn_mulmod_want_precond(mp_size_t n, slong num, ulong norm)
+
+    Assuming a precision of `n` limbs and that one wants to perform `num`
+    multiplications with a fixed (preconditioned) operand with norm ``norm``,
+    return one of the following constants indicating
+    which algorithm is better (accounting for the cost of pretransforming
+    the operand).
+
+    * ``MPN_MULMOD_PRECOND_NONE`` - should use :func:`flint_mpn_mulmod_preinvn` (no precomputation)
+
+    * ``MPN_MULMOD_PRECOND_SHOUP`` - should use :func:`flint_mpn_mulmod_precond_shoup`
+
+    * ``MPN_MULMOD_PRECOND_MATRIX`` - should use :func:`flint_mpn_mulmod_precond_matrix`
+
+.. function:: void flint_mpn_mulmod_precond_shoup(mp_ptr res, mp_srcptr a, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr d, ulong norm)
+
+    Compute `ab \pmod{d}` given precomputed data for ``apre``
+    generated with :func:`flint_mpn_mulmod_precond_shoup_precompute`.
+    We require that `b` is reduced modulo `d`.
+
+.. function:: void flint_mpn_mulmod_precond_shoup_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Given `0 \le a < d`, precompute data for
+    multiplication by `a` modulo `d` using Shoup's method.
+    The modulus is given as ``dnormed`` containing `d 2^{norm}` together
+    with precomputed inverse ``dinv``.
+    The destination ``apre`` must have space for `n` limbs.
+
+.. function:: void flint_mpn_mulmod_precond_matrix(mp_ptr rp, mp_srcptr apre, mp_srcptr b, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
+    provided by :func:`flint_mpn_preinvn`, computes `ab \pmod{d}`. We require
+    `b` to be reduced modulo `d`.
+    The user provides the operand `a` via the ``apre`` argument in the
+    pretransformed representation returned by :func:`flint_mpn_mulmod_precond_matrix_precompute`.
+    The complexity of this function is `O(n^2)`. Requires `n \ge 2`.
+
+.. function:: void flint_mpn_mulmod_precond_matrix_precompute(mp_ptr apre, mp_srcptr a, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Given ``dnormed`` containing a normalised integer `d 2^{norm}` with precomputed inverse ``dinv``
+    and an integer `a` which is reduced modulo `d`,
+    write to ``apre`` a pretransformed representation of `a`
+    for use with :func:`flint_mpn_mulmod_precond_matrix`.
+    Currently, the output consists of `n \times n` limbs storing
+    `a 2^{norm} \beta^i \mod {d 2^{norm}}` for `0 \le i < n` where `\beta` is the limb
+    radix, plus one junk limb.
+
+.. function:: mp_size_t flint_mpn_mulmod_precond_matrix_alloc(mp_size_t n)
+
+    The *alloc* function returns the number of limbs of space required for
+    :func:`flint_mpn_mulmod_precond_matrix_precompute`
+    given a modulus with `n` limbs.
+
+.. function:: void flint_mpn_fmmamod_precond_matrix(mp_ptr rp, mp_srcptr a1pre, mp_srcptr b1, mp_srcptr a2pre, mp_srcptr b2, mp_size_t n, mp_srcptr dnormed, mp_srcptr dinv, ulong norm)
+
+    Analogous to :func:`flint_mpn_mulmod_precond_matrix`, but computes `a_1 b_1 + a_2 b_2` modulo `d`.
 
 
 GCD
@@ -394,18 +492,30 @@ GCD
 Random Number Generation
 --------------------------------------------------------------------------------
 
+.. function:: void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n)
+
+    Generates a uniform random number of ``n`` bits and stores
+    it on ``rp``.
+
+.. function:: void flint_mpn_urandomm(mp_ptr rp, flint_rand_t state, mp_srcptr xp, mp_size_t xn)
+
+    Generates a uniform random number between 0 inclusive and ``(xp, xn)``
+    exclusive`[0, x)` and stores it on ``rp``. The most significant limb of
+    ``xp`` is required to be nonzero. This function will write ``xn`` limbs to
+    ``rp`` even if the largest possible value has one fewer limb.
 
 .. function:: void flint_mpn_rrandom(mp_ptr rp, flint_rand_t state, mp_size_t n)
 
-    Generates a random number with ``n`` limbs and stores 
+    Generates a random number with ``n`` limbs and stores
     it on ``rp``. The number it generates will tend to have
     long strings of zeros and ones in the binary representation.
 
     Useful for testing functions and algorithms, since this kind of random
     numbers have proven to be more likely to trigger corner-case bugs.
 
-.. function:: void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n)
+.. function:: void flint_mpn_rrandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t nbits)
 
-    Generates a uniform random number of ``n`` bits and stores 
-    it on ``rp``.
+    Generates a random number with ``nbits`` bits and stores
+    it on ``rp``. The number it generates will tend to have
+    long strings of zeros and ones in the binary representation.
 

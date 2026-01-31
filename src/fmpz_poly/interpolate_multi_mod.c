@@ -9,38 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "longlong.h"
-#include "flint.h"
 #include "fmpz.h"
+#include "fmpz/impl.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 #include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "gr.h"
 #include "gr_poly.h"
-
-static void
-_fmpz_ui_vec_prod(fmpz_t res, nn_srcptr x, slong n)
-{
-    if (n < 16)
-    {
-        slong i;
-        fmpz_set_ui(res, x[0]);
-        for (i = 1; i < n; i++)
-            fmpz_mul_ui(res, res, x[i]);
-    }
-    else
-    {
-        fmpz_t t;
-        fmpz_init(t);
-        _fmpz_ui_vec_prod(res, x, n / 2);
-        _fmpz_ui_vec_prod(t, x + n / 2, n - n / 2);
-        fmpz_mul(res, res, t);
-        fmpz_clear(t);
-    }
-}
 
 static int
 _fmpz_poly_check_interpolant(const fmpz * poly, const fmpz * xs, const fmpz * ys, slong n)
@@ -90,11 +65,6 @@ _checked_nmod_poly_interpolate(nn_ptr r, nn_srcptr x, nn_srcptr y, slong n, nmod
     return (_gr_poly_interpolate_fast(r, x, y, n, ctx) == GR_SUCCESS);
 }
 
-
-void
-_fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2,
-                   const fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign);
-
 int
 _fmpz_poly_interpolate_multi_mod(fmpz * poly,
                                     const fmpz * xs, const fmpz * ys, slong n)
@@ -104,7 +74,7 @@ _fmpz_poly_interpolate_multi_mod(fmpz * poly,
     nmod_t mod;
     nn_ptr xm, ym;
     fmpz_t M, t, u, c, M2, M1M2;
-    slong total_primes, num_primes, total_skipped, count_good;
+    slong total_primes, num_primes, count_good;
     slong xbits, ybits;
     int ok = 1;
     int checked_unique = 0;
@@ -141,7 +111,6 @@ _fmpz_poly_interpolate_multi_mod(fmpz * poly,
     xm = _nmod_vec_init(n);
     ym = _nmod_vec_init(n);
 
-    total_skipped = 0;
     total_primes = 0;
     /* Important: when changing this, change the list of adversarial primes
        in the test code to match. */
@@ -174,7 +143,6 @@ _fmpz_poly_interpolate_multi_mod(fmpz * poly,
             }
             else
             {
-                total_skipped++;
                 num_primes = 0;
             }
         }
@@ -237,8 +205,6 @@ _fmpz_poly_interpolate_multi_mod(fmpz * poly,
                         count_good++;
                     }
                 }
-
-                total_skipped += (num_primes - count_good);
 
                 /* Reinitialize CRT for the product of correct primes */
                 num_primes = count_good;
@@ -303,8 +269,6 @@ _fmpz_poly_interpolate_multi_mod(fmpz * poly,
             break;
         }
     }
-
-    /* flint_printf("total %wd  skipped %wd  %wd\n", total_primes, total_skipped, fmpz_bits(M)); */
 
     fmpz_clear(M);
     fmpz_clear(t);

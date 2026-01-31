@@ -80,6 +80,30 @@ elements.
     arithmetic in `\mathbf{Q}_p / (p^N)` such as powers of `p` close 
     to `p^N`.
 
+.. function:: void qadic_ctx_init_modulus(qadic_ctx_t ctx, const fmpz_t p, const fmpz_mod_poly_t modulus, slong min, slong max, const char *var, enum padic_print_mode mode)
+              void qadic_ctx_init_modulus_nmod(qadic_ctx_t ctx, ulong p, const nmod_poly_t modulus, slong min, slong max, const char *var, enum padic_print_mode mode)
+
+    Initialises the context ``ctx`` with prime `p`, given defining polynomial ``modulus``, variable name ``var``
+    and printing mode ``mode``.
+
+    Stores powers of `p` with exponents between ``min`` (inclusive) and
+    ``max`` exclusive.  Assumes that ``min`` is at most ``max``.
+
+    Assumes that `p` is a prime.
+
+    Assumes that ``modulus`` is a monic irreducible polynomial over
+    `\mathbf{F}_{p}`.
+
+    Assumes that the string ``var`` is a null-terminated string
+    of length at least one.
+
+    Assumes that the printing mode is one of ``PADIC_TERSE``,
+    ``PADIC_SERIES``, or ``PADIC_VAL_UNIT``.
+
+    This function also carries out some relevant precomputation for
+    arithmetic in `\mathbf{Q}_p / (p^N)` such as powers of `p` close
+    to `p^N`.
+
 .. function:: void qadic_ctx_clear(qadic_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.

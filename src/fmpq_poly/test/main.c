@@ -44,6 +44,7 @@
 #include "t-divides.c"
 #include "t-divrem.c"
 #include "t-div_series.c"
+#include "t-discriminant.c"
 #include "t-equal_trunc.c"
 #include "t-evaluate_fmpq.c"
 #include "t-evaluate_fmpz.c"
@@ -60,7 +61,10 @@
 #include "t-get_slice.c"
 #include "t-init_realloc_clear.c"
 #include "t-integral.c"
-#include "t-interpolate_fmpz_vec.c"
+#include "t-interpolate_fmpq_vec.c"
+#include "t-interpolate_fast.c"
+#include "t-interpolate_multi_mod.c"
+#include "t-interpolate_barycentric.c"
 #include "t-inv.c"
 #include "t-inv_series_newton.c"
 #include "t-invsqrt_series.c"
@@ -140,6 +144,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_poly_divides),
     TEST_FUNCTION(fmpq_poly_divrem),
     TEST_FUNCTION(fmpq_poly_div_series),
+    TEST_FUNCTION(fmpq_poly_discriminant),
     TEST_FUNCTION(fmpq_poly_equal_trunc),
     TEST_FUNCTION(fmpq_poly_evaluate_fmpq),
     TEST_FUNCTION(fmpq_poly_evaluate_fmpz),
@@ -156,7 +161,10 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_poly_get_slice),
     TEST_FUNCTION(fmpq_poly_init_realloc_clear),
     TEST_FUNCTION(fmpq_poly_integral),
-    TEST_FUNCTION(fmpq_poly_interpolate_fmpz_vec),
+    TEST_FUNCTION(fmpq_poly_interpolate_fmpq_vec),
+    TEST_FUNCTION(fmpq_poly_interpolate_fast),
+    TEST_FUNCTION(fmpq_poly_interpolate_multi_mod),
+    TEST_FUNCTION(fmpq_poly_interpolate_barycentric),
     TEST_FUNCTION(fmpq_poly_inv),
     TEST_FUNCTION(fmpq_poly_inv_series_newton),
     TEST_FUNCTION(fmpq_poly_invsqrt_series),

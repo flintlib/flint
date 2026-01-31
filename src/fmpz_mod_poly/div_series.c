@@ -96,7 +96,7 @@ void fmpz_mod_poly_div_series(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A,
     slong Blen = FLINT_MIN(B->length, n);
 
     if (Blen == 0)
-        flint_throw(FLINT_ERROR, "Division by zero in %s\n", __func__);
+        flint_throw(FLINT_DIVZERO, "Division by zero in %s\n", __func__);
 
     if (Alen == 0)
     {

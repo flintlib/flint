@@ -43,7 +43,7 @@ test_compose_series(flint_rand_t state, int which)
     GR_MUST_SUCCEED(gr_poly_randtest(A, state, 1 + n_randint(state, 20), ctx));
     GR_MUST_SUCCEED(gr_poly_randtest(B, state, 1 + n_randint(state, 20), ctx));
     GR_MUST_SUCCEED(gr_poly_randtest(C, state, 1 + n_randint(state, 20), ctx));
-    GR_MUST_SUCCEED(gr_poly_set_coeff_si(B, 0, 0, ctx));
+    status |= gr_poly_set_coeff_si(B, 0, 0, ctx);
 
     switch (which)
     {

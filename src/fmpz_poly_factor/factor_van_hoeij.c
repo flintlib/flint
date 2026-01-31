@@ -19,7 +19,7 @@
 #include "fmpz_poly_factor.h"
 #include "fmpz_lll.h"
 
-slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
+static slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
                                                             slong r, ulong p)
 {
    fmpz_t lead_b, trail_b;
@@ -45,7 +45,7 @@ slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
    resize the matrix M to num_rows, where num_rows <= M->r
 */
 /* todo: proper inplace realloc */
-void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
+static void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
 {
     slong i;
     fmpz_mat_t T;
@@ -174,6 +174,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
             if (do_lll)
             {
+                /* flint_printf("LLL %wd %wd  %wd\n", M->r, M->c, fmpz_mat_max_bits(M)); */
                num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
 
                fmpz_mat_van_hoeij_resize_matrix(M, num_rows);

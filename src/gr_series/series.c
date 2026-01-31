@@ -16,13 +16,14 @@
 #include "gr_generic.h"
 #include "gr_special.h"
 #include "gr_series.h"
+#include "gr_series/impl.h"
 
 
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */
 
 static const char * default_var = "x";
 
-int
+static int
 gr_poly_add_series(gr_poly_t res, const gr_poly_t poly1,
               const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 {
@@ -43,7 +44,7 @@ gr_poly_add_series(gr_poly_t res, const gr_poly_t poly1,
     return status;
 }
 
-int
+static int
 gr_poly_sub_series(gr_poly_t res, const gr_poly_t poly1,
               const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 {
@@ -371,7 +372,7 @@ gr_series_is_zero(const gr_series_t x, gr_ctx_t ctx)
     return T_UNKNOWN;
 }
 
-truth_t
+static truth_t
 _gr_poly_equal2(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
 {
     truth_t eq, eq2;
@@ -592,7 +593,7 @@ gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_ctx_t ctx)
 
 /* Todo: optimizations for len == 1 denominator */
 /* Todo: user gr_poly_series_divexact when there is one (currently only basecase) */
-int
+static int
 _gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, int divexact, gr_ctx_t ctx)
 {
     slong len, xlen, ylen, xerr, yerr, err;
@@ -962,7 +963,7 @@ gr_series_rsqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
 }
 
 
-int
+static int
 gr_series_i(gr_series_t res, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -975,7 +976,7 @@ gr_series_i(gr_series_t res, gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 gr_series_pi(gr_series_t res, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -1068,7 +1069,7 @@ static int check_acb(int status, gr_poly_t res)
     return status;
 }
 
-int
+static int
 _gr_series_arb_wrapper1(gr_series_t res, const gr_series_t x, gr_ctx_t ctx, _arb_func_1 arb_func, _acb_func_1 acb_func)
 {
     slong xlen, len, xerr, err;
@@ -1109,7 +1110,7 @@ _gr_series_arb_wrapper1(gr_series_t res, const gr_series_t x, gr_ctx_t ctx, _arb
     return status;
 }
 
-int
+static int
 _gr_series_arb_wrapper_c2_flag(gr_series_t res, const gr_series_t s, const gr_series_t x, int regularized, gr_ctx_t ctx, _arb_func_c2_flag func1, _acb_func_c2_flag func2)
 {
     slong xlen, len, xerr, err;
@@ -1519,7 +1520,7 @@ gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z
     return status;
 }
 
-int
+static int
 _gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_ctx_t ctx, int function)
 {
     slong xlen, len, xerr, err;
@@ -1927,6 +1928,21 @@ int gr_series_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return gr_series_ctx_set_gen_name(ctx, s[0]);
 }
 
+int
+_gr_series_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+{
+    if (i != 0)
+        return GR_DOMAIN;
+
+    char * var = GR_SERIES_CTX(ctx)->var;
+    size_t len = strlen(var);
+    * name = flint_malloc(len + 1);
+    if (* name == NULL)
+        return GR_UNABLE;
+    strncpy(* name, var, len + 1);
+
+    return GR_SUCCESS;
+}
 
 int
 gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
@@ -2024,6 +2040,8 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) gr_series_ctx_write},
     {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) gr_series_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES, (gr_funcptr) gr_series_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,    (gr_funcptr) _gr_series_ctx_gen_name},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) gr_series_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_series_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN, (gr_funcptr) gr_series_ctx_is_integral_domain},

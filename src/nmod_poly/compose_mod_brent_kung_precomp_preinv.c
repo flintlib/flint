@@ -74,7 +74,7 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
 
     if (len2 == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_precompute_matrix). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (nmod_poly_precompute_matrix). Division by zero.\n");
     }
 
     if (A->r != m || A->c != len)
@@ -111,7 +111,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv(nn_ptr res, nn_srcptr poly1,
                                  nn_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
     nmod_mat_t B, C;
-    nn_ptr t, h;
+    nn_ptr h;
     slong i, n, m;
 
     n = len3 - 1;
@@ -133,36 +133,27 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv(nn_ptr res, nn_srcptr poly1,
 
     m = n_sqrt(n) + 1;
 
-    /* TODO check A*/
+    FLINT_ASSERT(m == A->r);
 
     nmod_mat_init(B, m, m, mod.n);
     nmod_mat_init(C, m, n, mod.n);
 
     h = _nmod_vec_init(n);
-    t = _nmod_vec_init(n);
 
     /* Set rows of B to the segments of poly1 */
-    for (i = 0; i < len1/m; i++)
+    for (i = 0; i < len1 / m; i++)
         _nmod_vec_set(nmod_mat_entry_ptr(B, i, 0), poly1 + i*m, m);
 
     _nmod_vec_set(nmod_mat_entry_ptr(B, i, 0), poly1 + i*m, len1%m);
 
     nmod_mat_mul(C, B, A);
 
-    /* Evaluate block composition using the Horner scheme */
-    _nmod_vec_set(res, nmod_mat_entry_ptr(C, m - 1, 0), n);
-    _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m - 1, 0), n, nmod_mat_entry_ptr(A, 1, 0), n,
-                                           poly3, len3, poly3inv, len3inv,mod);
+    /* Evaluate block composition */
+    _nmod_poly_mulmod_preinv(h, nmod_mat_entry_ptr(A, m / 2, 0), n,
+                nmod_mat_entry_ptr(A, m - (m / 2), 0), n, poly3, len3, poly3inv, len3inv, mod);
 
-    for (i = m - 2; i >= 0; i--)
-    {
-        _nmod_poly_mulmod_preinv(t, res, n, h, n, poly3, len3,
-                                                       poly3inv, len3inv, mod);
-        _nmod_poly_add(res, t, n, nmod_mat_entry_ptr(C, i, 0), n, mod);
-    }
-
+    _nmod_poly_mod_matrix_rows_evaluate(res, C, h, n, poly3, len3, poly3inv, len3inv, mod);
     _nmod_vec_clear(h);
-    _nmod_vec_clear(t);
 
     nmod_mat_clear(B);
     nmod_mat_clear(C);
@@ -179,7 +170,7 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_precomp_preinv): Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "(nmod_poly_compose_mod_brent_kung_precomp_preinv): Division by zero.\n");
     }
 
     if (len1 >= len3)

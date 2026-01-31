@@ -66,8 +66,7 @@ test_mul(flint_rand_t state, int which)
             flint_abort();
     }
 
-    /* todo: should explicitly call basecase mul */
-    status |= gr_poly_mullow(D, A, B, FLINT_MAX(0, A->length + B->length - 1), ctx);
+    status |= gr_poly_mullow_classical(D, A, B, FLINT_MAX(0, A->length + B->length - 1), ctx);
 
     if (status == GR_SUCCESS && gr_poly_equal(C, D, ctx) == T_FALSE)
     {

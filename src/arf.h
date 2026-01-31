@@ -1158,6 +1158,9 @@ int arf_load_file(arf_t res, FILE *stream);
 int arf_dump_file(FILE* stream, const arf_t x);
 #endif
 
+int arf_dot(arf_t res, const arf_t initial, int subtract,
+    arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd);
+
 void arf_approx_dot(arf_t res, const arf_t initial, int subtract,
     arf_srcptr x, slong xstep, arf_srcptr y, slong ystep, slong len, slong prec, arf_rnd_t rnd);
 

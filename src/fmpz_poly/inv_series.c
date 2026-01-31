@@ -33,7 +33,7 @@ fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_inv_series). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_poly_inv_series). Division by zero.\n");
     }
 
     if (Qinv != Q)
@@ -239,7 +239,7 @@ fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_inv_series_basecase). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_poly_inv_series_basecase). Division by zero.\n");
     }
 
     if (Qinv != Q)
@@ -318,7 +318,7 @@ fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_inv_series_newton). Division by zero.\n");
+        flint_throw(FLINT_DIVZERO, "Exception (fmpz_poly_inv_series_newton). Division by zero.\n");
     }
 
     if (Qinv != Q)

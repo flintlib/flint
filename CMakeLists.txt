@@ -12,10 +12,6 @@
 
 cmake_minimum_required(VERSION 3.22)
 
-if(NOT WIN32)
-    message(FATAL_ERROR "Detected system is not Windows.  Please use the Autotools configuration along with the Makefile instead as it is more up-to-date.  Read INSTALL.md.")
-endif()
-
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
 include(CheckIPOSupported)
@@ -31,6 +27,10 @@ project(flint
   DESCRIPTION "Fast Library for Number Theory"
   HOMEPAGE_URL https://flintlib.org/
   LANGUAGES C CXX)
+
+if(NOT WIN32)
+    message(FATAL_ERROR "Detected system is not Windows.  Please use the Autotools configuration along with the Makefile instead as it is more up-to-date.  Read INSTALL.md.")
+endif()
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/configure.ac" CONFIGURE_CONTENTS)
 foreach(version in MAJOR MINOR PATCH)
@@ -212,8 +212,7 @@ set(_BUILD_DIRS
     perm
     double_extras   d_vec           d_mat
     nfloat
-    mpn_extras
-    mpfr_vec                        mpfr_mat
+    mpn_extras      radix
     nmod            nmod_vec        nmod_mat        nmod_poly
     mpn_mod
     fmpz            fmpz_vec        fmpz_mat        fmpz_poly
@@ -277,7 +276,7 @@ string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "$
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h flint-mparam.h
-    profiler.h templates.h mpf-impl.h
+    profiler.h templates.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 
@@ -343,38 +342,36 @@ endif()
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-config.h
+    ${CMAKE_CURRENT_BINARY_DIR}/src/flint-config.h
 )
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/flint.h
+    ${CMAKE_CURRENT_BINARY_DIR}/src/flint.h
 )
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/link/fmpz_${MEMORY_MANAGER}.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
+    ${CMAKE_CURRENT_BINARY_DIR}/src/fmpz/fmpz.c
     COPYONLY
 )
 if(FLINT_LONG_LONG)
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat-longlong.h.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        ${CMAKE_CURRENT_BINARY_DIR}/src/gmpcompat.h
         COPYONLY
     )
 else()
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
+        ${CMAKE_CURRENT_BINARY_DIR}/src/gmpcompat.h
         COPYONLY
     )
 endif()
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpn_extras/generic/flint-mparam.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-mparam.h
-        COPYONLY
-    )   
-endif()
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mpn_extras/generic/flint-mparam.h
+    ${CMAKE_CURRENT_BINARY_DIR}/src/flint-mparam.h
+    COPYONLY
+)
 
 
 foreach (build_dir IN LISTS BUILD_DIRS)
@@ -383,6 +380,7 @@ foreach (build_dir IN LISTS BUILD_DIRS)
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
     list(APPEND HEADERS ${TEMP})
 endforeach ()
+list(APPEND SOURCES ${CMAKE_CURRENT_BINARY_DIR}/src/fmpz/fmpz.c)
 
 set(TEMP ${HEADERS})
 set(HEADERS )
@@ -415,7 +413,7 @@ endif()
 # Include directories
 
 target_include_directories(flint PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_BINARY_DIR};${CMAKE_CURRENT_BINARY_DIR}/src>"
     "$<INSTALL_INTERFACE:include/flint>"
     ${PThreads_INCLUDE_DIRS}
 )

@@ -11,11 +11,9 @@
 
 #include "ca_vec.h"
 #include "ca_poly.h"
+#include "ca_poly/impl.h"
 
-ca_field_ptr
-_ca_vec_same_field2(ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, ca_ctx_t ctx);
-
-void
+static void
 _ca_poly_exp_series_basecase(ca_ptr f,
         ca_srcptr h, slong hlen, slong len, ca_ctx_t ctx)
 {
@@ -83,7 +81,7 @@ _ca_poly_integral_offset(ca_ptr res, ca_srcptr poly, slong len, slong m, ca_ctx_
         ca_div_ui(res + k, poly + k, m + k, ctx);
 }
 
-void
+static void
 _ca_poly_exp_series_newton(ca_ptr f, ca_ptr g,
     ca_srcptr h, slong hlen, slong n, ca_ctx_t ctx)
 {
