@@ -43,7 +43,7 @@ fmpz_fread(FILE * file, fmpz_t f)
     return (r > 0) ? 1 : 0;
 }
 
-int fmpz_read(fmpz_t f) { return fmpz_fread(stdout, f); }
+int fmpz_read(fmpz_t f) { return fmpz_fread(stdin, f); }
 
 /* file I/O ********************************************************************/
 
