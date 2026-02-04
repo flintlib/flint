@@ -28,10 +28,14 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: "Setup"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+
+      - name: "Install Python dependencies"
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-sphinx
+          uv pip install -r doc/requirements.txt
           sphinx-build --version
 
       - name: "Build documentation"
@@ -42,6 +46,7 @@ jobs:
       - name: "Setup LaTeX"
         if: github.repository == 'flintlib/flint' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
+          sudo apt-get update
           # See https://www.sphinx-doc.org/en/master/usage/builders/index.html#sphinx.builders.latex.LaTeXBuilder
           sudo apt-get install -y texlive-latex-recommended texlive-fonts-recommended texlive-fonts-extra tex-gyre texlive-latex-extra latexmk
 
