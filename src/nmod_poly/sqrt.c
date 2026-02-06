@@ -10,6 +10,7 @@
 */
 
 #include "flint.h"
+#include "nmod.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -40,11 +41,6 @@ _nmod_poly_sqrt(nn_ptr s, nn_srcptr p, slong len, nmod_t mod)
     if (len % 2 == 0)
         return len == 0;
 
-    /* Algorithm requires prime modulus */
-    if (!n_is_prime(mod.n))
-        flint_throw(FLINT_ERROR, "Exception (nmod_poly_sqrt). "
-            "Modulus must be prime.\n");
-
     if (mod.n == 2)
         return _nmod_poly_sqrt_2(s, p, len);
 
@@ -66,6 +62,9 @@ _nmod_poly_sqrt(nn_ptr s, nn_srcptr p, slong len, nmod_t mod)
         c = n_sqrtmod(c, mod.n);
         if (c == 0)
             return 0;
+        if (nmod_mul(c, c, mod) != d)
+            flint_throw(FLINT_ERROR, "Exception (nmod_poly_sqrt). "
+                "Modulus must be prime.\n");
     }
 
     if (len == 1)
@@ -76,23 +75,35 @@ _nmod_poly_sqrt(nn_ptr s, nn_srcptr p, slong len, nmod_t mod)
 
     slen = len / 2 + 1;
 
+    /* Even modulus: _nmod_poly_sqrt_series requires prime modulus */
+    if (mod.n % 2 == 0)
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_sqrt). "
+            "Modulus must be prime.\n");
+
     t = _nmod_vec_init(len);
 
     if (c == 1)
         _nmod_poly_sqrt_series(s, p, slen, slen, mod);
     else
     {
-       _nmod_vec_scalar_mul_nmod(t, p, slen, n_invmod(d, mod.n), mod);
+        ulong dinv, g;
+        g = n_gcdinv(&dinv, d, mod.n);
+        if (g != 1)
+            flint_throw(FLINT_ERROR, "Exception (nmod_poly_sqrt). "
+                "Modulus must be prime.\n");
+       _nmod_vec_scalar_mul_nmod(t, p, slen, dinv, mod);
         _nmod_poly_sqrt_series(s, t, slen, slen, mod);
     }
 
     if (c != 1)
         _nmod_vec_scalar_mul_nmod(s, s, slen, c, mod);
 
-    _nmod_poly_mulhigh(t, s, slen, s, slen, slen, mod);
+    /* Full verification: s^2 must equal p (all coefficients).
+       This catches incorrect results from Newton iteration
+       when the modulus is not prime. */
+    _nmod_poly_mul(t, s, slen, s, slen, mod);
 
-
-    result = _nmod_vec_equal(t + slen, p + slen, len - slen);
+    result = _nmod_vec_equal(t, p, len);
     _nmod_vec_clear(t);
     return result;
 }
