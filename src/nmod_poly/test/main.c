@@ -58,6 +58,7 @@
 #include "t-fread_print.c"
 #include "t-gcd.c"
 #include "t-gcd_euclidean.c"
+#include "t-gcd_euclidean_redc_fast.c"
 #include "t-gcd_hgcd.c"
 #include "t-gcdinv.c"
 #include "t-get_set_coeff_ui.c"
@@ -187,6 +188,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_fread_print),
     TEST_FUNCTION(nmod_poly_gcd),
     TEST_FUNCTION(nmod_poly_gcd_euclidean),
+    TEST_FUNCTION(nmod_poly_gcd_euclidean_redc_fast),
     TEST_FUNCTION(nmod_poly_gcd_hgcd),
     TEST_FUNCTION(nmod_poly_gcdinv),
     TEST_FUNCTION(nmod_poly_get_set_coeff_ui),

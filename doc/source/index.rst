@@ -94,6 +94,7 @@ Integers
    fft.rst
    fft_small.rst
    qsieve.rst
+   radix.rst
 
 
 .. only:: not latex

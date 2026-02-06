@@ -36,7 +36,7 @@ TEST_FUNCTION_START(n_rootrem, state)
         mpz_init(g);
         mpz_init(h);
 
-        c = n_randint(state, 0);    /*number */
+        c = n_randtest(state);    /*number */
         flint_mpz_set_ui(g, c);
 
         d = n_randint(state, 0);   /*root */

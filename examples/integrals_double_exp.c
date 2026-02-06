@@ -477,4 +477,9 @@ main(int argc, char *argv[])
 
     }
 
+    arb_clear(result);
+    arb_clear(exc);
+    arb_clear(d);
+
+    flint_cleanup_master();
 }

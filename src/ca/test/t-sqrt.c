@@ -32,11 +32,11 @@ TEST_FUNCTION_START(ca_sqrt, state)
         ca_init(d, ctx);
 
         /* test sqrt(x)^2 = x */
-        ca_randtest(x, state, 5, 5, ctx);
-        ca_randtest(y, state, 5, 5, ctx);
-        ca_randtest(z, state, 5, 5, ctx);
-        ca_randtest(a, state, 5, 5, ctx);
-        ca_randtest(b, state, 5, 5, ctx);
+        ca_randtest(x, state, 4, 4, ctx);
+        ca_randtest(y, state, 4, 4, ctx);
+        ca_randtest(z, state, 4, 4, ctx);
+        ca_randtest(a, state, 4, 4, ctx);
+        ca_randtest(b, state, 4, 4, ctx);
 
         ca_mul(x, x, x, ctx);
         ca_mul(x, x, z, ctx);

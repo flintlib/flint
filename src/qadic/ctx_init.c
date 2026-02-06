@@ -94,7 +94,6 @@ void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
 {
     flint_rand_t state;
     fmpz_mod_poly_t poly;
-    slong i, j;
     fmpz_mod_ctx_t ctxp;
 
     if (*p >= 2 && *p <= 109987)
@@ -110,12 +109,25 @@ void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
 
     flint_rand_clear(state);
 
+    qadic_ctx_init_modulus(ctx, p, poly, min, max, var, mode);
+
+    fmpz_mod_poly_clear(poly, ctxp);
+    fmpz_mod_ctx_clear(ctxp);
+}
+
+void qadic_ctx_init_modulus(qadic_ctx_t ctx, const fmpz_t p, const fmpz_mod_poly_t modulus,
+                           slong min, slong max,
+                           const char *var, enum padic_print_mode mode)
+{
+    slong i, j;
+    const slong d = modulus->length - 1;
+
     /* Find number of non-zero coefficients */
     ctx->len = 1;
 
     for (i = 0; i < d; i++)
     {
-        if (!fmpz_is_zero(poly->coeffs + i))
+        if (!fmpz_is_zero(modulus->coeffs + i))
             ctx->len ++;
     }
 
@@ -124,12 +136,11 @@ void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
 
     /* Copy the polynomial */
     j = 0;
-
     for (i = 0; i < d; i++)
     {
-        if (!fmpz_is_zero(poly->coeffs+i))
+        if (!fmpz_is_zero(modulus->coeffs + i))
         {
-            fmpz_set(ctx->a + j, poly->coeffs + i);
+            fmpz_set(ctx->a + j, modulus->coeffs + i);
             ctx->j[j] = i;
             j++;
         }
@@ -143,7 +154,49 @@ void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
 
     ctx->var = flint_malloc(strlen(var) + 1);
     strcpy(ctx->var, var);
+}
 
-    fmpz_mod_poly_clear(poly, ctxp);
-    fmpz_mod_ctx_clear(ctxp);
+void qadic_ctx_init_modulus_nmod(qadic_ctx_t ctx, ulong p, const nmod_poly_t modulus,
+                           slong min, slong max,
+                           const char *var, enum padic_print_mode mode)
+{
+    slong i, j;
+    fmpz_t pp;
+
+    const slong d = modulus->length - 1;
+
+    /* Find number of non-zero coefficients */
+    ctx->len = 1;
+
+    for (i = 0; i < d; i++)
+    {
+        if (modulus->coeffs[i])
+            ctx->len ++;
+    }
+
+    ctx->a = _fmpz_vec_init(ctx->len);
+    ctx->j = flint_malloc(ctx->len*sizeof(slong));
+
+    /* Copy the polynomial */
+    j = 0;
+    for (i = 0; i < d; i++)
+    {
+        if (modulus->coeffs[i])
+        {
+            fmpz_set_ui(ctx->a + j, modulus->coeffs[i]);
+            ctx->j[j] = i;
+            j++;
+        }
+    }
+
+    fmpz_set_ui(ctx->a + j, 1);
+    ctx->j[j] = d;
+
+    /* Complete the initialisation of the context */
+    fmpz_init_set_ui(pp, p);
+    padic_ctx_init(&ctx->pctx, pp, min, max, mode);
+    fmpz_clear(pp);
+
+    ctx->var = flint_malloc(strlen(var) + 1);
+    strcpy(ctx->var, var);
 }

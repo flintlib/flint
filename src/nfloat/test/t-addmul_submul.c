@@ -54,7 +54,7 @@ TEST_FUNCTION_START(addmul_submul, state)
                         GR_MUST_SUCCEED(gr_addmul(GR_ENTRY(r2, i, ctx->sizeof_elem), 
                                                   GR_ENTRY(x, i, ctx->sizeof_elem), y, ctx));
                 else
-                    GR_MUST_SUCCEED(gr_generic_vec_scalar_addmul(r2, x, len, y, ctx));
+                    GR_MUST_SUCCEED(gr_generic_vec_addmul_scalar(r2, x, len, y, ctx));
             }
             else
             {
@@ -65,7 +65,7 @@ TEST_FUNCTION_START(addmul_submul, state)
                         GR_MUST_SUCCEED(gr_submul(GR_ENTRY(r2, i, ctx->sizeof_elem), 
                                               GR_ENTRY(x, i, ctx->sizeof_elem), y, ctx));
                 else
-                    GR_MUST_SUCCEED(gr_generic_vec_scalar_submul(r2, x, len, y, ctx));
+                    GR_MUST_SUCCEED(gr_generic_vec_submul_scalar(r2, x, len, y, ctx));
             }
 
             if (_gr_vec_equal(r1, r2, len, ctx) != T_TRUE)

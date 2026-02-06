@@ -83,13 +83,6 @@ typedef struct
 }
 _gr_fmpz_mod_ctx_struct;
 
-typedef struct
-{
-    nmod_t nmod;
-    ulong a;   /* when used as finite field with defining polynomial x - a */
-}
-_gr_nmod_ctx_struct;
-
 /* end hack */
 
 #define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))

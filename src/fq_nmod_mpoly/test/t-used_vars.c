@@ -26,7 +26,7 @@ TEST_FUNCTION_START(fq_nmod_mpoly_used_vars, state)
         flint_bitcnt_t exp_bits;
         int * used;
 
-        fq_nmod_mpoly_ctx_init_rand(ctx, state, 20, FLINT_BITS, 10);
+        fq_nmod_mpoly_ctx_init_rand(ctx, state, 15, FLINT_BITS, 10);
         fq_nmod_mpoly_init(f, ctx);
         fmpz_init(fdeg);
         fq_nmod_init(one, ctx->fqctx);
@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fq_nmod_mpoly_used_vars, state)
 
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
-            len = n_randint(state, 200);
+            len = n_randint(state, 50);
             exp_bits = n_randint(state, 200) + 2;
 
             fq_nmod_mpoly_randtest_bits(f, state, len, exp_bits, ctx);

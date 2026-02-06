@@ -19,6 +19,8 @@
 #endif
 
 #include "fmpz_vec.h"
+#include "fmpz_mod_types.h"
+#include "nmod_types.h"
 #include "padic.h"
 #include "padic_poly.h"
 
@@ -61,6 +63,14 @@ int _qadic_ctx_init_conway_ui(qadic_ctx_t ctx, ulong p, slong d,
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max,
+                           const char *var, enum padic_print_mode mode);
+
+void qadic_ctx_init_modulus(qadic_ctx_t ctx, const fmpz_t p, const fmpz_mod_poly_t modulus,
+                           slong min, slong max,
+                           const char *var, enum padic_print_mode mode);
+
+void qadic_ctx_init_modulus_nmod(qadic_ctx_t ctx, ulong p, const nmod_poly_t modulus,
+                           slong min, slong max,
                            const char *var, enum padic_print_mode mode);
 
 void qadic_ctx_init(qadic_ctx_t ctx,

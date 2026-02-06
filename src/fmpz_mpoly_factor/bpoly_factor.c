@@ -725,7 +725,7 @@ static void _recombine_naive(
                 fmpz_tpoly_fit_length(F, F->length + 1);
                 fmpz_bpoly_swap(F->coeffs + F->length, trymez);
                 F->length++;
-                fmpz_bpoly_swap(B, Q);
+                fmpz_bpoly_swap(Q, B);
                 FLINT_ASSERT(B->length > 0);
                 fmpz_mod_poly_set_fmpz_poly(leadB, B->coeffs + B->length - 1, I->ctxpk);
 

@@ -11,46 +11,8 @@
 
 #include "ulong_extras.h"
 
-/*
-   Method of Niels Moller and Torbjorn Granlund see paper:
-   Improved Division by Invariant Integers: (algorithm 4)
-   https://gmplib.org/~tege/division-paper.pdf
-*/
-
-#define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
-
 ulong
 n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv)
 {
-    ulong norm, q1, q0, r;
-
-    FLINT_ASSERT(n != 0);
-
-    norm = flint_clz(n);
-    n <<= norm;
-
-    {
-        const ulong u1 = r_shift(a, FLINT_BITS - norm);
-        const ulong u0 = (a << norm);
-
-        umul_ppmm(q1, q0, ninv, u1);
-        add_ssaaaa(q1, q0, q1, q0, u1, u0);
-
-        (*q) = q1 + 1;
-        r = u0 - (*q) * n;
-
-        if (r > q0)
-        {
-            r += n;
-            (*q)--;
-        }
-
-        if (r >= n)
-        {
-            (*q)++;
-            r -= n;
-        }
-
-        return r >> norm;
-    }
+    return n_divrem_preinv(q, a, n, ninv, flint_clz(n));
 }

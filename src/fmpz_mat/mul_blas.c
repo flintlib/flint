@@ -306,7 +306,7 @@ static void _mod_worker(void * arg_ptr)
     fmpz_comb_temp_clear(comb_temp);
 }
 
-void _tod_worker(void * arg_ptr)
+static void _tod_worker(void * arg_ptr)
 {
     _worker_arg * arg = (_worker_arg *) arg_ptr;
     slong i;
@@ -331,7 +331,7 @@ void _tod_worker(void * arg_ptr)
         _lift_vec(dB + i*n, bigB + l*n + i*n*num_primes, n, prime);
 }
 
-void _fromd_worker(void * arg_ptr)
+static void _fromd_worker(void * arg_ptr)
 {
     _worker_arg * arg = (_worker_arg *) arg_ptr;
     slong i, j;
@@ -362,7 +362,7 @@ void _fromd_worker(void * arg_ptr)
     }
 }
 
-void _crt_worker(void * arg_ptr)
+static void _crt_worker(void * arg_ptr)
 {
     _worker_arg * arg = (_worker_arg *) arg_ptr;
     slong i, j, k;

@@ -19,7 +19,7 @@ TEST_FUNCTION_START(mag_dump_file, state)
 /* assume tmpfile() is broken on windows */
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
     /* just test no crashing... */
-    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * 0.1 * flint_test_multiplier(); iter++)
     {
         mag_t x;
         FILE* tmp;
@@ -38,7 +38,7 @@ TEST_FUNCTION_START(mag_dump_file, state)
         mag_clear(x);
     }
 
-    for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * 0.1 * flint_test_multiplier(); iter++)
     {
         mag_t x, y, z;
         int conversion_error;

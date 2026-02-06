@@ -1545,15 +1545,24 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
     status |= gr_neg_one(a, R);
     equal = gr_is_neg_one(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
+    {
+        flint_printf("zero_one: is_neg_one\n");
         status = GR_TEST_FAIL;
+    }
 
     status |= gr_neg(a, a, R);
     equal = gr_is_one(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
+    {
+        flint_printf("zero_one: is_one\n");
         status = GR_TEST_FAIL;
+    }
 
     if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+    {
+        flint_printf("zero_one: unable\n");
         status = GR_TEST_FAIL;
+    }
 
     GR_TMP_CLEAR(a, R);
 
@@ -1650,7 +1659,7 @@ gr_test_neg(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("neg\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
         flint_printf("x + y = \n"); gr_println(xy, R);
@@ -1668,7 +1677,7 @@ gr_test_neg(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("neg (2)\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
         flint_printf("\n");
@@ -1728,7 +1737,7 @@ gr_test_sub_equal_neg_add(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("sub_equal_neg_add\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
         flint_printf("-y = \n"); gr_println(neg_y, R);
@@ -1878,7 +1887,7 @@ gr_test_addmul_submul(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("addmul_submul\n");
         gr_ctx_println(R);
         flint_printf("which = %d\n", which);
         flint_printf("x = \n"); gr_println(x, R);
@@ -1949,9 +1958,8 @@ gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
-        gr_ctx_println(R);
         flint_printf("is_invertible\n");
+        gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("x ^ -1 = \n"); gr_println(x_inv, R);
         flint_printf("status = %d, invertible = %{truth}\n", status, invertible);
@@ -1989,7 +1997,8 @@ gr_test_inv_involution(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("inv_involution\n");
+        gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("x ^ -1 = \n"); gr_println(x_inv, R);
         flint_printf("(x ^ -1) ^ -1 = \n"); gr_println(x_inv_inv, R);
@@ -2033,7 +2042,8 @@ gr_test_inv_multiplication(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("inv_multiplication\n");
+        gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("x ^ -1 = \n"); gr_println(x_inv, R);
         flint_printf("(x ^ -1) * x = \n"); gr_println(x_inv_x, R);
@@ -2079,7 +2089,7 @@ gr_test_div_then_mul(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("div_then_mul\n");
         gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
@@ -2120,7 +2130,7 @@ gr_test_mul_then_div(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("mul_then_div\n");
         gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
@@ -2176,7 +2186,7 @@ gr_test_divexact(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("divexact\n");
         gr_ctx_println(R);
         flint_printf("aliasing = %d\n", aliasing);
         flint_printf("x = \n"); gr_println(x, R);
@@ -2273,7 +2283,7 @@ gr_test_divexact_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("divexact_type_variants\n");
         flint_printf("which: %d\n", which);
         flint_printf("alias: %d\n", alias);
         flint_printf("x = "); gr_println(x, R);
@@ -2494,7 +2504,7 @@ gr_test_pow_ui_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("pow_ui_exponent_addition\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("a = %wu\n", a);
         flint_printf("b = %wu\n", b);
@@ -2551,7 +2561,7 @@ gr_test_pow_ui_base_scalar_multiplication(gr_ctx_t R, flint_rand_t state, int te
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("pow_ui_base_scalar_multiplication\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = %wd\n", y);
         flint_printf("a = %wu\n", a);
@@ -2605,7 +2615,7 @@ gr_test_pow_ui_base_multiplication(gr_ctx_t R, flint_rand_t state, int test_flag
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("pow_ui_base_multiplication\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
         flint_printf("a = %wu\n", a);
@@ -2654,7 +2664,7 @@ gr_test_pow_ui_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("pow_ui_aliasing\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("a = %wu\n", a);
         flint_printf("x ^ a (1) = \n"); gr_println(xa1, R);
@@ -2724,7 +2734,7 @@ gr_test_pow_fmpz_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flag
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("pow_fmpz_exponent_addition\n");
         gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("a = "); fmpz_print(a); flint_printf("\n");
@@ -2787,7 +2797,7 @@ gr_test_pow_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("pow_aliasing\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("a = \n"); gr_println(a, R);
         flint_printf("x ^ a (1) = \n"); gr_println(xa1, R);
@@ -2837,7 +2847,7 @@ gr_test_pow_exponent_addition(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("pow_exponent_addition\n");
         gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("a = \n"); gr_println(a, R);
@@ -3083,7 +3093,7 @@ gr_test_ordered_ring_cmpabs(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("ordered_ring_cmpabs\n");
         flint_printf("R = "); gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
@@ -3148,7 +3158,7 @@ gr_test_complex_parts(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("complex_parts\n");
         gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("a = \n"); gr_println(a, R);
@@ -3397,7 +3407,7 @@ gr_test_canonical_associate(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
-        flint_printf("\n");
+        flint_printf("canonical_associate\n");
         gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("v = \n"); gr_println(v, R);
@@ -3805,7 +3815,10 @@ gr_test_vec_dot(gr_ctx_t R, flint_rand_t state, int test_flags)
     gr_ptr x, y, a, s, t;
     int initial, alias, subtract, reverse;
 
-    len = n_randint(state, 5);
+    if (gr_ctx_is_finite(R) == T_TRUE)
+        len = n_randint(state, 50);
+    else
+        len = n_randint(state, 5);
 
     initial = n_randint(state, 2);
     alias = n_randint(state, 2);

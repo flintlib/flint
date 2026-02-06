@@ -108,6 +108,7 @@ TEST_FUNCTION_START(fmpz_mod_poly_print_read, state)
                 fmpz_mod_poly_clear(a[j], ctx);
             flint_free(a);
             fclose(out);
+            flint_cleanup_master();
             exit(0);
         }
         else  /* Parent process */
@@ -217,6 +218,7 @@ TEST_FUNCTION_START(fmpz_mod_poly_print_read, state)
             }
 
             fclose(out);
+            flint_cleanup_master();
             exit(0);
         }
         else  /* Parent process */
