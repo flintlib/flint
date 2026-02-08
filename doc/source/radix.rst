@@ -110,7 +110,7 @@ Except where otherwise noted, the following rules apply:
 .. function:: void radix_mul(nn_ptr res, nn_srcptr x, slong xn, nn_srcptr y, slong yn, const radix_t radix)
 
     Sets *(res, xn + yn)* to the product of *(x, xn)* and *(y, yn)*.
-    Requires `xn \ge yn \ge 1`. Does not allow *res* to be aliased with
+    Requires `xn, yn \ge 1`. Does not allow *res* to be aliased with
     either *x* or *y*.
 
     This function is currently a wrapper of :func:`radix_mulmid`.
@@ -127,7 +127,7 @@ Except where otherwise noted, the following rules apply:
               void radix_mulmid_naive(nn_ptr res, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong lo, slong hi, const radix_t radix)
 
     Short, truncated or middle product.
-    Requires `xn \ge yn \ge 1` and `0 \le lo < hi \le xn + yn`.
+    Requires `xn, yn \ge 1` and `0 \le lo < hi \le xn + yn`.
     Does not allow *res* to be aliased with either *x* or *y*.
 
     Viewing as `x` and `y` as polynomials `X, Y \in \mathbb{Z}[T]` evaluated
@@ -224,7 +224,7 @@ String conversion
     If the given pointer *res* is *NULL*, a new string will be allocated
     with :func:`flint_malloc` and returned. Otherwise, *res* will be used,
     and is assumed to have sufficient space to store the result including
-    ter.
+    null terminator.
 
 .. function:: char * radix_get_str_sum(char * res, nn_srcptr x, slong n, int negative, int ascending, const radix_t radix)
 

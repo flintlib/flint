@@ -253,7 +253,12 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
 
     FLINT_ASSERT(an >= 1);
     FLINT_ASSERT(bn >= 1);
-    FLINT_ASSERT(an >= bn);
+
+    if (an < bn)
+    {
+        FLINT_SWAP(nn_srcptr, a, b);
+        FLINT_SWAP(slong, an, bn);
+    }
 
     if (zhi <= 2 && zlo == 0)
     {
@@ -285,6 +290,8 @@ radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, s
         radix_sqrmid_classical(z, a, an, zlo, zhi, radix);
         return;
     }
+
+    FLINT_ASSERT(an >= bn);
 
     an = FLINT_MIN(an, zhi);
     bn = FLINT_MIN(bn, zhi);

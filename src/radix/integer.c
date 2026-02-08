@@ -282,10 +282,7 @@ radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix_inte
         if (x == y)
             radix_sqr(rd, tmp, xn, radix);
         else
-            if (xn >= yn)
-                radix_mul(rd, tmp, xn, yd, yn, radix);
-            else
-                radix_mul(rd, yd, yn, tmp, xn, radix);
+            radix_mul(rd, tmp, xn, yd, yn, radix);
         TMP_END;
     }
     else if (res == y)
@@ -294,20 +291,15 @@ radix_integer_mul(radix_integer_t res, const radix_integer_t x, const radix_inte
         TMP_START;
         nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * yn);
         flint_mpn_copyi(tmp, yd, yn);
-        if (xn >= yn)
-            radix_mul(rd, xd, xn, tmp, yn, radix);
-        else
-            radix_mul(rd, tmp, yn, xd, xn, radix);
+        radix_mul(rd, xd, xn, tmp, yn, radix);
         TMP_END;
     }
     else
     {
         if (x == y)
             radix_sqr(rd, xd, xn, radix);
-        else if (xn >= yn)
-            radix_mul(rd, xd, xn, yd, yn, radix);
         else
-            radix_mul(rd, yd, yn, xd, xn, radix);
+            radix_mul(rd, xd, xn, yd, yn, radix);
     }
 
     rn -= (rd[rn - 1] == 0);
@@ -646,10 +638,8 @@ radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const r
         flint_mpn_copyi(tmp, xd, xn);
         if (x == y)
             radix_mulmid(rd, tmp, xn, tmp, yn, 0, rn, radix);
-        else if (xn >= yn)
-            radix_mulmid(rd, tmp, xn, yd, yn, 0, rn, radix);
         else
-            radix_mulmid(rd, yd, yn, tmp, xn, 0, rn, radix);
+            radix_mulmid(rd, tmp, xn, yd, yn, 0, rn, radix);
         TMP_END;
     }
     else if (res == y)
@@ -658,18 +648,12 @@ radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const r
         TMP_START;
         nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * yn);
         flint_mpn_copyi(tmp, yd, yn);
-        if (xn >= yn)
-            radix_mulmid(rd, xd, xn, tmp, yn, 0, rn, radix);
-        else
-            radix_mulmid(rd, tmp, yn, xd, xn, 0, rn, radix);
+        radix_mulmid(rd, xd, xn, tmp, yn, 0, rn, radix);
         TMP_END;
     }
     else
     {
-        if (xn >= yn)
-            radix_mulmid(rd, xd, xn, yd, yn, 0, rn, radix);
-        else
-            radix_mulmid(rd, yd, yn, xd, xn, 0, rn, radix);
+        radix_mulmid(rd, xd, xn, yd, yn, 0, rn, radix);
     }
 
     MPN_NORM(rd, rn);

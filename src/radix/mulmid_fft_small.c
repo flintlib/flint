@@ -590,6 +590,12 @@ static void _radix_mul_mpn_ctx(
 void
 radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)
 {
+    if (an < bn)
+    {
+        FLINT_SWAP(nn_srcptr, a, b);
+        FLINT_SWAP(slong, an, bn);
+    }
+
     _radix_mul_mpn_ctx(res, zlo, zhi, a, an, b, bn, radix->B, get_default_mpn_ctx());
 }
 

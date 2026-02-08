@@ -88,7 +88,7 @@ RADIX_INLINE void
 radix_mulmid(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix)
 {
     /* todo: tuning */
-    if (bn < 80 || hi - lo < 80)
+    if (FLINT_MIN(an, bn) < 80 || hi - lo < 80)
         radix_mulmid_classical(res, a, an, b, bn, lo, hi, radix);
     else
 #if FLINT_HAVE_FFT_SMALL

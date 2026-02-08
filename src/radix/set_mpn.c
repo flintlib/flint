@@ -266,10 +266,7 @@ _radix_set_mpn_recursive(nn_ptr res, nn_srcptr a, slong an_words, slong abits, s
         slong val = powers->val_limbs[depth];
         len_pow = powers->sizes[depth] - val;
 
-        if (len_hi >= len_pow)
-            radix_mul(res + val, hi, len_hi, powers->pows[depth] + val, len_pow, radix);
-        else
-            radix_mul(res + val, powers->pows[depth] + val, len_pow, hi, len_hi, radix);
+        radix_mul(res + val, hi, len_hi, powers->pows[depth] + val, len_pow, radix);
 
         len_res = len_pow + len_hi + val;
         len_res -= (res[len_res - 1] == 0);

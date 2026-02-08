@@ -22,6 +22,13 @@ radix_mulmid_KS(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zl
 
     FLINT_ASSERT(an >= 1);
     FLINT_ASSERT(bn >= 1);
+
+    if (an < bn)
+    {
+        FLINT_SWAP(nn_srcptr, a, b);
+        FLINT_SWAP(slong, an, bn);
+    }
+
     FLINT_ASSERT(an >= bn);
 
     an = FLINT_MIN(an, zhi);
