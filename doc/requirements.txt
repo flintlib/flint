@@ -1,6 +1,3 @@
 # Sphinx documentation dependencies
 sphinx>=9.0
-
-# Custom theme distributed as a wheel
-# Using vendored wheel file from the vendors directory
-./vendors/sphinx_clarity_theme-0.1.1-py3-none-any.whl
+sphinx_clarity_theme==1.0.2

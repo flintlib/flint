@@ -35,7 +35,7 @@ jobs:
 
       - name: "Install Python dependencies"
         run: |
-          uv pip install -r doc/requirements.txt
+          uv pip install --system -r doc/requirements.txt
           sphinx-build --version
 
       - name: "Build documentation"
