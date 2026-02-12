@@ -116,6 +116,8 @@ html_static_path = ['_static']
 #
 # html_sidebars = {}
 
+html_css_files = ["styles/custom.css"]
+
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

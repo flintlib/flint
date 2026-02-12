@@ -1,0 +1,6 @@
+/* More dense API signatures */
+dt.sig {
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--color-base-100) !important;
+}
