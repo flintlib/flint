@@ -30,8 +30,9 @@
 // k is in {2,3,4,5,6,7,8,9,12} 10 and 11 are skipped for efficiency
 static int n_is_semiprime_k(ulong n)
 {
-// Precomputed multiplicative inverses of the sqrt of k
+// Precomputed multiplicative inverses of the sqrt of k \in [2,9]
    const double SQRTINV[8] = {
+     // sqrt(2)^-1          sqrt(3)^-1
      0x1.6a09e667f3bccp-1 , 0x1.279a74590331dp-1 ,
      0x1p-1               , 0x1.c9f25c5bfedd9p-2 ,
      0x1.a20bd700c2c3fp-2 , 0x1.83091e6a7f7e6p-2 ,
@@ -40,19 +41,24 @@ static int n_is_semiprime_k(ulong n)
 
     // 1/sqrt(12)
   const double SQRTINV12 = 0x1.279a74590331dp-2;
+  // We only need a single sqrt
+  double sqrtn = sqrt(n);  
   // This is equivalent to sqrt(n/12)
-  uint64_t k = sqrtn*SQRTINV12;
+  // The result of sqrt(n/k) is always less than 2^32 so it fits into a signed int64
+  // Additionally float64 to signed int is generally faster than  float64 to unsigned int
+  int64_t ki = sqrtn*SQRTINV12;
+  // A simple interpretation change that should be zerocost
+  uint64_t k = ki;  
   // check that N is of the form 
   if (((k+1)*(12*k+1))==n){
       return 1;
-  } 
-    
-  // Compute sqrt just once
-   double sqrtn = sqrt(n);
-  
+  }
+  // Loop over the rest of the elements
    for (int idx=0;idx<8;idx++){
     // This is equivalent to sqrt(n/k)
-      uint64_t a = sqrtn*SQRTINV[idx];
+      int64_t ai = sqrtn*SQRTINV[idx];
+
+      uint64_t a = ai; 
       // increment the index to the offset
       uint64_t k = idx+2;
       // This is a composite so return true
