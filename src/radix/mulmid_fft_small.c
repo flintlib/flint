@@ -164,7 +164,7 @@ static void CAT(_crt, NP)( \
     ulong cy[3] = { 0, 0, 0 }; \
  \
     FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
-    FLINT_ASSERT(1 <= N && N <= 3); \
+    FLINT_ASSERT(1 <= N && N <= 4); \
  \
     if (n == m + 1) \
     { \
