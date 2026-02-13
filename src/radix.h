@@ -104,8 +104,6 @@ radix_mul(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_
     radix_mulmid(res, a, an, b, bn, 0, an + bn, radix);
 }
 
-/* Division */
-
 /* todo: squaring optimisations in all multiplication algorithms */
 RADIX_INLINE void
 radix_sqr(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
@@ -113,8 +111,18 @@ radix_sqr(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
     radix_mul(res, a, an, a, an, radix);
 }
 
+/* Division */
+
 ulong radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
 void radix_divexact_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
+
+void radix_inv_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_inv_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix);
+
+void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
 
 int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
 

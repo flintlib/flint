@@ -12,9 +12,11 @@
 /* Include functions *********************************************************/
 
 #include "t-add.c"
+#include "t-divrem.c"
 #include "t-divrem_1.c"
 #include "t-get_mpn.c"
 #include "t-integer.c"
+#include "t-inv_approx.c"
 #include "t-invmod_bn.c"
 #include "t-mulmid_classical.c"
 #include "t-mulmid_fft_small.c"
@@ -28,9 +30,11 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(radix_add),
+    TEST_FUNCTION(radix_divrem),
     TEST_FUNCTION(radix_divrem_1),
     TEST_FUNCTION(radix_get_mpn),
     TEST_FUNCTION(radix_integer),
+    TEST_FUNCTION(radix_inv_approx),
     TEST_FUNCTION(radix_invmod_bn),
     TEST_FUNCTION(radix_mulmid_classical),
     TEST_FUNCTION(radix_mulmid_fft_small),

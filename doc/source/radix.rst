@@ -169,6 +169,29 @@ Except where otherwise noted, the following rules apply:
     *(x, xn)* is an exact multiple of *d*, with undefined behavior otherwise.
     Requires `1 \le d \le B - 1`.
 
+.. function:: void radix_inv_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+              void radix_inv_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+
+    Given `(a, an)` with `a_{an-1} \ne 0` representing a fixed-point number
+    `a \in [1/B, 1)` with `an` fraction limbs,
+    sets `(q, n+2)` to an approximation of `1/a \in (1, B]` with `n` fraction limbs
+    and two integral limbs (the highest limb may be zero).
+
+.. function:: void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+              void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+              void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient and `(r,bn)` to the remainder of
+    `(a,an)` divided by `(b,bn)`. Requires `an \ge bn \ge 1` and
+    `b_{bn-1} \ne 0`.
+
+.. function:: void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix)
+
+    Similar to :func:`radix_divrem`, but accepts a precomputed inverse
+    of `b` given as `(b, binvn+2)` with `binvn` fraction limbs and two
+    integral limbs, as computed by :func:`radix_inv_approx`.
+    Currently requires that `binvn \ge an-bn+1`.
+
 .. function:: int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
 
     If *(x, xn)* is invertible modulo `B^n`, sets *(res, n)* to the inverse
