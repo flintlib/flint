@@ -101,8 +101,9 @@ radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slo
         if (r != NULL)
         {
             /* r = a - bq */
-            radix_mulmid(r, b, bn, q2, qn, 0, bn, radix);
-            radix_sub(r, a, bn, r, bn, radix);
+            /* Use br as scratch space to allow aliasing a with r */
+            radix_mulmid(br, b, bn, q2, qn, 0, bn, radix);
+            radix_sub(r, a, bn, br, bn, radix);
         }
 
         flint_mpn_copyi(q, q2, qn);
@@ -314,6 +315,7 @@ radix_divrem_preinv(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slon
 
     n = An - Bn + 1;
 
+    /* Todo: use the unbalanced division algorithm from radix_divrem */
     if (Binvn < n)
         flint_throw(FLINT_ERROR, "radix_divrem_preinv: inverse has too few limbs");
 

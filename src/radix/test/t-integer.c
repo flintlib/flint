@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "radix.h"
 #include "gr.h"
+#include "fmpz.h"
 
 TEST_FUNCTION_START(radix_integer, state)
 {
@@ -342,6 +343,77 @@ TEST_FUNCTION_START(radix_integer, state)
         radix_integer_clear(x, radix);
         radix_integer_clear(y, radix);
         radix_integer_clear(z, radix);
+        radix_clear(radix);
+    }
+
+    /* tdiv_qr, fdiv_qr */
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    {
+        radix_t radix;
+        radix_integer_t a, b, q, r, q2, r2;
+        fmpz_t fa, fb;
+        int rnd = n_randint(state, 3);
+
+        radix_init_randtest(radix, state);
+        radix_integer_init(a, radix);
+        radix_integer_init(b, radix);
+        radix_integer_init(q, radix);
+        radix_integer_init(r, radix);
+        radix_integer_init(q2, radix);
+        radix_integer_init(r2, radix);
+        fmpz_init(fa);
+        fmpz_init(fb);
+
+        radix_integer_randtest_limbs(a, state, 4, radix);
+        do {
+            radix_integer_randtest_limbs(b, state, 4, radix);
+        } while (b->size == 0);
+
+        radix_integer_randtest_limbs(q, state, 2, radix);
+        radix_integer_randtest_limbs(r, state, 2, radix);
+
+        if (rnd == 0)
+            radix_integer_tdiv_qr(q, r, a, b, radix);
+        else if (rnd == 1)
+            radix_integer_fdiv_qr(q, r, a, b, radix);
+        else
+            radix_integer_cdiv_qr(q, r, a, b, radix);
+
+        radix_integer_get_fmpz(fa, a, radix);
+        radix_integer_get_fmpz(fb, b, radix);
+
+        if (rnd == 0)
+            fmpz_tdiv_qr(fa, fb, fa, fb);
+        else if (rnd == 1)
+            fmpz_fdiv_qr(fa, fb, fa, fb);
+        else
+            fmpz_cdiv_qr(fa, fb, fa, fb);
+
+        radix_integer_set_fmpz(q2, fa, radix);
+        radix_integer_set_fmpz(r2, fb, radix);
+
+        if (!radix_integer_equal(q, q2, radix) || !radix_integer_equal(r, r2, radix))
+        {
+            flint_printf("FAIL: div_qr\n");
+            flint_printf("rnd = %d\n", rnd);
+            flint_printf("radix %wu ^ %u = %wu\n", DIGIT_RADIX(radix), radix->exp, LIMB_RADIX(radix));
+            flint_printf("a = (%wd %wd %{ulong*})\n", a->size, a->alloc, a->d, radix_integer_size(a, radix));
+            flint_printf("b = (%wd %wd %{ulong*})\n", b->size, b->alloc, b->d, radix_integer_size(b, radix));
+            flint_printf("q = (%wd %wd %{ulong*})\n", q->size, q->alloc, q->d, radix_integer_size(q, radix));
+            flint_printf("r = (%wd %wd %{ulong*})\n", r->size, r->alloc, r->d, radix_integer_size(r, radix));
+            flint_printf("q2 = (%wd %wd %{ulong*})\n", q2->size, q2->alloc, q2->d, radix_integer_size(q2, radix));
+            flint_printf("r2 = (%wd %wd %{ulong*})\n", r2->size, r2->alloc, r2->d, radix_integer_size(r2, radix));
+            flint_abort();
+        }
+
+        radix_integer_clear(a, radix);
+        radix_integer_clear(b, radix);
+        radix_integer_clear(q, radix);
+        radix_integer_clear(r, radix);
+        radix_integer_clear(q2, radix);
+        radix_integer_clear(r2, radix);
+        fmpz_clear(fa);
+        fmpz_clear(fb);
         radix_clear(radix);
     }
 

@@ -21,7 +21,7 @@ TEST_FUNCTION_START(radix_divrem, state)
         radix_t radix;
         nn_ptr a, b, q, r, bq, bqr;
         slong an, bn, qn, rn;
-        int algorithm;
+        int algorithm, aliasing;
 
         radix_init_randtest(radix, state);
 
@@ -49,12 +49,62 @@ TEST_FUNCTION_START(radix_divrem, state)
 
         algorithm = n_randint(state, 3);
 
+        void (*divrem_func)(nn_ptr q, nn_ptr r,
+                           nn_srcptr a, slong an,
+                           nn_srcptr b, slong bn,
+                           const radix_t radix);
+
         if (algorithm == 0)
-            radix_divrem_via_mpn(q, r, a, an, b, bn, radix);
+            divrem_func = radix_divrem_via_mpn;
         else if (algorithm == 1)
-            radix_divrem_newton(q, r, a, an, b, bn, radix);
+            divrem_func = radix_divrem_newton;
         else
-            radix_divrem(q, r, a, an, b, bn, radix);
+            divrem_func = radix_divrem;
+
+        aliasing = n_randint(state, 7);
+
+        if (aliasing == 0)
+        {
+            divrem_func(q, r, a, an, b, bn, radix);
+        }
+        else if (aliasing == 1)
+        {
+            q = flint_realloc(q, an * sizeof(ulong));
+            flint_mpn_copyi(q, a, an);
+            divrem_func(q, r, q, an, b, bn, radix);
+        }
+        else if (aliasing == 2)
+        {
+            r = flint_realloc(r, an * sizeof(ulong));
+            flint_mpn_copyi(r, a, an);
+            divrem_func(q, r, r, an, b, bn, radix);
+        }
+        else if (aliasing == 3)
+        {
+            q = flint_realloc(q, FLINT_MAX(qn, bn) * sizeof(ulong));
+            flint_mpn_copyi(q, b, bn);
+            divrem_func(q, r, a, an, q, bn, radix);
+        }
+        else if (aliasing == 4)
+        {
+            flint_mpn_copyi(r, b, bn);
+            divrem_func(q, r, a, an, r, bn, radix);
+        }
+        else if (aliasing == 5)
+        {
+            q = flint_realloc(q, an * sizeof(ulong));
+            flint_mpn_copyi(q, a, an);
+            flint_mpn_copyi(r, b, bn);
+            divrem_func(q, r, q, an, r, bn, radix);
+        }
+        else if (aliasing == 6)
+        {
+            q = flint_realloc(q, FLINT_MAX(qn, bn) * sizeof(ulong));
+            flint_mpn_copyi(q, b, bn);
+            r = flint_realloc(r, an * sizeof(ulong));
+            flint_mpn_copyi(r, a, an);
+            divrem_func(q, r, r, an, q, bn, radix);
+        }
 
         radix_mulmid(bq, q, qn, b, bn, 0, an, radix);
         radix_add(bqr, bq, an, r, rn, radix);
@@ -63,6 +113,7 @@ TEST_FUNCTION_START(radix_divrem, state)
         {
             flint_printf("FAIL: radix_divrem\n");
             flint_printf("algorithm = %d\n", algorithm);
+            flint_printf("aliasing = %d\n", aliasing);
             flint_printf("a = %{ulong*}\n", a, an);
             flint_printf("b = %{ulong*}\n", b, bn);
             flint_printf("q = %{ulong*}\n", q, qn);
