@@ -124,6 +124,9 @@ void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b
 void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
 void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
 
+int radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+void radix_divexact(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+
 int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
 
 /* compare (x, n) with floor(B^n / 2) */
@@ -262,6 +265,9 @@ void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slon
 
 void radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix);
 int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
+int radix_integer_div(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_divexact(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 
 void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);

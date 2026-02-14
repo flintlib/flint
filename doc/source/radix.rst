@@ -192,6 +192,18 @@ Except where otherwise noted, the following rules apply:
     integral limbs, as computed by :func:`radix_inv_approx`.
     Currently requires that `binvn \ge an-bn+1`.
 
+.. function:: int radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient of `a` divided by `b` and returns 1
+    if the division is exact. If the division is not exact, returns 0
+    leaving the data in `q` undefined.
+
+.. function:: int radix_divexact(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient of `a` divided by `b` assuming that
+    the division is exact. The result is undefined if the division is
+    inexact.
+
 .. function:: int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
 
     If *(x, xn)* is invertible modulo `B^n`, sets *(res, n)* to the inverse
@@ -366,6 +378,23 @@ Memory-managed integers
 
     Sets *res* to the product of *x* and *y* with the absolute value
     reduced modulo `B^n`.
+
+.. function:: int radix_integer_div(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Sets `q` to the quotient of `a` divided by `b` and returns 1
+    if the division is exact, otherwise sets `q` to zero and returns 0.
+
+.. function:: int radix_integer_divexact(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Sets `q` to the quotient of `a` divided by `b` assuming that the
+    division is exact. The behavior is undefined if the division is inexact.
+
+.. function:: void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Division with remainder: compute `a = qb + r` where `q` is the truncation,
+    floor, and ceiling quotient respectively.
 
 .. function:: int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 

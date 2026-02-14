@@ -446,3 +446,106 @@ radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, c
     radix_divrem_via_mpn(q, r, a, an, b, bn, radix);
 }
 
+static int
+_radix_div_via_mpn(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+{
+    /* Binary (machine) radix */
+    nn_ptr bq, br, ba, bb, tmp, q2;
+    slong bqn, ban, brn, bbn, alloc, qn, qn2;
+    int exact;
+    TMP_INIT;
+
+    FLINT_ASSERT(an >= bn);
+    FLINT_ASSERT(bn >= 1);
+    FLINT_ASSERT(b[bn - 1] != 0);
+
+    /* todo: tighten allocations when radix is much smaller than the machine radix */
+    alloc = ((an - bn + 2) + (bn + 1) + (an + 1) + (bn + 1));
+    TMP_START;
+    tmp = TMP_ALLOC(alloc * sizeof(ulong));
+    bq = tmp;
+    br = bq + (an - bn + 2);
+    ba = br + (bn + 1);
+    bb = ba + (an + 1);
+
+    ban = radix_get_mpn(ba, a, an, radix);
+    bbn = radix_get_mpn(bb, b, bn, radix);
+    bqn = ban - bbn + 1;
+    brn = bbn;
+
+    FLINT_ASSERT(ban >= bbn);
+
+    mpn_tdiv_qr(bq, br, 0, ba, ban, bb, bbn);
+    exact = flint_mpn_zero_p(br, brn);
+
+    /* Need to do radix conversion in temporary space as radix conversion may
+       need an extra output scratch limb. */
+    if (exact)
+    {
+        qn2 = radix_set_mpn_need_alloc(bqn, radix);
+        q2 = TMP_ALLOC(qn2 * sizeof(ulong));
+        qn = radix_set_mpn(q2, bq, bqn, radix);
+        flint_mpn_copyi(q, q2, qn);
+        flint_mpn_zero(q + qn, (an - bn + 1) - qn);
+    }
+
+    TMP_END;
+    return exact;
+}
+
+int
+radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+{
+    FLINT_ASSERT(an >= bn);
+    FLINT_ASSERT(bn >= 1);
+    FLINT_ASSERT(b[bn - 1] != 0);
+
+    if (bn == 1)
+        return radix_divrem_1(q, a, an, b[0], radix) == 0;
+
+    if (flint_mpn_zero_p(a + bn, an - bn) && mpn_cmp(a, b, bn) < 0)
+    {
+        if (flint_mpn_zero_p(a, bn))
+        {
+            flint_mpn_zero(q, an - bn + 1);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    if (bn >= 48 || an > 2 * bn)
+    {
+        int exact;
+        nn_ptr r;
+        TMP_INIT;
+        TMP_START;
+        r = TMP_ALLOC(bn * sizeof(ulong));
+        radix_divrem(q, r, a, an, b, bn, radix);
+        exact = flint_mpn_zero_p(r, bn);
+        TMP_END;
+        return exact;
+    }
+
+    return _radix_div_via_mpn(q, a, an, b, bn, radix);
+}
+
+void
+radix_divexact(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+{
+    FLINT_ASSERT(an >= bn);
+    FLINT_ASSERT(bn >= 1);
+    FLINT_ASSERT(b[bn - 1] != 0);
+
+    if (bn == 1)
+    {
+        radix_divexact_1(q, a, an, b[0], radix);
+        return;
+    }
+
+    /* todo: proper algorithm */
+    radix_div(q, a, an, b, bn, radix);
+}
+
