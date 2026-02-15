@@ -272,6 +272,12 @@ void radix_integer_divexact(radix_integer_t q, const radix_integer_t a, const ra
 void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_tdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_fdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_cdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_tdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_fdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
+void radix_integer_cdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 
 #ifdef __cplusplus
 }

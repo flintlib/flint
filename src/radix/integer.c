@@ -1002,6 +1002,67 @@ void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r,
     r->size = (bsize < 0) ? rn : -rn;
 }
 
+/* Todo: optimize */
+void
+radix_integer_tdiv_q(radix_integer_t q,
+    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+{
+    radix_integer_t r;
+    radix_integer_init(r, radix);
+    radix_integer_tdiv_qr(q, r, a, b, radix);
+    radix_integer_clear(r, radix);
+}
+
+void
+radix_integer_fdiv_q(radix_integer_t q,
+    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+{
+    radix_integer_t r;
+    radix_integer_init(r, radix);
+    radix_integer_fdiv_qr(q, r, a, b, radix);
+    radix_integer_clear(r, radix);
+}
+
+void
+radix_integer_cdiv_q(radix_integer_t q,
+    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+{
+    radix_integer_t r;
+    radix_integer_init(r, radix);
+    radix_integer_cdiv_qr(q, r, a, b, radix);
+    radix_integer_clear(r, radix);
+}
+
+void
+radix_integer_tdiv_r(radix_integer_t r,
+    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+{
+    radix_integer_t q;
+    radix_integer_init(q, radix);
+    radix_integer_tdiv_qr(q, r, a, b, radix);
+    radix_integer_clear(q, radix);
+}
+
+void
+radix_integer_fdiv_r(radix_integer_t r,
+    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+{
+    radix_integer_t q;
+    radix_integer_init(q, radix);
+    radix_integer_fdiv_qr(q, r, a, b, radix);
+    radix_integer_clear(q, radix);
+}
+
+void
+radix_integer_cdiv_r(radix_integer_t r,
+    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+{
+    radix_integer_t q;
+    radix_integer_init(q, radix);
+    radix_integer_cdiv_qr(q, r, a, b, radix);
+    radix_integer_clear(q, radix);
+}
+
 /* ------------------------------------------------------------------------- */
 /*    GR wrapper                                                             */
 /* ------------------------------------------------------------------------- */
@@ -1254,8 +1315,31 @@ static int _gr_radix_integer_divexact(radix_integer_t res, const radix_integer_t
 {
     if (y->size == 0)
         return GR_DOMAIN;
-
     radix_integer_divexact(res, x, y, GR_RADIX_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int _gr_radix_integer_fdiv_q(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, gr_ctx_t ctx)
+{
+    if (y->size == 0)
+        return GR_DOMAIN;
+    radix_integer_fdiv_q(res, x, y, GR_RADIX_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int _gr_radix_integer_fdiv_r(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, gr_ctx_t ctx)
+{
+    if (y->size == 0)
+        return GR_DOMAIN;
+    radix_integer_fdiv_r(res, x, y, GR_RADIX_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+static int _gr_radix_integer_fdiv_qr(radix_integer_t res1, radix_integer_t res2, const radix_integer_t x, const radix_integer_t y, gr_ctx_t ctx)
+{
+    if (y->size == 0)
+        return GR_DOMAIN;
+    radix_integer_fdiv_qr(res1, res2, x, y, GR_RADIX_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -1321,6 +1405,9 @@ gr_method_tab_input _gr_radix_integer_methods_input[] =
     {GR_METHOD_MUL,             (gr_funcptr) _gr_radix_integer_mul},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_radix_integer_div},
     {GR_METHOD_DIVEXACT,        (gr_funcptr) _gr_radix_integer_divexact},
+    {GR_METHOD_EUCLIDEAN_DIV,   (gr_funcptr) _gr_radix_integer_fdiv_q},
+    {GR_METHOD_EUCLIDEAN_REM,   (gr_funcptr) _gr_radix_integer_fdiv_r},
+    {GR_METHOD_EUCLIDEAN_DIVREM,   (gr_funcptr) _gr_radix_integer_fdiv_qr},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_radix_integer_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_radix_integer_cmpabs},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_radix_integer_sgn},
