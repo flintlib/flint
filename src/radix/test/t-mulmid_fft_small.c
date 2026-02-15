@@ -33,13 +33,13 @@ TEST_FUNCTION_START(radix_mulmid_fft_small, state)
 
         if (n_randint(state, 10) == 0)
         {
+            an = 1 + n_randint(state, 30000);
             bn = 1 + n_randint(state, 30000);
-            an = bn + n_randint(state, 10000);
         }
         else
         {
-            bn = 1 + n_randint(state, 30);
-            an = bn + n_randint(state, 50);
+            an = 1 + n_randint(state, 40);
+            bn = 1 + n_randint(state, 40);
         }
 
         squaring = n_randint(state, 2);

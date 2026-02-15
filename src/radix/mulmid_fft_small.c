@@ -164,7 +164,7 @@ static void CAT(_crt, NP)( \
     ulong cy[3] = { 0, 0, 0 }; \
  \
     FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
-    FLINT_ASSERT(1 <= N && N <= 3); \
+    FLINT_ASSERT(1 <= N && N <= 4); \
  \
     if (n == m + 1) \
     { \
@@ -590,6 +590,12 @@ static void _radix_mul_mpn_ctx(
 void
 radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)
 {
+    if (an < bn)
+    {
+        FLINT_SWAP(nn_srcptr, a, b);
+        FLINT_SWAP(slong, an, bn);
+    }
+
     _radix_mul_mpn_ctx(res, zlo, zhi, a, an, b, bn, radix->B, get_default_mpn_ctx());
 }
 

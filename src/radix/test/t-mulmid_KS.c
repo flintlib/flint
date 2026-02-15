@@ -25,8 +25,8 @@ TEST_FUNCTION_START(radix_mulmid_KS, state)
 
         radix_init_randtest(radix, state);
 
+        an = 1 + n_randint(state, 30);
         bn = 1 + n_randint(state, 30);
-        an = bn + n_randint(state, 5);
 
         squaring = n_randint(state, 2);
         if (squaring)

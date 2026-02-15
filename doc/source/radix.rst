@@ -110,7 +110,7 @@ Except where otherwise noted, the following rules apply:
 .. function:: void radix_mul(nn_ptr res, nn_srcptr x, slong xn, nn_srcptr y, slong yn, const radix_t radix)
 
     Sets *(res, xn + yn)* to the product of *(x, xn)* and *(y, yn)*.
-    Requires `xn \ge yn \ge 1`. Does not allow *res* to be aliased with
+    Requires `xn, yn \ge 1`. Does not allow *res* to be aliased with
     either *x* or *y*.
 
     This function is currently a wrapper of :func:`radix_mulmid`.
@@ -127,7 +127,7 @@ Except where otherwise noted, the following rules apply:
               void radix_mulmid_naive(nn_ptr res, nn_srcptr x, slong xn, nn_srcptr y, slong yn, slong lo, slong hi, const radix_t radix)
 
     Short, truncated or middle product.
-    Requires `xn \ge yn \ge 1` and `0 \le lo < hi \le xn + yn`.
+    Requires `xn, yn \ge 1` and `0 \le lo < hi \le xn + yn`.
     Does not allow *res* to be aliased with either *x* or *y*.
 
     Viewing as `x` and `y` as polynomials `X, Y \in \mathbb{Z}[T]` evaluated
@@ -168,6 +168,41 @@ Except where otherwise noted, the following rules apply:
     Sets *(res, xn)* to the quotient of *(x, xn)* divided by *d* assuming that
     *(x, xn)* is an exact multiple of *d*, with undefined behavior otherwise.
     Requires `1 \le d \le B - 1`.
+
+.. function:: void radix_inv_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+              void radix_inv_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+
+    Given `(a, an)` with `a_{an-1} \ne 0` representing a fixed-point number
+    `a \in [1/B, 1)` with `an` fraction limbs,
+    sets `(q, n+2)` to an approximation of `1/a \in (1, B]` with `n` fraction limbs
+    and two integral limbs (the highest limb may be zero).
+
+.. function:: void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+              void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+              void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient and `(r,bn)` to the remainder of
+    `(a,an)` divided by `(b,bn)`. Requires `an \ge bn \ge 1` and
+    `b_{bn-1} \ne 0`.
+
+.. function:: void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix)
+
+    Similar to :func:`radix_divrem`, but accepts a precomputed inverse
+    of `b` given as `(b, binvn+2)` with `binvn` fraction limbs and two
+    integral limbs, as computed by :func:`radix_inv_approx`.
+    Currently requires that `binvn \ge an-bn+1`.
+
+.. function:: int radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient of `a` divided by `b` and returns 1
+    if the division is exact. If the division is not exact, returns 0
+    leaving the data in `q` undefined.
+
+.. function:: int radix_divexact(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+
+    Sets `(q,an-bn+1)` to the quotient of `a` divided by `b` assuming that
+    the division is exact. The result is undefined if the division is
+    inexact.
 
 .. function:: int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
 
@@ -224,7 +259,7 @@ String conversion
     If the given pointer *res* is *NULL*, a new string will be allocated
     with :func:`flint_malloc` and returned. Otherwise, *res* will be used,
     and is assumed to have sufficient space to store the result including
-    ter.
+    null terminator.
 
 .. function:: char * radix_get_str_sum(char * res, nn_srcptr x, slong n, int negative, int ascending, const radix_t radix)
 
@@ -343,6 +378,29 @@ Memory-managed integers
 
     Sets *res* to the product of *x* and *y* with the absolute value
     reduced modulo `B^n`.
+
+.. function:: int radix_integer_div(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Sets `q` to the quotient of `a` divided by `b` and returns 1
+    if the division is exact, otherwise sets `q` to zero and returns 0.
+
+.. function:: int radix_integer_divexact(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Sets `q` to the quotient of `a` divided by `b` assuming that the
+    division is exact. The behavior is undefined if the division is inexact.
+
+.. function:: void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_tdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_fdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_cdiv_q(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_tdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_fdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+              void radix_integer_cdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+
+    Division with remainder: compute `a = qb + r` where `q` is the truncation,
+    floor, and ceiling quotient respectively.
 
 .. function:: int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
