@@ -933,7 +933,7 @@ Primality testing
     For the pseudoprimes up to 64 bits we modify the approach of Forisek and
     Jancina [ForJan2015]_. We first eliminate a class of pseudoprimes that
     are difficult to find reliable witnesses to. These are of the form pq where 
-    p and q are primes and q = k*p(-1)+1 where k is in the interval [2,12]. 
+    p and q are primes and q = k*p(-1)+1 where k is in the interval [2,9] and 12. 
     A semiprime check algorithm using a single floating-point sqrt, and the 
     multiplicative inverses of the sqrt of k eliminates this class in 
     approximately 1/20 of the runtime of a fermat test. The remaining pseudoprimes
