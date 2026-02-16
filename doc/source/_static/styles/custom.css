@@ -4,3 +4,34 @@ dt.sig {
     border: 0 !important;
     border-bottom: 1px solid var(--color-base-100) !important;
 }
+
+dt {
+    font-weight: normal !important;
+}
+
+/* -- object description styles --------------------------------------------- */
+
+.sig-name {
+    font-weight: bold;
+}
+
+.sig-param.n {
+	font-style: italic;
+}
+
+/* C++ specific styling */
+
+.sig.c   .k, .sig.c   .kt,
+.sig.cpp .k, .sig.cpp .kt {
+	color: #0033B3;
+}
+
+.sig.c   .m,
+.sig.cpp .m {
+	color: #1750EB;
+}
+
+.sig.c   .s, .sig.c   .sc,
+.sig.cpp .s, .sig.cpp .sc {
+	color: #067D17;
+}
