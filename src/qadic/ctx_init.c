@@ -95,24 +95,37 @@ void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
     flint_rand_t state;
     fmpz_mod_poly_t poly;
     fmpz_mod_ctx_t ctxp;
+    nmod_poly_t poly_small_p;
 
     if (*p >= 2 && *p <= 109987)
         if (_qadic_ctx_init_conway_ui(ctx, *p, d, min, max, var, mode))
             return;
 
-    flint_rand_init(state);
+    if (COEFF_IS_MPZ(*p))
+    {
+        flint_rand_init(state);
 
-    fmpz_mod_ctx_init(ctxp, p);
-    fmpz_mod_poly_init2(poly, d + 1, ctxp);
+        fmpz_mod_ctx_init(ctxp, p);
+        fmpz_mod_poly_init2(poly, d + 1, ctxp);
 
-    fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1, ctxp);
+        fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1, ctxp);
 
-    flint_rand_clear(state);
+        flint_rand_clear(state);
 
-    qadic_ctx_init_modulus(ctx, p, poly, min, max, var, mode);
+        qadic_ctx_init_modulus(ctx, p, poly, min, max, var, mode);
 
-    fmpz_mod_poly_clear(poly, ctxp);
-    fmpz_mod_ctx_clear(ctxp);
+        fmpz_mod_poly_clear(poly, ctxp);
+        fmpz_mod_ctx_clear(ctxp);
+    }
+    else
+    {
+        nmod_poly_init(poly_small_p, *p);
+        nmod_poly_minimal_irreducible(poly_small_p, d);
+
+        qadic_ctx_init_modulus_nmod(ctx, *p, poly_small_p, min, max, var, mode);
+
+        nmod_poly_clear(poly_small_p);
+    }
 }
 
 void qadic_ctx_init_modulus(qadic_ctx_t ctx, const fmpz_t p, const fmpz_mod_poly_t modulus,
