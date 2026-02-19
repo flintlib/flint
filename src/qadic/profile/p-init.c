@@ -16,7 +16,6 @@
       does not "pessimize" in this case (nmod_poly routines should be used)
  */
 
-#include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
 

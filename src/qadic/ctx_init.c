@@ -92,17 +92,28 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx, const fmpz_t p, slong d,
 void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
         slong min, slong max, const char * var, enum padic_print_mode mode)
 {
-    flint_rand_t state;
-    fmpz_mod_poly_t poly;
-    fmpz_mod_ctx_t ctxp;
-    nmod_poly_t poly_small_p;
-
     if (*p >= 2 && *p <= 109987)
         if (_qadic_ctx_init_conway_ui(ctx, *p, d, min, max, var, mode))
             return;
 
-    if (COEFF_IS_MPZ(*p))
+    if (fmpz_size(p) == 1)
     {
+        const ulong small_p = fmpz_get_ui(p);
+        nmod_poly_t poly_small_p;
+
+        nmod_poly_init(poly_small_p, small_p);
+        nmod_poly_minimal_irreducible(poly_small_p, d);
+
+        qadic_ctx_init_modulus_nmod(ctx, small_p, poly_small_p, min, max, var, mode);
+
+        nmod_poly_clear(poly_small_p);
+    }
+    else
+    {
+        flint_rand_t state;
+        fmpz_mod_poly_t poly;
+        fmpz_mod_ctx_t ctxp;
+
         flint_rand_init(state);
 
         fmpz_mod_ctx_init(ctxp, p);
@@ -116,15 +127,6 @@ void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
 
         fmpz_mod_poly_clear(poly, ctxp);
         fmpz_mod_ctx_clear(ctxp);
-    }
-    else
-    {
-        nmod_poly_init(poly_small_p, *p);
-        nmod_poly_minimal_irreducible(poly_small_p, d);
-
-        qadic_ctx_init_modulus_nmod(ctx, *p, poly_small_p, min, max, var, mode);
-
-        nmod_poly_clear(poly_small_p);
     }
 }
 
