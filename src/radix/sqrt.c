@@ -103,7 +103,7 @@ void radix_rsqrt_1_approx(nn_ptr Y, ulong a, slong n, const radix_t radix)
         radix_divrem_two(U, U, m + 2, radix);
         Un = m + 2;
         MPN_NORM(U, Un);
-        if (Un == 0)
+        if (Un + n - 2 * m <= 0)
             goto cleanup;
 
         if (LIMB_RADIX(radix) > m)
