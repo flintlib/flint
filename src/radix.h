@@ -79,6 +79,8 @@ radix_sub_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix)
 
 /* Multiplication */
 
+ulong radix_mul_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix);
+
 void radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 void radix_mulmid_classical(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
 void radix_mulmid_KS(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong lo, slong hi, const radix_t radix);
@@ -111,10 +113,17 @@ radix_sqr(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
     radix_mul(res, a, an, a, an, radix);
 }
 
+RADIX_INLINE ulong
+radix_mul_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
+{
+    return radix_add(res, a, an, a, an, radix);
+}
+
 /* Division */
 
 ulong radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
 void radix_divexact_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
+ulong radix_divrem_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix);
 
 void radix_inv_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
 void radix_inv_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
@@ -154,6 +163,11 @@ radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
     return 0;
 }
+
+/* Square roots */
+
+void radix_rsqrt_1_approx_basecase(nn_ptr res, ulong a, slong n, const radix_t radix);
+void radix_rsqrt_1_approx(nn_ptr res, ulong a, slong n, const radix_t radix);
 
 /* Radix conversion */
 

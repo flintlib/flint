@@ -107,6 +107,15 @@ Except where otherwise noted, the following rules apply:
     Sets *(res, xn)* to the sum or difference of *(x, xn)* and *(y, yn)*, returning
     carry or borrow. Requires `xn \ge yn \ge 1`.
 
+.. function:: ulong radix_mul_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix)
+
+    Sets *(res, xn)* to *(x, xn)* multiplied by *c*, returning
+    carry out. Requires `1 \le d \le c`.
+
+.. function:: ulong radix_mul_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets *(res, xn)* to *(x, xn)* multiplied by 2, returning carry out.
+
 .. function:: void radix_mul(nn_ptr res, nn_srcptr x, slong xn, nn_srcptr y, slong yn, const radix_t radix)
 
     Sets *(res, xn + yn)* to the product of *(x, xn)* and *(y, yn)*.
@@ -163,6 +172,11 @@ Except where otherwise noted, the following rules apply:
     Sets *(res, xn)* to the quotient of *(x, xn)* divided by *d*, returning the
     remainder. Requires `1 \le d \le B - 1`.
 
+.. function:: ulong radix_divrem_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets *(res, xn)* to the quotient of *(x, xn)* divided by 2, returning the
+    remainder.
+
 .. function:: void radix_divexact_1(nn_ptr res, nn_srcptr x, slong xn, ulong d, const radix_t radix)
 
     Sets *(res, xn)* to the quotient of *(x, xn)* divided by *d* assuming that
@@ -176,6 +190,8 @@ Except where otherwise noted, the following rules apply:
     `a \in [1/B, 1)` with `an` fraction limbs,
     sets `(q, n+2)` to an approximation of `1/a \in (1, B]` with `n` fraction limbs
     and two integral limbs (the highest limb may be zero).
+    The relative error is bounded by `4 B^{-n}`, i.e. the absolute error is bounded
+    by `4 B^{-n} / a`.
 
 .. function:: void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
               void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
@@ -183,14 +199,17 @@ Except where otherwise noted, the following rules apply:
 
     Sets `(q,an-bn+1)` to the quotient and `(r,bn)` to the remainder of
     `(a,an)` divided by `(b,bn)`. Requires `an \ge bn \ge 1` and
-    `b_{bn-1} \ne 0`.
+    `b_{bn-1} \ne 0`. The user can pass ``NULL`` for `r` to compute
+    only the quotient.
 
 .. function:: void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix)
 
     Similar to :func:`radix_divrem`, but accepts a precomputed inverse
     of `b` given as `(b, binvn+2)` with `binvn` fraction limbs and two
     integral limbs, as computed by :func:`radix_inv_approx`.
-    Currently requires that `binvn \ge an-bn+1`.
+    Currently requires that `binvn \ge an-bn+1`. Passing an inverse with
+    several extra limbs can improve performance. The user can pass ``NULL``
+    for `r` to compute only the quotient.
 
 .. function:: int radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
 
@@ -213,6 +232,13 @@ Except where otherwise noted, the following rules apply:
 
     Returns -1, 0 or 1 according to whether *(x, n)* is less, equal
     or greater than `\lfloor B^n / 2 \rfloor`. We require *n* to be positive.
+
+.. function:: void radix_rsqrt_1_approx_basecase(nn_ptr res, ulong a, slong n, const radix_t radix)
+              void radix_rsqrt_1_approx(nn_ptr res, ulong a, slong n, const radix_t radix)
+
+    Sets `(res,n)` to the fractional limbs of an approximation of `1 / \sqrt{a}`.
+    Assumes that `2 \le a < B`. The error is bounded by `2 B^{-n}`, i.e. by
+    2 fixed-point ulps.
 
 Radix conversion
 --------------------------------------------------------------------------------

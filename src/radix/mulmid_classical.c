@@ -242,7 +242,6 @@ radix_sqrmid_classical(nn_ptr z, nn_srcptr a, slong an, slong zlo, slong zhi, co
     }
 }
 
-
 void
 radix_mulmid_classical(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)
 {
