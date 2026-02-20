@@ -19,7 +19,7 @@ TEST_FUNCTION_START(radix_divrem, state)
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         radix_t radix;
-        nn_ptr a, b, q, r, bq, bqr;
+        nn_ptr a, b, q, q2, r, bq, bqr;
         slong an, bn, qn, rn;
         int algorithm, aliasing;
 
@@ -35,6 +35,7 @@ TEST_FUNCTION_START(radix_divrem, state)
         a = flint_malloc(an * sizeof(ulong));
         b = flint_malloc(bn * sizeof(ulong));
         q = flint_malloc(qn * sizeof(ulong));
+        q2 = flint_malloc(qn * sizeof(ulong));
         r = flint_malloc(rn * sizeof(ulong));
         bq = flint_malloc(an * sizeof(ulong));
         bqr = flint_malloc(an * sizeof(ulong));
@@ -123,11 +124,37 @@ TEST_FUNCTION_START(radix_divrem, state)
             flint_abort();
         }
 
+        aliasing = n_randint(state, 2);
+
+        if (aliasing == 0)
+        {
+            divrem_func(q2, NULL, a, an, b, bn, radix);
+        }
+        else
+        {
+            q2 = flint_realloc(q2, an * sizeof(ulong));
+            flint_mpn_copyi(q2, a, an);
+            divrem_func(q2, NULL, q2, an, b, bn, radix);
+        }
+
+        if (mpn_cmp(q, q2, qn) != 0)
+        {
+            flint_printf("FAIL: radix_divrem (r == NULL)\n");
+            flint_printf("algorithm = %d\n", algorithm);
+            flint_printf("aliasing = %d\n", aliasing);
+            flint_printf("a = %{ulong*}\n", a, an);
+            flint_printf("b = %{ulong*}\n", b, bn);
+            flint_printf("q = %{ulong*}\n", q, qn);
+            flint_printf("q2 = %{ulong*}\n", q2, qn);
+            flint_abort();
+        }
+
         radix_clear(radix);
 
         flint_free(a);
         flint_free(b);
         flint_free(q);
+        flint_free(q2);
         flint_free(r);
         flint_free(bq);
         flint_free(bqr);

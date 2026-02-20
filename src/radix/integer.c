@@ -862,6 +862,48 @@ void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r,
     r->size = (asize < 0) ? -rn : rn;
 }
 
+void radix_integer_tdiv_q(radix_integer_t q,
+    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
+{
+    slong asize, bsize, an, bn, qn;
+    nn_srcptr ad, bd;
+    nn_ptr qd;
+
+    asize = a->size;
+    bsize = b->size;
+
+    an = FLINT_ABS(asize);
+    bn = FLINT_ABS(bsize);
+
+    if (bn == 0)
+        flint_throw(FLINT_DIVZERO, "radix_integer_tdiv_qr: divide by zero");
+
+    if (an == 0)
+    {
+        radix_integer_zero(q, radix);
+        return;
+    }
+
+    if (an < bn)
+    {
+        radix_integer_zero(q, radix);
+        return;
+    }
+
+    qn = an - bn + 1;
+
+    ad = a->d;
+    bd = b->d;
+
+    qd = radix_integer_fit_limbs(q, qn, radix);
+
+    radix_divrem(qd, NULL, ad, an, bd, bn, radix);
+
+    MPN_NORM(qd, qn);
+
+    q->size = ((asize < 0) == (bsize < 0)) ? qn : -qn;
+}
+
 void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r,
     const radix_integer_t a, const radix_integer_t b, const radix_t radix)
 {
@@ -1003,15 +1045,6 @@ void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r,
 }
 
 /* Todo: optimize */
-void
-radix_integer_tdiv_q(radix_integer_t q,
-    const radix_integer_t a, const radix_integer_t b, const radix_t radix)
-{
-    radix_integer_t r;
-    radix_integer_init(r, radix);
-    radix_integer_tdiv_qr(q, r, a, b, radix);
-    radix_integer_clear(r, radix);
-}
 
 void
 radix_integer_fdiv_q(radix_integer_t q,
