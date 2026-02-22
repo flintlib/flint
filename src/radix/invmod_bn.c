@@ -127,11 +127,11 @@ radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
     if (n == 2)
         return 1;
 
-    nn_ptr u, v;
+    nn_ptr u;
     TMP_INIT;
     TMP_START;
-    u = TMP_ALLOC(2 * n * sizeof(ulong));
-    v = u + n;
+    /* Todo: can tighten allocation when we always do a mulhigh */
+    u = TMP_ALLOC(n * sizeof(ulong));
 
     slong a[FLINT_BITS];
     slong i, m;
@@ -144,9 +144,27 @@ radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
         m = n;
         n = a[i];
 
-        radix_mulmid(u, res, m, res, m, 0, n, radix);
-        radix_mulmid(v, u, n, x, FLINT_MIN(n, xn), 0, n, radix);
-        radix_neg(res + m, v + m, n - m, radix);
+        slong rxn = FLINT_MIN(n, m + xn);
+
+        /* Can use middle product */
+        if (m > 3 && LIMB_RADIX(radix) >= m && rxn > (m - 3))
+        {
+            ulong one = 1;
+            radix_mulmid(u + m - 3, res, m, x, FLINT_MIN(n, xn), m - 3, rxn, radix);
+            /* We know that the m least significant limbs of the full product
+               res * x are 00...001. The approximate high product is either
+               exact or 1 ulp too small. The latter is indicated by a
+               nonzero m-1 limb (i.e. a borrow to be returned). */
+            if (u[m - 1] != 0)
+                radix_add(u + m, u + m, n - m, &one, 1, radix);
+            radix_mulmid(res + m, u + m, rxn - m, res, m, 0, n - m, radix);
+        }
+        else
+        {
+            radix_mulmid(u, res, m, x, FLINT_MIN(n, xn), 0, rxn, radix);
+            radix_mulmid(res + m, u + m, rxn - m, res, m, 0, n - m, radix);
+        }
+        radix_neg(res + m, res + m, n - m, radix);
     }
 
     TMP_END;
