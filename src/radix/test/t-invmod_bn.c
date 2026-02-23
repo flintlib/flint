@@ -24,8 +24,8 @@ TEST_FUNCTION_START(radix_invmod_bn, state)
 
         radix_init_randtest(radix, state);
 
-        an = 1 + n_randint(state, 10);
-        n = 1 + n_randint(state, 10);
+        an = 1 + n_randint(state, 50);
+        n = 1 + n_randint(state, 50);
 
         a = flint_malloc(an * sizeof(ulong));
         b = flint_malloc(n * sizeof(ulong));
