@@ -254,6 +254,8 @@ void _arb_poly_mullow_block(arb_ptr C,
 void arb_poly_mullow_block(arb_poly_t res, const arb_poly_t poly1,
               const arb_poly_t poly2, slong len, slong prec);
 
+void arb_poly_mullow_convex(arb_poly_t c, const arb_poly_t a, const arb_poly_t b, slong prec);
+
 void _arb_poly_mullow(arb_ptr C,
     arb_srcptr A, slong lenA,
     arb_srcptr B, slong lenB, slong n, slong prec);
