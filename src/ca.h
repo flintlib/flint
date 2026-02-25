@@ -480,6 +480,10 @@ void ca_erfi(ca_t res, const ca_t x, ca_ctx_t ctx);
 
 void ca_gamma(ca_t res, const ca_t x, ca_ctx_t ctx);
 
+void ca_elliptic_k(ca_t res, const ca_t m, ca_ctx_t ctx);
+void ca_elliptic_e(ca_t res, const ca_t m, ca_ctx_t ctx);
+void ca_elliptic_pi(ca_t res, const ca_t n, const ca_t m, ca_ctx_t ctx);
+
 /* Numerical evaluation */
 
 void ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx);
