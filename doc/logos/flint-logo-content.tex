@@ -1,0 +1,65 @@
+\useasboundingbox (-1.3,-1.6) rectangle (1.3,1.3);
+
+% Some radii
+\pgfmathsetmacro{\ra}{1.0}
+\pgfmathsetmacro{\rb}{0.9}
+\pgfmathsetmacro{\rc}{1.1}
+\pgfmathsetmacro{\rt}{0.73}
+\pgfmathsetmacro{\rtb}{0.71}
+\pgfmathsetmacro{\rtc}{0.85}
+\pgfmathsetmacro{\rd}{1.1}
+
+% XXX: these need to change with the global document scaling
+\pgfmathsetmacro{\rw}{12.05}
+\pgfmathsetmacro{\rwa}{2.0}
+\pgfmathsetmacro{\rwb}{0.8}
+\pgfmathsetmacro{\rwc}{2.35}
+
+\draw [domain=-30.8 : -25,samples=64,color=red!70!blue,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=-25 - 0.1 : 0,samples=64,color=red!80,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=0  -0.1: 30,samples=64,color=red!20!orange,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=30 -0.1: 60,samples=64,color=orange!80,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=60 -0.1: 90,samples=64,color=orange!40!yellow,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=90 -0.1: 120,samples=64,color=orange!20!yellow,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=120 -0.1: 150,samples=64,color=yellow!70,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=150 -0.1: 180,samples=64,color=yellow!40,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+\draw [domain=180 -0.1: 210.8,samples=64,color=yellow!10,line width=\rw] plot ({\rc*cos(\x)}, {\rc*sin(\x)});
+
+\draw [color=facecolor,thick,domain=-30.8:210.8,samples=256,line width=\rwc] plot ({cos(\x)}, {sin(\x)});
+
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(-30)}, {\x*sin(-30)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(-15)}, {\x*sin(-15)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(0)}, {\x*sin(0)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(15)}, {\x*sin(15)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(30)}, {\x*sin(30)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(45)}, {\x*sin(45)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(60)}, {\x*sin(60)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(75)}, {\x*sin(75)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(90)}, {\x*sin(90)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(105)}, {\x*sin(105)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(120)}, {\x*sin(120)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(135)}, {\x*sin(135)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(150)}, {\x*sin(150)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(165)}, {\x*sin(165)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(180)}, {\x*sin(180)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwb] plot ({\x*cos(195)}, {\x*sin(195)});
+\draw [color=facecolor,thick,domain=\ra:\rb,samples=2,line width=\rwa] plot ({\x*cos(210)}, {\x*sin(210)});
+
+\node[color=facecolor,scale=0.8] at ({\rt*cos(210)},{\rt*sin(210)-0.05}) {$0$};
+\node[color=facecolor,scale=0.8] at ({\rt*cos(90)},{\rt*sin(90)}) {$1$};
+\node[color=facecolor,scale=0.8] at ({\rt*cos(-30)-0.05},{\rt*sin(-30)-0.05}) {$\infty$};
+\node[color=facecolor,scale=0.8] at ({\rtb*cos(150)},{\rtb*sin(150)}) {\tiny $\frac{1}{\sqrt{\kern-0.5pt 2}}$};
+\node[color=facecolor,scale=0.8] at ({\rtb*cos(30)},{\rtb*sin(30)}) {\tiny $\sqrt{\kern-0.5pt 2}$};
+
+\draw [color=black!10,fill=black!30] (0,0) circle (0.135);
+
+\pgfmathsetmacro{\th}{190}
+\fill [color=red!50!facecolor,fill opacity=0.1] (180-\th+8:0.1) arc (180-\th+8:180-\th+344:0.1) -- (180-\th-0.5:\rd) -- (180-\th+0.5:\rd) --  cycle;
+\pgfmathsetmacro{\th}{195}
+\fill [color=red!50!facecolor,fill opacity=0.3] (180-\th+8:0.1) arc (180-\th+8:180-\th+344:0.1) -- (180-\th-0.5:\rd) -- (180-\th+0.5:\rd) --  cycle;
+\pgfmathsetmacro{\th}{200}
+\fill [color=red!50!black] (180-\th+8:0.1) arc (180-\th+8:180-\th+344:0.1) -- (180-\th-0.5:\rd) -- (180-\th+0.5:\rd) --  cycle;
+
+\node[color=facecolor,scale=1.5] at ({0},{-1}) {\large $\mathbf{FLINT}$};
+\node[color=facecolor,scale=0.48] at ({0},{-1.4}) {\textit{Fast Library for Number Theory}};
+
