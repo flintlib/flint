@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "nmod_poly.h"
 #include "gr_poly.h"
 
@@ -17,8 +18,11 @@ void
 _nmod_poly_sqrt_series(nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
+
     _gr_ctx_init_nmod(ctx, &mod);
-    GR_MUST_SUCCEED(_gr_poly_sqrt_series(g, h, hlen, n, ctx));
+    if (_gr_poly_sqrt_series(g, h, hlen, n, ctx) != GR_SUCCESS)
+        flint_throw(FLINT_ERROR, "Exception (_nmod_poly_sqrt_series). "
+            "Modulus is not prime, or square root does not exist.\n");
 }
 
 void
