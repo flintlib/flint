@@ -22,7 +22,9 @@
 #include "t-pollard_brent.c"
 #include "t-pollard_brent_single.c"
 #include "t-refine.c"
-
+#include "t-sort.c"
+#include "t-mul.c"
+#include "t-gcd.c"
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
@@ -35,7 +37,10 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_factor_trial),
     TEST_FUNCTION(fmpz_factor_pollard_brent),
     TEST_FUNCTION(fmpz_factor_pollard_brent_single),
-    TEST_FUNCTION(fmpz_factor_refine)
+    TEST_FUNCTION(fmpz_factor_refine),
+    TEST_FUNCTION(fmpz_factor_sort),
+    TEST_FUNCTION(fmpz_factor_mul),
+    TEST_FUNCTION(fmpz_factor_gcd)
 };
 
 /* main function *************************************************************/
