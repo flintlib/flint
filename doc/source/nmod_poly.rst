@@ -217,14 +217,25 @@ Assignment and basic manipulation
 Randomization
 --------------------------------------------------------------------------------
 
-
-.. function:: void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
+.. function:: void nmod_poly_rand(nmod_poly_t poly, flint_rand_t state, slong len)
 
     Generates a random polynomial with length up to ``len``.
 
+.. function:: void nmod_poly_rand_monic(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random monic polynomial with length up to ``len``.
+
+.. function:: void nmod_poly_rand_irreducible(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random irreducible polynomial with length up to ``len``.
+
+.. function:: void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, slong len)
+
+    Generates a random and sparse with increased probability polynomial with length up to ``len``.
+
 .. function:: void nmod_poly_randtest_monic(nmod_poly_t poly, flint_rand_t state, slong len)
 
-    Generates a random monic polynomial with length ``len``.
+    Generates a random and sparse with increased probability monic polynomial with length ``len``.
 
 .. function:: void nmod_poly_randtest_trinomial(nmod_poly_t poly, flint_rand_t state, slong len)
 
