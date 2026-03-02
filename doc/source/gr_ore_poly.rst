@@ -306,6 +306,18 @@ Arithmetic
     Sets *res* to *poly* multiplied by *c* (or *x* multiplied by *poly*)
     which must be an element of or coercible to the coefficient ring.
 
+.. function:: int _gr_ore_poly_lmul_gen(gr_ptr res, gr_srcptr poly, slong len, gr_ore_poly_ctx_t ctx)
+              int gr_ore_poly_lmul_gen(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
+
+    Sets *res* to the result of the left multiplication:
+    `D \cdot poly = \sigma(poly) \cdot D + \delta(poly)`
+
+.. function:: int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ore_poly_ctx_t ctx)
+              int gr_ore_poly_mul(gr_ore_poly_t res, const gr_ore_poly_t poly1, const gr_ore_poly_t poly2, gr_ore_poly_ctx_t ctx)
+
+    Sets *res* to *poly1* multiplied by *poly2*
+    which must be two Ore polynomials in the Ore algebra *ctx*.
+
 .. raw:: latex
 
     \newpage

@@ -262,8 +262,8 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
     {GR_METHOD_SUB_FMPQ,    (gr_funcptr) gr_ore_poly_sub_fmpq},
     {GR_METHOD_SUB,         (gr_funcptr) gr_ore_poly_sub},
     {GR_METHOD_SUB_OTHER,   (gr_funcptr) gr_ore_poly_sub_other},
-/*
     {GR_METHOD_MUL,         (gr_funcptr) gr_ore_poly_mul},
+/*
     {GR_METHOD_MUL_OTHER,   (gr_funcptr) gr_ore_poly_mul_other},
 */
     {GR_METHOD_OTHER_MUL,   (gr_funcptr) gr_ore_poly_other_mul},

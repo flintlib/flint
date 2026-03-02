@@ -272,6 +272,10 @@ WARN_UNUSED_RESULT int gr_ore_poly_mul_fmpz(gr_ore_poly_t res, const gr_ore_poly
 WARN_UNUSED_RESULT int gr_ore_poly_mul_fmpq(gr_ore_poly_t res, const gr_ore_poly_t poly, const fmpq_t c, gr_ore_poly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ore_poly_other_mul(gr_ore_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_ore_poly_lmul_gen(gr_ptr res, gr_srcptr poly, slong len, gr_ore_poly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ore_poly_lmul_gen(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ore_poly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ore_poly_mul(gr_ore_poly_t res, const gr_ore_poly_t poly1, const gr_ore_poly_t poly2, gr_ore_poly_ctx_t ctx);
 
 #ifdef __cplusplus
 }
