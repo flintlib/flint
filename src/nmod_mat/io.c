@@ -36,25 +36,25 @@ int nmod_mat_fprint_pretty(FILE * file, const nmod_mat_t mat)
 
     for (i = 0; i < mat->r; i++)
     {
-        z = flint_printf("[");
+        z = flint_fprintf(file, "[");
         if (z <= 0)
             return z;
 
         for (j = 0; j < mat->c; j++)
         {
-            z = flint_printf(fmt, nmod_mat_entry(mat, i, j));
+            z = flint_fprintf(file, fmt, nmod_mat_entry(mat, i, j));
             if (z <= 0)
                 return z;
 
             if (j + 1 < mat->c)
             {
-                z = flint_printf(" ");
+                z = flint_fprintf(file, " ");
                 if (z <= 0)
                     return z;
             }
         }
 
-        flint_printf("]\n");
+        flint_fprintf(file, "]\n");
         if (z <= 0)
             return z;
     }
