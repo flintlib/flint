@@ -208,7 +208,7 @@ int main()
 
     flint_set_num_threads(1);
 
-    for (ndigits = 100000; ndigits <= 1000000000; ndigits *= 10)
+    for (ndigits = 1000; ndigits <= 1000000000; ndigits *= 10)
     {
         radix_integer_t x;
         arb_t y;
@@ -243,17 +243,17 @@ int main()
         TIMEIT_STOP;
 
         flint_printf("Radix to string:         ");
-        s = NULL;
+        s = flint_malloc(FLINT_ABS(x->size) * radix->exp + 3);
         TIMEIT_START;
-        flint_free(s);
-        s = radix_integer_get_str_decimal(NULL, x, radix);
+        radix_integer_get_str_decimal(s, x, radix);
         TIMEIT_STOP;
 
         print_condensed(s, ndigits, 20);
+        flint_free(s);
         radix_integer_clear(x, radix);
     }
 
-    for (ndigits = 100000; ndigits <= 1000000000; ndigits *= 10)
+    for (ndigits = 1000; ndigits <= 1000000000; ndigits *= 10)
     {
         radix_integer_t x;
         arb_t y;
@@ -288,13 +288,13 @@ int main()
         TIMEIT_STOP;
 
         flint_printf("Radix to string:   ");
-        s = NULL;
+        s = flint_malloc(FLINT_ABS(x->size) * radix->exp + 3);
         TIMEIT_START;
-        flint_free(s);
-        s = radix_integer_get_str_decimal(NULL, x, radix);
+        radix_integer_get_str_decimal(s, x, radix);
         TIMEIT_STOP;
 
         print_condensed(s, ndigits, 20);
+        flint_free(s);
         radix_integer_clear(x, radix);
     }
 

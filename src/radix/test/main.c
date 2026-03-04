@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-add.c"
+#include "t-div_approx.c"
 #include "t-divrem.c"
 #include "t-divrem_1.c"
 #include "t-get_mpn.c"
@@ -32,6 +33,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(radix_add),
+    TEST_FUNCTION(radix_div_approx),
     TEST_FUNCTION(radix_divrem),
     TEST_FUNCTION(radix_divrem_1),
     TEST_FUNCTION(radix_get_mpn),

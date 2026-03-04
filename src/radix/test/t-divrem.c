@@ -16,7 +16,7 @@ TEST_FUNCTION_START(radix_divrem, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * flint_test_multiplier(); iter++)
     {
         radix_t radix;
         nn_ptr a, b, q, q2, r, bq, bqr;
@@ -48,7 +48,7 @@ TEST_FUNCTION_START(radix_divrem, state)
         radix_randtest_limbs(q, state, qn, radix);
         radix_randtest_limbs(r, state, rn, radix);
 
-        algorithm = n_randint(state, 3);
+        algorithm = n_randint(state, 4);
 
         void (*divrem_func)(nn_ptr q, nn_ptr r,
                            nn_srcptr a, slong an,
@@ -59,6 +59,8 @@ TEST_FUNCTION_START(radix_divrem, state)
             divrem_func = radix_divrem_via_mpn;
         else if (algorithm == 1)
             divrem_func = radix_divrem_newton;
+        else if (algorithm == 2)
+            divrem_func = radix_divrem_newton_karp_markstein;
         else
             divrem_func = radix_divrem;
 

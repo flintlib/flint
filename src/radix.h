@@ -127,10 +127,13 @@ ulong radix_divrem_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix);
 
 void radix_inv_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
 void radix_inv_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
-void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix);
+void radix_div_approx_invmul(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A, slong An, slong n, const radix_t radix);
+void radix_div_approx(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A, slong An, slong n, const radix_t radix);
 
+void radix_divrem_preinv(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, nn_srcptr binv, slong binvn, const radix_t radix);
 void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
 void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
+void radix_divrem_newton_karp_markstein(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slong Bn, const radix_t radix);
 void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
 
 int radix_div(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix);
