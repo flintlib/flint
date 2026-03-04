@@ -67,7 +67,7 @@ TEST_FUNCTION_START(radix_rsqrt_1_approx, state)
 
             if (dbl_err > 1.7)
             {
-                flint_printf("FAIL: too large error: radix %wu^%wd, n = %wd\n", radix->B.n, radix->exp, n);
+                flint_printf("FAIL: too large error: radix %wu^%wd, n = %wd\n", DIGIT_RADIX(radix), radix->exp, n);
                 flint_printf("a = %wu\n", a);
                 flint_printf("A = %{ulong*}\n", A, n + err_limbs);
                 flint_printf("B = %{ulong*}\n", B, n + err_limbs);

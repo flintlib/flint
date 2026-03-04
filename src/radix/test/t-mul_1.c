@@ -52,7 +52,7 @@ TEST_FUNCTION_START(radix_mul_1, state)
         if (mpn_cmp(b, c, n) != 0 || cy != c[n])
         {
             flint_printf("FAIL: mul_1\n");
-            flint_printf("radix %wu^%wd, n = %wd\n", radix->B.n, radix->exp, n);
+            flint_printf("radix %wu^%wd, n = %wd\n", DIGIT_RADIX(radix), radix->exp, n);
             flint_printf("a = %{ulong*}\n", a, n);
             flint_printf("b = %{ulong*}\n", b, n);
             flint_printf("c = %{ulong*}\n", c, n + 1);

@@ -174,7 +174,8 @@ radix_inv_approx_basecase(nn_ptr Q, nn_srcptr A, slong An, slong n, const radix_
     TMP_END;
 }
 
-/* Must be at least 4 */
+/* Must be at least 4 for the indexing/padding operations in the code
+   to be valid. */
 #define RADIX_INV_NEWTON_CUTOFF 8
 
 /*
@@ -354,6 +355,203 @@ radix_inv_approx(nn_ptr Q, nn_srcptr A, slong An, slong n, const radix_t radix)
     }
 }
 
+void
+radix_div_approx_invmul(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A, slong An, slong n, const radix_t radix)
+{
+    nn_ptr T;
+    TMP_INIT;
+    TMP_START;
+
+    if (Bn > n)
+    {
+        B = B + Bn - n;
+        Bn = n;
+    }
+
+    T = TMP_ALLOC((Bn + n + 2) * sizeof(ulong));
+
+    radix_inv_approx(Q, A, An, n, radix);
+    /* Should be a high multiplication. */
+    radix_mul(T, Q, n + 2, B, Bn, radix);
+    flint_mpn_copyi(Q, T + Bn, n + 2);
+
+    TMP_END;
+
+}
+
+/* Karp-Markstein division: analogous to inv_approx
+   but evaluates TB + T * (B - A * TB) instead of T + T * (1 - A * T).
+   Since much of the code is the same, would it make sense to
+   merge inv_approx and div_approx into a single function? */
+
+void
+radix_div_approx(nn_ptr Q, nn_srcptr B, slong Bn, nn_srcptr A, slong An, slong n, const radix_t radix)
+{
+    // todo: basecase; without karp-markstein?
+
+    nn_ptr U, V, T, Vhigh, Uhigh;
+    nn_srcptr Ahigh;
+    slong m, Uhighn, Tn, Ahighn, Vhighn;
+    int Unegative;
+    TMP_INIT;
+
+    if (n <= 4)
+    {
+        radix_div_approx_invmul(Q, B, Bn, A, An, n, radix);
+        return;
+    }
+
+    m = (n + 1) / 2 + 1 + (LIMB_RADIX(radix) <= 3);
+
+    radix_inv_approx(Q + n - m, A, An, m, radix);
+
+    TMP_START;
+    T = Q + n - m;
+    Tn = m + 1 + (T[m + 1] != 0);
+
+    flint_mpn_zero(Q, n - m);
+
+    // Compute TB ~= B / A as a fixed-point number with m fraction limbs.
+    nn_ptr TB, TBhigh;
+    slong Bn2 = FLINT_MIN(m, Bn);
+    nn_srcptr B2 = B + Bn - Bn2;
+
+    if (LIMB_RADIX(radix) > 2 * (m + 2) && Bn2 > 2)
+    {
+        TB = TMP_ALLOC((Tn + 2) * sizeof(ulong));
+        radix_mulmid(TB, T, Tn, B2, Bn2, Bn2 - 2, Bn2 + Tn, radix);
+        TBhigh = TB + 2;
+    }
+    else
+    {
+        TB = TMP_ALLOC((2 * m + 2) * sizeof(ulong));
+        radix_mul(TB, T, Tn, B2, Bn2, radix);
+        TBhigh = TB + Bn2;
+    }
+
+    slong control_limb = n / 2 + 2;
+
+    /* If An < n + 1, zero-extend A. */
+    slong A_low_zeroes = 0;
+
+    if (An >= n + 1)
+    {
+        Ahighn = n + 1;
+        Ahigh = A + An - Ahighn;
+    }
+    else
+    {
+        Ahighn = An;
+        Ahigh = A;
+        A_low_zeroes = n + 1 - An;
+    }
+
+    slong low_trunc_without_mulhigh = m + 1;
+    slong low_trunc_with_mulhigh = m - 1;
+
+    if (LIMB_RADIX(radix) > 2 * (m + 2) && A_low_zeroes <= low_trunc_with_mulhigh)
+    {
+        U = TMP_ALLOC((2 + (control_limb + 1)) * sizeof(ulong));
+        radix_mulmid(U, Ahigh, Ahighn, TBhigh, Tn,
+            low_trunc_with_mulhigh - A_low_zeroes,
+            low_trunc_with_mulhigh - A_low_zeroes + 2 + (control_limb + 1),
+            radix);
+        Uhigh = U + 2;
+    }
+    else if (A_low_zeroes <= low_trunc_without_mulhigh)
+    {
+        U = TMP_ALLOC((low_trunc_without_mulhigh - A_low_zeroes + (control_limb) + 1) * sizeof(ulong));
+        radix_mulmid(U, Ahigh, Ahighn, TBhigh, Tn, 0,
+            low_trunc_without_mulhigh - A_low_zeroes + (control_limb) + 1,
+            radix);
+        Uhigh = U + low_trunc_without_mulhigh - A_low_zeroes;
+    }
+    else
+    {
+        U = TMP_ALLOC((control_limb + 1) * sizeof(ulong));
+        radix_mulmid(U + A_low_zeroes - low_trunc_without_mulhigh,
+            Ahigh, Ahighn, TBhigh, Tn, 0,
+            control_limb + 1 - (A_low_zeroes - low_trunc_without_mulhigh),
+            radix);
+        flint_mpn_zero(U, A_low_zeroes - low_trunc_without_mulhigh);
+        Uhigh = U;
+    }
+
+    slong Un = control_limb + 1;
+
+    // Compute (B - A * TB) with n fraction limbs, with sign
+    if (Bn > n - Un)
+    {
+        if (Bn >= n)
+        {
+            nn_srcptr Bhigh = B + Bn - n;
+            radix_sub(Uhigh, Bhigh, Un, Uhigh, Un, radix);
+        }
+        else
+        {
+            slong nz = n - Bn;
+            ulong cy = radix_neg(Uhigh, Uhigh, nz, radix);
+            radix_sub(Uhigh + nz, B, Un - nz, Uhigh + nz, Un - nz, radix);
+            radix_sub(Uhigh + nz, Uhigh + nz, Un - nz, &cy, 1, radix);
+        }
+
+        Unegative = 1;
+        if (radix_cmp_bn_half(Uhigh, Un, radix) > 0)
+        {
+            radix_neg(Uhigh, Uhigh, Un, radix);
+            Unegative = 0;
+        }
+    }
+    else
+    {
+        Unegative = 0;
+        if (radix_cmp_bn_half(Uhigh, Un, radix) > 0)
+        {
+            radix_neg(Uhigh, Uhigh, Un, radix);
+            Unegative = 1;
+        }
+    }
+
+    Uhighn = Un;
+    while (Uhighn > 0 && Uhigh[Uhighn - 1] == 0)
+        Uhighn--;
+
+    if (Uhighn != 0)
+    {
+        if (LIMB_RADIX(radix) > 2 * (m + 2))
+        {
+            V = TMP_ALLOC((Tn + Uhighn - (m - 2)) * sizeof(ulong));
+            radix_mulmid(V, T, Tn, Uhigh, Uhighn, m - 2, Tn + Uhighn, radix);
+            Vhigh = V + 2;
+            Vhighn = Tn + Uhighn - (m - 2) - 2;
+        }
+        else
+        {
+            V = TMP_ALLOC((Tn + Uhighn) * sizeof(ulong));
+            radix_mul(V, T, Tn, Uhigh, Uhighn, radix);
+            Vhigh = V + m;
+            Vhighn = Tn + Uhighn - m;
+        }
+
+        // Overwrite T with TB
+        Q[n + 1] = 0;
+        flint_mpn_copyi(Q + n - m, TBhigh, Tn);
+
+        if (Unegative)
+            radix_add(Q, Q, n + 2, Vhigh, Vhighn, radix);
+        else
+            radix_sub(Q, Q, n + 2, Vhigh, Vhighn, radix);
+    }
+    else
+    {
+        // Overwrite T with TB
+        Q[n + 1] = 0;
+        flint_mpn_copyi(Q + n - m, TBhigh, Tn);
+    }
+
+    TMP_END;
+}
+
 /* Instead of computing Q with ~1 ulp error and doing a full multiplication
    to check the remainder, compute a few fraction limbs. If the first
    fraction limb is not too close to the limb boundary, we have the correct
@@ -471,7 +669,6 @@ radix_divrem_newton(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slon
     nn_ptr T;
     slong n;
     TMP_INIT;
-    TMP_START;
 
     if (flint_mpn_zero_p(A + Bn, An - Bn) && mpn_cmp(A, B, Bn) < 0)
     {
@@ -481,6 +678,7 @@ radix_divrem_newton(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slon
         return;
     }
 
+    TMP_START;
     n = An - Bn + 1;
     T = TMP_ALLOC((n + PREINV2_EXTRA_LIMBS + 2) * sizeof(ulong));
 #if USE_PREINV2
@@ -492,6 +690,78 @@ radix_divrem_newton(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slon
 #endif
     TMP_END;
     return;
+}
+
+void
+radix_divrem_newton_karp_markstein(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slong Bn, const radix_t radix)
+{
+    if (flint_mpn_zero_p(A + Bn, An - Bn) && mpn_cmp(A, B, Bn) < 0)
+    {
+        if (R != NULL)
+            flint_mpn_copyi(R, A, Bn);
+        flint_mpn_zero(Q, An - Bn + 1);
+        return;
+    }
+
+    nn_ptr T, U, q, r;
+    slong n;
+    ulong one = 1;
+    TMP_INIT;
+    TMP_START;
+
+    n = An - Bn + 1;
+
+    slong n2 = n + PREINV2_EXTRA_LIMBS;
+
+    U = TMP_ALLOC((n2 + 2) * sizeof(ulong));
+
+    radix_div_approx(U, A, An, B, Bn, n2, radix);
+
+    FLINT_ASSERT(U[n2 + 1] == 0);
+    q = U + n2 + 2 - (n + 1);
+
+    if (q[-1] > 1 && q[-1] < LIMB_RADIX(radix) - 1)
+    {
+        if (R == NULL)
+            r = NULL;
+        else
+        {
+            T = TMP_ALLOC(Bn * sizeof(ulong));
+            r = T;
+            radix_mulmid(r, q, FLINT_MIN(Bn, n + 1), B, Bn, 0, Bn, radix);
+            radix_sub(r, A, Bn, r, Bn, radix);
+        }
+        goto done;
+    }
+
+    T = TMP_ALLOC((Bn + n) * sizeof(ulong));
+    r = T;
+
+    if (q[n] != 0)
+        radix_sub(q, q, n + 1, &one, 1, radix);
+
+    radix_mul(r, q, n, B, Bn, radix);
+
+    while (r[An] != 0 || mpn_cmp(r, A, An) > 0)
+    {
+        radix_sub(r, r, An + 1, B, Bn, radix);
+        radix_sub(q, q, n, &one, 1, radix);
+    }
+
+    radix_sub(r, A, An, r, An, radix);
+
+    while (r[Bn] != 0 || mpn_cmp(r, B, Bn) >= 0)
+    {
+        radix_add(q, q, n, &one, 1, radix);
+        radix_sub(r, r, Bn + 1, B, Bn, radix);
+    }
+
+done:
+    flint_mpn_copyi(Q, q, An - Bn + 1);
+    if (R != NULL)
+        flint_mpn_copyi(R, r, Bn);
+
+    TMP_END;
 }
 
 void
@@ -509,9 +779,9 @@ radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, c
         return;
     }
 
-    if ((bn >= 20 && (an - bn + 1) <= 70) || bn >= 80)
+    if ((bn >= 20 && (an - bn + 1) <= 150) || bn >= 70)
     {
-        radix_divrem_newton(q, r, a, an, b, bn, radix);
+        radix_divrem_newton_karp_markstein(q, r, a, an, b, bn, radix);
         return;
     }
 

@@ -193,8 +193,19 @@ Except where otherwise noted, the following rules apply:
     The relative error is bounded by `4 B^{-n}`, i.e. the absolute error is bounded
     by `4 B^{-n} / a`.
 
+.. function:: void radix_div_approx_invmul(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+              void radix_div_approx(nn_ptr q, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+
+    Given `(b, bn)` with `b_{bn-1} \ne 0` representing a fixed-point number
+    `b \in [1/B, 1)` with `bn \ge 1` fraction limbs, and `(a, an)` with `an \ge 1`
+    fraction limbs representing a fixed-point number `a \in [0, 1)`,
+    sets `(q, n+2)` to an approximation of `a/b` with `n` fraction limbs
+    and two integral limbs (the highest limbs may be zero).
+    The absolute error is bounded by `4 B^{-n} / b`.
+
 .. function:: void radix_divrem_via_mpn(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
               void radix_divrem_newton(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
+              void radix_divrem_newton_karp_markstein(nn_ptr Q, nn_ptr R, nn_srcptr A, slong An, nn_srcptr B, slong Bn, const radix_t radix)
               void radix_divrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
 
     Sets `(q,an-bn+1)` to the quotient and `(r,bn)` to the remainder of
