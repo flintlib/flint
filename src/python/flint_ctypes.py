@@ -5120,9 +5120,20 @@ def get_nfloat_class(prec):
     return _nfloat_class
 
 class RealFloat_nfloat(gr_ctx):
+    """
+        >>> RealFloat_nfloat(128)
+        Floating-point numbers with prec = 128 (nfloat)
+        >>> RealFloat_nfloat(128).pi()
+        3.14159265358979323846264338327950288420
+        >>> RealFloat_nfloat(10000)
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: precision out of range for nfloat
+    """
     def __init__(self, prec=128):
         gr_ctx.__init__(self)
-        libflint.nfloat_ctx_init(self._ref, prec, 0)
+        if libflint.nfloat_ctx_init(self._ref, prec, 0) != GR_SUCCESS:
+            raise FlintUnableError("precision out of range for nfloat")
         self._elem_type = get_nfloat_class(prec)
 
 @functools.cache
@@ -5147,9 +5158,20 @@ def get_nfloat_complex_class(prec):
     return _nfloat_complex_class
 
 class ComplexFloat_nfloat_complex(gr_ctx):
+    """
+        >>> ComplexFloat_nfloat_complex(128)
+        Complex floating-point numbers with prec = 128 (nfloat_complex)
+        >>> ComplexFloat_nfloat_complex(128).i()
+        1.00000000000000000000000000000000000000*I
+        >>> ComplexFloat_nfloat_complex(10000)
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: precision out of range for nfloat_complex
+    """
     def __init__(self, prec=128):
         gr_ctx.__init__(self)
-        libflint.nfloat_complex_ctx_init(self._ref, prec, 0)
+        if libflint.nfloat_complex_ctx_init(self._ref, prec, 0) != GR_SUCCESS:
+            raise FlintUnableError("precision out of range for nfloat_complex")
         self._elem_type = get_nfloat_complex_class(prec)
 
 
@@ -5170,12 +5192,21 @@ class nmod(gr_elem):
 
 
 class IntegersMod_mpn_mod(gr_ctx):
+    """
+
+        >>> IntegersMod_mpn_mod(10**20 + 1)
+        Integers mod 100000000000000000001 (mpn)
+        >>> IntegersMod_mpn_mod(10**1000)
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: n is not in range for the mpn_mod implementation
+
+    """
     def __init__(self, n, n_is_prime=None):
         n = self._as_fmpz(n)
-        # todo: error handling (must handle cleanup when ctx has not been initialized
-        assert n >= (1 << FLINT_BITS) and n < (1 << (8 * FLINT_BITS))
         gr_ctx.__init__(self)
-        libgr.gr_ctx_init_mpn_mod(self._ref, n._ref)
+        if libgr.gr_ctx_init_mpn_mod(self._ref, n._ref) != GR_SUCCESS:
+            raise FlintUnableError("n is not in range for the mpn_mod implementation")
         self._elem_type = mpn_mod
         if n_is_prime is not None:
             libgr.gr_ctx_set_is_field(self, T_TRUE if n_is_prime else T_FALSE)
@@ -5720,6 +5751,12 @@ class DirichletGroup_dirichlet_char(gr_ctx_ca):
         4
         >>> [G(i) for i in [1,3,7,9]]
         [chi_10(1, .), chi_10(3, .), chi_10(7, .), chi_10(9, .)]
+
+        >>> DirichletGroup(10**16+61)
+        Traceback (most recent call last):
+          ...
+        NotImplementedError: modulus with prime factor p > 10^16 is not currently supported
+
     """
 
     def __init__(self, q, **kwargs):
@@ -6880,6 +6917,69 @@ class FractionField_fmpz_mpoly_q(gr_ctx):
     @property
     def _coefficient_ring(self):
         return QQ
+
+
+
+class Fraction_gr_fraction(gr_ctx):
+    """
+    Fractions with GCD reduction:
+
+        >>> Q = Fraction_gr_fraction(ZZi)
+        >>> Q(ZZi.i())
+        (I) / (1)
+        >>> Q(Fraction_gr_fraction(QQbar).i())
+        (I) / (1)
+        >>> I, = Q.gens(recursive=True)
+        >>> s = sum(1/(1+j*I) for j in range(10))
+        >>> s
+        ((32798-28121*I)) / ((14651+1807*I))
+
+    Fractions without GCD reduction
+
+        >>> Q2 = Fraction_gr_fraction(ZZi, reduction=False)
+        >>> I2, = Q2.gens(recursive=True)
+        >>> s2 = sum(1/(1+j*I2) for j in range(10))
+        >>> s2
+        ((-468880-1874340*I)) / ((365300-549900*I))
+        >>> Q2(s)
+        ((32798-28121*I)) / ((14651+1807*I))
+        >>> Q2(s) == s2
+        True
+        >>> s - s2
+        (0) / (1)
+        >>> s2 - s
+        (0) / ((6345679600-7396487800*I))
+        >>> s2 - s == 0
+        True
+
+    """
+
+    def __init__(self, base_ring, reduction=True, strongly_canonical=False):
+        assert isinstance(base_ring, gr_ctx)
+        gr_ctx.__init__(self)
+
+        flags = 0
+        if not reduction:
+            flags |= 1
+        if strongly_canonical:
+            flags |= 2
+
+        libgr.gr_ctx_init_gr_fraction(self._ref, base_ring, flags)
+
+        class _gr_fraction_struct(ctypes.Structure):
+            _fields_ = [('data', ctypes.c_ubyte * libgr.gr_ctx_sizeof_elem(self._ref))]
+
+        class gr_fraction(gr_elem):
+            _struct_type = _gr_fraction_struct
+
+        self._elem_type = gr_fraction
+
+        base_ring._refcount += 1
+        self._base_ring = base_ring
+        self._elem_type = gr_fraction
+
+    def __del__(self):
+        self._base_ring._decrement_refcount()
 
 
 

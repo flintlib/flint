@@ -1447,7 +1447,10 @@ int
 gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
 {
     if (n == 0)
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_DOMAIN;
+    }
 
     ctx->which_ring = GR_CTX_NMOD;
     ctx->sizeof_elem = sizeof(ulong);

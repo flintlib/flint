@@ -145,7 +145,10 @@ _gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs)
 {
     flint_bitcnt_t norm;
     if (nlimbs < MPN_MOD_MIN_LIMBS || nlimbs > MPN_MOD_MAX_LIMBS || n[nlimbs - 1] == 0)
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_UNABLE;
+    }
 
     ctx->which_ring = GR_CTX_MPN_MOD;
     ctx->sizeof_elem = nlimbs * sizeof(ulong);
@@ -182,10 +185,16 @@ int
 gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n)
 {
     if (fmpz_sgn(n) <= 0)
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_DOMAIN;
+    }
 
     if (!COEFF_IS_MPZ(*n))
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_UNABLE;
+    }
 
     return _gr_ctx_init_mpn_mod(ctx, COEFF_TO_PTR(*n)->_mp_d, COEFF_TO_PTR(*n)->_mp_size);
 }

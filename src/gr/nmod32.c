@@ -680,9 +680,16 @@ int
 gr_ctx_init_nmod32(gr_ctx_t ctx, ulong n)
 {
     if (n == 0)
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_DOMAIN;
+    }
+
     if (n > UWORD(4294967295))
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_UNABLE;
+    }
 
     ctx->which_ring = GR_CTX_NMOD32;
     ctx->sizeof_elem = sizeof(uint32_t);

@@ -733,6 +733,7 @@ typedef enum
     GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
     GR_CTX_FEXPR,
     GR_CTX_DEBUG,
+    GR_CTX_UNINITIALIZED,
     GR_CTX_UNKNOWN_DOMAIN,
     GR_CTX_WHICH_STRUCTURE_TAB_SIZE
 }
@@ -1376,6 +1377,8 @@ truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx);
 truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx);
 
 /* Some base rings */
+
+void gr_ctx_uninitialized(gr_ctx_t ctx);
 
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
 
