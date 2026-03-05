@@ -6842,7 +6842,6 @@ class PolynomialRing_gr_mpoly(gr_ctx):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
 
-        gr_ctx.__init__(self)
         nvars = gr_ctx._as_si(nvars)
         assert nvars >= 0
         libgr.gr_ctx_init_gr_mpoly(self._ref, coefficient_ring._ref, nvars, 0)
@@ -6884,7 +6883,67 @@ class FractionField_fmpz_mpoly_q(gr_ctx):
 
 
 
+class Complex_gr_complex(gr_ctx):
+    """
+        >>> C = Complex_gr_complex(QQ)
+        >>> C
+        Complex algebra over Rational field (fmpq)
+        >>> x = C("2+3*I"); x
+        (2) + (3) * I
+        >>> x / 5
+        (2/5) + (3/5) * I
+        >>> 1 / (1 / x)
+        (2) + (3) * I
+        >>> x.re(); x.im(); x.conj()
+        (2) + (0) * I
+        (3) + (0) * I
+        (2) + (-3) * I
 
+        >>> C = Complex_gr_complex(ZZx)
+        >>> x, I = C.gens(recursive=True)
+        >>> (2+x*I)**5
+        (10*x^4-80*x^2+32) + (x^5-40*x^3+80*x) * I
+
+        >>> A = RealAlgebraicField_qqbar()
+        >>> C = Complex_gr_complex(A)
+        >>> C("2+3*I")
+        (2) + (3) * I
+        >>> C(A(2).sqrt())
+        (Root a = 1.41421 of a^2-2) + (0) * I
+        >>> C(2 + Complex_gr_complex(QQ).i()/5)
+        (2) + (1/5) * I
+        >>> abs(C("2+3*I"))
+        (Root a = 3.60555 of a^2-13) + (0) * I
+        >>> C(QQbar(-1) ** (QQ(1) / 5))
+        (Root a = 0.809017 of 4*a^2-2*a-1) + (Root a = 0.587785 of 16*a^4-20*a^2+5) * I
+        >>> _**5
+        (-1) + (0) * I
+
+        >>> C = Complex_gr_complex(RealFloat_nfloat(64))
+        >>> (C.pi() + C.i())**2
+        (8.8696044010893586177) + (6.2831853071795864766) * I
+    """
+
+    def __init__(self, real_ctx):
+        assert isinstance(real_ctx, gr_ctx)
+        gr_ctx.__init__(self)
+
+        libgr.gr_ctx_init_gr_complex(self._ref, real_ctx)
+
+        class _gr_complex_struct(ctypes.Structure):
+            _fields_ = [('data', ctypes.c_ubyte * libgr.gr_ctx_sizeof_elem(self._ref))]
+
+        class gr_complex(gr_elem):
+            _struct_type = _gr_complex_struct
+
+        self._elem_type = gr_complex
+
+        real_ctx._refcount += 1
+        self._real_ctx = real_ctx
+        self._elem_type = gr_complex
+
+    def __del__(self):
+        self._real_ctx._decrement_refcount()
 
 
 

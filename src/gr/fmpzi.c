@@ -36,7 +36,8 @@ _gr_fmpzi_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     * name = flint_malloc(2);
     if (* name == NULL)
         return GR_UNABLE;
-    strncpy(* name, "I", 2);
+    (*name)[0] = 'I';
+    (*name)[1] = '\0';
 
     return GR_SUCCESS;
 }
