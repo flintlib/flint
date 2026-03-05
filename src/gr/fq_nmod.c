@@ -815,7 +815,10 @@ gr_ctx_init_fq_nmod_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t mo
     int status;
 
     if (!fmpz_abs_fits_ui(mod_ctx->n))
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_UNABLE;
+    }
 
     nmod_poly_init(nmodulus, fmpz_get_ui(mod_ctx->n));
     fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);

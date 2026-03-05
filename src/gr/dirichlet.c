@@ -233,7 +233,10 @@ int
 gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q)
 {
     if (q == 0)
+    {
+        gr_ctx_uninitialized(ctx);
         return GR_DOMAIN;
+    }
 
     ctx->which_ring = GR_CTX_DIRICHLET_GROUP;
     ctx->sizeof_elem = sizeof(dirichlet_char_struct);
@@ -244,6 +247,7 @@ gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q)
     if (!dirichlet_group_init(DIRICHLET_CTX(ctx), q))
     {
         flint_free(GR_CTX_DATA_AS_PTR(ctx));
+        gr_ctx_uninitialized(ctx);
         return GR_UNABLE;
     }
 

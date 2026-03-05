@@ -100,6 +100,16 @@ when the user knows the type.
 Users may wish to define their own union types when only some
 particular types will appear in an application.
 
+.. function:: void gr_ctx_uninitialized(gr_ctx_t ctx)
+
+    Create an uninitialized context. This context object does not support
+    any operations, but it can be printed with :func:`gr_ctx_print`
+    and cleared with :func:`gr_ctx_clear`. A context constructor that can fail
+    (see for example :func:`gr_ctx_init_mpn_mod`) should call this method
+    so that the context object is safe to clear even if initialization
+    failed, i.e. ensuring that ``ctx`` contains a valid function pointer
+    for :func:`gr_ctx_clear`.
+
 Error handling
 ...............................................................................
 
