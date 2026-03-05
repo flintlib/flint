@@ -228,6 +228,21 @@ Real and complex numbers
 
     Sets or retrieves options of a Calcium context object.
 
+.. function:: void gr_ctx_init_gr_complex(gr_ctx_t ctx, gr_ctx_t real_ctx)
+
+    Initializes *ctx* to a generic implementation of the complex algebra `R[i]`
+    where `R` is represented by *real_ctx*.
+    Elements `a + bi` are represented as pairs `(a, b)` of elements of `R`
+    stored contiguously in memory.
+
+    Typically `R` will be an implementation of the real numbers or a subring
+    of the real numbers in which case this creates the complex numbers or
+    a subring of the complex numbers. This construction
+    also makes sense e.g. over real vector spaces and even general rings
+    (where `i` will just be a formal element satisfying `i^2 = -1`),
+    but in that case operations beyond basic arithmetic (e.g. absolute value)
+    may not make sense.
+
 Extended number sets
 -------------------------------------------------------------------------------
 
