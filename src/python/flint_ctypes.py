@@ -6883,6 +6883,65 @@ class FractionField_fmpz_mpoly_q(gr_ctx):
 
 
 
+class Fraction_gr_fraction(gr_ctx):
+    """
+    Fractions with GCD reduction:
+
+        >>> Q = Fraction_gr_fraction(ZZi)
+        >>> I, = Q.gens(recursive=True)
+        >>> s = sum(1/(1+j*I) for j in range(10))
+        >>> s
+        ((32798-28121*I)) / ((14651+1807*I))
+
+    Fractions without GCD reduction
+
+        >>> Q2 = Fraction_gr_fraction(ZZi, reduction=False)
+        >>> I2, = Q2.gens(recursive=True)
+        >>> s2 = sum(1/(1+j*I2) for j in range(10))
+        >>> s2
+        ((-468880-1874340*I)) / ((365300-549900*I))
+        >>> Q2(s)
+        ((32798-28121*I)) / ((14651+1807*I))
+        >>> Q2(s) == s2
+        True
+        >>> s - s2
+        (0) / (1)
+        >>> s2 - s
+        (0) / ((6345679600-7396487800*I))
+        >>> s2 - s == 0
+        True
+
+    """
+
+    def __init__(self, base_ring, reduction=True, strongly_canonical=False):
+        assert isinstance(base_ring, gr_ctx)
+        gr_ctx.__init__(self)
+
+        flags = 0
+        if not reduction:
+            flags |= 1
+        if strongly_canonical:
+            flags |= 2
+
+        libgr.gr_ctx_init_gr_fraction(self._ref, base_ring, flags)
+
+        class _gr_fraction_struct(ctypes.Structure):
+            _fields_ = [('data', ctypes.c_ubyte * libgr.gr_ctx_sizeof_elem(self._ref))]
+
+        class gr_fraction(gr_elem):
+            _struct_type = _gr_fraction_struct
+
+        self._elem_type = gr_fraction
+
+        base_ring._refcount += 1
+        self._base_ring = base_ring
+        self._elem_type = gr_fraction
+
+    def __del__(self):
+        self._base_ring._decrement_refcount()
+
+
+
 class Complex_gr_complex(gr_ctx):
     """
         >>> C = Complex_gr_complex(QQ)
