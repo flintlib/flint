@@ -1040,7 +1040,7 @@ fi
 
 use_assembly_files="$enable_assembly"
 if test "x$asm_path" = "x" || test "$flint_cv_abi" != "64";
-then use_assembly_files="no" fi
+then use_assembly_files="no"; fi
 
 if test "$use_assembly_files" = "yes";
 then
