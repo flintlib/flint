@@ -46,13 +46,14 @@ extern "C" {
 /* Addition, subtraction and multiplication */
 # if defined(__clang__)
 #  include "longlong_asm_clang.h"
-# else
+# elif FLINT_WANT_ASSEMBLY
 #  include "longlong_asm_gcc.h"
 # endif
-# include "longlong_asm_gnu.h"
 
-/* Division */
-# include "longlong_div_gnu.h"
+# if FLINT_WANT_ASSEMBLY
+#  include "longlong_asm_gnu.h"
+#  include "longlong_div_gnu.h"
+# endif
 
 #elif defined(_MSC_VER)
 
