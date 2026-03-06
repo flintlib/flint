@@ -84,5 +84,8 @@
 /* Define to enable use of GMP internals. */
 #undef FLINT_WANT_GMP_INTERNALS
 
+/* Define to enable inline assembly. */
+#undef FLINT_WANT_ASSEMBLY
+
 /* Define to enable pretty printing for tests. */
 #undef FLINT_WANT_PRETTY_TESTS

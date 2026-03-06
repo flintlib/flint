@@ -1,6 +1,6 @@
-################################################################################
+###############################################################################
 # preamble
-################################################################################
+###############################################################################
 
 define(FLINT_COPYRIGHT,[[
 Copyright (C) 2023, 2024 Albin Ahlbäck
@@ -115,9 +115,9 @@ AC_CONFIG_SRCDIR(src/fmpz/link/fmpz_reentrant.c)
 # clashes between different configurations.
 AX_INIT
 
-################################################################################
+###############################################################################
 # initialize libtool
-################################################################################
+###############################################################################
 
 # Later we want to overwrite the default CFLAGS. Check now whether they are set
 # or not as Libtool overwrites CFLAGS.
@@ -134,22 +134,22 @@ then CFLAGS=; fi
 if test "$cxxflags_set" = "no";
 then CXXFLAGS=; fi
 
-################################################################################
+###############################################################################
 # build system
-################################################################################
+###############################################################################
 
 if test -n "$target_alias";
 then AC_MSG_ERROR([FLINT does not support the use of specifying --target.]); fi
 
-################################################################################
+###############################################################################
 # configure headers
-################################################################################
+###############################################################################
 
 AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
 
-################################################################################
+###############################################################################
 # features
-################################################################################
+###############################################################################
 
 AC_ARG_ENABLE(pthread, [AS_HELP_STRING([--enable-pthread],
               [Enable pthread [default=yes]])],
@@ -287,9 +287,9 @@ yes|no) ;;
 esac],
 enable_lto="no")
 
-################################################################################
+###############################################################################
 # packages
-################################################################################
+###############################################################################
 
 AC_ARG_WITH(gmp_include,[AS_HELP_STRING([--with-gmp-include=DIR],
             [GMP include directory])],
@@ -443,9 +443,9 @@ with_ntl="no"
 if test "$with_ntl" != "no" || test -n "$ntl_include_path" || test -n "$ntl_lib_path";
 then with_ntl="yes"; fi
 
-################################################################################
+###############################################################################
 # architecture specifics
-################################################################################
+###############################################################################
 
 if test "$enable_fast_build" = "yes";
 then gcc_cflags="-O1"; else gcc_cflags="-O3"; fi
@@ -648,9 +648,9 @@ Please report at <https://github.com/flintlib/flint/issues/>])
 
 esac
 
-################################################################################
+###############################################################################
 # programs
-################################################################################
+###############################################################################
 
 dnl NOTE: The following line is invoked from LT_INIT
 dnl AC_PROG_CC
@@ -660,9 +660,9 @@ AC_PROG_MKDIR_P
 FLINT_CC_IS_GCC
 FLINT_CC_IS_CLANG
 
-################################################################################
+###############################################################################
 # check programs and system
-################################################################################
+###############################################################################
 
 AC_C_INLINE
 
@@ -746,9 +746,9 @@ then
     AC_DEFINE(FLINT_KNOW_STRONG_ORDER,1,[Define if system is strongly ordered])
 fi
 
-################################################################################
+###############################################################################
 # check GMP
-################################################################################
+###############################################################################
 
 FLINT_CHECK_GMP_H(6,2,1)
 FLINT_GMP_LONG_LONG_LIMB([SLONG="long long int"
@@ -769,24 +769,24 @@ fi
 AC_CONFIG_LINKS([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
 AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
 
-################################################################################
+###############################################################################
 # check MPFR
-################################################################################
+###############################################################################
 
 FLINT_CHECK_MPFR_H(4,1,0)
 
-################################################################################
+###############################################################################
 # check ABI
-################################################################################
+###############################################################################
 
 FLINT_ABI
 
 AC_DEFINE_UNQUOTED(FLINT_BITS,$flint_cv_abi,
                    [Define according to the ABI FLINT was compiled with])
 
-################################################################################
+###############################################################################
 # check headers
-################################################################################
+###############################################################################
 
 # Mandatory headers
 # The following headers are checked previously:
@@ -819,9 +819,9 @@ then
     AC_LANG_POP([C++])
 fi
 
-################################################################################
+###############################################################################
 # check libraries
-################################################################################
+###############################################################################
 
 # With certain CFLAGS, the compiler may return an error, thinking that the
 # compiler has not found the function in the library.
@@ -883,9 +883,9 @@ then AC_SEARCH_LIBS([cblas_dgemm],[cblas openblas blas],[],
 if test "$with_ntl" = "yes";
 then FLINT_CHECK_NTL(,[AC_MSG_ERROR([NTL library was not found.])]) fi
 
-################################################################################
+###############################################################################
 # check settings and environment
-################################################################################
+###############################################################################
 
 AC_SUBST(PIC_FLAG,$pic_flag)
 
@@ -917,9 +917,9 @@ operating system.])])
 
 AC_CHECK_FUNCS([aligned_alloc _aligned_malloc])
 
-################################################################################
+###############################################################################
 # CFLAGS
-################################################################################
+###############################################################################
 
 # The following is needed for Clang to check for unknown options.
 if test "$flint_cv_cc_is_clang" = "yes";
@@ -1021,9 +1021,9 @@ else
     AC_SUBST(UNROLL_LOOPS,0)
 fi
 
-################################################################################
+###############################################################################
 # fft_small module
-################################################################################
+###############################################################################
 
 FLINT_CHECK_FFT_SMALL(enable_fft_small="yes")
 if test "$enable_fft_small" = "yes";
@@ -1034,18 +1034,15 @@ else
     AC_SUBST(FFT_SMALL,[\	\	])
 fi
 
-################################################################################
-# Assembly
-################################################################################
+###############################################################################
+# assembly
+###############################################################################
 
-if test "$enable_assembly" = "yes" &&
-    $(test "x$asm_path" = "x" || test "$flint_cv_abi" != "64");
-then
-    AC_MSG_WARN([No assembly available.])
-    enable_assembly="no"
-fi
+use_assembly_files="$enable_assembly"
+if test "x$asm_path" = "x" || test "$flint_cv_abi" != "64";
+then use_assembly_files="no" fi
 
-if test "$enable_assembly" = "yes";
+if test "$use_assembly_files" = "yes";
 then
     GMP_INIT(config.m4)
 
@@ -1067,14 +1064,16 @@ then
 
     case $host in
         ARM64_PATTERN)
-            AC_DEFINE([FLINT_HAVE_ASSEMBLY_armv8],1,[Define if Arm v8 assembly is available])
+            AC_DEFINE([FLINT_HAVE_ASSEMBLY_armv8],1,
+                      [Define if Arm v8 assembly is available])
             case $host in
                 *-*-darwin*) GMP_INCLUDE_MPN(src/mpn_extras/arm64/darwin.m4) ;;
                 *) GMP_INCLUDE_MPN(src/mpn_extras/arm64/arm64-defs.m4)
             esac
             ;;
         X86_64_ADX_PATTERN)
-            AC_DEFINE([FLINT_HAVE_ASSEMBLY_x86_64_adx],1,[Define if x86_64 ADX assembly is available])
+            AC_DEFINE([FLINT_HAVE_ASSEMBLY_x86_64_adx],1,
+                      [Define if x86_64 ADX assembly is available])
             GMP_ASM_ALIGN_FILL_0x90
             GMP_ASM_COFF_TYPE
             GMP_INCLUDE_MPN(src/mpn_extras/x86_64/x86_64-defs.m4)
@@ -1099,29 +1098,24 @@ else
     esac
 fi
 
-if test "$enable_assembly" = "yes";
-then
-    AC_SUBST(WANT_ASSEMBLY,1)
-    AC_SUBST(ASM_PATH,$asm_path)
-else
-    AC_SUBST(WANT_ASSEMBLY,0)
-    AC_SUBST(ASM_PATH,)
-fi
+AC_SUBST(ASM_PATH,$asm_path)
 
-if test "$enable_lto" = "yes";
-then AC_SUBST(WANT_LTO,1)
-else AC_SUBST(WANT_LTO,0) fi
+# For Makefile
+if test "$use_assembly_files" = "yes";
+then AC_SUBST(WANT_ASSEMBLY,1)
+else AC_SUBST(WANT_ASSEMBLY,0) fi
 
-################################################################################
+###############################################################################
 # parameters
-################################################################################
+###############################################################################
 
-AC_CONFIG_LINKS([src/flint-mparam.h:src/mpn_extras/$param_path/flint-mparam.h],[],[param_path="$param_path"])
+AC_CONFIG_LINKS([src/flint-mparam.h:src/mpn_extras/$param_path/flint-mparam.h],
+                [],[param_path="$param_path"])
 AC_SUBST(PARAM_PATH,$param_path)
 
-################################################################################
+###############################################################################
 # substitutions and definitions
-################################################################################
+###############################################################################
 
 AC_SUBST(FLINT_VERSION_FULL, FLINT_VERSION)
 
@@ -1214,13 +1208,20 @@ if test "$enable_gmp_internals" = "yes";
 then AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,
                [Define to enable use of GMP internals.]) fi
 
+if test "$enable_assembly" = "yes";
+then AC_DEFINE(FLINT_WANT_ASSEMBLY,1,[Define to enable inline assembly.]) fi
+
+if test "$enable_lto" = "yes";
+then AC_SUBST(WANT_LTO,1)
+else AC_SUBST(WANT_LTO,0) fi
+
 if test "$ac_abs_confdir" = "`pwd`";
 then AC_SUBST(IS_OUT_OF_TREE,0)
 else AC_SUBST(IS_OUT_OF_TREE,1) fi
 
-################################################################################
-# epilog
-################################################################################
+###############################################################################
+# epilogue
+###############################################################################
 
 AC_CONFIG_FILES([Makefile flint.pc src/flint.h])
 AC_OUTPUT
