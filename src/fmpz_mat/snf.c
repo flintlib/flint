@@ -55,26 +55,15 @@ _fmpz_mat_snf_via_hnf(fmpz_mat_t S, const fmpz_mat_t A)
 
     if (r > 0)
     {
-        /* Extract nonzero rows and compute SNF of the r x n submatrix */
-        fmpz_mat_init(H_nz, r, n);
-        fmpz_mat_init(S_nz, r, n);
-
-        for (i = 0; i < r; i++)
-            for (j = 0; j < n; j++)
-                fmpz_set(fmpz_mat_entry(H_nz, i, j),
-                        fmpz_mat_entry(H, i, j));
+        /* Use windows into the first r rows to avoid copying */
+        fmpz_mat_window_init(H_nz, H, 0, 0, r, n);
+        fmpz_mat_window_init(S_nz, S, 0, 0, r, n);
 
         fmpz_abs(mod, mod);
         fmpz_mat_snf_iliopoulos(S_nz, H_nz, mod);
 
-        /* Embed result into the output matrix */
-        for (i = 0; i < r; i++)
-            for (j = 0; j < n; j++)
-                fmpz_set(fmpz_mat_entry(S, i, j),
-                        fmpz_mat_entry(S_nz, i, j));
-
-        fmpz_mat_clear(S_nz);
-        fmpz_mat_clear(H_nz);
+        fmpz_mat_window_clear(S_nz);
+        fmpz_mat_window_clear(H_nz);
     }
 
     fmpz_clear(mod);
