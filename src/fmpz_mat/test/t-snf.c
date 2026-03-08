@@ -279,37 +279,43 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     }
 
     /*
-        Cross-check: fmpz_mat_snf vs fmpz_mat_snf_kannan_bachem.
-        Keep max(m,n) < 9 to stay below the dispatcher cutoff, since
+        Cross-check: fmpz_mat_snf_kannan_bachem vs fmpz_mat_snf_iliopoulos
+        on small square nonsingular matrices.  We call both implementations
+        directly to avoid the dispatcher (which would send small matrices
+        to kannan_bachem in both cases).  Keep max size small since
         kannan_bachem can hang on larger matrices (see #2592).
     */
     for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S1, S2;
-        slong m, n, b, d, r;
+        fmpz_t det;
+        slong n, b, d;
 
-        m = n_randint(state, 9);
         n = n_randint(state, 9);
-        r = n_randint(state, FLINT_MIN(m, n) + 1);
 
-        fmpz_mat_init(A, m, n);
-        fmpz_mat_init(S1, m, n);
-        fmpz_mat_init(S2, m, n);
+        fmpz_mat_init(A, n, n);
+        fmpz_mat_init(S1, n, n);
+        fmpz_mat_init(S2, n, n);
+        fmpz_init(det);
 
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
-        d = n_randint(state, 2 * m * n + 1);
-        fmpz_mat_randrank(A, state, r, b);
+        d = n_randint(state, 2 * n * n + 1);
+        fmpz_mat_randrank(A, state, n, b);
 
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_snf(S1, A);
-        fmpz_mat_snf_kannan_bachem(S2, A);
+        fmpz_mat_det(det, A);
+        fmpz_abs(det, det);
+
+        fmpz_mat_snf_kannan_bachem(S1, A);
+        fmpz_mat_snf_iliopoulos(S2, A, det);
 
         if (!fmpz_mat_equal(S1, S2))
         {
             flint_printf("FAIL:\n");
-            flint_printf("snf and snf_kannan_bachem disagree!\n");
+            flint_printf("snf_kannan_bachem and snf_iliopoulos "
+                    "disagree!\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(S1); flint_printf("\n\n");
             fmpz_mat_print_pretty(S2); flint_printf("\n\n");
@@ -317,6 +323,7 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
             flint_abort();
         }
 
+        fmpz_clear(det);
         fmpz_mat_clear(S2);
         fmpz_mat_clear(S1);
         fmpz_mat_clear(A);
