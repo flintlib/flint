@@ -15,8 +15,9 @@
 
 /*
     Compute SNF via HNF preprocessing followed by Iliopoulos.
-    The product of the HNF pivot entries is a valid modulus for Iliopoulos
-    (it equals the product of the nonzero invariant factors).
+    The product of the first nonzero entry in each nonzero row of the HNF
+    equals the product of the nonzero invariant factors, and is therefore
+    a valid modulus for Iliopoulos.
     We extract only the nonzero rows from the HNF before passing to
     Iliopoulos, since it cannot handle zero invariant factors (it computes
     gcd(0, mod) = mod instead of 0).
@@ -63,6 +64,7 @@ _fmpz_mat_snf_via_hnf(fmpz_mat_t S, const fmpz_mat_t A)
                 fmpz_set(fmpz_mat_entry(H_nz, i, j),
                         fmpz_mat_entry(H, i, j));
 
+        fmpz_abs(mod, mod);
         fmpz_mat_snf_iliopoulos(S_nz, H_nz, mod);
 
         /* Embed result into the output matrix */
