@@ -154,6 +154,11 @@ void fprint_memory_usage(FILE * fs)
     sprint_size(line + 40, 1024 * rss);
     sprint_size(line + 50, 1024 * rsspeak);
     fputs(line, fs);
+
+#elif defined(__EMSCRIPTEN__)
+
+    /* Nothing */
+
 #else
         
     char line[] = "virt/rss/peak: 1234567 / 1234567 / 1234567\n";
