@@ -112,7 +112,19 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
         _test_snf_case(11, 11, data, snf);
     }
 
-    /* Matrices with nontrivial invariant factors */
+    /* Square nonsingular matrices with nontrivial invariant factors */
+    {
+        slong data[] = {8051,3,350,729,-1060,-2,2199,-1866,177,-732,-41534,-2,0,-3776,3806,6,-11326,11298,-12,3776,6330,9,1057,567,-1560,0,1737,-738,516,-576,-2831,5,-477,-255,735,0,-785,288,-255,256,-2110,-3,-352,-189,550,0,-579,216,-172,192,-11880,0,0,-1080,1080,2,-3240,3240,-6,1080,-14684,-10,-460,-1330,1752,4,-4004,3588,-222,1336,24861,30,3171,2235,-5244,0,6810,-3786,1539,-2262,-10098,8,-356,-916,1216,4,-2768,2448,-214,916,-37620,0,0,-3420,3420,6,-10260,10260,-18,3420};
+        slong snf[] = {1,1,1,1,1,2,6,30,60,180};
+        _test_snf_case(10, 10, data, snf);
+    }
+    {
+        slong data[] = {901,0,0,298,0,0,-900,0,0,300,-3,-298,0,1,0,0,0,0,0,0,0,0,0,0,4494,-45,7,1526,180,0,-4305,0,-67,1500,7114,-1526,-21,44894,12,-22461,9,2,48,0,-12,-4,-54067,-43,63,-134685,-36,67383,-26,-6,-143,0,36,12,162199,129,-6,-3,0,-2,0,1,6,0,0,-2,1,0,0,-9,0,0,0,0,3,0,0,0,-6,0,8088,0,0,2700,540,-36,-7560,12,-144,2700,-1140,-2700,-2700,0,0,-900,-180,0,2520,0,60,-900,360,900,3600,-44976,0,23700,171,0,-3429,0,-60,1200,67158,-1200,3,6,-3,-12,4,0,-2,0,3,0,-2999,12,0,-14992,0,7500,-3,0,-3,0,0,0,22506,0};
+        slong snf[] = {1,1,1,1,1,1,3,12,60,300,1500,7500};
+        _test_snf_case(12, 12, data, snf);
+    }
+
+    /* Non-square matrices with nontrivial invariant factors */
     {
         slong data[] = {6,0,0,0,0,0,0,18,0,0,6,0,0,0,0,0,12,0,-432,0,0,0,0,0,0,0,0,0,0,0,0,0,48,0,0,48,0,0,0,0,0,0,0,0,0,0,-24,0,1008,0,0,0,0,0,5184,0,0,-31104,0,0,0,0,0,0,15984,3456,0,0,1728,2592,0,0,0,7776,0,0,0,-48,-5184,-46656,-14304,2592,0,-7776,-7776,0,-1296,0,-23328,0,0,36,0,-3888,0,0,1296,0,0,0,10368,-15552,0,0,0,-2592,0,0,2592,1296,-5184,-1296,-6480,-2592,15552,-2592,0,-3888,0,0,0,0,0,0,15552,5184,0,0,2592,2592,0,0,0,7776,0,0,0,0,0,0,0,0,0,0,5184,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5184,0,0,0,0,0,-12,0,432,1296,-5184,0,0,-2592,0,-10368,15552,0,0,0,0,0,0,0,-1296,5184,0,0,2592,0,31104,-46656,15552,0,0};
         slong snf[] = {6,12,48,144,432,1296,1296,1296,2592,5184,5184,15552,15552};
@@ -135,6 +147,31 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     }
 
     /* Edge cases */
+    {
+        /* 0x0 matrix */
+        fmpz_mat_t S;
+        fmpz_mat_init(S, 0, 0);
+        fmpz_mat_snf(S, S);
+        fmpz_mat_clear(S);
+    }
+    {
+        /* 0x5 matrix */
+        fmpz_mat_t A, S;
+        fmpz_mat_init(A, 0, 5);
+        fmpz_mat_init(S, 0, 5);
+        fmpz_mat_snf(S, A);
+        fmpz_mat_clear(S);
+        fmpz_mat_clear(A);
+    }
+    {
+        /* 3x0 matrix */
+        fmpz_mat_t A, S;
+        fmpz_mat_init(A, 3, 0);
+        fmpz_mat_init(S, 3, 0);
+        fmpz_mat_snf(S, A);
+        fmpz_mat_clear(S);
+        fmpz_mat_clear(A);
+    }
     {
         slong data[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
         slong snf[] = {0,0,0,0,0};
@@ -160,8 +197,7 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S, S2;
-        slong m, n, b, d, r;
-        int equal;
+        slong i, m, n, b, d, r, snf_rank;
 
         m = n_randint(state, 30);
         n = n_randint(state, 30);
@@ -190,16 +226,46 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
             flint_abort();
         }
 
-        fmpz_mat_snf(S2, S);
-        equal = fmpz_mat_equal(S, S2);
+        /* Verify rank: number of nonzero diagonal entries must match */
+        snf_rank = 0;
+        for (i = 0; i < FLINT_MIN(m, n); i++)
+            if (!fmpz_is_zero(fmpz_mat_entry(S, i, i)))
+                snf_rank++;
 
-        if (!equal)
+        if (snf_rank != fmpz_mat_rank(A))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("snf rank %wd != matrix rank %wd\n",
+                    snf_rank, fmpz_mat_rank(A));
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(S); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        /* Idempotency */
+        fmpz_mat_snf(S2, S);
+
+        if (!fmpz_mat_equal(S, S2))
         {
             flint_printf("FAIL:\n");
             flint_printf("snf of a matrix in snf should be the same!\n");
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(S); flint_printf("\n\n");
             fmpz_mat_print_pretty(S2); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        /* Aliasing: fmpz_mat_snf(A, A) */
+        fmpz_mat_snf(A, A);
+
+        if (!fmpz_mat_equal(A, S))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("aliasing test failed!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(S); flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }
@@ -213,7 +279,7 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S;
-        slong m, n, b, d, r;
+        slong i, m, n, b, d, r, snf_rank;
 
         m = 10 + n_randint(state, 40);
         n = 10 + n_randint(state, 40);
@@ -241,6 +307,54 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
             flint_abort();
         }
 
+        snf_rank = 0;
+        for (i = 0; i < FLINT_MIN(m, n); i++)
+            if (!fmpz_is_zero(fmpz_mat_entry(S, i, i)))
+                snf_rank++;
+
+        if (snf_rank != fmpz_mat_rank(A))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("snf rank %wd != matrix rank %wd\n",
+                    snf_rank, fmpz_mat_rank(A));
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(S); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_mat_clear(S);
+        fmpz_mat_clear(A);
+    }
+
+    /* Square nonsingular matrices above cutoff (det + Iliopoulos path) */
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    {
+        fmpz_mat_t A, S;
+        slong n, b, d;
+
+        n = 10 + n_randint(state, 20);
+
+        fmpz_mat_init(A, n, n);
+        fmpz_mat_init(S, n, n);
+
+        b = 1 + n_randint(state, 10);
+        d = n_randint(state, 2 * n * n + 1);
+        fmpz_mat_randrank(A, state, n, b);
+        fmpz_mat_randops(A, state, d);
+
+        fmpz_mat_snf(S, A);
+
+        if (!fmpz_mat_is_in_snf(S))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("matrix not in snf!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(S); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
         fmpz_mat_clear(S);
         fmpz_mat_clear(A);
     }
@@ -249,7 +363,7 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S;
-        slong n, b, d, r;
+        slong i, n, b, d, r, snf_rank;
 
         n = 5 + n_randint(state, 25);
         r = n_randint(state, n);
@@ -268,6 +382,22 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
         {
             flint_printf("FAIL:\n");
             flint_printf("matrix not in snf!\n");
+            fmpz_mat_print_pretty(A); flint_printf("\n\n");
+            fmpz_mat_print_pretty(S); flint_printf("\n\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        snf_rank = 0;
+        for (i = 0; i < n; i++)
+            if (!fmpz_is_zero(fmpz_mat_entry(S, i, i)))
+                snf_rank++;
+
+        if (snf_rank != fmpz_mat_rank(A))
+        {
+            flint_printf("FAIL:\n");
+            flint_printf("snf rank %wd != matrix rank %wd\n",
+                    snf_rank, fmpz_mat_rank(A));
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(S); flint_printf("\n\n");
             fflush(stdout);
