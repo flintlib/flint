@@ -103,6 +103,7 @@
 #include "t-scalar_mul_si.c"
 #include "t-scalar_mul_ui.c"
 #include "t-scalar_smod.c"
+#include "t-snf.c"
 #include "t-snf_diagonal.c"
 #include "t-snf_iliopoulos.c"
 #include "t-snf_kannan_bachem.c"
@@ -203,6 +204,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_scalar_mul_si),
     TEST_FUNCTION(fmpz_mat_scalar_mul_ui),
     TEST_FUNCTION(fmpz_mat_scalar_smod),
+    TEST_FUNCTION(fmpz_mat_snf),
     TEST_FUNCTION(fmpz_mat_snf_diagonal),
     TEST_FUNCTION(fmpz_mat_snf_iliopoulos),
     TEST_FUNCTION(fmpz_mat_snf_kannan_bachem),
