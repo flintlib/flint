@@ -415,6 +415,8 @@ void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod)
 
 int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
+int fmpz_mat_is_diagonal(const fmpz_mat_t A);
+
 /* Special matrices **********************************************************/
 
 int fmpz_mat_is_hadamard(const fmpz_mat_t A);
