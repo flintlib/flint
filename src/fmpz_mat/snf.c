@@ -14,104 +14,121 @@
 #include "fmpz_mat.h"
 
 /*
-    Compute SNF via HNF preprocessing followed by Iliopoulos.
-    The product of the first nonzero entry in each nonzero row of the HNF
-    equals the product of the nonzero invariant factors, and is therefore
-    a valid modulus for Iliopoulos.
-    We extract only the nonzero rows from the HNF before passing to
-    Iliopoulos, since it cannot handle zero invariant factors (it computes
-    gcd(0, mod) = mod instead of 0).
+    Compute SNF via iterative Hermite normal form.
+
+    Phase 1: alternately compute row-HNF and column-HNF (via transpose)
+             until the matrix is diagonal.
+    Phase 2: fix divisibility chain on the diagonal using gcd/lcm.
+    Phase 3: make diagonal entries non-negative.
+
+    This is the same algorithm as fmpz_mat_snf_transform but without
+    tracking the transformation matrices U and V.
 */
 static void
-_fmpz_mat_snf_via_hnf(fmpz_mat_t S, const fmpz_mat_t A)
+_fmpz_mat_snf_iterative_hermite(fmpz_mat_t S, const fmpz_mat_t A)
 {
-    fmpz_mat_t H, H_nz, S_nz;
-    fmpz_t mod;
-    slong i, j, r, m = A->r, n = A->c;
+    slong m = fmpz_mat_nrows(A);
+    slong n = fmpz_mat_ncols(A);
+    slong d = FLINT_MIN(m, n);
+    slong max_iters, iter, j, k;
+    fmpz_mat_t X, Xt;
+    fmpz_t dd, pp, qq;
 
-    fmpz_mat_init(H, m, n);
-    fmpz_mat_hnf(H, A);
-
-    /* Count nonzero rows (= rank) and compute modulus */
-    fmpz_init(mod);
-    fmpz_one(mod);
-    r = 0;
-    for (i = 0; i < m; i++)
+    if (d == 0)
     {
-        if (fmpz_mat_is_zero_row(H, i))
+        fmpz_mat_zero(S);
+        return;
+    }
+
+    fmpz_mat_init(X, m, n);
+    fmpz_init(dd);
+    fmpz_init(pp);
+    fmpz_init(qq);
+
+    fmpz_mat_set(X, A);
+
+    /*
+        Phase 1: iterate HNF on rows and columns until diagonal.
+    */
+    max_iters = 100 + 10 * FLINT_MAX(m, n);
+
+    for (iter = 0; iter < max_iters; iter++)
+    {
+        if (fmpz_mat_is_diagonal(X))
             break;
-        r++;
-        for (j = 0; j < n; j++)
+
+        /* Row HNF */
+        fmpz_mat_hnf(X, X);
+
+        if (fmpz_mat_is_diagonal(X))
+            break;
+
+        /* Column HNF via transpose */
+        fmpz_mat_init(Xt, n, m);
+        fmpz_mat_transpose(Xt, X);
+        fmpz_mat_hnf(Xt, Xt);
+        fmpz_mat_transpose(X, Xt);
+        fmpz_mat_clear(Xt);
+    }
+
+    /*
+        Phase 2: fix divisibility chain on diagonal.
+        For each pair (j, k) with j < k, if X[j,j] does not divide X[k,k],
+        replace with gcd and lcm.
+    */
+    for (j = 0; j < d; j++)
+    {
+        if (fmpz_is_one(fmpz_mat_entry(X, j, j)))
+            continue;
+
+        for (k = j + 1; k < d; k++)
         {
-            if (!fmpz_is_zero(fmpz_mat_entry(H, i, j)))
-            {
-                fmpz_mul(mod, mod, fmpz_mat_entry(H, i, j));
-                break;
-            }
+            if (fmpz_is_zero(fmpz_mat_entry(X, k, k)))
+                continue;
+            if (!fmpz_is_zero(fmpz_mat_entry(X, j, j))
+                && fmpz_divisible(fmpz_mat_entry(X, k, k),
+                                  fmpz_mat_entry(X, j, j)))
+                continue;
+
+            fmpz_gcd(dd, fmpz_mat_entry(X, j, j),
+                fmpz_mat_entry(X, k, k));
+            fmpz_divexact(pp, fmpz_mat_entry(X, j, j), dd);
+            fmpz_divexact(qq, fmpz_mat_entry(X, k, k), dd);
+
+            /* X[j,j] = gcd, X[k,k] = lcm = p*q*d */
+            fmpz_set(fmpz_mat_entry(X, j, j), dd);
+            fmpz_mul(fmpz_mat_entry(X, k, k), pp, qq);
+            fmpz_mul(fmpz_mat_entry(X, k, k),
+                fmpz_mat_entry(X, k, k), dd);
         }
     }
 
-    fmpz_mat_zero(S);
-
-    if (r > 0)
+    /*
+        Phase 3: make diagonal entries non-negative.
+    */
+    for (j = 0; j < d; j++)
     {
-        /* Use windows into the first r rows to avoid copying */
-        fmpz_mat_window_init(H_nz, H, 0, 0, r, n);
-        fmpz_mat_window_init(S_nz, S, 0, 0, r, n);
-
-        fmpz_abs(mod, mod);
-        fmpz_mat_snf_iliopoulos(S_nz, H_nz, mod);
-
-        fmpz_mat_window_clear(S_nz);
-        fmpz_mat_window_clear(H_nz);
+        if (fmpz_sgn(fmpz_mat_entry(X, j, j)) < 0)
+            fmpz_neg(fmpz_mat_entry(X, j, j),
+                fmpz_mat_entry(X, j, j));
     }
 
-    fmpz_clear(mod);
-    fmpz_mat_clear(H);
+    fmpz_mat_set(S, X);
+
+    fmpz_mat_clear(X);
+    fmpz_clear(dd);
+    fmpz_clear(pp);
+    fmpz_clear(qq);
 }
 
 void
 fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
 {
-    fmpz_t det;
-    slong m = A->r, n = A->c, b = fmpz_mat_max_bits(A), cutoff = 9;
-
-    if (b <= 2)
-        cutoff = 15;
-    else if (b <= 4)
-        cutoff = 13;
-    else if (b <= 8)
-        cutoff = 13;
-    else if (b <= 16)
-        cutoff = 11;
-    else if (b <= 32)
-        cutoff = 11;
-    else if (b <= 64)
-        cutoff = 10;
-
     if (fmpz_mat_is_diagonal(A))
     {
         fmpz_mat_snf_diagonal(S, A);
         return;
     }
 
-    if (FLINT_MAX(m, n) < cutoff)
-        fmpz_mat_snf_kannan_bachem(S, A);
-    else if (m != n)
-        _fmpz_mat_snf_via_hnf(S, A);
-    else
-    {
-        fmpz_init(det);
-        fmpz_mat_det(det, A);
-        if (!fmpz_is_zero(det))
-        {
-            fmpz_abs(det, det);
-            fmpz_mat_snf_iliopoulos(S, A, det);
-        }
-        else
-        {
-            _fmpz_mat_snf_via_hnf(S, A);
-        }
-        fmpz_clear(det);
-    }
+    _fmpz_mat_snf_iterative_hermite(S, A);
 }
