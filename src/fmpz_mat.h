@@ -417,6 +417,8 @@ int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
 int fmpz_mat_is_diagonal(const fmpz_mat_t A);
 
+void fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_t A);
+
 /* Special matrices **********************************************************/
 
 int fmpz_mat_is_hadamard(const fmpz_mat_t A);

@@ -107,6 +107,7 @@
 #include "t-snf_diagonal.c"
 #include "t-snf_iliopoulos.c"
 #include "t-snf_kannan_bachem.c"
+#include "t-snf_transform.c"
 #include "t-solve_bound.c"
 #include "t-solve.c"
 #include "t-solve_cramer.c"
@@ -208,6 +209,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_snf_diagonal),
     TEST_FUNCTION(fmpz_mat_snf_iliopoulos),
     TEST_FUNCTION(fmpz_mat_snf_kannan_bachem),
+    TEST_FUNCTION(fmpz_mat_snf_transform),
     TEST_FUNCTION(fmpz_mat_solve_bound),
     TEST_FUNCTION(fmpz_mat_solve),
     TEST_FUNCTION(fmpz_mat_solve_cramer),
