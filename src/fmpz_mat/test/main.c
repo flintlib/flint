@@ -36,6 +36,7 @@
 #include "t-CRT_ui.c"
 #include "t-CRT_ui_unsigned.c"
 #include "t-det_bound.c"
+#include "t-elementary_divisors.c"
 #include "t-det.c"
 #include "t-det_divisor.c"
 #include "t-det_modular_accelerated.c"
@@ -138,6 +139,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_CRT_ui),
     TEST_FUNCTION(fmpz_mat_CRT_ui_unsigned),
     TEST_FUNCTION(fmpz_mat_det_bound),
+    TEST_FUNCTION(fmpz_mat_elementary_divisors),
     TEST_FUNCTION(fmpz_mat_det),
     TEST_FUNCTION(fmpz_mat_det_divisor),
     TEST_FUNCTION(fmpz_mat_det_modular_accelerated),
