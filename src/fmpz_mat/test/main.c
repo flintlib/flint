@@ -62,6 +62,7 @@
 #include "t-init_clear.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
+#include "t-is_diagonal.c"
 #include "t-is_empty.c"
 #include "t-is_one.c"
 #include "t-is_spd.c"
@@ -165,6 +166,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_init_clear),
     TEST_FUNCTION(fmpz_mat_inv),
     TEST_FUNCTION(fmpz_mat_invert_rows_cols),
+    TEST_FUNCTION(fmpz_mat_is_diagonal),
     TEST_FUNCTION(fmpz_mat_is_empty),
     TEST_FUNCTION(fmpz_mat_is_one),
     TEST_FUNCTION(fmpz_mat_is_spd),
