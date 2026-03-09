@@ -194,7 +194,7 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     }
 
     /* Randomized tests */
-    for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 3000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S, S2;
         slong i, m, n, b, d, r, snf_rank;

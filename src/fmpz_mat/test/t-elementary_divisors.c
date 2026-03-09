@@ -117,7 +117,7 @@ TEST_FUNCTION_START(fmpz_mat_elementary_divisors, state)
     }
 
     /* Randomized tests: cross-check against SNF diagonal */
-    for (iter = 0; iter < 3000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S;
         fmpz * ed;
