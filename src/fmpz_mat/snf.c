@@ -89,6 +89,12 @@ fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
     else if (b <= 64)
         cutoff = 10;
 
+    if (fmpz_mat_is_diagonal(A))
+    {
+        fmpz_mat_snf_diagonal(S, A);
+        return;
+    }
+
     if (FLINT_MAX(m, n) < cutoff)
         fmpz_mat_snf_kannan_bachem(S, A);
     else if (m != n)
