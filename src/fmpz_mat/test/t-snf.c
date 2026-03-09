@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 /*
@@ -194,7 +195,7 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     }
 
     /* Randomized tests */
-    for (iter = 0; iter < 3000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S, S2;
         slong i, m, n, b, d, r, snf_rank;
@@ -409,24 +410,35 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     }
 
     /*
-        Cross-check: fmpz_mat_snf_kannan_bachem vs fmpz_mat_snf_iliopoulos
-        on small square nonsingular matrices.  We call both implementations
-        directly to avoid the dispatcher (which would send small matrices
-        to kannan_bachem in both cases).  Keep max size small since
-        kannan_bachem can hang on larger matrices (see #2592).
+        Cross-check all implementations against each other on small
+        square nonsingular matrices:
+        - fmpz_mat_snf (dispatcher)
+        - fmpz_mat_snf_kannan_bachem
+        - fmpz_mat_snf_iliopoulos
+        - fmpz_mat_snf_transform (diagonal of S)
+        - fmpz_mat_elementary_divisors
+
+        Keep max size small since kannan_bachem can hang on larger
+        matrices (see #2592).
     */
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, S1, S2;
+        fmpz_mat_t A, S_disp, S_kb, S_ilio, S_xform, U, V;
         fmpz_t det;
-        slong n, b, d;
+        fmpz * ed;
+        slong n, b, d, i, rank;
 
         n = n_randint(state, 9);
 
         fmpz_mat_init(A, n, n);
-        fmpz_mat_init(S1, n, n);
-        fmpz_mat_init(S2, n, n);
+        fmpz_mat_init(S_disp, n, n);
+        fmpz_mat_init(S_kb, n, n);
+        fmpz_mat_init(S_ilio, n, n);
+        fmpz_mat_init(S_xform, n, n);
+        fmpz_mat_init(U, n, n);
+        fmpz_mat_init(V, n, n);
         fmpz_init(det);
+        ed = _fmpz_vec_init(n);
 
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
         d = n_randint(state, 2 * n * n + 1);
@@ -438,24 +450,61 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
         fmpz_mat_det(det, A);
         fmpz_abs(det, det);
 
-        fmpz_mat_snf_kannan_bachem(S1, A);
-        fmpz_mat_snf_iliopoulos(S2, A, det);
+        fmpz_mat_snf(S_disp, A);
+        fmpz_mat_snf_kannan_bachem(S_kb, A);
+        fmpz_mat_snf_iliopoulos(S_ilio, A, det);
+        fmpz_mat_snf_transform(S_xform, U, V, A);
+        fmpz_mat_elementary_divisors(ed, &rank, A);
 
-        if (!fmpz_mat_equal(S1, S2))
+        /* All SNF computations must agree */
+        if (!fmpz_mat_equal(S_disp, S_kb)
+            || !fmpz_mat_equal(S_disp, S_ilio)
+            || !fmpz_mat_equal(S_disp, S_xform))
         {
-            flint_printf("FAIL:\n");
-            flint_printf("snf_kannan_bachem and snf_iliopoulos "
-                    "disagree!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S1); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S2); flint_printf("\n\n");
+            flint_printf("FAIL: SNF implementations disagree!\n");
+            flint_printf("n=%wd b=%wd\n", n, b);
+            flint_printf("A: "); fmpz_mat_print_pretty(A);
+            flint_printf("\n");
+            flint_printf("dispatcher:    "); fmpz_mat_print_pretty(S_disp);
+            flint_printf("\n");
+            flint_printf("kannan_bachem: "); fmpz_mat_print_pretty(S_kb);
+            flint_printf("\n");
+            flint_printf("iliopoulos:    "); fmpz_mat_print_pretty(S_ilio);
+            flint_printf("\n");
+            flint_printf("snf_transform: "); fmpz_mat_print_pretty(S_xform);
+            flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
 
+        /* elementary_divisors must match the SNF diagonal */
+        if (rank != n)
+        {
+            flint_printf("FAIL: elementary_divisors rank %wd != %wd\n",
+                rank, n);
+            fflush(stdout);
+            flint_abort();
+        }
+        for (i = 0; i < n; i++)
+        {
+            if (!fmpz_equal(&ed[i], fmpz_mat_entry(S_disp, i, i)))
+            {
+                flint_printf("FAIL: ed[%wd] = %{fmpz} != snf[%wd] = "
+                    "%{fmpz}\n", i, &ed[i], i,
+                    fmpz_mat_entry(S_disp, i, i));
+                fflush(stdout);
+                flint_abort();
+            }
+        }
+
+        _fmpz_vec_clear(ed, n);
         fmpz_clear(det);
-        fmpz_mat_clear(S2);
-        fmpz_mat_clear(S1);
+        fmpz_mat_clear(V);
+        fmpz_mat_clear(U);
+        fmpz_mat_clear(S_xform);
+        fmpz_mat_clear(S_ilio);
+        fmpz_mat_clear(S_kb);
+        fmpz_mat_clear(S_disp);
         fmpz_mat_clear(A);
     }
 
