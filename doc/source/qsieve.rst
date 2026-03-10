@@ -115,8 +115,8 @@
 
 .. function:: relation_t qsieve_parse_relation(qs_t qs_inf)
 
-    Given a string representation of relation from the file, parse it to obtain
-    all the parameters of relation.
+    Read a relation from the file associated with *qs_inf* and parse it to
+    obtain all the parameters of the relation.
 
 .. function:: relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
 

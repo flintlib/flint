@@ -238,7 +238,7 @@ Note: :func:`gr_set_str` can be used for parsing.
 .. function:: int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
               int gr_mpoly_print_pretty(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 
-    Prints *A*.
+    Prints *A*, using the variable names stored in the context.
 
 Coefficient and exponent access
 -------------------------------------------------------------------------------
