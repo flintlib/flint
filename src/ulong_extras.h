@@ -179,6 +179,7 @@ ulong n_flog(ulong n, ulong b);
 ulong n_clog(ulong n, ulong b);
 ulong n_clog_2exp(ulong n, ulong b);
 
+#ifndef __GMP_H__
 #ifdef _MSC_VER
 # define DECLSPEC_IMPORT __declspec(dllimport)
 #else
@@ -187,6 +188,7 @@ ulong n_clog_2exp(ulong n, ulong b);
 DECLSPEC_IMPORT ulong __gmpn_gcd_11(ulong, ulong);
 DECLSPEC_IMPORT ulong __gmpn_gcd_1(nn_srcptr, long int, ulong);
 #undef DECLSPEC_IMPORT
+#endif
 
 ULONG_EXTRAS_INLINE
 ulong n_gcd(ulong x, ulong y)
