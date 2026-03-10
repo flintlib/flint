@@ -212,9 +212,9 @@ static void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
         return;
     }
 
+    qp = FLINT_MPZ_REALLOC(q, qsize + nm);
     dp = d->_mp_d;
     ap = a->_mp_d;
-    qp = FLINT_MPZ_REALLOC(q, qsize + nm);
 
     TMP_START;
     if ((r == d || q == d) && !nm) /* we have alias with d */
