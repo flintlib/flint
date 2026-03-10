@@ -454,7 +454,7 @@ void fmpq_mpoly_push_term_si_ui(fmpq_mpoly_t A,
 void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
 
 void fmpq_mpoly_reduce_easy(fmpq_mpoly_t A, slong easy_length,
-                                                       const fmpq_mpoly_ctx_t);
+                                                       const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_sort_terms(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)

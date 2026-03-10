@@ -190,7 +190,7 @@ void acb_dft_rad2_precomp_inplace_threaded(acb_ptr v, const acb_dft_rad2_t rad2,
 
 void acb_dft_inverse_rad2_precomp_inplace(acb_ptr v, const acb_dft_rad2_t rad2, slong prec);
 void acb_dft_inverse_rad2_precomp(acb_ptr w, acb_srcptr v, const acb_dft_rad2_t rad2, slong prec);
-void acb_dft_convol_rad2_precomp(acb_ptr w, acb_srcptr f, acb_srcptr g, slong len, const acb_dft_rad2_t, slong prec);
+void acb_dft_convol_rad2_precomp(acb_ptr w, acb_srcptr f, acb_srcptr g, slong len, const acb_dft_rad2_t rad2, slong prec);
 
 void _acb_dft_precomp_init(acb_dft_pre_t pre, slong dv, acb_ptr z, slong dz, slong len, slong prec);
 void acb_dft_precomp_init(acb_dft_pre_t pre, slong len, slong prec);
