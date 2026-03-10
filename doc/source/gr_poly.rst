@@ -121,7 +121,7 @@ Basic manipulation
 
 .. function:: int gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ctx)
               int _gr_poly_write(gr_stream_t out, gr_srcptr poly, slong n, const char * x, gr_ctx_t ctx)
-              int _gr_poly_get_str(char ** res, const gr_poly_t f, const char * x, gr_ctx_t ctx)
+              int _gr_poly_get_str(char ** res, gr_srcptr f, slong len, const char * x, gr_ctx_t ctx)
               int gr_poly_get_str(char ** res, const gr_poly_t f, const char * x, gr_ctx_t ctx)
               int gr_poly_print(const gr_poly_t poly, gr_ctx_t ctx)
 

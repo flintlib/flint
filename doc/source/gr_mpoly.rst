@@ -235,11 +235,10 @@ Input and output
 
 Note: :func:`gr_set_str` can be used for parsing.
 
-.. function:: int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, const char ** x, gr_mpoly_ctx_t ctx)
-              int gr_mpoly_print_pretty(const gr_mpoly_t A, const char ** x, gr_mpoly_ctx_t ctx)
+.. function:: int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_print_pretty(const gr_mpoly_t A, gr_mpoly_ctx_t ctx)
 
-    Prints *A* using the strings in *x* for the variables.
-    If *x* is *NULL*, defaults are used.
+    Prints *A*.
 
 Coefficient and exponent access
 -------------------------------------------------------------------------------

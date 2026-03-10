@@ -113,7 +113,7 @@
     
     Add 'prime' to the hast table.
 
-.. function:: relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
+.. function:: relation_t qsieve_parse_relation(qs_t qs_inf)
 
     Given a string representation of relation from the file, parse it to obtain
     all the parameters of relation.

@@ -49,7 +49,7 @@ int gettimeofday(struct timeval * p, void * tz);
 
 #if FLINT_HAVE_getrusage
 #if FLINT_HAVE_FILE
-void fprint_memory_usage(FILE *);
+void fprint_memory_usage(FILE * fs);
 #endif
 void print_memory_usage(void);
 #endif
