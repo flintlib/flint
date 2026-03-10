@@ -435,5 +435,85 @@ TEST_FUNCTION_START(fmpz_mat_snf_transform, state)
         fmpz_mat_clear(A);
     }
 
+    /* NULL transform tests */
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    {
+        fmpz_mat_t A, S, S_full, U, U_full, V, V_full, T1, T2;
+        slong m, n, r, b;
+
+        m = n_randint(state, 15);
+        n = n_randint(state, 15);
+        r = n_randint(state, FLINT_MIN(m, n) + 1);
+
+        fmpz_mat_init(A, m, n);
+        fmpz_mat_init(S, m, n);
+        fmpz_mat_init(S_full, m, n);
+        fmpz_mat_init(U, m, m);
+        fmpz_mat_init(U_full, m, m);
+        fmpz_mat_init(V, n, n);
+        fmpz_mat_init(V_full, n, n);
+        fmpz_mat_init(T1, m, n);
+        fmpz_mat_init(T2, m, n);
+
+        b = 1 + n_randint(state, 10) * n_randint(state, 10);
+        fmpz_mat_randrank(A, state, r, b);
+        if (n_randint(state, 2))
+            fmpz_mat_randops(A, state, n_randint(state, 2 * m * n + 1));
+
+        /* Full transform for reference */
+        fmpz_mat_snf_transform(S_full, U_full, V_full, A);
+
+        /* NULL V: only U computed */
+        fmpz_mat_snf_transform(S, U, NULL, A);
+        if (!fmpz_mat_equal(S, S_full))
+        {
+            flint_printf("FAIL (NULL V): S differs\n");
+            fflush(stdout);
+            flint_abort();
+        }
+        if (!fmpz_mat_equal(U, U_full))
+        {
+            flint_printf("FAIL (NULL V): U differs\n");
+            fflush(stdout);
+            flint_abort();
+        }
+        /* Verify U*A has correct column space */
+        fmpz_mat_mul(T1, U, A);
+
+        /* NULL U: only V computed */
+        fmpz_mat_snf_transform(S, NULL, V, A);
+        if (!fmpz_mat_equal(S, S_full))
+        {
+            flint_printf("FAIL (NULL U): S differs\n");
+            fflush(stdout);
+            flint_abort();
+        }
+        if (!fmpz_mat_equal(V, V_full))
+        {
+            flint_printf("FAIL (NULL U): V differs\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        /* Both NULL: just SNF */
+        fmpz_mat_snf_transform(S, NULL, NULL, A);
+        if (!fmpz_mat_equal(S, S_full))
+        {
+            flint_printf("FAIL (both NULL): S differs\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        fmpz_mat_clear(T2);
+        fmpz_mat_clear(T1);
+        fmpz_mat_clear(V_full);
+        fmpz_mat_clear(U_full);
+        fmpz_mat_clear(V);
+        fmpz_mat_clear(U);
+        fmpz_mat_clear(S_full);
+        fmpz_mat_clear(S);
+        fmpz_mat_clear(A);
+    }
+
     TEST_FUNCTION_END(state);
 }

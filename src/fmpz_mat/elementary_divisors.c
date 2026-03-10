@@ -14,6 +14,7 @@
 #include "fmpz_mat.h"
 #include "fmpz_factor.h"
 #include "nmod_mat.h"
+#include "flint.h"
 
 /*
     Compute p-adic valuations of the elementary divisors of the r x n
@@ -123,6 +124,8 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
                         break;
                     }
                 }
+
+                FLINT_ASSERT(piv_rows[j] != -1);
             }
 
             /* Compute all linear combinations using the original R */
@@ -140,9 +143,9 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
                 }
 
                 /* Divide by p */
-                for (i = 0; i < n; i++)
-                    fmpz_divexact_ui(fmpz_mat_entry(combos, j, i),
-                        fmpz_mat_entry(combos, j, i), p);
+                _fmpz_vec_scalar_divexact_ui(
+                    fmpz_mat_row(combos, j),
+                    fmpz_mat_row(combos, j), n, p);
             }
 
             /* Replace rows */
@@ -212,21 +215,32 @@ fmpz_mat_elementary_divisors(fmpz * ed, slong * rank_out,
     slong m = fmpz_mat_nrows(A);
     slong n = fmpz_mat_ncols(A);
     slong r, i, j, k;
-    fmpz_mat_t H, R;
+    fmpz_mat_t H;
+    fmpz_mat_t R; /* window into H */
     fmpz_t mod;
     fmpz_factor_t fac;
     int use_luebeck;
 
-    r = fmpz_mat_rank(A);
-    *rank_out = r;
-
-    if (r == 0)
-        return;
-
-    /* Compute HNF and extract modulus (product of leading entries) */
+    /* Compute HNF and extract rank (number of nonzero rows) */
     fmpz_mat_init(H, m, n);
     fmpz_mat_hnf(H, A);
 
+    r = 0;
+    for (i = 0; i < m; i++)
+    {
+        if (fmpz_mat_is_zero_row(H, i))
+            break;
+        r++;
+    }
+    *rank_out = r;
+
+    if (r == 0)
+    {
+        fmpz_mat_clear(H);
+        return;
+    }
+
+    /* Compute modulus (product of leading entries of nonzero rows) */
     fmpz_init(mod);
     fmpz_one(mod);
     for (i = 0; i < r; i++)
@@ -281,12 +295,8 @@ fmpz_mat_elementary_divisors(fmpz * ed, slong * rank_out,
     for (i = 0; i < r; i++)
         fmpz_one(&ed[i]);
 
-    /* Extract first r rows of H into a working copy R */
-    fmpz_mat_init(R, r, n);
-    for (i = 0; i < r; i++)
-        for (j = 0; j < n; j++)
-            fmpz_set(fmpz_mat_entry(R, i, j),
-                fmpz_mat_entry(H, i, j));
+    /* R is a window into the first r rows of H (avoids copying) */
+    fmpz_mat_window_init(R, H, 0, 0, r, n);
 
     /* For each prime, compute p-adic valuations and accumulate */
     for (k = 0; k < fac->num; k++)
@@ -303,7 +313,7 @@ fmpz_mat_elementary_divisors(fmpz * ed, slong * rank_out,
         fmpz_mat_clear(Rk);
     }
 
-    fmpz_mat_clear(R);
+    fmpz_mat_window_clear(R);
     fmpz_factor_clear(fac);
     fmpz_clear(mod);
     fmpz_mat_clear(H);

@@ -1358,6 +1358,36 @@ Smith normal form
     Checks that the given matrix is in Smith normal form, returns 1 if so and 0
     otherwise.
 
+.. function:: int fmpz_mat_is_diagonal(const fmpz_mat_t A)
+
+    Returns 1 if all off-diagonal entries of ``A`` are zero, and 0 otherwise.
+    An empty matrix is considered diagonal.
+
+.. function:: void fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_t A)
+
+    Computes the Smith normal form `S = U A V` of the `m \times n` matrix
+    ``A``, where ``U`` is an `m \times m` unimodular matrix and ``V`` is an
+    `n \times n` unimodular matrix.
+
+    Either ``U`` or ``V`` (or both) may be ``NULL``, in which case the
+    corresponding transformation matrix is not computed.
+
+    The algorithm alternates row and column Hermite normal form computations
+    until the matrix is diagonal, then fixes the divisibility chain using
+    extended gcd operations.
+
+.. function:: void fmpz_mat_elementary_divisors(fmpz * ed, slong * rank, const fmpz_mat_t A)
+
+    Computes the elementary divisors `d_1 \mid d_2 \mid \cdots \mid d_r` of
+    the `m \times n` matrix ``A``, where `r` is the rank. The vector ``ed``
+    must have space for at least `\min(m, n)` entries; on return, the first
+    ``*rank`` entries contain the elementary divisors.
+
+    Uses Luebeck's algorithm: compute the Hermite normal form, factor the
+    product of the pivots, then determine `p`-adic valuations for each prime
+    via iterated nullspace computations modulo `p`. Falls back to full Smith
+    normal form if any prime factor does not fit in a ``ulong``.
+
 
 Special matrices
 --------------------------------------------------------------------------------

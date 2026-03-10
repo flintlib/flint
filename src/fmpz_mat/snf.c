@@ -30,7 +30,7 @@ _fmpz_mat_snf_iterative_hermite(fmpz_mat_t S, const fmpz_mat_t A)
     slong m = fmpz_mat_nrows(A);
     slong n = fmpz_mat_ncols(A);
     slong d = FLINT_MIN(m, n);
-    slong max_iters, iter, j, k;
+    slong j, k;
     fmpz_mat_t X, Xt;
     fmpz_t dd, pp, qq;
 
@@ -41,6 +41,7 @@ _fmpz_mat_snf_iterative_hermite(fmpz_mat_t S, const fmpz_mat_t A)
     }
 
     fmpz_mat_init(X, m, n);
+    fmpz_mat_init(Xt, n, m);
     fmpz_init(dd);
     fmpz_init(pp);
     fmpz_init(qq);
@@ -49,14 +50,11 @@ _fmpz_mat_snf_iterative_hermite(fmpz_mat_t S, const fmpz_mat_t A)
 
     /*
         Phase 1: iterate HNF on rows and columns until diagonal.
+        Convergence is guaranteed: each HNF round strictly reduces
+        the off-diagonal entries.
     */
-    max_iters = 100 + 10 * FLINT_MAX(m, n);
-
-    for (iter = 0; iter < max_iters; iter++)
+    while (!fmpz_mat_is_diagonal(X))
     {
-        if (fmpz_mat_is_diagonal(X))
-            break;
-
         /* Row HNF */
         fmpz_mat_hnf(X, X);
 
@@ -64,11 +62,9 @@ _fmpz_mat_snf_iterative_hermite(fmpz_mat_t S, const fmpz_mat_t A)
             break;
 
         /* Column HNF via transpose */
-        fmpz_mat_init(Xt, n, m);
         fmpz_mat_transpose(Xt, X);
         fmpz_mat_hnf(Xt, Xt);
         fmpz_mat_transpose(X, Xt);
-        fmpz_mat_clear(Xt);
     }
 
     /*
@@ -115,6 +111,7 @@ _fmpz_mat_snf_iterative_hermite(fmpz_mat_t S, const fmpz_mat_t A)
 
     fmpz_mat_set(S, X);
 
+    fmpz_mat_clear(Xt);
     fmpz_mat_clear(X);
     fmpz_clear(dd);
     fmpz_clear(pp);

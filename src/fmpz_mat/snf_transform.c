@@ -18,7 +18,7 @@
     Compute the Smith normal form S of A and unimodular matrices U, V
     such that S = U * A * V.
 
-    S is m x n, U is m x m, V is n x n.
+    S is m x n, U is m x m (or NULL), V is n x n (or NULL).
 
     Algorithm: iterative Hermite normal form.
     Phase 1: alternately compute row-HNF and column-HNF (via transpose)
@@ -37,51 +37,41 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
     slong m = fmpz_mat_nrows(A);
     slong n = fmpz_mat_ncols(A);
     slong d = FLINT_MIN(m, n);
-    slong max_iters, iter;
     fmpz_mat_t X, Xt, Mr, Mc;
-    fmpz_t dd, uu, vv, pp, qq, vq_m1, one_m_up;
-    fmpz * save_j, * save_k;
     slong j, k, i;
 
     if (d == 0)
     {
         fmpz_mat_zero(S);
-        fmpz_mat_one(U);
-        fmpz_mat_one(V);
+        if (U != NULL)
+            fmpz_mat_one(U);
+        if (V != NULL)
+            fmpz_mat_one(V);
         return;
     }
 
     fmpz_mat_init(X, m, n);
+    fmpz_mat_init(Xt, n, m);
     fmpz_mat_init(Mr, m, m);
-    fmpz_init(dd);
-    fmpz_init(uu);
-    fmpz_init(vv);
-    fmpz_init(pp);
-    fmpz_init(qq);
-    fmpz_init(vq_m1);
-    fmpz_init(one_m_up);
-
-    save_j = _fmpz_vec_init(FLINT_MAX(m, n));
-    save_k = _fmpz_vec_init(FLINT_MAX(m, n));
+    fmpz_mat_init(Mc, n, n);
 
     fmpz_mat_set(X, A);
-    fmpz_mat_one(U);
-    fmpz_mat_one(V);
+    if (U != NULL)
+        fmpz_mat_one(U);
+    if (V != NULL)
+        fmpz_mat_one(V);
 
     /*
         Phase 1: iterate HNF on rows and columns until diagonal.
-        Each round typically reduces off-diagonal entries significantly.
+        Convergence is guaranteed: each HNF round strictly reduces
+        the off-diagonal entries.
     */
-    max_iters = 100 + 10 * FLINT_MAX(m, n);
-
-    for (iter = 0; iter < max_iters; iter++)
+    while (!fmpz_mat_is_diagonal(X))
     {
-        if (fmpz_mat_is_diagonal(X))
-            break;
-
         /* Row HNF: X -> Mr*X, U -> Mr*U (Mr is m x m) */
         fmpz_mat_hnf_transform(X, Mr, X);
-        fmpz_mat_mul(U, Mr, U);
+        if (U != NULL)
+            fmpz_mat_mul(U, Mr, U);
 
         if (fmpz_mat_is_diagonal(X))
             break;
@@ -89,15 +79,12 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
         /* Column HNF via transpose:
            Xt = X^T, compute Xt -> Mc*Xt (row HNF of transpose),
            then X = Xt^T, V -> V * Mc^T */
-        fmpz_mat_init(Xt, n, m);
-        fmpz_mat_init(Mc, n, n);
         fmpz_mat_transpose(Xt, X);
         fmpz_mat_hnf_transform(Xt, Mc, Xt);
         fmpz_mat_transpose(X, Xt);
         fmpz_mat_transpose(Mc, Mc);
-        fmpz_mat_mul(V, V, Mc);
-        fmpz_mat_clear(Mc);
-        fmpz_mat_clear(Xt);
+        if (V != NULL)
+            fmpz_mat_mul(V, V, Mc);
     }
 
     /*
@@ -118,6 +105,21 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
 
         Result: L * diag(a,b) * R = diag(d, pqd) = diag(gcd, lcm).
     */
+    {
+        fmpz_t dd, uu, vv, pp, qq, vq_m1, one_m_up;
+        fmpz * save_j, * save_k;
+
+        fmpz_init(dd);
+        fmpz_init(uu);
+        fmpz_init(vv);
+        fmpz_init(pp);
+        fmpz_init(qq);
+        fmpz_init(vq_m1);
+        fmpz_init(one_m_up);
+
+        save_j = _fmpz_vec_init(FLINT_MAX(m, n));
+        save_k = _fmpz_vec_init(FLINT_MAX(m, n));
+
     for (j = 0; j < d; j++)
     {
         if (fmpz_is_one(fmpz_mat_entry(X, j, j)))
@@ -151,20 +153,26 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
                 new row j = old row j + v * old row k
                 new row k = q * old row j + (vq-1) * old row k
             */
-            for (i = 0; i < m; i++)
-                fmpz_set(&save_j[i], fmpz_mat_entry(U, j, i));
-            for (i = 0; i < m; i++)
-                fmpz_set(&save_k[i], fmpz_mat_entry(U, k, i));
-
-            for (i = 0; i < m; i++)
+            if (U != NULL)
             {
-                /* U[j,i] = save_j[i] + v * save_k[i] */
-                fmpz_set(fmpz_mat_entry(U, j, i), &save_j[i]);
-                fmpz_addmul(fmpz_mat_entry(U, j, i), vv, &save_k[i]);
-                /* U[k,i] = q * save_j[i] + (vq-1) * save_k[i] */
-                fmpz_mul(fmpz_mat_entry(U, k, i), qq, &save_j[i]);
-                fmpz_addmul(fmpz_mat_entry(U, k, i), vq_m1,
-                    &save_k[i]);
+                for (i = 0; i < m; i++)
+                    fmpz_set(&save_j[i],
+                        fmpz_mat_entry(U, j, i));
+                for (i = 0; i < m; i++)
+                    fmpz_set(&save_k[i],
+                        fmpz_mat_entry(U, k, i));
+
+                for (i = 0; i < m; i++)
+                {
+                    fmpz_set(fmpz_mat_entry(U, j, i),
+                        &save_j[i]);
+                    fmpz_addmul(fmpz_mat_entry(U, j, i),
+                        vv, &save_k[i]);
+                    fmpz_mul(fmpz_mat_entry(U, k, i),
+                        qq, &save_j[i]);
+                    fmpz_addmul(fmpz_mat_entry(U, k, i),
+                        vq_m1, &save_k[i]);
+                }
             }
 
             /*
@@ -172,21 +180,27 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
                 new col j = u * old col j + old col k
                 new col k = (1-up) * old col j + (-p) * old col k
             */
-            for (i = 0; i < n; i++)
-                fmpz_set(&save_j[i], fmpz_mat_entry(V, i, j));
-            for (i = 0; i < n; i++)
-                fmpz_set(&save_k[i], fmpz_mat_entry(V, i, k));
-
-            for (i = 0; i < n; i++)
+            if (V != NULL)
             {
-                /* V[i,j] = u * save_j[i] + save_k[i] */
-                fmpz_mul(fmpz_mat_entry(V, i, j), uu, &save_j[i]);
-                fmpz_add(fmpz_mat_entry(V, i, j),
-                    fmpz_mat_entry(V, i, j), &save_k[i]);
-                /* V[i,k] = (1-up) * save_j[i] - p * save_k[i] */
-                fmpz_mul(fmpz_mat_entry(V, i, k), one_m_up,
-                    &save_j[i]);
-                fmpz_submul(fmpz_mat_entry(V, i, k), pp, &save_k[i]);
+                for (i = 0; i < n; i++)
+                    fmpz_set(&save_j[i],
+                        fmpz_mat_entry(V, i, j));
+                for (i = 0; i < n; i++)
+                    fmpz_set(&save_k[i],
+                        fmpz_mat_entry(V, i, k));
+
+                for (i = 0; i < n; i++)
+                {
+                    fmpz_mul(fmpz_mat_entry(V, i, j),
+                        uu, &save_j[i]);
+                    fmpz_add(fmpz_mat_entry(V, i, j),
+                        fmpz_mat_entry(V, i, j),
+                        &save_k[i]);
+                    fmpz_mul(fmpz_mat_entry(V, i, k),
+                        one_m_up, &save_j[i]);
+                    fmpz_submul(fmpz_mat_entry(V, i, k),
+                        pp, &save_k[i]);
+                }
             }
 
             /* Update X diagonal: X[j,j] = gcd, X[k,k] = lcm */
@@ -197,6 +211,17 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
         }
     }
 
+        _fmpz_vec_clear(save_k, FLINT_MAX(m, n));
+        _fmpz_vec_clear(save_j, FLINT_MAX(m, n));
+        fmpz_clear(dd);
+        fmpz_clear(uu);
+        fmpz_clear(vv);
+        fmpz_clear(pp);
+        fmpz_clear(qq);
+        fmpz_clear(vq_m1);
+        fmpz_clear(one_m_up);
+    }
+
     /*
         Phase 3: fix signs.  SNF requires non-negative diagonal entries.
         If X[j,j] < 0, negate row j of U to absorb the sign.
@@ -205,24 +230,21 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
     {
         if (fmpz_sgn(fmpz_mat_entry(X, j, j)) < 0)
         {
-            fmpz_neg(fmpz_mat_entry(X, j, j), fmpz_mat_entry(X, j, j));
-            for (i = 0; i < m; i++)
-                fmpz_neg(fmpz_mat_entry(U, j, i),
-                    fmpz_mat_entry(U, j, i));
+            fmpz_neg(fmpz_mat_entry(X, j, j),
+                fmpz_mat_entry(X, j, j));
+            if (U != NULL)
+            {
+                for (i = 0; i < m; i++)
+                    fmpz_neg(fmpz_mat_entry(U, j, i),
+                        fmpz_mat_entry(U, j, i));
+            }
         }
     }
 
     fmpz_mat_set(S, X);
 
-    _fmpz_vec_clear(save_k, FLINT_MAX(m, n));
-    _fmpz_vec_clear(save_j, FLINT_MAX(m, n));
+    fmpz_mat_clear(Mc);
+    fmpz_mat_clear(Xt);
     fmpz_mat_clear(X);
     fmpz_mat_clear(Mr);
-    fmpz_clear(dd);
-    fmpz_clear(uu);
-    fmpz_clear(vv);
-    fmpz_clear(pp);
-    fmpz_clear(qq);
-    fmpz_clear(vq_m1);
-    fmpz_clear(one_m_up);
 }
