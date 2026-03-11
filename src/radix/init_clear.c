@@ -244,11 +244,14 @@ void radix_init(radix_t radix, ulong b, unsigned int exp)
     radix->bval = flint_ctz(b);
     radix->bpow_oddinv[0].a = 1;
     radix->bpow_oddinv[0].b = UWORD_MAX;
+
+    ulong bodd_inv = n_binvert(b >> radix->bval);
+
     for (i = 1; i <= exp; i++)
     {
         ulong bodd = (radix->bpow[i] >> (radix->bval * i));
 
-        radix->bpow_oddinv[i].a = n_binvert(bodd);
+        radix->bpow_oddinv[i].a = radix->bpow_oddinv[i - 1].a * bodd_inv;
         radix->bpow_oddinv[i].b = UWORD_MAX / bodd;
     }
 
