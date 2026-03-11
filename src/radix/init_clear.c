@@ -228,11 +228,10 @@ void radix_init(radix_t radix, ulong b, unsigned int exp)
         n_div_precomp_init(radix->bpow_div + i, radix->bpow[i]);
 
     {
-        int prevbc = -1;
+        int prevbc = 0;
         for (i = 0; i <= exp; i++)
         {
-            unsigned int bc = FLINT_BIT_COUNT(radix->bpow[i]);
-            int jbc;
+            int jbc, bc = FLINT_BIT_COUNT(radix->bpow[i]);
 
             for (jbc = prevbc + 1; jbc <= bc; jbc++)
                 radix->bits_to_digit_size[jbc - 1] = i;
