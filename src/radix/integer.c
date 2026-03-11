@@ -574,7 +574,8 @@ radix_integer_lshift_digits(radix_integer_t res, const radix_integer_t x, slong 
 
     nn_ptr rd = radix_integer_fit_limbs(res, rn, radix);
 
-    flint_mpn_copyd(rd + nl, x->d, xn);
+    if (res != x || nl != 0)
+        flint_mpn_copyd(rd + nl, x->d, xn);
     flint_mpn_zero(rd, nl);
 
     if (nd != 0)
@@ -637,7 +638,8 @@ void radix_integer_rshift_digits(radix_integer_t res, const radix_integer_t x, s
     else
         rd = radix_integer_fit_limbs(res, rn, radix);
 
-    flint_mpn_copyi(rd, x->d + nl, rn);
+    if (res != x || nl != 0)
+        flint_mpn_copyi(rd, x->d + nl, rn);
 
     if (nd != 0)
     {
