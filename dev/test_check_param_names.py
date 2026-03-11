@@ -637,6 +637,28 @@ class TestCompareParams(unittest.TestCase):
         self.assertEqual(len(mm), 1)
         self.assertEqual(mm[0]["diffs"], [(1, "y", "b")])
 
+    def test_swap_detection(self):
+        a = self._make_funcs(foo=["x", "val", "len", "y"])
+        b = self._make_funcs(foo=["x", "len", "val", "y"])
+        mm = compare_params(a, b)
+        self.assertEqual(len(mm), 1)
+        self.assertEqual(mm[0]["swaps"], [(1, 2, "val", "len")])
+
+    def test_no_swap_when_names_differ(self):
+        a = self._make_funcs(foo=["a", "b"])
+        b = self._make_funcs(foo=["c", "d"])
+        mm = compare_params(a, b)
+        self.assertEqual(len(mm), 1)
+        self.assertEqual(mm[0]["swaps"], [])
+
+    def test_swap_among_multiple_diffs(self):
+        a = self._make_funcs(foo=["w", "val", "len", "z"])
+        b = self._make_funcs(foo=["x", "len", "val", "z"])
+        mm = compare_params(a, b)
+        self.assertEqual(len(mm), 1)
+        # Only positions 1,2 are swapped; position 0 is just different
+        self.assertEqual(mm[0]["swaps"], [(1, 2, "val", "len")])
+
 
 class TestEndToEnd(unittest.TestCase):
     """End-to-end tests with temp header + RST + source files."""

@@ -484,13 +484,25 @@ def compare_params(funcs_a, funcs_b):
 
         if a_params != b_params:
             diffs = []
+            swaps = []
             for k, (a, b) in enumerate(zip(a_params, b_params)):
                 if a != b:
                     diffs.append((k, a, b))
+            # Detect swapped parameters: pairs where a[i]=b[j] and
+            # a[j]=b[i] for i<j among the differing positions.
+            diff_indices = [d[0] for d in diffs]
+            for ii in range(len(diff_indices)):
+                for jj in range(ii + 1, len(diff_indices)):
+                    i = diff_indices[ii]
+                    j = diff_indices[jj]
+                    if (a_params[i] == b_params[j] and
+                            a_params[j] == b_params[i]):
+                        swaps.append((i, j, a_params[i], a_params[j]))
             mismatches.append({
                 "func": func_name,
                 "type": "param_name",
                 "diffs": diffs,
+                "swaps": swaps,
                 "a_params": a_params,
                 "b_params": b_params,
                 "a_info": funcs_a[func_name],
@@ -537,6 +549,11 @@ def print_mismatches(mismatches, label_a, label_b, path_a="", path_b=""):
             for idx, a_name, b_name in mm["diffs"]:
                 print(f"    param {idx}: {label_a} has '{a_name}'"
                       f", {label_b} has '{b_name}'")
+            if mm.get("swaps"):
+                for i, j, name_i, name_j in mm["swaps"]:
+                    print(f"    WARNING: params {i} and {j} "
+                          f"('{name_i}', '{name_j}') appear swapped"
+                          f" - possible bug!")
             if path_a:
                 print(f"    {label_a} ({path_a}:{a_info[1]})")
             else:
