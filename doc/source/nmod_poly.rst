@@ -1466,7 +1466,7 @@ Multipoint evaluation
 
     Uses Horner's method iteratively.
 
-.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len)
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nmod_geometric_progression_t G, slong len, nmod_t mod)
 
     Evaluates (``poly``, ``plen``) at the ``len`` values given
     by the precomputed geometric progression ``G``. The value of
