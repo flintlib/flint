@@ -46,12 +46,12 @@ _ca_vec_check_is_zero(ca_srcptr vec, slong len, ca_ctx_t ctx)
 }
 
 void
-_ca_vec_clear(ca_ptr v, slong n, ca_ctx_t ctx)
+_ca_vec_clear(ca_ptr vec, slong len, ca_ctx_t ctx)
 {
     slong i;
-    for (i = 0; i < n; i++)
-        ca_clear(v + i, ctx);
-    flint_free(v);
+    for (i = 0; i < len; i++)
+        ca_clear(vec + i, ctx);
+    flint_free(vec);
 }
 
 void
@@ -64,31 +64,31 @@ ca_vec_clear(ca_vec_t vec, ca_ctx_t ctx)
 }
 
 ca_ptr
-_ca_vec_init(slong n, ca_ctx_t ctx)
+_ca_vec_init(slong len, ca_ctx_t ctx)
 {
     slong i;
-    ca_ptr v = (ca_ptr) flint_malloc(sizeof(ca_struct) * n);
+    ca_ptr v = (ca_ptr) flint_malloc(sizeof(ca_struct) * len);
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < len; i++)
         ca_init(v + i, ctx);
 
     return v;
 }
 
 void
-ca_vec_init(ca_vec_t res, slong len, ca_ctx_t ctx)
+ca_vec_init(ca_vec_t vec, slong len, ca_ctx_t ctx)
 {
     if (len == 0)
     {
-        res->entries = NULL;
-        res->length = 0;
-        res->alloc = 0;
+        vec->entries = NULL;
+        vec->length = 0;
+        vec->alloc = 0;
     }
     else
     {
-        res->entries = _ca_vec_init(len, ctx);
-        res->length = len;
-        res->alloc = len;
+        vec->entries = _ca_vec_init(len, ctx);
+        vec->length = len;
+        vec->alloc = len;
     }
 }
 
@@ -131,17 +131,17 @@ ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx)
 }
 
 void
-ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx)
+ca_vec_printn(const ca_vec_t poly, slong digits, ca_ctx_t ctx)
 {
     slong len, i;
 
-    len = vec->length;
+    len = poly->length;
 
     flint_printf("[");
 
     for (i = 0; i < len; i++)
     {
-        ca_printn(vec->entries + i, digits, ctx);
+        ca_printn(poly->entries + i, digits, ctx);
         if (i < len - 1)
             flint_printf(", ");
     }
@@ -149,7 +149,7 @@ ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx)
 }
 
 void
-_ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx)
+_ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx)
 {
     slong i;
     ca_t t;
@@ -159,7 +159,7 @@ _ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_
         ca_init(t, ctx);
         for (i = 0; i < len; i++)
         {
-            ca_mul(t, vec + i, c, ctx);
+            ca_mul(t, src + i, c, ctx);
             ca_add(res + i, res + i, t, ctx);
         }
         ca_clear(t, ctx);
@@ -193,7 +193,7 @@ _ca_vec_scalar_mul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx
 }
 
 void
-_ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx)
+_ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx)
 {
     slong i;
     ca_t t;
@@ -203,7 +203,7 @@ _ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_
         ca_init(t, ctx);
         for (i = 0; i < len; i++)
         {
-            ca_mul(t, vec + i, c, ctx);
+            ca_mul(t, src + i, c, ctx);
             ca_sub(res + i, res + i, t, ctx);
         }
         ca_clear(t, ctx);

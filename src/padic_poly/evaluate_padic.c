@@ -184,16 +184,16 @@ void _padic_poly_evaluate_padic(fmpz_t u, slong *v, slong N,
 }
 
 void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
-                                          const padic_t x, const padic_ctx_t ctx)
+                                          const padic_t a, const padic_ctx_t ctx)
 {
-    if (y == x)
+    if (y == a)
     {
         padic_t t;
 
         padic_init2(t, padic_prec(y));
         _padic_poly_evaluate_padic(padic_unit(t), &padic_val(t), padic_prec(t),
                                    poly->coeffs, poly->val, poly->length,
-                                   padic_unit(x), padic_val(x), ctx);
+                                   padic_unit(a), padic_val(a), ctx);
         padic_swap(y, t);
         padic_clear(t);
     }
@@ -201,6 +201,6 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
     {
         _padic_poly_evaluate_padic(padic_unit(y), &padic_val(y), padic_prec(y),
                                    poly->coeffs, poly->val, poly->length,
-                                   padic_unit(x), padic_val(x), ctx);
+                                   padic_unit(a), padic_val(a), ctx);
     }
 }

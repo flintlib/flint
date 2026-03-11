@@ -95,9 +95,9 @@ void arf_interval_printd(const arf_interval_t v, slong n);
 int arb_calc_partition(arf_interval_t L, arf_interval_t R,
     arb_calc_func_t func, void * param, const arf_interval_t block, slong prec);
 
-slong arb_calc_isolate_roots(arf_interval_ptr * blocks, int ** flags,
+slong arb_calc_isolate_roots(arf_interval_ptr * found, int ** flags,
     arb_calc_func_t func, void * param,
-    const arf_interval_t block, slong maxdepth, slong maxeval, slong maxfound,
+    const arf_interval_t interval, slong maxdepth, slong maxeval, slong maxfound,
     slong prec);
 
 int arb_calc_refine_root_bisect(arf_interval_t r, arb_calc_func_t func,

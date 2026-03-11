@@ -12,18 +12,18 @@
 #include "padic.h"
 #include "padic_poly.h"
 
-void padic_poly_get_coeff_padic(padic_t x, const padic_poly_t f, slong n,
+void padic_poly_get_coeff_padic(padic_t c, const padic_poly_t poly, slong n,
                                 const padic_ctx_t ctx)
 {
-    if (n < f->length && !fmpz_is_zero(f->coeffs + n))
+    if (n < poly->length && !fmpz_is_zero(poly->coeffs + n))
     {
-        fmpz_set(padic_unit(x), f->coeffs + n);
-        padic_val(x) = f->val;
-        padic_prec(x) = f->N;
-        padic_reduce(x, ctx);
+        fmpz_set(padic_unit(c), poly->coeffs + n);
+        padic_val(c) = poly->val;
+        padic_prec(c) = poly->N;
+        padic_reduce(c, ctx);
     }
     else
     {
-        padic_zero(x);
+        padic_zero(c);
     }
 }
