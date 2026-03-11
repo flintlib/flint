@@ -59,7 +59,7 @@ slong ca_vec_length(const ca_vec_t vec, ca_ctx_t ctx)
 }
 
 void _ca_vec_fit_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
-void ca_vec_set_length(ca_vec_t res, slong len, ca_ctx_t ctx);
+void ca_vec_set_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
 
 /* Assignment */
 
