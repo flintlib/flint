@@ -15,18 +15,18 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_div_series_invmul(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, gr_ctx_t ctx)
+_gr_poly_div_series_invmul(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx)
 {
-    gr_ptr Ainv;
+    gr_ptr Binv;
     int status = GR_SUCCESS;
 
-    GR_TMP_INIT_VEC(Ainv, len, ctx);
+    GR_TMP_INIT_VEC(Binv, len, ctx);
 
-    status |= _gr_poly_inv_series(Ainv, A, Alen, len, ctx);
+    status |= _gr_poly_inv_series(Binv, B, Blen, len, ctx);
     if (status == GR_SUCCESS)
-        status |= _gr_poly_mullow(res, Ainv, len, B, Blen, len, ctx);
+        status |= _gr_poly_mullow(res, Binv, len, A, Alen, len, ctx);
 
-    GR_TMP_CLEAR_VEC(Ainv, len, ctx);
+    GR_TMP_CLEAR_VEC(Binv, len, ctx);
 
     return status;
 }
