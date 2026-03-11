@@ -51,8 +51,38 @@ void radix_init(radix_t radix, ulong b, unsigned int exp)
     nmod_init(&radix->b, b);
     radix->exp = exp;
     nmod_init(&radix->B, B);
+
+    radix->bpow = flint_malloc(sizeof(ulong) * (exp + 1));
+    radix->bpow_div = flint_malloc(sizeof(n_div_precomp_struct) * (exp + 1));
+
+    /* todo: combine with earlier power computations */
+    radix->bpow[0] = 1;
+    radix->bpow[1] = b;
+    for (i = 2; i <= exp; i++)
+        radix->bpow[i] = radix->bpow[i - 1] * b;
+
+    for (i = 0; i <= exp; i++)
+        n_div_precomp_init(radix->bpow_div + i, radix->bpow[i]);
+
+
+    {
+        int prevbc = -1;
+        for (i = 0; i <= exp; i++)
+        {
+            unsigned int bc = FLINT_BIT_COUNT(radix->bpow[i]);
+            int jbc;
+
+            for (jbc = prevbc + 1; jbc <= bc; jbc++)
+                radix->bits_to_digit_size[jbc - 1] = i;
+
+            prevbc = bc;
+        }
+    }
 }
 
 void radix_clear(radix_t radix)
 {
+    flint_free(radix->bpow);
+    flint_free(radix->bpow_div);
 }
+
