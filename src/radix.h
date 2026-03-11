@@ -39,13 +39,23 @@ typedef n_div_precomp_struct n_div_precomp_t[1];
 
 typedef struct
 {
+    ulong a;
+    ulong b;
+}
+n_pair_struct;
+
+typedef struct
+{
     nmod_t b;           /* Digit radix */
     unsigned int exp;   /* B = b^exp */
     nmod_t B;           /* Limb radix */
     ulong * bpow;       /* Precomputed powers of b */
     n_div_precomp_struct * bpow_div;  /* Division by powers of b */
     unsigned char bits_to_digit_size[FLINT_BITS];
-    /* extended data which may be used by some ring contexts */
+    unsigned int bval;  /* Binary valuation of b */
+    n_pair_struct * bpow_oddinv;    /* Inverses of (b>>bval)^k */
+    ulong (*val_func)(ulong, const void *);  /* Function to compute digit valuation */
+    /* Extended data which may be used by some ring contexts */
     slong trunc_limbs;
     slong trunc_digits;
 }
@@ -94,6 +104,14 @@ RADIX_INLINE ulong radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
         n--;
 
     return (n == 0) ? 0 : _radix_size_digits_1(x[n - 1], radix);
+}
+
+RADIX_INLINE ulong _radix_valuation_digits_1(ulong c, const radix_t radix)
+{
+    FLINT_ASSERT(c != 0);
+    FLINT_ASSERT(c < LIMB_RADIX(radix));
+
+    return radix->val_func(c, radix);
 }
 
 void radix_rand_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix);
@@ -346,9 +364,21 @@ radix_integer_valuation_limbs(const radix_integer_t x, const radix_t FLINT_UNUSE
     if (xn == 0)
         return 0;
     slong v = 0;
-    while (v < xn && x->d[v] == 0)
+    while (x->d[v] == 0)
         v++;
     return v;
+}
+
+RADIX_INLINE slong
+radix_integer_valuation_digits(const radix_integer_t x, const radix_t radix)
+{
+    slong xn = FLINT_ABS(x->size);
+    if (xn == 0)
+        return 0;
+    slong v = 0;
+    while (x->d[v] == 0)
+        v++;
+    return v * radix->exp + _radix_valuation_digits_1(x->d[v], radix);
 }
 
 void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);

@@ -11,6 +11,168 @@
 
 #include "radix.h"
 
+/* Functions to compute digit valuation. */
+
+static ulong
+_radix_val_exp1(ulong x, const void * FLINT_UNUSED(_radix))
+{
+    return 0;
+}
+
+static ulong
+_radix_val_pow2(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    /* Todo: optimize this division */
+    return flint_ctz(x) / radix->bval;
+}
+
+#define ODD_DIVISIBILITY_TEST(exp) \
+    do { \
+        ulong inv1 = radix->bpow_oddinv[exp].a; \
+        ulong inv2 = radix->bpow_oddinv[exp].b; \
+        if (n_divisible_odd_gm(x, inv1, inv2)) \
+        { \
+            x *= inv1; \
+            val += exp; \
+        } \
+    } while (0)
+
+static ulong
+_radix_val_odd2(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    ulong val = 0;
+    ODD_DIVISIBILITY_TEST(1);
+    return val;
+}
+
+static ulong
+_radix_val_odd4(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    ulong val = 0;
+    ODD_DIVISIBILITY_TEST(2);
+    ODD_DIVISIBILITY_TEST(1);
+    return val;
+}
+
+static ulong
+_radix_val_odd8(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    ulong val = 0;
+    ODD_DIVISIBILITY_TEST(4);
+    ODD_DIVISIBILITY_TEST(2);
+    ODD_DIVISIBILITY_TEST(1);
+    return val;
+}
+
+static ulong
+_radix_val_odd16(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    ulong val = 0;
+    ODD_DIVISIBILITY_TEST(8);
+    ODD_DIVISIBILITY_TEST(4);
+    ODD_DIVISIBILITY_TEST(2);
+    ODD_DIVISIBILITY_TEST(1);
+    return val;
+}
+
+static ulong
+_radix_val_odd32(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    ulong val = 0;
+    ODD_DIVISIBILITY_TEST(16);
+    ODD_DIVISIBILITY_TEST(8);
+    ODD_DIVISIBILITY_TEST(4);
+    ODD_DIVISIBILITY_TEST(2);
+    ODD_DIVISIBILITY_TEST(1);
+    return val;
+}
+
+static ulong
+_radix_val_odd64(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    ulong val = 0;
+    ODD_DIVISIBILITY_TEST(32);
+    ODD_DIVISIBILITY_TEST(16);
+    ODD_DIVISIBILITY_TEST(8);
+    ODD_DIVISIBILITY_TEST(4);
+    ODD_DIVISIBILITY_TEST(2);
+    ODD_DIVISIBILITY_TEST(1);
+    return val;
+}
+
+static ulong
+_radix_val_2odd2(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    unsigned int nz = flint_ctz(x);
+    return FLINT_MIN(nz, _radix_val_odd2(x, radix));
+}
+
+static ulong
+_radix_val_2odd4(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    unsigned int nz = flint_ctz(x);
+    return FLINT_MIN(nz, _radix_val_odd4(x, radix));
+}
+
+static ulong
+_radix_val_2odd8(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    unsigned int nz = flint_ctz(x);
+    return FLINT_MIN(nz, _radix_val_odd8(x, radix));
+}
+
+static ulong
+_radix_val_2odd16(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    unsigned int nz = flint_ctz(x);
+    if (nz <= 1)
+        return nz && n_divisible_odd_gm(x, radix->bpow_oddinv[1].a, radix->bpow_oddinv[1].b);
+    return FLINT_MIN(nz, _radix_val_odd16(x, radix));
+}
+
+static ulong
+_radix_val_2odd32(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    unsigned int nz = flint_ctz(x);
+    if (nz <= 1)
+        return nz && n_divisible_odd_gm(x, radix->bpow_oddinv[1].a, radix->bpow_oddinv[1].b);
+    return FLINT_MIN(nz, _radix_val_odd32(x, radix));
+}
+
+/* This can be optimized, but there are probably few applications for
+   radix b = 4*odd. */
+static ulong
+_radix_val_generic(ulong x, const void * _radix)
+{
+    const radix_struct * radix = _radix;
+    unsigned int nz = flint_ctz(x);
+
+    ulong val = 0;
+    ulong inv1 = radix->bpow_oddinv[1].a;
+    ulong inv2 = radix->bpow_oddinv[1].b;
+
+    while (nz >= radix->bval && n_divisible_odd_gm(x, inv1, inv2))
+    {
+        x *= inv1;
+        nz -= radix->bval;
+        val++;
+    }
+
+    return val;
+}
+
 void radix_init(radix_t radix, ulong b, unsigned int exp)
 {
     ulong B;
@@ -52,6 +214,7 @@ void radix_init(radix_t radix, ulong b, unsigned int exp)
     radix->exp = exp;
     nmod_init(&radix->B, B);
 
+    /* todo: as a single malloc? */
     radix->bpow = flint_malloc(sizeof(ulong) * (exp + 1));
     radix->bpow_div = flint_malloc(sizeof(n_div_precomp_struct) * (exp + 1));
 
@@ -63,7 +226,6 @@ void radix_init(radix_t radix, ulong b, unsigned int exp)
 
     for (i = 0; i <= exp; i++)
         n_div_precomp_init(radix->bpow_div + i, radix->bpow[i]);
-
 
     {
         int prevbc = -1;
@@ -78,11 +240,54 @@ void radix_init(radix_t radix, ulong b, unsigned int exp)
             prevbc = bc;
         }
     }
+
+    radix->bpow_oddinv = flint_malloc(sizeof(n_pair_struct) * (exp + 1));
+    radix->bval = flint_ctz(b);
+    radix->bpow_oddinv[0].a = 1;
+    radix->bpow_oddinv[0].b = UWORD_MAX;
+    for (i = 1; i <= exp; i++)
+    {
+        ulong bodd = (radix->bpow[i] >> (radix->bval * i));
+
+        radix->bpow_oddinv[i].a = n_binvert(bodd);
+        radix->bpow_oddinv[i].b = UWORD_MAX / bodd;
+    }
+
+    if (exp == 1)
+    {
+        radix->val_func = _radix_val_exp1;
+    }
+    else if ((b & (b - 1)) == 0)
+    {
+        radix->val_func = _radix_val_pow2;
+    }
+    else if (radix->bval == 0)
+    {
+        if (exp == 2)       radix->val_func = _radix_val_odd2;
+        else if (exp <= 4)  radix->val_func = _radix_val_odd4;
+        else if (exp <= 8)  radix->val_func = _radix_val_odd8;
+        else if (exp <= 16) radix->val_func = _radix_val_odd16;
+        else if (exp <= 32) radix->val_func = _radix_val_odd32;
+        else                radix->val_func = _radix_val_odd64;
+    }
+    else if (radix->bval == 1)  /* Mainly intended for base 10 */
+    {
+        if (exp == 2)       radix->val_func = _radix_val_2odd2;
+        else if (exp <= 4)  radix->val_func = _radix_val_2odd4;
+        else if (exp <= 8)  radix->val_func = _radix_val_2odd8;
+        else if (exp <= 16) radix->val_func = _radix_val_2odd16;
+        else                radix->val_func = _radix_val_2odd32;
+    }
+    else
+    {
+        radix->val_func = _radix_val_generic;
+    }
 }
 
 void radix_clear(radix_t radix)
 {
     flint_free(radix->bpow);
     flint_free(radix->bpow_div);
+    flint_free(radix->bpow_oddinv);
 }
 

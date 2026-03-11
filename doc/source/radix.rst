@@ -76,6 +76,25 @@ Except where otherwise noted, the following rules apply:
   will also be normalised to this range.
 * Aliasing is permitted as long as aliased operands start at the same address.
 
+.. function:: ulong _radix_size_digits_1(ulong c, const radix_t radix)
+              ulong radix_size_digits_1(ulong c, const radix_t radix)
+
+    Return the size of the limb `c` in digits. The underscore method
+    requires `c > 0`.
+
+.. function:: ulong _radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+              ulong radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+
+    Return the size of *(x, n)* in digits. The underscore requires `n > 0`
+    and `x_{n-1} \ne 0`. The version without an underscore allows `n = 0`
+    and `x_{n-1} = 0`.
+
+.. function:: ulong _radix_valuation_digits_1(ulong c, const radix_t radix)
+
+    Return the digit valuation of the limb `c`, i.e. the number of trailing
+    zeros in base `b`, or the largest exponent `k` such that `b^k` divides `c`.
+    Requires `c > 0`.
+
 .. function:: void radix_rand_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix)
 
     Sets *(res, n)* to a uniformly random integer in `[0, B^n-1]`.
@@ -423,8 +442,10 @@ Memory-managed integers
     truncating the result (rounding to zero).
 
 .. function:: slong radix_integer_valuation_limbs(const radix_integer_t x, const radix_t radix)
+              slong radix_integer_valuation_digits(const radix_integer_t x, const radix_t radix)
 
-    Returns the largest *n* such that `B^n` divides *x* exactly.
+    Returns the largest *n* such that `B^n` (respectively `b^n`) divides *x* exactly,
+    i.e. the number of least significant zero limbs (respectively digits).
     In the special case `x = 0`, returns zero.
 
 .. function:: void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
