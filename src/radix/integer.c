@@ -33,7 +33,6 @@ radix_integer_fit_limbs(radix_integer_t res, slong nlimbs, const radix_t radix)
 {
     if (res->alloc < nlimbs)
     {
-        /* todo: should we overallocate? */
         res->d = flint_realloc(res->d, nlimbs * sizeof(ulong));
         res->alloc = nlimbs;
     }
@@ -130,16 +129,19 @@ radix_integer_cmpabs(const radix_integer_t x, const radix_integer_t y, const rad
 void
 radix_integer_set(radix_integer_t res, const radix_integer_t x, const radix_t radix)
 {
-    slong size = x->size;
-    slong n = FLINT_ABS(size);
-
-    if (n != 0)
+    if (res != x)
     {
-        radix_integer_fit_limbs(res, n, radix);
-        flint_mpn_copyi(res->d, x->d, n);
-    }
+        slong size = x->size;
+        slong n = FLINT_ABS(size);
 
-    res->size = size;
+        if (n != 0)
+        {
+            radix_integer_fit_limbs(res, n, radix);
+            flint_mpn_copyi(res->d, x->d, n);
+        }
+
+        res->size = size;
+    }
 }
 
 void
