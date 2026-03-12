@@ -4944,7 +4944,28 @@ class radix_integer(gr_elem):
 
     _struct_type = radix_integer_struct
 
+    def size_limbs(self):
+        """
+            >>> Z = IntegerRing_radix_integer(10, 6)
+            >>> Z(10**20).size_limbs()
+            4
+        """
+        libflint.radix_integer_size_limbs.argtypes = (ctypes.c_void_p, ctypes.c_void_p)
+        libflint.radix_integer_size_limbs.restype = c_slong
+        return libflint.radix_integer_size_limbs(self._ref, libgr.gr_ctx_data_as_ptr(self._ctx))
 
+    def size_digits(self):
+        """
+            >>> Z = IntegerRing_radix_integer(10, 6)
+            >>> Z(10**20).size_digits()
+            21
+            >>> Z(10**20-1).size_digits()
+            20
+
+        """
+        libflint.radix_integer_size_digits.argtypes = (ctypes.c_void_p, ctypes.c_void_p)
+        libflint.radix_integer_size_digits.restype = c_slong
+        return libflint.radix_integer_size_digits(self._ref, libgr.gr_ctx_data_as_ptr(self._ctx))
 
 class fmpq(gr_elem):
     _struct_type = fmpq_struct

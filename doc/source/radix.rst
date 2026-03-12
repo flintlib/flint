@@ -76,6 +76,25 @@ Except where otherwise noted, the following rules apply:
   will also be normalised to this range.
 * Aliasing is permitted as long as aliased operands start at the same address.
 
+.. function:: ulong _radix_size_digits_1(ulong c, const radix_t radix)
+              ulong radix_size_digits_1(ulong c, const radix_t radix)
+
+    Return the size of the limb `c` in digits. The underscore method
+    requires `c > 0`.
+
+.. function:: ulong _radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+              ulong radix_size_digits(nn_srcptr x, slong n, const radix_t radix)
+
+    Return the size of *(x, n)* in digits. The underscore requires `n > 0`
+    and `x_{n-1} \ne 0`. The version without an underscore allows `n = 0`
+    and `x_{n-1} = 0`.
+
+.. function:: ulong _radix_valuation_digits_1(ulong c, const radix_t radix)
+
+    Return the digit valuation of the limb `c`, i.e. the number of trailing
+    zeros in base `b`, or the largest exponent `k` such that `b^k` divides `c`.
+    Requires `c > 0`.
+
 .. function:: void radix_rand_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix)
 
     Sets *(res, n)* to a uniformly random integer in `[0, B^n-1]`.
@@ -106,6 +125,27 @@ Except where otherwise noted, the following rules apply:
 
     Sets *(res, xn)* to the sum or difference of *(x, xn)* and *(y, yn)*, returning
     carry or borrow. Requires `xn \ge yn \ge 1`.
+
+.. function:: ulong radix_lshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int k, const radix_t radix)
+
+    Sets *(res, n)* to *(a, n)* shifted left by `k` digits, i.e.
+    multiplied by `b^k`, with the carry out returned in the `k` least
+    significant digits of the return limb.
+    This is equivalent to :func:`radix_mul_1` with scalar `b^k`,
+    but more efficient. Requires `n > 1` and `1 \le k < e`. Note that
+    this operation only makes sense in a limb radix with `e \ge 2` digits
+    per limb.
+
+.. function:: ulong radix_rshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int k, const radix_t radix)
+
+    Sets *(res, n)* to *(a, n)* shifted right by `k` digits, i.e.
+    divided by `b^k`, with the fractional part
+    returned in the `k` most significant digits of the return limb.
+    This is equivalent to :func:`radix_divrem_1` with scalar `b^k` followed
+    by multiplying the remainder by `b^{e-k}`,
+    but more efficient. Requires `n > 1` and `1 \le k < e`. Note that
+    this operation only makes sense in a limb radix with `e \ge 2` digits
+    per limb.
 
 .. function:: ulong radix_mul_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix)
 
@@ -365,34 +405,47 @@ Memory-managed integers
     and the most significant limb is nonzero. If the result is 0,
     operations on *x* have undefined behavior.
 
-.. function:: slong radix_integer_size(const radix_integer_t x, const radix_t radix)
+.. function:: slong radix_integer_size_limbs(const radix_integer_t x, const radix_t radix)
+              slong radix_integer_size_digits(const radix_integer_t x, const radix_t radix)
 
-    Number of limbs in *x*, ignoring the sign.
+    Number of limbs (respectively digits) in *x*, ignoring the sign.
+
+.. function:: slong radix_integer_ssize_limbs(const radix_integer_t x, const radix_t radix)
+              slong radix_integer_ssize_digits(const radix_integer_t x, const radix_t radix)
+
+    Number of limbs (respectively digits) in *x*, negated if *x* is negative.
 
 .. function:: ulong radix_integer_get_limb(const radix_integer_t x, slong index, const radix_t radix)
+              ulong radix_integer_get_digit(const radix_integer_t x, slong index, const radix_t radix)
 
-    Returns the limb at position *index* in *x*.
+    Returns the limb (respectively digit) at position *index* in *x*.
     The index must be nonnegative. The sign of *x* is ignored.
 
 .. function:: void radix_integer_set_limb(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix)
+              void radix_integer_set_digit(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix)
 
-    Sets *res* to *x* with the limb at position *index* replaced by the given
-    limb value *c*. The index must be nonnegative and *c* must be smaller
-    than the limb radix.
-    The sign of *x* is preserved. If *x* is zero and *c* is nonzero,
+    Sets *res* to *x* with the limb (respectively digit) at position *index*
+    replaced by the given limb (respectively digit) *c*. The index must be
+    nonnegative and *c* must be smaller than the limb radix (respectively
+    digit radix). The sign of *x* is preserved. If *x* is zero and *c* is nonzero,
     the sign of the result will be positive.
 
 .. function:: void radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_lshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* multiplied by `B^n`.
+    Sets *res* to *x* multiplied by `B^n` (respectively `b^n`).
 
 .. function:: void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_rshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* divided by `B^n`, truncating the result (rounding to zero).
+    Sets *res* to *x* divided by `B^n` (respectively `b^n`),
+    truncating the result (rounding to zero).
 
 .. function:: slong radix_integer_valuation_limbs(const radix_integer_t x, const radix_t radix)
+              slong radix_integer_valuation_digits(const radix_integer_t x, const radix_t radix)
 
-    Returns the largest *n* such that `B^n` divides *x* exactly.
+    Returns the largest *n* such that `B^n` (respectively `b^n`) divides *x* exactly,
+    i.e. the number of least significant zero limbs (respectively digits).
     In the special case `x = 0`, returns zero.
 
 .. function:: void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)

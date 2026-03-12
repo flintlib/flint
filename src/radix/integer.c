@@ -33,7 +33,6 @@ radix_integer_fit_limbs(radix_integer_t res, slong nlimbs, const radix_t radix)
 {
     if (res->alloc < nlimbs)
     {
-        /* todo: should we overallocate? */
         res->d = flint_realloc(res->d, nlimbs * sizeof(ulong));
         res->alloc = nlimbs;
     }
@@ -130,16 +129,19 @@ radix_integer_cmpabs(const radix_integer_t x, const radix_integer_t y, const rad
 void
 radix_integer_set(radix_integer_t res, const radix_integer_t x, const radix_t radix)
 {
-    slong size = x->size;
-    slong n = FLINT_ABS(size);
-
-    if (n != 0)
+    if (res != x)
     {
-        radix_integer_fit_limbs(res, n, radix);
-        flint_mpn_copyi(res->d, x->d, n);
-    }
+        slong size = x->size;
+        slong n = FLINT_ABS(size);
 
-    res->size = size;
+        if (n != 0)
+        {
+            radix_integer_fit_limbs(res, n, radix);
+            flint_mpn_copyi(res->d, x->d, n);
+        }
+
+        res->size = size;
+    }
 }
 
 void
@@ -476,6 +478,56 @@ radix_integer_set_limb(radix_integer_t res, const radix_integer_t x, slong index
     }
 }
 
+ulong
+radix_integer_get_digit(const radix_integer_t x, slong index, const radix_t radix)
+{
+    ulong d;
+    slong il, id;
+
+    /* todo: speed up this division */
+    il = (ulong) index / radix->exp;
+    id = (ulong) index % radix->exp;
+
+    d = radix_integer_get_limb(x, il, radix);
+
+    if (d == 0)
+    {
+        return 0;
+    }
+    else
+    {
+        d = n_div_precomp_unsafe(d, radix->bpow_div + id);
+        n_divrem_precomp_unsafe(&d, d, radix->bpow[1], radix->bpow_div + 1);
+        return d;
+    }
+}
+
+void
+radix_integer_set_digit(radix_integer_t res, const radix_integer_t x, slong index, ulong c, const radix_t radix)
+{
+    ulong d, hi, lo;
+    slong il, id;
+
+    /* todo: speed up this division */
+    il = (ulong) index / radix->exp;
+    id = (ulong) index % radix->exp;
+
+    d = radix_integer_get_limb(x, il, radix);
+
+    if (d == 0)
+    {
+        d = c * radix->bpow[id];
+    }
+    else
+    {
+        hi = n_divrem_precomp_unsafe(&lo, d, radix->bpow[id], radix->bpow_div + id);
+        hi = n_div_precomp_unsafe(hi, radix->bpow_div + 1);
+        d = hi * (radix->bpow[id] * radix->bpow[1]) + c * radix->bpow[id] + lo;
+    }
+
+    radix_integer_set_limb(res, x, il, d, radix);
+}
+
 void
 radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 {
@@ -495,6 +547,43 @@ radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, slong n
     nn_ptr rd = radix_integer_fit_limbs(res, rn, radix);
     flint_mpn_copyd(rd + n, x->d, xn);
     flint_mpn_zero(rd, n);
+    res->size = (xsize > 0) ? rn : -rn;
+}
+
+void
+radix_integer_lshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    FLINT_ASSERT(n >= 0);
+
+    slong xsize = x->size;
+
+    if (xsize == 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    slong nl, nd;
+
+    /* todo: speed up this division */
+    nl = (ulong) n / radix->exp;
+    nd = (ulong) n % radix->exp;
+
+    slong xn = FLINT_ABS(xsize);
+    slong rn = xn + nl + (nd != 0);
+
+    nn_ptr rd = radix_integer_fit_limbs(res, rn, radix);
+
+    if (res != x || nl != 0)
+        flint_mpn_copyd(rd + nl, x->d, xn);
+    flint_mpn_zero(rd, nl);
+
+    if (nd != 0)
+    {
+        rd[rn - 1] = radix_lshift_digits(rd + nl, rd + nl, xn, nd, radix);
+        rn -= (rd[rn - 1] == 0);
+    }
+
     res->size = (xsize > 0) ? rn : -rn;
 }
 
@@ -519,6 +608,45 @@ void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, sl
         rd = radix_integer_fit_limbs(res, rn, radix);
 
     flint_mpn_copyi(rd, x->d + n, rn);
+    res->size = (xsize > 0) ? rn : -rn;
+}
+
+void radix_integer_rshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    FLINT_ASSERT(n >= 0);
+
+    slong xsize = x->size;
+    slong xn = FLINT_ABS(xsize);
+
+    slong nl, nd;
+
+    /* todo: speed up this division */
+    nl = (ulong) n / radix->exp;
+    nd = (ulong) n % radix->exp;
+
+    slong rn = xn - nl;
+
+    if (rn <= 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    nn_ptr rd;
+    if (res == x)
+        rd = res->d;
+    else
+        rd = radix_integer_fit_limbs(res, rn, radix);
+
+    if (res != x || nl != 0)
+        flint_mpn_copyi(rd, x->d + nl, rn);
+
+    if (nd != 0)
+    {
+        radix_rshift_digits(rd, rd, rn, nd, radix);
+        rn -= (rd[rn - 1] == 0);
+    }
+
     res->size = (xsize > 0) ? rn : -rn;
 }
 
@@ -771,6 +899,9 @@ int radix_integer_div(radix_integer_t q,
     }
 
     qd = radix_integer_fit_limbs(q, qn, radix);
+    /* read after fit_limbs in case of possible aliasing */
+    ad = a->d;
+    bd = b->d;
 
     exact = radix_div(qd, ad, an, bd, bn, radix);
     if (!exact)
@@ -804,10 +935,10 @@ void radix_integer_divexact(radix_integer_t q,
         flint_throw(FLINT_ERROR, "radix_integer_divexact: an < bn");
 
     qn = an - bn + 1;
+    qd = radix_integer_fit_limbs(q, qn, radix);
+    /* read after fit_limbs in case of possible aliasing */
     ad = a->d;
     bd = b->d;
-
-    qd = radix_integer_fit_limbs(q, qn, radix);
 
     radix_divexact(qd, ad, an, bd, bn, radix);
     MPN_NORM(qd, qn);
@@ -846,12 +977,11 @@ void radix_integer_tdiv_qr(radix_integer_t q, radix_integer_t r,
 
     qn = an - bn + 1;
     rn = bn;
-
-    ad = a->d;
-    bd = b->d;
-
     qd = radix_integer_fit_limbs(q, qn, radix);
     rd = radix_integer_fit_limbs(r, rn, radix);
+    /* read after fit_limbs in case of possible aliasing */
+    ad = a->d;
+    bd = b->d;
 
     radix_divrem(qd, rd, ad, an, bd, bn, radix);
 
@@ -891,12 +1021,10 @@ void radix_integer_tdiv_q(radix_integer_t q,
     }
 
     qn = an - bn + 1;
-
+    qd = radix_integer_fit_limbs(q, qn, radix);
+    /* read after fit_limbs in case of possible aliasing */
     ad = a->d;
     bd = b->d;
-
-    qd = radix_integer_fit_limbs(q, qn, radix);
-
     radix_divrem(qd, NULL, ad, an, bd, bn, radix);
 
     MPN_NORM(qd, qn);
@@ -945,11 +1073,11 @@ void radix_integer_fdiv_qr(radix_integer_t q, radix_integer_t r,
     qn = an - bn + 1;
     rn = bn;
 
-    ad = a->d;
-    bd = b->d;
-
     qd = radix_integer_fit_limbs(q, qn, radix);
     rd = radix_integer_fit_limbs(r, rn, radix);
+    /* read after fit_limbs in case of possible aliasing */
+    ad = a->d;
+    bd = b->d;
 
     if ((asize < 0) == (bsize < 0))
     {
@@ -1015,11 +1143,11 @@ void radix_integer_cdiv_qr(radix_integer_t q, radix_integer_t r,
     qn = an - bn + 1;
     rn = bn;
 
-    ad = a->d;
-    bd = b->d;
-
     qd = radix_integer_fit_limbs(q, qn, radix);
     rd = radix_integer_fit_limbs(r, rn, radix);
+    /* read after fit_limbs in case of possible aliasing */
+    ad = a->d;
+    bd = b->d;
 
     if ((asize < 0) != (bsize < 0))
     {
