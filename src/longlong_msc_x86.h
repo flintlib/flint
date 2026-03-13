@@ -44,8 +44,8 @@ do \
 } while (0)
 
 /* Division */
-# define _FLINT_DIV _udiv64
-# define _FLINT_IDIV _div64
+# define _FLINT_DIV(_n1, _n0, _dx, _rp) _udiv64((unsigned __int64) (_n1) | (unsigned __int64) (_n0), _dx, _rp)
+# define _FLINT_IDIV(_n1, _n0, _dx, _rp) _div64((__int64) (_n1) | (__int64) (_n0), _dx, _rp)
 
 #else
 
