@@ -44,8 +44,26 @@ do \
 } while (0)
 
 /* Division */
+#if defined(_MSC_VER) && defined(_M_IX86)
+
+# define _FLINT_DIV(n1, n0, dx, r) \
+    _udiv64( \
+        (((unsigned __int64) (n1)) << 32) | (unsigned int) (n0), \
+        (unsigned int) (dx), \
+        (unsigned int *) (r))
+
+# define _FLINT_IDIV(n1, n0, dx, r) \
+    _div64( \
+        (((__int64) (n1)) << 32) | (unsigned int) (n0), \
+        (int) (dx), \
+        (int *) (r))
+
+# else
+
 # define _FLINT_DIV _udiv64
 # define _FLINT_IDIV _div64
+
+#endif
 
 #else
 
