@@ -17,15 +17,17 @@
 #if defined(_MSC_VER)
 # include <intrin.h>
 # include "gettimeofday.h"
-# pragma intrinsic(__rdtsc)
+# if defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64)
+#  pragma intrinsic(__rdtsc)
+# endif
 #else
 # include <sys/time.h>
 #endif
 #include <time.h>
 #include "flint.h"
 
-#if defined(_MSC_VER) || defined(__x86_64__) || defined(__aarch64__)
-# define FLINT_HAVE_get_cycle_counter  1
+#if (defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_ARM64) || defined(_M_ARM64EC))) || defined(__x86_64__) || defined(__aarch64__)
+# define FLINT_HAVE_get_cycle_counter 1
 #endif
 #if (defined(__unix__) && !defined(__CYGWIN__) && !defined(__EMSCRIPTEN__)) || defined(__APPLE__)
 # define FLINT_HAVE_getrusage   1
@@ -155,8 +157,10 @@ static inline void timeit_print(timeit_t timer, ulong reps)
 #if FLINT_HAVE_get_cycle_counter
 static inline double get_cycle_counter(void)
 {
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64) || defined(_M_AMD64))
     return __rdtsc();
+#elif defined(_MSC_VER) && (defined(_M_ARM64) || defined(_M_ARM64EC))
+    return (double) (unsigned __int64) _ReadStatusReg(ARM64_PMCCNTR_EL0);
 #elif defined(__x86_64__)
     unsigned int hi, lo;
     __asm__ volatile ("rdtsc; movl %%edx,%0; movl %%eax,%1"

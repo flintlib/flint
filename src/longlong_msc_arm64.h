@@ -14,16 +14,17 @@
 
 #include <stdlib.h>
 #include <intrin.h>
-#include <immintrin.h>
+#ifndef _MSC_VER
+    #include <immintrin.h>
+#endif
 
 /* Trailing and leading zeros */
 # define flint_clz _CountLeadingZeros64
 # define flint_ctz flint_ctz
 static inline int flint_ctz(ulong x)
 {
-    unsigned long int index;
-    _BitScanForward64(&index, x);
-    return index;
+    ulong y = x & (ulong) (-(slong) x);
+    return 63 - _CountLeadingZeros64(y);
 }
 
 /* Multiplication */
