@@ -33,47 +33,47 @@ void _padic_poly_mul(fmpz *rop, slong *rval, slong N,
         fmpz_clear(pow);
 }
 
-void padic_poly_mul(padic_poly_t f,
-                    const padic_poly_t g, const padic_poly_t h,
+void padic_poly_mul(padic_poly_t res,
+                    const padic_poly_t poly1, const padic_poly_t poly2,
                     const padic_ctx_t ctx)
 {
-    const slong lenG = g->length;
-    const slong lenH = h->length;
+    const slong lenG = poly1->length;
+    const slong lenH = poly2->length;
     const slong lenF = lenG + lenH - 1;
 
-    if (lenG == 0 || lenH == 0 || g->val + h->val >= f->N)
+    if (lenG == 0 || lenH == 0 || poly1->val + poly2->val >= res->N)
     {
-        padic_poly_zero(f);
+        padic_poly_zero(res);
     }
     else
     {
         fmpz *t;
 
-        if (f == g || f == h)
+        if (res == poly1 || res == poly2)
         {
             t = _fmpz_vec_init(lenF);
         }
         else
         {
-            padic_poly_fit_length(f, lenF);
-            t = f->coeffs;
+            padic_poly_fit_length(res, lenF);
+            t = res->coeffs;
         }
 
         if (lenG >= lenH)
-            _padic_poly_mul(t, &(f->val), f->N, g->coeffs, g->val, lenG,
-                                          h->coeffs, h->val, lenH, ctx);
+            _padic_poly_mul(t, &(res->val), res->N, poly1->coeffs, poly1->val, lenG,
+                                          poly2->coeffs, poly2->val, lenH, ctx);
         else
-            _padic_poly_mul(t, &(f->val), f->N, h->coeffs, h->val, lenH,
-                                          g->coeffs, g->val, lenG, ctx);
+            _padic_poly_mul(t, &(res->val), res->N, poly2->coeffs, poly2->val, lenH,
+                                          poly1->coeffs, poly1->val, lenG, ctx);
 
-        if (f == g || f == h)
+        if (res == poly1 || res == poly2)
         {
-            _fmpz_vec_clear(f->coeffs, f->alloc);
-            f->coeffs = t;
-            f->alloc  = lenF;
+            _fmpz_vec_clear(res->coeffs, res->alloc);
+            res->coeffs = t;
+            res->alloc  = lenF;
         }
 
-        _padic_poly_set_length(f, lenF);
-        _padic_poly_normalise(f);
+        _padic_poly_set_length(res, lenF);
+        _padic_poly_normalise(res);
     }
 }

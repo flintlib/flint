@@ -311,7 +311,7 @@ Addition and subtraction
 
     Computes `C = A - B`. Dimensions must be identical.
 
-.. function:: void nmod_mat_neg(nmod_mat_t A, const nmod_mat_t B)
+.. function:: void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B = -A`. Dimensions must be identical.
 

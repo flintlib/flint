@@ -62,7 +62,7 @@ _fmpz_mod_poly_inv_series_pure_newton(fmpz * Qinv, const fmpz * Q, slong n,
     }
 }
 
-void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
+void padic_poly_inv_series(padic_poly_t g, const padic_poly_t f, slong n,
                            const padic_ctx_t ctx)
 {
     fmpz_t cinv;
@@ -73,24 +73,24 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     fmpz *Qcopy;
     int Qalloc;
 
-    if (Q->length == 0 || fmpz_is_zero(Q->coeffs + 0))
+    if (f->length == 0 || fmpz_is_zero(f->coeffs + 0))
     {
         flint_throw(FLINT_ERROR, "Exception (padic_poly_inv_series):  Constant term is zero.\n");
     }
-    if (fmpz_divisible(Q->coeffs + 0, ctx->p))
+    if (fmpz_divisible(f->coeffs + 0, ctx->p))
     {
         flint_throw(FLINT_ERROR, "Exception (padic_poly_inv_series):\nValuation of constant term is not minimal.\n");
     }
 
-    if (- Q->val >= Qinv->N)
+    if (- f->val >= g->N)
     {
-        padic_poly_zero(Qinv);
+        padic_poly_zero(g);
         return;
     }
 
-    if (Q->length >= n)
+    if (f->length >= n)
     {
-        Qcopy = Q->coeffs;
+        Qcopy = f->coeffs;
         Qalloc = 0;
     }
     else
@@ -98,8 +98,8 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
         slong i;
 
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
-        for (i = 0; i < Q->length; i++)
-            Qcopy[i] = Q->coeffs[i];
+        for (i = 0; i < f->length; i++)
+            Qcopy[i] = f->coeffs[i];
         mpn_zero((nn_ptr) Qcopy + i, n - i);
         Qalloc = 1;
     }
@@ -107,15 +107,15 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     fmpz_init(cinv);
     fmpz_init(pow);
 
-    _padic_inv(cinv, Q->coeffs, ctx->p, Qinv->N + Q->val);
-    palloc = _padic_ctx_pow_ui(pow, Qinv->N + Q->val, ctx);
+    _padic_inv(cinv, f->coeffs, ctx->p, g->N + f->val);
+    palloc = _padic_ctx_pow_ui(pow, g->N + f->val, ctx);
 
-    if (Qinv != Q)
+    if (g != f)
     {
-        padic_poly_fit_length(Qinv, n);
+        padic_poly_fit_length(g, n);
 
         /* fails: _fmpz_vec_scalar_mod_fmpz(Qcopy, Qcopy, n, pow); */
-        _fmpz_mod_poly_inv_series_pure_newton(Qinv->coeffs, Qcopy, n, cinv, pow);
+        _fmpz_mod_poly_inv_series_pure_newton(g->coeffs, Qcopy, n, cinv, pow);
     }
     else
     {
@@ -123,16 +123,16 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
 
         /* fails: _fmpz_vec_scalar_mod_fmpz(Qcopy, Qcopy, n, pow); */
         _fmpz_mod_poly_inv_series_pure_newton(t, Qcopy, n, cinv, pow);
-        _fmpz_vec_clear(Qinv->coeffs, Qinv->alloc);
-        Qinv->coeffs = t;
-        Qinv->alloc  = n;
-        Qinv->length = n;
+        _fmpz_vec_clear(g->coeffs, g->alloc);
+        g->coeffs = t;
+        g->alloc  = n;
+        g->length = n;
     }
 
-    Qinv->val = - Q->val;
+    g->val = - f->val;
 
-    _padic_poly_set_length(Qinv, n);
-    _padic_poly_normalise(Qinv);
+    _padic_poly_set_length(g, n);
+    _padic_poly_normalise(g);
 
     fmpz_clear(cinv);
     if (palloc)

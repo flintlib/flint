@@ -14,19 +14,19 @@
 #include "padic.h"
 #include "padic_poly.h"
 
-void _padic_poly_sub(fmpz *rop, slong *val, slong N,
+void _padic_poly_sub(fmpz *rop, slong *rval, slong N,
                      const fmpz *op1, slong val1, slong len1, slong FLINT_UNUSED(N1),
                      const fmpz *op2, slong val2, slong len2, slong FLINT_UNUSED(N2),
                      const padic_ctx_t ctx)
 {
     const slong len = FLINT_MAX(len1, len2);
 
-    *val = FLINT_MIN(val1, val2);
+    *rval = FLINT_MIN(val1, val2);
 
     if (val1 == val2)
     {
         _fmpz_poly_sub(rop, op1, len1, op2, len2);
-        _padic_poly_canonicalise(rop, val, len, ctx->p);
+        _padic_poly_canonicalise(rop, rval, len, ctx->p);
     }
     else
     {
@@ -69,17 +69,17 @@ void _padic_poly_sub(fmpz *rop, slong *val, slong N,
     }
 
     /* Reduce */
-    if (N - *val > 0)
+    if (N - *rval > 0)
     {
         fmpz_t pow;
         int alloc;
 
-        alloc = _padic_ctx_pow_ui(pow, N - *val, ctx);
+        alloc = _padic_ctx_pow_ui(pow, N - *rval, ctx);
 
         _fmpz_vec_scalar_mod_fmpz(rop, rop, len, pow);
 
         if (_fmpz_vec_is_zero(rop, len))
-            *val = 0;
+            *rval = 0;
 
         if (alloc)
             fmpz_clear(pow);
@@ -87,7 +87,7 @@ void _padic_poly_sub(fmpz *rop, slong *val, slong N,
     else
     {
         _fmpz_vec_zero(rop, len);
-        *val = 0;
+        *rval = 0;
     }
 }
 

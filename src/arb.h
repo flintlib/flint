@@ -123,7 +123,7 @@ void arb_indeterminate(arb_t x);
 
 int arb_is_finite(const arb_t x);
 
-void arb_set(arb_t x, const arb_t y);
+void arb_set(arb_t y, const arb_t x);
 
 ARB_INLINE void
 arb_swap(arb_t x, arb_t y)
@@ -137,7 +137,7 @@ void arb_trim(arb_t y, const arb_t x);
 
 void arb_neg(arb_t y, const arb_t x);
 
-void arb_neg_round(arb_t x, const arb_t y, slong prec);
+void arb_neg_round(arb_t y, const arb_t x, slong prec);
 
 void arb_abs(arb_t y, const arb_t x);
 void arb_nonnegative_abs(arb_t y, const arb_t x);
@@ -163,13 +163,13 @@ arb_set_arf(arb_t x, const arf_t y)
     mag_zero(arb_radref(x));
 }
 
-void arb_set_si(arb_t x, slong y);
+void arb_set_si(arb_t y, slong x);
 
-void arb_set_ui(arb_t x, ulong y);
+void arb_set_ui(arb_t y, ulong x);
 
-void arb_set_d(arb_t x, double y);
+void arb_set_d(arb_t y, double x);
 
-void arb_set_fmpz(arb_t x, const fmpz_t y);
+void arb_set_fmpz(arb_t y, const fmpz_t x);
 
 ARB_INLINE void
 arb_set_fmpz_2exp(arb_t x, const fmpz_t y, const fmpz_t exp)
