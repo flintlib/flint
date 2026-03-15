@@ -90,7 +90,7 @@ void _ca_vec_undefined(ca_ptr vec, slong len, ca_ctx_t ctx)
 /* Input and output */
 
 void ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx);
-void ca_vec_printn(const ca_vec_t poly, slong digits, ca_ctx_t ctx);
+void ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx);
 
 /* List operations */
 

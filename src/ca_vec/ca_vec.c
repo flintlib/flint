@@ -131,17 +131,17 @@ ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx)
 }
 
 void
-ca_vec_printn(const ca_vec_t poly, slong digits, ca_ctx_t ctx)
+ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx)
 {
     slong len, i;
 
-    len = poly->length;
+    len = vec->length;
 
     flint_printf("[");
 
     for (i = 0; i < len; i++)
     {
-        ca_printn(poly->entries + i, digits, ctx);
+        ca_printn(vec->entries + i, digits, ctx);
         if (i < len - 1)
             flint_printf(", ");
     }
