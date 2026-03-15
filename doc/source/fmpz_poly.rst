@@ -592,15 +592,19 @@ Bit packing
     ``bit_size``, negating the coefficients before packing
     if ``negate`` is set to `-1`.
 
-.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, nn_srcptr arr, flint_bitcnt_t bit_size, int negate)
+.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong nlo, slong nhi, nn_srcptr arr, flint_bitcnt_t bit_size, int negate)
 
-    Unpacks the polynomial of given length from the array as packed into
+    Unpacks the polynomial of given length `nhi` from the array as packed into
     fields of the given ``bit_size``, finally negating the coefficients
     if ``negate`` is set to `-1`. Returns borrow, which is nonzero if a
     leading term with coefficient `\pm1` should be added at
-    position ``len`` of ``poly``.
+    position ``nhi`` of ``poly``.
 
-.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, nn_srcptr arr, flint_bitcnt_t bit_size)
+    If `nlo` is zero, all coefficients are unpacked; otherwise the
+    coefficients in the range `[nlo, nhi)` are unpacked and written to
+    indices `[0, nhi-nlo)` in ``poly``.
+
+.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong nlo, slong nhi, nn_srcptr arr, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial of given length from the array as packed into
     fields of the given ``bit_size``.  The coefficients are assumed to
@@ -669,19 +673,22 @@ Multiplication
     remainder to the corresponding coefficients of the product of ``poly1``
     and ``poly2``.
 
-.. function:: void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+.. function:: void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
 
-    Sets ``res`` to the middle ``len1 - len2 + 1`` coefficients of
-    the product of ``(poly1, len1)`` and ``(poly2, len2)``, i.e. the
-    coefficients from degree ``len2 - 1`` to ``len1 - 1`` inclusive.
-    Assumes that ``len1 >= len2 > 0``.
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices `[nlo, nhi)`
+    in the full product of ``(poly1, len1)`` and ``(poly2, len2)``.
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`.
 
 .. function:: void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+              void fmpz_poly_mulmid_KS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+              void fmpz_poly_mulmid_SS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets ``res`` to the middle ``len(poly1) - len(poly2) + 1``
-    coefficients of ``poly1 * poly2``, i.e. the coefficient from degree
-    ``len2 - 1`` to ``len1 - 1`` inclusive.  Assumes that
-    ``len1 >= len2``.
+    Sets ``res`` to the polynomial formed by the coefficients at indices `[nlo, nhi)`
+    in the product of ``poly1`` and ``poly2``. Equivalently, compute
+    `[(poly1 \cdot poly2) \bmod x^{nhi}] / x^{nlo}`.
 
 .. function:: void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 

@@ -190,7 +190,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    flint_mpn_zero(arrayg + limbsg, limbs2-limbsg);
 
    /* unpack gcd */
-   _fmpz_poly_bit_unpack(G, glen, arrayg, pack_bits, 0);
+   _fmpz_poly_bit_unpack(G, 0, glen, arrayg, pack_bits, 0);
    while (G[glen - 1] == 0) glen--;
 
 	/* divide by any content */
@@ -215,7 +215,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
       /* unpack quotient of first poly by gcd */
       Q = _fmpz_vec_init(len1);
       t = _fmpz_vec_init(len1 + glen);
-      _fmpz_poly_bit_unpack(Q, qlen, q, pack_bits, 0);
+      _fmpz_poly_bit_unpack(Q, 0, qlen, q, pack_bits, 0);
       while (Q[qlen - 1] == 0) qlen--;
 
       /* divide by content */
@@ -241,7 +241,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
          if (flint_mpn_divides(q, array2, limbs2, arrayg, limbsg, temp))
 	      {
             /* unpack quotient of second poly by gcd */
-            _fmpz_poly_bit_unpack(Q, qlen2, q, pack_bits, 0);
+            _fmpz_poly_bit_unpack(Q, 0, qlen2, q, pack_bits, 0);
             while (Q[qlen2 - 1] == 0) qlen2--;
 
 			/* check if we really need to multiply out to check for exact quotient */
