@@ -15,26 +15,26 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx)
+_gr_poly_div_series_newton(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, slong cutoff, gr_ctx_t ctx)
 {
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
-    slong i, m, n, Anlen, Wlen, W2len, alloc;
+    slong i, m, n, Bnlen, Wlen, W2len, alloc;
     gr_ptr W, T;
     slong a[FLINT_BITS];
 
     if (len == 0)
         return GR_SUCCESS;
 
-    if (Alen == 0)
+    if (Blen == 0)
         return GR_DOMAIN;
 
-    Alen = FLINT_MIN(Alen, len);
     Blen = FLINT_MIN(Blen, len);
+    Alen = FLINT_MIN(Alen, len);
 
     /* not supported by the following code */
-    if (Alen == 1)
-        return _gr_poly_div_series_basecase(res, B, Blen, A, Alen, len, ctx);
+    if (Blen == 1)
+        return _gr_poly_div_series_basecase(res, A, Alen, B, Blen, len, ctx);
 
     cutoff = FLINT_MAX(cutoff, 2);
 
@@ -42,7 +42,7 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slo
     while (n >= cutoff)
         a[++i] = (n = (n + 1) / 2);
 
-    status |= _gr_poly_inv_series_basecase(res, A, Alen, n, ctx);
+    status |= _gr_poly_inv_series_basecase(res, B, Blen, n, ctx);
 
     if (status != GR_SUCCESS)
         return status;
@@ -56,10 +56,10 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slo
         m = n;
         n = a[i];
 
-        Anlen = FLINT_MIN(Alen, n);
-        Wlen = FLINT_MIN(Anlen + m - 1, n);
+        Bnlen = FLINT_MIN(Blen, n);
+        Wlen = FLINT_MIN(Bnlen + m - 1, n);
         W2len = Wlen - m;
-        status |= _gr_poly_mullow(W, A, Anlen, res, m, Wlen, ctx);
+        status |= _gr_poly_mullow(W, B, Bnlen, res, m, Wlen, ctx);
         if (W2len != 0)
             status |= _gr_poly_mullow(GR_ENTRY(res, m, sz), res, m, GR_ENTRY(W, m, sz), W2len, n - m, ctx);
         status |= _gr_vec_neg(GR_ENTRY(res, m, sz), GR_ENTRY(res, m, sz), n - m, ctx);
@@ -68,13 +68,13 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slo
     m = (len + 1) / 2;
     n = len;
 
-    Anlen = FLINT_MIN(Alen, n);
-    Wlen = FLINT_MIN(Anlen + m - 1, n);
+    Bnlen = FLINT_MIN(Blen, n);
+    Wlen = FLINT_MIN(Bnlen + m - 1, n);
 
     /* Karp-Markstein */
-    status |= _gr_poly_mullow(T, res, m, B, Blen, m, ctx);
-    status |= _gr_poly_mullow(W, A, Anlen, T, m, Wlen, ctx);
-    status |= _gr_poly_sub(GR_ENTRY(W, m, sz), GR_ENTRY(B, m, sz), FLINT_MAX(0, FLINT_MIN(Blen - m, n - m)), GR_ENTRY(W, m, sz), n - m, ctx);
+    status |= _gr_poly_mullow(T, res, m, A, Alen, m, ctx);
+    status |= _gr_poly_mullow(W, B, Bnlen, T, m, Wlen, ctx);
+    status |= _gr_poly_sub(GR_ENTRY(W, m, sz), GR_ENTRY(A, m, sz), FLINT_MAX(0, FLINT_MIN(Alen - m, n - m)), GR_ENTRY(W, m, sz), n - m, ctx);
     status |= _gr_poly_mullow(GR_ENTRY(res, m, sz), res, m, GR_ENTRY(W, m, sz), n - m, n - m, ctx);
     _gr_vec_swap(res, T, m, ctx);
 

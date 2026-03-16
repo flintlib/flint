@@ -144,16 +144,16 @@ isolate_roots_recursive(arf_interval_ptr * blocks, int ** flags,
 }
 
 slong
-arb_calc_isolate_roots(arf_interval_ptr * blocks, int ** flags,
+arb_calc_isolate_roots(arf_interval_ptr * found, int ** flags,
     arb_calc_func_t func, void * param,
-    const arf_interval_t block, slong maxdepth, slong maxeval, slong maxfound,
+    const arf_interval_t interval, slong maxdepth, slong maxeval, slong maxfound,
     slong prec)
 {
     int asign, bsign;
     slong length, alloc;
     arb_t m, v;
 
-    *blocks = NULL;
+    *found = NULL;
     *flags = NULL;
     length = 0;
     alloc = 0;
@@ -161,22 +161,22 @@ arb_calc_isolate_roots(arf_interval_ptr * blocks, int ** flags,
     arb_init(m);
     arb_init(v);
 
-    arb_set_arf(m, &block->a);
+    arb_set_arf(m, &interval->a);
     func(v, m, param, 1, prec);
     asign = arb_sgn_nonzero(v);
 
-    arb_set_arf(m, &block->b);
+    arb_set_arf(m, &interval->b);
     func(v, m, param, 1, prec);
     bsign = arb_sgn_nonzero(v);
 
     arb_clear(m);
     arb_clear(v);
 
-    isolate_roots_recursive(blocks, flags, &length, &alloc,
-        func, param, block, asign, bsign,
+    isolate_roots_recursive(found, flags, &length, &alloc,
+        func, param, interval, asign, bsign,
         maxdepth, &maxeval, &maxfound, prec);
 
-    *blocks = flint_realloc(*blocks, length * sizeof(arf_interval_struct));
+    *found = flint_realloc(*found, length * sizeof(arf_interval_struct));
     *flags = flint_realloc(*flags, length * sizeof(int));
 
     return length;
