@@ -48,26 +48,26 @@ TEST_FUNCTION_START(fmpz_poly_mulmid, state)
 
         if (aliasing == 0)
         {
-            fmpz_poly_mulmid_KS(d, a, b, nlo, nhi);
+            fmpz_poly_mulmid(d, a, b, nlo, nhi);
         }
         else if (aliasing == 1)
         {
             fmpz_poly_set(d, a);
-            fmpz_poly_mulmid_KS(d, d, b, nlo, nhi);
+            fmpz_poly_mulmid(d, d, b, nlo, nhi);
         }
         else if (aliasing == 2)
         {
             fmpz_poly_set(d, b);
-            fmpz_poly_mulmid_KS(d, a, d, nlo, nhi);
+            fmpz_poly_mulmid(d, a, d, nlo, nhi);
         }
         else if (aliasing == 3)
         {
-            fmpz_poly_mulmid_KS(d, a, a, nlo, nhi);
+            fmpz_poly_mulmid(d, a, a, nlo, nhi);
         }
         else if (aliasing == 4)
         {
             fmpz_poly_set(d, a);
-            fmpz_poly_mulmid_KS(d, d, d, nlo, nhi);
+            fmpz_poly_mulmid(d, d, d, nlo, nhi);
         }
 
         result = (fmpz_poly_equal(c, d));
