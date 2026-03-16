@@ -88,7 +88,7 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len)
         result = 0;
     else
     {
-        _fmpz_poly_bit_unpack(rop, len2, arr2, bits, 0);
+        _fmpz_poly_bit_unpack(rop, 0, len2, arr2, bits, 0);
 
         bits2 = _fmpz_vec_max_bits(rop, len2);
 

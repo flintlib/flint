@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(fmpz_poly_mulmid_classical, state)
+TEST_FUNCTION_START(fmpz_poly_mulmid, state)
 {
     slong iter;
 
@@ -29,11 +29,11 @@ TEST_FUNCTION_START(fmpz_poly_mulmid_classical, state)
         fmpz_poly_init(c);
         fmpz_poly_init(d);
 
-        bits = 1 + n_randint(state, 200);
-        fmpz_poly_randtest(a, state, n_randint(state, 10), bits);
-        fmpz_poly_randtest(b, state, n_randint(state, 10), bits);
-        fmpz_poly_randtest(c, state, n_randint(state, 10), bits);
-        fmpz_poly_randtest(d, state, n_randint(state, 10), bits);
+        bits = 1 + n_randint(state, 500);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), bits);
+        fmpz_poly_randtest(b, state, n_randint(state, 100), bits);
+        fmpz_poly_randtest(c, state, n_randint(state, 100), bits);
+        fmpz_poly_randtest(d, state, n_randint(state, 100), bits);
 
         nlo = n_randint(state, 10);
         nhi = n_randint(state, 10);
@@ -48,32 +48,32 @@ TEST_FUNCTION_START(fmpz_poly_mulmid_classical, state)
 
         if (aliasing == 0)
         {
-            fmpz_poly_mulmid_classical(d, a, b, nlo, nhi);
+            fmpz_poly_mulmid(d, a, b, nlo, nhi);
         }
         else if (aliasing == 1)
         {
             fmpz_poly_set(d, a);
-            fmpz_poly_mulmid_classical(d, d, b, nlo, nhi);
+            fmpz_poly_mulmid(d, d, b, nlo, nhi);
         }
         else if (aliasing == 2)
         {
             fmpz_poly_set(d, b);
-            fmpz_poly_mulmid_classical(d, a, d, nlo, nhi);
+            fmpz_poly_mulmid(d, a, d, nlo, nhi);
         }
         else if (aliasing == 3)
         {
-            fmpz_poly_mulmid_classical(d, a, a, nlo, nhi);
+            fmpz_poly_mulmid(d, a, a, nlo, nhi);
         }
         else if (aliasing == 4)
         {
             fmpz_poly_set(d, a);
-            fmpz_poly_mulmid_classical(d, d, d, nlo, nhi);
+            fmpz_poly_mulmid(d, d, d, nlo, nhi);
         }
 
         result = (fmpz_poly_equal(c, d));
         if (!result)
         {
-            flint_printf("FAIL: fmpz_poly_mulmid_classical\n");
+            flint_printf("FAIL: fmpz_poly_mulmid\n");
             flint_printf("aliasing = %d, nlo = %wd, nhi = %wd\n", aliasing, nlo, nhi);
             fmpz_poly_print(a), flint_printf("\n\n");
             fmpz_poly_print(b), flint_printf("\n\n");

@@ -282,7 +282,7 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
         slong *a, i, m, Qnlen, Wlen, W2len;
         fmpz * W;
 
-        W = _fmpz_vec_init(n);
+        W = _fmpz_vec_init(n / 2);
         a = flint_malloc(sizeof(slong) * FLINT_BITS);
 
         a[i = 0] = n;
@@ -299,12 +299,12 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
             Qnlen = FLINT_MIN(Qlen, n);
             Wlen = FLINT_MIN(Qnlen + m - 1, n);
             W2len = Wlen - m;
-            MULLOW(W, Q, Qnlen, Qinv, m, Wlen);
-            MULLOW(Qinv + m, Qinv, m, W + m, W2len, n - m);
+            _fmpz_poly_mulmid(W, Q, Qnlen, Qinv, m, m, Wlen);
+            MULLOW(Qinv + m, Qinv, m, W, W2len, n - m);
             _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
         }
 
-        _fmpz_vec_clear(W, n);
+        _fmpz_vec_clear(W, n / 2);
         flint_free(a);
     }
 }

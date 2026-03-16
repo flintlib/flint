@@ -31,7 +31,7 @@ _fmpz_mod_poly_inv_series_pure_newton(fmpz * Qinv, const fmpz * Q, slong n,
     }
     else
     {
-        const slong alloc = FLINT_MAX(n, 3);
+        const slong alloc = FLINT_MAX(n / 2, 3);
         slong a[FLINT_BITS], i, m;
         fmpz *W;
 
@@ -51,9 +51,9 @@ _fmpz_mod_poly_inv_series_pure_newton(fmpz * Qinv, const fmpz * Q, slong n,
             m = n;
             n = a[i];
 
-            _fmpz_poly_mullow(W, Q, n, Qinv, m, n);
-            _fmpz_vec_scalar_mod_fmpz(W, W, n, p);
-            _fmpz_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, n - m);
+            _fmpz_poly_mulmid(W, Q, n, Qinv, m, m, n);
+            _fmpz_vec_scalar_mod_fmpz(W, W, n - m, p);
+            _fmpz_poly_mullow(Qinv + m, Qinv, m, W, n - m, n - m);
             _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
             _fmpz_vec_scalar_mod_fmpz(Qinv + m, Qinv + m, n - m, p);
         }

@@ -115,10 +115,10 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
         Wlen = FLINT_MIN(Qnlen + m - 1, n);
         W2len = Wlen - m;
 
-        MULLOW(W, Q, Qnlen, Qinv, m, Wlen);
+        _fmpz_poly_mulmid(W, Q, Qnlen, Qinv, m, m, Wlen);
         fmpz_mul(Wden, Qden, Qinvden);
 
-        MULLOW(Qinv + m, Qinv, m, W + m, W2len, n - m);
+        MULLOW(Qinv + m, Qinv, m, W, W2len, n - m);
         fmpz_mul(Qinvden, Qinvden, Wden);
 
         _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, m, Wden);
