@@ -250,7 +250,7 @@ _fmpz_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1,
         limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;
 
         /* todo: mulmid_karatsuba */
-        if (nlo == 0 && n < 16 && (limbs1 > 12 || limbs2 > 12))
+        if (nlo == 0 && nhi < 16 && (limbs1 > 12 || limbs2 > 12))
             _fmpz_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, nhi);
         else if (limbs1 + limbs2 <= 8)
             _fmpz_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi);

@@ -12,7 +12,17 @@
 
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
+
+static void
+_fmpq_poly_mulmid(fmpz * rpoly, fmpz_t rden,
+                  const fmpz * poly1, const fmpz_t den1, slong len1,
+                  const fmpz * poly2, const fmpz_t den2, slong len2, slong nlo, slong nhi)
+{
+    _fmpz_poly_mulmid(rpoly, poly1, len1, poly2, len2, nlo, nhi);
+    fmpz_mul(rden, den1, den2);
+}
 
 void
 _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
@@ -45,12 +55,12 @@ _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
         fmpz_zero(t + n - 1);
 
     _fmpq_poly_mullow(u, uden, t, tden, n, rpoly, rden, n, n);
-    _fmpq_poly_mullow(t, tden, u, uden, n, poly, den, len, n);
+    _fmpq_poly_mulmid(t + m, tden, u, uden, n, poly, den, len, m, n);
     _fmpz_vec_neg(t + m, t + m, n - m);
     _fmpz_vec_zero(t, m);
     fmpz_mul_ui(tden, tden, UWORD(2));
     _fmpq_poly_canonicalise(t, tden, n);
-
+    /* todo: concatenate instead of zero+add */
     _fmpq_poly_add(rpoly, rden, rpoly, rden, m, t, tden, n);
 
     fmpz_clear(tden);
