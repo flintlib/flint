@@ -676,6 +676,7 @@ Multiplication
 .. function:: void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
               void _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
               void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+              void _fmpz_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
 
     Sets ``(res, nhi - nlo)`` to the coefficients at indices `[nlo, nhi)`
     in the full product of ``(poly1, len1)`` and ``(poly2, len2)``.
@@ -685,6 +686,7 @@ Multiplication
 .. function:: void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
               void fmpz_poly_mulmid_KS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
               void fmpz_poly_mulmid_SS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+              void fmpz_poly_mulmid(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets ``res`` to the polynomial formed by the coefficients at indices `[nlo, nhi)`
     in the product of ``poly1`` and ``poly2``. Equivalently, compute
@@ -755,10 +757,10 @@ Multiplication
     Sets ``res`` to the lowest `n` coefficients of the product of
     ``poly1`` and ``poly2``.
 
-.. function:: void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, slong length1, const fmpz * input2, slong length2)
+.. function:: void _fmpz_poly_mul_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
-    Sets ``(output, length1 + length2 - 1)`` to the product of
-    ``(input1, length1)`` and ``(input2, length2)``.
+    Sets ``(res, len1 + len2 - 1)`` to the product of
+    ``(poly1, len1)`` and ``(poly2, len2)``.
 
     We must have ``len1 > 1`` and ``len2 > 1``.  Allows zero-padding
     of the two input polynomials.  Supports aliasing of inputs and outputs.
@@ -768,7 +770,7 @@ Multiplication
     Sets ``res`` to the product of ``poly1`` and ``poly2``. Uses the
     Schönhage-Strassen algorithm.
 
-.. function:: void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong length1, const fmpz * input2, slong length2, slong n)
+.. function:: void _fmpz_poly_mullow_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong n)
 
     Sets ``(res, n)`` to the lowest `n` coefficients of the product of
     ``(poly1, len1)`` and ``(poly2, len2)``.
@@ -789,7 +791,6 @@ Multiplication
     and ``(poly2, len2)``.  Assumes ``len1 >= len2 > 0``.  Allows
     zero-padding of the two input polynomials. Does not support aliasing
     between the inputs and the output.
-
 
 .. function:: void fmpz_poly_mul(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 

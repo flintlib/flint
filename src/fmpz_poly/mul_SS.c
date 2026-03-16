@@ -11,10 +11,10 @@
 
 #include "fmpz_poly.h"
 
-void _fmpz_poly_mul_SS(fmpz *output, const fmpz *input1, slong len1,
-                       const fmpz *input2, slong len2)
+void _fmpz_poly_mul_SS(fmpz * res, const fmpz * poly1, slong len1,
+                       const fmpz * poly2, slong len2)
 {
-    _fmpz_poly_mullow_SS(output, input1, len1, input2, len2, len1 + len2 - 1);
+    _fmpz_poly_mullow_SS(res, poly1, len1, poly2, len2, len1 + len2 - 1);
 }
 
 void

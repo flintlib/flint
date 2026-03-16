@@ -15,10 +15,10 @@
 #include "fmpz_poly.h"
 #include "fft.h"
 
-void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
-               const fmpz * input2, slong len2, slong trunc)
+void _fmpz_poly_mullow_SS(fmpz * res, const fmpz * poly1, slong len1,
+               const fmpz * poly2, slong len2, slong trunc)
 {
-    _fmpz_poly_mulmid_SS(output, input1, len1, input2, len2, 0, trunc);
+    _fmpz_poly_mulmid_SS(res, poly1, len1, poly2, len2, 0, trunc);
 }
 
 void

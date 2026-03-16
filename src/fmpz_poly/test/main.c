@@ -122,6 +122,7 @@
 #include "t-mullow_KS.c"
 #include "t-mullow_SS.c"
 #include "t-mullow_SS_precache.c"
+#include "t-mulmid.c"
 #include "t-mulmid_classical.c"
 #include "t-mulmid_KS.c"
 #include "t-mulmid_SS.c"
@@ -306,6 +307,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_mullow_KS),
     TEST_FUNCTION(fmpz_poly_mullow_SS),
     TEST_FUNCTION(fmpz_poly_mullow_SS_precache),
+    TEST_FUNCTION(fmpz_poly_mulmid),
     TEST_FUNCTION(fmpz_poly_mulmid_classical),
     TEST_FUNCTION(fmpz_poly_mulmid_KS),
     TEST_FUNCTION(fmpz_poly_mulmid_SS),

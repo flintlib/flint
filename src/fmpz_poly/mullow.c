@@ -110,15 +110,15 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, slong len1,
     FLINT_ASSERT(len2 > 0);
     FLINT_ASSERT(n <= len1 + len2 - 1);
 
+    if (len1 < len2)
+    {
+        FLINT_SWAP(const fmpz *, poly1, poly2);
+        FLINT_SWAP(slong, len1, len2);
+    }
+
     if (len2 == 1)
     {
         _fmpz_vec_scalar_mul_fmpz(res, poly1, len1, poly2);
-        return;
-    }
-
-    if (len1 < len2)
-    {
-        _fmpz_poly_mullow(res, poly2, len2, poly1, len1, n);
         return;
     }
 
@@ -223,12 +223,8 @@ fmpz_poly_mullow(fmpz_poly_t res,
     }
 
     n = FLINT_MIN(n, len1 + len2 - 1);
-
     fmpz_poly_fit_length(res, n);
-    if (len1 >= len2)
-        _fmpz_poly_mullow(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, n);
-    else
-        _fmpz_poly_mullow(res->coeffs, poly2->coeffs, len2, poly1->coeffs, len1, n);
+    _fmpz_poly_mullow(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, n);
     _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
 }
