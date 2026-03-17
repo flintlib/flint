@@ -205,16 +205,30 @@ uint32_t u32_preinv(uint32_t d)
     cy = 0; \
     uint32_t dd = mod.n; \
     uint64_t ddinv = u32_preinv(dd); \
-    for (i = 0; 2 * i + 1 < zn; i++) \
+    if (znlo != 0) \
     { \
-        c = z2[i]; \
+        if (znlo % 2) \
+        { \
+            c = z2[znlo / 2 - znlo2]; \
+            c1 = (c / m) % m; \
+            c2 = c / (m * m); \
+            d = u32_mod_preinv(c1, dd, ddinv); \
+            z[0] = d; \
+            cy = c2; \
+        } \
+        else \
+            cy = z2[znlo / 2 - 1 - znlo2] / (m * m); \
+    } \
+    for (i = (znlo + 1) / 2; 2 * i + 1 < zn; i++) \
+    { \
+        c = z2[i - znlo2]; \
         c0 = c % m; \
         c1 = (c / m) % m;  \
         c2 = c / (m * m); \
         d = u32_mod_preinv(c0 + cy, dd, ddinv); \
-        z[2 * i] = d; \
+        z[2 * i - znlo] = d; \
         d = u32_mod_preinv(c1, dd, ddinv); \
-        z[2 * i + 1] = d; \
+        z[2 * i + 1 - znlo] = d; \
         cy = c2; \
     } \
     if (zn % 2) \
@@ -222,18 +236,18 @@ uint32_t u32_preinv(uint32_t d)
         if (zn > 2 * zn2) \
             c0 = 0; \
         else \
-            c0 = z2[zn2 - 1] % M; \
+            c0 = z2[zn2 - 1 - znlo2] % M; \
         d = u32_mod_preinv(c0 + cy, dd, ddinv); \
-        z[zn - 1] = d; \
+        z[zn - 1 - znlo] = d; \
     }
 
 
 static int
-_nmod_poly_mullow_fft_small_repack_m(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, ulong M, nmod_t mod)
+_nmod_poly_mulmid_fft_small_repack_m(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, ulong M, nmod_t mod)
 {
     TMP_INIT;
     ulong *a2, *b2, *z2;
-    slong an2, bn2, zn2;
+    slong an2, bn2, zn2, znlo2;
     ulong d, cy, c, c0, c1, c2;
     nmod_t mod2;
     slong i;
@@ -248,18 +262,18 @@ _nmod_poly_mullow_fft_small_repack_m(nn_ptr z, nn_srcptr a, slong an, nn_srcptr 
 
     an2 = (an + 1) / 2;
     bn2 = (bn + 1) / 2;
-    zn2 = (zn + 1) / 2;
-    zn2 = FLINT_MIN(zn2, an2 + bn2 - 1);
+    zn2 = FLINT_MIN((zn + 1) / 2, an2 + bn2 - 1);
+    znlo2 = FLINT_MAX(0, (znlo - 1) / 2);
 
     if (squaring)
     {
-        a2 = TMP_ALLOC((an2 + zn2) * sizeof(ulong));
+        a2 = TMP_ALLOC((an2 + (zn2 - znlo2)) * sizeof(ulong));
         b2 = a2;
         z2 = a2 + an2;
     }
     else
     {
-        a2 = TMP_ALLOC((an2 + bn2 + zn2) * sizeof(ulong));
+        a2 = TMP_ALLOC((an2 + bn2 + (zn2 - znlo2)) * sizeof(ulong));
         b2 = a2 + an2;
         z2 = b2 + bn2;
     }
@@ -287,7 +301,7 @@ _nmod_poly_mullow_fft_small_repack_m(nn_ptr z, nn_srcptr a, slong an, nn_srcptr 
     if (bn % 2) b2[bn / 2] = b[bn - 1];
 
     nmod_init(&mod2, FFT_PRIME);
-    _nmod_poly_mul_mid_default_mpn_ctx(z2, 0, zn2, a2, an2, b2, bn2, mod2);
+    _nmod_poly_mul_mid_default_mpn_ctx(z2, znlo2, zn2, a2, an2, b2, bn2, mod2);
 
     if (M == M16)
     {
@@ -304,7 +318,7 @@ _nmod_poly_mullow_fft_small_repack_m(nn_ptr z, nn_srcptr a, slong an, nn_srcptr 
 }
 
 int
-_nmod_poly_mullow_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+_nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
 {
     uint32_t aeven;
     uint32_t aodd;
@@ -329,7 +343,7 @@ _nmod_poly_mullow_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b,
 
     /* Coefficients are < 2^16, and (2^16)^3 < FFT_PRIME. */
     if (c0_bound < M16)
-        return _nmod_poly_mullow_fft_small_repack_m(z, a, an, b, bn, zn, M16, mod);
+        return _nmod_poly_mulmid_fft_small_repack_m(z, a, an, b, bn, znlo, zn, M16, mod);
 
     /*
     Since packing space is very limited, we try a Cauchy-Schwarz bound if
@@ -407,21 +421,26 @@ _nmod_poly_mullow_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b,
     //     n, an, bn, aeven, aodd, beven, bodd, c0_bound, c1_bound, c2_bound);
 
     if (c0_bound < M16 && c1_bound < M16 && c2_bound * M16 * M16 < FFT_PRIME)
-        return _nmod_poly_mullow_fft_small_repack_m(z, a, an, b, bn, zn, M16, mod);
+        return _nmod_poly_mulmid_fft_small_repack_m(z, a, an, b, bn, znlo, zn, M16, mod);
 
     if (c0_bound < M17 && c1_bound < M17 && c2_bound * M17 * M17 < FFT_PRIME)
-        return _nmod_poly_mullow_fft_small_repack_m(z, a, an, b, bn, zn, M17, mod);
+        return _nmod_poly_mulmid_fft_small_repack_m(z, a, an, b, bn, znlo, zn, M17, mod);
 
     return 0;
 }
 
 void
-_nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+_nmod_poly_mulmid_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
 {
-    if (!_nmod_poly_mullow_fft_small_repack(z, a, an, b, bn, zn, mod))
-        _nmod_poly_mul_mid_default_mpn_ctx(z, 0, zn, a, an, b, bn, mod);
+    if (!_nmod_poly_mulmid_fft_small_repack(z, a, an, b, bn, znlo, zn, mod))
+        _nmod_poly_mul_mid_default_mpn_ctx(z, znlo, zn, a, an, b, bn, mod);
 }
 
+void
+_nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+{
+    _nmod_poly_mulmid_fft_small(z, a, an, b, bn, 0, zn, mod);
+}
 
 static const short fft_mul_tab[] = {1326, 1326, 1095, 802, 674, 537, 330, 306, 290,
 274, 200, 192, 182, 173, 163, 99, 97, 93, 90, 82, 80, 438, 414, 324, 393,
@@ -495,7 +514,7 @@ _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, 
 #else
 
 int
-_nmod_poly_mullow_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+_nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
 {
     return 0;
 }
@@ -507,11 +526,16 @@ _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, 
 }
 
 void
-_nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+_nmod_poly_mulmid_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
 {
     flint_throw(FLINT_ERROR, "fft_small is not available");
 }
 
+void
+_nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+{
+    _nmod_poly_mulmid_fft_small(z, a, an, b, bn, 0, zn, mod);
+}
 
 #endif
 

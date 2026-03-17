@@ -15,7 +15,7 @@
 
 TEST_FUNCTION_START(nmod_poly_mullow_fft_small_repack, state)
 {
-    slong an, bn, zn;
+    slong an, bn, zn, znlo;
     nn_ptr a, b, z, w;
     nmod_t mod;
 
@@ -39,6 +39,7 @@ TEST_FUNCTION_START(nmod_poly_mullow_fft_small_repack, state)
         }
 
         zn = FLINT_MIN(zn, an + bn - 1);
+        znlo = n_randint(state, zn);
 
         a = flint_malloc(sizeof(ulong) * an);
         b = flint_malloc(sizeof(ulong) * bn);
@@ -58,10 +59,14 @@ TEST_FUNCTION_START(nmod_poly_mullow_fft_small_repack, state)
         /* Additional check that the unpacking doesn't write one
            coefficient too much */
         z[zn] = 31337;
+        if (znlo != 0)
+            z[znlo - 1] = 31337;
 
-        if (_nmod_poly_mullow_fft_small_repack(z, a, an, b, bn, zn, mod))
+        if (_nmod_poly_mulmid_fft_small_repack(z + znlo, a, an, b, bn, znlo, zn, mod))
         {
             if (z[zn] != 31337)
+                flint_abort();
+            if (znlo != 0 && z[znlo - 1] != 31337)
                 flint_abort();
 
             if (an >= bn)
@@ -69,8 +74,9 @@ TEST_FUNCTION_START(nmod_poly_mullow_fft_small_repack, state)
             else
                 _nmod_poly_mullow_KS(w, b, bn, a, an, 0, zn, mod);
 
-            if (!_nmod_vec_equal(z, w, zn))
+            if (!_nmod_vec_equal(z + znlo, w + znlo, zn - znlo))
             {
+                flint_printf("znlo = %wd, zn = %wd\n", znlo, zn);
                 flint_printf("a = %{ulong*}\n\n", a, an);
                 flint_printf("b = %{ulong*}\n\n", b, bn);
                 flint_printf("z = %{ulong*}\n\n", z, zn);
