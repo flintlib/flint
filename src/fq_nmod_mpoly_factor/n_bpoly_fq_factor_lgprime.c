@@ -900,6 +900,12 @@ more:
         goto try_zas;
     }
 
+    /* Congratulations! You've reached the unreachable code!
+       Please report this input to FLINT's issue tracker. */
+    flint_printf("Congratulations! You've reached the unreachable code in "
+                 "n_fq_bpoly_factor_lgprime! Please report this input to "
+                 "https://github.com/flintlib/flint/issues\n");
+
     next_lift_pow = curr_lift_pow + r;
     next_lift_pow = FLINT_MIN(next_lift_pow, 2*curr_lift_pow);
 
