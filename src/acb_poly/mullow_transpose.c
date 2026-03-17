@@ -13,27 +13,47 @@
 #include "acb_poly.h"
 
 void
-_acb_poly_mullow_transpose(acb_ptr res,
+_acb_poly_mulmid_transpose(acb_ptr res,
     acb_srcptr poly1, slong len1,
-    acb_srcptr poly2, slong len2, slong n, slong prec)
+    acb_srcptr poly2, slong len2, slong nlo, slong nhi, slong prec)
 {
     arb_ptr a, b, c, d, e, f, w;
     arb_ptr t;
     slong i;
 
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
 
-    w = flint_malloc(sizeof(arb_struct) * (2 * (len1 + len2 + n)));
+    slong nlo2 = (len1 + len2 - 1) - nlo;
+
+    if (len1 > nlo2)
+    {
+        slong trunc = len1 - nlo2;
+        poly1 += trunc;
+        len1 -= trunc;
+        nlo -= trunc;
+        nhi -= trunc;
+    }
+
+    if (len2 > nlo2)
+    {
+        slong trunc = len2 - nlo2;
+        poly2 += trunc;
+        len2 -= trunc;
+        nlo -= trunc;
+        nhi -= trunc;
+    }
+
+    w = flint_malloc(sizeof(arb_struct) * (2 * (len1 + len2 + (nhi - nlo))));
     a = w;
     b = a + len1;
     c = b + len1;
     d = c + len2;
     e = d + len2;
-    f = e + n;
+    f = e + (nhi - nlo);
 
     /* (e+fi) = (a+bi)(c+di) = (ac - bd) + (ad + bc)i */
-    t = _arb_vec_init(n);
+    t = _arb_vec_init(nhi - nlo);
 
     for (i = 0; i < len1; i++)
     {
@@ -47,36 +67,82 @@ _acb_poly_mullow_transpose(acb_ptr res,
         d[i] = *acb_imagref(poly2 + i);
     }
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < nhi - nlo; i++)
     {
         e[i] = *acb_realref(res + i);
         f[i] = *acb_imagref(res + i);
     }
 
-    _arb_poly_mullow(e, a, len1, c, len2, n, prec);
-    _arb_poly_mullow(t, b, len1, d, len2, n, prec);
-    _arb_vec_sub(e, e, t, n, prec);
+    _arb_poly_mulmid(e, a, len1, c, len2, nlo, nhi, prec);
+    _arb_poly_mulmid(t, b, len1, d, len2, nlo, nhi, prec);
+    _arb_vec_sub(e, e, t, nhi - nlo, prec);
 
-    _arb_poly_mullow(f, a, len1, d, len2, n, prec);
+    _arb_poly_mulmid(f, a, len1, d, len2, nlo, nhi, prec);
     /* squaring */
     if (poly1 == poly2 && len1 == len2)
     {
-        _arb_vec_scalar_mul_2exp_si(f, f, n, 1);
+        _arb_vec_scalar_mul_2exp_si(f, f, nhi - nlo, 1);
     }
     else
     {
-        _arb_poly_mullow(t, b, len1, c, len2, n, prec);
-        _arb_vec_add(f, f, t, n, prec);
+        _arb_poly_mulmid(t, b, len1, c, len2, nlo, nhi, prec);
+        _arb_vec_add(f, f, t, nhi - nlo, prec);
     }
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < nhi - nlo; i++)
     {
         *acb_realref(res + i) = e[i];
         *acb_imagref(res + i) = f[i];
     }
 
-    _arb_vec_clear(t, n);
+    _arb_vec_clear(t, nhi - nlo);
     flint_free(w);
+}
+
+void
+_acb_poly_mullow_transpose(acb_ptr res,
+    acb_srcptr poly1, slong len1,
+    acb_srcptr poly2, slong len2, slong n, slong prec)
+{
+    _acb_poly_mulmid_transpose(res, poly1, len1, poly2, len2, 0, n, prec);
+}
+
+void
+acb_poly_mulmid_transpose(acb_poly_t res, const acb_poly_t poly1,
+              const acb_poly_t poly2, slong nlo, slong nhi, slong prec)
+{
+    slong xlen, ylen, zlen;
+
+    xlen = poly1->length;
+    ylen = poly2->length;
+
+    if (xlen == 0 || ylen == 0 || nlo >= FLINT_MIN(nhi, xlen + ylen - 1))
+    {
+        acb_poly_zero(res);
+        return;
+    }
+
+    nhi = FLINT_MIN(nhi, xlen + ylen - 1);
+    zlen = nhi - nlo;
+
+    if (res == poly1 || res == poly2)
+    {
+        acb_poly_t tmp;
+        acb_poly_init2(tmp, zlen);
+        _acb_poly_mulmid_transpose(tmp->coeffs, poly1->coeffs, xlen,
+            poly2->coeffs, ylen, nlo, nhi, prec);
+        acb_poly_swap(res, tmp);
+        acb_poly_clear(tmp);
+    }
+    else
+    {
+        acb_poly_fit_length(res, zlen);
+        _acb_poly_mulmid_transpose(res->coeffs, poly1->coeffs, xlen,
+            poly2->coeffs, ylen, nlo, nhi, prec);
+    }
+
+    _acb_poly_set_length(res, zlen);
+    _acb_poly_normalise(res);
 }
 
 void

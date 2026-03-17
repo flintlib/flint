@@ -261,6 +261,13 @@ void _arb_poly_mullow(arb_ptr C,
 void arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
               const arb_poly_t poly2, slong len, slong prec);
 
+void _arb_poly_mulmid_block(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+void arb_poly_mulmid_block(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec);
+void _arb_poly_mulmid_classical(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+void arb_poly_mulmid_classical(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec);
+void _arb_poly_mulmid(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+void arb_poly_mulmid(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec);
+
 void _arb_poly_mul(arb_ptr C,
     arb_srcptr A, slong lenA,
     arb_srcptr B, slong lenB, slong prec);
