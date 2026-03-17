@@ -225,7 +225,7 @@ _fmpz_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1,
 #if FLINT_HAVE_FFT_SMALL
 
     /* same as in mul.c */
-    if (len <= 8 || (len2 <= 6 && FLINT_MIN(bits1, bits2) <= 5000))
+    if (nhi <= 8 || (len2 <= 6 && FLINT_MIN(bits1, bits2) <= 5000) || len <= 3)
         _fmpz_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi);
     else if (nlo == 0 && (len2 <= 4 || (len2 <= 8 && bits1 + bits2 >= 1500 && bits1 + bits2 <= 10000)))
         _fmpz_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, nhi);
