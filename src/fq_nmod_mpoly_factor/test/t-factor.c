@@ -118,6 +118,29 @@ TEST_FUNCTION_START(fq_nmod_mpoly_factor, state)
 {
     slong i, j, tmul = 40;
 
+    /* issue 2611: crash in more: branch of n_bpoly_fq_factor_lgprime */
+    {
+        fq_nmod_mpoly_ctx_t ctx;
+        fq_nmod_mpoly_t a;
+        const char * vars[] = {"x", "y", "z"};
+
+        fq_nmod_mpoly_ctx_init_deg(ctx, 3, ORD_LEX, 3, 1);
+        fq_nmod_mpoly_init(a, ctx);
+
+        fq_nmod_mpoly_set_str_pretty(a,
+                "x^18+x^12*y^6+x^6*y^12+y^18"
+                "+x^12*y^4*z^2+2*x^10*y^6*z^2+2*x^6*y^10*z^2+x^4*y^12*z^2"
+                "+x^12*y^2*z^4+2*x^10*y^4*z^4+2*x^4*y^10*z^4+x^2*y^12*z^4"
+                "+x^12*z^6+2*x^10*y^2*z^6+x^6*y^6*z^6+2*x^2*y^10*z^6+y^12*z^6"
+                "+2*x^6*y^2*z^10+2*x^4*y^4*z^10+2*x^2*y^6*z^10"
+                "+x^6*z^12+x^4*y^2*z^12+x^2*y^4*z^12+y^6*z^12+z^18",
+                vars, ctx);
+        check_omega(1, 1, a, ctx, fq_nmod_mpoly_factor);
+
+        fq_nmod_mpoly_clear(a, ctx);
+        fq_nmod_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         slong lower;
