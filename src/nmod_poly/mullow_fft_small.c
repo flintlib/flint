@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2025 Fredrik Johansson
+    Copyright (C) 2025, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 

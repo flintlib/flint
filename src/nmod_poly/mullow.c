@@ -44,7 +44,7 @@ void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
     if (n < 10 + bits * bits / 10)
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
     else
-        _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, 0, n, mod);
+        _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, n, mod);
 }
 
 void nmod_poly_mullow(nmod_poly_t res,
@@ -62,7 +62,6 @@ void nmod_poly_mullow(nmod_poly_t res,
     if (len1 == 0 || len2 == 0 || trunc == 0)
     {
         nmod_poly_zero(res);
-
         return;
     }
 

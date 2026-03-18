@@ -554,12 +554,12 @@ Bit packing and unpacking
     coefficient of ``poly`` is bigger than ``bits/2`` bits. We
     also assume ``bits < 3 * FLINT_BITS``.
 
-.. function:: void _nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, ulong bits, nmod_t mod)
+.. function:: void _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, ulong bits, nmod_t mod)
 
-    Unpacks ``len`` coefficients stored in the big integer ``mpn``
-    in bit fields of the given number of bits, reduces them modulo the
-    given modulus, then stores them in the polynomial ``res``.
-    We assume ``len > 0`` and ``3 * FLINT_BITS > bits > 0``.
+    Unpacks ``nhi - nlo`` coefficients stored in the big integer ``mpn``
+    in bit fields of the given number of bits, starting at offset ``nlo``,
+    reduces them modulo the given modulus, then stores them in the polynomial ``res``.
+    We assume ``3 * FLINT_BITS > bits > 0``.
     There are no restrictions on the size of the actual coefficients as
     stored within the bitfields.
 
@@ -679,19 +679,14 @@ Multiplication
     coefficients from ``start`` onwards into the high coefficients of
     ``res``, the remaining coefficients being arbitrary but reduced.
 
-.. function:: void _nmod_poly_mul_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, flint_bitcnt_t bits, nmod_t mod)
+.. function:: void _nmod_poly_mul_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, nmod_t mod)
 
-    Sets ``res`` to the product of ``in1`` and ``in2``
-    assuming the output coefficients are at most the given number of
-    bits wide. If ``bits`` is set to `0` an appropriate value is
-    computed automatically.  Assumes that ``len1 >= len2 > 0``.
+    Sets ``res`` to the product of ``in1`` and ``in2``.
+    Assumes that ``len1 >= len2 > 0``.
 
-.. function:: void nmod_poly_mul_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits)
+.. function:: void nmod_poly_mul_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2``
-    assuming the output coefficients are at most the given number of
-    bits wide. If ``bits`` is set to `0` an appropriate value
-    is computed automatically.
+    Sets ``res`` to the product of ``poly1`` and ``poly2``.
 
 .. function:: void _nmod_poly_mul_KS2(nn_ptr res, nn_srcptr op1, slong n1, nn_srcptr op2, slong n2, nmod_t mod)
 
@@ -711,14 +706,14 @@ Multiplication
 
     Sets ``res`` to the product of ``poly1`` and ``poly2``.
 
-.. function:: void _nmod_poly_mullow_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, flint_bitcnt_t bits, slong n, nmod_t mod)
+.. function:: void _nmod_poly_mullow_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, slong n, nmod_t mod)
 
     Sets ``out`` to the low `n` coefficients of ``in1`` of length
     ``len1`` times ``in2`` of length ``len2``. The output must have
     space for ``n`` coefficients. We assume that ``len1 >= len2 > 0``
     and that ``0 < n <= len1 + len2 - 1``.
 
-.. function:: void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits, slong n)
+.. function:: void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 
     Set ``res`` to the low `n` coefficients of ``in1`` of length
     ``len1`` times ``in2`` of length ``len2``.
@@ -745,6 +740,20 @@ Multiplication
 
     Sets ``res`` to the first ``trunc`` coefficients of the
     product of ``poly1`` and ``poly2``.
+
+.. function:: void _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void _nmod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void nmod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void _nmod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void nmod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+
+    Sets ``res`` to the first ``nhi - nlo`` middle coefficients of the
+    product of ``poly1`` of length ``len1`` and ``poly2`` of
+    length ``len2`` starting at offset ``nlo``.
+    It is assumed that ``0 <= nlo < nhi <= len1 + len2 - 1``.
+    The function :func:`_nmod_poly_mulmid_classical` does not support
+    aliasing between inputs and outputs, but all others do.
 
 .. function:: void _nmod_poly_mulhigh(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 

@@ -70,9 +70,9 @@ TEST_FUNCTION_START(nmod_poly_mullow_fft_small_repack, state)
                 flint_abort();
 
             if (an >= bn)
-                _nmod_poly_mullow_KS(w, a, an, b, bn, 0, zn, mod);
+                _nmod_poly_mullow_KS(w, a, an, b, bn, zn, mod);
             else
-                _nmod_poly_mullow_KS(w, b, bn, a, an, 0, zn, mod);
+                _nmod_poly_mullow_KS(w, b, bn, a, an, zn, mod);
 
             if (!_nmod_vec_equal(z + znlo, w + znlo, zn - znlo))
             {
