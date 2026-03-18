@@ -343,6 +343,16 @@ Arithmetic
     If the same variable is passed for *A* and *B*, sets *C* to the
     square of *A*.
 
+.. function:: void _arb_poly_mulmid_block(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void arb_poly_mulmid_block(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _arb_poly_mulmid_classical(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void arb_poly_mulmid_classical(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _arb_poly_mulmid(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void arb_poly_mulmid(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec)
+
+    Analogous to *mullow* functions, but compute the product truncated
+    at length *nhi* and right-shifted by *nlo*.
+
 .. function:: void _arb_poly_inv_series(arb_ptr Q, arb_srcptr A, slong Alen, slong len, slong prec)
 
     Sets *{Q, len}* to the power series inverse of *{A, Alen}*. Uses Newton iteration.

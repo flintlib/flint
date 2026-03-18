@@ -354,13 +354,13 @@ _arb_vec_get_fmpz_2exp_blocks(fmpz * coeffs, fmpz * exps,
    ``xdbl`` must satisfy ``xdbl[ii] == xz[ii] / 2^DOUBLE_BLOCK_SHIFT``,
    similar for ``ydbl``. */
 static void
-_arb_poly_addmullow_rad(arb_ptr z, fmpz * zz,
+_arb_poly_addmulmid_rad(arb_ptr z, fmpz * zz,
     const fmpz * xz, const double * xdbl, const fmpz * xexps,
     const slong * xblocks, slong xlen,
     const fmpz * yz, const double * ydbl, const fmpz * yexps,
-    const slong * yblocks, slong ylen, slong n)
+    const slong * yblocks, slong ylen, slong nlo, slong nhi)
 {
-    slong i, j, k, ii, xp, yp, xl, yl, bn;
+    slong i, j, k, ii, xp, yp, xl, yl, bnlo, bnhi;
     fmpz_t zexp;
     mag_t t;
 
@@ -371,14 +371,20 @@ _arb_poly_addmullow_rad(arb_ptr z, fmpz * zz,
     {
         for (j = 0; (yp = yblocks[j]) != ylen; j++)
         {
-            if (xp + yp >= n)
+            if (xp + yp >= nhi)
                 continue;
 
             xl = xblocks[i + 1] - xp;
             yl = yblocks[j + 1] - yp;
-            bn = FLINT_MIN(xl + yl - 1, n - xp - yp);
-            xl = FLINT_MIN(xl, bn);
-            yl = FLINT_MIN(yl, bn);
+
+            if (xp + yp + (xl + yl - 1) <= nlo)
+                continue;
+
+            bnhi = FLINT_MIN(xl + yl - 1, nhi - xp - yp);
+            xl = FLINT_MIN(xl, bnhi);
+            yl = FLINT_MIN(yl, bnhi);
+
+            bnlo = FLINT_MAX(0, nlo - xp - yp);
 
             fmpz_add_inline(zexp, xexps + i, yexps + j);
 
@@ -387,13 +393,12 @@ _arb_poly_addmullow_rad(arb_ptr z, fmpz * zz,
             {
                 fmpz_add_ui(zexp, zexp, 2 * DOUBLE_BLOCK_SHIFT);
 
-                for (k = 0; k < bn; k++)
+                for (k = bnlo; k < bnhi; k++)
                 {
                     /* Classical multiplication (may round down!) */
                     double ss = 0.0;
 
-                    for (ii = FLINT_MAX(0, k - yl + 1);
-                        ii <= FLINT_MIN(xl - 1, k); ii++)
+                    for (ii = FLINT_MAX(0, k - yl + 1); ii <= FLINT_MIN(xl - 1, k); ii++)
                     {
                         ss += xdbl[xp + ii] * ydbl[yp + k - ii];
                     }
@@ -402,22 +407,19 @@ _arb_poly_addmullow_rad(arb_ptr z, fmpz * zz,
                     ss *= DOUBLE_ROUNDING_FACTOR;
 
                     mag_set_d_2exp_fmpz(t, ss, zexp);
-                    mag_add(arb_radref(z + xp + yp + k),
-                            arb_radref(z + xp + yp + k), t);
+                    mag_add(arb_radref(z + xp + yp + k - nlo),
+                            arb_radref(z + xp + yp + k - nlo), t);
                 }
             }
             else
             {
-                if (xl >= yl)
-                    _fmpz_poly_mullow(zz, xz + xp, xl, yz + yp, yl, bn);
-                else
-                    _fmpz_poly_mullow(zz, yz + yp, yl, xz + xp, xl, bn);
+                _fmpz_poly_mulmid(zz, xz + xp, xl, yz + yp, yl, bnlo, bnhi);
 
-                for (k = 0; k < bn; k++)
+                for (k = bnlo; k < bnhi; k++)
                 {
-                    mag_set_fmpz_2exp_fmpz(t, zz + k, zexp);
-                    mag_add(arb_radref(z + xp + yp + k),
-                            arb_radref(z + xp + yp + k), t);
+                    mag_set_fmpz_2exp_fmpz(t, zz + k - bnlo, zexp);
+                    mag_add(arb_radref(z + xp + yp + k - nlo),
+                            arb_radref(z + xp + yp + k - nlo), t);
                 }
             }
         }
@@ -427,15 +429,15 @@ _arb_poly_addmullow_rad(arb_ptr z, fmpz * zz,
     mag_clear(t);
 }
 
-/* Similar to ``_arb_poly_addmullow_rad``, but add to the value instead of the
+/* Similar to ``_arb_poly_addmulmid_rad``, but add to the value instead of the
    radius of ``z``. */
 static void
-_arb_poly_addmullow_block(arb_ptr z, fmpz * zz,
+_arb_poly_addmulmid_block(arb_ptr z, fmpz * zz,
     const fmpz * xz, const fmpz * xexps, const slong * xblocks, slong xlen,
     const fmpz * yz, const fmpz * yexps, const slong * yblocks, slong ylen,
-    slong n, slong prec, int squaring)
+    slong nlo, slong nhi, slong prec, int squaring)
 {
-    slong i, j, k, xp, yp, xl, yl, bn;
+    slong i, j, k, xp, yp, xl, yl, bnlo, bnhi;
     fmpz_t zexp;
 
     fmpz_init(zexp);
@@ -444,18 +446,24 @@ _arb_poly_addmullow_block(arb_ptr z, fmpz * zz,
     {
         for (i = 0; (xp = xblocks[i]) != xlen; i++)
         {
-            if (2 * xp >= n)
+            if (2 * xp >= nhi)
                 continue;
 
             xl = xblocks[i + 1] - xp;
-            bn = FLINT_MIN(2 * xl - 1, n - 2 * xp);
-            xl = FLINT_MIN(xl, bn);
 
-            _fmpz_poly_sqrlow(zz, xz + xp, xl, bn);
+            if (2 * xp + (2 * xl - 1) <= nlo)
+                continue;
+
+            bnhi = FLINT_MIN(2 * xl - 1, nhi - 2 * xp);
+            xl = FLINT_MIN(xl, bnhi);
+
+            bnlo = FLINT_MAX(0, nlo - 2 * xp);
+
+            _fmpz_poly_mulmid(zz, xz + xp, xl, xz + xp, xl, bnlo, bnhi);
             _fmpz_add2_fast(zexp, xexps + i, xexps + i, 0);
 
-            for (k = 0; k < bn; k++)
-                arb_add_fmpz_2exp(z + 2 * xp + k, z + 2 * xp + k, zz + k, zexp, prec);
+            for (k = bnlo; k < bnhi; k++)
+                arb_add_fmpz_2exp(z + 2 * xp + k - nlo, z + 2 * xp + k - nlo, zz + k - bnlo, zexp, prec);
         }
     }
 
@@ -463,24 +471,26 @@ _arb_poly_addmullow_block(arb_ptr z, fmpz * zz,
     {
         for (j = squaring ? i + 1 : 0; (yp = yblocks[j]) != ylen; j++)
         {
-            if (xp + yp >= n)
+            if (xp + yp >= nhi)
                 continue;
 
             xl = xblocks[i + 1] - xp;
             yl = yblocks[j + 1] - yp;
-            bn = FLINT_MIN(xl + yl - 1, n - xp - yp);
-            xl = FLINT_MIN(xl, bn);
-            yl = FLINT_MIN(yl, bn);
 
-            if (xl >= yl)
-                _fmpz_poly_mullow(zz, xz + xp, xl, yz + yp, yl, bn);
-            else
-                _fmpz_poly_mullow(zz, yz + yp, yl, xz + xp, xl, bn);
+            if (xp + yp + (xl + yl - 1) <= nlo)
+                continue;
 
+            bnhi = FLINT_MIN(xl + yl - 1, nhi - xp - yp);
+            xl = FLINT_MIN(xl, bnhi);
+            yl = FLINT_MIN(yl, bnhi);
+
+            bnlo = FLINT_MAX(0, nlo - xp - yp);
+
+            _fmpz_poly_mulmid(zz, xz + xp, xl, yz + yp, yl, bnlo, bnhi);
            _fmpz_add2_fast(zexp, xexps + i, yexps + j, squaring);
 
-            for (k = 0; k < bn; k++)
-                arb_add_fmpz_2exp(z + xp + yp + k, z + xp + yp + k, zz + k, zexp, prec);
+            for (k = bnlo; k < bnhi; k++)
+                arb_add_fmpz_2exp(z + xp + yp + k - nlo, z + xp + yp + k - nlo, zz + k - bnlo, zexp, prec);
         }
     }
 
@@ -488,8 +498,8 @@ _arb_poly_addmullow_block(arb_ptr z, fmpz * zz,
 }
 
 void
-_arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
-                                arb_srcptr y, slong ylen, slong n, slong prec)
+_arb_poly_mulmid_block(arb_ptr z, arb_srcptr x, slong xlen,
+                                arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
 {
     slong xmlen, xrlen, ymlen, yrlen, i;
     fmpz *xz, *yz, *zz;
@@ -498,8 +508,29 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
     int squaring;
     fmpz_t scale, t;
 
-    xlen = FLINT_MIN(xlen, n);
-    ylen = FLINT_MIN(ylen, n);
+    xlen = FLINT_MIN(xlen, nhi);
+    ylen = FLINT_MIN(ylen, nhi);
+
+    /* High truncation of inputs */
+    slong nlo2 = (xlen + ylen - 1) - nlo;
+
+    if (xlen > nlo2)
+    {
+        slong trunc = xlen - nlo2;
+        x += trunc;
+        xlen -= trunc;
+        nlo -= trunc;
+        nhi -= trunc;
+    }
+
+    if (ylen > nlo2)
+    {
+        slong trunc = ylen - nlo2;
+        y += trunc;
+        ylen -= trunc;
+        nlo -= trunc;
+        nhi -= trunc;
+    }
 
     squaring = (x == y) && (xlen == ylen);
 
@@ -524,7 +555,7 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
     if (!_arb_vec_is_finite(x, xlen) ||
         (!squaring && !_arb_vec_is_finite(y, ylen)))
     {
-        _arb_poly_mullow_classical(z, x, xlen, y, ylen, n, prec);
+        _arb_poly_mulmid_classical(z, x, xlen, y, ylen, nlo, nhi, prec);
         return;
     }
 
@@ -532,19 +563,19 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
     ylen = FLINT_MAX(ymlen, yrlen);
 
     /* Start with the zero polynomial */
-    _arb_vec_zero(z, n);
+    _arb_vec_zero(z, nhi - nlo);
 
     /* Nothing to do */
     if (xlen == 0 || ylen == 0)
         return;
 
-    n = FLINT_MIN(n, xlen + ylen - 1);
+    nhi = FLINT_MIN(nhi, xlen + ylen - 1);
 
     fmpz_init(scale);
     fmpz_init(t);
     xz = _fmpz_vec_init(xlen);
     yz = _fmpz_vec_init(ylen);
-    zz = _fmpz_vec_init(n);
+    zz = _fmpz_vec_init(nhi - nlo);
     xe = _fmpz_vec_init(xlen);
     ye = _fmpz_vec_init(ylen);
     xblocks = flint_malloc(sizeof(slong) * (xlen + 1));
@@ -578,7 +609,7 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
             }
 
             _mag_vec_get_fmpz_2exp_blocks(yz, ydbl, ye, yblocks, scale, NULL, tmp, xlen);
-            _arb_poly_addmullow_rad(z, zz, xz, xdbl, xe, xblocks, xrlen, yz, ydbl, ye, yblocks, xlen, n);
+            _arb_poly_addmulmid_rad(z, zz, xz, xdbl, xe, xblocks, xrlen, yz, ydbl, ye, yblocks, xlen, nlo, nhi);
         }
         else if (yrlen == 0)
         {
@@ -589,7 +620,7 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
                 arf_get_mag(tmp + i, arb_midref(y + i));
 
             _mag_vec_get_fmpz_2exp_blocks(yz, ydbl, ye, yblocks, scale, NULL, tmp, ymlen);
-            _arb_poly_addmullow_rad(z, zz, xz, xdbl, xe, xblocks, xrlen, yz, ydbl, ye, yblocks, ymlen, n);
+            _arb_poly_addmulmid_rad(z, zz, xz, xdbl, xe, xblocks, xrlen, yz, ydbl, ye, yblocks, ymlen, nlo, nhi);
         }
         else
         {
@@ -599,7 +630,7 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
 
             _mag_vec_get_fmpz_2exp_blocks(xz, xdbl, xe, xblocks, scale, NULL, tmp, xmlen);
             _mag_vec_get_fmpz_2exp_blocks(yz, ydbl, ye, yblocks, scale, y, NULL, yrlen);
-            _arb_poly_addmullow_rad(z, zz, xz, xdbl, xe, xblocks, xmlen, yz, ydbl, ye, yblocks, yrlen, n);
+            _arb_poly_addmulmid_rad(z, zz, xz, xdbl, xe, xblocks, xmlen, yz, ydbl, ye, yblocks, yrlen, nlo, nhi);
 
             /* xr*(|ym| + yr) */
             if (xrlen != 0)
@@ -610,7 +641,7 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
                     arb_get_mag(tmp + i, y + i);
 
                 _mag_vec_get_fmpz_2exp_blocks(yz, ydbl, ye, yblocks, scale, NULL, tmp, ylen);
-                _arb_poly_addmullow_rad(z, zz, xz, xdbl, xe, xblocks, xrlen, yz, ydbl, ye, yblocks, ylen, n);
+                _arb_poly_addmulmid_rad(z, zz, xz, xdbl, xe, xblocks, xrlen, yz, ydbl, ye, yblocks, ylen, nlo, nhi);
             }
         }
 
@@ -626,35 +657,43 @@ _arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
 
         if (squaring)
         {
-            _arb_poly_addmullow_block(z, zz, xz, xe, xblocks, xmlen, xz, xe, xblocks, xmlen, n, prec, 1);
+            _arb_poly_addmulmid_block(z, zz, xz, xe, xblocks, xmlen, xz, xe, xblocks, xmlen, nlo, nhi, prec, 1);
         }
         else
         {
             _arb_vec_get_fmpz_2exp_blocks(yz, ye, yblocks, scale, y, ymlen, prec);
-            _arb_poly_addmullow_block(z, zz, xz, xe, xblocks, xmlen, yz, ye, yblocks, ymlen, n, prec, 0);
+            _arb_poly_addmulmid_block(z, zz, xz, xe, xblocks, xmlen, yz, ye, yblocks, ymlen, nlo, nhi, prec, 0);
         }
     }
 
     /* Unscale. */
     if (!fmpz_is_zero(scale))
     {
-        fmpz_zero(t);
-        for (i = 0; i < n; i++)
+        fmpz_mul_ui(t, scale, nlo);
+
+        for (i = nlo; i < nhi; i++)
         {
-            arb_mul_2exp_fmpz(z + i, z + i, t);
+            arb_mul_2exp_fmpz(z + i - nlo, z + i - nlo, t);
             fmpz_add(t, t, scale);
         }
     }
 
     _fmpz_vec_clear(xz, xlen);
     _fmpz_vec_clear(yz, ylen);
-    _fmpz_vec_clear(zz, n);
+    _fmpz_vec_clear(zz, nhi - nlo);
     _fmpz_vec_clear(xe, xlen);
     _fmpz_vec_clear(ye, ylen);
     flint_free(xblocks);
     flint_free(yblocks);
     fmpz_clear(scale);
     fmpz_clear(t);
+}
+
+void
+_arb_poly_mullow_block(arb_ptr z, arb_srcptr x, slong xlen,
+                                arb_srcptr y, slong ylen, slong n, slong prec)
+{
+    _arb_poly_mulmid_block(z, x, xlen, y, ylen, 0, n, prec);
 }
 
 void
@@ -690,6 +729,44 @@ arb_poly_mullow_block(arb_poly_t res, const arb_poly_t poly1,
         arb_poly_fit_length(res, zlen);
         _arb_poly_mullow_block(res->coeffs, poly1->coeffs, xlen,
             poly2->coeffs, ylen, zlen, prec);
+    }
+
+    _arb_poly_set_length(res, zlen);
+    _arb_poly_normalise(res);
+}
+
+void
+arb_poly_mulmid_block(arb_poly_t res, const arb_poly_t poly1,
+              const arb_poly_t poly2, slong nlo, slong nhi, slong prec)
+{
+    slong xlen, ylen, zlen;
+
+    xlen = poly1->length;
+    ylen = poly2->length;
+
+    if (xlen == 0 || ylen == 0 || nlo >= FLINT_MIN(nhi, xlen + ylen - 1))
+    {
+        arb_poly_zero(res);
+        return;
+    }
+
+    nhi = FLINT_MIN(nhi, xlen + ylen - 1);
+    zlen = nhi - nlo;
+
+    if (res == poly1 || res == poly2)
+    {
+        arb_poly_t tmp;
+        arb_poly_init2(tmp, zlen);
+        _arb_poly_mulmid_block(tmp->coeffs, poly1->coeffs, xlen,
+            poly2->coeffs, ylen, nlo, nhi, prec);
+        arb_poly_swap(res, tmp);
+        arb_poly_clear(tmp);
+    }
+    else
+    {
+        arb_poly_fit_length(res, zlen);
+        _arb_poly_mulmid_block(res->coeffs, poly1->coeffs, xlen,
+            poly2->coeffs, ylen, nlo, nhi, prec);
     }
 
     _arb_poly_set_length(res, zlen);

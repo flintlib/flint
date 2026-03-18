@@ -36,7 +36,7 @@ void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
     if (3 * cutoff_len < 2 * FLINT_MAX(bits, 10))
         _nmod_poly_mul_classical(res, poly1, len1, poly2, len2, mod);
     else if (cutoff_len * bits < 800)
-        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, 0, mod);
+        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, mod);
     else if (cutoff_len * (bits + 1) * (bits + 1) < 100000)
         _nmod_poly_mul_KS2(res, poly1, len1, poly2, len2, mod);
     else
@@ -53,7 +53,6 @@ void nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t p
     if (len1 == 0 || len2 == 0)
     {
         nmod_poly_zero(res);
-
         return;
     }
 

@@ -950,6 +950,15 @@ _gr_nmod_poly_mullow(ulong * res,
     return GR_SUCCESS;
 }
 
+static int
+_gr_nmod_poly_mulmid(ulong * res,
+    const ulong * poly1, slong len1,
+    const ulong * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    _nmod_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 /* fixme: duplicates _nmod_poly_divrem for error handling */
 static int
 _gr_nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
@@ -1428,6 +1437,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_nmod_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_nmod_poly_divrem},
     {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_nmod_poly_divexact},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},

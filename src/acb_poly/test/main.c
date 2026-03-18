@@ -59,6 +59,9 @@
 #include "t-mullow_classical.c"
 #include "t-mullow_transpose.c"
 #include "t-mullow_transpose_gauss.c"
+#include "t-mulmid.c"
+#include "t-mulmid_classical.c"
+#include "t-mulmid_transpose.c"
 #include "t-polylog_cpx.c"
 #include "t-polylog_series.c"
 #include "t-pow_acb_series.c"
@@ -143,6 +146,9 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_mullow_classical),
     TEST_FUNCTION(acb_poly_mullow_transpose),
     TEST_FUNCTION(acb_poly_mullow_transpose_gauss),
+    TEST_FUNCTION(acb_poly_mulmid),
+    TEST_FUNCTION(acb_poly_mulmid_classical),
+    TEST_FUNCTION(acb_poly_mulmid_transpose),
     TEST_FUNCTION(acb_poly_polylog_cpx),
     TEST_FUNCTION(acb_poly_polylog_series),
     TEST_FUNCTION(acb_poly_pow_acb_series),

@@ -25,6 +25,7 @@ TEST_FUNCTION_START(nmod_poly_bit_pack, state)
         ulong n;
         ulong bits;
         nn_ptr mpn;
+        slong nlo;
 
         do
             n = n_randtest_not_zero(state);
@@ -43,7 +44,11 @@ TEST_FUNCTION_START(nmod_poly_bit_pack, state)
 
         _nmod_poly_bit_pack(mpn, a->coeffs, a->length, bits);
         nmod_poly_fit_length(b, a->length);
-        _nmod_poly_bit_unpack(b->coeffs, a->length, mpn, bits, a->mod);
+
+        nlo = n_randint(state, a->length);
+        _nmod_poly_bit_unpack(b->coeffs, 0, nlo, mpn, bits, a->mod);
+        _nmod_poly_bit_unpack(b->coeffs + nlo, nlo, a->length, mpn, bits, a->mod);
+
         b->length = a->length;
 
         result = (nmod_poly_equal(a, b));

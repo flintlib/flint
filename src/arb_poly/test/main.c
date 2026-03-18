@@ -57,6 +57,9 @@
 #include "t-mullow_block.c"
 #include "t-mullow.c"
 #include "t-mullow_classical.c"
+#include "t-mulmid.c"
+#include "t-mulmid_block.c"
+#include "t-mulmid_classical.c"
 #include "t-pow_arb_series.c"
 #include "t-pow_series.c"
 #include "t-pow_ui.c"
@@ -137,6 +140,9 @@ test_struct tests[] =
     TEST_FUNCTION(arb_poly_mullow_block),
     TEST_FUNCTION(arb_poly_mullow),
     TEST_FUNCTION(arb_poly_mullow_classical),
+    TEST_FUNCTION(arb_poly_mulmid),
+    TEST_FUNCTION(arb_poly_mulmid_block),
+    TEST_FUNCTION(arb_poly_mulmid_classical),
     TEST_FUNCTION(arb_poly_pow_arb_series),
     TEST_FUNCTION(arb_poly_pow_series),
     TEST_FUNCTION(arb_poly_pow_ui),

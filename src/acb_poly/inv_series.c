@@ -12,12 +12,6 @@
 #include "arb_poly.h"
 #include "acb_poly.h"
 
-#define MULLOW(z, x, xn, y, yn, nn, prec) \
-    if ((xn) >= (yn)) \
-        _acb_poly_mullow(z, x, xn, y, yn, nn, prec); \
-    else \
-        _acb_poly_mullow(z, y, yn, x, xn, nn, prec); \
-
 void
 _acb_poly_inv_series(acb_ptr Qinv,
     acb_srcptr Q, slong Qlen, slong len, slong prec)
@@ -60,7 +54,7 @@ _acb_poly_inv_series(acb_ptr Qinv,
             slong Qnlen, Wlen, W2len;
             acb_ptr W;
 
-            W = _acb_vec_init(len);
+            W = _acb_vec_init(len / 2);
 
             NEWTON_INIT(blen, len)
             NEWTON_LOOP(m, n)
@@ -68,14 +62,14 @@ _acb_poly_inv_series(acb_ptr Qinv,
             Qnlen = FLINT_MIN(Qlen, n);
             Wlen = FLINT_MIN(Qnlen + m - 1, n);
             W2len = Wlen - m;
-            MULLOW(W, Q, Qnlen, Qinv, m, Wlen, prec);
-            MULLOW(Qinv + m, Qinv, m, W + m, W2len, n - m, prec);
+            _acb_poly_mulmid(W, Q, Qnlen, Qinv, m, m, Wlen, prec);
+            _acb_poly_mullow(Qinv + m, Qinv, m, W, W2len, n - m, prec);
             _acb_vec_neg(Qinv + m, Qinv + m, n - m);
 
             NEWTON_END_LOOP
             NEWTON_END
 
-            _acb_vec_clear(W, len);
+            _acb_vec_clear(W, len / 2);
         }
     }
 }

@@ -43,7 +43,10 @@ _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slon
     if (status != GR_SUCCESS)
         return status;
 
-    GR_TMP_INIT_VEC(W, len, ctx);
+    /* Hack: until all rings have a good mulmid, implement both with and without. */
+    int have_mulmid = (ctx->methods[GR_METHOD_POLY_MULMID] != (gr_funcptr) _gr_poly_mulmid_generic);
+
+    GR_TMP_INIT_VEC(W, have_mulmid ? len / 2 : len, ctx);
 
     for (i--; i >= 0; i--)
     {
@@ -53,13 +56,24 @@ _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slon
         Qnlen = FLINT_MIN(Qlen, n);
         Wlen = FLINT_MIN(Qnlen + m - 1, n);
         W2len = Wlen - m;
-        status |= _gr_poly_mullow(W, Q, Qnlen, Qinv, m, Wlen, ctx);
-        /* should be mulmid */
-        status |= _gr_poly_mullow(GR_ENTRY(Qinv, m, sz), Qinv, m, GR_ENTRY(W, m, sz), W2len, n - m, ctx);
+
+        FLINT_ASSERT(W2len != 0);
+        FLINT_ASSERT(m < Wlen);
+
+        if (have_mulmid)
+        {
+            status |= _gr_poly_mulmid(W, Q, Qnlen, Qinv, m, m, Wlen, ctx);
+            status |= _gr_poly_mullow(GR_ENTRY(Qinv, m, sz), Qinv, m, W, W2len, n - m, ctx);
+        }
+        else
+        {
+            status |= _gr_poly_mullow(W, Q, Qnlen, Qinv, m, Wlen, ctx);
+            status |= _gr_poly_mullow(GR_ENTRY(Qinv, m, sz), Qinv, m, GR_ENTRY(W, m, sz), W2len, n - m, ctx);
+        }
         status |= _gr_vec_neg(GR_ENTRY(Qinv, m, sz), GR_ENTRY(Qinv, m, sz), n - m, ctx);
     }
 
-    GR_TMP_CLEAR_VEC(W, len, ctx);
+    GR_TMP_CLEAR_VEC(W, have_mulmid ? len / 2 : len, ctx);
 
     return status;
 }

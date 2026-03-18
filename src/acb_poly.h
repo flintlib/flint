@@ -333,6 +333,13 @@ void _acb_poly_mul(acb_ptr C,
 void acb_poly_mul(acb_poly_t res, const acb_poly_t poly1,
               const acb_poly_t poly2, slong prec);
 
+void _acb_poly_mulmid_transpose(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+void acb_poly_mulmid_transpose(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec);
+void _acb_poly_mulmid_classical(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+void acb_poly_mulmid_classical(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec);
+void _acb_poly_mulmid(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec);
+void acb_poly_mulmid(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec);
+
 ACB_POLY_INLINE void
 _acb_poly_mul_monic(acb_ptr res, acb_srcptr poly1, slong len1,
     acb_srcptr poly2, slong len2, slong prec)

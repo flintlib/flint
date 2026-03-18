@@ -53,6 +53,10 @@ _gr_poly_rsqrt_series_newton(gr_ptr g,
         gr_ptr t, u;
         slong tlen, ulen;
 
+        /* Hack: until all rings have a good mulmid, implement both with and without. */
+        /* Todo: tighten allocations when we have mulmid */
+        int have_mulmid = (ctx->methods[GR_METHOD_POLY_MULMID] != (gr_funcptr) _gr_poly_mulmid_generic);
+
         GR_TMP_INIT_VEC(t, 2 * len, ctx);
         u = GR_ENTRY(t, len, sz);
 
@@ -66,8 +70,18 @@ _gr_poly_rsqrt_series_newton(gr_ptr g,
 
             status |= _gr_poly_mullow(t, g, m, g, m, tlen, ctx);
             status |= _gr_poly_mullow(u, g, m, t, tlen, ulen, ctx);
-            status |= _gr_poly_mullow(t, u, ulen, h, FLINT_MIN(hlen, n), n, ctx);   /* should be mulmid */
-            status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(t, m, sz), n - m, -1, ctx);
+
+            if (have_mulmid)
+            {
+                status |= _gr_poly_mulmid(GR_ENTRY(g, m, sz), u, ulen, h, FLINT_MIN(hlen, n), m, n, ctx);
+                status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, -1, ctx);
+            }
+            else
+            {
+                status |= _gr_poly_mullow(t, u, ulen, h, FLINT_MIN(hlen, n), n, ctx);
+                status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(t, m, sz), n - m, -1, ctx);
+            }
+
             status |= _gr_vec_neg(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, ctx);
         }
 

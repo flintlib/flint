@@ -29,7 +29,7 @@ void _nmod_poly_mulhigh(nn_ptr res, nn_srcptr poly1, slong len1,
     if (2 * bits + bits2 <= FLINT_BITS && len1 + len2 < 16)
         _nmod_poly_mulhigh_classical(res, poly1, len1, poly2, len2, n, mod);
     else
-        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, 0, mod);
+        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, mod);
 }
 
 void nmod_poly_mulhigh(nmod_poly_t res,
