@@ -655,6 +655,7 @@ typedef enum
 
     /* Polynomial methods (todo: rename -> GR_POLY) */
     GR_METHOD_POLY_MULLOW,
+    GR_METHOD_POLY_MULMID,
     GR_METHOD_POLY_DIV,
     GR_METHOD_POLY_DIVREM,
     GR_METHOD_POLY_DIVEXACT,
@@ -845,6 +846,7 @@ typedef int ((*gr_method_poly_unary_trunc_op)(gr_ptr, gr_srcptr, slong, slong, g
 typedef int ((*gr_method_poly_binary_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
+typedef int ((*gr_method_poly_binary_trunc2_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_gcd_op)(gr_ptr, slong *, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_xgcd_op)(slong *, gr_ptr, gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_ctx_op)(gr_vec_t, gr_ctx_ptr));
@@ -947,6 +949,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_POLY_UNARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_unary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_BINARY_TRUNC2_OP(ctx, NAME) (((gr_method_poly_binary_trunc2_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_GCD_OP(ctx, NAME) (((gr_method_poly_gcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_XGCD_OP(ctx, NAME) (((gr_method_poly_xgcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CTX_OP(ctx, NAME) (((gr_method_vec_ctx_op *) ctx->methods)[GR_METHOD_ ## NAME])

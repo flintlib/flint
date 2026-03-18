@@ -134,8 +134,12 @@ WARN_UNUSED_RESULT int gr_poly_sub(gr_poly_t res, const gr_poly_t poly1, const g
 WARN_UNUSED_RESULT int _gr_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
 
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+{
+    return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx);
+}
+
 WARN_UNUSED_RESULT int _gr_poly_mullow_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
-GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx) { return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx); }
 WARN_UNUSED_RESULT int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_mullow_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
@@ -149,6 +153,14 @@ WARN_UNUSED_RESULT int gr_poly_mullow_bivariate_KS(gr_poly_t res, const gr_poly_
 
 WARN_UNUSED_RESULT int _gr_poly_mullow_toom_serial(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong trunc, slong num_points, slong splitting_degree, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mullow_toom_serial(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, slong num_points, slong splitting_degree, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    return GR_POLY_BINARY_TRUNC2_OP(ctx, POLY_MULMID)(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
+WARN_UNUSED_RESULT int _gr_poly_mulmid_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_mulmid(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong nlo, slong nhi, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);

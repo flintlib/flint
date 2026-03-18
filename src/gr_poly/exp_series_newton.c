@@ -100,6 +100,9 @@ _gr_poly_exp_series_newton(gr_ptr f, gr_ptr g,
     status |= _gr_poly_exp_series_basecase_mul(f, h, hlen, n, ctx);
     status |= _gr_poly_inv_series(g, f, n, n, ctx);
 
+    /* Hack: until all rings have a good mulmid, implement both with and without. */
+    int have_mulmid = (ctx->methods[GR_METHOD_POLY_MULMID] != (gr_funcptr) _gr_poly_mulmid_generic);
+
     for (i--; i >= 0; i--)
     {
         m = n;             /* previous length */
@@ -107,16 +110,33 @@ _gr_poly_exp_series_newton(gr_ptr f, gr_ptr g,
 
         l = FLINT_MIN(hlen, n) - 1;
         r = FLINT_MIN(l + m - 1, n - 1);
-        status |= _gr_poly_mullow(t, hprime, l, f, m, r, ctx);
-        status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, GR_ENTRY(t, m - 1, sz), r + 1 - m, n - m, ctx);
+
+        if (have_mulmid)
+        {
+            status |= _gr_poly_mulmid(t, hprime, l, f, m, m - 1, r, ctx);
+            status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, t, r + 1 - m, n - m, ctx);
+        }
+        else
+        {
+            status |= _gr_poly_mullow(t, hprime, l, f, m, r, ctx);
+            status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, GR_ENTRY(t, m - 1, sz), r + 1 - m, n - m, ctx);
+        }
         status |= _gr_poly_integral_offset(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, m, ctx);
         status |= _gr_poly_mullow(GR_ENTRY(f, m, sz), f, n - m, GR_ENTRY(g, m, sz), n - m, n - m, ctx);
 
         /* g := exp(-h) + O(x^n); not needed if we only want exp(x) */
         if (i != 0 || inverse)
         {
-            status |= _gr_poly_mullow(t, f, n, g, m, n, ctx);
-            status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, m, GR_ENTRY(t, m, sz), n - m, n - m, ctx);
+            if (have_mulmid)
+            {
+                status |= _gr_poly_mulmid(t, f, n, g, m, m, n, ctx);
+                status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, m, t, n - m, n - m, ctx);
+            }
+            else
+            {
+                status |= _gr_poly_mullow(t, f, n, g, m, n, ctx);
+                status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, m, GR_ENTRY(t, m, sz), n - m, n - m, ctx);
+            }
             status |= _gr_vec_neg(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, ctx);
         }
     }

@@ -860,12 +860,15 @@ _fmpq_vec_set_fmpz_vec_div_fmpz(fmpq * res, const fmpz * v, const fmpz_t den, sl
 }
 
 static int
-_gr_fmpq_poly_mullow(fmpq * res,
+_gr_fmpq_poly_mulmid(fmpq * res,
     const fmpq * poly1, slong len1,
-    const fmpq * poly2, slong len2, slong n, gr_ctx_t ctx)
+    const fmpq * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     fmpz *z1, *z2, *z3;
     fmpz_t den1, den2;
+
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
 
     /* Todo: handle mixed cases */
     if (_fmpq_vec_is_fmpz_vec(poly1, len1) &&
@@ -873,7 +876,7 @@ _gr_fmpq_poly_mullow(fmpq * res,
     {
         slong i;
 
-        z1 = flint_malloc((len1 + len2 + n) * sizeof(fmpz));
+        z1 = flint_malloc((len1 + len2 + nhi - nlo) * sizeof(fmpz));
         z2 = z1 + len1;
         z3 = z2 + len2;
 
@@ -881,15 +884,12 @@ _gr_fmpq_poly_mullow(fmpq * res,
             z1[i] = *fmpq_numref(poly1 + i);
         for (i = 0; i < len2; i++)
             z2[i] = *fmpq_numref(poly2 + i);
-        for (i = 0; i < n; i++)
+        for (i = 0; i < nhi - nlo; i++)
             z3[i] = *fmpq_numref(res + i);
 
-        if (len1 >= len2)
-            _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
-        else
-            _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+        _fmpz_poly_mulmid(z3, z1, len1, z2, len2, nlo, nhi);
 
-        for (i = 0; i < n; i++)
+        for (i = 0; i < nhi - nlo; i++)
         {
             *fmpq_numref(res + i) = z3[i];
             fmpz_one(fmpq_denref(res + i));
@@ -901,7 +901,7 @@ _gr_fmpq_poly_mullow(fmpq * res,
     {
         fmpz_init(den1);
         fmpz_init(den2);
-        z1 = _fmpz_vec_init(len1 + len2 + n);
+        z1 = _fmpz_vec_init(len1 + len2 + nhi - nlo);
         z2 = z1 + len1;
         z3 = z2 + len2;
 
@@ -909,19 +909,23 @@ _gr_fmpq_poly_mullow(fmpq * res,
         _fmpq_vec_get_fmpz_vec_den(z2, den2, poly2, len2);
 
         fmpz_mul(den1, den1, den2);
-        if (len1 >= len2)
-            _fmpz_poly_mullow(z3, z1, len1, z2, len2, n);
-        else
-            _fmpz_poly_mullow(z3, z2, len2, z1, len1, n);
+        _fmpz_poly_mulmid(z3, z1, len1, z2, len2, nlo, nhi);
+        _fmpq_vec_set_fmpz_vec_div_fmpz(res, z3, den1, nhi - nlo);
 
-        _fmpq_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n);
-
-        _fmpz_vec_clear(z1, len1 + len2 + n);
+        _fmpz_vec_clear(z1, len1 + len2 + nhi - nlo);
         fmpz_clear(den1);
         fmpz_clear(den2);
     }
 
     return GR_SUCCESS;
+}
+
+static int
+_gr_fmpq_poly_mullow(fmpq * res,
+    const fmpq * poly1, slong len1,
+    const fmpq * poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_fmpq_poly_mulmid(res, poly1, len1, poly2, len2, 0, n, ctx);
 }
 
 static int
@@ -1173,6 +1177,7 @@ gr_method_tab_input _fmpq_methods_input[] =
     {GR_METHOD_VEC_EQUAL,       (gr_funcptr) _gr_fmpq_vec_equal},
     {GR_METHOD_VEC_SUM,         (gr_funcptr) _gr_fmpq_vec_sum},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpq_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpq_poly_mulmid},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpq_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_fmpq_poly_roots_other},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpq_mat_mul},

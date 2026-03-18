@@ -1957,6 +1957,16 @@ _gr_acb_poly_mullow(acb_ptr res,
     return GR_SUCCESS;
 }
 
+static int
+_gr_acb_poly_mulmid(acb_ptr res,
+    acb_srcptr poly1, slong len1,
+    acb_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    _acb_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+
 /* xxx */
 static int
 roots_accurate(acb_ptr roots, slong len, slong prec)
@@ -2468,6 +2478,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_acb_poly_mulmid},
     {GR_METHOD_POLY_TAYLOR_SHIFT,   (gr_funcptr) _gr_acb_poly_taylor_shift},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) gr_generic_poly_factor_roots},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_acb_poly_roots},
