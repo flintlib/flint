@@ -180,7 +180,7 @@ cleanup_inner:
             if (ctx->which_ring == GR_CTX_FMPZ ||
                 ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_QQBAR)
                 status = GR_TEST_FAIL;
-            goto epilogue;
+            goto epilogue2;
         }
 
         if (want_d)
@@ -195,6 +195,7 @@ cleanup_inner:
             if (!fmpz_equal(d0, gr_vec_entry_ptr(disp1, disp1->length - 1, ZZ)))
                 status = GR_TEST_FAIL;
 
+epilogue2:
         gr_vec_clear(disp0, ZZ);
         gr_vec_clear(disp1, ZZ);
         fmpz_clear(d0);
