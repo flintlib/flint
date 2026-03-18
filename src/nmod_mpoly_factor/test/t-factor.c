@@ -148,6 +148,63 @@ TEST_FUNCTION_START(nmod_mpoly_factor, state)
         nmod_mpoly_ctx_clear(ctx);
     }
 
+    /* issue 2611: crash in more: branch of n_bpoly_mod_factor_lgprime */
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a;
+        const char * vars[] = {"x", "y", "z"};
+
+        nmod_mpoly_ctx_init(ctx, 3, ORD_LEX, 3);
+        nmod_mpoly_init(a, ctx);
+
+        nmod_mpoly_set_str_pretty(a,
+                "x^18+x^12*y^6+x^6*y^12+y^18"
+                "+x^12*y^4*z^2-x^10*y^6*z^2-x^6*y^10*z^2+x^4*y^12*z^2"
+                "+x^12*y^2*z^4-x^10*y^4*z^4-x^4*y^10*z^4+x^2*y^12*z^4"
+                "+x^12*z^6-x^10*y^2*z^6+x^6*y^6*z^6-x^2*y^10*z^6+y^12*z^6"
+                "-x^6*y^2*z^10-x^4*y^4*z^10-x^2*y^6*z^10"
+                "+x^6*z^12+x^4*y^2*z^12+x^2*y^4*z^12+y^6*z^12+z^18",
+                vars, ctx);
+        check_omega(1, 1, a, ctx, nmod_mpoly_factor);
+
+        /* additional irreducible polys over GF(3) exercising the same path */
+        nmod_mpoly_set_str_pretty(a,
+                "x^11*y+2*x^10*y^2+2*x^10*y*z+2*x^10*z^2+x^9*y^3+x^9*y^2*z"
+                "+x^9*z^3+2*x^8*y^4+x^8*y^3*z+x^8*y*z^3+2*x^8*z^4+x^7*y^5"
+                "+x^7*y^4*z+x^7*y^3*z^2+2*x^7*y^2*z^3+x^7*y*z^4+2*x^7*z^5"
+                "+x^6*y^6+x^6*y^5*z+2*x^6*y^4*z^2+2*x^6*y*z^5+x^5*y^6*z"
+                "+2*x^5*y^5*z^2+2*x^5*y^4*z^3+2*x^5*y^2*z^5+2*x^5*z^7"
+                "+x^4*y^8+x^4*y^7*z+2*x^4*y^6*z^2+x^4*y^5*z^3+2*x^4*y^3*z^5"
+                "+x^4*y^2*z^6+2*x^4*z^8+x^3*y^9+x^3*y^8*z+2*x^3*y^6*z^3"
+                "+2*x^3*y^5*z^4+x^3*y^4*z^5+x^3*y^3*z^6+2*x^3*y^2*z^7"
+                "+2*x^3*y*z^8+2*x^3*z^9+2*x^2*y^7*z^3+x^2*y^6*z^4"
+                "+2*x^2*y^5*z^5+x^2*y^4*z^6+x^2*y^3*z^7+x^2*y^2*z^8"
+                "+x^2*y*z^9+x^2*z^10+x*y^10*z+x*y^9*z^2+x*y^8*z^3"
+                "+x*y^6*z^5+x*y^4*z^7+x*y^2*z^9+2*y^12+2*y^8*z^4+y^7*z^5"
+                "+y^6*z^6+y^5*z^7+2*y^2*z^10+y*z^11+2*z^12",
+                vars, ctx);
+        check_omega(1, 1, a, ctx, nmod_mpoly_factor);
+
+        nmod_mpoly_set_str_pretty(a,
+                "2*x^11*y+x^11*z+x^10*y*z+x^9*y^2*z+2*x^9*y*z^2+2*x^8*y^4"
+                "+2*x^8*y^3*z+2*x^8*y^2*z^2+x^8*y*z^3+2*x^8*z^4+2*x^7*y^5"
+                "+2*x^7*y^3*z^2+x^7*y^2*z^3+x^7*y*z^4+2*x^7*z^5+x^6*y^4*z^2"
+                "+2*x^6*y^3*z^3+x^6*y^2*z^4+2*x^6*z^6+x^5*y^7+2*x^5*y^6*z"
+                "+x^5*y^5*z^2+2*x^5*y^4*z^3+x^5*y^2*z^5+2*x^5*y*z^6+x^4*y^8"
+                "+2*x^4*y^7*z+2*x^4*y^6*z^2+x^4*y^5*z^3+2*x^4*y^2*z^6"
+                "+x^4*y*z^7+2*x^4*z^8+x^3*y^9+x^3*y^8*z+x^3*y^5*z^4"
+                "+2*x^3*y^4*z^5+x^3*y^3*z^6+x^3*y*z^8+2*x^2*y^10+x^2*y^9*z"
+                "+2*x^2*y^8*z^2+2*x^2*y^6*z^4+x^2*y^4*z^6+x^2*z^10+2*x*y^11"
+                "+x*y^10*z+2*x*y^9*z^2+x*y^8*z^3+x*y^7*z^4+x*y^4*z^7"
+                "+x*y^2*z^9+x*y*z^10+2*x*z^11+y^11*z+2*y^10*z^2+2*y^9*z^3"
+                "+2*y^7*z^5+2*y^6*z^6+2*y^5*z^7+y^4*z^8+2*y^3*z^9+2*y*z^11",
+                vars, ctx);
+        check_omega(1, 1, a, ctx, nmod_mpoly_factor);
+
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 0; i < tmul*flint_test_multiplier(); i++)
     {
         slong lower;
