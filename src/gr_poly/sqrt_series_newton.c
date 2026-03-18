@@ -28,7 +28,7 @@ _gr_poly_sqrt_series_newton(gr_ptr g,
     if (len == 0)
         return GR_SUCCESS;
 
-    if (len < cutoff)
+    if (len < cutoff || len == 1)
         return _gr_poly_sqrt_series_basecase(g, h, hlen, len, ctx);
 
     cutoff = FLINT_MAX(cutoff, 2);
@@ -86,7 +86,8 @@ _gr_poly_sqrt_series_newton(gr_ptr g,
 
     if (have_mulmid)
     {
-        status |= _gr_poly_mulmid(t, v, m, v, m, m, tlen, ctx);
+        if (m < tlen)
+            status |= _gr_poly_mulmid(t, v, m, v, m, m, tlen, ctx);
         status |= _gr_poly_sub(GR_ENTRY(u, m, sz), GR_ENTRY(h, m, sz),
             FLINT_MAX(0, FLINT_MIN(hlen - m, n - m)), t, FLINT_MAX(0, FLINT_MIN(tlen - m, n - m)), ctx);
     }

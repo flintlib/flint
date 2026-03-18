@@ -56,7 +56,9 @@ _gr_poly_inv_series_newton(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, slon
         Qnlen = FLINT_MIN(Qlen, n);
         Wlen = FLINT_MIN(Qnlen + m - 1, n);
         W2len = Wlen - m;
+
         FLINT_ASSERT(W2len != 0);
+        FLINT_ASSERT(m < Wlen);
 
         if (have_mulmid)
         {

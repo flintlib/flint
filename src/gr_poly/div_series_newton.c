@@ -63,7 +63,9 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slo
         Bnlen = FLINT_MIN(Blen, n);
         Wlen = FLINT_MIN(Bnlen + m - 1, n);
         W2len = Wlen - m;
+
         FLINT_ASSERT(W2len != 0);
+        FLINT_ASSERT(m < Wlen);
 
         if (have_mulmid)
         {
@@ -89,6 +91,7 @@ _gr_poly_div_series_newton(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slo
 
     if (have_mulmid)
     {
+        FLINT_ASSERT(m < Wlen);
         status |= _gr_poly_mulmid(W, B, Bnlen, T, m, m, Wlen, ctx);
         status |= _gr_poly_sub(W, GR_ENTRY(A, m, sz), FLINT_MAX(0, FLINT_MIN(Alen - m, n - m)), W, n - m, ctx);
         status |= _gr_poly_mullow(GR_ENTRY(res, m, sz), res, m, W, n - m, n - m, ctx);
