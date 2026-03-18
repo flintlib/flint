@@ -51,7 +51,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
                 b[i] = a[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul_KS(c, a, an, a, an, 0, mod);
+            _nmod_poly_mul_KS(c, a, an, a, an, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, an, mod, R);
 
             for (i = zl; i < zh; i++)
@@ -103,7 +103,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
                 b[i] = a[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul_KS(c, a, an, a, an, 0, mod);
+            _nmod_poly_mul_KS(c, a, an, a, an, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, an, mod, R);
 
             for (i = zl; i < zh; i++)
@@ -158,7 +158,7 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
                 b[i] = n_randint(state, mod.n);
 
             flint_mpn_zero(c, sz);
-            _nmod_poly_mul_KS(c, a, an, b, bn, 0, mod);
+            _nmod_poly_mul_KS(c, a, an, b, bn, mod);
             _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, bn, mod, R);
 
             for (i = zl; i < zh; i++)
