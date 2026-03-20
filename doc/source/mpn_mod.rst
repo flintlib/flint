@@ -227,14 +227,17 @@ Multiplication
 All multiplication algorithms optimize for squaring.
 
 .. function:: int _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication using the schoolbook algorithm.
 
 .. function:: int _mpn_mod_poly_mullow_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication using Kronecker substitution (bit packing).
 
 .. function:: int _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, slong cutoff, gr_ctx_t ctx)
 
     Polynomial multiplication using the Karatsuba algorithm,
     implemented without intermediate modular reductions.
@@ -242,18 +245,21 @@ All multiplication algorithms optimize for squaring.
     basecase multiplication (also without intermediate reductions)
     when either *len1* or *len2* is smaller than *cutoff*.
 
-    Currently a full product is computed internally regardless of *len*;
-    truncation only skips the modular reductions.
+    Currently a full product is computed internally regardless of the
+    output length; truncation only skips the modular reductions.
 
 .. function:: int _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication using the small-prime FFT.
     Returns ``GR_UNABLE`` if the small-prime FFT is not available
     or if the coefficients are too large to use this implementation.
 
 .. function:: int _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 
     Polynomial multiplication with automatic algorithm selection.
+
 
 Division
 ..............

@@ -27,12 +27,31 @@ TEST_FUNCTION_START(mpn_mod_poly_mullow_fft_small, state)
         gr_ctx_clear(ctx);
     }
 
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_init_mpn_mod_randtest(ctx, state);
+        flint_set_num_threads(1 + n_randint(state, 4));
+        _gr_poly_test_mulmid((gr_method_poly_binary_trunc2_op) _mpn_mod_poly_mulmid_fft_small, NULL, state, 10, 50, ctx);
+        flint_set_num_threads(1);
+        gr_ctx_clear(ctx);
+    }
+
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
         flint_set_num_threads(1 + n_randint(state, 4));
         _gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_fft_small,
                             (gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_KS, state, 10, 5000, ctx);
+        flint_set_num_threads(1);
+        gr_ctx_clear(ctx);
+    }
+
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_init_mpn_mod_randtest(ctx, state);
+        flint_set_num_threads(1 + n_randint(state, 4));
+        _gr_poly_test_mulmid((gr_method_poly_binary_trunc2_op) _mpn_mod_poly_mulmid_fft_small,
+                            (gr_method_poly_binary_trunc2_op) _mpn_mod_poly_mulmid_KS, state, 10, 2000, ctx);
         flint_set_num_threads(1);
         gr_ctx_clear(ctx);
     }

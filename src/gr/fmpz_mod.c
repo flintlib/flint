@@ -554,6 +554,20 @@ _gr_fmpz_mod_poly_mullow(fmpz * res,
     return GR_SUCCESS;
 }
 
+static int
+_gr_fmpz_mod_poly_mulmid(fmpz * res,
+    const fmpz * poly1, slong len1,
+    const fmpz * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    if (len1 >= len2)
+        _fmpz_mod_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, FMPZ_MOD_CTX(ctx));
+    else
+        _fmpz_mod_poly_mulmid(res, poly2, len2, poly1, len1, nlo, nhi, FMPZ_MOD_CTX(ctx));
+
+    return GR_SUCCESS;
+}
+
+
 /* fixme: duplicate _fmpz_mod_poly methods for error handling */
 static int
 _gr_fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA,
@@ -852,6 +866,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_mod_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_mod_poly_mulmid},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fmpz_mod_poly_divrem},
