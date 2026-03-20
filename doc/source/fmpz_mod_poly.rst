@@ -495,6 +495,20 @@ Multiplication
     Sets ``res`` to the lowest `n` coefficients of the product of
     ``poly1`` and ``poly2``.
 
+.. function:: void _fmpz_mod_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi, const fmpz_mod_ctx_t ctx)
+
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices `[nlo, nhi)`
+    in the full product of ``(poly1, len1)`` and ``(poly2, len2)``.
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`.
+    Does not support aliasing between the inputs and the output.
+
+.. function:: void fmpz_mod_poly_mulmid(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong nlo, slong nhi, const fmpz_mod_ctx_t ctx)
+
+    Sets ``res`` to the polynomial formed by the coefficients at indices `[nlo, nhi)`
+    in the product of ``poly1`` and ``poly2``. Equivalently, compute
+    `[(poly1 \cdot poly2) \bmod x^{nhi}] / x^{nlo}`.
+
 .. function:: void _fmpz_mod_poly_sqr(fmpz * res, const fmpz * poly, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``res`` to the square of ``poly``.

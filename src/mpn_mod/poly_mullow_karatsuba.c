@@ -583,7 +583,7 @@ _mpn_poly_mul_karatsuba(nn_ptr res, nn_srcptr f, slong flen, nn_srcptr g, slong 
 }
 
 int
-_mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
+_mpn_mod_poly_mulmid_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, slong cutoff, gr_ctx_t ctx)
 {
     nn_ptr t;
     slong i, l;
@@ -595,11 +595,34 @@ _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
 
     norm = MPN_MOD_CTX_NORM(ctx);
 
-    len1 = FLINT_MIN(len1, len);
-    len2 = FLINT_MIN(len2, len);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
 
     nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
     sbits = MPN_MOD_CTX_MODULUS_BITS(ctx);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc * nlimbs;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc * nlimbs;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
 
     if (cutoff == -1)
     {
@@ -642,15 +665,22 @@ _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
 
     _mpn_poly_mul_karatsuba(t, poly1, len1, poly2, len2, nlimbs, slimbs, cutoff, norm);
 
-    /* We support len < len1 + len2 - 1 but currently only save time
+    /* We support 0 < nlo, nhi < len1 + len2 - 1 but currently only save time
        on reductions. TODO: fix this. */
-    for (i = 0; i < len; i++)
+    for (i = nlo; i < nhi; i++)
     {
         l = slimbs;
         MPN_NORM(t + i * slimbs, l);
-        mpn_mod_set_mpn(res + i * nlimbs, t + i * slimbs, l, ctx);
+        mpn_mod_set_mpn(res + (i - nlo) * nlimbs, t + i * slimbs, l, ctx);
     }
 
     TMP_END;
     return GR_SUCCESS;
 }
+
+int
+_mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
+{
+    return _mpn_mod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, 0, len, cutoff, ctx);
+}
+

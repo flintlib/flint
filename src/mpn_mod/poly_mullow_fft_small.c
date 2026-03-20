@@ -501,10 +501,25 @@ _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
         return _mpn_mod_poly_mulmid_fft_small_internal(res, 0, len, poly2, len2, poly1, len1, get_default_mpn_ctx(), ctx);
 }
 
+int
+_mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    if (len1 >= len2)
+        return _mpn_mod_poly_mulmid_fft_small_internal(res, nlo, nhi, poly1, len1, poly2, len2, get_default_mpn_ctx(), ctx);
+    else
+        return _mpn_mod_poly_mulmid_fft_small_internal(res, nlo, nhi, poly2, len2, poly1, len1, get_default_mpn_ctx(), ctx);
+}
+
 #else /* FLINT_HAVE_FFT_SMALL */
 
 int
 _mpn_mod_poly_mullow_fft_small(nn_ptr res,  nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
+int
+_mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     return GR_UNABLE;
 }

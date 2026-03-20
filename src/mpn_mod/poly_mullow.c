@@ -335,17 +335,41 @@ static const uint8_t sqrlow_cutoffs[][2] = {
 };
 
 int
-_mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     slong n;
     slong bits, cutoff_karatsuba, cutoff_fft_KS, tab_i;
 
-    len1 = FLINT_MIN(len1, len);
-    len2 = FLINT_MIN(len2, len);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc * MPN_MOD_CTX_NLIMBS(ctx);
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc * MPN_MOD_CTX_NLIMBS(ctx);
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
     n = FLINT_MIN(len1, len2);
 
-    if (n < 4)
-        return _mpn_mod_poly_mullow_classical(res, poly1, len1, poly2, len2, len, ctx);
+    if (n < 4 || nhi - nlo <= 4)
+        return _mpn_mod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
 
     bits = MPN_MOD_CTX_MODULUS_BITS(ctx);
 
@@ -355,7 +379,7 @@ _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, s
 
     if (poly1 == poly2 && len1 == len2)
     {
-        if (len == len1 + len2 - 1)
+        if (nlo == 0 && nhi == len1 + len2 - 1)
         {
             cutoff_karatsuba = sqr_cutoffs[tab_i][0];
             cutoff_fft_KS = sqr_cutoffs[tab_i][1];
@@ -373,7 +397,7 @@ _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, s
             cutoff_karatsuba = mul_unbalanced_cutoffs[tab_i][0];
             cutoff_fft_KS = mul_unbalanced_cutoffs[tab_i][1];
         }
-        else if (len == len1 + len2 - 1)
+        else if (nlo == 0 && nhi == len1 + len2 - 1)
         {
             cutoff_karatsuba = mul_cutoffs[tab_i][0];
             cutoff_fft_KS = mul_cutoffs[tab_i][1];
@@ -386,13 +410,20 @@ _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, s
     }
 
     if (n < cutoff_karatsuba)
-        return _mpn_mod_poly_mullow_classical(res, poly1, len1, poly2, len2, len, ctx);
+        return _mpn_mod_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
 
     if (n < cutoff_fft_KS && FLINT_MAX(len1, len2) < 4 * n)
-        return _mpn_mod_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, len, -1, ctx);
+        return _mpn_mod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, nlo, nhi, -1, ctx);
 
-    if (GR_SUCCESS == _mpn_mod_poly_mullow_fft_small(res, poly1, len1, poly2, len2, len, ctx))
+    if (GR_SUCCESS == _mpn_mod_poly_mulmid_fft_small(res, poly1, len1, poly2, len2, nlo, nhi, ctx))
         return GR_SUCCESS;
 
-    return _mpn_mod_poly_mullow_KS(res, poly1, len1, poly2, len2, len, ctx);
+    return _mpn_mod_poly_mulmid_KS(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
 }
+
+int
+_mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+{
+    return _mpn_mod_poly_mulmid(res, poly1, len1, poly2, len2, 0, len, ctx);
+}
+
