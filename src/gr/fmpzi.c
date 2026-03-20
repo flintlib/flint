@@ -943,6 +943,27 @@ _gr_fmpzi_poly_mullow(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1
     }
 }
 
+static int
+_gr_fmpzi_poly_mulmid(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    if (len1 < MUL_REORDER_CUTOFF ||
+        len2 < MUL_REORDER_CUTOFF ||
+        FLINT_MIN(nhi, len1 + len2 - 1 - nlo) < MUL_REORDER_CUTOFF ||
+        2 * (nhi - nlo) < MUL_REORDER_CUTOFF)
+    {
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+    }
+    else
+    {
+        gr_ctx_t fmpz_ctx;
+        gr_ctx_init_fmpz(fmpz_ctx);
+        /* Not currently using Karatsuba because it's often worse if the real
+           and imaginary parts are even slightly unbalanced */
+        return _gr_poly_mulmid_complex_reorder(res, poly1, len1, poly2, len2, nlo, nhi, 0, ctx, fmpz_ctx);
+    }
+}
+
+
 /*
 int
 _gr_fmpzi_sgn(fmpzi_t res, const fmpzi_t x, const gr_ctx_t ctx)
@@ -1085,6 +1106,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpzi_vec_dot_rev},
 */
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpzi_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpzi_poly_mulmid},
 /*
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpzi_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpzi_mat_det},

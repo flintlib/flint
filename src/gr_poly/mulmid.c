@@ -28,6 +28,9 @@ _gr_poly_mulmid_generic(gr_ptr res,
        implement a good mullow, so fall back on that. */
     if (ctx->methods[GR_METHOD_POLY_MULLOW] != (gr_funcptr) _gr_poly_mullow_generic)
     {
+        if (nlo == 0)
+            return _gr_poly_mullow(res, poly1, len1, poly2, len2, nhi, ctx);
+
         gr_ptr tmp;
         slong sz = ctx->sizeof_elem;
         int status;

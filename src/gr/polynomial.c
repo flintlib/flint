@@ -737,6 +737,21 @@ _polynomial_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr po
     return _gr_poly_mullow_bivariate_KS(res, poly1, len1, poly2, len2, n, ctx);
 }
 
+static int
+_polynomial_gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+
+    if (len1 < MUL_KS_CUTOFF || len2 < MUL_KS_CUTOFF || nhi < MUL_KS_CUTOFF
+        || len1 + len2 - 1 - nlo < MUL_KS_CUTOFF || 2 * (nhi - nlo) < MUL_KS_CUTOFF)
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+
+    if (!want_KS(cctx, 0))
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+
+    return _gr_poly_mulmid_bivariate_KS(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
 
 int _gr_poly_methods_initialized = 0;
 
@@ -829,6 +844,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
 
     {GR_METHOD_FACTOR,      (gr_funcptr) polynomial_factor},
     {GR_METHOD_POLY_MULLOW, (gr_funcptr) _polynomial_gr_poly_mullow},
+    {GR_METHOD_POLY_MULMID, (gr_funcptr) _polynomial_gr_poly_mulmid},
 
     {0,                     (gr_funcptr) NULL},
 };

@@ -826,6 +826,16 @@ _gr_fmpz_poly_gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr 
         return _gr_poly_mullow_bivariate_KS(res, poly1, len1, poly2, len2, n, ctx);
 }
 
+static int
+_gr_fmpz_poly_gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    if (len1 < MUL_KS_CUTOFF || len2 < MUL_KS_CUTOFF || nhi < MUL_KS_CUTOFF
+        || len1 + len2 - 1 - nlo < MUL_KS_CUTOFF || 2 * (nhi - nlo) < MUL_KS_CUTOFF)
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+    else
+        return _gr_poly_mulmid_bivariate_KS(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
 
 int _fmpz_poly_methods_initialized = 0;
 
@@ -923,6 +933,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_CANONICAL_ASSOCIATE,  (gr_funcptr) _gr_fmpz_poly_canonical_associate},
     {GR_METHOD_FACTOR,          (gr_funcptr) _gr_fmpz_poly_factor},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_poly_gr_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_fmpz_poly_gr_poly_mulmid},
     {0,                         (gr_funcptr) NULL},
 };
 
