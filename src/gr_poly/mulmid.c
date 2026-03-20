@@ -12,17 +12,11 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-/* Todo: a reasonable generic implementation. Currently many rings
-   implement a good mullow, so fall back on that. */
 int
 _gr_poly_mulmid_generic(gr_ptr res,
     gr_srcptr poly1, slong len1,
     gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    gr_ptr tmp;
-    slong sz = ctx->sizeof_elem;
-    int status;
-
     FLINT_ASSERT(len1 != 0);
     FLINT_ASSERT(len2 != 0);
     FLINT_ASSERT(nhi != 0);
@@ -30,12 +24,25 @@ _gr_poly_mulmid_generic(gr_ptr res,
     FLINT_ASSERT(nlo >= 0);
     FLINT_ASSERT(nhi <= len1 + len2 - 1);
 
-    GR_TMP_INIT_VEC(tmp, nhi, ctx);
-    status = _gr_poly_mullow(tmp, poly1, len1, poly2, len2, nhi, ctx);
-    _gr_vec_swap(res, GR_ENTRY(tmp, nlo, sz), nhi - nlo, ctx);
-    GR_TMP_CLEAR_VEC(tmp, nhi, ctx);
+    /* Todo: a reasonable generic implementation. Currently many rings
+       implement a good mullow, so fall back on that. */
+    if (ctx->methods[GR_METHOD_POLY_MULLOW] != (gr_funcptr) _gr_poly_mullow_generic)
+    {
+        gr_ptr tmp;
+        slong sz = ctx->sizeof_elem;
+        int status;
 
-    return status;
+        GR_TMP_INIT_VEC(tmp, nhi, ctx);
+        status = _gr_poly_mullow(tmp, poly1, len1, poly2, len2, nhi, ctx);
+        _gr_vec_swap(res, GR_ENTRY(tmp, nlo, sz), nhi - nlo, ctx);
+        GR_TMP_CLEAR_VEC(tmp, nhi, ctx);
+
+        return status;
+    }
+    else
+    {
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+    }
 }
 
 int

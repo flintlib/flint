@@ -60,6 +60,7 @@
 #include "t-mullow_complex_reorder.c"
 #include "t-mullow_toom_serial.c"
 #include "t-mulmid.c"
+#include "t-mulmid_classical.c"
 #include "t-mulmod.c"
 #include "t-mulmod_preinv.c"
 #include "t-newton_basis.c"
@@ -145,6 +146,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_mullow_complex_reorder),
     TEST_FUNCTION(gr_poly_mullow_toom_serial),
     TEST_FUNCTION(gr_poly_mulmid),
+    TEST_FUNCTION(gr_poly_mulmid_classical),
     TEST_FUNCTION(gr_poly_mulmod),
     TEST_FUNCTION(gr_poly_mulmod_preinv),
     TEST_FUNCTION(gr_poly_newton_basis),
