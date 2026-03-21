@@ -183,20 +183,24 @@ Arithmetic
     by default, which currently always delegates to :func:`_gr_poly_mullow_classical`.
     This can be overridden by specific rings.
 
-.. function:: int _gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
-              int _gr_poly_mulmid_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+.. function:: int _gr_poly_mulmid_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+              int _gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
               int gr_poly_mulmid(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong nlo, slong nhi, gr_ctx_t ctx)
 
 Multiplication algorithms
 -------------------------------------------------------------------------------
 
-.. function:: int _gr_poly_mullow_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+.. function:: int _gr_poly_mulmid_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+              int gr_poly_mulmid_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+              int _gr_poly_mullow_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
               int gr_poly_mullow_classical(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 
     Multiply using the classical (schoolbook) algorithm, performing
     a sequence of dot products.
 
-.. function:: int _gr_poly_mullow_bivariate_KS(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+.. function:: int _gr_poly_mulmid_bivariate_KS(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+              int gr_poly_mulmid_bivariate_KS(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+              int _gr_poly_mullow_bivariate_KS(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
               int gr_poly_mullow_bivariate_KS(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 
     Assuming that the coefficients are polynomials of type ``gr_poly``,
@@ -204,7 +208,9 @@ Multiplication algorithms
     Kronecker substitution. Returns ``GR_UNABLE`` if the elements are not
     of type ``gr_poly``.
 
-.. function:: int _gr_poly_mullow_complex_reorder(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
+.. function:: int _gr_poly_mulmid_complex_reorder(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
+              int gr_poly_mulmid_complex_reorder(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong nlo, slong nhi, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
+              int _gr_poly_mullow_complex_reorder(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
               int gr_poly_mullow_complex_reorder(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
 
     Assuming that the coefficients of the polynomials of type ``ctx`` are
@@ -268,7 +274,6 @@ Multiplication algorithms
     the interpolation matrix is computed with a common denominator and this
     denominator is removed from the final result with an exact division.
 
-
     The suffix "serial" indicates that the evaluations are done one point at a time
     and that the output is constructed incrementally with the goal to minimize
     memory allocation. This implementation is therefore well suited for huge
@@ -279,6 +284,9 @@ Multiplication algorithms
     ring elements or integers for the evaluation and interpolation matrices.
 
     The underscore method requires positive lengths and does not support aliasing.
+
+Scalar arithmetic
+-------------------------------------------------------------------------------
 
 .. function:: int gr_poly_add_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_add_ui(gr_poly_t res, const gr_poly_t poly, ulong c, gr_ctx_t ctx)
@@ -1309,11 +1317,13 @@ polynomials up to length *maxn*. If *ctx* is set to ``NULL``, a random
 ring is generated on each test iteration, otherwise the given ring is used.
 
 .. function:: void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+              void _gr_poly_test_mulmid(gr_method_poly_binary_trunc_op mulmid_impl, gr_method_poly_binary_trunc_op mulmid_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 
-    Tests the given function ``mullow_impl`` for correctness as an implementation
-    of :func:`_gr_poly_mullow`. 
+    Tests the given function ``mullow_impl`` (``mulmid_impl``) for correctness as an implementation
+    of :func:`_gr_poly_mullow` (:func:`_gr_poly_mulmid`).
     A reference implementation to compare against can be provided as
-    ``mullow_ref``; if ``NULL``, classical multiplication is used.
+    ``mullow_ref`` (``mulmid_ref``); if ``NULL``, classical
+    multiplication is used.
 
 .. function:: void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 

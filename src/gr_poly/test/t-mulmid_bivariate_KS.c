@@ -13,14 +13,14 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-TEST_FUNCTION_START(gr_poly_mullow_bivariate_KS, state)
+TEST_FUNCTION_START(gr_poly_mulmid_bivariate_KS, state)
 {
     slong iter;
 
     for (iter = 0; iter < 10000; iter++)
     {
         gr_ctx_t ctx, ctx2;
-        slong n;
+        slong nlo, nhi;
         gr_poly_t A, B, C, D;
         int status = GR_SUCCESS;
         int aliasing = n_randint(state, 5);
@@ -48,7 +48,8 @@ TEST_FUNCTION_START(gr_poly_mullow_bivariate_KS, state)
         gr_poly_init(C, ctx);
         gr_poly_init(D, ctx);
 
-        n = n_randint(state, 6);
+        nlo = n_randint(state, 6);
+        nhi = n_randint(state, 6);
 
         GR_MUST_SUCCEED(gr_poly_randtest(A, state, 1 + n_randint(state, 6), ctx));
         GR_MUST_SUCCEED(gr_poly_randtest(B, state, 1 + n_randint(state, 6), ctx));
@@ -58,24 +59,24 @@ TEST_FUNCTION_START(gr_poly_mullow_bivariate_KS, state)
         switch (aliasing)
         {
             case 0:
-                status |= gr_poly_mullow_bivariate_KS(C, A, B, n, ctx);
+                status |= gr_poly_mulmid_bivariate_KS(C, A, B, nlo, nhi, ctx);
                 break;
             case 1:
                 status |= gr_poly_set(C, A, ctx);
-                status |= gr_poly_mullow_bivariate_KS(C, C, B, n, ctx);
+                status |= gr_poly_mulmid_bivariate_KS(C, C, B, nlo, nhi, ctx);
                 break;
             case 2:
                 status |= gr_poly_set(C, B, ctx);
-                status |= gr_poly_mullow_bivariate_KS(C, A, C, n, ctx);
+                status |= gr_poly_mulmid_bivariate_KS(C, A, C, nlo, nhi, ctx);
                 break;
             case 3:
                 status |= gr_poly_set(B, A, ctx);
-                status |= gr_poly_mullow_bivariate_KS(C, A, A, n, ctx);
+                status |= gr_poly_mulmid_bivariate_KS(C, A, A, nlo, nhi, ctx);
                 break;
             case 4:
                 status |= gr_poly_set(B, A, ctx);
                 status |= gr_poly_set(C, A, ctx);
-                status |= gr_poly_mullow_bivariate_KS(C, C, C, n, ctx);
+                status |= gr_poly_mulmid_bivariate_KS(C, C, C, nlo, nhi, ctx);
                 break;
 
             default:
@@ -84,12 +85,12 @@ TEST_FUNCTION_START(gr_poly_mullow_bivariate_KS, state)
 
         if (status == GR_SUCCESS)
         {
-            status |= gr_poly_mullow_classical(D, A, B, n, ctx);
+            status |= gr_poly_mulmid_classical(D, A, B, nlo, nhi, ctx);
 
             if (status == GR_SUCCESS && gr_poly_equal(C, D, ctx) == T_FALSE)
             {
                 flint_printf("FAIL\n\n");
-                flint_printf("aliasing = %d, n = %wd\n\n", aliasing, n);
+                flint_printf("aliasing = %d, nlo = %wd, nhi = %wd\n\n", aliasing, nlo, nhi);
                 gr_ctx_println(ctx);
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n\n");
                 flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n\n");

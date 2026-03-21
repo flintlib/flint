@@ -13,40 +13,70 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_mullow_classical(gr_ptr res,
+_gr_poly_mulmid_classical(gr_ptr res,
     gr_srcptr poly1, slong len1,
-    gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+    gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    int status;
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
 
-    if (n == 1)
+    FLINT_ASSERT(len1 != 0);
+    FLINT_ASSERT(len2 != 0);
+    FLINT_ASSERT(nhi != 0);
+    FLINT_ASSERT(nlo < nhi);
+    FLINT_ASSERT(nlo >= 0);
+    FLINT_ASSERT(nhi <= len1 + len2 - 1);
+
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 = GR_ENTRY(poly1, trunc, sz);
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 = GR_ENTRY(poly2, trunc, sz);
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
+    if (nhi == 1)
         return gr_mul(res, poly1, poly2, ctx);
 
     if (len1 == 1)
-        return _gr_scalar_mul_vec(res, poly1, poly2, n, ctx);
+        return _gr_scalar_mul_vec(res, poly1, GR_ENTRY(poly2, nlo, sz), nhi - nlo, ctx);
 
     if (len2 == 1)
-        return _gr_vec_mul_scalar(res, poly1, n, poly2, ctx);
+        return _gr_vec_mul_scalar(res, GR_ENTRY(poly1, nlo, sz), nhi - nlo, poly2, ctx);
+
+    res = GR_ENTRY(res, -nlo, sz);
 
     /* Squaring */
     /* fixme: only valid for commutative rings, but we also want squaring over
        ringlike structures, e.g. floats */
     if (poly1 == poly2 && len1 == len2 /* && gr_ctx_is_commutative_ring(ctx) == T_TRUE */)
     {
-        slong i, start, stop, sz;
-        sz = ctx->sizeof_elem;
-
-        status = GR_SUCCESS;
+        slong i, start, stop;
 
         /* todo: double, square, addmul */
 
-        status |= gr_sqr(res, poly1, ctx);
-        status |= gr_mul(GR_ENTRY(res, 1, sz), poly1, GR_ENTRY(poly1, 1, sz), ctx);
-        status |= gr_mul_two(GR_ENTRY(res, 1, sz), GR_ENTRY(res, 1, sz), ctx);
+        if (nlo == 0)
+            status |= gr_sqr(res, poly1, ctx);
 
-        for (i = 2; i < FLINT_MIN(n, 2 * len1 - 3); i++)
+        for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
         {
             start = FLINT_MAX(0, i - len1 + 1);
             stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -58,25 +88,19 @@ _gr_poly_mullow_classical(gr_ptr res,
                 status |= gr_addmul(GR_ENTRY(res, i, sz), GR_ENTRY(poly1, i / 2, sz), GR_ENTRY(poly1, i / 2, sz), ctx);
         }
 
-        if (len1 > 2 && n >= 2 * len1 - 2)
-        {
-            status |= gr_mul(GR_ENTRY(res, 2 * len1 - 3, sz), GR_ENTRY(poly1, len1 - 1, sz), GR_ENTRY(poly1, len1 - 2, sz), ctx);
-            status |= gr_mul_two(GR_ENTRY(res, 2 * len1 - 3, sz), GR_ENTRY(res, 2 * len1 - 3, sz), ctx);
-        }
-
-        if (n >= 2 * len1 - 1)
+        if (nhi >= 2 * len1 - 1)
             status |= gr_sqr(GR_ENTRY(res, 2 * len1 - 2, sz), GR_ENTRY(poly1, len1 - 1, sz), ctx);
 
         return status;
     }
     else
     {
-        slong i, top1, top2, sz;
-        sz = ctx->sizeof_elem;
+        slong i, top1, top2;
 
-        status = gr_mul(res, poly1, poly2, ctx);
+        if (nlo == 0)
+            status = gr_mul(res, poly1, poly2, ctx);
 
-        for (i = 1; i < n; i++)
+        for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, len1 + len2 - 2); i++)
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
@@ -84,9 +108,51 @@ _gr_poly_mullow_classical(gr_ptr res,
             status |= _gr_vec_dot_rev(GR_ENTRY(res, i, sz), NULL, 0, GR_ENTRY(poly1, i - top2, sz), GR_ENTRY(poly2, i - top1, sz), top1 + top2 - i + 1, ctx);
         }
 
+        if (nhi >= len1 + len2 - 1)
+            status |= gr_mul(GR_ENTRY(res, len1 + len2 - 2, sz), GR_ENTRY(poly1, len1 - 1, sz), GR_ENTRY(poly2, len2 - 1, sz), ctx);
+
         return status;
     }
 }
+
+int
+gr_poly_mulmid_classical(gr_poly_t res, const gr_poly_t poly1,
+                                            const gr_poly_t poly2,
+                                                slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    int status;
+    slong len;
+
+    FLINT_ASSERT(nlo >= 0);
+    FLINT_ASSERT(nhi >= 0);
+
+    if (len1 == 0 || len2 == 0 || nlo >= FLINT_MIN(nhi, len1 + len2 - 1))
+        return gr_poly_zero(res, ctx);
+
+    nhi = FLINT_MIN(nhi, len1 + len2 - 1);
+    len = nhi - nlo;
+
+    if (res == poly1 || res == poly2)
+    {
+        gr_poly_t t;
+        gr_poly_init2(t, len, ctx);
+        status = _gr_poly_mulmid_classical(t->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, nlo, nhi, ctx);
+        gr_poly_swap(res, t, ctx);
+        gr_poly_clear(t, ctx);
+    }
+    else
+    {
+        gr_poly_fit_length(res, len, ctx);
+        status = _gr_poly_mulmid_classical(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, nlo, nhi, ctx);
+    }
+
+    _gr_poly_set_length(res, len, ctx);
+    _gr_poly_normalise(res, ctx);
+    return status;
+}
+
 
 int
 gr_poly_mullow_classical(gr_poly_t res, const gr_poly_t poly1,
