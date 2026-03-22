@@ -19,7 +19,7 @@ TEST_GR_FUNCTION_START(gr_mat_gr_poly_solve_lode_newton, state, count_success, c
 {
     slong iter;
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t ctx, poly_ctx;
         gr_mat_t A_numerator, Y, Y0, AY, err, tmp_mat;

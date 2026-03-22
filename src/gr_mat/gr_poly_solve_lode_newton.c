@@ -13,6 +13,66 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
+static int
+gr_mat_gr_poly_shift_left(gr_mat_t res, gr_mat_t A, slong s, gr_ctx_t poly_ctx)
+{
+    int status = GR_SUCCESS;
+    gr_ctx_struct *coeff_ctx = POLYNOMIAL_CTX(poly_ctx)->base_ring;
+
+    for (slong i = 0; i < A->r; i++)
+    {
+        for (slong j = 0; j < A->c; j++)
+        {
+            gr_srcptr entry_A = gr_mat_entry_srcptr(A, i, j, poly_ctx);
+            gr_ptr entry_res = gr_mat_entry_ptr(res, i, j, poly_ctx);
+
+            status |= gr_poly_shift_left(entry_res, entry_A, s, coeff_ctx);
+        }
+    }
+
+    return status;
+}
+
+static int
+gr_mat_gr_poly_shift_right(gr_mat_t res, gr_mat_t A, slong s, gr_ctx_t poly_ctx)
+{
+    int status = GR_SUCCESS;
+    gr_ctx_struct *coeff_ctx = POLYNOMIAL_CTX(poly_ctx)->base_ring;
+
+    for (slong i = 0; i < A->r; i++)
+    {
+        for (slong j = 0; j < A->c; j++)
+        {
+            gr_srcptr entry_A = gr_mat_entry_srcptr(A, i, j, poly_ctx);
+            gr_ptr entry_res = gr_mat_entry_ptr(res, i, j, poly_ctx);
+
+            status |= gr_poly_shift_right(entry_res, entry_A, s, coeff_ctx);
+        }
+    }
+
+    return status;
+}
+
+static int
+gr_mat_gr_poly_truncate(gr_mat_t res, gr_mat_t A, slong n, gr_ctx_t poly_ctx)
+{
+    int status = GR_SUCCESS;
+    gr_ctx_struct *coeff_ctx = POLYNOMIAL_CTX(poly_ctx)->base_ring;
+
+    for (slong i = 0; i < A->r; i++)
+    {
+        for (slong j = 0; j < A->c; j++)
+        {
+            gr_srcptr entry_A = gr_mat_entry_srcptr(A, i, j, poly_ctx);
+            gr_ptr entry_res = gr_mat_entry_ptr(res, i, j, poly_ctx);
+
+            status |= gr_poly_truncate(entry_res, entry_A, n, coeff_ctx);
+        }
+    }
+
+    return status;
+}
+
 /*
  * This is a FLINT implementation of the algorithm described in:
  * Fast computation of power series solutions of systems of differential equations
@@ -36,7 +96,7 @@
  * [ a b c d ]   [ b30 b31 b32 b33 ]   [ ... ... ... ... ]
  */
 static int
-gr_mat_gr_poly_mullow_companion(gr_mat_t res, gr_mat_t A, gr_mat_t B, slong len, gr_ctx_t poly_ctx)
+gr_mat_gr_poly_mulmid_companion(gr_mat_t res, gr_mat_t A, gr_mat_t B, slong nlo, slong nhi, gr_ctx_t poly_ctx)
 {
     gr_ctx_struct *coeff_ctx = POLYNOMIAL_CTX(poly_ctx)->base_ring;
     gr_mat_t tmp_mat;
@@ -46,25 +106,27 @@ gr_mat_gr_poly_mullow_companion(gr_mat_t res, gr_mat_t A, gr_mat_t B, slong len,
     gr_mat_init(tmp_mat, A->r, A->c, poly_ctx);
     gr_poly_init(tmp_poly, coeff_ctx);
 
-    status |= gr_mat_zero(tmp_mat, poly_ctx);
-    for (int i = 0; i < A->r - 1; i++)
+    for (slong i = 0; i < A->r - 1; i++)
     {
-        for (int j = 0; j < A->c; j++)
+        for (slong j = 0; j < A->c; j++)
         {
             gr_srcptr entry_B = gr_mat_entry_srcptr(B, i + 1, j, poly_ctx);
             gr_ptr entry_tmp = gr_mat_entry_ptr(tmp_mat, i, j, poly_ctx);
-            status |= gr_poly_set(entry_tmp, entry_B, coeff_ctx);
+
+            status |= gr_poly_shift_right(entry_tmp, entry_B, nlo, coeff_ctx);
         }
     }
 
-    for (int j = 0; j < A->c; j++)
+    for (slong j = 0; j < A->c; j++)
     {
         gr_ptr entry_tmp = gr_mat_entry_ptr(tmp_mat, A->r - 1, j, poly_ctx);
-        for (int i = 0; i < B->r; i++)
+
+        for (slong i = 0; i < B->r; i++)
         {
             gr_srcptr entry_A = gr_mat_entry_srcptr(A, A->r - 1, i, poly_ctx);
             gr_srcptr entry_B = gr_mat_entry_srcptr(B, i, j, poly_ctx);
-            status |= gr_poly_mullow(tmp_poly, entry_A, entry_B, len, coeff_ctx);
+
+            status |= gr_poly_mulmid(tmp_poly, entry_A, entry_B, nlo, nhi, coeff_ctx);
             status |= gr_poly_add(entry_tmp, entry_tmp, tmp_poly, coeff_ctx);
         }
     }
@@ -134,8 +196,7 @@ _gr_mat_gr_poly_solve_lode_newton_start(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_deno
     /* One initial iteration for A_denominator_inv mod z^2. */
     m = 2;
     status |= gr_poly_truncate(tmp_poly, A_denominator, m, sol_coeff_ctx);
-    status |= gr_poly_mullow(tmp_poly, tmp_poly, A_denominator_inv, m, sol_coeff_ctx);
-    status |= gr_poly_shift_right(tmp_poly, tmp_poly, m / 2, sol_coeff_ctx);
+    status |= gr_poly_mulmid(tmp_poly, tmp_poly, A_denominator_inv, m / 2, m, sol_coeff_ctx);
     status |= gr_poly_mullow(tmp_poly, tmp_poly, A_denominator_inv, m / 2, sol_coeff_ctx);
     status |= gr_poly_shift_left(tmp_poly, tmp_poly, m / 2, sol_coeff_ctx);
     status |= gr_poly_sub(A_denominator_inv, A_denominator_inv, tmp_poly, sol_coeff_ctx);
@@ -164,29 +225,23 @@ _gr_mat_gr_poly_solve_lode_newton_step(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denom
     /* Z = Z + (Z*(I - Y*Z) mod z^m) */
     status |= gr_mat_mul(tmp_mat, Y, Z, sol_poly_ctx);
     status |= gr_mat_sub_ui(tmp_mat, tmp_mat, 1, sol_poly_ctx);
+    /* Todo: should be mullow */
     status |= gr_mat_mul(tmp_mat, Z, tmp_mat, sol_poly_ctx);
-    for (i = 0; i < tmp_mat->r; i++)
-    {
-        for (j = 0; j < tmp_mat->c; j++)
-        {
-            gr_ptr entry_tmp = gr_mat_entry_ptr(tmp_mat, i, j, sol_poly_ctx);
-            status |= gr_poly_truncate(entry_tmp, entry_tmp, m, sol_coeff_ctx);
-        }
-    }
+    status |= gr_mat_gr_poly_truncate(tmp_mat, tmp_mat, m, sol_poly_ctx);
     status |= gr_mat_sub(Z, Z, tmp_mat, sol_poly_ctx);
 
     /* Iteration for A_denominator_inv mod z^len. */
-    status |= gr_poly_truncate(tmp_poly, A_denominator, len, sol_coeff_ctx);
-    /* TODO: Use middle product here? */
-    status |= gr_poly_mullow(tmp_poly, tmp_poly, A_denominator_inv, len, sol_coeff_ctx);
-    status |= gr_poly_shift_right(tmp_poly, tmp_poly, m, sol_coeff_ctx);
+    status |= gr_poly_mulmid(tmp_poly, A_denominator, A_denominator_inv, m, len, sol_coeff_ctx);
     status |= gr_poly_mullow(tmp_poly, tmp_poly, A_denominator_inv, m, sol_coeff_ctx);
     status |= gr_poly_shift_left(tmp_poly, tmp_poly, m, sol_coeff_ctx);
+
     status |= gr_poly_sub(A_denominator_inv, A_denominator_inv, tmp_poly, sol_coeff_ctx);
 
     /* Next we are going to set Err = Y' - (A mod z^{len - 1})*Y mod z^{len - 1} in a few steps. */
+    /* The m-1 low coefficients of Err are zero by construction, so we actually
+       compute Err divided by x^(m-1). */
 
-    /* tmp_mat = (A mod z^{len - 1})*Y */
+    /* tmp_mat = (A mod z^{len - 1})*Y    (divided by x^(m-1)) */
     for (i = 0; i < Y->r; i++)
     {
         for (j = 0; j < Y->c; j++)
@@ -197,24 +252,41 @@ _gr_mat_gr_poly_solve_lode_newton_step(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denom
         }
     }
     if (A_is_companion)
-        status |= gr_mat_gr_poly_mullow_companion(tmp_mat, tmp_mat, Y, len - 1, sol_poly_ctx);
+    {
+        status |= gr_mat_gr_poly_mulmid_companion(tmp_mat, tmp_mat, Y, m - 1, len - 1, sol_poly_ctx);
+    }
     else
+    {
+        /* Todo: should be mulmid */
         status |= gr_mat_mul(tmp_mat, tmp_mat, Y, sol_poly_ctx);
+        status |= gr_mat_gr_poly_truncate(tmp_mat, tmp_mat, len - 1, sol_poly_ctx);
+        status |= gr_mat_gr_poly_shift_right(tmp_mat, tmp_mat, m - 1, sol_poly_ctx);
+    }
 
-    /* Err = Y' - tmp_mat */
+    /* Err = Y' - tmp_mat   (divided by x^(m-1)) */
     for (i = 0; i < Y->r; i++)
     {
         for (j = 0; j < Y->c; j++)
         {
             gr_srcptr entry_Y = gr_mat_entry_srcptr(Y, i, j, sol_poly_ctx);
             gr_ptr entry_Err = gr_mat_entry_ptr(Err, i, j, sol_poly_ctx);
+            /* Todo: compute only the high part of the derivative */
             status |= gr_poly_derivative(entry_Err, entry_Y, sol_coeff_ctx);
+            status |= gr_poly_shift_right(entry_Err, entry_Err, m - 1, sol_coeff_ctx);
         }
+
     }
     status |= gr_mat_sub(Err, Err, tmp_mat, sol_poly_ctx);
 
     /* Y = Y - (Y*integral(Z*Err) mod z^len) */
+    /* Todo: should be mullow */
     status |= gr_mat_mul(tmp_mat, Z, Err, sol_poly_ctx);
+    status |= gr_mat_gr_poly_truncate(tmp_mat, tmp_mat, len - m, sol_poly_ctx);
+
+    /* Err was implicitly divided x^(m-1), so restore it to compute the integral */
+    /* Todo: avoid the following explicit shifts; compute just the high
+             part of the integral */
+    status |= gr_mat_gr_poly_shift_left(tmp_mat, tmp_mat, m - 1, sol_poly_ctx);
     for (i = 0; i < Y->r; i++)
     {
         for (j = 0; j < Y->c; j++)
@@ -223,15 +295,12 @@ _gr_mat_gr_poly_solve_lode_newton_step(gr_mat_t Y, gr_mat_t Z, gr_poly_t A_denom
             status |= gr_poly_integral(entry_tmp, entry_tmp, sol_coeff_ctx);
         }
     }
+    status |= gr_mat_gr_poly_shift_right(tmp_mat, tmp_mat, m, sol_poly_ctx);
+
+    /* Todo: should be mullow */
     status |= gr_mat_mul(tmp_mat, Y, tmp_mat, sol_poly_ctx);
-    for (i = 0; i < tmp_mat->r; i++)
-    {
-        for (j = 0; j < tmp_mat->c; j++)
-        {
-            gr_ptr entry_tmp = gr_mat_entry_ptr(tmp_mat, i, j, sol_poly_ctx);
-            status |= gr_poly_truncate(entry_tmp, entry_tmp, len, sol_coeff_ctx);
-        }
-    }
+    status |= gr_mat_gr_poly_truncate(tmp_mat, tmp_mat, len - m, sol_poly_ctx);
+    status |= gr_mat_gr_poly_shift_left(tmp_mat, tmp_mat, m, sol_poly_ctx);
     status |= gr_mat_sub(Y, Y, tmp_mat, sol_poly_ctx);
 
     gr_poly_clear(tmp_poly, sol_coeff_ctx);
