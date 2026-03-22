@@ -1210,19 +1210,45 @@ _gr_nmod_redc_fast_vec_dot_rev(ulong * res, const ulong * initial, int subtract,
 }
 
 static int
-_gr_nmod_redc_poly_mullow(ulong * res,
+_gr_nmod_redc_poly_mulmid(ulong * res,
     const ulong * poly1, slong len1,
-    const ulong * poly2, slong len2, slong n, gr_ctx_t ctx)
+    const ulong * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     slong i, j, m, n1, n2;
 
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
     m = FLINT_MIN(len1, len2);
 
-    if (m < NMOD_REDC_DOT_CUTOFF)
+    if (m < NMOD_REDC_DOT_CUTOFF || nhi - nlo < NMOD_REDC_DOT_CUTOFF)
     {
         ulong nbits, sbits;
+
+        res -= nlo;
 
         nbits = NMOD_BITS(GR_NMOD_REDC_MOD(ctx));
         sbits = 2 * (nbits + 1) + FLINT_BIT_COUNT(m);
@@ -1231,13 +1257,14 @@ _gr_nmod_redc_poly_mullow(ulong * res,
         {
             ulong cc;
 
-            res[0] = nmod_redc_mul(poly1[0], poly1[0], GR_NMOD_REDC_CTX(ctx));
+            if (nlo == 0)
+                res[0] = nmod_redc_mul(poly1[0], poly1[0], GR_NMOD_REDC_CTX(ctx));
 
             /* todo: avoid the extra reductions */
 
             if (sbits < FLINT_BITS + nbits)
             {
-                for (i = 1; i < FLINT_MIN(n, 2 * len1 - 2); i++)
+                for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
                 {
                     n1 = FLINT_MAX(0, i - len1 + 1);
                     n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -1252,7 +1279,7 @@ _gr_nmod_redc_poly_mullow(ulong * res,
             }
             else if (sbits <= 2 * FLINT_BITS)
             {
-                for (i = 1; i < FLINT_MIN(n, 2 * len1 - 2); i++)
+                for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
                 {
                     n1 = FLINT_MAX(0, i - len1 + 1);
                     n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -1267,7 +1294,7 @@ _gr_nmod_redc_poly_mullow(ulong * res,
             }
             else
             {
-                for (i = 1; i < FLINT_MIN(n, 2 * len1 - 2); i++)
+                for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
                 {
                     n1 = FLINT_MAX(0, i - len1 + 1);
                     n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -1281,14 +1308,14 @@ _gr_nmod_redc_poly_mullow(ulong * res,
                 }
             }
 
-            if (n >= 2 * len1 - 1)
+            if (nhi >= 2 * len1 - 1)
                 res[2 * len1 - 2] = nmod_redc_mul(poly1[len1 - 1], poly1[len1 - 1], GR_NMOD_REDC_CTX(ctx));
         }
         else
         {
             if (sbits < FLINT_BITS + nbits)
             {
-                for (i = 0; i < n; i++)
+                for (i = nlo; i < nhi; i++)
                 {
                     n1 = FLINT_MIN(len1 - 1, i);
                     n2 = FLINT_MIN(len2 - 1, i);
@@ -1297,7 +1324,7 @@ _gr_nmod_redc_poly_mullow(ulong * res,
             }
             else if (sbits <= 2 * FLINT_BITS)
             {
-                for (i = 0; i < n; i++)
+                for (i = nlo; i < nhi; i++)
                 {
                     n1 = FLINT_MIN(len1 - 1, i);
                     n2 = FLINT_MIN(len2 - 1, i);
@@ -1306,7 +1333,7 @@ _gr_nmod_redc_poly_mullow(ulong * res,
             }
             else
             {
-                for (i = 0; i < n; i++)
+                for (i = nlo; i < nhi; i++)
                 {
                     n1 = FLINT_MIN(len1 - 1, i);
                     n2 = FLINT_MIN(len2 - 1, i);
@@ -1318,7 +1345,7 @@ _gr_nmod_redc_poly_mullow(ulong * res,
         return GR_SUCCESS;
     }
 
-    if (len1 + len2 - 1 == n)
+    if (nlo == 0 && len1 + len2 - 1 == nhi)
     {
         if (len1 >= len2)
             _nmod_poly_mul(res, poly1, len1, poly2, len2, GR_NMOD_REDC_MOD(ctx));
@@ -1327,48 +1354,80 @@ _gr_nmod_redc_poly_mullow(ulong * res,
     }
     else
     {
-        if (len1 >= len2)
-            _nmod_poly_mullow(res, poly1, len1, poly2, len2, n, GR_NMOD_REDC_MOD(ctx));
-        else
-            _nmod_poly_mullow(res, poly2, len2, poly1, len1, n, GR_NMOD_REDC_MOD(ctx));
+        _nmod_poly_mulmid(res, poly1, len1, poly2, len2, nlo, nhi, GR_NMOD_REDC_MOD(ctx));
     }
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < nhi - nlo; i++)
         res[i] = nmod_redc_get_nmod(res[i], GR_NMOD_REDC_CTX(ctx));
 
     return GR_SUCCESS;
 }
 
 static int
-_gr_nmod_redc_fast_poly_mullow(ulong * res,
+_gr_nmod_redc_poly_mullow(ulong * res,
     const ulong * poly1, slong len1,
     const ulong * poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_nmod_redc_poly_mulmid(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
+static int
+_gr_nmod_redc_fast_poly_mulmid(ulong * res,
+    const ulong * poly1, slong len1,
+    const ulong * poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     nn_ptr t1, t2;
     slong i, j, m, n1, n2, alloc;
 
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
     m = FLINT_MIN(len1, len2);
 
-    if (m < NMOD_REDC_DOT_CUTOFF)
+    if (m < NMOD_REDC_DOT_CUTOFF || nhi - nlo < NMOD_REDC_DOT_CUTOFF)
     {
         ulong nbits, sbits;
 
         nbits = NMOD_BITS(GR_NMOD_REDC_MOD(ctx));
         sbits = 2 * (nbits + 1) + FLINT_BIT_COUNT(m);
 
+        res -= nlo;
+
         if (poly1 == poly2 && len1 == len2)
         {
             ulong cc;
 
-            res[0] = nmod_redc_fast_mul(poly1[0], poly1[0], GR_NMOD_REDC_CTX(ctx));
+            if (nlo == 0)
+                res[0] = nmod_redc_fast_mul(poly1[0], poly1[0], GR_NMOD_REDC_CTX(ctx));
 
             /* todo: avoid the extra reductions */
 
             if (sbits < FLINT_BITS + nbits)
             {
-                for (i = 1; i < FLINT_MIN(n, 2 * len1 - 2); i++)
+                for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
                 {
                     n1 = FLINT_MAX(0, i - len1 + 1);
                     n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -1383,7 +1442,7 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
             }
             else if (sbits <= 2 * FLINT_BITS)
             {
-                for (i = 1; i < FLINT_MIN(n, 2 * len1 - 2); i++)
+                for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
                 {
                     n1 = FLINT_MAX(0, i - len1 + 1);
                     n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -1398,7 +1457,7 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
             }
             else
             {
-                for (i = 1; i < FLINT_MIN(n, 2 * len1 - 2); i++)
+                for (i = FLINT_MAX(1, nlo); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
                 {
                     n1 = FLINT_MAX(0, i - len1 + 1);
                     n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -1412,14 +1471,14 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
                 }
             }
 
-            if (n >= 2 * len1 - 1)
+            if (nhi >= 2 * len1 - 1)
                 res[2 * len1 - 2] = nmod_redc_fast_mul(poly1[len1 - 1], poly1[len1 - 1], GR_NMOD_REDC_CTX(ctx));
         }
         else
         {
             if (sbits < FLINT_BITS + nbits)
             {
-                for (i = 0; i < n; i++)
+                for (i = nlo; i < nhi; i++)
                 {
                     n1 = FLINT_MIN(len1 - 1, i);
                     n2 = FLINT_MIN(len2 - 1, i);
@@ -1428,7 +1487,7 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
             }
             else if (sbits <= 2 * FLINT_BITS)
             {
-                for (i = 0; i < n; i++)
+                for (i = nlo; i < nhi; i++)
                 {
                     n1 = FLINT_MIN(len1 - 1, i);
                     n2 = FLINT_MIN(len2 - 1, i);
@@ -1437,7 +1496,7 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
             }
             else
             {
-                for (i = 0; i < n; i++)
+                for (i = nlo; i < nhi; i++)
                 {
                     n1 = FLINT_MIN(len1 - 1, i);
                     n2 = FLINT_MIN(len2 - 1, i);
@@ -1451,25 +1510,20 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
 
     if (poly1 == poly2 && len1 == len2)
     {
-        len1 = FLINT_MIN(len1, n);
         alloc = len1;
-
         t1 = GR_TMP_ALLOC(alloc * sizeof(ulong));
 
         for (i = 0; i < len1; i++)
             t1[i] = nmod_redc_fast_normalise(poly1[i], GR_NMOD_REDC_CTX(ctx));
 
-        if (len1 + len2 - 1 == n)
+        if (nlo == 0 && len1 + len2 - 1 == nhi)
             _nmod_poly_mul(res, t1, len1, t1, len1, GR_NMOD_REDC_MOD(ctx));
         else
-            _nmod_poly_mullow(res, t1, len1, t1, len1, n, GR_NMOD_REDC_MOD(ctx));
+            _nmod_poly_mulmid(res, t1, len1, t1, len1, nlo, nhi, GR_NMOD_REDC_MOD(ctx));
     }
     else
     {
-        len1 = FLINT_MIN(len1, n);
-        len2 = FLINT_MIN(len2, n);
         alloc = len1 + len2;
-
         t1 = GR_TMP_ALLOC(alloc * sizeof(ulong));
         t2 = t1 + len1;
 
@@ -1478,7 +1532,7 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
         for (i = 0; i < len2; i++)
             t2[i] = nmod_redc_fast_normalise(poly2[i], GR_NMOD_REDC_CTX(ctx));
 
-        if (len1 + len2 - 1 == n)
+        if (nlo == 0 && len1 + len2 - 1 == nhi)
         {
             if (len1 >= len2)
                 _nmod_poly_mul(res, t1, len1, t2, len2, GR_NMOD_REDC_MOD(ctx));
@@ -1487,20 +1541,26 @@ _gr_nmod_redc_fast_poly_mullow(ulong * res,
         }
         else
         {
-            if (len1 >= len2)
-                _nmod_poly_mullow(res, t1, len1, t2, len2, n, GR_NMOD_REDC_MOD(ctx));
-            else
-                _nmod_poly_mullow(res, t2, len2, t1, len1, n, GR_NMOD_REDC_MOD(ctx));
+            _nmod_poly_mulmid(res, t1, len1, t2, len2, nlo, nhi, GR_NMOD_REDC_MOD(ctx));
         }
     }
 
-    for (i = 0; i < n; i++)
+    for (i = 0; i < nhi - nlo; i++)
         res[i] = nmod_redc_get_nmod(res[i], GR_NMOD_REDC_CTX(ctx));
 
     GR_TMP_FREE(t1, alloc * sizeof(ulong));
 
     return GR_SUCCESS;
 }
+
+static int
+_gr_nmod_redc_fast_poly_mullow(ulong * res,
+    const ulong * poly1, slong len1,
+    const ulong * poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_nmod_redc_fast_poly_mulmid(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
 
 static void _nmod_redc_fast_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
                           nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
@@ -1732,6 +1792,7 @@ gr_method_tab_input __gr_nmod_redc_methods_input[] =
     {GR_METHOD_VEC_RECIPROCALS, GR_FUNCPTR_CAST _gr_nmod_redc_vec_reciprocals},
 */
     {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_mulmid},
 /*
     {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_poly_divrem},
 */
@@ -1783,6 +1844,7 @@ gr_method_tab_input __gr_nmod_redc_fast_methods_input[] =
     {GR_METHOD_VEC_DOT,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_divrem},
     {0,                         GR_FUNCPTR_CAST NULL},
 };
