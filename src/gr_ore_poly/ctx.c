@@ -89,6 +89,22 @@ int _gr_ore_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return _gr_ore_poly_ctx_set_gen_name(ctx, s[0]);
 }
 
+static int
+_gr_ore_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
+{
+    if (i != 0)
+        return GR_DOMAIN;
+
+    char * var = GR_ORE_POLY_CTX(ctx)->var;
+    size_t len = strlen(var);
+    * name = flint_malloc(len + 1);
+    if (* name == NULL)
+        return GR_UNABLE;
+    strncpy(* name, var, len + 1);
+
+    return GR_SUCCESS;
+}
+
 void
 gr_ore_poly_ctx_clear(gr_ore_poly_ctx_t ctx)
 {
@@ -135,7 +151,7 @@ gr_ore_poly_ctx_is_integral_domain(gr_ore_poly_ctx_t ctx)
     return T_UNKNOWN;
 }
 
-truth_t
+static truth_t
 gr_ore_poly_ctx_is_unique_factorization_domain(gr_ore_poly_ctx_t ctx)
 {
     return T_UNKNOWN;
@@ -147,7 +163,7 @@ gr_ore_poly_ctx_is_threadsafe(gr_ore_poly_ctx_t ctx)
     return gr_ctx_is_threadsafe(GR_ORE_POLY_ELEM_CTX(ctx));
 }
 
-int
+static int
 ore_poly_write(gr_stream_t out, gr_ore_poly_t poly, gr_ctx_t ctx)
 {
     /* todo */
@@ -160,7 +176,7 @@ ore_poly_write(gr_stream_t out, gr_ore_poly_t poly, gr_ctx_t ctx)
     return gr_ore_poly_write(out, poly, ctx);
 }
 
-int
+static int
 gr_ore_poly_i(gr_ore_poly_t res, gr_ore_poly_ctx_t ctx)
 {
     int status;
@@ -217,6 +233,8 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_ore_poly_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_ore_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_ore_poly_ctx_set_gen_names},
+    {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_1},
+    {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_ore_poly_ctx_gen_name},
 
     {GR_METHOD_INIT,        (gr_funcptr) gr_ore_poly_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_ore_poly_clear},
@@ -290,7 +308,7 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-void
+static void
 _gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, const ore_algebra_t which_algebra)
 {
     ctx->which_ring = GR_CTX_GR_ORE_POLY;
