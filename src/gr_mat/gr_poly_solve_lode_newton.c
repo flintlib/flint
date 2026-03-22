@@ -114,6 +114,7 @@ gr_mat_gr_poly_mulmid_companion(gr_mat_t res, gr_mat_t A, gr_mat_t B, slong nlo,
             gr_ptr entry_tmp = gr_mat_entry_ptr(tmp_mat, i, j, poly_ctx);
 
             status |= gr_poly_shift_right(entry_tmp, entry_B, nlo, coeff_ctx);
+            status |= gr_poly_truncate(entry_tmp, entry_tmp, nhi - nlo, coeff_ctx);
         }
     }
 
