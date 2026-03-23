@@ -549,25 +549,50 @@ _nmod32_vec_submul_scalar(uint32_t * res, const uint32_t * vec, slong len, const
 }
 
 static int
-_nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32_t * B, slong Blen, slong trunc, gr_ctx_t ctx)
+_nmod32_poly_mulmid(uint32_t * res, const uint32_t * A, slong Alen, const uint32_t * B, slong Blen, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     nn_ptr TR, TA, TB;
-    slong i, alloc;
+    slong i, alloc, len;
     int squaring;
 
-    Alen = FLINT_MIN(Alen, trunc);
-    Blen = FLINT_MIN(Blen, trunc);
+    Alen = FLINT_MIN(Alen, nhi);
+    Blen = FLINT_MIN(Blen, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (Alen + Blen - 1) - nlo;
+
+        if (Alen > nlo2)
+        {
+            slong trunc = Alen - nlo2;
+            A += trunc;
+            Alen -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (Blen > nlo2)
+        {
+            slong trunc = Blen - nlo2;
+            B += trunc;
+            Blen -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
+    len = nhi - nlo;
 
     /* todo: tune this */
-    if (Alen < 10 || Blen < 10)
-        return _gr_poly_mullow_classical(res, A, Alen, B, Blen, trunc, ctx);
+    if (Alen < 10 || Blen < 10 || len < 10)
+        return _gr_poly_mulmid_classical(res, A, Alen, B, Blen, nlo, nhi, ctx);
 
     squaring = (A == B) && (Alen == Blen);
 
-    alloc = squaring ? (Alen + trunc) : (Alen + Blen + trunc);
+    alloc = squaring ? (Alen + len) : (Alen + Blen + len);
     alloc *= sizeof(ulong);
     TR = GR_TMP_ALLOC(alloc);
-    TA = TR + trunc;
+    TA = TR + len;
     TB = TA + Alen;
 
     for (i = 0; i < Alen; i++)
@@ -575,24 +600,27 @@ _nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32
 
     if (squaring)
     {
-        _nmod_poly_mullow(TR, TA, Alen, TA, Alen, trunc, NMOD32_CTX(ctx));
+        _nmod_poly_mulmid(TR, TA, Alen, TA, Alen, nlo, nhi, NMOD32_CTX(ctx));
     }
     else
     {
         for (i = 0; i < Blen; i++)
             TB[i] = B[i];
 
-        if (Alen >= Blen)
-            _nmod_poly_mullow(TR, TA, Alen, TB, Blen, trunc, NMOD32_CTX(ctx));
-        else
-            _nmod_poly_mullow(TR, TB, Blen, TA, Alen, trunc, NMOD32_CTX(ctx));
+        _nmod_poly_mulmid(TR, TA, Alen, TB, Blen, nlo, nhi, NMOD32_CTX(ctx));
     }
 
-    for (i = 0; i < trunc; i++)
+    for (i = 0; i < len; i++)
         res[i] = TR[i];
 
     GR_TMP_FREE(TR, alloc);
     return GR_SUCCESS;
+}
+
+static int
+_nmod32_poly_mullow(uint32_t * res, const uint32_t * A, slong Alen, const uint32_t * B, slong Blen, slong len, gr_ctx_t ctx)
+{
+    return _nmod32_poly_mulmid(res, A, Alen, B, Blen, 0, len, ctx);
 }
 
 /* todo: tuning for rectangular matrices */
@@ -672,6 +700,7 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_VEC_ADDMUL_SCALAR,  (gr_funcptr) _nmod32_vec_addmul_scalar},
     {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod32_vec_submul_scalar},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod32_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod32_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},
     {0,                         (gr_funcptr) NULL},
 };
