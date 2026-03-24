@@ -12,7 +12,7 @@
 #include <ctype.h> /* isdigit */
 #include <stdint.h> /* intmax_t */
 #include <stdio.h>
-#include <string.h> /* memcpy, memcmp and strchr */
+#include <string.h> /* memcpy, strncmp and strchr */
 #include <stdarg.h>
 #include <wchar.h> /* wchar_t and wint_t */
 #include "nmod_types.h"

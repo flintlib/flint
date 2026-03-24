@@ -188,8 +188,8 @@ static size_t __flint_poly_print(FLINT_VPRINTF_OUT_T *, const void *, flint_type
 
 /* TODO: Add options for compact/spacious printing. */
 
-#define IS_FLINT_BASE_TYPE(ip, str) (memcmp(ip, str, sizeof(str) - sizeof(char)) == 0)
-#define IS_FLINT_TYPE(ip, str) (memcmp(ip, str "}", sizeof(str)) == 0)
+#define IS_FLINT_BASE_TYPE(ip, str) (strncmp(ip, str, STRING_LENGTH(str)) == 0)
+#define IS_FLINT_TYPE(ip, str) (strncmp(ip, str "}", STRING_LENGTH(str) + 1) == 0)
 
 /* Reference used for checks: https://en.cppreference.com/w/c/io/fprintf */
 #define IS_PRINTF_FLAG(chr) \
