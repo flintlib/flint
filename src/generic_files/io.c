@@ -12,7 +12,7 @@
 #include <ctype.h> /* isdigit */
 #include <stdint.h> /* intmax_t */
 #include <stdio.h>
-#include <string.h> /* memcpy, memcmp and strchr */
+#include <string.h> /* memcpy, strncmp and strchr */
 #include <stdarg.h>
 #include <wchar.h> /* wchar_t and wint_t */
 #include "nmod_types.h"
@@ -203,8 +203,8 @@ static size_t __flint_poly_fprint(FILE *, const void *, flint_type_t);
 
 /* TODO: Add options for compact/spacious printing. */
 
-#define IS_FLINT_BASE_TYPE(ip, str) (memcmp(ip, str, sizeof(str) - sizeof(char)) == 0)
-#define IS_FLINT_TYPE(ip, str) (memcmp(ip, str "}", sizeof(str)) == 0)
+#define IS_FLINT_BASE_TYPE(ip, str) (strncmp(ip, str, STRING_LENGTH(str)) == 0)
+#define IS_FLINT_TYPE(ip, str) (strncmp(ip, str "}", STRING_LENGTH(str) + 1) == 0)
 
 /* Reference used for checks: https://en.cppreference.com/w/c/io/fprintf */
 #define IS_PRINTF_FLAG(chr) \
