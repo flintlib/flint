@@ -1099,24 +1099,46 @@ _gr_arf_vec_dot_rev(arf_t res, const arf_t initial, int subtract, arf_srcptr vec
 #include "gr_poly.h"
 #include "acb_poly.h"
 
-/* todo: test */
 static int
-_gr_arf_poly_mullow(arf_ptr res,
+_gr_arf_poly_mulmid(arf_ptr res,
     arf_srcptr poly1, slong len1,
-    arf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+    arf_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
 
     /* todo: tuning */
-    if (len1 <= 10 || len2 <= 10)
+    if (len1 <= 10 || len2 <= 10 || 2 * (nhi - nlo) <= 10)
     {
-        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
     }
     else
     {
         arb_ptr tmp, t1, t2, t3;
-        slong i;
+        slong i, n = nhi - nlo;
         int squaring = (poly1 == poly2 && len1 == len2);
 
         if (!squaring)
@@ -1155,7 +1177,7 @@ _gr_arf_poly_mullow(arf_ptr res,
             mag_init(arb_radref(t3 + i));
         }
 
-        _arb_poly_mullow(t3, t1, len1, t2, len2, n, ARF_CTX_PREC(ctx));
+        _arb_poly_mulmid(t3, t1, len1, t2, len2, nlo, nhi, ARF_CTX_PREC(ctx));
 
         for (i = 0; i < n; i++)
         {
@@ -1168,6 +1190,15 @@ _gr_arf_poly_mullow(arf_ptr res,
         return GR_SUCCESS;
     }
 }
+
+static int
+_gr_arf_poly_mullow(arf_ptr res,
+    arf_srcptr poly1, slong len1,
+    arf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_arf_poly_mulmid(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
 
 /* todo: real-only roots in arb */
 static int
@@ -1440,6 +1471,7 @@ gr_method_tab_input _arf_methods_input[] =
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arf_vec_dot_rev},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arf_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_arf_poly_mulmid},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_arf_poly_roots_other},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arf_mat_mul},
