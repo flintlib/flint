@@ -118,35 +118,29 @@ static void _find_nonresidue(fmpz *rop,
 }
 
 /*
-    Given an element $d$ as \code{(op,len)}, returns whether it has a
-    preimage $u$ under the Artin Schreier map $Y \mapsto Y^2 + Y$, and
-    if so sets \code{(rop,d)} to $u$.
-
-    In this case, the other preimage is given by $u + 1$.  This
-    completes the set of preimages as the kernel of the Artin Schreier
-    map is $\mathbf{F}_2$.
-
-    The value of \code{(rop,d)}$ is undefined when the return value
-    is zero.
+    Given a polynomial defining q-adic extension, precomputes data necessary
+    for solving Artin-Schreier equation (this is needed to find initial
+    square root approximation). It computes LUP decomposition of the matrix of
+    the Artin-Schreier map.
+    Returns:
+    the matrix A (caller needs to free it with nmod_mat_clear)
+    the permutation P (caller needs to free it with flint_free)
+    the gap column c
  */
-int
-_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
-                         const fmpz *a, const slong *j, slong lena)
+static void _artin_schreier_lup(nmod_mat_t A, slong **P, slong *c,
+                                const fmpz *a, const slong *j, slong lena)
 {
-    const slong d   = j[lena - 1];
+    const slong  d = j[lena - 1];
     const fmpz_t p = {WORD(2)};
 
-    int ans;
-
     fmpz *e, *f;
-    nmod_mat_t A;
-    slong i, k, *P;
+    slong i, k;
+
+    nmod_mat_init(A, d, d, 2);
+    *P  = flint_malloc(d * sizeof(slong));
 
     e = _fmpz_vec_init(d);
     f = _fmpz_vec_init(2 * d - 1);
-
-    nmod_mat_init(A, d, d, 2);
-    P  = flint_malloc(d * sizeof(slong));
 
     /* Construct Artin Schreier matrix ------------------------------------- */
 
@@ -182,12 +176,51 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
 #if FLINT_WANT_ASSERT
     {
-        slong res = nmod_mat_lu(P, A, 0);
+        slong res = nmod_mat_lu(*P, A, 0);
         FLINT_ASSERT(res == d - 1);
     }
 #else
-    nmod_mat_lu(P, A, 0);
+    nmod_mat_lu(*P, A, 0);
 #endif
+
+    /* gap column */
+    for (i = 0; i < d; i++)
+    {
+        if (nmod_mat_entry(A, i, i) == 0)
+        {
+            *c = i;
+            break;
+        }
+    }
+
+    _fmpz_vec_clear(e, d);
+    _fmpz_vec_clear(f, 2 * d - 1);
+}
+
+/*
+    Given an element $d$ as \code{(op,len)}, returns whether it has a
+    preimage $u$ under the Artin Schreier map $Y \mapsto Y^2 + Y$, and
+    if so sets \code{(rop,d)} to $u$.
+
+    In this case, the other preimage is given by $u + 1$.  This
+    completes the set of preimages as the kernel of the Artin Schreier
+    map is $\mathbf{F}_2$.
+
+    The value of \code{(rop,d)}$ is undefined when the return value
+    is zero.
+ */
+int
+_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
+                         const fmpz *a, const slong *j, slong lena)
+{
+    const slong d = j[lena - 1];
+
+    int ans;
+
+    nmod_mat_t A;
+    slong i, k, c, *P;
+
+    _artin_schreier_lup(A, &P, &c, a, j, lena);
 
     /* Solve for a preimage of (op,len) ------------------------------------ */
 
@@ -204,12 +237,6 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
     if (ans)
     {
-        slong c;
-
-        for (c = 0; c < d; c++)
-            if (nmod_mat_entry(A, c, c) == 0)
-                break;
-
         for (k = d - 1; k > c; k--)
         {
             rop[k] = rop[k-1];
@@ -229,8 +256,6 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
     /* Clean-up ------------------------------------------------------------ */
 
-    _fmpz_vec_clear(e, d);
-    _fmpz_vec_clear(f, 2 * d - 1);
     nmod_mat_clear(A);
     flint_free(P);
 
