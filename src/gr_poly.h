@@ -629,6 +629,8 @@ WARN_UNUSED_RESULT int gr_poly_compose_mod_brent_kung_precomp_preinv(gr_poly_t r
 
 void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_mulmid(gr_method_poly_binary_trunc2_op mulmid_impl, gr_method_poly_binary_trunc2_op mulmid_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void _gr_poly_test_approx_mulmid_pos_entrywise_accurate(gr_method_poly_binary_trunc2_op mulmid_impl, gr_method_poly_binary_trunc2_op mulmid_ref,
+    gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_div(gr_method_poly_binary_op div_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);

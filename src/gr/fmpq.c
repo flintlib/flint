@@ -870,6 +870,29 @@ _gr_fmpq_poly_mulmid(fmpq * res,
     len1 = FLINT_MIN(len1, nhi);
     len2 = FLINT_MIN(len2, nhi);
 
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
     /* Todo: handle mixed cases */
     if (_fmpq_vec_is_fmpz_vec(poly1, len1) &&
         _fmpq_vec_is_fmpz_vec(poly2, len2))

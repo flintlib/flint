@@ -1355,6 +1355,13 @@ ring is generated on each test iteration, otherwise the given ring is used.
     Tests the given function ``xgcd_impl`` for correctness as an implementation
     of :func:`_gr_poly_xgcd`.
 
+.. function:: void _gr_poly_test_approx_mulmid_pos_entrywise_accurate(gr_method_poly_binary_trunc2_op mulmid_impl, gr_method_poly_binary_trunc2_op mulmid_ref, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given implementation of polynomial multiplication for accuracy
+    over an approximate numerical ring by generating nonnegative polynomials
+    and checking that the entrywise relative error compared to
+    the reference implementation does not exceed *rel_tol*.
+
 
 .. raw:: latex
 
