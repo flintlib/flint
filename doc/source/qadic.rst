@@ -332,6 +332,16 @@ Square root
     Return ``1`` if the input is a square (to input precision). If so, set
     ``rop`` to a square root (truncated to output precision).
 
+.. function:: struct qadic2_sqrt_precomp *_qadic_char2_sqrt_precomp_init(const qadic_ctx_t ctx)
+.. function:: int _qadic_char2_sqrt_with_precomp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx, const struct qadic2_sqrt_precomp *data)
+.. function:: void _qadic_char2_sqrt_precomp_clear(struct qadic2_sqrt_precomp *data)
+
+    To compute a qadic square root in characteristic 2, we need to solve the Artin-Schreier equation to get
+    the initial square root approximation. The data needed to solve it can be precomputed once, since it
+    depends only on the extension itself.
+
+    Note that ``struct qadic2_sqrt_precomp *`` is an opaque pointer; the definition of the struct is not provided.
+
 
 Special functions
 --------------------------------------------------------------------------------
