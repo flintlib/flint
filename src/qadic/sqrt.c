@@ -50,11 +50,15 @@ static int __fmpz_mod_poly_invmod(fmpz *A,
     finite fields and Hensel lifting.
 
         - _find_nonresidue()
-        - _artin_schreier_preimage()
+        - _artin_schreier_preimage() and _artin_schreier_preimage_precomp()
+            compute Artin-Schreier map preimage
+            used in characteristic 2 to find initial approximation
         - _fmpz_mod_poly_sqrtmod_p()
         - _fmpz_mod_poly_sqrtmod_2()
-        - _qadic_sqrt_p()
-        - _qadic_sqrt()
+        - _qadic_sqrt_p() and _qadic_sqrt_2()
+            implements square root in odd characteristic and in characteristic 2
+        - _qadic_sqrt_impl()
+            dispatcher to characteristic 2/odd
         - qadic_sqrt()
  */
 
@@ -197,6 +201,13 @@ static void _artin_schreier_lup(nmod_mat_t A, slong **P, slong *c,
     _fmpz_vec_clear(f, 2 * d - 1);
 }
 
+struct qadic2_sqrt_precomp
+{
+    nmod_mat_t A;
+    slong *P;
+    slong c;
+};
+
 /*
     Given an element $d$ as \code{(op,len)}, returns whether it has a
     preimage $u$ under the Artin Schreier map $Y \mapsto Y^2 + Y$, and
@@ -208,19 +219,23 @@ static void _artin_schreier_lup(nmod_mat_t A, slong **P, slong *c,
 
     The value of \code{(rop,d)}$ is undefined when the return value
     is zero.
+
+    We have two variants: one with precomputed data (the main driver), and
+    the other computing LUP decomposition of Artin-Schreier matrix. The second one
+    is implemented on top of the first one.
  */
-int
-_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
-                         const fmpz *a, const slong *j, slong lena)
+static int
+_artin_schreier_preimage_precomp(fmpz *rop, const fmpz *op, slong len,
+                                 const slong *j, slong lena,
+                                 const struct qadic2_sqrt_precomp *data)
 {
     const slong d = j[lena - 1];
 
     int ans;
 
-    nmod_mat_t A;
-    slong i, k, c, *P;
-
-    _artin_schreier_lup(A, &P, &c, a, j, lena);
+    slong i, k;
+    const nmod_mat_struct *A = data->A;
+    const slong *P = data->P;
 
     /* Solve for a preimage of (op,len) ------------------------------------ */
 
@@ -237,6 +252,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
     if (ans)
     {
+        const slong c = data->c;
         for (k = d - 1; k > c; k--)
         {
             rop[k] = rop[k-1];
@@ -254,10 +270,24 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
         }
     }
 
+    return ans;
+}
+
+int
+_artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
+                         const fmpz *a, const slong *j, slong lena)
+{
+    int ans;
+
+    struct qadic2_sqrt_precomp data = {0};
+
+    _artin_schreier_lup(data.A, &data.P, &data.c, a, j, lena);
+    ans = _artin_schreier_preimage_precomp(rop, op, len, j, lena, &data);
+
     /* Clean-up ------------------------------------------------------------ */
 
-    nmod_mat_clear(A);
-    flint_free(P);
+    nmod_mat_clear(data.A);
+    flint_free(data.P);
 
     return ans;
 }
@@ -671,7 +701,8 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len,
  */
 static int
 _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
-              const fmpz *a, const slong *j, slong lena, slong N)
+              const fmpz *a, const slong *j, slong lena, slong N,
+              const struct qadic2_sqrt_precomp *precomp)
 {
     int ans;
 
@@ -723,7 +754,10 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
         _fmpz_poly_mul(g, t, d, r, len);
         _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
 
-        ans = _artin_schreier_preimage(r, g, d, a, j, lena);
+        if (precomp)
+            ans = _artin_schreier_preimage_precomp(r, g, d, j, lena, precomp);
+        else
+            ans = _artin_schreier_preimage(r, g, d, a, j, lena);
 
         if (ans)
         {
@@ -821,13 +855,14 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-static int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
+static int _qadic_sqrt_impl(fmpz *rop, const fmpz *op, slong len,
                 const fmpz *a, const slong *j, slong lena,
-                const fmpz_t p, slong N)
+                const fmpz_t p, slong N,
+                const struct qadic2_sqrt_precomp *precomp)
 {
     if (*p == WORD(2))
     {
-        return _qadic_sqrt_2(rop, op, len, a, j, lena, N);
+        return _qadic_sqrt_2(rop, op, len, a, j, lena, N, precomp);
     }
     else
     {
@@ -835,7 +870,8 @@ static int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
     }
 }
 
-int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+static int _qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx,
+                       const struct qadic2_sqrt_precomp *precomp)
 {
     const fmpz *p   = (&ctx->pctx)->p;
     const slong d   = qadic_ctx_degree(ctx);
@@ -870,10 +906,10 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     if (rop->val >= N) /* must check square even if rop prec will be <= valuation */
     {
         slong prec = FLINT_MIN(qadic_prec(op) - vop, 1 + (fmpz_cmp_ui(p, 2) == 0));
-        ans = prec <= 0 ? 1 : _qadic_sqrt(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, prec);
+        ans = prec <= 0 ? 1 : _qadic_sqrt_impl(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, prec, precomp);
     }
     else
-        ans = _qadic_sqrt(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, N - rop->val);
+        ans = _qadic_sqrt_impl(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, N - rop->val, precomp);
 
     if (rop == op)
     {
@@ -895,4 +931,37 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     }
 
     return ans;
+}
+
+int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+{
+    return _qadic_sqrt(rop, op, ctx, NULL);
+}
+
+struct qadic2_sqrt_precomp *_qadic_char2_sqrt_precomp_init(const qadic_ctx_t ctx)
+{
+    struct qadic2_sqrt_precomp *data = NULL;
+
+    if (*(&ctx->pctx)->p != WORD(2))
+        flint_throw(FLINT_ERROR, "_qadic_char2_sqrt_precomp_init: must have characteristic 2");
+
+    data = flint_calloc(1, sizeof(*data));
+    _artin_schreier_lup(data->A, &data->P, &data->c, ctx->a, ctx->j, ctx->len);
+    return data;
+}
+
+int _qadic_char2_sqrt_with_precomp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx,
+                                   const struct qadic2_sqrt_precomp *data)
+{
+    if (*(&ctx->pctx)->p != WORD(2))
+        flint_throw(FLINT_ERROR, "_qadic_char2_sqrt_with_precomp: must have characteristic 2");
+
+    return _qadic_sqrt(rop, op, ctx, data);
+}
+
+void _qadic_char2_sqrt_precomp_clear(struct qadic2_sqrt_precomp *data)
+{
+    nmod_mat_clear(data->A);
+    flint_free(data->P);
+    flint_free(data);
 }
