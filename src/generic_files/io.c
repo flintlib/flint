@@ -12,7 +12,7 @@
 #include <ctype.h> /* isdigit */
 #include <stdint.h> /* intmax_t */
 #include <stdio.h>
-#include <string.h> /* memcpy, memcmp and strchr */
+#include <string.h> /* memcpy, strncmp and strchr */
 #include <stdarg.h>
 #include <wchar.h> /* wchar_t and wint_t */
 #include "nmod_types.h"
@@ -26,6 +26,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_ore_poly.h"
 #include "gr_mat.h"
 #include "gr_mat/impl.h"
 
@@ -202,8 +203,8 @@ static size_t __flint_poly_fprint(FILE *, const void *, flint_type_t);
 
 /* TODO: Add options for compact/spacious printing. */
 
-#define IS_FLINT_BASE_TYPE(ip, str) (memcmp(ip, str, sizeof(str) - sizeof(char)) == 0)
-#define IS_FLINT_TYPE(ip, str) (memcmp(ip, str "}", sizeof(str)) == 0)
+#define IS_FLINT_BASE_TYPE(ip, str) (strncmp(ip, str, STRING_LENGTH(str)) == 0)
+#define IS_FLINT_TYPE(ip, str) (strncmp(ip, str "}", STRING_LENGTH(str) + 1) == 0)
 
 /* Reference used for checks: https://en.cppreference.com/w/c/io/fprintf */
 #define IS_PRINTF_FLAG(chr) \
@@ -734,6 +735,14 @@ print_flint_type:
             GR_MUST_SUCCEED(gr_poly_write(out, elem, "x", ctx));
             res += out->len;
             ip += STRING_LENGTH("gr_poly}");
+        }
+        else if (IS_FLINT_TYPE(ip, "gr_ore_poly"))
+        {
+            const gr_ore_poly_struct * elem = va_arg(vlist, const gr_ore_poly_struct *);
+            gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
+            GR_MUST_SUCCEED(gr_ore_poly_write(out, elem, ctx));
+            res += out->len;
+            ip += STRING_LENGTH("gr_ore_poly}");
         }
         else if (IS_FLINT_TYPE(ip, "gr_mat"))
         {

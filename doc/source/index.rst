@@ -60,6 +60,7 @@ Generic rings
    gr_mat.rst
    gr_poly.rst
    gr_mpoly.rst
+   gr_ore_poly.rst
    gr_series.rst
 
 .. only:: not latex
