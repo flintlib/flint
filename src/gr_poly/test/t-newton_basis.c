@@ -29,12 +29,12 @@ TEST_FUNCTION_START(gr_poly_newton_basis, state)
         gr_ptr x, y, z;
         slong i;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
         /* Hack: avoid because slow */
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         gr_vec_init(R, n_randint(state, 6), ctx);
@@ -69,9 +69,9 @@ TEST_FUNCTION_START(gr_poly_newton_basis, state)
                 flint_printf("R = "); gr_vec_print(R, ctx); flint_printf("\n");
                 flint_printf("F = "); gr_poly_print(F, ctx); flint_printf("\n");
                 flint_printf("G = "); gr_poly_print(G, ctx); flint_printf("\n");
-                flint_printf("x = %{gr}\n\n", x);
-                flint_printf("F(x) = %{gr}\n\n", y);
-                flint_printf("G(x) = %{gr}\n\n", z);
+                flint_printf("x = %{gr}\n\n", x, ctx);
+                flint_printf("F(x) = %{gr}\n\n", y, ctx);
+                flint_printf("G(x) = %{gr}\n\n", z, ctx);
                 flint_abort();
             }
 

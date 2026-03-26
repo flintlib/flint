@@ -27,7 +27,7 @@ TEST_GR_FUNCTION_START(gr_mat_adjugate, state, count_success, count_domain, coun
         gr_mat_t A, B, C;
         gr_ptr d, e;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         /* Hack: avoid because slow */
         while (ctx->methods == _ca_methods)

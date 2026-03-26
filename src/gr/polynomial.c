@@ -122,6 +122,12 @@ polynomial_ctx_is_complex_vector_space(gr_ctx_t ctx)
 }
 
 static truth_t
+polynomial_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    return gr_ctx_is_approx_commutative_ring(POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+static truth_t
 polynomial_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(POLYNOMIAL_ELEM_CTX(ctx));
@@ -770,6 +776,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) polynomial_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) polynomial_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) polynomial_ctx_is_threadsafe},
     {GR_METHOD_CTX_SET_GEN_NAME,        (gr_funcptr) _gr_gr_poly_ctx_set_gen_name},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_poly_ctx_set_gen_names},

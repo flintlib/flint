@@ -27,7 +27,7 @@ TEST_GR_FUNCTION_START(gr_mat_hessenberg_householder, state, count_success, coun
         gr_mat_t A, B;
         gr_poly_t f, g;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         /* Hack: avoid because slow */
         while (ctx->methods == _ca_methods)

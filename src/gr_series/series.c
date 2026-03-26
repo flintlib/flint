@@ -568,6 +568,9 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
     if (xlen == 0 || xerr == 0)
         return GR_UNABLE;
 
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
     err = len;
 
@@ -600,6 +603,9 @@ _gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, int di
     int status = GR_SUCCESS;
     truth_t is_zero;
     slong val;
+
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
 
     xlen = GR_SERIES_POLY(x)->length;
     ylen = GR_SERIES_POLY(y)->length;

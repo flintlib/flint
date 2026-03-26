@@ -27,7 +27,7 @@ TEST_GR_FUNCTION_START(gr_mat_charpoly_faddeev, state, count_success, count_unab
         gr_mat_t A;
         gr_poly_t f, g;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         /* Hack: avoid because slow */
         while (ctx->methods == _ca_methods)

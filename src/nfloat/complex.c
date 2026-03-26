@@ -1878,6 +1878,7 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},

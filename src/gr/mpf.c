@@ -370,6 +370,7 @@ gr_method_tab_input _gr_mpf_methods_input[] =
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_mpf_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_HAS_REAL_PREC, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_REAL_PREC, (gr_funcptr) _gr_mpf_ctx_set_real_prec},
     {GR_METHOD_CTX_GET_REAL_PREC, (gr_funcptr) _gr_mpf_ctx_get_real_prec},

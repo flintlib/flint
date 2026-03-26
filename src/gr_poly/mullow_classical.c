@@ -65,9 +65,9 @@ _gr_poly_mulmid_classical(gr_ptr res,
     res = GR_ENTRY(res, -nlo, sz);
 
     /* Squaring */
-    /* fixme: only valid for commutative rings, but we also want squaring over
-       ringlike structures, e.g. floats */
-    if (poly1 == poly2 && len1 == len2 /* && gr_ctx_is_commutative_ring(ctx) == T_TRUE */)
+    if (poly1 == poly2 && len1 == len2 &&
+        (gr_ctx_is_commutative_ring(ctx) == T_TRUE
+        || gr_ctx_is_approx_commutative_ring(ctx) == T_TRUE))
     {
         slong i, start, stop;
 

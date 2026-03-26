@@ -35,6 +35,23 @@ Domain properties
     mathematical property.
     The result can be ``T_UNKNOWN``.
 
+.. function:: truth_t gr_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+
+    Returns whether the structure `\tilde R` implemented by ``ctx`` is assumed
+    to represent an approximate version of a structure `R` with the
+    respective mathematical property.
+    The usual axioms need not hold exactly as long as they hold
+    within a small perturbation, i.e. an axiom of the type `a = b` in `R` is
+    replaced by an axiom of the type
+    `|\tilde a - \tilde b| < \varepsilon` in `\tilde R`.
+    For example, polynomials with floating-point coefficients are
+    considered an approximate commutative ring, but two by two matrices
+    with floating-point coefficients are not.
+
+    The exact structure is trivially considered an approximate version of
+    itself; for example, every commutative ring is considered to be an
+    approximate commutative ring.
+
 .. function:: truth_t gr_ctx_is_exact(gr_ctx_t ctx)
 
     Returns whether the representation of elements is always exact.
@@ -109,6 +126,8 @@ Basic rings and fields
 -------------------------------------------------------------------------------
 
 .. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state)
 
     Initializes *ctx* to a random ring. This will currently
     only generate base rings and composite rings over certain

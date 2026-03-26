@@ -48,7 +48,7 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
 {
     gr_ctx_struct * base_ring = _gr_random_base_ring(state);
 
-    switch (n_randint(state, 6))
+    switch (n_randint(state, 10))
     {
         case 0:
             gr_ctx_init_gr_poly(ctx, base_ring);
@@ -74,13 +74,11 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
                 gr_ctx_init_debug(ctx, base_ring, flags, unable_probability);
             }
             break;
-/*
-    this will break tests that currently assume commutativity
-
-        case 5:
+        /* generate with slightly higher probability, because this is currently
+           the only way we generate noncommutative test rings */
+        default:
             gr_ctx_init_matrix_ring(ctx, base_ring, n_randint(state, 4));
             break;
-*/
     }
 }
 
@@ -276,4 +274,26 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
     flint_printf("  ");
     gr_ctx_println(ctx);
 */
+}
+
+void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state)
+{
+    while (1)
+    {
+        gr_ctx_init_random(ctx, state);
+        if (gr_ctx_is_commutative_ring(ctx) == T_TRUE)
+            break;
+        gr_ctx_clear(ctx);
+    }
+}
+
+void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state)
+{
+    while (1)
+    {
+        gr_ctx_init_random(ctx, state);
+        if (gr_ctx_is_field(ctx) == T_TRUE)
+            break;
+        gr_ctx_clear(ctx);
+    }
 }

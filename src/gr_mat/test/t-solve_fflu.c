@@ -30,7 +30,7 @@ TEST_GR_FUNCTION_START(gr_mat_solve_fflu, state, count_success, count_unable, co
         c = n_randint(state, 6);
 
         /* Hack: avoid because slow */
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
