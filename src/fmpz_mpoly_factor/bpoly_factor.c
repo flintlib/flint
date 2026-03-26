@@ -1069,6 +1069,16 @@ typedef struct
 
 typedef sparse_term2_struct sparse_term2_t[1];
 
+/* Local temporary factor list used only for speculative construction. */
+typedef struct
+{
+    fmpz_bpoly_struct * coeffs;
+    slong length;
+    slong alloc;
+} fmpz_bpoly_vec_struct;
+
+typedef fmpz_bpoly_vec_struct fmpz_bpoly_vec_t[1];
+
 /* Pairings: (0,1)|(2,3), (0,2)|(1,3), (0,3)|(1,2) */
 static const int fmpz_bpoly_factor_pairings_4term[3][4] =
 {
@@ -1087,6 +1097,57 @@ static void fmpz_bpoly_sparse_term_init(sparse_term2_t t)
 static void fmpz_bpoly_sparse_term_clear(sparse_term2_t t)
 {
     fmpz_clear(t->c);
+}
+
+static void fmpz_bpoly_sparse_term_swap(sparse_term2_t a, sparse_term2_t b)
+{
+    slong te;
+
+    te = a->ex; a->ex = b->ex; b->ex = te;
+    te = a->ey; a->ey = b->ey; b->ey = te;
+    fmpz_swap(a->c, b->c);
+}
+
+static void fmpz_bpoly_vec_init(fmpz_bpoly_vec_t V)
+{
+    V->coeffs = NULL;
+    V->length = 0;
+    V->alloc = 0;
+}
+
+static void fmpz_bpoly_vec_clear(fmpz_bpoly_vec_t V)
+{
+    slong i;
+
+    for (i = 0; i < V->alloc; i++)
+        fmpz_bpoly_clear(V->coeffs + i);
+
+    flint_free(V->coeffs);
+    V->coeffs = NULL;
+    V->length = 0;
+    V->alloc = 0;
+}
+
+static void fmpz_bpoly_vec_fit_length(fmpz_bpoly_vec_t V, slong len)
+{
+    slong i, oldalloc;
+
+    if (len <= V->alloc)
+        return;
+
+    oldalloc = V->alloc;
+    V->alloc = FLINT_MAX(len, 2*oldalloc + 1);
+    V->coeffs = flint_realloc(V->coeffs, V->alloc*sizeof(fmpz_bpoly_struct));
+
+    for (i = oldalloc; i < V->alloc; i++)
+        fmpz_bpoly_init(V->coeffs + i);
+}
+
+static void fmpz_bpoly_vec_append_swap(fmpz_bpoly_vec_t V, fmpz_bpoly_t A)
+{
+    fmpz_bpoly_vec_fit_length(V, V->length + 1);
+    fmpz_bpoly_swap(V->coeffs + V->length, A);
+    V->length++;
 }
 
 static int fmpz_bpoly_equal_exact(const fmpz_bpoly_t A, const fmpz_bpoly_t B)
@@ -1121,9 +1182,51 @@ static void fmpz_bpoly_zero_exact(fmpz_bpoly_t A)
     A->length = 0;
 }
 
-static void fmpz_bpoly_add_monomial_fmpz(fmpz_bpoly_t A, const fmpz_t coeff, slong xexp, slong yexp)
+static void fmpz_bpoly_one_exact(fmpz_bpoly_t A)
+{
+    fmpz_bpoly_zero_exact(A);
+    fmpz_bpoly_fit_length(A, 1);
+    fmpz_poly_one(A->coeffs + 0);
+    A->length = 1;
+}
+
+static void fmpz_bpoly_neg_exact(fmpz_bpoly_t A)
 {
     slong i;
+
+    for (i = 0; i < A->length; i++)
+        fmpz_poly_neg(A->coeffs + i, A->coeffs + i);
+}
+
+static void fmpz_bpoly_scalar_mul_fmpz_exact(
+    fmpz_bpoly_t A,
+    const fmpz_bpoly_t B,
+    const fmpz_t c)
+{
+    slong i;
+
+    if (fmpz_is_zero(c))
+    {
+        fmpz_bpoly_zero_exact(A);
+        return;
+    }
+
+    fmpz_bpoly_fit_length(A, B->length);
+
+    for (i = 0; i < B->length; i++)
+        fmpz_poly_scalar_mul_fmpz(A->coeffs + i, B->coeffs + i, c);
+
+    A->length = B->length;
+    fmpz_bpoly_trim_exact(A);
+}
+
+static void fmpz_bpoly_add_monomial_fmpz(
+    fmpz_bpoly_t A,
+    const fmpz_t coeff,
+    slong xexp,
+    slong yexp)
+{
+    slong i, oldlen;
     fmpz_t old;
 
     FLINT_ASSERT(xexp >= 0);
@@ -1134,8 +1237,9 @@ static void fmpz_bpoly_add_monomial_fmpz(fmpz_bpoly_t A, const fmpz_t coeff, slo
 
     if (yexp >= A->length)
     {
+        oldlen = A->length;
         fmpz_bpoly_fit_length(A, yexp + 1);
-        for (i = A->length; i <= yexp; i++)
+        for (i = oldlen; i <= yexp; i++)
             fmpz_poly_zero(A->coeffs + i);
         A->length = yexp + 1;
     }
@@ -1149,15 +1253,19 @@ static void fmpz_bpoly_add_monomial_fmpz(fmpz_bpoly_t A, const fmpz_t coeff, slo
     fmpz_bpoly_trim_exact(A);
 }
 
-static slong fmpz_bpoly_term_count_exact(const fmpz_bpoly_t A)
+static slong fmpz_bpoly_term_count_fast(const fmpz_bpoly_t A)
 {
     slong i, total = 0;
+
     for (i = 0; i < A->length; i++)
         total += A->coeffs[i].length;
+
     return total;
 }
 
-static int fmpz_bpoly_extract_terms_4(sparse_term2_t out[4], const fmpz_bpoly_t A)
+static int fmpz_bpoly_extract_terms_4(
+    sparse_term2_t out[4],
+    const fmpz_bpoly_t A)
 {
     slong i, j, k = 0;
 
@@ -1181,7 +1289,9 @@ static int fmpz_bpoly_extract_terms_4(sparse_term2_t out[4], const fmpz_bpoly_t 
     return (k == 4);
 }
 
-static int fmpz_bpoly_extract_terms_2(sparse_term2_t out[2], const fmpz_bpoly_t A)
+static int fmpz_bpoly_extract_terms_2(
+    sparse_term2_t out[2],
+    const fmpz_bpoly_t A)
 {
     slong i, j, k = 0;
 
@@ -1208,25 +1318,26 @@ static int fmpz_bpoly_extract_terms_2(sparse_term2_t out[2], const fmpz_bpoly_t 
 static int fmpz_bpoly_leading_coeff_positive(const fmpz_bpoly_t A)
 {
     const fmpz_poly_struct * p;
+
     FLINT_ASSERT(A->length > 0);
     p = A->coeffs + (A->length - 1);
     FLINT_ASSERT(p->length > 0);
+
     return fmpz_sgn(p->coeffs + (p->length - 1)) > 0;
 }
 
 /*
-Normalize a 2-term polynomial
-    t0 + t1
-into
-    M * R
-where M is a monomial with integer coefficient and R is primitive 2-term.
+Normalize a 2-term polynomial t0 + t1 into M*R, where M is a monomial with integer coefficient and R is primitive 2-term.
 */
-static int fmpz_bpoly_normalize_pair(fmpz_bpoly_t M, fmpz_bpoly_t R, const sparse_term2_t t0, const sparse_term2_t t1)
+static int fmpz_bpoly_normalize_pair(
+    fmpz_bpoly_t M,
+    fmpz_bpoly_t R,
+    const sparse_term2_t t0,
+    const sparse_term2_t t1)
 {
     slong minx, miny;
     slong ax, ay, bx, by;
     fmpz_t g, a0, a1;
-    slong i;
 
     minx = FLINT_MIN(t0->ex, t1->ex);
     miny = FLINT_MIN(t0->ey, t1->ey);
@@ -1264,9 +1375,8 @@ static int fmpz_bpoly_normalize_pair(fmpz_bpoly_t M, fmpz_bpoly_t R, const spars
 
     if (!fmpz_bpoly_leading_coeff_positive(R))
     {
-        fmpz_poly_neg(M->coeffs + 0, M->coeffs + 0);
-        for (i = 0; i < R->length; i++)
-            fmpz_poly_neg(R->coeffs + i, R->coeffs + i);
+        fmpz_bpoly_neg_exact(M);
+        fmpz_bpoly_neg_exact(R);
     }
 
     fmpz_clear(g);
@@ -1275,14 +1385,19 @@ static int fmpz_bpoly_normalize_pair(fmpz_bpoly_t M, fmpz_bpoly_t R, const spars
     return 1;
 }
 
-static void fmpz_bpoly_append_factor(fmpz_tpoly_t F, fmpz_bpoly_t A)
+static void fmpz_bpoly_append_factor(
+    fmpz_tpoly_t F,
+    fmpz_bpoly_t A)
 {
     fmpz_tpoly_fit_length(F, F->length + 1);
     fmpz_bpoly_swap(F->coeffs + F->length, A);
     F->length++;
 }
 
-static void fmpz_bpoly_append_univar_factorization(fmpz_poly_t c, fmpz_tpoly_t F, fmpz_bpoly_t A)
+static void fmpz_bpoly_append_univar_factorization(
+    fmpz_poly_t c,
+    fmpz_tpoly_t F,
+    fmpz_bpoly_t A)
 {
     fmpz_poly_factor_t uf;
     slong i, j, e;
@@ -1312,55 +1427,94 @@ static void fmpz_bpoly_append_univar_factorization(fmpz_poly_t c, fmpz_tpoly_t F
     fmpz_poly_factor_clear(uf);
 }
 
+static void fmpz_bpoly_mul_many(
+    fmpz_bpoly_t P,
+    const fmpz_bpoly_vec_t V)
+{
+    slong i;
+    fmpz_bpoly_t T;
+
+    fmpz_bpoly_init(T);
+    fmpz_bpoly_one_exact(P);
+
+    for (i = 0; i < V->length; i++)
+    {
+        fmpz_bpoly_mul(T, P, V->coeffs + i);
+        fmpz_bpoly_swap(P, T);
+    }
+
+    fmpz_bpoly_clear(T);
+}
+
+static void fmpz_bpoly_vec_commit(
+    fmpz_tpoly_t F,
+    fmpz_bpoly_vec_t V)
+{
+    while (V->length > 0)
+    {
+        V->length--;
+        fmpz_bpoly_append_factor(F, V->coeffs + V->length);
+    }
+}
+
 /*
 Fast factorization of A + B*m^d where m = x^u y^v and one term is constant.
-This handles factors like 1 + x^66 y^168.
+Handles factors like 1 + x^66 y^168. It builds factors speculatively, multiplies 
+them back together, and only commits them if the reconstruction equals B.
 */
-static int fmpz_bpoly_factor_try_binomial_monomial(fmpz_poly_t c, fmpz_tpoly_t F, fmpz_bpoly_t B)
+static int fmpz_bpoly_factor_try_binomial_monomial(
+    fmpz_poly_t c,
+    fmpz_tpoly_t F,
+    fmpz_bpoly_t B)
 {
     sparse_term2_t t[2];
-    fmpz_poly_t U;
+    fmpz_poly_t U, ctmp;
     fmpz_poly_factor_t Uf;
-    fmpz_bpoly_t T;
+    fmpz_bpoly_t T, P, Ps;
+    fmpz_bpoly_vec_t V;
     slong i, j, k;
     slong dx, dy, d;
+    int success = 0;
 
-    if (fmpz_bpoly_term_count_exact(B) != 2)
+    if (fmpz_bpoly_term_count_fast(B) != 2)
         return 0;
 
     fmpz_bpoly_sparse_term_init(t[0]);
     fmpz_bpoly_sparse_term_init(t[1]);
 
     if (!fmpz_bpoly_extract_terms_2(t, B))
-        goto fail;
+        goto cleanup_terms;
 
-    if (!(t[0]->ex == 0 && t[0]->ey == 0) && (t[1]->ex == 0 && t[1]->ey == 0))
+    if (!(t[0]->ex == 0 && t[0]->ey == 0) &&
+         (t[1]->ex == 0 && t[1]->ey == 0))
     {
-        sparse_term2_struct tmp = t[0][0];
-        t[0][0] = t[1][0];
-        t[1][0] = tmp;
+        fmpz_bpoly_sparse_term_swap(t[0], t[1]);
     }
 
     if (!(t[0]->ex == 0 && t[0]->ey == 0))
-        goto fail;
+        goto cleanup_terms;
 
     dx = t[1]->ex;
     dy = t[1]->ey;
     d = n_gcd(dx, dy);
 
     if (d <= 0)
-        goto fail;
+        goto cleanup_terms;
 
     fmpz_poly_init(U);
+    fmpz_poly_init(ctmp);
     fmpz_poly_factor_init(Uf);
     fmpz_bpoly_init(T);
+    fmpz_bpoly_init(P);
+    fmpz_bpoly_init(Ps);
+    fmpz_bpoly_vec_init(V);
 
     fmpz_poly_zero(U);
     fmpz_poly_set_coeff_fmpz(U, 0, t[0]->c);
     fmpz_poly_set_coeff_fmpz(U, d, t[1]->c);
 
     fmpz_poly_factor(Uf, U);
-    fmpz_poly_mul(c, c, &Uf->c);
+    fmpz_poly_set(ctmp, &Uf->c);
 
     for (i = 0; i < Uf->num; i++)
     {
@@ -1380,25 +1534,57 @@ static int fmpz_bpoly_factor_try_binomial_monomial(fmpz_poly_t c, fmpz_tpoly_t F
                     (dy / d) * k);
             }
 
-            fmpz_bpoly_append_factor(F, T);
+            fmpz_bpoly_vec_append_swap(V, T);
         }
     }
 
+    fmpz_bpoly_mul_many(P, V);
+
+    if (fmpz_poly_is_zero(ctmp))
+        goto cleanup_full;
+
+    if (ctmp->length > 1)
+        goto cleanup_full;
+
+    if (fmpz_poly_is_one(ctmp))
+    {
+        fmpz_bpoly_set(Ps, P);
+    }
+    else
+    {
+        fmpz_t cc;
+        fmpz_init(cc);
+        fmpz_poly_get_coeff_fmpz(cc, ctmp, 0);
+        fmpz_bpoly_scalar_mul_fmpz_exact(Ps, P, cc);
+        fmpz_clear(cc);
+    }
+
+    if (!fmpz_bpoly_equal_exact(Ps, B))
+        goto cleanup_full;
+
+    fmpz_poly_mul(c, c, ctmp);
+    fmpz_bpoly_vec_commit(F, V);
+    success = 1;
+
+cleanup_full:
+    fmpz_bpoly_vec_clear(V);
+    fmpz_bpoly_clear(Ps);
+    fmpz_bpoly_clear(P);
     fmpz_bpoly_clear(T);
     fmpz_poly_factor_clear(Uf);
+    fmpz_poly_clear(ctmp);
     fmpz_poly_clear(U);
 
+cleanup_terms:
     fmpz_bpoly_sparse_term_clear(t[0]);
     fmpz_bpoly_sparse_term_clear(t[1]);
-    return 1;
-
-fail:
-    fmpz_bpoly_sparse_term_clear(t[0]);
-    fmpz_bpoly_sparse_term_clear(t[1]);
-    return 0;
+    return success;
 }
 
-static void fmpz_bpoly_append_factorization(fmpz_poly_t c, fmpz_tpoly_t F, fmpz_bpoly_t A)
+static void fmpz_bpoly_append_factorization(
+    fmpz_poly_t c,
+    fmpz_tpoly_t F,
+    fmpz_bpoly_t A)
 {
     if (A->length == 1)
     {
@@ -1434,12 +1620,15 @@ Try the sparse 4-term "two pairs share a primitive binomial" pattern.
 Assumes B has already been primitive-normalized by fmpz_bpoly_make_primitive(c, B).
 Returns 1 if handled, 0 otherwise.
 */
-static int fmpz_bpoly_factor_try_sparse_4term_pairs(fmpz_poly_t c, fmpz_tpoly_t F, fmpz_bpoly_t B)
+static int fmpz_bpoly_factor_try_sparse_4term_pairs(
+    fmpz_poly_t c,
+    fmpz_tpoly_t F,
+    fmpz_bpoly_t B)
 {
     sparse_term2_t t[4];
     int i, pidx;
 
-    if (fmpz_bpoly_term_count_exact(B) != 4)
+    if (fmpz_bpoly_term_count_fast(B) != 4)
         return 0;
 
     for (i = 0; i < 4; i++)
@@ -1503,7 +1692,7 @@ static int fmpz_bpoly_factor_try_sparse_4term_pairs(fmpz_poly_t c, fmpz_tpoly_t 
         if (!fmpz_bpoly_equal_exact(Q, H))
             goto cleanup_pair;
 
-        F->length = 0;
+        FLINT_ASSERT(F->length == 0);
         fmpz_bpoly_append_factorization(c, F, G);
         fmpz_bpoly_append_factorization(c, F, H);
         ok = 1;
