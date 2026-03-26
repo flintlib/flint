@@ -38,7 +38,7 @@ TEST_FUNCTION_START(gr_poly_resultant_hgcd, state)
         {
             while (1)
             {
-                gr_ctx_init_random(ctx, state);
+                gr_ctx_init_random_commutative_ring(ctx, state);
 
                 if (gr_ctx_is_finite(ctx) == T_TRUE)
                     break;
@@ -48,7 +48,7 @@ TEST_FUNCTION_START(gr_poly_resultant_hgcd, state)
         }
         else
         {
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         if (huge)

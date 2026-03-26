@@ -261,11 +261,17 @@ int gr_series_mod_mul(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ct
 
 int gr_series_mod_inv(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 {
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     return gr_poly_inv_series(res, x, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
 int gr_series_mod_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     return gr_poly_div_series(res, x, y, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 

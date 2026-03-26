@@ -31,7 +31,7 @@ TEST_FUNCTION_START(gr_generic_fmpz_mpoly_evaluate, state)
         gr_ptr fx, gx, hx, y;
         slong sz;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
         sz = ctx->sizeof_elem;
 
         n = 1 + n_randint(state, 5);

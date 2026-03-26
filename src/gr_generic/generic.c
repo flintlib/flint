@@ -91,6 +91,11 @@ static truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_generic_ctx_is_rational_vector_space(ctx);
 }
 
+static truth_t gr_generic_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    return (gr_ctx_is_commutative_ring(ctx) == T_TRUE) ? T_TRUE : T_UNKNOWN;
+}
+
 slong
 gr_generic_ctx_ngens_0(slong * ngens, gr_ctx_t ctx)
 {
@@ -2704,8 +2709,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,            (gr_funcptr) gr_generic_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_complex_vector_space},
-
     {GR_METHOD_CTX_IS_ORDERED_RING,     (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING,      (gr_funcptr) gr_generic_ctx_is_approx_commutative_ring},
 
     /* should be true for most rings */
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_generic_ctx_predicate_true},

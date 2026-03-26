@@ -70,7 +70,7 @@ TEST_FUNCTION_START(gr_mpoly_mul_monomial, state)
 
             status |= gr_mpoly_add(k1, g, h, ctx);
 
-            if (n_randint(state, 2))
+            if (n_randint(state, 2) || (gr_ctx_is_commutative_ring(ctx) != T_TRUE))
                 status |= gr_mpoly_mul_johnson(k1, f, k1, ctx);
             else
                 status |= gr_mpoly_mul_johnson(k1, k1, f, ctx);
@@ -92,7 +92,7 @@ TEST_FUNCTION_START(gr_mpoly_mul_monomial, state)
 
             if (status == GR_SUCCESS && gr_mpoly_equal(k1, k2, ctx) == T_FALSE)
             {
-                flint_printf("FAIL: Check (f + g) - g = f\n");
+                flint_printf("FAIL: Check f * (g + h) = f * g + f * h\n");
                 flint_printf("i = %wd, j = %wd\n", i ,j);
                 gr_ctx_println(ctx);
                 flint_printf("f = "); gr_mpoly_print_pretty(f, ctx); flint_printf("\n");

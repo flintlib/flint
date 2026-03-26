@@ -31,7 +31,7 @@ TEST_FUNCTION_START(gr_poly_resultant, state)
         int status = GR_SUCCESS;
         slong n;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);

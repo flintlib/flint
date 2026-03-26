@@ -25,7 +25,7 @@ TEST_FUNCTION_START(gr_poly_taylor_shift_convolution, state)
         gr_ptr c, d, cd;
 
         /* check F(x+c)(x+d) = F(x+c+d) */
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         gr_poly_init(F, ctx);
         gr_poly_init(Fc, ctx);

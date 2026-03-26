@@ -109,6 +109,16 @@ static truth_t vector_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_ctx_is_complex_vector_space(ENTRY_CTX(ctx));
 }
 
+static truth_t vector_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return T_FALSE;
+    if (VECTOR_CTX(ctx)->n == 0)
+        return T_TRUE;
+    return gr_ctx_is_approx_commutative_ring(ENTRY_CTX(ctx));
+}
+
+
 #if 0
 /* todo: public */
 static truth_t gr_ctx_vector_gr_vec_is_fixed_size(gr_ctx_t ctx)
@@ -726,6 +736,7 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) vector_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) vector_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) vector_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) vector_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,    (gr_funcptr) vector_ctx_is_threadsafe},
 
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) vector_gr_vec_ctx_write},

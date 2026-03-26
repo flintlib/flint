@@ -28,12 +28,12 @@ TEST_FUNCTION_START(gr_poly_product_roots, state)
         gr_poly_t F;
         slong n;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
         /* Hack: avoid because slow */
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         n = n_randint(state, 10);

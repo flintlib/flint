@@ -24,7 +24,7 @@ test_compose_series(flint_rand_t state, int which)
     int status = GR_SUCCESS;
 
     if (n_randint(state, 4) == 0)
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
     else
         gr_ctx_init_fmpz(ctx);
 

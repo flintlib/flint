@@ -69,7 +69,7 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
 
             status |= gr_mpoly_add(k1, g, h, ctx);
 
-            if (n_randint(state, 2))
+            if (n_randint(state, 2) || (gr_ctx_is_commutative_ring(ctx) != T_TRUE))
                 status |= gr_mpoly_mul_johnson(k1, f, k1, ctx);
             else
                 status |= gr_mpoly_mul_johnson(k1, k1, f, ctx);

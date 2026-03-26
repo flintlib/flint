@@ -144,6 +144,12 @@ gr_mpoly_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_ctx_is_complex_vector_space(GR_MPOLY_CCTX(ctx));
 }
 
+static truth_t
+gr_mpoly_ctx_is_approx_commutative_ring(gr_mpoly_ctx_t ctx)
+{
+    return gr_ctx_is_approx_commutative_ring(GR_MPOLY_CCTX(ctx));
+}
+
 truth_t
 gr_mpoly_ctx_is_threadsafe(gr_mpoly_ctx_t ctx)
 {
@@ -321,6 +327,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,     (gr_funcptr) gr_mpoly_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) gr_mpoly_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) gr_mpoly_ctx_set_gen_names},
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) _gr_mpoly_ctx_ngens},
     {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_mpoly_ctx_gen_name},

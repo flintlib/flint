@@ -54,6 +54,7 @@ static truth_t _gr_complex_ctx_is_integral_domain(gr_ctx_t ctx) { return gr_ctx_
 static truth_t _gr_complex_ctx_is_field(gr_ctx_t ctx) { return gr_ctx_is_field(REAL_CTX(ctx)); }
 static truth_t _gr_complex_ctx_is_rational_vector_space(gr_ctx_t ctx) { return gr_ctx_is_rational_vector_space(REAL_CTX(ctx)); }
 static truth_t _gr_complex_ctx_is_real_vector_space(gr_ctx_t ctx) { return gr_ctx_is_real_vector_space(REAL_CTX(ctx)); }
+static truth_t _gr_complex_ctx_is_approx_commutative_ring(gr_ctx_t ctx) { return gr_ctx_is_approx_commutative_ring(REAL_CTX(ctx)); }
 
 static truth_t _gr_complex_ctx_is_threadsafe(gr_ctx_t ctx) { return gr_ctx_is_threadsafe(REAL_CTX(ctx)); }
 static truth_t _gr_complex_ctx_is_finite(gr_ctx_t ctx) { return gr_ctx_is_finite(REAL_CTX(ctx)); }
@@ -633,6 +634,7 @@ gr_method_tab_input _gr_complex_methods_input[] =
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr)  _gr_complex_ctx_is_threadsafe},
     {GR_METHOD_CTX_IS_FINITE,           (gr_funcptr) _gr_complex_ctx_is_finite},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,    (gr_funcptr) _gr_complex_ctx_is_finite_characteristic},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr)  _gr_complex_ctx_is_approx_commutative_ring},
 
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) _gr_complex_ctx_is_exact},
     {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},

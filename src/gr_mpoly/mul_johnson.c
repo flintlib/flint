@@ -23,6 +23,7 @@ static int _gr_mpoly_mul_johnson(
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
+    int flip_operands,   /* to allow noncommutative coefficient rings */
     gr_mpoly_ctx_t ctx)
 {
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
@@ -104,7 +105,10 @@ static int _gr_mpoly_mul_johnson(
             Q[Q_len++] = x->j;
 
             /* todo: use addmul when better */
-            status |= mul(pp, GR_ENTRY(coeff2, x->i, sz), GR_ENTRY(coeff3, x->j, sz), cctx);
+            if (flip_operands)
+                status |= mul(pp, GR_ENTRY(coeff3, x->j, sz), GR_ENTRY(coeff2, x->i, sz), cctx);
+            else
+                status |= mul(pp, GR_ENTRY(coeff2, x->i, sz), GR_ENTRY(coeff3, x->j, sz), cctx);
             status |= add(GR_ENTRY(p1, len1, sz), GR_ENTRY(p1, len1, sz), pp, cctx);
 
             while ((x = x->next) != NULL)
@@ -114,7 +118,10 @@ static int _gr_mpoly_mul_johnson(
                 Q[Q_len++] = x->j;
 
                 /* todo: use addmul when better */
-                status |= mul(pp, GR_ENTRY(coeff2, x->i, sz), GR_ENTRY(coeff3, x->j, sz), cctx);
+                if (flip_operands)
+                    status |= mul(pp, GR_ENTRY(coeff3, x->j, sz), GR_ENTRY(coeff2, x->i, sz), cctx);
+                else
+                    status |= mul(pp, GR_ENTRY(coeff2, x->i, sz), GR_ENTRY(coeff3, x->j, sz), cctx);
                 status |= add(GR_ENTRY(p1, len1, sz), GR_ENTRY(p1, len1, sz), pp, cctx);
             }
         } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -215,7 +222,7 @@ int gr_mpoly_mul_johnson(
     }
 
     /* todo: could have a version of mul_monomial for the noncommutative case */
-    if (poly2->length == 1 && gr_ctx_is_commutative_ring(cctx) == T_TRUE)
+    if (poly2->length == 1 && gr_ctx_is_approx_commutative_ring(cctx) == T_TRUE)
     {
         return gr_mpoly_mul_monomial(poly1, poly3, poly2, ctx);
     }
@@ -283,7 +290,7 @@ int gr_mpoly_mul_johnson(
                                     &temp->coeffs, &temp->exps, &temp->coeffs_alloc, &temp->exps_alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                          exp_bits, N, cmpmask, ctx);
+                                          exp_bits, N, cmpmask, 1, ctx);
         }
         else
         {
@@ -291,7 +298,7 @@ int gr_mpoly_mul_johnson(
                 &temp->coeffs, &temp->exps, &temp->coeffs_alloc, &temp->exps_alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                          exp_bits, N, cmpmask, ctx);
+                                          exp_bits, N, cmpmask, 0, ctx);
         }
 
         gr_mpoly_swap(temp, poly1, ctx);
@@ -307,7 +314,7 @@ int gr_mpoly_mul_johnson(
                                     &poly1->coeffs, &poly1->exps, &poly1->coeffs_alloc, &poly1->exps_alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
-                                          exp_bits, N, cmpmask, ctx);
+                                          exp_bits, N, cmpmask, 1, ctx);
         }
         else
         {
@@ -315,7 +322,7 @@ int gr_mpoly_mul_johnson(
                                     &poly1->coeffs, &poly1->exps, &poly1->coeffs_alloc, &poly1->exps_alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
-                                          exp_bits, N, cmpmask, ctx);
+                                          exp_bits, N, cmpmask, 0, ctx);
         }
     }
 
