@@ -13,17 +13,6 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
-#if FLINT_BITS == 32
-
-/* Todo: could implement a reasonable 64-bit primality test here. */
-int
-n_ll_is_prime(ulong nhi, ulong nlo)
-{
-    return -1;
-}
-
-#else
-
 /* Fast implementation of the Sorenson-Webster certified Rabin-Miller
    primality test for integers up to about 81 bits. More precisely, the
    test is valid for n < SWbound = 3317044064679887385961981. */
@@ -243,8 +232,8 @@ n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3,
     {
         ulong bit2, bit1;
 
-        bit1 = exp[(ebits - 2) / 64] >> ((ebits - 2) % 64);
-        bit2 = exp[(ebits - 3) / 64] >> ((ebits - 3) % 64);
+        bit1 = exp[(ebits - 2) / FLINT_BITS] >> ((ebits - 2) % FLINT_BITS);
+        bit2 = exp[(ebits - 3) / FLINT_BITS] >> ((ebits - 3) % FLINT_BITS);
 
         xr0 = b1 * b1;
         yr0 = b2 * b2;
@@ -267,11 +256,11 @@ n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3,
         }
 
         ebits -= 3;
-        elimbs = (ebits + 64) / 64;
+        elimbs = (ebits + FLINT_BITS) / FLINT_BITS;
     }
 
-    if (ebits >= 64)
-        ebits -= 64;
+    if (ebits >= FLINT_BITS)
+        ebits -= FLINT_BITS;
 
     for (limbi = elimbs - 1; limbi >= 0; limbi--)
     {
@@ -299,6 +288,12 @@ n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3,
     n_ll_small_reduce2_precise(res3 + 1, res3, zr1, zr0, m1, m0, minv1, minv0);
 }
 
+#if FLINT_BITS == 64
+#define LG_FLINT_BITS 6
+#else
+#define LG_FLINT_BITS 5
+#endif
+
 /* Specialization for b = 2. */
 void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
 {
@@ -325,23 +320,23 @@ void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
         ebits = FLINT_BITS + FLINT_BIT_COUNT(exp[1]);
     }
 
-    if (ebits >= 6)
+    if (ebits >= LG_FLINT_BITS)
     {
         ulong exp_top;
-        ulong shift = ebits - 6;
+        ulong shift = ebits - LG_FLINT_BITS;
 
-        if (shift >= 64)
-            exp_top = exp[1] >> (shift - 64);
-        else if (ebits >= 64)
-            exp_top = (exp[1] << (64 - shift)) | (exp[0] >> shift);
+        if (shift >= FLINT_BITS)
+            exp_top = exp[1] >> (shift - FLINT_BITS);
+        else if (ebits >= FLINT_BITS)
+            exp_top = (exp[1] << (FLINT_BITS - shift)) | (exp[0] >> shift);
         else
             exp_top = exp[0] >> shift;
 
         xr0 = UWORD(1) << exp_top;
-        ebits -= 6;
-        elimbs = (ebits + 64) / 64;
-        if (ebits >= 64)
-            ebits -= 64;
+        ebits -= LG_FLINT_BITS;
+        elimbs = (ebits + FLINT_BITS) / FLINT_BITS;
+        if (ebits >= FLINT_BITS)
+            ebits -= FLINT_BITS;
     }
 
     for (limbi = elimbs - 1; limbi >= 0; limbi--)
@@ -363,6 +358,17 @@ void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
 
     n_ll_small_reduce2_precise(res + 1, res, xr1, xr0, m1, m0, minv1, minv0);
 }
+
+#if FLINT_BITS == 32
+
+/* Todo: could implement a reasonable 64-bit primality test here. */
+int
+n_ll_is_prime(ulong nhi, ulong nlo)
+{
+    return -1;
+}
+
+#else
 
 static
 int n_ll_small_sprp_stage2(nn_srcptr y, slong s, nn_srcptr nm1, nn_srcptr n, nn_srcptr ninv)
