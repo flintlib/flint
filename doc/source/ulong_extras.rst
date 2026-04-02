@@ -776,6 +776,31 @@ precomputed quotient for `b`:
 5. compute `h = b \check{a} - q n` (two single-word multiplications)
 6. if `h \ge n` then `q \gets q+1`
 
+Double-limb modular arithmetic
+--------------------------------------------------------------------------------
+
+..  function:: void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
+               void n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3, ulong b1, ulong b2, ulong b3, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
+
+    Computes `b^e \bmod m` where `b` is a small single-limb integer,
+    `e` is a double-limb integer stored in the array ``exp`` and
+    `m` is a double-limb integer accompanied by the two-limb
+    precomputed inverse `\lfloor 2^{3 \mathtt{FLINT\_BITS}} / \rfloor`
+    stored in ``minv``. The function :func:`n_ll_small_2_powmod` is
+    specialized for base `b = 2`, writing the double-limb result to
+    ``res``, while :func:`n_ll_small_powmod_triple`
+    performs three simultaneous exponentations, writing the results
+    for bases `b_1, b_2, b_3` to ``res1``, ``res2`` and ``res3``
+    respectively.
+
+    These functions require `b, m` to be "small" for
+    correctness, i.e. the whole double-limb range is not supported.
+    A sufficient criterion for correctness is that
+    `(6 b m)^2 < 2^{3 \mathtt{FLINT\_BITS}}`,
+    `m > 2^{\mathtt{FLINT\_BITS}}`, and `b^7 < 2^{\mathtt{FLINT\_BITS}}`.
+
+    These are helper functions used by :func:`n_ll_is_prime`.
+
 Divisibility testing
 --------------------------------------------------------------------------------
 
@@ -1090,6 +1115,18 @@ Primality testing
 
     This function is obsolete and currently just wraps :func:`n_is_prime`.
 
+.. function:: int n_ll_is_prime(ulong nhi, ulong nlo)
+
+    Primality test for a double-limb integer `n` represented by
+    low part ``nlo`` and high part ``nhi``. The high part must be nonzero.
+    Returns 1 if `n` is certainly prime, 0 if `n` is certainly composite,
+    and -1 if `n` is out of range for the present implementation.
+    For `n` up to about 81 bits, this uses a strong probable prime test
+    (Miller-Rabin test) with the first 13 primes as witnesses. This has
+    been shown to prove primality [SorWeb2016]_.
+    Currently no other primality test is implemented for larger input;
+    users may fall back on :func:`fmpz_is_prime` when this function returns -1.
+    On 32-bit machines, this function currently always returns -1.
 
 Chinese remaindering
 --------------------------------------------------------------------------------

@@ -371,6 +371,11 @@ ulong n_invmod(ulong x, ulong y)
 
 ulong n_binvert(ulong a);
 
+void n_ll_small_preinv(nn_ptr minv, nn_srcptr m);
+void n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3, ulong b1,
+    ulong b2, ulong b3, nn_srcptr exp, nn_srcptr m, nn_srcptr minv);
+void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv);
+
 /* Modular multiplication with fixed operand **********************************/
 
 ULONG_EXTRAS_INLINE
@@ -503,6 +508,8 @@ ulong n_prime_pi(ulong n);
 void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
 
 ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
+
+int n_ll_is_prime(ulong nhi, ulong nlo);
 
 /* Factorisation *************************************************************/
 
