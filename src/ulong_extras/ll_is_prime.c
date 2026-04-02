@@ -133,7 +133,7 @@ void n_ll_small_reduce3_sloppy(ulong * r1, ulong *r0,
    The result will typically be in [0, 2m). */
 FLINT_FORCE_INLINE
 void n_ll_small_reduce2_sloppy(ulong * r1, ulong * r0,
-    ulong x1, ulong x0, ulong m1, ulong m0, ulong minv1, ulong minv0)
+    ulong x1, ulong x0, ulong m1, ulong m0, ulong minv1, ulong FLINT_UNUSED(minv0))
 {
     ulong q0, t1, t0;
     q0 = n_mulhi(x1, minv1);
