@@ -225,10 +225,13 @@ n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3,
         ebits = FLINT_BITS + FLINT_BIT_COUNT(exp[1]);
     }
 
-    /* Do the first two rounds without modular reduction, since the result
-       certainly fits in one word. To do: could do one more round, with a
-       two-word result. */
-    if (ebits >= 3)
+    /* Do the first two rounds without modular reduction if b^7 fits in a limb.
+       To do: could do one more round, with a two-word result. */
+#define MAX_7THROOT (FLINT_BITS == 64 ? 565 : 23)
+    FLINT_ASSERT(b1 <= b2);
+    FLINT_ASSERT(b2 <= b3);
+
+    if (ebits >= 3 && b3 <= MAX_7THROOT)
     {
         ulong bit2, bit1;
 
@@ -257,10 +260,15 @@ n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3,
 
         ebits -= 3;
         elimbs = (ebits + FLINT_BITS) / FLINT_BITS;
-    }
 
-    if (ebits >= FLINT_BITS)
-        ebits -= FLINT_BITS;
+        if (ebits >= FLINT_BITS)
+            ebits -= FLINT_BITS;
+    }
+    else
+    {
+        if (ebits > FLINT_BITS)
+            ebits -= FLINT_BITS;
+    }
 
     for (limbi = elimbs - 1; limbi >= 0; limbi--)
     {

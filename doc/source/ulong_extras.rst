@@ -785,19 +785,21 @@ Double-limb modular arithmetic
     Computes `b^e \bmod m` where `b` is a small single-limb integer,
     `e` is a double-limb integer stored in the array ``exp`` and
     `m` is a double-limb integer accompanied by the two-limb
-    precomputed inverse `\lfloor 2^{3 \mathtt{FLINT\_BITS}} / \rfloor`
+    precomputed inverse `\lfloor 2^{3 \cdot \mathtt{FLINT\_BITS}} / \rfloor`
     stored in ``minv``. The function :func:`n_ll_small_2_powmod` is
     specialized for base `b = 2`, writing the double-limb result to
     ``res``, while :func:`n_ll_small_powmod_triple`
     performs three simultaneous exponentations, writing the results
-    for bases `b_1, b_2, b_3` to ``res1``, ``res2`` and ``res3``
+    for bases `b_1 \le b_2 \le b_3` to ``res1``, ``res2`` and ``res3``
     respectively.
 
-    These functions require `b, m` to be "small" for
-    correctness, i.e. the whole double-limb range is not supported.
+    We require `m > 2^{\mathtt{FLINT\_BITS}}`. In addition, both `m` and
+    `b` must be "small" for correctness, i.e. the whole double-limb
+    operand range is not supported.
     A sufficient criterion for correctness is that
-    `(6 b m)^2 < 2^{3 \mathtt{FLINT\_BITS}}`,
-    `m > 2^{\mathtt{FLINT\_BITS}}`, and `b^7 < 2^{\mathtt{FLINT\_BITS}}`.
+    `(12 m)^2 < 2^{3 \cdot \mathtt{FLINT\_BITS}}` for the base-2 test
+    and `(6 b_3 m)^2 < 2^{3 \cdot \mathtt{FLINT\_BITS}}` for the general
+    test.
 
     These are helper functions used by :func:`n_ll_is_prime`.
 

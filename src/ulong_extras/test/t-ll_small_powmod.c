@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "gmpcompat.h"
 #include "test_helpers.h"
 #include "ulong_extras.h"
@@ -29,7 +30,10 @@ TEST_FUNCTION_START(n_ll_small_powmod, state)
 
         while (1)
         {
-            bmax = n_randint(state, (FLINT_BITS == 64) ? 566 : 24);
+            if (n_randint(state, 2))
+                bmax = n_randint(state, (FLINT_BITS == 64) ? 565 : 23);
+            else
+                bmax = n_randtest(state);
             bmax = FLINT_MAX(bmax, 2);
 
             m[0] = n_randtest(state);
@@ -38,15 +42,18 @@ TEST_FUNCTION_START(n_ll_small_powmod, state)
             if (m[1] == 1 && m[0] == 0)
                 continue;
 
-            ulong mbits = FLINT_BITS + FLINT_BIT_COUNT(m[1]);
+            double bound;
 
-            if (2 * (mbits + FLINT_BIT_COUNT(6 * bmax)) <= 3 * FLINT_BITS)
+            bound = 6.0 * bmax * (m[0] + ldexp(1.0, FLINT_BITS) * m[1]);
+            bound = bound * bound;
+
+            if (bound < ldexp(1.0, 3 * FLINT_BITS))
                 break;
         }
 
-        b[0] = n_randint(state, bmax);
-        b[1] = n_randint(state, bmax);
-        b[2] = n_randint(state, bmax);
+        b[2] = n_randint(state, bmax + 1);
+        b[1] = n_randint(state, b[2] + 1);
+        b[0] = n_randint(state, b[1] + 1);
 
         n_ll_small_preinv(minv, m);
 
