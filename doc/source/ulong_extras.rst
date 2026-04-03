@@ -1122,12 +1122,20 @@ Primality testing
     Primality test for a double-limb integer `n` represented by
     low part ``nlo`` and high part ``nhi``. The high part must be nonzero.
     Returns 1 if `n` is certainly prime, 0 if `n` is certainly composite,
-    and -1 if `n` is out of range for the present implementation.
-    For `n` up to about 81 bits, this uses a strong probable prime test
-    (Miller-Rabin test) with the first 13 primes as witnesses. This has
-    been shown to prove primality [SorWeb2016]_.
-    Currently no other primality test is implemented for larger input;
-    users may fall back on :func:`fmpz_is_prime` when this function returns -1.
+    and -1 if unknown.
+
+    For `n` up to about 81 bits on a 64-bit machine, this function first does
+    trial division and then performs a strong probable prime test (Miller-Rabin
+    test) with the first 13 primes as witnesses. This has been shown to prove
+    primality for integers in this range [SorWeb2016]_, so the return
+    value in this range is always 0 or 1.
+
+    For larger `n` on a 64-bit machine, this function does trial division
+    and a base-2 test, returning either 0 or -1.
+    A return value of -1 thus indicates that `n` is at least a base
+    strong probable prime. Users may fall back on
+    :func:`fmpz_is_prime` for a proved result in this case.
+
     On 32-bit machines, this function currently always returns -1.
 
 Chinese remaindering

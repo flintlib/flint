@@ -56,33 +56,39 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
       if (d[0] % 2 == 0)
           return 0;
 
-      if (size == 2)
+      if (size == 2 && FLINT_BITS == 64)
       {
-         /* Currently n_ll_is_prime is faster than fmpz_is_probabprime_BPSW,
-            so use it even when !proved */
+         /* n_ll_is_prime does trial division, a base-2 sprp test, and may
+            additionally be able to certify some inputs. Currently the
+            certifications in n_ll_is_prime are faster than a Lucas test,
+            so use it even when !proved. */
          res = n_ll_is_prime(d[1], d[0]);
          if (res != -1)
             return res;
       }
+      else
+      {
+          bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
+          trial_primes = bits;
 
-      bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
-      trial_primes = bits;
+          if (flint_mpn_factor_trial(d, size, 1, trial_primes))
+               return 0;
 
-      if (flint_mpn_factor_trial(d, size, 1, trial_primes))
-           return 0;
-    }
+           /* todo: use fmpz_is_perfect_power? */
+           if (fmpz_is_square(n))
+              return 0;
 
-   /* todo: use fmpz_is_perfect_power? */
-   if (fmpz_is_square(n))
-      return 0;
+           /* Do a single base-2 test to rule out most composites */
+           fmpz base2 = 2;
+           if (!fmpz_is_strong_probabprime(n, &base2))
+             return 0;
+      }
+   }
 
+   /* At this point n has no small factor and is at least a base-2 sprp.
+      Adding a Lucas test makes this a BPSW test. */
    if (!proved)
-      return fmpz_is_probabprime_BPSW(n);
-
-   /* Do a single base-2 test to rule out most composites */
-   fmpz base2 = 2;
-   if (!fmpz_is_strong_probabprime(n, &base2))
-     return 0;
+     return fmpz_is_probabprime_lucas(n);
 
    logd = fmpz_dlog(n);
    limit = (ulong) (logd*logd*logd/100.0) + 20;

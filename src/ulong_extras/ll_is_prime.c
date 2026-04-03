@@ -407,7 +407,7 @@ int n_ll_small_sprp_stage2(nn_srcptr y, slong s, nn_srcptr nm1, nn_srcptr n, nn_
 }
 
 static int
-n_ll_small_is_prime_mr_13base(ulong n1, ulong n0)
+n_ll_small_is_prime_mr(ulong n1, ulong n0, int base2only)
 {
     ulong nm1[2], t[2], y[2];
     slong s = 0;
@@ -443,6 +443,10 @@ n_ll_small_is_prime_mr_13base(ulong n1, ulong n0)
     if (!n_ll_small_sprp_stage2(y, s, nm1, n, ninv))
         return 0;
 
+    /* Only a probable prime */
+    if (base2only)
+        return -1;
+
     /* Odd base tests. */
     static const unsigned char bases[12] = { 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41 }; 
 
@@ -463,47 +467,101 @@ n_ll_small_is_prime_mr_13base(ulong n1, ulong n0)
     return 1;
 }
 
-/* Low and high word of 1/p mod 2^128; low and high word of 2^128 / p */
-static const ulong ll_trial_primes[302][4] = {
-    { UWORD(0xaaaaaaaaaaaaaaab), UWORD(0xaaaaaaaaaaaaaaaa), UWORD(0xaaaaaaaaaaaaaaaa), UWORD(0x2aaaaaaaaaaaaaaa) },  // 3
-    { UWORD(0xcccccccccccccccd), UWORD(0xcccccccccccccccc), UWORD(0x9999999999999999), UWORD(0x1999999999999999) },  // 5
-    { UWORD(0x6db6db6db6db6db7), UWORD(0xb6db6db6db6db6db), UWORD(0x2492492492492492), UWORD(0x1249249249249249) },  // 7
-    { UWORD(0x2e8ba2e8ba2e8ba3), UWORD(0xa2e8ba2e8ba2e8ba), UWORD(0xba2e8ba2e8ba2e8b), UWORD(0xba2e8ba2e8ba2e8) },  // 11
-    { UWORD(0x4ec4ec4ec4ec4ec5), UWORD(0xc4ec4ec4ec4ec4ec), UWORD(0x9d89d89d89d89d89), UWORD(0x9d89d89d89d89d8) },  // 13
-    { UWORD(0xf0f0f0f0f0f0f0f1), UWORD(0xf0f0f0f0f0f0f0f0), UWORD(0x8787878787878787), UWORD(0x787878787878787) },  // 17
-    { UWORD(0x86bca1af286bca1b), UWORD(0xbca1af286bca1af2), UWORD(0xf286bca1af286bca), UWORD(0x6bca1af286bca1a) },  // 19
-    { UWORD(0xd37a6f4de9bd37a7), UWORD(0x4de9bd37a6f4de9b), UWORD(0x21642c8590b21642), UWORD(0x590b21642c8590b) },  // 23
-    { UWORD(0x34f72c234f72c235), UWORD(0xc234f72c234f72c2), UWORD(0x69ee58469ee58469), UWORD(0x469ee58469ee584) },  // 29
-    { UWORD(0xef7bdef7bdef7bdf), UWORD(0xdef7bdef7bdef7bd), UWORD(0x4210842108421084), UWORD(0x421084210842108) },  // 31
-    { UWORD(0x14c1bacf914c1bad), UWORD(0xc1bacf914c1bacf9), UWORD(0x2983759f22983759), UWORD(0x3759f22983759f2) },  // 37
-    { UWORD(0x8f9c18f9c18f9c19), UWORD(0x18f9c18f9c18f9c1), UWORD(0x31f3831f3831f383), UWORD(0x31f3831f3831f38) },  // 41
-    { UWORD(0x82fa0be82fa0be83), UWORD(0xbe82fa0be82fa0be), UWORD(0xfa0be82fa0be82fa), UWORD(0x2fa0be82fa0be82) },  // 43
-    { UWORD(0x51b3bea3677d46cf), UWORD(0x3677d46cefa8d9df), UWORD(0xc415c9882b931057), UWORD(0x2b9310572620ae4) },  // 47
-    { UWORD(0x21cfb2b78c13521d), UWORD(0x13521cfb2b78c135), UWORD(0xa439f656f1826a43), UWORD(0x26a439f656f1826) },  // 53
-    { UWORD(0xcbeea4e1a08ad8f3), UWORD(0x8f2fba9386822b63), UWORD(0x8ad8f2fba9386822), UWORD(0x22b63cbeea4e1a0) },  // 59
-    { UWORD(0x4fbcda3ac10c9715), UWORD(0x14fbcda3ac10c971), UWORD(0x2192e29f79b47582), UWORD(0x2192e29f79b4758) },  // 61
-    { UWORD(0xf0b7672a07a44c6b), UWORD(0xc2dd9ca81e9131ab), UWORD(0xa07a44c6afc2dd9c), UWORD(0x1e9131abf0b7672) },  // 67
-    { UWORD(0x193d4bb7e327a977), UWORD(0x4f52edf8c9ea5dbf), UWORD(0x12073615a240e6c2), UWORD(0x1cd85689039b0ad) },  // 71
-    { UWORD(0x7e3f1f8fc7e3f1f9), UWORD(0x3f1f8fc7e3f1f8fc), UWORD(0x381c0e070381c0e), UWORD(0x1c0e070381c0e07) },  // 73
-    { UWORD(0x9b8b577e613716af), UWORD(0xd5df984dc5abbf30), UWORD(0xd2a2067b23a5440c), UWORD(0x19ec8e951033d91) },  // 79
-    { UWORD(0xa3784a062b2e43db), UWORD(0x2818acb90f6bf3a9), UWORD(0x3784a062b2e43daf), UWORD(0x18acb90f6bf3a9a) },  // 83
-    { UWORD(0xf47e8fd1fa3f47e9), UWORD(0xd1fa3f47e8fd1fa3), UWORD(0xe05c0b81702e05c0), UWORD(0x1702e05c0b81702) },  // 89
-    { UWORD(0xa3a0fd5c5f02a3a1), UWORD(0x5f02a3a0fd5c5f02), UWORD(0xd07eae2f8151d07e), UWORD(0x151d07eae2f8151) },  // 97
-    { UWORD(0x3a4c0a237c32b16d), UWORD(0xc32b16cfd7720f35), UWORD(0xe41e6a74981446f8), UWORD(0x1446f86562d9fae) },  // 101
-    { UWORD(0xdab7ec1dd3431b57), UWORD(0xd0c6d5bf60ee9a18), UWORD(0xc45979c95204f88b), UWORD(0x13e22cbce4a9027) },  // 103
-    { UWORD(0x77a04c8f8d28ac43), UWORD(0xa2b10bf66e0e5aea), UWORD(0x6e0e5aea77a04c8f), UWORD(0x1323e34a2b10bf6) },  // 107
-    { UWORD(0xa6c0964fda6c0965), UWORD(0xc0964fda6c0964fd), UWORD(0x4d812c9fb4d812c9), UWORD(0x12c9fb4d812c9fb) },  // 109
-    { UWORD(0x90fdbc090fdbc091), UWORD(0xc090fdbc090fdbc0), UWORD(0x21fb78121fb78121), UWORD(0x121fb78121fb781) },  // 113
-    { UWORD(0x7efdfbf7efdfbf7f), UWORD(0xbf7efdfbf7efdfbf), UWORD(0x204081020408102), UWORD(0x102040810204081) },  // 127
-    { UWORD(0x3e88cb3c9484e2b), UWORD(0xf82ee6986d6f63aa), UWORD(0xbf82ee6986d6f63a), UWORD(0xfa232cf252138a) },  // 131
-    { UWORD(0xe21a291c077975b9), UWORD(0x21a291c077975b8f), UWORD(0x380ef2eb71fc4345), UWORD(0xef2eb71fc43452) },  // 137
+/* Low and high word of 1/p mod 2^128; low and high word of (2^128-1) / p */
+static const ulong ll_trial_primes[64][4] = {
+    { UWORD(0xaaaaaaaaaaaaaaab), UWORD(0xaaaaaaaaaaaaaaaa), UWORD(0x5555555555555555), UWORD(0x5555555555555555) },  // 3
+    { UWORD(0xcccccccccccccccd), UWORD(0xcccccccccccccccc), UWORD(0x3333333333333333), UWORD(0x3333333333333333) },  // 5
+    { UWORD(0x6db6db6db6db6db7), UWORD(0xb6db6db6db6db6db), UWORD(0x4924924924924924), UWORD(0x2492492492492492) },  // 7
+    { UWORD(0x2e8ba2e8ba2e8ba3), UWORD(0xa2e8ba2e8ba2e8ba), UWORD(0x745d1745d1745d17), UWORD(0x1745d1745d1745d1) },  // 11
+    { UWORD(0x4ec4ec4ec4ec4ec5), UWORD(0xc4ec4ec4ec4ec4ec), UWORD(0x3b13b13b13b13b13), UWORD(0x13b13b13b13b13b1) },  // 13
+    { UWORD(0xf0f0f0f0f0f0f0f1), UWORD(0xf0f0f0f0f0f0f0f0), UWORD(0xf0f0f0f0f0f0f0f), UWORD(0xf0f0f0f0f0f0f0f) },  // 17
+    { UWORD(0x86bca1af286bca1b), UWORD(0xbca1af286bca1af2), UWORD(0xe50d79435e50d794), UWORD(0xd79435e50d79435) },  // 19
+    { UWORD(0xd37a6f4de9bd37a7), UWORD(0x4de9bd37a6f4de9b), UWORD(0x42c8590b21642c85), UWORD(0xb21642c8590b216) },  // 23
+    { UWORD(0x34f72c234f72c235), UWORD(0xc234f72c234f72c2), UWORD(0xd3dcb08d3dcb08d3), UWORD(0x8d3dcb08d3dcb08) },  // 29
+    { UWORD(0xef7bdef7bdef7bdf), UWORD(0xdef7bdef7bdef7bd), UWORD(0x8421084210842108), UWORD(0x842108421084210) },  // 31
+    { UWORD(0x14c1bacf914c1bad), UWORD(0xc1bacf914c1bacf9), UWORD(0x5306eb3e45306eb3), UWORD(0x6eb3e45306eb3e4) },  // 37
+    { UWORD(0x8f9c18f9c18f9c19), UWORD(0x18f9c18f9c18f9c1), UWORD(0x63e7063e7063e706), UWORD(0x63e7063e7063e70) },  // 41
+    { UWORD(0x82fa0be82fa0be83), UWORD(0xbe82fa0be82fa0be), UWORD(0xf417d05f417d05f4), UWORD(0x5f417d05f417d05) },  // 43
+    { UWORD(0x51b3bea3677d46cf), UWORD(0x3677d46cefa8d9df), UWORD(0x882b9310572620ae), UWORD(0x572620ae4c415c9) },  // 47
+    { UWORD(0x21cfb2b78c13521d), UWORD(0x13521cfb2b78c135), UWORD(0x4873ecade304d487), UWORD(0x4d4873ecade304d) },  // 53
+    { UWORD(0xcbeea4e1a08ad8f3), UWORD(0x8f2fba9386822b63), UWORD(0x15b1e5f75270d045), UWORD(0x456c797dd49c341) },  // 59
+    { UWORD(0x4fbcda3ac10c9715), UWORD(0x14fbcda3ac10c971), UWORD(0x4325c53ef368eb04), UWORD(0x4325c53ef368eb0) },  // 61
+    { UWORD(0xf0b7672a07a44c6b), UWORD(0xc2dd9ca81e9131ab), UWORD(0x40f4898d5f85bb39), UWORD(0x3d226357e16ece5) },  // 67
+    { UWORD(0x193d4bb7e327a977), UWORD(0x4f52edf8c9ea5dbf), UWORD(0x240e6c2b4481cd85), UWORD(0x39b0ad12073615a) },  // 71
+    { UWORD(0x7e3f1f8fc7e3f1f9), UWORD(0x3f1f8fc7e3f1f8fc), UWORD(0x70381c0e070381c), UWORD(0x381c0e070381c0e) },  // 73
+    { UWORD(0x9b8b577e613716af), UWORD(0xd5df984dc5abbf30), UWORD(0xa5440cf6474a8819), UWORD(0x33d91d2a2067b23) },  // 79
+    { UWORD(0xa3784a062b2e43db), UWORD(0x2818acb90f6bf3a9), UWORD(0x6f0940c565c87b5f), UWORD(0x3159721ed7e7534) },  // 83
+    { UWORD(0xf47e8fd1fa3f47e9), UWORD(0xd1fa3f47e8fd1fa3), UWORD(0xc0b81702e05c0b81), UWORD(0x2e05c0b81702e05) },  // 89
+    { UWORD(0xa3a0fd5c5f02a3a1), UWORD(0x5f02a3a0fd5c5f02), UWORD(0xa0fd5c5f02a3a0fd), UWORD(0x2a3a0fd5c5f02a3) },  // 97
+    { UWORD(0x3a4c0a237c32b16d), UWORD(0xc32b16cfd7720f35), UWORD(0xc83cd4e930288df0), UWORD(0x288df0cac5b3f5d) },  // 101
+    { UWORD(0xdab7ec1dd3431b57), UWORD(0xd0c6d5bf60ee9a18), UWORD(0x88b2f392a409f116), UWORD(0x27c45979c95204f) },  // 103
+    { UWORD(0x77a04c8f8d28ac43), UWORD(0xa2b10bf66e0e5aea), UWORD(0xdc1cb5d4ef40991f), UWORD(0x2647c69456217ec) },  // 107
+    { UWORD(0xa6c0964fda6c0965), UWORD(0xc0964fda6c0964fd), UWORD(0x9b02593f69b02593), UWORD(0x2593f69b02593f6) },  // 109
+    { UWORD(0x90fdbc090fdbc091), UWORD(0xc090fdbc090fdbc0), UWORD(0x43f6f0243f6f0243), UWORD(0x243f6f0243f6f02) },  // 113
+    { UWORD(0x7efdfbf7efdfbf7f), UWORD(0xbf7efdfbf7efdfbf), UWORD(0x408102040810204), UWORD(0x204081020408102) },  // 127
+    { UWORD(0x3e88cb3c9484e2b), UWORD(0xf82ee6986d6f63aa), UWORD(0x7f05dcd30dadec75), UWORD(0x1f44659e4a42715) },  // 131
+    { UWORD(0xe21a291c077975b9), UWORD(0x21a291c077975b8f), UWORD(0x701de5d6e3f8868a), UWORD(0x1de5d6e3f8868a4) },  // 137
+    { UWORD(0x3aef6ca970586723), UWORD(0xa2126ad1f4f31ba0), UWORD(0x17f14424d5a3e9e6), UWORD(0x1d77b654b82c339) },  // 139
+    { UWORD(0xdf5b0f768ce2cabd), UWORD(0x93c225cc74d50c06), UWORD(0xaf3f920a4f089731), UWORD(0x1b7d6c3dda338b2) },  // 149
+    { UWORD(0x6fe4dfc9bf937f27), UWORD(0x26fe4dfc9bf937f2), UWORD(0x1b2036406c80d901), UWORD(0x1b2036406c80d90) },  // 151
+    { UWORD(0x5b4fe5e92c0685b5), UWORD(0x685b4fe5e92c068), UWORD(0x16d3f97a4b01a16d), UWORD(0x1a16d3f97a4b01a) },  // 157
+    { UWORD(0x1f693a1c451ab30b), UWORD(0x8bc775ca99ea0324), UWORD(0x59857f36f825b178), UWORD(0x1920fb49d0e228d) },  // 163
+    { UWORD(0x8d07aa27db35a717), UWORD(0x513ed9ad38b7f3bc), UWORD(0x4b1d20310dcbe157), UWORD(0x1886e5f0abb0499) },  // 167
+    { UWORD(0x882383b30d516325), UWORD(0x133caba736c05eb4), UWORD(0x458c93fa14b77dc7), UWORD(0x17ad2208e0ecc35) },  // 173
+    { UWORD(0xed6866f8d962ae7b), UWORD(0xe4d3aa30a02dc3e), UWORD(0xb1573d7f48f044a5), UWORD(0x16e1f76b4337c6c) },  // 179
+    { UWORD(0x3454dca410f8ed9d), UWORD(0x6fbc1c498c05a84f), UWORD(0x3e3b673fa57b0cba), UWORD(0x16a13cd15372904) },  // 181
+    { UWORD(0x1d7ca632ee936f3f), UWORD(0x7749b79f7f547096), UWORD(0x22d9218202ae3da7), UWORD(0x1571ed3c506b39a) },  // 191
+    { UWORD(0x70bf015390948f41), UWORD(0x90948f40feac6f6b), UWORD(0x6f6b70bf01539094), UWORD(0x15390948f40feac) },  // 193
+    { UWORD(0xc96bdb9d3d137e0d), UWORD(0xbb207cc0532ae21), UWORD(0x4f44df833facd51d), UWORD(0x14cab88725af6e7) },  // 197
+    { UWORD(0x2697cc8aef46c0f7), UWORD(0x7a3607b7f5b5630e), UWORD(0xa21727e120292a73), UWORD(0x149539e3b2d066e) },  // 199
+    { UWORD(0xc0e8f2a76e68575b), UWORD(0x2f514a026d31be7b), UWORD(0x53b7342bad7f64b3), UWORD(0x13698df3de07479) },  // 211
+    { UWORD(0x687763dfdb43bb1f), UWORD(0xdd8f7f6d0eec7bfb), UWORD(0x3840497889c2024b), UWORD(0x125e22708092f11) },  // 223
+    { UWORD(0x1b10ea929ba144cb), UWORD(0x766a024168e18cf8), UWORD(0x75494dd0a2657f6f), UWORD(0x120b470c67c0d88) },  // 227
+    { UWORD(0x1d10c4c0478bbced), UWORD(0xc4c0478bbcecfee), UWORD(0x313011e2ef3b3fb8), UWORD(0x11e2ef3b3fb8744) },  // 229
+    { UWORD(0x63fb9aeb1fdcd759), UWORD(0x758fee6bac7f735d), UWORD(0x46514e02328a7011), UWORD(0x119453808ca29c0) },  // 233
+    { UWORD(0x64afaa4f437b2e0f), UWORD(0x77f76e538c5167e), UWORD(0xa0ab617909a3e202), UWORD(0x112358e75d30336) },  // 239
+    { UWORD(0xf010fef010fef011), UWORD(0x10fef010fef010fe), UWORD(0xef010fef010fef01), UWORD(0x10fef010fef010f) },  // 241
+    { UWORD(0x28cbfbeb9a020a33), UWORD(0xa020a32fefae6808), UWORD(0x465fdf5cd0105197), UWORD(0x105197f7d734041) },  // 251
+    { UWORD(0xff00ff00ff00ff01), UWORD(0xff00ff00ff00ff00), UWORD(0xff00ff00ff00ff), UWORD(0xff00ff00ff00ff) },  // 257
+    { UWORD(0xd624fd1470e99cb7), UWORD(0xf836826ef73d52bc), UWORD(0x653b605d71e2cc69), UWORD(0xf92fb2211855a8) },  // 263
+    { UWORD(0x8fb3ddbd6205b5c5), UWORD(0x3ce8354b2ea1c8cd), UWORD(0x363ecf76f58816d7), UWORD(0xf3a0d52cba8723) },  // 269
+    { UWORD(0xd57da36ca27acdef), UWORD(0x8715ba188f963302), UWORD(0xfa5504b926bb0a64), UWORD(0xf1d48bcee0d399) },  // 271
+    { UWORD(0xee70c03b25e4463d), UWORD(0xb25e4463cff13686), UWORD(0xa1bb9c300ec97911), UWORD(0xec979118f3fc4d) },  // 277
+    { UWORD(0xc5b1a6b80749cb29), UWORD(0x6c69ae01d272ca3f), UWORD(0x5c03a4e5947f8b63), UWORD(0xe939651fe2d8d3) },  // 281
+    { UWORD(0x47768073c9b97113), UWORD(0xf26e5c44bfc61b23), UWORD(0xd91a3bb4039e4dcb), UWORD(0xe79372e225fe30) },  // 283
+    { UWORD(0x2591e94884ce32ad), UWORD(0xb07dd0d1b15d7cf1), UWORD(0x5f3c49647a522133), UWORD(0xdfac1f74346c57) },  // 293
+    { UWORD(0xf02806abc74be1fb), UWORD(0xd2f87ebfcaa1c5a0), UWORD(0x50e2d078140355e3), UWORD(0xd578e97c3f5fe5) },  // 307
+    { UWORD(0x7ec3e8f3a7198487), UWORD(0xbe25dd6d7aa646ca), UWORD(0xab3726b02782e18b), UWORD(0xd2ba083b445250) },  // 311
+    { UWORD(0x58550f8a39409d09), UWORD(0xbc1d71afd8bdc034), UWORD(0x7423fcba7aaf075c), UWORD(0xd161543e28e502) },  // 313
+
 };
+
+
+/* FIXME: until we have good double-limb implementation, mock one up. */
+#include <fmpz.h>
+
+static int
+n_ll_fallback_is_prime_base2(ulong nhi, ulong nlo)
+{
+    int res;
+    fmpz_t nn;
+    fmpz_init(nn);
+    fmpz_set_uiui(nn, nhi, nlo);
+    fmpz base2 = 2;
+    if (!fmpz_is_strong_probabprime(nn, &base2))
+        res = 0;
+    else
+        res = -1;
+    fmpz_clear(nn);
+    return res;
+}
 
 int
 n_ll_is_prime(ulong nhi, ulong nlo)
 {
     ulong n1 = nhi, n0 = nlo;
-    ulong t1, t0;
+    ulong a0, a1;
+    ulong b0, b1;
     slong i;
 
     FLINT_ASSERT(nhi != 0);
@@ -512,38 +570,52 @@ n_ll_is_prime(ulong nhi, ulong nlo)
     if (n0 % 2 == 0)
         return 0;
 
-    /* To do: move this check below trial division. Currently this
-       abort is done early to avoid duplicate trial division in
-       fmpz_is_prime. */
-    if (n1 > SWbound[1] || (n1 == SWbound[1] && n0 >= SWbound[0]))
-        return -1;
-
     /* Granlund-Montgomery trial division by 3, 5, ..., 137.
        On Zen 3, unrolling by two and combining comparisons bitwise
        is faster than a more branchy version. */
+#define ainv0 ll_trial_primes[i][0]
+#define ainv1 ll_trial_primes[i][1]
+#define abound0 ll_trial_primes[i][2]
+#define abound1 ll_trial_primes[i][3]
+#define binv0 ll_trial_primes[i + 1][0]
+#define binv1 ll_trial_primes[i + 1][1]
+#define bbound0 ll_trial_primes[i + 1][2]
+#define bbound1 ll_trial_primes[i + 1][3]
+
     for (i = 0; i < 32; i += 2)
     {
-        ulong v1, v0, u1, u0;
-        ulong w1, w0, q1, q0, r1, r0;
+        mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
+        mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
 
-        u0 = ll_trial_primes[i][0];
-        u1 = ll_trial_primes[i][1];
-        v0 = ll_trial_primes[i][2];
-        v1 = ll_trial_primes[i][3];
-
-        q0 = ll_trial_primes[i + 1][0];
-        q1 = ll_trial_primes[i + 1][1];
-        w0 = ll_trial_primes[i + 1][2];
-        w1 = ll_trial_primes[i + 1][3];
-
-        mullo_2x2(&t1, &t0, n1, n0, u1, u0);
-        mullo_2x2(&r1, &r0, n1, n0, q1, q0);
-
-        if ((t1 < v1) | ((t1 == v1) & (t0 <= v0)) | (r1 < v1) | ((r1 == w1) & (r0 <= w0)))
+        if ((a1 < abound1) | ((a1 == abound1) & (a0 <= abound0)) |
+            (b1 < bbound1) | ((b1 == bbound1) & (b0 <= bbound0)))
             return 0;
     }
 
-    return n_ll_small_is_prime_mr_13base(n1, n0);
+    if (n1 > SWbound[1] || (n1 == SWbound[1] && n0 >= SWbound[0]))
+    {
+        /* 6 * 2 * (357913941 * 2^64) < 2^192, so we can use the fast
+           base-2 Miller-Rabin code */
+        if (n1 < UWORD(357913941))
+            return n_ll_small_is_prime_mr(n1, n0, 1);
+        else
+        {
+            /* The base-2 test is slower now, so do some extra trial division. */
+            for (i = 32; i < 64; i += 2)
+            {
+                mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
+                mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
+
+                if ((a1 < abound1) | ((a1 == abound1) & (a0 <= abound0)) |
+                    (b1 < bbound1) | ((b1 == bbound1) & (b0 <= bbound0)))
+                    return 0;
+            }
+
+            return n_ll_fallback_is_prime_base2(n1, n0);
+        }
+    }
+
+    return n_ll_small_is_prime_mr(n1, n0, 0);
 }
 
 #endif
