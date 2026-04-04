@@ -776,6 +776,33 @@ precomputed quotient for `b`:
 5. compute `h = b \check{a} - q n` (two single-word multiplications)
 6. if `h \ge n` then `q \gets q+1`
 
+Double-limb modular arithmetic
+--------------------------------------------------------------------------------
+
+..  function:: void n_ll_small_2_powmod(nn_ptr res, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
+               void n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3, ulong b1, ulong b2, ulong b3, nn_srcptr exp, nn_srcptr m, nn_srcptr minv)
+
+    Computes `b^e \bmod m` where `b` is a small single-limb integer,
+    `e` is a double-limb integer stored in the array ``exp`` and
+    `m` is a double-limb integer accompanied by the two-limb
+    precomputed inverse `\lfloor 2^{3 \cdot \mathtt{FLINT\_BITS}} / \rfloor`
+    stored in ``minv``. The function :func:`n_ll_small_2_powmod` is
+    specialized for base `b = 2`, writing the double-limb result to
+    ``res``, while :func:`n_ll_small_powmod_triple`
+    performs three simultaneous exponentations, writing the results
+    for bases `b_1 \le b_2 \le b_3` to ``res1``, ``res2`` and ``res3``
+    respectively.
+
+    We require `m > 2^{\mathtt{FLINT\_BITS}}`. In addition, both `m` and
+    `b` must be "small" for correctness, i.e. the whole double-limb
+    operand range is not supported.
+    A sufficient criterion for correctness is that
+    `(12 m)^2 < 2^{3 \cdot \mathtt{FLINT\_BITS}}` for the base-2 test
+    and `(6 b_3 m)^2 < 2^{3 \cdot \mathtt{FLINT\_BITS}}` for the general
+    test.
+
+    These are helper functions used by :func:`n_ll_is_prime`.
+
 Divisibility testing
 --------------------------------------------------------------------------------
 
@@ -1090,6 +1117,26 @@ Primality testing
 
     This function is obsolete and currently just wraps :func:`n_is_prime`.
 
+.. function:: int n_ll_is_prime(ulong nhi, ulong nlo)
+
+    Primality test for a double-limb integer `n` represented by
+    low part ``nlo`` and high part ``nhi``. The high part must be nonzero.
+    Returns 1 if `n` is certainly prime, 0 if `n` is certainly composite,
+    and -1 if unknown.
+
+    For `n` up to about 81 bits on a 64-bit machine, this function first does
+    trial division and then performs a strong probable prime test (Miller-Rabin
+    test) with the first 13 primes as witnesses. This has been shown to prove
+    primality for integers in this range [SorWeb2016]_, so the return
+    value in this range is always 0 or 1.
+
+    For larger `n` on a 64-bit machine, this function does trial division
+    and a base-2 test, returning either 0 or -1.
+    A return value of -1 thus indicates that `n` is at least a base
+    strong probable prime. Users may fall back on
+    :func:`fmpz_is_prime` for a proved result in this case.
+
+    On 32-bit machines, this function currently always returns -1.
 
 Chinese remaindering
 --------------------------------------------------------------------------------

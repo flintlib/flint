@@ -61,8 +61,10 @@
 #include "t-is_strong_probabprime2_preinv.c"
 #include "t-is_strong_probabprime_precomp.c"
 #include "t-jacobi.c"
+#include "t-ll_is_prime.c"
 #include "t-lll_mod_preinv.c"
 #include "t-ll_mod_preinv.c"
+#include "t-ll_small_powmod.c"
 #include "t-mod2_precomp.c"
 #include "t-mod2_preinv.c"
 #include "t-mod_precomp.c"
@@ -158,8 +160,10 @@ test_struct tests[] =
     TEST_FUNCTION(n_is_strong_probabprime2_preinv),
     TEST_FUNCTION(n_is_strong_probabprime_precomp),
     TEST_FUNCTION(n_jacobi),
+    TEST_FUNCTION(n_ll_is_prime),
     TEST_FUNCTION(n_lll_mod_preinv),
     TEST_FUNCTION(n_ll_mod_preinv),
+    TEST_FUNCTION(n_ll_small_powmod),
     TEST_FUNCTION(n_mod2_precomp),
     TEST_FUNCTION(n_mod2_preinv),
     TEST_FUNCTION(n_mod_precomp),

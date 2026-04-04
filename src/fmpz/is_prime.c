@@ -25,7 +25,7 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
    const ulong * primes;
    const double * pinv;
 
-   fmpz_t F1, Fsqr, Fcub, R, t;
+   fmpz_t F1, Fsqr, Fcub, R;
    int res = -1;
 
     if (!COEFF_IS_MPZ(*n))
@@ -34,9 +34,8 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
        if (v <= 1)
            return 0;
 
-       /* Note: we want n_is_prime rather than n_is_probabprime
-          even when proved == 0, because ns_is_prime handles general
-          input faster. */
+       /* Note: n_is_prime and n_is_probabprime are currently identical,
+          so we ignore the proved flag. */
        return n_is_prime(v);
    }
    else
@@ -57,45 +56,39 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
       if (d[0] % 2 == 0)
           return 0;
 
-      bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
-      trial_primes = bits;
-
-      if (flint_mpn_factor_trial(d, size, 1, trial_primes))
-           return 0;
-    }
-
-   /* todo: use fmpz_is_perfect_power? */
-   if (fmpz_is_square(n))
-      return 0;
-
-   if (!proved)
-      return fmpz_is_probabprime_BPSW(n);
-
-   /* Fast deterministic Miller-Rabin test up to about 81 bits. This choice of
-      bases certifies primality for n < 3317044064679887385961981;
-      see https://doi.org/10.1090/mcom/3134 */
-   fmpz_init(t);
-   fmpz_tdiv_q_2exp(t, n, 64);
-   if (fmpz_cmp_ui(t, 179817) < 0)
-   {
-      static const char bases[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 0 };
-
-      for (i = 0; bases[i] != 0; i++)
+      if (size == 2 && FLINT_BITS == 64)
       {
-         fmpz_set_ui(t, bases[i]);
-         if (!fmpz_is_strong_probabprime(n, t))
-             return 0;  /* no need to clear t since it is small */
+         /* n_ll_is_prime does trial division, a base-2 sprp test, and may
+            additionally be able to certify some inputs. Currently the
+            certifications in n_ll_is_prime are faster than a Lucas test,
+            so use it even when !proved. */
+         res = n_ll_is_prime(d[1], d[0]);
+         if (res != -1)
+            return res;
       }
+      else
+      {
+          bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
+          trial_primes = bits;
 
-      return 1;
+          if (flint_mpn_factor_trial(d, size, 1, trial_primes))
+               return 0;
+
+           /* todo: use fmpz_is_perfect_power? */
+           if (fmpz_is_square(n))
+              return 0;
+
+           /* Do a single base-2 test to rule out most composites */
+           fmpz base2 = 2;
+           if (!fmpz_is_strong_probabprime(n, &base2))
+             return 0;
+      }
    }
 
-   /* Do a single base-2 test to rule out most composites */
-   fmpz_set_ui(t, 2);
-   if (!fmpz_is_strong_probabprime(n, t))
-     return 0;
-
-   fmpz_clear(t);
+   /* At this point n has no small factor and is at least a base-2 sprp.
+      Adding a Lucas test makes this a BPSW test. */
+   if (!proved)
+     return fmpz_is_probabprime_lucas(n);
 
    logd = fmpz_dlog(n);
    limit = (ulong) (logd*logd*logd/100.0) + 20;
