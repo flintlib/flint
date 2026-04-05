@@ -199,6 +199,16 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
     }
 }
 
+
+/* Lemire-Kaser-Kurz remainder for half-limb primes */
+#include "nmod.h"
+
+FLINT_FORCE_INLINE
+ulong n_mod_halflimb_preinv(ulong x, ulong d, ulong dinv)
+{
+    return n_mulhi(dinv * x, d);
+}
+
 /*
     check position i in sieve array for smoothness
 */
@@ -279,8 +289,9 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    for (j = 3; j < qs_inf->small_primes; j++) /* pull out small primes */
    {
       prime = factor_base[j].p;
-      pinv = factor_base[j].pinv;
-      modp = n_mod2_preinv(i, prime, pinv);
+      pinv = factor_base[j].pinv2;
+      FLINT_ASSERT(prime < UWORD(1) << (FLINT_BITS / 2));
+      modp = n_mod_halflimb_preinv(i, prime, pinv);
 
       if (modp == soln1[j] || modp == soln2[j])
       {
@@ -310,39 +321,76 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
           we stop once we have reached the same number of bits as indicated in
           the sieve entry
       */
-      for (j = qs_inf->small_primes; j < num_primes && extra_bits < sieve[i]; j++)
-      {
-         prime = factor_base[j].p;
-         pinv = factor_base[j].pinv;
-         modp = n_mod2_preinv(i, prime, pinv);
 
-         if (soln2[j] != 0) /* not a prime dividing A */
+      /* can use fast remainder */
+      if (factor_base[num_primes - 1].p < UWORD(1) << (FLINT_BITS / 2))
+      {
+         for (j = qs_inf->small_primes; j < num_primes && extra_bits < sieve[i]; j++)
          {
-            if (modp == soln1[j] || modp == soln2[j])
+            prime = factor_base[j].p;
+            pinv = factor_base[j].pinv2;
+            modp = n_mod_halflimb_preinv(i, prime, pinv);
+
+            if (soln2[j] != 0) /* not a prime dividing A */
+            {
+               if (modp == soln1[j] || modp == soln2[j])
+               {
+                  fmpz_set_ui(p, prime);
+                  exp = fmpz_remove(res, res, p);
+                  extra_bits += qs_inf->factor_base[j].size;
+                  factor[num_factors].ind = j;
+                  factor[num_factors++].exp = exp;
+#if QS_DEBUG & 128
+                     flint_printf("%ld^%ld ", prime, exp);
+#endif
+               }
+            } else /* prime dividing A */
             {
                fmpz_set_ui(p, prime);
                exp = fmpz_remove(res, res, p);
-               extra_bits += qs_inf->factor_base[j].size;
                factor[num_factors].ind = j;
-               factor[num_factors++].exp = exp;
+               factor[num_factors++].exp = exp + 1; /* really factoring A*f(i) */
 #if QS_DEBUG & 128
+               if (exp)
                   flint_printf("%ld^%ld ", prime, exp);
 #endif
-
             }
-         } else /* prime dividing A */
-         {
-            fmpz_set_ui(p, prime);
-            exp = fmpz_remove(res, res, p);
-            factor[num_factors].ind = j;
-            factor[num_factors++].exp = exp + 1; /* really factoring A*f(i) */
-#if QS_DEBUG & 128
-            if (exp)
-               flint_printf("%ld^%ld ", prime, exp);
-#endif
-
          }
-      }
+    }
+    else
+    {
+         for (j = qs_inf->small_primes; j < num_primes && extra_bits < sieve[i]; j++)
+         {
+            prime = factor_base[j].p;
+            pinv = factor_base[j].pinv;
+            modp = n_mod2_preinv(i, prime, pinv);
+
+            if (soln2[j] != 0) /* not a prime dividing A */
+            {
+               if (modp == soln1[j] || modp == soln2[j])
+               {
+                  fmpz_set_ui(p, prime);
+                  exp = fmpz_remove(res, res, p);
+                  extra_bits += qs_inf->factor_base[j].size;
+                  factor[num_factors].ind = j;
+                  factor[num_factors++].exp = exp;
+#if QS_DEBUG & 128
+                     flint_printf("%ld^%ld ", prime, exp);
+#endif
+               }
+            } else /* prime dividing A */
+            {
+               fmpz_set_ui(p, prime);
+               exp = fmpz_remove(res, res, p);
+               factor[num_factors].ind = j;
+               factor[num_factors++].exp = exp + 1; /* really factoring A*f(i) */
+#if QS_DEBUG & 128
+               if (exp)
+                  flint_printf("%ld^%ld ", prime, exp);
+#endif
+            }
+         }
+    }
 
 #if QS_DEBUG & 128
       if (num_factors > 0)

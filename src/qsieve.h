@@ -36,6 +36,7 @@ extern "C" {
 typedef struct
 {
    ulong pinv;     /* precomputed inverse */
+   ulong pinv2;    /* alternative precomputed inverse */
    int p;              /* prime */
    char size;
 } prime_t;
