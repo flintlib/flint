@@ -36,6 +36,7 @@
 #include "t-CRT_ui.c"
 #include "t-CRT_ui_unsigned.c"
 #include "t-det_bound.c"
+#include "t-elementary_divisors.c"
 #include "t-det.c"
 #include "t-det_divisor.c"
 #include "t-det_modular_accelerated.c"
@@ -61,6 +62,7 @@
 #include "t-init_clear.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
+#include "t-is_diagonal.c"
 #include "t-is_empty.c"
 #include "t-is_one.c"
 #include "t-is_spd.c"
@@ -107,6 +109,7 @@
 #include "t-snf_diagonal.c"
 #include "t-snf_iliopoulos.c"
 #include "t-snf_kannan_bachem.c"
+#include "t-snf_transform.c"
 #include "t-solve_bound.c"
 #include "t-solve.c"
 #include "t-solve_cramer.c"
@@ -137,6 +140,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_CRT_ui),
     TEST_FUNCTION(fmpz_mat_CRT_ui_unsigned),
     TEST_FUNCTION(fmpz_mat_det_bound),
+    TEST_FUNCTION(fmpz_mat_elementary_divisors),
     TEST_FUNCTION(fmpz_mat_det),
     TEST_FUNCTION(fmpz_mat_det_divisor),
     TEST_FUNCTION(fmpz_mat_det_modular_accelerated),
@@ -162,6 +166,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_init_clear),
     TEST_FUNCTION(fmpz_mat_inv),
     TEST_FUNCTION(fmpz_mat_invert_rows_cols),
+    TEST_FUNCTION(fmpz_mat_is_diagonal),
     TEST_FUNCTION(fmpz_mat_is_empty),
     TEST_FUNCTION(fmpz_mat_is_one),
     TEST_FUNCTION(fmpz_mat_is_spd),
@@ -208,6 +213,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_snf_diagonal),
     TEST_FUNCTION(fmpz_mat_snf_iliopoulos),
     TEST_FUNCTION(fmpz_mat_snf_kannan_bachem),
+    TEST_FUNCTION(fmpz_mat_snf_transform),
     TEST_FUNCTION(fmpz_mat_solve_bound),
     TEST_FUNCTION(fmpz_mat_solve),
     TEST_FUNCTION(fmpz_mat_solve_cramer),

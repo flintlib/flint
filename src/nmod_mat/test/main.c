@@ -36,6 +36,7 @@
 #include "t-mul_strassen.c"
 #include "t-neg.c"
 #include "t-nmod_vec_mul.c"
+#include "t-left_nullspace.c"
 #include "t-nullspace.c"
 #include "t-permute_rows.c"
 #include "t-pow.c"
@@ -84,6 +85,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_mul_strassen),
     TEST_FUNCTION(nmod_mat_neg),
     TEST_FUNCTION(nmod_mat_nmod_vec_mul),
+    TEST_FUNCTION(nmod_mat_left_nullspace),
     TEST_FUNCTION(nmod_mat_nullspace),
     TEST_FUNCTION(nmod_mat_permute_rows),
     TEST_FUNCTION(nmod_mat_pow),
