@@ -669,6 +669,17 @@ Nullspace
     This function computes the reduced row echelon form and then reads
     off the basis vectors.
 
+.. function:: slong nmod_mat_left_nullspace(nmod_mat_t X, const nmod_mat_t A)
+
+    Computes the left nullspace of `A` and returns the nullity.
+
+    More precisely, the columns of `X` form a basis for the left
+    nullspace of `A`, i.e. each column `v` satisfies `v^T A = 0`.
+    The return value is the rank of `X`.
+
+    `X` must have sufficient space to store all basis vectors
+    in the left nullspace.
+
 
 Transforms
 --------------------------------------------------------------------------------

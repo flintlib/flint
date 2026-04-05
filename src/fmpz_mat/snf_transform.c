@@ -120,96 +120,108 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
         save_j = _fmpz_vec_init(FLINT_MAX(m, n));
         save_k = _fmpz_vec_init(FLINT_MAX(m, n));
 
-    for (j = 0; j < d; j++)
-    {
-        if (fmpz_is_one(fmpz_mat_entry(X, j, j)))
-            continue;
-
-        for (k = j + 1; k < d; k++)
+        for (j = 0; j < d; j++)
         {
-            if (fmpz_is_zero(fmpz_mat_entry(X, k, k)))
-                continue;
-            if (!fmpz_is_zero(fmpz_mat_entry(X, j, j))
-                && fmpz_divisible(fmpz_mat_entry(X, k, k),
-                                  fmpz_mat_entry(X, j, j)))
+            if (fmpz_is_one(fmpz_mat_entry(X, j, j)))
                 continue;
 
-            fmpz_xgcd_canonical_bezout(dd, uu, vv,
-                fmpz_mat_entry(X, j, j), fmpz_mat_entry(X, k, k));
-            fmpz_divexact(pp, fmpz_mat_entry(X, j, j), dd);
-            fmpz_divexact(qq, fmpz_mat_entry(X, k, k), dd);
-
-            /* vq_m1 = v*q - 1 */
-            fmpz_mul(vq_m1, vv, qq);
-            fmpz_sub_ui(vq_m1, vq_m1, 1);
-
-            /* one_m_up = 1 - u*p */
-            fmpz_mul(one_m_up, uu, pp);
-            fmpz_neg(one_m_up, one_m_up);
-            fmpz_add_ui(one_m_up, one_m_up, 1);
-
-            /*
-                Left transform on rows j,k of U (m columns):
-                new row j = old row j + v * old row k
-                new row k = q * old row j + (vq-1) * old row k
-            */
-            if (U != NULL)
+            for (k = j + 1; k < d; k++)
             {
-                for (i = 0; i < m; i++)
-                    fmpz_set(&save_j[i],
-                        fmpz_mat_entry(U, j, i));
-                for (i = 0; i < m; i++)
-                    fmpz_set(&save_k[i],
-                        fmpz_mat_entry(U, k, i));
+                if (fmpz_is_zero(fmpz_mat_entry(X, k, k)))
+                    continue;
+                if (!fmpz_is_zero(fmpz_mat_entry(X, j, j))
+                    && fmpz_divisible(
+                        fmpz_mat_entry(X, k, k),
+                        fmpz_mat_entry(X, j, j)))
+                    continue;
 
-                for (i = 0; i < m; i++)
+                fmpz_xgcd_canonical_bezout(dd, uu, vv,
+                    fmpz_mat_entry(X, j, j),
+                    fmpz_mat_entry(X, k, k));
+                fmpz_divexact(pp,
+                    fmpz_mat_entry(X, j, j), dd);
+                fmpz_divexact(qq,
+                    fmpz_mat_entry(X, k, k), dd);
+
+                /* vq_m1 = v*q - 1 */
+                fmpz_mul(vq_m1, vv, qq);
+                fmpz_sub_ui(vq_m1, vq_m1, 1);
+
+                /* one_m_up = 1 - u*p */
+                fmpz_mul(one_m_up, uu, pp);
+                fmpz_neg(one_m_up, one_m_up);
+                fmpz_add_ui(one_m_up, one_m_up, 1);
+
+                /*
+                    Left transform on rows j,k of U:
+                    new row j = old row j + v * old row k
+                    new row k = q * old row j
+                                + (vq-1) * old row k
+                */
+                if (U != NULL)
                 {
-                    fmpz_set(fmpz_mat_entry(U, j, i),
-                        &save_j[i]);
-                    fmpz_addmul(fmpz_mat_entry(U, j, i),
-                        vv, &save_k[i]);
-                    fmpz_mul(fmpz_mat_entry(U, k, i),
-                        qq, &save_j[i]);
-                    fmpz_addmul(fmpz_mat_entry(U, k, i),
-                        vq_m1, &save_k[i]);
+                    for (i = 0; i < m; i++)
+                        fmpz_set(&save_j[i],
+                            fmpz_mat_entry(U, j, i));
+                    for (i = 0; i < m; i++)
+                        fmpz_set(&save_k[i],
+                            fmpz_mat_entry(U, k, i));
+
+                    for (i = 0; i < m; i++)
+                    {
+                        fmpz_addmul(
+                            fmpz_mat_entry(U, j, i),
+                            vv, &save_k[i]);
+                        fmpz_mul(
+                            fmpz_mat_entry(U, k, i),
+                            qq, &save_j[i]);
+                        fmpz_addmul(
+                            fmpz_mat_entry(U, k, i),
+                            vq_m1, &save_k[i]);
+                    }
                 }
-            }
 
-            /*
-                Right transform on cols j,k of V (n rows):
-                new col j = u * old col j + old col k
-                new col k = (1-up) * old col j + (-p) * old col k
-            */
-            if (V != NULL)
-            {
-                for (i = 0; i < n; i++)
-                    fmpz_set(&save_j[i],
-                        fmpz_mat_entry(V, i, j));
-                for (i = 0; i < n; i++)
-                    fmpz_set(&save_k[i],
-                        fmpz_mat_entry(V, i, k));
-
-                for (i = 0; i < n; i++)
+                /*
+                    Right transform on cols j,k of V:
+                    new col j = u * old col j + old col k
+                    new col k = (1-up) * old col j
+                                + (-p) * old col k
+                */
+                if (V != NULL)
                 {
-                    fmpz_mul(fmpz_mat_entry(V, i, j),
-                        uu, &save_j[i]);
-                    fmpz_add(fmpz_mat_entry(V, i, j),
-                        fmpz_mat_entry(V, i, j),
-                        &save_k[i]);
-                    fmpz_mul(fmpz_mat_entry(V, i, k),
-                        one_m_up, &save_j[i]);
-                    fmpz_submul(fmpz_mat_entry(V, i, k),
-                        pp, &save_k[i]);
-                }
-            }
+                    for (i = 0; i < n; i++)
+                        fmpz_set(&save_j[i],
+                            fmpz_mat_entry(V, i, j));
+                    for (i = 0; i < n; i++)
+                        fmpz_set(&save_k[i],
+                            fmpz_mat_entry(V, i, k));
 
-            /* Update X diagonal: X[j,j] = gcd, X[k,k] = lcm */
-            fmpz_set(fmpz_mat_entry(X, j, j), dd);
-            fmpz_mul(fmpz_mat_entry(X, k, k), pp, qq);
-            fmpz_mul(fmpz_mat_entry(X, k, k),
-                fmpz_mat_entry(X, k, k), dd);
+                    for (i = 0; i < n; i++)
+                    {
+                        fmpz_mul(
+                            fmpz_mat_entry(V, i, j),
+                            uu, &save_j[i]);
+                        fmpz_add(
+                            fmpz_mat_entry(V, i, j),
+                            fmpz_mat_entry(V, i, j),
+                            &save_k[i]);
+                        fmpz_mul(
+                            fmpz_mat_entry(V, i, k),
+                            one_m_up, &save_j[i]);
+                        fmpz_submul(
+                            fmpz_mat_entry(V, i, k),
+                            pp, &save_k[i]);
+                    }
+                }
+
+                /* X[j,j] = gcd, X[k,k] = lcm */
+                fmpz_set(fmpz_mat_entry(X, j, j), dd);
+                fmpz_mul(fmpz_mat_entry(X, k, k),
+                    pp, qq);
+                fmpz_mul(fmpz_mat_entry(X, k, k),
+                    fmpz_mat_entry(X, k, k), dd);
+            }
         }
-    }
 
         _fmpz_vec_clear(save_k, FLINT_MAX(m, n));
         _fmpz_vec_clear(save_j, FLINT_MAX(m, n));

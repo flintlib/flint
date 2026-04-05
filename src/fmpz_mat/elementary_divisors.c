@@ -34,7 +34,7 @@ static void
 _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
     ulong p)
 {
-    nmod_mat_t Rp, Rpt, N;
+    nmod_mat_t Rp, N;
     slong rp, nullity, level, i, j, k;
     slong * mults;
     slong num_levels, mults_alloc;
@@ -67,12 +67,9 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
         mults[num_levels] = nullity;
         num_levels++;
 
-        /* Compute left nullspace of Rp via right nullspace of Rp^T */
-        nmod_mat_init(Rpt, n, r, p);
-        nmod_mat_transpose(Rpt, Rp);
+        /* Compute left nullspace of Rp */
         nmod_mat_init(N, r, nullity, p);
-        nmod_mat_nullspace(N, Rpt);
-        nmod_mat_clear(Rpt);
+        nmod_mat_left_nullspace(N, Rp);
         nmod_mat_clear(Rp);
 
         /*
@@ -81,7 +78,7 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
             - Compute combo = (v^T * R) / p as an integer vector
             - Replace the row at v's free variable position with combo
 
-            The nullspace from nmod_mat_nullspace is in reduced echelon
+            The nullspace from nmod_mat_left_nullspace is in reduced echelon
             form: column j has entry 1 at its free variable position
             (nonpivots[j]) and 0 at all other free variable positions.
             We must use these positions as pivots (not just "first

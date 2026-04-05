@@ -438,7 +438,7 @@ TEST_FUNCTION_START(fmpz_mat_snf_transform, state)
     /* NULL transform tests */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, S, S_full, U, U_full, V, V_full, T1, T2;
+        fmpz_mat_t A, S, S_full, U, U_full, V, V_full;
         slong m, n, r, b;
 
         m = n_randint(state, 15);
@@ -452,9 +452,6 @@ TEST_FUNCTION_START(fmpz_mat_snf_transform, state)
         fmpz_mat_init(U_full, m, m);
         fmpz_mat_init(V, n, n);
         fmpz_mat_init(V_full, n, n);
-        fmpz_mat_init(T1, m, n);
-        fmpz_mat_init(T2, m, n);
-
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
         fmpz_mat_randrank(A, state, r, b);
         if (n_randint(state, 2))
@@ -477,8 +474,6 @@ TEST_FUNCTION_START(fmpz_mat_snf_transform, state)
             fflush(stdout);
             flint_abort();
         }
-        /* Verify U*A has correct column space */
-        fmpz_mat_mul(T1, U, A);
 
         /* NULL U: only V computed */
         fmpz_mat_snf_transform(S, NULL, V, A);
@@ -504,8 +499,6 @@ TEST_FUNCTION_START(fmpz_mat_snf_transform, state)
             flint_abort();
         }
 
-        fmpz_mat_clear(T2);
-        fmpz_mat_clear(T1);
         fmpz_mat_clear(V_full);
         fmpz_mat_clear(U_full);
         fmpz_mat_clear(V);
