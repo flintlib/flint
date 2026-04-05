@@ -66,3 +66,5 @@ config.m4
 src/flint-mparam.h
 .gdb_history
 vgcore.*
+.venv/
+venv/
