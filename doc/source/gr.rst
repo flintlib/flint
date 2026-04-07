@@ -103,12 +103,13 @@ particular types will appear in an application.
 .. function:: void gr_ctx_uninitialized(gr_ctx_t ctx)
 
     Create an uninitialized context. This context object does not support
-    any operations, but it can be printed with :func:`gr_ctx_print`
-    and cleared with :func:`gr_ctx_clear`. A context constructor that can fail
-    (see for example :func:`gr_ctx_init_mpn_mod`) should call this method
-    so that the context object is safe to clear even if initialization
-    failed, i.e. ensuring that ``ctx`` contains a valid function pointer
-    for :func:`gr_ctx_clear`.
+    any operations and attempting to initialize an element will throw an
+    exception, but the context object itself can be printed with
+    :func:`gr_ctx_print` and cleared with :func:`gr_ctx_clear`.
+
+    This method is intended for use in wrapper code to allow creating
+    a dummy context that can be safely deinitialized even if an
+    initialization method (for example :func:`gr_ctx_init_mpn_mod`) failed.
 
 Error handling
 ...............................................................................
