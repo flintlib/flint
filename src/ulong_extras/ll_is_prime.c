@@ -533,8 +533,26 @@ static const ulong ll_trial_primes[64][4] = {
     { UWORD(0xf02806abc74be1fb), UWORD(0xd2f87ebfcaa1c5a0), UWORD(0x50e2d078140355e3), UWORD(0xd578e97c3f5fe5) },  // 307
     { UWORD(0x7ec3e8f3a7198487), UWORD(0xbe25dd6d7aa646ca), UWORD(0xab3726b02782e18b), UWORD(0xd2ba083b445250) },  // 311
     { UWORD(0x58550f8a39409d09), UWORD(0xbc1d71afd8bdc034), UWORD(0x7423fcba7aaf075c), UWORD(0xd161543e28e502) },  // 313
-
 };
+
+/* Let d be the largest trial prime. If x < 2^(2*FLINT_BITS) - d*2^FLINT_BITS, then
+   a < comparison of the high limbs in the Granlund-Montgomery divisibility test
+   is guaranteed to give the same result as a <= comparison of both limbs. */
+#define FAST_TRIAL_BOUND (UWORD_MAX - 313)
+
+/* The fallback full comparison will rarely be used except e.g. when
+   generating decreasing primes from 2^128. */
+static int
+n_ll_le(ulong ahi, ulong alo, ulong bhi, ulong blo)
+{
+#ifdef __SIZEOF_INT128__
+    return (((__uint128_t) ahi << 64) | alo) <=
+           (((__uint128_t) bhi << 64) | blo);
+#else
+    return (ahi < bhi) | ((ahi == bhi) & (alo <= blo));
+#endif
+
+}
 
 
 /* FIXME: until we have good double-limb implementation, mock one up. */
@@ -582,14 +600,25 @@ n_ll_is_prime(ulong nhi, ulong nlo)
 #define bbound0 ll_trial_primes[i + 1][2]
 #define bbound1 ll_trial_primes[i + 1][3]
 
-    for (i = 0; i < 32; i += 2)
+    if (nhi < FAST_TRIAL_BOUND)
     {
-        mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
-        mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
-
-        if ((a1 < abound1) | ((a1 == abound1) & (a0 <= abound0)) |
-            (b1 < bbound1) | ((b1 == bbound1) & (b0 <= bbound0)))
-            return 0;
+        for (i = 0; i < 32; i += 2)
+        {
+            mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
+            mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
+            if ((a1 < abound1) | (b1 < bbound1))
+                return 0;
+        }
+    }
+    else
+    {
+        for (i = 0; i < 32; i += 2)
+        {
+            mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
+            mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
+            if (n_ll_le(a1, a0, abound1, abound0) | n_ll_le(b1, b0, bbound1, bbound0))
+                return 0;
+        }
     }
 
     if (n1 > SWbound[1] || (n1 == SWbound[1] && n0 >= SWbound[0]))
@@ -598,17 +627,27 @@ n_ll_is_prime(ulong nhi, ulong nlo)
            base-2 Miller-Rabin code */
         if (n1 < UWORD(357913941))
             return n_ll_small_is_prime_mr(n1, n0, 1);
-        else
+        else /* The base-2 test is slower now, so do some extra trial division. */
         {
-            /* The base-2 test is slower now, so do some extra trial division. */
-            for (i = 32; i < 64; i += 2)
+            if (nhi < FAST_TRIAL_BOUND)
             {
-                mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
-                mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
-
-                if ((a1 < abound1) | ((a1 == abound1) & (a0 <= abound0)) |
-                    (b1 < bbound1) | ((b1 == bbound1) & (b0 <= bbound0)))
-                    return 0;
+                for (i = 32; i < 64; i += 2)
+                {
+                    mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
+                    mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
+                    if ((a1 < abound1) | (b1 < bbound1))
+                        return 0;
+                }
+            }
+            else
+            {
+                for (i = 32; i < 64; i += 2)
+                {
+                    mullo_2x2(&a1, &a0, n1, n0, ainv1, ainv0);
+                    mullo_2x2(&b1, &b0, n1, n0, binv1, binv0);
+                    if (n_ll_le(a1, a0, abound1, abound0) | n_ll_le(b1, b0, bbound1, bbound0))
+                        return 0;
+                }
             }
 
             return n_ll_fallback_is_prime_base2(n1, n0);
