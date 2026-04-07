@@ -398,6 +398,7 @@ class gr_ctx:
     def __init__(self):
         self._data = gr_ctx_struct()
         self._ref = ctypes.byref(self._data)
+        libgr.gr_ctx_uninitialized(self._ref)
         self._str = None
         self._refcount = 1
 

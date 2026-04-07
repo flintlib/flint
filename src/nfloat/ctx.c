@@ -194,10 +194,7 @@ nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags)
     slong nlimbs;
 
     if (prec <= 0 || prec > NFLOAT_MAX_LIMBS * FLINT_BITS)
-    {
-        gr_ctx_uninitialized(ctx);
         return GR_UNABLE;
-    }
 
     nlimbs = (prec + FLINT_BITS - 1) / FLINT_BITS;
 
