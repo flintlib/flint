@@ -880,7 +880,7 @@ main ()
   cpuid_osxsave = (feature_string[11] >> 3) & 1;
 
   CPUID (feature_string, 7);
-  cpuid_avx512f = (feature_string[ 2] >> 0) & 1
+  cpuid_avx512f = (feature_string[ 2] >> 0) & 1;
 
   modelstr = "$guess_cpu";
 
