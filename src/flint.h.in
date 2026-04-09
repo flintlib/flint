@@ -395,6 +395,7 @@ int parse_fmt(int * floating, const char * fmt);
 
 int flint_printf(const char * str, ...);
 int flint_sprintf(char * s, const char * str, ...);
+int flint_snprintf(char * s, size_t n, const char * str, ...);
 int flint_scanf(const char * str, ...);
 int flint_sscanf(const char * s, const char * str, ...);
 
