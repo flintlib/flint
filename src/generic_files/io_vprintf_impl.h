@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2026 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -167,21 +168,21 @@ static inline size_t flint_type_size_in_chars(flint_type_t type)
 #define FLAG_IS_NEG(flag) ((flag) & FLAG_NEG)
 #define FLAG_IS_PAREN(flag) ((flag) & FLAG_PAREN)
 
-static size_t __ulong_fprint(FILE *, const ulong *, int);
-static size_t __slong_fprint(FILE *, const slong *, int);
-static size_t __fmpz_fprint(FILE *, const fmpz *, int);
-static size_t __fmpq_fprint(FILE *, const fmpq *, int);
-static size_t __mpz_fprint(FILE *, mpz_srcptr);
-static size_t __mpq_fprint(FILE *, mpq_srcptr);
-static size_t __mag_fprint(FILE *, mag_srcptr, int);
-static size_t __arf_fprint(FILE *, arf_srcptr, int);
-static size_t __arb_fprint(FILE *, arb_srcptr, int);
-static size_t __acb_fprint(FILE *, acb_srcptr, int);
-static size_t __nmod_fprint(FILE *, nmod_t);
-static size_t __fmpz_mod_ctx_fprint(FILE *, const fmpz_mod_ctx_struct *);
-static size_t __flint_vec_fprint(FILE *, const void *, slong, flint_type_t);
-static size_t __flint_mat_fprint(FILE *, const void *, flint_type_t);
-static size_t __flint_poly_fprint(FILE *, const void *, flint_type_t);
+static size_t __ulong_fprint(FLINT_VPRINTF_OUT_T *, const ulong *, int);
+static size_t __slong_fprint(FLINT_VPRINTF_OUT_T *, const slong *, int);
+static size_t __fmpz_fprint(FLINT_VPRINTF_OUT_T *, const fmpz *, int);
+static size_t __fmpq_fprint(FLINT_VPRINTF_OUT_T *, const fmpq *, int);
+static size_t __mpz_fprint(FLINT_VPRINTF_OUT_T *, mpz_srcptr);
+static size_t __mpq_fprint(FLINT_VPRINTF_OUT_T *, mpq_srcptr);
+static size_t __mag_fprint(FLINT_VPRINTF_OUT_T *, mag_srcptr, int);
+static size_t __arf_fprint(FLINT_VPRINTF_OUT_T *, arf_srcptr, int);
+static size_t __arb_fprint(FLINT_VPRINTF_OUT_T *, arb_srcptr, int);
+static size_t __acb_fprint(FLINT_VPRINTF_OUT_T *, acb_srcptr, int);
+static size_t __nmod_fprint(FLINT_VPRINTF_OUT_T *, nmod_t);
+static size_t __fmpz_mod_ctx_fprint(FLINT_VPRINTF_OUT_T *, const fmpz_mod_ctx_struct *);
+static size_t __flint_vec_fprint(FLINT_VPRINTF_OUT_T *, const void *, slong, flint_type_t);
+static size_t __flint_mat_fprint(FLINT_VPRINTF_OUT_T *, const void *, flint_type_t);
+static size_t __flint_poly_fprint(FLINT_VPRINTF_OUT_T *, const void *, flint_type_t);
 
 /* flint_vfprintf and friends ************************************************/
 
@@ -300,7 +301,7 @@ do                              \
 #define IS_PRINTF_WCHARPFMT(str) \
     ((str)[0] == 'l' && (str)[1] == 's')
 
-int flint_vfprintf(FILE * fs, const char * ip, va_list vlist)
+int FLINT_VPRINTF_FUNCTION(FLINT_VPRINTF_FUNCTION_ARGS, const char * ip, va_list vlist)
 {
     size_t iplen;
     const char * ipcur;
@@ -308,7 +309,11 @@ int flint_vfprintf(FILE * fs, const char * ip, va_list vlist)
     size_t res;
     va_list vlist_cpy;
     int tmp;
+    FLINT_VPRINTF_OUT_T out_state;
+    FLINT_VPRINTF_OUT_T * out = &out_state;
     TMP_INIT;
+
+    FLINT_VPRINTF_INIT(out);
 
     res = 0;
     iplen = strlen(ip);
@@ -425,7 +430,7 @@ continue_while:
         opcur[cpsz] = '\0';
     }
 
-    tmp = vfprintf(fs, op, vlist_cpy);
+    tmp = FLINT_VPRINTF_VPRINTF(out, op, vlist_cpy);
     if (tmp < 0)
         res = tmp;
     else
@@ -444,7 +449,7 @@ print_flint_type:
         memcpy(opcur, ip, sizeof(char) * cpsz);
         opcur[cpsz] = '\0';
     }
-    tmp = vfprintf(fs, op, vlist_cpy);
+    tmp = FLINT_VPRINTF_VPRINTF(out, op, vlist_cpy);
     if (tmp < 0)
     {
         res = tmp;
@@ -463,14 +468,14 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "ulong"))
         {
-            res += fprintf(fs, WORD_FMT "u", va_arg(vlist, ulong));
+            res += FLINT_VPRINTF_PRINTF(out, WORD_FMT "u", va_arg(vlist, ulong));
             ip += STRING_LENGTH("ulong}");
         }
         else if (IS_FLINT_TYPE(ip, "ulong*"))
         {
             const ulong * vec = va_arg(vlist, const ulong *);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, ulong_type);
+            res += __flint_vec_fprint(out, vec, len, ulong_type);
             ip += STRING_LENGTH("ulong*}");
         }
         else
@@ -480,14 +485,14 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "slong"))
         {
-            res += fprintf(fs, WORD_FMT "d", va_arg(vlist, slong));
+            res += FLINT_VPRINTF_PRINTF(out, WORD_FMT "d", va_arg(vlist, slong));
             ip += STRING_LENGTH("slong}");
         }
         else if (IS_FLINT_TYPE(ip, "slong*"))
         {
             const slong * vec = va_arg(vlist, const slong *);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, slong_type);
+            res += __flint_vec_fprint(out, vec, len, slong_type);
             ip += STRING_LENGTH("slong*}");
         }
         else
@@ -497,17 +502,17 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "nmod"))
         {
-            res += __nmod_fprint(fs, va_arg(vlist, nmod_t));
+            res += __nmod_fprint(out, va_arg(vlist, nmod_t));
             ip += STRING_LENGTH("nmod}");
         }
         else if (IS_FLINT_TYPE(ip, "nmod_mat"))
         {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const nmod_mat_struct *), ulong_type);
+            res += __flint_mat_fprint(out, va_arg(vlist, const nmod_mat_struct *), ulong_type);
             ip += STRING_LENGTH("nmod_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "nmod_poly"))
         {
-            res += __flint_poly_fprint(fs, va_arg(vlist, const nmod_poly_struct *), ulong_type);
+            res += __flint_poly_fprint(out, va_arg(vlist, const nmod_poly_struct *), ulong_type);
             ip += STRING_LENGTH("nmod_poly}");
         }
         else
@@ -517,41 +522,41 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "fmpz"))
         {
-            res += __fmpz_fprint(fs, va_arg(vlist, const fmpz *), FLAG_NONE);
+            res += __fmpz_fprint(out, va_arg(vlist, const fmpz *), FLAG_NONE);
             ip += STRING_LENGTH("fmpz}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpz*"))
         {
             const fmpz * vec = va_arg(vlist, const fmpz *);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, fmpz_type);
+            res += __flint_vec_fprint(out, vec, len, fmpz_type);
             ip += STRING_LENGTH("fmpz*}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpz_mat"))
         {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpz_mat_struct *), fmpz_type);
+            res += __flint_mat_fprint(out, va_arg(vlist, const fmpz_mat_struct *), fmpz_type);
             ip += STRING_LENGTH("fmpz_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpz_poly"))
         {
-            res += __flint_poly_fprint(fs, va_arg(vlist, const fmpz_poly_struct *), fmpz_type);
+            res += __flint_poly_fprint(out, va_arg(vlist, const fmpz_poly_struct *), fmpz_type);
             ip += STRING_LENGTH("fmpz_poly}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpz_mod_ctx"))
         {
-            res += __fmpz_mod_ctx_fprint(fs, va_arg(vlist, const fmpz_mod_ctx_struct *));
+            res += __fmpz_mod_ctx_fprint(out, va_arg(vlist, const fmpz_mod_ctx_struct *));
             ip += STRING_LENGTH("fmpz_mod_ctx}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpz_mod_mat"))
         {
             /* Print as if fmpz_mat */
-            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpz_mod_mat_struct *), fmpz_type);
+            res += __flint_mat_fprint(out, va_arg(vlist, const fmpz_mod_mat_struct *), fmpz_type);
             ip += STRING_LENGTH("fmpz_mod_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpz_mod_poly"))
         {
             /* Print as if fmpz_poly */
-            res += __flint_poly_fprint(fs, va_arg(vlist, const fmpz_mod_poly_struct *), fmpz_type);
+            res += __flint_poly_fprint(out, va_arg(vlist, const fmpz_mod_poly_struct *), fmpz_type);
             ip += STRING_LENGTH("fmpz_mod_poly}");
         }
         else
@@ -561,24 +566,24 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "fmpq"))
         {
-            res += __fmpq_fprint(fs, va_arg(vlist, const fmpq *), FLAG_NONE);
+            res += __fmpq_fprint(out, va_arg(vlist, const fmpq *), FLAG_NONE);
             ip += STRING_LENGTH("fmpq}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpq*"))
         {
             const fmpq * vec = va_arg(vlist, const fmpq *);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, fmpq_type);
+            res += __flint_vec_fprint(out, vec, len, fmpq_type);
             ip += STRING_LENGTH("fmpq*}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpq_mat"))
         {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpq_mat_struct *), fmpq_type);
+            res += __flint_mat_fprint(out, va_arg(vlist, const fmpq_mat_struct *), fmpq_type);
             ip += STRING_LENGTH("fmpq_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpq_poly"))
         {
-            res += __flint_poly_fprint(fs, va_arg(vlist, const fmpq_poly_struct *), fmpq_type);
+            res += __flint_poly_fprint(out, va_arg(vlist, const fmpq_poly_struct *), fmpq_type);
             ip += STRING_LENGTH("fmpq_poly}");
         }
         else
@@ -588,14 +593,14 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "arf"))
         {
-            res += __arf_fprint(fs, va_arg(vlist, arf_srcptr), 0);
+            res += __arf_fprint(out, va_arg(vlist, arf_srcptr), 0);
             ip += STRING_LENGTH("arf}");
         }
         else if (IS_FLINT_TYPE(ip, "arf*"))
         {
             arf_srcptr vec = va_arg(vlist, arf_srcptr);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, arf_type);
+            res += __flint_vec_fprint(out, vec, len, arf_type);
             ip += STRING_LENGTH("arf*}");
         }
         else
@@ -605,14 +610,14 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "mag"))
         {
-            res += __mag_fprint(fs, va_arg(vlist, mag_srcptr), 0);
+            res += __mag_fprint(out, va_arg(vlist, mag_srcptr), 0);
             ip += STRING_LENGTH("mag}");
         }
         else if (IS_FLINT_TYPE(ip, "mag*"))
         {
             mag_srcptr vec = va_arg(vlist, mag_srcptr);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, mag_type);
+            res += __flint_vec_fprint(out, vec, len, mag_type);
             ip += STRING_LENGTH("mag*}");
         }
         else
@@ -622,24 +627,24 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "arb"))
         {
-            res += __arb_fprint(fs, va_arg(vlist, arb_srcptr), FLAG_NONE);
+            res += __arb_fprint(out, va_arg(vlist, arb_srcptr), FLAG_NONE);
             ip += STRING_LENGTH("arb}");
         }
         else if (IS_FLINT_TYPE(ip, "arb*"))
         {
             arb_srcptr vec = va_arg(vlist, arb_srcptr);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, arb_type);
+            res += __flint_vec_fprint(out, vec, len, arb_type);
             ip += STRING_LENGTH("arb*}");
         }
         else if (IS_FLINT_TYPE(ip, "arb_mat"))
         {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const arb_mat_struct *), arb_type);
+            res += __flint_mat_fprint(out, va_arg(vlist, const arb_mat_struct *), arb_type);
             ip += STRING_LENGTH("arb_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "arb_poly"))
         {
-            res += __flint_poly_fprint(fs, va_arg(vlist, const arb_poly_struct *), arb_type);
+            res += __flint_poly_fprint(out, va_arg(vlist, const arb_poly_struct *), arb_type);
             ip += STRING_LENGTH("arb_poly}");
         }
         else
@@ -649,24 +654,24 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "acb"))
         {
-            res += __acb_fprint(fs, va_arg(vlist, acb_srcptr), FLAG_NONE);
+            res += __acb_fprint(out, va_arg(vlist, acb_srcptr), FLAG_NONE);
             ip += STRING_LENGTH("acb}");
         }
         else if (IS_FLINT_TYPE(ip, "acb*"))
         {
             acb_srcptr vec = va_arg(vlist, acb_srcptr);
             slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, acb_type);
+            res += __flint_vec_fprint(out, vec, len, acb_type);
             ip += STRING_LENGTH("acb*}");
         }
         else if (IS_FLINT_TYPE(ip, "acb_mat"))
         {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const acb_mat_struct *), acb_type);
+            res += __flint_mat_fprint(out, va_arg(vlist, const acb_mat_struct *), acb_type);
             ip += STRING_LENGTH("acb_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "acb_poly"))
         {
-            res += __flint_poly_fprint(fs, va_arg(vlist, const acb_poly_struct *), acb_type);
+            res += __flint_poly_fprint(out, va_arg(vlist, const acb_poly_struct *), acb_type);
             ip += STRING_LENGTH("acb_poly}");
         }
         else
@@ -674,33 +679,33 @@ print_flint_type:
     }
     else if (IS_FLINT_TYPE(ip, "mpz"))
     {
-        res += __mpz_fprint(fs, va_arg(vlist, mpz_srcptr));
+        res += __mpz_fprint(out, va_arg(vlist, mpz_srcptr));
         ip += STRING_LENGTH("mpz}");
     }
     else if (IS_FLINT_TYPE(ip, "mpq"))
     {
-        res += __mpq_fprint(fs, va_arg(vlist, mpq_srcptr));
+        res += __mpq_fprint(out, va_arg(vlist, mpq_srcptr));
         ip += STRING_LENGTH("mpq}");
     }
     else if (IS_FLINT_TYPE(ip, "truth"))
     {
         truth_t t = va_arg(vlist, truth_t);
-        if (t == T_TRUE) res += fprintf(fs, "T_TRUE");
-        else if (t == T_FALSE) res += fprintf(fs, "T_FALSE");
-        else res += fprintf(fs, "T_UNKNOWN");
+        if (t == T_TRUE) res += FLINT_VPRINTF_PRINTF(out, "T_TRUE");
+        else if (t == T_FALSE) res += FLINT_VPRINTF_PRINTF(out, "T_FALSE");
+        else res += FLINT_VPRINTF_PRINTF(out, "T_UNKNOWN");
         ip += STRING_LENGTH("truth}");
     }
     else if (IS_FLINT_BASE_TYPE(ip, "gr"))
     {
-        gr_stream_t out;
-        gr_stream_init_file(out, fs);
+        gr_stream_t gr_out;
+        FLINT_VPRINTF_GR_STREAM_INIT(gr_out, out);
 
         if (IS_FLINT_TYPE(ip, "gr"))
         {
             gr_srcptr elem = va_arg(vlist, gr_srcptr);
             gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
-            GR_MUST_SUCCEED(gr_write(out, elem, ctx));
-            res += out->len;
+            GR_MUST_SUCCEED(gr_write(gr_out, elem, ctx));
+            res += gr_out->len;
             ip += STRING_LENGTH("gr}");
         }
         else if (IS_FLINT_TYPE(ip, "gr*"))
@@ -708,44 +713,46 @@ print_flint_type:
             gr_srcptr elem = va_arg(vlist, gr_srcptr);
             slong len = va_arg(vlist, slong);
             gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
-            GR_MUST_SUCCEED(_gr_vec_write(out, elem, len, ctx));
-            res += out->len;
+            GR_MUST_SUCCEED(_gr_vec_write(gr_out, elem, len, ctx));
+            res += gr_out->len;
             ip += STRING_LENGTH("gr*}");
         }
         else if (IS_FLINT_TYPE(ip, "gr_poly"))
         {
             const gr_poly_struct * elem = va_arg(vlist, const gr_poly_struct *);
             gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
-            GR_MUST_SUCCEED(gr_poly_write(out, elem, "x", ctx));
-            res += out->len;
+            GR_MUST_SUCCEED(gr_poly_write(gr_out, elem, "x", ctx));
+            res += gr_out->len;
             ip += STRING_LENGTH("gr_poly}");
         }
         else if (IS_FLINT_TYPE(ip, "gr_mat"))
         {
             const gr_mat_struct * elem = va_arg(vlist, const gr_mat_struct *);
             gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
-            GR_MUST_SUCCEED(_gr_mat_write(out, elem, 0, ctx));
-            res += out->len;
+            GR_MUST_SUCCEED(_gr_mat_write(gr_out, elem, 0, ctx));
+            res += gr_out->len;
             ip += STRING_LENGTH("gr_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "gr_ctx"))
         {
             gr_ctx_struct * ctx = va_arg(vlist, gr_ctx_struct *);
-            GR_MUST_SUCCEED(gr_ctx_write(out, ctx));
-            res += out->len;
+            GR_MUST_SUCCEED(gr_ctx_write(gr_out, ctx));
+            res += gr_out->len;
             ip += STRING_LENGTH("gr_ctx}");
         }
         else
             goto printpercentcurlybracket;
+
+        FLINT_VPRINTF_GR_STREAM_FLUSH(gr_out, out);
     }
     else
     {
 printpercentcurlybracket:
         /* Invalid use of "%{FLINT_TYPE}". As we are currently pointed to
-         * "FLINT_TYPE}", we let fprintf take care of printing "%{". */
+         * "FLINT_TYPE}", we let FLINT_VPRINTF_PRINTF take care of printing "%{". */
 DIAGNOSTIC_PUSH
 DIAGNOSTIC_IGNORE_FORMAT
-        tmp = fprintf(fs, "%{");
+        tmp = FLINT_VPRINTF_PRINTF(out, "%{");
 DIAGNOSTIC_POP
         if (tmp < 0)
         {
@@ -766,25 +773,25 @@ DIAGNOSTIC_POP
 
 /* TODO: Add option to print in different basis? */
 
-static size_t __ulong_fprint(FILE * fs, const ulong * ip, int FLINT_UNUSED(flag))
+static size_t __ulong_fprint(FLINT_VPRINTF_OUT_T * out, const ulong * ip, int FLINT_UNUSED(flag))
 {
-    return fprintf(fs, WORD_FMT "u", *ip);
+    return FLINT_VPRINTF_PRINTF(out, WORD_FMT "u", *ip);
 }
 
-static size_t __slong_fprint(FILE * fs, const slong * ip, int FLINT_UNUSED(flag))
+static size_t __slong_fprint(FLINT_VPRINTF_OUT_T * out, const slong * ip, int FLINT_UNUSED(flag))
 {
-    return fprintf(fs, WORD_FMT "d", *ip);
+    return FLINT_VPRINTF_PRINTF(out, WORD_FMT "d", *ip);
 }
 
 #define BASE 10
-static size_t __fmpz_fprint(FILE * fs, const fmpz * ip, int flag)
+static size_t __fmpz_fprint(FLINT_VPRINTF_OUT_T * out, const fmpz * ip, int flag)
 {
     size_t res = 0;
     char * str;
     size_t skipminus = __fmpz_is_neg(ip) ? FLAG_IS_NEG(flag) : 0;
 
     str = fmpz_get_str(NULL, BASE, ip);
-    res += fwrite(str + skipminus, sizeof(char), strlen(str + skipminus), fs);
+    res += FLINT_VPRINTF_WRITE(str + skipminus, strlen(str + skipminus), out);
 
     flint_free(str);
 
@@ -792,7 +799,7 @@ static size_t __fmpz_fprint(FILE * fs, const fmpz * ip, int flag)
 }
 #undef BASE
 
-static size_t __mpz_fprint(FILE * fs, mpz_srcptr ip)
+static size_t __mpz_fprint(FLINT_VPRINTF_OUT_T * out, mpz_srcptr ip)
 {
     fmpz_t fip;
 
@@ -801,26 +808,26 @@ static size_t __mpz_fprint(FILE * fs, mpz_srcptr ip)
     else
         *fip = PTR_TO_COEFF(ip);
 
-    return __fmpz_fprint(fs, fip, FLAG_NONE);
+    return __fmpz_fprint(out, fip, FLAG_NONE);
 }
 
-static size_t __fmpq_fprint(FILE * fs, const fmpq * ip, int flag)
+static size_t __fmpq_fprint(FLINT_VPRINTF_OUT_T * out, const fmpq * ip, int flag)
 {
     size_t res = 0;
 
     /* NOTE: We do not care about parentheses here, and __fmpz_fprint does not
      * care either. */
-    res += __fmpz_fprint(fs, fmpq_numref(ip), flag);
+    res += __fmpz_fprint(out, fmpq_numref(ip), flag);
     if (!fmpz_is_one(fmpq_denref(ip)))
     {
-        res += fwrite(" / ", sizeof(char), STRING_LENGTH(" / "), fs);
-        res += __fmpz_fprint(fs, fmpq_denref(ip), FLAG_NONE);
+        res += FLINT_VPRINTF_WRITE(" / ", STRING_LENGTH(" / "), out);
+        res += __fmpz_fprint(out, fmpq_denref(ip), FLAG_NONE);
     }
 
     return res;
 }
 
-static size_t __mpq_fprint(FILE * fs, mpq_srcptr ip)
+static size_t __mpq_fprint(FLINT_VPRINTF_OUT_T * out, mpq_srcptr ip)
 {
     fmpq_t fip;
 
@@ -834,42 +841,42 @@ static size_t __mpq_fprint(FILE * fs, mpq_srcptr ip)
     else
         *fmpq_denref(fip) = PTR_TO_COEFF(&(ip->_mp_den));
 
-    return __fmpq_fprint(fs, fip, FLAG_NONE);
+    return __fmpq_fprint(out, fip, FLAG_NONE);
 }
 
 #define DIGITS 6
-static size_t __mag_fprint(FILE * fs, mag_srcptr ip, int FLINT_UNUSED(flag))
+static size_t __mag_fprint(FLINT_VPRINTF_OUT_T * out, mag_srcptr ip, int FLINT_UNUSED(flag))
 {
     size_t res;
     char * str;
 
 #if DIGITS != 6
-# error Change fwrite below
+# error Change FLINT_VPRINTF_WRITE below
 #endif
     if (mag_is_zero(ip))
-        return fwrite("0.00000", sizeof(char), STRING_SIZE("0.00000"), fs);
+        return FLINT_VPRINTF_WRITE("0.00000", STRING_SIZE("0.00000"), out);
 
     str = __mag_get_str(ip, DIGITS);
-    res = fwrite(str, sizeof(char), strlen(str), fs);
+    res = FLINT_VPRINTF_WRITE(str, strlen(str), out);
 
     flint_free(str);
 
     return res;
 }
 
-static size_t __arf_fprint(FILE * fs, arf_srcptr ip, int FLINT_UNUSED(flag))
+static size_t __arf_fprint(FLINT_VPRINTF_OUT_T * out, arf_srcptr ip, int FLINT_UNUSED(flag))
 {
     size_t res;
     char * str;
 
 #if DIGITS != 6
-# error Change fwrite below
+# error Change FLINT_VPRINTF_WRITE below
 #endif
     if (arf_is_zero(ip))
-        return fwrite("0.00000", sizeof(char), STRING_SIZE("0.00000"), fs);
+        return FLINT_VPRINTF_WRITE("0.00000", STRING_SIZE("0.00000"), out);
 
     str = arf_get_str(ip, DIGITS);
-    res = fwrite(str, sizeof(char), strlen(str), fs);
+    res = FLINT_VPRINTF_WRITE(str, strlen(str), out);
 
     flint_free(str);
 
@@ -878,13 +885,13 @@ static size_t __arf_fprint(FILE * fs, arf_srcptr ip, int FLINT_UNUSED(flag))
 
 #define MAX_INT_SIZE 64
 /* NOTE: If arb is an integer, we print it as one. */
-static size_t __arb_fprint(FILE * fs, arb_srcptr ip, int flag)
+static size_t __arb_fprint(FLINT_VPRINTF_OUT_T * out, arb_srcptr ip, int flag)
 {
     size_t res;
 
     if (arb_is_zero(ip))
     {
-        return (fputc('0', fs) != EOF);
+        return (FLINT_VPRINTF_PUTC('0', out) != FLINT_VPRINTF_PUTC_ERRVAL);
     }
     else if (arb_is_int(ip) && ARF_EXP(arb_midref(ip)) <= MAX_INT_SIZE)
     {
@@ -898,7 +905,7 @@ static size_t __arb_fprint(FILE * fs, arb_srcptr ip, int flag)
         arf_get_fmpz(fip, arb_midref(ip), ARF_RND_DOWN);
         /* NOTE: We do not care about parentheses here, and __fmpz_fprint does not
          * care either. */
-        res = __fmpz_fprint(fs, fip, flag);
+        res = __fmpz_fprint(out, fip, flag);
 
         fmpz_clear(fip);
     }
@@ -913,7 +920,7 @@ static size_t __arb_fprint(FILE * fs, arb_srcptr ip, int flag)
             ip2 = *ip;
 
         str = arb_get_str(&ip2, DIGITS, 0);
-        res = fwrite(str, sizeof(char), strlen(str), fs);
+        res = FLINT_VPRINTF_WRITE(str, strlen(str), out);
 
         flint_free(str);
     }
@@ -923,7 +930,7 @@ static size_t __arb_fprint(FILE * fs, arb_srcptr ip, int flag)
 #undef MAX_INT_SIZE
 #undef DIGITS
 
-static size_t __acb_fprint(FILE * fs, acb_srcptr ip, int flag)
+static size_t __acb_fprint(FLINT_VPRINTF_OUT_T * out, acb_srcptr ip, int flag)
 {
     size_t res = 0;
     int realiszero, imagiszero;
@@ -932,15 +939,15 @@ static size_t __acb_fprint(FILE * fs, acb_srcptr ip, int flag)
     imagiszero = arb_is_zero(acb_imagref(ip));
 
     if (realiszero && imagiszero)
-        return (fputc('0', fs) != EOF);
+        return (FLINT_VPRINTF_PUTC('0', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
     /* Only print parentheses if both real and imaginary part is non-zero. */
     if (FLAG_IS_PAREN(flag) && !realiszero && !imagiszero)
-        res += (fputc('(', fs) != EOF);
+        res += (FLINT_VPRINTF_PUTC('(', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
     /* Print real part if non-zero */
     if (!realiszero)
-        res += __arb_fprint(fs, acb_realref(ip), flag);
+        res += __arb_fprint(out, acb_realref(ip), flag);
 
     /* Print imaginary part if non-zero */
     if (!imagiszero)
@@ -948,35 +955,35 @@ static size_t __acb_fprint(FILE * fs, acb_srcptr ip, int flag)
         int imagisneg = arb_is_negative(acb_imagref(ip));
 
         if (!realiszero)
-            res += fwrite(FLAG_IS_NEG(flag) ^ imagisneg ? " - " : " + ", sizeof(char), STRING_SIZE(" - "), fs);
+            res += FLINT_VPRINTF_WRITE(FLAG_IS_NEG(flag) ^ imagisneg ? " - " : " + ", STRING_SIZE(" - "), out);
 
         /* If imaginary part of ip is \pm 1, then we only print \pm i. */
         if (!__arb_is_pm1(acb_imagref(ip)))
         {
-            res += __arb_fprint(fs, acb_imagref(ip), (FLAG_IS_NEG(flag) ^ imagisneg) & (~realiszero));
-            res += fwrite(" * ", sizeof(char), STRING_LENGTH(" * "), fs);
+            res += __arb_fprint(out, acb_imagref(ip), (FLAG_IS_NEG(flag) ^ imagisneg) & (~realiszero));
+            res += FLINT_VPRINTF_WRITE(" * ", STRING_LENGTH(" * "), out);
         }
 
-        res += (fputc('i', fs) != EOF);
+        res += (FLINT_VPRINTF_PUTC('i', out) != FLINT_VPRINTF_PUTC_ERRVAL);
     }
 
     if (FLAG_IS_PAREN(flag) && !realiszero && !imagiszero)
-        res += (fputc(')', fs) != EOF);
+        res += (FLINT_VPRINTF_PUTC(')', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
     return res;
 }
 
-static size_t __nmod_fprint(FILE * fs, nmod_t ip)
+static size_t __nmod_fprint(FLINT_VPRINTF_OUT_T * out, nmod_t ip)
 {
-    return fprintf(fs, "mod " WORD_FMT "u", ip.n);
+    return FLINT_VPRINTF_PRINTF(out, "mod " WORD_FMT "u", ip.n);
 }
 
-static size_t __fmpz_mod_ctx_fprint(FILE * fs, const fmpz_mod_ctx_struct * ip)
+static size_t __fmpz_mod_ctx_fprint(FLINT_VPRINTF_OUT_T * out, const fmpz_mod_ctx_struct * ip)
 {
     size_t res = 0;
 
-    res += fwrite("mod ", sizeof(char), STRING_LENGTH("mod "), fs);
-    res += fmpz_fprint(fs, fmpz_mod_ctx_modulus(ip));
+    res += FLINT_VPRINTF_WRITE("mod ", STRING_LENGTH("mod "), out);
+    res += __fmpz_fprint(out, fmpz_mod_ctx_modulus(ip), FLAG_NONE);
 
     return res;
 }
@@ -997,7 +1004,7 @@ static size_t __fmpz_mod_ctx_fprint(FILE * fs, const fmpz_mod_ctx_struct * ip)
  * matrices and polynomials (such as what Julia does). This should be the
  * default. */
 
-typedef size_t (* print_func_t)(FILE *, const void *, int);
+typedef size_t (* print_func_t)(FLINT_VPRINTF_OUT_T *, const void *, int);
 
 static print_func_t print_functions[] =
 {
@@ -1011,7 +1018,7 @@ static print_func_t print_functions[] =
     (print_func_t) __arf_fprint    /* types. */
 };
 
-static size_t __flint_vec_fprint(FILE * fs, const void * ip, slong len, flint_type_t type)
+static size_t __flint_vec_fprint(FLINT_VPRINTF_OUT_T * out, const void * ip, slong len, flint_type_t type)
 {
     size_t res = 0;
     slong ix;
@@ -1019,18 +1026,18 @@ static size_t __flint_vec_fprint(FILE * fs, const void * ip, slong len, flint_ty
     size_t type_size = flint_type_size_in_chars(type);
     print_func_t print = print_functions[type];
 
-    res += (fputc('[', fs) != EOF);
+    res += (FLINT_VPRINTF_PUTC('[', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
     if (len > 0)
-        res += print(fs, vec, FLAG_NONE);
+        res += print(out, vec, FLAG_NONE);
 
     for (ix = 1; ix < len; ix++)
     {
-        res += fwrite(", ", sizeof(char), STRING_LENGTH(", "), fs);
-        res += print(fs, vec + type_size * ix, FLAG_NONE);
+        res += FLINT_VPRINTF_WRITE(", ", STRING_LENGTH(", "), out);
+        res += print(out, vec + type_size * ix, FLAG_NONE);
     }
 
-    res += (fputc(']', fs) != EOF);
+    res += (FLINT_VPRINTF_PUTC(']', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
     return res;
 }
@@ -1038,7 +1045,7 @@ static size_t __flint_vec_fprint(FILE * fs, const void * ip, slong len, flint_ty
 /* NOTE: This function relies on the fact that the layout of
  * [fmpz/fmpq/arb/acb]_mat_struct are all on the form (pointer, slong, slong,
  * pointer). */
-static size_t __flint_mat_fprint(FILE * fs, const void * ip, flint_type_t type)
+static size_t __flint_mat_fprint(FLINT_VPRINTF_OUT_T * out, const void * ip, flint_type_t type)
 {
     size_t res = 0;
     slong ix;
@@ -1052,18 +1059,18 @@ static size_t __flint_mat_fprint(FILE * fs, const void * ip, flint_type_t type)
     stride = ((const fmpz_mat_struct *) ip)->stride * flint_type_size_in_chars(type);
 
     if (nr == 0 || nc == 0)
-        return fprintf(fs, WORD_FMT "d by " WORD_FMT "d empty matrix", nr, nc);
+        return FLINT_VPRINTF_PRINTF(out, WORD_FMT "d by " WORD_FMT "d empty matrix", nr, nc);
 
-    res += (fputc('[', fs) != EOF);
-    res += __flint_vec_fprint(fs, entries, nc, type);
+    res += (FLINT_VPRINTF_PUTC('[', out) != FLINT_VPRINTF_PUTC_ERRVAL);
+    res += __flint_vec_fprint(out, entries, nc, type);
 
     for (ix = 1; ix < nr; ix++)
     {
-        res += fwrite(", ", sizeof(char), STRING_LENGTH(", "), fs);
-        res += __flint_vec_fprint(fs, entries + ix * stride, nc, type);
+        res += FLINT_VPRINTF_WRITE(", ", STRING_LENGTH(", "), out);
+        res += __flint_vec_fprint(out, entries + ix * stride, nc, type);
     }
 
-    res += (fputc(']', fs) != EOF);
+    res += (FLINT_VPRINTF_PUTC(']', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
     return res;
 }
@@ -1100,7 +1107,7 @@ static is_func_t is_neg_functions[] =
 /* NOTE: This function relies on the fact that the layout of
  * [fmpz/arb/acb]_poly_struct are all on the form (pointer, slong, slong) and
  * fmpq_poly_struct on the form (pointer, slong, slong, pointer). */
-static size_t __flint_poly_fprint(FILE * fs, const void * ip, flint_type_t type)
+static size_t __flint_poly_fprint(FLINT_VPRINTF_OUT_T * out, const void * ip, flint_type_t type)
 {
     size_t res = 0;
     slong ix;
@@ -1109,7 +1116,7 @@ static size_t __flint_poly_fprint(FILE * fs, const void * ip, flint_type_t type)
     len = ((const fmpz_poly_struct *) ip)->length;
 
     if (len == 0)
-        return fputc('0', fs) != EOF;
+        return FLINT_VPRINTF_PUTC('0', out) != FLINT_VPRINTF_PUTC_ERRVAL;
 
     if (type != fmpq_type)
     {
@@ -1121,42 +1128,42 @@ static size_t __flint_poly_fprint(FILE * fs, const void * ip, flint_type_t type)
         is_func_t is_neg = is_neg_functions[type];
 
         if (len == 1)
-            return print(fs, coeffs, FLAG_NONE);
+            return print(out, coeffs, FLAG_NONE);
 
         /* Leading coefficient cannot be zero */
         if (!is_pm1(coeffs + type_size * (len - 1)))
         {
-            res += print(fs, coeffs + type_size * (len - 1), FLAG_PAREN);
-            res += fwrite(" * ", sizeof(char), STRING_LENGTH(" * "), fs);
+            res += print(out, coeffs + type_size * (len - 1), FLAG_PAREN);
+            res += FLINT_VPRINTF_WRITE(" * ", STRING_LENGTH(" * "), out);
         }
         else if (is_neg(coeffs + type_size * (len - 1)))
-            res += (fputc('-', fs) != EOF);
+            res += (FLINT_VPRINTF_PUTC('-', out) != FLINT_VPRINTF_PUTC_ERRVAL);
         if (len != 2)
-            res += fprintf(fs, "x^" WORD_FMT "d", len - 1);
+            res += FLINT_VPRINTF_PRINTF(out, "x^" WORD_FMT "d", len - 1);
         else
-            res += (fputc('x', fs) != EOF);
+            res += (FLINT_VPRINTF_PUTC('x', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
         for (ix = len - 2; ix > 0; ix--)
         {
             if (!is_zero(coeffs + type_size * ix))
             {
-                res += fwrite(is_neg(coeffs + type_size * ix) ? " - " : " + ", sizeof(char), STRING_LENGTH(" - "), fs);
+                res += FLINT_VPRINTF_WRITE(is_neg(coeffs + type_size * ix) ? " - " : " + ", STRING_LENGTH(" - "), out);
                 if (!is_pm1(coeffs + type_size * ix))
                 {
-                    res += print(fs, coeffs + type_size * ix, is_neg(coeffs + type_size * ix) | FLAG_PAREN);
-                    res += fwrite(" * ", sizeof(char), STRING_LENGTH(" * "), fs);
+                    res += print(out, coeffs + type_size * ix, is_neg(coeffs + type_size * ix) | FLAG_PAREN);
+                    res += FLINT_VPRINTF_WRITE(" * ", STRING_LENGTH(" * "), out);
                 }
                 if (ix != 1)
-                    res += fprintf(fs, "x^" WORD_FMT "d", ix);
+                    res += FLINT_VPRINTF_PRINTF(out, "x^" WORD_FMT "d", ix);
                 else
-                    res += (fputc('x', fs) != EOF);
+                    res += (FLINT_VPRINTF_PUTC('x', out) != FLINT_VPRINTF_PUTC_ERRVAL);
             }
         }
 
         if (!is_zero(coeffs + 0))
         {
-            res += fwrite(is_neg(coeffs + 0) ? " - " : " + ", sizeof(char), STRING_LENGTH(" - "), fs);
-            res += print(fs, coeffs + 0, is_neg(coeffs + 0));
+            res += FLINT_VPRINTF_WRITE(is_neg(coeffs + 0) ? " - " : " + ", STRING_LENGTH(" - "), out);
+            res += print(out, coeffs + 0, is_neg(coeffs + 0));
         }
     }
     else
@@ -1172,7 +1179,7 @@ static size_t __flint_poly_fprint(FILE * fs, const void * ip, flint_type_t type)
 
         if (len == 1)
         {
-            res += __fmpq_fprint(fs, canonical, FLAG_NONE);
+            res += __fmpq_fprint(out, canonical, FLAG_NONE);
             fmpq_clear(canonical);
             return res;
         }
@@ -1180,39 +1187,39 @@ static size_t __flint_poly_fprint(FILE * fs, const void * ip, flint_type_t type)
         /* Leading coefficient cannot be zero */
         if (!fmpq_is_pm1(canonical))
         {
-            res += __fmpq_fprint(fs, canonical, FLAG_NONE);
-            res += fwrite(" * ", sizeof(char), STRING_LENGTH(" * "), fs);
+            res += __fmpq_fprint(out, canonical, FLAG_NONE);
+            res += FLINT_VPRINTF_WRITE(" * ", STRING_LENGTH(" * "), out);
         }
         else if (__fmpq_is_neg(canonical))
-            res += (fputc('-', fs) != EOF);
+            res += (FLINT_VPRINTF_PUTC('-', out) != FLINT_VPRINTF_PUTC_ERRVAL);
         if (len != 2)
-            res += fprintf(fs, "x^" WORD_FMT "d", len - 1);
+            res += FLINT_VPRINTF_PRINTF(out, "x^" WORD_FMT "d", len - 1);
         else
-            res += (fputc('x', fs) != EOF);
+            res += (FLINT_VPRINTF_PUTC('x', out) != FLINT_VPRINTF_PUTC_ERRVAL);
 
         for (ix = len - 2; ix > 0; ix--)
         {
             if (!fmpz_is_zero(coeffs + ix))
             {
                 fmpq_set_fmpz_frac(canonical, coeffs + ix, den);
-                res += fwrite(__fmpq_is_neg(canonical) ? " - " : " + ", sizeof(char), STRING_LENGTH(" - "), fs);
+                res += FLINT_VPRINTF_WRITE(__fmpq_is_neg(canonical) ? " - " : " + ", STRING_LENGTH(" - "), out);
                 if (!fmpq_is_pm1(canonical))
                 {
-                    res += __fmpq_fprint(fs, canonical, __fmpq_is_neg(canonical));
-                    res += fwrite(" * ", sizeof(char), STRING_LENGTH(" * "), fs);
+                    res += __fmpq_fprint(out, canonical, __fmpq_is_neg(canonical));
+                    res += FLINT_VPRINTF_WRITE(" * ", STRING_LENGTH(" * "), out);
                 }
                 if (ix != 1)
-                    res += fprintf(fs, "x^" WORD_FMT "d", ix);
+                    res += FLINT_VPRINTF_PRINTF(out, "x^" WORD_FMT "d", ix);
                 else
-                    res += (fputc('x', fs) != EOF);
+                    res += (FLINT_VPRINTF_PUTC('x', out) != FLINT_VPRINTF_PUTC_ERRVAL);
             }
         }
 
         fmpq_set_fmpz_frac(canonical, coeffs + 0, den);
         if (!fmpq_is_zero(canonical))
         {
-            res += fwrite(__fmpq_is_neg(canonical) ? " - " : " + ", sizeof(char), STRING_LENGTH(" - "), fs);
-            res += __fmpq_fprint(fs, canonical, __fmpq_is_neg(canonical));
+            res += FLINT_VPRINTF_WRITE(__fmpq_is_neg(canonical) ? " - " : " + ", STRING_LENGTH(" - "), out);
+            res += __fmpq_fprint(out, canonical, __fmpq_is_neg(canonical));
         }
 
         fmpq_clear(canonical);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2026 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -30,7 +31,68 @@
 #include "gr_mat/impl.h"
 
 
+typedef struct {
+    FILE * fs;
+} flint_vfprintf_out;
+
+#define FLINT_VPRINTF_PUTC_ERRVAL (EOF)
+
+static void flint_vfprintf_init(flint_vfprintf_out * out, FILE * fs)
+{
+    out->fs = fs;
+}
+
+static int flint_vfprintf_vprintf(flint_vfprintf_out * out, const char * fmt, va_list ap)
+{
+    return vfprintf(out->fs, fmt, ap);
+}
+
+static int flint_vfprintf_printf(flint_vfprintf_out * out, const char * fmt, ...)
+{
+    va_list ap;
+    int res;
+
+    va_start(ap, fmt);
+    res = flint_vfprintf_vprintf(out, fmt, ap);
+    va_end(ap);
+
+    return res;
+}
+
+static size_t flint_vfprintf_write(const void * buf, size_t len, flint_vfprintf_out * out)
+{
+    return fwrite(buf, sizeof(char), len, out->fs);
+}
+
+static int flint_vfprintf_putc(int ch, flint_vfprintf_out * out)
+{
+    return fputc(ch, out->fs);
+}
+
+#define FLINT_VPRINTF_FUNCTION flint_vfprintf
+#define FLINT_VPRINTF_FUNCTION_ARGS FILE * fs
+#define FLINT_VPRINTF_OUT_T flint_vfprintf_out
+#define FLINT_VPRINTF_INIT(out) flint_vfprintf_init((out), fs)
+#define FLINT_VPRINTF_PRINTF(out, ...) flint_vfprintf_printf((out), __VA_ARGS__)
+#define FLINT_VPRINTF_VPRINTF(out, fmt, ap) flint_vfprintf_vprintf((out), (fmt), (ap))
+#define FLINT_VPRINTF_WRITE(buf, len, out) flint_vfprintf_write((buf), (len), (out))
+#define FLINT_VPRINTF_PUTC(ch, out) flint_vfprintf_putc((ch), (out))
+#define FLINT_VPRINTF_GR_STREAM_INIT(gr_out, out) gr_stream_init_file((gr_out), (out)->fs)
+#define FLINT_VPRINTF_GR_STREAM_FLUSH(gr_out, out) do { (void) (gr_out); (void) (out); } while (0)
+
 #include "io_vprintf_impl.h"
+
+#undef FLINT_VPRINTF_FUNCTION
+#undef FLINT_VPRINTF_FUNCTION_ARGS
+#undef FLINT_VPRINTF_OUT_T
+#undef FLINT_VPRINTF_INIT
+#undef FLINT_VPRINTF_PRINTF
+#undef FLINT_VPRINTF_VPRINTF
+#undef FLINT_VPRINTF_WRITE
+#undef FLINT_VPRINTF_PUTC
+#undef FLINT_VPRINTF_GR_STREAM_INIT
+#undef FLINT_VPRINTF_GR_STREAM_FLUSH
+#undef FLINT_VPRINTF_PUTC_ERRVAL
 
 
 int flint_fprintf(FILE * fs, const char * str, ...)

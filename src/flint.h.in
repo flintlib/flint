@@ -400,6 +400,7 @@ int flint_sscanf(const char * s, const char * str, ...);
 
 #if FLINT_HAVE_VA_LIST
 int flint_vprintf(const char * str, va_list ap);
+int flint_vsnprintf(char * s, size_t n, const char * str, va_list ap);
 #endif
 
 #if FLINT_HAVE_FILE
