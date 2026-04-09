@@ -866,7 +866,7 @@ main ()
   const char *modelstr;
   int cpu_64bit = 0, cpu_avx = 0;
   int cpu_avx_fma = 0, cpu_avx512f_avx512dq = 0;
-  int cpuid_64bit, cpuid_avx, cpuid_osxsave;
+  int cpuid_64bit, cpuid_avx, cpuid_osxsave, cpuid_avx512f;
 
   CPUID (vendor_string, 0);
   vendor_string[12] = 0;
