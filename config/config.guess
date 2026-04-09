@@ -866,7 +866,7 @@ main ()
   const char *modelstr;
   int cpu_64bit = 0, cpu_avx = 0;
   int cpu_avx_fma = 0, cpu_avx512f_avx512dq = 0;
-  int cpuid_64bit, cpuid_avx, cpuid_osxsave;
+  int cpuid_64bit, cpuid_avx, cpuid_osxsave, cpuid_avx512f;
 
   CPUID (vendor_string, 0);
   vendor_string[12] = 0;
@@ -878,6 +878,9 @@ main ()
 
   cpuid_avx     = (feature_string[11] >> 4) & 1;
   cpuid_osxsave = (feature_string[11] >> 3) & 1;
+
+  CPUID (feature_string, 7);
+  cpuid_avx512f = (feature_string[ 2] >> 0) & 1;
 
   modelstr = "$guess_cpu";
 
@@ -1061,7 +1064,7 @@ main ()
               break;
             case 0x10:
             default:
-              modelstr = "zen4";
+              modelstr = cpuid_avx512f ? "zen4" : "zen3";
               break;
           }
           break;
