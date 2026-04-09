@@ -879,6 +879,9 @@ main ()
   cpuid_avx     = (feature_string[11] >> 4) & 1;
   cpuid_osxsave = (feature_string[11] >> 3) & 1;
 
+  CPUID (feature_string, 7);
+  cpuid_avx512f = (feature_string[ 2] >> 0) & 1
+
   modelstr = "$guess_cpu";
 
   /**************************************************/
@@ -1061,7 +1064,7 @@ main ()
               break;
             case 0x10:
             default:
-              modelstr = "zen4";
+              modelstr = cpuid_avx512f ? "zen4" : "zen3";
               break;
           }
           break;
