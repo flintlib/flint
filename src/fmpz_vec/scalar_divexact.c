@@ -27,14 +27,6 @@
 #define DIVEXACT_1_EVEN_GMP_CUTOFF 25
 
 FLINT_FORCE_INLINE
-ulong n_mulhi(ulong a, ulong b)
-{
-    ulong h, l;
-    umul_ppmm(h, l, a, b);
-    return h;
-}
-
-FLINT_FORCE_INLINE
 ulong n_subc(ulong * c, ulong a, ulong b)
 {
     ulong d = a - b;

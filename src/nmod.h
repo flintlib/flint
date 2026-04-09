@@ -318,18 +318,6 @@ NMOD_INLINE ull_t ull(ulong hi, ulong lo) { ull_t t; t.lo = lo; t.hi = hi; retur
 
 #endif
 
-FLINT_FORCE_INLINE ulong n_mulhi(ulong a, ulong b)
-{
-    return ull_hi(ull_u_mul_u(a, b));
-}
-
-FLINT_FORCE_INLINE void n_mul2(ulong * hi, ulong * lo, ulong a, ulong b)
-{
-    ull_t t = ull_u_mul_u(a, b);
-    *hi = ull_hi(t);
-    *lo = ull_lo(t);
-}
-
 /* Assumes a already reduced mod n. */
 FLINT_FORCE_INLINE ulong
 n_to_redc_preinv(ulong a, ulong n, ulong ninv, ulong norm)
