@@ -473,8 +473,8 @@ TEST_FUNCTION_START(flint_fprintf, state)
         TEST_FUNCTION_FAIL("Could not open temporary file \"" TMP_FILENAME "\"\n");
 
     {
-        int res1, res2;
-        char * str1, * str2;
+        int res1, res2, res3;
+        char * str1, * str2, * str3;
 
         ulong xulong1 = UWORD(93112), xulong2 = UWORD(8721);
         slong xslong = WORD(-1982);
@@ -648,6 +648,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
 #define STR_SIZE 10000 /* 10 kB should suffice. */
         str1 = flint_calloc(STR_SIZE, sizeof(char));
         str2 = flint_calloc(STR_SIZE, sizeof(char));
+        str3 = flint_calloc(STR_SIZE, sizeof(char));
 
 #if FLINT_LONG_LONG
 # define ULONG_SLONG_STR \
@@ -954,6 +955,175 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 xgr_mat, xgr_ctx,
                 xgr_ctx);
 
+        res3 = flint_snprintf(str3, STR_SIZE,
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do "
+                "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut "
+                "enim ad minim veniam, quis nostrud exercitation ullamco laboris "
+                "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor "
+                "in reprehenderit in voluptate velit esse cillum dolore eu fugiat "
+                "nulla pariatur. Excepteur sint occaecat cupidatat non proident, "
+                "sunt in culpa qui officia deserunt mollit anim id est laborum.\n"
+                "\n"
+                "Here are some %% characters: %%, %% and %%%%\n"
+                "\n"
+                "We will now start printing primitive types...\n"
+                "\n"
+                "Here we print a ulong: %020wu\n"
+                "Here we print a slong: %20wd\n"
+                "Here we print a ulong in hexadecimal: %wx\n"
+                "Here we print a double with flags: %05.2f\n"
+                "Here we print another double: %le\n"
+                "\n"
+                "We will now start printing FLINT types...\n"
+                "\n"
+                "ulong: %{ulong}\n"
+                "slong: %{slong}\n"
+                "nmod: %{nmod}\n"
+                "small fmpz: %{fmpz}\n"
+                "big fmpz: %{fmpz}\n"
+                "fmpz_mod_ctx: %{fmpz_mod_ctx}\n"
+                "integer fmpq: %{fmpq}\n"
+                "fmpq: %{fmpq}\n"
+                "zero arf: %{arf}\n"
+                "integer arf: %{arf}\n"
+                "arf: %{arf}\n"
+                "zero mag: %{mag}\n"
+                "integer mag: %{mag}\n"
+                "mag: %{mag}\n"
+                "zero arb: %{arb}\n"
+                "integer arb: %{arb}\n"
+                "arb: %{arb}\n"
+                "zero acb: %{acb}\n"
+                "half gaussian acb: %{acb}\n"
+                "other half gaussian acb: %{acb}\n"
+                "another half gaussian acb: %{acb}\n"
+                "gaussian integer acb: %{acb}\n"
+                "real acb: %{acb}\n"
+                "imaginary acb: %{acb}\n"
+                "acb: %{acb}\n"
+                "small mpz: %{mpz}\n"
+                "big mpz: %{mpz}\n"
+                "small mpq: %{mpq}\n"
+                "big mpq: %{mpq}\n"
+                "\n"
+                "We intersect with some other primitive types...\n"
+                "\n"
+                "char: % 20hhd\n"
+                "short: %-20hx\n"
+                "int: %.*i\n"
+                "size_t: %zo\n"
+                "char *: %.20s\n"
+                "wint_t: %lc\n"
+                "long int: %.*lX\n"
+                "long long int: %3llu\n"
+                "intmax_t: %ji\n"
+                "ptrdiff_t: %tu\n"
+                "long double: %+33.12LG\n"
+                "pointer: %p\n"
+                "wchar_t *: %ls\n"
+                "\n"
+                "And now we go back to printing FLINT types...\n"
+                "\n"
+                "slong_vec: %{slong*}\n"
+                "nmod_vec: %{ulong*}\n"
+                "fmpz_vec: %{fmpz*}\n"
+                "fmpq_vec: %{fmpq*}\n"
+                "arb_vec: %{arb*}\n"
+                "acb_vec: %{acb*}\n"
+                "\n"
+                "empty fmpz_mat: %{fmpz_mat}\n"
+                "window nmod_mat: %{nmod_mat}\n"
+                "fmpz_mat: %{fmpz_mat}\n"
+                "\n"
+                "zero nmod_poly: %{nmod_poly}\n"
+                "constant nmod_poly: %{nmod_poly}\n"
+                "nmod_poly: %{nmod_poly}\n"
+                "fmpz_poly: %{fmpz_poly}\n"
+                "zero fmpq_poly: %{fmpq_poly}\n"
+                "constant fmpq_poly: %{fmpq_poly}\n"
+                "fmpq_poly (1): %{fmpq_poly}\n"
+                "fmpq_poly (2): %{fmpq_poly}\n"
+                "arb_poly: %{arb_poly}\n"
+                "acb_poly: %{acb_poly}\n"
+                "truth: %{truth} %{truth} %{truth}\n"
+                "gr: %{gr}\n"
+                "gr_vec: %{gr*}\n"
+                "gr_poly: %{gr_poly}\n"
+                "gr_mat: %{gr_mat}\n"
+                "gr_ctx: %{gr_ctx}\n",
+                xulong1,
+                xslong,
+                xulong2,
+                xdouble,
+                xdouble,
+                xulong1,
+                xslong,
+                xnmod,
+                xfmpz1,
+                xfmpz2,
+                xfmpz_mod_ctx,
+                xfmpq1,
+                xfmpq2,
+                xarf1,
+                xarf2,
+                xarf3,
+                xmag1,
+                xmag2,
+                xmag3,
+                xarb1,
+                xarb2,
+                xarb3,
+                xacb1,
+                xacb2,
+                xacb3,
+                xacb4,
+                xacb5,
+                xacb6,
+                xacb7,
+                xacb8,
+                xmpz1,
+                xmpz2,
+                xmpq1,
+                xmpq2,
+                xchar,
+                xshort,
+                10, xint,
+                xsize,
+                xcharp,
+                xwint,
+                4, xlong,
+                xlonglong,
+                xintmax,
+                xptrdiff,
+                xlongdouble,
+                xpointer,
+                xwcharp,
+                xslong_vec, SLONG_VEC_LEN,
+                xnmod_vec, NMOD_VEC_LEN,
+                xfmpz_vec, FMPZ_VEC_LEN,
+                xfmpq_vec, FMPQ_VEC_LEN,
+                xarb_vec, ARB_VEC_LEN,
+                xacb_vec, ACB_VEC_LEN,
+                empty_matrix,
+                xnmod_mat_window,
+                xfmpz_mat,
+                xnmod_poly_zero,
+                xnmod_poly_constant,
+                xnmod_poly,
+                xfmpz_poly,
+                xfmpq_poly_zero,
+                xfmpq_poly_constant,
+                xfmpq_poly1,
+                xfmpq_poly2,
+                xarb_poly,
+                xacb_poly,
+                T_TRUE, T_FALSE, T_UNKNOWN,
+                xgr, xgr_ctx,
+                xgr_vec, GR_VEC_LEN, xgr_ctx,
+                xgr_poly, xgr_ctx,
+                xgr_mat, xgr_ctx,
+                xgr_ctx);
+
         if (res2 > STR_SIZE - 1)
             TEST_FUNCTION_FAIL(
                     "Printed more than expected into fs.\n");
@@ -961,6 +1131,10 @@ TEST_FUNCTION_START(flint_fprintf, state)
         if (res2 < 0)
             TEST_FUNCTION_FAIL(
                     "Negative return value from flint_fprintf.\n");
+
+        if (res3 < 0)
+            TEST_FUNCTION_FAIL(
+                    "Negative return value from flint_snprintf.\n");
 
 #undef STR_SIZE
 
@@ -971,7 +1145,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
                     "Could not read %d bytes from filestream.\n",
                     res2);
 
-        /* Check strings line by line */
+        /* Check flint_fprintf output line by line */
         {
             const char * str1cur, * str2cur;
             size_t lnsz1, lnsz2;
@@ -1048,6 +1222,81 @@ TEST_FUNCTION_START(flint_fprintf, state)
             }
         }
 
+        /* Check flint_snprintf output line by line */
+        {
+            const char * str1cur, * str3cur;
+            size_t lnsz1, lnsz3;
+            int line;
+
+            str1cur = str1;
+            str3cur = str3;
+            line = 0;
+            while (1)
+            {
+                lnsz1 = strcspn(str1cur, "\n");
+                lnsz3 = strcspn(str3cur, "\n");
+
+                if (lnsz1 != lnsz3)
+                    TEST_FUNCTION_FAIL(
+                            "Line size at line %d differs (vsnprintf).\n"
+                            "Expected: %zu\n"
+                            "Got:      %zu\n"
+                            "\n"
+                            "Expected string at line %d:\n"
+                            "\n"
+                            "%.*s\n"
+                            "\n"
+                            "Got string at line %d:\n"
+                            "\n"
+                            "%.*s\n",
+                            line,
+                            lnsz1,
+                            lnsz3,
+                            line,
+                            lnsz1, str1cur,
+                            line,
+                            lnsz3, str3cur);
+
+                if (memcmp(str1cur, str3cur, sizeof(char) * lnsz1))
+                    TEST_FUNCTION_FAIL(
+                            "String at line %d differs (vsnprintf).\n"
+                            "\n"
+                            "Expected:\n"
+                            "\n"
+                            "%.*s\n"
+                            "\n"
+                            "Got:\n"
+                            "\n"
+                            "%.*s\n",
+                            line,
+                            lnsz1, str1cur,
+                            lnsz3, str3cur);
+
+                if (str1cur[lnsz1] == '\0' && str3cur[lnsz3] == '\0')
+                    break;
+                else if (str1cur[lnsz1] == '\0' || str3cur[lnsz3] == '\0')
+                    TEST_FUNCTION_FAIL(
+                            "Reached end of string in str%d at line %d (vsnprintf).\n"
+                            "\n"
+                            "Expected string at line %d:\n"
+                            "\n"
+                            "%.*s\n"
+                            "\n"
+                            "Got string at line %d:\n"
+                            "\n"
+                            "%.*s\n",
+                            str1cur[lnsz1] == '\0' ? 1 : 3, line,
+                            line,
+                            lnsz1, str1cur,
+                            line,
+                            lnsz3, str3cur);
+
+                str1cur += lnsz1 + 1;
+                str3cur += lnsz3 + 1;
+                line++;
+            }
+        }
+
         /* Check return value */
         if (res1 != res2)
             TEST_FUNCTION_FAIL(
@@ -1056,9 +1305,17 @@ TEST_FUNCTION_START(flint_fprintf, state)
                     "Got:      %d\n",
                     res1, res2);
 
+        if (res1 != res3)
+            TEST_FUNCTION_FAIL(
+                    "Result from flint_snprintf differed.\n"
+                    "Expected: %d\n"
+                    "Got:      %d\n",
+                    res1, res3);
+
         /* Clear *****************************************************************/
         flint_free(str1);
         flint_free(str2);
+        flint_free(str3);
 
         NMOD_CLEAR(xnmod);
         FMPZ1_CLEAR(xfmpz1);
@@ -1129,6 +1386,55 @@ TEST_FUNCTION_START(flint_fprintf, state)
 
     TEST_FUNCTION_END(state);
 }
+
+TEST_FUNCTION_START(flint_snprintf, state)
+{
+    /* Truncation checks for flint_snprintf */
+    const char * trunc_fmt = "X%wdY";
+    char full_buf[64];
+    int full_len;
+    size_t sizes[] = {0, 1, 2, 3, 4, 5};
+    size_t ix;
+
+    full_len = flint_snprintf(full_buf, sizeof(full_buf), trunc_fmt, (slong) 12345);
+    if (full_len < 0)
+        TEST_FUNCTION_FAIL(
+                "Negative return value from flint_snprintf (full).\n");
+
+    for (ix = 0; ix < sizeof(sizes) / sizeof(sizes[0]); ix++)
+    {
+        size_t size = sizes[ix];
+        char buf[8];
+        size_t prefix;
+        int got;
+
+        memset(buf, 'Z', sizeof(buf));
+        got = flint_snprintf(buf, size, trunc_fmt, (slong) 12345);
+
+        if (got != full_len)
+            TEST_FUNCTION_FAIL(
+                    "Truncation return mismatch for size %zu.\n"
+                    "Expected: %d\n"
+                    "Got:      %d\n",
+                    size, full_len, got);
+
+        if (size == 0)
+            continue;
+
+        prefix = (size - 1 < (size_t) full_len) ? size - 1 : (size_t) full_len;
+        if (buf[prefix] != '\0')
+            TEST_FUNCTION_FAIL(
+                    "Buffer not null-terminated for size %zu.\n",
+                    size);
+
+        if (memcmp(buf, full_buf, prefix) != 0)
+            TEST_FUNCTION_FAIL(
+                    "Truncated prefix mismatch for size %zu.\n",
+                    size);
+    }
+    TEST_FUNCTION_END(state);
+}
+
 
 #if HAVE_UNISTD_H && FLINT_COVERAGE
 #include <unistd.h>

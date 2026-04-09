@@ -36,8 +36,6 @@ typedef struct
     size_t used;
 } flint_vsnprintf_out;
 
-#define FLINT_VPRINTF_PUTC_ERRVAL (-1)
-
 static void flint_vsnprintf_init(flint_vsnprintf_out * out, char * buf, size_t size)
 {
     out->buf = buf;
@@ -69,14 +67,15 @@ static int flint_vsnprintf_putc(int ch, flint_vsnprintf_out * out)
     {
         out->buf[out->used++] = (char) ch;
         out->buf[out->used] = '\0';
-        return (unsigned char) ch;
     }
-    return FLINT_VPRINTF_PUTC_ERRVAL;
+    return (unsigned char) ch;
 }
 
 static int flint_vsnprintf_vprintf(flint_vsnprintf_out * out, const char * fmt, va_list ap)
 {
+    va_list ap_copy;
     int res;
+    char dummy[1];
     char * dst;
     size_t avail;
 
@@ -84,23 +83,29 @@ static int flint_vsnprintf_vprintf(flint_vsnprintf_out * out, const char * fmt, 
     {
         dst = out->buf + out->used;
         avail = out->size - out->used;
-
-        res = vsnprintf(dst, avail, fmt, ap);
-
-        if (res < 0)
-            return res;
-
-        if (out->buf != NULL && out->size > 0 && out->used < out->size)
-        {
-            if ((size_t) res < avail)
-                out->used += (size_t) res;
-            else
-                out->used = out->size - 1;
-        }
-
-        return res;
     }
-    return 0;
+    else
+    {
+        dst = dummy;
+        avail = 1;
+    }
+
+    va_copy(ap_copy, ap);
+    res = vsnprintf(dst, avail, fmt, ap_copy);
+    va_end(ap_copy);
+
+    if (res < 0)
+        return res;
+
+    if (out->buf != NULL && out->size > 0 && out->used < out->size)
+    {
+        if ((size_t) res < avail)
+            out->used += (size_t) res;
+        else
+            out->used = out->size - 1;
+    }
+
+    return res;
 }
 
 static int flint_vsnprintf_printf(flint_vsnprintf_out * out, const char * fmt, ...)
@@ -123,6 +128,7 @@ static int flint_vsnprintf_printf(flint_vsnprintf_out * out, const char * fmt, .
 #define FLINT_VPRINTF_VPRINTF(out, fmt, ap) flint_vsnprintf_vprintf((out), (fmt), (ap))
 #define FLINT_VPRINTF_WRITE(buf, len, out) flint_vsnprintf_write((buf), (len), (out))
 #define FLINT_VPRINTF_PUTC(ch, out) flint_vsnprintf_putc((ch), (out))
+#define FLINT_VPRINTF_PUTC_ERRVAL (-1)
 #define FLINT_VPRINTF_GR_STREAM_INIT(gr_out, out) gr_stream_init_str((gr_out))
 #define FLINT_VPRINTF_GR_STREAM_FLUSH(gr_out, out) \
     do { \
@@ -140,9 +146,9 @@ static int flint_vsnprintf_printf(flint_vsnprintf_out * out, const char * fmt, .
 #undef FLINT_VPRINTF_VPRINTF
 #undef FLINT_VPRINTF_WRITE
 #undef FLINT_VPRINTF_PUTC
+#undef FLINT_VPRINTF_PUTC_ERRVAL
 #undef FLINT_VPRINTF_GR_STREAM_INIT
 #undef FLINT_VPRINTF_GR_STREAM_FLUSH
-#undef FLINT_VPRINTF_PUTC_ERRVAL
 
 int flint_snprintf(char * s, size_t n, const char * str, ...)
 {

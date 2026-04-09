@@ -35,8 +35,6 @@ typedef struct {
     FILE * fs;
 } flint_vfprintf_out;
 
-#define FLINT_VPRINTF_PUTC_ERRVAL (EOF)
-
 static void flint_vfprintf_init(flint_vfprintf_out * out, FILE * fs)
 {
     out->fs = fs;
@@ -77,6 +75,7 @@ static int flint_vfprintf_putc(int ch, flint_vfprintf_out * out)
 #define FLINT_VPRINTF_VPRINTF(out, fmt, ap) flint_vfprintf_vprintf((out), (fmt), (ap))
 #define FLINT_VPRINTF_WRITE(buf, len, out) flint_vfprintf_write((buf), (len), (out))
 #define FLINT_VPRINTF_PUTC(ch, out) flint_vfprintf_putc((ch), (out))
+#define FLINT_VPRINTF_PUTC_ERRVAL (EOF)
 #define FLINT_VPRINTF_GR_STREAM_INIT(gr_out, out) gr_stream_init_file((gr_out), (out)->fs)
 #define FLINT_VPRINTF_GR_STREAM_FLUSH(gr_out, out) do { (void) (gr_out); (void) (out); } while (0)
 
@@ -90,9 +89,9 @@ static int flint_vfprintf_putc(int ch, flint_vfprintf_out * out)
 #undef FLINT_VPRINTF_VPRINTF
 #undef FLINT_VPRINTF_WRITE
 #undef FLINT_VPRINTF_PUTC
+#undef FLINT_VPRINTF_PUTC_ERRVAL
 #undef FLINT_VPRINTF_GR_STREAM_INIT
 #undef FLINT_VPRINTF_GR_STREAM_FLUSH
-#undef FLINT_VPRINTF_PUTC_ERRVAL
 
 
 int flint_fprintf(FILE * fs, const char * str, ...)
