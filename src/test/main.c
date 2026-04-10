@@ -35,6 +35,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_clz),
     TEST_FUNCTION(flint_ctz),
     TEST_FUNCTION(flint_fprintf),
+    TEST_FUNCTION(flint_snprintf),
     TEST_FUNCTION(flint_printf),
     TEST_FUNCTION(memory_manager),
     TEST_FUNCTION(sdiv_qrnnd),
