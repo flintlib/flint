@@ -442,11 +442,81 @@ n_div_precomp_c0(ulong x, const n_div_precomp_t pre)
     return n_mulhi(x, pre->m) >> pre->e;
 }
 
+RADIX_INLINE ulong n_incsat(ulong x)
+{
+    ulong t = x + 1;
+    return (t > x) ? t : x;
+}
+
 /* Assumes x != UWORD_MAX */
 RADIX_INLINE ulong
-n_div_precomp_c1_unsafe(ulong x, const n_div_precomp_t pre)
+n_div_precomp_c1_bounded(ulong x, const n_div_precomp_t pre)
 {
     return n_mulhi(x + 1, pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_div_precomp_c1(ulong x, const n_div_precomp_t pre)
+{
+    return n_mulhi(n_incsat(x), pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_div_precomp(ulong x, const n_div_precomp_t pre)
+{
+    if (pre->m == 0)
+        return x >> pre->e;
+    else if (pre->c == 0)
+        return n_mulhi(x, pre->m) >> pre->e;
+    else
+        return n_mulhi(n_incsat(x), pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
+{
+    if (pre->m == 0)
+        return x >> pre->e;
+    else if (pre->c == 0)
+        return n_mulhi(x, pre->m) >> pre->e;
+    else
+        return n_mulhi(x + 1, pre->m) >> pre->e;
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_m0(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x & ((UWORD(1) << (FLINT_MAX(pre->e, 1) - 1)) - 1);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_c0(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c0(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_c1(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c1(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_bounded(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp_c1_bounded(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp_c1_bounded(x, pre);
+}
+
+RADIX_INLINE ulong
+n_rem_precomp(ulong x, ulong d, const n_div_precomp_t pre)
+{
+    return x - d * n_div_precomp(x, pre);
 }
 
 RADIX_INLINE ulong
@@ -466,30 +536,33 @@ n_divrem_precomp_c0(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
 }
 
 RADIX_INLINE ulong
-n_divrem_precomp_c1_unsafe(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+n_divrem_precomp_c1(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
 {
-    ulong q = n_div_precomp_c1_unsafe(x, pre);
+    ulong q = n_div_precomp_c1(x, pre);
     *r = x - d * q;
     return q;
 }
 
 RADIX_INLINE ulong
-n_div_precomp_unsafe(ulong x, const n_div_precomp_t pre)
+n_divrem_precomp_c1_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
 {
-    if (pre->m == 0)
-        return x >> pre->e;
-    else
-        return n_mulhi(x + pre->c, pre->m) >> pre->e;
+    ulong q = n_div_precomp_c1_bounded(x, pre);
+    *r = x - d * q;
+    return q;
 }
 
 RADIX_INLINE ulong
-n_divrem_precomp_unsafe(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+n_divrem_precomp(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
 {
-    ulong q;
-    if (pre->m == 0)
-        q = x >> pre->e;
-    else
-        q = n_mulhi(x + pre->c, pre->m) >> pre->e;
+    ulong q = n_div_precomp(x, pre);
+    *r = x - d * q;
+    return q;
+}
+
+RADIX_INLINE ulong
+n_divrem_precomp_bounded(ulong * r, ulong x, ulong d, const n_div_precomp_t pre)
+{
+    ulong q = n_div_precomp_bounded(x, pre);
     *r = x - d * q;
     return q;
 }

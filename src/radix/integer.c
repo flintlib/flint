@@ -496,8 +496,8 @@ radix_integer_get_digit(const radix_integer_t x, slong index, const radix_t radi
     }
     else
     {
-        d = n_div_precomp_unsafe(d, radix->bpow_div + id);
-        n_divrem_precomp_unsafe(&d, d, radix->bpow[1], radix->bpow_div + 1);
+        d = n_div_precomp_bounded(d, radix->bpow_div + id);
+        n_divrem_precomp_bounded(&d, d, radix->bpow[1], radix->bpow_div + 1);
         return d;
     }
 }
@@ -520,8 +520,8 @@ radix_integer_set_digit(radix_integer_t res, const radix_integer_t x, slong inde
     }
     else
     {
-        hi = n_divrem_precomp_unsafe(&lo, d, radix->bpow[id], radix->bpow_div + id);
-        hi = n_div_precomp_unsafe(hi, radix->bpow_div + 1);
+        hi = n_divrem_precomp_bounded(&lo, d, radix->bpow[id], radix->bpow_div + id);
+        hi = n_div_precomp_bounded(hi, radix->bpow_div + 1);
         d = hi * (radix->bpow[id] * radix->bpow[1]) + c * radix->bpow[id] + lo;
     }
 
