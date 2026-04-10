@@ -218,6 +218,7 @@ static mp_limb_t flint_mpn_mulhigh_2(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, low;
     FLINT_MPN_MUL_2X2(res[1], res[0], low, b, u[1], u[0], v[1], v[0]);
+    (void) b;
     return low;
 }
 
