@@ -372,6 +372,7 @@ typedef struct {
 typedef mpn_ctx_struct mpn_ctx_t[1];
 
 void _convert_block(ulong* Xs, sd_fft_ctx_struct* Rffts, double* d, ulong dstride, ulong np, ulong Iv);
+void _convert_block_1_mod(ulong* Xs, sd_fft_ctx_struct* Rffts, double* d, ulong dstride, ulong I, double p2, double p2inv);
 ulong flint_mpn_nbits(const ulong* a, ulong an);
 int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e);
 unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, unsigned char cf);

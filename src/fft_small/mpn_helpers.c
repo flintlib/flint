@@ -48,6 +48,51 @@ void _convert_block(
     }
 }
 
+/* Same as _convert_block, but only do the first prime, and additionally
+   reduce the results mod {p2, p2inv}. */
+void _convert_block_1_mod(
+    ulong* Xs,
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
+    ulong I,
+    double p2, double p2inv)
+{
+    ulong l = 0;
+    vec4d p = vec4d_set_d(Rffts[l].p);
+    vec4d pinv = vec4d_set_d(Rffts[l].pinv);
+    vec4d vp2 = vec4d_set_d(p2);
+    vec4d vp2inv = vec4d_set_d(p2inv);
+    double* x = sd_fft_ctx_blk_index(d + l*dstride, I);
+    ulong j = 0; do {
+        vec4d x0, x1, x2, x3;
+        vec4n y0, y1, y2, y3;
+        x0 = vec4d_load(x + j + 0*VEC_SZ);
+        x1 = vec4d_load(x + j + 1*VEC_SZ);
+        x2 = vec4d_load(x + j + 2*VEC_SZ);
+        x3 = vec4d_load(x + j + 3*VEC_SZ);
+        /* We first reduce by {p, pinv} and then by {vp2, vp2inv} as the
+           entries before reduction can be negative. An improvement would
+           be to just adjust negative entries in the first reduction,
+           if that could be done more quickly. */
+        x0 = vec4d_reduce_to_0n(x0, p, pinv);
+        x1 = vec4d_reduce_to_0n(x1, p, pinv);
+        x2 = vec4d_reduce_to_0n(x2, p, pinv);
+        x3 = vec4d_reduce_to_0n(x3, p, pinv);
+        x0 = vec4d_reduce_to_0n(x0, vp2, vp2inv);
+        x1 = vec4d_reduce_to_0n(x1, vp2, vp2inv);
+        x2 = vec4d_reduce_to_0n(x2, vp2, vp2inv);
+        x3 = vec4d_reduce_to_0n(x3, vp2, vp2inv);
+        y0 = vec4d_convert_limited_vec4n(x0);
+        y1 = vec4d_convert_limited_vec4n(x1);
+        y2 = vec4d_convert_limited_vec4n(x2);
+        y3 = vec4d_convert_limited_vec4n(x3);
+        vec4n_store_unaligned(Xs + l*BLK_SZ + j + 0*VEC_SZ, y0);
+        vec4n_store_unaligned(Xs + l*BLK_SZ + j + 1*VEC_SZ, y1);
+        vec4n_store_unaligned(Xs + l*BLK_SZ + j + 2*VEC_SZ, y2);
+        vec4n_store_unaligned(Xs + l*BLK_SZ + j + 3*VEC_SZ, y3);
+    } while (j += 4*VEC_SZ, j < BLK_SZ);
+    FLINT_ASSERT(j == BLK_SZ);
+}
+
 ulong flint_mpn_nbits(const ulong* a, ulong an)
 {
     while (an > 0 && a[an-1] == 0)

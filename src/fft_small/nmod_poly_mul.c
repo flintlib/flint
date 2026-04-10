@@ -294,34 +294,44 @@ static void _crt_1(
 {
     ulong i, j, jstart, jstop;
     ulong Xs[BLK_SZ*1];
+    int have_fft_prime;
+    double n = 0.0, ninv = 0.0;
 
-    if (mod.n == Rffts[0].mod.n)
+    /* Reconstructing from a single prime; the modulus is either an FFT
+       prime itself or small enough to be a valid FFT prime. */
+    FLINT_ASSERT(mod.n <= (UWORD(1) << 50));
+
+    /* Todo: generalize _convert_block to allow using the fast path
+       for all FFT primes. */
+    have_fft_prime = (mod.n == Rffts[0].mod.n);
+    if (!have_fft_prime)
     {
-        for (i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ)
-        {
-            _convert_block(Xs, Rffts, d, dstride, 1, i/BLK_SZ);
-
-            jstart = (i < zi_start) ? zi_start - i : 0; \
-            jstop = FLINT_MIN(BLK_SZ, zi_stop - i);
-            for (j = jstart; j < jstop; j += 1)
-            {
-                z[i+j-zl] = Xs[j];
-            }
-        }
+        n = mod.n;
+        ninv = 1.0 / n;
     }
-    else
-    {
-        for (i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ)
-        {
-            _convert_block(Xs, Rffts, d, dstride, 1, i/BLK_SZ);
 
-            jstart = (i < zi_start) ? zi_start - i : 0; \
-            jstop = FLINT_MIN(BLK_SZ, zi_stop - i);
+    for (i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ)
+    {
+        jstart = (i < zi_start) ? zi_start - i : 0; \
+        jstop = FLINT_MIN(BLK_SZ, zi_stop - i);
+
+        /* Can write block directly to output */
+        if (jstart == 0 && jstop == BLK_SZ)
+        {
+            if (have_fft_prime)
+                _convert_block(z + i - zl, Rffts, d, dstride, 1, i/BLK_SZ);
+            else
+                _convert_block_1_mod(z + i - zl, Rffts, d, dstride, i/BLK_SZ, n, ninv);
+        }
+        else /* Write to temporary buffer, then copy truncated part of block */
+        {
+            if (have_fft_prime)
+                _convert_block(Xs, Rffts, d, dstride, 1, i/BLK_SZ);
+            else
+                _convert_block_1_mod(Xs, Rffts, d, dstride, i/BLK_SZ, n, ninv);
 
             for (j = jstart; j < jstop; j += 1)
-            {
-                NMOD_RED(z[i+j-zl], Xs[j], mod);
-            }
+                z[i+j-zl] = Xs[j];
         }
     }
 }
