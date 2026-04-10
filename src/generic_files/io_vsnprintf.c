@@ -65,7 +65,8 @@ static int flint_vsnprintf_putc(int ch, flint_vsnprintf_out * out)
 {
     if (out->buf != NULL && out->size > 0 && out->used < out->size - 1)
     {
-        out->buf[out->used++] = (char) ch;
+        out->buf[out->used] = (char) ch;
+        out->used++;
         out->buf[out->used] = '\0';
     }
     return (unsigned char) ch;
@@ -164,7 +165,7 @@ int flint_snprintf(char * s, size_t n, const char * str, ...)
 
 int flint_vsprintf(char * s, const char * str, va_list vlist)
 {
-    return flint_vsnprintf(s, SIZE_MAX, str, vlist);
+    return flint_vsnprintf(s, INT_MAX, str, vlist);
 }
 
 int flint_sprintf(char * s, const char * str, ...)
