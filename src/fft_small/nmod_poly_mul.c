@@ -247,6 +247,8 @@ static void CAT(_crt, NP)( \
  \
     ulong Xs[BLK_SZ*NP]; \
  \
+    (void) min_an_bn; \
+ \
     for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ) \
     { \
         _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ); \
@@ -395,19 +397,37 @@ static void _crt_2(
             high_reduced = 1;
     }
 
+#if defined(__SIZEOF_INT128__)
+
     /* The two-limb CRT is slightly faster using __uint128_t than using
        the generic macros. */
     __uint128_t crt_M = ((__uint128_t) crt_data_prod_primes(Rcrts + np - 1)[0]) |
                         (((__uint128_t) crt_data_prod_primes(Rcrts + np - 1)[1]) << 64);
     ulong c0 = _crt_data_co_prime(Rcrts + np - 1, 0, 2)[0];
     ulong c1 = _crt_data_co_prime(Rcrts + np - 1, 1, 2)[0];
-    __uint128_t r;
 
 #define DO_CRT \
-    r = ((__uint128_t) c0) * ((__uint128_t) (Xs[0*BLK_SZ + j])) + \
+    ulong r[2]; \
+    __uint128_t rr; \
+    rr = ((__uint128_t) c0) * ((__uint128_t) (Xs[0*BLK_SZ + j])) + \
          ((__uint128_t) c1) * ((__uint128_t) (Xs[1*BLK_SZ + j])); \
-    if (r >= crt_M) \
-        r -= crt_M; \
+    if (rr >= crt_M) \
+        rr -= crt_M; \
+    r[0] = rr; \
+    r[1] = rr >> 64;
+
+#else
+
+#define DO_CRT \
+    ulong r[2]; \
+    ulong t[2]; \
+    ulong l = 0; \
+    CAT3(_big_mul, 2, 1)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    for (l++; l < np; l++) \
+        CAT3(_big_addmul, 2, 1)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    CAT(_reduce_big_sum, 2)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+
+#endif
 
     for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ)
     {
@@ -421,8 +441,8 @@ static void _crt_2(
             for (ulong j = jstart; j < jstop; j += 1)
             {
                 DO_CRT
-                FLINT_ASSERT((ulong)(r >> 64) < mod.n);
-                NMOD_RED2_NONFULLWORD(z[i+j-zl], (ulong)(r >> 64), (ulong) r, mod);
+                FLINT_ASSERT(r[1] < mod.n);
+                NMOD_RED2_NONFULLWORD(z[i+j-zl], r[1], r[0], mod);
             }
         }
         else
@@ -430,7 +450,7 @@ static void _crt_2(
             for (ulong j = jstart; j < jstop; j += 1)
             {
                 DO_CRT
-                NMOD2_RED2(z[i+j-zl], (ulong)(r >> 64), (ulong) r, mod);
+                NMOD2_RED2(z[i+j-zl], r[1], r[0], mod);
             }
         }
     }
