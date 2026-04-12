@@ -219,11 +219,12 @@ FLINT_ASSERT(i+j < atrunc);
 }
 
 
+
 #define DEFINE_IT(NP, N, M) \
 static void CAT(_crt, NP)( \
     ulong* z, ulong zl, ulong zi_start, ulong zi_stop, \
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
-    crt_data_struct* Rcrts, \
+    crt_data_struct* Rcrts, ulong min_an_bn,\
     nmod_t mod) \
 { \
     ulong np = NP; \
@@ -281,15 +282,28 @@ static void CAT(_crt, NP)( \
     } \
 }
 
-DEFINE_IT(2, 2, 1)
-DEFINE_IT(3, 3, 2)
+// DEFINE_IT(1, 1, 1) -- special-cased below
+// DEFINE_IT(2, 2, 1) -- special-cased below
+// DEFINE_IT(3, 3, 2) -- special-cased below
 DEFINE_IT(4, 4, 3)
 #undef DEFINE_IT
+
+
+FLINT_FORCE_INLINE
+void mullo_2x1(ulong * r1, ulong * r0, ulong a1, ulong a0, ulong b0)
+{
+    ulong t0, t1;
+    umul_ppmm(t1, t0, a0, b0);
+    t1 += a1 * b0;
+    *r0 = t0;
+    *r1 = t1;
+}
 
 static void _crt_1(
     ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
     crt_data_struct* FLINT_UNUSED(Rcrts),
+    ulong FLINT_UNUSED(min_an_bn),
     nmod_t mod)
 {
     ulong i, j, jstart, jstop;
@@ -335,6 +349,284 @@ static void _crt_1(
         }
     }
 }
+
+static void _crt_2(
+    ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
+    crt_data_struct* Rcrts, ulong min_an_bn,
+    nmod_t mod)
+{
+    ulong np = 2;
+    ulong n = 2;
+    ulong m = 1;
+
+    FLINT_ASSERT(n == Rcrts[np-1].coeff_len);
+
+    if (n == m + 1)
+    {
+        for (ulong l = 0; l < np; l++) {
+            FLINT_ASSERT(crt_data_co_prime(Rcrts + np - 1, l)[m] == 0);
+        }
+    }
+    else
+    {
+        FLINT_ASSERT(n == m);
+    }
+
+    ulong Xs[BLK_SZ*2];
+
+    /* If the output fits in 100 bits then certainly the modulus
+       should have <= 63 bits. */
+    FLINT_ASSERT(mod.n < (UWORD(1) << (FLINT_BITS - 1)));
+
+    /* The output coefficients are bounded by min(an,bn) * (n-1)^2. If
+       the high words are smaller than n (i.e. already reduced mod n), we
+       can use NMOD_RED2 (or NMOD_RED2_NONFULLWORD), otherwise NMOD2_RED2.
+       We could do something faster than NMOD2_RED2, but in practice the bound
+       is rarely exceeded (we need products longer than 10^10 or so), so just
+       keep it simple and fall back on NMOD2_RED2 when that occurs. */
+    int high_reduced = 0;
+
+    {
+        ulong hi, lo;
+        umul_ppmm(hi, lo, mod.n - 1, mod.n - 1);
+        mullo_2x1(&hi, &lo, hi, lo, min_an_bn);
+        if (hi < mod.n)
+            high_reduced = 1;
+    }
+
+    /* The two-limb CRT is slightly faster using __uint128_t than using
+       the generic macros. */
+    __uint128_t crt_M = ((__uint128_t) crt_data_prod_primes(Rcrts + np - 1)[0]) |
+                        (((__uint128_t) crt_data_prod_primes(Rcrts + np - 1)[1]) << 64);
+    ulong c0 = _crt_data_co_prime(Rcrts + np - 1, 0, 2)[0];
+    ulong c1 = _crt_data_co_prime(Rcrts + np - 1, 1, 2)[0];
+    __uint128_t r;
+
+#define DO_CRT \
+    r = ((__uint128_t) c0) * ((__uint128_t) (Xs[0*BLK_SZ + j])) + \
+         ((__uint128_t) c1) * ((__uint128_t) (Xs[1*BLK_SZ + j])); \
+    if (r >= crt_M) \
+        r -= crt_M; \
+
+    for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ)
+    {
+        _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ);
+
+        ulong jstart = (i < zi_start) ? zi_start - i : 0;
+        ulong jstop = FLINT_MIN(BLK_SZ, zi_stop - i);
+
+        if (high_reduced)
+        {
+            for (ulong j = jstart; j < jstop; j += 1)
+            {
+                DO_CRT
+                FLINT_ASSERT((ulong)(r >> 64) < mod.n);
+                NMOD_RED2_NONFULLWORD(z[i+j-zl], (ulong)(r >> 64), (ulong) r, mod);
+            }
+        }
+        else
+        {
+            for (ulong j = jstart; j < jstop; j += 1)
+            {
+                DO_CRT
+                NMOD2_RED2(z[i+j-zl], (ulong)(r >> 64), (ulong) r, mod);
+            }
+        }
+    }
+#undef DO_CRT
+}
+
+/* Ad hoc modular reduction to do better than NMOD2_RED2 and NMOD_RED3.
+   This should eventually be moved out and used elsewhere. */
+
+/* Precompute floor(2^(2*FLINT_BITS) / n) for Shoup-style modular reduction.
+   This could be optimized (not necessary here, but relevant for other
+   applications). */
+static void
+n_ll_rem_l_precomp(ulong * qhi, ulong * qlo, ulong n)
+{
+    ulong q[4];
+    ulong a[4];
+    a[0] = 0;
+    a[1] = 0;
+    a[2] = 1;
+    mpn_divrem_1(q, 0, a, 3, n);
+    *qlo = q[0];
+    *qhi = q[1];
+}
+
+/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Shoup */
+FLINT_FORCE_INLINE ulong
+n_ll_rem_l_nonfullword(ulong xhi, ulong xlo, ulong n, ulong qhi, ulong qlo)
+{
+    ulong c2, c1, c0;
+    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, xhi, xlo);
+    (void) c1;
+    (void) c0;
+    xlo -= c2 * n;
+    if (xlo >= n)
+        xlo -= n;
+    return xlo;
+}
+
+/* 3 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Shoup */
+FLINT_FORCE_INLINE ulong
+n_lll_rem_l_nonfullword(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo, ulong alpha2, ulong alpha1)
+{
+    ulong c2, c1, c0, t1, t0;
+    ulong xhi, xlo;
+
+    umul_ppmm(t1, t0, y2, alpha2);
+    umul_ppmm(c1, c0, y1, alpha1);
+    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
+    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
+
+    FLINT_MPN_MUL_3P2X2(c2, c1, c0, qhi, qlo, xhi, xlo);
+    (void) c1;
+    (void) c0;
+    xlo -= c2 * n;
+    if (xlo >= n)
+        xlo -= n;
+
+    return xlo;
+}
+
+/* 3 -> 1 limb mod, n >= 2^(FLINT_BITS-1), using linear combination + Granlund-Möller */
+FLINT_FORCE_INLINE ulong
+n_lll_rem_l_fullword(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
+{
+    ulong c1, c0, t1, t0;
+    ulong xhi, xlo;
+    ulong hi, lo;
+
+    umul_ppmm(t1, t0, y2, alpha2);
+    umul_ppmm(c1, c0, y1, alpha1);
+    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
+    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
+
+    umul_ppmm(hi, lo, xhi, alpha1);
+    add_ssaaaa(hi, lo, hi, lo, 0, xlo);
+    NMOD_RED2_FULLWORD(xlo, hi, lo, mod);
+
+    return xlo;
+}
+
+static void _crt_3(
+    ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
+    crt_data_struct* Rcrts, ulong min_an_bn,
+    nmod_t mod)
+{
+    ulong np = 3;
+    ulong n = 3;
+
+#if FLINT_WANT_ASSERT
+    ulong m = 2;
+    FLINT_ASSERT(n == Rcrts[np-1].coeff_len);
+    for (ulong l = 0; l < np; l++)
+        FLINT_ASSERT(crt_data_co_prime(Rcrts + np - 1, l)[m] == 0);
+#endif
+
+    ulong Xs[BLK_SZ*3];
+
+    ulong qhi = 0, qlo = 0;
+    ulong alpha1 = 0, alpha2 = 0;
+    ulong hi, lo, u2, u1, u0;
+
+    /* Coefficients before modular reduction can have 2 or 3 limbs. */
+    int two_limbs = 0;
+    /* High word of 2-limb input is reduced */
+    int high_reduced = 0;
+    /* Modulus has MSB set. */
+    int mod_fullword = (mod.norm == 0);
+
+    /* Bound coefficients before modular reduction. */
+    umul_ppmm(hi, lo, mod.n - 1, mod.n - 1);
+    FLINT_MPN_MUL_2X1(u2, u1, u0, hi, lo, min_an_bn);
+    two_limbs = (u2 == 0);
+
+    /* Branch 1 and 2 of mod code */
+    if (two_limbs && !mod_fullword)
+    {
+        high_reduced = (u1 < mod.n);
+
+        /* Extra precomputation for branch 2 */
+        if (!high_reduced)
+            n_ll_rem_l_precomp(&qhi, &qlo, mod.n);
+    }
+    else
+    {
+        /* Extra precomputation for branch 3 and 4 of mod code */
+        alpha1 = nmod_set_ui(UWORD(1) << (FLINT_BITS / 2), mod);
+        alpha1 = nmod_mul(alpha1, alpha1, mod);
+        alpha2 = nmod_mul(alpha1, alpha1, mod);
+
+        /* Extra precomputation for branch 3 */
+        if (!mod_fullword)
+            n_ll_rem_l_precomp(&qhi, &qlo, mod.n);
+    }
+
+#define DO_CRT \
+    ulong r[3]; \
+    ulong t[3]; \
+    ulong l = 0; \
+    CAT3(_big_mul, 3, 2)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    for (l++; l < np; l++) \
+        CAT3(_big_addmul, 3, 2)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+    CAT(_reduce_big_sum, 3)(r, t, crt_data_prod_primes(Rcrts + np - 1));
+
+    for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ)
+    {
+        _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ);
+
+        ulong jstart = (i < zi_start) ? zi_start - i : 0;
+        ulong jstop = FLINT_MIN(BLK_SZ, zi_stop - i);
+
+        if (two_limbs && !mod_fullword)
+        {
+            if (high_reduced)
+            {
+                for (ulong j = jstart; j < jstop; j += 1)
+                {
+                    DO_CRT
+                    FLINT_ASSERT(r[2] == 0);
+                    NMOD_RED2_NONFULLWORD(z[i+j-zl], r[1], r[0], mod);
+                }
+            }
+            else
+            {
+                for (ulong j = jstart; j < jstop; j += 1)
+                {
+                    DO_CRT
+                    FLINT_ASSERT(r[2] == 0);
+                    z[i+j-zl] = n_ll_rem_l_nonfullword(r[1], r[0], mod.n, qhi, qlo);
+                }
+            }
+        }
+        else
+        {
+            if (!mod_fullword)
+            {
+                for (ulong j = jstart; j < jstop; j += 1)
+                {
+                    DO_CRT
+                    z[i+j-zl] = n_lll_rem_l_nonfullword(r[2], r[1], r[0], mod.n, qhi, qlo, alpha2, alpha1);
+                }
+            }
+            else
+            {
+                for (ulong j = jstart; j < jstop; j += 1)
+                {
+                    DO_CRT
+                    z[i+j-zl] = n_lll_rem_l_fullword(r[2], r[1], r[0], mod, alpha2, alpha1);
+                }
+            }
+        }
+    }
+#undef DO_CRT
+}
+
 
 typedef struct {
     ulong np;
@@ -435,10 +727,11 @@ typedef struct {
     sd_fft_ctx_struct* ffts;
     crt_data_struct* crts;
     nmod_t mod;
+    ulong min_an_bn;  /* for precise output bounds */
     void (*f)(
         ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
         sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-        crt_data_struct* Rcrts,
+        crt_data_struct* Rcrts, ulong min_an_bn,
         nmod_t mod);
 } s2worker_struct;
 
@@ -447,7 +740,7 @@ static void s2worker_func(void* varg)
     s2worker_struct* X = (s2worker_struct*) varg;
 
     X->f(X->z, X->zl, X->start_zi, X->stop_zi, X->ffts + X->offset, X->buf,
-         X->stride, X->crts + X->offset, X->mod);
+         X->stride, X->crts + X->offset, X->min_an_bn, X->mod);
 }
 
 void _nmod_poly_mul_mid_mpn_ctx(
@@ -608,6 +901,7 @@ got_np_and_offset:
         X->ffts = R->ffts;
         X->crts = R->crts;
         X->mod = mod;
+        X->min_an_bn = FLINT_MIN(an, bn);
         X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
     }
 
@@ -669,7 +963,7 @@ static void _nmod_poly_mul_mod_xpnm1(
     FLINT_ASSERT(bn > 0);
     FLINT_ASSERT(ztrunc <= N);
 
-    /* first see if mod.n is on of R->ffts[i].mod.n */
+    /* first see if mod.n is one of R->ffts[i].mod.n */
 
     if (modbits == 50)
     {
@@ -766,6 +1060,7 @@ got_np_and_offset:
         X->ffts = R->ffts;
         X->crts = R->crts;
         X->mod = mod;
+        X->min_an_bn = FLINT_MIN(an, bn);
         X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
     }
 
@@ -1000,6 +1295,7 @@ int _nmod_poly_mul_mid_precomp(
         X->ffts = R->ffts;
         X->crts = R->crts;
         X->mod = mod;
+        X->min_an_bn = FLINT_MIN(an, bn);
         X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
     }
 
@@ -1085,6 +1381,8 @@ static void _nmod_poly_mul_mod_xpnm1_precomp(
         X->ffts = R->ffts;
         X->crts = R->crts;
         X->mod = mod;
+        X->min_an_bn = an;  /* Todo: we might want to store bn and min by this here,
+                               in case this is much smaller than an. */
         X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
     }
 
