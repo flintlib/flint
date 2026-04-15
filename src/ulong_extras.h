@@ -377,6 +377,42 @@ ulong n_invmod(ulong x, ulong y)
 
 ulong n_binvert(ulong a);
 
+ULONG_EXTRAS_INLINE
+ulong n_barrett_precomp(ulong n)
+{
+    ulong q, r;
+    FLINT_ASSERT(n >= 2);
+    udiv_qrnnd(q, r, UWORD(1), UWORD(0), n);
+    return q;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_barrett_sloppy(ulong x, ulong n, ulong npre)
+{
+    return x - n_mulhi(x, npre) * n;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_barrett(ulong x, ulong n, ulong npre)
+{
+    ulong y = n_mod_barrett_sloppy(x, n, npre);
+    if (y >= n)
+        y -= n;
+    return y;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_lemire_precomp(ulong n)
+{
+    return UWORD_MAX / n + 1;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_lemire(ulong x, ulong n, ulong npre)
+{
+    return n_mulhi(n, x * npre);
+}
+
 /* Double-limb arithmetic. */
 
 void n_ll_small_preinv(nn_ptr minv, nn_srcptr m);

@@ -80,7 +80,7 @@ compute_factor_base(ulong * small_factor, qs_t qs_inf, slong num_primes)
         {
             factor_base[fb_prime].p = p;
             factor_base[fb_prime].pinv = pinv;
-            factor_base[fb_prime].pinv2 = UWORD_MAX / p + 1;
+            factor_base[fb_prime].pinv2 = n_lemire_precomp(p);
             factor_base[fb_prime].size = FLINT_BIT_COUNT(p);
             sqrts[fb_prime] = n_sqrtmod(nmod, p);
             fb_prime++;
