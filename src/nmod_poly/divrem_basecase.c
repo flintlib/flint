@@ -141,7 +141,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
         ulong ninv = n_lemire_precomp(n);
 
         q1 = n_mod_lemire(A[lenA-1] * invL, n, ninv);
-        t  = n_mod_lemire(q1, B[lenB-2] * n, ninv);
+        t  = n_mod_lemire(q1 * B[lenB-2], n, ninv);
         t  = nmod_sub(t, A[lenA-2], mod);
         q0 = n_mod_lemire(t * invL, n, ninv);
         Q[0] = nmod_neg(q0, mod);

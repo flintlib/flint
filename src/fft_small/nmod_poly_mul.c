@@ -497,7 +497,7 @@ n_lll_rem_l_nonfullword(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong 
     ulong c2, c1, c0, t1, t0;
     ulong xhi, xlo;
 
-    FLINT_ASSERT(mod.n < (UWORD(1) << (FLINT_BITS - 1)));
+    FLINT_ASSERT(n < (UWORD(1) << (FLINT_BITS - 1)));
 
     umul_ppmm(t1, t0, y2, alpha2);
     umul_ppmm(c1, c0, y1, alpha1);
