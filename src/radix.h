@@ -486,7 +486,7 @@ n_div_precomp_bounded(ulong x, const n_div_precomp_t pre)
 RADIX_INLINE ulong
 n_rem_precomp_m0(ulong x, ulong FLINT_UNUSED(d), const n_div_precomp_t pre)
 {
-    return x & ((UWORD(1) << (FLINT_MAX(pre->e, 1) - 1)) - 1);
+    return x & ((UWORD(1) << pre->e) - 1);
 }
 
 RADIX_INLINE ulong
