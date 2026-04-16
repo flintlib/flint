@@ -416,7 +416,7 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
                         fmpz_mat_snf_transform(S_other, U, V, A);
                         break;
                     case 3:
-                        fmpz_mat_elementary_divisors(ed, &rank, A);
+                        rank = fmpz_mat_elementary_divisors(ed, A);
                         if (rank != n)
                         {
                             flint_printf("FAIL: %s rank %wd != %wd"

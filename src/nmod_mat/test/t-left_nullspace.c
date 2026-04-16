@@ -19,7 +19,7 @@ TEST_FUNCTION_START(nmod_mat_left_nullspace, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        nmod_mat_t A, B, ker, kert;
+        nmod_mat_t A, B, ker;
         ulong mod;
         slong m, n, d, r, nullity, nulrank;
 
@@ -33,7 +33,6 @@ TEST_FUNCTION_START(nmod_mat_left_nullspace, state)
 
             nmod_mat_init(A, m, n, mod);
             nmod_mat_init(ker, m, m, mod);
-            nmod_mat_init(kert, m, m, mod);
             nmod_mat_init(B, m, n, mod);
 
             nmod_mat_randrank(A, state, r);
@@ -55,22 +54,17 @@ TEST_FUNCTION_START(nmod_mat_left_nullspace, state)
                         "A = %{nmod_mat}\n",
                         A);
 
-            /*
-                ker has left nullspace vectors as columns,
-                so ker^T * A = 0.
-            */
-            nmod_mat_transpose(kert, ker);
-            nmod_mat_mul(B, kert, A);
+            /* Rows of ker are left nullspace vectors: ker * A = 0. */
+            nmod_mat_mul(B, ker, A);
 
             if (nmod_mat_rank(B) != 0)
                 TEST_FUNCTION_FAIL(
-                        "ker^T * A != 0\n"
+                        "ker * A != 0\n"
                         "A = %{nmod_mat}\n",
                         A);
 
             nmod_mat_clear(A);
             nmod_mat_clear(ker);
-            nmod_mat_clear(kert);
             nmod_mat_clear(B);
         }
     }

@@ -673,12 +673,19 @@ Nullspace
 
     Computes the left nullspace of `A` and returns the nullity.
 
-    More precisely, the columns of `X` form a basis for the left
-    nullspace of `A`, i.e. each column `v` satisfies `v^T A = 0`.
-    The return value is the rank of `X`.
+    More precisely, this function sets the first ``nullity`` rows of
+    `X` to a basis of the left nullspace of `A`, so that each such
+    row `v` satisfies `v A = 0`. Remaining rows of `X` are set to
+    zero. The return value is the nullity.
 
-    `X` must have sufficient space to store all basis vectors
-    in the left nullspace.
+    `X` must have sufficient space to store all basis vectors in the
+    left nullspace, i.e. it must have at least ``nullity`` rows and
+    `m` columns where `m` is the number of rows of `A`. In particular
+    an `m \times m` allocation is always sufficient.
+
+    This function is implemented via :func:`nmod_mat_nullspace` applied
+    to the transpose of `A`, and returns a basis in the same
+    (non-reduced) form produced by that function.
 
 
 Transforms

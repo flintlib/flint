@@ -17,6 +17,13 @@
 #include "flint.h"
 
 /*
+    Pivots above this many bits cause a fall back to full SNF:
+    factoring very large pivots is not worth the effort since
+    Luebeck's algorithm only uses word-sized primes anyway.
+*/
+#define ELEMENTARY_DIVISORS_MAX_PIVOT_BITS (2 * FLINT_BITS)
+
+/*
     Compute p-adic valuations of the elementary divisors of the r x n
     integer matrix R (which has rank r, i.e., full row rank).
 
@@ -24,11 +31,12 @@
     (which are assumed to be initialized and sorted ascending).
 
     Algorithm (Luebeck):
-    Iteratively compute nullspace of R mod p; each nullspace vector gives
-    a linear combination of rows divisible by p; replace that row with
-    the combination divided by p. Repeat until R has full rank mod p.
-    The nullity at each level gives the number of elementary divisors
-    whose p-adic valuation exceeds the current level.
+    Iteratively compute left nullspace of R mod p; each basis vector
+    gives a linear combination of rows divisible by p; replace that
+    row with the combination divided by p. Repeat until R has full
+    rank mod p. The nullity at each level gives the number of
+    elementary divisors whose p-adic valuation exceeds the current
+    level.
 */
 static void
 _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
@@ -67,22 +75,25 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
         mults[num_levels] = nullity;
         num_levels++;
 
-        /* Compute left nullspace of Rp */
-        nmod_mat_init(N, r, nullity, p);
+        /*
+            Compute left nullspace of Rp as row vectors: row j of N
+            is the j-th basis vector v with v * Rp = 0 (mod p).
+        */
+        nmod_mat_init(N, nullity, r, p);
         nmod_mat_left_nullspace(N, Rp);
         nmod_mat_clear(Rp);
 
         /*
-            For each nullspace vector v (column of N):
-            - v is in Z_p^r with v^T * R = 0 (mod p)
-            - Compute combo = (v^T * R) / p as an integer vector
-            - Replace the row at v's free variable position with combo
+            For each basis vector v (row j of N):
+            - v * R == 0 (mod p), so (v * R) / p is an integer vector
+            - Replace some row of R (assigned to j) with that vector
 
-            The nullspace from nmod_mat_left_nullspace is in reduced echelon
-            form: column j has entry 1 at its free variable position
-            (nonpivots[j]) and 0 at all other free variable positions.
-            We must use these positions as pivots (not just "first
-            nonzero") to ensure distinct row replacements.
+            We must assign each basis vector to a distinct row of R.
+            The non-reduced basis from nmod_mat_nullspace has the
+            property that the j-th basis vector has a 1 at its free
+            variable position and 0 at all other free variable
+            positions, so we can recover a distinct row index per j
+            by scanning.
 
             We compute ALL combinations BEFORE replacing any rows,
             since the nullspace was computed for the original R.
@@ -94,22 +105,20 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
             fmpz_mat_init(combos, nullity, n);
             piv_rows = flint_malloc(nullity * sizeof(slong));
 
-            /* Identify free variable positions: for column j of N,
-               find row where N[row,j] == 1 and N[row,k] == 0
-               for all k != j */
+            /* Identify a unique pivot column for each row of N */
             for (j = 0; j < nullity; j++)
             {
                 piv_rows[j] = -1;
                 for (i = 0; i < r; i++)
                 {
                     int ok;
-                    if (nmod_mat_entry(N, i, j) != 1)
+                    if (nmod_mat_entry(N, j, i) != 1)
                         continue;
                     ok = 1;
                     for (k = 0; k < nullity; k++)
                     {
                         if (k != j
-                            && nmod_mat_entry(N, i, k) != 0)
+                            && nmod_mat_entry(N, k, i) != 0)
                         {
                             ok = 0;
                             break;
@@ -130,12 +139,12 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
             {
                 for (i = 0; i < r; i++)
                 {
-                    if (nmod_mat_entry(N, i, j) != 0)
+                    if (nmod_mat_entry(N, j, i) != 0)
                     {
                         _fmpz_vec_scalar_addmul_ui(
                             fmpz_mat_row(combos, j),
                             fmpz_mat_row(R, i), n,
-                            nmod_mat_entry(N, i, j));
+                            nmod_mat_entry(N, j, i));
                     }
                 }
 
@@ -205,17 +214,17 @@ _elementary_divisors_via_snf(fmpz * ed, slong r,
     fmpz_mat_clear(S);
 }
 
-void
-fmpz_mat_elementary_divisors(fmpz * ed, slong * rank_out,
-    const fmpz_mat_t A)
+slong
+fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A)
 {
     slong m = fmpz_mat_nrows(A);
     slong n = fmpz_mat_ncols(A);
     slong r, i, j, k;
     fmpz_mat_t H;
     fmpz_mat_t R; /* window into H */
-    fmpz_t mod;
-    fmpz_factor_t fac;
+    fmpz_factor_t fac_pivot;
+    ulong * primes;
+    slong num_primes, primes_alloc;
     int use_luebeck;
 
     /* Compute HNF and extract rank (number of nonzero rows) */
@@ -229,89 +238,126 @@ fmpz_mat_elementary_divisors(fmpz * ed, slong * rank_out,
             break;
         r++;
     }
-    *rank_out = r;
 
     if (r == 0)
     {
         fmpz_mat_clear(H);
-        return;
+        return 0;
     }
 
-    /* Compute modulus (product of leading entries of nonzero rows) */
-    fmpz_init(mod);
-    fmpz_one(mod);
-    for (i = 0; i < r; i++)
+    /*
+        Factor each pivot individually (cheaper than factoring their
+        product), accumulating distinct prime factors. Abort as soon
+        as a pivot has a prime that does not fit in a ulong or is
+        too large to factor cheaply.
+    */
+    primes_alloc = 8;
+    primes = flint_malloc(primes_alloc * sizeof(ulong));
+    num_primes = 0;
+    use_luebeck = 1;
+
+    fmpz_factor_init(fac_pivot);
+
+    for (i = 0; i < r && use_luebeck; i++)
     {
+        fmpz * pivot = NULL;
+
         for (j = 0; j < n; j++)
         {
             if (!fmpz_is_zero(fmpz_mat_entry(H, i, j)))
             {
-                fmpz_mul(mod, mod, fmpz_mat_entry(H, i, j));
+                pivot = fmpz_mat_entry(H, i, j);
                 break;
             }
         }
-    }
-    fmpz_abs(mod, mod);
+        FLINT_ASSERT(pivot != NULL);
 
-    /* If modulus is 1, all elementary divisors are 1 */
-    if (fmpz_is_one(mod))
-    {
-        for (i = 0; i < r; i++)
-            fmpz_one(&ed[i]);
-        fmpz_clear(mod);
-        fmpz_mat_clear(H);
-        return;
-    }
+        if (fmpz_is_pm1(pivot))
+            continue;
 
-    /* Try to factor the modulus */
-    fmpz_factor_init(fac);
-    fmpz_factor(fac, mod);
-
-    /* Check if all primes fit in ulong */
-    use_luebeck = 1;
-    for (k = 0; k < fac->num; k++)
-    {
-        if (!fmpz_abs_fits_ui(&fac->p[k]))
+        if (fmpz_bits(pivot) > ELEMENTARY_DIVISORS_MAX_PIVOT_BITS)
         {
             use_luebeck = 0;
             break;
         }
+
+        /*
+            Smooth factoring keeps the work bounded even when the
+            pivot has a large prime factor: primes beyond FLINT_BITS
+            bits are not useful for the Luebeck step anyway.
+        */
+        if (!fmpz_factor_smooth(fac_pivot, pivot, FLINT_BITS, 1))
+        {
+            use_luebeck = 0;
+            break;
+        }
+
+        for (k = 0; k < fac_pivot->num; k++)
+        {
+            ulong p;
+            slong l;
+            int seen;
+
+            if (!fmpz_abs_fits_ui(&fac_pivot->p[k]))
+            {
+                use_luebeck = 0;
+                break;
+            }
+            p = fmpz_get_ui(&fac_pivot->p[k]);
+
+            seen = 0;
+            for (l = 0; l < num_primes; l++)
+            {
+                if (primes[l] == p)
+                {
+                    seen = 1;
+                    break;
+                }
+            }
+            if (!seen)
+            {
+                if (num_primes == primes_alloc)
+                {
+                    primes_alloc *= 2;
+                    primes = flint_realloc(primes,
+                        primes_alloc * sizeof(ulong));
+                }
+                primes[num_primes++] = p;
+            }
+        }
     }
+
+    fmpz_factor_clear(fac_pivot);
 
     if (!use_luebeck)
     {
-        /* Fall back to full SNF */
         _elementary_divisors_via_snf(ed, r, A);
-        fmpz_factor_clear(fac);
-        fmpz_clear(mod);
+        flint_free(primes);
         fmpz_mat_clear(H);
-        return;
+        return r;
     }
 
-    /* Initialize elementary divisors to 1 */
     for (i = 0; i < r; i++)
         fmpz_one(&ed[i]);
 
     /* R is a window into the first r rows of H (avoids copying) */
     fmpz_mat_window_init(R, H, 0, 0, r, n);
 
-    /* For each prime, compute p-adic valuations and accumulate */
-    for (k = 0; k < fac->num; k++)
+    for (k = 0; k < num_primes; k++)
     {
         fmpz_mat_t Rk;
-        ulong p = fmpz_get_ui(&fac->p[k]);
 
-        /* Make a fresh copy for each prime */
+        /* Fresh copy for each prime (the algorithm mutates R) */
         fmpz_mat_init(Rk, r, n);
         fmpz_mat_set(Rk, R);
 
-        _elementary_divisors_p(ed, Rk, r, n, p);
+        _elementary_divisors_p(ed, Rk, r, n, primes[k]);
 
         fmpz_mat_clear(Rk);
     }
 
     fmpz_mat_window_clear(R);
-    fmpz_factor_clear(fac);
-    fmpz_clear(mod);
+    flint_free(primes);
     fmpz_mat_clear(H);
+    return r;
 }

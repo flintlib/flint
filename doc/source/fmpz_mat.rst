@@ -1376,17 +1376,20 @@ Smith normal form
     until the matrix is diagonal, then fixes the divisibility chain using
     extended gcd operations.
 
-.. function:: void fmpz_mat_elementary_divisors(fmpz * ed, slong * rank, const fmpz_mat_t A)
+.. function:: slong fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A)
 
     Computes the elementary divisors `d_1 \mid d_2 \mid \cdots \mid d_r` of
     the `m \times n` matrix ``A``, where `r` is the rank. The vector ``ed``
     must have space for at least `\min(m, n)` entries; on return, the first
-    ``*rank`` entries contain the elementary divisors.
+    `r` entries contain the elementary divisors, and the return value is
+    `r`.
 
     Uses Luebeck's algorithm: compute the Hermite normal form, factor the
-    product of the pivots, then determine `p`-adic valuations for each prime
-    via iterated nullspace computations modulo `p`. Falls back to full Smith
-    normal form if any prime factor does not fit in a ``ulong``.
+    pivots individually to collect the set of prime factors, then determine
+    `p`-adic valuations for each prime via iterated nullspace computations
+    modulo `p`. Falls back to full Smith normal form if any pivot has a
+    prime factor that does not fit in a ``ulong`` or exceeds a size
+    threshold above which factoring becomes impractical.
 
 
 Special matrices

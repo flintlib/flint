@@ -34,7 +34,7 @@ _test_ed_case(slong m, slong n, slong expected_rank,
             fmpz_set_si(fmpz_mat_entry(A, i, j), data[i * n + j]);
 
     ed = _fmpz_vec_init(d);
-    fmpz_mat_elementary_divisors(ed, &rank, A);
+    rank = fmpz_mat_elementary_divisors(ed, A);
 
     if (rank != expected_rank)
     {
@@ -139,7 +139,7 @@ TEST_FUNCTION_START(fmpz_mat_elementary_divisors, state)
                 n_randint(state, 2 * m * n + 1));
 
         ed = _fmpz_vec_init(d);
-        fmpz_mat_elementary_divisors(ed, &rank, A);
+        rank = fmpz_mat_elementary_divisors(ed, A);
 
         /* Check rank */
         if (rank != r)
@@ -177,10 +177,8 @@ TEST_FUNCTION_START(fmpz_mat_elementary_divisors, state)
     {
         /* 0x0 matrix */
         fmpz_mat_t A;
-        slong rank;
         fmpz_mat_init(A, 0, 0);
-        fmpz_mat_elementary_divisors(NULL, &rank, A);
-        if (rank != 0)
+        if (fmpz_mat_elementary_divisors(NULL, A) != 0)
         {
             flint_printf("FAIL: 0x0 rank\n");
             fflush(stdout);
@@ -191,11 +189,9 @@ TEST_FUNCTION_START(fmpz_mat_elementary_divisors, state)
     {
         /* Zero matrix */
         fmpz_mat_t A;
-        slong rank;
         fmpz_mat_init(A, 5, 3);
         fmpz_mat_zero(A);
-        fmpz_mat_elementary_divisors(NULL, &rank, A);
-        if (rank != 0)
+        if (fmpz_mat_elementary_divisors(NULL, A) != 0)
         {
             flint_printf("FAIL: zero matrix rank\n");
             fflush(stdout);
@@ -207,12 +203,11 @@ TEST_FUNCTION_START(fmpz_mat_elementary_divisors, state)
         /* Identity matrix */
         fmpz_mat_t A;
         fmpz * ed;
-        slong rank, i;
+        slong i;
         fmpz_mat_init(A, 4, 4);
         fmpz_mat_one(A);
         ed = _fmpz_vec_init(4);
-        fmpz_mat_elementary_divisors(ed, &rank, A);
-        if (rank != 4)
+        if (fmpz_mat_elementary_divisors(ed, A) != 4)
         {
             flint_printf("FAIL: identity rank\n");
             fflush(stdout);
@@ -235,15 +230,13 @@ TEST_FUNCTION_START(fmpz_mat_elementary_divisors, state)
         /* Known diagonal matrix */
         fmpz_mat_t A;
         fmpz * ed;
-        slong rank;
         fmpz_mat_init(A, 3, 3);
         fmpz_mat_zero(A);
         fmpz_set_si(fmpz_mat_entry(A, 0, 0), 12);
         fmpz_set_si(fmpz_mat_entry(A, 1, 1), 6);
         fmpz_set_si(fmpz_mat_entry(A, 2, 2), 0);
         ed = _fmpz_vec_init(3);
-        fmpz_mat_elementary_divisors(ed, &rank, A);
-        if (rank != 2)
+        if (fmpz_mat_elementary_divisors(ed, A) != 2)
         {
             flint_printf("FAIL: diag rank\n");
             fflush(stdout);
