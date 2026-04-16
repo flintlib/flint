@@ -17,13 +17,16 @@
     Helper: build m x n matrix from slong array, compute snf_transform,
     check S matches expected diagonal (verified with Magma), and verify
     U*A*V == S with |det(U)| == |det(V)| == 1.
+
+    Expected SNF entries are passed as decimal strings so test cases
+    with entries exceeding slong range are portable across 32/64-bit.
 */
 static void
 _test_transform_case(slong m, slong n, const slong * data,
-    const slong * expected_snf)
+    const char * const * expected_snf)
 {
     fmpz_mat_t A, S, U, V, T1, T2;
-    fmpz_t det;
+    fmpz_t det, expected;
     slong i, j, d;
 
     d = FLINT_MIN(m, n);
@@ -35,6 +38,7 @@ _test_transform_case(slong m, slong n, const slong * data,
     fmpz_mat_init(T1, m, n);
     fmpz_mat_init(T2, m, n);
     fmpz_init(det);
+    fmpz_init(expected);
 
     for (i = 0; i < m; i++)
         for (j = 0; j < n; j++)
@@ -45,10 +49,11 @@ _test_transform_case(slong m, slong n, const slong * data,
     /* Check diagonal matches expected */
     for (i = 0; i < d; i++)
     {
-        if (!fmpz_equal_si(fmpz_mat_entry(S, i, i), expected_snf[i]))
+        fmpz_set_str(expected, expected_snf[i], 10);
+        if (!fmpz_equal(fmpz_mat_entry(S, i, i), expected))
         {
             flint_printf("FAIL (hardcoded):\n");
-            flint_printf("S[%wd,%wd] = %{fmpz}, expected %wd\n",
+            flint_printf("S[%wd,%wd] = %{fmpz}, expected %s\n",
                 i, i, fmpz_mat_entry(S, i, i), expected_snf[i]);
             fmpz_mat_print_pretty(A); flint_printf("\n\n");
             fmpz_mat_print_pretty(S); flint_printf("\n\n");
@@ -102,6 +107,7 @@ _test_transform_case(slong m, slong n, const slong * data,
         }
     }
 
+    fmpz_clear(expected);
     fmpz_clear(det);
     fmpz_mat_clear(T2);
     fmpz_mat_clear(T1);
@@ -120,73 +126,73 @@ TEST_FUNCTION_START(fmpz_mat_snf_transform, state)
     /* structured 5x5 */
     {
         slong data[] = {2,4,6,8,10,1,3,5,7,9,0,2,4,6,8,1,1,1,1,1,3,6,9,12,15};
-        slong snf[] = {1,1,0,0,0};
+        const char * snf[] = {"1","1","0","0","0"};
         _test_transform_case(5, 5, data, snf);
     }
     /* structured tall 6x4 */
     {
         slong data[] = {6,12,18,24,3,9,15,21,0,6,12,18,3,3,3,3,9,18,27,36,12,24,36,48};
-        slong snf[] = {3,3,0,0};
+        const char * snf[] = {"3","3","0","0"};
         _test_transform_case(6, 4, data, snf);
     }
     /* structured wide 3x7 */
     {
         slong data[] = {10,20,30,40,50,60,70,5,15,25,35,45,55,65,0,10,20,30,40,50,60};
-        slong snf[] = {5,10,0};
+        const char * snf[] = {"5","10","0"};
         _test_transform_case(3, 7, data, snf);
     }
     /* random square 10x10 */
     {
         slong data[] = {5,11,-18,15,-14,7,-15,5,-11,11,-12,-8,7,9,16,-4,-10,16,-12,17,17,0,-8,-4,20,16,-5,6,-15,8,6,-2,-1,-6,2,20,8,-8,12,-19,11,-14,7,20,-16,14,-20,11,-7,-6,18,-17,9,6,-5,8,16,9,11,3,-3,-12,10,0,6,14,17,4,13,5,-2,-16,-10,6,-13,-9,13,19,1,-5,-11,-11,3,-16,17,6,-15,-7,18,16,19,-12,-5,-17,-15,19,-5,2,2,15};
-        slong snf[] = {1,1,1,1,1,1,1,2,4,3395595701880};
+        const char * snf[] = {"1","1","1","1","1","1","1","2","4","3395595701880"};
         _test_transform_case(10, 10, data, snf);
     }
     /* prescribed divisors 4x6 */
     {
         slong data[] = {0,-4466,566,6304,-2618,104,0,12894,-1634,-18200,7558,-300,0,-466,78,776,-458,76,0,11970,-1590,-17360,7754,-536};
-        slong snf[] = {2,4,16,64};
+        const char * snf[] = {"2","4","16","64"};
         _test_transform_case(4, 6, data, snf);
     }
     /* prescribed divisors 5x5 */
     {
         slong data[] = {-129276,-19962,407454,278226,31434,-2556756,-391248,8102508,5524632,632040,5358948,818754,-16998894,-11587626,-1328562,1529784,233520,-4855032,-3309072,-379872,-3692352,-562932,11726772,7991124,918996};
-        slong snf[] = {6,12,48,144,720};
+        const char * snf[] = {"6","12","48","144","720"};
         _test_transform_case(5, 5, data, snf);
     }
     /* prescribed divisors 4x7 */
     {
         slong data[] = {1150,1580,-7800,69820,7800,31800,2400,-2645,-3635,17940,-160585,-17940,-73140,-5520,1375,2705,-9360,81295,9360,37440,2160,725,1485,-4940,42755,4940,19720,1100};
-        slong snf[] = {5,10,20,60};
+        const char * snf[] = {"5","10","20","60"};
         _test_transform_case(4, 7, data, snf);
     }
     /* single row 1x6 */
     {
         slong data[] = {12,-18,30,0,6,-24};
-        slong snf[] = {6};
+        const char * snf[] = {"6"};
         _test_transform_case(1, 6, data, snf);
     }
     /* single column 7x1 */
     {
         slong data[] = {20,-30,10,0,40,-50,60};
-        slong snf[] = {10};
+        const char * snf[] = {"10"};
         _test_transform_case(7, 1, data, snf);
     }
     /* negative diagonal 3x3 */
     {
         slong data[] = {-6,0,0,0,-12,0,0,0,3};
-        slong snf[] = {3,6,12};
+        const char * snf[] = {"3","6","12"};
         _test_transform_case(3, 3, data, snf);
     }
     /* singular 8x8 rank 6 */
     {
         slong data[] = {156,-77,-31,58,144,35,-45,-23,196,-222,9,116,55,69,200,-77,-22,-9,-229,-53,-83,115,-84,178,-63,66,-98,16,-20,-62,-124,2,-94,-43,-31,-51,-59,17,45,62,-30,-23,-91,5,13,3,-79,59,18,92,191,-48,53,-25,25,-67,122,-63,84,14,-45,96,194,-25};
-        slong snf[] = {1,1,1,1,1,1,0,0};
+        const char * snf[] = {"1","1","1","1","1","1","0","0"};
         _test_transform_case(8, 8, data, snf);
     }
     /* singular 7x7 rank 1 */
     {
         slong data[] = {-30,-27,-24,-18,-6,0,-9,-60,-54,-48,-36,-12,0,-18,-10,-9,-8,-6,-2,0,-3,20,18,16,12,4,0,6,20,18,16,12,4,0,6,-30,-27,-24,-18,-6,0,-9,-30,-27,-24,-18,-6,0,-9};
-        slong snf[] = {1,0,0,0,0,0,0};
+        const char * snf[] = {"1","0","0","0","0","0","0"};
         _test_transform_case(7, 7, data, snf);
     }
 
