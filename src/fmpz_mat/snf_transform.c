@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
@@ -37,6 +38,8 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
     slong m = fmpz_mat_nrows(A);
     slong n = fmpz_mat_ncols(A);
     slong d = FLINT_MIN(m, n);
+    slong mmn, bits, log_mmn, max_iters, iter;
+    double bound;
     fmpz_mat_t X, Xt, Mr, Mc;
     slong j, k, i;
 
@@ -63,11 +66,30 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
 
     /*
         Phase 1: iterate HNF on rows and columns until diagonal.
-        Convergence is guaranteed: each HNF round strictly reduces
-        the off-diagonal entries.
+        Convergence is mathematically guaranteed, but bound the loop
+        defensively against future bugs in fmpz_mat_hnf_transform.
+
+        Kannan & Bachem (1979), SIAM J. Comput. 8, Theorem 5, gives a
+        worst-case bound of O(mmn^2 * log(mmn * ||A||)) HNF/LHNF
+        passes; the same asymptotic holds for rectangular and singular
+        inputs with mmn = max(m, n).  Use a 4x padding and saturate at
+        WORD_MAX so only true runaway loops throw.
     */
-    while (!fmpz_mat_is_diagonal(X))
+    mmn = FLINT_MAX(m, n);
+    bits = FLINT_ABS(fmpz_mat_max_bits(A));
+    log_mmn = FLINT_BIT_COUNT((ulong) mmn) + 1;
+    bound = 16.0 + 4.0 * (double) mmn * (double) mmn
+            * (double) (bits + log_mmn);
+    max_iters = (bound >= (double) WORD_MAX) ? WORD_MAX : (slong) bound;
+
+    for (iter = 0; !fmpz_mat_is_diagonal(X); iter++)
     {
+        if (iter >= max_iters)
+            flint_throw(FLINT_ERROR,
+                "(fmpz_mat_snf_transform): Phase 1 exceeded iteration "
+                "bound (%wd).  Likely bug in fmpz_mat_hnf_transform or "
+                "unexpected input; please report.\n", max_iters);
+
         /* Row HNF: X -> Mr*X, U -> Mr*U (Mr is m x m) */
         fmpz_mat_hnf_transform(X, Mr, X);
         if (U != NULL)
