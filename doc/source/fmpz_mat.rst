@@ -1388,9 +1388,9 @@ Smith normal form
     pivots individually to collect the set of prime factors, then determine
     `p`-adic valuations for each prime via iterated nullspace computations
     modulo `p`.  Falls back to full Smith normal form for any pivot that
-    either exceeds ``2 * FLINT_BITS`` bits, or leaves a composite cofactor
-    after trial-dividing primes of up to ``FLINT_BITS`` bits (i.e. has a
-    prime factor that does not fit in a ``ulong``) — the regimes where
+    exceeds ``2 * FLINT_BITS`` bits, that leaves a composite cofactor
+    after trial-dividing primes of up to ``FLINT_BITS`` bits, or that has
+    a prime factor too large to fit in a ``ulong`` -- all regimes where
     per-pivot factoring is impractical.
 
 
