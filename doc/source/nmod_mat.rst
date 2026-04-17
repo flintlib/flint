@@ -684,8 +684,11 @@ Nullspace
     an `m \times m` allocation is always sufficient.
 
     This function is implemented via :func:`nmod_mat_nullspace` applied
-    to the transpose of `A`, and returns a basis in the same
-    (non-reduced) form produced by that function.
+    to the transpose of `A`, transposing the resulting basis columns to
+    rows.  The returned rows inherit the structure produced by
+    :func:`nmod_mat_nullspace`: each row has a `1` at a unique
+    free-variable column and `0` at every other row's free-variable
+    column.
 
 
 Transforms
