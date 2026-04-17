@@ -36,54 +36,6 @@
 
 #endif
 
-/* Lemire, Kaser & Kurz */
-static ulong _mod1_preinvert(ulong n)
-{
-    return UWORD_MAX / n + 1;
-}
-
-/* Shoup */
-static ulong _mod2_preinvert(ulong n)
-{
-    return n_mulmod_precomp_shoup(1, n);
-}
-
-static ulong _mod1(ulong x, ulong n, ulong ninv)
-{
-    ulong l = ninv * x;
-
-#if FLINT_BITS != 64 || !defined(__GNUC__)
-    ulong hi, lo;
-    umul_ppmm(hi, lo, l, n);
-    return hi;
-#else
-    return ((__uint128_t) l * n ) >> 64;
-#endif
-}
-
-static ulong _mulmod1(ulong a, ulong b, ulong n, ulong ninv)
-{
-    return _mod1(a * b, n, ninv);
-}
-
-static ulong _mod2_fast(ulong x, ulong n, ulong ninv)
-{
-    return x - n_mulhi(ninv, x) * n;
-}
-
-static ulong _mod2(ulong x, ulong n, ulong ninv)
-{
-    ulong y = _mod2_fast(x, n, ninv);
-    if (y >= n)
-        y -= n;
-    return y;
-}
-
-static ulong _mulmod2(ulong a, ulong b, ulong n, ulong ninv)
-{
-    return _mod2(a * b, n, ninv);
-}
-
 void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
                           nn_srcptr A, nn_srcptr B, slong lenA, ulong invL, nmod_t mod)
 {
@@ -186,57 +138,57 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
     if (NMOD_ADDMUL_FITS_HALFWORD(mod))
     {
         ulong n = mod.n;
-        ulong ninv = _mod1_preinvert(n);
+        ulong ninv = n_lemire_precomp(n);
 
-        q1 = _mulmod1(A[lenA-1], invL, n, ninv);
-        t  = _mulmod1(q1, B[lenB-2], n, ninv);
+        q1 = n_mod_lemire(A[lenA-1] * invL, n, ninv);
+        t  = n_mod_lemire(q1 * B[lenB-2], n, ninv);
         t  = nmod_sub(t, A[lenA-2], mod);
-        q0 = _mulmod1(t, invL, n, ninv);
+        q0 = n_mod_lemire(t * invL, n, ninv);
         Q[0] = nmod_neg(q0, mod);
         Q[1] = q1;
         q1 = nmod_neg(q1, mod);
         /* R = A + (q1*x + q0)*B */
 
-        R[0] = _mod1(A[0] + q0 * B[0], n, ninv);
+        R[0] = n_mod_lemire(A[0] + q0 * B[0], n, ninv);
 
         if (NMOD_ADDMUL_ADDMUL_FITS_HALFWORD(mod))
         {
             for (i = 1; i < lenB - 1; i++)
-                R[i] = _mod1(A[i] + q1*B[i - 1] + q0*B[i], n, ninv);
+                R[i] = n_mod_lemire(A[i] + q1*B[i - 1] + q0*B[i], n, ninv);
         }
         else
         {
             for (i = 1; i < lenB - 1; i++)
-                R[i] = _mod1(_mod1(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
+                R[i] = n_mod_lemire(n_mod_lemire(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
         }
     }
     else if (NMOD_ADDMUL_FITS_WORD(mod))
     {
         ulong n = mod.n;
-        ulong ninv = _mod2_preinvert(n);
+        ulong ninv = n_barrett_precomp(n);
 
-        q1 = _mulmod2(A[lenA-1], invL, n, ninv);
-        t  = _mulmod2(q1, B[lenB-2], n, ninv);
+        q1 = n_mod_barrett(A[lenA-1] * invL, n, ninv);
+        t  = n_mod_barrett(q1 * B[lenB-2], n, ninv);
         t  = nmod_sub(t, A[lenA-2], mod);
-        q0 = _mulmod2(t, invL, n, ninv);
+        q0 = n_mod_barrett(t * invL, n, ninv);
         Q[0] = nmod_neg(q0, mod);
         Q[1] = q1;
         q1 = nmod_neg(q1, mod);
         /* R = A + (q1*x + q0)*B */
 
-        R[0] = _mod2(A[0] + q0 * B[0], n, ninv);
+        R[0] = n_mod_barrett(A[0] + q0 * B[0], n, ninv);
 
-        /* In the second branch, the _mod2_fast maps
+        /* In the second branch, the lazy mod maps
                [0, ..., (n-1) + (n-1)^2] -> [0, 2n-1]
            and the _mod2 maps
                 [0, 2n-1 + (n-1)^2] -> [0,n-1]. */
 
         if (NMOD_ADDMUL_ADDMUL_FITS_WORD(mod))
             for (i = 1; i < lenB - 1; i++)
-                R[i] = _mod2(A[i] + q1*B[i - 1] + q0*B[i], n, ninv);
+                R[i] = n_mod_barrett(A[i] + q1*B[i - 1] + q0*B[i], n, ninv);
         else
             for (i = 1; i < lenB - 1; i++)
-                R[i] = _mod2(_mod2_fast(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
+                R[i] = n_mod_barrett(n_mod_barrett_lazy(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
     }
     else if (NMOD_BITS(mod) != FLINT_BITS)
     {

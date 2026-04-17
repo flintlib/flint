@@ -32,6 +32,7 @@ _nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
     ulong coeffs[MAX_NZ];
     slong n = lenB - 1;
     ulong c, leadB;
+    ulong negcbound;
     nn_ptr r;
 
     nz = 1;
@@ -40,7 +41,7 @@ _nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
         if (B[i] != 0)
         {
             exps[nz - 1] = i;
-            coeffs[nz - 1] = B[i];
+            coeffs[nz - 1] = mod.n - B[i];
             nz++;
             if (nz > MAX_NZ)
                 return 0;
@@ -52,6 +53,12 @@ _nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
     if (leadB != 1)
         _nmod_vec_scalar_mul_nmod(coeffs, coeffs, nz - 1, Binv[0], mod);
 
+    /* Detect the common case of all coefficients 1 */
+    /* TODO: could optimize for combinations of 1, -1, other... */
+    negcbound = 0;
+    for (i = 0; i < nz - 1; i++)
+        negcbound |= (mod.n - coeffs[i]);
+
     TMP_INIT;
     TMP_START;
 
@@ -59,15 +66,58 @@ _nmod_poly_divrem_try_sparse(nn_ptr Q, nn_ptr R, nn_srcptr A,
     r = TMP_ALLOC((lenA) * sizeof(ulong));
     _nmod_vec_set(r, A, lenA);
 
-    for (i = lenA - 1; i >= n; i--)
+    if (mod.n == 2)
     {
-        Q[i - n] = c = r[i];
-
-        /* Todo: incorporate delayed reduction, specialize for coeffs +/- 1, ... */
-        for (k = nz - 2; k >= 0; k--)
+        for (i = lenA - 1; i >= n; i--)
         {
-            j = exps[k];
-            r[j + i - n] = nmod_sub(r[j + i - n], nmod_mul(c, coeffs[k], mod), mod);
+            Q[i - n] = c = r[i];
+
+            for (k = nz - 2; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] ^= c;
+            }
+        }
+    }
+    else if (negcbound == 1)
+    {
+        for (i = lenA - 1; i >= n; i--)
+        {
+            Q[i - n] = c = r[i];
+
+            for (k = nz - 2; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] = nmod_sub(r[j + i - n], c, mod);
+            }
+        }
+    }
+    else if (NMOD_BITS(mod) < FLINT_BITS / 2)
+    {
+        ulong ninv = n_barrett_precomp(mod.n);
+
+        for (i = lenA - 1; i >= n; i--)
+        {
+            Q[i - n] = c = r[i];
+
+            for (k = nz - 2; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] = n_mod_barrett(r[j + i - n] + c * coeffs[k], mod.n, ninv);
+            }
+        }
+    }
+    else
+    {
+        for (i = lenA - 1; i >= n; i--)
+        {
+            Q[i - n] = c = r[i];
+
+            for (k = nz - 2; k >= 0; k--)
+            {
+                j = exps[k];
+                r[j + i - n] = nmod_addmul(r[j + i - n], c, coeffs[k], mod);
+            }
         }
     }
 

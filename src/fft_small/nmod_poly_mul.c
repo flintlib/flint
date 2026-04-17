@@ -460,7 +460,7 @@ static void _crt_2(
 /* Ad hoc modular reduction to do better than NMOD2_RED2 and NMOD_RED3.
    This should eventually be moved out and used elsewhere. */
 
-/* Precompute floor(2^(2*FLINT_BITS) / n) for Shoup-style modular reduction.
+/* Precompute floor(2^(2*FLINT_BITS) / n) for Barrett-style modular reduction.
    This could be optimized (not necessary here, but relevant for other
    applications). */
 static void
@@ -476,7 +476,7 @@ n_ll_rem_l_precomp(ulong * qhi, ulong * qlo, ulong n)
     *qhi = q[1];
 }
 
-/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Shoup */
+/* 2 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Barrett */
 FLINT_FORCE_INLINE ulong
 n_ll_rem_l_nonfullword(ulong xhi, ulong xlo, ulong n, ulong qhi, ulong qlo)
 {
@@ -490,12 +490,14 @@ n_ll_rem_l_nonfullword(ulong xhi, ulong xlo, ulong n, ulong qhi, ulong qlo)
     return xlo;
 }
 
-/* 3 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Shoup */
+/* 3 -> 1 limb mod, n < 2^(FLINT_BITS-1), using linear combination + Barrett */
 FLINT_FORCE_INLINE ulong
 n_lll_rem_l_nonfullword(ulong y2, ulong y1, ulong y0, ulong n, ulong qhi, ulong qlo, ulong alpha2, ulong alpha1)
 {
     ulong c2, c1, c0, t1, t0;
     ulong xhi, xlo;
+
+    FLINT_ASSERT(n < (UWORD(1) << (FLINT_BITS - 1)));
 
     umul_ppmm(t1, t0, y2, alpha2);
     umul_ppmm(c1, c0, y1, alpha1);
@@ -518,16 +520,37 @@ n_lll_rem_l_fullword(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulo
 {
     ulong c1, c0, t1, t0;
     ulong xhi, xlo;
-    ulong hi, lo;
+
+    FLINT_ASSERT(mod.n >= (UWORD(1) << (FLINT_BITS - 1)));
 
     umul_ppmm(t1, t0, y2, alpha2);
     umul_ppmm(c1, c0, y1, alpha1);
     add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
     add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
 
-    umul_ppmm(hi, lo, xhi, alpha1);
-    add_ssaaaa(hi, lo, hi, lo, 0, xlo);
-    NMOD_RED2_FULLWORD(xlo, hi, lo, mod);
+    if (xhi >= mod.n) xhi -= mod.n;
+    NMOD_RED2_FULLWORD(xlo, xhi, xlo, mod);
+
+    return xlo;
+}
+
+/* For moduli just larger than 2^63, the conditional subtraction can be shown
+   to be redundant. */
+FLINT_FORCE_INLINE ulong
+n_lll_rem_l_fullword_limited(ulong y2, ulong y1, ulong y0, nmod_t mod, ulong alpha2, ulong alpha1)
+{
+    ulong c1, c0, t1, t0;
+    ulong xhi, xlo;
+
+    FLINT_ASSERT(mod.n >= (UWORD(1) << (FLINT_BITS - 1)));
+    FLINT_ASSERT(mod.n < (UWORD(1) << (FLINT_BITS - 1)) + (UWORD(1) << (FLINT_BITS / 2 - 2)));
+
+    umul_ppmm(t1, t0, y2, alpha2);
+    umul_ppmm(c1, c0, y1, alpha1);
+    add_ssaaaa(xhi, xlo, t1, t0, c1, c0);
+    add_ssaaaa(xhi, xlo, xhi, xlo, 0, y0);
+
+    NMOD_RED2_FULLWORD(xlo, xhi, xlo, mod);
 
     return xlo;
 }
@@ -566,6 +589,10 @@ static void _crt_3(
     FLINT_MPN_MUL_2X1(u2, u1, u0, hi, lo, min_an_bn);
     two_limbs = (u2 == 0);
 
+    /* For moduli close to 2^63, we can avoid the high word reduction
+       before NMOD_RED2. */
+    int fullword_limited = 0;
+
     /* Branch 1 and 2 of mod code */
     if (two_limbs && !mod_fullword)
     {
@@ -585,6 +612,9 @@ static void _crt_3(
         /* Extra precomputation for branch 3 */
         if (!mod_fullword)
             n_ll_rem_l_precomp(&qhi, &qlo, mod.n);
+
+        if (mod_fullword && (mod.n < ((UWORD(1) << 63) + (UWORD(1) << 30))))
+            fullword_limited = 1;
     }
 
 #define DO_CRT \
@@ -632,6 +662,14 @@ static void _crt_3(
                 {
                     DO_CRT
                     z[i+j-zl] = n_lll_rem_l_nonfullword(r[2], r[1], r[0], mod.n, qhi, qlo, alpha2, alpha1);
+                }
+            }
+            else if (fullword_limited)
+            {
+                for (ulong j = jstart; j < jstop; j += 1)
+                {
+                    DO_CRT
+                    z[i+j-zl] = n_lll_rem_l_fullword_limited(r[2], r[1], r[0], mod, alpha2, alpha1);
                 }
             }
             else

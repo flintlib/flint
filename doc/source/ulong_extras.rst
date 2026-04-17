@@ -139,6 +139,11 @@ Basic arithmetic
 --------------------------------------------------------------------------------
 
 
+.. function:: ulong n_mulhi(ulong a, ulong b)
+
+    Returns the high word of the product of ``a`` and ``b``, i.e.
+    returns `\lfloor ab / 2^{\mathtt{FLINT\_BITS}} \rfloor`.
+
 .. function:: ulong n_pow(ulong n, ulong exp)
 
     Returns ``n^exp``. No checking is done for overflow. The exponent
@@ -410,6 +415,31 @@ Basic arithmetic with precomputed inverses
 
     The algorithm used is that of Granlund and Möller [GraMol2010]_.
 
+.. function:: ulong n_barrett_precomp(ulong n)
+
+    Given `n \ge 2`, return a precomputed inverse for Barrett division.
+
+.. function:: ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
+              ulong n_mod_barrett(ulong x, ulong n, ulong npre)
+
+    Returns `x \bmod n` given the precomputed inverse ``npre`` returned
+    by :func:`n_barrett_precomp`. The ``lazy`` function returns a
+    noncanonical residue in the interval `[0, 2n)`; the other version
+    returns the canonical residue in `[0, n)`. There are no restrictions
+    on `x`.
+
+    Note: these functions support `n = 1` if one sets ``npre`` to ``UWORD_MAX``.
+
+.. function:: ulong n_lemire_precomp(ulong n)
+
+    Given `n \ge 1`, returns a precomputed inverse for Lemire, Kaser & Kurz
+    remainder.
+
+.. function:: ulong n_mod_lemire(ulong x, ulong n, ulong npre)
+
+    Returns `x \bmod n` given the precomputed inverse ``npre`` returned
+    by :func:`n_lemire_precomp`. This function is only guaranteed to be
+    correct if `n, x < 2^{\mathtt{FLINT\_BITS} / 2}`.
 
 
 Greatest common divisor

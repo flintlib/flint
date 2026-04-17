@@ -41,6 +41,18 @@ ulong n_randtest(flint_rand_t state);
 ulong n_randtest_not_zero(flint_rand_t state);
 ulong n_randtest_prime(flint_rand_t state, int proved);
 
+ULONG_EXTRAS_INLINE ulong n_mulhi(ulong a, ulong b)
+{
+/* Experimental: see if the compiler generates better code than inline assembly */
+#if FLINT_BITS == 64 && defined(__GNUC__)
+    return ((__uint128_t) a * (__uint128_t) b) >> 64;
+#else
+    ulong hi, lo;
+    umul_ppmm(hi, lo, a, b);
+    return hi;
+#endif
+}
+
 #if FLINT64
 ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
 {
@@ -62,15 +74,9 @@ ULONG_EXTRAS_INLINE ulong _n_randlimb(flint_rand_t state)
 ULONG_EXTRAS_INLINE ulong _n_randint(flint_rand_t state, ulong limit)
 {
     if ((limit & (limit - 1)) == 0)
-    {
         return _n_randlimb(state) & (limit - 1);
-    }
     else
-    {
-        ulong hi, lo;
-        umul_ppmm(hi, lo, _n_randlimb(state), limit);
-        return hi;
-    }
+        return n_mulhi(_n_randlimb(state), limit);
 }
 
 /* Basic arithmetic **********************************************************/
@@ -370,6 +376,44 @@ ulong n_invmod(ulong x, ulong y)
 }
 
 ulong n_binvert(ulong a);
+
+ULONG_EXTRAS_INLINE
+ulong n_barrett_precomp(ulong n)
+{
+    ulong q, r;
+    FLINT_ASSERT(n >= 2);
+    udiv_qrnnd(q, r, UWORD(1), UWORD(0), n);
+    return q;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
+{
+    return x - n_mulhi(x, npre) * n;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_barrett(ulong x, ulong n, ulong npre)
+{
+    ulong y = n_mod_barrett_lazy(x, n, npre);
+    if (y >= n)
+        y -= n;
+    return y;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_lemire_precomp(ulong n)
+{
+    return UWORD_MAX / n + 1;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mod_lemire(ulong x, ulong n, ulong npre)
+{
+    return n_mulhi(n, x * npre);
+}
+
+/* Double-limb arithmetic. */
 
 void n_ll_small_preinv(nn_ptr minv, nn_srcptr m);
 void n_ll_small_powmod_triple(nn_ptr res1, nn_ptr res2, nn_ptr res3, ulong b1,

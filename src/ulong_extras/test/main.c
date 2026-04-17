@@ -67,6 +67,8 @@
 #include "t-ll_small_powmod.c"
 #include "t-mod2_precomp.c"
 #include "t-mod2_preinv.c"
+#include "t-mod_barrett.c"
+#include "t-mod_lemire.c"
 #include "t-mod_precomp.c"
 #include "t-moebius_mu.c"
 #include "t-mulmod2.c"
@@ -166,6 +168,8 @@ test_struct tests[] =
     TEST_FUNCTION(n_ll_small_powmod),
     TEST_FUNCTION(n_mod2_precomp),
     TEST_FUNCTION(n_mod2_preinv),
+    TEST_FUNCTION(n_mod_barrett),
+    TEST_FUNCTION(n_mod_lemire),
     TEST_FUNCTION(n_mod_precomp),
     TEST_FUNCTION(n_moebius_mu),
     TEST_FUNCTION(n_mulmod2),

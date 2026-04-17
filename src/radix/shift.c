@@ -54,7 +54,7 @@ radix_lshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int e, const radi
     {
         for (i = 0; i < n; i++)
         {
-            hi = n_divrem_precomp_c1_unsafe(&lo, a[i], be2, pre);
+            hi = n_divrem_precomp_c1_bounded(&lo, a[i], be2, pre);
             res[i] = cy + lo * be;
             cy = hi;
         }
@@ -101,7 +101,7 @@ radix_rshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int e, const radi
     {
         for (i = n - 1; i >= 0; i--)
         {
-            hi = n_divrem_precomp_c1_unsafe(&lo, a[i], be, pre);
+            hi = n_divrem_precomp_c1_bounded(&lo, a[i], be, pre);
             res[i] = hi + cy * be2;
             cy = lo;
         }

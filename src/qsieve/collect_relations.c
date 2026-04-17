@@ -199,16 +199,6 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
     }
 }
 
-
-/* Lemire-Kaser-Kurz remainder for half-limb primes */
-#include "nmod.h"
-
-FLINT_FORCE_INLINE
-ulong n_mod_halflimb_preinv(ulong x, ulong d, ulong dinv)
-{
-    return n_mulhi(dinv * x, d);
-}
-
 /*
     check position i in sieve array for smoothness
 */
@@ -291,7 +281,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
       prime = factor_base[j].p;
       pinv = factor_base[j].pinv2;
       FLINT_ASSERT(prime < UWORD(1) << (FLINT_BITS / 2));
-      modp = n_mod_halflimb_preinv(i, prime, pinv);
+      modp = n_mod_lemire(i, prime, pinv);
 
       if (modp == soln1[j] || modp == soln2[j])
       {
@@ -329,7 +319,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
          {
             prime = factor_base[j].p;
             pinv = factor_base[j].pinv2;
-            modp = n_mod_halflimb_preinv(i, prime, pinv);
+            modp = n_mod_lemire(i, prime, pinv);
 
             if (soln2[j] != 0) /* not a prime dividing A */
             {

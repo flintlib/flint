@@ -87,20 +87,6 @@ static int u32_is_base2_pseudoprime(uint32_t x)
 #include "radix.h"
 
 static ulong
-n_rem_precomp_c0(ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp_c0(x, pre);
-    return x - d * q;
-}
-
-static ulong
-n_rem_precomp_c1_unsafe(ulong x, ulong d, const n_div_precomp_t pre)
-{
-    ulong q = n_div_precomp_c1_unsafe(x, pre);
-    return x - d * q;
-}
-
-static ulong
 n_2_powmod_c0(uint32_t exp, ulong n, const n_div_precomp_t pre)
 {
     ulong x;
@@ -144,16 +130,16 @@ n_2_powmod_c1(uint32_t exp, ulong n, const n_div_precomp_t pre)
     int k, ebits;
 
     if (exp < FLINT_BITS)
-        return n_rem_precomp_c1_unsafe(UWORD(1) << exp, n, pre);
+        return n_rem_precomp_c1_bounded(UWORD(1) << exp, n, pre);
 
     ebits = FLINT_BITS - flint_clz(exp);
-    x = n_rem_precomp_c1_unsafe(UWORD(1) << (exp >> (ebits - 6)), n, pre);
+    x = n_rem_precomp_c1_bounded(UWORD(1) << (exp >> (ebits - 6)), n, pre);
 
     if (n < UWORD(1) << (FLINT_BITS / 2 - 1))
     {
         for (k = ebits - 7; k >= 0; k--)
         {
-            x = n_rem_precomp_c1_unsafe(x * x, n, pre);
+            x = n_rem_precomp_c1_bounded(x * x, n, pre);
             x <<= ((exp >> k) & 1);
         }
 
@@ -164,7 +150,7 @@ n_2_powmod_c1(uint32_t exp, ulong n, const n_div_precomp_t pre)
     {
         for (k = ebits - 7; k >= 0; k--)
         {
-            x = n_rem_precomp_c1_unsafe(x * x, n, pre);
+            x = n_rem_precomp_c1_bounded(x * x, n, pre);
             x <<= ((exp >> k) & 1);
             if (x >= n)
                 x -= n;
@@ -209,7 +195,7 @@ static int u32_is_base2_probabprime(uint32_t n)
         t <<= 1;
         while ((t != n - 1) && (y != n - 1))
         {
-            y = n_rem_precomp_c1_unsafe(y * y, n, pre);
+            y = n_rem_precomp_c1_bounded(y * y, n, pre);
             t <<= 1;
         }
     }
