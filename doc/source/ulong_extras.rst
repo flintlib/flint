@@ -419,11 +419,11 @@ Basic arithmetic with precomputed inverses
 
     Given `n \ge 2`, return a precomputed inverse for Barrett division.
 
-.. function:: ulong n_mod_barrett_sloppy(ulong x, ulong n, ulong npre)
+.. function:: ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
               ulong n_mod_barrett(ulong x, ulong n, ulong npre)
 
     Returns `x \bmod n` given the precomputed inverse ``npre`` returned
-    by :func:`n_barrett_precomp`. The ``sloppy`` function returns a
+    by :func:`n_barrett_precomp`. The ``lazy`` function returns a
     noncanonical residue in the interval `[0, 2n)`; the other version
     returns the canonical residue in `[0, n)`. There are no restrictions
     on `x`.

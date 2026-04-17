@@ -178,7 +178,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
 
         R[0] = n_mod_barrett(A[0] + q0 * B[0], n, ninv);
 
-        /* In the second branch, the sloppy mod maps
+        /* In the second branch, the lazy mod maps
                [0, ..., (n-1) + (n-1)^2] -> [0, 2n-1]
            and the _mod2 maps
                 [0, 2n-1 + (n-1)^2] -> [0,n-1]. */
@@ -188,7 +188,7 @@ void _nmod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
                 R[i] = n_mod_barrett(A[i] + q1*B[i - 1] + q0*B[i], n, ninv);
         else
             for (i = 1; i < lenB - 1; i++)
-                R[i] = n_mod_barrett(n_mod_barrett_sloppy(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
+                R[i] = n_mod_barrett(n_mod_barrett_lazy(A[i] + q1*B[i - 1], n, ninv) + q0*B[i], n, ninv);
     }
     else if (NMOD_BITS(mod) != FLINT_BITS)
     {

@@ -387,7 +387,7 @@ ulong n_barrett_precomp(ulong n)
 }
 
 ULONG_EXTRAS_INLINE
-ulong n_mod_barrett_sloppy(ulong x, ulong n, ulong npre)
+ulong n_mod_barrett_lazy(ulong x, ulong n, ulong npre)
 {
     return x - n_mulhi(x, npre) * n;
 }
@@ -395,7 +395,7 @@ ulong n_mod_barrett_sloppy(ulong x, ulong n, ulong npre)
 ULONG_EXTRAS_INLINE
 ulong n_mod_barrett(ulong x, ulong n, ulong npre)
 {
-    ulong y = n_mod_barrett_sloppy(x, n, npre);
+    ulong y = n_mod_barrett_lazy(x, n, npre);
     if (y >= n)
         y -= n;
     return y;

@@ -26,7 +26,7 @@ TEST_FUNCTION_START(n_mod_barrett, state)
         x = n_randtest(state);
 
         r1 = n_mod_barrett(x, n, npre);
-        r2 = n_mod_barrett_sloppy(x, n, npre);
+        r2 = n_mod_barrett_lazy(x, n, npre);
         r3 = x % n;
 
         result = (r1 == r3) && (r2 == r3 || (r3 <= UWORD_MAX - n && r2 == r3 + n));
