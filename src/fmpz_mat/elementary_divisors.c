@@ -39,7 +39,7 @@
     level.
 */
 static void
-_elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
+_fmpz_mat_elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
     ulong p)
 {
     nmod_mat_t Rp, N;
@@ -205,7 +205,7 @@ _elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
     Fallback: extract elementary divisors from full SNF.
 */
 static void
-_elementary_divisors_via_snf(fmpz * ed, slong r,
+_fmpz_mat_elementary_divisors_via_snf(fmpz * ed, slong r,
     const fmpz_mat_t A)
 {
     fmpz_mat_t S;
@@ -337,7 +337,7 @@ fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A)
 
     if (!use_luebeck)
     {
-        _elementary_divisors_via_snf(ed, r, A);
+        _fmpz_mat_elementary_divisors_via_snf(ed, r, A);
         flint_free(primes);
         fmpz_mat_clear(H);
         return r;
@@ -357,7 +357,7 @@ fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A)
         fmpz_mat_init(Rk, r, n);
         fmpz_mat_set(Rk, R);
 
-        _elementary_divisors_p(ed, Rk, r, n, primes[k]);
+        _fmpz_mat_elementary_divisors_p(ed, Rk, r, n, primes[k]);
 
         fmpz_mat_clear(Rk);
     }
