@@ -51,6 +51,12 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
         return;
     }
 
+    if (U == NULL && V == NULL)
+    {
+        fmpz_mat_snf(S, A);
+        return;
+    }
+
     fmpz_mat_init(X, m, n);
     fmpz_mat_init(Xt, n, m);
     fmpz_mat_init(Mr, m, m);
@@ -164,25 +170,13 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
                 */
                 if (U != NULL)
                 {
-                    for (i = 0; i < m; i++)
-                        fmpz_set(&save_j[i],
-                            fmpz_mat_entry(U, j, i));
-                    for (i = 0; i < m; i++)
-                        fmpz_set(&save_k[i],
-                            fmpz_mat_entry(U, k, i));
-
-                    for (i = 0; i < m; i++)
-                    {
-                        fmpz_addmul(
-                            fmpz_mat_entry(U, j, i),
-                            vv, &save_k[i]);
-                        fmpz_mul(
-                            fmpz_mat_entry(U, k, i),
-                            qq, &save_j[i]);
-                        fmpz_addmul(
-                            fmpz_mat_entry(U, k, i),
-                            vq_m1, &save_k[i]);
-                    }
+                    fmpz * row_j = fmpz_mat_row(U, j);
+                    fmpz * row_k = fmpz_mat_row(U, k);
+                    _fmpz_vec_set(save_j, row_j, m);
+                    _fmpz_vec_set(save_k, row_k, m);
+                    _fmpz_vec_scalar_addmul_fmpz(row_j, save_k, m, vv);
+                    _fmpz_vec_scalar_mul_fmpz(row_k, save_j, m, qq);
+                    _fmpz_vec_scalar_addmul_fmpz(row_k, save_k, m, vq_m1);
                 }
 
                 /*
@@ -250,9 +244,8 @@ fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V,
                 fmpz_mat_entry(X, j, j));
             if (U != NULL)
             {
-                for (i = 0; i < m; i++)
-                    fmpz_neg(fmpz_mat_entry(U, j, i),
-                        fmpz_mat_entry(U, j, i));
+                fmpz * row_j = fmpz_mat_row(U, j);
+                _fmpz_vec_neg(row_j, row_j, m);
             }
         }
     }

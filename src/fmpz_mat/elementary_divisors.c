@@ -51,18 +51,16 @@ _fmpz_mat_elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
     mults = flint_malloc(mults_alloc * sizeof(slong));
     num_levels = 0;
 
+    nmod_mat_init(Rp, r, n, p);
+
     while (1)
     {
         /* Reduce R mod p and compute rank */
-        nmod_mat_init(Rp, r, n, p);
         fmpz_mat_get_nmod_mat(Rp, R);
         rp = nmod_mat_rank(Rp);
 
         if (rp == r)
-        {
-            nmod_mat_clear(Rp);
             break;
-        }
 
         nullity = r - rp;
 
@@ -81,7 +79,6 @@ _fmpz_mat_elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
         */
         nmod_mat_init(N, nullity, r, p);
         nmod_mat_left_nullspace(N, Rp);
-        nmod_mat_clear(Rp);
 
         /*
             For each basis vector v (row j of N):
@@ -171,6 +168,8 @@ _fmpz_mat_elementary_divisors_p(fmpz * ed, fmpz_mat_t R, slong r, slong n,
 
         nmod_mat_clear(N);
     }
+
+    nmod_mat_clear(Rp);
 
     /*
         Convert multiplicities to valuations.

@@ -20,7 +20,6 @@ typedef struct
     slong cols;
     slong bits;
     slong rank;
-    int section;
 } snf_params_t;
 
 /*

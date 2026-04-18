@@ -13,9 +13,6 @@
 #include "fmpz_mat.h"
 #include "acb_theta.h"
 
-/* fmpz_mat_is_diagonal and fmpz_mat_snf_transform are now public in
-   fmpz_mat module */
-
 static fmpz_mat_struct *
 sp2gz_decompose_g1(slong * nb, const fmpz_mat_t mat)
 {
