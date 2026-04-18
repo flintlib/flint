@@ -1390,11 +1390,11 @@ Smith normal form
     Uses Luebeck's algorithm: compute the Hermite normal form, factor the
     pivots individually to collect the set of prime factors, then determine
     `p`-adic valuations for each prime via iterated nullspace computations
-    modulo `p`.  Falls back to full Smith normal form for any pivot that
-    exceeds ``2 * FLINT_BITS`` bits, that leaves a composite cofactor
-    after trial-dividing primes of up to ``FLINT_BITS`` bits, or that has
-    a prime factor too large to fit in a ``ulong`` -- all regimes where
-    per-pivot factoring is impractical.
+    modulo `p`.  Pivots are factored with :func:`fmpz_factor_smooth` using a
+    ``FLINT_BITS``-bit bound.  Falls back to full Smith normal form for any
+    pivot that exceeds ``2 * FLINT_BITS`` bits, that leaves a composite
+    cofactor within that bound, or that has a prime factor too large to fit
+    in a ``ulong`` -- all regimes where per-pivot factoring is impractical.
 
 
 Special matrices
