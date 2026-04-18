@@ -1373,8 +1373,9 @@ Smith normal form
     corresponding transformation matrix is not computed.
 
     The algorithm alternates row and column Hermite normal form computations
-    until the matrix is diagonal, then fixes the divisibility chain using
-    extended gcd operations.
+    until the matrix is diagonal, fixes the divisibility chain using extended
+    gcd operations, and then negates rows of ``U`` to make the diagonal of
+    ``S`` non-negative.
 
     Aliasing of ``S`` and ``A`` is allowed.  When non-``NULL``, ``U`` and
     ``V`` must be distinct from ``A``, from ``S``, and from each other.
