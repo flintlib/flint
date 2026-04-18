@@ -1376,6 +1376,9 @@ Smith normal form
     until the matrix is diagonal, then fixes the divisibility chain using
     extended gcd operations.
 
+    Aliasing of ``S`` and ``A`` is allowed.  When non-``NULL``, ``U`` and
+    ``V`` must be distinct from ``A``, from ``S``, and from each other.
+
 .. function:: slong fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A)
 
     Computes the elementary divisors `d_1 \mid d_2 \mid \cdots \mid d_r` of
