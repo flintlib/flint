@@ -417,6 +417,8 @@ int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
 int fmpz_mat_is_diagonal(const fmpz_mat_t A);
 
+slong _fmpz_mat_snf_iter_bound(const fmpz_mat_t A);
+
 void fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_t A);
 
 slong fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A);
