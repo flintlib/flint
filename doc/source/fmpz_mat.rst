@@ -1319,9 +1319,10 @@ Smith normal form
 .. function:: void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of ``A``. The algorithm used is selected from the
-    implementations in FLINT to be the one most likely to be optimal, based on
-    the characteristics of the input matrix.
+    normal form of ``A``.  Uses :func:`fmpz_mat_snf_diagonal` when ``A``
+    is already diagonal; otherwise uses the iterative Hermite normal form
+    algorithm, the same as :func:`fmpz_mat_snf_transform` but without
+    tracking the unimodular transforms.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
