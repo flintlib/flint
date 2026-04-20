@@ -141,6 +141,39 @@ Arithmetic operations
     `c` and all elements of ``vec`` are assumed to be less than ``mod.n``.
 
 
+Arithmetic operations without reduction
+--------------------------------------------------------------------------------
+
+The following functions set `r_i \gets r_i + v_i \cdot c`,
+`0 \le i < len`, with `r` given by ``res`` and `v` given by ``vec``,
+without performing modular reduction,
+with specific limitations on the inputs.
+
+.. function:: void _nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    Assumes that `v_i` and `c` are half-limb values and that
+    `r_i + v_i \cdot c` does not overflow a limb.
+
+.. function:: void _nmod_vec_nored_ll_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    The array ``res`` contains ``2 len`` limbs, representing double-limb
+    integers contiguously.
+    Assumes that `v_i` and `c` are half-limb values and that
+    `r_i + v_i \cdot c` does not overflow two limbs.
+
+.. function:: void _nmod_vec_nored_ll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    The array ``res`` contains ``2 len`` limbs, representing double-limb
+    integers contiguously.
+    Assumes that `r_i + v_i \cdot c` does not overflow two limbs.
+
+.. function:: void _nmod_vec_nored_lll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    The array ``res`` contains ``3 len`` limbs, representing triple-limb
+    integers contiguously.
+    Assumes that `r_i + v_i \cdot c` does not overflow three limbs.
+
+
 Dot products
 --------------------------------------------------------------------------------
 

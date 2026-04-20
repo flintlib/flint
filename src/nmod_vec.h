@@ -126,6 +126,31 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
+#if FLINT_BITS == 64 && defined(__AVX2__)
+void _nmod_vec_nored_scalar_addmul_halflimb_avx2(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+#endif
+
+NMOD_VEC_INLINE void
+_nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+{
+#if FLINT_BITS == 64 && defined(__AVX2__)
+    if (len >= 16)
+    {
+        _nmod_vec_nored_scalar_addmul_halflimb_avx2(res, vec, len, c);
+        return;
+    }
+#endif
+
+    slong i;
+    for (i = 0; i < len; i++)
+        res[i] += vec[i] * c;
+}
+
+void _nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+void _nmod_vec_nored_ll_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+void _nmod_vec_nored_ll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+void _nmod_vec_nored_lll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+
 /* invert each coefficient */
 void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
 void _nmod_vec_invert_naive(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
