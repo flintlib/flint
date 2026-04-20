@@ -1319,9 +1319,10 @@ Smith normal form
 .. function:: void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of ``A``. The algorithm used is selected from the
-    implementations in FLINT to be the one most likely to be optimal, based on
-    the characteristics of the input matrix.
+    normal form of ``A``.  Uses :func:`fmpz_mat_snf_diagonal` when ``A``
+    is already diagonal; otherwise uses the iterative Hermite normal form
+    algorithm, the same as :func:`fmpz_mat_snf_transform` but without
+    tracking the unimodular transforms.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1357,6 +1358,45 @@ Smith normal form
 
     Checks that the given matrix is in Smith normal form, returns 1 if so and 0
     otherwise.
+
+.. function:: int fmpz_mat_is_diagonal(const fmpz_mat_t A)
+
+    Returns 1 if all off-diagonal entries of ``A`` are zero, and 0 otherwise.
+    An empty matrix is considered diagonal.
+
+.. function:: void fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_t A)
+
+    Computes the Smith normal form `S = U A V` of the `m \times n` matrix
+    ``A``, where ``U`` is an `m \times m` unimodular matrix and ``V`` is an
+    `n \times n` unimodular matrix.
+
+    Either ``U`` or ``V`` (or both) may be ``NULL``, in which case the
+    corresponding transformation matrix is not computed.
+
+    The algorithm alternates row and column Hermite normal form computations
+    until the matrix is diagonal, fixes the divisibility chain using extended
+    gcd operations, and then negates rows of ``U`` to make the diagonal of
+    ``S`` non-negative.
+
+    Aliasing of ``S`` and ``A`` is allowed.  When non-``NULL``, ``U`` and
+    ``V`` must be distinct from ``A``, from ``S``, and from each other.
+
+.. function:: slong fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A)
+
+    Computes the elementary divisors `d_1 \mid d_2 \mid \cdots \mid d_r` of
+    the `m \times n` matrix ``A``, where `r` is the rank. The vector ``ed``
+    must have space for at least `\min(m, n)` entries; on return, the first
+    `r` entries contain the elementary divisors, and the return value is
+    `r`.
+
+    Uses Luebeck's algorithm: compute the Hermite normal form, factor the
+    pivots individually to collect the set of prime factors, then determine
+    `p`-adic valuations for each prime via iterated nullspace computations
+    modulo `p`.  Pivots are factored with :func:`fmpz_factor_smooth` using a
+    ``FLINT_BITS``-bit bound.  Falls back to full Smith normal form for any
+    pivot that exceeds ``2 * FLINT_BITS`` bits, that leaves a composite
+    cofactor within that bound, or that has a prime factor too large to fit
+    in a ``ulong`` -- all regimes where per-pivot factoring is impractical.
 
 
 Special matrices

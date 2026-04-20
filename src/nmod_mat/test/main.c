@@ -25,6 +25,7 @@
 #include "t-init_clear.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
+#include "t-left_nullspace.c"
 #include "t-lu_classical.c"
 #include "t-lu_classical_delayed.c"
 #include "t-lu_recursive.c"
@@ -73,6 +74,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_init_clear),
     TEST_FUNCTION(nmod_mat_inv),
     TEST_FUNCTION(nmod_mat_invert_rows_cols),
+    TEST_FUNCTION(nmod_mat_left_nullspace),
     TEST_FUNCTION(nmod_mat_lu_classical),
     TEST_FUNCTION(nmod_mat_lu_classical_delayed),
     TEST_FUNCTION(nmod_mat_lu_recursive),

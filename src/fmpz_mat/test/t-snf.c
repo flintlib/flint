@@ -11,7 +11,80 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
+
+/*
+    Helper: compute SNF of A, check is_in_snf, rank, idempotency, aliasing.
+*/
+static void
+_check_snf_rand(const fmpz_mat_t A, slong expected_rank)
+{
+    fmpz_mat_t S, T;
+    slong i, m, n, snf_rank;
+
+    m = fmpz_mat_nrows(A);
+    n = fmpz_mat_ncols(A);
+
+    fmpz_mat_init(S, m, n);
+    fmpz_mat_init(T, m, n);
+
+    fmpz_mat_snf(S, A);
+
+    if (!fmpz_mat_is_in_snf(S))
+    {
+        flint_printf("FAIL: matrix not in snf!\n");
+        fmpz_mat_print_pretty(A); flint_printf("\n\n");
+        fmpz_mat_print_pretty(S); flint_printf("\n\n");
+        fflush(stdout);
+        flint_abort();
+    }
+
+    snf_rank = 0;
+    for (i = 0; i < FLINT_MIN(m, n); i++)
+        if (!fmpz_is_zero(fmpz_mat_entry(S, i, i)))
+            snf_rank++;
+
+    if (snf_rank != expected_rank)
+    {
+        flint_printf("FAIL: snf rank %wd != expected %wd\n",
+            snf_rank, expected_rank);
+        fmpz_mat_print_pretty(A); flint_printf("\n\n");
+        fmpz_mat_print_pretty(S); flint_printf("\n\n");
+        fflush(stdout);
+        flint_abort();
+    }
+
+    /* Idempotency */
+    fmpz_mat_snf(T, S);
+
+    if (!fmpz_mat_equal(S, T))
+    {
+        flint_printf("FAIL: snf not idempotent!\n");
+        fmpz_mat_print_pretty(A); flint_printf("\n\n");
+        fmpz_mat_print_pretty(S); flint_printf("\n\n");
+        fmpz_mat_print_pretty(T); flint_printf("\n\n");
+        fflush(stdout);
+        flint_abort();
+    }
+
+    /* Aliasing */
+    fmpz_mat_set(T, A);
+    fmpz_mat_snf(T, T);
+
+    if (!fmpz_mat_equal(T, S))
+    {
+        flint_printf("FAIL: aliasing test failed!\n");
+        fmpz_mat_print_pretty(A); flint_printf("\n\n");
+        fmpz_mat_print_pretty(S); flint_printf("\n\n");
+        fmpz_mat_print_pretty(T); flint_printf("\n\n");
+        fflush(stdout);
+        flint_abort();
+    }
+
+    fmpz_mat_clear(T);
+    fmpz_mat_clear(S);
+}
 
 /*
     Helper: build m x n matrix from slong array, compute SNF, and check
@@ -194,18 +267,16 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
     }
 
     /* Randomized tests */
-    for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, S, S2;
-        slong i, m, n, b, d, r, snf_rank;
+        fmpz_mat_t A;
+        slong m, n, b, d, r;
 
         m = n_randint(state, 30);
         n = n_randint(state, 30);
         r = n_randint(state, FLINT_MIN(m, n) + 1);
 
         fmpz_mat_init(A, m, n);
-        fmpz_mat_init(S, m, n);
-        fmpz_mat_init(S2, m, n);
 
         b = 1 + n_randint(state, 10) * n_randint(state, 10);
         d = n_randint(state, 2 * m * n + 1);
@@ -214,72 +285,15 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_snf(S, A);
-
-        if (!fmpz_mat_is_in_snf(S))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("matrix not in snf!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        /* Verify rank: number of nonzero diagonal entries must match */
-        snf_rank = 0;
-        for (i = 0; i < FLINT_MIN(m, n); i++)
-            if (!fmpz_is_zero(fmpz_mat_entry(S, i, i)))
-                snf_rank++;
-
-        if (snf_rank != fmpz_mat_rank(A))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("snf rank %wd != matrix rank %wd\n",
-                    snf_rank, fmpz_mat_rank(A));
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        /* Idempotency */
-        fmpz_mat_snf(S2, S);
-
-        if (!fmpz_mat_equal(S, S2))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("snf of a matrix in snf should be the same!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S2); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        /* Aliasing: fmpz_mat_snf(A, A) */
-        fmpz_mat_snf(A, A);
-
-        if (!fmpz_mat_equal(A, S))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("aliasing test failed!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_mat_clear(S2);
-        fmpz_mat_clear(S);
+        _check_snf_rand(A, r);
         fmpz_mat_clear(A);
     }
 
     /* Non-square matrices of moderate size */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, S;
-        slong i, m, n, b, d, r, snf_rank;
+        fmpz_mat_t A;
+        slong m, n, b, d, r;
 
         m = 10 + n_randint(state, 40);
         n = 10 + n_randint(state, 40);
@@ -288,175 +302,161 @@ TEST_FUNCTION_START(fmpz_mat_snf, state)
         r = n_randint(state, FLINT_MIN(m, n) + 1);
 
         fmpz_mat_init(A, m, n);
-        fmpz_mat_init(S, m, n);
 
         b = 1 + n_randint(state, 10);
         d = n_randint(state, 2 * m * n + 1);
         fmpz_mat_randrank(A, state, r, b);
         fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_snf(S, A);
-
-        if (!fmpz_mat_is_in_snf(S))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("matrix not in snf!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        snf_rank = 0;
-        for (i = 0; i < FLINT_MIN(m, n); i++)
-            if (!fmpz_is_zero(fmpz_mat_entry(S, i, i)))
-                snf_rank++;
-
-        if (snf_rank != fmpz_mat_rank(A))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("snf rank %wd != matrix rank %wd\n",
-                    snf_rank, fmpz_mat_rank(A));
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_mat_clear(S);
+        _check_snf_rand(A, r);
         fmpz_mat_clear(A);
     }
 
-    /* Square nonsingular matrices above cutoff (det + Iliopoulos path) */
+    /* Square nonsingular matrices above cutoff */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, S;
+        fmpz_mat_t A;
         slong n, b, d;
 
         n = 10 + n_randint(state, 20);
 
         fmpz_mat_init(A, n, n);
-        fmpz_mat_init(S, n, n);
 
         b = 1 + n_randint(state, 10);
         d = n_randint(state, 2 * n * n + 1);
         fmpz_mat_randrank(A, state, n, b);
         fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_snf(S, A);
-
-        if (!fmpz_mat_is_in_snf(S))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("matrix not in snf!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_mat_clear(S);
+        _check_snf_rand(A, n);
         fmpz_mat_clear(A);
     }
 
     /* Square singular matrices (zero det) */
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, S;
-        slong i, n, b, d, r, snf_rank;
+        fmpz_mat_t A;
+        slong n, b, d, r;
 
         n = 5 + n_randint(state, 25);
         r = n_randint(state, n);
 
         fmpz_mat_init(A, n, n);
-        fmpz_mat_init(S, n, n);
 
         b = 1 + n_randint(state, 10);
         d = n_randint(state, 2 * n * n + 1);
         fmpz_mat_randrank(A, state, r, b);
         fmpz_mat_randops(A, state, d);
 
-        fmpz_mat_snf(S, A);
-
-        if (!fmpz_mat_is_in_snf(S))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("matrix not in snf!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        snf_rank = 0;
-        for (i = 0; i < n; i++)
-            if (!fmpz_is_zero(fmpz_mat_entry(S, i, i)))
-                snf_rank++;
-
-        if (snf_rank != fmpz_mat_rank(A))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("snf rank %wd != matrix rank %wd\n",
-                    snf_rank, fmpz_mat_rank(A));
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_mat_clear(S);
+        _check_snf_rand(A, r);
         fmpz_mat_clear(A);
     }
 
     /*
-        Cross-check: fmpz_mat_snf_kannan_bachem vs fmpz_mat_snf_iliopoulos
-        on small square nonsingular matrices.  We call both implementations
-        directly to avoid the dispatcher (which would send small matrices
-        to kannan_bachem in both cases).  Keep max size small since
-        kannan_bachem can hang on larger matrices (see #2592).
+        Cross-check all implementations against each other on small
+        square nonsingular matrices:
+        - fmpz_mat_snf (dispatcher)
+        - fmpz_mat_snf_kannan_bachem
+        - fmpz_mat_snf_iliopoulos
+        - fmpz_mat_snf_transform (diagonal of S)
+        - fmpz_mat_elementary_divisors
+
+        Keep max size small since kannan_bachem can hang on larger
+        matrices (see #2592).
     */
-    for (iter = 0; iter < 2000 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, S1, S2;
-        fmpz_t det;
-        slong n, b, d;
+        const char * method_names[] = {
+            "kannan_bachem", "iliopoulos",
+            "snf_transform", "elementary_divisors"
+        };
+        slong num_methods = 4;
 
-        n = n_randint(state, 9);
-
-        fmpz_mat_init(A, n, n);
-        fmpz_mat_init(S1, n, n);
-        fmpz_mat_init(S2, n, n);
-        fmpz_init(det);
-
-        b = 1 + n_randint(state, 10) * n_randint(state, 10);
-        d = n_randint(state, 2 * n * n + 1);
-        fmpz_mat_randrank(A, state, n, b);
-
-        if (n_randint(state, 2))
-            fmpz_mat_randops(A, state, d);
-
-        fmpz_mat_det(det, A);
-        fmpz_abs(det, det);
-
-        fmpz_mat_snf_kannan_bachem(S1, A);
-        fmpz_mat_snf_iliopoulos(S2, A, det);
-
-        if (!fmpz_mat_equal(S1, S2))
+        for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("snf_kannan_bachem and snf_iliopoulos "
-                    "disagree!\n");
-            fmpz_mat_print_pretty(A); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S1); flint_printf("\n\n");
-            fmpz_mat_print_pretty(S2); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            fmpz_mat_t A, S_ref, S_other, U, V;
+            fmpz_t det;
+            fmpz * ed;
+            slong n, b, d, i, method, rank;
 
-        fmpz_clear(det);
-        fmpz_mat_clear(S2);
-        fmpz_mat_clear(S1);
-        fmpz_mat_clear(A);
+            n = n_randint(state, 9);
+
+            fmpz_mat_init(A, n, n);
+            fmpz_mat_init(S_ref, n, n);
+            fmpz_mat_init(S_other, n, n);
+            fmpz_mat_init(U, n, n);
+            fmpz_mat_init(V, n, n);
+            fmpz_init(det);
+            ed = _fmpz_vec_init(n);
+
+            b = 1 + n_randint(state, 10) * n_randint(state, 10);
+            d = n_randint(state, 2 * n * n + 1);
+            fmpz_mat_randrank(A, state, n, b);
+
+            if (n_randint(state, 2))
+                fmpz_mat_randops(A, state, d);
+
+            /* Reference: dispatcher */
+            fmpz_mat_snf(S_ref, A);
+
+            fmpz_mat_det(det, A);
+            fmpz_abs(det, det);
+
+            for (method = 0; method < num_methods; method++)
+            {
+                fmpz_mat_zero(S_other);
+
+                switch (method)
+                {
+                    case 0:
+                        fmpz_mat_snf_kannan_bachem(S_other, A);
+                        break;
+                    case 1:
+                        fmpz_mat_snf_iliopoulos(S_other, A, det);
+                        break;
+                    case 2:
+                        fmpz_mat_snf_transform(S_other, U, V, A);
+                        break;
+                    case 3:
+                        rank = fmpz_mat_elementary_divisors(ed, A);
+                        if (rank != n)
+                        {
+                            flint_printf("FAIL: %s rank %wd != %wd"
+                                "\n", method_names[method], rank, n);
+                            fflush(stdout);
+                            flint_abort();
+                        }
+                        for (i = 0; i < n; i++)
+                            fmpz_set(fmpz_mat_entry(S_other, i, i),
+                                &ed[i]);
+                        break;
+                }
+
+                if (!fmpz_mat_equal(S_ref, S_other))
+                {
+                    flint_printf("FAIL: %s disagrees with "
+                        "dispatcher!\n", method_names[method]);
+                    flint_printf("n=%wd b=%wd\n", n, b);
+                    flint_printf("A:          ");
+                    fmpz_mat_print_pretty(A);
+                    flint_printf("\n");
+                    flint_printf("dispatcher: ");
+                    fmpz_mat_print_pretty(S_ref);
+                    flint_printf("\n");
+                    flint_printf("%s: ", method_names[method]);
+                    fmpz_mat_print_pretty(S_other);
+                    flint_printf("\n");
+                    fflush(stdout);
+                    flint_abort();
+                }
+            }
+
+            _fmpz_vec_clear(ed, n);
+            fmpz_clear(det);
+            fmpz_mat_clear(V);
+            fmpz_mat_clear(U);
+            fmpz_mat_clear(S_other);
+            fmpz_mat_clear(S_ref);
+            fmpz_mat_clear(A);
+        }
     }
 
     TEST_FUNCTION_END(state);

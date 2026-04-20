@@ -346,6 +346,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
 /* Nullspace */
 
 slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
+slong nmod_mat_left_nullspace(nmod_mat_t X, const nmod_mat_t A);
 
 /* Howell form */
 
