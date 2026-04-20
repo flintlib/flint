@@ -12,6 +12,7 @@
 #include <math.h>
 #include <gmp.h>
 #include "long_extras.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b)
@@ -30,6 +31,9 @@ size_t fmpz_sizeinbase(const fmpz_t f, int b)
     /* Power-of-2 bases: mpz_sizeinbase is exact. */
     if ((b & (b - 1)) == 0)
         return mpz_sizeinbase(z, b);
+
+    if (b == 10 && mpz_size(z) == 1)
+        return (size_t) n_nonzero_sizeinbase10(mpz_getlimbn(z, 0));
 
     /* Otherwise approximate log_b(|z|) in double precision. If its
        floor is robust to a tiny relative perturbation, return floor + 1

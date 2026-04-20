@@ -78,6 +78,7 @@
 #include "t-mulmod_shoup.c"
 #include "t-mulmod_and_precomp_shoup.c"
 #include "t-nextprime.c"
+#include "t-nonzero_sizeinbase10.c"
 #include "t-nth_prime_bounds.c"
 #include "t-urandint.c"
 #include "t-pow.c"
@@ -179,6 +180,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_mulmod_shoup),
     TEST_FUNCTION(n_mulmod_and_precomp_shoup),
     TEST_FUNCTION(n_nextprime),
+    TEST_FUNCTION(n_nonzero_sizeinbase10),
     TEST_FUNCTION(n_nth_prime_bounds),
     TEST_FUNCTION(n_urandint),
     TEST_FUNCTION(n_pow),
