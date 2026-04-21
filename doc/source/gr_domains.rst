@@ -357,6 +357,13 @@ Polynomial rings
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_struct`.
 
+.. function:: void gr_ctx_init_fmpq_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    polynomials in *nvars* variables over the rationals,
+    with monomial ordering *ord*.
+    Elements have type :type:`fmpq_mpoly_struct`.
+
 .. function:: void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate

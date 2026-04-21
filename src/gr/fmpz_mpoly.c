@@ -526,7 +526,7 @@ _gr_fmpz_mpoly_gcd(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_
     if (fmpz_mpoly_gcd(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx)))
         return GR_SUCCESS;
 
-    return GR_DOMAIN;
+    return GR_UNABLE;
 }
 
 static int
