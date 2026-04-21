@@ -964,9 +964,11 @@ static int
 _gr_nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
                                   nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
-    if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||
-            (NMOD_BITS(NMOD_CTX(ctx)) <= 61 && lenA <= 40) ||
-            (NMOD_BITS(NMOD_CTX(ctx)) <= 29 && lenA <= 70))
+#if FLINT_BITS == 64 && defined(__AVX2__)
+    if (lenA - lenB < 80 || lenB < ((NMOD_BITS(NMOD_CTX(ctx)) <= 27) ? 400 : 80))
+#else
+    if (lenA - lenB < 80 || lenB < ((NMOD_BITS(NMOD_CTX(ctx)) <= 27) ? 200 : 80))
+#endif
     {
         ulong invB;
         int status;
