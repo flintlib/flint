@@ -26,6 +26,7 @@
 #include "t-debug.c"
 #include "t-dirichlet.c"
 #include "t-fmpq.c"
+#include "t-fmpq_mpoly.c"
 #include "t-fmpq_poly.c"
 #include "t-fmpz.c"
 #include "t-fmpzi.c"
@@ -78,6 +79,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_debug),
     TEST_FUNCTION(gr_dirichlet),
     TEST_FUNCTION(gr_fmpq),
+    TEST_FUNCTION(gr_fmpq_mpoly),
     TEST_FUNCTION(gr_fmpq_poly),
     TEST_FUNCTION(gr_fmpz),
     TEST_FUNCTION(gr_fmpzi),

@@ -148,6 +148,10 @@ class fmpz_mpoly_struct(ctypes.Structure):
                 ('length', c_slong),
                 ('bits', c_slong)]
 
+class fmpq_mpoly_struct(ctypes.Structure):
+    _fields_ = [('content', fmpq_struct),
+                ('zpoly', fmpz_mpoly_struct)]
+
 class fmpz_mpoly_q_struct(ctypes.Structure):
     _fields_ = [('num', fmpz_mpoly_struct),
                 ('den', fmpz_mpoly_struct)]
@@ -294,6 +298,7 @@ libgr.gr_sub_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.PO
 libgr.gr_mul_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_div_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_pow_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_derivative_gen.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_set_d.argtypes = (ctypes.c_void_p, ctypes.c_double, ctypes.POINTER(gr_ctx_struct))
 
@@ -3917,6 +3922,16 @@ class gr_elem:
         return res
 
     @staticmethod
+    def _binary_op_si(self, other, op, rstr):
+        other = int(other)
+        elem_type = type(self)
+        res = elem_type(context=self._ctx_python)
+        status = op(res._ref, self._ref, other, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, rstr, self, other)
+        return res
+
+    @staticmethod
     def _constant(self, op, rstr):
         elem_type = type(self)
         res = elem_type(context=self._ctx_python)
@@ -4011,6 +4026,48 @@ class gr_elem:
 
     def is_neg_one(self):
         return self._unary_predicate(self, libgr.gr_is_neg_one, "is_neg_one")
+
+    def derivative_gen(self, i):
+        """
+        Derivative with respect to ith generator.
+
+            >>> ZZx("3*x^2").derivative_gen(0)
+            6*x
+            >>> ZZx("3*x^2").derivative_gen(1)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+            >>> RRx("x^3/3").derivative_gen(0)
+            [1.00000000000000 +/- 3.89e-16]*x^2
+            >>> RRx("x").derivative_gen(1)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+            >>> x, y = PolynomialRing_fmpz_mpoly(2, ["x", "y"]).gens()
+            >>> ((3*x + 5*y)**2).derivative_gen(0)
+            18*x+30*y
+            >>> ((3*x + 5*y)**2).derivative_gen(1)
+            30*x+50*y
+            >>> x.derivative_gen(2)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+            >>> x, y = PolynomialRing_fmpq_mpoly(2, ["x", "y"]).gens()
+            >>> ((3*x + 5*y/2)**2).derivative_gen(0)
+            18*x + 15*y
+            >>> ((3*x + 5*y/2)**2).derivative_gen(1)
+            15*x + 25/2*y
+            >>> x.derivative_gen(2)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+        """
+        return self._binary_op_si(self, i, libgr.gr_derivative_gen, "derivative_gen")
+
 
     def divexact(self, other):
         """
@@ -6892,6 +6949,25 @@ class PolynomialRing_fmpz_mpoly(gr_ctx):
         return ZZ
 
 
+class fmpq_mpoly(gr_elem):
+    _struct_type = fmpq_mpoly_struct
+
+class PolynomialRing_fmpq_mpoly(gr_ctx):
+
+    def __init__(self, nvars, vars=None):
+        gr_ctx.__init__(self)
+        nvars = gr_ctx._as_si(nvars)
+        assert nvars >= 0
+        libgr.gr_ctx_init_fmpq_mpoly(self._ref, nvars, 0)
+        self._elem_type = fmpq_mpoly
+        if vars is not None:
+            assert len(vars) == nvars
+            self._set_gen_names(vars)
+
+    @property
+    def _coefficient_ring(self):
+        return QQ
+
 
 class gr_mpoly(gr_elem):
     _struct_type = gr_mpoly_struct
@@ -8829,6 +8905,21 @@ def test_mpoly():
     assert raises(lambda: RA(RB.gens()[0]), NotImplementedError)
     assert raises(lambda: RB(RA.gens()[0]), NotImplementedError)
 
+def test_fmpq_mpoly():
+    QQxyz = PolynomialRing_fmpq_mpoly(3)
+    x, y, z = QQxyz.gens()
+    f = (-72 * (1+x)**2 * (y+z+1)) / 5
+    assert f.numerator() == (-72 * (1+x)**2 * (y+z+1))
+    assert f.denominator() == 5
+    assert x.denominator() == 1
+    assert (x * 0).numerator() == 0
+    assert (x * 0).denominator() == 1
+    c, fac, exp = f.factor()
+    assert c == QQ(-72) / 5
+    assert ((fac, exp) == ([1+x, y+z+1], [2, 1])) or ((fac, exp) == ([y+z+1, 1+x], [1, 2]))
+    assert f.gcd((-100-100*x) / 17) == (1+1*x)
+    assert str(QQxyz.gens()) == '[x1, x2, x3]'
+    assert str(PolynomialRing_fmpq_mpoly(2, ["a", "b"]).gens()[1]) == "b"
 
 def test_mpoly_q():
     assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'
