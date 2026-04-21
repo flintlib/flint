@@ -203,6 +203,18 @@ mpn_mod_set_other(nn_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 }
 
 int
+mpn_mod_rand(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_set_ui_array(t, MPN_MOD_CTX_MODULUS(ctx), MPN_MOD_CTX_NLIMBS(ctx));
+    fmpz_randm(t, state, t);
+    GR_IGNORE(mpn_mod_set_fmpz(res, t, ctx));
+    fmpz_clear(t);
+    return GR_SUCCESS;
+}
+
+int
 mpn_mod_randtest(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
 {
     fmpz_t t;
