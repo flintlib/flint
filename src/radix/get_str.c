@@ -14,34 +14,6 @@
 #include "mpn_extras.h"
 #include "radix.h"
 
-static const uint8_t n_sizeinbase10_tab1[64] = {
-    1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 7, 7, 8,
-    8, 8, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13,
-    14, 14, 14, 15, 15, 15, 16, 16, 16, 16, 17, 17, 17, 18, 18, 18, 19, 19,
-    19, 19, 20,
-};
-
-static const ulong n_sizeinbase10_tab2[FLINT_BITS] = {
-    1, 1, 1, 10, 10, 10, 100, 100, 100, 1000, 1000, 1000, 1000, 10000, 10000,
-    10000, 100000, 100000, 100000, 1000000, 1000000, 1000000, 1000000, 10000000,
-    10000000, 10000000, 100000000, 100000000, 100000000, 1000000000,
-    1000000000, 1000000000,
-#if FLINT_BITS == 64
-    1000000000, UWORD(10000000000), UWORD(10000000000), UWORD(10000000000),
-    UWORD(100000000000), UWORD(100000000000), UWORD(100000000000),
-    UWORD(1000000000000), UWORD(1000000000000), UWORD(1000000000000),
-    UWORD(1000000000000), UWORD(10000000000000), UWORD(10000000000000),
-    UWORD(10000000000000), UWORD(100000000000000), UWORD(100000000000000),
-    UWORD(100000000000000), UWORD(1000000000000000), UWORD(1000000000000000),
-    UWORD(1000000000000000), UWORD(1000000000000000), UWORD(10000000000000000),
-    UWORD(10000000000000000), UWORD(10000000000000000),
-    UWORD(100000000000000000), UWORD(100000000000000000),
-    UWORD(100000000000000000),  UWORD(1000000000000000000),
-    UWORD(1000000000000000000), UWORD(1000000000000000000),
-    UWORD(1000000000000000000), UWORD(10000000000000000000),
-#endif
-};
-
 static const char dec_to_str_tab[200] =
     "000102030405060708091011121314151617181920212223242526272829"
     "303132333435363738394041424344454647484950515253545556575859"
@@ -103,14 +75,6 @@ n_get_str_nd(char * s, ulong x, int d)
     }
 }
 
-static slong
-n_nonzero_sizeinbase10(ulong n)
-{
-    FLINT_ASSERT(n != 0);
-    int b = FLINT_BIT_COUNT(n) - 1;
-    return n_sizeinbase10_tab1[b] - (n < n_sizeinbase10_tab2[b]);
-}
-
 static char * _radix_decimal_get_str(char * res, nn_srcptr t, slong decimal_limbs, int negative, slong digits_per_limb)
 {
     slong i;
@@ -159,7 +123,7 @@ char * radix_get_str_decimal(char * res, nn_srcptr x, slong n, int negative, con
     {
         return _radix_decimal_get_str(res, x, n, negative, radix->exp);
     }
-    else if (n == 1 && LIMB_RADIX(radix) < n_sizeinbase10_tab2[FLINT_BITS - 1])  /* todo: could work even for 10/20-digit input */
+    else if (n == 1 && n_nonzero_sizeinbase10(LIMB_RADIX(radix)) <= ((FLINT_BITS == 64) ? 19 : 9))  /* todo: could work even for 10/20-digit input */
     {
         return _radix_decimal_get_str(res, x, 1, negative, ((FLINT_BITS == 64) ? 19 : 9));
     }

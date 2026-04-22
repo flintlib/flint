@@ -180,6 +180,7 @@ int n_is_perfect_power235(ulong n);
 int n_is_perfect_power(ulong * root, ulong n);
 
 int n_sizeinbase(ulong n, int base);
+slong n_nonzero_sizeinbase10(ulong n);
 
 ulong n_flog(ulong n, ulong b);
 ulong n_clog(ulong n, ulong b);
