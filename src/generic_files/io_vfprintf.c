@@ -13,7 +13,7 @@
 #include <ctype.h> /* isdigit */
 #include <stdint.h> /* intmax_t */
 #include <stdio.h>
-#include <string.h> /* memcpy, memcmp and strchr */
+#include <string.h> /* memcpy, strncmp and strchr */
 #include <stdarg.h>
 #include <wchar.h> /* wchar_t and wint_t */
 #include "nmod_types.h"
@@ -27,6 +27,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_ore_poly.h"
 #include "gr_mat.h"
 #include "gr_mat/impl.h"
 
