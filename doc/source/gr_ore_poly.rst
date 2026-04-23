@@ -6,8 +6,7 @@
 .. note::
 
     This module is under construction. Functionality is currently limited to
-    memory management, additive arithmetic, and multiplication from the left
-    by an element of the base ring.
+    memory management, additive arithmetic, and multiplication.
 
 A :type:`gr_ore_poly_t` represents a univariate Ore polynomial `L \in R[D]`
 implemented as a dense array of coefficients in a generic ring *R*.
@@ -132,11 +131,11 @@ Context object methods
 
 .. function:: void gr_ore_poly_ctx_init(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
 
-    Initializes ``ctx`` to a ring of densely represented Ore polynomials over
-    the given ``base_ring``, with the choice of Ore algebra structure given by
-    ``which_algebra``. The Ore algebra structure may refer to a distinguished
-    generator of ``base_ring``; this will be the generator of index
-    ``base_var``.
+    Initializes *ctx* to a ring of densely represented Ore polynomials over
+    the given *base_ring*, with the choice of Ore algebra structure given by
+    *which_algebra*. The Ore algebra structure may refer to a distinguished
+    generator of *base_ring*; this will be the generator of index
+    *base_var*.
 
     This function can be used with all Ore algebra types for which no more
     specific initialization function is listed below.
@@ -152,34 +151,34 @@ Context object methods
 
 .. function:: void gr_ore_poly_ctx_init_custom(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, const gr_ore_poly_sigma_delta_t sigma_delta, void * ore_data)
 
-    Initializes ``ctx`` to a ring of densely represented Ore polynomials over
-    the given ``base_ring``, with a custom Ore algebra structure specified by a
-    pointer ``sigma_delta`` to an implementation of
+    Initializes *ctx* to a ring of densely represented Ore polynomials over
+    the given *base_ring*, with a custom Ore algebra structure specified by a
+    pointer *sigma_delta* to an implementation of
     :func:`gr_ore_poly_sigma_delta`.
-    The ``ore_data`` argument is accessible to ``sigma_delta`` as
+    The *ore_data* argument is accessible to *sigma_delta* as
     ``gr_ore_poly_ctx_data_ptr(ctx)``.
 
 .. function:: void gr_ore_poly_ctx_init_randtest(gr_ore_poly_ctx_t ctx, flint_rand_t state, gr_ctx_t base_ring)
 
-    Initializes ``ctx`` with a random Ore algebra structure.
+    Initializes *ctx* with a random Ore algebra structure.
 
 .. function:: void gr_ore_poly_ctx_init_randtest2(gr_ctx_t base_ring, gr_ore_poly_ctx_t ctx, flint_rand_t state)
 
-    Initializes ``ctx`` with a random Ore algebra structure over a random base
+    Initializes *ctx* with a random Ore algebra structure over a random base
     ring.
 
 .. function:: void gr_ore_poly_ctx_clear(gr_ore_poly_ctx_t ctx)
 
-    Clears the context object ``ctx``.
+    Clears the context object *ctx*.
 
 The following methods implement parts of the standard interface
-for ``gr`` context objects.
+for *gr* context objects.
 
 .. function:: int _gr_ore_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
               int _gr_ore_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 
-    Sets the name of the generator to the string in ``s``, respectively the
-    first string in ``s``.
+    Sets the name of the generator to the string in *s*, respectively the
+    first string in *s*.
 
 .. function:: int gr_ore_poly_ctx_write(gr_stream_t out, gr_ore_poly_ctx_t ctx)
               truth_t gr_ore_poly_ctx_is_ring(gr_ore_poly_ctx_t ctx)
@@ -261,7 +260,7 @@ Action
 
     Compute *σ(a)*,  *δ(a)*, or both, where *a* is an element of the base ring.
     In the *sigma_delta* variant, the output variables *sigma* or *delta* can be
-    `NULL`.
+    ``NULL``.
 
 .. type:: gr_ore_poly_sigma_delta_t
 
@@ -310,15 +309,15 @@ Arithmetic
               int gr_ore_poly_lmul_gen(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
 
     Sets *res* to the result of the left multiplication:
-    `D \cdot poly = \sigma(poly) \cdot D + \delta(poly)`.
-    The underscore method assumes `len \neq 0`.
+    *D · poly = σ(poly) · D + δ(poly)*.
+    The underscore method assumes *len ≠ 0*.
 
 .. function:: int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ore_poly_ctx_t ctx)
               int gr_ore_poly_mul(gr_ore_poly_t res, const gr_ore_poly_t poly1, const gr_ore_poly_t poly2, gr_ore_poly_ctx_t ctx)
 
     Sets *res* to *poly1* multiplied by *poly2*
     which must be two Ore polynomials in the Ore algebra *ctx*.
-    The underscore method assumes `res \neq poly1, res \neq poly2` (no aliasing) and `len1 \neq 0, len2 \neq 0.`
+    The underscore method assumes *res ≠ poly1*, *res ≠ poly2* (no aliasing) and *len1* ≠ 0, *len2* ≠ 0.
 
 .. raw:: latex
 
