@@ -257,7 +257,7 @@ gr_ore_poly_add_other(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_srcptr x, 
         tmp->coeffs = (gr_ptr) x;
         tmp->length = 1;
         tmp->alloc = 1;
-        return gr_poly_add_scalar((gr_poly_struct *) poly, (gr_poly_struct *) poly, tmp, GR_ORE_POLY_ELEM_CTX(ctx));
+        return gr_poly_add_scalar((gr_poly_struct *) res, (gr_poly_struct *) poly, tmp, GR_ORE_POLY_ELEM_CTX(ctx));
     } else if (x_ctx->which_ring == GR_CTX_FMPZ) {
         return gr_poly_add_fmpz((gr_poly_struct *) res, (const gr_poly_struct *) poly, x, GR_ORE_POLY_ELEM_CTX(ctx));
     } else if (x_ctx->which_ring == GR_CTX_FMPQ) {
@@ -303,7 +303,7 @@ gr_ore_poly_sub_other(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_srcptr x, 
         tmp->coeffs = (gr_ptr) x;
         tmp->length = 1;
         tmp->alloc = 1;
-        return gr_poly_sub_scalar((gr_poly_struct *) poly, (gr_poly_struct *) poly, tmp, GR_ORE_POLY_ELEM_CTX(ctx));
+        return gr_poly_sub_scalar((gr_poly_struct *) res, (gr_poly_struct *) poly, tmp, GR_ORE_POLY_ELEM_CTX(ctx));
     } else if (x_ctx->which_ring == GR_CTX_FMPZ) {
         return gr_poly_sub_fmpz((gr_poly_struct *) res, (const gr_poly_struct *) poly, x, GR_ORE_POLY_ELEM_CTX(ctx));
     } else if (x_ctx->which_ring == GR_CTX_FMPQ) {
@@ -349,7 +349,7 @@ gr_ore_poly_other_mul(gr_ore_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_o
         tmp->coeffs = (gr_ptr) x;
         tmp->length = 1;
         tmp->alloc = 1;
-        return gr_poly_scalar_mul((gr_poly_struct *) poly, tmp, (const gr_poly_struct *) poly, GR_ORE_POLY_ELEM_CTX(ctx));
+        return gr_poly_scalar_mul((gr_poly_struct *) res, tmp, (const gr_poly_struct *) poly, GR_ORE_POLY_ELEM_CTX(ctx));
     } else if (x_ctx->which_ring == GR_CTX_FMPZ) {
         return gr_poly_mul_fmpz((gr_poly_struct *) res, (const gr_poly_struct *) poly, x, GR_ORE_POLY_ELEM_CTX(ctx));
     } else if (x_ctx->which_ring == GR_CTX_FMPQ) {

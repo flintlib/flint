@@ -1334,7 +1334,6 @@ gr_test_binary_op_other_variants(gr_ctx_t R,
                 flint_printf("y = %{gr}\n", y, R);
                 if (gr_op == gr_divexact)
                     flint_printf("x2 = %{gr}\n", x2, R2);
-                flint_printf("y2 = %{gr}\n", y2, R2);
                 flint_printf("x op y = %{gr}\n", xy, R);
                 flint_printf("x2 op y = %{gr}\n", xy2, R);
                 status = GR_TEST_FAIL;
