@@ -123,6 +123,9 @@ int gr_ore_poly_mul(gr_ore_poly_t res, const gr_ore_poly_t poly1, const gr_ore_p
     if (len1 == 0 || len2 == 0)
         return gr_ore_poly_zero(res, ctx);
 
+    if (len1 + len2 - 1 > ctx->size_limit)
+        return GR_UNABLE;
+
     // Aliasing
     if (res == poly1 || res == poly2)
     {

@@ -29,6 +29,10 @@ TEST_FUNCTION_START(gr_ore_poly_ring, state)
 
         gr_ore_poly_ctx_init_randtest2(ctx, ore_ctx, state);
 
+        if (GR_ORE_POLY_CTX(ore_ctx)->which_algebra == ORE_ALGEBRA_MAHLER
+            || GR_ORE_POLY_CTX(ore_ctx)->which_algebra == ORE_ALGEBRA_Q_SHIFT)
+            ore_ctx->size_limit = 2;
+
         if (gr_ctx_is_finite(ctx) == T_TRUE ||
             gr_ctx_has_real_prec(ctx) == T_TRUE)
         {

@@ -47,6 +47,9 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
             gr_ctx_clear(ctx);
         }
 
+        if (algebra == ORE_ALGEBRA_MAHLER || algebra == ORE_ALGEBRA_Q_SHIFT)
+            ore_ctx->size_limit = 4;
+
         if (gr_ctx_is_finite(ctx) == T_TRUE ||
             gr_ctx_has_real_prec(ctx) == T_TRUE)
         {
