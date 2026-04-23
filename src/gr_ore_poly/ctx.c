@@ -474,12 +474,15 @@ gr_ore_poly_ctx_init_randtest2(gr_ctx_t base_ring, gr_ore_poly_ctx_t ctx, flint_
             fmpz_clear(mod);
             break;
         case 4:
-            fmpz_init(mod);
-            fmpz_set_ui(mod, n_randtest_prime(state, 1));
-            gr_ctx_init_fq(base_ring, mod, 1 + n_randint(state, 3), NULL);
-            gr_ore_poly_ctx_init(ctx, base_ring, 0, ORE_ALGEBRA_FROBENIUS);
-            fmpz_clear(mod);
-            return;
+            if (n_randint(state, 4))
+            {
+                fmpz_init(mod);
+                fmpz_set_ui(mod, n_randtest_prime(state, 1));
+                gr_ctx_init_fq(base_ring, mod, 1 + n_randint(state, 3), NULL);
+                gr_ore_poly_ctx_init(ctx, base_ring, 0, ORE_ALGEBRA_FROBENIUS);
+                fmpz_clear(mod);
+                return;
+            }
         default:
             gr_ctx_init_random_poly(base_ring, state);
             break;

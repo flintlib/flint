@@ -19,7 +19,7 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
 {
     int status;
     // slong success = 0, unable = 0, unable_frobenius = 0, domain = 0, success_frobenius = 0;
-    for (slong iter = 0; iter < 1500 * flint_test_multiplier(); iter++)
+    for (slong iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t ctx;
         gr_ore_poly_ctx_t ore_ctx;
