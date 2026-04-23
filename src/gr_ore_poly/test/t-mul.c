@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2026 Maria Neagoie, supervised by Marc Mezzarobba and Ricardo Buring
+    Copyright (C) 2026 Maria Neagoie
 
     This file is part of FLINT.
 
@@ -13,29 +13,20 @@
 #include "gr_ore_poly.h"
 #include "gr_vec.h"
 
-// same as GR_MUST_SUCCEED but details of the failing printed
-#define MUST_OK(expr) do { \
-    int st = (expr); \
-    if (st != GR_SUCCESS) \
-    { \
-        flint_printf("FAIL at %s:%d: %s returned %d\n", __FILE__, __LINE__, #expr, st); \
-        flint_abort(); \
-    } \
-} while(0)
-
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
 TEST_FUNCTION_START(gr_ore_poly_mul, state)
 {
+    int status;
+    // slong success = 0, unable = 0, unable_frobenius = 0, domain = 0, success_frobenius = 0;
     for (slong iter = 0; iter < 1500 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t ctx;
         gr_ore_poly_ctx_t ore_ctx;
         slong reps;
         ore_algebra_t algebra;
-        int found_algebra = 0;
 
-        while(!found_algebra)
+        while(1)
         {
             // Random context
             gr_ore_poly_ctx_init_randtest2(ctx, ore_ctx, state);
@@ -44,29 +35,17 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
             algebra = GR_ORE_POLY_CTX(ore_ctx)->which_algebra;
 
             if (algebra == ORE_ALGEBRA_COMMUTATIVE) // Standard polynomials
-                found_algebra = 1;
-            else
-            {
-                if (algebra != ORE_ALGEBRA_FROBENIUS && ctx->which_ring == GR_CTX_GR_POLY)
-                {
-                    gr_ctx_struct* base_ring = POLYNOMIAL_CTX(ctx)->base_ring;
-                    gr_ctx_clear(ctx);
-                    gr_ctx_init_gr_poly(ctx, base_ring);
-                    found_algebra = 1;
-                }
-            }
-        }
+                break;
 
-        // gr_ctx_print(ctx);
-        // flint_printf("\n");
+            if (algebra == ORE_ALGEBRA_FROBENIUS && gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
+                break;
 
-        // flint_printf("sigma_delta = %p\n", (void*) GR_ORE_POLY_CTX(ore_ctx)->sigma_delta);
-        /*if (GR_ORE_POLY_CTX(ore_ctx)->sigma_delta == NULL)
-        {
+            if (algebra != ORE_ALGEBRA_FROBENIUS && ctx->which_ring == GR_CTX_GR_POLY)
+                break;
+
             gr_ore_poly_ctx_clear(ore_ctx);
             gr_ctx_clear(ctx);
-            continue;
-        }*/
+        }
 
         if (gr_ctx_is_finite(ctx) == T_TRUE ||
             gr_ctx_has_real_prec(ctx) == T_TRUE)
@@ -82,21 +61,10 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
             reps = 3;
         }
 
-        /* Hack: for string conversion tests, make sure we don't have
-           overlapping generator names. */
-        gr_vec_t vec;
-        gr_vec_init(vec, 0, ctx);
-        if (gr_gens_recursive(vec, ctx) == GR_SUCCESS)
-        {
-            const char * vars[] = { "DD" };
-
-            MUST_OK(gr_ctx_set_gen_names(ore_ctx, vars));
-
-        }
-        gr_vec_clear(vec, ctx);
-
         for (slong j = 0; j < reps; j++)
         {
+            status = GR_SUCCESS;
+
             gr_ore_poly_t A, B, C, AB, BC, LHS, RHS, TEMP;
 
             gr_ore_poly_init(A, ore_ctx);
@@ -109,29 +77,24 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
             gr_ore_poly_init(TEMP, ore_ctx);
 
             // Build objects with coefficients in random context
-            MUST_OK(gr_ore_poly_randtest(A, state, 4, ore_ctx));
-            MUST_OK(gr_ore_poly_randtest(B, state, 4, ore_ctx));
-            MUST_OK(gr_ore_poly_randtest(C, state, 4, ore_ctx));
+            status |= gr_ore_poly_randtest(A, state, 1 + n_randint(state, 6), ore_ctx);
+            status |= gr_ore_poly_randtest(B, state, 1 + n_randint(state, 6), ore_ctx);
+            status |= gr_ore_poly_randtest(C, state, 1 + n_randint(state, 6), ore_ctx);
 
-            // flint_printf("A = "); gr_ore_poly_print(A, ore_ctx); flint_printf("\n");
-            // flint_printf("B = "); gr_ore_poly_print(B, ore_ctx); flint_printf("\n");
-            // flint_printf("C = "); gr_ore_poly_print(C, ore_ctx); flint_printf("\n");
-            // flint_printf("\n");
-
-            MUST_OK(gr_ore_poly_mul(AB, A, B, ore_ctx));
+            status |= gr_ore_poly_mul(AB, A, B, ore_ctx);
             // Aliasing test
             if (iter & 1) // odd => test out = A
             {
-                MUST_OK(gr_ore_poly_set(TEMP, A, ore_ctx));
-                MUST_OK(gr_ore_poly_mul(TEMP, TEMP, B, ore_ctx));
+                status |= gr_ore_poly_set(TEMP, A, ore_ctx);
+                status |= gr_ore_poly_mul(TEMP, TEMP, B, ore_ctx);
             }
             else // even => test out = B
             {
-                MUST_OK(gr_ore_poly_set(TEMP, B, ore_ctx));
-                MUST_OK(gr_ore_poly_mul(TEMP, A, TEMP, ore_ctx));
+                status |= gr_ore_poly_set(TEMP, B, ore_ctx);
+                status |= gr_ore_poly_mul(TEMP, A, TEMP, ore_ctx);
             }
 
-            if (gr_ore_poly_equal(TEMP, AB, ore_ctx) == T_FALSE)
+            if (status == GR_SUCCESS && gr_ore_poly_equal(TEMP, AB, ore_ctx) == T_FALSE)
             {
                 if(iter & 1)
                     flint_printf("FAIL: alias (out = A)\n");
@@ -148,12 +111,12 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
             }
 
             // Associativity test: (A*B)*C = A*(B*C)
-            MUST_OK(gr_ore_poly_mul(LHS, AB, C, ore_ctx));
+            status |= gr_ore_poly_mul(LHS, AB, C, ore_ctx);
 
-            MUST_OK(gr_ore_poly_mul(BC, B, C, ore_ctx));
-            MUST_OK(gr_ore_poly_mul(RHS, A, BC, ore_ctx));
+            status |= gr_ore_poly_mul(BC, B, C, ore_ctx);
+            status |= gr_ore_poly_mul(RHS, A, BC, ore_ctx);
 
-            if (gr_ore_poly_equal(LHS, RHS, ore_ctx) == T_FALSE)
+            if (status == GR_SUCCESS && gr_ore_poly_equal(LHS, RHS, ore_ctx) == T_FALSE)
             {
                 flint_printf("FAIL: (A·B)·C = A·(B·C)\n");
 
@@ -166,6 +129,26 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
 
                 flint_abort();
             }
+
+            /*if(status == GR_SUCCESS)
+            {
+                success++;
+                if (algebra == ORE_ALGEBRA_FROBENIUS)
+                    success_frobenius++;
+            }
+
+            if (status == GR_DOMAIN)
+                domain++;
+
+            if (status == GR_UNABLE)
+            {
+                unable++;
+                if (algebra == ORE_ALGEBRA_FROBENIUS)
+                {
+                    unable_frobenius++;
+                    gr_ctx_println(ctx);
+                }
+            }*/
 
             gr_ore_poly_clear(A, ore_ctx);
             gr_ore_poly_clear(B, ore_ctx);
@@ -180,6 +163,10 @@ TEST_FUNCTION_START(gr_ore_poly_mul, state)
         gr_ore_poly_ctx_clear(ore_ctx);
         gr_ctx_clear(ctx);
     }
-
+    /*flint_printf("GR_SUCCESS = %d\n", success);
+    flint_printf("GR_DOMAIN = %d\n", domain);
+    flint_printf("GR_UNABLE = %d\n", unable);
+    flint_printf("GR_UNABLE Frobenius = %d\n", unable_frobenius);
+    flint_printf("GR_SUCCESS Frobenius = %d\n", success_frobenius);*/
     TEST_FUNCTION_END(state);
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2026 Maria Neagoie, supervised by Marc Mezzarobba and Ricardo Buring
+    Copyright (C) 2026 Maria Neagoie
 
     This file is part of FLINT.
 
@@ -19,29 +19,13 @@ int _gr_ore_poly_lmul_gen(gr_ptr res, gr_srcptr poly, slong len, gr_ore_poly_ctx
     slong el_size = gr_ctx_sizeof_elem(GR_ORE_POLY_ELEM_CTX(ctx));
     int status = GR_SUCCESS;
 
-    if (GR_ORE_POLY_CTX(ctx)->sigma_delta == NULL)
-        return GR_UNABLE;
+    // Set the new coefficient (L) to zero
+    status |= gr_zero(GR_ENTRY(res, len, el_size), GR_ORE_POLY_ELEM_CTX(ctx));
 
-    // Aliasing
-    if (res == poly)
-    {
-        // Set the new coefficient (L) to zero
-        status |= gr_zero(GR_ENTRY(res, len, el_size), GR_ORE_POLY_ELEM_CTX(ctx));
-    }
-    else
-    {
-        // Output initialized at 0
-        for (slong k = 0; k <= len; k++)
-            status |= gr_zero(GR_ENTRY(res, k, el_size), GR_ORE_POLY_ELEM_CTX(ctx));
-    }
-
-    TMP_INIT;
-    TMP_START;
-
-    gr_ptr temps = TMP_ALLOC(el_size);
-    gr_ptr tempd = TMP_ALLOC(el_size);
-    gr_init(temps, GR_ORE_POLY_ELEM_CTX(ctx));
-    gr_init(tempd, GR_ORE_POLY_ELEM_CTX(ctx));
+    gr_ptr temps;
+    gr_ptr tempd;
+    GR_TMP_INIT(temps, GR_ORE_POLY_ELEM_CTX(ctx));
+    GR_TMP_INIT(tempd, GR_ORE_POLY_ELEM_CTX(ctx));
 
     for (slong j = len - 1; j >= 0; j--)
     {
@@ -57,10 +41,8 @@ int _gr_ore_poly_lmul_gen(gr_ptr res, gr_srcptr poly, slong len, gr_ore_poly_ctx
         status |= gr_set(GR_ENTRY(res, j, el_size), tempd, GR_ORE_POLY_ELEM_CTX(ctx));
     }
 
-    gr_clear(temps, GR_ORE_POLY_ELEM_CTX(ctx));
-    gr_clear(tempd, GR_ORE_POLY_ELEM_CTX(ctx));
-
-    TMP_END;
+    GR_TMP_CLEAR(temps, GR_ORE_POLY_ELEM_CTX(ctx));
+    GR_TMP_CLEAR(tempd, GR_ORE_POLY_ELEM_CTX(ctx));
 
     return status;
 }
@@ -79,7 +61,7 @@ int gr_ore_poly_lmul_gen(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_ore_pol
     return status;
 }
 
-// Assumes: res != a, res != b (no aliasing), a->length > 0, b->length > 0, sigma_delta != NULL
+// Assumes: res != a, res != b (no aliasing), a->length > 0, b->length > 0
 int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ore_poly_ctx_t ctx)
 {
     slong el_size = gr_ctx_sizeof_elem(GR_ORE_POLY_ELEM_CTX(ctx));
@@ -99,12 +81,8 @@ int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, s
     _gr_ore_poly_set_length(Q, len2, ctx);
     _gr_ore_poly_normalise(Q, ctx);
 
-    // Accumulate res += a_i * Q and update Q at every step.
-    TMP_INIT;
-    TMP_START;
-
-    gr_ptr temp_prod = TMP_ALLOC(el_size);
-    gr_init(temp_prod, GR_ORE_POLY_ELEM_CTX(ctx));
+    gr_ptr temp_prod;
+    GR_TMP_INIT(temp_prod, GR_ORE_POLY_ELEM_CTX(ctx));
 
     for (slong i = 0; i < len1; i++)
     {
@@ -123,14 +101,13 @@ int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, s
         }
 
         // Update Q = Q * D so that Q = D^i * b is also true at the next step
-        if (i + 1 < len1){
+        if (i + 1 < len1)
+        {
             status |= gr_ore_poly_lmul_gen(Q, Q, ctx);
         }
     }
 
-    gr_clear(temp_prod, GR_ORE_POLY_ELEM_CTX(ctx));
-
-    TMP_END;
+    GR_TMP_CLEAR(temp_prod, GR_ORE_POLY_ELEM_CTX(ctx));
 
     gr_ore_poly_clear(Q, ctx);
 
@@ -145,9 +122,6 @@ int gr_ore_poly_mul(gr_ore_poly_t res, const gr_ore_poly_t poly1, const gr_ore_p
 
     if (len1 == 0 || len2 == 0)
         return gr_ore_poly_zero(res, ctx);
-
-    if (GR_ORE_POLY_CTX(ctx)->sigma_delta == NULL)
-        return GR_UNABLE;
 
     // Aliasing
     if (res == poly1 || res == poly2)
