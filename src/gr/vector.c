@@ -133,6 +133,9 @@ vector_ctx_is_threadsafe(gr_ctx_t ctx)
     return gr_ctx_is_threadsafe(ENTRY_CTX(ctx));
 }
 
+static gr_ptr vector_ctx_base(gr_ctx_t ctx) { return ENTRY_CTX(ctx); }
+
+
 static void
 vector_gr_vec_clear(gr_vec_t res, gr_ctx_t ctx)
 {
@@ -738,6 +741,7 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) vector_ctx_is_complex_vector_space},
     {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) vector_ctx_is_approx_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,    (gr_funcptr) vector_ctx_is_threadsafe},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) vector_ctx_base},
 
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) vector_gr_vec_ctx_write},
     {GR_METHOD_INIT,        (gr_funcptr) vector_gr_vec_init},

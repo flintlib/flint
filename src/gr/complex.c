@@ -75,6 +75,8 @@ _gr_complex_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+static gr_ptr _gr_complex_ctx_base(gr_ctx_t ctx) { return REAL_CTX(ctx); }
+
 static void
 _gr_complex_init(gr_ptr x, gr_complex_ctx_t ctx)
 {
@@ -639,6 +641,7 @@ gr_method_tab_input _gr_complex_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) _gr_complex_ctx_is_exact},
     {GR_METHOD_CTX_NGENS,       (gr_funcptr) gr_generic_ctx_ngens_1},
     {GR_METHOD_CTX_GEN_NAME,    (gr_funcptr) _gr_complex_ctx_gen_name},
+    {GR_METHOD_CTX_BASE,                (gr_funcptr) _gr_complex_ctx_base},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_complex_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_complex_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_complex_swap},

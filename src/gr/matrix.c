@@ -167,6 +167,9 @@ matrix_ctx_is_threadsafe(gr_ctx_t ctx)
     return gr_ctx_is_threadsafe(MATRIX_CTX(ctx)->base_ring);
 }
 
+static gr_ptr matrix_ctx_base(gr_ctx_t ctx) { return MATRIX_CTX(ctx)->base_ring; }
+
+
 static void
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
 {
@@ -600,6 +603,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_complex_vector_space},
     {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) matrix_ctx_is_approx_commutative_ring},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) matrix_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},

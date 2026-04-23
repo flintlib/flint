@@ -873,9 +873,20 @@ gr_test_set_other(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
     gr_ptr x, y, z, xy, x2, y2, z2, t2;
-    gr_ctx_t R2;
+    gr_ctx_t R2ctx;
+    gr_ctx_struct * R2;
 
-    gr_ctx_init_random(R2, state);
+    if (n_randint(state, 4) == 0)
+    {
+        R2 = R;
+        while (n_randint(state, 2) && gr_ctx_base(R2) != NULL)
+            R2 = gr_ctx_base(R2);
+    }
+    else
+    {
+        gr_ctx_init_random(R2ctx, state);
+        R2 = R2ctx;
+    }
 
     GR_TMP_INIT4(x, y, z, xy, R);
     GR_TMP_INIT4(x2, y2, z2, t2, R2);
@@ -921,7 +932,8 @@ gr_test_set_other(gr_ctx_t R, flint_rand_t state, int test_flags)
     GR_TMP_CLEAR4(x, y, z, xy, R);
     GR_TMP_CLEAR4(x2, y2, z2, t2, R2);
 
-    gr_ctx_clear(R2);
+    if (R2 == R2ctx)
+        gr_ctx_clear(R2ctx);
 
     return status;
 }
@@ -1201,13 +1213,25 @@ gr_test_binary_op_other_variants(gr_ctx_t R,
     int fused,
     flint_rand_t state, int test_flags)
 {
-    gr_ctx_t R2;
-    gr_ctx_init_random(R2, state);
+    gr_ctx_struct * R2;
+    gr_ctx_t R2ctx;
     int status = GR_SUCCESS;
     int status2;
     int alias = n_randint(state, 2);
 
     gr_ptr x, y, x2, y2, xy, xy2;
+
+    if (n_randint(state, 4) == 0)
+    {
+        R2 = R;
+        while (n_randint(state, 2) && gr_ctx_base(R2) != NULL)
+            R2 = gr_ctx_base(R2);
+    }
+    else
+    {
+        gr_ctx_init_random(R2ctx, state);
+        R2 = R2ctx;
+    }
 
     GR_TMP_INIT4(x, y, xy, xy2, R);
     GR_TMP_INIT2(x2, y2, R2);
@@ -1241,21 +1265,22 @@ gr_test_binary_op_other_variants(gr_ctx_t R,
             status2 = gr_op_other(xy2, x, y2, R2, R);
         }
 
-        if ((status == GR_SUCCESS && status2 == GR_DOMAIN) ||
+        if ((status == GR_SUCCESS && status2 == GR_DOMAIN
+                && (gr_op != gr_divexact || gr_ctx_is_integral_domain(R) == T_TRUE)) ||
             (status == GR_SUCCESS && status2 == GR_SUCCESS &&
             gr_equal(xy, xy2, R) == T_FALSE))
         {
-            status = GR_TEST_FAIL;
             flint_printf("binary_op_other_variants\n");
             gr_ctx_println(R);
             gr_ctx_println(R2);
-            flint_printf("status2 = %d, alias = %d\n", status2, alias);
+            flint_printf("status = %d, status2 = %d, alias = %d\n", status, status2, alias);
             flint_printf("%s (right)\n", opname);
             flint_printf("x = %{gr}\n", x, R);
             flint_printf("y = %{gr}\n", y, R);
             flint_printf("y2 = %{gr}\n", y2, R2);
             flint_printf("x op y = %{gr}\n", xy, R);
             flint_printf("x op y2 = %{gr}\n", xy2, R);
+            status = GR_TEST_FAIL;
             goto cleanup;
         }
 
@@ -1295,15 +1320,15 @@ gr_test_binary_op_other_variants(gr_ctx_t R,
                 status2 = gr_other_op(xy2, x2, R2, y, R);
             }
 
-            if ((status == GR_SUCCESS && status2 == GR_DOMAIN) ||
+            if ((status == GR_SUCCESS && status2 == GR_DOMAIN
+                    && (gr_op != gr_divexact || gr_ctx_is_integral_domain(R) == T_TRUE)) ||
                 (status == GR_SUCCESS && status2 == GR_SUCCESS &&
                 gr_equal(xy, xy2, R) == T_FALSE))
             {
-                status = GR_TEST_FAIL;
                 flint_printf("binary_op_other_variants (left)\n");
                 gr_ctx_println(R);
                 gr_ctx_println(R2);
-                flint_printf("status2 = %d, alias = %d\n", status2, alias);
+                flint_printf("status = %d, status2 = %d, alias = %d\n", status, status2, alias);
                 flint_printf("%s (left)\n", opname);
                 flint_printf("x = %{gr}\n", x, R);
                 flint_printf("y = %{gr}\n", y, R);
@@ -1312,6 +1337,7 @@ gr_test_binary_op_other_variants(gr_ctx_t R,
                 flint_printf("y2 = %{gr}\n", y2, R2);
                 flint_printf("x op y = %{gr}\n", xy, R);
                 flint_printf("x2 op y = %{gr}\n", xy2, R);
+                status = GR_TEST_FAIL;
                 goto cleanup;
             }
         }
@@ -1321,7 +1347,8 @@ cleanup:
     GR_TMP_CLEAR4(x, y, xy, xy2, R);
     GR_TMP_CLEAR2(x2, y2, R2);
 
-    gr_ctx_clear(R2);
+    if (R2 == R2ctx)
+        gr_ctx_clear(R2ctx);
 
     return status;
 }

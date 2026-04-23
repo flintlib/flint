@@ -298,6 +298,13 @@ Context operations
     Get the name of the generator of index *i*.
     The returned buffer must be freed with :func:`flint_free`.
 
+.. function:: gr_ptr gr_ctx_base(gr_ctx_t ctx)
+
+    Assuming that ``ctx`` is an extension of a base structure ``base_ctx``,
+    returns the pointer to ``base_ctx``.
+    Otherwise, returns ``NULL``.
+
+
 Element operations
 --------------------------------------------------------------------------------
 

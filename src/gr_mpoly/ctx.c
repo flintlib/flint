@@ -156,6 +156,9 @@ gr_mpoly_ctx_is_threadsafe(gr_mpoly_ctx_t ctx)
     return gr_ctx_is_threadsafe(GR_MPOLY_CCTX(ctx));
 }
 
+static gr_ptr _gr_mpoly_ctx_base(gr_ctx_t ctx) { return GR_MPOLY_CCTX(ctx); }
+
+
 int
 gr_mpoly_gens(gr_vec_t res, gr_mpoly_ctx_t ctx)
 {
@@ -331,6 +334,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) gr_mpoly_ctx_set_gen_names},
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) _gr_mpoly_ctx_ngens},
     {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_mpoly_ctx_gen_name},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_mpoly_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) gr_mpoly_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_mpoly_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_mpoly_swap},

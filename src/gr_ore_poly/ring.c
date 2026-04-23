@@ -340,8 +340,7 @@ int
 gr_ore_poly_other_mul(gr_ore_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
 {
     if (x_ctx == ctx) {
-        /* TODO: Multiplication of Ore polynomials. */
-        return GR_UNABLE;
+        return gr_ore_poly_mul(res, x, poly, ctx);
     } else if (x_ctx == GR_ORE_POLY_ELEM_CTX(ctx)) {
         return gr_poly_scalar_mul((gr_poly_struct *) res, x, (const gr_poly_struct *) poly, GR_ORE_POLY_ELEM_CTX(ctx));
     } else if (GR_ORE_POLY_CTX(ctx)->base_ring->which_ring == GR_CTX_GR_POLY && \
