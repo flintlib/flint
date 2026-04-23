@@ -258,7 +258,7 @@ Action
               int gr_ore_poly_delta(gr_ptr res, gr_srcptr a, gr_ore_poly_ctx_t ctx)
               int gr_ore_poly_sigma_delta(gr_ptr sigma, gr_ptr delta, gr_srcptr a, gr_ore_poly_ctx_t ctx)
 
-    Compute *σ(a)*,  *δ(a)*, or both, where *a* is an element of the base ring.
+    Compute `\sigma(a)`, `\delta(a)`, or both, where *a* is an element of the base ring.
     In the *sigma_delta* variant, the output variables *sigma* or *delta* can be
     ``NULL``.
 
@@ -309,15 +309,15 @@ Arithmetic
               int gr_ore_poly_lmul_gen(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
 
     Sets *res* to the result of the left multiplication:
-    *D · poly = σ(poly) · D + δ(poly)*.
-    The underscore method assumes *len ≠ 0*.
+    `D \cdot poly = \sigma(poly) \cdot D + \sigma(poly)`.
+    The underscore method assumes *len != 0*.
 
 .. function:: int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ore_poly_ctx_t ctx)
               int gr_ore_poly_mul(gr_ore_poly_t res, const gr_ore_poly_t poly1, const gr_ore_poly_t poly2, gr_ore_poly_ctx_t ctx)
 
     Sets *res* to *poly1* multiplied by *poly2*
     which must be two Ore polynomials in the Ore algebra *ctx*.
-    The underscore method assumes *res ≠ poly1*, *res ≠ poly2* (no aliasing) and *len1* ≠ 0, *len2* ≠ 0.
+    The underscore method assumes *res != poly1*, *res != poly2* (no aliasing) and *len1* != 0, *len2* != 0.
 
 .. raw:: latex
 
