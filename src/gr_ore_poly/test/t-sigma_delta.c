@@ -65,34 +65,44 @@ TEST_FUNCTION_START(gr_ore_poly_sigma_delta, state)
 
         if (status != GR_SUCCESS)
         {
-            if (cctx->which_ring == GR_CTX_GR_POLY)
+            switch (cctx->which_ring)
             {
-                switch (POLYNOMIAL_CTX(cctx)->base_ring->which_ring)
-                {
-                    case GR_CTX_FMPZ:
-                    case GR_CTX_FMPQ:
-                        break;
-                    default:
-                        goto cleanup;
-                }
-                switch (GR_ORE_POLY_CTX(ctx)->which_algebra)
-                {
-                    case ORE_ALGEBRA_COMMUTATIVE:
-                    case ORE_ALGEBRA_DERIVATIVE:
-                    case ORE_ALGEBRA_EULER_DERIVATIVE:
-                    case ORE_ALGEBRA_FORWARD_SHIFT:
-                    case ORE_ALGEBRA_FORWARD_DIFFERENCE:
-                    case ORE_ALGEBRA_BACKWARD_SHIFT:
-                    case ORE_ALGEBRA_BACKWARD_DIFFERENCE:
-                    case ORE_ALGEBRA_Q_SHIFT:
-                    case ORE_ALGEBRA_MAHLER:
+                case GR_CTX_GR_POLY:
+                    switch (POLYNOMIAL_CTX(cctx)->base_ring->which_ring)
+                    {
+                        case GR_CTX_FMPZ:
+                        case GR_CTX_FMPQ:
+                            break;
+                        default:
+                            goto cleanup;
+                    }
+                    switch (GR_ORE_POLY_CTX(ctx)->which_algebra)
+                    {
+                        case ORE_ALGEBRA_COMMUTATIVE:
+                        case ORE_ALGEBRA_DERIVATIVE:
+                        case ORE_ALGEBRA_EULER_DERIVATIVE:
+                        case ORE_ALGEBRA_FORWARD_SHIFT:
+                        case ORE_ALGEBRA_FORWARD_DIFFERENCE:
+                        case ORE_ALGEBRA_BACKWARD_SHIFT:
+                        case ORE_ALGEBRA_BACKWARD_DIFFERENCE:
+                        case ORE_ALGEBRA_Q_SHIFT:
+                        case ORE_ALGEBRA_MAHLER:
+                            flint_printf("FAIL: unexpected failure\n");
+                            flint_abort();
+                        default:
+                            goto cleanup;
+                    }
+                case GR_CTX_FQ:
+                case GR_CTX_FQ_NMOD:
+                case GR_CTX_FQ_ZECH:
+                    if (GR_ORE_POLY_CTX(ctx)->which_algebra == ORE_ALGEBRA_FROBENIUS)
+                    {
                         flint_printf("FAIL: unexpected failure\n");
                         flint_abort();
-                    default:
-                        goto cleanup;
-                }
+                    }
+                default:
+                    goto cleanup;
             }
-            goto cleanup;
         }
 
         status = gr_add(c, a, b, cctx);
