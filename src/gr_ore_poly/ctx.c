@@ -378,7 +378,7 @@ gr_ore_poly_ctx_init_q_shift(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring,
 
 int
 gr_ore_poly_ctx_init_mahler(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring,
-                            slong base_var, long mahler_base)
+                            slong base_var, slong mahler_base)
 {
     if (mahler_base == 0)
         return GR_DOMAIN;
