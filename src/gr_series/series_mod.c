@@ -147,6 +147,9 @@ gr_series_mod_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
+static gr_ptr _gr_series_mod_ctx_base(gr_ctx_t ctx) { return GR_SERIES_MOD_ELEM_CTX(ctx); }
+
+
 void gr_series_mod_init(gr_poly_t res, gr_ctx_t ctx)
 {
     gr_poly_init(res, GR_SERIES_MOD_ELEM_CTX(ctx));
@@ -344,7 +347,7 @@ gr_series_mod_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx
 {
     if (x_ctx == ctx)
     {
-        return gr_poly_set(res, x, ctx);
+        return gr_series_mod_set(res, x, ctx);
     }
     else if (x_ctx == GR_SERIES_MOD_ELEM_CTX(ctx))
     {
@@ -412,6 +415,7 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_series_mod_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_mod_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_mod_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_series_mod_swap},

@@ -62,12 +62,18 @@ _gr_gr_poly_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
 
     char * var = POLYNOMIAL_CTX(ctx)->var;
     size_t len = strlen(var);
+
     * name = flint_malloc(len + 1);
     if (* name == NULL)
         return GR_UNABLE;
     strncpy(* name, var, len + 1);
 
     return GR_SUCCESS;
+}
+
+static gr_ptr _gr_gr_poly_ctx_base(gr_ctx_t ctx)
+{
+    return POLYNOMIAL_ELEM_CTX(ctx);
 }
 
 static void
@@ -782,6 +788,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_poly_ctx_set_gen_names},
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_1},
     {GR_METHOD_CTX_GEN_NAME,            (gr_funcptr) _gr_gr_poly_ctx_gen_name},
+    {GR_METHOD_CTX_BASE,                (gr_funcptr) _gr_gr_poly_ctx_base},
 
     {GR_METHOD_INIT,        (gr_funcptr) polynomial_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) polynomial_clear},

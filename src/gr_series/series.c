@@ -1950,6 +1950,9 @@ _gr_series_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+static gr_ptr _gr_series_ctx_base(gr_ctx_t ctx) { return GR_SERIES_ELEM_CTX(ctx); }
+
+
 int
 gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
 {
@@ -2054,6 +2057,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_series_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_series_swap},

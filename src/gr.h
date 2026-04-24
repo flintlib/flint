@@ -138,6 +138,8 @@ typedef enum
     GR_METHOD_CTX_NGENS,
     GR_METHOD_CTX_GEN_NAME,
 
+    GR_METHOD_CTX_BASE,
+
     GR_METHOD_INIT,
     GR_METHOD_CLEAR,
     GR_METHOD_SWAP,
@@ -762,6 +764,7 @@ typedef void ((*gr_method_init_clear_op)(gr_ptr, gr_ctx_ptr));
 typedef void ((*gr_method_swap_op)(gr_ptr, gr_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_ctx)(gr_ctx_ptr));
 typedef void ((*gr_method_ctx_void_op)(gr_ctx_ptr));
+typedef gr_ctx_ptr ((*gr_method_ctx_base)(gr_ctx_ptr));
 typedef truth_t ((*gr_method_ctx_predicate)(gr_ctx_ptr));
 typedef slong ((*gr_method_ctx_size)(gr_ctx_ptr));
 typedef int ((*gr_method_ctx_gen_name)(char **, slong, gr_ctx_ptr));
@@ -872,6 +875,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_CTX_SET_TRUTH(ctx, NAME) (((gr_method_ctx_set_truth *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_SET_STR(ctx, NAME) (((gr_method_ctx_set_str *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_CTX_SET_STRS(ctx, NAME) (((gr_method_ctx_set_strs *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_BASE(ctx, NAME) (((gr_method_ctx_base *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN(ctx, NAME) (((gr_method_stream_in *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_STREAM_IN_SI(ctx, NAME) (((gr_method_stream_in_si *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_RANDTEST(ctx, NAME) (((gr_method_randtest *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -1006,6 +1010,9 @@ GR_INLINE slong _gr_ctx_get_real_prec(gr_ctx_t ctx)
     GR_IGNORE(gr_ctx_get_real_prec(&res, ctx));
     return res;
 }
+
+GR_INLINE gr_ptr gr_ctx_base(gr_ctx_t ctx) { return GR_CTX_BASE(ctx, CTX_BASE)(ctx); }
+
 
 GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(res, ctx); }
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
