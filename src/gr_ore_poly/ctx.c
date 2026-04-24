@@ -258,9 +258,9 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
     {GR_METHOD_GENS,           (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE, (gr_funcptr) gr_ore_poly_gens_recursive},
 
-/*
     {GR_METHOD_IS_ZERO,     (gr_funcptr) gr_ore_poly_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) gr_ore_poly_is_one},
+/*
     {GR_METHOD_IS_NEG_ONE,  (gr_funcptr) gr_ore_poly_is_neg_one},
 */
     {GR_METHOD_EQUAL,       (gr_funcptr) gr_ore_poly_equal},
