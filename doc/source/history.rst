@@ -6,12 +6,331 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+
 FLINT 3.5.0-dev
 -------------------------------------------------------------------------------
 
-Contributors: David Sparks (DS), Fredrik Johansson (FJ), Mathieu Gouttenoire (MG)
+Contributors
 
-* Smaller hash table for ``n_is_prime`` (FJ, DS, MG).
+* Albin Ahlbäck (AA)
+* Alexey Orlov (AO)
+* David Sparks (DS)
+* Edgar Costa (EC)
+* Fredrik Johansson (FJ)
+* Guillaume Moroz (GM)
+* Jerry James (JJ)
+* Julien Schueller (JS)
+* Kerem Kelleboz (KK)
+* Lars Göttgens (LG)
+* Mathieu Gouttenoire (MG)
+* Maria Neagoie (MN)
+* Marc Mezzarobba (MM)
+* Mate Soos (MS)
+* Ricardo Buring (RB)
+* Sergey Fedorov (SF)
+* Tal Regev (TR)
+* user202729 (U2)
+* Vincent Neiger (VN)
+* Vlad Shcherbina (VS)
+* Viorel Wegner (VW)
+
+Features
+
+* Add the ``radix`` module for multiprecision ``mpn``-style arithmetic
+  in any word-size limb radix (e.g. decimal or `p`-adic radices).
+  Supports FFT multiplication, asymptotically fast division and modular
+  inversion, digit-level manipulation, and memory-managed (``mpz``-style)
+  integers.
+  [FJ, `#2544 <https://github.com/flintlib/flint/pull/2544>`_,
+  `#2561 <https://github.com/flintlib/flint/pull/2561>`_,
+  `#2580 <https://github.com/flintlib/flint/pull/2580>`_,
+  `#2554 <https://github.com/flintlib/flint/pull/2554>`_,
+  `#2583 <https://github.com/flintlib/flint/pull/2583>`_,
+  `#2584 <https://github.com/flintlib/flint/pull/2584>`_,
+  `#2588 <https://github.com/flintlib/flint/pull/2588>`_,
+  `#2603 <https://github.com/flintlib/flint/pull/2603>`_].
+* Add the module ``gr_ore_poly`` for Ore polynomials over generic rings.
+  Currently construction of various differential and difference operators
+  and basic arithmetic is supported.
+  [RB, MM, MN, `#2299 <https://github.com/flintlib/flint/pull/2299>`_].
+* Add middle products for most polynomial types
+  (``fmpz_poly_mulmid``, ``fmpq_poly_mulmid``, ``nmod_poly_mulmid``,
+  ``arb_poly_mulmid``, ``acb_poly_mulmid``, ``gr_poly_mulmid``, etc).
+  [FJ, `#2610 <https://github.com/flintlib/flint/pull/2610>`_,
+  `#2613 <https://github.com/flintlib/flint/pull/2613>`_,
+  `#2614 <https://github.com/flintlib/flint/pull/2614>`_,
+  `#2615 <https://github.com/flintlib/flint/pull/2615>`_,
+  `#2619 <https://github.com/flintlib/flint/pull/2619>`_,
+  `#2620 <https://github.com/flintlib/flint/pull/2620>`_].
+* Add generic complex numbers and algebras (``gr_ctx_init_gr_complex``)
+  [FJ, `#2589 <https://github.com/flintlib/flint/pull/2589>`_].
+* Unified printing code: add ``flint_snprintf``, ``flint_vsnprintf``,
+  ``flint_vsprintf``, and fix ``flint_sprintf``; all these functions
+  now support the same print formats as ``flint_printf``
+  [LG, `#2633 <https://github.com/flintlib/flint/pull/2633>`_].
+* Add ``qadic_ctx_init_modulus`` and ``qadic_ctx_init_modulus_nmod`` to allow
+  initializing a `q`-adic context with a given modulus
+  [AO, `#2550 <https://github.com/flintlib/flint/pull/2550>`_].
+* Add ``gr_poly_mullow_toom_serial`` implementing Toom-Cook multiplication
+  with arbitrary number of interpolation points.
+  This can be used for subquadratic multiplication over generic rings.
+  It can also be used to save memory for rings which already support
+  FFT-based multiplication, allowing a product that is too large for a
+  full in-memory FFT product to be split into several smaller FFT products.
+  [FJ, `#2536 <https://github.com/flintlib/flint/pull/2536>`_].
+* Add Montgomery arithmetic (redc) to the ``nmod`` module.
+  Four variants (fullword and halfword with eager and lazy reduction)
+  are supported.
+  [FJ, `#2513 <https://github.com/flintlib/flint/pull/2513>`_].
+* Add generic ring interface to Montgomery arithmetic (``gr_ctx_init_nmod_redc``,
+  ``gr_ctx_init_nmod_redc_fast``)
+  [FJ, `#2527 <https://github.com/flintlib/flint/pull/2527>`_].
+* Add ``n_binvert`` for inverses modulo the word radix
+  [FJ, `#2513 <https://github.com/flintlib/flint/pull/2513>`_].
+* Add ``nmod_2_pow_ui``, ``nmod_ui_add_ui``, ``nmod_ui_mul_ui``,
+  ``nmod_ui_pow_ui``,
+  [FJ, `#2513 <https://github.com/flintlib/flint/pull/2513>`_].
+* Add ``flint_mpn_divrem_1_preinv`` for nx1 integer division with
+  a precomputed inverse
+  [FJ, `#2540 <https://github.com/flintlib/flint/pull/2540>`_].
+* Add ``flint_mpn_get_str``
+  [FJ, `#2544 <https://github.com/flintlib/flint/pull/2544>`_].
+* Add GR wrapper for ``fmpq_mpoly``
+  [FJ, `#2641 <https://github.com/flintlib/flint/pull/2641>`_].
+* Add ``n_mod_barrett``, ``n_mod_barrett_lazy``, ``n_mod_lemire`` for
+  fast single-word modular reduction using Barrett and Lemire-Kaser-Kurz
+  algorithms
+  [FJ, `#2636 <https://github.com/flintlib/flint/pull/2636>`_].
+* Add ``n_mulhi``
+  [FJ, `#2636 <https://github.com/flintlib/flint/pull/2636>`_].
+* Add ``gr_ctx_uninitialized`` as a helper for safe cleanup in wrapper code
+  [FJ, `#2591 <https://github.com/flintlib/flint/pull/2591>`_].
+* Add ``fmpz_mat_snf_transform``, ``fmpz_mat_elementary_divisors``,
+  and ``fmpz_mat_is_diagonal``, ``nmod_mat_left_nullspace``.
+  [EC, `#2627 <https://github.com/flintlib/flint/pull/2627>`_].
+* Add precomputation functions for faster evaluation of ``qadic`` square
+  roots in characteristic 2. This allows computing square roots around
+  five times faster than without the precomputation.
+  [AO, `#2622 <https://github.com/flintlib/flint/pull/2622>`_].
+* Add ``gr_ctx_is_approx_commutative_ring`` and ``gr_ctx_base``
+  [FJ, `#2623 <https://github.com/flintlib/flint/pull/2623>`_,
+  `#2642 <https://github.com/flintlib/flint/pull/2642>`_].
+* Add more convenience functions for generating random rings
+  [FJ, MM, RB, `#2623 <https://github.com/flintlib/flint/pull/2623>`_,
+  `#2299 <https://github.com/flintlib/flint/pull/2299>`_].
+
+
+Bug fixes
+
+* Fix ``fmpz_mat_snf`` hanging on certain non-square matrices
+  [EC, `#2596 <https://github.com/flintlib/flint/pull/2596>`_].
+* Fix exception in ``nmod_mpoly_factor`` and ``fq_nmod_mpoly_factor`` when
+  attempting to factor certain polynomials
+  [EC, `#2612 <https://github.com/flintlib/flint/pull/2612>`_].
+* Fix ``fmpz_sizeinbase`` to return the exact size in digits instead of an
+  upper bound [EC, `#2639 <https://github.com/flintlib/flint/pull/2639>`_].
+* Add workaround for a miscompilation bug in GCC 15 that would cause segfaults
+  in the ``fmpz_mpoly_factor`` module
+  [U2, `#2557 <https://github.com/flintlib/flint/pull/2557>`_].
+* Fix ``n_randint`` to generate uniformly random numbers even when the bound
+  is close to a full limb
+  [FJ, `#2547 <https://github.com/flintlib/flint/pull/2547>`_].
+* Fix support for noncommutative coefficient rings in various ``gr_poly`` and
+  ``gr_mpoly`` methods
+  [FJ, `#2623 <https://github.com/flintlib/flint/pull/2623>`_].
+* Fix reallocation for aliased operands in ``fmpz_fdiv_preinvn``
+  [AA, `#2600 <https://github.com/flintlib/flint/pull/2600>`_].
+* Fix several memory leaks
+  [FJ, `#2565 <https://github.com/flintlib/flint/pull/2565>`_,
+  `#2566 <https://github.com/flintlib/flint/pull/2566>`_].
+* Fix bug in ``gr_mat_move_row`` that caused ``fmpz_lll`` to abort when given
+  rectangular, rank-deficient matrices
+  [FJ, `#2511 <https://github.com/flintlib/flint/pull/2511>`_].
+* Fix an invalid memory read in ``fmpz_mod_poly_factor``
+  [AA, `#2553 <https://github.com/flintlib/flint/pull/2553>`_].
+* Fix return value in ``_gr_fraction_write``
+  [KK, `#2530 <https://github.com/flintlib/flint/pull/2530>`_].
+* Fix segfaults in the ``ctypes`` Python wrapper [FJ, #2591].
+* Fix ``fmpz_read`` trying to read from ``stdout`` instead of ``stdin``
+  [FJ, `#2571 <https://github.com/flintlib/flint/pull/2571>`_].
+* Fix ``nmod_mat_fprint_pretty`` and ``_nmod_vec_fprint_pretty`` writing
+  to ``stdout`` instead of the given stream.
+  [EC, `#2587 <https://github.com/flintlib/flint/pull/2587>`_].
+* Fix longlong division for x86 and x86-64 on MSVC
+  [AA, `#2607 <https://github.com/flintlib/flint/pull/2607>`_].
+* Fix handling of random state. FLINT previously used its own PRNG to
+  generate single-word integers and GMP's PRNG to generate multi-word integers.
+  The FLINT PRNG is now used for all purposes. As a result,
+  ``flint_rand_set_seed`` and ``flint_rand_get_seed`` now correctly capture
+  the PRNG state whereas they previously ignored the GMP state. As a minor
+  performance benefit, ``flint_rand_t`` no longer needs to initialize
+  a heap-allocated GMP state object.
+  Note that this change affects the outputs and performance of randomized
+  algorithms relying on FLINT's random functions, and may require adaptations
+  in downstream projects.
+  [FJ, `#2547 <https://github.com/flintlib/flint/pull/2547>`_].
+
+Performance
+
+* Rewrite ``fmpz_mat_snf`` to use the iterative Hermite algorithm instead of
+  Kannan-Bachem/Iliopoulo. There is also a fast path for already-diagonal
+  matrices. The new implementation is generally faster, and many orders of
+  magnitude faster for worst-case input, e.g.
+  for 20 by 20 matrices with word-size entries, the new algorithm consistently
+  finishes in a millisecond while the old implementation could take several
+  seconds in pathological cases.
+  [EC, `#2627 <https://github.com/flintlib/flint/pull/2627>`_,
+  `#2596 <https://github.com/flintlib/flint/pull/2596>`_].
+* Optimize complex root-finding of polynomials (``acb_poly_find_roots``) by
+  improving the choice of initial values, using machine-precision floating-point
+  arithmetic when possible, and using a more stable algorithm to compute
+  root inclusions. Root-finding is now faster in most cases, and significantly
+  faster for well-conditioned polynomials of high degree; for example, finding
+  the roots of `1 + 2x + \ldots + 3201 x^{3200}` has been sped up 26x.
+  [GM, `#2539 <https://github.com/flintlib/flint/pull/2539>`_].
+* Speed up ``n_factor`` for input between 33 and 64 bits by using Montgomery
+  arithmetic in Pollard-Brent and attempting a single run of Pollard-Brent
+  before HOLF or SQUFOF. This gives an average 5x speedup
+  for factoring word-size integers.
+  [FJ, `#2517 <https://github.com/flintlib/flint/pull/2517>`_].
+* Make ``n_is_prime`` instantaneous up to 20 bits by including
+  a static mod 30 lookup table.
+  Generating the primes up to one million with ``n_nextprime`` has been
+  sped up 14x.
+  [FJ, `#2548 <https://github.com/flintlib/flint/pull/2548>`_].
+* Speed up ``n_is_prime`` by about 20-50% in the 21-64 bit range by vectorizing
+  trial division, optimizing the modular arithmetic (including use of
+  Montgomery arithmetic between 33 and 64 bits), and using hash table instead
+  of binary search to speed up detection of 32-bit pseudoprimes.
+  [FJ, `#2519 <https://github.com/flintlib/flint/pull/2519>`_,
+  `#2616 <https://github.com/flintlib/flint/pull/2616>`_,
+  `#2509 <https://github.com/flintlib/flint/pull/2509>`_].
+* Smaller hash table for ``n_is_prime``: the size of the witness table for
+  pseudoprimes up to 64 bits has been reduced from 340 KB to 64 KB
+  by incorporating a cheap semiprime check
+  [VW, `#2564 <https://github.com/flintlib/flint/pull/2564>`_,
+  `#2579 <https://github.com/flintlib/flint/pull/2579>`_].
+  This change superedes an earlier patch which reduced the original
+  table to 307 KB
+  [FJ, DS, MG, `#2507 <https://github.com/flintlib/flint/pull/2507>`_].
+* Speed up ``fmpz_is_prime`` by about 5x and ``fmpz_is_probabprime`` by about 2x
+  for input between 65 and 81 bits with the addition of a new function
+  ``n_ll_is_prime`` implementing optimized trial division and modular
+  exponentiation for numbers in this range.
+  [FJ, `#2624 <https://github.com/flintlib/flint/pull/2624>`_,
+  `#2629 <https://github.com/flintlib/flint/pull/2629>`_].
+* Slightly speed up ``fmpz_factor`` for large input by optimizing remainder
+  computations in the quadratic sieve
+  [FJ, `#2626 <https://github.com/flintlib/flint/pull/2626>`_].
+* Significantly speed up constructing ``qadic`` contexts by using
+  ``nmod_poly_minimal_irreducible`` for word-size `p` when no Conway
+  polynomial is available.
+  [AO, `#2582 <https://github.com/flintlib/flint/pull/2582>`_].
+* Use middle product to speed up Newton iteration for polynomial division,
+  power series inverse, power series exponentials, and power series ODEs
+  [FJ, `#2610 <https://github.com/flintlib/flint/pull/2610>`_,
+  `#2613 <https://github.com/flintlib/flint/pull/2613>`_,
+  `#2618 <https://github.com/flintlib/flint/pull/2618>`_].
+* Optimize modular reduction in the output reconstruction in ``fft_small``
+  based ``nmod_poly`` multiplication, giving up to a 20% speedup for
+  ``nmod_poly_mul``
+  [FJ, `#2634 <https://github.com/flintlib/flint/pull/2634>`_,
+  `#2635 <https://github.com/flintlib/flint/pull/2635>`_].
+* Optimize arithmetic in sparse ``nmod_poly`` division
+  [FJ, `#2636 <https://github.com/flintlib/flint/pull/2636>`_].
+* Speed up ``nmod_mat_lu`` for small to medium sized matrices
+  [FJ, `#2640 <https://github.com/flintlib/flint/pull/2640>`_].
+* Optimize basecase ``nmod_poly_divrem``
+  [FJ, `#2637 <https://github.com/flintlib/flint/pull/2637>`_].
+* Speed up ``fmpz_set_str`` (and other string conversion functions depending
+  on this) up to 2x by using ``radix`` arithmetic internally
+  [FJ, `#2544 <https://github.com/flintlib/flint/pull/2544>`_].
+* Optimize ``arb_poly`` and ``acb_poly`` ``set_coeff`` methods when
+  the coefficient is zero, avoiding quadratic complexity when performing this
+  in a loop
+  [U2, `#2533 <https://github.com/flintlib/flint/pull/#2533>`_].
+* Speed up ``nmod_addmul``, ``_nmod_vec_scalar_addmul_nmod`` and
+  ``_nmod_vec_scalar_addmul_nmod``
+  [FJ, `#2529 <https://github.com/flintlib/flint/pull/2529>`_].
+* Optimize various operations for ``nmod8`` and ``nmod32``
+  [FJ, `#2531 <https://github.com/flintlib/flint/pull/2531>`_].
+* Speed up ``nmod_poly_gcd``, ``nmod_poly_xgcd`` and ``nmod_poly_resultant``
+  by using more optimized basecase loops for the Euclidean algorithm,
+  using Montgomery arithmetic when appropriate,
+  and tuning algorithm cutoffs for each bit size.
+  The speedup is more than 2x for some sizes.
+  [FJ, `#2524 <https://github.com/flintlib/flint/pull/2524>`_,
+  `#2527 <https://github.com/flintlib/flint/pull/2527>`_,
+  `#2528 <https://github.com/flintlib/flint/pull/2528>`_,].
+* Speed up ``nmod_poly_evaluate_geometric_nmod_vec_fast`` for unequal
+  parameters [VN, `#2518 <https://github.com/flintlib/flint/pull/2518>`_].
+* Speed up ``nmod_pow_ui`` by using Montgomery arithmetic
+  [FJ, `#2513 <https://github.com/flintlib/flint/pull/2513>`_].
+* Speed up Bell numbers (``arith_bell_number``) by using
+  Montgomery arithmetic and enabling parallel computation in the
+  multimodular algorithm
+  [FJ, `#2515 <https://github.com/flintlib/flint/pull/2515>`_].
+* Speed up Euler numbers (``arb_fmpz_euler_number_ui``)
+  [FJ, `#2513 <https://github.com/flintlib/flint/pull/2513>`_].
+* Optimize and clean up ``n_root``, ``n_rootrem``
+  [FJ, `#2551 <https://github.com/flintlib/flint/pull/2551>`_,
+  `#2563 <https://github.com/flintlib/flint/pull/2563>`_].
+* Optimize ``fmpz_mul_tdiv_q_2exp``
+  [U2, `#2556 <https://github.com/flintlib/flint/pull/2556>`_].
+* Optimize generating random large integers and vectors of random numbers:
+  ``_nmod_vec_rand`` is around 2x faster, and ``fmpz_randbits`` is around 3x
+  faster for 1000-bit integers.
+  [FJ, `#2547 <https://github.com/flintlib/flint/pull/2547>`_].
+
+Documentation
+
+* Remove spurious backslashes
+  [U2, `#2532 <https://github.com/flintlib/flint/pull/2532>`_].
+* Remove deleted functions
+  [U2, `#2546 <https://github.com/flintlib/flint/pull/2546>`_].
+* Add documentation for window and concatenation functions for ``nmod_poly_mat``
+  [VN, `#2543 <https://github.com/flintlib/flint/pull/2543>`_].
+* Make parameter names consistent across headers, docs, and sources
+  in a subset of modules
+  [EC, `#2601 <https://github.com/flintlib/flint/pull/2601>`_,
+  `#2604 <https://github.com/flintlib/flint/pull/2604>`_].
+
+Build system and maintenance
+
+* Fix compilation under Emscripten
+  [MS, `#2594 <https://github.com/flintlib/flint/pull/2594>`_].
+* Avoid writing generated files into the source directory with CMake
+  [JS, `#2560 <https://github.com/flintlib/flint/pull/2560>`_].
+* Fix cross-compilation from linux/mingw
+  [JS, `#2558 <https://github.com/flintlib/flint/pull/2558>`_].
+* Fix compilation on Windows static with vcpkg
+  [TR, `#2598 <https://github.com/flintlib/flint/pull/2598>`_].
+* Fix ``---disable-assembly``
+  [AA, `#2593 <https://github.com/flintlib/flint/pull/2593>`_].
+* Add option ``--enable-asan`` for compiling with address sanitizer enabled
+  [AA, `#2552 <https://github.com/flintlib/flint/pull/2552>`_].
+* Fix linking with libflint in out of tree builds
+  [AA, `#2549 <https://github.com/flintlib/flint/pull/2549>`_].
+* Detect Zen 4 without AVX512 as Zen 3
+  [AA, `#2631 <https://github.com/flintlib/flint/pull/2631>`_].
+* Avoid undefined behavior negating ``slong``
+  [U2, `#2534 <https://github.com/flintlib/flint/pull/#2534>`_].
+* Improve generics test coverage
+  [FJ, `#2642 <https://github.com/flintlib/flint/pull/2642>`_].
+* Fix compiling ``profiler.c`` on macOS when ``MACH_TASK_BASIC_INFO`` is not
+  defined.
+  [SF, `#2525 <https://github.com/flintlib/flint/pull/2525>`_].
+* Fix running ``./configure`` when building from a tarball if
+  ``configure.ac`` has been modified.
+  [VS, `#2522 <https://github.com/flintlib/flint/pull/2522>`_].
+* Fix compiler warnings
+  [AA, JJ, `#2632 <https://github.com/flintlib/flint/pull/2632>`_
+  `#2506 <https://github.com/flintlib/flint/pull/2506>`_].
+* Re-enable CI testing with ``--enable-assert`` on 64-bit runners
+  [AA, `#2568 <https://github.com/flintlib/flint/pull/2568>`_].
+* Clean up build scripts
+  [AA, `#2545 <https://github.com/flintlib/flint/pull/2545>`_].
+
 
 2025-11-25 -- FLINT 3.4.0
 -------------------------------------------------------------------------------

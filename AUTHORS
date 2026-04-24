@@ -194,8 +194,8 @@ Martin Lee
 
 Marc Mezzarobba
 
-  Fast evaluation of Legendre polynomials, work on the Arb interface
-  in Sage, functionality for generic polynomials; shift equivalence,
+  Ore polynomials, fast evaluation of Legendre polynomials, work on the Arb
+  interface in Sage, functionality for generic polynomials; shift equivalence,
   dispersion, and shiftless decomposition for polynomials; bug reports,
   feedback.
 
@@ -483,7 +483,8 @@ Andrii Yanovets
 Ricardo Buring
 
   Functionality for generic polynomials and matrices, series solutions of
-  linear systems of ODEs with rational function coefficients.
+  linear systems of ODEs with rational function coefficients,
+  Ore polynomials.
 
   github   rburing
 
@@ -508,6 +509,56 @@ Remi Prebet
 Hartmut Monien
 
   Double exponential integration example program, bug reports and feedback.
+
+Alexey Orlov
+
+  Optimizations to qadic numbers.
+
+  github   https://github.com/alexey-orlov-math
+
+Guillaume Moroz
+
+  Machine-precision polynomial root-finding; improved initial value selection
+  for root-finding.
+
+  github   https://github.com/guyomes
+
+Edgar Costa
+
+  Smith normal form using iterated Hermite form; many bug fixes.
+
+  github   https://github.com/edgarcosta
+
+Lars Göttgens
+
+  Unified printing functions and other helper functions.
+
+  github   https://github.com/lgoettgens
+
+Maria Neagoie
+
+  Multiplication of Ore polynomials.
+
+  github   https://github.com/vioneers
+
+Mate Soos
+
+  Emscripten support.
+
+  github   https://github.com/msoos
+
+user202729
+
+  Many optimizations and bugfixes.
+
+  github   https://github.com/user202729
+
+Viorel Wegner
+
+  Optimized hash table and algorithm for detecting 64-bit pseudoprimes.
+
+  github   https://github.com/JASory
+
 
 
 Other contributors
@@ -535,7 +586,6 @@ Ondřej Čertík
 Frédéric Chapoton
 Frédéric Chyzak
 Craig Citro
-Edgar Costa
 Gianfranco Costamagna
 Håvard Damm-Johnsen
 Jeroen Demeyer
@@ -546,11 +596,11 @@ David Lowry-Duda
 Andreas Enge
 Jan Englehardt
 Daniel Fabian
+Sergey Fedorov
 Raphael Fourquet
 Peter Frentrep
 Srajan Garg
 Max Goldfar
-Lars Göttgens
 Dan Grayson
 Qingwen Guan
 Fabian Gundlach
@@ -566,6 +616,7 @@ Jan Jancar
 Marek Kaluba
 Lars Kastner
 Kiran Kedlaya
+Kerem Kelleboz
 Alexander Kobel
 Matthias Koeppe
 Denis Kryskov
@@ -588,18 +639,22 @@ John Palmieri
 Dima Pasechnik
 Giacomo Pope
 Julien Puydt
+Tal Regev
 Josh Rickmar
 Erico Rolim Noguerira
 Julian Ruth
 Mahrud Sayrafi
 Hans Schoenemann
+Julien Schueller
 Frithjof Schulze
 Marcello Seri
+Vlad Shcherbina
 Victor Shoup
 Tomás Oliveira e Silva
 Alexander Smirnov
 Bob Smith
 Ahmed Soliman
+David Sparks
 Jaap Spies
 William Stein
 Mike Stillman
@@ -620,7 +675,6 @@ Mgkurtz
 Vinklein
 Sourcekris
 Lzmths
-user202729
 
 Other credits
 -------------------------------------------------------------------------------
