@@ -1450,7 +1450,7 @@ TEST_FUNCTION_START(flint_sprintf, state)
         char expected[16];
         memset(buf, 'Z', sizeof(buf));
         got = flint_sprintf(buf, "x%wd", i + 1);
-        snprintf(expected, sizeof(expected), "x%ld", (long) (i + 1));
+        snprintf(expected, sizeof(expected), "x%lld", (long long) (i + 1));
         if (got < 0)
             TEST_FUNCTION_FAIL(
                     "Negative return value from flint_sprintf for i=%wd.\n", i);
@@ -1468,7 +1468,7 @@ TEST_FUNCTION_START(flint_sprintf, state)
             char expected[64];
             memset(buf, 'Z', sizeof(buf));
             got = flint_sprintf(buf, "[%wd]", values[ix]);
-            snprintf(expected, sizeof(expected), "[%ld]", (long) values[ix]);
+            snprintf(expected, sizeof(expected), "[%lld]", (long long) values[ix]);
             if (got < 0 || strcmp(buf, expected) != 0)
                 TEST_FUNCTION_FAIL(
                         "flint_sprintf(\"[%%wd]\", %wd) gave \"%s\" expected \"%s\"\n",
