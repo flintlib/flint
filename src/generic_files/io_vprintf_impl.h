@@ -369,7 +369,9 @@ continue_while:
         if (IS_FLINT_PRINTF_ULONGFMT(ipcur))
         {
             size_t cpsz;
+            int is_signed;
 
+            is_signed = (ipcur[1] == 'd' || ipcur[1] == 'i');
             ipcur += 2; /* To include 'w' and following format specifier */
             cpsz = ipcur - ip;
 
@@ -386,7 +388,10 @@ continue_while:
             opcur[-2] = 'l';
 #endif
             /* Pop entry from vlist (still present in vlist_cpy) */
-            va_arg(vlist, ulong);
+            if (is_signed)
+                va_arg(vlist, slong);
+            else
+                va_arg(vlist, ulong);
         }
         else if (IS_PRINTF_INTFMT(ipcur)
                 || IS_PRINTF_CHARFMT(ipcur)
