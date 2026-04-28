@@ -163,20 +163,3 @@ int flint_snprintf(char * s, size_t n, const char * str, ...)
 
    return ret;
 }
-
-int flint_vsprintf(char * s, const char * str, va_list vlist)
-{
-    return flint_vsnprintf(s, INT_MAX, str, vlist);
-}
-
-int flint_sprintf(char * s, const char * str, ...)
-{
-   va_list vlist;
-   int ret;
-
-   va_start(vlist, str);
-   ret = flint_vsprintf(s, str, vlist);
-   va_end(vlist);
-
-   return ret;
-}

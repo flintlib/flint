@@ -1435,6 +1435,58 @@ TEST_FUNCTION_START(flint_snprintf, state)
     TEST_FUNCTION_END(state);
 }
 
+TEST_FUNCTION_START(flint_sprintf, state)
+{
+    /* Regression test for #2646: on 32-bit glibc, vsnprintf called with a
+       very large size_t (such as INT_MAX) silently drops output past the
+       first character, causing flint_sprintf("x%wd", n) to produce "x"
+       instead of "x<n>". */
+    char buf[64];
+    int got;
+    slong i;
+
+    for (i = 0; i < 10; i++)
+    {
+        char expected[16];
+        memset(buf, 'Z', sizeof(buf));
+        got = flint_sprintf(buf, "x%wd", i + 1);
+        snprintf(expected, sizeof(expected), "x%lld", (long long) (i + 1));
+        if (got < 0)
+            TEST_FUNCTION_FAIL(
+                    "Negative return value from flint_sprintf for i=%wd.\n", i);
+        if (strcmp(buf, expected) != 0)
+            TEST_FUNCTION_FAIL(
+                    "flint_sprintf(\"x%%wd\", %wd) gave \"%s\" expected \"%s\"\n",
+                    i + 1, buf, expected);
+    }
+
+    {
+        slong values[] = {0, 1, -1, 12345, -12345, WORD_MIN, WORD_MAX};
+        size_t ix;
+        for (ix = 0; ix < sizeof(values) / sizeof(values[0]); ix++)
+        {
+            char expected[64];
+            memset(buf, 'Z', sizeof(buf));
+            got = flint_sprintf(buf, "[%wd]", values[ix]);
+            snprintf(expected, sizeof(expected), "[%lld]", (long long) values[ix]);
+            if (got < 0 || strcmp(buf, expected) != 0)
+                TEST_FUNCTION_FAIL(
+                        "flint_sprintf(\"[%%wd]\", %wd) gave \"%s\" expected \"%s\"\n",
+                        values[ix], buf, expected);
+        }
+    }
+
+    {
+        memset(buf, 'Z', sizeof(buf));
+        got = flint_sprintf(buf, "a%wd b%wu c%wx", (slong) -7, (ulong) 42, (ulong) 0xab);
+        if (got < 0 || strcmp(buf, "a-7 b42 cab") != 0)
+            TEST_FUNCTION_FAIL(
+                    "flint_sprintf with multiple %%w specifiers: got \"%s\"\n", buf);
+    }
+
+    TEST_FUNCTION_END(state);
+}
+
 
 #if HAVE_UNISTD_H && FLINT_COVERAGE
 #include <unistd.h>
