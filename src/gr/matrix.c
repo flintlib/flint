@@ -198,7 +198,12 @@ static int
 matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
-        _gr_mat_resize(res, n_randint(state, 7), n_randint(state, 7), MATRIX_CTX(ctx)->base_ring);
+    {
+        /* Split state-mutating calls so consumption order is architecture-independent. */
+        slong r = n_randint(state, 7);
+        slong c = n_randint(state, 7);
+        _gr_mat_resize(res, r, c, MATRIX_CTX(ctx)->base_ring);
+    }
 
     return gr_mat_randtest(res, state, MATRIX_CTX(ctx)->base_ring);
 }

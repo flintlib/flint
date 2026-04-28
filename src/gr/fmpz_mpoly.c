@@ -140,21 +140,32 @@ _gr_fmpz_mpoly_set_shallow(fmpz_mpoly_t res, const fmpz_mpoly_t poly, gr_ctx_t c
 static int
 _gr_fmpz_mpoly_randtest(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    slong bits;
+    slong bits, length;
+    flint_bitcnt_t exp_bits;
 
     if (n_randint(state, 10) != 0)
         bits = 10;
     else
         bits = 100;
 
-    fmpz_mpoly_randtest_bits(res, state, n_randint(state, 5), bits, 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
+    /* The two n_randint calls have side effects on `state`; split them so
+       the consumption order is the same on every architecture (C does not
+       specify the order in which function arguments are evaluated). */
+    length = n_randint(state, 5);
+    exp_bits = 1 + n_randint(state, 3);
+    fmpz_mpoly_randtest_bits(res, state, length, bits, exp_bits, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
 static int
 _gr_fmpz_mpoly_randtest_small(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    fmpz_mpoly_randtest_bits(res, state, n_randint(state, 3), 3, 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
+    slong length;
+    flint_bitcnt_t exp_bits;
+
+    length = n_randint(state, 3);
+    exp_bits = 1 + n_randint(state, 3);
+    fmpz_mpoly_randtest_bits(res, state, length, 3, exp_bits, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
