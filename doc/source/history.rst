@@ -7,6 +7,17 @@ FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+FLINT 3.6.0 (in development)
+-------------------------------------------------------------------------------
+
+Bug fixes
+
+* Fix ``flint_sprintf`` producing truncated output (e.g. ``"x"`` instead of
+  ``"x1"``) on 32-bit glibc, which broke ``mpoly_test_irreducible`` and the
+  ``compose_mpoly`` tests on i386/armhf
+  [EC, `#2648 <https://github.com/flintlib/flint/pull/2648>`_].
+
+
 2026-04-24 -- FLINT 3.5.0
 -------------------------------------------------------------------------------
 
