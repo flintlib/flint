@@ -54,7 +54,12 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_gr_poly(ctx, base_ring);
             break;
         case 1:
-            gr_ctx_init_gr_mpoly(ctx, base_ring, n_randint(state, 3), mpoly_ordering_randtest(state));
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                slong nvars = n_randint(state, 3);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_gr_mpoly(ctx, base_ring, nvars, ord);
+            }
             break;
         case 2:
             gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
@@ -127,16 +132,30 @@ gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
     switch (n_randint(state, 3))
     {
         case 0:
-            gr_ctx_init_fq_nmod(ctx, n_randtest_prime(state, 0), 1 + n_randint(state, 4), NULL);
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                ulong p = n_randtest_prime(state, 0);
+                slong d = 1 + n_randint(state, 4);
+                gr_ctx_init_fq_nmod(ctx, p, d, NULL);
+            }
             break;
 
         case 1:
-            gr_ctx_init_fq_zech(ctx, n_randprime(state, 4, 0), 1 + n_randint(state, 3), NULL);
+            {
+                ulong p = n_randprime(state, 4, 0);
+                slong d = 1 + n_randint(state, 3);
+                gr_ctx_init_fq_zech(ctx, p, d, NULL);
+            }
             break;
 
         case 2:
-            fmpz_randprime(t, state, 2 + n_randint(state, 100), 0);
-            gr_ctx_init_fq(ctx, t, 1 + n_randint(state, 4), NULL);
+            {
+                flint_bitcnt_t bits = 2 + n_randint(state, 100);
+                slong d;
+                fmpz_randprime(t, state, bits, 0);
+                d = 1 + n_randint(state, 4);
+                gr_ctx_init_fq(ctx, t, d, NULL);
+            }
             break;
     }
 
@@ -154,7 +173,16 @@ gr_ctx_init_random_ring_number_field(gr_ctx_t ctx, flint_rand_t state)
 
     do
     {
-        fmpz_poly_randtest_irreducible(g, state, 2 + n_randint(state, 5), 1 + n_randint(state, 10));
+        slong len;
+        flint_bitcnt_t bits;
+
+        /* The two n_randint calls below have side effects on `state`; we
+           split them into separate statements so the order of consumption
+           is the same on every architecture (C does not specify the order
+           in which function arguments are evaluated). */
+        len = 2 + n_randint(state, 5);
+        bits = 1 + n_randint(state, 10);
+        fmpz_poly_randtest_irreducible(g, state, len, bits);
     } while (g->length < 2);
 
     fmpq_poly_set_fmpz_poly(f, g);
@@ -217,10 +245,19 @@ gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_fmpq_poly(ctx);
             break;
         case 2:
-            gr_ctx_init_fmpz_mpoly(ctx, n_randint(state, 3), mpoly_ordering_randtest(state));
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                slong nvars = n_randint(state, 3);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly(ctx, nvars, ord);
+            }
             break;
         case 3:
-            gr_ctx_init_fmpz_mpoly_q(ctx, n_randint(state, 2), mpoly_ordering_randtest(state));
+            {
+                slong nvars = n_randint(state, 2);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly_q(ctx, nvars, ord);
+            }
             break;
     }
 }
@@ -323,10 +360,19 @@ gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state)
     switch (n_randint(state, 2))
     {
         case 0:
-            gr_ctx_init_gr_mpoly(ctx, _gr_random_base_ring(state), n_randint(state, 3), ordering);
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                gr_ctx_struct * base = _gr_random_base_ring(state);
+                slong nvars = n_randint(state, 3);
+                gr_ctx_init_gr_mpoly(ctx, base, nvars, ordering);
+            }
             break;
         case 1:
-            gr_ctx_init_fmpz_mpoly(ctx, n_randint(state, 3), mpoly_ordering_randtest(state));
+            {
+                slong nvars = n_randint(state, 3);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly(ctx, nvars, ord);
+            }
             break;
     }
 }

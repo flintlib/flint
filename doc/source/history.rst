@@ -12,11 +12,16 @@ FLINT 3.6.0 (in development)
 
 Bug fixes
 
+* Fix architecture-dependent test behaviour caused by undefined argument
+  evaluation order in several ``gr_ctx_init_random_*`` and ``_gr_*_randtest``
+  functions, which produced different RNG sequences on 32-bit ARM, i386, and
+  x86_64. Also gate the ``log(a*b) = log(a) + log(b)`` check in
+  ``gr_poly_log_series`` on commutativity of the coefficient ring
+  [EC, `#2649 <https://github.com/flintlib/flint/pull/2649>`_].
 * Fix ``flint_sprintf`` producing truncated output (e.g. ``"x"`` instead of
   ``"x1"``) on 32-bit glibc, which broke ``mpoly_test_irreducible`` and the
   ``compose_mpoly`` tests on i386/armhf
   [EC, `#2648 <https://github.com/flintlib/flint/pull/2648>`_].
-
 
 2026-04-24 -- FLINT 3.5.0
 -------------------------------------------------------------------------------
