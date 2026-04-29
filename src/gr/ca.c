@@ -28,16 +28,16 @@ static int
 _gr_ca_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     if (ctx->which_ring == GR_CTX_RR_CA)
-        gr_stream_write(out, "Real numbers (ca)");
+        return gr_stream_write(out, "Real numbers (ca)");
     else if (ctx->which_ring == GR_CTX_CC_CA)
-        gr_stream_write(out, "Complex numbers (ca)");
+        return gr_stream_write(out, "Complex numbers (ca)");
     else if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA)
-        gr_stream_write(out, "Real algebraic numbers (ca)");
+        return gr_stream_write(out, "Real algebraic numbers (ca)");
     else if (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA)
-        gr_stream_write(out, "Complex algebraic numbers (ca)");
+        return gr_stream_write(out, "Complex algebraic numbers (ca)");
     else if (ctx->which_ring == GR_CTX_COMPLEX_EXTENDED_CA)
-        gr_stream_write(out, "Complex numbers + extended values (ca)");
-    return GR_SUCCESS;
+        return gr_stream_write(out, "Complex numbers + extended values (ca)");
+    return GR_UNABLE;
 }
 
 void
@@ -123,8 +123,7 @@ _gr_ca_randtest(ca_t res, flint_rand_t state, gr_ctx_t ctx)
 static int
 _gr_ca_write(gr_stream_t out, const ca_t x, gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, ca_get_str(x, GR_CA_CTX(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, ca_get_str(x, GR_CA_CTX(ctx)));
 }
 
 static int

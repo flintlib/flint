@@ -41,8 +41,7 @@ _gr_fq_nmod_ctx_clear(gr_ctx_t ctx)
 static int
 _gr_fq_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Finite field (fq_nmod)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Finite field (fq_nmod)");
 }
 
 static int _gr_fq_nmod_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
@@ -113,8 +112,7 @@ _gr_fq_nmod_randtest(fq_nmod_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fq_nmod_write(gr_stream_t out, const fq_nmod_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fq_nmod_get_str_pretty(x, FQ_CTX(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fq_nmod_get_str_pretty(x, FQ_CTX(ctx)));
 }
 
 static int

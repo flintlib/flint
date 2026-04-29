@@ -49,10 +49,11 @@ static int _gr_arf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 static int
 _gr_arf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Floating-point numbers (arf, prec = ");
-    gr_stream_write_si(out, ARF_CTX_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Floating-point numbers (arf, prec = ");
+    status |= gr_stream_write_si(out, ARF_CTX_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 static void
@@ -94,8 +95,7 @@ _gr_arf_randtest(arf_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_arf_write(gr_stream_t out, const arf_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, arf_get_str(x, ARF_CTX_PREC(ctx) * 0.30102999566398 + 1));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, arf_get_str(x, ARF_CTX_PREC(ctx) * 0.30102999566398 + 1));
 }
 
 static int

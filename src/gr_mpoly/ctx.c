@@ -17,18 +17,19 @@
 
 int gr_mpoly_ctx_write(gr_stream_t out, gr_mpoly_ctx_t ctx)
 {
-    gr_stream_write(out, "Ring of multivariate polynomials over ");
-    gr_ctx_write(out, GR_MPOLY_CCTX(ctx));
-    gr_stream_write(out, " in ");
-    gr_stream_write_si(out, GR_MPOLY_NVARS(ctx));
-    gr_stream_write(out, " variables");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Ring of multivariate polynomials over ");
+    status |= gr_ctx_write(out, GR_MPOLY_CCTX(ctx));
+    status |= gr_stream_write(out, " in ");
+    status |= gr_stream_write_si(out, GR_MPOLY_NVARS(ctx));
+    status |= gr_stream_write(out, " variables");
     if (GR_MPOLY_MCTX(ctx)->ord == ORD_LEX)
-        gr_stream_write(out, ", lex order");
+        status |= gr_stream_write(out, ", lex order");
     else if (GR_MPOLY_MCTX(ctx)->ord == ORD_DEGLEX)
-        gr_stream_write(out, ", deglex order");
+        status |= gr_stream_write(out, ", deglex order");
     else if (GR_MPOLY_MCTX(ctx)->ord == ORD_DEGREVLEX)
-        gr_stream_write(out, ", degrevlex order");
-    return GR_SUCCESS;
+        status |= gr_stream_write(out, ", degrevlex order");
+    return status;
 }
 
 void

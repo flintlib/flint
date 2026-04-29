@@ -37,10 +37,11 @@ _gr_fmpz_mod_ctx_struct;
 static int
 _gr_fmpz_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integers mod ");
-    gr_stream_write_fmpz(out, FMPZ_MOD_CTX(ctx)->n);
-    gr_stream_write(out, " (fmpz)");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Integers mod ");
+    status |= gr_stream_write_fmpz(out, FMPZ_MOD_CTX(ctx)->n);
+    status |= gr_stream_write(out, " (fmpz)");
+    return status;
 }
 
 static void
@@ -106,8 +107,7 @@ _gr_fmpz_mod_randtest(fmpz_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fmpz_mod_write(gr_stream_t out, const fmpz_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_fmpz(out, x);
-    return GR_SUCCESS;
+    return gr_stream_write_fmpz(out, x);
 }
 
 static int

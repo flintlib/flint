@@ -220,18 +220,19 @@ nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags)
 int
 nfloat_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
     if (ctx->which_ring == GR_CTX_NFLOAT_COMPLEX)
     {
-        gr_stream_write(out, "Complex floating-point numbers with prec = ");
-        gr_stream_write_si(out, NFLOAT_CTX_PREC(ctx));
-        gr_stream_write(out, " (nfloat_complex)");
-        return GR_SUCCESS;
+        status |= gr_stream_write(out, "Complex floating-point numbers with prec = ");
+        status |= gr_stream_write_si(out, NFLOAT_CTX_PREC(ctx));
+        status |= gr_stream_write(out, " (nfloat_complex)");
     }
     else
     {
-        gr_stream_write(out, "Floating-point numbers with prec = ");
-        gr_stream_write_si(out, NFLOAT_CTX_PREC(ctx));
-        gr_stream_write(out, " (nfloat)");
-        return GR_SUCCESS;
+        status |= gr_stream_write(out, "Floating-point numbers with prec = ");
+        status |= gr_stream_write_si(out, NFLOAT_CTX_PREC(ctx));
+        status |= gr_stream_write(out, " (nfloat)");
     }
+    return status;
 }
+

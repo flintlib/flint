@@ -27,10 +27,11 @@ _mpf_ctx_struct;
 static int
 _gr_mpf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Floating-point numbers with prec = ");
-    gr_stream_write_si(out, GR_MPF_CTX_PREC(ctx));
-    gr_stream_write(out, " (mpf)");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Floating-point numbers with prec = ");
+    status |= gr_stream_write_si(out, GR_MPF_CTX_PREC(ctx));
+    status |= gr_stream_write(out, " (mpf)");
+    return status;
 }
 
 static void

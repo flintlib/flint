@@ -20,15 +20,17 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
-static void
+static int
 _gr_nmod_redc_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integers mod ");
-    gr_stream_write_ui(out, GR_NMOD_REDC_N(ctx));
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Integers mod ");
+    status |= gr_stream_write_ui(out, GR_NMOD_REDC_N(ctx));
     if (GR_NMOD_REDC_IS_FAST(ctx))
-        gr_stream_write(out, " (nmod_redc_fast)");
+        status |= gr_stream_write(out, " (nmod_redc_fast)");
     else
-        gr_stream_write(out, " (nmod_redc)");
+        status |= gr_stream_write(out, " (nmod_redc)");
+    return status;
 }
 
 static truth_t
@@ -83,8 +85,7 @@ _gr_nmod_redc_randtest(ulong * res, flint_rand_t state, gr_ctx_t ctx)
 static int
 _gr_nmod_redc_write(gr_stream_t out, const ulong * x, gr_ctx_t ctx)
 {
-    gr_stream_write_ui(out, nmod_redc_get_nmod(x[0], GR_NMOD_REDC_CTX(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_ui(out, nmod_redc_get_nmod(x[0], GR_NMOD_REDC_CTX(ctx)));
 }
 
 static int

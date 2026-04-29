@@ -29,18 +29,19 @@ _gr_fmpz_mod_mpoly_ctx_t;
 
 static int _gr_fmpz_mod_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Fraction field of multivariate polynomials over finite field (fmpz_mod) mod ");
-    gr_stream_write_fmpz(out, MPOLYNOMIAL_MCTX(ctx)->ffinfo->n);
-    gr_stream_write(out, " in ");
-    gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
-    gr_stream_write(out, " variables");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Fraction field of multivariate polynomials over finite field (fmpz_mod) mod ");
+    status |= gr_stream_write_fmpz(out, MPOLYNOMIAL_MCTX(ctx)->ffinfo->n);
+    status |= gr_stream_write(out, " in ");
+    status |= gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
+    status |= gr_stream_write(out, " variables");
     if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_LEX)
-        gr_stream_write(out, ", lex order");
+        status |= gr_stream_write(out, ", lex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGLEX)
-        gr_stream_write(out, ", deglex order");
+        status |= gr_stream_write(out, ", deglex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGREVLEX)
-        gr_stream_write(out, ", degrevlex order");
-    return GR_SUCCESS;
+        status |= gr_stream_write(out, ", degrevlex order");
+    return status;
 }
 
 static void _gr_fmpz_mod_mpoly_q_ctx_clear(gr_ctx_t ctx)
@@ -170,27 +171,33 @@ _gr_fmpz_mod_mpoly_q_length(const fmpz_mod_mpoly_q_t x, gr_ctx_t ctx)
 static int
 _gr_fmpz_mod_mpoly_q_write(gr_stream_t out, fmpz_mod_mpoly_q_t f, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
     if (fmpz_mod_mpoly_is_one(fmpz_mod_mpoly_q_denref(f), MPOLYNOMIAL_MCTX(ctx)))
     {
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
     }
     else if (fmpz_mod_mpoly_is_fmpz(fmpz_mod_mpoly_q_denref(f), MPOLYNOMIAL_MCTX(ctx)))
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-        gr_stream_write(out, ")/");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, ")/");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
     }
     else
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-        gr_stream_write(out, ")/(");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-        gr_stream_write(out, ")");
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, ")/(");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, ")");
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static truth_t

@@ -85,11 +85,11 @@ void gr_stream_init_file(gr_stream_t out, FILE * fp);
 #endif
 
 void gr_stream_init_str(gr_stream_t out);
-int gr_stream_write(gr_stream_t out, const char * s);
-int gr_stream_write_si(gr_stream_t out, slong x);
-int gr_stream_write_ui(gr_stream_t out, ulong x);
-int gr_stream_write_free(gr_stream_t out, char * s);
-int gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
+WARN_UNUSED_RESULT int gr_stream_write(gr_stream_t out, const char * s);
+WARN_UNUSED_RESULT int gr_stream_write_si(gr_stream_t out, slong x);
+WARN_UNUSED_RESULT int gr_stream_write_ui(gr_stream_t out, ulong x);
+WARN_UNUSED_RESULT int gr_stream_write_free(gr_stream_t out, char * s);
+WARN_UNUSED_RESULT int gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
 #define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)

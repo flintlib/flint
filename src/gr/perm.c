@@ -27,10 +27,11 @@ typedef perm_struct perm_t[1];
 
 static int _gr_perm_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Symmetric group S_");
-    gr_stream_write_ui(out, PERM_N(ctx));
-    gr_stream_write(out, " (perm)");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Symmetric group S_");
+    status |= gr_stream_write_ui(out, PERM_N(ctx));
+    status |= gr_stream_write(out, " (perm)");
+    return status;
 }
 
 static int
@@ -59,19 +60,20 @@ static int
 _gr_perm_write(gr_stream_t out, perm_t x, gr_ctx_t ctx)
 {
     slong i;
+    int status = GR_SUCCESS;
 
-    gr_stream_write(out, "[");
+    status |= gr_stream_write(out, "[");
 
     for (i = 0; i < PERM_N(ctx); i++)
     {
-        gr_stream_write_si(out, x->entries[i]);
+        status |= gr_stream_write_si(out, x->entries[i]);
         if (i + 1 < PERM_N(ctx))
-            gr_stream_write(out, ", ");
+            status |= gr_stream_write(out, ", ");
     }
 
-    gr_stream_write(out, "]");
+    status |= gr_stream_write(out, "]");
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int

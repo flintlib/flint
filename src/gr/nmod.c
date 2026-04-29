@@ -21,12 +21,14 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
-static void
+static int
 _gr_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integers mod ");
-    gr_stream_write_ui(out, NMOD_CTX(ctx).n);
-    gr_stream_write(out, " (_gr_nmod)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Integers mod ");
+    status |= gr_stream_write_ui(out, NMOD_CTX(ctx).n);
+    status |= gr_stream_write(out, " (_gr_nmod)");
+    return status;
 }
 
 static truth_t
@@ -81,8 +83,7 @@ _gr_nmod_randtest(ulong * res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_nmod_write(gr_stream_t out, const ulong * x, const gr_ctx_t ctx)
 {
-    gr_stream_write_ui(out, x[0]);
-    return GR_SUCCESS;
+    return gr_stream_write_ui(out, x[0]);
 }
 
 static int

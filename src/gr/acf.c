@@ -49,10 +49,11 @@ static int _gr_acf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 static int
 _gr_acf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Complex floating-point numbers (acf, prec = ");
-    gr_stream_write_si(out, ACF_CTX_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Complex floating-point numbers (acf, prec = ");
+    status |= gr_stream_write_si(out, ACF_CTX_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 static void
@@ -96,38 +97,39 @@ static int
 _gr_acf_write(gr_stream_t out, const acf_t x, const gr_ctx_t ctx)
 {
     slong digits = ACF_CTX_PREC(ctx) * 0.30102999566398 + 1;
+    int status = GR_SUCCESS;
 
     if (arf_is_zero(acf_imagref(x)))
     {
-        gr_stream_write_free(out, arf_get_str(acf_realref(x), digits));
+        status |= gr_stream_write_free(out, arf_get_str(acf_realref(x), digits));
     }
     else if (arf_is_zero(acf_realref(x)))
     {
-        gr_stream_write_free(out, arf_get_str(acf_imagref(x), digits));
-        gr_stream_write(out, "*I");
+        status |= gr_stream_write_free(out, arf_get_str(acf_imagref(x), digits));
+        status |= gr_stream_write(out, "*I");
     }
     else
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_free(out, arf_get_str(acf_realref(x), digits));
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_free(out, arf_get_str(acf_realref(x), digits));
 
         if (arf_sgn(acf_imagref(x)) < 0)
         {
             arf_t t;
             arf_init_neg_shallow(t, acf_imagref(x));
-            gr_stream_write(out, " - ");
-            gr_stream_write_free(out, arf_get_str(t, digits));
+            status |= gr_stream_write(out, " - ");
+            status |= gr_stream_write_free(out, arf_get_str(t, digits));
         }
         else
         {
-            gr_stream_write(out, " + ");
-            gr_stream_write_free(out, arf_get_str(acf_imagref(x), digits));
+            status |= gr_stream_write(out, " + ");
+            status |= gr_stream_write_free(out, arf_get_str(acf_imagref(x), digits));
         }
 
-        gr_stream_write(out, "*I)");
+        status |= gr_stream_write(out, "*I)");
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int

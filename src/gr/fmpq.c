@@ -28,8 +28,7 @@
 static int
 _gr_fmpq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Rational field (fmpq)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Rational field (fmpq)");
 }
 
 static void
@@ -78,15 +77,16 @@ _gr_fmpq_randtest(fmpq_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fmpq_write(gr_stream_t out, const fmpq_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_fmpz(out, fmpq_numref(x));
+    int status = GR_SUCCESS;
+    status |= gr_stream_write_fmpz(out, fmpq_numref(x));
 
     if (!fmpz_is_one(fmpq_denref(x)))
     {
-        gr_stream_write(out, "/");
-        gr_stream_write_fmpz(out, fmpq_denref(x));
+        status |= gr_stream_write(out, "/");
+        status |= gr_stream_write_fmpz(out, fmpq_denref(x));
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int

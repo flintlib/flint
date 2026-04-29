@@ -56,8 +56,7 @@ static int _gr_fmpq_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 static int
 _gr_fmpq_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Polynomials over rationals (fmpq_poly)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Polynomials over rationals (fmpq_poly)");
 }
 
 static void
@@ -102,8 +101,7 @@ _gr_fmpq_poly_randtest(fmpq_poly_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fmpq_poly_write(gr_stream_t out, const fmpq_poly_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fmpq_poly_get_str_pretty(x, FMPQ_POLY_CTX_VAR(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fmpq_poly_get_str_pretty(x, FMPQ_POLY_CTX_VAR(ctx)));
 }
 
 static int

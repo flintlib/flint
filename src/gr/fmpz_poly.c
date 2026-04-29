@@ -59,8 +59,7 @@ static int _gr_fmpz_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 static int
 _gr_fmpz_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Polynomials over integers (fmpz_poly)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Polynomials over integers (fmpz_poly)");
 }
 
 static void
@@ -110,8 +109,7 @@ _gr_fmpz_poly_write(gr_stream_t out, const fmpz_poly_t x, const gr_ctx_t ctx)
     if (var == NULL)
         var = "x";
 
-    gr_stream_write_free(out, fmpz_poly_get_str_pretty(x, var));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fmpz_poly_get_str_pretty(x, var));
 }
 
 static int

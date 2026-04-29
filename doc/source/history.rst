@@ -22,6 +22,15 @@ Bug fixes
   ``"x1"``) on 32-bit glibc, which broke ``mpoly_test_irreducible`` and the
   ``compose_mpoly`` tests on i386/armhf
   [EC, `#2648 <https://github.com/flintlib/flint/pull/2648>`_].
+* Fix return values for ``gr_write`` and ``gr_ctx_write methods``.
+  Some ``gr_ctx_write`` implementations were incorrectly declared ``void``
+  instead of ``int``, causing test failures on ppc64el. In addition,
+  several methods ignored the return value from inner writes and would always
+  return ``GR_SUCCESS`` even in the case of failure.
+  The ``gr_stream_write`` family of functions have been marked
+  ``WARN_UNUSED_RESULT`` to catch similar bugs more easily.
+  [FJ, `#2652 <https://github.com/flintlib/flint/pull/2652>`_].
+
 
 2026-04-24 -- FLINT 3.5.0
 -------------------------------------------------------------------------------

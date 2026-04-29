@@ -46,20 +46,21 @@ vector_gr_vec_init(gr_vec_t res, gr_ctx_t ctx)
 static int vector_gr_vec_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_ctx_ptr elem_ctx = ENTRY_CTX(ctx);
+    int status = GR_SUCCESS;
 
     if (VECTOR_CTX(ctx)->all_sizes)
     {
-        gr_stream_write(out, "Vectors (any length) over ");
+        status |= gr_stream_write(out, "Vectors (any length) over ");
     }
     else
     {
-        gr_stream_write(out, "Space of length ");
-        gr_stream_write_si(out, VECTOR_CTX(ctx)->n);
-        gr_stream_write(out, " vectors over ");
+        status |= gr_stream_write(out, "Space of length ");
+        status |= gr_stream_write_si(out, VECTOR_CTX(ctx)->n);
+        status |= gr_stream_write(out, " vectors over ");
     }
 
-    gr_ctx_write(out, elem_ctx);
-    return GR_SUCCESS;
+    status |= gr_ctx_write(out, elem_ctx);
+    return status;
 }
 
 static truth_t vector_ctx_is_ring(gr_ctx_t ctx)

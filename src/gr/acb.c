@@ -61,10 +61,11 @@ static int _gr_acb_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 static int
 _gr_acb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Complex numbers (acb, prec = ");
-    gr_stream_write_si(out, ACB_CTX_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Complex numbers (acb, prec = ");
+    status |= gr_stream_write_si(out, ACB_CTX_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 static void
@@ -105,6 +106,8 @@ _gr_acb_randtest(acb_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 __gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
+
     if (arb_is_zero(acb_imagref(x)))
     {
         /* used by polynomial printing */
@@ -112,32 +115,29 @@ __gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr
         {
             if (arf_is_zero(arb_midref(acb_realref(x))))
             {
-                gr_stream_write(out, "0");
-                return GR_SUCCESS;
+                return gr_stream_write(out, "0");
             }
             else if (arf_is_one(arb_midref(acb_realref(x))))
             {
-                gr_stream_write(out, "1");
-                return GR_SUCCESS;
+                return gr_stream_write(out, "1");
             }
             else if (arf_equal_si(arb_midref(acb_realref(x)), -1))
             {
-                gr_stream_write(out, "-1");
-                return GR_SUCCESS;
+                return gr_stream_write(out, "-1");
             }
         }
 
-        gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
+        status |= gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
     }
     else if (arb_is_zero(acb_realref(x)))
     {
-        gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
-        gr_stream_write(out, "*I");
+        status |= gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
+        status |= gr_stream_write(out, "*I");
     }
     else
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
 
         if ((arb_is_exact(acb_imagref(x)) || (flags & ARB_STR_NO_RADIUS))
                 && arf_sgn(arb_midref(acb_imagref(x))) < 0)
@@ -145,20 +145,20 @@ __gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr
             arb_t t;
             arb_init(t);
             arb_neg(t, acb_imagref(x));
-            gr_stream_write(out, " - ");
-            gr_stream_write_free(out, arb_get_str(t, digits, flags));
+            status |= gr_stream_write(out, " - ");
+            status |= gr_stream_write_free(out, arb_get_str(t, digits, flags));
             arb_clear(t);
         }
         else
         {
-            gr_stream_write(out, " + ");
-            gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
+            status |= gr_stream_write(out, " + ");
+            status |= gr_stream_write_free(out, arb_get_str(acb_imagref(x), digits, flags));
         }
 
-        gr_stream_write(out, "*I)");
+        status |= gr_stream_write(out, "*I)");
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 static int
 _gr_acb_write(gr_stream_t out, const acb_t x, const gr_ctx_t ctx)
