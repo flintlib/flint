@@ -42,9 +42,10 @@ typedef gr_fraction_ctx_struct gr_fraction_ctx_t[1];
 static int
 _gr_fraction_ctx_write(gr_stream_t out, gr_fraction_ctx_t ctx)
 {
-    gr_stream_write(out, "Fraction field over ");
-    gr_ctx_write(out, GR_FRACTION_DOMAIN_CTX(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Fraction field over ");
+    status |= gr_ctx_write(out, GR_FRACTION_DOMAIN_CTX(ctx));
+    return status;
 }
 
 static void

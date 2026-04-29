@@ -31,9 +31,10 @@ polynomial_init(gr_poly_t res, gr_ctx_t ctx)
 
 static int polynomial_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Ring of polynomials over ");
-    gr_ctx_write(out, POLYNOMIAL_ELEM_CTX(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Ring of polynomials over ");
+    status |= gr_ctx_write(out, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
 }
 
 static int _gr_gr_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
@@ -161,13 +162,6 @@ polynomial_set_shallow(gr_poly_t res, const gr_poly_t x, const gr_ctx_t ctx)
 static int
 polynomial_write(gr_stream_t out, gr_poly_t poly, gr_ctx_t ctx)
 {
-    /* todo */
-    if (poly->length == 0)
-    {
-        gr_stream_write(out, "0");
-        return GR_SUCCESS;
-    }
-
     return gr_poly_write(out, poly, POLYNOMIAL_CTX(ctx)->var, POLYNOMIAL_ELEM_CTX(ctx));
 }
 

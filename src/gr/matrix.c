@@ -56,28 +56,29 @@ static int
 matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_ctx_ptr elem_ctx = MATRIX_CTX(ctx)->base_ring;
+    int status = GR_SUCCESS;
 
     if (MATRIX_CTX(ctx)->all_sizes)
     {
-        gr_stream_write(out, "Matrices (any shape) over ");
+        status |= gr_stream_write(out, "Matrices (any shape) over ");
     }
     else
     {
         if (gr_ctx_is_ring(ctx) == T_TRUE)
-            gr_stream_write(out, "Ring of ");
+            status |= gr_stream_write(out, "Ring of ");
         else
-            gr_stream_write(out, "Space of ");
+            status |= gr_stream_write(out, "Space of ");
 
-        gr_stream_write_si(out, MATRIX_CTX(ctx)->nrows);
-        gr_stream_write(out, " x ");
-        gr_stream_write_si(out, MATRIX_CTX(ctx)->ncols);
-        gr_stream_write(out, " ");
+        status |= gr_stream_write_si(out, MATRIX_CTX(ctx)->nrows);
+        status |= gr_stream_write(out, " x ");
+        status |= gr_stream_write_si(out, MATRIX_CTX(ctx)->ncols);
+        status |= gr_stream_write(out, " ");
 
-        gr_stream_write(out, "matrices over ");
+        status |= gr_stream_write(out, "matrices over ");
     }
 
-    gr_ctx_write(out, elem_ctx);
-    return GR_SUCCESS;
+    status |= gr_ctx_write(out, elem_ctx);
+    return status;
 }
 
 static truth_t matrix_ctx_is_ring(gr_ctx_t ctx)

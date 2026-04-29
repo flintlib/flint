@@ -23,8 +23,7 @@
 static int
 _gr_fmpzi_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Gaussian integer ring (fmpzi)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Gaussian integer ring (fmpzi)");
 }
 
 static int
@@ -88,41 +87,42 @@ _gr_fmpzi_randtest(fmpzi_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fmpzi_write(gr_stream_t out, const fmpzi_t x, const gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
     if (fmpz_is_zero(fmpzi_imagref(x)))
     {
-        gr_stream_write_fmpz(out, fmpzi_realref(x));
+        status |= gr_stream_write_fmpz(out, fmpzi_realref(x));
     }
     else if (fmpz_is_zero(fmpzi_realref(x)))
     {
         if (fmpz_is_one(fmpzi_imagref(x)))
-            gr_stream_write(out, "I");
+            status |= gr_stream_write(out, "I");
         else if (fmpz_equal_si(fmpzi_imagref(x), -1))
-            gr_stream_write(out, "-I");
+            status |= gr_stream_write(out, "-I");
         else
         {
-            gr_stream_write_fmpz(out, fmpzi_imagref(x));
-            gr_stream_write(out, "*I");
+            status |= gr_stream_write_fmpz(out, fmpzi_imagref(x));
+            status |= gr_stream_write(out, "*I");
         }
     }
     else
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_fmpz(out, fmpzi_realref(x));
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_fmpz(out, fmpzi_realref(x));
 
         if (fmpz_is_one(fmpzi_imagref(x)))
-            gr_stream_write(out, "+I)");
+            status |= gr_stream_write(out, "+I)");
         else if (fmpz_equal_si(fmpzi_imagref(x), -1))
-            gr_stream_write(out, "-I)");
+            status |= gr_stream_write(out, "-I)");
         else
         {
             if (fmpz_sgn(fmpzi_imagref(x)) > 0)
-                gr_stream_write(out, "+");
-            gr_stream_write_fmpz(out, fmpzi_imagref(x));
-            gr_stream_write(out, "*I)");
+                status |= gr_stream_write(out, "+");
+            status |= gr_stream_write_fmpz(out, fmpzi_imagref(x));
+            status |= gr_stream_write(out, "*I)");
         }
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int

@@ -27,13 +27,14 @@ void gr_series_mod_ctx_clear(gr_ctx_t ctx)
 
 int gr_series_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Power series over ");
-    gr_ctx_write(out, GR_SERIES_MOD_ELEM_CTX(ctx));
-    gr_stream_write(out, " mod ");
-    gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
-    gr_stream_write(out, "^");
-    gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Power series over ");
+    status |= gr_ctx_write(out, GR_SERIES_MOD_ELEM_CTX(ctx));
+    status |= gr_stream_write(out, " mod ");
+    status |= gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
+    return status;
 }
 
 truth_t
@@ -174,11 +175,11 @@ int gr_series_mod_write(gr_stream_t out, const gr_poly_t x, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     status |= gr_poly_write(out, x, GR_SERIES_MOD_CTX(ctx)->var, GR_SERIES_MOD_ELEM_CTX(ctx));
-    gr_stream_write(out, " (mod ");
-    gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
-    gr_stream_write(out, "^");
-    gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
-    gr_stream_write(out, ")");
+    status |= gr_stream_write(out, " (mod ");
+    status |= gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
+    status |= gr_stream_write(out, ")");
     return status;
 }
 

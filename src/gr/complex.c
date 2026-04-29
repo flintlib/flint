@@ -38,9 +38,10 @@ typedef gr_complex_ctx_struct gr_complex_ctx_t[1];
 static int
 _gr_complex_ctx_write(gr_stream_t out, gr_complex_ctx_t ctx)
 {
-    gr_stream_write(out, "Complex algebra over ");
-    gr_ctx_write(out, REAL_CTX(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Complex algebra over ");
+    status |= gr_ctx_write(out, REAL_CTX(ctx));
+    return status;
 }
 
 static void

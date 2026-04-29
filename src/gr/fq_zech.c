@@ -42,8 +42,7 @@ _gr_fq_zech_ctx_clear(gr_ctx_t ctx)
 static int
 _gr_fq_zech_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Finite field (fq_zech)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Finite field (fq_zech)");
 }
 
 static int _gr_fq_zech_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
@@ -114,8 +113,7 @@ _gr_fq_zech_randtest(fq_zech_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fq_zech_write(gr_stream_t out, const fq_zech_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fq_zech_get_str_pretty(x, FQ_CTX(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fq_zech_get_str_pretty(x, FQ_CTX(ctx)));
 }
 
 static int

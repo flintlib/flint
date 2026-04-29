@@ -29,8 +29,7 @@
 static int
 _gr_fmpz_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integer ring (fmpz)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Integer ring (fmpz)");
 }
 
 static void
@@ -79,8 +78,7 @@ _gr_fmpz_randtest(fmpz_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fmpz_write(gr_stream_t out, const fmpz_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_fmpz(out, x);
-    return GR_SUCCESS;
+    return gr_stream_write_fmpz(out, x);
 }
 
 static int

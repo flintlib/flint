@@ -27,48 +27,49 @@ static const char * default_var = "D";
 
 int gr_ore_poly_ctx_write(gr_stream_t out, gr_ore_poly_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
     switch (GR_ORE_POLY_CTX(ctx)->which_algebra)
     {
         case ORE_ALGEBRA_CUSTOM:
-            gr_stream_write(out, "Custom Ore polynomials");
+            status |= gr_stream_write(out, "Custom Ore polynomials");
             break;
         case ORE_ALGEBRA_COMMUTATIVE:
-            gr_stream_write(out, "Commutative Ore polynomials");
+            status |= gr_stream_write(out, "Commutative Ore polynomials");
             break;
         case ORE_ALGEBRA_DERIVATIVE:
-            gr_stream_write(out, "Differential operators");
+            status |= gr_stream_write(out, "Differential operators");
             break;
         case ORE_ALGEBRA_EULER_DERIVATIVE:
-            gr_stream_write(out, "Differential operators (Euler derivative)");
+            status |= gr_stream_write(out, "Differential operators (Euler derivative)");
             break;
         case ORE_ALGEBRA_FORWARD_SHIFT:
-            gr_stream_write(out, "Difference operators (forward shift)");
+            status |= gr_stream_write(out, "Difference operators (forward shift)");
             break;
         case ORE_ALGEBRA_FORWARD_DIFFERENCE:
-            gr_stream_write(out, "Difference operators (forward differences)");
+            status |= gr_stream_write(out, "Difference operators (forward differences)");
             break;
         case ORE_ALGEBRA_BACKWARD_SHIFT:
-            gr_stream_write(out, "Difference operators (backward shift)");
+            status |= gr_stream_write(out, "Difference operators (backward shift)");
             break;
         case ORE_ALGEBRA_BACKWARD_DIFFERENCE:
-            gr_stream_write(out, "Difference operators (backward differences)");
+            status |= gr_stream_write(out, "Difference operators (backward differences)");
             break;
         case ORE_ALGEBRA_Q_SHIFT:
-            gr_stream_write(out, "q-difference operators (q-shift)");
+            status |= gr_stream_write(out, "q-difference operators (q-shift)");
             break;
         case ORE_ALGEBRA_MAHLER:
-            gr_stream_write(out, "Mahler operators");
+            status |= gr_stream_write(out, "Mahler operators");
             break;
         case ORE_ALGEBRA_FROBENIUS:
-            gr_stream_write(out, "Ore-Frobenius polynomials");
+            status |= gr_stream_write(out, "Ore-Frobenius polynomials");
             break;
         default:
-            gr_stream_write(out, "Ore polynomials");
+            status |= gr_stream_write(out, "Ore polynomials");
             break;
     }
-    gr_stream_write(out, " over ");
-    gr_ctx_write(out, GR_ORE_POLY_ELEM_CTX(ctx));
-    return GR_SUCCESS;
+    status |= gr_stream_write(out, " over ");
+    status |= gr_ctx_write(out, GR_ORE_POLY_ELEM_CTX(ctx));
+    return status;
 }
 
 int _gr_ore_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
@@ -172,13 +173,6 @@ gr_ore_poly_ctx_is_threadsafe(gr_ore_poly_ctx_t ctx)
 static int
 ore_poly_write(gr_stream_t out, gr_ore_poly_t poly, gr_ctx_t ctx)
 {
-    /* todo */
-    if (poly->length == 0)
-    {
-        gr_stream_write(out, "0");
-        return GR_SUCCESS;
-    }
-
     return gr_ore_poly_write(out, poly, ctx);
 }
 

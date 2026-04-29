@@ -24,12 +24,14 @@
 
 typedef uint8_t nmod8_t[1];
 
-static void
+static int
 nmod8_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integers mod ");
-    gr_stream_write_ui(out, NMOD8_CTX(ctx).n);
-    gr_stream_write(out, " (nmod8)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Integers mod ");
+    status |= gr_stream_write_ui(out, NMOD8_CTX(ctx).n);
+    status |= gr_stream_write(out, " (nmod8)");
+    return status;
 }
 
 /* todo: n_is_prime is fast, but this should still be cached
@@ -76,8 +78,7 @@ nmod8_randtest(nmod8_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 nmod8_write(gr_stream_t out, const nmod8_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_ui(out, x[0]);
-    return GR_SUCCESS;
+    return gr_stream_write_ui(out, x[0]);
 }
 
 static int

@@ -15,8 +15,7 @@
 
 static int _gr_psl2z_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Modular group (psl2z)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Modular group (psl2z)");
 }
 
 static int
@@ -42,16 +41,17 @@ _gr_psl2z_swap(psl2z_t x, psl2z_t y, gr_ctx_t ctx)
 static int
 _gr_psl2z_write(gr_stream_t out, psl2z_t x, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "[[");
-    gr_stream_write_fmpz(out, &x->a);
-    gr_stream_write(out, ", ");
-    gr_stream_write_fmpz(out, &x->b);
-    gr_stream_write(out, "], [");
-    gr_stream_write_fmpz(out, &x->c);
-    gr_stream_write(out, ", ");
-    gr_stream_write_fmpz(out, &x->d);
-    gr_stream_write(out, "]]");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "[[");
+    status |= gr_stream_write_fmpz(out, &x->a);
+    status |= gr_stream_write(out, ", ");
+    status |= gr_stream_write_fmpz(out, &x->b);
+    status |= gr_stream_write(out, "], [");
+    status |= gr_stream_write_fmpz(out, &x->c);
+    status |= gr_stream_write(out, ", ");
+    status |= gr_stream_write_fmpz(out, &x->d);
+    status |= gr_stream_write(out, "]]");
+    return status;
 }
 
 static int

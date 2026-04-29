@@ -16,8 +16,7 @@
 static int
 _gr_fexpr_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Symbolic expressions (fexpr)");
-    return GR_SUCCESS;
+    return gr_stream_write(out, "Symbolic expressions (fexpr)");
 }
 
 static void
@@ -58,8 +57,7 @@ _gr_fexpr_randtest(fexpr_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 _gr_fexpr_write(gr_stream_t out, const fexpr_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fexpr_get_str(x));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fexpr_get_str(x));
 }
 
 static int

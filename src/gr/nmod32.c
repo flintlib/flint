@@ -24,12 +24,14 @@
 
 typedef uint32_t nmod32_t[1];
 
-static void
+static int
 nmod32_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integers mod ");
-    gr_stream_write_ui(out, NMOD32_CTX(ctx).n);
-    gr_stream_write(out, " (nmod32)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Integers mod ");
+    status |= gr_stream_write_ui(out, NMOD32_CTX(ctx).n);
+    status |= gr_stream_write(out, " (nmod32)");
+    return status;
 }
 
 /* we don't want to call n_is_prime because this predicate should
@@ -76,8 +78,7 @@ nmod32_randtest(nmod32_t res, flint_rand_t state, const gr_ctx_t ctx)
 static int
 nmod32_write(gr_stream_t out, const nmod32_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_ui(out, x[0]);
-    return GR_SUCCESS;
+    return gr_stream_write_ui(out, x[0]);
 }
 
 static int

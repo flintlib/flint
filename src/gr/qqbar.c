@@ -45,24 +45,26 @@ _gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit)
 static int
 _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
+
     if (QQBAR_CTX(ctx)->real_only)
-        gr_stream_write(out, "Real algebraic numbers (qqbar)");
+        status |= gr_stream_write(out, "Real algebraic numbers (qqbar)");
     else
-        gr_stream_write(out, "Complex algebraic numbers (qqbar)");
+        status |= gr_stream_write(out, "Complex algebraic numbers (qqbar)");
 
     if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX)
     {
-        gr_stream_write(out, ", deg_limit = ");
-        gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
+        status |= gr_stream_write(out, ", deg_limit = ");
+        status |= gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
     }
 
     if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
     {
-        gr_stream_write(out, ", bits_limit = ");
-        gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
+        status |= gr_stream_write(out, ", bits_limit = ");
+        status |= gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static void
@@ -132,17 +134,18 @@ static int
 _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
 {
     char *re_s, *im_s;
+    int status = GR_SUCCESS;
 
     if (qqbar_is_rational(x))
     {
         fmpq_t t;
         fmpq_init(t);
         qqbar_get_fmpq(t, x);
-        gr_stream_write_fmpz(out, fmpq_numref(t));
+        status |= gr_stream_write_fmpz(out, fmpq_numref(t));
         if (!fmpz_is_one(fmpq_denref(t)))
         {
-            gr_stream_write(out, "/");
-            gr_stream_write_fmpz(out, fmpq_denref(t));
+            status |= gr_stream_write(out, "/");
+            status |= gr_stream_write_fmpz(out, fmpq_denref(t));
         }
         fmpq_clear(t);
     }
@@ -150,11 +153,11 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
     {
         qqbar_get_decimal_root_nearest(&re_s, &im_s, x, 6);
 
-        gr_stream_write(out, "Root a = ");
+        status |= gr_stream_write(out, "Root a = ");
 
         if (re_s != NULL)
         {
-            gr_stream_write_free(out, re_s);
+            status |= gr_stream_write_free(out, re_s);
         }
 
         if (im_s != NULL)
@@ -163,28 +166,28 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
             {
                 if (im_s[0] == '-')
                 {
-                    gr_stream_write(out, " - ");
-                    gr_stream_write(out, im_s + 1);
+                    status |= gr_stream_write(out, " - ");
+                    status |= gr_stream_write(out, im_s + 1);
                     flint_free(im_s);
                 }
                 else
                 {
-                    gr_stream_write(out, " + ");
-                    gr_stream_write_free(out, im_s);
+                    status |= gr_stream_write(out, " + ");
+                    status |= gr_stream_write_free(out, im_s);
                 }
             }
             else
             {
-                gr_stream_write_free(out, im_s);
+                status |= gr_stream_write_free(out, im_s);
             }
 
-            gr_stream_write(out, "*I");
+            status |= gr_stream_write(out, "*I");
         }
-        gr_stream_write(out, " of ");
-        gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
+        status |= gr_stream_write(out, " of ");
+        status |= gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 static int

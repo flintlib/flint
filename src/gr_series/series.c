@@ -153,19 +153,20 @@ int
 gr_series_write(gr_stream_t out, const gr_series_t x, gr_ctx_t ctx)
 {
     const char * var = GR_SERIES_CTX(ctx)->var;
+    int status = GR_SUCCESS;
 
-    gr_poly_write(out, GR_SERIES_POLY(x), var, GR_SERIES_ELEM_CTX(ctx));
+    status |= gr_poly_write(out, GR_SERIES_POLY(x), var, GR_SERIES_ELEM_CTX(ctx));
 
     if (GR_SERIES_ERROR(x) != GR_SERIES_ERR_EXACT)
     {
-        gr_stream_write(out, " + O(");
-        gr_stream_write(out, var);
-        gr_stream_write(out, "^");
-        gr_stream_write_si(out, GR_SERIES_ERROR(x));
-        gr_stream_write(out, ")");
+        status |= gr_stream_write(out, " + O(");
+        status |= gr_stream_write(out, var);
+        status |= gr_stream_write(out, "^");
+        status |= gr_stream_write_si(out, GR_SERIES_ERROR(x));
+        status |= gr_stream_write(out, ")");
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 int
@@ -1869,15 +1870,16 @@ void gr_series_ctx_clear(gr_ctx_t ctx)
 
 int gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Power series over ");
-    gr_ctx_write(out, GR_SERIES_ELEM_CTX(ctx));
-    gr_stream_write(out, " with precision ");
-    gr_stream_write(out, "O(");
-    gr_stream_write(out, GR_SERIES_CTX(ctx)->var);
-    gr_stream_write(out, "^");
-    gr_stream_write_si(out, GR_SERIES_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Power series over ");
+    status |= gr_ctx_write(out, GR_SERIES_ELEM_CTX(ctx));
+    status |= gr_stream_write(out, " with precision ");
+    status |= gr_stream_write(out, "O(");
+    status |= gr_stream_write(out, GR_SERIES_CTX(ctx)->var);
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, GR_SERIES_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 truth_t

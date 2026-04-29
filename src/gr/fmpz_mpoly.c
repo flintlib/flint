@@ -30,17 +30,18 @@ _gr_fmpz_mpoly_ctx_t;
 
 static int _gr_fmpz_mpoly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Ring of multivariate polynomials over Integer ring (fmpz)");
-    gr_stream_write(out, " in ");
-    gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
-    gr_stream_write(out, " variables");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Ring of multivariate polynomials over Integer ring (fmpz)");
+    status |= gr_stream_write(out, " in ");
+    status |= gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
+    status |= gr_stream_write(out, " variables");
     if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_LEX)
-        gr_stream_write(out, ", lex order");
+        status |= gr_stream_write(out, ", lex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGLEX)
-        gr_stream_write(out, ", deglex order");
+        status |= gr_stream_write(out, ", deglex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGREVLEX)
-        gr_stream_write(out, ", degrevlex order");
-    return GR_SUCCESS;
+        status |= gr_stream_write(out, ", degrevlex order");
+    return status;
 }
 
 void
@@ -178,8 +179,7 @@ _gr_fmpz_mpoly_length(const fmpz_mpoly_t x, gr_ctx_t ctx)
 static int
 _gr_fmpz_mpoly_write(gr_stream_t out, fmpz_mpoly_t poly, gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(poly, (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(poly, (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
 }
 
 static truth_t

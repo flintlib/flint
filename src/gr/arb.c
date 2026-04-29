@@ -102,10 +102,11 @@ static int _gr_arb_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 static int
 _gr_arb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Real numbers (arb, prec = ");
-    gr_stream_write_si(out, ARB_CTX_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Real numbers (arb, prec = ");
+    status |= gr_stream_write_si(out, ARB_CTX_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 static void
@@ -151,32 +152,21 @@ _gr_arb_write(gr_stream_t out, const arb_t x, const gr_ctx_t ctx)
     if (arb_is_exact(x))
     {
         if (arf_is_zero(arb_midref(x)))
-        {
-            gr_stream_write(out, "0");
-            return GR_SUCCESS;
-        }
+            return gr_stream_write(out, "0");
         else if (arf_is_one(arb_midref(x)))
-        {
-            gr_stream_write(out, "1");
-            return GR_SUCCESS;
-        }
+            return gr_stream_write(out, "1");
         else if (arf_equal_si(arb_midref(x), -1))
-        {
-            gr_stream_write(out, "-1");
-            return GR_SUCCESS;
-        }
+            return gr_stream_write(out, "-1");
     }
 
-    gr_stream_write_free(out, arb_get_str(x, ARB_CTX_PREC(ctx) * 0.30102999566398 + 1, 0));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, arb_get_str(x, ARB_CTX_PREC(ctx) * 0.30102999566398 + 1, 0));
 }
 
 static int
 _gr_arb_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
 {
     n = FLINT_MAX(n, 1);
-    gr_stream_write_free(out, arb_get_str(x, n, ARB_STR_NO_RADIUS));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, arb_get_str(x, n, ARB_STR_NO_RADIUS));
 }
 
 static int
