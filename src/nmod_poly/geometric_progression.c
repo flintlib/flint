@@ -105,24 +105,29 @@ void _nmod_geometric_progression_interpolate_init_nonfullword(nmod_geometric_pro
     G->int_s2[0] = 1;
     G->int_s3[0] = 1;
 
+    const ulong one_precomp = n_mulmod_precomp_shoup(UWORD(1), mod.n);
     ulong q_pow_i = 1;
+    ulong q_pow_i_pr = one_precomp;
     ulong inv_q_pow_i = 1;
+    ulong inv_q_pow_i_pr = one_precomp;
     ulong inv_q_i = 1;
+    ulong inv_q_i_pr = one_precomp;
     ulong prod_diff = 1;
 
-    /* TODO improve with Shoup */
     for (slong i = 1; i < len; i++)
     {
-        inv_q_i = nmod_mul(inv_q_i, inv_q_pow_i, mod);      /* 1 / q_i */
-        inv_q_pow_i = nmod_mul(inv_q_pow_i, inv_q, mod);    /* 1 / q**i */
-        G->int_f2->coeffs[i] = nmod_mul(G->int_f2->coeffs[i-1], q_pow_i, mod);  /* q_i */
-        q_pow_i = nmod_mul(q_pow_i, q, mod);                /* q**i */
+        ulong inv_q_pow_i_pr_rem = n_mulmod_precomp_shoup_rem_from_quo(inv_q_pow_i_pr, mod.n);
+        n_mulmod_and_precomp_shoup(&inv_q_i, &inv_q_i_pr, inv_q_pow_i, inv_q_i, inv_q_pow_i_pr, inv_q_pow_i_pr_rem, inv_q_i_pr, mod.n);  /* 1 / q_i */
+        /* inv_q_pow_i = n_mulmod_shoup(inv_q, inv_q_pow_i, inv_q_pr_quo, mod.n); */  
+        n_mulmod_and_precomp_shoup(&inv_q_pow_i, &inv_q_pow_i_pr, inv_q, inv_q_pow_i, inv_q_pr_quo, inv_q_pr_rem, inv_q_pow_i_pr, mod.n);  /* 1 / q**i */
+        G->int_f2->coeffs[i] = n_mulmod_shoup(q_pow_i, G->int_f2->coeffs[i-1], q_pow_i_pr, mod.n);  /* q_i */
+        n_mulmod_and_precomp_shoup(&q_pow_i, &q_pow_i_pr, q, q_pow_i, q_pr_quo, q_pr_rem, q_pow_i_pr, mod.n);  /* q**i */ 
         G->int_s3[i] = q_pow_i - 1;                         /* temporarily, G->int_s3[i] = q**i - 1 */
         prod_diff = nmod_mul(q_pow_i - 1, prod_diff, mod);  /* u_i */
         if (i % 2)  /* i is odd */
-            G->int_s2[i] = nmod_mul(mod.n - prod_diff, inv_q_i, mod);  /* (-1)**i * u_i / q_i */
+            G->int_s2[i] = n_mulmod_shoup(inv_q_i, mod.n - prod_diff, inv_q_i_pr, mod.n);  /* (-1)**i * u_i / q_i */
         else  /* i is even */
-            G->int_s2[i] = nmod_mul(prod_diff, inv_q_i, mod);          /* (-1)**i * u_i / q_i */
+            G->int_s2[i] = n_mulmod_shoup(inv_q_i, prod_diff, inv_q_i_pr, mod.n);          /* (-1)**i * u_i / q_i */
     }
 
     G->int_s1[len-1] = nmod_inv(prod_diff, mod);  /* 1 / u_{len-1} */
@@ -179,7 +184,6 @@ void _nmod_geometric_progression_interpolate_init(nmod_geometric_progression_t G
     ulong inv_q_i = 1;
     ulong prod_diff = 1;
 
-    /* TODO improve with Shoup */
     for (slong i = 1; i < len; i++)
     {
         inv_q_i = nmod_mul(inv_q_i, inv_q_pow_i, mod);      /* 1 / q_i */
