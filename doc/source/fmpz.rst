@@ -22,9 +22,9 @@ to understand, except for three important things.
 
 Firstly, :type:`fmpz_t`'s will be more efficient than :type:`mpz_t`'s
 for single limb operations, or more precisely for signed quantities
-whose absolute value does not exceed ``FLINT_BITS - 2``` bits.
+whose absolute value does not exceed ``FLINT_BITS - 2`` bits.
 
-Secondly, for small integers that fit into ```FLINT_BITS - 2``` bits
+Secondly, for small integers that fit into ``FLINT_BITS - 2`` bits
 much less memory will be used than for an :type:`mpz_t`. When very
 many :type:`fmpz_t`'s are used, there can be important cache benefits
 on account of this.
