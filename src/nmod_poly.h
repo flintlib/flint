@@ -68,7 +68,6 @@ typedef struct
     slong len;                    // number of points
 } nmod_geometric_progression_struct;
 
-
 typedef nmod_geometric_progression_struct nmod_geometric_progression_t[1];
 
 /* Memory management  ********************************************************/

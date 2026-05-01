@@ -16,6 +16,7 @@
 #include "profiler.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 #include "nmod_vec.h"
 
 #define __NB_ITER 10
@@ -54,8 +55,8 @@ typedef struct
     slong npoints_precomp;
 } info_t;
 
-/* tree, counting only precomputations */
-void sample_nmod_vec_fast_onlyprecomp(void * arg, ulong count)
+/* precomputation for general points (subproduct tree) */
+void sample_general_precomp(void * arg, ulong count)
 {
     ulong n;
     nmod_t mod;
@@ -91,8 +92,8 @@ void sample_nmod_vec_fast_onlyprecomp(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
-/* geometric: fast, counting only precomputations */
-void sample_nmod_vec_geom_fast_onlyprecomp(void * arg, ulong count)
+/* precomputations for geometric progression (eval+interp) */
+void sample_geometric_precomp(void * arg, ulong count)
 {
     ulong n;
     nmod_t mod;
@@ -116,10 +117,61 @@ void sample_nmod_vec_geom_fast_onlyprecomp(void * arg, ulong count)
 
         prof_start();
         for (ulong ii = 0; ii < __NB_ITER; ii++)
+        {
             nmod_geometric_progression_init(G, r, npoints_precomp, mod);
+            nmod_geometric_progression_clear(G);
+        }
         prof_stop();
 
-        nmod_geometric_progression_clear(G);
+    }
+
+    FLINT_TEST_CLEAR(state);
+}
+
+/* precomputations for geometric progression (eval only) */
+void sample_geometric_precomp_eval(void * arg, ulong count)
+{
+    ulong n;
+    nmod_t mod;
+    ulong i;
+
+    info_t * info = (info_t *) arg;
+    flint_bitcnt_t bits = info->bits;
+    slong npoints_precomp = info->npoints_precomp;
+
+    FLINT_TEST_INIT(state);
+
+    for (i = 0; i < count; i++)
+    {
+        n = n_randprime(state, bits, 1);
+        nmod_init(&mod, n);
+        ulong r = nmod_find_root(2*npoints_precomp, mod);
+        if (r == 0)
+            flint_printf("\n...could not find element of suitable order for geometric progression...\n");
+
+        nmod_geometric_progression_t G;
+        G->len = npoints_precomp;
+        G->mod = mod;
+        const ulong q = nmod_mul(r, r, mod);
+        const ulong inv_r = nmod_inv(r, mod);
+        const ulong inv_q = nmod_mul(inv_r, inv_r, mod);
+
+        prof_start();
+        if (NMOD_CAN_USE_SHOUP(mod) && npoints_precomp >= 4)
+            for (ulong ii = 0; ii < __NB_ITER; ii++)
+            {
+                _nmod_geometric_progression_evaluate_init_nonfullword(G, r, npoints_precomp, mod, q, inv_r, inv_q);
+                nmod_poly_clear(G->ev_f);
+                flint_free(G->ev_s);
+            }
+        else
+            for (ulong ii = 0; ii < __NB_ITER; ii++)
+            {
+                _nmod_geometric_progression_evaluate_init(G, r, npoints_precomp, mod, q, inv_r, inv_q);
+                nmod_poly_clear(G->ev_f);
+                flint_free(G->ev_s);
+            }
+        prof_stop();
     }
 
     FLINT_TEST_CLEAR(state);
@@ -181,26 +233,28 @@ int main(int argc, char * argv[])
     /* }; */
 
     double tmp;
-    double time_fast_onlyprecomp;
-    double time_geom_fast_onlyprecomp;
+    double time_general;
+    double time_geometric_all;
+    double time_geometric_eval;
+    /* double time_geometric_interp; */
 
     info_t info;
     flint_bitcnt_t i;
 
     flint_printf("unit: measurements in ms\n");
 
-    for (i = 62; i <= FLINT_BITS; i++)
+    for (i = 63; i <= FLINT_BITS; i++)
     {
         info.bits = i;
 
         printf("==== nbits = %ld====\n", i);
 
         if (func_bench == 0)  /* bench all */
-            flint_printf("len\tpoints | general | geometric \n");
+            flint_printf("len\tpoints | general |   geom  |  g-eval  \n");
         else if (func_bench == 1)  /* general only */
             flint_printf("len\tpoints | general\n");
         else if (func_bench == 2)  /* geometric only */
-            flint_printf("len\tpoints | geometric\n");
+            flint_printf("len\tpoints |   geom  |  g-eval  \n");
 
         for (int len = 0; len < nb_lens; ++len)
         {
@@ -210,29 +264,34 @@ int main(int argc, char * argv[])
             info.length = lengths[len];
 
             if (func_bench == 0 || func_bench == 1)
-                prof_repeat(&time_fast_onlyprecomp, &tmp, sample_nmod_vec_fast_onlyprecomp, (void *) &info);
+                prof_repeat(&time_general, &tmp, sample_general_precomp, (void *) &info);
 
             if (func_bench == 0 || func_bench == 2)
-                prof_repeat(&time_geom_fast_onlyprecomp, &tmp, sample_nmod_vec_geom_fast_onlyprecomp, (void *) &info);
+            {
+                prof_repeat(&time_geometric_all, &tmp, sample_geometric_precomp, (void *) &info);
+                prof_repeat(&time_geometric_eval, &tmp, sample_geometric_precomp_eval, (void *) &info);
+            }
 
             if (func_bench == 0)
             {
-                flint_printf("%ld\t%7ld| %.1e | %.1e\n",
+                flint_printf("%ld\t%7ld| %.1e | %.1e | %.1e\n",
                              info.length, info.npoints_precomp,
-                             time_fast_onlyprecomp/fac,
-                             time_geom_fast_onlyprecomp/fac);
+                             time_general/fac,
+                             time_geometric_all/fac,
+                             time_geometric_eval/fac);
             }
             else if (func_bench == 1)
             {
                 flint_printf("%ld\t%7ld| %.1e\n",
                              info.length, info.npoints_precomp,
-                             time_fast_onlyprecomp/fac);
+                             time_general/fac);
             }
             else if (func_bench == 2)
             {
-                flint_printf("%ld\t%7ld| %.1e\n",
+                flint_printf("%ld\t%7ld| %.1e | %.1e\n",
                              info.length, info.npoints_precomp,
-                             time_geom_fast_onlyprecomp/fac);
+                             time_geometric_all/fac,
+                             time_geometric_eval/fac);
             }
         }
 
