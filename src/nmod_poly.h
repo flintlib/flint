@@ -60,12 +60,14 @@ nmod_poly_compose_mod_precomp_preinv_arg_t;
 
 typedef struct
 {
-    nn_ptr x, t, w, y, z;       // five vectors of precomputed constants
-    nmod_poly_t f, g1, g2;      // three precomputed polys
+    nn_ptr ev_s;                    /* evaluate: scaling constants */
+    nmod_poly_t ev_f;               /* evaluate: polynomial */
+    nn_ptr int_s1, int_s2, int_s3;  /* interpolate: scaling constants */
+    nmod_poly_t int_f1, int_f2;     /* interpolate: polynomials */
     nmod_t mod;
     slong len;                    // number of points
-
 } nmod_geometric_progression_struct;
+
 
 typedef nmod_geometric_progression_struct nmod_geometric_progression_t[1];
 

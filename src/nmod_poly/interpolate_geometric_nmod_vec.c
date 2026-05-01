@@ -31,6 +31,8 @@ _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
         return;
     }
 
+    /* TODO what is f? */
+    /* TODO what is h? */
     f = _nmod_vec_init(N);
     h = _nmod_vec_init(N);
 
@@ -43,13 +45,13 @@ _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
     }
 
     f1_len = N - i;
-    h1_len = FLINT_MIN(G->g1->length + f1_len - 1, N);
+    h1_len = FLINT_MIN(G->int_f1->length + f1_len - 1, N);
 
     for (i = 0; i < f1_len; i++)
     {
-        f[i] = nmod_mul(v[i], G->w[i], mod);
+        f[i] = nmod_mul(v[i], G->int_s1[i], mod);
     }
-    _nmod_poly_mullow(h, G->g1->coeffs, G->g1->length, f, f1_len, N, mod);
+    _nmod_poly_mullow(h, G->int_f1->coeffs, G->int_f1->length, f, f1_len, N, mod);
 
     while (h1_len > 0 && h[h1_len - 1] == 0)
     {
@@ -67,16 +69,16 @@ _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
 
     for (i = h2_min; i < h1_len; i++)
     {
-       f[N - 1 - i] = nmod_mul(h[i], G->y[i], mod);
+       f[N - 1 - i] = nmod_mul(h[i], G->int_s2[i], mod);
     }
 
     f2_len = N - h2_min;
     _nmod_vec_zero(f, N - h1_len);
-    _nmod_poly_mullow(h, G->g2->coeffs, G->g2->length, f, f2_len, N, mod);
+    _nmod_poly_mullow(h, G->int_f2->coeffs, G->int_f2->length, f, f2_len, N, mod);
 
     for (i = 0; i < len; i++)
     {
-        poly[i] = nmod_mul(h[N - 1 - i], G->z[i], mod);
+        poly[i] = nmod_mul(h[N - 1 - i], G->int_s3[i], mod);
     }
 
     _nmod_vec_clear(f);
