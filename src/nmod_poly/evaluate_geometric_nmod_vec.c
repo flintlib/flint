@@ -129,7 +129,7 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, slon
         return;
 
     nmod_geometric_progression_t G;
-    nmod_geometric_progression_init(G, r, FLINT_MAX(n, plen), mod);
+    _nmod_geometric_progression_init_function(G, r, FLINT_MAX(n, plen), mod, UWORD(1));
     _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(ys, poly, plen, G, n, mod);
     nmod_geometric_progression_clear(G);
 }

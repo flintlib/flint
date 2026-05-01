@@ -64,8 +64,9 @@ typedef struct
     nmod_poly_t ev_f;               /* evaluate: polynomial */
     nn_ptr int_s1, int_s2, int_s3;  /* interpolate: scaling constants */
     nmod_poly_t int_f1, int_f2;     /* interpolate: polynomials */
-    nmod_t mod;
-    slong len;                    // number of points
+    nmod_t mod;                     /* modulus */
+    slong len;                      /* number of points */
+    ulong function;                 /* choice of precomputations */
 } nmod_geometric_progression_struct;
 
 typedef nmod_geometric_progression_struct nmod_geometric_progression_t[1];
@@ -464,20 +465,20 @@ void _nmod_poly_powmod_x_fmpz_preinv (nn_ptr res, fmpz_t e, nn_srcptr f, slong l
 void nmod_poly_powmod_x_fmpz_preinv(nmod_poly_t res, fmpz_t e, const nmod_poly_t f,                             const nmod_poly_t finv);
 
 void _nmod_poly_powers_mod_preinv_naive(nn_ptr * res, nn_srcptr f,
-		 slong flen, slong n, nn_srcptr g, slong glen, nn_srcptr ginv,
-		                              slong ginvlen, const nmod_t mod);
+                                        slong flen, slong n, nn_srcptr g, slong glen, nn_srcptr ginv,
+                                        slong ginvlen, const nmod_t mod);
 
 void nmod_poly_powers_mod_naive(nmod_poly_struct * res,
                             const nmod_poly_t f, slong n, const nmod_poly_t g);
 
 void _nmod_poly_powers_mod_preinv_threaded_pool(nn_ptr * res,
-	       nn_srcptr f, slong flen, slong n, nn_srcptr g, slong glen,
-			    nn_srcptr ginv, slong ginvlen, const nmod_t mod,
-                              thread_pool_handle * threads, slong num_threads);
+                                                nn_srcptr f, slong flen, slong n, nn_srcptr g, slong glen,
+                                                nn_srcptr ginv, slong ginvlen, const nmod_t mod,
+                                                thread_pool_handle * threads, slong num_threads);
 
 void
 _nmod_poly_powers_mod_preinv_threaded(nn_ptr * res, nn_srcptr f,
-		                 slong flen, slong n, nn_srcptr g, slong glen,
+                                      slong flen, slong n, nn_srcptr g, slong glen,
                               nn_srcptr ginv, slong ginvlen, const nmod_t mod);
 
 void nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
@@ -594,13 +595,13 @@ void _nmod_poly_tree_build(nn_ptr * tree, nn_srcptr roots, slong len, nmod_t mod
 /* Geometric evaluation / interpolation  *************************************/
 
 
-void _nmod_geometric_progression_init_mask(nmod_geometric_progression_t G,
-                                           ulong r, slong len, nmod_t mod,
-                                           ulong mask);
+void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
+                                               ulong r, slong len, nmod_t mod,
+                                               ulong function);
 void nmod_geometric_progression_init(nmod_geometric_progression_t G,
                                      ulong r, slong len, nmod_t mod);
 
-void _nmod_geometric_progression_clear_mask(nmod_geometric_progression_t G, ulong mask);
+void _nmod_geometric_progression_clear_function(nmod_geometric_progression_t G, ulong function);
 void nmod_geometric_progression_clear(nmod_geometric_progression_t G);
 
 void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod);
@@ -702,7 +703,7 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
 void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                     const nmod_poly_struct * polys, slong len1, slong n,
                     const nmod_poly_t g, const nmod_poly_t poly,
-		    const nmod_poly_t polyinv);
+                    const nmod_poly_t polyinv);
 
 void _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr);
 

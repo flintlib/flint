@@ -218,16 +218,17 @@ void _nmod_geometric_progression_interpolate_init(nmod_geometric_progression_t G
     }
 }
 
-/* initialize for selection of functionalities:          */
-/*    the lowest 3 bits of `mask` act as a mask for the  */
-/*    three functionalities, in this order:              */
-/*    evaluate(bit0)+interpolate(bit1)+extrapolate(bit2) */
-void _nmod_geometric_progression_init_mask(nmod_geometric_progression_t G,
-                                           ulong r, slong len, nmod_t mod,
-                                           ulong mask)
+/* initialize for selection of functionalities:              */
+/*    the lowest 3 bits of `function` act as a mask for the  */
+/*    three functionalities, in this order:                  */
+/*    evaluate(bit0)+interpolate(bit1)+extrapolate(bit2)     */
+void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
+                                               ulong r, slong len, nmod_t mod,
+                                               ulong function)
 {
     G->len = len;
     G->mod = mod;
+    G->function = function;
 
     if (NMOD_CAN_USE_SHOUP(mod))
     {
@@ -242,11 +243,11 @@ void _nmod_geometric_progression_init_mask(nmod_geometric_progression_t G,
         n_mulmod_precomp_shoup_quo_rem(&q_pr_quo, &q_pr_rem, q, mod.n);
         n_mulmod_precomp_shoup_quo_rem(&inv_q_pr_quo, &inv_q_pr_rem, inv_q, mod.n);
 
-        if (mask & UWORD(1))  /* evaluate */
+        if (function & UWORD(1))  /* evaluate */
             _nmod_geometric_progression_evaluate_init_nonfullword(G, r, len, mod, q, q_pr_quo, q_pr_rem, inv_r, inv_q, inv_q_pr_quo, inv_q_pr_rem);
-        if ((mask>>1) & UWORD(1))  /* interpolate */
+        if ((function>>1) & UWORD(1))  /* interpolate */
             _nmod_geometric_progression_interpolate_init_nonfullword(G, len, mod, q, q_pr_quo, q_pr_rem, inv_q, inv_q_pr_quo, inv_q_pr_rem);
-        /* if ((mask>>2) & UWORD(1)) */
+        /* if ((function>>2) & UWORD(1)) */
         /* extrapolate */
     }
     else
@@ -255,24 +256,24 @@ void _nmod_geometric_progression_init_mask(nmod_geometric_progression_t G,
         const ulong inv_r = nmod_inv(r, mod);
         const ulong inv_q = nmod_mul(inv_r, inv_r, mod);
 
-        if (mask & UWORD(1))  /* evaluate */
+        if (function & UWORD(1))  /* evaluate */
             _nmod_geometric_progression_evaluate_init(G, r, len, mod, q, inv_r, inv_q);
-        if ((mask>>1) & UWORD(1))  /* interpolate */
+        if ((function>>1) & UWORD(1))  /* interpolate */
             _nmod_geometric_progression_interpolate_init(G, len, mod, q, inv_q);
-        /* if ((mask>>2) & UWORD(1)) */
+        /* if ((function>>2) & UWORD(1)) */
         /* extrapolate */
     }
 }
 
 /* clear for selection of functionalities (see init)  */
-void _nmod_geometric_progression_clear_mask(nmod_geometric_progression_t G, ulong mask)
+void _nmod_geometric_progression_clear_function(nmod_geometric_progression_t G, ulong function)
 {
-    if (mask & UWORD(1))  /* evaluate */
+    if (function & UWORD(1))  /* evaluate */
     {
         _nmod_vec_clear(G->ev_s);
         nmod_poly_clear(G->ev_f);
     }
-    if ((mask>>1) & UWORD(1))  /* interpolate */
+    if ((function>>1) & UWORD(1))  /* interpolate */
     {
         _nmod_vec_clear(G->int_s1);
         _nmod_vec_clear(G->int_s2);
@@ -280,18 +281,18 @@ void _nmod_geometric_progression_clear_mask(nmod_geometric_progression_t G, ulon
         nmod_poly_clear(G->int_f1);
         nmod_poly_clear(G->int_f2);
     }
-    /* if ((mask>>2) & UWORD(1)) */
+    /* if ((function>>2) & UWORD(1)) */
 }
 
 /* initialize for all: evaluate+interpolate+extrapolate */
 void nmod_geometric_progression_init(nmod_geometric_progression_t G,
                                      ulong r, slong len, nmod_t mod)
 {
-    _nmod_geometric_progression_init_mask(G, r, len, mod, UWORD(7));
+    _nmod_geometric_progression_init_function(G, r, len, mod, UWORD(7));
 }
 
 /* clear for all: evaluate+interpolate+extrapolate */
 void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 {
-    _nmod_geometric_progression_clear_mask(G, UWORD(7));
+    _nmod_geometric_progression_clear_function(G, G->function);
 }
