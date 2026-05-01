@@ -134,13 +134,13 @@ _flint_mpn_sqrhigh_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_size_t n)
     /* Corrections for precise high product (not needed for the
        original Mulders). */
     {
-        mp_limb_t hi, lo;
+        mp_limb_t hi;
 
         /* Note: if we relax the condition on k, we will need
            a branch for k == l here to avoid double counting. */
         FLINT_ASSERT(k != l);
 
-        umul_ppmm(hi, lo, np[k - 1], np[l - 1]);
+        umulhigh_pmm(hi, np[k - 1], np[l - 1]);
         MPN_INCR_U(rp + n - 1, n + 1, hi);
         MPN_INCR_U(rp + n - 1, n + 1, hi);
     }

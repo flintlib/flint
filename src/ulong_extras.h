@@ -434,9 +434,9 @@ ulong n_mulmod_precomp_shoup(ulong a, ulong n)
 ULONG_EXTRAS_INLINE
 ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 {
-    ulong res, p_hi, p_lo;
+    ulong res, p_hi;
 
-    umul_ppmm(p_hi, p_lo, a_precomp, b);
+    umulhigh_pmm(p_hi, a_precomp, b);
     res = a * b - p_hi * n;
 
     if (res >= n)

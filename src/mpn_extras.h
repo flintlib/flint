@@ -347,15 +347,15 @@ char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int ne
 /* Like NN_DOTREV_S3_1X1 but summing only over the high parts of the products. */
 #define NN_DOTREV_S3_1X1_HIGH(s2, s1, u, v, n) \
     do { \
-        mp_limb_t __dt0, __dt1, __ds0, __ds1, __ds2; \
+        mp_limb_t __dt1, __ds1, __ds2; \
         slong __i; \
         FLINT_ASSERT((n) >= 2); \
-        umul_ppmm(__ds1, __ds0, (u)[0], (v)[(n) - 1]); \
-        umul_ppmm(__dt1, __dt0, (u)[1], (v)[(n) - 2]); \
+        umulhigh_pmm(__ds1, (u)[0], (v)[(n) - 1]); \
+        umulhigh_pmm(__dt1, (u)[1], (v)[(n) - 2]); \
         add_ssaaaa(__ds2, __ds1, 0, __ds1, 0, __dt1); \
         for (__i = 2; __i < (n); __i++) \
         { \
-            umul_ppmm(__dt1, __dt0, (u)[__i], (v)[(n) - 1 - __i]); \
+            umulhigh_pmm(__dt1, (u)[__i], (v)[(n) - 1 - __i]); \
             add_ssaaaa(__ds2, __ds1, __ds2, __ds1, 0, __dt1); \
         } \
         (s1) = __ds1; (s2) = __ds2; \
@@ -389,9 +389,9 @@ char * flint_mpn_get_str(char * res, int base, mp_srcptr x, mp_size_t xn, int ne
 
 #define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
    do { \
-      mp_limb_t __q2, __q3, __q4; \
+      mp_limb_t __q2, __q3; \
       umul_ppmm((q), __q2, (a_hi), (dinv)); \
-      umul_ppmm(__q3, __q4, (a_lo), (dinv)); \
+      umulhigh_pmm(__q3, (a_lo), (dinv)); \
       add_ssaaaa((q), __q2, (q), __q2, 0, __q3); \
       add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
    } while (0)

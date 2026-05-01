@@ -287,6 +287,13 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
   } while (0)
 #endif
 
+#define umulhigh_pmm(w1, u, v) \
+  do { \
+    ulong __w0; \
+    umul_ppmm(w1, __w0, u, v); \
+    (void) __w0; \
+  } while (0)
+
 /* Division */
 #if !defined(udiv_qrnnd)
 # define udiv_qrnnd_int(q, r, n1, n0, d) \

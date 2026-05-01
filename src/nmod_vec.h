@@ -237,8 +237,8 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
     {
         const ulong t0 = (mod.n - 1) * (mod.n - 1);
-        ulong u1, u0;
-        umul_ppmm(u1, u0, t0, len);
+        ulong u1;
+        umulhigh_pmm(u1, t0, len);
         if (u1 == 0)  // 1 limb
         {
             dot_params_t params = {_DOT1, UWORD(0)};
@@ -268,10 +268,10 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     // from here on, mod.n > 2**(FLINT_BITS / 2)
     // --> unreduced dot cannot fit in 1 limb
 
-    ulong t2, t1, t0, u1, u0;
+    ulong t2, t1, t0, u1;
     umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
     umul_ppmm(t2, t1, t1, len);
-    umul_ppmm(u1, u0, t0, len);
+    umulhigh_pmm(u1, t0, len);
     add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
 
     if (t2 == 0) // 2 limbs

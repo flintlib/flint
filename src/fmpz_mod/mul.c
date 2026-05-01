@@ -71,7 +71,7 @@ void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
     ulong a1, a0, b1, b0, c1, c0;
     ulong x3, x2, x1, x0;
     ulong q2, q1, q0;
-    ulong z4, z3, z2, z1, z0;
+    ulong z4, z3, z2, z1;
     ulong t4, t3, t2, t1;
     ulong s3, s2, s1;
     ulong u4, u3, u2, u1;
@@ -93,7 +93,7 @@ void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c,
     add_sssaaaaaa(x3, x2, x1, x3, x2, x1, t3, t2, t1);
 
     /* z[5:0] = x[3:1] * ninv[2:0], z[5] should end up zero */
-    umul_ppmm(z1, z0, x1, ctx->ninv_limbs[0]);
+    umulhigh_pmm(z1, x1, ctx->ninv_limbs[0]);
     umul_ppmm(z3, z2, x2, ctx->ninv_limbs[1]);
     z4 = x3 * ctx->ninv_limbs[2];
     umul_ppmm(t3, t2, x3, ctx->ninv_limbs[0]);
