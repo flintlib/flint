@@ -16,7 +16,6 @@
 #include "profiler.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
-#include "nmod_poly/impl.h"
 #include "nmod_vec.h"
 
 #define __NB_ITER 10
@@ -152,25 +151,50 @@ void sample_geometric_precomp_eval(void * arg, ulong count)
         nmod_geometric_progression_t G;
         G->len = npoints_precomp;
         G->mod = mod;
-        const ulong q = nmod_mul(r, r, mod);
-        const ulong inv_r = nmod_inv(r, mod);
-        const ulong inv_q = nmod_mul(inv_r, inv_r, mod);
 
         prof_start();
-        if (NMOD_CAN_USE_SHOUP(mod) && npoints_precomp >= 4)
-            for (ulong ii = 0; ii < __NB_ITER; ii++)
-            {
-                _nmod_geometric_progression_evaluate_init_nonfullword(G, r, npoints_precomp, mod, q, inv_r, inv_q);
-                nmod_poly_clear(G->ev_f);
-                flint_free(G->ev_s);
-            }
-        else
-            for (ulong ii = 0; ii < __NB_ITER; ii++)
-            {
-                _nmod_geometric_progression_evaluate_init(G, r, npoints_precomp, mod, q, inv_r, inv_q);
-                nmod_poly_clear(G->ev_f);
-                flint_free(G->ev_s);
-            }
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+        {
+            _nmod_geometric_progression_init_mask(G, r, npoints_precomp, mod, UWORD(1));
+            _nmod_geometric_progression_clear_mask(G, UWORD(1));
+        }
+        prof_stop();
+    }
+
+    FLINT_TEST_CLEAR(state);
+}
+
+/* precomputations for geometric progression (interp only) */
+void sample_geometric_precomp_interp(void * arg, ulong count)
+{
+    ulong n;
+    nmod_t mod;
+    ulong i;
+
+    info_t * info = (info_t *) arg;
+    flint_bitcnt_t bits = info->bits;
+    slong npoints_precomp = info->npoints_precomp;
+
+    FLINT_TEST_INIT(state);
+
+    for (i = 0; i < count; i++)
+    {
+        n = n_randprime(state, bits, 1);
+        nmod_init(&mod, n);
+        ulong r = nmod_find_root(2*npoints_precomp, mod);
+        if (r == 0)
+            flint_printf("\n...could not find element of suitable order for geometric progression...\n");
+
+        nmod_geometric_progression_t G;
+        G->len = npoints_precomp;
+        G->mod = mod;
+
+        prof_start();
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+        {
+            _nmod_geometric_progression_init_mask(G, r, npoints_precomp, mod, UWORD(2));
+            _nmod_geometric_progression_clear_mask(G, UWORD(2));
+        }
         prof_stop();
     }
 
@@ -236,7 +260,7 @@ int main(int argc, char * argv[])
     double time_general;
     double time_geometric_all;
     double time_geometric_eval;
-    /* double time_geometric_interp; */
+    double time_geometric_interp;
 
     info_t info;
     flint_bitcnt_t i;
@@ -250,11 +274,11 @@ int main(int argc, char * argv[])
         printf("==== nbits = %ld====\n", i);
 
         if (func_bench == 0)  /* bench all */
-            flint_printf("len\tpoints | general |   geom  |  g-eval  \n");
+            flint_printf("len\tpoints | general |   geom  |  g-eval | g-interp \n");
         else if (func_bench == 1)  /* general only */
             flint_printf("len\tpoints | general\n");
         else if (func_bench == 2)  /* geometric only */
-            flint_printf("len\tpoints |   geom  |  g-eval  \n");
+            flint_printf("len\tpoints |   geom  |  g-eval | g-interp \n");
 
         for (int len = 0; len < nb_lens; ++len)
         {
@@ -270,15 +294,17 @@ int main(int argc, char * argv[])
             {
                 prof_repeat(&time_geometric_all, &tmp, sample_geometric_precomp, (void *) &info);
                 prof_repeat(&time_geometric_eval, &tmp, sample_geometric_precomp_eval, (void *) &info);
+                prof_repeat(&time_geometric_interp, &tmp, sample_geometric_precomp_interp, (void *) &info);
             }
 
             if (func_bench == 0)
             {
-                flint_printf("%ld\t%7ld| %.1e | %.1e | %.1e\n",
+                flint_printf("%ld\t%7ld| %.1e | %.1e | %.1e | %.1e\n",
                              info.length, info.npoints_precomp,
                              time_general/fac,
                              time_geometric_all/fac,
-                             time_geometric_eval/fac);
+                             time_geometric_eval/fac,
+                             time_geometric_interp/fac);
             }
             else if (func_bench == 1)
             {
@@ -288,10 +314,11 @@ int main(int argc, char * argv[])
             }
             else if (func_bench == 2)
             {
-                flint_printf("%ld\t%7ld| %.1e | %.1e\n",
+                flint_printf("%ld\t%7ld| %.1e | %.1e | %.1e\n",
                              info.length, info.npoints_precomp,
                              time_geometric_all/fac,
-                             time_geometric_eval/fac);
+                             time_geometric_eval/fac,
+                             time_geometric_interp/fac);
             }
         }
 
