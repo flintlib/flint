@@ -111,6 +111,7 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
 
             nmod_poly_clear(P);
             nmod_poly_clear(Q);
+            nmod_geometric_progression_clear(G);
         }
 
         flint_free(y);

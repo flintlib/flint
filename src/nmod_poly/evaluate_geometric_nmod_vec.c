@@ -52,47 +52,19 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
      * [rev(a) * (G->ev_f >> x**val)]_{alen - 1}^{len}  (that is, coeffs [alen - 1, alen - 1 + len))
      */
 
-    /* below are 3 different versions (one requires fft_small) */
-    /* TODO once some optimized middle product is written, the "version 1" should probably be discarded */
+    /* below are 2 different versions (one requiring fft_small) */
+    /* TODO some optimization needed in mulmid: */
+    /* mulmid is often excellent, but fft_small variant still useful */
 
     const slong alen = plen - val;
 
-    /* version 1:  (2025-12-04: fastest in small lengths, waiting for optimized middle product) */
-    /** this uses a short product: write rev(a) = x**(alen-1) a(1/x), and write F = (G->ev_f(x) >> x**val) rem x**(alen - 1 + len)
-     * rev(a) * F has length L = 2 * alen - 2 + len, reverse it: we get a * rev(F),
-     * we want its coefficients from L - 1 - (alen - 1) = alen - 1 + len - 1
-     * down to, included, L - 1 - (alen - 1 + len - 1) = alen - 1
-     **/
-#if FLINT_HAVE_FFT_SMALL
-    if (2 * (plen - val) - 2 + len <= 192)
-#else
-    if (1)
-#endif
-    {
-        slong blen = alen - 1 + len;
-        nn_ptr a = _nmod_vec_init(alen);
-        nn_ptr b = _nmod_vec_init(blen);
-
-        for (slong i = val; i < plen; i++)
-            a[i - val] = nmod_mul(G->ev_s[i], poly[i], mod);
-
-        nn_ptr Frev = _nmod_vec_init(blen);
-        _nmod_poly_reverse(Frev, G->ev_f->coeffs + val, blen, blen);
-        _nmod_poly_mullow(b, Frev, blen, a, alen, blen, mod);
-
-        for (slong i = 0; i < len; i++)
-            vs[i] = nmod_mul(G->ev_s[i], b[alen - 1 + len - 1 - i], mod);
-
-        _nmod_vec_clear(Frev);
-        _nmod_vec_clear(a);
-        _nmod_vec_clear(b);
-    }
-    else
-    {
-    /* version 2 */
     /* this uses a middle product to compute [rev(p) * G->ev_f]_{plen - 1}^{len}  (i.e. coeffs [plen - 1, plen - 1 + len)) */
 #if FLINT_HAVE_FFT_SMALL
-        /* version 2.a uses fft_small directly  (2025-12-04: fastest in medium and large lengths, like 100 and more) */
+    if (2 * (plen - val) - 2 + len > 192)
+    {
+        /* uses fft_small directly */
+        /* 2025-12-04: fastest in medium and large lengths, like 100 and more */
+        /* 2026-05-03: still useful for some short range where mulmid is not yet good */
         nn_ptr b = _nmod_vec_init(alen + len - 1);
 
         for (slong i = val; i < plen; i++)
@@ -104,23 +76,27 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
             vs[i] = nmod_mul(G->ev_s[i], b[i], mod);
 
         _nmod_vec_clear(b);
-#else
-        /* version 2.b uses nmod_poly_mulhigh  (2025-12-04: tested correct, but disabled: nmod_poly_mulhigh not yet optimized) */
-        /* (currently, with the branching mechanism above, this should never be called) */
+    }
+    else
+#endif
+    {
+        /* uses nmod_poly_mulmid */
+        /* 2025-12-04: disabled: nmod_poly_mulhigh/mulmid not yet optimized */
+        /* 2026-05-03: best method, much better than fft_small for small parameters, */
+        /*             but also sometimes quite slower for some parameter ranges    */
         nn_ptr a = _nmod_vec_init(alen);
-        nn_ptr b = _nmod_vec_init(alen + (alen - 1 + len));
+        nn_ptr b = _nmod_vec_init(alen - 1 + len);
 
         for (slong i = val; i < plen; i++)
             a[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
 
-        _nmod_poly_mulhigh(b, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, mod);
+        _nmod_poly_mulmid(b, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
 
         for (slong i = 0; i < len; i++)
-            vs[i] = nmod_mul(G->ev_s[i], b[alen - 1 + i], mod);
+            vs[i] = nmod_mul(G->ev_s[i], b[i], mod);
 
         _nmod_vec_clear(a);
         _nmod_vec_clear(b);
-#endif
     }
 }
 
