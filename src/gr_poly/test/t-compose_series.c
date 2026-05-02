@@ -37,12 +37,14 @@ test_compose_series(flint_rand_t state, int which)
 
     if (ctx->methods == _ca_methods)
         n = n_randint(state, 5);
+    else if (gr_ctx_is_finite(ctx) == T_TRUE)
+        n = n_randint(state, 100);
     else
         n = n_randint(state, 20);
 
-    GR_MUST_SUCCEED(gr_poly_randtest(A, state, 1 + n_randint(state, 20), ctx));
-    GR_MUST_SUCCEED(gr_poly_randtest(B, state, 1 + n_randint(state, 20), ctx));
-    GR_MUST_SUCCEED(gr_poly_randtest(C, state, 1 + n_randint(state, 20), ctx));
+    GR_MUST_SUCCEED(gr_poly_randtest(A, state, 1 + n_randint(state, n + 5), ctx));
+    GR_MUST_SUCCEED(gr_poly_randtest(B, state, 1 + n_randint(state, n + 5), ctx));
+    GR_MUST_SUCCEED(gr_poly_randtest(C, state, 1 + n_randint(state, n + 5), ctx));
     status |= gr_poly_set_coeff_si(B, 0, 0, ctx);
 
     switch (which)
@@ -95,6 +97,19 @@ test_compose_series(flint_rand_t state, int which)
             status |= gr_poly_compose_series(C, A, C, n, ctx);
             break;
 
+        case 12:
+            status |= gr_poly_compose_series_kinoshita_li(C, A, B, n, ctx);
+            break;
+        case 13:
+            status |= gr_poly_set(C, A, ctx);
+            status |= gr_poly_compose_series_kinoshita_li(C, C, B, n, ctx);
+            break;
+        case 14:
+            status |= gr_poly_set(C, B, ctx);
+            status |= gr_poly_compose_series_kinoshita_li(C, A, C, n, ctx);
+            break;
+
+
         default:
             flint_abort();
     }
@@ -146,9 +161,10 @@ TEST_FUNCTION_START(gr_poly_compose_series, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        test_compose_series(state, n_randint(state, 12));
+        for (slong i = 0; i < 15; i++)
+            test_compose_series(state, i);
     }
 
     TEST_FUNCTION_END(state);
