@@ -100,7 +100,7 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
             result = nmod_poly_equal(P, Q);
             if (!result)
             {
-                flint_printf("FAIL (`len` points):\n");
+                flint_printf("FAIL (precomp):\n");
                 flint_printf("mod=%wu, len=%wd, npoints=%wd\n\n", mod, len, npoints);
                 nmod_poly_print_pretty(P, "x"), flint_printf("\n\n");
                 nmod_poly_print_pretty(Q, "x"), flint_printf("\n\n");
