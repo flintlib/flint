@@ -20,19 +20,15 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
     FLINT_ASSERT(len <= G->len);
     FLINT_ASSERT((G->function >> 1) & 1);
 
-    slong i, N, f_len, h_len;
-    nn_ptr f, h;
-
-    N = G->len;
-
     if (len == 1)
     {
         poly[0] = v[0];
         return;
     }
 
-    f = _nmod_vec_init(N);
-    h = _nmod_vec_init(N);
+    slong f_len, h_len, val;
+    nn_ptr f = _nmod_vec_init(len);
+    nn_ptr h = _nmod_vec_init(len);
 
     /** step1: Newton interpolation
      * [Bostan - Schost, J.Complexity 2005, Section 5.1]
@@ -50,7 +46,6 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
      */
 
     /* val = valuation of output poly in Newton basis */
-    slong val = 0;
     for (val = 0; val < len; val++)
         if (v[val] != 0)
             break;
@@ -68,18 +63,18 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
 
     /* f = sum_{i=val}^{len-1} v[i] * G->int_s1[i] x**{i-val} */
     /*   == sum_{i=0}^{f_len-1} v[i+val] * G->int_s1[i+val] x**i */
-    for (i = 0; i < f_len; i++)
+    for (slong i = 0; i < f_len; i++)
         f[i] = nmod_mul(v[i+val], G->int_s1[i+val], mod);
 
     /* h = (x**val * f) * G->int_f  mod x**len                     */
     /*   == x**val (f * G->int_f  mod x**(len-val))                */
     /* note: len - val is <= G->int_f->length, since G->intf_1 has */
     /* length G->len >= len (all its coefficients are nonzero)      */
-    _nmod_vec_zero(h, val);
     _nmod_poly_mullow(h+val, G->int_f->coeffs, len - val, f, f_len, len - val, mod);
 
     /* for Newton interpolation, here we should compute h[i] = h[i]/q_i */
-    /* yet this will simplify just below, so we just leave h as it is   */
+    /* yet this "/q_i" will simplify with another operation just below, */
+    /* so we just leave h as it is                                      */
 
     /** step2: Newton basis -> monomial basis
      * [Bostan - Schost, J.Complexity 2005, Section 5.2]
@@ -117,16 +112,15 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
             break;
 
     /* compute reversed and scaled f */
-    _nmod_vec_zero(f, len - h_len);  /* TODO necessary? */
-    for (i = val; i < h_len; i++)
-        f[len-1-i] = nmod_mul(h[i], G->int_s2[i], mod);
-    _nmod_vec_zero(f+len-val, val);  /* TODO necessary? */
+    for (slong i = 0; i < h_len-val; i++)
+        f[i] = nmod_mul(h[h_len-1-i], G->int_s2[h_len-1-i], mod);
 
     /* transposed short product */
-    _nmod_poly_mullow(h, f, len, G->int_f->coeffs, len, len, mod);
+    _nmod_poly_mullow(h+len-h_len, f, h_len-val, G->int_f->coeffs, h_len, h_len, mod);
 
     /* final scaling */
-    for (i = 0; i < len; i++)
+    _nmod_vec_zero(poly+h_len, len-h_len);
+    for (slong i = 0; i < h_len; i++)
         poly[i] = nmod_mul(h[len-1-i], G->int_s1[i], mod);
 
     _nmod_vec_clear(f);
