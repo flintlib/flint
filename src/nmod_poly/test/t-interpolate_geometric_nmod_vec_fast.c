@@ -25,7 +25,8 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
         ulong mod, r;
         slong len, npoints;
 
-        npoints = 1 + (i == 0 ? 1 : n_randint(state, 200));
+        /* npoints = 1 + (i == 0 ? 1 : n_randint(state, 200)); */
+        npoints = 1 + n_randint(state, 200);
         len = 1 + n_randint(state, npoints);
         do 
         { 

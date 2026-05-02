@@ -45,7 +45,7 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
      *  and u_i = prod_{1 <= k <= i} (q**k - 1),
      *  and q_i = q**(i*(i-1)/2)
      * -> With the precomputed data, these are the `len` coefficients of
-     *    f * G->int_f1  mod x**len
+     *    f * G->int_f  mod x**len
      * where f = sum_{i=0}^{len-1} v[i] * G->int_s1[i] x**i
      */
 
@@ -60,7 +60,7 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
         return;
     }
 
-    /* i = number of trailing zero coefficients */
+    /* actual length of f */
     for (f_len = len; f_len > val; f_len--)
         if (v[f_len-1] != 0)
             break;
@@ -71,56 +71,63 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
     for (i = 0; i < f_len; i++)
         f[i] = nmod_mul(v[i+val], G->int_s1[i+val], mod);
 
-    /* h = (x**val * f) * G->int_f1  mod x**len                     */
-    /*   == x**val (f * G->int_f1  mod x**(len-val))                */
-    /* note: len - val is <= G->int_f1->length, since G->intf_1 has */
+    /* h = (x**val * f) * G->int_f  mod x**len                     */
+    /*   == x**val (f * G->int_f  mod x**(len-val))                */
+    /* note: len - val is <= G->int_f->length, since G->intf_1 has */
     /* length G->len >= len (all its coefficients are nonzero)      */
     _nmod_vec_zero(h, val);
-    _nmod_poly_mullow(h+val, G->int_f1->coeffs, len - val, f, f_len, len - val, mod);
+    _nmod_poly_mullow(h+val, G->int_f->coeffs, len - val, f, f_len, len - val, mod);
 
+    /* for Newton interpolation, here we should compute h[i] = h[i]/q_i */
+    /* yet this will simplify just below, so we just leave h as it is   */
+
+    /** step2: Newton basis -> monomial basis
+     * [Bostan - Schost, J.Complexity 2005, Section 5.2]
+     * -> Convert h[i]/q_i to monomial basis, through the transposed
+     *  x**len-truncated multiplication of two polynomials
+     *       sum_{i=0}^{len-1} uu_i x**i
+     *  and  sum_{i=0}^{len-1} (-1)**i * (h[i]/q_i)*q_i/uu_i x**i)
+     *  where q_i = q**(i*(i-1)/2) as above,
+     *  and uu_i = prod_{1 <= k <= i} q**(k-1) / (1 - q**k)
+     *           == (-1)**i * q_i / u_i, for u_i as above
+     *  (in the paper this is prod q**k / (1 - q**k), is this a typo?)
+     *  This gives `len` coefficients that must then be scaled
+     *  by (-1)**i * uu_i / q_i == 1 / u_i
+     * -> Transposing the truncated product of poly1,poly2 of degree < len,
+     *      mullow_t(res, poly1, poly2, len)
+     *  simply amounts to a (non-tranposed) mullow and reversals:
+     *      mullow(res, poly1, rev(poly2, len), len)
+     *      res = rev(res, len)
+     * -> With the precomputed data, the two polynomials have coefficients
+     *     uu_i == G->int_f[i] and (-1)**i * h[i]/uu_i == h[i] * G->int_s2[i]
+     *  meaning that we want to compute
+     *          mullow_t(res, G->int_f, F, len)
+     *   where F = sum_{i=0}^{len-1} h[i] * G->int_s2[i] x**i,
+     *  and then scale by 1/u_i == G->int_s1[i]
+     */
+
+    /* valuation of h is at least val, see if it is higher */
+    for (; val < len; val++)
+        if (h[val] != 0)
+            break;
+
+    /* actual length of h */
     for (h_len = len; h_len > val; h_len--)
         if (h[h_len-1] != 0)
             break;
 
-    /* FIXME division by q_i ?? */
-
-    /* TODO remove debug */
-    /* if (f_len != len) */
-    /*     flint_printf("len = %ld, G->len = %ld, flen = %ld\n", len, G->len, f_len); */
-
-    /** step2: Newton basis -> monomial basis             
-     * [Bostan - Schost, J.Complexity 2005, Section 5.2]
-     * in the Newton basis, poly has coefficients h[i] / q_i, i=0..len-1
-     * -> Convert it to monomial basis, through the transposed product
-     *       mul_t(len-1, sum_{i=0}^{len-1} uu_i x**i,
-     *                    sum_{i=0}^{len-1} (-1)**i * (h[i]/q_i)*q_i/uu_i x**i)
-     *  where q_i = q**(i*(i-1)/2) as above,
-     *  and uu_i =  prod_{1 <= k <= i} q**k / (1 - q**k)
-     *           == (-1)**i * q_i / u_i, for u_i as above
-     *  This gives `len` coefficients and it just remains to scale the i-th one
-     *  by (-1)**i * uu_i / q_i == 1 / u_i
-     * -> so, with the precomputed data, the two polynomials have coefficients
-     *     uu_i == G->int_f1[i] and (-1)**i * h[i]/uu_i == (-1)**i * h[i] * G->int_s2[i]
-     *  and the final scaling factors are 1/u_i == G->int_s1[i]
-     *   meaning that we are looking to compute
-     *          mul_t(len-1, G->int_f1, f)
-     *   where f = sum_{i=0}^{len-1} h[i] * G->int_s2[i] x**i
-     * -> from that, it remains to scale coefficients by 1/u_i == G->int_s1[i]
-     */
-
-    for (val = 0; val < h_len; val++)
-        if (h[val] != 0)
-            break;
-
+    /* compute reversed and scaled f */
+    _nmod_vec_zero(f, len - h_len);  /* TODO necessary? */
     for (i = val; i < h_len; i++)
-        f[N - 1 - i] = nmod_mul(h[i], G->int_s2[i], mod);
+        f[len-1-i] = nmod_mul(h[i], G->int_s2[i], mod);
+    _nmod_vec_zero(f+len-val, val);  /* TODO necessary? */
 
-    f_len = N - val;
-    _nmod_vec_zero(f, N - h_len);
-    _nmod_poly_mullow(h, G->int_f2->coeffs, G->int_f2->length, f, f_len, N, mod);
+    /* transposed short product */
+    _nmod_poly_mullow(h, f, len, G->int_f->coeffs, len, len, mod);
 
+    /* final scaling */
     for (i = 0; i < len; i++)
-        poly[i] = nmod_mul(h[N - 1 - i], G->int_s3[i], mod);
+        poly[i] = nmod_mul(h[len-1-i], G->int_s1[i], mod);
 
     _nmod_vec_clear(f);
     _nmod_vec_clear(h);
