@@ -14,16 +14,15 @@
 #include "nmod_poly.h"
 #include "nmod_vec.h"
 
-void
-_nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
-    const nmod_geometric_progression_t G, slong len, nmod_t mod)
+void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
+            nn_srcptr v, const nmod_geometric_progression_t G, slong len, nmod_t mod)
 {
+    FLINT_ASSERT((G->function >> 1) & 1);
+
     slong i, N, f1_len, f2_len, h1_len, h2_min;
     nn_ptr f, h;
 
     N = G->len;
-
-    FLINT_ASSERT(len == N);
 
     if (len == 1)
     {
@@ -85,23 +84,22 @@ _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v,
     _nmod_vec_clear(h);
 }
 
-void
-nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v,
-    const nmod_geometric_progression_t G, slong len)
+void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly,
+                nn_srcptr v, const nmod_geometric_progression_t G, slong len)
 {
+    FLINT_ASSERT((G->function >> 1) & 1);
+
     nmod_poly_fit_length(poly, len);
     _nmod_poly_set_length(poly, len);
     _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(poly->coeffs, v, G, len, G->mod);
     _nmod_poly_normalise(poly);
 }
 
-void
-nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly, ulong r, 
-    nn_srcptr ys, slong n)
+void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly,
+                                                   ulong r, nn_srcptr ys, slong n)
 {
     nmod_geometric_progression_t G;
-    nmod_geometric_progression_init(G, r, n, poly->mod);
-
+    _nmod_geometric_progression_init_function(G, r, n, poly->mod, UWORD(2));
     nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(poly, ys, G, n);
-    nmod_geometric_progression_clear(G);
+    _nmod_geometric_progression_clear_function(G, UWORD(2));
 }
