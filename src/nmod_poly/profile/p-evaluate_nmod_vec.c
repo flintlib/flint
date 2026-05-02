@@ -433,7 +433,7 @@ int main(int argc, char * argv[])
 
     if (pre_fact != 1)
     {
-        flint_printf("[pre_fact provided] -> will build geometric progression with `pre_fact * points` points\n");
+        flint_printf("[pre_fact provided] -> will build geometric progression with `%ld * points` points\n", pre_fact);
         flint_printf("[pre_fact provided] -> for general points (except precomp only), tree has `points` points\n");
     }
 

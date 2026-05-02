@@ -35,6 +35,9 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
     f = _nmod_vec_init(N);
     h = _nmod_vec_init(N);
 
+    /* step1: Newton interpolation                       */
+    /* [Bostan - Schost, J.Complexity 2005, Section 5.1] */
+
     for (i = 0; i < N; i++)
     {
         if (v[N - i - 1] != 0)
@@ -51,6 +54,11 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
         f[i] = nmod_mul(v[i], G->int_s1[i], mod);
     }
     _nmod_poly_mullow(h, G->int_f1->coeffs, G->int_f1->length, f, f1_len, N, mod);
+
+    /* FIXME division by q_i ?? */
+
+    /* step2: Newton basis -> monomial basis             */
+    /* [Bostan - Schost, J.Complexity 2005, Section 5.2] */
 
     while (h1_len > 0 && h[h1_len - 1] == 0)
     {
