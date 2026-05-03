@@ -14,6 +14,7 @@
 #include "qqbar.h"
 #include "qqbar/impl.h"
 
+/* Find a rational p/q close to x with |p/q-x| < 1/N and q <= N. */
 void
 best_rational_fast(slong * p, ulong * q, double x, slong N)
 {
