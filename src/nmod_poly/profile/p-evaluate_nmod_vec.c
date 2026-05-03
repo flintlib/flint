@@ -367,6 +367,46 @@ void sample_nmod_vec_geom_fast_onlyprecomp(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
+/* multiplying two polynomials */
+void sample_nmod_poly_mul(void * arg, ulong count)
+{
+    ulong n;
+    nmod_t mod;
+    ulong i;
+
+    info_t * info = (info_t *) arg;
+    flint_bitcnt_t bits = info->bits;
+    slong length = info->length;
+
+    FLINT_TEST_INIT(state);
+
+    for (i = 0; i < count; i++)
+    {
+        n = n_randprime(state, bits, 1);
+        nmod_init(&mod, n);
+        nmod_poly_t poly1;
+        nmod_poly_t poly2;
+        nmod_poly_t poly3;
+        nmod_poly_init(poly1, n);
+        nmod_poly_init(poly2, n);
+        nmod_poly_init(poly3, n);
+        nmod_poly_randtest_monic(poly1, state, 2*length);
+        nmod_poly_randtest_monic(poly2, state, length);
+
+        prof_start();
+        for (ulong ii = 0; ii < __NB_ITER; ii++)
+            /* nmod_poly_mul(poly3, poly1, poly2); */
+            nmod_poly_mulmid(poly3, poly1, poly2, length, 2*length);
+        prof_stop();
+
+        nmod_poly_clear(poly1);
+        nmod_poly_clear(poly2);
+        nmod_poly_clear(poly3);
+    }
+
+    FLINT_TEST_CLEAR(state);
+}
+
 int main(int argc, char * argv[])
 {
     if (argc > 1 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))
@@ -439,6 +479,7 @@ int main(int argc, char * argv[])
     double time_geom_fast;
     double time_geom_fast_precomp;
     double time_geom_fast_onlyprecomp;
+    double time_poly_mul;
 
     info_t info;
     flint_bitcnt_t i;
@@ -456,7 +497,7 @@ int main(int argc, char * argv[])
             if (func_bench == 0)  /* bench all */
             {
                 flint_printf("==== nb eval points == %d * (poly length) ====\n", npoints_factor);
-                flint_printf("len\tpoints |        GENERAL POINTS         |       GEOMETRIC PROGRESSION     \n");
+                flint_printf("len\tpoints |        GENERAL POINTS         |       GEOMETRIC PROGRESSION    | POLY_MUL\n");
                 flint_printf("len\tpoints |iter\tfast\tw/ tree\ttree   |iter\tfast\tw/ prec\tprecomp\n");
             }
             else if (func_bench == 1)  /* general only */
@@ -468,7 +509,7 @@ int main(int argc, char * argv[])
             else if (func_bench == 2)  /* geometric only */
             {
                 flint_printf("==== nb eval points == %d * (poly length) ====\n", npoints_factor);
-                flint_printf("len\tpoints |       GEOMETRIC PROGRESSION     \n");
+                flint_printf("len\tpoints |       GEOMETRIC PROGRESSION    | POLY_MUL\n");
                 flint_printf("len\tpoints |iter\tfast\tw/ prec\tprecomp\n");
             }
 
@@ -510,14 +551,17 @@ int main(int argc, char * argv[])
                     prof_repeat(&time_geom_fast_precomp, &tmp, sample_nmod_vec_geom_fast_precomp, (void *) &info);
 
                     prof_repeat(&time_geom_fast_onlyprecomp, &tmp, sample_nmod_vec_geom_fast_onlyprecomp, (void *) &info);
+
+                    prof_repeat(&time_poly_mul, &tmp, sample_nmod_poly_mul, (void *) &info);
                 }
 
                 if (func_bench == 0)
                 {
-                    flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e|%.1e\t%.1e\t%.1e\t%.1e\n",
+                    flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e|%.1e\t%.1e\t%.1e\t%.1e\t|%.1e\n",
                                  info.length, info.npoints,
                                  time_iter/fac, time_fast/fac, time_fast_precomp/fac, time_fast_onlyprecomp/fac,
-                                 time_geom_iter/fac, time_geom_fast/fac, time_geom_fast_precomp/fac, time_geom_fast_onlyprecomp/fac);
+                                 time_geom_iter/fac, time_geom_fast/fac, time_geom_fast_precomp/fac, time_geom_fast_onlyprecomp/fac,
+                                 time_poly_mul/fac);
                 }
                 else if (func_bench == 1)
                 {
@@ -527,9 +571,10 @@ int main(int argc, char * argv[])
                 }
                 else if (func_bench == 2)
                 {
-                    flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e\n",
+                    flint_printf("%ld\t%7ld|%.1e\t%.1e\t%.1e\t%.1e\t|%.1e\n",
                                  info.length, info.npoints,
-                                 time_geom_iter/fac, time_geom_fast/fac, time_geom_fast_precomp/fac, time_geom_fast_onlyprecomp/fac);
+                                 time_geom_iter/fac, time_geom_fast/fac, time_geom_fast_precomp/fac, time_geom_fast_onlyprecomp/fac,
+                                 time_poly_mul/fac);
                 }
             }
         }
