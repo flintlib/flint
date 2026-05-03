@@ -10,6 +10,12 @@ FLINT version history
 FLINT 3.6.0 (in development)
 -------------------------------------------------------------------------------
 
+Contributors
+
+* Albin Ahlbäck (AA)
+* Edgar Costa (EC)
+* Fredrik Johansson (FJ)
+
 Bug fixes
 
 * Fix architecture-dependent test behaviour caused by undefined argument
@@ -30,6 +36,8 @@ Bug fixes
   The ``gr_stream_write`` family of functions have been marked
   ``WARN_UNUSED_RESULT`` to catch similar bugs more easily.
   [FJ, `#2652 <https://github.com/flintlib/flint/pull/2652>`_].
+* Fix virtual memory usage fetchers for OpenBSD [AA reported by Oliver Krüger,
+  `#2653 <https://github.com/flintlib/flint/pull/2653>`_].
 
 
 2026-04-24 -- FLINT 3.5.0
