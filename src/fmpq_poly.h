@@ -683,6 +683,13 @@ void _fmpq_poly_compose_series_brent_kung(fmpz * res, fmpz_t den,
 void fmpq_poly_compose_series_brent_kung(fmpq_poly_t res,
                     const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
 
+void _fmpq_poly_compose_series_kinoshita_li(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, slong len1,
+        const fmpz * poly2, const fmpz_t den2, slong len2, slong n);
+
+void fmpq_poly_compose_series_kinoshita_li(fmpq_poly_t res,
+                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
+
 void _fmpq_poly_compose_series(fmpz * res, fmpz_t den,
         const fmpz * poly1, const fmpz_t den1, slong len1,
         const fmpz * poly2, const fmpz_t den2, slong len2, slong n);

@@ -217,6 +217,8 @@ References
 
 .. [Kar1998] \E. A. Karatsuba, "Fast evaluation of the Hurwitz zeta function and Dirichlet L-series", Problems of Information Transmission 34:4 (1998), 342-353, http://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=ppi&paperid=425&option_lang=eng
 
+.. [KL2024] \Y. Kinoshita and B. Li, "Power series composition in near-linear time", 2024, https://arxiv.org/abs/2404.05177
+
 .. [Knu1997] \Knuth, D. E. The Art of Computer Programming, volume 2: Seminumerical algorithms, 1997
 
 .. [Kob2010] \A. Kobel, "Certified Complex Numerical Root Finding", Seminar on Computational Geometry and Geometric Computing (2010), http://www.mpi-inf.mpg.de/departments/d1/teaching/ss10/Seminar_CGGC/Slides/02_Kobel_NRS.pdf

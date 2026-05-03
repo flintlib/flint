@@ -20,13 +20,7 @@ _fmpq_poly_compose_series_horner(fmpz * res, fmpz_t den, const fmpz * poly1,
         const fmpz_t den1, slong len1, const fmpz * poly2,
         const fmpz_t den2, slong len2, slong n)
 {
-    if (fmpz_is_one(den2))
-    {
-        _fmpz_poly_compose_series(res, poly1, len1, poly2, len2, n);
-        fmpz_set(den, den1);
-        _fmpq_poly_canonicalise(res, den, n);
-    }
-    else if (n == 1)
+    if (n == 1)
     {
         fmpz_set(res, poly1);
         fmpz_set(den, den1);

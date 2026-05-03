@@ -36,6 +36,7 @@
 #include "t-compose_series_brent_kung.c"
 #include "t-compose_series.c"
 #include "t-compose_series_horner.c"
+#include "t-compose_series_kinoshita_li.c"
 #include "t-content.c"
 #include "t-cosh_series.c"
 #include "t-cos_series.c"
@@ -136,6 +137,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_poly_compose_series_brent_kung),
     TEST_FUNCTION(fmpq_poly_compose_series),
     TEST_FUNCTION(fmpq_poly_compose_series_horner),
+    TEST_FUNCTION(fmpq_poly_compose_series_kinoshita_li),
     TEST_FUNCTION(fmpq_poly_content),
     TEST_FUNCTION(fmpq_poly_cosh_series),
     TEST_FUNCTION(fmpq_poly_cos_series),

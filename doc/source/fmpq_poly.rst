@@ -1516,8 +1516,6 @@ Power series composition
     of the inputs and the output.
 
     This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
-    The default ``fmpz_poly`` composition algorithm is automatically
-    used when the composition can be performed over the integers.
 
 .. function:: void fmpq_poly_compose_series_brent_kung(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
@@ -1526,8 +1524,25 @@ Power series composition
     to be zero.
 
     This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
-    The default ``fmpz_poly`` composition algorithm is automatically
-    used when the composition can be performed over the integers.
+
+.. function:: void _fmpq_poly_compose_series_kinoshita_li(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+
+    Sets ``(res, den, n)`` to the composition of
+    ``(poly1, den1, len1)`` and ``(poly2, den2, len2)`` modulo `x^n`,
+    where the constant term of ``poly2`` is required to be zero.
+
+    Assumes that ``len1, len2, n > 0``, that ``len1, len2 <= n``,
+    and that ``res`` has space for ``n`` coefficients.
+
+    This implementation uses the Kinoshita-Li algorithm [KL2024]_.
+
+.. function:: void fmpq_poly_compose_series_kinoshita_li(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
+
+    Sets ``res`` to the composition of ``poly1`` and ``poly2``
+    modulo `x^n`, where the constant term of ``poly2`` is required
+    to be zero.
+
+    This implementation uses the Kinoshita-Li algorithm [KL2024]_.
 
 .. function:: void _fmpq_poly_compose_series(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
@@ -1540,10 +1555,10 @@ Power series composition
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation automatically switches between the Horner scheme
-    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
-    The default ``fmpz_poly`` composition algorithm is automatically
-    used when the composition can be performed over the integers.
+    This implementation automatically switches between the Horner scheme,
+    Brent-Kung algorithm 2.1 and the Kinoshita-Li algorithm depending on the
+    size of the inputs. The default ``fmpz_poly`` composition algorithm is
+    automaticallyused when the composition can be performed over the integers.
 
 .. function:: void fmpq_poly_compose_series(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
@@ -1641,7 +1656,8 @@ Power series reversion
     the linear term is required to be nonzero. Assumes that `n > 0`.
     Does not support aliasing between any of the inputs and the output.
 
-    This implementation defaults to using Newton iteration.
+    This implementation chooses between fast Lagrange inversion and
+    Newton iteration depending on the inputs.
     The default ``fmpz_poly`` reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
@@ -1651,7 +1667,8 @@ Power series reversion
     The constant term of ``poly2`` is required to be zero and
     the linear term is required to be nonzero.
 
-    This implementation defaults to using Newton iteration.
+    This implementation chooses between fast Lagrange inversion and
+    Newton iteration depending on the inputs.
     The default ``fmpz_poly`` reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 

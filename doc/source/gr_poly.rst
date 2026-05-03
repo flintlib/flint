@@ -798,13 +798,16 @@ Power series composition and reversion
               int gr_poly_compose_series_brent_kung(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
               int _gr_poly_compose_series_divconquer(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
               int gr_poly_compose_series_divconquer(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
+              int _gr_poly_compose_series_kinoshita_li(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+              int gr_poly_compose_series_kinoshita_li(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
               int _gr_poly_compose_series(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
               int gr_poly_compose_series(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 
     Sets *res* to the power series composition `h(x) = f(g(x))` truncated
     to order `O(x^n)` where `f` is given by *poly1* and `g` is given by *poly2*,
     respectively using Horner's rule, the Brent-Kung baby step-giant step
-    algorithm [BrentKung1978]_, divide-and-conquer, and an automatic choice between the algorithms.
+    algorithm [BrentKung1978]_, divide-and-conquer, the quasilinear-complexity
+    Kinoshita-Li algorithm [KL2024]_, and an automatic choice between the algorithms.
 
     The default algorithm also handles short input and
     special-form input `g = ax^n` efficiently.
