@@ -26,10 +26,6 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
         return;
     }
 
-    slong f_len, h_len, val;
-    nn_ptr f = _nmod_vec_init(len);
-    nn_ptr h = _nmod_vec_init(len);
-
     /** step1: Newton interpolation
      * [Bostan - Schost, J.Complexity 2005, Section 5.1]
      * -> The coefficients of the interpolant, in the Newton basis associated
@@ -46,7 +42,8 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
      */
 
     /* val = valuation of output poly in Newton basis */
-    for (val = 0; val < len; val++)
+    slong val = 0;
+    for (; val < len; val++)
         if (v[val] != 0)
             break;
     if (val == len)
@@ -54,6 +51,10 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
         _nmod_vec_zero(poly, len);
         return;
     }
+
+    slong f_len, h_len;
+    nn_ptr f = _nmod_vec_init(len);
+    nn_ptr h = _nmod_vec_init(len);
 
     /* actual length of f */
     for (f_len = len; f_len > val; f_len--)
@@ -139,10 +140,10 @@ void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly,
 }
 
 void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly,
-                                                   ulong r, nn_srcptr ys, slong n)
+                                                   ulong r, nn_srcptr ys, slong len)
 {
     nmod_geometric_progression_t G;
-    _nmod_geometric_progression_init_function(G, r, n, poly->mod, UWORD(2));
-    nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(poly, ys, G, n);
-    _nmod_geometric_progression_clear_function(G, UWORD(2));
+    _nmod_geometric_progression_init_function(G, r, len, poly->mod, UWORD(2));
+    nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(poly, ys, G, len);
+    nmod_geometric_progression_clear(G);
 }

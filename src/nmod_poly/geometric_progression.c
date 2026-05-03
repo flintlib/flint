@@ -13,9 +13,9 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "impl.h"
 
 /* specialized for moduli that support n_mulmod_shoup */
+static
 void _nmod_geometric_progression_evaluate_init_nonfullword(nmod_geometric_progression_t G,
                                                            ulong r, slong len, nmod_t mod,
                                                            ulong q, ulong q_pr_quo, ulong q_pr_rem,
@@ -23,7 +23,7 @@ void _nmod_geometric_progression_evaluate_init_nonfullword(nmod_geometric_progre
                                                            ulong inv_q, ulong inv_q_pr_quo, ulong inv_q_pr_rem)
 {
     /* G->ev_f = sum_{0 <= i < 2*len - 1} q**(i*i/2) * x**i */
-    /* G->ev_s[i] = 1 / q**(i*i/2)                          */
+    /* G->ev_s[i] = 1 / q**(i*i/2) = 1 / r**(i*i)           */
     nmod_poly_init2_preinv(G->ev_f, mod.n, mod.ninv, 2*len - 1);
     G->ev_s = _nmod_vec_init(len);
 
@@ -50,6 +50,7 @@ void _nmod_geometric_progression_evaluate_init_nonfullword(nmod_geometric_progre
 }
 
 /* general variant */
+static
 void _nmod_geometric_progression_evaluate_init(nmod_geometric_progression_t G,
                                                ulong r, slong len, nmod_t mod,
                                                ulong q, ulong inv_r, ulong inv_q)
@@ -75,6 +76,7 @@ void _nmod_geometric_progression_evaluate_init(nmod_geometric_progression_t G,
     }
 }
 
+static
 void _nmod_geometric_progression_interpolate_init_nonfullword(nmod_geometric_progression_t G,
                                                               slong len, nmod_t mod,
                                                               ulong q, ulong q_pr_quo, ulong q_pr_rem,
@@ -130,6 +132,7 @@ void _nmod_geometric_progression_interpolate_init_nonfullword(nmod_geometric_pro
     }
 }
 
+static
 void _nmod_geometric_progression_interpolate_init(nmod_geometric_progression_t G,
                                                   slong len, nmod_t mod,
                                                   ulong q, ulong inv_q)
@@ -227,6 +230,7 @@ void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G,
 }
 
 /* clear for selection of functionalities (see init)  */
+static
 void _nmod_geometric_progression_clear_function(nmod_geometric_progression_t G, ulong function)
 {
     if (function & UWORD(1))  /* evaluate */
