@@ -19,7 +19,7 @@ _fmpq_poly_compose_series(fmpz * res, fmpz_t den, const fmpz * poly1,
         const fmpz_t den1, slong len1, const fmpz * poly2,
         const fmpz_t den2, slong len2, slong n)
 {
-    if (len1 <= 20)
+    if (FLINT_MIN(len1, n) < 8)
         _fmpq_poly_compose_series_horner(res, den, poly1, den1, len1,
                 poly2, den2, len2, n);
     else
