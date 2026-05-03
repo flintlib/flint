@@ -23,41 +23,98 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
         nmod_poly_t P, Q;
         nn_ptr y;
         ulong mod, r;
-        slong n, npoints;
+        slong len, npoints;
 
-        npoints = 1 + (i == 0 ? 1 : n_randint(state, 100));
-        n = 1 + n_randint(state, npoints);
+        /* npoints = 1 + (i == 0 ? 1 : n_randint(state, 200)); */
+        npoints = 1 + n_randint(state, 200);
+        len = 1 + n_randint(state, npoints);
         do 
         { 
             mod = n_randtest_prime(state, 1); 
         }
-        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maximum order r
-
-        nmod_poly_init(P, mod);
-        nmod_poly_init(Q, mod);
+        while (mod <= (ulong)(2*FLINT_MAX(npoints, len) + 1)); // minimum limit for maximum order r
 
         r = n_primitive_root_prime(mod);
         y = _nmod_vec_init(npoints);
 
-        nmod_poly_randtest(P, state, n);
-
-        nmod_poly_evaluate_geometric_nmod_vec_fast(y, P, r, npoints);
-        nmod_poly_interpolate_geometric_nmod_vec_fast(Q, r, y, npoints);
-
-        result = nmod_poly_equal(P, Q);
-        if (!result)
+        /* use full `npoints` points */
         {
-            flint_printf("FAIL:\n");
-            flint_printf("mod=%wu, n=%wd, npoints=%wd\n\n", mod, n, npoints);
-            nmod_poly_print_pretty(P, "x"), flint_printf("\n\n");
-            nmod_poly_print_pretty(Q, "x"), flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
+            nmod_poly_init(P, mod);
+            nmod_poly_init(Q, mod);
+            nmod_poly_randtest(P, state, len);
+
+            nmod_poly_evaluate_geometric_nmod_vec_fast(y, P, r, npoints);
+            nmod_poly_interpolate_geometric_nmod_vec_fast(Q, r, y, npoints);
+            result = nmod_poly_equal(P, Q);
+            if (!result)
+            {
+                flint_printf("FAIL (all points):\n");
+                flint_printf("mod=%wu, len=%wd, npoints=%wd\n\n", mod, len, npoints);
+                nmod_poly_print_pretty(P, "x"), flint_printf("\n\n");
+                nmod_poly_print_pretty(Q, "x"), flint_printf("\n\n");
+                fflush(stdout);
+                flint_abort();
+            }
+
+            nmod_poly_clear(P);
+            nmod_poly_clear(Q);
         }
 
-        nmod_poly_clear(P);
-        nmod_poly_clear(Q);
-        _nmod_vec_clear(y);
+        /* use only `len` points */
+        {
+            nmod_poly_init(P, mod);
+            nmod_poly_init(Q, mod);
+            nmod_poly_randtest(P, state, len);
+
+            nmod_poly_evaluate_geometric_nmod_vec_fast(y, P, r, npoints);
+            nmod_poly_interpolate_geometric_nmod_vec_fast(Q, r, y, len);
+            result = nmod_poly_equal(P, Q);
+            if (!result)
+            {
+                flint_printf("FAIL (`len` points):\n");
+                flint_printf("mod=%wu, len=%wd, npoints=%wd\n\n", mod, len, npoints);
+                nmod_poly_print_pretty(P, "x"), flint_printf("\n\n");
+                nmod_poly_print_pretty(Q, "x"), flint_printf("\n\n");
+                fflush(stdout);
+                flint_abort();
+            }
+
+            nmod_poly_clear(P);
+            nmod_poly_clear(Q);
+        }
+
+        /* use variant with given precomputation */
+        {
+            nmod_t mod2;
+            nmod_init(&mod2, mod);
+            nmod_geometric_progression_t G;
+            nmod_geometric_progression_init(G, r, npoints, mod2);
+            nmod_poly_init(P, mod);
+            nmod_poly_init(Q, mod);
+            nmod_poly_randtest(P, state, len);
+
+            _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(y, P->coeffs, P->length, G, npoints, mod2);
+            nmod_poly_fit_length(Q, len);
+            _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(Q->coeffs, y, G, len, mod2);
+            _nmod_poly_set_length(Q, len);
+            _nmod_poly_normalise(Q);
+            result = nmod_poly_equal(P, Q);
+            if (!result)
+            {
+                flint_printf("FAIL (precomp):\n");
+                flint_printf("mod=%wu, len=%wd, npoints=%wd\n\n", mod, len, npoints);
+                nmod_poly_print_pretty(P, "x"), flint_printf("\n\n");
+                nmod_poly_print_pretty(Q, "x"), flint_printf("\n\n");
+                fflush(stdout);
+                flint_abort();
+            }
+
+            nmod_poly_clear(P);
+            nmod_poly_clear(Q);
+            nmod_geometric_progression_clear(G);
+        }
+
+        flint_free(y);
     }
 
     TEST_FUNCTION_END(state);
