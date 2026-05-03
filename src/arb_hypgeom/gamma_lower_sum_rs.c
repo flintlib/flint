@@ -38,7 +38,7 @@ _arb_hypgeom_gamma_lower_sum_rs_1(arb_t res, ulong p, ulong q, const arb_t z, sl
 {
     slong m, j, k, jlen, jbot, wp;
     double dz, logdz;
-    ulong c, chi, clo;
+    ulong c, chi;
     arb_t s;
     arb_ptr zpow;
     nn_ptr cs;
@@ -83,7 +83,7 @@ _arb_hypgeom_gamma_lower_sum_rs_1(arb_t res, ulong p, ulong q, const arb_t z, sl
         if (k != 0)
         {
             /* Check if new coefficient will overflow limb */
-            umul_ppmm(chi, clo, c, p + (k - 1) * q);
+            umulhigh_pmm(chi, c, p + (k - 1) * q);
 
             if (chi != 0)
             {

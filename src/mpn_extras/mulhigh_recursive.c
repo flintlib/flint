@@ -25,7 +25,7 @@ _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
 
         mp_size_t m1 = n - FLINT_MPN_MULHIGH_BEST_TAB_N;
         mp_size_t m2 = FLINT_MPN_MULHIGH_BEST_TAB_N;
-        mp_limb_t cy, lo, w0, w1, w2;
+        mp_limb_t cy, w0, w1, w2;
 
         FLINT_ASSERT(FLINT_MPN_MULHIGH_BEST_TAB_N <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH);
 
@@ -37,7 +37,7 @@ _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
         cy = mpn_add_n(r, r, t, m1);
         MPN_INCR_U(r + m1, m2, cy);
 
-        umul_ppmm(w2, lo, x[m1 - 1], y[m2 - 1]);
+        umulhigh_pmm(w2, x[m1 - 1], y[m2 - 1]);
         add_ssaaaa(cy, w0, 0, w0, 0, w1);
         add_ssaaaa(cy, w0, cy, w0, 0, w2);
         MPN_INCR_U(r, n, cy);
@@ -47,7 +47,7 @@ _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
     else
     {
         mp_ptr t;
-        mp_limb_t cy, lo, w0, w1, w2;
+        mp_limb_t cy, w0, w1, w2;
         mp_size_t m1 = n / 2;
         mp_size_t m2 = n - m1;
         TMP_INIT;
@@ -75,7 +75,7 @@ _flint_mpn_mulhigh_n_recursive(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
             MPN_INCR_U(r + m1, m2, cy);
         }
 
-        umul_ppmm(w2, lo, x[m1 - 1], y[m2 - 1]);
+        umulhigh_pmm(w2, x[m1 - 1], y[m2 - 1]);
         add_ssaaaa(cy, w0, 0, w0, 0, w1);
         add_ssaaaa(cy, w0, cy, w0, 0, w2);
         MPN_INCR_U(r, n, cy);
