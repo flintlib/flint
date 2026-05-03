@@ -19,11 +19,22 @@ _fmpq_poly_compose_series(fmpz * res, fmpz_t den, const fmpz * poly1,
         const fmpz_t den1, slong len1, const fmpz * poly2,
         const fmpz_t den2, slong len2, slong n)
 {
+    if (fmpz_is_one(den2))
+    {
+        _fmpz_poly_compose_series(res, poly1, len1, poly2, len2, n);
+        fmpz_set(den, den1);
+        _fmpq_poly_canonicalise(res, den, n);
+        return;
+    }
+
     if (FLINT_MIN(len1, n) < 8)
         _fmpq_poly_compose_series_horner(res, den, poly1, den1, len1,
                 poly2, den2, len2, n);
-    else
+    else if (n < 250)
         _fmpq_poly_compose_series_brent_kung(res, den, poly1, den1, len1,
+                poly2, den2, len2, n);
+    else
+        _fmpq_poly_compose_series_kinoshita_li(res, den, poly1, den1, len1,
                 poly2, den2, len2, n);
 }
 

@@ -39,7 +39,7 @@
 #define FLINT_NEWTON_END }
 
 
-#define FLINT_REVERSE_NEWTON_CUTOFF 4
+#define FLINT_REVERSE_NEWTON_CUTOFF 8
 
 void
 _fmpq_poly_revert_series_newton(fmpz * Qinv, fmpz_t den,
@@ -75,15 +75,15 @@ _fmpq_poly_revert_series_newton(fmpz * Qinv, fmpz_t den,
         FLINT_NEWTON_INIT(FLINT_REVERSE_NEWTON_CUTOFF, n)
 
         FLINT_NEWTON_BASECASE(k)
-        _fmpq_poly_revert_series_lagrange(Qinv, den, Q, Qden, Qlen, k);
+        _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, Qlen, k);
         _fmpz_vec_zero(Qinv + k, n - k);
         FLINT_NEWTON_END_BASECASE
 
         FLINT_NEWTON_LOOP(k0, k)
         _fmpq_poly_compose_series(T, Tden, Q, Qden, FLINT_MIN(Qlen, k), Qinv, den, k0, k);
-        _fmpq_poly_derivative(U, Uden, T, Tden, k); fmpz_zero(U + k - 1);
+        _fmpq_poly_derivative(U, Uden, T, Tden, k);
         fmpz_zero(T + 1);
-        _fmpq_poly_div_series(V, Vden, T, Tden, k, U, Uden, k, k);
+        _fmpq_poly_div_series(V, Vden, T, Tden, k, U, Uden, k - 1, k);
         _fmpq_poly_canonicalise(V, Vden, k);
         _fmpq_poly_derivative(T, Tden, Qinv, den, k);
         _fmpq_poly_mullow(U, Uden, V, Vden, k, T, Tden, k, k);
