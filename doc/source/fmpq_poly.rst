@@ -1558,7 +1558,7 @@ Power series composition
     This implementation automatically switches between the Horner scheme,
     Brent-Kung algorithm 2.1 and the Kinoshita-Li algorithm depending on the
     size of the inputs. The default ``fmpz_poly`` composition algorithm is
-    automaticallyused when the composition can be performed over the integers.
+    automatically used when the composition can be performed over the integers.
 
 .. function:: void fmpq_poly_compose_series(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
