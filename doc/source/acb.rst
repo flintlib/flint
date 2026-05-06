@@ -1206,6 +1206,14 @@ Vector functions
 
     Swaps the entries of *vec1* and *vec2*.
 
+.. function:: void _acb_vec_get_mag(mag_t bound, acb_srcptr vec, slong len)
+
+    Sets *bound* to an upper bound for the entries in *vec*.
+
+.. function:: void _acb_vec_get_mag_lower(mag_t bound, acb_srcptr vec, slong len)
+
+    Sets *bound* to an lower bound for the absolute values of the entries in *vec*.
+
 .. function:: void _acb_vec_get_real(arb_ptr re, acb_srcptr vec, slong len)
 
 .. function:: void _acb_vec_get_imag(arb_ptr im, acb_srcptr vec, slong len)

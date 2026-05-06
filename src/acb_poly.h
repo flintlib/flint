@@ -716,6 +716,19 @@ void cd_poly_horner(double* results_r, double* results_i,
 double cd_poly_find_roots(double * z, const double * p, const double * z0, slong n, slong num_iter, double reltol);
 double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec);
 
+/* Vector functions */
+
+acb_poly_struct * _acb_poly_vec_init(slong n);
+void _acb_poly_vec_clear(acb_poly_struct *vec, slong n);
+void _acb_poly_vec_zero(acb_poly_struct *dest, slong n);
+void _acb_poly_vec_set(acb_poly_struct *dest, const acb_poly_struct *src, slong n);
+void _acb_poly_vec_set_block(acb_poly_struct *dest, const acb_poly_struct *src,
+                             slong n, slong base, slong len);
+void _acb_poly_vec_fit_length(acb_poly_struct *vec, slong n, slong len);
+void _acb_poly_vec_set_length(acb_poly_struct *vec, slong n, slong len);
+void _acb_poly_vec_normalise(acb_poly_struct *vec, slong n);
+int _acb_poly_vec_overlaps(acb_poly_struct *vec1, acb_poly_struct *vec2, slong n);
+slong _acb_poly_vec_length(const acb_poly_struct * vec, slong n);
 
 #ifdef __cplusplus
 }

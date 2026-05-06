@@ -169,6 +169,9 @@ then
 elif test "$1" = "hilbert_matrix_ca";
 then
     echo "hilbert_matrix_ca....SKIPPED"
+elif test "$1" = "ode";
+then
+    echo "ode....SKIPPED"
 elif test "$1" = "huge_expr";
 then
     echo "huge_expr....SKIPPED"
