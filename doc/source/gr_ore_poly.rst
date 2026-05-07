@@ -319,6 +319,11 @@ Arithmetic
     which must be two Ore polynomials in the Ore algebra *ctx*.
     The underscore method assumes *res != poly1*, *res != poly2* (no aliasing) and *len1* != 0, *len2* != 0.
 
+.. function:: int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V, slong lenV, gr_ore_poly_ctx_t ctx)
+              int gr_ore_poly_divrem(gr_ore_poly_t Q, gr_ore_poly_t R, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx)
+
+    Sets *(Q, R)* to the unique pair such that `U = QV + R` and `ord(R) < ord(V)`.
+
 .. raw:: latex
 
     \newpage

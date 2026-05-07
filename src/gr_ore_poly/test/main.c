@@ -15,6 +15,7 @@
 #include "t-set_str.c"
 #include "t-sigma_delta.c"
 #include "t-mul.c"
+#include "t-divrem.c"
 
 /* Array of test functions ***************************************************/
 
@@ -24,6 +25,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_ore_poly_set_str),
     TEST_FUNCTION(gr_ore_poly_sigma_delta),
     TEST_FUNCTION(gr_ore_poly_mul),
+    TEST_FUNCTION(gr_ore_poly_divrem)
 };
 
 /* main function *************************************************************/
