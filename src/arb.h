@@ -338,6 +338,7 @@ int arb_contains_int(const arb_t x);
 
 void arb_get_interval_fmpz_2exp(fmpz_t a, fmpz_t b, fmpz_t exp, const arb_t x);
 int arb_get_unique_fmpz(fmpz_t z, const arb_t x);
+int arb_get_simplest_fmpq(fmpq_t res, const arb_t x);
 
 void arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, slong n);
 
