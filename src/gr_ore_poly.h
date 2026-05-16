@@ -282,6 +282,8 @@ WARN_UNUSED_RESULT int gr_ore_poly_mul(gr_ore_poly_t res, const gr_ore_poly_t po
 
 WARN_UNUSED_RESULT int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V, slong lenV, gr_ore_poly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ore_poly_divrem(gr_ore_poly_t Q, gr_ore_poly_t R, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ore_poly_div(gr_ore_poly_t Q, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ore_poly_rem(gr_ore_poly_t R, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx);
 
 #ifdef __cplusplus
 }

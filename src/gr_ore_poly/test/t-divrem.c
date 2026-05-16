@@ -13,10 +13,9 @@
 #include "ulong_extras.h"
 #include "gr_ore_poly.h"
 
-TEST_FUNCTION_START(gr_ore_poly_divrem, state)
+TEST_GR_FUNCTION_START(gr_ore_poly_divrem, state, count_success, count_domain, count_unable)
 {
     slong iter;
-    // slong success = 0, domain = 0, unable = 0, combined = 0;
     for (iter = 0; iter < 3000 * flint_test_multiplier(); iter++)
     {
         int status = GR_SUCCESS;
@@ -45,7 +44,7 @@ TEST_FUNCTION_START(gr_ore_poly_divrem, state)
 
         if (status == GR_SUCCESS)
         {
-            /* test aliasing */
+            // test aliasing
             switch (n_randint(state, 5))
             {
                 case 0:
@@ -84,18 +83,12 @@ TEST_FUNCTION_START(gr_ore_poly_divrem, state)
                     flint_printf("Q*B + R = "); gr_ore_poly_print(QBR, ore_ctx); flint_printf("\n");
                     flint_abort();
                 }
-                // success++;
             }
         }
 
-        /*if (status == GR_DOMAIN)
-            domain++;
-
-        if (status == GR_UNABLE)
-            unable++;
-
-        if (status == 3)
-            combined++;*/
+        count_success += (status == GR_SUCCESS);
+        count_domain += ((status & GR_DOMAIN) != 0);
+        count_unable += ((status & GR_UNABLE) != 0);
 
         gr_ore_poly_clear(A, ore_ctx);
         gr_ore_poly_clear(B, ore_ctx);
@@ -106,9 +99,5 @@ TEST_FUNCTION_START(gr_ore_poly_divrem, state)
         gr_ore_poly_ctx_clear(ore_ctx);
         gr_ctx_clear(ctx);
     }
-    /*flint_printf("GR_SUCCESS = %d\n", success);
-    flint_printf("GR_DOMAIN = %d\n", domain);
-    flint_printf("GR_UNABLE = %d\n", unable);
-    flint_printf("Combined (3) = %d\n", combined);*/
-    TEST_FUNCTION_END(state);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }
