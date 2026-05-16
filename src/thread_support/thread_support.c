@@ -85,8 +85,10 @@ int flint_restore_thread_affinity(void)
     return thread_pool_restore_affinity(global_thread_pool);
 }
 
-/* Takes in the *thread limit* but returns the number of **handles**. That is,
- * the maximum return value is `thread_limit - 1`. */
+/* Wrapper around `thread_pool_request` using `global_thread_pool`, and
+   dynamically allocate the handle array.
+   Takes in the *thread limit* but returns the number of **handles**. That is,
+   the maximum return value is `thread_limit - 1`. */
 slong flint_request_threads(thread_pool_handle ** handles, slong thread_limit)
 {
     slong num_handles = 0;
@@ -113,6 +115,8 @@ slong flint_request_threads(thread_pool_handle ** handles, slong thread_limit)
     return num_handles;
 }
 
+/* Wrapper around `thread_pool_give_back` to use `global_thread_pool`
+   and free the memory allocated by `flint_request_threads`. */
 void flint_give_back_threads(thread_pool_handle * handles, slong num_handles)
 {
     slong i;

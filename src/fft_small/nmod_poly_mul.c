@@ -317,8 +317,9 @@ static void _crt_1(
        prime itself or small enough to be a valid FFT prime. */
     FLINT_ASSERT(mod.n <= (UWORD(1) << 50));
 
-    /* Todo: generalize _convert_block to allow using the fast path
-       for all FFT primes. */
+    /* Todo: use the fast path for all FFT primes. Currently this only
+       applies when `mod.n` is already in the context, since `s2worker_func`
+       passes `Rffts = ffts + offset`, making the matched prime `Rffts[0]`.  */
     have_fft_prime = (mod.n == Rffts[0].mod.n);
     if (!have_fft_prime)
     {
@@ -710,6 +711,9 @@ typedef struct {
 } s1worker_struct;
 
 
+/* Reduce `const ulong* b` into `bbuf` and FFT-transform it in place.
+   Used as a helper for `s1worker_func` in order to process
+   `bbuf` and `abuf` in parallel, assuming `!squaring`.  */
 static void extra_func(void* varg)
 {
     s1worker_struct* X = (s1worker_struct*) varg;
@@ -719,6 +723,14 @@ static void extra_func(void* varg)
     sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
 }
 
+/* compute convolutions modulo the selected precomputed FFT primes.
+   Specifically, for each `start_pi <= i < stop_pi`, reduce
+   `a + stride*i` into `abuf + stride*i`, and multiply it by `b`,
+   modulo `ffts[i + X->offset].p`. The output is written in-place to
+   `abuf + stride*i`.
+   If `squaring` is true, `abuf` is squared, and `bbuf` is not used.
+   If `flint_request_threads` returns the requested number of threads,
+   then each `s1worker_func` processes exactly one prime.  */
 static void s1worker_func(void* varg)
 {
     s1worker_struct* X = (s1worker_struct*) varg;
@@ -736,28 +748,22 @@ static void s1worker_func(void* varg)
         double* bbuf = X->bbuf;
         sd_fft_ctx_struct* Q = X->ffts + ioff;
 
-        if (!X->squaring)
+        if (nworkers > 0)
         {
-            if (nworkers > 0)
-            {
-                X->ioff = ioff;
-                thread_pool_wake(global_thread_pool, handles[0], 0, extra_func, X);
-            }
-            else
-            {
-                _mod(bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
-                sd_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
-            }
+            X->ioff = ioff; // read by extra_func on the worker thread
+            thread_pool_wake(global_thread_pool, handles[0], 0, extra_func, X);
+        }
+        else if (!X->squaring)
+        {
+            _mod(bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
+            sd_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
         }
 
         _mod(abuf, X->atrunc, X->a, X->an, Q, X->mod);
         sd_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
 
-        if (!X->squaring)
-        {
-            if (nworkers > 0)
-                thread_pool_wait(global_thread_pool, handles[0]);
-        }
+        if (nworkers > 0)
+            thread_pool_wait(global_thread_pool, handles[0]);
 
         ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
         NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, Q->mod);
@@ -790,9 +796,11 @@ typedef struct {
         ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
         sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
         crt_data_struct* Rcrts, ulong min_an_bn,
-        nmod_t mod);
+        nmod_t mod);  /* f = _crt_{np} for 1 <= np <= 4 */
 } s2worker_struct;
 
+/* Computes CRT for an output range, writing to `z[zi - zl]` for
+   `start_zi <= zi < stop_zi`.  */
 static void s2worker_func(void* varg)
 {
     s2worker_struct* X = (s2worker_struct*) varg;
@@ -839,7 +847,7 @@ void _nmod_poly_mul_mid_mpn_ctx(
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
-    /* first see if mod.n is on of R->ffts[i].mod.n */
+    /* first see if mod.n is one of R->ffts[i].mod.n */
     if (modbits == 50)
     {
         for (i = 0; i < MPN_CTX_NCRTS; i++)
@@ -1003,6 +1011,10 @@ static void _nmod_poly_mul_mod_xpnm1_naive(
 }
 #endif
 
+/*
+Set `z` to the cyclic convolution of `a` and `b` modulo `mod`
+with length `N = 2^depth`.
+*/
 static void _nmod_poly_mul_mod_xpnm1(
     ulong* z, ulong ztrunc,
     const ulong* a, ulong an,
@@ -1022,7 +1034,6 @@ static void _nmod_poly_mul_mod_xpnm1(
     FLINT_ASSERT(ztrunc <= N);
 
     /* first see if mod.n is one of R->ffts[i].mod.n */
-
     if (modbits == 50)
     {
         for (i = 0; i < MPN_CTX_NCRTS; i++)
@@ -1150,6 +1161,9 @@ typedef struct {
     nmod_t mod;
 } s1pworker_struct;
 
+/* similar to `s1worker_func`, but assume `bbuf` is already FFT-transformed.
+   If `flint_request_threads` returns the requested number of threads,
+   then each `s1pworker_func` processes exactly one prime.  */
 static void s1pworker_func(void* varg)
 {
     s1pworker_struct* X = (s1pworker_struct*) varg;
@@ -1189,8 +1203,7 @@ void _mul_precomp_init(
 
     FLINT_ASSERT(bn > 0);
 
-    /* first see if mod.n is on of R->ffts[i].mod.n */
-
+    /* first see if mod.n is one of R->ffts[i].mod.n */
     if (modbits == 50)
     {
         for (i = 0; i < MPN_CTX_NCRTS; i++)

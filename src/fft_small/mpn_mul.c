@@ -40,7 +40,8 @@ The following profiles are hardcoded.
      8  192  7 6
 
 Here np is the number of primes {p[0], p[1], ...p[np-1]}. By default the
-following 50-bit primes are used:
+following 50-bit primes are used (produced by repeatedly applying next_fft_number
+on DEFAULT_PRIME):
 
     p[0] = 1108307720798209
     p[1] = 659706976665601
@@ -899,7 +900,7 @@ DEFINE_IT(8, 7, 6)
 /*
     Specialized helper function, currently only called from mpn_ctx_init.
     Assume p is odd and p - 1 has high 2-valuation, return some number q
-    (not necessarily prime) less than p such that q - 1 has high 2-valuation.
+    (not necessarily prime) such that q - 1 also has high 2-valuation.
 */
 static ulong next_fft_number(ulong p)
 {
@@ -910,9 +911,12 @@ static ulong next_fft_number(ulong p)
     if (bits < 15)
         flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     if (n_nbits(q) == bits)
+        // Best case: q - 1 has the same bit length and 2-valuation as p - 1
         return q;
     if (l < 5)
-        return n_pow2(bits - 2) + 1;
+        return n_pow2(bits - 2) + 1;  // Worst case: drop the bit length by 1
+    // Second-best case: keep the bit length, but drop the 2-valuation by 1
+    // (this is the only case where q > p)
     return n_pow2(bits) - n_pow2(l - 1) + 1;
 }
 

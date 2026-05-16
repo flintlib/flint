@@ -80,8 +80,20 @@ Access and conversions
 
     Create vector from distinct entries.
 
-.. function:: vec4n vec4d_convert_limited_vec4n(vec4d a)
+.. function:: vec1n vec1d_convert_limited_vec1n(vec1d a)
+              vec2n vec2d_convert_limited_vec2n(vec2d a)
+              vec4n vec4d_convert_limited_vec4n(vec4d a)
+
+    Given that each entry in the input vector is an exact integer in
+    ``[0, 2^{52})``, convert it to :type:`ulong`.
+    Note that ``vec1d`` and ``vec2d`` functions are only available on NEON.
+
+.. function:: vec2d vec2n_convert_limited_vec2d(vec2n a)
+              vec4d vec4n_convert_limited_vec4d(vec4n a)
               vec8d vec8n_convert_limited_vec8d(vec8n a)
+
+    The inverse conversion, from :type:`ulong` entries to exact
+    ``double`` entries. Requires the same assumption.
 
 Permutations
 -------------------------------------------------------------------------------
