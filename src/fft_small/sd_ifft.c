@@ -1510,11 +1510,11 @@ void sd_ifft_trunc(
 {
     FLINT_ASSERT(trunc <= n_pow2(L));
 
+    sd_fft_ctx_fit_depth(Q, L);
+
     if (L > LG_BLK_SZ)
     {
         ulong new_trunc = n_cdiv(trunc, BLK_SZ);
-
-        sd_fft_ctx_fit_depth(Q, L);
 
         sd_ifft_trunc_internal(Q, d, 1, L - LG_BLK_SZ, 0, new_trunc, new_trunc, 0);
         return;

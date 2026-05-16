@@ -479,6 +479,7 @@ void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
 
 /* Primitive roots and discrete logarithms ***********************************/
 
+ulong n_quadratic_nonresidue(ulong n);
 ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors);
 ulong n_primitive_root_prime(ulong p);
 

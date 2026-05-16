@@ -26,6 +26,28 @@ void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 }
 
 /*
+    Return a primitive 2^depth-th root modulo the prime pp.
+    Requires depth == valuation(pp - 1, 2).
+*/
+static ulong
+sd_fft_ctx_primitive_2power_root(ulong pp, ulong depth, nmod_t mod)
+{
+    ulong a = n_quadratic_nonresidue(pp);
+    return nmod_pow_ui(a, (pp - 1) >> depth, mod);
+}
+
+/*
+    Return the primitive 2^(k+1)-th root used to generate w2tab[k].
+    Requires depth == valuation(Q->mod.n - 1, 2).
+*/
+static ulong
+sd_fft_ctx_w2tab_root(const sd_fft_ctx_t Q, ulong depth, ulong k)
+{
+    FLINT_ASSERT(k + 1 <= depth);
+    return nmod_pow_ui(Q->primitive_2power_root, UWORD(1) << (depth - k - 1), Q->mod);
+}
+
+/*
     Initialize FFT context.
     pp is a prime with at most ~ 50 bits (exactly representable with a `double`)
     such that pp - 1 has sufficiently high 2-valuation.
@@ -33,7 +55,7 @@ void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 */
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 {
-    ulong N, i, k, l;
+    ulong N, i, k, l, init_depth, two_power_depth;
     double * t;
     double n, ninv;
 
@@ -43,14 +65,18 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     Q->p = pp;
     Q->pinv = 1.0/Q->p;
     nmod_init(&Q->mod, pp);
-    Q->primitive_root = n_primitive_root_prime(pp);
+    two_power_depth = n_trailing_zeros(pp - 1);
+    if (two_power_depth == 0)
+        flint_throw(FLINT_ERROR, "Input %wu is either 2 or not a prime", pp);
+    Q->primitive_2power_root = sd_fft_ctx_primitive_2power_root(pp, two_power_depth, Q->mod);
+    init_depth = n_min(two_power_depth, SD_FFT_CTX_W2TAB_INIT);
 
     n = Q->p;
     ninv = Q->pinv;
 
     /*
-        fill wtab to a depth of SD_FFT_CTX_W2TAB_INIT:
-        2^(SD_FFT_CTX_W2TAB_INIT-1) entries: 1, e(1/4), e(1/8), e(3/8), ...
+        fill wtab to a depth of init_depth:
+        2^(init_depth-1) entries: 1, e(1/4), e(1/8), e(3/8), ...
 
         Q->w2tab[j] is itself a table of length 2^(j-1) containing 2^(j+1) st
         roots of unity. More documentation on the layout of w2tab can be found
@@ -60,14 +86,14 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
         they're stored as `double` to make use of the vectorized functions in
         machine_vectors.h.
     */
-    N = n_pow2(SD_FFT_CTX_W2TAB_INIT - 1);
+    N = n_pow2(init_depth - 1);
     t = (double*) flint_aligned_alloc(4096, n_round_up(N*sizeof(double), 4096));
 
     Q->w2tab[0] = t;
     t[0] = 1;
-    for (k = 1, l = 1; k < SD_FFT_CTX_W2TAB_INIT; k++, l *= 2)
+    for (k = 1, l = 1; k < init_depth; k++, l *= 2)
     {
-        ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+        ulong ww = sd_fft_ctx_w2tab_root(Q, two_power_depth, k);
         double w = vec1d_set_d(vec1d_reduce_0n_to_pmhn(ww, n));
         double* curr = t + l;
         Q->w2tab[k] = curr;
@@ -94,9 +120,9 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 #endif
 
 #if FLINT_WANT_ASSERT
-    for (k = 1; k < SD_FFT_CTX_W2TAB_INIT; k++)
+    for (k = 1; k < init_depth; k++)
     {
-        ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+        ulong ww = sd_fft_ctx_w2tab_root(Q, two_power_depth, k);
         for (i = 0; i < n_pow2(k-1); i++)
         {
             ulong www = nmod_pow_ui(ww, n_revbin(i+n_pow2(k-1), k), Q->mod);
@@ -108,6 +134,11 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 
 void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong depth)
 {
+    ulong two_power_depth = n_trailing_zeros(Q->mod.n - 1);
+
+    if (depth > two_power_depth)
+        flint_throw(FLINT_ERROR, "FFT prime %wu does not support depth %wu", Q->mod.n, depth);
+
 #if FLINT_USES_PTHREAD
     pthread_mutex_lock(&Q->mutex);
 #endif
@@ -121,7 +152,7 @@ void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong depth)
     while (k < depth)
     {
         ulong i, j, l, off;
-        ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+        ulong ww = sd_fft_ctx_w2tab_root(Q, two_power_depth, k);
         vec8d w    = vec8d_set_d(vec1d_reduce_0n_to_pmhn(ww, Q->p));
         vec8d n    = vec8d_set_d(Q->p);
         vec8d ninv = vec8d_set_d(Q->pinv);
@@ -153,7 +184,7 @@ void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong depth)
 
 #if FLINT_WANT_ASSERT
         {
-            ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
+            ulong ww = sd_fft_ctx_w2tab_root(Q, two_power_depth, k);
             for (i = 0; i < n_pow2(k-1); i++)
             {
                 ulong www = nmod_pow_ui(ww, n_revbin(i+n_pow2(k-1), k), Q->mod);

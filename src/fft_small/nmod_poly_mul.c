@@ -836,7 +836,7 @@ _nmod_poly_should_directly_fft(ulong bn, ulong depth, nmod_t mod)
         /* unlikely, the convolution length would have to be massive */
         return 0;
 
-    if (n_trailing_zeros(mod.n - 1) < n_max(depth, SD_FFT_CTX_W2TAB_INIT))
+    if (n_trailing_zeros(mod.n - 1) < depth)
         return 0;
 
     return n_is_prime(mod.n); /* check the most expensive condition last */
