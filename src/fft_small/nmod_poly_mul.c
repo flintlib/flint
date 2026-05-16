@@ -12,6 +12,7 @@
 #include "thread_pool.h"
 #include "thread_support.h"
 #include "mpn_extras.h"
+#include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -317,9 +318,9 @@ static void _crt_1(
        prime itself or small enough to be a valid FFT prime. */
     FLINT_ASSERT(mod.n <= (UWORD(1) << 50));
 
-    /* Todo: use the fast path for all FFT primes. Currently this only
-       applies when `mod.n` is already in the context, since `s2worker_func`
-       passes `Rffts = ffts + offset`, making the matched prime `Rffts[0]`.  */
+    /* This applies in the `direct_fft` branch, or when `mod.n` is already
+       in the context. In the latter case, `s2worker_func` passes
+       `Rffts = ffts + offset`, making the matched prime `Rffts[0]`.  */
     have_fft_prime = (mod.n == Rffts[0].mod.n);
     if (!have_fft_prime)
     {
@@ -809,6 +810,38 @@ static void s2worker_func(void* varg)
          X->stride, X->crts + X->offset, X->min_an_bn, X->mod);
 }
 
+/* Return whether to compute the FFT directly modulo `mod`, rather than
+   modulo precomputed FFT primes followed by CRT reconstruction.
+   Direct computation requires `mod.n` to be prime and `mod.n - 1`
+   to have sufficiently high 2-valuation.
+   This is usually faster when CRT would need multiple primes, but it pays
+   the setup cost of initializing and clearing a temporary `sd_fft_ctx_t`.  */
+static int
+_nmod_poly_should_directly_fft(ulong bn, ulong depth, nmod_t mod)
+{
+    if (bn < 1500)
+        return 0;
+
+    if (mod.n <= 2 || mod.n > (UWORD(1) << 50))
+        return 0;
+
+    if (NMOD_BITS(mod) < 20)
+        return 0;
+
+    if (!fft_small_mulmod_satisfies_bounds(mod.n))
+        /* should be implied by the 50-bit bound, but just in case */
+        return 0;
+
+    if (depth > SD_FFT_CTX_W2TAB_SIZE)
+        /* unlikely, the convolution length would have to be massive */
+        return 0;
+
+    if (n_trailing_zeros(mod.n - 1) < n_max(depth, SD_FFT_CTX_W2TAB_INIT))
+        return 0;
+
+    return n_is_prime(mod.n); /* check the most expensive condition last */
+}
+
 void _nmod_poly_mul_mid_mpn_ctx(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
@@ -822,7 +855,10 @@ void _nmod_poly_mul_mid_mpn_ctx(
     ulong atrunc, btrunc, ztrunc;
     ulong i, np, depth, stride;
     double* buf;
+    sd_fft_ctx_t direct_fft;  // initialized with mod.n in direct mode
     int squaring;
+
+    direct_fft->w2tab[0] = NULL;  // use direct_fft branch iff this is not NULL
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
@@ -847,37 +883,6 @@ void _nmod_poly_mul_mid_mpn_ctx(
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
-    /* first see if mod.n is one of R->ffts[i].mod.n */
-    if (modbits == 50)
-    {
-        for (i = 0; i < MPN_CTX_NCRTS; i++)
-        {
-            if (mod.n == R->ffts[i].mod.n)
-            {
-                offset = i;
-                np = 1;
-                goto got_np_and_offset;
-            }
-        }
-    }
-
-    /* need prod_of_primes >= blen * 4^modbits */
-    for (np = 1; np < 4; np++)
-    {
-        if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
-              R->crts[np - 1].coeff_len, bn, 2*modbits) >= 0)
-        {
-            break;
-        }
-    }
-
-    FLINT_ASSERT(0 <= flint_mpn_cmp_ui_2exp(
-                                  crt_data_prod_primes(R->crts + np - 1),
-                                  R->crts[np - 1].coeff_len, bn, 2*modbits));
-
-
-got_np_and_offset:
-
     atrunc = n_round_up(an, BLK_SZ);
     btrunc = n_round_up(bn, BLK_SZ);
     ztrunc = n_round_up(zn, BLK_SZ);
@@ -896,6 +901,45 @@ got_np_and_offset:
     {
         depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
     }
+
+    /* first see if mod.n is one of R->ffts[i].mod.n */
+    if (modbits == 50)
+    {
+        for (i = 0; i < MPN_CTX_NCRTS; i++)
+        {
+            if (mod.n == R->ffts[i].mod.n)
+            {
+                offset = i;
+                np = 1;
+                goto got_np_and_offset;
+            }
+        }
+    }
+
+    if (_nmod_poly_should_directly_fft(bn, depth, mod))
+    {
+        sd_fft_ctx_init_prime(direct_fft, mod.n);
+        offset = 0;
+        np = 1;
+        goto got_np_and_offset;
+    }
+
+    /* need prod_of_primes >= blen * 4^modbits */
+    for (np = 1; np < 4; np++)
+    {
+        if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
+              R->crts[np - 1].coeff_len, bn, 2*modbits) >= 0)
+        {
+            break;
+        }
+    }
+
+    FLINT_ASSERT(0 <= flint_mpn_cmp_ui_2exp(
+                                  crt_data_prod_primes(R->crts + np - 1),
+                                  R->crts[np - 1].coeff_len, bn, 2*modbits));
+
+
+got_np_and_offset:
 
     stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
 
@@ -931,7 +975,7 @@ got_np_and_offset:
         X->an = an;
         X->b = b;
         X->bn = bn;
-        X->ffts = R->ffts;
+        X->ffts = direct_fft->w2tab[0] != NULL ? direct_fft : R->ffts;
         X->crts = R->crts;
         X->mod = mod;
         X->squaring = squaring;
@@ -964,7 +1008,7 @@ got_np_and_offset:
         X->buf = buf;
         X->offset = offset;
         X->stride = stride;
-        X->ffts = R->ffts;
+        X->ffts = direct_fft->w2tab[0] != NULL ? direct_fft : R->ffts;
         X->crts = R->crts;
         X->mod = mod;
         X->min_an_bn = FLINT_MIN(an, bn);
@@ -978,6 +1022,9 @@ got_np_and_offset:
         thread_pool_wait(global_thread_pool, handles[i - 1]);
 
     flint_give_back_threads(handles, nworkers);
+
+    if (direct_fft->w2tab[0] != NULL)
+        sd_fft_ctx_clear(direct_fft);
 }
 
 #if 0
