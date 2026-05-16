@@ -57,7 +57,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 {
     ulong N, i, k, l, init_depth, two_power_depth;
     double * t;
-    double n, ninv;
+    double n, ninv, w;
 
     if (!fft_small_mulmod_satisfies_bounds(pp))
         flint_throw(FLINT_ERROR, "FFT prime %wu does not satisfy bounds for arithmetic", pp);
@@ -70,6 +70,8 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
         flint_throw(FLINT_ERROR, "Input %wu is either 2 or not a prime", pp);
     Q->primitive_2power_root = sd_fft_ctx_primitive_2power_root(pp, two_power_depth, Q->mod);
     init_depth = n_min(two_power_depth, SD_FFT_CTX_W2TAB_INIT);
+    if (init_depth < 4)
+        flint_throw(FLINT_ERROR, "Input %wu does not support FFT context initialization", pp);
 
     n = Q->p;
     ninv = Q->pinv;
@@ -91,18 +93,37 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 
     Q->w2tab[0] = t;
     t[0] = 1;
-    for (k = 1, l = 1; k < init_depth; k++, l *= 2)
+
     {
-        ulong ww = sd_fft_ctx_w2tab_root(Q, two_power_depth, k);
-        double w = vec1d_set_d(vec1d_reduce_0n_to_pmhn(ww, n));
+        ulong ww = sd_fft_ctx_w2tab_root(Q, two_power_depth, 3);
+        w = vec1d_reduce_0n_to_pmhn(ww, n);
+        double w2 = vec1d_reduce_pm1n_to_pmhn(vec1d_mulmod(w, w, n, ninv), n);
+
+        Q->w2tab[1] = t + 1;
+        t[1] = vec1d_reduce_pm1n_to_pmhn(vec1d_mulmod(w2, w2, n, ninv), n);
+
+        Q->w2tab[2] = t + 2;
+        t[2] = w2;
+        t[3] = vec1d_reduce_pm1n_to_pmhn(vec1d_mulmod(t[1], w2, n, ninv), n);
+    }
+
+    vec4d n4 = vec4d_set_d(n);
+    vec4d ninv4 = vec4d_set_d(ninv);
+
+    for (k = 3, l = 4; k < init_depth; k++, l *= 2)
+    {
         double* curr = t + l;
+        vec4d w4 = vec4d_set_d(w);
         Q->w2tab[k] = curr;
         i = 0; do {
-            vec1d x = vec1d_load(t + i);
-            x = vec1d_mulmod(x, w, n, ninv);
-            x = vec1d_reduce_pm1n_to_pmhn(x, n);
-            vec1d_store(curr + i, x);
-        } while (i += 1, i < l);
+            vec4d x = vec4d_load_aligned(t + i);
+            x = vec4d_mulmod(x, w4, n4, ninv4);
+            x = vec4d_reduce_pm1n_to_pmhn(x, n4);
+            vec4d_store_aligned(curr + i, x);
+        } while (i += 4, i < l);
+
+        if (k + 1 < init_depth)
+            w = vec1d_reduce_0n_to_pmhn(sd_fft_ctx_w2tab_root(Q, two_power_depth, k + 1), n);
     }
 
 #if FLINT_USES_PTHREAD
