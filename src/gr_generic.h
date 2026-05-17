@@ -239,6 +239,7 @@ WARN_UNUSED_RESULT truth_t gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, 
 WARN_UNUSED_RESULT int gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_si(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const slong * vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const fmpz * vec2, slong len, gr_ctx_t ctx);

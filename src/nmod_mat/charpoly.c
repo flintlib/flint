@@ -108,154 +108,206 @@ void nmod_mat_charpoly_berkowitz(nmod_poly_t cp, const nmod_mat_t mat)
     _nmod_mat_charpoly_berkowitz(cp->coeffs, mat, mat->mod);
 }
 
-void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
+static
+int _nmod_mat_charpoly_danilevsky(nn_ptr p, const nmod_mat_t M, nmod_t mod)
 {
-   slong n = M->r, i, j, k;
-   ulong * V, * W, * T;
-   ulong h;
-   nmod_poly_t b;
-   nmod_mat_t M2;
-   TMP_INIT;
+    slong n = M->r, i, j, k, plen;
+    ulong * V, * W, * b, * t;
+    ulong g, h;
+    nmod_mat_t M2;
+    int success = 1;
+    TMP_INIT;
 
-   if (M->r != M->c)
-   {
-      flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly_danilevsky).  Non-square matrix.\n");
-   }
 
-   if (n == 0)
-   {
-      nmod_poly_one(p);
-      return;
-   }
+    if (n == 0)
+    {
+        p[0] = 1;
+        return 1;
+    }
 
-   if (n == 1)
-   {
-      nmod_poly_set_coeff_ui(p, 1, 1);
-      nmod_poly_set_coeff_ui(p, 0, n_negmod(nmod_mat_entry(M, 0, 0), p->mod.n));
-      _nmod_poly_set_length(p, 2);
-      return;
-   }
+    if (n == 1)
+    {
+        p[1] = 1;
+        p[0] = nmod_neg(nmod_mat_entry(M, 0, 0), mod);
+        return 1;
+    }
 
-   TMP_START;
+    TMP_START;
 
-   i = 1;
-   const dot_params_t params = _nmod_vec_dot_params(n, p->mod);
-   nmod_poly_one(p);
-   nmod_poly_init(b, p->mod.n);
-   nmod_mat_init_set(M2, M);
-   V = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-   W = (ulong *) TMP_ALLOC(n*sizeof(ulong));
-   T = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    i = 1;
+    plen = 1;
+    p[0] = 1;
+
+    const dot_params_t params = _nmod_vec_dot_params(n, mod);
+
+    nmod_mat_init_set(M2, M);
+    b = (ulong *) TMP_ALLOC((n + 1)*sizeof(ulong));
+    t = (ulong *) TMP_ALLOC((n + 1)*sizeof(ulong));
+    V = (ulong *) TMP_ALLOC(n*sizeof(ulong));
+    W = (ulong *) TMP_ALLOC(n*sizeof(ulong));
 
 #define A(ii, jj) nmod_mat_entry(M2, ii, jj)
 #define Aptr(ii, jj) nmod_mat_entry_ptr(M2, ii, jj)
 
-   while (i < n)
-   {
-      h = A(n - i, n - i - 1);
+    while (i < n)
+    {
+        h = A(n - i, n - i - 1);
 
-      while (h == 0)
-      {
-         k = 1;
-         while (k < n - i && A(n - i, n - i - k - 1) == 0)
-            k++;
+        while (h == 0)
+        {
+            k = 1;
+            while (k < n - i && A(n - i, n - i - k - 1) == 0)
+                k++;
 
-         if (k == n - i)
-         {
-            nmod_poly_fit_length(b, i + 1);
-            nmod_poly_set_coeff_ui(b, i, 1);
-            for (k = 1; k <= i; k++)
-               nmod_poly_set_coeff_ui(b, k - 1, n_negmod(A(n - i, n - k), p->mod.n));
-            _nmod_poly_set_length(b, i + 1);
-            nmod_poly_mul(p, p, b);
-            n -= i;
-            i = 1;
-
-            if (n == 1)
+            if (k == n - i)
             {
-               nmod_poly_set_coeff_ui(b, 1, 1);
-               nmod_poly_set_coeff_ui(b, 0, n_negmod(A(0, 0), p->mod.n));
-               _nmod_poly_set_length(b, 2);
-               nmod_poly_mul(p, p, b);
-               goto cleanup;
+                b[i] = 1;
+                for (k = 1; k <= i; k++)
+                    b[k - 1] = nmod_neg(A(n - i, n - k), mod);
+                if (plen >= i + 1)
+                    _nmod_poly_mul(t, p, plen, b, i + 1, mod);
+                else
+                    _nmod_poly_mul(t, b, i + 1, p, plen, mod);
+                plen += i;
+                _nmod_vec_set(p, t, plen);
+                n -= i;
+                i = 1;
+
+                if (n == 1)
+                {
+                    b[1] = 1;
+                    b[0] = nmod_neg(A(0, 0), mod);
+
+                    if (plen >= 2)
+                        _nmod_poly_mul(t, p, plen, b, 2, mod);
+                    else
+                        _nmod_poly_mul(t, b, 2, p, plen, mod);
+
+                    plen += 1;
+                    _nmod_vec_set(p, t, plen);
+                   goto cleanup;
+                }
             }
-         } else
-         {
-            nmod_mat_swap_rows(M2, NULL, n - i - k - 1, n - i - 1);
+            else
+            {
+                nmod_mat_swap_rows(M2, NULL, n - i - k - 1, n - i - 1);
 
-            for (j = 1; j <= n - i + 1; j++)
-                FLINT_SWAP(ulong, A(j - 1, n - i - k - 1), A(j - 1, n - i - 1));
-         }
+                for (j = 1; j <= n - i + 1; j++)
+                    FLINT_SWAP(ulong, A(j - 1, n - i - k - 1), A(j - 1, n - i - 1));
+            }
 
-         h = A(n - i, n - i - 1);
-      }
+            h = A(n - i, n - i - 1);
+        }
 
-      h = n_invmod(n_negmod(h, p->mod.n), p->mod.n);
+        // h = nmod_inv(nmod_neg(h, mod), mod);
+        h = nmod_neg(h, mod);
+        g = n_gcdinv(&h, h, mod.n);
+        if (g != 1)
+        {
+            success = 0;
+            goto cleanup;
+        }
 
-      for (j = 1; j <= n; j++)
-      {
-         V[j - 1] = n_mulmod2_preinv(A(n - i, j - 1), h, p->mod.n, p->mod.ninv);
-         W[j - 1] = A(n - i, j - 1);
-      }
+        _nmod_vec_set(W, Aptr(n - i, 0), n);
+        _nmod_vec_scalar_mul_nmod(V, Aptr(n - i, 0), n, h, mod);
+        h = nmod_neg(h, mod);
 
-      h = n_negmod(h, p->mod.n);
+        for (j = 1; j <= n - i; j++)
+        {
+            ulong c = A(j - 1, n - i - 1);
+            nn_ptr row = nmod_mat_row_ptr(M2, j - 1);
 
-      for (j = 1; j <= n - i; j++)
-      {
-         for (k = 1; k <= n - i - 1; k++)
-            NMOD_ADDMUL(A(j - 1, k - 1), A(j - 1, n - i - 1), V[k - 1], p->mod);
+            _nmod_vec_scalar_addmul_nmod(row, V, n - i - 1, c, mod);
+            _nmod_vec_scalar_addmul_nmod(row + (n - i), V + (n - i), i, c, mod);
 
-         for (k = n - i + 1; k <= n; k++)
-            NMOD_ADDMUL(A(j - 1, k - 1), A(j - 1, n - i - 1), V[k - 1], p->mod);
+            A(j - 1, n - i - 1) = nmod_mul(c, h, mod);
+        }
 
-         A(j - 1, n - i - 1) = n_mulmod2_preinv(A(j - 1, n - i - 1), h, p->mod.n, p->mod.ninv);
-      }
+        for (j = 1; j <= n - i - 1; j++)
+            A(n - i - 1, j - 1) = _nmod_vec_dot_strided(Aptr(0, j - 1), M2->stride, W, 1, n - i, mod, params);
 
-      for (j = 1; j <= n - i - 1; j++)
-      {
-         for (k = 1; k <= n - i; k++)
-            T[k - 1] = A(k - 1, j - 1);
+        for (j = n - i; j <= n - 1; j++)
+            A(n - i - 1, j - 1) = nmod_add(_nmod_vec_dot_strided(Aptr(0, j - 1), M2->stride, W, 1, n - i, mod, params), W[j], mod);
 
-         A(n - i - 1, j - 1) = _nmod_vec_dot(T, W, n - i, p->mod, params);
-      }
+        A(n - i - 1, n - 1) = _nmod_vec_dot_strided(Aptr(0, n - 1), M2->stride, W, 1, n - i, mod, params);
 
-      for (j = n - i; j <= n - 1; j++)
-      {
-         for (k = 1; k <= n - i; k++)
-            T[k - 1] = A(k - 1, j - 1);
+        i++;
+    }
 
-         A(n - i - 1, j - 1) = n_addmod(_nmod_vec_dot(T, W, n - i, p->mod, params), W[j], p->mod.n);
-      }
 
-      for (k = 1; k <= n - i; k++)
-         T[k - 1] = A(k - 1, j - 1);
-
-      A(n - i - 1, n - 1) = _nmod_vec_dot(T, W, n - i, p->mod, params);
-
-      i++;
-   }
-
-   nmod_poly_fit_length(b, n + 1);
-   nmod_poly_set_coeff_ui(b, n, 1);
-   for (i = 1; i <= n; i++)
-      nmod_poly_set_coeff_ui(b, i - 1, n_negmod(A(0, n - i), p->mod.n));
-   _nmod_poly_set_length(b, n + 1);
-   nmod_poly_mul(p, p, b);
+    b[n] = 1;
+    for (i = 1; i <= n; i++)
+        b[i - 1] = nmod_neg(A(0, n - i), mod);
+    if (plen >= n + 1)
+        _nmod_poly_mul(t, p, plen, b, n + 1, mod);
+    else
+        _nmod_poly_mul(t, b, n + 1, p, plen, mod);
+    plen += n;
+    _nmod_vec_set(p, t, plen);
 
 #undef A
 
 cleanup:
 
-   nmod_mat_clear(M2);
-   nmod_poly_clear(b);
-   TMP_END;
+    nmod_mat_clear(M2);
+    TMP_END;
+
+    return success;
 }
+
+int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t mat)
+{
+    if (mat->r != mat->c)
+    {
+        flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly_danilevsky).  Non-square matrix.\n");
+    }
+
+    nmod_poly_fit_length(p, mat->r + 1);
+    _nmod_poly_set_length(p, mat->r + 1);
+    return _nmod_mat_charpoly_danilevsky(p->coeffs, mat, mat->mod);
+}
+
+#include "gr.h"
+#include "gr_mat.h"
+#include <stdint.h>
 
 void
 nmod_mat_charpoly(nmod_poly_t cp, const nmod_mat_t mat)
 {
-    if (mat->r <= 8 || !n_is_prime(mat->mod.n))
-        nmod_mat_charpoly_berkowitz(cp, mat);
-    else
-        nmod_mat_charpoly_danilevsky(cp, mat);
+    if (mat->r >= 32 && mat->mod.n <= 255 && n_is_prime(mat->mod.n))
+    {
+        slong n = mat->r;
+        gr_ctx_t ctx;
+        gr_ctx_init_nmod8(ctx, mat->mod.n);
+
+        gr_mat_t M;
+        uint8_t * t;
+
+        gr_mat_init(M, n, n, ctx);
+        t = GR_TMP_ALLOC(n + 1);
+
+        slong i, j;
+        for (i = 0; i < n; i++)
+            for (j = 0; j < n; j++)
+                ((uint8_t *) (M->entries))[i * M->stride + j] = mat->entries[i * mat->stride + j];
+
+        GR_MUST_SUCCEED(_gr_mat_charpoly(t, M, ctx));
+
+        nmod_poly_fit_length(cp, n + 1);
+        _nmod_poly_set_length(cp, n + 1);
+
+        for (i = 0; i <= n; i++)
+            cp->coeffs[i] = t[i];
+
+        GR_TMP_FREE(t, n + 1);
+        gr_mat_clear(M, ctx);
+        return;
+    }
+
+    /* Todo: modulus-dependent cutoff */
+    if (mat->r > 8 && nmod_mat_charpoly_danilevsky(cp, mat))
+        return;
+
+    nmod_mat_charpoly_berkowitz(cp, mat);
 }
+

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2015 William Hart
-    Copyright (C) 2022 Fredrik Johansson
+    Copyright (C) 2022, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,39 +15,22 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
-/* todo: use dot products */
 int
 _gr_mat_charpoly_danilevsky_inplace(gr_ptr p, gr_mat_t A, gr_ctx_t ctx)
 {
-    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
-    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
-    gr_method_binary_op addmul = GR_BINARY_OP(ctx, ADDMUL);
     slong n, n_input;
     slong i, j, k;
+    slong Astride = A->stride;
     gr_ptr V, W, T;
     gr_ptr t, b;
     gr_ptr c, h;
     truth_t is_zero;
     slong plen;
     slong sz = ctx->sizeof_elem;
-    int have_addmul;
     int status = GR_SUCCESS;
 
 #define MAT_ENTRY(i, j) GR_MAT_ENTRY(A, i, j, sz)
 #define POL_ENTRY(i) GR_ENTRY(p, i, sz)
-
-    have_addmul = (addmul != (gr_method_binary_op) gr_generic_addmul);
-
-#define ADDMUL(z, x, y) \
-    if (have_addmul) \
-    { \
-        status |= addmul(z, x, y, ctx); \
-    } \
-    else \
-    { \
-        status |= mul(c, x, y, ctx); \
-        status |= add(z, z, c, ctx); \
-    } \
 
     n = n_input = A->r;
 
@@ -145,61 +128,40 @@ _gr_mat_charpoly_danilevsky_inplace(gr_ptr p, gr_mat_t A, gr_ctx_t ctx)
         if (status != GR_SUCCESS)
             goto cleanup;
 
-        for (j = 1; j <= n; j++)
-        {
-            status |= mul(GR_ENTRY(V, j - 1, sz), MAT_ENTRY(n - i, j - 1), h, ctx);
-            status |= gr_set(GR_ENTRY(W, j - 1, sz), MAT_ENTRY(n - i, j - 1), ctx);
-        }
+        status |= _gr_vec_set(W, MAT_ENTRY(n - i, 0), n, ctx);
+        status |= _gr_vec_mul_scalar(V, MAT_ENTRY(n - i, 0), n, h, ctx);
 
         status |= gr_neg(h, h, ctx);
 
         for (j = 1; j <= n - i; j++)
         {
-            for (k = 1; k <= n - i - 1; k++)
-            {
-                ADDMUL(MAT_ENTRY(j - 1, k - 1), MAT_ENTRY(j - 1, n - i - 1), GR_ENTRY(V, k - 1, sz))
-            }
+            gr_srcptr c = MAT_ENTRY(j - 1, n - i - 1);
+            gr_ptr row = MAT_ENTRY(j - 1, 0);
 
-            for (k = n - i + 1; k <= n; k++)
-            {
-                ADDMUL(MAT_ENTRY(j - 1, k - 1), MAT_ENTRY(j - 1, n - i - 1), GR_ENTRY(V, k - 1, sz))
-            }
-
-            status |= mul(MAT_ENTRY(j - 1, n - i - 1), MAT_ENTRY(j - 1, n - i - 1), h, ctx);
+            status |= _gr_vec_addmul_scalar(row, V, n - i - 1, c, ctx);
+            status |= _gr_vec_addmul_scalar(GR_ENTRY(row, n - i, sz), GR_ENTRY(V, n - i, sz), i, c, ctx);
+            status |= gr_mul(MAT_ENTRY(j - 1, n - i - 1), MAT_ENTRY(j - 1, n - i - 1), h, ctx);
         }
 
-        /* todo: rewrite as dot */
+        /* The following dot products need to write to a temporary, because the
+           destination is aliased with an input vector and some dot implementations
+           don't support this aliasing. */
+
         for (j = 1; j <= n - i - 1; j++)
         {
-            status |= mul(MAT_ENTRY(n - i - 1, j - 1), MAT_ENTRY(n - i - 1, j - 1), GR_ENTRY(W, n - i - 1, sz), ctx);
-
-            for (k = 1; k < n - i; k++)
-            {
-                ADDMUL(MAT_ENTRY(n - i - 1, j - 1), MAT_ENTRY(k - 1, j - 1), GR_ENTRY(W, k - 1, sz))
-            }
+            status |= _gr_vec_dot_strided(t, NULL, 0, MAT_ENTRY(0, j - 1), Astride, W, 1, n - i, ctx);
+            gr_swap(MAT_ENTRY(n - i - 1, j - 1), t, ctx);
         }
 
-        /* todo: rewrite as dot */
         for (j = n - i; j <= n - 1; j++)
         {
-            status |= mul(MAT_ENTRY(n - i - 1, j - 1), MAT_ENTRY(n - i - 1, j - 1), GR_ENTRY(W, n - i - 1, sz), ctx);
-
-            for (k = 1; k < n - i; k++)
-            {
-                ADDMUL(MAT_ENTRY(n - i - 1, j - 1), MAT_ENTRY(k - 1, j - 1), GR_ENTRY(W, k - 1, sz))
-            }
-
-            status |= add(MAT_ENTRY(n - i - 1, j - 1), MAT_ENTRY(n - i - 1, j - 1), GR_ENTRY(W, j, sz), ctx);
+            status |= _gr_vec_dot_strided(t, GR_ENTRY(W, j, sz), 0,
+                MAT_ENTRY(0, j - 1), Astride, W, 1, n - i, ctx);
+            gr_swap(MAT_ENTRY(n - i - 1, j - 1), t, ctx);
         }
 
-        status |= mul(MAT_ENTRY(n - i - 1, n - 1),
-                        MAT_ENTRY(n - i - 1, n - 1), GR_ENTRY(W, n - i - 1, sz), ctx);
-
-        /* todo: rewrite as dot */
-        for (k = 1; k < n - i; k++)
-        {
-            ADDMUL(MAT_ENTRY(n - i - 1, n - 1), MAT_ENTRY(k - 1, n - 1), GR_ENTRY(W, k - 1, sz))
-        }
+        status |= _gr_vec_dot_strided(t, NULL, 0, MAT_ENTRY(0, n - 1), Astride, W, 1, n - i, ctx);
+        gr_swap(MAT_ENTRY(n - i - 1, n - 1), t, ctx);
 
         i++;
     }

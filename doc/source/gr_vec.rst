@@ -202,6 +202,11 @@ Dot products
 
     Sets *res* to `c \pm \sum_{i=0}^{n-1} a_i b_i`.
 
+.. function:: int _gr_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+
+    Sets *res* to `c \pm \sum_{i=0}^{n-1} a_{i \cdot stride1} b_{i \cdot stride2}`.
+    The strides may be negative.
+
 .. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
     Sets *res* to `c \pm \sum_{i=0}^{n-1} a_i b_{n-1-i}`.

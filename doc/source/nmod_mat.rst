@@ -714,13 +714,14 @@ Characteristic polynomial
 --------------------------------------------------------------------------------
 
 .. function:: void nmod_mat_charpoly_berkowitz(nmod_poly_t p, const nmod_mat_t M)
-              void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
+              int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
               void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.
-    The *danilevsky* algorithm assumes that the modulus is prime.
-
+    The *danilevsky* algorithm returns 1 on success and 0 indicating failure
+    if it encounters an impossible inverse; it is guaranteed to succeed if
+    the modulus is prime.
 
 Minimal polynomial
 --------------------------------------------------------------------------------

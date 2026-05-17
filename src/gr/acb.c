@@ -1951,6 +1951,13 @@ _gr_acb_vec_dot_rev(acb_t res, const acb_t initial, int subtract, acb_srcptr vec
 }
 
 static int
+_gr_acb_vec_dot_strided(acb_t res, const acb_t initial, int subtract, acb_srcptr vec1, slong stride1, acb_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    acb_dot(res, initial, subtract, vec1, stride1, vec2, stride2, len, ACB_CTX_PREC(ctx));
+    return GR_SUCCESS;
+}
+
+static int
 _gr_acb_poly_mullow(acb_ptr res,
     acb_srcptr poly1, slong len1,
     acb_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -2480,6 +2487,7 @@ gr_method_tab_input _acb_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acb_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acb_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _gr_acb_vec_dot_strided},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acb_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_acb_poly_mulmid},
