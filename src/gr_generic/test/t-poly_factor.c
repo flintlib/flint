@@ -79,6 +79,6 @@ cleanup:
         gr_ctx_clear(ctx);
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }
 

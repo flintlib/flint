@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "gr_mat.h"
 
-TEST_GR_FUNCTION_START(gr_mat_hadamard, state, count_success, count_unable, count_domain)
+TEST_GR_FUNCTION_START(gr_mat_hadamard, state, count_success, count_domain, count_unable)
 {
     slong iter;
 
@@ -71,5 +71,5 @@ TEST_GR_FUNCTION_START(gr_mat_hadamard, state, count_success, count_unable, coun
         gr_ctx_clear(ctx);
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }

@@ -15,7 +15,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_GR_FUNCTION_START(gr_mat_inv, state, count_success, count_unable, count_domain)
+TEST_GR_FUNCTION_START(gr_mat_inv, state, count_success, count_domain, count_unable)
 {
     slong iter;
 
@@ -92,5 +92,5 @@ TEST_GR_FUNCTION_START(gr_mat_inv, state, count_success, count_unable, count_dom
         gr_ctx_clear(ctx);
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }
