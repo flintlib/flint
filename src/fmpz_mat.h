@@ -386,9 +386,19 @@ void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 
 void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_t m1, const nmod_mat_t mat2, int sign);
 
+/* fmpz_comb has poor basecase code; only use it when it's worth it.
+   Fixme: improve fmpz_comb so that this isn't necessary. */
+#define FMPZ_MAT_MOD_PRIMES_COMB_CUTOFF 200
+#define FMPZ_MAT_CRT_PRIMES_COMB_CUTOFF 8
+
+/* Minimum (entries * primes) that warrant spawning a worker for multimodular
+   reduction/CRT. */
+#define FMPZ_MAT_CRT_MIN_WORK_PER_THREAD 1024
+
 #ifdef FMPZ_H
-void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp);
-void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
+void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb);
+void fmpz_mat_multi_mod_2_ui_precomp(nmod_mat_t * residues_A, nmod_mat_t * residues_B, slong nres, const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_comb_t comb);
+void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, int sign);
 #endif
 
 void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat);

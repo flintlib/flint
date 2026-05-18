@@ -433,11 +433,11 @@ Modular reduction and reconstruction
     with entries satisfying `-mn/2 <= c < mn/2` (if sign = 1)
     or `0 <= c < mn` (if sign = 0).
 
-.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
+.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb)
 
     Sets each of the ``nres`` matrices in ``residues`` to ``mat`` reduced modulo
-    the modulus of the respective matrix, given precomputed ``comb`` and
-    ``comb_temp`` structures.
+    the modulus of the respective matrix, given a precomputed ``comb``
+    structure.
 
     Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
     this function to be declared.
@@ -451,10 +451,10 @@ Modular reduction and reconstruction
     For reducing or reconstructing multiple integer matrices over the same
     set of moduli, it is faster to use ``fmpz_mat_multi_mod_precomp``.
 
-.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
+.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, int sign)
 
     Reconstructs ``mat`` from its images modulo the ``nres`` matrices in
-    ``residues``, given precomputed ``comb`` and ``comb_temp`` structures.
+    ``residues``, given a precomputed ``comb`` structure.
 
     Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
     this function to be declared.
