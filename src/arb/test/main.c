@@ -120,6 +120,7 @@
 #include "t-get_mpn_fixed_mod_log2.c"
 #include "t-get_mpn_fixed_mod_pi4.c"
 #include "t-get_rand_fmpq.c"
+#include "t-get_simplest_fmpq.c"
 #include "t-get_str.c"
 #include "t-get_unique_fmpz.c"
 #include "t-hurwitz_zeta.c"
@@ -328,6 +329,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_get_mpn_fixed_mod_log2),
     TEST_FUNCTION(arb_get_mpn_fixed_mod_pi4),
     TEST_FUNCTION(arb_get_rand_fmpq),
+    TEST_FUNCTION(arb_get_simplest_fmpq),
     TEST_FUNCTION(arb_get_str),
     TEST_FUNCTION(arb_get_unique_fmpz),
     TEST_FUNCTION(arb_hurwitz_zeta),

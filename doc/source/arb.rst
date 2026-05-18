@@ -558,6 +558,22 @@ Radius and interval operations
     in swapping. It is recommended to check that the midpoint of *x* is
     within a reasonable range before calling this method.
 
+.. function:: int arb_get_simplest_fmpq(fmpq_t res, const arb_t x)
+
+    Sets *res* to the rational `p/q` in lowest terms, with smallest
+    positive denominator `q`, that lies in the closed real interval
+    represented by *x*, and returns 1. Among rationals with the smallest
+    denominator, returns the one with smallest absolute numerator (i.e.
+    closest to 0); if 0 lies in *x*, returns 0/1.
+
+    Returns 0 and leaves *res* unchanged if *x* is not finite.
+
+    Warning: like :func:`arb_get_unique_fmpz`, this method may allocate
+    a large amount of memory when the midpoint or dyadic endpoints of
+    *x* have very large or very small magnitude. It is recommended to
+    check that the midpoint of *x* is within a reasonable range before
+    calling this method.
+
 .. function:: void arb_floor(arb_t y, const arb_t x, slong prec)
               void arb_ceil(arb_t y, const arb_t x, slong prec)
               void arb_trunc(arb_t y, const arb_t x, slong prec)
