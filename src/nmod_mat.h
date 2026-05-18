@@ -362,7 +362,7 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* The following prototype actually lives in nmod_poly.h
  *
- * void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+ * int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
  *
  * void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
 */

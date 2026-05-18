@@ -792,6 +792,16 @@ do                                                                    \
 
 #endif  // FLINT_BITS == 64
 
+/* Note: if de-inlining this, consider specializing for the common use
+   case of stride1 == 1 or stride2 == 1. */
+NMOD_VEC_INLINE ulong _nmod_vec_dot_strided(nn_srcptr vec1, slong stride1,
+    nn_srcptr vec2, slong stride2, slong len, nmod_t mod, dot_params_t params)
+{
+    slong i;
+    ulong r;
+    NMOD_VEC_DOT(r, i, len, vec1[i * stride1], vec2[i * stride2], mod, params)
+    return r;
+}
 
 #ifdef __cplusplus
 }

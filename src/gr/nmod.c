@@ -895,6 +895,44 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
     return GR_SUCCESS;
 }
 
+static int
+__gr_nmod_vec_dot_strided(ulong * res, const ulong * initial, int subtract, const ulong * vec1, slong stride1, const ulong * vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    ulong s;
+    dot_params_t params;
+    nmod_t mod;
+
+    if (len == 0)
+    {
+        if (initial == NULL)
+            _gr_nmod_zero(res, ctx);
+        else
+            _gr_nmod_set(res, initial, ctx);
+        return GR_SUCCESS;
+    }
+
+    mod = NMOD_CTX(ctx);
+    params = _nmod_vec_dot_params(len, mod);
+    s = _nmod_vec_dot_strided(vec1, stride1, vec2, stride2, len, mod, params);
+
+    if (initial == NULL)
+    {
+        if (subtract)
+            s = nmod_neg(s, mod);
+    }
+    else
+    {
+        if (subtract)
+            s = nmod_sub(initial[0], s, mod);
+        else
+            s = nmod_add(initial[0], s, mod);
+    }
+
+    *res = s;
+
+    return GR_SUCCESS;
+}
+
 /* todo: better algorithms for large len */
 static int
 _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
@@ -1349,6 +1387,18 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+static int
+_gr_nmod_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    /* todo: tune cutoff */
+    if (n > 8 && _gr_mat_charpoly_danilevsky(res, mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    return _gr_mat_charpoly_berkowitz(res, mat, ctx);
+}
+
 int __gr_nmod_methods_initialized = 0;
 
 gr_static_method_table __gr_nmod_methods;
@@ -1438,6 +1488,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_PRODUCT,     (gr_funcptr) _gr_nmod_vec_product},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) __gr_nmod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) __gr_nmod_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) __gr_nmod_vec_dot_strided},
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_nmod_poly_mulmid},
@@ -1452,6 +1503,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POLY_EXP_SERIES,  (gr_funcptr) _gr_nmod_poly_exp_series},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_nmod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_nmod_mat_mul},
+    {GR_METHOD_MAT_CHARPOLY,     (gr_funcptr) _gr_nmod_mat_charpoly},
 
     {0,                         (gr_funcptr) NULL},
 };

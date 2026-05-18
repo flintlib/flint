@@ -166,6 +166,7 @@ Vector functions
               int _mpn_mod_vec_submul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx)
               int _mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
               int _mpn_mod_vec_dot_rev(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
+              int _mpn_mod_vec_dot_strided(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
 
     Overrides for generic ``gr`` vector operations with inlined or partially inlined
     code for reduced overhead.

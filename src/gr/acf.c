@@ -948,6 +948,14 @@ _gr_acf_vec_dot_rev(acf_t res, const acf_t initial, int subtract, acf_srcptr vec
     return GR_SUCCESS;
 }
 
+static int
+_gr_acf_vec_dot_strided(acf_t res, const acf_t initial, int subtract, acf_srcptr vec1, slong stride1, acf_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    acf_approx_dot(res, initial, subtract, vec1, stride1, vec2, stride2, len, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    return GR_SUCCESS;
+}
+
+
 #include "gr_poly.h"
 #include "acb_poly.h"
 
@@ -1429,6 +1437,7 @@ gr_method_tab_input _acf_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_acf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_acf_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _gr_acf_vec_dot_strided},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_acf_poly_mulmid},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_acf_poly_mullow},
     {GR_METHOD_POLY_FACTOR,     (gr_funcptr) gr_generic_poly_factor_roots},

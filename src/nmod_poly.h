@@ -969,7 +969,7 @@ void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, slong inflat
 
 void _nmod_mat_charpoly_berkowitz(nn_ptr p, const nmod_mat_t M, nmod_t mod);
 void nmod_mat_charpoly_berkowitz(nmod_poly_t p, const nmod_mat_t M);
-void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
 void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M);
 
 void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P);
