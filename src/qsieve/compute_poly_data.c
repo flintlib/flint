@@ -123,7 +123,9 @@ int qsieve_init_A(qs_t qs_inf)
             */
             low = factor_bound[i - 1 - (i <= 10)];
             high = factor_bound[i + 1];
-            break;
+            /* If this would re-use the same range as before (which failed to give
+               enough A-values), try a wider range by continuing to smaller i. */
+            if (low != qs_inf->low || high != qs_inf->high) break;
         }
         else if (rem <= num_factors)
         {
@@ -135,7 +137,7 @@ int qsieve_init_A(qs_t qs_inf)
             {
                 low = factor_bound[i - (i <= 9)];
                 high = factor_bound[i + 2];
-                break;
+                if (low != qs_inf->low || high != qs_inf->high) break;
             }
         }
         else if (i - rem <= num_factors)
@@ -151,7 +153,7 @@ int qsieve_init_A(qs_t qs_inf)
                 num_factors++;
                 low = factor_bound[i - 1 - (i <= 10)];
                 high = factor_bound[i + 1];
-                break;
+                if (low != qs_inf->low || high != qs_inf->high) break;
             }
         }
     }
@@ -166,6 +168,10 @@ int qsieve_init_A(qs_t qs_inf)
 
     s = num_factors;
     qs_inf->s = s;
+    /* Save low/high now so that even if init_A fails, the next call knows what
+       parameters were attempted and can try a different (wider) range. */
+    qs_inf->low = low;
+    qs_inf->high = high;
 
 #if QS_DEBUG
     flint_printf("s = %wd\n", s);
@@ -266,8 +272,28 @@ int qsieve_init_A(qs_t qs_inf)
 
             if (found_j) break; /* success */
 
+            /* If prod is already larger than upper_bound divided by the smallest
+               possible final prime (factor_base[low].p), then all subsequent
+               (lex-larger) subsets -- which yield even larger prod -- also fail.
+               Exit immediately instead of exhausting O(C(span, s-1)) subsets. */
+            fmpz_mul_ui(temp, prod, factor_base[low].p);
+            if (fmpz_cmp(temp, upper_bound) > 0)
+            {
+                ret = 0;
+                goto init_A_cleanup;
+            }
+
             /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
             h = (4*(m + h + 1)/3 >= span) ? h + 1 : 1;
+
+            /* h must not exceed s - 1: if it does the index s - h - 1
+               goes negative and we have exhausted all (s-1)-subsets */
+            if (h >= s)
+            {
+                ret = 0;
+                goto init_A_cleanup;
+            }
+
             m = curr_subset[s - h - 1] + 1;
 
             for (j = 0; j < h; j++)
@@ -445,6 +471,15 @@ int qsieve_next_A(qs_t qs_inf)
             }
 
             h = (4*(m + diff + h + 1)/3 >= span) ? h + 1 : 1;
+
+            /* h must not exceed s - 2: if it does the index s - 2 - h
+               goes negative and we have exhausted all valid (s-1)-subsets */
+            if (h > s - 2)
+            {
+                ret = 0;
+                goto next_A_cleanup;
+            }
+
             m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
             if (h == 2)
                inc_diff = 1;
@@ -505,6 +540,16 @@ int qsieve_next_A(qs_t qs_inf)
 
                 break;
             }
+
+            /* Monotone early-exit: lex-larger subsets have larger prod, so once
+               prod * smallest_final_prime > upper_bound, all future subsets fail too. */
+            fmpz_mul_ui(temp, prod, factor_base[low].p);
+            if (fmpz_cmp(temp, qs_inf->upp_bound) > 0)
+            {
+                ret = 0;
+                goto next_A_cleanup;
+            }
+
         }
     }
 
