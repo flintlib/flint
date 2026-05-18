@@ -309,7 +309,7 @@ Arithmetic
               int gr_ore_poly_lmul_gen(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
 
     Sets *res* to the result of the left multiplication:
-    `D \cdot poly = \sigma(poly) \cdot D + \sigma(poly)`.
+    `D \cdot poly = \sigma(poly) \cdot D + \delta(poly)`.
     The underscore method assumes *len != 0*.
 
 .. function:: int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ore_poly_ctx_t ctx)
