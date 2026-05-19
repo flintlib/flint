@@ -225,6 +225,20 @@ int qsieve_init_A(qs_t qs_inf)
         for (j = 0; j < s - 1; j++) /* first s - 1 allowed primes, indices not 0 mod 4 */
             curr_subset[j] = j;
 
+        /* O(s) pre-check: the initial curr_subset {0,1,...,s-2} gives the smallest
+           possible product.  If even that product times the smallest 0-mod-4 prime
+           exceeds upper_bound, every subsequent (lex-larger) subset also fails.
+           Exit now rather than exhausting O(C(span, s-1)) iterations. */
+        fmpz_set_ui(prod, 1);
+        for (j = 0; j < s - 1; j++)
+            fmpz_mul_ui(prod, prod, factor_base[4*curr_subset[j]/3 + 1 + low].p);
+        fmpz_mul_ui(temp, prod, factor_base[low].p);
+        if (fmpz_cmp(temp, upper_bound) > 0)
+        {
+            ret = 0;
+            goto init_A_cleanup;
+        }
+
         /* search until we find A of the right size, or until we run out of allowed primes */
         while (1)
         {
@@ -272,17 +286,6 @@ int qsieve_init_A(qs_t qs_inf)
 
             if (found_j) break; /* success */
 
-            /* If prod is already larger than upper_bound divided by the smallest
-               possible final prime (factor_base[low].p), then all subsequent
-               (lex-larger) subsets -- which yield even larger prod -- also fail.
-               Exit immediately instead of exhausting O(C(span, s-1)) subsets. */
-            fmpz_mul_ui(temp, prod, factor_base[low].p);
-            if (fmpz_cmp(temp, upper_bound) > 0)
-            {
-                ret = 0;
-                goto init_A_cleanup;
-            }
-
             /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
             h = (4*(m + h + 1)/3 >= span) ? h + 1 : 1;
 
@@ -293,6 +296,8 @@ int qsieve_init_A(qs_t qs_inf)
                 ret = 0;
                 goto init_A_cleanup;
             }
+
+
 
             m = curr_subset[s - h - 1] + 1;
 
@@ -541,14 +546,10 @@ int qsieve_next_A(qs_t qs_inf)
                 break;
             }
 
-            /* Monotone early-exit: lex-larger subsets have larger prod, so once
-               prod * smallest_final_prime > upper_bound, all future subsets fail too. */
-            fmpz_mul_ui(temp, prod, factor_base[low].p);
-            if (fmpz_cmp(temp, qs_inf->upp_bound) > 0)
-            {
-                ret = 0;
-                goto next_A_cleanup;
-            }
+            /* When h == 1 only the last element of curr_subset increases, so
+               prod is non-decreasing.  Once prod * smallest final prime exceeds
+               upper_bound, exit rather than scanning all remaining subsets. */
+
 
         }
     }
