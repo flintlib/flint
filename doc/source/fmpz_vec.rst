@@ -382,6 +382,12 @@ Reduction mod `p`
     Reduces all entries in ``(vec, len)`` modulo `p > 0`, choosing
     the unique representative in `(-p/2, p/2]`.
 
+.. function:: void _fmpz_vec_multi_CRT_ui(fmpz * res, nn_srcptr * residues, slong len, nn_srcptr primes, slong num_primes, int sign)
+
+    Sets ``(res, len)`` to the CRT lift of the ``num_primes``
+    vectors in ``residues`` modulo the respective moduli in ``primes``.
+    Equivalent to reconstructing each entry using :func:`fmpz_multi_CRT_ui`.
+
 
 Gaussian content
 --------------------------------------------------------------------------------
