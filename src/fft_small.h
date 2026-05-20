@@ -218,6 +218,7 @@ FLINT_FORCE_INLINE ulong sd_fft_ctx_data_size(ulong L)
     return n_pow2(L);
 }
 
+/* Return the address of block `I` in `d`, where each block has `BLK_SZ` entries. */
 FLINT_FORCE_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
 {
     return d + sd_fft_ctx_blk_offset(I);
