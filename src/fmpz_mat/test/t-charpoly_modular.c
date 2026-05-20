@@ -12,30 +12,29 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 #include "fmpz_mat.h"
+#include "fmpz_poly.h"
 
-TEST_FUNCTION_START(fmpz_mat_charpoly, state)
+TEST_FUNCTION_START(fmpz_mat_charpoly_modular, state)
 {
-    slong m, n, rep, i;
+    slong rep, i;
 
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         fmpz_mat_t A, B, C, D;
         fmpz_poly_t f, g;
+        slong n;
 
-        m = n_randint(state, 10);
-        n = m;
+        n = n_randint(state, 8);
 
-        fmpz_mat_init(A, m, n);
-        fmpz_mat_init(B, m, n);
-        fmpz_mat_init(C, m, m);
+        flint_set_num_threads(1 + n_randint(state, 3));
+
+        fmpz_mat_init(A, n, n);
+        fmpz_mat_init(B, n, n);
+        fmpz_mat_init(C, n, n);
         fmpz_mat_init(D, n, n);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
-
-        fmpz_poly_randtest(f, state, 10, 100);
-        fmpz_poly_randtest(g, state, 10, 100);
 
         fmpz_mat_randtest(A, state, 10);
         fmpz_mat_randtest(B, state, 10);
@@ -43,8 +42,8 @@ TEST_FUNCTION_START(fmpz_mat_charpoly, state)
         fmpz_mat_mul(C, A, B);
         fmpz_mat_mul(D, B, A);
 
-        fmpz_mat_charpoly(f, C);
-        fmpz_mat_charpoly(g, D);
+        fmpz_mat_charpoly_modular(f, C);
+        fmpz_mat_charpoly_modular(g, D);
 
         if (!fmpz_poly_equal(f, g))
         {
@@ -70,30 +69,38 @@ TEST_FUNCTION_START(fmpz_mat_charpoly, state)
         fmpz_t c;
         fmpz_mat_t A, B;
         fmpz_poly_t f, g;
+        slong n, bits;
 
-        m = n_randint(state, 10);
-        n = m;
+        if (n_randint(state, 10) == 0)
+        {
+            n = n_randint(state, 4);
+            bits = n_randint(state, 5000);
+        }
+        else
+        {
+            n = n_randint(state, 8);
+            bits = n_randint(state, 10);
+        }
+
+        flint_set_num_threads(1 + n_randint(state, 3));
 
         fmpz_init(c);
-        fmpz_mat_init(A, m, n);
-        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(A, n, n);
+        fmpz_mat_init(B, n, n);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
 
-        fmpz_poly_randtest(f, state, 10, 100);
-        fmpz_poly_randtest(g, state, 10, 100);
-
-        fmpz_mat_randtest(A, state, 10);
+        fmpz_mat_randtest(A, state, bits);
         fmpz_mat_set(B, A);
 
         for (i = 0; i < 10; i++)
         {
            fmpz_randtest(c, state, 5);
-           fmpz_mat_similarity(B, n_randint(state, m), c);
+           fmpz_mat_similarity(B, n_randint(state, n), c);
         }
 
-        fmpz_mat_charpoly(f, A);
-        fmpz_mat_charpoly(g, B);
+        fmpz_mat_charpoly_modular(f, A);
+        fmpz_mat_charpoly_modular(g, B);
 
         if (!fmpz_poly_equal(f, g))
         {

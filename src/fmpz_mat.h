@@ -295,22 +295,8 @@ void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat);
 void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op);
 void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
 
-FMPZ_MAT_INLINE
-void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
-{
-   _fmpz_mat_charpoly_modular(cp, mat);
-}
-
-FMPZ_MAT_INLINE
-void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
-{
-   if (mat->r != mat->c)
-   {
-       flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly).  Non-square matrix.\n");
-   }
-
-   fmpz_mat_charpoly_modular(cp, mat);
-}
+void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat);
+void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat);
 
 /* Characteristic polynomial ************************************************/
 

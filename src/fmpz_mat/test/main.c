@@ -28,6 +28,7 @@
 #include "t-can_solve_multi_mod_den.c"
 #include "t-charpoly_berkowitz.c"
 #include "t-charpoly_bound.c"
+#include "t-charpoly_modular.c"
 #include "t-charpoly.c"
 #include "t-chol_d.c"
 #include "t-col_partition.c"
@@ -133,6 +134,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_can_solve_multi_mod_den),
     TEST_FUNCTION(fmpz_mat_charpoly_berkowitz),
     TEST_FUNCTION(fmpz_mat_charpoly_bound),
+    TEST_FUNCTION(fmpz_mat_charpoly_modular),
     TEST_FUNCTION(fmpz_mat_charpoly),
     TEST_FUNCTION(fmpz_mat_chol_d),
     TEST_FUNCTION(fmpz_mat_col_partition),

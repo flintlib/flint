@@ -865,37 +865,23 @@ Characteristic polynomial
     of these bounds is returned.
 
 .. function:: void _fmpz_mat_charpoly_berkowitz(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
+    Compute the characteristic polynomial of an `n \times n` square matrix.
+    The underscore methods write `n + 1` coefficients.
 
-.. function:: void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses an `O(n^4)` algorithm based on the
-    method of Berkowitz.
-
-.. function:: void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses a modular method based on an `O(n^3)`
-    method over `\mathbb{Z}/n\mathbb{Z}`.
-
-.. function:: void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix.
-
+    The *berkowitz* algorithm is a wrapper of :func:`gr_mat_charpoly_berkowitz`.
+    The *modular* algorithm computes the characteristic polynomial modulo
+    several primes and combines them using CRT, using the bound
+    returned by :func:`fmpz_mat_charpoly_bound` to guarantee that sufficiently
+    many primes are chosen. This algorithm supports multithreading.
+    The default algorithm handles for various special cases and otherwise
+    delegates to the *berkowitz* or *modular* algorithms depending on the
+    size of the input.
 
 Minimal polynomial
 --------------------------------------------------------------------------------
