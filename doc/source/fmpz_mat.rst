@@ -879,7 +879,7 @@ Characteristic polynomial
     several primes and combines them using CRT, using the bound
     returned by :func:`fmpz_mat_charpoly_bound` to guarantee that sufficiently
     many primes are chosen. This algorithm supports multithreading.
-    The default algorithm handles for various special cases and otherwise
+    The default algorithm handles various special cases and otherwise
     delegates to the *berkowitz* or *modular* algorithms depending on the
     size of the input.
 

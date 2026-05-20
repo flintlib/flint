@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2012, 2013 Sebastian Pancratz
-    Copyrigth (C) 2026 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 

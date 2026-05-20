@@ -84,7 +84,7 @@ TEST_FUNCTION_START(fmpz_vec_multi_CRT_ui, state)
             flint_printf("FAIL\n");
             flint_printf("primes = %{ulong*}\n\n", primes, num_primes);
             flint_printf("A = %{fmpz*}\n\n", A, len);
-            flint_printf("A = %{fmpz*}\n\n", B, len);
+            flint_printf("B = %{fmpz*}\n\n", B, len);
             flint_abort();
         }
 
