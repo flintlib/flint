@@ -287,6 +287,8 @@ void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
 
 /* Characteristic polynomial ************************************************/
 
+void fmpz_mat_charpoly_bound(fmpz_t bound, const fmpz_mat_t A);
+
 void _fmpz_mat_charpoly_berkowitz(fmpz * rop, const fmpz_mat_t op);
 void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat);
 
