@@ -123,7 +123,9 @@ int qsieve_init_A(qs_t qs_inf)
             */
             low = factor_bound[i - 1 - (i <= 10)];
             high = factor_bound[i + 1];
-            break;
+            /* If this would re-use the same range as before (which failed to give
+               enough A-values), try a wider range by continuing to smaller i. */
+            if (low != qs_inf->low || high != qs_inf->high) break;
         }
         else if (rem <= num_factors)
         {
@@ -135,7 +137,7 @@ int qsieve_init_A(qs_t qs_inf)
             {
                 low = factor_bound[i - (i <= 9)];
                 high = factor_bound[i + 2];
-                break;
+                if (low != qs_inf->low || high != qs_inf->high) break;
             }
         }
         else if (i - rem <= num_factors)
@@ -151,7 +153,7 @@ int qsieve_init_A(qs_t qs_inf)
                 num_factors++;
                 low = factor_bound[i - 1 - (i <= 10)];
                 high = factor_bound[i + 1];
-                break;
+                if (low != qs_inf->low || high != qs_inf->high) break;
             }
         }
     }
@@ -166,6 +168,10 @@ int qsieve_init_A(qs_t qs_inf)
 
     s = num_factors;
     qs_inf->s = s;
+    /* Save low/high now so that even if init_A fails, the next call knows what
+       parameters were attempted and can try a different (wider) range. */
+    qs_inf->low = low;
+    qs_inf->high = high;
 
 #if QS_DEBUG
     flint_printf("s = %wd\n", s);
@@ -219,6 +225,20 @@ int qsieve_init_A(qs_t qs_inf)
         for (j = 0; j < s - 1; j++) /* first s - 1 allowed primes, indices not 0 mod 4 */
             curr_subset[j] = j;
 
+        /* O(s) pre-check: the initial curr_subset {0,1,...,s-2} gives the smallest
+           possible product.  If even that product times the smallest 0-mod-4 prime
+           exceeds upper_bound, every subsequent (lex-larger) subset also fails.
+           Exit now rather than exhausting O(C(span, s-1)) iterations. */
+        fmpz_set_ui(prod, 1);
+        for (j = 0; j < s - 1; j++)
+            fmpz_mul_ui(prod, prod, factor_base[4*curr_subset[j]/3 + 1 + low].p);
+        fmpz_mul_ui(temp, prod, factor_base[low].p);
+        if (fmpz_cmp(temp, upper_bound) > 0)
+        {
+            ret = 0;
+            goto init_A_cleanup;
+        }
+
         /* search until we find A of the right size, or until we run out of allowed primes */
         while (1)
         {
@@ -268,6 +288,17 @@ int qsieve_init_A(qs_t qs_inf)
 
             /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
             h = (4*(m + h + 1)/3 >= span) ? h + 1 : 1;
+
+            /* h must not exceed s - 1: if it does the index s - h - 1
+               goes negative and we have exhausted all (s-1)-subsets */
+            if (h >= s)
+            {
+                ret = 0;
+                goto init_A_cleanup;
+            }
+
+
+
             m = curr_subset[s - h - 1] + 1;
 
             for (j = 0; j < h; j++)
@@ -445,6 +476,15 @@ int qsieve_next_A(qs_t qs_inf)
             }
 
             h = (4*(m + diff + h + 1)/3 >= span) ? h + 1 : 1;
+
+            /* h must not exceed s - 2: if it does the index s - 2 - h
+               goes negative and we have exhausted all valid (s-1)-subsets */
+            if (h > s - 2)
+            {
+                ret = 0;
+                goto next_A_cleanup;
+            }
+
             m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
             if (h == 2)
                inc_diff = 1;
@@ -505,6 +545,12 @@ int qsieve_next_A(qs_t qs_inf)
 
                 break;
             }
+
+            /* When h == 1 only the last element of curr_subset increases, so
+               prod is non-decreasing.  Once prod * smallest final prime exceeds
+               upper_bound, exit rather than scanning all remaining subsets. */
+
+
         }
     }
 
