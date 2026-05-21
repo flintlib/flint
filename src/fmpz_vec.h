@@ -182,6 +182,8 @@ void _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr vec, slong len);
 void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p);
 void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p);
 
+void _fmpz_vec_multi_CRT_ui(fmpz * res, nn_srcptr * residues, slong len, nn_srcptr primes, slong num_primes, int sign);
+
 /*  Gaussian content  ********************************************************/
 
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len);

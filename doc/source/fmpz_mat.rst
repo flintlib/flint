@@ -839,39 +839,49 @@ Transforms
 Characteristic polynomial
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_mat_charpoly_bound(fmpz_t bound, const fmpz_mat_t A)
+
+    Compute a bound for the absolute value of the coefficients `c_k` of the
+    characteristic polynomial of `A` which is required to be an `n \times n`
+    (square) matrix. We use the fact that
+
+    .. math ::
+
+        c_{n-k} = (-1)^k \sum_{\substack{S \subseteq \{1,\ldots,n\} \\ |S|=k}} \det(A_S)
+
+    where `A_S` is the `k \times k` principal submatrix of `A` with rows
+    and columns indexed by `S`. Counting the number of terms and applying
+    Hadamard's bound to the determinants gives
+
+    .. math ::
+
+        |c_{n-k}| \le \binom{n}{k} \max_{\substack{S \subseteq \{1,\ldots,n\} \\ |S|=k}}
+           \prod_{i \in S} \|r_i\|_2
+           = \binom{n}{k} \prod_{i=1}^{k} \|r_i\|_2
+
+    where `r_1, \ldots, r_n` are the rows of `A` indexed in order of decreasing
+    Euclidean norm. We compute the maximum of these bounds for all `k`.
+    The same computation is done both rowwise and columnwise and the minimum
+    of these bounds is returned.
 
 .. function:: void _fmpz_mat_charpoly_berkowitz(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
+    Compute the characteristic polynomial of an `n \times n` square matrix.
+    The underscore methods write `n + 1` coefficients.
 
-.. function:: void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses an `O(n^4)` algorithm based on the
-    method of Berkowitz.
-
-.. function:: void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses a modular method based on an `O(n^3)`
-    method over `\mathbb{Z}/n\mathbb{Z}`.
-
-.. function:: void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix.
-
+    The *berkowitz* algorithm is a wrapper of :func:`gr_mat_charpoly_berkowitz`.
+    The *modular* algorithm computes the characteristic polynomial modulo
+    several primes and combines them using CRT, using the bound
+    returned by :func:`fmpz_mat_charpoly_bound` to guarantee that sufficiently
+    many primes are chosen. This algorithm supports multithreading.
+    The default algorithm handles various special cases and otherwise
+    delegates to the *berkowitz* or *modular* algorithms depending on the
+    size of the input.
 
 Minimal polynomial
 --------------------------------------------------------------------------------
