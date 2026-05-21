@@ -19,6 +19,175 @@
 #include "crt_helpers.h"
 #include "fft_small.h"
 
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+/*
+    Add ap[0..5]*b_arg to the 7-limb accumulator rp[0..6],
+    discarding any carry beyond rp[6].
+*/
+# define FLINT_FFT_SMALL_CRT_ADDMUL_6X1(rp_arg, ap_arg, b_arg) \
+    __extension__ ({ \
+        mp_ptr __rp = (rp_arg); \
+        mp_srcptr __ap = (ap_arg); \
+        mp_limb_t __b = (b_arg); \
+        mp_limb_t __lo, __hi0, __hi1; \
+        __asm__( \
+            "xor %[lo], %[lo]\n" \
+            "mulx %[a0], %[lo], %[hi0]\n" \
+            "adcx %[lo], %[r0]\n" \
+            "mulx %[a1], %[lo], %[hi1]\n" \
+            "adcx %[hi0], %[r1]\n" \
+            "adox %[lo], %[r1]\n" \
+            "mulx %[a2], %[lo], %[hi0]\n" \
+            "adcx %[hi1], %[r2]\n" \
+            "adox %[lo], %[r2]\n" \
+            "mulx %[a3], %[lo], %[hi1]\n" \
+            "adcx %[hi0], %[r3]\n" \
+            "adox %[lo], %[r3]\n" \
+            "mulx %[a4], %[lo], %[hi0]\n" \
+            "adcx %[hi1], %[r4]\n" \
+            "adox %[lo], %[r4]\n" \
+            "mulx %[a5], %[lo], %[hi1]\n" \
+            "adcx %[hi0], %[r5]\n" \
+            "adox %[lo], %[r5]\n" \
+            "mov  $0, %[lo]\n" \
+            "adcx %[lo], %[hi1]\n" \
+            "adox %[lo], %[hi1]\n" \
+            "add  %[hi1], %[r6]\n" \
+            : [lo] "=&r" (__lo), \
+              [hi0] "=&r" (__hi0), \
+              [hi1] "=&r" (__hi1), \
+              [r0] "+r" (__rp[0]), \
+              [r1] "+r" (__rp[1]), \
+              [r2] "+r" (__rp[2]), \
+              [r3] "+r" (__rp[3]), \
+              [r4] "+r" (__rp[4]), \
+              [r5] "+r" (__rp[5]), \
+              [r6] "+r" (__rp[6]) \
+            : "d" (__b), \
+              [a0] "rm" (__ap[0]), \
+              [a1] "rm" (__ap[1]), \
+              [a2] "rm" (__ap[2]), \
+              [a3] "rm" (__ap[3]), \
+              [a4] "rm" (__ap[4]), \
+              [a5] "rm" (__ap[5]) \
+            : "cc"); \
+    })
+
+# define FLINT_FFT_SMALL_CRT_USE_ASM(N, M) ((N) == 7 && (M) == 6 && overhang == NULL)
+
+/*
+    Initialize the CRT accumulator with C[0..M-1]*y.  The 7-by-6 path
+    writes the direct sum to r; the fallback path writes the split r/t form.
+*/
+# define FLINT_FFT_SMALL_CRT_MUL(N, M, r, t, C, y) \
+    do { \
+        if (FLINT_FFT_SMALL_CRT_USE_ASM(N, M)) \
+            FLINT_MPN_MUL_HARD(r, C, M, &(y), 1); \
+        else \
+            CAT3(_big_mul, N, M)(r, t, C, y); \
+    } while (0)
+
+/*
+    Add C[0..M-1]*y to the CRT accumulator.  The 7-by-6 path updates the
+    direct sum in r; the fallback path updates the split r/t form.
+*/
+# define FLINT_FFT_SMALL_CRT_ADDMUL(N, M, r, t, C, y) \
+    do { \
+        if (FLINT_FFT_SMALL_CRT_USE_ASM(N, M)) \
+            FLINT_FFT_SMALL_CRT_ADDMUL_6X1(r, C, y); \
+        else \
+            CAT3(_big_addmul, N, M)(r, t, C, y); \
+    } while (0)
+
+/*
+    Reduce the 7-limb accumulator r in place until 0 <= r < limit.
+    Identical to _reduce_big_sum_7 in crt_helpers.h, but without t.
+*/
+FLINT_FORCE_INLINE void _fft_small_reduce_sum_7(ulong r[], const ulong * limit)
+{
+check:
+    for (ulong k = 7; k > 1; k--)
+    {
+        if (FLINT_LIKELY(r[k - 1] > limit[k - 1]))
+            goto sub;
+        if (r[k - 1] < limit[k - 1])
+            return;
+    }
+    if (r[0] < limit[0])
+        return;
+sub:
+    multi_sub_7(r, limit);
+    goto check;
+}
+
+/*
+    Reduce the CRT accumulator modulo limit and leave the canonical N-limb
+    value in r.  The fallback path folds t into r before reducing.
+*/
+# define FLINT_FFT_SMALL_CRT_REDUCE(N, M, r, t, limit) \
+    do { \
+        if (FLINT_FFT_SMALL_CRT_USE_ASM(N, M)) \
+            _fft_small_reduce_sum_7(r, limit); \
+        else \
+            CAT(_reduce_big_sum, N)(r, t, limit); \
+    } while (0)
+#else // !FLINT_HAVE_ASSEMBLY_x86_64_adx
+
+/* Same as above, but without the ASM branches. */
+# define FLINT_FFT_SMALL_CRT_MUL(N, M, r, t, C, y) \
+    CAT3(_big_mul, N, M)(r, t, C, y)
+
+# define FLINT_FFT_SMALL_CRT_ADDMUL(N, M, r, t, C, y) \
+    CAT3(_big_addmul, N, M)(r, t, C, y)
+
+# define FLINT_FFT_SMALL_CRT_REDUCE(N, M, r, t, limit) \
+    CAT(_reduce_big_sum, N)(r, t, limit)
+#endif
+
+/*
+    Declare r and set it to the canonical N-limb CRT reconstruction of the
+    residues Xs[l*BLK_SZ + j] for 0 <= l < np, using Rcrts[np - 1].  The
+    reconstructed value is reduced modulo the product of the CRT primes and is
+    left in r for the caller to add to the output limbs.
+*/
+#define FLINT_FFT_SMALL_CRT_RECONSTRUCT_BLOCK(N, M, r, Rcrts, np, n, Xs, j) \
+    ulong r[N + 1]; \
+    do { \
+        ulong t[N + 1]; \
+        ulong l = 0; \
+ \
+        FLINT_FFT_SMALL_CRT_MUL(N, M, r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+        for (l++; l < np; l++) \
+            FLINT_FFT_SMALL_CRT_ADDMUL(N, M, r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+ \
+        FLINT_FFT_SMALL_CRT_REDUCE(N, M, r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+    } while (0)
+
+/*
+    Declare r and set it to the canonical N-limb CRT reconstruction of the
+    coefficient d[l*dstride + i] for 0 <= l < np.  Each floating-point residue
+    is first reduced modulo Rffts[l].p, and the reconstructed value is reduced
+    modulo the product of the CRT primes and left in r for the caller.
+*/
+#define FLINT_FFT_SMALL_CRT_RECONSTRUCT_COEFF(N, M, r, Rcrts, Rffts, d, dstride, np, i) \
+    ulong r[N + 1]; \
+    do { \
+        ulong t[N + 1]; \
+        ulong l = 0; \
+        double xx = (d + l*dstride)[i]; \
+        ulong x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
+ \
+        FLINT_FFT_SMALL_CRT_MUL(N, M, r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
+        for (l++; l < np; l++) \
+        { \
+            xx = (d + l*dstride)[i]; \
+            x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
+            FLINT_FFT_SMALL_CRT_ADDMUL(N, M, r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
+        } \
+ \
+        FLINT_FFT_SMALL_CRT_REDUCE(N, M, r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+    } while (0)
+
 /*
 The following profiles are hardcoded.
 
@@ -792,15 +961,7 @@ static void CAT(_mpn_from_ffts, NP)( \
  \
         for (ulong j = 0; j < BLK_SZ; j += 1) \
         { \
-            ulong r[N + 1]; \
-            ulong t[N + 1]; \
-            ulong l = 0; \
- \
-            CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
-            for (l++; l < np; l++) \
-                CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
- \
-            CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+            FLINT_FFT_SMALL_CRT_RECONSTRUCT_BLOCK(N, M, r, Rcrts, np, n, Xs, j); \
  \
             ulong toff = ((i+j)*bits)/FLINT_BITS; \
             ulong tshift = ((i+j)*bits)%FLINT_BITS; \
@@ -818,15 +979,7 @@ static void CAT(_mpn_from_ffts, NP)( \
  \
         for (ulong j = 0; j < BLK_SZ; j += 1) \
         { \
-            ulong r[N + 1]; \
-            ulong t[N + 1]; \
-            ulong l = 0; \
- \
-            CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
-            for (l++; l < np; l++) \
-                CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
- \
-            CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+            FLINT_FFT_SMALL_CRT_RECONSTRUCT_BLOCK(N, M, r, Rcrts, np, n, Xs, j); \
  \
             ulong toff = ((i+j)*bits)/FLINT_BITS; \
             ulong tshift = ((i+j)*bits)%FLINT_BITS; \
@@ -863,21 +1016,7 @@ static void CAT(_mpn_from_ffts, NP)( \
     { \
         for (ulong i = stop_easy; i < zlen; i++) \
         { \
-            ulong r[N + 1]; \
-            ulong t[N + 1]; \
-            ulong l = 0; \
-            double xx = (d + l*dstride)[i]; \
-            ulong x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
- \
-            CAT3(_big_mul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
-            for (l++; l < np; l++) \
-            { \
-                xx = (d + l*dstride)[i]; \
-                x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
-                CAT3(_big_addmul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
-            } \
- \
-            CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+            FLINT_FFT_SMALL_CRT_RECONSTRUCT_COEFF(N, M, r, Rcrts, Rffts, d, dstride, np, i); \
  \
             ulong toff = (i*bits)/FLINT_BITS; \
             ulong tshift = (i*bits)%FLINT_BITS; \
