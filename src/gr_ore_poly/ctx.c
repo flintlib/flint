@@ -296,11 +296,11 @@ gr_method_tab_input _gr_ore_poly_methods_input[] =
     {GR_METHOD_POW_FMPZ,    (gr_funcptr) gr_ore_poly_pow_fmpz},
     {GR_METHOD_DIV,         (gr_funcptr) gr_ore_poly_div},
     {GR_METHOD_INV,         (gr_funcptr) gr_ore_poly_inv},
-
-    {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) gr_ore_poly_euclidean_div},
-    {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) gr_ore_poly_euclidean_rem},
-    {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) gr_ore_poly_euclidean_divrem},
-
+*/
+    {GR_METHOD_EUCLIDEAN_DIV,         (gr_funcptr) gr_ore_poly_div},
+    {GR_METHOD_EUCLIDEAN_REM,         (gr_funcptr) gr_ore_poly_rem},
+    {GR_METHOD_EUCLIDEAN_DIVREM,      (gr_funcptr) gr_ore_poly_divrem},
+/*
     {GR_METHOD_GCD,         (gr_funcptr) gr_ore_poly_gcd},
 
     {GR_METHOD_FACTOR,      (gr_funcptr) gr_ore_poly_factor},
