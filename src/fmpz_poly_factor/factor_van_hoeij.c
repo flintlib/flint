@@ -19,6 +19,21 @@
 #include "fmpz_poly_factor.h"
 #include "fmpz_lll.h"
 
+/* Some tuning parameters */
+
+/* Use ULLL or standard LLL? */
+#define VAN_HOEIJ_USE_ULLL 1
+
+/* FLINT 1.6 parameters */
+#define LLL_DELTA 0.75
+#define LLL_ETA 0.81
+
+#define ULLL_BIG_CUTOFF 100
+#define ULLL_BIG_SIZE_PARAM 150
+#define ULLL_SMALL_SIZE_PARAM 350
+
+#define VAN_HOEIJ_VERBOSE 0
+
 static slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
                                                             slong r, ulong p)
 {
@@ -125,7 +140,8 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
    /* compute leading coefficient */
    N = f->length - 1;
-   sqN = (ulong) sqrt(N);
+   sqN = sqrt(N);
+
    fmpz_init(lc);
    fmpz_set(lc, f->coeffs + N);
 
@@ -138,7 +154,12 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
    fmpz_init(bound_sum);
    fmpz_mat_init(col, r, 1);
-   fmpz_lll_context_init_default(fl);
+
+   fmpz_lll_context_init(fl, LLL_DELTA, LLL_ETA, Z_BASIS, APPROX);
+
+#if VAN_HOEIJ_VERBOSE
+   flint_printf("factor_van_hoeij: len = %wd, bits = %wd, r = %wd\n", f->length, fmpz_poly_max_bits(f), r);
+#endif
 
    while (!fmpz_poly_factor_van_hoeij_check_if_solved(M, final_fac, lifted_fac, f, P, exp, lc))
    {
@@ -174,8 +195,16 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
 
             if (do_lll)
             {
-                /* flint_printf("LLL %wd %wd  %wd\n", M->r, M->c, fmpz_mat_max_bits(M)); */
-               num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
+#if VAN_HOEIJ_VERBOSE
+                flint_printf("LLL %wd %wd  %wd\n", M->r, M->c, fmpz_mat_max_bits(M));
+#endif
+
+#if VAN_HOEIJ_USE_ULLL
+                   slong new_size_ulll = (M->r > ULLL_BIG_CUTOFF) ? ULLL_BIG_SIZE_PARAM : ULLL_SMALL_SIZE_PARAM;
+                   num_rows = fmpz_lll_with_removal_ulll(M, NULL, new_size_ulll, B, fl);
+#else
+                    num_rows = fmpz_lll_wrapper_with_removal_knapsack(M, NULL, B, fl);
+#endif
 
                fmpz_mat_van_hoeij_resize_matrix(M, num_rows);
 
@@ -221,3 +250,4 @@ cleanup:
    flint_free(w);
    flint_free(link);
 }
+
