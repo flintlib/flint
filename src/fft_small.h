@@ -145,8 +145,9 @@ int fft_small_mulmod_satisfies_bounds(ulong n);
         [j_bits][j_r]  where j_bits = nbits(j), j_r = j - 2^(j_bits-1)
 
     with the special case j_bits = j_r = 0 for j = 0.
-    The first SD_FFT_CTX_W2TAB_INIT tables are stored consecutively to ease the
-    lookup of small indices, which must currently be at least max(4, LG_BLK_SZ).
+    Up to the first SD_FFT_CTX_W2TAB_INIT tables are stored consecutively to ease
+    the lookup of small indices, which must currently be at least max(4,
+    LG_BLK_SZ).
 */
 
 /* for the fft look up of powers of w */
@@ -192,7 +193,7 @@ typedef struct {
     double p;   /* the FFT prime */
     double pinv;
     nmod_t mod;
-    ulong primitive_root;
+    ulong primitive_2power_root; /* primitive 2^v-th root, v = valuation(p - 1, 2) */
 #if FLINT_USES_PTHREAD
     _Atomic(unsigned int) w2tab_depth;
 #else

@@ -1028,11 +1028,11 @@ void sd_fft_trunc(
     FLINT_ASSERT(itrunc <= n_pow2(L));
     FLINT_ASSERT(otrunc <= n_pow2(L));
 
+    sd_fft_ctx_fit_depth(Q, L);
+
     if (L > LG_BLK_SZ)
     {
         ulong new_itrunc, new_otrunc;
-
-        sd_fft_ctx_fit_depth(Q, L);
 
         new_itrunc = n_cdiv(itrunc, BLK_SZ);
         new_otrunc = n_cdiv(otrunc, BLK_SZ);
