@@ -37,7 +37,7 @@ int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V
     GR_TMP_INIT(c, cctx);
 
     gr_ptr A, B;
-    GR_TMP_INIT_VEC(A, lenQ, cctx); 
+    GR_TMP_INIT_VEC(A, lenQ, cctx);
     GR_TMP_INIT_VEC(B, lenU, cctx);
 
     gr_ptr sigma_pows;
@@ -65,7 +65,7 @@ int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V
         // R -= B
         slong lenB = lenA + lenV - 1;
         status |= _gr_vec_sub(R, R, B, lenB, cctx);
-        
+
         // Q += c * x^k, so Q[k] += c
         status |= gr_add(GR_ENTRY(Q, k, el_size), GR_ENTRY(Q, k, el_size), c, cctx);
 
@@ -75,7 +75,7 @@ int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V
     GR_TMP_CLEAR_VEC(sigma_pows, lenQ, cctx);
     GR_TMP_CLEAR(c, cctx);
 
-    GR_TMP_CLEAR_VEC(A, lenQ, cctx); 
+    GR_TMP_CLEAR_VEC(A, lenQ, cctx);
     GR_TMP_CLEAR_VEC(B, lenU, cctx);
 
     return status;
