@@ -324,11 +324,11 @@ Arithmetic
 
     Sets *(Q, R)* to the unique pair such that `U = QV + R` and `ord(R) < ord(V)`.
 
-.. function:: int _gr_ore_poly_div(gr_ptr Q, gr_srcptr U, slong lenU, gr_srcptr V, slong lenV, gr_ore_poly_ctx_t ctx)
+.. function:: int gr_ore_poly_div(gr_ore_poly_t Q, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx)
 
     Version of the divrem function which outputs only the quotient.
 
-.. function:: int _gr_ore_poly_rem(gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V, slong lenV, gr_ore_poly_ctx_t ctx)
+.. function:: int gr_ore_poly_rem(gr_ore_poly_t R, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx)
 
     Version of the divrem function which outputs only the remainder.
 
