@@ -69,6 +69,8 @@ References
 
 .. [BuhlerCrandallSompolski1992] \Buhler, J.P. and Crandall, R.E. and Sompolski, R.W. : Irregular primes to one million : Math. Comp. 59:2000 (1992) 717--722
 
+.. [BW1993] \T. Becker and V. Weispfenning, *Gröbner Bases: A Computational Approach to Commutative Algebra*, Graduate Texts in Mathematics 141, Springer-Verlag (1993). https://doi.org/10.1007/978-1-4612-0913-3
+
 .. [CFG2017] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and vector-valued Siegel modular forms of genus two", Math. Ann. 369 (2017), 1649--1669. https://doi.org/10.1007/s00208-016-1510-2
 
 .. [CFG2019] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and modular forms of degree 2 with character", Math. Comp. 88 (2019), 2423--2441. https://doi.org/10.1090/mcom/3412

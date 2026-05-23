@@ -723,8 +723,8 @@ We use monic polynomials as normalised generators.
 
 .. function:: void fmpz_mod_mpoly_buchberger_naive(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx)
 
-    Sets *G* to a Gröbner basis for *F*, computed using
-    a naive implementation of Buchberger's algorithm.
+    Sets *G* to a Gröbner basis for *F*, computed using a version of
+    Buchberger's algorithm. The algorithm essentially follows [BW1993]_.
 
 .. function:: int fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F, slong ideal_len_limit, slong poly_len_limit, const fmpz_mod_mpoly_ctx_t ctx)
 
