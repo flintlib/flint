@@ -13,15 +13,16 @@
 #include "ulong_extras.h"
 #include "gr_poly.h"
 
-TEST_FUNCTION_START(gr_poly_xgcd_euclidean, state)
+TEST_FUNCTION_START(gr_poly_xgcd_subresultant, state)
 {
-    _gr_poly_test_xgcd((gr_method_poly_xgcd_op) _gr_poly_xgcd_euclidean,
+    _gr_poly_test_xgcd((gr_method_poly_xgcd_op) _gr_poly_xgcd_subresultant,
         state,
-        100 * flint_test_multiplier(),
+        1000 * flint_test_multiplier(),
         0,  /* default maxn */
-        0,  /* only expected to succeed over fields */
+        1,  /* expected to succeed over appropriate UFDs (not just fields) */
         NULL /* test random contexts */
     );
 
     TEST_FUNCTION_END(state);
 }
+

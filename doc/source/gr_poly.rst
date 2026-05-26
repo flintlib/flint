@@ -902,8 +902,8 @@ GCD
 
     GCD in the polynomial ring `R[x]`.
 
-    The *gcd_subresultant* algorithm assumes that *R* is a unique factorization
-    domain. The *euclidean* and *hgcd* algorithms assume that *R* is a field.
+    The *gcd_subresultant* algorithm assumes that *R* is a GCD domain.
+    The *euclidean* and *hgcd* algorithms assume that *R* is a field.
     The time complexity of the half-GCD algorithm is `\mathcal{O}(n \log^2 n)`
     field operations. For further details, see [ThullYap1990]_.
 
@@ -922,13 +922,48 @@ GCD
 
 .. function:: int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
-
-.. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_xgcd_hgcd(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
               int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
-
-.. function:: int _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int _gr_poly_xgcd_subresultant(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_xgcd_subresultant(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int _gr_poly_xgcd(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_xgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+
+    Given `A, B \in R[x]` where `R` is assumed to be a GCD domain, compute
+    `G, S, T` satisfying `G = S A + T B` where `G` is an associate of
+    `\gcd(A,B)`. Over a field, `G` will be the monic GCD of
+    `A` and `B`; over a ring, it may differ from the GCD by a scalar
+    factor that divides the resultant of `A` and `B`.
+
+    The following algorithms are implemented:
+
+    * *euclidean* is the standard Euclidean algorithm. It is correct over
+      fields, but may succeed over non-fields if all occurring divisions by
+      leading coefficients succeed.
+    * *hgcd* is the asymptotically fast half-GCD algorithm. The assumptions
+      are the same as for the Euclidean algorithm.
+    * *subresultant* uses the subresultant PRS method. It works over any GCD
+      domain, e.g. over `\mathbb{Z}`.
+    * *generic* attempts to choose the best method automatically.
+    * the default method may be overridden by the base ring.
+
+    The underscore methods require
+    `\operatorname{lenA} \ge \operatorname{lenB} \ge 2` and do not
+    allow aliasing. The output buffers must have the capacities
+
+    * `\operatorname{lenB}` coefficients for *G*
+    * `\operatorname{lenB} - 1` coefficients for *S*
+    * `\operatorname{lenA} - 1` coefficients for *T*
+
+    even if the final results are known in advance to be shorter.
+
+    For *G*, the final length is written to *lenG* and any higher
+    coefficients may be left with garbage values. An output of
+    `\operatorname{lenG} = 0` is possible if the algorithm terminates
+    abnormally, e.g. due to a failed division.
+    For *S* and *T*, the unused high parts of the output buffers will be zeroed
+    on successful termination.
 
 Resultant
 -------------------------------------------------------------------------------
@@ -948,6 +983,8 @@ of the two polynomials is zero.
               int gr_poly_resultant_euclidean(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
               int gr_poly_resultant_hgcd(gr_ptr res, const gr_poly_t f, const gr_poly_t g, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_resultant_subresultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_resultant_subresultant(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_sylvester(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_resultant_sylvester(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_small(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
@@ -973,15 +1010,15 @@ of the two polynomials is zero.
     Currently this function handles the cases where `len1 \le 2`
     or `len2 \le 3`.
 
+    The *subresultant* version uses the subresultant PRS algorithm.
+    It is valid whenever the ring is a GCD domain.
+
     The *sylvester* version constructs the Sylvester matrix
     and computes its determinant. This is useful over inexact rings
     and as a fallback for rings without division.
 
     The default version attempts to choose an appropriate
     algorithm automatically.
-
-    Currently no algorithm has been implemented that is appropriate for
-    integral domains.
 
 
 Squarefree factorization
@@ -1422,10 +1459,12 @@ ring is generated on each test iteration, otherwise the given ring is used.
     Tests the given function ``gcd_impl`` for correctness as an implementation
     of :func:`_gr_poly_gcd`.
 
-.. function:: void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+.. function:: void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, int flags, gr_ctx_t ctx)
 
     Tests the given function ``xgcd_impl`` for correctness as an implementation
-    of :func:`_gr_poly_xgcd`.
+    of :func:`_gr_poly_xgcd`. If *flags* is 1, the implementation is expected
+    to succeed over standard GCD domains, otherwise it is only expected to
+    succeed over fields.
 
 .. function:: void _gr_poly_test_approx_mulmid_pos_entrywise_accurate(gr_method_poly_binary_trunc2_op mulmid_impl, gr_method_poly_binary_trunc2_op mulmid_ref, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 

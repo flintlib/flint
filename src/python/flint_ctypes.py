@@ -5540,6 +5540,101 @@ class gr_poly(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def resultant(self, other, algorithm=None):
+        """
+            >>> I, x = PolynomialRing(ZZi, "x").gens(recursive=True)
+            >>> f = ((2+3*I) + x)**3
+            >>> g = ((3+4*I) + x)**3
+            >>> f.resultant(g)
+            (16+16*I)
+            >>> g.resultant(f)
+            (-16-16*I)
+            >>> (f * (x + 1)).resultant(g * (x + 1))
+            0
+            >>> f.resultant(g, algorithm="subresultant")
+            (16+16*I)
+            >>> f.resultant(g, algorithm="sylvester")
+            (16+16*I)
+            >>> f.resultant(g, algorithm="euclidean")
+            Traceback (most recent call last):
+              ...
+            ValueError
+            >>> Kx = PolynomialRing(Fraction_gr_fraction(ZZi), "x")
+            >>> Kx(f).resultant(g, algorithm="euclidean")
+            ((16+16*I)) / (1)
+
+        """
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        # fixme:
+        other = Rx(other)
+        res = R()
+        if algorithm is None:
+            status = libgr.gr_poly_resultant(res._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "euclidean":
+            status = libgr.gr_poly_resultant_euclidean(res._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "subresultant":
+            status = libgr.gr_poly_resultant_subresultant(res._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "sylvester":
+            status = libgr.gr_poly_resultant_sylvester(res._ref, self._ref, other._ref, R._ref)
+        else:
+            raise ValueError
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    # todo: want gr_xgcd for generic elements
+    def xgcd(self, other, algorithm=None):
+        """
+            >>> x = ZZx.gen()
+            >>> f = (x+1)**2; g = (x-1)**3
+            >>> G, S, T = f.xgcd(g)
+            >>> (G, S, T); G == S*f + T*g
+            (64, 12*x^2-40*x+44, -12*x-20)
+            True
+            >>> f = (x**2 + 2) * (x+1)**3; g = (x**2 + 2) * (x-1)**2
+            >>> f.gcd(g)
+            x^2+2
+            >>> G, S, T = f.xgcd(g)
+            >>> G
+            64*x^2+128
+            >>> S
+            -12*x+20
+            >>> T
+            12*x^2+40*x+44
+            >>> G == S*f + T*g
+            True
+            >>> f.xgcd(g, algorithm="subresultant")
+            (64*x^2+128, -12*x+20, 12*x^2+40*x+44)
+            >>> f.xgcd(g, algorithm="euclidean")
+            Traceback (most recent call last):
+              ...
+            ValueError
+            >>> Kx = PolynomialRing_gr_poly(QQ, "x")
+            >>> Kx(f).xgcd(g, algorithm="euclidean")
+            (2 + x^2, (5/16) + (-3/16)*x, (11/16) + (5/8)*x + (3/16)*x^2)
+        """
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        # fixme:
+        other = Rx(other)
+        G = Rx()
+        S = Rx()
+        T = Rx()
+        if algorithm is None:
+            status = libgr.gr_poly_xgcd(G._ref, S._ref, T._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "euclidean":
+            status = libgr.gr_poly_xgcd_euclidean(G._ref, S._ref, T._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "subresultant":
+            status = libgr.gr_poly_xgcd_subresultant(G._ref, S._ref, T._ref, self._ref, other._ref, R._ref)
+        else:
+            raise ValueError
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (G, S, T)
+
     def roots(self, domain=None):
         """
         Computes the roots in the coefficient ring of this polynomial,
