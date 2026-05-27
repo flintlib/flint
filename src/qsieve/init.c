@@ -62,4 +62,6 @@ void qsieve_init(qs_t qs_inf, const fmpz_t n)
     qs_inf->sqrts       = NULL;
 
     qs_inf->s = 0;
+    qs_inf->low = 0;
+    qs_inf->high = 0;
 }

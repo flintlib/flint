@@ -545,12 +545,6 @@ int qsieve_next_A(qs_t qs_inf)
 
                 break;
             }
-
-            /* When h == 1 only the last element of curr_subset increases, so
-               prod is non-decreasing.  Once prod * smallest final prime exceeds
-               upper_bound, exit rather than scanning all remaining subsets. */
-
-
         }
     }
 
