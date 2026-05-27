@@ -63,6 +63,9 @@ TEST_FUNCTION_START(fmpz_poly_divlow_smodp, state)
            }
         } while (b->length < 2 || !fmpz_is_one(d1) || !fmpz_is_one(d2));
 
+        /* Test with some leading zeros */
+        fmpz_poly_shift_left(b, b, n_randint(state, 3));
+
         fmpz_poly_mul(c, a, b);
 
         fmpz_poly_scalar_mod_fmpz(d, b, P);
