@@ -28,6 +28,9 @@ extern "C" {
 void _fmpz_mod_vec_set_fmpz_vec(fmpz * A, const fmpz * B, slong len,
                                                      const fmpz_mod_ctx_t ctx);
 
+void _fmpz_mod_vec_get_fmpz_vec_smod(fmpz * res, const fmpz * vec, slong len,
+    const fmpz_mod_ctx_t ctx);
+
 void _fmpz_mod_vec_neg(fmpz * A, const fmpz * B, slong len,
                                                      const fmpz_mod_ctx_t ctx);
 
