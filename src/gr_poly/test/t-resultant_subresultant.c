@@ -17,7 +17,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_FUNCTION_START(gr_poly_resultant, state)
+TEST_FUNCTION_START(gr_poly_resultant_subresultant, state)
 {
     slong iter;
 
@@ -45,8 +45,8 @@ TEST_FUNCTION_START(gr_poly_resultant, state)
 
         status |= gr_poly_randtest(f, state, n, ctx);
         status |= gr_poly_randtest(g, state, n, ctx);
-        status |= gr_poly_resultant(x, f, g, ctx);
-        status |= gr_poly_resultant(y, g, f, ctx);
+        status |= gr_poly_resultant_subresultant(x, f, g, ctx);
+        status |= gr_poly_resultant_subresultant(y, g, f, ctx);
 
         if (((f->length - 1) * (g->length - 1)) % 2)
            status |= gr_neg(y, y, ctx);
@@ -124,12 +124,12 @@ TEST_FUNCTION_START(gr_poly_resultant, state)
         status |= gr_poly_randtest(f, state, n, ctx);
         status |= gr_poly_randtest(g, state, n, ctx);
         status |= gr_poly_randtest(h, state, n, ctx);
-        status |= gr_poly_resultant(y, f, g, ctx);
-        status |= gr_poly_resultant(z, h, g, ctx);
+        status |= gr_poly_resultant_subresultant(y, f, g, ctx);
+        status |= gr_poly_resultant_subresultant(z, h, g, ctx);
         status |= gr_mul(yz, y, z, ctx);
 
         status |= gr_poly_mul(fh, f, h, ctx);
-        status |= gr_poly_resultant(x, fh, g, ctx);
+        status |= gr_poly_resultant_subresultant(x, fh, g, ctx);
 
         if (status == GR_SUCCESS && gr_ctx_is_field(ctx) == T_TRUE && gr_equal(x, yz, ctx) == T_FALSE)
         {

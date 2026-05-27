@@ -76,6 +76,7 @@
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
+#include "t-resultant_subresultant.c"
 #include "t-resultant_sylvester.c"
 #include "t-revert_series.c"
 #include "t-roots.c"
@@ -96,6 +97,7 @@
 #include "t-xgcd.c"
 #include "t-xgcd_euclidean.c"
 #include "t-xgcd_hgcd.c"
+#include "t-xgcd_subresultant.c"
 
 /* Array of test functions ***************************************************/
 
@@ -166,6 +168,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_resultant),
     TEST_FUNCTION(gr_poly_resultant_euclidean),
     TEST_FUNCTION(gr_poly_resultant_hgcd),
+    TEST_FUNCTION(gr_poly_resultant_subresultant),
     TEST_FUNCTION(gr_poly_resultant_sylvester),
     TEST_FUNCTION(gr_poly_revert_series),
     TEST_FUNCTION(gr_poly_roots),
@@ -185,7 +188,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_taylor_shift_horner),
     TEST_FUNCTION(gr_poly_xgcd),
     TEST_FUNCTION(gr_poly_xgcd_euclidean),
-    TEST_FUNCTION(gr_poly_xgcd_hgcd)
+    TEST_FUNCTION(gr_poly_xgcd_hgcd),
+    TEST_FUNCTION(gr_poly_xgcd_subresultant),
 };
 
 /* main function *************************************************************/
