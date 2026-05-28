@@ -247,7 +247,7 @@ fmpq_mat_can_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
 
     fmpz_init(D);
 
-    fmpz_mat_det_bound_nonzero(D, A);
+    fmpz_mat_det_bound_submatrix(D, A);
 
     res = _fmpq_mat_can_solve_multi_mod(X, A, B, D);
 

@@ -275,7 +275,7 @@ void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A, const fm
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
 
 void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
-void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A);
+void fmpz_mat_det_bound_submatrix(fmpz_t bound, const fmpz_mat_t A);
 
 void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 

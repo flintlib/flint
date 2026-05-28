@@ -43,9 +43,8 @@ void fmpz_mat_charpoly_bound(fmpz_t bound, const fmpz_mat_t A)
         for (j = 0; j < n; j++)
         {
             mag_set_fmpz(t, fmpz_mat_entry(A, i, j));
-            mag_fast_mul(t, t, t);
-            mag_add(rnorms + i, rnorms + i, t);
-            mag_add(cnorms + j, cnorms + j, t);
+            mag_fast_addmul(rnorms + i, t, t);
+            mag_fast_addmul(cnorms + j, t, t);
         }
     }
 

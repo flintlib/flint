@@ -787,16 +787,20 @@ Determinant
 
 .. function:: void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 
-    Sets ``bound`` to a nonnegative integer `B` such that
-    `|\det(A)| \le B`. Assumes `A` to be a square matrix.
-    The bound is computed from the Hadamard inequality
-    `|\det(A)| \le \prod \|a_i\|_2` where the product is taken
-    over the rows `a_i` of `A`.
+    Assuming that `A` is a square matrix, sets ``bound`` to a nonnegative
+    integer `B` such that `|\det(A)| \le B`. The bound is computed from the
+    Hadamard inequality `|\det(A)| \le \prod \|a_i\|_2` where the product is
+    taken over the rows `a_i` of `A`. The same bound is also computed
+    columnwise and the minimum of the two bounds is returned.
 
-.. function:: void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+.. function:: void fmpz_mat_det_bound_submatrix(fmpz_t bound, const fmpz_mat_t A)
 
-    As per ``fmpz_mat_det_bound()`` but excludes zero columns. For use with
-    non-square matrices.
+    Given an arbitrary matrix `A`, returns a bound for the
+    determinant of any square submatrix of `A` obtained by removing any
+    number of rows and/or columns. This uses the same algorithm as
+    :func:`fmpz_mat_det_bound`, but excludes row and column norms which are zero.
+    The bound may be suboptimal if the number of rows is significantly larger
+    or smaller than the number of columns.
 
 .. function:: void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
