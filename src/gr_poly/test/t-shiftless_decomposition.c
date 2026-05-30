@@ -84,7 +84,7 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
         gr_vec_init(slshifts, n_randint(state, 4), ZZvec);
         gr_vec_init(slmult, n_randint(state, 4), ZZvec);
 
-        status |= gr_poly_shiftless_decomposition(c, slfac, slshifts, slmult, f, ctx);
+        status |= gr_poly_shiftless_decomposition(c, (gr_poly_vec_struct *) slfac, slshifts, slmult, f, ctx);
 
         if (status == GR_SUCCESS)
         {

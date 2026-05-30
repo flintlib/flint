@@ -952,7 +952,7 @@ _gr_fmpq_poly_mullow(fmpq * res,
 }
 
 static int
-_gr_fmpq_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_fmpq_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     gr_ctx_t ZZ;
     gr_poly_t f;
@@ -981,7 +981,7 @@ _gr_fmpq_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fla
 }
 
 static int
-_gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_fmpq_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
@@ -991,18 +991,15 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
         int status = GR_SUCCESS;
         slong deg;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         if (deg == 0)
         {
             gr_vec_set_length(roots, 0, ctx);
-            gr_vec_set_length(mult, 0, ZZ);
+            fmpz_vec_set_length(mult, 0);
         }
         else /* todo: special cases */
         {
@@ -1021,7 +1018,7 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
                     num++;
 
             gr_vec_set_length(roots, num, ctx);
-            gr_vec_set_length(mult, num, ZZ);
+            fmpz_vec_set_length(mult, num);
 
             res_entries = roots->entries;
             mult_entries = mult->entries;
@@ -1043,8 +1040,6 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
 
             fmpz_poly_factor_clear(fac);
         }
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }

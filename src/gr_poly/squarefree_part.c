@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -34,29 +34,27 @@ gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
            the factorization algorithm and multiply the distinct factors
            together. */
         gr_ptr c;
-        gr_vec_t fac, exp;
-        gr_ctx_t poly_ctx, fmpz_ctx;
+        gr_poly_vec_t fac;
+        fmpz_vec_t exp;
         slong i;
 
-        gr_ctx_init_gr_poly(poly_ctx, ctx);
-        gr_ctx_init_fmpz(fmpz_ctx);
-        gr_vec_init(fac, 0, poly_ctx);
-        gr_vec_init(exp, 0, fmpz_ctx);
+        gr_poly_vec_init(fac, 0, ctx);
+        fmpz_vec_init(exp, 0);
         c = gr_heap_init(ctx);
 
         status |= gr_poly_factor_squarefree(c, fac, exp, poly, ctx);
 
         if (status == GR_SUCCESS)
         {
-            status |= _gr_vec_product(res, fac->entries, fac->length, poly_ctx);
+            status |= gr_poly_one(res, ctx);
+            for (i = 0; i < fac->length; i++)
+                status |= gr_poly_mul(res, res, fac->entries + i, ctx);
             status |= gr_poly_canonical_associate(res, NULL, res, ctx);
         }
 
         gr_heap_clear(c, ctx);
-        gr_vec_clear(fac, poly_ctx);
-        gr_vec_clear(exp, fmpz_ctx);
-        gr_ctx_clear(poly_ctx);
-        gr_ctx_clear(fmpz_ctx);
+        gr_poly_vec_clear(fac, ctx);
+        fmpz_vec_clear(exp);
 
         return status;
     }

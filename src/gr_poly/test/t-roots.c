@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -22,18 +23,18 @@ TEST_FUNCTION_START(gr_poly_roots, state)
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         int status;
-        gr_ctx_t ctx, ZZ;
+        gr_ctx_t ctx;
         gr_poly_t f, g, h, q, r;
-        gr_vec_t roots, mult;
+        gr_vec_t roots;
+        fmpz_vec_t mult;
         slong i, j, expected_mult;
         int init_from_roots;
 
         gr_ctx_init_random(ctx, state);
-        gr_ctx_init_fmpz(ZZ);
 
         gr_poly_init(f, ctx);
         gr_vec_init(roots, 0, ctx);
-        gr_vec_init(mult, 0, ZZ);
+        fmpz_vec_init(mult, 0);
 
         status = GR_SUCCESS;
 
@@ -99,7 +100,7 @@ TEST_FUNCTION_START(gr_poly_roots, state)
                     status |= gr_poly_neg(h, h, ctx);
                     status |= gr_poly_set_coeff_si(h, 1, 1, ctx);
 
-                    for (j = 0; j < fmpz_get_si(gr_vec_entry_ptr(mult, i, ZZ)); j++)
+                    for (j = 0; j < fmpz_get_si(mult->entries + i); j++)
                         status |= gr_poly_mul(g, g, h, ctx);
                 }
 
@@ -150,10 +151,9 @@ TEST_FUNCTION_START(gr_poly_roots, state)
 
         gr_poly_clear(f, ctx);
         gr_vec_clear(roots, ctx);
-        gr_vec_clear(mult, ZZ);
+        fmpz_vec_clear(mult);
 
         gr_ctx_clear(ctx);
-        gr_ctx_clear(ZZ);
     }
 
     TEST_FUNCTION_END(state);
