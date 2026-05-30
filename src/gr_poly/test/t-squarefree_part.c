@@ -29,13 +29,12 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
         slong i;
         int status = GR_SUCCESS;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
-        while (gr_ctx_is_integral_domain(ctx) != T_TRUE ||
-            gr_ctx_is_finite_characteristic(ctx) != T_FALSE || ctx->methods == _ca_methods)
+        while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         gr_ctx_init_gr_poly(poly_ctx, ctx);
@@ -50,7 +49,7 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
 
         c = gr_heap_init(ctx);
 
-        status |= gr_poly_randtest(A, state, 6, ctx);
+        status |= gr_poly_randtest(A, state, 8, ctx);
 
         status |= gr_poly_factor_squarefree(c, F, exp, A, ctx);
 

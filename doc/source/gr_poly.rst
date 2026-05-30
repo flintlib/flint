@@ -1031,9 +1031,8 @@ Squarefree factorization
 
     .. math ::
 
-        f = c \prod_i {g_i}^{e_i}
+        poly = c \prod_i {g_i}^{e_i}.
 
-    of the polynomial *f* given by *poly*.
     On success, *fac* is set to a vector of pairwise coprime squarefree
     factors `g_i` with respective multiplicities `e_i` in *exp*.
     The order of the factors is arbitrary.
@@ -1043,20 +1042,19 @@ Squarefree factorization
 
     The constant *c* is set to an element of the scalar ring.
     If *ctx* is known to be a field, all factors will be monic and the
-    leading coefficient of *f* is stored in *c*.
+    leading coefficient of *poly* is stored in *c*.
     Otherwise, the factors are normalized to be content-free and to have
     a canonical associate as the leading coefficient; *c* will be set
-    to a unit multiple of the content of *f*.
+    to a unit multiple of the content of *poly*.
     Note that *c* itself is not factored over the base ring.
 
-    This function requiires that *ctx* is a unique factorization domain
+    This function requires that *ctx* is a unique factorization domain
     and returns ``GR_UNABLE`` if this cannot be verified.
 
 .. function:: int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 
-    Sets *res* to the squarefreepart of *poly*.
-
-    TODO: currently only fields of characteristic 0 are supported.
+    Sets *res* to the squarefree part of *poly*. In terms of the squarefree
+    factorization, this corresponds to the canonical associate of `\prod_i g_i`.
 
 Shift equivalence
 -------------------------------------------------------------------------------

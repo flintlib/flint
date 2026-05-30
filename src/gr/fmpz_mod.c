@@ -354,6 +354,7 @@ _gr_fmpz_mod_inv(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 
         fmpz_t d;
         fmpz_init(d);
+
         fmpz_gcdinv(d, res, x, FMPZ_MOD_CTX(ctx)->n);
 
         if (fmpz_is_one(d))
@@ -451,7 +452,11 @@ _gr_fmpz_mod_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
     }
     else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
     {
-        return fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
+        int status = fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
+        /* fmpz_sqrtmod may have set res to an unreduced value on failure */
+        if (status != GR_SUCCESS)
+            fmpz_zero(res);
+        return status;
     }
     else
     {
