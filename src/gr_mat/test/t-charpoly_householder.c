@@ -33,7 +33,7 @@ TEST_GR_FUNCTION_START(gr_mat_charpoly_householder, state, count_success, count_
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         n = n_randint(state, 8);

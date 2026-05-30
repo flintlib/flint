@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2023, 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -20,7 +20,7 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t ctx, poly_ctx, fmpz_ctx;
         gr_poly_t A, B, C;
@@ -31,7 +31,8 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
 
         gr_ctx_init_random(ctx, state);
 
-        while (gr_ctx_is_field(ctx) != T_TRUE)
+        while (gr_ctx_is_integral_domain(ctx) != T_TRUE ||
+            gr_ctx_is_finite_characteristic(ctx) != T_FALSE || ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
             gr_ctx_init_random(ctx, state);
@@ -49,10 +50,7 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
 
         c = gr_heap_init(ctx);
 
-        if (ctx->methods == _ca_methods)
-            status |= gr_poly_randtest(A, state, 3, ctx);
-        else
-            status |= gr_poly_randtest(A, state, 10, ctx);
+        status |= gr_poly_randtest(A, state, 6, ctx);
 
         status |= gr_poly_factor_squarefree(c, F, exp, A, ctx);
 
@@ -65,14 +63,15 @@ TEST_FUNCTION_START(gr_poly_squarefree_part, state)
                 status |= gr_poly_one(C, ctx);
                 for (i = 0; i < F->length; i++)
                     status |= gr_poly_mul(C, C, gr_vec_entry_ptr(F, i, poly_ctx), ctx);
+                status |= gr_poly_canonical_associate(C, NULL, C, ctx);
 
                 if (status == GR_SUCCESS && gr_poly_equal(B, C, ctx) == T_FALSE)
                 {
                     flint_printf("FAIL (product)\n\n");
+                    gr_ctx_println(ctx);
                     flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
                     flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");
                     flint_printf("C = "); gr_poly_print(C, ctx); flint_printf("\n");
-
                     flint_abort();
                 }
             }

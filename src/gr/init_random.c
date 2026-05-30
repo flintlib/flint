@@ -155,9 +155,14 @@ gr_ctx_init_random_finite_field(gr_ctx_t ctx, flint_rand_t state)
         case 5:
             /* gr_ctx_init_mpn_mod_randtest is cheap and
                generates primes with high probability */
-            do {
+            while (1)
+            {
                 gr_ctx_init_mpn_mod_randtest(ctx, state);
-            } while (gr_ctx_is_field(ctx) != T_TRUE);
+                if (gr_ctx_is_field(ctx) == T_TRUE)
+                    break;
+                else
+                    gr_ctx_clear(ctx);
+            } 
             break;
 
         case 6:

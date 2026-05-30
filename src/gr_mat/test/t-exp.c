@@ -27,13 +27,7 @@ TEST_GR_FUNCTION_START(gr_mat_exp, state, count_success, count_domain, count_una
         int status = GR_SUCCESS;
         int which;
 
-        while (1)
-        {
-            gr_ctx_init_random(ctx, state);
-            if (gr_ctx_is_field(ctx) == T_TRUE)
-                break;
-            gr_ctx_clear(ctx);
-        }
+        gr_ctx_init_random_field(ctx, state);
 
         if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);

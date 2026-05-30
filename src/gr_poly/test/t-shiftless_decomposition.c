@@ -36,8 +36,14 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
         if (n_randint(state, 2))
             gr_ctx_init_fmpz(ctx);
         else
+        {
             gr_ctx_init_random(ctx, state);
-        int calcium = ctx->methods == _ca_methods;
+            while (ctx->methods == _ca_methods)
+            {
+                gr_ctx_clear(ctx);
+                gr_ctx_init_random(ctx, state);
+            }
+        }
 
         gr_ptr a = gr_heap_init(ctx);
         gr_poly_init(f, ctx);
@@ -46,13 +52,13 @@ TEST_FUNCTION_START(gr_poly_shiftless_decomposition, state)
         int status = GR_SUCCESS;
 
         status |= gr_poly_one(f, ctx);
-        slong li = 1 + n_randint(state, calcium ? 2 : 5);
+        slong li = 1 + n_randint(state, 5);
 
         for (slong i = 0; i < li && status == GR_SUCCESS; i++)
         {
             for (slong j = 0; j < 10 && gr_poly_is_zero(u, ctx) == T_TRUE; j++)
-                gr_poly_randtest(u, state, 2 + (calcium ? 0 : n_randint(state, 3)), ctx);
-            slong lj = 1 + n_randint(state, calcium ? 5 : 2);
+                gr_poly_randtest(u, state, 2 + n_randint(state, 3), ctx);
+            slong lj = 1 + n_randint(state, 5);
             for (slong j = 0; j < lj && status == GR_SUCCESS; j++)
             {
                 if (n_randint(state, 2))

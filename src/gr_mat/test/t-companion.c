@@ -26,14 +26,7 @@ TEST_FUNCTION_START(gr_mat_companion, state)
         gr_ptr den;
         slong n;
 
-        while (1)
-        {
-            gr_ctx_init_random(ctx, state);
-            if (gr_ctx_is_field(ctx) == T_TRUE)
-                break;
-            else
-                gr_ctx_clear(ctx);
-        }
+        gr_ctx_init_random_field(ctx, state);
 
         gr_poly_init(f, ctx);
         gr_poly_init(g, ctx);

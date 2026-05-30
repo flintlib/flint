@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2023, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -17,8 +17,7 @@ gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
     gr_poly_t t;
     int status = GR_SUCCESS;
 
-    /* todo */
-    if (gr_ctx_is_field(ctx) != T_TRUE || gr_ctx_is_finite_characteristic(ctx) != T_FALSE)
+    if (gr_ctx_is_field(ctx) != T_TRUE && gr_ctx_is_unique_factorization_domain(ctx) != T_TRUE)
         return GR_UNABLE;
 
     if (poly->length <= 1)
