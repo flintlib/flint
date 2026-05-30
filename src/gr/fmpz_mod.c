@@ -354,6 +354,7 @@ _gr_fmpz_mod_inv(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 
         fmpz_t d;
         fmpz_init(d);
+
         fmpz_gcdinv(d, res, x, FMPZ_MOD_CTX(ctx)->n);
 
         if (fmpz_is_one(d))
@@ -451,7 +452,11 @@ _gr_fmpz_mod_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
     }
     else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
     {
-        return fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
+        int status = fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
+        /* fmpz_sqrtmod may have set res to an unreduced value on failure */
+        if (status != GR_SUCCESS)
+            fmpz_zero(res);
+        return status;
     }
     else
     {
@@ -482,6 +487,14 @@ _gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
         return T_UNKNOWN;
     }
 }
+
+static int
+_gr_fmpz_mod_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set(res, FMPZ_MOD_CTX(ctx)->n);
+    return GR_SUCCESS;
+}
+
 
 /* todo: len 1 */
 static int
@@ -847,7 +860,8 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_mod_pow_fmpz},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_mod_sqrt},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_mod_is_square},
-
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_fmpz_mod_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_fmpz_mod_ctx_fq_prime},
 /*
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_mpn_mod_vec_zero},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_mpn_mod_vec_clear},

@@ -559,6 +559,12 @@ _gr_nmod_pow_fmpz(ulong * res, const ulong * x, const fmpz_t y, gr_ctx_t ctx)
     }
 }
 
+static int
+_gr_nmod_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD_CTX(ctx).n);
+    return GR_SUCCESS;
+}
 
 static void
 _gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
@@ -1464,6 +1470,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_nmod_pow_fmpz},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_nmod_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_nmod_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_nmod_ctx_fq_prime},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_nmod_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_nmod_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _gr_nmod_vec_set},

@@ -35,7 +35,7 @@ TEST_GR_FUNCTION_START(gr_mat_solve_den_fflu, state, count_success, count_domain
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         gr_mat_init(A, n, n, ctx);

@@ -56,7 +56,7 @@ TEST_GR_FUNCTION_START(gr_mat_rref_fflu, state, count_success, count_domain, cou
         slong rank1, rank2, r, c;
         int status = GR_SUCCESS;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         r = n_randint(state, 6);
         c = n_randint(state, 6);
