@@ -332,6 +332,13 @@ nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_
     return status;
 }
 
+static int
+nmod32_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD32_CTX(ctx).n);
+    return GR_SUCCESS;
+}
+
 static void
 _nmod32_vec_init(uint32_t * res, slong len, gr_ctx_t ctx)
 {
@@ -741,6 +748,8 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) nmod32_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod32_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod32_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod32_ctx_fq_prime},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod32_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_zero},

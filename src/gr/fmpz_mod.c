@@ -483,6 +483,14 @@ _gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
     }
 }
 
+static int
+_gr_fmpz_mod_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set(res, FMPZ_MOD_CTX(ctx)->n);
+    return GR_SUCCESS;
+}
+
+
 /* todo: len 1 */
 static int
 _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
@@ -847,7 +855,8 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_mod_pow_fmpz},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_mod_sqrt},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_mod_is_square},
-
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) _gr_fmpz_mod_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _gr_fmpz_mod_ctx_fq_prime},
 /*
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_mpn_mod_vec_zero},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_mpn_mod_vec_clear},

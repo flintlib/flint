@@ -358,6 +358,7 @@ Scalar division
 --------------------------------------------------------------------------------
 
 .. function:: int gr_poly_div_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+              int gr_poly_divexact_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
 
 Division with remainder
 --------------------------------------------------------------------------------
@@ -1024,21 +1025,38 @@ of the two polynomials is zero.
 Squarefree factorization
 -------------------------------------------------------------------------------
 
-TODO: currently only fields of characteristic 0 are supported.
-
 .. function:: int gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t poly, gr_ctx_t ctx)
 
-    Computes a squarefree factorization of *poly*.
+    Computes a squarefree factorization
+
+    .. math ::
+
+        f = c \prod_i {g_i}^{e_i}
+
+    of the polynomial *f* given by *poly*.
+    On success, *fac* is set to a vector of pairwise coprime squarefree
+    factors `g_i` with respective multiplicities `e_i` in *exp*.
+    The order of the factors is arbitrary.
+    The user must initialize *fac* to a vector of polynomials of the same
+    type as *poly* (and *not* to the scalar type *ctx*).
+    The exponent vector *exp* must be initialized to the *fmpz* type.
 
     The constant *c* is set to an element of the scalar ring.
-    The factors in *fac* are set to polynomials; the user must thus
-    initialize it to a vector of polynomials of the same type as
-    *poly* (and *not* to the parent *ctx*).
-    The exponent vector *exp* must be initialized to the *fmpz* type.
+    If *ctx* is known to be a field, all factors will be monic and the
+    leading coefficient of *f* is stored in *c*.
+    Otherwise, the factors are normalized to be content-free and to have
+    a canonical associate as the leading coefficient; *c* will be set
+    to a unit multiple of the content of *f*.
+    Note that *c* itself is not factored over the base ring.
+
+    This function requiires that *ctx* is a unique factorization domain
+    and returns ``GR_UNABLE`` if this cannot be verified.
 
 .. function:: int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 
     Sets *res* to the squarefreepart of *poly*.
+
+    TODO: currently only fields of characteristic 0 are supported.
 
 Shift equivalence
 -------------------------------------------------------------------------------

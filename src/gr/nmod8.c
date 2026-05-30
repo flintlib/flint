@@ -332,6 +332,13 @@ nmod8_div_nonunique(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_
     return status;
 }
 
+static int
+nmod8_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD8_CTX(ctx).n);
+    return GR_SUCCESS;
+}
+
 static void
 _nmod8_vec_init(uint8_t * res, slong len, gr_ctx_t ctx)
 {
@@ -877,6 +884,8 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) nmod8_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod8_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod8_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod8_ctx_fq_prime},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod8_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod8_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod8_vec_set},

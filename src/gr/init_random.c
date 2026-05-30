@@ -123,15 +123,44 @@ gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
     }
 }
 
-static void
-gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
+void
+gr_ctx_init_random_finite_field(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t t;
     fmpz_init(t);
 
-    switch (n_randint(state, 3))
+    switch (n_randint(state, 9))
     {
-        case 0:
+        case 0: gr_ctx_init_nmod8(ctx, 2); break;
+        case 1: gr_ctx_init_nmod8(ctx, 3); break;
+        case 2: gr_ctx_init_nmod8(ctx, 5); break;
+
+        case 3:
+            {
+                ulong p = n_randtest_prime(state, 0);
+                gr_ctx_init_nmod(ctx, p);
+                GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+            }
+            break;
+
+        case 4:
+            {
+                flint_bitcnt_t bits = 2 + n_randint(state, 70);
+                fmpz_randprime(t, state, bits, 0);
+                gr_ctx_init_fmpz_mod(ctx, t);
+                GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+            }
+            break;
+
+        case 5:
+            /* gr_ctx_init_mpn_mod_randtest is cheap and
+               generates primes with high probability */
+            do {
+                gr_ctx_init_mpn_mod_randtest(ctx, state);
+            } while (gr_ctx_is_field(ctx) != T_TRUE);
+            break;
+
+        case 6:
             {
                 /* Split state-mutating calls so consumption order is architecture-independent. */
                 ulong p = n_randtest_prime(state, 0);
@@ -140,7 +169,7 @@ gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
             }
             break;
 
-        case 1:
+        case 7:
             {
                 ulong p = n_randprime(state, 4, 0);
                 slong d = 1 + n_randint(state, 3);
@@ -148,9 +177,9 @@ gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
             }
             break;
 
-        case 2:
+        default:
             {
-                flint_bitcnt_t bits = 2 + n_randint(state, 100);
+                flint_bitcnt_t bits = 2 + n_randint(state, 70);
                 slong d;
                 fmpz_randprime(t, state, bits, 0);
                 d = 1 + n_randint(state, 4);
@@ -288,7 +317,7 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_random_ring_integers_mod(ctx, state);
             break;
         case 6:
-            gr_ctx_init_random_ring_finite_field(ctx, state);
+            gr_ctx_init_random_finite_field(ctx, state);
             break;
         case 7:
             gr_ctx_init_random_ring_number_field(ctx, state);
