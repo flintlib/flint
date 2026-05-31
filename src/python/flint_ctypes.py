@@ -9437,6 +9437,13 @@ def test_gr_series():
 
     assert raises(lambda: x / 0, FlintDomainError)
 
+    # regression test
+    assert CCser(1).cos_pi() == -1
+    assert str(CCser(1).cos()) == "[0.540302305868140 +/- 4.59e-16]"
+    assert CCser(1).sin_pi() == 0
+    assert str(CCser(1).sin()) == "[0.841470984807897 +/- 6.08e-16]"
+
+
 def test_integers_mod():
     R = IntegersMod_mpn_mod(10**20 + 1)
     c = ZZ(2) ** 4321

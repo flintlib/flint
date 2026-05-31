@@ -30,7 +30,7 @@ _gr_poly_sin_cos_series_basecase(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen,
         {
             if (s == NULL)
             {
-                if (times_pi == 0)
+                if (times_pi)
                     status |= gr_cos_pi(c, h, ctx);
                 else
                     status |= gr_cos(c, h, ctx);
@@ -38,7 +38,7 @@ _gr_poly_sin_cos_series_basecase(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen,
             }
             else
             {
-                if (times_pi == 0)
+                if (times_pi)
                     status |= gr_sin_pi(s, h, ctx);
                 else
                     status |= gr_sin(s, h, ctx);
