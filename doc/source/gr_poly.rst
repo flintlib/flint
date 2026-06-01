@@ -99,6 +99,58 @@ Memory management
 
 .. function:: void _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
 
+
+Vectors of polynomials
+-------------------------------------------------------------------------------
+ 
+.. type:: gr_poly_vec_struct
+          gr_poly_vec_t
+ 
+    A resizable vector of :type:`gr_poly_t` elements. Unlike
+    :type:`gr_vec_t`, this type stores actual :type:`gr_poly_struct`
+    objects, so no polynomial-ring context object is needed: the *ctx* argument
+    refers directly to the coefficient ring of the polynomials. It is safe to
+    cast a :type:`gr_poly_vec_t` to a :type:`gr_vec_t` (with :type:`gr_poly_t`
+    elements of the correct type) and vice versa.
+
+.. function:: void gr_poly_vec_init(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
+ 
+    Initializes *vec* to a vector of length *len* with all entries
+    set to the zero polynomial over *ctx*. The length must be nonnegative.
+ 
+.. function:: void gr_poly_vec_clear(gr_poly_vec_t vec, gr_ctx_t ctx)
+ 
+    Clears the vector *vec*, freeing all allocated memory.
+ 
+.. function:: gr_poly_struct * gr_poly_vec_entry_ptr(gr_poly_vec_t vec, slong i, gr_ctx_t ctx)
+              const gr_poly_struct * gr_poly_vec_entry_srcptr(const gr_poly_vec_t vec, slong i, gr_ctx_t ctx)
+ 
+    Returns a pointer to the *i*-th polynomial in the vector, indexed from zero.
+    The index must be in bounds.
+ 
+.. function:: slong gr_poly_vec_length(const gr_poly_vec_t vec, gr_ctx_t ctx)
+ 
+    Returns the length of the vector.
+ 
+.. function:: void gr_poly_vec_fit_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
+ 
+    Allocates space for at least *len* elements. This does not change
+    the length of the vector.
+ 
+.. function:: void gr_poly_vec_set_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
+ 
+    Resizes the vector to length *len*, which must be nonnegative.
+    The vector will be extended with zero polynomials if necessary.
+ 
+.. function:: int gr_poly_vec_set(gr_poly_vec_t res, const gr_poly_vec_t src, gr_ctx_t ctx)
+ 
+    Sets *res* to a copy of *src*.
+ 
+.. function:: int gr_poly_vec_append(gr_poly_vec_t vec, const gr_poly_t f, gr_ctx_t ctx)
+ 
+    Appends the polynomial *f* to the end of the vector.
+
+
 Basic manipulation
 -------------------------------------------------------------------------------
 
@@ -1025,7 +1077,7 @@ of the two polynomials is zero.
 Squarefree factorization
 -------------------------------------------------------------------------------
 
-.. function:: int gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t poly, gr_ctx_t ctx)
+.. function:: int gr_poly_factor_squarefree(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t poly, gr_ctx_t ctx)
 
     Computes a squarefree factorization
 
@@ -1037,8 +1089,7 @@ Squarefree factorization
     factors `g_i` with respective multiplicities `e_i` in *exp*.
     The order of the factors is arbitrary.
     The user must initialize *fac* to a vector of polynomials of the same
-    type as *poly* (and *not* to the scalar type *ctx*).
-    The exponent vector *exp* must be initialized to the *fmpz* type.
+    type as *poly*.
 
     The constant *c* is set to an element of the scalar ring.
     If *ctx* is known to be a field, all factors will be monic and the
@@ -1089,15 +1140,14 @@ Shift equivalence
     The *resultant* version computes the integer roots of a bivariate resultant
     and is mainly intended for testing.
 
-.. function:: int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_vec_t ffac, const gr_vec_t gfac, gr_ctx_t ctx)
+.. function:: int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_poly_vec_t ffac, const gr_poly_vec_t gfac, gr_ctx_t ctx)
 
     Same as :func:`gr_poly_dispersion_factor` for nonzero *f* and *g* but takes
     as input their nonconstant irreducible factors (without multiplicities)
     instead of the polynomials themselves.
 
-.. function:: int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
-              int gr_poly_shiftless_decomposition(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
-
+.. function:: int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition(gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
 
     Computes a decomposition of *f* of the form
 
@@ -1124,8 +1174,8 @@ Shift equivalence
     No algorithm avoiding a full irreducible factorization is currently
     implemented.
 
-.. function:: int _gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
-              int gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
+.. function:: int _gr_poly_shiftless_decomposition_from_factors(gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_vec_t fac, const fmpz_vec_t mult, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition_from_factors(gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_vec_t fac, const fmpz_vec_t mult, gr_ctx_t ctx)
 
     Same as :func:`gr_poly_shiftless_decomposition_factor` but takes as input
     an irreducible factorization (*fac*, *mult*) of *f* (without the
@@ -1135,8 +1185,8 @@ Shift equivalence
 Roots
 -------------------------------------------------------------------------------
 
-.. function:: int gr_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
-              int gr_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx)
+.. function:: int gr_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+              int gr_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx)
 
     Finds all roots of the given polynomial in the ring defined by *ctx*,
     storing the roots without duplication in *roots* (a vector with

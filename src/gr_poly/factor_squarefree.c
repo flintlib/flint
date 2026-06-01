@@ -16,6 +16,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -61,15 +62,18 @@ _gr_poly_pth_root(gr_poly_t h, const gr_poly_t f, ulong p, gr_ctx_t ctx)
     }
 
 static int
-gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
-    const gr_poly_t f, gr_ctx_t poly_ctx, gr_ctx_t fmpz_ctx, gr_ctx_t ctx)
+gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp,
+    const gr_poly_t f, gr_ctx_t ctx)
 {
     gr_poly_t d, t1, v, w, s;
-    fmpz_t e, p;
-    slong i;
+    gr_poly_vec_t sub_fac;
+    fmpz_vec_t sub_exp;
+    gr_ptr sub_c;
+    ulong p_ui;
+    fmpz_t p;
+    slong i, j;
     int status = GR_SUCCESS;
 
-    fmpz_init(e);
     fmpz_init(p);
     gr_poly_init(d, ctx);
     gr_poly_init(t1, ctx);
@@ -84,34 +88,26 @@ gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
     /* Case 1: f' = 0 means f = h(x^p); extract h and recurse. */
     if (t1->length == 0)
     {
-        gr_vec_t sub_fac, sub_exp;
-        gr_ptr sub_c;
-        ulong p_ui;
-        slong j;
-
         status |= gr_ctx_fq_prime(p, ctx);
         if (status != GR_SUCCESS)
             goto cleanup;
         p_ui = fmpz_get_ui(p);
 
-        gr_vec_init(sub_fac, 0, poly_ctx);
-        gr_vec_init(sub_exp, 0, fmpz_ctx);
+        gr_poly_vec_init(sub_fac, 0, ctx);
+        fmpz_vec_init(sub_exp, 0);
         sub_c = gr_heap_init(ctx);
 
         status |= _gr_poly_pth_root(t1, f, p_ui, ctx);
-        status |= gr_poly_factor_squarefree_finite_field(sub_c, sub_fac, sub_exp, t1, poly_ctx, fmpz_ctx, ctx);
+        status |= gr_poly_factor_squarefree_finite_field(sub_c, sub_fac, sub_exp, t1, ctx);
 
         for (j = 0; j < sub_fac->length; j++)
         {
-            status |= gr_vec_append(fac,
-                gr_vec_entry_ptr(sub_fac, j, poly_ctx), poly_ctx);
-            fmpz_mul_ui(e,
-                (fmpz *) gr_vec_entry_ptr(sub_exp, j, fmpz_ctx), p_ui);
-            status |= gr_vec_append(exp, e, fmpz_ctx);
+            status |= gr_poly_vec_append(fac, sub_fac->entries + j, ctx);
+            fmpz_vec_append_ui(exp, p_ui * (ulong) (sub_exp->entries[j]));
         }
 
-        gr_vec_clear(sub_fac, poly_ctx);
-        gr_vec_clear(sub_exp, fmpz_ctx);
+        gr_poly_vec_clear(sub_fac, ctx);
+        fmpz_vec_clear(sub_exp);
         gr_heap_clear(sub_c, ctx);
 
         goto cleanup;
@@ -124,9 +120,8 @@ gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
     if (d->length == 1)
     {
         /* f is already squarefree */
-        status |= gr_vec_append(fac, f, poly_ctx);
-        fmpz_one(e);
-        status |= gr_vec_append(exp, e, fmpz_ctx);
+        status |= gr_poly_vec_append(fac, f, ctx);
+        fmpz_vec_append_ui(exp, 1);
     }
     else
     {
@@ -144,9 +139,8 @@ gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
             if (w->length > 1)
             {
                 status |= gr_poly_make_monic(w, w, ctx);
-                status |= gr_vec_append(fac, w, poly_ctx);
-                fmpz_set_ui(e, i);
-                status |= gr_vec_append(exp, e, fmpz_ctx);
+                status |= gr_poly_vec_append(fac, w, ctx);
+                fmpz_vec_append_ui(exp, i);
             }
 
             status |= gr_poly_divexact(d, d, s, ctx);
@@ -159,42 +153,33 @@ gr_poly_factor_squarefree_finite_field(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
         /* d holds the inseparable part; recurse on d^(1/p). */
         if (d->length > 1)
         {
-            gr_vec_t sub_fac, sub_exp;
-            gr_ptr sub_c;
-            ulong p_ui;
-            slong j;
-
             status |= gr_ctx_fq_prime(p, ctx);
             if (status != GR_SUCCESS)
                 goto cleanup;
             p_ui = fmpz_get_ui(p);
 
-            gr_vec_init(sub_fac, 0, poly_ctx);
-            gr_vec_init(sub_exp, 0, fmpz_ctx);
+            gr_poly_vec_init(sub_fac, 0, ctx);
+            fmpz_vec_init(sub_exp, 0);
             sub_c = gr_heap_init(ctx);
 
             status |= gr_poly_make_monic(d, d, ctx);
             status |= _gr_poly_pth_root(t1, d, p_ui, ctx);
-            status |= gr_poly_factor_squarefree_finite_field(sub_c, sub_fac, sub_exp, t1, poly_ctx, fmpz_ctx, ctx);
+            status |= gr_poly_factor_squarefree_finite_field(sub_c, sub_fac, sub_exp, t1, ctx);
 
             for (j = 0; j < sub_fac->length; j++)
             {
-                status |= gr_vec_append(fac,
-                    gr_vec_entry_ptr(sub_fac, j, poly_ctx), poly_ctx);
-                fmpz_mul_ui(e,
-                    (fmpz *) gr_vec_entry_ptr(sub_exp, j, fmpz_ctx), p_ui);
-                status |= gr_vec_append(exp, e, fmpz_ctx);
+                status |= gr_poly_vec_append(fac, sub_fac->entries + j, ctx);
+                fmpz_vec_append_ui(exp, p_ui * (ulong) (sub_exp->entries[j]));
             }
 
-            gr_vec_clear(sub_fac, poly_ctx);
-            gr_vec_clear(sub_exp, fmpz_ctx);
+            gr_poly_vec_clear(sub_fac, ctx);
+            fmpz_vec_clear(sub_exp);
             gr_heap_clear(sub_c, ctx);
         }
     }
 
     for (i = 0; i < fac->length; i++)
-        status |= gr_poly_make_monic(gr_vec_entry_ptr(fac, i, poly_ctx),
-            gr_vec_entry_srcptr(fac, i, poly_ctx), ctx);
+        status |= gr_poly_make_monic(fac->entries + i, fac->entries + i, ctx);
 
 cleanup:
     gr_poly_clear(d, ctx);
@@ -202,23 +187,20 @@ cleanup:
     gr_poly_clear(v, ctx);
     gr_poly_clear(w, ctx);
     gr_poly_clear(s, ctx);
-    fmpz_clear(e);
     fmpz_clear(p);
 
     return status;
 }
 
 static int
-gr_poly_factor_squarefree_ufd_char_0(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
-    const gr_poly_t F, gr_ctx_t poly_ctx, gr_ctx_t fmpz_ctx, truth_t is_field, gr_ctx_t ctx)
+gr_poly_factor_squarefree_ufd_char_0(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp,
+    const gr_poly_t F, truth_t is_field, gr_ctx_t ctx)
 {
     gr_poly_t f, d, t1, v, w, s;
     gr_ptr lc, lc_pow;
-    fmpz_t e;
     slong i, k;
     int status = GR_SUCCESS;
 
-    fmpz_init(e);
     gr_poly_init(f, ctx);
     gr_poly_init(d, ctx);
     gr_poly_init(t1, ctx);
@@ -248,9 +230,8 @@ gr_poly_factor_squarefree_ufd_char_0(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
 
     if (d->length == 1)
     {
-        status |= gr_vec_append(fac, f, poly_ctx);
-        fmpz_one(e);
-        status |= gr_vec_append(exp, e, fmpz_ctx);
+        status |= gr_poly_vec_append(fac, f, ctx);
+        fmpz_vec_append_ui(exp, 1);
     }
     else
     {
@@ -269,9 +250,8 @@ gr_poly_factor_squarefree_ufd_char_0(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
 
                 if (v->length > 1)
                 {
-                    status |= gr_vec_append(fac, v, poly_ctx);
-                    fmpz_set_ui(e, i);
-                    status |= gr_vec_append(exp, e, fmpz_ctx);
+                    status |= gr_poly_vec_append(fac, v, ctx);
+                    fmpz_vec_append_ui(exp, i);
                 }
 
                 break;
@@ -285,9 +265,8 @@ gr_poly_factor_squarefree_ufd_char_0(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
 
             if (d->length > 1)
             {
-                status |= gr_vec_append(fac, d, poly_ctx);
-                fmpz_set_ui(e, i);
-                status |= gr_vec_append(exp, e, fmpz_ctx);
+                status |= gr_poly_vec_append(fac, d, ctx);
+                fmpz_vec_append_ui(exp, i);
             }
         }
     }
@@ -298,24 +277,21 @@ gr_poly_factor_squarefree_ufd_char_0(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
         if (is_field == T_TRUE)
         {
             for (i = 0; i < fac->length; i++)
-                status |= gr_poly_make_monic(gr_vec_entry_ptr(fac, i, poly_ctx),
-                    gr_vec_entry_srcptr(fac, i, poly_ctx), ctx);
+                status |= gr_poly_make_monic(fac->entries + i, fac->entries + i, ctx);
         }
         else
         {
-            fmpz *expc = exp->entries;
             slong j;
 
             status |= gr_one(lc, ctx);
 
             for (j = 0; j < fac->length; j++)
             {
-                gr_poly_struct *fac_j = (gr_poly_struct *) gr_vec_entry_ptr(fac, j, poly_ctx);
-
+                gr_poly_struct *fac_j = fac->entries + j;
                 status |= gr_poly_canonical_associate(fac_j, NULL, fac_j, ctx);
                 CHECK_PROPER(fac_j)
                 gr_srcptr lc_j = gr_poly_coeff_srcptr(fac_j, fac_j->length - 1, ctx);
-                status |= gr_pow_ui(lc_pow, lc_j, (ulong) expc[j], ctx);
+                status |= gr_pow_ui(lc_pow, lc_j, (ulong) (exp->entries[j]), ctx);
                 status |= gr_mul(lc, lc, lc_pow, ctx);
             }
 
@@ -333,64 +309,37 @@ cleanup:
     gr_poly_clear(s, ctx);
     gr_heap_clear(lc, ctx);
     gr_heap_clear(lc_pow, ctx);
-    fmpz_clear(e);
 
     return status;
 }
 
 
 int
-gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp,
+gr_poly_factor_squarefree(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp,
     const gr_poly_t F, gr_ctx_t ctx)
 {
-    gr_ctx_t poly_ctx, fmpz_ctx;
-    int status = GR_SUCCESS;
     truth_t is_field, is_fin_char;
 
-    gr_ctx_init_gr_poly(poly_ctx, ctx);
-    gr_ctx_init_fmpz(fmpz_ctx);
-
-    gr_vec_set_length(fac, 0, poly_ctx);
-    gr_vec_set_length(exp, 0, fmpz_ctx);
+    gr_poly_vec_set_length(fac, 0, ctx);
+    fmpz_vec_set_length(exp, 0);
 
     if (F->length == 0)
-    {
-        status |= gr_zero(c, ctx);
-        goto done;
-    }
+        return gr_zero(c, ctx);
 
     if (gr_is_zero(gr_poly_coeff_srcptr(F, F->length - 1, ctx), ctx) != T_FALSE)
-    {
-        status = GR_UNABLE;
-        goto done;
-    }
+        return GR_UNABLE;
 
     if (F->length == 1)
-    {
-        status |= gr_set(c, F->coeffs, ctx);
-        goto done;
-    }
+        return gr_set(c, F->coeffs, ctx);
 
     is_field = gr_ctx_is_field(ctx);
     is_fin_char = gr_ctx_is_finite_characteristic(ctx);
 
     if (is_field == T_TRUE && is_fin_char == T_TRUE)
-    {
-        status |= gr_poly_factor_squarefree_finite_field(c, fac, exp, F, poly_ctx, fmpz_ctx, ctx);
-    }
+        return gr_poly_factor_squarefree_finite_field(c, fac, exp, F, ctx);
     else if (gr_ctx_is_unique_factorization_domain(ctx) == T_TRUE && is_fin_char == T_FALSE)
-    {
-        status |= gr_poly_factor_squarefree_ufd_char_0(c, fac, exp, F, poly_ctx, fmpz_ctx, is_field, ctx);
-    }
+        return gr_poly_factor_squarefree_ufd_char_0(c, fac, exp, F, is_field, ctx);
     else
-    {
-        status = GR_UNABLE;
-    }
-
-done:
-    gr_ctx_clear(poly_ctx);
-    gr_ctx_clear(fmpz_ctx);
-
-    return status;
+        return GR_UNABLE;
 }
 

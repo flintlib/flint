@@ -696,7 +696,7 @@ polynomial_canonical_associate(gr_poly_t ux, gr_poly_t u, const gr_poly_t x, gr_
 
 
 static int
-polynomial_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
+polynomial_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, const gr_poly_t pol, int flags, const gr_ctx_t ctx)
 {
     gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
     return GR_FACTOR_OP(cctx, POLY_FACTOR)(c, fac, mult, pol, flags, cctx);

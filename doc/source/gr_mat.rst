@@ -852,8 +852,8 @@ Similarity transformations
 Eigenvalues
 -------------------------------------------------------------------------------
 
-.. function:: int gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx)
-              int gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx)
+.. function:: int gr_mat_eigenvalues(gr_vec_t lambda, fmpz_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx)
+              int gr_mat_eigenvalues_other(gr_vec_t lambda, fmpz_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx)
 
     Finds all eigenvalues of the given matrix in the ring defined by *ctx*,
     storing the eigenvalues without duplication in *lambda* (a vector with
@@ -863,7 +863,7 @@ Eigenvalues
     The interface is essentially the same as that of
     :func:`gr_poly_roots`; see its documentation for details.
 
-.. function:: int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const gr_vec_t mult, gr_ctx_t ctx)
+.. function:: int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const fmpz_vec_t mult, gr_ctx_t ctx)
               int gr_mat_diagonalization_generic(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
               int gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
 

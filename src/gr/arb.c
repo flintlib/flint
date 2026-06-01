@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
@@ -1589,7 +1590,7 @@ _gr_arb_poly_mulmid(arb_ptr res,
 }
 
 static int
-_gr_arb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_arb_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     int status;
     slong i;
@@ -1605,7 +1606,7 @@ _gr_arb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flag
 }
 
 static int
-_gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_arb_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
@@ -1617,17 +1618,14 @@ _gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
         slong i, j, deg, deg2;
         acb_ptr croots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         if (deg != 0)
         {
@@ -1646,9 +1644,8 @@ _gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
                 {
                     if (acb_is_real(croots + j))
                     {
-                        fmpz m2 = fac->exp[i];
                         GR_MUST_SUCCEED(gr_vec_append(roots, acb_realref(croots + j), ctx));
-                        GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                        fmpz_vec_append_ui(mult, fac->exp[i]);
                     }
                 }
 
@@ -1657,8 +1654,6 @@ _gr_arb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
             fmpz_poly_factor_clear(fac);
         }
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }

@@ -16,6 +16,7 @@
 
 #include "fexpr.h"
 #include "fmpq.h"
+#include "fmpz_vec.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -3683,14 +3684,15 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
     int status;
     gr_ptr x, c, t, u;
     gr_ctx_t ZZ;
-    gr_vec_t fac, exp;
+    gr_vec_t fac;
+    fmpz_vec_t exp;
     slong i;
 
     GR_TMP_INIT4(x, c, t, u, R);
     gr_ctx_init_fmpz(ZZ);
 
     gr_vec_init(fac, n_randint(state, 3), R);
-    gr_vec_init(exp, n_randint(state, 3), ZZ);
+    fmpz_vec_init(exp, n_randint(state, 3));
 
     status = GR_SUCCESS;
     status |= gr_randtest_small(x, state, R);
@@ -3715,7 +3717,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
 
             for (i = 0; i < fac->length; i++)
             {
-                status |= gr_pow_fmpz(t, gr_vec_entry_srcptr(fac, i, R), gr_vec_entry_srcptr(exp, i, ZZ), R);
+                status |= gr_pow_fmpz(t, gr_vec_entry_srcptr(fac, i, R), fmpz_vec_entry_srcptr(exp, i), R);
                 status |= gr_mul(u, u, t, R);
             }
 
@@ -3732,7 +3734,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
             flint_printf("x = "); gr_println(x, R);
             flint_printf("c = "); gr_println(c, R);
             flint_printf("fac = "); gr_vec_print(fac, R); flint_printf("\n");
-            flint_printf("exp = "); gr_vec_print(exp, ZZ); flint_printf("\n");
+            flint_printf("exp = "); gr_vec_print((gr_vec_struct *) exp, ZZ); flint_printf("\n");
             flint_printf("\n");
         }
     }
@@ -3760,7 +3762,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
     gr_ctx_clear(ZZ);
 
     gr_vec_clear(fac, R);
-    gr_vec_clear(exp, ZZ);
+    fmpz_vec_clear(exp);
 
     return status;
 }

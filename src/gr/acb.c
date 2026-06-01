@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpzi.h"
@@ -2003,12 +2004,11 @@ roots_accurate(acb_ptr roots, slong len, slong prec)
 
 /* hidden feature: also works with arb ctx */
 int
-_gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_acb_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     slong prec, initial_prec, target_prec, isolated, maxiter, maxprec, deg, i;
     acb_ptr croots;
     acb_poly_t tmp;
-    gr_ctx_t ZZ;
     int status = GR_UNABLE;
     int arb_roots;
 
@@ -2020,7 +2020,6 @@ _gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flag
     if (acb_contains_zero(((acb_srcptr) poly->coeffs) + deg))
         return GR_UNABLE;
 
-    gr_ctx_init_fmpz(ZZ);
     croots = _acb_vec_init(deg);
     acb_poly_init(tmp);
     acb_poly_fit_length(tmp, deg + 1);
@@ -2079,41 +2078,39 @@ _gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flag
         if (arb_roots)
         {
             gr_vec_set_length(roots, 0, ctx);
-            gr_vec_set_length(mult, 0, ZZ);
+            fmpz_vec_set_length(mult, 0);
 
             for (i = 0; i < deg; i++)
             {
                 if (arb_contains_zero(acb_imagref(croots + i)))
                 {
-                    fmpz one = 1;
                     arb_set_round(acb_realref(croots + i), acb_realref(croots + i), target_prec);
                     GR_MUST_SUCCEED(gr_vec_append(roots, acb_realref(croots + i), ctx));
-                    GR_MUST_SUCCEED(gr_vec_append(mult, &one, ZZ));
+                    fmpz_vec_append_ui(mult, 1);
                 }
             }
         }
         else
         {
             gr_vec_set_length(roots, deg, ctx);
-            gr_vec_set_length(mult, deg, ZZ);
+            fmpz_vec_set_length(mult, deg);
 
             for (i = 0; i < deg; i++)
             {
                 acb_set_round(((acb_ptr) roots->entries) + i, croots + i, target_prec);
-                fmpz_one(((fmpz *) mult->entries) + i);
+                fmpz_one(mult->entries + i);
             }
         }
     }
 
     acb_poly_clear(tmp);
     _acb_vec_clear(croots, deg);
-    gr_ctx_clear(ZZ);
 
     return status;
 }
 
 static int
-_gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+_gr_acb_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
@@ -2123,17 +2120,14 @@ _gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
         slong i, j, deg, deg2;
         acb_ptr croots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         if (deg != 0)
         {
@@ -2150,9 +2144,8 @@ _gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
                 for (j = 0; j < deg2; j++)
                 {
-                    fmpz m2 = fac->exp[i];
                     GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
-                    GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                    fmpz_vec_append_ui(mult, fac->exp[i]);
                 }
 
                 _acb_vec_clear(croots, deg2);
@@ -2160,8 +2153,6 @@ _gr_acb_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 
             fmpz_poly_factor_clear(fac);
         }
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }

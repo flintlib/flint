@@ -1303,7 +1303,7 @@ _gr_nmod_poly_exp_series(ulong * res,
 }
 
 static int
-_gr_nmod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_nmod_roots_gr_poly(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;

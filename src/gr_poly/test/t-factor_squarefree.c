@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 
@@ -25,8 +26,8 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
         gr_ctx_t ctx;
         gr_poly_t A, B, P, Q, G1, G2, G3;
         gr_ptr c;
-        gr_vec_t fac, exp;
-        gr_ctx_t poly_ctx, fmpz_ctx;
+        gr_poly_vec_t fac;
+        fmpz_vec_t exp;
         ulong e, emax, maxexp;
         fmpz *expc;
         slong i, j, exp_bound, factor_len_bound, factor_bound;
@@ -60,9 +61,6 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
                         ctx->which_ring == GR_CTX_FQ_NMOD ||
                         ctx->which_ring == GR_CTX_FQ_ZECH);
 
-        gr_ctx_init_gr_poly(poly_ctx, ctx);
-        gr_ctx_init_fmpz(fmpz_ctx);
-
         gr_poly_init(A, ctx);
         gr_poly_init(B, ctx);
         gr_poly_init(G1, ctx);
@@ -71,8 +69,8 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
         gr_poly_init(P, ctx);
         gr_poly_init(Q, ctx);
 
-        gr_vec_init(fac, 0, poly_ctx);
-        gr_vec_init(exp, 0, fmpz_ctx);
+        gr_poly_vec_init(fac, 0, ctx);
+        fmpz_vec_init(exp, 0);
 
         c = gr_heap_init(ctx);
 
@@ -138,16 +136,16 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
 
             for (i = 0; i < fac->length; i++)
             {
-                status1 |= gr_poly_derivative(Q, gr_vec_entry_ptr(fac, i, poly_ctx), ctx);
-                status1 |= gr_poly_gcd(Q, Q, gr_vec_entry_ptr(fac, i, poly_ctx), ctx);
+                status1 |= gr_poly_derivative(Q, fac->entries + i, ctx);
+                status1 |= gr_poly_gcd(Q, Q, fac->entries + i, ctx);
 
                 if (status1 == GR_SUCCESS && gr_poly_is_scalar(Q, ctx) == T_FALSE)
                 {
                     flint_printf("FAIL (factor not squarefree)\n\n");
                     gr_ctx_println(ctx);
                     flint_printf("emax = %wd\n\n", emax);
-                    flint_printf("fac = %{gr*}\n\n", fac->entries, fac->length, poly_ctx);
-                    flint_printf("exp = %{gr*}\n\n", exp->entries, exp->length, fmpz_ctx);
+                    flint_printf("fac = %{gr_poly*}\n\n", fac->entries, fac->length, ctx);
+                    flint_printf("exp = %{fmpz*}\n\n", exp->entries, exp->length);
                     flint_printf("c = %{gr}\n\n", c, ctx);
                     flint_printf("P = "); gr_poly_print(P, ctx); flint_printf("\n");
                     flint_printf("Q = "); gr_poly_print(Q, ctx); flint_printf("\n");
@@ -163,8 +161,7 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
             status |= gr_poly_one(Q, ctx);
             for (i = 0; i < fac->length; i++)
                 for (j = 0; j < expc[i]; j++)
-                    status |= gr_poly_mul(Q, Q,
-                        gr_vec_entry_ptr(fac, i, poly_ctx), ctx);
+                    status |= gr_poly_mul(Q, Q, fac->entries + i, ctx);
             status |= gr_poly_mul_scalar(Q, Q, c, ctx);
 
             maxexp = 0;
@@ -178,8 +175,8 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
                 flint_printf("FAIL (product)\n\n");
                 gr_ctx_println(ctx);
                 flint_printf("emax = %wd\n\n", emax);
-                flint_printf("fac = %{gr*}\n\n", fac->entries, fac->length, poly_ctx);
-                flint_printf("exp = %{gr*}\n\n", exp->entries, exp->length, fmpz_ctx);
+                flint_printf("fac = %{gr_poly*}\n\n", fac->entries, fac->length, ctx);
+                flint_printf("exp = %{fmpz*}\n\n", exp->entries, exp->length);
                 flint_printf("c = %{gr}\n\n", c, ctx);
                 flint_printf("P = "); gr_poly_print(P, ctx); flint_printf("\n");
                 flint_printf("Q = "); gr_poly_print(Q, ctx); flint_printf("\n");
@@ -196,11 +193,9 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
         gr_poly_clear(Q, ctx);
 
 cleanup:
-        gr_vec_clear(fac, poly_ctx);
-        gr_vec_clear(exp, fmpz_ctx);
+        gr_poly_vec_clear(fac, ctx);
+        fmpz_vec_clear(exp);
         gr_heap_clear(c, ctx);
-        gr_ctx_clear(poly_ctx);
-        gr_ctx_clear(fmpz_ctx);
         gr_ctx_clear(ctx);
     }
 
