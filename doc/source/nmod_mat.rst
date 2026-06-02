@@ -590,7 +590,6 @@ Nonsingular square solving
     elements of `x` to undefined values.
 
 
-
 LU decomposition
 --------------------------------------------------------------------------------
 
@@ -622,7 +621,11 @@ LU decomposition
     The *recursive* version uses block recursive decomposition.
     The default function chooses an algorithm automatically.
 
+.. function:: slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A)
 
+    Like :func:`nmod_mat_lu` with ``rank_check`` 0, but additionally
+    writes to ``pivots_nonpivots`` the indices of the pivot columns in order,
+    followed by the indices of the nonpivot columns in order.
 
 Reduced row echelon form
 --------------------------------------------------------------------------------

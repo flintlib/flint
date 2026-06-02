@@ -319,6 +319,8 @@ slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 
+slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A);
+
 /* Nonsingular solving */
 
 int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);

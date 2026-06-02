@@ -40,7 +40,7 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         nmod_mat_init(Amod, m, n, p);
         fmpz_mat_get_nmod_mat(Amod, A);
 
-        rank = _nmod_mat_rref(Amod, pivs, P);
+        rank = nmod_mat_lu_with_pivots(P, pivs, Amod);
 
         nmod_mat_clear(Amod);
 
