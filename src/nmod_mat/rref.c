@@ -16,7 +16,7 @@
 slong
 _nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots, slong * P)
 {
-    slong i, j, k, n, rank;
+    slong i, j, n, rank;
     slong * pivots;
     slong * nonpivots;
 
@@ -24,81 +24,62 @@ _nmod_mat_rref(nmod_mat_t A, slong * pivots_nonpivots, slong * P)
 
     n = A->c;
 
-    rank = nmod_mat_lu(P, A, 0);
+    rank = nmod_mat_lu_with_pivots(P, pivots_nonpivots, A);
 
     if (rank == 0)
-    {
-        for (i = 0; i < n; i++)
-            pivots_nonpivots[i] = i;
         return rank;
-    }
-
-    /* Clear L */
-    for (i = 0; i < A->r; i++)
-        for (j = 0; j < FLINT_MIN(i, rank); j++)
-            nmod_mat_entry(A, i, j) = UWORD(0);
-
-    /* We now reorder U to proper upper triangular form U | V
-       with U full-rank triangular, set V = U^(-1) V, and then
-       put the column back in the original order.
-
-       An improvement for some matrices would be to compress V by
-       discarding columns containing nothing but zeros. */
-
-    nmod_mat_init(U, rank, rank, A->mod.n);
-    nmod_mat_init(V, rank, n - rank, A->mod.n);
 
     pivots = pivots_nonpivots;
     nonpivots = pivots_nonpivots + rank;
 
-    for (i = j = k = 0; i < rank; i++)
-    {
-        while (nmod_mat_entry(A, i, j) == UWORD(0))
-        {
-            nonpivots[k] = j;
-            k++;
-            j++;
-        }
-        pivots[i] = j;
-        j++;
-    }
-    while (k < n - rank)
-    {
-        nonpivots[k] = j;
-        k++;
-        j++;
-    }
+    /* Clear L. */
+    for (i = 0; i < A->r; i++)
+        for (j = 0; j < FLINT_MIN(i, rank); j++)
+            nmod_mat_entry(A, i, j) = UWORD(0);
 
-    for (i = 0; i < rank; i++)
+    if (rank != n)
     {
-        for (j = 0; j <= i; j++)
-            nmod_mat_entry(U, j, i) = nmod_mat_entry(A, j, pivots[i]);
-    }
+        /* We now reorder U to proper upper triangular form U | V
+           with U full-rank triangular, set V = U^(-1) V, and then
+           put the column back in the original order.
+ 
+           An improvement for some matrices would be to compress V by
+           discarding columns containing nothing but zeros. */
 
-    for (i = 0; i < n - rank; i++)
-    {
+        nmod_mat_init(U, rank, rank, A->mod.n);
+        nmod_mat_init(V, rank, n - rank, A->mod.n);
+
         for (j = 0; j < rank; j++)
-            nmod_mat_entry(V, j, i) = nmod_mat_entry(A, j, nonpivots[i]);
-    }
+        {
+            for (i = j; i < rank; i++)
+                nmod_mat_entry(U, j, i) = nmod_mat_entry(A, j, pivots[i]);
+        }
 
-    nmod_mat_solve_triu(V, U, V, 0);
+        for (j = 0; j < rank; j++)
+        {
+            for (i = 0; i < n - rank; i++)
+                nmod_mat_entry(V, j, i) = nmod_mat_entry(A, j, nonpivots[i]);
+        }
+
+        nmod_mat_solve_triu(V, U, V, 0);
+
+        /* Write back the actual content */
+        for (j = 0; j < rank; j++)
+        {
+            for (i = 0; i < n - rank; i++)
+                nmod_mat_entry(A, j, nonpivots[i]) = nmod_mat_entry(V, j, i);
+        }
+
+        nmod_mat_clear(U);
+        nmod_mat_clear(V);
+    }
 
     /* Clear pivot columns */
-    for (i = 0; i < rank; i++)
+    for (j = 0; j < rank; j++)
     {
-        for (j = 0; j <= i; j++)
+        for (i = j; i < rank; i++)
             nmod_mat_entry(A, j, pivots[i]) = (i == j);
     }
-
-    /* Write back the actual content */
-    for (i = 0; i < n - rank; i++)
-    {
-        for (j = 0; j < rank; j++)
-            nmod_mat_entry(A, j, nonpivots[i]) = nmod_mat_entry(V, j, i);
-    }
-
-    nmod_mat_clear(U);
-    nmod_mat_clear(V);
 
     return rank;
 }
@@ -148,3 +129,4 @@ nmod_mat_rref(nmod_mat_t A)
 
     return rank;
 }
+
