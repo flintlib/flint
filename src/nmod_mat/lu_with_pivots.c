@@ -24,7 +24,7 @@ nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A)
 
     rank = nmod_mat_lu(P, A, 0);
 
-    if (rank == 0)
+    if (rank == 0 || rank == n)
     {
         for (i = 0; i < n; i++)
             pivots_nonpivots[i] = i;
