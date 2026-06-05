@@ -1158,18 +1158,44 @@ Row reduction
     and returns the rank of ``A``. Aliasing of ``A`` and ``B``
     is allowed.
 
-    The algorithm works by computing the reduced row echelon form of ``A``
-    modulo a prime `p` using ``nmod_mat_rref``. The pivot columns and rows
+    The algorithm works by computing an echelon form of ``A``
+    modulo a prime `p`. The pivot columns and rows
     of this matrix will then define a non-singular submatrix of ``A``,
     nonsingular solving and matrix multiplication can then be used to determine
     the reduced row echelon form of the whole of ``A``. This procedure is
-    described in [Stein2007]_.
+    described in [Stein2007]_. The certification
+    step itself is implemented by :func:`fmpz_mat_compressed_rref_given_mod_p_structure`.
 
 .. function:: int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank)
 
     Checks that the matrix `A/den` is in reduced row echelon form of rank
     ``rank``, returns 1 if so and 0 otherwise.
 
+.. function:: int fmpz_mat_rref_upper_certify_lu_mod_p(fmpz_mat_t E, fmpz_t den, const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs)
+
+    Given the echelon structure for the `m \times n` matrix *A* computed
+    modulo some prime `p`, attempt to compute a certified RREF of *A* over
+    `\mathbb{Z}`.
+
+    The user supplies the following data from an LU factorization as computed by
+    :func:`nmod_mat_lu_with_pivots` (or an equivalent procedure):
+    the mod-`p` *rank*, row permutations *P*, and an array *pivs*
+    containing the the *rank* pivot column positions followed by the `n - rank`
+    non-pivot column positions.
+    The output matrix *E* is *rank* by *n*, must be zero-initialized by the caller,
+    and must not be aliased with *A*.
+
+    Returns 1 if the rank is certified: *E* will then hold the top *rank* rows
+    of the RREF of *A* with common denominator *den*.
+
+    Returns 0 if the prime was unlucky (the mod-`p` rank is below the true rank,
+    or the remaining rows are not in the row span); the contents of *E* and *den*
+    are then unspecified and the caller should try another prime.
+
+.. function:: int fmpz_mat_rank_certify_lu_mod_p(const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs)
+
+    As :func:`fmpz_mat_rref_upper_certify_lu_mod_p`, certifying the
+    rank without storing the echelon form.
 
 Strong echelon form and Howell form
 --------------------------------------------------------------------------------
@@ -1211,30 +1237,6 @@ Nullspace
     the pivot entries in `B` will generally differ from unity.
     `B` must be allocated with sufficient space to represent the result
     (at most `n \times n` where `n` is the number of columns of `A`).
-
-
-
-Echelon form
---------------------------------------------------------------------------------
-
-
-.. function:: slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
-
-    Computes an integer matrix ``B`` and an integer ``den`` such that
-    ``B / den`` is the unique row reduced echelon form (RREF) of ``A``
-    and returns the rank, i.e. the number of nonzero rows in ``B``.
-
-    Aliasing of ``B`` and ``A`` is allowed, with an in-place
-    computation being more efficient. The size of ``B`` must be
-    the same as that of ``A``.
-
-    The permutation order will be written to ``perm`` unless this
-    argument is ``NULL``. That is, row ``i`` of the output matrix will
-    correspond to row ``perm[i]`` of the input matrix.
-
-    The denominator will always be a divisor of the determinant of (some
-    submatrix of) `A`, but is not guaranteed to be minimal or canonical in
-    any other sense.
 
 
 Hermite normal form

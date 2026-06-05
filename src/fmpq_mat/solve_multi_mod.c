@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2019 William Hart
-    Copyright (C) 2019 Fredrik Johansson
+    Copyright (C) 2019, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,6 +11,8 @@
 */
 
 #include "ulong_extras.h"
+#include "perm.h"
+#include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -23,11 +25,20 @@ static ulong fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
         const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t det_bound)
 {
     ulong p;
-    fmpz_t tested;
+    slong i, n, rank, * pivs, * P;
+    fmpz_t tested, den;
+    nmod_mat_t PB;
+
+    n = A->r;   /* A is square (checked by the caller) */
+
+    pivs = (slong *) flint_malloc(n * sizeof(slong));
+    P = _perm_init(n);
+
+    fmpz_init(tested);
+    fmpz_init(den);
+    fmpz_one(tested);
 
     p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
-    fmpz_init(tested);
-    fmpz_one(tested);
 
     while (1)
     {
@@ -37,17 +48,48 @@ static ulong fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
         nmod_mat_set_mod(Bmod, p);
         fmpz_mat_get_nmod_mat(Amod, A);
         fmpz_mat_get_nmod_mat(Bmod, B);
-        if (nmod_mat_solve(Xmod, Amod, Bmod))
-            break;
+
+        rank = nmod_mat_lu_with_pivots(P, pivs, Amod);
+
+        if (rank == n)
+        {
+            /* full rank mod p: solve A X = B with the LU we just computed */
+            /* todo: could avoid copies if permutation is the identity */
+            nmod_mat_init(PB, B->r, B->c, p);
+
+            for (i = 0; i < n; i++)
+                _nmod_vec_set(nmod_mat_entry_ptr(PB, i, 0),
+                              nmod_mat_entry_ptr(Bmod, P[i], 0), Bmod->c);
+
+            nmod_mat_solve_tril(Xmod, Amod, PB, 1);
+            nmod_mat_solve_triu(Xmod, Amod, Xmod, 0);
+
+            nmod_mat_clear(PB);
+            break;   /* success: return p, with the solution mod p in Xmod */
+        }
+
+        /* enough primes to certify rank deficiency */
         fmpz_mul_ui(tested, tested, p);
         if (fmpz_cmp(tested, det_bound) > 0)
         {
             p = 0;
             break;
         }
-    }
+
+        /* rank-deficient mod p: try to certify that A is rank-deficient over
+           Z (hence singular), as in fmpz_mat_rref_mul */
+        if (fmpz_mat_rank_certify_lu_mod_p(A, rank, P, pivs))
+        {
+            p = 0;
+            break;
+        }
+     }
 
     fmpz_clear(tested);
+    fmpz_clear(den);
+    flint_free(pivs);
+    _perm_clear(P);
+
     return p;
 }
 
@@ -199,6 +241,7 @@ fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
     nmod_mat_init(Xmod, B->r, B->c, 1);
 
     p = fmpz_mat_find_good_prime_and_solve(Xmod, Amod, Bmod, A, B, D);
+
     if (p != 0)
         _fmpq_mat_solve_multi_mod(X, A, B, Xmod, Amod, Bmod, p, N, D);
 

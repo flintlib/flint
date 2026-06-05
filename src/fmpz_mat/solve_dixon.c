@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "perm.h"
 #include "nmod_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -18,29 +19,74 @@ ulong
 fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
                                 const fmpz_mat_t A, const fmpz_t det_bound)
 {
+    nmod_mat_t LU, PB;
+    fmpz_t den, tested;
     ulong p;
-    fmpz_t tested;
+    slong i, n, rank, * pivs, * P;
 
-    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
+    n = fmpz_mat_nrows(A);   /* A is square: nrows == ncols */
+
+    pivs = (slong *) flint_malloc(n * sizeof(slong));
+    P = _perm_init(n);
+
+    fmpz_init(den);
     fmpz_init(tested);
     fmpz_one(tested);
+
+    /* workspace for A mod p / its LU; the modulus is reset each iteration */
+    nmod_mat_init(LU, n, n, UWORD(2));
+
+    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
     while (1)
     {
         p = n_nextprime(p, 0);
-        nmod_mat_set_mod(Ainv, p);
-        fmpz_mat_get_nmod_mat(Ainv, A);
-        if (nmod_mat_inv(Ainv, Ainv))
-            break;
+
+        nmod_mat_set_mod(LU, p);
+        fmpz_mat_get_nmod_mat(LU, A);
+
+        rank = nmod_mat_lu_with_pivots(P, pivs, LU);
+
+        if (rank == n)
+        {
+            /* full rank mod p: A is invertible mod p. Reuse the LU we just
+               computed to solve A * Ainv = I. */
+            nmod_mat_set_mod(Ainv, p);
+
+            nmod_mat_init(PB, n, n, p);
+            for (i = 0; i < n; i++)
+                nmod_mat_entry(PB, i, P[i]) = UWORD(1);
+
+            nmod_mat_solve_tril(Ainv, LU, PB, 1);
+            nmod_mat_solve_triu(Ainv, LU, Ainv, 0);
+
+            nmod_mat_clear(PB);
+            break;   /* success: return p */
+        }
+
+        /* enough primes to certify rank deficiency */
         fmpz_mul_ui(tested, tested, p);
         if (fmpz_cmp(tested, det_bound) > 0)
         {
             p = 0;
             break;
         }
+
+        /* rank-deficient mod p: try to certify that A is rank-deficient over
+           Z (hence singular), as in fmpz_mat_rref_mul */
+        if (fmpz_mat_rank_certify_lu_mod_p(A, rank, P, pivs))
+        {
+            p = 0;
+            break;
+        }
     }
 
+    nmod_mat_clear(LU);
+    fmpz_clear(den);
     fmpz_clear(tested);
+    flint_free(pivs);
+    _perm_clear(P);
+
     return p;
 }
 
