@@ -541,7 +541,17 @@ int qsieve_process_relation(qs_t qs_inf)
 #endif
 
     rlist = flint_malloc(num_relations * sizeof(relation_t));
-    memset(hash_table, 0, (1 << 20) * sizeof(ulong));
+
+    /* Clear only the hash buckets touched during the read loop, rather than
+       zeroing the full 2^20-entry (8 MB) table.  table[1..vertices] holds
+       exactly the primes inserted, each in bucket HASH(prime). */
+    {
+        // instead of memset(hash_table, 0, (1 << 20) * sizeof(ulong));
+        slong _v;
+        for (_v = 1; _v <= (slong) qs_inf->vertices; _v++)
+            hash_table[HASH(qs_inf->table[_v].prime)] = 0;
+    }
+
     qs_inf->vertices = 0;
 
     rlist_length = 0;

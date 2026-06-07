@@ -48,10 +48,13 @@ static int compare_facs(const void * a, const void * b)
 
 /*
    Finds at least one nontrivial factor of n using the self initialising
-   multiple polynomial quadratic sieve with single large prime variation.
+   multiple polynomial quadratic sieve with single large prime variation,
+   using the supplied tuning parameters instead of the qsieve_tune defaults.
    Assumes n is not prime and not a perfect power.
 */
-void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
+void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
+        ulong ks_primes, slong fb_primes, slong small_primes,
+        slong sieve_size, ulong sieve_bits)
 {
     qs_t qs_inf;
     ulong small_factor, delta;
@@ -79,7 +82,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
        factors->sign *= -1;
 
-       qsieve_factor(factors, n2);
+       qsieve_factor_with_tune(factors, n2, ks_primes, fb_primes,
+                               small_primes, sieve_size, sieve_bits);
 
        fmpz_clear(n2);
 
@@ -95,7 +99,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     flint_printf("\nstart\n");
 #endif
 
-    qsieve_init(qs_inf, n);
+    qsieve_init_with_tune(qs_inf, n, ks_primes, fb_primes, small_primes,
+                          sieve_size, sieve_bits);
 
 #if QS_DEBUG
     flint_printf("factoring ");
@@ -498,3 +503,31 @@ cleanup:
     fmpz_clear(temp);
     fmpz_clear(temp2);
 }
+
+/*
+   Finds at least one nontrivial factor of n using the self initialising
+   multiple polynomial quadratic sieve with single large prime variation.
+   Assumes n is not prime and not a perfect power.
+*/
+void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
+{
+    slong i;
+    flint_bitcnt_t bits = fmpz_bits(n);
+
+    /* determine which index in the tuning table n corresponds to */
+    for (i = 1; i < QS_TUNE_SIZE; i++)
+    {
+        if (qsieve_tune[i][0] > bits)
+            break;
+    }
+    i--;
+
+    /* factor with the default tuning parameters for this bit-size */
+    qsieve_factor_with_tune(factors, n,
+        qsieve_tune[i][1],  /* ks_primes    */
+        qsieve_tune[i][2],  /* fb_primes    */
+        qsieve_tune[i][3],  /* small_primes */
+        qsieve_tune[i][4],  /* sieve_size   */
+        qsieve_tune[i][5]); /* sieve_bits   */
+}
+
