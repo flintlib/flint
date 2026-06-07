@@ -77,7 +77,7 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 #if FLINT_BITS == 64
                 slong bits = fmpz_bits(n2);
 
-                if (bits <= 80)
+                if (bits <= 76)
                 {
                     slong squfof_iters;
                     ulong nhi, nlo, f1 = 0;

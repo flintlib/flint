@@ -149,5 +149,8 @@
     prime and not a perfect power. There is no guarantee that the factors found will
     be prime, or distinct.
 
+.. function:: void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n, ulong ks_primes, slong fb_primes, slong small_primes, slong sieve_size, ulong sieve_bits)
 
- 
+    As :func:`qsieve_factor`, but with the provided tuning parameters
+    instead of default values.
+

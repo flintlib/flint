@@ -101,6 +101,8 @@ typedef struct
 
    ulong ks_primes;        /* number of Knuth-Schroeppel primes */
 
+   slong fb_primes;        /* number of factor base primes to use (incl. k and 2) */
+
    ulong k;            /* Multiplier */
    fmpz_t kn;              /* kn as a multiprecision integer */
 
@@ -230,87 +232,69 @@ typedef qs_s qs_t[1];
      * sieve_bits - sieve_fill
 */
 
-#if 0 /* TODO have the tuning values taken from here if multithreaded */
-
 static const ulong qsieve_tune[][6] =
 {
-   {10,   50,   100,  5,   2 *  2000,  30}, /* */
-   {20,   50,   120,  6,   2 *  2500,  30}, /* */
-   {30,   50,   150,  6,   2 *  2000,  31}, /* */
-   {40,   50,   150,  8,   2 *  3000,  32}, /* 12 digits */
-   {50,   50,   150,  8,   2 *  3000,  34}, /* 15 digits */
-   {60,   50,   150,  9,   2 *  3500,  36}, /* 18 digits */
-   {70,  100,   200,  9,   2 *  4000,  42}, /* 21 digits */
-   {80,  100,   200,  9,   2 *  6000,  44}, /* 24 digits */
-   {90,  100,   200,  9,   2 *  6000,  50}, /* */
-   {100, 100,   300,  9,   2 *  7000,  54}, /* */
-   {110, 100,   500,  9,   2 *  25000, 62}, /* 31 digits */
-   {120, 100,   800,  9,   2 *  30000, 64}, /* */
-   {130, 100,  1000,  9,   2 *  30000, 64}, /* 41 digits */
-   {140, 100,  1200,  9,   2 *  30000, 66}, /* */
-   {150, 100,  1500, 10,   2 *  32000, 68}, /* 45 digit */
-   {160, 150,  1800, 11,   2 *  32000, 70}, /* */
-   {170, 150,  2000, 12,   2 *  32000, 72}, /* 50 digits */
-   {180, 150,  2500, 12,   2 *  32000, 73}, /* */
-   {190, 150,  2800, 12,   2 *  32000, 76}, /* */
-   {200, 200,  4000, 12,   2 *  32000, 80}, /* 60 digits */
-   {210, 100,  3600, 12,   2 *  32000, 83}, /* */
-   {220, 300,  6000, 15,   2 *  65536, 87}, /* */
-   {230, 350,  8500, 17,   3 *  65536, 90}, /* 70 digits */
-   {240, 400, 10000, 19,   4 *  65536, 93}, /* */
-   {250, 500, 15000, 19,   4 *  65536, 97}, /* 75 digits */
-   {260, 600, 25000, 25,   4 *  65536, 100}, /* 80 digits */
-   {270, 800, 35000, 27,   5 *  65536, 104}  /* */
+    /* Generated with qsieve-tune */
+    {10,  49,     84,  4,    4300,  25},  /* 3 digits, 0.00 ms/semiprime */
+    {20,  10,    120,  5,    4800,  26},  /* 6 digits, 0.01 ms/semiprime */
+    {30,  14,     25,  3,    4500,  19},  /* 9 digits, 0.72 ms/semiprime */
+    {40,  28,     73,  9,    5700,  24},  /* 12 digits, 1.05 ms/semiprime */
+    {50,  25,     85,  7,    5400,  28},  /* 15 digits, 1.25 ms/semiprime */
+    {60,  27,    100, 14,   11000,  28},  /* 18 digits, 1.45 ms/semiprime */
+    {65,  26,    110, 19,   13000,  28},  /* 19 digits, 1.86 ms/semiprime */
+    {70,  26,    180,  3,   12000,  43},  /* 21 digits, 2.26 ms/semiprime */
+    {75,  26,    190,  4,   12000,  45},  /* 22 digits, 2.61 ms/semiprime */
+    {80,  27,    190,  5,   12000,  45},  /* 24 digits, 3.16 ms/semiprime */
+    {85,  28,    150,  5,   10000,  45},  /* 25 digits, 2.34 ms/semiprime */
+    {90,  34,    150,  5,   10000,  45},  /* 27 digits, 2.68 ms/semiprime */
+    {100, 40,    210,  6,   14000,  48},  /* 30 digits, 4.20 ms/semiprime */
+    {110, 46,    220,  7,   13000,  48},  /* 33 digits, 6.50 ms/semiprime */
+    {120, 50,    250,  7,   13000,  50},  /* 36 digits, 11.58 ms/semiprime */
+    {130, 47,    310,  9,   16000,  50},  /* 39 digits, 19.37 ms/semiprime */
+    {135, 39,    450, 10,   20000,  53},  /* 40 digits, 25.39 ms/semiprime */
+    {140, 47,    580,  8,   17000,  56},  /* 41 digits, 33.47 ms/semiprime */
+    {145, 47,    610,  9,   16000,  56},  /* 43 digits, 46.47 ms/semiprime */
+    {150, 45,    610,  8,   17000,  59},  /* 45 digits, 59.05 ms/semiprime */
+    {155, 43,    860, 10,   21000,  59},  /* 46 digits, 92.20 ms/semiprime */
+    /* Legacy tuning values that seem reasonable */
+    {160, 150,  2000, 11,   4 *  65536, 73}, /* 49 digit */
+    {170, 150,  2000, 12,   4 *  65536, 75}, /* 52 digits */
+    {180, 150,  3000, 12,   4 *  65536, 76}, /* 55 digits */
+    {190, 150,  3000, 13,   4 *  65536, 78}, /* 58 digit */
+    {200, 200,  4500, 14,   4 *  65536, 81}, /* 61 digits */
+    {210, 100,  8000, 14,   12 *  65536, 84}, /* 64 digits */
+    {220, 300, 10000, 15,   12 *  65536, 88}, /* 67 digits */
+    {230, 400, 20000, 17,   20 *  65536, 90}, /* 70 digits */
+    {240, 450, 20000, 19,   20 *  65536, 93}, /* 73 digis */
+    {250, 500, 22000, 22,   24 *  65536, 97}, /* 76 digits */
+    {260, 600, 25000, 25,   24 *  65536, 100}, /* 79 digits */
+    {270, 800, 35000, 27,   28 *  65536, 102}, /* 82 digits */
+    {280, 900, 40000, 29,   28 *  65536, 104}, /* 85 digits */
+    {290, 1000, 60000, 29,  32 *  65536, 106}, /* 88 digits */
+    {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */
 };
-
-#else /* currently tuned for four threads */
-
-static const ulong qsieve_tune[][6] =
-{
-   {10,   50,   90,  5,   2 *  1500,  18}, /* */
-   {20,   50,   90,  6,   2 *  1600,  18}, /* */
-   {30,   50,   100,  6,   2 *  1800,  19}, /* */
-   {40,   50,   100,  8,   2 *  2000,  20}, /* 13 digits */
-   {50,   50,   100,  8,   2 *  2500,  22}, /* 16 digits */
-   {60,   50,   100,  9,   2 *  3000,  24}, /* 19 digits */
-   {70,  100,   250,  9,   2 *  6000,  25}, /* 22 digits */
-   {80,  100,   250,  9,   2 *  8000,  26}, /* 25 digits */
-   {90,  100,   250,  9,   2 *  9000,  30}, /* 28 digits */
-   {100, 100,   250,  9,   2 *  10000, 34}, /* 31 digits */
-   {110, 100,   250,  9,   2 *  30000, 38}, /* 34 digits */
-   {120, 100,   700,  9,   2 *  40000, 49}, /* 37 digits */
-   {130, 100,   800,  9,   2 *  50000, 59}, /* 40 digits */
-   {140, 100,  1200,  9,   2 *  65536, 66}, /* 43 digits */
-   {150, 100,  1500, 10,   2 *  65536, 70}, /* 46 digit */
-   {160, 150,  2000, 11,   4 *  65536, 73}, /* 49 digit */
-   {170, 150,  2000, 12,   4 *  65536, 75}, /* 52 digits */
-   {180, 150,  3000, 12,   4 *  65536, 76}, /* 55 digits */
-   {190, 150,  3000, 13,   4 *  65536, 78}, /* 58 digit */
-   {200, 200,  4500, 14,   4 *  65536, 81}, /* 61 digits */
-   {210, 100,  8000, 14,   12 *  65536, 84}, /* 64 digits */
-   {220, 300, 10000, 15,   12 *  65536, 88}, /* 67 digits */
-   {230, 400, 20000, 17,   20 *  65536, 90}, /* 70 digits */
-   {240, 450, 20000, 19,   20 *  65536, 93}, /* 73 digis */
-   {250, 500, 22000, 22,   24 *  65536, 97}, /* 76 digits */
-   {260, 600, 25000, 25,   24 *  65536, 100}, /* 79 digits */
-   {270, 800, 35000, 27,   28 *  65536, 102}, /* 82 digits */
-   {280, 900, 40000, 29,   28 *  65536, 104}, /* 85 digits */
-   {290, 1000, 60000, 29,  32 *  65536, 106}, /* 88 digits */
-   {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */
-};
-
-#endif
 
 /* number of entries in the tuning table */
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(6*sizeof(ulong)))
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n);
 
+/* As qsieve_init, but with the tuning parameters supplied explicitly rather
+   than read from the qsieve_tune table.  qsieve_init calls this with the
+   table defaults for the bit-size of n. */
+void qsieve_init_with_tune(qs_t qs_inf, const fmpz_t n, ulong ks_primes,
+        slong fb_primes, slong small_primes, slong sieve_size, ulong sieve_bits);
+
 ulong qsieve_knuth_schroeppel(qs_t qs_inf);
 
 void qsieve_clear(qs_t qs_inf);
 
 void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
+
+/* As qsieve_factor, but with the tuning parameters supplied explicitly. */
+void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
+        ulong ks_primes, slong fb_primes, slong small_primes,
+        slong sieve_size, ulong sieve_bits);
 
 prime_t * compute_factor_base(ulong * small_factor, qs_t qs_inf,
                                                              slong num_primes);

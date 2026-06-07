@@ -97,41 +97,21 @@ compute_factor_base(ulong * small_factor, qs_t qs_inf, slong num_primes)
 ulong qsieve_primes_init(qs_t qs_inf)
 {
     slong num_primes;
-    slong i;
     ulong k = qs_inf->k;
     ulong small_factor = 0;
-    slong bits;
 
     prime_t * factor_base;
 
-    /* determine which index in the tuning table n corresponds to */
-    for (i = 1; i < QS_TUNE_SIZE; i++)
-    {
-        if (qsieve_tune[i][0] > qs_inf->bits)
-            break;
-    }
-    i--;
-
-    num_primes = qsieve_tune[i][2]; /* number of factor base primes */
+    /* tuning parameters were stored in the struct by qsieve_init */
+    num_primes = qs_inf->fb_primes; /* number of factor base primes */
 
     if (num_primes < 3)
     {
        flint_throw(FLINT_ERROR, "Too few factor base primes\n");
     }
 
-    qs_inf->sieve_size = qsieve_tune[i][4]; /* size of sieve to use */
-    qs_inf->small_primes = qsieve_tune[i][3]; /* number of primes to not sieve with */
-
-    bits = qsieve_tune[i][5];
-    if (bits >= 64)
-    {
-       qs_inf->sieve_bits = bits;
-       qs_inf->sieve_fill = 0;
-    } else
-    {
-       qs_inf->sieve_bits = 64;
-       qs_inf->sieve_fill = 64 - bits;
-    }
+    /* qs_inf->sieve_size, qs_inf->small_primes, qs_inf->sieve_bits and
+       qs_inf->sieve_fill have already been set from the tuning parameters */
 
     if (qs_inf->small_primes > num_primes)
     {
