@@ -32,8 +32,8 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
         ulong i;
         ulong Xn = n_pow2(L);
         double* X = FLINT_ARRAY_ALLOC(Xn, double);
-        double* data =  (double*) flint_aligned_alloc(32,
-                                      FLINT_MAX(32, n_pow2(L)*sizeof(double)));
+        double* data =  (double*) flint_aligned_alloc(64,
+                                      FLINT_MAX(64, n_pow2(L)*sizeof(double)));
 
         ulong nreps = ireps + irepmul*L;
         for (ulong rep = 0; rep < nreps; rep++)
