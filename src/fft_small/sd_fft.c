@@ -12,6 +12,170 @@
 #include "fft_small.h"
 
 /*
+    This module contains the function `sd_fft_trunc` to compute a truncated FFT,
+    together with the helper functions and macros to implement it.
+    See [vdH2004]_ for a high-level overview of the truncated FFT algorithm.
+
+    For a concrete example, let `L = 3` and `itrunc = otrunc = 8`, so no truncation
+    happens. The algorithm can be visualized by the following diagram:
+
+         0   1   2   3   4   5   6   7
+        [-------------]X[-------------]  // layer 0
+         0   1   2   3   4   5   6   7
+        [-----]X[-----] [-----]X[-----]  // layer 1
+         0   1   2   3   4   5   6   7
+        [-]X[-] [-]X[-] [-]X[-] [-]X[-]  // layer 2
+         0   1   2   3   4   5   6   7
+
+    We say:
+    - at layer 0, there is 1 transform of length 8,
+    - at layer 1, there are 2 independent contiguous transforms each of length 4,
+    - at layer 2, there are 4 independent contiguous transforms each of length 2.
+
+    Let `w` be an 8-th root of unity. If the input array represents a polynomial
+    `f(x) = sum(a[i] * x^i)`, then the output array is
+
+        [f(w^0), f(w^4), f(w^2), f(w^6), f(w^1), f(w^5), f(w^3), f(w^7)].
+
+    Note that the order is bit-flipped, but this is fine for us. The goal
+    is to compute the convolution of two sequences, so it suffices for the FFT
+    result to be permuted, as long as the inverse FFT takes into account the same
+    permutation. This does not affect the pointwise multiplication either.
+
+    The bit-flipped ordering is actually more convenient. To see why, we redraw
+    the diagram above with each transform labeled with the twiddle factor:
+
+         0   1   2   3   4   5   6   7
+        [------------ w^0 ------------]  // layer 0
+         0   1   2   3   4   5   6   7
+        [---- w^0 ----] [---- w^2 ----]  // layer 1
+         0   1   2   3   4   5   6   7
+        [ w^0 ] [ w^2 ] [ w^1 ] [ w^3 ]  // layer 2
+         0   1   2   3   4   5   6   7
+
+    This is exactly the ordering of the stored even-index twiddle factors `sd_fft_ctx_w2(Q, j)`.
+
+    Here, the diagram
+
+         a   b
+        [ w^i ]
+         c   d
+
+    corresponds to the (in-place) calculation `c = a + b * w^i`, `d = a - b * w^i`.
+
+    In the diagram above, layer 1 is shown as 2 independent contiguous transforms
+    of length 4, while layer 0 is shown as 1 contiguous transform of length 8.
+    However, if we consider the flat array as a 2x4 matrix in row-major order:
+
+        [  0   1   2   3  ]
+        [                 ]
+        [  4   5   6   7  ]
+
+    the layer 0 transform can be seen as 4 independent transforms operating
+    on each _column_:
+
+        [  0   1   2   3  ]
+        [  |   |   |   |  ]
+        [  4   5   6   7  ]
+
+    while the layer 1 transform can be seen as 2 independent transforms operating
+    on each row:
+
+        [  0---1---2---3  ]
+        [                 ]
+        [  4---5---6---7  ]
+
+    That's why "column" and "row" are used in the comments below.
+
+    The exact transform above is performed by `sd_fft_basecase_3_1`.
+    We call this **one contiguous 3-layer transform with lengths (8, 4, 2)**.
+    This is done by one contiguous 1-layer transform with length 8, followed by
+    two independent contiguous 2-layer transforms with lengths (4, 2).
+    In general,
+
+        A independent contiguous B-layer transforms with lengths (C, C/2, ..., C/2^(B-1))
+
+    means
+
+         0   1  ...   C-1   C   C+1 ...  2C-1    ........   (A-1)C (A-1)C+1 ...  AC-2   AC-1
+        [--------X-------] [---------X-------] [-] ... [-] [-----------------X--------------]  // layer 0
+         0   1  ...   C-1   C   C+1 ...  2C-1    ........   (A-1)C (A-1)C+1 ...  AC-2   AC-1
+        [---X---] [--X---] [---X----] [--X---] [-] ... [-] [-------X--------] [-----X-------]  // layer 1
+         0   1  ...   C-1   C   C+1 ...  2C-1    ........   (A-1)C (A-1)C+1 ...  AC-2   AC-1
+          .
+          .
+          .
+        [---X---] [--X---] [---X----] [--X---] [-] ... [-] [-------X--------] [-----X-------]  // layer B-1
+         0   1  ...   C-1   C   C+1 ...  2C-1    ........   (A-1)C (A-1)C+1 ...  AC-2   AC-1
+
+    Here, "contiguous" emphasizes that each independent transform operates on a contiguous
+    block of memory. The "column" transforms are also independent, but not contiguous.
+
+    When `L >= 4`, the order is less consistent: for `w` a 16-th root of unity, the
+    output array is not
+
+        [f(w^0),  f(w^8),  f(w^4),  f(w^12),
+         f(w^2),  f(w^10), f(w^6),  f(w^14),
+         f(w^1),  f(w^9),  f(w^5),  f(w^13),
+         f(w^3),  f(w^11), f(w^7),  f(w^15)]
+
+    but it is instead
+
+        [f(w^0),  f(w^2),  f(w^1),  f(w^3),
+         f(w^8),  f(w^10), f(w^9),  f(w^11),
+         f(w^4),  f(w^6),  f(w^5),  f(w^7),
+         f(w^12), f(w^14), f(w^13), f(w^15)]
+
+    Formally, each block of 16 consecutive terms is transposed as a 4x4 matrix.
+
+    See the comment in `sd_fft_basecase_4_1`: a final `VEC4D_TRANSPOSE` is omitted.
+    This also explains why `sd_fft_ctx_trunc_index` needs to adjust the last 4 bits of `i`.
+
+    Because the column transforms are also independent, it is not necessary
+    to handle the earlier layers strictly before the later layers either.
+    For example, to do a 2-layer transform with lengths (16, 8):
+
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        [---------------------------- w^0 ----------------------------]
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        [------------ w^0 ------------] [------------ w^4 ------------]
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+
+    we can first do ("#" marks the transformed entries, "-" marks the
+    unmodified entries):
+
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        [#######--------########--------########--------########------]
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        [#######--------########------] [#######--------########------]
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+
+    followed by:
+
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        [-------#######---------#######---------#######---------######]
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+        [-------#######---------######] [-------#######---------######]
+         0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
+
+    We call the two steps above a
+
+        2-layer transform with lengths (16, 8) and mask (0..2)
+
+    and a
+
+        2-layer transform with lengths (16, 8) and mask (2..4)
+
+    respectively. More generally, we have a
+
+        B-layer transform with lengths (C, C/2, ..., C/2^(B-1)) and mask (D..E)
+
+    for 0 <= D < E <= C/2^B. The mask range is half-open: only entries
+    whose index is congruent to some `i` with D <= i < E modulo C/2^B are
+    transformed.
+
+    ********************************************************************************
+
     N is supposed to be a good fit for the number of points to process per loop
     in the radix 4 butterflies.
 
@@ -22,151 +186,173 @@
 
 #define N 8
 #define VECND vec8d
-#define VECNOP(op) vec8d_##op
+#define VECNOP(op) TEMPLATE(VECND, op)
 
 /********************* forward butterfly **************************************
     b0 = a0 + w*a1
     b1 = a0 - w*a1
+
+    Many macros here come in pairs; each pair has a `PARAM` macro and a `MOTH` macro.
+    They are meant to be used as::
+
+        *_PARAM_*(...);
+        ulong i = 0; do {
+            *_MOTH_*(...);
+        } while (i += N, i < BLK_SZ);
+
+    The `PARAM` macro defines local variables used by the corresponding `MOTH` macro.
+
+    The first argument `V` is usually `VECND` = `vec8d`. This means each `MOTH`
+    macro invocation transforms `N = 8` entries from each `X*` argument,
+    so `i` is increased by `N` each iteration.
+
+    `j` is the twiddle table index. In the example above, we have:
+
+         0   1   2   3   4   5   6   7
+        [------------ j=0 ------------]  // layer 0
+         0   1   2   3   4   5   6   7
+        [---- j=0 ----] [---- j=1 ----]  // layer 1
+         0   1   2   3   4   5   6   7
+        [ j=0 ] [ j=1 ] [ j=2 ] [ j=3 ]  // layer 2
+         0   1   2   3   4   5   6   7
+
+    When `j == 0`, there is no need to multiply by the twiddle factor. This is why
+    there is separate code for the `j == 0` (`J_IS_Z`) and `j != 0` cases.
+
+    When the macros take separate `j_r` and `j_bits`, these values can be
+    computed from `j` with the `SET_J_BITS_AND_J_R` macro.
+
+    The following macros perform a 1-layer transform. The mask length of each
+    transform is determined by the outer loop, in the example above, it is `BLK_SZ`.
+    The spacing between X0 and X1 is half transform length.
 */
 
 #define RADIX_2_FORWARD_PARAM_J_IS_Z(V, Q) \
-    V n    = V##_set_d(Q->p); \
-    V ninv = V##_set_d(Q->pinv);
+    V n    = CAT(V, set_d)(Q->p); \
+    V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_FORWARD_MOTH_J_IS_Z(V, X0, X1) \
 { \
     V x0, x1; \
-    x0 = V##_load(X0); \
-    x0 = V##_reduce_to_pm1n(x0, n, ninv); \
-    x1 = V##_load(X1); \
-    x1 = V##_reduce_to_pm1n(x1, n, ninv); \
-    V##_store(X0, V##_add(x0, x1)); \
-    V##_store(X1, V##_sub(x0, x1)); \
+    x0 = CAT(V, load)(X0); \
+    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
+    x1 = CAT(V, load)(X1); \
+    x1 = CAT(V, reduce_to_pm1n)(x1, n, ninv); \
+    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
+    CAT(V, store)(X1, CAT(V, sub)(x0, x1)); \
 }
 
 #define RADIX_2_FORWARD_PARAM_J_IS_NZ(V, Q, j_r, j_bits) \
-    V w = V##_set_d(Q->w2tab[j_bits][j_r]); \
-    V n    = V##_set_d(Q->p); \
-    V ninv = V##_set_d(Q->pinv);
+    V w = CAT(V, set_d)(Q->w2tab[j_bits][j_r]); \
+    V n    = CAT(V, set_d)(Q->p); \
+    V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_2_FORWARD_MOTH_J_IS_NZ(V, X0, X1) \
 { \
     V x0, x1; \
-    x0 = V##_load(X0); \
-    x0 = V##_reduce_to_pm1n(x0, n, ninv); \
-    x1 = V##_load(X1); \
-    x1 = V##_mulmod(x1, w, n, ninv); \
-    V##_store(X0, V##_add(x0, x1)); \
-    V##_store(X1, V##_sub(x0, x1)); \
+    x0 = CAT(V, load)(X0); \
+    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
+    x1 = CAT(V, load)(X1); \
+    x1 = CAT(V, mulmod)(x1, w, n, ninv); \
+    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
+    CAT(V, store)(X1, CAT(V, sub)(x0, x1)); \
 }
-
-/* for when the V arguments above needs "evaluation" */
-#define _RADIX_2_FORWARD_PARAM_J_IS_Z(...)  RADIX_2_FORWARD_PARAM_J_IS_Z(__VA_ARGS__)
-#define _RADIX_2_FORWARD_MOTH_J_IS_Z(...)   RADIX_2_FORWARD_MOTH_J_IS_Z(__VA_ARGS__)
-#define _RADIX_2_FORWARD_PARAM_J_IS_NZ(...) RADIX_2_FORWARD_PARAM_J_IS_NZ(__VA_ARGS__)
-#define _RADIX_2_FORWARD_MOTH_J_IS_NZ(...)  RADIX_2_FORWARD_MOTH_J_IS_NZ(__VA_ARGS__)
 
 /**************** forward butterfly with truncation **************************/
 
 #define RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(V, X0, X1) \
 { \
     V x0, x1; \
-    x0 = V##_load(X0); \
-    x0 = V##_reduce_to_pm1n(x0, n, ninv); \
-    x1 = V##_load(X1); \
-    x1 = V##_reduce_to_pm1n(x1, n, ninv); \
-    V##_store(X0, V##_add(x0, x1)); \
+    x0 = CAT(V, load)(X0); \
+    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
+    x1 = CAT(V, load)(X1); \
+    x1 = CAT(V, reduce_to_pm1n)(x1, n, ninv); \
+    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
 }
 
 #define RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(V, X0, X1) \
 { \
     V x0, x1; \
-    x0 = V##_load(X0); \
-    x0 = V##_reduce_to_pm1n(x0, n, ninv); \
-    x1 = V##_load(X1); \
-    x1 = V##_mulmod(x1, w, n, ninv); \
-    V##_store(X0, V##_add(x0, x1)); \
+    x0 = CAT(V, load)(X0); \
+    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
+    x1 = CAT(V, load)(X1); \
+    x1 = CAT(V, mulmod)(x1, w, n, ninv); \
+    CAT(V, store)(X0, CAT(V, add)(x0, x1)); \
 }
-
-#define _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(...)  RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(__VA_ARGS__)
-#define _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(...) RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(__VA_ARGS__)
 
 /********************* forward butterfly **************************************
     b0 = a0 + w^2*a2 +   w*(a1 + w^2*a3)
     b1 = a0 + w^2*a2 -   w*(a1 + w^2*a3)
     b2 = a0 - w^2*a2 + i*w*(a1 - w^2*a3)
     b3 = a0 - w^2*a2 - i*w*(a1 - w^2*a3)
+
+    In other words: a 2-layer transform.
 */
 
 #define RADIX_4_FORWARD_PARAM_J_IS_Z(V, Q) \
-    V iw = V##_set_d(Q->w2tab[1][0]); \
-    V n    = V##_set_d(Q->p); \
-    V ninv = V##_set_d(Q->pinv);
+    V iw = CAT(V, set_d)(Q->w2tab[1][0]); \
+    V n    = CAT(V, set_d)(Q->p); \
+    V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_4_FORWARD_MOTH_J_IS_Z(V, X0, X1, X2, X3) \
 { \
     V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = V##_load(X0); \
-    x0 = V##_reduce_to_pm1n(x0, n, ninv); \
-    x1 = V##_load(X1); \
-    x2 = V##_load(X2); \
-    x3 = V##_load(X3); \
-    x2 = V##_reduce_to_pm1n(x2, n, ninv); \
-    x3 = V##_reduce_to_pm1n(x3, n, ninv); \
-    y0 = V##_add(x0, x2); \
-    y1 = V##_add(x1, x3); \
-    y2 = V##_sub(x0, x2); \
-    y3 = V##_sub(x1, x3); \
-    y1 = V##_reduce_to_pm1n(y1, n, ninv); \
-    y3 = V##_mulmod(y3, iw, n, ninv); \
-    x0 = V##_add(y0, y1); \
-    x1 = V##_sub(y0, y1); \
-    x2 = V##_add(y2, y3); \
-    x3 = V##_sub(y2, y3); \
-    V##_store(X0, x0); \
-    V##_store(X1, x1); \
-    V##_store(X2, x2); \
-    V##_store(X3, x3); \
+    x0 = CAT(V, load)(X0); \
+    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
+    x1 = CAT(V, load)(X1); \
+    x2 = CAT(V, load)(X2); \
+    x3 = CAT(V, load)(X3); \
+    x2 = CAT(V, reduce_to_pm1n)(x2, n, ninv); \
+    x3 = CAT(V, reduce_to_pm1n)(x3, n, ninv); \
+    y0 = CAT(V, add)(x0, x2); \
+    y1 = CAT(V, add)(x1, x3); \
+    y2 = CAT(V, sub)(x0, x2); \
+    y3 = CAT(V, sub)(x1, x3); \
+    y1 = CAT(V, reduce_to_pm1n)(y1, n, ninv); \
+    y3 = CAT(V, mulmod)(y3, iw, n, ninv); \
+    x0 = CAT(V, add)(y0, y1); \
+    x1 = CAT(V, sub)(y0, y1); \
+    x2 = CAT(V, add)(y2, y3); \
+    x3 = CAT(V, sub)(y2, y3); \
+    CAT(V, store)(X0, x0); \
+    CAT(V, store)(X1, x1); \
+    CAT(V, store)(X2, x2); \
+    CAT(V, store)(X3, x3); \
 }
 
 #define RADIX_4_FORWARD_PARAM_J_IS_NZ(V, Q, j_r, j_bits) \
     FLINT_ASSERT(j_bits > 0); \
-    V w  = V##_set_d(Q->w2tab[1+j_bits][2*j_r]); \
-    V w2 = V##_set_d(Q->w2tab[0+j_bits][j_r]); \
-    V iw = V##_set_d(Q->w2tab[1+j_bits][2*j_r+1]); \
-    V n    = V##_set_d(Q->p); \
-    V ninv = V##_set_d(Q->pinv);
+    V w  = CAT(V, set_d)(Q->w2tab[1+j_bits][2*j_r]); \
+    V w2 = CAT(V, set_d)(Q->w2tab[0+j_bits][j_r]); \
+    V iw = CAT(V, set_d)(Q->w2tab[1+j_bits][2*j_r+1]); \
+    V n    = CAT(V, set_d)(Q->p); \
+    V ninv = CAT(V, set_d)(Q->pinv);
 
 #define RADIX_4_FORWARD_MOTH_J_IS_NZ(V, X0, X1, X2, X3) \
 { \
     V x0, x1, x2, x3, y0, y1, y2, y3; \
-    x0 = V##_load(X0); \
-    x0 = V##_reduce_to_pm1n(x0, n, ninv); \
-    x1 = V##_load(X1); \
-    x2 = V##_load(X2); \
-    x3 = V##_load(X3); \
-    x2 = V##_mulmod(x2, w2, n, ninv); \
-    x3 = V##_mulmod(x3, w2, n, ninv); \
-    y0 = V##_add(x0, x2); \
-    y1 = V##_add(x1, x3); \
-    y2 = V##_sub(x0, x2); \
-    y3 = V##_sub(x1, x3); \
-    y1 = V##_mulmod(y1, w, n, ninv); \
-    y3 = V##_mulmod(y3, iw, n, ninv); \
-    x0 = V##_add(y0, y1); \
-    x1 = V##_sub(y0, y1); \
-    x2 = V##_add(y2, y3); \
-    x3 = V##_sub(y2, y3); \
-    V##_store(X0, x0); \
-    V##_store(X1, x1); \
-    V##_store(X2, x2); \
-    V##_store(X3, x3); \
+    x0 = CAT(V, load)(X0); \
+    x0 = CAT(V, reduce_to_pm1n)(x0, n, ninv); \
+    x1 = CAT(V, load)(X1); \
+    x2 = CAT(V, load)(X2); \
+    x3 = CAT(V, load)(X3); \
+    x2 = CAT(V, mulmod)(x2, w2, n, ninv); \
+    x3 = CAT(V, mulmod)(x3, w2, n, ninv); \
+    y0 = CAT(V, add)(x0, x2); \
+    y1 = CAT(V, add)(x1, x3); \
+    y2 = CAT(V, sub)(x0, x2); \
+    y3 = CAT(V, sub)(x1, x3); \
+    y1 = CAT(V, mulmod)(y1, w, n, ninv); \
+    y3 = CAT(V, mulmod)(y3, iw, n, ninv); \
+    x0 = CAT(V, add)(y0, y1); \
+    x1 = CAT(V, sub)(y0, y1); \
+    x2 = CAT(V, add)(y2, y3); \
+    x3 = CAT(V, sub)(y2, y3); \
+    CAT(V, store)(X0, x0); \
+    CAT(V, store)(X1, x1); \
+    CAT(V, store)(X2, x2); \
+    CAT(V, store)(X3, x3); \
 }
-
-#define _RADIX_4_FORWARD_PARAM_J_IS_Z(...)  RADIX_4_FORWARD_PARAM_J_IS_Z(__VA_ARGS__)
-#define _RADIX_4_FORWARD_MOTH_J_IS_Z(...)   RADIX_4_FORWARD_MOTH_J_IS_Z(__VA_ARGS__)
-#define _RADIX_4_FORWARD_PARAM_J_IS_NZ(...) RADIX_4_FORWARD_PARAM_J_IS_NZ(__VA_ARGS__)
-#define _RADIX_4_FORWARD_MOTH_J_IS_NZ(...)  RADIX_4_FORWARD_MOTH_J_IS_NZ(__VA_ARGS__)
 
 #define LENGTH4_ANY_J(T, x0, x1, x2, x3, n, ninv, w2, w, iw) \
 { \
@@ -203,6 +389,8 @@
     x2 = CAT(T, add)(Y2, Y3); \
     x3 = CAT(T, sub)(Y2, Y3); \
 }
+
+/* A 3-layer transform. */
 
 #define LENGTH8_ANY_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w2, w, iw, ww0, ww1, ww2, ww3) \
 { \
@@ -289,7 +477,10 @@
 
 
 /**************** basecase transform of size 2^m **********************/
-/* template<int m, bool j_is_zero> sd_fft_basecase(Q, X, j_r, j_bits) */
+/* template<int m, bool j_is_zero> sd_fft_basecase(Q, X, j_r, j_bits)
+
+    With notation as above: sd_fft_basecase_{m} performs a contiguous m-layer
+    transform with lengths (2^m, 2^(m-1), ..., 2^1).  */
 
 static void sd_fft_basecase_0_1(const sd_fft_ctx_t FLINT_UNUSED(Q), double* FLINT_UNUSED(X))
 {
@@ -344,7 +535,7 @@ static void sd_fft_basecase_4_1(const sd_fft_ctx_t Q, double* X)
     VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3);
     LENGTH4_ANY_J(vec4d, x0,x1,x2,x3, n,ninv, w2, w,iw);
 
-    /* transpose_4x4(x0,x1,x2,x3, x0,x1,x2,x3) */ /* skipped */
+    /* VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3) */ /* skipped */
     vec4d_store(X+4*0, x0);
     vec4d_store(X+4*1, x1);
     vec4d_store(X+4*2, x2);
@@ -375,7 +566,7 @@ static void sd_fft_basecase_4_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulon
     VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3);
     LENGTH4_ANY_J(vec4d, x0,x1,x2,x3, n,ninv, w2, w,iw);
 
-    /* transpose_4x4(x0,x1,x2,x3, x0,x1,x2,x3) */ /* skipped */
+    /* VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3) */ /* skipped */
     vec4d_store(X+4*0, x0);
     vec4d_store(X+4*1, x1);
     vec4d_store(X+4*2, x2);
@@ -389,7 +580,7 @@ The length 32 transform can be broken up as
 Since the length 16 basecase is missing the final 4x4 transpose, so the output
 is worse than bit-reversed. If the length 32 transform used a order different from 16's,
 then we will have a problem at a higher level since it would be difficult to keep track
-of what basecase happened to have be used. Therefore, the length 16 and 32 basecases
+of what basecase happened to have been used. Therefore, the length 16 and 32 basecases
 should produce the same order, and this is easier with (b).
 */
 static void sd_fft_basecase_5_1(const sd_fft_ctx_t Q, double* X)
@@ -429,8 +620,8 @@ static void sd_fft_basecase_5_1(const sd_fft_ctx_t Q, double* X)
     ww1 = vec4d_unpack_hi_permute_0_2_1_3(u, v);
     LENGTH4_ANY_J(vec4d, x4,x5,x6,x7, n,ninv, w0,ww0,ww1);
 
-    /* transpose_4x4(x0,x1,x2,x3, x0,x1,x2,x3); */ /* skipped */
-    /* transpose_4x4(x4,x5,x6,x7, x4,x5,x6,x7); */
+    /* VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3); */ /* skipped */
+    /* VEC4D_TRANSPOSE(x4,x5,x6,x7, x4,x5,x6,x7); */
     vec4d_store(X+4*0, x0);
     vec4d_store(X+4*1, x1);
     vec4d_store(X+4*2, x2);
@@ -484,8 +675,8 @@ static void sd_fft_basecase_5_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulon
     ww1 = vec4d_unpack_hi_permute_0_2_1_3(u, v);
     LENGTH4_ANY_J(vec4d, x4,x5,x6,x7,n,ninv, w0, ww0, ww1);
 
-    /* transpose_4x4(x0,x1,x2,x3, x0,x1,x2,x3); */ /* skipped */
-    /* transpose_4x4(x4,x5,x6,x7, x4,x5,x6,x7); */
+    /* VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3); */ /* skipped */
+    /* VEC4D_TRANSPOSE(x4,x5,x6,x7, x4,x5,x6,x7); */
     vec4d_store(X+4*0, x0);
     vec4d_store(X+4*1, x1);
     vec4d_store(X+4*2, x2);
@@ -502,9 +693,9 @@ static void sd_fft_basecase_5_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulon
 static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
 { \
     ulong l = n_pow2(m - 2); \
-    _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q) \
+    RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q) \
     ulong i = 0; do { \
-        _RADIX_4_FORWARD_MOTH_J_IS_Z(VECND, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
+        RADIX_4_FORWARD_MOTH_J_IS_Z(VECND, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
     } while (i += N, i < l); \
     CAT3(sd_fft_basecase, n, 1)(Q, X+0*l); \
     CAT3(sd_fft_basecase, n, 0)(Q, X+1*l, 0, 1); \
@@ -514,9 +705,9 @@ static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
 static void CAT3(sd_fft_basecase, m, 0)(const sd_fft_ctx_t Q, double* X, ulong j_r, ulong j_bits) \
 { \
     ulong l = n_pow2(m - 2); \
-    _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits) \
+    RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits) \
     ulong i = 0; do { \
-        _RADIX_4_FORWARD_MOTH_J_IS_NZ(VECND, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
+        RADIX_4_FORWARD_MOTH_J_IS_NZ(VECND, X+0*l+i, X+1*l+i, X+2*l+i, X+3*l+i) \
     } while (i += N, i < l); \
     CAT3(sd_fft_basecase, n, 0)(Q, X+0*l, 4*j_r+0, j_bits+2); \
     CAT3(sd_fft_basecase, n, 0)(Q, X+1*l, 4*j_r+1, j_bits+2); \
@@ -528,6 +719,9 @@ EXTEND_BASECASE(5, 7)
 EXTEND_BASECASE(6, 8)
 EXTEND_BASECASE(7, 9)
 #undef EXTEND_BASECASE
+
+/* The `sd_fft_base_{m}_*` functions take `j`, unlike `sd_fft_basecase_{m}_*`
+   which takes `j_r` and `j_bits` (or nothing, if `j` is zero).  */
 
 /* parameter 1: j can be zero */
 static void sd_fft_base_8_1(const sd_fft_ctx_t Q, double* x, ulong j)
@@ -574,6 +768,15 @@ static void sd_fft_base_9_1(const sd_fft_ctx_t Q, double* x, ulong j)
 
 /**************** forward butterfly with truncation **************************/
 
+/*
+    Let `D = X1-X0`, measured in `double` entries. Assume `D = X2-X1 = X3-X2` and `D >= BLK_SZ`.
+    `sd_fft_moth_trunc_block_{itrunc}_{otrunc}_{j_is_zero}` computes a possibly
+    truncated 2-layer transform with lengths (4*D, 2*D) and mask (0..BLK_SZ).
+    Only the first `itrunc` blocks are read (`2 <= itrunc <= 4`),
+    missing input blocks are treated as zero, and only the first `otrunc` output
+    blocks are written (`1 <= otrunc <= 4`).
+*/
+
 /* third parameter is j == 0 */
 #define DEFINE_IT(itrunc, otrunc) \
 static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
@@ -581,7 +784,7 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
     ulong FLINT_UNUSED(j_r), ulong FLINT_UNUSED(j_bits), \
     double* X0, double* X1, double* X2, double* X3) \
 { \
-    _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q); \
+    RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q); \
     ulong i = 0; do { \
         VECND x0, x1, x2, x3, y0, y1, y2, y3; \
         x0 = x1 = x2 = x3 = VECNOP(zero)(); \
@@ -614,7 +817,7 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 0)( \
     ulong j_r, ulong j_bits, \
     double* X0, double* X1, double* X2, double* X3) \
 { \
-    _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits); \
+    RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits); \
     ulong i = 0; do { \
         VECND x0, x1, x2, x3, y0, y1, y2, y3; \
         x0 = x1 = x2 = x3 = VECNOP(zero)(); \
@@ -659,6 +862,10 @@ DEFINE_IT(4, 4)
 
 /************************ the recursive stuff ********************************/
 
+/*
+    Compute an untruncated k-layer transform with lengths
+    (BLK_SZ*S*2^k, BLK_SZ*S*2^(k-1), ..., BLK_SZ*S*2) and mask (0..BLK_SZ).
+*/
 static void sd_fft_no_trunc_block(
     const sd_fft_ctx_t Q,
     double* x,
@@ -698,27 +905,27 @@ static void sd_fft_no_trunc_block(
         /* column ffts */
         if (FLINT_UNLIKELY(j_bits == 0))
         {
-            _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q)
+            RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong a = 0; do {
                 double* X0 = x + BLK_SZ*(a*S + (S<<k2)*0);
                 double* X1 = x + BLK_SZ*(a*S + (S<<k2)*1);
                 double* X2 = x + BLK_SZ*(a*S + (S<<k2)*2);
                 double* X3 = x + BLK_SZ*(a*S + (S<<k2)*3);
                 ulong i = 0; do {
-                    _RADIX_4_FORWARD_MOTH_J_IS_Z(VECND, X0+i, X1+i, X2+i, X3+i);
+                    RADIX_4_FORWARD_MOTH_J_IS_Z(VECND, X0+i, X1+i, X2+i, X3+i);
                 } while (i += N, i < BLK_SZ);
             } while (a++, a < l2);
         }
         else
         {
-            _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
+            RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
             ulong a = 0; do {
                 double* X0 = x + BLK_SZ*(a*S + (S<<k2)*0);
                 double* X1 = x + BLK_SZ*(a*S + (S<<k2)*1);
                 double* X2 = x + BLK_SZ*(a*S + (S<<k2)*2);
                 double* X3 = x + BLK_SZ*(a*S + (S<<k2)*3);
                 ulong i = 0; do {
-                    _RADIX_4_FORWARD_MOTH_J_IS_NZ(VECND, X0+i, X1+i, X2+i, X3+i);
+                    RADIX_4_FORWARD_MOTH_J_IS_NZ(VECND, X0+i, X1+i, X2+i, X3+i);
                 } while (i += N, i < BLK_SZ);
             } while (a++, a < l2);
         }
@@ -738,27 +945,28 @@ static void sd_fft_no_trunc_block(
         double* X1 = x + BLK_SZ*(S*1);
         if (FLINT_UNLIKELY(j_bits == 0))
         {
-            _RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
+            RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
-                _RADIX_2_FORWARD_MOTH_J_IS_Z(VECND, X0+i, X1+i);
+                RADIX_2_FORWARD_MOTH_J_IS_Z(VECND, X0+i, X1+i);
             } while (i += N, i < BLK_SZ);
         }
         else
         {
-            _RADIX_2_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
+            RADIX_2_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
             ulong i = 0; do {
-                _RADIX_2_FORWARD_MOTH_J_IS_NZ(VECND, X0+i, X1+i);
+                RADIX_2_FORWARD_MOTH_J_IS_NZ(VECND, X0+i, X1+i);
             } while (i += N, i < BLK_SZ);
         }
     }
 }
 
-
-
+/*
+    Computes an untruncated (LG_BLK_SZ + k)-layer contiguous transform with
+    lengths (BLK_SZ*2^k, BLK_SZ*2^(k-1), ..., BLK_SZ, BLK_SZ/2, ..., 2).
+*/
 static void sd_fft_no_trunc_internal(
     const sd_fft_ctx_t Q,
     double* x,
-    ulong S,    /* stride */
     ulong k,    /* 1 transform of length BLK_SZ*2^k */
     ulong j)    /* twist param */
 {
@@ -770,13 +978,13 @@ static void sd_fft_no_trunc_internal(
         /* column ffts */
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_fft_no_trunc_block(Q, x + BLK_SZ*(a*S), S<<k2, k1, j);
+            sd_fft_no_trunc_block(Q, x + BLK_SZ*a, n_pow2(k2), k1, j);
         } while (a++, a < l2);
 
         /* row ffts */
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_fft_no_trunc_internal(Q, x + BLK_SZ*(b*(S<<k2)), S, k2, (j<<k1) + b);
+            sd_fft_no_trunc_internal(Q, x + BLK_SZ*(b<<k2), k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         return;
@@ -785,11 +993,11 @@ static void sd_fft_no_trunc_internal(
     if (k == 2)
     {
         /* k1 = 2; k2 = 0 */
-        sd_fft_no_trunc_block(Q, x, S, 2, j);
-        sd_fft_base_8_1(Q, x + BLK_SZ*(S*0), 4*j + 0);
-        sd_fft_base_8_0(Q, x + BLK_SZ*(S*1), 4*j + 1);
-        sd_fft_base_8_0(Q, x + BLK_SZ*(S*2), 4*j + 2);
-        sd_fft_base_8_0(Q, x + BLK_SZ*(S*3), 4*j + 3);
+        sd_fft_no_trunc_block(Q, x, 1, 2, j);
+        sd_fft_base_8_1(Q, x + BLK_SZ*0, 4*j + 0);
+        sd_fft_base_8_0(Q, x + BLK_SZ*1, 4*j + 1);
+        sd_fft_base_8_0(Q, x + BLK_SZ*2, 4*j + 2);
+        sd_fft_base_8_0(Q, x + BLK_SZ*3, 4*j + 3);
     }
     else if (k == 1)
     {
@@ -911,16 +1119,16 @@ static void sd_fft_trunc_block(
         FLINT_ASSERT(otrunc == 1);
         if (FLINT_UNLIKELY(j_bits == 0))
         {
-            _RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
+            RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong i = 0; do {
-                _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(VECND, X0 + i, X1 + i);
+                RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_Z(VECND, X0 + i, X1 + i);
             } while (i += N, i < BLK_SZ);
         }
         else
         {
-            _RADIX_2_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
+            RADIX_2_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
             ulong i = 0; do {
-                _RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(VECND, X0 + i, X1 + i);
+                RADIX_2_FORWARD_MOTH_TRUNC_2_1_J_IS_NZ(VECND, X0 + i, X1 + i);
             } while (i += N, i < BLK_SZ);
         }
     }
@@ -930,7 +1138,6 @@ static void sd_fft_trunc_block(
 static void sd_fft_trunc_internal(
     const sd_fft_ctx_t Q,
     double* x,      /* x = data + BLK_SZ*I  where I = starting index */
-    ulong S,        /* stride */
     ulong k,        /* transform length BLK_SZ*2^k */
     ulong j,
     ulong itrunc,   /* actual trunc is BLK_SZ*itrunc */
@@ -943,7 +1150,7 @@ static void sd_fft_trunc_internal(
     {
         for (ulong a = 0; a < otrunc; a++)
         {
-            double* X0 = x + BLK_SZ*(S*a);
+            double* X0 = x + BLK_SZ*a;
             VECND z = VECNOP(zero)();
             ulong i = 0; do {
                 VECNOP(store)(X0 + i, z);
@@ -955,7 +1162,7 @@ static void sd_fft_trunc_internal(
 
     if (itrunc == otrunc && otrunc == n_pow2(k))
     {
-        sd_fft_no_trunc_internal(Q, x, S, k, j);
+        sd_fft_no_trunc_internal(Q, x, k, j);
         return;
     }
 
@@ -974,32 +1181,32 @@ static void sd_fft_trunc_internal(
 
         /* columns */
         for (ulong a = 0; a < z2p; a++)
-            sd_fft_trunc_block(Q, x + BLK_SZ*(a*S), S << k2, k1, j, z1 + (a < z2), n1p);
+            sd_fft_trunc_block(Q, x + BLK_SZ*a, n_pow2(k2), k1, j, z1 + (a < z2), n1p);
 
         /* full rows */
         for (ulong b = 0; b < n1; b++)
-            sd_fft_trunc_internal(Q, x + BLK_SZ*(b*(S << k2)), S, k2, (j << k1) + b, z2p, l2);
+            sd_fft_trunc_internal(Q, x + BLK_SZ*(b << k2), k2, (j << k1) + b, z2p, l2);
 
         /* last partial row */
         if (n2 > 0)
-            sd_fft_trunc_internal(Q, x + BLK_SZ*(n1*(S << k2)), S, k2, (j << k1) + n1, z2p, n2);
+            sd_fft_trunc_internal(Q, x + BLK_SZ*(n1 << k2), k2, (j << k1) + n1, z2p, n2);
 
         return;
     }
 
     if (k == 2)
     {
-        sd_fft_trunc_block(Q, x, S, 2, j, itrunc, otrunc);
-                        sd_fft_base_8_1(Q, x + BLK_SZ*(S*0), 4*j + 0);
-        if (otrunc > 1) sd_fft_base_8_0(Q, x + BLK_SZ*(S*1), 4*j + 1);
-        if (otrunc > 2) sd_fft_base_8_0(Q, x + BLK_SZ*(S*2), 4*j + 2);
-        if (otrunc > 3) sd_fft_base_8_0(Q, x + BLK_SZ*(S*3), 4*j + 3);
+        sd_fft_trunc_block(Q, x, 1, 2, j, itrunc, otrunc);
+                        sd_fft_base_8_1(Q, x + BLK_SZ*0, 4*j + 0);
+        if (otrunc > 1) sd_fft_base_8_0(Q, x + BLK_SZ*1, 4*j + 1);
+        if (otrunc > 2) sd_fft_base_8_0(Q, x + BLK_SZ*2, 4*j + 2);
+        if (otrunc > 3) sd_fft_base_8_0(Q, x + BLK_SZ*3, 4*j + 3);
     }
     else if (k == 1)
     {
-        sd_fft_trunc_block(Q, x, S, 1, j, itrunc, otrunc);
-                        sd_fft_base_8_1(Q, x + BLK_SZ*(S*0), 2*j + 0);
-        if (otrunc > 1) sd_fft_base_8_0(Q, x + BLK_SZ*(S*1), 2*j + 1);
+        sd_fft_trunc_block(Q, x, 1, 1, j, itrunc, otrunc);
+                        sd_fft_base_8_1(Q, x + BLK_SZ*0, 2*j + 0);
+        if (otrunc > 1) sd_fft_base_8_0(Q, x + BLK_SZ*1, 2*j + 1);
     }
     else
     {
@@ -1011,13 +1218,14 @@ static void sd_fft_trunc_internal(
 /********************* interface functions ***********************/
 
 /*
-compute a truncated FFT inline in the array `d`, assuming terms beyond `itrunc`
-first terms are zero. The output satisfies
+Compute a truncated FFT in place in `d`, assuming all terms after the first `itrunc`
+are zero.
+
+The output satisfies
     eval_poly(in_data, sd_fft_ctx_w(Q, i)) = out_data[sd_fft_ctx_trunc_index(L, i)]
-Usually it only make sense to have `otrunc >= itrunc`.
-The array `d` need to have size at least the smallest power of 2 larger than or equal
-to `n_max(itrunc, otrunc)`. See [vdH2004]_.
-This function is tested in `test/t-sd_fft.c`.
+for all `0 <= i < otrunc`. This invariant is tested in `test/t-sd_fft.c`.
+Usually, it only makes sense to have `otrunc >= itrunc` and `n_max(itrunc, otrunc) >= 2^(L-1)`.
+The array `d` needs to have size at least `2^L`.
 */
 void sd_fft_trunc(
     sd_fft_ctx_t Q,
@@ -1040,7 +1248,7 @@ void sd_fft_trunc(
         for (int i = 0; i < ((-(int)itrunc)&(BLK_SZ-1)); i++)
             d[itrunc+i] = 0.0;
 
-        sd_fft_trunc_internal(Q, d, 1, L - LG_BLK_SZ, 0, new_itrunc, new_otrunc);
+        sd_fft_trunc_internal(Q, d, L - LG_BLK_SZ, 0, new_itrunc, new_otrunc);
         return;
     }
 
