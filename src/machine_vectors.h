@@ -57,6 +57,7 @@ typedef struct {__m256d e1, e2;} vec8d;
 # if defined(__AVX512F__)
 typedef __m512i vec8nz;
 typedef __m512d vec8dz;
+typedef struct {vec8dz e1, e2;} vec16dz;
 # endif
 
 
@@ -767,6 +768,44 @@ vec8dz_transpose(vec8dz* z0, vec8dz* z1, vec8dz* z2, vec8dz* z3,
     *z6 = vec8dz_permute2_128_1_3_5_7(u1, u5);
     *z7 = vec8dz_permute2_128_1_3_5_7(u3, u7);
 }
+
+/* vec16dz -- AVX512F *******************************************************/
+
+FLINT_FORCE_INLINE vec16dz vec16dz_set_d(double a) {
+    vec8dz z1 = vec8dz_set_d(a);
+    vec16dz z = {z1, z1};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec16dz vec16dz_load(const double* a) {
+    vec16dz z = {vec8dz_load(a + 0), vec8dz_load(a + 8)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec16dz vec16dz_load_aligned(const double* a) {
+    vec16dz z = {vec8dz_load_aligned(a + 0), vec8dz_load_aligned(a + 8)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec16dz vec16dz_load_unaligned(const double* a) {
+    vec16dz z = {vec8dz_load_unaligned(a + 0), vec8dz_load_unaligned(a + 8)};
+    return z;
+}
+
+FLINT_FORCE_INLINE void vec16dz_store(double* z, vec16dz a) {
+    vec8dz_store(z + 0, a.e1);
+    vec8dz_store(z + 8, a.e2);
+}
+
+FLINT_FORCE_INLINE void vec16dz_store_aligned(double* z, vec16dz a) {
+    vec8dz_store_aligned(z + 0, a.e1);
+    vec8dz_store_aligned(z + 8, a.e2);
+}
+
+FLINT_FORCE_INLINE void vec16dz_store_unaligned(double* z, vec16dz a) {
+    vec8dz_store_unaligned(z + 0, a.e1);
+    vec8dz_store_unaligned(z + 8, a.e2);
+}
 #endif
 
 
@@ -989,6 +1028,13 @@ EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
 EXTEND_VEC_DEF3(vec4n, vec8n, _addmod_limited)
 EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod)
 EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
+# if defined(__AVX512F__)
+EXTEND_VEC_DEF0(vec8dz, vec16dz, _zero)
+EXTEND_VEC_DEF2(vec8dz, vec16dz, _add)
+EXTEND_VEC_DEF2(vec8dz, vec16dz, _sub)
+EXTEND_VEC_DEF3(vec8dz, vec16dz, _reduce_to_pm1n)
+EXTEND_VEC_DEF4(vec8dz, vec16dz, _mulmod)
+# endif
 
 #undef EXTEND_VEC_DEF4
 #undef EXTEND_VEC_DEF3

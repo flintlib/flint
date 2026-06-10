@@ -691,7 +691,7 @@ static void sd_fft_basecase_5_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulon
 
 
 /* use with n = m-2 and m >= 6 */
-#define EXTEND_BASECASE(n, m) \
+#define EXTEND_BASECASE(n, m, VECND, N) \
 static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
 { \
     ulong l = n_pow2(m - 2); \
@@ -827,12 +827,15 @@ static void sd_fft_basecase_6_0(const sd_fft_ctx_t Q, double* X, ulong j_r, ulon
 
     sd_fft_store_vec8dz_basecase_order(X, x0,x1,x2,x3,x4,x5,x6,x7);
 }
+EXTEND_BASECASE(5, 7, vec16dz, 16)
+EXTEND_BASECASE(6, 8, vec16dz, 16)
+EXTEND_BASECASE(7, 9, vec16dz, 16)
 #else
-EXTEND_BASECASE(4, 6)
+EXTEND_BASECASE(4, 6, VECND, N)
+EXTEND_BASECASE(5, 7, VECND, N)
+EXTEND_BASECASE(6, 8, VECND, N)
+EXTEND_BASECASE(7, 9, VECND, N)
 #endif
-EXTEND_BASECASE(5, 7)
-EXTEND_BASECASE(6, 8)
-EXTEND_BASECASE(7, 9)
 #undef EXTEND_BASECASE
 
 /* The `sd_fft_base_{m}_*` functions take `j`, unlike `sd_fft_basecase_{m}_*`
