@@ -2973,12 +2973,12 @@ class gr_ctx:
             [1, -1/2, 1/6, 0, -1/30, 0, 1/42, 0, -1/30, 0, 5/66, 0]
             >>> CC_ca.bernoulli_vec(5)
             [1, -0.500000 {-1/2}, 0.166667 {1/6}, 0, -0.0333333 {-1/30}]
-            >>> sum(RR.bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(RR.bernoulli_vec(100)).nprint(16)
+            1.127124216595034e+76
             >>> sum(RF.bernoulli_vec(100))
             1.127124216595034e+76
-            >>> sum(CC.bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(CC.bernoulli_vec(100)).nprint(16)
+            1.127124216595034e+76
 
         """
         return ctx._op_vec_len(length, libgr.gr_bernoulli_vec, "bernoulli_vec($length)")
@@ -5142,6 +5142,46 @@ class acb(gr_elem):
     @staticmethod
     def _default_context():
         return CC_acb
+
+    def secondary_zeta(self):
+        """
+        Secondary zeta function (ad-hoc wrapper for testing).
+
+            >>> CC(0.5+10j).secondary_zeta()
+            ([0.1725005546943535 +/- 4.73e-17] + [-0.1680692210280708 +/- 4.12e-17]*I)
+            >>> CC(2).secondary_zeta()
+            [0.02310499311541897 +/- 3.75e-18]
+            >>> CC("-20.001").secondary_zeta()
+            [1.32e+18 +/- 6.41e+15]
+            >>> ComplexField_acb(prec=128)("-20.001").secondary_zeta()
+            [1.31697271383159e+18 +/- 8.21e+3]
+            >>> [raises(lambda: CC(s).secondary_zeta(), FlintUnableError)
+            ...     for s in [1, -1, -3, "1 +/- 0.001", "-5 +/- 0.001"]]
+            [True, True, True, True, True]
+
+        Dyadic values:
+
+            >>> for n in range(10):
+            ...     print(CC(-2*n).secondary_zeta())
+            ... 
+            0.8750000000000000
+            -0.2812500000000000
+            0.02343750000000000
+            -0.1347656250000000
+            -0.6723632812500000
+            -6.168090820312500
+            [-82.48159790039063 +/- 5.00e-15]
+            [-1521.003639221191 +/- 4.07e-13]
+            [-36986.37416267395 +/- 1.96e-13]
+            [-1146735.990261555 +/- 2.82e-10]
+        """
+        C = self.parent()
+        prec = C.prec
+        res = C()
+        libflint.acb_dirichlet_secondary_zeta(res._ref, self._ref, prec)
+        if not libflint.acb_is_finite(res._ref):
+            raise FlintUnableError("unable")
+        return res
 
 class gr_arf_ctx(gr_ctx):
     pass

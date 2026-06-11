@@ -767,6 +767,20 @@ mpmath [Joh2018b]_ by Juan Arias de Reyna, described in [Ari2012]_.
 
     Compute `S(g_n)` where `g_n` is the *n*-th Gram point. Requires `n \ge -1`.
 
+Functions of zeros
+-------------------------------------------------------------------------------
+
+.. function:: void acb_dirichlet_secondary_zeta(acb_t res, const acb_t s, slong prec)
+
+    Computes the secondary zeta function `Z(s) = \sum_{n=1}^{\infty} 1 / {\alpha^s_n}`
+    where `\rho_n = 1/2 + i \alpha_n` runs through the zeros of `\zeta(s)`
+    with positive imaginary part. The Riemann hypothesis is not presumed.
+    The algorithm follows [Ari2020]_ computing a decomposition
+    `Z(s) = A(s) - P(s) + E(s) - S(s)` where each term implicitly depends
+    on a free parameter `a > 0`. We implement an improved tail bound for the
+    *P* term and rigorous bounds for the *A* and *S* tails
+    replacing the heuristic bounds in [Ari2020]_.
+
 Riemann zeta function zeros (Platt's method)
 -------------------------------------------------------------------------------
 

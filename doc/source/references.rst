@@ -11,6 +11,8 @@ References
 
 .. [Ari2012] \J. Arias de Reyna, "Programs for Riemann's zeta function", (J. A. J. van Vonderen, Ed.) *Leven met getallen : liber amicorum ter gelegenheid van de pensionering van Herman te Riele* CWI (2012) 102-112, https://ir.cwi.nl/pub/19724
 
+.. [Ari2020] \J. Arias de Reyna, "Computation of the secondary zeta function", https://arxiv.org/abs/2006.04869
+
 .. [Arn2010] \J. Arndt, *Matters Computational*, Springer (2010), https://www.jjj.de/fxt/#fxtbook
 
 .. [Arn2012] \J. Arndt, "On computing the generalized Lambert series", https://arxiv.org/abs/1202.6525
