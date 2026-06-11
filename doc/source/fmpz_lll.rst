@@ -11,7 +11,8 @@ type ``fmpz_lll_t``. These objects contain all information about the
 options governing the reduction using this module's functions including the
 LLL parameters \delta and \eta, the representation type of the input matrix
 (whether it is a lattice basis or a Gram matrix), and the type of Gram
-matrix to be used during L^2 (approximate or exact).
+matrix to be used during L^2 (approximate or exact). There is no
+corresponding clear function since these objects do not allocate memory.
 
 .. function:: void fmpz_lll_context_init_default(fmpz_lll_t fl)
 
@@ -148,8 +149,12 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
     heuristic version (:func:`fmpz_lll_check_babai_heuristic_d`) for only one
     loop and switches right back to the fast version. It reduces ``B`` in
     place. ``U`` is the matrix used to capture the unimodular
-    transformations if it is not `NULL`. An exception is raised if `U` != `NULL`
-    and ``U->r`` != `d`, where `d` is the lattice dimension. ``fl`` is the
+    transformations if it is not `NULL`: the row operations applied to ``B``
+    are also applied to ``U``. To obtain the transformation matrix, set
+    ``U`` to the identity matrix (e.g. via :func:`fmpz_mat_one`) before
+    calling; a newly initialised matrix is zero and will remain zero. An
+    exception is raised if `U` != `NULL` and ``U->r`` != `d`, where `d` is
+    the lattice dimension. ``fl`` is the
     context object containing information containing the LLL parameters \delta
     and \eta. The function can perform reduction on both the lattice basis as
     well as its Gram matrix. The type of lattice representation can be
@@ -189,8 +194,12 @@ unreduced - that is to say, not do their job - includes (but is not necessarily 
     if needed.
 
     ``U`` is the matrix used to capture the unimodular
-    transformations if it is not `NULL`. An exception is raised if `U` != `NULL`
-    and ``U->r`` != `d`, where `d` is the lattice dimension. ``fl`` is the
+    transformations if it is not `NULL`: the row operations applied to ``B``
+    are also applied to ``U``. To obtain the transformation matrix, set
+    ``U`` to the identity matrix (e.g. via :func:`fmpz_mat_one`) before
+    calling; a newly initialised matrix is zero and will remain zero. An
+    exception is raised if `U` != `NULL` and ``U->r`` != `d`, where `d` is
+    the lattice dimension. ``fl`` is the
     context object containing information containing the LLL parameters \delta
     and \eta. The function can perform reduction on both the lattice basis as
     well as its Gram matrix. The type of lattice representation can be
@@ -263,8 +272,9 @@ ULLL
     numerically than traditional LLL which means higher dimensions can be
     attacked using doubles. In each iteration a new identity matrix is adjoined
     to the truncated lattice. ``UM`` is used to capture the unimodular
-    transformations, while ``gs_B`` and ``fl`` have the same role as in
-    the previous routines. The function is optimised for factoring polynomials.
+    transformations in the same way as ``U`` above, while ``gs_B`` and
+    ``fl`` have the same role as in the previous routines. The function
+    is optimised for factoring polynomials.
 
 
 LLL-reducedness
@@ -325,8 +335,12 @@ Main LLL functions
     LLL if required.
 
     ``U`` is the matrix used to capture the unimodular
-    transformations if it is not `NULL`. An exception is raised if `U` != `NULL`
-    and ``U->r`` != `d`, where `d` is the lattice dimension. ``fl`` is the
+    transformations if it is not `NULL`: the row operations applied to ``B``
+    are also applied to ``U``. To obtain the transformation matrix, set
+    ``U`` to the identity matrix (e.g. via :func:`fmpz_mat_one`) before
+    calling; a newly initialised matrix is zero and will remain zero. An
+    exception is raised if `U` != `NULL` and ``U->r`` != `d`, where `d` is
+    the lattice dimension. ``fl`` is the
     context object containing information containing the LLL parameters \delta
     and \eta. The function can perform reduction on both the lattice basis as
     well as its Gram matrix. The type of lattice representation can be
@@ -344,4 +358,5 @@ Main LLL functions
 
     This is the main LLL with removals function which should be called by
     the user. Like ``fmpz_lll`` it calls ULLL, but it also sets the
-    Gram-Schmidt bound to that supplied and does removals.
+    Gram-Schmidt bound to that supplied and does removals. ``U`` is as in
+    :func:`fmpz_lll`.
