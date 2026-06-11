@@ -279,6 +279,17 @@ Except where otherwise noted, the following rules apply:
     If *(x, xn)* is invertible modulo `B^n`, sets *(res, n)* to the inverse
     and returns 1. If *(x, xn)* is not invertible, returns 0.
 
+.. function:: int radix_divmod_bn_1(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, ulong b, slong n, const radix_t radix)
+              int radix_divmod_bn_classical(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+              int radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+              int radix_divmod_bn(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix)
+
+    Given *(a, an)* and *(b, bn)* with *b* invertible modulo the limb
+    radix B, develop *n* limbs of the B-adic (Hensel) quotient *q* with
+    `qb = a \bmod B^n`.
+    If *rem* is not NULL, the remainder `r = (a - qb)/B^n \bmod B^{bn}` is
+    written to *(rem, bn)*. This gives `a = qb + B^n rem \bmod B^{n+bn}`.
+
 .. function:: int radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
     Returns -1, 0 or 1 according to whether *(x, n)* is less, equal
