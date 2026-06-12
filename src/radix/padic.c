@@ -1192,7 +1192,7 @@ radix_padic_inv(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
        of x, which is also the sign of 1/x. Handles res aliasing x internally. */
     invertible = radix_integer_invmod_limbs(&res->u, &x->u, nlimbs, radix);
     if (!invertible)
-        return GR_UNABLE;                        /* defensive: should not happen */
+        flint_abort();  /* should not happen */
 
     res->v = vq;
     res->N = vq + krel;                          /* bounded; finalize clamps + truncates */

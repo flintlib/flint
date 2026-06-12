@@ -156,7 +156,7 @@ radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
                exact or 1 ulp too small. The latter is indicated by a
                nonzero m-1 limb (i.e. a borrow to be returned). */
             if (u[m - 1] != 0)
-                radix_add(u + m, u + m, n - m, &one, 1, radix);
+                radix_add(u + m, u + m, rxn - m, &one, 1, radix);
             radix_mulmid(res + m, u + m, rxn - m, res, m, 0, n - m, radix);
         }
         else
