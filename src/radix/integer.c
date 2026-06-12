@@ -688,6 +688,7 @@ radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, c
     {
         slong rn = FLINT_ABS(res->size);
         radix_neg(res->d, res->d, rn, radix);
+
         if (rn < n)
         {
             slong i;

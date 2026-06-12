@@ -141,6 +141,7 @@ radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an,
     {
         nn_ptr bq0h, dh, scratch;
         slong ah;
+        ulong bo;
 
         scratch = TMP_ALLOC(n * sizeof(ulong));
 
@@ -148,14 +149,21 @@ radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an,
         bq0h = TMP_ALLOC(nm * sizeof(ulong));
         _radix_mulhigh_known_low(bq0h, b, bn, qf, m, a, an, m, n, scratch, radix);
 
-        /* dh = (a - b*q0)[m, n) = a[m, n) - bq0h (no incoming borrow, since the
-           low m limbs of a - b*q0 vanish). */
+        /* dh = (a - b*q0)[m, n) = a[m, n) - bq0h, where a is zero above limb an.
+           No incoming borrow (the low m limbs of a - b*q0 vanish). Built without
+           a zero-padded operand: subtract where a has limbs, negate the rest,
+           fold in the borrow from the low subtraction. */
         dh = TMP_ALLOC(nm * sizeof(ulong));
         ah = (an > m) ? FLINT_MIN(an - m, nm) : 0;
+        bo = 0;
         if (ah > 0)
-            flint_mpn_copyi(dh, a + m, ah);
-        flint_mpn_zero(dh + ah, nm - ah);
-        radix_sub(dh, dh, nm, bq0h, nm, radix);
+            bo = radix_sub(dh, a + m, ah, bq0h, ah, radix);
+        if (ah < nm)
+        {
+            radix_neg(dh + ah, bq0h + ah, nm - ah, radix);
+            if (bo)
+                radix_sub(dh + ah, dh + ah, nm - ah, &bo, 1, radix);
+        }
 
         /* qh = y * dh mod B^{n-m} -> high n-m limbs (a low product) */
         radix_mulmid(qf + m, y, m, dh, nm, 0, nm, radix);
@@ -165,6 +173,7 @@ radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an,
     {
         nn_ptr prodh, scratch;
         slong ac;
+        ulong bo;
 
         scratch = TMP_ALLOC((n + bn) * sizeof(ulong));
 
@@ -172,12 +181,18 @@ radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an,
         prodh = TMP_ALLOC(bn * sizeof(ulong));
         _radix_mulhigh_known_low(prodh, qf, n, b, bn, a, an, n, n + bn, scratch, radix);
 
-        /* rem = (a - q*b)/B^n mod B^bn = a[n, n+bn) - prodh (no incoming borrow). */
+        /* rem = (a - q*b)/B^n mod B^bn = a[n, n+bn) - prodh, a zero above an.
+           No incoming borrow; built without a zero-padded operand. */
         ac = (an > n) ? FLINT_MIN(an - n, bn) : 0;
+        bo = 0;
         if (ac > 0)
-            flint_mpn_copyi(rem, a + n, ac);
-        flint_mpn_zero(rem + ac, bn - ac);
-        radix_sub(rem, rem, bn, prodh, bn, radix);
+            bo = radix_sub(rem, a + n, ac, prodh, ac, radix);
+        if (ac < bn)
+        {
+            radix_neg(rem + ac, prodh + ac, bn - ac, radix);
+            if (bo)
+                radix_sub(rem + ac, rem + ac, bn - ac, &bo, 1, radix);
+        }
     }
 
     flint_mpn_copyi(q, qf, n);
