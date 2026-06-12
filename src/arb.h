@@ -663,7 +663,9 @@ void _arb_vec_sub(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 void _arb_vec_add(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 
 void _arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
+void _arb_vec_scalar_mul_arf(arb_ptr res, arb_srcptr vec, slong len, const arf_t c, slong prec);
 void _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec);
+void _arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong prec);
 void _arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c);
 void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
 void _arb_vec_scalar_addmul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);

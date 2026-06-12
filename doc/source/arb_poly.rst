@@ -263,6 +263,8 @@ Arithmetic
 
 .. function:: void arb_poly_scalar_mul(arb_poly_t C, const arb_poly_t A, const arb_t c, slong prec)
 
+.. function:: void arb_poly_scalar_mul_si(arb_poly_t C, const arb_poly_t A, slong c, slong prec)
+
     Sets *C* to *A* multiplied by *c*.
 
 .. function:: void arb_poly_scalar_div(arb_poly_t C, const arb_poly_t A, const arb_t c, slong prec)

@@ -231,6 +231,15 @@ arb_poly_scalar_mul(arb_poly_t res, const arb_poly_t poly, const arb_t c, slong 
 }
 
 ARB_POLY_INLINE void
+arb_poly_scalar_mul_si(arb_poly_t res, const arb_poly_t poly, slong c, slong prec)
+{
+    arb_poly_fit_length(res, poly->length);
+    _arb_vec_scalar_mul_si(res->coeffs, poly->coeffs, poly->length, c, prec);
+    _arb_poly_set_length(res, poly->length);
+    _arb_poly_normalise(res);
+}
+
+ARB_POLY_INLINE void
 arb_poly_scalar_div(arb_poly_t res, const arb_poly_t poly, const arb_t c, slong prec)
 {
     arb_poly_fit_length(res, poly->length);

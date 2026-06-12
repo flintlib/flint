@@ -1975,9 +1975,13 @@ Vector functions
 
 .. function:: void _arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec)
 
+.. function:: void _arb_vec_scalar_mul_arf(arb_ptr res, arb_srcptr vec, slong len, const arf_t c, slong prec)
+
 .. function:: void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec)
 
 .. function:: void _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec)
+
+.. function:: void _arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong prec)
 
 .. function:: void _arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c)
 
