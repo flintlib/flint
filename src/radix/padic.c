@@ -98,7 +98,7 @@ _radix_integer_residue_eq_mod(const radix_integer_t x, const radix_integer_t y,
     slong k, const radix_t radix)
 {
     slong e = radix->exp;
-    slong limbs, rem, i, xs, ys;
+    slong limbs, rem, i, xs, ys, sig, loop_to;
 
     if (k <= 0)
         return 1;
@@ -108,13 +108,22 @@ _radix_integer_residue_eq_mod(const radix_integer_t x, const radix_integer_t y,
     xs = x->size;
     ys = y->size;
 
-    for (i = 0; i < limbs; i++)
+    /* both operands are zero in every limb at or above sig, so the residues can
+       only differ within the first sig limbs; this keeps the work O(unit size)
+       even when k (and hence limbs) is enormous. */
+    sig = FLINT_MAX(xs, ys);
+    loop_to = FLINT_MIN(limbs, sig);
+
+    for (i = 0; i < loop_to; i++)
     {
         ulong xv = (i < xs) ? x->d[i] : 0;
         ulong yv = (i < ys) ? y->d[i] : 0;
         if (xv != yv)
             return 0;
     }
+
+    if (limbs >= sig)
+        return 1;                       /* all higher digits (incl. rem) are 0 == 0 */
 
     if (rem != 0)
     {
@@ -128,6 +137,48 @@ _radix_integer_residue_eq_mod(const radix_integer_t x, const radix_integer_t y,
     }
 
     return 1;
+}
+
+/*
+    Whether the unit integers ux, uy (of either sign) are congruent modulo p^k.
+    Bounded by the operands' significant size: a nonnegative unit pads its high
+    digits with 0 and a negative unit pads with p-1, so once k passes the content
+    a sign mismatch is automatically incongruent and matching signs reduce to the
+    content. This avoids materialising a residue of ~k digits.
+*/
+static int
+_radix_units_congruent_mod(const radix_integer_t ux, const radix_integer_t uy,
+    slong k, const radix_t radix)
+{
+    slong e = radix->exp;
+    slong content;
+    int res;
+    radix_integer_t rx, ry;
+
+    if (k <= 0)
+        return 1;
+
+    if (ux->size >= 0 && uy->size >= 0)
+        return _radix_integer_residue_eq_mod(ux, uy, k, radix);
+
+    content = (FLINT_MAX(FLINT_ABS(ux->size), FLINT_ABS(uy->size)) + 1) * e;
+
+    if (k > content)
+    {
+        if ((ux->size < 0) != (uy->size < 0))
+            return 0;                   /* differ in the padding region within p^k */
+        k = content;                    /* identical padding: only the content matters */
+    }
+
+    /* k is now bounded by 'content' (a few limbs); compare nonnegative residues */
+    radix_integer_init(rx, radix);
+    radix_integer_init(ry, radix);
+    radix_integer_mod_digits_nonneg(rx, ux, k, radix);
+    radix_integer_mod_digits_nonneg(ry, uy, k, radix);
+    res = radix_integer_equal(rx, ry, radix);
+    radix_integer_clear(rx, radix);
+    radix_integer_clear(ry, radix);
+    return res;
 }
 
 /*
@@ -324,31 +375,6 @@ _radix_padic_finish(radix_padic_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-/* r = (value of x) mod p^k, nonnegative, as a radix_integer. Assumes x->v >= 0. */
-static void
-_radix_padic_value_mod_pk(radix_integer_t r, const radix_padic_t x, slong k, gr_ctx_t ctx)
-{
-    radix_struct * radix = RADIX_PADIC_CTX_RADIX(ctx);
-
-    if (x->u.size == 0 || k <= x->v || x->v < 0)
-    {
-        if (x->v < 0)
-        {
-            /* negative valuation not produced by the basic layer; be safe */
-            radix_integer_mod_digits_nonneg(r, &x->u, k, radix);
-        }
-        else
-        {
-            radix_integer_zero(r, radix);
-        }
-        return;
-    }
-
-    radix_integer_mod_digits_nonneg(r, &x->u, k - x->v, radix);
-    if (x->v != 0)
-        radix_integer_lshift_digits(r, r, x->v, radix);
-}
-
 /* ------------------------------------------------------------------------- */
 /*    Memory management                                                      */
 /* ------------------------------------------------------------------------- */
@@ -521,6 +547,9 @@ radix_padic_get_fmpz(fmpz_t res, const radix_padic_t x, gr_ctx_t ctx)
         fmpz_zero(res);
         return GR_SUCCESS;
     }
+
+    if (x->v > ctx->size_limit)
+        return GR_UNABLE;
 
     radix_integer_get_fmpz(res, &x->u, radix);
 
@@ -1250,23 +1279,11 @@ radix_padic_equal(const radix_padic_t x, const radix_padic_t y, gr_ctx_t ctx)
     if (err <= 0)
         return T_UNKNOWN;
 
-    /* a signed (negative) unit only occurs for exact elements; handle the rare
-       case with the temporary-based residue computation */
-    if (x->u.size < 0 || y->u.size < 0)
-    {
-        radix_integer_t rx, ry;
-        truth_t res;
-        radix_integer_init(rx, radix);
-        radix_integer_init(ry, radix);
-        _radix_padic_value_mod_pk(rx, x, err, ctx);
-        _radix_padic_value_mod_pk(ry, y, err, ctx);
-        res = radix_integer_equal(rx, ry, radix) ? T_UNKNOWN : T_FALSE;
-        radix_integer_clear(rx, radix);
-        radix_integer_clear(ry, radix);
-        return res;
-    }
-
-    /* both units nonnegative: decide x == y (mod p^err) structurally, no alloc */
+    /* Decide x == y (mod p^err) structurally from the valuations and units. The
+       lowest digit of a unit (either sign) sits at its valuation and is nonzero,
+       so differing valuations disagree at min(vx, vy); equal valuations reduce to
+       a unit congruence that _radix_units_congruent_mod settles in O(unit size),
+       regardless of how large err or the valuations are. */
     xz = (x->u.size == 0);
     yz = (y->u.size == 0);
 
@@ -1277,7 +1294,7 @@ radix_padic_equal(const radix_padic_t x, const radix_padic_t y, gr_ctx_t ctx)
     else if (yz)
         eq = (vx >= err);
     else if (vx == vy)
-        eq = _radix_integer_residue_eq_mod(&x->u, &y->u, err - vx, radix);
+        eq = _radix_units_congruent_mod(&x->u, &y->u, err - vx, radix);
     else
         eq = (FLINT_MIN(vx, vy) >= err);  /* differ at the lower valuation if it is within the horizon */
 
@@ -1305,11 +1322,7 @@ radix_padic_randtest(radix_padic_t res, flint_rand_t state, gr_ctx_t ctx)
     /* the limits mode is only meaningful for an inexact ring (it produces
        error terms and over-large valuations that an exact ring cannot hold) */
     int limits = (RADIX_PADIC_CTX_FLAGS(ctx) & RADIX_PADIC_TEST_LIMITS)
-              // FIXME: some operations still fail with huge val/N if
-              // one does not bound both precisions
-              // && !ctx_exact
               && RADIX_PADIC_CTX_PREC_REL(ctx) != RADIX_PADIC_PREC_INF
-              && RADIX_PADIC_CTX_PREC_ABS(ctx) != RADIX_PADIC_PREC_INF
               && (n_randint(state, 2) == 0);
 
     slong nlimbs, sz;

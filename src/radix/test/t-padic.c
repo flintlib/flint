@@ -26,7 +26,8 @@ TEST_FUNCTION_START(radix_padic, state)
         slong prec_abs, prec_rel;
         int flags = 0;
 
-        if (n_randint(state, 2)) flags |= RADIX_PADIC_SIGNED;
+        if (n_randint(state, 2))
+            flags |= RADIX_PADIC_SIGNED;
 
         switch (n_randint(state, 4))
         {
@@ -52,6 +53,10 @@ TEST_FUNCTION_START(radix_padic, state)
             flags |= RADIX_PADIC_TEST_LIMITS;
 
         gr_ctx_init_radix_padic(ctx, p, prec_rel, prec_abs, flags);
+
+        /* allow get_fmpz roundtrip to return unable for huge test values */
+        if (flags & RADIX_PADIC_TEST_LIMITS)
+            ctx->size_limit = (1 << 16);
 
         gr_test_ring(ctx, 30, 0);
 
