@@ -190,15 +190,14 @@ _radix2_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t ra
     L = 0;
     while (ed[L] > e)
     {
-        if (L > 100) flint_abort();
         ed[L + 1] = (ed[L] + 3) / 2;
         L++;
     }
 
     TMP_START;
-    y2 = TMP_ALLOC(n * sizeof(ulong));
-    w  = TMP_ALLOC(n * sizeof(ulong));
-    t  = TMP_ALLOC(n * sizeof(ulong));
+    y2 = TMP_ALLOC((n + 1) * sizeof(ulong));
+    w  = TMP_ALLOC((n + 1) * sizeof(ulong));
+    t  = TMP_ALLOC((n + 1) * sizeof(ulong));
 
     for (k = L - 1; k >= 0; k--)
     {
@@ -248,7 +247,14 @@ radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radi
 
     if (DIGIT_RADIX(radix) == 2)
     {
-        _radix2_rsqrtmod_bn(res, x, xn, n, radix);
+        /* XXX: _radix2_rsqrtmod_bn use need one extra limb internally */
+        TMP_START;
+        t = TMP_ALLOC((n + 1) * sizeof(ulong));
+        t[0] = res[0];
+        t[n] = 0;
+        _radix2_rsqrtmod_bn(t, x, xn, n, radix);
+        flint_mpn_copyi(res, t, n);
+        TMP_END;
         return 1;
     }
 

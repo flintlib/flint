@@ -1475,8 +1475,12 @@ radix_padic_is_square(const radix_padic_t x, gr_ctx_t ctx)
     }
 
     ulong d = x->u.d[0];
+
     if (x->u.size < 0)
         d = p - d;
+
+    if (p == 2)
+        return ((d & 7) == 1) ? T_TRUE : T_FALSE;
 
     return (n_jacobi_unsigned(nmod_set_ui(d, radix->b), p) == 1) ? T_TRUE : T_FALSE;
 }
