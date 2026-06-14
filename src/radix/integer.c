@@ -836,6 +836,112 @@ radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n
     return invertible;
 }
 
+/* res = a reciprocal square root of x modulo B^n, i.e. res^2 x == 1 (mod B^n).
+   x must be a unit (x->d[0] coprime to p). Returns 1 on success, 0 if x is zero
+   or not a square modulo p (in which case res is set to zero). */
+int
+radix_integer_rsqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong xsize, xn, rn;
+    int ok;
+    nn_ptr rd;
+    nn_srcptr xd;
+
+    if (n == 0)
+    {
+        radix_integer_zero(res, radix);
+        return 1;
+    }
+
+    xsize = x->size;
+    if (xsize == 0)
+        return 0;                       /* zero has no reciprocal square root */
+
+    xn = FLINT_ABS(xsize);
+    xn = FLINT_MIN(xn, n);
+
+    rn = n;
+    rd = radix_integer_fit_limbs(res, n, radix);
+    xd = x->d;
+
+    if (res == x)
+    {
+        TMP_INIT;
+        TMP_START;
+        nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * xn);
+        flint_mpn_copyi(tmp, xd, xn);
+        ok = radix_rsqrtmod_bn(rd, tmp, xn, n, radix);
+        TMP_END;
+    }
+    else
+    {
+        ok = radix_rsqrtmod_bn(rd, xd, xn, n, radix);
+    }
+
+    if (!ok)
+    {
+        radix_integer_zero(res, radix);
+        return 0;
+    }
+
+    MPN_NORM(rd, rn);
+    res->size = rn;                     /* canonical nonnegative unit */
+    return 1;
+}
+
+/* res = a square root of x modulo B^n, i.e. res^2 == x (mod B^n). x must be a
+   unit (x->d[0] coprime to p). Returns 1 on success, 0 if x is zero or not a
+   square modulo p (in which case res is set to zero). */
+int
+radix_integer_sqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong xsize, xn, rn;
+    int ok;
+    nn_ptr rd;
+    nn_srcptr xd;
+
+    if (n == 0)
+    {
+        radix_integer_zero(res, radix);
+        return 1;
+    }
+
+    xsize = x->size;
+    if (xsize == 0)
+        return 0;                       /* zero handled by the caller's valuation */
+
+    xn = FLINT_ABS(xsize);
+    xn = FLINT_MIN(xn, n);
+
+    rn = n;
+    rd = radix_integer_fit_limbs(res, n, radix);
+    xd = x->d;
+
+    if (res == x)
+    {
+        TMP_INIT;
+        TMP_START;
+        nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * xn);
+        flint_mpn_copyi(tmp, xd, xn);
+        ok = radix_sqrtmod_bn(rd, tmp, xn, n, radix);
+        TMP_END;
+    }
+    else
+    {
+        ok = radix_sqrtmod_bn(rd, xd, xn, n, radix);
+    }
+
+    if (!ok)
+    {
+        radix_integer_zero(res, radix);
+        return 0;
+    }
+
+    MPN_NORM(rd, rn);
+    res->size = rn;                     /* canonical nonnegative root */
+    return 1;
+}
+
 static ulong
 radix_cdivrem(nn_ptr q, nn_ptr r, nn_srcptr a, slong an, nn_srcptr b, slong bn, const radix_t radix)
 {

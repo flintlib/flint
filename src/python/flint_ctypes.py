@@ -9722,6 +9722,18 @@ def test_is_vector_space():
         assert R.is_real_vector_space()
         assert R.is_complex_vector_space()
 
+def test_padic():
+    Q7 = Qp_radix_padic(7, rel_prec=10)
+    assert str(Q7(7) * Q7(7)) == "(1) * 7^2"
+    assert Q7(0).sqrt() == 0
+    assert Q7(1).sqrt() == 1
+    assert Q7(4).sqrt() == 2
+    assert str(Q7(2).sqrt()) == "(266983762) + O(7^10)"
+    assert str((1/(1/Q7(4))).sqrt()) == "(2) + O(7^10)"
+    assert raises(lambda: Q7(3).sqrt(), FlintDomainError)
+    assert raises(lambda: Q7(5).sqrt(), FlintDomainError)
+    assert raises(lambda: Q7(6).sqrt(), FlintDomainError)
+
 
 if __name__ == "__main__":
     from time import time

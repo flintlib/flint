@@ -56,6 +56,10 @@ Radix objects
 
     Initializes to a randomly chosen radix.
 
+.. function:: void radix_init_randtest_prime(radix_t radix, flint_rand_t state)
+
+    Initializes to a randomly chosen radix with `b` a prime number.
+
 .. function:: ulong radix_digit_radix(const radix_t radix)
               ulong radix_limb_radix(const radix_t radix)
               ulong radix_limb_exponent(const radix_t radix)
@@ -290,6 +294,20 @@ Except where otherwise noted, the following rules apply:
     If *rem* is not NULL, the remainder `r = (a - qb)/B^n \bmod B^{bn}` is
     written to *(rem, bn)*. This gives `a = qb + B^n rem \bmod B^{n+bn}`.
 
+.. function:: int radix_sqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
+
+    The digit radix is assumed to be a prime number `p`, with limb
+    radix exponent `e \ge 3` if `p = 2`.
+    If *(x, xn)* is a unit and a perfect square modulo `p` (modulo 8 if `p = 2`),
+    sets *(res, n)* to a square root modulo `B^n` and returns 1. Otherwise
+    returns 0. We choose the square root with the smallest nonnegative
+    residue mod `p`.
+
+.. function:: int radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
+
+    Computes the reciprocal of the square root computed by
+    :func:`radix_rsqrtmod_bn`, with the same meaning of the return flag.
+
 .. function:: int radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
     Returns -1, 0 or 1 according to whether *(x, n)* is less, equal
@@ -509,6 +527,11 @@ Memory-managed integers
     and returns 1. The sign of the input is preserved.
     If *x* is not invertible, returns 0.
 
+.. function:: int radix_integer_rsqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              int radix_integer_sqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+
+    Square root modulo `B^n`: see :func:`radix_sqrtmod_bn` and
+    :func:`radic_rsqrtmod_bn`.
 
 p-adic numbers
 --------------------------------------------------------------------------------
@@ -603,4 +626,7 @@ As a special case, we always set `v = 0` when `u = 0`.
               int radix_padic_inv(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
               int radix_padic_div(radix_padic_t res, const radix_padic_t x, const radix_padic_t y, gr_ctx_t ctx)
               truth_t radix_padic_is_invertible(const radix_padic_t x, gr_ctx_t ctx)
+              int radix_padic_sqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
+              int radix_padic_rsqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
+              truth_t radix_padic_is_square(const radix_padic_t x, gr_ctx_t ctx)
 

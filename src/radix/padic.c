@@ -878,6 +878,8 @@ radix_padic_mul(radix_padic_t res, const radix_padic_t x, const radix_padic_t y,
     slong vx = x->v, vy = y->v, Nx = x->N, Ny = y->N;
     slong vz, Nz, xn, yn, target;
 
+    //return _radix_padic_mul_reference(res, x, y, ctx);
+
     /* an exact zero annihilates exactly */
     if ((x->u.size == 0 && Nx == RADIX_PADIC_EXACT)
      || (y->u.size == 0 && Ny == RADIX_PADIC_EXACT))
@@ -922,7 +924,7 @@ radix_padic_mul(radix_padic_t res, const radix_padic_t x, const radix_padic_t y,
         {
             slong digits = target - vz;                    /* exact digits permitted */
             slong maxD = (xn + yn) * e;                    /* upper bound on product digits */
-            slong minD = (xn + yn - 1) * e + 1;            /* lower bound on product digits */
+            slong minD = (xn + yn - 2) * e + 1;            /* lower bound on product digits */
 
             if (digits <= 0)
             {
@@ -1200,6 +1202,393 @@ radix_padic_inv(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
     return _radix_padic_finalize_assume_canonical(res, ctx);
 }
 
+/* TODO: optimize this */
+/*
+    If the exact unit u = x->u is a perfect square, store its terminating square
+    root in res->u and return 1; otherwise return 0. On entry res->u holds one
+    square root of u modulo B^M (M limbs, as produced by radix_integer_sqrtmod_
+    limbs); the terminating root, if it exists, is that value or its negation
+    modulo B^M (both are checked by squaring and comparing against the full u).
+*/
+static int
+_radix_padic_exact_unit_sqrt(radix_padic_t res, const radix_padic_t x, slong M,
+    const radix_t radix)
+{
+    ulong p = DIGIT_RADIX(radix);
+    slong ncand = (p == 2) ? 4 : 2;     /* a unit square has 4 roots mod 2^n */
+    nn_ptr root, c, sq, d;
+    slong i, k, sqn, cn, rs, cmp_limbs;
+    int found = 0, neg = 0;
+    TMP_INIT;
+
+    if (x->u.size <= 0)         /* a perfect-square exact unit is positive */
+        return 0;
+
+    TMP_START;
+    root = TMP_ALLOC(M * sizeof(ulong));
+    c    = TMP_ALLOC(M * sizeof(ulong));
+    sq   = TMP_ALLOC(2 * M * sizeof(ulong));
+
+    /* the canonical branch residue r, zero-extended to M limbs */
+    rs = FLINT_MIN(FLINT_ABS(res->u.size), M);
+    flint_mpn_copyi(root, res->u.d, rs);
+    flint_mpn_zero(root + rs, M - rs);
+
+    /* limbs of r that are reliable for the sign test: all but the top limb,
+       whose top bit is the one the 2-adic root leaves undetermined. */
+    cmp_limbs = (M > 1) ? (M - 1) : 1;
+
+    /* candidates: root, -root, and (for p = 2) root + B^M/2, -root + B^M/2. The
+       candidate that squares (as an exact integer) to x->u is the small positive
+       integer root s; only s, not B^M - s, can match exactly. */
+    for (k = 0; k < ncand && !found; k++)
+    {
+        if (k & 1)
+            radix_neg(c, root, M, radix);
+        else
+            flint_mpn_copyi(c, root, M);
+
+        if (k >= 2)             /* add B^M/2 = 2^{eM-1} in the top limb (p = 2) */
+        {
+            ulong h = UWORD(1) << (radix->exp - 1);
+            ulong t = c[M - 1] + h;
+            if (t >= LIMB_RADIX(radix))
+                t -= LIMB_RADIX(radix);     /* mod B; carry out of B^M dropped */
+            c[M - 1] = t;
+        }
+
+        radix_mulmid(sq, c, M, c, M, 0, 2 * M, radix);   /* c^2 (full product) */
+        sqn = 2 * M;
+        MPN_NORM(sq, sqn);
+
+        if (sqn == x->u.size)
+        {
+            int eq = 1;
+            for (i = 0; i < sqn; i++)
+                if (sq[i] != x->u.d[i]) { eq = 0; break; }
+
+            if (eq)
+            {
+                /* c == s, the small positive integer root. The two p-adic roots
+                   are +s and -s; the canonical branch is whichever is congruent
+                   to r (mod p^k). Store that signed integer so the exact root
+                   agrees with the finite-precision result on every shared digit.
+                   r == s (on the reliable limbs) selects +s, otherwise -s (whose
+                   nonnegative residue B^M - s equals r). */
+                neg = 0;
+                for (i = 0; i < cmp_limbs; i++)
+                    if (root[i] != c[i]) { neg = 1; break; }
+                found = 1;
+            }
+        }
+    }
+
+    if (found)
+    {
+        cn = M;
+        MPN_NORM(c, cn);
+        if (cn == 0)
+            cn = 1;                 /* the root of a unit is nonzero */
+        d = radix_integer_fit_limbs(&res->u, cn, radix);
+        flint_mpn_copyi(d, c, cn);
+        res->u.size = neg ? -cn : cn;   /* signed, consistent with the branch */
+    }
+
+    TMP_END;
+    return found;
+}
+
+/*
+    square modulo p (modulo 8 for p = 2). The relative precision of the root
+    equals that of x, capped by the context precisions, exactly as for inv/div.
+    A definite zero gives the exact zero; an unknown (inexact) zero gives
+    GR_UNABLE; an odd valuation or a non-residue unit gives GR_DOMAIN. The branch
+    is pinned to a canonical representative, and when the input is exact and a
+    perfect square the exact (terminating) root is returned regardless of the
+    context precision.
+*/
+int
+radix_padic_sqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
+{
+    radix_struct * radix = RADIX_PADIC_CTX_RADIX(ctx);
+    slong e = radix->exp;
+    slong vx = x->v, Nx = x->N;
+    slong prec_abs = RADIX_PADIC_CTX_PREC_ABS(ctx);
+    slong prec_rel = RADIX_PADIC_CTX_PREC_REL(ctx);
+    slong vq, rel, relcap, krel, nlimbs, loss, kin, ndet;
+    truth_t xz;
+    int issquare, input_exact;
+    radix_integer_t unit;
+
+    input_exact = (Nx == RADIX_PADIC_EXACT);
+
+    xz = radix_padic_is_zero(x, ctx);
+    if (xz == T_TRUE)
+        return radix_padic_zero(res, ctx);       /* sqrt(0) = 0 (exact) */
+    if (xz == T_UNKNOWN)
+        return GR_UNABLE;                        /* x not known to be nonzero */
+
+    /* A square has even valuation. */
+    if (vx & WORD(1))
+        return GR_DOMAIN;
+    vq = vx / 2;
+
+    /* x = + p^vx exactly (unit 1) has the exact root + p^{vq}. (Other exact
+       units have an infinite root expansion, truncated to context precision
+       below.) */
+    if (Nx == RADIX_PADIC_EXACT && x->u.size == 1 && x->u.d[0] == 1)
+    {
+        radix_integer_fit_limbs(&res->u, 1, radix)[0] = 1;
+        res->u.size = 1;
+        res->v = vq;
+        res->N = RADIX_PADIC_EXACT;
+        return _radix_padic_finalize_assume_canonical(res, ctx);
+    }
+
+    /* Relative precision of the root. sqrt preserves relative precision for odd
+       p, but the 2-adic square root loses one bit (d/dt t^2 = 2t has valuation 1),
+       so an input known to relative precision 'rel' determines the root only to
+       'rel - loss'. This loss applies to the input-limited term only: when the
+       context's relative cap binds and the input still has bits to spare, the
+       capped bits are all determined. Dropping the one unreliable bit is what
+       makes sqrt a single precision-independent function (a lower-precision
+       result is the truncation of a higher-precision one). */
+    loss = (DIGIT_RADIX(radix) == 2) ? 1 : 0;
+
+    rel = (Nx == RADIX_PADIC_EXACT) ? RADIX_PADIC_PREC_INF : (Nx - vx);
+    if (rel != RADIX_PADIC_PREC_INF)
+        rel = FLINT_MAX(rel - loss, 0);          /* input-limited root precision */
+
+    relcap = RADIX_PADIC_PREC_INF;
+    if (prec_rel != RADIX_PADIC_PREC_INF)
+        relcap = prec_rel;
+    if (prec_abs != RADIX_PADIC_PREC_INF)
+    {
+        slong c = prec_abs - vq;                 /* bounded: no overflow */
+        relcap = (relcap == RADIX_PADIC_PREC_INF) ? c : FLINT_MIN(relcap, c);
+    }
+
+    if (rel == RADIX_PADIC_PREC_INF && relcap == RADIX_PADIC_PREC_INF)
+        krel = RADIX_PADIC_PREC_INF;             /* exact ring, infinite expansion */
+    else if (rel == RADIX_PADIC_PREC_INF)
+        krel = relcap;
+    else if (relcap == RADIX_PADIC_PREC_INF)
+        krel = rel;
+    else
+        krel = FLINT_MIN(rel, relcap);
+
+    if (krel != RADIX_PADIC_PREC_INF && krel > RADIX_PADIC_ERR_MAX)
+        krel = RADIX_PADIC_ERR_MAX;
+
+    /* Input precision to develop: one bit beyond the delivered root precision so
+       that the unreliable top bit is computed for headroom and then truncated away
+       by the finalizer, leaving every delivered bit pinned. */
+    kin = (krel == RADIX_PADIC_PREC_INF) ? RADIX_PADIC_PREC_INF
+        : (krel > RADIX_PADIC_ERR_MAX - loss ? RADIX_PADIC_ERR_MAX : krel + loss);
+
+    /* Develop the unit root. If the input is exact the root may terminate (x a
+       perfect square), and detecting that needs about half of u's limbs no matter
+       what the context precision is -- this is what lets sqrt(4) = 2 exactly even
+       in a finite-precision ring. Otherwise develop kin = krel + loss relative
+       bits. Non-squareness is read from radix_integer_sqrtmod_limbs, which finds
+       the root modulo p itself, so it is never recomputed here. */
+    ndet = input_exact ? (FLINT_ABS(x->u.size) / 2 + 2) : 0;
+
+    if (krel == RADIX_PADIC_PREC_INF)
+        nlimbs = ndet;                              /* exact ring implies input exact */
+    else if (kin <= 0)
+        nlimbs = 1;
+    else
+        nlimbs = (kin + e - 1) / e;
+
+    if (input_exact && ndet > nlimbs)
+        nlimbs = ndet;                              /* enough to detect termination */
+
+    /* Materialise the unit's nonnegative residue modulo p^{e*nlimbs} (this also
+       resolves a signed exact unit), then take its square root. */
+    radix_integer_init(unit, radix);
+    radix_integer_mod_digits_nonneg(unit, &x->u, e * nlimbs, radix);
+    issquare = radix_integer_sqrtmod_limbs(&res->u, unit, nlimbs, radix);
+    radix_integer_clear(unit, radix);
+
+    if (!issquare)
+        return GR_DOMAIN;                            /* unit is not a square mod p */
+
+    /* Exact input + perfect-square unit: return the exact (terminating) root, with
+       the sign matching the canonical branch so the exact result agrees with the
+       finite-precision result on every shared digit. Works in any context. */
+    if (input_exact &&
+        _radix_padic_exact_unit_sqrt(res, x, (ndet > 0 ? ndet : nlimbs), radix))
+    {
+        res->v = vq;
+        res->N = RADIX_PADIC_EXACT;
+        return _radix_padic_finalize_assume_canonical(res, ctx);
+    }
+
+    if (krel == RADIX_PADIC_PREC_INF)
+        return GR_UNABLE;       /* exact ring: an irrational root cannot be exact */
+
+    if (krel <= 0)
+    {
+        /* root is zero to the tracked precision */
+        radix_integer_zero(&res->u, radix);
+        res->v = 0;
+        res->N = vq + krel;                          /* bounded; finalize clamps */
+        return _radix_padic_finalize_assume_canonical(res, ctx);
+    }
+
+    res->v = vq;
+    res->N = vq + krel;                              /* bounded; finalize clamps + truncates */
+
+    return _radix_padic_finalize_assume_canonical(res, ctx);
+}
+
+/*
+    Whether x is a square. A square has even valuation and a unit that is a square
+    in Z_p: for odd p this is decided by the single low digit (a quadratic residue
+    modulo p, which always lifts), and that digit is always known; for p = 2 it
+    needs the unit modulo 8, so a relative precision below 3 is undecided. A
+    definite zero is a square; an inexact (unknown) zero is undecided.
+*/
+truth_t
+radix_padic_is_square(const radix_padic_t x, gr_ctx_t ctx)
+{
+    radix_struct * radix = RADIX_PADIC_CTX_RADIX(ctx);
+    ulong p = DIGIT_RADIX(radix);
+    truth_t xz;
+
+    xz = radix_padic_is_zero(x, ctx);
+    if (xz == T_TRUE)
+        return T_TRUE;                  /* 0 = 0^2 */
+    if (xz == T_UNKNOWN)
+        return T_UNKNOWN;               /* inexact zero: cannot tell */
+
+    if (x->v & WORD(1))
+        return T_FALSE;                 /* a square has even valuation */
+
+    if (p == 2)
+    {
+        slong rel = (x->N == RADIX_PADIC_EXACT)
+            ? RADIX_PADIC_PREC_INF : (x->N - x->v);
+        if (rel != RADIX_PADIC_PREC_INF && rel < 3)
+            return T_UNKNOWN;           /* need the unit modulo 8 */
+    }
+
+    ulong d = x->u.d[0];
+    if (x->u.size < 0)
+        d = p - d;
+
+    return (n_jacobi_unsigned(nmod_set_ui(d, radix->b), p) == 1) ? T_TRUE : T_FALSE;
+}
+
+/*
+    Reciprocal square root x^{-1/2}. Computed directly from
+    radix_integer_rsqrtmod_limbs (the same primitive that underlies sqrt), not by
+    inverting sqrt. The unit's reciprocal root carries valuation -v/2; relative
+    precision and the one-bit 2-adic loss are handled exactly as for sqrt. The
+    branch is pinned to the reciprocal of the canonical square root, so
+    rsqrt(x) * sqrt(x) == 1. GR_DOMAIN when x is not a square (odd valuation or a
+    non-residue unit) or is a definite zero; GR_UNABLE when x is not known nonzero,
+    or in the exact ring when the reciprocal root has an infinite expansion (every
+    case except x = +p^v, whose reciprocal root is the exact + p^{-v/2}).
+*/
+int
+radix_padic_rsqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
+{
+    radix_struct * radix = RADIX_PADIC_CTX_RADIX(ctx);
+    slong e = radix->exp;
+    slong vx = x->v, Nx = x->N;
+    slong prec_abs = RADIX_PADIC_CTX_PREC_ABS(ctx);
+    slong prec_rel = RADIX_PADIC_CTX_PREC_REL(ctx);
+    slong vq, vr, rel, relcap, krel, nlimbs, loss, kin;
+    truth_t xz;
+    int issquare;
+    radix_integer_t unit;
+
+    xz = radix_padic_is_zero(x, ctx);
+    if (xz == T_TRUE)
+        return GR_DOMAIN;                        /* 1/sqrt(0) is undefined */
+    if (xz == T_UNKNOWN)
+        return GR_UNABLE;                        /* x not known to be nonzero */
+
+    if (vx & WORD(1))
+        return GR_DOMAIN;                        /* a square has even valuation */
+    vq = vx / 2;
+    vr = -vq;                                    /* valuation of x^{-1/2} */
+
+    /* x = + p^vx exactly (unit 1) has the exact reciprocal root + p^{-vq}. */
+    if (Nx == RADIX_PADIC_EXACT && x->u.size == 1 && x->u.d[0] == 1)
+    {
+        radix_integer_fit_limbs(&res->u, 1, radix)[0] = 1;
+        res->u.size = 1;
+        res->v = vr;
+        res->N = RADIX_PADIC_EXACT;
+        return _radix_padic_finalize_assume_canonical(res, ctx);
+    }
+
+    loss = (DIGIT_RADIX(radix) == 2) ? 1 : 0;
+
+    rel = (Nx == RADIX_PADIC_EXACT) ? RADIX_PADIC_PREC_INF : (Nx - vx);
+    if (rel != RADIX_PADIC_PREC_INF)
+        rel = FLINT_MAX(rel - loss, 0);
+
+    relcap = RADIX_PADIC_PREC_INF;
+    if (prec_rel != RADIX_PADIC_PREC_INF)
+        relcap = prec_rel;
+    if (prec_abs != RADIX_PADIC_PREC_INF)
+    {
+        slong c = prec_abs - vr;                 /* absolute cap relative to vr = -vq */
+        relcap = (relcap == RADIX_PADIC_PREC_INF) ? c : FLINT_MIN(relcap, c);
+    }
+
+    if (rel == RADIX_PADIC_PREC_INF && relcap == RADIX_PADIC_PREC_INF)
+        krel = RADIX_PADIC_PREC_INF;             /* exact ring */
+    else if (rel == RADIX_PADIC_PREC_INF)
+        krel = relcap;
+    else if (relcap == RADIX_PADIC_PREC_INF)
+        krel = rel;
+    else
+        krel = FLINT_MIN(rel, relcap);
+
+    if (krel != RADIX_PADIC_PREC_INF && krel > RADIX_PADIC_ERR_MAX)
+        krel = RADIX_PADIC_ERR_MAX;
+
+    kin = (krel == RADIX_PADIC_PREC_INF) ? RADIX_PADIC_PREC_INF
+        : (krel > RADIX_PADIC_ERR_MAX - loss ? RADIX_PADIC_ERR_MAX : krel + loss);
+
+    /* Develop the reciprocal unit root. In the exact ring the result is infinite
+       (the unit-1 case is already returned above), so one limb is enough to decide
+       squareness; otherwise develop kin = krel + loss relative bits. Non-squareness
+       is read directly from radix_integer_rsqrtmod_limbs. */
+    if (krel == RADIX_PADIC_PREC_INF || kin <= 0)
+        nlimbs = 1;
+    else
+        nlimbs = (kin + e - 1) / e;
+
+    radix_integer_init(unit, radix);
+    radix_integer_mod_digits_nonneg(unit, &x->u, e * nlimbs, radix);
+    issquare = radix_integer_rsqrtmod_limbs(&res->u, unit, nlimbs, radix);
+    radix_integer_clear(unit, radix);
+
+    if (!issquare)
+        return GR_DOMAIN;                        /* unit is not a square mod p */
+
+    if (krel == RADIX_PADIC_PREC_INF)
+        return GR_UNABLE;       /* exact ring: an infinite reciprocal root */
+
+    if (krel <= 0)
+    {
+        radix_integer_zero(&res->u, radix);
+        res->v = 0;
+        res->N = vr + krel;
+        return _radix_padic_finalize_assume_canonical(res, ctx);
+    }
+
+    res->v = vr;
+    res->N = vr + krel;
+    return _radix_padic_finalize_assume_canonical(res, ctx);
+}
+
 /* ------------------------------------------------------------------------- */
 /*    Predicates                                                             */
 /* ------------------------------------------------------------------------- */
@@ -1325,19 +1714,15 @@ radix_padic_randtest(radix_padic_t res, flint_rand_t state, gr_ctx_t ctx)
               && RADIX_PADIC_CTX_PREC_REL(ctx) != RADIX_PADIC_PREC_INF
               && (n_randint(state, 2) == 0);
 
-    slong nlimbs, sz;
-    nn_ptr d;
+    if (n_randint(state, 2))
+        radix_integer_set_si(&res->u, n_randint(state, 5) - 2, radix);
+    else
+        radix_integer_randtest_limbs(&res->u, state, 1 + n_randint(state, 10), radix);
 
-    nlimbs = 1 + n_randint(state, 3);
-    d = radix_integer_fit_limbs(&res->u, nlimbs, radix);
-    radix_rand_limbs(d, state, nlimbs, radix);
-    sz = _norm(d, nlimbs);
-    res->u.size = sz;
+    if (!RADIX_PADIC_CTX_SIGNED(ctx))
+        radix_integer_abs(&res->u, &res->u, radix);
 
-    if (sz != 0 && RADIX_PADIC_CTX_SIGNED(ctx) && (n_randlimb(state) & 1))
-        res->u.size = -sz;
-
-    if (limits)
+    if (limits && (n_randint(state, 4) == 0))
     {
         /* valuation and precision at or just inside the representable range, so
            that subsequent operations push the intermediate exponents over the
@@ -1505,6 +1890,9 @@ gr_method_tab_input _radix_padic_methods_input[] =
     {GR_METHOD_MUL,             (gr_funcptr) radix_padic_mul},
     {GR_METHOD_INV,             (gr_funcptr) radix_padic_inv},
     {GR_METHOD_DIV,             (gr_funcptr) radix_padic_div},
+    {GR_METHOD_SQRT,            (gr_funcptr) radix_padic_sqrt},
+    {GR_METHOD_RSQRT,           (gr_funcptr) radix_padic_rsqrt},
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) radix_padic_is_square},
     {0,                         (gr_funcptr) NULL},
 };
 

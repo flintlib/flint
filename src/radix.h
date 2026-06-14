@@ -69,6 +69,7 @@ typedef radix_struct radix_t[1];
 void radix_init(radix_t radix, ulong b, unsigned int exp);
 void radix_clear(radix_t radix);
 void radix_init_randtest(radix_t radix, flint_rand_t state);
+void radix_init_randtest_prime(radix_t radix, flint_rand_t state);
 
 RADIX_INLINE ulong radix_digit_radix(const radix_t radix) { return radix->b.n; }
 RADIX_INLINE ulong radix_limb_radix(const radix_t radix) { return radix->B.n; }
@@ -187,6 +188,11 @@ radix_mul_two(nn_ptr res, nn_srcptr a, slong an, const radix_t radix)
     return radix_add(res, a, an, a, an, radix);
 }
 
+void
+_radix_mulhigh_known_low(nn_ptr out, nn_srcptr x, slong xn, nn_srcptr y, slong yn,
+    nn_srcptr kl, slong kl_len, slong klo, slong khi, nn_ptr scratch,
+    const radix_t radix);
+
 /* Division */
 
 ulong radix_divrem_1(nn_ptr res, nn_srcptr a, slong an, ulong d, const radix_t radix);
@@ -247,6 +253,10 @@ int radix_divmod_bn_classical(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_sr
 int radix_divmod_bn_karp_markstein(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix);
 int radix_divmod_bn(nn_ptr q, nn_ptr rem, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong n, const radix_t radix);
 
+/* Modular square roots */
+
+int radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
+int radix_sqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
 
 /* Radix conversion */
 
@@ -395,6 +405,8 @@ void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slon
 
 void radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix);
 int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+int radix_integer_rsqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+int radix_integer_sqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 
 int radix_integer_div(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 void radix_integer_divexact(radix_integer_t q, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
@@ -492,6 +504,10 @@ int radix_padic_sub(radix_padic_t res, const radix_padic_t x, const radix_padic_
 int radix_padic_mul(radix_padic_t res, const radix_padic_t x, const radix_padic_t y, gr_ctx_t ctx);
 int radix_padic_inv(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx);
 int radix_padic_div(radix_padic_t res, const radix_padic_t x, const radix_padic_t y, gr_ctx_t ctx);
+int radix_padic_sqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx);
+int radix_padic_rsqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx);
+truth_t radix_padic_is_square(const radix_padic_t x, gr_ctx_t ctx);
+
 truth_t radix_padic_is_zero(const radix_padic_t x, gr_ctx_t ctx);
 truth_t radix_padic_is_one(const radix_padic_t x, gr_ctx_t ctx);
 truth_t radix_padic_is_neg_one(const radix_padic_t x, gr_ctx_t ctx);

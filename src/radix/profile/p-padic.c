@@ -32,7 +32,7 @@ int main()
 
     flint_printf("precision %wu^n, limb radix = %wu^%wd\n\n", p, p, radix->exp);
 
-    for (op = 0; op < 9; op++)
+    for (op = 0; op < 11; op++)
     {
         if (op == 0)
             flint_printf("x + y  (same valuation)\n");
@@ -52,6 +52,10 @@ int main()
             flint_printf("x / y\n");
         else if (op == 8)
             flint_printf("x / 100\n");
+        else if (op == 9)
+            flint_printf("sqrt(y)\n");
+        else if (op == 10)
+            flint_printf("sqrt(100)\n");
 
         for (n = 10; n <= 11000000; n *= 2)
         {
@@ -92,10 +96,10 @@ int main()
             do
             {
                 fmpz_randm(fy, state, pn);
-            } while (fmpz_divisible_ui(fy, p));
+            } while (fmpz_divisible_ui(fy, p) || (op == 9 && fmpz_fdiv_ui(fy, p) != 1));
 
 
-            if (op == 4 || op == 6 || op == 8)
+            if (op == 4 || op == 6 || op == 8 || op == 10)
                 fmpz_set_ui(fy, 100);
 
             padic_set_fmpz(px, fx, pctx);
@@ -154,6 +158,15 @@ int main()
                 TIMEIT_STOP_VALUES(__, t1);
                 TIMEIT_START;
                 radix_padic_div(rz, rx, ry, ctx);
+                TIMEIT_STOP_VALUES(__, t2);
+            }
+            else if (op == 9 || op == 10)
+            {
+                TIMEIT_START;
+                padic_sqrt(pz, py, pctx);
+                TIMEIT_STOP_VALUES(__, t1);
+                TIMEIT_START;
+                radix_padic_sqrt(rz, ry, ctx);
                 TIMEIT_STOP_VALUES(__, t2);
             }
 

@@ -34,7 +34,9 @@
 #include "t-padic.c"
 #include "t-rshift.c"
 #include "t-rsqrt_1_approx.c"
+#include "t-rsqrtmod_bn.c"
 #include "t-set_mpn.c"
+#include "t-sqrtmod_bn.c"
 #include "t-sub.c"
 
 /* Array of test functions ***************************************************/
@@ -64,7 +66,9 @@ test_struct tests[] =
     TEST_FUNCTION(radix_padic),
     TEST_FUNCTION(radix_rshift),
     TEST_FUNCTION(radix_rsqrt_1_approx),
+    TEST_FUNCTION(radix_rsqrtmod_bn),
     TEST_FUNCTION(radix_set_mpn),
+    TEST_FUNCTION(radix_sqrtmod_bn),
     TEST_FUNCTION(radix_sub),
 };
 

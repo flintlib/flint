@@ -99,6 +99,47 @@ TEST_FUNCTION_START(radix_padic, state)
             radix_padic_clear(r2, ctx);
         }
 
+        /* Check consistency of square root */
+        for (slong j = 0; j < 10; j++)
+        {
+            radix_padic_t x, y, r1, r2;
+            int s1, s2;
+
+            radix_padic_init(x, ctx);
+            radix_padic_init(y, ctx);
+            radix_padic_init(r1, ctx);
+            radix_padic_init(r2, ctx);
+
+            GR_IGNORE(gr_randtest(x, state, ctx));
+            GR_IGNORE(gr_randtest(r1, state, ctx));
+            GR_IGNORE(gr_randtest(r2, state, ctx));
+
+            y->N = n_randint(state, 10);
+            GR_MUST_SUCCEED(radix_padic_add(y, x, y, ctx));
+
+            s1 = radix_padic_sqrt(r1, x, ctx);
+            s2 = radix_padic_sqrt(r2, y, ctx);
+
+            if ((s1 == GR_SUCCESS && s2 == GR_SUCCESS && radix_padic_equal(r1, r2, ctx) == T_FALSE)
+                || (s1 == GR_SUCCESS && s2 == GR_DOMAIN) || (s1 == GR_DOMAIN && s2 == GR_SUCCESS))
+            {
+                flint_printf("FAIL: p-adic sqrt\n");
+                flint_printf("s1 = %d\n", s1);
+                flint_printf("s2 = %d\n", s2);
+                flint_printf("x = "); gr_println(x, ctx);
+                flint_printf("y = "); gr_println(y, ctx);
+                flint_printf("r1 = "); gr_println(r1, ctx);
+                flint_printf("r2 = "); gr_println(r2, ctx);
+                flint_abort();
+            }
+
+            radix_padic_clear(x, ctx);
+            radix_padic_clear(y, ctx);
+            radix_padic_clear(r1, ctx);
+            radix_padic_clear(r2, ctx);
+        }
+
+
         gr_ctx_clear(ctx);
     }
 
