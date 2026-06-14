@@ -1345,6 +1345,10 @@ radix_padic_sqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
         return _radix_padic_finalize_assume_canonical(res, ctx);
     }
 
+    /* Unit must be known mod 2^3 */
+    if (DIGIT_RADIX(radix) == 2 && Nx - vx < 3)
+        return GR_UNABLE;
+
     /* Relative precision of the root. sqrt preserves relative precision for odd
        p, but the 2-adic square root loses one bit (d/dt t^2 = 2t has valuation 1),
        so an input known to relative precision 'rel' determines the root only to
