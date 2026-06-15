@@ -247,7 +247,7 @@ radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radi
 
     if (DIGIT_RADIX(radix) == 2)
     {
-        /* XXX: _radix2_rsqrtmod_bn use need one extra limb internally */
+        /* XXX: _radix2_rsqrtmod_bn may use one extra limb internally */
         TMP_START;
         t = TMP_ALLOC((n + 1) * sizeof(ulong));
         t[0] = res[0];

@@ -4,7 +4,7 @@
 ===============================================================================
 
 This module implements multiprecision `p`-adic numbers for word-size `p`
-using base `p^e` limbs building on the :ref:`radix` module.
+using base `p^e` limbs building on the :ref:`radix <radix>` module.
 By default the limb radix is chosen as large as possible,
 e.g. `p = 7` will use radix `7^{22}` internally on a 64-bit machine.
 The limb radix is mainly an implementation detail: most user-facing
@@ -42,7 +42,7 @@ not introduce an `O(x^N)` term as long as the result is exact.
 One can set `a = +\infty` to work with relative precision only
 and `r = +\infty` to work with absolute precision only.
 If both are set to `+\infty`, we effectively restrict all arithmetic to exact
-operations in the subring `\mathbb{Z}[1/p] \in \mathbb{Q}_p`.
+operations in the subring `\mathbb{Z}[1/p] \subset \mathbb{Q}_p`.
 
 .. macro:: RADIX_PADIC_EXACT
 
@@ -52,7 +52,7 @@ operations in the subring `\mathbb{Z}[1/p] \in \mathbb{Q}_p`.
 
     Upper bound for admissible `N`: `O(x^N)` will automatically be
     clamped to this bound. Also, negative `N` underflowing
-    the negation of this value will trigger a `GR_UNABLE` status flag.
+    the negation of this value will trigger a ``GR_UNABLE`` status flag.
 
 .. macro:: RADIX_PADIC_PREC_INF
 
