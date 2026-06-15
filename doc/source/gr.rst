@@ -928,6 +928,13 @@ Ordering methods
 Enclosure and interval methods
 ........................................................................
 
+.. function:: int gr_big_o(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
+    In a structure (typically a discrete valuation ring) with
+    big-O enclosures, return a big-O error term of the same magnitude as the
+    given element. For example, in a ring of formal power series `R[[t]]`,
+    `O(2t^3 + t^4)` returns `O(t^3)`.
+
 .. function:: int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx)
 
     In ball representations of the real numbers, sets *res* to

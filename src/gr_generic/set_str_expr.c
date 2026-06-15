@@ -86,6 +86,7 @@ static const function1 functions1[] = {
     { "tanpi", 5, GR_METHOD_TAN_PI },
     { "gamma", 5, GR_METHOD_GAMMA },
     { "zeta", 4, GR_METHOD_ZETA },
+    { "O", 1, GR_METHOD_BIG_O },
 };
 
 #define NUM_FUNCTIONS1 (sizeof(functions1) / sizeof(function1))

@@ -1071,6 +1071,32 @@ class gr_ctx:
         else:
             return ctx._op_vec_ctx(libgr.gr_gens, "gens")
 
+    def O(ctx, x):
+        """
+        Return a big-O error term with the magnitude of the given
+        element.
+
+            >>> ZZser
+            Power series over Integer ring (fmpz) with precision O(x^6)
+            >>> x = ZZser.gen()
+            >>> ZZser.O(x**4)
+            0 + O(x^4)
+            >>> ZZser.O(3)
+            0 + O(x^0)
+            >>> ZZser.O(0)
+            0
+            >>> ZZser.O(5*x**3 + 7*x**4)
+            0 + O(x^3)
+            >>> ZZser.O(x**100)
+            0 + O(x^6)
+            >>> 3*x + 5*x**4 + ZZser.O(x**3)
+            3*x + O(x^3)
+            >>> QQser("1/3 + x/5 - O(x^2)")
+            (1/3) + (1/5)*x + O(x^2)
+
+        """
+        return ctx._unary_op(x, libgr.gr_big_o, "O($x)")
+
     def zero(ctx):
         """
         The zero element of this domain.

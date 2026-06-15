@@ -598,6 +598,8 @@ typedef enum
     GR_METHOD_GENS,
     GR_METHOD_GENS_RECURSIVE,
 
+    GR_METHOD_BIG_O,
+
     /* Finite field methods */
     GR_METHOD_CTX_FQ_PRIME,
     GR_METHOD_CTX_FQ_DEGREE,
@@ -1209,6 +1211,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr
 GR_INLINE WARN_UNUSED_RESULT int gr_gen(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, GEN)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gens(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS_RECURSIVE)(res, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_big_o(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, BIG_O)(res, x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }

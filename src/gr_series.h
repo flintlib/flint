@@ -103,6 +103,7 @@ WARN_UNUSED_RESULT int gr_series_set(gr_series_t res, const gr_series_t x, gr_ct
 WARN_UNUSED_RESULT int gr_series_gen(gr_series_t res, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_neg(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_series_big_o(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_set_gr_poly(gr_series_t res, const gr_poly_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_set_scalar(gr_series_t res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_set_si(gr_series_t res, slong c, gr_ctx_t ctx);

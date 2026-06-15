@@ -184,6 +184,42 @@ gr_series_one(gr_series_t res, gr_ctx_t ctx)
     }
 }
 
+int
+gr_series_big_o(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
+{
+    slong xlen, val;
+    int status = GR_SUCCESS;
+    truth_t is_zero;
+
+    xlen = GR_SERIES_POLY(x)->length;
+
+    if (xlen == 0)
+    {
+        val = GR_SERIES_ERROR(x);
+    }
+    else
+    {
+        val = 0;
+        while (val < xlen)
+        {
+            is_zero = gr_series_coeff_is_zero(x, val, ctx);
+            if (is_zero == T_UNKNOWN)
+                break;   /* Alternative: return GR_UNABLE */
+            if (is_zero == T_FALSE)
+                break;
+            val++;
+        }
+
+        /* Defensive */
+        val = FLINT_MIN(val, GR_SERIES_ERROR(x));
+    }
+
+    status |= gr_poly_zero(GR_SERIES_POLY(res), GR_SERIES_ELEM_CTX(ctx));
+    GR_SERIES_ERROR(res) = val;
+
+    return status;
+}
+
 /* todo: truncate without set */
 int
 gr_series_set(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
@@ -2122,6 +2158,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_GEN,         (gr_funcptr) gr_series_gen},
     {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE,  (gr_funcptr) gr_series_gens_recursive},
+    {GR_METHOD_BIG_O,       (gr_funcptr) gr_series_big_o},
     {GR_METHOD_SET,         (gr_funcptr) gr_series_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) gr_series_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) gr_series_set_si},
