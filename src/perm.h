@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2026 Ricardo Buring
 
     This file is part of FLINT.
 
@@ -138,6 +139,39 @@ int _perm_randtest(slong * vec, slong n, flint_rand_t state);
 /* Parity ********************************************************************/
 
 int _perm_parity(const slong * vec, slong n);
+
+/* Iteration *****************************************************************/
+
+PERM_INLINE int _perm_next_lex(slong *perm, slong n)
+{
+    slong k = n-2;
+    while (k >= 0 && perm[k] >= perm[k+1])
+        k--;
+    if (k < 0)
+        return 0;
+    slong l = n-1;
+    while (l >= k && perm[k] >= perm[l])
+        l--;
+    FLINT_SWAP(slong, perm[k], perm[l]);
+    slong i = k+1, j = n-1;
+    while (i < j) {
+        FLINT_SWAP(slong, perm[i], perm[j]);
+        i++;
+        j--;
+    }
+    return 1;
+}
+
+PERM_INLINE int _perm_next_heap(slong *perm, slong n, slong *stack)
+{
+    slong sp = 1;
+    while (sp < n && stack[sp] >= sp)
+        stack[sp++] = 0;
+    if (sp == n) return 0;
+    FLINT_SWAP(slong, perm[sp % 2 ? stack[sp] : 0], perm[sp]);
+    stack[sp]++;
+    return 1;
+}
 
 #define _long_vec_print _Pragma("GCC error \"'_long_vec_print(vec, len)' is deprecated. Use 'flint_printf(\"%{slong*}\", vec, len)' instead.\"")
 #define _perm_print _Pragma("GCC error \"'_perm_print(vec, len)' is deprecated. Use 'flint_printf(\"%{slong*}\", vec, len)' instead.\"")
