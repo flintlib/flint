@@ -76,6 +76,7 @@
 #include "t-rising_ui_series.c"
 #include "t-root_bound_fujiwara.c"
 #include "t-rsqrt_series.c"
+#include "t-scalar_mul_si.c"
 #include "t-set_trunc_round.c"
 #include "t-shift_left_right.c"
 #include "t-sin_cos_pi_series.c"
@@ -163,6 +164,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_rising_ui_series),
     TEST_FUNCTION(acb_poly_root_bound_fujiwara),
     TEST_FUNCTION(acb_poly_rsqrt_series),
+    TEST_FUNCTION(acb_poly_scalar_mul_si),
     TEST_FUNCTION(acb_poly_set_trunc_round),
     TEST_FUNCTION(acb_poly_shift_left_right),
     TEST_FUNCTION(acb_poly_sin_cos_pi_series),
