@@ -228,6 +228,7 @@ set(_BUILD_DIRS
     fq_zech_embed
     padic                           padic_mat       padic_poly
     qadic
+    radix_padic
 
     nmod_poly_factor                fmpz_factor
     fmpz_poly_factor                fmpz_mod_poly_factor

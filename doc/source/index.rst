@@ -298,6 +298,7 @@ p-adic numbers
    padic_poly.rst
    padic_mat.rst
    qadic.rst
+   radix_padic.rst
 
 Floating-point support code
 -----------------------------------

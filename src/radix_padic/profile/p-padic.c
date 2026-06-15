@@ -14,6 +14,7 @@
 #include "gr.h"
 #include "profiler.h"
 #include "radix.h"
+#include "radix_padic.h"
 #include "padic.h"
 #include "nmod.h"
 

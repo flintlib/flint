@@ -10,7 +10,7 @@
 */
 
 #include "test_helpers.h"
-#include "radix.h"
+#include "radix_padic.h"
 #include "gr.h"
 #include "fmpz.h"
 

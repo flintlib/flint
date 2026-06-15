@@ -31,7 +31,6 @@
 #include "t-mulmid_KS.c"
 #include "t-n_divrem.c"
 #include "t-neg.c"
-#include "t-padic.c"
 #include "t-rshift.c"
 #include "t-rsqrt_1_approx.c"
 #include "t-rsqrtmod_bn.c"
@@ -63,7 +62,6 @@ test_struct tests[] =
     TEST_FUNCTION(radix_mulmid_KS),
     TEST_FUNCTION(radix_n_divrem),
     TEST_FUNCTION(radix_neg),
-    TEST_FUNCTION(radix_padic),
     TEST_FUNCTION(radix_rshift),
     TEST_FUNCTION(radix_rsqrt_1_approx),
     TEST_FUNCTION(radix_rsqrtmod_bn),
