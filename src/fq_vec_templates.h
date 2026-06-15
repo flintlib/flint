@@ -101,6 +101,21 @@ void _TEMPLATE3(T, vec_scalar_mul, T) (TEMPLATE(T, struct) * vec1,
                                   slong len2, const TEMPLATE(T, t) x,
                                   const TEMPLATE(T, ctx_t) ctx);
 
+void _TEMPLATE(T, vec_scalar_mul_fmpz) (TEMPLATE(T, struct) * vec1,
+                                  const TEMPLATE(T, struct) * vec2,
+                                  slong len2, const fmpz_t x,
+                                  const TEMPLATE(T, ctx_t) ctx);
+
+void _TEMPLATE(T, vec_scalar_mul_si) (TEMPLATE(T, struct) * vec1,
+                                  const TEMPLATE(T, struct) * vec2,
+                                  slong len2, const slong x,
+                                  const TEMPLATE(T, ctx_t) ctx);
+
+void _TEMPLATE(T, vec_scalar_mul_ui) (TEMPLATE(T, struct) * vec1,
+                                  const TEMPLATE(T, struct) * vec2,
+                                  slong len2, const ulong x,
+                                  const TEMPLATE(T, ctx_t) ctx);
+
 /* ****************************************************************************/
 void _TEMPLATE(T, vec_dot)(TEMPLATE(T, t) res,
                       const TEMPLATE(T, struct) * vec1,
