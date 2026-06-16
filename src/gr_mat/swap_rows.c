@@ -14,9 +14,13 @@
 
 int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 {
-    /* todo: bounds checking */
+    if (r < 0 || r >= mat->r || s < 0 || s >= mat->r)
+        return GR_DOMAIN;
 
-    if (r != s && gr_mat_is_empty(mat, ctx) == T_FALSE)
+    if (r == s)
+        return GR_SUCCESS;
+
+    if (gr_mat_is_empty(mat, ctx) == T_FALSE)
     {
         slong sz = ctx->sizeof_elem;
 
