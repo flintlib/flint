@@ -1,5 +1,5 @@
 project('FLINT', 'c', 'cpp',
-  version: '3.2.0-dev',
+  version: '3.6.0-dev',
   license: 'LGPL3+',
   meson_version: '>=1.1.0',
   default_options: [
@@ -11,8 +11,12 @@ project('FLINT', 'c', 'cpp',
 
 FLINT_MAJOR = meson.project_version().split('.')[0]
 FLINT_MINOR = meson.project_version().split('.')[1]
-FLINT_PATCH = meson.project_version().split('.')[2]
+FLINT_PATCH = meson.project_version().split('.')[2].split('-')[0]
 FLINT_VERSION_FULL = meson.project_version()
+FLINT_MAJOR_SO = '24'
+FLINT_MINOR_SO = '0'
+FLINT_PATCH_SO = '0'
+FLINT_LIBRARY_VERSION = '.'.join([FLINT_MAJOR_SO, FLINT_MINOR_SO, FLINT_PATCH_SO])
 
 cc = meson.get_compiler('c')
 fs = import('fs')
@@ -52,6 +56,8 @@ libflint = library('flint', c_files_all + headers_all,
   dependencies: flint_deps,
   include_directories: [headers_built_nodir_inc, 'src'],
   install: true,
+  version: FLINT_LIBRARY_VERSION,
+  soversion: FLINT_MAJOR_SO,
   c_args: [
     '-DBUILDING_FLINT',
     '-DFLINT_NOSTDIO',
@@ -72,7 +78,7 @@ endif
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
   libraries: libflint,
-  version : '3.1.0',
+  version : meson.project_version(),
   name: 'flint',
   filebase: 'flint',
   description: 'Fast Library for Number Theory'
