@@ -77,6 +77,21 @@ gmp_long_long_limb = cc.compiles('''
 #endif
 ''')
 
+if gmp_long_long_limb
+  cfg_data.set('FLINT_LONG_LONG', 1,
+    description: 'Define to use long long limbs')
+endif
+
+gmp_64_bit_limb = cc.compiles('''
+#include <gmp.h>
+#if GMP_LIMB_BITS != 64
+# error GMP_LIMB_BITS != 64
+#endif
+''', dependencies: gmp_dep, name: 'GMP_LIMB_BITS is 64')
+
+cfg_data.set('FLINT_BITS', gmp_64_bit_limb ? 64 : 32,
+  description: 'Define according to the ABI FLINT was compiled with')
+
 # We need to check with cc.links rather than cc.has_function etc because we
 # are checking if we can link symbols not in the headers.
 
