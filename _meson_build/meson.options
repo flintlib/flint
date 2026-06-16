@@ -8,6 +8,8 @@ option('reentrant', type : 'feature', value : 'disabled',
         description: 'Build the reentrant module')
 option('thread_safe', type : 'feature', value : 'enabled',
         description: 'Build the threadsafe module')
+option('abi', type : 'combo', choices : ['auto', '32', '64'], value : 'auto',
+        description: 'Target ABI')
 option('assert', type : 'feature', value : 'disabled',
         description: 'Enable assertions')
 option('pretty_tests', type : 'feature', value : 'enabled',

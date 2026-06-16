@@ -42,6 +42,10 @@ add_project_arguments(
 )
 
 subdir('config')
+
+add_project_arguments(flint_abi_c_args, language: ['c', 'cpp'])
+add_project_link_arguments(flint_abi_c_args, language: ['c', 'cpp'])
+
 subdir('src')
 
 if have_assembly

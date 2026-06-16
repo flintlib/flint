@@ -14,6 +14,7 @@ libtool_lock_opt = get_option('libtool_lock')
 pthread_opt = get_option('pthread')
 reentrant_opt = get_option('reentrant')
 thread_safe_opt = get_option('thread_safe')
+abi_opt = get_option('abi')
 assert_opt = get_option('assert')
 pretty_tests_opt = get_option('pretty_tests')
 gmp_internals_opt = get_option('gmp_internals')
@@ -78,14 +79,24 @@ if gmp_long_long_limb
     description: 'Define to use long long limbs')
 endif
 
+flint_abi_c_args = []
+if abi_opt != 'auto'
+  abi_flag = '-m' + abi_opt
+  if not cc.has_argument(abi_flag)
+    error(meson.get_compiler('c').get_id() + ' does not support ' + abi_flag)
+  endif
+  flint_abi_c_args += abi_flag
+  flint_bits = abi_opt == '64' ? 64 : 32
+else
 gmp_64_bit_limb = cc.compiles('''
 #include <gmp.h>
 #if GMP_LIMB_BITS != 64
 # error GMP_LIMB_BITS != 64
 #endif
-''', dependencies: gmp_dep, name: 'GMP_LIMB_BITS is 64')
+''', args: flint_abi_c_args, dependencies: gmp_dep, name: 'GMP_LIMB_BITS is 64')
 
 flint_bits = gmp_64_bit_limb ? 64 : 32
+endif
 
 cfg_data.set('FLINT_BITS', flint_bits,
   description: 'Define according to the ABI FLINT was compiled with')
@@ -104,6 +115,8 @@ int main() {
 }
 '''
 
+gmp_abi_error_suffix = abi_opt == 'auto' ? '' : ' for ABI ' + abi_opt + ' (check that GMP/MPFR are built for this ABI)'
+
 gmp_base_tests = {
   'mpz_init': ['', 'mpz_t x; __gmpz_init(x);'],
   'mpn_mul_basecase': [
@@ -114,9 +127,9 @@ gmp_base_tests = {
 
 foreach name, snippets : gmp_base_tests
   _code = gmp_test_code.format(snippets[0], snippets[1])
-  if not cc.links(_code, dependencies: gmp_dep, name: name + ' links')
+  if not cc.links(_code, args: flint_abi_c_args, dependencies: gmp_dep, name: name + ' links')
     message('This code did not link with -lgmp: ', _code)
-    error('GMP does not have ' + name)
+    error('GMP does not have ' + name + gmp_abi_error_suffix)
   endif
 endforeach
 
@@ -132,10 +145,10 @@ if gmp_internals_opt.allowed()
 
   foreach name, snippets : gmp_internals_required
     _code = gmp_test_code.format(snippets[0], snippets[1])
-    if not cc.links(_code, dependencies: gmp_dep, name: name + ' links')
+    if not cc.links(_code, args: flint_abi_c_args, dependencies: gmp_dep, name: name + ' links')
       message('This code did not link with -lgmp: ', _code)
       # Maybe disable gmp_internals rather than error?
-      error('GMP does not have ' + name)
+      error('GMP does not have ' + name + gmp_abi_error_suffix)
     endif
   endforeach
 
