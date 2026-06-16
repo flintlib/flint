@@ -61,6 +61,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_scalar_mul_fmpz, state)
         TEMPLATE(T, mat_clear)(C, ctx);
         TEMPLATE(T, mat_clear)(D, ctx);
         fmpz_clear(c);
+        TEMPLATE(T, ctx_clear)(ctx);
     }
 
     TEST_FUNCTION_END(state);

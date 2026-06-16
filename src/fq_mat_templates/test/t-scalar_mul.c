@@ -60,6 +60,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_scalar_mul, state)
         TEMPLATE(T, mat_clear)(C, ctx);
         TEMPLATE(T, mat_clear)(D, ctx);
         TEMPLATE(T, clear)(c, ctx);
+        TEMPLATE(T, ctx_clear)(ctx);
     }
 
     TEST_FUNCTION_END(state);
