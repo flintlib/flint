@@ -62,7 +62,7 @@ libflint = library('flint', c_files_all + headers_all,
     '-DBUILDING_FLINT',
     '-DFLINT_NOSTDIO',
     '-DFLINT_NOSTDARG',
-  ]
+  ] + flint_cpu_c_args
 )
 
 tests_opt = get_option('tests')

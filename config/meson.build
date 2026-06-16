@@ -222,6 +222,10 @@ message('EXACT CPU:', exact_cpu)
 
 gcc_cflags = '-O3 -pedantic -std=c11'
 gcc_warnings = '-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow'
+gcc_cflags_optlist = ''
+gcc_cflags_arch = ''
+gcc_cflags_tune = ''
+flint_cpu_c_args = []
 
 # We only try to provide specifics for those systems that currently supports
 # our assembly routines. If more combinations are wished for than what is
@@ -347,6 +351,10 @@ if host_machine.cpu_family() == 'aarch64'
 
   elif exact_cpu.startswith('applem3')
     gcc_cflags_arch = '-march=armv8.6-a'
+    gcc_cflags_tune = ''
+
+  elif exact_cpu.startswith('applem4')
+    gcc_cflags_arch = '-march=armv8.7-a'
     gcc_cflags_tune = ''
 
   elif exact_cpu.startswith('aarch64') or exact_cpu.startswith('armv8')
@@ -482,7 +490,7 @@ elif host_machine.cpu_family() == 'x86_64' and exact_cpu in X86_64_ADX_CPU_NAMES
 elif host_machine.cpu_family() == 'x86_64'
 
   # NOTE: We do not care if the user specifies noavx!
-  gcc_cflags = '$gcc_cflags'
+  gcc_cflags = gcc_cflags
   gcc_cflags_optlist = 'arch'
   asm_path = ''
   param_path = 'x86_64'
@@ -543,6 +551,31 @@ else
 
 endif
 
+# Probe and collect CPU-specific compiler flags. For architecture flags, the
+# autotools build treats a whitespace-separated list as ordered fallbacks.
+foreach opt : gcc_cflags_optlist.split()
+  candidate_flags = get_variable('gcc_cflags_' + opt, '').split()
+  found_single = false
+
+  foreach flag : candidate_flags
+    if found_single
+      break
+    endif
+
+    if cc.has_argument(flag)
+      flint_cpu_c_args += flag
+      if opt == 'arch'
+        found_single = true
+      endif
+    elif opt == 'arch'
+      flint_cv_have_fft_small_x86_i = 'no'
+      flint_cv_have_fft_small_arm_i = 'no'
+    endif
+  endforeach
+endforeach
+
+message('CPU-specific C arguments:', ' '.join(flint_cpu_c_args))
+
 # -----------------------------------------------------------------------------
 #   mparam
 # -----------------------------------------------------------------------------
@@ -586,12 +619,16 @@ int main(){return 0;}
 if host_machine.cpu_family() == 'aarch64'
   fft_small_supported = (
     flint_cv_have_fft_small_arm_i == 'yes'
-    and cc.compiles(fft_small_arm_code, dependencies: gmp_dep)
+    and cc.compiles(fft_small_arm_code,
+      args: flint_cpu_c_args,
+      dependencies: gmp_dep)
   )
 else
   fft_small_supported = (
     flint_cv_have_fft_small_x86_i == 'yes'
-    and cc.compiles(fft_small_x86_code, dependencies: gmp_dep)
+    and cc.compiles(fft_small_x86_code,
+      args: flint_cpu_c_args,
+      dependencies: gmp_dep)
   )
 endif
 
