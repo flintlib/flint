@@ -220,6 +220,16 @@ Basic row, column and entry operations
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
+.. function:: int gr_mat_permute_rows(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+
+    Permutes rows of the matrix ``mat`` according to permutation ``perm_act``
+    and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
+
+.. function:: int gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+
+    Permutes columns of the matrix ``mat`` according to permutation ``perm_act``
+    and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
+
 .. function:: int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
 
     Moves row ``i`` to the new position ``new_i``, displacing all intervening

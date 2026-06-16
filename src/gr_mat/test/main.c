@@ -45,6 +45,8 @@
 #include "t-mul_waksman.c"
 #include "t-nullspace.c"
 #include "t-permanent.c"
+#include "t-permute_cols.c"
+#include "t-permute_rows.c"
 #include "t-pow.c"
 #include "t-pow_fmpq.c"
 #include "t-pow_scalar.c"
@@ -109,6 +111,8 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_mul_waksman),
     TEST_FUNCTION(gr_mat_nullspace),
     TEST_FUNCTION(gr_mat_permanent),
+    TEST_FUNCTION(gr_mat_permute_cols),
+    TEST_FUNCTION(gr_mat_permute_rows),
     TEST_FUNCTION(gr_mat_pow),
     TEST_FUNCTION(gr_mat_pow_fmpq),
     TEST_FUNCTION(gr_mat_pow_scalar),
