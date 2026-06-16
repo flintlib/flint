@@ -31,9 +31,7 @@ coverage_opt = get_option('b_coverage')
 #   Unsupported options
 # -----------------------------------------------------------------------------
 
-if blas_opt.enabled()
-  error('BLAS support is not yet implemented')
-elif gc_opt.enabled()
+if gc_opt.enabled()
   error('Garbage collection is not yet implemented')
 endif
 
@@ -61,6 +59,61 @@ endif
 
 if not cc.has_function('atan2', dependencies: m_dep)
   error('libm is required')
+endif
+
+# -----------------------------------------------------------------------------
+#   BLAS
+# -----------------------------------------------------------------------------
+
+blas_dep = declare_dependency()
+have_blas = false
+
+if not blas_opt.disabled()
+  blas_candidates = [
+    dependency('cblas', required: false),
+    dependency('openblas', required: false),
+  ]
+
+  foreach dep : blas_candidates
+    if dep.found()
+      dep_has_cblas_h = cc.has_header('cblas.h', dependencies: dep)
+      dep_has_cblas_dgemm = dep_has_cblas_h and cc.has_function(
+        'cblas_dgemm',
+        prefix: '#include <cblas.h>',
+        dependencies: dep)
+      if dep_has_cblas_dgemm
+        blas_dep = dep
+        have_blas = true
+        break
+      endif
+    endif
+  endforeach
+
+  if not have_blas
+    foreach libname : ['cblas', 'openblas', 'blas']
+      libdep = cc.find_library(libname, required: false)
+      if libdep.found()
+        lib_has_cblas_h = cc.has_header('cblas.h')
+        lib_has_cblas_dgemm = lib_has_cblas_h and cc.has_function(
+          'cblas_dgemm',
+          prefix: '#include <cblas.h>',
+          dependencies: libdep)
+        if lib_has_cblas_dgemm
+          blas_dep = libdep
+          have_blas = true
+          break
+        endif
+      endif
+    endforeach
+  endif
+
+  if blas_opt.enabled() and not have_blas
+    if not cc.has_header('cblas.h')
+      error('Could not find cblas.h')
+    else
+      error('BLAS library was not found.')
+    endif
+  endif
 endif
 
 # -----------------------------------------------------------------------------

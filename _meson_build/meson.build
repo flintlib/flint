@@ -27,14 +27,10 @@ gmp_dep = dependency('gmp', version: '>= 6.2.1')
 mpfr_dep = dependency('mpfr', version: '>= 4.1.0')
 
 gmp_libdir = gmp_dep.get_variable(pkgconfig: 'libdir')
-gmp_incdir = gmp_dep.get_variable(pkgconfig: 'includedir')
-mpfr_incdir = mpfr_dep.get_variable(pkgconfig: 'includedir')
 gmp_link_dep = declare_dependency(
   dependencies: gmp_dep,
   link_args: ['-L' + gmp_libdir],
 )
-
-flint_deps = [gmp_link_dep, mpfr_dep, m_dep]
 
 add_project_arguments(
   '-Werror=implicit-function-declaration',
@@ -42,6 +38,11 @@ add_project_arguments(
 )
 
 subdir('config')
+
+flint_deps = [gmp_link_dep, mpfr_dep, m_dep]
+if have_blas
+  flint_deps += blas_dep
+endif
 
 add_project_arguments(flint_abi_c_args, language: ['c', 'cpp'])
 add_project_link_arguments(flint_abi_c_args, language: ['c', 'cpp'])
@@ -80,12 +81,7 @@ libflint = library('flint', c_files_all + headers_all,
 flint_test_dep = declare_dependency(
   link_with: libflint,
   dependencies: flint_deps,
-  include_directories: [
-    headers_built_nodir_inc,
-    'src',
-    include_directories(gmp_incdir),
-    include_directories(mpfr_incdir),
-  ],
+  include_directories: [headers_built_nodir_inc, 'src'],
 )
 
 tests_opt = get_option('tests')
