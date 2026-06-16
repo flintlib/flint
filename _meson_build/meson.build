@@ -27,6 +27,8 @@ gmp_dep = dependency('gmp', version: '>= 6.2.1')
 mpfr_dep = dependency('mpfr', version: '>= 4.1.0')
 
 gmp_libdir = gmp_dep.get_variable(pkgconfig: 'libdir')
+gmp_incdir = gmp_dep.get_variable(pkgconfig: 'includedir')
+mpfr_incdir = mpfr_dep.get_variable(pkgconfig: 'includedir')
 gmp_link_dep = declare_dependency(
   dependencies: gmp_dep,
   link_args: ['-L' + gmp_libdir],
@@ -69,6 +71,17 @@ libflint = library('flint', c_files_all + headers_all,
     '-DFLINT_NOSTDIO',
     '-DFLINT_NOSTDARG',
   ] + flint_cpu_c_args
+)
+
+flint_test_dep = declare_dependency(
+  link_with: libflint,
+  dependencies: flint_deps,
+  include_directories: [
+    headers_built_nodir_inc,
+    'src',
+    include_directories(gmp_incdir),
+    include_directories(mpfr_incdir),
+  ],
 )
 
 tests_opt = get_option('tests')

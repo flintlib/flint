@@ -176,9 +176,7 @@ test_mod_meson_build = '''\
 
 test_exe = executable('main',
   'main.c',
-  dependencies: flint_deps,
-  link_with: libflint,
-  include_directories: [headers_built_nodir_inc, '../..'],
+  dependencies: [flint_test_dep],
   install: false,
 )
 
@@ -199,9 +197,7 @@ ntl_dep = cpp.find_library('ntl')
 
 test_exe = executable('main',
   't-NTL-interface.cpp',
-  dependencies: flint_deps + [ntl_dep],
-  link_with: libflint,
-  include_directories: [headers_built_nodir_inc, '../..'],
+  dependencies: [flint_test_dep, ntl_dep],
   install: false,
 )
 

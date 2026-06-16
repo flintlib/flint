@@ -30,11 +30,7 @@ coverage_opt = get_option('b_coverage')
 #   Unsupported options
 # -----------------------------------------------------------------------------
 
-if avx2_opt.enabled()
-  error('AVX2 support is not yet implemented')
-elif avx512_opt.enabled()
-  error('AVX512 support is not yet implemented')
-elif blas_opt.enabled()
+if blas_opt.enabled()
   error('BLAS support is not yet implemented')
 elif gc_opt.enabled()
   error('Garbage collection is not yet implemented')
@@ -574,6 +570,30 @@ foreach opt : gcc_cflags_optlist.split()
   endforeach
 endforeach
 
+if avx2_opt.enabled()
+  if host_machine.cpu_family() != 'x86_64'
+    error('AVX2 is only supported for x86_64 builds')
+  endif
+  if not cc.has_argument('-mavx2')
+    error(meson.get_compiler('c').get_id() + ' does not support -mavx2')
+  endif
+  flint_cpu_c_args += '-mavx2'
+  if cc.has_argument('-mfma')
+    flint_cpu_c_args += '-mfma'
+  endif
+  flint_cv_have_fft_small_x86_i = 'yes'
+endif
+
+if avx512_opt.enabled()
+  if host_machine.cpu_family() != 'x86_64'
+    error('AVX512 is only supported for x86_64 builds')
+  endif
+  if not cc.has_argument('-mavx512f')
+    error(meson.get_compiler('c').get_id() + ' does not support -mavx512f')
+  endif
+  flint_cpu_c_args += '-mavx512f'
+endif
+
 message('CPU-specific C arguments:', ' '.join(flint_cpu_c_args))
 
 # -----------------------------------------------------------------------------
@@ -709,6 +729,11 @@ if have_assembly and FLINT_HAVE_ASSEMBLY == 'armv8'
 elif have_assembly and FLINT_HAVE_ASSEMBLY == 'x86_64_adx'
   cfg_data.set('FLINT_HAVE_ASSEMBLY_x86_64_adx', 1,
     description: 'Define if x86_64 ADX assembly is available')
+endif
+
+if have_assembly
+  cfg_data.set('FLINT_WANT_ASSEMBLY', 1,
+    description: 'Define to enable inline assembly.')
 endif
 
 if have_fft_small
