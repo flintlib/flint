@@ -35,6 +35,20 @@ Assignment
     Allows aliasing of ``res`` and ``vec``.
 
 
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
+
+    Returns 1 if the two permutations are equal, 0 otherwise.
+
+
+.. function:: slong _perm_is_one(const slong *vec, slong n)
+
+    Returns 1 if the permutation is the identity permutation, 0 otherwise.
+
+
 Composition
 --------------------------------------------------------------------------------
 

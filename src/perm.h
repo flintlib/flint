@@ -63,6 +63,17 @@ PERM_INLINE slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
     return 1;
 }
 
+PERM_INLINE slong _perm_is_one(const slong *vec, slong n)
+{
+    slong i;
+
+    for (i = 0; i < n; i++)
+        if (vec[i] != i)
+            return 0;
+
+    return 1;
+}
+
 PERM_INLINE void _perm_set(slong *res, const slong *vec, slong n)
 {
     slong i;
