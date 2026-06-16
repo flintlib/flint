@@ -69,11 +69,15 @@ slong fmpz_poly_num_real_roots_0_1_sturm(const fmpz_poly_t pol)
 
         fmpz_poly_swap(p0, p1);
         fmpz_poly_pseudo_rem(p1, &d, p1, p0);
-        if ((d%2 == 0) || (fmpz_sgn(p0->coeffs + p0->length - 1) == 1))
-            fmpz_poly_neg(p1, p1);
-        fmpz_poly_content(c, p1);
-        if (!fmpz_is_one(c))
-            _fmpz_vec_scalar_divexact_fmpz(p1->coeffs, p1->coeffs, p1->length, c);
+
+        if (!fmpz_poly_is_zero(p1))
+        {
+            if ((d%2 == 0) || (fmpz_sgn(p0->coeffs + p0->length - 1) == 1))
+                fmpz_poly_neg(p1, p1);
+            fmpz_poly_content(c, p1);
+            if (!fmpz_is_one(c))
+                _fmpz_vec_scalar_divexact_fmpz(p1->coeffs, p1->coeffs, p1->length, c);
+        }
     }
 
     fmpz_poly_clear(p0);

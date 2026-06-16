@@ -3315,7 +3315,7 @@ Roots
 
     Isolate the real roots of ``pol``. The array
     ``exact_roots`` will be set to the exact dyadic roots found
-    by the algorithm and ``n_exact_roots`` updated accordingly.
+    by the algorithm and ``n_exact`` updated accordingly.
     The arrays ``c_array`` and ``k_array`` are set to be
     interval data that enclose the remaining roots and
     ``n_interval`` is updated accordingly. The data
