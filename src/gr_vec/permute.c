@@ -47,3 +47,30 @@ gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
 
     return GR_SUCCESS;
 }
+
+void
+_gr_vec_permute_inv(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
+{
+    _perm_inv(perm, perm, len);
+    _gr_vec_permute(vec, perm, len, ctx);
+}
+
+int
+gr_vec_permute_inv(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
+{
+    if (dest != src)
+    {
+        int status = gr_vec_set(dest, src, ctx);
+        if (status != GR_SUCCESS)
+            return status;
+    }
+
+    slong * _perm = _perm_init(src->length);
+    _perm_set(_perm, perm, src->length);
+
+    _gr_vec_permute_inv(dest->entries, _perm, dest->length, ctx);
+
+    _perm_clear(_perm);
+
+    return GR_SUCCESS;
+}

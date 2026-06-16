@@ -228,8 +228,14 @@ Sorting and searching
 .. function:: void _gr_vec_permute(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
               int gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
 
-    Applies a permutation to a vector. The underscore version works in-place and
-    overwrites `perm`.
+    Applies a permutation to a vector, i.e. ``dest[perm[i]] = src[i]``.
+    The underscore version works in-place and overwrites `perm`.
+
+.. function:: void _gr_vec_permute_inv(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
+              int gr_vec_permute_inv(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
+
+    Applies the inverse of a permutation to a vector, i.e. ``dest[i] = src[perm[i]]``.
+    The underscore version works in-place and overwrites `perm`.
 
 .. function:: void _gr_vec_shuffle(gr_ptr vec, flint_rand_t state, slong len, gr_ctx_t ctx)
 
