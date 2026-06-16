@@ -43,6 +43,9 @@ flint_deps = [gmp_link_dep, mpfr_dep, m_dep]
 if have_blas
   flint_deps += blas_dep
 endif
+if have_gc
+  flint_deps += gc_dep
+endif
 
 add_project_arguments(flint_abi_c_args, language: ['c', 'cpp'])
 add_project_link_arguments(flint_abi_c_args, language: ['c', 'cpp'])

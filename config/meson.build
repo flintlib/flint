@@ -28,32 +28,6 @@ ntl_opt = get_option('ntl')
 coverage_opt = get_option('b_coverage')
 
 # -----------------------------------------------------------------------------
-#   Unsupported options
-# -----------------------------------------------------------------------------
-
-if gc_opt.enabled()
-  error('Garbage collection is not yet implemented')
-endif
-
-# -----------------------------------------------------------------------------
-#   fmpz memory management
-# -----------------------------------------------------------------------------
-
-if gc_opt.allowed()
-  if thread_safe_opt.allowed()
-    error('Garbage collection is not thread safe')
-  else
-    fmpz_c_in = 'fmpz_gc.c'
-  endif
-else
-  if reentrant_opt.enabled()
-    fmpz_c_in = 'fmpz_reentrant.c'
-  else
-    fmpz_c_in = 'fmpz_single.c'
-  endif
-endif
-
-# -----------------------------------------------------------------------------
 #   libm
 # -----------------------------------------------------------------------------
 
@@ -113,6 +87,65 @@ if not blas_opt.disabled()
     else
       error('BLAS library was not found.')
     endif
+  endif
+endif
+
+# -----------------------------------------------------------------------------
+#   Boehm GC
+# -----------------------------------------------------------------------------
+
+gc_dep = declare_dependency()
+have_gc = false
+
+if not gc_opt.disabled()
+  gc_candidates = [
+    dependency('bdw-gc', required: false),
+    dependency('gc', required: false),
+  ]
+
+  foreach dep : gc_candidates
+    if dep.found()
+      dep_has_gc_h = cc.has_header('gc.h', dependencies: dep)
+      if dep_has_gc_h
+        gc_dep = dep
+        have_gc = true
+        break
+      endif
+    endif
+  endforeach
+
+  if not have_gc
+    libgc_dep = cc.find_library('gc', required: false)
+    if libgc_dep.found() and cc.has_header('gc.h')
+      gc_dep = libgc_dep
+      have_gc = true
+    endif
+  endif
+
+  if gc_opt.enabled() and not have_gc
+    if not cc.has_header('gc.h')
+      error('Could not find gc.h')
+    else
+      error('GC library was not found.')
+    endif
+  endif
+endif
+
+# -----------------------------------------------------------------------------
+#   fmpz memory management
+# -----------------------------------------------------------------------------
+
+if gc_opt.enabled()
+  if thread_safe_opt.enabled()
+    error('GC does not support TLS.')
+  else
+    fmpz_c_in = 'fmpz_gc.c'
+  endif
+else
+  if reentrant_opt.enabled()
+    fmpz_c_in = 'fmpz_reentrant.c'
+  else
+    fmpz_c_in = 'fmpz_single.c'
   endif
 endif
 
