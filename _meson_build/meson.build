@@ -26,7 +26,13 @@ m_dep = cc.find_library('m', required: false)
 gmp_dep = dependency('gmp', version: '>= 6.2.1')
 mpfr_dep = dependency('mpfr', version: '>= 4.1.0')
 
-flint_deps = [gmp_dep, mpfr_dep, m_dep]
+gmp_libdir = gmp_dep.get_variable(pkgconfig: 'libdir')
+gmp_link_dep = declare_dependency(
+  dependencies: gmp_dep,
+  link_args: ['-L' + gmp_libdir],
+)
+
+flint_deps = [gmp_link_dep, mpfr_dep, m_dep]
 
 add_project_arguments(
   '-Werror=implicit-function-declaration',
