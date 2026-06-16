@@ -71,8 +71,10 @@ gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t FLINT_UNUSED(ctx))
     FLINT_SWAP(gr_mat_struct, *mat1, *mat2);
 }
 
+void _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
+void _gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
 

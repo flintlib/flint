@@ -12,15 +12,21 @@
 #include "gr_vec.h"
 #include "gr_mat.h"
 
-int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+int
+gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 {
     if (r < 0 || r >= mat->r || s < 0 || s >= mat->r)
         return GR_DOMAIN;
 
-    if (r == s)
-        return GR_SUCCESS;
+    _gr_mat_swap_rows(mat, perm, r, s, ctx);
 
-    if (gr_mat_is_empty(mat, ctx) == T_FALSE)
+    return GR_SUCCESS;
+}
+
+void
+_gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+{
+    if (r != s && gr_mat_is_empty(mat, ctx) == T_FALSE)
     {
         slong sz = ctx->sizeof_elem;
 
@@ -29,6 +35,4 @@ int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 
         _gr_vec_swap(GR_MAT_ENTRY(mat, r, 0, sz), GR_MAT_ENTRY(mat, s, 0, sz), mat->c, ctx);
     }
-
-    return GR_SUCCESS;
 }
