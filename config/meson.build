@@ -232,12 +232,20 @@ endif
 #   GMP
 # -----------------------------------------------------------------------------
 
+if not cc.has_header('gmp.h', dependencies: gmp_dep)
+  error('Could not find gmp.h')
+endif
+
+if not cc.has_header('mpfr.h', dependencies: mpfr_dep)
+  error('Could not find mpfr.h')
+endif
+
 gmp_long_long_limb = cc.compiles('''
 #include <gmp.h>
 #if !defined(_LONG_LONG_LIMB)
 # error mp_limb_t != unsigned long long int
 #endif
-''')
+''', dependencies: gmp_dep)
 
 if gmp_long_long_limb
   cfg_data.set('FLINT_LONG_LONG', 1,
@@ -1086,6 +1094,27 @@ endif
 if cc.has_header_symbol('stdlib.h', 'aligned_alloc')
   cfg_data_internal.set('HAVE_ALIGNED_ALLOC', 1,
     description: 'Define to 1 if you have the \'aligned_alloc\' function.')
+endif
+
+mandatory_headers = [
+  'stdarg.h',
+  'math.h',
+  'float.h',
+  'errno.h',
+]
+
+foreach h : mandatory_headers
+  if not cc.has_header(h)
+    error('Could not find a mandatory header: ' + h)
+  endif
+endforeach
+
+if pthread_opt.enabled() and not cc.has_header('pthread.h')
+  error('Could not find pthread.h')
+endif
+
+if assert_opt.enabled() and not cc.has_header('assert.h')
+  error('Could not find assert.h')
 endif
 
 ac_headers_check = [
