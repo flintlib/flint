@@ -1,7 +1,7 @@
 import sys
 from os import listdir, makedirs
 from os.path import join, dirname, abspath, isdir
-from shutil import copyfile
+from shutil import copy2
 from argparse import ArgumentParser
 
 this_dir = dirname(abspath(__file__))
@@ -386,7 +386,7 @@ def write_file(dst_path, text):
 
 def copy_file(src_path, dst_path):
     makedirs(dirname(dst_path), exist_ok=True)
-    copyfile(src_path, dst_path)
+    copy2(src_path, dst_path)
 
 
 def same_files(src_path, dst_path):
