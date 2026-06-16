@@ -12,20 +12,6 @@
 #include "gr_vec.h"
 #include "gr_mat.h"
 
-static void
-_gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
-{
-    if (r != s)
-    {
-        slong sz = ctx->sizeof_elem;
-
-        if (perm != NULL)
-            FLINT_SWAP(slong, perm[r], perm[s]);
-
-        _gr_vec_swap(GR_MAT_ENTRY(mat, r, 0, sz), GR_MAT_ENTRY(mat, s, 0, sz), mat->c, ctx);
-    }
-}
-
 int
 gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {

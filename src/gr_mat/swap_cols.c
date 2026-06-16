@@ -15,8 +15,17 @@
 int
 gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 {
-    /* todo: bounds checking */
+    if (r < 0 || r >= mat->c || s < 0 || s >= mat->c)
+        return GR_DOMAIN;
 
+    _gr_mat_swap_cols(mat, perm, r, s, ctx);
+
+    return GR_SUCCESS;
+}
+
+void
+_gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+{
     if (r != s && gr_mat_is_empty(mat, ctx) == T_FALSE)
     {
         slong t;
@@ -28,6 +37,4 @@ gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
         for (t = 0; t < mat->r; t++)
             gr_swap(GR_MAT_ENTRY(mat, t, r, sz), GR_MAT_ENTRY(mat, t, s, sz), ctx);
     }
-
-    return GR_SUCCESS;
 }
