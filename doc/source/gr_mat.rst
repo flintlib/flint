@@ -224,6 +224,13 @@ Basic row, column and entry operations
 
     Permutes rows of the matrix ``mat`` according to permutation ``perm_act``
     and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
+    This means that ``mat[perm_act[i], j]`` will be moved to ``mat[i, j]``
+    and ``perm_store[perm_act[i]]`` will be moved to ``perm_store[i]``.
+
+    This function is compatible with :func:`gr_mat_swap_cols` and :func:`gr_mat_invert_cols`
+    in the following sense: When starting with the identity permutation, calling these two functions
+    repeatedly with the same matrix, and finally calling :func:`gr_mat_permute_rows` with the inverse of the permutation as
+    ``perm_act``, the result will be the original matrix. 
 
 .. function:: int gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
 
