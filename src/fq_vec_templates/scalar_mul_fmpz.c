@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2026 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -14,16 +15,16 @@
 #include "templates.h"
 
 void
-_TEMPLATE3(T, vec_scalar_mul, T) (TEMPLATE(T, struct) * vec1,
+_TEMPLATE(T, vec_scalar_mul_fmpz) (TEMPLATE(T, struct) * vec1,
                                   const TEMPLATE(T, struct) * vec2,
-                                  slong len2, const TEMPLATE(T, t) x,
+                                  slong len2, const fmpz_t x,
                                   const TEMPLATE(T, ctx_t) ctx)
 {
     slong i;
 
     for (i = 0; i < len2; i++)
     {
-        TEMPLATE(T, mul) (vec1 + i, vec2 + i, x, ctx);
+        TEMPLATE(T, mul_fmpz) (vec1 + i, vec2 + i, x, ctx);
     }
 }
 
