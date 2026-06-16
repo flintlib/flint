@@ -244,6 +244,7 @@ X86_64_ADX_CPU_NAMES = [
   'zen2',
   'zen3',
   'zen4',
+  'zen5',
   'coreibwl',
   'broadwell',
   'skylake',
@@ -256,6 +257,7 @@ X86_64_ADX_CPU_NAMES = [
   'tigerlake',
   'alderlake',
   'raptorlake',
+  'meteorlake',
   'knightslanding',
   'sapphirerapids',
   'cometlake',
@@ -384,12 +386,17 @@ elif host_machine.cpu_family() == 'x86_64' and exact_cpu in X86_64_ADX_CPU_NAMES
 
   elif exact_cpu == 'zen4'
     gcc_cflags_arch = '-march=znver4'
-    param_path = 'x86_64/zen3'
+    param_path = 'x86_64/zen4'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'zen5'
+    gcc_cflags_arch = '-march=znver5 -march=znver4'
+    param_path = 'x86_64/zen4'
     have_avx512 = 'yes'
 
   elif exact_cpu in ['coreibwl', 'broadwell']
     gcc_cflags_arch = '-march=broadwell'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/broadwell'
 
   elif exact_cpu == 'skylake'
     gcc_cflags_arch = '-march=skylake'
@@ -402,7 +409,7 @@ elif host_machine.cpu_family() == 'x86_64' and exact_cpu in X86_64_ADX_CPU_NAMES
 
   elif exact_cpu == 'cannonlake'
     gcc_cflags_arch = '-march=cannonlake'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/icelake'
     have_avx512 = 'yes'
 
   elif exact_cpu == 'kabylake'
@@ -411,31 +418,35 @@ elif host_machine.cpu_family() == 'x86_64' and exact_cpu in X86_64_ADX_CPU_NAMES
 
   elif exact_cpu == 'icelake'
     gcc_cflags_arch = '-march=icelake-client'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/icelake'
     have_avx512 = 'yes'
 
   elif exact_cpu == 'icelake_server'
     gcc_cflags_arch = '-march=icelake-server'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/icelake'
     have_avx512 = 'yes'
 
   elif exact_cpu == 'rocketlake'
     gcc_cflags_arch = '-march=rocketlake'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/icelake'
     have_avx512 = 'yes'
 
   elif exact_cpu == 'tigerlake'
     gcc_cflags_arch = '-march=tigerlake'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/tigerlake'
     have_avx512 = 'yes'
 
   elif exact_cpu == 'alderlake'
     gcc_cflags_arch = '-march=alderlake'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/icelake'
 
   elif exact_cpu == 'raptorlake'
-    gcc_cflags_arch = '-march=alderlake'
-    param_path = 'x86_64/skylake'
+    gcc_cflags_arch = '-march=raptorlake -march=alderlake'
+    param_path = 'x86_64/raptorlake'
+
+  elif exact_cpu == 'meteorlake'
+    gcc_cflags_arch = '-march=meteorlake -march=alderlake'
+    param_path = 'x86_64/meteorlake'
 
   elif exact_cpu == 'knightslanding'
     gcc_cflags_arch = '-march=knl'
@@ -443,7 +454,7 @@ elif host_machine.cpu_family() == 'x86_64' and exact_cpu in X86_64_ADX_CPU_NAMES
 
   elif exact_cpu == 'sapphirerapids'
     gcc_cflags_arch = '-march=sapphirerapids'
-    param_path = 'x86_64/skylake'
+    param_path = 'x86_64/icelake'
     have_avx512 = 'yes'
 
   elif exact_cpu == 'cometlake'
