@@ -191,10 +191,6 @@ test_mod_NTL_meson_build = '''\
 #   python _meson_build/generate_meson_build.py
 #
 
-# NTL no found by pkgconfig
-cpp = meson.get_compiler('cpp')
-ntl_dep = cpp.find_library('ntl')
-
 test_exe = executable('main',
   't-NTL-interface.cpp',
   dependencies: [flint_test_dep, ntl_dep],
