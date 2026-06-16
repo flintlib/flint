@@ -146,6 +146,12 @@ radix_sub_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix)
 ulong radix_lshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int e, const radix_t radix);
 ulong radix_rshift_digits(nn_ptr res, nn_srcptr a, slong n, unsigned int e, const radix_t radix);
 
+/* fused add/sub with an on-the-fly left shift by sh digits, 1 <= sh < exp */
+ulong radix_addlsh(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, unsigned int sh, const radix_t radix);
+ulong radix_sublsh(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, unsigned int sh, const radix_t radix);
+ulong radix_lshsub(nn_ptr res, nn_srcptr b, slong bn, unsigned int sh, nn_srcptr a, slong an, const radix_t radix);
+int radix_cmplsh(nn_srcptr a, slong an, nn_srcptr b, slong bn, unsigned int sh, const radix_t radix);
+
 /* Multiplication */
 
 ulong radix_mul_1(nn_ptr res, nn_srcptr a, slong n, ulong c, const radix_t radix);
@@ -374,6 +380,9 @@ void radix_integer_lshift_limbs(radix_integer_t res, const radix_integer_t x, sl
 void radix_integer_rshift_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 void radix_integer_lshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 void radix_integer_rshift_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
+void radix_integer_addlsh(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong v, const radix_t radix);
+void radix_integer_sublsh(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong v, const radix_t radix);
 
 RADIX_INLINE slong
 radix_integer_valuation_limbs(const radix_integer_t x, const radix_t FLINT_UNUSED(radix))

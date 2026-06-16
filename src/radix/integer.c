@@ -420,6 +420,299 @@ radix_integer_sub(radix_integer_t res, const radix_integer_t x, const radix_inte
     res->size = rsgnbit ? -rn : rn;
 }
 
+/*
+    Fused integer add/sub with a left shift of the second operand:
+        radix_integer_addlsh: res = x + (y << v)
+        radix_integer_sublsh: res = x - (y << v)
+    for any shift v >= 0. The shift is decomposed into a limb offset nl = v / e
+    and a within-limb digit shift nd = v % e (e = radix->exp); the nd == 0 case is
+    a pure limb offset handled with radix_add / radix_sub on offset pointers, while
+    nd != 0 uses the fused radix_addlsh / radix_sublsh / radix_lshsub primitives.
+
+    No temporary integer is allocated for the differing-alignment work: when res
+    does not alias x we materialise (y << v) directly in res and accumulate x into
+    it; when res aliases x we operate in place with the fused primitives (the
+    classic acc += shifted pattern). The only exception is the degenerate
+    res == x == y aliasing, where one operand must be preserved in a small copy.
+
+    The magnitude helpers below take normalised limb arrays (no high zero limbs)
+    and return the normalised result length; dst may alias a, but never b.
+*/
+
+/* dst = |a| + (|b| << (nl*e + nd)); returns limb count. dst may alias a. */
+static slong
+_radix_imag_addlsh(nn_ptr dst, nn_srcptr a, slong an, nn_srcptr b, slong bn,
+    slong nl, unsigned int nd, const radix_t radix)
+{
+    slong rn, top;
+    ulong cy;
+
+    if (an <= nl)
+    {
+        /* no overlap: a, then zeros up to nl, then b << nd */
+        if (dst != a)
+            flint_mpn_copyi(dst, a, an);
+        flint_mpn_zero(dst + an, nl - an);
+        if (nd == 0)
+        {
+            flint_mpn_copyi(dst + nl, b, bn);
+            rn = nl + bn;
+        }
+        else
+        {
+            dst[nl + bn] = radix_lshift_digits(dst + nl, b, bn, nd, radix);
+            rn = nl + bn + 1;
+        }
+    }
+    else
+    {
+        slong am = an - nl;
+        if (dst != a)
+            flint_mpn_copyi(dst, a, nl);
+        if (nd == 0)
+        {
+            if (am >= bn)
+            {
+                cy = radix_add(dst + nl, a + nl, am, b, bn, radix);
+                top = nl + am;
+            }
+            else
+            {
+                cy = radix_add(dst + nl, b, bn, a + nl, am, radix);
+                top = nl + bn;
+            }
+        }
+        else
+        {
+            cy = radix_addlsh(dst + nl, a + nl, am, b, bn, nd, radix);
+            top = nl + FLINT_MAX(am, bn + 1);
+        }
+        dst[top] = cy;
+        rn = top + 1;
+    }
+
+    MPN_NORM(dst, rn);
+    return rn;
+}
+
+/* dst = |a| - (|b| << (nl*e+nd)), assuming |a| >= |b<<..|; dst may alias a. */
+static slong
+_radix_imag_sublsh(nn_ptr dst, nn_srcptr a, slong an, nn_srcptr b, slong bn,
+    slong nl, unsigned int nd, const radix_t radix)
+{
+    slong am = an - nl, top;
+
+    if (dst != a)
+        flint_mpn_copyi(dst, a, nl);
+
+    if (nd == 0)
+    {
+        radix_sub(dst + nl, a + nl, am, b, bn, radix);     /* am >= bn */
+        top = nl + am;
+    }
+    else
+    {
+        radix_sublsh(dst + nl, a + nl, am, b, bn, nd, radix);
+        top = nl + FLINT_MAX(am, bn + 1);
+    }
+
+    MPN_NORM(dst, top);
+    return top;
+}
+
+/* dst = (|b| << (nl*e+nd)) - |a|, assuming |b<<..| >= |a|; dst may alias a. */
+static slong
+_radix_imag_lshsub(nn_ptr dst, nn_srcptr b, slong bn, slong nl, unsigned int nd,
+    nn_srcptr a, slong an, const radix_t radix)
+{
+    ulong B = LIMB_RADIX(radix);
+    ulong one = 1;
+    ulong b0;
+    slong i, top;
+
+    if (an <= nl)
+    {
+        /* a lies entirely below the shifted b; the low part is -a, which leaves a
+           borrow b0 to take out of (b << nd) sitting at limb nl. */
+        b0 = radix_neg(dst, a, an, radix);
+        for (i = an; i < nl; i++)
+            dst[i] = b0 ? (B - 1) : 0;
+
+        if (nd == 0)
+        {
+            if (b0)
+                radix_sub(dst + nl, b, bn, &one, 1, radix);
+            else
+                flint_mpn_copyi(dst + nl, b, bn);
+            top = nl + bn;
+        }
+        else
+        {
+            dst[nl + bn] = radix_lshift_digits(dst + nl, b, bn, nd, radix);
+            if (b0)
+                radix_sub(dst + nl, dst + nl, bn + 1, &one, 1, radix);
+            top = nl + bn + 1;
+        }
+    }
+    else
+    {
+        slong am = an - nl;
+        b0 = radix_neg(dst, a, nl, radix);             /* low nl limbs negated */
+        if (nd == 0)
+        {
+            radix_sub(dst + nl, b, bn, a + nl, am, radix);    /* bn >= am */
+            top = nl + bn;
+        }
+        else
+        {
+            radix_lshsub(dst + nl, b, bn, nd, a + nl, am, radix);
+            top = nl + FLINT_MAX(am, bn + 1);
+        }
+        if (b0)
+            radix_sub(dst + nl, dst + nl, top - nl, &one, 1, radix);
+    }
+
+    MPN_NORM(dst, top);
+    return top;
+}
+
+/* sign of |a| - (|b| << (nl*e+nd)); a, b assumed normalised. */
+static int
+_radix_icmp_lsh(nn_srcptr a, slong an, nn_srcptr b, slong bn, slong nl,
+    unsigned int nd, const radix_t radix)
+{
+    slong bvn, i;
+    int c;
+
+    if (nd == 0)
+        bvn = nl + bn;
+    else
+    {
+        ulong be2 = radix->bpow[radix->exp - nd];
+        bvn = nl + bn + (b[bn - 1] >= be2);
+    }
+
+    if (an != bvn)
+        return (an < bvn) ? -1 : 1;
+
+    if (nd == 0)
+        c = mpn_cmp(a + nl, b, bn);
+    else
+        c = radix_cmplsh(a + nl, an - nl, b, bn, nd, radix);
+    if (c != 0)
+        return c;
+
+    /* high parts equal; any nonzero low limb of a makes |a| the larger */
+    for (i = 0; i < nl; i++)
+        if (a[i] != 0)
+            return 1;
+    return 0;
+}
+
+static void
+_radix_integer_addlsh_core(radix_integer_t res, const radix_integer_t x,
+    const radix_integer_t y, slong v, int ysub, const radix_t radix)
+{
+    slong xsize = x->size, ysize = y->size;
+    slong e = radix->exp;
+    slong xn, yn, nl, rn;
+    unsigned int nd;
+    int sx, sy, c, alias_xy;
+    nn_ptr rd;
+    nn_srcptr xd, yd;
+    radix_integer_t tmp;
+
+    if (ysize == 0)                         /* x +/- 0 */
+    {
+        radix_integer_set(res, x, radix);
+        return;
+    }
+    if (xsize == 0)                         /* 0 +/- (y<<v) */
+    {
+        radix_integer_lshift_digits(res, y, v, radix);
+        if (ysub && res->size != 0)
+            res->size = -res->size;
+        return;
+    }
+    if (v == 0)
+    {
+        if (ysub) radix_integer_sub(res, x, y, radix);
+        else      radix_integer_add(res, x, y, radix);
+        return;
+    }
+
+    /* res distinct from x: materialise (y<<v) in res, then combine x (no temp). */
+    if (res != x)
+    {
+        radix_integer_lshift_digits(res, y, v, radix);     /* in place if res==y */
+        if (ysub)
+            radix_integer_sub(res, x, res, radix);         /* x - (y<<v) */
+        else
+            radix_integer_add(res, res, x, radix);         /* (y<<v) + x */
+        return;
+    }
+
+    /* res aliases x: fused in-place combine. */
+    xn = FLINT_ABS(xsize);
+    yn = FLINT_ABS(ysize);
+    sx = (xsize < 0);
+    sy = (ysize < 0) ^ (ysub != 0);
+
+    nl = (ulong) v / (ulong) e;
+    nd = (ulong) v % (ulong) e;
+
+    /* degenerate res == x == y: y must be preserved in a copy */
+    alias_xy = (x->d == y->d);
+    if (alias_xy)
+    {
+        radix_integer_init(tmp, radix);
+        radix_integer_set(tmp, y, radix);
+    }
+
+    rd = radix_integer_fit_limbs(res, FLINT_MAX(xn, nl + yn + 1) + 1, radix);
+    xd = x->d;                              /* == rd, data preserved by fit */
+    yd = alias_xy ? tmp->d : y->d;
+
+    if (sx == sy)
+    {
+        rn = _radix_imag_addlsh(rd, xd, xn, yd, yn, nl, nd, radix);
+        res->size = sx ? -rn : rn;
+    }
+    else
+    {
+        c = _radix_icmp_lsh(xd, xn, yd, yn, nl, nd, radix);
+        if (c == 0)
+            res->size = 0;
+        else if (c > 0)
+        {
+            rn = _radix_imag_sublsh(rd, xd, xn, yd, yn, nl, nd, radix);
+            res->size = sx ? -rn : rn;
+        }
+        else
+        {
+            rn = _radix_imag_lshsub(rd, yd, yn, nl, nd, xd, xn, radix);
+            res->size = sy ? -rn : rn;
+        }
+    }
+
+    if (alias_xy)
+        radix_integer_clear(tmp, radix);
+}
+
+void
+radix_integer_addlsh(radix_integer_t res, const radix_integer_t x,
+    const radix_integer_t y, slong v, const radix_t radix)
+{
+    _radix_integer_addlsh_core(res, x, y, v, 0, radix);
+}
+
+void
+radix_integer_sublsh(radix_integer_t res, const radix_integer_t x,
+    const radix_integer_t y, slong v, const radix_t radix)
+{
+    _radix_integer_addlsh_core(res, x, y, v, 1, radix);
+}
+
 int
 radix_integer_is_normalised(const radix_integer_t x, const radix_t radix)
 {

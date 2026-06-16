@@ -83,6 +83,8 @@ void radix_padic_set_shallow(radix_padic_t res, const radix_padic_t x, gr_ctx_t 
 slong radix_padic_get_error(const radix_padic_t x, gr_ctx_t ctx);
 truth_t radix_padic_is_exact(const radix_padic_t x, gr_ctx_t ctx);
 
+int _radix_padic_finalize(radix_padic_t res, gr_ctx_t ctx);
+
 /* Basic assignment and predicates */
 int radix_padic_randtest(radix_padic_t res, flint_rand_t state, gr_ctx_t ctx);
 int radix_padic_write(gr_stream_t out, const radix_padic_t x, gr_ctx_t ctx);
@@ -112,7 +114,25 @@ truth_t radix_padic_is_neg_one(const radix_padic_t x, gr_ctx_t ctx);
 truth_t radix_padic_is_invertible(const radix_padic_t x, gr_ctx_t ctx);
 truth_t radix_padic_equal(const radix_padic_t x, const radix_padic_t y, gr_ctx_t ctx);
 
+int radix_padic_dot(radix_padic_t res, const radix_padic_t initial,
+    int subtract, const radix_padic_struct * vec1,
+    const radix_padic_struct * vec2, slong len, gr_ctx_t ctx);
+int radix_padic_dot_rev(radix_padic_t res, const radix_padic_t initial,
+    int subtract, const radix_padic_struct * vec1,
+    const radix_padic_struct * vec2, slong len, gr_ctx_t ctx);
+
+int radix_padic_dot_strided(radix_padic_t res, const radix_padic_t initial,
+    int subtract, const radix_padic_struct * vec1, slong stride1,
+    const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx);
+int radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
+    int subtract, const radix_padic_struct * vec1, slong stride1,
+    const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx);
+int radix_padic_dot_strided_naive(radix_padic_t res, const radix_padic_t initial,
+    int subtract, const radix_padic_struct * vec1, slong stride1,
+    const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx);
+
 /* For testing */
+int _radix_padic_add_sub_reference(radix_padic_t res, const radix_padic_t x, const radix_padic_t y, int sub, gr_ctx_t ctx);
 int _radix_padic_mul_reference(radix_padic_t res, const radix_padic_t x, const radix_padic_t y, gr_ctx_t ctx);
 
 

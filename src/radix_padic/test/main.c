@@ -11,12 +11,14 @@
 
 /* Include functions *********************************************************/
 
+#include "t-dot.c"
 #include "t-padic.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(radix_padic_dot),
     TEST_FUNCTION(radix_padic),
 };
 

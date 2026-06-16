@@ -12,6 +12,7 @@
 #include "radix_padic.h"
 #include "fmpz.h"
 #include "gr.h"
+#include "gr_mat.h"
 
 /* ------------------------------------------------------------------------- */
 /*    Internal helpers                                                       */
@@ -652,16 +653,21 @@ _radix_padic_finalize_assume_canonical(radix_padic_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-static int
+int
 _radix_padic_finalize(radix_padic_t res, gr_ctx_t ctx)
 {
     _radix_padic_canonicalise(res, ctx);
     return _radix_padic_finalize_assume_canonical(res, ctx);
 }
 
-/* res = x + y  (sub != 0 selects x - y). */
-static int
-_radix_padic_add_sub(radix_padic_t res, const radix_padic_t x,
+/*
+    Reference (unoptimized) add/sub: aligns the higher-valuation operand into a
+    temporary and lets the finalizer reduce/truncate. Kept as a correctness oracle
+    for the optimized _radix_padic_add_sub below (the test suite cross-checks the
+    two). res = x + y, with sub != 0 selecting x - y.
+*/
+int
+_radix_padic_add_sub_reference(radix_padic_t res, const radix_padic_t x,
     const radix_padic_t y, int sub, gr_ctx_t ctx)
 {
     radix_struct * radix = RADIX_PADIC_CTX_RADIX(ctx);
@@ -690,6 +696,12 @@ _radix_padic_add_sub(radix_padic_t res, const radix_padic_t x,
     else
         P = FLINT_MIN(Nz, target);
 
+    /*
+        Zero operands: the result is the other operand (no shift needed). This
+        must be handled before the horizon optimisation below, which assumes
+        the lower-valuation operand is nonzero (otherwise the result valuation
+        is not v_min and an operand could be dropped incorrectly).
+    */
     if (x->u.size == 0 || y->u.size == 0)
     {
         if (x->u.size == 0 && y->u.size == 0)
@@ -724,7 +736,12 @@ _radix_padic_add_sub(radix_padic_t res, const radix_padic_t x,
         return _radix_padic_finalize_assume_canonical(res, ctx);   /* zero is canonical */
     }
 
-    /* Equal valuations */
+    /*
+        Equal valuations: the sum/difference can be written straight into the
+        result unit (no temporary needed, even when res aliases x or y, since
+        radix_integer_add/sub handle that). The leading digits may cancel, so
+        this is the one case that still needs a canonicalising scan.
+    */
     if (vx == vy)
     {
         if (sub)
@@ -790,6 +807,130 @@ _radix_padic_add_sub(radix_padic_t res, const radix_padic_t x,
         of the lower-valuation operand (a unit), so the result is already
         canonical and needs no canonicalisation.
     */
+    return _radix_padic_finalize_assume_canonical(res, ctx);
+}
+
+/*
+    res = x + y (sub != 0 selects x - y), optimized.
+
+    Identical in behaviour to _radix_padic_add_sub_reference, but the
+    differing-valuation alignment is done in place with the fused
+    radix_integer_addlsh / radix_integer_sublsh, eliminating the temporary that
+    the reference allocates to hold the shifted higher-valuation operand.
+
+    With v_x < v_y the lower operand is x, the result is x_unit +/- (y_unit << d);
+    with v_x > v_y the lower operand is y, the result is (x_unit << d) +/- y_unit.
+    Writing lo / hi for the lower / higher valuation operand and d = |v_x - v_y|,
+    addition is always lo + (hi << d). Subtraction is lo - (hi << d) when x is the
+    lower operand, and -(lo - (hi << d)) = (hi << d) - lo when y is, so in the
+    latter case we negate the fused difference.
+*/
+static int
+_radix_padic_add_sub(radix_padic_t res, const radix_padic_t x,
+    const radix_padic_t y, int sub, gr_ctx_t ctx)
+{
+    radix_struct * radix = RADIX_PADIC_CTX_RADIX(ctx);
+    slong vx = x->v, vy = y->v, Nx = x->N, Ny = y->N;
+    slong vmin = FLINT_MIN(vx, vy);
+    slong vmax = FLINT_MAX(vx, vy);
+    slong Nz, target, P, Nresult;
+
+    Nz = FLINT_MIN(Nx, Ny);
+
+    target = _radix_padic_target_prec(vmin, ctx);
+    if (Nz == RADIX_PADIC_EXACT)
+        P = target;
+    else if (target == RADIX_PADIC_PREC_INF)
+        P = Nz;
+    else
+        P = FLINT_MIN(Nz, target);
+
+    /* zero operands: result is the other operand */
+    if (x->u.size == 0 || y->u.size == 0)
+    {
+        if (x->u.size == 0 && y->u.size == 0)
+        {
+            radix_integer_zero(&res->u, radix);
+            res->v = 0;
+        }
+        else if (x->u.size == 0)
+        {
+            if (sub)
+                radix_integer_neg(&res->u, &y->u, radix);
+            else
+                radix_integer_set(&res->u, &y->u, radix);
+            res->v = vy;
+        }
+        else
+        {
+            radix_integer_set(&res->u, &x->u, radix);
+            res->v = vx;
+        }
+        res->N = Nz;
+        return _radix_padic_finalize_assume_canonical(res, ctx);
+    }
+
+    /* whole result below the precision horizon: 0 + O(p^P) */
+    if (P != RADIX_PADIC_PREC_INF && vmin >= P)
+    {
+        radix_integer_zero(&res->u, radix);
+        res->v = 0;
+        res->N = P;
+        return _radix_padic_finalize_assume_canonical(res, ctx);
+    }
+
+    /* equal valuations: combine straight into res (cancellation possible). */
+    if (vx == vy)
+    {
+        if (sub)
+            radix_integer_sub(&res->u, &x->u, &y->u, radix);
+        else
+            radix_integer_add(&res->u, &x->u, &y->u, radix);
+        res->v = vmin;
+        res->N = Nz;
+        return _radix_padic_finalize(res, ctx);
+    }
+
+    Nresult = Nz;
+
+    if (P != RADIX_PADIC_PREC_INF && vmax >= P)
+    {
+        /* higher-valuation operand is negligible modulo p^P; drop it (no shift). */
+        Nresult = P;
+        if (vx < vy)
+        {
+            radix_integer_set(&res->u, &x->u, radix);
+        }
+        else
+        {
+            if (sub)
+                radix_integer_neg(&res->u, &y->u, radix);
+            else
+                radix_integer_set(&res->u, &y->u, radix);
+        }
+    }
+    else
+    {
+        /* align in place via the fused shift, no temporary. lo / hi are the
+           lower / higher valuation operands; d is the digit gap. */
+        const radix_padic_struct * lo = (vx < vy) ? x : y;
+        const radix_padic_struct * hi = (vx < vy) ? y : x;
+        slong d = vmax - vmin;
+        int negate = (sub && vx > vy);    /* x - y with y the lower operand */
+
+        if (sub)
+            radix_integer_sublsh(&res->u, &lo->u, &hi->u, d, radix);
+        else
+            radix_integer_addlsh(&res->u, &lo->u, &hi->u, d, radix);
+
+        if (negate)
+            radix_integer_neg(&res->u, &res->u, radix);
+    }
+
+    res->v = vmin;
+    res->N = Nresult;
+
+    /* low digit is the lower-valuation operand's (a unit): already canonical. */
     return _radix_padic_finalize_assume_canonical(res, ctx);
 }
 
@@ -1901,6 +2042,12 @@ gr_method_tab_input _radix_padic_methods_input[] =
     {GR_METHOD_SQRT,            (gr_funcptr) radix_padic_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) radix_padic_rsqrt},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) radix_padic_is_square},
+    {GR_METHOD_VEC_DOT,         (gr_funcptr) radix_padic_dot},
+    {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) radix_padic_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) radix_padic_dot_strided},
+    /* todo: this ought to be automatic */
+    /* todo: use different algorithm with exact precision */
+    {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     {0,                         (gr_funcptr) NULL},
 };
 

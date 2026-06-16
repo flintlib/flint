@@ -156,3 +156,20 @@ The following methods mainly implement the :ref:`generics <gr>` interface.
               int radix_padic_rsqrt(radix_padic_t res, const radix_padic_t x, gr_ctx_t ctx)
               truth_t radix_padic_is_square(const radix_padic_t x, gr_ctx_t ctx)
 
+.. function:: int radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial, int subtract, const radix_padic_struct * vec1, slong stride1, const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
+              int radix_padic_dot_strided_naive(radix_padic_t res, const radix_padic_t initial, int subtract, const radix_padic_struct * vec1, slong stride1, const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
+              int radix_padic_dot_strided(radix_padic_t res, const radix_padic_t initial, int subtract, const radix_padic_struct * vec1, slong stride1, const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
+
+    General strided dot product. The *naive* algorithm just calls :func:`radix_padic_mul`
+    and :func:`radix_padic_add` in a loop.
+    The *delayed* algorithm computes a global precision and sums the limb cross-products
+    from small operands into multiple accumulators, allowing shifts and divisions by
+    the digit or limb radix to be delayed until the final recombination step.
+    The default algorithm chooses a method automatically.
+
+.. function:: int radix_padic_dot(radix_padic_t res, const radix_padic_t initial, int subtract, const radix_padic_struct * vec1, const radix_padic_struct * vec2, slong len, gr_ctx_t ctx)
+              int radix_padic_dot_rev(radix_padic_t res, const radix_padic_t initial, int subtract, const radix_padic_struct * vec1, const radix_padic_struct * vec2, slong len, gr_ctx_t ctx)
+
+    Wrappers for :func:`radix_padic_dot_strided`.
+
+
