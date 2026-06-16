@@ -184,7 +184,7 @@ HEADER_DIRS	:=	\
 		fq			fq_vec		fq_mat		fq_poly			\
 		padic					padic_mat	padic_poly		\
 		qadic												\
-		radix_padic											\
+		padic_radix											\
 															\
 		fmpz_extras	fmpz_factor	fmpzi						\
 		fft			@FFT_SMALL@								\

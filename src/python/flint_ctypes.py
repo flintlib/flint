@@ -157,7 +157,7 @@ class fmpz_mpoly_q_struct(ctypes.Structure):
                 ('den', fmpz_mpoly_struct)]
 
 
-class radix_padic_struct(ctypes.Structure):
+class padic_radix_struct(ctypes.Structure):
     _fields_ = [('u', radix_integer_struct),
                 ('v', c_slong),
                 ('N', c_slong)]
@@ -318,7 +318,7 @@ libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_ctx_init_nmod.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
-libgr.gr_ctx_init_radix_padic.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong, c_slong, c_slong, ctypes.c_int)
+libgr.gr_ctx_init_padic_radix.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong, c_slong, c_slong, ctypes.c_int)
 
 _add_methods = [libgr.gr_add, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_other, libgr.gr_other_add]
 _sub_methods = [libgr.gr_sub, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_other, libgr.gr_other_sub]
@@ -4930,19 +4930,19 @@ class ComplexExtended_ca(gr_ctx_ca):
 
 
 
-RADIX_PADIC_SIGNED = 1     # allow signed units for exact elements
-RADIX_PADIC_DECIMAL = 4    # print the unit as a plain decimal integer
-RADIX_PADIC_PREC_INF = WORD_MAX    # context precision sentinel for "infinite"
+PADIC_RADIX_SIGNED = 1     # allow signed units for exact elements
+PADIC_RADIX_DECIMAL = 4    # print the unit as a plain decimal integer
+PADIC_RADIX_PREC_INF = WORD_MAX    # context precision sentinel for "infinite"
 
-class Qp_radix_padic(gr_ctx):
+class Qp_padic_radix(gr_ctx):
     r"""
     The field of p-adic numbers Q_p, implemented with radix arithmetic
-    arithmetic (radix_padic). A nonzero element is stored canonically as
+    arithmetic (padic_radix). A nonzero element is stored canonically as
     u * p^v + O(p^N): the unit u has p-adic valuation 0, v is the valuation,
     and N is the absolute precision (N == +inf marks an exactly represented
     element, printed with no error term).
 
-        >>> Q7 = Qp_radix_padic(7, rel_prec=30)
+        >>> Q7 = Qp_padic_radix(7, rel_prec=30)
         >>> d1 = Mat(Q7, 20, 20)().hilbert().det()
         >>> d2 = Q7(Mat(QQ, 20, 20)().hilbert().det())
         >>> d1
@@ -4960,7 +4960,7 @@ class Qp_radix_padic(gr_ctx):
     such as 1/3 is reported as not computable rather than silently truncated.
     ``p`` must be a word-size prime.
 
-        >>> Q7 = Qp_radix_padic(7, rel_prec=None)
+        >>> Q7 = Qp_padic_radix(7, rel_prec=None)
         >>> Q7
         Radix 7-adic numbers (rel prec inf, abs prec inf)
         >>> Q7(0)
@@ -5000,7 +5000,7 @@ class Qp_radix_padic(gr_ctx):
     A finite relative precision truncates such expansions to N - v digits,
     recording the error term O(p^N):
 
-        >>> Q7r = Qp_radix_padic(7, rel_prec=8)
+        >>> Q7r = Qp_padic_radix(7, rel_prec=8)
         >>> Q7r
         Radix 7-adic numbers (rel prec 8, abs prec inf)
         >>> Q7r(1) / Q7r(2)               # 2^-1 (mod 7^8)
@@ -5023,7 +5023,7 @@ class Qp_radix_padic(gr_ctx):
     A finite *absolute* precision instead bounds N directly: anything at or
     below the horizon p^abs_prec collapses to zero:
 
-        >>> Q7a = Qp_radix_padic(7, rel_prec=None, abs_prec=5)
+        >>> Q7a = Qp_padic_radix(7, rel_prec=None, abs_prec=5)
         >>> Q7a
         Radix 7-adic numbers (rel prec inf, abs prec 5)
         >>> Q7a(7**3)                     # valuation 3 < 5: still exact
@@ -5039,18 +5039,18 @@ class Qp_radix_padic(gr_ctx):
 
     def __init__(self, p, rel_prec=10, abs_prec=None, signed=True, decimal=True):
         gr_ctx.__init__(self)
-        prec_rel = RADIX_PADIC_PREC_INF if rel_prec is None else int(rel_prec)
-        prec_abs = RADIX_PADIC_PREC_INF if abs_prec is None else int(abs_prec)
+        prec_rel = PADIC_RADIX_PREC_INF if rel_prec is None else int(rel_prec)
+        prec_abs = PADIC_RADIX_PREC_INF if abs_prec is None else int(abs_prec)
         flags = 0
         if signed:
-            flags |= RADIX_PADIC_SIGNED
+            flags |= PADIC_RADIX_SIGNED
         if decimal:
-            flags |= RADIX_PADIC_DECIMAL
+            flags |= PADIC_RADIX_DECIMAL
         p = int(p)
         if p < 0 or p > UWORD_MAX or not libflint.n_is_prime(p):
             raise FlintUnableError("p must be a word-size prime")
-        libgr.gr_ctx_init_radix_padic(self._ref, p, prec_rel, prec_abs, flags)
-        self._elem_type = radix_padic
+        libgr.gr_ctx_init_padic_radix(self._ref, p, prec_rel, prec_abs, flags)
+        self._elem_type = padic_radix
 
 
 class PolynomialRing_gr_poly(gr_ctx):
@@ -7476,16 +7476,16 @@ class Complex_gr_complex(gr_ctx):
         self._real_ctx._decrement_refcount()
 
 
-class radix_padic(gr_elem):
+class padic_radix(gr_elem):
 
-    _struct_type = radix_padic_struct
+    _struct_type = padic_radix_struct
 
     def valuation(self):
         """
         The p-adic valuation v of this element (the exponent of the leading
         power of p). The valuation of zero is reported as ``None``.
 
-            >>> Q7 = Qp_radix_padic(7)
+            >>> Q7 = Qp_padic_radix(7)
             >>> Q7(14).valuation()
             1
             >>> Q7(98).valuation()
@@ -7506,7 +7506,7 @@ class radix_padic(gr_elem):
         The absolute precision N: the element is known modulo p^N. An exactly
         represented element returns ``None`` (infinite precision).
 
-            >>> Q7r = Qp_radix_padic(7, rel_prec=8)
+            >>> Q7r = Qp_padic_radix(7, rel_prec=8)
             >>> (Q7r(1) / Q7r(2)).precision()
             8
             >>> (Q7r(1) / Q7r(14)).precision()
@@ -7518,7 +7518,7 @@ class radix_padic(gr_elem):
             >>> (Q7r(1) / Q7r(7)).precision() is None
             True
         """
-        if int(self._data.N) == RADIX_PADIC_PREC_INF:
+        if int(self._data.N) == PADIC_RADIX_PREC_INF:
             return None
         return int(self._data.N)
 
@@ -9723,7 +9723,7 @@ def test_is_vector_space():
         assert R.is_complex_vector_space()
 
 def test_padic():
-    Q7 = Qp_radix_padic(7, rel_prec=10)
+    Q7 = Qp_padic_radix(7, rel_prec=10)
     assert str(Q7(7) * Q7(7)) == "(1) * 7^2"
     assert Q7(0).sqrt() == 0
     assert Q7(1).sqrt() == 1

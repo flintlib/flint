@@ -14,7 +14,7 @@
 #include "gr.h"
 #include "profiler.h"
 #include "radix.h"
-#include "radix_padic.h"
+#include "padic_radix.h"
 #include "padic.h"
 #include "nmod.h"
 
@@ -62,7 +62,7 @@ int main()
         {
             gr_ctx_t ctx;
             radix_integer_t x, y, z;
-            radix_padic_t rx, ry, rz;
+            padic_radix_t rx, ry, rz;
             padic_ctx_t pctx;
             padic_t px, py, pz;
             fmpz_t fp, pn, fx, fy, fz;
@@ -72,7 +72,7 @@ int main()
             fmpz_ui_pow_ui(pn, p, n);
 
             padic_ctx_init(pctx, fp, n - 1, n + 1, PADIC_SERIES);
-            gr_ctx_init_radix_padic(ctx, p, n, RADIX_PADIC_PREC_INF, 0);
+            gr_ctx_init_padic_radix(ctx, p, n, PADIC_RADIX_PREC_INF, 0);
 
             radix_integer_init(x, radix);
             radix_integer_init(y, radix);
@@ -86,9 +86,9 @@ int main()
             fmpz_init(fy);
             fmpz_init(fz);
 
-            radix_padic_init(rx, ctx);
-            radix_padic_init(ry, ctx);
-            radix_padic_init(rz, ctx);
+            padic_radix_init(rx, ctx);
+            padic_radix_init(ry, ctx);
+            padic_radix_init(rz, ctx);
 
             do
             {
@@ -106,8 +106,8 @@ int main()
             padic_set_fmpz(px, fx, pctx);
             padic_set_fmpz(py, fy, pctx);
 
-            radix_padic_set_fmpz(rx, fx, ctx);
-            radix_padic_set_fmpz(ry, fy, ctx);
+            padic_radix_set_fmpz(rx, fx, ctx);
+            padic_radix_set_fmpz(ry, fy, ctx);
 
             rx->N = n;
             ry->N = n;
@@ -131,7 +131,7 @@ int main()
                 padic_add(pz, px, py, pctx);
                 TIMEIT_STOP_VALUES(__, t1);
                 TIMEIT_START;
-                radix_padic_add(rz, rx, ry, ctx);
+                padic_radix_add(rz, rx, ry, ctx);
                 TIMEIT_STOP_VALUES(__, t2);
             }
             else if (op == 3 || op == 4)
@@ -140,7 +140,7 @@ int main()
                 padic_mul(pz, px, py, pctx);
                 TIMEIT_STOP_VALUES(__, t1);
                 TIMEIT_START;
-                radix_padic_mul(rz, rx, ry, ctx);
+                padic_radix_mul(rz, rx, ry, ctx);
                 TIMEIT_STOP_VALUES(__, t2);
             }
             else if (op == 5 || op == 6)
@@ -149,7 +149,7 @@ int main()
                 padic_inv(pz, py, pctx);
                 TIMEIT_STOP_VALUES(__, t1);
                 TIMEIT_START;
-                radix_padic_inv(rz, ry, ctx);
+                padic_radix_inv(rz, ry, ctx);
                 TIMEIT_STOP_VALUES(__, t2);
             }
             else if (op == 7 || op == 8)
@@ -158,7 +158,7 @@ int main()
                 padic_div(pz, px, py, pctx);
                 TIMEIT_STOP_VALUES(__, t1);
                 TIMEIT_START;
-                radix_padic_div(rz, rx, ry, ctx);
+                padic_radix_div(rz, rx, ry, ctx);
                 TIMEIT_STOP_VALUES(__, t2);
             }
             else if (op == 9 || op == 10)
@@ -167,18 +167,18 @@ int main()
                 padic_sqrt(pz, py, pctx);
                 TIMEIT_STOP_VALUES(__, t1);
                 TIMEIT_START;
-                radix_padic_sqrt(rz, ry, ctx);
+                padic_radix_sqrt(rz, ry, ctx);
                 TIMEIT_STOP_VALUES(__, t2);
             }
 
             if (n == 10)
-                flint_printf("       n      padic     radix_padic    speedup\n");
+                flint_printf("       n      padic     padic_radix    speedup\n");
 
             flint_printf("%8wd   %10.2e    %10.2e     %5.2fx\n", n, t1, t2, t1 / t2);
 
-            radix_padic_clear(rx, ctx);
-            radix_padic_clear(ry, ctx);
-            radix_padic_clear(rz, ctx);
+            padic_radix_clear(rx, ctx);
+            padic_radix_clear(ry, ctx);
+            padic_radix_clear(rz, ctx);
 
             padic_clear(px);
             padic_clear(py);

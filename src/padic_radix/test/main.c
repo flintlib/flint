@@ -18,8 +18,8 @@
 
 test_struct tests[] =
 {
-    TEST_FUNCTION(radix_padic_dot),
-    TEST_FUNCTION(radix_padic),
+    TEST_FUNCTION(padic_radix_dot),
+    TEST_FUNCTION(padic_radix),
 };
 
 /* main function *************************************************************/

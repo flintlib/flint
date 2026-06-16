@@ -10,58 +10,58 @@
 */
 
 #include "radix.h"
-#include "radix_padic.h"
+#include "padic_radix.h"
 #include "gr.h"
 #include "longlong.h"
 #include "mpn_extras.h"
 
 int
-radix_padic_dot_strided_naive(radix_padic_t res, const radix_padic_t initial,
-    int subtract, const radix_padic_struct * vec1, slong stride1,
-    const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
+padic_radix_dot_strided_naive(padic_radix_t res, const padic_radix_t initial,
+    int subtract, const padic_radix_struct * vec1, slong stride1,
+    const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
 {
     if (len <= 0)
     {
         if (initial == NULL)
-            return radix_padic_zero(res, ctx);
-        return radix_padic_set(res, initial, ctx);
+            return padic_radix_zero(res, ctx);
+        return padic_radix_set(res, initial, ctx);
     }
 
     int status = GR_SUCCESS;
 
-    radix_padic_t t;
-    radix_padic_init(t, ctx);
+    padic_radix_t t;
+    padic_radix_init(t, ctx);
 
     if (initial == NULL)
     {
-        status |= radix_padic_mul(res, vec1, vec2, ctx);
+        status |= padic_radix_mul(res, vec1, vec2, ctx);
     }
     else
     {
         if (subtract)
-            status |= radix_padic_neg(res, initial, ctx);
+            status |= padic_radix_neg(res, initial, ctx);
         else
-            status |= radix_padic_set(res, initial, ctx);
+            status |= padic_radix_set(res, initial, ctx);
 
-        status |= radix_padic_mul(t, vec1, vec2, ctx);
-        status |= radix_padic_add(res, res, t, ctx);
+        status |= padic_radix_mul(t, vec1, vec2, ctx);
+        status |= padic_radix_add(res, res, t, ctx);
     }
 
     for (slong i = 1; i < len; i++)
     {
-        status |= radix_padic_mul(t, vec1 + i * stride1, vec2 + i * stride2, ctx);
-        status |= radix_padic_add(res, res, t, ctx);
+        status |= padic_radix_mul(t, vec1 + i * stride1, vec2 + i * stride2, ctx);
+        status |= padic_radix_add(res, res, t, ctx);
     }
 
     if (subtract)
-        status |= radix_padic_neg(res, res, ctx);
+        status |= padic_radix_neg(res, res, ctx);
 
-    radix_padic_clear(t, ctx);
+    padic_radix_clear(t, ctx);
     return status;
 }
 
 /*
-    Optimized strided dot product for radix_padic:
+    Optimized strided dot product for padic_radix:
 
         res = (initial or 0)  +/-  sum_{k=0}^{len-1} a_k * b_k,
 
@@ -89,7 +89,7 @@ radix_padic_dot_strided_naive(radix_padic_t res, const radix_padic_t initial,
     Pass 3 carry-propagates each accumulator into a normalized integer, shifts it by
     its residue r, and sums the residues; the negative side is subtracted from the
     positive. The resulting unit, valuation vmin and precision N are handed to
-    _radix_padic_finalize, which canonicalises (handling low-digit cancellation) and
+    _padic_radix_finalize, which canonicalises (handling low-digit cancellation) and
     reduces / keeps-exact as appropriate.
 */
 
@@ -137,19 +137,19 @@ _radix_dot_normalize_acc(radix_integer_t T, nn_srcptr acc, slong nslots,
 }
 
 int
-radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
-    int subtract, const radix_padic_struct * vec1, slong stride1,
-    const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
+padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial,
+    int subtract, const padic_radix_struct * vec1, slong stride1,
+    const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
 {
-    radix_struct * radix = RADIX_PADIC_CTX_RADIX(ctx);
+    radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
     slong e = radix->exp;
-    slong prec_abs = RADIX_PADIC_CTX_PREC_ABS(ctx);
-    slong prec_rel = RADIX_PADIC_CTX_PREC_REL(ctx);
+    slong prec_abs = PADIC_RADIX_CTX_PREC_ABS(ctx);
+    slong prec_rel = PADIC_RADIX_CTX_PREC_REL(ctx);
 
     slong k, vmin, maxhi, Nterms, N, Wdig, nslots;
     int have_value;
-    const radix_padic_struct * a;
-    const radix_padic_struct * b;
+    const padic_radix_struct * a;
+    const padic_radix_struct * b;
     int init_nonzero;
 
     nn_ptr * accp;
@@ -160,8 +160,8 @@ radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
     if (len <= 0)
     {
         if (initial == NULL)
-            return radix_padic_zero(res, ctx);
-        return radix_padic_set(res, initial, ctx);
+            return padic_radix_zero(res, ctx);
+        return padic_radix_set(res, initial, ctx);
     }
 
     /* ---------------- Pass 1: window and precision ---------------- */
@@ -178,7 +178,7 @@ radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
         maxhi = FLINT_MAX(maxhi, initial->v + ni * e);
         have_value = 1;
     }
-    if (initial != NULL && initial->N != RADIX_PADIC_EXACT)
+    if (initial != NULL && initial->N != PADIC_RADIX_EXACT)
         Nterms = DOT_MIN2(Nterms, initial->N);
 
     for (k = 0; k < len; k++)
@@ -189,17 +189,17 @@ radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
         b = vec2 + k * stride2;
 
         /* exact zero annihilates exactly: contributes nothing at all */
-        if ((a->u.size == 0 && a->N == RADIX_PADIC_EXACT)
-         || (b->u.size == 0 && b->N == RADIX_PADIC_EXACT))
+        if ((a->u.size == 0 && a->N == PADIC_RADIX_EXACT)
+         || (b->u.size == 0 && b->N == PADIC_RADIX_EXACT))
             continue;
 
         va = a->v; vb = b->v; Na = a->N; Nb = b->N;
         vk = va + vb;
 
-        Nk = RADIX_PADIC_EXACT;
-        if (Na != RADIX_PADIC_EXACT) Nk = DOT_MIN2(Nk, vb + Na);
-        if (Nb != RADIX_PADIC_EXACT) Nk = DOT_MIN2(Nk, va + Nb);
-        if (Nk != RADIX_PADIC_EXACT) Nterms = DOT_MIN2(Nterms, Nk);
+        Nk = PADIC_RADIX_EXACT;
+        if (Na != PADIC_RADIX_EXACT) Nk = DOT_MIN2(Nk, vb + Na);
+        if (Nb != PADIC_RADIX_EXACT) Nk = DOT_MIN2(Nk, va + Nb);
+        if (Nk != PADIC_RADIX_EXACT) Nterms = DOT_MIN2(Nterms, Nk);
 
         if (a->u.size != 0 && b->u.size != 0)
         {
@@ -216,7 +216,7 @@ radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
         radix_integer_zero(&res->u, radix);
         res->v = 0;
         res->N = Nterms;            /* EXACT if everything cancelled exactly */
-        return _radix_padic_finalize(res, ctx);
+        return _padic_radix_finalize(res, ctx);
     }
 
     /* absolute precision to compute: terms, context absolute, context relative.
@@ -224,7 +224,7 @@ radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
        accepted slightly-suboptimal choice. */
     N = Nterms;
     N = DOT_MIN2(N, prec_abs);
-    if (prec_rel != RADIX_PADIC_PREC_INF)
+    if (prec_rel != PADIC_RADIX_PREC_INF)
         N = DOT_MIN2(N, vmin + prec_rel);
 
     if (N != DOT_INF && N <= vmin)
@@ -233,7 +233,7 @@ radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
         radix_integer_zero(&res->u, radix);
         res->v = 0;
         res->N = N;
-        return _radix_padic_finalize(res, ctx);
+        return _padic_radix_finalize(res, ctx);
     }
 
     /* number of result limbs (slots) to cover */
@@ -432,33 +432,33 @@ radix_padic_dot_strided_delayed(radix_padic_t res, const radix_padic_t initial,
     radix_integer_clear(big, radix);
     radix_integer_clear(Ptmp, radix);
 
-    return _radix_padic_finalize(res, ctx);
+    return _padic_radix_finalize(res, ctx);
 }
 
 int
-radix_padic_dot_strided(radix_padic_t res, const radix_padic_t initial,
-    int subtract, const radix_padic_struct * vec1, slong stride1,
-    const radix_padic_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
+padic_radix_dot_strided(padic_radix_t res, const padic_radix_t initial,
+    int subtract, const padic_radix_struct * vec1, slong stride1,
+    const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
 {
     if (len <= 7)
-        return radix_padic_dot_strided_naive(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
+        return padic_radix_dot_strided_naive(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
     else
-        return radix_padic_dot_strided_delayed(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
+        return padic_radix_dot_strided_delayed(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx);
 }
 
 int
-radix_padic_dot(radix_padic_t res, const radix_padic_t initial,
-    int subtract, const radix_padic_struct * vec1,
-    const radix_padic_struct * vec2, slong len, gr_ctx_t ctx)
+padic_radix_dot(padic_radix_t res, const padic_radix_t initial,
+    int subtract, const padic_radix_struct * vec1,
+    const padic_radix_struct * vec2, slong len, gr_ctx_t ctx)
 {
-    return radix_padic_dot_strided(res, initial, subtract, vec1, 1, vec2, 1, len, ctx);
+    return padic_radix_dot_strided(res, initial, subtract, vec1, 1, vec2, 1, len, ctx);
 }
 
 int
-radix_padic_dot_rev(radix_padic_t res, const radix_padic_t initial,
-    int subtract, const radix_padic_struct * vec1,
-    const radix_padic_struct * vec2, slong len, gr_ctx_t ctx)
+padic_radix_dot_rev(padic_radix_t res, const padic_radix_t initial,
+    int subtract, const padic_radix_struct * vec1,
+    const padic_radix_struct * vec2, slong len, gr_ctx_t ctx)
 {
-    return radix_padic_dot_strided(res, initial, subtract, vec1, 1, vec2 + len - 1, -1, len, ctx);
+    return padic_radix_dot_strided(res, initial, subtract, vec1, 1, vec2 + len - 1, -1, len, ctx);
 }
 
