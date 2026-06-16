@@ -720,6 +720,105 @@ if pretty_tests_opt.enabled()
 endif
 
 # -----------------------------------------------------------------------------
+#  compiler pragmas
+# -----------------------------------------------------------------------------
+
+pragma_compiler = ''
+if cc.get_id() == 'clang'
+  pragma_compiler = 'clang'
+elif cc.get_id() == 'gcc'
+  pragma_compiler = 'GCC'
+endif
+
+pragma_checks = {
+  'DIAGNOSTIC_PUSH': [
+    'diagnostic push',
+    '',
+  ],
+  'DIAGNOSTIC_POP': [
+    'diagnostic pop',
+    'diagnostic push',
+  ],
+  'DIAGNOSTIC_IGNORE_INCOMPATIBLE_FUNCTION_POINTER_TYPES': [
+    'diagnostic ignored \\"-Wincompatible-function-pointer-types\\"',
+    '',
+  ],
+  'DIAGNOSTIC_IGNORE_DISCARDED_QUALIFIERS': [
+    'diagnostic ignored \\"-Wdiscarded-qualifiers\\"',
+    '',
+  ],
+  'DIAGNOSTIC_IGNORE_FORMAT': [
+    'diagnostic ignored \\"-Wformat\\"',
+    '',
+  ],
+  'DIAGNOSTIC_IGNORE_DANGLING_POINTER': [
+    'diagnostic ignored \\"-Wdangling-pointer\\"',
+    '',
+  ],
+  'DIAGNOSTIC_IGNORE_CAST_FUNCTION_TYPE': [
+    'diagnostic ignored \\"-Wcast-function-type\\"',
+    '',
+  ],
+  'DIAGNOSTIC_IGNORE_OVERLENGTH_STRINGS': [
+    'diagnostic ignored \\"-Woverlength-strings\\"',
+    '',
+  ],
+  'DIAGNOSTIC_IGNORE_UNUSED_VARIABLE': [
+    'diagnostic ignored \\"-Wunused-variable\\"',
+    '',
+  ],
+  'DIAGNOSTIC_IGNORE_MAYBE_UNINITIALIZED': [
+    'diagnostic ignored \\"-Wmaybe-uninitialized\\"',
+    '',
+  ],
+  'PUSH_OPTIONS': [
+    'push_options',
+    '',
+  ],
+  'POP_OPTIONS': [
+    'pop_options',
+    'push_options',
+  ],
+  'OPTIMIZE_O2': [
+    'optimize (\\"O2\\")',
+    '',
+  ],
+  'OPTIMIZE_OSIZE': [
+    'optimize (\\"Os\\")',
+    '',
+  ],
+  'OPTIMIZE_UNROLL_LOOPS': [
+    'optimize (\\"unroll-loops\\")',
+    '',
+  ],
+}
+
+foreach macro_name, pragma_info : pragma_checks
+  cfg_data.set(macro_name, '',
+    description: 'Define to the corresponding compiler pragma if supported.')
+
+  if pragma_compiler != ''
+    pragma = pragma_info[0]
+    pre_pragma = pragma_info[1]
+    pragma_value = '_Pragma("@0@ @1@")'.format(pragma_compiler, pragma)
+    pragma_test = ''
+
+    if pre_pragma != ''
+      pragma_test += '_Pragma("@0@ @1@")\n'.format(pragma_compiler, pre_pragma)
+    endif
+
+    pragma_test += pragma_value + '\nint main(void) { return 0; }\n'
+
+    if cc.compiles(pragma_test,
+        args: ['-Werror', '-Wunknown-pragmas'],
+        name: macro_name + ' pragma')
+      cfg_data.set(macro_name, pragma_value,
+        description: 'Define to the corresponding compiler pragma if supported.')
+    endif
+  endif
+endforeach
+
+# -----------------------------------------------------------------------------
 #  internal configuration for config.h
 # -----------------------------------------------------------------------------
 
