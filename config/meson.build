@@ -89,7 +89,9 @@ gmp_64_bit_limb = cc.compiles('''
 #endif
 ''', dependencies: gmp_dep, name: 'GMP_LIMB_BITS is 64')
 
-cfg_data.set('FLINT_BITS', gmp_64_bit_limb ? 64 : 32,
+flint_bits = gmp_64_bit_limb ? 64 : 32
+
+cfg_data.set('FLINT_BITS', flint_bits,
   description: 'Define according to the ABI FLINT was compiled with')
 
 # We need to check with cc.links rather than cc.has_function etc because we
@@ -607,7 +609,7 @@ message('FFT_SMALL: ', have_fft_small ? 'enabled' : 'disabled')
 #   Assembly
 # -----------------------------------------------------------------------------
 
-if asm_path != ''
+if asm_path != '' and flint_bits == 64
   assembly_cpu_supported = true
   assembly_dir = 'mpn_extras/' + asm_path
   if host_machine.cpu_family() == 'aarch64'
