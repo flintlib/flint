@@ -27,6 +27,7 @@ gc_opt = get_option('gc')
 ntl_opt = get_option('ntl')
 coverage_opt = get_option('b_coverage')
 cpp = meson.get_compiler('cpp')
+python = import('python').find_installation()
 
 # -----------------------------------------------------------------------------
 #   libm
@@ -853,6 +854,20 @@ message('FFT_SMALL: ', have_fft_small ? 'enabled' : 'disabled')
 #   Assembly
 # -----------------------------------------------------------------------------
 
+asm_text = '.text'
+asm_data = '.data'
+asm_label_suffix = ':'
+asm_globl = '.globl'
+asm_globl_attr = ''
+asm_gsym_prefix = ''
+asm_rodata = '.section .rodata'
+asm_type = ''
+asm_size = ''
+asm_lsym_prefix = 'L'
+asm_align_logarithmic = 'yes'
+asm_align_fill_0x90 = 'no'
+asm_have_coff_type = 'no'
+
 if asm_path != '' and flint_bits == 64
   assembly_cpu_supported = true
   assembly_dir = 'mpn_extras/' + asm_path
@@ -874,14 +889,107 @@ assembly_opt = assembly_opt.require(host_machine.system() != 'windows',
 assembly_opt = assembly_opt.require(assembly_cpu_supported,
     error_message: 'No assembly support for host CPU')
 
+if host_machine.cpu_family() == 'aarch64' or host_machine.cpu_family() == 'x86_64'
+  asm_detect = run_command(
+    python,
+    files('../_meson_build/check_assembly.py'),
+    [
+      '--host-cpu', host_machine.cpu_family(),
+      '--host-system', host_machine.system(),
+      '--',
+    ] + cc.cmd_array() + flint_abi_c_args + flint_cpu_c_args,
+    check: true,
+  )
+
+  asm_detect_lines = asm_detect.stdout().strip().split('\n')
+  foreach line : asm_detect_lines
+    if line.contains('=')
+      asm_pair = line.split('=')
+      asm_key = asm_pair[0]
+      asm_value = ''
+      if asm_pair.length() > 1
+        asm_value = asm_pair[1]
+      endif
+      if asm_key == 'TEXT'
+        asm_text = asm_value
+      elif asm_key == 'DATA'
+        asm_data = asm_value
+      elif asm_key == 'LABEL_SUFFIX'
+        asm_label_suffix = asm_value
+      elif asm_key == 'GLOBL'
+        asm_globl = asm_value
+      elif asm_key == 'GLOBL_ATTR'
+        asm_globl_attr = asm_value
+      elif asm_key == 'GSYM_PREFIX'
+        asm_gsym_prefix = asm_value
+      elif asm_key == 'RODATA'
+        asm_rodata = asm_value
+      elif asm_key == 'TYPE'
+        asm_type = asm_value
+      elif asm_key == 'SIZE'
+        asm_size = asm_value
+      elif asm_key == 'LSYM_PREFIX'
+        asm_lsym_prefix = asm_value
+      elif asm_key == 'ALIGN_LOGARITHMIC'
+        asm_align_logarithmic = asm_value
+      elif asm_key == 'ALIGN_FILL_0x90'
+        asm_align_fill_0x90 = asm_value
+      elif asm_key == 'HAVE_COFF_TYPE'
+        asm_have_coff_type = asm_value
+      endif
+    endif
+  endforeach
+endif
+
+asm_m4_includes = ''
+if host_machine.cpu_family() == 'aarch64'
+  if host_machine.system() == 'darwin'
+    asm_m4_includes = 'include(' + meson.project_source_root() + '/src/mpn_extras/arm64/darwin.m4)\n'
+  else
+    asm_m4_includes = 'include(' + meson.project_source_root() + '/src/mpn_extras/arm64/arm64-defs.m4)\n'
+  endif
+elif host_machine.cpu_family() == 'x86_64'
+  asm_m4_includes = 'include(' + meson.project_source_root() + '/src/mpn_extras/x86_64/x86_64-defs.m4)\n'
+  if host_machine.system() == 'darwin'
+    asm_m4_includes += 'include(' + meson.project_source_root() + '/src/mpn_extras/x86_64/darwin.m4)\n'
+  endif
+endif
+
+asm_cfg = configuration_data()
+asm_cfg.set('SOURCE_DIR', meson.project_source_root())
+asm_cfg.set('TEXT', asm_text)
+asm_cfg.set('DATA', asm_data)
+asm_cfg.set('LABEL_SUFFIX', asm_label_suffix)
+asm_cfg.set('GLOBL', asm_globl)
+asm_cfg.set('GLOBL_ATTR', asm_globl_attr)
+asm_cfg.set('GSYM_PREFIX', asm_gsym_prefix)
+asm_cfg.set('RODATA', asm_rodata)
+asm_cfg.set('TYPE', asm_type)
+asm_cfg.set('SIZE', asm_size)
+asm_cfg.set('LSYM_PREFIX', asm_lsym_prefix)
+asm_cfg.set('ALIGN_LOGARITHMIC', asm_align_logarithmic)
+asm_cfg.set('ALIGN_FILL_0x90', asm_align_fill_0x90)
+asm_cfg.set('HAVE_COFF_TYPE', asm_have_coff_type)
+asm_cfg.set('ASM_M4_INCLUDES', asm_m4_includes)
+
 assembly_opt = assembly_opt.enable_auto_if(true)
 have_assembly = assembly_opt.enabled()
 
 message('ASSEMBLY: ', have_assembly ? 'enabled' : 'disabled')
-
-# XXX: Need better detection of ASM language support
 if have_assembly
-  LSYM_PREFIX = 'L'
+  message('ASM TEXT: "@0@"'.format(asm_text))
+  message('ASM DATA: "@0@"'.format(asm_data))
+  message('ASM LABEL_SUFFIX: "@0@"'.format(asm_label_suffix))
+  message('ASM GLOBL: "@0@"'.format(asm_globl))
+  message('ASM GLOBL_ATTR: "@0@"'.format(asm_globl_attr))
+  message('ASM GSYM_PREFIX: "@0@"'.format(asm_gsym_prefix))
+  message('ASM RODATA: "@0@"'.format(asm_rodata))
+  message('ASM TYPE: "@0@"'.format(asm_type))
+  message('ASM SIZE: "@0@"'.format(asm_size))
+  message('ASM LSYM_PREFIX: "@0@"'.format(asm_lsym_prefix))
+  message('ASM ALIGN_LOGARITHMIC: "@0@"'.format(asm_align_logarithmic))
+  message('ASM ALIGN_FILL_0x90: "@0@"'.format(asm_align_fill_0x90))
+  message('ASM HAVE_COFF_TYPE: "@0@"'.format(asm_have_coff_type))
 endif
 
 # -----------------------------------------------------------------------------
@@ -1155,7 +1263,7 @@ foreach h : ac_headers_check
 endforeach
 
 # XXX: Need better checking for LSYM_PREFIX and related assembly options
-cfg_data_internal.set_quoted('LSYM_PREFIX', 'L',
+cfg_data_internal.set_quoted('LSYM_PREFIX', asm_lsym_prefix,
   description: 'Assembler local label prefix')
 
 cfg_data_internal.set_quoted('LT_OBJDIR', '.libs/',

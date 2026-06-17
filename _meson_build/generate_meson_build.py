@@ -246,7 +246,7 @@ foreach asm_file: asm_files
   s_file = custom_target(s_filename,
     input: [asm_file, config_m4] + asm_deps,
     output: s_filename,
-    command: [m4_prog, '@INPUT0@'],
+    command: [m4_prog, '-I', meson.project_build_root(), '@INPUT0@'],
     capture: true,
   )
   s_files += [s_file]

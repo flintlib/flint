@@ -57,7 +57,7 @@ if have_assembly
   config_m4 = configure_file(
     input: 'config.m4.in',
     output: 'config.m4',
-    configuration: {'LSYM_PREFIX': LSYM_PREFIX},
+    configuration: asm_cfg,
   )
 
   s_files = []
