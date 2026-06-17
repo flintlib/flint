@@ -14,12 +14,12 @@
 int
 padic_nmod_set(padic_nmod_t res, const padic_nmod_t x, gr_ctx_t ctx)
 {
-    res->man = x->man;
-    res->val = x->val;
+    res->u = x->u;
+    res->v = x->v;
 
     _padic_nmod_canonicalise(res, ctx);
-    /* Underflow */
-    if (res->val > PADIC_EMAX)
+
+    if (res->v > PADIC_EMAX)  /* Underflow */
         return GR_UNABLE;
 
     return GR_SUCCESS;

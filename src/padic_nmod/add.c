@@ -15,47 +15,49 @@ int
 padic_nmod_add(padic_nmod_t res, const padic_nmod_t a, const padic_nmod_t b,
                gr_ctx_t ctx)
 {
-    if (a->man == 0)
+    if (a->u == 0)
     {
         padic_nmod_set(res, b, ctx);
     }
-    else if (b->man == 0)
+
+    else if (b->u == 0)
     {
         padic_nmod_set(res, a, ctx);
     }
+
     else
     {
-        if (a->val == b->val)
+        if (a->v == b->v)
         {
-            res->man = nmod_add(a->man, b->man, PADIC_NMOD_CTX_PN_MOD(ctx));
-            res->val = a->val;
+            res->u = nmod_add(a->u, b->u, PADIC_NMOD_CTX_PN_MOD(ctx));
+            res->v = a->v;
 
             _padic_nmod_canonicalise(res, ctx);
             /* Underflow */
-            if (res->val > PADIC_EMAX)
+            if (res->v > PADIC_EMAX)
                 return GR_UNABLE;
         }
-        else if (a->val < b->val)
+
+        else if (a->v < b->v)
         {
             ulong f;
 
-            f = (b->val - a->val > PADIC_NMOD_CTX_N(ctx))
+            f = (b->v - a->v > PADIC_NMOD_CTX_N(ctx))
                 ? PADIC_NMOD_CTX_POW(ctx)[PADIC_NMOD_CTX_N(ctx) - 1]
-                : PADIC_NMOD_CTX_POW(ctx)[b->val - a->val - 1];
-            res->man = nmod_addmul(a->man, f, b->man,
-                                   PADIC_NMOD_CTX_PN_MOD(ctx));
-            res->val = a->val;
+                : PADIC_NMOD_CTX_POW(ctx)[b->v - a->v - 1];
+            res->u = nmod_addmul(a->u, f, b->u, PADIC_NMOD_CTX_PN_MOD(ctx));
+            res->v = a->v;
         }
-        else                    /* a->val > b->val */
+
+        else  /* a->v > b->v */
         {
             ulong f;
 
-            f = (a->val - b->val > PADIC_NMOD_CTX_N(ctx))
+            f = (a->v - b->v > PADIC_NMOD_CTX_N(ctx))
                 ? PADIC_NMOD_CTX_POW(ctx)[PADIC_NMOD_CTX_N(ctx) - 1]
-                : PADIC_NMOD_CTX_POW(ctx)[a->val - b->val - 1];
-            res->man = nmod_addmul(b->man, f, a->man,
-                                   PADIC_NMOD_CTX_PN_MOD(ctx));
-            res->val = b->val;
+                : PADIC_NMOD_CTX_POW(ctx)[a->v - b->v - 1];
+            res->u = nmod_addmul(b->u, f, a->u, PADIC_NMOD_CTX_PN_MOD(ctx));
+            res->v = b->v;
         }
     }
 

@@ -50,29 +50,32 @@ void padic_nmod_init(padic_nmod_t res, gr_ctx_t ctx);
 PADIC_NMOD_INLINE
 void _padic_nmod_canonicalise(padic_nmod_t x, gr_ctx_t ctx)
 {
-    if (x->man != 0)
+    if (x->u != 0)
     {
-        if (x->man > 0)
+        if (x->u > 0)
         {
-            x->val += n_remove2_precomp(&x->man, PADIC_NMOD_CTX_P(ctx),
+            x->v += n_remove2_precomp(&x->u, PADIC_NMOD_CTX_P(ctx),
                                         PADIC_NMOD_CTX_PINV(ctx));
         }
+
         else
         {
-            ulong z = - x->man;
+            ulong z = - x->u;
             slong e = n_remove2_precomp(&z, PADIC_NMOD_CTX_P(ctx),
                                         PADIC_NMOD_CTX_PINV(ctx));
 
             if (e > 0)
             {
-                x->man = - (slong) z;
+                x->u = - (slong) z;
             }
-            x->val += e;
+
+            x->v += e;
         }
     }
+
     else
     {
-        x->val = 0;
+        x->v = 0;
     }
 }
 
@@ -92,16 +95,18 @@ int padic_nmod_set_ui(padic_nmod_t res, ulong x, gr_ctx_t ctx);
 PADIC_NMOD_INLINE
 int padic_nmod_zero(padic_nmod_t res, gr_ctx_t ctx)
 {
-    res->man = 0;
-    res->val = PADIC_EMAX;
+    res->u = 0;
+    res->v = PADIC_EMAX;
+
     return GR_SUCCESS;
 }
 
 PADIC_NMOD_INLINE 
 int padic_nmod_one(padic_nmod_t res, gr_ctx_t ctx)
 {
-    res->man = 1;
-    res->val = 0;
+    res->u = 1;
+    res->v = 0;
+
     return GR_SUCCESS;
 }
 
@@ -110,13 +115,13 @@ int padic_nmod_one(padic_nmod_t res, gr_ctx_t ctx)
 PADIC_NMOD_INLINE
 truth_t padic_nmod_is_zero(const padic_nmod_t x, gr_ctx_t ctx)
 {
-    return (x->man == 0) ? T_TRUE : T_FALSE;
+    return (x->u == 0) ? T_TRUE : T_FALSE;
 }
 
 PADIC_NMOD_INLINE
 truth_t padic_nmod_is_one(const padic_nmod_t x, gr_ctx_t ctx)
 {
-    return (x->man == 1 && x->val == 0) ? T_TRUE : T_FALSE;
+    return (x->u == 1 && x->v == 0) ? T_TRUE : T_FALSE;
 }
 
 /* Arithmetic operations *****************************************************/

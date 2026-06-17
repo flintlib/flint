@@ -14,14 +14,15 @@
 int
 padic_nmod_neg(padic_nmod_t res, const padic_nmod_t a, gr_ctx_t ctx)
 {
-    if (a->man == 0)
+    if (a->u == 0)
     {
         padic_nmod_zero(res, ctx);
     }
+
     else
     {
-        res->val = a->val;
-        res->man = nmod_neg(a->man, PADIC_NMOD_CTX_PN_MOD(ctx));
+        res->v = a->v;
+        res->u = nmod_neg(a->u, PADIC_NMOD_CTX_PN_MOD(ctx));
     }
 
     return GR_SUCCESS;

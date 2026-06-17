@@ -26,10 +26,12 @@ padic_nmod_ctx_init(gr_ctx_t ctx, ulong p, slong n)
     PADIC_NMOD_CTX_POW(ctx) = (ulong *) flint_malloc(n * sizeof(ulong));
 
     PADIC_NMOD_CTX_POW(ctx)[0] = p;
+
     for (i = 1; i < n; i++)
     {
         umul_ppmm(hi, PADIC_NMOD_CTX_POW(ctx)[i],
                   PADIC_NMOD_CTX_POW(ctx)[i - 1], p);
+
         if (hi != 0)
         {
             padic_nmod_ctx_clear(ctx);
@@ -44,6 +46,7 @@ padic_nmod_ctx_init(gr_ctx_t ctx, ulong p, slong n)
 
     nmod_init(&PADIC_NMOD_CTX_P_MOD(ctx), p);
     nmod_init(&PADIC_NMOD_CTX_PN_MOD(ctx), PADIC_NMOD_CTX_POW(ctx)[n - 1]);
+
     for (i = 0; i < n; i++)
     {
         NMOD_RED(PADIC_NMOD_CTX_POW(ctx)[i], PADIC_NMOD_CTX_POW(ctx)[i],

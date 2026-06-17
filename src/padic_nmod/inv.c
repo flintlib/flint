@@ -14,14 +14,15 @@
 int
 padic_nmod_inv(padic_nmod_t res, const padic_nmod_t a, gr_ctx_t ctx)
 {
-    if (a->man == 0)
+    if (a->u == 0)
     {
         flint_throw(FLINT_ERROR, "Exception (padic_nmod_inv).  a is zero.\n");
+
         return GR_UNABLE;
     }
 
-    res->man = nmod_inv(a->man, PADIC_NMOD_CTX_PN_MOD(ctx));
-    res->val = -a->val;
+    res->u = nmod_inv(a->u, PADIC_NMOD_CTX_PN_MOD(ctx));
+    res->v = -a->v;
 
     return GR_SUCCESS;
 }

@@ -44,16 +44,16 @@ TEST_FUNCTION_START(padic_nmod_sub, state)
         padic_randtest(a, state, ctx_padic);
         padic_randtest(b, state, ctx_padic);
         padic_nmod_set_ui(c, fmpz_get_ui(padic_unit(a)), ctx_nmod);
-        c->val = padic_get_val(a);
+        c->v = padic_get_val(a);
         _padic_nmod_canonicalise(c, ctx_nmod);
         padic_nmod_set_ui(d, fmpz_get_ui(padic_unit(b)), ctx_nmod);
-        d->val = padic_get_val(b);
+        d->v = padic_get_val(b);
         _padic_nmod_canonicalise(d, ctx_nmod);
 
         padic_sub(res, a, b, ctx_padic);
         padic_nmod_sub(res_float, c, d, ctx_nmod);
 
-        if (!fmpz_equal_ui(padic_unit(a), c->man))
+        if (!fmpz_equal_ui(padic_unit(a), c->u))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("a = ");
@@ -67,7 +67,7 @@ TEST_FUNCTION_START(padic_nmod_sub, state)
             fflush(stdout);
             flint_abort();
         }
-        if (!fmpz_equal_ui(padic_unit(b), d->man))
+        if (!fmpz_equal_ui(padic_unit(b), d->u))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("b = ");
@@ -84,17 +84,17 @@ TEST_FUNCTION_START(padic_nmod_sub, state)
 
         ulong inv_prec;
 
-        if (res_float->val == FLINT_MIN(c->val, d->val))
+        if (res_float->v == FLINT_MIN(c->v, d->v))
             inv_prec = max_val;
-        else if (res_float->val > FLINT_MIN(c->val, d->val) + (signed) max_val)
+        else if (res_float->v > FLINT_MIN(c->v, d->v) + (signed) max_val)
             inv_prec = 0;
         else
-            inv_prec = max_val - (res_float->val - FLINT_MIN(c->val, d->val));
+            inv_prec = max_val - (res_float->v - FLINT_MIN(c->v, d->v));
 
         if ((fmpz_fdiv_ui(padic_unit(res),
                           fmpz_get_ui(ctx_padic->pow + inv_prec))
-             != res_float->man % fmpz_get_ui(ctx_padic->pow + inv_prec))
-            || ((padic_get_val(res) != res_float->val)
+             != res_float->u % fmpz_get_ui(ctx_padic->pow + inv_prec))
+            || ((padic_get_val(res) != res_float->v)
                 && (!padic_is_zero(res)
                     || (padic_nmod_is_zero(res_float, ctx_nmod) != T_TRUE))))
         {

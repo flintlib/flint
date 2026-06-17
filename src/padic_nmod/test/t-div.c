@@ -46,10 +46,10 @@ TEST_FUNCTION_START(padic_nmod_div, state)
         padic_randtest(a, state, ctx_padic);
         padic_randtest_not_zero(b, state, ctx_padic);
         padic_nmod_set_ui(c, fmpz_get_ui(padic_unit(a)), ctx_nmod);
-        c->val = padic_get_val(a);
+        c->v = padic_get_val(a);
         _padic_nmod_canonicalise(c, ctx_nmod);
         padic_nmod_set_ui(d, fmpz_get_ui(padic_unit(b)), ctx_nmod);
-        d->val = padic_get_val(b);
+        d->v = padic_get_val(b);
         _padic_nmod_canonicalise(d, ctx_nmod);
         padic_set(a_temp, a, ctx_padic);
         padic_set(b_temp, b, ctx_padic);
@@ -57,7 +57,7 @@ TEST_FUNCTION_START(padic_nmod_div, state)
         padic_div(res, a_temp, b_temp, ctx_padic);
         padic_nmod_div(res_float, c, d, ctx_nmod);
 
-        if (!fmpz_equal_ui(padic_unit(a), c->man))
+        if (!fmpz_equal_ui(padic_unit(a), c->u))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("a = ");
@@ -71,7 +71,7 @@ TEST_FUNCTION_START(padic_nmod_div, state)
             fflush(stdout);
             flint_abort();
         }
-        if (!fmpz_equal_ui(padic_unit(b), d->man))
+        if (!fmpz_equal_ui(padic_unit(b), d->u))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("b = ");
@@ -88,16 +88,16 @@ TEST_FUNCTION_START(padic_nmod_div, state)
 
         ulong inv_prec;
 
-        if (c->val < d->val)
+        if (c->v < d->v)
             inv_prec = max_val;
-        else if (c->val > d->val + (signed) max_val)
+        else if (c->v > d->v + (signed) max_val)
             inv_prec = 0;
         else
-            inv_prec = max_val - (c->val - d->val);
+            inv_prec = max_val - (c->v - d->v);
 
         if ((fmpz_fdiv_ui(padic_unit(res), PADIC_NMOD_CTX_PN_MOD(ctx_nmod).n)
-             != res_float->man % fmpz_get_ui(ctx_padic->pow + inv_prec))
-            || ((padic_get_val(res) != res_float->val)
+             != res_float->u % fmpz_get_ui(ctx_padic->pow + inv_prec))
+            || ((padic_get_val(res) != res_float->v)
                 && (!padic_is_zero(res)
                     || (padic_nmod_is_zero(res_float, ctx_nmod) != T_TRUE))))
         {

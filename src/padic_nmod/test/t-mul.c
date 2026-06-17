@@ -44,16 +44,16 @@ TEST_FUNCTION_START(padic_nmod_mul, state)
         padic_randtest(a, state, ctx_padic);
         padic_randtest(b, state, ctx_padic);
         padic_nmod_set_ui(c, fmpz_get_ui(padic_unit(a)), ctx_nmod);
-        c->val = padic_get_val(a);
+        c->v = padic_get_val(a);
         _padic_nmod_canonicalise(c, ctx_nmod);
         padic_nmod_set_ui(d, fmpz_get_ui(padic_unit(b)), ctx_nmod);
-        d->val = padic_get_val(b);
+        d->v = padic_get_val(b);
         _padic_nmod_canonicalise(d, ctx_nmod);
 
         padic_mul(res, a, b, ctx_padic);
         padic_nmod_mul(res_float, c, d, ctx_nmod);
 
-        if (!fmpz_equal_ui(padic_unit(a), c->man))
+        if (!fmpz_equal_ui(padic_unit(a), c->u))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("a = ");
@@ -67,7 +67,7 @@ TEST_FUNCTION_START(padic_nmod_mul, state)
             fflush(stdout);
             flint_abort();
         }
-        if (!fmpz_equal_ui(padic_unit(b), d->man))
+        if (!fmpz_equal_ui(padic_unit(b), d->u))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("b = ");
@@ -82,8 +82,8 @@ TEST_FUNCTION_START(padic_nmod_mul, state)
             flint_abort();
         }
         if ((fmpz_fdiv_ui(padic_unit(res), PADIC_NMOD_CTX_PN_MOD(ctx_nmod).n)
-             != res_float->man)
-            || ((padic_get_val(res) != res_float->val)
+             != res_float->u)
+            || ((padic_get_val(res) != res_float->v)
                 && (!padic_is_zero(res)
                     || (padic_nmod_is_zero(res_float, ctx_nmod) != T_TRUE))))
         {

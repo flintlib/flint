@@ -16,8 +16,8 @@ padic_nmod_set_ui(padic_nmod_t res, ulong x, gr_ctx_t ctx)
 {
     if (x < PADIC_NMOD_CTX_P(ctx))
     {
-        res->man = x;
-        res->val = (x == 0) ? PADIC_EMAX : 0;
+        res->u = x;
+        res->v = (x == 0) ? PADIC_EMAX : 0;
     }
     else
     {
@@ -25,8 +25,8 @@ padic_nmod_set_ui(padic_nmod_t res, ulong x, gr_ctx_t ctx)
 
         p = PADIC_NMOD_CTX_P(ctx);
 
-        res->val = n_remove2_precomp(&x, p, PADIC_NMOD_CTX_PINV(ctx));
-        res->man = nmod_set_ui(x, PADIC_NMOD_CTX_PN_MOD(ctx));
+        res->v = n_remove2_precomp(&x, p, PADIC_NMOD_CTX_PINV(ctx));
+        res->u = nmod_set_ui(x, PADIC_NMOD_CTX_PN_MOD(ctx));
     }
 
     return GR_SUCCESS;

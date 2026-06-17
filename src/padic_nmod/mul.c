@@ -15,15 +15,16 @@ int
 padic_nmod_mul(padic_nmod_t res, const padic_nmod_t a, const padic_nmod_t b,
                gr_ctx_t ctx)
 {
-    if (a->man == 0 || b->man == 0)
+    if (a->u == 0 || b->u == 0)
         return padic_nmod_zero(res, ctx);
 
-    res->man = nmod_mul(a->man, b->man, PADIC_NMOD_CTX_PN_MOD(ctx));
-    res->val = a->val + b->val;
+    res->u = nmod_mul(a->u, b->u, PADIC_NMOD_CTX_PN_MOD(ctx));
+    res->v = a->v + b->v;
 
     /* Overflow or underflow */
-    if (res->val < PADIC_EMIN || res->val > PADIC_EMAX)
+    if (res->v < PADIC_EMIN || res->v > PADIC_EMAX)
         return GR_UNABLE;
+
     else
         return GR_SUCCESS;
 }

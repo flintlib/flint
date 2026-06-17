@@ -14,6 +14,6 @@
 void
 padic_nmod_init(padic_nmod_t res, gr_ctx_t ctx)
 {
-    res->man = 0;
-    res->val = PADIC_EMAX;
+    res->u = 0;
+    res->v = PADIC_EMAX;
 }

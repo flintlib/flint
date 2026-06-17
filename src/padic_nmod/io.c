@@ -14,12 +14,13 @@
 void
 padic_nmod_println(const padic_nmod_t x, gr_ctx_t ctx)
 {
-    if (x->man == 0)
+    if (x->u == 0)
     {
         flint_printf("0\n");
     }
+
     else
     {
-        flint_printf("%wu*%wu^%wd\n", x->man, PADIC_NMOD_CTX_P(ctx), x->val);
+        flint_printf("%wu*%wu^%wd\n", x->u, PADIC_NMOD_CTX_P(ctx), x->v);
     }
 }

@@ -29,8 +29,8 @@ typedef padic_struct padic_t[1];
 
 typedef struct
 {
-    ulong man;
-    slong val;
+    ulong u;
+    slong v;
 }
 padic_nmod_struct;
 
