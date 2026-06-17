@@ -63,11 +63,11 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build-meson -Dtests=enabled
+        run: meson setup build -Dtests=enabled
       - name: "Compile"
-        run: meson compile -C build-meson
+        run: meson compile -C build
       - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build-meson --print-errorlogs
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
 
   assert-ntl-msolve-nemo:
     name: NTL, msolve and Nemo.jl
@@ -194,11 +194,11 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build-meson -Dtests=enabled
+        run: meson setup build -Dtests=enabled
       - name: "Compile"
-        run: meson compile -C build-meson
+        run: meson compile -C build
       - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build-meson --print-errorlogs
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
 
   macos-m1:
     name: Meson, M1 (x0.5)
@@ -220,11 +220,11 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build-meson -Dtests=enabled
+        run: meson setup build -Dtests=enabled
       - name: "Compile"
-        run: meson compile -C build-meson
+        run: meson compile -C build
       - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build-meson --print-errorlogs
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
 
   ubuntu-clang:
     name: ASan, BLAS, examples (x1)
@@ -258,7 +258,7 @@ jobs:
         run: $MAKE checkexamples
 
   mingw64-gcc:
-    name: MinGW (x0.5)
+    name: Meson, MinGW (x0.5)
     runs-on: windows-latest
     defaults:
       run:
@@ -273,24 +273,22 @@ jobs:
         with:
           msystem: mingw64
           update: true
-          install: bc mingw-w64-x86_64-gcc mingw-w64-x86_64-autotools
+          install: bc mingw-w64-x86_64-gcc mingw-w64-x86_64-gmp mingw-w64-x86_64-mpfr mingw-w64-x86_64-meson mingw-w64-x86_64-ninja mingw-w64-x86_64-pkgconf
       - name: "Rescale multiplier"
         run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
       - name: "Setup"
         run: |
           gcc --version
-          make --version
-          autoconf --version
-          libtool --version
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+          meson --version
+          ninja --version
+      - name: "Generate Meson files"
+        run: python update_meson.py
       - name: "Configure"
-        run: ./bootstrap.sh && ./configure CC=${CC} --enable-fast-build --disable-debug
-      - name: "Compile library"
-        run: $MAKE
-      - name: "Compile tests"
-        run: $MAKE tests
+        run: meson setup build -Dtests=enabled
+      - name: "Compile"
+        run: meson compile -C build
       - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
 
   msvc:
     name: MSVC (x0.5)
@@ -335,7 +333,7 @@ jobs:
           ctest -j5 --output-on-failure
 
   alpine-32bit:
-    name: 32-bit, musl, assert (x2.5)
+    name: Meson, 32-bit, musl, assert (x2.5)
     runs-on: ubuntu-24.04
     env:
       CC: "gcc"
@@ -350,21 +348,20 @@ jobs:
         with:
           arch: x86
           branch: edge
-          packages: gmp-dev mpfr-dev gcc musl-dev make autoconf automake libtool
+          packages: gmp-dev mpfr-dev gcc musl-dev meson ninja pkgconf python3
       - name: "Rescale multiplier"
         run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
       - name: "Setup"
         run: |
           gcc --version
-          make --version
-          autoconf --version
-          libtool --version
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+          meson --version
+          ninja --version
+          python3 --version
+      - name: "Generate Meson files"
+        run: python3 update_meson.py
       - name: "Configure"
-        run: ./bootstrap.sh && ./configure CC=${CC} --enable-assert --disable-debug
-      - name: "Compile library"
-        run: $MAKE
-      - name: "Compile tests"
-        run: $MAKE tests
+        run: meson setup build -Dtests=enabled -Dassert=enabled
+      - name: "Compile"
+        run: meson compile -C build
       - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
