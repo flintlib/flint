@@ -1,5 +1,5 @@
-option('tests', type : 'feature', value : 'disabled',
-        description: 'Build the tests')
+option('tests', type : 'feature', value : 'auto',
+        description: 'Configure tests; enabled also builds them by default')
 option('libtool_lock', type : 'feature', value : 'enabled',
         description: 'Use libtool lock')
 option('pthread', type : 'feature', value : 'enabled',

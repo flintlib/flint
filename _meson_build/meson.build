@@ -88,13 +88,10 @@ flint_test_dep = declare_dependency(
 )
 
 tests_opt = get_option('tests')
-if tests_opt.enabled()
+if not tests_opt.disabled()
   foreach mod_test : mod_tests
     subdir('src' / mod_test)
   endforeach
-else
-  bad_test_exe = executable('bad_test', '_meson_build/bad_test.c')
-  test('Need to build tests with -Dtests=enabled', bad_test_exe)
 endif
 
 pkg_mod = import('pkgconfig')

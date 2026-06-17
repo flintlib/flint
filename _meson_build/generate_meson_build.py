@@ -178,6 +178,7 @@ test_exe = executable('main',
   'main.c',
   dependencies: [flint_test_dep],
   install: false,
+  build_by_default: tests_opt.enabled(),
 )
 
 test('%s', test_exe)
@@ -195,6 +196,7 @@ test_exe = executable('main',
   't-NTL-interface.cpp',
   dependencies: [flint_test_dep, ntl_dep],
   install: false,
+  build_by_default: tests_opt.enabled(),
 )
 
 test('%s', test_exe)
