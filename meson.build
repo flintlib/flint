@@ -25,17 +25,21 @@ m_dep = cc.find_library('m', required: false)
 gmp_dep = dependency('gmp', version: '>= 6.2.1')
 mpfr_dep = dependency('mpfr', version: '>= 4.1.0')
 
-gmp_libdir = gmp_dep.get_variable(pkgconfig: 'libdir')
+gmp_link_args = []
+if cc.get_argument_syntax() != 'msvc'
+  gmp_libdir = gmp_dep.get_variable(pkgconfig: 'libdir')
+  gmp_link_args = ['-L' + gmp_libdir]
+endif
 gmp_link_dep = declare_dependency(
   dependencies: gmp_dep,
-  link_args: ['-L' + gmp_libdir],
+  link_args: gmp_link_args,
 )
 
 subdir('config')
 
 add_project_arguments(flint_warning_c_args, language: 'c')
 
-flint_deps = [gmp_link_dep, mpfr_dep, m_dep]
+flint_deps = [gmp_link_dep, mpfr_dep, m_dep, pthread_dep]
 if have_blas
   flint_deps += blas_dep
 endif

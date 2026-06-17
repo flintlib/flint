@@ -37,6 +37,50 @@ if not cc.has_function('atan2', dependencies: m_dep)
 endif
 
 # -----------------------------------------------------------------------------
+#   POSIX threads
+# -----------------------------------------------------------------------------
+
+pthread_dep = declare_dependency()
+have_pthread = false
+
+if pthread_opt.enabled()
+  pthread_candidates = []
+
+  if host_machine.system() == 'windows'
+    pthread_candidates += [
+      dependency('PThreads4W', required: false, method: 'cmake'),
+      dependency('pthreads4w', required: false),
+    ]
+  endif
+
+  pthread_candidates += [
+    dependency('pthread', required: false),
+    dependency('pthreads', required: false),
+    dependency('threads', required: false),
+  ]
+
+  foreach dep : pthread_candidates
+    if dep.found() and cc.has_header('pthread.h', dependencies: dep) and cc.has_function('pthread_create', dependencies: dep)
+      pthread_dep = dep
+      have_pthread = true
+      break
+    endif
+  endforeach
+
+  if not have_pthread
+    libpthread_dep = cc.find_library('pthread', required: false)
+    if libpthread_dep.found() and cc.has_header('pthread.h', dependencies: libpthread_dep) and cc.has_function('pthread_create', dependencies: libpthread_dep)
+      pthread_dep = libpthread_dep
+      have_pthread = true
+    endif
+  endif
+
+  if not have_pthread
+    error('POSIX threads was not found.')
+  endif
+endif
+
+# -----------------------------------------------------------------------------
 #   BLAS
 # -----------------------------------------------------------------------------
 
