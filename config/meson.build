@@ -26,7 +26,6 @@ blas_opt = get_option('blas')
 gc_opt = get_option('gc')
 ntl_opt = get_option('ntl')
 coverage_opt = get_option('b_coverage')
-cpp = meson.get_compiler('cpp')
 python = import('python').find_installation()
 
 # -----------------------------------------------------------------------------
@@ -100,73 +99,83 @@ ntl_dep = declare_dependency()
 have_ntl = false
 
 if not ntl_opt.disabled()
-  ntl_candidates = [
-    dependency('ntl', required: false, static: true),
-    dependency('ntl', required: false),
-  ]
+  have_cpp = add_languages('cpp', native: false, required: false)
 
-  foreach dep : ntl_candidates
-    if dep.found()
-      dep_has_ntl_h = cpp.has_header('NTL/ZZ.h', dependencies: dep)
-      dep_links_ntl = dep_has_ntl_h and cpp.links(
-        '''
-        #include <iostream>
-        #include <NTL/ZZ.h>
+  if have_cpp
+    cpp = meson.get_compiler('cpp')
+    add_project_arguments(flint_abi_c_args, language: 'cpp')
+    add_project_link_arguments(flint_abi_c_args, language: 'cpp')
 
-        int main() {
-          NTL::ZZ a, b, c;
-          std::cin >> a;
-          std::cin >> b;
-          c = (a + 1) * (b + 1);
-          std::cout << c << "\\n";
-          return 0;
-        }
-        ''',
-        dependencies: dep,
-        name: 'if linking with NTL works')
-      if dep_links_ntl
-        ntl_dep = dep
-        have_ntl = true
-        break
+    ntl_candidates = [
+      dependency('ntl', required: false, static: true),
+      dependency('ntl', required: false),
+    ]
+
+    foreach dep : ntl_candidates
+      if dep.found()
+        dep_has_ntl_h = cpp.has_header('NTL/ZZ.h', dependencies: dep)
+        dep_links_ntl = dep_has_ntl_h and cpp.links(
+          '''
+          #include <iostream>
+          #include <NTL/ZZ.h>
+
+          int main() {
+            NTL::ZZ a, b, c;
+            std::cin >> a;
+            std::cin >> b;
+            c = (a + 1) * (b + 1);
+            std::cout << c << "\\n";
+            return 0;
+          }
+          ''',
+          dependencies: dep,
+          name: 'if linking with NTL works')
+        if dep_links_ntl
+          ntl_dep = dep
+          have_ntl = true
+          break
+        endif
+      endif
+    endforeach
+
+    if not have_ntl
+      libntl_dep = cpp.find_library('ntl', required: false)
+      if libntl_dep.found() and cpp.has_header('NTL/ZZ.h')
+        libntl_full_dep = declare_dependency(
+          dependencies: [libntl_dep, gmp_link_dep],
+        )
+        lib_links_ntl = cpp.links(
+          '''
+          #include <iostream>
+          #include <NTL/ZZ.h>
+
+          int main() {
+            NTL::ZZ a, b, c;
+            std::cin >> a;
+            std::cin >> b;
+            c = (a + 1) * (b + 1);
+            std::cout << c << "\\n";
+            return 0;
+          }
+          ''',
+          dependencies: libntl_full_dep,
+          name: 'if linking with NTL works')
+        if lib_links_ntl
+          ntl_dep = libntl_full_dep
+          have_ntl = true
+        endif
       endif
     endif
-  endforeach
 
-  if not have_ntl
-    libntl_dep = cpp.find_library('ntl', required: false)
-    if libntl_dep.found() and cpp.has_header('NTL/ZZ.h')
-      libntl_full_dep = declare_dependency(
-        dependencies: [libntl_dep, gmp_link_dep],
-      )
-      lib_links_ntl = cpp.links(
-        '''
-        #include <iostream>
-        #include <NTL/ZZ.h>
-
-        int main() {
-          NTL::ZZ a, b, c;
-          std::cin >> a;
-          std::cin >> b;
-          c = (a + 1) * (b + 1);
-          std::cout << c << "\\n";
-          return 0;
-        }
-        ''',
-        dependencies: libntl_full_dep,
-        name: 'if linking with NTL works')
-      if lib_links_ntl
-        ntl_dep = libntl_full_dep
-        have_ntl = true
+    if ntl_opt.enabled() and not have_ntl
+      if not cpp.has_header('NTL/ZZ.h')
+        error('Could not find NTL/ZZ.h')
+      else
+        error('NTL library was not found.')
       endif
     endif
-  endif
-
-  if ntl_opt.enabled() and not have_ntl
-    if not cpp.has_header('NTL/ZZ.h')
-      error('Could not find NTL/ZZ.h')
-    else
-      error('NTL library was not found.')
-    endif
+  elif ntl_opt.enabled()
+    error('A C++ compiler is required for NTL support.')
   endif
 endif
 

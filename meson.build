@@ -1,11 +1,10 @@
-project('FLINT', 'c', 'cpp',
+project('FLINT', 'c',
   version: '3.6.0-dev',
   license: 'LGPL3+',
   meson_version: '>=1.1.0',
   default_options: [
     'buildtype=release',
     'c_std=c11',
-    'cpp_std=c++11',
   ],
 )
 
@@ -47,8 +46,8 @@ if have_gc
   flint_deps += gc_dep
 endif
 
-add_project_arguments(flint_abi_c_args, language: ['c', 'cpp'])
-add_project_link_arguments(flint_abi_c_args, language: ['c', 'cpp'])
+add_project_arguments(flint_abi_c_args, language: 'c')
+add_project_link_arguments(flint_abi_c_args, language: 'c')
 
 subdir('src')
 
