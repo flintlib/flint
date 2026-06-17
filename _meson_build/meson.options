@@ -30,11 +30,13 @@ option('gc', type : 'feature', value : 'disabled',
         description: 'Use the Boehm garbage collector')
 option('ntl', type : 'feature', value : 'disabled',
         description: 'Use NTL (in tests)')
-# Not included from original configure:
-# coverage  -Db_coverage=true
-# debug
-# dependency_tracking
-# with-pic
+# Autotools options covered by Meson built-ins:
+# coverage: -Db_coverage=true
+# debug: -Ddebug=true or -Dbuildtype=debug
+# with-pic: -Db_staticpic=true/false
+# with-sysroot: machine-file sys_root or compiler/pkg-config environment
+# with-gnu-ld: linker selection via compiler/native/cross file
+# dependency_tracking: handled by Meson/Ninja
+#
+# Not currently mirrored:
 # with-aix-soname
-# with-gnu-ld
-# with-sysroot
