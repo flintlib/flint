@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2026 Ricardo Buring
+    Copyright (C) 2026 Lars Göttgens
 
     This file is part of FLINT.
 
@@ -120,6 +121,7 @@ PERM_INLINE void
 
 /* Composition ***************************************************************/
 
+// if p is encoded by vec1 and q is encoded by vec2, then p*q is encoded by res
 PERM_INLINE void
 _perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
 {
@@ -140,6 +142,74 @@ _perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
     {
         for (i = 0; i < n; i++)
             res[i] = vec1[vec2[i]];
+    }
+}
+
+// if a is encoded by vec1 and b is encoded by vec2, then (a^-1)*b is encoded by res
+PERM_INLINE void
+_perm_compose_inv1(slong *res, const slong *vec1, const slong *vec2, slong n)
+{
+    slong i;
+
+    // FIXME: do this without allocating memory, if non-aliasing
+    if (vec1 == vec2)
+    {
+        _perm_one(res, n);
+    }
+    if (res == vec2)
+    {
+        slong *t = (slong *) flint_malloc(n * sizeof(slong));
+
+        for (i = 0; i < n; i++)
+            t[vec1[i]] = i;
+        for (i = 0; i < n; i++)
+            res[i] = t[vec2[i]];
+
+        flint_free(t);
+    }
+    else
+    {
+        _perm_inv(res, vec1, n);
+        _perm_compose(res, res, vec2, n);
+    }
+}
+
+// if a is encoded by vec1 and b is encoded by vec2, then a*(b^-1) is encoded by res
+PERM_INLINE void
+_perm_compose_inv2(slong *res, const slong *vec1, const slong *vec2, slong n)
+{
+    slong i;
+
+    if (vec1 == vec2)
+    {
+        _perm_one(res, n);
+    }
+    else if (res == vec1)
+    {
+        slong *t = (slong *) flint_malloc(n * sizeof(slong));
+
+        for (i = 0; i < n; i++)
+            t[i] = vec1[i];
+        for (i = 0; i < n; i++)
+            res[vec2[i]] = t[i];
+
+        flint_free(t);
+    }
+    else if (res == vec2)
+    {
+        slong *t = (slong *) flint_malloc(n * sizeof(slong));
+
+        for (i = 0; i < n; i++)
+            t[vec2[i]] = i;
+        for (i = 0; i < n; i++)
+            res[i] = vec1[t[i]];
+
+        flint_free(t);
+    }
+    else
+    {
+        for (i = 0; i < n; i++)
+            res[vec2[i]] = vec1[i];
     }
 }
 
