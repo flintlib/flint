@@ -11,7 +11,12 @@ on:
       - 'CMakeLists.txt'
       - 'config/**'
       - 'configure.ac'
+      - 'include/meson.build'
+      - 'include/flint/meson.build'
       - 'Makefile.in'
+      - 'meson.build'
+      - 'meson.options'
+      - 'update_meson.py'
   push:
     paths:
       - '.github/workflows/CI.yml'
@@ -22,7 +27,12 @@ on:
       - 'CMakeLists.txt'
       - 'config/**'
       - 'configure.ac'
+      - 'include/meson.build'
+      - 'include/flint/meson.build'
       - 'Makefile.in'
+      - 'meson.build'
+      - 'meson.options'
+      - 'update_meson.py'
 
 env:
   GLOBAL_MULTIPLIER: 1
@@ -34,6 +44,31 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
+  ubuntu-meson:
+    name: Meson, GCC (x0.5)
+    runs-on: ubuntu-24.04
+    env:
+      CC: "gcc"
+      TESTCOEFF: "0.5"
+    steps:
+      - name: "Rescale multiplier"
+        run: echo "FLINT_TEST_MULTIPLIER=$(echo "${TESTCOEFF} * ${GLOBAL_MULTIPLIER}" | bc)" >> $GITHUB_ENV
+      - uses: actions/checkout@v5
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y libgmp-dev libmpfr-dev meson ninja-build pkg-config
+          $CC --version
+          meson --version
+          ninja --version
+      - name: "Generate Meson files"
+        run: python3 update_meson.py
+      - name: "Configure"
+        run: meson setup build-meson -Dtests=enabled
+      - name: "Compile"
+        run: meson compile -C build-meson
+      - name: "Check"
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build-meson --print-errorlogs
+
   assert-ntl-msolve-nemo:
     name: NTL, msolve and Nemo.jl
     runs-on: ubuntu-24.04
