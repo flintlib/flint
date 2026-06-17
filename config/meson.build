@@ -58,7 +58,9 @@ if pthread_opt.enabled()
   if host_machine.system() == 'windows'
     pthread_candidates += [
       dependency('unofficial-pthreads', required: false, method: 'cmake', modules: ['unofficial::pthreads::pthread']),
-      dependency('PThreads4W', required: false, method: 'cmake'),
+      dependency('PThreads4W', required: false, method: 'cmake', modules: ['PThreads4W::PThreads4W']),
+      dependency('PThreads4W', required: false, method: 'cmake', modules: ['PThreads4W::pthread']),
+      dependency('PThreads4W', required: false, method: 'cmake', modules: ['PThreads4W::pthreadVC3']),
       dependency('pthreads4w', required: false),
     ]
   endif
