@@ -80,11 +80,14 @@ if pthread_opt.enabled()
   endforeach
 
   if not have_pthread
-    libpthread_dep = cc.find_library('pthread', required: false)
-    if libpthread_dep.found() and cc.has_header('pthread.h', dependencies: libpthread_dep) and cc.has_function('pthread_create', dependencies: libpthread_dep)
-      pthread_dep = libpthread_dep
-      have_pthread = true
-    endif
+    foreach libname : ['pthread', 'pthreadVC3', 'pthreadVCE3', 'pthreadVSE3']
+      libpthread_dep = cc.find_library(libname, required: false)
+      if libpthread_dep.found() and cc.has_header('pthread.h', dependencies: libpthread_dep) and cc.has_function('pthread_create', dependencies: libpthread_dep)
+        pthread_dep = libpthread_dep
+        have_pthread = true
+        break
+      endif
+    endforeach
   endif
 
   if not have_pthread
