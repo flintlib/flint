@@ -320,7 +320,8 @@ if gmp_internals_opt.allowed()
     _code = gmp_test_code.format(snippets[0], snippets[1])
     if not cc.links(_code, args: flint_abi_c_args, dependencies: gmp_dep, name: name + ' links')
       message('This code did not link with -lgmp: ', _code)
-      # Maybe disable gmp_internals rather than error?
+      # Match autotools: GMP internals are enabled by default and these symbols
+      # are required unless -Dgmp_internals=disabled is used.
       error('GMP does not have ' + name + gmp_abi_error_suffix)
     endif
   endforeach
@@ -366,7 +367,7 @@ if gmp_internals_opt.allowed()
 
   foreach name, snippets : gmp_internals_optional
     _code = gmp_test_code.format(snippets[0], snippets[1])
-    if cc.links(_code, dependencies: gmp_dep, name: name + ' links')
+    if cc.links(_code, args: flint_abi_c_args, dependencies: gmp_dep, name: name + ' links')
       cfg_data.set('FLINT_HAVE_NATIVE_' + name, 1,
         description: 'Define if GMP has ' + name)
     endif
@@ -1124,7 +1125,6 @@ ac_headers_check = [
   'errno.h',
   'fenv.h',
   'float.h',
-  'immintrin.h', # XXX: has_header is not equivalent to autotools check...
   'inttypes.h',
   'malloc.h',
   'math.h',
@@ -1175,5 +1175,3 @@ cfg_data_internal.set('STDC_HEADERS', 1,
   description: '''Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it.''')
-
-# XXX: set WORDS_BIGENDIAN or undef inline here?

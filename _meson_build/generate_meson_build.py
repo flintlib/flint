@@ -86,7 +86,7 @@ mod_no_tests = [
     'fq_zech_mpoly_factor',
     'generic_files',
     'hypgeom',
-    # XXX: Templates...
+    # Template tests are included by the concrete fq_nmod/fq_zech modules.
     'fq_templates',
     'fq_embed_templates',
     'fq_poly_templates',
