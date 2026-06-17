@@ -23,10 +23,8 @@ TEST_GR_FUNCTION_START(gr_mat_permute_rows, state, count_success, count_domain, 
     {
         slong m, n, i, j;
         gr_ctx_t ctx;
-        gr_mat_t mat, mat2;
-        slong * perm_act;
-        slong * perm_store;
-        slong * perm;
+        gr_mat_t mat, mat2, mat3;
+        slong *perm_act, *perm_act_inv, *perm, *perm_store, *perm_store_copy;
 
         slong status = GR_SUCCESS;
 
@@ -76,40 +74,60 @@ TEST_GR_FUNCTION_START(gr_mat_permute_rows, state, count_success, count_domain, 
             }
         }
 
-        // Now permute back using the inverse of perm_act to verify that the operation is reversible
-        _perm_inv(perm_act, perm_act, m);
-        status |= gr_mat_permute_rows(mat2, perm_store, perm_act, ctx);
+        // Now permute back using the inverse of perm_act (in two different ways) to verify that the operation is reversible
+        status |= gr_mat_init_set(mat3, mat2, ctx);
+        perm_act_inv = _perm_init(m);
+        _perm_inv(perm_act_inv, perm_act, m);
+        perm_store_copy = _perm_init(m);
+        _perm_set(perm_store_copy, perm_store, m);
         
+        status |= gr_mat_permute_rows_inv(mat2, perm_store, perm_act, ctx);
+
         if (!_perm_equal(perm_store, perm, m))
         {
             flint_printf("FAIL (3):\n");
-            flint_printf("auxiliary permutation not correctly permuted back by inverse of perm_act\n");
+            flint_printf("auxiliary permutation not correctly permuted back by gr_mat_permute_rows_inv\n");
             flint_abort();
         }
 
         if (gr_mat_equal(mat, mat2, ctx) == T_FALSE)
         {
             flint_printf("FAIL (4):\n");
+            flint_printf("matrix not correctly row-permuted back by gr_mat_permute_rows_inv\n");
+            flint_abort();
+        }
+
+        _perm_set(perm_store, perm_store_copy, m);
+        status |= gr_mat_permute_rows(mat3, perm_store, perm_act_inv, ctx);
+
+        if (!_perm_equal(perm_store, perm, m))
+        {
+            flint_printf("FAIL (5):\n");
+            flint_printf("auxiliary permutation not correctly permuted back by inverse of perm_act\n");
+            flint_abort();
+        }
+
+        if (gr_mat_equal(mat, mat2, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL (6):\n");
             flint_printf("matrix not correctly row-permuted back by inverse of perm_act\n");
             flint_abort();
         }
 
         // Act once again with the original permutation, but this time with perm_store set to one
-        _perm_inv(perm_act, perm_act, m);
         _perm_one(perm_store, m);
         status |= gr_mat_permute_rows(mat2, perm_store, perm_act, ctx);
-        _perm_inv(perm_act, perm_store, m);
-        status |= gr_mat_permute_rows(mat2, perm_store, perm_act, ctx);
+        status |= gr_mat_permute_rows_inv(mat2, perm_store, perm_act, ctx);
         if (!_perm_is_one(perm_store, m))
         {
-            flint_printf("FAIL (5):\n");
+            flint_printf("FAIL (7):\n");
             flint_printf("auxiliary permutation not correctly permuted back by its inverse\n");
             flint_abort();
         }
 
         if (gr_mat_equal(mat, mat2, ctx) == T_FALSE)
         {
-            flint_printf("FAIL (B 2):\n");
+            flint_printf("FAIL (8):\n");
             flint_printf("matrix not correctly row-permuted back by inverse of perm_store\n");
             flint_abort();
         }
@@ -122,8 +140,10 @@ TEST_GR_FUNCTION_START(gr_mat_permute_rows, state, count_success, count_domain, 
         gr_mat_clear(mat2, ctx);
         gr_ctx_clear(ctx);
         _perm_clear(perm_act);
+        _perm_clear(perm_act_inv);
         _perm_clear(perm);
         _perm_clear(perm_store);
+        _perm_clear(perm_store_copy);
     }
 
     // consistency with gr_mat_swap_rows
@@ -133,8 +153,7 @@ TEST_GR_FUNCTION_START(gr_mat_permute_rows, state, count_success, count_domain, 
         slong n = 3;
         gr_ctx_t ctx;
         gr_mat_t mat, mat2;
-        slong * perm_act;
-        slong * perm_store;
+        slong * perm;
 
         slong status = GR_SUCCESS;
 
@@ -145,18 +164,15 @@ TEST_GR_FUNCTION_START(gr_mat_permute_rows, state, count_success, count_domain, 
 
         status |= gr_mat_init_set(mat2, mat, ctx);
 
-        perm_store = _perm_init(m);
-        _perm_one(perm_store, m);
+        perm = _perm_init(m);
+        _perm_one(perm, m);
 
-        status |= gr_mat_swap_rows(mat2, perm_store, 0, 1, ctx);
-        status |= gr_mat_swap_rows(mat2, perm_store, 1, 2, ctx);
+        status |= gr_mat_swap_rows(mat2, perm, 0, 1, ctx);
+        status |= gr_mat_swap_rows(mat2, perm, 1, 2, ctx);
 
-        perm_act = _perm_init(m);
-        _perm_inv(perm_act, perm_store, m);
+        status |= gr_mat_permute_rows_inv(mat2, perm, perm, ctx);
 
-        status |= gr_mat_permute_rows(mat2, perm_store, perm_act, ctx);
-
-        if (!_perm_is_one(perm_store, m))
+        if (!_perm_is_one(perm, m))
         {
             flint_printf("FAIL (B 1):\n");
             flint_printf("auxiliary permutation not correctly permuted back by its inverse\n");
@@ -166,7 +182,7 @@ TEST_GR_FUNCTION_START(gr_mat_permute_rows, state, count_success, count_domain, 
         if (gr_mat_equal(mat, mat2, ctx) == T_FALSE)
         {
             flint_printf("FAIL (B 2):\n");
-            flint_printf("matrix not correctly row-permuted back by inverse of perm_store\n");
+            flint_printf("matrix not correctly row-permuted back by inverse of perm\n");
             flint_abort();
         }
         
@@ -177,8 +193,7 @@ TEST_GR_FUNCTION_START(gr_mat_permute_rows, state, count_success, count_domain, 
         gr_mat_clear(mat, ctx);
         gr_mat_clear(mat2, ctx);
         gr_ctx_clear(ctx);
-        _perm_clear(perm_act);
-        _perm_clear(perm_store);
+        _perm_clear(perm);
     }
 
 

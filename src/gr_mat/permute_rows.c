@@ -38,3 +38,13 @@ gr_mat_permute_rows(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr
     
     return status;
 }
+
+int
+gr_mat_permute_rows_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx)
+{
+    slong *perm_act_inv = _perm_init(mat->r);
+    _perm_inv(perm_act_inv, perm_act, mat->r);
+    int status = gr_mat_permute_rows(mat, perm_store, perm_act_inv, ctx);
+    _perm_clear(perm_act_inv);
+    return status;
+}

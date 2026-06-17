@@ -229,8 +229,18 @@ Basic row, column and entry operations
 
     This function is compatible with :func:`gr_mat_swap_cols` and :func:`gr_mat_invert_cols`
     in the following sense: When starting with the identity permutation, calling these two functions
-    repeatedly with the same matrix, and finally calling :func:`gr_mat_permute_rows` with the inverse of the permutation as
-    ``perm_act``, the result will be the original matrix. 
+    repeatedly with the same matrix, and finally calling :func:`gr_mat_permute_rows_inv` with the permutation as
+    ``perm_act``, the result will be the original matrix.
+
+.. function:: int gr_mat_permute_rows_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+
+    Permutes rows of the matrix ``mat`` according to the inverse of the permutation ``perm_act``
+    and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
+    This means that ``mat[i, j]`` will be moved to ``mat[perm_act[i], j]``
+    and ``perm_store[i]`` will be moved to ``perm_store[perm_act[i]]``.
+
+    This function is semantically equivalent to :func:`gr_mat_permute_rows` with the inverse of ``perm_act`` as argument,
+    but is more efficient since it does not require computing the inverse permutation.
 
 .. function:: int gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
 
@@ -241,8 +251,18 @@ Basic row, column and entry operations
 
     This function is compatible with :func:`gr_mat_swap_rows` and :func:`gr_mat_invert_rows`
     in the following sense: When starting with the identity permutation, calling these two functions
-    repeatedly with the same matrix, and finally calling :func:`gr_mat_permute_cols` with the inverse of the permutation as
+    repeatedly with the same matrix, and finally calling :func:`gr_mat_permute_cols_inv` with the permutation as
     ``perm_act``, the result will be the original matrix.
+
+.. function:: int gr_mat_permute_cols_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+
+    Permutes columns of the matrix ``mat`` according to the inverse of the permutation ``perm_act``
+    and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
+    This means that ``mat[i, j]`` will be moved to ``mat[i, perm_act[j]]``
+    and ``perm_store[j]`` will be moved to ``perm_store[perm_act[j]]``.
+
+    This function is semantically equivalent to :func:`gr_mat_permute_cols` with the inverse of ``perm_act`` as argument,
+    but is more efficient since it does not require computing the inverse permutation.
 
 .. function:: int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
 
