@@ -892,7 +892,7 @@ assembly_opt = assembly_opt.require(assembly_cpu_supported,
 if host_machine.cpu_family() == 'aarch64' or host_machine.cpu_family() == 'x86_64'
   asm_detect = run_command(
     python,
-    files('../_meson_build/check_assembly.py'),
+    files('check_assembly.py'),
     [
       '--host-cpu', host_machine.cpu_family(),
       '--host-system', host_machine.system(),

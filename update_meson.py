@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 from os import listdir, makedirs
 from os.path import join, dirname, abspath, isdir
@@ -7,8 +9,6 @@ from argparse import ArgumentParser
 this_dir = dirname(abspath(__file__))
 
 files_to_copy = [
-    'configure',
-    'Makefile',
     'meson.build',
     'meson.options',
     'include/meson.build',
@@ -100,7 +100,7 @@ src_meson_build = '''\
 # This file is generated automatically.
 #
 # To regenerate it, run:
-#   python _meson_build/generate_meson_build.py
+#   python update_meson.py
 #
 
 modules = [
@@ -159,7 +159,7 @@ src_mod_meson_build = '''\
 # This file is generated automatically.
 #
 # To regenerate it, run:
-#   python _meson_build/generate_meson_build.py
+#   python update_meson.py
 #
 
 c_files_all += files(
@@ -171,7 +171,7 @@ test_mod_meson_build = '''\
 # This file is generated automatically.
 #
 # To regenerate it, run:
-#   python _meson_build/generate_meson_build.py
+#   python update_meson.py
 #
 
 test_exe = executable('main',
@@ -189,7 +189,7 @@ test_mod_NTL_meson_build = '''\
 # This file is generated automatically.
 #
 # To regenerate it, run:
-#   python _meson_build/generate_meson_build.py
+#   python update_meson.py
 #
 
 test_exe = executable('main',
@@ -295,20 +295,20 @@ parser.add_argument('-q', '--quiet', action='store_true',
                     help='Do not print anything')
 parser.add_argument('-v', '--verbose', action='store_true',
                     help='Show all steps')
-parser.add_argument('output_dir', default='.', help='Output directory')
 
 
 def main(args):
     args = parser.parse_args(args)
+    output_dir = this_dir
 
     for fname in files_to_copy:
         src_path = join(this_dir, fname)
-        dst_path = join(args.output_dir, fname)
+        dst_path = join(output_dir, fname)
         if not args.quiet:
             print('Copying %s to %s' % (src_path, dst_path))
         copy_file(src_path, dst_path)
 
-    modules = get_flint_modules(args.output_dir)
+    modules = get_flint_modules(output_dir)
 
     # We will generate the meson.build file for conditional modules but the
     # main meson.build file will decide whether to include them or not.
@@ -321,7 +321,7 @@ def main(args):
         format_lines(mod_no_tests),
         format_lines(head_no_dir),
     )
-    dst_path = join(args.output_dir, 'src', 'meson.build')
+    dst_path = join(output_dir, 'src', 'meson.build')
     if not args.quiet:
         print('Writing %s' % dst_path)
     write_file(dst_path, src_meson_build_text)
@@ -330,7 +330,7 @@ def main(args):
         print('Making meson.build files in all modules')
     # src/mod/meson.build
     for mod in modules + mod_no_header:
-        mod_dir = join(args.output_dir, 'src', mod)
+        mod_dir = join(output_dir, 'src', mod)
         c_files = [f for f in listdir(mod_dir) if f.endswith('.c')]
         if mod == 'fmpz':
             c_files = [f for f in c_files if f != 'fmpz.c']
@@ -350,7 +350,7 @@ def main(args):
             write_file(dst_path, test_mod_meson_build_text)
 
     # Build for the NTL tests
-    dst_path = join(args.output_dir, 'src', 'interfaces', 'test', 'meson.build')
+    dst_path = join(output_dir, 'src', 'interfaces', 'test', 'meson.build')
     test_mod_meson_build_text = test_mod_NTL_meson_build % 'NTL-interface'
     if args.verbose:
         print('Writing %s' % dst_path)
@@ -358,7 +358,7 @@ def main(args):
 
     # src/mpn_extras/*/meson.build
     for path, asm_submodule in asm_modules:
-        asm_dir = join(args.output_dir, 'src', path)
+        asm_dir = join(output_dir, 'src', path)
         asm_files = [f for f in listdir(asm_dir) if f.endswith('.asm')]
         asm_submodule_text = asm_submodule % format_lines(asm_files)
         asm_submodule_text += asm_to_s_files
@@ -379,6 +379,8 @@ def write_file(dst_path, text):
 
 
 def copy_file(src_path, dst_path):
+    if abspath(src_path) == abspath(dst_path):
+        return
     makedirs(dirname(dst_path), exist_ok=True)
     copy2(src_path, dst_path)
 

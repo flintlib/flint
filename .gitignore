@@ -21,6 +21,8 @@ config/*
 !config/config.sub
 !config/configfsf.guess
 !config/configfsf.sub
+!config/check_assembly.py
+!config/meson.build
 config.log
 confdefs.h
 conftest.*
@@ -63,10 +65,7 @@ libtool
 flint.pc
 autom4te.cache/
 config.m4
-config.m4.in
 src/flint-mparam.h
 .gdb_history
 vgcore.*
-meson
-meson.build
-meson.options
+src/**/meson.build
