@@ -324,6 +324,12 @@ jobs:
           meson --version
           ninja --version
           C:\vcpkg\installed\x64-windows\tools\pkgconf\pkgconf.exe --version
+      - name: "Inspect vcpkg pthreads"
+        run: |
+          Get-ChildItem C:\vcpkg\installed\x64-windows\include -Filter '*pthread*' | Select-Object FullName
+          Get-ChildItem C:\vcpkg\installed\x64-windows\lib -Filter '*pthread*' | Select-Object FullName
+          Get-ChildItem C:\vcpkg\installed\x64-windows\lib\pkgconfig -Filter '*pthread*' | Select-Object FullName
+          Get-ChildItem C:\vcpkg\installed\x64-windows\share -Recurse -Filter '*pthread*' | Select-Object FullName
       - name: "Generate Meson files"
         run: python update_meson.py
       - name: "Configure"
