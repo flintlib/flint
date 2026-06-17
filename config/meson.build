@@ -48,6 +48,7 @@ if pthread_opt.enabled()
 
   if host_machine.system() == 'windows'
     pthread_candidates += [
+      dependency('unofficial-pthreads', required: false, method: 'cmake', modules: ['unofficial::pthreads::pthread']),
       dependency('PThreads4W', required: false, method: 'cmake'),
       dependency('pthreads4w', required: false),
     ]
@@ -1277,7 +1278,7 @@ foreach h : mandatory_headers
   endif
 endforeach
 
-if pthread_opt.enabled() and not cc.has_header('pthread.h')
+if pthread_opt.enabled() and not have_pthread and not cc.has_header('pthread.h')
   error('Could not find pthread.h')
 endif
 

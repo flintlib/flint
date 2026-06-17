@@ -320,6 +320,7 @@ jobs:
           $pkgConfigPath = "C:/vcpkg/installed/x64-windows/lib/pkgconfig"
           echo "PKG_CONFIG=C:\vcpkg\installed\x64-windows\tools\pkgconf\pkgconf.exe" | Out-File -Append -FilePath $env:GITHUB_ENV
           echo "PKG_CONFIG_PATH=$pkgConfigPath" | Out-File -Append -FilePath $env:GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=C:/vcpkg/installed/x64-windows" | Out-File -Append -FilePath $env:GITHUB_ENV
           echo "C:\vcpkg\installed\x64-windows\bin" | Out-File -Append -FilePath $env:GITHUB_PATH
           echo "C:\vcpkg\installed\x64-windows\tools\pkgconf" | Out-File -Append -FilePath $env:GITHUB_PATH
           cl 2>&1 | Select-Object -First 3
