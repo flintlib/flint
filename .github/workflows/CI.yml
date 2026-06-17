@@ -79,21 +79,27 @@ jobs:
       - uses: actions/checkout@v5
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev libmpfr-dev libntl-dev autoconf libtool-bin
+          sudo apt-get install -y libgmp-dev libmpfr-dev libntl-dev autoconf libtool-bin meson ninja-build pkg-config
           $CC --version
           make --version
           autoconf --version
           libtool --version
+          meson --version
+          ninja --version
           julia --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+      - name: "Generate Meson files"
+        run: python3 update_meson.py
       - name: "Build FLINT for msolve"
         run: |
-          ./bootstrap.sh && ./configure CC=${CC} --with-ntl --enable-assert
-          $MAKE && sudo make install && sudo ldconfig
+          meson setup build -Dtests=enabled -Dntl=enabled -Dassert=enabled
+          meson compile -C build
+          sudo meson install -C build
+          sudo ldconfig
       - name: "Test FLINT for msolve"
         run: |
-          $MAKE tests
-          $MAKE check
+          echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER"
+          meson test -C build --print-errorlogs
       - name: "Test msolve"
         run: |
           git clone --depth=1 https://github.com/algebraic-solving/msolve
@@ -103,14 +109,14 @@ jobs:
           gmp_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(gmp_artifact_dir())')
           mpfr_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(mpfr_artifact_dir())')
           echo "Path to GMP and MPFR: ${gmp_path}, ${mpfr_path}"
-          ./bootstrap.sh && ./configure CC=${CC} --with-gmp=$gmp_path --with-mpfr=$mpfr_path && $MAKE
-          mkdir lib
-          cp libflint.so* lib/
+          PKG_CONFIG_PATH="${gmp_path}/lib/pkgconfig:${mpfr_path}/lib/pkgconfig" meson setup build-nemo --prefix="$(pwd)/nemo-flint" -Dlibdir=lib -Dtests=disabled
+          meson compile -C build-nemo
+          meson install -C build-nemo
       - name: "Test Nemo.jl"
         run: |
           git clone --depth 1 https://github.com/Nemocas/Nemo.jl.git
           mkdir -p ~/.julia/artifacts
-          echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"$(pwd)\"" > ~/.julia/artifacts/Overrides.toml
+          echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"$(pwd)/nemo-flint\"" > ~/.julia/artifacts/Overrides.toml
           julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\"); Pkg.test(\"Nemo\")"
 
   ubuntu-codecov:

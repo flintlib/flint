@@ -28,6 +28,15 @@ ntl_opt = get_option('ntl')
 coverage_opt = get_option('b_coverage')
 python = import('python').find_installation()
 
+flint_abi_c_args = []
+if abi_opt != 'auto'
+  abi_flag = '-m' + abi_opt
+  if not cc.has_argument(abi_flag)
+    error(meson.get_compiler('c').get_id() + ' does not support ' + abi_flag)
+  endif
+  flint_abi_c_args += abi_flag
+endif
+
 # -----------------------------------------------------------------------------
 #   libm
 # -----------------------------------------------------------------------------
@@ -307,13 +316,7 @@ if gmp_long_long_limb
     description: 'Define to use long long limbs')
 endif
 
-flint_abi_c_args = []
 if abi_opt != 'auto'
-  abi_flag = '-m' + abi_opt
-  if not cc.has_argument(abi_flag)
-    error(meson.get_compiler('c').get_id() + ' does not support ' + abi_flag)
-  endif
-  flint_abi_c_args += abi_flag
   flint_bits = abi_opt == '64' ? 64 : 32
 else
 gmp_64_bit_limb = cc.compiles('''
