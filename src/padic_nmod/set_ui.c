@@ -25,7 +25,8 @@ padic_nmod_set_ui(padic_nmod_t res, ulong x, gr_ctx_t ctx)
 
         p = PADIC_NMOD_CTX_P(ctx);
 
-        res->v = n_remove2_precomp(&x, p, PADIC_NMOD_CTX_PINV(ctx));
+        res->v = n_remove2_prime_inv(&x, p, PADIC_NMOD_CTX_PINV1(ctx),
+                                     PADIC_NMOD_CTX_PINV2(ctx));
         res->u = nmod_set_ui(x, PADIC_NMOD_CTX_PN_MOD(ctx));
     }
 

@@ -36,13 +36,11 @@ valuation `val`.
 Context
 --------------------------------------------------------------------------------
 
-A context object for `p`-adic arithmetic contains data pertinent to 
-`p`-adic computations, but which we choose not to store with each 
-element individually.
-Currently, this includes the prime number `p`, its ``double`` 
-inverse in case of word-sized primes, precomputed powers of `p` 
-in the range between `1` and `N`, and the integers modulo `p` 
-and `p^N`.
+A context object for `p`-adic arithmetic contains data pertinent to `p`-adic
+computations, but which we choose not to store with each element individually.
+Currently, this includes the prime number `p`, its inverse and the quotient of
+`UWORD_MAX` by `p`, precomputed powers of `p` in the range between `1` and `N`,
+and the integers modulo `p` and `p^N`.
 
 .. function:: int padic_nmod_ctx_init(gr_ctx_t ctx, ulong p, slong n)
 

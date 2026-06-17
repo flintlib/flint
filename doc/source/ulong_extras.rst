@@ -1344,6 +1344,19 @@ Factorisation
     `p` we make repeated use of :func:`n_divrem2_precomp` until division
     by `p` is no longer possible.
 
+.. function:: int n_remove2_prime_inv(ulong * n, ulong p, ulong inv1, ulong inv2)
+
+    Removes the highest possible power of `p` from `n`, replacing `n` with the
+    quotient. The return value is the highest power of `p` that divided `n`.
+    Assumes `n` is not `0`.
+
+    For `p = 2` trailing zeroes are counted. For other primes `p` we require
+    `inv1` to be set to a precomputed inverse of `p` computed with
+    :func:`n_binvert`, and `inv2` to be the quotient of ``UWORD_MAX`` by `p`.
+    Then repeated divisions by `p` are done until it is no longer possible.
+
+    Assumes that `p` is prime.
+
 .. function:: void n_factor_insert(n_factor_t * factors, ulong p, ulong exp)
 
     Inserts the given prime power factor ``p^exp`` into ``factors``.

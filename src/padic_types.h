@@ -58,7 +58,8 @@ typedef padic_ctx_struct padic_ctx_t[1];
 typedef struct
 {
     ulong p;
-    double pinv;
+    ulong pinv1;
+    ulong pinv2;
     slong n;
     ulong * pow;
     nmod_t p_mod;

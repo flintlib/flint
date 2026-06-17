@@ -32,7 +32,8 @@ extern "C" {
 #define PADIC_NMOD_CTX(ctx) \
 ((_padic_nmod_ctx_struct *)(GR_CTX_DATA_AS_PTR(ctx)))
 #define PADIC_NMOD_CTX_P(ctx) (PADIC_NMOD_CTX(ctx)->p)
-#define PADIC_NMOD_CTX_PINV(ctx) (PADIC_NMOD_CTX(ctx)->pinv)
+#define PADIC_NMOD_CTX_PINV1(ctx) (PADIC_NMOD_CTX(ctx)->pinv1)
+#define PADIC_NMOD_CTX_PINV2(ctx) (PADIC_NMOD_CTX(ctx)->pinv2)
 #define PADIC_NMOD_CTX_N(ctx) (PADIC_NMOD_CTX(ctx)->n)
 #define PADIC_NMOD_CTX_POW(ctx) (PADIC_NMOD_CTX(ctx)->pow)
 #define PADIC_NMOD_CTX_P_MOD(ctx) (PADIC_NMOD_CTX(ctx)->p_mod)
@@ -54,15 +55,17 @@ void _padic_nmod_canonicalise(padic_nmod_t x, gr_ctx_t ctx)
     {
         if (x->u > 0)
         {
-            x->v += n_remove2_precomp(&x->u, PADIC_NMOD_CTX_P(ctx),
-                                        PADIC_NMOD_CTX_PINV(ctx));
+            x->v += n_remove2_prime_inv(&x->u, PADIC_NMOD_CTX_P(ctx),
+                                        PADIC_NMOD_CTX_PINV1(ctx),
+                                        PADIC_NMOD_CTX_PINV2(ctx));
         }
 
         else
         {
             ulong z = - x->u;
-            slong e = n_remove2_precomp(&z, PADIC_NMOD_CTX_P(ctx),
-                                        PADIC_NMOD_CTX_PINV(ctx));
+            slong e = n_remove2_prime_inv(&z, PADIC_NMOD_CTX_P(ctx),
+                                          PADIC_NMOD_CTX_PINV1(ctx),
+                                          PADIC_NMOD_CTX_PINV2(ctx));
 
             if (e > 0)
             {

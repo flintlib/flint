@@ -41,8 +41,8 @@ padic_nmod_ctx_init(gr_ctx_t ctx, ulong p, slong n)
 
     PADIC_NMOD_CTX_P(ctx) = p;
     PADIC_NMOD_CTX_N(ctx) = n;
-
-    PADIC_NMOD_CTX_PINV(ctx) = n_precompute_inverse(p);
+    PADIC_NMOD_CTX_PINV1(ctx) = n_binvert(p);
+    PADIC_NMOD_CTX_PINV2(ctx) = UWORD_MAX / p;
 
     nmod_init(&PADIC_NMOD_CTX_P_MOD(ctx), p);
     nmod_init(&PADIC_NMOD_CTX_PN_MOD(ctx), PADIC_NMOD_CTX_POW(ctx)[n - 1]);
