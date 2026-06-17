@@ -1024,6 +1024,34 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) \
     return status; \
 } \
 
+#define UNARY_PARAM_POLY_WRAPPER(func) \
+int \
+gr_series_ ## func(gr_series_t res, gr_srcptr p, const gr_series_t x, gr_ctx_t ctx) \
+{ \
+    slong len, xlen, xerr, err; \
+    int status = GR_SUCCESS; \
+ \
+    if (gr_ctx_is_rational_vector_space(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE) \
+        return GR_UNABLE; \
+\
+    xlen = GR_SERIES_POLY(x)->length; \
+    xerr = GR_SERIES_ERROR(x); \
+    err = xerr; \
+ \
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err); \
+    err = len; \
+ \
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT) \
+    { \
+        len = FLINT_MIN(len, 1); \
+        err = GR_SERIES_ERR_EXACT; \
+    } \
+ \
+    GR_SERIES_ERROR(res) = err; \
+    status |= gr_poly_ ## func ## _series(GR_SERIES_POLY(res), p, GR_SERIES_POLY(x), len, GR_SERIES_ELEM_CTX(ctx)); \
+    return status; \
+} \
+
 #define BINARY_UNARY_POLY_WRAPPER(func) \
 int \
 gr_series_ ## func(gr_series_t res1, gr_series_t res2, const gr_series_t x, gr_ctx_t ctx) \
@@ -1075,6 +1103,8 @@ UNARY_POLY_WRAPPER(atan)
 UNARY_POLY_WRAPPER(asinh)
 UNARY_POLY_WRAPPER(acosh)
 UNARY_POLY_WRAPPER(atanh)
+
+UNARY_PARAM_POLY_WRAPPER(bessel_j)
 
 
 #include "arb_poly.h"
