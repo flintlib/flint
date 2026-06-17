@@ -81,6 +81,7 @@ flint_test_dep = declare_dependency(
   link_with: libflint,
   dependencies: flint_deps,
   include_directories: [headers_built_nodir_inc, 'src'],
+  sources: headers_all,
   compile_args: flint_cpu_c_args,
 )
 
