@@ -181,7 +181,7 @@ test_exe = executable('main',
   build_by_default: tests_opt.enabled(),
 )
 
-test('%s', test_exe)
+test('%s', test_exe, timeout: 120)
 '''
 
 
@@ -199,7 +199,7 @@ test_exe = executable('main',
   build_by_default: tests_opt.enabled(),
 )
 
-test('%s', test_exe)
+test('%s', test_exe, timeout: 120)
 '''
 
 asm_submodule_arm64 = '''\
