@@ -28,7 +28,7 @@ TEST_FUNCTION_START(padic_radix_dot, state)
         int flags = 0;
         padic_radix_struct * v1, * v2;
         padic_radix_t r1, r2;
-        int s1, s2;
+        int s1, s2, initial, negate;
         slong i;
 
         if (n_randint(state, 2))
@@ -69,11 +69,14 @@ TEST_FUNCTION_START(padic_radix_dot, state)
             _padic_radix_finalize(v2 + i, ctx);
         }
 
+        initial = n_randint(state, 2);
+        negate = n_randint(state, 2);
+
         padic_radix_randtest(r1, state, ctx);
         padic_radix_randtest(r2, state, ctx);
 
-        s1 = padic_radix_dot_strided_naive(r1, NULL, 0, v1, 1, v2, 1, len, ctx);
-        s2 = padic_radix_dot_strided_delayed(r2, NULL, 0, v1, 1, v2, 1, len, ctx);
+        s1 = padic_radix_dot_strided_naive(r1, initial ? r2 : NULL, negate, v1, 1, v2, 1, len, ctx);
+        s2 = padic_radix_dot_strided_delayed(r2, initial ? r2 : NULL, negate, v1, 1, v2, 1, len, ctx);
 
         if (s1 == GR_SUCCESS && s2 == GR_SUCCESS && padic_radix_equal(r1, r2, ctx) == T_FALSE)
         {
