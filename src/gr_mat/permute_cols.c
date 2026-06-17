@@ -21,16 +21,16 @@ gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr
     slong sz = ctx->sizeof_elem;
     slong * _perm_act = _perm_init(mat->c);
 
-    /* perm_store[i] <- perm_store[perm_act[i]] */
-    if (perm_store)
-        _perm_compose(perm_store, perm_store, perm_act, mat->c);
-
     /* permute each row */
     for (i = 0; i < mat->r; i++)
     {
         _perm_set(_perm_act, perm_act, mat->c);
         _gr_vec_permute_inv(GR_MAT_ENTRY(mat, i, 0, sz), _perm_act, mat->c, ctx);
     }
+
+    /* perm_store[i] <- perm_store[perm_act[i]] */
+    if (perm_store)
+        _perm_compose(perm_store, perm_store, perm_act, mat->c);
 
     _perm_clear(_perm_act);
     
@@ -40,9 +40,21 @@ gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr
 int
 gr_mat_permute_cols_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx)
 {
-    slong *perm_act_inv = _perm_init(mat->c);
-    _perm_inv(perm_act_inv, perm_act, mat->c);
-    int status = gr_mat_permute_cols(mat, perm_store, perm_act_inv, ctx);
-    _perm_clear(perm_act_inv);
+    int status = GR_SUCCESS;
+    slong i;
+    slong sz = ctx->sizeof_elem;
+    slong * _perm_act = _perm_init(mat->c);
+
+    for (i = 0; i < mat->r; i++)
+    {
+        _perm_set(_perm_act, perm_act, mat->c);
+        _gr_vec_permute(GR_MAT_ENTRY(mat, i, 0, sz), _perm_act, mat->c, ctx);
+    }
+
+    if (perm_store)
+        _perm_compose_inv2(perm_store, perm_store, perm_act, mat->c);
+
+    _perm_clear(_perm_act);
+    
     return status;
 }

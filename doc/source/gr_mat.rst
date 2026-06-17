@@ -232,6 +232,8 @@ Basic row, column and entry operations
     repeatedly with the same matrix, and finally calling :func:`gr_mat_permute_rows_inv` with the permutation as
     ``perm_act``, the result will be the original matrix.
 
+    Allows aliasing of ``perm_store`` and ``perm_act``.
+
 .. function:: int gr_mat_permute_rows_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
 
     Permutes rows of the matrix ``mat`` according to the inverse of the permutation ``perm_act``
@@ -241,6 +243,8 @@ Basic row, column and entry operations
 
     This function is semantically equivalent to :func:`gr_mat_permute_rows` with the inverse of ``perm_act`` as argument,
     but is more efficient since it does not require computing the inverse permutation.
+
+    Allows aliasing of ``perm_store`` and ``perm_act``.
 
 .. function:: int gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
 
@@ -254,6 +258,8 @@ Basic row, column and entry operations
     repeatedly with the same matrix, and finally calling :func:`gr_mat_permute_cols_inv` with the permutation as
     ``perm_act``, the result will be the original matrix.
 
+    Allows aliasing of ``perm_store`` and ``perm_act``.
+
 .. function:: int gr_mat_permute_cols_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
 
     Permutes columns of the matrix ``mat`` according to the inverse of the permutation ``perm_act``
@@ -263,6 +269,8 @@ Basic row, column and entry operations
 
     This function is semantically equivalent to :func:`gr_mat_permute_cols` with the inverse of ``perm_act`` as argument,
     but is more efficient since it does not require computing the inverse permutation.
+
+    Allows aliasing of ``perm_store`` and ``perm_act``.
 
 .. function:: int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
 
