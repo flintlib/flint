@@ -1,5 +1,6 @@
 /*
    Copyright (C) 2025 Marc Mezzarobba
+   Copyright (C) 2026 Lars Göttgens
 
    This file is part of FLINT.
 
@@ -51,8 +52,19 @@ gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
 void
 _gr_vec_permute_inv(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
 {
-    _perm_inv(perm, perm, len);
-    _gr_vec_permute(vec, perm, len, ctx);
+    for (slong base = 0; base < len; base++)
+    {
+        slong k = perm[base];
+        while (k != base)
+        {
+            slong j = perm[k];
+            gr_swap(GR_ENTRY(vec, k, ctx->sizeof_elem),
+                    GR_ENTRY(vec, j, ctx->sizeof_elem),
+                    ctx);
+            perm[k] = k;
+            k = j;
+        }
+    }
 }
 
 int
