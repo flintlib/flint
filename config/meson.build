@@ -1097,6 +1097,11 @@ if cc.has_header_symbol('stdlib.h', 'aligned_alloc')
     description: 'Define to 1 if you have the \'aligned_alloc\' function.')
 endif
 
+if cc.has_function('_aligned_malloc', prefix: '#include <malloc.h>')
+  cfg_data_internal.set('HAVE__ALIGNED_MALLOC', 1,
+    description: 'Define to 1 if you have the \'_aligned_malloc\' function.')
+endif
+
 mandatory_headers = [
   'stdarg.h',
   'math.h',
@@ -1148,8 +1153,6 @@ foreach h : ac_headers_check
       description: f'Define to 1 if you have the <@h@> header file.')
   endif
 endforeach
-
-# XXX: Do we need to check for _alligned_malloc?
 
 # XXX: Need better checking for LSYM_PREFIX and related assembly options
 cfg_data_internal.set_quoted('LSYM_PREFIX', 'L',
