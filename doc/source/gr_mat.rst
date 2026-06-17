@@ -199,14 +199,18 @@ Basic row, column and entry operations
     Aliasing is allowed for square matrices.
 
 .. function:: int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+.. function:: void _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 
     Swaps rows ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the rows will also be applied to ``perm``.
+    The underscore method will not check bounds of ``r`` and ``s``.
 
 .. function:: int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
+.. function:: void _gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 
     Swaps columns ``r`` and ``s`` of ``mat``.  If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
+    The underscore method will not check bounds of ``r`` and ``s``.
 
 .. function:: int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t ctx)
 
