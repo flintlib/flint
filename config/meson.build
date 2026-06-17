@@ -472,6 +472,10 @@ gcc_cflags_optlist = ''
 gcc_cflags_arch = ''
 gcc_cflags_tune = ''
 flint_warning_c_args = cc.get_supported_arguments(gcc_warnings.split())
+flint_msvc_c_args = []
+if pthread_opt.enabled() and cc.get_argument_syntax() == 'msvc'
+  flint_msvc_c_args += cc.get_supported_arguments('/experimental:c11atomics')
+endif
 flint_cpu_c_args = []
 
 # We only try to provide specifics for those systems that currently supports

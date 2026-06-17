@@ -37,7 +37,7 @@ gmp_link_dep = declare_dependency(
 
 subdir('config')
 
-add_project_arguments(flint_warning_c_args, language: 'c')
+add_project_arguments(flint_warning_c_args + flint_msvc_c_args, language: 'c')
 
 flint_deps = [gmp_link_dep, mpfr_dep, m_dep, pthread_dep]
 if have_blas
