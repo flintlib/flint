@@ -238,24 +238,21 @@ jobs:
       - uses: actions/checkout@v5
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin perl libopenblas-dev
+          sudo apt-get install -y libgmp-dev libmpfr-dev meson ninja-build pkg-config perl libopenblas-dev
           clang --version
-          make --version
-          autoconf --version
-          libtool --version
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+          meson --version
+          ninja --version
+      - name: "Generate Meson files"
+        run: python3 update_meson.py
       - name: "Configure"
-        run: ./bootstrap.sh && ./configure CC=${CC} --with-blas --disable-debug --enable-asan
-      - name: "Compile library"
-        run: $MAKE && ldd libflint.so
-      - name: "Compile tests"
-        run: $MAKE tests
+        run: meson setup build -Dtests=enabled -Dexamples=enabled -Dblas=enabled -Db_sanitize=address -Db_lundef=false
+      - name: "Compile"
+        run: meson compile -C build
       - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
-      - name: "Compile examples"
-        run: $MAKE examples
-      - name: "Check examples"
-        run: $MAKE checkexamples
+        env:
+          ASAN_OPTIONS: halt_on_error=1:abort_on_error=1:print_summary=1
+          UBSAN_OPTIONS: halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
 
   mingw64-gcc:
     name: Meson, MinGW (x0.5)

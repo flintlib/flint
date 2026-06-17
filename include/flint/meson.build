@@ -49,11 +49,12 @@ flint_mparam_h = fs.copyfile(
 
 # Copy all the other headers to the build directory so you can do
 #   gcc -Ibuild-dir/include ...
+public_headers = []
 foreach h: headers_all
-  fs.copyfile(h, kwargs: header_install_kwargs)
+  public_headers += fs.copyfile(h, kwargs: header_install_kwargs)
 endforeach
 
-headers_all += [
+headers_all = public_headers + [
   flint_h,
   flint_config_h,
   config_h,

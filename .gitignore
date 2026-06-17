@@ -69,3 +69,4 @@ src/flint-mparam.h
 .gdb_history
 vgcore.*
 src/**/meson.build
+examples/meson.build

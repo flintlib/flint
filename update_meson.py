@@ -202,6 +202,46 @@ test_exe = executable('main',
 test('%s', test_exe, timeout: 0)
 '''
 
+examples_meson_build = '''\
+#
+# This file is generated automatically.
+#
+# To regenerate it, run:
+#   python update_meson.py
+#
+
+check_examples = find_program('../dev/check_examples.sh')
+
+example_exes = []
+
+foreach example : [
+%s
+]
+  example_exe = executable(
+    example,
+    example + '.c',
+    dependencies: [flint_test_dep],
+    include_directories: [headers_built_inc],
+    install: false,
+    build_by_default: examples_opt.enabled(),
+  )
+
+  example_exes += example_exe
+
+  test(
+    'example_' + example,
+    check_examples,
+    args: [example, meson.current_build_dir()],
+    depends: example_exe,
+    suite: 'examples',
+    timeout: 0,
+    workdir: meson.project_source_root(),
+  )
+endforeach
+
+alias_target('examples', example_exes)
+'''
+
 asm_submodule_arm64 = '''\
 
 asm_deps = [
@@ -355,6 +395,18 @@ def main(args):
     if args.verbose:
         print('Writing %s' % dst_path)
     write_file(dst_path, test_mod_meson_build_text)
+
+    # examples/meson.build
+    examples_dir = join(output_dir, 'examples')
+    examples = [
+        f[:-2] for f in listdir(examples_dir)
+        if f.endswith('.c')
+    ]
+    examples_meson_build_text = examples_meson_build % format_lines(examples)
+    dst_path = join(examples_dir, 'meson.build')
+    if args.verbose:
+        print('Writing %s' % dst_path)
+    write_file(dst_path, examples_meson_build_text)
 
     # src/mpn_extras/*/meson.build
     for path, asm_submodule in asm_modules:

@@ -89,6 +89,11 @@ flint_test_dep = declare_dependency(
   compile_args: flint_cpu_c_args,
 )
 
+examples_opt = get_option('examples')
+if not examples_opt.disabled()
+  subdir('examples')
+endif
+
 tests_opt = get_option('tests')
 if not tests_opt.disabled()
   foreach mod_test : mod_tests
