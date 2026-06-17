@@ -31,12 +31,9 @@ gmp_link_dep = declare_dependency(
   link_args: ['-L' + gmp_libdir],
 )
 
-add_project_arguments(
-  '-Werror=implicit-function-declaration',
-  language: 'c',
-)
-
 subdir('config')
+
+add_project_arguments(flint_warning_c_args, language: 'c')
 
 flint_deps = [gmp_link_dep, mpfr_dep, m_dep]
 if have_blas

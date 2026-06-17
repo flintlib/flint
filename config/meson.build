@@ -414,10 +414,11 @@ message('EXACT CPU:', exact_cpu)
 ################################################################################
 
 gcc_cflags = '-O3 -pedantic -std=c11'
-gcc_warnings = '-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow'
+gcc_warnings = '-Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wno-deprecated-declarations'
 gcc_cflags_optlist = ''
 gcc_cflags_arch = ''
 gcc_cflags_tune = ''
+flint_warning_c_args = cc.get_supported_arguments(gcc_warnings.split())
 flint_cpu_c_args = []
 
 # We only try to provide specifics for those systems that currently supports
