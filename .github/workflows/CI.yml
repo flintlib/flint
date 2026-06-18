@@ -149,7 +149,7 @@ jobs:
       - name: "Check Python"
         run: LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(pwd)/build python3 src/python/flint_ctypes.py
       - name: "Gather coverage data"
-        run: meson compile -C build coverage
+        run: ninja -C build coverage
       - name: "Upload coverage data"
         uses: codecov/codecov-action@v5
         if: github.repository == 'flintlib/flint'
