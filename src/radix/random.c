@@ -29,6 +29,39 @@ radix_init_randtest(radix_t radix, flint_rand_t state)
 }
 
 void
+radix_init_randtest_prime(radix_t radix, flint_rand_t state)
+{
+    ulong p = n_randtest_prime(state, 1);
+    ulong ppow, hi;
+    int maxe;
+
+    switch (n_randlimb(state) & 3)
+    {
+        case 0:
+        case 1:
+            radix_init(radix, p, 1);
+            break;
+        case 2:
+            radix_init(radix, p, 0);
+            break;
+        default:
+            ppow = p;
+            maxe = 1;
+
+            while (1)
+            {
+                umul_ppmm(hi, ppow, ppow, p);
+                if (hi != 0)
+                    break;
+                else
+                    maxe++;
+            }
+
+            radix_init(radix, p, 1 + n_randint(state, maxe));
+    }
+}
+
+void
 radix_rand_limbs(nn_ptr res, flint_rand_t state, slong n, const radix_t radix)
 {
     slong i;
