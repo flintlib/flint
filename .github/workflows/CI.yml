@@ -131,31 +131,29 @@ jobs:
       - uses: actions/checkout@v5
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin lcov
+          sudo apt-get install -y libgmp-dev libmpfr-dev meson ninja-build pkg-config lcov
           $CC --version
-          make --version
-          autoconf --version
-          libtool --version
+          meson --version
+          ninja --version
           lcov --version
           python3 --version
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+      - name: "Generate Meson files"
+        run: python3 update_meson.py
       - name: "Configure"
-        run: ./bootstrap.sh && ./configure CC=${CC} --enable-avx2 --enable-coverage
-      - name: "Compile library"
-        run: $MAKE && ldd libflint.so
-      - name: "Compile tests"
-        run: $MAKE tests
+        run: meson setup build -Dtests=enabled -Davx2=enabled -Db_coverage=true
+      - name: "Compile"
+        run: meson compile -C build && ldd build/libflint.so
       - name: "Check"
-        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
+        run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
       - name: "Check Python"
-        run: $MAKE check PYTHON=1
+        run: LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(pwd)/build python3 src/python/flint_ctypes.py
       - name: "Gather coverage data"
-        run: $MAKE coverage
+        run: meson compile -C build coverage
       - name: "Upload coverage data"
         uses: codecov/codecov-action@v5
         if: github.repository == 'flintlib/flint'
         with:
-          files: build/coverage/coverage.info
+          files: build/meson-logs/coverage.info
           token: ${{ secrets.CODECOV_TOKEN }}
 
   regression-check:
