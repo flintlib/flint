@@ -107,7 +107,7 @@ _nfloat_vec_init(nfloat_ptr res, slong len, gr_ctx_t ctx)
 }
 
 void
-_nfloat_vec_clear(nfloat_ptr res, slong len, gr_ctx_t ctx)
+_nfloat_vec_clear(nfloat_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
@@ -235,7 +235,7 @@ nfloat_nan(nfloat_ptr res, gr_ctx_t ctx)
 }
 
 int
-_nfloat_underflow(nfloat_ptr res, int sgnbit, gr_ctx_t ctx)
+_nfloat_underflow(nfloat_ptr res, int FLINT_UNUSED(sgnbit), gr_ctx_t ctx)
 {
     if (!(NFLOAT_CTX_FLAGS(ctx) & NFLOAT_ALLOW_UNDERFLOW))
         return GR_UNABLE;
@@ -866,7 +866,7 @@ nfloat_sgn(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 }
 
 int
-nfloat_im(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
+nfloat_im(nfloat_ptr res, nfloat_srcptr FLINT_UNUSED(x), gr_ctx_t ctx)
 {
     return nfloat_zero(res, ctx);
 }
@@ -1918,7 +1918,7 @@ _nfloat_sub_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr y
 }
 
 static int
-_nfloat_sub_n_directed(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
+_nfloat_sub_n_directed(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong FLINT_UNUSED(nlimbs), gr_ctx_t ctx)
 {
     mpfr_t rf, xf, yf;
     slong prec = NFLOAT_CTX_PREC(ctx);

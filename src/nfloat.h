@@ -123,7 +123,7 @@ int nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags);
 int nfloat_ctx_write(gr_stream_t out, gr_ctx_t ctx);
 
 NFLOAT_INLINE void
-nfloat_init(nfloat_ptr res, gr_ctx_t ctx)
+nfloat_init(nfloat_ptr res, gr_ctx_t FLINT_UNUSED(ctx))
 {
     NFLOAT_EXP(res) = NFLOAT_EXP_ZERO;
     NFLOAT_SGNBIT(res) = 0;
@@ -141,7 +141,7 @@ int nfloat_set(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 truth_t nfloat_equal(nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 
 NFLOAT_INLINE
-int nfloat_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+int nfloat_ctx_set_real_prec(gr_ctx_t FLINT_UNUSED(ctx), slong FLINT_UNUSED(prec))
 {
     return GR_UNABLE;
 }
@@ -154,7 +154,7 @@ int nfloat_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 }
 
 NFLOAT_INLINE int
-nfloat_zero(nfloat_ptr res, gr_ctx_t ctx)
+nfloat_zero(nfloat_ptr res, gr_ctx_t FLINT_UNUSED(ctx))
 {
     NFLOAT_EXP(res) = NFLOAT_EXP_ZERO;
     NFLOAT_SGNBIT(res) = 0;
@@ -190,7 +190,7 @@ int nfloat_one(nfloat_ptr res, gr_ctx_t ctx);
 int nfloat_neg_one(nfloat_ptr res, gr_ctx_t ctx);
 
 NFLOAT_INLINE truth_t
-nfloat_is_zero(nfloat_srcptr x, gr_ctx_t ctx)
+nfloat_is_zero(nfloat_srcptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (NFLOAT_IS_NAN(x))
         return T_UNKNOWN;
