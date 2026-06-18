@@ -280,7 +280,7 @@ arb_lambertw_halley_step(arb_t res, const arb_t x, const arf_t w,
 /* Double precision approximation good for x >= 2^1000, or
    roughly |x| <= 2^(1000-60) for the -1 branch. */
 static slong
-arb_lambertw_initial_asymp1(arf_t res, const arf_t x, int branch, slong prec)
+arb_lambertw_initial_asymp1(arf_t res, const arf_t x, int branch, slong FLINT_UNUSED(prec))
 {
     fmpz_t e;
     double l, ll, h, t2, t3, t4;
@@ -325,7 +325,7 @@ _arf_log(arf_t res, const arf_t x, slong prec)
 }
 
 static slong
-arb_lambertw_initial_asymp2(arf_t res, const arf_t x, int branch, slong prec)
+arb_lambertw_initial_asymp2(arf_t res, const arf_t x, int branch, slong FLINT_UNUSED(prec))
 {
     arf_t l, ll;
     slong wp, acc;

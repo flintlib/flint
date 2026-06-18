@@ -98,7 +98,7 @@ acb_agm_close_taylor(acb_t res, acb_t z, acb_t z2,
 }
 
 static void
-acb_agm1_around_zero(acb_t res, const acb_t z, slong prec)
+acb_agm1_around_zero(acb_t res, const acb_t z, slong FLINT_UNUSED(prec))
 {
     mag_t a, b;
     mag_init(a);

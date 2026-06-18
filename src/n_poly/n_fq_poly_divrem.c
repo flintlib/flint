@@ -20,7 +20,7 @@
     FLINT_MAX(FLINT_MAX(4, N_FQ_MUL_ITCH), 2 + (N_FQ_REDUCE_ITCH))
 
 void _n_fq_poly_rem_basecase_(
-    ulong * Q,
+    ulong * FLINT_UNUSED(Q),
     ulong * A,
     const ulong * AA, slong Alen,
     const ulong * B, slong Blen,
