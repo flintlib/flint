@@ -4,9 +4,8 @@ import re
 from pathlib import Path
 
 
-C_SOURCE_RE = re.compile(r"['\"]([^'\"]+\.c)['\"]")
 COMMENT_RE = re.compile(r"/\*.*?\*/|//[^\n]*", re.S)
-SIGNATURE_RE = re.compile(r"([A-Za-z_]\w*)\s*\([^;{}]*\)\s*$", re.S)
+PROTOTYPE_RE = re.compile(r"\b([A-Za-z_]\w*)\s*\([^;{}]*\)\s*;$", re.S)
 SKIP_SYMBOLS = {
     "TEMPLATE",
     "_TEMPLATE",
@@ -14,32 +13,42 @@ SKIP_SYMBOLS = {
     "TEMPLATE4",
     "main",
 }
+GMP_INTERNAL_SYMBOLS = {
+    "mpn_add_nc",
+    "mpn_addlsh1_n",
+    "mpn_addlsh1_n_ip1",
+    "mpn_addmul_2",
+    "mpn_div_q",
+    "mpn_gcd_11",
+    "mpn_invert_limb",
+    "mpn_modexact_1_odd",
+    "mpn_rsh1add_n",
+    "mpn_rsh1sub_n",
+    "mpn_sub_nc",
+}
 
 
-def meson_c_sources(source_root, with_fft_small, fmpz_source):
+def meson_headers(source_root, with_fft_small):
     src_root = source_root / "src"
-    sources = {src_root / "fmpz" / "link" / fmpz_source}
+    headers = set(src_root.glob("*.h"))
 
     for meson_build in src_root.glob("*/meson.build"):
         mod = meson_build.parent.name
         if mod == "fft_small" and not with_fft_small:
             continue
 
-        text = meson_build.read_text(encoding="utf-8")
-        for match in C_SOURCE_RE.finditer(text):
-            source = meson_build.parent / match.group(1)
-            if "test" in source.parts or "profile" in source.parts:
-                continue
-            sources.add(source)
+        header = src_root / f"{mod}.h"
+        if header.exists():
+            headers.add(header)
 
-    return sorted(sources)
+    return sorted(headers)
 
 
-def exported_functions(source):
-    text = source.read_text(encoding="utf-8", errors="ignore")
+def exported_functions(header):
+    text = header.read_text(encoding="utf-8", errors="ignore")
     text = COMMENT_RE.sub("", text)
 
-    signature = []
+    declaration = []
     in_preprocessor = False
     for line in text.splitlines():
         stripped = line.strip()
@@ -48,31 +57,41 @@ def exported_functions(source):
             in_preprocessor = stripped.endswith("\\")
             continue
 
-        if not signature:
+        if not declaration:
             if (
                 not stripped
                 or line[:1].isspace()
-                or stripped.startswith(("static", "typedef"))
+                or stripped.startswith(("static", "typedef", "struct", "enum"))
+                or "FLINT_INLINE" in stripped
+                or "FLINT_FORCE_INLINE" in stripped
             ):
                 continue
-            signature = [stripped]
+            declaration = [stripped]
         else:
-            signature.append(stripped)
+            declaration.append(stripped)
 
-        joined = " ".join(signature)
-        before_brace, has_brace, _ = joined.partition("{")
-        if ";" in before_brace or "=" in before_brace:
-            signature = []
+        joined = " ".join(declaration)
+        if "{" in joined or "=" in joined or "DECLSPEC_IMPORT" in joined:
+            declaration = []
             continue
-        if not has_brace:
+        if not joined.endswith(";"):
             continue
 
-        match = SIGNATURE_RE.search(before_brace.strip())
+        if "static" in joined or "typedef" in joined:
+            declaration = []
+            continue
+
+        match = PROTOTYPE_RE.search(joined)
         if match:
             name = match.group(1)
-            if name not in SKIP_SYMBOLS and name == name.lower():
+            if (
+                name not in SKIP_SYMBOLS
+                and name not in GMP_INTERNAL_SYMBOLS
+                and not name.startswith("__gmp")
+                and name == name.lower()
+            ):
                 yield name
-        signature = []
+        declaration = []
 
 
 def main():
@@ -81,16 +100,12 @@ def main():
     )
     parser.add_argument("source_root", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--fmpz-source", required=True)
     parser.add_argument("--with-fft-small", action="store_true")
     args = parser.parse_args()
 
     symbols = set()
-    for source in meson_c_sources(
-        args.source_root, args.with_fft_small, args.fmpz_source
-    ):
-        if source.exists():
-            symbols.update(exported_functions(source))
+    for header in meson_headers(args.source_root, args.with_fft_small):
+        symbols.update(exported_functions(header))
 
     with args.output.open("w", encoding="utf-8", newline="\n") as output:
         output.write("EXPORTS\n")

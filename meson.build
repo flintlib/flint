@@ -80,8 +80,6 @@ if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'stat
     files('config/generate_msvc_def.py'),
     meson.project_source_root(),
     '@OUTPUT@',
-    '--fmpz-source',
-    fmpz_c_in,
   ]
   if have_fft_small
     msvc_def_args += ['--with-fft-small']
