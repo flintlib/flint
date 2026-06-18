@@ -88,6 +88,7 @@ regression_lib = static_library('flint_regression_check',
   install: false,
   build_by_default: false,
   c_args: regression_c_args,
+  override_options: ['optimization=0'],
 )
 
 alias_target('regression-check', regression_lib)
