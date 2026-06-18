@@ -85,7 +85,7 @@ truth_t gr_mpoly_ctx_is_threadsafe(gr_mpoly_ctx_t ctx);
 /* Memory management */
 
 GR_MPOLY_INLINE
-void gr_mpoly_init(gr_mpoly_t A, gr_mpoly_ctx_t ctx)
+void gr_mpoly_init(gr_mpoly_t A, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -135,7 +135,7 @@ void gr_mpoly_fit_length_reset_bits(
 
 /* todo: when to zero out coefficients? */
 GR_MPOLY_INLINE
-void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, gr_mpoly_ctx_t ctx)
+void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(newlen <= A->coeffs_alloc);
     FLINT_ASSERT(mpoly_words_per_exp(A->bits, GR_MPOLY_MCTX(ctx))*newlen <= A->exps_alloc);
@@ -144,7 +144,7 @@ void _gr_mpoly_set_length(gr_mpoly_t A, slong newlen, gr_mpoly_ctx_t ctx)
 }
 
 GR_MPOLY_INLINE slong
-gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
+gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return x->length;
 }
@@ -154,13 +154,13 @@ gr_mpoly_length(const gr_mpoly_t x, gr_mpoly_ctx_t ctx)
 void _gr_mpoly_normalise(gr_mpoly_t A, gr_mpoly_ctx_t ctx);
 
 GR_MPOLY_INLINE
-void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+void gr_mpoly_swap(gr_mpoly_t A, gr_mpoly_t B, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(gr_mpoly_struct, *A, *B);
 }
 
 GR_MPOLY_INLINE void
-gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
+gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *poly;
 }
