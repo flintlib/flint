@@ -5,9 +5,9 @@
 int _gr_poly_inflate(gr_ptr poly, slong len, slong n, gr_ctx_t ctx);
 
 int
-sigma_delta_unable(gr_ptr sigma, gr_ptr delta,
-                   gr_srcptr a,
-                   gr_ore_poly_ctx_struct * ctx)
+sigma_delta_unable(gr_ptr FLINT_UNUSED(sigma), gr_ptr FLINT_UNUSED(delta),
+                   gr_srcptr FLINT_UNUSED(a),
+                   gr_ore_poly_ctx_struct * FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }

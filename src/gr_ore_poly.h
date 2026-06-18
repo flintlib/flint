@@ -152,7 +152,7 @@ gr_ore_poly_swap(gr_ore_poly_t poly1, gr_ore_poly_t poly2, gr_ore_poly_ctx_t FLI
 }
 
 GR_ORE_POLY_INLINE void
-gr_ore_poly_set_shallow(gr_ore_poly_t res, const gr_ore_poly_t x, const gr_ore_poly_ctx_t ctx)
+gr_ore_poly_set_shallow(gr_ore_poly_t res, const gr_ore_poly_t x, const gr_ore_poly_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
