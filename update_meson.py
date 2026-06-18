@@ -95,6 +95,81 @@ mod_no_tests = [
     'fq_vec_templates',
 ]
 
+regression_modules = [
+    'thread_pool',
+    'thread_support',
+    'ulong_extras',
+    'long_extras',
+    'perm',
+    'double_extras',
+    'd_vec',
+    'd_mat',
+    'mpn_extras',
+    'nmod',
+    'nmod_vec',
+    'nmod_mat',
+    'nmod_poly',
+    'mpn_mod',
+    'fmpz',
+    'fmpz_vec',
+    'fmpz_mat',
+    'fmpz_poly',
+    'fmpz_mod',
+    'fmpz_mod_vec',
+    'fmpz_mod_mat',
+    'fmpz_mod_poly',
+    'fmpq',
+    'fmpq_vec',
+    'fmpq_mat',
+    'fmpq_poly',
+    'fq',
+    'fq_vec',
+    'fq_mat',
+    'fq_poly',
+    'fq_nmod',
+    'fq_nmod_vec',
+    'fq_nmod_mat',
+    'fq_nmod_poly',
+    'fq_zech',
+    'fq_zech_mat',
+    'fq_zech_poly',
+    'fq_default',
+    'fq_default_mat',
+    'fq_default_poly',
+    'fq_embed',
+    'fq_nmod_embed',
+    'fq_zech_embed',
+    'padic',
+    'padic_mat',
+    'padic_poly',
+    'qadic',
+    'nmod_poly_factor',
+    'fmpz_factor',
+    'fmpz_poly_factor',
+    'fmpz_mod_poly_factor',
+    'fq_poly_factor',
+    'fq_nmod_poly_factor',
+    'fq_zech_poly_factor',
+    'fq_default_poly_factor',
+    'nmod_poly_mat',
+    'fmpz_poly_mat',
+    'mpoly',
+    'nmod_mpoly',
+    'fmpz_mpoly',
+    'fmpz_mod_mpoly',
+    'fmpq_mpoly',
+    'fq_nmod_mpoly',
+    'fq_zech_mpoly',
+    'nmod_mpoly_factor',
+    'fmpz_mpoly_factor',
+    'fmpz_mod_mpoly_factor',
+    'fmpq_mpoly_factor',
+    'fq_nmod_mpoly_factor',
+    'fq_zech_mpoly_factor',
+    'fft',
+    'fft_small',
+]
+
 src_meson_build = '''\
 #
 # This file is generated automatically.
@@ -119,12 +194,19 @@ headers_no_dir = [
 %s
 ]
 
+regression_modules = [
+%s
+]
+
 headers_all = []
 c_files_all = []
+regression_c_files = []
 mod_tests = []
 
 # Select the right version of fmpz.c (see configuration)
-c_files_all += files('fmpz/link' / fmpz_c_in)
+fmpz_link_c_file = files('fmpz/link' / fmpz_c_in)
+c_files_all += fmpz_link_c_file
+regression_c_files += fmpz_link_c_file
 
 foreach mod : modules
   subdir(mod)
@@ -162,9 +244,15 @@ src_mod_meson_build = '''\
 #   python update_meson.py
 #
 
-c_files_all += files(
+module_c_files = files(
 %s
 )
+
+c_files_all += module_c_files
+
+if '%s' in regression_modules
+  regression_c_files += module_c_files
+endif
 '''
 
 test_mod_meson_build = '''\
@@ -360,6 +448,7 @@ def main(args):
         format_lines(mod_no_header),
         format_lines(mod_no_tests),
         format_lines(head_no_dir),
+        format_lines(regression_modules),
     )
     dst_path = join(output_dir, 'src', 'meson.build')
     if not args.quiet:
@@ -374,7 +463,7 @@ def main(args):
         c_files = [f for f in listdir(mod_dir) if f.endswith('.c')]
         if mod == 'fmpz':
             c_files = [f for f in c_files if f != 'fmpz.c']
-        src_mod_meson_build_text = src_mod_meson_build % format_lines(c_files)
+        src_mod_meson_build_text = src_mod_meson_build % (format_lines(c_files), mod)
         dst_path = join(mod_dir, 'meson.build')
         if args.verbose:
             print('Writing %s' % dst_path)

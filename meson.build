@@ -74,6 +74,24 @@ libflint_c_args = [
   '-DFLINT_NOSTDARG',
 ]
 
+regression_c_args = libflint_c_args + flint_cpu_c_args + cc.get_supported_arguments([
+  '-march=native',
+  '-Wall',
+  '-Wextra',
+  '-Werror',
+])
+
+regression_lib = static_library('flint_regression_check',
+  regression_c_files + headers_all,
+  dependencies: flint_deps,
+  include_directories: [headers_built_nodir_inc, 'src'],
+  install: false,
+  build_by_default: false,
+  c_args: regression_c_args,
+)
+
+alias_target('regression-check', regression_lib)
+
 if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'static'
   libflint_objects = static_library('flint_objects', c_files_all + headers_all,
     dependencies: flint_deps,
