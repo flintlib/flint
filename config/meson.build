@@ -467,7 +467,7 @@ message('EXACT CPU:', exact_cpu)
 ################################################################################
 
 gcc_cflags = '-O3 -pedantic -std=c11'
-gcc_warnings = '-Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wno-deprecated-declarations'
+gcc_warnings = '-pedantic -Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wno-deprecated-declarations'
 gcc_library_warnings = '-Wmissing-prototypes'
 gcc_cflags_optlist = ''
 gcc_cflags_arch = ''
