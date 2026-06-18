@@ -29,6 +29,30 @@ conditional_modules = [
     'fft_small',
 ]
 
+template_modules = [
+    'fq_templates',
+    'fq_embed_templates',
+    'fq_poly_templates',
+    'fq_poly_factor_templates',
+    'fq_mat_templates',
+    'fq_vec_templates',
+]
+
+test_only_modules = [
+    'fq_zech_vec',
+]
+
+non_library_modules = template_modules + test_only_modules
+
+unroll_modules = [
+    'ulong_extras',
+    'nmod',
+    'nmod_vec',
+    'nmod_mat',
+    'nmod_poly',
+    'arith',
+]
+
 # Modules that do not have a corresponding header file
 mod_no_header = [
     'generic_files',
@@ -67,7 +91,7 @@ head_no_dir = [
     'profiler',
     'templates',
     'test_helpers',
-]
+] + non_library_modules
 
 headers_skip = [
     'flint',
@@ -86,13 +110,6 @@ mod_no_tests = [
     'fq_zech_mpoly_factor',
     'generic_files',
     'hypgeom',
-    # Template tests are included by the concrete fq_nmod/fq_zech modules.
-    'fq_templates',
-    'fq_embed_templates',
-    'fq_poly_templates',
-    'fq_poly_factor_templates',
-    'fq_mat_templates',
-    'fq_vec_templates',
 ]
 
 regression_modules = [
@@ -198,14 +215,23 @@ regression_modules = [
 %s
 ]
 
+unroll_modules = [
+%s
+]
+
 headers_all = []
 c_files_all = []
+c_files_missing_prototypes = []
+c_files_missing_prototypes_unroll = []
+c_files_no_missing_prototypes = []
+c_files_no_missing_prototypes_unroll = []
 regression_c_files = []
 mod_tests = []
 
 # Select the right version of fmpz.c (see configuration)
 fmpz_link_c_file = files('fmpz/link' / fmpz_c_in)
 c_files_all += fmpz_link_c_file
+c_files_missing_prototypes += fmpz_link_c_file
 regression_c_files += fmpz_link_c_file
 
 foreach mod : modules
@@ -233,6 +259,12 @@ if ntl_opt.enabled()
   mod_tests += ['interfaces/test']
 endif
 
+foreach mod : [
+%s
+]
+  mod_tests += [mod / 'test']
+endforeach
+
 headers_all = files(headers_all)
 '''
 
@@ -248,10 +280,24 @@ module_c_files = files(
 %s
 )
 
+module_c_files_no_missing_prototypes = files(
+%s
+)
+
 c_files_all += module_c_files
+c_files_all += module_c_files_no_missing_prototypes
+
+if '%s' in unroll_modules
+  c_files_missing_prototypes_unroll += module_c_files
+  c_files_no_missing_prototypes_unroll += module_c_files_no_missing_prototypes
+else
+  c_files_missing_prototypes += module_c_files
+  c_files_no_missing_prototypes += module_c_files_no_missing_prototypes
+endif
 
 if '%s' in regression_modules
   regression_c_files += module_c_files
+  regression_c_files += module_c_files_no_missing_prototypes
 endif
 '''
 
@@ -370,14 +416,29 @@ asm_to_s_files = '''\
 m4_prog = find_program('m4', native: true)
 
 foreach asm_file: asm_files
-  s_filename = fs.stem(asm_file) + '.s'
-  s_file = custom_target(s_filename,
-    input: [asm_file, config_m4] + asm_deps,
-    output: s_filename,
-    command: [m4_prog, '-I', meson.project_build_root(), '@INPUT0@'],
-    capture: true,
-  )
-  s_files += [s_file]
+  asm_stem = fs.stem(asm_file)
+
+  if default_library_opt in ['static', 'both']
+    s_filename = asm_stem + '.s'
+    s_file = custom_target(s_filename,
+      input: [asm_file, config_m4] + asm_deps,
+      output: s_filename,
+      command: [m4_prog, '-I', meson.project_build_root(), '@INPUT0@'],
+      capture: true,
+    )
+    s_files_static += [s_file]
+  endif
+
+  if default_library_opt in ['shared', 'both']
+    s_pic_filename = asm_stem + '_pic.s'
+    s_pic_file = custom_target(s_pic_filename,
+      input: [asm_file, config_m4] + asm_deps,
+      output: s_pic_filename,
+      command: [m4_prog, '-I', meson.project_build_root(), '-DPIC', '@INPUT0@'],
+      capture: true,
+    )
+    s_files_shared += [s_pic_file]
+  endif
 endforeach
 '''
 
@@ -440,7 +501,7 @@ def main(args):
 
     # We will generate the meson.build file for conditional modules but the
     # main meson.build file will decide whether to include them or not.
-    modules_unconditional = set(modules) - set(conditional_modules)
+    modules_unconditional = set(modules) - set(conditional_modules) - set(non_library_modules)
 
     # src/meson.build
     src_meson_build_text = src_meson_build % (
@@ -449,6 +510,8 @@ def main(args):
         format_lines(mod_no_tests),
         format_lines(head_no_dir),
         format_lines(regression_modules),
+        format_lines(unroll_modules),
+        format_lines(test_only_modules),
     )
     dst_path = join(output_dir, 'src', 'meson.build')
     if not args.quiet:
@@ -463,7 +526,14 @@ def main(args):
         c_files = [f for f in listdir(mod_dir) if f.endswith('.c')]
         if mod == 'fmpz':
             c_files = [f for f in c_files if f != 'fmpz.c']
-        src_mod_meson_build_text = src_mod_meson_build % (format_lines(c_files), mod)
+        c_files_no_missing_prototypes = [f for f in c_files if f == 'inlines.c']
+        c_files = [f for f in c_files if f not in c_files_no_missing_prototypes]
+        src_mod_meson_build_text = src_mod_meson_build % (
+            format_lines(c_files),
+            format_lines(c_files_no_missing_prototypes),
+            mod,
+            mod,
+        )
         dst_path = join(mod_dir, 'meson.build')
         if args.verbose:
             print('Writing %s' % dst_path)

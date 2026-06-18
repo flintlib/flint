@@ -19,6 +19,9 @@ FLINT_LIBRARY_VERSION = '.'.join([FLINT_MAJOR_SO, FLINT_MINOR_SO, FLINT_PATCH_SO
 
 cc = meson.get_compiler('c')
 fs = import('fs')
+default_library_opt = get_option('default_library')
+build_shared_library = default_library_opt in ['shared', 'both']
+build_static_library = default_library_opt in ['static', 'both']
 
 m_dep = cc.find_library('m', required: false)
 
@@ -60,10 +63,18 @@ if have_assembly
     configuration: asm_cfg,
   )
 
-  s_files = []
+  s_files_static = []
+  s_files_shared = []
   subdir('src' / assembly_dir)
-  c_files_all += s_files
+else
+  s_files_static = []
+  s_files_shared = []
 endif
+
+c_files_static_all = c_files_all + s_files_static
+c_files_shared_all = c_files_all + s_files_shared
+c_files_static = c_files_missing_prototypes + s_files_static
+c_files_shared = c_files_missing_prototypes + s_files_shared
 
 # Build include directory after list of all source files is complete
 subdir('include')
@@ -73,6 +84,51 @@ libflint_c_args = [
   '-DFLINT_NOSTDIO',
   '-DFLINT_NOSTDARG',
 ]
+
+libflint_shared_link_whole = []
+libflint_static_link_whole = []
+
+if cc.get_argument_syntax() != 'msvc'
+  foreach bucket : [
+    ['no_missing_prototypes',
+      c_files_no_missing_prototypes,
+      libflint_c_args + flint_cpu_c_args],
+    ['unroll',
+      c_files_missing_prototypes_unroll,
+      libflint_c_args + flint_cpu_c_args + flint_library_warning_c_args + flint_unroll_loops_c_args],
+    ['no_missing_prototypes_unroll',
+      c_files_no_missing_prototypes_unroll,
+      libflint_c_args + flint_cpu_c_args + flint_unroll_loops_c_args],
+  ]
+    bucket_name = bucket[0]
+    bucket_sources = bucket[1]
+    bucket_c_args = bucket[2]
+
+    if bucket_sources.length() > 0
+      if build_shared_library
+        libflint_shared_link_whole += [static_library('flint_' + bucket_name + '_shared',
+          bucket_sources + headers_all,
+          dependencies: flint_deps,
+          include_directories: [headers_built_nodir_inc, 'src'],
+          install: false,
+          pic: true,
+          c_args: bucket_c_args,
+        )]
+      endif
+
+      if build_static_library
+        libflint_static_link_whole += [static_library('flint_' + bucket_name + '_static',
+          bucket_sources + headers_all,
+          dependencies: flint_deps,
+          include_directories: [headers_built_nodir_inc, 'src'],
+          install: false,
+          pic: false,
+          c_args: bucket_c_args,
+        )]
+      endif
+    endif
+  endforeach
+endif
 
 regression_c_args = libflint_c_args + flint_cpu_c_args + cc.get_supported_arguments([
   '-march=native',
@@ -93,12 +149,12 @@ regression_lib = static_library('flint_regression_check',
 
 alias_target('regression-check', regression_lib)
 
-if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'static'
-  libflint_objects = static_library('flint_objects', c_files_all + headers_all,
+if cc.get_argument_syntax() == 'msvc' and build_shared_library
+  libflint_objects = static_library('flint_objects', c_files_shared_all + headers_all,
     dependencies: flint_deps,
     include_directories: [headers_built_nodir_inc, 'src'],
     install: false,
-    c_args: libflint_c_args + ['-DFLINT_BUILD_DLL'] + flint_cpu_c_args,
+    c_args: libflint_c_args + ['-DFLINT_BUILD_DLL'] + flint_cpu_c_args + flint_library_warning_c_args,
   )
 
   libflint_object_files = libflint_objects.extract_all_objects(recursive: false)
@@ -116,7 +172,7 @@ if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'stat
     depends: libflint_objects,
   )
 
-  libflint = shared_library('flint',
+  libflint_shared = shared_library('flint',
     objects: libflint_object_files,
     dependencies: flint_deps,
     include_directories: [headers_built_nodir_inc, 'src'],
@@ -125,15 +181,51 @@ if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'stat
     soversion: FLINT_MAJOR_SO,
     vs_module_defs: libflint_def,
   )
-else
-  libflint = library('flint', c_files_all + headers_all,
+
+  if build_static_library
+    libflint_static = static_library('flint', c_files_static_all + headers_all,
+      dependencies: flint_deps,
+      include_directories: [headers_built_nodir_inc, 'src'],
+      install: true,
+      c_args: libflint_c_args + flint_cpu_c_args + flint_library_warning_c_args,
+    )
+  endif
+
+  libflint = libflint_shared
+elif cc.get_argument_syntax() == 'msvc'
+  libflint = static_library('flint', c_files_static_all + headers_all,
     dependencies: flint_deps,
     include_directories: [headers_built_nodir_inc, 'src'],
     install: true,
-    version: FLINT_LIBRARY_VERSION,
-    soversion: FLINT_MAJOR_SO,
-    c_args: libflint_c_args + flint_cpu_c_args,
+    c_args: libflint_c_args + flint_cpu_c_args + flint_library_warning_c_args,
   )
+else
+  if build_shared_library
+    libflint_shared = shared_library('flint', c_files_shared + headers_all,
+      dependencies: flint_deps,
+      include_directories: [headers_built_nodir_inc, 'src'],
+      link_whole: libflint_shared_link_whole,
+      install: true,
+      version: FLINT_LIBRARY_VERSION,
+      soversion: FLINT_MAJOR_SO,
+      c_args: libflint_c_args + flint_cpu_c_args + flint_library_warning_c_args,
+    )
+    libflint = libflint_shared
+  endif
+
+  if build_static_library
+    libflint_static = static_library('flint', c_files_static + headers_all,
+      dependencies: flint_deps,
+      include_directories: [headers_built_nodir_inc, 'src'],
+      link_whole: libflint_static_link_whole,
+      install: true,
+      c_args: libflint_c_args + flint_cpu_c_args + flint_library_warning_c_args,
+    )
+
+    if not build_shared_library
+      libflint = libflint_static
+    endif
+  endif
 endif
 
 flint_test_dep = declare_dependency(

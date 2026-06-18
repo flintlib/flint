@@ -467,11 +467,14 @@ message('EXACT CPU:', exact_cpu)
 ################################################################################
 
 gcc_cflags = '-O3 -pedantic -std=c11'
-gcc_warnings = '-Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wmissing-prototypes -Wno-deprecated-declarations'
+gcc_warnings = '-Werror=implicit-function-declaration -Werror=newline-eof -Wno-stringop-overread -Wno-stringop-overflow -Wno-deprecated-declarations'
+gcc_library_warnings = '-Wmissing-prototypes'
 gcc_cflags_optlist = ''
 gcc_cflags_arch = ''
 gcc_cflags_tune = ''
 flint_warning_c_args = cc.get_supported_arguments(gcc_warnings.split())
+flint_library_warning_c_args = cc.get_supported_arguments(gcc_library_warnings.split())
+flint_unroll_loops_c_args = cc.get_supported_arguments('-funroll-loops')
 flint_msvc_c_args = []
 if cc.get_argument_syntax() == 'msvc'
   flint_msvc_c_args += cc.get_supported_arguments('/wd4146')
