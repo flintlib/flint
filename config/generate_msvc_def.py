@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from pathlib import Path
 import re
 import subprocess
 
@@ -55,11 +56,19 @@ def main():
         description="Generate a MSVC module definition file from object files."
     )
     parser.add_argument("output")
-    parser.add_argument("objects", nargs="+")
+    parser.add_argument("objects", nargs="*")
+    parser.add_argument("--object-dir")
     args = parser.parse_args()
 
+    objects = list(args.objects)
+    if args.object_dir:
+        objects.extend(str(obj) for obj in Path(args.object_dir).rglob("*.obj"))
+
+    if not objects:
+        raise SystemExit("no object files found")
+
     symbols = set()
-    for obj in args.objects:
+    for obj in objects:
         symbols.update(object_symbols(obj))
 
     with open(args.output, "w", encoding="utf-8", newline="\n") as output:

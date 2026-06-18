@@ -86,14 +86,15 @@ if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'stat
 
   libflint_def = custom_target(
     'flint.def',
-    input: libflint_object_files,
     output: 'flint.def',
     command: [
       python,
       files('config/generate_msvc_def.py'),
       '@OUTPUT@',
-      '@INPUT@',
+      '--object-dir',
+      'libflint_objects.a.p',
     ],
+    depends: libflint_objects,
   )
 
   libflint = shared_library('flint',
