@@ -68,18 +68,49 @@ endif
 # Build include directory after list of all source files is complete
 subdir('include')
 
-libflint = library('flint', c_files_all + headers_all,
-  dependencies: flint_deps,
-  include_directories: [headers_built_nodir_inc, 'src'],
-  install: true,
-  version: FLINT_LIBRARY_VERSION,
-  soversion: FLINT_MAJOR_SO,
-  c_args: [
-    '-DBUILDING_FLINT',
-    '-DFLINT_NOSTDIO',
-    '-DFLINT_NOSTDARG',
-  ] + flint_cpu_c_args
-)
+libflint_c_args = [
+  '-DBUILDING_FLINT',
+  '-DFLINT_NOSTDIO',
+  '-DFLINT_NOSTDARG',
+]
+
+if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'static'
+  msvc_def_args = [
+    python,
+    files('config/generate_msvc_def.py'),
+    meson.project_source_root(),
+    '@OUTPUT@',
+    '--fmpz-source',
+    fmpz_c_in,
+  ]
+  if have_fft_small
+    msvc_def_args += ['--with-fft-small']
+  endif
+
+  libflint_def = configure_file(
+    output: 'flint.def',
+    command: msvc_def_args,
+  )
+
+  libflint = library('flint', c_files_all + headers_all,
+    dependencies: flint_deps,
+    include_directories: [headers_built_nodir_inc, 'src'],
+    install: true,
+    version: FLINT_LIBRARY_VERSION,
+    soversion: FLINT_MAJOR_SO,
+    c_args: libflint_c_args + ['-DFLINT_BUILD_DLL'] + flint_cpu_c_args,
+    vs_module_defs: libflint_def,
+  )
+else
+  libflint = library('flint', c_files_all + headers_all,
+    dependencies: flint_deps,
+    include_directories: [headers_built_nodir_inc, 'src'],
+    install: true,
+    version: FLINT_LIBRARY_VERSION,
+    soversion: FLINT_MAJOR_SO,
+    c_args: libflint_c_args + flint_cpu_c_args,
+  )
+endif
 
 flint_test_dep = declare_dependency(
   link_with: libflint,

@@ -1156,6 +1156,11 @@ if pretty_tests_opt.enabled()
     description: 'Define to enable pretty printing for tests.')
 endif
 
+if cc.get_argument_syntax() == 'msvc' and get_option('default_library') == 'static'
+  cfg_data.set('FLINT_STATIC_BUILD', 1,
+    description: 'Define when building FLINT statically with MSVC.')
+endif
+
 # -----------------------------------------------------------------------------
 #  compiler pragmas
 # -----------------------------------------------------------------------------

@@ -22,6 +22,7 @@ config/*
 !config/configfsf.guess
 !config/configfsf.sub
 !config/check_assembly.py
+!config/generate_msvc_def.py
 !config/meson.build
 config.log
 confdefs.h
