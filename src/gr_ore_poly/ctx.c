@@ -484,6 +484,7 @@ gr_ore_poly_ctx_init_randtest2(gr_ctx_t base_ring, gr_ore_poly_ctx_t ctx, flint_
                 fmpz_clear(mod);
                 return;
             }
+            FLINT_FALLTHROUGH;
         default:
             gr_ctx_init_random_poly(base_ring, state);
             break;
