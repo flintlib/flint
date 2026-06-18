@@ -138,6 +138,7 @@ TEST_GR_FUNCTION_START(gr_mat_permute_cols, state, count_success, count_domain, 
 
         gr_mat_clear(mat, ctx);
         gr_mat_clear(mat2, ctx);
+        gr_mat_clear(mat3, ctx);
         gr_ctx_clear(ctx);
         _perm_clear(perm_act);
         _perm_clear(perm_act_inv);
