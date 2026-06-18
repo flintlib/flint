@@ -39,11 +39,7 @@ slong _fmpz_poly_descartes_bound_0_1(const fmpz * p, slong len, slong bound)
     q = _fmpz_vec_init(len);
     fmpz_set(q, p);
     for (j = 0; j <= deg - 1; j++)
-    {
-        fmpz_set(q + j + 1, p + j + 1);
-        fmpz_add(q + j + 1, q + j + 1, q + j);
-    }
-
+        fmpz_add(q + j + 1, q + j, p + j + 1);
 
     s = fmpz_sgn(q + deg);  /* = sign(p(1)) */
 
