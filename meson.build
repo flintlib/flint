@@ -75,28 +75,34 @@ libflint_c_args = [
 ]
 
 if cc.get_argument_syntax() == 'msvc' and get_option('default_library') != 'static'
-  msvc_def_args = [
-    python,
-    files('config/generate_msvc_def.py'),
-    meson.project_source_root(),
-    '@OUTPUT@',
-  ]
-  if have_fft_small
-    msvc_def_args += ['--with-fft-small']
-  endif
-
-  libflint_def = configure_file(
-    output: 'flint.def',
-    command: msvc_def_args,
+  libflint_objects = static_library('flint_objects', c_files_all + headers_all,
+    dependencies: flint_deps,
+    include_directories: [headers_built_nodir_inc, 'src'],
+    install: false,
+    c_args: libflint_c_args + ['-DFLINT_BUILD_DLL'] + flint_cpu_c_args,
   )
 
-  libflint = library('flint', c_files_all + headers_all,
+  libflint_object_files = libflint_objects.extract_all_objects(recursive: false)
+
+  libflint_def = custom_target(
+    'flint.def',
+    input: libflint_object_files,
+    output: 'flint.def',
+    command: [
+      python,
+      files('config/generate_msvc_def.py'),
+      '@OUTPUT@',
+      '@INPUT@',
+    ],
+  )
+
+  libflint = shared_library('flint',
+    objects: libflint_object_files,
     dependencies: flint_deps,
     include_directories: [headers_built_nodir_inc, 'src'],
     install: true,
     version: FLINT_LIBRARY_VERSION,
     soversion: FLINT_MAJOR_SO,
-    c_args: libflint_c_args + ['-DFLINT_BUILD_DLL'] + flint_cpu_c_args,
     vs_module_defs: libflint_def,
   )
 else
