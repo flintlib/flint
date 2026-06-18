@@ -131,11 +131,12 @@ jobs:
       - uses: actions/checkout@v5
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev libmpfr-dev meson ninja-build pkg-config lcov
+          sudo apt-get install -y libgmp-dev libmpfr-dev meson ninja-build pkg-config lcov gcovr
           $CC --version
           meson --version
           ninja --version
           lcov --version
+          gcovr --version
           python3 --version
       - name: "Generate Meson files"
         run: python3 update_meson.py
