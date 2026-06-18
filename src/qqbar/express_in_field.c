@@ -14,7 +14,7 @@
 #include "qqbar.h"
 
 int
-qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x, slong max_bits, int flags, slong prec)
+qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x, slong FLINT_UNUSED(max_bits), int FLINT_UNUSED(flags), slong prec)
 {
     slong d, dx;
     acb_ptr vec;
