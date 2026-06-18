@@ -107,6 +107,7 @@
 #include "t-inv_series_newton.c"
 #include "t-is_cyclotomic.c"
 #include "t-is_squarefree.c"
+#include "t-isolate_real_roots.c"
 #include "t-lcm.c"
 #include "t-legendre_pt.c"
 #include "t-mul.c"
@@ -132,7 +133,11 @@
 #include "t-newton_to_monomial.c"
 #include "t-nth_derivative.c"
 #include "t-num_real_roots.c"
+#include "t-num_real_roots_0_1.c"
 #include "t-num_real_roots_sturm.c"
+#include "t-num_real_roots_upper_bound.c"
+#include "t-num_real_roots_vca.c"
+#include "t-positive_root_upper_bound_2exp.c"
 #include "t-pow_addchains.c"
 #include "t-pow_binexp.c"
 #include "t-pow_binomial.c"
@@ -292,6 +297,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_inv_series_newton),
     TEST_FUNCTION(fmpz_poly_is_cyclotomic),
     TEST_FUNCTION(fmpz_poly_is_squarefree),
+    TEST_FUNCTION(fmpz_poly_isolate_real_roots),
     TEST_FUNCTION(fmpz_poly_lcm),
     TEST_FUNCTION(fmpz_poly_legendre_pt),
     TEST_FUNCTION(fmpz_poly_mul),
@@ -317,7 +323,11 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_newton_to_monomial),
     TEST_FUNCTION(fmpz_poly_nth_derivative),
     TEST_FUNCTION(fmpz_poly_num_real_roots),
+    TEST_FUNCTION(fmpz_poly_num_real_roots_0_1),
     TEST_FUNCTION(fmpz_poly_num_real_roots_sturm),
+    TEST_FUNCTION(fmpz_poly_num_real_roots_upper_bound),
+    TEST_FUNCTION(fmpz_poly_num_real_roots_vca),
+    TEST_FUNCTION(fmpz_poly_positive_root_upper_bound_2exp),
     TEST_FUNCTION(fmpz_poly_pow_addchains),
     TEST_FUNCTION(fmpz_poly_pow_binexp),
     TEST_FUNCTION(fmpz_poly_pow_binomial),

@@ -1201,16 +1201,34 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
 /* Roots */
 
 void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len);
-
 void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 
 void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len);
-
 slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t poly);
-
+slong _fmpz_poly_num_real_roots_vca(const fmpz * pol, slong len);
+slong fmpz_poly_num_real_roots_vca(const fmpz_poly_t pol);
 slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len);
-
 slong fmpz_poly_num_real_roots(const fmpz_poly_t poly);
+
+slong fmpz_poly_num_real_roots_upper_bound(const fmpz_poly_t pol);
+slong _fmpz_poly_descartes_bound_0_1(const fmpz * p, slong len, slong bound);
+
+int _fmpz_poly_has_real_root(const fmpz * p, slong len);
+int fmpz_poly_has_real_root(const fmpz_poly_t pol);
+
+slong fmpz_poly_num_real_roots_0_1_sturm(const fmpz_poly_t pol);
+slong fmpz_poly_num_real_roots_0_1_vca(const fmpz_poly_t pol);
+slong fmpz_poly_num_real_roots_0_1(const fmpz_poly_t pol);
+
+slong _fmpz_poly_positive_root_upper_bound_2exp_local_max(const fmpz * pol, slong len);
+slong _fmpz_poly_positive_root_upper_bound_2exp(const fmpz * pol, slong len);
+slong fmpz_poly_positive_root_upper_bound_2exp(const fmpz_poly_t pol);
+
+void _fmpz_poly_isolate_real_roots_0_1_vca(fmpq * exact_roots, slong * n_exact,
+        fmpz * c_array, slong * k_array, slong * n_intervals,
+        const fmpz * pol, slong len);
+void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact,
+    fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol);
 
 /* CLD bounds */
 

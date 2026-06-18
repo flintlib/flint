@@ -3252,6 +3252,19 @@ Roots
 
     where the coefficients of the polynomial are `a_0, \ldots, a_n`.
 
+.. function:: slong _fmpz_poly_positive_root_upper_bound_2exp_local_max(const fmpz * pol, slong len)
+              slong _fmpz_poly_positive_root_upper_bound_2exp(const fmpz * pol, slong len)
+              slong fmpz_poly_positive_root_upper_bound_2exp(const fmpz_poly_t pol)
+
+    Return the bitsize `e` of an upper bound `2^e` for the largest
+    positive real root of ``pol``.
+
+.. function:: slong _fmpz_poly_descartes_bound_0_1(const fmpz * p, slong len, slong bound)
+
+    Return an upper bound on the number of real roots in the interval `(0, 1)`
+    (excluding the endpoints) of the polynomial ``(p, len)`` using Descartes' rule
+    of sign. If the result is larger than ``bound`` then ``WORD_MAX`` is returned.
+
 .. function:: void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len)
 
     Sets ``n_neg`` and ``n_pos`` to the number of negative and
@@ -3264,25 +3277,50 @@ Roots
     and with non-zero constant coefficient.
 
 .. function:: slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol)
+              slong _fmpz_poly_num_real_roots_vca(const fmpz * pol, slong len)
+              slong fmpz_poly_num_real_roots_vca(const fmpz_poly_t pol)
+              slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
+              slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
 
-    Returns the number of real roots of the squarefree polynomial ``pol``
-    using Sturm sequence.
-
+    Returns the number of real roots of the polynomial ``pol``.
     The polynomial is assumed to be squarefree.
 
-.. function:: slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
+.. function:: slong fmpz_poly_num_real_roots_0_1_sturm(const fmpz_poly_t pol)
+              slong fmpz_poly_num_real_roots_0_1_vca(const fmpz_poly_t pol)
+              slong fmpz_poly_num_real_roots_0_1(const fmpz_poly_t pol)
 
-    Returns the number of real roots of the squarefree polynomial
-    ``(pol, len)``.
-
+    Returns the number of real roots of the polynomial ``pol`` on the
+    interval `(0, 1)` (excluding the endpoints).
     The polynomial is assumed to be squarefree.
 
-.. function:: slong fmpz_poly_num_real_roots(const fmpz_poly_t pol)
+.. function:: int _fmpz_poly_has_real_root(const fmpz * p, slong len)
+              int fmpz_poly_has_real_root(const fmpz_poly_t pol)
 
-    Returns the number of real roots of the squarefree polynomial ``pol``.
-
+    Returns whether the polynomial has a real root.
     The polynomial is assumed to be squarefree.
 
+.. function:: void _fmpz_poly_isolate_real_roots_0_1_vca(fmpq * exact_roots, slong * n_exact_roots, fmpz * c_array, slong * k_array, slong * n_intervals, const fmpz * pol, slong len)
+
+    Isolate the real roots of ``(pol, len)`` in the interval `(0, 1)`
+    (excluding the endpoints). The array ``exact_roots`` will be set to
+    the exact dyadic roots found by the algorithm and
+    ``n_exact_roots`` updated accordingly. The arrays
+    ``c_array`` and ``k_array`` are set to be interval data
+    that enclose the remaining roots and ``n_interval`` is
+    updated accordingly. The data ``c = c_array + i`` and
+    ``k = k_array[i]`` represents the open interval
+    `(c 2^k, (c + 1) 2^k)`.
+
+.. function:: void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+
+    Isolate the real roots of ``pol``. The array
+    ``exact_roots`` will be set to the exact dyadic roots found
+    by the algorithm and ``n_exact`` updated accordingly.
+    The arrays ``c_array`` and ``k_array`` are set to be
+    interval data that enclose the remaining roots and
+    ``n_interval`` is updated accordingly. The data
+    ``c = c_array + i`` and ``k = k_array[i]`` represents the
+    open interval `(c 2^k, (c + 1) 2^k)`.
 
 Minimal polynomials
 --------------------------------------------------------------------------------
