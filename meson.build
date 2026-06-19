@@ -50,6 +50,15 @@ if have_gc
   flint_deps += gc_dep
 endif
 
+flint_compile_deps = []
+foreach dep : flint_deps
+  flint_compile_deps += dep.partial_dependency(
+    compile_args: true,
+    includes: true,
+    sources: true,
+  )
+endforeach
+
 add_project_arguments(flint_abi_c_args, language: 'c')
 add_project_link_arguments(flint_abi_c_args, language: 'c')
 
@@ -118,7 +127,7 @@ if cc.get_argument_syntax() != 'msvc'
       if build_shared_library
         libflint_shared_link_whole += [static_library('flint_' + bucket_name + '_' + bucket_source_name + '_shared',
           bucket_sources + headers_all,
-          dependencies: flint_deps,
+          dependencies: flint_compile_deps,
           include_directories: [headers_built_nodir_inc, 'src'],
           install: false,
           pic: true,
@@ -129,7 +138,7 @@ if cc.get_argument_syntax() != 'msvc'
       if build_static_library
         libflint_static_link_whole += [static_library('flint_' + bucket_name + '_' + bucket_source_name + '_static',
           bucket_sources + headers_all,
-          dependencies: flint_deps,
+          dependencies: flint_compile_deps,
           include_directories: [headers_built_nodir_inc, 'src'],
           install: false,
           pic: false,
