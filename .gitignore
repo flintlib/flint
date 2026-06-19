@@ -27,7 +27,6 @@ config/*
 config.log
 confdefs.h
 conftest.*
-/Makefile
 doc/build
 doc/latex/flint-manual.*
 !doc/latex/flint-manual.tex
