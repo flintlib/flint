@@ -136,6 +136,9 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
     _arb_poly_set_length(invden_ser, ord);
     _arb_poly_normalise(invden_ser);
 
+    if (den_rt_len % 2)
+        arb_poly_neg(invden_ser, invden_ser);
+
     if (arb_contains_zero(invden_ser->coeffs))
     {
         arb_poly_fit_length(res, ord);
@@ -148,6 +151,8 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
     arb_poly_scalar_mul(invden_ser, invden_ser, cst, prec);
 
     /* flint_printf("invden_ser=%{arb_poly}\n", invden_ser); */
+    for (slong i = 0; i < invden_ser->length; i++)
+        FLINT_ASSERT(!arb_is_negative(invden_ser->coeffs + i));
 
     /* Rational part */
 
@@ -162,6 +167,8 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
     arb_poly_mullow(pre_ser, pre_ser, invden_ser, ord, prec);
 
     /* flint_printf("pre_ser=%{arb_poly}\n", pre_ser); */
+    for (slong i = 0; i < pre_ser->length; i++)
+        FLINT_ASSERT(!arb_is_negative(pre_ser->coeffs + i));
 
     /* Exponential part. Up to the sign in the exponential, this is the
      * same expression as in hexp_series, but now we want a bound on the series
@@ -170,6 +177,9 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
 
     arb_poly_integral(int_pol_ser, itg_pol, prec);
     arb_poly_taylor_shift_trunc(int_pol_ser, int_pol_ser, rad, ord, prec);
+
+    for (slong i = 0; i < int_pol_ser->length; i++)
+        FLINT_ASSERT(!arb_is_negative(int_pol_ser->coeffs + i));
 
     arb_poly_fit_length(int_rat_ser, itg_num->length);
     _arb_poly_set_length(int_rat_ser, itg_num->length);
@@ -187,6 +197,8 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
     arb_poly_mullow(int_rat_ser, int_rat_ser, invden_ser, ord, prec);
 
     /* flint_printf("int_rat_ser=%{arb_poly}\n", int_ser); */
+    for (slong i = 0; i < int_rat_ser->length; i++)
+        FLINT_ASSERT(!arb_is_negative(int_rat_ser->coeffs + i));
 
     arb_poly_add(int_ser, int_pol_ser, int_rat_ser, prec);
 
@@ -221,8 +233,6 @@ acb_ode_tail_bound_jet_precomp(arb_poly_t res,
 
     arb_poly_t pre;
 
-    // flint_printf("nres_maj=%{arb_poly}\n", nres_maj);
-
     if (arb_poly_is_zero(nres_maj))
     {
         arb_poly_zero(res);
@@ -253,7 +263,10 @@ acb_ode_tail_bound_jet_precomp(arb_poly_t res,
 }
 
 void acb_ode_tail_bound_jet(arb_poly_t res,
-            const acb_ode_group_t group, const acb_ode_bound_t bound, slong n,
+            const acb_ode_group_t group,
+            const acb_ode_bound_t bound,
+            const acb_ode_group_bound_t gbound,
+            slong n,
             slong nlogs, const arb_poly_t nres_maj, const arb_t rad,
             slong ord, slong prec)
 {
@@ -262,8 +275,8 @@ void acb_ode_tail_bound_jet(arb_poly_t res,
     arb_poly_init(itg_pol);
     arb_poly_init(itg_num);
 
-    acb_ode_bound_precompute_integrand(itg_pol, itg_num, group, bound, n, nlogs,
-                                       prec);
+    acb_ode_bound_precompute_integrand(itg_pol, itg_num, group, bound, gbound,
+                                       n, nlogs, prec);
     acb_ode_tail_bound_jet_precomp(res, bound, n, itg_pol, itg_num, nres_maj,
                                    rad, ord, prec);
 

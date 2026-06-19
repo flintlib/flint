@@ -9,6 +9,7 @@ void
 acb_ode_bound_precompute_integrand(arb_poly_t itg_pol, arb_poly_t itg_num,
                                    const acb_ode_group_t group,
                                    const acb_ode_bound_t bound,
+                                   const acb_ode_group_bound_t gbound,
                                    slong n0, slong nlogs, slong prec)
 {
     /* flint_printf("== acb_ode_bound_precompute_integrand n0=%ld ==\n", n0); */
@@ -19,7 +20,7 @@ acb_ode_bound_precompute_integrand(arb_poly_t itg_pol, arb_poly_t itg_num,
      * length wrt log(x) of the solutions of interest truncated after their term
      * in x^n, instead of τ(n0) as Algo 6.1, step 3 would prescribe. */
     acb_ode_bound_rat_vec(maj_all_nums, bound->all_nums + 1, bound->all_nums_len - 1,
-                           bound->ind, group, bound->ind_lbound, bound->stairs,
+                           gbound->ind, group, gbound->ind_lbound, gbound->stairs,
                            n0, nlogs, prec);
 
     /* flint_printf("n0=%ld maj_all_nums = %{mag*}\n", n0, maj_all_nums, bound->all_nums_len - 1); */

@@ -2,7 +2,7 @@
 #include "acb_poly.h"
 #include "acb_mat.h"
 #include "acb_ode.h"
-
+#include "fmpz_vec.h"
 #include "gr.h"
 #include "gr_poly.h"
 #include "gr_ore_poly.h"
@@ -49,7 +49,7 @@ fix_column_echelon(acb_mat_struct * mat,
 
     for (slong s1 = s + 1; s1 < grp->nshifts; s1++)
     {
-        slong j1 = j1 = col(grp, s1, 0);
+        slong j1 = col(grp, s1, 0);
         slong mult1 =  grp->shifts[s1].mult;
         for (slong k1 = FLINT_MAX(0, mult1 - delta); k1 < mult1; k1++)
         {
@@ -63,7 +63,7 @@ fix_column_echelon(acb_mat_struct * mat,
                 acb_submul(a, cc, a1, prec);
                 /* flint_printf(" = %{acb}\n", a); */
             }
-            j1++;
+            j1--;
         }
     }
 
@@ -78,9 +78,10 @@ fill_group(acb_mat_t mat, const acb_ode_sum_t sum,
     for (slong s = grp->nshifts - 1; s >= 0; s--)
     {
         acb_ode_sol_struct * sol = sum->sol + s;
-        acb_poly_struct * val = _acb_poly_vec_init(sol->nlogs);
-
         slong mult = grp->shifts[s].mult;
+
+        acb_poly_struct * val = _acb_poly_vec_init(mult);
+
         acb_ode_sol_jet(val, sum->group->leader, sol, p, sum->pts + p,
                         acb_mat_nrows(mat), mult, prec);
         // flint_printf("s=%wd mult=%wd val=%{acb_poly}\n\n", s, mult, val);
@@ -117,19 +118,17 @@ _acb_ode_fundamental_matrix_vec(
         const acb_poly_struct * dop, slong dop_len,
         const acb_ode_exponents_t expos,
         acb_srcptr lcrt,
+        acb_ode_bound_t bound,  /* mutable */
         acb_srcptr pts, slong npts,
         acb_ode_basis_t basis,
         acb_ode_sum_worker_t sum_worker,
+        void * worker_data,
         slong prec)
 {
     mag_t cvrad, mag;
-    acb_ode_bound_t bound;
 
     mag_init(cvrad);
     mag_init(mag);
-    acb_ode_bound_init(bound);
-
-    slong dop_clen = _acb_poly_vec_length(dop, dop_len);
 
     slong nder = 0;
     for (slong p = 0; p < npts; p++)
@@ -137,10 +136,6 @@ _acb_ode_fundamental_matrix_vec(
 
     if (nder == 0)
         return;
-
-    // XXX somehow make pol_part_len and bounds_prec customizable
-    slong pol_part_len = dop_clen / 2 + 3;
-    acb_ode_bound_precompute(bound, dop, dop_len, lcrt, pol_part_len, MAG_BITS);
 
     _acb_vec_get_mag_lower(cvrad, lcrt, dop[dop_len - 1].length - 1);
 
@@ -158,22 +153,27 @@ _acb_ode_fundamental_matrix_vec(
     for (slong g = 0, j = 0; g < expos->ngroups; g++)
     {
         acb_ode_sum_t sum;
+        acb_ode_group_bound_t gbound;
 
         acb_ode_group_struct * group = expos->groups + g;
         slong glen = acb_ode_group_length(expos->groups + g);
 
-        acb_ode_bound_precompute_group(bound, dop, dop_len, expos, g, MAG_BITS);
+        flint_printf("GROUP #%ld leader=%{acb} shifts+muls=%{slong*} glen=%ld\n",
+                     g, group->leader, group->shifts, 2*group->nshifts, glen);
+
+        acb_ode_group_bound_init(gbound);
+        acb_ode_group_bound_precompute(gbound, dop, dop_len, expos, g, bound, bound->prec);
 
         acb_ode_sum_init(sum, dop_len, npts, group->nshifts, nder);
         acb_ode_sum_set_diffop(sum, dop, dop_len, cvrad);
-        sum->bound = bound;  /* XXX handle in set_diffop or move out of sum */
         acb_ode_sum_set_group(sum, group);
-        /* todo: This only avoids part of the redundant computations between
-           solutions of the same group in the presence of logs. */
+        /* todo: only avoids part of the redundant computations between
+           solutions of the same group in the presence of logs */
         acb_ode_sum_set_ini_highest(sum);
         acb_ode_sum_set_points(sum, pts, npts);
+        sum->data = worker_data;
 
-        sum_worker(sum, -1, prec);
+        sum_worker(sum, -1, bound, gbound, prec);
 
         for (slong p = 0; p < npts; p++)
         {
@@ -182,18 +182,40 @@ _acb_ode_fundamental_matrix_vec(
 
             fill_group(win, sum, expos->groups + g, p, basis, prec);
 
+            flint_printf("g=%ld p=%ld win=%{acb_mat}\n", g, p, win);
+
             acb_mat_window_clear(win);
         }
 
         acb_ode_sum_clear(sum);
+        acb_ode_group_bound_clear(gbound);
 
         j += glen;
     }
 
 cleanup:
-    acb_ode_bound_clear(bound);
     mag_clear(cvrad);
     mag_clear(mag);
+}
+
+
+static slong
+x_valuation(const gr_ore_poly_t dop, gr_ctx_t Cst)
+{
+    slong val = WORD_MAX;
+
+    for (slong i = 0; val > 0 && i < dop->length; i++)
+    {
+        gr_poly_struct * pol = ((gr_poly_struct *) (dop->coeffs)) + i;
+        slong v = 0;
+        while (v < val && v < pol->length
+               && gr_is_zero(gr_poly_coeff_ptr(pol, v, Cst), Cst) == T_TRUE)
+            v++;
+        if (v < pol->length)
+            val = v;
+    }
+
+    return val;
 }
 
 
@@ -213,27 +235,43 @@ acb_ode_fundamental_matrix_vec(
     gr_ore_poly_struct * _dop;
     gr_vec_t sing;
     acb_struct * _lcrt = NULL;
+    acb_ode_bound_t bound;
 
     if (gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Scalars, &Pol, Dop) != GR_SUCCESS)
-        // flint_abort();
+    {
+        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
         return GR_UNABLE;
+    }
 
     /* todo: support d/dx (handle lcrt) */
     if (GR_ORE_POLY_CTX(Dop)->which_algebra != ORE_ALGEBRA_EULER_DERIVATIVE)
-        // flint_abort();
+    {
+        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
         return GR_UNABLE;
+    }
 
     if (dop->length == 0)
         return GR_DOMAIN;
     if (dop->length == 1)
         return GR_SUCCESS;
-    if (gr_ore_poly_is_zero(dop, Dop) != T_FALSE)
+
+    int is_zero = gr_ore_poly_is_zero(dop, Dop);
+    if (is_zero != T_FALSE)
+        return gr_check(truth_not(is_zero));
+
+    gr_poly_struct * lc = (gr_poly_struct *) (dop->coeffs) + dop->length - 1;
+    slong xval = x_valuation(dop, Scalars);
+
+    int is_regular = xval < lc->length
+        && truth_not(gr_is_zero(gr_poly_coeff_ptr(lc, xval, Scalars), Scalars));
+    if (is_regular != T_TRUE)
+        return gr_check(is_regular);
+    if (gr_is_zero(lc->coeffs, Scalars) != T_FALSE)
+        /* we could handle some cases if we were more careful with lcroots */
         return GR_UNABLE;
 
     gr_ctx_init_complex_acb(bCC, MAG_BITS);  // XXX prec choice?
     gr_vec_init(sing, 0, bCC);
-
-    gr_poly_struct * lc = (gr_poly_struct *) (dop->coeffs) + dop->length - 1;
 
     int status = GR_SUCCESS;
 
@@ -267,10 +305,8 @@ acb_ode_fundamental_matrix_vec(
 
     if (lcrt == NULL)
     {
-        gr_ctx_t ZZ;
-        gr_vec_t sing_mult;
-        gr_ctx_init_fmpz(ZZ);
-        gr_vec_init(sing_mult, 0, ZZ);
+        fmpz_vec_t sing_mult;
+        fmpz_vec_init(sing_mult, 0);
 
         /* todo: should use (multiple) root enclosures supporting polynomials
            with interval coefficients */
@@ -287,19 +323,28 @@ acb_ode_fundamental_matrix_vec(
         }
         lcrt = _lcrt;
 
-        gr_vec_clear(sing_mult, ZZ);
-        gr_ctx_clear(ZZ);
+        fmpz_vec_clear(sing_mult);
     }
 
-    flint_printf("lcrt=%{acb*}\n", lcrt, sing->length);
+    if (status != GR_SUCCESS)
+        goto cleanup;
 
-    if (status == GR_SUCCESS)
-        _acb_ode_fundamental_matrix_vec(mat, _dop->coeffs, _dop->length,
-                                        expos, lcrt,
-                                        pts, npts,
-                                        basis, acb_ode_sum_divconquer,
-                                        prec);
+    acb_ode_bound_init(bound);
+    slong dop_clen = _acb_poly_vec_length(_dop->coeffs, _dop->length);
+    slong pol_part_len = dop_clen / 2 + 3;
+    acb_ode_bound_precompute(bound, _dop->coeffs, _dop->length, lcrt,
+                             pol_part_len, MAG_BITS);
 
+    _acb_ode_fundamental_matrix_vec(mat, _dop->coeffs, _dop->length,
+                                    expos, lcrt, bound,
+                                    pts, npts,
+                                    basis,
+                                    acb_ode_sum_divconquer, NULL,
+                                    prec);
+
+    acb_ode_bound_clear(bound);
+
+cleanup:
     flint_free(_lcrt);
     gr_vec_clear(sing, bCC);
     if (expos == _expos)
@@ -320,7 +365,7 @@ acb_ode_fundamental_matrix(
         const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop,
         const acb_ode_exponents_t expos,
         acb_srcptr lcrt,
-        acb_srcptr pt,
+        const acb_t pt,
         acb_ode_basis_t basis,
         slong prec)
 {

@@ -7,16 +7,15 @@ acb_ode_bound_rat_exceptional_vec(mag_ptr res, slong len,
                                    const acb_ode_group_t group,
                                    const acb_ode_stairs_t stairs, slong n)
 {
-    for (slong i = 0; i < len; i++)
-    {
-        slong s = 0;
-        while (s < group->nshifts && group->shifts[s].n < n)
-            s++;
-        if (s < group->nshifts)
+    slong s = 0;
+    while (s < group->nshifts && group->shifts[s].n < n)
+        s++;
+    if (s < group->nshifts)
+        for (slong i = 0; i < len; i++)
             mag_set(res + i, stairs->h + i * group->nshifts + s);
-        else
+    else
+        for (slong i = 0; i < len; i++)
             mag_zero(res + i);
-    }
 }
 
 /* [M19], Algorithm 7.4, steps 2 to 4, with the slight refinement that

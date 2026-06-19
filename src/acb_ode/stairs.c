@@ -48,7 +48,7 @@ acb_ode_stairs_precompute(acb_ode_stairs_t stairs,
         /* flint_printf("  n=%ld ref = %{mag*}\n", n, bound + i, len); */
         if (s == group->nshifts - 1 || group->shifts[s + 1].n != n + 1) {
             acb_ode_bound_rat_ordinary_vec(bound1, num, len, ind, ind_lbound,
-                                            n + 1, ord, prec);
+                                           n + 1, ord, prec);
             /* flint_printf("  n=%ld bound1 = %{mag*}\n", n, bound1 + i, len); */
             for (slong i = 0; i < len; i++)
                 mag_max(bound + i, bound + i, bound1 + i);

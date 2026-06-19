@@ -1,8 +1,27 @@
 #include "acb_types.h"
 #include "acb.h"
+#include "acb_mat.h"
 #include "acb_poly.h"
 #include "acb_ode.h"
 #include "arb_poly.h"
+
+static int
+sol_has_ini_past(const acb_ode_sol_t sol, slong n, const acb_ode_group_t group)
+{
+    for (slong s = 0; s < group->nshifts; s++)
+        if (group->shifts[s].n >= n)
+            for (slong k = 0; k < group->shifts[s].mult; k++)
+                if (!acb_is_zero(acb_mat_entry(sol->extini, s, k)))
+                    return 1;
+    return 0;
+}
+
+static void
+_mag_vec_inf(mag_ptr mag, slong len)
+{
+    for (slong i = 0; i < len; i++)
+        mag_inf(mag + i);
+}
 
 void
 acb_ode_cvest_println(const acb_ode_cvest_t cvest)
@@ -15,7 +34,7 @@ acb_ode_cvest_println(const acb_ode_cvest_t cvest)
 }
 
 
-/* TODO support the case when only part of the residual is known */
+/* todo: support the case when only part of the residual is known */
 static void
 bound_normalized_residuals(arb_poly_struct * nres_maj,
                            acb_ode_sum_struct * sum,
@@ -73,12 +92,13 @@ bound_normalized_residuals(arb_poly_struct * nres_maj,
 
             // XXX tighten?
             slong nlogs_dm = FLINT_MIN(sum->sol[m].nlogs, nlogs_d);
+            // flint_printf("n=%ld sol[%ld].nlogs=%ld nlogs_d=%ld\n", sum->n, m, sum->sol[m].nlogs, nlogs_d);
 
             /* nres_term = coeff of x^{λ+n+d} in normalized residual of sol m */
             for (slong k = 0; k < nlogs_dm; k++)
                 rhs_term[k] = (sum->sol[m].series + k)->coeffs[n + d - sum->n0];
             _acb_ode_poly_negdivrevhigh(nres_term, ind_nd->coeffs + mult,
-                                    cst, rhs_term, nlogs_dm, prec);
+                                        cst, rhs_term, nlogs_dm, prec);
 
             /* nres_maj[m] = common majorant of the coefficients of log(x)^k/k!
              * in the normalized residual of solution m */
@@ -103,7 +123,9 @@ bound_normalized_residuals(arb_poly_struct * nres_maj,
 
 
 static void
-update_tail_bounds(acb_ode_sum_struct * sum, slong prec)
+update_tail_bounds(acb_ode_sum_struct * sum,
+                   acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
+                   slong prec)
 {
     arb_t rad;
     arb_poly_t jet_tb;
@@ -124,7 +146,8 @@ update_tail_bounds(acb_ode_sum_struct * sum, slong prec)
     // enough or nlogs has changed. (We can also use the larger nlogs from the
     // start, but this leads to worse bounds before nlogs increases.)
     acb_ode_bound_precompute_integrand(sum->itg_pol, sum->itg_num, sum->group,
-                                       sum->bound, sum->n, acb_ode_sum_max_nlogs(sum), MAG_BITS);
+                                       bound, gbound, sum->n,
+                                       acb_ode_sum_max_nlogs(sum), MAG_BITS);
 
     bound_normalized_residuals(nres_maj, sum, prec);
 
@@ -144,10 +167,20 @@ update_tail_bounds(acb_ode_sum_struct * sum, slong prec)
     for (slong m = 0; m < sum->nsols; m++)
     {
         slong i;
+
+        /* tail_bound_jet only yields a bound for n past the nonzero initial
+           values of the solution */
+        if (sol_has_ini_past(sum->sol + m, sum->n, sum->group))
+        {
+            _mag_vec_inf((sum->sol + m)->tb, sum->nder);
+            continue;
+        }
+
         arf_set_mag(arb_midref(rad), sum->mag);
-        acb_ode_tail_bound_jet_precomp(jet_tb,
-                    sum->bound, sum->n, sum->itg_pol, sum->itg_num,
-                    nres_maj + m, rad, sum->nder, MAG_BITS);
+        // flint_printf("n=%ld m=%ld nres_maj=%{arb_poly}\n", sum->n, m, nres_maj + m);
+        acb_ode_tail_bound_jet_precomp(jet_tb, bound, sum->n, sum->itg_pol,
+                                       sum->itg_num, nres_maj + m, rad,
+                                       sum->nder, MAG_BITS);
         for (i = 0; i < jet_tb->length; i++)
             arb_get_mag((sum->sol + m)->tb + i, jet_tb->coeffs + i);
         for (; i < sum->nder; i++)
@@ -163,7 +196,10 @@ update_tail_bounds(acb_ode_sum_struct * sum, slong prec)
 
 /* stride = terms since last check */
 int
-acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride, slong prec)
+acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
+                 /* in the future sum_done may refine bound, gbound */
+                 acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
+                 slong prec)
 {
     mag_t eps, est, sum_mag, sum_rad;
     mag_init(eps);
@@ -249,7 +285,7 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride, slong prec)
         if (!have_tail_bounds)
         {
             // XXX wasteful when only some sols have converged
-            update_tail_bounds(sum, MAG_BITS);
+            update_tail_bounds(sum, bound, gbound, MAG_BITS);
             have_tail_bounds = 1;
         }
 
@@ -282,8 +318,7 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride, slong prec)
         }
 
         if (stop || sum->n % (10 * stride) == 0)
-            // flint_printf("n=%ld m=%ld tb=%{mag*}\n", sum->n, m, sum->sol[m].tb, sum->nder);
-            flint_printf("n=%ld m=%ld tb=%{mag}\n", sum->n, m, sum->sol[m].tb);
+            flint_printf("n=%ld m=%ld tb=%{mag*}\n", sum->n, m, sol->tb, sol->nder);
     }
 
     mag_clear(eps);

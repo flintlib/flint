@@ -81,8 +81,9 @@ acb_ode_sol_zero(acb_ode_sol_t sol)
 
     _acb_vec_zero(sol->sums, sol->npts * sol->alloc_logs * sol->nder);
 
+    for (slong i = 0; i < sol->nder; i++)
+        mag_inf(sol->tb + i);  /* XXX right place to do this? */
     sol->done = 0;
-    // XXX reset tail bounds, cvest??
 }
 
 

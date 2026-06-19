@@ -42,11 +42,10 @@ TEST_FUNCTION_START(acb_ode_sum_divconquer, state)
             acb_div_si(a, a, 4, prec);
         }
 
-        /* note that sum->bound is null */
         sum->flags = ACB_ODE_APPROX
                    | (n_randint(state, 2) * ACB_ODE_WANT_SERIES);
 
-        acb_ode_sum_divconquer(sum, nterms, prec);
+        acb_ode_sum_divconquer(sum, nterms, NULL, NULL, prec);
 
         acb_poly_struct * ref = _acb_poly_vec_init(dop_order);
         acb_poly_one(ref);  /* atan: first sol=1 */

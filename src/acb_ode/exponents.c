@@ -3,6 +3,7 @@
 #include "acb.h"
 #include "acb_ode.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "gr_poly.h"
 #include "gr_vec.h"
 
@@ -79,6 +80,16 @@ acb_ode_exponents_clear(acb_ode_exponents_t expos)
     flint_free(expos->groups);
 }
 
+slong
+acb_ode_exponents_length(const acb_ode_exponents_t expos)
+{
+    slong len = 0;
+
+    for (slong g = 0; g < expos->ngroups; g++)
+        len += acb_ode_group_length(expos->groups + g);
+
+    return len;
+}
 
 void
 acb_ode_exponents_ordinary(acb_ode_exponents_t expos, slong order)
@@ -95,10 +106,91 @@ acb_ode_exponents_ordinary(acb_ode_exponents_t expos, slong order)
         expos->groups->shifts[n].n = n;
         expos->groups->shifts[n].mult = 1;
     }
+    expos->groups->nshifts = order;
 
     expos->ngroups = 1;
 }
 
+void
+acb_ode_exponents_println(const acb_ode_exponents_t expos)
+{
+    flint_printf("[");
+    for (slong g = 0; g < expos->ngroups; g++)
+    {
+        acb_ode_group_struct * grp = expos->groups + g;
+        flint_printf("%{acb} ", grp->leader);
+        for (slong s = 0; s < grp->nshifts; s++)
+        {
+            flint_printf("+ %ld", grp->shifts[s].n);
+            if (grp->shifts[s].mult != 1)
+                flint_printf(" (mult=%ld)", grp->shifts[s].mult);
+            if (g < expos->ngroups - 1 || s < grp->nshifts - 1)
+                flint_printf(", ");
+        }
+    }
+    flint_printf("]\n");
+}
+
+
+
+/* Random exponents, exactly len in total, nontrivial shift structure with high
+   probability. */
+void
+acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
+                           slong len, slong disp, slong prec, slong mag_bits)
+{
+    void * buf = flint_realloc(expos->groups,
+                               len * (sizeof(acb_ode_group_struct) +
+                                      sizeof(acb_ode_shift_struct)));
+    expos->groups = (acb_ode_group_struct *) buf;
+
+    int precise = n_randint(state, 64);
+
+    acb_ode_shift_struct * shift =
+        (acb_ode_shift_struct *) (expos->groups + len);
+
+    for (acb_ode_group_struct * grp = expos->groups; len > 0; grp++)
+    {
+        flint_printf("len = %wd\n", len);
+
+        expos->ngroups++;
+
+        acb_init(grp->leader);
+        if (precise)
+            acb_randtest_precise(grp->leader, state, prec, mag_bits);
+        else
+            acb_randtest(grp->leader, state, prec, mag_bits);
+
+        /* mathematically equal leaders would be unsound */
+        for (slong g = 0; g < expos->ngroups - 1; g++)
+            if (acb_eq(grp->leader, expos->groups[g].leader))
+                mag_set_d(&grp->leader->real.rad, 1e-50);
+
+        grp->shifts = shift;
+        grp->nshifts = 0;
+
+        slong grplen = 1 + n_randint(state, len);
+        len -= grplen;
+
+        for (slong n = 0;
+             grplen > 0;
+             shift++, n += 1 + n_randint(state, disp - n))
+        {
+            flint_printf("len = %wd grplen = %wd n = %wd\n", len, grplen, n);
+
+            grp->nshifts++;
+
+            shift->n = n;
+            if (n == disp)
+                shift->mult = grplen;
+            else
+                shift->mult = 1 + n_randint(state, grplen);
+            grplen -= shift->mult;
+
+            acb_ode_exponents_println(expos);
+        }
+    }
+}
 
 /* todo: also provide a function for computing the exponents starting from the
    indicial polynomial */
@@ -111,29 +203,35 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
     gr_ctx_struct * Scalars, * Pol;
     gr_ctx_t ZZ, ZZvec;
     gr_poly_t ind, polc;
-    gr_vec_t fac, mult, slfac, slshifts, slmult, roots, rtmult;
+    gr_vec_t slshifts, slmult, roots;
+    gr_poly_vec_t fac, slfac;
+    fmpz_vec_t mult, rtmult;
 
     if (gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Scalars, &Pol, Dop) != GR_SUCCESS)
-        flint_abort();
-        /* return GR_UNABLE; */
+    {
+        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
+        return GR_UNABLE;
+    }
 
-    /* For now exponents are of type acb_t, but this might change */
+    /* For now exponents are of type acb_t */
     if (CC->which_ring != GR_CTX_CC_ACB)
-        flint_abort();
-        /* return GR_UNABLE; */
+    {
+        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
+        return GR_UNABLE;
+    }
 
     gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_vector_gr_vec(ZZvec, ZZ);
+    gr_ctx_init_vector_gr_vec(ZZvec, ZZ);  /* XXX fmpz_vec */
 
     gr_poly_init(ind, Scalars);
-    gr_poly_init(polc, Scalars);  /* unused */
-    gr_vec_init(fac, 0, Pol);
-    gr_vec_init(mult, 0, ZZ);
-    gr_vec_init(slfac, 0, Pol);
+    gr_poly_init(polc, Scalars);
+    gr_poly_vec_init(fac, 0, Scalars);
+    fmpz_vec_init(mult, 0);
+    gr_poly_vec_init(slfac, 0, Scalars);
     gr_vec_init(slshifts, 0, ZZvec);
     gr_vec_init(slmult, 0, ZZvec);
     gr_vec_init(roots, 0, CC);
-    gr_vec_init(rtmult, 0, ZZ);  /* unused */
+    fmpz_vec_init(rtmult, 0);
 
     /* Compute the local exponents (indicial roots) and organize them into shift
        equivalence classes */
@@ -146,11 +244,12 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
        representing the exponents exactly; in others, this should compute the
        roots of the shiftless factors without further decomposing them.
 
-       On pourrait (au moins dans la plupart des cas) continuer même si
-       gr_factor échoue, mais dans l'état actuel des choses on n'a pas de
-       décomposition shiftless qui fonctionne sans factorisation. */
+       Quite often it would be possible to continue even if gr_factor fails,
+       however the current implementation of shiftless decomposition requires
+       factoring. */
 
-    status |= gr_factor(polc, fac, mult, ind, 0, Pol);
+    status |= gr_factor(polc /* unused */, (gr_vec_struct *) fac,
+                        mult, ind, 0, Pol);
     if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
     // GR_MUST_SUCCEED(status); // tmp
     status |= gr_poly_shiftless_decomposition_from_factors(
@@ -175,7 +274,7 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
     expos->ngroups = 0;
     for (slong i = 0; i < slfac->length; i++)
     {
-        gr_poly_struct * indfactor = gr_vec_entry_ptr(slfac, i, Pol);
+        gr_poly_struct * indfactor = gr_poly_vec_entry_ptr(slfac, i, Scalars);
         expos->ngroups += indfactor->length - 1;
     }
 
@@ -200,11 +299,12 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
 
     for (slong i = 0, g = 0; i < slfac->length; i++)
     {
-        gr_poly_struct * indfactor = gr_vec_entry_ptr(slfac, i, Pol);
+        gr_poly_struct * indfactor = gr_poly_vec_entry_ptr(slfac, i, Scalars);
         gr_vec_struct * shi = gr_vec_entry_ptr(slshifts, i, ZZvec);
         gr_vec_struct * mi = gr_vec_entry_ptr(slmult, i, ZZvec);
 
-        status |= gr_poly_roots_other(roots, rtmult, indfactor, Scalars, 0, CC);
+        status |= gr_poly_roots_other(roots, rtmult /* unused */,
+                                      indfactor, Scalars, 0, CC);
         if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
         FLINT_ASSERT(roots->length + 1 == indfactor->length || status != GR_SUCCESS);
 
@@ -235,13 +335,13 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
 
     FLINT_ASSERT((unsigned char *) shifts == buf + bufsz);
 
-    gr_vec_clear(rtmult, ZZ);
+    fmpz_vec_clear(rtmult);
     gr_vec_clear(roots, CC);
     gr_vec_clear(slmult, ZZvec);
     gr_vec_clear(slshifts, ZZvec);
-    gr_vec_clear(slfac, Pol);
-    gr_vec_clear(mult, ZZ);
-    gr_vec_clear(fac, Pol);
+    gr_poly_vec_clear(slfac, Scalars);
+    fmpz_vec_clear(mult);
+    gr_poly_vec_clear(fac, Scalars);
     gr_poly_clear(polc, Scalars);
     gr_poly_clear(ind, Scalars);
 

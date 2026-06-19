@@ -43,9 +43,11 @@ acb_ode_sum_init(acb_ode_sum_t sum, slong dop_len, slong npts,
     arb_poly_init(sum->itg_pol);
     arb_poly_init(sum->itg_num);
 
+    sum->flags = 0;
+    sum->data = NULL;
+
     sum->binom_n = _fmpz_vec_init(nder);
 
-    sum->flags = 0;
     sum->have_precomputed = 0;
 }
 
@@ -77,7 +79,7 @@ acb_ode_sum_clear(acb_ode_sum_t sum)
 /* Operator */
 
 void
-acb_ode_sum_set_diffop(acb_ode_sum_t sum, const acb_poly_t dop, slong dop_len,
+acb_ode_sum_set_diffop(acb_ode_sum_t sum, const acb_poly_struct * dop, slong dop_len,
                        const mag_t cvrad)
 {
     FLINT_ASSERT(dop_len > 0);
@@ -141,9 +143,6 @@ acb_ode_sum_precompute(acb_ode_sum_t sum)
 
     slong dop_len = sum->dop_len;
 
-    arf_t abspt;
-    arf_init(abspt);
-
     sum->dop_clen = _acb_poly_vec_length(sum->dop, dop_len);
 
     /* XXX _gr_ore_poly_indicial_polynomial? */
@@ -165,6 +164,4 @@ acb_ode_sum_precompute(acb_ode_sum_t sum)
     FLINT_ASSERT(mag_cmp(sum->mag, sum->cvrad) <= 0);
 
     sum->have_precomputed = 1;
-
-    arf_clear(abspt);
 }

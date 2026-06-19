@@ -119,6 +119,10 @@ acb_ode_bound_precompute(acb_ode_bound_t bound,
 {
     const acb_poly_struct * den = dop + dop_len - 1;
 
+    if (acb_is_zero(den->coeffs + 0))
+        flint_throw(FLINT_ERROR, "irregular singular point or common factor "
+                                  "with a zero at the origin\n");
+
     /* Denominator bound: 1/lc_Θ(dop) << cst/prod(rt-x) = cst/den_lbound */
 
     if (prec > bound->prec)

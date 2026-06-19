@@ -23,17 +23,17 @@ acb_ode_sum_reset(acb_ode_sum_t sum)
 
 /* XXX make it possible to customize the working precision--how exactly? */
 void
-acb_ode_sum_divconquer(acb_ode_sum_t sum, slong nterms, slong prec)
+acb_ode_sum_divconquer(acb_ode_sum_t sum, slong nterms, acb_ode_bound_t bound,
+                       acb_ode_group_bound_t gbound, slong prec)
 {
     if (nterms < 0)
         nterms = WORD_MAX;
 
     acb_ode_sum_precompute(sum);
-    acb_ode_sum_reset(sum);
-
     /* todo: take into account nterms and the APPROX flag */
     sum->sum_wp = acb_ode_choose_prec(&sum->wp, sum->dop, sum->dop_len,
                                          sum->mag, sum->cvrad, prec);
+    acb_ode_sum_reset(sum);
 
     slong block_len = FLINT_MAX(1, sum->dop_clen - 1);
     slong stride = block_len;  /* todo: less when block_len is large */
@@ -41,6 +41,7 @@ acb_ode_sum_divconquer(acb_ode_sum_t sum, slong nterms, slong prec)
     for (slong m = 0; m < sum->nsols; m++)
         acb_ode_sol_fit_length(sum->sol + m, 2 * block_len);
 
-    _acb_ode_sum_forward_divconquer(sum, nterms, block_len, stride, prec);
+    _acb_ode_sum_forward_divconquer(sum, nterms, block_len, stride, bound,
+                                    gbound, prec);
     _acb_ode_sum_fix(sum);
 }

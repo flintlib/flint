@@ -85,7 +85,9 @@ discard_block(acb_ode_sum_struct * sum, slong block_len)
 // assumes all sol have enough space for 2*block_len coefficients
 int
 _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high,
-                                slong block_len, slong stride, slong prec)
+                                slong block_len, slong stride,
+                                acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
+                                slong prec)
 {
     slong low = sum->n;
     FLINT_ASSERT(low <= high);
@@ -99,20 +101,21 @@ _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high,
 
     slong mid = high <= low + block_len ? (high + low)/2 : low + block_len;
 
-    int done = _acb_ode_sum_forward_divconquer(sum, mid, block_len, stride, prec);
+    int done = _acb_ode_sum_forward_divconquer(sum, mid, block_len, stride,
+                                               bound, gbound, prec);
 
-    /*
-       acb_poly_t tmp;
-       acb_poly_init(tmp);
-       flint_printf("divconquer: block_len=%wd n0=%wd low=%wd mid=%wd high=%wd\n", block_len, n0, low, mid, high);
-       for (slong m = 0; m < sum->nsols; m++)
-       {
-       acb_poly_set(tmp, sum->sol[m].series);
-       acb_poly_truncate(tmp, mid - n0);
-       flint_printf("series[%wd]=%{acb_poly}\n", m, tmp);
-       }
-       acb_poly_clear(tmp);
-       */
+    // flint_printf("divconquer: block_len=%wd low=%wd mid=%wd high=%wd\n", block_len, low, mid, high);
+
+    // // warning: only prints the log^0 part
+    // acb_poly_t tmp;
+    // acb_poly_init(tmp);
+    // for (slong m = 0; m < sum->nsols; m++)
+    // {
+    //     acb_poly_set(tmp, sum->sol[m].series);
+    //     acb_poly_truncate(tmp, mid - sum->n0);
+    //     flint_printf("series[%wd]=%{acb_poly}\n", m, tmp);
+    // }
+    // acb_poly_clear(tmp);
 
     if (done)
         return 1;
@@ -120,13 +123,11 @@ _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high,
     slong resid_len = FLINT_MIN(high - mid, block_len);
     apply_diffop(sum, low, mid, mid + resid_len);
 
-    /*
-       for (slong m = 0; m < sum->nsols; m++)
-       flint_printf("series+res[%wd]=%{acb_poly}\n", m, sum->sol[m].series);
-       for (slong j = 0; j < sum->npts; j++)
-       for (slong m = 0; m < sum->nsols; m++)
-       flint_printf("sums[%wd][%wd]=%{acb_poly}\n", m, j, sum->sol[m].sums + j);
-       */
+    // for (slong m = 0; m < sum->nsols; m++)
+    //     flint_printf("series+res[%wd]=%{acb_poly}\n", m, sum->sol[m].series);
+    // for (slong j = 0; j < sum->npts; j++)
+    //     for (slong m = 0; m < sum->nsols; m++)
+    //         flint_printf("sums[%wd][%wd]=%{acb_poly}\n", m, j, sum->sol[m].sums + j);
 
     /* Doing the convergence test here allows the call to apply_diffop to be
        shared, but otherwise it would make sense as well to do it in or just
@@ -139,7 +140,7 @@ _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high,
            quick convergence check and (2) the full residual */
         FLINT_ASSERT(sum->n >= sum->n0 + sum->dop_clen - 1);  /* (1) */
         FLINT_ASSERT(resid_len >= sum->dop_clen - 1);         /* (2) */
-        if (acb_ode_sum_done(sum, stride, prec))
+        if (acb_ode_sum_done(sum, stride, bound, gbound, prec))
             return 1;
 
         /* gradually decrease the working precision when it appears wasteful */
@@ -165,5 +166,6 @@ _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high,
     }
 
     /* XXX terminal recursion --> loop for -O0? */
-    return _acb_ode_sum_forward_divconquer(sum, high, block_len, stride, prec);
+    return _acb_ode_sum_forward_divconquer(sum, high, block_len, stride, bound,
+                                           gbound, prec);
 }

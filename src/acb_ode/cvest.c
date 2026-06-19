@@ -28,6 +28,8 @@ acb_ode_cvest_update(acb_ode_cvest_t cvest,  /* aliasing allowed */
                      slong stride,
                      slong prec, slong work_prec)
 {
+    FLINT_ASSERT(stride > 0);
+
     acb_ode_cvest_struct _old = * old;
 
     /* estimated absolute accuracy of the sum in bits based on the magnitude of

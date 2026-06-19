@@ -5,9 +5,7 @@
 #include "gr.h"
 #include "gr_ore_poly.h"
 
-// XXX also manual sing?
-
-void
+int
 fundamental_matrix(const char * dop_str,
                    const acb_ode_exponents_struct * expos,
                    double pt_d)
@@ -29,10 +27,7 @@ fundamental_matrix(const char * dop_str,
     status |= gr_ctx_set_gen_name(Dop, "Tz");
     status |= gr_ore_poly_set_str(dop, dop_str, Dop);
 
-    status |= gr_println(dop, Dop);
-    flint_printf("\n");
-
-    GR_MUST_SUCCEED(status);
+    flint_printf("%{gr}\n", dop, Dop);
 
     slong dop_order = gr_ore_poly_length(dop, Dop) - 1;
 
@@ -45,8 +40,7 @@ fundamental_matrix(const char * dop_str,
 
     GR_MUST_SUCCEED(acb_ode_fundamental_matrix(mat, dop, Dop, expos, NULL, pt, 0, prec));
 
-    flint_printf("%{acb_mat}\n\n", mat);
-    flint_printf("--------\n\n");
+    flint_printf("@(x=%{acb}) =\n%{acb_mat}\n\n", pt, mat);
 
     acb_mat_clear(mat);
     GR_TMP_CLEAR(dop, Dop);
@@ -54,12 +48,14 @@ fundamental_matrix(const char * dop_str,
     gr_ctx_clear(Pol);
     gr_ctx_clear(CC);
     acb_clear(pt);
-}
 
+    return status;
+}
 
 void
 apery(void)
 {
+    flint_printf("Apery:\n");
     acb_ode_shift_struct shift[1] = {{ .n = 0, .mult = 3 }};
     acb_ode_group_struct grp[1] = {{ .nshifts = 1, .shifts = shift }};
     acb_init(grp->leader);
@@ -74,10 +70,10 @@ apery(void)
     acb_clear(grp->leader);
 }
 
-
 void
 multiple_shifts(void)
 {
+    flint_printf("Multiple shifts:\n");
     const char * dop = "Tz^6 - 6*Tz^5 + 12*Tz^4 - 10*Tz^3 + 3*Tz^2 + z^2";
 
     acb_ode_shift_struct shift[3] = {
@@ -95,10 +91,10 @@ multiple_shifts(void)
     acb_clear(grp->leader);
 }
 
-
 void
 whittaker(void)
 {
+    flint_printf("Whittaker:\n");
     slong prec = 30;
 
     acb_t kappa, mu, half;
@@ -131,7 +127,6 @@ whittaker(void)
     acb_clear(mu);
     acb_clear(half);
 }
-
 
 int
 main(void)

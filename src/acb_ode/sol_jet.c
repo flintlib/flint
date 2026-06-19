@@ -8,8 +8,8 @@
  * for further processing */
 
 void
-_acb_ode_sol_jet(acb_poly_struct * val, acb_srcptr expo,
-                 acb_srcptr sums, mag_srcptr tb, acb_srcptr pt,
+_acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo,
+                 acb_srcptr sums, slong stride, mag_srcptr tb, const acb_t pt,
                  slong nlogs, slong nder, slong nfrobshifts,
                  slong prec)
 {
@@ -42,7 +42,7 @@ _acb_ode_sol_jet(acb_poly_struct * val, acb_srcptr expo,
     for (slong d = 0; d < len; d++)
     {
         acb_poly_fit_length(val + d, nder);
-        _acb_vec_set((val + d)->coeffs, sums + d * nder, nder);
+        _acb_vec_set((val + d)->coeffs, sums + d * stride, nder);
         for (slong i = 0; i < nder; i++)
             acb_add_error_mag((val + d)->coeffs + i, tb + i);
         _acb_poly_set_length(val + d, nder);
@@ -59,7 +59,7 @@ _acb_ode_sol_jet(acb_poly_struct * val, acb_srcptr expo,
         for (slong d = 0; d < FLINT_MIN(nlogs - p, nfrobshifts); d++)
         {
             _acb_poly_mullow(term->coeffs,
-                             sums + (d + p) * nder, nder,
+                             sums + (d + p) * stride, nder,
                              logpow->coeffs, nder,
                              nder, prec);
             _acb_poly_set_length(term, nder);
@@ -81,16 +81,16 @@ _acb_ode_sol_jet(acb_poly_struct * val, acb_srcptr expo,
 
 void
 acb_ode_sol_jet(acb_poly_struct * val,
-                acb_srcptr expo, const acb_ode_sol_t sol, slong j,
-                acb_srcptr pt, slong nder, slong nfrobshifts, slong prec)
+                const acb_t expo, const acb_ode_sol_t sol, slong j,
+                const acb_t pt, slong ord, slong nfrobshifts, slong prec)
 {
-    FLINT_ASSERT(nder <= sol->nder);
+    FLINT_ASSERT(ord <= sol->nder);
 
-    if (nder == 0)
+    if (ord == 0)
         return;
 
     _acb_ode_sol_jet(val, expo,
-                     acb_ode_sol_sum_ptr(sol, j, 0, 0), sol->tb, pt,
-                     sol->nlogs, nder, nfrobshifts,
+                     acb_ode_sol_sum_ptr(sol, j, 0, 0), sol->nder, sol->tb, pt,
+                     sol->nlogs, ord, nfrobshifts,
                      prec);
 }

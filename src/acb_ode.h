@@ -76,7 +76,7 @@ typedef acb_ode_exponents_struct acb_ode_exponents_t[1];
 typedef enum
 {
     ACB_ODE_BASIS_ECHELON = 0,
-    ACB_ODE_BASIS_CASCADE,  /* XXX: same as Frobenius? */
+    ACB_ODE_BASIS_CASCADE,
 
     ACB_ODE_NUM_BASES
 }
@@ -93,12 +93,35 @@ slong acb_ode_group_nlogs (const acb_ode_group_t group, slong n);
 void acb_ode_exponents_init(acb_ode_exponents_t expos);
 void acb_ode_exponents_clear(acb_ode_exponents_t expos);
 
+slong acb_ode_exponents_length(const acb_ode_exponents_t expos);
+void acb_ode_exponents_println(const acb_ode_exponents_t expos);
+
 void acb_ode_exponents_ordinary(acb_ode_exponents_t expos, slong dop_order);
+void acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state, slong len, slong disp, slong prec, slong mag_bits);
 int acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop, gr_ctx_t Dop, gr_ctx_t CC);
+
+void acb_ode_indicial_polynomial_from_exponents(acb_poly_t ind, const acb_ode_exponents_t expos, slong prec);
 
 /****************************************************************************
  * Error bounds
  ****************************************************************************/
+
+typedef struct
+{
+    slong prec;
+
+    arb_t cst;       /* 1/abs(lc_x(lc_θ(dop))) */
+    arb_poly_t den_lbound;
+    arb_ptr den_rt;  /* roots(lc_θ(dop)), with multiple roots repeated */
+    slong den_rt_len;
+
+    acb_poly_struct * all_nums;
+    slong all_nums_len;
+    slong pol_part_len;
+}
+acb_ode_bound_struct;
+
+typedef acb_ode_bound_struct acb_ode_bound_t[1];
 
 typedef struct
 {
@@ -127,38 +150,32 @@ typedef acb_ode_stairs_struct acb_ode_stairs_t[1];
 
 typedef struct
 {
-    slong prec;
-
-    arb_t cst;       /* 1/abs(lc_x(lc_θ(dop)) */
-    arb_poly_t den_lbound;
-    arb_ptr den_rt;  /* roots(lc_θ(dop)), with multiple roots repeated */
-    slong den_rt_len;
-
-    acb_poly_struct * all_nums;
-    slong all_nums_len;
-    slong pol_part_len;
-
     acb_poly_t ind;  /* MONIC indicial polynomial shifted so that 0 corresponds
-                        to the current group leader */
+                        to the group leader */
     acb_ode_ind_lbound_t ind_lbound;
     acb_ode_stairs_t stairs;
 }
-acb_ode_bound_struct;
+acb_ode_group_bound_struct;
 
-typedef acb_ode_bound_struct acb_ode_bound_t[1];
+typedef acb_ode_group_bound_struct acb_ode_group_bound_t[1];
 
 void acb_ode_bound_init(acb_ode_bound_t bound);
 void acb_ode_bound_clear(acb_ode_bound_t bound);
 void acb_ode_bound_precompute(acb_ode_bound_t bound,
         const acb_poly_struct *dop, slong dop_len, acb_srcptr lcrt,
         slong pol_part_len, slong prec);
-void acb_ode_bound_precompute_group(acb_ode_bound_t bound,
+
+void acb_ode_group_bound_init(acb_ode_group_bound_t gbound);
+void acb_ode_group_bound_clear(acb_ode_group_bound_t gbound);
+void acb_ode_group_bound_precompute(acb_ode_group_bound_t gbound,
         const acb_poly_struct * dop, slong dop_len,
-        const acb_ode_exponents_t expos, slong grp, slong prec);
+        const acb_ode_exponents_t expos, slong grp,
+        const acb_ode_bound_t bound,
+        slong prec);
 
 void acb_ode_bound_precompute_integrand(arb_poly_t itg_pol, arb_poly_t itg_num,
         const acb_ode_group_t group, const acb_ode_bound_t bound,
-        slong n0, slong ord, slong prec);
+        const acb_ode_group_bound_t gbound, slong n0, slong ord, slong prec);
 void acb_ode_tail_bound_jet_precomp(arb_poly_t res,
         const acb_ode_bound_t bound, slong n,
         const arb_poly_t itg_pol, const arb_poly_t itg_num,
@@ -166,6 +183,7 @@ void acb_ode_tail_bound_jet_precomp(arb_poly_t res,
         const arb_t rad, slong ord, slong prec);
 void acb_ode_tail_bound_jet(arb_poly_t res,
         const acb_ode_group_t group, const acb_ode_bound_t bound,
+        const acb_ode_group_bound_t gbound,
         slong n, slong nlogs, const arb_poly_t nres_maj,
         const arb_t rad, slong ord, slong prec);
 
@@ -222,17 +240,22 @@ void acb_ode_cvest_update(acb_ode_cvest_t cvest, const acb_ode_cvest_t old, mag_
 typedef struct
 {
     /* vector of polynomials in x, entries = coefficients of log(x)^k/k! of
-     * a slice of solution and/or rhs */
+     * a slice of solution and/or rhs; polynomials not always normalized */
     acb_poly_struct * series;
 
     /* coefficients of Taylor expansions (jets) of the partial sums
      * dim: sums[npts][alloc_logs][nder] */
     acb_ptr sums;
+    /* "extended" initial value matrix; nshifts × logs; *rows* correspond to
+       shifts in increasing order; column k contains the coeff of
+       log(x)^k/k!*x^(leader+shift); the first mult of the entries of a given
+       row are initial values, the remaining entries are filled by series
+       expansion functions and used for recombining solutions */
     acb_mat_t extini;
 
     /* bounds on the tails of successive derivatives, valid uniformly for all
      * coefficients of log(x)^k/k! and all evaluation points */
-    // XXX move into cvest?
+    // XXX move to cvest?
     mag_ptr tb;
 
     /* convergence estimates */
@@ -243,6 +266,7 @@ typedef struct
     slong npts;
     slong nder;
 
+    /* flag indicating that no further terms should be added */
     int done;
 }
 acb_ode_sol_struct;
@@ -282,13 +306,8 @@ _acb_ode_sol_add_term(
         const fmpz * binom_n,
         slong nder, slong prec, slong sums_prec);
 
-void _acb_ode_sol_jet(acb_poly_struct * val, acb_srcptr expo,
-                      acb_srcptr sums, mag_srcptr tb, acb_srcptr pt,
-                      slong nlogs, slong nder, slong nfrobshifts,
-                      slong prec);
-void acb_ode_sol_jet(acb_poly_struct * val, acb_srcptr expo, const acb_ode_sol_t
-                     sol, slong j, acb_srcptr pt, slong nder, slong nfrobshifts,
-                     slong prec);
+void _acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, acb_srcptr sums, slong stride, mag_srcptr tb, const acb_t pt, slong nlogs, slong ord, slong nfrobshifts, slong prec);
+void acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, const acb_ode_sol_t sol, slong j, const acb_t pt, slong nder, slong nfrobshifts, slong prec);
 
 slong
 acb_ode_sol_estimate_terms(mag_t est,
@@ -326,7 +345,7 @@ typedef struct
     slong n;   /* current truncation order */
 
     /* evaluation points */
-    acb_ptr pts;   /* evaluation points x[j] for 0 < j < npts */
+    acb_ptr pts;   /* evaluation points x[j] for 0 <= j < npts */
     acb_ptr pows;  /* x[j]^{n-i} for i < nder (i-major, cyclic on i);
                       only the block i=0 is really used for nonzero points */
     char * shifted_sums;  /* nonzero if the i-th derivatives of the sums at x[j]
@@ -338,18 +357,13 @@ typedef struct
     slong wp;
     slong sum_wp;
 
-    /* error bounds
-       XXX at least the pointer probably should be a separate argument */
-    acb_ode_bound_struct * bound;
+    /* error bounds */
     mag_t mag;
     mag_t magpow;
     arb_poly_t itg_pol, itg_num;  // itg_n ?
 
-    /* options
-       XXX at least some of these would make better sense outside the sum object
-       since one may want to pass them to higher-level functions than sum_* */
+    /* options */
     ulong flags;
-    // slong bound_pol_part_len?
     void * data;     /* user data for sum workers */
 
     /* miscellaneous state */
@@ -363,7 +377,7 @@ typedef acb_ode_sum_struct acb_ode_sum_t[1];
 void acb_ode_sum_init(acb_ode_sum_t sum, slong dop_len, slong npts, slong nsols, slong nder);
 void acb_ode_sum_clear(acb_ode_sum_t sum);
 
-void acb_ode_sum_set_diffop(acb_ode_sum_t sum, const acb_poly_t dop, slong dop_len, const mag_t cvrad);
+void acb_ode_sum_set_diffop(acb_ode_sum_t sum, const acb_poly_struct * dop, slong dop_len, const mag_t cvrad);
 
 void acb_ode_sum_set_group(acb_ode_sum_t sum, const acb_ode_group_t grp);
 void acb_ode_sum_set_ordinary(acb_ode_sum_t sum);
@@ -379,11 +393,15 @@ slong acb_ode_sum_max_nlogs_xn(acb_ode_sum_struct * sum, slong off);
 void acb_ode_sum_precompute(acb_ode_sum_t sum);
 
 void _acb_ode_sum_forward_1(acb_ode_sum_struct * sum);
-int _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high, slong block_len, slong stride, slong prec);
-int acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride, slong prec);
+int _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high, slong block_len, slong stride, acb_ode_bound_t bound, acb_ode_group_bound_t gbound, slong prec);
+int acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
+                     acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
+                     slong prec);
 void _acb_ode_sum_fix(acb_ode_sum_struct * sum);
 
-void acb_ode_sum_divconquer(acb_ode_sum_t sum, slong nterms, slong prec);
+void acb_ode_sum_divconquer(acb_ode_sum_t sum, slong nterms,
+                            acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
+                            slong prec);
 
 void _acb_ode_poly_negdivrevhigh(acb_ptr res, acb_srcptr a, acb_srcptr cst,
                              acb_srcptr b, slong len, slong prec);
@@ -392,18 +410,18 @@ void acb_ode_poly_taylor_shift_aps_trunc(acb_poly_t g, const acb_poly_t f, acb_s
 
 /****************************************************************************/
 
-/* XXX struct with a data field? currently the data is part of sum, but sum may
-   not have the right lifespan */
-typedef void (* acb_ode_sum_worker_t)(acb_ode_sum_t sum, slong nterms, slong prec);
+typedef void (* acb_ode_sum_worker_t)(acb_ode_sum_t sum, slong nterms, acb_ode_bound_t bound, acb_ode_group_bound_t gbound, slong prec);
 
 void _acb_ode_fundamental_matrix_vec(
         acb_mat_struct * mat,
         const acb_poly_struct * dop, slong dop_len,
         const acb_ode_exponents_t expos,
         acb_srcptr lcrt,
+        acb_ode_bound_t bound,  /* mutable */
         acb_srcptr pts, slong npts,
         acb_ode_basis_t basis,
         acb_ode_sum_worker_t sum_worker,
+        void * worker_data,
         slong prec);
 
 WARN_UNUSED_RESULT int acb_ode_fundamental_matrix_vec(
@@ -420,9 +438,13 @@ WARN_UNUSED_RESULT int acb_ode_fundamental_matrix(
         const gr_ore_poly_t dop, gr_ore_poly_ctx_t dop_ctx,
         const acb_ode_exponents_t expos,
         acb_srcptr lcrt,
-        acb_srcptr pt,
+        const acb_t pt,
         acb_ode_basis_t basis,
         slong prec);
+
+/****************************************************************************/
+
+void acb_ode_randtest_acb(acb_poly_struct * dop, acb_struct * lcroots, acb_ode_exponents_t expos, flint_rand_t state, slong disp, slong lcdeg, slong clen, slong len, slong prec);
 
 /****************************************************************************/
 
