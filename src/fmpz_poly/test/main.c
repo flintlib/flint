@@ -198,6 +198,7 @@
 #include "t-sqrtrem_classical.c"
 #include "t-sqrtrem_divconquer.c"
 #include "t-sqrt_series.c"
+#include "t-squarefree_part.c"
 #include "t-sub.c"
 #include "t-sub_series.c"
 #include "t-swap.c"
@@ -388,6 +389,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_sqrtrem_classical),
     TEST_FUNCTION(fmpz_poly_sqrtrem_divconquer),
     TEST_FUNCTION(fmpz_poly_sqrt_series),
+    TEST_FUNCTION(fmpz_poly_squarefree_part),
     TEST_FUNCTION(fmpz_poly_sub),
     TEST_FUNCTION(fmpz_poly_sub_series),
     TEST_FUNCTION(fmpz_poly_swap),

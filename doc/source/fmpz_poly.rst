@@ -1436,6 +1436,10 @@ Greatest common divisor
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
+.. function:: void fmpz_poly_squarefree_part(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets ``res`` to the squarefree part of ``poly``, normalised to have
+    positive leading coefficient.
 
 Discriminant
 --------------------------------------------------------------------------------
@@ -3321,6 +3325,19 @@ Roots
     ``n_interval`` is updated accordingly. The data
     ``c = c_array + i`` and ``k = k_array[i]`` represents the
     open interval `(c 2^k, (c + 1) 2^k)`.
+
+.. function:: void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+
+    As :func:`fmpz_poly_isolate_real_roots`, but finds only
+    the roots which are strictly positive.
+
+Note: to compute complex roots or refine roots to high precision, see:
+
+* :func:`arb_fmpz_poly_real_roots`
+
+* :func:`arb_fmpz_poly_complex_roots`
+
+* :func:`arb_fmpz_poly_refine_root_arb`
 
 Minimal polynomials
 --------------------------------------------------------------------------------
