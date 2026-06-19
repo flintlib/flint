@@ -245,6 +245,7 @@ c_files_no_missing_prototypes = []
 c_files_no_missing_prototypes_unroll = []
 regression_c_files = []
 mod_tests = []
+test_exes = []
 mod_profiles = []
 profile_exes = []
 mod_tunes = []
@@ -338,8 +339,9 @@ test_exe = executable('main',
   'main.c',
   dependencies: [flint_test_dep],
   install: false,
-  build_by_default: tests_opt.enabled(),
+  build_by_default: false,
 )
+test_exes += test_exe
 
 test('%s', test_exe, timeout: 0)
 '''
@@ -361,7 +363,7 @@ foreach profile_source : [
     dependencies: [flint_test_dep],
     include_directories: [headers_built_inc],
     install: false,
-    build_by_default: profiles_opt.enabled(),
+    build_by_default: false,
   )
 endforeach
 '''
@@ -383,7 +385,7 @@ foreach tune_source : [
     dependencies: [flint_test_dep],
     include_directories: [headers_built_inc],
     install: false,
-    build_by_default: tunes_opt.enabled(),
+    build_by_default: false,
   )
 endforeach
 '''
@@ -400,8 +402,9 @@ test_exe = executable('main',
   't-NTL-interface.cpp',
   dependencies: [flint_test_dep, ntl_dep],
   install: false,
-  build_by_default: tests_opt.enabled(),
+  build_by_default: false,
 )
+test_exes += test_exe
 
 test('%s', test_exe, timeout: 0)
 '''
@@ -427,7 +430,7 @@ foreach example : [
     dependencies: [flint_test_dep],
     include_directories: [headers_built_inc],
     install: false,
-    build_by_default: examples_opt.enabled(),
+    build_by_default: false,
   )
 
   example_exes += example_exe

@@ -236,33 +236,22 @@ flint_test_dep = declare_dependency(
   compile_args: flint_cpu_c_args,
 )
 
-examples_opt = get_option('examples')
-if not examples_opt.disabled()
-  subdir('examples')
-endif
+subdir('examples')
 
-profiles_opt = get_option('profiles')
-if not profiles_opt.disabled()
-  foreach mod_profile : mod_profiles
-    subdir('src' / mod_profile)
-  endforeach
-  alias_target('profile', profile_exes)
-endif
+foreach mod_profile : mod_profiles
+  subdir('src' / mod_profile)
+endforeach
+alias_target('profile', profile_exes)
 
-tunes_opt = get_option('tunes')
-if not tunes_opt.disabled()
-  foreach mod_tune : mod_tunes
-    subdir('src' / mod_tune)
-  endforeach
-  alias_target('tune', tune_exes)
-endif
+foreach mod_tune : mod_tunes
+  subdir('src' / mod_tune)
+endforeach
+alias_target('tune', tune_exes)
 
-tests_opt = get_option('tests')
-if not tests_opt.disabled()
-  foreach mod_test : mod_tests
-    subdir('src' / mod_test)
-  endforeach
-endif
+foreach mod_test : mod_tests
+  subdir('src' / mod_test)
+endforeach
+alias_target('tests', test_exes)
 
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(

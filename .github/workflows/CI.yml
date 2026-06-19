@@ -63,7 +63,7 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled
+        run: meson setup build
       - name: "Compile"
         run: meson compile -C build
       - name: "Check"
@@ -92,7 +92,7 @@ jobs:
         run: python3 update_meson.py
       - name: "Build FLINT for msolve"
         run: |
-          meson setup build -Dtests=enabled -Dntl=enabled -Dassert=enabled
+          meson setup build -Dntl=enabled -Dassert=enabled
           meson compile -C build
           sudo meson install -C build
           sudo ldconfig
@@ -109,7 +109,7 @@ jobs:
           gmp_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(gmp_artifact_dir())')
           mpfr_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(mpfr_artifact_dir())')
           echo "Path to GMP and MPFR: ${gmp_path}, ${mpfr_path}"
-          PKG_CONFIG_PATH="${gmp_path}/lib/pkgconfig:${mpfr_path}/lib/pkgconfig" meson setup build-nemo --prefix="$(pwd)/nemo-flint" -Dlibdir=lib -Dtests=disabled
+          PKG_CONFIG_PATH="${gmp_path}/lib/pkgconfig:${mpfr_path}/lib/pkgconfig" meson setup build-nemo --prefix="$(pwd)/nemo-flint" -Dlibdir=lib
           meson compile -C build-nemo
           meson install -C build-nemo
       - name: "Test Nemo.jl"
@@ -141,7 +141,7 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled -Davx2=enabled -Db_coverage=true
+        run: meson setup build -Davx2=enabled -Db_coverage=true
       - name: "Compile"
         run: meson compile -C build && ldd build/libflint.so
       - name: "Check"
@@ -173,7 +173,7 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=disabled
+        run: meson setup build
       - name: "Check regression in a subset of modules"
         run: meson compile -C build regression-check
 
@@ -196,7 +196,7 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled
+        run: meson setup build
       - name: "Compile"
         run: meson compile -C build
       - name: "Check"
@@ -222,7 +222,7 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled
+        run: meson setup build
       - name: "Compile"
         run: meson compile -C build
       - name: "Check"
@@ -247,7 +247,7 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled -Dexamples=enabled -Dblas=enabled -Db_sanitize=address -Db_lundef=false
+        run: meson setup build -Dblas=enabled -Db_sanitize=address -Db_lundef=false
       - name: "Compile"
         run: meson compile -C build
       - name: "Check"
@@ -283,7 +283,7 @@ jobs:
       - name: "Generate Meson files"
         run: python update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled
+        run: meson setup build
       - name: "Compile"
         run: meson compile -C build
       - name: "Check"
@@ -337,7 +337,7 @@ jobs:
       - name: "Generate Meson files"
         run: python update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled
+        run: meson setup build
       - name: "Compile"
         run: meson compile -C build
       - name: "Check"
@@ -371,7 +371,7 @@ jobs:
       - name: "Generate Meson files"
         run: python3 update_meson.py
       - name: "Configure"
-        run: meson setup build -Dtests=enabled -Dassert=enabled
+        run: meson setup build -Dassert=enabled
       - name: "Compile"
         run: meson compile -C build
       - name: "Check"

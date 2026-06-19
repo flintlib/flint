@@ -25,50 +25,43 @@ setup:
 
 test: check
 
-tests:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dtests=enabled $(MESON_SETUP_ARGS); \
-	$(MESON) compile -C $(BUILD) $(MESON_COMPILE_ARGS)
+tests: setup
+	$(MESON) compile -C $(BUILD) tests $(MESON_COMPILE_ARGS)
 
 check: setup
 	$(MESON) test -C $(BUILD) $(MESON_TEST_ARGS) $(MOD)
 
-debug:
+debug: setup
 ifndef MOD
 	$(error Use make debug MOD=module ARGS='test arguments')
 endif
 ifndef ARGS
 	$(error Use make debug MOD=module ARGS='test arguments')
 endif
-	$(MESON) setup "$(BUILD)" --reconfigure -Dtests=enabled $(MESON_SETUP_ARGS)
 	$(MESON) test -C $(BUILD) --gdb --gdb-path $(GDB) --interactive $(MESON_TEST_ARGS) --test-args '$(ARGS)' $(MOD)
 
-valgrind:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dtests=enabled $(MESON_SETUP_ARGS)
+valgrind: setup
 	$(MESON) test -C $(BUILD) --wrapper '$(VALGRIND) $(VALGRIND_ARGS)' $(MESON_TEST_ARGS) $(MOD)
 
-examples:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dexamples=enabled $(MESON_SETUP_ARGS)
+examples: setup
 	$(MESON) compile -C $(BUILD) examples $(MESON_COMPILE_ARGS)
 
-checkexamples:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dexamples=enabled $(MESON_SETUP_ARGS)
+checkexamples: setup
 	$(MESON) test -C $(BUILD) --suite examples $(MESON_TEST_ARGS)
 
-profile:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dprofiles=enabled $(MESON_SETUP_ARGS)
+profile: setup
 	$(MESON) compile -C $(BUILD) profile $(MESON_COMPILE_ARGS)
 
-tune:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dtunes=enabled $(MESON_SETUP_ARGS)
+tune: setup
 	$(MESON) compile -C $(BUILD) tune $(MESON_COMPILE_ARGS)
 
 coverage:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dtests=enabled -Db_coverage=true $(MESON_SETUP_ARGS); \
+	$(MESON) setup "$(BUILD)" --reconfigure -Db_coverage=true $(MESON_SETUP_ARGS); \
 	$(MESON) test -C $(BUILD) $(MESON_TEST_ARGS) $(MOD)
 	$(MESON) coverage -C $(BUILD)
 
 coverage-html:
-	$(MESON) setup "$(BUILD)" --reconfigure -Dtests=enabled -Db_coverage=true $(MESON_SETUP_ARGS); \
+	$(MESON) setup "$(BUILD)" --reconfigure -Db_coverage=true $(MESON_SETUP_ARGS); \
 	$(MESON) test -C $(BUILD) $(MESON_TEST_ARGS) $(MOD)
 	$(MESON) coverage -C $(BUILD) --html
 
