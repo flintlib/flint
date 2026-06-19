@@ -21,7 +21,7 @@ gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr
     slong sz = ctx->sizeof_elem;
     slong * _perm_act = _perm_init(mat->c);
 
-    /* permute each row */
+    /* cols[i] <- cols[perm_act[i]]  */
     for (i = 0; i < mat->r; i++)
     {
         _perm_set(_perm_act, perm_act, mat->c);
@@ -45,12 +45,14 @@ gr_mat_permute_cols_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act
     slong sz = ctx->sizeof_elem;
     slong * _perm_act = _perm_init(mat->c);
 
+    /* cols[perm_act[i]] <- cols[i]  */
     for (i = 0; i < mat->r; i++)
     {
         _perm_set(_perm_act, perm_act, mat->c);
         _gr_vec_permute(GR_MAT_ENTRY(mat, i, 0, sz), _perm_act, mat->c, ctx);
     }
 
+    /* perm_store[perm_act[i]] <- perm_store[i] */
     if (perm_store)
         _perm_compose_inv2(perm_store, perm_store, perm_act, mat->c);
 

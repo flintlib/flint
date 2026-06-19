@@ -19,18 +19,21 @@ gr_mat_permute_rows(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr
     int status = GR_SUCCESS;
     slong i;
     slong sz = ctx->sizeof_elem;
-    gr_ptr mat_tmp;
-
-    GR_TMP_INIT_VEC(mat_tmp, mat->r * mat->c, ctx);
+    gr_mat_t mat_tmp;
 
     /* rows[i] <- rows[perm_act[i]]  */
-    for (i = 0; i < mat->r; i++)
-        status |= _gr_vec_set(GR_ENTRY(mat_tmp, i * mat->c, sz), GR_MAT_ENTRY(mat, perm_act[i], 0, sz), mat->c, ctx);
+    mat_tmp->entries = GR_TMP_ALLOC(mat->r * mat->c * sz);
+    mat_tmp->r = mat->r;
+    mat_tmp->c = mat->c;
+    mat_tmp->stride = mat->stride;
 
     for (i = 0; i < mat->r; i++)
-        status |= _gr_vec_set(GR_MAT_ENTRY(mat, i, 0, sz), GR_ENTRY(mat_tmp, i * mat->c, sz), mat->c, ctx);
+        _gr_vec_set_shallow(GR_MAT_ENTRY(mat_tmp, i, 0, sz), GR_MAT_ENTRY(mat, perm_act[i], 0, sz), mat->c, ctx);
 
-    GR_TMP_CLEAR_VEC(mat_tmp, mat->r * mat->c, ctx);
+    for (i = 0; i < mat->r; i++)
+        _gr_vec_set_shallow(GR_MAT_ENTRY(mat, i, 0, sz), GR_MAT_ENTRY(mat_tmp, i, 0, sz), mat->c, ctx);
+
+    GR_TMP_FREE(mat_tmp->entries, mat->r * mat->c * sz);
 
     /* perm_store[i] <- perm_store[perm_act[i]] */
     if (perm_store)
@@ -45,18 +48,23 @@ gr_mat_permute_rows_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act
     int status = GR_SUCCESS;
     slong i;
     slong sz = ctx->sizeof_elem;
-    gr_ptr mat_tmp;
+    gr_mat_t mat_tmp;
 
-    GR_TMP_INIT_VEC(mat_tmp, mat->r * mat->c, ctx);
+    /* rows[perm_act[i]] <- rows[i]  */
+    mat_tmp->entries = GR_TMP_ALLOC(mat->r * mat->c * sz);
+    mat_tmp->r = mat->r;
+    mat_tmp->c = mat->c;
+    mat_tmp->stride = mat->stride;
 
     for (i = 0; i < mat->r; i++)
-        status |= _gr_vec_set(GR_ENTRY(mat_tmp, perm_act[i] * mat->c, sz), GR_MAT_ENTRY(mat, i, 0, sz), mat->c, ctx);
+        _gr_vec_set_shallow(GR_MAT_ENTRY(mat_tmp, perm_act[i], 0, sz), GR_MAT_ENTRY(mat, i, 0, sz), mat->c, ctx);
 
     for (i = 0; i < mat->r; i++)
-        status |= _gr_vec_set(GR_MAT_ENTRY(mat, i, 0, sz), GR_ENTRY(mat_tmp, i * mat->c, sz), mat->c, ctx);
+        _gr_vec_set_shallow(GR_MAT_ENTRY(mat, i, 0, sz), GR_MAT_ENTRY(mat_tmp, i, 0, sz), mat->c, ctx);
 
-    GR_TMP_CLEAR_VEC(mat_tmp, mat->r * mat->c, ctx);
+    GR_TMP_FREE(mat_tmp->entries, mat->r * mat->c * sz);
 
+    /* perm_store[perm_act[i]] <- perm_store[i] */
     if (perm_store)
         _perm_compose_inv2(perm_store, perm_store, perm_act, mat->r);
     

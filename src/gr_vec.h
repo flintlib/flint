@@ -18,6 +18,7 @@
 #define GR_VEC_INLINE static inline
 #endif
 
+#include <string.h>
 #include "gr.h"
 
 #ifdef __cplusplus
@@ -51,6 +52,7 @@ GR_VEC_INLINE slong gr_vec_length(const gr_vec_t vec, gr_ctx_t FLINT_UNUSED(ctx)
 void gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
+void gr_vec_set_shallow(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx);
 void gr_vec_append_swap(gr_vec_t vec, gr_ptr f, gr_ctx_t ctx);
 
@@ -78,6 +80,7 @@ int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
+GR_VEC_INLINE void _gr_vec_set_shallow(gr_ptr dest, gr_srcptr src, slong len, gr_ctx_t ctx) { memcpy(dest, src, len * ctx->sizeof_elem); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
 
 typedef int ((*gr_method_vec_normalise_op)(slong *, gr_srcptr, slong, gr_ctx_ptr));
