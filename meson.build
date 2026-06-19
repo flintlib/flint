@@ -73,8 +73,8 @@ endif
 
 c_files_static_all = c_files_all + s_files_static
 c_files_shared_all = c_files_all + s_files_shared
-c_files_static = c_files_missing_prototypes + s_files_static
-c_files_shared = c_files_missing_prototypes + s_files_shared
+c_files_static = s_files_static
+c_files_shared = s_files_shared
 
 # Build include directory after list of all source files is complete
 subdir('include')
@@ -90,23 +90,33 @@ libflint_static_link_whole = []
 
 if cc.get_argument_syntax() != 'msvc'
   foreach bucket : [
+    ['missing_prototypes',
+      c_file_buckets_missing_prototypes,
+      libflint_c_args + flint_cpu_c_args + flint_library_warning_c_args],
     ['no_missing_prototypes',
-      c_files_no_missing_prototypes,
+      c_file_buckets_no_missing_prototypes,
       libflint_c_args + flint_cpu_c_args],
     ['unroll',
-      c_files_missing_prototypes_unroll,
+      c_file_buckets_missing_prototypes_unroll,
       libflint_c_args + flint_cpu_c_args + flint_library_warning_c_args + flint_unroll_loops_c_args],
     ['no_missing_prototypes_unroll',
-      c_files_no_missing_prototypes_unroll,
+      c_file_buckets_no_missing_prototypes_unroll,
       libflint_c_args + flint_cpu_c_args + flint_unroll_loops_c_args],
   ]
     bucket_name = bucket[0]
-    bucket_sources = bucket[1]
+    bucket_source_groups = bucket[1]
     bucket_c_args = bucket[2]
 
-    if bucket_sources.length() > 0
+    foreach bucket_source_group : bucket_source_groups
+      bucket_source_name = bucket_source_group[0]
+      bucket_sources = bucket_source_group[1]
+
+      if bucket_sources.length() == 0
+        continue
+      endif
+
       if build_shared_library
-        libflint_shared_link_whole += [static_library('flint_' + bucket_name + '_shared',
+        libflint_shared_link_whole += [static_library('flint_' + bucket_name + '_' + bucket_source_name + '_shared',
           bucket_sources + headers_all,
           dependencies: flint_deps,
           include_directories: [headers_built_nodir_inc, 'src'],
@@ -117,7 +127,7 @@ if cc.get_argument_syntax() != 'msvc'
       endif
 
       if build_static_library
-        libflint_static_link_whole += [static_library('flint_' + bucket_name + '_static',
+        libflint_static_link_whole += [static_library('flint_' + bucket_name + '_' + bucket_source_name + '_static',
           bucket_sources + headers_all,
           dependencies: flint_deps,
           include_directories: [headers_built_nodir_inc, 'src'],
@@ -126,7 +136,7 @@ if cc.get_argument_syntax() != 'msvc'
           c_args: bucket_c_args,
         )]
       endif
-    endif
+    endforeach
   endforeach
 endif
 

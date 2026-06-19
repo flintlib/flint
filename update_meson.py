@@ -243,6 +243,10 @@ c_files_missing_prototypes = []
 c_files_missing_prototypes_unroll = []
 c_files_no_missing_prototypes = []
 c_files_no_missing_prototypes_unroll = []
+c_file_buckets_missing_prototypes = []
+c_file_buckets_missing_prototypes_unroll = []
+c_file_buckets_no_missing_prototypes = []
+c_file_buckets_no_missing_prototypes_unroll = []
 regression_c_files = []
 mod_tests = []
 test_exes = []
@@ -255,6 +259,7 @@ tune_exes = []
 fmpz_link_c_file = files('fmpz/link' / fmpz_c_in)
 c_files_all += fmpz_link_c_file
 c_files_missing_prototypes += fmpz_link_c_file
+c_file_buckets_missing_prototypes += [['fmpz_link', fmpz_link_c_file]]
 regression_c_files += fmpz_link_c_file
 
 foreach mod : modules
@@ -317,9 +322,13 @@ c_files_all += module_c_files_no_missing_prototypes
 if '%s' in unroll_modules
   c_files_missing_prototypes_unroll += module_c_files
   c_files_no_missing_prototypes_unroll += module_c_files_no_missing_prototypes
+  c_file_buckets_missing_prototypes_unroll += [['%s', module_c_files]]
+  c_file_buckets_no_missing_prototypes_unroll += [['%s', module_c_files_no_missing_prototypes]]
 else
   c_files_missing_prototypes += module_c_files
   c_files_no_missing_prototypes += module_c_files_no_missing_prototypes
+  c_file_buckets_missing_prototypes += [['%s', module_c_files]]
+  c_file_buckets_no_missing_prototypes += [['%s', module_c_files_no_missing_prototypes]]
 endif
 
 if '%s' in regression_modules
@@ -652,6 +661,10 @@ def main(args):
         src_mod_meson_build_text = src_mod_meson_build % (
             format_lines(c_files),
             format_lines(c_files_no_missing_prototypes),
+            mod,
+            mod,
+            mod,
+            mod,
             mod,
             mod,
         )
