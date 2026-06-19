@@ -115,6 +115,9 @@ mod_no_tests = [
 mod_no_profiles = [
 ]
 
+mod_no_tunes = [
+]
+
 regression_modules = [
     'thread_pool',
     'thread_support',
@@ -230,6 +233,10 @@ conditional_profile_modules = [
 %s
 ]
 
+tune_modules = [
+%s
+]
+
 headers_all = []
 c_files_all = []
 c_files_missing_prototypes = []
@@ -240,6 +247,8 @@ regression_c_files = []
 mod_tests = []
 mod_profiles = []
 profile_exes = []
+mod_tunes = []
+tune_exes = []
 
 # Select the right version of fmpz.c (see configuration)
 fmpz_link_c_file = files('fmpz/link' / fmpz_c_in)
@@ -280,6 +289,7 @@ foreach mod : [
 endforeach
 
 mod_profiles += profile_modules
+mod_tunes += tune_modules
 
 headers_all = files(headers_all)
 '''
@@ -352,6 +362,28 @@ foreach profile_source : [
     include_directories: [headers_built_inc],
     install: false,
     build_by_default: profiles_opt.enabled(),
+  )
+endforeach
+'''
+
+tune_mod_meson_build = '''\
+# This file is generated automatically.
+#
+# To regenerate it, run:
+#   python update_meson.py
+#
+
+foreach tune_source : [
+%s
+]
+  tune_stem = fs.stem(tune_source)
+  tune_exes += executable(
+    tune_stem,
+    tune_source,
+    dependencies: [flint_test_dep],
+    include_directories: [headers_built_inc],
+    install: false,
+    build_by_default: tunes_opt.enabled(),
   )
 endforeach
 '''
@@ -575,6 +607,29 @@ def main(args):
             if profile_c_files:
                 conditional_profile_modules.append(mod + '/profile')
 
+    top_tune_dir = join(output_dir, 'src', 'tune')
+    top_tune_sources = []
+    if isdir(top_tune_dir):
+        top_tune_sources = [
+            f for f in listdir(top_tune_dir)
+            if f.endswith('.c')
+        ]
+    tune_modules = []
+    if top_tune_sources:
+        tune_modules.append('tune')
+    tune_scan_modules = (
+        set(modules) - set(non_library_modules) - set(conditional_modules)
+    ) | set(mod_no_header)
+    for mod in tune_scan_modules:
+        tune_dir = join(output_dir, 'src', mod, 'tune')
+        if mod not in mod_no_tunes and isdir(tune_dir):
+            tune_c_files = [
+                f for f in listdir(tune_dir)
+                if f.endswith('.c')
+            ]
+            if tune_c_files:
+                tune_modules.append(mod + '/tune')
+
     src_meson_build_text = src_meson_build % (
         format_lines(modules_unconditional),
         format_lines(mod_no_header),
@@ -584,6 +639,7 @@ def main(args):
         format_lines(unroll_modules),
         format_lines(profile_modules),
         format_lines(conditional_profile_modules),
+        format_lines(tune_modules),
         format_lines(test_only_modules),
     )
     dst_path = join(output_dir, 'src', 'meson.build')
@@ -634,6 +690,19 @@ def main(args):
                     print('Writing %s' % dst_path)
                 write_file(dst_path, profile_mod_meson_build_text)
 
+        # src/mod/tune/meson.build
+        tune_dir = join(mod_dir, 'tune')
+        if mod not in mod_no_tunes and isdir(tune_dir):
+            tune_c_files = [f for f in listdir(tune_dir) if f.endswith('.c')]
+            if tune_c_files:
+                tune_mod_meson_build_text = tune_mod_meson_build % (
+                    format_lines(tune_c_files),
+                )
+                dst_path = join(tune_dir, 'meson.build')
+                if args.verbose:
+                    print('Writing %s' % dst_path)
+                write_file(dst_path, tune_mod_meson_build_text)
+
     # Build for the NTL tests
     dst_path = join(output_dir, 'src', 'interfaces', 'test', 'meson.build')
     test_mod_meson_build_text = test_mod_NTL_meson_build % 'NTL-interface'
@@ -662,6 +731,16 @@ def main(args):
         if args.verbose:
             print('Writing %s' % dst_path)
         write_file(dst_path, profile_mod_meson_build_text)
+
+    # src/tune/meson.build
+    if top_tune_sources:
+        tune_mod_meson_build_text = tune_mod_meson_build % (
+            format_lines(top_tune_sources),
+        )
+        dst_path = join(top_tune_dir, 'meson.build')
+        if args.verbose:
+            print('Writing %s' % dst_path)
+        write_file(dst_path, tune_mod_meson_build_text)
 
     # src/mpn_extras/*/meson.build
     for path, asm_submodule in asm_modules:

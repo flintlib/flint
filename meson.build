@@ -249,6 +249,14 @@ if not profiles_opt.disabled()
   alias_target('profile', profile_exes)
 endif
 
+tunes_opt = get_option('tunes')
+if not tunes_opt.disabled()
+  foreach mod_tune : mod_tunes
+    subdir('src' / mod_tune)
+  endforeach
+  alias_target('tune', tune_exes)
+endif
+
 tests_opt = get_option('tests')
 if not tests_opt.disabled()
   foreach mod_test : mod_tests
