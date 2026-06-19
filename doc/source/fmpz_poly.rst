@@ -3327,6 +3327,14 @@ Roots
     As :func:`fmpz_poly_isolate_real_roots`, but finds only
     the roots which are strictly positive.
 
+Note: to compute complex roots or refine roots to high precision, see:
+
+* :func:`arb_fmpz_poly_real_roots`
+
+* :func:`arb_fmpz_poly_complex_roots`
+
+* :func:`arb_fmpz_poly_refine_root_arb`
+
 Minimal polynomials
 --------------------------------------------------------------------------------
 
