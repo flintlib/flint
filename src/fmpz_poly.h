@@ -619,6 +619,8 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     fmpz_poly_xgcd_modular(r, s, t, poly1, poly2);
 }
 
+void fmpz_poly_squarefree_part(fmpz_poly_t res, const fmpz_poly_t poly);
+
 /*  Discriminant  ********************************************************/
 
 void _fmpz_poly_discriminant(fmpz_t res, const fmpz * poly, slong len);

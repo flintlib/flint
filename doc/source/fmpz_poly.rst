@@ -1436,6 +1436,10 @@ Greatest common divisor
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
+.. function:: void fmpz_poly_squarefree_part(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets ``res`` to the squarefree part of ``poly``, normalised to have
+    positive leading coefficient.
 
 Discriminant
 --------------------------------------------------------------------------------

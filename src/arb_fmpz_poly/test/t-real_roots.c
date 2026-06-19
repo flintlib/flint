@@ -79,36 +79,6 @@ check_real_roots(const fmpz_poly_t poly, arb_srcptr roots, slong num_real, slong
     arb_clear(t);
 }
 
-static void fmpz_poly_squarefree_part(fmpz_poly_t res, fmpz_poly_t poly)
-{
-
-    if (poly->length == 0)
-        fmpz_poly_zero(res);
-    else if (poly->length == 1)
-    {
-        fmpz_poly_one(res);
-    }
-    else
-    {
-        fmpz_poly_t der, gcd;
-
-        fmpz_poly_init(der);
-        fmpz_poly_init(gcd);
-
-        fmpz_poly_derivative(der, poly);
-        fmpz_poly_gcd(gcd, poly, der);
-        fmpz_poly_divexact(res, poly, gcd);
-
-        fmpz_poly_clear(der);
-        fmpz_poly_clear(gcd);
-
-        if (res->length && fmpz_cmp_ui(res->coeffs + res->length - 1, 0) < 0)
-        {
-            fmpz_poly_neg(res, res);
-        }
-    }
-}
-
 TEST_FUNCTION_START(arb_fmpz_poly_real_roots, state)
 {
     slong iter;
