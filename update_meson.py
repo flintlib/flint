@@ -362,11 +362,13 @@ profile_mod_meson_build = '''\
 #   python update_meson.py
 #
 
+mod_profile_exes = []
+
 foreach profile_source : [
 %s
 ]
   profile_stem = fs.stem(profile_source)
-  profile_exes += executable(
+  profile_exe = executable(
     profile_stem,
     profile_source,
     dependencies: [flint_test_dep],
@@ -374,7 +376,11 @@ foreach profile_source : [
     install: false,
     build_by_default: false,
   )
+  profile_exes += profile_exe
+  mod_profile_exes += profile_exe
 endforeach
+
+alias_target('%s-profile', mod_profile_exes)
 '''
 
 tune_mod_meson_build = '''\
@@ -689,6 +695,7 @@ def main(args):
             if profile_c_files:
                 profile_mod_meson_build_text = profile_mod_meson_build % (
                     format_lines(profile_c_files),
+                    mod,
                 )
                 dst_path = join(profile_dir, 'meson.build')
                 if args.verbose:
@@ -731,6 +738,7 @@ def main(args):
     if top_profile_sources:
         profile_mod_meson_build_text = profile_mod_meson_build % (
             format_lines(top_profile_sources),
+            'profile',
         )
         dst_path = join(top_profile_dir, 'meson.build')
         if args.verbose:
