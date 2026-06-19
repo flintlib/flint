@@ -483,6 +483,9 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly);
 
+void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
+                           const fmpz * poly, const fmpz_t den, slong len, slong m);
+
 /*  Square roots  ************************************************************/
 
 void  _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
@@ -558,6 +561,14 @@ void _fmpq_poly_cos_series(fmpz * g, fmpz_t gden,
                             const fmpz * h, const fmpz_t hden, slong hlen, slong n);
 
 void fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
+
+void _fmpq_poly_sin_cos_series_basecase(fmpz * S, fmpz_t Sden,
+    fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n);
+
+void _fmpq_poly_sin_cos_series_newton(
+    fmpz * S, fmpz_t Sden,
+    fmpz * C, fmpz_t Cden,
+    const fmpz * h, const fmpz_t hden, slong hlen, slong cutoff, slong n);
 
 void _fmpq_poly_sin_cos_series(fmpz * s, fmpz_t sden, fmpz * c, fmpz_t cden,
                             const fmpz * h, const fmpz_t hden, slong hlen, slong n);

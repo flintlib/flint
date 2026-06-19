@@ -128,6 +128,7 @@ Basic rings and fields
 .. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
               void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state)
               void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_finite_field(gr_ctx_t ctx, flint_rand_t state)
 
     Initializes *ctx* to a random ring. This will currently
     only generate base rings and composite rings over certain

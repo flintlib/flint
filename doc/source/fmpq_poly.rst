@@ -1063,6 +1063,14 @@ Derivative and integral
     term is set to zero. In particular, the integral of the zero
     polynomial is the zero polynomial.
 
+.. function:: void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len, slong m)
+
+    Sets ``(rpoly, rden, len)`` to the offset integral of
+    ``(poly, den, len1)`` mapping $c_k$ to $c_k / (k + m)$.
+    Assumes ``len >= 0``.
+    Supports aliasing between the two polynomials.
+    The output will be in canonical form if the input is
+    in canonical form.
 
 Square roots
 --------------------------------------------------------------------------------
@@ -1317,6 +1325,11 @@ Transcendental functions
     Sets ``res`` to the series expansion of the hyperbolic tangent of
     ``f`` to order ``n > 0``. Requires ``f`` to have constant term 0.
 
+.. function:: void _fmpq_poly_sin_cos_series_basecase(fmpz * S, fmpz_t Sden, fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n)
+              void _fmpq_poly_sin_cos_series_newton(fmpz * S, fmpz_t Sden, fmpz * C, fmpz_t Cden, const fmpz * h, const fmpz_t hden, slong hlen, slong cutoff, slong n)
+
+    Alternative algorithms implementing :func:`_fmpq_poly_sin_cos_series`.
+
 
 Orthogonal polynomials
 --------------------------------------------------------------------------------
@@ -1558,7 +1571,7 @@ Power series composition
     This implementation automatically switches between the Horner scheme,
     Brent-Kung algorithm 2.1 and the Kinoshita-Li algorithm depending on the
     size of the inputs. The default ``fmpz_poly`` composition algorithm is
-    automaticallyused when the composition can be performed over the integers.
+    automatically used when the composition can be performed over the integers.
 
 .. function:: void fmpq_poly_compose_series(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 

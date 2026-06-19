@@ -16,7 +16,7 @@
 
 int
 gr_generic_poly_factor_roots(
-        gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt, int flags,
+        gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt, int flags,
         gr_ctx_t ctx)
 {
     gr_ctx_t pctx;

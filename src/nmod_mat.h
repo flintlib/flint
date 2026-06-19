@@ -319,6 +319,8 @@ slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 
+slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A);
+
 /* Nonsingular solving */
 
 int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
@@ -362,7 +364,7 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* The following prototype actually lives in nmod_poly.h
  *
- * void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+ * int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
  *
  * void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
 */

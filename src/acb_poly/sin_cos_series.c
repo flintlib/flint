@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
 #include "acb_poly.h"
 #include "gr_poly.h"
 
@@ -24,6 +23,7 @@ __acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong 
             acb_sin_cos_pi(s, c, h, prec);
         else
             acb_sin_cos(s, c, h, prec);
+
         _acb_vec_zero(s + 1, n - 1);
         _acb_vec_zero(c + 1, n - 1);
     }
@@ -42,6 +42,7 @@ __acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong 
             acb_set(t, h + 1);
             acb_sin_cos(s, c, h, prec);
         }
+
         acb_mul(s + 1, c, t, prec);
         acb_neg(t, t);
         acb_mul(c + 1, s, t, prec);
@@ -49,26 +50,14 @@ __acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong 
     }
     else
     {
-        slong cutoff;
         gr_ctx_t ctx;
         int status;
+        gr_ctx_init_complex_acb(ctx, prec);
 
-        if (prec <= 128)
-        {
-            cutoff = 1400;
-        }
+        if (times_pi)
+            status = _gr_poly_sin_cos_pi_series(s, c, h, hlen, n, ctx);
         else
-        {
-            cutoff = 100000 / pow(log(prec), 3);
-            cutoff = FLINT_MIN(cutoff, 700);
-        }
-
-        gr_ctx_init_complex_acb(ctx, 53);
-
-        if (hlen < cutoff)
-            status = _gr_poly_sin_cos_series_basecase(s, c, h, hlen, n, times_pi, ctx);
-        else
-            status = _gr_poly_sin_cos_series_tangent(s, c, h, hlen, n, times_pi, ctx);
+            status = _gr_poly_sin_cos_series(s, c, h, hlen, n, ctx);
 
         if (status != GR_SUCCESS)
         {
@@ -152,4 +141,218 @@ acb_poly_sin_cos_pi_series(acb_poly_t s, acb_poly_t c,
     _acb_poly_normalise(s);
     _acb_poly_set_length(c, n);
     _acb_poly_normalise(c);
+}
+
+void
+_acb_poly_sin_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        acb_sin(g, h, prec);
+        _acb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        acb_t t;
+        acb_init(t);
+        acb_sin_cos(g, t, h, prec);
+        acb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        acb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_complex_acb(ctx, prec);
+        status = _gr_poly_sin_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _acb_vec_indeterminate(g, n);
+    }
+}
+
+void
+acb_poly_sin_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (hlen == 0 || n == 0)
+    {
+        acb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    acb_poly_fit_length(g, n);
+    _acb_poly_sin_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _acb_poly_set_length(g, n);
+    _acb_poly_normalise(g);
+}
+
+void
+_acb_poly_sin_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        acb_sin_pi(g, h, prec);
+        _acb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        acb_t t;
+        acb_init(t);
+        acb_sin_cos_pi(g, t, h, prec);
+        acb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        acb_const_pi(t, prec);
+        acb_mul(g + 1, g + 1, t, prec);
+        acb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_complex_acb(ctx, prec);
+        status = _gr_poly_sin_pi_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _acb_vec_indeterminate(g, n);
+    }
+}
+
+void
+acb_poly_sin_pi_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (hlen == 0 || n == 0)
+    {
+        acb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    acb_poly_fit_length(g, n);
+    _acb_poly_sin_pi_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _acb_poly_set_length(g, n);
+    _acb_poly_normalise(g);
+}
+
+void
+_acb_poly_cos_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        acb_cos(g, h, prec);
+        _acb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        acb_t t;
+        acb_init(t);
+        acb_sin_cos(t, g, h, prec);
+        acb_neg(t, t);
+        acb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        acb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_complex_acb(ctx, prec);
+        status = _gr_poly_cos_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _acb_vec_indeterminate(g, n);
+    }
+}
+
+void
+acb_poly_cos_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (n == 0)
+    {
+        acb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 0)
+    {
+        acb_poly_one(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    acb_poly_fit_length(g, n);
+    _acb_poly_cos_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _acb_poly_set_length(g, n);
+    _acb_poly_normalise(g);
+}
+
+void
+_acb_poly_cos_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        acb_cos_pi(g, h, prec);
+        _acb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        acb_t t;
+        acb_init(t);
+        acb_sin_cos_pi(t, g, h, prec);
+        acb_neg(t, t);
+        acb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        acb_const_pi(t, prec);
+        acb_mul(g + 1, g + 1, t, prec);
+        acb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_complex_acb(ctx, prec);
+        status = _gr_poly_cos_pi_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _acb_vec_indeterminate(g, n);
+    }
+}
+
+void
+acb_poly_cos_pi_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (n == 0)
+    {
+        acb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 0)
+    {
+        acb_poly_one(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    acb_poly_fit_length(g, n);
+    _acb_poly_cos_pi_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _acb_poly_set_length(g, n);
+    _acb_poly_normalise(g);
 }

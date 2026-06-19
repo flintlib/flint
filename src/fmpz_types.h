@@ -52,6 +52,16 @@ typedef fmpz_preinvn_struct fmpz_preinvn_t[1];
 
 typedef struct
 {
+    fmpz * entries;
+    slong alloc;
+    slong length;
+}
+fmpz_vec_struct;
+ 
+typedef fmpz_vec_struct fmpz_vec_t[1];
+
+typedef struct
+{
     fmpz * coeffs;
     slong alloc;
     slong length;

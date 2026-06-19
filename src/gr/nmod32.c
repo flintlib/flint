@@ -332,6 +332,13 @@ nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_
     return status;
 }
 
+static int
+nmod32_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD32_CTX(ctx).n);
+    return GR_SUCCESS;
+}
+
 static void
 _nmod32_vec_init(uint32_t * res, slong len, gr_ctx_t ctx)
 {
@@ -424,7 +431,6 @@ _nmod32_vec_mul(uint32_t * res, const uint32_t * vec1, const uint32_t * vec2, sl
     return GR_SUCCESS;
 }
 
-/* todo: overflow checks */
 static int
 _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
@@ -469,7 +475,6 @@ _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const uint32
     return GR_SUCCESS;
 }
 
-/* todo: overflow checks */
 static int
 _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, const uint32_t * vec2, slong len, gr_ctx_t ctx)
 {
@@ -504,6 +509,50 @@ _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const ui
 
         const dot_params_t params = _nmod_vec_dot_params(len, NMOD32_CTX(ctx));
         NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i], (ulong) vec2[len - 1 - i], NMOD32_CTX(ctx), params);
+        s = n_addmod(s, ss, n);
+    }
+
+    nmod32_set_ui(res, s, ctx);
+
+    if (subtract && res[0] != 0)
+        res[0] = (n - res[0]);
+
+    return GR_SUCCESS;
+}
+
+static int
+_nmod32_vec_dot_strided(nmod32_t res, const nmod32_t initial, int subtract, const uint32_t * vec1, slong stride1, const uint32_t * vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    ulong n, s;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            nmod32_zero(res, ctx);
+        else
+            nmod32_set(res, initial, ctx);
+        return GR_SUCCESS;
+    }
+
+    n = NMOD32_CTX(ctx).n;
+
+    if (initial == NULL)
+    {
+        s = 0;
+    }
+    else
+    {
+        if (subtract)
+            s = n_negmod(initial[0], n);
+        else
+            s = initial[0];
+    }
+
+    {
+        ulong ss;
+        const dot_params_t params = _nmod_vec_dot_params(len, NMOD32_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i * stride1], (ulong) vec2[i * stride2], NMOD32_CTX(ctx), params);
         s = n_addmod(s, ss, n);
     }
 
@@ -634,6 +683,18 @@ _nmod32_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
         return gr_mat_mul_classical(C, A, B, ctx);
 }
 
+static int
+_nmod32_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    /* todo: tune cutoff */
+    if (n > 8 && _gr_mat_charpoly_danilevsky(res, mat, ctx) == GR_SUCCESS)
+        return GR_SUCCESS;
+
+    return _gr_mat_charpoly_berkowitz(res, mat, ctx);
+}
+
 
 int _nmod32_methods_initialized = 0;
 
@@ -687,6 +748,8 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) nmod32_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod32_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod32_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod32_ctx_fq_prime},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod32_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod32_vec_zero},
@@ -697,12 +760,14 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_VEC_MUL,         (gr_funcptr) _nmod32_vec_mul},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod32_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod32_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _nmod32_vec_dot_strided},
     {GR_METHOD_VEC_MUL_SCALAR,     (gr_funcptr) _nmod32_vec_mul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR,  (gr_funcptr) _nmod32_vec_addmul_scalar},
     {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod32_vec_submul_scalar},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod32_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod32_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod32_mat_mul},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod32_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 

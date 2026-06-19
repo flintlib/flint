@@ -289,6 +289,21 @@ Addition and subtraction
     Sets `B = -A`. Dimensions must be identical.
 
 
+Matrix-scalar arithmetic
+--------------------------------------------------------------------------------
+
+
+.. function:: void fq_default_mat_scalar_mul(fq_default_mat_t B, const fq_default_mat_t A, const fq_default_t c, const fq_default_ctx_t ctx)
+              void fq_default_mat_scalar_mul_fmpz(fq_default_mat_t B, const fq_default_mat_t A, const fmpz_t c, const fq_default_ctx_t ctx)
+              void fq_default_mat_scalar_mul_si(fq_default_mat_t B, const fq_default_mat_t A, const slong c, const fq_default_ctx_t ctx)
+              void fq_default_mat_scalar_mul_ui(fq_default_mat_t B, const fq_default_mat_t A, const ulong c, const fq_default_ctx_t ctx)
+
+    Set ``B = A*c`` where ``A`` is an ``fq_default_mat_t`` and ``c``
+    is a scalar respectively of type ``fq_default_t``, ``fmpz_t``, ``slong``,
+    or ``ulong``. The dimensions of ``A`` and ``B`` must
+    be compatible.
+
+
 Matrix multiplication
 --------------------------------------------------------------------------------
 

@@ -44,7 +44,7 @@ gr_mat_randrowops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx)
 }
 #endif
 
-TEST_GR_FUNCTION_START(gr_mat_rref_fflu, state, count_success, count_unable, count_domain)
+TEST_GR_FUNCTION_START(gr_mat_rref_fflu, state, count_success, count_domain, count_unable)
 {
     slong iter;
 
@@ -56,7 +56,7 @@ TEST_GR_FUNCTION_START(gr_mat_rref_fflu, state, count_success, count_unable, cou
         slong rank1, rank2, r, c;
         int status = GR_SUCCESS;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         r = n_randint(state, 6);
         c = n_randint(state, 6);
@@ -104,5 +104,5 @@ TEST_GR_FUNCTION_START(gr_mat_rref_fflu, state, count_success, count_unable, cou
         gr_ctx_clear(ctx);
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }

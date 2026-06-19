@@ -1277,7 +1277,6 @@ static void sd_ifft_no_trunc_block(
 static void sd_ifft_no_trunc_internal(
     const sd_fft_ctx_t Q,
     double* x,
-    ulong S, /* stride */
     ulong k, /* transform length BLK_SZ*2^k */
     ulong j)
 {
@@ -1288,12 +1287,12 @@ static void sd_ifft_no_trunc_internal(
 
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_ifft_no_trunc_internal(Q, x + BLK_SZ*(b*(S<<k2)), S, k2, (j<<k1) + b);
+            sd_ifft_no_trunc_internal(Q, x + BLK_SZ*(b<<k2), k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_ifft_no_trunc_block(Q, x + BLK_SZ*(a*S), S<<k2, k1, j);
+            sd_ifft_no_trunc_block(Q, x + BLK_SZ*a, n_pow2(k2), k1, j);
         } while (a++, a < l2);
 
         return;
@@ -1302,11 +1301,11 @@ static void sd_ifft_no_trunc_internal(
     if (k == 2)
     {
         /* k1 = 2; k2 = 0 */
-        sd_ifft_base_8_1(Q, x + BLK_SZ*(S*0), 4*j+0);
-        sd_ifft_base_8_0(Q, x + BLK_SZ*(S*1), 4*j+1);
-        sd_ifft_base_8_0(Q, x + BLK_SZ*(S*2), 4*j+2);
-        sd_ifft_base_8_0(Q, x + BLK_SZ*(S*3), 4*j+3);
-        sd_ifft_no_trunc_block(Q, x, S, 2, j);
+        sd_ifft_base_8_1(Q, x + BLK_SZ*0, 4*j+0);
+        sd_ifft_base_8_0(Q, x + BLK_SZ*1, 4*j+1);
+        sd_ifft_base_8_0(Q, x + BLK_SZ*2, 4*j+2);
+        sd_ifft_base_8_0(Q, x + BLK_SZ*3, 4*j+3);
+        sd_ifft_no_trunc_block(Q, x, 1, 2, j);
     }
     else if (k == 1)
     {
@@ -1419,7 +1418,6 @@ static void sd_ifft_trunc_block(
 static void sd_ifft_trunc_internal(
     const sd_fft_ctx_t Q,
     double* x,  /* x = data + BLK_SZ*I  where I = starting index */
-    ulong S,    /* stride */
     ulong k,    /* transform length 2^(k + LG_BLK_SZ) */
     ulong j,
     ulong z,    /* actual trunc is z*BLK_SZ */
@@ -1433,7 +1431,7 @@ static void sd_ifft_trunc_internal(
 
     if (!f && z == n && n == n_pow2(k))
     {
-        sd_ifft_no_trunc_internal(Q, x, S, k, j);
+        sd_ifft_no_trunc_internal(Q, x, k, j);
         return;
     }
 
@@ -1454,38 +1452,38 @@ static void sd_ifft_trunc_internal(
 
         /* complete rows */
         for (ulong b = 0; b < n1; b++)
-            sd_ifft_no_trunc_internal(Q, x + BLK_SZ*(b*(S << k2)), S, k2, (j << k1) + b);
+            sd_ifft_no_trunc_internal(Q, x + BLK_SZ*(b << k2), k2, (j << k1) + b);
 
         /* rightmost columns */
         for (ulong a = n2; a < z2p; a++)
-            sd_ifft_trunc_block(Q, x + BLK_SZ*(a*S), S << k2, k1, j, z1 + (a < mp), n1, fp);
+            sd_ifft_trunc_block(Q, x + BLK_SZ*a, n_pow2(k2), k1, j, z1 + (a < mp), n1, fp);
 
         /* last partial row */
         if (fp)
-            sd_ifft_trunc_internal(Q, x + BLK_SZ*(n1*(S << k2)), S, k2, (j << k1) + n1, z2p, n2, f);
+            sd_ifft_trunc_internal(Q, x + BLK_SZ*(n1 << k2), k2, (j << k1) + n1, z2p, n2, f);
 
         /* leftmost columns */
         for (ulong a = 0; a < n2; a++)
-            sd_ifft_trunc_block(Q, x + BLK_SZ*(a*S), S << k2, k1, j, z1 + (a < m), n1 + 1, 0);
+            sd_ifft_trunc_block(Q, x + BLK_SZ*a, n_pow2(k2), k1, j, z1 + (a < m), n1 + 1, 0);
 
         return;
     }
 
     if (k == 2)
     {
-                   sd_ifft_base_8_1(Q, x + BLK_SZ*(S*0), 4*j+0);
-        if (n > 1) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*1), 4*j+1);
-        if (n > 2) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*2), 4*j+2);
-        if (n > 3) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*3), 4*j+3);
-        sd_ifft_trunc_block(Q, x, S, 2, j, z, n, f);
-        if (f) sd_ifft_trunc_internal(Q, x + BLK_SZ*(S*n), S, 0, 4*j+n, 1, 0, f);
+                   sd_ifft_base_8_1(Q, x + BLK_SZ*0, 4*j+0);
+        if (n > 1) sd_ifft_base_8_0(Q, x + BLK_SZ*1, 4*j+1);
+        if (n > 2) sd_ifft_base_8_0(Q, x + BLK_SZ*2, 4*j+2);
+        if (n > 3) sd_ifft_base_8_0(Q, x + BLK_SZ*3, 4*j+3);
+        sd_ifft_trunc_block(Q, x, 1, 2, j, z, n, f);
+        if (f) sd_ifft_trunc_internal(Q, x + BLK_SZ*n, 0, 4*j+n, 1, 0, f);
     }
     else if (k == 1)
     {
-                   sd_ifft_base_8_1(Q, x + BLK_SZ*(S*0), 2*j+0);
-        if (n > 1) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*1), 2*j+1);
-        sd_ifft_trunc_block(Q, x, S, 1, j, z, n, f);
-        if (f) sd_ifft_trunc_internal(Q, x + BLK_SZ*(S*n), S, 0, 2*j+n, 1, 0, f);
+                   sd_ifft_base_8_1(Q, x + BLK_SZ*0, 2*j+0);
+        if (n > 1) sd_ifft_base_8_0(Q, x + BLK_SZ*1, 2*j+1);
+        sd_ifft_trunc_block(Q, x, 1, 1, j, z, n, f);
+        if (f) sd_ifft_trunc_internal(Q, x + BLK_SZ*n, 0, 2*j+n, 1, 0, f);
     }
     else
     {
@@ -1497,6 +1495,11 @@ static void sd_ifft_trunc_internal(
 
 /********************* interface functions ***********************/
 
+/*
+Truncated inverse Fourier transform, inverse of sd_fft_trunc, assume the entries
+past `trunc` first entries of the _output_ are zero. See [vdH2004]_.
+The array `d` need to have size at least `n_pow2(L)`.
+*/
 void sd_ifft_trunc(
     sd_fft_ctx_t Q,
     double* d,
@@ -1505,13 +1508,13 @@ void sd_ifft_trunc(
 {
     FLINT_ASSERT(trunc <= n_pow2(L));
 
+    sd_fft_ctx_fit_depth(Q, L);
+
     if (L > LG_BLK_SZ)
     {
         ulong new_trunc = n_cdiv(trunc, BLK_SZ);
 
-        sd_fft_ctx_fit_depth(Q, L);
-
-        sd_ifft_trunc_internal(Q, d, 1, L - LG_BLK_SZ, 0, new_trunc, new_trunc, 0);
+        sd_ifft_trunc_internal(Q, d, L - LG_BLK_SZ, 0, new_trunc, new_trunc, 0);
         return;
     }
 

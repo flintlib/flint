@@ -69,6 +69,8 @@ References
 
 .. [BuhlerCrandallSompolski1992] \Buhler, J.P. and Crandall, R.E. and Sompolski, R.W. : Irregular primes to one million : Math. Comp. 59:2000 (1992) 717--722
 
+.. [BW1993] \T. Becker and V. Weispfenning, *Gröbner Bases: A Computational Approach to Commutative Algebra*, Graduate Texts in Mathematics 141, Springer-Verlag (1993). https://doi.org/10.1007/978-1-4612-0913-3
+
 .. [CFG2017] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and vector-valued Siegel modular forms of genus two", Math. Ann. 369 (2017), 1649--1669. https://doi.org/10.1007/s00208-016-1510-2
 
 .. [CFG2019] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and modular forms of degree 2 with character", Math. Comp. 88 (2019), 2423--2441. https://doi.org/10.1090/mcom/3412
@@ -356,6 +358,8 @@ References
 .. [vHP2012] \M. van Hoeij and V. Pal. "Isomorphisms of algebraic number fields". Journal de Théorie des Nombres de Bordeaux, Vol. 24, No. 2 (2012), pp. 293-305. https://doi.org/10.2307/43973105
 
 .. [vdH1995] \J. van der Hoeven, "Automatic numerical expansions". Proc. of the conference Real numbers and computers (1995), 261-274. https://www.texmacs.org/joris/ane/ane-abs.html
+
+.. [vdH2004] \J. van der Hoeven, "Truncated FFTs", ISSAC 2004 notes, https://www.texmacs.org/joris/issac04/issac04.html
 
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 

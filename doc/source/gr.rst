@@ -815,7 +815,7 @@ Factorization
     `u x` with respect to multiplication by units, also writing the normalizing
     unit *u* as a second output. If `x = 0`, sets *res* to 0 and *u* to 1.
 
-.. function:: int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+.. function:: int gr_factor(gr_ptr c, gr_vec_t factors, fmpz_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 
     Given `x \in R`, computes a factorization
 

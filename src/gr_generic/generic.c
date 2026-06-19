@@ -2498,6 +2498,88 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
 }
 
 int
+gr_generic_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    int status;
+    slong i, sz;
+    gr_ptr t;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            return gr_zero(res, ctx);
+        else
+            return gr_set(res, initial, ctx);
+    }
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    /* Currently many rings define a good dot product but not
+       a strided one. */
+    if (len >= 2 && (GR_VEC_DOT_OP(ctx, VEC_DOT) != (gr_method_vec_dot_op) gr_generic_vec_dot))
+    {
+        gr_ptr tmp1, tmp2;
+        gr_srcptr v1 = vec1, v2 = vec2;
+
+        if (stride1 != 1)
+        {
+            v1 = tmp1 = GR_TMP_ALLOC(len * sz);
+            for (i = 0; i < len; i++)
+                memcpy(GR_ENTRY(tmp1, i, sz), GR_ENTRY(vec1, i * stride1, sz), sz);
+        }
+
+        if (stride2 != 1)
+        {
+            v2 = tmp2 = GR_TMP_ALLOC(len * sz);
+            for (i = 0; i < len; i++)
+                memcpy(GR_ENTRY(tmp2, i, sz), GR_ENTRY(vec2, i * stride2, sz), sz);
+        }
+
+        status = _gr_vec_dot(res, initial, subtract, v1, v2, len, ctx);
+
+        if (stride1 != 1)
+            GR_TMP_FREE(tmp1, len * sz);
+        if (stride2 != 1)
+            GR_TMP_FREE(tmp2, len * sz);
+
+        return status;
+    }
+
+    GR_TMP_INIT(t, ctx);
+
+    if (initial == NULL)
+    {
+        status |= mul(res, vec1, vec2, ctx);
+    }
+    else
+    {
+        if (subtract)
+            status |= gr_neg(res, initial, ctx);
+        else
+            status |= gr_set(res, initial, ctx);
+
+        status |= mul(t, vec1, vec2, ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        status |= mul(t, GR_ENTRY(vec1, i * stride1, sz), GR_ENTRY(vec2, i * stride2, sz), ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    if (subtract)
+        status |= gr_neg(res, res, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+
+int
 gr_generic_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
 {
     gr_method_binary_op_ui mul_ui = GR_BINARY_OP_UI(ctx, MUL_UI);
@@ -2874,6 +2956,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
     {GR_METHOD_SIN_COS,                 (gr_funcptr) gr_generic_sin_cos},
     {GR_METHOD_TAN,                     (gr_funcptr) gr_generic_tan},
+    {GR_METHOD_TANH,                    (gr_funcptr) gr_generic_tanh},
     {GR_METHOD_ASIN,                    (gr_funcptr) gr_generic_asin},
     {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
     {GR_METHOD_ASINH,                   (gr_funcptr) gr_generic_asinh},
@@ -3051,6 +3134,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_VEC_DOT,                 (gr_funcptr) gr_generic_vec_dot},
     {GR_METHOD_VEC_DOT_REV,             (gr_funcptr) gr_generic_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED,         (gr_funcptr) gr_generic_vec_dot_strided},
     {GR_METHOD_VEC_DOT_UI,              (gr_funcptr) gr_generic_vec_dot_ui},
     {GR_METHOD_VEC_DOT_SI,              (gr_funcptr) gr_generic_vec_dot_si},
     {GR_METHOD_VEC_DOT_FMPZ,            (gr_funcptr) gr_generic_vec_dot_fmpz},

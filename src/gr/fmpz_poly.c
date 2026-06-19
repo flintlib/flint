@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"
@@ -780,10 +781,10 @@ _gr_fmpz_poly_canonical_associate(fmpz_poly_t ux, fmpz_poly_t u, const fmpz_poly
 
 
 int
-_gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+_gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, fmpz_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
 {
     fmpz_poly_factor_t fac;
-    gr_ctx_t Pol, ZZ;
+    gr_ctx_t Pol;
     slong i;
 
     fmpz_poly_factor_init(fac);
@@ -794,18 +795,16 @@ _gr_fmpz_poly_factor(fmpz_poly_t c, gr_vec_t factors, gr_vec_t exponents, gr_src
     /* Avoid using ctx so that this function can be used both with ctx = ZZ and
      * with ctx = ZZ[x] */
     gr_ctx_init_fmpz_poly(Pol);
-    gr_ctx_init_fmpz(ZZ);
 
     gr_vec_set_length(factors, fac->num, Pol);
-    gr_vec_set_length(exponents, fac->num, ZZ);
+    fmpz_vec_set_length(exponents, fac->num);
 
     for (i = 0; i < fac->num; i++)
     {
         fmpz_poly_swap((fmpz_poly_struct *) (factors->entries) + i, fac->p + i);
-        fmpz_set_ui((fmpz *) (exponents->entries) + i, fac->exp[i]);
+        fmpz_set_ui(exponents->entries + i, fac->exp[i]);
     }
 
-    gr_ctx_clear(ZZ);
     gr_ctx_clear(Pol);
 
     fmpz_poly_factor_clear(fac);

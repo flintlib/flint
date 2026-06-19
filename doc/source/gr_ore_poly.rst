@@ -309,7 +309,7 @@ Arithmetic
               int gr_ore_poly_lmul_gen(gr_ore_poly_t res, const gr_ore_poly_t poly, gr_ore_poly_ctx_t ctx)
 
     Sets *res* to the result of the left multiplication:
-    `D \cdot poly = \sigma(poly) \cdot D + \sigma(poly)`.
+    `D \cdot poly = \sigma(poly) \cdot D + \delta(poly)`.
     The underscore method assumes *len != 0*.
 
 .. function:: int _gr_ore_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ore_poly_ctx_t ctx)
@@ -318,6 +318,19 @@ Arithmetic
     Sets *res* to *poly1* multiplied by *poly2*
     which must be two Ore polynomials in the Ore algebra *ctx*.
     The underscore method assumes *res != poly1*, *res != poly2* (no aliasing) and *len1* != 0, *len2* != 0.
+
+.. function:: int _gr_ore_poly_divrem(gr_ptr Q, gr_ptr R, gr_srcptr U, slong lenU, gr_srcptr V, slong lenV, gr_ore_poly_ctx_t ctx)
+              int gr_ore_poly_divrem(gr_ore_poly_t Q, gr_ore_poly_t R, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx)
+
+    Sets *(Q, R)* to the unique pair such that `U = QV + R` and `ord(R) < ord(V)`.
+
+.. function:: int gr_ore_poly_div(gr_ore_poly_t Q, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx)
+
+    Version of the divrem function which outputs only the quotient.
+
+.. function:: int gr_ore_poly_rem(gr_ore_poly_t R, const gr_ore_poly_t U, gr_ore_poly_t V, gr_ore_poly_ctx_t ctx)
+
+    Version of the divrem function which outputs only the remainder.
 
 .. raw:: latex
 

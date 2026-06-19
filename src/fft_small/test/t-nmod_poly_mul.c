@@ -23,6 +23,89 @@ TEST_FUNCTION_START(_nmod_poly_mul_mid_mpn_ctx, state)
 
     mpn_ctx_init(R, UWORD(0x0003f00000000001));
 
+    /* Check the direct FFT branch. */
+    {
+        ulong * a, * b, * c, * d;
+        ulong an, bn, zn, zl, zh, sz, i;
+
+        nmod_init(&mod, UWORD(7340033));  /* 7*2^20 + 1 */
+
+        for (slong reps = 0; reps < 4; reps++)
+        {
+            flint_set_num_threads(1 + reps);
+
+            an = 1800 + 37*reps;
+            bn = 1600 + 19*reps;
+            zn = an + bn - 1;
+            zl = reps == 0 ? 0 : 123 + reps;
+            zh = reps == 1 ? zn : zn - 17*reps;
+            sz = FLINT_MAX(zn, zh);
+
+            a = FLINT_ARRAY_ALLOC(an, ulong);
+            b = FLINT_ARRAY_ALLOC(bn, ulong);
+            c = FLINT_ARRAY_ALLOC(sz, ulong);
+            d = FLINT_ARRAY_ALLOC(sz, ulong);
+
+            for (i = 0; i < an; i++)
+                a[i] = n_randint(state, mod.n);
+
+            for (i = 0; i < bn; i++)
+                b[i] = n_randint(state, mod.n);
+
+            flint_mpn_zero(c, sz);
+            _nmod_poly_mul_KS(c, a, an, b, bn, mod);
+            _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, b, bn, mod, R);
+
+            for (i = zl; i < zh; i++)
+            {
+                if (c[i] != d[i-zl])
+                {
+                    flint_printf("(direct fft) mulmid error at index %wu\n", i);
+                    flint_printf("zl=%wu, zh=%wu, an=%wu, bn=%wu\n", zl, zh, an, bn);
+                    flint_printf("mod: %wu\n", mod.n);
+                    flint_abort();
+                }
+            }
+
+            flint_free(a);
+            flint_free(b);
+            flint_free(c);
+            flint_free(d);
+        }
+
+        an = 1700;
+        zn = an + an - 1;
+        zl = 41;
+        zh = zn - 29;
+        sz = zn;
+
+        a = FLINT_ARRAY_ALLOC(an, ulong);
+        c = FLINT_ARRAY_ALLOC(sz, ulong);
+        d = FLINT_ARRAY_ALLOC(sz, ulong);
+
+        for (i = 0; i < an; i++)
+            a[i] = n_randint(state, mod.n);
+
+        flint_mpn_zero(c, sz);
+        _nmod_poly_mul_KS(c, a, an, a, an, mod);
+        _nmod_poly_mul_mid_mpn_ctx(d, zl, zh, a, an, a, an, mod, R);
+
+        for (i = zl; i < zh; i++)
+        {
+            if (c[i] != d[i-zl])
+            {
+                flint_printf("(direct fft squaring) mulmid error at index %wu\n", i);
+                flint_printf("zl=%wu, zh=%wu, an=%wu\n", zl, zh, an);
+                flint_printf("mod: %wu\n", mod.n);
+                flint_abort();
+            }
+        }
+
+        flint_free(a);
+        flint_free(c);
+        flint_free(d);
+    }
+
     /* (slow) test bug where 3 instead of 4 primes were used */
 #if 0
     {

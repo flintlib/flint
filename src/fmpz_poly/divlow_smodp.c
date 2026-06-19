@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,58 +13,43 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
+#include "fmpz_mod_poly.h"
 
 void fmpz_poly_divlow_smodp(fmpz * res, const fmpz_poly_t f,
-                                  const fmpz_poly_t g, const fmpz_t p, slong n)
+                             const fmpz_poly_t g, const fmpz_t p, slong n)
 {
-   fmpz_t d, cinv;
-   slong i = 0, k, zeroes;
-   fmpz_poly_t tf;
+    fmpz_mod_ctx_t ctx;
+    fmpz *tA, *tB;
+    slong zeroes, glen, flen, Alen, Blen;
 
-   fmpz_init(d);
-   fmpz_init(cinv);
+    zeroes = 0;
+    while (fmpz_is_zero(g->coeffs + zeroes))
+        zeroes++;
 
-   while (fmpz_is_zero(g->coeffs + i))
-      i++;
+    flen = f->length - zeroes;
+    glen = g->length - zeroes;
+    Alen = FLINT_MAX(0, FLINT_MIN(flen, n));
+    Blen = FLINT_MIN(glen, n);
 
-   zeroes = i;
+    if (Alen == 0)
+    {
+        _fmpz_vec_zero(res, n);
+        return;
+    }
 
-   fmpz_poly_init2(tf, n + zeroes);
+    fmpz_mod_ctx_init(ctx, p);
+    tA = _fmpz_vec_init(Alen);
+    tB = _fmpz_vec_init(Blen);
 
-   fmpz_poly_set(tf, f);
+    _fmpz_mod_vec_set_fmpz_vec(tA, f->coeffs + zeroes, Alen, ctx);
+    _fmpz_mod_vec_set_fmpz_vec(tB, g->coeffs + zeroes, Blen, ctx);
+    _fmpz_mod_poly_div_series(res, tA, Alen, tB, Blen, n, ctx);
+    _fmpz_mod_vec_get_fmpz_vec_smod(res, res, n, ctx);
 
-   if (fmpz_sgn(g->coeffs + zeroes) >= 0)
-      fmpz_gcdinv(d, cinv, g->coeffs + zeroes, p);
-   else
-   {
-      fmpz_t temp;
-
-      fmpz_init(temp);
-
-      fmpz_add(temp, g->coeffs + zeroes, p);
-      fmpz_gcdinv(d, cinv, temp, p);
-
-      fmpz_clear(temp);
-   }
-
-   if (!fmpz_is_one(d))
-   {
-      flint_throw(FLINT_ERROR, "Exception (fmpz_poly_divlow_smodp). Impossible inverse.\n");
-   }
-
-   for (k = 0; k < n; i++, k++)
-   {
-      fmpz_mul(res + k, tf->coeffs + i, cinv);
-
-      fmpz_smod(res + k, res + k, p);
-
-      _fmpz_vec_scalar_submul_fmpz(tf->coeffs + i,  g->coeffs + zeroes,
-                                FLINT_MIN(g->length - zeroes, n - k), res + k);
-      _fmpz_vec_scalar_smod_fmpz(tf->coeffs + i, tf->coeffs + i,
-                                      FLINT_MIN(g->length - zeroes, n - k), p);
-   }
-
-   fmpz_poly_clear(tf);
-   fmpz_clear(cinv);
-   fmpz_clear(d);
+    _fmpz_vec_clear(tA, Alen);
+    _fmpz_vec_clear(tB, Blen);
+    fmpz_mod_ctx_clear(ctx);
 }
+

@@ -1024,9 +1024,50 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) \
     return status; \
 } \
 
+#define BINARY_UNARY_POLY_WRAPPER(func) \
+int \
+gr_series_ ## func(gr_series_t res1, gr_series_t res2, const gr_series_t x, gr_ctx_t ctx) \
+{ \
+    slong len, xlen, xerr, err; \
+    int status = GR_SUCCESS; \
+ \
+    if (gr_ctx_is_rational_vector_space(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE) \
+        return GR_UNABLE; \
+\
+    xlen = GR_SERIES_POLY(x)->length; \
+    xerr = GR_SERIES_ERROR(x); \
+    err = xerr; \
+ \
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err); \
+    err = len; \
+ \
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT) \
+    { \
+        len = FLINT_MIN(len, 1); \
+        err = GR_SERIES_ERR_EXACT; \
+    } \
+ \
+    GR_SERIES_ERROR(res1) = err; \
+    GR_SERIES_ERROR(res1) = err; \
+    status |= gr_poly_ ## func ## _series(GR_SERIES_POLY(res1), GR_SERIES_POLY(res2), GR_SERIES_POLY(x), len, GR_SERIES_ELEM_CTX(ctx)); \
+    return status; \
+} \
+
 UNARY_POLY_WRAPPER(exp)
 UNARY_POLY_WRAPPER(log)
+UNARY_POLY_WRAPPER(sin)
+UNARY_POLY_WRAPPER(cos)
+UNARY_POLY_WRAPPER(sin_pi)
+UNARY_POLY_WRAPPER(cos_pi)
 UNARY_POLY_WRAPPER(tan)
+UNARY_POLY_WRAPPER(tanh)
+UNARY_POLY_WRAPPER(cot)
+UNARY_POLY_WRAPPER(coth)
+UNARY_POLY_WRAPPER(tan_pi)
+UNARY_POLY_WRAPPER(cot_pi)
+
+BINARY_UNARY_POLY_WRAPPER(sin_cos)
+BINARY_UNARY_POLY_WRAPPER(sin_cos_pi)
 
 UNARY_POLY_WRAPPER(asin)
 UNARY_POLY_WRAPPER(acos)
@@ -1918,6 +1959,12 @@ gr_series_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_ctx_is_complex_vector_space(GR_SERIES_ELEM_CTX(ctx));
 }
 
+truth_t
+gr_series_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(GR_SERIES_ELEM_CTX(ctx));
+}
+
 int gr_series_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
@@ -2059,6 +2106,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_series_ctx_is_finite_characteristic},
     {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_series_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_clear},
@@ -2094,7 +2142,18 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_I,           (gr_funcptr) gr_series_i},
     {GR_METHOD_EXP,         (gr_funcptr) gr_series_exp},
     {GR_METHOD_LOG,         (gr_funcptr) gr_series_log},
+    {GR_METHOD_SIN,         (gr_funcptr) gr_series_sin},
+    {GR_METHOD_COS,         (gr_funcptr) gr_series_cos},
+    {GR_METHOD_SIN_PI,      (gr_funcptr) gr_series_sin_pi},
+    {GR_METHOD_COS_PI,      (gr_funcptr) gr_series_cos_pi},
+    {GR_METHOD_SIN_COS,     (gr_funcptr) gr_series_sin_cos},
+    {GR_METHOD_SIN_COS_PI,  (gr_funcptr) gr_series_sin_cos_pi},
     {GR_METHOD_TAN,         (gr_funcptr) gr_series_tan},
+    {GR_METHOD_TANH,        (gr_funcptr) gr_series_tanh},
+    {GR_METHOD_COT,         (gr_funcptr) gr_series_cot},
+    {GR_METHOD_COTH,        (gr_funcptr) gr_series_coth},
+    {GR_METHOD_TAN_PI,      (gr_funcptr) gr_series_tan_pi},
+    {GR_METHOD_COT_PI,      (gr_funcptr) gr_series_cot_pi},
     {GR_METHOD_ASIN,        (gr_funcptr) gr_series_asin},
     {GR_METHOD_ACOS,        (gr_funcptr) gr_series_acos},
     {GR_METHOD_ATAN,        (gr_funcptr) gr_series_atan},

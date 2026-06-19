@@ -84,23 +84,8 @@ FLINT_FORCE_INLINE ulong n_trailing_zeros(ulong x) {
     return x == 0 ? FLINT_BITS : flint_ctz(x);
 }
 
-/*
-    nbits is a mess
-
-    without assuming x != 0:
-        on x86 we want 64 - LZCNT
-        on arm we want 64 - CLZ
-
-        the problem is gcc decided that __builtin_clz is undefined on zero
-        input even though both instructions LZCNT and CLZ are defined
-
-    assuming x != 0:
-        on x86 we want BSR + 1
-*/
 FLINT_FORCE_INLINE ulong n_nbits(ulong x) {
-    if (x == 0)
-        return 0;
-    return FLINT_BITS - flint_clz(x);
+    return FLINT_BIT_COUNT(x);
 }
 
 FLINT_FORCE_INLINE ulong n_nbits_nz(ulong x) {
@@ -123,9 +108,30 @@ FLINT_FORCE_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 int fft_small_mulmod_satisfies_bounds(ulong n);
 
 /*
+    Let `e(theta) = exp(2*pi*i*theta)`, let `++` denotes concatenation, and `*`
+    denotes pointwise multiplication.
+    Consider an infinite sequence `w` of complex numbers defined as follows.
+
+        w_0 = {1}
+        w_i = w_{i-1} ++ e(2^-i) * w_{i-1}
+
+    For example
+
+        w_1 = {1, -1}
+        w_2 = {1, -1, i, -i}
+        w_3 = {1, -1, i, -i, e(1/8), e(5/8), e(3/8), e(7/8)}
+
+    Note that the `2i+1`-th element of `w` is the negation of the `2i`-th element,
+    so we only need to store every other element of `w`. Specific elements of `w`
+    can be directly accessed with `sd_fft_ctx_w`.
+
+    In actual implementation, we work modulo a prime `p` such that `p-1` has
+    high, but finite, 2-valuation. Most of the calculation works there as well,
+    except the sequence `w` cannot be infinite.
+
     The twiddle factors are split across SD_FFT_CTX_W2TAB_SIZE tables:
 
-        [0] = {e(1)}                                original index 0
+        [0] = {e(0)}                                original index 0
         [1] = {e(1/4)}                              original index 1
         [2] = {e(1/8), e(3/8)}                      original index 2,3
         [3] = {e(1/16), e(5/16), e(3/16), e(7/16)}  original index 4,5,6,7
@@ -139,8 +145,9 @@ int fft_small_mulmod_satisfies_bounds(ulong n);
         [j_bits][j_r]  where j_bits = nbits(j), j_r = j - 2^(j_bits-1)
 
     with the special case j_bits = j_r = 0 for j = 0.
-    The first SD_FFT_CTX_W2TAB_INIT tables are stored consecutively to ease the
-    lookup of small indices, which must currently be at least max(4, LG_BLK_SZ).
+    Up to the first SD_FFT_CTX_W2TAB_INIT tables are stored consecutively to ease
+    the lookup of small indices, which must currently be at least max(4,
+    LG_BLK_SZ).
 */
 
 /* for the fft look up of powers of w */
@@ -177,18 +184,24 @@ do { \
 #define SD_FFT_CTX_W2TAB_INIT 12
 #define SD_FFT_CTX_W2TAB_SIZE 40
 
-/* This context is the one expected to sit in a global position */
+/*
+    This context is the one expected to sit in a global position.
+    One container of this context is the thread_local storage for mpn_ctx_t.
+    See sd_fft_ctx_init_prime for the meaning of each field.
+*/
 typedef struct {
-    double p;
+    double p;   /* the FFT prime */
     double pinv;
     nmod_t mod;
-    ulong primitive_root;
+    ulong primitive_2power_root; /* primitive 2^v-th root, v = valuation(p - 1, 2) */
 #if FLINT_USES_PTHREAD
     _Atomic(unsigned int) w2tab_depth;
 #else
     unsigned int w2tab_depth;
 #endif
     double* w2tab[SD_FFT_CTX_W2TAB_SIZE];
+    /* see above for the layout of w2tab. Each entry is an integer
+       in the range [-p/2, p/2]. */
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
@@ -206,6 +219,7 @@ FLINT_FORCE_INLINE ulong sd_fft_ctx_data_size(ulong L)
     return n_pow2(L);
 }
 
+/* Return the address of block `I` in `d`, where each block has `BLK_SZ` entries. */
 FLINT_FORCE_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
 {
     return d + sd_fft_ctx_blk_offset(I);
@@ -214,7 +228,7 @@ FLINT_FORCE_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
 /*
 location of the bit-reversed eval:
     with out_data = fft(in_data) of length 2^L, then
-    eval_poly(in_data, sd_fft_ctx_w(, i)) = out_data[sd_fft_ctx_trunc_index(L, i)]
+    eval_poly(in_data, sd_fft_ctx_w(Q, i)) = out_data[sd_fft_ctx_trunc_index(L, i)]
 */
 FLINT_FORCE_INLINE ulong sd_fft_ctx_trunc_index(ulong L, ulong i)
 {
@@ -257,6 +271,7 @@ void sd_fft_ctx_point_sqr(const sd_fft_ctx_t Q,
         w = {e(0), e(1/2), e(1/4), e(3/4), e(1/8), e(5/8), e(3/8), e(7/8), ...}
     Only the terms of even index are explicitly stored, and they are split
     among several tables.
+    The recursive definition of the infinite sequence `w` can be found above.
 */
 
 /* look up w[2*j] */
@@ -275,7 +290,7 @@ FLINT_FORCE_INLINE double sd_fft_ctx_w2inv(const sd_fft_ctx_t Q, ulong j)
     return (j == 0) ? -1.0 : Q->w2tab[j_bits][j_mr];
 }
 
-/* look up w[j] */
+/* look up w[j]. Definition of w above */
 FLINT_FORCE_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong j)
 {
     double r = sd_fft_ctx_w2(Q, j/2);

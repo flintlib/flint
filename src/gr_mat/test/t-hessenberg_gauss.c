@@ -15,7 +15,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_GR_FUNCTION_START(gr_mat_hessenberg_gauss, state, count_success, count_unable, count_domain)
+TEST_GR_FUNCTION_START(gr_mat_hessenberg_gauss, state, count_success, count_domain, count_unable)
 {
     slong iter;
 
@@ -33,7 +33,7 @@ TEST_GR_FUNCTION_START(gr_mat_hessenberg_gauss, state, count_success, count_unab
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         n = n_randint(state, 8);
@@ -77,5 +77,5 @@ TEST_GR_FUNCTION_START(gr_mat_hessenberg_gauss, state, count_success, count_unab
         gr_ctx_clear(ctx);
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }

@@ -18,6 +18,7 @@
 #define GR_INLINE static inline
 #endif
 
+#include "fmpz_types.h"
 #include "gr_types.h"
 
 #ifdef __cplusplus
@@ -650,6 +651,7 @@ typedef enum
 
     GR_METHOD_VEC_DOT,
     GR_METHOD_VEC_DOT_REV,
+    GR_METHOD_VEC_DOT_STRIDED,
     GR_METHOD_VEC_DOT_UI,
     GR_METHOD_VEC_DOT_SI,
     GR_METHOD_VEC_DOT_FMPZ,
@@ -719,6 +721,7 @@ typedef enum
     GR_CTX_MPN_MOD,
     GR_CTX_FQ, GR_CTX_FQ_NMOD, GR_CTX_FQ_ZECH,
     GR_CTX_NF,
+    GR_CTX_PADIC_RADIX,
     GR_CTX_REAL_ALGEBRAIC_QQBAR, GR_CTX_COMPLEX_ALGEBRAIC_QQBAR,
     GR_CTX_REAL_ALGEBRAIC_CA, GR_CTX_COMPLEX_ALGEBRAIC_CA,
     GR_CTX_RR_CA, GR_CTX_CC_CA,
@@ -847,7 +850,7 @@ typedef int ((*gr_method_vec_scalar_op_fmpz)(gr_ptr, gr_srcptr, slong, const fmp
 typedef int ((*gr_method_vec_scalar_op_fmpq)(gr_ptr, gr_srcptr, slong, const fmpq_t, gr_ctx_ptr));
 typedef truth_t ((*gr_method_vec_predicate)(gr_srcptr, slong, gr_ctx_ptr));
 typedef truth_t ((*gr_method_vec_vec_predicate)(gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
-typedef int ((*gr_method_factor_op)(gr_ptr, gr_vec_t, gr_vec_t, gr_srcptr, int, gr_ctx_ptr));
+typedef int ((*gr_method_factor_op)(gr_ptr, gr_vec_t, fmpz_vec_t, gr_srcptr, int, gr_ctx_ptr));
 typedef int ((*gr_method_poly_unary_trunc_op)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
@@ -1143,7 +1146,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr
 GR_INLINE WARN_UNUSED_RESULT int gr_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NUMERATOR)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DENOMINATOR)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx) { return GR_FACTOR_OP(ctx, FACTOR)(c, factors, exponents, x, flags, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_factor(gr_ptr c, gr_vec_t factors, fmpz_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx) { return GR_FACTOR_OP(ctx, FACTOR)(c, factors, exponents, x, flags, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POW)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, POW_UI)(res, x, y, ctx); }
@@ -1397,6 +1400,7 @@ void gr_ctx_uninitialized(gr_ctx_t ctx);
 void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state);
+void gr_ctx_init_random_finite_field(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state);

@@ -15,7 +15,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_GR_FUNCTION_START(gr_mat_solve_tril, state, count_success, count_unable, count_domain)
+TEST_GR_FUNCTION_START(gr_mat_solve_tril, state, count_success, count_domain, count_unable)
 {
     slong iter;
 
@@ -37,7 +37,7 @@ TEST_GR_FUNCTION_START(gr_mat_solve_tril, state, count_success, count_unable, co
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         sz = ctx->sizeof_elem;
@@ -104,5 +104,5 @@ TEST_GR_FUNCTION_START(gr_mat_solve_tril, state, count_success, count_unable, co
 
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }

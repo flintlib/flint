@@ -839,6 +839,7 @@ void _acb_vec_sub(acb_ptr res, acb_srcptr vec1, acb_srcptr vec2, slong len, slon
 void _acb_vec_scalar_submul(acb_ptr res, acb_srcptr vec, slong len, const acb_t c, slong prec);
 void _acb_vec_scalar_addmul(acb_ptr res, acb_srcptr vec, slong len, const acb_t c, slong prec);
 void _acb_vec_scalar_mul(acb_ptr res, acb_srcptr vec, slong len, const acb_t c, slong prec);
+void _acb_vec_scalar_mul_si(acb_ptr res, acb_srcptr vec, slong len, slong c, slong prec);
 void _acb_vec_scalar_mul_ui(acb_ptr res, acb_srcptr vec, slong len, ulong c, slong prec);
 void _acb_vec_scalar_mul_2exp_si(acb_ptr res, acb_srcptr vec, slong len, slong c);
 void _acb_vec_scalar_mul_onei(acb_ptr res, acb_srcptr vec, slong len);

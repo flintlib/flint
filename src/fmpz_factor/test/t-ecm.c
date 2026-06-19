@@ -31,6 +31,8 @@ TEST_FUNCTION_START(fmpz_factor_ecm, state)
     {
         for (j = 0; j < flint_test_multiplier(); j++)
         {
+            flint_set_num_threads(1 + n_randint(state, 3));
+
             fmpz_randprime(prime1, state, i, 1);
             fmpz_randprime(prime2, state, i, 1);
 

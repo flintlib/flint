@@ -25,8 +25,6 @@ void factor_poly(const char * file_str, const char * name, slong wanted_factors)
     FILE * file;
     fmpz_poly_t f;
     fmpz_poly_factor_t fac;
-    struct timeval start, stop;
-    ulong ms;
 
     fmpz_poly_init(f);
 
@@ -42,10 +40,10 @@ void factor_poly(const char * file_str, const char * name, slong wanted_factors)
     {
         fmpz_poly_t g;
         fmpz_poly_init(g);
-        file = fopen(MY_DIR"P7_flint", "rw");
+        file = fopen(MY_DIR"P7_flint", "r");
         fmpz_poly_fread(file, g);
         fclose(file);
-        file = fopen((!strcmp(name, "P7*M12_5") ? MY_DIR"M12_5_flint" : MY_DIR"M12_6_flint"), "rw");
+        file = fopen((!strcmp(name, "P7*M12_5") ? MY_DIR"M12_5_flint" : MY_DIR"M12_6_flint"), "r");
         fmpz_poly_fread(file, f);
         fclose(file);
         fmpz_poly_mul(f, f, g);
@@ -53,19 +51,21 @@ void factor_poly(const char * file_str, const char * name, slong wanted_factors)
     }
     else
     {
-        file = fopen(file_str, "rw");
+        file = fopen(file_str, "r");
         fmpz_poly_fread(file, f);
         fclose(file);
     }
 
     fmpz_poly_factor_init(fac);
 
-    gettimeofday(&start, NULL);
-    fmpz_poly_factor(fac, f);
-    gettimeofday(&stop, NULL);
-    ms = (stop.tv_sec - start.tv_sec)*1000 + (stop.tv_usec - start.tv_usec) / 1000;
+    double tcpu, twall;
 
-    flint_printf("%s has %wd factors: %ld ms\n", name, fac->num, ms);
+    TIMEIT_START;
+    fmpz_poly_factor(fac, f);
+    TIMEIT_STOP_VALUES(tcpu, twall);
+    (void) tcpu;
+
+    flint_printf("%9s has %3wd factors: %10.3f s\n", name, fac->num, twall);
 
     if (fac->num != wanted_factors)
     {
@@ -103,11 +103,11 @@ int main(int argc, char *argv[])
     /* Not run by default because they are too slow currently */
     if (argc > 1 && !strcmp(argv[1], "-hard"))
     {
-        factor_poly(MY_DIR"P7_M12_5_flint", "P7*M12_5", 2);     /*  51 seconds */
-        factor_poly(MY_DIR"P7_M12_6_flint", "P7*M12_6", 3);     /*  96 seconds */
-        factor_poly(MY_DIR"H2_flint", "H2", 6);     /*  71 seconds */
-        factor_poly(MY_DIR"S9_flint", "S9", 1);     /*  57 seconds */
-        factor_poly(MY_DIR"S10_flint", "S10", 1);   /* 6300 seconds */
+        factor_poly(MY_DIR"S9_flint", "S9", 1);     /*  28 seconds */
+        factor_poly(MY_DIR"H2_flint", "H2", 6);     /*  18 seconds */
+        factor_poly(MY_DIR"P7_M12_5_flint", "P7*M12_5", 2);     /*  31 seconds */
+        factor_poly(MY_DIR"P7_M12_6_flint", "P7*M12_6", 3);     /*  53 seconds */
+        factor_poly(MY_DIR"S10_flint", "S10", 1);   /* 1170 seconds */
     }
 
     return 0;

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint.h"
 #include "test_helpers.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -81,6 +82,29 @@ TEST_FUNCTION_START(nmod_poly_interpolate_geometric_nmod_vec_fast, state)
 
             nmod_poly_clear(P);
             nmod_poly_clear(Q);
+        }
+
+        /* use only `len` points, interpolate then evaluate */
+        {
+            nmod_poly_init(P, mod);
+            nn_ptr val = FLINT_ARRAY_ALLOC(len, ulong);
+            _nmod_vec_randtest(y, state, len, P->mod);
+
+            nmod_poly_interpolate_geometric_nmod_vec_fast(P, r, y, len);
+            nmod_poly_evaluate_geometric_nmod_vec_fast(val, P, r, len);
+            result = _nmod_vec_equal(val, y, len);
+            if (!result)
+            {
+                flint_printf("FAIL (`len` points):\n");
+                flint_printf("mod=%wu, len=%wd, npoints=%wd\n\n", mod, len, npoints);
+                flint_printf("val = %{slong*}...\n", val, len);
+                flint_printf("y = %{slong*}...\n", y, len);
+                fflush(stdout);
+                flint_abort();
+            }
+
+            flint_free(val);
+            nmod_poly_clear(P);
         }
 
         /* use variant with given precomputation */

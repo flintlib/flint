@@ -141,6 +141,7 @@ void func_name(S rp, T ap, slong len, U b, slong prec) \
         OP(rp + ix, ap + ix, b, prec); \
 }
 
+SCALAR_OP(_acb_vec_scalar_mul_si,   acb_ptr, acb_srcptr, slong,        acb_mul_si)
 SCALAR_OP(_acb_vec_scalar_mul_ui,   acb_ptr, acb_srcptr, ulong,        acb_mul_ui)
 SCALAR_OP(_acb_vec_scalar_mul_fmpz, acb_ptr, acb_srcptr, const fmpz_t, acb_mul_fmpz)
 SCALAR_OP(_acb_vec_scalar_mul_arb,  acb_ptr, acb_srcptr, const arb_t,  acb_mul_arb)

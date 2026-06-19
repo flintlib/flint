@@ -24,20 +24,20 @@ void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr po
     FLINT_ASSERT(G->function & 1);
     FLINT_ASSERT(len <= G->len);
 
-    if (plen == 0)
-    {
-        _nmod_vec_zero(vs, len);
-        return;
-    }
-
     /* val = valuation of poly */
-    slong val;
-    for (val = 0; val < plen; val++)
+    slong val = 0;
+    for ( ; val < plen; val++)
     {
         if (poly[val] != 0)
         {
             break;
         }
+    }
+
+    if (val == plen) /* covers the case plen == 0 */
+    {
+        _nmod_vec_zero(vs, len);
+        return;
     }
 
     /** Formula, based on Bluestein's trick:

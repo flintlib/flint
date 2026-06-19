@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 
@@ -64,8 +65,7 @@ gr_mat_jordan_blocks(gr_vec_t lambda, slong * num_blocks, slong * block_lambda, 
     fmpz * exp;
     slong exp_i;
     int status = GR_SUCCESS;
-    gr_ctx_t ZZ;
-    gr_vec_t mult;
+    fmpz_vec_t mult;
 
     n = gr_mat_nrows(A, ctx);
 
@@ -78,8 +78,7 @@ gr_mat_jordan_blocks(gr_vec_t lambda, slong * num_blocks, slong * block_lambda, 
     ranks = flint_malloc(sizeof(slong) * (n + 1));
     diagram = flint_malloc(sizeof(slong) * n);
 
-    gr_ctx_init_fmpz(ZZ);
-    gr_vec_init(mult, 0, ZZ);
+    fmpz_vec_init(mult, 0);
 
     status |= gr_mat_eigenvalues(lambda, mult, A, 0, ctx);
 
@@ -157,8 +156,7 @@ gr_mat_jordan_blocks(gr_vec_t lambda, slong * num_blocks, slong * block_lambda, 
         }
     }
 
-    gr_vec_clear(mult, ZZ);
-    gr_ctx_clear(ZZ);
+    fmpz_vec_clear(mult);
 
     flint_free(ranks);
     flint_free(diagram);

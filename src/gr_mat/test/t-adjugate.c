@@ -33,7 +33,7 @@ TEST_GR_FUNCTION_START(gr_mat_adjugate, state, count_success, count_domain, coun
         while (ctx->methods == _ca_methods)
         {
             gr_ctx_clear(ctx);
-            gr_ctx_init_random(ctx, state);
+            gr_ctx_init_random_commutative_ring(ctx, state);
         }
 
         n = n_randint(state, 5);
@@ -52,6 +52,7 @@ TEST_GR_FUNCTION_START(gr_mat_adjugate, state, count_success, count_domain, coun
         if (status == GR_SUCCESS && (gr_mat_equal(B, C, ctx) == T_FALSE || gr_equal(d, e, ctx) == T_FALSE))
         {
             flint_printf("FAIL\n");
+            gr_ctx_println(ctx);
             flint_printf("A = "), gr_mat_print(A, ctx); flint_printf("\n");
             flint_printf("B = "), gr_mat_print(B, ctx); flint_printf("\n");
             flint_printf("C = "), gr_mat_print(C, ctx); flint_printf("\n");

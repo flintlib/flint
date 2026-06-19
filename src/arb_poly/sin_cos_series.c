@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
 #include "arb_poly.h"
 #include "gr_poly.h"
 
@@ -51,26 +50,14 @@ __arb_poly_sin_cos_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong 
     }
     else
     {
-        slong cutoff;
         gr_ctx_t ctx;
         int status;
-
-        if (prec <= 128)
-        {
-            cutoff = 1400;
-        }
-        else
-        {
-            cutoff = 100000 / pow(log(prec), 3);
-            cutoff = FLINT_MIN(cutoff, 700);
-        }
-
         gr_ctx_init_real_arb(ctx, prec);
 
-        if (hlen < cutoff)
-            status = _gr_poly_sin_cos_series_basecase(s, c, h, hlen, n, times_pi, ctx);
+        if (times_pi)
+            status = _gr_poly_sin_cos_pi_series(s, c, h, hlen, n, ctx);
         else
-            status = _gr_poly_sin_cos_series_tangent(s, c, h, hlen, n, times_pi, ctx);
+            status = _gr_poly_sin_cos_series(s, c, h, hlen, n, ctx);
 
         if (status != GR_SUCCESS)
         {
@@ -154,4 +141,218 @@ arb_poly_sin_cos_pi_series(arb_poly_t s, arb_poly_t c,
     _arb_poly_normalise(s);
     _arb_poly_set_length(c, n);
     _arb_poly_normalise(c);
+}
+
+void
+_arb_poly_sin_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        arb_sin(g, h, prec);
+        _arb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_sin_cos(g, t, h, prec);
+        arb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        arb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_real_arb(ctx, prec);
+        status = _gr_poly_sin_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _arb_vec_indeterminate(g, n);
+    }
+}
+
+void
+arb_poly_sin_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (hlen == 0 || n == 0)
+    {
+        arb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    arb_poly_fit_length(g, n);
+    _arb_poly_sin_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _arb_poly_set_length(g, n);
+    _arb_poly_normalise(g);
+}
+
+void
+_arb_poly_sin_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        arb_sin_pi(g, h, prec);
+        _arb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_sin_cos_pi(g, t, h, prec);
+        arb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        arb_const_pi(t, prec);
+        arb_mul(g + 1, g + 1, t, prec);
+        arb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_real_arb(ctx, prec);
+        status = _gr_poly_sin_pi_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _arb_vec_indeterminate(g, n);
+    }
+}
+
+void
+arb_poly_sin_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (hlen == 0 || n == 0)
+    {
+        arb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    arb_poly_fit_length(g, n);
+    _arb_poly_sin_pi_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _arb_poly_set_length(g, n);
+    _arb_poly_normalise(g);
+}
+
+void
+_arb_poly_cos_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        arb_cos(g, h, prec);
+        _arb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_sin_cos(t, g, h, prec);
+        arb_neg(t, t);
+        arb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        arb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_real_arb(ctx, prec);
+        status = _gr_poly_cos_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _arb_vec_indeterminate(g, n);
+    }
+}
+
+void
+arb_poly_cos_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (n == 0)
+    {
+        arb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 0)
+    {
+        arb_poly_one(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    arb_poly_fit_length(g, n);
+    _arb_poly_cos_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _arb_poly_set_length(g, n);
+    _arb_poly_normalise(g);
+}
+
+void
+_arb_poly_cos_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+{
+    hlen = FLINT_MIN(hlen, n);
+
+    if (hlen == 1)
+    {
+        arb_cos_pi(g, h, prec);
+        _arb_vec_zero(g + 1, n - 1);
+    }
+    else if (n == 2)
+    {
+        arb_t t;
+        arb_init(t);
+        arb_sin_cos_pi(t, g, h, prec);
+        arb_neg(t, t);
+        arb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
+        arb_const_pi(t, prec);
+        arb_mul(g + 1, g + 1, t, prec);
+        arb_clear(t);
+    }
+    else
+    {
+        gr_ctx_t ctx;
+        int status;
+        gr_ctx_init_real_arb(ctx, prec);
+        status = _gr_poly_cos_pi_series(g, h, hlen, n, ctx);
+        if (status != GR_SUCCESS)
+            _arb_vec_indeterminate(g, n);
+    }
+}
+
+void
+arb_poly_cos_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+{
+    slong hlen = h->length;
+
+    if (n == 0)
+    {
+        arb_poly_zero(g);
+        return;
+    }
+
+    if (hlen == 0)
+    {
+        arb_poly_one(g);
+        return;
+    }
+
+    if (hlen == 1)
+        n = 1;
+
+    arb_poly_fit_length(g, n);
+    _arb_poly_cos_pi_series(g->coeffs, h->coeffs, hlen, n, prec);
+    _arb_poly_set_length(g, n);
+    _arb_poly_normalise(g);
 }

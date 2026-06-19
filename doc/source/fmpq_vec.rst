@@ -38,12 +38,12 @@ Randomisation
 Bit sizes and heights
 --------------------------------------------------------------------------------
 
-.. function:: void _fmpq_vec_max_height(fmpz_t height, const fmpq * vec, slong len);
+.. function:: void _fmpq_vec_max_height(fmpz_t height, const fmpq * vec, slong len)
 
     Computes the maximum of the height of any coefficient of ``(vec, len)``,
     each height being computed by :func:`fmpq_height`.
 
-.. function:: flint_bitcnt_t _fmpq_vec_max_height_bits(const fmpq * vec, slong len);
+.. function:: flint_bitcnt_t _fmpq_vec_max_height_bits(const fmpq * vec, slong len)
 
     Computes the maximum number of bits of the height of any coefficient
     of ``(vec, len)``, each one being computed by :func:`fmpq_height_bits`.

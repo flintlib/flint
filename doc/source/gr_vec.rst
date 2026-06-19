@@ -202,6 +202,11 @@ Dot products
 
     Sets *res* to `c \pm \sum_{i=0}^{n-1} a_i b_i`.
 
+.. function:: int _gr_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+
+    Sets *res* to `c \pm \sum_{i=0}^{n-1} a_{i \cdot stride1} b_{i \cdot stride2}`.
+    The strides may be negative.
+
 .. function:: int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
     Sets *res* to `c \pm \sum_{i=0}^{n-1} a_i b_{n-1-i}`.
@@ -210,7 +215,7 @@ Sorting and searching
 --------------------------------------------------------------------------------
 
 .. function:: truth_t _gr_vec_contains(gr_srcptr vec, slong len, gr_srcptr x, gr_ctx_t ctx)
-              truth_t gr_vec_contains(const gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx);
+              truth_t gr_vec_contains(const gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx)
 
 .. function:: int _gr_vec_sort(gr_ptr vec, slong len, gr_ctx_t ctx)
               int gr_vec_sort(gr_vec_t dest, const gr_vec_t src, gr_ctx_t ctx)
@@ -223,8 +228,14 @@ Sorting and searching
 .. function:: void _gr_vec_permute(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
               int gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
 
-    Applies a permutation to a vector. The underscore version works in-place and
-    overwrites `perm`.
+    Applies a permutation to a vector, i.e. ``dest[perm[i]] = src[i]``.
+    The underscore version works in-place and overwrites `perm`.
+
+.. function:: void _gr_vec_permute_inv(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx)
+              int gr_vec_permute_inv(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx)
+
+    Applies the inverse of a permutation to a vector, i.e. ``dest[i] = src[perm[i]]``.
+    The underscore version works in-place and overwrites `perm`.
 
 .. function:: void _gr_vec_shuffle(gr_ptr vec, flint_rand_t state, slong len, gr_ctx_t ctx)
 

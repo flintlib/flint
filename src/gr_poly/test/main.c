@@ -76,6 +76,7 @@
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
+#include "t-resultant_subresultant.c"
 #include "t-resultant_sylvester.c"
 #include "t-revert_series.c"
 #include "t-roots.c"
@@ -85,8 +86,10 @@
 #include "t-shift_left_right.c"
 #include "t-shift_equivalent.c"
 #include "t-shiftless_decomposition.c"
+#include "t-sin_cos_series.c"
 #include "t-sqrt_series.c"
 #include "t-squarefree_part.c"
+#include "t-tan_series.c"
 #include "t-taylor_shift.c"
 #include "t-taylor_shift_convolution.c"
 #include "t-taylor_shift_divconquer.c"
@@ -94,6 +97,7 @@
 #include "t-xgcd.c"
 #include "t-xgcd_euclidean.c"
 #include "t-xgcd_hgcd.c"
+#include "t-xgcd_subresultant.c"
 
 /* Array of test functions ***************************************************/
 
@@ -164,6 +168,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_resultant),
     TEST_FUNCTION(gr_poly_resultant_euclidean),
     TEST_FUNCTION(gr_poly_resultant_hgcd),
+    TEST_FUNCTION(gr_poly_resultant_subresultant),
     TEST_FUNCTION(gr_poly_resultant_sylvester),
     TEST_FUNCTION(gr_poly_revert_series),
     TEST_FUNCTION(gr_poly_roots),
@@ -173,15 +178,18 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_shift_left_right),
     TEST_FUNCTION(gr_poly_shift_equivalent),
     TEST_FUNCTION(gr_poly_shiftless_decomposition),
+    TEST_FUNCTION(gr_poly_sin_cos_series),
     TEST_FUNCTION(gr_poly_sqrt_series),
     TEST_FUNCTION(gr_poly_squarefree_part),
+    TEST_FUNCTION(gr_poly_tan_series),
     TEST_FUNCTION(gr_poly_taylor_shift),
     TEST_FUNCTION(gr_poly_taylor_shift_convolution),
     TEST_FUNCTION(gr_poly_taylor_shift_divconquer),
     TEST_FUNCTION(gr_poly_taylor_shift_horner),
     TEST_FUNCTION(gr_poly_xgcd),
     TEST_FUNCTION(gr_poly_xgcd_euclidean),
-    TEST_FUNCTION(gr_poly_xgcd_hgcd)
+    TEST_FUNCTION(gr_poly_xgcd_hgcd),
+    TEST_FUNCTION(gr_poly_xgcd_subresultant),
 };
 
 /* main function *************************************************************/

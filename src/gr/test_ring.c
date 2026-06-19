@@ -16,6 +16,7 @@
 
 #include "fexpr.h"
 #include "fmpq.h"
+#include "fmpz_vec.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -3683,14 +3684,15 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
     int status;
     gr_ptr x, c, t, u;
     gr_ctx_t ZZ;
-    gr_vec_t fac, exp;
+    gr_vec_t fac;
+    fmpz_vec_t exp;
     slong i;
 
     GR_TMP_INIT4(x, c, t, u, R);
     gr_ctx_init_fmpz(ZZ);
 
     gr_vec_init(fac, n_randint(state, 3), R);
-    gr_vec_init(exp, n_randint(state, 3), ZZ);
+    fmpz_vec_init(exp, n_randint(state, 3));
 
     status = GR_SUCCESS;
     status |= gr_randtest_small(x, state, R);
@@ -3715,7 +3717,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
 
             for (i = 0; i < fac->length; i++)
             {
-                status |= gr_pow_fmpz(t, gr_vec_entry_srcptr(fac, i, R), gr_vec_entry_srcptr(exp, i, ZZ), R);
+                status |= gr_pow_fmpz(t, gr_vec_entry_srcptr(fac, i, R), fmpz_vec_entry_srcptr(exp, i), R);
                 status |= gr_mul(u, u, t, R);
             }
 
@@ -3732,7 +3734,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
             flint_printf("x = "); gr_println(x, R);
             flint_printf("c = "); gr_println(c, R);
             flint_printf("fac = "); gr_vec_print(fac, R); flint_printf("\n");
-            flint_printf("exp = "); gr_vec_print(exp, ZZ); flint_printf("\n");
+            flint_printf("exp = "); gr_vec_print((gr_vec_struct *) exp, ZZ); flint_printf("\n");
             flint_printf("\n");
         }
     }
@@ -3760,7 +3762,7 @@ gr_test_factor(gr_ctx_t R, flint_rand_t state, int test_flags)
     gr_ctx_clear(ZZ);
 
     gr_vec_clear(fac, R);
-    gr_vec_clear(exp, ZZ);
+    fmpz_vec_clear(exp);
 
     return status;
 }
@@ -4106,6 +4108,77 @@ gr_test_vec_dot(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     GR_TMP_CLEAR_VEC(x, len, R);
     GR_TMP_CLEAR_VEC(y, len, R);
+    GR_TMP_CLEAR3(a, s, t, R);
+
+    return status;
+}
+
+static int
+gr_test_vec_dot_strided(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    slong len, stride1, stride2;
+    gr_ptr x, y, a, s, t;
+    int initial, alias, subtract;
+
+    if (gr_ctx_is_finite(R) == T_TRUE)
+        len = n_randint(state, 50);
+    else
+        len = n_randint(state, 5);
+
+    initial = n_randint(state, 2);
+    alias = n_randint(state, 2);
+    subtract = n_randint(state, 2);
+
+    stride1 = n_randint(state, 3);
+    stride2 = n_randint(state, 3);
+
+    GR_TMP_INIT_VEC(x, 2 * len, R);
+    GR_TMP_INIT_VEC(y, 2 * len, R);
+    GR_TMP_INIT3(a, s, t, R);
+
+    GR_MUST_SUCCEED(_gr_vec_randtest(x, state, 2 * len, R));
+    GR_MUST_SUCCEED(_gr_vec_randtest(y, state, 2 * len, R));
+    GR_MUST_SUCCEED(gr_randtest(a, state, R));
+    GR_MUST_SUCCEED(gr_randtest(s, state, R));
+    GR_MUST_SUCCEED(gr_randtest(t, state, R));
+
+    status = GR_SUCCESS;
+
+    if (initial && alias)
+    {
+        GR_MUST_SUCCEED(gr_set(s, a, R));
+        GR_MUST_SUCCEED(gr_set(t, a, R));
+    }
+
+    status |= _gr_vec_dot_strided(s, initial ? (alias ? s : a) : NULL, subtract, x, stride1, y, stride2, len, R);
+    status |= gr_generic_vec_dot_strided(t, initial ? (alias ? t : a) : NULL, subtract, x, stride1, y, stride2, len, R);
+
+    if (status == GR_SUCCESS && gr_equal(s, t, R) == T_FALSE)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("dot_strided\n");
+        gr_ctx_println(R);
+        flint_printf("alias: %d\n", alias);
+        flint_printf("initial: %d\n", initial);
+        flint_printf("subtract: %d\n", subtract);
+        flint_printf("stride: %wd, %wd\n", stride1, stride2);
+        _gr_vec_print(x, 2 * len, R); flint_printf("\n");
+        _gr_vec_print(y, 2 * len, R); flint_printf("\n");
+        gr_println(a, R);
+        gr_println(s, R);
+        gr_println(t, R);
+    }
+
+    GR_TMP_CLEAR_VEC(x, 2 * len, R);
+    GR_TMP_CLEAR_VEC(y, 2 * len, R);
     GR_TMP_CLEAR3(a, s, t, R);
 
     return status;
@@ -4994,6 +5067,11 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "vec_mul_scalar", gr_test_vec_mul_scalar, vec_iters, test_flags);
 
     gr_test_iter(R, state, "vec_dot", gr_test_vec_dot, iters, test_flags);
+
+    if (GR_VEC_DOT_STRIDED_OP(R, VEC_DOT_STRIDED) != (gr_method_vec_dot_strided_op) gr_generic_vec_dot_strided)
+    {
+        gr_test_iter(R, state, "vec_dot_strided", gr_test_vec_dot_strided, iters, test_flags);
+    }
 
     gr_test_iter(R, state, "mat_mul_classical: associative", gr_test_mat_mul_classical_associative, iters, test_flags);
 

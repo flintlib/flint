@@ -239,6 +239,12 @@ performed at the very end of the computation.
 
     The same as ``_nmod_vec_dot``, but reverses ``vec2``.
 
+.. function:: ulong _nmod_vec_dot_strided(nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, nmod_t mod, dot_params_t params)
+
+    The same as ``_nmod_vec_dot``, but reads entries at index `i \cdot stride1`
+    of ``vec1`` and `i \cdot stride2` of ``vec2``.
+    The strides may be negative.
+
 .. function:: ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
 
     Returns the dot product of (``vec1``, ``len``) and the values at

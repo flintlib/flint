@@ -55,10 +55,22 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
         (twall) = __timer->wall*0.001 / __reps; \
     } while (0);
 
-#if 1
+#if 0
 #define INIT_CTX gr_ctx_init_nmod(ctx, n_nextprime(UWORD(1) << (bits - 1), 0));
 #define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx))
-#define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
+#define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits += 8, j++)
+#endif
+
+#if 0
+#define INIT_CTX gr_ctx_init_real_arb(ctx, bits);
+#define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randlimb(state), ctx)); GR_IGNORE(gr_div_ui(t, t, UWORD_MAX, ctx))
+#define STEP_BITS for (bits = 64, j = 0; bits <= 131072; bits *= 2, j++)
+#endif
+
+#if 1
+#define INIT_CTX gr_ctx_init_fmpq(ctx);
+#define RANDCOEFF(t, ctx) GR_IGNORE(gr_set_ui(t, n_randint(state, 10), ctx)); GR_IGNORE(gr_div_ui(t, t, 1 + n_randint(state, 3), ctx))
+#define STEP_BITS for (bits = 1, j = 0; bits <= 1; bits++, j++)
 #endif
 
 #if 0
@@ -134,11 +146,27 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #endif
 
 #if 0
-#define INFO "exp_series (mul-> newton)"
+#define INFO "exp_series (mul -> newton)"
 #define SETUP random_input(A, state, len, ctx); \
               GR_IGNORE(gr_poly_set_coeff_si(A, 0, 0, ctx));
 #define CASE_A GR_IGNORE(gr_poly_exp_series_basecase_mul(B, A, len, ctx));
 #define CASE_B GR_IGNORE(gr_poly_exp_series_newton(B, A, len, len, ctx));
+#endif
+
+#if 0
+#define INFO "sin_cos_series (basecase -> newton)"
+#define SETUP random_input(A, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(A, 0, 0, ctx));
+#define CASE_A GR_IGNORE(gr_poly_sin_cos_series_basecase(B, C, A, len, 0, ctx));
+#define CASE_B GR_IGNORE(gr_poly_sin_cos_series_newton(B, C, A, len, len, 0, ctx));
+#endif
+
+#if 1
+#define INFO "tan_series (basecase -> newton)"
+#define SETUP random_input(A, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(A, 0, 0, ctx));
+#define CASE_A GR_IGNORE(gr_poly_tan_series_basecase(B, A, len, 0, ctx));
+#define CASE_B GR_IGNORE(gr_poly_tan_series_newton(B, A, len, len, 0, ctx));
 #endif
 
 
@@ -236,7 +264,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcpt
 #define CASE_B GR_MUST_SUCCEED(gr_poly_gcd_hgcd(C, A, B, len / 3, len, ctx));
 #endif
 
-#if 1
+#if 0
 #define MOD ((nmod_t *) gr_ctx_data_ptr(ctx))[0]
 #define BASECASE (NMOD_POLY_GCD_EUCLIDEAN_USE_REDC_FAST(FLINT_MIN(A->length, B->length), MOD) ? _nmod_poly_gcd_euclidean_redc_fast : _nmod_poly_gcd_euclidean)
 

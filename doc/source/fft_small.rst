@@ -6,6 +6,9 @@
 This module currently requires building FLINT with support for
 AVX2 or NEON instructions.
 
+The truncated FFT routines used internally by this module follow the
+approach described by van der Hoeven in [vdH2004]_.
+
 Integer multiplication
 --------------------------------------------------------------------------------
 
@@ -19,6 +22,7 @@ Integer multiplication
 .. function:: void mpn_ctx_init(mpn_ctx_t R, ulong p)
 
     Initialize multiplication context object with initial prime ``p``.
+    Usually ``p`` is a constant provided by :func:`get_default_mpn_ctx`.
 
 .. function:: void mpn_ctx_clear(mpn_ctx_t R)
 

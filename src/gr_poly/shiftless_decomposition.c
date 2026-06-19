@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "gr.h"
 #include "gr_poly.h"
 #include "gr_vec.h"
@@ -29,8 +30,8 @@ cmp(const void * i, const void * j, void * data)
 
 int
 _gr_poly_shiftless_decomposition_from_factors(
-        gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
-        const gr_vec_t fac, const gr_vec_t mult,
+        gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
+        const gr_poly_vec_t fac, const fmpz_vec_t mult,
         gr_ctx_t ctx)
 {
     gr_ctx_t pctx, ZZ, ZZvec;
@@ -53,13 +54,13 @@ _gr_poly_shiftless_decomposition_from_factors(
 
     for (slong i = 0; i < fac->length; i++)
     {
-        const gr_poly_struct * f = gr_vec_entry_srcptr(fac, i, pctx);
-        const fmpz * m = gr_vec_entry_srcptr(mult, i, ZZ);
+        const gr_poly_struct * f = gr_poly_vec_entry_srcptr(fac, i, ctx);
+        const fmpz * m = fmpz_vec_entry_srcptr(mult, i);
         slong j = 0;
 
         for (; j < slfac->length; j++)
         {
-            const gr_poly_struct * sl = gr_vec_entry_srcptr(slfac, j, pctx);
+            const gr_poly_struct * sl = gr_poly_vec_entry_srcptr(slfac, j, ctx);
 
             int equiv = gr_poly_shift_equivalent(shift, sl, f, ctx);
             if (equiv == T_TRUE)
@@ -73,7 +74,7 @@ _gr_poly_shiftless_decomposition_from_factors(
 
         if (j == slfac->length)
         {
-            status |= gr_vec_append(slfac, f, pctx);
+            status |= gr_poly_vec_append(slfac, f, ctx);
             gr_vec_fit_length(slshifts, ++slshifts->length, ZZvec);
             gr_vec_fit_length(slmult, ++slmult->length, ZZvec);
         }
@@ -87,7 +88,7 @@ _gr_poly_shiftless_decomposition_from_factors(
     for (slong j = 0; j < slfac->length; j++)
     {
 
-        gr_poly_struct * f = gr_vec_entry_ptr(slfac, j, pctx);
+        gr_poly_struct * f = gr_poly_vec_entry_ptr(slfac, j, ctx);
         gr_vec_struct * shifts = gr_vec_entry_ptr(slshifts, j, ZZvec);
         gr_vec_struct * shmult = gr_vec_entry_ptr(slmult, j, ZZvec);
 
@@ -122,34 +123,30 @@ cleanup:
 
 int
 gr_poly_shiftless_decomposition_from_factors(
-        gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
-        const gr_vec_t fac, const gr_vec_t mult,
+        gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
+        const gr_poly_vec_t fac, const fmpz_vec_t mult,
         gr_ctx_t ctx)
 {
-    gr_ctx_t pctx;
-    gr_vec_t _slfac;
-
-    gr_ctx_init_gr_poly(pctx, ctx);
-    gr_vec_init(_slfac, 0, pctx);
+    gr_poly_vec_t _slfac;
+    gr_poly_vec_init(_slfac, 0, ctx);
 
     int status = _gr_poly_shiftless_decomposition_from_factors(
             _slfac, slshifts, slmult, fac, mult, ctx);
-    FLINT_SWAP(gr_vec_struct, *slfac, *_slfac);
+    FLINT_SWAP(gr_poly_vec_struct, *slfac, *_slfac);
 
-    gr_vec_clear(_slfac, pctx);
-    gr_ctx_clear(pctx);
+    gr_poly_vec_clear(_slfac, ctx);
 
     return status;
 }
 
 int
 gr_poly_shiftless_decomposition_factor(
-        gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
+        gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
         const gr_poly_t pol,
         gr_ctx_t ctx)
 {
     gr_ctx_t pctx, ZZ;
-    gr_vec_t mult;
+    fmpz_vec_t mult;
     gr_poly_t polc;
 
     if (gr_poly_is_zero(pol, ctx) == T_TRUE)
@@ -159,11 +156,11 @@ gr_poly_shiftless_decomposition_factor(
     gr_ctx_init_gr_poly(pctx, ctx);
 
     gr_poly_init(polc, ctx);
-    gr_vec_init(mult, 0, ZZ);
+    fmpz_vec_init(mult, 0);
 
     int status = GR_SUCCESS;
 
-    status |= gr_factor(polc, slfac, mult, pol, 0, pctx);
+    status |= gr_factor(polc, (gr_vec_struct *) slfac, mult, pol, 0, pctx);
     if (status != GR_SUCCESS)
         goto cleanup;
 
@@ -175,7 +172,7 @@ gr_poly_shiftless_decomposition_factor(
 
 cleanup:
     gr_poly_clear(polc, ctx);
-    gr_vec_clear(mult, ZZ);
+    fmpz_vec_clear(mult);
 
     gr_ctx_clear(pctx);
     gr_ctx_clear(ZZ);
@@ -185,7 +182,7 @@ cleanup:
 
 int
 gr_poly_shiftless_decomposition(
-        gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
+        gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult,
         const gr_poly_t pol,
         gr_ctx_t ctx)
 {

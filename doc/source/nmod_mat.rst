@@ -590,7 +590,6 @@ Nonsingular square solving
     elements of `x` to undefined values.
 
 
-
 LU decomposition
 --------------------------------------------------------------------------------
 
@@ -622,7 +621,11 @@ LU decomposition
     The *recursive* version uses block recursive decomposition.
     The default function chooses an algorithm automatically.
 
+.. function:: slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A)
 
+    Like :func:`nmod_mat_lu` with ``rank_check`` 0, but additionally
+    writes to ``pivots_nonpivots`` the indices of the pivot columns in order,
+    followed by the indices of the nonpivot columns in order.
 
 Reduced row echelon form
 --------------------------------------------------------------------------------
@@ -714,13 +717,14 @@ Characteristic polynomial
 --------------------------------------------------------------------------------
 
 .. function:: void nmod_mat_charpoly_berkowitz(nmod_poly_t p, const nmod_mat_t M)
-              void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
+              int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
               void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.
-    The *danilevsky* algorithm assumes that the modulus is prime.
-
+    The *danilevsky* algorithm returns 1 on success and 0 indicating failure
+    if it encounters an impossible inverse; it is guaranteed to succeed if
+    the modulus is prime.
 
 Minimal polynomial
 --------------------------------------------------------------------------------

@@ -54,6 +54,7 @@
 #include "t-evaluate_nmod_vec_fast.c"
 #include "t-evaluate_geometric_nmod_vec_fast.c"
 #include "t-exp_series.c"
+#include "t-extrapolate_geometric.c"
 #include "t-find_distinct_nonzero_roots.c"
 #include "t-fread_print.c"
 #include "t-gcd.c"
@@ -187,6 +188,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_evaluate_nmod_vec_fast),
     TEST_FUNCTION(nmod_poly_evaluate_geometric_nmod_vec_fast),
     TEST_FUNCTION(nmod_poly_exp_series),
+    TEST_FUNCTION(nmod_poly_extrapolate_geometric),
     TEST_FUNCTION(nmod_poly_find_distinct_nonzero_roots),
     TEST_FUNCTION(nmod_poly_fread_print),
     TEST_FUNCTION(nmod_poly_gcd),

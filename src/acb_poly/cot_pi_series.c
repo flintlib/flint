@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_poly.h"
 #include "acb_poly.h"
 
 void
@@ -23,51 +24,10 @@ _acb_poly_cot_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong len, slong pr
     }
     else
     {
-        acb_ptr t, u;
-
-        t = _acb_vec_init(len);
-        u = _acb_vec_init(len);
-
-        if (arf_cmpabs_2exp_si(arb_midref(acb_imagref(h)), 0) < 0)
-        {
-            _acb_poly_sin_cos_pi_series(t, u, h, hlen, len, prec);
-            _acb_poly_div_series(g, u, len, t, len, len, prec);
-        }
-        else
-        {
-            _acb_vec_scalar_mul_2exp_si(t, h, hlen, 1);
-
-            if (arf_sgn(arb_midref(acb_imagref(h))) > 0)
-            {
-                acb_const_pi(u, prec);
-                acb_mul_onei(u, u);
-                _acb_vec_scalar_mul(t, t, hlen, u, prec);
-                _acb_poly_exp_series(t, t, hlen, len, prec);
-                acb_sub_ui(u, t, 1, prec);
-                _acb_vec_set(u + 1, t + 1, len - 1);
-                _acb_poly_div_series(g, t, len, u, len, len, prec);
-                _acb_vec_scalar_mul_2exp_si(g, g, len, 1);
-                acb_sub_ui(g, g, 1, prec);
-                _acb_vec_scalar_mul_onei(g, g, len);
-            }
-            else
-            {
-                acb_const_pi(u, prec);
-                acb_div_onei(u, u);
-                _acb_vec_scalar_mul(t, t, hlen, u, prec);
-                _acb_poly_exp_series(t, t, hlen, len, prec);
-                acb_sub_ui(u, t, 1, prec);
-                _acb_vec_set(u + 1, t + 1, len - 1);
-                _acb_poly_div_series(g, t, len, u, len, len, prec);
-                _acb_vec_scalar_mul_2exp_si(g, g, len, 1);
-                acb_sub_ui(g, g, 1, prec);
-                _acb_vec_scalar_mul_onei(g, g, len);
-                _acb_vec_neg(g, g, len);
-            }
-        }
-
-        _acb_vec_clear(t, len);
-        _acb_vec_clear(u, len);
+        gr_ctx_t ctx;
+        gr_ctx_init_complex_acb(ctx, prec);
+        if (_gr_poly_cot_pi_series(g, h, hlen, len, ctx) != GR_SUCCESS)
+            _acb_vec_indeterminate(g, len);
     }
 }
 

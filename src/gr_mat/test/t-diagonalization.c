@@ -29,7 +29,7 @@ TEST_FUNCTION_START(gr_mat_diagonalization, state)
         int status = GR_SUCCESS;
         int haveL, haveR;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
         n = n_randint(state, 5);
         haveL = n_randint(state, 2);
         haveR = n_randint(state, 2);

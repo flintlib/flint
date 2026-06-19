@@ -338,6 +338,7 @@ int arb_contains_int(const arb_t x);
 
 void arb_get_interval_fmpz_2exp(fmpz_t a, fmpz_t b, fmpz_t exp, const arb_t x);
 int arb_get_unique_fmpz(fmpz_t z, const arb_t x);
+int arb_get_simplest_fmpq(fmpq_t res, const arb_t x);
 
 void arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, slong n);
 
@@ -662,7 +663,9 @@ void _arb_vec_sub(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 void _arb_vec_add(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 
 void _arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
+void _arb_vec_scalar_mul_arf(arb_ptr res, arb_srcptr vec, slong len, const arf_t c, slong prec);
 void _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec);
+void _arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong prec);
 void _arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c);
 void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
 void _arb_vec_scalar_addmul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);

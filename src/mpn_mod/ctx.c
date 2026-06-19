@@ -13,6 +13,13 @@
 #include "mpn_mod.h"
 #include "gr.h"
 
+static int
+_mpn_mod_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui_array(res, MPN_MOD_CTX_MODULUS(ctx), MPN_MOD_CTX_NLIMBS(ctx));
+    return GR_SUCCESS;
+}
+
 int _mpn_mod_methods_initialized = 0;
 
 gr_static_method_table _mpn_mod_methods;
@@ -100,6 +107,9 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) mpn_mod_is_square},
 */
 
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) mpn_mod_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) _mpn_mod_ctx_fq_prime},
+
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _mpn_mod_vec_zero},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _mpn_mod_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _mpn_mod_vec_set},
@@ -116,6 +126,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _mpn_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _mpn_mod_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _mpn_mod_vec_dot_strided},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _mpn_mod_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _mpn_mod_poly_mulmid},

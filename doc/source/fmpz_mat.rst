@@ -433,11 +433,11 @@ Modular reduction and reconstruction
     with entries satisfying `-mn/2 <= c < mn/2` (if sign = 1)
     or `0 <= c < mn` (if sign = 0).
 
-.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
+.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb)
 
     Sets each of the ``nres`` matrices in ``residues`` to ``mat`` reduced modulo
-    the modulus of the respective matrix, given precomputed ``comb`` and
-    ``comb_temp`` structures.
+    the modulus of the respective matrix, given a precomputed ``comb``
+    structure.
 
     Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
     this function to be declared.
@@ -451,10 +451,10 @@ Modular reduction and reconstruction
     For reducing or reconstructing multiple integer matrices over the same
     set of moduli, it is faster to use ``fmpz_mat_multi_mod_precomp``.
 
-.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
+.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, int sign)
 
     Reconstructs ``mat`` from its images modulo the ``nres`` matrices in
-    ``residues``, given precomputed ``comb`` and ``comb_temp`` structures.
+    ``residues``, given a precomputed ``comb`` structure.
 
     Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
     this function to be declared.
@@ -787,16 +787,20 @@ Determinant
 
 .. function:: void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 
-    Sets ``bound`` to a nonnegative integer `B` such that
-    `|\det(A)| \le B`. Assumes `A` to be a square matrix.
-    The bound is computed from the Hadamard inequality
-    `|\det(A)| \le \prod \|a_i\|_2` where the product is taken
-    over the rows `a_i` of `A`.
+    Assuming that `A` is a square matrix, sets ``bound`` to a nonnegative
+    integer `B` such that `|\det(A)| \le B`. The bound is computed from the
+    Hadamard inequality `|\det(A)| \le \prod \|a_i\|_2` where the product is
+    taken over the rows `a_i` of `A`. The same bound is also computed
+    columnwise and the minimum of the two bounds is returned.
 
-.. function:: void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+.. function:: void fmpz_mat_det_bound_submatrix(fmpz_t bound, const fmpz_mat_t A)
 
-    As per ``fmpz_mat_det_bound()`` but excludes zero columns. For use with
-    non-square matrices.
+    Given an arbitrary matrix `A`, returns a bound for the
+    determinant of any square submatrix of `A` obtained by removing any
+    number of rows and/or columns. This uses the same algorithm as
+    :func:`fmpz_mat_det_bound`, but excludes row and column norms which are zero.
+    The bound may be suboptimal if the number of rows is significantly larger
+    or smaller than the number of columns.
 
 .. function:: void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
@@ -839,39 +843,49 @@ Transforms
 Characteristic polynomial
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_mat_charpoly_bound(fmpz_t bound, const fmpz_mat_t A)
+
+    Compute a bound for the absolute value of the coefficients `c_k` of the
+    characteristic polynomial of `A` which is required to be an `n \times n`
+    (square) matrix. We use the fact that
+
+    .. math ::
+
+        c_{n-k} = (-1)^k \sum_{\substack{S \subseteq \{1,\ldots,n\} \\ |S|=k}} \det(A_S)
+
+    where `A_S` is the `k \times k` principal submatrix of `A` with rows
+    and columns indexed by `S`. Counting the number of terms and applying
+    Hadamard's bound to the determinants gives
+
+    .. math ::
+
+        |c_{n-k}| \le \binom{n}{k} \max_{\substack{S \subseteq \{1,\ldots,n\} \\ |S|=k}}
+           \prod_{i \in S} \|r_i\|_2
+           = \binom{n}{k} \prod_{i=1}^{k} \|r_i\|_2
+
+    where `r_1, \ldots, r_n` are the rows of `A` indexed in order of decreasing
+    Euclidean norm. We compute the maximum of these bounds for all `k`.
+    The same computation is done both rowwise and columnwise and the minimum
+    of these bounds is returned.
 
 .. function:: void _fmpz_mat_charpoly_berkowitz(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
+    Compute the characteristic polynomial of an `n \times n` square matrix.
+    The underscore methods write `n + 1` coefficients.
 
-.. function:: void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses an `O(n^4)` algorithm based on the
-    method of Berkowitz.
-
-.. function:: void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses a modular method based on an `O(n^3)`
-    method over `\mathbb{Z}/n\mathbb{Z}`.
-
-.. function:: void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix.
-
+    The *berkowitz* algorithm is a wrapper of :func:`gr_mat_charpoly_berkowitz`.
+    The *modular* algorithm computes the characteristic polynomial modulo
+    several primes and combines them using CRT, using the bound
+    returned by :func:`fmpz_mat_charpoly_bound` to guarantee that sufficiently
+    many primes are chosen. This algorithm supports multithreading.
+    The default algorithm handles various special cases and otherwise
+    delegates to the *berkowitz* or *modular* algorithms depending on the
+    size of the input.
 
 Minimal polynomial
 --------------------------------------------------------------------------------
@@ -1144,18 +1158,44 @@ Row reduction
     and returns the rank of ``A``. Aliasing of ``A`` and ``B``
     is allowed.
 
-    The algorithm works by computing the reduced row echelon form of ``A``
-    modulo a prime `p` using ``nmod_mat_rref``. The pivot columns and rows
+    The algorithm works by computing an echelon form of ``A``
+    modulo a prime `p`. The pivot columns and rows
     of this matrix will then define a non-singular submatrix of ``A``,
     nonsingular solving and matrix multiplication can then be used to determine
     the reduced row echelon form of the whole of ``A``. This procedure is
-    described in [Stein2007]_.
+    described in [Stein2007]_. The certification
+    step itself is implemented by :func:`fmpz_mat_compressed_rref_given_mod_p_structure`.
 
 .. function:: int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank)
 
     Checks that the matrix `A/den` is in reduced row echelon form of rank
     ``rank``, returns 1 if so and 0 otherwise.
 
+.. function:: int fmpz_mat_rref_upper_certify_lu_mod_p(fmpz_mat_t E, fmpz_t den, const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs)
+
+    Given the echelon structure for the `m \times n` matrix *A* computed
+    modulo some prime `p`, attempt to compute a certified RREF of *A* over
+    `\mathbb{Z}`.
+
+    The user supplies the following data from an LU factorization as computed by
+    :func:`nmod_mat_lu_with_pivots` (or an equivalent procedure):
+    the mod-`p` *rank*, row permutations *P*, and an array *pivs*
+    containing the the *rank* pivot column positions followed by the `n - rank`
+    non-pivot column positions.
+    The output matrix *E* is *rank* by *n*, must be zero-initialized by the caller,
+    and must not be aliased with *A*.
+
+    Returns 1 if the rank is certified: *E* will then hold the top *rank* rows
+    of the RREF of *A* with common denominator *den*.
+
+    Returns 0 if the prime was unlucky (the mod-`p` rank is below the true rank,
+    or the remaining rows are not in the row span); the contents of *E* and *den*
+    are then unspecified and the caller should try another prime.
+
+.. function:: int fmpz_mat_rank_certify_lu_mod_p(const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs)
+
+    As :func:`fmpz_mat_rref_upper_certify_lu_mod_p`, certifying the
+    rank without storing the echelon form.
 
 Strong echelon form and Howell form
 --------------------------------------------------------------------------------
@@ -1197,30 +1237,6 @@ Nullspace
     the pivot entries in `B` will generally differ from unity.
     `B` must be allocated with sufficient space to represent the result
     (at most `n \times n` where `n` is the number of columns of `A`).
-
-
-
-Echelon form
---------------------------------------------------------------------------------
-
-
-.. function:: slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
-
-    Computes an integer matrix ``B`` and an integer ``den`` such that
-    ``B / den`` is the unique row reduced echelon form (RREF) of ``A``
-    and returns the rank, i.e. the number of nonzero rows in ``B``.
-
-    Aliasing of ``B`` and ``A`` is allowed, with an in-place
-    computation being more efficient. The size of ``B`` must be
-    the same as that of ``A``.
-
-    The permutation order will be written to ``perm`` unless this
-    argument is ``NULL``. That is, row ``i`` of the output matrix will
-    correspond to row ``perm[i]`` of the input matrix.
-
-    The denominator will always be a divisor of the determinant of (some
-    submatrix of) `A`, but is not guaranteed to be minimal or canonical in
-    any other sense.
 
 
 Hermite normal form

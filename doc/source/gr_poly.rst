@@ -99,6 +99,58 @@ Memory management
 
 .. function:: void _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx)
 
+
+Vectors of polynomials
+-------------------------------------------------------------------------------
+ 
+.. type:: gr_poly_vec_struct
+          gr_poly_vec_t
+ 
+    A resizable vector of :type:`gr_poly_t` elements. Unlike
+    :type:`gr_vec_t`, this type stores actual :type:`gr_poly_struct`
+    objects, so no polynomial-ring context object is needed: the *ctx* argument
+    refers directly to the coefficient ring of the polynomials. It is safe to
+    cast a :type:`gr_poly_vec_t` to a :type:`gr_vec_t` (with :type:`gr_poly_t`
+    elements of the correct type) and vice versa.
+
+.. function:: void gr_poly_vec_init(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
+ 
+    Initializes *vec* to a vector of length *len* with all entries
+    set to the zero polynomial over *ctx*. The length must be nonnegative.
+ 
+.. function:: void gr_poly_vec_clear(gr_poly_vec_t vec, gr_ctx_t ctx)
+ 
+    Clears the vector *vec*, freeing all allocated memory.
+ 
+.. function:: gr_poly_struct * gr_poly_vec_entry_ptr(gr_poly_vec_t vec, slong i, gr_ctx_t ctx)
+              const gr_poly_struct * gr_poly_vec_entry_srcptr(const gr_poly_vec_t vec, slong i, gr_ctx_t ctx)
+ 
+    Returns a pointer to the *i*-th polynomial in the vector, indexed from zero.
+    The index must be in bounds.
+ 
+.. function:: slong gr_poly_vec_length(const gr_poly_vec_t vec, gr_ctx_t ctx)
+ 
+    Returns the length of the vector.
+ 
+.. function:: void gr_poly_vec_fit_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
+ 
+    Allocates space for at least *len* elements. This does not change
+    the length of the vector.
+ 
+.. function:: void gr_poly_vec_set_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx)
+ 
+    Resizes the vector to length *len*, which must be nonnegative.
+    The vector will be extended with zero polynomials if necessary.
+ 
+.. function:: int gr_poly_vec_set(gr_poly_vec_t res, const gr_poly_vec_t src, gr_ctx_t ctx)
+ 
+    Sets *res* to a copy of *src*.
+ 
+.. function:: int gr_poly_vec_append(gr_poly_vec_t vec, const gr_poly_t f, gr_ctx_t ctx)
+ 
+    Appends the polynomial *f* to the end of the vector.
+
+
 Basic manipulation
 -------------------------------------------------------------------------------
 
@@ -235,8 +287,8 @@ Multiplication algorithms
     algorithm with `O(n^{1.6})` complexity, the ring must overload :func:`_gr_poly_mul` to dispatch
     to :func:`_gr_poly_mul_karatsuba` above some cutoff.
 
-.. function:: int _gr_poly_mul_toom33(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
-              int gr_poly_mul_toom33(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
+.. function:: int _gr_poly_mul_toom33(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_mul_toom33(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
 
     Balanced Toom-3 multiplication with interpolation in five points,
     using the Bodrato evaluation scheme. Assumes commutativity and that the ring
@@ -358,6 +410,7 @@ Scalar division
 --------------------------------------------------------------------------------
 
 .. function:: int gr_poly_div_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+              int gr_poly_divexact_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
 
 Division with remainder
 --------------------------------------------------------------------------------
@@ -902,8 +955,8 @@ GCD
 
     GCD in the polynomial ring `R[x]`.
 
-    The *gcd_subresultant* algorithm assumes that *R* is a unique factorization
-    domain. The *euclidean* and *hgcd* algorithms assume that *R* is a field.
+    The *gcd_subresultant* algorithm assumes that *R* is a GCD domain.
+    The *euclidean* and *hgcd* algorithms assume that *R* is a field.
     The time complexity of the half-GCD algorithm is `\mathcal{O}(n \log^2 n)`
     field operations. For further details, see [ThullYap1990]_.
 
@@ -922,13 +975,48 @@ GCD
 
 .. function:: int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
-
-.. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_xgcd_hgcd(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
               int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
-
-.. function:: int _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int _gr_poly_xgcd_subresultant(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_xgcd_subresultant(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int _gr_poly_xgcd(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_xgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+
+    Given `A, B \in R[x]` where `R` is assumed to be a GCD domain, compute
+    `G, S, T` satisfying `G = S A + T B` where `G` is an associate of
+    `\gcd(A,B)`. Over a field, `G` will be the monic GCD of
+    `A` and `B`; over a ring, it may differ from the GCD by a scalar
+    factor that divides the resultant of `A` and `B`.
+
+    The following algorithms are implemented:
+
+    * *euclidean* is the standard Euclidean algorithm. It is correct over
+      fields, but may succeed over non-fields if all occurring divisions by
+      leading coefficients succeed.
+    * *hgcd* is the asymptotically fast half-GCD algorithm. The assumptions
+      are the same as for the Euclidean algorithm.
+    * *subresultant* uses the subresultant PRS method. It works over any GCD
+      domain, e.g. over `\mathbb{Z}`.
+    * *generic* attempts to choose the best method automatically.
+    * the default method may be overridden by the base ring.
+
+    The underscore methods require
+    `\operatorname{lenA} \ge \operatorname{lenB} \ge 2` and do not
+    allow aliasing. The output buffers must have the capacities
+
+    * `\operatorname{lenB}` coefficients for *G*
+    * `\operatorname{lenB} - 1` coefficients for *S*
+    * `\operatorname{lenA} - 1` coefficients for *T*
+
+    even if the final results are known in advance to be shorter.
+
+    For *G*, the final length is written to *lenG* and any higher
+    coefficients may be left with garbage values. An output of
+    `\operatorname{lenG} = 0` is possible if the algorithm terminates
+    abnormally, e.g. due to a failed division.
+    For *S* and *T*, the unused high parts of the output buffers will be zeroed
+    on successful termination.
 
 Resultant
 -------------------------------------------------------------------------------
@@ -948,6 +1036,8 @@ of the two polynomials is zero.
               int gr_poly_resultant_euclidean(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
               int gr_poly_resultant_hgcd(gr_ptr res, const gr_poly_t f, const gr_poly_t g, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
+              int _gr_poly_resultant_subresultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_resultant_subresultant(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_sylvester(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_resultant_sylvester(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_small(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
@@ -973,6 +1063,9 @@ of the two polynomials is zero.
     Currently this function handles the cases where `len1 \le 2`
     or `len2 \le 3`.
 
+    The *subresultant* version uses the subresultant PRS algorithm.
+    It is valid whenever the ring is a GCD domain.
+
     The *sylvester* version constructs the Sylvester matrix
     and computes its determinant. This is useful over inexact rings
     and as a fallback for rings without division.
@@ -980,28 +1073,39 @@ of the two polynomials is zero.
     The default version attempts to choose an appropriate
     algorithm automatically.
 
-    Currently no algorithm has been implemented that is appropriate for
-    integral domains.
-
 
 Squarefree factorization
 -------------------------------------------------------------------------------
 
-TODO: currently only fields of characteristic 0 are supported.
+.. function:: int gr_poly_factor_squarefree(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t poly, gr_ctx_t ctx)
 
-.. function:: int gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t poly, gr_ctx_t ctx)
+    Computes a squarefree factorization
 
-    Computes a squarefree factorization of *poly*.
+    .. math ::
+
+        poly = c \prod_i {g_i}^{e_i}.
+
+    On success, *fac* is set to a vector of pairwise coprime squarefree
+    factors `g_i` with respective multiplicities `e_i` in *exp*.
+    The order of the factors is arbitrary.
+    The user must initialize *fac* to a vector of polynomials of the same
+    type as *poly*.
 
     The constant *c* is set to an element of the scalar ring.
-    The factors in *fac* are set to polynomials; the user must thus
-    initialize it to a vector of polynomials of the same type as
-    *poly* (and *not* to the parent *ctx*).
-    The exponent vector *exp* must be initialized to the *fmpz* type.
+    If *ctx* is known to be a field, all factors will be monic and the
+    leading coefficient of *poly* is stored in *c*.
+    Otherwise, the factors are normalized to be content-free and to have
+    a canonical associate as the leading coefficient; *c* will be set
+    to a unit multiple of the content of *poly*.
+    Note that *c* itself is not factored over the base ring.
+
+    This function requires that *ctx* is a unique factorization domain
+    and returns ``GR_UNABLE`` if this cannot be verified.
 
 .. function:: int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx)
 
-    Sets *res* to the squarefreepart of *poly*.
+    Sets *res* to the squarefree part of *poly*. In terms of the squarefree
+    factorization, this corresponds to the canonical associate of `\prod_i g_i`.
 
 Shift equivalence
 -------------------------------------------------------------------------------
@@ -1016,9 +1120,9 @@ Shift equivalence
 
     Computes (if possible) *s* such that `p(x+s) = q(x)(1+O(x^2))`.
 
-.. function:: int gr_poly_dispersion_resultant(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
-              int gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
-              int gr_poly_dispersion(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+.. function:: int gr_poly_dispersion_resultant(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+              int gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
+              int gr_poly_dispersion(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
 
     Computes the dispersion and/or the dispersion set of *f* and *g*.
 
@@ -1036,15 +1140,14 @@ Shift equivalence
     The *resultant* version computes the integer roots of a bivariate resultant
     and is mainly intended for testing.
 
-.. function:: int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_vec_t ffac, const gr_vec_t gfac, gr_ctx_t ctx);
+.. function:: int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_poly_vec_t ffac, const gr_poly_vec_t gfac, gr_ctx_t ctx)
 
     Same as :func:`gr_poly_dispersion_factor` for nonzero *f* and *g* but takes
     as input their nonconstant irreducible factors (without multiplicities)
     instead of the polynomials themselves.
 
-.. function:: int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
-              int gr_poly_shiftless_decomposition(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
-
+.. function:: int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition(gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t f, gr_ctx_t ctx)
 
     Computes a decomposition of *f* of the form
 
@@ -1071,8 +1174,8 @@ Shift equivalence
     No algorithm avoiding a full irreducible factorization is currently
     implemented.
 
-.. function:: int _gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
-              int gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx)
+.. function:: int _gr_poly_shiftless_decomposition_from_factors(gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_vec_t fac, const fmpz_vec_t mult, gr_ctx_t ctx)
+              int gr_poly_shiftless_decomposition_from_factors(gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_vec_t fac, const fmpz_vec_t mult, gr_ctx_t ctx)
 
     Same as :func:`gr_poly_shiftless_decomposition_factor` but takes as input
     an irreducible factorization (*fac*, *mult*) of *f* (without the
@@ -1082,8 +1185,8 @@ Shift equivalence
 Roots
 -------------------------------------------------------------------------------
 
-.. function:: int gr_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
-              int gr_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx)
+.. function:: int gr_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+              int gr_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx)
 
     Finds all roots of the given polynomial in the ring defined by *ctx*,
     storing the roots without duplication in *roots* (a vector with
@@ -1165,10 +1268,50 @@ Power series special functions
               int _gr_poly_exp_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
               int gr_poly_exp_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
+.. function:: int _gr_poly_sin_cos_series(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int _gr_poly_sin_cos_pi_series(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_sin_cos_series(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int gr_poly_sin_cos_pi_series(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_sin_series(gr_ptr s, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_sin_series(gr_poly_t s, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_sin_pi_series(gr_ptr s, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_sin_pi_series(gr_poly_t s, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_cos_series(gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_cos_series(gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_cos_pi_series(gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_cos_pi_series(gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx)
+
+    Compute `s = \sin(h)`, `c = \cos(h)` as power series truncated to length `n`,
+    or `s = \sin(\pi h)`, `c = \cos(\pi h)` for the ``pi`` variants.
+    The underscore methods allow aliasing.
+
+.. function:: int _gr_poly_tan_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_tanh_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_tanh_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_cot_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_cot_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_coth_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_coth_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_tan_pi_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_tan_pi_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+              int _gr_poly_cot_pi_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
+              int gr_poly_cot_pi_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+
+    Compute the respective trigonometric and hyperbolic functions of power series
+    truncated to length `n`. The underscore methods allow aliasing.
+
 .. function:: int _gr_poly_sin_cos_series_basecase(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, int times_pi, gr_ctx_t ctx)
               int gr_poly_sin_cos_series_basecase(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, int times_pi, gr_ctx_t ctx)
               int _gr_poly_sin_cos_series_tangent(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, int times_pi, gr_ctx_t ctx)
               int gr_poly_sin_cos_series_tangent(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, int times_pi, gr_ctx_t ctx)
+              int _gr_poly_sin_cos_series_newton(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, slong cutoff, int times_pi, gr_ctx_t ctx)
+              int gr_poly_sin_cos_series_newton(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, slong cutoff, int times_pi, gr_ctx_t ctx)
+
+    Various algorithms to compute sine and cosine of power series.
+    The default functions (:func:`_gr_poly_sin_cos_series` et al.)
+    choose an algorithm automatically.
+    The *times_pi* flag specifies that the input is to be multiplied by `\pi`.
 
     The *basecase* version uses a simple recurrence for the coefficients,
     requiring `O(nm)` operations where `m` is the length of `h`.
@@ -1181,15 +1324,44 @@ Power series special functions
     `\sin(h_0 + h_1) = \cos(h_0) \sin(h_1) + \sin(h_0) \cos(h_1)`,
     `\cos(h_0 + h_1) = \cos(h_0) \cos(h_1) - \sin(h_0) \sin(h_1)`.
 
-    The *basecase* and *tangent* versions take a flag *times_pi*
-    specifying that the input is to be multiplied by `\pi`.
+    The *newton* version uses Newton iteration for `\exp(ih)`. The complex
+    parts are represented formally; complex arithmetic is not required.
+    The *cutoff* parameter specifies the initial length to compute with the
+    basecase algorithm.
 
-.. function:: int _gr_poly_tan_series_basecase(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
-              int gr_poly_tan_series_basecase(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
-              int _gr_poly_tan_series_newton(gr_ptr f, gr_srcptr h, slong hlen, slong n, slong cutoff, gr_ctx_t ctx)
-              int gr_poly_tan_series_newton(gr_poly_t f, const gr_poly_t h, slong n, slong cutoff, gr_ctx_t ctx)
-              int _gr_poly_tan_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
-              int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
+.. function:: int _gr_poly_tan_series_basecase(gr_ptr f, gr_srcptr h, slong hlen, slong n, int func, gr_ctx_t ctx)
+              int gr_poly_tan_series_basecase(gr_poly_t f, const gr_poly_t h, slong n, int func, gr_ctx_t ctx)
+              int _gr_poly_tan_series_newton(gr_ptr f, gr_srcptr h, slong hlen, slong n, slong cutoff, int func, gr_ctx_t ctx)
+              int gr_poly_tan_series_newton(gr_poly_t f, const gr_poly_t h, slong n, slong cutoff, int func, gr_ctx_t ctx)
+              int _gr_poly_tan_series_sine_cosine(gr_ptr f, gr_srcptr h, slong hlen, slong n, int func, gr_ctx_t ctx)
+              int gr_poly_tan_series_sine_cosine(gr_poly_t res, const gr_poly_t h, slong len, int func, gr_ctx_t ctx)
+              int _gr_poly_tan_series_exponential(gr_ptr f, gr_srcptr h, slong hlen, slong n, int func, gr_ctx_t ctx)
+              int gr_poly_tan_series_exponential(gr_poly_t res, const gr_poly_t h, slong len, int func, gr_ctx_t ctx)
+
+    Various algorithms to compute tangent-like functions of power series.
+    The *func* parameter specifies the function as follows:
+
+    * 0 - tan
+    * 1 - tanh
+    * 2 - cot
+    * 3 - coth
+    * 4 - tan_pi
+    * 5 - tanh_pi  (not currently implemented)
+    * 6 - cot_pi
+    * 7 - coth_pi  (not currently implemented)
+
+    The *basecase* algorithm uses an `O(n^2)` recurrence for the coefficients.
+    The *newton* algorithm uses Newton iteration to invert the integral
+    defining the corresponding inverse function; the *cutoff* parameter
+    specifies the initial length to compute with the basecase algorithm.
+    The *sine_cosine* algorithm computes the function as a quotient of
+    a sine and cosine; for the hyperbolic functions this algorithm requires that
+    the ring contains the imaginary unit.
+    The *exponential* algorithm computes the function as a quotient of
+    `\pm 1` plus an exponential, where the sign of the exponent is chosen
+    (if possible) so that the exponential is small. For the trigonometric
+    functions this algorithm requires that the ring contains the imaginary unit.
+
 
 Modular arithmetic and composition
 --------------------------------------------------------------------------------
@@ -1353,10 +1525,12 @@ ring is generated on each test iteration, otherwise the given ring is used.
     Tests the given function ``gcd_impl`` for correctness as an implementation
     of :func:`_gr_poly_gcd`.
 
-.. function:: void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+.. function:: void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, int flags, gr_ctx_t ctx)
 
     Tests the given function ``xgcd_impl`` for correctness as an implementation
-    of :func:`_gr_poly_xgcd`.
+    of :func:`_gr_poly_xgcd`. If *flags* is 1, the implementation is expected
+    to succeed over standard GCD domains, otherwise it is only expected to
+    succeed over fields.
 
 .. function:: void _gr_poly_test_approx_mulmid_pos_entrywise_accurate(gr_method_poly_binary_trunc2_op mulmid_impl, gr_method_poly_binary_trunc2_op mulmid_ref, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 

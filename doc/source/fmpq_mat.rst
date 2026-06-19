@@ -154,28 +154,25 @@ Addition, scalar multiplication
     the two matrices have the same dimensions.
 
 .. function:: void fmpq_mat_scalar_mul_fmpq(fmpq_mat_t rop, const fmpq_mat_t op, const fmpq_t x)
+.. function:: void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
+.. function:: void fmpq_mat_scalar_mul_si(fmpq_mat_t rop, const fmpq_mat_t op, slong x)
+.. function:: void fmpq_mat_scalar_mul_ui(fmpq_mat_t rop, const fmpq_mat_t op, ulong x)
 
-    Sets ``rop`` to ``op`` multiplied by the rational `x`,
+    Sets ``rop`` to ``op`` multiplied by the scalar ``x`` of the respective type,
     assuming that the two matrices have the same dimensions.
 
-    Note that the rational ``x`` may not be aliased with any part of the
+    Note that the scalar ``x`` may not be aliased with any part of the
     entries of ``rop``.
 
-.. function:: void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
-
-    Sets ``rop`` to ``op`` multiplied by the integer `x`,
-    assuming that the two matrices have the same dimensions.
-
-    Note that the integer `x` may not be aliased with any part of
-    the entries of ``rop``.
-
 .. function:: void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
+.. function:: void fmpq_mat_scalar_div_si(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
+.. function:: void fmpq_mat_scalar_div_ui(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
 
-    Sets ``rop`` to ``op`` divided by the integer `x`,
+    Sets ``rop`` to ``op`` divided by the integer ``x`` of the respective type,
     assuming that the two matrices have the same dimensions
-    and that `x` is non-zero.
+    and that ``x`` is non-zero.
 
-    Note that the integer `x` may not be aliased with any part of
+    Note that the integer ``x`` may not be aliased with any part of
     the entries of ``rop``.
 
 

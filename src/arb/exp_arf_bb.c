@@ -132,13 +132,13 @@ pmerge(arb_t res, const arb_t a, const arb_t b, pwork_t * work)
 }
 
 static void
-pinit(arb_t x, void * args)
+pinit(arb_t x, void * FLINT_UNUSED(args))
 {
     arb_init(x);
 }
 
 static void
-pclear(arb_t x, void * args)
+pclear(arb_t x, void * FLINT_UNUSED(args))
 {
     arb_clear(x);
 }

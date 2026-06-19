@@ -1632,10 +1632,22 @@ Primitive roots and discrete logarithms
 --------------------------------------------------------------------------------
 
 
+.. function:: ulong n_quadratic_nonresidue(ulong n)
+
+    Given an odd non-square `n`, returns an `a` with Jacobi symbol
+    `\left(\frac{a}{n}\right) = -1`. In particular, if `n` is prime, `a`
+    is a quadratic nonresidue modulo `n`.
+
+
 .. function:: ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 
-    Returns a primitive root for the multiplicative subgroup of `\mathbb{Z}/p\mathbb{Z}`
-    where `p` is prime given the factorisation (``factors``) of `p - 1`.
+    Given a prime `p` and a list of prime divisors of `p - 1` in
+    ``factors``, returns an element `a` of `(\mathbb{Z}/p\mathbb{Z})^*`
+    such that `a^{(p-1)/q} \ne 1` for every prime `q` in ``factors``.
+    The exponents in ``factors`` are ignored.
+
+    In particular, if ``factors`` contains all prime divisors of `p - 1`,
+    this returns a primitive root modulo `p`.
 
 
 .. function:: ulong n_primitive_root_prime(ulong p)

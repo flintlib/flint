@@ -148,6 +148,15 @@ gr_generic_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
+gr_generic_tanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+{
+    if (gr_is_zero(x, ctx) == T_TRUE)
+        return gr_zero(res, ctx);
+
+    return GR_UNABLE;
+}
+
+int
 gr_generic_asin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_is_zero(x, ctx) == T_TRUE)

@@ -28,6 +28,10 @@
 #include "t-one.c"
 #include "t-rank.c"
 #include "t-rref.c"
+#include "t-scalar_mul.c"
+#include "t-scalar_mul_fmpz.c"
+#include "t-scalar_mul_si.c"
+#include "t-scalar_mul_ui.c"
 #include "t-set_fmpz_mod_mat.c"
 #include "t-set_nmod_mat.c"
 #include "t-solve.c"
@@ -60,6 +64,10 @@ test_struct tests[] =
     TEST_FUNCTION(fq_zech_mat_one),
     TEST_FUNCTION(fq_zech_mat_rank),
     TEST_FUNCTION(fq_zech_mat_rref),
+    TEST_FUNCTION(fq_zech_mat_scalar_mul),
+    TEST_FUNCTION(fq_zech_mat_scalar_mul_fmpz),
+    TEST_FUNCTION(fq_zech_mat_scalar_mul_si),
+    TEST_FUNCTION(fq_zech_mat_scalar_mul_ui),
     TEST_FUNCTION(fq_zech_mat_set_fmpz_mod_mat),
     TEST_FUNCTION(fq_zech_mat_set_nmod_mat),
     TEST_FUNCTION(fq_zech_mat_solve),

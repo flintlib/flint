@@ -18,7 +18,7 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
             nn_srcptr v, const nmod_geometric_progression_t G, slong len, nmod_t mod)
 {
     FLINT_ASSERT(len <= G->len);
-    FLINT_ASSERT((G->function >> 1) & 1);
+    FLINT_ASSERT((G->function & UWORD(2)) == UWORD(2));
 
     if (len == 1)
     {
@@ -53,7 +53,7 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
     }
 
     slong f_len, h_len;
-    nn_ptr f = _nmod_vec_init(len);
+    nn_ptr f = _nmod_vec_init(len - val);
     nn_ptr h = _nmod_vec_init(len);
 
     /* actual length of f */
@@ -69,8 +69,8 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
 
     /* h = (x**val * f) * G->int_f  mod x**len                     */
     /*   == x**val (f * G->int_f  mod x**(len-val))                */
-    /* note: len - val is <= G->int_f->length, since G->intf_1 has */
-    /* length G->len >= len (all its coefficients are nonzero)      */
+    /* note: len - val is <= G->int_f->length, since G->int_f has  */
+    /* length G->len >= len (all its coefficients are nonzero)     */
     _nmod_poly_mullow(h+val, G->int_f->coeffs, len - val, f, f_len, len - val, mod);
 
     /* for Newton interpolation, here we should compute h[i] = h[i]/q_i */
@@ -117,7 +117,7 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
         f[i] = nmod_mul(h[h_len-1-i], G->int_s2[h_len-1-i], mod);
 
     /* transposed short product */
-    _nmod_poly_mullow(h+len-h_len, f, h_len-val, G->int_f->coeffs, h_len, h_len, mod);
+    _nmod_poly_mullow(h+len-h_len, G->int_f->coeffs, h_len, f, h_len-val, h_len, mod);
 
     /* final scaling */
     _nmod_vec_zero(poly+h_len, len-h_len);
@@ -131,7 +131,7 @@ void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly,
 void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly,
                 nn_srcptr v, const nmod_geometric_progression_t G, slong len)
 {
-    FLINT_ASSERT((G->function >> 1) & 1);
+    FLINT_ASSERT((G->function & UWORD(2)) == UWORD(2));
 
     nmod_poly_fit_length(poly, len);
     _nmod_poly_set_length(poly, len);

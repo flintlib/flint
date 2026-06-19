@@ -101,6 +101,16 @@ gr_poly_struct;
 
 typedef gr_poly_struct gr_poly_t[1];
 
+typedef struct
+{
+    gr_poly_struct * entries;
+    slong alloc;
+    slong length;
+}
+gr_poly_vec_struct;
+ 
+typedef gr_poly_vec_struct gr_poly_vec_t[1];
+
 #ifdef __cplusplus
 }
 #endif

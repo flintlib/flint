@@ -1033,6 +1033,74 @@ _gr_nmod_redc_vec_dot_rev(ulong * res, const ulong * initial, int subtract, cons
 }
 
 static int
+_gr_nmod_redc_vec_dot_strided(ulong * res, const ulong * initial, int subtract, const ulong * vec1, slong stride1, const ulong * vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    ulong s;
+    dot_params_t params;
+    nmod_t mod;
+    slong i;
+
+    if (len == 0)
+    {
+        if (initial == NULL)
+            *res = 0;
+        else
+            *res = *initial;
+        return GR_SUCCESS;
+    }
+
+    if (len < NMOD_REDC_DOT_CUTOFF)
+    {
+        ulong nbits, sbits;
+
+        nbits = NMOD_BITS(GR_NMOD_REDC_MOD(ctx));
+        /* sum <= len * (n-1)^2 */
+        sbits = 2 * nbits + FLINT_BIT_COUNT(len);
+
+        if (sbits < FLINT_BITS + nbits)
+        {
+            NMOD_REDC_DOT_1(s, i, vec1[i * stride1], vec2[i * stride2], len, ctx);
+        }
+        else if (sbits <= 2 * FLINT_BITS)
+        {
+            NMOD_REDC_DOT_2(s, i, vec1[i * stride1], vec2[i * stride2], len, ctx);
+        }
+        else
+        {
+            NMOD_REDC_DOT_3(s, i, vec1[i * stride1], vec2[i * stride2], len, ctx);
+        }
+    }
+    else
+    {
+        mod = GR_NMOD_REDC_MOD(ctx);
+        params = _nmod_vec_dot_params(len, mod);
+        s = _nmod_vec_dot_strided(vec1, stride1, vec2, stride2, len, mod, params);
+        s = nmod_redc_get_nmod(s, GR_NMOD_REDC_CTX(ctx));
+    }
+
+    if (initial == NULL)
+    {
+        mod = GR_NMOD_REDC_MOD(ctx);
+
+        if (subtract)
+            s = nmod_neg(s, mod);
+    }
+    else
+    {
+        mod = GR_NMOD_REDC_MOD(ctx);
+
+        if (subtract)
+            s = nmod_sub(initial[0], s, mod);
+        else
+            s = nmod_add(initial[0], s, mod);
+    }
+
+    *res = s;
+
+    return GR_SUCCESS;
+}
+
+static int
 _gr_nmod_redc_fast_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong * vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
 {
     ulong s;
@@ -1189,6 +1257,95 @@ _gr_nmod_redc_fast_vec_dot_rev(ulong * res, const ulong * initial, int subtract,
 
         params = _nmod_vec_dot_params(len, mod);
         s = _nmod_vec_dot_rev(vec1, vec2, len, mod, params);
+        s = nmod_redc_get_nmod(s, GR_NMOD_REDC_CTX(ctx));
+
+        if (initial == NULL)
+        {
+            if (subtract)
+                s = nmod_neg(s, mod);
+        }
+        else
+        {
+            if (subtract)
+                s = nmod_sub(initial[0], s, mod);
+            else
+                s = nmod_add(initial[0], s, mod);
+        }
+    }
+
+    *res = s;
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_nmod_redc_fast_vec_dot_strided(ulong * res, const ulong * initial, int subtract, const ulong * vec1, slong stride1, const ulong * vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    ulong s;
+    dot_params_t params;
+    nmod_t mod;
+    slong i;
+
+    if (len == 0)
+    {
+        if (initial == NULL)
+            *res = 0;
+        else
+            *res = *initial;
+        return GR_SUCCESS;
+    }
+
+    if (len < NMOD_REDC_DOT_CUTOFF)
+    {
+        ulong nbits, sbits;
+
+        nbits = NMOD_BITS(GR_NMOD_REDC_MOD(ctx));
+        /* sum <= len * (2n-1)^2 */
+        sbits = 2 * (nbits + 1) + FLINT_BIT_COUNT(len);
+
+        if (sbits < FLINT_BITS + nbits)
+        {
+            NMOD_REDC_FAST_DOT_1(s, i, vec1[i * stride1], vec2[i * stride2], len, ctx);
+        }
+        else if (sbits <= 2 * FLINT_BITS)
+        {
+            NMOD_REDC_FAST_DOT_2(s, i, vec1[i * stride1], vec2[i * stride2], len, ctx);
+        }
+        else
+        {
+            NMOD_REDC_FAST_DOT_3(s, i, vec1[i * stride1], vec2[i * stride2], len, ctx);
+        }
+
+        if (initial != NULL || subtract)
+        {
+            mod = GR_NMOD_REDC_MOD(ctx);
+            mod.n = mod.n * 2;
+            mod.ninv = mod.ninv;
+            mod.norm = mod.norm - 1;
+
+            if (initial == NULL)
+            {
+                if (subtract)
+                    s = nmod_neg(s, mod);
+            }
+            else
+            {
+                if (subtract)
+                    s = nmod_sub(initial[0], s, mod);
+                else
+                    s = nmod_add(initial[0], s, mod);
+            }
+        }
+    }
+    else
+    {
+        mod = GR_NMOD_REDC_MOD(ctx);
+        mod.n = mod.n * 2;
+        mod.ninv = mod.ninv;
+        mod.norm = mod.norm - 1;
+
+        params = _nmod_vec_dot_params(len, mod);
+        s = _nmod_vec_dot_strided(vec1, stride1, vec2, stride2, len, mod, params);
         s = nmod_redc_get_nmod(s, GR_NMOD_REDC_CTX(ctx));
 
         if (initial == NULL)
@@ -1789,6 +1946,7 @@ gr_method_tab_input __gr_nmod_redc_methods_input[] =
     {GR_METHOD_VEC_PRODUCT,     GR_FUNCPTR_CAST _gr_nmod_redc_vec_product},
     {GR_METHOD_VEC_DOT,         GR_FUNCPTR_CAST _gr_nmod_redc_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     GR_FUNCPTR_CAST _gr_nmod_redc_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, GR_FUNCPTR_CAST _gr_nmod_redc_vec_dot_strided},
 /*
     {GR_METHOD_VEC_RECIPROCALS, GR_FUNCPTR_CAST _gr_nmod_redc_vec_reciprocals},
 */
@@ -1844,6 +2002,7 @@ gr_method_tab_input __gr_nmod_redc_fast_methods_input[] =
     {GR_METHOD_VEC_PRODUCT,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_product},
     {GR_METHOD_VEC_DOT,         GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, GR_FUNCPTR_CAST _gr_nmod_redc_fast_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mullow},
     {GR_METHOD_POLY_MULMID,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     GR_FUNCPTR_CAST _gr_nmod_redc_fast_poly_divrem},

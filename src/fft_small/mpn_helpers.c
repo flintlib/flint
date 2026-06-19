@@ -12,7 +12,9 @@
 #include "fft_small.h"
 #include "crt_helpers.h"
 
-/* transpose a block */
+/* For each `0 <= l < np`, reduce values in the `I`-th block of `d + l*dstride`
+   modulo `Rffts[l].p`, convert the result to integers, and write the result
+   to `Xs + l*BLK_SZ`. */
 void _convert_block(
     ulong* Xs,
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride,

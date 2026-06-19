@@ -100,6 +100,16 @@ gr_series_mod_ctx_is_field(gr_ctx_t ctx)
     return gr_ctx_is_field(GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
+truth_t
+gr_series_mod_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    /* Zero ring */
+    if (GR_SERIES_MOD_N(ctx) == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_finite_characteristic(GR_SERIES_MOD_ELEM_CTX(ctx));
+}
+
 int gr_series_mod_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
@@ -286,16 +296,35 @@ gr_series_mod_ ## func(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx) \
     return gr_poly_ ## func ## _series(res, x, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx)); \
 } \
 
+#define BINARY_UNARY_POLY_WRAPPER(func) \
+int \
+gr_series_mod_ ## func(gr_poly_t res1, gr_poly_t res2, const gr_poly_t x, gr_ctx_t ctx) \
+{ \
+    return gr_poly_ ## func ## _series(res1, res2, x, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx)); \
+} \
+
 UNARY_POLY_WRAPPER(exp)
 UNARY_POLY_WRAPPER(log)
 UNARY_POLY_WRAPPER(rsqrt)
+UNARY_POLY_WRAPPER(sin)
+UNARY_POLY_WRAPPER(cos)
+UNARY_POLY_WRAPPER(sin_pi)
+UNARY_POLY_WRAPPER(cos_pi)
 UNARY_POLY_WRAPPER(tan)
+UNARY_POLY_WRAPPER(tanh)
+UNARY_POLY_WRAPPER(cot)
+UNARY_POLY_WRAPPER(coth)
+UNARY_POLY_WRAPPER(tan_pi)
+UNARY_POLY_WRAPPER(cot_pi)
 UNARY_POLY_WRAPPER(asin)
 UNARY_POLY_WRAPPER(acos)
 UNARY_POLY_WRAPPER(atan)
 UNARY_POLY_WRAPPER(asinh)
 UNARY_POLY_WRAPPER(acosh)
 UNARY_POLY_WRAPPER(atanh)
+
+BINARY_UNARY_POLY_WRAPPER(sin_cos)
+BINARY_UNARY_POLY_WRAPPER(sin_cos_pi)
 
 
 /* fixme: gr_poly_sqrt_series does not deal with leading zeros */
@@ -416,6 +445,7 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_series_mod_ctx_is_finite_characteristic},
     {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_series_mod_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_mod_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_mod_clear},
@@ -448,7 +478,18 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_RSQRT,       (gr_funcptr) gr_series_mod_rsqrt},
     {GR_METHOD_EXP,         (gr_funcptr) gr_series_mod_exp},
     {GR_METHOD_LOG,         (gr_funcptr) gr_series_mod_log},
+    {GR_METHOD_SIN,         (gr_funcptr) gr_series_mod_sin},
+    {GR_METHOD_COS,         (gr_funcptr) gr_series_mod_cos},
+    {GR_METHOD_SIN_PI,      (gr_funcptr) gr_series_mod_sin_pi},
+    {GR_METHOD_COS_PI,      (gr_funcptr) gr_series_mod_cos_pi},
+    {GR_METHOD_SIN_COS,     (gr_funcptr) gr_series_mod_sin_cos},
+    {GR_METHOD_SIN_COS_PI,  (gr_funcptr) gr_series_mod_sin_cos_pi},
     {GR_METHOD_TAN,         (gr_funcptr) gr_series_mod_tan},
+    {GR_METHOD_TANH,        (gr_funcptr) gr_series_mod_tanh},
+    {GR_METHOD_COT,         (gr_funcptr) gr_series_mod_cot},
+    {GR_METHOD_COTH,        (gr_funcptr) gr_series_mod_coth},
+    {GR_METHOD_TAN_PI,      (gr_funcptr) gr_series_mod_tan_pi},
+    {GR_METHOD_COT_PI,      (gr_funcptr) gr_series_mod_cot_pi},
     {GR_METHOD_ASIN,        (gr_funcptr) gr_series_mod_asin},
     {GR_METHOD_ACOS,        (gr_funcptr) gr_series_mod_acos},
     {GR_METHOD_ATAN,        (gr_funcptr) gr_series_mod_atan},

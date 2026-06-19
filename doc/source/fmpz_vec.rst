@@ -16,6 +16,54 @@ Memory management
     Clears the entries of ``(vec, len)`` and frees the space allocated
     for ``vec``.
 
+Resizable vectors
+-------------------------------------------------------------------------------
+ 
+.. type:: fmpz_vec_struct
+          fmpz_vec_t
+ 
+    A resizable vector of :type:`fmpz` elements. It is safe to cast an
+    :type:`fmpz_vec_t` to a :type:`gr_vec_t` with :type:`fmpz` elements
+    and vice versa.
+
+.. function:: void fmpz_vec_init(fmpz_vec_t vec, slong len)
+ 
+    Initializes *vec* to a vector of length *len* with all entries set
+    to zero. The length must be nonnegative.
+ 
+.. function:: void fmpz_vec_clear(fmpz_vec_t vec)
+ 
+    Clears the vector *vec*, freeing all allocated memory.
+ 
+.. function:: fmpz * fmpz_vec_entry_ptr(fmpz_vec_t vec, slong i)
+              const fmpz * fmpz_vec_entry_srcptr(const fmpz_vec_t vec, slong i)
+ 
+    Returns a pointer to the *i*-th element in the vector, indexed from zero.
+    The index must be in bounds.
+ 
+.. function:: slong fmpz_vec_length(const fmpz_vec_t vec)
+ 
+    Returns the length of the vector.
+ 
+.. function:: void fmpz_vec_fit_length(fmpz_vec_t vec, slong len)
+ 
+    Allocates space for at least *len* elements. This does not change
+    the length of the vector.
+ 
+.. function:: void fmpz_vec_set_length(fmpz_vec_t vec, slong len)
+ 
+    Resizes the vector to length *len*, which must be nonnegative.
+    The vector will be extended with zeros if necessary.
+ 
+.. function:: void fmpz_vec_set(fmpz_vec_t res, const fmpz_vec_t src)
+ 
+    Sets *res* to a copy of *src*.
+ 
+.. function:: void fmpz_vec_append(fmpz_vec_t vec, const fmpz_t f)
+              void fmpz_vec_append_ui(fmpz_vec_t vec, ulong f) 
+
+    Appends the integer *f* to the end of the vector.
+
 
 Randomisation
 --------------------------------------------------------------------------------
@@ -381,6 +429,12 @@ Reduction mod `p`
 
     Reduces all entries in ``(vec, len)`` modulo `p > 0`, choosing
     the unique representative in `(-p/2, p/2]`.
+
+.. function:: void _fmpz_vec_multi_CRT_ui(fmpz * res, nn_srcptr * residues, slong len, nn_srcptr primes, slong num_primes, int sign)
+
+    Sets ``(res, len)`` to the CRT lift of the ``num_primes``
+    vectors in ``residues`` modulo the respective moduli in ``primes``.
+    Equivalent to reconstructing each entry using :func:`fmpz_multi_CRT_ui`.
 
 
 Gaussian content

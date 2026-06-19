@@ -1482,7 +1482,7 @@ _gr_ca_poly_mullow(ca_ptr res,
 }
 
 static int
-_gr_ca_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
+_gr_ca_poly_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt,
                    int flags, gr_ctx_t ctx)
 {
     if (gr_ctx_is_algebraically_closed(ctx) == T_TRUE)
@@ -1491,23 +1491,18 @@ _gr_ca_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
 }
 
 static int
-_gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_ca_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     ca_vec_t ca_roots;
     ulong * exp;
     slong deg;
-    gr_ctx_t ZZ;
     slong i;
-    fmpz_t exp_z;
 
     if (poly->length == 0)
         return GR_DOMAIN;
 
     deg = poly->length - 1;
-
-    gr_ctx_init_fmpz(ZZ);
-    fmpz_init(exp_z);
 
     ca_vec_init(ca_roots, 0, GR_CA_CTX(ctx));
     exp = flint_malloc(sizeof(ulong) * deg);
@@ -1515,7 +1510,7 @@ _gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags
     if (ca_poly_roots(ca_roots, exp, (const ca_poly_struct *) poly, GR_CA_CTX(ctx)))
     {
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         for (i = 0; i < ca_roots->length; i++)
         {
@@ -1533,62 +1528,19 @@ _gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags
                 }
             }
 
-            fmpz_set_ui(exp_z, exp[i]);
             status |= gr_vec_append(roots, ca_roots->entries + i, ctx);
-            status |= gr_vec_append(mult, exp_z, ZZ);
+            fmpz_vec_append_ui(mult, exp[i]);
         }
     }
     else
     {
         status = GR_UNABLE;
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
     }
 
     ca_vec_clear(ca_roots, GR_CA_CTX(ctx));
     flint_free(exp);
-
-    gr_ctx_clear(ZZ);
-    fmpz_clear(exp_z);
-
-/*
-    if (status == GR_SUCCESS)
-    {
-        _acb_vec_sort_pretty(croots, deg);
-
-        if (arb_roots)
-        {
-
-            for (i = 0; i < deg; i++)
-            {
-                if (arb_contains_zero(acb_imagref(croots + i)))
-                {
-                    fmpz one = 1;
-                    arb_set_round(acb_realref(croots + i), acb_realref(croots + i), target_prec);
-                    GR_MUST_SUCCEED(gr_vec_append(roots, acb_realref(croots + i), ctx));
-                    GR_MUST_SUCCEED(gr_vec_append(mult, &one, ZZ));
-                }
-            }
-        }
-        else
-        {
-            gr_vec_set_length(roots, deg, ctx);
-            gr_vec_set_length(mult, deg, ZZ);
-
-            for (i = 0; i < deg; i++)
-            {
-                acb_set_round(((acb_ptr) roots->entries) + i, croots + i, target_prec);
-                fmpz_one(((fmpz *) mult->entries) + i);
-            }
-        }
-    }
-
-    acb_poly_clear(tmp);
-    _acb_vec_clear(croots, deg);
-    gr_ctx_clear(ZZ);
-
-    return status;
-*/
 
     return status;
 }

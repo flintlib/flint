@@ -92,11 +92,11 @@ Types, macros and constants
    64-bit machines) or `2^{30}-1` (on 32-bit machines). It switches
    automatically to a GMP integer for larger values.
 
-   An ``fmpz`` is implemented as an ``slong``. When its second most significant
-   bit is `0` the ``fmpz`` represents an ordinary ``slong`` integer whose
-   absolute value is at most ``FLINT_BITS - 2`` bits.
+   An ``fmpz`` is implemented as an ``slong``. When its two most significant
+   bits are either ``00`` or ``11`` the ``fmpz`` represents an ordinary ``slong``
+   integer whose absolute value is at most ``FLINT_BITS - 2`` bits.
 
-   When the second most significant bit is `1` then the value represents a
+   When the two most significant bits are ``01`` then the value represents a
    pointer (the pointer is shifted right `2` bits and the second most
    significant bit is set to `1`. This relies on the fact that ``malloc`` always
    allocates memory blocks on a `4` or `8` byte boundary).

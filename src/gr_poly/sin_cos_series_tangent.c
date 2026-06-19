@@ -24,15 +24,7 @@ _gr_poly_sin_cos_series_tangent(gr_ptr s, gr_ptr c,
     hlen = FLINT_MIN(hlen, len);
 
     if (hlen == 1)
-    {
-        if (times_pi)
-            status |= gr_sin_cos_pi(s, c, h, ctx);
-        else
-            status |= gr_sin_cos(s, c, h, ctx);
-        status |= _gr_vec_zero(GR_ENTRY(s, 1, sz), len - 1, ctx);
-        status |= _gr_vec_zero(GR_ENTRY(c, 1, sz), len - 1, ctx);
-        return status;
-    }
+        return _gr_poly_sin_cos_series_basecase(s, c, h, hlen, len, times_pi, ctx);
 
     /*
     sin(x) = 2*tan(x/2)/(1+tan(x/2)^2)

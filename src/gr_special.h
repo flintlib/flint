@@ -344,6 +344,7 @@ WARN_UNUSED_RESULT int gr_generic_sin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_cos(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_sin_cos(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_tan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_tanh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_asin(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_asinh(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_atan(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);

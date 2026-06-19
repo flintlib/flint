@@ -22,7 +22,22 @@ _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, s
     FLINT_ASSERT(lenA >= lenB);
     FLINT_ASSERT(lenB >= 1);
 
-    return _gr_poly_xgcd_euclidean(lenG, G, S, T, A, lenA, B, lenB, ctx);
+    if (gr_ctx_is_field(ctx) == T_TRUE)
+    {
+        /* todo: dispatch to hgcd at least over finite fields */
+        /* todo: clear denominators + subresultant over fraction fields */
+
+        return _gr_poly_xgcd_euclidean(lenG, G, S, T, A, lenA, B, lenB, ctx);
+    }
+    else if (gr_ctx_is_unique_factorization_domain(ctx) == T_TRUE)
+    {
+        return _gr_poly_xgcd_subresultant(lenG, G, S, T, A, lenA, B, lenB, ctx);
+    }
+    else
+    {
+        *lenG = 0;
+        return GR_UNABLE;
+    }
 }
 
 int
@@ -37,8 +52,7 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
         const slong lenA = A->length, lenB = B->length;
         int status = GR_SUCCESS;
         slong sz = ctx->sizeof_elem;
-        gr_ptr t;
-
+        gr_ptr t, u;
 
         if (lenA == 0)          /* lenA = lenB = 0 */
         {
@@ -48,12 +62,8 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
         }
         else if (lenB == 0)     /* lenA > lenB = 0 */
         {
-            GR_TMP_INIT(t, ctx);
-            status |= gr_inv(t, GR_ENTRY(A->coeffs, lenA - 1, sz), ctx);
-            status |= gr_poly_mul_scalar(G, A, t, ctx);
+            status |= gr_poly_canonical_associate(G, S, A, ctx);
             status |= gr_poly_zero(T, ctx);
-            status |= gr_poly_set_scalar(S, t, ctx);
-            GR_TMP_CLEAR(t, ctx);
         }
         else if (gr_is_zero(GR_ENTRY(A->coeffs, A->length - 1, sz), ctx) != T_FALSE ||
                 gr_is_zero(GR_ENTRY(B->coeffs, B->length - 1, sz), ctx) != T_FALSE)
@@ -62,12 +72,12 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
         }
         else if (lenB == 1)  /* lenA >= lenB = 1 */
         {
-            GR_TMP_INIT(t, ctx);
-            status |= gr_inv(t, B->coeffs, ctx);
-            status |= gr_poly_set_scalar(T, t, ctx);
-            status |= gr_poly_one(G, ctx);
+            GR_TMP_INIT2(t, u, ctx);
+            status |= gr_canonical_associate(t, u, B->coeffs, ctx);
+            status |= gr_poly_set_scalar(G, t, ctx);
+            status |= gr_poly_set_scalar(T, u, ctx);
             status |= gr_poly_zero(S, ctx);
-            GR_TMP_CLEAR(t, ctx);
+            GR_TMP_CLEAR2(t, u, ctx);
         }
         else                    /* lenA >= lenB >= 2 */
         {
@@ -87,23 +97,23 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
 
             if (S == A || S == B)
             {
-                s = flint_malloc(sz * lenB);
-                _gr_vec_init(s, lenB, ctx);
+                s = flint_malloc(sz * (lenB - 1));
+                _gr_vec_init(s, lenB - 1, ctx);
             }
             else
             {
-                gr_poly_fit_length(S, lenB, ctx);
+                gr_poly_fit_length(S, lenB - 1, ctx);
                 s = S->coeffs;
             }
 
             if (T == A || T == B)
             {
-                t = flint_malloc(sz * lenA);
-                _gr_vec_init(t, lenA, ctx);
+                t = flint_malloc(sz * (lenA - 1));
+                _gr_vec_init(t, lenA - 1, ctx);
             }
             else
             {
-                gr_poly_fit_length(T, lenA, ctx);
+                gr_poly_fit_length(T, lenA - 1, ctx);
                 t = T->coeffs;
             }
 
@@ -123,7 +133,7 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
                 _gr_vec_clear(S->coeffs, S->alloc, ctx);
                 flint_free(S->coeffs);
                 S->coeffs = s;
-                S->alloc = lenB;
+                S->alloc = lenB - 1;
                 S->length = S->alloc;
             }
 
@@ -132,24 +142,31 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
                 _gr_vec_clear(T->coeffs, T->alloc, ctx);
                 flint_free(T->coeffs);
                 T->coeffs = t;
-                T->alloc = lenA;
+                T->alloc = lenA - 1;
                 T->length = T->alloc;
             }
 
             _gr_poly_set_length(G, lenG, ctx);
-            _gr_poly_set_length(S, FLINT_MAX(lenB - lenG, 1), ctx);
-            _gr_poly_set_length(T, FLINT_MAX(lenA - lenG, 1), ctx);
+            _gr_poly_set_length(S, FLINT_MAX(lenB - FLINT_MAX(1, lenG), 1), ctx);
+            _gr_poly_set_length(T, FLINT_MAX(lenA - FLINT_MAX(1, lenG), 1), ctx);
+
             _gr_poly_normalise(S, ctx);
             _gr_poly_normalise(T, ctx);
 
-            if (status == GR_SUCCESS && gr_is_one(GR_ENTRY(G->coeffs, G->length - 1, sz), ctx) != T_TRUE)
+            if (status == GR_SUCCESS && G->length > 0 &&
+                gr_is_one(GR_ENTRY(G->coeffs, G->length - 1, sz), ctx) != T_TRUE)
             {
-                GR_TMP_INIT(t, ctx);
-                status |= gr_inv(t, GR_ENTRY(G->coeffs, G->length - 1, sz), ctx);
-                status |= gr_poly_mul_scalar(G, G, t, ctx);
-                status |= gr_poly_mul_scalar(S, S, t, ctx);
-                status |= gr_poly_mul_scalar(T, T, t, ctx);
-                GR_TMP_CLEAR(t, ctx);
+                gr_poly_t u;
+                gr_poly_init(u, ctx);
+                status |= gr_poly_canonical_associate(G, u, G, ctx);
+
+                if (status == GR_SUCCESS && u->length >= 1 && gr_is_one(u->coeffs, ctx) != T_TRUE)
+                {
+                    status |= gr_poly_mul_scalar(S, S, u->coeffs, ctx);
+                    status |= gr_poly_mul_scalar(T, T, u->coeffs, ctx);
+                }
+
+                gr_poly_clear(u, ctx);
             }
         }
 

@@ -14,6 +14,10 @@
 #include "t-add.c"
 #include "t-digit_size.c"
 #include "t-div_approx.c"
+#include "t-divmod_bn.c"
+#include "t-divmod_bn_1.c"
+#include "t-divmod_bn_classical.c"
+#include "t-divmod_bn_karp_markstein.c"
 #include "t-divrem.c"
 #include "t-divrem_1.c"
 #include "t-get_mpn.c"
@@ -29,7 +33,9 @@
 #include "t-neg.c"
 #include "t-rshift.c"
 #include "t-rsqrt_1_approx.c"
+#include "t-rsqrtmod_bn.c"
 #include "t-set_mpn.c"
+#include "t-sqrtmod_bn.c"
 #include "t-sub.c"
 
 /* Array of test functions ***************************************************/
@@ -41,6 +47,10 @@ test_struct tests[] =
     TEST_FUNCTION(radix_div_approx),
     TEST_FUNCTION(radix_divrem),
     TEST_FUNCTION(radix_divrem_1),
+    TEST_FUNCTION(radix_divmod_bn),
+    TEST_FUNCTION(radix_divmod_bn_1),
+    TEST_FUNCTION(radix_divmod_bn_classical),
+    TEST_FUNCTION(radix_divmod_bn_karp_markstein),
     TEST_FUNCTION(radix_get_mpn),
     TEST_FUNCTION(radix_integer),
     TEST_FUNCTION(radix_inv_approx),
@@ -54,7 +64,9 @@ test_struct tests[] =
     TEST_FUNCTION(radix_neg),
     TEST_FUNCTION(radix_rshift),
     TEST_FUNCTION(radix_rsqrt_1_approx),
+    TEST_FUNCTION(radix_rsqrtmod_bn),
     TEST_FUNCTION(radix_set_mpn),
+    TEST_FUNCTION(radix_sqrtmod_bn),
     TEST_FUNCTION(radix_sub),
 };
 

@@ -282,6 +282,8 @@ Arithmetic
 
 .. function:: void acb_poly_scalar_mul(acb_poly_t C, const acb_poly_t A, const acb_t c, slong prec)
 
+.. function:: void acb_poly_scalar_mul_si(acb_poly_t C, const acb_poly_t A, slong c, slong prec)
+
     Sets *C* to *A* multiplied by *c*.
 
 .. function:: void acb_poly_scalar_div(acb_poly_t C, const acb_poly_t A, const acb_t c, slong prec)

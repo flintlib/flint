@@ -18,6 +18,7 @@
 #define GR_VEC_INLINE static inline
 #endif
 
+#include <string.h>
 #include "gr.h"
 
 #ifdef __cplusplus
@@ -51,6 +52,7 @@ GR_VEC_INLINE slong gr_vec_length(const gr_vec_t vec, gr_ctx_t FLINT_UNUSED(ctx)
 void gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
+void gr_vec_set_shallow(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx);
 void gr_vec_append_swap(gr_vec_t vec, gr_ptr f, gr_ctx_t ctx);
 
@@ -67,6 +69,8 @@ WARN_UNUSED_RESULT int gr_vec_sort(gr_vec_t dest, const gr_vec_t src, gr_ctx_t c
 
 void _gr_vec_permute(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx);
+void _gr_vec_permute_inv(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_vec_permute_inv(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx);
 void _gr_vec_shuffle(gr_ptr vec, flint_rand_t state, slong len, gr_ctx_t ctx);
 
 int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx);
@@ -76,6 +80,7 @@ int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
+GR_VEC_INLINE void _gr_vec_set_shallow(gr_ptr dest, gr_srcptr src, slong len, gr_ctx_t ctx) { memcpy(dest, src, len * ctx->sizeof_elem); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
 
 typedef int ((*gr_method_vec_normalise_op)(slong *, gr_srcptr, slong, gr_ctx_ptr));
@@ -177,12 +182,14 @@ GR_VEC_INLINE truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx) { 
 typedef int ((*gr_method_vec_reduce_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 
 typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));
+typedef int ((*gr_method_vec_dot_strided_op)(gr_ptr, gr_srcptr, int, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_si_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const slong *, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_ui_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const ulong *, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_dot_fmpz_op)(gr_ptr, gr_srcptr, int, gr_srcptr, const fmpz *, slong, gr_ctx_ptr));
 
 #define GR_VEC_REDUCE_OP(ctx, NAME) (((gr_method_vec_reduce_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_OP(ctx, NAME) (((gr_method_vec_dot_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_VEC_DOT_STRIDED_OP(ctx, NAME) (((gr_method_vec_dot_strided_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_SI_OP(ctx, NAME) (((gr_method_vec_dot_si_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_UI_OP(ctx, NAME) (((gr_method_vec_dot_ui_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_DOT_FMPZ_OP(ctx, NAME) (((gr_method_vec_dot_fmpz_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -192,6 +199,7 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_product(gr_ptr res, gr_srcptr vec, 
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT)(res, initial, subtract, vec1, vec2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_OP(ctx, VEC_DOT_REV)(res, initial, subtract, vec1, vec2, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_STRIDED_OP(ctx, VEC_DOT_STRIDED)(res, initial, subtract, vec1, stride1, vec2, stride2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_si(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const slong * vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_SI_OP(ctx, VEC_DOT_SI)(res, initial, subtract, vec1, vec2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_UI_OP(ctx, VEC_DOT_UI)(res, initial, subtract, vec1, vec2, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const fmpz * vec2, slong len, gr_ctx_t ctx) { return GR_VEC_DOT_FMPZ_OP(ctx, VEC_DOT_FMPZ)(res, initial, subtract, vec1, vec2, len, ctx); }

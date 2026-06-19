@@ -332,6 +332,13 @@ nmod8_div_nonunique(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_
     return status;
 }
 
+static int
+nmod8_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD8_CTX(ctx).n);
+    return GR_SUCCESS;
+}
+
 static void
 _nmod8_vec_init(uint8_t * res, slong len, gr_ctx_t ctx)
 {
@@ -590,6 +597,69 @@ _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const uint8
     return GR_SUCCESS;
 }
 
+static int
+_nmod8_vec_dot_strided(nmod8_t res, const nmod8_t initial, int subtract, const uint8_t * vec1, slong stride1, const uint8_t * vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    ulong n, s;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            nmod8_zero(res, ctx);
+        else
+            nmod8_set(res, initial, ctx);
+        return GR_SUCCESS;
+    }
+
+    n = NMOD8_CTX(ctx).n;
+
+    if (initial == NULL)
+    {
+        s = 0;
+    }
+    else
+    {
+        if (subtract)
+            s = n_negmod(initial[0], n);
+        else
+            s = initial[0];
+    }
+
+    if (len < 65536)
+    {
+        unsigned int ss = 0;
+
+        for (i = 0; i + 4 < len; i += 4)
+        {
+            ss += (unsigned int) vec1[(i + 0) * stride1] * (unsigned int) vec2[(i + 0) * stride2];
+            ss += (unsigned int) vec1[(i + 1) * stride1] * (unsigned int) vec2[(i + 1) * stride2];
+            ss += (unsigned int) vec1[(i + 2) * stride1] * (unsigned int) vec2[(i + 2) * stride2];
+            ss += (unsigned int) vec1[(i + 3) * stride1] * (unsigned int) vec2[(i + 3) * stride2];
+        }
+
+        for ( ; i < len; i++)
+            ss += (unsigned int) vec1[i * stride1] * (unsigned int) vec2[i * stride2];
+
+        s += ss;
+    }
+    else
+    {
+        ulong ss;
+
+        const dot_params_t params = _nmod_vec_dot_params(len, NMOD8_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i * stride1], (ulong) vec2[i * stride2], NMOD8_CTX(ctx), params);
+        s = n_addmod(s, ss, n);
+    }
+
+    nmod8_set_ui(res, s, ctx);
+
+    if (subtract && res[0] != 0)
+        res[0] = (n - res[0]);
+
+    return GR_SUCCESS;
+}
+
 static uint32_t _mod1_preinvert(uint32_t n)
 {
     return (~((uint32_t) 0)) / n + 1;
@@ -748,6 +818,19 @@ _nmod8_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
         return gr_mat_mul_classical(C, A, B, ctx);
 }
 
+static int
+_nmod8_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    /* Danilevsky has a high chance of failing over small non-fields, so
+       only use it over fields */
+    /* todo: tune cutoff */
+    if (n > 8 && nmod8_ctx_is_field(ctx) == T_TRUE)
+        return _gr_mat_charpoly_danilevsky(res, mat, ctx);
+
+    return _gr_mat_charpoly_berkowitz(res, mat, ctx);
+}
 
 int _nmod8_methods_initialized = 0;
 
@@ -801,6 +884,8 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) nmod8_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod8_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod8_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod8_ctx_fq_prime},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod8_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod8_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod8_vec_set},
@@ -814,9 +899,11 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod8_vec_submul_scalar},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod8_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod8_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _nmod8_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod8_poly_mullow},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod8_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod8_mat_mul},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod8_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 

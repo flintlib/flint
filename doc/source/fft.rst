@@ -203,6 +203,8 @@ Radix 2 transforms
     space, but their value is irrelevant. The value of ``trunc`` must be
     divisible by 2.
 
+    This is a truncated FFT variant in the sense of [vdH2004]_.
+
 .. function:: void fft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
 
     As for ``fft_radix2`` except that only the first ``trunc``
@@ -266,6 +268,8 @@ Radix 2 transforms
     Finally a single layer of the IFFT is completed on all the coefficients
     up to ``trunc`` being careful to note that this involves doubling the
     coefficients from ``trunc - n`` up to ``n``.
+
+    This inverse truncated transform follows the approach of [vdH2004]_.
 
 .. function:: void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
 
