@@ -1229,6 +1229,8 @@ void _fmpz_poly_isolate_real_roots_0_1_vca(fmpq * exact_roots, slong * n_exact,
         const fmpz * pol, slong len);
 void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact,
     fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol);
+void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact,
+    fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol);
 
 /* CLD bounds */
 

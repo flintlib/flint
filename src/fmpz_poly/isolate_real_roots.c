@@ -112,7 +112,8 @@ void _fmpz_poly_isolate_real_roots_0_1_vca(fmpq * exact_roots, slong * n_exact,
     }
 }
 
-void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+static void
+_fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol, int positive_only)
 {
     slong i, k, n_neg, tmp, len, n_zeros, n_neg_exact;
     fmpz * p;
@@ -130,59 +131,61 @@ void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_
     p = _fmpz_vec_init(len);
     _fmpz_vec_set(p, pol->coeffs + n_zeros, len);
 
-    /* negative roots (use P(-x)) */
-    for (i = 1; i < len; i += 2) fmpz_neg(p + i, p + i);
-    k = _fmpz_poly_positive_root_upper_bound_2exp(p, len);
-
-    if (k != WORD_MIN)
+    if (!positive_only)
     {
-        _fmpz_poly_scale_2exp(p, len, k);
-        _fmpz_poly_isolate_real_roots_0_1_vca(exact_roots, n_exact, c_array, k_array, n_interval, p, len);
-        n_neg = *n_interval;
-        n_neg_exact = *n_exact;
-        if ((c_array != NULL) && (k_array != NULL))
+        /* negative roots (use P(-x)) */
+        for (i = 1; i < len; i += 2) fmpz_neg(p + i, p + i);
+        k = _fmpz_poly_positive_root_upper_bound_2exp(p, len);
+
+        if (k != WORD_MIN)
         {
-            for (i = 0; i < *n_interval; i++)
+            _fmpz_poly_scale_2exp(p, len, k);
+            _fmpz_poly_isolate_real_roots_0_1_vca(exact_roots, n_exact, c_array, k_array, n_interval, p, len);
+            n_neg = *n_interval;
+            n_neg_exact = *n_exact;
+            if ((c_array != NULL) && (k_array != NULL))
             {
-                fmpz_add_ui(c_array + i, c_array + i, 1);
-                fmpz_neg(c_array + i, c_array + i);
-                k_array[i] += k;
+                for (i = 0; i < *n_interval; i++)
+                {
+                    fmpz_add_ui(c_array + i, c_array + i, 1);
+                    fmpz_neg(c_array + i, c_array + i);
+                    k_array[i] += k;
+                }
+                for (i = 0; i < *n_interval / 2; i++)
+                {
+                    fmpz_swap(c_array + i, c_array + *n_interval - i - 1);
+                    tmp = k_array[i];
+                    k_array[i] = k_array[*n_interval - i - 1];
+                    k_array[*n_interval - i - 1] = tmp;
+                }
             }
-            for (i = 0; i < *n_interval / 2; i++)
+
+            if (exact_roots != NULL)
             {
-                fmpz_swap(c_array + i, c_array + *n_interval - i - 1);
-                tmp = k_array[i];
-                k_array[i] = k_array[*n_interval - i - 1];
-                k_array[*n_interval - i - 1] = tmp;
+                for (i = 0; i < n_neg_exact; i++)
+                {
+                    fmpq_neg(exact_roots + i, exact_roots + i);
+                    if (k > 0)
+                        fmpq_mul_2exp(exact_roots + i, exact_roots + i, (ulong)k);
+                    else if (k < 0)
+                        fmpq_div_2exp(exact_roots + i, exact_roots + i, (ulong)-k);
+                }
+                for (i = 0; i < n_neg_exact/2; i++)
+                {
+                    fmpq_swap(exact_roots + i, exact_roots + *n_exact - i - 1);
+                }
             }
         }
+        else
+            n_neg = 0;
 
+        /* insert zero roots */
         if (exact_roots != NULL)
         {
-            for (i = 0; i < n_neg_exact; i++)
-            {
-                fmpq_neg(exact_roots + i, exact_roots + i);
-                if (k > 0)
-                    fmpq_mul_2exp(exact_roots + i, exact_roots + i, (ulong)k);
-                else if (k < 0)
-                    fmpq_div_2exp(exact_roots + i, exact_roots + i, (ulong)-k);
-            }
-            for (i = 0; i < n_neg_exact/2; i++)
-            {
-                fmpq_swap(exact_roots + i, exact_roots + *n_exact - i - 1);
-            }
+            for (i = *n_exact; i < *n_exact+n_zeros; i++) fmpq_zero(exact_roots + i);
         }
+        *n_exact += n_zeros;
     }
-    else
-        n_neg = 0;
-
-    /* insert zero roots */
-    if (exact_roots != NULL)
-    {
-        for (i = *n_exact; i < *n_exact+n_zeros; i++) fmpq_zero(exact_roots + i);
-    }
-    *n_exact += n_zeros;
-
 
     /* positive roots */
     _fmpz_vec_set(p, pol->coeffs + n_zeros, len);
@@ -210,8 +213,16 @@ void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_
         }
     }
 
-
     _fmpz_vec_clear(p, len);
 }
 
+void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+{
+    _fmpz_poly_isolate_real_roots(exact_roots, n_exact, c_array, k_array, n_interval, pol, 0);
+}
+
+void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+{
+    _fmpz_poly_isolate_real_roots(exact_roots, n_exact, c_array, k_array, n_interval, pol, 1);
+}
 

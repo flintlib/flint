@@ -3322,6 +3322,11 @@ Roots
     ``c = c_array + i`` and ``k = k_array[i]`` represents the
     open interval `(c 2^k, (c + 1) 2^k)`.
 
+.. function:: void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+
+    As :func:`fmpz_poly_isolate_real_roots`, but finds only
+    the roots which are strictly positive.
+
 Minimal polynomials
 --------------------------------------------------------------------------------
 
