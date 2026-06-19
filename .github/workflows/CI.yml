@@ -255,6 +255,16 @@ jobs:
           ASAN_OPTIONS: halt_on_error=1:abort_on_error=1:print_summary=1
           UBSAN_OPTIONS: halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1
         run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && meson test -C build --print-errorlogs
+      - name: "Check examples"
+        env:
+          ASAN_OPTIONS: halt_on_error=1:abort_on_error=1:print_summary=1
+          UBSAN_OPTIONS: halt_on_error=1:abort_on_error=1:print_summary=1:print_stacktrace=1
+        run: |
+          meson compile -C build examples
+          for src in examples/*.c; do
+            example=$(basename "$src" .c)
+            ./dev/check_examples.sh "$example" build/examples
+          done
 
   mingw64-gcc:
     name: Meson, MinGW (x0.5)

@@ -47,7 +47,11 @@ examples: setup
 	$(MESON) compile -C $(BUILD) examples $(MESON_COMPILE_ARGS)
 
 checkexamples: setup
-	$(MESON) test -C $(BUILD) --suite examples $(MESON_TEST_ARGS)
+	$(MESON) compile -C $(BUILD) examples $(MESON_COMPILE_ARGS)
+	@for src in examples/*.c; do \
+		example=$$(basename "$$src" .c); \
+		./dev/check_examples.sh "$$example" "$(BUILD)/examples"; \
+	done
 
 profile: setup
 	$(MESON) compile -C $(BUILD) profile $(MESON_COMPILE_ARGS)

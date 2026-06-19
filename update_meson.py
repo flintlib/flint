@@ -417,13 +417,12 @@ examples_meson_build = '''\
 #   python update_meson.py
 #
 
-check_examples = find_program('../dev/check_examples.sh')
-
-example_exes = []
-
-foreach example : [
+examples = [
 %s
 ]
+example_exes = []
+
+foreach example : examples
   example_exe = executable(
     example,
     example + '.c',
@@ -434,16 +433,6 @@ foreach example : [
   )
 
   example_exes += example_exe
-
-  test(
-    'example_' + example,
-    check_examples,
-    args: [example, meson.current_build_dir()],
-    depends: example_exe,
-    suite: 'examples',
-    timeout: 0,
-    workdir: meson.project_source_root(),
-  )
 endforeach
 
 alias_target('examples', example_exes)
