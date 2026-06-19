@@ -112,6 +112,9 @@ mod_no_tests = [
     'hypgeom',
 ]
 
+mod_no_profiles = [
+]
+
 regression_modules = [
     'thread_pool',
     'thread_support',
@@ -219,6 +222,14 @@ unroll_modules = [
 %s
 ]
 
+profile_modules = [
+%s
+]
+
+conditional_profile_modules = [
+%s
+]
+
 headers_all = []
 c_files_all = []
 c_files_missing_prototypes = []
@@ -227,6 +238,8 @@ c_files_no_missing_prototypes = []
 c_files_no_missing_prototypes_unroll = []
 regression_c_files = []
 mod_tests = []
+mod_profiles = []
+profile_exes = []
 
 # Select the right version of fmpz.c (see configuration)
 fmpz_link_c_file = files('fmpz/link' / fmpz_c_in)
@@ -252,6 +265,7 @@ endforeach
 if have_fft_small
   subdir('fft_small')
   mod_tests += ['fft_small/test']
+  mod_profiles += conditional_profile_modules
   headers_all += ['fft_small.h']
 endif
 
@@ -264,6 +278,8 @@ foreach mod : [
 ]
   mod_tests += [mod / 'test']
 endforeach
+
+mod_profiles += profile_modules
 
 headers_all = files(headers_all)
 '''
@@ -316,6 +332,28 @@ test_exe = executable('main',
 )
 
 test('%s', test_exe, timeout: 0)
+'''
+
+profile_mod_meson_build = '''\
+# This file is generated automatically.
+#
+# To regenerate it, run:
+#   python update_meson.py
+#
+
+foreach profile_source : [
+%s
+]
+  profile_stem = fs.stem(profile_source)
+  profile_exes += executable(
+    profile_stem,
+    profile_source,
+    dependencies: [flint_test_dep],
+    include_directories: [headers_built_inc],
+    install: false,
+    build_by_default: profiles_opt.enabled(),
+  )
+endforeach
 '''
 
 
@@ -504,6 +542,39 @@ def main(args):
     modules_unconditional = set(modules) - set(conditional_modules) - set(non_library_modules)
 
     # src/meson.build
+    top_profile_dir = join(output_dir, 'src', 'profile')
+    top_profile_sources = []
+    if isdir(top_profile_dir):
+        top_profile_sources = [
+            f for f in listdir(top_profile_dir)
+            if f.endswith('.c')
+        ]
+    profile_modules = []
+    if top_profile_sources:
+        profile_modules.append('profile')
+    conditional_profile_modules = []
+    profile_scan_modules = (
+        set(modules) - set(non_library_modules) - set(conditional_modules)
+    ) | set(mod_no_header)
+    for mod in profile_scan_modules:
+        profile_dir = join(output_dir, 'src', mod, 'profile')
+        if mod not in mod_no_profiles and isdir(profile_dir):
+            profile_c_files = [
+                f for f in listdir(profile_dir)
+                if f.endswith('.c')
+            ]
+            if profile_c_files:
+                profile_modules.append(mod + '/profile')
+    for mod in conditional_modules:
+        profile_dir = join(output_dir, 'src', mod, 'profile')
+        if mod not in mod_no_profiles and isdir(profile_dir):
+            profile_c_files = [
+                f for f in listdir(profile_dir)
+                if f.endswith('.c')
+            ]
+            if profile_c_files:
+                conditional_profile_modules.append(mod + '/profile')
+
     src_meson_build_text = src_meson_build % (
         format_lines(modules_unconditional),
         format_lines(mod_no_header),
@@ -511,6 +582,8 @@ def main(args):
         format_lines(head_no_dir),
         format_lines(regression_modules),
         format_lines(unroll_modules),
+        format_lines(profile_modules),
+        format_lines(conditional_profile_modules),
         format_lines(test_only_modules),
     )
     dst_path = join(output_dir, 'src', 'meson.build')
@@ -548,6 +621,19 @@ def main(args):
                 print('Writing %s' % dst_path)
             write_file(dst_path, test_mod_meson_build_text)
 
+        # src/mod/profile/meson.build
+        profile_dir = join(mod_dir, 'profile')
+        if mod not in mod_no_profiles and isdir(profile_dir):
+            profile_c_files = [f for f in listdir(profile_dir) if f.endswith('.c')]
+            if profile_c_files:
+                profile_mod_meson_build_text = profile_mod_meson_build % (
+                    format_lines(profile_c_files),
+                )
+                dst_path = join(profile_dir, 'meson.build')
+                if args.verbose:
+                    print('Writing %s' % dst_path)
+                write_file(dst_path, profile_mod_meson_build_text)
+
     # Build for the NTL tests
     dst_path = join(output_dir, 'src', 'interfaces', 'test', 'meson.build')
     test_mod_meson_build_text = test_mod_NTL_meson_build % 'NTL-interface'
@@ -566,6 +652,16 @@ def main(args):
     if args.verbose:
         print('Writing %s' % dst_path)
     write_file(dst_path, examples_meson_build_text)
+
+    # src/profile/meson.build
+    if top_profile_sources:
+        profile_mod_meson_build_text = profile_mod_meson_build % (
+            format_lines(top_profile_sources),
+        )
+        dst_path = join(top_profile_dir, 'meson.build')
+        if args.verbose:
+            print('Writing %s' % dst_path)
+        write_file(dst_path, profile_mod_meson_build_text)
 
     # src/mpn_extras/*/meson.build
     for path, asm_submodule in asm_modules:

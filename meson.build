@@ -241,6 +241,14 @@ if not examples_opt.disabled()
   subdir('examples')
 endif
 
+profiles_opt = get_option('profiles')
+if not profiles_opt.disabled()
+  foreach mod_profile : mod_profiles
+    subdir('src' / mod_profile)
+  endforeach
+  alias_target('profile', profile_exes)
+endif
+
 tests_opt = get_option('tests')
 if not tests_opt.disabled()
   foreach mod_test : mod_tests
