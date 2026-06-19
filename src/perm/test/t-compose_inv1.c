@@ -1,5 +1,4 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2026 Lars Göttgens
 
     This file is part of FLINT.
@@ -13,49 +12,53 @@
 #include "test_helpers.h"
 #include "perm.h"
 
-TEST_FUNCTION_START(perm_compose, state)
+TEST_FUNCTION_START(perm_compose_inv1, state)
 {
     int i;
 
-    /* check (b^(-1))(b(a)) = a */
+    /* check perm_compose_inv1(a, b) = perm_compose(inv(a), b) without aliasing */
     for (i = 0; i < 10000; i++)
     {
-        slong n, *a, *b, *binv, *c;
+        slong n, *a, *ainv, *b, *c, *d;
 
         n = n_randint(state, 100);
 
         a = _perm_init(n);
+        ainv = _perm_init(n);
         b = _perm_init(n);
-        binv = _perm_init(n);
         c = _perm_init(n);
+        d = _perm_init(n);
 
         _perm_randtest(a, n, state);
         _perm_randtest(b, n, state);
-        _perm_inv(binv, b, n);
+        _perm_inv(ainv, a, n);
 
-        _perm_compose(c, b, a, n);
-        _perm_compose(c, binv, c, n);
+        _perm_compose_inv1(c, a, b, n);
+        _perm_compose(d, ainv, b, n);
 
-        if (!_perm_equal(a, c, n))
+        if (!_perm_equal(c, d, n))
             TEST_FUNCTION_FAIL("FAIL (1):\n"
                     "n = %wd\n"
                     "a = %{slong*}\n\n"
+                    "ainv = %{slong*}\n\n"
                     "b = %{slong*}\n\n"
-                    "binv = %{slong*}\n\n"
-                    "c = %{slong*}\n\n",
+                    "c = %{slong*}\n\n"
+                    "d = %{slong*}\n\n",
                     n,
                     a, n,
+                    ainv, n,
                     b, n,
-                    binv, n,
-                    c, n);
+                    c, n,
+                    d, n);
 
         _perm_clear(a);
+        _perm_clear(ainv);
         _perm_clear(b);
-        _perm_clear(binv);
         _perm_clear(c);
+        _perm_clear(d);
     }
 
-    /* check aliasing with first argument */
+    /* check aliasing the first argument */
     for (i = 0; i < 10000; i++)
     {
         slong n, *a, *b, *c;
@@ -69,10 +72,10 @@ TEST_FUNCTION_START(perm_compose, state)
         _perm_randtest(a, n, state);
         _perm_randtest(b, n, state);
 
-        _perm_compose(c, b, a, n);
-        _perm_compose(b, b, a, n);
+        _perm_compose_inv1(c, a, b, n);
+        _perm_compose_inv1(a, a, b, n);
 
-        if (!_perm_equal(b, c, n))
+        if (!_perm_equal(c, a, n))
             TEST_FUNCTION_FAIL("FAIL (2):\n"
                     "n = %wd\n"
                     "a = %{slong*}\n\n"
@@ -88,7 +91,7 @@ TEST_FUNCTION_START(perm_compose, state)
         _perm_clear(c);
     }
 
-    /* check aliasing with second argument */
+    /* check aliasing the second argument */
     for (i = 0; i < 10000; i++)
     {
         slong n, *a, *b, *c;
@@ -102,10 +105,10 @@ TEST_FUNCTION_START(perm_compose, state)
         _perm_randtest(a, n, state);
         _perm_randtest(b, n, state);
 
-        _perm_compose(c, a, b, n);
-        _perm_compose(b, a, b, n);
+        _perm_compose_inv1(c, a, b, n);
+        _perm_compose_inv1(b, a, b, n);
 
-        if (!_perm_equal(b, c, n))
+        if (!_perm_equal(c, b, n))
             TEST_FUNCTION_FAIL("FAIL (3):\n"
                     "n = %wd\n"
                     "a = %{slong*}\n\n"
@@ -121,7 +124,7 @@ TEST_FUNCTION_START(perm_compose, state)
         _perm_clear(c);
     }
 
-    /* check aliasing with both arguments */
+    /* check aliasing both arguments */
     for (i = 0; i < 10000; i++)
     {
         slong n, *a, *c;
@@ -133,10 +136,10 @@ TEST_FUNCTION_START(perm_compose, state)
 
         _perm_randtest(a, n, state);
 
-        _perm_compose(c, a, a, n);
-        _perm_compose(a, a, a, n);
+        _perm_compose_inv1(c, a, a, n);
+        _perm_compose_inv1(a, a, a, n);
 
-        if (!_perm_equal(a, c, n))
+        if (!_perm_equal(c, a, n))
             TEST_FUNCTION_FAIL("FAIL (4):\n"
                     "n = %wd\n"
                     "a = %{slong*}\n\n"
