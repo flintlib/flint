@@ -1618,8 +1618,8 @@ _gr_arb_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, 
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        slong i, j, deg, deg2;
-        acb_ptr croots;
+        slong i, j, deg, deg2, num;
+        arb_ptr rroots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
@@ -1637,19 +1637,16 @@ _gr_arb_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, 
             {
                 deg2 = fmpz_poly_degree(fac->p + i);
 
-                croots = _acb_vec_init(deg2);
-                arb_fmpz_poly_complex_roots(croots, fac->p + i, 0, ARB_CTX_PREC(ctx));
+                rroots = _arb_vec_init(deg2);
+                num = arb_fmpz_poly_real_roots(rroots, fac->p + i, 0, ARB_CTX_PREC(ctx));
 
-                for (j = 0; j < deg2; j++)
+                for (j = 0; j < num; j++)
                 {
-                    if (acb_is_real(croots + j))
-                    {
-                        GR_MUST_SUCCEED(gr_vec_append(roots, acb_realref(croots + j), ctx));
-                        fmpz_vec_append_ui(mult, fac->exp[i]);
-                    }
+                    GR_MUST_SUCCEED(gr_vec_append(roots, rroots + j, ctx));
+                    fmpz_vec_append_ui(mult, fac->exp[i]);
                 }
 
-                _acb_vec_clear(croots, deg2);
+                _arb_vec_clear(rroots, deg2);
             }
 
             fmpz_poly_factor_clear(fac);
