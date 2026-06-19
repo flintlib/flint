@@ -10,7 +10,6 @@ cfg_data = configuration_data()
 #   Project options
 # -----------------------------------------------------------------------------
 
-libtool_lock_opt = get_option('libtool_lock')
 pthread_opt = get_option('pthread')
 reentrant_opt = get_option('reentrant')
 thread_safe_opt = get_option('thread_safe')

@@ -6,8 +6,6 @@ option('profiles', type : 'feature', value : 'disabled',
         description: 'Configure profile/benchmark programs; enabled also builds them by default')
 option('tunes', type : 'feature', value : 'disabled',
         description: 'Configure tune programs; enabled also builds them by default')
-option('libtool_lock', type : 'feature', value : 'enabled',
-        description: 'Use libtool lock')
 option('pthread', type : 'feature', value : 'enabled',
         description: 'Use pthread')
 option('reentrant', type : 'feature', value : 'disabled',
