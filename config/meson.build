@@ -18,6 +18,7 @@ abi_opt = get_option('abi')
 assert_opt = get_option('assert')
 pretty_tests_opt = get_option('pretty_tests')
 gmp_internals_opt = get_option('gmp_internals')
+mpfr_check_opt = get_option('mpfr_check')
 assembly_opt = get_option('assembly')
 avx2_opt = get_option('avx2')
 avx512_opt = get_option('avx512')
@@ -436,6 +437,44 @@ if gmp_internals_opt.allowed()
     endif
   endforeach
 
+endif
+
+# Match autotools --enable-mpfr-check, which is enabled by default but can be
+# disabled for environments where MPFR hides these internal symbols.
+if not mpfr_check_opt.disabled()
+  mpfr_test_code = '''
+#include <mpfr.h>
+
+@0@
+
+int main(void) {
+  @1@
+  return 0;
+}
+'''
+
+  mpfr_internal_tests = {
+    'mpfr_round_p': [
+      'int mpfr_round_p(mp_srcptr, mp_size_t, mpfr_exp_t, mpfr_prec_t);',
+      'mp_limb_t a[1] = { 0 }; return mpfr_round_p(a, (mp_size_t) 1, (mpfr_exp_t) 0, (mpfr_prec_t) 1);',
+    ],
+    'mpfr_mulhigh_n': [
+      'void mpfr_mulhigh_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);',
+      'mp_limb_t r[1], a[1] = { 0 }, b[1] = { 0 }; mpfr_mulhigh_n(r, a, b, (mp_size_t) 1);',
+    ],
+    'mpfr_sqrhigh_n': [
+      'void mpfr_sqrhigh_n(mp_ptr, mp_srcptr, mp_size_t);',
+      'mp_limb_t r[1], a[1] = { 0 }; mpfr_sqrhigh_n(r, a, (mp_size_t) 1);',
+    ],
+  }
+
+  foreach name, snippets : mpfr_internal_tests
+    _code = mpfr_test_code.format(snippets[0], snippets[1])
+    if not cc.links(_code, args: flint_abi_c_args, dependencies: [mpfr_dep, gmp_link_dep], name: name + ' links')
+      message('This code did not link with -lmpfr: ', _code)
+      error(name + ' was not found in MPFR. Use -Dmpfr_check=disabled to skip this check.')
+    endif
+  endforeach
 endif
 
 # -----------------------------------------------------------------------------

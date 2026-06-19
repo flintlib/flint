@@ -22,6 +22,8 @@ option('pretty_tests', type : 'feature', value : 'enabled',
         description: 'Pretty print test output')
 option('gmp_internals', type : 'feature', value : 'auto',
         description: 'Use GMP internals')
+option('mpfr_check', type : 'feature', value : 'enabled',
+        description: 'Check for MPFR internal functions used by FLINT')
 option('assembly', type : 'feature', value : 'auto',
         description: 'Use assembly code')
 option('avx2', type : 'feature', value : 'disabled',
