@@ -13,7 +13,7 @@ VALGRIND ?= valgrind
 VALGRIND_ARGS ?= --track-origins=yes --leak-check=full --show-reachable=yes
 DESTDIR ?=
 
-.PHONY: all setup library shared static test tests check debug valgrind examples checkexamples profile tune coverage coverage_html install uninstall clean distclean print-%
+.PHONY: all setup library shared static test tests check debug valgrind examples checkexamples profile tune bench coverage coverage_html install uninstall clean distclean print-%
 
 ifneq ($(NJOBS),)
 number_generator = $(words $2) $(if $(word $1,$2),,$(call number_generator,$1,w $2))
@@ -127,6 +127,10 @@ endif
 
 tune: setup
 	$(MESON) compile -C $(BUILD) tune $(MESON_COMPILE_ARGS)
+
+bench: setup
+	$(MESON) compile -C $(BUILD) examples fmpz-profile fmpz_factor-profile fmpz_poly_factor-profile fmpz_mpoly_factor-profile nmod_mpoly_factor-profile $(MESON_COMPILE_ARGS)
+	@LD_LIBRARY_PATH="$(BUILD):$${LD_LIBRARY_PATH}" DYLD_LIBRARY_PATH="$(BUILD):$${DYLD_LIBRARY_PATH}" python3 dev/bench.py
 
 coverage:
 	$(MESON) setup "$(BUILD)" --reconfigure -Db_coverage=true $(MESON_SETUP_ARGS); \

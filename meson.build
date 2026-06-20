@@ -19,6 +19,7 @@ FLINT_LIBRARY_VERSION = '.'.join([FLINT_MAJOR_SO, FLINT_MINOR_SO, FLINT_PATCH_SO
 
 cc = meson.get_compiler('c')
 fs = import('fs')
+python3 = find_program('python3')
 default_library_opt = get_option('default_library')
 build_shared_library = default_library_opt in ['shared', 'both']
 build_static_library = default_library_opt in ['static', 'both']
@@ -63,6 +64,12 @@ add_project_arguments(flint_abi_c_args, language: 'c')
 add_project_link_arguments(flint_abi_c_args, language: 'c')
 
 subdir('src')
+
+meson.add_postconf_script(
+  python3,
+  files('dev/create_build_links.py'),
+  meson.project_build_root(),
+)
 
 if have_assembly
   # Generate config.m4 with assembly language configuration
