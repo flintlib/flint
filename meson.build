@@ -5,6 +5,7 @@ project('FLINT', 'c',
   default_options: [
     'buildtype=release',
     'c_std=c11',
+    'debug=true',
   ],
 )
 
@@ -64,12 +65,6 @@ add_project_arguments(flint_abi_c_args, language: 'c')
 add_project_link_arguments(flint_abi_c_args, language: 'c')
 
 subdir('src')
-
-meson.add_postconf_script(
-  python3,
-  files('dev/create_build_links.py'),
-  meson.project_build_root(),
-)
 
 if have_assembly
   # Generate config.m4 with assembly language configuration

@@ -61,6 +61,7 @@ test: check
 
 tests: setup
 	$(MESON) compile -C $(BUILD) tests $(MESON_COMPILE_ARGS)
+	@python3 dev/create_build_links.py "$(BUILD)"
 
 check: setup
 ifneq ($(NJOBS),)
@@ -124,12 +125,15 @@ ifdef MOD
 else
 	$(MESON) compile -C $(BUILD) profile $(MESON_COMPILE_ARGS)
 endif
+	@python3 dev/create_build_links.py "$(BUILD)"
 
 tune: setup
 	$(MESON) compile -C $(BUILD) tune $(MESON_COMPILE_ARGS)
+	@python3 dev/create_build_links.py "$(BUILD)"
 
 bench: setup
 	$(MESON) compile -C $(BUILD) examples fmpz-profile fmpz_factor-profile fmpz_poly_factor-profile fmpz_mpoly_factor-profile nmod_mpoly_factor-profile $(MESON_COMPILE_ARGS)
+	@python3 dev/create_build_links.py "$(BUILD)"
 	@LD_LIBRARY_PATH="$(BUILD):$${LD_LIBRARY_PATH}" DYLD_LIBRARY_PATH="$(BUILD):$${DYLD_LIBRARY_PATH}" python3 dev/bench.py
 
 coverage:

@@ -1,6 +1,39 @@
 #!/usr/bin/env python3
 import os
+import shutil
+import stat
 import sys
+
+
+EXEC_DIRS = {"profile", "test", "tune"}
+SKIP_SUFFIXES = {".o", ".obj", ".d", ".pdb", ".ilk", ".rsp"}
+
+
+def is_executable_file(path):
+    if not os.path.isfile(path):
+        return False
+    name = os.path.basename(path)
+    if name.endswith(".exe"):
+        return True
+    if os.path.splitext(name)[1] in SKIP_SUFFIXES:
+        return False
+    mode = os.stat(path).st_mode
+    return bool(mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH))
+
+
+def link_or_copy(src, dst):
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+
+    if os.path.lexists(dst):
+        if os.path.isdir(dst) and not os.path.islink(dst):
+            return
+        os.unlink(dst)
+
+    rel_src = os.path.relpath(src, os.path.dirname(dst))
+    try:
+        os.symlink(rel_src, dst)
+    except OSError:
+        shutil.copy2(src, dst)
 
 
 def main(argv):
@@ -14,21 +47,21 @@ def main(argv):
     if not os.path.isdir(src_build_dir):
         return 0
 
-    for name in os.listdir(src_build_dir):
-        src = os.path.join(src_build_dir, name)
-        dst = os.path.join(build_dir, name)
+    for root, dirs, files in os.walk(src_build_dir):
+        dirs[:] = [d for d in dirs if not d.endswith(".p")]
+        rel_root = os.path.relpath(root, src_build_dir)
+        parts = rel_root.split(os.sep)
 
-        if not os.path.isdir(src) or os.path.exists(dst) or os.path.islink(dst):
+        if not any(part in EXEC_DIRS for part in parts):
             continue
 
-        rel_src = os.path.relpath(src, os.path.dirname(dst))
-        try:
-            os.symlink(rel_src, dst, target_is_directory=True)
-        except OSError:
-            # Symlinks may be unavailable on some platforms. The canonical Meson
-            # paths under build/src still work, so this compatibility layer is
-            # best-effort.
-            pass
+        for name in files:
+            src = os.path.join(root, name)
+            if not is_executable_file(src):
+                continue
+
+            dst = os.path.join(build_dir, rel_root, name)
+            link_or_copy(src, dst)
 
     return 0
 
