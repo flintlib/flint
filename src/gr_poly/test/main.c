@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-atan_series.c"
+#include "t-bessel_j_series.c"
 #include "t-compose.c"
 #include "t-compose_divconquer.c"
 #include "t-compose_horner.c"
@@ -104,6 +105,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_poly_atan_series),
+    TEST_FUNCTION(gr_poly_bessel_j_series),
     TEST_FUNCTION(gr_poly_compose),
     TEST_FUNCTION(gr_poly_compose_divconquer),
     TEST_FUNCTION(gr_poly_compose_horner),

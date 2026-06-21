@@ -653,6 +653,8 @@ WARN_UNUSED_RESULT int gr_poly_coth_series(gr_poly_t f, const gr_poly_t h, slong
 WARN_UNUSED_RESULT int gr_poly_tan_pi_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_cot_pi_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int _gr_poly_bessel_j_series(gr_ptr res, gr_srcptr nu, gr_srcptr z, slong zlen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_bessel_j_series(gr_poly_t res, gr_srcptr nu, const gr_poly_t z, slong len, gr_ctx_t ctx);
 
 /* Modular arithmetic and composition */
 
