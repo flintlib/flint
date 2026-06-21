@@ -1078,6 +1078,28 @@ class gr_ctx:
         else:
             return ctx._op_vec_ctx(libgr.gr_gens, "gens")
 
+    def O(ctx, x, exp):
+        """
+        Create a big-O error term. The base must be a generator in
+        a power series ring or the base of a p-adic ring.
+
+            >>> ZZser
+            Power series over Integer ring (fmpz) with precision O(x^6)
+            >>> x = ZZser.gen()
+            >>> ZZser.O(x, 4)
+            0 + O(x^4)
+            >>> 3*x + 5*x**4 + ZZser.O(x, 3)
+            3*x + O(x^3)
+            >>> QQser("1/3 + x/5 - O(x^2)")
+            (1/3) + (1/5)*x + O(x^2)
+            >>> (2**32 - 1) * (1 + Qp_padic_radix(2).O(2, 8))
+            255 + O(2^8)
+
+        Constant input is ambiguous. Use the two-argument version instead:
+
+        """
+        return ctx._binary_op_fmpz(x, exp, libgr.gr_big_o_base_fmpz, "big_o($x, $y)")
+
     def zero(ctx):
         """
         The zero element of this domain.
@@ -4966,18 +4988,18 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7(0)
         0
         >>> Q7(5)
-        (5)
+        5
         >>> Q7(14)            # 14 = 2 * 7
         (2) * 7^1
         >>> Q7(98)            # 98 = 2 * 7^2
         (2) * 7^2
         >>> Q7(-1)
-        (-1)
+        -1
 
     Arithmetic on exactly representable elements stays exact:
 
         >>> Q7(2) + Q7(3)
-        (5)
+        5
         >>> Q7(3) * Q7(7)
         (3) * 7^1
         >>> Q7(7) * Q7(7)
@@ -4985,7 +5007,7 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7(2) - Q7(2)
         0
         >>> Q7(6) / Q7(2)
-        (3)
+        3
         >>> Q7(1) / Q7(7)     # 7^-1 is exact
         (1) * 7^-1
 
@@ -5004,9 +5026,9 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7r
         Radix 7-adic numbers (rel prec 8, abs prec inf)
         >>> Q7r(1) / Q7r(2)               # 2^-1 (mod 7^8)
-        (2882401) + O(7^8)
+        2882401 + O(7^8)
         >>> Q7r(1) / Q7r(3)               # 3^-1 (mod 7^8)
-        (3843201) + O(7^8)
+        3843201 + O(7^8)
         >>> Q7r(1) / Q7r(14)              # (2*7)^-1: valuation -1, 8 digits
         (2882401) * 7^-1 + O(7^7)
 
@@ -5014,7 +5036,7 @@ class Qp_padic_radix(gr_ctx):
     and a finite *relative* precision does not bound the valuation:
 
         >>> Q7r(5)
-        (5)
+        5
         >>> Q7r(7**10)
         (1) * 7^10
         >>> Q7r(1) / Q7r(7)
@@ -5033,7 +5055,7 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7a(7**10)
         0 + O(7^5)
         >>> Q7a(1) / Q7a(3)               # 3^-1 (mod 7^5)
-        (11205) + O(7^5)
+        11205 + O(7^5)
 
     """
 
@@ -9768,12 +9790,33 @@ def test_padic():
     assert Q7(0).sqrt() == 0
     assert Q7(1).sqrt() == 1
     assert Q7(4).sqrt() == 2
-    assert str(Q7(2).sqrt()) == "(266983762) + O(7^10)"
-    assert str((1/(1/Q7(4))).sqrt()) == "(2) + O(7^10)"
+    assert str(Q7(2).sqrt()) == "266983762 + O(7^10)"
+    assert str((1/(1/Q7(4))).sqrt()) == "2 + O(7^10)"
     assert raises(lambda: Q7(3).sqrt(), FlintDomainError)
     assert raises(lambda: Q7(5).sqrt(), FlintDomainError)
     assert raises(lambda: Q7(6).sqrt(), FlintDomainError)
 
+def test_big_o():
+    Q = Qp_padic_radix(7, rel_prec=3)
+    assert raises(lambda: Q("O(5^3)"), FlintUnableError)
+    assert str(Q("O(7^-3)")) == "0 + O(7^-3)"
+    # should saturate the precision limit
+    assert str(Q("O(7^100000000000000000000000000000000000000)")) == str(Q(7) ** (10**100))
+    assert raises(lambda: Q("O(7^-100000000000000000000000000000000000000)"), FlintUnableError)
+    Qx = PolynomialRing(Q, "x")
+    Qxy = PowerSeriesRing(Qx, 2, "y")
+    Qxyz = PolynomialRing(Qxy, "z")
+    Qxyzt = PowerSeriesRing(Qxyz, 3, "t")
+    f = Qxyzt("(3 + O(7^2))*t + (2 + O(y^2))*t + (5 + O(7^1))*t^2")
+    assert str(f) == "((5 + O(7^2)) + O(y^2))*t + (5 + O(7^1))*t^2"
+    for e in range(8):
+        f = Qxyzt("3+x+y+z+t")**e
+        fs = str(f)
+        assert str(Qxyzt(fs)) == fs
+    assert raises(lambda: Q("O(5^3)"), FlintUnableError)
+    assert raises(lambda: Qxy("O(y^-2)"), FlintUnableError)
+    assert str(Qxy("O(y^0)")) == "0 + O(y^0)"
+    assert str(Qxy("O(y)")) == "0 + O(y^1)"
 
 if __name__ == "__main__":
     from time import time

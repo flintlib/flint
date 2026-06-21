@@ -14,6 +14,7 @@
 /* Include functions *********************************************************/
 
 #include "t-series.c"
+#include "t-big_o.c"
 #include "t-series_acb.c"
 #include "t-series_arb.c"
 #include "t-series_fmpq.c"
@@ -26,6 +27,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_series),
+    TEST_FUNCTION(gr_series_big_o),
     TEST_FUNCTION(gr_series_acb),
     TEST_FUNCTION(gr_series_arb),
     TEST_FUNCTION(gr_series_fmpq),

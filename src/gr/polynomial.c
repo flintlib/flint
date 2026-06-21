@@ -393,6 +393,32 @@ polynomial_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
+static int
+polynomial_big_o_base_fmpz(gr_poly_t res, const gr_poly_t base, const fmpz_t exp, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = POLYNOMIAL_ELEM_CTX(ctx);
+    int status;
+
+    /* base is a constant: build O(base^exp) in the coefficient ring and place
+       it as the constant term. Never truncate in y. */
+    if (gr_poly_length(base, cctx) == 1)
+    {
+        gr_ptr t;
+
+        GR_TMP_INIT(t, cctx);
+
+        status = gr_big_o_base_fmpz(t, base->coeffs, exp, cctx);
+        if (status == GR_SUCCESS)
+            status = gr_poly_set_scalar(res, t, cctx);
+
+        GR_TMP_CLEAR(t, cctx);
+        return status;
+    }
+
+    /* we don't support inexact elements with respect to the generator */
+    return GR_UNABLE;
+}
+
 static truth_t
 polynomial_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
 {
@@ -797,6 +823,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_GEN,            (gr_funcptr) polynomial_gen},
     {GR_METHOD_GENS,           (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE, (gr_funcptr) polynomial_gens_recursive},
+    {GR_METHOD_BIG_O_BASE_FMPZ,   (gr_funcptr) polynomial_big_o_base_fmpz},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) polynomial_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) polynomial_is_one},
 /*

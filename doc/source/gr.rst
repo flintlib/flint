@@ -928,6 +928,25 @@ Ordering methods
 Enclosure and interval methods
 ........................................................................
 
+.. function:: int gr_big_o_base_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t n, gr_ctx_t ctx)
+
+    Construct the error term `O(x^n)` as a ring element, where *x* typically
+    will be either a generator of a finite-precision power series ring or the
+    base `p` of a finite-precision `p`-adic ring. Returns ``GR_UNABLE`` for ring
+    implementations that cannot represent such an error term,
+    e.g. when *x* is the generator of an exact polynomial ring.
+
+    If the element *x* is not a top-level generator, the ring implementation
+    should search recursively for a generator of a base ring. For example, in
+    `(R[[x]])[[y]]`, the term `O(x^2)` is understood as `O(x^2) y^0`,
+    and one can build objects with nested error terms like
+    `(x + O(x^5)) + (3 + x + O(x^4)) y^2 + O(y^5)`.
+
+    In ring implementations that provide this method, :func:`gr_set_str`
+    allows parsing strings containing subexpressions of the form ``O(x^n)``.
+    Such expressions are parsed specially and the components *x* and *n*
+    are passed to this function without eagerly evaluating the power `x^n`.
+
 .. function:: int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx)
 
     In ball representations of the real numbers, sets *res* to
@@ -937,6 +956,9 @@ Enclosure and interval methods
     intervals are handled independently for the generators;
     for example, in the complex numbers, `a + b i \pm (0.1 + 0.2 i)`
     is equivalent to `(a \pm 0.1) + (b \pm 0.2) i`.
+
+    In ring implementations that provide this method, :func:`gr_set_str`
+    allows parsing strings containing subexpressions with the syntax ``a +/- b``.
 
 Finite field methods
 ........................................................................
