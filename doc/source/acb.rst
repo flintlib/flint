@@ -465,6 +465,8 @@ Arithmetic
 
 .. function:: void acb_mul_fmpz(acb_t z, const acb_t x, const fmpz_t y, slong prec)
 
+.. function:: void acb_mul_arf(acb_t z, const acb_t x, const arf_t y, slong prec)
+
 .. function:: void acb_mul_arb(acb_t z, const acb_t x, const arb_t y, slong prec)
 
     Sets *z* to the product of *x* and *y*.
