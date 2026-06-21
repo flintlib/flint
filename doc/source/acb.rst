@@ -1231,9 +1231,15 @@ Vector functions
 
 .. function:: void _acb_vec_scalar_mul(acb_ptr res, acb_srcptr vec, slong len, const acb_t c, slong prec)
 
-.. function:: void _acb_vec_scalar_mul_si(acb_ptr res, acb_srcptr vec, slong len, slong c, slong prec)
+.. function:: void _acb_vec_scalar_mul_arb(acb_ptr res, acb_srcptr vec, slong len, const arb_t c, slong prec)
+
+.. function:: void _acb_vec_scalar_mul_arf(acb_ptr res, acb_srcptr vec, slong len, const arf_t c, slong prec)
 
 .. function:: void _acb_vec_scalar_mul_ui(acb_ptr res, acb_srcptr vec, slong len, ulong c, slong prec)
+
+.. function:: void _acb_vec_scalar_mul_si(acb_ptr res, acb_srcptr vec, slong len, slong c, slong prec)
+
+.. function:: void _acb_vec_scalar_mul_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c, slong prec)
 
 .. function:: void _acb_vec_scalar_mul_2exp_si(acb_ptr res, acb_srcptr vec, slong len, slong c)
 
@@ -1243,11 +1249,7 @@ Vector functions
 
 .. function:: void _acb_vec_scalar_div(acb_ptr res, acb_srcptr vec, slong len, const acb_t c, slong prec)
 
-.. function:: void _acb_vec_scalar_mul_arb(acb_ptr res, acb_srcptr vec, slong len, const arb_t c, slong prec)
-
 .. function:: void _acb_vec_scalar_div_arb(acb_ptr res, acb_srcptr vec, slong len, const arb_t c, slong prec)
-
-.. function:: void _acb_vec_scalar_mul_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c, slong prec)
 
 .. function:: void _acb_vec_scalar_div_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c, slong prec)
 
