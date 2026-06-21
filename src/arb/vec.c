@@ -143,13 +143,11 @@ SCALAR_OP(_arb_vec_scalar_div,      arb_ptr, arb_srcptr, const arb_t,  arb_div)
 SCALAR_OP(_arb_vec_scalar_addmul,   arb_ptr, arb_srcptr, const arb_t, arb_addmul)
 
 void
-_arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec)
+_arb_vec_scalar_mul_ui(arb_ptr res, arb_srcptr vec, slong len, ulong c, slong prec)
 {
     arf_t t;
-    arf_init(t);
-    arf_set_fmpz(t, c);
+    arf_init_set_ui(t, c); /* no need to free */
     _arb_vec_scalar_mul_arf(res, vec, len, t, prec);
-    arf_clear(t);
 }
 
 void
@@ -159,6 +157,17 @@ _arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong pr
     arf_init_set_si(t, c); /* no need to free */
     _arb_vec_scalar_mul_arf(res, vec, len, t, prec);
 }
+
+void
+_arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec)
+{
+    arf_t t;
+    arf_init(t);
+    arf_set_fmpz(t, c);
+    _arb_vec_scalar_mul_arf(res, vec, len, t, prec);
+    arf_clear(t);
+}
+
 
 #define COMPARISON_OP(func_name, S, T, OP) \
 int func_name(S ap, T bp, slong len)\
