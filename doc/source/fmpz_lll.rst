@@ -13,6 +13,11 @@ LLL parameters \delta and \eta, the representation type of the input matrix
 (whether it is a lattice basis or a Gram matrix), and the type of Gram
 matrix to be used during L^2 (approximate or exact).
 
+Throughout this module, the contents of ``B`` (or ``FM``) must be consistent
+with ``fl->rt`` (a lattice basis when ``fl->rt`` is `Z\_BASIS`, or a symmetric
+positive semidefinite Gram matrix when ``fl->rt`` is `GRAM`) and with
+``fl->gt``. This consistency is the caller's responsibility and is not checked.
+
 .. function:: void fmpz_lll_context_init_default(fmpz_lll_t fl)
 
     Sets ``fl->delta``, ``fl->eta``, ``fl->rt`` and ``fl->gt`` to

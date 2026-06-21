@@ -176,7 +176,9 @@ Comparison
 
 .. function:: int padic_mat_equal(const padic_mat_t A, const padic_mat_t B)
 
-    Returns whether the two matrices `A` and `B` are equal.
+    Returns whether the two matrices `A` and `B` are equal. The matrices are
+    assumed to be in canonical form; this is not checked. (Two equal matrices
+    that are not both in canonical form may compare as unequal.)
 
 .. function:: int padic_mat_is_zero(const padic_mat_t A)
 
@@ -236,8 +238,10 @@ Addition and subtraction
 
 .. function:: void _padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, const padic_ctx_t ctx)
 
-    Sets `C` to the exact sum `A + B`, ensuring that the result is in 
-    canonical form.
+    Sets `C` to the exact sum `A + B`, ensuring that the result is in
+    canonical form. Assumes that `\operatorname{ord}_p(A) \ge
+    \operatorname{ord}_p(B)`; this is not checked. Use :func:`padic_mat_add`
+    if this cannot be guaranteed.
 
 .. function:: void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, const padic_ctx_t ctx)
 

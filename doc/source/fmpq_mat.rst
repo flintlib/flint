@@ -428,7 +428,8 @@ Trace
 .. function:: void fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat)
 
     Computes the trace of the matrix, i.e. the sum of the entries on
-    the main diagonal. The matrix is required to be square.
+    the main diagonal. The matrix is required to be square, which is not
+    checked.
 
 
 Determinant
@@ -448,8 +449,9 @@ Permanent
 
 .. function:: int fmpq_mat_permanent(fmpq_t res, const fmpq_mat_t A)
 
-    Sets ``res`` to the permanent of the square matrix *A*, returning 1
-    on success. If the matrix is too large, returns 0.
+    Sets ``res`` to the permanent of the square matrix *A* (squareness is
+    not checked), returning 1 on success. If the matrix is too large,
+    returns 0.
 
 
 Nonsingular solving
@@ -523,7 +525,8 @@ Inverse
 .. function:: int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets ``B`` to the inverse matrix of ``A`` and returns nonzero.
-    Returns zero if ``A`` is singular. ``A`` must be a square matrix.
+    Returns zero if ``A`` is singular. ``A`` must be a square matrix,
+    which is not checked.
 
 
 
@@ -579,6 +582,8 @@ Transforms
 .. function:: void fmpq_mat_similarity(fmpq_mat_t A, slong r, fmpq_t d)
 
     Applies a similarity transform to the `n\times n` matrix `M` in-place.
+    The matrix is assumed to be square and ``r`` to satisfy
+    `0 \le r < n`; this is not checked.
 
     If `P` is the `n\times n` identity matrix the zero entries of whose row
     `r` (`0`-indexed) have been replaced by `d`, this transform is equivalent

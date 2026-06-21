@@ -517,7 +517,9 @@ Solving
               int gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
 
     Solves the lower triangular system `LX = B` or the upper triangular system
-    `UX = B`, respectively. Division by the the diagonal entries must
+    `UX = B`, respectively. It is assumed but not checked that *L* is lower
+    triangular (respectively *U* upper triangular); only the relevant triangle
+    is read. Division by the diagonal entries must
     be possible; if not a division fails, ``GR_DOMAIN`` is returned
     even if the system is solvable.
     If *unit* is set, the main diagonal of *L* or *U*
@@ -540,6 +542,9 @@ Solving
               int gr_mat_nonsingular_solve_lu_precomp(gr_mat_t X, const slong * perm, const gr_mat_t LU, const gr_mat_t B, gr_ctx_t ctx)
 
     Solves `AX = B` given a precomputed FFLU or LU factorization of *A*.
+    The factorization data *perm* and the combined factor are assumed (not
+    checked) to be valid, as produced by the corresponding factorization
+    routine.
 
 .. function:: int gr_mat_nonsingular_solve_den_fflu(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_den(gr_mat_t X, gr_ptr den, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
@@ -825,7 +830,8 @@ Companion matrix
     Sets the *n* by *n* matrix *res* to the companion matrix of the polynomial
     *poly* which must have degree *n*.
     The underscore method reads `n + 1` input coefficients.
-    The algorithm assumes that the leading coefficient of *poly* is invertible.
+    The algorithm assumes that the leading coefficient of *poly* is invertible,
+    which is not checked.
 
 .. function:: int _gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, gr_srcptr poly, gr_ctx_t ctx)
               int gr_mat_companion_fraction(gr_mat_t res_num, gr_ptr res_den, const gr_poly_t poly, gr_ctx_t ctx)

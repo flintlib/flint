@@ -780,7 +780,8 @@ Determinant
 
 .. function:: void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A, const fmpz_t d, int proved)
 
-    Given a positive divisor `d` of `\det(A)`, sets ``det`` to the
+    Given a positive divisor `d` of `\det(A)` (this is not checked), sets
+    ``det`` to the
     determinant of the square matrix `A` (if ``proved`` = 1), or a
     probabilistic value for the determinant (``proved`` = 0), computed
     using a multimodular algorithm.
@@ -820,8 +821,9 @@ Permanent
 
 .. function:: int fmpz_mat_permanent(fmpz_t res, const fmpz_mat_t A)
 
-    Sets ``res`` to the permanent of the square matrix *A*, returning 1
-    on success. If the matrix is too large, returns 0.
+    Sets ``res`` to the permanent of the square matrix *A* (squareness is
+    not checked), returning 1 on success. If the matrix is too large,
+    returns 0.
 
 
 Transforms
@@ -831,6 +833,8 @@ Transforms
 .. function:: void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d)
 
     Applies a similarity transform to the `n\times n` matrix `M` in-place.
+    The matrix is assumed to be square and ``r`` to satisfy `0 \le r < n`;
+    this is not checked.
 
     If `P` is the `n\times n` identity matrix the zero entries of whose row
     `r` (`0`-indexed) have been replaced by `d`, this transform is equivalent
@@ -847,7 +851,7 @@ Characteristic polynomial
 
     Compute a bound for the absolute value of the coefficients `c_k` of the
     characteristic polynomial of `A` which is required to be an `n \times n`
-    (square) matrix. We use the fact that
+    (square) matrix, which is not checked. We use the fact that
 
     .. math ::
 
@@ -876,7 +880,9 @@ Characteristic polynomial
               void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
     Compute the characteristic polynomial of an `n \times n` square matrix.
-    The underscore methods write `n + 1` coefficients.
+    The underscore methods write `n + 1` coefficients. The *berkowitz* and
+    *modular* methods assume the matrix is square and do not check it;
+    ``fmpz_mat_charpoly`` itself raises an exception on a non-square matrix.
 
     The *berkowitz* algorithm is a wrapper of :func:`gr_mat_charpoly_berkowitz`.
     The *modular* algorithm computes the characteristic polynomial modulo
@@ -899,6 +905,7 @@ Minimal polynomial
 .. function:: void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
 
     Computes the minimal polynomial of an `n \times n` square matrix.
+    Squareness is assumed and not checked.
     Uses a modular method based on an average time `O(n^3)`, worst case
     `O(n^4)` method over `\mathbb{Z}/n\mathbb{Z}`.
 
@@ -980,7 +987,9 @@ allowed between arguments.
 .. function:: int fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm, const fmpz_mat_t FFLU, const fmpz_mat_t B)
 
     Performs fraction-free forward and back substitution given a precomputed
-    fraction-free LU decomposition and corresponding permutation. If no
+    fraction-free LU decomposition and corresponding permutation. ``FFLU`` and
+    ``perm`` are assumed to be the output of :func:`fmpz_mat_fflu` for the
+    system matrix; this is not checked. If no
     impossible division is encountered, the function returns `1`. This does not
     mean the system has a solution, however a return value of `0` can only
     occur if the system is insoluble.
@@ -1286,7 +1295,8 @@ Hermite normal form
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
     assumed to be of rank `n` and ``D`` is known to be a positive multiple of
-    the determinant of the non-zero rows of ``H``. The algorithm used here is
+    the determinant of the non-zero rows of ``H``. Neither assumption is
+    checked. The algorithm used here is
     due to Domich, Kannan and Trotter [DomKanTro1987]_ and is also described
     in [Algorithm 2.4.8] [Coh1996]_.
 
@@ -1297,16 +1307,17 @@ Hermite normal form
 
     Transforms the `m\times n` matrix ``A`` into Hermite normal form,
     where ``A`` is assumed to be of rank `n` and ``D`` is known to be a
-    positive multiple of the largest elementary divisor of ``A``.
+    positive multiple of the largest elementary divisor of ``A``. Neither
+    assumption is checked.
     The algorithm used here is described in [FieHof2014]_.
 
 .. function:: void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
-    assumed to be of rank `n`. The algorithm used here is due to Kannan and
-    Bachem [KanBac1979]_ and takes the principal minors to Hermite normal
-    form in turn.
+    assumed to be of rank `n`, which is not checked. The algorithm used here
+    is due to Kannan and Bachem [KanBac1979]_ and takes the principal minors
+    to Hermite normal form in turn.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1344,8 +1355,10 @@ Smith normal form
 .. function:: void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of the diagonal matrix ``A``. The algorithm used simply takes
-    gcds of pairs on the diagonal in turn until the Smith form is obtained.
+    normal form of the diagonal matrix ``A``. Only the diagonal entries of
+    ``A`` affect the result; that ``A`` is diagonal is assumed and not
+    checked. The algorithm used simply takes gcds of pairs on the diagonal
+    in turn until the Smith form is obtained.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1362,8 +1375,11 @@ Smith normal form
 .. function:: void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of the nonsingular `n\times n` matrix ``A``. The algorithm
-    used is due to Iliopoulos [Iliopoulos1989]_.
+    normal form of the nonsingular `n\times n` matrix ``A``. It is assumed
+    that ``A`` is nonsingular and that ``mod`` is a positive multiple of the
+    largest elementary divisor of ``A`` (for example a multiple of
+    `\det(A)`); this is not checked. The algorithm used is due to Iliopoulos
+    [Iliopoulos1989]_.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1468,7 +1484,8 @@ Cholesky Decomposition
 .. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
 
     Computes ``R``, the Cholesky factor of a symmetric, positive definite
-    matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
+    matrix ``A`` (this property is assumed and not checked) using the Cholesky
+    decomposition process. (Sets ``R``
     such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
 
 .. note::

@@ -445,6 +445,9 @@ Gaussian elimination and solving
     `UX = B`, respectively. If *unit* is set, the main diagonal of *L* or *U*
     is taken to consist of all ones, and in that case the actual entries on
     the diagonal are not read at all and can contain other data.
+    *L* (respectively *U*) is assumed to be lower (respectively upper)
+    triangular with nonzero diagonal entries; this is not checked, and
+    entries in the unused triangle are ignored.
 
     The *classical* versions perform the computations iteratively while the
     *recursive* versions perform the computations in a block recursive
@@ -454,6 +457,8 @@ Gaussian elimination and solving
 .. function:: void acb_mat_solve_lu_precomp(acb_mat_t X, const slong * perm, const acb_mat_t LU, const acb_mat_t B, slong prec)
 
     Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`.
+    The factorization (*perm* and *LU*) is assumed valid, as produced by the
+    corresponding routine, and is not re-checked.
     The matrices `X` and `B` are allowed to be aliased with each other,
     but `X` is not allowed to be aliased with `LU`.
 
@@ -544,6 +549,11 @@ Gaussian elimination and solving
     the use of block recursive strategies for large matrices), and the
     output matrices are set to the approximate floating-point results with
     zeroed error bounds.
+
+    The triangular solves assume the relevant operand is triangular with
+    nonzero diagonal; this is not checked. For *approx_solve_lu_precomp*,
+    *perm* and the factored matrix are assumed to come from the corresponding
+    *approx_lu*; this is not checked.
 
 Characteristic polynomial and companion matrix
 -------------------------------------------------------------------------------
