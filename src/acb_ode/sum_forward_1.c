@@ -65,10 +65,15 @@ next_coeff(acb_ode_sol_t sol, slong base, slong n,
 
     /* Write the new term to sol, store new extini */
 
+    slong ini_nlogs = 0;
+
     for (k = 0; k < mult; k++)  /* initial conditions */
     {
-        acb_set((sol->series + k)->coeffs + n - base,
-                acb_mat_entry(sol->extini, ini_i, k));
+        acb_ptr c = acb_mat_entry(sol->extini, ini_i, k);
+        acb_set((sol->series + k)->coeffs + n - base, c);
+
+        if (!acb_is_zero(c))
+            ini_nlogs = k + 1;
     }
     for (; k < rhs_nlogs + mult; k++)
     {
@@ -85,7 +90,10 @@ next_coeff(acb_ode_sol_t sol, slong base, slong n,
 
     /* Update log-degree and used initial values */
 
-    sol->nlogs = FLINT_MAX(sol->nlogs, rhs_nlogs + mult);
+    sol->nlogs = FLINT_MAX(sol->nlogs,
+                           rhs_nlogs > 0 ? rhs_nlogs + mult : ini_nlogs);
+    // if (mult)
+    //     flint_printf("n=%wd rhs_nlogs=%wd mult=%wd sol->nlogs=%wd\n", n, rhs_nlogs, mult, sol->nlogs);
 
     for (slong k = 0; k < rhs_nlogs; k++)
         acb_clear(new_term + k);
@@ -168,7 +176,7 @@ _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
     acb_ode_poly_taylor_shift_aps_trunc(ind_n, sum->ind, sum->group->leader, n,
                                         len + mult, sum->wp);
 
-    /* flint_printf("fwd1: n=%wd mult=%wd len=%wd ind_n=%{acb_poly}\n", n, mult, len, ind_n); */
+    // flint_printf("fwd1: n=%wd mult=%wd len=%wd ind_n=%{acb_poly}\n", n, mult, len, ind_n);
 
     /* advance solutions */
 
@@ -184,6 +192,17 @@ _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
                    ind_n, sum->flags & ACB_ODE_APPROX, sum->wp);
         next_sums(sol, sum->n0, n, sum->pows, sum->shifted_sums, sum->npts,
                   sum->binom_n, sum->nder, sum->sum_wp);
+
+        // slong h = sum->sol[m].nlogs - 1;
+        // if (h >= 0)
+        // {
+        //     acb_poly_struct tmp = sum->sol[m].series[h];
+        //     tmp.length = n - sum->n0;
+        //     flint_printf("fwd1: n=%wd m=%wd coeffs=x^%wd*log(x)^%wd/%wd!*(%{acb_poly}) + (...)\n",
+        //                  n, m, sum->n0, h, h, &tmp);
+        //     flint_printf("fwd1: n=%wd m=%wd sum[@log%wd,@pt0]=%{acb}\n",
+        //                  n, m, h, acb_ode_sol_sum_ptr(sum->sol + m, 0, h, 0));
+        // }
     }
 
     /* compute the next power of each evaluation point */

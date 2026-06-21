@@ -84,7 +84,7 @@ fill_group(acb_mat_t mat, const acb_ode_sum_t sum,
 
         acb_ode_sol_jet(val, sum->group->leader, sol, p, sum->pts + p,
                         acb_mat_nrows(mat), mult, prec);
-        // flint_printf("s=%wd mult=%wd val=%{acb_poly}\n\n", s, mult, val);
+        flint_printf("s=%wd mult=%wd cst.acc=%ld val=%{acb_poly}\n", s, mult, val->length > 0 ? acb_rel_accuracy_bits(val->coeffs + 0) : ARF_PREC_EXACT, val);
 
         for (slong k = 0; k < mult; k++)
         {
@@ -142,7 +142,7 @@ _acb_ode_fundamental_matrix_vec(
     /* XXX maybe not the best place to test this;
        redundant with sum_set_points */
     _acb_vec_get_mag(mag, pts, npts);
-    flint_printf("mag=%{mag} cvrad=%{mag}\n", mag, cvrad);
+    flint_printf("fundamental_matrix: mag=%{mag} cvrad=%{mag}\n", mag, cvrad);
     if (mag_cmp(mag, cvrad) >= 0)
     {
         for (slong p = 0; p < npts; p++)
@@ -182,7 +182,7 @@ _acb_ode_fundamental_matrix_vec(
 
             fill_group(win, sum, expos->groups + g, p, basis, prec);
 
-            flint_printf("g=%ld p=%ld win=%{acb_mat}\n", g, p, win);
+            // flint_printf("g=%ld p=%ld win=%{acb_mat}\n", g, p, win);
 
             acb_mat_window_clear(win);
         }
@@ -251,7 +251,10 @@ acb_ode_fundamental_matrix_vec(
     }
 
     if (dop->length == 0)
+    {
+        flint_printf("%s:%d DOMAIN\n", __FILE__, __LINE__);
         return GR_DOMAIN;
+    }
     if (dop->length == 1)
         return GR_SUCCESS;
 
@@ -267,8 +270,11 @@ acb_ode_fundamental_matrix_vec(
     if (is_regular != T_TRUE)
         return gr_check(is_regular);
     if (gr_is_zero(lc->coeffs, Scalars) != T_FALSE)
+    {
         /* we could handle some cases if we were more careful with lcroots */
+        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
         return GR_UNABLE;
+    }
 
     gr_ctx_init_complex_acb(bCC, MAG_BITS);  // XXX prec choice?
     gr_vec_init(sing, 0, bCC);
@@ -315,11 +321,12 @@ acb_ode_fundamental_matrix_vec(
         if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
 
         _lcrt = flint_malloc(sizeof(acb_struct) * (lc->length - 1));
-        for (slong j0 = 0; j0 < sing->length; j0++)
+        for (slong j0 = 0, r = 0; j0 < sing->length; j0++)
         {
             slong m = fmpz_get_si((fmpz *) (sing_mult->entries) + j0);
             for (slong j1 = 0; j1 < m; j1++)
-                _lcrt[j0 + j1] = ((acb_ptr) sing->entries)[j0];
+                _lcrt[r + j1] = ((acb_ptr) sing->entries)[j0];
+            r += m;
         }
         lcrt = _lcrt;
 

@@ -111,7 +111,7 @@ _acb_ode_apply_diffop_basecase_precomp(
         acb_srcptr weights, slong weights_nlogs,
         const acb_poly_struct * f, slong foff, slong flen,
         slong nlogs,
-        slong start, slong len,
+        slong start, slong len,  /* start currently unused */
         slong prec)
 {
     for (slong p1 = 0; p1 < len; p1++)  /* n1 = offset + start + p1 */

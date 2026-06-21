@@ -275,9 +275,9 @@ typedef acb_ode_sol_struct acb_ode_sol_t[1];
 
 ACB_ODE_INLINE acb_ptr
 acb_ode_sol_sum_ptr(const acb_ode_sol_t sol,
-                    slong j, slong k, slong i)
+                    slong p, slong k, slong i)
 {
-    return sol->sums + (j * sol->alloc_logs + k) * sol->nder + i;
+    return sol->sums + (p * sol->alloc_logs + k) * sol->nder + i;
 }
 
 void acb_ode_sol_init(acb_ode_sol_t sol, slong nshifts,
@@ -293,18 +293,6 @@ void acb_ode_sol_fit_length(acb_ode_sol_t sol, slong len);
 void
 acb_ode_sol_set_ini(acb_ode_sol_t sol, acb_srcptr ini,
                     const acb_ode_shift_t shifts);  // unused
-void acb_ode_sol_unit_ini(acb_ode_sol_t sol, slong i0,
-                          const acb_ode_shift_t shifts);
-
-void
-_acb_ode_sol_add_term(
-        acb_ode_sol_t sol, slong base, slong n,
-        acb_poly_struct * rhs, slong rhs_nlogs,
-        /* XXX define a separate struct with the next three? */
-        slong mult, slong ini_i, const acb_poly_t ind_n,
-        acb_srcptr pows, const char * shifted, slong npts,
-        const fmpz * binom_n,
-        slong nder, slong prec, slong sums_prec);
 
 void _acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, acb_srcptr sums, slong stride, mag_srcptr tb, const acb_t pt, slong nlogs, slong ord, slong nfrobshifts, slong prec);
 void acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, const acb_ode_sol_t sol, slong j, const acb_t pt, slong nder, slong nfrobshifts, slong prec);
@@ -313,7 +301,7 @@ slong
 acb_ode_sol_estimate_terms(mag_t est,
                            const acb_ode_sol_t sol, slong off, slong len,
                            const mag_t radpow);
-slong acb_ode_sol_estimate_sums(mag_t est, mag_t rad, const acb_ode_sol_t sol);
+slong acb_ode_sol_estimate_sums(mag_t mag, mag_t rad, const acb_ode_sol_t sol);
 
 
 /****************************************************************************/
@@ -426,7 +414,7 @@ void _acb_ode_fundamental_matrix_vec(
 
 WARN_UNUSED_RESULT int acb_ode_fundamental_matrix_vec(
         acb_mat_struct * mat,
-        const gr_ore_poly_t dop, gr_ore_poly_ctx_t dop_ctx,
+        const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop,
         const acb_ode_exponents_t expos,
         acb_srcptr lcrt,
         acb_srcptr pts, slong npts,
@@ -435,7 +423,7 @@ WARN_UNUSED_RESULT int acb_ode_fundamental_matrix_vec(
 
 WARN_UNUSED_RESULT int acb_ode_fundamental_matrix(
         acb_mat_t mat,
-        const gr_ore_poly_t dop, gr_ore_poly_ctx_t dop_ctx,
+        const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop,
         const acb_ode_exponents_t expos,
         acb_srcptr lcrt,
         const acb_t pt,

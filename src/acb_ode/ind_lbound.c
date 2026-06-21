@@ -84,8 +84,8 @@ find_min(slong * n_min, mag_ptr lb, const acb_ode_group_t group,
             acb_get_mag_lower(tmpmag, tmpacb);
             mag_min(lb, lb, tmpmag);
         }
-        mag_pow_ui_lower(lb, lb, mult);
     }
+    mag_pow_ui_lower(lb, lb, mult);
 
     acb_clear(tmpacb);
     arb_clear(crit_n);
@@ -101,7 +101,7 @@ acb_ode_ind_lbound_precompute(acb_ode_ind_lbound_t ind_lbound,
                               slong prec)
 {
     acb_t leader, rt;
-    /* flint_printf("== acb_ode_ind_lbound_precompute ==\n"); */
+    /* flint_printf("acb_ode_ind_lbound_precompute\n"); */
 
     acb_init(leader);
     acb_init(rt);

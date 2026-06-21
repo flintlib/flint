@@ -22,7 +22,7 @@ _acb_vec_get_mag_lower(mag_t bound, acb_srcptr vec, slong len)
     {
         mag_t t;
         slong i;
-        acb_get_mag(bound, vec);
+        acb_get_mag_lower(bound, vec);
         mag_init(t);
         for (i = 1; i < len; i++)
         {

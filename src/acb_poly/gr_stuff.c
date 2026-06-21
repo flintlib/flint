@@ -2,7 +2,7 @@
 #include "gr_poly.h"
 
 int
-gr_ore_poly_ctx_over_gr_poly_base_ptrs(gr_ctx_struct ** Scalars,
+gr_ore_poly_ctx_over_gr_poly_base_ptrs(gr_ctx_struct ** Cst,
                                     gr_ctx_struct ** Pol, const gr_ctx_t Ore)
 {
     gr_ctx_struct * _Pol = GR_ORE_POLY_ELEM_CTX(Ore);
@@ -13,27 +13,28 @@ gr_ore_poly_ctx_over_gr_poly_base_ptrs(gr_ctx_struct ** Scalars,
 
     if (Pol != NULL)
         * Pol = _Pol;
-    if (Scalars != NULL)
-        * Scalars = POLYNOMIAL_ELEM_CTX(_Pol);
+    if (Cst != NULL)
+        * Cst = POLYNOMIAL_ELEM_CTX(_Pol);
 
     return GR_SUCCESS;
 }
 
+/* assumes that the coefficients are not all divisible by x */
 int
 _gr_ore_poly_indicial_polynomial_euler_derivative(gr_ptr ind, gr_srcptr op,
                                                   slong len, gr_ctx_t Ore)
 {
-    gr_ctx_struct * Scalars, * Pol;
+    gr_ctx_struct * Cst, * Pol;
 
     int status = GR_SUCCESS;
 
-    GR_MUST_SUCCEED (gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Scalars, &Pol, Ore));
+    GR_MUST_SUCCEED (gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Cst, &Pol, Ore));
 
     for (slong i = 0; i < len; i++)
-        status = gr_poly_get_coeff_scalar(
-                GR_ENTRY(ind, i, Scalars->sizeof_elem),
+        status |= gr_poly_get_coeff_scalar(
+                GR_ENTRY(ind, i, Cst->sizeof_elem),
                 GR_ENTRY(op, i, Pol->sizeof_elem),
-                0, Scalars);
+                0, Cst);
 
     return status;
 }
@@ -53,18 +54,22 @@ _gr_ore_poly_indicial_polynomial(gr_ptr ind, gr_srcptr op, slong len, gr_ctx_t O
 int
 gr_ore_poly_indicial_polynomial(gr_poly_t ind, const gr_ore_poly_t op, gr_ctx_t Ore)
 {
-    gr_ctx_struct * Scalars;
+    gr_ctx_struct * Cst;
 
-    if (gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Scalars, NULL, Ore) != GR_SUCCESS)
+    if (gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Cst, NULL, Ore) != GR_SUCCESS)
         return GR_UNABLE;
 
     // XXX move to level depending on operator type?
-    gr_poly_fit_length(ind, op->length, Scalars);
+    gr_poly_fit_length(ind, op->length, Cst);
 
-    int status = _gr_ore_poly_indicial_polynomial(ind->coeffs, op->coeffs, op->length, Ore);
+    int status = _gr_ore_poly_indicial_polynomial(ind->coeffs, op->coeffs,
+                                                  op->length, Ore);
 
-    _gr_poly_set_length(ind, op->length, Scalars);
-    _gr_poly_normalise(ind, Scalars);
+    _gr_poly_set_length(ind, op->length, Cst);
+    _gr_poly_normalise(ind, Cst);
+
+    if (gr_poly_is_zero(ind, Cst) != T_FALSE)
+        return GR_UNABLE;
 
     return status;
 }

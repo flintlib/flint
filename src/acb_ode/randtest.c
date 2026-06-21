@@ -28,7 +28,7 @@ acb_ode_randtest_acb(acb_poly_struct * dop, acb_struct * lcroots,
         acb_poly_set_acb(dop + i, tmp->coeffs + i);
 
     // flint_printf("expos_len=%wd ind=%{acb_poly} expos=", expos_len, tmp);
-    acb_ode_exponents_println(expos);
+    // acb_ode_exponents_println(expos);
 
     /* adjust the leading coefficient */
 

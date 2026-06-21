@@ -57,5 +57,5 @@ int main(void)
 
     flint_cleanup_master();
 
-    return (status == GR_SUCCESS);
+    return status;
 }

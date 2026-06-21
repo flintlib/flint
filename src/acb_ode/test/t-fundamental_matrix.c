@@ -19,8 +19,16 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
     gr_ctx_init_complex_qqbar(QQbar);
     gr_ctx_init_complex_ca(CaCC);
 
+    // flint_rand_set_seed(state, 0x1a80d415a36b39ff, 0xa199470569e8c77c);
+
     for (slong iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
+        flint_printf("******************************************\n");
+
+        ulong seed1, seed2;
+        flint_rand_get_seed(&seed1, &seed2, state);
+        flint_printf("flint_rand_set_seed(state, 0x%lx, 0x%lx);\n", seed1, seed2);
+
         int status = GR_SUCCESS;
         int expect_success = 0;
 
@@ -125,7 +133,12 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
             }
             acb_poly_product_roots(pert, lcroots + lcdeg, lcdeg1 - lcdeg, prec);
 
-            expect_success = 1;
+            if (dop->length == 0
+                || !acb_contains_zero(
+                        ((acb_poly_struct *)
+                                   gr_ore_poly_coeff_ptr(dop, dop_len - 1, Dop))
+                        ->coeffs + 0))
+                expect_success = 1;
         }
         else
         {
@@ -139,7 +152,11 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
                 acb_ode_group_struct * grp = expos->groups + g;
                 for (slong s = 0; s < grp->nshifts; s++)
                     if (grp->shifts[s].n > disp)
+                    {
+                        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
                         status = GR_UNABLE;
+                        expect_success = 0;
+                    }
             }
 
             status |= gr_randtest_not_zero(pert, state, Pol);
@@ -152,13 +169,14 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
                         POLYNOMIAL_ELEM_CTX(Pol));
         }
 
+        slong order = dop->length - 1;
+
         if (expos->ngroups == 1 && n_randint(state, 4))
             expos1 = NULL;
         else
             expos1 = expos;
 
         status |= gr_ore_poly_other_mul(dop1, pert, Pol, dop, Dop);
-        slong order = dop->length - 1;
 
         /* evaluation points */
 
@@ -184,7 +202,7 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
             if (n_randint(state, 2))
                 acb_set(pts1 + p, pts + p);
             else
-            {
+            {  // XXX do this less often or perturb less violently
                 acb_randtest_special(r, state, prec, 3);
                 acb_add(pts1 + p, pts  + p, r, prec);
                 acb_sub(pts1 + p, pts1 + p, r, prec);
@@ -204,17 +222,26 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
             acb_mat_init(mat2 + p, nrows, order);
         }
 
+        // XXX maybe let it run at least when we just failed to compute the
+        // optional parts of the input
         if (status != GR_SUCCESS)
             goto cleanup;
 
-        flint_printf("******** testing: ********\n", Dop);
+        flint_printf("--- testing: ---\n");
         flint_printf("Dop = %{gr_ctx}\n", Dop);
         flint_printf("dop = %{gr}\n", dop, Dop);
         flint_printf("dop1 = %{gr}\n", dop1, Dop);
-        flint_printf("pts = %{acb*}\n", pts, npts);
+        flint_printf("pts = %{acb*} accuracy", pts, npts);
+        for (slong i = 0; i < npts; i++)
+            flint_printf(" %ld", acb_rel_accuracy_bits(pts + i));
+        flint_printf("\n");
         flint_printf("pts1 = %{acb*}\n", pts1, npts);
         flint_printf("expos = "); acb_ode_exponents_println(expos);
         flint_printf("expos1 = %p\n", expos1);
+        if (lcroots)
+            flint_printf("lcroots = %{acb*}\n", lcroots, lcdeg1);
+        else
+            flint_printf("lcroots = (nil)\n");
         flint_printf("prec = %wd, prec1 = %wd\n", prec, prec1);
 
         flint_printf("--- run 0 ---\n");
@@ -275,9 +302,9 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
                         if (!acb_overlaps(c, c1))
                         {
                             flint_printf("\nres[%ld,%ld] ", i, j);
-                            acb_printn(c, prec/3, 0);
+                            acb_printn(c, prec * 0.3, 0);
                             flint_printf(" ≠ ");
-                            acb_printn(c1, prec/3, 0);
+                            acb_printn(c1, prec * 0.3, 0);
                             flint_printf("\n");
                             // acb_print(c);
                             // flint_printf(" ≠ ");
@@ -312,24 +339,25 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
             {
                 slong failed = 0;
                 for (slong i = 0; i < mat[p].r; i++)
+                {
                     for (slong j = 0; j < mat[p].c; j++)
                     {
                         acb_ptr c = acb_mat_entry_ptr(mat + p, i, j);
                         acb_ptr c2 = acb_mat_entry_ptr(mat2 + p, i, j);
+                        flint_printf("res[%ld,%ld] ", i, j);
+                        acb_printn(c, prec/3, 0);
                         if (!acb_overlaps(c, c2))
                         {
-                            flint_printf("\nres[%ld,%ld] ", i, j);
-                            acb_printn(c, prec/3, 0);
                             flint_printf(" ≠ ");
-                            acb_printn(c2, prec/3, 0);
-                            flint_printf("\n");
-                            // acb_print(c);
-                            // flint_printf(" ≠ ");
-                            // acb_print(c1);
-                            // flint_printf("\n");
                             failed = 1;
                         }
+                        else
+                            flint_printf(" ≈ ");
+                        acb_printn(c2, prec/3, 0);
+                        flint_printf("\n");
                     }
+                    flint_printf("\n");
+                }
                 if (failed)
                 {
                     flint_printf("FAIL: overlap 2\n\n");

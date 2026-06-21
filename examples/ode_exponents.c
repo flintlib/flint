@@ -136,4 +136,6 @@ main(void)
     whittaker();
 
     flint_cleanup_master();
+
+    return 0;
 }

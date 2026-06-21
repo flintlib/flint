@@ -37,20 +37,6 @@ acb_ode_sol_set_ini(acb_ode_sol_t sol, acb_srcptr ini,
 
 
 void
-acb_ode_sol_unit_ini(acb_ode_sol_t sol, slong i0,
-                     const acb_ode_shift_t shifts)
-{
-    slong nshifts = acb_mat_nrows(sol->extini);
-    for (slong i = 0, j = 0; j < nshifts; j++)
-    {
-        slong mult = shifts ? shifts[j].mult : 1;
-        for (slong k = 0; k < mult; k++, i++)
-            acb_set_si(acb_mat_entry(sol->extini, j, k), i == i0 ? 1 : 0);
-    }
-}
-
-
-void
 acb_ode_sol_clear(acb_ode_sol_t sol)
 {
     acb_mat_clear(sol->extini);

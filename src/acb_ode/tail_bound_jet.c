@@ -37,7 +37,9 @@ _arb_poly_product_roots_trunc(arb_ptr res, arb_ptr rts, slong rts_len,
     }
 
     if (trunc > rts_len)
+    {
         arb_one(res + rts_len);
+    }
 }
 
 static void
@@ -114,7 +116,7 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
         const arb_t cst, arb_ptr den_rt, slong den_rt_len,
         const arb_t rad, slong ord, slong prec)
 {
-    /* flint_printf("== maj_jet n=%ld ord=%ld rad=%{arb} ==\n", n, ord, rad); */
+    // flint_printf("maj_jet n=%ld ord=%ld rad=%{arb}\n", n, ord, rad);
 
     arb_poly_t pre_ser, invden_ser, shx_ser, int_pol_ser, int_rat_ser, int_ser;
     arb_ptr rt_rad = _arb_vec_init(den_rt_len);
@@ -136,8 +138,14 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
     _arb_poly_set_length(invden_ser, ord);
     _arb_poly_normalise(invden_ser);
 
+    // flint_printf("den_rt=%{arb*}\n", den_rt, den_rt_len);
+    // flint_printf("rt_rad=%{arb*}\n", rt_rad, den_rt_len);
+    // flint_printf("invden_ser(1)=%{arb_poly}\n", invden_ser);
+
     if (den_rt_len % 2)
         arb_poly_neg(invden_ser, invden_ser);
+
+    // flint_printf("invden_ser(2)=%{arb_poly}\n", invden_ser);
 
     if (arb_contains_zero(invden_ser->coeffs))
     {
@@ -147,10 +155,10 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
         goto cleanup;
     }
     arb_poly_inv_series(invden_ser, invden_ser, ord, prec);
-    // XXX not 100% sure this cst should be there
     arb_poly_scalar_mul(invden_ser, invden_ser, cst, prec);
 
-    /* flint_printf("invden_ser=%{arb_poly}\n", invden_ser); */
+    // flint_printf("invden_ser(3)=%{arb_poly}\n", invden_ser);
+
     for (slong i = 0; i < invden_ser->length; i++)
         FLINT_ASSERT(!arb_is_negative(invden_ser->coeffs + i));
 
@@ -229,8 +237,6 @@ acb_ode_tail_bound_jet_precomp(arb_poly_t res,
             const arb_poly_t nres_maj,  /* implicit x^n factor */
             const arb_t rad, slong ord, slong prec)
 {
-    // flint_printf("== acb_ode_tail_bound_jet_precomp n=%ld ==\n", n);
-
     arb_poly_t pre;
 
     if (arb_poly_is_zero(nres_maj))
@@ -256,8 +262,8 @@ acb_ode_tail_bound_jet_precomp(arb_poly_t res,
     maj_jet(res, n, pre, itg_pol, rat_shift, itg_num, bound->cst,
             bound->den_rt, bound->den_rt_len, rad, ord, prec);
 
-    // flint_printf("n=%ld pre=%{arb_poly}\n", n, pre);
-    // flint_printf("n=%ld maj_jet=%{arb_poly}\n", n, res);
+    flint_printf("n=%ld pre=%{arb_poly}\n", n, pre);
+    flint_printf("n=%ld maj_jet=%{arb_poly}\n", n, res);
 
     arb_poly_clear(pre);
 }

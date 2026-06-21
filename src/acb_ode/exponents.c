@@ -151,7 +151,7 @@ acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
 
     for (acb_ode_group_struct * grp = expos->groups; len > 0; grp++)
     {
-        flint_printf("len = %wd\n", len);
+        // flint_printf("len = %wd\n", len);
 
         expos->ngroups++;
 
@@ -176,7 +176,7 @@ acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
              grplen > 0;
              shift++, n += 1 + n_randint(state, disp - n))
         {
-            flint_printf("len = %wd grplen = %wd n = %wd\n", len, grplen, n);
+            // flint_printf("len = %wd grplen = %wd n = %wd\n", len, grplen, n);
 
             grp->nshifts++;
 
@@ -187,7 +187,7 @@ acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
                 shift->mult = 1 + n_randint(state, grplen);
             grplen -= shift->mult;
 
-            acb_ode_exponents_println(expos);
+            // acb_ode_exponents_println(expos);
         }
     }
 }
@@ -220,10 +220,21 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
         return GR_UNABLE;
     }
 
+    gr_poly_init(ind, Scalars);
+
+    /* Compute the local exponents (indicial roots) and organize them into shift
+       equivalence classes */
+
+    status |= gr_ore_poly_indicial_polynomial(ind, dop, Dop);
+    if(status)
+    {
+        flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+        goto cleanup_ind;
+    }
+
     gr_ctx_init_fmpz(ZZ);
     gr_ctx_init_vector_gr_vec(ZZvec, ZZ);  /* XXX fmpz_vec */
 
-    gr_poly_init(ind, Scalars);
     gr_poly_init(polc, Scalars);
     gr_poly_vec_init(fac, 0, Scalars);
     fmpz_vec_init(mult, 0);
@@ -232,13 +243,6 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
     gr_vec_init(slmult, 0, ZZvec);
     gr_vec_init(roots, 0, CC);
     fmpz_vec_init(rtmult, 0);
-
-    /* Compute the local exponents (indicial roots) and organize them into shift
-       equivalence classes */
-
-    status |= gr_ore_poly_indicial_polynomial(ind, dop, Dop);
-    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
-    // GR_MUST_SUCCEED(status); // tmp
 
     /* XXX In some cases this should use the irreducible factorization for
        representing the exponents exactly; in others, this should compute the
@@ -343,10 +347,12 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
     fmpz_vec_clear(mult);
     gr_poly_vec_clear(fac, Scalars);
     gr_poly_clear(polc, Scalars);
-    gr_poly_clear(ind, Scalars);
 
     gr_ctx_clear(ZZvec);
     gr_ctx_clear(ZZ);
+
+cleanup_ind:
+    gr_poly_clear(ind, Scalars);
 
     return status;
 }

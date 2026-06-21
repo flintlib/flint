@@ -24,7 +24,7 @@ acb_ode_stairs_precompute(acb_ode_stairs_t stairs,
                           const acb_ode_ind_lbound_t ind_lbound,
                           slong prec)
 {
-    /* flint_printf("== _acb_ode_stairs_precompute %{acb} ==\n", group->leader); */
+    /* flint_printf("_acb_ode_stairs_precompute %{acb}\n", group->leader); */
 
     if (stairs->h != NULL)
         acb_ode_stairs_clear(stairs);

@@ -55,10 +55,10 @@ ind_lbound_eval(mag_t res, const acb_ode_ind_lbound_t ind_lbound, slong n,
 
 void
 acb_ode_bound_rat_ordinary_vec(mag_ptr res,
-                                const acb_poly_struct * num, slong len,
-                                const acb_poly_t ind,
-                                const acb_ode_ind_lbound_t ind_lbound,
-                                slong n0, slong ord, slong prec)
+                               const acb_poly_struct * num, slong len,
+                               const acb_poly_t ind,
+                               const acb_ode_ind_lbound_t ind_lbound,
+                               slong n0, slong ord, slong prec)
 {
     FLINT_ASSERT(n0 >= 0);
 

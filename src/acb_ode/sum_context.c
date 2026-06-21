@@ -14,7 +14,7 @@ acb_ode_sum_init(acb_ode_sum_t sum, slong dop_len, slong npts,
 {
     slong dop_order = dop_len - 1;
 
-    sum->dop = _acb_poly_vec_init(dop_len);
+    sum->dop = _acb_poly_vec_init(dop_len);  // XXX leave this to set_diffop?
     sum->dop_len = dop_len;
 
     acb_ode_group_init(sum->group, dop_order);
@@ -83,6 +83,7 @@ acb_ode_sum_set_diffop(acb_ode_sum_t sum, const acb_poly_struct * dop, slong dop
                        const mag_t cvrad)
 {
     FLINT_ASSERT(dop_len > 0);
+    FLINT_ASSERT(dop_len == sum->dop_len);  // XXX grow buffer?
     _acb_poly_vec_set(sum->dop, dop, dop_len);
     mag_set(sum->cvrad, cvrad);
 }
@@ -98,6 +99,7 @@ acb_ode_sum_set_ordinary(acb_ode_sum_t sum)
         sum->group->shifts[n].n = n;
         sum->group->shifts[n].mult = 1;
     }
+    sum->group->nshifts = sum->dop_len - 1;
 }
 
 void
@@ -108,11 +110,25 @@ acb_ode_sum_set_group(acb_ode_sum_t sum, const acb_ode_group_t group)
 
 /* Initial values */
 
+static void
+acb_ode_sol_unit_ini(acb_ode_sol_t sol, slong i0,
+                     const acb_ode_shift_struct * shifts, slong nshifts)
+{
+    for (slong i = 0, j = 0; j < nshifts; j++)
+    {
+        slong mult = shifts ? shifts[j].mult : 1;
+        for (slong k = 0; k < mult; k++, i++)
+            acb_set_si(acb_mat_entry(sol->extini, j, k), i == i0 ? 1 : 0);
+    }
+}
+
+
 void
 acb_ode_sum_set_ini_echelon(acb_ode_sum_t sum)
 {
     for (int m = 0; m < sum->nsols; m++)
-        acb_ode_sol_unit_ini(sum->sol + m, m, sum->group->shifts);
+        acb_ode_sol_unit_ini(sum->sol + m, m, sum->group->shifts,
+                             sum->group->nshifts);
 }
 
 

@@ -92,6 +92,7 @@ bound_normalized_residuals(arb_poly_struct * nres_maj,
 
             // XXX tighten?
             slong nlogs_dm = FLINT_MIN(sum->sol[m].nlogs, nlogs_d);
+
             // flint_printf("n=%ld sol[%ld].nlogs=%ld nlogs_d=%ld\n", sum->n, m, sum->sol[m].nlogs, nlogs_d);
 
             /* nres_term = coeff of x^{λ+n+d} in normalized residual of sol m */
@@ -177,7 +178,7 @@ update_tail_bounds(acb_ode_sum_struct * sum,
         }
 
         arf_set_mag(arb_midref(rad), sum->mag);
-        // flint_printf("n=%ld m=%ld nres_maj=%{arb_poly}\n", sum->n, m, nres_maj + m);
+        flint_printf("n=%ld m=%ld nres_maj=%{arb_poly}\n", sum->n, m, nres_maj + m);
         acb_ode_tail_bound_jet_precomp(jet_tb, bound, sum->n, sum->itg_pol,
                                        sum->itg_num, nres_maj + m, rad,
                                        sum->nder, MAG_BITS);
@@ -263,7 +264,7 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
         }
 
         // flint_printf("n=%ld ", sum->n); acb_ode_cvest_println(sol->cvest);
-        // if (sum->n % (10 * stride) == 0)
+        // // if (sum->n % (10 * stride) == 0)
         //     flint_printf("n=%ld prec=%ld m=%ld est=%{mag} accuracy=%ld sum_mag=%{mag} sum_rad=%{mag} sum_accuracy=%ld eps=%{mag}\n", sum->n, prec, m, est, accuracy, sum_mag, sum_rad, sum_accuracy, eps);
 
         /* quick non-rigorous check */
@@ -317,7 +318,7 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
             stop = 0;
         }
 
-        if (stop || sum->n % (10 * stride) == 0)
+        // if (stop || sum->n % (10 * stride) == 0)
             flint_printf("n=%ld m=%ld tb=%{mag*}\n", sum->n, m, sol->tb, sol->nder);
     }
 

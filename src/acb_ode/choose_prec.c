@@ -35,7 +35,7 @@ acb_ode_choose_prec(slong * rec_prec, const acb_poly_struct * dop, slong dop_len
     {
         mag_div_lower(ratio, cvrad, rad);
         nterms = prec / mag_get_d_log2_approx(ratio);
-        flint_printf("rad=%{mag} cvrad=%{mag} prec0=%ld nterms=%ld\n", rad, cvrad, prec0, nterms);
+        flint_printf("choose_prec: rad=%{mag} cvrad=%{mag} prec0=%ld nterms=%f\n", rad, cvrad, prec0, nterms);
     }
     else
     {
