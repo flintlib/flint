@@ -45,7 +45,7 @@ void ca_vec_clear(ca_vec_t vec, ca_ctx_t ctx);
 void _ca_vec_swap(ca_ptr vec1, ca_ptr vec2, slong len, ca_ctx_t ctx);
 
 CA_VEC_INLINE void
-ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
+ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(ca_vec_struct, *vec1, *vec2);
 }
@@ -53,7 +53,7 @@ ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
 /* Length */
 
 CA_VEC_INLINE
-slong ca_vec_length(const ca_vec_t vec, ca_ctx_t ctx)
+slong ca_vec_length(const ca_vec_t vec, ca_ctx_t FLINT_UNUSED(ctx))
 {
     return vec->length;
 }
@@ -131,7 +131,7 @@ _ca_vec_is_fmpq_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
 }
 
 CA_VEC_INLINE int
-_ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t ctx)
+_ca_vec_fmpq_vec_is_fmpz_vec(ca_srcptr vec, slong len, ca_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     for (i = 0; i < len; i++)
