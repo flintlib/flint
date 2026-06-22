@@ -63,46 +63,57 @@ Utility methods
 Polynomial roots
 -------------------------------------------------------------------------------
 
-.. function:: void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)
+The following methods assume that the input polynomial is squarefree.
+For a general polynomial, compute the squarefree part `f / \gcd(f,f')` or
+do a full squarefree factorization to obtain the multiplicities of the roots::
 
-    Writes to *roots* all the real and complex roots of the polynomial *poly*,
+    fmpz_poly_factor_t fac;
+    fmpz_poly_factor_init(fac);
+    fmpz_poly_factor_squarefree(fac, poly);
+
+    for (i = 0; i < fac->num; i++)
+    {
+        deg = fmpz_poly_degree(fac->p + i);
+        flint_printf("%wd roots of multiplicity %wd\n", deg, fac->exp[i]);
+        roots = _acb_vec_init(deg);
+        arb_fmpz_poly_complex_roots(roots, fac->p + i, 0, prec);
+        _acb_vec_clear(roots, deg);
+    }
+
+    fmpz_poly_factor_clear(fac);
+
+.. function:: void arb_fmpz_poly_refine_root_arb(arb_t res, const fmpz_poly_t poly, const arb_t initial, slong prec)
+
+    Given an enclosure *initial* known to contain exactly one root of *poly*,
+    compute an enclosure for the same root accurate to at least *prec* bits.
+    The polynomial must be squarefree.
+
+    Currently this method assumes that the root lies in the interior
+    of *initial* unless *initial* is exact; it may fail to converge
+    if the root is either endpoint of *initial*.
+
+.. function:: slong arb_fmpz_poly_real_roots(arb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)
+              void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong prec)
+
+    Writes to *roots* all the roots of the polynomial *poly* over `\mathbb{R}`
+    and `\mathbb{C}` respectively,
     computed to at least *prec* accurate bits.
     The root enclosures are guaranteed to be disjoint, so that
     all roots are isolated.
 
-    The real roots are written first in ascending order (with
-    the imaginary parts set exactly to zero). The following
+    The *real* version returns the number of real roots (for the *complex*
+    version, the number of roots is always equal to the degree
+    of the polynomial).
+    For the *complex* method, the real roots are written first in
+    ascending order (with the imaginary parts set exactly to zero). The following
     nonreal roots are written in arbitrary order, but with conjugate pairs
     grouped together (the root in the upper plane leading
     the root in the lower plane).
-
-    The input polynomial *must* be squarefree. For a general polynomial,
-    compute the squarefree part `f / \gcd(f,f')` or do a full squarefree
-    factorization to obtain the multiplicities of the roots::
-
-        fmpz_poly_factor_t fac;
-        fmpz_poly_factor_init(fac);
-        fmpz_poly_factor_squarefree(fac, poly);
-
-        for (i = 0; i < fac->num; i++)
-        {
-            deg = fmpz_poly_degree(fac->p + i);
-            flint_printf("%wd roots of multiplicity %wd\n", deg, fac->exp[i]);
-            roots = _acb_vec_init(deg);
-            arb_fmpz_poly_complex_roots(roots, fac->p + i, 0, prec);
-            _acb_vec_clear(roots, deg);
-        }
-
-        fmpz_poly_factor_clear(fac);
 
     All roots are refined to a relative accuracy of at least *prec* bits.
     The output values will generally have higher actual precision,
     depending on the precision needed for isolation and the
     precision used internally by the algorithm.
-
-    This implementation should be adequate for general use, but it is not
-    currently competitive with state-of-the-art isolation
-    methods for finding real roots alone.
 
     The following *flags* are supported:
 

@@ -18,6 +18,7 @@
 #define GR_VEC_INLINE static inline
 #endif
 
+#include <string.h>
 #include "gr.h"
 
 #ifdef __cplusplus
@@ -51,6 +52,7 @@ GR_VEC_INLINE slong gr_vec_length(const gr_vec_t vec, gr_ctx_t FLINT_UNUSED(ctx)
 void gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
+void gr_vec_set_shallow(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx);
 void gr_vec_append_swap(gr_vec_t vec, gr_ptr f, gr_ctx_t ctx);
 
@@ -67,6 +69,8 @@ WARN_UNUSED_RESULT int gr_vec_sort(gr_vec_t dest, const gr_vec_t src, gr_ctx_t c
 
 void _gr_vec_permute(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_permute(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx);
+void _gr_vec_permute_inv(gr_ptr vec, slong * perm, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_vec_permute_inv(gr_vec_t dest, gr_vec_t src, slong * perm, gr_ctx_t ctx);
 void _gr_vec_shuffle(gr_ptr vec, flint_rand_t state, slong len, gr_ctx_t ctx);
 
 int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx);
@@ -74,8 +78,26 @@ int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx);
 int _gr_vec_print(gr_srcptr vec, slong len, gr_ctx_t ctx);
 int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_vec_set_str(gr_vec_t vec, const char * s, int resize, gr_ctx_t ctx);
+
+/* Determine the entry count (shape) of a bracketed list string. */
+WARN_UNUSED_RESULT int gr_vec_str_count_entries(slong * count, const char * s, gr_ctx_t ctx);
+/* Evaluate a bracketed list at s into the preallocated array res of length len,
+   returning GR_DOMAIN if the number of entries differs from len. Characters
+   following the matching closing bracket are ignored. */
+WARN_UNUSED_RESULT int _gr_vec_set_str(gr_ptr res, const char * s, slong len, gr_ctx_t ctx);
+
+/* Internal string-splitting helpers shared with gr_mat_set_str. Separators are
+   resolved by tracking the nesting depth of (), [] and {}. */
+int _gr_str_is_space(char c);
+const char * _gr_str_find_sep(const char * s, const char * end, int * err);
+int _gr_str_strip_brackets(const char ** content_begin, const char ** content_end, const char * s, char open, char close);
+int _gr_str_blank(const char * s, const char * end);
+void _gr_str_trim(const char ** s, const char ** end);
+
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
+GR_VEC_INLINE void _gr_vec_set_shallow(gr_ptr dest, gr_srcptr src, slong len, gr_ctx_t ctx) { memcpy(dest, src, len * ctx->sizeof_elem); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
 
 typedef int ((*gr_method_vec_normalise_op)(slong *, gr_srcptr, slong, gr_ctx_ptr));

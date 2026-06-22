@@ -12,6 +12,8 @@
 /* Include functions *********************************************************/
 
 #include "t-compose.c"
+#include "t-compose_inv1.c"
+#include "t-compose_inv2.c"
 #include "t-inv.c"
 #include "t-parity.c"
 #include "t-next.c"
@@ -21,6 +23,8 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(perm_compose),
+    TEST_FUNCTION(perm_compose_inv1),
+    TEST_FUNCTION(perm_compose_inv2),
     TEST_FUNCTION(perm_inv),
     TEST_FUNCTION(perm_parity),
     TEST_FUNCTION(perm_next)

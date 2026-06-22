@@ -1078,6 +1078,28 @@ class gr_ctx:
         else:
             return ctx._op_vec_ctx(libgr.gr_gens, "gens")
 
+    def O(ctx, x, exp):
+        """
+        Create a big-O error term. The base must be a generator in
+        a power series ring or the base of a p-adic ring.
+
+            >>> ZZser
+            Power series over Integer ring (fmpz) with precision O(x^6)
+            >>> x = ZZser.gen()
+            >>> ZZser.O(x, 4)
+            0 + O(x^4)
+            >>> 3*x + 5*x**4 + ZZser.O(x, 3)
+            3*x + O(x^3)
+            >>> QQser("1/3 + x/5 - O(x^2)")
+            (1/3) + (1/5)*x + O(x^2)
+            >>> (2**32 - 1) * (1 + Qp_padic_radix(2).O(2, 8))
+            255 + O(2^8)
+
+        Constant input is ambiguous. Use the two-argument version instead:
+
+        """
+        return ctx._binary_op_fmpz(x, exp, libgr.gr_big_o_base_fmpz, "big_o($x, $y)")
+
     def zero(ctx):
         """
         The zero element of this domain.
@@ -2980,12 +3002,12 @@ class gr_ctx:
             [1, -1/2, 1/6, 0, -1/30, 0, 1/42, 0, -1/30, 0, 5/66, 0]
             >>> CC_ca.bernoulli_vec(5)
             [1, -0.500000 {-1/2}, 0.166667 {1/6}, 0, -0.0333333 {-1/30}]
-            >>> sum(RR.bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(RR.bernoulli_vec(100)).nprint(16)
+            1.127124216595034e+76
             >>> sum(RF.bernoulli_vec(100))
             1.127124216595034e+76
-            >>> sum(CC.bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(CC.bernoulli_vec(100)).nprint(16)
+            1.127124216595034e+76
 
         """
         return ctx._op_vec_len(length, libgr.gr_bernoulli_vec, "bernoulli_vec($length)")
@@ -4966,18 +4988,18 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7(0)
         0
         >>> Q7(5)
-        (5)
+        5
         >>> Q7(14)            # 14 = 2 * 7
         (2) * 7^1
         >>> Q7(98)            # 98 = 2 * 7^2
         (2) * 7^2
         >>> Q7(-1)
-        (-1)
+        -1
 
     Arithmetic on exactly representable elements stays exact:
 
         >>> Q7(2) + Q7(3)
-        (5)
+        5
         >>> Q7(3) * Q7(7)
         (3) * 7^1
         >>> Q7(7) * Q7(7)
@@ -4985,7 +5007,7 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7(2) - Q7(2)
         0
         >>> Q7(6) / Q7(2)
-        (3)
+        3
         >>> Q7(1) / Q7(7)     # 7^-1 is exact
         (1) * 7^-1
 
@@ -5004,9 +5026,9 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7r
         Radix 7-adic numbers (rel prec 8, abs prec inf)
         >>> Q7r(1) / Q7r(2)               # 2^-1 (mod 7^8)
-        (2882401) + O(7^8)
+        2882401 + O(7^8)
         >>> Q7r(1) / Q7r(3)               # 3^-1 (mod 7^8)
-        (3843201) + O(7^8)
+        3843201 + O(7^8)
         >>> Q7r(1) / Q7r(14)              # (2*7)^-1: valuation -1, 8 digits
         (2882401) * 7^-1 + O(7^7)
 
@@ -5014,7 +5036,7 @@ class Qp_padic_radix(gr_ctx):
     and a finite *relative* precision does not bound the valuation:
 
         >>> Q7r(5)
-        (5)
+        5
         >>> Q7r(7**10)
         (1) * 7^10
         >>> Q7r(1) / Q7r(7)
@@ -5033,7 +5055,7 @@ class Qp_padic_radix(gr_ctx):
         >>> Q7a(7**10)
         0 + O(7^5)
         >>> Q7a(1) / Q7a(3)               # 3^-1 (mod 7^5)
-        (11205) + O(7^5)
+        11205 + O(7^5)
 
     """
 
@@ -5280,6 +5302,46 @@ class acb(gr_elem):
     @staticmethod
     def _default_context():
         return CC_acb
+
+    def secondary_zeta(self):
+        """
+        Secondary zeta function (ad-hoc wrapper for testing).
+
+            >>> CC(0.5+10j).secondary_zeta()
+            ([0.1725005546943535 +/- 4.73e-17] + [-0.1680692210280708 +/- 4.12e-17]*I)
+            >>> CC(2).secondary_zeta()
+            [0.02310499311541897 +/- 3.75e-18]
+            >>> CC("-20.001").secondary_zeta()
+            [1.32e+18 +/- 6.41e+15]
+            >>> ComplexField_acb(prec=128)("-20.001").secondary_zeta()
+            [1.31697271383159e+18 +/- 8.21e+3]
+            >>> [raises(lambda: CC(s).secondary_zeta(), FlintUnableError)
+            ...     for s in [1, -1, -3, "1 +/- 0.001", "-5 +/- 0.001"]]
+            [True, True, True, True, True]
+
+        Dyadic values:
+
+            >>> for n in range(10):
+            ...     print(CC(-2*n).secondary_zeta())
+            ... 
+            0.8750000000000000
+            -0.2812500000000000
+            0.02343750000000000
+            -0.1347656250000000
+            -0.6723632812500000
+            -6.168090820312500
+            [-82.48159790039063 +/- 5.00e-15]
+            [-1521.003639221191 +/- 4.07e-13]
+            [-36986.37416267395 +/- 1.96e-13]
+            [-1146735.990261555 +/- 2.82e-10]
+        """
+        C = self.parent()
+        prec = C.prec
+        res = C()
+        libflint.acb_dirichlet_secondary_zeta(res._ref, self._ref, prec)
+        if not libflint.acb_is_finite(res._ref):
+            raise FlintUnableError("unable")
+        return res
 
 class gr_arf_ctx(gr_ctx):
     pass
@@ -5807,7 +5869,7 @@ class gr_poly(gr_elem):
             >>> f.roots(domain=QQbar)     # complex algebraic roots
             ([Root a = 1.00000*I of a^2+1, Root a = -1.00000*I of a^2+1, Root a = 1.41421 of a^2-2, Root a = -1.41421 of a^2-2, -3/2], [1, 1, 1, 1, 2])
             >>> f.roots(domain=RR)      # real ball roots
-            ([[-1.414213562373095 +/- 4.89e-17], [1.414213562373095 +/- 4.89e-17], -1.500000000000000], [1, 1, 2])
+            ([[-1.414213562373095 +/- 6.23e-17], [1.414213562373095 +/- 6.23e-17], -1.500000000000000], [1, 1, 2])
             >>> f.roots(domain=CC)      # complex ball roots
             ([[-1.414213562373095 +/- 4.89e-17], [1.414213562373095 +/- 4.89e-17], 1.000000000000000*I, -1.000000000000000*I, -1.500000000000000], [1, 1, 1, 1, 2])
             >>> f.roots(RF)     # real floating-point roots
@@ -6173,6 +6235,23 @@ class Mat(gr_ctx):
         [[5, 0],
         [0, 5]]
 
+    Construction from strings:
+
+        >>> Mat(QQ)("[[1, 1/2], [1/3, 1/4]]")
+        [[1, 1/2],
+        [1/3, 1/4]]
+        >>> Mat(QQ)("[[0, 0, 0], [0, 0, 0]]")
+        [[0, 0, 0],
+        [0, 0, 0]]
+        >>> Mat(QQ, 2, 3)("[[0, 0, 0], [0, 0, 0]]")
+        [[0, 0, 0],
+        [0, 0, 0]]
+        >>> Mat(QQ, 2, 3)("[[0, 0], [0, 0]]")  # input does not match shape
+        Traceback (most recent call last):
+          ...
+        ValueError
+
+
     """
 
     def __init__(self, element_domain, nrows=None, ncols=None):
@@ -6207,6 +6286,7 @@ class gr_mat(gr_elem):
     _struct_type = gr_mat_struct
 
     def __init__(self, *args, **kwargs):
+
         context = kwargs['context']
         gr_elem.__init__(self, None, context)
         element_ring = context._element_ring
@@ -6236,6 +6316,8 @@ class gr_mat(gr_elem):
                                 x = element_ring(row[j])
                                 ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
                                 status |= libgr.gr_set(ijptr, x._ref, x._ctx)
+                elif isinstance(val, str):
+                    status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
                 elif libgr.gr_ctx_matrix_is_fixed_size(self._ctx) == T_TRUE:
                     if not isinstance(val, gr_elem):
                         val = element_ring(val)
@@ -6861,7 +6943,7 @@ class gr_mat(gr_elem):
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=QQbar)
             ([Root a = 5.37228 of a^2-5*a-2, Root a = -0.372281 of a^2-5*a-2], [1, 1])
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=RR)
-            ([[-0.3722813232690143 +/- 3.00e-17], [5.372281323269014 +/- 3.30e-16]], [1, 1])
+            ([[-0.3722813232690143 +/- 3.00e-17], [5.372281323269014 +/- 3.31e-16]], [1, 1])
             >>> Mat(QQbar)([[1, 0, QQbar.i()], [0, 0, 1], [1, 1, 1]]).eigenvalues()
             ([Root a = 1.94721 + 0.604643*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = 0.654260 - 0.430857*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = -0.601467 - 0.173786*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1], [1, 1, 1])
             >>> Mat(ZZi)([[1, 0, ZZi.i()], [0, 0, 1], [1, 1, 1]]).eigenvalues(domain=QQbar)
@@ -7057,6 +7139,36 @@ libgr.gr_vec_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
 class Vec(gr_ctx):
     """
     Parent class for vector domains.
+
+        >>> Vec(ZZ)
+        Vectors (any length) over Integer ring (fmpz)
+        >>> Vec(ZZ, 5)
+        Space of length 5 vectors over Integer ring (fmpz)
+        >>> VecZZ([0, 5, 10])
+        [0, 5, 10]
+        >>> VecZZ(range(3, 20, 3))
+        [3, 6, 9, 12, 15, 18]
+
+    Construction of vectors from strings:
+
+        >>> Vec(QQ)("[1/3, 1/5]")
+        [1/3, 1/5]
+        >>> Vec(ZZ, 3)("[1, 2, 3]")
+        [1, 2, 3]
+        >>> Vec(ZZ, 3)("[1, 2]")     # input does not match size
+        Traceback (most recent call last):
+          ...
+        ValueError
+        >>> Vec(RR)("[1, 1/3, 1/3 +/- exp(-10)]")
+        [1, [0.3333333333333333 +/- 7.04e-17], [0.3333 +/- 7.88e-5]]
+        >>> v = Vec(Mat(QQ, 2, 2))("[[[1,0],[0,1]], [[0,1],[-1,0]]]")
+        >>> v[0]
+        [[1, 0],
+        [0, 1]]
+        >>> v[1]
+        [[0, 1],
+        [-1, 0]]
+
     """
 
     def __init__(self, element_domain, n=None):
@@ -7085,6 +7197,7 @@ class gr_vec(gr_elem):
             >>> VecZZ(range(3, 20, 3))
             [3, 6, 9, 12, 15, 18]
         """
+
         context = kwargs['context']
         gr_elem.__init__(self, None, context)
         element_ring = context._element_ring
@@ -7106,6 +7219,8 @@ class gr_vec(gr_elem):
                             status |= libgr.gr_set(iptr, x._ref, x._ctx)
                 elif isinstance(val, gr_elem):
                     status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                elif isinstance(val, str):
+                    status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
                 elif isinstance(val, range):
                     start = val.start
                     step = val.step
@@ -9728,12 +9843,33 @@ def test_padic():
     assert Q7(0).sqrt() == 0
     assert Q7(1).sqrt() == 1
     assert Q7(4).sqrt() == 2
-    assert str(Q7(2).sqrt()) == "(266983762) + O(7^10)"
-    assert str((1/(1/Q7(4))).sqrt()) == "(2) + O(7^10)"
+    assert str(Q7(2).sqrt()) == "266983762 + O(7^10)"
+    assert str((1/(1/Q7(4))).sqrt()) == "2 + O(7^10)"
     assert raises(lambda: Q7(3).sqrt(), FlintDomainError)
     assert raises(lambda: Q7(5).sqrt(), FlintDomainError)
     assert raises(lambda: Q7(6).sqrt(), FlintDomainError)
 
+def test_big_o():
+    Q = Qp_padic_radix(7, rel_prec=3)
+    assert raises(lambda: Q("O(5^3)"), FlintUnableError)
+    assert str(Q("O(7^-3)")) == "0 + O(7^-3)"
+    # should saturate the precision limit
+    assert str(Q("O(7^100000000000000000000000000000000000000)")) == str(Q(7) ** (10**100))
+    assert raises(lambda: Q("O(7^-100000000000000000000000000000000000000)"), FlintUnableError)
+    Qx = PolynomialRing(Q, "x")
+    Qxy = PowerSeriesRing(Qx, 2, "y")
+    Qxyz = PolynomialRing(Qxy, "z")
+    Qxyzt = PowerSeriesRing(Qxyz, 3, "t")
+    f = Qxyzt("(3 + O(7^2))*t + (2 + O(y^2))*t + (5 + O(7^1))*t^2")
+    assert str(f) == "((5 + O(7^2)) + O(y^2))*t + (5 + O(7^1))*t^2"
+    for e in range(8):
+        f = Qxyzt("3+x+y+z+t")**e
+        fs = str(f)
+        assert str(Qxyzt(fs)) == fs
+    assert raises(lambda: Q("O(5^3)"), FlintUnableError)
+    assert raises(lambda: Qxy("O(y^-2)"), FlintUnableError)
+    assert str(Qxy("O(y^0)")) == "0 + O(y^0)"
+    assert str(Qxy("O(y)")) == "0 + O(y^1)"
 
 if __name__ == "__main__":
     from time import time

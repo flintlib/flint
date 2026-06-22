@@ -445,6 +445,24 @@ padic_radix_one(padic_radix_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* Allows parsing 'O(p^n)' in strings */
+static int
+padic_radix_big_o_base_fmpz(padic_radix_t res, const padic_radix_t x, const fmpz_t exp, gr_ctx_t ctx)
+{
+    /* p^exp */
+    if (x->v == 1 && radix_integer_is_one(&x->u, PADIC_RADIX_CTX_RADIX(ctx)) && res->N == PADIC_RADIX_EXACT)
+    {
+        if (fmpz_cmp_si(exp, -PADIC_RADIX_ERR_MAX) >= 0)
+        {
+            padic_radix_zero(res, ctx);
+            res->N = fmpz_cmp_si(exp, PADIC_RADIX_ERR_MAX) <= 0 ? *exp : PADIC_RADIX_ERR_MAX;
+            return GR_SUCCESS;
+        }
+    }
+
+    return GR_UNABLE;
+}
+
 int
 padic_radix_set(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
 {
@@ -1927,9 +1945,11 @@ padic_radix_write(gr_stream_t out, const padic_radix_t x, gr_ctx_t ctx)
         else
             str = radix_get_str_sum(NULL, x->u.d, FLINT_ABS(size), size < 0, 1, radix);
 
-        status |= gr_stream_write(out, "(");
+        if (x->v != 0)
+            status |= gr_stream_write(out, "(");
         status |= gr_stream_write_free(out, str);
-        status |= gr_stream_write(out, ")");
+        if (x->v != 0)
+            status |= gr_stream_write(out, ")");
 
         if (x->v != 0)
         {
@@ -2021,6 +2041,7 @@ gr_method_tab_input _padic_radix_methods_input[] =
     {GR_METHOD_SET_SHALLOW,     (gr_funcptr) padic_radix_set_shallow},
     {GR_METHOD_RANDTEST,        (gr_funcptr) padic_radix_randtest},
     {GR_METHOD_WRITE,           (gr_funcptr) padic_radix_write},
+    {GR_METHOD_BIG_O_BASE_FMPZ, (gr_funcptr) padic_radix_big_o_base_fmpz},
     {GR_METHOD_ZERO,            (gr_funcptr) padic_radix_zero},
     {GR_METHOD_ONE,             (gr_funcptr) padic_radix_one},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) padic_radix_is_zero},

@@ -158,6 +158,32 @@ gr_series_mod_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
+static int
+gr_series_mod_big_o_base_fmpz(gr_poly_t res, const gr_poly_t base, const fmpz_t exp, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_SERIES_MOD_ELEM_CTX(ctx);
+    int status;
+
+    /* base is a constant: build O(base^exp) in the coefficient ring */
+    if (gr_poly_length(base, cctx) == 1)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, cctx);
+
+        status = gr_big_o_base_fmpz(t, base->coeffs, exp, cctx);
+
+        if (status == GR_SUCCESS)
+            status = (GR_SERIES_MOD_N(ctx) == 0) ? GR_SUCCESS
+                                                 : gr_poly_set_scalar(res, t, cctx);
+
+        GR_TMP_CLEAR(t, cctx);
+        return status;
+    }
+
+    /* we don't support inexact elements with respect to the generator */
+    return GR_UNABLE;
+}
+
 static gr_ptr _gr_series_mod_ctx_base(gr_ctx_t ctx) { return GR_SERIES_MOD_ELEM_CTX(ctx); }
 
 
@@ -461,6 +487,7 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_GEN,         (gr_funcptr) gr_series_mod_gen},
     {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE,  (gr_funcptr) gr_series_mod_gens_recursive},
+    {GR_METHOD_BIG_O_BASE_FMPZ, (gr_funcptr) gr_series_mod_big_o_base_fmpz},
     {GR_METHOD_SET,         (gr_funcptr) gr_series_mod_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) gr_series_mod_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) gr_series_mod_set_si},

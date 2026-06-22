@@ -35,6 +35,20 @@ Assignment
     Allows aliasing of ``res`` and ``vec``.
 
 
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
+
+    Returns 1 if the two permutations are equal, 0 otherwise.
+
+
+.. function:: slong _perm_is_one(const slong *vec, slong n)
+
+    Returns 1 if the permutation is the identity permutation, 0 otherwise.
+
+
 Composition
 --------------------------------------------------------------------------------
 
@@ -44,6 +58,22 @@ Composition
     Forms the composition `\pi_1 \circ \pi_2` of two permutations 
     `\pi_1` and `\pi_2`.  Here, `\pi_2` is applied first, that is, 
     `(\pi_1 \circ \pi_2)(i) = \pi_1(\pi_2(i))`.
+
+    Allows aliasing of ``res``, ``vec1`` and ``vec2``.
+
+.. function:: void _perm_compose_inv1(slong * res, const slong * vec1, const slong * vec2, slong n)
+
+    Forms the composition `(\pi_1^{-1}) \circ \pi_2` of two permutations 
+    `\pi_1` and `\pi_2`.  Here, `\pi_2` is applied first, that is, 
+    `((\pi_1^{-1}) \circ \pi_2)(i) = \pi_1^{-1}(\pi_2(i))`.
+
+    Allows aliasing of ``res``, ``vec1`` and ``vec2``.
+
+.. function:: void _perm_compose_inv2(slong * res, const slong * vec1, const slong * vec2, slong n)
+
+    Forms the composition `\pi_1 \circ (\pi_2^{-1})` of two permutations 
+    `\pi_1` and `\pi_2`.  Here, `\pi_2^{-1}` is applied first, that is, 
+    `(\pi_1 \circ (\pi_2^{-1}))(i) = \pi_1(\pi_2^{-1}(i))`.
 
     Allows aliasing of ``res``, ``vec1`` and ``vec2``.
 
