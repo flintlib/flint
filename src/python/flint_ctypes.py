@@ -6235,6 +6235,23 @@ class Mat(gr_ctx):
         [[5, 0],
         [0, 5]]
 
+    Construction from strings:
+
+        >>> Mat(QQ)("[[1, 1/2], [1/3, 1/4]]")
+        [[1, 1/2],
+        [1/3, 1/4]]
+        >>> Mat(QQ)("[[0, 0, 0], [0, 0, 0]]")
+        [[0, 0, 0],
+        [0, 0, 0]]
+        >>> Mat(QQ, 2, 3)("[[0, 0, 0], [0, 0, 0]]")
+        [[0, 0, 0],
+        [0, 0, 0]]
+        >>> Mat(QQ, 2, 3)("[[0, 0], [0, 0]]")  # input does not match shape
+        Traceback (most recent call last):
+          ...
+        ValueError
+
+
     """
 
     def __init__(self, element_domain, nrows=None, ncols=None):
@@ -6269,6 +6286,7 @@ class gr_mat(gr_elem):
     _struct_type = gr_mat_struct
 
     def __init__(self, *args, **kwargs):
+
         context = kwargs['context']
         gr_elem.__init__(self, None, context)
         element_ring = context._element_ring
@@ -6298,6 +6316,8 @@ class gr_mat(gr_elem):
                                 x = element_ring(row[j])
                                 ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
                                 status |= libgr.gr_set(ijptr, x._ref, x._ctx)
+                elif isinstance(val, str):
+                    status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
                 elif libgr.gr_ctx_matrix_is_fixed_size(self._ctx) == T_TRUE:
                     if not isinstance(val, gr_elem):
                         val = element_ring(val)
@@ -7119,6 +7139,36 @@ libgr.gr_vec_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
 class Vec(gr_ctx):
     """
     Parent class for vector domains.
+
+        >>> Vec(ZZ)
+        Vectors (any length) over Integer ring (fmpz)
+        >>> Vec(ZZ, 5)
+        Space of length 5 vectors over Integer ring (fmpz)
+        >>> VecZZ([0, 5, 10])
+        [0, 5, 10]
+        >>> VecZZ(range(3, 20, 3))
+        [3, 6, 9, 12, 15, 18]
+
+    Construction of vectors from strings:
+
+        >>> Vec(QQ)("[1/3, 1/5]")
+        [1/3, 1/5]
+        >>> Vec(ZZ, 3)("[1, 2, 3]")
+        [1, 2, 3]
+        >>> Vec(ZZ, 3)("[1, 2]")     # input does not match size
+        Traceback (most recent call last):
+          ...
+        ValueError
+        >>> Vec(RR)("[1, 1/3, 1/3 +/- exp(-10)]")
+        [1, [0.3333333333333333 +/- 7.04e-17], [0.3333 +/- 7.88e-5]]
+        >>> v = Vec(Mat(QQ, 2, 2))("[[[1,0],[0,1]], [[0,1],[-1,0]]]")
+        >>> v[0]
+        [[1, 0],
+        [0, 1]]
+        >>> v[1]
+        [[0, 1],
+        [-1, 0]]
+
     """
 
     def __init__(self, element_domain, n=None):
@@ -7147,6 +7197,7 @@ class gr_vec(gr_elem):
             >>> VecZZ(range(3, 20, 3))
             [3, 6, 9, 12, 15, 18]
         """
+
         context = kwargs['context']
         gr_elem.__init__(self, None, context)
         element_ring = context._element_ring
@@ -7168,6 +7219,8 @@ class gr_vec(gr_elem):
                             status |= libgr.gr_set(iptr, x._ref, x._ctx)
                 elif isinstance(val, gr_elem):
                     status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                elif isinstance(val, str):
+                    status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
                 elif isinstance(val, range):
                     start = val.start
                     step = val.step

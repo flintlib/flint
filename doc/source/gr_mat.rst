@@ -139,6 +139,27 @@ Input and output
 
     Prints *mat* to standard output.
 
+.. function:: int gr_mat_set_str(gr_mat_t mat, const char * s, int resize, gr_ctx_t ctx)
+
+    Sets *mat* to the matrix described by the string *s*, which must have the
+    form ``[[expr11, ..., expr1n], ..., [exprm1, ..., exprmn]]``, where each row
+    is a bracketed list parsed as in :func:`gr_vec_set_str` and each entry
+    expression is parsed with :func:`gr_set_str` over *ctx*. All rows must have
+    the same number of entries; otherwise ``GR_DOMAIN`` is returned. Whitespace
+    around the brackets and separators (including the line breaks produced by
+    :func:`gr_mat_write`) is ignored.
+
+    If *resize* is 1, *mat* is resized to the detected number of rows and
+    columns. If *resize* is 0, returns ``GR_DOMAIN`` when the detected shape
+    does not match the current shape of *mat*. Returns ``GR_UNABLE`` if *s* is
+    not a well-formed list of rows.
+
+    The string ``[]`` denotes a matrix with zero rows but an ambiguous number of
+    columns. With *resize* equal to 1 it produces a `0 \times 0` matrix; with
+    *resize* equal to 0 it is accepted for any `0 \times c` matrix. A matrix
+    with `n > 0` rows and zero columns is unambiguous and is written as
+    ``[[], ..., []]`` with *n* empty rows.
+
 Comparisons
 -------------------------------------------------------------------------------
 

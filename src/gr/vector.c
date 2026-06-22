@@ -156,6 +156,15 @@ vector_gr_vec_write(gr_stream_t out, gr_vec_t vec, gr_ctx_t ctx)
 }
 
 static int
+vector_gr_vec_set_str(gr_vec_t res, const char * s, gr_ctx_t ctx)
+{
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return gr_vec_set_str(res, s, 1, ENTRY_CTX(ctx));
+    else
+        return gr_vec_set_str(res, s, 0, ENTRY_CTX(ctx));
+}
+
+static int
 vector_gr_vec_randtest(gr_vec_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     slong i, n;
@@ -750,6 +759,7 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_SWAP,        (gr_funcptr) vector_gr_vec_swap},
     {GR_METHOD_RANDTEST,    (gr_funcptr) vector_gr_vec_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) vector_gr_vec_write},
+    {GR_METHOD_SET_STR,     (gr_funcptr) vector_gr_vec_set_str},
     {GR_METHOD_EQUAL,       (gr_funcptr) vector_gr_vec_equal},
     {GR_METHOD_SET,         (gr_funcptr) vector_gr_vec_set},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) vector_gr_vec_set_other},

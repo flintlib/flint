@@ -60,6 +60,7 @@
 #include "t-rref_den_fflu.c"
 #include "t-rref_fflu.c"
 #include "t-rref_lu.c"
+#include "t-set_str.c"
 #include "t-scalar.c"
 #include "t-solve.c"
 #include "t-solve_den.c"
@@ -127,6 +128,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mat_rref_fflu),
     TEST_FUNCTION(gr_mat_rref_lu),
     TEST_FUNCTION(gr_mat_scalar),
+    TEST_FUNCTION(gr_mat_set_str),
     TEST_FUNCTION(gr_mat_solve),
     TEST_FUNCTION(gr_mat_solve_den),
     TEST_FUNCTION(gr_mat_solve_den_fflu),

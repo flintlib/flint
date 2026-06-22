@@ -196,6 +196,15 @@ matrix_write(gr_stream_t out, gr_mat_t mat, gr_ctx_t ctx)
 }
 
 static int
+matrix_set_str(gr_mat_t res, const char * s, gr_ctx_t ctx)
+{
+    if (MATRIX_CTX(ctx)->all_sizes)
+        return gr_mat_set_str(res, s, 1, MATRIX_CTX(ctx)->base_ring);
+    else
+        return gr_mat_set_str(res, s, 0, MATRIX_CTX(ctx)->base_ring);
+}
+
+static int
 matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
@@ -616,6 +625,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_SET_SHALLOW, (gr_funcptr) matrix_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) matrix_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) matrix_write},
+    {GR_METHOD_SET_STR,     (gr_funcptr) matrix_set_str},
     {GR_METHOD_ZERO,        (gr_funcptr) matrix_zero},
     {GR_METHOD_ONE,         (gr_funcptr) matrix_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) matrix_is_zero},
