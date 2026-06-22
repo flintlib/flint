@@ -33,8 +33,8 @@
  */
 int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
 {
-    int ans, i, m;
-    size_t len;
+    int ans;
+    size_t len, i, m;
     char * numstr;
 
     len = strlen(s);

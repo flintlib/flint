@@ -125,6 +125,7 @@ typedef const ulong * nn_srcptr;
 # define FLINT_RETURNS_NONNULL __attribute__((returns_nonnull))
 # define FLINT_MALLOC __attribute__((malloc))
 # define FLINT_DEPRECATED __attribute__((deprecated))
+# define FLINT_FALLTHROUGH __attribute__((fallthrough))
 #else
 # define __attribute__(x)
 # if defined(_MSC_VER)
@@ -145,6 +146,7 @@ typedef const ulong * nn_srcptr;
 # define FLINT_RETURNS_NONNULL
 # define FLINT_MALLOC
 # define FLINT_DEPRECATED
+# define FLINT_FALLTHROUGH
 #endif
 
 #if defined(__cplusplus) || ( __STDC_VERSION__ >= 202300L )

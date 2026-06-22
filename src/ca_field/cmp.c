@@ -157,7 +157,7 @@ ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 }
 
 static slong
-ca_ext_depth(const ca_ext_t x, ca_ctx_t ctx)
+ca_ext_depth(const ca_ext_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     return CA_EXT_DEPTH(x);
 }
