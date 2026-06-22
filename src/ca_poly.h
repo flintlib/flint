@@ -168,7 +168,7 @@ ca_poly_div_fmpz(ca_poly_t res, const ca_poly_t poly, const fmpz_t c, ca_ctx_t c
     ca_t t;
     ca_init(t, ctx);
     ca_set_fmpz(t, c, ctx);
-    ca_poly_div_ca(res, res, t, ctx);
+    ca_poly_div_ca(res, poly, t, ctx);
     ca_clear(t, ctx);
 }
 
