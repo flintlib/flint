@@ -43,6 +43,7 @@ void sample_interface(void * arg, ulong count)
         _nmod_poly_set_length(poly, length);
         for (j = 0; j < length; j++)
             poly->coeffs[j] = n_randint(state, n);
+        _nmod_poly_normalise(poly);
 
         pt = n_randint(state, n);
 
