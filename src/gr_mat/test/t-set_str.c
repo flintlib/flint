@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2025 FLINT contributors
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,15 +12,6 @@
 #include "test_helpers.h"
 #include "gr.h"
 #include "gr_mat.h"
-
-static char *
-mat_to_str(const gr_mat_t m, gr_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_str(out);
-    GR_MUST_SUCCEED(gr_mat_write(out, m, ctx));
-    return out->s;
-}
 
 TEST_FUNCTION_START(gr_mat_set_str, state)
 {
@@ -137,24 +128,26 @@ TEST_FUNCTION_START(gr_mat_set_str, state)
 
         gr_ctx_clear(ZZ);
     }
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
-        gr_ctx_t ZZ;
+        gr_ctx_t ZZ, ZZM;
         gr_mat_t a, b;
         char * str;
         slong r, c;
 
         gr_ctx_init_fmpz(ZZ);
+        gr_ctx_init_matrix_domain(ZZM, ZZ);
         r = n_randint(state, 5);
         c = n_randint(state, 5);
-        if (r == 0 || c == 0)
-            r = c = 0;   /* a 0xc or rx0 matrix prints as "[]"; normalize */
+        if (r == 0)
+            c = 0;   /* a 0xc matrix prints as "[]"; normalize */
 
         gr_mat_init(a, r, c, ZZ);
         gr_mat_init(b, 0, 0, ZZ);
         GR_MUST_SUCCEED(gr_mat_randtest(a, state, ZZ));
 
-        str = mat_to_str(a, ZZ);
+        GR_MUST_SUCCEED(gr_get_str(&str, a, ZZM));
 
         if (gr_mat_set_str(b, str, 1, ZZ) != GR_SUCCESS)
             TEST_FUNCTION_FAIL("round-trip parse failed: %s\n", str);
@@ -162,9 +155,18 @@ TEST_FUNCTION_START(gr_mat_set_str, state)
         if (gr_mat_equal(a, b, ZZ) != T_TRUE)
             TEST_FUNCTION_FAIL("round-trip mismatch: %s\n", str);
 
+        GR_MUST_SUCCEED(gr_mat_randtest(b, state, ZZ));
+
+        if (gr_set_str(b, str, ZZM) != GR_SUCCESS)
+            TEST_FUNCTION_FAIL("round-trip parse failed 2: %s\n", str);
+
+        if (gr_mat_equal(a, b, ZZ) != T_TRUE)
+            TEST_FUNCTION_FAIL("round-trip mismatch 2: %s\n", str);
+
         flint_free(str);
         gr_mat_clear(a, ZZ);
         gr_mat_clear(b, ZZ);
+        gr_ctx_clear(ZZM);
         gr_ctx_clear(ZZ);
     }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2025 FLINT contributors
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -21,7 +21,7 @@ gr_mat_set_str(gr_mat_t mat, const char * s, int resize, gr_ctx_t ctx)
     slong r, c, i;
     int status;
 
-    /* Strict validation of the outer brackets. */
+    /* Validate the outer brackets. */
     status = _gr_str_strip_brackets(&lo, &hi, s, '[', ']');
     if (status != GR_SUCCESS)
         return status;
@@ -70,8 +70,7 @@ gr_mat_set_str(gr_mat_t mat, const char * s, int resize, gr_ctx_t ctx)
         return GR_DOMAIN;
     }
 
-    /* Evaluate each row directly into the matrix's (contiguous) row storage.
-       _gr_vec_set_str enforces that every row has exactly c entries. */
+    /* Evaluate each row. _gr_vec_set_str enforces exactly c entries. */
     seg = lo;
     for (i = 0; i < r; i++)
     {

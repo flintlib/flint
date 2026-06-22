@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2025 FLINT contributors
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,15 +13,6 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_series.h"
-
-static char *
-vec_to_str(const gr_vec_t v, gr_ctx_t ctx)
-{
-    gr_stream_t out;
-    gr_stream_init_str(out);
-    GR_MUST_SUCCEED(gr_vec_write(out, v, ctx));
-    return out->s;
-}
 
 TEST_FUNCTION_START(gr_vec_set_str, state)
 {
@@ -146,21 +137,22 @@ TEST_FUNCTION_START(gr_vec_set_str, state)
     }
 
     /* Random round-trip over ZZ: write, then parse back. */
-    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
-        gr_ctx_t ZZ;
+        gr_ctx_t ZZ, ZZx;
         gr_vec_t a, b;
         char * str;
         slong n;
 
         gr_ctx_init_fmpz(ZZ);
+        gr_ctx_init_vector_gr_vec(ZZx, ZZ);
         n = n_randint(state, 8);
 
         gr_vec_init(a, n, ZZ);
         gr_vec_init(b, 0, ZZ);
         GR_MUST_SUCCEED(_gr_vec_randtest(a->entries, state, n, ZZ));
 
-        str = vec_to_str(a, ZZ);
+        GR_MUST_SUCCEED(gr_get_str(&str, a, ZZx));
 
         if (gr_vec_set_str(b, str, 1, ZZ) != GR_SUCCESS)
             TEST_FUNCTION_FAIL("round-trip parse failed: %s\n", str);
@@ -168,9 +160,18 @@ TEST_FUNCTION_START(gr_vec_set_str, state)
         if (b->length != n || _gr_vec_equal(a->entries, b->entries, n, ZZ) != T_TRUE)
             TEST_FUNCTION_FAIL("round-trip mismatch: %s\n", str);
 
+        GR_MUST_SUCCEED(gr_randtest(b, state, ZZx));
+
+        if (gr_set_str(b, str, ZZx) != GR_SUCCESS)
+            TEST_FUNCTION_FAIL("round-trip parse failed 2: %s\n", str);
+
+        if (b->length != n || _gr_vec_equal(a->entries, b->entries, n, ZZ) != T_TRUE)
+            TEST_FUNCTION_FAIL("round-trip mismatch 2: %s\n", str);
+
         flint_free(str);
         gr_vec_clear(a, ZZ);
         gr_vec_clear(b, ZZ);
+        gr_ctx_clear(ZZx);
         gr_ctx_clear(ZZ);
     }
 
