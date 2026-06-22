@@ -1,0 +1,134 @@
+#!/usr/bin/env python3
+import json
+import os
+import shutil
+import subprocess
+import sys
+import configparser
+
+
+HELP = """\
+usage: dev/gcc [-C builddir] SOURCE.c [compiler arguments...]
+
+Compile an ad-hoc C program against the FLINT development build.
+
+Common examples:
+  dev/gcc bug.c -o bug
+  dev/gcc -C build-debug bug.c -o bug -O0 -g
+  BUILD=build-debug dev/gcc bug.c -o bug
+
+The script builds libflint first, uses the C compiler configured by Meson,
+adds the in-tree FLINT include/library paths, and uses pkg-config for FLINT,
+GMP, and MPFR. It reuses the pkg-config path saved in the Meson build
+directory; set PKG_CONFIG_PATH only to add extra pkg-config search paths.
+"""
+
+
+def pop_builddir(args):
+    builddir = os.environ.get("BUILD", "build")
+    out = []
+    it = iter(args)
+    for arg in it:
+        if arg == "-C":
+            builddir = next(it, None)
+            if builddir is None:
+                raise SystemExit("error: -C needs a build directory")
+        elif arg.startswith("--builddir="):
+            builddir = arg.split("=", 1)[1]
+        else:
+            out.append(arg)
+    return builddir, out
+
+
+def run_stdout(cmd, env=None):
+    return subprocess.check_output(cmd, env=env, text=True).strip()
+
+
+def shell_words(text):
+    # pkg-config output is shell-like. Keep this helper local so callers do not
+    # need a shell for the final compiler invocation.
+    import shlex
+    return shlex.split(text)
+
+
+def dedup(args):
+    seen = set()
+    out = []
+    for arg in args:
+        if arg in seen:
+            continue
+        seen.add(arg)
+        out.append(arg)
+    return out
+
+
+def configured_pkg_config_path(builddir):
+    cmd_line = os.path.join(builddir, "meson-private", "cmd_line.txt")
+    if not os.path.exists(cmd_line):
+        return []
+
+    parser = configparser.ConfigParser(interpolation=None)
+    parser.read(cmd_line)
+    if not parser.has_option("options", "pkg_config_path"):
+        return []
+
+    value = parser.get("options", "pkg_config_path").strip()
+    if not value:
+        return []
+
+    return [path for path in value.split(os.pathsep) if path]
+
+
+def main(argv):
+    if argv and argv[0] in ["-h", "--help"]:
+        print(HELP, end="")
+        return 0
+
+    builddir, compiler_args = pop_builddir(argv)
+    if not compiler_args:
+        print(HELP, end="", file=sys.stderr)
+        return 2
+
+    builddir = os.path.abspath(builddir)
+    source_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    meson = os.path.join(source_dir, ".venv", "bin", "meson")
+    if not os.path.exists(meson):
+        meson = shutil.which("meson") or "meson"
+
+    subprocess.check_call([meson, "compile", "-C", builddir])
+
+    compilers = json.loads(run_stdout([meson, "introspect", builddir, "--compilers"]))
+    c_compiler = compilers["host"]["c"]["exelist"]
+
+    env = os.environ.copy()
+    uninstalled_pc_dir = os.path.join(builddir, "meson-uninstalled")
+    pkg_config_paths = [uninstalled_pc_dir]
+    pkg_config_paths += configured_pkg_config_path(builddir)
+    if env.get("PKG_CONFIG_PATH"):
+        pkg_config_paths += env["PKG_CONFIG_PATH"].split(os.pathsep)
+    env["PKG_CONFIG_PATH"] = os.pathsep.join(dedup(pkg_config_paths))
+
+    pkg_config = env.get("PKG_CONFIG") or shutil.which("pkg-config") or "pkg-config"
+    flint_pkg = "flint-uninstalled"
+    if subprocess.call([pkg_config, "--exists", flint_pkg], env=env) != 0:
+        flint_pkg = "flint"
+
+    cflags = [
+        "-I" + os.path.join(builddir, "include"),
+        "-I" + os.path.join(source_dir, "include"),
+    ]
+    cflags += shell_words(run_stdout([pkg_config, "--cflags", flint_pkg, "gmp", "mpfr"], env=env))
+    cflags = dedup(cflags)
+    libs = dedup(shell_words(run_stdout([pkg_config, "--libs", flint_pkg, "gmp", "mpfr"], env=env)))
+
+    rpath_args = []
+    if os.name != "nt":
+        rpath_args = ["-Wl,-rpath," + builddir]
+
+    cmd = c_compiler + cflags + compiler_args + libs + rpath_args
+    print(" ".join(cmd))
+    return subprocess.call(cmd, env=env)
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

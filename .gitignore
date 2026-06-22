@@ -21,10 +21,12 @@ config/*
 !config/config.sub
 !config/configfsf.guess
 !config/configfsf.sub
+!config/check_assembly.py
+!config/generate_msvc_def.py
+!config/meson.build
 config.log
 confdefs.h
 conftest.*
-/Makefile
 doc/build
 doc/latex/flint-manual.*
 !doc/latex/flint-manual.tex
@@ -66,3 +68,5 @@ config.m4
 src/flint-mparam.h
 .gdb_history
 vgcore.*
+src/**/meson.build
+examples/meson.build
