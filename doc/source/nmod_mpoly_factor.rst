@@ -62,6 +62,9 @@ Basic manipulation
 Factorisation
 --------------------------------------------------------------------------------
 
+    The factorisation functions assume that the modulus is prime, which is
+    not checked.
+
     A return of `1` indicates that the function was successful. Otherwise,
     the return is `0` and *f* is undefined. None of these functions
     multiply *f* by *A*: *f* is simply set to a factorisation of *A*, and thus

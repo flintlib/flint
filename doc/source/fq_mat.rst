@@ -416,7 +416,9 @@ Triangular solving
 
     Sets `X = L^{-1} B` where `L` is a full rank lower triangular
     square matrix. If ``unit`` = 1, `L` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
+    its main diagonal, and the main diagonal will not be read.  It is
+    assumed that `L` is lower triangular with invertible diagonal (or
+    unit diagonal when ``unit`` = 1); this is not checked.  `X`
     and `B` are allowed to be the same matrix, but no other aliasing
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
@@ -425,7 +427,9 @@ Triangular solving
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular
     square matrix. If ``unit`` = 1, `U` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
+    its main diagonal, and the main diagonal will not be read.  It is
+    assumed that `U` is upper triangular with invertible diagonal (or
+    unit diagonal when ``unit`` = 1); this is not checked.  `X`
     and `B` are allowed to be the same matrix, but no other aliasing
     is allowed. Automatically chooses between the classical and
     recursive algorithms.

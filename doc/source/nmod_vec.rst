@@ -113,32 +113,34 @@ Arithmetic operations
 
     Sets each entry of ``(res, len)`` to the modular inverse of the
     corresponding entry in ``(vec, len)``. Assumes all entries in
-    ``vec`` are invertible modulo `mod.n`. Aliasing of ``res`` and ``vec`` is
-    allowed.
+    ``vec`` are invertible modulo `mod.n`; this is not checked. Aliasing
+    of ``res`` and ``vec`` is allowed.
 
 .. function:: void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c`. The element
-    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``.
+    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``
+    (this is not checked).
 
 .. function:: void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
     :func:`n_mulmod_shoup`. ``mod.n`` should be less than
-    `2^{\mathtt{FLINT\_BITS} - 1}`, and `c` should be less than ``mod.n``.
-    There is no constraint on elements of ``vec``.
+    `2^{\mathtt{FLINT\_BITS} - 1}`, and `c` should be less than ``mod.n``
+    (this is not checked). There is no constraint on elements of ``vec``.
 
 .. function:: void _nmod_vec_scalar_mul_nmod_redc(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
     Montgomery multiplication. Requires that ``mod.n`` is odd.
     The element `c` and all elements of ``vec`` are assumed to be less
-    than ``mod.n``.
+    than ``mod.n`` (this is not checked).
 
 .. function:: void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Adds ``(vec, len)`` times `c` to the vector ``(res, len)``. The element
-    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``.
+    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``
+    (this is not checked).
 
 
 Arithmetic operations without reduction
@@ -233,7 +235,7 @@ performed at the very end of the computation.
     Returns the dot product of (``vec1``, ``len``) and (``vec2``, ``len``). The
     input ``params`` has type ``dot_params_t`` and must have been computed via
     ``_nmod_vec_dot_params`` with the specified ``mod`` and with a length
-    greater than or equal to ``len``.
+    greater than or equal to ``len`` (this is not checked).
 
 .. function:: ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 
@@ -250,7 +252,8 @@ performed at the very end of the computation.
     Returns the dot product of (``vec1``, ``len``) and the values at
     ``vec2[i][offset]``. The input ``params`` has type ``dot_params_t`` and
     must have been computed via ``_nmod_vec_dot_params`` with the specified
-    ``mod`` and with a length greater than or equal to ``len``.
+    ``mod`` and with a length greater than or equal to ``len`` (this is not
+    checked).
 
 .. macro:: NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)
 
@@ -263,7 +266,7 @@ performed at the very end of the computation.
     but with the arithmetic performed modulo ``mod``. The input ``params`` has
     type ``dot_params_t`` and must have been computed via
     ``_nmod_vec_dot_params`` with the specified ``mod`` and with a length
-    greater than or equal to ``len``.
+    greater than or equal to ``len`` (this is not checked).
 
     ``nmod.h`` has to be included in order for this macro to work (order of
     inclusions does not matter).

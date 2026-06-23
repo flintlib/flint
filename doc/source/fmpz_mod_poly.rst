@@ -34,6 +34,11 @@ be normalised and all coefficients to be reduced modulo `n`, and
 unless otherwise specified they produce output that is normalised with
 coefficients reduced modulo `n`.
 
+Many functions in this module (greatest common divisors and extended
+gcds, modular inverses, minimal polynomials, division as if over a
+field, square roots, factorisation and irreducibility testing) require
+the modulus to be prime. This is assumed and not checked.
+
 Simple example
 --------------
 
@@ -806,7 +811,7 @@ Division
     `0 \leq \operatorname{len}(R) < \operatorname{len}(B)`.
 
     Assumes that the leading coefficient of `B` is invertible
-    modulo `p`.
+    modulo `p`, which is not checked.
 
 .. function:: void _fmpz_mod_poly_divrem_newton_n_preinv (fmpz * Q, fmpz * R, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz * Binv, slong lenBinv, const fmpz_mod_ctx_t ctx)
 
@@ -992,7 +997,8 @@ Power series inversion
 
     Sets ``Qinv`` to the inverse of ``Q`` modulo `x^n`,
     where `n \geq 1`, assuming that the bottom coefficient of
-    `Q` is a unit.
+    `Q` is a unit. A non-unit bottom coefficient (a zero or, over a
+    composite modulus, a nonzero non-invertible value) raises an exception.
 
 .. function:: void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv, const fmpz_mod_poly_t Q, slong n, const fmpz_mod_ctx_t ctx)
 
@@ -1015,7 +1021,8 @@ Power series division
 
     Set `Q` to the quotient of the series `A` by `B`, thinking of the series as
     though they were of length `n`. We assume that the bottom coefficient of
-    `B` is a unit.
+    `B` is a unit. A non-unit bottom coefficient (a zero or, over a
+    composite modulus, a nonzero non-invertible value) raises an exception.
 
 
 Greatest common divisor
@@ -1053,7 +1060,8 @@ Greatest common divisor
 
     In general, the greatest common divisor is defined in the polynomial
     ring `(\mathbf{Z}/(p \mathbf{Z}))[X]` if and only if `p` is a prime
-    number.  Thus, this function assumes that `p` is prime.
+    number.  Thus, this function assumes that `p` is prime, which is not
+    checked.
 
 .. function:: slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz * G, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx)
 
@@ -1240,7 +1248,7 @@ Greatest common divisor
 
     Attempts to set `A` to the inverse of `B` modulo `P` in the polynomial
     ring `(\mathbf{Z}/p\mathbf{Z})[X]`, where we assume that `p` is a prime
-    number.
+    number, which is not checked.
 
     If `\deg(P) < 2`, raises an exception.
 
@@ -1266,16 +1274,16 @@ Minpoly
 
     The return value equals the length of ``poly``.
 
-    It is assumed that `p` is prime and ``poly`` has space for at least
-    `len+1` coefficients. No aliasing between inputs and outputs is
-    allowed.
+    It is assumed that `p` is prime, which is not checked, and that
+    ``poly`` has space for at least `len+1` coefficients. No aliasing
+    between inputs and outputs is allowed.
 
 .. function:: void fmpz_mod_poly_minpoly_bm(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to a minimal generating polynomial for sequence
     ``seq`` of length ``len``.
 
-    Assumes that the modulus is prime.
+    Assumes that the modulus is prime, which is not checked.
 
     This version uses the Berlekamp-Massey algorithm, whose running time
     is proportional to ``len`` times the size of the minimal generator.
@@ -1287,16 +1295,16 @@ Minpoly
 
     The return value equals the length of ``poly``.
 
-    It is assumed that `p` is prime and ``poly`` has space for at least
-    `len+1` coefficients. No aliasing between inputs and outputs is
-    allowed.
+    It is assumed that `p` is prime, which is not checked, and that
+    ``poly`` has space for at least `len+1` coefficients. No aliasing
+    between inputs and outputs is allowed.
 
 .. function:: void fmpz_mod_poly_minpoly_hgcd(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
     Sets ``poly`` to a minimal generating polynomial for sequence
     ``seq`` of length ``len``.
 
-    Assumes that the modulus is prime.
+    Assumes that the modulus is prime, which is not checked.
 
     This version uses the HGCD algorithm, whose running time is
     `O(n \log^2 n)` field operations, regardless of the actual size of
@@ -1309,9 +1317,9 @@ Minpoly
 
     The return value equals the length of ``poly``.
 
-    It is assumed that `p` is prime and ``poly`` has space for at least
-    `len+1` coefficients. No aliasing between inputs and outputs is
-    allowed.
+    It is assumed that `p` is prime, which is not checked, and that
+    ``poly`` has space for at least `len+1` coefficients. No aliasing
+    between inputs and outputs is allowed.
 
 .. function:: void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz * seq, slong len, const fmpz_mod_ctx_t ctx)
 
@@ -1325,7 +1333,7 @@ Minpoly
 
     `seq_i = -\sum_{j=0}^{d-1} seq_{i+j}*f_j.`
 
-    Assumes that the modulus is prime.
+    Assumes that the modulus is prime, which is not checked.
 
     This version automatically chooses the fastest underlying
     implementation based on ``len`` and the size of the modulus.

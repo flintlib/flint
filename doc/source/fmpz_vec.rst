@@ -313,17 +313,20 @@ Scalar multiplication and division
 .. function:: void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2, slong len2, const fmpz_t x)
 
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` divided by `x`, where the
-    division is assumed to be exact for every entry in ``vec2``.
+    division is assumed to be exact for every entry in ``vec2``
+    (this is not checked).
 
 .. function:: void _fmpz_vec_scalar_divexact_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
 
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` divided by `x`, where the
-    division is assumed to be exact for every entry in ``vec2``.
+    division is assumed to be exact for every entry in ``vec2``
+    (this is not checked).
 
 .. function:: void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
 
     Sets ``(vec1, len2)`` to ``(vec2, len2)`` divided by `x`, where the
-    division is assumed to be exact for every entry in ``vec2``.
+    division is assumed to be exact for every entry in ``vec2``
+    (this is not checked).
 
 .. function:: void _fmpz_vec_scalar_fdiv_q_fmpz(fmpz * vec1, const fmpz * vec2, slong len2, const fmpz_t c)
 

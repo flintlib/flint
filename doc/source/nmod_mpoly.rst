@@ -486,7 +486,7 @@ Powering
 Division
 --------------------------------------------------------------------------------
 
-The division functions assume that the modulus is prime.
+The division functions assume that the modulus is prime, which is not checked.
 
 .. function:: int nmod_mpoly_divides(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
@@ -538,7 +538,8 @@ The division functions assume that the modulus is prime.
 Greatest Common Divisor
 --------------------------------------------------------------------------------
 
-The greatest common divisor functions assume that the modulus is prime.
+The greatest common divisor functions assume that the modulus is prime,
+which is not checked.
 
 .. function:: void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
@@ -577,7 +578,8 @@ The greatest common divisor functions assume that the modulus is prime.
 Square Root
 --------------------------------------------------------------------------------
 
-The square root functions assume that the modulus is prime for correct operation.
+The square root functions assume that the modulus is prime for correct
+operation, which is not checked.
 
 .. function:: int nmod_mpoly_sqrt(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
