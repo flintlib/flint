@@ -1369,22 +1369,23 @@ Evaluation
     multiplications done as in :func:`n_mulmod_shoup` using the precomputed
     ``c_precomp`` obtained via :func:`n_mulmod_precomp_shoup`.
 
-.. function:: ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+.. function:: ulong _nmod_poly_evaluate_nmod_horner(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+              ulong _nmod_poly_evaluate_nmod_rectangular(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+              ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 
     Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
-    of ``poly``. The value ``c`` should be reduced modulo the modulus. The
-    algorithm used is Horner's method, with multiplications done via
-    :func:`nmod_mul`.
+    of ``poly``. The value ``c`` should be reduced modulo the modulus.
+    The implemented algorithms are Horner's method and rectangular splitting.
+    The default function :func:`_nmod_poly_evaluate_nmod` selects
+    automatically between :func:`_nmod_poly_evaluate_nmod_horner`,
+    :func:`_nmod_poly_evaluate_nmod_rectangular`
+    :func:`_nmod_poly_evaluate_nmod_precomp`, and
+    :func:`_nmod_poly_evaluate_nmod_precomp_lazy`.
 
 .. function:: ulong nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
 
     Evaluates ``poly`` at the value ``c`` and reduces modulo the modulus of
-    ``poly``. The value ``c`` should be reduced modulo the modulus. The
-    algorithm used is Horner's method, with multiplications and additions done
-    differently depending on the modulus ``poly->mod`` and on the degree (calls
-    one of :func:`_nmod_poly_evaluate_nmod`,
-    :func:`_nmod_poly_evaluate_nmod_precomp`,
-    :func:`_nmod_poly_evaluate_nmod_precomp_lazy`).
+    ``poly``. The value ``c`` should be reduced modulo the modulus.
 
 .. function:: void nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
 
