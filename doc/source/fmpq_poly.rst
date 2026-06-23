@@ -230,7 +230,7 @@ Assignment, swap, negation
 .. function:: void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x)
 
     Sets ``poly`` to the rational `x`, which is assumed to be
-    given in lowest terms.
+    given in lowest terms, which is not checked.
 
 .. function:: void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
 
@@ -247,14 +247,15 @@ Assignment, swap, negation
     Sets the coefficients of ``rop`` to the coefficients in the denominator of ``op``,
     reduced by the modulus of ``rop``. The result is multiplied by the inverse of the
     denominator of ``op``. It is assumed that the reduction of the denominator of ``op``
-    is invertible.
+    is invertible, which is not checked.
 
 .. function:: void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
 
     Sets the coefficients of ``rop`` to the coefficients in the denominator
     of ``op``, reduced by the modulus of ``rop``. If ``den == 1``, the result is
     multiplied by the inverse of the denominator of ``op``. In this case it is
-    assumed that the reduction of the denominator of ``op`` is invertible.
+    assumed that the reduction of the denominator of ``op`` is invertible,
+    which is not checked.
 
 .. function:: int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)
 
@@ -866,14 +867,15 @@ Power series division
 
     The result is produced in canonical form.
 
-    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term.
+    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term;
+    this is not checked.
     Does not support aliasing.
 
 .. function:: void fmpq_poly_inv_series_newton(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     Computes the first `n` terms of the inverse power series
     of ``poly`` using Newton iteration, assuming that ``poly``
-    has non-zero constant term and `n \geq 1`.
+    has non-zero constant term and `n \geq 1`; this is not checked.
 
 .. function:: void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong den_len, slong n)
 
@@ -882,19 +884,21 @@ Power series division
 
     The result is produced in canonical form.
 
-    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term.
+    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term;
+    this is not checked.
     Does not support aliasing.
 
 .. function:: void fmpq_poly_inv_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     Computes the first `n` terms of the inverse power series of ``poly``,
-    assuming that ``poly`` has non-zero constant term and `n \geq 1`.
+    assuming that ``poly`` has non-zero constant term and `n \geq 1`;
+    this is not checked.
 
 .. function:: void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, const fmpz * A, const fmpz_t denA, slong lenA, const fmpz * B, const fmpz_t denB, slong lenB, slong n)
 
     Divides ``(A, denA, lenA)`` by ``(B, denB, lenB)`` as power series
     over `\mathbb{Q}`, assuming `B` has non-zero constant term and that
-    all lengths are positive.
+    all lengths are positive. The constant term is not checked.
 
     Aliasing is not supported.
 
@@ -906,7 +910,7 @@ Power series division
     Performs power series division in `\mathbb{Q}[[x]] / (x^n)`.  The function
     considers the polynomials `A` and `B` as power series of length `n`
     starting with the constant terms.  The function assumes that `B` has
-    non-zero constant term and `n \geq 1`.
+    non-zero constant term and `n \geq 1`. The constant term is not checked.
 
 
 Greatest common divisor

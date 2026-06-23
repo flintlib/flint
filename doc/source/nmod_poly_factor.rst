@@ -13,6 +13,8 @@ Types, macros and constants
 Factorisation
 --------------------------------------------------------------------------------
 
+The factorisation and irreducibility functions in this module assume
+that the modulus is prime. This is not checked.
 
 .. function:: void nmod_poly_factor_init(nmod_poly_factor_t fac)
 
@@ -101,13 +103,15 @@ Factorisation
     placed in factor and 1 is returned, otherwise 0 is returned and
     the value of factor is undetermined.
 
-    Requires that ``pol`` be monic, non-constant and squarefree.
+    Requires that ``pol`` be monic, non-constant and squarefree. These
+    requirements are not checked.
 
 .. function:: void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors, const nmod_poly_t pol, slong d)
 
     Assuming ``pol`` is a product of irreducible factors all of
     degree ``d``, finds all those factors and places them in factors.
-    Requires that ``pol`` be monic, non-constant and squarefree.
+    Requires that ``pol`` be monic, non-constant and squarefree. These
+    requirements are not checked.
 
 .. function:: void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const * degs)
 
@@ -116,7 +120,7 @@ Factorisation
     `f[d]` is the product of the monic irreducible factors of ``poly``
     of degree `d`. Factors `f[d]` are stored in ``res``, and the degree `d`
     of the irreducible factors is stored in ``degs`` in the same order
-    as the factors.
+    as the factors. The squarefree requirement is not checked.
 
     Requires that ``degs`` has enough space for ``(n/2)+1 * sizeof(slong)``.
 
@@ -132,7 +136,8 @@ Factorisation
 .. function:: void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a non-constant, squarefree polynomial ``f`` into monic
-    irreducible factors using the Berlekamp algorithm.
+    irreducible factors using the Berlekamp algorithm. The squarefree
+    requirement is not checked.
 
 .. function:: void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res, const nmod_poly_t poly)
 
