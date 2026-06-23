@@ -474,7 +474,7 @@ Conversion
 
     Sets `f` to the signed remainder `y \equiv x \bmod m` satisfying
     `-m/2 < y \leq m/2`, given `x` which is assumed to satisfy
-    `0 \leq x < m`.
+    `0 \leq x < m` (this is not checked).
 
 .. function:: void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 
@@ -887,13 +887,15 @@ Basic arithmetic
 
     Sets `f` to the quotient of `g` and `h`, assuming that the
     division is exact, i.e. `g` is a multiple of `h`.  If `h`
-    is `0` an exception is raised.
+    is `0` an exception is raised. The exactness of the division is
+    not checked; if it is not exact the result is undefined.
 
 .. function:: void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
     Sets `f` to the quotient of `g` and `h = x \times y`, assuming that
     the division is exact, i.e. `g` is a multiple of `h`.
-    If `x` or `y` is `0` an exception is raised.
+    If `x` or `y` is `0` an exception is raised. The exactness of the
+    division is not checked; if it is not exact the result is undefined.
 
 .. function:: int fmpz_divisible(const fmpz_t f, const fmpz_t g)
 
@@ -988,7 +990,7 @@ Basic arithmetic
     If `p` is not prime the return value is with high probability `0`,
     indicating that `p` is not prime, or `a` is not a square modulo `p`.
     If `p` is not prime and the return value is `1`, the value of `b` is
-    meaningless.
+    meaningless. Primality of ``p`` is assumed and not checked.
 
 .. function:: void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 
@@ -1188,11 +1190,13 @@ Modular arithmetic
 
 .. function:: void fmpz_negmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets `f` to `-g \pmod{h}`, assuming `g` is reduced modulo `h`.
+    Sets `f` to `-g \pmod{h}`, assuming `g` is reduced modulo `h`
+    (this is not checked).
 
 .. function:: int fmpz_jacobi(const fmpz_t a, const fmpz_t n)
 
     Computes the Jacobi symbol `\left(\frac{a}{n}\right)` for any `a` and odd positive `n`.
+    The parity and sign of ``n`` are not checked.
 
 .. function:: int fmpz_kronecker(const fmpz_t a, const fmpz_t n)
 
@@ -1314,6 +1318,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.
+    These assumptions are not checked.
 
 .. function:: void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign)
 

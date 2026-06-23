@@ -49,6 +49,10 @@ Generic rings
 Modular reduction and arithmetic
 --------------------------------------------------------------------------------
 
+Many of the functions below assume that their operands are already
+reduced modulo ``mod.n``. These reduced-operand assumptions are not
+checked.
+
 .. function:: void nmod_init(nmod_t * mod, ulong n)
 
     Initialises the given ``nmod_t`` structure for reduction modulo `n`

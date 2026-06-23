@@ -119,7 +119,7 @@ Discrete Logarithms via Pohlig-Hellman
 
 .. function:: double fmpz_mod_discrete_log_pohlig_hellman_precompute_prime(fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t p)
 
-    Configure ``L`` for discrete logarithms modulo ``p`` to an internally chosen base. It is assumed that ``p`` is prime.
+    Configure ``L`` for discrete logarithms modulo ``p`` to an internally chosen base. It is assumed that ``p`` is prime (not checked).
     The return is an estimate on the number of multiplications needed for one run.
 
 .. function:: const fmpz * fmpz_mod_discrete_log_pohlig_hellman_primitive_root(fmpz_mod_discrete_log_pohlig_hellman_t L)
@@ -128,7 +128,7 @@ Discrete Logarithms via Pohlig-Hellman
 
 .. function:: void fmpz_mod_discrete_log_pohlig_hellman_run(fmpz_t x, const fmpz_mod_discrete_log_pohlig_hellman_t L, const fmpz_t y)
 
-    Set ``x`` to the logarithm of ``y`` with respect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
+    Set ``x`` to the logarithm of ``y`` with respect to the internally stored base. ``y`` is expected to be reduced modulo the ``p`` (this is not checked).
     The function is undefined if the logarithm does not exist.
 
 

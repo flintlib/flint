@@ -30,6 +30,10 @@ use the ``n_blah2_preinv`` variants.
 Some functions with the ``n_ll_`` or ``n_lll_`` prefix accept
 parameters of two or three limbs respectively.
 
+Throughout, a precomputed inverse is assumed to correspond to the
+stated modulus, and operands passed to the modular routines are
+assumed to be already reduced modulo `n`; none of this is checked.
+
 Simple example
 --------------
 
@@ -501,10 +505,12 @@ Jacobi and Kronecker symbols
 .. function:: int n_jacobi(slong x, ulong y)
 
     Computes the Jacobi symbol `\left(\frac{x}{y}\right)` for any `x` and odd `y`.
+    It is assumed that ``y`` is odd; this is not checked.
 
 .. function:: int n_jacobi_unsigned(ulong x, ulong y)
 
     Computes the Jacobi symbol, allowing `x` to go up to a full limb.
+    It is assumed that ``y`` is odd; this is not checked.
 
 
 Modular arithmetic
@@ -611,7 +617,8 @@ Modular arithmetic
 
     If `p` is not prime the result is with high probability `0`, indicating
     that `p` is not prime, or `a` is not a square modulo `p`. Otherwise the
-    result is meaningless.
+    result is meaningless. It is assumed that ``p`` is prime; this is not
+    checked.
 
     Assumes that `a` is reduced modulo `p`.
 
@@ -635,7 +642,7 @@ Modular arithmetic
     ``flint_free``. The number of roots is returned by the function. If
     ``a`` is not a quadratic residue modulo ``p^exp`` then 0 is
     returned by the function and the location ``sqrt`` points to is set to
-    NULL.
+    NULL. The supplied prime ``p`` is assumed correct; this is not checked.
 
 .. function:: slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
 
@@ -646,7 +653,8 @@ Modular arithmetic
     cleaned up by the user by calling :func:`flint_free`. The number of roots
     is returned by the function. If ``a`` is not a quadratic residue modulo
     ``m`` then 0 is returned by the function and the location ``sqrt``
-    points to is set to NULL.
+    points to is set to NULL. The supplied factorisation ``fac`` is assumed
+    correct; this is not checked.
 
 
 Modular arithmetic with fixed operand
@@ -1179,6 +1187,7 @@ Chinese remaindering
 
     It is assumed that `m_1` and `m_2` are positive integers greater
     than `1` and coprime. It is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
+    None of this is checked.
 
 
 Square root and perfect power testing
@@ -1323,7 +1332,8 @@ Factorisation
 
     Removes the highest possible power of `p` from `n`, replacing
     `n` with the quotient. The return value is the highest
-    power of `p` that divided `n`. Assumes `n` is not `0`.
+    power of `p` that divided `n`. Assumes `n` is not `0`. It is
+    assumed that ``p`` is greater than `1`; this is not checked.
 
     For `p = 2` trailing zeroes are counted. For other primes
     `p` is repeatedly squared and stored in a table of powers
@@ -1338,7 +1348,8 @@ Factorisation
     `n` with the quotient. The return value is the highest
     power of `p` that divided `n`. Assumes `n` is not `0`. We require
     ``ppre`` to be set to a precomputed inverse of `p` computed
-    with :func:`n_precompute_inverse`.
+    with :func:`n_precompute_inverse`. It is assumed that ``p`` is
+    greater than `1`; this is not checked.
 
     For `p = 2` trailing zeroes are counted. For other primes
     `p` we make repeated use of :func:`n_divrem2_precomp` until division
