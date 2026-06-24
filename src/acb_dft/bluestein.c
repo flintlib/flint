@@ -41,7 +41,7 @@ _acb_vec_bluestein_factors(acb_ptr z, slong n, slong prec)
     else
     {
         nmod_t n2;
-        slong k, k2, dk;
+        slong k, k2, dk, wp;
         slong * v, * s;
         acb_ptr t;
         s = flint_malloc(n * sizeof(slong));
@@ -64,13 +64,20 @@ _acb_vec_bluestein_factors(acb_ptr z, slong n, slong prec)
         }
         acb_modular_fill_addseq(v, n);
 
+        /* Build the base root and the addition-sequence products at wp, not
+           prec: the addseq raises the base root to powers via products of
+           earlier entries, amplifying the base-root error ~linearly in the
+           index. The factor table z is rounded back to prec after the
+           (exact) copy-out below. */
+        wp = prec + 6 + 2 * FLINT_BIT_COUNT(2 * n);
+
         acb_one(t + 0);
-        acb_unit_root(t + 1, 2 * n, prec);
+        acb_unit_root(t + 1, 2 * n, wp);
         acb_conj(t + 1, t + 1);
         acb_set_si(t + n, -1);
         for (k = 2; k < n; k++)
             if (v[k])
-                acb_mul(t + k, t + v[k], t + k - v[k], prec);
+                acb_mul(t + k, t + v[k], t + k - v[k], wp);
         for (k = 0; k < n; k++)
         {
             if (s[k] <= n)
@@ -78,6 +85,7 @@ _acb_vec_bluestein_factors(acb_ptr z, slong n, slong prec)
             else
                 acb_conj(z + k, t + 2 * n - s[k]);
         }
+        _acb_vec_set_round(z, z, n, prec);
         _acb_vec_clear(t, n + 1);
         flint_free(s);
         flint_free(v);
