@@ -829,6 +829,27 @@ Powers and elementary functions
     The underscore methods supports aliasing of the input and output
     arrays. They require that *flen* and *n* are greater than zero.
 
+.. function:: void _arb_poly_atanh_series(arb_ptr res, arb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void arb_poly_atanh_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
+
+.. function:: void _arb_poly_asinh_series(arb_ptr res, arb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void arb_poly_asinh_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
+
+.. function:: void _arb_poly_acosh_series(arb_ptr res, arb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void arb_poly_acosh_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
+
+    Sets *res* respectively to the power series inverse hyperbolic
+    tangent, inverse hyperbolic sine and inverse hyperbolic cosine of
+    *f*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *flen* and *n* are greater than zero.
+
 .. function:: void _arb_poly_exp_series_basecase(arb_ptr f, arb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void arb_poly_exp_series_basecase(arb_poly_t f, const arb_poly_t h, slong n, slong prec)
@@ -882,6 +903,17 @@ Powers and elementary functions
     The underscore version does not support aliasing, and requires
     the lengths to be nonzero.
 
+.. function:: void _arb_poly_cot_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_cot_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+
+    Sets *g* to the power series cotangent of *h*.*
+
+    Wraps :func: `_gr_poly_cot_series`.
+
+    The underscore method supports aliasing of the input and output
+    arrays. It require that *flen* and *n* are greater than zero.
+
 .. function:: void _arb_poly_sin_cos_pi_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void arb_poly_sin_cos_pi_series(arb_poly_t s, arb_poly_t c, const arb_poly_t h, slong n, slong prec)
@@ -893,6 +925,10 @@ Powers and elementary functions
 .. function:: void _arb_poly_cos_pi_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void arb_poly_cos_pi_series(arb_poly_t c, const arb_poly_t h, slong n, slong prec)
+
+.. function:: void _arb_poly_tan_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_tan_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
 
 .. function:: void _arb_poly_cot_pi_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -927,6 +963,22 @@ Powers and elementary functions
     The implementations mirror those for sine and cosine, except that
     the *exponential* version computes both functions using the exponential
     function instead of the hyperbolic tangent.
+
+.. function:: void _arb_poly_tanh_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_tanh_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+
+.. function:: void _arb_poly_coth_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_coth_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+
+    Sets *g* respectively to the power series cotangent and hyperbolic
+    cotangent of *h*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *hlen* and *n* are greater than zero.
 
 .. function:: void _arb_poly_sinc_series(arb_ptr s, arb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -1131,4 +1183,3 @@ Other special polynomials
     The underscore version accepts an additional *trunc* parameter. Even
     when computing a truncated polynomial, the array *poly* must have room for
     `2^n + 1` coefficients, used as temporary space.
-
