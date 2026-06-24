@@ -42,7 +42,11 @@ _acb_vec_unit_roots(acb_ptr res, slong n, slong len, slong prec)
     wp = prec + 6 + 2 * FLINT_BIT_COUNT(len1);
 
     acb_init(t);
-    acb_unit_root(t, n, prec);
+    /* Base root at wp, not prec: _acb_vec_set_powers raises it to powers by
+       binary powering, amplifying the base-root error ~linearly in the
+       index, so a prec-accurate base would leave the largest stored roots
+       only ~prec - log2(len1) bits accurate. Rounded back to prec below. */
+    acb_unit_root(t, n, wp);
     _acb_vec_set_powers(res, t, len1, wp);
     acb_clear(t);
     _acb_vec_set_round(res, res, len1, prec);
