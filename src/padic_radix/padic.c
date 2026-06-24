@@ -18,52 +18,6 @@
 /*    Internal helpers                                                       */
 /* ------------------------------------------------------------------------- */
 
-/* Normalise a limb array length. */
-static slong
-_norm(nn_srcptr d, slong n)
-{
-    while (n > 0 && d[n - 1] == 0)
-        n--;
-    return n;
-}
-
-/*
-    res = (nonnegative residue of x) mod p^k, as a radix_integer with digit
-    range [0, k). Built from a limb-level modulo plus a partial reduction of
-    the top limb. Handles negative x (the residue is the nonnegative
-    representative in [0, p^k)).
-*/
-static void
-radix_integer_mod_digits_nonneg(radix_integer_t res, const radix_integer_t x,
-    slong k, const radix_t radix)
-{
-    slong e = radix->exp;
-    slong limbs, rem, tot;
-
-    if (k <= 0)
-    {
-        radix_integer_zero(res, radix);
-        return;
-    }
-
-    limbs = k / e;
-    rem = k - limbs * e;       /* 0 <= rem < e */
-    tot = limbs + (rem != 0);
-
-    radix_integer_mod_limbs(res, x, tot, radix);   /* nonnegative, size <= tot */
-
-    if (rem != 0 && res->size == tot)
-    {
-        /* reduce the top limb (index `limbs`) modulo p^rem */
-        ulong top = res->d[limbs];
-        ulong m = radix->bpow[rem];
-        ulong t = n_rem_precomp(top, m, radix->bpow_div + rem);
-
-        res->d[limbs] = t;
-        res->size = _norm(res->d, tot);
-    }
-}
-
 /*
     Whether |x| < p^k (i.e. x fits in k digits), determined without counting
     digits: we only look at the limb sitting on the digit boundary and compare
@@ -174,8 +128,8 @@ _radix_units_congruent_mod(const radix_integer_t ux, const radix_integer_t uy,
     /* k is now bounded by 'content' (a few limbs); compare nonnegative residues */
     radix_integer_init(rx, radix);
     radix_integer_init(ry, radix);
-    radix_integer_mod_digits_nonneg(rx, ux, k, radix);
-    radix_integer_mod_digits_nonneg(ry, uy, k, radix);
+    radix_integer_mod_digits(rx, ux, k, radix);
+    radix_integer_mod_digits(ry, uy, k, radix);
     res = radix_integer_equal(rx, ry, radix);
     radix_integer_clear(rx, radix);
     radix_integer_clear(ry, radix);
@@ -348,7 +302,7 @@ _padic_radix_reduce(padic_radix_t x, gr_ctx_t ctx)
         return;
 
     /* otherwise the result is inexact: store the nonnegative residue */
-    radix_integer_mod_digits_nonneg(&x->u, &x->u, r, radix);
+    radix_integer_mod_digits(&x->u, &x->u, r, radix);
     if (x->u.size == 0)
         x->v = 0;
     x->N = FLINT_MIN(Neff, PADIC_RADIX_ERR_MAX);
@@ -612,7 +566,7 @@ padic_radix_neg(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
         }
         else
         {
-            radix_integer_mod_digits_nonneg(&res->u, &res->u, r, radix);
+            radix_integer_mod_digits(&res->u, &res->u, r, radix);
             if (res->u.size == 0)
                 res->v = 0;
         }
@@ -1570,7 +1524,7 @@ padic_radix_sqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
     /* Materialise the unit's nonnegative residue modulo p^{e*nlimbs} (this also
        resolves a signed exact unit), then take its square root. */
     radix_integer_init(unit, radix);
-    radix_integer_mod_digits_nonneg(unit, &x->u, e * nlimbs, radix);
+    radix_integer_mod_digits(unit, &x->u, e * nlimbs, radix);
     issquare = radix_integer_sqrtmod_limbs(&res->u, unit, nlimbs, radix);
     radix_integer_clear(unit, radix);
 
@@ -1733,7 +1687,7 @@ padic_radix_rsqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
         nlimbs = (kin + e - 1) / e;
 
     radix_integer_init(unit, radix);
-    radix_integer_mod_digits_nonneg(unit, &x->u, e * nlimbs, radix);
+    radix_integer_mod_digits(unit, &x->u, e * nlimbs, radix);
     issquare = radix_integer_rsqrtmod_limbs(&res->u, unit, nlimbs, radix);
     radix_integer_clear(unit, radix);
 
@@ -2063,6 +2017,7 @@ gr_method_tab_input _padic_radix_methods_input[] =
     {GR_METHOD_SQRT,            (gr_funcptr) padic_radix_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) padic_radix_rsqrt},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) padic_radix_is_square},
+    {GR_METHOD_EXP,             (gr_funcptr) padic_radix_exp},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) padic_radix_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) padic_radix_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) padic_radix_dot_strided},
@@ -2112,4 +2067,45 @@ gr_ctx_init_padic_radix(gr_ctx_t ctx, ulong p, slong prec_rel, slong prec_abs, i
 
     return GR_SUCCESS;
 }
+
+int
+gr_ctx_init_padic_radix_randtest(gr_ctx_t ctx, flint_rand_t state, slong maxprec)
+{
+    ulong p = n_randtest_prime(state, 0);
+    slong prec_abs, prec_rel;
+    int flags = 0;
+
+    if (n_randint(state, 2))
+        flags |= PADIC_RADIX_SIGNED;
+
+    switch (n_randint(state, 4))
+    {
+        case 0:   /* classic padic: absolute precision only */
+            prec_abs = 1 + n_randint(state, maxprec);
+            prec_rel = PADIC_RADIX_PREC_INF;
+            break;
+        case 1:   /* relative precision only */
+            prec_abs = PADIC_RADIX_PREC_INF;
+            prec_rel = 1 + n_randint(state, maxprec);
+            break;
+        case 2:   /* both */
+            prec_abs = 1 + n_randint(state, maxprec);
+            prec_rel = 1 + n_randint(state, maxprec);
+            break;
+        default:  /* exact ring */
+            prec_abs = PADIC_RADIX_PREC_INF;
+            prec_rel = PADIC_RADIX_PREC_INF;
+            break;
+    }
+
+    if (n_randint(state, 2))
+        flags |= PADIC_RADIX_TEST_LIMITS;
+
+    /* allow e.g. get_fmpz roundtrip to return unable for huge test values */
+    if (flags & PADIC_RADIX_TEST_LIMITS)
+        ctx->size_limit = (1 << 16);
+
+    return gr_ctx_init_padic_radix(ctx, p, prec_rel, prec_abs, flags);
+}
+
 

@@ -22,41 +22,8 @@ TEST_FUNCTION_START(padic_radix, state)
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t ctx;
-        ulong p = n_randtest_prime(state, 0);
-        slong prec_abs, prec_rel;
-        int flags = 0;
 
-        if (n_randint(state, 2))
-            flags |= PADIC_RADIX_SIGNED;
-
-        switch (n_randint(state, 4))
-        {
-            case 0:   /* classic padic: absolute precision only */
-                prec_abs = 1 + n_randint(state, 20);
-                prec_rel = PADIC_RADIX_PREC_INF;
-                break;
-            case 1:   /* relative precision only */
-                prec_abs = PADIC_RADIX_PREC_INF;
-                prec_rel = 1 + n_randint(state, 20);
-                break;
-            case 2:   /* both */
-                prec_abs = 1 + n_randint(state, 20);
-                prec_rel = 1 + n_randint(state, 20);
-                break;
-            default:  /* exact ring */
-                prec_abs = PADIC_RADIX_PREC_INF;
-                prec_rel = PADIC_RADIX_PREC_INF;
-                break;
-        }
-
-        if (n_randint(state, 2))
-            flags |= PADIC_RADIX_TEST_LIMITS;
-
-        gr_ctx_init_padic_radix(ctx, p, prec_rel, prec_abs, flags);
-
-        /* allow get_fmpz roundtrip to return unable for huge test values */
-        if (flags & PADIC_RADIX_TEST_LIMITS)
-            ctx->size_limit = (1 << 16);
+        gr_ctx_init_padic_radix_randtest(ctx, state, 20);
 
         gr_test_ring(ctx, 30, 0);
 

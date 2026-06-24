@@ -9839,15 +9839,36 @@ def test_is_vector_space():
 
 def test_padic():
     Q7 = Qp_padic_radix(7, rel_prec=10)
+    Q2 = Qp_padic_radix(2, rel_prec=10)
+
     assert str(Q7(7) * Q7(7)) == "(1) * 7^2"
     assert Q7(0).sqrt() == 0
     assert Q7(1).sqrt() == 1
     assert Q7(4).sqrt() == 2
     assert str(Q7(2).sqrt()) == "266983762 + O(7^10)"
     assert str((1/(1/Q7(4))).sqrt()) == "2 + O(7^10)"
-    assert raises(lambda: Q7(3).sqrt(), FlintDomainError)
-    assert raises(lambda: Q7(5).sqrt(), FlintDomainError)
-    assert raises(lambda: Q7(6).sqrt(), FlintDomainError)
+    assert raises(Q7(3).sqrt, FlintDomainError)
+    assert raises(Q7(5).sqrt, FlintDomainError)
+    assert raises(Q7(6).sqrt, FlintDomainError)
+
+    assert Q7(0).exp() == 1
+    assert str(Q7(7).exp()) == "182289612 + O(7^10)"
+    assert str(Q7("7 + O(7^11)").exp()) == "182289612 + O(7^10)"
+    assert str(Q7("7 + O(7^9)").exp()) == "20875184 + O(7^9)"
+    assert str(Q7("0 + O(7^2)").exp()) == "1 + O(7^2)"
+    assert str(Q7("0 + O(7^1)").exp()) == "1 + O(7^1)"
+    assert raises(Q7("0 + O(7^0)").exp, FlintUnableError)
+    assert raises(Q7("0 + O(7^-1)").exp, FlintUnableError)
+
+    assert Q2(0).exp() == 1
+    assert str(Q2(4).exp()) == "333 + O(2^10)"
+    assert str(Q2("4 + O(2^12)").exp()) == "333 + O(2^10)"
+    assert str(Q2("4 + O(2^8)").exp()) == "77 + O(2^8)"
+    assert str(Q2("0 + O(2^2)").exp()) == "1 + O(2^2)"
+    assert raises(Q2("0 + O(2^1)").exp, FlintUnableError)
+    assert raises(Q2("0 + O(2^0)").exp, FlintUnableError)
+    assert raises(Q2("0 + O(2^1)").exp, FlintUnableError)
+
 
 def test_big_o():
     Q = Qp_padic_radix(7, rel_prec=3)
