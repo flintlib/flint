@@ -38,6 +38,16 @@ Bug fixes
   [FJ, `#2652 <https://github.com/flintlib/flint/pull/2652>`_].
 * Fix virtual memory usage fetchers for OpenBSD [AA reported by Oliver Krüger,
   `#2653 <https://github.com/flintlib/flint/pull/2653>`_].
+* Fix ``acb_dft`` plan accuracy: the precomputed root-of-unity tables
+  (``_acb_vec_unit_roots`` and the Bluestein factor table) built their base
+  root at the call precision and raised it to powers, amplifying the base-root
+  error roughly linearly in the index, so plan output radii grew like ``O(n)``
+  (rad2/dft about 11 bits too wide at ``n = 2^16``; Bluestein far worse for
+  prime lengths). Build the base root at an internal guard precision and round
+  the stored table back to ``prec``. Also fix a pre-existing leak in
+  ``acb_dft_bluestein_precomp``, which cleared only ``n`` of its ``np``
+  allocated scratch entries
+  [EC, `#2756 <https://github.com/flintlib/flint/pull/2756>`_].
 
 
 2026-04-24 -- FLINT 3.5.0
