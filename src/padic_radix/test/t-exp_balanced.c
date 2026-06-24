@@ -70,6 +70,8 @@ TEST_FUNCTION_START(padic_radix_exp_balanced, state)
         padic_radix_clear(ey, ctx);
         padic_radix_clear(exy, ctx);
         padic_radix_clear(exey, ctx);
+
+        gr_ctx_clear(ctx);
     }
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)

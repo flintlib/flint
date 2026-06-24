@@ -1188,6 +1188,9 @@ radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n
         invertible = radix_invmod_bn(rd, xd, xn, n, radix);
     }
 
+    if (!invertible)
+        rn = 0;
+
     MPN_NORM(rd, rn);
     res->size = (xsize > 0) ? rn : -rn;
     return invertible;

@@ -276,8 +276,6 @@ _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u,
         ulong carry;
         ulong cy[3];
 
-        FLINT_ASSERT(hi > lo);
-
         /* s = sum over the block of pows[hi-lo] * c, accumulated with delayed
            carries: limbs 3*t, 3*t+1, 3*t+2 of acc hold the unreduced
            contribution to limb t of s.  Each term adds pows[hi-lo][t]*c (a two
