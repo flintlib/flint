@@ -57,7 +57,7 @@ void sample_interface(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
-void sample_generic(void * arg, ulong count)
+void sample_horner(void * arg, ulong count)
 {
     ulong n;
     nmod_t mod;
@@ -87,7 +87,7 @@ void sample_generic(void * arg, ulong count)
 
         prof_start();
         for (j = 0; j < 100; j++)
-            _nmod_poly_evaluate_nmod(poly, length, pt, mod);
+            _nmod_poly_evaluate_nmod_horner(poly, length, pt, mod);
         prof_stop();
     }
 
@@ -184,76 +184,116 @@ void sample_precomp_lazy(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
+void sample_rectangular(void * arg, ulong count)
+{
+    ulong n;
+    nmod_t mod;
+    info_t * info = (info_t *) arg;
+    flint_bitcnt_t bits = info->bits;
+    slong length = info->length;
+    slong i, j;
+
+    ulong * poly;
+    ulong pt;
+
+    FLINT_TEST_INIT(state);
+
+    poly = _nmod_vec_init(length);
+
+    for (i = 0; i < count; i++)
+    {
+        n = n_randbits(state, bits);
+        if (n == UWORD(0)) n++;
+
+        nmod_init(&mod, n);
+
+        for (j = 0; j < length; j++)
+            poly[j] = n_randint(state, n);
+
+        pt = n_randint(state, n);
+
+        prof_start();
+        for (j = 0; j < 100; j++)
+        {
+            _nmod_poly_evaluate_nmod_rectangular(poly, length, pt, mod);
+        }
+        prof_stop();
+    }
+
+    _nmod_vec_clear(poly);
+
+    FLINT_TEST_CLEAR(state);
+}
+
+#define NUM_LENGTHS 19
+#define NUM_BITS 5
+
 int main(void)
 {
-    slong lengths[18] = {1, 2, 3, 4, 6, 8,
-                         10, 12, 16, 20, 32, 45,
+    slong lengths[NUM_LENGTHS] = {1, 2, 3, 4, 6, 8,
+                         10, 12, 16, 20, 32, 45, 56,
                          64, 128, 256, 1024, 8192, 65536};
+    int bits[NUM_BITS] = { 16, 60, 62, 63, 64 };
+    int ibits;
 
     double min, max;
-    double mins[18]; // note: max seems to be consistently identical or extremely close to min
-    double mins_generic[18];
-    double mins_precomp[18];
-    double mins_precomp_lazy[18];
+    double mins[NUM_LENGTHS]; // note: max seems to be consistently identical or extremely close to min
+    double mins_horner[NUM_LENGTHS];
+    double mins_precomp[NUM_LENGTHS];
+    double mins_precomp_lazy[NUM_LENGTHS];
+    double mins_rectangular[NUM_LENGTHS];
     info_t info;
     flint_bitcnt_t i;
+    
 
     flint_printf("unit: all measurements in c/l\n");
-    flint_printf("profiled: interface | generic | precomp | precomp_lazy\n");
+    flint_printf("profiled: interface | horner | precomp | precomp_lazy | rectangular\n");
 
-    for (i = 62; i <= FLINT_BITS; i++)
+    for (ibits = 0; ibits < NUM_BITS; ibits++)
     {
+        i = bits[ibits];
         info.bits = i;
 
         printf("nbits = %ld\n", i);
-        for (int len = 0; len < 18; ++len)
+        for (int len = 0; len < NUM_LENGTHS; ++len)
         {
             info.length = lengths[len];
 
             prof_repeat(&min, &max, sample_interface, (void *) &info);
-            mins[len-1] = min;
-            prof_repeat(&min, &max, sample_generic, (void *) &info);
-            mins_generic[len-1] = min;
+            mins[len] = min;
+            prof_repeat(&min, &max, sample_horner, (void *) &info);
+            mins_horner[len] = min;
             prof_repeat(&min, &max, sample_precomp, (void *) &info);
-            mins_precomp[len-1] = min;
+            mins_precomp[len] = min;
             prof_repeat(&min, &max, sample_precomp_lazy, (void *) &info);
-            mins_precomp_lazy[len-1] = min;
+            mins_precomp_lazy[len] = min;
+            prof_repeat(&min, &max, sample_rectangular, (void *) &info);
+            mins_rectangular[len] = min;
         }
 
-        if (i < FLINT_BITS-1)
+        if (i < FLINT_BITS)
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < NUM_LENGTHS; ++len)
             {
-                flint_printf("   len %ld\t%.2lf\t%.2lf\t%.2lf\t%.2lf",
+                flint_printf("   len %ld\t%.2lf\t%.2lf\t%.2lf\t%.2lf\t%.2lf",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        (mins[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_horner[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_precomp[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_precomp_lazy[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_rectangular[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
                 flint_printf("\n");
             }
         }
-        else if (i < FLINT_BITS)
+        else
         {
-            for (int len = 0; len < 18; ++len)
+            for (int len = 0; len < NUM_LENGTHS; ++len)
             {
-                flint_printf("   len %ld\t%.2lf\t%.2lf\t%.2lf\t na",
+                flint_printf("   len %ld\t%.2lf\t%.2lf\t na \t na\t%.2lf",
                         lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
-                flint_printf("\n");
-            }
-        }
-        else  // i == FLINT_BITS
-        {
-            for (int len = 0; len < 18; ++len)
-            {
-                flint_printf("   len %ld\t%.2lf\t%.2lf\t na \t na",
-                        lengths[len],
-                        (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        (mins[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_horner[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_rectangular[len]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
                 flint_printf("\n");
             }
         }
