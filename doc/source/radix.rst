@@ -527,9 +527,15 @@ Memory-managed integers
     and returns 1. The sign of the input is preserved.
     If *x* is not invertible, returns 0.
 
+.. function:: int radix_integer_divmod_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer y, slong n, const radix_t radix)
+
+    If *y* is invertible modulo `B^n`, sets *res* to the quotient
+    `x / y` modulo `B^n` and returns 1. The sign of the inputs is preserved.
+    If *y* is not invertible, returns 0.
+
 .. function:: int radix_integer_rsqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
               int radix_integer_sqrtmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
     Square root modulo `B^n`: see :func:`radix_sqrtmod_bn` and
-    :func:`radic_rsqrtmod_bn`.
+    :func:`radix_rsqrtmod_bn`.
 

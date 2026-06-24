@@ -1129,6 +1129,74 @@ radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n
     return invertible;
 }
 
+int
+radix_integer_divmod_limbs(radix_integer_t res, const radix_integer_t a,
+    const radix_integer_t b, slong n, const radix_t radix)
+{
+    slong asize = a->size;
+    slong bsize = b->size;
+    slong an, bn, rn, sgn;
+    nn_ptr rd;
+    int invertible;
+
+    if (n == 0)
+    {
+        radix_integer_zero(res, radix);
+        return 1;
+    }
+
+    if (bsize == 0)
+    {
+        radix_integer_zero(res, radix);
+        return 0;
+    }
+
+    if (asize == 0)
+    {
+        ulong tmp = b->d[0];
+        radix_integer_zero(res, radix);
+        return radix_invmod_bn(&tmp, &tmp, 1, 1, radix);
+    }
+
+    an = FLINT_MIN(FLINT_ABS(asize), n);
+    bn = FLINT_MIN(FLINT_ABS(bsize), n);
+    sgn = asize ^ bsize;
+
+    if (bn == 1 && b->d[0] == 1)
+    {
+        radix_integer_trunc_limbs(res, a, n, radix);
+        res->size = (sgn >= 0) ? FLINT_ABS(res->size) : -FLINT_ABS(res->size);
+        return 1;
+    }
+
+    rd = radix_integer_fit_limbs(res, n, radix);
+
+    if (res == b)
+    {
+        TMP_INIT;
+        TMP_START;
+        nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * bn);
+        flint_mpn_copyi(tmp, b->d, bn);
+        invertible = radix_divmod_bn(rd, NULL, a->d, an, tmp, bn, n, radix);
+        TMP_END;
+    }
+    else
+    {
+        invertible = radix_divmod_bn(rd, NULL, a->d, an, b->d, bn, n, radix);
+    }
+
+    if (!invertible)
+    {
+        radix_integer_zero(res, radix);
+        return 0;
+    }
+
+    rn = n;
+    MPN_NORM(rd, rn);
+    res->size = (rn == 0) ? 0 : ((sgn >= 0) ? rn : -rn);
+    return 1;
+}
+
 /* res = a reciprocal square root of x modulo B^n, i.e. res^2 x == 1 (mod B^n).
    x must be a unit (x->d[0] coprime to p). Returns 1 on success, 0 if x is zero
    or not a square modulo p (in which case res is set to zero). */
