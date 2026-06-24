@@ -129,12 +129,13 @@ _acb_dft_bluestein_init(acb_dft_bluestein_t t, slong dv, slong n, slong prec)
 void
 acb_dft_bluestein_precomp(acb_ptr w, acb_srcptr v, const acb_dft_bluestein_t t, slong prec)
 {
-    slong n = t->n, np = t->rad2->n, dv = t->dv;
+    slong n = t->n, dv = t->dv, np;
     acb_ptr fp;
 
     if (n == 0)
         return;
 
+    np = t->rad2->n;
     fp = _acb_vec_init(np);
     _acb_vec_kronecker_mul_step(fp, t->z, v, dv, n, prec);
 
@@ -145,7 +146,7 @@ acb_dft_bluestein_precomp(acb_ptr w, acb_srcptr v, const acb_dft_bluestein_t t, 
 
     _acb_vec_kronecker_mul(w, t->z, fp, n, prec);
 
-    _acb_vec_clear(fp, n);
+    _acb_vec_clear(fp, np);
 }
 
 void
