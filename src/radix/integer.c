@@ -1029,6 +1029,70 @@ radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, 
 }
 
 void
+radix_integer_trunc_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong e = radix->exp;
+    slong limbs, rem, tot;
+
+    if (n <= 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    limbs = n / e;
+    rem = n - limbs * e;
+    tot = limbs + (rem != 0);
+
+    radix_integer_trunc_limbs(res, x, tot, radix);
+
+    if (rem != 0 && FLINT_ABS(res->size) == tot)
+    {
+        ulong top = res->d[limbs];
+        ulong m = radix->bpow[rem];
+        ulong t = n_rem_precomp(top, m, radix->bpow_div + rem);
+
+        res->d[limbs] = t;
+
+        while (tot > 0 && res->d[tot - 1] == 0)
+            tot--;
+        res->size = (res->size >= 0) ?  tot : -tot;
+    }
+}
+
+void
+radix_integer_mod_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong e = radix->exp;
+    slong limbs, rem, tot;
+
+    if (n <= 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    limbs = n / e;
+    rem = n - limbs * e;
+    tot = limbs + (rem != 0);
+
+    radix_integer_mod_limbs(res, x, tot, radix);
+
+    if (rem != 0 && FLINT_ABS(res->size) == tot)
+    {
+        ulong top = res->d[limbs];
+        ulong m = radix->bpow[rem];
+        ulong t = n_rem_precomp(top, m, radix->bpow_div + rem);
+
+        res->d[limbs] = t;
+
+        while (tot > 0 && res->d[tot - 1] == 0)
+            tot--;
+        res->size = tot;
+    }
+}
+
+void
 radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix)
 {
     slong xsize = x->size;

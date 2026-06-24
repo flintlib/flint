@@ -478,14 +478,16 @@ Memory-managed integers
     In the special case `x = 0`, returns zero.
 
 .. function:: void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_trunc_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* with the absolute value reduced modulo `B^n`, preserving
-    the sign of *x*.
+    Sets *res* to *x* with the absolute value reduced modulo `B^n` (respectively `b^n`),
+    preserving the sign of *x*.
 
 .. function:: void radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+              void radix_integer_mod_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 
-    Sets *res* to *x* reduced modulo `B^n`, returning the unique
-    unsigned representative in `[0, B^n-1]`.
+    Sets *res* to *x* reduced modulo `B^n` (respectively `b^n`), returning the unique
+    unsigned representative in `[0, B^n-1]` (respectively `[0, b^n-1]`).
 
 .. function:: void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 

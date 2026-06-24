@@ -412,6 +412,9 @@ void radix_integer_trunc_limbs(radix_integer_t res, const radix_integer_t x, slo
 void radix_integer_mod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 void radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 
+void radix_integer_trunc_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+void radix_integer_mod_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
+
 void radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix);
 int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix);
 int radix_integer_divmod_limbs(radix_integer_t res, const radix_integer_t a, const radix_integer_t b, slong n, const radix_t radix);
