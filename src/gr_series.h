@@ -159,6 +159,8 @@ WARN_UNUSED_RESULT int gr_series_cosh_integral(gr_series_t res, const gr_series_
 WARN_UNUSED_RESULT int gr_series_sin_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_sinh_integral(gr_series_t res, const gr_series_t x, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_series_bessel_j(gr_series_t res, const gr_srcptr nu, const gr_series_t z, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_series_fresnel(gr_series_t res1, gr_series_t res2, const gr_series_t x, int normalized, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_fresnel_s(gr_series_t res, const gr_series_t x, int normalized, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_series_fresnel_c(gr_series_t res, const gr_series_t x, int normalized, gr_ctx_t ctx);

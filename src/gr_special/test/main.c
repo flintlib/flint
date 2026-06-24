@@ -11,6 +11,7 @@
 
 /* Include functions *********************************************************/
 
+#include "t-bessel_j_jet.c"
 #include "t-chebyshev.c"
 #include "t-fac.c"
 #include "t-fib.c"
@@ -19,6 +20,7 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(gr_bessel_j_jet),
     TEST_FUNCTION(gr_special_chebyshev),
     TEST_FUNCTION(gr_special_fac),
     TEST_FUNCTION(gr_special_fib)
