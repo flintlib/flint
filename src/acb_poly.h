@@ -527,6 +527,21 @@ void _acb_poly_atan_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong
 
 void acb_poly_atan_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec);
 
+void _acb_poly_atanh_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_atanh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
+void _acb_poly_asin_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_asin_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
+void _acb_poly_asinh_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_asinh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
+void _acb_poly_acos_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_acos_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
+void _acb_poly_acosh_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_acosh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
 void _acb_poly_exp_series_basecase(acb_ptr f, acb_srcptr h, slong hlen, slong n, slong prec);
 void acb_poly_exp_series_basecase(acb_poly_t f, const acb_poly_t h, slong n, slong prec);
 void _acb_poly_exp_series(acb_ptr f, acb_srcptr h, slong hlen, slong n, slong prec);
@@ -547,6 +562,9 @@ void acb_poly_sinh_series(acb_poly_t s, const acb_poly_t h, slong n, slong prec)
 
 void _acb_poly_cosh_series(acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec);
 void acb_poly_cosh_series(acb_poly_t c, const acb_poly_t h, slong n, slong prec);
+
+void _acb_poly_tanh_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_tanh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
 
 void _acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong len, slong prec);
 void acb_poly_sin_cos_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec);
@@ -574,9 +592,18 @@ void _acb_poly_cot_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong len, slo
 
 void acb_poly_cot_pi_series(acb_poly_t res, const acb_poly_t f, slong len, slong prec);
 
+void _acb_poly_cot_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_cot_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
+void _acb_poly_coth_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_coth_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
 void _acb_poly_tan_series(acb_ptr g, acb_srcptr h, slong hlen, slong len, slong prec);
 
 void acb_poly_tan_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
+
+void _acb_poly_tan_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
+void acb_poly_tan_pi_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);
 
 void _acb_poly_sinc_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec);
 void acb_poly_sinc_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec);

@@ -746,6 +746,34 @@ Elementary functions
     The underscore method supports aliasing of the input and output
     arrays. It requires that *flen* and *n* are greater than zero.
 
+.. function:: void _acb_poly_asin_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_asin_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_acos_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_acos_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_atanh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_atanh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_asinh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_asinh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_acosh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_acosh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+    Sets *res* respectively to the power series inverse trigonometric
+    and hyperbolic functions of *f*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *flen* and *n* are greater than zero.
+
 .. function:: void _acb_poly_exp_series_basecase(acb_ptr f, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_exp_series_basecase(acb_poly_t f, const acb_poly_t h, slong n, slong prec)
@@ -807,6 +835,17 @@ Elementary functions
     The underscore version does not support aliasing, and requires
     the lengths to be nonzero.
 
+.. function:: void _acb_poly_cot_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_cot_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+    Sets *g* to the power series cotangent of *h*.*
+
+    Wraps :func: `_gr_poly_cot_series`.
+
+    The underscore method supports aliasing of the input and output
+    arrays. It require that *flen* and *n* are greater than zero.
+
 .. function:: void _acb_poly_sin_cos_pi_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_sin_cos_pi_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
@@ -818,6 +857,10 @@ Elementary functions
 .. function:: void _acb_poly_cos_pi_series(acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_cos_pi_series(acb_poly_t c, const acb_poly_t h, slong n, slong prec)
+
+.. function:: void _acb_poly_tan_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_tan_pi_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 
 .. function:: void _acb_poly_cot_pi_series(acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -852,6 +895,22 @@ Elementary functions
     The implementations mirror those for sine and cosine, except that
     the *exponential* version computes both functions using the exponential
     function instead of the hyperbolic tangent.
+
+.. function:: void _acb_poly_tanh_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_tanh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+.. function:: void _acb_poly_coth_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_coth_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+    Sets *g* respectively to the power series cotangent and hyperbolic
+    cotangent of *h*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *hlen* and *n* are greater than zero.
 
 .. function:: void _acb_poly_sinc_series(acb_ptr s, acb_srcptr h, slong hlen, slong n, slong prec)
 

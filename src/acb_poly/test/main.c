@@ -91,6 +91,7 @@
 #include "t-sub_series.c"
 #include "t-tan_series.c"
 #include "t-taylor_shift.c"
+#include "t-wrapped_series.c"
 #include "t-zeta_cpx_series.c"
 #include "t-zeta_em_tail_bsplit.c"
 #include "t-zeta_series.c"
@@ -179,6 +180,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_sub_series),
     TEST_FUNCTION(acb_poly_tan_series),
     TEST_FUNCTION(acb_poly_taylor_shift),
+    TEST_FUNCTION(acb_poly_wrapped_series),
     TEST_FUNCTION(acb_poly_zeta_cpx_series),
     TEST_FUNCTION(acb_poly_zeta_em_tail_bsplit),
     TEST_FUNCTION(acb_poly_zeta_series),

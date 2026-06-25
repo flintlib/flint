@@ -89,6 +89,7 @@
 #include "t-swinnerton_dyer_ui.c"
 #include "t-tan_series.c"
 #include "t-taylor_shift.c"
+#include "t-wrapped_series.c"
 #include "t-zeta_series.c"
 
 /* Array of test functions ***************************************************/
@@ -173,6 +174,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_poly_swinnerton_dyer_ui),
     TEST_FUNCTION(arb_poly_tan_series),
     TEST_FUNCTION(arb_poly_taylor_shift),
+    TEST_FUNCTION(arb_poly_wrapped_series),
     TEST_FUNCTION(arb_poly_zeta_series)
 };
 
