@@ -1,0 +1,33 @@
+\documentclass[tikz,border=0pt]{standalone}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage[default,oldstyle,scale=0.95]{opensans}
+\usetikzlibrary{shadings}
+\usetikzlibrary{backgrounds}
+
+% OPTIONS
+
+% Version with black color for use on bright backgrounds
+\definecolor{facecolor}{RGB}{0,0,0}
+
+% Version with white color for use on dark backgrounds
+% \definecolor{facecolor}{RGB}{255,255,255}
+
+\definecolor{darkbackcolor}{RGB}{80,96,117}
+
+
+\begin{document}
+
+% Transparent background
+\begin{tikzpicture}[thick,scale=2.5, every node/.style={transform shape}, every draw/.style={transform shape}]
+
+% White opaque background
+% \begin{tikzpicture}[background rectangle/.style={fill=white}, show background rectangle]
+
+% Dark opaque background
+%\begin{tikzpicture}[background rectangle/.style={fill=darkbackcolor}, show background rectangle]
+
+\input{flint-logo-content.tex}
+
+\end{tikzpicture}
+\end{document}
