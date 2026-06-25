@@ -45,6 +45,11 @@ If `G=\mathbb Z/n\mathbb Z`, we compute the DFT according to the usual conventio
 If several computations are to be done on the same group, the FFT scheme
 should be reused.
 
+The precomputed schemes build their internal tables of roots of unity at the
+precision passed to their *init* function. Build a scheme at (at least) the
+precision at which you intend to evaluate transforms; *acb_dft* and the
+precomputed schemes then return results accurate to about *prec* bits.
+
 .. type:: acb_dft_pre_struct
 
 .. type:: acb_dft_pre_t
@@ -96,7 +101,7 @@ We assume that `f` is given by a vector of length `\prod n_i` corresponding
 to a lexicographic ordering of the values `y_1,\dots y_r`, and the computation
 returns the same indexing for values of `\hat f`.
 
-.. function:: void acb_dirichlet_dft_prod(acb_ptr w, acb_srcptr v, slong * cyc, slong num, slong prec)
+.. function:: void acb_dft_prod(acb_ptr w, acb_srcptr v, slong * cyc, slong num, slong prec)
 
    Computes the DFT on the group product of *num* cyclic components of sizes *cyc*. Assume the entries
    of *v* are indexed according to lexicographic ordering of the cyclic
@@ -119,10 +124,10 @@ returns the same indexing for values of `\hat f`.
 
    Clears *t*.
 
-.. function:: void acb_dirichlet_dft_prod_precomp(acb_ptr w, acb_srcptr v, const acb_dft_prod_t prod, slong prec)
+.. function:: void acb_dft_prod_precomp(acb_ptr w, acb_srcptr v, const acb_dft_prod_t prod, slong prec)
 
    Sets *w* to the DFT of *v*. Assume the entries are lexicographically
-   ordered according to the product of cyclic groups initialized in *t*.
+   ordered according to the product of cyclic groups initialized in *prod*.
 
 Convolution
 -------------------------------------------------------------------------------
@@ -254,10 +259,10 @@ Radix 2 decomposition
    Computes the DFT of *v* into *w*, where *v* and *w* have size `2^e`,
    using a radix 2 FFT.
 
-.. function:: void acb_dft_inverse_rad2(acb_ptr w, acb_srcptr v, int e, slong prec)
+.. function:: void acb_dft_inverse_rad2_precomp_inplace(acb_ptr v, const acb_dft_rad2_t t, slong prec)
 
-   Computes the inverse DFT of *v* into *w*, where *v* and *w* have size `2^e`,
-   using a radix 2 FFT.
+   Computes the inverse DFT of *v* in place, of size *t->n*, using the
+   precomputed radix 2 scheme *t*.
 
 .. type:: acb_dft_rad2_struct
 
