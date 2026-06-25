@@ -155,6 +155,7 @@ ulong
 nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
     const nmod_poly_t input)
 {
+    result->num = 0;
     return __nmod_poly_factor_deflation(result, input, BERLEKAMP);
 }
 
@@ -162,6 +163,7 @@ ulong
 nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
     const nmod_poly_t input)
 {
+    result->num = 0;
     return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
 }
 
@@ -169,6 +171,7 @@ ulong
 nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
     const nmod_poly_t input)
 {
+    result->num = 0;
     return __nmod_poly_factor_deflation(result, input, KALTOFEN);
 }
 
