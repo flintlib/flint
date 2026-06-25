@@ -1029,6 +1029,70 @@ radix_integer_smod_limbs(radix_integer_t res, const radix_integer_t x, slong n, 
 }
 
 void
+radix_integer_trunc_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong e = radix->exp;
+    slong limbs, rem, tot;
+
+    if (n <= 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    limbs = n / e;
+    rem = n - limbs * e;
+    tot = limbs + (rem != 0);
+
+    radix_integer_trunc_limbs(res, x, tot, radix);
+
+    if (rem != 0 && FLINT_ABS(res->size) == tot)
+    {
+        ulong top = res->d[limbs];
+        ulong m = radix->bpow[rem];
+        ulong t = n_rem_precomp(top, m, radix->bpow_div + rem);
+
+        res->d[limbs] = t;
+
+        while (tot > 0 && res->d[tot - 1] == 0)
+            tot--;
+        res->size = (res->size >= 0) ?  tot : -tot;
+    }
+}
+
+void
+radix_integer_mod_digits(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
+{
+    slong e = radix->exp;
+    slong limbs, rem, tot;
+
+    if (n <= 0)
+    {
+        radix_integer_zero(res, radix);
+        return;
+    }
+
+    limbs = n / e;
+    rem = n - limbs * e;
+    tot = limbs + (rem != 0);
+
+    radix_integer_mod_limbs(res, x, tot, radix);
+
+    if (rem != 0 && FLINT_ABS(res->size) == tot)
+    {
+        ulong top = res->d[limbs];
+        ulong m = radix->bpow[rem];
+        ulong t = n_rem_precomp(top, m, radix->bpow_div + rem);
+
+        res->d[limbs] = t;
+
+        while (tot > 0 && res->d[tot - 1] == 0)
+            tot--;
+        res->size = tot;
+    }
+}
+
+void
 radix_integer_mullow_limbs(radix_integer_t res, const radix_integer_t x, const radix_integer_t y, slong n, const radix_t radix)
 {
     slong xsize = x->size;
@@ -1124,9 +1188,80 @@ radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n
         invertible = radix_invmod_bn(rd, xd, xn, n, radix);
     }
 
+    if (!invertible)
+        rn = 0;
+
     MPN_NORM(rd, rn);
     res->size = (xsize > 0) ? rn : -rn;
     return invertible;
+}
+
+int
+radix_integer_divmod_limbs(radix_integer_t res, const radix_integer_t a,
+    const radix_integer_t b, slong n, const radix_t radix)
+{
+    slong asize = a->size;
+    slong bsize = b->size;
+    slong an, bn, rn, sgn;
+    nn_ptr rd;
+    int invertible;
+
+    if (n == 0)
+    {
+        radix_integer_zero(res, radix);
+        return 1;
+    }
+
+    if (bsize == 0)
+    {
+        radix_integer_zero(res, radix);
+        return 0;
+    }
+
+    if (asize == 0)
+    {
+        ulong tmp = b->d[0];
+        radix_integer_zero(res, radix);
+        return radix_invmod_bn(&tmp, &tmp, 1, 1, radix);
+    }
+
+    an = FLINT_MIN(FLINT_ABS(asize), n);
+    bn = FLINT_MIN(FLINT_ABS(bsize), n);
+    sgn = asize ^ bsize;
+
+    if (bn == 1 && b->d[0] == 1)
+    {
+        radix_integer_trunc_limbs(res, a, n, radix);
+        res->size = (sgn >= 0) ? FLINT_ABS(res->size) : -FLINT_ABS(res->size);
+        return 1;
+    }
+
+    rd = radix_integer_fit_limbs(res, n, radix);
+
+    if (res == b)
+    {
+        TMP_INIT;
+        TMP_START;
+        nn_ptr tmp = TMP_ALLOC(sizeof(ulong) * bn);
+        flint_mpn_copyi(tmp, b->d, bn);
+        invertible = radix_divmod_bn(rd, NULL, a->d, an, tmp, bn, n, radix);
+        TMP_END;
+    }
+    else
+    {
+        invertible = radix_divmod_bn(rd, NULL, a->d, an, b->d, bn, n, radix);
+    }
+
+    if (!invertible)
+    {
+        radix_integer_zero(res, radix);
+        return 0;
+    }
+
+    rn = n;
+    MPN_NORM(rd, rn);
+    res->size = (rn == 0) ? 0 : ((sgn >= 0) ? rn : -rn);
+    return 1;
 }
 
 /* res = a reciprocal square root of x modulo B^n, i.e. res^2 x == 1 (mod B^n).

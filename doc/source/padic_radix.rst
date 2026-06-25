@@ -156,6 +156,9 @@ The following methods mainly implement the :ref:`generics <gr>` interface.
               int padic_radix_rsqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
               truth_t padic_radix_is_square(const padic_radix_t x, gr_ctx_t ctx)
 
+Dot products
+--------------------------------------------------------------------------------
+
 .. function:: int padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial, int subtract, const padic_radix_struct * vec1, slong stride1, const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
               int padic_radix_dot_strided_naive(padic_radix_t res, const padic_radix_t initial, int subtract, const padic_radix_struct * vec1, slong stride1, const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
               int padic_radix_dot_strided(padic_radix_t res, const padic_radix_t initial, int subtract, const padic_radix_struct * vec1, slong stride1, const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
@@ -172,4 +175,43 @@ The following methods mainly implement the :ref:`generics <gr>` interface.
 
     Wrappers for :func:`padic_radix_dot_strided`.
 
+Transcendental functions
+--------------------------------------------------------------------------------
+
+.. function:: slong _padic_radix_exp_bound(slong v, slong N, ulong p)
+
+    Returns the number of terms `n` such that the tail of the exponential
+    series for `x = p^v u` has valuation at least `N`, i.e. the smallest `n`
+    with `nv - v_p(n!) \ge N`:
+
+    .. math ::
+
+        n = \max(1, \left \lceil \frac{N(p-1) - 1}{v(p-1) - 1} \right \rceil)
+
+    Assumes (not checked) that `v` is large enough for the series to converge.
+
+.. function:: int _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+              int _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+              int _padic_radix_exp(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+
+    Given a unit `u` and a valuation `v` such that `v \ge 1` if `p \ne 2`
+    and `v \ge 2` if `p = 2` (not checked), sets *rop* to `\exp(u p^v)`
+    truncated to precision `p^N`.
+
+    The *rectangular* algorithm uses rectangular splitting.
+    The *balanced* algorithm uses the `p`-adic bit-burst algorithm with
+    binary splitting. The default function chooses an algorithm automatically.
+
+    The *rectangular* algorithm can return ``GR_UNABLE`` if `N` is too large
+    for the implementation; the *balanced* algorithm and the default
+    algorithm always succeed and return ``GR_SUCCESS`` (given valid input).
+
+.. function:: int padic_radix_exp_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_exp_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_exp(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+
+    Sets *res* to the `p`-adic exponential function `\exp(x)`.
+    Returns ``GR_DOMAIN`` if the series does not converge
+    and ``GR_UNABLE`` if this convergence cannot be determined or if the
+    precision is too large for the implementation.
 
