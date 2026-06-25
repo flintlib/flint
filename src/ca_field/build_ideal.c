@@ -1102,6 +1102,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
     /* ca_field_build_ideal_sin_cos(K, ctx); */
     ca_field_build_ideal_erf(K, ctx);
     ca_field_build_ideal_gamma(K, ctx);
+    ca_field_build_ideal_elliptic(K, ctx);
 
     if (ctx->options[CA_OPT_USE_GROEBNER])
     {
