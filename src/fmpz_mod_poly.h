@@ -134,6 +134,15 @@ int fmpz_mod_poly_is_canonical(const fmpz_mod_poly_t A, const fmpz_mod_ctx_t ctx
 
 
 /*  Randomisation ************************************************************/
+void fmpz_mod_poly_rand(fmpz_mod_poly_t f, flint_rand_t state,
+                                          slong len, const fmpz_mod_ctx_t ctx);
+
+void fmpz_mod_poly_rand_monic(fmpz_mod_poly_t f,
+                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+
+void fmpz_mod_poly_rand_irreducible(fmpz_mod_poly_t f,
+                      flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+
 
 void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state,
                                           slong len, const fmpz_mod_ctx_t ctx);
