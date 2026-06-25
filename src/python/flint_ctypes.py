@@ -9859,6 +9859,19 @@ def test_padic():
     assert str(Q7("0 + O(7^1)").exp()) == "1 + O(7^1)"
     assert raises(Q7("0 + O(7^0)").exp, FlintUnableError)
     assert raises(Q7("0 + O(7^-1)").exp, FlintUnableError)
+    assert raises((Q7(7)**(-5) + Q7("O(7^-2)")).exp, FlintDomainError)
+
+    assert Q7(1).log() == 0
+    assert str(Q7("1 + O(7^5)").log()) == "0 + O(7^5)"
+    assert str(Q7(1000 * 7).exp().log()) == "(1000) * 7^1 + O(7^10)"
+    assert raises(Q7(2).log, FlintDomainError)
+    assert raises(Q7(0).log, FlintDomainError)
+    assert str(Q7("1 + O(7)").log()) == "0 + O(7^1)"
+
+    assert raises(Q7("O(7)").log, FlintDomainError)
+    assert raises(Q7("0 + O(7^0)").log, FlintUnableError)
+    assert raises(Q7("0 + O(7^-1)").log, FlintUnableError)
+    assert raises((Q7(7)**(-5) + Q7("O(7^-2)")).log, FlintDomainError)
 
     assert Q2(0).exp() == 1
     assert str(Q2(4).exp()) == "333 + O(2^10)"

@@ -37,7 +37,7 @@ int main()
 
         flint_printf("precision %wu^n, limb radix = %wu^%wd\n\n", p, p, radix->exp);
 
-        for (n = 10; n <= 11000000; n *= 2)
+        for (n = 10; n <= 1500000; n *= 2)
         {
             gr_ctx_t ctx;
             radix_integer_t x, y;
@@ -78,33 +78,42 @@ int main()
             rx->v = 1;
             rx->N += 1;
 
-            double t1, t2 = 0.0, t3, t4, FLINT_SET_BUT_UNUSED(__);
+            double t1, t2, t3, t4, t5, FLINT_SET_BUT_UNUSED(__);
+
+            padic_exp(py, px, pctx);
+            padic_set(px, py, pctx);
 
             TIMEIT_START;
-            padic_exp(py, px, pctx);
+            padic_log(py, px, pctx);
             TIMEIT_STOP_VALUES(__, t1);
+
+            TIMEIT_START;
+            padic_radix_exp(ry, rx, ctx);
+            TIMEIT_STOP_VALUES(__, t2);
+
+            padic_radix_set(rx, ry, ctx);
 
             if (n < 1000)
             {
                 TIMEIT_START;
-                padic_radix_exp_rectangular(ry, rx, ctx);
-                TIMEIT_STOP_VALUES(__, t2);
+                padic_radix_log_rectangular(ry, rx, ctx);
+                TIMEIT_STOP_VALUES(__, t3);
             }
             else
-                t2 = D_NAN;
+                t3 = D_NAN;
 
             TIMEIT_START;
-            padic_radix_exp_balanced(ry, rx, ctx);
-            TIMEIT_STOP_VALUES(__, t3);
-
-            TIMEIT_START;
-            padic_radix_exp(ry, rx, ctx);
+            padic_radix_log_balanced(ry, rx, ctx);
             TIMEIT_STOP_VALUES(__, t4);
 
-            if (n == 10)
-                flint_printf("       n      padic     rectangular   balanced    default   speedup\n");
+            TIMEIT_START;
+            padic_radix_log(ry, rx, ctx);
+            TIMEIT_STOP_VALUES(__, t5);
 
-            flint_printf("%8wd   %10g  %10g  %10g  %10g  %6.3fx\n", n, t1, t2, t3, t4, t1 / t4);
+            if (n == 10)
+                flint_printf("       n      padic       exp       rectangular   balanced     log       speedup\n");
+
+            flint_printf("%8wd   %10g  %10g  %10g  %10g  %10g   %6.3fx\n", n, t1, t2, t3, t4, t5, t1 / t5);
 
             padic_radix_clear(rx, ctx);
             padic_radix_clear(ry, ctx);
@@ -130,7 +139,6 @@ int main()
         flint_printf("\n");
     }
 
-    radix_clear(radix);
     flint_rand_clear(state);
     flint_cleanup_master();
     return 0;

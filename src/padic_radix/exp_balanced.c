@@ -368,7 +368,7 @@ _bsplit_block_numden(radix_integer_t pnum, radix_integer_t pden,
     p^N.  Requires v >= 1 (odd p) or v >= 2 (p = 2) and N >= 1.  Always returns
     GR_SUCCESS (an internal invariant failure aborts via flint_throw).
 */
-int
+void
 _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u,
     slong v, slong N, const radix_t radix)
 {
@@ -382,13 +382,13 @@ _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u,
     if (N <= 0)
     {
         radix_integer_zero(rop, radix);
-        return GR_SUCCESS;
+        return;
     }
 
     if (v >= N || radix_integer_is_zero(u, radix))
     {
         radix_integer_one(rop, radix);
-        return GR_SUCCESS;
+        return;
     }
 
     lN = (N + e - 1) / e;
@@ -403,7 +403,7 @@ _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u,
     {
         radix_integer_one(rop, radix);
         radix_integer_clear(t, radix);
-        return GR_SUCCESS;
+        return;
     }
 
     /* Digit length D of t.  Blocks are [0,S), [S,2S), [2S,4S), [4S,8S), ...
@@ -467,7 +467,5 @@ _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u,
     radix_integer_clear(Pden, radix);
     radix_integer_clear(pnum, radix);
     radix_integer_clear(pden, radix);
-
-    return GR_SUCCESS;
 }
 

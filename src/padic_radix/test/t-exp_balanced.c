@@ -81,7 +81,6 @@ TEST_FUNCTION_START(padic_radix_exp_balanced, state)
         slong thr, v, N;
         fmpz_t uf, pf, ref, got;
         radix_integer_t u, g;
-        int status;
 
         radix_init_randtest_prime(radix, state);
         p = DIGIT_RADIX(radix);
@@ -107,13 +106,7 @@ TEST_FUNCTION_START(padic_radix_exp_balanced, state)
         radix_integer_init(g, radix);
         radix_integer_set_fmpz(u, uf, radix);
 
-        status = _padic_radix_exp_balanced(g, u, v, N, radix);
-
-        if (status != GR_SUCCESS)
-        {
-            flint_printf("FAIL: unexpected status %d (p = %wu, e = %wu)\n", status, p, radix->exp);
-            flint_abort();
-        }
+        _padic_radix_exp_balanced(g, u, v, N, radix);
 
         _padic_exp(ref, uf, v, pf, N);
         radix_integer_get_fmpz(got, g, radix);

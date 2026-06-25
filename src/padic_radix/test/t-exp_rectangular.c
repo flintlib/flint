@@ -80,7 +80,6 @@ TEST_FUNCTION_START(padic_radix_exp_rectangular, state)
         slong thr, v, N;
         fmpz_t uf, pf, ref, got;
         radix_integer_t u, g;
-        int status;
 
         radix_init_randtest_prime(radix, state);
         p = DIGIT_RADIX(radix);
@@ -105,29 +104,18 @@ TEST_FUNCTION_START(padic_radix_exp_rectangular, state)
         radix_integer_init(g, radix);
         radix_integer_set_fmpz(u, uf, radix);
 
-        status = _padic_radix_exp_rectangular(g, u, v, N, radix);
+        _padic_radix_exp_rectangular(g, u, v, N, radix);
 
-        if (status == GR_SUCCESS)
-        {
-            _padic_exp(ref, uf, v, pf, N);
-            radix_integer_get_fmpz(got, g, radix);
+        _padic_exp(ref, uf, v, pf, N);
+        radix_integer_get_fmpz(got, g, radix);
 
-            if (!fmpz_equal(ref, got))
-            {
-                flint_printf("FAIL: _padic_radix_exp_balanced vs _padic_exp\n");
-                flint_printf("p = %wu, e = %wu, v = %wd, N = %wd\n", p, radix->exp, v, N);
-                flint_printf("u = "); fmpz_print(uf); flint_printf("\n");
-                flint_printf("ref = "); fmpz_print(ref); flint_printf("\n");
-                flint_printf("got = "); fmpz_print(got); flint_printf("\n");
-                flint_abort();
-            }
-        }
-        else if (status == GR_UNABLE)
+        if (!fmpz_equal(ref, got))
         {
-        }
-        else
-        {
-            flint_printf("FAIL: unexpected status %d (p = %wu, e = %wu)\n", status, p, radix->exp);
+            flint_printf("FAIL: _padic_radix_exp_balanced vs _padic_exp\n");
+            flint_printf("p = %wu, e = %wu, v = %wd, N = %wd\n", p, radix->exp, v, N);
+            flint_printf("u = "); fmpz_print(uf); flint_printf("\n");
+            flint_printf("ref = "); fmpz_print(ref); flint_printf("\n");
+            flint_printf("got = "); fmpz_print(got); flint_printf("\n");
             flint_abort();
         }
 
