@@ -64,11 +64,6 @@ _acb_vec_bluestein_factors(acb_ptr z, slong n, slong prec)
         }
         acb_modular_fill_addseq(v, n);
 
-        /* Build the base root and the addition-sequence products at wp, not
-           prec: the addseq raises the base root to powers via products of
-           earlier entries, amplifying the base-root error ~linearly in the
-           index. The factor table z is rounded back to prec after the
-           (exact) copy-out below. */
         wp = prec + 6 + 2 * FLINT_BIT_COUNT(2 * n);
 
         acb_one(t + 0);
