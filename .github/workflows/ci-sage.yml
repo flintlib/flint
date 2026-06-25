@@ -1,0 +1,140 @@
+name: Run Sage CI
+
+## This GitHub Actions workflow provides:
+##
+##  - portability testing, by building and testing this project on many platforms
+##    (Linux variants, macOS, Windows with mingw32), each with two configurations (installed packages),
+##
+##  - continuous integration, by building and testing other software
+##    that depends on this project.
+##
+## It runs on every pull request and push of a tag to the GitHub repository.
+##
+## The testing can be monitored in the "Actions" tab of the GitHub repository.
+##
+## After all jobs have finished (or are canceled) and a short delay,
+## tar files of all logs are made available as "build artifacts".
+##
+## This GitHub Actions workflow uses the portability testing framework
+## of SageMath (https://www.sagemath.org/).  For more information, see
+## https://doc.sagemath.org/html/en/developer/portability_testing.html
+
+## The workflow consists of two jobs:
+##
+##  - First, it builds a source distribution of the project
+##    and generates a script "update-pkgs.sh".  It uploads them
+##    as a build artifact named upstream.
+##
+##  - Second, it checks out a copy of the SageMath source tree.
+##    It downloads the upstream artifact and replaces the project's
+##    package in the SageMath distribution by the newly packaged one
+##    from the upstream artifact, by running the script "update-pkgs.sh".
+##    Then it builds a small portion of the Sage distribution.
+##
+## Many copies of the second step are run in parallel for each of the tested
+## systems/configurations.
+
+on:
+  push:
+    tags:
+      - '*'
+  schedule:
+    # run each Tuesday at 01:00
+    - cron: '0 1 * * 2'
+  workflow_dispatch:
+    # Allow to run manually
+
+env:
+  # Ubuntu packages to install so that the project's "make dist" can succeed
+  DIST_PREREQ:      tar libgmp-dev libmpfr-dev
+  # Name of this project in the Sage distribution
+  SPKG:             flint
+  REMOVE_PATCHES:   "*"
+
+jobs:
+
+  dist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out ${{ env.SPKG }}
+        uses: actions/checkout@v4
+        with:
+          path: build/pkgs/${{ env.SPKG }}/src
+      - name: Install prerequisites
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install $DIST_PREREQ
+        if: env.DIST_PREREQ != ''
+      - name: Run make dist, prepare upstream artifact
+        run: |
+          (cd build/pkgs/${{ env.SPKG }}/src && ./bootstrap.sh && ./configure && make dist) \
+          && mkdir -p upstream && cp build/pkgs/${{ env.SPKG }}/src/*.tar.gz upstream/${{ env.SPKG }}-git.tar.gz \
+          && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=standard" > upstream/update-pkgs.sh \
+          && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
+          && ls -l upstream/
+      - uses: actions/upload-artifact@v4
+        with:
+          path: upstream
+          name: upstream
+
+  linux:
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
+    with:
+      # Sage distribution packages to build
+      targets: SAGE_CHECK=no SAGE_CHECK_flint=yes flint
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
+      upstream_artifact: upstream
+      # Docker targets (stages) to tag
+      docker_targets: "with-targets"
+      # We prefix the image name with the SPKG name ("flint_") to avoid the error
+      # 'Package "sage-docker-..." is already associated with another repository.'
+      docker_push_repository: ghcr.io/${{ github.repository }}/flint_
+    needs: [dist]
+
+  macos:
+    uses: passagemath/passagemath/.github/workflows/macos.yml@main
+    with:
+      targets: SAGE_CHECK=no SAGE_CHECK_flint=yes flint
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
+      upstream_artifact: upstream
+    needs: [dist]
+
+  mingw:
+    uses: passagemath/passagemath/.github/workflows/mingw.yml@main
+    with:
+      # Extra system packages to install. See available packages at
+      # https://github.com/passagemath/passagemath/tree/main/build/pkgs
+      extra_sage_packages: "info"
+      # Sage distribution packages to build
+      targets: SAGE_CHECK=no SAGE_CHECK_flint=yes flint
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
+      upstream_artifact: upstream
+    needs: [dist]
+
+  sage:
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
+    with:
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
+      upstream_artifact: upstream
+      # Build incrementally from published Docker image
+      incremental: true
+      free_disk_space: true
+      from_docker_repository: ghcr.io/passagemath/passagemath/
+      from_docker_target: "with-targets"
+      from_docker_tag: "dev"
+      docker_targets: "with-targets"
+      targets: "SAGE_CHECK_passagemath_flint=yes sagemath_flint msolve"
+      tox_system_factors: >-
+        ["debian-bookworm"]
+      tox_packages_factors: >-
+        ["standard"]
+      docker_push_repository: ghcr.io/${{ github.repository }}/flint_
+    needs: [dist]
