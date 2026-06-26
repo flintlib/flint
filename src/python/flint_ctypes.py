@@ -9859,6 +9859,18 @@ def test_padic():
     assert str(Q7("0 + O(7^1)").exp()) == "1 + O(7^1)"
     assert raises(Q7("0 + O(7^0)").exp, FlintUnableError)
     assert raises(Q7("0 + O(7^-1)").exp, FlintUnableError)
+    assert raises((Q7(7)**(-5) + Q7("O(7^-2)")).exp, FlintDomainError)
+
+    assert Q7(1).log() == 0
+    assert str(Q7("1 + O(7^5)").log()) == "0 + O(7^5)"
+    assert str(Q7(1000 * 7).exp().log()) == "(1000) * 7^1 + O(7^10)"
+    assert raises(Q7(2).log, FlintDomainError)
+    assert raises(Q7(0).log, FlintDomainError)
+    assert str(Q7("1 + O(7)").log()) == "0 + O(7^1)"
+    assert raises(Q7("O(7)").log, FlintDomainError)
+    assert raises(Q7("0 + O(7^0)").log, FlintUnableError)
+    assert raises(Q7("0 + O(7^-1)").log, FlintUnableError)
+    assert raises(Q7("7^-5 + O(7^-2)").log, FlintDomainError)
 
     assert Q2(0).exp() == 1
     assert str(Q2(4).exp()) == "333 + O(2^10)"
@@ -9868,6 +9880,26 @@ def test_padic():
     assert raises(Q2("0 + O(2^1)").exp, FlintUnableError)
     assert raises(Q2("0 + O(2^0)").exp, FlintUnableError)
     assert raises(Q2("0 + O(2^1)").exp, FlintUnableError)
+
+    assert Q2(1).log() == 0
+    assert str(Q2("1 + O(2^5)").log()) == "0 + O(2^5)"
+    assert str(Q2("1 + 2 * 3").log()) == "(59) * 2^3 + O(2^10)"
+    assert str(Q2(123 * 4).exp().log()) == "(123) * 2^2 + O(2^10)"
+    assert raises(Q2(2).log, FlintDomainError)
+    assert raises(Q2(0).log, FlintDomainError)
+    assert str(Q2("1 + O(2)").log()) == "0 + O(2^1)"
+    assert raises(Q2("O(2)").log, FlintDomainError)
+    assert raises(Q2("0 + O(2^0)").log, FlintUnableError)
+    assert raises(Q2("0 + O(2^-1)").log, FlintUnableError)
+    assert raises(Q2("2^-5 + O(2^-2)").log, FlintDomainError)
+
+    Q5 = Qp_padic_radix(5, rel_prec=10)
+    f = PowerSeriesRing(Q5)("5 * 1234 + x")
+    ef = f.exp()
+    stref = "(1779246 + O(5^10)) + (1779246 + O(5^10))*x + (889623 + O(5^10))*x^2 + (296541 + O(5^10))*x^3 + (7398354 + O(5^10))*x^4 + ((7398354) * 5^-1 + O(5^9))*x^5 + O(x^6)"
+    assert str(ef) == stref
+    assert str((PowerSeriesRing(Q5))(stref)) == stref
+    assert str(f.exp() * (-f).exp()) == "(1 + O(5^10)) + (0 + O(5^10))*x + (0 + O(5^10))*x^2 + (0 + O(5^10))*x^3 + (0 + O(5^10))*x^4 + (0 + O(5^9))*x^5 + O(x^6)"
 
 
 def test_big_o():

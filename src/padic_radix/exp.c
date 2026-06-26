@@ -75,7 +75,7 @@ _padic_radix_exp_bound(slong v, slong N, ulong p)
     }
 }
 
-int
+void
 _padic_radix_exp(radix_integer_t rop, const radix_integer_t u,
     slong v, slong N, const radix_t radix)
 {
@@ -91,10 +91,10 @@ _padic_radix_exp(radix_integer_t rop, const radix_integer_t u,
     else
         cutoff = 80;
 
-    if (N < cutoff && _padic_radix_exp_rectangular(rop, u, v, N, radix) == GR_SUCCESS)
-        return GR_SUCCESS;
-
-    return _padic_radix_exp_balanced(rop, u, v, N, radix);
+    if (N < cutoff)
+        _padic_radix_exp_rectangular(rop, u, v, N, radix);
+    else
+        _padic_radix_exp_balanced(rop, u, v, N, radix);
 }
 
 static int
@@ -103,7 +103,6 @@ _padic_radix_exp_wrapper(padic_radix_t res, const padic_radix_t x, int algorithm
     radix_struct * radix = PADIC_RADIX_CTX_RADIX(ctx);
     ulong p = GR_PADIC_RADIX_CTX(ctx)->p;
     slong vx = x->v, Nx = x->N;
-    int status;
 
     slong prec_abs = PADIC_RADIX_CTX_PREC_ABS(ctx);
     slong prec_rel = PADIC_RADIX_CTX_PREC_REL(ctx);
@@ -138,16 +137,15 @@ _padic_radix_exp_wrapper(padic_radix_t res, const padic_radix_t x, int algorithm
         prec = FLINT_MIN(prec, Nx);
 
     if (algorithm == 0)
-        status = _padic_radix_exp(&res->u, &x->u, vx, prec, radix);
+        _padic_radix_exp(&res->u, &x->u, vx, prec, radix);
     else if (algorithm == 1)
-        status = _padic_radix_exp_rectangular(&res->u, &x->u, vx, prec, radix);
+        _padic_radix_exp_rectangular(&res->u, &x->u, vx, prec, radix);
     else
-        status = _padic_radix_exp_balanced(&res->u, &x->u, vx, prec, radix);
+        _padic_radix_exp_balanced(&res->u, &x->u, vx, prec, radix);
 
     res->v = 0;
     res->N = prec;
-    status |= _padic_radix_finalize(res, ctx);
-    return status;
+    return _padic_radix_finalize(res, ctx);
 }
 
 int

@@ -180,9 +180,9 @@ Transcendental functions
 
 .. function:: slong _padic_radix_exp_bound(slong v, slong N, ulong p)
 
-    Returns the number of terms `n` such that the tail of the exponential
-    series for `x = p^v u` has valuation at least `N`, i.e. the smallest `n`
-    with `nv - v_p(n!) \ge N`:
+    Returns the smallest number of terms `n` such that the tail of the
+    exponential series for `x = p^v u` has valuation at least `N`, i.e.
+    the smallest `n` with `nv - v_p(n!) \ge N`:
 
     .. math ::
 
@@ -190,11 +190,11 @@ Transcendental functions
 
     Assumes (not checked) that `v` is large enough for the series to converge.
 
-.. function:: int _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
-              int _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
-              int _padic_radix_exp(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+.. function:: void _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+              void _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+              void _padic_radix_exp(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
 
-    Given a unit `u` and a valuation `v` such that `v \ge 1` if `p \ne 2`
+    Given an integer `u` and a valuation `v` such that `v \ge 1` if `p \ne 2`
     and `v \ge 2` if `p = 2` (not checked), sets *rop* to `\exp(u p^v)`
     truncated to precision `p^N`.
 
@@ -202,16 +202,35 @@ Transcendental functions
     The *balanced* algorithm uses the `p`-adic bit-burst algorithm with
     binary splitting. The default function chooses an algorithm automatically.
 
-    The *rectangular* algorithm can return ``GR_UNABLE`` if `N` is too large
-    for the implementation; the *balanced* algorithm and the default
-    algorithm always succeed and return ``GR_SUCCESS`` (given valid input).
-
 .. function:: int padic_radix_exp_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
               int padic_radix_exp_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
               int padic_radix_exp(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
 
     Sets *res* to the `p`-adic exponential function `\exp(x)`.
     Returns ``GR_DOMAIN`` if the series does not converge
-    and ``GR_UNABLE`` if this convergence cannot be determined or if the
+    and ``GR_UNABLE`` if convergence cannot be determined or if the
     precision is too large for the implementation.
+
+.. function:: slong _padic_radix_log_bound(slong v, slong N, ulong p)
+
+    Returns the smallest number of terms `n` such that the tail of the
+    logarithm series for `1 + p^v u` has valuation at least `N`.
+
+.. function:: void _padic_radix_log_rectangular(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
+              void _padic_radix_log_balanced(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
+              void _padic_radix_log(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
+
+    Given an integer `y` with valuation `v \ge 1` (not checked),
+    sets *rop* to `\log(1-y)` truncated to precision `p^N`.
+
+.. function:: int padic_radix_log_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_log_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_log(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+
+    Sets *res* to the `p`-adic natural logarithm `\log(x)`.
+    Returns ``GR_DOMAIN`` if the series does not converge
+    and ``GR_UNABLE`` if convergence cannot be determined or if the
+    precision is too large for the implementation.
+
+
 

@@ -110,7 +110,7 @@ _radix_array_valuation_digits(nn_srcptr a, slong n, const radix_t radix)
     GR_SUCCESS, or GR_UNABLE only on the (degenerate) failure of the final
     inversion.
 */
-int
+void
 _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u,
     slong v, slong N, const radix_t radix)
 {
@@ -128,13 +128,13 @@ _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u,
     if (N <= 0)
     {
         radix_integer_zero(rop, radix);
-        return GR_SUCCESS;
+        return;
     }
 
     if (v >= N || radix_integer_is_zero(u, radix))
     {
         radix_integer_one(rop, radix);
-        return GR_SUCCESS;
+        return;
     }
 
     n = _padic_radix_exp_bound(v, N, p);
@@ -190,7 +190,7 @@ _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u,
             res = res % radix->bpow[N];          /* reduce to N digits (N <= e) */
 
             radix_integer_set_ui(rop, res, radix);
-            return GR_SUCCESS;
+            return;
         }
     }
 
@@ -219,8 +219,12 @@ _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u,
         }
     }
 
+    /* Probably an artificially small limb radix, not supported by the implementation */
     if (npows_fit < 1)
-        return GR_UNABLE;
+    {
+        _padic_radix_exp_balanced(rop, u, v, N, radix);
+        return;
+    }
 
     npows = (slong) n_sqrt((ulong) n);
     if (npows < 1)
@@ -381,7 +385,5 @@ _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u,
     radix_integer_mod_digits(rop, rop, N, radix);
 
     flint_free(scratch);
-
-    return GR_SUCCESS;
 }
 

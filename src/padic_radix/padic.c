@@ -2018,6 +2018,7 @@ gr_method_tab_input _padic_radix_methods_input[] =
     {GR_METHOD_RSQRT,           (gr_funcptr) padic_radix_rsqrt},
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) padic_radix_is_square},
     {GR_METHOD_EXP,             (gr_funcptr) padic_radix_exp},
+    {GR_METHOD_LOG,             (gr_funcptr) padic_radix_log},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) padic_radix_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) padic_radix_dot_rev},
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) padic_radix_dot_strided},
