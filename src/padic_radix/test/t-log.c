@@ -89,7 +89,7 @@ TEST_FUNCTION_START(padic_radix_log, state)
         radix_init_randtest_prime(radix, state);
         p = DIGIT_RADIX(radix);
 
-        thr = (p == 2) ? 2 : 1;
+        thr = 1;   /* log converges for valuation >= 1 for every p */
         v = thr + (slong) n_randint(state, 6);
         N = 1 + (slong) n_randint(state, n_randint(state, 2) ? 60 : 250);
 

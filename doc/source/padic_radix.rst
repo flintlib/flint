@@ -208,7 +208,7 @@ Transcendental functions
 
     Sets *res* to the `p`-adic exponential function `\exp(x)`.
     Returns ``GR_DOMAIN`` if the series does not converge
-    and ``GR_UNABLE`` if this convergence cannot be determined or if the
+    and ``GR_UNABLE`` if convergence cannot be determined or if the
     precision is too large for the implementation.
 
 .. function:: slong _padic_radix_log_bound(slong v, slong N, ulong p)
@@ -220,13 +220,17 @@ Transcendental functions
               void _padic_radix_log_balanced(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
               void _padic_radix_log(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
 
-    Given an integer `y` and a valuation `v` such that `v \ge 1` if `p \ne 2`
-    and `v \ge 2` if `p = 2` (not checked), sets *rop* to `\log(1-y)`
-    truncated to precision `p^N`.
+    Given an integer `y` with valuation `v \ge 1` (not checked),
+    sets *rop* to `\log(1-y)` truncated to precision `p^N`.
 
 .. function:: int padic_radix_log_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
               int padic_radix_log_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
               int padic_radix_log(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+
+    Sets *res* to the `p`-adic natural logarithm `\log(x)`.
+    Returns ``GR_DOMAIN`` if the series does not converge
+    and ``GR_UNABLE`` if convergence cannot be determined or if the
+    precision is too large for the implementation.
 
 
 
