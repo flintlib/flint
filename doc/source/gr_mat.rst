@@ -245,7 +245,7 @@ Basic row, column and entry operations
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
-.. function:: int gr_mat_permute_rows(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+.. function:: int gr_mat_permute_rows(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx)
 
     Permutes rows of the matrix ``mat`` according to permutation ``perm_act``
     and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
@@ -259,7 +259,7 @@ Basic row, column and entry operations
 
     Allows aliasing of ``perm_store`` and ``perm_act``.
 
-.. function:: int gr_mat_permute_rows_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+.. function:: int gr_mat_permute_rows_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx)
 
     Permutes rows of the matrix ``mat`` according to the inverse of the permutation ``perm_act``
     and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
@@ -271,7 +271,7 @@ Basic row, column and entry operations
 
     Allows aliasing of ``perm_store`` and ``perm_act``.
 
-.. function:: int gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+.. function:: int gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx)
 
     Permutes columns of the matrix ``mat`` according to permutation ``perm_act``
     and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
@@ -285,7 +285,7 @@ Basic row, column and entry operations
 
     Allows aliasing of ``perm_store`` and ``perm_act``.
 
-.. function:: int gr_mat_permute_cols_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+.. function:: int gr_mat_permute_cols_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx)
 
     Permutes columns of the matrix ``mat`` according to the inverse of the permutation ``perm_act``
     and, if ``perm_store`` is not ``NULL``, apply the same permutation to it.
