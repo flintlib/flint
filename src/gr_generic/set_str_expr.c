@@ -722,10 +722,26 @@ static int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen
             }
             else
             {
-                if (++s >= send || !('0' <= *s && *s <= '9'))
+                /* Try to parse exponent as an fmpz. TODO: this only supports
+                   literals for now. Implement parsing expressions,
+                   and allow fmpq. */
+
+                int neg = 0;
+
+                s++;
+
+                if (s < send && *s == '-')
+                {
+                    neg = 1;
+                    s++;
+                }
+
+                if (s >= send || !('0' <= *s && *s <= '9'))
                     goto failed;
 
                 s = _parse_int(c, s, send);
+                if (neg)
+                    fmpz_neg(c, c);
 
                 if (_gr_parse_pop_prec(E, PREC_POWER))
                     goto failed;
