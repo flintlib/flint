@@ -247,6 +247,9 @@ gr_ore_poly_delta(gr_ptr res, gr_srcptr a, gr_ore_poly_ctx_t ctx)
 
 extern const gr_ore_poly_sigma_delta_t _gr_ore_poly_default_sigma_delta[];
 
+WARN_UNUSED_RESULT int gr_ore_poly_apply_custom(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_srcptr d1, gr_ore_poly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_ore_poly_apply(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_ore_poly_ctx_t ctx);
+
 /* Arithmetic */
 
 WARN_UNUSED_RESULT int gr_ore_poly_neg(gr_ore_poly_t res, const gr_ore_poly_t src, gr_ore_poly_ctx_t ctx);

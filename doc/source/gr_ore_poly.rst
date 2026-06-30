@@ -267,6 +267,20 @@ Action
     A pointer to a function with the same specification as
     :func:`gr_ore_poly_sigma_delta`.
 
+.. function:: int gr_ore_poly_apply_custom(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_srcptr d1, gr_ore_poly_ctx_t ctx)
+
+    Sets *res* to the result of applying *P* to the base ring element *f*, where
+    the generator `D` acts by `g \mapsto \sigma(g) \cdot d1 + \delta(g)` for the
+    given value ``d1`` of `D(1)`. Any ``d1`` defines a valid action. Aliasing of
+    *res* with *f* or *d1* is allowed.
+
+.. function:: int gr_ore_poly_apply(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_ore_poly_ctx_t ctx)
+
+    As :func:`gr_ore_poly_apply_custom`, but with the standard `D(1)` for the
+    algebra type (so derivative operators differentiate, shift operators shift,
+    etc.). Returns ``GR_UNABLE`` when no standard action exists
+    (`ORE_ALGEBRA_COMMUTATIVE`, `ORE_ALGEBRA_CUSTOM`) or it cannot be computed.
+
 Arithmetic
 -------------------------------------------------------------------------------
 
