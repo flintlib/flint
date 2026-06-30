@@ -42,7 +42,13 @@ _gr_fq_zech_ctx_clear(gr_ctx_t ctx)
 static int
 _gr_fq_zech_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    return gr_stream_write(out, "Finite field (fq_zech)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "GF(");
+    status |= gr_stream_write_ui(out, fq_zech_ctx_prime(FQ_CTX(ctx)));
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, fq_zech_ctx_degree(FQ_CTX(ctx)));
+    status |= gr_stream_write(out, ") (fq_zech)");
+    return status;
 }
 
 static int _gr_fq_zech_ctx_set_gen_name(gr_ctx_t ctx, const char * s)

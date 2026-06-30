@@ -257,6 +257,8 @@ WARN_UNUSED_RESULT int gr_mpoly_sub(gr_mpoly_t A, const gr_mpoly_t B, const gr_m
 
 WARN_UNUSED_RESULT int gr_mpoly_mul(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_johnson(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_mul_heap_threaded(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mpoly_mul_monomial(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_mul_scalar(gr_mpoly_t A, const gr_mpoly_t B, gr_srcptr c, gr_mpoly_ctx_t ctx);

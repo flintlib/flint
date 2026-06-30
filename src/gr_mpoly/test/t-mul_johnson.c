@@ -19,7 +19,7 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
     slong i, j;
 
     /* Check f*(g + h) = f*g + f*h */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         gr_ctx_t cctx;
         gr_mpoly_ctx_t ctx;
@@ -38,17 +38,17 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
         gr_mpoly_init(k2, ctx);
         gr_mpoly_init(t, ctx);
 
-        if (cctx->methods == _ca_methods)
-        {
-            len = n_randint(state, 10);
-            len1 = n_randint(state, 10);
-            len2 = n_randint(state, 10);
-        }
-        else
+        if (gr_ctx_is_finite(cctx) == T_TRUE)
         {
             len = n_randint(state, 100);
             len1 = n_randint(state, 100);
             len2 = n_randint(state, 100);
+        }
+        else
+        {
+            len = n_randint(state, 5);
+            len1 = n_randint(state, 5);
+            len2 = n_randint(state, 5);
         }
 
         exp_bits = n_randint(state, 200) + 2;
