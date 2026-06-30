@@ -5541,6 +5541,16 @@ class FiniteField_base(gr_ctx):
 
 
 class FiniteField_fq(FiniteField_base):
+    """
+    Finite field (fq representation).
+
+        >>> K = FiniteField_fq(5, 3)
+        >>> K
+        GF(5^3) (fq)
+        >>> (1 + K.gen()) ** 10
+        4*a^2+2
+    """
+
     def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
         p = ZZ(p)
@@ -5553,6 +5563,16 @@ class FiniteField_fq(FiniteField_base):
         self._elem_type = fq
 
 class FiniteField_fq_nmod(FiniteField_base):
+    """
+    Finite field (fq_nmod representation).
+
+        >>> K = FiniteField_fq_nmod(5, 3)
+        >>> K
+        GF(5^3) (fq_nmod)
+        >>> (1 + K.gen()) ** 10
+        4*a^2+2
+    """
+
     def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
         p = self._as_ui(p)
@@ -5565,6 +5585,16 @@ class FiniteField_fq_nmod(FiniteField_base):
         self._elem_type = fq_nmod
 
 class FiniteField_fq_zech(FiniteField_base):
+    """
+    Finite field (Zech logarithm representation).
+
+        >>> K = FiniteField_fq_zech(5, 3)
+        >>> K
+        GF(5^3) (fq_zech)
+        >>> (1 + K.gen()) ** 10
+        a^92
+    """
+
     def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
         p = self._as_ui(p)
