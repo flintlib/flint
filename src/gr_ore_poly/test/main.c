@@ -17,6 +17,11 @@
 #include "t-mul.c"
 #include "t-divrem.c"
 #include "t-apply.c"
+#include "t-ddx_to_euler.c"
+#include "t-euler_to_ddx.c"
+#include "t-shift_convert.c"
+#include "t-differential_shift.c"
+#include "t-convert.c"
 
 /* Array of test functions ***************************************************/
 
@@ -27,7 +32,12 @@ test_struct tests[] =
     TEST_FUNCTION(gr_ore_poly_sigma_delta),
     TEST_FUNCTION(gr_ore_poly_mul),
     TEST_FUNCTION(gr_ore_poly_divrem),
-    TEST_FUNCTION(gr_ore_poly_apply)
+    TEST_FUNCTION(gr_ore_poly_apply),
+    TEST_FUNCTION(gr_ore_poly_ddx_to_euler),
+    TEST_FUNCTION(gr_ore_poly_euler_to_ddx),
+    TEST_FUNCTION(gr_ore_poly_shift_convert),
+    TEST_FUNCTION(gr_ore_poly_differential_to_shift),
+    TEST_FUNCTION(gr_ore_poly_convert)
 };
 
 /* main function *************************************************************/

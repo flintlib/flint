@@ -409,10 +409,17 @@ gr_ore_poly_ctx_init_randtest(gr_ore_poly_ctx_t ctx, flint_rand_t state,
                               gr_ctx_t base_ring)
 {
     ore_algebra_t alg = ore_algebra_randtest(state);
-    /* todo: base_var = n_randint(gr_ctx_ngens(base_ring)) */
-    slong base_var = 0;
+    slong ngens = 0;
+    slong base_var;
 
     int status = GR_SUCCESS;
+
+    if (gr_ctx_ngens(&ngens, base_ring) != GR_SUCCESS)
+        ngens = 0;
+    /* an invalid index when the base ring has no generator, so that a spurious
+       reliance on a default generator surfaces as GR_UNABLE rather than silently
+       using generator 0 */
+    base_var = (ngens > 0) ? (slong) n_randint(state, ngens) : -1;
 
     if (alg == ORE_ALGEBRA_CUSTOM)
     {

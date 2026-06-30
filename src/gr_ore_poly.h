@@ -250,6 +250,52 @@ extern const gr_ore_poly_sigma_delta_t _gr_ore_poly_default_sigma_delta[];
 WARN_UNUSED_RESULT int gr_ore_poly_apply_custom(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_srcptr d1, gr_ore_poly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_ore_poly_apply(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_ore_poly_ctx_t ctx);
 
+/* Conversions between operator types.
+
+   These act on raw coefficient arrays and take the coefficient ring context
+   (not the Ore polynomial ring context). The variable x is the generator of the
+   coefficient ring of index var, i.e. entry var of gr_gens(ctx). Since x need
+   not be invertible, ddx_to_euler multiplies the operator by x^(len-1);
+   euler_to_ddx leaves it unchanged. The result res has the same length len as
+   op. */
+WARN_UNUSED_RESULT int _gr_ore_poly_ddx_to_euler(gr_ptr res, gr_srcptr op, slong len, slong var, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ore_poly_euler_to_ddx(gr_ptr res, gr_srcptr op, slong len, slong var, gr_ctx_t ctx);
+
+/* Convert a length-len operator between the shift/difference algebra types
+   src_alg and dst_alg. Each generator is a degree-one Laurent polynomial in the
+   forward shift S, so on output *p and res satisfy
+   S^p * res_in_dst = op_in_src (a power of S appears only when crossing between
+   the forward side S, S-1 and the backward side S^-1, 1-S^-1; it then needs a
+   GR_CTX_GR_POLY base ring). Returns GR_DOMAIN if either algebra is not a
+   shift/difference type. The variable is the base ring generator of index var;
+   only var == 0 over a univariate polynomial ring is implemented (else
+   GR_UNABLE). */
+WARN_UNUSED_RESULT int _gr_ore_poly_shift_convert(gr_ptr res, slong * p, gr_srcptr op, slong len, ore_algebra_t src_alg, ore_algebra_t dst_alg, slong var, gr_ctx_t ctx);
+
+/* Exact bridge of the isomorphism theta <-> n, x <-> backward shift S^{-1}, on
+   raw coefficient vectors over a GR_CTX_GR_POLY base ring (else GR_UNABLE). The
+   caller allocates res to reslen = 1 + the maximum coefficient degree of op. */
+WARN_UNUSED_RESULT int _gr_ore_poly_euler_to_backshift_univar(gr_ptr res, slong reslen, gr_srcptr op, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, slong len, gr_ctx_t ctx);
+
+/* Convert between differential operators (op_ctx/res_ctx in {DERIVATIVE,
+   EULER_DERIVATIVE}) and shift/difference operators (in the four shift types),
+   via the generating-series isomorphism theta <-> n, x <-> backward shift.
+   Both contexts must share a GR_CTX_GR_POLY base ring. On output *p is such that
+   C^p * res corresponds to op under the isomorphism, where C is the companion
+   generator on the res side (S for *_to_shift, x for *_to_differential).
+   Returns GR_DOMAIN if a context algebra is outside its family. */
+WARN_UNUSED_RESULT int gr_ore_poly_differential_to_shift(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx);
+WARN_UNUSED_RESULT int gr_ore_poly_shift_to_differential(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx);
+
+/* Convert an operator between two algebras of the same family (both differential
+   or both shift/difference), dispatching to the conversions above. On output *p
+   satisfies C^p * res = op, where the companion generator C depends on the pair
+   (x for differential conversions, the forward shift S for shift ones).
+   Returns GR_UNABLE for an unsupported pair (crossing the differential/shift
+   boundary, or involving an algebra outside those two families). */
+WARN_UNUSED_RESULT int gr_ore_poly_convert(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx);
+
 /* Arithmetic */
 
 WARN_UNUSED_RESULT int gr_ore_poly_neg(gr_ore_poly_t res, const gr_ore_poly_t src, gr_ore_poly_ctx_t ctx);
