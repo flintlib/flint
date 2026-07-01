@@ -9,9 +9,15 @@
 
 /* generated using Claude Opus 4.8 */
 
-#include "gr.h"
 #include "gr_vec.h"
 #include "gr_ore_poly.h"
+
+static int
+is_shift_case(ore_algebra_t a)
+{
+    return a == ORE_ALGEBRA_FORWARD_SHIFT || a == ORE_ALGEBRA_BACKWARD_SHIFT
+        || a == ORE_ALGEBRA_FORWARD_DIFFERENCE || a == ORE_ALGEBRA_BACKWARD_DIFFERENCE;
+}
 
 int
 gr_ore_poly_convert(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op,
@@ -21,7 +27,7 @@ gr_ore_poly_convert(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op,
     ore_algebra_t sa = GR_ORE_POLY_CTX(op_ctx)->which_algebra;
     ore_algebra_t da = GR_ORE_POLY_CTX(res_ctx)->which_algebra;
     int status = GR_SUCCESS;
-    slong len, sp = 0;
+    slong len;
 
     *p = 0;
 
@@ -32,45 +38,35 @@ gr_ore_poly_convert(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op,
     if (len == 0)
         return gr_ore_poly_zero(res, res_ctx);
 
+    gr_ore_poly_ore_data_t * od = GR_ORE_POLY_ORE_DATA(op_ctx);
+    slong var = (od != NULL) ? od->base_var : -1;
+
     gr_ore_poly_fit_length(res, len, res_ctx);
 
-    if ((sa == ORE_ALGEBRA_DERIVATIVE || sa == ORE_ALGEBRA_EULER_DERIVATIVE)
-        && (da == ORE_ALGEBRA_DERIVATIVE || da == ORE_ALGEBRA_EULER_DERIVATIVE))
+    if (sa == da)
+        status |= _gr_vec_set(res->coeffs, op->coeffs, len, base);
+    else if (sa == ORE_ALGEBRA_DERIVATIVE && da == ORE_ALGEBRA_EULER_DERIVATIVE)
     {
-        /* differential family {d/dx, theta} */
-        slong var = GR_ORE_POLY_ORE_DATA(op_ctx)->base_var;
-
-        if (sa == da)
-            status |= _gr_vec_set(res->coeffs, op->coeffs, len, base);
-        else if (sa == ORE_ALGEBRA_DERIVATIVE)      /* d/dx -> theta */
-        {
-            status |= _gr_ore_poly_ddx_to_euler(res->coeffs, op->coeffs, len, var, base);
-            /* res = x^(len-1) * op, i.e. x^p * res = op with p = -(len-1) */
-            *p = -(len - 1);
-        }
-        else                                        /* theta -> d/dx */
-            status |= _gr_ore_poly_euler_to_ddx(res->coeffs, op->coeffs, len, var, base);
+        status |= _gr_ore_poly_ddx_to_euler(res->coeffs, op->coeffs, len, var, base);
+        *p = -(len - 1);
     }
-    else
-    {
-        /* _gr_ore_poly_shift_convert handles the shift/difference family (the
-           same-algebra case included) and returns GR_DOMAIN for anything that is
-           not a shift/difference type, which is exactly the remaining unsupported
-           case: a boundary-crossing pair, or an algebra such as Q_SHIFT, MAHLER
-           or COMMUTATIVE (whose identity we deliberately do not claim, since its
-           parameters could differ between the two contexts). */
-        /* a custom algebra has no ore_data; shift_convert then returns GR_DOMAIN
-           regardless of var, so the placeholder 0 is harmless */
-        gr_ore_poly_ore_data_t * od = GR_ORE_POLY_ORE_DATA(op_ctx);
-        slong var = (od != NULL) ? od->base_var : 0;
-
-        status = _gr_ore_poly_shift_convert(res->coeffs, &sp, op->coeffs, len,
+    else if (sa == ORE_ALGEBRA_EULER_DERIVATIVE && da == ORE_ALGEBRA_DERIVATIVE)
+        status |= _gr_ore_poly_euler_to_ddx(res->coeffs, op->coeffs, len, var, base);
+    else if (sa == ORE_ALGEBRA_FORWARD_DIFFERENCE
+             && da == ORE_ALGEBRA_BACKWARD_DIFFERENCE)
+        status |= _gr_ore_poly_shift_convert_difference(res->coeffs, p,
+                                                        op->coeffs, len, 1, var,
+                                                        base);
+    else if (sa == ORE_ALGEBRA_BACKWARD_DIFFERENCE
+             && da == ORE_ALGEBRA_FORWARD_DIFFERENCE)
+        status |= _gr_ore_poly_shift_convert_difference(res->coeffs, p,
+                                                        op->coeffs, len, 0, var,
+                                                        base);
+    else if (is_shift_case(sa) && is_shift_case(da))
+        status = _gr_ore_poly_shift_convert(res->coeffs, p, op->coeffs, len,
                                             sa, da, var, base);
-        if (status == GR_DOMAIN)
-            status = GR_UNABLE;
-        else
-            *p = sp;
-    }
+    else
+        return GR_UNABLE;
 
     if (status == GR_SUCCESS)
     {

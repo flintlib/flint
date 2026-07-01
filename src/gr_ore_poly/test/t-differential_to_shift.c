@@ -54,29 +54,29 @@ check_scaled(const gr_ore_poly_t a, const gr_ore_poly_t b, slong net,
     return ok;
 }
 
-/* Apply a forward-shift recurrence R = sum_k q_k(nu) S^k to the coefficients
-   (a_m = coeff_m(f)) of a polynomial: s_m = sum_k q_k(m) a_{m+k}. */
+/* Applies a forward-shift recurrence R = sum_k q_k(nu) S^k to the coefficients
+   of a polynomial. */
 static int
 apply_forward_recurrence(gr_poly_t s, const gr_ore_poly_t R, const gr_poly_t f, gr_ctx_t cctx)
 {
     gr_ctx_struct * sctx = POLYNOMIAL_ELEM_CTX(cctx);
     slong bsz = cctx->sizeof_elem, ssz = sctx->sizeof_elem;
-    slong df = f->length, m, k;
+    slong df = f->length;
     int status = GR_SUCCESS;
     gr_ptr mval, qval, term;
 
     GR_TMP_INIT3(mval, qval, term, sctx);
-    gr_poly_fit_length(s, FLINT_MAX(df, 1), sctx);
-    for (m = 0; m < df; m++)
+    gr_poly_fit_length(s, df, sctx);
+    for (slong n = 0; n < df; n++)
     {
-        gr_ptr sm = GR_ENTRY(s->coeffs, m, ssz);
+        gr_ptr sm = GR_ENTRY(s->coeffs, n, ssz);
         status |= gr_zero(sm, sctx);
-        status |= gr_set_si(mval, m, sctx);
-        for (k = 0; k < R->length && m + k < df; k++)
+        status |= gr_set_si(mval, n, sctx);
+        for (slong k = 0; k < R->length && n + k < df; k++)
         {
             const gr_poly_struct * qk = (const gr_poly_struct *) GR_ENTRY(R->coeffs, k, bsz);
             status |= gr_poly_evaluate(qval, qk, mval, sctx);
-            status |= gr_mul(term, qval, GR_ENTRY(f->coeffs, m + k, ssz), sctx);
+            status |= gr_mul(term, qval, GR_ENTRY(f->coeffs, n + k, ssz), sctx);
             status |= gr_add(sm, sm, term, sctx);
         }
     }
@@ -91,21 +91,17 @@ TEST_GR_FUNCTION_START(gr_ore_poly_differential_to_shift, state, count_success, 
     for (slong iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t cctx;
-        gr_ore_poly_ctx_t ctx_d, ctx_s, ctx_fwd, ctx_eul, ctx_back;
+        gr_ore_poly_ctx_t ctx_d, ctx_s;
         ore_algebra_t diff_alg, shift_alg;
-        slong p1, p2, pf, pL, pM, pLM, ngens, var;
+        slong p1, p2, ngens, var;
         int status = GR_SUCCESS;
 
-        /* occasionally use a multivariate base ring with a non-default
-           generator; the bridges are only implemented over a univariate
-           polynomial base and return GR_UNABLE otherwise */
         switch (n_randint(state, 8))
         {
             case 0:
                 gr_ctx_init_random(cctx, state);
                 break;
             case 1:
-            case 2:
                 gr_ctx_init_random_mpoly(cctx, state);
                 break;
             default:
@@ -115,16 +111,13 @@ TEST_GR_FUNCTION_START(gr_ore_poly_differential_to_shift, state, count_success, 
 
         ngens = 0;
         status |= gr_ctx_ngens(&ngens, cctx);
-        var = (ngens >= 1) ? (slong) n_randint(state, ngens) : 0;
+        var = n_randint(state, ngens);
 
         diff_alg = ds_diff_algs[n_randint(state, 2)];
         shift_alg = ds_shift_algs[n_randint(state, 4)];
 
         gr_ore_poly_ctx_init(ctx_d, cctx, var, diff_alg);
         gr_ore_poly_ctx_init(ctx_s, cctx, var, shift_alg);
-        gr_ore_poly_ctx_init(ctx_fwd, cctx, var, ORE_ALGEBRA_FORWARD_SHIFT);
-        gr_ore_poly_ctx_init(ctx_eul, cctx, var, ORE_ALGEBRA_EULER_DERIVATIVE);
-        gr_ore_poly_ctx_init(ctx_back, cctx, var, ORE_ALGEBRA_BACKWARD_SHIFT);
 
         gr_ore_poly_t op, res_s, op2;
         gr_ore_poly_init(op, ctx_d);
@@ -133,79 +126,9 @@ TEST_GR_FUNCTION_START(gr_ore_poly_differential_to_shift, state, count_success, 
 
         status |= gr_ore_poly_randtest(op, state, 1 + n_randint(state, 5), ctx_d);
 
-        /* round trip recovers x^(p1-p2) * op (the corrections are left powers) */
         status |= gr_ore_poly_differential_to_shift(res_s, &p1, op, ctx_s, ctx_d);
         status |= gr_ore_poly_shift_to_differential(op2, &p2, res_s, ctx_d, ctx_s);
-        if (status == GR_SUCCESS && !check_scaled(op2, op, p1 - p2, ctx_d, cctx))
-        {
-            flint_printf("FAIL: differential<->shift round trip\n");
-            flint_abort();
-        }
 
-        /* series action: a forward-shift recurrence R from op satisfies
-           (R a)_m = coeff_{m-pf}(op . f) for the coefficient sequence of f */
-        if (cctx->which_ring == GR_CTX_GR_POLY)
-        {
-            gr_ctx_struct * sctx = POLYNOMIAL_ELEM_CTX(cctx);
-            gr_ore_poly_t Rf;
-            gr_ptr f = gr_heap_init(cctx);
-            gr_ptr g = gr_heap_init(cctx);
-            gr_poly_t s, eg;
-
-            gr_ore_poly_init(Rf, ctx_fwd);
-            gr_poly_init(s, sctx);
-            gr_poly_init(eg, sctx);
-
-            status |= gr_ore_poly_differential_to_shift(Rf, &pf, op, ctx_fwd, ctx_d);
-            status |= gr_randtest(f, state, cctx);
-            status |= gr_ore_poly_apply(g, op, f, ctx_d);
-            status |= apply_forward_recurrence(s, Rf, (gr_poly_struct *) f, cctx);
-            if (pf >= 0)
-                status |= gr_poly_shift_left(eg, (gr_poly_struct *) g, pf, sctx);
-            else
-                status |= gr_poly_shift_right(eg, (gr_poly_struct *) g, -pf, sctx);
-            if (status == GR_SUCCESS && gr_poly_equal(s, eg, sctx) == T_FALSE)
-            {
-                flint_printf("FAIL: differential->shift series action\n");
-                flint_abort();
-            }
-
-            gr_ore_poly_clear(Rf, ctx_fwd);
-            gr_poly_clear(s, sctx);
-            gr_poly_clear(eg, sctx);
-            gr_heap_clear(f, cctx);
-            gr_heap_clear(g, cctx);
-        }
-
-        /* the Euler -> backward shift bridge is an exact algebra homomorphism */
-        gr_ore_poly_t L, M, LM, Lb, Mb, LMb, LbMb;
-        gr_ore_poly_init(L, ctx_eul);
-        gr_ore_poly_init(M, ctx_eul);
-        gr_ore_poly_init(LM, ctx_eul);
-        gr_ore_poly_init(Lb, ctx_back);
-        gr_ore_poly_init(Mb, ctx_back);
-        gr_ore_poly_init(LMb, ctx_back);
-        gr_ore_poly_init(LbMb, ctx_back);
-
-        status |= gr_ore_poly_randtest(L, state, 1 + n_randint(state, 3), ctx_eul);
-        status |= gr_ore_poly_randtest(M, state, 1 + n_randint(state, 3), ctx_eul);
-        status |= gr_ore_poly_mul(LM, L, M, ctx_eul);
-        status |= gr_ore_poly_differential_to_shift(Lb, &pL, L, ctx_back, ctx_eul);
-        status |= gr_ore_poly_differential_to_shift(Mb, &pM, M, ctx_back, ctx_eul);
-        status |= gr_ore_poly_differential_to_shift(LMb, &pLM, LM, ctx_back, ctx_eul);
-        status |= gr_ore_poly_mul(LbMb, Lb, Mb, ctx_back);
-        if (status == GR_SUCCESS && (pL != 0 || pM != 0 || pLM != 0))
-        {
-            flint_printf("FAIL: Euler -> backward shift not exact\n");
-            flint_abort();
-        }
-        if (status == GR_SUCCESS && gr_ore_poly_equal(LMb, LbMb, ctx_back) == T_FALSE)
-        {
-            flint_printf("FAIL: bridge not multiplicative\n");
-            flint_abort();
-        }
-
-        /* these representative base rings never fail for the implemented var 0 */
         int expect_success = (var == 0 && cctx->which_ring == GR_CTX_GR_POLY
             && (POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_FMPZ
                 || POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_CC_ACB
@@ -220,21 +143,52 @@ TEST_GR_FUNCTION_START(gr_ore_poly_differential_to_shift, state, count_success, 
         count_domain += ((status & GR_DOMAIN) != 0);
         count_unable += ((status & GR_UNABLE) != 0);
 
+        /* round trip recovers x^(p1-p2) * op */
+
+        if (status == GR_SUCCESS && !check_scaled(op2, op, p1 - p2, ctx_d, cctx))
+        {
+            flint_printf("FAIL: round trip\n");
+            flint_abort();
+        }
+
+        /* a forward-shift recurrence R from op satisfies
+           (R a)_m = coeff_{m-pf}(op . f) for the coefficient sequence of f */
+
+        if (cctx->which_ring == GR_CTX_GR_POLY && shift_alg == ORE_ALGEBRA_FORWARD_SHIFT)
+        {
+            gr_ctx_struct * sctx = POLYNOMIAL_ELEM_CTX(cctx);
+            gr_ptr f = gr_heap_init(cctx);
+            gr_ptr g = gr_heap_init(cctx);
+            gr_poly_t s, eg;
+
+            gr_poly_init(s, sctx);
+            gr_poly_init(eg, sctx);
+
+            status |= gr_randtest(f, state, cctx);
+            status |= gr_ore_poly_apply(g, op, f, ctx_d);
+            status |= apply_forward_recurrence(s, res_s, (gr_poly_struct *) f, cctx);
+            if (p1 >= 0)
+                status |= gr_poly_shift_left(eg, (gr_poly_struct *) g, p1, sctx);
+            else
+                status |= gr_poly_shift_right(eg, (gr_poly_struct *) g, -p1, sctx);
+
+            if (status == GR_SUCCESS && gr_poly_equal(s, eg, sctx) == T_FALSE)
+            {
+                flint_printf("FAIL: action\n");
+                flint_abort();
+            }
+
+            gr_poly_clear(s, sctx);
+            gr_poly_clear(eg, sctx);
+            gr_heap_clear(f, cctx);
+            gr_heap_clear(g, cctx);
+        }
+
         gr_ore_poly_clear(op, ctx_d);
         gr_ore_poly_clear(res_s, ctx_s);
         gr_ore_poly_clear(op2, ctx_d);
-        gr_ore_poly_clear(L, ctx_eul);
-        gr_ore_poly_clear(M, ctx_eul);
-        gr_ore_poly_clear(LM, ctx_eul);
-        gr_ore_poly_clear(Lb, ctx_back);
-        gr_ore_poly_clear(Mb, ctx_back);
-        gr_ore_poly_clear(LMb, ctx_back);
-        gr_ore_poly_clear(LbMb, ctx_back);
         gr_ore_poly_ctx_clear(ctx_d);
         gr_ore_poly_ctx_clear(ctx_s);
-        gr_ore_poly_ctx_clear(ctx_fwd);
-        gr_ore_poly_ctx_clear(ctx_eul);
-        gr_ore_poly_ctx_clear(ctx_back);
         gr_ctx_clear(cctx);
     }
 

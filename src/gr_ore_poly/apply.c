@@ -32,7 +32,7 @@ gr_ore_poly_apply_custom(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_srcp
     GR_TMP_INIT5(g, acc, sig, del, term, base);
 
     status |= gr_set(g, f, base);
-    status |= gr_zero(acc, base);
+    status |= gr_zero(acc, base);  /* todo: add underscore version? */
 
     for (slong i = 0; i < len; i++)
     {
@@ -44,10 +44,7 @@ gr_ore_poly_apply_custom(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_srcp
         if (i + 1 < len)
         {
             if (d1_is_zero == T_TRUE)
-            {
-                status |= gr_ore_poly_delta(del, g, ctx);
-                status |= gr_set(g, del, base);
-            }
+                status |= gr_ore_poly_delta(g, g, ctx);
             else
             {
                 status |= gr_ore_poly_sigma_delta(sig, del, g, ctx);
@@ -74,7 +71,6 @@ gr_ore_poly_apply(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_ore_poly_ct
 
     GR_TMP_INIT(d1, base);
 
-    /* Standard value of D(1) for the algebra type. */
     switch (GR_ORE_POLY_CTX(ctx)->which_algebra)
     {
         case ORE_ALGEBRA_DERIVATIVE:
@@ -90,7 +86,7 @@ gr_ore_poly_apply(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_ore_poly_ct
         case ORE_ALGEBRA_FROBENIUS:
             status |= gr_one(d1, base);
             break;
-        default:    /* ORE_ALGEBRA_COMMUTATIVE, ORE_ALGEBRA_CUSTOM: no standard action */
+        default:
             status = GR_UNABLE;
     }
 

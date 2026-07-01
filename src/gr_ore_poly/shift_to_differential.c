@@ -10,45 +10,50 @@
 /* generated using Claude Opus 4.8 */
 
 #include "gr.h"
-#include "gr_poly.h"
-#include "gr_vec.h"
 #include "gr_ore_poly.h"
 
 int
-gr_ore_poly_shift_to_differential(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op,
-                                  gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx)
+gr_ore_poly_shift_to_differential(gr_ore_poly_t res, slong * p,
+                                  const gr_ore_poly_t op,
+                                  gr_ore_poly_ctx_t res_ctx,
+                                  gr_ore_poly_ctx_t op_ctx)
 {
-    gr_ctx_struct * base = GR_ORE_POLY_ELEM_CTX(op_ctx);
-    ore_algebra_t sa = GR_ORE_POLY_CTX(op_ctx)->which_algebra;
-    ore_algebra_t da = GR_ORE_POLY_CTX(res_ctx)->which_algebra;
-    slong var = GR_ORE_POLY_ORE_DATA(res_ctx)->base_var;
-    slong bsz = base->sizeof_elem;
+    gr_ore_poly_ctx_t rec_ctx, eul_ctx;
+    gr_ore_poly_t rec, eul;
+
     int status = GR_SUCCESS;
-    slong len, elen = 0, sp = 0, k;
-    gr_ptr rec = NULL, eul = NULL;
 
-    *p = 0;
-
+    gr_ctx_struct * base = GR_ORE_POLY_ELEM_CTX(op_ctx);
     if (GR_ORE_POLY_ELEM_CTX(res_ctx) != base || base->which_ring != GR_CTX_GR_POLY)
         return GR_UNABLE;
 
+    ore_algebra_t da = GR_ORE_POLY_CTX(res_ctx)->which_algebra;
     if (da != ORE_ALGEBRA_DERIVATIVE && da != ORE_ALGEBRA_EULER_DERIVATIVE)
-        return GR_DOMAIN;
+        return GR_UNABLE;
 
-    len = op->length;
+    slong len = op->length;
+    slong var = GR_ORE_POLY_ORE_DATA(res_ctx)->base_var;
+
+    gr_ore_poly_ctx_init(rec_ctx, base, var, ORE_ALGEBRA_BACKWARD_SHIFT);
+    gr_ore_poly_ctx_init(eul_ctx, base, var, ORE_ALGEBRA_EULER_DERIVATIVE);
+
+    gr_ore_poly_init(rec, rec_ctx);
+    gr_ore_poly_init(eul, eul_ctx);
+
+    /* this is where the input algebra type is validated */
+    status |= gr_ore_poly_convert(rec, p, op, rec_ctx, op_ctx);
+    *p = -*p;
+
     if (len == 0)
-        return gr_ore_poly_zero(res, res_ctx);
-
-    /* source shift type -> backward shift (the algebra is validated here) */
-    GR_TMP_INIT_VEC(rec, len, base);
-    status |= _gr_ore_poly_shift_convert(rec, &sp, op->coeffs, len,
-                                         sa, ORE_ALGEBRA_BACKWARD_SHIFT, var, base);
-    if (status != GR_SUCCESS)
-        goto cleanup;
-
-    for (k = 0; k < len; k++)
     {
-        const gr_poly_struct * q = (const gr_poly_struct *) GR_ENTRY(rec, k, bsz);
+        status |= gr_ore_poly_zero(res, res_ctx);
+        goto cleanup;
+    }
+
+    slong elen = 0;
+    for (slong k = 0; k < len; k++)
+    {
+        const gr_poly_struct * q = GR_ENTRY(rec->coeffs, k, base->sizeof_elem);
         if (q->length > elen)
             elen = q->length;
     }
@@ -58,28 +63,24 @@ gr_ore_poly_shift_to_differential(gr_ore_poly_t res, slong * p, const gr_ore_pol
         goto cleanup;
     }
 
-    /* backward shift -> Euler -> destination differential type. For the Euler
-       destination, backshift_to_euler_univar writes the result in place. */
     gr_ore_poly_fit_length(res, elen, res_ctx);
     if (da == ORE_ALGEBRA_EULER_DERIVATIVE)
-    {
-        status |= _gr_ore_poly_backshift_to_euler_univar(res->coeffs, elen, rec, len, base);
-    }
+        status |= _gr_ore_poly_backshift_to_euler_univar(res->coeffs, elen, rec->coeffs, len, base);
     else
     {
-        GR_TMP_INIT_VEC(eul, elen, base);
-        status |= _gr_ore_poly_backshift_to_euler_univar(eul, elen, rec, len, base);
-        status |= _gr_ore_poly_euler_to_ddx(res->coeffs, eul, elen, var, base);
+        gr_ore_poly_fit_length(eul, elen, res_ctx);
+        status |= _gr_ore_poly_backshift_to_euler_univar(eul->coeffs, elen, rec->coeffs, len, base);
+        status |= _gr_ore_poly_euler_to_ddx(res->coeffs, eul->coeffs, elen, var, base);
     }
     _gr_ore_poly_set_length(res, elen, res_ctx);
     _gr_ore_poly_normalise(res, res_ctx);
-    *p = -sp;
 
 cleanup:
-    if (rec != NULL)
-        GR_TMP_CLEAR_VEC(rec, len, base);
-    if (eul != NULL)
-        GR_TMP_CLEAR_VEC(eul, elen, base);
+
+    gr_ore_poly_clear(rec, rec_ctx);
+    gr_ore_poly_clear(eul, eul_ctx);
+    gr_ore_poly_ctx_clear(rec_ctx);
+    gr_ore_poly_ctx_clear(eul_ctx);
 
     return status;
 }

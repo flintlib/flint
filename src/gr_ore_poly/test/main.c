@@ -20,7 +20,7 @@
 #include "t-ddx_to_euler.c"
 #include "t-euler_to_ddx.c"
 #include "t-shift_convert.c"
-#include "t-differential_shift.c"
+#include "t-differential_to_shift.c"
 #include "t-convert.c"
 
 /* Array of test functions ***************************************************/

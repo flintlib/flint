@@ -13,11 +13,6 @@
 #include "gr_poly.h"
 #include "gr_ore_poly.h"
 
-/* Bridge from the backward shift operator (K[n]<S^{-1}>) to the Euler operator
-   (K[x]<theta>), the inverse of _gr_ore_poly_euler_to_backshift: Taylor-shift
-   column k by +k, then transpose the (S^{-1}-degree, n-degree) coefficient
-   matrix. The caller must allocate res to reslen, the number of
-   theta-coefficients (= 1 + max n-degree of op). */
 int
 _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, slong len, gr_ctx_t ctx)
 {
@@ -25,7 +20,7 @@ _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, s
     gr_ctx_struct * sctx;
     slong bsz = ctx->sizeof_elem, ssz;
     slong i, k;
-    gr_ptr c, cols;
+    gr_ptr _k, rcoeffs;
 
     if (ctx->which_ring != GR_CTX_GR_POLY)
         return GR_UNABLE;
@@ -33,15 +28,15 @@ _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, s
     sctx = POLYNOMIAL_ELEM_CTX(ctx);
     ssz = sctx->sizeof_elem;
 
-    GR_TMP_INIT(c, sctx);
-    GR_TMP_INIT_VEC(cols, len, ctx);
+    GR_TMP_INIT(_k, sctx);
+    GR_TMP_INIT_VEC(rcoeffs, len, ctx);
+
     for (k = 0; k < len; k++)
     {
-        const gr_poly_struct * ok = (const gr_poly_struct *) GR_ENTRY(op, k, bsz);
-        gr_poly_struct * colk = (gr_poly_struct *) GR_ENTRY(cols, k, bsz);
-        status |= gr_poly_set(colk, ok, sctx);
-        status |= gr_set_si(c, k, sctx);
-        status |= gr_poly_taylor_shift(colk, colk, c, sctx);
+        gr_poly_struct * rck = (gr_poly_struct *) GR_ENTRY(rcoeffs, k, bsz);
+        status |= gr_poly_set(rck, GR_ENTRY(op, k, bsz), sctx);
+        status |= gr_set_si(_k, k, sctx);
+        status |= gr_poly_taylor_shift(rck, rck, _k, sctx);
     }
 
     for (i = 0; i < reslen; i++)
@@ -51,10 +46,10 @@ _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, s
         gr_poly_fit_length(ri, len, sctx);
         for (k = 0; k < len; k++)
         {
-            gr_poly_struct * colk = (gr_poly_struct *) GR_ENTRY(cols, k, bsz);
+            gr_poly_struct * rck = (gr_poly_struct *) GR_ENTRY(rcoeffs, k, bsz);
             gr_ptr dst = GR_ENTRY(ri->coeffs, k, ssz);
-            if (i < colk->length)
-                status |= gr_set(dst, GR_ENTRY(colk->coeffs, i, ssz), sctx);
+            if (i < rck->length)
+                status |= gr_set(dst, GR_ENTRY(rck->coeffs, i, ssz), sctx);
             else
                 status |= gr_zero(dst, sctx);
         }
@@ -62,8 +57,8 @@ _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, s
         _gr_poly_normalise(ri, sctx);
     }
 
-    GR_TMP_CLEAR_VEC(cols, len, ctx);
-    GR_TMP_CLEAR(c, sctx);
+    GR_TMP_CLEAR_VEC(rcoeffs, len, ctx);
+    GR_TMP_CLEAR(_k, sctx);
 
     return status;
 }

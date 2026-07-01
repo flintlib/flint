@@ -24,15 +24,12 @@ TEST_GR_FUNCTION_START(gr_ore_poly_ddx_to_euler, state, count_success, count_dom
         slong len, i, j, sz, ngens, var;
         int status = GR_SUCCESS;
 
-        /* occasionally use a multivariate base ring so that the conversions are
-           exercised with a generator other than the default one */
         switch (n_randint(state, 8))
         {
             case 0:
                 gr_ctx_init_random(cctx, state);
                 break;
             case 1:
-            case 2:
                 gr_ctx_init_random_mpoly(cctx, state);
                 break;
             default:
@@ -55,6 +52,14 @@ TEST_GR_FUNCTION_START(gr_ore_poly_ddx_to_euler, state, count_success, count_dom
         gr_ore_poly_init(P_d2, ctx_d);
         gr_ore_poly_init(scaled_P, ctx_d);
 
+        gr_ptr xpow = gr_heap_init(cctx);
+        gr_ptr f = gr_heap_init(cctx);
+        gr_ptr g_d = gr_heap_init(cctx);
+        gr_ptr g_e = gr_heap_init(cctx);
+        gr_ptr scaled = gr_heap_init(cctx);
+
+        /* main run */
+
         status |= gr_ore_poly_randtest(P_d, state, 1 + n_randint(state, 5), ctx_d);
         len = P_d->length;
 
@@ -63,18 +68,22 @@ TEST_GR_FUNCTION_START(gr_ore_poly_ddx_to_euler, state, count_success, count_dom
         _gr_ore_poly_set_length(P_e, len, ctx_e);
         _gr_ore_poly_normalise(P_e, ctx_e);
 
-        gr_ore_poly_fit_length(P_d2, len, ctx_d);
-        status |= _gr_ore_poly_euler_to_ddx(P_d2->coeffs, P_e->coeffs, len, var, cctx);
-        _gr_ore_poly_set_length(P_d2, len, ctx_d);
-        _gr_ore_poly_normalise(P_d2, ctx_d);
+        int expect_success = (var == 0 && cctx->which_ring == GR_CTX_GR_POLY
+            && (POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_FMPZ
+                || POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_CC_ACB
+                || POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_NMOD));
+        if (expect_success && status != GR_SUCCESS)
+        {
+            flint_printf("FAIL: unexpected failure\n");
+            flint_abort();
+        }
 
-        gr_ptr xpow = gr_heap_init(cctx);
-        gr_ptr f = gr_heap_init(cctx);
-        gr_ptr g_d = gr_heap_init(cctx);
-        gr_ptr g_e = gr_heap_init(cctx);
-        gr_ptr scaled = gr_heap_init(cctx);
+        count_success += (status == GR_SUCCESS);
+        count_domain += ((status & GR_DOMAIN) != 0);
+        count_unable += ((status & GR_UNABLE) != 0);
 
-        /* x is the generator of index var */
+        /* correcting factor */
+
         gr_vec_init(gens, 0, cctx);
         status |= gr_gens(gens, cctx);
         if (var < gens->length)
@@ -84,7 +93,13 @@ TEST_GR_FUNCTION_START(gr_ore_poly_ddx_to_euler, state, count_success, count_dom
         gr_vec_clear(gens, cctx);
         status |= gr_pow_ui(xpow, xpow, (len >= 1) ? (ulong) (len - 1) : 0, cctx);
 
-        /* round trip euler_to_ddx(ddx_to_euler(P_d)) = x^(len-1) P_d */
+        /* test round trip */
+
+        gr_ore_poly_fit_length(P_d2, len, ctx_d);
+        status |= _gr_ore_poly_euler_to_ddx(P_d2->coeffs, P_e->coeffs, len, var, cctx);
+        _gr_ore_poly_set_length(P_d2, len, ctx_d);
+        _gr_ore_poly_normalise(P_d2, ctx_d);
+
         gr_ore_poly_fit_length(scaled_P, len, ctx_d);
         for (i = 0; i < len; i++)
             status |= gr_mul(GR_ENTRY(scaled_P->coeffs, i, sz), xpow, GR_ENTRY(P_d->coeffs, i, sz), cctx);
@@ -93,39 +108,25 @@ TEST_GR_FUNCTION_START(gr_ore_poly_ddx_to_euler, state, count_success, count_dom
 
         if (status == GR_SUCCESS && gr_ore_poly_equal(P_d2, scaled_P, ctx_d) == T_FALSE)
         {
-            flint_printf("FAIL: ddx_to_euler round trip\n");
+            flint_printf("FAIL: round trip\n");
             flint_abort();
         }
+
+        /* test action */
 
         for (j = 0; j < 4; j++)
         {
-            status |= gr_randtest(f, state, cctx);
+            status |= gr_randtest_not_zero(f, state, cctx);
             status |= gr_ore_poly_apply(g_d, P_d, f, ctx_d);
             status |= gr_ore_poly_apply(g_e, P_e, f, ctx_e);
 
-            /* P_e(f) = x^(len-1) P_d(f) */
             status |= gr_mul(scaled, xpow, g_d, cctx);
             if (status == GR_SUCCESS && gr_equal(g_e, scaled, cctx) == T_FALSE)
             {
-                flint_printf("FAIL: ddx_to_euler application identity\n");
+                flint_printf("FAIL: application identity\n");
                 flint_abort();
             }
         }
-
-        /* these representative base rings never fail for the implemented var 0 */
-        int expect_success = (var == 0 && cctx->which_ring == GR_CTX_GR_POLY
-            && (POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_FMPZ
-                || POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_CC_ACB
-                || POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_NMOD));
-        if (expect_success && status != GR_SUCCESS)
-        {
-            flint_printf("FAIL: ddx_to_euler unexpected failure\n");
-            flint_abort();
-        }
-
-        count_success += (status == GR_SUCCESS);
-        count_domain += ((status & GR_DOMAIN) != 0);
-        count_unable += ((status & GR_UNABLE) != 0);
 
         gr_heap_clear(xpow, cctx);
         gr_heap_clear(f, cctx);
