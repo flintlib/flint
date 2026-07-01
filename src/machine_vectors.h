@@ -54,6 +54,11 @@ typedef double vec1d;
 typedef __m128d vec2d;
 typedef __m256d vec4d;
 typedef struct {__m256d e1, e2;} vec8d;
+# if defined(__AVX512F__)
+typedef __m512i vec8nz;
+typedef __m512d vec8dz;
+typedef struct {vec8dz e1, e2;} vec16dz;
+# endif
 
 
 
@@ -559,6 +564,250 @@ FLINT_FORCE_INLINE ulong vec4n_horizontal_sum(vec4n a) {
     return (ulong) _mm_cvtsi128_si64(sum);
 }
 
+#if defined(__AVX512F__)
+/* vec8dz -- AVX512F ********************************************************/
+
+FLINT_FORCE_INLINE vec8dz vec8dz_load(const double* a) {
+    return _mm512_load_pd(a);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_load_aligned(const double* a) {
+    return _mm512_load_pd(a);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_load_unaligned(const double* a) {
+    return _mm512_loadu_pd(a);
+}
+
+FLINT_FORCE_INLINE void vec8dz_store(double* z, vec8dz a) {
+    _mm512_store_pd(z, a);
+}
+
+FLINT_FORCE_INLINE void vec8dz_store_aligned(double* z, vec8dz a) {
+    _mm512_store_pd(z, a);
+}
+
+FLINT_FORCE_INLINE void vec8dz_store_unaligned(double* z, vec8dz a) {
+    _mm512_storeu_pd(z, a);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_set_d(double a) {
+    return _mm512_set1_pd(a);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_set_d8(double a0, double a1, double a2, double a3,
+                                        double a4, double a5, double a6, double a7) {
+    return _mm512_set_pd(a7, a6, a5, a4, a3, a2, a1, a0);
+}
+
+FLINT_FORCE_INLINE vec8nz vec8nz_set_n8(ulong a0, ulong a1, ulong a2, ulong a3,
+                                        ulong a4, ulong a5, ulong a6, ulong a7) {
+    return _mm512_set_epi64(a7, a6, a5, a4, a3, a2, a1, a0);
+}
+
+/* For a = {a0,a1,a2,a3,a4,a5,a6,a7} and b = {b0,b1,b2,b3,b4,b5,b6,b7}, return
+   {a0,b0,a2,b2,a4,b4,a6,b6}. */
+FLINT_FORCE_INLINE vec8dz vec8dz_unpacklo(vec8dz a, vec8dz b) {
+    return _mm512_unpacklo_pd(a, b);
+}
+
+/* For a = {a0,a1,a2,a3,a4,a5,a6,a7} and b = {b0,b1,b2,b3,b4,b5,b6,b7}, return
+   {a1,b1,a3,b3,a5,b5,a7,b7}. */
+FLINT_FORCE_INLINE vec8dz vec8dz_unpackhi(vec8dz a, vec8dz b) {
+    return _mm512_unpackhi_pd(a, b);
+}
+
+/* For a = {a0,a1,a2,a3,a4,a5,a6,a7} and b = {b0,b1,b2,b3,b4,b5,b6,b7}, return
+   {a0,a1,a2,a3,b0,b1,b2,b3}. */
+FLINT_FORCE_INLINE vec8dz vec8dz_permute2_128_0_1_4_5(vec8dz a, vec8dz b) {
+    return _mm512_shuffle_f64x2(a, b, 0x44);
+}
+
+/* For a = {a0,a1,a2,a3,a4,a5,a6,a7} and b = {b0,b1,b2,b3,b4,b5,b6,b7}, return
+   {a4,a5,a6,a7,b4,b5,b6,b7}. */
+FLINT_FORCE_INLINE vec8dz vec8dz_permute2_128_2_3_6_7(vec8dz a, vec8dz b) {
+    return _mm512_shuffle_f64x2(a, b, 0xee);
+}
+
+/* For a = {a0,a1,a2,a3,a4,a5,a6,a7} and b = {b0,b1,b2,b3,b4,b5,b6,b7}, return
+   {a0,a1,a4,a5,b0,b1,b4,b5}. */
+FLINT_FORCE_INLINE vec8dz vec8dz_permute2_128_0_2_4_6(vec8dz a, vec8dz b) {
+    return _mm512_shuffle_f64x2(a, b, 0x88);
+}
+
+/* For a = {a0,a1,a2,a3,a4,a5,a6,a7} and b = {b0,b1,b2,b3,b4,b5,b6,b7}, return
+   {a2,a3,a6,a7,b2,b3,b6,b7}. */
+FLINT_FORCE_INLINE vec8dz vec8dz_permute2_128_1_3_5_7(vec8dz a, vec8dz b) {
+    return _mm512_shuffle_f64x2(a, b, 0xdd);
+}
+
+/* For a = {a0,a1,a2,a3,a4,a5,a6,a7}, return {a0,a1,a4,a5,a2,a3,a6,a7}. */
+FLINT_FORCE_INLINE vec8dz vec8dz_permute_128_0_2_1_3(vec8dz a) {
+    return _mm512_shuffle_f64x2(a, a, 0xd8);
+}
+
+/* For indices i[k] in [0,16), return a[i[k]] for i[k] < 8 and
+   b[i[k] - 8] otherwise. */
+FLINT_FORCE_INLINE vec8dz vec8dz_permute2var(vec8dz a, vec8nz i, vec8dz b) {
+    return _mm512_permutex2var_pd(a, i, b);
+}
+
+/* Load a[0] through a[15], setting
+   z0 = {a[0],a[2],a[4],a[6],a[8],a[10],a[12],a[14]} and
+   z1 = {a[1],a[3],a[5],a[7],a[9],a[11],a[13],a[15]}. */
+FLINT_FORCE_INLINE void
+vec8dz_load_deinterleave2_aligned(const double* a, vec8dz* z0, vec8dz* z1)
+{
+    vec8dz u = vec8dz_load_aligned(a + 0);
+    vec8dz v = vec8dz_load_aligned(a + 8);
+    vec8dz t0 = vec8dz_permute2_128_0_2_4_6(u, v);
+    vec8dz t1 = vec8dz_permute2_128_1_3_5_7(u, v);
+    *z0 = vec8dz_unpacklo(t0, t1);
+    *z1 = vec8dz_unpackhi(t0, t1);
+}
+
+/* Load a[0] through a[31], setting
+   z0 = {a[0],a[4],a[8],a[12],a[16],a[20],a[24],a[28]},
+   z1 = {a[1],a[5],a[9],a[13],a[17],a[21],a[25],a[29]},
+   z2 = {a[2],a[6],a[10],a[14],a[18],a[22],a[26],a[30]},
+   z3 = {a[3],a[7],a[11],a[15],a[19],a[23],a[27],a[31]}. */
+FLINT_FORCE_INLINE void
+vec8dz_load_deinterleave4_aligned(const double* a, vec8dz* z0, vec8dz* z1,
+                                  vec8dz* z2, vec8dz* z3)
+{
+    const vec8nz i0 = vec8nz_set_n8(0, 4, 8, 12, 0, 4, 8, 12);
+    const vec8nz i1 = vec8nz_set_n8(1, 5, 9, 13, 1, 5, 9, 13);
+    const vec8nz i2 = vec8nz_set_n8(2, 6, 10, 14, 2, 6, 10, 14);
+    const vec8nz i3 = vec8nz_set_n8(3, 7, 11, 15, 3, 7, 11, 15);
+    vec8dz u0 = vec8dz_load_aligned(a + 0);
+    vec8dz u1 = vec8dz_load_aligned(a + 8);
+    vec8dz u2 = vec8dz_load_aligned(a + 16);
+    vec8dz u3 = vec8dz_load_aligned(a + 24);
+    vec8dz l0 = vec8dz_permute2var(u0, i0, u1);
+    vec8dz l1 = vec8dz_permute2var(u0, i1, u1);
+    vec8dz l2 = vec8dz_permute2var(u0, i2, u1);
+    vec8dz l3 = vec8dz_permute2var(u0, i3, u1);
+    vec8dz h0 = vec8dz_permute2var(u2, i0, u3);
+    vec8dz h1 = vec8dz_permute2var(u2, i1, u3);
+    vec8dz h2 = vec8dz_permute2var(u2, i2, u3);
+    vec8dz h3 = vec8dz_permute2var(u2, i3, u3);
+    *z0 = vec8dz_permute2_128_0_1_4_5(l0, h0);
+    *z1 = vec8dz_permute2_128_0_1_4_5(l1, h1);
+    *z2 = vec8dz_permute2_128_0_1_4_5(l2, h2);
+    *z3 = vec8dz_permute2_128_0_1_4_5(l3, h3);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_zero(void) {
+    return _mm512_setzero_pd();
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_add(vec8dz a, vec8dz b) {
+    return _mm512_add_pd(a, b);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_sub(vec8dz a, vec8dz b) {
+    return _mm512_sub_pd(a, b);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_mul(vec8dz a, vec8dz b) {
+    return _mm512_mul_pd(a, b);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_round(vec8dz a) {
+    return _mm512_roundscale_pd(a, _MM_FROUND_CUR_DIRECTION);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_fmsub(vec8dz a, vec8dz b, vec8dz c) {
+    return _mm512_fmsub_pd(a, b, c);
+}
+
+FLINT_FORCE_INLINE vec8dz vec8dz_fnmadd(vec8dz a, vec8dz b, vec8dz c) {
+    return _mm512_fnmadd_pd(a, b, c);
+}
+
+/* For input a0 = {a00,a01,a02,a03,a04,a05,a06,a07} through
+   a7 = {a70,a71,a72,a73,a74,a75,a76,a77}, set
+   z0 = {a00,a10,a20,a30,a40,a50,a60,a70},
+   z1 = {a01,a11,a21,a31,a41,a51,a61,a71},
+   z2 = {a02,a12,a22,a32,a42,a52,a62,a72},
+   z3 = {a03,a13,a23,a33,a43,a53,a63,a73},
+   z4 = {a04,a14,a24,a34,a44,a54,a64,a74},
+   z5 = {a05,a15,a25,a35,a45,a55,a65,a75},
+   z6 = {a06,a16,a26,a36,a46,a56,a66,a76},
+   z7 = {a07,a17,a27,a37,a47,a57,a67,a77}. */
+FLINT_FORCE_INLINE void
+vec8dz_transpose(vec8dz* z0, vec8dz* z1, vec8dz* z2, vec8dz* z3,
+                 vec8dz* z4, vec8dz* z5, vec8dz* z6, vec8dz* z7,
+                 vec8dz a0, vec8dz a1, vec8dz a2, vec8dz a3,
+                 vec8dz a4, vec8dz a5, vec8dz a6, vec8dz a7)
+{
+    vec8dz t0, t1, t2, t3, t4, t5, t6, t7;
+    vec8dz u0, u1, u2, u3, u4, u5, u6, u7;
+    t0 = vec8dz_unpacklo(a0, a1);
+    t1 = vec8dz_unpackhi(a0, a1);
+    t2 = vec8dz_unpacklo(a2, a3);
+    t3 = vec8dz_unpackhi(a2, a3);
+    t4 = vec8dz_unpacklo(a4, a5);
+    t5 = vec8dz_unpackhi(a4, a5);
+    t6 = vec8dz_unpacklo(a6, a7);
+    t7 = vec8dz_unpackhi(a6, a7);
+    u0 = vec8dz_permute2_128_0_1_4_5(t0, t2);
+    u1 = vec8dz_permute2_128_2_3_6_7(t0, t2);
+    u2 = vec8dz_permute2_128_0_1_4_5(t1, t3);
+    u3 = vec8dz_permute2_128_2_3_6_7(t1, t3);
+    u4 = vec8dz_permute2_128_0_1_4_5(t4, t6);
+    u5 = vec8dz_permute2_128_2_3_6_7(t4, t6);
+    u6 = vec8dz_permute2_128_0_1_4_5(t5, t7);
+    u7 = vec8dz_permute2_128_2_3_6_7(t5, t7);
+    *z0 = vec8dz_permute2_128_0_2_4_6(u0, u4);
+    *z1 = vec8dz_permute2_128_0_2_4_6(u2, u6);
+    *z2 = vec8dz_permute2_128_1_3_5_7(u0, u4);
+    *z3 = vec8dz_permute2_128_1_3_5_7(u2, u6);
+    *z4 = vec8dz_permute2_128_0_2_4_6(u1, u5);
+    *z5 = vec8dz_permute2_128_0_2_4_6(u3, u7);
+    *z6 = vec8dz_permute2_128_1_3_5_7(u1, u5);
+    *z7 = vec8dz_permute2_128_1_3_5_7(u3, u7);
+}
+
+/* vec16dz -- AVX512F *******************************************************/
+
+FLINT_FORCE_INLINE vec16dz vec16dz_set_d(double a) {
+    vec8dz z1 = vec8dz_set_d(a);
+    vec16dz z = {z1, z1};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec16dz vec16dz_load(const double* a) {
+    vec16dz z = {vec8dz_load(a + 0), vec8dz_load(a + 8)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec16dz vec16dz_load_aligned(const double* a) {
+    vec16dz z = {vec8dz_load_aligned(a + 0), vec8dz_load_aligned(a + 8)};
+    return z;
+}
+
+FLINT_FORCE_INLINE vec16dz vec16dz_load_unaligned(const double* a) {
+    vec16dz z = {vec8dz_load_unaligned(a + 0), vec8dz_load_unaligned(a + 8)};
+    return z;
+}
+
+FLINT_FORCE_INLINE void vec16dz_store(double* z, vec16dz a) {
+    vec8dz_store(z + 0, a.e1);
+    vec8dz_store(z + 8, a.e2);
+}
+
+FLINT_FORCE_INLINE void vec16dz_store_aligned(double* z, vec16dz a) {
+    vec8dz_store_aligned(z + 0, a.e1);
+    vec8dz_store_aligned(z + 8, a.e2);
+}
+
+FLINT_FORCE_INLINE void vec16dz_store_unaligned(double* z, vec16dz a) {
+    vec8dz_store_unaligned(z + 0, a.e1);
+    vec8dz_store_unaligned(z + 8, a.e2);
+}
+#endif
+
 
 /* vec8d -- AVX2 ***********************************************************/
 
@@ -648,6 +897,9 @@ FLINT_FORCE_INLINE V V##_reduce_to_pm1n(V a, V n, V ninv) { \
 }
 DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
+# if defined(__AVX512F__)
+DEFINE_IT(vec8dz)
+# endif
 #undef DEFINE_IT
 
 /* reduce_to_pm1n(a, n, ninv): return a mod n in (-n,n) */
@@ -704,6 +956,9 @@ FLINT_FORCE_INLINE V V##_nmulmod(V a, V b, V n, V ninv) { \
 
 DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
+# if defined(__AVX512F__)
+DEFINE_IT(vec8dz)
+# endif
 #undef DEFINE_IT
 
 
@@ -773,6 +1028,13 @@ EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
 EXTEND_VEC_DEF3(vec4n, vec8n, _addmod_limited)
 EXTEND_VEC_DEF4(vec4d, vec8d, _mulmod)
 EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
+# if defined(__AVX512F__)
+EXTEND_VEC_DEF0(vec8dz, vec16dz, _zero)
+EXTEND_VEC_DEF2(vec8dz, vec16dz, _add)
+EXTEND_VEC_DEF2(vec8dz, vec16dz, _sub)
+EXTEND_VEC_DEF3(vec8dz, vec16dz, _reduce_to_pm1n)
+EXTEND_VEC_DEF4(vec8dz, vec16dz, _mulmod)
+# endif
 
 #undef EXTEND_VEC_DEF4
 #undef EXTEND_VEC_DEF3
