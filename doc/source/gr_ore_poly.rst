@@ -57,7 +57,7 @@ Ore algebra types
 
     .. enumerator:: ORE_ALGEBRA_FORWARD_DIFFERENCE
 
-        Linear difference operator in the forward finite difference operator.
+        Linear difference operators in the forward finite difference.
 
         The endomorphism `\sigma` is the shift `x \mapsto x + 1` with respect
         to a generator `x` of the base ring, and the `\sigma`-derivation
@@ -69,7 +69,7 @@ Ore algebra types
 
     .. enumerator:: ORE_ALGEBRA_BACKWARD_DIFFERENCE
 
-        Linear difference operator in the backward finite difference operator.
+        Linear difference operators in the backward finite difference.
 
     .. enumerator:: ORE_ALGEBRA_Q_SHIFT
 
@@ -136,8 +136,7 @@ Context object methods
     specific initialization function is listed below.
 
 .. function:: int gr_ore_poly_ctx_init_q_shift(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, gr_srcptr q)
-              int gr_ore_poly_ctx_init_q_difference(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, gr_srcptr q)
-              int gr_ore_poly_ctx_init_mahler(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, long mahler_base)
+              int gr_ore_poly_ctx_init_mahler(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, slong mahler_base)
 
     Like :func:`gr_ore_poly_ctx_init` for predefined Ore polynomial types where
     `\sigma` and `\delta` depend on parameters.
