@@ -27,6 +27,15 @@ typedef struct
 
 typedef padic_struct padic_t[1];
 
+typedef struct
+{
+    ulong u;
+    slong v;
+}
+padic_nmod_struct;
+
+typedef padic_nmod_struct padic_nmod_t[1];
+
 enum padic_print_mode
 {
     PADIC_TERSE,
@@ -45,6 +54,18 @@ typedef struct
 } padic_ctx_struct;
 
 typedef padic_ctx_struct padic_ctx_t[1];
+
+typedef struct
+{
+    ulong p;
+    ulong pinv1;
+    ulong pinv2;
+    slong n;
+    ulong * pow;
+    nmod_t p_mod;
+    nmod_t pn_mod;
+}
+_padic_nmod_ctx_struct;
 
 typedef struct
 {

@@ -297,6 +297,7 @@ p-adic numbers
    padic.rst
    padic_poly.rst
    padic_mat.rst
+   padic_nmod.rst
    qadic.rst
    padic_radix.rst
 
