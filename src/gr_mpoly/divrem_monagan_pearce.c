@@ -803,9 +803,9 @@ static int _gr_mpoly_divrem_mp(
 
     if (status != GR_SUCCESS)
     {
-        gr_mpoly_zero(Q, ctx);
+        GR_IGNORE(gr_mpoly_zero(Q, ctx));
         if (R != NULL)
-            gr_mpoly_zero(R, ctx);
+            GR_IGNORE(gr_mpoly_zero(R, ctx));
     }
 
     flint_free(cmpmask);

@@ -371,6 +371,7 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_MUL_SI,      (gr_funcptr) gr_mpoly_mul_si},
     {GR_METHOD_MUL_FMPZ,    (gr_funcptr) gr_mpoly_mul_fmpz},
     {GR_METHOD_MUL_FMPQ,    (gr_funcptr) gr_mpoly_mul_fmpq},
+    {GR_METHOD_SQR,         (gr_funcptr) gr_mpoly_sqr},
     {GR_METHOD_INV,         (gr_funcptr) gr_mpoly_inv},
     {GR_METHOD_DIV,         (gr_funcptr) gr_mpoly_divides},
     {GR_METHOD_CANONICAL_ASSOCIATE,         (gr_funcptr) gr_mpoly_canonical_associate},

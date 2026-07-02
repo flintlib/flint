@@ -342,6 +342,15 @@ Arithmetic
     Sets *A* to *B* multiplied by the scalar *c* which must be
     an element of or coercible to the coefficient ring.
 
+.. function:: int gr_mpoly_sqr_monomial(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr_johnson(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr_heap_threaded(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+
+    Sets *poly1* to the square of *poly2*. The *monomial* version assumes
+    that *poly2* is a monomial. The *johnson* and *heap_threaded* versions
+    assume a commutative coefficient ring.
+
 Division
 -------------------------------------------------------------------------------
 

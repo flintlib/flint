@@ -930,8 +930,8 @@ static int _gr_mpoly_divrem_ideal(
     if (status != GR_SUCCESS)
     {
         for (i = 0; i < len; i++)
-            gr_mpoly_zero(Q[i], ctx);
-        gr_mpoly_zero(R, ctx);
+            GR_IGNORE(gr_mpoly_zero(Q[i], ctx));
+        GR_IGNORE(gr_mpoly_zero(R, ctx));
     }
 
 cleanup:

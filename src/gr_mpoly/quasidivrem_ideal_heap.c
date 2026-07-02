@@ -572,9 +572,9 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
     if (status != GR_SUCCESS)
     {
         for (i = 0; i < len; i++)
-            gr_mpoly_zero(Q[i], ctx);
-        gr_mpoly_zero(R, ctx);
-        gr_one(scale, cctx);
+            GR_IGNORE(gr_mpoly_zero(Q[i], ctx));
+        GR_IGNORE(gr_mpoly_zero(R, ctx));
+        GR_IGNORE(gr_one(scale, cctx));
     }
 
 cleanup:

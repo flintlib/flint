@@ -523,10 +523,10 @@ int gr_mpoly_quasidivrem_heap(
 
     if (status != GR_SUCCESS)
     {
-        gr_mpoly_zero(Q, ctx);
+        GR_IGNORE(gr_mpoly_zero(Q, ctx));
         if (R != NULL)
-            gr_mpoly_zero(R, ctx);
-        gr_one(scale, cctx);
+            GR_IGNORE(gr_mpoly_zero(R, ctx));
+        GR_IGNORE(gr_one(scale, cctx));
     }
 
     flint_free(cmpmask);
