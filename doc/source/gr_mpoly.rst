@@ -131,6 +131,53 @@ Memory management
 
     Clears *A*, freeing all allocated data.
 
+Vectors of polynomials
+-------------------------------------------------------------------------------
+
+.. type:: gr_mpoly_vec_struct
+          gr_mpoly_vec_t
+
+    A resizable vector of :type:`gr_mpoly_t` elements. It is safe to
+    cast a :type:`gr_mpoly_vec_t` to a :type:`gr_vec_t` (with :type:`gr_mpoly_t`
+    elements of the correct type) and vice versa.
+
+.. function:: void gr_mpoly_vec_init(gr_mpoly_vec_t vec, slong len, gr_ctx_t ctx)
+
+    Initializes *vec* to a vector of length *len* with all entries
+    set to the zero polynomial of type *ctx*. The length must be nonnegative.
+
+.. function:: void gr_mpoly_vec_clear(gr_mpoly_vec_t vec, gr_ctx_t ctx)
+
+    Clears the vector *vec*, freeing all allocated memory.
+
+.. function:: gr_mpoly_struct * gr_mpoly_vec_entry_ptr(gr_mpoly_vec_t vec, slong i, gr_ctx_t ctx)
+              const gr_mpoly_struct * gr_mpoly_vec_entry_srcptr(const gr_mpoly_vec_t vec, slong i, gr_ctx_t ctx)
+
+    Returns a pointer to the *i*-th polynomial in the vector, indexed from zero.
+    The index must be in bounds.
+
+.. function:: slong gr_mpoly_vec_length(const gr_mpoly_vec_t vec, gr_ctx_t ctx)
+
+    Returns the length of the vector.
+
+.. function:: void gr_mpoly_vec_fit_length(gr_mpoly_vec_t vec, slong len, gr_ctx_t ctx)
+
+    Allocates space for at least *len* elements. This does not change
+    the length of the vector.
+
+.. function:: void gr_mpoly_vec_set_length(gr_mpoly_vec_t vec, slong len, gr_ctx_t ctx)
+
+    Resizes the vector to length *len*, which must be nonnegative.
+    The vector will be extended with zero polynomials if necessary.
+
+.. function:: int gr_mpoly_vec_set(gr_mpoly_vec_t res, const gr_mpoly_vec_t src, gr_ctx_t ctx)
+
+    Sets *res* to a copy of *src*.
+
+.. function:: int gr_mpoly_vec_append(gr_mpoly_vec_t vec, const gr_mpoly_t f, gr_ctx_t ctx)
+
+    Appends the polynomial *f* to the end of the vector.
+
 Basic manipulation
 -------------------------------------------------------------------------------
 
@@ -279,12 +326,14 @@ Arithmetic
     Sets *A* to the difference of *B* and *C*.
 
 .. function:: int gr_mpoly_mul(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
-              int gr_mpoly_mul_johnson(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_mul_heap(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
               int gr_mpoly_mul_heap_threaded(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
               int gr_mpoly_mul_monomial(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
 
     Sets *A* to the product of *B* and *C*.
     The *monomial* version assumes that *C* is a monomial.
+    The *heap* and *heap_threaded* versions implement Johnson's heap-based
+    algorithms.
 
 .. function:: int gr_mpoly_mul_scalar(gr_mpoly_t A, const gr_mpoly_t B, gr_srcptr c, gr_mpoly_ctx_t ctx)
               int gr_mpoly_mul_si(gr_mpoly_t A, const gr_mpoly_t B, slong c, gr_mpoly_ctx_t ctx)
@@ -295,7 +344,85 @@ Arithmetic
     Sets *A* to *B* multiplied by the scalar *c* which must be
     an element of or coercible to the coefficient ring.
 
+.. function:: int gr_mpoly_sqr_monomial(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr_commutative_heap(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr_commutative_heap_threaded(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+
+    Sets *poly1* to the square of *poly2*. The *monomial* version assumes
+    that *poly2* is a monomial. The *commutative_heap* and
+    *commutative_heap_threaded* versions assume a commutative coefficient ring.
+
+Division
+-------------------------------------------------------------------------------
+
 .. function:: int gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t src, gr_mpoly_ctx_t ctx)
+
+    If *src* has a multiplicative inverse, sets *res* to the inverse
+    and returns ``GR_SUCCESS``. If *src* is not invertible,
+    returns ``GR_DOMAIN``.
+    If invertibility cannot be decided, returns ``GR_UNABLE``.
+
+.. function:: int gr_mpoly_divides_heap(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divides(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+
+    Standard checked, exact division.
+    If *A* is divisible by *B*, sets *Q* to the exact quotient `Q = A / B` and returns ``GR_SUCCESS``.
+    If *A* is not divisible by *B*, sets *Q* to zero and returns ``GR_DOMAIN``.
+    If divisibility cannot be decided, returns ``GR_UNABLE``.
+
+    The *heap* version implements the Monagan-Pearce heap algorithm.
+    The default version currently only delegates to the heap algorithm
+    except for trivial special cases.
+
+.. function:: int gr_mpoly_divrem_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+
+    Standard multivariate division with remainder, typically used
+    when ``ctx`` is a field.
+    Sets *Q* and *R* to the quotient and remainder of *A* divided by *B*,
+    satisfying `A = Q B + R` and where no monomial in *R* is divisible
+    by the leading monomial of *B*.
+
+    If ``ctx`` is not a field, this works if the leading coefficient in *B*
+    is a unit and more generally if any division by the leading coefficient in *B*
+    succeeds in the execution of the division algorithm. If any non-exact
+    division is encountered, returns ``GR_DOMAIN``.
+
+.. function:: int gr_mpoly_div(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+
+    Like :func:`gr_mpoly_divrem`, but discarding the remainder.
+
+.. function:: int gr_mpoly_divrem_ideal(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
+
+    Like :func:`gr_mpoly_divrem`, but takes a vector *B* of divisor polynomials
+    and outputs a vector *Q* of quotient polynomials such that
+    `A = \sum_i Q_i B_i + R`, where no monomial in *R* is divisible by
+    any leading monomial in *B*.
+
+.. function:: int gr_mpoly_div_weak(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_weak(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_ideal_weak(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
+
+    Like the ``divrem`` functions, producing quotient and remainder
+    satisfying `A = Q B + R` (or `A = \sum_i Q_i B_i + R` in the ideal case),
+    except that if a nonexact coefficient division is encountered,
+    instead of halting and returning ``GR_DOMAIN``,
+    we divide the coefficients with remainder and accumulate the
+    remainder. This produces a polynomial remainder which is partially
+    reduced, but where monomials in *R* may still be divisible (ignoring
+    the coefficient) by the leading monomial of *B*.
+
+.. function:: int gr_mpoly_quasidivrem_heap(gr_ptr scale, gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_quasidiv(gr_ptr scale, gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_quasidivrem(gr_ptr scale, gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_quasidivrem_ideal(gr_ptr scale, gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
+
+    Like the ``divrem`` functions, but compute a scalar ``scale`` (as an
+    element of the scalar ring of ``ctx``) such that
+    `scale \cdot A = Q B + R` (or `scale \cdot A = \sum_i Q_i B_i + R` in the ideal case).
+    This is typically useful to perform division over the fraction field when ``ctx`` is an
+    integral domain.
 
 Derivative and integral
 -------------------------------------------------------------------------------

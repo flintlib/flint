@@ -204,8 +204,7 @@ gr_mpoly_gens_recursive(gr_vec_t vec, gr_mpoly_ctx_t ctx)
     return status;
 }
 
-/* FIXME: this may inappropriately return GR_DOMAIN for nonconstant
-   polynomials non-integral domains. See AbstractAlgebra. */
+/* TODO: find inverses of nonconstant polynomials over non-integral domains? */
 int
 gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
 {
@@ -224,7 +223,13 @@ gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
 
         N = mpoly_words_per_exp(poly->bits, GR_MPOLY_MCTX(ctx));
         if (!mpoly_monomial_is_zero(poly->exps + N*0, N))
-            return GR_DOMAIN;
+        {
+            if (gr_is_zero(poly->coeffs, GR_MPOLY_CCTX(ctx)) == T_FALSE &&
+                gr_ctx_is_integral_domain(GR_MPOLY_CCTX(ctx)) == T_TRUE)
+                return GR_DOMAIN;
+            else
+                return GR_UNABLE;
+        }
 
         /* todo: avoid the temporary */
         GR_TMP_INIT(c, GR_MPOLY_CCTX(ctx));
@@ -235,7 +240,8 @@ gr_mpoly_inv(gr_mpoly_t res, const gr_mpoly_t poly, gr_mpoly_ctx_t ctx)
     }
     else
     {
-        if (gr_is_zero(poly->coeffs, GR_MPOLY_CCTX(ctx)) == T_FALSE)
+        if (gr_is_zero(poly->coeffs, GR_MPOLY_CCTX(ctx)) == T_FALSE &&
+                gr_ctx_is_integral_domain(GR_MPOLY_CCTX(ctx)) == T_TRUE)
             return GR_DOMAIN;
         else
             return GR_UNABLE;
@@ -365,7 +371,9 @@ gr_method_tab_input _gr_mpoly_methods_input[] =
     {GR_METHOD_MUL_SI,      (gr_funcptr) gr_mpoly_mul_si},
     {GR_METHOD_MUL_FMPZ,    (gr_funcptr) gr_mpoly_mul_fmpz},
     {GR_METHOD_MUL_FMPQ,    (gr_funcptr) gr_mpoly_mul_fmpq},
+    {GR_METHOD_SQR,         (gr_funcptr) gr_mpoly_sqr},
     {GR_METHOD_INV,         (gr_funcptr) gr_mpoly_inv},
+    {GR_METHOD_DIV,         (gr_funcptr) gr_mpoly_divides},
     {GR_METHOD_CANONICAL_ASSOCIATE,         (gr_funcptr) gr_mpoly_canonical_associate},
     {GR_METHOD_DERIVATIVE_GEN,              (gr_funcptr) gr_mpoly_derivative},
     {0,                     (gr_funcptr) NULL},

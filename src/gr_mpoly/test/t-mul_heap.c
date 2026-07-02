@@ -14,7 +14,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
+TEST_FUNCTION_START(gr_mpoly_mul_heap, state)
 {
     slong i, j;
 
@@ -70,19 +70,19 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
             status |= gr_mpoly_add(k1, g, h, ctx);
 
             if (n_randint(state, 2) || (gr_ctx_is_commutative_ring(ctx) != T_TRUE))
-                status |= gr_mpoly_mul_johnson(k1, f, k1, ctx);
+                status |= gr_mpoly_mul_heap(k1, f, k1, ctx);
             else
-                status |= gr_mpoly_mul_johnson(k1, k1, f, ctx);
+                status |= gr_mpoly_mul_heap(k1, k1, f, ctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(k1, ctx);
 
-            status |= gr_mpoly_mul_johnson(k2, f, g, ctx);
+            status |= gr_mpoly_mul_heap(k2, f, g, ctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(k2, ctx);
 
-            status |= gr_mpoly_mul_johnson(t, f, h, ctx);
+            status |= gr_mpoly_mul_heap(t, f, h, ctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(t, ctx);
