@@ -927,7 +927,7 @@ static size_t __arb_print(FLINT_VPRINTF_OUT_T * out, arb_srcptr ip, int flag)
         else
             ip2 = *ip;
 
-        str = arb_get_str(&ip2, DIGITS, 0);
+        str = arb_get_str(&ip2, 1000, 40*ARB_STR_CONDENSE);
         res = FLINT_VPRINTF_WRITE(str, strlen(str), out);
 
         flint_free(str);
