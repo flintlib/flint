@@ -9456,6 +9456,16 @@ def test_mpoly():
     assert raises(lambda: RA(RB.gens()[0]), NotImplementedError)
     assert raises(lambda: RB(RA.gens()[0]), NotImplementedError)
 
+    x, y, z = PolynomialRing_gr_mpoly(QQbar, 3, ["x", "y", "z"]).gens()
+    I = QQbar.i()
+    assert ((x+I)*(x-I)*(y+I)*(y-I)) / ((x+I)*(y-I)) == (x-I)*(y+I)
+    assert raises(lambda: ((x+I)*(x-I)*(y+I)*(y-I)) / ((x+I)*(z+I)), FlintDomainError)
+
+    x, y, z = PolynomialRing_gr_mpoly(RR, 3, ["x", "y", "z"]).gens()
+    assert raises(lambda: x / (x**0 - y**0), FlintDomainError)
+    assert raises(lambda: (x**4 * y**3) / (RR("0 +/- 0.1")*(x**3 * y**2)), FlintUnableError)
+
+
 def test_fmpq_mpoly():
     QQxyz = PolynomialRing_fmpq_mpoly(3)
     x, y, z = QQxyz.gens()

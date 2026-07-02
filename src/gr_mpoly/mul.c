@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2020 Daniel Schultz
-    Copyright (C) 2022 Fredrik Johansson
+    Copyright (C) 2022, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -17,17 +17,37 @@ int gr_mpoly_mul(gr_mpoly_t poly1,
     const gr_mpoly_t poly3,
     gr_mpoly_ctx_t ctx)
 {
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong len2 = poly2->length;
     slong len3 = poly3->length;
 
     if (len2 == 0 || len3 == 0)
         return gr_mpoly_zero(poly1, ctx);
 
+    /* Squaring */
+    if (poly2 == poly3)
+    {
+        if (len2 == 1)
+            return gr_mpoly_sqr_monomial(poly1, poly2, ctx);
+
+        if (gr_ctx_is_commutative_ring(cctx) == T_TRUE ||
+                gr_ctx_is_approx_commutative_ring(cctx) == T_TRUE)
+        {
+            if (len2 * len2 > ctx->size_limit)
+                return GR_UNABLE | gr_mpoly_zero(poly1, ctx);
+
+            if (len2 > 100)
+                return gr_mpoly_sqr_heap_threaded(poly1, poly2, ctx);
+            else
+                return gr_mpoly_sqr_johnson(poly1, poly2, ctx);
+        }
+    }
+
     if (len3 == 1)
         return gr_mpoly_mul_monomial(poly1, poly2, poly3, ctx);
 
     /* todo: could have a version of mul_monomial for the noncommutative case */
-    if (len2 == 1 && gr_ctx_is_approx_commutative_ring(GR_MPOLY_CCTX(ctx)) == T_TRUE)
+    if (len2 == 1 && gr_ctx_is_approx_commutative_ring(cctx) == T_TRUE)
         return gr_mpoly_mul_monomial(poly1, poly3, poly2, ctx);
 
     if (len2 * len3 > ctx->size_limit)
