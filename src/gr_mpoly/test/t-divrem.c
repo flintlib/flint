@@ -137,7 +137,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
         }
 
         /* nonfield (euclidean) variant: a == q*b + r always */
-        status = gr_mpoly_divrem_allowing_nonunit_lc(q, r, a, b, ctx);
+        status = gr_mpoly_divrem_weak(q, r, a, b, ctx);
         if (status == GR_SUCCESS)
         {
             gr_mpoly_assert_canonical(q, ctx);
@@ -147,7 +147,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
                 gr_mpoly_add(t, t, r, ctx) == GR_SUCCESS &&
                 gr_mpoly_equal(t, a, ctx) == T_FALSE)
             {
-                flint_printf("FAIL: allowing_nonunit_lc a != q*b + r\n");
+                flint_printf("FAIL: weak a != q*b + r\n");
                 gr_ctx_println(cctx);
                 flint_printf("a = "); gr_mpoly_print_pretty(a, ctx); flint_printf("\n");
                 flint_printf("b = "); gr_mpoly_print_pretty(b, ctx); flint_printf("\n");
@@ -157,10 +157,10 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
                 flint_abort();
             }
 
-            if (gr_mpoly_div_allowing_nonunit_lc(t, a, b, ctx) == GR_SUCCESS &&
+            if (gr_mpoly_div_weak(t, a, b, ctx) == GR_SUCCESS &&
                 gr_mpoly_equal(t, q, ctx) == T_FALSE)
             {
-                flint_printf("FAIL: div_allowing_nonunit_lc != divrem_allowing_nonunit_lc quotient\n");
+                flint_printf("FAIL: div_weak != divrem_weak quotient\n");
                 gr_ctx_println(cctx);
                 fflush(stdout);
                 flint_abort();
@@ -172,7 +172,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
                 (gr_mpoly_equal(t, q, ctx) == T_FALSE ||
                  gr_mpoly_equal(u, r, ctx) == T_FALSE))
             {
-                flint_printf("FAIL: field/allowing_nonunit_lc disagree over a field\n");
+                flint_printf("FAIL: field/weak disagree over a field\n");
                 gr_ctx_println(cctx);
                 fflush(stdout);
                 flint_abort();

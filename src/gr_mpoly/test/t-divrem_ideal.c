@@ -126,13 +126,13 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal, state)
             }
 
             /* allowing non-unit leading coefficients (euclidean) */
-            status = gr_mpoly_divrem_ideal_allowing_nonunit_lc(Q, R, A, B, ctx);
+            status = gr_mpoly_divrem_ideal_weak(Q, R, A, B, ctx);
             if (status == GR_SUCCESS)
             {
                 for (w = 0; w < len; w++)
                     gr_mpoly_assert_canonical(gr_mpoly_vec_entry_ptr(Q, w, ctx), ctx);
                 gr_mpoly_assert_canonical(R, ctx);
-                _check_identity("allowing_nonunit_lc", Q, B, R, A, cctx, ctx);
+                _check_identity("weak", Q, B, R, A, cctx, ctx);
             }
         }
 

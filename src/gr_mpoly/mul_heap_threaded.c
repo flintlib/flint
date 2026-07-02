@@ -22,14 +22,14 @@
 #include "gr_mpoly.h"
 
 /*
-    This is a multithreaded variant of gr_mpoly_mul_johnson, modeled on
+    This is a multithreaded variant of gr_mpoly_mul_heap, modeled on
     fmpz_mpoly_mul_heap_threaded.  The product is partitioned by output
     monomial into a number of disjoint chunks; each chunk is computed by a
     Johnson heap restricted to a range [start, end) of the multiplier, and the
     chunks are concatenated to form the (already sorted) result.
 
     The two small/large coefficient code paths of the fmpz version correspond
-    here to the two accumulation strategies of gr_mpoly_mul_johnson: a fast
+    here to the two accumulation strategies of gr_mpoly_mul_heap: a fast
     path that gathers the operands of each diagonal into two shallow vectors
     and accumulates them with a single _gr_vec_dot call (used whenever the
     coefficient ring overloads VEC_DOT), and a generic path that multiplies and
@@ -981,7 +981,7 @@ static int _gr_mpoly_mul_heap_threaded_maxfields(
         /* algorithm more efficient if smaller poly first */
         if (hi != 0 || BClen < 0)
         {
-            status = gr_mpoly_mul_johnson(T, B, C, ctx);
+            status = gr_mpoly_mul_heap(T, B, C, ctx);
         }
         else if (B->length >= C->length)
         {
@@ -1007,7 +1007,7 @@ static int _gr_mpoly_mul_heap_threaded_maxfields(
 
         if (hi != 0 || BClen < 0)
         {
-            status = gr_mpoly_mul_johnson(A, B, C, ctx);
+            status = gr_mpoly_mul_heap(A, B, C, ctx);
         }
         /* algorithm more efficient if smaller poly first */
         else if (B->length > C->length)
@@ -1059,7 +1059,7 @@ int gr_mpoly_mul_heap_threaded(
 
     /* the coefficient ring must allow concurrent operations */
     if (gr_ctx_is_threadsafe(cctx) != T_TRUE)
-        return gr_mpoly_mul_johnson(A, B, C, ctx);
+        return gr_mpoly_mul_heap(A, B, C, ctx);
 
     thread_limit = 1 + (B->length * C->length) / 10000;
     thread_limit = FLINT_MIN(thread_limit, FLINT_MIN(B->length, C->length) / 2);

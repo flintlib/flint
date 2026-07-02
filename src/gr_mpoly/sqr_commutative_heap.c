@@ -20,7 +20,7 @@
 
 /*
     Squaring of a sparse multivariate polynomial using a binary heap, in the
-    spirit of Johnson's algorithm (see gr_mpoly_mul_johnson).  A commutative
+    spirit of Johnson's algorithm (see gr_mpoly_mul_heap).  A commutative
     coefficient ring is assumed, so that a_i*a_j = a_j*a_i.
 
     Writing f = sum_i a_i X^{e_i} (with the e_i distinct), we have
@@ -38,7 +38,7 @@
     2 e_d = e_p + e_q for some p < q).
 */
 
-/* Shallow-copy helpers, identical to gr_mpoly_mul_johnson: place operands in
+/* Shallow-copy helpers, identical to gr_mpoly_mul_heap: place operands in
    temporary arrays so the off-diagonal part can be accumulated with a single
    _gr_vec_dot call. */
 
@@ -180,7 +180,7 @@
         } \
     } while (0)
 
-static int _gr_mpoly_sqr_johnson1(
+static int _gr_mpoly_sqr_commutative_heap1(
     slong * res_len,
     gr_ptr * coeff1, ulong ** exp1, slong * alloc, slong * exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
@@ -340,7 +340,7 @@ static int _gr_mpoly_sqr_johnson1(
     return status;
 }
 
-static int _gr_mpoly_sqr_johnson(
+static int _gr_mpoly_sqr_commutative_heap(
     slong * res_len,
     gr_ptr * coeff1, ulong ** exp1, slong * alloc, slong * exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
@@ -374,7 +374,7 @@ static int _gr_mpoly_sqr_johnson(
 
     /* if exponent vectors fit in single word, call special version */
     if (N == 1)
-        return _gr_mpoly_sqr_johnson1(res_len, coeff1, exp1, alloc, exps_alloc,
+        return _gr_mpoly_sqr_commutative_heap1(res_len, coeff1, exp1, alloc, exps_alloc,
             coeff2, exp2, len2, cmpmask[0], ctx);
 
     TMP_START;
@@ -531,7 +531,7 @@ static int _gr_mpoly_sqr_johnson(
     return status;
 }
 
-int gr_mpoly_sqr_johnson(
+int gr_mpoly_sqr_commutative_heap(
     gr_mpoly_t poly1,
     const gr_mpoly_t poly2,
     gr_mpoly_ctx_t ctx)
@@ -593,7 +593,7 @@ int gr_mpoly_sqr_johnson(
         gr_mpoly_fit_length_reset_bits(temp,
                                 poly2->length + poly2->length, exp_bits, ctx);
 
-        status = _gr_mpoly_sqr_johnson(&len1,
+        status = _gr_mpoly_sqr_commutative_heap(&len1,
                                 &temp->coeffs, &temp->exps, &temp->coeffs_alloc, &temp->exps_alloc,
                                   poly2->coeffs, exp2, poly2->length,
                                       exp_bits, N, cmpmask, ctx);
@@ -605,7 +605,7 @@ int gr_mpoly_sqr_johnson(
     {
         gr_mpoly_fit_length_reset_bits(poly1, poly2->length + poly2->length, exp_bits, ctx);
 
-        status = _gr_mpoly_sqr_johnson(&len1,
+        status = _gr_mpoly_sqr_commutative_heap(&len1,
                                 &poly1->coeffs, &poly1->exps, &poly1->coeffs_alloc, &poly1->exps_alloc,
                                   poly2->coeffs, exp2, poly2->length,
                                       exp_bits, N, cmpmask, ctx);

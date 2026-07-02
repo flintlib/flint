@@ -986,7 +986,7 @@ int gr_mpoly_divrem_ideal(
     return _gr_mpoly_divrem_ideal_vec(Q, R, A, B, 0, ctx);
 }
 
-int gr_mpoly_divrem_ideal_allowing_nonunit_lc(
+int gr_mpoly_divrem_ideal_weak(
     gr_mpoly_vec_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_vec_t B,
     gr_mpoly_ctx_t ctx)

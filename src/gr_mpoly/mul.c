@@ -37,9 +37,9 @@ int gr_mpoly_mul(gr_mpoly_t poly1,
                 return GR_UNABLE | gr_mpoly_zero(poly1, ctx);
 
             if (len2 > 100)
-                return gr_mpoly_sqr_heap_threaded(poly1, poly2, ctx);
+                return gr_mpoly_sqr_commutative_heap_threaded(poly1, poly2, ctx);
             else
-                return gr_mpoly_sqr_johnson(poly1, poly2, ctx);
+                return gr_mpoly_sqr_commutative_heap(poly1, poly2, ctx);
         }
     }
 
@@ -56,5 +56,5 @@ int gr_mpoly_mul(gr_mpoly_t poly1,
     if (len2 * len3 > 10000 && len2 > 2 && len3 > 2)
         return gr_mpoly_mul_heap_threaded(poly1, poly2, poly3, ctx);
     else
-        return gr_mpoly_mul_johnson(poly1, poly2, poly3, ctx);
+        return gr_mpoly_mul_heap(poly1, poly2, poly3, ctx);
 }

@@ -82,7 +82,7 @@ TEST_FUNCTION_START(gr_mpoly_mul_heap_threaded, state)
             status |= gr_mpoly_randtest_bits(h2, state, n_randint(state, 10),
                                                    n_randint(state, 100) + 2, ctx);
 
-            status |= gr_mpoly_mul_johnson(h1, f, g, ctx);
+            status |= gr_mpoly_mul_heap(h1, f, g, ctx);
 
             aliasing = n_randint(state, 3);
 

@@ -98,7 +98,7 @@
         } \
     } while (0)
 
-static int _gr_mpoly_mul_johnson1(
+static int _gr_mpoly_mul_heap1(
     slong * res_len,
     gr_ptr * coeff1, ulong ** exp1, slong * alloc, slong * exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
@@ -255,7 +255,7 @@ static int _gr_mpoly_mul_johnson1(
     return status;
 }
 
-static int _gr_mpoly_mul_johnson(
+static int _gr_mpoly_mul_heap(
     slong * res_len,
     gr_ptr * coeff1, ulong ** exp1, slong * alloc, slong * exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
@@ -291,7 +291,7 @@ static int _gr_mpoly_mul_johnson(
 
     /* if exponent vectors fit in single word, call special version */
     if (N == 1)
-      return _gr_mpoly_mul_johnson1(res_len, coeff1, exp1, alloc, exps_alloc,
+      return _gr_mpoly_mul_heap1(res_len, coeff1, exp1, alloc, exps_alloc,
         coeff2, exp2, len2, coeff3, exp3, len3, cmpmask[0], flip_operands, ctx);
 
     TMP_START;
@@ -444,7 +444,7 @@ static int _gr_mpoly_mul_johnson(
     return status;
 }
 
-int gr_mpoly_mul_johnson(
+int gr_mpoly_mul_heap(
     gr_mpoly_t poly1,
     const gr_mpoly_t poly2,
     const gr_mpoly_t poly3,
@@ -524,7 +524,7 @@ int gr_mpoly_mul_johnson(
 
         if (poly2->length >= poly3->length)
         {
-            status = _gr_mpoly_mul_johnson(&len1,
+            status = _gr_mpoly_mul_heap(&len1,
                                     &temp->coeffs, &temp->exps, &temp->coeffs_alloc, &temp->exps_alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
@@ -532,7 +532,7 @@ int gr_mpoly_mul_johnson(
         }
         else
         {
-            status = _gr_mpoly_mul_johnson(&len1,
+            status = _gr_mpoly_mul_heap(&len1,
                 &temp->coeffs, &temp->exps, &temp->coeffs_alloc, &temp->exps_alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,
@@ -548,7 +548,7 @@ int gr_mpoly_mul_johnson(
 
         if (poly2->length > poly3->length)
         {
-            status = _gr_mpoly_mul_johnson(&len1,
+            status = _gr_mpoly_mul_heap(&len1,
                                     &poly1->coeffs, &poly1->exps, &poly1->coeffs_alloc, &poly1->exps_alloc,
                                       poly3->coeffs, exp3, poly3->length,
                                       poly2->coeffs, exp2, poly2->length,
@@ -556,7 +556,7 @@ int gr_mpoly_mul_johnson(
         }
         else
         {
-            status = _gr_mpoly_mul_johnson(&len1,
+            status = _gr_mpoly_mul_heap(&len1,
                                     &poly1->coeffs, &poly1->exps, &poly1->coeffs_alloc, &poly1->exps_alloc,
                                       poly2->coeffs, exp2, poly2->length,
                                       poly3->coeffs, exp3, poly3->length,

@@ -24,7 +24,7 @@
 /*
     Multithreaded squaring of a sparse multivariate polynomial, assuming a
     commutative coefficient ring.  It is modeled on gr_mpoly_mul_heap_threaded
-    (which parallelizes gr_mpoly_mul_johnson) and reuses that routine's
+    (which parallelizes gr_mpoly_mul_heap) and reuses that routine's
     partitioning, heap traversal and join machinery verbatim.  The only change
     is the per-monomial coefficient accumulation.
 
@@ -218,7 +218,7 @@ typedef _gr_mpoly_stripe_struct _gr_mpoly_stripe_t[1];
    exponent version.  Both operand roles read from coeff2/exp2 since f is being
    squared.  Returns the number of terms produced and writes the accumulated gr
    status to *res_status. */
-static slong _gr_mpoly_sqr_heap_part1(
+static slong _gr_mpoly_sqr_commutative_heap_part1(
     gr_ptr * A_coeff, ulong ** A_exp, slong * A_alloc, slong * A_exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
     slong * start, slong * end, slong * hind,
@@ -383,7 +383,7 @@ static slong _gr_mpoly_sqr_heap_part1(
 
 
 /* Multi-word exponent version of the above. */
-static slong _gr_mpoly_sqr_heap_part(
+static slong _gr_mpoly_sqr_commutative_heap_part(
     gr_ptr * A_coeff, ulong ** A_exp, slong * A_alloc, slong * A_exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
     slong * start, slong * end, slong * hind,
@@ -644,7 +644,7 @@ _worker_arg_struct;
       yy = tt; \
    } while (0)
 
-static void _gr_mpoly_sqr_heap_threaded_worker(void * varg)
+static void _gr_mpoly_sqr_commutative_heap_threaded_worker(void * varg)
 {
     _worker_arg_struct * arg = (_worker_arg_struct *) varg;
     _gr_mpoly_stripe_struct * S = arg->S;
@@ -766,7 +766,7 @@ static void _gr_mpoly_sqr_heap_threaded_worker(void * varg)
         /* calculate products in [start, end) */
         if (N == 1)
         {
-            divs[i].Alen = _gr_mpoly_sqr_heap_part1(
+            divs[i].Alen = _gr_mpoly_sqr_commutative_heap_part1(
                          &divs[i].Acoeff, &divs[i].Aexp,
                          &divs[i].Aalloc, &divs[i].Aexps_alloc,
                               base->coeff2, base->exp2, base->len2,
@@ -774,7 +774,7 @@ static void _gr_mpoly_sqr_heap_threaded_worker(void * varg)
         }
         else
         {
-            divs[i].Alen = _gr_mpoly_sqr_heap_part(
+            divs[i].Alen = _gr_mpoly_sqr_commutative_heap_part(
                          &divs[i].Acoeff, &divs[i].Aexp,
                          &divs[i].Aalloc, &divs[i].Aexps_alloc,
                               base->coeff2, base->exp2, base->len2,
@@ -836,7 +836,7 @@ static void _join_worker(void * varg)
     }
 }
 
-static int _gr_mpoly_sqr_heap_threaded(
+static int _gr_mpoly_sqr_commutative_heap_threaded(
     gr_mpoly_t A,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
     flint_bitcnt_t bits,
@@ -922,13 +922,13 @@ static int _gr_mpoly_sqr_heap_threaded(
         args[i].base = base;
         args[i].divs = divs;
         thread_pool_wake(global_thread_pool, handles[i], 0,
-                               _gr_mpoly_sqr_heap_threaded_worker, &args[i]);
+                               _gr_mpoly_sqr_commutative_heap_threaded_worker, &args[i]);
     }
     i = num_handles;
     args[i].idx = i;
     args[i].base = base;
     args[i].divs = divs;
-    _gr_mpoly_sqr_heap_threaded_worker(&args[i]);
+    _gr_mpoly_sqr_commutative_heap_threaded_worker(&args[i]);
     for (i = 0; i < num_handles; i++)
     {
         thread_pool_wait(global_thread_pool, handles[i]);
@@ -987,7 +987,7 @@ static int _gr_mpoly_sqr_heap_threaded(
 
 
 /* maxBfields gets clobbered */
-static int _gr_mpoly_sqr_heap_threaded_maxfields(
+static int _gr_mpoly_sqr_commutative_heap_threaded_maxfields(
     gr_mpoly_t A,
     const gr_mpoly_t B, fmpz * maxBfields,
     gr_mpoly_ctx_t ctx,
@@ -1040,9 +1040,9 @@ static int _gr_mpoly_sqr_heap_threaded_maxfields(
         gr_mpoly_init3(T, 0, exp_bits, ctx);
 
         if (hi != 0 || BClen < 0)
-            status = gr_mpoly_sqr_johnson(T, B, ctx);
+            status = gr_mpoly_sqr_commutative_heap(T, B, ctx);
         else
-            status = _gr_mpoly_sqr_heap_threaded(T,
+            status = _gr_mpoly_sqr_commutative_heap_threaded(T,
                                 B->coeffs, Bexp, B->length,
                                 exp_bits, N, cmpmask, ctx, handles, num_handles);
 
@@ -1054,9 +1054,9 @@ static int _gr_mpoly_sqr_heap_threaded_maxfields(
         gr_mpoly_fit_length_reset_bits(A, B->length + B->length, exp_bits, ctx);
 
         if (hi != 0 || BClen < 0)
-            status = gr_mpoly_sqr_johnson(A, B, ctx);
+            status = gr_mpoly_sqr_commutative_heap(A, B, ctx);
         else
-            status = _gr_mpoly_sqr_heap_threaded(A,
+            status = _gr_mpoly_sqr_commutative_heap_threaded(A,
                                 B->coeffs, Bexp, B->length,
                                 exp_bits, N, cmpmask, ctx, handles, num_handles);
     }
@@ -1070,7 +1070,7 @@ static int _gr_mpoly_sqr_heap_threaded_maxfields(
 }
 
 
-int gr_mpoly_sqr_heap_threaded(
+int gr_mpoly_sqr_commutative_heap_threaded(
     gr_mpoly_t A,
     const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
@@ -1094,7 +1094,7 @@ int gr_mpoly_sqr_heap_threaded(
 
     /* the coefficient ring must allow concurrent operations */
     if (gr_ctx_is_threadsafe(cctx) != T_TRUE)
-        return gr_mpoly_sqr_johnson(A, B, ctx);
+        return gr_mpoly_sqr_commutative_heap(A, B, ctx);
 
     thread_limit = 1 + (B->length * B->length) / 10000;
     thread_limit = FLINT_MIN(thread_limit, B->length / 2);
@@ -1108,7 +1108,7 @@ int gr_mpoly_sqr_heap_threaded(
 
     num_handles = flint_request_threads(&handles, thread_limit);
 
-    status = _gr_mpoly_sqr_heap_threaded_maxfields(A, B, maxBfields,
+    status = _gr_mpoly_sqr_commutative_heap_threaded_maxfields(A, B, maxBfields,
                                                     ctx, handles, num_handles);
 
     flint_give_back_threads(handles, num_handles);

@@ -21,7 +21,7 @@ TEST_FUNCTION_START(gr_mpoly_sqr, state)
     gr_ctx_t ctx1;
     gr_ctx_init_nmod(ctx1, 17);
 
-    /* Check gr_mpoly_sqr(f) == gr_mpoly_mul_johnson(f, f) for every ring:
+    /* Check gr_mpoly_sqr(f) == gr_mpoly_mul_heap(f, f) for every ring:
        for (approx-)commutative rings the dispatcher routes to the dedicated
        squaring code, for noncommutative rings it falls through to the general
        product; either way the identity must hold. */
@@ -92,7 +92,7 @@ TEST_FUNCTION_START(gr_mpoly_sqr, state)
                                                    n_randint(state, 100) + 2, ctx);
 
             /* reference */
-            status |= gr_mpoly_mul_johnson(h1, f, f, ctx);
+            status |= gr_mpoly_mul_heap(h1, f, f, ctx);
 
             aliasing = n_randint(state, 2);
 
@@ -157,7 +157,7 @@ TEST_FUNCTION_START(gr_mpoly_sqr, state)
             status |= gr_mpoly_randtest_bits(f, state, 1,
                                               n_randint(state, 100) + 2, ctx);
 
-            status |= gr_mpoly_mul_johnson(h1, f, f, ctx);
+            status |= gr_mpoly_mul_heap(h1, f, f, ctx);
 
             /* out-of-place */
             status |= gr_mpoly_sqr_monomial(h2, f, ctx);

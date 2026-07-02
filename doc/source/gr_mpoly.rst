@@ -326,12 +326,14 @@ Arithmetic
     Sets *A* to the difference of *B* and *C*.
 
 .. function:: int gr_mpoly_mul(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
-              int gr_mpoly_mul_johnson(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_mul_heap(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
               int gr_mpoly_mul_heap_threaded(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
               int gr_mpoly_mul_monomial(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_ctx_t ctx)
 
     Sets *A* to the product of *B* and *C*.
     The *monomial* version assumes that *C* is a monomial.
+    The *heap* and *heap_threaded* versions implement Johnson's heap-based
+    algorithms.
 
 .. function:: int gr_mpoly_mul_scalar(gr_mpoly_t A, const gr_mpoly_t B, gr_srcptr c, gr_mpoly_ctx_t ctx)
               int gr_mpoly_mul_si(gr_mpoly_t A, const gr_mpoly_t B, slong c, gr_mpoly_ctx_t ctx)
@@ -343,13 +345,13 @@ Arithmetic
     an element of or coercible to the coefficient ring.
 
 .. function:: int gr_mpoly_sqr_monomial(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
-              int gr_mpoly_sqr_johnson(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
-              int gr_mpoly_sqr_heap_threaded(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr_commutative_heap(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_sqr_commutative_heap_threaded(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
               int gr_mpoly_sqr(gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_mpoly_ctx_t ctx)
 
     Sets *poly1* to the square of *poly2*. The *monomial* version assumes
-    that *poly2* is a monomial. The *johnson* and *heap_threaded* versions
-    assume a commutative coefficient ring.
+    that *poly2* is a monomial. The *commutative_heap* and
+    *commutative_heap_threaded* versions assume a commutative coefficient ring.
 
 Division
 -------------------------------------------------------------------------------
@@ -361,7 +363,7 @@ Division
     returns ``GR_DOMAIN``.
     If invertibility cannot be decided, returns ``GR_UNABLE``.
 
-.. function:: int gr_mpoly_divides_monagan_pearce(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+.. function:: int gr_mpoly_divides_heap(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divides(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 
     Standard checked, exact division.
@@ -369,7 +371,11 @@ Division
     If *A* is not divisible by *B*, sets *Q* to zero and returns ``GR_DOMAIN``.
     If divisibility cannot be decided, returns ``GR_UNABLE``.
 
-.. function:: int gr_mpoly_divrem_monagan_pearce(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+    The *heap* version implements the Monagan-Pearce heap algorithm.
+    The default version currently only delegates to the heap algorithm
+    except for trivial special cases.
+
+.. function:: int gr_mpoly_divrem_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 
     Standard multivariate division with remainder, typically used
@@ -394,9 +400,9 @@ Division
     `A = \sum_i Q_i B_i + R`, where no monomial in *R* is divisible by
     any leading monomial in *B*.
 
-.. function:: int gr_mpoly_div_allowing_nonunit_lc(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
-              int gr_mpoly_divrem_allowing_nonunit_lc(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
-              int gr_mpoly_divrem_ideal_allowing_nonunit_lc(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
+.. function:: int gr_mpoly_div_weak(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_weak(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_ideal_weak(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
 
     Like the ``divrem`` functions, producing quotient and remainder
     satisfying `A = Q B + R` (or `A = \sum_i Q_i B_i + R` in the ideal case),
@@ -413,9 +419,9 @@ Division
               int gr_mpoly_quasidivrem_ideal(gr_ptr scale, gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
 
     Like the ``divrem`` functions, but compute a scalar ``scale`` (as an
-    element of the scalar ring of ``ctx``) such
+    element of the scalar ring of ``ctx``) such that
     `scale \cdot A = Q B + R` (or `scale \cdot A = \sum_i Q_i B_i + R` in the ideal case).
-    This is typically useful to emulate division over the fraction field when ``ctx`` is an
+    This is typically useful to perform division over the fraction field when ``ctx`` is an
     integral domain.
 
 Derivative and integral

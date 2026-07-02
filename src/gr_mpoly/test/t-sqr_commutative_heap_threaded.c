@@ -14,7 +14,7 @@
 
 FLINT_DLL extern gr_static_method_table _ca_methods;
 
-TEST_FUNCTION_START(gr_mpoly_sqr_heap_threaded, state)
+TEST_FUNCTION_START(gr_mpoly_sqr_commutative_heap_threaded, state)
 {
     slong i, j;
 
@@ -43,7 +43,7 @@ TEST_FUNCTION_START(gr_mpoly_sqr_heap_threaded, state)
                 gr_ctx_init_complex_acb(cctx, 2 + n_randint(state, 200));
                 break;
         }
-        /* gr_mpoly_sqr_heap_threaded assumes a (approximately) commutative
+        /* gr_mpoly_sqr_commutative_heap_threaded assumes a (approximately) commutative
            coefficient ring a priori (guaranteed here by construction) */
 
         gr_mpoly_ctx_init_rand(ctx, state, cctx, 4);
@@ -72,18 +72,18 @@ TEST_FUNCTION_START(gr_mpoly_sqr_heap_threaded, state)
                                                    n_randint(state, 100) + 2, ctx);
 
             /* reference: f*f via the serial generic multiplication */
-            status |= gr_mpoly_mul_johnson(h1, f, f, ctx);
+            status |= gr_mpoly_mul_heap(h1, f, f, ctx);
 
             aliasing = n_randint(state, 2);
 
             if (aliasing == 0)
             {
-                status |= gr_mpoly_sqr_heap_threaded(h2, f, ctx);
+                status |= gr_mpoly_sqr_commutative_heap_threaded(h2, f, ctx);
             }
             else
             {
                 status |= gr_mpoly_set(h2, f, ctx);
-                status |= gr_mpoly_sqr_heap_threaded(h2, h2, ctx);
+                status |= gr_mpoly_sqr_commutative_heap_threaded(h2, h2, ctx);
             }
 
             if (status == GR_SUCCESS)

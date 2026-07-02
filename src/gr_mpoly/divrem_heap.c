@@ -140,7 +140,7 @@
 }
 
 
-static int _gr_mpoly_divrem_monagan_pearce1(
+static int _gr_mpoly_divrem_heap1(
     gr_mpoly_t Q, gr_mpoly_t R, int * overflowed, int nonfield,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
     gr_srcptr coeff3, const ulong * exp3, slong len3,
@@ -380,7 +380,7 @@ cleanup:
 }
 
 
-static int _gr_mpoly_divrem_monagan_pearce(
+static int _gr_mpoly_divrem_heap(
     gr_mpoly_t Q, gr_mpoly_t R, int * overflowed, int nonfield,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
     gr_srcptr coeff3, const ulong * exp3, slong len3,
@@ -415,7 +415,7 @@ static int _gr_mpoly_divrem_monagan_pearce(
     TMP_INIT;
 
     if (N == 1)
-        return _gr_mpoly_divrem_monagan_pearce1(Q, R, overflowed, nonfield,
+        return _gr_mpoly_divrem_heap1(Q, R, overflowed, nonfield,
                    coeff2, exp2, len2, coeff3, exp3, len3, bits, cmpmask[0], ctx);
 
     have_fast_dot = (GR_VEC_DOT_OP(cctx, VEC_DOT) != (gr_method_vec_dot_op) gr_generic_vec_dot);
@@ -754,7 +754,7 @@ static int _gr_mpoly_divrem_mp(
         if (r != NULL)
             r->bits = exp_bits;
 
-        status = _gr_mpoly_divrem_monagan_pearce(q, r, &overflowed, nonfield,
+        status = _gr_mpoly_divrem_heap(q, r, &overflowed, nonfield,
                             A->coeffs, exp2, A->length,
                             B->coeffs, exp3, B->length, exp_bits, N, cmpmask, ctx);
 
@@ -818,7 +818,7 @@ static int _gr_mpoly_divrem_mp(
 }
 
 
-int gr_mpoly_divrem_monagan_pearce(
+int gr_mpoly_divrem_heap(
     gr_mpoly_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
@@ -836,7 +836,7 @@ int gr_mpoly_divrem(
 }
 
 
-int gr_mpoly_divrem_allowing_nonunit_lc(
+int gr_mpoly_divrem_weak(
     gr_mpoly_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
@@ -855,7 +855,7 @@ int gr_mpoly_div(
 }
 
 
-int gr_mpoly_div_allowing_nonunit_lc(
+int gr_mpoly_div_weak(
     gr_mpoly_t Q,
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)

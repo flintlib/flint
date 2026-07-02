@@ -21,12 +21,12 @@
 #include "t-quasidivrem.c"
 #include "t-quasidivrem_ideal.c"
 #include "t-vec.c"
+#include "t-mul_heap.c"
 #include "t-mul_heap_threaded.c"
-#include "t-mul_johnson.c"
 #include "t-mul_monomial.c"
 #include "t-sqr.c"
-#include "t-sqr_heap_threaded.c"
-#include "t-sqr_johnson.c"
+#include "t-sqr_commutative_heap.c"
+#include "t-sqr_commutative_heap_threaded.c"
 #include "t-ring.c"
 
 /* Array of test functions ***************************************************/
@@ -43,13 +43,13 @@ test_struct tests[] =
     TEST_FUNCTION(gr_mpoly_quasidivrem),
     TEST_FUNCTION(gr_mpoly_quasidivrem_ideal),
     TEST_FUNCTION(gr_mpoly_vec),
+    TEST_FUNCTION(gr_mpoly_mul_heap),
     TEST_FUNCTION(gr_mpoly_mul_heap_threaded),
-    TEST_FUNCTION(gr_mpoly_mul_johnson),
     TEST_FUNCTION(gr_mpoly_mul_monomial),
     TEST_FUNCTION(gr_mpoly_ring),
     TEST_FUNCTION(gr_mpoly_sqr),
-    TEST_FUNCTION(gr_mpoly_sqr_heap_threaded),
-    TEST_FUNCTION(gr_mpoly_sqr_johnson),
+    TEST_FUNCTION(gr_mpoly_sqr_commutative_heap),
+    TEST_FUNCTION(gr_mpoly_sqr_commutative_heap_threaded),
 };
 
 /* main function *************************************************************/

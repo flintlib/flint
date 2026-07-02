@@ -13,7 +13,7 @@
 #include "test_helpers.h"
 #include "gr_mpoly.h"
 
-TEST_FUNCTION_START(gr_mpoly_sqr_johnson, state)
+TEST_FUNCTION_START(gr_mpoly_sqr_commutative_heap, state)
 {
     slong i, j;
 
@@ -29,7 +29,7 @@ TEST_FUNCTION_START(gr_mpoly_sqr_johnson, state)
 
         gr_ctx_init_random(cctx, state);
 
-        /* gr_mpoly_sqr_johnson assumes a (approximately) commutative
+        /* gr_mpoly_sqr_commutative_heap assumes a (approximately) commutative
            coefficient ring a priori; skip rings that are not known to be so */
         if (gr_ctx_is_commutative_ring(cctx) != T_TRUE &&
             gr_ctx_is_approx_commutative_ring(cctx) != T_TRUE)
@@ -60,13 +60,13 @@ TEST_FUNCTION_START(gr_mpoly_sqr_johnson, state)
             status |= gr_mpoly_randtest_bits(k2, state, len1, exp_bits1, ctx);
 
             /* k1 = f^2 via dedicated squaring */
-            status |= gr_mpoly_sqr_johnson(k1, f, ctx);
+            status |= gr_mpoly_sqr_commutative_heap(k1, f, ctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(k1, ctx);
 
             /* k2 = f*f via generic multiplication (reference) */
-            status |= gr_mpoly_mul_johnson(k2, f, f, ctx);
+            status |= gr_mpoly_mul_heap(k2, f, f, ctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(k2, ctx);
@@ -90,9 +90,9 @@ TEST_FUNCTION_START(gr_mpoly_sqr_johnson, state)
             status |= gr_mpoly_randtest_bits(f, state, len1, exp_bits1, ctx);
 
             status |= gr_mpoly_set(k2, f, ctx);
-            status |= gr_mpoly_mul_johnson(k2, k2, k2, ctx);
+            status |= gr_mpoly_mul_heap(k2, k2, k2, ctx);
 
-            status |= gr_mpoly_sqr_johnson(f, f, ctx);
+            status |= gr_mpoly_sqr_commutative_heap(f, f, ctx);
 
             if (status == GR_SUCCESS)
                 gr_mpoly_assert_canonical(f, ctx);

@@ -168,6 +168,6 @@ gr_mpoly_divides(gr_mpoly_t Q,
     if (gr_ctx_is_integral_domain(GR_MPOLY_CCTX(ctx)) != T_TRUE)
         return GR_UNABLE;
 
-    return gr_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+    return gr_mpoly_divides_heap(Q, A, B, ctx);
 }
 

@@ -30,7 +30,7 @@
 
     The two coefficient code paths of fmpz_mpoly (machine-word vs multiprecision
     accumulation) are replaced here by the two accumulation strategies used in
-    gr_mpoly_mul_johnson: a fast path that gathers the divisor/quotient operands
+    gr_mpoly_mul_heap: a fast path that gathers the divisor/quotient operands
     of each diagonal into two shallow vectors and accumulates with a single
     _gr_vec_dot (used when the ring overloads VEC_DOT), and a generic path that
     accumulates term by term as acc -= B[i]*Q[j] using a single preallocated
@@ -89,7 +89,7 @@
                   : gr_div(GR_ENTRY(p1, k, sz), acc, coeff3, cctx))
 
 
-static int _gr_mpoly_divides_monagan_pearce1(
+static int _gr_mpoly_divides_heap1(
     slong * lenout,
     gr_ptr * poly1, ulong ** exp1, slong * alloc, slong * exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
@@ -337,7 +337,7 @@ unable:
 }
 
 
-static int _gr_mpoly_divides_monagan_pearce(
+static int _gr_mpoly_divides_heap(
     slong * lenout,
     gr_ptr * poly1, ulong ** exp1, slong * alloc, slong * exps_alloc,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
@@ -371,7 +371,7 @@ static int _gr_mpoly_divides_monagan_pearce(
     TMP_INIT;
 
     if (N == 1)
-        return _gr_mpoly_divides_monagan_pearce1(lenout, poly1, exp1, alloc, exps_alloc,
+        return _gr_mpoly_divides_heap1(lenout, poly1, exp1, alloc, exps_alloc,
                    coeff2, exp2, len2, coeff3, exp3, len3, bits, cmpmask[0], ctx);
 
     have_fast_dot = (GR_VEC_DOT_OP(cctx, VEC_DOT) != (gr_method_vec_dot_op) gr_generic_vec_dot);
@@ -638,7 +638,7 @@ unable:
 }
 
 
-int gr_mpoly_divides_monagan_pearce(
+int gr_mpoly_divides_heap(
     gr_mpoly_t Q,
     const gr_mpoly_t A,
     const gr_mpoly_t B,
@@ -767,7 +767,7 @@ int gr_mpoly_divides_monagan_pearce(
         gr_mpoly_t T;
         gr_mpoly_init3(T, A->length/B->length + 1, exp_bits, ctx);
 
-        status = _gr_mpoly_divides_monagan_pearce(&lenq,
+        status = _gr_mpoly_divides_heap(&lenq,
                             &T->coeffs, &T->exps, &T->coeffs_alloc, &T->exps_alloc,
                             A->coeffs, exp2, A->length,
                             B->coeffs, exp3, B->length, exp_bits, N, cmpmask, ctx);
@@ -780,7 +780,7 @@ int gr_mpoly_divides_monagan_pearce(
     {
         gr_mpoly_fit_length_reset_bits(Q, A->length/B->length + 1, exp_bits, ctx);
 
-        status = _gr_mpoly_divides_monagan_pearce(&lenq,
+        status = _gr_mpoly_divides_heap(&lenq,
                             &Q->coeffs, &Q->exps, &Q->coeffs_alloc, &Q->exps_alloc,
                             A->coeffs, exp2, A->length,
                             B->coeffs, exp3, B->length, exp_bits, N, cmpmask, ctx);
