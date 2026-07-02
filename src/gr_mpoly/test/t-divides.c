@@ -124,6 +124,9 @@ _check_one(flint_rand_t state, gr_ctx_t cctx, gr_mpoly_ctx_t ctx, int big)
 
     /* explicitly exercise the scalar/monomial divisor special case */
     status = GR_SUCCESS;
+
+    if (n_randint(state, 4) == 0)
+        ebits = 2 + n_randint(state, 200);
     status |= gr_mpoly_randtest_bits(f, state, n_randint(state, len) + 1, ebits, ctx);
     status |= gr_mpoly_randtest_bits(g, state, 1, ebits, ctx);   /* monomial or scalar */
     if (gr_mpoly_is_zero(g, ctx) != T_FALSE)

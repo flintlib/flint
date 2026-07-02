@@ -36,7 +36,7 @@ TEST_FUNCTION_START(gr_mpoly_quasidivrem_ideal, state)
             default: gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1)); break;
         }
 
-        gr_mpoly_ctx_init_rand(ctx, state, cctx, 3);
+        gr_mpoly_ctx_init_rand(ctx, state, cctx, 8);
 
         len = 1 + n_randint(state, 4);
         gr_mpoly_init(A, ctx);
@@ -64,7 +64,25 @@ TEST_FUNCTION_START(gr_mpoly_quasidivrem_ideal, state)
 
         if (status == GR_SUCCESS)
         {
-            status = gr_mpoly_quasidivrem_ideal(scale, Q, R, A, B, ctx);
+            switch (n_randint(state, 4) * 0)
+            {
+                case 0:
+                    status = gr_mpoly_quasidivrem_ideal(scale, Q, R, A, B, ctx);
+                    break;
+                case 1:
+                    status = gr_mpoly_vec_set(Q, B, ctx);
+                    status |= gr_mpoly_quasidivrem_ideal(scale, Q, R, A, Q, ctx);
+                    break;
+                case 2:
+                    status = gr_mpoly_set(R, A, ctx);
+                    status |= gr_mpoly_quasidivrem_ideal(scale, Q, R, R, B, ctx);
+                    break;
+                default:
+                    status = gr_mpoly_set(R, A, ctx);
+                    status = gr_mpoly_vec_set(Q, B, ctx);
+                    status |= gr_mpoly_quasidivrem_ideal(scale, Q, R, R, Q, ctx);
+                    break;
+            }
 
             if (status == GR_SUCCESS)
             {

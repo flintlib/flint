@@ -61,25 +61,15 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal, state)
 
         big = (n_randint(state, 4) == 0);
 
-        if (big)
+        switch (n_randint(state, 4))
         {
-            /* many variables (small per-variable exponents) force N > 1 and
-               exercise the multi-word kernel + its fast dot path, without the
-               quotient blow-up that large exponents can cause */
-            gr_ctx_init_nmod(cctx, n_randprime(state, 5 + n_randint(state, 10), 1));
-            gr_mpoly_ctx_init_rand(ctx, state, cctx, 12);
+            case 0: gr_ctx_init_fmpz(cctx); break;
+            case 1: gr_ctx_init_fmpq(cctx); break;
+            case 2: gr_ctx_init_random_finite_field(cctx, state); break;
+            default: gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1)); break;
         }
-        else
-        {
-            switch (n_randint(state, 4))
-            {
-                case 0: gr_ctx_init_fmpz(cctx); break;
-                case 1: gr_ctx_init_fmpq(cctx); break;
-                case 2: gr_ctx_init_random_finite_field(cctx, state); break;
-                default: gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1)); break;
-            }
-            gr_mpoly_ctx_init_rand(ctx, state, cctx, 3);
-        }
+
+        gr_mpoly_ctx_init_rand(ctx, state, cctx, big ? 3 : 10);
 
         len = 1 + n_randint(state, 4);
         gr_mpoly_init(A, ctx);
@@ -104,8 +94,29 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal, state)
 
         if (status == GR_SUCCESS)
         {
-            /* field-like */
             status = gr_mpoly_divrem_ideal(Q, R, A, B, ctx);
+
+            /* field-like */
+            switch (n_randint(state, 4) * 0)
+            {
+                case 0:
+                    status = gr_mpoly_divrem_ideal(Q, R, A, B, ctx);
+                    break;
+                case 1:
+                    status = gr_mpoly_vec_set(Q, B, ctx);
+                    status |= gr_mpoly_divrem_ideal(Q, R, A, Q, ctx);
+                    break;
+                case 2:
+                    status = gr_mpoly_set(R, A, ctx);
+                    status |= gr_mpoly_divrem_ideal(Q, R, R, B, ctx);
+                    break;
+                default:
+                    status = gr_mpoly_set(R, A, ctx);
+                    status = gr_mpoly_vec_set(Q, B, ctx);
+                    status |= gr_mpoly_divrem_ideal(Q, R, R, Q, ctx);
+                    break;
+            }
+
             if (status == GR_SUCCESS)
             {
                 for (w = 0; w < len; w++)

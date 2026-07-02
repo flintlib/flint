@@ -78,7 +78,25 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
         if (status != GR_SUCCESS)
             goto next;
 
-        status = gr_mpoly_divrem(q, r, a, b, ctx);
+        switch (n_randint(state, 4))
+        {
+            case 0:
+                status = gr_mpoly_divrem(q, r, a, b, ctx);
+                break;
+            case 1:
+                status = gr_mpoly_set(q, b, ctx);
+                status |= gr_mpoly_divrem(q, r, a, q, ctx);
+                break;
+            case 2:
+                status = gr_mpoly_set(r, a, ctx);
+                status |= gr_mpoly_divrem(q, r, r, b, ctx);
+                break;
+            default:
+                status = gr_mpoly_set(r, a, ctx);
+                status = gr_mpoly_set(q, b, ctx);
+                status |= gr_mpoly_divrem(q, r, r, q, ctx);
+                break;
+        }
 
         if (status == GR_SUCCESS)
         {
@@ -116,21 +134,6 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
             gr_ctx_println(cctx);
             fflush(stdout);
             flint_abort();
-        }
-
-        /* aliasing: q = a / b with output overwriting dividend */
-        status = gr_mpoly_set(t, a, ctx);
-        if (status == GR_SUCCESS)
-        {
-            int s2 = gr_mpoly_divrem(t, r, t, b, ctx);
-            if (s2 == GR_SUCCESS && gr_mpoly_divrem(q, r, a, b, ctx) == GR_SUCCESS &&
-                gr_mpoly_equal(t, q, ctx) == T_FALSE)
-            {
-                flint_printf("FAIL: divrem aliasing\n");
-                gr_ctx_println(cctx);
-                fflush(stdout);
-                flint_abort();
-            }
         }
 
         /* nonfield (euclidean) variant: a == q*b + r always */

@@ -402,9 +402,9 @@ Division
     satisfying `A = Q B + R` (or `A = \sum_i Q_i B_i + R` in the ideal case),
     except that if a nonexact coefficient division is encountered,
     instead of halting and returning ``GR_DOMAIN``,
-    we perform Euclidean division on the coefficients and accumulate the
-    remainder. As a consequence this produces a remainder which is in some
-    sense reduced, but where monomials in *R* may still be divisible (ignoring
+    we divide the coefficients with remainder and accumulate the
+    remainder. This produces a polynomial remainder which is partially
+    reduced, but where monomials in *R* may still be divisible (ignoring
     the coefficient) by the leading monomial of *B*.
 
 .. function:: int gr_mpoly_quasidivrem_heap(gr_ptr scale, gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)

@@ -35,7 +35,7 @@ TEST_FUNCTION_START(gr_mpoly_quasidivrem, state)
             default: gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1)); break;
         }
 
-        gr_mpoly_ctx_init_rand(ctx, state, cctx, 3);
+        gr_mpoly_ctx_init_rand(ctx, state, cctx, 12);
 
         gr_mpoly_init(a, ctx);
         gr_mpoly_init(b, ctx);
@@ -48,7 +48,7 @@ TEST_FUNCTION_START(gr_mpoly_quasidivrem, state)
 
         /* keep inputs small: over Z the scale grows like lc(B)^(#steps) */
         len = 1 + n_randint(state, 7);
-        ebits = 2 + n_randint(state, 5);
+        ebits = 2 + n_randint(state, 8);
 
         status = GR_SUCCESS;
         status |= gr_mpoly_randtest_bits(a, state, len, ebits, ctx);
@@ -59,7 +59,26 @@ TEST_FUNCTION_START(gr_mpoly_quasidivrem, state)
         if (status != GR_SUCCESS)
             goto next;
 
-        status = gr_mpoly_quasidivrem(scale, q, r, a, b, ctx);
+        /* field-like */
+        switch (n_randint(state, 4))
+        {
+            case 0:
+                status = gr_mpoly_quasidivrem(scale, q, r, a, b, ctx);
+                break;
+            case 1:
+                status = gr_mpoly_set(q, b, ctx);
+                status |= gr_mpoly_quasidivrem(scale, q, r, a, q, ctx);
+                break;
+            case 2:
+                status = gr_mpoly_set(r, a, ctx);
+                status |= gr_mpoly_quasidivrem(scale, q, r, r, b, ctx);
+                break;
+            default:
+                status = gr_mpoly_set(r, a, ctx);
+                status = gr_mpoly_set(q, b, ctx);
+                status |= gr_mpoly_quasidivrem(scale, q, r, r, q, ctx);
+                break;
+        }
 
         if (status == GR_SUCCESS)
         {
