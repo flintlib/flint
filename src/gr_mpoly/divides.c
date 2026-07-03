@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
 #include "mpoly.h"
 #include "gr_mpoly.h"
 
@@ -133,20 +134,17 @@ _gr_mpoly_divides_monomial(gr_mpoly_t Q,
     return status;
 }
 
-/*
-    TODO: dispatch to gr_mpoly_divides_heap_threaded (port of
-    fmpz_mpoly_divides_heap_threaded) for large A when the coefficient ring is
-    threadsafe; for now the serial Monagan-Pearce algorithm is used.
-*/
 int
 gr_mpoly_divides(gr_mpoly_t Q,
     const gr_mpoly_t A,
     const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
+
     if (B->length == 0)
     {
-        truth_t zero = gr_ctx_is_zero_ring(GR_MPOLY_CCTX(ctx));
+        truth_t zero = gr_ctx_is_zero_ring(cctx);
 
         if (zero == T_FALSE)
             return GR_DOMAIN;
@@ -165,8 +163,13 @@ gr_mpoly_divides(gr_mpoly_t Q,
 
     /* This method is used to overload gr_div, so it should be conservative
        when ctx is something weird. */
-    if (gr_ctx_is_integral_domain(GR_MPOLY_CCTX(ctx)) != T_TRUE)
+    if (gr_ctx_is_integral_domain(cctx) != T_TRUE)
         return GR_UNABLE;
+
+    if (A->length > 500 && B->length > 2 &&
+            gr_ctx_is_threadsafe(cctx) == T_TRUE &&
+            flint_get_num_available_threads() > 1)
+        return gr_mpoly_divides_heap_threaded(Q, A, B, ctx);
 
     return gr_mpoly_divides_heap(Q, A, B, ctx);
 }

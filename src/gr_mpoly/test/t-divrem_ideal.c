@@ -61,12 +61,16 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal, state)
 
         big = (n_randint(state, 4) == 0);
 
-        switch (n_randint(state, 4))
+        gr_ctx_t ctx1;
+        gr_ctx_init_nmod8(ctx1, n_randprime(state, 8, 1));
+
+        switch (n_randint(state, 5))
         {
             case 0: gr_ctx_init_fmpz(cctx); break;
             case 1: gr_ctx_init_fmpq(cctx); break;
             case 2: gr_ctx_init_random_finite_field(cctx, state); break;
-            default: gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1)); break;
+            case 3: gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1)); break;
+            default: gr_ctx_init_debug(cctx, ctx1, n_randint(state, 2), n_randint(state, 2) ? 0.0 : 0.001);
         }
 
         gr_mpoly_ctx_init_rand(ctx, state, cctx, big ? 3 : 10);
@@ -143,6 +147,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal, state)
 
         gr_mpoly_ctx_clear(ctx);
         gr_ctx_clear(cctx);
+        gr_ctx_clear(ctx1);
     }
 
     TEST_FUNCTION_END(state);

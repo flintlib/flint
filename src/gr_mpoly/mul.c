@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
 #include "gr_mpoly.h"
 
 int gr_mpoly_mul(gr_mpoly_t poly1,
@@ -36,7 +37,7 @@ int gr_mpoly_mul(gr_mpoly_t poly1,
             if (len2 * len2 > ctx->size_limit)
                 return GR_UNABLE | gr_mpoly_zero(poly1, ctx);
 
-            if (len2 > 100)
+            if (len2 > 100 && flint_get_num_available_threads() > 1)
                 return gr_mpoly_sqr_commutative_heap_threaded(poly1, poly2, ctx);
             else
                 return gr_mpoly_sqr_commutative_heap(poly1, poly2, ctx);
@@ -53,7 +54,7 @@ int gr_mpoly_mul(gr_mpoly_t poly1,
     if (len2 * len3 > ctx->size_limit)
         return GR_UNABLE | gr_mpoly_zero(poly1, ctx);
 
-    if (len2 * len3 > 10000 && len2 > 2 && len3 > 2)
+    if (len2 * len3 > 10000 && len2 > 2 && len3 > 2 && flint_get_num_available_threads() > 1)
         return gr_mpoly_mul_heap_threaded(poly1, poly2, poly3, ctx);
     else
         return gr_mpoly_mul_heap(poly1, poly2, poly3, ctx);

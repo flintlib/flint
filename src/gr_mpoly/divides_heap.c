@@ -327,7 +327,10 @@ cleanup:
 
 not_exact_division:
     *lenout = 0;
-    status = GR_DOMAIN;
+    /* preserve any GR_UNABLE accumulated while computing this term's acc:
+       if an earlier operation could not decide, this term's apparent
+       non-exactness may just be an artifact of that, not a genuine proof. */
+    status |= GR_DOMAIN;
     goto cleanup;
 
 unable:
@@ -628,7 +631,10 @@ cleanup:
 
 not_exact_division:
     *lenout = 0;
-    status = GR_DOMAIN;
+    /* preserve any GR_UNABLE accumulated while computing this term's acc:
+       if an earlier operation could not decide, this term's apparent
+       non-exactness may just be an artifact of that, not a genuine proof. */
+    status |= GR_DOMAIN;
     goto cleanup;
 
 unable:

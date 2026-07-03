@@ -364,6 +364,7 @@ Division
     If invertibility cannot be decided, returns ``GR_UNABLE``.
 
 .. function:: int gr_mpoly_divides_heap(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divides_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divides(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 
     Standard checked, exact division.
@@ -372,10 +373,17 @@ Division
     If divisibility cannot be decided, returns ``GR_UNABLE``.
 
     The *heap* version implements the Monagan-Pearce heap algorithm.
-    The default version currently only delegates to the heap algorithm
-    except for trivial special cases.
+    The *heap_threaded* version implements a multithreaded version of the
+    same algorithm, using multiple threads when the inputs are large
+    and the coefficient ring supports concurrent access
+    (see :func:`gr_ctx_is_threadsafe`); for small inputs or a
+    non-threadsafe coefficient ring it falls back on the single-threaded
+    *heap* algorithm.
+    The default version currently only delegates to the (possibly
+    multithreaded) heap algorithm except for trivial special cases.
 
 .. function:: int gr_mpoly_divrem_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 
     Standard multivariate division with remainder, typically used
@@ -389,9 +397,15 @@ Division
     succeeds in the execution of the division algorithm. If any non-exact
     division is encountered, returns ``GR_DOMAIN``.
 
-.. function:: int gr_mpoly_div(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+    The *heap_threaded* version is a multithreaded version of the *heap*
+    algorithm, used automatically by the default version for large,
+    threadsafe inputs, analogously to :func:`gr_mpoly_divides_heap_threaded`.
 
-    Like :func:`gr_mpoly_divrem`, but discarding the remainder.
+.. function:: int gr_mpoly_div(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_div_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+
+    Like :func:`gr_mpoly_divrem` and :func:`gr_mpoly_divrem_heap_threaded`
+    respectively, but discarding the remainder.
 
 .. function:: int gr_mpoly_divrem_ideal(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
 
@@ -401,13 +415,16 @@ Division
     any leading monomial in *B*.
 
 .. function:: int gr_mpoly_div_weak(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_div_weak_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem_weak(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_weak_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem_ideal_weak(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
 
-    Like the ``divrem`` functions, producing quotient and remainder
-    satisfying `A = Q B + R` (or `A = \sum_i Q_i B_i + R` in the ideal case),
-    except that if a nonexact coefficient division is encountered,
-    instead of halting and returning ``GR_DOMAIN``,
+    Like the ``divrem`` and ``div`` functions (respectively their
+    *heap_threaded* multithreaded versions), producing quotient and
+    remainder satisfying `A = Q B + R` (or `A = \sum_i Q_i B_i + R` in the
+    ideal case), except that if a nonexact coefficient division is
+    encountered, instead of halting and returning ``GR_DOMAIN``,
     we divide the coefficients with remainder and accumulate the
     remainder. This produces a polynomial remainder which is partially
     reduced, but where monomials in *R* may still be divisible (ignoring

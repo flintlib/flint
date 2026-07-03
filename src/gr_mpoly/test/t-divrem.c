@@ -26,6 +26,9 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
         int status, big;
         truth_t is_field;
 
+        gr_ctx_t ctx1;
+        gr_ctx_init_nmod8(ctx1, n_randprime(state, 8, 1));
+
         big = (n_randint(state, 4) == 0);
 
         if (big)
@@ -42,8 +45,10 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
             gr_ctx_init_fmpq(cctx);
         else if (n_randint(state, 2))
             gr_ctx_init_real_arb(cctx, 2 + n_randint(state, 200));
-        else
+        else if (n_randint(state, 2))
             gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1));
+        else
+            gr_ctx_init_debug(cctx, ctx1, n_randint(state, 2), n_randint(state, 2) ? 0.0 : 0.001);
 
         gr_mpoly_ctx_init_rand(ctx, state, cctx, 15);
         is_field = gr_mpoly_ctx_is_field(ctx);
@@ -188,6 +193,7 @@ next:
         gr_mpoly_clear(u, ctx);
         gr_mpoly_ctx_clear(ctx);
         gr_ctx_clear(cctx);
+        gr_ctx_clear(ctx1);
     }
 
     TEST_FUNCTION_END(state);

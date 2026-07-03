@@ -13,12 +13,14 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "mpoly.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 #include "gr_mpoly.h"
+#include "threaded_divmod.h"
 
 /*
     GR port of fmpz_mpoly_divrem_monagan_pearce.
@@ -670,7 +672,7 @@ cleanup:
 }
 
 
-static int _gr_mpoly_divrem_mp(
+int _gr_mpoly_divrem_mp(
     gr_mpoly_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_t B, int nonfield,
     gr_mpoly_ctx_t ctx)
@@ -827,12 +829,38 @@ int gr_mpoly_divrem_heap(
 }
 
 
+/*
+    Dispatch to the multithreaded engine (gr_mpoly/divrem_heap_threaded.c)
+    for large, thread-safe instances; the threshold mirrors gr_mpoly_divides.
+*/
+GR_MPOLY_INLINE int
+_gr_mpoly_divrem_dispatch(gr_mpoly_t Q, gr_mpoly_t R,
+    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield, gr_mpoly_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
+
+    if (A->length > 500 && B->length > 2 &&
+            gr_ctx_is_threadsafe(cctx) == T_TRUE &&
+            flint_get_num_available_threads() > 1)
+    {
+        if (R != NULL)
+            return nonfield ? gr_mpoly_divrem_weak_heap_threaded(Q, R, A, B, ctx)
+                             : gr_mpoly_divrem_heap_threaded(Q, R, A, B, ctx);
+        else
+            return nonfield ? gr_mpoly_div_weak_heap_threaded(Q, A, B, ctx)
+                             : gr_mpoly_div_heap_threaded(Q, A, B, ctx);
+    }
+
+    return _gr_mpoly_divrem_mp(Q, R, A, B, nonfield, ctx);
+}
+
+
 int gr_mpoly_divrem(
     gr_mpoly_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_mp(Q, R, A, B, 0, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, R, A, B, 0, ctx);
 }
 
 
@@ -841,7 +869,7 @@ int gr_mpoly_divrem_weak(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_mp(Q, R, A, B, 1, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, R, A, B, 1, ctx);
 }
 
 
@@ -851,7 +879,7 @@ int gr_mpoly_div(
     gr_mpoly_ctx_t ctx)
 {
     /* remainder-free: the kernel skips all remainder writes when R is NULL */
-    return _gr_mpoly_divrem_mp(Q, NULL, A, B, 0, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, NULL, A, B, 0, ctx);
 }
 
 
@@ -860,5 +888,6 @@ int gr_mpoly_div_weak(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_mp(Q, NULL, A, B, 1, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, NULL, A, B, 1, ctx);
 }
+

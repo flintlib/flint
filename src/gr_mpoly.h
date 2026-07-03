@@ -311,12 +311,19 @@ WARN_UNUSED_RESULT int gr_mpoly_sqr_commutative_heap_threaded(gr_mpoly_t poly1, 
 
 WARN_UNUSED_RESULT int gr_mpoly_divides(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_divides_heap(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divides_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_div(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mpoly_div_weak(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_div_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_divrem(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mpoly_divrem_weak(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_divrem_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mpoly_div_weak(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_div_weak_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_weak(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_weak_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mpoly_divrem_weak_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_divrem_ideal(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mpoly_divrem_ideal_weak(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx);
