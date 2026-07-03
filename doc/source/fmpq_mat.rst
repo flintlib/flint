@@ -165,8 +165,8 @@ Addition, scalar multiplication
     entries of ``rop``.
 
 .. function:: void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
-.. function:: void fmpq_mat_scalar_div_si(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
-.. function:: void fmpq_mat_scalar_div_ui(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
+.. function:: void fmpq_mat_scalar_div_si(fmpq_mat_t rop, const fmpq_mat_t op, slong x)
+.. function:: void fmpq_mat_scalar_div_ui(fmpq_mat_t rop, const fmpq_mat_t op, ulong x)
 
     Sets ``rop`` to ``op`` divided by the integer ``x`` of the respective type,
     assuming that the two matrices have the same dimensions
