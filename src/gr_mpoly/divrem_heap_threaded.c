@@ -94,12 +94,14 @@
     } while (0)
 
 /* exact-coefficient path: same as STRIPE_DIVIDES_COEFF in
-   divides_heap_threaded.c, duplicated here (a one-line macro) so that this
-   file has no compile-time dependency on that file's private macros. */
+   divides_heap_threaded.c, except for the extra "unchecked" branch used by
+   gr_mpoly_divexact_heap_threaded (S->unchecked implies S->nonfield == 0,
+   i.e. the two are mutually exclusive -- see the base struct comment). */
 #define STRIPE_DIVREM_QCOEFF(acc) \
     (lc_is_one  ? gr_set(GR_ENTRY(Qcoeff, Qlen, sz), acc, cctx) \
      : lc_is_unit ? gr_mul(GR_ENTRY(Qcoeff, Qlen, sz), acc, lc_inv, cctx) \
-                  : gr_div(GR_ENTRY(Qcoeff, Qlen, sz), acc, Bcoeff, cctx))
+     : S->unchecked ? gr_divexact(GR_ENTRY(Qcoeff, Qlen, sz), acc, Bcoeff, cctx) \
+                    : gr_div(GR_ENTRY(Qcoeff, Qlen, sz), acc, Bcoeff, cctx))
 
 /*
     Decide the fate of the accumulated coefficient acc at monomial exp:
@@ -732,7 +734,8 @@ cleanup:
 
 static int
 _gr_mpoly_divrem_serial(gr_mpoly_t Q, gr_mpoly_t R,
-    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield, gr_mpoly_ctx_t ctx)
+    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield, int unchecked,
+    gr_mpoly_ctx_t ctx)
 {
     /*
         Call the guaranteed-serial kernel directly, NOT the public
@@ -741,7 +744,7 @@ _gr_mpoly_divrem_serial(gr_mpoly_t Q, gr_mpoly_t R,
         recurse indefinitely whenever this function is reached as a
         fallback from within the threaded engine itself (A, B unchanged).
     */
-    return _gr_mpoly_divrem_mp(Q, R, A, B, nonfield, ctx);
+    return _gr_mpoly_divrem_mp(Q, R, A, B, nonfield, unchecked, ctx);
 }
 
 /*
@@ -758,6 +761,7 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
     const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx,
     int nonfield,
+    int unchecked,
     const thread_pool_handle * handles,
     slong num_handles)
 {
@@ -778,7 +782,7 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
     TMP_INIT;
 
     if (B->length < 2 || A->length < 2)
-        return _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, ctx);
+        return _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
 
     TMP_START;
 
@@ -835,7 +839,7 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
     if (mpoly_divides_select_exps(S, zctx, num_handles,
                                    Aexp, A->length, Bexp, B->length, exp_bits))
     {
-        status = _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, ctx);
+        status = _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
         goto cleanup1;
     }
 
@@ -866,6 +870,7 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
     H->require_exact = 0;
     H->want_remainder = (R != NULL);
     H->nonfield = nonfield;
+    H->unchecked = unchecked;
     H->failed = 0;
     H->have_domain = 0;
     H->have_unable = 0;
@@ -960,7 +965,8 @@ static int _gr_mpoly_divrem_heap_threaded_dispatch(
     const gr_mpoly_t A,
     const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx,
-    int nonfield)
+    int nonfield,
+    int unchecked)
 {
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     thread_pool_handle * handles;
@@ -985,14 +991,14 @@ static int _gr_mpoly_divrem_heap_threaded_dispatch(
     /* fall back to the single-threaded algorithm for small inputs, or when
        the coefficient ring does not allow concurrent operations */
     if (B->length < 2 || A->length < 2 || gr_ctx_is_threadsafe(cctx) != T_TRUE)
-        return _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, ctx);
+        return _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
 
     thread_limit = A->length/32;
 
     num_handles = flint_request_threads(&handles, thread_limit);
 
     status = _gr_mpoly_divrem_heap_threaded_pool(Q, R, A, B, ctx,
-                                                nonfield, handles, num_handles);
+                                    nonfield, unchecked, handles, num_handles);
 
     flint_give_back_threads(handles, num_handles);
 
@@ -1005,7 +1011,7 @@ int gr_mpoly_divrem_heap_threaded(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, R, A, B, ctx, 0);
+    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, R, A, B, ctx, 0, 0);
 }
 
 
@@ -1014,7 +1020,7 @@ int gr_mpoly_divrem_weak_heap_threaded(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, R, A, B, ctx, 1);
+    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, R, A, B, ctx, 1, 0);
 }
 
 
@@ -1023,7 +1029,7 @@ int gr_mpoly_div_heap_threaded(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, NULL, A, B, ctx, 0);
+    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, NULL, A, B, ctx, 0, 0);
 }
 
 
@@ -1032,5 +1038,14 @@ int gr_mpoly_div_weak_heap_threaded(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, NULL, A, B, ctx, 1);
+    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, NULL, A, B, ctx, 1, 0);
+}
+
+
+int gr_mpoly_divexact_heap_threaded(
+    gr_mpoly_t Q,
+    const gr_mpoly_t A, const gr_mpoly_t B,
+    gr_mpoly_ctx_t ctx)
+{
+    return _gr_mpoly_divrem_heap_threaded_dispatch(Q, NULL, A, B, ctx, 0, 1);
 }

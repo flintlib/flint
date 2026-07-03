@@ -12,10 +12,12 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "thread_support.h"
 #include "mpoly.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 #include "gr_mpoly.h"
+#include "threaded_divmod.h"
 
 /*
     GR port of fmpz_mpoly_divrem_ideal_monagan_pearce.
@@ -783,7 +785,16 @@ cleanup:
 }
 
 
-static int _gr_mpoly_divrem_ideal(
+/*
+    The guaranteed-serial divrem_ideal kernel (never dispatches to
+    threading). External linkage so that divrem_ideal_heap_threaded.c can
+    call it directly as a fallback -- calling the *public*
+    gr_mpoly_divrem_ideal/_weak functions instead would be wrong, since
+    those may route large instances straight back into the threaded
+    engine, risking infinite recursion (see the analogous fix for
+    gr_mpoly_div/gr_mpoly_divrem in divrem_heap_threaded.c).
+*/
+int _gr_mpoly_divrem_ideal(
     gr_mpoly_struct ** Q, gr_mpoly_t R,
     const gr_mpoly_t A, gr_mpoly_struct * const * B, slong len,
     int nonfield, gr_mpoly_ctx_t ctx)
@@ -978,12 +989,33 @@ _gr_mpoly_divrem_ideal_vec(gr_mpoly_vec_t Q, gr_mpoly_t R,
     return status;
 }
 
+/*
+    Dispatch to the multithreaded engine (gr_mpoly/divrem_ideal_heap_threaded.c)
+    for large, thread-safe instances, mirroring gr_mpoly_divrem.
+*/
+GR_MPOLY_INLINE int
+_gr_mpoly_divrem_ideal_dispatch(gr_mpoly_vec_t Q, gr_mpoly_t R,
+    const gr_mpoly_t A, const gr_mpoly_vec_t B, int nonfield, gr_mpoly_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
+
+    if (B->length > 0 && A->length > 500 && B->entries[0].length > 2 &&
+            gr_ctx_is_threadsafe(cctx) == T_TRUE &&
+            flint_get_num_available_threads() > 1)
+    {
+        return nonfield ? gr_mpoly_divrem_ideal_weak_heap_threaded(Q, R, A, B, ctx)
+                         : gr_mpoly_divrem_ideal_heap_threaded(Q, R, A, B, ctx);
+    }
+
+    return _gr_mpoly_divrem_ideal_vec(Q, R, A, B, nonfield, ctx);
+}
+
 int gr_mpoly_divrem_ideal(
     gr_mpoly_vec_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_vec_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_ideal_vec(Q, R, A, B, 0, ctx);
+    return _gr_mpoly_divrem_ideal_dispatch(Q, R, A, B, 0, ctx);
 }
 
 int gr_mpoly_divrem_ideal_weak(
@@ -991,5 +1023,5 @@ int gr_mpoly_divrem_ideal_weak(
     const gr_mpoly_t A, const gr_mpoly_vec_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_ideal_vec(Q, R, A, B, 1, ctx);
+    return _gr_mpoly_divrem_ideal_dispatch(Q, R, A, B, 1, ctx);
 }

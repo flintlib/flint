@@ -382,6 +382,12 @@ Division
     The default version currently only delegates to the (possibly
     multithreaded) heap algorithm except for trivial special cases.
 
+.. function:: int gr_mpoly_divexact(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divexact_heap_threaded(gr_mpoly_t Q, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
+
+    Compute `Q = A / B`, assuming (without checking) that *B* divides *A*
+    exactly.
+
 .. function:: int gr_mpoly_divrem_heap(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
@@ -408,6 +414,7 @@ Division
     respectively, but discarding the remainder.
 
 .. function:: int gr_mpoly_divrem_ideal(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_ideal_heap_threaded(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
 
     Like :func:`gr_mpoly_divrem`, but takes a vector *B* of divisor polynomials
     and outputs a vector *Q* of quotient polynomials such that
@@ -419,6 +426,7 @@ Division
               int gr_mpoly_divrem_weak(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem_weak_heap_threaded(gr_mpoly_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
               int gr_mpoly_divrem_ideal_weak(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
+              int gr_mpoly_divrem_ideal_weak_heap_threaded(gr_mpoly_vec_t Q, gr_mpoly_t R, const gr_mpoly_t A, const gr_mpoly_vec_t B, gr_mpoly_ctx_t ctx)
 
     Like the ``divrem`` and ``div`` functions (respectively their
     *heap_threaded* multithreaded versions), producing quotient and

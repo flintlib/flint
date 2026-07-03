@@ -1855,6 +1855,7 @@ void worker_loop(void * varg)
     S->lc_is_unit = H->lc_is_unit;
     S->lc_inv = H->lc_inv;
     S->nonfield = H->nonfield;
+    S->unchecked = H->unchecked;
     S->big_mem_alloc = 0;
     S->big_mem = NULL;
 
@@ -2046,6 +2047,7 @@ static int _gr_mpoly_divides_heap_threaded_pool(
     H->require_exact = 1;
     H->want_remainder = 0;
     H->nonfield = 0;
+    H->unchecked = 0;
     H->failed = 0;
     H->have_domain = 0;
     H->have_unable = 0;

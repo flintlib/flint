@@ -165,7 +165,14 @@ typedef divides_heap_chunk_struct divides_heap_chunk_t[1];
                                 _heap_threaded).  nonfield selects exact
                                 (gr_div) vs Euclidean (gr_euclidean_divrem)
                                 coefficient handling, exactly like the
-                                serial gr_mpoly_divrem_heap kernel.
+                                serial gr_mpoly_divrem_heap kernel.  unchecked
+                                (only meaningful when nonfield == 0) instead
+                                selects gr_divexact for a non-unit lc(B),
+                                i.e. gr_mpoly_divexact_heap_threaded; leftover
+                                terms are always discarded in that case
+                                (want_remainder == 0), matching the fact that
+                                gr_mpoly_divexact has no remainder-producing
+                                counterpart.
 */
 typedef struct
 {
@@ -191,6 +198,9 @@ typedef struct
     int require_exact;   /* 1: gr_mpoly_divides semantics; 0: div/divrem */
     int want_remainder;  /* 0: gr_mpoly_div(_weak); 1: gr_mpoly_divrem(_weak) */
     int nonfield;         /* 1: Euclidean ("weak") per-term coefficient divrem */
+    int unchecked;        /* 1: gr_mpoly_divexact -- gr_divexact instead of
+                              gr_div for a non-unit lc(B); mutually exclusive
+                              with nonfield (both require_exact == 0) */
     volatile int failed;      /* stop: either not exact, or arithmetic unable */
     volatile int have_domain; /* division is provably not exact (require_exact only) */
     volatile int have_unable; /* some ring operation returned GR_UNABLE */
@@ -243,6 +253,8 @@ typedef struct
     int lc_is_one;
     int lc_is_unit;
     gr_srcptr lc_inv;
+    int unchecked;  /* only consulted by the divrem-family stripe leaves,
+                       and only meaningful together with nonfield == 0 */
     int nonfield;   /* only consulted by the divrem-family stripe leaves */
 } _gr_mpoly_stripe_struct;
 
@@ -325,7 +337,17 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length);
 */
 int _gr_mpoly_divrem_mp(
     gr_mpoly_t Q, gr_mpoly_t R,
-    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield,
+    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield, int unchecked,
     gr_mpoly_ctx_t ctx);
+
+/*
+    The guaranteed-serial divrem_ideal kernel, defined in divrem_ideal.c.
+    Declared here so that divrem_ideal_heap_threaded.c can fall back to it
+    directly, for the same reason _gr_mpoly_divrem_mp is exposed above.
+*/
+int _gr_mpoly_divrem_ideal(
+    gr_mpoly_struct ** Q, gr_mpoly_t R,
+    const gr_mpoly_t A, gr_mpoly_struct * const * B, slong len,
+    int nonfield, gr_mpoly_ctx_t ctx);
 
 #endif
