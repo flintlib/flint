@@ -578,18 +578,19 @@ slong _gr_mpoly_mulsub_stripe1(
             }
         }
 
-        switch (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx))
-        {
-            case T_TRUE:
-                break;
-            case T_FALSE:
-                Alen++;
-                break;
-            default:
-                status |= GR_UNABLE;
-                Alen++;
-                break;
-        }
+        /* an unknown zero-status is kept as a (possibly redundant) term
+           rather than causing an abort -- this mirrors the "acc" checks
+           fixed for divrem/divexact (see the discussion at
+           gr_mpoly_divexact), and is unconditionally safe here regardless
+           of that discussion's open questions for gr_mpoly_divides itself:
+           mulsub_stripe never makes any exactness determination, it only
+           chooses a (possibly non-maximally-reduced) representation of the
+           difference D - stripe(B*C). This was already keeping the term in
+           the "unknown" case; the only change is to stop also tainting the
+           overall status with GR_UNABLE merely for being unable to prove
+           it away. */
+        if (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx) != T_TRUE)
+            Alen++;
     }
 
     FLINT_ASSERT(Di <= Dlen);
@@ -859,18 +860,19 @@ slong _gr_mpoly_mulsub_stripe(
             }
         }
 
-        switch (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx))
-        {
-            case T_TRUE:
-                break;
-            case T_FALSE:
-                Alen++;
-                break;
-            default:
-                status |= GR_UNABLE;
-                Alen++;
-                break;
-        }
+        /* an unknown zero-status is kept as a (possibly redundant) term
+           rather than causing an abort -- this mirrors the "acc" checks
+           fixed for divrem/divexact (see the discussion at
+           gr_mpoly_divexact), and is unconditionally safe here regardless
+           of that discussion's open questions for gr_mpoly_divides itself:
+           mulsub_stripe never makes any exactness determination, it only
+           chooses a (possibly non-maximally-reduced) representation of the
+           difference D - stripe(B*C). This was already keeping the term in
+           the "unknown" case; the only change is to stop also tainting the
+           overall status with GR_UNABLE merely for being unable to prove
+           it away. */
+        if (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx) != T_TRUE)
+            Alen++;
     }
 
     FLINT_ASSERT(Di <= Dlen);

@@ -123,12 +123,11 @@
     { \
         cstatus = gr_euclidean_divrem(GR_ENTRY(Qcoeff, Qlen, sz), rem, acc, Bcoeff, cctx); \
         if (cstatus != GR_SUCCESS) { status |= cstatus; goto unable; } \
-        switch (gr_is_zero(rem, cctx)) \
-        { \
-            case T_TRUE: break; \
-            case T_FALSE: ADD_W_TERM(rem); break; \
-            default: status |= GR_UNABLE; goto unable; \
-        } \
+        /* an unknown zero-status is treated as "not zero" (i.e. kept in \
+           W): we only need the euclidean division itself to succeed, not \
+           to know for certain whether its remainder happens to vanish. */ \
+        if (gr_is_zero(rem, cctx) != T_TRUE) \
+            ADD_W_TERM(rem); \
         commit = (gr_is_zero(GR_ENTRY(Qcoeff, Qlen, sz), cctx) != T_TRUE); \
     } \
     else \
@@ -376,16 +375,12 @@ slong _gr_mpoly_divrem_stripe1(
             }
         }
 
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto unable;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         commit = 0;
         STRIPE_DIVREM_COEFF_STEP(STRIPE_ADD_W_TERM1);
@@ -671,16 +666,12 @@ slong _gr_mpoly_divrem_stripe(
             }
         }
 
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto unable;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         commit = 0;
         STRIPE_DIVREM_COEFF_STEP(STRIPE_ADD_W_TERMN);

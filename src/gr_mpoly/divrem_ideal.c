@@ -12,7 +12,6 @@
 
 #include <stdint.h>
 #include <string.h>
-#include "thread_support.h"
 #include "mpoly.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
@@ -292,16 +291,12 @@ static int _gr_mpoly_divrem_ideal_mp1(
             }
         }
 
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto cleanup;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         /* try to reduce the term acc*x^exp by the divisors in order */
         {
@@ -657,16 +652,12 @@ static int _gr_mpoly_divrem_ideal_mp(
         }
 
         /* if the accumulated coefficient is zero, the term vanishes */
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto cleanup;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         /* try to reduce the term acc*x^exp by the divisors in order */
         {

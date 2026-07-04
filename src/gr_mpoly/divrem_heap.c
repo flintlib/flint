@@ -126,12 +126,11 @@
     { \
         cstatus = gr_euclidean_divrem(GR_ENTRY(q_coeff, q_len, sz), rem, acc, coeff3, cctx); \
         if (cstatus != GR_SUCCESS) { status |= cstatus; goto cleanup; } \
-        switch (gr_is_zero(rem, cctx)) \
-        { \
-            case T_TRUE: break; \
-            case T_FALSE: ADD_R_TERM(rem); break; \
-            default: status |= GR_UNABLE; goto cleanup; \
-        } \
+        /* an unknown zero-status is treated as "not zero" (i.e. kept in \
+           R): we only need the euclidean division itself to succeed, not \
+           to know for certain whether its remainder happens to vanish. */ \
+        if (gr_is_zero(rem, cctx) != T_TRUE) \
+            ADD_R_TERM(rem); \
         commit = (gr_is_zero(GR_ENTRY(q_coeff, q_len, sz), cctx) != T_TRUE); \
     } \
     else \
@@ -321,16 +320,12 @@ static int _gr_mpoly_divrem_heap1(
         }
 
         /* if accumulated coefficient is zero, this term vanishes */
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto cleanup;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         commit = 0;
         DIVREM_COEFF_STEP(ADD_R_TERM1);
@@ -606,16 +601,12 @@ static int _gr_mpoly_divrem_heap(
             }
         }
 
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto cleanup;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         commit = 0;
         DIVREM_COEFF_STEP(ADD_R_TERMN);
@@ -853,7 +844,8 @@ _gr_mpoly_divrem_dispatch(gr_mpoly_t Q, gr_mpoly_t R,
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
 
     if (A->length > 500 && B->length > 2 &&
-            gr_ctx_is_threadsafe(cctx) == T_TRUE)
+            gr_ctx_is_threadsafe(cctx) == T_TRUE &&
+            flint_get_num_available_threads() > 1)
     {
         if (R != NULL)
             return nonfield ? gr_mpoly_divrem_weak_heap_threaded(Q, R, A, B, ctx)

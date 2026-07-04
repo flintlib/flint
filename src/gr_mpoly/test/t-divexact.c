@@ -245,5 +245,118 @@ TEST_FUNCTION_START(gr_mpoly_divexact, state)
         gr_ctx_clear(R);
     }
 
+    /*
+        Regression test: an "unknown" gr_is_zero verdict on the running
+        accumulator, while reducing a term whose monomial *does* divide
+        that of the (non-monomial) divisor, must not abort gr_mpoly_divexact
+        or gr_mpoly_divrem with GR_UNABLE. We only need the coefficient
+        division itself to succeed; an accumulator that cannot be proven
+        zero is simply kept as a (possibly redundant, wide) term instead
+        of being dropped, exactly like gr_poly_divrem already does for
+        univariate polynomials.
+
+        Concretely: a = y, b = (1/3)*x + 1, c = a*b = (1/3)*x*y + y.
+        Dividing c by b (whose leading coefficient 1/3 is a unit but not
+        exactly representable) is expected to succeed with quotient y,
+        even though intermediate arb accumulators along the way straddle
+        zero without being provably zero.
+    */
+    {
+        gr_ctx_t R;
+        gr_mpoly_ctx_t Rx;
+        gr_mpoly_t a, b, c, q, q2, r2;
+        int status;
+
+        gr_ctx_init_real_arb(R, 64);
+        gr_mpoly_ctx_init(Rx, R, 2, ORD_LEX);
+
+        {
+            const char * ss[] = {"x", "y"};
+            GR_MUST_SUCCEED(gr_ctx_set_gen_names(Rx, ss));
+        }
+
+        gr_mpoly_init(a, Rx);
+        gr_mpoly_init(b, Rx);
+        gr_mpoly_init(c, Rx);
+        gr_mpoly_init(q, Rx);
+        gr_mpoly_init(q2, Rx);
+        gr_mpoly_init(r2, Rx);
+
+        status = GR_SUCCESS;
+        status |= gr_mpoly_gen(a, 1, Rx);                    /* a = y */
+        status |= gr_set_str(b, "(1/3)*x + 1", Rx);          /* b = (1/3)x + 1 */
+        status |= gr_mpoly_mul(c, a, b, Rx);                 /* c = a*b */
+
+        if (status != GR_SUCCESS)
+        {
+            flint_printf("FAIL: unexpected failure setting up divexact/arb test\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        status = gr_mpoly_divexact(q, c, b, Rx);
+        if (status != GR_SUCCESS)
+        {
+            flint_printf("FAIL: gr_mpoly_divexact(a*b, b) over arb returned "
+                         "%d (expected GR_SUCCESS)\n", status);
+            fflush(stdout);
+            flint_abort();
+        }
+        if (gr_mpoly_equal(q, a, Rx) == T_FALSE)
+        {
+            flint_printf("FAIL: gr_mpoly_divexact(a*b, b) over arb gave a "
+                         "quotient inconsistent with a = y: ");
+            gr_mpoly_print_pretty(q, Rx);
+            flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        status = gr_mpoly_divrem(q2, r2, c, b, Rx);
+        if (status != GR_SUCCESS)
+        {
+            flint_printf("FAIL: gr_mpoly_divrem(a*b, b) over arb returned "
+                         "%d (expected GR_SUCCESS)\n", status);
+            fflush(stdout);
+            flint_abort();
+        }
+        if (gr_mpoly_equal(q2, a, Rx) == T_FALSE)
+        {
+            flint_printf("FAIL: gr_mpoly_divrem(a*b, b) over arb gave a "
+                         "quotient inconsistent with a = y: ");
+            gr_mpoly_print_pretty(q2, Rx);
+            flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        /* by contrast, gr_mpoly_divides is allowed (expected) to report
+           GR_UNABLE here, since exactness genuinely cannot be certified
+           over an inexact ring; this is a deliberate difference in
+           semantics from gr_mpoly_div(exact)/gr_mpoly_divrem, not a bug */
+        {
+            gr_mpoly_t qd;
+            gr_mpoly_init(qd, Rx);
+            status = gr_mpoly_divides(qd, c, b, Rx);
+            if (status == GR_DOMAIN)
+            {
+                flint_printf("FAIL: gr_mpoly_divides(a*b, b) over arb "
+                             "incorrectly reported GR_DOMAIN\n");
+                fflush(stdout);
+                flint_abort();
+            }
+            gr_mpoly_clear(qd, Rx);
+        }
+
+        gr_mpoly_clear(a, Rx);
+        gr_mpoly_clear(b, Rx);
+        gr_mpoly_clear(c, Rx);
+        gr_mpoly_clear(q, Rx);
+        gr_mpoly_clear(q2, Rx);
+        gr_mpoly_clear(r2, Rx);
+        gr_mpoly_ctx_clear(Rx);
+        gr_ctx_clear(R);
+    }
+
     TEST_FUNCTION_END(state);
 }
