@@ -215,12 +215,11 @@ void gr_mpoly_ts_append(gr_mpoly_ts_t A,
 
         for (i = 0; i < oldlength; i++)
         {
-            /* NOTE: this must be a copy, not a swap/move: other threads may
-               still be concurrently reading through a stale pointer to the
-               old array (we deliberately never free it -- see below), so we
-               must not disturb its contents. This mirrors the plain word
-               copy used for this step by fmpz_mpoly_ts_append. */
-            GR_IGNORE(gr_set(GR_ENTRY(newcoeffs, i, sz), GR_ENTRY(oldcoeffs, i, sz), cctx));
+            /* NOTE: fmpz_mpoly_ts_append uses a shallow set here.
+               This should be possible in the GR setting too but would
+               require some care regarding how we free/clear
+               the coefficients. */
+            GR_MUST_SUCCEED(gr_set(GR_ENTRY(newcoeffs, i, sz), GR_ENTRY(oldcoeffs, i, sz), cctx));
             mpoly_monomial_set(newexps + N*i, oldexps + N*i, N);
         }
         for (i = 0; i < Blen; i++)
@@ -860,17 +859,8 @@ slong _gr_mpoly_mulsub_stripe(
             }
         }
 
-        /* an unknown zero-status is kept as a (possibly redundant) term
-           rather than causing an abort -- this mirrors the "acc" checks
-           fixed for divrem/divexact (see the discussion at
-           gr_mpoly_divexact), and is unconditionally safe here regardless
-           of that discussion's open questions for gr_mpoly_divides itself:
-           mulsub_stripe never makes any exactness determination, it only
-           chooses a (possibly non-maximally-reduced) representation of the
-           difference D - stripe(B*C). This was already keeping the term in
-           the "unknown" case; the only change is to stop also tainting the
-           overall status with GR_UNABLE merely for being unable to prove
-           it away. */
+        /* Note: the zero status of this coefficient does not affect divisibility
+           testing at this point. */
         if (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx) != T_TRUE)
             Alen++;
     }

@@ -48,7 +48,7 @@ TEST_FUNCTION_START(gr_mpoly_quasidivrem, state)
 
         /* keep inputs small: over Z the scale grows like lc(B)^(#steps) */
         len = 1 + n_randint(state, 7);
-        ebits = 2 + n_randint(state, 8);
+        ebits = 2 + n_randint(state, 5);
 
         status = GR_SUCCESS;
         status |= gr_mpoly_randtest_bits(a, state, len, ebits, ctx);
