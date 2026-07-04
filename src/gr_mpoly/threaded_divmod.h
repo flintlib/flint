@@ -204,6 +204,22 @@ typedef struct
     volatile int failed;      /* stop: either not exact, or arithmetic unable */
     volatile int have_domain; /* division is provably not exact (require_exact only) */
     volatile int have_unable; /* some ring operation returned GR_UNABLE */
+    volatile int overflowed;  /* an internal exponent computation overflowed
+                                  the current bit width (see the comment on
+                                  _gr_mpoly_mulsub_stripe1 above): the whole
+                                  computation must be redone at a wider bit
+                                  width, it cannot be salvaged in place.
+                                  Setting this also sets failed, to stop all
+                                  workers immediately, exactly like
+                                  have_domain/have_unable. Whether this is
+                                  acted on (retried) or just folded into an
+                                  UNABLE verdict depends on the caller: the
+                                  require_exact (gr_mpoly_divides) pool
+                                  function does the latter (unchanged
+                                  behaviour, now merely made safe rather than
+                                  silently undetected -- see the long comment
+                                  at _gr_mpoly_mulsub_stripe1), while the
+                                  divrem/divrem_ideal pool functions retry. */
 } divides_heap_base_struct;
 
 typedef divides_heap_base_struct divides_heap_base_t[1];
@@ -264,20 +280,30 @@ void stripe_fit_length(_gr_mpoly_stripe_struct * S, slong new_len);
 
 /* A = D - (a stripe of B * C); see the long comment at its definition in
    divides_heap_threaded.c. Shared verbatim: has no notion of "divides" vs
-   "divrem", it just forms a difference of products. */
+   "divrem", it just forms a difference of products.
+
+   *overflowed is set to 1 (and *res_status/the returned length should be
+   ignored -- they are not meaningful) if an exponent computed internally
+   (e.g. as a sum of a term of B and a term of C) does not fit in the
+   current bit width. This can happen even when every term of D, B and C
+   individually fits, since two individually-valid packed exponents can
+   overflow a shared field when added; the caller must repack to a wider
+   bit width and redo the whole computation -- there is no way to recover
+   in place. See the retry loops in gr_mpoly_divrem_heap_threaded /
+   gr_mpoly_divrem_ideal_heap_threaded. */
 slong _gr_mpoly_mulsub_stripe1(
     gr_ptr * A_coeff, ulong ** A_exp, slong * A_alloc, slong * A_exps_alloc,
     gr_srcptr Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
     gr_srcptr Ccoeff, const ulong * Cexp, slong Clen,
-    const _gr_mpoly_stripe_t S, int * res_status);
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed);
 
 slong _gr_mpoly_mulsub_stripe(
     gr_ptr * A_coeff, ulong ** A_exp, slong * A_alloc, slong * A_exps_alloc,
     gr_srcptr Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
     gr_srcptr Ccoeff, const ulong * Cexp, slong Clen,
-    const _gr_mpoly_stripe_t S, int * res_status);
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed);
 
 /*
     Bounded ("stripe") division-with-remainder leaves, defined in
@@ -287,6 +313,10 @@ slong _gr_mpoly_mulsub_stripe(
     (Wcoeff/Wexp/Wlen) instead. *res_status only ever reports GR_SUCCESS or
     GR_UNABLE (never GR_DOMAIN -- that concept does not apply once
     require_exact == 0).
+
+    *overflowed has the same meaning as for _gr_mpoly_mulsub_stripe1 above:
+    an internal exponent computation overflowed the current bit width, and
+    *res_status / the returned Qlen / *Wlen_out are not meaningful.
 */
 slong _gr_mpoly_divrem_stripe1(
     gr_ptr * Q_coeff, ulong ** Q_exp, slong * Q_alloc, slong * Q_exps_alloc,
@@ -294,7 +324,7 @@ slong _gr_mpoly_divrem_stripe1(
     slong * Wlen_out,
     gr_srcptr Acoeff, const ulong * Aexp, slong Alen,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
-    const _gr_mpoly_stripe_t S, int * res_status);
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed);
 
 slong _gr_mpoly_divrem_stripe(
     gr_ptr * Q_coeff, ulong ** Q_exp, slong * Q_alloc, slong * Q_exps_alloc,
@@ -302,7 +332,7 @@ slong _gr_mpoly_divrem_stripe(
     slong * Wlen_out,
     gr_srcptr Acoeff, const ulong * Aexp, slong Alen,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
-    const _gr_mpoly_stripe_t S, int * res_status);
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed);
 
 /*
     The worker struct has the stripe scratch memory and three polys for

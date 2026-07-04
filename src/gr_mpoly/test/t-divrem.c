@@ -141,6 +141,16 @@ TEST_FUNCTION_START(gr_mpoly_divrem, state)
             flint_abort();
         }
 
+        if (cctx->which_ring != GR_CTX_DEBUG &&
+            status != GR_SUCCESS &&
+            gr_is_invertible(b->coeffs, cctx) == T_TRUE)
+        {
+            flint_printf("FAIL: division unable although lc(g) is invertible\n");
+            gr_ctx_println(ctx);
+            fflush(stdout);
+            flint_abort();
+        }
+
         /* nonfield (euclidean) variant: a == q*b + r always */
         status = gr_mpoly_divrem_weak(q, r, a, b, ctx);
         if (status == GR_SUCCESS)

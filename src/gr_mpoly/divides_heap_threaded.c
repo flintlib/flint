@@ -217,7 +217,7 @@ void gr_mpoly_ts_append(gr_mpoly_ts_t A,
         {
             /* NOTE: fmpz_mpoly_ts_append uses a shallow set here.
                This should be possible in the GR setting too but would
-               require some care regarding how we free/clear
+               require some care regarding how we init/clear
                the coefficients. */
             GR_MUST_SUCCEED(gr_set(GR_ENTRY(newcoeffs, i, sz), GR_ENTRY(oldcoeffs, i, sz), cctx));
             mpoly_monomial_set(newexps + N*i, oldexps + N*i, N);
@@ -289,7 +289,7 @@ int divides_heap_base_clear(gr_mpoly_t Q, gr_mpoly_t R, divides_heap_base_t H)
 
     if (H->have_domain)
         status = GR_DOMAIN;
-    else if (H->have_unable)
+    else if (H->have_unable || H->overflowed)
         status = GR_UNABLE;
     else
         status = GR_SUCCESS;
@@ -361,7 +361,7 @@ slong _gr_mpoly_mulsub_stripe1(
     gr_srcptr Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
     gr_srcptr Ccoeff, const ulong * Cexp, slong Clen,
-    const _gr_mpoly_stripe_t S, int * res_status)
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed)
 {
     gr_mpoly_ctx_struct * ctx = S->ctx;
     gr_ctx_struct * cctx = S->cctx;
@@ -371,6 +371,7 @@ slong _gr_mpoly_mulsub_stripe1(
     slong startidx, endidx;
     ulong prev_startidx;
     ulong maskhi = S->cmpmask[0];
+    ulong mask = mpoly_overflow_mask_sp(S->bits);
     ulong emax, emin;
     slong i, j;
     slong next_loc = Blen + 4;
@@ -392,6 +393,8 @@ slong _gr_mpoly_mulsub_stripe1(
     gr_ptr pp, dot_a, dot_b;
     slong dot_len;
     int status = GR_SUCCESS;
+
+    *overflowed = 0;
 
     FLINT_ASSERT(S->N == 1);
 
@@ -474,6 +477,12 @@ slong _gr_mpoly_mulsub_stripe1(
     while (heap_len > 1)
     {
         exp = heap[1].exp;
+
+        if (mpoly_monomial_overflows1(exp, mask))
+        {
+            *overflowed = 1;
+            goto cleanup;
+        }
 
         while (Di < Dlen && mpoly_monomial_gt1(Dexp[Di], exp, maskhi))
         {
@@ -577,17 +586,8 @@ slong _gr_mpoly_mulsub_stripe1(
             }
         }
 
-        /* an unknown zero-status is kept as a (possibly redundant) term
-           rather than causing an abort -- this mirrors the "acc" checks
-           fixed for divrem/divexact (see the discussion at
-           gr_mpoly_divexact), and is unconditionally safe here regardless
-           of that discussion's open questions for gr_mpoly_divides itself:
-           mulsub_stripe never makes any exactness determination, it only
-           chooses a (possibly non-maximally-reduced) representation of the
-           difference D - stripe(B*C). This was already keeping the term in
-           the "unknown" case; the only change is to stop also tainting the
-           overall status with GR_UNABLE merely for being unable to prove
-           it away. */
+        /* Note: the zero status of this coefficient does not affect divisibility
+           testing at this point. */
         if (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx) != T_TRUE)
             Alen++;
     }
@@ -600,6 +600,8 @@ slong _gr_mpoly_mulsub_stripe1(
         _gr_vec_swap(GR_ENTRY(Acoeff, Alen, sz), (gr_ptr) GR_ENTRY(Dcoeff, Di, sz), Dlen - Di, cctx);
     mpoly_copy_monomials(Aexp + Alen, Dexp + Di, Dlen - Di, 1);
     Alen += Dlen - Di;
+
+cleanup:
 
     GR_TMP_CLEAR(pp, cctx);
     flint_free(dot_a);
@@ -619,7 +621,7 @@ slong _gr_mpoly_mulsub_stripe(
     gr_srcptr Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
     gr_srcptr Ccoeff, const ulong * Cexp, slong Clen,
-    const _gr_mpoly_stripe_t S, int * res_status)
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed)
 {
     gr_mpoly_ctx_struct * ctx = S->ctx;
     gr_ctx_struct * cctx = S->cctx;
@@ -631,6 +633,8 @@ slong _gr_mpoly_mulsub_stripe(
     ulong * emax = S->emax;
     ulong * emin = S->emin;
     slong N = S->N;
+    flint_bitcnt_t bits = S->bits;
+    ulong mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
     slong i, j;
     slong next_loc = Blen + 4;
     slong heap_len = 1;
@@ -653,6 +657,8 @@ slong _gr_mpoly_mulsub_stripe(
     gr_ptr pp, dot_a, dot_b;
     slong dot_len;
     int status = GR_SUCCESS;
+
+    *overflowed = 0;
 
     i = 0;
     hind = (slong *)(S->big_mem + i);
@@ -746,6 +752,14 @@ slong _gr_mpoly_mulsub_stripe(
     while (heap_len > 1)
     {
         exp = heap[1].exp;
+
+        if (bits <= FLINT_BITS
+                ? mpoly_monomial_overflows(exp, N, mask)
+                : mpoly_monomial_overflows_mp(exp, N, bits))
+        {
+            *overflowed = 1;
+            goto cleanup;
+        }
 
         while (Di < Dlen && mpoly_monomial_gt(Dexp + N*Di, exp, N, S->cmpmask))
         {
@@ -859,8 +873,17 @@ slong _gr_mpoly_mulsub_stripe(
             }
         }
 
-        /* Note: the zero status of this coefficient does not affect divisibility
-           testing at this point. */
+        /* an unknown zero-status is kept as a (possibly redundant) term
+           rather than causing an abort -- this mirrors the "acc" checks
+           fixed for divrem/divexact (see the discussion at
+           gr_mpoly_divexact), and is unconditionally safe here regardless
+           of that discussion's open questions for gr_mpoly_divides itself:
+           mulsub_stripe never makes any exactness determination, it only
+           chooses a (possibly non-maximally-reduced) representation of the
+           difference D - stripe(B*C). This was already keeping the term in
+           the "unknown" case; the only change is to stop also tainting the
+           overall status with GR_UNABLE merely for being unable to prove
+           it away. */
         if (gr_is_zero(GR_ENTRY(Acoeff, Alen, sz), cctx) != T_TRUE)
             Alen++;
     }
@@ -873,6 +896,8 @@ slong _gr_mpoly_mulsub_stripe(
         _gr_vec_swap(GR_ENTRY(Acoeff, Alen, sz), (gr_ptr) GR_ENTRY(Dcoeff, Di, sz), Dlen - Di, cctx);
     mpoly_copy_monomials(Aexp + N*Alen, Dexp + N*Di, Dlen - Di, N);
     Alen += Dlen - Di;
+
+cleanup:
 
     GR_TMP_CLEAR(pp, cctx);
     flint_free(dot_a);
@@ -1564,6 +1589,7 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
     gr_mpoly_struct * T1 = W->polyT1;
     _gr_mpoly_stripe_struct * S = W->S;
     int status;
+    int overflowed;
 
     S->startidx = &L->startidx;
     S->endidx = &L->endidx;
@@ -1582,7 +1608,7 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
                     C->coeffs, C->exps, C->length, 1,
                     GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
-                    S, &status);
+                    S, &status, &overflowed);
         }
         else
         {
@@ -1591,9 +1617,10 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
                     C->coeffs, C->exps, C->length, 1,
                     GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
-                    S, &status);
+                    S, &status, &overflowed);
         }
-        gr_mpoly_swap(C, T1, H->ctx);
+        if (!overflowed)
+            gr_mpoly_swap(C, T1, H->ctx);
     }
     else
     {
@@ -1619,7 +1646,7 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
                     GR_ENTRY(A->coeffs, startidx, cctx->sizeof_elem), A->exps + N*startidx, stopidx - startidx, 1,
                     GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
-                    S, &status);
+                    S, &status, &overflowed);
         }
         else
         {
@@ -1628,8 +1655,21 @@ void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_length)
                     GR_ENTRY(A->coeffs, startidx, cctx->sizeof_elem), A->exps + N*startidx, stopidx - startidx, 1,
                     GR_ENTRY(Q->coeffs, L->mq, cctx->sizeof_elem), Q->exps + N*L->mq, q_prev_length - L->mq,
                     B->coeffs, B->exps, B->length,
-                    S, &status);
+                    S, &status, &overflowed);
         }
+    }
+
+    if (overflowed)
+    {
+#if FLINT_USES_PTHREAD
+        pthread_mutex_lock(&H->mutex);
+#endif
+        H->overflowed = 1;
+        H->failed = 1;
+#if FLINT_USES_PTHREAD
+        pthread_mutex_unlock(&H->mutex);
+#endif
+        return;
     }
 
     if (status != GR_SUCCESS)
@@ -1763,6 +1803,7 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
                    terms -- they are routed to the remainder instead. */
                 gr_mpoly_struct * T3 = W->polyT3;
                 slong Wlen;
+                int overflowed;
 
                 if (N == 1)
                 {
@@ -1770,7 +1811,7 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
                                         &T2->coeffs, &T2->exps, &T2->coeffs_alloc, &T2->exps_alloc,
                                         &T3->coeffs, &T3->exps, &T3->coeffs_alloc, &T3->exps_alloc, &Wlen,
                                            Rcoeff, Rexp, Rlen,
-                                           B->coeffs, B->exps, B->length, S, &rstatus);
+                                           B->coeffs, B->exps, B->length, S, &rstatus, &overflowed);
                 }
                 else
                 {
@@ -1778,7 +1819,20 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
                                         &T2->coeffs, &T2->exps, &T2->coeffs_alloc, &T2->exps_alloc,
                                         &T3->coeffs, &T3->exps, &T3->coeffs_alloc, &T3->exps_alloc, &Wlen,
                                            Rcoeff, Rexp, Rlen,
-                                           B->coeffs, B->exps, B->length, S, &rstatus);
+                                           B->coeffs, B->exps, B->length, S, &rstatus, &overflowed);
+                }
+
+                if (overflowed)
+                {
+#if FLINT_USES_PTHREAD
+                    pthread_mutex_lock(&H->mutex);
+#endif
+                    H->overflowed = 1;
+                    H->failed = 1;
+#if FLINT_USES_PTHREAD
+                    pthread_mutex_unlock(&H->mutex);
+#endif
+                    return;
                 }
 
                 if (rstatus != GR_SUCCESS)
@@ -2043,6 +2097,7 @@ static int _gr_mpoly_divides_heap_threaded_pool(
     H->failed = 0;
     H->have_domain = 0;
     H->have_unable = 0;
+    H->overflowed = 0;
 
     for (i = 0; i + 1 < S->length; i++)
     {

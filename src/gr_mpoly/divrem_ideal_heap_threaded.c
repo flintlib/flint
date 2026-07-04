@@ -133,6 +133,10 @@ typedef struct
     int nonfield;
     volatile int failed;
     volatile int have_unable;
+    volatile int overflowed;  /* see the comment on the same field in
+                                 divides_heap_base_struct (threaded_divmod.h);
+                                 the divrem_ideal pool function retries at a
+                                 wider bit width when this is set. */
 } ideal_base_struct;
 
 typedef ideal_base_struct ideal_base_t[1];
@@ -194,7 +198,7 @@ static int ideal_base_clear(gr_mpoly_struct * const * Q, gr_mpoly_t R, ideal_bas
     H->cur = NULL;
     H->length = 0;
 
-    status = H->have_unable ? GR_UNABLE : GR_SUCCESS;
+    status = (H->have_unable || H->overflowed) ? GR_UNABLE : GR_SUCCESS;
 
     if (status != GR_SUCCESS)
     {
@@ -274,7 +278,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
     gr_mpoly_struct * const * poly3, slong len,
     ulong emin, ulong cmpmask, flint_bitcnt_t bits,
     int nonfield, int * lc_is_one, int * lc_is_unit, gr_srcptr lc_inv,
-    gr_mpoly_ctx_t ctx, int * res_status)
+    gr_mpoly_ctx_t ctx, int * res_status, int * overflowed)
 {
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong sz = cctx->sizeof_elem;
@@ -299,6 +303,8 @@ static void _gr_mpoly_divrem_ideal_stripe1(
     slong r_len;
     int status = GR_SUCCESS;
     TMP_INIT;
+
+    *overflowed = 0;
 
     TMP_START;
 
@@ -360,7 +366,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
 
         if (mpoly_monomial_overflows1(exp, mask))
         {
-            status |= GR_UNABLE;
+            *overflowed = 1;
             goto unable;
         }
 
@@ -599,7 +605,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
     gr_mpoly_struct * const * poly3, slong len,
     const ulong * emin, const ulong * cmpmask, slong N, flint_bitcnt_t bits,
     int nonfield, int * lc_is_one, int * lc_is_unit, gr_srcptr lc_inv,
-    gr_mpoly_ctx_t ctx, int * res_status)
+    gr_mpoly_ctx_t ctx, int * res_status, int * overflowed)
 {
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong sz = cctx->sizeof_elem;
@@ -626,6 +632,8 @@ static void _gr_mpoly_divrem_ideal_stripe(
     slong r_len;
     int status = GR_SUCCESS;
     TMP_INIT;
+
+    *overflowed = 0;
 
     TMP_START;
 
@@ -699,7 +707,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
         {
             if (mpoly_monomial_overflows(exp, N, mask))
             {
-                status |= GR_UNABLE;
+                *overflowed = 1;
                 goto unable;
             }
         }
@@ -707,7 +715,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
             {
-                status |= GR_UNABLE;
+                *overflowed = 1;
                 goto unable;
             }
         }
@@ -1042,6 +1050,7 @@ static void ideal_chunk_mulsub(ideal_worker_arg_t W, ideal_chunk_t L, const slon
         slong mq = L->mq[w];
         slong new_length = q_prev_length[w];
         int status;
+        int overflowed;
 
         if (new_length <= mq)
             continue;
@@ -1057,7 +1066,7 @@ static void ideal_chunk_mulsub(ideal_worker_arg_t W, ideal_chunk_t L, const slon
                     C->coeffs, C->exps, C->length, 1,
                     GR_ENTRY(Q->coeffs, mq, sz), Q->exps + N*mq, new_length - mq,
                     B->coeffs, B->exps, B->length,
-                    S, &status);
+                    S, &status, &overflowed);
         }
         else
         {
@@ -1066,7 +1075,20 @@ static void ideal_chunk_mulsub(ideal_worker_arg_t W, ideal_chunk_t L, const slon
                     C->coeffs, C->exps, C->length, 1,
                     GR_ENTRY(Q->coeffs, mq, sz), Q->exps + N*mq, new_length - mq,
                     B->coeffs, B->exps, B->length,
-                    S, &status);
+                    S, &status, &overflowed);
+        }
+
+        if (overflowed)
+        {
+#if FLINT_USES_PTHREAD
+            pthread_mutex_lock(&H->mutex);
+#endif
+            H->overflowed = 1;
+            H->failed = 1;
+#if FLINT_USES_PTHREAD
+            pthread_mutex_unlock(&H->mutex);
+#endif
+            return;
         }
 
         gr_mpoly_swap(C, T1, H->ctx);
@@ -1177,6 +1199,7 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
             ideal_stripe_out_t * Qout;
             ideal_stripe_out_t Wout;
             int rstatus;
+            int overflowed;
 
             Qout = (ideal_stripe_out_t *) flint_malloc(H->len*sizeof(ideal_stripe_out_t));
             for (w = 0; w < H->len; w++)
@@ -1198,13 +1221,13 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
                         Rcoeff, Rexp, Rlen, H->polyB, H->len,
                         L->emin[0], H->cmpmask[0], H->bits,
                         H->nonfield, H->lc_is_one, H->lc_is_unit, H->lc_inv,
-                        H->ctx, &rstatus);
+                        H->ctx, &rstatus, &overflowed);
             else
                 _gr_mpoly_divrem_ideal_stripe(Qout, Wout,
                         Rcoeff, Rexp, Rlen, H->polyB, H->len,
                         L->emin, H->cmpmask, N, H->bits,
                         H->nonfield, H->lc_is_one, H->lc_is_unit, H->lc_inv,
-                        H->ctx, &rstatus);
+                        H->ctx, &rstatus, &overflowed);
 
             for (w = 0; w < H->len; w++)
             {
@@ -1221,6 +1244,19 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
             T3->length = Wout->len;
 
             flint_free(Qout);
+
+            if (overflowed)
+            {
+#if FLINT_USES_PTHREAD
+                pthread_mutex_lock(&H->mutex);
+#endif
+                H->overflowed = 1;
+                H->failed = 1;
+#if FLINT_USES_PTHREAD
+                pthread_mutex_unlock(&H->mutex);
+#endif
+                return;
+            }
 
             if (rstatus != GR_SUCCESS)
             {
@@ -1383,12 +1419,32 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
     ideal_base_t H;
     gr_mpoly_struct * polyB_storage;
     gr_mpoly_struct ** polyB_ptrs;
-    TMP_INIT;
+    gr_ptr lc_inv;
+    int * lc_is_one, * lc_is_unit;
 
     if (A->length < 2 || B[0]->length < 2)
         return _gr_mpoly_divrem_ideal_serial(Q, R, A, B, len, nonfield, ctx);
 
-    TMP_START;
+    /*
+        lc_is_one/lc_is_unit/lc_inv depend only on the ring elements
+        lc(B[w]), never on the exponent bit width, so (unlike everything
+        else set up below) they only need computing once, outside the
+        retry-on-overflow loop.
+    */
+    lc_inv = flint_malloc(len*sz);
+    _gr_vec_init(lc_inv, len, cctx);
+    lc_is_one = (int *) flint_malloc(len*sizeof(int));
+    lc_is_unit = (int *) flint_malloc(len*sizeof(int));
+    for (w = 0; w < len; w++)
+    {
+        lc_is_one[w] = lc_is_unit[w] = 0;
+        if (!nonfield)
+        {
+            lc_is_one[w] = (gr_is_one(GR_ENTRY(B[w]->coeffs, 0, sz), cctx) == T_TRUE);
+            lc_is_unit[w] = lc_is_one[w] ||
+                (gr_inv(GR_ENTRY(lc_inv, w, sz), GR_ENTRY(B[w]->coeffs, 0, sz), cctx) == GR_SUCCESS);
+        }
+    }
 
     exp_bits = MPOLY_MIN_BITS;
     exp_bits = FLINT_MAX(exp_bits, A->bits);
@@ -1397,7 +1453,7 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
 
     N = mpoly_words_per_exp(exp_bits, mctx);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
 
     Aexp = A->exps;
@@ -1409,8 +1465,8 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
         mpoly_repack_monomials(Aexp, exp_bits, A->exps, A->bits, A->length, mctx);
     }
 
-    Bexp = (ulong **) TMP_ALLOC(len*sizeof(ulong *));
-    freeBexp = (int *) TMP_ALLOC(len*sizeof(int));
+    Bexp = (ulong **) flint_malloc(len*sizeof(ulong *));
+    freeBexp = (int *) flint_malloc(len*sizeof(int));
     for (w = 0; w < len; w++)
     {
         Bexp[w] = B[w]->exps;
@@ -1423,165 +1479,214 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
         }
     }
 
-    polyB_storage = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
-    polyB_ptrs = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    for (w = 0; w < len; w++)
+    while (1)
     {
-        polyB_ptrs[w] = polyB_storage + w;
-        polyB_storage[w].coeffs = B[w]->coeffs;
-        polyB_storage[w].exps = Bexp[w];
-        polyB_storage[w].bits = exp_bits;
-        polyB_storage[w].length = B[w]->length;
-        polyB_storage[w].coeffs_alloc = B[w]->coeffs_alloc;
-        polyB_storage[w].exps_alloc = N*B[w]->length;
-    }
-
-    fmpz_mpoly_ctx_init(zctx, mctx->nvars, mctx->ord);
-    fmpz_mpoly_init(S, zctx);
-
-    /*
-        mpoly_divides_select_exps only needs *a* representative divisor to
-        pick reasonable chunk boundaries -- these are purely a load
-        balancing hint (unlike the plain-divide case, correctness never
-        depends on them), so B[0] is a fine, simple choice regardless of
-        how many divisors there are.
-    */
-    if (mpoly_divides_select_exps(S, zctx, num_handles,
-                                   Aexp, A->length, Bexp[0], B[0]->length, exp_bits))
-    {
-        /* select_exps's failure notion ("provably not exact") does not
-           apply to divrem_ideal (which always succeeds via the
-           remainder), but a degenerate/pathological exponent spread is
-           not worth trying to patch up -- fall back to the serial engine. */
-        status = _gr_mpoly_divrem_ideal_serial(Q, R, A, B, len, nonfield, ctx);
-        goto cleanup1;
-    }
-
-    ideal_base_init(H);
-
-    H->polyA->coeffs = A->coeffs;
-    H->polyA->exps = Aexp;
-    H->polyA->bits = exp_bits;
-    H->polyA->length = A->length;
-    H->polyA->coeffs_alloc = A->coeffs_alloc;
-    H->polyA->exps_alloc = N*A->length;
-
-    H->polyB = polyB_ptrs;
-    H->len = len;
-    H->ctx = ctx;
-    H->cctx = cctx;
-    H->bits = exp_bits;
-    H->N = N;
-    H->cmpmask = cmpmask;
-    H->nonfield = nonfield;
-    H->failed = 0;
-    H->have_unable = 0;
-
-    H->polyQ = (gr_mpoly_ts_struct *) flint_malloc(len*sizeof(gr_mpoly_ts_struct));
-    for (w = 0; w < len; w++)
-        gr_mpoly_ts_init(H->polyQ + w, NULL, NULL, 0, exp_bits, N, cctx);
-    gr_mpoly_ts_init(H->polyR, NULL, NULL, 0, exp_bits, N, cctx);
-
-    H->lc_inv = flint_malloc(len*sz);
-    _gr_vec_init(H->lc_inv, len, cctx);
-    H->lc_is_one = (int *) flint_malloc(len*sizeof(int));
-    H->lc_is_unit = (int *) flint_malloc(len*sizeof(int));
-    for (w = 0; w < len; w++)
-    {
-        H->lc_is_one[w] = H->lc_is_unit[w] = 0;
-        if (!nonfield)
-        {
-            H->lc_is_one[w] = (gr_is_one(GR_ENTRY(B[w]->coeffs, 0, sz), cctx) == T_TRUE);
-            H->lc_is_unit[w] = H->lc_is_one[w] ||
-                (gr_inv(GR_ENTRY(H->lc_inv, w, sz), GR_ENTRY(B[w]->coeffs, 0, sz), cctx) == GR_SUCCESS);
-        }
-    }
-
-    for (i = 0; i + 1 < S->length; i++)
-    {
-        ideal_chunk_struct * L;
-        L = (ideal_chunk_struct *) flint_malloc(sizeof(ideal_chunk_struct));
-        L->startidx = (slong *) flint_malloc(3*len*sizeof(slong));
-        L->endidx = L->startidx + len;
-        L->mq = L->startidx + 2*len;
+        polyB_storage = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
+        polyB_ptrs = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
         for (w = 0; w < len; w++)
         {
-            L->startidx[w] = B[w]->length;
-            L->endidx[w] = B[w]->length;
-            L->mq[w] = 0;
+            polyB_ptrs[w] = polyB_storage + w;
+            polyB_storage[w].coeffs = B[w]->coeffs;
+            polyB_storage[w].exps = Bexp[w];
+            polyB_storage[w].bits = exp_bits;
+            polyB_storage[w].length = B[w]->length;
+            polyB_storage[w].coeffs_alloc = B[w]->coeffs_alloc;
+            polyB_storage[w].exps_alloc = N*B[w]->length;
         }
-        L->emax = S->exps + N*i;
-        L->emin = S->exps + N*(i + 1);
-        L->upperclosed = 0;
-        L->producer = 0;
-        L->Cinited = 0;
-        L->done = 0;
-        L->lock = -2;
-        ideal_base_add_chunk(H, L);
-    }
 
-    H->head->upperclosed = 1;
-    H->head->producer = 1;
-    H->cur = H->head;
+        fmpz_mpoly_ctx_init(zctx, mctx->nvars, mctx->ord);
+        fmpz_mpoly_init(S, zctx);
 
-    /*
-        No "initial burst" pre-pass here, for the same reason
-        gr_mpoly_divrem_heap_threaded doesn't need one (see the long
-        comment there): the head chunk, already marked as producer, can be
-        fully resolved from scratch on first touch regardless of how many
-        terms of A it covers.
-    */
+        /*
+            mpoly_divides_select_exps only needs *a* representative divisor to
+            pick reasonable chunk boundaries -- these are purely a load
+            balancing hint (unlike the plain-divide case, correctness never
+            depends on them), so B[0] is a fine, simple choice regardless of
+            how many divisors there are.
+        */
+        if (mpoly_divides_select_exps(S, zctx, num_handles,
+                                       Aexp, A->length, Bexp[0], B[0]->length, exp_bits))
+        {
+            /* select_exps's failure notion ("provably not exact") does not
+               apply to divrem_ideal (which always succeeds via the
+               remainder), but a degenerate/pathological exponent spread is
+               not worth trying to patch up -- fall back to the serial engine. */
+            status = _gr_mpoly_divrem_ideal_serial(Q, R, A, B, len, nonfield, ctx);
+            fmpz_mpoly_clear(S, zctx);
+            fmpz_mpoly_ctx_clear(zctx);
+            flint_free(polyB_storage);
+            flint_free(polyB_ptrs);
+            goto cleanup1;
+        }
+
+        ideal_base_init(H);
+
+        H->polyA->coeffs = A->coeffs;
+        H->polyA->exps = Aexp;
+        H->polyA->bits = exp_bits;
+        H->polyA->length = A->length;
+        H->polyA->coeffs_alloc = A->coeffs_alloc;
+        H->polyA->exps_alloc = N*A->length;
+
+        H->polyB = polyB_ptrs;
+        H->len = len;
+        H->ctx = ctx;
+        H->cctx = cctx;
+        H->bits = exp_bits;
+        H->N = N;
+        H->cmpmask = cmpmask;
+        H->nonfield = nonfield;
+        H->failed = 0;
+        H->have_unable = 0;
+        H->overflowed = 0;
+        H->lc_inv = lc_inv;
+        H->lc_is_one = lc_is_one;
+        H->lc_is_unit = lc_is_unit;
+
+        H->polyQ = (gr_mpoly_ts_struct *) flint_malloc(len*sizeof(gr_mpoly_ts_struct));
+        for (w = 0; w < len; w++)
+            gr_mpoly_ts_init(H->polyQ + w, NULL, NULL, 0, exp_bits, N, cctx);
+        gr_mpoly_ts_init(H->polyR, NULL, NULL, 0, exp_bits, N, cctx);
+
+        for (i = 0; i + 1 < S->length; i++)
+        {
+            ideal_chunk_struct * L;
+            L = (ideal_chunk_struct *) flint_malloc(sizeof(ideal_chunk_struct));
+            L->startidx = (slong *) flint_malloc(3*len*sizeof(slong));
+            L->endidx = L->startidx + len;
+            L->mq = L->startidx + 2*len;
+            for (w = 0; w < len; w++)
+            {
+                L->startidx[w] = B[w]->length;
+                L->endidx[w] = B[w]->length;
+                L->mq[w] = 0;
+            }
+            L->emax = S->exps + N*i;
+            L->emin = S->exps + N*(i + 1);
+            L->upperclosed = 0;
+            L->producer = 0;
+            L->Cinited = 0;
+            L->done = 0;
+            L->lock = -2;
+            ideal_base_add_chunk(H, L);
+        }
+
+        H->head->upperclosed = 1;
+        H->head->producer = 1;
+        H->cur = H->head;
+
+        /*
+            No "initial burst" pre-pass here, for the same reason
+            gr_mpoly_divrem_heap_threaded doesn't need one (see the long
+            comment there): the head chunk, already marked as producer, can be
+            fully resolved from scratch on first touch regardless of how many
+            terms of A it covers.
+        */
 
 #if FLINT_USES_PTHREAD
-    pthread_mutex_init(&H->mutex, NULL);
+        pthread_mutex_init(&H->mutex, NULL);
 #endif
 
-    worker_args = (ideal_worker_arg_struct *) flint_malloc((num_handles + 1)
-                                                        *sizeof(ideal_worker_arg_struct));
-    for (i = 0; i < num_handles; i++)
-    {
-        (worker_args + i)->H = H;
-        (worker_args + i)->polyT2 = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
-        thread_pool_wake(global_thread_pool, handles[i], 0,
-                                                 ideal_worker_loop, worker_args + i);
-    }
-    (worker_args + num_handles)->H = H;
-    (worker_args + num_handles)->polyT2 = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
-    ideal_worker_loop(worker_args + num_handles);
-    for (i = 0; i < num_handles; i++)
-        thread_pool_wait(global_thread_pool, handles[i]);
+        worker_args = (ideal_worker_arg_struct *) flint_malloc((num_handles + 1)
+                                                            *sizeof(ideal_worker_arg_struct));
+        for (i = 0; i < num_handles; i++)
+        {
+            (worker_args + i)->H = H;
+            (worker_args + i)->polyT2 = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
+            thread_pool_wake(global_thread_pool, handles[i], 0,
+                                                     ideal_worker_loop, worker_args + i);
+        }
+        (worker_args + num_handles)->H = H;
+        (worker_args + num_handles)->polyT2 = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
+        ideal_worker_loop(worker_args + num_handles);
+        for (i = 0; i < num_handles; i++)
+            thread_pool_wait(global_thread_pool, handles[i]);
 
-    for (i = 0; i <= num_handles; i++)
-        flint_free((worker_args + i)->polyT2);
-    flint_free(worker_args);
+        for (i = 0; i <= num_handles; i++)
+            flint_free((worker_args + i)->polyT2);
+        flint_free(worker_args);
 
 #if FLINT_USES_PTHREAD
-    pthread_mutex_destroy(&H->mutex);
+        pthread_mutex_destroy(&H->mutex);
 #endif
 
-    status = ideal_base_clear(Q, R, H);
+        if (H->overflowed)
+        {
+            /*
+                An internal exponent computation overflowed the bit width
+                chosen for this attempt (see the long comment on
+                _gr_mpoly_mulsub_stripe1 in threaded_divmod.h): discard
+                everything from this attempt (nothing was transferred to any
+                Q[w] or R) and redo the whole computation at a wider bit
+                width, exactly like the retry loop in
+                gr_mpoly_divrem_heap_threaded / _gr_mpoly_divrem_mp.
+            */
+            GR_IGNORE(ideal_base_clear(Q, R, H));
 
-    flint_free(H->polyQ);
-    _gr_vec_clear(H->lc_inv, len, cctx);
-    flint_free(H->lc_inv);
-    flint_free(H->lc_is_one);
-    flint_free(H->lc_is_unit);
+            flint_free(H->polyQ);
+
+            fmpz_mpoly_clear(S, zctx);
+            fmpz_mpoly_ctx_clear(zctx);
+            flint_free(polyB_storage);
+            flint_free(polyB_ptrs);
+
+            {
+                slong old_exp_bits = exp_bits;
+                ulong * old_Aexp = Aexp;
+
+                exp_bits = mpoly_fix_bits(exp_bits + 1, mctx);
+                N = mpoly_words_per_exp(exp_bits, mctx);
+                cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
+                mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
+
+                Aexp = (ulong *) flint_malloc(N*A->length*sizeof(ulong));
+                mpoly_repack_monomials(Aexp, exp_bits, old_Aexp, old_exp_bits, A->length, mctx);
+                if (freeAexp)
+                    flint_free(old_Aexp);
+                freeAexp = 1;
+
+                for (w = 0; w < len; w++)
+                {
+                    ulong * old_Bexp_w = Bexp[w];
+                    Bexp[w] = (ulong *) flint_malloc(N*B[w]->length*sizeof(ulong));
+                    mpoly_repack_monomials(Bexp[w], exp_bits, old_Bexp_w, old_exp_bits, B[w]->length, mctx);
+                    if (freeBexp[w])
+                        flint_free(old_Bexp_w);
+                    freeBexp[w] = 1;
+                }
+            }
+
+            continue;
+        }
+
+        status = ideal_base_clear(Q, R, H);
+
+        flint_free(H->polyQ);
+
+        fmpz_mpoly_clear(S, zctx);
+        fmpz_mpoly_ctx_clear(zctx);
+        flint_free(polyB_storage);
+        flint_free(polyB_ptrs);
+
+        break;
+    }
 
 cleanup1:
 
-    fmpz_mpoly_clear(S, zctx);
-    fmpz_mpoly_ctx_clear(zctx);
-
-    flint_free(polyB_storage);
-    flint_free(polyB_ptrs);
+    _gr_vec_clear(lc_inv, len, cctx);
+    flint_free(lc_inv);
+    flint_free(lc_is_one);
+    flint_free(lc_is_unit);
 
     if (freeAexp)
         flint_free(Aexp);
     for (w = 0; w < len; w++)
         if (freeBexp[w])
             flint_free(Bexp[w]);
+    flint_free(Bexp);
+    flint_free(freeBexp);
 
-    TMP_END;
+    flint_free(cmpmask);
 
     return status;
 }

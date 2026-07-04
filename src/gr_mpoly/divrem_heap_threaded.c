@@ -171,7 +171,7 @@ slong _gr_mpoly_divrem_stripe1(
     slong * Wlen_out,
     gr_srcptr Acoeff, const ulong * Aexp, slong Alen,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
-    const _gr_mpoly_stripe_t S, int * res_status)
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed)
 {
     gr_mpoly_ctx_struct * ctx = S->ctx;
     gr_ctx_struct * cctx = S->cctx;
@@ -204,6 +204,9 @@ slong _gr_mpoly_divrem_stripe1(
     int have_dividend, cstatus;
     slong dividend_j = 0;
     int status = GR_SUCCESS;
+
+    *overflowed = 0;
+
 
     FLINT_ASSERT(Alen > 0);
     FLINT_ASSERT(Blen > 0);
@@ -249,14 +252,23 @@ slong _gr_mpoly_divrem_stripe1(
     {
         exp = heap[1].exp;
 
-        /* An exponent window is chosen (by the caller, via
-           mpoly_divides_select_exps) from the actual monomials appearing
-           in A and B, so this cannot overflow in practice; treat it like
-           any other "cannot proceed" condition rather than introducing a
-           GR_DOMAIN-shaped abort that the divrem family has no use for. */
+        /*
+            exp here is either a genuine monomial of A (from the dividend
+            chain) or a candidate B[i]+Q[j] sum generated while exploring
+            the heap; either way, whatever gets inserted into the heap is
+            eventually popped and checked here before being used for
+            anything. The B[i]+Q[j] sums matter: two individually valid
+            packed exponents (each comfortably fitting the current bit
+            width) can legitimately overflow a shared field when added,
+            even though every "real" monomial of A, B and the quotient
+            fits fine. This is not a "cannot proceed" condition in the
+            GR_UNABLE sense -- it just means the whole computation must be
+            redone at a wider bit width (see the retry loop in
+            gr_mpoly_divrem_heap_threaded).
+        */
         if (mpoly_monomial_overflows1(exp, mask))
         {
-            status |= GR_UNABLE;
+            *overflowed = 1;
             goto unable;
         }
 
@@ -436,7 +448,7 @@ slong _gr_mpoly_divrem_stripe(
     slong * Wlen_out,
     gr_srcptr Acoeff, const ulong * Aexp, slong Alen,
     gr_srcptr Bcoeff, const ulong * Bexp, slong Blen,
-    const _gr_mpoly_stripe_t S, int * res_status)
+    const _gr_mpoly_stripe_t S, int * res_status, int * overflowed)
 {
     gr_mpoly_ctx_struct * ctx = S->ctx;
     gr_ctx_struct * cctx = S->cctx;
@@ -469,6 +481,8 @@ slong _gr_mpoly_divrem_stripe(
     int have_dividend, cstatus;
     slong dividend_j = 0;
     int status = GR_SUCCESS;
+
+    *overflowed = 0;
 
     FLINT_ASSERT(Alen > 0);
     FLINT_ASSERT(Blen > 0);
@@ -527,11 +541,14 @@ slong _gr_mpoly_divrem_stripe(
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
+        /* see the comment on the single-word overflow check above:
+           this can legitimately happen even for well-chosen bits, and
+           means "redo everything wider", not GR_UNABLE. */
         if (bits <= FLINT_BITS)
         {
             if (mpoly_monomial_overflows(exp, N, mask))
             {
-                status |= GR_UNABLE;
+                *overflowed = 1;
                 goto unable;
             }
             lt_divides = mpoly_monomial_divides(Qexp + N*Qlen, exp, Bexp + N*0, N, mask);
@@ -540,7 +557,7 @@ slong _gr_mpoly_divrem_stripe(
         {
             if (mpoly_monomial_overflows_mp(exp, N, bits))
             {
-                status |= GR_UNABLE;
+                *overflowed = 1;
                 goto unable;
             }
             lt_divides = mpoly_monomial_divides_mp(Qexp + N*Qlen, exp, Bexp + N*0, N, bits);
@@ -770,12 +787,9 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
     gr_ptr lc_inv;
     divides_heap_base_t H;
     int lc_is_one, lc_is_unit;
-    TMP_INIT;
 
     if (B->length < 2 || A->length < 2)
         return _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
-
-    TMP_START;
 
     GR_TMP_INIT(lc_inv, cctx);
 
@@ -785,7 +799,7 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
 
     N = mpoly_words_per_exp(exp_bits, mctx);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
+    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
 
     /* ensure input exponents packed to same size as output exponents */
@@ -809,9 +823,6 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
                                                     B->length, mctx);
     }
 
-    fmpz_mpoly_ctx_init(zctx, mctx->nvars, mctx->ord);
-    fmpz_mpoly_init(S, zctx);
-
     lc_is_one = lc_is_unit = 0;
     if (!nonfield)
     {
@@ -819,122 +830,175 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
         lc_is_unit = lc_is_one || (gr_inv(lc_inv, B->coeffs, cctx) == GR_SUCCESS);
     }
 
-    /*
-        mpoly_divides_select_exps's failure return only ever means "this
-        division is provably not exact" -- irrelevant for div/divrem, which
-        have no notion of an "impossible" division. Rather than try to
-        patch up a partition in that case, just fall back to the serial
-        engine (this can only happen on genuinely pathological / huge
-        exponent spreads).
-    */
-    if (mpoly_divides_select_exps(S, zctx, num_handles,
-                                   Aexp, A->length, Bexp, B->length, exp_bits))
+    while (1)
     {
-        status = _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
-        goto cleanup1;
-    }
+        fmpz_mpoly_ctx_init(zctx, mctx->nvars, mctx->ord);
+        fmpz_mpoly_init(S, zctx);
 
-    divides_heap_base_init(H);
+        /*
+            mpoly_divides_select_exps's failure return only ever means "this
+            division is provably not exact" -- irrelevant for div/divrem,
+            which have no notion of an "impossible" division. Rather than
+            try to patch up a partition in that case, just fall back to the
+            serial engine (this can only happen on genuinely pathological /
+            huge exponent spreads).
+        */
+        if (mpoly_divides_select_exps(S, zctx, num_handles,
+                                       Aexp, A->length, Bexp, B->length, exp_bits))
+        {
+            status = _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
+            fmpz_mpoly_clear(S, zctx);
+            fmpz_mpoly_ctx_clear(zctx);
+            goto cleanup1;
+        }
 
-    H->polyA->coeffs = A->coeffs;
-    H->polyA->exps = Aexp;
-    H->polyA->bits = exp_bits;
-    H->polyA->length = A->length;
-    H->polyA->coeffs_alloc = A->coeffs_alloc;
-    H->polyA->exps_alloc = N*A->length;
+        divides_heap_base_init(H);
 
-    H->polyB->coeffs = B->coeffs;
-    H->polyB->exps = Bexp;
-    H->polyB->bits = exp_bits;
-    H->polyB->length = B->length;
-    H->polyB->coeffs_alloc = B->coeffs_alloc;
-    H->polyB->exps_alloc = N*B->length;
+        H->polyA->coeffs = A->coeffs;
+        H->polyA->exps = Aexp;
+        H->polyA->bits = exp_bits;
+        H->polyA->length = A->length;
+        H->polyA->coeffs_alloc = A->coeffs_alloc;
+        H->polyA->exps_alloc = N*A->length;
 
-    H->ctx = ctx;
-    H->cctx = cctx;
-    H->bits = exp_bits;
-    H->N = N;
-    H->cmpmask = cmpmask;
-    H->lc_is_one = lc_is_one;
-    H->lc_is_unit = lc_is_unit;
-    H->lc_inv = lc_inv;
-    H->require_exact = 0;
-    H->want_remainder = (R != NULL);
-    H->nonfield = nonfield;
-    H->unchecked = unchecked;
-    H->failed = 0;
-    H->have_domain = 0;
-    H->have_unable = 0;
+        H->polyB->coeffs = B->coeffs;
+        H->polyB->exps = Bexp;
+        H->polyB->bits = exp_bits;
+        H->polyB->length = B->length;
+        H->polyB->coeffs_alloc = B->coeffs_alloc;
+        H->polyB->exps_alloc = N*B->length;
 
-    for (i = 0; i + 1 < S->length; i++)
-    {
-        divides_heap_chunk_struct * L;
-        L = (divides_heap_chunk_struct *) flint_malloc(
-                                            sizeof(divides_heap_chunk_struct));
-        L->ma = 0;
-        L->mq = 0;
-        L->emax = S->exps + N*i;
-        L->emin = S->exps + N*(i + 1);
-        L->upperclosed = 0;
-        L->startidx = B->length;
-        L->endidx = B->length;
-        L->producer = 0;
-        L->Cinited = 0;
-        L->lock = -2;
-        divides_heap_base_add_chunk(H, L);
-    }
+        H->ctx = ctx;
+        H->cctx = cctx;
+        H->bits = exp_bits;
+        H->N = N;
+        H->cmpmask = cmpmask;
+        H->lc_is_one = lc_is_one;
+        H->lc_is_unit = lc_is_unit;
+        H->lc_inv = lc_inv;
+        H->require_exact = 0;
+        H->want_remainder = (R != NULL);
+        H->nonfield = nonfield;
+        H->unchecked = unchecked;
+        H->failed = 0;
+        H->have_domain = 0;
+        H->have_unable = 0;
+        H->overflowed = 0;
 
-    H->head->upperclosed = 1;
-    H->head->producer = 1;
-    H->cur = H->head;
+        for (i = 0; i + 1 < S->length; i++)
+        {
+            divides_heap_chunk_struct * L;
+            L = (divides_heap_chunk_struct *) flint_malloc(
+                                                sizeof(divides_heap_chunk_struct));
+            L->ma = 0;
+            L->mq = 0;
+            L->emax = S->exps + N*i;
+            L->emin = S->exps + N*(i + 1);
+            L->upperclosed = 0;
+            L->startidx = B->length;
+            L->endidx = B->length;
+            L->producer = 0;
+            L->Cinited = 0;
+            L->lock = -2;
+            divides_heap_base_add_chunk(H, L);
+        }
 
-    /*
-        Unlike gr_mpoly_divides_heap_threaded, no "generate an initial
-        burst of leading terms" pre-pass is needed here: that pre-pass is
-        purely a latency optimisation there (so that H->polyQ has *some*
-        content before the thread pool is woken), never a correctness
-        requirement -- a chunk that is not waiting on any higher quotient
-        terms (the head chunk, here marked as producer from the start) can
-        always be fully resolved on first touch, regardless of how many
-        terms of A it covers, via the ordinary stripe finalisation path in
-        trychunk. So we simply seed both thread-safe arrays empty.
-    */
-    gr_mpoly_ts_init(H->polyQ, NULL, NULL, 0, H->bits, H->N, cctx);
-    if (H->want_remainder)
-        gr_mpoly_ts_init(H->polyR, NULL, NULL, 0, H->bits, H->N, cctx);
+        H->head->upperclosed = 1;
+        H->head->producer = 1;
+        H->cur = H->head;
 
-    /* start the workers */
+        /*
+            Unlike gr_mpoly_divides_heap_threaded, no "generate an initial
+            burst of leading terms" pre-pass is needed here: that pre-pass is
+            purely a latency optimisation there (so that H->polyQ has *some*
+            content before the thread pool is woken), never a correctness
+            requirement -- a chunk that is not waiting on any higher quotient
+            terms (the head chunk, here marked as producer from the start) can
+            always be fully resolved on first touch, regardless of how many
+            terms of A it covers, via the ordinary stripe finalisation path in
+            trychunk. So we simply seed both thread-safe arrays empty.
+        */
+        gr_mpoly_ts_init(H->polyQ, NULL, NULL, 0, H->bits, H->N, cctx);
+        if (H->want_remainder)
+            gr_mpoly_ts_init(H->polyR, NULL, NULL, 0, H->bits, H->N, cctx);
+
+        /* start the workers */
 
 #if FLINT_USES_PTHREAD
-    pthread_mutex_init(&H->mutex, NULL);
+        pthread_mutex_init(&H->mutex, NULL);
 #endif
 
-    worker_args = (worker_arg_struct *) flint_malloc((num_handles + 1)
-                                                        *sizeof(worker_arg_t));
+        worker_args = (worker_arg_struct *) flint_malloc((num_handles + 1)
+                                                            *sizeof(worker_arg_t));
 
-    for (i = 0; i < num_handles; i++)
-    {
-        (worker_args + i)->H = H;
-        thread_pool_wake(global_thread_pool, handles[i], 0,
-                                                 worker_loop, worker_args + i);
-    }
-    (worker_args + num_handles)->H = H;
-    worker_loop(worker_args + num_handles);
-    for (i = 0; i < num_handles; i++)
-        thread_pool_wait(global_thread_pool, handles[i]);
+        for (i = 0; i < num_handles; i++)
+        {
+            (worker_args + i)->H = H;
+            thread_pool_wake(global_thread_pool, handles[i], 0,
+                                                     worker_loop, worker_args + i);
+        }
+        (worker_args + num_handles)->H = H;
+        worker_loop(worker_args + num_handles);
+        for (i = 0; i < num_handles; i++)
+            thread_pool_wait(global_thread_pool, handles[i]);
 
-    flint_free(worker_args);
+        flint_free(worker_args);
 
 #if FLINT_USES_PTHREAD
-    pthread_mutex_destroy(&H->mutex);
+        pthread_mutex_destroy(&H->mutex);
 #endif
 
-    status = divides_heap_base_clear(Q, R, H);
+        if (H->overflowed)
+        {
+            /*
+                An internal exponent computation overflowed the bit width
+                chosen for this attempt (see the long comment on
+                _gr_mpoly_mulsub_stripe1 in threaded_divmod.h): discard
+                everything from this attempt (nothing was transferred to Q
+                or R) and redo the whole computation at a wider bit width,
+                exactly like the retry loop in _gr_mpoly_divrem_mp
+                (divrem_heap.c) does for the single-threaded algorithm.
+            */
+            GR_IGNORE(divides_heap_base_clear(Q, R, H));
+
+            fmpz_mpoly_clear(S, zctx);
+            fmpz_mpoly_ctx_clear(zctx);
+
+            {
+                slong old_exp_bits = exp_bits;
+                ulong * old_Aexp = Aexp;
+                ulong * old_Bexp = Bexp;
+
+                exp_bits = mpoly_fix_bits(exp_bits + 1, mctx);
+                N = mpoly_words_per_exp(exp_bits, mctx);
+                cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
+                mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
+
+                Aexp = (ulong *) flint_malloc(N*A->length*sizeof(ulong));
+                mpoly_repack_monomials(Aexp, exp_bits, old_Aexp, old_exp_bits, A->length, mctx);
+                if (freeAexp)
+                    flint_free(old_Aexp);
+                freeAexp = 1;
+
+                Bexp = (ulong *) flint_malloc(N*B->length*sizeof(ulong));
+                mpoly_repack_monomials(Bexp, exp_bits, old_Bexp, old_exp_bits, B->length, mctx);
+                if (freeBexp)
+                    flint_free(old_Bexp);
+                freeBexp = 1;
+            }
+
+            continue;
+        }
+
+        status = divides_heap_base_clear(Q, R, H);
+
+        fmpz_mpoly_clear(S, zctx);
+        fmpz_mpoly_ctx_clear(zctx);
+
+        break;
+    }
 
 cleanup1:
-
-    fmpz_mpoly_clear(S, zctx);
-    fmpz_mpoly_ctx_clear(zctx);
 
     if (freeAexp)
         flint_free(Aexp);
@@ -942,9 +1006,9 @@ cleanup1:
     if (freeBexp)
         flint_free(Bexp);
 
-    GR_TMP_CLEAR(lc_inv, cctx);
+    flint_free(cmpmask);
 
-    TMP_END;
+    GR_TMP_CLEAR(lc_inv, cctx);
 
     return status;
 }
