@@ -648,8 +648,12 @@ slong _gr_mpoly_divrem_stripe(
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Qexp + N*x->j, N);
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
+                                                                  Qexp + N*x->j, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
+                                                                  Qexp + N*x->j, N);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], S->emin, N, S->cmpmask) >= 0)
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -671,8 +675,12 @@ slong _gr_mpoly_divrem_stripe(
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Qexp + N*x->j, N);
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
+                                                                  Qexp + N*x->j, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
+                                                                  Qexp + N*x->j, N);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], S->emin, N, S->cmpmask) >= 0)
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -704,7 +712,10 @@ slong _gr_mpoly_divrem_stripe(
                 x->next = NULL;
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i, Qexp + N*x->j, N);
+                if (bits <= FLINT_BITS)
+                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i, Qexp + N*x->j, N);
+                else
+                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i, Qexp + N*x->j, N);
 
                 if (mpoly_monomial_cmp(exp_list[exp_next], S->emin, N, S->cmpmask) >= 0)
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -787,9 +798,46 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
     gr_ptr lc_inv;
     divides_heap_base_t H;
     int lc_is_one, lc_is_unit;
+    gr_mpoly_t TQ, TR;
+    gr_mpoly_struct * q, * r;
 
     if (B->length < 2 || A->length < 2)
         return _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
+
+    /*
+        Use temporaries to handle aliasing of Q, R with A, B: the retry
+        loop below re-reads A->length/A->exps/B->length/B->exps on every
+        pass (in particular via mpoly_divides_select_exps and the H->polyA/
+        H->polyB setup), while divides_heap_base_clear zeroes Q (and R) on
+        any non-successful attempt, including the ordinary overflow-retry
+        case. If Q or R is the same object as A or B, that zeroing would
+        corrupt the operand out from under the very next loop iteration --
+        exactly mirroring the aliasing guard already used by the serial
+        kernel in _gr_mpoly_divrem_mp (divrem_heap.c).
+    */
+    if (Q == A || Q == B)
+    {
+        gr_mpoly_init(TQ, ctx);
+        q = TQ;
+    }
+    else
+    {
+        q = Q;
+    }
+
+    if (R == NULL)
+    {
+        r = NULL;
+    }
+    else if (R == A || R == B)
+    {
+        gr_mpoly_init(TR, ctx);
+        r = TR;
+    }
+    else
+    {
+        r = R;
+    }
 
     GR_TMP_INIT(lc_inv, cctx);
 
@@ -849,6 +897,10 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
             status = _gr_mpoly_divrem_serial(Q, R, A, B, nonfield, unchecked, ctx);
             fmpz_mpoly_clear(S, zctx);
             fmpz_mpoly_ctx_clear(zctx);
+            if (q == TQ)
+                gr_mpoly_clear(TQ, ctx);
+            if (r == TR)
+                gr_mpoly_clear(TR, ctx);
             goto cleanup1;
         }
 
@@ -959,7 +1011,7 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
                 exactly like the retry loop in _gr_mpoly_divrem_mp
                 (divrem_heap.c) does for the single-threaded algorithm.
             */
-            GR_IGNORE(divides_heap_base_clear(Q, R, H));
+            GR_IGNORE(divides_heap_base_clear(q, r, H));
 
             fmpz_mpoly_clear(S, zctx);
             fmpz_mpoly_ctx_clear(zctx);
@@ -990,12 +1042,23 @@ static int _gr_mpoly_divrem_heap_threaded_pool(
             continue;
         }
 
-        status = divides_heap_base_clear(Q, R, H);
+        status = divides_heap_base_clear(q, r, H);
 
         fmpz_mpoly_clear(S, zctx);
         fmpz_mpoly_ctx_clear(zctx);
 
         break;
+    }
+
+    if (q == TQ)
+    {
+        gr_mpoly_swap(Q, TQ, ctx);
+        gr_mpoly_clear(TQ, ctx);
+    }
+    if (r == TR)
+    {
+        gr_mpoly_swap(R, TR, ctx);
+        gr_mpoly_clear(TR, ctx);
     }
 
 cleanup1:

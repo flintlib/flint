@@ -807,7 +807,11 @@ static void _gr_mpoly_divrem_ideal_stripe(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_mp(exp_list[exp_next], poly3[p]->exps + x->i*N,
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], poly3[p]->exps + x->i*N,
+                                                        Qout[p]->exps + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], poly3[p]->exps + x->i*N,
                                                         Qout[p]->exps + x->j*N, N);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
@@ -830,7 +834,11 @@ static void _gr_mpoly_divrem_ideal_stripe(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_mp(exp_list[exp_next], poly3[p]->exps + x->i*N,
+                    if (bits <= FLINT_BITS)
+                        mpoly_monomial_add(exp_list[exp_next], poly3[p]->exps + x->i*N,
+                                                        Qout[p]->exps + x->j*N, N);
+                    else
+                        mpoly_monomial_add_mp(exp_list[exp_next], poly3[p]->exps + x->i*N,
                                                         Qout[p]->exps + x->j*N, N);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
@@ -899,7 +907,11 @@ static void _gr_mpoly_divrem_ideal_stripe(
                         x->next = NULL;
                         hinds[w][x->i] = 2*(x->j + 1) + 0;
 
-                        mpoly_monomial_add_mp(exp_list[exp_next], poly3[w]->exps + N,
+                        if (bits <= FLINT_BITS)
+                            mpoly_monomial_add(exp_list[exp_next], poly3[w]->exps + N,
+                                                            Qout[w]->exps + k[w]*N, N);
+                        else
+                            mpoly_monomial_add_mp(exp_list[exp_next], poly3[w]->exps + N,
                                                             Qout[w]->exps + k[w]*N, N);
 
                         if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
@@ -1421,9 +1433,52 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
     gr_mpoly_struct ** polyB_ptrs;
     gr_ptr lc_inv;
     int * lc_is_one, * lc_is_unit;
+    gr_mpoly_struct * TQarr;
+    gr_mpoly_struct ** q;
+    gr_mpoly_t TR;
+    gr_mpoly_struct * r;
 
     if (A->length < 2 || B[0]->length < 2)
         return _gr_mpoly_divrem_ideal_serial(Q, R, A, B, len, nonfield, ctx);
+
+    /*
+        Use temporaries to handle aliasing of any Q[w] or R with A or any
+        B[w']: the retry loop below re-reads A->length/A->exps and
+        B[w]->length/B[w]->exps on every pass, while ideal_base_clear
+        zeroes every Q[w] and R on any non-successful attempt, including
+        the ordinary overflow-retry case. If some Q[w] or R is the same
+        object as A or a B[w'], that zeroing would corrupt the operand out
+        from under the very next loop iteration -- exactly mirroring the
+        aliasing guard already used by gr_mpoly_divrem_heap_threaded (and,
+        for R against A, the serial _gr_mpoly_divrem_ideal kernel).
+    */
+    TQarr = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
+    q = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
+    for (w = 0; w < len; w++)
+    {
+        int alias = (Q[w] == A);
+        for (i = 0; !alias && i < len; i++)
+            alias = (Q[w] == B[i]);
+
+        gr_mpoly_init(TQarr + w, ctx);
+        q[w] = alias ? (TQarr + w) : Q[w];
+    }
+
+    {
+        int alias_R = (R == A);
+        for (w = 0; !alias_R && w < len; w++)
+            alias_R = (R == B[w]);
+
+        if (alias_R)
+        {
+            gr_mpoly_init(TR, ctx);
+            r = TR;
+        }
+        else
+        {
+            r = R;
+        }
+    }
 
     /*
         lc_is_one/lc_is_unit/lc_inv depend only on the ring elements
@@ -1516,6 +1571,12 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
             fmpz_mpoly_ctx_clear(zctx);
             flint_free(polyB_storage);
             flint_free(polyB_ptrs);
+            for (w = 0; w < len; w++)
+                gr_mpoly_clear(TQarr + w, ctx);
+            flint_free(TQarr);
+            flint_free(q);
+            if (r == TR)
+                gr_mpoly_clear(TR, ctx);
             goto cleanup1;
         }
 
@@ -1621,7 +1682,7 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
                 width, exactly like the retry loop in
                 gr_mpoly_divrem_heap_threaded / _gr_mpoly_divrem_mp.
             */
-            GR_IGNORE(ideal_base_clear(Q, R, H));
+            GR_IGNORE(ideal_base_clear(q, r, H));
 
             flint_free(H->polyQ);
 
@@ -1659,7 +1720,7 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
             continue;
         }
 
-        status = ideal_base_clear(Q, R, H);
+        status = ideal_base_clear(q, r, H);
 
         flint_free(H->polyQ);
 
@@ -1669,6 +1730,21 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
         flint_free(polyB_ptrs);
 
         break;
+    }
+
+    for (w = 0; w < len; w++)
+    {
+        if (q[w] == TQarr + w)
+            gr_mpoly_swap(Q[w], TQarr + w, ctx);
+        gr_mpoly_clear(TQarr + w, ctx);
+    }
+    flint_free(TQarr);
+    flint_free(q);
+
+    if (r == TR)
+    {
+        gr_mpoly_swap(R, TR, ctx);
+        gr_mpoly_clear(TR, ctx);
     }
 
 cleanup1:
