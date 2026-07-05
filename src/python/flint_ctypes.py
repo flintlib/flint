@@ -9465,6 +9465,10 @@ def test_mpoly():
     assert raises(lambda: x / (x**0 - y**0), FlintDomainError)
     assert raises(lambda: (x**4 * y**3) / (RR("0 +/- 0.1")*(x**3 * y**2)), FlintUnableError)
 
+    R = PolynomialRing_gr_mpoly(QQx, 1, "y");
+    f = R("(x/3 + x^2/5)*y^2")
+    assert f == R(str(f))
+
 
 def test_fmpq_mpoly():
     QQxyz = PolynomialRing_fmpq_mpoly(3)
