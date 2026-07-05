@@ -13,6 +13,12 @@
 #include "gr_ore_poly.h"
 
 static int
+is_diff_case(ore_algebra_t a)
+{
+    return a == ORE_ALGEBRA_DERIVATIVE || a == ORE_ALGEBRA_EULER_DERIVATIVE;
+}
+
+static int
 is_shift_case(ore_algebra_t a)
 {
     return a == ORE_ALGEBRA_FORWARD_SHIFT || a == ORE_ALGEBRA_BACKWARD_SHIFT
@@ -39,11 +45,23 @@ gr_ore_poly_convert(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op,
         return gr_ore_poly_zero(res, res_ctx);
 
     gr_ore_poly_ore_data_t * od = GR_ORE_POLY_ORE_DATA(op_ctx);
+    gr_ore_poly_ore_data_t * rd = GR_ORE_POLY_ORE_DATA(res_ctx);
     slong var = (od != NULL) ? od->base_var : -1;
 
     gr_ore_poly_fit_length(res, len, res_ctx);
 
-    if (sa == da)
+    if (res_ctx == op_ctx)
+        status |= _gr_vec_set(res->coeffs, op->coeffs, len, base);
+    /* Distinct contexts with equal which_algebra need not define the same
+       algebra (e.g., two q-shift algebras with different q, or operators
+       acting on different variables of the base ring). Only the differential
+       and shift/difference algebras are fully determined by which_algebra and
+       base_var. */
+    else if (!(is_diff_case(sa) || is_shift_case(sa))
+             || !(is_diff_case(da) || is_shift_case(da))
+             || od->base_var != rd->base_var)
+        return GR_UNABLE;
+    else if (sa == da)
         status |= _gr_vec_set(res->coeffs, op->coeffs, len, base);
     else if (sa == ORE_ALGEBRA_DERIVATIVE && da == ORE_ALGEBRA_EULER_DERIVATIVE)
     {
