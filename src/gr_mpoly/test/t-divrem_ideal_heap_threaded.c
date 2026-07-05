@@ -12,13 +12,11 @@
 #include "test_helpers.h"
 #include "gr_mpoly.h"
 
-FLINT_DLL extern gr_static_method_table _ca_methods;
-
 TEST_FUNCTION_START(gr_mpoly_divrem_ideal_heap_threaded, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         gr_ctx_t cctx;
         gr_mpoly_ctx_t ctx;
@@ -29,23 +27,19 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal_heap_threaded, state)
         int status, s1, s2, nonfield;
         int big = (n_randint(state, 8) == 0);
 
-        switch (n_randint(state, 4))
+        gr_ctx_t ctx1;
+        gr_ctx_init_nmod8(ctx1, n_randprime(state, 8, 1));
+
+        switch (n_randint(state, 5))
         {
-            case 0:
-                gr_ctx_init_random_finite_field(cctx, state);
-                break;
-            case 1:
-                gr_ctx_init_fmpz(cctx);
-                break;
-            case 2:
-                gr_ctx_init_fmpq(cctx);
-                break;
-            default:
-                gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1));
-                break;
+            case 0: gr_ctx_init_fmpz(cctx); break;
+            case 1: gr_ctx_init_fmpq(cctx); break;
+            case 2: gr_ctx_init_random_finite_field(cctx, state); break;
+            case 3: gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1)); break;
+            default: gr_ctx_init_debug(cctx, ctx1, n_randint(state, 2), n_randint(state, 2) ? 0.0 : 0.001);
         }
 
-        gr_mpoly_ctx_init_rand(ctx, state, cctx, 4);
+        gr_mpoly_ctx_init_rand(ctx, state, cctx, 12);
 
         gr_mpoly_init(A, ctx);
         gr_mpoly_init(R1, ctx);
@@ -162,6 +156,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal_heap_threaded, state)
         gr_mpoly_vec_clear(Q2, ctx);
         gr_mpoly_ctx_clear(ctx);
         gr_ctx_clear(cctx);
+        gr_ctx_clear(ctx1);
     }
 
     TEST_FUNCTION_END(state);

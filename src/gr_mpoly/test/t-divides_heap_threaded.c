@@ -12,8 +12,6 @@
 #include "test_helpers.h"
 #include "gr_mpoly.h"
 
-FLINT_DLL extern gr_static_method_table _ca_methods;
-
 TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
 {
     slong i, j;
@@ -22,7 +20,7 @@ TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
     gr_ctx_init_nmod(ctx1, 17);
 
     /* Check that the threaded quotient matches the serial heap quotient */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         gr_ctx_t cctx;
         gr_ctx_t debug_base_ctx;
@@ -32,7 +30,7 @@ TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
         slong lenf, leng;
         flint_bitcnt_t exp_bits;
         int status, aliasing;
-        int big = (n_randint(state, 8) == 0);
+        int big = (n_randint(state, 10) == 0);
 
         switch (n_randint(state, 5))
         {
@@ -78,7 +76,7 @@ TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
 
         lenf = n_randint(state, big ? 80 : 20) + 1;
         leng = n_randint(state, big ? 30 : 10) + 1;
-        exp_bits = n_randint(state, big ? 12 : 4) + 2;
+        exp_bits = n_randint(state, big ? 6 : 4) + 2;
 
         for (j = 0; j < 2; j++)
         {
@@ -98,9 +96,9 @@ TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
 
             status = GR_SUCCESS;
             status |= gr_mpoly_randtest_bits(q1, state, n_randint(state, 3),
-                                                   n_randint(state, 4) + 2, ctx);
+                                                   n_randint(state, 6) + 2, ctx);
             status |= gr_mpoly_randtest_bits(q2, state, n_randint(state, 3),
-                                                   n_randint(state, 4) + 2, ctx);
+                                                   n_randint(state, 6) + 2, ctx);
 
             {
                 int dstatus1 = gr_mpoly_divides_heap(q1, h, g, ctx);
@@ -181,14 +179,14 @@ TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
 
     /* Also check on arbitrary (not necessarily divisible) inputs that the
        two algorithms never disagree when both succeed */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         gr_mpoly_ctx_t ctx;
         gr_mpoly_t f, g, q1, q2;
         int status, dstatus1, dstatus2;
-        int big = (n_randint(state, 8) == 0);
+        int big = (n_randint(state, 100) == 0);
 
-        gr_mpoly_ctx_init_rand(ctx, state, ctx1, 4);
+        gr_mpoly_ctx_init_rand(ctx, state, ctx1, 12);
 
         gr_mpoly_init(f, ctx);
         gr_mpoly_init(g, ctx);
@@ -199,9 +197,9 @@ TEST_FUNCTION_START(gr_mpoly_divides_heap_threaded, state)
 
         status = GR_SUCCESS;
         status |= gr_mpoly_randtest_bits(f, state, n_randint(state, big ? 100 : 20) + 1,
-                                                n_randint(state, big ? 12 : 4) + 2, ctx);
+                                                n_randint(state, big ? 8 : 4) + 2, ctx);
         status |= gr_mpoly_randtest_bits(g, state, n_randint(state, big ? 30 : 10) + 1,
-                                                n_randint(state, big ? 12 : 4) + 2, ctx);
+                                                n_randint(state, big ? 8 : 4) + 2, ctx);
         if (gr_mpoly_is_zero(g, ctx) != T_FALSE)
             status |= gr_mpoly_one(g, ctx);
 
