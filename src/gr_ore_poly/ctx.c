@@ -416,9 +416,6 @@ gr_ore_poly_ctx_init_randtest(gr_ore_poly_ctx_t ctx, flint_rand_t state,
 
     if (gr_ctx_ngens(&ngens, base_ring) != GR_SUCCESS)
         ngens = 0;
-    /* an invalid index when the base ring has no generator, so that a spurious
-       reliance on a default generator surfaces as GR_UNABLE rather than silently
-       using generator 0 */
     base_var = (ngens > 0) ? (slong) n_randint(state, ngens) : -1;
 
     if (alg == ORE_ALGEBRA_CUSTOM)

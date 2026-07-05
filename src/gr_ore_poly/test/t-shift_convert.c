@@ -99,6 +99,7 @@ TEST_GR_FUNCTION_START(gr_ore_poly_shift_convert, state, count_success, count_do
             flint_abort();
         }
 
+        /* not guaranteed by the documentation */
         if (status == GR_SUCCESS && sh + sh2 != 0)
         {
             flint_printf("FAIL: round-trip power\n");

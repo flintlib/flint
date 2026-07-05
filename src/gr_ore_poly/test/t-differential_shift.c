@@ -56,9 +56,7 @@ check_scaled(const gr_ore_poly_t a, const gr_ore_poly_t b, slong net,
 }
 
 /* Returns 0 only if a == S^net * b is provably false, where S is the forward
-   shift operator. Since S is not an element of octx when it is a backward
-   algebra, we compare in an auxiliary algebra in which S is the generator: we
-   convert both operands to it and clear the S^p offsets returned by convert. */
+   shift operator. */
 static int
 check_shifted(const gr_ore_poly_t a, const gr_ore_poly_t b, slong net,
               gr_ore_poly_ctx_t octx)
@@ -77,12 +75,9 @@ check_shifted(const gr_ore_poly_t a, const gr_ore_poly_t b, slong net,
     gr_ore_poly_init(lhs, fs_ctx);
     gr_ore_poly_init(rhs, fs_ctx);
 
-    /* S^ea * af = a and S^eb * bf = b */
     status |= gr_ore_poly_convert(af, &ea, a, fs_ctx, octx);
     status |= gr_ore_poly_convert(bf, &eb, b, fs_ctx, octx);
 
-    /* a == S^net * b becomes S^(ea+c) af == S^(net+eb+c) bf, with c shifting
-       both exponents to be nonnegative so the powers of S are representable */
     la = ea;
     lb = net + eb;
     c = FLINT_MAX(0, -FLINT_MIN(la, lb));
@@ -105,8 +100,8 @@ check_shifted(const gr_ore_poly_t a, const gr_ore_poly_t b, slong net,
     return ok;
 }
 
-/* Applies a forward-shift recurrence R = sum_k q_k(nu) S^k to the coefficients
-   of a polynomial. */
+/* Applies a recurrence R = sum_k q_k(nu) S^k to the coefficients of a
+   polynomial. */
 static int
 apply_forward_recurrence(gr_poly_t s, const gr_ore_poly_t R, const gr_poly_t f, gr_ctx_t cctx)
 {
@@ -168,12 +163,12 @@ TEST_GR_FUNCTION_START(gr_ore_poly_differential_to_shift, state, count_success, 
         diff_alg = ds_diff_algs[n_randint(state, 2)];
         shift_alg = ds_shift_algs[n_randint(state, 4)];
 
-        if (n_randint(state, 16))
+        if (!n_randint(state, 16))
         {
             diff_alg = ORE_ALGEBRA_COMMUTATIVE;
             expect_success = 0;
         }
-        if (n_randint(state, 16))
+        if (!n_randint(state, 16))
         {
             shift_alg = ORE_ALGEBRA_COMMUTATIVE;
             expect_success = 0;
@@ -207,7 +202,7 @@ TEST_GR_FUNCTION_START(gr_ore_poly_differential_to_shift, state, count_success, 
         count_domain += ((status & GR_DOMAIN) != 0);
         count_unable += ((status & GR_UNABLE) != 0);
 
-        /* round trip recovers x^(p1-p2) * op */
+        /* round trip */
 
         if (status == GR_SUCCESS && !check_scaled(op2, op, p1 - p2, ctx_d))
         {
@@ -291,12 +286,12 @@ TEST_GR_FUNCTION_START(gr_ore_poly_shift_to_differential, state, count_success, 
         shift_alg = ds_shift_algs[n_randint(state, 4)];
 
 
-        if (n_randint(state, 16))
+        if (!n_randint(state, 16))
         {
             diff_alg = ORE_ALGEBRA_COMMUTATIVE;
             expect_success = 0;
         }
-        if (n_randint(state, 16))
+        if (!n_randint(state, 16))
         {
             shift_alg = ORE_ALGEBRA_COMMUTATIVE;
             expect_success = 0;

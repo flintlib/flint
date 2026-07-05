@@ -23,11 +23,8 @@ TEST_GR_FUNCTION_START(gr_ore_poly_convert, state, count_success, count_domain, 
         gr_ore_poly_ctx_t ctx_src, ctx_dst;
         ore_algebra_t sa, da;
         slong power = 0, j;
-        int independent, cstatus, status = GR_SUCCESS;
+        int independent, status = GR_SUCCESS;
 
-        /* Most of the time convert between two algebras over a shared base ring;
-           occasionally use unrelated base rings to check that the function copes
-           sensibly (it returns GR_UNABLE) rather than misbehaving. */
         independent = (n_randint(state, 4) == 0);
 
         gr_ore_poly_ctx_init_randtest2(cctx, ctx_src, state);
@@ -45,12 +42,8 @@ TEST_GR_FUNCTION_START(gr_ore_poly_convert, state, count_success, count_domain, 
 
         status |= gr_ore_poly_randtest(op, state, 1 + n_randint(state, 5), ctx_src);
 
-        cstatus = gr_ore_poly_convert(res, &power, op, ctx_dst, ctx_src);
-        status |= cstatus;
+        status = gr_ore_poly_convert(res, &power, op, ctx_dst, ctx_src);
 
-        /* Over these representative base rings the conversion never fails, as
-           long as both algebras stay within one family (differential or
-           shift/difference) and the two contexts share the base ring. */
         int sa_diff = (sa == ORE_ALGEBRA_DERIVATIVE || sa == ORE_ALGEBRA_EULER_DERIVATIVE);
         int da_diff = (da == ORE_ALGEBRA_DERIVATIVE || da == ORE_ALGEBRA_EULER_DERIVATIVE);
         int sa_shift = (sa == ORE_ALGEBRA_FORWARD_SHIFT || sa == ORE_ALGEBRA_BACKWARD_SHIFT
@@ -62,72 +55,56 @@ TEST_GR_FUNCTION_START(gr_ore_poly_convert, state, count_success, count_domain, 
             && (POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_FMPZ
                 || POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_CC_ACB
                 || POLYNOMIAL_ELEM_CTX(cctx)->which_ring == GR_CTX_NMOD));
-        if (expect_success && cstatus != GR_SUCCESS)
+        if (expect_success && status != GR_SUCCESS)
         {
-            flint_printf("FAIL: convert unexpected failure\n");
+            flint_printf("FAIL: unexpected failure\n");
             flint_printf("sa = %d, da = %d\n", sa, da);
             flint_abort();
         }
 
-        /* When the conversion succeeds, the converted operator must act on the
-           base ring consistently with the original, up to the reported left
-           power: x^power for the differential family, the forward shift S^power
-           (a Taylor shift) for the shift/difference family. */
-        if (cstatus == GR_SUCCESS)
-        {
-            int differential = (sa == ORE_ALGEBRA_DERIVATIVE || sa == ORE_ALGEBRA_EULER_DERIVATIVE)
-                            && (da == ORE_ALGEBRA_DERIVATIVE || da == ORE_ALGEBRA_EULER_DERIVATIVE);
+        /* the converted operator must act on the base ring consistently with
+           the original */
 
+        if (status == GR_SUCCESS)
+        {
             gr_ptr f = gr_heap_init(cctx);
             gr_ptr g_src = gr_heap_init(cctx);
             gr_ptr g_dst = gr_heap_init(cctx);
             gr_ptr corrected = gr_heap_init(cctx);
 
-            for (j = 0; j < 2; j++)
+            for (j = 0; j < 4; j++)
             {
-                int s1, s2;
-
                 status |= gr_randtest(f, state, cctx);
-                s1 = gr_ore_poly_apply(g_src, op, f, ctx_src);
-                s2 = gr_ore_poly_apply(g_dst, res, f, ctx_dst);
-                status |= s1 | s2;
+                status |= gr_ore_poly_apply(g_src, op, f, ctx_src);
+                status |= gr_ore_poly_apply(g_dst, res, f, ctx_dst);
 
-                if (s1 != GR_SUCCESS || s2 != GR_SUCCESS)
+                if (status != GR_SUCCESS)
                     continue;
 
-                /* power == 0 is the identity correction and is the only case
-                   reachable over a non-polynomial base ring (apply succeeds there
-                   only for a constant operator, whose conversion has power 0). A
-                   nonzero power implies a GR_CTX_GR_POLY base ring. */
                 if (power == 0)
                 {
                     status |= gr_set(corrected, g_src, cctx);
                 }
-                else if (differential)
+                else if (sa_diff && da_diff)
                 {
-                    /* x^power * res = op, so corrected = x^{-power} * g_src, x the
-                       generator of index var */
+                    /* for currently implemented conversions */
+                    FLINT_ASSERT(power <= 0);
+
                     slong var = GR_ORE_POLY_ORE_DATA(ctx_src)->base_var;
                     gr_vec_t gens;
-                    gr_ptr xp = gr_heap_init(cctx);
 
                     gr_vec_init(gens, 0, cctx);
                     status |= gr_gens(gens, cctx);
                     if (var < gens->length)
-                        status |= gr_set(xp, gr_vec_entry_srcptr(gens, var, cctx), cctx);
+                        status |= gr_pow_si(corrected, gr_vec_entry_srcptr(gens, var, cctx), -power, cctx);
                     else
                         status |= GR_UNABLE;
                     gr_vec_clear(gens, cctx);
 
-                    status |= gr_pow_ui(xp, xp, (ulong) (-power), cctx);
-                    status |= gr_mul(corrected, xp, g_src, cctx);
-
-                    gr_heap_clear(xp, cctx);
+                    status |= gr_mul(corrected, corrected, g_src, cctx);
                 }
-                else
+                else if (sa_shift && da_shift)
                 {
-                    /* S^power * res = op, so corrected = S^{-power}(g_src), a
-                       Taylor shift of the base ring element (a polynomial) */
                     gr_ctx_struct * sctx = POLYNOMIAL_ELEM_CTX(cctx);
                     gr_ptr c = gr_heap_init(sctx);
 
@@ -139,7 +116,7 @@ TEST_GR_FUNCTION_START(gr_ore_poly_convert, state, count_success, count_domain, 
 
                 if (status == GR_SUCCESS && gr_equal(g_dst, corrected, cctx) == T_FALSE)
                 {
-                    flint_printf("FAIL: convert application inconsistent\n");
+                    flint_printf("FAIL: application\n");
                     flint_printf("sa = %d, da = %d, power = %wd\n", sa, da, power);
                     flint_abort();
                 }

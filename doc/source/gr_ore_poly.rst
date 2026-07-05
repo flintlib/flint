@@ -307,9 +307,9 @@ different Ore polynomial rings over the same base ring.
     to operators written in terms of the forward and backward shifts `S`,
     `S^{-1}` and the forward and backward differences `S-1`, `1-S^{-1}`).
     The context *ctx* is the common base ring and *var* is the index of the
-    generator of *ctx* on which `S` acts. Conversions that crosses between the
+    generator of *ctx* on which `S` acts. Conversions that cross between the
     forward side `S`, `S-1` and the backward side `S^{-1}`, `1-S^{-1}`
-    additionally require a generic univariate polynomial base ring and otherwise
+    currently require a generic univariate polynomial base ring and otherwise
     return ``GR_UNABLE``.
     The result satisfies
     `S^{\textit{p}} \cdot \textit{res} = \textit{op}`.
