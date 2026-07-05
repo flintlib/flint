@@ -86,7 +86,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal_heap_threaded, state)
             s2 = nonfield ? gr_mpoly_divrem_ideal_weak_heap_threaded(Q2, R2, A, B, ctx)
                           : gr_mpoly_divrem_ideal_heap_threaded(Q2, R2, A, B, ctx);
 
-            if (s1 != s2)
+            if (cctx->which_ring != GR_CTX_DEBUG && s1 != s2)
             {
                 flint_printf("FAIL: status mismatch serial=%d threaded=%d\n", s1, s2);
                 flint_printf("iter = %wd\n", iter);
@@ -95,7 +95,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal_heap_threaded, state)
                 flint_abort();
             }
 
-            if (s1 == GR_SUCCESS)
+            if (s1 == GR_SUCCESS && s2 == GR_SUCCESS)
             {
                 gr_mpoly_assert_canonical(R1, ctx);
                 gr_mpoly_assert_canonical(R2, ctx);

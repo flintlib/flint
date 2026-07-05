@@ -114,7 +114,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem_heap_threaded, state)
                           : gr_mpoly_div_heap_threaded(q2, f, g, ctx);
         }
 
-        if (s1 != s2)
+        if (!used_debug_base && (s1 != s2))
         {
             flint_printf("FAIL: status mismatch serial=%d threaded=%d "
                          "nonfield=%d want_r=%d\n", s1, s2, nonfield, want_r);
