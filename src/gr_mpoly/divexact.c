@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2017 William Hart
+    Copyright (C) 2017 Daniel Schultz
     Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
@@ -9,26 +11,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
 #include "mpoly.h"
 #include "gr_mpoly.h"
+#include "threaded_divmod.h" /* for the exposed _gr_mpoly_divrem_mp kernel */
 
-/*
-    Division by a single term B = c * x^beta.  Every term a*x^alpha of A must
-    have x^beta | x^alpha and c | a exactly; the quotient term is then
-    (a/c) * x^(alpha - beta).  Since alpha - beta preserves the monomial order
-    and is injective, the quotient is already canonical (this also covers the
-    scalar case beta = 0).  The coefficient division follows the same rule as
-    divides_monagan_pearce: multiply by 1/c when c is a unit, else use gr_div.
-*/
 static int
-_gr_mpoly_divides_monomial(gr_mpoly_t Q,
+_gr_mpoly_divexact_monomial(gr_mpoly_t Q,
     const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
     slong sz = cctx->sizeof_elem;
-    slong i, N, Alen = A->length;
+    slong i, qlen, N, Alen = A->length;
     flint_bitcnt_t exp_bits;
     ulong * Aexps = A->exps, * Bexps = B->exps;
     gr_srcptr Bc = B->coeffs;
@@ -75,48 +69,43 @@ _gr_mpoly_divides_monomial(gr_mpoly_t Q,
     lc_is_one = (gr_is_one(Bc, cctx) == T_TRUE);
     lc_is_unit = lc_is_one || (gr_inv(inv, Bc, cctx) == GR_SUCCESS);
 
+    qlen = 0;
     for (i = 0; i < Alen; i++)
     {
         int divides, cstatus;
 
         if (exp_bits <= FLINT_BITS)
-            divides = mpoly_monomial_divides(T->exps + N*i, Aexps + N*i, Bexps, N, mask);
+            divides = mpoly_monomial_divides(T->exps + N*qlen, Aexps + N*i, Bexps, N, mask);
         else
-            divides = mpoly_monomial_divides_mp(T->exps + N*i, Aexps + N*i, Bexps, N, exp_bits);
+            divides = mpoly_monomial_divides_mp(T->exps + N*qlen, Aexps + N*i, Bexps, N, exp_bits);
 
+        /* Since the division is known to be exact, spurious terms must correspond
+           to inexact/unproved representation of actual zeros, which are thus
+           safe to discard (e.g. we must have [+/-0.1]*x / y -> 0). */
         if (!divides)
-        {
-            if (gr_is_zero(GR_ENTRY(A->coeffs, i, sz), cctx) == T_FALSE)
-                status = GR_DOMAIN;
-            else
-                status = GR_UNABLE;
-            break;
-        }
+            continue;
 
         if (lc_is_one)
-            cstatus = gr_set(GR_ENTRY(T->coeffs, i, sz), GR_ENTRY(A->coeffs, i, sz), cctx);
+            cstatus = gr_set(GR_ENTRY(T->coeffs, qlen, sz), GR_ENTRY(A->coeffs, i, sz), cctx);
         else if (lc_is_unit)
-            cstatus = gr_mul(GR_ENTRY(T->coeffs, i, sz), GR_ENTRY(A->coeffs, i, sz), inv, cctx);
+            cstatus = gr_mul(GR_ENTRY(T->coeffs, qlen, sz), GR_ENTRY(A->coeffs, i, sz), inv, cctx);
         else
-            cstatus = gr_div(GR_ENTRY(T->coeffs, i, sz), GR_ENTRY(A->coeffs, i, sz), Bc, cctx);
+            cstatus = gr_divexact(GR_ENTRY(T->coeffs, qlen, sz), GR_ENTRY(A->coeffs, i, sz), Bc, cctx);
 
-        if (cstatus == GR_DOMAIN)
-        {
-            status = GR_DOMAIN;
-            break;
-        }
-        else if (cstatus != GR_SUCCESS)
+        if (cstatus != GR_SUCCESS)
         {
             status |= cstatus;
             break;
         }
+
+        qlen++;
     }
 
     GR_TMP_CLEAR(inv, cctx);
 
     if (status == GR_SUCCESS)
     {
-        _gr_mpoly_set_length(T, Alen, ctx);
+        _gr_mpoly_set_length(T, qlen, ctx);
         gr_mpoly_swap(Q, T, ctx);
     }
     else
@@ -134,11 +123,10 @@ _gr_mpoly_divides_monomial(gr_mpoly_t Q,
     return status;
 }
 
+
 int
-gr_mpoly_divides(gr_mpoly_t Q,
-    const gr_mpoly_t A,
-    const gr_mpoly_t B,
-    gr_mpoly_ctx_t ctx)
+gr_mpoly_divexact(gr_mpoly_t Q,
+    const gr_mpoly_t A, const gr_mpoly_t B, gr_mpoly_ctx_t ctx)
 {
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
 
@@ -157,20 +145,13 @@ gr_mpoly_divides(gr_mpoly_t Q,
     if (A->length == 0)
         return gr_mpoly_zero(Q, ctx);
 
-    /* scalar or monomial divisor: cheaper direct handling */
     if (B->length == 1)
-        return _gr_mpoly_divides_monomial(Q, A, B, ctx);
-
-    /* This method is used to overload gr_div, so it should be conservative
-       when ctx is something weird. */
-    if (gr_ctx_is_integral_domain(cctx) != T_TRUE)
-        return GR_UNABLE;
+        return _gr_mpoly_divexact_monomial(Q, A, B, ctx);
 
     if (A->length > 500 && B->length > 2 &&
             gr_ctx_is_threadsafe(cctx) == T_TRUE &&
             flint_get_num_available_threads() > 1)
-        return gr_mpoly_divides_heap_threaded(Q, A, B, ctx);
+        return gr_mpoly_divexact_heap_threaded(Q, A, B, ctx);
 
-    return gr_mpoly_divides_heap(Q, A, B, ctx);
+    return _gr_mpoly_divrem_mp(Q, NULL, A, B, 0, 1, ctx);
 }
-

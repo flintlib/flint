@@ -86,8 +86,14 @@ int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
 
     T0 = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     T1 = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_monomial_sub_mp(T0, Aexp + N*0, Bexp + N*0, N);
-    mpoly_monomial_sub_mp(T1, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_sub(T0, Aexp + N*0, Bexp + N*0, N);
+    else
+        mpoly_monomial_sub_mp(T0, Aexp + N*0, Bexp + N*0, N);
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_sub(T1, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
+    else
+        mpoly_monomial_sub_mp(T1, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
     if (bits <= FLINT_BITS)
     {
         if (   mpoly_monomial_overflows(T0, N, mask)
@@ -116,16 +122,28 @@ int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
         j = FLINT_MAX(j, WORD(0));
         j = FLINT_MIN(j, Blen - 1);
 
-        mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*0, Bexp + N*0, N);
-        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
+        if (bits <= FLINT_BITS)
+            mpoly_monomial_sub(Sexp + N*Slen, Aexp + N*0, Bexp + N*0, N);
+        else
+            mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*0, Bexp + N*0, N);
+        if (bits <= FLINT_BITS)
+            mpoly_monomial_add(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
+        else
+            mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
         fmpz_one(Scoeff + Slen);
         if (bits <= FLINT_BITS)
             Slen += !(mpoly_monomial_overflows(Sexp + N*Slen, N, mask));
         else
             Slen += !(mpoly_monomial_overflows_mp(Sexp + N*Slen, N, bits));
 
-        mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
-        mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
+        if (bits <= FLINT_BITS)
+            mpoly_monomial_sub(Sexp + N*Slen, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
+        else
+            mpoly_monomial_sub_mp(Sexp + N*Slen, Aexp + N*(Alen - 1), Bexp + N*(Blen - 1), N);
+        if (bits <= FLINT_BITS)
+            mpoly_monomial_add(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
+        else
+            mpoly_monomial_add_mp(Sexp + N*Slen, Sexp + N*Slen, Bexp + N*j, N);
         fmpz_one(Scoeff + Slen);
         if (bits <= FLINT_BITS)
             Slen += !(mpoly_monomial_overflows(Sexp + N*Slen, N, mask));

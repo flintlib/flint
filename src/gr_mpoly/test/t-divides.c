@@ -191,8 +191,11 @@ TEST_FUNCTION_START(gr_mpoly_divides, state)
         gr_mpoly_ctx_t ctx;
         int big = (n_randint(state, 8) == 0);
 
+        gr_ctx_t ctx1;
+        gr_ctx_init_nmod8(ctx1, n_randprime(state, 8, 1));
+
         /* commutative rings only: choose a field or integral domain */
-        switch (n_randint(state, 5))
+        switch (n_randint(state, 8))
         {
             case 0:
                 gr_ctx_init_fmpz(cctx);
@@ -207,7 +210,7 @@ TEST_FUNCTION_START(gr_mpoly_divides, state)
                 gr_ctx_init_real_arb(cctx, 2 + n_randint(state, 200));
                 break;
             default:
-                gr_ctx_init_nmod(cctx, n_randtest_prime(state, 1));
+                gr_ctx_init_debug(cctx, ctx1, n_randint(state, 2), n_randint(state, 2) ? 0.0 : 0.001);
                 break;
         }
 
@@ -219,6 +222,7 @@ TEST_FUNCTION_START(gr_mpoly_divides, state)
 
         gr_mpoly_ctx_clear(ctx);
         gr_ctx_clear(cctx);
+        gr_ctx_clear(ctx1);
     }
 
     TEST_FUNCTION_END(state);

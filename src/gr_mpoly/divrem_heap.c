@@ -19,6 +19,7 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 #include "gr_mpoly.h"
+#include "threaded_divmod.h"
 
 /*
     GR port of fmpz_mpoly_divrem_monagan_pearce.
@@ -69,11 +70,14 @@
         } \
     } while (0)
 
-/* quotient coefficient = acc / lc(B) (field-like: must be exact) */
+/* quotient coefficient = acc / lc(B) (field-like: must be exact, unless
+   unchecked, in which case we trust the caller and use gr_divexact for
+   the non-unit case -- see gr_mpoly_divexact) */
 #define DIVREM_QCOEFF(dst, acc) \
     (lc_is_one  ? gr_set(dst, acc, cctx) \
      : lc_is_unit ? gr_mul(dst, acc, lc_inv, cctx) \
-                  : gr_div(dst, acc, coeff3, cctx))
+     : unchecked ? gr_divexact(dst, acc, coeff3, cctx) \
+                 : gr_div(dst, acc, coeff3, cctx))
 
 /* append a remainder term (val) * x^exp; skipped entirely when R is absent
    (write_r == 0), which is how the remainder-free div variants are obtained */
@@ -104,11 +108,13 @@
     Sets commit = 1 if a quotient term GR_ENTRY(q_coeff, q_len, sz) was produced.
 
     Field-like (nonfield == 0): the coefficient division must be exact
-    (returning GR_DOMAIN otherwise); terms not reducible go to R.
+    (returning GR_DOMAIN otherwise, unless unchecked -- see DIVREM_QCOEFF);
+    terms not reducible go to R.
 
     Non-field (nonfield == 1): the coefficient is divided with remainder via
     gr_euclidean_divrem (the analogue of fmpz_fdiv_qr); the excess remainder is
     added to R, so a monomial divisible by lm(B) may still contribute to R.
+    (unchecked is not meaningful together with nonfield.)
 */
 #define DIVREM_COEFF_STEP(ADD_R_TERM) \
 { \
@@ -120,12 +126,11 @@
     { \
         cstatus = gr_euclidean_divrem(GR_ENTRY(q_coeff, q_len, sz), rem, acc, coeff3, cctx); \
         if (cstatus != GR_SUCCESS) { status |= cstatus; goto cleanup; } \
-        switch (gr_is_zero(rem, cctx)) \
-        { \
-            case T_TRUE: break; \
-            case T_FALSE: ADD_R_TERM(rem); break; \
-            default: status |= GR_UNABLE; goto cleanup; \
-        } \
+        /* an unknown zero-status is treated as "not zero" (i.e. kept in \
+           R): we only need the euclidean division itself to succeed, not \
+           to know for certain whether its remainder happens to vanish. */ \
+        if (gr_is_zero(rem, cctx) != T_TRUE) \
+            ADD_R_TERM(rem); \
         commit = (gr_is_zero(GR_ENTRY(q_coeff, q_len, sz), cctx) != T_TRUE); \
     } \
     else \
@@ -141,7 +146,7 @@
 
 
 static int _gr_mpoly_divrem_heap1(
-    gr_mpoly_t Q, gr_mpoly_t R, int * overflowed, int nonfield,
+    gr_mpoly_t Q, gr_mpoly_t R, int * overflowed, int nonfield, int unchecked,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
     gr_srcptr coeff3, const ulong * exp3, slong len3,
     flint_bitcnt_t bits, ulong maskhi,
@@ -315,16 +320,12 @@ static int _gr_mpoly_divrem_heap1(
         }
 
         /* if accumulated coefficient is zero, this term vanishes */
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto cleanup;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         commit = 0;
         DIVREM_COEFF_STEP(ADD_R_TERM1);
@@ -381,7 +382,7 @@ cleanup:
 
 
 static int _gr_mpoly_divrem_heap(
-    gr_mpoly_t Q, gr_mpoly_t R, int * overflowed, int nonfield,
+    gr_mpoly_t Q, gr_mpoly_t R, int * overflowed, int nonfield, int unchecked,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
     gr_srcptr coeff3, const ulong * exp3, slong len3,
     flint_bitcnt_t bits, slong N, const ulong * cmpmask,
@@ -415,7 +416,7 @@ static int _gr_mpoly_divrem_heap(
     TMP_INIT;
 
     if (N == 1)
-        return _gr_mpoly_divrem_heap1(Q, R, overflowed, nonfield,
+        return _gr_mpoly_divrem_heap1(Q, R, overflowed, nonfield, unchecked,
                    coeff2, exp2, len2, coeff3, exp3, len3, bits, cmpmask[0], ctx);
 
     have_fast_dot = (GR_VEC_DOT_OP(cctx, VEC_DOT) != (gr_method_vec_dot_op) gr_generic_vec_dot);
@@ -600,16 +601,12 @@ static int _gr_mpoly_divrem_heap(
             }
         }
 
-        switch (gr_is_zero(acc, cctx))
-        {
-            case T_TRUE:
-                continue;
-            case T_FALSE:
-                break;
-            default:
-                status |= GR_UNABLE;
-                goto cleanup;
-        }
+        /* an unknown zero-status is treated as "not zero" -- see the
+           discussion at gr_mpoly_divexact for why this is safe: we only
+           need the coefficient division below to succeed, not to know for
+           certain that acc is nonzero. */
+        if (gr_is_zero(acc, cctx) == T_TRUE)
+            continue;
 
         commit = 0;
         DIVREM_COEFF_STEP(ADD_R_TERMN);
@@ -670,9 +667,18 @@ cleanup:
 }
 
 
-static int _gr_mpoly_divrem_mp(
+/*
+    The guaranteed-serial divrem kernel (never dispatches to threading).
+    External linkage so that divrem_heap_threaded.c can call it directly as
+    a fallback -- calling the *public* gr_mpoly_div/divrem/_weak functions
+    instead would be wrong, since those may route large instances straight
+    back into the threaded engine, risking infinite recursion whenever the
+    threaded engine's own fallback paths are hit (e.g. mpoly_divides_select_exps
+    failing to find a clean partition on a large instance).
+*/
+int _gr_mpoly_divrem_mp(
     gr_mpoly_t Q, gr_mpoly_t R,
-    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield,
+    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield, int unchecked,
     gr_mpoly_ctx_t ctx)
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
@@ -754,7 +760,7 @@ static int _gr_mpoly_divrem_mp(
         if (r != NULL)
             r->bits = exp_bits;
 
-        status = _gr_mpoly_divrem_heap(q, r, &overflowed, nonfield,
+        status = _gr_mpoly_divrem_heap(q, r, &overflowed, nonfield, unchecked,
                             A->coeffs, exp2, A->length,
                             B->coeffs, exp3, B->length, exp_bits, N, cmpmask, ctx);
 
@@ -823,7 +829,33 @@ int gr_mpoly_divrem_heap(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_mp(Q, R, A, B, 0, ctx);
+    return _gr_mpoly_divrem_mp(Q, R, A, B, 0, 0, ctx);
+}
+
+
+/*
+    Dispatch to the multithreaded engine (gr_mpoly/divrem_heap_threaded.c)
+    for large, thread-safe instances; the threshold mirrors gr_mpoly_divides.
+*/
+GR_MPOLY_INLINE int
+_gr_mpoly_divrem_dispatch(gr_mpoly_t Q, gr_mpoly_t R,
+    const gr_mpoly_t A, const gr_mpoly_t B, int nonfield, gr_mpoly_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
+
+    if (A->length > 500 && B->length > 2 &&
+            gr_ctx_is_threadsafe(cctx) == T_TRUE &&
+            flint_get_num_available_threads() > 1)
+    {
+        if (R != NULL)
+            return nonfield ? gr_mpoly_divrem_weak_heap_threaded(Q, R, A, B, ctx)
+                             : gr_mpoly_divrem_heap_threaded(Q, R, A, B, ctx);
+        else
+            return nonfield ? gr_mpoly_div_weak_heap_threaded(Q, A, B, ctx)
+                             : gr_mpoly_div_heap_threaded(Q, A, B, ctx);
+    }
+
+    return _gr_mpoly_divrem_mp(Q, R, A, B, nonfield, 0, ctx);
 }
 
 
@@ -832,7 +864,7 @@ int gr_mpoly_divrem(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_mp(Q, R, A, B, 0, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, R, A, B, 0, ctx);
 }
 
 
@@ -841,7 +873,7 @@ int gr_mpoly_divrem_weak(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_mp(Q, R, A, B, 1, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, R, A, B, 1, ctx);
 }
 
 
@@ -851,7 +883,7 @@ int gr_mpoly_div(
     gr_mpoly_ctx_t ctx)
 {
     /* remainder-free: the kernel skips all remainder writes when R is NULL */
-    return _gr_mpoly_divrem_mp(Q, NULL, A, B, 0, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, NULL, A, B, 0, ctx);
 }
 
 
@@ -860,5 +892,5 @@ int gr_mpoly_div_weak(
     const gr_mpoly_t A, const gr_mpoly_t B,
     gr_mpoly_ctx_t ctx)
 {
-    return _gr_mpoly_divrem_mp(Q, NULL, A, B, 1, ctx);
+    return _gr_mpoly_divrem_dispatch(Q, NULL, A, B, 1, ctx);
 }
