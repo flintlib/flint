@@ -101,7 +101,7 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal, state)
             status = gr_mpoly_divrem_ideal(Q, R, A, B, ctx);
 
             /* field-like */
-            switch (n_randint(state, 4) * 0)
+            switch (n_randint(state, 4))
             {
                 case 0:
                     status = gr_mpoly_divrem_ideal(Q, R, A, B, ctx);

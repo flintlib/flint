@@ -376,8 +376,8 @@ int _gr_mpoly_divrem_mp(
     directly, for the same reason _gr_mpoly_divrem_mp is exposed above.
 */
 int _gr_mpoly_divrem_ideal(
-    gr_mpoly_struct ** Q, gr_mpoly_t R,
-    const gr_mpoly_t A, gr_mpoly_struct * const * B, slong len,
+    gr_mpoly_struct * Q, gr_mpoly_t R,
+    const gr_mpoly_t A, const gr_mpoly_struct * B, slong len,
     int nonfield, gr_mpoly_ctx_t ctx);
 
 #endif

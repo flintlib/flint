@@ -83,8 +83,35 @@ TEST_FUNCTION_START(gr_mpoly_divrem_ideal_heap_threaded, state)
         {
             s1 = nonfield ? gr_mpoly_divrem_ideal_weak(Q1, R1, A, B, ctx)
                           : gr_mpoly_divrem_ideal(Q1, R1, A, B, ctx);
-            s2 = nonfield ? gr_mpoly_divrem_ideal_weak_heap_threaded(Q2, R2, A, B, ctx)
-                          : gr_mpoly_divrem_ideal_heap_threaded(Q2, R2, A, B, ctx);
+
+            /* exercise aliasing of the threaded call's own Q2/R2 with its
+               own A/B arguments (Q2 == B, or R2 == A); B and A themselves
+               are never mutated here (Q2/R2 receive copies beforehand),
+               so the later comparisons against Q1/R1/B/A below remain
+               valid regardless of which case is taken */
+            switch (n_randint(state, 4))
+            {
+                case 0:
+                    s2 = nonfield ? gr_mpoly_divrem_ideal_weak_heap_threaded(Q2, R2, A, B, ctx)
+                                  : gr_mpoly_divrem_ideal_heap_threaded(Q2, R2, A, B, ctx);
+                    break;
+                case 1:
+                    status |= gr_mpoly_vec_set(Q2, B, ctx);
+                    s2 = nonfield ? gr_mpoly_divrem_ideal_weak_heap_threaded(Q2, R2, A, Q2, ctx)
+                                  : gr_mpoly_divrem_ideal_heap_threaded(Q2, R2, A, Q2, ctx);
+                    break;
+                case 2:
+                    status |= gr_mpoly_set(R2, A, ctx);
+                    s2 = nonfield ? gr_mpoly_divrem_ideal_weak_heap_threaded(Q2, R2, R2, B, ctx)
+                                  : gr_mpoly_divrem_ideal_heap_threaded(Q2, R2, R2, B, ctx);
+                    break;
+                default:
+                    status |= gr_mpoly_set(R2, A, ctx);
+                    status |= gr_mpoly_vec_set(Q2, B, ctx);
+                    s2 = nonfield ? gr_mpoly_divrem_ideal_weak_heap_threaded(Q2, R2, R2, Q2, ctx)
+                                  : gr_mpoly_divrem_ideal_heap_threaded(Q2, R2, R2, Q2, ctx);
+                    break;
+            }
 
             if (cctx->which_ring != GR_CTX_DEBUG && s1 != s2)
             {

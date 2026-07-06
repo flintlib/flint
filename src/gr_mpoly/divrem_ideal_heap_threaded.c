@@ -64,7 +64,7 @@
         else \
         { \
             hinds[x->p][x->i] |= WORD(1); \
-            SET_SHALLOW(dot_a, dot_len, poly3[x->p]->coeffs, x->i); \
+            SET_SHALLOW(dot_a, dot_len, poly3[x->p].coeffs, x->i); \
             SET_SHALLOW(dot_b, dot_len, Qcoeff[x->p], x->j); \
             dot_len++; \
         } \
@@ -74,7 +74,7 @@
 #define IDEAL_STRIPE_QCOEFF(dst, w, val) \
     (lc_is_one[w]  ? gr_set(dst, val, cctx) \
      : lc_is_unit[w] ? gr_mul(dst, val, GR_ENTRY(lc_inv, w, sz), cctx) \
-                     : gr_div(dst, val, GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx))
+                     : gr_div(dst, val, GR_ENTRY(poly3[w].coeffs, 0, sz), cctx))
 
 
 /*
@@ -117,7 +117,7 @@ typedef struct
     ideal_chunk_struct * tail;
     ideal_chunk_struct * volatile cur;
     gr_mpoly_t polyA;
-    gr_mpoly_struct * const * polyB; /* array of length `len`, shallow */
+    const gr_mpoly_struct * polyB;   /* array of length `len`, shallow */
     gr_mpoly_ts_struct * polyQ;      /* array of length `len` */
     gr_mpoly_ts_t polyR;
     gr_mpoly_ctx_struct * ctx;
@@ -275,7 +275,7 @@ typedef ideal_stripe_out_struct ideal_stripe_out_t[1];
 static void _gr_mpoly_divrem_ideal_stripe1(
     ideal_stripe_out_t * Qout, ideal_stripe_out_t Wout,
     gr_srcptr Acoeff, const ulong * Aexp, slong Alen,
-    gr_mpoly_struct * const * poly3, slong len,
+    const gr_mpoly_struct * poly3, slong len,
     ulong emin, ulong cmpmask, flint_bitcnt_t bits,
     int nonfield, int * lc_is_one, int * lc_is_unit, gr_srcptr lc_inv,
     gr_mpoly_ctx_t ctx, int * res_status, int * overflowed)
@@ -320,7 +320,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
     hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
     for (w = 0; w < len; w++)
-        len3 += poly3[w]->length;
+        len3 += poly3[w].length;
     chains_ptr = (mpoly_nheap_t *) TMP_ALLOC(len3*sizeof(mpoly_nheap_t));
     hinds_ptr = (slong *) TMP_ALLOC(len3*sizeof(slong));
 
@@ -329,8 +329,8 @@ static void _gr_mpoly_divrem_ideal_stripe1(
     {
         chains[w] = chains_ptr + len3;
         hinds[w] = hinds_ptr + len3;
-        len3 += poly3[w]->length;
-        for (i = 0; i < poly3[w]->length; i++)
+        len3 += poly3[w].length;
+        for (i = 0; i < poly3[w].length; i++)
             hinds[w][i] = 1;
     }
 
@@ -346,7 +346,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
     for (w = 0; w < len; w++)
     {
         k[w] = -WORD(1);
-        s[w] = poly3[w]->length;
+        s[w] = poly3[w].length;
     }
 
     mask = mpoly_overflow_mask_sp(bits);
@@ -412,7 +412,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
                     else
                     {
                         hinds[x->p][x->i] |= WORD(1);
-                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p]->coeffs, x->i, sz),
+                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p].coeffs, x->i, sz),
                                              GR_ENTRY(Qcoeff[x->p], x->j, sz), cctx);
                         status |= gr_sub(acc, acc, pp, cctx);
                     }
@@ -445,7 +445,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
             }
             else
             {
-                if ((i + 1 < poly3[p]->length) && (hinds[p][i + 1] == 2*j + 1))
+                if ((i + 1 < poly3[p].length) && (hinds[p][i + 1] == 2*j + 1))
                 {
                     x = chains[p] + i + 1;
                     x->i = i + 1;
@@ -454,7 +454,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    texp = poly3[p]->exps[x->i] + Qout[p]->exps[x->j];
+                    texp = poly3[p].exps[x->i] + Qout[p]->exps[x->j];
                     if (mpoly_monomial_cmp1(texp, emin, cmpmask) >= 0)
                         _mpoly_heap_insert1(heap, texp, x, &next_loc, &heap_len, cmpmask);
                     else
@@ -474,7 +474,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    texp = poly3[p]->exps[x->i] + Qout[p]->exps[x->j];
+                    texp = poly3[p].exps[x->i] + Qout[p]->exps[x->j];
                     if (mpoly_monomial_cmp1(texp, emin, cmpmask) >= 0)
                         _mpoly_heap_insert1(heap, texp, x, &next_loc, &heap_len, cmpmask);
                     else
@@ -498,7 +498,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
             {
                 int d1, d2;
 
-                d1 = mpoly_monomial_divides1(&texp, exp, poly3[w]->exps[0], mask);
+                d1 = mpoly_monomial_divides1(&texp, exp, poly3[w].exps[0], mask);
 
                 if (!d1)
                     continue;
@@ -509,7 +509,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
                 if (nonfield)
                 {
                     cstatus = gr_euclidean_divrem(GR_ENTRY(Qcoeff[w], k[w] + 1, sz),
-                                     rem, acc, GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx);
+                                     rem, acc, GR_ENTRY(poly3[w].coeffs, 0, sz), cctx);
                     if (cstatus != GR_SUCCESS) { status |= cstatus; goto unable; }
                     gr_swap(acc, rem, cctx);
                     d2 = (gr_is_zero(GR_ENTRY(Qcoeff[w], k[w] + 1, sz), cctx) != T_TRUE);
@@ -537,7 +537,7 @@ static void _gr_mpoly_divrem_ideal_stripe1(
                         x->next = NULL;
                         hinds[w][x->i] = 2*(x->j + 1) + 0;
 
-                        texp = poly3[w]->exps[1] + Qout[w]->exps[k[w]];
+                        texp = poly3[w].exps[1] + Qout[w]->exps[k[w]];
                         if (mpoly_monomial_cmp1(texp, emin, cmpmask) >= 0)
                             _mpoly_heap_insert1(heap, texp, x, &next_loc, &heap_len, cmpmask);
                         else
@@ -602,7 +602,7 @@ cleanup:
 static void _gr_mpoly_divrem_ideal_stripe(
     ideal_stripe_out_t * Qout, ideal_stripe_out_t Wout,
     gr_srcptr Acoeff, const ulong * Aexp, slong Alen,
-    gr_mpoly_struct * const * poly3, slong len,
+    const gr_mpoly_struct * poly3, slong len,
     const ulong * emin, const ulong * cmpmask, slong N, flint_bitcnt_t bits,
     int nonfield, int * lc_is_one, int * lc_is_unit, gr_srcptr lc_inv,
     gr_mpoly_ctx_t ctx, int * res_status, int * overflowed)
@@ -649,7 +649,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
     hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
     for (w = 0; w < len; w++)
-        len3 += poly3[w]->length;
+        len3 += poly3[w].length;
     chains_ptr = (mpoly_nheap_t *) TMP_ALLOC(len3*sizeof(mpoly_nheap_t));
     hinds_ptr = (slong *) TMP_ALLOC(len3*sizeof(slong));
 
@@ -658,8 +658,8 @@ static void _gr_mpoly_divrem_ideal_stripe(
     {
         chains[w] = chains_ptr + len3;
         hinds[w] = hinds_ptr + len3;
-        len3 += poly3[w]->length;
-        for (i = 0; i < poly3[w]->length; i++)
+        len3 += poly3[w].length;
+        for (i = 0; i < poly3[w].length; i++)
             hinds[w][i] = 1;
     }
 
@@ -683,7 +683,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
     for (w = 0; w < len; w++)
     {
         k[w] = -WORD(1);
-        s[w] = poly3[w]->length;
+        s[w] = poly3[w].length;
     }
 
     mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
@@ -703,21 +703,10 @@ static void _gr_mpoly_divrem_ideal_stripe(
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
         {
-            if (mpoly_monomial_overflows(exp, N, mask))
-            {
-                *overflowed = 1;
-                goto unable;
-            }
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-            {
-                *overflowed = 1;
-                goto unable;
-            }
+            *overflowed = 1;
+            goto unable;
         }
 
         FLINT_ASSERT(mpoly_monomial_cmp(exp, emin, N, cmpmask) >= 0);
@@ -764,7 +753,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                     else
                     {
                         hinds[x->p][x->i] |= WORD(1);
-                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p]->coeffs, x->i, sz),
+                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p].coeffs, x->i, sz),
                                              GR_ENTRY(Qcoeff[x->p], x->j, sz), cctx);
                         status |= gr_sub(acc, acc, pp, cctx);
                     }
@@ -798,7 +787,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
             }
             else
             {
-                if ((i + 1 < poly3[p]->length) && (hinds[p][i + 1] == 2*j + 1))
+                if ((i + 1 < poly3[p].length) && (hinds[p][i + 1] == 2*j + 1))
                 {
                     x = chains[p] + i + 1;
                     x->i = i + 1;
@@ -807,7 +796,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[p]->exps + x->i*N, Qout[p]->exps + x->j*N, N, bits);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[p].exps + x->i*N, Qout[p]->exps + x->j*N, N, bits);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -829,7 +818,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[p]->exps + x->i*N, Qout[p]->exps + x->j*N, N, bits);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[p].exps + x->i*N, Qout[p]->exps + x->j*N, N, bits);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -855,7 +844,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
             {
                 int d1, d2;
 
-                d1 = mpoly_monomial_divides_any_bits(texp, exp, poly3[w]->exps, N, mask, bits);
+                d1 = mpoly_monomial_divides_any_bits(texp, exp, poly3[w].exps, N, mask, bits);
 
                 if (!d1)
                     continue;
@@ -866,7 +855,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                 if (nonfield)
                 {
                     cstatus = gr_euclidean_divrem(GR_ENTRY(Qcoeff[w], k[w] + 1, sz),
-                                     rem, acc, GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx);
+                                     rem, acc, GR_ENTRY(poly3[w].coeffs, 0, sz), cctx);
                     if (cstatus != GR_SUCCESS) { status |= cstatus; goto unable; }
                     gr_swap(acc, rem, cctx);
                     d2 = (gr_is_zero(GR_ENTRY(Qcoeff[w], k[w] + 1, sz), cctx) != T_TRUE);
@@ -894,7 +883,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                         x->next = NULL;
                         hinds[w][x->i] = 2*(x->j + 1) + 0;
 
-                        mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[w]->exps + N, Qout[w]->exps + k[w]*N, N, bits);
+                        mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[w].exps + N, Qout[w]->exps + k[w]*N, N, bits);
 
                         if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
                             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -1039,7 +1028,7 @@ static void ideal_chunk_mulsub(ideal_worker_arg_t W, ideal_chunk_t L, const slon
 
     for (w = 0; w < H->len; w++)
     {
-        gr_mpoly_struct * B = H->polyB[w];
+        const gr_mpoly_struct * B = H->polyB + w;
         gr_mpoly_ts_struct * Q = H->polyQ + w;
         slong mq = L->mq[w];
         slong new_length = q_prev_length[w];
@@ -1314,7 +1303,7 @@ static void ideal_worker_loop(void * varg)
     S->big_mem = NULL;
 
     for (w = 0; w < H->len; w++)
-        maxBlen = FLINT_MAX(maxBlen, H->polyB[w]->length);
+        maxBlen = FLINT_MAX(maxBlen, H->polyB[w].length);
     stripe_fit_length(S, maxBlen);
 
     gr_mpoly_init3(T1, 16, H->bits, H->ctx);
@@ -1371,8 +1360,8 @@ static void ideal_worker_loop(void * varg)
 
 
 static int
-_gr_mpoly_divrem_ideal_serial(gr_mpoly_struct * const * Q, gr_mpoly_t R,
-    const gr_mpoly_t A, gr_mpoly_struct * const * B, slong len,
+_gr_mpoly_divrem_ideal_serial(gr_mpoly_struct * Q, gr_mpoly_t R,
+    const gr_mpoly_t A, const gr_mpoly_struct * B, slong len,
     int nonfield, gr_mpoly_ctx_t ctx)
 {
     /*
@@ -1382,15 +1371,15 @@ _gr_mpoly_divrem_ideal_serial(gr_mpoly_struct * const * Q, gr_mpoly_t R,
         recurse indefinitely whenever this function is reached as a
         fallback from within the threaded engine itself (A, B unchanged).
     */
-    return _gr_mpoly_divrem_ideal((gr_mpoly_struct **) Q, R, A, B, len, nonfield, ctx);
+    return _gr_mpoly_divrem_ideal(Q, R, A, B, len, nonfield, ctx);
 }
 
 
 static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
-    gr_mpoly_struct * const * Q,
+    gr_mpoly_struct * Q,
     gr_mpoly_t R,
     const gr_mpoly_t A,
-    gr_mpoly_struct * const * B,
+    const gr_mpoly_struct * B,
     slong len,
     gr_mpoly_ctx_t ctx,
     int nonfield,
@@ -1412,7 +1401,6 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
     ideal_worker_arg_struct * worker_args;
     ideal_base_t H;
     gr_mpoly_struct * polyB_storage;
-    gr_mpoly_struct ** polyB_ptrs;
     gr_ptr lc_inv;
     int * lc_is_one, * lc_is_unit;
     gr_mpoly_struct * TQarr;
@@ -1420,38 +1408,26 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
     gr_mpoly_t TR;
     gr_mpoly_struct * r;
 
-    if (A->length < 2 || B[0]->length < 2)
+    if (A->length < 2 || B[0].length < 2)
         return _gr_mpoly_divrem_ideal_serial(Q, R, A, B, len, nonfield, ctx);
 
-    /*
-        Use temporaries to handle aliasing of any Q[w] or R with A or any
-        B[w']: the retry loop below re-reads A->length/A->exps and
-        B[w]->length/B[w]->exps on every pass, while ideal_base_clear
-        zeroes every Q[w] and R on any non-successful attempt, including
-        the ordinary overflow-retry case. If some Q[w] or R is the same
-        object as A or a B[w'], that zeroing would corrupt the operand out
-        from under the very next loop iteration -- exactly mirroring the
-        aliasing guard already used by gr_mpoly_divrem_heap_threaded (and,
-        for R against A, the serial _gr_mpoly_divrem_ideal kernel).
-    */
-    TQarr = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
-    q = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    for (w = 0; w < len; w++)
+    FLINT_ASSERT(Q != (gr_mpoly_struct *) A);
     {
-        int alias = (Q[w] == A);
-        for (i = 0; !alias && i < len; i++)
-            alias = (Q[w] == B[i]);
+        int alias = (Q == B);
 
-        gr_mpoly_init(TQarr + w, ctx);
-        q[w] = alias ? (TQarr + w) : Q[w];
+        TQarr = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
+        q = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
+        for (w = 0; w < len; w++)
+        {
+            gr_mpoly_init(TQarr + w, ctx);
+            q[w] = alias ? (TQarr + w) : &Q[w];
+        }
     }
 
     {
-        int alias_R = (R == A);
-        for (w = 0; !alias_R && w < len; w++)
-            alias_R = (R == B[w]);
+        FLINT_ASSERT(R < B || R >= B + len);
 
-        if (alias_R)
+        if (R == A)
         {
             gr_mpoly_init(TR, ctx);
             r = TR;
@@ -1477,16 +1453,16 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
         lc_is_one[w] = lc_is_unit[w] = 0;
         if (!nonfield)
         {
-            lc_is_one[w] = (gr_is_one(GR_ENTRY(B[w]->coeffs, 0, sz), cctx) == T_TRUE);
+            lc_is_one[w] = (gr_is_one(GR_ENTRY(B[w].coeffs, 0, sz), cctx) == T_TRUE);
             lc_is_unit[w] = lc_is_one[w] ||
-                (gr_inv(GR_ENTRY(lc_inv, w, sz), GR_ENTRY(B[w]->coeffs, 0, sz), cctx) == GR_SUCCESS);
+                (gr_inv(GR_ENTRY(lc_inv, w, sz), GR_ENTRY(B[w].coeffs, 0, sz), cctx) == GR_SUCCESS);
         }
     }
 
     exp_bits = MPOLY_MIN_BITS;
     exp_bits = FLINT_MAX(exp_bits, A->bits);
     for (w = 0; w < len; w++)
-        exp_bits = FLINT_MAX(exp_bits, B[w]->bits);
+        exp_bits = FLINT_MAX(exp_bits, B[w].bits);
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
 
     MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, exp_bits, mctx);
@@ -1504,29 +1480,27 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
     freeBexp = (int *) flint_malloc(len*sizeof(int));
     for (w = 0; w < len; w++)
     {
-        Bexp[w] = B[w]->exps;
+        Bexp[w] = B[w].exps;
         freeBexp[w] = 0;
-        if (exp_bits > B[w]->bits)
+        if (exp_bits > B[w].bits)
         {
             freeBexp[w] = 1;
-            Bexp[w] = (ulong *) flint_malloc(N*B[w]->length*sizeof(ulong));
-            mpoly_repack_monomials(Bexp[w], exp_bits, B[w]->exps, B[w]->bits, B[w]->length, mctx);
+            Bexp[w] = (ulong *) flint_malloc(N*B[w].length*sizeof(ulong));
+            mpoly_repack_monomials(Bexp[w], exp_bits, B[w].exps, B[w].bits, B[w].length, mctx);
         }
     }
 
     while (1)
     {
         polyB_storage = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
-        polyB_ptrs = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
         for (w = 0; w < len; w++)
         {
-            polyB_ptrs[w] = polyB_storage + w;
-            polyB_storage[w].coeffs = B[w]->coeffs;
+            polyB_storage[w].coeffs = B[w].coeffs;
             polyB_storage[w].exps = Bexp[w];
             polyB_storage[w].bits = exp_bits;
-            polyB_storage[w].length = B[w]->length;
-            polyB_storage[w].coeffs_alloc = B[w]->coeffs_alloc;
-            polyB_storage[w].exps_alloc = N*B[w]->length;
+            polyB_storage[w].length = B[w].length;
+            polyB_storage[w].coeffs_alloc = B[w].coeffs_alloc;
+            polyB_storage[w].exps_alloc = N*B[w].length;
         }
 
         fmpz_mpoly_ctx_init(zctx, mctx->nvars, mctx->ord);
@@ -1540,7 +1514,7 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
             how many divisors there are.
         */
         if (mpoly_divides_select_exps(S, zctx, num_handles,
-                                       Aexp, A->length, Bexp[0], B[0]->length, exp_bits))
+                                       Aexp, A->length, Bexp[0], B[0].length, exp_bits))
         {
             /* select_exps's failure notion ("provably not exact") does not
                apply to divrem_ideal (which always succeeds via the
@@ -1550,7 +1524,6 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
             fmpz_mpoly_clear(S, zctx);
             fmpz_mpoly_ctx_clear(zctx);
             flint_free(polyB_storage);
-            flint_free(polyB_ptrs);
             for (w = 0; w < len; w++)
                 gr_mpoly_clear(TQarr + w, ctx);
             flint_free(TQarr);
@@ -1569,7 +1542,7 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
         H->polyA->coeffs_alloc = A->coeffs_alloc;
         H->polyA->exps_alloc = N*A->length;
 
-        H->polyB = polyB_ptrs;
+        H->polyB = polyB_storage;
         H->len = len;
         H->ctx = ctx;
         H->cctx = cctx;
@@ -1598,8 +1571,8 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
             L->mq = L->startidx + 2*len;
             for (w = 0; w < len; w++)
             {
-                L->startidx[w] = B[w]->length;
-                L->endidx[w] = B[w]->length;
+                L->startidx[w] = B[w].length;
+                L->endidx[w] = B[w].length;
                 L->mq[w] = 0;
             }
             L->emax = S->exps + N*i;
@@ -1669,7 +1642,6 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
             fmpz_mpoly_clear(S, zctx);
             fmpz_mpoly_ctx_clear(zctx);
             flint_free(polyB_storage);
-            flint_free(polyB_ptrs);
 
             {
                 slong old_exp_bits = exp_bits;
@@ -1688,8 +1660,8 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
                 for (w = 0; w < len; w++)
                 {
                     ulong * old_Bexp_w = Bexp[w];
-                    Bexp[w] = (ulong *) flint_malloc(N*B[w]->length*sizeof(ulong));
-                    mpoly_repack_monomials(Bexp[w], exp_bits, old_Bexp_w, old_exp_bits, B[w]->length, mctx);
+                    Bexp[w] = (ulong *) flint_malloc(N*B[w].length*sizeof(ulong));
+                    mpoly_repack_monomials(Bexp[w], exp_bits, old_Bexp_w, old_exp_bits, B[w].length, mctx);
                     if (freeBexp[w])
                         flint_free(old_Bexp_w);
                     freeBexp[w] = 1;
@@ -1706,7 +1678,6 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
         fmpz_mpoly_clear(S, zctx);
         fmpz_mpoly_ctx_clear(zctx);
         flint_free(polyB_storage);
-        flint_free(polyB_ptrs);
 
         break;
     }
@@ -1714,7 +1685,7 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
     for (w = 0; w < len; w++)
     {
         if (q[w] == TQarr + w)
-            gr_mpoly_swap(Q[w], TQarr + w, ctx);
+            gr_mpoly_swap(&Q[w], TQarr + w, ctx);
         gr_mpoly_clear(TQarr + w, ctx);
     }
     flint_free(TQarr);
@@ -1748,10 +1719,10 @@ cleanup1:
 
 
 static int _gr_mpoly_divrem_ideal_heap_threaded_dispatch(
-    gr_mpoly_struct * const * Q,
+    gr_mpoly_struct * Q,
     gr_mpoly_t R,
     const gr_mpoly_t A,
-    gr_mpoly_struct * const * B,
+    const gr_mpoly_struct * B,
     slong len,
     gr_mpoly_ctx_t ctx,
     int nonfield)
@@ -1765,9 +1736,9 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_dispatch(
 
     for (w = 0; w < len; w++)
     {
-        if (B[w]->length == 0)
+        if (B[w].length == 0)
             return GR_DOMAIN;
-        if (gr_is_zero(B[w]->coeffs, cctx) != T_FALSE)
+        if (gr_is_zero(B[w].coeffs, cctx) != T_FALSE)
             return GR_UNABLE;
     }
 
@@ -1775,14 +1746,14 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_dispatch(
     {
         status = GR_SUCCESS;
         for (w = 0; w < len; w++)
-            status |= gr_mpoly_zero(Q[w], ctx);
+            status |= gr_mpoly_zero(&Q[w], ctx);
         status |= gr_mpoly_zero(R, ctx);
         return status;
     }
 
     /* fall back to the single-threaded algorithm for small inputs, or when
        the coefficient ring does not allow concurrent operations */
-    if (A->length < 2 || B[0]->length < 2 || gr_ctx_is_threadsafe(cctx) != T_TRUE)
+    if (A->length < 2 || B[0].length < 2 || gr_ctx_is_threadsafe(cctx) != T_TRUE)
         return _gr_mpoly_divrem_ideal_serial(Q, R, A, B, len, nonfield, ctx);
 
     thread_limit = A->length/32;
@@ -1802,10 +1773,7 @@ static int
 _gr_mpoly_divrem_ideal_vec_threaded(gr_mpoly_vec_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_vec_t B, int nonfield, gr_mpoly_ctx_t ctx)
 {
-    slong w, len = B->length;
-    gr_mpoly_struct ** Qptr;
-    gr_mpoly_struct ** Bptr;
-    int status;
+    slong len = B->length;
 
     if (len == 0)
     {
@@ -1815,20 +1783,7 @@ _gr_mpoly_divrem_ideal_vec_threaded(gr_mpoly_vec_t Q, gr_mpoly_t R,
 
     gr_mpoly_vec_set_length(Q, len, ctx);
 
-    Qptr = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    Bptr = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    for (w = 0; w < len; w++)
-    {
-        Qptr[w] = Q->entries + w;
-        Bptr[w] = B->entries + w;
-    }
-
-    status = _gr_mpoly_divrem_ideal_heap_threaded_dispatch(Qptr, R, A, Bptr, len, ctx, nonfield);
-
-    flint_free(Qptr);
-    flint_free(Bptr);
-
-    return status;
+    return _gr_mpoly_divrem_ideal_heap_threaded_dispatch(Q->entries, R, A, B->entries, len, ctx, nonfield);
 }
 
 

@@ -469,21 +469,10 @@ static int _gr_mpoly_divrem_heap(
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
         {
-            if (mpoly_monomial_overflows(exp, N, mask))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
+            *overflowed = 1;
+            goto cleanup;
         }
 
         _gr_mpoly_fit_length(&q_coeff, &Q->coeffs_alloc, &q_exp, &Q->exps_alloc, N, q_len + 1, ctx);

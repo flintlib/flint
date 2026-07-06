@@ -544,24 +544,12 @@ slong _gr_mpoly_divrem_stripe(
         /* see the comment on the single-word overflow check above:
            this can legitimately happen even for well-chosen bits, and
            means "redo everything wider", not GR_UNABLE. */
-        if (bits <= FLINT_BITS)
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
         {
-            if (mpoly_monomial_overflows(exp, N, mask))
-            {
-                *overflowed = 1;
-                goto unable;
-            }
-            lt_divides = mpoly_monomial_divides(Qexp + N*Qlen, exp, Bexp + N*0, N, mask);
+            *overflowed = 1;
+            goto unable;
         }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-            {
-                *overflowed = 1;
-                goto unable;
-            }
-            lt_divides = mpoly_monomial_divides_mp(Qexp + N*Qlen, exp, Bexp + N*0, N, bits);
-        }
+        lt_divides = mpoly_monomial_divides_any_bits(Qexp + N*Qlen, exp, Bexp + N*0, N, mask, bits);
 
         FLINT_ASSERT(mpoly_monomial_cmp(exp, S->emin, N, S->cmpmask) >= 0);
 
