@@ -323,18 +323,9 @@ int _fq_nmod_mpoly_divides_monagan_pearce(
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
-        {
-            if (mpoly_monomial_overflows(exp, N, mask))
-                goto not_exact_division;
-            lt_divides = mpoly_monomial_divides(Qexps + N*Qlen, exp, Bexps, N, mask);
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto not_exact_division;
-            lt_divides = mpoly_monomial_divides_mp(Qexps + N*Qlen, exp, Bexps, N, bits);
-        }
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
+            goto not_exact_division;
+        lt_divides = mpoly_monomial_divides_any_bits(Qexps + N*Qlen, exp, Bexps, N, mask, bits);
 
         _n_fq_zero(Qcoeffs + d*Qlen, d);
         _nmod_vec_zero(t, 6*d);
@@ -428,12 +419,7 @@ case n:                                                                       \
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], Bexps + N*x->i,
-                                                            Qexps + N*x->j, N);
-                    else
-                        mpoly_monomial_add_mp(exp_list[exp_next], Bexps + N*x->i,
-                                                            Qexps + N*x->j, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], Bexps + N*x->i, Qexps + N*x->j, N, bits);
 
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -452,12 +438,7 @@ case n:                                                                       \
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], Bexps + N*x->i,
-                                                            Qexps + N*x->j, N);
-                    else
-                        mpoly_monomial_add_mp(exp_list[exp_next], Bexps + N*x->i,
-                                                            Qexps + N*x->j, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], Bexps + N*x->i, Qexps + N*x->j, N, bits);
 
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -487,12 +468,7 @@ case n:                                                                       \
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
 
-            if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], Bexps + N*x->i,
-                                                       Qexps + N*x->j, N);
-            else
-                mpoly_monomial_add_mp(exp_list[exp_next], Bexps + N*x->i,
-                                                          Qexps + N*x->j, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], Bexps + N*x->i, Qexps + N*x->j, N, bits);
 
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);

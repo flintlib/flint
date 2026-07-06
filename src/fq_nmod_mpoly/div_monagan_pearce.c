@@ -92,20 +92,9 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
-        {
-            if (mpoly_monomial_overflows(exp, N, mask))
-                goto exp_overflow;
-
-            lt_divides = mpoly_monomial_divides(Qexps + N*Qlen, exp, Bexps, N, mask);
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto exp_overflow;
-
-            lt_divides = mpoly_monomial_divides_mp(Qexps + N*Qlen, exp, Bexps, N, bits);
-        }
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
+            goto exp_overflow;
+        lt_divides = mpoly_monomial_divides_any_bits(Qexps + N*Qlen, exp, Bexps, N, mask, bits);
 
         _n_fq_zero(Qcoeffs + d*Qlen, d);
         do {

@@ -93,18 +93,9 @@ static slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
-        {
-            if (mpoly_monomial_overflows(exp, N, mask))
-                goto exp_overflow2;
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto exp_overflow2;
-            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
-        }
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
+            goto exp_overflow2;
+        lt_divides = mpoly_monomial_divides_any_bits(q_exp + q_len*N, exp, exp3, N, mask, bits);
 
         fq_zech_zero(q_coeff + q_len, fqctx);
         do {

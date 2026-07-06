@@ -439,10 +439,7 @@ static int _gr_mpoly_divides_heap(
         k++;
         _gr_mpoly_fit_length(&p1, alloc, &e1, exps_alloc, N, k + 1, ctx);
 
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(e1 + k*N, exp, exp3, N, mask);
-        else
-            lt_divides = mpoly_monomial_divides_mp(e1 + k*N, exp, exp3, N, bits);
+        lt_divides = mpoly_monomial_divides_any_bits(e1 + k*N, exp, exp3, N, mask, bits);
 
         dot_len = 0;
         have_dividend = 0;
@@ -525,12 +522,7 @@ static int _gr_mpoly_divides_heap(
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                               e1 + x->j*N, N);
-                    else
-                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
-                                                               e1 + x->j*N, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N, bits);
 
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -549,12 +541,7 @@ static int _gr_mpoly_divides_heap(
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                               e1 + x->j*N, N);
-                    else
-                        mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
-                                                               e1 + x->j*N, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N, bits);
 
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -596,12 +583,7 @@ static int _gr_mpoly_divides_heap(
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
 
-            if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], exp3 + x->i*N,
-                                                               e1 + x->j*N, N);
-            else
-                mpoly_monomial_add_mp(exp_list[exp_next], exp3 + x->i*N,
-                                                               e1 + x->j*N, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], exp3 + x->i*N, e1 + x->j*N, N, bits);
 
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);

@@ -284,10 +284,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
    heap[1].next = x;
    heap[1].exp = exp_list[exp_next++];
 
-    if (bits <= FLINT_BITS)
-        mpoly_monomial_add(heap[1].exp, exp2, exp3, N);
-    else
-        mpoly_monomial_add_mp(heap[1].exp, exp2, exp3, N);
+            mpoly_monomial_add_any_bits(heap[1].exp, exp2, exp3, N, bits);
 
     hind[0] = 2*1 + 0;
 
@@ -404,10 +401,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             hind[x->i] = 2*(x->j+1) + 0;
 
-            if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-            else
-                mpoly_monomial_add_mp(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N, bits);
 
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))
@@ -430,10 +424,7 @@ slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
 
             hind[x->i] = 2*(x->j+1) + 0;
 
-            if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
-            else
-                mpoly_monomial_add_mp(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], exp2 + x->i*N, exp3 + x->j*N, N, bits);
 
             if (!_mpoly_heap_insert(heap, exp_list[exp_next++], x,
                                       &next_loc, &heap_len, N, cmpmask))

@@ -221,10 +221,7 @@ static int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
         {
             int divides;
 
-            if (bits <= FLINT_BITS)
-                divides = mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask);
-            else
-                divides = mpoly_monomial_divides_mp(texp, exp, exp3[w] + N*0, N, bits);
+            divides = mpoly_monomial_divides_any_bits(texp, exp, exp3[w] + N*0, N, mask, bits);
 
             if (divides)
             {

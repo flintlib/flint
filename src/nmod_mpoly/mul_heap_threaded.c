@@ -227,12 +227,7 @@ static void _nmod_mpoly_mul_heap_part(
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
 
-            if (bits <= FLINT_BITS)
-                mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                       Cexp + N*x->j, N);
-            else
-                mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                          Cexp + N*x->j, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -294,12 +289,7 @@ static void _nmod_mpoly_mul_heap_part(
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -320,12 +310,7 @@ static void _nmod_mpoly_mul_heap_part(
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);

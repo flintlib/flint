@@ -807,12 +807,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], poly3[p]->exps + x->i*N,
-                                                        Qout[p]->exps + x->j*N, N);
-                    else
-                        mpoly_monomial_add_mp(exp_list[exp_next], poly3[p]->exps + x->i*N,
-                                                        Qout[p]->exps + x->j*N, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[p]->exps + x->i*N, Qout[p]->exps + x->j*N, N, bits);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -834,12 +829,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
 
-                    if (bits <= FLINT_BITS)
-                        mpoly_monomial_add(exp_list[exp_next], poly3[p]->exps + x->i*N,
-                                                        Qout[p]->exps + x->j*N, N);
-                    else
-                        mpoly_monomial_add_mp(exp_list[exp_next], poly3[p]->exps + x->i*N,
-                                                        Qout[p]->exps + x->j*N, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[p]->exps + x->i*N, Qout[p]->exps + x->j*N, N, bits);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
@@ -865,10 +855,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
             {
                 int d1, d2;
 
-                if (bits <= FLINT_BITS)
-                    d1 = mpoly_monomial_divides(texp, exp, poly3[w]->exps, N, mask);
-                else
-                    d1 = mpoly_monomial_divides_mp(texp, exp, poly3[w]->exps, N, bits);
+                d1 = mpoly_monomial_divides_any_bits(texp, exp, poly3[w]->exps, N, mask, bits);
 
                 if (!d1)
                     continue;
@@ -907,12 +894,7 @@ static void _gr_mpoly_divrem_ideal_stripe(
                         x->next = NULL;
                         hinds[w][x->i] = 2*(x->j + 1) + 0;
 
-                        if (bits <= FLINT_BITS)
-                            mpoly_monomial_add(exp_list[exp_next], poly3[w]->exps + N,
-                                                            Qout[w]->exps + k[w]*N, N);
-                        else
-                            mpoly_monomial_add_mp(exp_list[exp_next], poly3[w]->exps + N,
-                                                            Qout[w]->exps + k[w]*N, N);
+                        mpoly_monomial_add_any_bits(exp_list[exp_next], poly3[w]->exps + N, Qout[w]->exps + k[w]*N, N, bits);
 
                         if (mpoly_monomial_cmp(exp_list[exp_next], emin, N, cmpmask) >= 0)
                             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,

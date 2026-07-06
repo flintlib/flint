@@ -571,10 +571,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
             div_flag = 0;
             for (w = 0; w < len; w++)
             {
-                if (bits <= FLINT_BITS)
-                    d1 = mpoly_monomial_divides(texp, exp, exp3[w], N, mask);
-                else
-                    d1 = mpoly_monomial_divides_mp(texp, exp, exp3[w], N, bits);
+                                    d1 = mpoly_monomial_divides_any_bits(texp, exp, exp3[w], N, mask, bits);
 
                 if (d1)
                 {

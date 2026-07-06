@@ -236,10 +236,7 @@ static void _nmod_mpoly_mulsub(nmod_mpoly_t A,
     heap[1].next = x;
     heap[1].exp = exp_list[exp_next++];
 
-    if (bits <= FLINT_BITS)
-        mpoly_monomial_add(heap[1].exp, Bexp + N*0, Cexp + N*0, N);
-    else
-        mpoly_monomial_add_mp(heap[1].exp, Bexp + N*0, Cexp + N*0, N);
+    mpoly_monomial_add_any_bits(heap[1].exp, Bexp + N*0, Cexp + N*0, N, bits);
 
     hind[0] = 2*1 + 0;
 
@@ -317,12 +314,7 @@ static void _nmod_mpoly_mulsub(nmod_mpoly_t A,
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -341,12 +333,7 @@ static void _nmod_mpoly_mulsub(nmod_mpoly_t A,
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
