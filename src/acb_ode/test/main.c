@@ -18,6 +18,7 @@
 #include "t-fundamental_matrix_convergence.c"
 #include "t-fundamental_matrix_vs_ref.c"
 #include "t-ind_lbound_eval.c"
+#include "t-hypgeom_pfq.c"
 #include "t-indicial_polynomial_from_exponents.c"
 #include "t-lc_roots.c"
 #include "t-local_diffop.c"
@@ -44,6 +45,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_ode_fundamental_matrix_convergence),
     TEST_FUNCTION(acb_ode_fundamental_matrix_vs_ref),
     TEST_FUNCTION(acb_ode_ind_lbound_eval),
+    TEST_FUNCTION(acb_ode_hypgeom_pfq),
     TEST_FUNCTION(acb_ode_indicial_polynomial_from_exponents),
     TEST_FUNCTION(acb_ode_lc_roots),
     TEST_FUNCTION(acb_ode_local_diffop),

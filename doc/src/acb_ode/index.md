@@ -320,6 +320,35 @@ The entries of $N$ are computed from the first few terms of the series
 expansions of the basis elements.
 :::
 
+## Special functions {#special-functions}
+
+::: function
+int acb_ode_hypgeom_pfq(acb_ptr res, const gr_vec_t a, const gr_vec_t b, gr_ctx_t R, const acb_t z, slong len, slong prec)
+
+Set `res` to the first `len` Taylor coefficients
+$f(z), f'(z), \dots, f^{(\mathit{len}-1)}(z)/(\mathit{len}-1)!$ at $z$ of the
+generalized hypergeometric function $f = {}_pF_q(a; b; \cdot)$, where
+the parameters $a = (a_1, \dots, a_p)$ and $b = (b_1, \dots, b_q)$ are
+vectors of elements of the ring `R`, which must admit a conversion to complex
+balls.
+
+This function is currently limited to $p \leq q + 1$ and to $z$ in the
+disk $|z - 1| < 1$, excluding $z = 1$ when $p = q + 1$. For other
+values of $z$, the output may be indeterminate.
+It uses the differential equation satisfied by the hypergeometric function,
+which makes it possible to deal with $z$ close to the singular point $z = 1$.
+When $p = q + 1$, the branch is the principal one, with a branch cut along
+$[1, \infty)$ and the values on the cut obtained by continuity from the lower
+half-plane, as in `acb_hypgeom_pfq`.
+For an input ball straddling the cut, the output contains the values of both
+branches.
+
+The return value is `GR_UNABLE` when $p > q + 1$ and when the structure of
+the local exponents at $z = 1$ cannot be determined (for example, when
+$\sum_j b_j - \sum_i a_i$ is a ball containing an integer but not exactly
+known to be an integer).
+:::
+
 ## Series solutions {#series-solutions}
 
 ::: function

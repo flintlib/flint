@@ -394,6 +394,12 @@ void _acb_ode_local_monodromy(acb_mat_t mono, const acb_poly_struct * dop, slong
 WARN_UNUSED_RESULT int acb_ode_local_monodromy(acb_mat_t mono, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, const acb_ode_exponents_t expos, ulong flags, slong prec);
 
 /****************************************************************************
+ * Special functions
+ ****************************************************************************/
+
+WARN_UNUSED_RESULT int acb_ode_hypgeom_pfq(acb_ptr res, const gr_vec_t a, const gr_vec_t b, gr_ctx_t R, const acb_t z, slong len, slong prec);
+
+/****************************************************************************
  * Utilities
  ****************************************************************************/
 
