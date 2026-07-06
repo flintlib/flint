@@ -1107,6 +1107,57 @@ void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bi
 void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 int mpoly_repack_monomials(ulong * exps1, flint_bitcnt_t bits1, const ulong * exps2, flint_bitcnt_t bits2, slong len, const mpoly_ctx_t mctx);
+
+/*
+    N + CMPMASK SETUP, AND OVERFLOW -> WIDER REPACK, HELPERS.
+
+    Two more recurring boilerplate blocks throughout the mpoly modules:
+
+    1. Computing N for a given bits/mctx and immediately deriving a
+       cmpmask array for it -- almost always into TMP_ALLOC'd storage,
+       so this has to be a macro (not a function) to keep the
+       allocation in the caller's own TMP_INIT/TMP_START/TMP_END scope:
+
+           N = mpoly_words_per_exp(bits, mctx);
+           cmpmask = (ulong *) TMP_ALLOC(N * sizeof(ulong));
+           mpoly_get_cmpmask(cmpmask, N, bits, mctx);
+
+       MPOLY_GET_CMPMASK_TMP_ALLOC below is exactly this, and must only
+       be used within such a TMP_ALLOC scope.
+
+    2. On overflow, widening the current packing width by (at least)
+       one field and repacking previously-computed monomials into
+       freshly allocated storage sized for it -- see
+       mpoly_monomials_repack_wider and
+       mpoly_monomials_repack_wider_cmpmask below.
+*/
+
+#define MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, bits, mctx)        \
+    do {                                                          \
+        (N) = mpoly_words_per_exp((bits), (mctx));                 \
+        (cmpmask) = (ulong *) TMP_ALLOC((N) * sizeof(ulong));      \
+        mpoly_get_cmpmask((cmpmask), (N), (bits), (mctx));          \
+    } while (0)
+
+/* As above, but for the (less common) case where cmpmask needs to
+   outlive the caller's own TMP_ALLOC scope (e.g. because it is handed
+   off to worker threads), so it must be a real flint_malloc allocation
+   that the caller remains responsible for flint_free-ing. */
+#define MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, bits, mctx)     \
+    do {                                                          \
+        (N) = mpoly_words_per_exp((bits), (mctx));                 \
+        (cmpmask) = (ulong *) flint_malloc((N) * sizeof(ulong));   \
+        mpoly_get_cmpmask((cmpmask), (N), (bits), (mctx));          \
+    } while (0)
+
+ulong * mpoly_monomials_repack_wider(flint_bitcnt_t * bits_ptr, slong * N_ptr,
+        const ulong * old_exps, flint_bitcnt_t old_bits, slong len,
+        slong alloc, const mpoly_ctx_t mctx);
+
+ulong * mpoly_monomials_repack_wider_cmpmask(flint_bitcnt_t * bits_ptr,
+        slong * N_ptr, ulong ** cmpmask_ptr, const ulong * old_exps,
+        flint_bitcnt_t old_bits, slong len, slong alloc,
+        const mpoly_ctx_t mctx);
 void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2, slong len, const slong * mults, slong num, slong bits);
 void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len, slong * mults, slong num, slong bits);
 

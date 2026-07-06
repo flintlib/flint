@@ -562,9 +562,7 @@ int gr_mpoly_sqr_commutative_heap(
     for (i = 0; i < mctx->nfields; i++)
         fmpz_clear(max_fields2 + i);
 
-    N = mpoly_words_per_exp(exp_bits, mctx);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, exp_bits, mctx);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)

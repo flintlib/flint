@@ -2012,9 +2012,7 @@ int _fmpz_mpoly_divides_heap_threaded_pool(
     exp_bits = FLINT_MAX(exp_bits, B->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     Aexp = A->exps;

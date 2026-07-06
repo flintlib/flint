@@ -191,9 +191,7 @@ void fmpz_mod_mpoly_sort_terms(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ct
     TMP_INIT;
 
     TMP_START;
-    N = mpoly_words_per_exp(A->bits, ctx->minfo);
-    ptempexp = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(ptempexp, N, A->bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(ptempexp, N, A->bits, ctx->minfo);
 
     himask = 0;
     for (i = 0; i < A->length; i++)

@@ -96,14 +96,12 @@ void fmpz_mpoly_mul_monomial(
     /* slightly dirty: repack monomials can handle 1-bit overfown fields */
     if (overflowed)
     {
-        ulong * newAexps;
-        flint_bitcnt_t newAbits = mpoly_fix_bits(Abits + 1, ctx->minfo);
-        N = mpoly_words_per_exp(newAbits, ctx->minfo);
-        newAexps = FLINT_ARRAY_ALLOC(N*A->alloc, ulong);
-        mpoly_repack_monomials(newAexps, newAbits, A->exps, Abits, Blen, ctx->minfo);
+        ulong * newAexps = mpoly_monomials_repack_wider(&Abits, &N,
+                                                        A->exps, Abits, Blen,
+                                                        A->alloc, ctx->minfo);
         flint_free(A->exps);
         A->exps = newAexps;
-        A->bits = newAbits;
+        A->bits = Abits;
     }
 
     _fmpz_vec_scalar_mul_fmpz(A->coeffs, B->coeffs, Blen, &Ccoeff0);

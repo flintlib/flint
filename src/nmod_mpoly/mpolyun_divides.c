@@ -552,9 +552,7 @@ int nmod_mpolyun_divides(
     FLINT_ASSERT(bits == B->bits);
     FLINT_ASSERT(bits == Q->bits);
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, bits, ctx->minfo);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */
