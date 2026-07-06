@@ -694,9 +694,7 @@ int gr_mpoly_divides_heap(
         return GR_DOMAIN;
     }
 
-    N = mpoly_words_per_exp(exp_bits, mctx);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, exp_bits, mctx);
 
     expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 

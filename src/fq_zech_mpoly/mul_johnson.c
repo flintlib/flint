@@ -212,9 +212,7 @@ void fq_zech_mpoly_mul_johnson(
         fmpz_clear(max_fields3 + i);
     }
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (exp_bits > poly2->bits)

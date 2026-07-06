@@ -499,9 +499,7 @@ int nmod_mpoly_divides_monagan_pearce(
         goto cleanup;
     }
 
-    N = mpoly_words_per_exp(Qbits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Qbits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Qbits, ctx->minfo);
 
     /* temporary space to check leading monomials divide */
     expq = (ulong *) TMP_ALLOC(N*sizeof(ulong));

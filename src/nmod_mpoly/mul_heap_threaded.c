@@ -731,9 +731,7 @@ void _nmod_mpoly_mul_heap_threaded_pool_maxfields(
     Abits = FLINT_MAX(Abits, C->bits);
     Abits = mpoly_fix_bits(Abits, ctx->minfo);
 
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     freeBexp = 0;

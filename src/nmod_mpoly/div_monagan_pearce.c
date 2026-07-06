@@ -504,9 +504,7 @@ void nmod_mpoly_div_monagan_pearce(
     Qbits = FLINT_MAX(A->bits, B->bits);
     Qbits = mpoly_fix_bits(Qbits, ctx->minfo);
 
-    N = mpoly_words_per_exp(Qbits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Qbits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, Qbits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     if (Qbits > A->bits)

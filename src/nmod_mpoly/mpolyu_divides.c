@@ -402,9 +402,7 @@ int nmod_mpolyuu_divides(
 
     TMP_START;
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, bits, ctx->minfo);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */

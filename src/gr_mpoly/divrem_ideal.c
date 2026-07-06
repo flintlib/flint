@@ -812,9 +812,7 @@ int _gr_mpoly_divrem_ideal(
         exp_bits = FLINT_MAX(exp_bits, B[i]->bits);
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
 
-    N = mpoly_words_per_exp(exp_bits, mctx);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, exp_bits, mctx);
 
     exp2 = A->exps;
     if (exp_bits > A->bits)
@@ -880,13 +878,11 @@ int _gr_mpoly_divrem_ideal(
             slong old_exp_bits = exp_bits;
             ulong * old_exp2 = exp2, * old_exp3;
 
-            exp_bits = mpoly_fix_bits(exp_bits + 1, mctx);
-            N = mpoly_words_per_exp(exp_bits, mctx);
-            cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
-            mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
-
-            exp2 = (ulong *) flint_malloc(N*A->length*sizeof(ulong));
-            mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits, A->length, mctx);
+            exp2 = mpoly_monomials_repack_wider_cmpmask(&exp_bits,
+                                                        &N, &cmpmask, old_exp2,
+                                                        old_exp_bits,
+                                                        A->length, A->length,
+                                                        mctx);
             if (free2) flint_free(old_exp2);
             free2 = 1;
 

@@ -423,9 +423,7 @@ void fq_nmod_mpoly_mul_johnson(
         fmpz_clear(Cmaxfields + i);
     }
 
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (Abits != B->bits)

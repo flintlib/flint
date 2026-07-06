@@ -1489,9 +1489,7 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
         exp_bits = FLINT_MAX(exp_bits, B[w]->bits);
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
 
-    N = mpoly_words_per_exp(exp_bits, mctx);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, exp_bits, mctx);
 
     Aexp = A->exps;
     freeAexp = 0;
@@ -1677,13 +1675,12 @@ static int _gr_mpoly_divrem_ideal_heap_threaded_pool(
                 slong old_exp_bits = exp_bits;
                 ulong * old_Aexp = Aexp;
 
-                exp_bits = mpoly_fix_bits(exp_bits + 1, mctx);
-                N = mpoly_words_per_exp(exp_bits, mctx);
-                cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
-                mpoly_get_cmpmask(cmpmask, N, exp_bits, mctx);
-
-                Aexp = (ulong *) flint_malloc(N*A->length*sizeof(ulong));
-                mpoly_repack_monomials(Aexp, exp_bits, old_Aexp, old_exp_bits, A->length, mctx);
+                Aexp = mpoly_monomials_repack_wider_cmpmask(&exp_bits,
+                                                            &N, &cmpmask,
+                                                            old_Aexp,
+                                                            old_exp_bits,
+                                                            A->length,
+                                                            A->length, mctx);
                 if (freeAexp)
                     flint_free(old_Aexp);
                 freeAexp = 1;
