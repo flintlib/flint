@@ -579,6 +579,152 @@ void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c
     __gmpn_mul_1(exp2, exp3, N, c);
 }
 
+/* Check that the operand has not overflowed into the guard bit */
+FLINT_FORCE_INLINE
+int mpoly_monomial_valid_any_bits(const ulong * exp, slong N,
+                                                        flint_bitcnt_t bits)
+{
+    if (bits <= FLINT_BITS)
+        return !mpoly_monomial_overflows((ulong *) exp, N,
+                                                    mpoly_overflow_mask_sp(bits));
+    else
+        return !mpoly_monomial_overflows_mp((ulong *) exp, N, bits);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_add_any_bits(ulong * exp1, const ulong * exp2,
+                            const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_add(exp1, exp2, exp3, N);
+    else
+        mpoly_monomial_add_mp(exp1, exp2, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_sub_any_bits(ulong * exp1, const ulong * exp2,
+                            const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_sub(exp1, exp2, exp3, N);
+    else
+        mpoly_monomial_sub_mp(exp1, exp2, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_madd_any_bits(ulong * exp1, const ulong * exp2,
+                ulong scalar, const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    /* Only the inputs are asserted here; exp2 + scalar*exp3 can
+       legitimately need to overflow-check its own *result*, which
+       remains the caller's responsibility as usual. */
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_madd(exp1, exp2, scalar, exp3, N);
+    else
+        mpoly_monomial_madd_mp(exp1, exp2, scalar, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_msub_any_bits(ulong * exp1, const ulong * exp2,
+                ulong scalar, const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_msub(exp1, exp2, scalar, exp3, N);
+    else
+        mpoly_monomial_msub_mp(exp1, exp2, scalar, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_max_any_bits(ulong * exp1, const ulong * exp2,
+             const ulong * exp3, flint_bitcnt_t bits, slong N, ulong mask)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_max(exp1, exp2, exp3, bits, N, mask);
+    else
+        mpoly_monomial_max_mp(exp1, exp2, exp3, bits, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_min_any_bits(ulong * exp1, const ulong * exp2,
+             const ulong * exp3, flint_bitcnt_t bits, slong N, ulong mask)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_min(exp1, exp2, exp3, bits, N, mask);
+    else
+        mpoly_monomial_min_mp(exp1, exp2, exp3, bits, N);
+}
+
+FLINT_FORCE_INLINE
+int mpoly_monomial_overflows_any_bits(ulong * exp, slong N, ulong mask,
+                                                        flint_bitcnt_t bits)
+{
+    /* No precondition to assert here: this function's entire purpose is
+       to determine whether `exp` has overflowed, so `exp` is not
+       expected to be valid on entry. */
+    if (bits <= FLINT_BITS)
+        return mpoly_monomial_overflows(exp, N, mask);
+    else
+        return mpoly_monomial_overflows_mp(exp, N, bits);
+}
+
+FLINT_FORCE_INLINE
+int mpoly_monomial_divides_any_bits(ulong * exp_ptr, const ulong * exp2,
+                    const ulong * exp3, slong N, ulong mask, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        return mpoly_monomial_divides(exp_ptr, exp2, exp3, N, mask);
+    else
+        return mpoly_monomial_divides_mp(exp_ptr, exp2, exp3, N, bits);
+}
+
+FLINT_FORCE_INLINE
+int mpoly_monomial_halves_any_bits(ulong * exp_ptr, const ulong * exp2,
+                                slong N, ulong mask, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+
+    if (bits <= FLINT_BITS)
+        return mpoly_monomial_halves(exp_ptr, exp2, N, mask);
+    else
+        return mpoly_monomial_halves_mp(exp_ptr, exp2, N, bits);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_mul_ui_any_bits(ulong * exp2, const ulong * exp3,
+                                      slong N, ulong c, flint_bitcnt_t bits)
+{
+    /* Only exp3 (the input) is asserted; exp3*c can legitimately need
+       to overflow-check its own *result*, which remains the caller's
+       responsibility as usual. */
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_mul_ui(exp2, exp3, N, c);
+    else
+        mpoly_monomial_mul_ui_mp(exp2, exp3, N, c);
+}
+
 void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3, slong N, const fmpz_t c);
 
 FLINT_FORCE_INLINE

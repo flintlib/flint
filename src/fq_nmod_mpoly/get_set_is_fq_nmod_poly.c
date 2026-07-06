@@ -139,10 +139,7 @@ void _fq_nmod_mpoly_set_fq_nmod_poly(
         FLINT_ASSERT(d*Alen < A->coeffs_alloc);
         FLINT_ASSERT(N*Alen < A->exps_alloc);
         n_fq_set_fq_nmod(A->coeffs + d*Alen, Bcoeffs + i, ctx->fqctx);
-        if (Abits <= FLINT_BITS)
-            mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);
-        else
-            mpoly_monomial_mul_ui_mp(A->exps + N*Alen, genexp, N, i);
+        mpoly_monomial_mul_ui_any_bits(A->exps + N*Alen, genexp, N, i, Abits);
         Alen++;
     }
     A->length = Alen;

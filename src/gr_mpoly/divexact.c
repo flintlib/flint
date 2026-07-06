@@ -74,10 +74,7 @@ _gr_mpoly_divexact_monomial(gr_mpoly_t Q,
     {
         int divides, cstatus;
 
-        if (exp_bits <= FLINT_BITS)
-            divides = mpoly_monomial_divides(T->exps + N*qlen, Aexps + N*i, Bexps, N, mask);
-        else
-            divides = mpoly_monomial_divides_mp(T->exps + N*qlen, Aexps + N*i, Bexps, N, exp_bits);
+        divides = mpoly_monomial_divides_any_bits(T->exps + N*qlen, Aexps + N*i, Bexps, N, mask, exp_bits);
 
         /* Since the division is known to be exact, spurious terms must correspond
            to inexact/unproved representation of actual zeros, which are thus
