@@ -64,7 +64,7 @@ TEST_FUNCTION_START(gr_mpoly_quasidivrem_ideal, state)
 
         if (status == GR_SUCCESS)
         {
-            switch (n_randint(state, 4) * 0)
+            switch (n_randint(state, 4))
             {
                 case 0:
                     status = gr_mpoly_quasidivrem_ideal(scale, Q, R, A, B, ctx);

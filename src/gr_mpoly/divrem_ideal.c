@@ -74,8 +74,8 @@
         else \
         { \
             hinds[x->p][x->i] |= WORD(1); \
-            SET_SHALLOW(dot_a, dot_len, poly3[x->p]->coeffs, x->i); \
-            SET_SHALLOW(dot_b, dot_len, Q[x->p]->coeffs, x->j); \
+            SET_SHALLOW(dot_a, dot_len, poly3[x->p].coeffs, x->i); \
+            SET_SHALLOW(dot_b, dot_len, Q[x->p].coeffs, x->j); \
             dot_len++; \
         } \
     } while (0)
@@ -84,14 +84,14 @@
 #define IDEAL_QCOEFF(dst, w, val) \
     (lc_is_one[w]  ? gr_set(dst, val, cctx) \
      : lc_is_unit[w] ? gr_mul(dst, val, GR_ENTRY(lc_inv, w, sz), cctx) \
-                     : gr_div(dst, val, GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx))
+                     : gr_div(dst, val, GR_ENTRY(poly3[w].coeffs, 0, sz), cctx))
 
 
 /* single-word exponent version */
 static int _gr_mpoly_divrem_ideal_mp1(
-    gr_mpoly_struct ** Q, gr_mpoly_t R, int * overflowed, int nonfield,
+    gr_mpoly_struct * Q, gr_mpoly_t R, int * overflowed, int nonfield,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
-    gr_mpoly_struct * const * poly3, ulong * const * exp3, slong len,
+    const gr_mpoly_struct * poly3, ulong * const * exp3, slong len,
     flint_bitcnt_t bits, ulong maskhi,
     gr_mpoly_ctx_t ctx)
 {
@@ -128,7 +128,7 @@ static int _gr_mpoly_divrem_ideal_mp1(
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
     hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
     for (w = 0; w < len; w++)
-        len3 += poly3[w]->length;
+        len3 += poly3[w].length;
     chains_ptr = (mpoly_nheap_t *) TMP_ALLOC(len3*sizeof(mpoly_nheap_t));
     hinds_ptr = (slong *) TMP_ALLOC(len3*sizeof(slong));
 
@@ -137,8 +137,8 @@ static int _gr_mpoly_divrem_ideal_mp1(
     {
         chains[w] = chains_ptr + len3;
         hinds[w] = hinds_ptr + len3;
-        len3 += poly3[w]->length;
-        for (i = 0; i < poly3[w]->length; i++)
+        len3 += poly3[w].length;
+        for (i = 0; i < poly3[w].length; i++)
             hinds[w][i] = 1;
     }
 
@@ -154,7 +154,7 @@ static int _gr_mpoly_divrem_ideal_mp1(
     for (w = 0; w < len; w++)
     {
         k[w] = -WORD(1);
-        s[w] = poly3[w]->length;
+        s[w] = poly3[w].length;
     }
 
     lc_inv = flint_malloc(len * sz);
@@ -166,9 +166,9 @@ static int _gr_mpoly_divrem_ideal_mp1(
         lc_is_one[w] = lc_is_unit[w] = 0;
         if (!nonfield)
         {
-            lc_is_one[w] = (gr_is_one(GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx) == T_TRUE);
+            lc_is_one[w] = (gr_is_one(GR_ENTRY(poly3[w].coeffs, 0, sz), cctx) == T_TRUE);
             lc_is_unit[w] = lc_is_one[w] ||
-                (gr_inv(GR_ENTRY(lc_inv, w, sz), GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx) == GR_SUCCESS);
+                (gr_inv(GR_ENTRY(lc_inv, w, sz), GR_ENTRY(poly3[w].coeffs, 0, sz), cctx) == GR_SUCCESS);
         }
     }
 
@@ -231,8 +231,8 @@ static int _gr_mpoly_divrem_ideal_mp1(
                     else
                     {
                         hinds[x->p][x->i] |= WORD(1);
-                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p]->coeffs, x->i, sz),
-                                             GR_ENTRY(Q[x->p]->coeffs, x->j, sz), cctx);
+                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p].coeffs, x->i, sz),
+                                             GR_ENTRY(Q[x->p].coeffs, x->j, sz), cctx);
                         status |= gr_sub(acc, acc, pp, cctx);
                     }
                 } while ((x = x->next) != NULL);
@@ -261,7 +261,7 @@ static int _gr_mpoly_divrem_ideal_mp1(
             }
             else
             {
-                if ((i + 1 < poly3[p]->length) && (hinds[p][i + 1] == 2*j + 1))
+                if ((i + 1 < poly3[p].length) && (hinds[p][i + 1] == 2*j + 1))
                 {
                     x = chains[p] + i + 1;
                     x->i = i + 1;
@@ -269,7 +269,7 @@ static int _gr_mpoly_divrem_ideal_mp1(
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    _mpoly_heap_insert1(heap, exp3[p][x->i] + Q[p]->exps[x->j], x,
+                    _mpoly_heap_insert1(heap, exp3[p][x->i] + Q[p].exps[x->j], x,
                                              &next_loc, &heap_len, maskhi);
                 }
                 if (j == k[p])
@@ -285,7 +285,7 @@ static int _gr_mpoly_divrem_ideal_mp1(
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    _mpoly_heap_insert1(heap, exp3[p][x->i] + Q[p]->exps[x->j], x,
+                    _mpoly_heap_insert1(heap, exp3[p][x->i] + Q[p].exps[x->j], x,
                                              &next_loc, &heap_len, maskhi);
                 }
             }
@@ -311,30 +311,30 @@ static int _gr_mpoly_divrem_ideal_mp1(
                 if (!d1)
                     continue;
 
-                _gr_mpoly_fit_length(&Q[w]->coeffs, &Q[w]->coeffs_alloc,
-                                     &Q[w]->exps, &Q[w]->exps_alloc, 1, k[w] + 2, ctx);
+                _gr_mpoly_fit_length(&Q[w].coeffs, &Q[w].coeffs_alloc,
+                                     &Q[w].exps, &Q[w].exps_alloc, 1, k[w] + 2, ctx);
 
                 if (nonfield)
                 {
-                    cstatus = gr_euclidean_divrem(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz),
-                                     rem, acc, GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx);
+                    cstatus = gr_euclidean_divrem(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz),
+                                     rem, acc, GR_ENTRY(poly3[w].coeffs, 0, sz), cctx);
                     if (cstatus != GR_SUCCESS) { status |= cstatus; goto cleanup; }
                     gr_swap(acc, rem, cctx);
-                    d2 = (gr_is_zero(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz), cctx) != T_TRUE);
+                    d2 = (gr_is_zero(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz), cctx) != T_TRUE);
                 }
                 else
                 {
-                    cstatus = IDEAL_QCOEFF(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz), w, acc);
+                    cstatus = IDEAL_QCOEFF(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz), w, acc);
                     if (cstatus == GR_DOMAIN)
                         continue;
                     if (cstatus != GR_SUCCESS) { status |= cstatus; goto cleanup; }
-                    d2 = (gr_is_zero(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz), cctx) != T_TRUE);
+                    d2 = (gr_is_zero(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz), cctx) != T_TRUE);
                 }
 
                 if (d2)
                 {
                     k[w]++;
-                    Q[w]->exps[k[w]] = texp;
+                    Q[w].exps[k[w]] = texp;
 
                     if (s[w] > 1)
                     {
@@ -344,7 +344,7 @@ static int _gr_mpoly_divrem_ideal_mp1(
                         x->p = w;
                         x->next = NULL;
                         hinds[w][x->i] = 2*(x->j + 1) + 0;
-                        _mpoly_heap_insert1(heap, exp3[w][1] + Q[w]->exps[k[w]], x,
+                        _mpoly_heap_insert1(heap, exp3[w][1] + Q[w].exps[k[w]], x,
                                                  &next_loc, &heap_len, maskhi);
                     }
                     s[w] = 1;
@@ -388,13 +388,13 @@ cleanup:
     if (*overflowed || status != GR_SUCCESS)
     {
         for (w = 0; w < len; w++)
-            Q[w]->length = 0;
+            Q[w].length = 0;
         R->length = 0;
     }
     else
     {
         for (w = 0; w < len; w++)
-            Q[w]->length = k[w] + 1;
+            Q[w].length = k[w] + 1;
         R->length = r_len;
     }
 
@@ -405,9 +405,9 @@ cleanup:
 
 
 static int _gr_mpoly_divrem_ideal_mp(
-    gr_mpoly_struct ** Q, gr_mpoly_t R, int * overflowed, int nonfield,
+    gr_mpoly_struct * Q, gr_mpoly_t R, int * overflowed, int nonfield,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
-    gr_mpoly_struct * const * poly3, ulong * const * exp3, slong len,
+    const gr_mpoly_struct * poly3, ulong * const * exp3, slong len,
     flint_bitcnt_t bits, slong N, const ulong * cmpmask,
     gr_mpoly_ctx_t ctx)
 {
@@ -452,7 +452,7 @@ static int _gr_mpoly_divrem_ideal_mp(
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
     hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
     for (w = 0; w < len; w++)
-        len3 += poly3[w]->length;
+        len3 += poly3[w].length;
     chains_ptr = (mpoly_nheap_t *) TMP_ALLOC(len3*sizeof(mpoly_nheap_t));
     hinds_ptr = (slong *) TMP_ALLOC(len3*sizeof(slong));
 
@@ -461,8 +461,8 @@ static int _gr_mpoly_divrem_ideal_mp(
     {
         chains[w] = chains_ptr + len3;
         hinds[w] = hinds_ptr + len3;
-        len3 += poly3[w]->length;
-        for (i = 0; i < poly3[w]->length; i++)
+        len3 += poly3[w].length;
+        for (i = 0; i < poly3[w].length; i++)
             hinds[w][i] = 1;
     }
 
@@ -486,7 +486,7 @@ static int _gr_mpoly_divrem_ideal_mp(
     for (w = 0; w < len; w++)
     {
         k[w] = -WORD(1);
-        s[w] = poly3[w]->length;
+        s[w] = poly3[w].length;
     }
 
     lc_inv = flint_malloc(len * sz);
@@ -498,9 +498,9 @@ static int _gr_mpoly_divrem_ideal_mp(
         lc_is_one[w] = lc_is_unit[w] = 0;
         if (!nonfield)
         {
-            lc_is_one[w] = (gr_is_one(GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx) == T_TRUE);
+            lc_is_one[w] = (gr_is_one(GR_ENTRY(poly3[w].coeffs, 0, sz), cctx) == T_TRUE);
             lc_is_unit[w] = lc_is_one[w] ||
-                (gr_inv(GR_ENTRY(lc_inv, w, sz), GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx) == GR_SUCCESS);
+                (gr_inv(GR_ENTRY(lc_inv, w, sz), GR_ENTRY(poly3[w].coeffs, 0, sz), cctx) == GR_SUCCESS);
         }
     }
 
@@ -519,21 +519,10 @@ static int _gr_mpoly_divrem_ideal_mp(
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
         {
-            if (mpoly_monomial_overflows(exp, N, mask))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
+            *overflowed = 1;
+            goto cleanup;
         }
 
         store_len = 0;
@@ -578,8 +567,8 @@ static int _gr_mpoly_divrem_ideal_mp(
                     else
                     {
                         hinds[x->p][x->i] |= WORD(1);
-                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p]->coeffs, x->i, sz),
-                                             GR_ENTRY(Q[x->p]->coeffs, x->j, sz), cctx);
+                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p].coeffs, x->i, sz),
+                                             GR_ENTRY(Q[x->p].coeffs, x->j, sz), cctx);
                         status |= gr_sub(acc, acc, pp, cctx);
                     }
                 } while ((x = x->next) != NULL);
@@ -609,7 +598,7 @@ static int _gr_mpoly_divrem_ideal_mp(
             }
             else
             {
-                if ((i + 1 < poly3[p]->length) && (hinds[p][i + 1] == 2*j + 1))
+                if ((i + 1 < poly3[p].length) && (hinds[p][i + 1] == 2*j + 1))
                 {
                     x = chains[p] + i + 1;
                     x->i = i + 1;
@@ -617,7 +606,7 @@ static int _gr_mpoly_divrem_ideal_mp(
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p]->exps + x->j*N, N, bits);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p].exps + x->j*N, N, bits);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
                 }
@@ -634,7 +623,7 @@ static int _gr_mpoly_divrem_ideal_mp(
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p]->exps + x->j*N, N, bits);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p].exps + x->j*N, N, bits);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
                 }
@@ -662,30 +651,30 @@ static int _gr_mpoly_divrem_ideal_mp(
                 if (!d1)
                     continue;
 
-                _gr_mpoly_fit_length(&Q[w]->coeffs, &Q[w]->coeffs_alloc,
-                                     &Q[w]->exps, &Q[w]->exps_alloc, N, k[w] + 2, ctx);
+                _gr_mpoly_fit_length(&Q[w].coeffs, &Q[w].coeffs_alloc,
+                                     &Q[w].exps, &Q[w].exps_alloc, N, k[w] + 2, ctx);
 
                 if (nonfield)
                 {
-                    cstatus = gr_euclidean_divrem(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz),
-                                     rem, acc, GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx);
+                    cstatus = gr_euclidean_divrem(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz),
+                                     rem, acc, GR_ENTRY(poly3[w].coeffs, 0, sz), cctx);
                     if (cstatus != GR_SUCCESS) { status |= cstatus; goto cleanup; }
                     gr_swap(acc, rem, cctx);   /* acc <- euclidean remainder */
-                    d2 = (gr_is_zero(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz), cctx) != T_TRUE);
+                    d2 = (gr_is_zero(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz), cctx) != T_TRUE);
                 }
                 else
                 {
-                    cstatus = IDEAL_QCOEFF(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz), w, acc);
+                    cstatus = IDEAL_QCOEFF(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz), w, acc);
                     if (cstatus == GR_DOMAIN)
                         continue;   /* this divisor cannot divide exactly */
                     if (cstatus != GR_SUCCESS) { status |= cstatus; goto cleanup; }
-                    d2 = (gr_is_zero(GR_ENTRY(Q[w]->coeffs, k[w] + 1, sz), cctx) != T_TRUE);
+                    d2 = (gr_is_zero(GR_ENTRY(Q[w].coeffs, k[w] + 1, sz), cctx) != T_TRUE);
                 }
 
                 if (d2)
                 {
                     k[w]++;
-                    mpoly_monomial_set(Q[w]->exps + k[w]*N, texp, N);
+                    mpoly_monomial_set(Q[w].exps + k[w]*N, texp, N);
 
                     if (s[w] > 1)
                     {
@@ -695,7 +684,7 @@ static int _gr_mpoly_divrem_ideal_mp(
                         x->p = w;
                         x->next = NULL;
                         hinds[w][x->i] = 2*(x->j + 1) + 0;
-                        mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[w] + N, Q[w]->exps + k[w]*N, N, bits);
+                        mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[w] + N, Q[w].exps + k[w]*N, N, bits);
                         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                                  &next_loc, &heap_len, N, cmpmask);
                     }
@@ -742,13 +731,13 @@ cleanup:
     if (*overflowed || status != GR_SUCCESS)
     {
         for (w = 0; w < len; w++)
-            Q[w]->length = 0;
+            Q[w].length = 0;
         R->length = 0;
     }
     else
     {
         for (w = 0; w < len; w++)
-            Q[w]->length = k[w] + 1;
+            Q[w].length = k[w] + 1;
         R->length = r_len;
     }
 
@@ -768,8 +757,8 @@ cleanup:
     gr_mpoly_div/gr_mpoly_divrem in divrem_heap_threaded.c).
 */
 int _gr_mpoly_divrem_ideal(
-    gr_mpoly_struct ** Q, gr_mpoly_t R,
-    const gr_mpoly_t A, gr_mpoly_struct * const * B, slong len,
+    gr_mpoly_struct * Q, gr_mpoly_t R,
+    const gr_mpoly_t A, const gr_mpoly_struct * B, slong len,
     int nonfield, gr_mpoly_ctx_t ctx)
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
@@ -782,24 +771,37 @@ int _gr_mpoly_divrem_ideal(
     int free2 = 0, * free3, overflowed;
     gr_mpoly_t TR;
     gr_mpoly_struct * r;
+    gr_mpoly_struct * q;
+    gr_mpoly_struct * TQarr = NULL;
     int status = GR_SUCCESS;
     TMP_INIT;
 
     for (i = 0; i < len; i++)
     {
-        if (B[i]->length == 0)
+        if (B[i].length == 0)
             return GR_DOMAIN;   /* division by zero */
-        if (gr_is_zero(B[i]->coeffs, cctx) != T_FALSE)
+        if (gr_is_zero(B[i].coeffs, cctx) != T_FALSE)
             return GR_UNABLE;
-        len3 = FLINT_MAX(len3, B[i]->length);
+        len3 = FLINT_MAX(len3, B[i].length);
     }
 
     if (A->length == 0)
     {
         for (i = 0; i < len; i++)
-            status |= gr_mpoly_zero(Q[i], ctx);
+            status |= gr_mpoly_zero(&Q[i], ctx);
         status |= gr_mpoly_zero(R, ctx);
         return status;
+    }
+
+    FLINT_ASSERT(Q != (gr_mpoly_struct *) A);
+    q = (Q == B) ? NULL : Q;   /* NULL signals: aliased, switch to TQarr below */
+
+    if (q == NULL)
+    {
+        TQarr = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
+        for (i = 0; i < len; i++)
+            gr_mpoly_init(TQarr + i, ctx);
+        q = TQarr;
     }
 
     TMP_START;
@@ -809,7 +811,7 @@ int _gr_mpoly_divrem_ideal(
 
     exp_bits = A->bits;
     for (i = 0; i < len; i++)
-        exp_bits = FLINT_MAX(exp_bits, B[i]->bits);
+        exp_bits = FLINT_MAX(exp_bits, B[i].bits);
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
 
     MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, exp_bits, mctx);
@@ -824,16 +826,16 @@ int _gr_mpoly_divrem_ideal(
 
     for (i = 0; i < len; i++)
     {
-        exp3[i] = B[i]->exps;
+        exp3[i] = B[i].exps;
         free3[i] = 0;
-        if (exp_bits > B[i]->bits)
+        if (exp_bits > B[i].bits)
         {
             free3[i] = 1;
-            exp3[i] = (ulong *) flint_malloc(N*B[i]->length*sizeof(ulong));
-            mpoly_repack_monomials(exp3[i], exp_bits, B[i]->exps, B[i]->bits,
-                                                            B[i]->length, mctx);
+            exp3[i] = (ulong *) flint_malloc(N*B[i].length*sizeof(ulong));
+            mpoly_repack_monomials(exp3[i], exp_bits, B[i].exps, B[i].bits,
+                                                            B[i].length, mctx);
         }
-        gr_mpoly_fit_length_reset_bits(Q[i], 1, exp_bits, ctx);
+        gr_mpoly_fit_length_reset_bits(&q[i], 1, exp_bits, ctx);
     }
 
     /* if lm(A) < lm(B[i]) for all i, the quotients are zero and R = A */
@@ -847,11 +849,18 @@ int _gr_mpoly_divrem_ideal(
     {
         status |= gr_mpoly_set(R, A, ctx);
         for (i = 0; i < len; i++)
-            status |= gr_mpoly_zero(Q[i], ctx);
+            status |= gr_mpoly_zero(&Q[i], ctx);
+        if (q == TQarr)
+        {
+            for (i = 0; i < len; i++)
+                gr_mpoly_clear(TQarr + i, ctx);
+            flint_free(TQarr);
+        }
         goto cleanup;
     }
 
-    /* handle aliasing of R with A */
+    FLINT_ASSERT(R < B || R >= B + len);
+
     if (R == A)
     {
         gr_mpoly_init3(TR, len3, exp_bits, ctx);
@@ -867,7 +876,7 @@ int _gr_mpoly_divrem_ideal(
     {
         r->bits = exp_bits;
 
-        status = _gr_mpoly_divrem_ideal_mp(Q, r, &overflowed, nonfield,
+        status = _gr_mpoly_divrem_ideal_mp(q, r, &overflowed, nonfield,
                             A->coeffs, exp2, A->length,
                             B, exp3, len, exp_bits, N, cmpmask, ctx);
 
@@ -891,14 +900,24 @@ int _gr_mpoly_divrem_ideal(
             for (i = 0; i < len; i++)
             {
                 old_exp3 = exp3[i];
-                exp3[i] = (ulong *) flint_malloc(N*B[i]->length*sizeof(ulong));
+                exp3[i] = (ulong *) flint_malloc(N*B[i].length*sizeof(ulong));
                 mpoly_repack_monomials(exp3[i], exp_bits, old_exp3, old_exp_bits,
-                                                            B[i]->length, mctx);
+                                                            B[i].length, mctx);
                 if (free3[i]) flint_free(old_exp3);
                 free3[i] = 1;
-                gr_mpoly_fit_length_reset_bits(Q[i], 1, exp_bits, ctx);
+                gr_mpoly_fit_length_reset_bits(&q[i], 1, exp_bits, ctx);
             }
         }
+    }
+
+    if (q == TQarr)
+    {
+        for (i = 0; i < len; i++)
+        {
+            gr_mpoly_swap(&Q[i], TQarr + i, ctx);
+            gr_mpoly_clear(TQarr + i, ctx);
+        }
+        flint_free(TQarr);
     }
 
     if (r == TR)
@@ -910,7 +929,7 @@ int _gr_mpoly_divrem_ideal(
     if (status != GR_SUCCESS)
     {
         for (i = 0; i < len; i++)
-            GR_IGNORE(gr_mpoly_zero(Q[i], ctx));
+            GR_IGNORE(gr_mpoly_zero(&Q[i], ctx));
         GR_IGNORE(gr_mpoly_zero(R, ctx));
     }
 
@@ -931,31 +950,18 @@ cleanup:
 }
 
 
-/* build pointer arrays from the quotient/divisor vectors and run the kernel */
+/* gr_mpoly_vec_t's entries are already one contiguous gr_mpoly_struct
+   array, matching what the kernel wants directly -- no pointer-array
+   repacking needed. */
 static int
 _gr_mpoly_divrem_ideal_vec(gr_mpoly_vec_t Q, gr_mpoly_t R,
     const gr_mpoly_t A, const gr_mpoly_vec_t B, int nonfield, gr_mpoly_ctx_t ctx)
 {
-    slong w, len = B->length;
-    gr_mpoly_struct ** Qptr, ** Bptr;
-    int status;
+    slong len = B->length;
 
     gr_mpoly_vec_set_length(Q, len, ctx);
 
-    Qptr = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    Bptr = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    for (w = 0; w < len; w++)
-    {
-        Qptr[w] = Q->entries + w;
-        Bptr[w] = B->entries + w;
-    }
-
-    status = _gr_mpoly_divrem_ideal(Qptr, R, A, Bptr, len, nonfield, ctx);
-
-    flint_free(Qptr);
-    flint_free(Bptr);
-
-    return status;
+    return _gr_mpoly_divrem_ideal(Q->entries, R, A, B->entries, len, nonfield, ctx);
 }
 
 /*

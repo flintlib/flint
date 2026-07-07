@@ -135,24 +135,12 @@ static int _gr_mpoly_quasidivrem_heap(
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
         {
-            if (mpoly_monomial_overflows(exp, N, mask))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
-            lt_divides = mpoly_monomial_divides(q_exp + q_len*N, exp, exp3, N, mask);
+            *overflowed = 1;
+            goto cleanup;
         }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
-            lt_divides = mpoly_monomial_divides_mp(q_exp + q_len*N, exp, exp3, N, bits);
-        }
+        lt_divides = mpoly_monomial_divides_any_bits(q_exp + q_len*N, exp, exp3, N, mask, bits);
 
         store_len = 0;
         status |= gr_zero(acc, cctx);

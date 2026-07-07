@@ -22,6 +22,10 @@
 #include "gr_mpoly.h"
 #include "threaded_divmod.h"
 
+#if FLINT_USES_PTHREAD
+# include <stdatomic.h>
+#endif
+
 /*
     GR port of fmpz_mpoly_divides_heap_threaded (equivalently
     nmod_mpoly_divides_heap_threaded).
@@ -176,8 +180,6 @@ void gr_mpoly_ts_clear_poly(gr_mpoly_t Q, gr_mpoly_ts_t A, gr_ctx_t cctx)
 void gr_mpoly_ts_append(gr_mpoly_ts_t A,
                 gr_ptr Bcoeff, ulong * Bexps, slong Blen, slong N, gr_ctx_t cctx)
 {
-/* TODO: this needs barriers on non-x86 */
-
     slong i;
     slong sz = cctx->sizeof_elem;
     ulong * oldexps = A->exps;
@@ -236,6 +238,24 @@ void gr_mpoly_ts_append(gr_mpoly_ts_t A,
 
         /* do not free oldcoeffs/oldexps as other threads may be using them */
     }
+
+    /* Other threads may read A->length (see the matching acquire fence
+       at each call site below) to decide how much of A->coeffs/A->exps
+       is safe to consume, without holding H->mutex -- this is deliberate
+       (a full lock here would serialize every single append). On
+       strongly-ordered hardware (x86) plain stores already become
+       visible to other cores in program order, but on weakly-ordered
+       hardware like ARM, the data writes above (and, when we just
+       reallocated, the A->exps/A->coeffs/A->alloc/A->idx updates too) could
+       otherwise become visible to another core *after* the A->length store
+       below, letting a concurrent reader see a length that claims more terms
+       are available than are actually visible yet.
+
+       TODO: port this guard to fmpz_mpoly / nmod_mpoly (where threaded
+       division is currently disabled on ARM). */
+#if FLINT_USES_PTHREAD
+    atomic_thread_fence(memory_order_release);
+#endif
 
     /* update length at the very end */
     A->length = newlength;
@@ -1688,6 +1708,13 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
 
     /* process more quotient terms if available */
     q_prev_length = Q->length;
+#if FLINT_USES_PTHREAD
+    /* pairs with the release fence in gr_mpoly_ts_append: guarantees that
+       everything the producer wrote before publishing this length (the
+       new terms' coeffs/exps, and, after a growth, Q->coeffs/Q->exps
+       themselves) is visible before we read them via chunk_mulsub below */
+    atomic_thread_fence(memory_order_acquire);
+#endif
     if (q_prev_length > L->mq)
     {
         if (L->producer == 0 && q_prev_length - L->mq < 20)
@@ -1705,6 +1732,9 @@ void trychunk(worker_arg_t W, divides_heap_chunk_t L)
 
         /* process the remaining quotient terms */
         q_prev_length = Q->length;
+#if FLINT_USES_PTHREAD
+        atomic_thread_fence(memory_order_acquire);
+#endif
         if (q_prev_length > L->mq)
             chunk_mulsub(W, L, q_prev_length);
 

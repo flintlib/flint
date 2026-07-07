@@ -48,9 +48,9 @@ _gr_vec_grow(gr_ptr * vec, slong * alloc, slong len, gr_ctx_t cctx)
 }
 
 static int _gr_mpoly_quasidivrem_ideal_heap(
-    gr_ptr scale, gr_mpoly_struct ** Q, gr_mpoly_t R, int * overflowed,
+    gr_ptr scale, gr_mpoly_struct * Q, gr_mpoly_t R, int * overflowed,
     gr_srcptr coeff2, const ulong * exp2, slong len2,
-    gr_mpoly_struct * const * poly3, ulong * const * exp3, slong len,
+    const gr_mpoly_struct * poly3, ulong * const * exp3, slong len,
     flint_bitcnt_t bits, slong N, const ulong * cmpmask,
     gr_mpoly_ctx_t ctx)
 {
@@ -89,7 +89,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
     chains = (mpoly_nheap_t **) TMP_ALLOC(len*sizeof(mpoly_nheap_t *));
     hinds = (slong **) TMP_ALLOC(len*sizeof(slong *));
     for (w = 0; w < len; w++)
-        len3 += poly3[w]->length;
+        len3 += poly3[w].length;
     chains_ptr = (mpoly_nheap_t *) TMP_ALLOC(len3*sizeof(mpoly_nheap_t));
     hinds_ptr = (slong *) TMP_ALLOC(len3*sizeof(slong));
 
@@ -98,8 +98,8 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
     {
         chains[w] = chains_ptr + len3;
         hinds[w] = hinds_ptr + len3;
-        len3 += poly3[w]->length;
-        for (i = 0; i < poly3[w]->length; i++)
+        len3 += poly3[w].length;
+        for (i = 0; i < poly3[w].length; i++)
             hinds[w][i] = 1;
     }
 
@@ -124,7 +124,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
     for (w = 0; w < len; w++)
     {
         k[w] = WORD(0);
-        s[w] = poly3[w]->length;
+        s[w] = poly3[w].length;
         qs_alloc[w] = 16;
         qs[w] = flint_malloc(qs_alloc[w] * sz);
         _gr_vec_init(qs[w], qs_alloc[w], cctx);
@@ -148,21 +148,10 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
     {
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
         {
-            if (mpoly_monomial_overflows(exp, N, mask))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-            {
-                *overflowed = 1;
-                goto cleanup;
-            }
+            *overflowed = 1;
+            goto cleanup;
         }
 
         store_len = 0;
@@ -196,15 +185,15 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
                     /* quotient term: - poly3[p][i] * (scale/qs[p][j]) * Q[p][j] */
                     if (scaleis1)
                     {
-                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p]->coeffs, x->i, sz),
-                                             GR_ENTRY(Q[x->p]->coeffs, x->j, sz), cctx);
+                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p].coeffs, x->i, sz),
+                                             GR_ENTRY(Q[x->p].coeffs, x->j, sz), cctx);
                         status |= gr_sub(acc, acc, pp, cctx);
                     }
                     else
                     {
                         status |= gr_divexact(tp, scale, GR_ENTRY(qs[x->p], x->j, sz), cctx);
-                        status |= gr_mul(tp, tp, GR_ENTRY(Q[x->p]->coeffs, x->j, sz), cctx);
-                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p]->coeffs, x->i, sz), tp, cctx);
+                        status |= gr_mul(tp, tp, GR_ENTRY(Q[x->p].coeffs, x->j, sz), cctx);
+                        status |= gr_mul(pp, GR_ENTRY(poly3[x->p].coeffs, x->i, sz), tp, cctx);
                         status |= gr_sub(acc, acc, pp, cctx);
                     }
                 }
@@ -234,7 +223,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
             }
             else
             {
-                if ((i + 1 < poly3[p]->length) && (hinds[p][i + 1] == 2*j + 1))
+                if ((i + 1 < poly3[p].length) && (hinds[p][i + 1] == 2*j + 1))
                 {
                     x = chains[p] + i + 1;
                     x->i = i + 1;
@@ -242,7 +231,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p]->exps + x->j*N, N, bits);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p].exps + x->j*N, N, bits);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
                 }
@@ -259,7 +248,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
                     x->p = p;
                     x->next = NULL;
                     hinds[p][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p]->exps + x->j*N, N, bits);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[p] + x->i*N, Q[p].exps + x->j*N, N, bits);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
                 }
@@ -290,30 +279,30 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
                 if (!d1)
                     continue;
 
-                _gr_mpoly_fit_length(&Q[w]->coeffs, &Q[w]->coeffs_alloc,
-                                     &Q[w]->exps, &Q[w]->exps_alloc, N, k[w] + 1, ctx);
+                _gr_mpoly_fit_length(&Q[w].coeffs, &Q[w].coeffs_alloc,
+                                     &Q[w].exps, &Q[w].exps_alloc, N, k[w] + 1, ctx);
                 _gr_vec_grow(&qs[w], &qs_alloc[w], k[w] + 1, cctx);
 
                 /* pseudo-quotient coefficient, scaling up if inexact */
-                cstatus = gr_div(GR_ENTRY(Q[w]->coeffs, k[w], sz), acc,
-                                     GR_ENTRY(poly3[w]->coeffs, 0, sz), cctx);
+                cstatus = gr_div(GR_ENTRY(Q[w].coeffs, k[w], sz), acc,
+                                     GR_ENTRY(poly3[w].coeffs, 0, sz), cctx);
                 if (cstatus == GR_SUCCESS)
                 {
                     status |= gr_set(GR_ENTRY(qs[w], k[w], sz), scale, cctx);
                 }
                 else if (cstatus == GR_DOMAIN)
                 {
-                    gr_srcptr lc = GR_ENTRY(poly3[w]->coeffs, 0, sz);
+                    gr_srcptr lc = GR_ENTRY(poly3[w].coeffs, 0, sz);
 
                     if (gr_gcd(g, acc, lc, cctx) == GR_SUCCESS)
                     {
-                        status |= gr_divexact(GR_ENTRY(Q[w]->coeffs, k[w], sz), acc, g, cctx);
+                        status |= gr_divexact(GR_ENTRY(Q[w].coeffs, k[w], sz), acc, g, cctx);
                         status |= gr_divexact(ns, lc, g, cctx);
                         status |= gr_mul(scale, scale, ns, cctx);
                     }
                     else
                     {
-                        status |= gr_set(GR_ENTRY(Q[w]->coeffs, k[w], sz), acc, cctx);
+                        status |= gr_set(GR_ENTRY(Q[w].coeffs, k[w], sz), acc, cctx);
                         status |= gr_mul(scale, scale, lc, cctx);
                     }
                     status |= gr_set(GR_ENTRY(qs[w], k[w], sz), scale, cctx);
@@ -325,7 +314,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
                     goto cleanup;
                 }
 
-                mpoly_monomial_set(Q[w]->exps + k[w]*N, texp, N);
+                mpoly_monomial_set(Q[w].exps + k[w]*N, texp, N);
 
                 if (s[w] > 1)
                 {
@@ -335,7 +324,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
                     x->p = w;
                     x->next = NULL;
                     hinds[w][x->i] = 2*(x->j + 1) + 0;
-                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[w] + N, Q[w]->exps + k[w]*N, N, bits);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], exp3[w] + N, Q[w].exps + k[w]*N, N, bits);
                     exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
                 }
@@ -364,7 +353,7 @@ static int _gr_mpoly_quasidivrem_ideal_heap(
         for (i = 0; i < k[w] && status == GR_SUCCESS; i++)
         {
             status |= gr_divexact(tp, scale, GR_ENTRY(qs[w], i, sz), cctx);
-            status |= gr_mul(GR_ENTRY(Q[w]->coeffs, i, sz), GR_ENTRY(Q[w]->coeffs, i, sz), tp, cctx);
+            status |= gr_mul(GR_ENTRY(Q[w].coeffs, i, sz), GR_ENTRY(Q[w].coeffs, i, sz), tp, cctx);
         }
     }
     for (i = 0; i < r_len && status == GR_SUCCESS; i++)
@@ -390,13 +379,13 @@ cleanup:
     if (*overflowed || status != GR_SUCCESS)
     {
         for (w = 0; w < len; w++)
-            Q[w]->length = 0;
+            Q[w].length = 0;
         R->length = 0;
     }
     else
     {
         for (w = 0; w < len; w++)
-            Q[w]->length = k[w];
+            Q[w].length = k[w];
         R->length = r_len;
     }
 
@@ -407,8 +396,8 @@ cleanup:
 
 
 static int _gr_mpoly_quasidivrem_ideal_arr(
-    gr_ptr scale, gr_mpoly_struct ** Q, gr_mpoly_t R,
-    const gr_mpoly_t A, gr_mpoly_struct * const * B, slong len,
+    gr_ptr scale, gr_mpoly_struct * Q, gr_mpoly_t R,
+    const gr_mpoly_t A, const gr_mpoly_struct * B, slong len,
     gr_mpoly_ctx_t ctx)
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
@@ -421,25 +410,38 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
     int free2 = 0, * free3, overflowed;
     gr_mpoly_t TR;
     gr_mpoly_struct * r;
+    gr_mpoly_struct * q;
+    gr_mpoly_struct * TQarr = NULL;
     int status = GR_SUCCESS;
     TMP_INIT;
 
     for (i = 0; i < len; i++)
     {
-        if (B[i]->length == 0)
+        if (B[i].length == 0)
             return GR_DOMAIN;
-        if (gr_is_zero(B[i]->coeffs, cctx) != T_FALSE)
+        if (gr_is_zero(B[i].coeffs, cctx) != T_FALSE)
             return GR_UNABLE;
-        len3 = FLINT_MAX(len3, B[i]->length);
+        len3 = FLINT_MAX(len3, B[i].length);
     }
 
     if (A->length == 0)
     {
         status = gr_one(scale, cctx);
         for (i = 0; i < len; i++)
-            status |= gr_mpoly_zero(Q[i], ctx);
+            status |= gr_mpoly_zero(&Q[i], ctx);
         status |= gr_mpoly_zero(R, ctx);
         return status;
+    }
+
+    FLINT_ASSERT(Q != (gr_mpoly_struct *) A);
+    q = (Q == B) ? NULL : Q;   /* NULL signals: aliased, switch to TQarr below */
+
+    if (q == NULL)
+    {
+        TQarr = (gr_mpoly_struct *) flint_malloc(len*sizeof(gr_mpoly_struct));
+        for (i = 0; i < len; i++)
+            gr_mpoly_init(TQarr + i, ctx);
+        q = TQarr;
     }
 
     TMP_START;
@@ -449,7 +451,7 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
 
     exp_bits = A->bits;
     for (i = 0; i < len; i++)
-        exp_bits = FLINT_MAX(exp_bits, B[i]->bits);
+        exp_bits = FLINT_MAX(exp_bits, B[i].bits);
     exp_bits = mpoly_fix_bits(exp_bits, mctx);
 
     MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, exp_bits, mctx);
@@ -464,16 +466,16 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
 
     for (i = 0; i < len; i++)
     {
-        exp3[i] = B[i]->exps;
+        exp3[i] = B[i].exps;
         free3[i] = 0;
-        if (exp_bits > B[i]->bits)
+        if (exp_bits > B[i].bits)
         {
             free3[i] = 1;
-            exp3[i] = (ulong *) flint_malloc(N*B[i]->length*sizeof(ulong));
-            mpoly_repack_monomials(exp3[i], exp_bits, B[i]->exps, B[i]->bits,
-                                                            B[i]->length, mctx);
+            exp3[i] = (ulong *) flint_malloc(N*B[i].length*sizeof(ulong));
+            mpoly_repack_monomials(exp3[i], exp_bits, B[i].exps, B[i].bits,
+                                                            B[i].length, mctx);
         }
-        gr_mpoly_fit_length_reset_bits(Q[i], 1, exp_bits, ctx);
+        gr_mpoly_fit_length_reset_bits(&q[i], 1, exp_bits, ctx);
     }
 
     /* if lm(A) < lm(B[i]) for all i, quotients are zero and R = A */
@@ -488,9 +490,17 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
         status |= gr_one(scale, cctx);
         status |= gr_mpoly_set(R, A, ctx);
         for (i = 0; i < len; i++)
-            status |= gr_mpoly_zero(Q[i], ctx);
+            status |= gr_mpoly_zero(&Q[i], ctx);
+        if (q == TQarr)
+        {
+            for (i = 0; i < len; i++)
+                gr_mpoly_clear(TQarr + i, ctx);
+            flint_free(TQarr);
+        }
         goto cleanup;
     }
+
+    FLINT_ASSERT(R < B || R >= B + len);
 
     if (R == A)
     {
@@ -507,7 +517,7 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
     {
         r->bits = exp_bits;
 
-        status = _gr_mpoly_quasidivrem_ideal_heap(scale, Q, r, &overflowed,
+        status = _gr_mpoly_quasidivrem_ideal_heap(scale, q, r, &overflowed,
                             A->coeffs, exp2, A->length,
                             B, exp3, len, exp_bits, N, cmpmask, ctx);
 
@@ -531,14 +541,24 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
             for (i = 0; i < len; i++)
             {
                 old_exp3 = exp3[i];
-                exp3[i] = (ulong *) flint_malloc(N*B[i]->length*sizeof(ulong));
+                exp3[i] = (ulong *) flint_malloc(N*B[i].length*sizeof(ulong));
                 mpoly_repack_monomials(exp3[i], exp_bits, old_exp3, old_exp_bits,
-                                                            B[i]->length, mctx);
+                                                            B[i].length, mctx);
                 if (free3[i]) flint_free(old_exp3);
                 free3[i] = 1;
-                gr_mpoly_fit_length_reset_bits(Q[i], 1, exp_bits, ctx);
+                gr_mpoly_fit_length_reset_bits(&q[i], 1, exp_bits, ctx);
             }
         }
+    }
+
+    if (q == TQarr)
+    {
+        for (i = 0; i < len; i++)
+        {
+            gr_mpoly_swap(&Q[i], TQarr + i, ctx);
+            gr_mpoly_clear(TQarr + i, ctx);
+        }
+        flint_free(TQarr);
     }
 
     if (r == TR)
@@ -550,7 +570,7 @@ static int _gr_mpoly_quasidivrem_ideal_arr(
     if (status != GR_SUCCESS)
     {
         for (i = 0; i < len; i++)
-            GR_IGNORE(gr_mpoly_zero(Q[i], ctx));
+            GR_IGNORE(gr_mpoly_zero(&Q[i], ctx));
         GR_IGNORE(gr_mpoly_zero(R, ctx));
         GR_IGNORE(gr_one(scale, cctx));
     }
@@ -577,24 +597,9 @@ int gr_mpoly_quasidivrem_ideal(
     const gr_mpoly_t A, const gr_mpoly_vec_t B,
     gr_mpoly_ctx_t ctx)
 {
-    slong w, len = B->length;
-    gr_mpoly_struct ** Qptr, ** Bptr;
-    int status;
+    slong len = B->length;
 
     gr_mpoly_vec_set_length(Q, len, ctx);
 
-    Qptr = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    Bptr = (gr_mpoly_struct **) flint_malloc(len*sizeof(gr_mpoly_struct *));
-    for (w = 0; w < len; w++)
-    {
-        Qptr[w] = Q->entries + w;
-        Bptr[w] = B->entries + w;
-    }
-
-    status = _gr_mpoly_quasidivrem_ideal_arr(scale, Qptr, R, A, Bptr, len, ctx);
-
-    flint_free(Qptr);
-    flint_free(Bptr);
-
-    return status;
+    return _gr_mpoly_quasidivrem_ideal_arr(scale, Q->entries, R, A, B->entries, len, ctx);
 }
