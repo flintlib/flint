@@ -18,6 +18,10 @@
 #include "mpoly.h"
 #include "gr_generic.h"
 #include "gr_mpoly.h"
+
+#if FLINT_USES_PTHREAD
+# include <stdatomic.h>
+#endif
 #include "threaded_divmod.h"
 
 /*
@@ -1109,6 +1113,14 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
 
     for (w = 0; w < H->len; w++)
         q_prev_length[w] = (H->polyQ + w)->length;
+#if FLINT_USES_PTHREAD
+    /* pairs with the release fence in gr_mpoly_ts_append: guarantees that
+       everything each producer wrote before publishing these lengths (the
+       new terms' coeffs/exps, and, after a growth, the corresponding
+       polyQ[w]->coeffs/exps themselves) is visible before we read them
+       via ideal_chunk_mulsub below */
+    atomic_thread_fence(memory_order_acquire);
+#endif
 
     for (w = 0; w < H->len; w++)
         if (q_prev_length[w] > L->mq[w])
@@ -1142,6 +1154,9 @@ static void ideal_trychunk(ideal_worker_arg_t W, ideal_chunk_t L)
         /* process any further quotient terms that trickled in */
         for (w = 0; w < H->len; w++)
             q_prev_length[w] = (H->polyQ + w)->length;
+#if FLINT_USES_PTHREAD
+        atomic_thread_fence(memory_order_acquire);
+#endif
         for (w = 0; w < H->len; w++)
             if (q_prev_length[w] > L->mq[w])
                 break;
