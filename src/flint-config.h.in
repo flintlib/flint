@@ -42,6 +42,9 @@
 /* Define if system has mpn_modexact_1_odd */
 #undef FLINT_HAVE_NATIVE_mpn_modexact_1_odd
 
+/* Define if GMP has mpn_mulmid_n */
+#undef FLINT_HAVE_NATIVE_mpn_mulmid_n
+
 /* Define if GMP has mpn_rsh1add_n */
 #undef FLINT_HAVE_NATIVE_mpn_rsh1add_n
 
