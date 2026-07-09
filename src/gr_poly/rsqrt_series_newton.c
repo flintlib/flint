@@ -26,6 +26,14 @@ _gr_poly_rsqrt_series_newton(gr_ptr g,
     if (len == 0)
         return GR_SUCCESS;
 
+    if (hlen == 1)
+    {
+        status = _gr_poly_rsqrt_series_basecase(g, h, 1, 1, ctx);
+        if (len > 1)
+            status |= _gr_vec_zero(GR_ENTRY(g, 1, sz), len - 1, ctx);
+        return status;
+    }
+
     cutoff = FLINT_MAX(cutoff, 2);
     a[i = 0] = n = len;
     while (n >= cutoff)
@@ -51,13 +59,14 @@ _gr_poly_rsqrt_series_newton(gr_ptr g,
     if (len > n)
     {
         gr_ptr t, u;
-        slong tlen, ulen;
+        slong tlen, ualloc;
 
         /* Hack: until all rings have a good mulmid, implement both with and without. */
-        /* Todo: tighten allocations when we have mulmid */
         int have_mulmid = (ctx->methods[GR_METHOD_POLY_MULMID] != (gr_funcptr) _gr_poly_mulmid_generic);
 
-        GR_TMP_INIT_VEC(t, 2 * len, ctx);
+        ualloc = have_mulmid ? (len / 2) : len;
+
+        GR_TMP_INIT_VEC(t, len + ualloc, ctx);
         u = GR_ENTRY(t, len, sz);
 
         for (i--; i >= 0; i--)
@@ -66,26 +75,24 @@ _gr_poly_rsqrt_series_newton(gr_ptr g,
             n = a[i];
 
             tlen = FLINT_MIN(2 * m - 1, n);
-            ulen = FLINT_MIN(n, m + tlen - 1);
-
             status |= _gr_poly_mullow(t, g, m, g, m, tlen, ctx);
-            status |= _gr_poly_mullow(u, g, m, t, tlen, ulen, ctx);
 
             if (have_mulmid)
             {
-                status |= _gr_poly_mulmid(GR_ENTRY(g, m, sz), u, ulen, h, FLINT_MIN(hlen, n), m, n, ctx);
-                status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, -1, ctx);
+                status |= _gr_poly_mulmid(u, t, tlen, h, FLINT_MIN(hlen, n), m, n, ctx);
+                status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, u, n - m, n - m, ctx);
             }
             else
             {
-                status |= _gr_poly_mullow(t, u, ulen, h, FLINT_MIN(hlen, n), n, ctx);
-                status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(t, m, sz), n - m, -1, ctx);
+                status |= _gr_poly_mullow(u, t, tlen, h, FLINT_MIN(hlen, n), n, ctx);
+                status |= _gr_poly_mullow(GR_ENTRY(g, m, sz), g, n - m, GR_ENTRY(u, m, sz), n - m, n - m, ctx);
             }
 
+            status |= _gr_vec_mul_scalar_2exp_si(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, -1, ctx);
             status |= _gr_vec_neg(GR_ENTRY(g, m, sz), GR_ENTRY(g, m, sz), n - m, ctx);
         }
 
-        GR_TMP_CLEAR_VEC(t, 2 * len, ctx);
+        GR_TMP_CLEAR_VEC(t, len + ualloc, ctx);
     }
 
     return status;

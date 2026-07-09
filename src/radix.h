@@ -250,6 +250,15 @@ radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 void radix_rsqrt_1_approx_basecase(nn_ptr res, ulong a, slong n, const radix_t radix);
 void radix_rsqrt_1_approx(nn_ptr res, ulong a, slong n, const radix_t radix);
 
+void radix_sqrtrem_via_mpn(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+void radix_rsqrt_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_rsqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrt_approx_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix);
+void radix_sqrtrem_newton_karp_markstein(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+void radix_sqrtrem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix);
+int radix_sqrt(nn_ptr s, nn_srcptr a, slong an, const radix_t radix);
+
 /* Modular (Hensel) division */
 
 int radix_invmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix);
@@ -434,6 +443,12 @@ void radix_integer_tdiv_r(radix_integer_t r, const radix_integer_t a, const radi
 void radix_integer_fdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 void radix_integer_cdiv_r(radix_integer_t r, const radix_integer_t a, const radix_integer_t b, const radix_t radix);
 
+int radix_integer_inv(radix_integer_t res, const radix_integer_t x, const radix_t radix);
+int radix_integer_is_invertible(const radix_integer_t x, const radix_t radix);
+
+int radix_integer_sqrt(radix_integer_t s, const radix_integer_t x, const radix_t radix);
+void radix_integer_sqrtrem(radix_integer_t s, radix_integer_t r, const radix_integer_t x, const radix_t radix);
+int radix_integer_is_square(const radix_integer_t x, const radix_t radix);
 
 /* Utilities */
 
