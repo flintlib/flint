@@ -376,9 +376,10 @@ radix_rsqrt_approx(nn_ptr Q, nn_srcptr A, slong An, slong n, const radix_t radix
         // product.
         slong low_trunc_with_mulhigh = 2 * m;
 
-        /* A_low_zeroes <= n <= 2m - 2, so unlike in radix_inv_approx no
-           third case for very short A is needed. */
-        FLINT_ASSERT(A_low_zeroes <= low_trunc_with_mulhigh - 2);
+        /* A_low_zeroes <= n + 1 <= 2m - 1 (the extreme being An = 1 with
+           n even), so unlike in radix_inv_approx no third case for very
+           short A is needed: the band always starts at limb >= 1. */
+        FLINT_ASSERT(A_low_zeroes <= low_trunc_with_mulhigh - 1);
 
         if (LIMB_RADIX(radix) > 2 * (m + 2))
         {
