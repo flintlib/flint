@@ -412,25 +412,19 @@ gr_dft_prod_precomp(gr_ptr res, gr_srcptr vec, const gr_dft_prod_pre_t P,
 }
 
 /* the raw inverse omits the 1/n normalization of each component;
-   apply the full 1/n once */
+   scale by the full 1/n once at the end (as in
+   gr_dft_inverse_precomp, using scalar division so that exact
+   division succeeds even in rings without an inverse of n) */
 int
 gr_dft_prod_inverse_precomp(gr_ptr res, gr_srcptr vec,
         const gr_dft_prod_pre_t P, gr_ctx_t ctx)
 {
     int status;
-    gr_ptr c;
 
     status = _gr_dft_prod_precomp_raw(res, vec, 1, P, ctx);
 
-    if (status == GR_SUCCESS && P->n > 1)
-    {
-        GR_TMP_INIT(c, ctx);
-        status |= gr_set_ui(c, P->n, ctx);
-        status |= gr_inv(c, c, ctx);
-        if (status == GR_SUCCESS)
-            status |= _gr_vec_mul_scalar(res, res, (slong) P->n, c, ctx);
-        GR_TMP_CLEAR(c, ctx);
-    }
+    if (P->n >= 2)
+        status |= _gr_vec_div_scalar_ui(res, res, (slong) P->n, P->n, ctx);
 
     return status;
 }
