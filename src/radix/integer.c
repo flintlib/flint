@@ -1759,6 +1759,110 @@ radix_integer_cdiv_r(radix_integer_t r,
     radix_integer_clear(q, radix);
 }
 
+
+int
+radix_integer_sqrt(radix_integer_t s, const radix_integer_t x, const radix_t radix)
+{
+    slong xn, sn;
+    nn_srcptr xd;
+    nn_ptr sd;
+    int exact;
+
+    xn = x->size;
+
+    if (xn < 0)
+        return 0;
+
+    if (xn == 0)
+    {
+        radix_integer_zero(s, radix);
+        return 1;
+    }
+
+    sn = (xn + 1) / 2;
+    sd = radix_integer_fit_limbs(s, sn, radix);
+    /* read after fit_limbs in case of possible aliasing */
+    xd = x->d;
+
+    exact = radix_sqrt(sd, xd, xn, radix);
+
+    MPN_NORM(sd, sn);
+    s->size = sn;
+
+    return exact;
+}
+
+void
+radix_integer_sqrtrem(radix_integer_t s, radix_integer_t r, const radix_integer_t x, const radix_t radix)
+{
+    slong xn, sn, rn;
+    nn_srcptr xd;
+    nn_ptr sd, rd;
+
+    xn = x->size;
+
+    if (xn < 0)
+        flint_throw(FLINT_ERROR, "radix_integer_sqrtrem: negative input");
+
+    if (xn == 0)
+    {
+        radix_integer_zero(s, radix);
+        radix_integer_zero(r, radix);
+        return;
+    }
+
+    sn = (xn + 1) / 2;
+    rn = sn + 1;
+    sd = radix_integer_fit_limbs(s, sn, radix);
+    rd = radix_integer_fit_limbs(r, rn, radix);
+    /* read after fit_limbs in case of possible aliasing */
+    xd = x->d;
+
+    radix_sqrtrem(sd, rd, xd, xn, radix);
+
+    MPN_NORM(sd, sn);
+    MPN_NORM(rd, rn);
+
+    s->size = sn;
+    r->size = rn;
+}
+
+/* todo: fast nonresidue tests to detect most non-squares cheaply */
+int
+radix_integer_is_square(const radix_integer_t x, const radix_t radix)
+{
+    radix_integer_t s;
+    int exact;
+
+    if (x->size < 0)
+        return 0;
+
+    if (x->size == 0)
+        return 1;
+
+    radix_integer_init(s, radix);
+    exact = radix_integer_sqrt(s, x, radix);
+    radix_integer_clear(s, radix);
+
+    return exact;
+}
+
+int
+radix_integer_is_invertible(const radix_integer_t x, const radix_t radix)
+{
+    return radix_integer_is_one(x, radix) || radix_integer_is_neg_one(x, radix);
+}
+
+int
+radix_integer_inv(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+{
+    if (!radix_integer_is_invertible(x, radix))
+        return 0;
+
+    radix_integer_set(res, x, radix);
+    return 1;
+}
+
 /* ------------------------------------------------------------------------- */
 /*    GR wrapper                                                             */
 /* ------------------------------------------------------------------------- */
@@ -2039,6 +2143,26 @@ static int _gr_radix_integer_fdiv_qr(radix_integer_t res1, radix_integer_t res2,
     return GR_SUCCESS;
 }
 
+static int _gr_radix_integer_sqrt(radix_integer_t res, const radix_integer_t x, gr_ctx_t ctx)
+{
+    return radix_integer_sqrt(res, x, GR_RADIX_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+}
+
+static truth_t _gr_radix_integer_is_square(const radix_integer_t x, gr_ctx_t ctx)
+{
+    return radix_integer_is_square(x, GR_RADIX_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
+static int _gr_radix_integer_inv(radix_integer_t res, const radix_integer_t x, gr_ctx_t ctx)
+{
+    return radix_integer_inv(res, x, GR_RADIX_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+}
+
+static truth_t _gr_radix_integer_is_invertible(const radix_integer_t x, gr_ctx_t ctx)
+{
+    return radix_integer_is_invertible(x, GR_RADIX_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
 static int _gr_radix_integer_cmp(int * res, const radix_integer_t x, const radix_integer_t y, gr_ctx_t ctx)
 {
     *res = radix_integer_cmp(x, y, GR_RADIX_CTX(ctx));
@@ -2104,6 +2228,10 @@ gr_method_tab_input _gr_radix_integer_methods_input[] =
     {GR_METHOD_EUCLIDEAN_DIV,   (gr_funcptr) _gr_radix_integer_fdiv_q},
     {GR_METHOD_EUCLIDEAN_REM,   (gr_funcptr) _gr_radix_integer_fdiv_r},
     {GR_METHOD_EUCLIDEAN_DIVREM,   (gr_funcptr) _gr_radix_integer_fdiv_qr},
+    {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_radix_integer_is_invertible},
+    {GR_METHOD_INV,             (gr_funcptr) _gr_radix_integer_inv},
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_radix_integer_is_square},
+    {GR_METHOD_SQRT,            (gr_funcptr) _gr_radix_integer_sqrt},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_radix_integer_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_radix_integer_cmpabs},
     {GR_METHOD_SGN,             (gr_funcptr) _gr_radix_integer_sgn},

@@ -306,7 +306,7 @@ Except where otherwise noted, the following rules apply:
 .. function:: int radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radix)
 
     Computes the reciprocal of the square root computed by
-    :func:`radix_rsqrtmod_bn`, with the same meaning of the return flag.
+    :func:`radix_sqrtmod_bn`, with the same meaning of the return flag.
 
 .. function:: int radix_cmp_bn_half(nn_srcptr x, slong n, const radix_t radix)
 
@@ -319,6 +319,48 @@ Except where otherwise noted, the following rules apply:
     Sets `(res,n)` to the fractional limbs of an approximation of `1 / \sqrt{a}`.
     Assumes that `2 \le a < B`. The error is bounded by `2 B^{-n}`, i.e. by
     2 fixed-point ulps.
+
+.. function:: void radix_rsqrt_approx_basecase(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+              void radix_rsqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+
+    Given `(a, an)` representing a fixed-point number `a \in [B^{-2}, 1)`
+    with `an` fraction limbs (at least one of the two highest limbs must
+    be nonzero), sets `(q, n+2)` to an approximation of
+    `1/\sqrt{a} \in (1, B]` with `n` fraction limbs and two integral limbs
+    (the highest limb is nonzero only when `a` is close to `B^{-2}`).
+    The absolute error is bounded by `4 B^{-n} / \sqrt{a}`.
+    The input normalization is wider than that of :func:`radix_inv_approx`
+    (which requires `a \in [1/B, 1)`) so that :func:`radix_sqrtrem` can
+    handle inputs with an odd number of limbs, the square root scale
+    factor `B^{1/2}` not being a limb shift.
+
+.. function:: void radix_sqrt_approx_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+              void radix_sqrt_approx(nn_ptr q, nn_srcptr a, slong an, slong n, const radix_t radix)
+
+    Given `(a, an)` representing a fixed-point number `a \in [B^{-2}, 1)`
+    as in :func:`radix_rsqrt_approx`, sets `(q, n+2)` to an approximation
+    of `\sqrt{a} \in [1/B, 1)` with `n` fraction limbs and two integral
+    limbs (normally zero, though the computed value can round up to 1).
+    The absolute error is bounded by `4 B^{-n} / \sqrt{a}`. Note that the
+    error is proportional to `1/\sqrt{a}` rather than to the output
+    `\sqrt{a}`: the corrections of the final iteration are multiplied by
+    an approximation of `1/\sqrt{a} \le B`, which amplifies their
+    `B^{-n}`-size rounding errors accordingly.
+
+.. function:: void radix_sqrtrem_via_mpn(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix)
+              void radix_sqrtrem_newton_karp_markstein(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix)
+              void radix_sqrtrem(nn_ptr s, nn_ptr r, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets `(s, \lceil an/2 \rceil)` to the truncated square root of
+    `(a, an)` and `(r, \lceil an/2 \rceil + 1)` to the remainder
+    `a - s^2 \le 2s`. Requires `an \ge 1` and `a_{an-1} \ne 0`. The user
+    can pass ``NULL`` for `r` to compute only the square root.
+
+.. function:: int radix_sqrt(nn_ptr s, nn_srcptr a, slong an, const radix_t radix)
+
+    Sets `(s, \lceil an/2 \rceil)` to the truncated square root of
+    `(a, an)`, returning 1 if `a` is a perfect square and 0 otherwise.
+    Requires `an \ge 1` and `a_{an-1} \ne 0`.
 
 Radix conversion
 --------------------------------------------------------------------------------
@@ -522,6 +564,31 @@ Memory-managed integers
 
     Division with remainder: compute `a = qb + r` where `q` is the truncation,
     floor, and ceiling quotient respectively.
+
+.. function:: int radix_integer_sqrt(radix_integer_t s, const radix_integer_t x, const radix_t radix)
+
+    Sets `s` to the truncated square root of `x` and returns 1 if `x` is
+    a perfect square, otherwise returns 0. If `x` is negative, returns 0
+    without modifying `s`.
+
+.. function:: void radix_integer_sqrtrem(radix_integer_t s, radix_integer_t r, const radix_integer_t x, const radix_t radix)
+
+    Sets `s` to the truncated square root of `x` and `r` to the remainder
+    `x - s^2 \le 2s`. Raises an error if `x` is negative.
+
+.. function:: int radix_integer_is_square(const radix_integer_t x, const radix_t radix)
+
+    Returns 1 if `x` is a perfect square and 0 otherwise (in particular,
+    if `x` is negative).
+
+.. function:: int radix_integer_inv(radix_integer_t res, const radix_integer_t x, const radix_t radix)
+
+    If `x` is invertible, sets *res* to the inverse of `x` and returns 1,
+    otherwise returns 0 without modifying *res*.
+
+.. function:: int radix_integer_is_invertible(const radix_integer_t x, const radix_t radix)
+
+    Returns 1 if `x` is invertible, i.e. if `x = \pm 1`, and 0 otherwise.
 
 .. function:: int radix_integer_invmod_limbs(radix_integer_t res, const radix_integer_t x, slong n, const radix_t radix)
 

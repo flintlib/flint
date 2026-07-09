@@ -33,9 +33,13 @@
 #include "t-neg.c"
 #include "t-rshift.c"
 #include "t-rsqrt_1_approx.c"
+#include "t-rsqrt_approx.c"
 #include "t-rsqrtmod_bn.c"
 #include "t-set_mpn.c"
+#include "t-sqrt.c"
+#include "t-sqrt_approx.c"
 #include "t-sqrtmod_bn.c"
+#include "t-sqrtrem.c"
 #include "t-sub.c"
 
 /* Array of test functions ***************************************************/
@@ -64,9 +68,12 @@ test_struct tests[] =
     TEST_FUNCTION(radix_neg),
     TEST_FUNCTION(radix_rshift),
     TEST_FUNCTION(radix_rsqrt_1_approx),
+    TEST_FUNCTION(radix_rsqrt_approx),
     TEST_FUNCTION(radix_rsqrtmod_bn),
     TEST_FUNCTION(radix_set_mpn),
+    TEST_FUNCTION(radix_sqrt),
     TEST_FUNCTION(radix_sqrtmod_bn),
+    TEST_FUNCTION(radix_sqrtrem),
     TEST_FUNCTION(radix_sub),
 };
 
