@@ -704,3 +704,76 @@ Internal functions
     Bluestein chirp-z transform (``GR_DFT_ALG_BLUESTEIN``). *res* must
     not alias *vec*. The inverse transform is computed as the forward
     transform of the cyclically reversed input.
+
+DFT on products of cyclic groups
+-------------------------------------------------------------------------------
+
+The following functions compute the DFT on a product group
+`\mathbb{Z}/c_0 \times \cdots \times \mathbb{Z}/c_{k-1}` with row-major
+indexing (the first component varies slowest), following the same
+algorithm as :func:`acb_dft_prod`: one cyclic DFT along each axis,
+with no twiddle factors in between. Component plans are shared
+between axes of equal length. The lines of one axis are independent
+and are transformed in parallel when multiple threads are available
+and the ring is marked thread-safe.
+
+.. function:: int gr_dft_prod_precomp_init(gr_dft_prod_pre_t P, const ulong * cyc, slong num, int flags, gr_ctx_t ctx)
+              int gr_dft_prod_precomp_init_root(gr_dft_prod_pre_t P, gr_srcptr w, ulong order, const ulong * cyc, slong num, int flags, gr_ctx_t ctx)
+
+    Initializes a plan for the product DFT with component lengths
+    *cyc*. The first version uses canonical roots of unity
+    (:func:`gr_dft_default_root`); the second takes a root of unity
+    *w* of the given *order*, which every component length must
+    divide, the component of length `m` using `w^{\mathrm{order}/m}`.
+    Any *flags* are passed on to the component plans.
+
+.. function:: void gr_dft_prod_precomp_clear(gr_dft_prod_pre_t P)
+
+.. function:: int gr_dft_prod_precomp(gr_ptr res, gr_srcptr vec, const gr_dft_prod_pre_t P, gr_ctx_t ctx)
+              int gr_dft_prod_inverse_precomp(gr_ptr res, gr_srcptr vec, const gr_dft_prod_pre_t P, gr_ctx_t ctx)
+              int gr_dft_prod(gr_ptr res, gr_srcptr vec, const ulong * cyc, slong num, gr_ctx_t ctx)
+              int gr_dft_prod_inverse(gr_ptr res, gr_srcptr vec, const ulong * cyc, slong num, gr_ctx_t ctx)
+
+    Product DFT and its inverse (the latter including the `1/n`
+    normalization, applied once at the end rather than per axis).
+    Aliasing of *res* and *vec* is allowed.
+
+.. function:: void gr_dft_prod_precomp_nfixed_bound(double * peak, double * err_ulps, double in_mag, double in_err, const gr_dft_prod_pre_t P)
+
+    Composes the fixed-point error bounds of the component
+    transforms, axis by axis.
+
+.. function:: void gr_dft_acb_prod(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num, slong prec)
+              void gr_dft_acb_prod_inverse(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num, slong prec)
+              int gr_dft_acb_prod_precomp_init(gr_dft_acb_prod_pre_t Q, const ulong * cyc, slong num, slong prec)
+              void gr_dft_acb_prod_precomp_clear(gr_dft_acb_prod_pre_t Q)
+              void gr_dft_acb_prod_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_prod_pre_t Q, slong prec)
+              void gr_dft_acb_prod_inverse_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_prod_pre_t Q, slong prec)
+
+    Product DFT with complex ball input and output, using fixed-point
+    arithmetic internally with rigorous error bounds (the same
+    scaling and error analysis as :func:`gr_dft_acb`, with the
+    composed product bound), falling back to ball arithmetic when
+    fixed point does not apply.
+
+DFT on Dirichlet groups
+-------------------------------------------------------------------------------
+
+Counterparts of :func:`acb_dirichlet_dft` and
+:func:`acb_dirichlet_dft_index`: the group of Dirichlet characters
+mod `q` is a product of cyclic groups, so its DFT is a product DFT
+over the Conrey component sizes.
+
+.. function:: int gr_dft_dirichlet_index(gr_ptr w, gr_srcptr v, const dirichlet_group_t G, gr_ctx_t ctx)
+              int gr_dft_dirichlet(gr_ptr w, gr_srcptr v, const dirichlet_group_t G, gr_ctx_t ctx)
+
+    DFT of *v* over the Dirichlet group *G*, in lexicographic Conrey
+    indexing (array size ``G->phi_q``) and number indexing (array
+    size ``G->q``) respectively, over an arbitrary ring with the
+    required roots of unity.
+
+.. function:: void gr_dft_acb_dirichlet_index(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
+              void gr_dft_acb_dirichlet(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
+
+    The same transforms for complex ball input and output, routed
+    through the fixed-point product transform.

@@ -86,22 +86,23 @@ _gr_dft_acb_ball(acb_ptr w, acb_srcptr v, slong n, int inverse, slong prec)
     return status;
 }
 
+/* Scaling and limb-count selection shared by the cyclic and product
+   fixed-point wrappers, parameterized by the plan's error-bound
+   evaluator. On failure the caller owns cleaning up its plan. */
+typedef void (*_gr_dft_nfixed_bound_fn)(double * peak, double * err_ulps,
+        double in_mag, double in_err, const void * plan);
+
 static int
-_gr_dft_acb_nfixed_select(gr_dft_acb_pre_struct * Q, slong n, slong prec)
+_gr_dft_acb_select_core(slong * nl_out, slong * p1e_out, double * in_mag_out,
+        double * errulps_out, _gr_dft_nfixed_bound_fn bound,
+        const void * plan, slong prec)
 {
-    int status = GR_SUCCESS;
-    double peak1, err0, peak;
+    double peak1, err0, peak, in_mag, errulps;
     slong nl, p1e;
-
-    prec = FLINT_MAX(prec, 2);
-
-    status = _gr_dft_precomp_init_layout(Q->P, n, GR_DFT_ALG_AUTO, 0, 1);
-    if (status != GR_SUCCESS)
-        return status;
 
     {
         int p1exp;
-        gr_dft_precomp_nfixed_bound(&peak1, &err0, 1.0, 0.0, Q->P);
+        bound(&peak1, &err0, 1.0, 0.0, plan);
 
         /* the bound of a unit input is at least 1 and, for sane
            transform lengths, far below 2^500; refuse defensively if
@@ -113,44 +114,75 @@ _gr_dft_acb_nfixed_select(gr_dft_acb_pre_struct * Q, slong n, slong prec)
            range: an underflow to zero there would silently understate
            the bound. */
         if (!(peak1 >= 1.0 && peak1 <= ldexp(1.0, 500)))
-        {
-            gr_dft_precomp_clear(Q->P);
             return GR_UNABLE;
-        }
 
         frexp(peak1, &p1exp);   /* peak1 < 2^p1exp */
         p1e = p1exp;
     }
-    Q->p1e = p1e;
     /* p1exp lies in [1, 1024] here, so this neither under- nor
        overflows */
-    Q->in_mag = ldexp(1.0, -p1e - 1);
+    in_mag = ldexp(1.0, -p1e - 1);
 
-    gr_dft_precomp_nfixed_bound(&peak, &Q->errulps, Q->in_mag, 1.0, Q->P);
-    if (!(peak < 1.0) ||
-        !(Q->errulps >= 1.0 && Q->errulps <= DBL_MAX))
-    {
-        gr_dft_precomp_clear(Q->P);
+    bound(&peak, &errulps, in_mag, 1.0, plan);
+    if (!(peak < 1.0) || !(errulps >= 1.0 && errulps <= DBL_MAX))
         return GR_UNABLE;
-    }
 
     /* guard bits: absolute roundoff errulps 2^(-64 nl) should stay
        below 2^-(prec+2) in_mag */
     nl = (prec + FLINT_BITS - 1) / FLINT_BITS;
     {
-        double need = prec + 2.0 + log2(Q->errulps) - log2(Q->in_mag);
+        double need = prec + 2.0 + log2(errulps) - log2(in_mag);
         slong nl2 = (slong) (need / FLINT_BITS) + 1;
         nl = FLINT_MAX(nl, nl2);
     }
     if (nl > GR_DFT_NFIXED_MAX_NLIMBS)
+        return GR_UNABLE;
+
+    *nl_out = nl;
+    *p1e_out = p1e;
+    *in_mag_out = in_mag;
+    *errulps_out = errulps;
+    return GR_SUCCESS;
+}
+
+static void
+_gr_dft_nfixed_bound_cyc(double * peak, double * err_ulps, double in_mag,
+        double in_err, const void * plan)
+{
+    gr_dft_precomp_nfixed_bound(peak, err_ulps, in_mag, in_err,
+            (const gr_dft_pre_struct *) plan);
+}
+
+static void
+_gr_dft_nfixed_bound_prod(double * peak, double * err_ulps, double in_mag,
+        double in_err, const void * plan)
+{
+    gr_dft_prod_precomp_nfixed_bound(peak, err_ulps, in_mag, in_err,
+            (const gr_dft_prod_pre_struct *) plan);
+}
+
+static int
+_gr_dft_acb_nfixed_select(gr_dft_acb_pre_struct * Q, slong n, slong prec)
+{
+    int status = GR_SUCCESS;
+    double peak, errulps2;
+
+    prec = FLINT_MAX(prec, 2);
+
+    status = _gr_dft_precomp_init_layout(Q->P, n, GR_DFT_ALG_AUTO, 0, 1);
+    if (status != GR_SUCCESS)
+        return status;
+
+    status = _gr_dft_acb_select_core(&Q->nl, &Q->p1e, &Q->in_mag,
+            &Q->errulps, _gr_dft_nfixed_bound_cyc, Q->P, prec);
+    if (status != GR_SUCCESS)
     {
         gr_dft_precomp_clear(Q->P);
-        return GR_UNABLE;
+        return status;
     }
-    Q->nl = nl;
 
-    status |= gr_dft_ctx_init_nfixed(Q->rctx, nl);
-    status |= gr_dft_ctx_init_nfixed_complex(Q->cctx, nl);
+    status |= gr_dft_ctx_init_nfixed(Q->rctx, Q->nl);
+    status |= gr_dft_ctx_init_nfixed_complex(Q->cctx, Q->nl);
     status |= _gr_dft_precomp_realize(Q->P, Q->rctx, Q->cctx);
     if (status != GR_SUCCESS)
     {
@@ -163,7 +195,8 @@ _gr_dft_acb_nfixed_select(gr_dft_acb_pre_struct * Q, slong n, slong prec)
     /* re-evaluate the error bound with the realized plan (actual
        complex-multiplication constant and root-table error), for
        tighter output radii */
-    gr_dft_precomp_nfixed_bound(&peak, &Q->errulps, Q->in_mag, 1.0, Q->P);
+    gr_dft_precomp_nfixed_bound(&peak, &errulps2, Q->in_mag, 1.0, Q->P);
+    Q->errulps = errulps2;
     if (!(peak < 1.0) ||
         !(Q->errulps >= 1.0 && Q->errulps <= DBL_MAX))
     {
@@ -483,13 +516,13 @@ _acb_dft_scan(mag_t R, arf_t t, acb_srcptr v, slong n)
 }
 
 static int
-_gr_dft_acb_nfixed_apply(acb_ptr w, acb_srcptr v, int inverse,
-        const gr_dft_acb_pre_struct * Q, slong prec)
+_gr_dft_acb_nfixed_run(acb_ptr w, acb_srcptr v, int inverse,
+        slong n, slong nl, slong p1e, double errulps,
+        gr_ctx_struct * rctx, gr_ctx_struct * cctx,
+        int (*transform)(gr_ptr, gr_srcptr, int, const void *, gr_ctx_t),
+        const void * plan, slong prec)
 {
     int status = GR_SUCCESS;
-    gr_ctx_struct * rctx = (gr_ctx_struct *) Q->rctx;
-    gr_ctx_struct * cctx = (gr_ctx_struct *) Q->cctx;
-    slong n = Q->n;
     gr_ptr x, y;
     mag_t R, errmag;
     arf_t t;
@@ -543,7 +576,7 @@ _gr_dft_acb_nfixed_apply(acb_ptr w, acb_srcptr v, int inverse,
     }
 
     /* input scale 2^-e with (m 2^-e) peak(1) <= 1/2 */
-    e = EM + Q->p1e + 1;
+    e = EM + p1e + 1;
 
     rsz = rctx->sizeof_elem;
 
@@ -556,17 +589,14 @@ _gr_dft_acb_nfixed_apply(acb_ptr w, acb_srcptr v, int inverse,
 
     /* scale (exactly) and truncate the midpoints, writing the
        fraction limbs directly */
-    _acb_dft_conv_run(0, v, (nn_ptr) x, NULL, NULL, 2 * n, e, Q->nl,
+    _acb_dft_conv_run(0, v, (nn_ptr) x, NULL, NULL, 2 * n, e, nl,
             rsz, 0, prec, NULL);
 
-    if (inverse)
-        status |= _gr_dft_precomp_raw(y, x, 1, Q->P, cctx);
-    else
-        status |= gr_dft_precomp(y, x, Q->P, cctx);
+    status |= transform(y, x, inverse, plan, cctx);
 
     /* absolute roundoff error, back at the input scale */
-    mag_set_d(errmag, Q->errulps);
-    mag_mul_2exp_si(errmag, errmag, -Q->nl * FLINT_BITS + e);
+    mag_set_d(errmag, errulps);
+    mag_mul_2exp_si(errmag, errmag, -nl * FLINT_BITS + e);
     mag_add(errmag, errmag, R);
 
     /* the raw inverse omits the 1/n normalization: for power-of-two
@@ -594,7 +624,7 @@ _gr_dft_acb_nfixed_apply(acb_ptr w, acb_srcptr v, int inverse,
         }
 
         _acb_dft_conv_run(1, NULL, NULL, w, (nn_srcptr) y, 2 * n, eout,
-                Q->nl, rsz, den, prec, errmag);
+                nl, rsz, den, prec, errmag);
     }
 
     flint_free(x);
@@ -606,6 +636,37 @@ cleanup:
     arf_clear(t);
 
     return status;
+}
+
+
+static int
+_gr_dft_acb_transform_cyc(gr_ptr y, gr_srcptr x, int inverse,
+        const void * plan, gr_ctx_t cctx)
+{
+    const gr_dft_pre_struct * P = plan;
+
+    if (inverse)
+        return _gr_dft_precomp_raw(y, x, 1, P, cctx);
+    else
+        return gr_dft_precomp(y, x, P, cctx);
+}
+
+static int
+_gr_dft_acb_transform_prod(gr_ptr y, gr_srcptr x, int inverse,
+        const void * plan, gr_ctx_t cctx)
+{
+    const gr_dft_prod_pre_struct * P = plan;
+
+    return _gr_dft_prod_precomp_raw(y, x, inverse, P, cctx);
+}
+
+static int
+_gr_dft_acb_nfixed_apply(acb_ptr w, acb_srcptr v, int inverse,
+        const gr_dft_acb_pre_struct * Q, slong prec)
+{
+    return _gr_dft_acb_nfixed_run(w, v, inverse, Q->n, Q->nl, Q->p1e,
+            Q->errulps, (gr_ctx_struct *) Q->rctx, (gr_ctx_struct *) Q->cctx,
+            _gr_dft_acb_transform_cyc, Q->P, prec);
 }
 
 static int
@@ -786,4 +847,274 @@ gr_dft_acb_inverse(acb_ptr w, acb_srcptr v, slong n, slong prec)
 {
     if (n > 0)
         GR_IGNORE(_gr_dft_acb(w, v, n, 1, 0, prec));
+}
+
+/* Product-group variant *******************************************/
+
+static int
+_gr_dft_acb_prod_ball(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num,
+        int inverse, slong prec)
+{
+    int status;
+    gr_ctx_t ctx;
+
+    gr_ctx_init_complex_acb(ctx, prec);
+    if (inverse)
+        status = gr_dft_prod_inverse((gr_ptr) w, (gr_srcptr) v, cyc, num, ctx);
+    else
+        status = gr_dft_prod((gr_ptr) w, (gr_srcptr) v, cyc, num, ctx);
+    gr_ctx_clear(ctx);
+
+    return status;
+}
+
+static int
+_gr_dft_acb_prod_nfixed_select(gr_dft_acb_prod_pre_struct * Q,
+        const ulong * cyc, slong num, slong prec)
+{
+    int status = GR_SUCCESS;
+    double peak, errulps2;
+
+    prec = FLINT_MAX(prec, 2);
+
+    status = _gr_dft_prod_precomp_init_layout(Q->P, cyc, num, 0, 1);
+    if (status != GR_SUCCESS)
+    {
+        gr_dft_prod_precomp_clear(Q->P);
+        return status;
+    }
+
+    status = _gr_dft_acb_select_core(&Q->nl, &Q->p1e, &Q->in_mag,
+            &Q->errulps, _gr_dft_nfixed_bound_prod, Q->P, prec);
+    if (status != GR_SUCCESS)
+    {
+        gr_dft_prod_precomp_clear(Q->P);
+        return status;
+    }
+
+    status |= gr_dft_ctx_init_nfixed(Q->rctx, Q->nl);
+    status |= gr_dft_ctx_init_nfixed_complex(Q->cctx, Q->nl);
+    status |= _gr_dft_prod_precomp_realize(Q->P, Q->rctx, Q->cctx);
+    if (status != GR_SUCCESS)
+    {
+        gr_dft_prod_precomp_clear(Q->P);
+        gr_ctx_clear(Q->rctx);
+        gr_ctx_clear(Q->cctx);
+        return status;
+    }
+
+    /* re-evaluate with the realized component plans */
+    gr_dft_prod_precomp_nfixed_bound(&peak, &errulps2, Q->in_mag, 1.0, Q->P);
+    Q->errulps = errulps2;
+    if (!(peak < 1.0) ||
+        !(Q->errulps >= 1.0 && Q->errulps <= DBL_MAX))
+    {
+        gr_dft_prod_precomp_clear(Q->P);
+        gr_ctx_clear(Q->rctx);
+        gr_ctx_clear(Q->cctx);
+        return GR_UNABLE;
+    }
+
+    return GR_SUCCESS;
+}
+
+static int
+_gr_dft_acb_prod_nfixed_apply(acb_ptr w, acb_srcptr v, int inverse,
+        const gr_dft_acb_prod_pre_struct * Q, slong prec)
+{
+    return _gr_dft_acb_nfixed_run(w, v, inverse, Q->n, Q->nl, Q->p1e,
+            Q->errulps, (gr_ctx_struct *) Q->rctx, (gr_ctx_struct *) Q->cctx,
+            _gr_dft_acb_transform_prod, Q->P, prec);
+}
+
+int
+gr_dft_acb_prod_precomp_init(gr_dft_acb_prod_pre_t Q, const ulong * cyc,
+        slong num, slong prec)
+{
+    int status = GR_SUCCESS;
+    slong a, n = 1;
+
+    for (a = 0; a < num; a++)
+    {
+        if (cyc[a] == 0 || (ulong) n > (WORD_MAX / 8) / cyc[a])
+            return GR_DOMAIN;
+        n *= (slong) cyc[a];
+    }
+
+    prec = FLINT_MAX(prec, 2);
+
+    Q->n = n;
+    Q->num = num;
+    Q->prec = prec;
+    Q->cyc = flint_malloc(FLINT_MAX(num, 1) * sizeof(ulong));
+    for (a = 0; a < num; a++)
+        Q->cyc[a] = cyc[a];
+
+    status = _gr_dft_acb_prod_nfixed_select(Q, cyc, num, prec);
+    if (status == GR_SUCCESS)
+    {
+        Q->which = 2;
+        return GR_SUCCESS;
+    }
+
+    /* ball arithmetic */
+    gr_ctx_init_real_arb(Q->rctx, prec);
+    gr_ctx_init_complex_acb(Q->cctx, prec);
+    status = gr_dft_prod_precomp_init(Q->P, cyc, num, 0,
+            (gr_ctx_struct *) Q->cctx);
+    if (status != GR_SUCCESS)
+    {
+        gr_dft_prod_precomp_clear(Q->P);
+        gr_ctx_clear(Q->rctx);
+        gr_ctx_clear(Q->cctx);
+        flint_free(Q->cyc);
+        Q->cyc = NULL;
+        Q->which = 0;
+        return status;
+    }
+    Q->which = 1;
+
+    return GR_SUCCESS;
+}
+
+void
+gr_dft_acb_prod_precomp_clear(gr_dft_acb_prod_pre_t Q)
+{
+    if (Q->which != 0)
+    {
+        gr_dft_prod_precomp_clear(Q->P);
+        gr_ctx_clear(Q->rctx);
+        gr_ctx_clear(Q->cctx);
+        Q->which = 0;
+    }
+    flint_free(Q->cyc);
+    Q->cyc = NULL;
+}
+
+int
+_gr_dft_acb_prod_precomp(acb_ptr w, acb_srcptr v, int inverse,
+        const gr_dft_acb_prod_pre_t Q, slong prec)
+{
+    int status;
+    slong n = Q->n;
+
+    prec = FLINT_MAX(prec, 2);
+
+    if (Q->which == 2)
+    {
+        status = _gr_dft_acb_prod_nfixed_apply(w, v, inverse, Q, prec);
+
+        /* inputs the fixed-point path cannot handle: fall back to a
+           one-shot ball transform */
+        if (status != GR_SUCCESS)
+            status = _gr_dft_acb_prod_ball(w, v, Q->cyc, Q->num, inverse,
+                    prec);
+    }
+    else if (Q->which == 1)
+    {
+        if (inverse)
+            status = gr_dft_prod_inverse_precomp((gr_ptr) w, (gr_srcptr) v,
+                    Q->P, (gr_ctx_struct *) Q->cctx);
+        else
+            status = gr_dft_prod_precomp((gr_ptr) w, (gr_srcptr) v,
+                    Q->P, (gr_ctx_struct *) Q->cctx);
+    }
+    else
+    {
+        status = GR_UNABLE;
+    }
+
+    if (status != GR_SUCCESS)
+    {
+        slong j;
+        for (j = 0; j < n; j++)
+            acb_indeterminate(w + j);
+    }
+
+    return status;
+}
+
+void
+gr_dft_acb_prod_precomp(acb_ptr w, acb_srcptr v,
+        const gr_dft_acb_prod_pre_t Q, slong prec)
+{
+    GR_IGNORE(_gr_dft_acb_prod_precomp(w, v, 0, Q, prec));
+}
+
+void
+gr_dft_acb_prod_inverse_precomp(acb_ptr w, acb_srcptr v,
+        const gr_dft_acb_prod_pre_t Q, slong prec)
+{
+    GR_IGNORE(_gr_dft_acb_prod_precomp(w, v, 1, Q, prec));
+}
+
+int
+_gr_dft_acb_prod(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num,
+        int inverse, int which, slong prec)
+{
+    int status = GR_SUCCESS;
+    gr_dft_acb_prod_pre_struct Q;
+    slong a, n = 1;
+
+    for (a = 0; a < num; a++)
+    {
+        if (cyc[a] == 0 || (ulong) n > (WORD_MAX / 8) / cyc[a])
+            return GR_DOMAIN;
+        n *= (slong) cyc[a];
+    }
+
+    prec = FLINT_MAX(prec, 2);
+
+    if (which == 0 || which == 2)
+    {
+        Q.n = n;
+        Q.num = num;
+        Q.prec = prec;
+        Q.which = 2;
+
+        status = _gr_dft_acb_prod_nfixed_select(&Q, cyc, num, prec);
+        if (status == GR_SUCCESS)
+        {
+            status = _gr_dft_acb_prod_nfixed_apply(w, v, inverse, &Q, prec);
+
+            gr_dft_prod_precomp_clear(Q.P);
+            gr_ctx_clear(Q.rctx);
+            gr_ctx_clear(Q.cctx);
+        }
+
+        if (status == GR_SUCCESS || which == 2)
+        {
+            if (status != GR_SUCCESS)
+            {
+                slong j;
+                for (j = 0; j < n; j++)
+                    acb_indeterminate(w + j);
+            }
+            return status;
+        }
+    }
+
+    status = _gr_dft_acb_prod_ball(w, v, cyc, num, inverse, prec);
+    if (status != GR_SUCCESS)
+    {
+        slong j;
+        for (j = 0; j < n; j++)
+            acb_indeterminate(w + j);
+    }
+
+    return status;
+}
+
+void
+gr_dft_acb_prod(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num,
+        slong prec)
+{
+    GR_IGNORE(_gr_dft_acb_prod(w, v, cyc, num, 0, 0, prec));
+}
+
+void
+gr_dft_acb_prod_inverse(acb_ptr w, acb_srcptr v, const ulong * cyc,
+        slong num, slong prec)
+{
+    GR_IGNORE(_gr_dft_acb_prod(w, v, cyc, num, 1, 0, prec));
 }

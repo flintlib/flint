@@ -14,7 +14,7 @@
 #include "acb.h"
 #include "arb_mat.h"
 #include "acb_mat.h"
-#include "acb_dft.h"
+#include "gr_dft.h"
 #include "acb_theta.h"
 
 static void
@@ -126,7 +126,7 @@ acb_theta_jet_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
     acb_ptr aux;
     arb_t t, e;
     slong * tups;
-    slong * cyc;
+    ulong * cyc;
     slong j, i, l;
     slong k;
 
@@ -134,13 +134,13 @@ acb_theta_jet_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
     arb_init(t);
     arb_init(e);
     tups = flint_malloc(g * nbjet * sizeof(slong));
-    cyc = flint_malloc(g * sizeof(slong));
+    cyc = flint_malloc(g * sizeof(ulong));
 
     for (j = 0; j < g; j++)
     {
         cyc[j] = ord + 1;
     }
-    acb_dft_prod(aux, val, cyc, g, prec);
+    gr_dft_acb_prod(aux, val, cyc, g, prec);
     arb_set_si(t, nbaux);
     _acb_vec_scalar_div_arb(aux, aux, nbaux, t, prec);
 

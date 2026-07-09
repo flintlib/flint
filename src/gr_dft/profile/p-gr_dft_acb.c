@@ -13,13 +13,16 @@
 #include <stdlib.h>
 #include "profiler.h"
 #include "acb.h"
-#include "acb_dft.h"
 #include "gr.h"
 #include "gr_dft.h"
 
-/* Compares acb_dft against the drop-in gr_dft_acb, reporting the
-   precomputation and per-transform times separately. Optional
-   arguments: max_n max_prec. */
+/* Compares the two internal paths of the gr_dft_acb drop-in: ball
+   arithmetic (a Karatsuba plan over arb/acb contexts, as used by the
+   fallback) against the default fixed-point path, reporting the
+   precomputation and per-transform times separately. The path column
+   shows which arithmetic the automatic plan selected at this length
+   and precision (it falls back to ball when the fixed-point limb
+   count would be excessive). Optional arguments: max_n max_prec. */
 
 static double
 time_ms(void (*f)(void *), void * arg, slong min_reps)
@@ -47,26 +50,39 @@ typedef struct
     acb_srcptr v;
     slong n;
     slong prec;
-    acb_dft_pre_struct * apre;
+    gr_ctx_struct * rctx;
+    gr_ctx_struct * cctx;
+    gr_dft_pre_struct * bpre;
     gr_dft_acb_pre_struct * qpre;
 }
 args_t;
 
-static void f_acb_pre(void * p)
+/* ball path: contexts and Karatsuba plan, as in the which = 1 branch
+   of gr_dft_acb_precomp_init */
+static void f_ball_pre(void * p)
 {
     args_t * a = p;
-    acb_dft_pre_t pre;
-    acb_dft_precomp_init(pre, a->n, a->prec);
-    acb_dft_precomp_clear(pre);
+    gr_ctx_t rctx, cctx;
+    gr_dft_pre_t pre;
+
+    gr_ctx_init_real_arb(rctx, a->prec);
+    gr_ctx_init_complex_acb(cctx, a->prec);
+    GR_IGNORE(gr_dft_precomp_init_karatsuba(pre, a->n, GR_DFT_ALG_AUTO, 0,
+            rctx, cctx));
+    gr_dft_precomp_clear(pre);
+    gr_ctx_clear(rctx);
+    gr_ctx_clear(cctx);
 }
 
-static void f_acb_dft(void * p)
+static void f_ball_dft(void * p)
 {
     args_t * a = p;
-    acb_dft_precomp(a->w, a->v, a->apre, a->prec);
+    GR_IGNORE(gr_dft_precomp((gr_ptr) a->w, (gr_srcptr) a->v, a->bpre,
+            a->cctx));
 }
 
-static void f_gr_pre(void * p)
+/* fixed-point path: the automatic drop-in plan */
+static void f_nfixed_pre(void * p)
 {
     args_t * a = p;
     gr_dft_acb_pre_t Q;
@@ -74,7 +90,7 @@ static void f_gr_pre(void * p)
     gr_dft_acb_precomp_clear(Q);
 }
 
-static void f_gr_dft(void * p)
+static void f_nfixed_dft(void * p)
 {
     args_t * a = p;
     gr_dft_acb_precomp(a->w, a->v, (const gr_dft_acb_pre_struct *) a->qpre,
@@ -109,18 +125,20 @@ main(int argc, char * argv[])
             continue;
 
         flint_printf("prec = %wd\n", prec);
-        flint_printf("%8s %12s %12s %12s %12s %10s\n", "n",
-                "acb pre", "acb dft", "gr pre", "gr dft", "dft ratio");
+        flint_printf("%8s %12s %12s %12s %12s %10s %7s\n", "n",
+                "ball pre", "ball dft", "auto pre", "auto dft", "dft ratio",
+                "path");
 
         for (ni = 0; ns[ni] != 0; ni++)
         {
             ulong n = ns[ni];
             slong j;
             acb_ptr v, w;
-            acb_dft_pre_t apre;
+            gr_ctx_t rctx, cctx;
+            gr_dft_pre_t bpre;
             gr_dft_acb_pre_t qpre;
             args_t a;
-            double t_acb_pre, t_acb_dft, t_gr_pre, t_gr_dft;
+            double t_ball_pre, t_ball_dft, t_nf_pre, t_nf_dft;
 
             if ((slong) n > max_n)
                 continue;
@@ -130,26 +148,34 @@ main(int argc, char * argv[])
             for (j = 0; j < (slong) n; j++)
                 acb_urandom(v + j, state, prec);
 
-            acb_dft_precomp_init(apre, n, prec);
+            gr_ctx_init_real_arb(rctx, prec);
+            gr_ctx_init_complex_acb(cctx, prec);
+            GR_IGNORE(gr_dft_precomp_init_karatsuba(bpre, n,
+                    GR_DFT_ALG_AUTO, 0, rctx, cctx));
             GR_IGNORE(gr_dft_acb_precomp_init(qpre, n, prec));
 
             a.w = w;
             a.v = v;
             a.n = n;
             a.prec = prec;
-            a.apre = apre;
+            a.rctx = rctx;
+            a.cctx = cctx;
+            a.bpre = bpre;
             a.qpre = qpre;
 
-            t_acb_pre = time_ms(f_acb_pre, &a, 1);
-            t_acb_dft = time_ms(f_acb_dft, &a, 1);
-            t_gr_pre = time_ms(f_gr_pre, &a, 1);
-            t_gr_dft = time_ms(f_gr_dft, &a, 1);
+            t_ball_pre = time_ms(f_ball_pre, &a, 1);
+            t_ball_dft = time_ms(f_ball_dft, &a, 1);
+            t_nf_pre = time_ms(f_nfixed_pre, &a, 1);
+            t_nf_dft = time_ms(f_nfixed_dft, &a, 1);
 
-            flint_printf("%8wu %12.4g %12.4g %12.4g %12.4g %9.2fx\n",
-                    n, t_acb_pre, t_acb_dft, t_gr_pre, t_gr_dft,
-                    t_acb_dft / t_gr_dft);
+            flint_printf("%8wu %12.4g %12.4g %12.4g %12.4g %9.2fx %7s\n",
+                    n, t_ball_pre, t_ball_dft, t_nf_pre, t_nf_dft,
+                    t_ball_dft / t_nf_dft,
+                    (qpre->which == 2) ? "nfixed" : "ball");
 
-            acb_dft_precomp_clear(apre);
+            gr_dft_precomp_clear(bpre);
+            gr_ctx_clear(rctx);
+            gr_ctx_clear(cctx);
             gr_dft_acb_precomp_clear(qpre);
             _acb_vec_clear(v, n);
             _acb_vec_clear(w, n);

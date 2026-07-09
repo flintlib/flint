@@ -17,6 +17,7 @@
 #include "gr.h"
 #include "arf_types.h"
 #include "acb_types.h"
+#include "dirichlet.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -226,6 +227,79 @@ void gr_dft_acb_precomp_clear(gr_dft_acb_pre_t Q);
 void gr_dft_acb_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_pre_t Q, slong prec);
 void gr_dft_acb_inverse_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_pre_t Q, slong prec);
 int _gr_dft_acb_precomp(acb_ptr w, acb_srcptr v, int inverse, const gr_dft_acb_pre_t Q, slong prec);
+
+
+/* DFT on products of cyclic groups ******************************************/
+
+/* Multidimensional DFT over Z/cyc[0] x ... x Z/cyc[num-1], row-major
+   indexing (the first component varies slowest). Realized as one
+   cyclic transform along each axis; plans for repeated component
+   lengths are shared. */
+typedef struct
+{
+    ulong n;                     /* product of the component lengths */
+    slong num;
+    ulong * cyc;
+    slong num_plans;             /* distinct component lengths */
+    slong * plan_of;             /* axis -> plan index */
+    gr_dft_pre_struct * plans;
+    int flags;
+    slong serial_block;
+}
+gr_dft_prod_pre_struct;
+
+typedef gr_dft_prod_pre_struct gr_dft_prod_pre_t[1];
+
+WARN_UNUSED_RESULT int gr_dft_prod_precomp_init(gr_dft_prod_pre_t P, const ulong * cyc, slong num, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dft_prod_precomp_init_root(gr_dft_prod_pre_t P, gr_srcptr w, ulong order, const ulong * cyc, slong num, int flags, gr_ctx_t ctx);
+void gr_dft_prod_precomp_clear(gr_dft_prod_pre_t P);
+WARN_UNUSED_RESULT int gr_dft_prod_precomp(gr_ptr res, gr_srcptr vec, const gr_dft_prod_pre_t P, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dft_prod_inverse_precomp(gr_ptr res, gr_srcptr vec, const gr_dft_prod_pre_t P, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dft_prod(gr_ptr res, gr_srcptr vec, const ulong * cyc, slong num, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dft_prod_inverse(gr_ptr res, gr_srcptr vec, const ulong * cyc, slong num, gr_ctx_t ctx);
+void gr_dft_prod_precomp_set_serial_block(gr_dft_prod_pre_t P, slong serial_block);
+void gr_dft_prod_precomp_nfixed_bound(double * peak, double * err_ulps, double in_mag, double in_err, const gr_dft_prod_pre_t P);
+WARN_UNUSED_RESULT int _gr_dft_prod_precomp_raw(gr_ptr res, gr_srcptr vec, int inverse, const gr_dft_prod_pre_t P, gr_ctx_t ctx);
+int _gr_dft_prod_precomp_init_layout(gr_dft_prod_pre_t P, const ulong * cyc, slong num, int flags, int complex_mode);
+int _gr_dft_prod_precomp_realize(gr_dft_prod_pre_t P, gr_ctx_struct * real_ctx, gr_ctx_t ctx);
+
+/* acb wrapper for the product DFT, using fixed-point arithmetic
+   internally with rigorous error bounds, falling back to ball
+   arithmetic when fixed point does not apply */
+typedef struct
+{
+    slong n;
+    slong num;
+    ulong * cyc;
+    slong prec;
+    int which;
+    slong nl;
+    slong p1e;
+    double in_mag;
+    double errulps;
+    gr_ctx_struct rctx[1];
+    gr_ctx_struct cctx[1];
+    gr_dft_prod_pre_t P;
+}
+gr_dft_acb_prod_pre_struct;
+
+typedef gr_dft_acb_prod_pre_struct gr_dft_acb_prod_pre_t[1];
+
+void gr_dft_acb_prod(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num, slong prec);
+void gr_dft_acb_prod_inverse(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num, slong prec);
+int _gr_dft_acb_prod(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num, int inverse, int which, slong prec);
+WARN_UNUSED_RESULT int gr_dft_acb_prod_precomp_init(gr_dft_acb_prod_pre_t Q, const ulong * cyc, slong num, slong prec);
+void gr_dft_acb_prod_precomp_clear(gr_dft_acb_prod_pre_t Q);
+void gr_dft_acb_prod_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_prod_pre_t Q, slong prec);
+void gr_dft_acb_prod_inverse_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_prod_pre_t Q, slong prec);
+int _gr_dft_acb_prod_precomp(acb_ptr w, acb_srcptr v, int inverse, const gr_dft_acb_prod_pre_t Q, slong prec);
+
+/* DFT on Dirichlet groups (counterparts of acb_dirichlet_dft and
+   acb_dirichlet_dft_index) */
+WARN_UNUSED_RESULT int gr_dft_dirichlet_index(gr_ptr w, gr_srcptr v, const dirichlet_group_t G, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_dft_dirichlet(gr_ptr w, gr_srcptr v, const dirichlet_group_t G, gr_ctx_t ctx);
+void gr_dft_acb_dirichlet_index(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec);
+void gr_dft_acb_dirichlet(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec);
 
 /* Internal functions *******************************************************/
 

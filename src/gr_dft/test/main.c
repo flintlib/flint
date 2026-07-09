@@ -15,7 +15,9 @@
 #include "t-dft.c"
 #include "t-dft_inverse.c"
 #include "t-acb_dft.c"
+#include "t-dirichlet_dft.c"
 #include "t-nfixed.c"
+#include "t-prod.c"
 
 /* Array of test functions ***************************************************/
 
@@ -24,7 +26,9 @@ test_struct tests[] =
     TEST_FUNCTION(gr_dft),
     TEST_FUNCTION(gr_dft_inverse),
     TEST_FUNCTION(gr_dft_acb),
+    TEST_FUNCTION(gr_dft_dirichlet),
     TEST_FUNCTION(gr_dft_nfixed),
+    TEST_FUNCTION(gr_dft_prod),
 };
 
 /* main function *************************************************************/

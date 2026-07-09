@@ -471,7 +471,7 @@ to consider the Fourier transform on Conrey labels as
    g(a) = \sum_{b\bmod q}\overline{\chi_q(a,b)}f(b)
 
 
-.. function:: void acb_dirichlet_dft_conrey(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
+.. function:: void acb_dirichlet_dft_index(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
 
    Compute the DFT of *v* using Conrey indices.
    This function assumes *v* and *w* are vectors
@@ -502,6 +502,12 @@ to consider the Fourier transform on Conrey labels as
    Compute the DFT of *v* using Conrey numbers.
    This function assumes *v* and *w* are vectors of size *G->q*.
    All values at index not coprime to *G->q* are ignored.
+
+   Both functions are thin wrappers around the :doc:`gr_dft <gr_dft>`
+   module (see :func:`gr_dft_dirichlet` and
+   :func:`gr_dft_dirichlet_index`), which computes the product DFT
+   over the Conrey components in fixed-point arithmetic with rigorous
+   error bounds whenever possible.
 
 Dirichlet L-functions
 -------------------------------------------------------------------------------
@@ -581,7 +587,7 @@ Dirichlet L-functions
     Hurwitz zeta function and a discrete Fourier transform.
     The output *res* is assumed to have length *G->phi_q* and values
     are stored by lexicographically ordered
-    Conrey logs. See :func:`acb_dirichlet_dft_conrey`.
+    Conrey logs. See :func:`acb_dirichlet_dft_index`.
 
     If *precomp* is *NULL*, each Hurwitz zeta function value is computed
     directly. If a pre-initialized *precomp* object is provided, this will be
