@@ -107,6 +107,35 @@ TEST_FUNCTION_START(fq_nmod_mpoly_gcd_zippel, state)
 {
     slong i, j;
 
+    /* issue #2581: the LINZIP scale system in gcds_zippel was generically
+       underdetermined for these inputs and the evaluation-point retry loop
+       effectively never terminated */
+    {
+        fq_nmod_mpoly_ctx_t ctx;
+        fq_nmod_mpoly_t g, a, b, t;
+
+        fq_nmod_mpoly_ctx_init_deg(ctx, 12, ORD_LEX, UWORD(2147483647), 1);
+        fq_nmod_mpoly_init(g, ctx);
+        fq_nmod_mpoly_init(a, ctx);
+        fq_nmod_mpoly_init(b, ctx);
+        fq_nmod_mpoly_init(t, ctx);
+
+        fq_nmod_mpoly_set_str_pretty(t, "x4*x7^2*x11^3*x12 + x4*x7^2*x11*x12^3 + 2*x4*x7*x8*x10*x11^2*x12 + 2*x4*x7*x8*x10*x12^3 + 2*x4*x7*x9*x10*x11^3 + 2*x4*x7*x9*x10*x11*x12^2 + x4*x8^2*x10^2*x11*x12 + x4*x8^2*x11*x12^3 + x4*x8*x9*x10^2*x11^2 + x4*x8*x9*x10^2*x12^2 + 2*x4*x8*x9*x11^2*x12^2 + x4*x9^2*x10^2*x11*x12 + x4*x9^2*x11^3*x12 - x5*x7^2*x11*x12^3 - 2*x5*x7*x8*x10*x12^3 - 2*x5*x7*x9*x10*x11*x12^2 - x5*x8^2*x11*x12^3 + x5*x8*x9*x10^2*x11^2 - 2*x5*x8*x9*x10^2*x12^2 - x5*x8*x9*x11^2*x12^2 - x5*x9^2*x10^2*x11*x12 - x6*x7^2*x11^3*x12 - 2*x6*x7*x8*x10*x11^2*x12 - 2*x6*x7*x9*x10*x11^3 - x6*x8^2*x10^2*x11*x12 - 2*x6*x8*x9*x10^2*x11^2 + x6*x8*x9*x10^2*x12^2 - x6*x8*x9*x11^2*x12^2 - x6*x9^2*x11^3*x12", NULL, ctx);
+        fq_nmod_mpoly_set_str_pretty(a, "x3*(x5-x4)", NULL, ctx);
+        fq_nmod_mpoly_set_str_pretty(b, "x2*(x4-x6)", NULL, ctx);
+        fq_nmod_mpoly_mul(a, a, t, ctx);
+        fq_nmod_mpoly_mul(b, b, t, ctx);
+
+        gcd_check(g, a, b, t, ctx, 0, 0, "issue 2581");
+
+        fq_nmod_mpoly_clear(g, ctx);
+        fq_nmod_mpoly_clear(a, ctx);
+        fq_nmod_mpoly_clear(b, ctx);
+        fq_nmod_mpoly_clear(t, ctx);
+        fq_nmod_mpoly_ctx_clear(ctx);
+    }
+
+
     for (i = 0; i < 20*flint_test_multiplier(); i++)
     {
         fq_nmod_mpoly_ctx_t ctx;
