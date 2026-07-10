@@ -194,6 +194,7 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
           const nmod_mpoly_ctx_t ctx, flint_rand_t randstate, slong * degbound)
 {
     int eval_points_tried;
+    slong l_growths = 0;
     nmod_gcds_ret_t success;
     nmod_mpolyu_t Aevalsk1, Bevalsk1, fevalsk1, Aevalski, Bevalski, fevalski;
     nmod_poly_t Aeval, Beval, Geval;
@@ -303,10 +304,19 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     b = (ulong *) TMP_ALLOC((f->coeffs + d[f->length - 1])->length
                                                            *sizeof(ulong));
 
-    nmod_mat_init(MF, 0, l, ctx->mod.n);
+    /* compute how many masks are needed */
+    entries = f->bits * var;
+    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    powers = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
 
     M = (nmod_mat_struct *) TMP_ALLOC(f->length*sizeof(nmod_mat_struct));
     ML_is_initialized = (int *) TMP_ALLOC(f->length*sizeof(int));
+
+alloc_images:
+
+    nmod_mat_init(MF, 0, l, ctx->mod.n);
+
     for (i = 0; i < f->length; i++)
     {
         nmod_mat_init(M + i, l, (f->coeffs + i)->length, ctx->mod.n);
@@ -316,12 +326,6 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     W = (ulong *) flint_malloc(l*f->length*sizeof(ulong));
 
     nmod_mat_init(Msol, l, 1, ctx->mod.n);
-
-    /* compute how many masks are needed */
-    entries = f->bits * var;
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
 
 
     /***** evaluation loop head *******/
@@ -526,6 +530,29 @@ pick_evaluation_point:
         ++underdeterminedcount;
         if (underdeterminedcount < 2)
             goto pick_evaluation_point;
+
+        /*
+            The failure is likely structural: with this form the scale
+            system is generically underdetermined for this number of
+            images. Retry with more images instead of giving up, which
+            would otherwise send the caller into a near-infinite loop
+            of new evaluation points that can never succeed.
+        */
+        if (++l_growths <= 4)
+        {
+            flint_free(W);
+            nmod_mat_clear(MF);
+            nmod_mat_clear(Msol);
+            for (i = 0; i < f->length; i++)
+            {
+                nmod_mat_clear(M + i);
+                if (ML_is_initialized[i])
+                    nmod_mat_clear(ML + i);
+            }
+            l += 1 + l/2;
+            underdeterminedcount = 0;
+            goto alloc_images;
+        }
 
         success = nmod_gcds_scales_not_found;
         goto finished;
