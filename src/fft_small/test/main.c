@@ -13,6 +13,7 @@
 
 #include "t-fmpz_poly_mul.c"
 #include "t-mpn_add_inplace_c.c"
+#include "t-mpn_mulmid.c"
 #include "t-mul.c"
 #include "t-nmod_poly_divrem.c"
 #include "t-nmod_poly_mul.c"
@@ -24,6 +25,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(_fmpz_poly_mul_mid_mpn_ctx),
     TEST_FUNCTION(flint_mpn_add_inplace_c),
+    TEST_FUNCTION(_mpn_ctx_mpn_mul_range),
     TEST_FUNCTION(mpn_ctx_mpn_mul),
     TEST_FUNCTION(_nmod_poly_divrem_mpn_ctx),
     TEST_FUNCTION(_nmod_poly_mul_mid_mpn_ctx),

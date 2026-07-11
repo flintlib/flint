@@ -606,7 +606,7 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
         flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
     }
 
-/* High and low multiplication *******************************************************/
+/* High, low and middle multiplication *******************************************************/
 
 #define FLINT_HAVE_MULLOW_FUNC(n) ((n) <= FLINT_MPN_MULLOW_FUNC_TAB_WIDTH)
 #define FLINT_HAVE_MULHIGH_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH)
@@ -666,7 +666,40 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #define FLINT_MPN_MULLOW_MULDERS_CUTOFF 50
 #define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 40
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
+#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 1300
 #define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
+
+#define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90
+#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 1500
+#define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
+#define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
+
+
+/* Windowed middle product ***************************************************/
+
+void flint_mpn_mulmid(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi);
+void flint_mpn_mulmid_classical(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi);
+void flint_mpn_mulmid_via_mul(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi);
+void flint_mpn_mulmid_via_mullow_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi);
+void flint_mpn_mulmid_via_mulhigh_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi);
+
+#if FLINT_HAVE_FFT_SMALL
+void flint_mpn_mulmid_fft_small(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi);
+mp_limb_t _flint_mpn_mulhigh_n_fft_small(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+mp_limb_t _flint_mpn_mullow_n_fft_small(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_mulmid_n
+void __gmpn_mulmid_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+
+MPN_EXTRAS_INLINE
+void flint_mpn_mulmid_n(mp_ptr rp, mp_srcptr ap, mp_srcptr bp, mp_size_t n)
+{
+    __gmpn_mulmid_n(rp, ap, bp, n);
+}
+
+void flint_mpn_mulmid_via_n_padded(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi);
+#endif
 
 FLINT_DLL extern const signed short flint_mpn_mulhigh_k_tab[FLINT_MPN_MULHIGH_K_TAB_SIZE];
 
@@ -731,10 +764,17 @@ void flint_mpn_mul_or_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t 
 
     if (FLINT_HAVE_MULLOW_FUNC(n))
         rp[n] = flint_mpn_mullow_func_tab[n](rp, xp, yp);
+#if FLINT_HAVE_FFT_SMALL
+    else if (n < FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF)
+        rp[n] = _flint_mpn_mullow_n(rp, xp, yp, n);
+    else
+        flint_mpn_mulmid_fft_small(rp, xp, n, yp, n, 0, n + 1);
+#else
     else if (n < FLINT_MPN_MULHIGH_MUL_CUTOFF)
         rp[n] = _flint_mpn_mullow_n(rp, xp, yp, n);
     else
         flint_mpn_mul_n(rp, xp, yp, n);
+#endif
 }
 
 MPN_EXTRAS_INLINE
@@ -744,15 +784,18 @@ void flint_mpn_mul_or_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t
 
     if (FLINT_HAVE_MULHIGH_FUNC(n))
         rp[n - 1] = flint_mpn_mulhigh_func_tab[n](rp + n, xp, yp);
+#if FLINT_HAVE_FFT_SMALL
+    else if (n < FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF)
+        rp[n - 1] = _flint_mpn_mulhigh_n(rp + n, xp, yp, n);
+    else
+        flint_mpn_mulmid_fft_small(rp + n - 2, xp, n, yp, n, n - 2, 2 * n);
+#else
     else if (n < FLINT_MPN_MULHIGH_MUL_CUTOFF)
         rp[n - 1] = _flint_mpn_mulhigh_n(rp + n, xp, yp, n);
     else
         flint_mpn_mul_n(rp, xp, yp, n);
+#endif
 }
-
-#define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90
-#define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
-#define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
