@@ -307,13 +307,13 @@ arb_get_str_parts(int * negative, char **mid_digits, fmpz_t mid_exp,
         fmpz_zero(mid_exp);
         *mid_digits = flint_malloc(4);
         if (arf_is_nan(arb_midref(x)))
-            strcpy(*mid_digits, "nan");
+            memcpy(*mid_digits, "nan", 4);
         else
-            strcpy(*mid_digits, "0");
+            memcpy(*mid_digits, "0", 2);
 
         fmpz_zero(rad_exp);
         *rad_digits = flint_malloc(4);
-        strcpy(*rad_digits, "inf");
+        memcpy(*rad_digits, "inf", 4);
 
         return;
     }
@@ -384,7 +384,7 @@ arb_get_str_parts(int * negative, char **mid_digits, fmpz_t mid_exp,
     {
         fmpz_add(rad, rad, mid);
         fmpz_zero(mid);
-        strcpy(*mid_digits, "0");  /* must have space already! */
+        memcpy(*mid_digits, "0", 2);  /* must have space already! */
     }
     else
     {
@@ -426,7 +426,7 @@ char * arb_get_str(const arb_t x, slong n, ulong flags)
     if (arb_is_zero(x))
     {
         res = flint_malloc(2);
-        strcpy(res, "0");
+        memcpy(res, "0", 2);
         return res;
     }
 
@@ -438,9 +438,9 @@ char * arb_get_str(const arb_t x, slong n, ulong flags)
         res = flint_malloc(10);
 
         if (arf_is_nan(arb_midref(x)))
-            strcpy(res, "nan");
+            memcpy(res, "nan", 4);
         else
-            strcpy(res, "[+/- inf]");
+            memcpy(res, "[+/- inf]", 10);
 
         return res;
     }
@@ -477,36 +477,30 @@ char * arb_get_str(const arb_t x, slong n, ulong flags)
 
         if (skip_rad)
         {
-            res = flint_malloc(strlen(mid_digits) + 2);
+            slong res_sz = strlen(mid_digits) + 2;
+            res = flint_malloc(res_sz);
 
             if (negative)
-                strcpy(res, "-");
+                snprintf(res, res_sz, "-%s", mid_digits);
             else
-                strcpy(res, "");
-
-            strcat(res, mid_digits);
+                snprintf(res, res_sz, "%s", mid_digits);
         }
         else if (skip_mid)
         {
-            res = flint_malloc(strlen(rad_digits) + 7);
+            slong res_sz = strlen(rad_digits) + 7;
+            res = flint_malloc(res_sz);
 
-            strcpy(res, "[+/- ");
-            strcat(res, rad_digits);
-            strcat(res, "]");
+            snprintf(res, res_sz, "[+/- %s]", rad_digits);
         }
         else
         {
-            res = flint_malloc(strlen(mid_digits) + strlen(rad_digits) + 9);
-
-            strcpy(res, "[");
+            slong res_sz = strlen(mid_digits) + strlen(rad_digits) + 9;
+            res = flint_malloc(res_sz);
 
             if (negative)
-                strcat(res, "-");
-
-            strcat(res, mid_digits);
-            strcat(res, " +/- ");
-            strcat(res, rad_digits);
-            strcat(res, "]");
+                snprintf(res, res_sz, "[-%s +/- %s]", mid_digits, rad_digits);
+            else
+                snprintf(res, res_sz, "[%s +/- %s]", mid_digits, rad_digits);
         }
     }
 
