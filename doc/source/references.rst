@@ -147,6 +147,8 @@ References
 
 .. [GraMon1994] \Törbjorn Granlund and Peter L. Montgomery : Division by Invariant Integers using Multiplication https://gmplib.org/~tege/divcnst-pldi94.pdf
 
+.. [HJ2024] \J. van der Hoeven and F. Johansson, "Fast multiple precision exp(x) with precomputations", 2024 IEEE 31st Symposium on Computer Arithmetic (ARITH) (2024), https://hal.science/hal-04454093
+
 .. [HM2017] \J. van der Hoeven and B. Mourrain. "Efficient certification of numeric solutions to eigenproblems", MACIS 2017, 81-94, (2017), https://hal.archives-ouvertes.fr/hal-01579079
 
 .. [HS1967] \E. Hansen and R. Smith, "Interval Arithmetic in Matrix Computations, Part II", SIAM Journal of Numerical Analysis, 4(1):1-9 (1967). https://doi.org/10.1137/0704001
@@ -195,7 +197,7 @@ References
 
 .. [Joh2014b] \F. Johansson, "Evaluating parametric holonomic sequences using rectangular splitting", ISSAC 2014, 256-263. https://doi.org/10.1145/2608628.2608629
 
-.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", https://arxiv.org/abs/1410.7176
+.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", 22nd IEEE Symposium on Computer Arithmetic (ARITH 22), 83-89 (2015), https://arxiv.org/abs/1410.7176
 
 .. [Joh2015] \F. Johansson, "Computing Bell numbers", https://fredrikj.net/blog/2015/08/computing-bell-numbers/
 
