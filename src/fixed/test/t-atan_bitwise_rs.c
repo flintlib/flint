@@ -1,0 +1,93 @@
+/*
+    Copyright (C) 2026 Fredrik Johansson
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include "test_helpers.h"
+#include "mpn_extras.h"
+#include "arb.h"
+#include "fixed.h"
+
+TEST_FUNCTION_START(fixed_atan_bitwise_rs, state)
+{
+    slong iter;
+
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
+    {
+        /* the first iterations sweep (n, r) deterministically: all
+           window counts, both boundary forms of the extra step, and
+           the extreme legal r per n */
+        slong det_n = 1 + (iter / 24) % 9;
+        slong det_k = iter % 24;
+        int det_r = (det_k < 8) ? (int) (FLINT_BITS * (det_k + 1))
+                  : (det_k < 16) ? (int) (FLINT_BITS * (det_k - 7) + 1)
+                  : (det_k == 16) ? 32
+                  : (det_k == 17) ? 0
+                  : (int) (FLINT_BITS * det_n - 16 - (det_k - 18));
+        int det = (iter < 24 * 9);
+
+        /* n = 1 is unsupported on 32-bit limbs (r would clamp below
+           the series contract) */
+        slong nmin = (FLINT_BITS == 64) ? 1 : 2;
+        slong n = det ? FLINT_MAX(det_n, nmin)
+            : nmin + n_randint(state, (iter % 5 == 0) ? 80 : 16);
+        int r = det ? FLINT_MAX(det_r, ((det_r == 0) ? 0 : 32))
+            : (iter % 4 == 0) ? 0 :
+            (iter % 9 == 3) ? 32 + (int) n_randint(state, 17) :
+            (iter % 7 == 2) ? FLINT_BITS * (1 + (int) n_randint(state, 7))
+                            : 32 + (int) n_randint(state, 401);
+        ulong x[81], res[81];
+        arb_t xa, e, va, dd;
+        fmpz_t f;
+        mag_t mb;
+        slong prec = FLINT_BITS * n + 128;
+        double u;
+
+        flint_mpn_rrandom(x, state, n);
+        if (iter % 13 == 3)
+            flint_mpn_zero(x, n);
+        if (iter % 7 == 1)
+            flint_mpn_store(x, n, ~UWORD(0));
+
+        fixed_atan_bitwise_rs(res, x, n, r);
+
+        arb_init(xa);
+        arb_init(e);
+        arb_init(va);
+        arb_init(dd);
+        fmpz_init(f);
+        mag_init(mb);
+
+        fmpz_set_ui_array(f, x, n);
+        arb_set_fmpz(xa, f);
+        arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
+        arb_atan(e, xa, prec);
+
+        fmpz_set_ui_array(f, res, n);
+        arb_set_fmpz(va, f);
+        arb_mul_2exp_si(va, va, -FLINT_BITS * n);
+        arb_sub(dd, va, e, ARF_PREC_EXACT);
+        arb_get_mag(mb, dd);
+        mag_mul_2exp_si(mb, mb, FLINT_BITS * n);
+        u = mag_get_d(mb);
+
+        if (u > (double) FIXED_ATAN_BITWISE_RS_MAX_ERR(n, r))
+            TEST_FUNCTION_FAIL("n = %wd, r = %d, ulp error = %f\n",
+                n, r, u);
+
+        arb_clear(xa);
+        arb_clear(e);
+        arb_clear(va);
+        arb_clear(dd);
+        fmpz_clear(f);
+        mag_clear(mb);
+    }
+
+    TEST_FUNCTION_END(state);
+}
