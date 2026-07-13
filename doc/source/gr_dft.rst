@@ -48,11 +48,12 @@ The *alg* parameter of the plan constructors selects the algorithm:
   decomposes a transform of length `n = n_1 n_2` with
   `n_1, n_2 \approx \sqrt{n}` into column transforms of length `n_2`,
   pointwise twiddle multiplications, row transforms of length `n_1`,
-  and a final transposition. This is cache-friendlier than plain
-  Cooley-Tukey for transforms too large to fit in cache. The row and
+  and a final transposition. The row and
   column transforms currently use radix-2 Cooley-Tukey sub-plans.
-  This is the algorithm supporting multithreading (see below), and
-  ``GR_DFT_ALG_AUTO`` selects it for large power-of-two lengths.
+  Only available on explicit request: ``GR_DFT_ALG_AUTO`` never
+  selects it, since in measurements up to `n = 2^{20}` its cache
+  blocking did not outperform the plain transforms, serially or
+  threaded (see the multithreading section below).
 * ``GR_DFT_ALG_SPLIT`` -- recursive split-radix, performing about
   `\tfrac{1}{3} n \log_2 n` multiplications by nontrivial roots of
   unity when multiplication by `w^{n/4}` (playing the role of `-i`)
@@ -95,10 +96,12 @@ The *alg* parameter of the plan constructors selects the algorithm:
   transforms plus a pointwise multiplication by the precomputed
   transformed kernel). All chirp factors are entries of the root
   table. The power-of-two sub-plan requires a root of unity for the
-  convolution length, obtained with :func:`gr_dft_default_root`;
-  over rings where this fails (e.g. finite fields without roots of
-  the required order), Bluestein is unavailable and plans fall back
-  to direct prime kernels.
+  convolution length, obtained with :func:`gr_dft_default_root` (or,
+  over the fixed-point contexts, built directly by the canonical
+  fixed-point table constructor); over rings where no such root is
+  available (e.g. finite fields without roots of the required order),
+  Bluestein is unavailable and plans fall back to direct prime
+  kernels.
 
 The *flags* parameter is a bitwise combination of:
 
@@ -302,15 +305,18 @@ The values `1`, `-1`, `i`, `-i` are not representable and are rounded
 to magnitude `1 - \operatorname{ulp}`; the transforms never multiply
 by these values explicitly. Consequently the contexts are not rings in
 the strict sense: ``is_one`` and ``is_neg_one`` return ``T_FALSE``,
-and integers of absolute value greater than 1 cannot be assigned. In
-particular :func:`gr_dft_inverse_precomp`, which scales by `1/n`,
-returns ``GR_DOMAIN`` over these contexts; use the unscaled inverse
-:func:`_gr_dft_precomp_raw` and incorporate the scaling into the
-caller's own normalization. For the same reason the Bluestein
-algorithm is not available over fixed-point contexts (its kernel
-normalization and convolution intermediates do not fit the
-representation); prime and prime-power lengths automatically fall
-back to the direct kernels of the mixed-radix algorithm.
+and integers of absolute value greater than 1 cannot be assigned.
+Division by an unsigned integer is supported (a truncating
+``mpn`` division per component, with error below 1 ulp), so the
+scaled inverse :func:`gr_dft_inverse_precomp` works over these
+contexts; the unscaled :func:`_gr_dft_precomp_raw` remains available
+when the caller prefers to fold the `1/n` into its own
+normalization, as the ``acb`` drop-in transforms do. The Bluestein
+algorithm is likewise supported: the `1/\mathrm{conv\_len}` scaling
+of its inverse sub-transform is folded into the precomputed
+transformed kernel, together with an extra factor `1/2` keeping the
+kernel entries inside the representable range `|t| < 1`, which is
+undone with an exact doubling during the pointwise multiplication.
 
 The root table of a fixed-point plan is built from a primitive root
 computed via ``arb`` at elevated internal precision, truncated to
@@ -578,8 +584,7 @@ Plan construction
     are decidable in the ring), returning ``GR_DOMAIN`` on a definite
     failure.
 
-    A sanity check `w^{n/2} = -1` is performed; if this can be decided
-    and is false, ``GR_DOMAIN`` is returned. If the return status is
+    If the return status is
     not ``GR_SUCCESS``, the plan is left in a cleared state and must
     not be used (calling :func:`gr_dft_precomp_clear` is harmless).
 
@@ -628,8 +633,13 @@ Transforms
 
     Sets *res* to the forward respectively inverse DFT of *vec*, both of
     length `n`, using the plan *P*. Aliasing of *res* and *vec* is
-    allowed. The inverse transform includes the scaling by `1/n` and
-    returns ``GR_DOMAIN`` if `n` is not invertible in the ring.
+    allowed. The inverse transform includes the scaling by `1/n`,
+    performed as a division by `n` on the raw result (so it also
+    succeeds in rings where `n` has no inverse whenever the ring can
+    carry out the division, and over the fixed-point contexts, where
+    it is a truncating division per component); the division's error
+    status, ``GR_DOMAIN`` in a ring where it fails, is passed
+    through.
 
 .. function:: int gr_dft(gr_ptr res, gr_srcptr vec, ulong n, gr_ctx_t ctx)
               int gr_dft_inverse(gr_ptr res, gr_srcptr vec, ulong n, gr_ctx_t ctx)
@@ -704,3 +714,77 @@ Internal functions
     Bluestein chirp-z transform (``GR_DFT_ALG_BLUESTEIN``). *res* must
     not alias *vec*. The inverse transform is computed as the forward
     transform of the cyclically reversed input.
+
+DFT on products of cyclic groups
+-------------------------------------------------------------------------------
+
+The following functions compute the DFT on a product group
+`\mathbb{Z}/c_0 \times \cdots \times \mathbb{Z}/c_{k-1}` with row-major
+indexing (the first component varies slowest), following the same
+algorithm as :func:`acb_dft_prod`: one cyclic DFT along each axis,
+with no twiddle factors in between. Component plans are shared
+between axes of equal length. The lines of one axis are independent
+and are transformed in parallel when multiple threads are available
+and the ring is marked thread-safe.
+
+.. function:: int gr_dft_prod_precomp_init(gr_dft_prod_pre_t P, const ulong * cyc, slong num, int flags, gr_ctx_t ctx)
+              int gr_dft_prod_precomp_init_root(gr_dft_prod_pre_t P, gr_srcptr w, ulong order, const ulong * cyc, slong num, int flags, gr_ctx_t ctx)
+
+    Initializes a plan for the product DFT with component lengths
+    *cyc*. The first version uses canonical roots of unity
+    (:func:`gr_dft_default_root`); the second takes a root of unity
+    *w* of the given *order*, which every component length must
+    divide, the component of length `m` using `w^{\mathrm{order}/m}`.
+    Any *flags* are passed on to the component plans.
+
+.. function:: void gr_dft_prod_precomp_clear(gr_dft_prod_pre_t P)
+
+.. function:: int gr_dft_prod_precomp(gr_ptr res, gr_srcptr vec, const gr_dft_prod_pre_t P, gr_ctx_t ctx)
+              int gr_dft_prod_inverse_precomp(gr_ptr res, gr_srcptr vec, const gr_dft_prod_pre_t P, gr_ctx_t ctx)
+              int gr_dft_prod(gr_ptr res, gr_srcptr vec, const ulong * cyc, slong num, gr_ctx_t ctx)
+              int gr_dft_prod_inverse(gr_ptr res, gr_srcptr vec, const ulong * cyc, slong num, gr_ctx_t ctx)
+
+    Product DFT and its inverse (the latter including the `1/n`
+    normalization, performed as a single division by `n` at the end
+    rather than per axis, as in :func:`gr_dft_inverse_precomp`).
+    Aliasing of *res* and *vec* is allowed.
+
+.. function:: void gr_dft_prod_precomp_nfixed_bound(double * peak, double * err_ulps, double in_mag, double in_err, const gr_dft_prod_pre_t P)
+
+    Composes the fixed-point error bounds of the component
+    transforms, axis by axis.
+
+.. function:: void gr_dft_acb_prod(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num, slong prec)
+              void gr_dft_acb_prod_inverse(acb_ptr w, acb_srcptr v, const ulong * cyc, slong num, slong prec)
+              int gr_dft_acb_prod_precomp_init(gr_dft_acb_prod_pre_t Q, const ulong * cyc, slong num, slong prec)
+              void gr_dft_acb_prod_precomp_clear(gr_dft_acb_prod_pre_t Q)
+              void gr_dft_acb_prod_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_prod_pre_t Q, slong prec)
+              void gr_dft_acb_prod_inverse_precomp(acb_ptr w, acb_srcptr v, const gr_dft_acb_prod_pre_t Q, slong prec)
+
+    Product DFT with complex ball input and output, using fixed-point
+    arithmetic internally with rigorous error bounds (the same
+    scaling and error analysis as :func:`gr_dft_acb`, with the
+    composed product bound), falling back to ball arithmetic when
+    fixed point does not apply.
+
+DFT on Dirichlet groups
+-------------------------------------------------------------------------------
+
+Counterparts of :func:`acb_dirichlet_dft` and
+:func:`acb_dirichlet_dft_index`: the group of Dirichlet characters
+mod `q` is a product of cyclic groups, so its DFT is a product DFT
+over the Conrey component sizes.
+
+.. function:: int gr_dft_dirichlet_index(gr_ptr w, gr_srcptr v, const dirichlet_group_t G, gr_ctx_t ctx)
+              int gr_dft_dirichlet(gr_ptr w, gr_srcptr v, const dirichlet_group_t G, gr_ctx_t ctx)
+
+    DFT of *v* over the Dirichlet group *G*, in lexicographic Conrey
+    indexing (array size ``G->phi_q``) and number indexing (array
+    size ``G->q``) respectively, over an arbitrary ring with the
+    required roots of unity.
+
+.. function:: void gr_dft_acb_dirichlet_index(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
+              void gr_dft_acb_dirichlet(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
+
+    The same transforms for complex ball input and output, routed
+    through the fixed-point product transform.

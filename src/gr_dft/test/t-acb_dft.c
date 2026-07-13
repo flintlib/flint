@@ -13,7 +13,6 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "acb.h"
-#include "acb_dft.h"
 #include "gr.h"
 #include "gr_dft.h"
 
@@ -46,13 +45,13 @@ TEST_FUNCTION_START(gr_dft_acb, state)
                 acb_get_mid(v + j, v + j);
         }
 
-        /* reference: acb_dft at elevated precision on the midpoints */
+        /* reference: this module's ball path (plain gr_dft over an
+           acb context, itself tested against naive references in
+           t-dft) at elevated precision on the midpoints */
         for (j = 0; j < n; j++)
             acb_get_mid(ref + j, v + j);
-        if (inverse)
-            acb_dft_inverse(ref, ref, n, refprec);
-        else
-            acb_dft(ref, ref, n, refprec);
+        if (_gr_dft_acb(ref, ref, n, inverse, 1, refprec) != GR_SUCCESS)
+            TEST_FUNCTION_FAIL("reference failed, n = %wd\n", n);
 
         /* both internal paths must contain the reference and agree */
         status = _gr_dft_acb(w1, v, n, inverse, 2, prec);
