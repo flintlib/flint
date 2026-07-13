@@ -19,12 +19,14 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
 {
     nmod_poly_t v;
     nmod_poly_factor_t sq_free, dist_deg;
-    slong i, j, k, l, res_num, dist_deg_num;
+    slong i, j, k, l, res_num;
     slong * degs;
 
     nmod_poly_init_mod(v, poly->mod);
 
     nmod_poly_make_monic(v, poly);
+
+    res->num = 0;
 
     if (poly->length <= 2)
     {
@@ -44,8 +46,6 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
     nmod_poly_factor_init(dist_deg);
     for (i = 0; i < sq_free->num; i++)
     {
-        dist_deg_num = dist_deg->num;
-
         if ((flint_get_num_threads() > 1) &&
             ((sq_free->p + i)->length > (1024*flint_get_num_threads())/4))
             nmod_poly_factor_distinct_deg_threaded(dist_deg, sq_free->p + i,
@@ -54,7 +54,7 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
             nmod_poly_factor_distinct_deg(dist_deg, sq_free->p + i, &degs);
 
         /* compute equal-degree factorisation */
-        for (j = dist_deg_num, l = 0; j < dist_deg->num; j++, l++)
+        for (j = 0, l = 0; j < dist_deg->num; j++, l++)
         {
             res_num = res->num;
 
