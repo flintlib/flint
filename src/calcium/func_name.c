@@ -63,6 +63,10 @@ const char * calcium_func_name(calcium_func_code func)
         case CA_Erfi: return "Erfi";
         case CA_RiemannZeta: return "RiemannZeta";
         case CA_HurwitzZeta: return "HurwitzZeta";
+        /* Complete elliptic integrals */
+        case CA_EllipticK: return "EllipticK";
+        case CA_EllipticE: return "EllipticE";
+        case CA_EllipticPi: return "EllipticPi";
         default: return "<unknown function>";
     }
 }
