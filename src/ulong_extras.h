@@ -605,6 +605,7 @@ int n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in, ulong 
 
 int n_remove(ulong * n, ulong p);
 int n_remove2_precomp(ulong * n, ulong p, double ppre);
+int n_remove2_prime_inv(ulong * n, ulong p, ulong inv1, ulong inv2);
 
 /* ECM functions *************************************************************/
 

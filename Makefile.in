@@ -182,7 +182,7 @@ HEADER_DIRS	:=	\
 		fq_zech					fq_zech_mat	fq_zech_poly	\
 											n_poly			\
 		fq			fq_vec		fq_mat		fq_poly			\
-		padic					padic_mat	padic_poly		\
+		padic		padic_nmod	padic_mat	padic_poly		\
 		qadic												\
 		padic_radix											\
 															\
