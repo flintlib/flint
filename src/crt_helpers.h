@@ -425,10 +425,46 @@ DEFINE_IT(4, 3)
 DEFINE_IT(4, 4)
 DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
-DEFINE_IT(7, 6)
 #undef DEFINE_IT
 
+/* The (7, 6) functions differ from the other variants, that they do not use t[],
+   instead they accumulate everything into r[] to save registers. */
+FLINT_FORCE_INLINE void CAT3(_big_mul, 7, 6)(ulong r[], ulong FLINT_UNUSED(t[]), ulong C[], ulong y)
+{
+    ulong hi, lo;
+    ulong k;
 
+    _mul(&r[1], &r[0], C[0], y);
+    r[2] = 0;
+
+    for (k = 1; k < 5; k++)
+    {
+        umul_ppmm(hi, lo, C[k], y);
+        add_sssaaaaaa(r[k + 2], r[k + 1], r[k],
+                      0,        r[k + 1], r[k],
+                      0,        hi,       lo);
+    }
+
+    umul_ppmm(hi, lo, C[5], y);
+    add_ssaaaa(r[6], r[5], r[6], r[5], hi, lo);
+}
+
+FLINT_FORCE_INLINE void CAT3(_big_addmul, 7, 6)(ulong r[], ulong FLINT_UNUSED(t[]), ulong C[], ulong y)
+{
+    ulong hi, lo;
+    ulong k, carry;
+
+    carry = 0;
+    for (k = 0; k < 6; k++)
+    {
+        umul_ppmm(hi, lo, C[k], y);
+        add_sssaaaaaa(carry, r[k + 1], r[k],
+                      0,     r[k + 1], r[k],
+                      0,     hi + carry, lo);
+    }
+
+    FLINT_ASSERT(carry == 0);
+}
 
 #define DEFINE_IT(n, n_minus_1) \
 FLINT_FORCE_INLINE void CAT(_reduce_big_sum, n)(ulong r[], ulong t[], const ulong* limit) \
@@ -455,8 +491,24 @@ DEFINE_IT(3, 2)
 DEFINE_IT(4, 3)
 DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
-DEFINE_IT(7, 6)
 #undef DEFINE_IT
+
+FLINT_FORCE_INLINE void CAT(_reduce_big_sum, 7)(ulong r[], ulong FLINT_UNUSED(t[]), const ulong* limit)
+{
+check:
+    for (ulong k = 7; k > 1; k--)
+    {
+        if (FLINT_LIKELY(r[k - 1] > limit[k - 1]))
+            goto sub;
+        if (r[k - 1] < limit[k - 1])
+            return;
+    }
+    if (r[0] < limit[0])
+        return;
+sub:
+    multi_sub_7(r, limit);
+    goto check;
+}
 
 #ifdef __cplusplus
 }
