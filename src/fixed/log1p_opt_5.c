@@ -17,7 +17,6 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
 #include "hand_mulhi.inc"
 
 #if FLINT_BITS == 64
@@ -87,8 +86,8 @@ fixed_log1p_opt_5(nn_ptr res, nn_srcptr x)
     slong i, nc;
 
 
-    _fixed_exp_logs_ensure(5, r);
-    nc = _fixed_exp_logs_n;
+    nn_srcptr tab;
+    tab = _fixed_exp_logs_tab(5, r, &nc);
 
     d0 = x[0];
     d1 = x[1];
@@ -106,7 +105,7 @@ fixed_log1p_opt_5(nn_ptr res, nn_srcptr x)
     a3 = 0;
     a4 = 0;
 
-#define LP(ii) (_fixed_exp_logs + (ii) * nc + (nc - 5))
+#define LP(ii) (tab + (ii) * nc + (nc - 5))
 
     /* window 0 */
     {

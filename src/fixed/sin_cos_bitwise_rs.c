@@ -13,7 +13,6 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "fixed.h"
-#include "impl.h"
 
 /* sin and cos on [0, 1) by the rotation analog of the bitwise exp
    algorithm, following the identity of [Joh2022]: with
@@ -88,28 +87,8 @@ _fixed_atans_cleanup(void)
     _fixed_atans_cleanup_registered = 0;
 }
 
-#define FIXED_FRAC_BSPLIT_NO_LOG1
-#include "frac_bsplit.inc"
-
 #define ATANS_A(i) (_fixed_atans + (i) * _fixed_atans_n)
 
-/* floor(x 2^(FLINT_BITS nc)) of a nonnegative arb into nc limbs */
-static void
-_fixed_tab_store(nn_ptr e, const arb_t x, slong nc)
-{
-    arf_t lb;
-    fmpz_t f;
-
-    arf_init(lb);
-    fmpz_init(f);
-    arb_get_lbound_arf(lb, x, FLINT_BITS * nc + 30);
-    arf_mul_2exp_si(lb, lb, FLINT_BITS * nc);
-    arf_get_fmpz(f, lb, ARF_RND_FLOOR);
-    FLINT_ASSERT(fmpz_sgn(f) >= 0);
-    fmpz_get_ui_array(e, nc, f);
-    arf_clear(lb);
-    fmpz_clear(f);
-}
 
 /* acc (nc limbs) += or -= t >> s; the bits shifted below position 0
    fall below the guard limb and are dropped.  scratch: nc limbs. */
@@ -159,10 +138,10 @@ _fixed_tab_addshift(nn_ptr acc, nn_srcptr t, slong nc, slong s,
        atan(1/4) = 2 theta_0 - theta_3        (complement of atan 4)
        atan(1/8) = theta_1 - theta_2          (8 + i = -i(1+2i)(3+2i))
 
-   and beyond that arb_atan1_frac_bsplit (frac_bsplit.inc, in its
-   alternating mode) sums the series of 1/2^i directly.  TODO:
-   reimplement the binary splitting natively with mpn arithmetic;
-   arb is fine for now, and this tier is not the bottleneck.
+   and beyond that fixed_atan_2mexp_ui_bs (tab_bsplit.c) splits the
+   series natively in mpn arithmetic, writing straight into the
+   entry.  TODO: the remaining arb dependency of this tier is the
+   gauss-prime vector combination for i <= 3.
 
    Large i: fixed-point multi-summation of
 
@@ -235,14 +214,14 @@ _fixed_atans_ensure(slong nv, slong rc)
                     arb_sub(x, th + 1, th + 2, wp);
                     break;
                 default:
-                    fmpz_one(p);
-                    fmpz_one(q);
-                    fmpz_mul_2exp(q, q, i);
-                    arb_atan1_frac_bsplit(x, p, q, 0, wp);
-                    break;
+                    /* native mpn binary splitting, straight into the
+                       entry (see tab_bsplit.c) */
+                    fixed_atan_2mexp_ui_bs(ATANS_A(i), (ulong) i, nc);
+                    continue;
             }
 
-            _fixed_tab_store(ATANS_A(i), x, nc);
+            if (!_fixed_tab_store_floor(ATANS_A(i), x, nc, wp))
+                _fixed_tab_entry_exact(ATANS_A(i), 1, (ulong) i, nc);
         }
 
         _arb_vec_clear(th, 4);
@@ -297,10 +276,43 @@ _fixed_atans_ensure(slong nv, slong rc)
         flint_register_cleanup_function(_fixed_atans_cleanup);
         _fixed_atans_cleanup_registered = 1;
     }
+    /* Direct tail band: for 3i >= 64 nc every term of
+       atan(2^-i) = 2^-i - 2^(-3i)/3 + ... beyond the first falls
+       below the entry, and the omitted mass r satisfies
+       0 < r 2^(64 nc) <= 1/3, so the exact floor is the pure bit
+       pattern 2^(64 nc - i) - 1.  Writing these directly (they are
+       exactly the entries whose guard limb legitimately sits at
+       0xfff..., which would otherwise trip the rescan below) keeps
+       the arb fallback for genuinely borderline entries only. */
+    {
+        slong wp = FLINT_BITS * nc, band = (wp + 2) / 3;
+
+        for (i = FLINT_MAX(band, 4); i <= rc; i++)
+        {
+            nn_ptr acc = ATANS_A(i);
+            slong b = wp - i;   /* rc < 64 nv by the r convention,
+                                   so b >= 1 */
+            flint_mpn_zero(acc, nc);
+            flint_mpn_store(acc, b / FLINT_BITS, ~UWORD(0));
+            if (b % FLINT_BITS)
+                acc[b / FLINT_BITS] =
+                    (UWORD(1) << (b % FLINT_BITS)) - 1;
+        }
+
+        /* exactness rescan of the fast tiers below the band; see
+           the log table's twin loop for the reasoning */
+        for (i = 4; i < FLINT_MIN(band, rc + 1); i++)
+        {
+            ulong g = _fixed_atans[i * nc];
+            if (g + FIXED_TAB_GUARD_SLACK < g)
+                _fixed_tab_entry_exact(ATANS_A(i), 1, (ulong) i, nc);
+        }
+    }
+
 }
 
 /* Read-only view of the table for code outside the library (the
-   thread-local storage itself is not exported; see impl.h):
+   thread-local storage itself is not exported; see fixed.h):
    the top n limbs of entry i, valid until the next ensure call on
    this thread. */
 nn_srcptr

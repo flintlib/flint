@@ -37,17 +37,21 @@ TEST_FUNCTION_START(fixed_log1p_bitwise_rs, state)
            the series contract) */
         slong nmin = (FLINT_BITS == 64) ? 1 : 2;
         slong n = det ? FLINT_MAX(det_n, nmin)
-            : nmin + n_randint(state, (iter % 5 == 0) ? 80 : 16);
+            : nmin + n_randint(state, (iter % 97 == 1) ? 1800
+                : (iter % 5 == 0) ? 80 : 16);
         int r = det ? FLINT_MAX(det_r, ((det_r == 0) ? 0 : 32))
             : (iter % 4 == 0) ? 0 :
             (iter % 7 == 2) ? FLINT_BITS * (1 + (int) n_randint(state, 7))
                             : 32 + (int) n_randint(state, 401);
-        ulong x[90], res[90];
+        nn_ptr x, res;
         arb_t xa, e, va, delta;
         fmpz_t t;
         mag_t mb;
         slong prec = FLINT_BITS * n + 128;
         double u;
+
+        x = flint_malloc((n + 1) * sizeof(ulong));
+        res = flint_malloc((n + 1) * sizeof(ulong));
 
         flint_mpn_rrandom(x, state, n);
         if (iter % 13 == 3)
@@ -78,6 +82,8 @@ TEST_FUNCTION_START(fixed_log1p_bitwise_rs, state)
 
         arb_clear(xa); arb_clear(e); arb_clear(va); arb_clear(delta);
         fmpz_clear(t); mag_clear(mb);
+        flint_free(x);
+        flint_free(res);
 
         if (u > (double) FIXED_LOG1P_BITWISE_RS_MAX_ERR(n, r))
             TEST_FUNCTION_FAIL("n = %wd, r = %d, ulp = %f\n", n, r, u);

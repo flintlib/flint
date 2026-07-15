@@ -18,6 +18,62 @@ This module is mainly optimized for 64-bit systems. With 32-bit limbs, some
 generated straight-line and register implementations are disabled and
 evaluation goes through generic and fallback code paths.
 
+Arithmetic
+-------------------------------------------------------------------------------
+
+Newton-based division and square root
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: void fixed_inv_newton_basecase(nn_ptr q, nn_srcptr a, slong an, slong n)
+              void fixed_inv_newton(nn_ptr q, nn_srcptr a, slong an, slong n)
+
+    Given `(a, an)` with `a_{an-1} \ne 0` representing a fixed-point number
+    `a \in [1/B, 1)` with `an` fraction limbs, sets `(q, n+2)` to an
+    approximation of `1/a \in (1, B]` with `n` fraction limbs and two
+    integral limbs (the highest limb may be zero). The absolute error is
+    bounded by `4 B^{-n} / a`. The *newton* suffix flags that the result
+    is not ulp-accurate. The basecase divides by ``mpn_tdiv_qr``; the
+    main function runs a Newton iteration on middle products, ported
+    from :func:`radix_inv_approx`.
+
+.. function:: void fixed_div_newton_invmul(nn_ptr q, nn_srcptr b, slong bn, nn_srcptr a, slong an, slong n)
+              void fixed_div_newton(nn_ptr q, nn_srcptr b, slong bn, nn_srcptr a, slong an, slong n)
+
+    Given a numerator `(b, bn)` with `bn \ge 1` fraction limbs representing
+    `b \in [0, 1)` and a denominator `(a, an)` with `a_{an-1} \ne 0`
+    representing `a \in [1/B, 1)`, sets `(q, n+2)` to an approximation of
+    `b/a` with `n` fraction limbs and two integral limbs. The absolute
+    error is bounded by `4 B^{-n} / a`. The *invmul* variant multiplies
+    the numerator by :func:`fixed_inv_newton`; the main function performs
+    a Karp-Markstein iteration, ported from :func:`radix_div_approx`.
+
+.. function:: void fixed_rsqrt_ui_newton_basecase(nn_ptr res, ulong a, slong n)
+              void fixed_rsqrt_ui_newton(nn_ptr res, ulong a, slong n)
+
+    Sets `(res, n)` to the fraction limbs of an approximation of
+    `1/\sqrt{a}`, requiring `2 \le a < B`. The error is bounded by
+    `2 B^{-n}`. Ported from :func:`radix_rsqrt_1_approx`.
+
+.. function:: void fixed_rsqrt_newton_basecase(nn_ptr q, nn_srcptr a, slong an, slong n)
+              void fixed_rsqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n)
+
+    Given `(a, an)` representing `a \in [B^{-2}, 1)` with `an` fraction
+    limbs (at least one of the two highest limbs must be nonzero), sets
+    `(q, n+2)` to an approximation of `1/\sqrt{a} \in (1, B]` with `n`
+    fraction limbs and two integral limbs. The absolute error is bounded
+    by `4 B^{-n} / \sqrt{a}`. Ported from :func:`radix_rsqrt_approx`;
+    the basecase combines ``mpn_sqrtrem`` and ``mpn_tdiv_qr``.
+
+.. function:: void fixed_sqrt_newton_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n)
+              void fixed_sqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n)
+
+    Input as for :func:`fixed_rsqrt_newton`; sets `(q, n+2)` to an
+    approximation of `\sqrt{a} \in [1/B, 1)` (the computed value can
+    round up to 1) with absolute error bounded by `4 B^{-n} / \sqrt{a}`.
+    Note that the error is proportional to `1/\sqrt{a}` rather than to
+    the output. The main function performs a Karp-Markstein iteration,
+    ported from :func:`radix_sqrt_approx`.
+
 Elementary functions
 -------------------------------------------------------------------------------
 
@@ -96,6 +152,23 @@ On 32-bit systems, it is assumes that `n \ge 2`.
     currently `9 r + 100`.  The bound grows linearly with `r` because
     all work happens at the output precision; callers wanting sub-ulp
     accuracy should pad the precision by one limb themselves.
+
+.. function:: void fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn, flint_bitcnt_t r, int alg)
+
+    Sets `(y, wn + 1)` (``wn`` fraction limbs and a units limb) to an
+    approximation of `\exp(t)` for a reduced argument `(t, wn)` with
+    `t < 2^{-r}`, `r \ge 16`, independent of any particular argument
+    reduction (algorithms 1 and 2 additionally require
+    `r \ge 32`).  The error is at most ``FIXED_EXP_REDUCED_MAX_ERR``
+    ulps.  *alg* selects the internal method: 0 the tuned automatic
+    choice, 1 the direct rectangular-splitting series, 2 the sinh
+    series plus a square root, 3 one bit-burst step (the leading
+    slice of *t*, on limb boundaries, evaluated by binary splitting
+    and the remainder by the sinh series at the doubled rate), 4 the
+    full bit-burst algorithm with slice lengths doubling, which is
+    asymptotically quasi-optimal for very large ``wn``.  The
+    automatic thresholds can be recalibrated with
+    ``tune/tune-exp-reduced``.
 
 .. function:: void fixed_exp_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
 
@@ -327,6 +400,32 @@ On 32-bit systems, it is assumes that `n \ge 2`.
     four small multiplications, and `\cos t'` cancels in every ratio
     just as `|W|` does.
 
+.. function:: void fixed_log1p_2mexp_ui_bs(nn_ptr res, ulong i, slong n)
+              void fixed_atan_2mexp_ui_bs(nn_ptr res, ulong i, slong n)
+
+    Sets `(res, n)` to a one-sided fixed-point approximation of
+    `\log(1 + 2^{-i})` resp. `\operatorname{atan}(2^{-i})`, `i \ge 1`:
+    at most the true value, short by no more than a couple of ulps.
+    These build the entries of the cached reduction tables (which call
+    them with one guard limb) by binary splitting in mpn arithmetic:
+    the split products are carried as truncated mantissas with
+    limb-radix exponents, an iterative basecase accumulates blocks of
+    terms with shifts and single-limb multiplications, and every
+    truncation rounds numerators down and denominators up so that the
+    final truncating division stays one-sided.  The logarithm sums
+    `2\operatorname{atanh}(1/(2^{i+1}+1))`, carrying one `q^2` factor
+    per TERM in the materialized denominator so that ranges compose
+    without any `q`-power at the merges; the `q^2` multiplications
+    all happen at the leaves, each a single ``mpn_mul_1`` whenever
+    `q^2` fits in a limb.  At high precision the direct `\log(1+x)`
+    series takes over, its larger term count offset by purely dyadic
+    merges.
+
+    The smallest indices of the tables (`i \le 6` for the logarithms,
+    `i \le 3` for the angles) are instead combined from
+    `\log 2, \log 3, \ldots` resp. Gauss-machin style atans, computed
+    by generic binary splitting.
+
 
 The reduction parameter selected by `r = 0` is tuned in two tiers.
 
@@ -381,3 +480,4 @@ size is called once before timing so that table precomputation stays
 out of the measurement, and the timing loop cycles over an array of
 random inputs so that the branchy reductions pay their real
 misprediction costs.
+

@@ -17,6 +17,13 @@
 #include "t-exp_rs.c"
 #include "t-log1p_bitwise_rs.c"
 #include "t-sin_cos_bitwise_rs.c"
+#include "t-div_newton.c"
+#include "t-sqrt_newton.c"
+#include "t-tab_bsplit.c"
+#include "t-exp_reduced.c"
+#include "t-exp_sum_bs.c"
+#include "t-tab_floor.c"
+#include "t-tab_static.c"
 #include "t-tan_bitwise_rs.c"
 #include "t-trig_rs.c"
 
@@ -30,6 +37,13 @@ test_struct tests[] =
     TEST_FUNCTION(fixed_exp_rs),
     TEST_FUNCTION(fixed_log1p_bitwise_rs),
     TEST_FUNCTION(fixed_sin_cos_bitwise_rs),
+    TEST_FUNCTION(fixed_div_newton),
+    TEST_FUNCTION(fixed_sqrt_newton),
+    TEST_FUNCTION(fixed_tab_bsplit),
+    TEST_FUNCTION(fixed_exp_reduced),
+    TEST_FUNCTION(fixed_exp_sum_bs),
+    TEST_FUNCTION(fixed_tab_floor),
+    TEST_FUNCTION(fixed_tab_static),
     TEST_FUNCTION(fixed_tan_bitwise_rs),
     TEST_FUNCTION(fixed_trig_rs)
 };

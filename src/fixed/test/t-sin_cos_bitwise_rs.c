@@ -35,19 +35,24 @@ TEST_FUNCTION_START(fixed_sin_cos_bitwise_rs, state)
         /* n = 1 is unsupported on 32-bit limbs */
         slong nmin = (FLINT_BITS == 64) ? 1 : 2;
         slong n = det ? FLINT_MAX(det_n, nmin)
-            : nmin + n_randint(state, (iter % 5 == 0) ? 80 : 16);
+            : nmin + n_randint(state, (iter % 97 == 1) ? 1800
+                : (iter % 5 == 0) ? 80 : 16);
         int r = det ? FLINT_MAX(det_r, ((det_r == 0) ? 0 : 32))
             : (iter % 4 == 0) ? 0 :
             (iter % 9 == 3) ? 32 + (int) n_randint(state, 17) :
             (iter % 7 == 2) ? FLINT_BITS * (1 + (int) n_randint(state, 7))
                             : 32 + (int) n_randint(state, 401);
-        ulong x[82], ysin[83], ycos[83];
+        nn_ptr x, ysin, ycos;
         arb_t xa, e, va, dd;
         fmpz_t f;
         mag_t mb;
         slong prec = FLINT_BITS * n + 128;
         double u;
         int which;
+
+        x = flint_malloc((n + 2) * sizeof(ulong));
+        ysin = flint_malloc((n + 2) * sizeof(ulong));
+        ycos = flint_malloc((n + 2) * sizeof(ulong));
 
         flint_mpn_rrandom(x, state, n);
         if (iter % 13 == 3)
@@ -100,6 +105,9 @@ TEST_FUNCTION_START(fixed_sin_cos_bitwise_rs, state)
         arb_clear(dd);
         fmpz_clear(f);
         mag_clear(mb);
+        flint_free(x);
+        flint_free(ysin);
+        flint_free(ycos);
     }
 
     TEST_FUNCTION_END(state);

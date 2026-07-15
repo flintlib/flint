@@ -1,3 +1,4 @@
+
 /*
     Copyright (C) 2026 Fredrik Johansson
 
@@ -13,9 +14,94 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
 
 #include "tan_rotate.inc"
+
+/* R = floor-or-slightly-below of (2^(128n-1) - 1) / S for S with the
+   top bit set (S' = S 2^-64n in [1/2, 1)), i.e. R ~ 1/(2 S') scaled
+   to n limbs, R < 2^(64n).  N holds the all-ones numerator and h is
+   n limbs of scratch; both callers pass them.  Above the cutoff this
+   runs fixed_inv_newton with one guard limb; its two-sided error
+   4 B^(-n-1) / S' <= 8 B^(-n-1), shifted into R's frame, stays below
+   one R ulp, so truncating leaves R within 1 + eps ulps of
+   floor(N / S) -- the callers' mulhigh truncation budgets absorb
+   that like the tdiv floor.  When S' = 1/2 exactly the
+   contract value 1/S' = 2 would overflow R; the compensated result
+   clamps to all ones, matching the tdiv path.  The cutoff comes
+   from in-context measurements (see dev/notes): in a tight loop the
+   Newton inversion wins from a few dozen limbs, but embedded in the
+   evaluation it loses 10-15% of the whole call at n = 512-1024 and
+   only wins (3-6%) from about 1536 limbs, where the FFT range
+   starts. */
+/* Evaluate only the sine series and recover the cosine through a
+   squaring and a square root once the series gets long enough,
+   mirroring EXP_USE_SINH: the sine series of the reduced argument
+   t' < 2^-r drops one term per 2r bits, so FLINT_BITS n / (2 r)
+   terms in all, and skipping the cosine pass saves one of the two
+   rectangular-splitting sums against the fixed cost of the squaring
+   and the square root.  50 terms matches the crossover measured on
+   the reference machine (n = 150 with the default ladder, which
+   puts n = 150 in the r = 192 band: 64 * 150 = 50 * 192); the
+   development VM measured a much later crossover in context, in
+   line with its inflated Newton cutoffs, and the exp analogue uses
+   128 terms.  Retune with the Newton cutoffs. */
+#ifndef FIXED_TRIG_SIN_SQRT_TERMS
+#define FIXED_TRIG_SIN_SQRT_TERMS 50
+#endif
+#define TRIG_USE_SIN_SQRT(n, r) \
+    (FLINT_BITS * (n) >= FIXED_TRIG_SIN_SQRT_TERMS * (slong) (r))
+
+/* working precision from which that square root runs through
+   fixed_sqrt_newton instead of mpn_sqrtrem (same shape as the exp
+   sinh-path square root) */
+#ifndef FIXED_TRIG_SQRT_NEWTON_CUTOFF
+#define FIXED_TRIG_SQRT_NEWTON_CUTOFF 2000
+#endif
+
+/* precision from which the rotation product W is accumulated in the
+   growing-extent form instead of one shift-and-add pair per factor
+   over the full width */
+#ifndef FIXED_TRIG_ROTATE_PROD_CUTOFF
+#define FIXED_TRIG_ROTATE_PROD_CUTOFF 8
+#endif
+
+#ifndef FIXED_TRIG_RECIP_NEWTON_CUTOFF
+#define FIXED_TRIG_RECIP_NEWTON_CUTOFF 40
+#endif
+
+static void
+_fixed_recip_bn(nn_ptr R, nn_ptr h, nn_srcptr N, nn_srcptr S, slong n)
+{
+    if (n < FIXED_TRIG_RECIP_NEWTON_CUTOFF)
+    {
+        mpn_tdiv_qr(R, h, 0, N, 2 * n, S, n);
+    }
+    else
+    {
+        nn_ptr q;
+        TMP_INIT;
+        TMP_START;
+
+        /* (q, n+3) ~ 1/S' with n+1 fraction limbs, 2 integral */
+        q = TMP_ALLOC((n + 3) * sizeof(ulong));
+        fixed_inv_newton(q, S, n, n + 1);
+
+        /* R = (1/S') 2^(64n-1): shift q down 65 bits and truncate
+           the guard limb; the two-sided error (< 8 half-ulps of q's
+           bottom limb) leaves R within 1 + eps ulps of floor(N / S),
+           which the callers' mulhigh truncation budgets absorb like
+           the tdiv floor */
+        mpn_rshift(q, q + 1, n + 2, 1);
+        flint_mpn_copyi(R, q, n);
+
+        /* q's remaining top limb is 1 iff 1/S' reached 2 (S' = 1/2):
+           clamp to all ones as the all-ones numerator does */
+        if (q[n] != 0)
+            flint_mpn_store(R, n, ~UWORD(0));
+
+        TMP_END;
+    }
+}
 
 /* the sizes for which the rotation is emitted in registers */
 #define FIXED_TAN_ROTATE_NMAX 7
@@ -96,8 +182,8 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     slong * used;
     TMP_INIT;
 
-    _fixed_atans_ensure(n, r);
-    nc = _fixed_atans_n;
+    nn_srcptr tab;
+    tab = _fixed_atans_tab(n, r, &nc);
 
     TMP_START;
     t = TMP_ALLOC((n + n + wn + wn + n + n + wn + wn
@@ -120,7 +206,7 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     /* reduce x/2; the residual t' is wanted as it stands, so unlike the
        sin/cos reduction there is no doubling and no extra index */
     mpn_rshift(t, x, n, 1);
-    num = _fixed_bitwise_reduce(t, n, r, 1, _fixed_atans, nc, used);
+    num = _fixed_bitwise_reduce(t, n, r, 1, tab, nc, used);
 
     /* W = prod (1 + i 2^-i).  For the small sizes this runs in
        registers (tan_rotate.inc): the generic loop below materializes
@@ -132,7 +218,7 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     {
         _fixed_tan_rotate_tab[n](wx, wy, used, num);
     }
-    else
+    else if (n < FIXED_TRIG_ROTATE_PROD_CUTOFF)
     {
         flint_mpn_zero(wx, n);
         wx[n] = 1;
@@ -160,6 +246,161 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
             mpn_sub(wx, wx, wn, vb, n);
             mpn_add(wy, wy, wn, va, n);
         }
+    }
+    else
+    {
+        /* Growing-extent form of the same product, the trig analogue
+           of the exp product reconstruction: with the used indices
+           ascending write W = (1 - alpha) + i b, alpha, b >= 0
+           (alpha starts at 0 and only grows; b stays below 1 since
+           the total angle is under one radian), both lsb-anchored as
+           integers at a common extent B that deepens by i per factor:
+
+               alpha' = (alpha << i) + b
+               b'     = (b << i) + 2^B - alpha
+
+           using the old values on the right.  The extent grows only
+           quadratically (about the sum of the used indices), so
+           several factors fit in one limb, then two, three, ...;
+           limbs deeper than 64 (wn + 1) bits are dropped as the
+           buffers grow, each drop losing under one bit two guard
+           limbs down.  Unlike exp there is no final multiplication
+           at all: wx = 1 - alpha and wy = b are expanded into their
+           dense frames in one pass each. */
+        slong capd = FLINT_BITS * (wn + 1);
+        slong B = 0, al = 1, bl = 1, alloc;
+        nn_ptr aa, at, ba, bt;
+        TMP_INIT;
+
+        TMP_START;
+        alloc = wn + 16;
+        aa = TMP_ALLOC(4 * alloc * sizeof(ulong));
+        at = aa + alloc;
+        ba = at + alloc;
+        bt = ba + alloc;
+        aa[0] = 0;
+        ba[0] = 0;
+
+        for (j = 0; j < num; j++)
+        {
+            slong ii = used[j], q = ii / FLINT_BITS;
+            int sb = (int) (ii - q * FLINT_BITS);
+            slong la, lb, d;
+            ulong cy;
+
+            /* at = (aa << ii) + ba */
+            la = al + q + (sb != 0);
+            flint_mpn_zero(at, q);
+            if (sb)
+                at[al + q] = mpn_lshift(at + q, aa, al, sb);
+            else
+                flint_mpn_copyi(at + q, aa, al);
+            while (la > 1 && at[la - 1] == 0)
+                la--;
+            if (la >= bl)
+            {
+                cy = mpn_add(at, at, la, ba, bl);
+                at[la] = cy;
+                la += (cy != 0);
+            }
+            else
+            {
+                cy = mpn_add(at, ba, bl, at, la);
+                at[bl] = cy;
+                la = bl + (cy != 0);
+            }
+
+            /* bt = (ba << ii) + 2^B - aa */
+            lb = bl + q + (sb != 0);
+            flint_mpn_zero(bt, q);
+            if (sb)
+                bt[bl + q] = mpn_lshift(bt + q, ba, bl, sb);
+            else
+                flint_mpn_copyi(bt + q, ba, bl);
+            while (lb > 1 && bt[lb - 1] == 0)
+                lb--;
+            {
+                slong pb = B / FLINT_BITS;
+                if (pb >= lb)
+                {
+                    flint_mpn_zero(bt + lb, pb - lb + 1);
+                    lb = pb + 1;
+                }
+                cy = mpn_add_1(bt + pb, bt + pb, lb - pb,
+                    UWORD(1) << (B % FLINT_BITS));
+                bt[lb] = cy;
+                lb += (cy != 0);
+            }
+            if (al > 0 && !(al == 1 && aa[0] == 0))
+                mpn_sub(bt, bt, lb, aa, al);
+            while (lb > 1 && bt[lb - 1] == 0)
+                lb--;
+
+            { nn_ptr u_; u_ = aa; aa = at; at = u_;
+                         u_ = ba; ba = bt; bt = u_; }
+            al = la;
+            bl = lb;
+            B += ii;
+
+            d = (B - capd) / FLINT_BITS;
+            if (d > 0)
+            {
+                if (d < al) { flint_mpn_copyi(aa, aa + d, al - d); al -= d; }
+                else { aa[0] = 0; al = 1; }
+                if (d < bl) { flint_mpn_copyi(ba, ba + d, bl - d); bl -= d; }
+                else { ba[0] = 0; bl = 1; }
+                B -= FLINT_BITS * d;
+            }
+        }
+
+        /* expand: wy = b 2^(64 n), wx = 2^(64 n) - alpha 2^(64 n) */
+        {
+            slong sh = FLINT_BITS * n - B;
+
+            flint_mpn_zero(wy, wn);
+            flint_mpn_zero(va, wn + 1);
+            if (sh >= 0)
+            {
+                slong q = sh / FLINT_BITS;
+                int b2 = (int) (sh % FLINT_BITS);
+                if (b2)
+                {
+                    if (bl + q < wn + 1)
+                        wy[bl + q] = mpn_lshift(wy + q, ba, bl, b2);
+                    else
+                        mpn_lshift(wy + q, ba, bl, b2);
+                    va[al + q] = mpn_lshift(va + q, aa, al, b2);
+                }
+                else
+                {
+                    flint_mpn_copyi(wy + q, ba, bl);
+                    flint_mpn_copyi(va + q, aa, al);
+                }
+            }
+            else
+            {
+                slong q = (-sh) / FLINT_BITS;
+                int b2 = (int) ((-sh) % FLINT_BITS);
+                if (b2)
+                {
+                    if (bl - q > 0)
+                        mpn_rshift(wy, ba + q, bl - q, b2);
+                    if (al - q > 0)
+                        mpn_rshift(va, aa + q, al - q, b2);
+                }
+                else
+                {
+                    if (bl - q > 0)
+                        flint_mpn_copyi(wy, ba + q, bl - q);
+                    if (al - q > 0)
+                        flint_mpn_copyi(va, aa + q, al - q);
+                }
+            }
+            flint_mpn_zero(wx, n);
+            wx[n] = 1;
+            mpn_sub(wx, wx, wn, va, wn);
+        }
+        TMP_END;
     }
 
     /* TT and DE, the imaginary and real parts of W (cos t' + i sin t')
@@ -195,12 +436,61 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     }
     else
     {
-        fixed_sin_cos_rs(ss, cc, t, n);
+        if (TRIG_USE_SIN_SQRT(n, r))
+        {
+            /* Evaluate only the sine series -- the analogue of the
+               exp sinh path -- and recover
 
-        if (cc[n])
-            flint_mpn_zero(cc, n);          /* cos t' = 1: g = 0 */
+                   g = 1 - cos t' = 1 - sqrt(1 - sin^2 t')
+
+               by a squaring and a square root, saving the cosine
+               pass of fixed_sin_cos_rs (the powers of t'^2 are
+               shared between the two sums, but each sum is a full
+               rectangular-splitting pass).  The square root sits
+               just below 1, so its derivative is ~1/2 and nothing
+               is amplified: sqrhigh's few-ulp deficit on sin^2
+               (which can only raise 1 - sin^2, lowering g), the
+               square root's floor (raising g by at most one ulp)
+               and the Newton route's ~2 compensated ulps leave g
+               within a few 2^-64n ulps either way, well inside the
+               budget the direct cosine's truncation already used. */
+            nn_ptr u2 = N, rt = Q;      /* free until the divisions */
+
+            fixed_sin_rs(ss, t, n);
+
+            flint_mpn_sqrhigh(rt, ss, n);
+            if (flint_mpn_zero_p(rt, n))
+            {
+                flint_mpn_zero(cc, n);  /* sin^2 below 2^-64n: g = 0 */
+            }
+            else if (n < FIXED_TRIG_SQRT_NEWTON_CUTOFF)
+            {
+                flint_mpn_zero(u2, n);
+                mpn_neg(u2 + n, rt, n); /* (1 - sin^2) 2^(128n) */
+                mpn_sqrtrem(rt, sc, u2, 2 * n);
+                mpn_neg(cc, rt, n);     /* g 2^(64n) */
+            }
+            else
+            {
+                /* the Newton square root reads short input directly:
+                   (1 - sin^2) as an n-limb fraction, no zero padding */
+                mpn_neg(u2, rt, n);
+                fixed_sqrt_newton(rt, u2, n, n + 2);
+                if (rt[n + 2])
+                    flint_mpn_zero(cc, n);  /* cos rounded to 1 */
+                else
+                    mpn_neg(cc, rt + 2, n);
+            }
+        }
         else
-            mpn_neg(cc, cc, n);             /* g = 1 - cos t' */
+        {
+            fixed_sin_cos_rs(ss, cc, t, n);
+
+            if (cc[n])
+                flint_mpn_zero(cc, n);      /* cos t' = 1: g = 0 */
+            else
+                mpn_neg(cc, cc, n);         /* g = 1 - cos t' */
+        }
 
         flint_mpn_mulhigh_n(va, wx, ss, n); /* wx ss */
         if (wx[n])
@@ -278,7 +568,7 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
 
             /* R = 1/(2 S'): the all-ones numerator keeps R below
                2^(64n) even when S' = 1/2 exactly */
-            mpn_tdiv_qr(R, h, 0, N, 2 * n, S, n);
+            _fixed_recip_bn(R, h, N, S, n);
 
             if (ysin != NULL)
             {
@@ -313,7 +603,7 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
             if (e)
                 mpn_lshift(W, W, n, e);
 
-            mpn_tdiv_qr(R, h, 0, N, 2 * n, W, n);
+            _fixed_recip_bn(R, h, N, W, n);
 
             /* tan = 2A/(B - C) = 2^(2+e) A R < 1.56 */
             flint_mpn_mulhigh_n(ytan, A, R, n);

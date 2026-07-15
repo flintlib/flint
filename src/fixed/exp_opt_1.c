@@ -17,7 +17,6 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
 #include "hand_mulhi.inc"
 
 #if FLINT_BITS == 64
@@ -76,15 +75,15 @@ fixed_exp_opt_1(nn_ptr res, nn_srcptr x)
     slong used[1 * FLINT_BITS + 2];
 
 
-    _fixed_exp_logs_ensure(1, r);
-    nc = _fixed_exp_logs_n;
+    nn_srcptr tab;
+    tab = _fixed_exp_logs_tab(1, r, &nc);
 
     t0 = x[0];
 
 /* exact compare-subtract of L_ii, recording the index */
 #define STEP(ii) \
     do { \
-        nn_srcptr Lq = _fixed_exp_logs + (ii) * nc + (nc - 1); \
+        nn_srcptr Lq = tab + (ii) * nc + (nc - 1); \
         sub_ddmmss(bw, d0, \
             UWORD(0), t0, \
             UWORD(0), Lq[0]); \
@@ -97,7 +96,7 @@ fixed_exp_opt_1(nn_ptr res, nn_srcptr x)
 #define FLUSH() \
     for (; bj < num; bj++) \
     { \
-        nn_srcptr Lq = _fixed_exp_logs + used[bj] * nc + (nc - 1); \
+        nn_srcptr Lq = tab + used[bj] * nc + (nc - 1); \
         t0 -= Lq[0]; \
     }
 

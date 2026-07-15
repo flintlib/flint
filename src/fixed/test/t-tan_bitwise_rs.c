@@ -23,11 +23,12 @@ TEST_FUNCTION_START(fixed_tan_bitwise_rs, state)
         /* the specialized sizes take r = 0; larger ones divide sin by
            cos and so accept any legal r */
         slong nmin = (FLINT_BITS == 64) ? 1 : 2;
-        slong n = nmin + n_randint(state, (iter % 5 == 0) ? 40 : 9);
+        slong n = nmin + n_randint(state, (iter % 97 == 1) ? 1800
+            : (iter % 5 == 0) ? 40 : 9);
         int r = (iter % 3 == 0) ? 0
               : (iter % 3 == 1) ? 32 + (int) n_randint(state, 200)
                                 : 32 + (int) n_randint(state, 17);
-        ulong x[64], res[66];
+        nn_ptr x, res;
         arb_t xa, e, va, d;
         fmpz_t f;
         mag_t mb;
@@ -37,7 +38,10 @@ TEST_FUNCTION_START(fixed_tan_bitwise_rs, state)
         if (n > 40)
             n = 40;
 
-        flint_mpn_rrandom(x, state, n);
+x = flint_malloc((n + 2) * sizeof(ulong));
+        res = flint_malloc((n + 2) * sizeof(ulong));
+
+                flint_mpn_rrandom(x, state, n);
         if (iter % 13 == 3)
             flint_mpn_zero(x, n);
         if (iter % 7 == 1)
@@ -74,6 +78,8 @@ TEST_FUNCTION_START(fixed_tan_bitwise_rs, state)
         arb_clear(d);
         fmpz_clear(f);
         mag_clear(mb);
+        flint_free(x);
+        flint_free(res);
     }
 
     TEST_FUNCTION_END(state);

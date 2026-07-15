@@ -13,7 +13,6 @@
 #include "mpn_extras.h"
 #include "arb.h"
 #include "fixed.h"
-#include "impl.h"
 
 /* exp via bitwise argument reduction: subtract in turn each
    L_i = log(1 + 2^-i), i = 0, 1, ..., r, for which L_i <= x, evaluate
@@ -74,28 +73,9 @@ _fixed_exp_logs_cleanup(void)
     _fixed_exp_logs_cleanup_registered = 0;
 }
 
-#include "frac_bsplit.inc"
-
 #define LOGS_L(i) (_fixed_exp_logs + (i) * _fixed_exp_logs_n)
 #define TAB_E(i) (tab + (i) * nc)
 
-/* floor(x 2^(FLINT_BITS nc)) of a nonnegative arb into nc limbs */
-static void
-_fixed_tab_store(nn_ptr e, const arb_t x, slong nc)
-{
-    arf_t lb;
-    fmpz_t f;
-
-    arf_init(lb);
-    fmpz_init(f);
-    arb_get_lbound_arf(lb, x, FLINT_BITS * nc + 30);
-    arf_mul_2exp_si(lb, lb, FLINT_BITS * nc);
-    arf_get_fmpz(f, lb, ARF_RND_FLOOR);
-    FLINT_ASSERT(fmpz_sgn(f) >= 0);
-    fmpz_get_ui_array(e, nc, f);
-    arf_clear(lb);
-    fmpz_clear(f);
-}
 
 /* acc (nc limbs) += or -= t >> s, where t has nc limbs and the bits
    shifted below position 0 are dropped (they fall below the guard
@@ -149,13 +129,10 @@ _fixed_tab_subbit(nn_ptr acc, slong nc, slong e)
    Small i (below about sqrt(precision) bits, where the series is
    long): binary splitting.  For i <= 6 the arguments (2^i + 1)/2^i
    factor over the primes up to 17, so seven bsplit logarithms serve
-   all of them; beyond that, log(1 + 2^-i) = 2 atanh(1/(2^(i+1) + 1))
-   through arb_atan1_frac_bsplit (frac_bsplit.inc), switching to the
-   direct log(1 + 2^-i) series of arb_log1_frac_bsplit once the
-   precision passes 6000 bits and i passes 30, where its plainer
-   recursion wins.  TODO: reimplement the binary splitting natively
-   with mpn arithmetic; arb is fine for now, and this tier is not
-   the bottleneck.
+   all of them; beyond that, fixed_log1p_2mexp_ui_bs (tab_bsplit.c)
+   splits the series natively in mpn arithmetic, writing straight
+   into the entry.  TODO: the remaining arb dependency of this tier
+   is the seven-logarithm prime-vector combination for i <= 6.
 
    Large i: fixed-point multi-summation of
 
@@ -243,28 +220,15 @@ _fixed_exp_logs_ensure(slong nv, slong rc)
                     arb_submul_ui(x, lp + 0, 6, wp);
                     break;
                 default:
-                    if (prec >= 6000 && i >= 30)
-                    {
-                        /* direct log(1 + 1/2^i) series */
-                        fmpz_one(p);
-                        fmpz_one(q);
-                        fmpz_mul_2exp(q, q, i);
-                        arb_log1_frac_bsplit(x, p, q, wp);
-                    }
-                    else
-                    {
-                        /* log(1 + 2^-i) = 2 atanh(1 / (2^(i+1) + 1)) */
-                        fmpz_one(p);
-                        fmpz_one(q);
-                        fmpz_mul_2exp(q, q, i + 1);
-                        fmpz_add_ui(q, q, 1);
-                        arb_atan1_frac_bsplit(x, p, q, 1, wp);
-                        arb_mul_2exp_si(x, x, 1);
-                    }
-                    break;
+                    /* native mpn binary splitting, straight into the
+                       entry (atanh form, switching to the direct
+                       series at high precision; see tab_bsplit.c) */
+                    fixed_log1p_2mexp_ui_bs(LOGS_L(i), (ulong) i, nc);
+                    continue;
             }
 
-            _fixed_tab_store(LOGS_L(i), x, nc);
+            if (!_fixed_tab_store_floor(LOGS_L(i), x, nc, wp))
+                _fixed_tab_entry_exact(LOGS_L(i), 0, (ulong) i, nc);
         }
 
         _arb_vec_clear(lp, 7);
@@ -331,11 +295,63 @@ _fixed_exp_logs_ensure(slong nv, slong rc)
         flint_register_cleanup_function(_fixed_exp_logs_cleanup);
         _fixed_exp_logs_cleanup_registered = 1;
     }
+    /* Direct tail band: for 3i >= 64 nc every term of
+       log(1 + 2^-i) = 2^-i - 2^(-2i-1) + 2^(-3i)/3 - ... from the
+       third on falls below the entry, with the omitted alternating
+       mass s satisfying 0 < s 2^(64 nc) <= 1/3, so the exact floor
+       is a pure bit pattern: 2^(64 nc - i) - 2^(64 nc - 2i - 1)
+       when the second term is still representable, and
+       2^(64 nc - i) - 1 when it too falls below (then the omitted
+       mass sits in (0, 1/2]).  Writing these directly covers the
+       entries whose guard limb legitimately sits near wrapping.
+
+       Exactness rescan below the band: the fast tiers produce
+       entries at most a few guard ulps below the truth, so a guard
+       limb within FIXED_TAB_GUARD_SLACK of wrapping means that
+       deficit may have borrowed into the value limbs -- recompute
+       such (now genuinely astronomically rare) entries via arb.
+       Together with the exact-floor tier-1 store, every entry's
+       value limbs equal the exact floor at their precision, hence
+       at every shorter truncation as well. */
+    {
+        slong wp = FLINT_BITS * nc, band = (wp + 2) / 3;
+
+        for (i = FLINT_MAX(band, 7); i <= rc; i++)
+        {
+            nn_ptr acc = LOGS_L(i);
+            slong b = wp - i;
+
+            flint_mpn_zero(acc, nc);
+            if (2 * i + 1 <= wp)
+            {
+                /* ones on bits [64 nc - 2i - 1, 64 nc - i) */
+                slong lo = wp - 2 * i - 1;
+                slong j;
+                for (j = lo; j < wp - i; j++)
+                    acc[j / FLINT_BITS] |= UWORD(1) << (j % FLINT_BITS);
+            }
+            else
+            {
+                flint_mpn_store(acc, b / FLINT_BITS, ~UWORD(0));
+                if (b % FLINT_BITS)
+                    acc[b / FLINT_BITS] =
+                        (UWORD(1) << (b % FLINT_BITS)) - 1;
+            }
+        }
+
+        for (i = 7; i < FLINT_MIN(band, rc + 1); i++)
+        {
+            ulong g = _fixed_exp_logs[i * nc];
+            if (g + FIXED_TAB_GUARD_SLACK < g)
+                _fixed_tab_entry_exact(LOGS_L(i), 0, (ulong) i, nc);
+        }
+    }
+
 }
 
 
 /* Read-only view of the table for code outside the library (the
-   thread-local storage itself is not exported; see impl.h):
+   thread-local storage itself is not exported; see fixed.h):
    the top n limbs of entry i, valid until the next ensure call on
    this thread. */
 nn_srcptr
@@ -355,64 +371,123 @@ _fixed_exp_logs_max_index(void)
 }
 
 
-/* Use the sinh series (half the terms) plus a squaring and a square
-   root once the direct exp series gets long enough.  Measured
-   crossovers on x86-64: for r < 64 (series through the pre32 path)
-   sinh wins from about 45 terms (n ~ 24 at r = 32); for r >= 64 the
-   windowed pre64 series is more efficient per term and mpn_sqrtrem
-   sets a higher floor, moving the crossover to about 128 terms
-   (n ~ 2r).  The margins near the crossovers are within a few
-   percent, so the exact placement is not critical. */
-#define EXP_USE_SINH(wn, r) \
-    (FLINT_BITS * (wn) >= (((r) >= 64) ? 128 : 45) * (slong) (r))
 
-/* exp(t) of the reduced argument t < 2^-r into y (wn + 1 limbs:
-   wn fraction limbs and a units limb); the series functions pick the
-   32- or 64-bit internal range from the top limb of t.  When the
-   direct series would need many terms, evaluate sinh(t) instead --
-   the odd series has half the terms -- and reconstruct
-   exp(t) = sinh(t) + sqrt(1 + sinh(t)^2), costing one squaring and
-   one square root.  The sinh error (FIXED_SINH_RS_MAX_ERR = 15 ulp),
-   the truncated squaring and the floored integer square root
-   together contribute some 20 ulp, amplified below e by the
-   reconstruction: this is part of the constant term of
-   FIXED_EXP_BITWISE_RS_MAX_ERR. */
+
+/* Product-form reconstruction for large ylen: accumulate
+   P = prod (1 + 2^-used[j]) exactly in a growing lsb-anchored buffer
+   (P = m 2^-B with B the accumulated bottom extent, so several
+   factors fit in one limb, then two, three, ...), capping the extent
+   at 64 ylen + 64 bits -- each capped factor then drops less than
+   one bit below the cap, u such drops staying far under an output
+   ulp -- and finish with a single multiplication y <- floor(y P)
+   instead of one shift-and-add per factor.  With the used indices
+   increasing, B grows only quadratically (about (sum of used
+   indices) bits, r^2/4 in the worst case), so for large ylen the
+   final multiplication is short times long and the whole
+   reconstruction costs a fraction of the shift-and-add chain; the
+   result is also tighter, one truncation instead of one per
+   factor.  With the middle-product finish the path wins on the
+   whole exp call from n ~ 256 at the default ladder on the
+   development machine (7% there, 12-13% at n = 4096..8192, a wash
+   only around n = 512 where the capped extent is at its relative
+   largest).  Retune with the Newton cutoffs. */
 static void
-_fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn, int r, int use_sinh)
+_fixed_exp_recon_prod(nn_ptr y, slong ylen, const slong * used,
+    slong j, slong num)
 {
-    if (!use_sinh)
+    slong capd = FLINT_BITS * (ylen + 1);   /* keep bits above 2^-capd */
+    slong B = 0, mlen = 1, alloc, plen;
+    nn_ptr m, t, prod;
+    TMP_INIT;
+
+    TMP_START;
+    alloc = ylen + 16;      /* extent <= capd + 63 + r < 64 alloc */
+    m = TMP_ALLOC((2 * alloc + alloc + ylen + 2) * sizeof(ulong));
+    t = m + alloc;
+    prod = t + alloc;
+
+    m[0] = 1;
+
+    for (; j < num; j++)
     {
-        fixed_exp_rs(y, t, wn);
+        slong i = used[j], q = i / FLINT_BITS, b = i % FLINT_BITS;
+        slong tl, d;
+
+        /* m' 2^-(B+i) = (m 2^i + m) 2^-(B+i) = m 2^-B (1 + 2^-i) */
+        tl = mlen + q + (b != 0);
+        flint_mpn_zero(t, q);
+        if (b)
+            t[mlen + q] = mpn_lshift(t + q, m, mlen, (int) b);
+        else
+            flint_mpn_copyi(t + q, m, mlen);
+        while (tl > 1 && t[tl - 1] == 0)
+            tl--;
+        /* t = m 2^i (tl limbs, tl >= mlen); m' = t + m */
+        {
+            ulong cy = mpn_add(t, t, tl, m, mlen);
+            t[tl] = cy;
+            mlen = tl + (cy != 0);
+        }
+        { nn_ptr u_ = m; m = t; t = u_; }
+        B += i;
+
+        /* drop whole limbs sitting deeper than capd bits: each drop
+           loses less than 2^-capd, one output guard bit, and there
+           are at most r of them in total */
+        d = (B - capd) / FLINT_BITS;
+        if (d > 0)
+        {
+            flint_mpn_copyi(m, m + d, mlen - d);
+            mlen -= d;
+            B -= FLINT_BITS * d;
+        }
     }
-    else
+
+    /* y <- floor(y P) = (y m) >> B.  Only the product window at and
+       above limb B/64 matters, so when the operands are nearly
+       balanced a middle product beats the full multiplication.  Its
+       lower-approximation deficit is bounded by
+       min(ylen, mlen, zlo) 2^64 window units -- up to ~min ulps of
+       the limb ABOVE the window bottom, a bound that all-ones
+       operands very nearly attain -- so ONE sacrificial limb is not
+       enough (at bit offset b = 0 up to min ulps would leak into
+       the kept result); TWO are, leaving the deficit below
+       min / 2^64 < 1 ulp of the result, hence within 1 ulp of the
+       exact floor like the full product's plain truncation (the
+       capped drops sit further below still), far inside the budget
+       the per-factor chain used to spend. */
+    plen = ylen + mlen;
     {
-        nn_ptr s, u2, rt, rem;
-        TMP_INIT;
+        slong q = B / FLINT_BITS, b = B % FLINT_BITS;
 
-        TMP_START;
-        s = TMP_ALLOC(((wn + 1) + (2 * wn + 1) + (wn + 1) + (wn + 2))
-            * sizeof(ulong));
-        u2 = s + (wn + 1);
-        rt = u2 + (2 * wn + 1);
-        rem = rt + (wn + 1);
-
-        fixed_sinh_rs(s, t, wn);
-
-        /* u2 = (1 + sinh(t)^2) 2^(2 FLINT_BITS wn) */
-        flint_mpn_zero(u2, wn);
-        flint_mpn_sqrhigh(u2 + wn, s, wn);
-        u2[2 * wn] = 1;
-
-        /* cosh(t) = sqrt(1 + sinh(t)^2) */
-        mpn_sqrtrem(rt, rem, u2, 2 * wn + 1);
-
-        /* exp(t) = sinh(t) + cosh(t) */
-        mpn_add_n(y, rt, s, wn + 1);
-
-        TMP_END;
+        if (2 * mlen >= ylen && q >= 2)
+        {
+            /* window two limbs below the kept result: both
+               sacrificial limbs absorb the deficit */
+            flint_mpn_mulmid(prod + q - 2, y, ylen, m, mlen,
+                q - 2, plen);
+            if (b)
+                mpn_rshift(prod + q - 2, prod + q - 2,
+                    plen - q + 2, (int) b);
+            flint_mpn_copyi(y, prod + q, ylen);
+        }
+        else
+        {
+            if (mlen >= ylen)
+                flint_mpn_mul(prod, m, mlen, y, ylen);
+            else
+                flint_mpn_mul(prod, y, ylen, m, mlen);
+            if (b)
+                mpn_rshift(prod + q, prod + q, plen - q, (int) b);
+            flint_mpn_copyi(y, prod + q, ylen);
+        }
     }
+    TMP_END;
 }
 
+#ifndef FIXED_EXP_RECON_PROD_CUTOFF
+#define FIXED_EXP_RECON_PROD_CUTOFF 192
+#endif
 
 /* multiply y (ylen limbs, fraction plus a units limb) by the factors
    (1 + 2^-used[j]) for j0 <= j < num: each is a shift and an add.
@@ -423,6 +498,12 @@ void
 _fixed_exp_recon(nn_ptr y, nn_ptr sh, slong ylen, const slong * used,
     slong j, slong num)
 {
+    if (ylen >= FIXED_EXP_RECON_PROD_CUTOFF && num - j >= 8)
+    {
+        _fixed_exp_recon_prod(y, ylen, used, j, num);
+        return;
+    }
+
     if (j == 0 && num > 0 && used[0] == 0)
     {
         mpn_add_n(y, y, y, ylen);               /* factor 2 */
@@ -664,7 +745,7 @@ fixed_exp_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
         _fixed_exp_logs_n, used);
 
     /* exp of the reduced argument */
-    _fixed_exp_reduced(y, t, wn, r, EXP_USE_SINH(wn, r));
+    fixed_exp_reduced(y, t, wn, (flint_bitcnt_t) r, 0);
 
     _fixed_exp_recon(y, sh, n + 1, used, 0, num);
 
