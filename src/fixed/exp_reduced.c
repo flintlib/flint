@@ -108,6 +108,80 @@
 #define FIXED_EXP_FULLBURST_TERMS 4096
 #endif
 
+/* Assemble the bit-burst factor F = Q 2^Qexp + T as
+   value = (F, *fn) 2^(*fexp): exactly when it fits within
+   cap + 2 limbs (then *fexp = 0), and otherwise as its top window
+   of about cap + 1 limbs -- Q shifted into place and T's
+   limb-aligned tail above the window bottom added -- with the
+   dropped bits, under one bit at the limb-aligned bottom, going
+   into *fexp.  F must have room for cap + 3 limbs.  Exposed
+   non-statically so that the window arithmetic, which the burst
+   only reaches in specific precision regimes, can be unit-tested
+   directly (t-exp_sum_bs). */
+void
+_fixed_exp_burst_factor(nn_ptr F, slong * fn, slong * fexp,
+    nn_srcptr T, slong tn, nn_srcptr Q, slong qn,
+    flint_bitcnt_t Qexp, slong cap)
+{
+    slong qb = FLINT_BITS * (qn - 1) + FLINT_BIT_COUNT(Q[qn - 1]);
+    slong fbits = (slong) Qexp + qb + 1;    /* F < 1.5 Q 2^Qexp */
+    slong l;
+
+    /* Q must fit inside the window (in the burst, qbits stays well
+       under 0.6 wp against a window of 64 (wn + 4) bits) */
+    FLINT_ASSERT(qb < FLINT_BITS * (cap + 1));
+
+    if (fbits <= FLINT_BITS * (cap + 2))
+    {
+        /* small factor: form it exactly */
+        slong Fq = (slong) Qexp / FLINT_BITS;
+        int Fb = (int) ((slong) Qexp % FLINT_BITS);
+
+        flint_mpn_zero(F, cap + 3);
+        if (Fb)
+            F[Fq + qn] = mpn_lshift(F + Fq, Q, qn, Fb);
+        else
+            flint_mpn_copyi(F + Fq, Q, qn);
+        if (tn > 0)
+            mpn_add(F, F, cap + 3, T, tn);
+        *fexp = 0;
+    }
+    else
+    {
+        /* assemble only the top window: wbot is the window's
+           bottom bit, limb-aligned */
+        slong wbot = ((fbits - FLINT_BITS * (cap + 1))
+            / FLINT_BITS) * FLINT_BITS;
+        slong sh1 = (slong) Qexp - wbot;
+        slong s1q = sh1 / FLINT_BITS;
+        int s1b = (int) (sh1 % FLINT_BITS);
+
+        FLINT_ASSERT(sh1 >= 0);
+        flint_mpn_zero(F, cap + 3);
+        if (s1b)
+            F[s1q + qn] = mpn_lshift(F + s1q, Q, qn, s1b);
+        else
+            flint_mpn_copyi(F + s1q, Q, qn);
+        /* add T's limb-aligned tail above wbot; dropping the rest
+           loses under one bit at wbot, a relative 2^(-64 cap) */
+        {
+            slong dq2 = wbot / FLINT_BITS;
+            if (dq2 < tn)
+            {
+                ulong cy = mpn_add(F, F, cap + 3, T + dq2,
+                    tn - dq2);
+                FLINT_ASSERT(cy == 0);
+                (void) cy;
+            }
+        }
+        *fexp = wbot;
+    }
+    l = cap + 3;
+    while (l > 1 && F[l - 1] == 0)
+        l--;
+    *fn = l;
+}
+
 /* Bit-burst evaluation.  Slice boundaries double from depth r:
    b_0 = r, b_{k+1} = min(2 b_k, wp); slice k = bits [b_k, b_{k+1})
    of t, extracted at bit granularity as u = t >> (wp - b_{k+1})
@@ -303,68 +377,9 @@ _fixed_exp_reduced_burst(nn_ptr y, nn_srcptr t, slong wn,
             }
             QE += (slong) Qexp;
 
-            /* factor F_k = Q_k 2^{Qexp_k} + T_k: value f 2^fexp */
-            {
-                slong qb = FLINT_BITS * (qn - 1)
-                    + FLINT_BIT_COUNT(Q[qn - 1]);
-                slong fbits = (slong) Qexp + qb + 1;   /* F < 1.5 Q 2^Qexp */
-
-                if (fbits <= FLINT_BITS * (cap + 2))
-                {
-                    /* small factor: form it exactly */
-                    slong Fq = (slong) Qexp / FLINT_BITS;
-                    int Fb = (int) ((slong) Qexp % FLINT_BITS);
-
-                    flint_mpn_zero(F, cap + 3);
-                    if (Fb)
-                        F[Fq + qn] = mpn_lshift(F + Fq, Q, qn, Fb);
-                    else
-                        flint_mpn_copyi(F + Fq, Q, qn);
-                    if (tn > 0)
-                        mpn_add(F, F, cap + 3, T, tn);
-                    fn = cap + 3;
-                    while (fn > 1 && F[fn - 1] == 0)
-                        fn--;
-                    f = F;
-                    fexp = 0;
-                }
-                else
-                {
-                    /* assemble only the top window: wbot is the
-                       window's bottom bit, limb-aligned */
-                    slong wbot = ((fbits - FLINT_BITS * (cap + 1))
-                        / FLINT_BITS) * FLINT_BITS;
-                    slong sh1 = (slong) Qexp - wbot;
-                    slong s1q = sh1 / FLINT_BITS;
-                    int s1b = (int) (sh1 % FLINT_BITS);
-
-                    FLINT_ASSERT(sh1 >= 0);
-                    flint_mpn_zero(F, cap + 3);
-                    if (s1b)
-                        F[s1q + qn] = mpn_lshift(F + s1q, Q, qn,
-                            s1b);
-                    else
-                        flint_mpn_copyi(F + s1q, Q, qn);
-                    /* add T's limb-aligned tail above wbot;
-                       dropping the rest loses under one bit at
-                       wbot, a relative 2^(-64 cap) */
-                    {
-                        slong dq2 = wbot / FLINT_BITS;
-                        if (dq2 < tn)
-                        {
-                            ulong cy = mpn_add(F, F, cap + 3,
-                                T + dq2, tn - dq2);
-                            FLINT_ASSERT(cy == 0);
-                            (void) cy;
-                        }
-                    }
-                    fn = cap + 3;
-                    while (fn > 1 && F[fn - 1] == 0)
-                        fn--;
-                    f = F;
-                    fexp = wbot;
-                }
-            }
+            _fixed_exp_burst_factor(F, &fn, &fexp, T, tn, Q, qn,
+                Qexp, cap);
+            f = F;
         }
 
         /* NUM *= f, msb-truncated at cap */

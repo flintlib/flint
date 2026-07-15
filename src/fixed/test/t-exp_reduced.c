@@ -77,5 +77,76 @@ TEST_FUNCTION_START(fixed_exp_reduced, state)
         flint_free(t); flint_free(y);
     }
 
+    /* targeted precision regimes that random sampling misses */
+    {
+        struct { slong wn; flint_bitcnt_t r; int alg; int fill; }
+        cases[] = {
+            { 64,   16, 0, 0 },   /* r < 32 forces a burst in auto */
+            { 48,   16, 4, 1 },   /* extraction masks, all-ones */
+            { 48,   63, 3, 1 },
+            { 48,   64, 4, 1 },
+            { 48,   65, 3, 1 },
+            { 48,  127, 4, 1 },
+            { 48,  128, 3, 1 },
+            { 48,  129, 4, 1 },
+            { 80,   34, 3, 1 },   /* the span-carry hard shape */
+            { 512,  16, 4, 0 },   /* Qexp < wp up-shift branch */
+            { 1100, 16, 0, 0 },   /* FULLBURST gate in auto */
+            { 2100, 128, 2, 0 },  /* sinh square root above the
+                                     Newton cutoff */
+            { 40,  256, 0, 2 },   /* t = 0: y = 1 on every path */
+        };
+        slong c, i;
+
+        for (c = 0; c < (slong) (sizeof(cases) / sizeof(cases[0]));
+            c++)
+        {
+            slong wn = cases[c].wn;
+            flint_bitcnt_t r = cases[c].r;
+            nn_ptr t, y;
+            arb_t ta, ref, got, bnd;
+            fmpz_t f;
+
+            t = flint_malloc((wn + 2) * sizeof(ulong));
+            y = flint_malloc((wn + 2) * sizeof(ulong));
+            arb_init(ta); arb_init(ref); arb_init(got);
+            arb_init(bnd); fmpz_init(f);
+
+            if (cases[c].fill == 2)
+                flint_mpn_zero(t, wn);
+            else if (cases[c].fill == 1)
+                flint_mpn_store(t, wn, ~UWORD(0));
+            else
+                flint_mpn_urandomb(t, state, FLINT_BITS * wn);
+            for (i = 0; i < (slong) (r / FLINT_BITS) && i < wn; i++)
+                t[wn - 1 - i] = 0;
+            if ((r % FLINT_BITS) && (slong) (r / FLINT_BITS) < wn)
+                t[wn - 1 - r / FLINT_BITS] >>= (r % FLINT_BITS);
+
+            fmpz_set_ui_array(f, t, wn);
+            arb_set_fmpz(ta, f);
+            arb_mul_2exp_si(ta, ta, -FLINT_BITS * wn);
+            arb_exp(ref, ta, FLINT_BITS * wn + 128);
+
+            fixed_exp_reduced(y, t, wn, r, cases[c].alg);
+
+            fmpz_set_ui_array(f, y, wn + 1);
+            arb_set_fmpz(got, f);
+            arb_mul_2exp_si(got, got, -FLINT_BITS * wn);
+            arb_sub(got, got, ref, FLINT_BITS * wn + 128);
+            arb_mul_2exp_si(got, got, FLINT_BITS * wn);
+            arb_abs(got, got);
+            arb_set_ui(bnd, FIXED_EXP_REDUCED_MAX_ERR);
+            if (!arb_le(got, bnd))
+                TEST_FUNCTION_FAIL("targeted case %wd: wn = %wd, "
+                    "r = %wd, alg = %d\n", c, wn, (slong) r,
+                    cases[c].alg);
+
+            arb_clear(ta); arb_clear(ref); arb_clear(got);
+            arb_clear(bnd); fmpz_clear(f);
+            flint_free(t); flint_free(y);
+        }
+    }
+
     TEST_FUNCTION_END(state);
 }

@@ -58,13 +58,6 @@
 #define FIXED_TRIG_SQRT_NEWTON_CUTOFF 2000
 #endif
 
-/* precision from which the rotation product W is accumulated in the
-   growing-extent form instead of one shift-and-add pair per factor
-   over the full width */
-#ifndef FIXED_TRIG_ROTATE_PROD_CUTOFF
-#define FIXED_TRIG_ROTATE_PROD_CUTOFF 8
-#endif
-
 #ifndef FIXED_TRIG_RECIP_NEWTON_CUTOFF
 #define FIXED_TRIG_RECIP_NEWTON_CUTOFF 40
 #endif
@@ -218,38 +211,9 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     {
         _fixed_tan_rotate_tab[n](wx, wy, used, num);
     }
-    else if (n < FIXED_TRIG_ROTATE_PROD_CUTOFF)
-    {
-        flint_mpn_zero(wx, n);
-        wx[n] = 1;
-        flint_mpn_zero(wy, wn);
-
-        for (j = 0; j < num; j++)
-        {
-            slong ii = used[j], q = ii / FLINT_BITS;
-            int b = (int) (ii - q * FLINT_BITS);
-
-            flint_mpn_zero(va + (wn - q), q);
-            flint_mpn_zero(vb + (n - q), q);
-            if (b != 0)
-            {
-                mpn_rshift(va, wx + q, wn - q, b);
-                if (n - q > 0)
-                    mpn_rshift(vb, wy + q, n - q, b);
-            }
-            else
-            {
-                flint_mpn_copyi(va, wx + q, wn - q);
-                if (n - q > 0)
-                    flint_mpn_copyi(vb, wy + q, n - q);
-            }
-            mpn_sub(wx, wx, wn, vb, n);
-            mpn_add(wy, wy, wn, va, n);
-        }
-    }
     else
     {
-        /* Growing-extent form of the same product, the trig analogue
+        /* Growing-extent form of the rotation product, the trig analogue
            of the exp product reconstruction: with the used indices
            ascending write W = (1 - alpha) + i b, alpha, b >= 0
            (alpha starts at 0 and only grows; b stays below 1 since
@@ -273,7 +237,10 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
         TMP_INIT;
 
         TMP_START;
-        alloc = wn + 16;
+        /* extent below capd + 63 + max_index bits; a fixed "+ 16"
+           slack overflowed on 32-bit limbs at large r, exactly as
+           in the exp product reconstruction */
+        alloc = wn + 4 + ((num > 0) ? used[num - 1] : 0) / FLINT_BITS;
         aa = TMP_ALLOC(4 * alloc * sizeof(ulong));
         at = aa + alloc;
         ba = at + alloc;

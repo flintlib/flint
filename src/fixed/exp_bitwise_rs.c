@@ -413,7 +413,13 @@ _fixed_exp_recon_prod(nn_ptr y, slong ylen, const slong * used,
     TMP_INIT;
 
     TMP_START;
-    alloc = ylen + 16;      /* extent <= capd + 63 + r < 64 alloc */
+    /* the mantissa extent stays below capd + 63 + max_index bits:
+       the depth cap plus one partial limb plus one factor's shift.
+       A fixed "+ 16" slack here encoded max_index / 64 <= 12 and
+       OVERFLOWED on 32-bit limbs, where the same indices span twice
+       the limbs (an all-ones input at n = 420, r >= 576 corrupted
+       the product a few limbs deep) */
+    alloc = ylen + 4 + used[num - 1] / FLINT_BITS;
     m = TMP_ALLOC((2 * alloc + alloc + ylen + 2) * sizeof(ulong));
     t = m + alloc;
     prod = t + alloc;

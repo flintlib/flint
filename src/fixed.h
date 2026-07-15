@@ -394,6 +394,9 @@ extern FLINT_TLS_PREFIX slong _fixed_atans_r;
    (exp_sum_bs.c); T needs (N (r + 128))/64 + 4 limbs, Q needs
    (N bits(N+1))/64 + 3 */
 slong _fixed_exp_bs_num_terms(flint_bitcnt_t r, slong prec);
+void _fixed_exp_burst_factor(nn_ptr F, slong * fn, slong * fexp,
+    nn_srcptr T, slong tn, nn_srcptr Q, slong qn,
+    flint_bitcnt_t Qexp, slong cap);
 void _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q,
     slong * qn, flint_bitcnt_t * Qexp, nn_srcptr xp, slong xn,
     flint_bitcnt_t r, slong N);

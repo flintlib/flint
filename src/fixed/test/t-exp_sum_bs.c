@@ -23,7 +23,8 @@ TEST_FUNCTION_START(fixed_exp_sum_bs, state)
     {
         slong xn = 1 + n_randint(state, 6);
         flint_bitcnt_t r = FLINT_BITS * (xn + n_randint(state, 4));
-        slong N = 1 + n_randint(state, 300);
+        slong N = 1 + n_randint(state,
+            (iter % 13 == 0) ? 1600 : 300);
         slong tn, qn, i;
         flint_bitcnt_t Qexp;
         nn_ptr xp, T, Q;
@@ -65,6 +66,66 @@ TEST_FUNCTION_START(fixed_exp_sum_bs, state)
         fmpz_clear(x); fmpz_clear(Ta); fmpz_clear(Qa);
         fmpz_clear(Tm); fmpz_clear(Qm);
         flint_free(xp); flint_free(T); flint_free(Q);
+    }
+
+    /* the factor assembly reproduces Q 2^Qexp + T on both its
+       branches: exactly below the cap window, and as a top window
+       with the dropped bits (under one at the limb-aligned bottom)
+       in the exponent */
+    for (iter = 0; iter < 50 + 50 * flint_test_multiplier(); iter++)
+    {
+        slong cap = 2 + n_randint(state, 8);
+        /* the helper requires Q inside the window: qb < 64 (cap+1) */
+        slong qn = 1 + n_randint(state, cap);
+        slong tn = n_randint(state, cap + 2);
+        flint_bitcnt_t Qexp = n_randint(state,
+            FLINT_BITS * (cap + 4));
+        slong fn, fexp;
+        nn_ptr Q, T, F;
+        fmpz_t exact, got, low;
+
+        Q = flint_malloc(qn * sizeof(ulong));
+        T = flint_malloc(FLINT_MAX(tn, 1) * sizeof(ulong));
+        F = flint_malloc((cap + 3) * sizeof(ulong));
+        flint_mpn_urandomb(Q, state, FLINT_BITS * qn);
+        Q[qn - 1] |= UWORD(1) << (FLINT_BITS - 1
+            - n_randint(state, FLINT_BITS));
+        while (qn > 1 && Q[qn - 1] == 0)
+            qn--;
+        if (tn > 0)
+            flint_mpn_urandomb(T, state, FLINT_BITS * tn);
+        while (tn > 0 && T[tn - 1] == 0)
+            tn--;
+        /* keep the invariant T < Q 2^Qexp (F < 1.5 Q 2^Qexp): drop
+           T when it would dominate */
+        if (FLINT_BITS * tn > (slong) Qexp)
+            tn = 0;
+
+        fmpz_init(exact); fmpz_init(got); fmpz_init(low);
+        fmpz_set_ui_array(exact, Q, qn);
+        fmpz_mul_2exp(exact, exact, Qexp);
+        if (tn > 0)
+        {
+            fmpz_set_ui_array(low, T, tn);
+            fmpz_add(exact, exact, low);
+        }
+
+        _fixed_exp_burst_factor(F, &fn, &fexp, T, tn, Q, qn,
+            Qexp, cap);
+
+        fmpz_set_ui_array(got, F, fn);
+        fmpz_mul_2exp(got, got, fexp);
+        fmpz_sub(low, exact, got);
+        /* 0 <= exact - got < 2^fexp, and exact when fexp = 0 */
+        if (fmpz_sgn(low) < 0
+            || fmpz_sizeinbase(low, 2) > (ulong) FLINT_MAX(fexp, 1)
+            || (fexp == 0 && !fmpz_is_zero(low)))
+            TEST_FUNCTION_FAIL("factor: cap = %wd, qn = %wd, "
+                "tn = %wd, Qexp = %wd\n", cap, qn, tn,
+                (slong) Qexp);
+
+        fmpz_clear(exact); fmpz_clear(got); fmpz_clear(low);
+        flint_free(Q); flint_free(T); flint_free(F);
     }
 
     /* the terms helper agrees with the arb pair it ports, up to the
