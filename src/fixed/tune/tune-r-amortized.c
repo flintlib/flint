@@ -55,19 +55,9 @@ static void
 tables_reset(which_t w)
 {
     if (w == F_EXP || w == F_LOG1P)
-    {
-        flint_free(_fixed_exp_logs);
-        _fixed_exp_logs = NULL;
-        _fixed_exp_logs_n = 0;
-        _fixed_exp_logs_r = 0;
-    }
+        _fixed_exp_logs_clear();
     else
-    {
-        flint_free(_fixed_atans);
-        _fixed_atans = NULL;
-        _fixed_atans_n = 0;
-        _fixed_atans_r = 0;
-    }
+        _fixed_atans_clear();
 }
 
 static void

@@ -33,24 +33,25 @@ TEST_FUNCTION_START(fixed_tab_floor, state)
         _fixed_exp_logs_ensure(nv, rc);
         _fixed_atans_ensure(nv, rc);
 
-        nc = _fixed_exp_logs_n;
+        /* compare at the requested width nv through the exported
+           entry accessors (the thread-local data is not
+           DLL-exported): exact floors truncate to exact floors, so
+           this checks the guarantee at every ensure width */
+        nc = nv;
         exact = flint_malloc(nc * sizeof(ulong));
 
         for (i = 0; i <= rc; i++)
         {
-            _fixed_tab_entry_exact(exact, 0, (ulong) i, nc - 1);
-            if (mpn_cmp(exact, _fixed_exp_logs + i * nc + 1, nc - 1) != 0)
+            _fixed_tab_entry_exact(exact, 0, (ulong) i, nc);
+            if (mpn_cmp(exact, _fixed_exp_logs_entry(i, nc), nc) != 0)
                 TEST_FUNCTION_FAIL("logs: nv = %wd, rc = %wd, "
                     "i = %wd\n", nv, rc, i);
         }
-        flint_free(exact);
 
-        nc = _fixed_atans_n;
-        exact = flint_malloc(nc * sizeof(ulong));
         for (i = 0; i <= rc; i++)
         {
-            _fixed_tab_entry_exact(exact, 1, (ulong) i, nc - 1);
-            if (mpn_cmp(exact, _fixed_atans + i * nc + 1, nc - 1) != 0)
+            _fixed_tab_entry_exact(exact, 1, (ulong) i, nc);
+            if (mpn_cmp(exact, _fixed_atans_entry(i, nc), nc) != 0)
                 TEST_FUNCTION_FAIL("atans: nv = %wd, rc = %wd, "
                     "i = %wd\n", nv, rc, i);
         }

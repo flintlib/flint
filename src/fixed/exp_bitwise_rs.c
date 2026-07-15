@@ -363,6 +363,18 @@ _fixed_exp_logs_entry(slong i, slong n)
         + (_fixed_exp_logs_n - n);
 }
 
+/* free the cached table (tuning programs measure cold rebuilds;
+   exported so that code outside the library never touches the
+   thread-local data directly) */
+void
+_fixed_exp_logs_clear(void)
+{
+    flint_free(_fixed_exp_logs);
+    _fixed_exp_logs = NULL;
+    _fixed_exp_logs_n = 0;
+    _fixed_exp_logs_r = 0;
+}
+
 /* the largest index the cached table currently covers */
 slong
 _fixed_exp_logs_max_index(void)

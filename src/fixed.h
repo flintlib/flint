@@ -248,6 +248,7 @@ void _fixed_exp_rs_fallback(nn_ptr res, nn_srcptr x, slong n);
    this thread. */
 void _fixed_exp_logs_ensure(slong nv, slong rc);
 nn_srcptr _fixed_exp_logs_entry(slong i, slong n);
+void _fixed_exp_logs_clear(void);
 slong _fixed_exp_logs_max_index(void);
 
 /* Internal: number of slots the used array of _fixed_bitwise_reduce
@@ -314,6 +315,7 @@ void fixed_rsqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n);
 void fixed_sqrt_newton_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n);
 void fixed_sqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n);
 nn_srcptr _fixed_atans_entry(slong i, slong n);
+void _fixed_atans_clear(void);
 slong _fixed_atans_max_index(void);
 void _fixed_sin_cos_rs_fallback(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
     slong n, int alternating);
@@ -407,6 +409,14 @@ void _fixed_tab_entry_exact(nn_ptr e, int which, ulong i, slong nc);
 
 FLINT_DLL extern const ulong _fixed_exp_logs_static[(FIXED_STATIC_TAB_R + 1) * FIXED_STATIC_TAB_N];
 FLINT_DLL extern const ulong _fixed_atans_static[(FIXED_STATIC_TAB_R + 1) * FIXED_STATIC_TAB_N];
+
+/* NOTE: the two inline _tab accessors below dereference the
+   thread-local table data and are therefore usable only from
+   translation units compiled INTO the library.  Code linking
+   against a Windows DLL (tests, tuning and profiling programs)
+   must use the exported _fixed_*_entry / _fixed_*_ensure /
+   _fixed_*_clear functions instead: thread-local data cannot be
+   DLL-exported, so direct references fail to link there. */
 
 FIXED_STATIC_TAB_INLINE nn_srcptr
 _fixed_exp_logs_tab(slong nv, slong rc, slong * nc)

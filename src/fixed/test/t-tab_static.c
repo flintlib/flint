@@ -21,25 +21,25 @@ TEST_FUNCTION_START(fixed_tab_static, state)
 {
     slong i, j;
 
+    /* go through the exported entry accessors: the thread-local
+       table data itself is not DLL-exported on Windows */
     _fixed_exp_logs_ensure(FIXED_STATIC_TAB_N, FIXED_STATIC_TAB_R);
     _fixed_atans_ensure(FIXED_STATIC_TAB_N, FIXED_STATIC_TAB_R);
 
-    if (_fixed_exp_logs_n < FIXED_STATIC_TAB_N + 1
-        || _fixed_atans_n < FIXED_STATIC_TAB_N + 1)
-        TEST_FUNCTION_FAIL("dynamic stride too small\n");
-
     for (i = 0; i <= FIXED_STATIC_TAB_R; i++)
+    {
+        nn_srcptr el = _fixed_exp_logs_entry(i, FIXED_STATIC_TAB_N);
+        nn_srcptr ea = _fixed_atans_entry(i, FIXED_STATIC_TAB_N);
         for (j = 0; j < FIXED_STATIC_TAB_N; j++)
         {
             if (_fixed_exp_logs_static[i * FIXED_STATIC_TAB_N + j]
-                != _fixed_exp_logs[i * _fixed_exp_logs_n
-                    + (_fixed_exp_logs_n - FIXED_STATIC_TAB_N) + j])
+                != el[j])
                 TEST_FUNCTION_FAIL("logs entry %wd limb %wd\n", i, j);
             if (_fixed_atans_static[i * FIXED_STATIC_TAB_N + j]
-                != _fixed_atans[i * _fixed_atans_n
-                    + (_fixed_atans_n - FIXED_STATIC_TAB_N) + j])
+                != ea[j])
                 TEST_FUNCTION_FAIL("atans entry %wd limb %wd\n", i, j);
         }
+    }
 
     TEST_FUNCTION_END(state);
 }

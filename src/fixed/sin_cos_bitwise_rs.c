@@ -75,6 +75,16 @@
 FLINT_TLS_PREFIX nn_ptr _fixed_atans = NULL;
 FLINT_TLS_PREFIX slong _fixed_atans_n = 0;
 FLINT_TLS_PREFIX slong _fixed_atans_r = 0;
+
+/* free the cached table; see _fixed_exp_logs_clear */
+void
+_fixed_atans_clear(void)
+{
+    flint_free(_fixed_atans);
+    _fixed_atans = NULL;
+    _fixed_atans_n = 0;
+    _fixed_atans_r = 0;
+}
 static FLINT_TLS_PREFIX int _fixed_atans_cleanup_registered = 0;
 
 static void
