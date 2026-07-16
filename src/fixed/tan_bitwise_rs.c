@@ -434,7 +434,7 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
             {
                 flint_mpn_zero(u2, n);
                 mpn_neg(u2 + n, rt, n); /* (1 - sin^2) 2^(128n) */
-                mpn_sqrtrem(rt, sc, u2, 2 * n);
+                mpn_sqrtrem(rt, NULL, u2, 2 * n);
                 mpn_neg(cc, rt, n);     /* g 2^(64n) */
             }
             else

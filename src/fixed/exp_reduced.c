@@ -539,7 +539,7 @@ fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn, flint_bitcnt_t r,
            experiments beyond that range.  See dev/notes. */
         if (wn < FIXED_EXP_SQRT_NEWTON_CUTOFF)
         {
-            mpn_sqrtrem(rt, rem, u2, 2 * wn + 1);
+            mpn_sqrtrem(rt, NULL, u2, 2 * wn + 1);
         }
         else
         {

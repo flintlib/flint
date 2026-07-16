@@ -191,7 +191,7 @@ fixed_rsqrt_newton(nn_ptr Q, nn_srcptr A, slong An, slong n)
         /* W = T^2 with 2m fraction limbs (full product; nearly all
            its limbs are consumed below) */
         W = TMP_ALLOC(2 * Tn * sizeof(ulong));
-        flint_mpn_mul(W, T, Tn, T, Tn);
+        flint_mpn_sqr(W, T, Tn);
 
         /* U ~= 1 - A'*T^2 with n fraction limbs, via the middle
            product + control limb construction of fixed_inv_newton */
@@ -343,6 +343,7 @@ fixed_sqrt_newton(nn_ptr Q, nn_srcptr A, slong An, slong n)
        guard limbs; the full square has 2m fraction limbs, so the band
        starts 2m - n limbs up */
     FLINT_ASSERT(2 * m - n - 2 >= 0);
+
     U = TMP_ALLOC((2 + Un) * sizeof(ulong));
     flint_mpn_mulmid(U, TShigh, Tn, TShigh, Tn,
         2 * m - n - 2, 2 * m - n + Un);
