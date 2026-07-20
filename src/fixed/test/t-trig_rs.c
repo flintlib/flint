@@ -76,14 +76,13 @@ TEST_FUNCTION_START(fixed_trig_rs, state)
         mask_top2(x, n, zbits);
         /* pin the effective geometry on the deterministic sweep:
            rrandom's blocky patterns can zero whole limbs, silently
-           shifting which specialization the dispatch selects */
-        if (det)
-        {
-            if (zbits == 32)
-                x[n - 1] |= UWORD(1) << 16;
-            else if (n >= 2)
-                x[n - 2] |= UWORD(1) << 16;
-        }
+           shifting which specialization the dispatch selects.  The
+           pinned bit goes in the first limb wholly below the mask
+           (bit 16 sits under the partial 32-bit mask on 64-bit
+           machines), so the arguments keep the promised zbits
+           leading zeros on every limb size */
+        if (det && n - 1 - zbits / FLINT_BITS >= 0)
+            x[n - 1 - zbits / FLINT_BITS] |= UWORD(1) << 16;
 
         xr[0] = 0;
         flint_mpn_copyi(xr + 1, x, n);

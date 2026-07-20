@@ -20,7 +20,8 @@
        (x B^-D) (Q B^QE - B B^be) / (Q B^QE) ~ sin(x B^-D)
 
    within the truncated tree's working accuracy (relative
-   2^(-64 (lmax - 1) + 40) covers the one-sided drop class with
+   2^(-FLINT_BITS (lmax - 1) + 40) covers the one-sided drop class
+   with
    margin) plus the series tail beyond N terms */
 
 TEST_FUNCTION_START(fixed_sin_cos_sum_bs, state)
@@ -32,15 +33,16 @@ TEST_FUNCTION_START(fixed_sin_cos_sum_bs, state)
     {
         slong D = 1 + n_randint(state, 60);
         slong xn = 1 + n_randint(state, D);
-        slong xbits = 64 * (xn - 1) + 1
-            + (slong) n_randint(state, 64);
+        slong xbits = FLINT_BITS * (xn - 1) + 1
+            + (slong) n_randint(state, FLINT_BITS);
         slong N = 1 + n_randint(state, 60);
         slong lmax = 4 + n_randint(state, 40);
         nn_ptr x, A, B, Q;
         slong an, bn, qn, ae, be, qb2, QE;
         fmpz_t fx, fa, fb, fq;
         arb_t va, vb, ra, rb, t, tol, tail;
-        slong prec = 128 * D + 64 * lmax + 64 * N + 512;
+        slong prec = 2 * FLINT_BITS * D + FLINT_BITS * lmax
+            + FLINT_BITS * N + 512;
 
         x = flint_malloc((xn + 1) * sizeof(ulong));
         flint_mpn_urandomb(x, state, (flint_bitcnt_t) xbits);
@@ -69,17 +71,17 @@ TEST_FUNCTION_START(fixed_sin_cos_sum_bs, state)
 
         /* va = A B^ae / (Q B^QE) ~ 1 - cos(x B^-D) */
         arb_set_fmpz(va, fa);
-        arb_mul_2exp_si(va, va, 64 * ae);
+        arb_mul_2exp_si(va, va, FLINT_BITS * ae);
         arb_set_fmpz(t, fq);
-        arb_mul_2exp_si(t, t, 64 * QE);
+        arb_mul_2exp_si(t, t, FLINT_BITS * QE);
         arb_div(va, va, t, prec);
         /* vb = (x B^-D)(Q B^QE - B B^be)/(Q B^QE) ~ sin */
         arb_set_fmpz(vb, fb);
-        arb_mul_2exp_si(vb, vb, 64 * be);
+        arb_mul_2exp_si(vb, vb, FLINT_BITS * be);
         arb_sub(vb, t, vb, prec);
         arb_div(vb, vb, t, prec);
         arb_set_fmpz(t, fx);
-        arb_mul_2exp_si(t, t, -64 * D);
+        arb_mul_2exp_si(t, t, -FLINT_BITS * D);
         arb_mul(vb, vb, t, prec);
 
         arb_sin_cos(rb, ra, t, prec);
@@ -92,9 +94,9 @@ TEST_FUNCTION_START(fixed_sin_cos_sum_bs, state)
         arb_abs(rb, rb);
 
         arb_abs(tol, va);
-        arb_mul_2exp_si(tol, tol, -64 * (lmax - 1) + 40);
+        arb_mul_2exp_si(tol, tol, -FLINT_BITS * (lmax - 1) + 40);
         arb_set_fmpz(tail, fx);
-        arb_mul_2exp_si(tail, tail, -64 * D);
+        arb_mul_2exp_si(tail, tail, -FLINT_BITS * D);
         arb_pow_ui(tail, tail, 2 * (ulong) N + 2, 128);
         arb_add(tol, tol, tail, 128);
         if (!arb_le(ra, tol))
@@ -102,9 +104,9 @@ TEST_FUNCTION_START(fixed_sin_cos_sum_bs, state)
                 "N = %wd, lmax = %wd\n", D, xbits, N, lmax);
 
         arb_abs(tol, vb);
-        arb_mul_2exp_si(tol, tol, -64 * (lmax - 1) + 40);
+        arb_mul_2exp_si(tol, tol, -FLINT_BITS * (lmax - 1) + 40);
         arb_set_fmpz(tail, fx);
-        arb_mul_2exp_si(tail, tail, -64 * D);
+        arb_mul_2exp_si(tail, tail, -FLINT_BITS * D);
         arb_pow_ui(tail, tail, 2 * (ulong) N + 1, 128);
         arb_add(tol, tol, tail, 128);
         if (!arb_le(rb, tol))
