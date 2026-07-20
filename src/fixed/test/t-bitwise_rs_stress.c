@@ -359,5 +359,48 @@ TEST_FUNCTION_START(fixed_bitwise_rs_stress, state)
         fmpz_clear(f);
     }
 
+    /* cache lifecycle: the loop above has warmed both cached
+       reduction tables; query the angle-table extent, free the
+       tables through the public explicit-clear entry points, and
+       verify that fresh calls rebuild them and still compute
+       correctly; finish with flint_cleanup to run the registered
+       thread-exit path over freshly rebuilt tables as well */
+    {
+        ulong x[3], y[4];
+        arb_t xa, exact;
+        fmpz_t f;
+        double u;
+        slong n = 3, prec = FLINT_BITS * n + 128;
+
+        if (_fixed_atans_max_index() < 1)
+            TEST_FUNCTION_FAIL("angle table not warmed\n");
+
+        _fixed_exp_logs_clear();
+        _fixed_atans_clear();
+
+        arb_init(xa); arb_init(exact); fmpz_init(f);
+        flint_mpn_rrandom(x, state, n);
+        x[n - 1] >>= 1;
+
+        fixed_exp_bitwise_rs(y, x, n, 64);
+        fmpz_set_ui_array(f, x, n);
+        arb_set_fmpz(xa, f);
+        arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
+        arb_exp(exact, xa, prec);
+        u = ulp_error_vs_arb(y, n + 1, exact, n);
+        if (u > (double) FIXED_EXP_BITWISE_RS_MAX_ERR(n, 64))
+            TEST_FUNCTION_FAIL("exp after cleanup: ulp = %f\n", u);
+
+        fixed_tan_bitwise_rs(y, x, n, 64);
+        arb_tan(exact, xa, prec);
+        u = ulp_error_vs_arb(y, n + 1, exact, n);
+        if (u > (double) FIXED_TAN_BITWISE_RS_MAX_ERR(n, 64))
+            TEST_FUNCTION_FAIL("tan after cleanup: ulp = %f\n", u);
+
+        arb_clear(xa); arb_clear(exact); fmpz_clear(f);
+
+        flint_cleanup();
+    }
+
     TEST_FUNCTION_END(state);
 }

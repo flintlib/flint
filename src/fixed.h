@@ -78,6 +78,46 @@ void fixed_exp_rs(nn_ptr res, nn_srcptr x, slong n);
 void fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn,
     flint_bitcnt_t r, int alg);
 
+/* sin(t) and g = 1 - cos(t) of a reduced argument t < 2^-r,
+   r >= 16 (the series algorithms 1 and 2 require r >= 32), into
+   (ysin, wn) and (yg, wn); the trigonometric analogue of
+   fixed_exp_reduced.  alg: 0 = tuned automatic choice, 1 = direct
+   sine + cosine rectangular-splitting series, 2 = sine series plus
+   a squaring and a square root, 3 = one bit-burst step + series,
+   4 = full bit-burst.  Error at most FIXED_SIN_COS_REDUCED_MAX_ERR
+   ulps on each output. */
+#define FIXED_SIN_COS_REDUCED_MAX_ERR 96
+void fixed_sin_cos_reduced(nn_ptr ysin, nn_ptr yg, nn_srcptr t,
+    slong wn, flint_bitcnt_t r, int alg);
+
+/* exp, sine and cosine on [0, 1) without table-based argument
+   reduction: leading-zero inspection, repeated halving to a tuned
+   depth r(n), fixed_*_reduced, and squarings back (for the
+   trigonometric pair, cosine doublings and one final square root
+   for the sine), with internal guard limbs keeping the doubling
+   amplification below one output ulp.  Outputs carry n fraction
+   limbs and a unit limb.  Errors at most the *_MAX_ERR ulps. */
+#define FIXED_EXP_NOTAB_MAX_ERR 128
+void fixed_exp_notab(nn_ptr y, nn_srcptr x, slong n);
+#define FIXED_SIN_COS_NOTAB_MAX_ERR 128
+void fixed_sin_cos_notab(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
+    slong n);
+
+/* internal forced-depth workers (the public entry points choose r
+   from tuned tables; these take it explicitly, for tuning) */
+void _fixed_exp_notab_r(nn_ptr y, nn_srcptr x, slong n, int r);
+void _fixed_sin_cos_notab_r(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
+    slong n, int r);
+
+/* notab tuning: the trigonometric bit-burst boundary and the sine
+   square root's Newton cutoff */
+#ifndef FIXED_SIN_COS_NOTAB_BURST_CUTOFF
+#define FIXED_SIN_COS_NOTAB_BURST_CUTOFF 1200
+#endif
+#ifndef FIXED_SIN_COS_NOTAB_SQRT_NEWTON_CUTOFF
+#define FIXED_SIN_COS_NOTAB_SQRT_NEWTON_CUTOFF 2000
+#endif
+
 void fixed_exp_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r);
 
 /* fully specialized per-size implementations (default dispatch;
@@ -394,12 +434,13 @@ extern FLINT_TLS_PREFIX slong _fixed_atans_r;
    (exp_sum_bs.c); T needs (N (r + 128))/64 + 4 limbs, Q needs
    (N bits(N+1))/64 + 3 */
 slong _fixed_exp_bs_num_terms(flint_bitcnt_t r, slong prec);
-void _fixed_exp_burst_factor(nn_ptr F, slong * fn, slong * fexp,
-    nn_srcptr T, slong tn, nn_srcptr Q, slong qn,
-    flint_bitcnt_t Qexp, slong cap);
+void _fixed_sin_cos_sum_bs_powtab(nn_ptr A, slong * an, slong * ae,
+    nn_ptr B, slong * bn, slong * be, nn_ptr Q, slong * qn,
+    slong * QE, nn_srcptr xp, slong xn, slong D, slong N,
+    slong lmax);
 void _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q,
-    slong * qn, flint_bitcnt_t * Qexp, nn_srcptr xp, slong xn,
-    flint_bitcnt_t r, slong N);
+    slong * qn, slong * QE, nn_srcptr xp, slong xn, slong D,
+    slong N);
 
 /* internal: exact-floor entry helpers (tab_exact.c) */
 int _fixed_tab_store_floor(nn_ptr e, const arb_t x, slong nc, slong prec);

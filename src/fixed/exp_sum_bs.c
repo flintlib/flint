@@ -209,180 +209,46 @@ nnn_mul(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn)
     return nnn_normalize(z, an + bn);
 }
 
-/* z = a << e (bits), z not aliased below a; returns length */
+/* strip trailing zero LIMBS of q into the limb exponent *e: the
+   limb-granular 2-valuation normalization of the base-B kernel
+   (the factorial product Q = prod k carries val_2(N!) ~ N bits of
+   2-adic content, i.e. whole dead limbs once N exceeds ~64, which
+   would otherwise ride along through every Q Q2 and T Q2 product) */
 static slong
-nnn_shl(nn_ptr z, nn_srcptr a, slong an, flint_bitcnt_t e)
+nnn_strip_low(nn_ptr q, slong qn, slong * e)
 {
-    slong q = e / FLINT_BITS;
-    int b = (int) (e % FLINT_BITS);
-    if (an == 0)
-        return 0;
-    flint_mpn_zero(z, q);
-    if (b)
+    slong z = 0;
+    while (z < qn - 1 && q[z] == 0)
+        z++;
+    if (z > 0)
     {
-        z[an + q] = mpn_lshift(z + q, a, an, b);
-        return nnn_normalize(z, an + q + 1);
+        flint_mpn_copyi(q, q + z, qn - z);
+        *e += z;
+        qn -= z;
     }
-    flint_mpn_copyi(z + q, a, an);
-    return an + q;
+    return qn;
 }
 
-/* z += a (in place, z has room); returns new length */
-static slong
-nnn_add(nn_ptr z, slong zn, nn_srcptr a, slong an)
+/* power table: xpow[i] = x^(xexp[i]), by squarings, preferring
+   squares of the previous entries (same structure as the arb
+   original, which guarantees one of the four cases applies).
+   Returns the malloc'd backing storage (caller frees).
+
+   When xoff is non-NULL, each entry is stored with its trailing
+   zero LIMBS stripped and xpow[i] B^xoff[i] = x^xexp[i]: the
+   2-adic content of x multiplies under powering
+   (val_2(x^e) = e val_2(x)), so even a sub-limb val_2(x) turns
+   into whole dead limbs at higher powers, and squaring a stripped
+   entry inherits twice its offset before fresh stripping.  With
+   xoff NULL nothing is stripped (the bit-granular kernel keeps
+   its arb-identical layout). */
+static nn_ptr
+build_xpow_table(nn_srcptr xp, slong xn, const slong * xexp,
+    slong length, nn_srcptr * xpow, slong * xlen, slong * xoff)
 {
-    ulong cy;
-    if (an == 0)
-        return zn;
-    if (zn >= an)
-    {
-        cy = mpn_add(z, z, zn, a, an);
-        z[zn] = cy;
-        return zn + (cy != 0);
-    }
-    flint_mpn_zero(z + zn, an - zn);
-    cy = mpn_add(z, a, an, z, zn);
-    z[an] = cy;
-    return an + (cy != 0);
-}
-
-/* ---- the recursion ---- */
-
-typedef struct
-{
-    const slong * xexp;
-    nn_srcptr * xpow;
-    const slong * xlen;
-    flint_bitcnt_t r;
-    slong xn;               /* limbs of x, for size bounds */
-}
-bs_args;
-
-/* T length bound for the range [a, b): T spans Qexp + O(qbits)
-   bits with Qexp = sum (r + ctz) over the range, so the r term is
-   intrinsic -- the splitting integers scale with r, which is why a
-   bit-burst caller slicing on limb boundaries pays a factor
-   (64 D) / r in tree content over bit-granular slices (measured
-   ~1.5x peak RSS vs arb_exp_arf_bb at r = 16; see dev/notes) */
-static slong
-tbound(const bs_args * args, slong a, slong b)
-{
-    /* T < Q 2^Qexp: Qexp <= (b-a)(r+64) and Q < b^(b-a) */
-    return ((b - a) * ((slong) args->r + 2 * FLINT_BITS))
-        / FLINT_BITS + 4;
-}
-
-static slong
-qbound(const bs_args * args, slong a, slong b)
-{
-    return ((b - a) * FLINT_BIT_COUNT((ulong) b + 1)) / FLINT_BITS + 3;
-}
-
-static void
-bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn,
-    flint_bitcnt_t * Qexp, const bs_args * args, slong a, slong b)
-{
-    int cc;
-
-    if (b - a == 1)
-    {
-        cc = flint_ctz((ulong) (a + 1));
-        Q[0] = (ulong) (a + 1) >> cc;
-        *qn = 1;
-        *Qexp = args->r + cc;
-        flint_mpn_copyi(T, args->xpow[0], args->xlen[0]);
-        *tn = args->xlen[0];
-    }
-    else if (b - a == 2)
-    {
-        /* T = x (a+2) 2^r + x^2 */
-        nn_ptr t1;
-        slong l1;
-        TMP_INIT;
-        TMP_START;
-        t1 = TMP_ALLOC((args->xlen[0] + 2) * sizeof(ulong));
-        t1[args->xlen[0]] = mpn_mul_1(t1, args->xpow[0],
-            args->xlen[0], (ulong) (a + 2));
-        l1 = nnn_normalize(t1, args->xlen[0] + 1);
-        *tn = nnn_shl(T, t1, l1, args->r);
-        FLINT_ASSERT(args->xexp[1] == 2);
-        *tn = nnn_add(T, *tn, args->xpow[1], args->xlen[1]);
-        TMP_END;
-
-        cc = flint_ctz((ulong) (a + 2));
-        Q[0] = (ulong) (a + 2) >> cc;
-        *Qexp = args->r + cc;
-        cc = flint_ctz((ulong) (a + 1));
-        {
-            ulong hi;
-            umul_ppmm(hi, Q[0], Q[0], (ulong) (a + 1) >> cc);
-            Q[1] = hi;
-            *qn = 1 + (hi != 0);
-        }
-        *Qexp += args->r + cc;
-    }
-    else
-    {
-        slong step, m, i, t2n, q2n, l;
-        flint_bitcnt_t Q2exp;
-        nn_ptr T2, Q2, sc;
-        TMP_INIT;
-
-        step = (b - a) / 2;
-        m = a + step;
-
-        TMP_START;
-        T2 = TMP_ALLOC((tbound(args, m, b) + qbound(args, m, b)
-            + tbound(args, a, b) + 8) * sizeof(ulong));
-        Q2 = T2 + tbound(args, m, b);
-        sc = Q2 + qbound(args, m, b);
-
-        bsplit(T, tn, Q, qn, Qexp, args, a, m);
-        bsplit(T2, &t2n, Q2, &q2n, &Q2exp, args, m, b);
-
-        /* T = (T Q2) << Q2exp + x^step T2 */
-        l = nnn_mul(sc, T, *tn, Q2, q2n);
-        *tn = nnn_shl(T, sc, l, Q2exp);
-        i = get_exp_pos(args->xexp, step);
-        l = nnn_mul(sc, args->xpow[i], args->xlen[i], T2, t2n);
-        *tn = nnn_add(T, *tn, sc, l);
-
-        /* Q = Q Q2 */
-        l = nnn_mul(sc, Q, *qn, Q2, q2n);
-        flint_mpn_copyi(Q, sc, l);
-        *qn = l;
-        *Qexp = *Qexp + Q2exp;
-        TMP_END;
-    }
-}
-
-/* T (returned length *tn) / (Q (*qn) 2^Qexp) = the sum above.
-   T must have room for ((N (r + 128)) / 64 + 4) limbs and Q for
-   ((N bits(N+1)) / 64 + 3) limbs. */
-void
-_fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q, slong * qn,
-    flint_bitcnt_t * Qexp, nn_srcptr xp, slong xn, flint_bitcnt_t r,
-    slong N)
-{
-    slong xexp[2 * FLINT_BITS];
-    slong xlen[2 * FLINT_BITS];
-    nn_srcptr xpow[2 * FLINT_BITS];
     nn_ptr storage;
-    slong length, i, off;
-    bs_args args;
+    slong i, off;
 
-    FLINT_ASSERT(N >= 1 && xn >= 1 && xp[xn - 1] != 0);
-    /* the size bounds assume a chunk-sized argument x < 2^r */
-    FLINT_ASSERT(FLINT_BITS * (xn - 1) + FLINT_BIT_COUNT(xp[xn - 1])
-        <= (slong) r);
-
-    for (i = 0; i < 2 * FLINT_BITS; i++)
-        xexp[i] = 0;
-    length = compute_bs_exponents(xexp, N);
-
-    /* power table: xpow[i] = x^(xexp[i]), by squarings, preferring
-       squares of the previous entries (same structure as the arb
-       original, which guarantees one of the four cases applies) */
     {
         slong total = 0;
         for (i = 0; i < length; i++)
@@ -395,6 +261,8 @@ _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q, slong * qn,
         nn_ptr dst = storage + off;
         off += xexp[i] * xn + 1;
 
+        slong off2 = 0;
+
         if (i == 0)
         {
             FLINT_ASSERT(xexp[0] == 1);
@@ -405,11 +273,15 @@ _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q, slong * qn,
         {
             flint_mpn_sqr(dst, xpow[i - 1], xlen[i - 1]);
             xlen[i] = nnn_normalize(dst, 2 * xlen[i - 1]);
+            if (xoff)
+                off2 = 2 * xoff[i - 1];
         }
         else if (i >= 2 && xexp[i] == 2 * xexp[i - 2])
         {
             flint_mpn_sqr(dst, xpow[i - 2], xlen[i - 2]);
             xlen[i] = nnn_normalize(dst, 2 * xlen[i - 2]);
+            if (xoff)
+                off2 = 2 * xoff[i - 2];
         }
         else
         {
@@ -429,17 +301,210 @@ _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q, slong * qn,
             sl = nnn_normalize(sq, 2 * xlen[src]);
             xlen[i] = nnn_mul(dst, sq, sl, xp, xn);
             flint_free(sq);
+            if (xoff)
+                off2 = 2 * xoff[src] + xoff[0];
+        }
+        if (xoff)
+        {
+            xoff[i] = off2;
+            xlen[i] = nnn_strip_low(dst, xlen[i], &xoff[i]);
         }
         xpow[i] = dst;
     }
+    return storage;
+}
+
+/* ---- the recursion ---- */
+
+typedef struct
+{
+    const slong * xexp;
+    nn_srcptr * xpow;
+    const slong * xlen;
+    const slong * xoff;     /* per-entry limb offsets when the
+                               power table is stored stripped
+                               (base-B kernel); NULL otherwise */
+    flint_bitcnt_t r;
+    slong xn;               /* limbs of x, for size bounds */
+}
+bs_args;
+
+static slong
+qbound(const bs_args * args, slong a, slong b)
+{
+    return ((b - a) * FLINT_BIT_COUNT((ulong) b + 1)) / FLINT_BITS + 3;
+}
+
+/* ==== base-2^FLINT_BITS twin ============================================
+
+   Same sum, but the common power-of-two exponent QE is tracked in
+   LIMBS rather than bits and the argument frame is a whole number of
+   limbs:
+
+       T / (Q B^QE) = sum_{k=1}^{N} x^k / (k! B^(D k)),   B = 2^64,
+
+   x = (xp, xn) with value x B^-D, D >= 1 limbs.  All 2-valuation
+   normalization happens at limb granularity: the factorial factors
+   keep their 2-adic content inside Q (no ctz stripping -- Q is at
+   most the same worst-case size, prod k <= N^(range), merely up to
+   ~N bits denser in practice), and every << Qexp in the recursion
+   becomes a zero-and-copy at a limb offset, with no mpn_lshift
+   anywhere.  The trade, known from the dev notes on limb-aligned
+   burst slicing: the splitting integers scale with the FRAME 64 D
+   instead of the argument's true rate r, a content factor
+   (64 D) / r that matters for r well below the limb size and fades
+   as r grows. */
+
+/* z (length zn) += a B^q, i.e. the addition itself is performed at
+   the limb offset q -- no zeroing or copying of shifted operands
+   except to fill a gap when z does not reach the offset; returns
+   the new length */
+static slong
+nnn_add_shifted(nn_ptr z, slong zn, nn_srcptr a, slong an, slong q)
+{
+    ulong cy;
+
+    if (an == 0)
+        return zn;
+    if (zn <= q)
+    {
+        flint_mpn_zero(z + zn, q - zn);
+        flint_mpn_copyi(z + q, a, an);
+        return q + an;
+    }
+    if (zn - q >= an)
+    {
+        cy = mpn_add(z + q, z + q, zn - q, a, an);
+        z[zn] = cy;
+        return zn + (cy != 0);
+    }
+    cy = mpn_add(z + q, a, an, z + q, zn - q);
+    z[q + an] = cy;
+    return q + an + (cy != 0);
+}
+
+/* T bound in limbs for the range [a, b): T < Q B^QE with
+   QE = (b - a) D and Q < b^(b-a) */
+static slong
+tbound(const bs_args * args, slong D, slong a, slong b)
+{
+    (void) args;
+    return (b - a) * (D + 2) + 4;
+}
+
+static void
+bsplit(nn_ptr T, slong * tn, nn_ptr Q, slong * qn, slong * QE,
+    const bs_args * args, slong D, slong a, slong b)
+{
+    if (b - a == 1)
+    {
+        Q[0] = (ulong) (a + 1);
+        *qn = 1;
+        *QE = D;
+        flint_mpn_zero(T, args->xoff[0]);
+        flint_mpn_copyi(T + args->xoff[0], args->xpow[0],
+            args->xlen[0]);
+        *tn = args->xoff[0] + args->xlen[0];
+    }
+    else if (b - a == 2)
+    {
+        /* T = x (a+2) B^D + x^2: the low term x^2 goes into T
+           directly and the high term is ADDED at limb offset D */
+        nn_ptr t1;
+        slong l1;
+        ulong hi;
+        TMP_INIT;
+        TMP_START;
+        t1 = TMP_ALLOC((args->xlen[0] + 2) * sizeof(ulong));
+        t1[args->xlen[0]] = mpn_mul_1(t1, args->xpow[0],
+            args->xlen[0], (ulong) (a + 2));
+        l1 = nnn_normalize(t1, args->xlen[0] + 1);
+        FLINT_ASSERT(args->xexp[1] == 2);
+        flint_mpn_zero(T, args->xoff[1]);
+        flint_mpn_copyi(T + args->xoff[1], args->xpow[1],
+            args->xlen[1]);
+        *tn = nnn_add_shifted(T, args->xoff[1] + args->xlen[1],
+            t1, l1, D + args->xoff[0]);
+        TMP_END;
+
+        umul_ppmm(hi, Q[0], (ulong) (a + 1), (ulong) (a + 2));
+        Q[1] = hi;
+        *qn = 1 + (hi != 0);
+        *QE = 2 * D;
+    }
+    else
+    {
+        slong step, m, i, t2n, q2n, l, Q2E;
+        nn_ptr T2, Q2, sc;
+        TMP_INIT;
+
+        step = (b - a) / 2;
+        m = a + step;
+
+        TMP_START;
+        T2 = TMP_ALLOC((tbound(args, D, m, b)
+            + qbound(args, m, b)
+            + tbound(args, D, a, b) + 8) * sizeof(ulong));
+        Q2 = T2 + tbound(args, D, m, b);
+        sc = Q2 + qbound(args, m, b);
+
+        bsplit(T, tn, Q, qn, QE, args, D, a, m);
+        bsplit(T2, &t2n, Q2, &q2n, &Q2E, args, D, m, b);
+
+        /* T = (T Q2) B^Q2E + x^step T2: the high product goes to
+           scratch (it reads T), the low product x^step T2 then
+           lands in T directly, and the high part is ADDED at the
+           limb offset Q2E -- no shifted zero-and-copy */
+        l = nnn_mul(sc, T, *tn, Q2, q2n);
+        i = get_exp_pos(args->xexp, step);
+        flint_mpn_zero(T, args->xoff[i]);
+        *tn = args->xoff[i] + nnn_mul(T + args->xoff[i],
+            args->xpow[i], args->xlen[i], T2, t2n);
+        *tn = nnn_add_shifted(T, *tn, sc, l, Q2E);
+
+        /* Q = Q Q2, trailing zero limbs stripped into QE */
+        l = nnn_mul(sc, Q, *qn, Q2, q2n);
+        flint_mpn_copyi(Q, sc, l);
+        *QE = *QE + Q2E;
+        *qn = nnn_strip_low(Q, l, QE);
+        TMP_END;
+    }
+}
+
+/* T (*tn) / (Q (*qn) B^QE) = sum_{k=1}^N x^k / (k! B^(D k)).
+   T must have room for N (D + 2) + 4 limbs and Q for
+   ((N bits(N+1)) / 64 + 3) limbs. */
+void
+_fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q,
+    slong * qn, slong * QE, nn_srcptr xp, slong xn, slong D,
+    slong N)
+{
+    slong xexp[2 * FLINT_BITS];
+    slong xlen[2 * FLINT_BITS];
+    slong xoff[2 * FLINT_BITS];
+    nn_srcptr xpow[2 * FLINT_BITS];
+    nn_ptr storage;
+    slong length, i;
+    bs_args args;
+
+    FLINT_ASSERT(N >= 1 && xn >= 1 && xp[xn - 1] != 0);
+    FLINT_ASSERT(xn <= D);      /* value x B^-D below 1 */
+
+    for (i = 0; i < 2 * FLINT_BITS; i++)
+        xexp[i] = 0;
+    length = compute_bs_exponents(xexp, N);
+
+    storage = build_xpow_table(xp, xn, xexp, length, xpow, xlen,
+        xoff);
 
     args.xexp = xexp;
     args.xpow = xpow;
     args.xlen = xlen;
-    args.r = r;
+    args.xoff = xoff;
+    args.r = 0;
     args.xn = xn;
 
-    bsplit(T, tn, Q, qn, Qexp, &args, 0, N);
+    bsplit(T, tn, Q, qn, QE, &args, D, 0, N);
 
     flint_free(storage);
 }

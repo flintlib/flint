@@ -82,5 +82,33 @@ x = flint_malloc((n + 2) * sizeof(ulong));
         flint_free(res);
     }
 
+#if FLINT_BITS == 64
+    /* the public per-size wrappers fixed_tan_opt_<n> route to the
+       same specialized bodies as the r = 0 dispatch, so the two
+       must agree bit for bit */
+    {
+        static void (* const tab[])(nn_ptr, nn_srcptr) = {
+            NULL,
+            fixed_tan_opt_1, fixed_tan_opt_2, fixed_tan_opt_3,
+            fixed_tan_opt_4, fixed_tan_opt_5, fixed_tan_opt_6,
+            fixed_tan_opt_7, fixed_tan_opt_8, fixed_tan_opt_9,
+            fixed_tan_opt_10, fixed_tan_opt_11, fixed_tan_opt_12
+        };
+        slong n;
+
+        for (n = 1; n <= 12; n++)
+        {
+            ulong x[12], t1[13], t2[13];
+
+            flint_mpn_rrandom(x, state, n);
+            tab[n](t1, x);
+            fixed_tan_bitwise_rs(t2, x, n, 0);
+            if (mpn_cmp(t1, t2, n + 1) != 0)
+                TEST_FUNCTION_FAIL("opt wrapper mismatch: "
+                    "n = %wd\n", n);
+        }
+    }
+#endif
+
     TEST_FUNCTION_END(state);
 }

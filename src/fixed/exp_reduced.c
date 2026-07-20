@@ -118,143 +118,86 @@
    non-statically so that the window arithmetic, which the burst
    only reaches in specific precision regimes, can be unit-tested
    directly (t-exp_sum_bs). */
-void
-_fixed_exp_burst_factor(nn_ptr F, slong * fn, slong * fexp,
-    nn_srcptr T, slong tn, nn_srcptr Q, slong qn,
-    flint_bitcnt_t Qexp, slong cap)
+/* Bit length of an unsigned mpn (x, xn), xn >= 1: the position of
+   its most significant set bit, i.e. 64 (xn - 1) + bitcount(top).
+   For a normalized (top limb nonzero) operand this is its exact
+   floor(log2) + 1. */
+static slong
+mpn_bits(nn_srcptr x, slong xn)
 {
-    slong qb = FLINT_BITS * (qn - 1) + FLINT_BIT_COUNT(Q[qn - 1]);
-    slong fbits = (slong) Qexp + qb + 1;    /* F < 1.5 Q 2^Qexp */
-    slong l;
-
-    /* Q must fit inside the window (in the burst, qbits stays well
-       under 0.6 wp against a window of 64 (wn + 4) bits) */
-    FLINT_ASSERT(qb < FLINT_BITS * (cap + 1));
-
-    if (fbits <= FLINT_BITS * (cap + 2))
-    {
-        /* small factor: form it exactly */
-        slong Fq = (slong) Qexp / FLINT_BITS;
-        int Fb = (int) ((slong) Qexp % FLINT_BITS);
-
-        flint_mpn_zero(F, cap + 3);
-        if (Fb)
-            F[Fq + qn] = mpn_lshift(F + Fq, Q, qn, Fb);
-        else
-            flint_mpn_copyi(F + Fq, Q, qn);
-        if (tn > 0)
-            mpn_add(F, F, cap + 3, T, tn);
-        *fexp = 0;
-    }
-    else
-    {
-        /* assemble only the top window: wbot is the window's
-           bottom bit, limb-aligned */
-        slong wbot = ((fbits - FLINT_BITS * (cap + 1))
-            / FLINT_BITS) * FLINT_BITS;
-        slong sh1 = (slong) Qexp - wbot;
-        slong s1q = sh1 / FLINT_BITS;
-        int s1b = (int) (sh1 % FLINT_BITS);
-
-        FLINT_ASSERT(sh1 >= 0);
-        flint_mpn_zero(F, cap + 3);
-        if (s1b)
-            F[s1q + qn] = mpn_lshift(F + s1q, Q, qn, s1b);
-        else
-            flint_mpn_copyi(F + s1q, Q, qn);
-        /* add T's limb-aligned tail above wbot; dropping the rest
-           loses under one bit at wbot, a relative 2^(-64 cap) */
-        {
-            slong dq2 = wbot / FLINT_BITS;
-            if (dq2 < tn)
-            {
-                ulong cy = mpn_add(F, F, cap + 3, T + dq2,
-                    tn - dq2);
-                FLINT_ASSERT(cy == 0);
-                (void) cy;
-            }
-        }
-        *fexp = wbot;
-    }
-    l = cap + 3;
-    while (l > 1 && F[l - 1] == 0)
-        l--;
-    *fn = l;
+    return FLINT_BITS * (xn - 1) + FLINT_BIT_COUNT(x[xn - 1]);
 }
 
-/* Bit-burst evaluation.  Slice boundaries double from depth r:
-   b_0 = r, b_{k+1} = min(2 b_k, wp); slice k = bits [b_k, b_{k+1})
-   of t, extracted at bit granularity as u = t >> (wp - b_{k+1})
-   with the bits above depth b_k masked off (t is read in place; arb
-   instead subtracts used bits from a working copy).  Each factor is
-   the exact rational
-
-       1 + s_k = (Q_k 2^{Qexp_k} + T_k) / (Q_k 2^{Qexp_k}),
-
-   and instead of dividing per level, the loop accumulates
-
-       NUM = prod (Q_k 2^{Qexp_k} + T_k),      DEN = prod Q_k,
-       QE  = sum Qexp_k,
-
-   NUM and DEN msb-truncated to wn + 3 limbs with dropped-bit
-   exponents, and finishes with a SINGLE balanced division by
-   fixed_div_newton.  The slices are processed in REVERSE (deepest
-   first): a deep factor's numerator carries only
-   qbits_k + (wp - b_k) + O(1) significant bits -- it is
-   Q_k (1 + s_k) with s_k < 2^{-b_k} -- and its denominator only
-   qbits_k, so both products grow from small to large and every
-   accumulation multiplication is balanced against the content
-   gathered so far, the same growing-product scheme as the exp and
-   trig reconstructions.  For the level-capped variant (alg 3) the
-   remainder below the last splitting slice is evaluated by the
-   tuned series choice and folded in as the deepest factor
-   (numerator 1 + f_res, denominator 1).
-
-   Frames: every quantity is a mantissa with an explicit power of
-   two, value = m 2^e.  A factor F_k = Q_k 2^{Qexp_k} + T_k is
-   formed exactly when it fits in the cap window and otherwise only
-   its top window is assembled, Q_k shifted into place and T_k's
-   limb-aligned tail added, the dropped low bits going into e.
-   Errors: each factor and product truncation is one ulp at the
-   cap, a relative 2^(-64 (wn + 3) + 64); over at most log2(wp)
-   levels on both sides of the quotient, plus the Newton division's
-   4 B^{-wn-2}/den and the final one-ulp placement, everything
-   lands orders of magnitude inside FIXED_EXP_REDUCED_MAX_ERR.  No
-   per-level quotient frames, shifts or additions remain, and the
-   product starts from the deepest factor rather than from a
-   full-precision 1. */
+#ifndef EXP_BURST_GUARD
 #define EXP_BURST_GUARD 3
+#endif
 
+/* ==== the bit-burst driver ==============================================
+
+   Slice boundaries snap to LIMBS and every
+   power-of-two frame (fexp, nexp, dexp, QE, the final placement) is
+   a LIMB count.  Consequences, all following from limb granularity:
+
+   - slice extraction is a pointer and a length: bits shallower than
+     a boundary live in separate limbs, so there is no rshift and no
+     masking (the top slice's leading bits above depth r are zero in
+     t itself);
+   - the series-leaf residual clears whole limbs, no partial-limb
+     mask;
+   - the factor assembly F = Q B^QE + T places Q by a plain copy at
+     a limb offset;
+   - the final division's placement is a limb-offset copy of the
+     quotient -- no shift at all.
+
+   An exact bit count is still taken where it is genuinely needed:
+   the trimmed slice's mpn_bits feeds the tight series term count.
+   The known trade (see the tbound comment in exp_sum_bs.c): the
+   splitting integers scale with the frame 64 D rather than the true
+   rate r, a content factor (64 D)/r on the leading slices that
+   matters for r well below the limb size and fades as r grows;
+   deeper slices are limb-aligned in both versions. */
 static void
 _fixed_exp_reduced_burst(nn_ptr y, nn_srcptr t, slong wn,
     flint_bitcnt_t r, int levels)
 {
-    slong wp = FLINT_BITS * wn;
     slong cap = wn + EXP_BURST_GUARD;
-    slong bnds[FLINT_BITS + 2];
-    slong nb = 0, k, nn_, dn, l;
+    slong L[FLINT_BITS + 2];
+    slong nb = 0, k, nn_, dn;
     slong nexp, dexp, QE;
-    nn_ptr num, den, sc, q;
+    nn_ptr num, num2, den, den2, q;
     TMP_INIT;
 
-    /* boundary ladder b_0 = r < b_1 < ... < b_nb = wp */
-    bnds[nb++] = (slong) r;
-    while (bnds[nb - 1] < wp)
+    /* boundary ladder in limbs: L[0] = max(r/64, 1) (the top slice
+       reaches up to the r zero bits regardless), doubling to wn */
+    L[nb++] = FLINT_MAX((slong) r / FLINT_BITS, 1);
+    while (L[nb - 1] < wn)
     {
-        slong nxt = FLINT_MIN(2 * bnds[nb - 1], wp);
+        slong nxt = FLINT_MIN(2 * L[nb - 1], wn);
         if (levels > 0 && nb > levels)
-            nxt = wp;   /* level cap: one final series slice */
-        bnds[nb] = nxt;
+            nxt = wn;
+        L[nb] = nxt;
         nb++;
     }
-    nb--;               /* nb slices: [bnds[k], bnds[k+1]) */
+    nb--;
+    if (nb == 0)
+    {
+        /* argument narrower than one boundary step: one slice
+           spanning everything */
+        L[1] = wn;
+        nb = 1;
+    }
 
-    TMP_START;
-    num = TMP_ALLOC((2 * (cap + 1) + 2 * cap + 2 + (wn + 4))
-        * sizeof(ulong));
-    den = num + cap + 1;
-    sc = den + cap + 1;
-    q = sc + 2 * cap + 2;
+    {
+        slong win_alloc = cap + 1;
+        slong q_alloc = wn + 4;
+
+        TMP_START;
+        num = TMP_ALLOC((4 * win_alloc + q_alloc) * sizeof(ulong));
+        num2 = num + win_alloc;
+        den = num2 + win_alloc;
+        den2 = den + win_alloc;
+        q = den2 + win_alloc;
+    }
 
     num[0] = 1;
     nn_ = 1;
@@ -266,198 +209,157 @@ _fixed_exp_reduced_burst(nn_ptr y, nn_srcptr t, slong wn,
 
     for (k = nb - 1; k >= 0; k--)
     {
-        slong blo = bnds[k], bhi = bnds[k + 1];
         int series = (levels > 0 && k >= levels);
         slong fn, fexp;
-        nn_ptr f;
+        nn_srcptr f;
         TMP_INIT;
 
         TMP_START;
 
         if (series)
         {
-            /* remainder below depth blo: tuned series on a copy
-               with the bits above depth blo cleared; factor
-               1 + f_res over denominator 1 */
+            /* residual below limb depth L[k]: whole-limb clear */
             nn_ptr xres, fac;
-            slong zq = blo / FLINT_BITS;
-            int zb = (int) (blo % FLINT_BITS);
 
             fac = TMP_ALLOC((wn + 2 + wn) * sizeof(ulong));
             xres = fac + wn + 2;
             flint_mpn_copyi(xres, t, wn);
-            flint_mpn_zero(xres + wn - zq, zq);
-            if (zb && zq < wn)
-                xres[wn - zq - 1] &= (UWORD(1)
-                    << (FLINT_BITS - zb)) - 1;
-            fixed_exp_reduced(fac, xres, wn, (flint_bitcnt_t) blo, 0);
+            flint_mpn_zero(xres + wn - L[k], L[k]);
+            fixed_exp_reduced(fac, xres, wn,
+                (flint_bitcnt_t) (FLINT_BITS * L[k]), 0);
 
-            /* value = FacInt 2^(-64 wn), FacInt over wn + 1 limbs
-               with the units limb on top; cap >= wn + 1, so no
-               truncation is ever needed here */
             f = fac;
             fn = wn + 1;
-            fexp = -FLINT_BITS * wn;
+            fexp = -wn;
         }
         else
         {
-            slong sq = (wp - bhi) / FLINT_BITS;
-            int sb = (int) ((wp - bhi) % FLINT_BITS);
-            slong un = (bhi + FLINT_BITS - 1) / FLINT_BITS + 1;
-            slong xn, N, tn, qn, mq;
-            int mb;
-            flint_bitcnt_t Qexp;
-            nn_ptr u, T, Q, F;
+            /* slice k = limbs [L[k], L[k+1]) of depth (the top
+               slice reaches the top): a pointer and a length */
+            slong D = L[k + 1];
+            nn_srcptr u = t + (wn - D);
+            slong xn = D - (k ? L[k] : 0);
+            slong N, tn, qn, QEk;
+            nn_ptr T, Q, F;
 
-            u = TMP_ALLOC(un * sizeof(ulong));
-            if (sb)
-                mpn_rshift(u, t + sq, wn - sq, sb);
-            else
-                flint_mpn_copyi(u, t + sq, wn - sq);
-            xn = FLINT_MIN(un, wn - sq);
-            /* mask the bits above depth blo (shallower slices) */
-            mq = (bhi - blo) / FLINT_BITS;
-            mb = (int) ((bhi - blo) % FLINT_BITS);
-            if (mq < xn)
-            {
-                if (mb)
-                {
-                    u[mq] &= (UWORD(1) << mb) - 1;
-                    flint_mpn_zero(u + mq + 1, xn - mq - 1);
-                }
-                else
-                    flint_mpn_zero(u + mq, xn - mq);
-                xn = FLINT_MIN(xn, mq + 1);
-            }
             while (xn > 0 && u[xn - 1] == 0)
                 xn--;
-
             if (xn == 0)
             {
                 TMP_END;
                 continue;
             }
-
+            /* strip trailing zero limbs of the slice into the
+               frame: u B^-D = (u / B^z) B^-(D - z).  For sparse
+               arguments (a low-precision value at high precision:
+               one significant limb atop a deep frame) this shrinks
+               EVERYTHING downstream -- the kernel's splitting
+               integers all scale with D. */
+            while (xn > 1 && u[0] == 0)
             {
-                slong ubits = FLINT_BITS * (xn - 1)
-                    + FLINT_BIT_COUNT(u[xn - 1]);
-                N = _fixed_exp_bs_num_terms(
-                    (flint_bitcnt_t) (bhi - ubits), wp + 64);
+                u++;
+                xn--;
+                D--;
             }
 
-            T = TMP_ALLOC((
-                (N * (bhi + 128)) / FLINT_BITS + 4
-                + (N * FLINT_BIT_COUNT((ulong) N + 1)) / FLINT_BITS
-                + 3 + (cap + 3)) * sizeof(ulong));
-            Q = T + (N * (bhi + 128)) / FLINT_BITS + 4;
-            F = Q + (N * FLINT_BIT_COUNT((ulong) N + 1))
-                / FLINT_BITS + 3;
+            N = _fixed_exp_bs_num_terms((flint_bitcnt_t)
+                (FLINT_BITS * D - mpn_bits(u, xn)),
+                FLINT_BITS * wn + 64);
 
-            _fixed_exp_sum_bs_powtab(T, &tn, Q, &qn, &Qexp,
-                u, xn, (flint_bitcnt_t) bhi, N);
-
-            /* DEN *= Q_k, msb-truncated at cap */
-            if (dn >= qn)
-                flint_mpn_mul(sc, den, dn, Q, qn);
-            else
-                flint_mpn_mul(sc, Q, qn, den, dn);
-            l = dn + qn;
-            while (l > 1 && sc[l - 1] == 0)
-                l--;
-            if (l > cap)
+            /* kernel buffers per _fixed_exp_sum_bs_powtab_b:
+               T spans N (D + 2) + 4 limbs, Q a product of N
+               factors below N + 1, F the cap + 3 factor window */
             {
-                flint_mpn_copyi(den, sc + (l - cap), cap);
-                dexp += FLINT_BITS * (l - cap);
-                dn = cap;
-            }
-            else
-            {
-                flint_mpn_copyi(den, sc, l);
-                dn = l;
-            }
-            QE += (slong) Qexp;
+                slong t_alloc = N * (D + 2) + 4;
+                slong q_alloc2 = (N * FLINT_BIT_COUNT((ulong) N + 1))
+                    / FLINT_BITS + 3;
+                slong f_alloc = cap + 3;
 
-            _fixed_exp_burst_factor(F, &fn, &fexp, T, tn, Q, qn,
-                Qexp, cap);
-            f = F;
+                T = TMP_ALLOC((t_alloc + q_alloc2 + f_alloc)
+                    * sizeof(ulong));
+                Q = T + t_alloc;
+                F = Q + q_alloc2;
+            }
+
+            _fixed_exp_sum_bs_powtab(T, &tn, Q, &qn, &QEk,
+                u, xn, D, N);
+
+            /* DEN *= Q_k, windowed product + swap */
+            {
+                slong tot = dn + qn;
+                slong lo = FLINT_MAX(0, tot - cap);
+                flint_mpn_mulmid(den2, den, dn, Q, qn, lo, tot);
+                dexp += lo;
+                dn = tot - lo;
+                while (dn > 1 && den2[dn - 1] == 0)
+                    dn--;
+                FLINT_SWAP(nn_ptr, den, den2);
+            }
+            QE += QEk;
+
+            /* factor F = Q B^QEk + T: pure limb placement, exactly
+               when it fits within cap + 2 limbs, else only the top
+               window with T's tail above the limb wbot (dropping
+               the rest loses under one ulp there) */
+            {
+                slong fl = QEk + qn + 1;    /* F < 2 Q B^QEk */
+
+                FLINT_ASSERT(qn <= cap);
+                flint_mpn_zero(F, cap + 3);
+                if (fl <= cap + 2)
+                {
+                    flint_mpn_copyi(F + QEk, Q, qn);
+                    if (tn > 0)
+                        mpn_add(F, F, cap + 3, T, tn);
+                    fexp = 0;
+                }
+                else
+                {
+                    slong wbot = fl - (cap + 1);
+                    flint_mpn_copyi(F + QEk - wbot, Q, qn);
+                    if (wbot < tn)
+                    {
+                        ulong cy = mpn_add(F, F, cap + 3,
+                            T + wbot, tn - wbot);
+                        FLINT_ASSERT(cy == 0);
+                        (void) cy;
+                    }
+                    fexp = wbot;
+                }
+                fn = cap + 3;
+                while (fn > 1 && F[fn - 1] == 0)
+                    fn--;
+                f = F;
+            }
         }
 
-        /* NUM *= f, msb-truncated at cap */
-        if (nn_ >= fn)
-            flint_mpn_mul(sc, num, nn_, f, fn);
-        else
-            flint_mpn_mul(sc, f, fn, num, nn_);
-        l = nn_ + fn;
-        while (l > 1 && sc[l - 1] == 0)
-            l--;
+        /* NUM *= f, windowed product + swap */
         nexp += fexp;
-        if (l > cap)
         {
-            flint_mpn_copyi(num, sc + (l - cap), cap);
-            nexp += FLINT_BITS * (l - cap);
-            nn_ = cap;
-        }
-        else
-        {
-            flint_mpn_copyi(num, sc, l);
-            nn_ = l;
+            slong tot = nn_ + fn;
+            slong lo = FLINT_MAX(0, tot - cap);
+            flint_mpn_mulmid(num2, num, nn_, f, fn, lo, tot);
+            nexp += lo;
+            nn_ = tot - lo;
+            while (nn_ > 1 && num2[nn_ - 1] == 0)
+                nn_--;
+            FLINT_SWAP(nn_ptr, num, num2);
         }
 
         TMP_END;
     }
 
-    /* y = (num 2^nexp) / (den 2^{dexp + QE}), one balanced Newton
-       division.  Normalize both mantissas to fractions in [1/2, 1)
-       (so the denominator's top limb is nonzero as the kernel
-       requires); the log difference is then exactly
-       (nexp + numb) - (dexp + QE + denb) with numb, denb the
-       mantissa bit lengths, and y in [1, e) makes that difference
-       0 or 1. */
+    /* one balanced Newton division; the placement of the quotient
+       is a limb-offset copy, no shift */
     {
-        slong numb = FLINT_BITS * (nn_ - 1)
-            + FLINT_BIT_COUNT(num[nn_ - 1]);
-        slong denb = FLINT_BITS * (dn - 1)
-            + FLINT_BIT_COUNT(den[dn - 1]);
-        slong sh = (nexp + numb) - (dexp + QE + denb);
-        slong tot, yq;
-        int lz, yb;
-        nn_ptr a2, b2;
+        slong E = (nexp + nn_) - (dexp + QE + dn);
 
-        a2 = sc;
-        b2 = sc + cap + 1;
+        fixed_div_newton(q, num, nn_, den, dn, wn + 2);
 
-        lz = (int) ((FLINT_BITS - (denb % FLINT_BITS))
-            % FLINT_BITS);
-        if (lz)
-            mpn_lshift(a2, den, dn, lz);
-        else
-            flint_mpn_copyi(a2, den, dn);
-
-        lz = (int) ((FLINT_BITS - (numb % FLINT_BITS))
-            % FLINT_BITS);
-        if (lz)
-            mpn_lshift(b2, num, nn_, lz);
-        else
-            flint_mpn_copyi(b2, num, nn_);
-
-        fixed_div_newton(q, b2, nn_, a2, dn, wn + 2);
-
-        /* q = b/a in [1/2, 2) over wn + 2 fraction limbs; value
-           y = (b/a) 2^sh with sh in {0, 1}.  Place into the y
-           frame (wn fraction limbs + units): a plain truncating
-           shift, one-sided within 1 ulp on top of the division's
-           error. */
-        FLINT_ASSERT(sh == 0 || sh == 1);
-        tot = 2 * FLINT_BITS - sh;
-        yq = tot / FLINT_BITS;
-        yb = (int) (tot % FLINT_BITS);
-        if (yb)
-        {
-            mpn_rshift(q, q + yq, wn + 4 - yq, yb);
-            flint_mpn_copyi(y, q, wn + 1);
-        }
-        else
-            flint_mpn_copyi(y, q + yq, wn + 1);
+        /* y = (q B^-(wn+2)) B^E into wn fraction limbs + units:
+           y = q shifted down by 2 - E whole limbs */
+        FLINT_ASSERT(2 - E >= 0 && 2 - E <= 3);
+        flint_mpn_copyi(y, q + (2 - E), wn + 1);
     }
     TMP_END;
 }
@@ -498,15 +400,14 @@ fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn, flint_bitcnt_t r,
     }
     else
     {
-        nn_ptr s, u2, rt, rem;
+        nn_ptr s, u2, rt;
         TMP_INIT;
 
         TMP_START;
-        s = TMP_ALLOC(((wn + 1) + (2 * wn + 1) + (wn + 1) + (wn + 2))
+        s = TMP_ALLOC(((wn + 1) + (2 * wn + 1) + (wn + 1))
             * sizeof(ulong));
         u2 = s + (wn + 1);
         rt = u2 + (2 * wn + 1);
-        rem = rt + (wn + 1);
 
         fixed_sinh_rs(s, t, wn);
 

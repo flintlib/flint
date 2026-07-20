@@ -166,8 +166,14 @@ On 32-bit systems, it is assumes that `n \ge 2`.
     slice of *t*, on limb boundaries, evaluated by binary splitting
     and the remainder by the sinh series at the doubled rate), 4 the
     full bit-burst algorithm with slice lengths doubling, which is
-    asymptotically quasi-optimal for very large ``wn``.  The
-    automatic thresholds can be recalibrated with
+    asymptotically quasi-optimal for very large ``wn``.  The burst
+    machinery works at limb granularity throughout -- slice
+    boundaries, splitting-tree truncation frames and quotient
+    placements are all limb counts, with no bit shifts on the path
+    -- and dead low limbs of a slice fold into its frame, so sparse
+    arguments (a few significant limbs over a deep frame, the shape
+    of a double-precision input at high precision) shrink the whole
+    computation.  The automatic thresholds can be recalibrated with
     ``tune/tune-exp-reduced``.
 
 .. function:: void fixed_exp_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
@@ -245,6 +251,143 @@ On 32-bit systems, it is assumes that `n \ge 2`.
     accepted factor), so the per-factor work starts out at a single
     limb and `P` is only ever truncated once its exact length exceeds
     `n` limbs.
+
+.. macro:: FIXED_SIN_COS_REDUCED_MAX_ERR
+
+    Bound, in ulp, for the error of each output of
+    :func:`fixed_sin_cos_reduced`, currently 96 -- a constant, like
+    ``FIXED_EXP_REDUCED_MAX_ERR``, because the internal working
+    precision carries guard limbs.
+
+.. function:: void fixed_sin_cos_reduced(nn_ptr ysin, nn_ptr yg, nn_srcptr t, slong wn, flint_bitcnt_t r, int alg)
+
+    Sets `(ysin, wn)` and `(yg, wn)` to approximations of `\sin(t)`
+    and `g = 1 - \cos(t)` for a reduced argument `(t, wn)` with
+    `t < 2^{-r}`, `r \ge 16`, independent of any particular argument
+    reduction (algorithms 1 and 2 additionally require
+    `r \ge 32`).  Both results are pure fractions
+    (`\sin t < 2^{-r}`, `g < 2^{-2r-1}`), but both buffers must have
+    room for `wn + 1` limbs, the top limb being scratch.  The error
+    of each output is at most ``FIXED_SIN_COS_REDUCED_MAX_ERR``
+    ulps.  Returning `g` rather than `\cos` preserves the
+    information near the top: the tangent half-angle reconstruction
+    of :func:`fixed_sin_cos_bitwise_rs` and
+    :func:`fixed_tan_bitwise_rs` consumes exactly this pair, with
+    `\cos t` never formed explicitly.
+
+    *alg* selects the internal method: 0 the tuned automatic choice,
+    1 the direct sine and cosine rectangular-splitting series, 2 the
+    sine series plus a squaring and a square root
+    (`g = 1 - \sqrt{1 - \sin^2 t}`, half the series terms), 3 one
+    bit-burst step (the leading slice of *t*, on limb boundaries,
+    evaluated as a complex exponential by Gaussian binary splitting
+    and the remainder by the tuned series at the raised rate), 4 the
+    full bit-burst algorithm with slice lengths tripling, which is
+    asymptotically quasi-optimal for very large ``wn``.
+
+    The burst evaluates each slice factor
+    `\exp(i x_k) = (\cos x_k + i \sin x_k)` by a JOINT truncated
+    binary splitting of the sine and `1 - \cos` series over one
+    shared exact denominator per slice
+    (``_fixed_sin_cos_sum_bs_powtab``), accumulates the complex
+    numerator by windowed middle products (a Karatsuba 3-product
+    update when the imaginary content dominates the window slack, a
+    borrow-safe direct sum of nonnegative windows otherwise) and the
+    real denominator by middle products in ping-pong buffers, and
+    finishes with two balanced Newton divisions against the single
+    accumulated denominator -- where the classical per-slice scheme
+    spends a full-precision square root per slice.  Past a per-slice
+    term threshold the cosine track is dropped from the tree and
+    recovered from the slice's own denominator by one square root,
+    `\cos_k Q = \sqrt{(Q B^{Q_e})^2 - (\sin_k Q B^{Q_e})^2}`.  As
+    in :func:`fixed_exp_reduced`, everything is limb-granular and
+    dead low limbs of a slice fold into its frame, so sparse
+    arguments shrink the whole computation (including the internal
+    power tables, whose entries strip their dead low limbs into
+    per-entry exponents).  The automatic thresholds can be
+    recalibrated with the tuner alongside the exp ones.
+
+.. macro:: FIXED_EXP_NOTAB_MAX_ERR
+
+    Bound, in ulp, for the error of :func:`fixed_exp_notab`,
+    currently 128.
+
+.. function:: void fixed_exp_notab(nn_ptr y, nn_srcptr x, slong n)
+
+    Sets `(y, n + 1)` (`n` fraction limbs and a unit limb) to an
+    approximation of `\exp(x)` for any `(x, n)` in `[0, 1)`,
+    without table-based argument reduction: the number of leading
+    zero bits `z` of `x` is inspected, the argument is halved
+    `h = \max(0, r(n) - z)` times (an exact shift inside the
+    internal guard limbs), :func:`fixed_exp_reduced` runs on the
+    halved argument at depth `z + h`, and the result is squared `h`
+    times, each squaring one ``sqrhigh`` at the working precision.
+    All intermediate values lie in `[1, e)`.  Relative errors double
+    per squaring, so `h + \log_2 n + 8` guard bits (rounded up to
+    limbs) keep the amplified component below one output ulp; the
+    error is at most ``FIXED_EXP_NOTAB_MAX_ERR`` ulps.
+
+    The reduction depth `r(n)` comes from a tuned table: `r = 32`
+    and `r = 16` alternate in windows through the
+    rectangular-splitting range (the 16-windows are where the
+    automatic dispatch inside :func:`fixed_exp_reduced` switches to
+    the bit-burst path early and beats the series), and `r = 32`
+    carries the whole bit-burst regime -- unlike arb's bit-burst
+    exponential (16 squarings below `\sim 10^8` bits), the deeper
+    reduction measured consistently ahead on the development
+    machine, the shrunken first-level splitting trees outweighing
+    the extra squarings.  The internal worker
+    ``_fixed_exp_notab_r(y, x, n, r)`` takes the depth explicitly,
+    for tuning; ``profile/p-fixed exp_notab [nmax]`` compares
+    against :func:`arb_exp` without stopping while arb is ahead
+    (the interesting regime is the asymptotic one: arb's table-based
+    reduction wins below roughly `2^{19}` bits, after which the
+    table-free path here measured `1.1\text{--}1.4\times` faster
+    than arb's bit-burst exponential up to `8 \times 10^6` bits).
+
+.. macro:: FIXED_SIN_COS_NOTAB_MAX_ERR
+
+    Bound, in ulp, for the error of each output of
+    :func:`fixed_sin_cos_notab`, currently 128.
+
+.. function:: void fixed_sin_cos_notab(nn_ptr ysin, nn_ptr ycos, nn_srcptr x, slong n)
+
+    Sets `(ysin, n + 1)` and `(ycos, n + 1)` (`n` fraction limbs
+    and a unit limb each) to approximations of `\sin(x)` and
+    `\cos(x)` for any `(x, n)` in `[0, 1)`, without table-based
+    argument reduction.  As in :func:`fixed_exp_notab` the argument
+    is halved `h = \max(0, r(n) - z)` times and
+    :func:`fixed_sin_cos_reduced` runs at depth `z + h`; the angle
+    is then doubled back on the cosine alone, working with
+    `g = 1 - \cos` throughout:
+
+    .. math::
+
+        g(2\theta) = 2 g (2 - g),
+
+    one ``sqrhigh`` per doubling with every intermediate a pure
+    fraction (the chain ends at `g(x) \le 1 - \cos 1 < 0.46`, so
+    its inputs stay below `g(1/2) < 0.13`).  The final sine comes
+    from one square root, `\sin x = \sqrt{2g - g^2}`, through
+    ``mpn_sqrtrem`` at small sizes and :func:`fixed_sqrt_newton`
+    above a cutoff, the input taken at a limb position of matching
+    parity so that the root placement is a limb copy.  The absolute
+    error of `g` multiplies by at most 4 per doubling and the
+    square root divides it by `2 \sin x`; since any path that
+    doubles at all has `x \ge 2^{-z-1}`, the total amplification is
+    bounded by `2^{2 r - z + 2}`, and `2h + z + \log_2 n + 8` guard
+    bits keep the amplified component below one output ulp.  The
+    error of each output is at most
+    ``FIXED_SIN_COS_NOTAB_MAX_ERR`` ulps.
+
+    The tuned depth is `r = 32` across the rectangular-splitting
+    range and `r = 24` in the bit-burst regime (matching arb's
+    bit-burst sine/cosine); the internal worker
+    ``_fixed_sin_cos_notab_r`` takes it explicitly, and
+    ``profile/p-fixed sin_cos_notab [nmax]`` compares against
+    :func:`arb_sin_cos` (measured `1.2\text{--}1.8\times` faster
+    from `6 \times 10^4` through `8 \times 10^6` bits on the
+    development machine).
 
 .. macro:: FIXED_SIN_COS_BITWISE_RS_MAX_ERR(n, r)
 
@@ -398,7 +541,10 @@ On 32-bit systems, it is assumes that `n \ge 2`.
         D = w_x - w_x g - w_y \sin t',
 
     four small multiplications, and `\cos t'` cancels in every ratio
-    just as `|W|` does.
+    just as `|W|` does.  The pair `(\sin t', g)` itself comes from
+    :func:`fixed_sin_cos_reduced`, which owns the tuned choice
+    between the direct series, the sine-plus-square-root variant and
+    the bit-burst modes for large `n / r`.
 
 .. function:: void fixed_log1p_2mexp_ui_bs(nn_ptr res, ulong i, slong n)
               void fixed_atan_2mexp_ui_bs(nn_ptr res, ulong i, slong n)

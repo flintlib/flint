@@ -33,31 +33,6 @@
    evaluation it loses 10-15% of the whole call at n = 512-1024 and
    only wins (3-6%) from about 1536 limbs, where the FFT range
    starts. */
-/* Evaluate only the sine series and recover the cosine through a
-   squaring and a square root once the series gets long enough,
-   mirroring EXP_USE_SINH: the sine series of the reduced argument
-   t' < 2^-r drops one term per 2r bits, so FLINT_BITS n / (2 r)
-   terms in all, and skipping the cosine pass saves one of the two
-   rectangular-splitting sums against the fixed cost of the squaring
-   and the square root.  50 terms matches the crossover measured on
-   the reference machine (n = 150 with the default ladder, which
-   puts n = 150 in the r = 192 band: 64 * 150 = 50 * 192); the
-   development VM measured a much later crossover in context, in
-   line with its inflated Newton cutoffs, and the exp analogue uses
-   128 terms.  Retune with the Newton cutoffs. */
-#ifndef FIXED_TRIG_SIN_SQRT_TERMS
-#define FIXED_TRIG_SIN_SQRT_TERMS 50
-#endif
-#define TRIG_USE_SIN_SQRT(n, r) \
-    (FLINT_BITS * (n) >= FIXED_TRIG_SIN_SQRT_TERMS * (slong) (r))
-
-/* working precision from which that square root runs through
-   fixed_sqrt_newton instead of mpn_sqrtrem (same shape as the exp
-   sinh-path square root) */
-#ifndef FIXED_TRIG_SQRT_NEWTON_CUTOFF
-#define FIXED_TRIG_SQRT_NEWTON_CUTOFF 2000
-#endif
-
 #ifndef FIXED_TRIG_RECIP_NEWTON_CUTOFF
 #define FIXED_TRIG_RECIP_NEWTON_CUTOFF 40
 #endif
@@ -403,61 +378,11 @@ _fixed_tan_halfangle_mid(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     }
     else
     {
-        if (TRIG_USE_SIN_SQRT(n, r))
-        {
-            /* Evaluate only the sine series -- the analogue of the
-               exp sinh path -- and recover
-
-                   g = 1 - cos t' = 1 - sqrt(1 - sin^2 t')
-
-               by a squaring and a square root, saving the cosine
-               pass of fixed_sin_cos_rs (the powers of t'^2 are
-               shared between the two sums, but each sum is a full
-               rectangular-splitting pass).  The square root sits
-               just below 1, so its derivative is ~1/2 and nothing
-               is amplified: sqrhigh's few-ulp deficit on sin^2
-               (which can only raise 1 - sin^2, lowering g), the
-               square root's floor (raising g by at most one ulp)
-               and the Newton route's ~2 compensated ulps leave g
-               within a few 2^-64n ulps either way, well inside the
-               budget the direct cosine's truncation already used. */
-            nn_ptr u2 = N, rt = Q;      /* free until the divisions */
-
-            fixed_sin_rs(ss, t, n);
-
-            flint_mpn_sqrhigh(rt, ss, n);
-            if (flint_mpn_zero_p(rt, n))
-            {
-                flint_mpn_zero(cc, n);  /* sin^2 below 2^-64n: g = 0 */
-            }
-            else if (n < FIXED_TRIG_SQRT_NEWTON_CUTOFF)
-            {
-                flint_mpn_zero(u2, n);
-                mpn_neg(u2 + n, rt, n); /* (1 - sin^2) 2^(128n) */
-                mpn_sqrtrem(rt, NULL, u2, 2 * n);
-                mpn_neg(cc, rt, n);     /* g 2^(64n) */
-            }
-            else
-            {
-                /* the Newton square root reads short input directly:
-                   (1 - sin^2) as an n-limb fraction, no zero padding */
-                mpn_neg(u2, rt, n);
-                fixed_sqrt_newton(rt, u2, n, n + 2);
-                if (rt[n + 2])
-                    flint_mpn_zero(cc, n);  /* cos rounded to 1 */
-                else
-                    mpn_neg(cc, rt + 2, n);
-            }
-        }
-        else
-        {
-            fixed_sin_cos_rs(ss, cc, t, n);
-
-            if (cc[n])
-                flint_mpn_zero(cc, n);      /* cos t' = 1: g = 0 */
-            else
-                mpn_neg(cc, cc, n);         /* g = 1 - cos t' */
-        }
+        /* sin t' and g = 1 - cos t' of the residual, factored out
+           into fixed_sin_cos_reduced (which also owns the tuned
+           series-vs-sqrt choice and adds the bit-burst modes for
+           large n / r); r >= 32 here per _fixed_tan_halfangle */
+        fixed_sin_cos_reduced(ss, cc, t, n, (flint_bitcnt_t) r, 0);
 
         flint_mpn_mulhigh_n(va, wx, ss, n); /* wx ss */
         if (wx[n])

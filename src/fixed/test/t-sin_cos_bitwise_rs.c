@@ -110,5 +110,37 @@ TEST_FUNCTION_START(fixed_sin_cos_bitwise_rs, state)
         flint_free(ycos);
     }
 
+#if FLINT_BITS == 64
+    /* the public per-size wrappers fixed_sin_cos_opt_<n> route to
+       the same specialized bodies as the r = 0 dispatch, so the two
+       must agree bit for bit; this pins the wrapper wiring and the
+       NULL-output entry shapes */
+    {
+        static void (* const tab[])(nn_ptr, nn_ptr, nn_srcptr) = {
+            NULL,
+            fixed_sin_cos_opt_1, fixed_sin_cos_opt_2,
+            fixed_sin_cos_opt_3, fixed_sin_cos_opt_4,
+            fixed_sin_cos_opt_5, fixed_sin_cos_opt_6,
+            fixed_sin_cos_opt_7, fixed_sin_cos_opt_8,
+            fixed_sin_cos_opt_9, fixed_sin_cos_opt_10,
+            fixed_sin_cos_opt_11, fixed_sin_cos_opt_12
+        };
+        slong n;
+
+        for (n = 1; n <= 12; n++)
+        {
+            ulong x[12], s1[13], c1[13], s2[13], c2[13];
+
+            flint_mpn_rrandom(x, state, n);
+            tab[n](s1, c1, x);
+            fixed_sin_cos_bitwise_rs(s2, c2, x, n, 0);
+            if (mpn_cmp(s1, s2, n + 1) != 0
+                || mpn_cmp(c1, c2, n + 1) != 0)
+                TEST_FUNCTION_FAIL("opt wrapper mismatch: "
+                    "n = %wd\n", n);
+        }
+    }
+#endif
+
     TEST_FUNCTION_END(state);
 }

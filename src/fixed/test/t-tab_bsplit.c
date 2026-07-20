@@ -20,10 +20,15 @@ TEST_FUNCTION_START(fixed_tab_bsplit, state)
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         /* every fourth iteration goes big to reach the direct-log
-           regime (prec >= 6000, i >= 30) */
-        slong n = 1 + n_randint(state, (iter % 4 == 0) ? 160 : 12);
-        slong i = 1 + n_randint(state, (iter % 3 == 0) ? 700 : 40);
-        int is_log = iter % 2;
+           regime (prec >= 6000, i >= 30); iter = 0 pins one case
+           inside it, since iter % 4 == 0 and iter % 2 would
+           otherwise anti-correlate the size with the function
+           choice and starve that branch */
+        slong n = (iter == 0) ? 100
+            : 1 + n_randint(state, (iter % 4 == 0) ? 160 : 12);
+        slong i = (iter == 0) ? 40
+            : 1 + n_randint(state, (iter % 3 == 0) ? 700 : 40);
+        int is_log = (iter == 0) ? 1 : (int) n_randint(state, 2);
         nn_ptr got, ref;
         arb_t v, t;
         arf_t lb;

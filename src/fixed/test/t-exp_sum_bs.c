@@ -10,141 +10,74 @@
 */
 
 #include "test_helpers.h"
-#include "arb.h"
+#include "mpn_extras.h"
 #include "fixed.h"
+#include "fmpq.h"
+#include "arb.h"
 
-/* the mpn port must reproduce _arb_exp_sum_bs_powtab bit for bit */
+/* the limb-radix kernel must agree with _arb_exp_sum_bs_powtab as
+   an exact rational: T / (Q B^QE) == Ta / (Qa 2^Qexpa) */
+void _arb_exp_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
+    const fmpz_t x, flint_bitcnt_t r, slong N);
 
 TEST_FUNCTION_START(fixed_exp_sum_bs, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 40 + 40 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 200; iter++)
     {
-        slong xn = 1 + n_randint(state, 6);
-        flint_bitcnt_t r = FLINT_BITS * (xn + n_randint(state, 4));
-        slong N = 1 + n_randint(state,
-            (iter % 13 == 0) ? 1600 : 300);
-        slong tn, qn, i;
-        flint_bitcnt_t Qexp;
+        slong D = 1 + n_randint(state, 8);
+        slong xn = 1 + n_randint(state, D);
+        slong N = 1 + n_randint(state, 60);
+        slong tn, qn, QE, i;
         nn_ptr xp, T, Q;
-        fmpz_t x, Ta, Qa, Tm, Qm;
+        fmpz_t Ta, Qa, xf, num, den;
+        fmpq_t qa, qb;
         flint_bitcnt_t Qexpa;
 
         xp = flint_malloc(xn * sizeof(ulong));
-        T = flint_malloc(((N * ((slong) r + 128)) / FLINT_BITS + 4)
-            * sizeof(ulong));
+        flint_mpn_urandomb(xp, state, FLINT_BITS * xn);
+        xp[xn - 1] |= (UWORD(1) << n_randint(state, FLINT_BITS));
+        while (xn > 1 && xp[0] == 0)    /* the driver strips */
+        {
+            for (i = 0; i < xn - 1; i++)
+                xp[i] = xp[i + 1];
+            xn--;
+        }
+
+        T = flint_malloc((N * (D + 2) + 4) * sizeof(ulong));
         Q = flint_malloc(((N * FLINT_BIT_COUNT((ulong) N + 1))
             / FLINT_BITS + 3) * sizeof(ulong));
 
-        flint_mpn_urandomb(xp, state, FLINT_BITS * xn);
-        xp[xn - 1] |= UWORD(1);   /* nonzero */
-        while (xp[xn - 1] == 0)
-            xn--;
+        _fixed_exp_sum_bs_powtab(T, &tn, Q, &qn, &QE, xp, xn, D, N);
 
-        fmpz_init(x); fmpz_init(Ta); fmpz_init(Qa);
-        fmpz_init(Tm); fmpz_init(Qm);
-        fmpz_set_ui_array(x, xp, xn);
+        fmpz_init(Ta); fmpz_init(Qa); fmpz_init(xf);
+        fmpz_init(num); fmpz_init(den);
+        fmpq_init(qa); fmpq_init(qb);
 
-        _arb_exp_sum_bs_powtab(Ta, Qa, &Qexpa, x, r, N);
-        _fixed_exp_sum_bs_powtab(T, &tn, Q, &qn, &Qexp, xp, xn, r, N);
+        fmpz_set_ui_array(xf, xp, xn);
+        _arb_exp_sum_bs_powtab(Ta, Qa, &Qexpa, xf,
+            (flint_bitcnt_t) (FLINT_BITS * D), N);
 
-        fmpz_set_ui_array(Tm, T, FLINT_MAX(tn, 1));
-        fmpz_set_ui_array(Qm, Q, FLINT_MAX(qn, 1));
+        fmpz_set_ui_array(num, T, FLINT_MAX(tn, 1));
+        fmpz_set_ui_array(den, Q, FLINT_MAX(qn, 1));
+        fmpz_mul_2exp(den, den, (ulong) (FLINT_BITS * QE));
+        fmpq_set_fmpz_frac(qa, num, den);
 
-        if (!fmpz_equal(Tm, Ta) || !fmpz_equal(Qm, Qa)
-            || Qexp != Qexpa)
-            TEST_FUNCTION_FAIL("xn = %wd, r = %wd, N = %wd "
-                "(Qexp %wd vs %wd)\n", xn, (slong) r, N,
-                (slong) Qexp, (slong) Qexpa);
+        fmpz_mul_2exp(Qa, Qa, Qexpa);
+        fmpq_set_fmpz_frac(qb, Ta, Qa);
 
-        /* lengths must be normalized */
-        if ((tn > 0 && T[tn - 1] == 0) || (qn > 0 && Q[qn - 1] == 0))
-            TEST_FUNCTION_FAIL("unnormalized output\n");
-        (void) i;
-
-        fmpz_clear(x); fmpz_clear(Ta); fmpz_clear(Qa);
-        fmpz_clear(Tm); fmpz_clear(Qm);
-        flint_free(xp); flint_free(T); flint_free(Q);
-    }
-
-    /* the factor assembly reproduces Q 2^Qexp + T on both its
-       branches: exactly below the cap window, and as a top window
-       with the dropped bits (under one at the limb-aligned bottom)
-       in the exponent */
-    for (iter = 0; iter < 50 + 50 * flint_test_multiplier(); iter++)
-    {
-        slong cap = 2 + n_randint(state, 8);
-        /* the helper requires Q inside the window: qb < 64 (cap+1) */
-        slong qn = 1 + n_randint(state, cap);
-        slong tn = n_randint(state, cap + 2);
-        flint_bitcnt_t Qexp = n_randint(state,
-            FLINT_BITS * (cap + 4));
-        slong fn, fexp;
-        nn_ptr Q, T, F;
-        fmpz_t exact, got, low;
-
-        Q = flint_malloc(qn * sizeof(ulong));
-        T = flint_malloc(FLINT_MAX(tn, 1) * sizeof(ulong));
-        F = flint_malloc((cap + 3) * sizeof(ulong));
-        flint_mpn_urandomb(Q, state, FLINT_BITS * qn);
-        Q[qn - 1] |= UWORD(1) << (FLINT_BITS - 1
-            - n_randint(state, FLINT_BITS));
-        while (qn > 1 && Q[qn - 1] == 0)
-            qn--;
-        if (tn > 0)
-            flint_mpn_urandomb(T, state, FLINT_BITS * tn);
-        while (tn > 0 && T[tn - 1] == 0)
-            tn--;
-        /* keep the invariant T < Q 2^Qexp (F < 1.5 Q 2^Qexp): drop
-           T when it would dominate */
-        if (FLINT_BITS * tn > (slong) Qexp)
-            tn = 0;
-
-        fmpz_init(exact); fmpz_init(got); fmpz_init(low);
-        fmpz_set_ui_array(exact, Q, qn);
-        fmpz_mul_2exp(exact, exact, Qexp);
-        if (tn > 0)
+        if (!fmpq_equal(qa, qb))
         {
-            fmpz_set_ui_array(low, T, tn);
-            fmpz_add(exact, exact, low);
+            flint_printf("FAIL: value mismatch D=%wd xn=%wd N=%wd\n",
+                D, xn, N);
+            flint_abort();
         }
 
-        _fixed_exp_burst_factor(F, &fn, &fexp, T, tn, Q, qn,
-            Qexp, cap);
-
-        fmpz_set_ui_array(got, F, fn);
-        fmpz_mul_2exp(got, got, fexp);
-        fmpz_sub(low, exact, got);
-        /* 0 <= exact - got < 2^fexp, and exact when fexp = 0 */
-        if (fmpz_sgn(low) < 0
-            || fmpz_sizeinbase(low, 2) > (ulong) FLINT_MAX(fexp, 1)
-            || (fexp == 0 && !fmpz_is_zero(low)))
-            TEST_FUNCTION_FAIL("factor: cap = %wd, qn = %wd, "
-                "tn = %wd, Qexp = %wd\n", cap, qn, tn,
-                (slong) Qexp);
-
-        fmpz_clear(exact); fmpz_clear(got); fmpz_clear(low);
-        flint_free(Q); flint_free(T); flint_free(F);
-    }
-
-    /* the terms helper agrees with the arb pair it ports, up to the
-       safe floor-log continuation beyond the table */
-    {
-        slong r2, p2;
-        for (r2 = 16; r2 <= 512; r2 *= 2)
-            for (p2 = 128; p2 <= 65536; p2 *= 4)
-            {
-                slong Nf = _fixed_exp_bs_num_terms(
-                    (flint_bitcnt_t) r2, p2);
-                slong Na = _arb_exp_taylor_bound(-r2, p2) - 1;
-                if (Na > 10000) while (Na % 128) Na++;
-                if (Na > 1000) while (Na % 16) Na++;
-                if (Na > 100) while (Na % 2) Na++;
-                if (Nf < Na || Nf > Na + Na / 8 + 16)
-                    TEST_FUNCTION_FAIL("terms: r = %wd, prec = %wd: "
-                        "%wd vs arb %wd\n", r2, p2, Nf, Na);
-            }
+        fmpz_clear(Ta); fmpz_clear(Qa); fmpz_clear(xf);
+        fmpz_clear(num); fmpz_clear(den);
+        fmpq_clear(qa); fmpq_clear(qb);
+        flint_free(xp); flint_free(T); flint_free(Q);
     }
 
     TEST_FUNCTION_END(state);

@@ -89,5 +89,56 @@ TEST_FUNCTION_START(fixed_log1p_bitwise_rs, state)
             TEST_FUNCTION_FAIL("n = %wd, r = %d, ulp = %f\n", n, r, u);
     }
 
+#if FLINT_BITS == 64
+    /* dense r = 0 sampling at the fully specialized sizes (the
+       straight-line code's reduction and borrow branches are
+       input-dependent) */
+    {
+        slong n, k;
+
+        for (n = 1; n <= 7; n++)
+        {
+            for (k = 0; k < 24; k++)
+            {
+                ulong x[7], res[7];
+                arb_t xa, e, va, delta;
+                fmpz_t t;
+                mag_t mb;
+                double u;
+                slong prec = FLINT_BITS * n + 128;
+
+                flint_mpn_rrandom(x, state, n);
+                if (k == 0)
+                    flint_mpn_zero(x, n);
+                if (k == 1)
+                    flint_mpn_store(x, n, ~UWORD(0));
+
+                fixed_log1p_bitwise_rs(res, x, n, 0);
+
+                arb_init(xa); arb_init(e); arb_init(va);
+                arb_init(delta); fmpz_init(t); mag_init(mb);
+                fmpz_set_ui_array(t, x, n);
+                arb_set_fmpz(xa, t);
+                arb_mul_2exp_si(xa, xa, -FLINT_BITS * n);
+                arb_log1p(e, xa, prec);
+                fmpz_set_ui_array(t, res, n);
+                arb_set_fmpz(va, t);
+                arb_mul_2exp_si(va, va, -FLINT_BITS * n);
+                arb_sub(delta, va, e, ARF_PREC_EXACT);
+                arb_get_mag(mb, delta);
+                mag_mul_2exp_si(mb, mb, FLINT_BITS * n);
+                u = mag_get_d(mb);
+                arb_clear(xa); arb_clear(e); arb_clear(va);
+                arb_clear(delta); fmpz_clear(t); mag_clear(mb);
+
+                if (u > (double) FIXED_LOG1P_BITWISE_RS_MAX_ERR(n,
+                    fixed_log1p_bitwise_rs_default_r(n)))
+                    TEST_FUNCTION_FAIL("r = 0: n = %wd, "
+                        "ulp = %f\n", n, u);
+            }
+        }
+    }
+#endif
+
     TEST_FUNCTION_END(state);
 }
