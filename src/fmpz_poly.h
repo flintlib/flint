@@ -619,6 +619,8 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     fmpz_poly_xgcd_modular(r, s, t, poly1, poly2);
 }
 
+void fmpz_poly_squarefree_part(fmpz_poly_t res, const fmpz_poly_t poly);
+
 /*  Discriminant  ********************************************************/
 
 void _fmpz_poly_discriminant(fmpz_t res, const fmpz * poly, slong len);
@@ -1228,6 +1230,8 @@ void _fmpz_poly_isolate_real_roots_0_1_vca(fmpq * exact_roots, slong * n_exact,
         fmpz * c_array, slong * k_array, slong * n_intervals,
         const fmpz * pol, slong len);
 void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact,
+    fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol);
+void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact,
     fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol);
 
 /* CLD bounds */

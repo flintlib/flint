@@ -294,7 +294,7 @@ Gaussian elimination
     Sets ``res`` to the reduced row echelon form of ``mat``
     and returns the rank.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, which is not checked.
 
 
 Strong echelon form and Howell form
@@ -329,7 +329,7 @@ Inverse
 
     `A` and `B` must be square matrices with the same dimensions.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, which is not checked.
 
 
 LU decomposition
@@ -356,7 +356,7 @@ LU decomposition
     will abandon the output matrix in an undefined state and return 0
     if `A` is detected to be rank-deficient.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, which is not checked.
 
 
 Triangular solving
@@ -372,7 +372,8 @@ Triangular solving
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, and ``L`` is assumed to have the
+    stated triangular shape; neither is checked.
 
 .. function:: void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t U, const fmpz_mod_mat_t B, int unit, const fmpz_mod_ctx_t ctx)
 
@@ -383,7 +384,8 @@ Triangular solving
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, and ``U`` is assumed to have the
+    stated triangular shape; neither is checked.
 
 
 Solving
@@ -399,7 +401,7 @@ Solving
 
     The matrix `A` must be square.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, which is not checked.
 
 .. function:: int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 
@@ -411,7 +413,7 @@ Solving
 
     There are no restrictions on the shape of `A` and it may be singular.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, which is not checked.
 
 
 Transforms
@@ -454,4 +456,4 @@ Minimal polynomial
     Compute the minimal polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.
 
-    The modulus is assumed to be prime.
+    The modulus is assumed to be prime, which is not checked.

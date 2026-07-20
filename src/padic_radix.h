@@ -70,6 +70,8 @@ typedef padic_radix_ctx_struct padic_radix_ctx_t[1];
 
 /* Context management */
 int gr_ctx_init_padic_radix(gr_ctx_t ctx, ulong p, slong prec_rel, slong prec_abs, int flags);
+int gr_ctx_init_padic_radix_randtest(gr_ctx_t ctx, flint_rand_t state, slong maxprec);
+
 void padic_radix_ctx_clear(gr_ctx_t ctx);
 int padic_radix_ctx_write(gr_stream_t out, gr_ctx_t ctx);
 
@@ -130,6 +132,26 @@ int padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initi
 int padic_radix_dot_strided_naive(padic_radix_t res, const padic_radix_t initial,
     int subtract, const padic_radix_struct * vec1, slong stride1,
     const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx);
+
+slong _padic_radix_exp_bound(slong v, slong N, ulong p);
+
+void _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix);
+void _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix);
+void _padic_radix_exp(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix);
+
+int padic_radix_exp_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
+int padic_radix_exp_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
+int padic_radix_exp(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
+
+slong _padic_radix_log_bound(slong v, slong N, ulong p);
+
+void _padic_radix_log_rectangular(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix);
+void _padic_radix_log_balanced(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix);
+void _padic_radix_log(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix);
+
+int padic_radix_log_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
+int padic_radix_log_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
+int padic_radix_log(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx);
 
 /* For testing */
 int _padic_radix_add_sub_reference(padic_radix_t res, const padic_radix_t x, const padic_radix_t y, int sub, gr_ctx_t ctx);

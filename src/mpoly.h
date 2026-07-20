@@ -579,6 +579,152 @@ void mpoly_monomial_mul_ui_mp(ulong * exp2, const ulong * exp3, slong N, ulong c
     __gmpn_mul_1(exp2, exp3, N, c);
 }
 
+/* Check that the operand has not overflowed into the guard bit */
+FLINT_FORCE_INLINE
+int mpoly_monomial_valid_any_bits(const ulong * exp, slong N,
+                                                        flint_bitcnt_t bits)
+{
+    if (bits <= FLINT_BITS)
+        return !mpoly_monomial_overflows((ulong *) exp, N,
+                                                    mpoly_overflow_mask_sp(bits));
+    else
+        return !mpoly_monomial_overflows_mp((ulong *) exp, N, bits);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_add_any_bits(ulong * exp1, const ulong * exp2,
+                            const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_add(exp1, exp2, exp3, N);
+    else
+        mpoly_monomial_add_mp(exp1, exp2, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_sub_any_bits(ulong * exp1, const ulong * exp2,
+                            const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_sub(exp1, exp2, exp3, N);
+    else
+        mpoly_monomial_sub_mp(exp1, exp2, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_madd_any_bits(ulong * exp1, const ulong * exp2,
+                ulong scalar, const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    /* Only the inputs are asserted here; exp2 + scalar*exp3 can
+       legitimately need to overflow-check its own *result*, which
+       remains the caller's responsibility as usual. */
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_madd(exp1, exp2, scalar, exp3, N);
+    else
+        mpoly_monomial_madd_mp(exp1, exp2, scalar, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_msub_any_bits(ulong * exp1, const ulong * exp2,
+                ulong scalar, const ulong * exp3, slong N, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_msub(exp1, exp2, scalar, exp3, N);
+    else
+        mpoly_monomial_msub_mp(exp1, exp2, scalar, exp3, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_max_any_bits(ulong * exp1, const ulong * exp2,
+             const ulong * exp3, flint_bitcnt_t bits, slong N, ulong mask)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_max(exp1, exp2, exp3, bits, N, mask);
+    else
+        mpoly_monomial_max_mp(exp1, exp2, exp3, bits, N);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_min_any_bits(ulong * exp1, const ulong * exp2,
+             const ulong * exp3, flint_bitcnt_t bits, slong N, ulong mask)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_min(exp1, exp2, exp3, bits, N, mask);
+    else
+        mpoly_monomial_min_mp(exp1, exp2, exp3, bits, N);
+}
+
+FLINT_FORCE_INLINE
+int mpoly_monomial_overflows_any_bits(ulong * exp, slong N, ulong mask,
+                                                        flint_bitcnt_t bits)
+{
+    /* No precondition to assert here: this function's entire purpose is
+       to determine whether `exp` has overflowed, so `exp` is not
+       expected to be valid on entry. */
+    if (bits <= FLINT_BITS)
+        return mpoly_monomial_overflows(exp, N, mask);
+    else
+        return mpoly_monomial_overflows_mp(exp, N, bits);
+}
+
+FLINT_FORCE_INLINE
+int mpoly_monomial_divides_any_bits(ulong * exp_ptr, const ulong * exp2,
+                    const ulong * exp3, slong N, ulong mask, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        return mpoly_monomial_divides(exp_ptr, exp2, exp3, N, mask);
+    else
+        return mpoly_monomial_divides_mp(exp_ptr, exp2, exp3, N, bits);
+}
+
+FLINT_FORCE_INLINE
+int mpoly_monomial_halves_any_bits(ulong * exp_ptr, const ulong * exp2,
+                                slong N, ulong mask, flint_bitcnt_t bits)
+{
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp2, N, bits));
+
+    if (bits <= FLINT_BITS)
+        return mpoly_monomial_halves(exp_ptr, exp2, N, mask);
+    else
+        return mpoly_monomial_halves_mp(exp_ptr, exp2, N, bits);
+}
+
+FLINT_FORCE_INLINE
+void mpoly_monomial_mul_ui_any_bits(ulong * exp2, const ulong * exp3,
+                                      slong N, ulong c, flint_bitcnt_t bits)
+{
+    /* Only exp3 (the input) is asserted; exp3*c can legitimately need
+       to overflow-check its own *result*, which remains the caller's
+       responsibility as usual. */
+    FLINT_ASSERT(mpoly_monomial_valid_any_bits(exp3, N, bits));
+
+    if (bits <= FLINT_BITS)
+        mpoly_monomial_mul_ui(exp2, exp3, N, c);
+    else
+        mpoly_monomial_mul_ui_mp(exp2, exp3, N, c);
+}
+
 void mpoly_monomial_mul_fmpz(ulong * exp2, const ulong * exp3, slong N, const fmpz_t c);
 
 FLINT_FORCE_INLINE
@@ -961,6 +1107,57 @@ void mpoly_set_monomial_ffmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bi
 void mpoly_set_monomial_pfmpz(ulong * exp1, fmpz * const * exp2, flint_bitcnt_t bits, const mpoly_ctx_t mctx);
 
 int mpoly_repack_monomials(ulong * exps1, flint_bitcnt_t bits1, const ulong * exps2, flint_bitcnt_t bits2, slong len, const mpoly_ctx_t mctx);
+
+/*
+    N + CMPMASK SETUP, AND OVERFLOW -> WIDER REPACK, HELPERS.
+
+    Two more recurring boilerplate blocks throughout the mpoly modules:
+
+    1. Computing N for a given bits/mctx and immediately deriving a
+       cmpmask array for it -- almost always into TMP_ALLOC'd storage,
+       so this has to be a macro (not a function) to keep the
+       allocation in the caller's own TMP_INIT/TMP_START/TMP_END scope:
+
+           N = mpoly_words_per_exp(bits, mctx);
+           cmpmask = (ulong *) TMP_ALLOC(N * sizeof(ulong));
+           mpoly_get_cmpmask(cmpmask, N, bits, mctx);
+
+       MPOLY_GET_CMPMASK_TMP_ALLOC below is exactly this, and must only
+       be used within such a TMP_ALLOC scope.
+
+    2. On overflow, widening the current packing width by (at least)
+       one field and repacking previously-computed monomials into
+       freshly allocated storage sized for it -- see
+       mpoly_monomials_repack_wider and
+       mpoly_monomials_repack_wider_cmpmask below.
+*/
+
+#define MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, bits, mctx)        \
+    do {                                                          \
+        (N) = mpoly_words_per_exp((bits), (mctx));                 \
+        (cmpmask) = (ulong *) TMP_ALLOC((N) * sizeof(ulong));      \
+        mpoly_get_cmpmask((cmpmask), (N), (bits), (mctx));          \
+    } while (0)
+
+/* As above, but for the (less common) case where cmpmask needs to
+   outlive the caller's own TMP_ALLOC scope (e.g. because it is handed
+   off to worker threads), so it must be a real flint_malloc allocation
+   that the caller remains responsible for flint_free-ing. */
+#define MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, bits, mctx)     \
+    do {                                                          \
+        (N) = mpoly_words_per_exp((bits), (mctx));                 \
+        (cmpmask) = (ulong *) flint_malloc((N) * sizeof(ulong));   \
+        mpoly_get_cmpmask((cmpmask), (N), (bits), (mctx));          \
+    } while (0)
+
+ulong * mpoly_monomials_repack_wider(flint_bitcnt_t * bits_ptr, slong * N_ptr,
+        const ulong * old_exps, flint_bitcnt_t old_bits, slong len,
+        slong alloc, const mpoly_ctx_t mctx);
+
+ulong * mpoly_monomials_repack_wider_cmpmask(flint_bitcnt_t * bits_ptr,
+        slong * N_ptr, ulong ** cmpmask_ptr, const ulong * old_exps,
+        flint_bitcnt_t old_bits, slong len, slong alloc,
+        const mpoly_ctx_t mctx);
 void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2, slong len, const slong * mults, slong num, slong bits);
 void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len, slong * mults, slong num, slong bits);
 

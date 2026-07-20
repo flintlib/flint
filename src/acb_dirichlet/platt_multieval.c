@@ -10,10 +10,19 @@
 */
 
 #include "fmpz_vec.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
 #include "acb_dirichlet/impl.h"
 #include "arb_hypgeom.h"
 #include "acb_dft.h"
+
+FLINT_FORCE_INLINE void
+_acb_vec_kronecker_mul(acb_ptr z, acb_srcptr x, acb_srcptr y, slong len, slong prec)
+{
+    slong k;
+    for (k = 0; k < len; k++)
+        acb_mul(z + k, x + k, y + k, prec);
+}
 
 static void
 _acb_dot_arb(acb_t res, const acb_t initial, int subtract,

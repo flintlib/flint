@@ -156,6 +156,9 @@ The following methods mainly implement the :ref:`generics <gr>` interface.
               int padic_radix_rsqrt(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
               truth_t padic_radix_is_square(const padic_radix_t x, gr_ctx_t ctx)
 
+Dot products
+--------------------------------------------------------------------------------
+
 .. function:: int padic_radix_dot_strided_delayed(padic_radix_t res, const padic_radix_t initial, int subtract, const padic_radix_struct * vec1, slong stride1, const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
               int padic_radix_dot_strided_naive(padic_radix_t res, const padic_radix_t initial, int subtract, const padic_radix_struct * vec1, slong stride1, const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
               int padic_radix_dot_strided(padic_radix_t res, const padic_radix_t initial, int subtract, const padic_radix_struct * vec1, slong stride1, const padic_radix_struct * vec2, slong stride2, slong len, gr_ctx_t ctx)
@@ -171,5 +174,63 @@ The following methods mainly implement the :ref:`generics <gr>` interface.
               int padic_radix_dot_rev(padic_radix_t res, const padic_radix_t initial, int subtract, const padic_radix_struct * vec1, const padic_radix_struct * vec2, slong len, gr_ctx_t ctx)
 
     Wrappers for :func:`padic_radix_dot_strided`.
+
+Transcendental functions
+--------------------------------------------------------------------------------
+
+.. function:: slong _padic_radix_exp_bound(slong v, slong N, ulong p)
+
+    Returns the smallest number of terms `n` such that the tail of the
+    exponential series for `x = p^v u` has valuation at least `N`, i.e.
+    the smallest `n` with `nv - v_p(n!) \ge N`:
+
+    .. math ::
+
+        n = \max(1, \left \lceil \frac{N(p-1) - 1}{v(p-1) - 1} \right \rceil)
+
+    Assumes (not checked) that `v` is large enough for the series to converge.
+
+.. function:: void _padic_radix_exp_rectangular(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+              void _padic_radix_exp_balanced(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+              void _padic_radix_exp(radix_integer_t rop, const radix_integer_t u, slong v, slong N, const radix_t radix)
+
+    Given an integer `u` and a valuation `v` such that `v \ge 1` if `p \ne 2`
+    and `v \ge 2` if `p = 2` (not checked), sets *rop* to `\exp(u p^v)`
+    truncated to precision `p^N`.
+
+    The *rectangular* algorithm uses rectangular splitting.
+    The *balanced* algorithm uses the `p`-adic bit-burst algorithm with
+    binary splitting. The default function chooses an algorithm automatically.
+
+.. function:: int padic_radix_exp_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_exp_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_exp(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+
+    Sets *res* to the `p`-adic exponential function `\exp(x)`.
+    Returns ``GR_DOMAIN`` if the series does not converge
+    and ``GR_UNABLE`` if convergence cannot be determined or if the
+    precision is too large for the implementation.
+
+.. function:: slong _padic_radix_log_bound(slong v, slong N, ulong p)
+
+    Returns the smallest number of terms `n` such that the tail of the
+    logarithm series for `1 + p^v u` has valuation at least `N`.
+
+.. function:: void _padic_radix_log_rectangular(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
+              void _padic_radix_log_balanced(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
+              void _padic_radix_log(radix_integer_t rop, const radix_integer_t y, slong N, const radix_t radix)
+
+    Given an integer `y` with valuation `v \ge 1` (not checked),
+    sets *rop* to `\log(1-y)` truncated to precision `p^N`.
+
+.. function:: int padic_radix_log_rectangular(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_log_balanced(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+              int padic_radix_log(padic_radix_t res, const padic_radix_t x, gr_ctx_t ctx)
+
+    Sets *res* to the `p`-adic natural logarithm `\log(x)`.
+    Returns ``GR_DOMAIN`` if the series does not converge
+    and ``GR_UNABLE`` if convergence cannot be determined or if the
+    precision is too large for the implementation.
+
 
 

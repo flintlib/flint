@@ -436,7 +436,8 @@ Trace
 .. function:: void nmod_poly_mat_trace(nmod_poly_t trace, const nmod_poly_mat_t mat)
 
     Computes the trace of the matrix, i.e. the sum of the entries on
-    the main diagonal. The matrix is required to be square.
+    the main diagonal. The matrix is required to be square, which is not
+    checked.
 
 
 Determinant and rank
@@ -481,6 +482,7 @@ Inverse
 
     Sets (``Ainv``, ``den``) to the inverse matrix of ``A``.
     Returns 1 if ``A`` is nonsingular and 0 if ``A`` is singular.
+    ``A`` must be a square matrix, which is not checked.
     Aliasing of ``Ainv`` and ``A`` is allowed.
 
     More precisely, ``det`` will be set to the determinant of ``A``
@@ -520,6 +522,7 @@ Solving
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    ``A`` is assumed to be square; this is not checked.
     Returns 1 if `A` is nonsingular and 0 if `A` is singular.
     The computed denominator will not generally be minimal.
 
@@ -530,6 +533,7 @@ Solving
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    ``A`` is assumed to be square; this is not checked.
     Returns 1 if `A` is nonsingular and 0 if `A` is singular.
     The computed denominator will not generally be minimal.
 
@@ -540,3 +544,6 @@ Solving
 
     Performs fraction-free forward and back substitution given a precomputed
     fraction-free LU decomposition and corresponding permutation.
+    The decomposition ``FFLU`` and permutation ``perm`` are assumed to come
+    from :func:`nmod_poly_mat_fflu` applied to a nonsingular square matrix;
+    this is not checked.

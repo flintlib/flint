@@ -47,6 +47,7 @@
 #include "t-platt_zeta_zeros.c"
 #include "t-powsum_smooth.c"
 #include "t-roots.c"
+#include "t-secondary_zeta.c"
 #include "t-stieltjes.c"
 #include "t-thetanull.c"
 #include "t-turing_method_bound.c"
@@ -100,6 +101,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_dirichlet_platt_zeta_zeros),
     TEST_FUNCTION(acb_dirichlet_powsum_smooth),
     TEST_FUNCTION(acb_dirichlet_roots),
+    TEST_FUNCTION(acb_dirichlet_secondary_zeta),
     TEST_FUNCTION(acb_dirichlet_stieltjes),
     TEST_FUNCTION(acb_dirichlet_thetanull),
     TEST_FUNCTION(acb_dirichlet_turing_method_bound),

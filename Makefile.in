@@ -173,6 +173,7 @@ HEADER_DIRS	:=	\
 		double_extras		d_vec				d_mat		\
 															\
 		mpn_extras	radix   	mpn_mod		nfloat			\
+		fixed											\
 															\
 		nmod		nmod_vec	nmod_mat	nmod_poly		\
 		fmpz		fmpz_vec	fmpz_mat	fmpz_poly		\
@@ -224,7 +225,7 @@ HEADER_DIRS	:=	\
 															\
 		gr			gr_generic	gr_vec		gr_mat			\
 		gr_poly		gr_mpoly	gr_ore_poly					\
-		gr_series	gr_special								\
+		gr_series	gr_special	gr_dft						\
 															\
 		calcium												\
 															\

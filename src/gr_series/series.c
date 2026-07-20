@@ -1024,6 +1024,34 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) \
     return status; \
 } \
 
+#define UNARY_PARAM_POLY_WRAPPER(func) \
+int \
+gr_series_ ## func(gr_series_t res, gr_srcptr p, const gr_series_t x, gr_ctx_t ctx) \
+{ \
+    slong len, xlen, xerr, err; \
+    int status = GR_SUCCESS; \
+ \
+    if (gr_ctx_is_rational_vector_space(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE) \
+        return GR_UNABLE; \
+\
+    xlen = GR_SERIES_POLY(x)->length; \
+    xerr = GR_SERIES_ERROR(x); \
+    err = xerr; \
+ \
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err); \
+    err = len; \
+ \
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT) \
+    { \
+        len = FLINT_MIN(len, 1); \
+        err = GR_SERIES_ERR_EXACT; \
+    } \
+ \
+    GR_SERIES_ERROR(res) = err; \
+    status |= gr_poly_ ## func ## _series(GR_SERIES_POLY(res), p, GR_SERIES_POLY(x), len, GR_SERIES_ELEM_CTX(ctx)); \
+    return status; \
+} \
+
 #define BINARY_UNARY_POLY_WRAPPER(func) \
 int \
 gr_series_ ## func(gr_series_t res1, gr_series_t res2, const gr_series_t x, gr_ctx_t ctx) \
@@ -1075,6 +1103,8 @@ UNARY_POLY_WRAPPER(atan)
 UNARY_POLY_WRAPPER(asinh)
 UNARY_POLY_WRAPPER(acosh)
 UNARY_POLY_WRAPPER(atanh)
+
+UNARY_PARAM_POLY_WRAPPER(bessel_j)
 
 
 #include "arb_poly.h"
@@ -2028,6 +2058,60 @@ gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
+static int
+gr_series_big_o_base_fmpz(gr_series_t res, const gr_series_t base, const fmpz_t exp, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_SERIES_ELEM_CTX(ctx);
+    gr_series_t gen;
+    truth_t is_gen;
+    int status;
+
+    /* Is base the generator of this ring? */
+    gr_series_init(gen, ctx);
+    status = gr_series_gen(gen, ctx);
+    is_gen = gr_series_equal(base, gen, ctx);
+    gr_series_clear(gen, ctx);
+
+    if (status != GR_SUCCESS)
+        return status;
+
+    /* O(y^exp): an inexact zero carrying an outer error of exp. */
+    if (is_gen == T_TRUE)
+    {
+        slong n;
+
+        if (fmpz_sgn(exp) < 0)
+            return GR_UNABLE;
+
+        if (fmpz_cmp_si(exp, GR_SERIES_ERR_MAX) >= 0)
+            n = GR_SERIES_ERR_MAX;
+        else
+            n = fmpz_get_si(exp);   /* todo: should this cap */
+
+        status = gr_series_zero(res, ctx);
+        GR_SERIES_ERROR(res) = n;
+        return status;
+    }
+
+    /* base is a constant of S[[y]] (a coefficient-ring generator promoted via
+       set_scalar): build O(base^exp) in S and lift it back as a constant.
+       The resulting inexact constant lands in the y^0 coefficient only. */
+    if (GR_SERIES_ERROR(base) == GR_SERIES_ERR_EXACT && GR_SERIES_POLY(base)->length == 1)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, cctx);
+
+        status |= gr_big_o_base_fmpz(t, GR_SERIES_POLY(base)->coeffs, exp, cctx);
+        if (status == GR_SUCCESS)
+            status = gr_series_set_scalar(res, t, ctx);
+
+        GR_TMP_CLEAR(t, cctx);
+        return status;
+    }
+
+    return GR_UNABLE;
+}
+
 int
 gr_series_set_other(gr_series_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
@@ -2122,6 +2206,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_GEN,         (gr_funcptr) gr_series_gen},
     {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE,  (gr_funcptr) gr_series_gens_recursive},
+    {GR_METHOD_BIG_O_BASE_FMPZ, (gr_funcptr) gr_series_big_o_base_fmpz},
     {GR_METHOD_SET,         (gr_funcptr) gr_series_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) gr_series_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) gr_series_set_si},

@@ -249,10 +249,7 @@ void _fq_nmod_mpoly_mul_johnson(
     heap[1].next = x;
     heap[1].exp = exp_list[exp_next++];
 
-    if (bits <= FLINT_BITS)
-        mpoly_monomial_add(heap[1].exp, Bexps + N*0, Cexps + N*0, N);
-    else
-        mpoly_monomial_add_mp(heap[1].exp, Bexps + N*0, Cexps + N*0, N);
+    mpoly_monomial_add_any_bits(heap[1].exp, Bexps + N*0, Cexps + N*0, N, bits);
 
     hind[0] = 2*1 + 0;
 
@@ -347,12 +344,7 @@ void _fq_nmod_mpoly_mul_johnson(
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexps + x->i*N,
-                                                           Cexps + x->j*N, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexps + x->i*N,
-                                                              Cexps + x->j*N, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexps + x->i*N, Cexps + x->j*N, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -371,12 +363,7 @@ void _fq_nmod_mpoly_mul_johnson(
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexps + x->i*N,
-                                                           Cexps + x->j*N, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexps + x->i*N,
-                                                              Cexps + x->j*N, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexps + x->i*N, Cexps + x->j*N, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -436,9 +423,7 @@ void fq_nmod_mpoly_mul_johnson(
         fmpz_clear(Cmaxfields + i);
     }
 
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (Abits != B->bits)

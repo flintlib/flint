@@ -197,6 +197,8 @@ acb_dirichlet_zeta_zero(acb_t res, const fmpz_t n, slong prec)
     acb_dirichlet_zeta_zeros(res, n, 1, prec);
 }
 
+void acb_dirichlet_secondary_zeta(acb_t res, const acb_t s, slong prec);
+
 void acb_dirichlet_vec_mellin_arb(acb_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, const arb_t t, slong n, slong prec);
 
 /* Platt zeta zeros */

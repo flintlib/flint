@@ -141,11 +141,63 @@ void func_name(S rp, T ap, slong len, U b, slong prec) \
         OP(rp + ix, ap + ix, b, prec); \
 }
 
-SCALAR_OP(_acb_vec_scalar_mul_si,   acb_ptr, acb_srcptr, slong,        acb_mul_si)
-SCALAR_OP(_acb_vec_scalar_mul_ui,   acb_ptr, acb_srcptr, ulong,        acb_mul_ui)
-SCALAR_OP(_acb_vec_scalar_mul_fmpz, acb_ptr, acb_srcptr, const fmpz_t, acb_mul_fmpz)
-SCALAR_OP(_acb_vec_scalar_mul_arb,  acb_ptr, acb_srcptr, const arb_t,  acb_mul_arb)
-SCALAR_OP(_acb_vec_scalar_mul,      acb_ptr, acb_srcptr, const acb_t,  acb_mul)
+SCALAR_OP(_acb_vec_scalar_mul_arf,  acb_ptr, acb_srcptr, const arf_t,  acb_mul_arf)
+
+void
+_acb_vec_scalar_mul(acb_ptr res, acb_srcptr vec, slong len, const acb_t c, slong prec)
+{
+    if (acb_is_real(c))
+    {
+	_acb_vec_scalar_mul_arb(res, vec, len, acb_realref(c), prec);
+    }
+    else
+    {
+	slong ix;
+	for (ix = 0; ix < len; ix++)
+	    acb_mul(res + ix, vec + ix, c, prec);
+    }
+}
+
+void
+_acb_vec_scalar_mul_arb(acb_ptr res, acb_srcptr vec, slong len, const arb_t c, slong prec)
+{
+    if (arb_is_exact(c))
+    {
+	_acb_vec_scalar_mul_arf(res, vec, len, arb_midref(c), prec);
+    }
+    else
+    {
+	slong ix;
+	for (ix = 0; ix < len; ix++)
+	    acb_mul_arb(res + ix, vec + ix, c, prec);
+    }
+}
+
+void
+_acb_vec_scalar_mul_ui(acb_ptr res, acb_srcptr vec, slong len, ulong c, slong prec)
+{
+    arf_t t;
+    arf_init_set_ui(t, c); /* no need to free */
+    _acb_vec_scalar_mul_arf(res, vec, len, t, prec);
+}
+
+void
+_acb_vec_scalar_mul_si(acb_ptr res, acb_srcptr vec, slong len, slong c, slong prec)
+{
+    arf_t t;
+    arf_init_set_si(t, c); /* no need to free */
+    _acb_vec_scalar_mul_arf(res, vec, len, t, prec);
+}
+
+void
+_acb_vec_scalar_mul_fmpz(acb_ptr res, acb_srcptr vec, slong len, const fmpz_t c, slong prec)
+{
+    arf_t t;
+    arf_init(t);
+    arf_set_fmpz(t, c);
+    _acb_vec_scalar_mul_arf(res, vec, len, t, prec);
+    arf_clear(t);
+}
 
 SCALAR_OP(_acb_vec_scalar_div_ui,   acb_ptr, acb_srcptr, ulong,        acb_div_ui)
 SCALAR_OP(_acb_vec_scalar_div_fmpz, acb_ptr, acb_srcptr, const fmpz_t, acb_div_fmpz)

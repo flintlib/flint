@@ -18,7 +18,8 @@ int
 gr_mat_randtest_orthogonal(gr_mat_t A, flint_rand_t state, gr_ctx_t ctx)
 {
     slong n = A->r;
-    slong i, j, density;
+    slong i, j;
+    ulong density;
     int status = GR_SUCCESS;
 
     if (n != A->c)

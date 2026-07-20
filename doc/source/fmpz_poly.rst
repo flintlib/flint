@@ -1436,6 +1436,10 @@ Greatest common divisor
     For convenience, we define the resultant to be equal to zero if either
     of the two polynomials is zero.
 
+.. function:: void fmpz_poly_squarefree_part(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets ``res`` to the squarefree part of ``poly``, normalised to have
+    positive leading coefficient.
 
 Discriminant
 --------------------------------------------------------------------------------
@@ -1822,7 +1826,8 @@ Euclidean division
 .. function:: void _fmpz_poly_div_root_fmpz(fmpz * Q, const fmpz * A, slong len, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `x - c`.
+    division by `x - c`. Assumes the division is exact, which is not
+    checked.
 
     Supports aliasing of ``Q`` and ``A``, but the result is
     undefined in case of partial overlap.
@@ -1830,17 +1835,20 @@ Euclidean division
 .. function:: void fmpz_poly_div_root_fmpz(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `x - c`.
+    division by `x - c`. Assumes the division is exact, which is not
+    checked.
 
 .. function:: void _fmpz_poly_divexact(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
               void fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Like :func:`fmpz_poly_div`, but assumes that the division is exact.
+    This is not checked; the result is undefined if the division is inexact.
 
 .. function:: void _fmpz_poly_divexact_root_fmpq(fmpz * Q, const fmpz * A, slong len, const fmpq_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `q x - p` where `c = p/q`. Assumes the division is exact.
+    division by `q x - p` where `c = p/q`. Assumes the division is exact,
+    which is not checked.
 
     Supports aliasing of ``Q`` and ``A``, but the result is
     undefined in case of partial overlap.
@@ -1848,7 +1856,8 @@ Euclidean division
 .. function:: void fmpz_poly_divexact_root_fmpq(fmpz_poly_t Q, const fmpz_poly_t A, const fmpq_t c)
 
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
-    division by `q x - p` where `c = p/q`. Assumes the division is exact.
+    division by `q x - p` where `c = p/q`. Assumes the division is exact,
+    which is not checked.
 
 Division with precomputed inverse
 --------------------------------------------------------------------------------
@@ -1969,8 +1978,8 @@ Division mod p
     division is exact modulo `p`. The computed coefficients are reduced modulo
     `p` using the symmetric remainder system. We require `f` to be at least `n`
     in length. The function can handle trailing zeroes, but the low nonzero
-    coefficient of `g` must be coprime to `p`. This is a bespoke function used
-    by factoring.
+    coefficient of `g` must be coprime to `p`, which is not checked. This is a
+    bespoke function used by factoring.
 
 .. function:: void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_t p, slong n)
 
@@ -1979,7 +1988,7 @@ Division mod p
     `p` using the symmetric remainder system. We require `f` to be as output
     by ``fmpz_poly_mulhigh_n`` given polynomials `g` and a polynomial of
     length `n` as inputs. The leading coefficient of `g` must be coprime to
-    `p`. This is a bespoke function used by factoring.
+    `p`, which is not checked. This is a bespoke function used by factoring.
 
 
 Power series division
@@ -1991,40 +2000,45 @@ Power series division
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)`` using a recurrence.
 
-    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`.
+    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`;
+    the constant term is not checked.
     Does not support aliasing.
 
 .. function:: void fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first `n` terms of the inverse power series of `Q`
     using a recurrence, assuming that `Q` has constant term `\pm 1`
-    and `n \geq 1`.
+    and `n \geq 1`; the constant term is not checked.
 
 .. function:: void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)`` using Newton iteration.
 
-    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`.
+    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`;
+    the constant term is not checked.
     Does not support aliasing.
 
 .. function:: void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first `n` terms of the inverse power series of `Q` using
-    Newton iteration, assuming `Q` has constant term `\pm 1` and `n \geq 1`.
+    Newton iteration, assuming `Q` has constant term `\pm 1` and `n \geq 1`;
+    the constant term is not checked.
 
 .. function:: void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
 
     Computes the first `n` terms of the inverse power series of
     ``(Q, lenQ)``.
 
-    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`.
+    Assumes that `n \geq 1` and that `Q` has constant term `\pm 1`;
+    the constant term is not checked.
     Does not support aliasing.
 
 .. function:: void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 
     Computes the first `n` terms of the inverse power series of `Q`,
-    assuming `Q` has constant term `\pm 1` and `n \geq 1`.
+    assuming `Q` has constant term `\pm 1` and `n \geq 1`; the constant
+    term is not checked.
 
 .. function:: void _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
@@ -2033,7 +2047,8 @@ Power series division
 .. function:: void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, slong Alen, const fmpz * B, slong Blen, slong n)
 
     Divides ``(A, Alen)`` by ``(B, Blen)`` as power series over `\mathbb{Z}`,
-    assuming `B` has constant term `\pm 1` and `n \geq 1`.
+    assuming `B` has constant term `\pm 1` and `n \geq 1`; the constant
+    term is not checked.
     Aliasing is not supported.
 
 .. function:: void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B, slong n)
@@ -2045,7 +2060,7 @@ Power series division
     Performs power series division in `\mathbb{Z}[[x]] / (x^n)`.  The function
     considers the polynomials `A` and `B` as power series of length `n`
     starting with the constant terms.  The function assumes that `B` has
-    constant term `\pm 1` and `n \geq 1`.
+    constant term `\pm 1` and `n \geq 1`; the constant term is not checked.
 
 
 Pseudo division
@@ -2629,7 +2644,7 @@ Power series reversion
     Sets ``Qinv`` to the compositional inverse or reversion of ``Q``
     as a power series, i.e. computes `Q^{-1}` such that
     `Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n`.
-    It is required that `Q_0 = 0` and `Q_1 = \pm 1`.
+    It is required that `Q_0 = 0` and `Q_1 = \pm 1`. This is not checked.
 
     Wraps :func:`_gr_poly_revert_series` which chooses automatically
     between various algorithms.
@@ -3321,6 +3336,19 @@ Roots
     ``n_interval`` is updated accordingly. The data
     ``c = c_array + i`` and ``k = k_array[i]`` represents the
     open interval `(c 2^k, (c + 1) 2^k)`.
+
+.. function:: void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact, fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol)
+
+    As :func:`fmpz_poly_isolate_real_roots`, but finds only
+    the roots which are strictly positive.
+
+Note: to compute complex roots or refine roots to high precision, see:
+
+* :func:`arb_fmpz_poly_real_roots`
+
+* :func:`arb_fmpz_poly_complex_roots`
+
+* :func:`arb_fmpz_poly_refine_root_arb`
 
 Minimal polynomials
 --------------------------------------------------------------------------------

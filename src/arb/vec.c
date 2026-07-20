@@ -137,10 +137,40 @@ void func_name(S rp, T ap, slong len, U b, slong prec) \
         OP(rp + ix, ap + ix, b, prec); \
 }
 
-SCALAR_OP(_arb_vec_scalar_mul,      arb_ptr, arb_srcptr, const arb_t,  arb_mul)
 SCALAR_OP(_arb_vec_scalar_mul_arf,  arb_ptr, arb_srcptr, const arf_t,  arb_mul_arf)
 SCALAR_OP(_arb_vec_scalar_div,      arb_ptr, arb_srcptr, const arb_t,  arb_div)
 SCALAR_OP(_arb_vec_scalar_addmul,   arb_ptr, arb_srcptr, const arb_t, arb_addmul)
+
+void
+_arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec)
+{
+    if (arb_is_exact(c))
+    {
+	_arb_vec_scalar_mul_arf(res, vec, len, arb_midref(c), prec);
+    }
+    else
+    {
+	slong ix;
+	for (ix = 0; ix < len; ix++)
+	    arb_mul(res + ix, vec + ix, c, prec);
+    }
+}
+
+void
+_arb_vec_scalar_mul_ui(arb_ptr res, arb_srcptr vec, slong len, ulong c, slong prec)
+{
+    arf_t t;
+    arf_init_set_ui(t, c); /* no need to free */
+    _arb_vec_scalar_mul_arf(res, vec, len, t, prec);
+}
+
+void
+_arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong prec)
+{
+    arf_t t;
+    arf_init_set_si(t, c); /* no need to free */
+    _arb_vec_scalar_mul_arf(res, vec, len, t, prec);
+}
 
 void
 _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec)
@@ -152,13 +182,6 @@ _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c,
     arf_clear(t);
 }
 
-void
-_arb_vec_scalar_mul_si(arb_ptr res, arb_srcptr vec, slong len, slong c, slong prec)
-{
-    arf_t t;
-    arf_init_set_si(t, c); /* no need to free */
-    _arb_vec_scalar_mul_arf(res, vec, len, t, prec);
-}
 
 #define COMPARISON_OP(func_name, S, T, OP) \
 int func_name(S ap, T bp, slong len)\

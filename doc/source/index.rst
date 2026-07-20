@@ -62,6 +62,7 @@ Generic rings
    gr_mpoly.rst
    gr_ore_poly.rst
    gr_series.rst
+   gr_dft.rst
 
 .. only:: not latex
 
@@ -90,6 +91,7 @@ Integers
    long_extras.rst
    longlong.rst
    mpn_extras.rst
+   fixed.rst
    aprcl.rst
    arith.rst
    fft.rst

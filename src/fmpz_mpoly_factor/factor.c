@@ -174,8 +174,18 @@ static int _factor_irred_compressed(
 
         success = 1;
     }
-    else if (ctx->minfo->nvars == 2)
+    else if (ctx->minfo->nvars == 2 &&
+             ((Adegs[0] + 1.0)*(Adegs[1] + 1.0) <= 400 ||
+              A->length >= 0.2*(Adegs[0] + 1.0)*(Adegs[1] + 1.0)))
     {
+        /*
+            The dense bivariate factoring code is only competitive for
+            dense-ish inputs: its lifting and recombination work with dense
+            representations of size about deg_x*deg_y. For sparse inputs with
+            large degrees (issue #2408) it can be several orders of magnitude
+            slower than the generic sparse machinery below, which also
+            handles nvars == 2.
+        */
         fmpz_bpoly_t b;
         fmpz_tpoly_t bf;
 

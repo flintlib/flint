@@ -490,7 +490,7 @@ Powering
 Division
 --------------------------------------------------------------------------------
 
-The division functions assume that the modulus is prime.
+The division functions assume that the modulus is prime, which is not checked.
 
 .. function:: int fmpz_mod_mpoly_divides(fmpz_mod_mpoly_t Q, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t ctx)
 
@@ -512,6 +512,9 @@ The division functions assume that the modulus is prime.
 
 Greatest Common Divisor
 --------------------------------------------------------------------------------
+
+The greatest common divisor functions assume that the modulus is prime,
+which is not checked.
 
 .. function:: void fmpz_mod_mpoly_term_content(fmpz_mod_mpoly_t M, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx)
 
@@ -552,7 +555,8 @@ Greatest Common Divisor
 Square Root
 --------------------------------------------------------------------------------
 
-The square root functions assume that the modulus is prime for correct operation.
+The square root functions assume that the modulus is prime for correct
+operation, which is not checked.
 
 .. function:: int fmpz_mod_mpoly_sqrt(fmpz_mod_mpoly_t Q, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx)
 

@@ -18,6 +18,9 @@ Types, macros and constants
 Factorisation
 --------------------------------------------------------------------------------
 
+The factorisation, irreducibility and squarefreeness functions in this
+module assume that the modulus is prime. This is not checked.
+
 
 .. function:: void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx)
 
@@ -122,13 +125,15 @@ Factorisation
     placed in ``factor`` and 1 is returned, otherwise 0 is returned and
     the value of factor is undetermined.
 
-    Requires that ``pol`` be monic, non-constant and squarefree.
+    Requires that ``pol`` be monic, non-constant and squarefree. These
+    requirements are not checked.
 
 .. function:: void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors, const fmpz_mod_poly_t pol, slong d, const fmpz_mod_ctx_t ctx)
 
     Assuming ``pol`` is a product of irreducible factors all of
     degree ``d``, finds all those factors and places them in factors.
-    Requires that ``pol`` be monic, non-constant and squarefree.
+    Requires that ``pol`` be monic, non-constant and squarefree. These
+    requirements are not checked.
 
 .. function:: void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_t poly, slong * const * degs, const fmpz_mod_ctx_t ctx)
 
@@ -137,7 +142,8 @@ Factorisation
     `f[d]` is the product of the monic irreducible factors of ``poly``
     of degree `d`. Factors `f[d]` are stored in ``res``, and the degree `d`
     of the irreducible factors is stored in ``degs`` in the same order
-    as the factors.
+    as the factors. The monic, non-constant and squarefree assumptions
+    on ``poly`` are not checked.
 
     Requires that ``degs`` has enough space for `(n/2)+1 * sizeof(slong)`.
 

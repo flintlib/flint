@@ -12,6 +12,12 @@
 /* Include functions *********************************************************/
 
 #include "t-dot.c"
+#include "t-exp.c"
+#include "t-exp_balanced.c"
+#include "t-exp_rectangular.c"
+#include "t-log.c"
+#include "t-log_balanced.c"
+#include "t-log_rectangular.c"
 #include "t-padic.c"
 
 /* Array of test functions ***************************************************/
@@ -19,6 +25,12 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(padic_radix_dot),
+    TEST_FUNCTION(padic_radix_exp),
+    TEST_FUNCTION(padic_radix_exp_balanced),
+    TEST_FUNCTION(padic_radix_exp_rectangular),
+    TEST_FUNCTION(padic_radix_log),
+    TEST_FUNCTION(padic_radix_log_balanced),
+    TEST_FUNCTION(padic_radix_log_rectangular),
     TEST_FUNCTION(padic_radix),
 };
 

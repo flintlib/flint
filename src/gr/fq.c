@@ -40,7 +40,13 @@ _gr_fq_ctx_clear(gr_ctx_t ctx)
 static int
 _gr_fq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    return gr_stream_write(out, "Finite field (fq)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "GF(");
+    status |= gr_stream_write_fmpz(out, fq_ctx_prime(FQ_CTX(ctx)));
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, fq_ctx_degree(FQ_CTX(ctx)));
+    status |= gr_stream_write(out, ") (fq)");
+    return status;
 }
 
 static int _gr_fq_ctx_set_gen_name(gr_ctx_t ctx, const char * s)

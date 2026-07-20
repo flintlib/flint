@@ -564,9 +564,7 @@ void nmod_mpoly_divrem_ideal_monagan_pearce(
         QRbits = FLINT_MAX(QRbits, B[i]->bits);
     QRbits = mpoly_fix_bits(QRbits, ctx->minfo);
 
-    N = mpoly_words_per_exp(QRbits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, QRbits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, QRbits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     Aexps = A->exps;

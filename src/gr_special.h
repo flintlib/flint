@@ -193,6 +193,8 @@ GR_SPECIAL_DEF int gr_bessel_j_y(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcpt
 GR_SPECIAL_DEF int gr_bessel_i_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_I_SCALED)(res, x, y, ctx); }
 GR_SPECIAL_DEF int gr_bessel_k_scaled(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, BESSEL_K_SCALED)(res, x, y, ctx); }
 
+WARN_UNUSED_RESULT int gr_bessel_j_jet(gr_ptr res, gr_srcptr nu, gr_srcptr z, slong len, gr_ctx_t ctx);
+
 GR_SPECIAL_DEF int gr_airy(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr x, gr_ctx_t ctx) { return GR_QUATERNARY_UNARY_OP(ctx, AIRY)(res1, res2, res3, res4, x, ctx); }
 GR_SPECIAL_DEF int gr_airy_ai(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_AI)(res, x, ctx); }
 GR_SPECIAL_DEF int gr_airy_bi(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, AIRY_BI)(res, x, ctx); }

@@ -627,6 +627,7 @@ static slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * 
     ulong * emax = S->emax;
     ulong * emin = S->emin;
     slong N = S->N;
+    flint_bitcnt_t bits = S->bits;
     slong i, j;
     slong next_loc = Blen + 4;   /* something bigger than heap can ever be */
     slong heap_len = 1; /* heap zero index unused */
@@ -682,13 +683,13 @@ static slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * 
     {
         if (startidx < Clen)
         {
-            mpoly_monomial_add_mp(texp, Bexp + N*i, Cexp + N*startidx, N);
+            mpoly_monomial_add_any_bits(texp, Bexp + N*i, Cexp + N*startidx, N, bits);
             FLINT_ASSERT(mpoly_monomial_cmp(emax, texp, N, S->cmpmask)
                                                                > -upperclosed);
         }
         while (startidx > 0)
         {
-            mpoly_monomial_add_mp(texp, Bexp + N*i, Cexp + N*(startidx - 1), N);
+            mpoly_monomial_add_any_bits(texp, Bexp + N*i, Cexp + N*(startidx - 1), N, bits);
             if (mpoly_monomial_cmp(emax, texp, N, S->cmpmask) <= -upperclosed)
             {
                 break;
@@ -698,12 +699,12 @@ static slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * 
 
         if (endidx < Clen)
         {
-            mpoly_monomial_add_mp(texp, Bexp + N*i, Cexp + N*endidx, N);
+            mpoly_monomial_add_any_bits(texp, Bexp + N*i, Cexp + N*endidx, N, bits);
             FLINT_ASSERT(mpoly_monomial_cmp(emin, texp, N, S->cmpmask) > 0);
         }
         while (endidx > 0)
         {
-            mpoly_monomial_add_mp(texp, Bexp + N*i, Cexp + N*(endidx - 1), N);
+            mpoly_monomial_add_any_bits(texp, Bexp + N*i, Cexp + N*(endidx - 1), N, bits);
             if (mpoly_monomial_cmp(emin, texp, N, S->cmpmask) <= 0)
             {
                 break;
@@ -725,8 +726,7 @@ static slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * 
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
 
-            mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                      Cexp + N*x->j, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
             exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                           &next_loc, &heap_len, N, S->cmpmask);
@@ -869,8 +869,7 @@ static slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * 
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                          Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                           &next_loc, &heap_len, N, S->cmpmask);
@@ -891,8 +890,7 @@ static slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * 
 
                 hind[x->i] = 2*(x->j + 1) + 0;
 
-                mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                          Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                           &next_loc, &heap_len, N, S->cmpmask);
@@ -1367,20 +1365,9 @@ static slong _fmpz_mpoly_divides_stripe(
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
-        {
-            if (mpoly_monomial_overflows(exp, N, mask))
-                goto not_exact_division;
-            lt_divides = mpoly_monomial_divides(Qexp + N*Qlen, exp,
-                                                         Bexp + N*0, N, mask);
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto not_exact_division;
-            lt_divides = mpoly_monomial_divides_mp(Qexp + N*Qlen, exp,
-                                                         Bexp + N*0, N, bits);
-        }
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
+            goto not_exact_division;
+        lt_divides = mpoly_monomial_divides_any_bits(Qexp + N*Qlen, exp, Bexp + N*0, N, mask, bits);
 
         FLINT_ASSERT(mpoly_monomial_cmp(exp, S->emin, N, S->cmpmask) >= 0);
 
@@ -1469,8 +1456,7 @@ static slong _fmpz_mpoly_divides_stripe(
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Qexp + N*x->j, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Qexp + N*x->j, N, bits);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], S->emin, N,
                                                               S->cmpmask) >= 0)
@@ -1497,8 +1483,7 @@ static slong _fmpz_mpoly_divides_stripe(
                     x->next = NULL;
                     hind[x->i] = 2*(x->j + 1) + 0;
 
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Qexp + N*x->j, N);
+                    mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Qexp + N*x->j, N, bits);
 
                     if (mpoly_monomial_cmp(exp_list[exp_next], S->emin, N,
                                                               S->cmpmask) >= 0)
@@ -1589,8 +1574,7 @@ static slong _fmpz_mpoly_divides_stripe(
             x->next = NULL;
             hind[x->i] = 2*(x->j + 1) + 0;
 
-            mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                             Qexp + N*x->j, N);
+            mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Qexp + N*x->j, N, bits);
 
             if (mpoly_monomial_cmp(exp_list[exp_next], S->emin, N, S->cmpmask)
                                                                           >= 0)
@@ -2028,9 +2012,7 @@ int _fmpz_mpoly_divides_heap_threaded_pool(
     exp_bits = FLINT_MAX(exp_bits, B->bits);
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     Aexp = A->exps;
@@ -2127,12 +2109,12 @@ int _fmpz_mpoly_divides_heap_threaded_pool(
     texps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     qexps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
-    mpoly_monomial_sub_mp(qexps + N*0, Aexp + N*0, Bexp + N*0, N);
+    mpoly_monomial_sub_any_bits(qexps + N*0, Aexp + N*0, Bexp + N*0, N, exp_bits);
     fmpz_divexact(qcoeff, A->coeffs + 0, B->coeffs + 0); /* already checked */
 
     fmpz_mpoly_ts_init(H->polyQ, qcoeff, qexps, 1, H->bits, H->N);
 
-    mpoly_monomial_add_mp(texps, qexps + N*0, Bexp + N*1, N);
+    mpoly_monomial_add_any_bits(texps, qexps + N*0, Bexp + N*1, N, exp_bits);
 
     mask = 0;
     for (i = 0; (flint_bitcnt_t) i < FLINT_BITS/exp_bits; i++)
@@ -2142,12 +2124,7 @@ int _fmpz_mpoly_divides_heap_threaded_pool(
     while (k < A->length && mpoly_monomial_gt(Aexp + N*k, texps, N, cmpmask))
     {
         int lt_divides;
-        if (exp_bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(qexps, Aexp + N*k,
-                                                      Bexp + N*0, N, mask);
-        else
-            lt_divides = mpoly_monomial_divides_mp(qexps, Aexp + N*k,
-                                                      Bexp + N*0, N, exp_bits);
+        lt_divides = mpoly_monomial_divides_any_bits(qexps, Aexp + N*k, Bexp + N*0, N, mask, exp_bits);
         if (!lt_divides)
         {
             H->failed = 1;

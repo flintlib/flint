@@ -37,6 +37,12 @@ It is recommended that users do not access the fields of an
 :type:`nmod_poly_t` or its coefficient data directly, but make use of
 the functions designed for this purpose, detailed below.
 
+Many functions in this module (greatest common divisors, modular
+inverses, division as if over a field, resultants and discriminants,
+factorisation, irreducibility testing, root finding, square roots, and
+the transcendental series) require the modulus to be prime. This is
+assumed and not checked.
+
 Functions in ``nmod_poly`` do all the memory management for the user.
 One does not need to specify the maximum length in advance before
 using a polynomial object. FLINT reallocates space automatically as
@@ -237,7 +243,7 @@ Randomization
 Construction of irreducible polynomials
 --------------------------------------------------------------------------------
 
-The following functions assume a prime modulus.
+The following functions assume a prime modulus, which is not checked.
 
 .. function:: void nmod_poly_minimal_irreducible(nmod_poly_t res, ulong n)
 
@@ -1320,13 +1326,15 @@ Derivative and integral
     The constant term of ``x_int`` is set to zero.
     It is assumed that ``len > 0``. The result is only well-defined
     if the modulus is a prime number strictly larger than the degree of
-    ``x``. Supports aliasing between the two polynomials.
+    ``x``; these conditions are not checked. Supports aliasing between
+    the two polynomials.
 
 .. function:: void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
 
     Set ``x_int`` to the indefinite integral of ``x`` with constant
     term zero. The result is only well-defined if the modulus
-    is a prime number strictly larger than the degree of ``x``.
+    is a prime number strictly larger than the degree of ``x``; these
+    conditions are not checked.
 
 
 
@@ -1361,22 +1369,23 @@ Evaluation
     multiplications done as in :func:`n_mulmod_shoup` using the precomputed
     ``c_precomp`` obtained via :func:`n_mulmod_precomp_shoup`.
 
-.. function:: ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+.. function:: ulong _nmod_poly_evaluate_nmod_horner(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+              ulong _nmod_poly_evaluate_nmod_rectangular(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+              ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 
     Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
-    of ``poly``. The value ``c`` should be reduced modulo the modulus. The
-    algorithm used is Horner's method, with multiplications done via
-    :func:`nmod_mul`.
+    of ``poly``. The value ``c`` should be reduced modulo the modulus.
+    The implemented algorithms are Horner's method and rectangular splitting.
+    The default function :func:`_nmod_poly_evaluate_nmod` selects
+    automatically between :func:`_nmod_poly_evaluate_nmod_horner`,
+    :func:`_nmod_poly_evaluate_nmod_rectangular`
+    :func:`_nmod_poly_evaluate_nmod_precomp`, and
+    :func:`_nmod_poly_evaluate_nmod_precomp_lazy`.
 
 .. function:: ulong nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
 
     Evaluates ``poly`` at the value ``c`` and reduces modulo the modulus of
-    ``poly``. The value ``c`` should be reduced modulo the modulus. The
-    algorithm used is Horner's method, with multiplications and additions done
-    differently depending on the modulus ``poly->mod`` and on the degree (calls
-    one of :func:`_nmod_poly_evaluate_nmod`,
-    :func:`_nmod_poly_evaluate_nmod_precomp`,
-    :func:`_nmod_poly_evaluate_nmod_precomp_lazy`).
+    ``poly``. The value ``c`` should be reduced modulo the modulus.
 
 .. function:: void nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
 
@@ -1703,23 +1712,25 @@ Taylor shift
 
     Performs the Taylor shift composing ``poly`` by `x+c` in-place.
     Writes the composition as a single convolution with cost `O(M(n))`.
-    We require that the modulus is a prime at least as large as the length.
+    We require that the modulus is a prime at least as large as the
+    length (this is not checked).
 
 .. function:: void nmod_poly_taylor_shift_convolution(nmod_poly_t g, const nmod_poly_t f, ulong c)
 
     Performs the Taylor shift composing ``f`` by `x+c`.
     Writes the composition as a single convolution with cost `O(M(n))`.
-    We require that the modulus is a prime at least as large as the length.
+    We require that the modulus is a prime at least as large as the
+    length (this is not checked).
 
 .. function:: void _nmod_poly_taylor_shift(nn_ptr poly, ulong c, slong len, nmod_t mod)
 
     Performs the Taylor shift composing ``poly`` by `x+c` in-place.
-    We require that the modulus is a prime.
+    We require that the modulus is a prime (this is not checked).
 
 .. function:: void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, ulong c)
 
     Performs the Taylor shift composing ``f`` by `x+c`.
-    We require that the modulus is a prime.
+    We require that the modulus is a prime (this is not checked).
 
 
 Modular composition
@@ -2193,7 +2204,7 @@ Greatest common divisor
 
     Attempts to set `A` to the inverse of `B` modulo `P` in the polynomial
     ring `(\mathbf{Z}/p\mathbf{Z})[X]`, where we assume that `p` is a prime
-    number.
+    number (this is not checked).
 
     If `\operatorname{len}(P) < 2`, raises an exception.
 
@@ -2292,7 +2303,7 @@ It is assumed that `h` has constant term `1` and that the coefficients
 .. function:: void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
-    It is assumed that `h` has constant term 1.
+    It is assumed that `h` has constant term 1 (this is not checked).
 
 .. function:: int _nmod_poly_sqrt(nn_ptr s, nn_srcptr p, slong n, nmod_t mod)
 
@@ -2399,6 +2410,8 @@ must therefore be a prime satisfying `p \ge n`. Further, we always
 require that `p > 2` in order to be able to multiply by `1/2` for
 internal purposes.
 If the input does not satisfy all these conditions, results are undefined.
+These conditions on the modulus are not checked (the required constant
+term is checked).
 Except where otherwise noted, functions are implemented with optimal
 (up to constants) complexity `O(M(n))`, where `M(n)` is the cost
 of polynomial multiplication.
@@ -2578,7 +2591,7 @@ Products
 .. function:: int nmod_poly_find_distinct_nonzero_roots(ulong * roots, const nmod_poly_t A)
 
     If ``A`` has `\deg(A)` distinct nonzero roots in `\mathbb{F}_p`, write these roots out to ``roots[0]`` to ``roots[deg(A) - 1]`` and return ``1``.
-    Otherwise, return ``0``. It is assumed that ``A`` is nonzero and that the modulus of ``A`` is prime.
+    Otherwise, return ``0``. It is assumed that ``A`` is nonzero and that the modulus of ``A`` is prime (the primality is not checked).
     This function uses Rabin's probabilistic method via gcd's with `(x + \delta)^{\frac{p-1}{2}} - 1`.
 
 

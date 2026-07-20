@@ -86,7 +86,7 @@ static ulong primorial_tab[] = {
 static inline int
 bound_primes(ulong k)
 {
-    int i;
+    unsigned int i;
 
     for (i = 0; i < sizeof(primorial_tab) / sizeof(ulong); i++)
         if (k <= primorial_tab[i])
@@ -268,7 +268,7 @@ worker(slong i, work_t * work)
 }
 
 void
-partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubles)
+partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int FLINT_UNUSED(use_doubles))
 {
     arb_t C, t, exp1;
     fmpz_t n24;

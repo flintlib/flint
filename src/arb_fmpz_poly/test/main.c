@@ -15,6 +15,7 @@
 #include "t-evaluate_acb.c"
 #include "t-evaluate_arb.c"
 #include "t-gauss_period_minpoly.c"
+#include "t-real_roots.c"
 
 /* Array of test functions ***************************************************/
 
@@ -23,7 +24,8 @@ test_struct tests[] =
     TEST_FUNCTION(arb_fmpz_poly_complex_roots),
     TEST_FUNCTION(arb_fmpz_poly_evaluate_acb),
     TEST_FUNCTION(arb_fmpz_poly_evaluate_arb),
-    TEST_FUNCTION(arb_fmpz_poly_gauss_period_minpoly)
+    TEST_FUNCTION(arb_fmpz_poly_gauss_period_minpoly),
+    TEST_FUNCTION(arb_fmpz_poly_real_roots),
 };
 
 /* main function *************************************************************/

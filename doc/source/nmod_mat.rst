@@ -29,7 +29,8 @@ modulus. The modulus is assumed to be a prime number in functions that
 perform some kind of division, solving, or Gaussian elimination
 (including computation of rank and determinant), but can be composite
 in functions that only perform basic manipulation and ring operations
-(e.g. transpose and matrix multiplication).
+(e.g. transpose and matrix multiplication). None of these primality
+assumptions are checked.
 
 Unless indicated, functions may assume that the stored values are in the range `[0, n)`. The user can manipulate matrix entries directly, but must assume responsibility for normalising all values to the range `[0, n)`.
 
@@ -446,7 +447,8 @@ Determinant and rank
 
 .. function:: slong nmod_mat_rank(const nmod_mat_t A)
 
-    Returns the rank of `A`. The modulus of `A` must be a prime number.
+    Returns the rank of `A`. The modulus of `A` must be a prime number;
+    this is not checked.
 
 
 
@@ -461,7 +463,7 @@ Inverse
     `B` to undefined values.
 
     `A` and `B` must be square matrices with the same dimensions
-    and modulus. The modulus must be prime.
+    and modulus. The modulus must be prime; this is not checked.
 
 
 
@@ -478,6 +480,9 @@ Triangular solving
     aliasing is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 
     Sets `X = L^{-1} B` where `L` is a full rank lower triangular square
@@ -485,6 +490,9 @@ Triangular solving
     main diagonal, and the main diagonal will not be read.
     `X` and `B` are allowed to be the same matrix, but no other
     aliasing is allowed. Uses forward substitution.
+
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
 
 .. function:: void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 
@@ -505,6 +513,9 @@ Triangular solving
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular square
@@ -514,6 +525,9 @@ Triangular solving
     aliasing is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular square
@@ -521,6 +535,9 @@ Triangular solving
     main diagonal, and the main diagonal will not be read.
     `X` and `B` are allowed to be the same matrix, but no other
     aliasing is allowed. Uses forward substitution.
+
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
 
 .. function:: void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
@@ -541,6 +558,9 @@ Triangular solving
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 
 
 Nonsingular square solving
@@ -550,8 +570,8 @@ Nonsingular square solving
 .. function:: int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
-    should have the same moduli.
+    is the modulus of `X` which must be a prime number; this is not
+    checked. `X`, `A`, and `B` should have the same moduli.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `X` to undefined values.
@@ -572,8 +592,8 @@ Nonsingular square solving
 .. function:: int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
-    should have the same moduli.
+    is the modulus of `X` which must be a prime number; this is not
+    checked. `X`, `A`, and `B` should have the same moduli.
 
     Returns `1` if a solution exists; otherwise returns `0` and sets the
     elements of `X` to zero. If more than one solution exists, one of the
@@ -584,7 +604,8 @@ Nonsingular square solving
 .. function:: int nmod_mat_solve_vec(nn_ptr x, const nmod_mat_t A, nn_srcptr b)
 
     Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `A` which must be a prime number.
+    is the modulus of `A` which must be a prime number; this is not
+    checked.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `x` to undefined values.

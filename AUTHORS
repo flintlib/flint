@@ -371,8 +371,9 @@ Alex Griffing
 
 Vincent Delecroix
 
-  Power sums, various polynomial improvements, speedups,
-  root counting and some patches. Work on Sage interface.
+  Real root isolation and root counting for integer polynomials, power sums,
+  various polynomial improvements, speedups, and some patches.
+  Work on Sage interface.
 
   web      https://www.labri.fr/perso/vdelecro/
 
@@ -433,7 +434,7 @@ D.H.J. Polymath
 Joel Dahne
 
   Feedback and improvements for Legendre functions, nth derivatives for Arb
-  polynomials, minmax function.
+  polynomials, power series functions, minmax function.
 
 Vincent Neiger
 
@@ -484,7 +485,7 @@ Ricardo Buring
 
   Functionality for generic polynomials and matrices, series solutions of
   linear systems of ODEs with rational function coefficients,
-  Ore polynomials.
+  Ore polynomials, functionality for permutations.
 
   github   rburing
 
@@ -525,19 +526,21 @@ Guillaume Moroz
 
 Edgar Costa
 
-  Smith normal form using iterated Hermite form; many bug fixes.
+  Smith normal form using iterated Hermite form; many bug fixes
+  and documentation improvements.
 
   github   https://github.com/edgarcosta
 
 Lars Göttgens
 
-  Unified printing functions and other helper functions.
+  Unified printing functions, many helper functions for linear algebra,
+  many bug fixes.
 
   github   https://github.com/lgoettgens
 
 Maria Neagoie
 
-  Multiplication of Ore polynomials.
+  Multiplication and division of Ore polynomials.
 
   github   https://github.com/vioneers
 
@@ -559,6 +562,16 @@ Viorel Wegner
 
   github   https://github.com/JASory
 
+Chenxin Zhong
+
+  Tuning of linear algebra over the integers and rationals.
+
+  github   https://github.com/cxzhong
+
+Elias Tsigaridas
+
+  Real root isolation for integer polynomials.
+
 
 
 Other contributors
@@ -578,10 +591,12 @@ Francesco Biscani
 Francois Bissey
 Guillem Blanco
 Janko Boehm
+Valentin Boettcher
 Andrew Booker
 Robert Bradshaw
 Volker Braun
 Eric Bray
+Nicolas Brisebarre
 Ondřej Čertík
 Frédéric Chapoton
 Frédéric Chyzak
@@ -606,6 +621,7 @@ Qingwen Guan
 Fabian Gundlach
 Tobias Hansen
 Clemens Heuberger
+Mikhail Hogrefe
 Pavel Holoborodko
 Max Horn
 Matthew House
@@ -619,6 +635,7 @@ Kiran Kedlaya
 Kerem Kelleboz
 Alexander Kobel
 Matthias Koeppe
+Oliver Krüger
 Denis Kryskov
 Dejan Latinovic
 Andrea Lesavourey
@@ -627,9 +644,11 @@ Leif Lionhardy
 Ben Lorenz
 Peter Luschny
 Yuri Matiyasevich
+Massoud Mazar
 Anton Mellit
 Kate Minola
 Apoorv Mishra
+Thierry Monteil
 Jake Moss
 Oleksandr Motsak
 Michael Orlitzky
@@ -637,12 +656,14 @@ Michele Orru
 Julien Ospald
 John Palmieri
 Dima Pasechnik
+Dave Platt
 Giacomo Pope
 Julien Puydt
 Tal Regev
 Josh Rickmar
 Erico Rolim Noguerira
 Julian Ruth
+Bruno Salvy
 Mahrud Sayrafi
 Hans Schoenemann
 Julien Schueller
@@ -667,14 +688,17 @@ Debian User
 Gregory Vanuxem
 Antony Vennard
 David Walker
+Mark Watkins
 Carl Witty
 Michiel de Wilde
+Hanhong Xue
 yuri@FreeBSD
 kac3pro
 Mgkurtz
 Vinklein
 Sourcekris
 Lzmths
+p15-git-acc
 
 Other credits
 -------------------------------------------------------------------------------

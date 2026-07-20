@@ -40,8 +40,22 @@
 
     For odd p the high part H = (x y^2)[m, n) is obtained from a guarded middle
     product (its low m limbs are the identity 0..01), via the shared
-    _radix_mulhigh_known_low, exactly as radix_invmod_bn forms (x y)[m, n). The
-    p = 2 path still uses plain low products.
+    _radix_mulhigh_known_low, exactly as radix_invmod_bn forms (x y)[m, n).
+
+    The full-recompute structure for p = 2 does not force full-width products:
+    entering a step with c bits of equation precision (x y^2 == 1 (mod 2^c)),
+    the low zl = (c - 1)/e limbs of x y^2 are 00..01, so its high limbs also
+    come from _radix_mulhigh_known_low; the subtraction of 1 lives entirely
+    below that window, the halving shifts in a zero bit from below, and the
+    halved residual is divisible by B^zl, so the final product and subtraction
+    act only on limbs [zl, nl). (One cannot take zl = c/e: the schedule only
+    guarantees equation precision c, not root precision, so merely
+    zl e + 1 <= c low bits of x y^2 - 1 may be assumed zero; with e | c and
+    zl = c/e the bit shifted out by the halving could be lost.) In addition,
+    the squaring passes y with its actual support of ceil(c/e) limbs. Note
+    that _radix_mulhigh_known_low falls back to a plain low product for small
+    limb radix; the fast path applies in the regime B >> n of practical
+    interest.
 
     Returns 1 on success, 0 if x is not a square modulo B (in which case nothing
     is written). y receives n limbs (caller provides room); y may alias x only
@@ -176,7 +190,7 @@ _radix2_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t ra
     slong ed[2 * FLINT_BITS];
     slong L, k;
     ulong one = 1;
-    nn_ptr y2, w, t;
+    nn_ptr y2, w, t, scr;
     TMP_INIT;
 
     FLINT_ASSERT(e >= 3);
@@ -195,32 +209,61 @@ _radix2_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t ra
     }
 
     TMP_START;
-    y2 = TMP_ALLOC((n + 1) * sizeof(ulong));
-    w  = TMP_ALLOC((n + 1) * sizeof(ulong));
-    t  = TMP_ALLOC((n + 1) * sizeof(ulong));
+    y2  = TMP_ALLOC((n + 1) * sizeof(ulong));
+    w   = TMP_ALLOC((n + 1) * sizeof(ulong));
+    t   = TMP_ALLOC((n + 1) * sizeof(ulong));
+    scr = TMP_ALLOC((n + 1) * sizeof(ulong));
 
     for (k = L - 1; k >= 0; k--)
     {
+        slong cd = ed[k + 1];             /* x y^2 == 1 (mod 2^cd) on entry */
         slong nd = ed[k];                 /* target bits this step */
         slong hd = nd + 1;                /* one guard bit kept before the shift */
         slong nl = (nd + e - 1) / e;
         slong hl = (hd + e - 1) / e;
+        slong pl = (cd + e - 1) / e;      /* support of res (masked to cd bits) */
+        slong zl = (cd - 1) / e;          /* zero limbs of the halved residual */
 
-        /* w = (x y^2 - 1) mod 2^hd  (divisible by 2) */
-        radix_mulmid(y2, res, hl, res, hl, 0, hl, radix);
+        /* y^2 mod 2^hd: res has pl nonzero limbs, and hl <= 2 pl since
+           nd <= 2 cd - 2. */
+        radix_mulmid(y2, res, pl, res, pl, 0, hl, radix);
         _radix2_mask(y2, hd, hl, e);
-        radix_mulmid(w, x, FLINT_MIN(xn, hl), y2, hl, 0, hl, radix);
-        _radix2_mask(w, hd, hl, e);
-        radix_sub(w, w, hl, &one, 1, radix);
-        _radix2_mask(w, hd, hl, e);
 
-        /* w /= 2  ->  (x y^2 - 1)/2 mod 2^nd */
-        radix_rshift_digits(w, w, hl, 1, radix);
+        if (zl >= 1)
+        {
+            /* x y^2 - 1 == 0 (mod 2^cd) with zl e + 1 <= cd, so the low zl
+               limbs of x y^2 are 00..01: limbs [zl, hl) come from a known-low
+               high product, the subtraction of 1 lives below the window (no
+               borrow), and the halving is an exact bit shift with a zero bit
+               entering from below. The halved residual is divisible by B^zl,
+               so the correction touches only limbs [zl, nl) of res. */
+            _radix_mulhigh_known_low(w, x, FLINT_MIN(xn, hl), y2, hl,
+                &one, 1, zl, hl, scr, radix);
+            _radix2_mask(w, hd - zl * e, hl - zl, e);
+            radix_rshift_digits(w, w, hl - zl, 1, radix);
 
-        /* res = y - y w mod 2^nd */
-        radix_mulmid(t, res, nl, w, nl, 0, nl, radix);
-        _radix2_mask(t, nd, nl, e);
-        radix_sub(res, res, nl, t, nl, radix);
+            /* res[zl, nl) -= (y w)[0, nl - zl) mod 2^(nd - zl e) */
+            radix_mulmid(t, res, FLINT_MIN(pl, nl - zl), w, nl - zl, 0, nl - zl, radix);
+            _radix2_mask(t, nd - zl * e, nl - zl, e);
+            radix_sub(res + zl, res + zl, nl - zl, t, nl - zl, radix);
+        }
+        else
+        {
+            /* w = (x y^2 - 1) mod 2^hd  (divisible by 2) */
+            radix_mulmid(w, x, FLINT_MIN(xn, hl), y2, hl, 0, hl, radix);
+            _radix2_mask(w, hd, hl, e);
+            radix_sub(w, w, hl, &one, 1, radix);
+            _radix2_mask(w, hd, hl, e);
+
+            /* w /= 2  ->  (x y^2 - 1)/2 mod 2^nd */
+            radix_rshift_digits(w, w, hl, 1, radix);
+
+            /* res = y - y w mod 2^nd */
+            radix_mulmid(t, res, FLINT_MIN(pl, nl), w, nl, 0, nl, radix);
+            _radix2_mask(t, nd, nl, e);
+            radix_sub(res, res, nl, t, nl, radix);
+        }
+
         _radix2_mask(res, nd, nl, e);
     }
 
@@ -288,8 +331,9 @@ radix_rsqrtmod_bn(nn_ptr res, nn_srcptr x, slong xn, slong n, const radix_t radi
         _radix_mulhigh_known_low(hbuf, x, FLINT_MIN(xn, nn), t, nn,
             &one, 1, m, nn, scr, radix);
 
-        /* y'[m, nn) = -((y H)/2)[0, nm) */
-        radix_mulmid(t, res, m, hbuf, nm, 0, nm, radix);     /* y H, low nm */
+        /* y'[m, nn) = -((y H)/2)[0, nm); only the low nm <= m limbs of y
+           enter. */
+        radix_mulmid(t, res, nm, hbuf, nm, 0, nm, radix);    /* y H, low nm */
         _radix_halve_odd(t, t, nm, radix);                   /* (y H) 2^{-1} */
         radix_neg(res + m, t, nm, radix);
     }

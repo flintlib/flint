@@ -81,7 +81,8 @@ int gr_mpoly_add(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_
 {
     mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
     gr_ctx_struct * cctx = GR_MPOLY_CCTX(ctx);
-    slong Abits, N;
+    slong N;
+    flint_bitcnt_t Abits;
     ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
     int freeBexps = 0, freeCexps = 0;
@@ -99,9 +100,7 @@ int gr_mpoly_add(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, gr_mpoly_
 
     TMP_START;
     Abits = FLINT_MAX(B->bits, C->bits);
-    N = mpoly_words_per_exp(Abits, mctx);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, mctx);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, mctx);
 
     if (Abits != B->bits)
     {

@@ -182,7 +182,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             v = fmpz_remove(t, x, p);
             fmpz_clear(t);
 
-            if (v >= 2 || (!fmpz_equal_ui(p, 2) && v >= 1))
+            if (v >= 1)
             {
                 if (v >= N)
                 {

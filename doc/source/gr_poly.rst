@@ -1362,6 +1362,12 @@ Power series special functions
     (if possible) so that the exponential is small. For the trigonometric
     functions this algorithm requires that the ring contains the imaginary unit.
 
+.. function:: int _gr_poly_bessel_j_series(gr_ptr res, gr_srcptr nu, gr_srcptr z, slong zlen, slong len, gr_ctx_t ctx)
+              int gr_poly_bessel_j_series(gr_poly_t res, gr_srcptr nu, const gr_poly_t z, slong len, gr_ctx_t ctx)
+
+    Computes the Bessel function of the first kind, `J_{\nu}(z)`,
+    evaluated at the power series *z*, truncated to length *len*. The
+    underscore method allows aliasing.
 
 Modular arithmetic and composition
 --------------------------------------------------------------------------------

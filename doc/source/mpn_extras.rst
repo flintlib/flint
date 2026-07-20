@@ -217,6 +217,55 @@ More generally, we can define `n`-limb high products of `m`-limb and
     The low `n - 1` limbs of the output may be used as scratch space or
     to write the whole product when this is the fastest method.
 
+Middle product
+--------------------------------------------------------------------------------
+
+The *windowed middle product* extracts a chosen limb window of a product.  For
+`\mathrm{an} \ge 1`, `\mathrm{bn} \ge 1` and `0 \le \mathrm{zlo} < \mathrm{zhi}
+\le \mathrm{an} + \mathrm{bn}`, it writes `\mathrm{zhi} - \mathrm{zlo}` limbs to
+``z`` approximating limbs `[\mathrm{zlo}, \mathrm{zhi})` of `a b`.  It is a
+*lower approximation*: partial products `a[p] b[q]` with `p + q < \mathrm{zlo}`
+are dropped, so the computed value never exceeds the exact window, and the
+deficit (a single carry from below `\mathrm{zlo}`) is bounded by
+`\min(\mathrm{an}, \mathrm{bn}, \mathrm{zlo}) \cdot 2^{64}`.  With
+`\mathrm{zlo} = 0` the window is exact.
+
+.. function:: void flint_mpn_mulmid(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi)
+
+    Compute the window `[\mathrm{zlo}, \mathrm{zhi})` of `a b`, dispatching to
+    whichever of the routines below is expected to be fastest for the given
+    shape.  Individual backends may return the exact window or a tighter
+    approximation than the classical drop; all satisfy the contract above.
+
+.. function:: void flint_mpn_mulmid_classical(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi)
+
+    Row-based schoolbook implementation, `O((\mathrm{zhi} - \mathrm{zlo}) \cdot
+    \min(\mathrm{an}, \mathrm{bn}))`.
+
+.. function:: void flint_mpn_mulmid_via_mul(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi)
+              void flint_mpn_mulmid_via_mullow_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi)
+              void flint_mpn_mulmid_via_mulhigh_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi)
+              void flint_mpn_mulmid_via_n_padded(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi)
+              void flint_mpn_mulmid_fft_small(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn, mp_size_t zlo, mp_size_t zhi)
+
+    Reductions of a general window to, respectively, a full product
+    (:func:`flint_mpn_mul`), a balanced low product (:func:`flint_mpn_mullow_n`),
+    a balanced high product (:func:`flint_mpn_mulhigh_n`), a balanced middle
+    product (:func:`flint_mpn_mulmid_n`) and the small-prime FFT.  Each is valid
+    for arbitrary input by padding internally, but is only economical in its own
+    regime; :func:`flint_mpn_mulmid` chooses between them.
+
+.. function:: void flint_mpn_mulmid_n(mp_ptr rp, mp_srcptr ap, mp_srcptr bp, mp_size_t n)
+
+    Exact balanced middle product of `\{ap, 2n-1\}` and `\{bp, n\}`, writing
+    `n + 2` limbs: the high `n` limbs are exact and the low two are guard limbs
+    (they lack the carry into the band from below).  This is a wrapper around
+    GMP's ``mpn_mulmid_n`` and is only defined when
+    ``FLINT_HAVE_NATIVE_mpn_mulmid_n`` is set (that is, when the build may call
+    GMP internals and GMP exports the symbol; see ``configure``).  When it is
+    unavailable, :func:`flint_mpn_mulmid_via_n_padded` is likewise unavailable
+    and :func:`flint_mpn_mulmid` uses its other methods.
+
 Divisibility
 --------------------------------------------------------------------------------
 

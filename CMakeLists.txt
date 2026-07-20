@@ -213,6 +213,7 @@ set(_BUILD_DIRS
     double_extras   d_vec           d_mat
     nfloat
     mpn_extras      radix
+    fixed
     nmod            nmod_vec        nmod_mat        nmod_poly
     mpn_mod
     fmpz            fmpz_vec        fmpz_mat        fmpz_poly
@@ -262,7 +263,7 @@ set(_BUILD_DIRS
 
     gr              gr_generic      gr_vec          gr_mat
     gr_poly         gr_mpoly        gr_ore_poly     gr_series
-    gr_special
+    gr_special      gr_dft
 
     calcium
     fmpz_mpoly_q

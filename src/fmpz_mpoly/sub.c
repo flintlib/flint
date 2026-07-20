@@ -257,9 +257,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
     TMP_START;
     Abits = FLINT_MAX(B->bits, C->bits);
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, ctx->minfo);
 
     if (Abits > B->bits)
     {

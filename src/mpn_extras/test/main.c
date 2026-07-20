@@ -29,6 +29,8 @@
 #include "t-mulhigh_n_tab.c"
 #include "t-mulhigh_n_recursive.c"
 #include "t-mulhigh_normalised.c"
+#include "t-mulmid.c"
+#include "t-mulmid_n.c"
 #include "t-mulmod_2expp1.c"
 #include "t-mulmod_precond_matrix.c"
 #include "t-mulmod_precond_shoup.c"
@@ -62,6 +64,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mulhigh_n),
     TEST_FUNCTION(flint_mpn_mulhigh_n_recursive),
     TEST_FUNCTION(flint_mpn_mulhigh_normalised),
+    TEST_FUNCTION(flint_mpn_mulmid),
+    TEST_FUNCTION(flint_mpn_mulmid_n),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
     TEST_FUNCTION(flint_mpn_mulmod_precond_matrix),
     TEST_FUNCTION(flint_mpn_mulmod_precond_shoup),
