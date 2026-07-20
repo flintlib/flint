@@ -44,16 +44,17 @@ _arb_poly_product_roots_trunc(arb_ptr res, arb_ptr rts, slong rts_len,
 
 static void
 hexp_series(arb_poly_t res, const arb_poly_t itg_pol, slong shift,
-            const arb_poly_t itg_num, const arb_poly_t itg_den,
+            const arb_poly_t itg_num, const arb_t cst, const arb_poly_t itg_den,
             slong ord, slong prec)
 {
+    arb_poly_zero(res);
     if (ord > shift + 1) {
-        /* XXX Not yet tested(?)
-         * 1/itg_den could be cached.
+        /* XXX * 1/itg_den could be cached.
          * And couldn't we just choose pol_part_len so that this case never
          * occurs? */
         arb_poly_div_series(res, itg_num, itg_den, ord - 1 - shift, prec);
         arb_poly_shift_left(res, res, shift);
+        arb_poly_scalar_mul(res, res, cst, prec);
     }
     arb_poly_add_series(res, res, itg_pol, ord - 1, prec);
 
@@ -72,7 +73,7 @@ hexp_series(arb_poly_t res, const arb_poly_t itg_pol, slong shift,
 static void
 maj_pre_num(arb_poly_t pre, const arb_poly_t nres_maj, slong n,
             const arb_poly_t itg_pol, slong itg_rat_shift,
-            const arb_poly_t itg_num, const arb_poly_t itg_den,
+            const arb_poly_t itg_num, const arb_t cst, const arb_poly_t itg_den,
             slong prec)
 {
     arb_poly_t inv_exp;
@@ -84,7 +85,7 @@ maj_pre_num(arb_poly_t pre, const arb_poly_t nres_maj, slong n,
         arb_mul_si(pre->coeffs + j, nres_maj->coeffs + j, n + j, prec);
 
     hexp_series(inv_exp, itg_pol, itg_rat_shift, itg_num,
-                itg_den, nres_maj->length, prec);
+                cst, itg_den, nres_maj->length, prec);
 
     /* polynomial factor in rhs of majorizing equation */
     arb_poly_mullow(pre, pre, inv_exp, nres_maj->length, prec);
@@ -118,6 +119,9 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
 {
     // flint_printf("maj_jet n=%ld ord=%ld rad=%{arb}\n", n, ord, rad);
 
+    if (ord == 0)
+        return;
+
     arb_poly_t pre_ser, invden_ser, shx_ser, int_pol_ser, int_rat_ser, int_ser;
     arb_ptr rt_rad = _arb_vec_init(den_rt_len);
 
@@ -138,14 +142,12 @@ maj_jet(arb_poly_t res, slong n, const arb_poly_t pre_num,
     _arb_poly_set_length(invden_ser, ord);
     _arb_poly_normalise(invden_ser);
 
-    // flint_printf("den_rt=%{arb*}\n", den_rt, den_rt_len);
-    // flint_printf("rt_rad=%{arb*}\n", rt_rad, den_rt_len);
-    // flint_printf("invden_ser(1)=%{arb_poly}\n", invden_ser);
-
     if (den_rt_len % 2)
         arb_poly_neg(invden_ser, invden_ser);
 
-    // flint_printf("invden_ser(2)=%{arb_poly}\n", invden_ser);
+    // flint_printf("den_rt=%{arb*}\n", den_rt, den_rt_len);
+    // flint_printf("rt_rad=%{arb*}\n", rt_rad, den_rt_len);
+    // flint_printf("invden_ser=%{arb_poly}\n", invden_ser);
 
     if (arb_contains_zero(invden_ser->coeffs))
     {
@@ -256,14 +258,14 @@ acb_ode_tail_bound_jet_precomp(arb_poly_t res,
 
     /* Variation of constants */
     maj_pre_num(pre, nres_maj, n, itg_pol, rat_shift, itg_num,
-                bound->den_lbound, prec);
+                bound->cst, bound->den_lbound, prec);
 
     /* Evaluate the resulting majorant */
     maj_jet(res, n, pre, itg_pol, rat_shift, itg_num, bound->cst,
             bound->den_rt, bound->den_rt_len, rad, ord, prec);
 
-    flint_printf("n=%ld pre=%{arb_poly}\n", n, pre);
-    flint_printf("n=%ld maj_jet=%{arb_poly}\n", n, res);
+    // flint_printf("n=%ld pre=%{arb_poly}\n", n, pre);
+    // flint_printf("n=%ld maj_jet=%{arb_poly}\n", n, res);
 
     arb_poly_clear(pre);
 }

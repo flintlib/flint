@@ -15,7 +15,7 @@ equations
    a_r(x) y^{(r)}(x) + \dots + a_1(x) y'(x) + a_0(x) y(x) = 0
 
 with polynomial coefficients `a_i(x) \in \mathbb C[x]`.
-When working locally at 0, is is often convenient to rewrite the equation as
+When working locally at 0, it is often convenient to rewrite the equation as
 
 .. math::
 
@@ -71,9 +71,9 @@ See also the :ref:`usage example <ode-example-basic>` below.
     In both cases, the basis is the concatenation of blocks corresponding to
     groups of local exponents.
     Within each block, the columns are ordered by increasing shift relative to
-    the group leader (that is, by increasing real part of the exponent), and for
-    a given shift by decreasing degree in `\log(x)` of the coefficient of `x` of
-    minimal valuation.
+    the group leader (that is, by increasing real part of the exponent), and,
+    for a given shift, by decreasing degree in `\log(x)` of the coefficient
+    of the leading power of `x`.
     The order of the blocks is specified separately.
 
     Let `E` denote the set of pairs `(\alpha, k)` where `\alpha` is a local
@@ -93,11 +93,12 @@ See also the :ref:`usage example <ode-example-basic>` below.
 
     .. macro:: ACB_ODE_BASIS_CASCADE
 
-        The basis contains a solution of leading term `x^{\alpha} \log(x)^m/m!`
+        The basis contains a solution of leading term
+        `x^{\alpha} \log(x)^{m-1}/(m-1)!`
         for each exponent `\alpha`, with `m` the multiplicity of `\alpha`.
         The series expansions of these basis elements involve no term in
         `x^{\beta} \log(x)^\ell`
-        with `(\beta, \ell) \in E \setminus \{ (\alpha, m) \}`.
+        with `(\beta, \ell) \in E \setminus \{ (\alpha, m-1) \}`.
         The remaining elements of the basis are obtained by repeatedly changing
         each `\log(x)^k/k!` to `\log(x)^{k-1}/(k-1)!` and dropping the terms not
         involving `\log(x)` in previously constructed elements.
@@ -111,10 +112,10 @@ See also the :ref:`usage example <ode-example-basic>` below.
     basis *basis* of the differential operator *dop*.
 
     This function is currently limited to operators *dop* of algebra type
-    :macro:`GR_ORE_POLY_EULER_DERIVATIVE`.
+    :enumerator:`ORE_ALGEBRA_EULER_DERIVATIVE`.
 
     The origin may be an ordinary point or a regular singular point of *dop*.
-    Operators whose coefficients with respect to the Euler derivative have a
+    Operators whose coefficients with respect to the Euler derivation have a
     common factor with a root at the origin are currently not supported even if
     they fall in the previous class.
 
@@ -137,18 +138,21 @@ See also the :ref:`usage example <ode-example-basic>` below.
     ground field supports computing complex ball roots using
     :func:`gr_poly_roots_other`, in which case *lcrt* may be set to ``NULL``.
 
-    The columns of the output matrix correspond to the basis of type *basis* of
-    the solution space, with solution groups ordered as in *expos*.
-    (Note that when *expos* is omitted on input, the order is unspecified.)
-    The row dimension of the output matrix determines the number of derivatives
-    of the solutions to be evaluated.
+    Each of the first `r` columns of the output matrix *mat*, where `r` is the
+    order of *dop*, is set to a vector of initial coefficients of the Taylor
+    expansion at *pt* of the corresponding element of the basis of type *basis*
+    of the solution space, with solution groups ordered as in *expos*.
+    (Extraneous columns are left untouched. Note that when *expos* is omitted
+    on input, the order of the columns is not fully specified.)
+    The row dimension of *mat* determines the number of Taylor coefficients to
+    be evaluated.
     (The current implementation is not designed to evaluate a number of
-    derivatives exceeding the order of *dop* efficiently.)
+    Taylor coefficients exceeding the order of *dop* efficiently.)
 
-    The return value is *gr*-style status code. A return value other than
+    The return value is a *gr*-style status code. A return value other than
     ``GR_SUCCESS`` indicates a failure in the algebraic part of the computation.
     It may happen, however, that the return value is ``GR_SUCCESS`` but the
-    output matrices are indeterminate.
+    output matrix is indeterminate.
 
 .. function:: void _acb_ode_fundamental_matrix_vec(acb_mat_struct * mat, const acb_poly_struct * dop, slong dop_len, const acb_ode_exponents_t expos, acb_srcptr lcrt, acb_ode_bound_t bound, acb_srcptr pts, slong npts, acb_ode_basis_t basis, acb_ode_sum_worker_t sum_worker, void * worker_data, slong prec)
               int acb_ode_fundamental_matrix_vec(acb_mat_struct * mat, const gr_ore_poly_t dop, gr_ore_poly_ctx_t Dop, const acb_ode_exponents_t expos, acb_srcptr lcrt, acb_srcptr pts, slong npts, acb_ode_basis_t basis, slong prec)
@@ -169,7 +173,7 @@ See also the :ref:`usage example <ode-example-basic>` below.
 Solution groups and exponents
 -------------------------------------------------------------------------------
 
-See ``examples/ode_exponents`` example of how to use these functions in
+See ``examples/ode_exponents`` for an example of how to use these functions in
 combination with :func:`acb_ode_fundamental_matrix`.
 
 .. type:: acb_ode_shift_struct
@@ -195,6 +199,12 @@ combination with :func:`acb_ode_fundamental_matrix`.
 .. function:: void acb_ode_exponents_init(acb_ode_exponents_t expos)
               void acb_ode_exponents_clear(acb_ode_exponents_t expos)
 
+.. function:: int acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop, gr_ctx_t Dop, gr_ctx_t CC)
+
+    Sets *expos* to the exponent structure of the operator *dop* at the origin,
+    computed as elements of *CC*. The only currently supported *CC* are complex
+    ball fields.
+
 .. function:: void acb_ode_exponents_ordinary(acb_ode_exponents_t expos, slong order)
 
     Sets *expos* to the exponent structure of an operator of order *order* at
@@ -205,18 +215,12 @@ combination with :func:`acb_ode_fundamental_matrix`.
     Sets *expos* to a random exponent structure with *len* exponents in total
     (counting multiplicities) and a maximum dispersion of *disp*.
 
-.. function:: void acb_ode_exponents_println(const acb_ode_exponents_t expos)
-
-.. function:: int acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop, gr_ctx_t Dop, gr_ctx_t CC)
-
-    Sets *expos* to the exponent structure of the operator *dop* at the origin,
-    computed as elements of *CC*. The only currently supported *CC* are complex
-    ball fields.
-
 .. function:: slong acb_ode_exponents_length(const acb_ode_exponents_t expos)
 
     Returns the total number of solutions across all groups in *expos*, counted
     with multiplicities.
+
+.. function:: void acb_ode_exponents_println(const acb_ode_exponents_t expos)
 
 .. function:: void acb_ode_group_init(acb_ode_group_t group, slong len)
 
@@ -254,8 +258,8 @@ Partial sums of logarithmic series solutions
 
 This section describes low-level functions for computing series expansions
 and/or values of partial sums or derivatives of partial sums of solutions.
-These functions can handle several solutions from the same group (or possibly,
-in some cases, from conjugate groups) in parallel, and can evaluate them at
+These functions can handle several solutions from the same group (and possibly,
+in the future, from conjugate groups) in parallel, and can evaluate them at
 zero, one, or more points.
 
 The general usage pattern is as follows:
@@ -266,15 +270,20 @@ The general usage pattern is as follows:
    similar) and some vectors of initial values (*acb_ode_sum_set_ini_\**), in
    this order;
 3. optionally set some evaluation points and other options;
-4. call one or more summation functions such as *acb_ode_sum_divconquer* to
+4. call *acb_ode_sum_precompute*;
+5. call one or more summation functions such as *acb_ode_sum_divconquer* to
    compute partial sums of solutions;
-5. extract the value and/or coefficients of the solution (XXX this step
-   currently requires using *sol_* functions).
+6. extract the value and/or coefficients of the solution.
 
 .. type:: acb_ode_sum_struct
           acb_ode_sum_t
 
-    Context object.
+    An :type:`acb_ode_sum_t` object *sum* stores, among other things:
+
+    * the terms in `x^i` in the solutions being computed, for `i` between
+      *sum->n0* and *sum->n - 1*,
+    * some additional coefficients, associated with indices *i >= sum->n* and
+      collectively referred to as the *residual buffer*.
 
     The following options can be set by writing to the corresponding fields
     after initializing the object:
@@ -289,11 +298,19 @@ The general usage pattern is as follows:
 
             Skip the computation of rigorous error bounds.
 
+.. type:: acb_ode_sol_struct
+          acb_ode_sol_t
+
+    Represents an individual logarithmic series solution in the process of being
+    computed.
+    Mainly makes sense as a component of an :type:`acb_ode_sum_t` object or
+    given such an object as context.
+
 .. function:: void acb_ode_sum_init(acb_ode_sum_t sum, slong dop_len, slong npts, slong nsols, slong nder)
 
-    Initializes a context object suitable for computing the derivatives of order
-    0 to *nder - 1* of *nsols* solutions of an equation *dop_len - 1* at
-    *npts* points.
+    Initializes a context object suitable for computing the derivatives of
+    order 0 to *nder - 1* of *nsols* solutions of an equation of order
+    *dop_len - 1* at *npts* points.
     When only the coefficients of the series are of interest, *npts* can be set
     to zero.
 
@@ -302,6 +319,11 @@ The general usage pattern is as follows:
     approximation valid in a certain disk. For computing a fixed number of
     coefficients without any kind of tail bound, though, we may want to allow
     *nder = 0*.
+
+.. function:: void acb_ode_sum_fit_length(acb_ode_sum_t sum, slong len)
+
+    Ensures that *sum* has space for *len* terms, counting both partial sum
+    terms and entries of the residual buffer.
 
 .. function:: void acb_ode_sum_clear(acb_ode_sum_t sum)
 
@@ -315,7 +337,7 @@ The general usage pattern is as follows:
     solutions and will limit the magnitude of the evaluation points.
 
 .. function:: void acb_ode_sum_set_group(acb_ode_sum_t sum, const acb_ode_group_t grp)
-              void acb_ode_sum_set_ordinary(acb_ode_sum_t  sum)
+              void acb_ode_sum_set_ordinary(acb_ode_sum_t sum)
 
     Sets the solution group.
 
@@ -326,9 +348,8 @@ The general usage pattern is as follows:
     The solution group must have been set before.
     The *echelon* version sets initial values corresponding to the elements of
     the echelonized basis of solutions (as defined above) belonging to the
-    *sum* objects's group, sorted first by increasing shift, then by increasing
-    degree in `\log(x)` of the leading term.
-    The *highest* version sets initial values for a single of these basis
+    *sum* object's group.
+    The *highest* version sets initial values for a single one of these basis
     elements per shift, namely the one with the highest power of `\log(x)` in
     the leading term.
 
@@ -361,42 +382,63 @@ The general usage pattern is as follows:
     This function computes the sum from scratch even if *sum* already contains a
     partial sum from a previous run.
 
-    XXX Clarify what happens with no evaluation points and how to evaluate the
-    *coefficients* to a given precision.
+    XXX Clarify what happens with no evaluation points/no bound objects and how
+    to evaluate the *coefficients* to a given precision.
 
-All *_acb_ode_sum_forward_\** functions assume that
-:func:`acb_ode_sum_precompute` has been applied and that the *sum* object's
-component *acb_ode_sol_t* all have space for the new coefficients.
-Additionally, these functions may leave some of these components in a state
-that requires :func:`_acb_ode_sum_fix` to be called before using other
-functions on them.
+The *_acb_ode_sum_forward_\** functions expect an object *sum* in which a
+certain number of initial entries of the residual buffer are equal to the
+corresponding coefficients of the image by the differential operator of the
+solutions truncated at order *sum->n* (the current partial sums).
+They extend the partial sums by a possibly different number of new terms,
+destroying the corresponding entries of the residual buffer (if any).
+They do not otherwise update the residual buffer to match the new partial sum.
+Additionally, these functions require that :func:`acb_ode_sum_precompute` has
+been applied to *sum* and may leave *sum* in a state that requires
+:func:`_acb_ode_sum_fix` to be called before passing *sum* to other functions.
 
 .. function:: void _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
 
-    Adds one term to *sum*, whose components are assumed to have space for the
-    update.
+    Adds one term to *sum*, consuming the entry of index *sum->n* of the
+    residual buffer.
 
 .. function:: int _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high, slong block_len, slong stride, acb_ode_bound_t bound, acb_ode_group_bound_t gbound, slong prec)
 
     Extends the sum until the partial sum of order *high* is reached, some error
     tolerance based on *prec* is met, or the working precision and/or tail bound
-    quality are determined to be insufficient (whichever comes first).
+    quality are determined to be insufficient, whichever happens first.
 
-    Returns nonzero when either the sum has converged (within a tolerance based
-    on *prec*) or the current working precision is insufficient to significantly
-    improve the current estimate.
+    The first min(*block_len*, *high* - *sum->n*) entries of the residual buffer
+    must be set to the corresponding residual coefficients and are consumed.
+    Unless the :macro:`ACB_ODE_WANT_SERIES` flag is set, series coefficients
+    before the last *block_len* computed are discarded.
 
-    The algorithm computes strides of *stride* terms (checking for convergence
-    and making some internal adjustments after each stride) by chaining blocks
-    of *block_len* terms that are computed using a divide-and-conquer method.
-    It is assumed that *block_len* is at least the degree of the coefficients of
-    the differential operator written in terms the Euler derivation.
-    Currently it is also assumed that *stride* is a multiple of *block_len* and
-    that the starting index (value of ``sum->n``) of a top-level recursive call
-    is a multiple of *stride*.
-
-    The caller must supply an object *gbound* precomputed using
+    The *bound* and *gbound* parameters may either both be ``NULL`` or be set to
+    objects precomputed using respectively :func:`acb_ode_bound_precompute` and
     :func:`acb_ode_group_bound_precompute`.
+    In the former case, the function stops exactly at term *high* and returns
+    zero.
+    In the latter, it returns nonzero when either the sum has converged (within
+    a tolerance based on *prec*) or the current working precision is
+    insufficient to significantly improve the current estimate.
+
+    The value of *block_len* must be at least the maximum degree of the
+    coefficients of the differential operator written in terms of the Euler
+    derivation. The algorithm computes strides of *stride* terms (checking for
+    convergence and making some internal adjustments after each stride) by
+    chaining blocks of *block_len* terms that are computed using a
+    divide-and-conquer method.
+
+.. function:: void _acb_ode_sum_update_residuals(acb_ode_sum_struct * sum, slong low, slong mid, slong high)
+
+    Adds the coefficients of `x^i`, *mid <= i < high*, in the image by the
+    differential operator of the terms in `x^i`, *low <= i < mid*, of the
+    current partial sum to the entries of index *mid* to *high - 1* of the
+    residual buffer.
+
+.. function:: void acb_ode_sum_discard_head(acb_ode_sum_struct * sum, slong n0)
+
+    Discards the terms of index less than *n0* of the partial sums stored in
+    *sum*, increasing *sum->n0* accordingly.
 
 .. function:: void _acb_ode_sum_fix(acb_ode_sum_struct * sum)
 
@@ -404,7 +446,7 @@ functions on them.
     After a sequence of calls to those functions, *_acb_ode_sum_fix* must be
     called before accessing the computed sum.
 
-.. function:: int acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride, acb_ode_bound_t bound, acb_ode_group_bound_t gbound, slong prec)
+.. function:: int _acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride, acb_ode_bound_t bound, acb_ode_group_bound_t gbound, slong prec)
 
     Returns nonzero when either the sum has converged (within a tolerance based
     on *prec*) or the current working precision is insufficient to significantly
@@ -413,20 +455,15 @@ functions on them.
     *stride* terms have been added since the last update.
     When returning nonzero, also updates the rigorous tail bounds if they have
     improved (unless the :macro:`ACB_ODE_APPROX` flag is set in *sum*).
+
+    The entries of index *sum->n* to *sum->n + d - 1* where *d* is the maximum
+    degree in *x* of the coefficients of the differential operator must be
+    preloaded with the corresponding residual coefficients.
     The caller must supply two objects *bound* and *gbound* precomputed using
     :func:`acb_ode_bound_precompute` and :func:`acb_ode_group_bound_precompute`.
-    This function may be called on a *sum* object modified by *sum_foward_\**
+
+    This function may be called on a *sum* object modified by *sum_forward_\**
     without first calling *sum_fix*.
-
-Partial sums of individual solutions
--------------------------------------------------------------------------------
-
-.. type:: acb_ode_sol_struct
-          acb_ode_sol_t
-
-    Represents a logarithmic series solution in the process of being computed.
-    Mainly makes sense as a component of an :type:`acb_ode_sum_t` object or
-    given such an object as context.
 
 .. function:: void acb_ode_sol_init(acb_ode_sol_t sol, slong nshifts, slong nlogs, slong npts, slong nder)
 
@@ -434,6 +471,9 @@ Partial sums of individual solutions
     belonging to a solution group with *nshifts* shifts, involving `\log(x)` to
     powers less than *nlogs*, the derivatives of order up to *nder - 1* of
     which are to be evaluated at *npts* points.
+    For rigorous error bounds, *nlogs* should be greater than or equal to the
+    length as a polynomial in `\log(x)` of the mathematical solution even if
+    only a partial sum of lower degree in `\log(x)` is to be computed.
 
 .. function:: void acb_ode_sol_clear(acb_ode_sol_t sol)
 
@@ -458,18 +498,22 @@ Partial sums of individual solutions
               void acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, const acb_ode_sol_t sol, slong p, const acb_t pt, slong ord, slong nfrobshifts, slong prec)
 
     Computes the jets of order *ord* at the evaluation point *pt* of
-    the Frobenius shifts of order 0 to *nfrobshifts* - 1 of the solution *sol*.
+    the Frobenius shifts of order 0 to *nfrobshifts* - 1 of the solution *sol*,
+    based on the partial sums currently stored in the *sol* object.
     The integer *p* is the index of the partial sum at *pt* in *sol*.
     The Frobenius shift of order *j* of `y(x)` is defined as the series obtained
     by replacing `\log(x)^k/k!` for `k \geq j` by `\log(x)^{k-j}/(k-j)!` in the
     series expansion and dropping the terms with `k < j`.
 
-    The underscore version assumes *ord* > 0.
+    The underscore version assumes that *ord* > 0, that the length with respect
+    to `\log(x)` of the complete series solution (as opposed to the current
+    truncation) is at most *nlogs*, and that *sums + k * stride* points to the
+    jet of the coefficient of `\log(x)^k/k!` for all *k < nlogs*.
 
 .. function:: slong acb_ode_sol_estimate_terms(mag_t est, const acb_ode_sol_t sol, slong off, slong len, const mag_t radpow)
 
-    Sets *est* to heuristic estimate of the magnitude of the coefficients at
-    positions *off* to *off + len* in the coefficient buffer of *sol*,
+    Sets *est* to a heuristic estimate of the magnitude of the coefficients at
+    positions *off* to *off + len - 1* in the coefficient buffer of *sol*,
     multiplied by *radpow*.
     Returns an estimate of the relative accuracy in bits of these coefficients.
 
@@ -524,7 +568,7 @@ Functions for working with differential operators
     used to apply the differential operator *dop* to multiple series using
     :func:`_acb_ode_apply_diffop_basecase_precomp`.
     See that function for the meaning of the remaining parameters.
-    The *expo* parameter can be ``NULL``, this is understood as zero.
+    The *expo* parameter can be ``NULL``; this is understood as zero.
 
 Other summation utilities
 -------------------------------------------------------------------------------
@@ -540,7 +584,7 @@ Other summation utilities
     where *a*, *res*, *b* are polynomials of length *len*. The *cst* pointer may
     be null; this is understood as *cst = 1*.
 
-.. function:: void acb_ode_poly_taylor_shift_aps_trunc(acb_poly_t g, const acb_poly_t f, acb_srcptr a, slong n, slong len, slong prec);
+.. function:: void acb_ode_poly_taylor_shift_aps_trunc(acb_poly_t g, const acb_poly_t f, acb_srcptr a, slong n, slong len, slong prec)
 
     Shifts the variable by *a + n*, truncates to length *len*.
 
@@ -598,7 +642,7 @@ where the sums are finite and `q_{k,j} = 0` whenever `\lambda + n + j` is a root
 of multiplicity strictly more than `k` of `Q_0`.
 
 All functions in this section assume that the leading coefficient with respect
-to the Euler derivative of the differential equation of interest does not
+to the Euler derivation of the differential equation of interest does not
 vanish at the origin. (For an equation with coprime coefficients, this is
 equivalent to the origin being an ordinary point or a regular singular point.)
 
@@ -671,8 +715,9 @@ equivalent to the origin being an ordinary point or a regular singular point.)
       and `k`, the absolute value `|q_{k,j}|` is bounded by the coefficient
       of `x^j` in *nres_maj*.
 
-    * The coefficients `c_{k,j}` with `j \geq n` such that `\lambda + j` is a root of the
-      indicial polynomial `Q_0` of multiplicity *k* or more are zero.
+    * The coefficients `c_{k,j}` with `j \geq n` such that `\lambda + j` is a
+      root of the indicial polynomial `Q_0` of multiplicity strictly greater
+      than *k* are zero.
 
     * The degree in `\log(x)` of the truncation at order `x^n` of `y(x)` is
       strictly smaller than *nlogs*. In other words, `c_{k,j} = 0` when `j < n`
@@ -706,12 +751,14 @@ The functions in this section compute upper bounds of the expression
 
    F_T(n) = n \cdot \sum_{t=0}^{T-1} \left| [X^t] \frac{p(n+X)}{X^{-m(n)} q(n+X)} \right|
 
-where `q` is a monic polynomial, `m(n)` denotes the multiplicity of `n` as a
-root of `q`, and `p` is a polynomial of strictly smaller degree than `q`.
+where `q` is a monic polynomial with `q(0) = 0`, `m(n)` denotes the multiplicity
+of `n` as a root of `q`, and `p` is a polynomial of strictly smaller degree
+than `q`.
 All functions work with a vector of numerators `p` and a single denominator `q`.
 
 The function and parameter names reflect that, in the intended application,
-`q` is the monic indicial polynomial of the differential equation being solved.
+`q` is the monic indicial polynomial of the differential equation being solved,
+recentered at one of its roots.
 
 Some functions accept a working precision *prec* for intermediate computations
 even though their outputs are represented in fixed precision.
@@ -719,51 +766,51 @@ even though their outputs are represented in fixed precision.
 .. type:: acb_ode_ind_lbound_struct
           acb_ode_ind_lbound_t
 
-    A precomputed lower bound on `q(n)/n^r` where `q` is a monic polynomial
-    of degree `r`.
+    A precomputed lower bound on `|q(k)|/k^r` where `q` is a monic polynomial
+    of degree `r` with `q(0)=0`.
     The data structure contains an integer *length* and a vector *r* of
-    length *length* of structures each containing
-    a root *root* of `q`,
-    its multiplicity *mult*,
-    an integer *n_min* such that *|1-root/n|* is nondecreasing for *n >= n_min*,
-    and a lower bound *global_lbound* of *|1-root/n|^mult* for *n >= n_min*.
+    length *length* of structures each containing a root *root* of `q`,
+    its multiplicity *mult*, an integer *n_min* such that *|1-root/k|* is
+    nondecreasing for *k >= n_min*, and a lower bound *global_lbound* of
+    *|1-root/k|^mult* valid for all *k >= 1* except the integer roots of `q`.
 
 .. function:: void acb_ode_ind_lbound_init(acb_ode_ind_lbound_t ind_lbound)
               void acb_ode_ind_lbound_clear(acb_ode_ind_lbound_t ind_lbound)
 
 .. function:: void acb_ode_ind_lbound_precompute(acb_ode_ind_lbound_t ind_lbound, const acb_ode_exponents_t expos, slong grp, slong prec)
 
-    Fills *ind_lbound* with data corresponding to `q(X) = q_0(\lambda + X)` where
-    `q_0` is the monic polynomial whose roots are given by *expos* and `\lambda` is
-    the leader of the group of index *grp*.
+    Fills *ind_lbound* with data corresponding to `q(X) = Q(\lambda + X)` where
+    `Q` is the monic polynomial whose roots are given by *expos* and `\lambda`
+    is the leader of the group of index *grp*.
+
+.. function:: void acb_ode_ind_lbound_eval(mag_t res, const acb_ode_ind_lbound_t ind_lbound, slong n, slong prec)
+
+    Sets *res* to a lower bound of `|q(k)|/k^r` for all `k \geq n` that are not
+    roots of `q`, with `q` as above.
 
 In the following descriptions `\tau(n) = \sum_{k=0}^{n} m(k)`.
 
 .. type:: acb_ode_stairs_struct
           acb_ode_stairs_t
 
-    A vector *h* of length *length* of *mag_struct*.
-
 .. function:: void acb_ode_stairs_init(acb_ode_stairs_t stairs)
               void acb_ode_stairs_clear(acb_ode_stairs_t stairs)
 
 .. function:: void acb_ode_stairs_precompute(acb_ode_stairs_t stairs, const acb_poly_struct * num, slong len, const acb_poly_t ind, const acb_ode_group_t group, const acb_ode_ind_lbound_t ind_lbound, slong prec)
 
-    For each `p` in the vector *num* of length *len* and for each shift `s` in
-    *group*, computes an upper bound of `F_{\tau(n)}(n)` valid for *n >= s*.
-    The parameter *ind* corresponds to `q`.
-    The parameter *group* must describe the integer roots of `q` and their
-    multiplicities (its *leader* field is ignored).
-    Additionally, the caller must supply an *ind_lbound* structure precomputed
-    as described above.
+    Fills *stairs* with data expected by :func:`acb_ode_bound_rat_vec`.
+    The parameters have the same meaning as in that function.
+    The caller must supply an *ind_lbound* structure precomputed as described
+    above.
 
 .. function:: void acb_ode_bound_rat_vec(mag_ptr res, const acb_poly_struct * num, slong len, const acb_poly_t ind, const acb_ode_group_t group, const acb_ode_ind_lbound_t ind_lbound, const acb_ode_stairs_t stairs, slong n0, slong ord, slong prec)
 
     For each `p` in the vector *num* of length *len*, computes a bound on
-    `F_{\rho(n)}(n)` valid for all `n \geq n_0`, where `\rho(n) = \tau(n)` when
-    there is no integer root of `q` between `n_0` (exclusive) and `n`
-    (inclusive), and `\rho(n)` is equal to *ord* otherwise.
+    `F_{\rho(n)}(n)` valid for all `n \geq n_0`, where `\rho(n) = \mathit{ord}`
+    as long as there is no integer root of `q` between `n_0` and `n`
+    (inclusive), and `\rho(n) = \tau(n)` otherwise.
     The parameter *ind* specifies the common denominator `q`.
+    The integer *n0* is assumed to be nonnegative.
 
     The caller must supply the integer roots of `q` in the parameter *group*
     (the *leader* field is ignored), as well as two data structures *ind_lbound*
@@ -778,7 +825,7 @@ In the following descriptions `\tau(n) = \sum_{k=0}^{n} m(k)`.
 .. function:: void acb_ode_bound_rat_ref_vec(mag_ptr res, const acb_poly_struct * num, slong len, const acb_poly_t ind, slong n, slong mult, slong ord, slong prec)
 
     Similar but assumes that `m(n)` is equal to *mult* and computes a bound on
-    `F_{T}(n)` at the given *n*.
+    `F_{T}(n)` at the given (nonnegative) *n*.
 
 Miscellaneous bounds and estimates
 -------------------------------------------------------------------------------

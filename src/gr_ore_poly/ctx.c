@@ -112,6 +112,25 @@ _gr_ore_poly_ctx_base(gr_ctx_t ctx)
     return GR_ORE_POLY_ELEM_CTX(ctx);
 }
 
+int
+gr_ore_poly_ctx_over_gr_poly_base_ptrs(gr_ctx_struct ** Cst,
+                                       gr_ctx_struct ** Pol,
+                                       const gr_ctx_t Ore)
+{
+    gr_ctx_struct * _Pol = GR_ORE_POLY_ELEM_CTX(Ore);
+
+    ulong which_base = _Pol->which_ring;
+    if (which_base != GR_CTX_GR_POLY)
+        return GR_UNABLE;
+
+    if (Pol != NULL)
+        * Pol = _Pol;
+    if (Cst != NULL)
+        * Cst = POLYNOMIAL_ELEM_CTX(_Pol);
+
+    return GR_SUCCESS;
+}
+
 void
 gr_ore_poly_ctx_clear(gr_ore_poly_ctx_t ctx)
 {

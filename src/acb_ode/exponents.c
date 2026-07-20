@@ -94,13 +94,15 @@ acb_ode_exponents_length(const acb_ode_exponents_t expos)
 void
 acb_ode_exponents_ordinary(acb_ode_exponents_t expos, slong order)
 {
+    acb_ode_exponents_clear(expos);
+
     slong off = sizeof(acb_ode_group_struct);
     slong bufsz = off + sizeof(acb_ode_shift_struct) * order;
-    unsigned char * buf = flint_realloc(expos->groups, bufsz);
+    unsigned char * buf = flint_malloc(bufsz);
     expos->groups = (acb_ode_group_struct *) buf;
     expos->groups->shifts = (acb_ode_shift_struct *) (buf + off);
 
-    acb_zero(expos->groups->leader);
+    acb_init(expos->groups->leader);
     for (slong n = 0; n < order; n++)
     {
         expos->groups->shifts[n].n = n;
@@ -121,9 +123,9 @@ acb_ode_exponents_println(const acb_ode_exponents_t expos)
         flint_printf("%{acb} ", grp->leader);
         for (slong s = 0; s < grp->nshifts; s++)
         {
-            flint_printf("+ %ld", grp->shifts[s].n);
+            flint_printf("+ %wd", grp->shifts[s].n);
             if (grp->shifts[s].mult != 1)
-                flint_printf(" (mult=%ld)", grp->shifts[s].mult);
+                flint_printf(" (mult=%wd)", grp->shifts[s].mult);
             if (g < expos->ngroups - 1 || s < grp->nshifts - 1)
                 flint_printf(", ");
         }
@@ -139,20 +141,20 @@ void
 acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
                            slong len, slong disp, slong prec, slong mag_bits)
 {
-    void * buf = flint_realloc(expos->groups,
-                               len * (sizeof(acb_ode_group_struct) +
-                                      sizeof(acb_ode_shift_struct)));
+    arb_t tmp;
+    arb_init(tmp);
+
+    acb_ode_exponents_clear(expos);
+    void * buf = flint_malloc(len * (sizeof(acb_ode_group_struct) +
+                                     sizeof(acb_ode_shift_struct)));
     expos->groups = (acb_ode_group_struct *) buf;
-
-    int precise = n_randint(state, 64);
-
     acb_ode_shift_struct * shift =
         (acb_ode_shift_struct *) (expos->groups + len);
 
+    expos->ngroups = 0;
+    int precise = n_randint(state, 64);
     for (acb_ode_group_struct * grp = expos->groups; len > 0; grp++)
     {
-        // flint_printf("len = %wd\n", len);
-
         expos->ngroups++;
 
         acb_init(grp->leader);
@@ -161,10 +163,20 @@ acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
         else
             acb_randtest(grp->leader, state, prec, mag_bits);
 
-        /* mathematically equal leaders would be unsound */
+        /* leaders differing by integers would be unsound, so we perturb one
+           and pretend they were close but different */
         for (slong g = 0; g < expos->ngroups - 1; g++)
-            if (acb_eq(grp->leader, expos->groups[g].leader))
-                mag_set_d(&grp->leader->real.rad, 1e-50);
+        {
+            if (acb_is_exact(grp->leader) && acb_is_exact(expos->groups[g].leader))
+            {
+                arb_sub(tmp,
+                        acb_realref(grp->leader),
+                        acb_realref(expos->groups[g].leader),
+                        ARF_PREC_EXACT);
+                if (arb_is_int(tmp))
+                    mag_set_d(&grp->leader->real.rad, 1e-50);
+            }
+        }
 
         grp->shifts = shift;
         grp->nshifts = 0;
@@ -172,9 +184,7 @@ acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
         slong grplen = 1 + n_randint(state, len);
         len -= grplen;
 
-        for (slong n = 0;
-             grplen > 0;
-             shift++, n += 1 + n_randint(state, disp - n))
+        for (slong n = 0;;)
         {
             // flint_printf("len = %wd grplen = %wd n = %wd\n", len, grplen, n);
 
@@ -187,9 +197,16 @@ acb_ode_exponents_randtest(acb_ode_exponents_t expos, flint_rand_t state,
                 shift->mult = 1 + n_randint(state, grplen);
             grplen -= shift->mult;
 
-            // acb_ode_exponents_println(expos);
+            shift++;
+
+            if (grplen == 0)
+                break;
+
+            n += 1 + n_randint(state, disp - n);
         }
     }
+
+    arb_clear(tmp);
 }
 
 /* todo: also provide a function for computing the exponents starting from the
@@ -209,14 +226,14 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
 
     if (gr_ore_poly_ctx_over_gr_poly_base_ptrs(&Scalars, &Pol, Dop) != GR_SUCCESS)
     {
-        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
+        // flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
         return GR_UNABLE;
     }
 
     /* For now exponents are of type acb_t */
     if (CC->which_ring != GR_CTX_CC_ACB)
     {
-        flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
+        // flint_printf("%s:%d UNABLE\n", __FILE__, __LINE__);
         return GR_UNABLE;
     }
 
@@ -228,7 +245,7 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
     status |= gr_ore_poly_indicial_polynomial(ind, dop, Dop);
     if(status)
     {
-        flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+        // flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
         goto cleanup_ind;
     }
 
@@ -254,12 +271,10 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
 
     status |= gr_factor(polc /* unused */, (gr_vec_struct *) fac,
                         mult, ind, 0, Pol);
-    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
-    // GR_MUST_SUCCEED(status); // tmp
+    // if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
     status |= gr_poly_shiftless_decomposition_from_factors(
             slfac, slshifts, slmult, fac, mult, Scalars);
-    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
-    // GR_MUST_SUCCEED(status); // tmp
+    // if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
 
     /*
     gr_ctx_t Polvec, ZZvecvec;
@@ -270,6 +285,8 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
     gr_ctx_clear(ZZvecvec);
     gr_ctx_clear(Polvec);
     */
+
+    acb_ode_exponents_clear(expos);
 
     /* Allocate space for sum(deg(slfac)) exponents and sum(len(shiftset))
        shifts; exponents belonging to the same irred factor will share a shift
@@ -294,10 +311,13 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
         bufsz += shi->length * sizeof(acb_ode_shift_struct);
     }
 
-    unsigned char * buf = flint_realloc(expos->groups, bufsz);
+    unsigned char * buf = flint_malloc(bufsz);
 
     expos->groups = (acb_ode_group_struct *) buf;
     acb_ode_shift_struct * shifts = (acb_ode_shift_struct *) (buf + shifts_offset);
+
+    for (slong g = 0; g < expos->ngroups; g++)
+        gr_init(expos->groups[g].leader, CC);
 
     /* Populate the data structure */
 
@@ -309,7 +329,7 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
 
         status |= gr_poly_roots_other(roots, rtmult /* unused */,
                                       indfactor, Scalars, 0, CC);
-        if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+        // if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
         FLINT_ASSERT(roots->length + 1 == indfactor->length || status != GR_SUCCESS);
 
         slong len = shi->length;
@@ -324,11 +344,10 @@ acb_ode_exponents(acb_ode_exponents_t expos, const gr_ore_poly_t dop,
 
         for (slong j = 0; j < roots->length; j++, g++)
         {
-            gr_init(expos->groups[g].leader, CC);
             status |= gr_sub_si(expos->groups[g].leader,
                                 GR_ENTRY(roots->entries, j, CC->sizeof_elem),
                                 maxshift, CC);
-            if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+            // if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
             /* XXX exponents share shift pointers but not shift counts... */
             expos->groups[g].nshifts = shi->length;
             expos->groups[g].shifts = shifts;

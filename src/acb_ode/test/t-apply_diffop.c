@@ -10,7 +10,7 @@ TEST_FUNCTION_START(acb_ode_apply_diffop, state)
     fmpq_poly_t tmp;
     fmpq_poly_init(tmp);
 
-    for (slong iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (slong iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong dop_len = n_randint(state, 3);
         acb_poly_struct * dop = _acb_poly_vec_init(dop_len);

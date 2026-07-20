@@ -15,7 +15,12 @@ acb_ode_stairs_clear(acb_ode_stairs_t stairs)
     _mag_vec_clear(stairs->h, stairs->length);
 }
 
-/* [M19], Algorithm 7.4, step 1 */
+/* For each p in num and for each shift s in group, computes an upper bound of
+   F_{\tau(n)}(n) valid for n >= s, where
+
+   F_T(n) = n \cdot \sum_{t=0}^{T-1} \left| [X^t] \frac{p(n+X)}{X^{-m(n)} q(n+X)} \right|.
+
+   [M19], Algorithm 7.4, step 1 */
 
 void
 acb_ode_stairs_precompute(acb_ode_stairs_t stairs,

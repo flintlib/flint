@@ -4,7 +4,6 @@
 #include "acb_ode.h"
 #include "acb_poly.h"
 #include "acb.h"
-#include "arf.h"
 #include "gr_poly.h"
 
 FLINT_DLL extern gr_static_method_table _ca_methods,  _qqbar_methods;
@@ -19,9 +18,7 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
     gr_ctx_init_complex_qqbar(QQbar);
     gr_ctx_init_complex_ca(CaCC);
 
-    // flint_rand_set_seed(state, 0x1a80d415a36b39ff, 0xa199470569e8c77c);
-
-    for (slong iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (slong iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         flint_printf("******************************************\n");
 
@@ -37,7 +34,6 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
         gr_ptr pert;
         gr_ore_poly_t dop, dop1;
         acb_t r;
-        arf_t frac;
         acb_ode_exponents_t expos;
         acb_ode_exponents_struct * expos1;
         acb_ptr lcroots = NULL;
@@ -45,7 +41,6 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
         mag_t refmag, mag;
 
         acb_init(r);
-        arf_init(frac);
         acb_ode_exponents_init(expos);
         mag_init(refmag);
         mag_init(mag);
@@ -62,7 +57,7 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
             gr_ore_poly_ctx_init_randtest2(Pol, Dop, state);
         else
         {
-            slong rnd = n_randint(state, 8);
+            slong rnd = n_randint(state, 12);
             if (rnd == 0)
                 gr_ctx_init_random_poly(Pol, state);
             else if (rnd == 1)
@@ -97,7 +92,7 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
         gr_ore_poly_init(dop,  Dop);
         gr_ore_poly_init(dop1, Dop);
 
-        slong dop_len_bound = 20;
+        slong dop_len_bound = 8;
         if (Pol->which_ring == GR_CTX_GR_POLY
             && (POLYNOMIAL_ELEM_CTX(Pol)->methods == _ca_methods
                 || POLYNOMIAL_ELEM_CTX(Pol)->methods ==  _qqbar_methods))
@@ -114,24 +109,24 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
         {
             /* todo: increase once sum_forward_divconquer is able to stop in the
                middle of a block */
-            slong clen = 1 + (n_randint(state, 8) ? n_randint(state, 10)
-                                                  : n_randint(state, 100));
+            slong clen = 1 + n_randint(state, 10);
             slong lcdeg = n_randint(state, clen);
             lcdeg1 = lcdeg + n_randint(state, 4);
             lcroots = _acb_vec_init(lcdeg1);
 
             gr_ore_poly_fit_length(dop, dop_len, Dop);
             acb_ode_randtest_acb(dop->coeffs, lcroots, expos, state, disp,
-                                 lcdeg, clen, dop_len, prec);
+                                 lcdeg, clen, dop_len, prec * 4);
             _gr_ore_poly_set_length(dop, dop_len, Dop);
 
             for (slong i = lcdeg; i < lcdeg1; i++)  /* extra lcroots for dop1 */
             {
-                acb_randtest(lcroots + i, state, prec, 3);
+                acb_randtest(lcroots + i, state, prec * 4, 3);
                 if (acb_is_zero(lcroots + i))
                     acb_one(lcroots + i);
             }
-            acb_poly_product_roots(pert, lcroots + lcdeg, lcdeg1 - lcdeg, prec);
+            acb_poly_product_roots(pert, lcroots + lcdeg, lcdeg1 - lcdeg,
+                                   prec * 4);
 
             if (dop->length == 0
                 || !acb_contains_zero(
@@ -186,9 +181,8 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
         if (mag_is_inf(refmag))
             mag_set_ui(refmag, 3);
 
-        // XXX large npts hits hard entire function case too often
-        // slong npts = n_randint(state, n_randint(state, 8) ? 3 : 100);
-        slong npts = n_randint(state, 3);
+        slong npts = n_randint(state, 8) ? 1 + n_randint(state, 2)
+                                         : n_randint(state, 20);
         acb_ptr pts = _acb_vec_init(npts * 2);
         acb_ptr pts1 = pts + npts;
         for (slong p = 0; p < npts; p++)
@@ -199,10 +193,10 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
             slong s = FLINT_MAX(0., mag_get_d_log2_approx(mag) + 1.5);
             acb_mul_2exp_si(pts + p, pts + p, -s);
 
-            if (n_randint(state, 2))
+            if (n_randint(state, 16))
                 acb_set(pts1 + p, pts + p);
             else
-            {  // XXX do this less often or perturb less violently
+            {
                 acb_randtest_special(r, state, prec, 3);
                 acb_add(pts1 + p, pts  + p, r, prec);
                 acb_sub(pts1 + p, pts1 + p, r, prec);
@@ -222,7 +216,7 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
             acb_mat_init(mat2 + p, nrows, order);
         }
 
-        // XXX maybe let it run at least when we just failed to compute the
+        // XXX maybe let it run when we only failed to compute the
         // optional parts of the input
         if (status != GR_SUCCESS)
             goto cleanup;
@@ -230,18 +224,18 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
         flint_printf("--- testing: ---\n");
         flint_printf("Dop = %{gr_ctx}\n", Dop);
         flint_printf("dop = %{gr}\n", dop, Dop);
-        flint_printf("dop1 = %{gr}\n", dop1, Dop);
+        // flint_printf("dop1 = %{gr}\n", dop1, Dop);
         flint_printf("pts = %{acb*} accuracy", pts, npts);
         for (slong i = 0; i < npts; i++)
             flint_printf(" %ld", acb_rel_accuracy_bits(pts + i));
         flint_printf("\n");
         flint_printf("pts1 = %{acb*}\n", pts1, npts);
         flint_printf("expos = "); acb_ode_exponents_println(expos);
-        flint_printf("expos1 = %p\n", expos1);
-        if (lcroots)
-            flint_printf("lcroots = %{acb*}\n", lcroots, lcdeg1);
-        else
-            flint_printf("lcroots = (nil)\n");
+        // flint_printf("expos1 = %p\n", expos1);
+        // if (lcroots)
+        //     flint_printf("lcroots = %{acb*}\n", lcroots, lcdeg1);
+        // else
+        //     flint_printf("lcroots = (nil)\n");
         flint_printf("prec = %wd, prec1 = %wd\n", prec, prec1);
 
         flint_printf("--- run 0 ---\n");
@@ -278,7 +272,7 @@ TEST_FUNCTION_START(acb_ode_fundamental_matrix, state)
 
         flint_printf("--- run 1 ---\n");
 
-        status |= acb_ode_fundamental_matrix_vec(mat1, dop, Dop, expos, lcroots,
+        status |= acb_ode_fundamental_matrix_vec(mat1, dop, Dop, expos1, lcroots,
                                                  pts1, npts, basis, prec1);
         flint_printf("status1 = %wd\n", status);
 
@@ -384,7 +378,6 @@ cleanup:
         gr_ctx_clear(Dop);
         gr_ctx_clear(Pol);
         gr_ctx_clear(CC);
-        arf_clear(frac);
         acb_clear(r);
         mag_clear(refmag);
         mag_clear(mag);

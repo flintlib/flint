@@ -259,7 +259,8 @@ set(_BUILD_DIRS
     acb_mat         acb_poly        acb_calc        acb_hypgeom
     arb_fmpz_poly   arb_fpwrap
     acb_dft         acb_elliptic    acb_modular     acb_dirichlet
-    acb_theta       dirichlet       bernoulli       hypgeom
+    acb_theta       acb_ode
+    dirichlet       bernoulli       hypgeom
 
     gr              gr_generic      gr_vec          gr_mat
     gr_poly         gr_mpoly        gr_ore_poly     gr_series

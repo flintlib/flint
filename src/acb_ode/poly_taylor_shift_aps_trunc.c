@@ -9,17 +9,20 @@ acb_ode_poly_taylor_shift_aps_trunc(acb_poly_t g,
 
     if (len == 1 && acb_is_zero(a))  /* covers ordinary points */
     {
-        acb_ptr c = g->coeffs;
-        acb_zero(c);
+        acb_t c;
+        acb_init(c);
 
         for (slong i = acb_poly_degree(f); i >= 0; i--)
         {
             acb_mul_si(c, c, n, prec);
             acb_add(c, c, f->coeffs + i, prec);
         }
+        acb_swap(g->coeffs + 0, c);
 
         _acb_poly_set_length(g, 1);
         _acb_poly_normalise(g);
+
+        acb_clear(c);
     }
     else
     {

@@ -75,14 +75,18 @@ _acb_ode_apply_diffop_basecase_weights(
                 slong j = start + p1 - p;
                 slong n = offset + p;
 
+                acb_ptr c = weights + p1 * nlogs * flen + t * flen + p;
+                acb_zero(c);
+
                 if (j < 0)
+                {
+                    _acb_vec_zero(c, flen - p);
                     break;
+                }
 
                 if (expo != NULL)
                     acb_add_si(expo1, expo, n, prec);
 
-                acb_ptr c = weights + p1 * nlogs * flen + t * flen + p;
-                acb_zero(c);
                 for (slong i = dop_len - 1; i >= t; i--)  /* Horner */
                 {
                     if (expo == NULL)

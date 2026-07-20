@@ -32,11 +32,15 @@ acb_ode_randtest_acb(acb_poly_struct * dop, acb_struct * lcroots,
 
     /* adjust the leading coefficient */
 
+    int precise = n_randint(state, 32);
     for (slong i = 0; i < lcdeg; i++)
     {
         if (i > 0 && n_randint(state, 8))
             acb_set(lcroots + i, lcroots + i - 1);
-        acb_randtest_precise(lcroots + i, state, prec, 5);
+        else if (precise)
+            acb_randtest_precise(lcroots + i, state, prec, 5);
+        else
+            acb_randtest(lcroots + i, state, prec, 5);
     }
     acb_poly_product_roots(tmp, lcroots, lcdeg, prec);
 

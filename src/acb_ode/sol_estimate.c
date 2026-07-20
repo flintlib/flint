@@ -37,20 +37,30 @@ acb_ode_sol_estimate_terms(mag_t est,
 slong
 acb_ode_sol_estimate_sums(mag_t mag, mag_t rad, const acb_ode_sol_t sol)
 {
-    slong len = sol->npts * sol->nlogs * sol->nder;
+    mag_t tmp;
 
-    _acb_vec_get_mag(mag, sol->sums, len);  /* XXX good enough? */
+    mag_init(tmp);
 
+    mag_zero(mag);
     mag_zero(rad);
-    for (slong i = 0; i < len; i++)
-    {
-        mag_max(rad, rad, &sol->sums[i].real.rad);
-        mag_max(rad, rad, &sol->sums[i].imag.rad);
-    }
-
     slong accuracy = ARF_PREC_EXACT;
-    for (slong i = 0; i < len; i++)
-        accuracy = FLINT_MIN(accuracy, acb_rel_accuracy_bits(sol->sums + i));
+
+    for (slong p = 0; p < sol->npts; p++)
+        for (slong k = 0; k < sol->nlogs; k++)
+            for (slong i = 0; i < sol->nder; i++)
+            {
+                acb_ptr c = acb_ode_sol_sum_ptr(sol, p, k, i);
+
+                acb_get_mag(tmp, c);
+                mag_max(mag, mag, tmp);
+
+                mag_max(rad, rad, &c->real.rad);
+                mag_max(rad, rad, &c->imag.rad);
+
+                accuracy = FLINT_MIN(accuracy, acb_rel_accuracy_bits(c));
+            }
+
+    mag_clear(tmp);
 
     return accuracy;
 }

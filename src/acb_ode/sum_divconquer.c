@@ -26,13 +26,19 @@ void
 acb_ode_sum_divconquer(acb_ode_sum_t sum, slong nterms, acb_ode_bound_t bound,
                        acb_ode_group_bound_t gbound, slong prec)
 {
+    FLINT_ASSERT((bound == NULL) == (gbound == NULL));
+
     if (nterms < 0)
+    {
+        if (bound == NULL)
+            flint_throw(FLINT_ERROR, "Unlimited terms with bounds == NULL");
         nterms = WORD_MAX;
+    }
 
     acb_ode_sum_precompute(sum);
     /* todo: take into account nterms and the APPROX flag */
     sum->sum_wp = acb_ode_choose_prec(&sum->wp, sum->dop, sum->dop_len,
-                                         sum->mag, sum->cvrad, prec);
+                                      sum->mag, sum->cvrad, prec);
     acb_ode_sum_reset(sum);
 
     slong block_len = FLINT_MAX(1, sum->dop_clen - 1);

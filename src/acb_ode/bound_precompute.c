@@ -121,14 +121,12 @@ acb_ode_bound_precompute(acb_ode_bound_t bound,
 
     if (acb_is_zero(den->coeffs + 0))
         flint_throw(FLINT_ERROR, "irregular singular point or common factor "
-                                  "with a zero at the origin\n");
+                                 "with a zero at the origin\n");
 
     /* Denominator bound: 1/lc_Θ(dop) << cst/prod(rt-x) = cst/den_lbound */
 
     if (prec > bound->prec)
     {
-        bound->prec = prec;
-
         acb_abs(bound->cst, den->coeffs + den->length - 1, prec);
         arb_inv(bound->cst, bound->cst, prec);
 
@@ -144,6 +142,8 @@ acb_ode_bound_precompute(acb_ode_bound_t bound,
 
         arb_poly_product_roots(bound->den_lbound,
                                bound->den_rt, den->length - 1, prec);
+        if ((den->length - 1) % 2)
+            arb_poly_neg(bound->den_lbound, bound->den_lbound);
     }
 
     /* Write dop with θ on the left, right-divide by lc, isolate pol_part_len
@@ -195,4 +195,7 @@ acb_ode_bound_precompute(acb_ode_bound_t bound,
 
         _acb_poly_vec_clear(rcoeffs, 3*dop_len - 1);
     }
+
+    if (prec > bound->prec)
+        bound->prec = prec;
 }

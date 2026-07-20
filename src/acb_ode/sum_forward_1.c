@@ -26,7 +26,8 @@ next_binom_n(fmpz * binom_n, slong n, slong len)
 
 static void
 next_coeff(acb_ode_sol_t sol, slong base, slong n,
-           acb_poly_struct * rhs, slong rhs_nlogs,
+           const acb_poly_struct * rhs, slong rhs_nlogs,
+           const acb_ode_group_t group,
            slong mult, slong ini_i, const acb_poly_t ind_n,
            int approx, slong prec)
 {
@@ -90,8 +91,19 @@ next_coeff(acb_ode_sol_t sol, slong base, slong n,
 
     /* Update log-degree and used initial values */
 
-    sol->nlogs = FLINT_MAX(sol->nlogs,
-                           rhs_nlogs > 0 ? rhs_nlogs + mult : ini_nlogs);
+    slong term_nlogs = rhs_nlogs > 0 ? rhs_nlogs + mult : ini_nlogs;
+    if (term_nlogs > sol->nlogs)
+    {
+        sol->future_logs -= term_nlogs - sol->nlogs;
+        sol->nlogs = term_nlogs;
+    }
+
+    /* May need updating to support inhomogeneous equations */
+    slong future_shifts = 0;
+    for (slong s = group->nshifts - 1; group->shifts[s].n > n; s--)
+        future_shifts += group->shifts[s].mult;
+    sol->future_logs = FLINT_MIN(sol->future_logs, future_shifts);
+
     // if (mult)
     //     flint_printf("n=%wd rhs_nlogs=%wd mult=%wd sol->nlogs=%wd\n", n, rhs_nlogs, mult, sol->nlogs);
 
@@ -106,6 +118,9 @@ next_sums(acb_ode_sol_t sol, slong base, slong n,
           const fmpz * binom_n,
           slong nder, slong prec)
 {
+    if (nder == 0)
+        return;
+
     acb_t tmp;
     acb_init(tmp);
 
@@ -155,7 +170,7 @@ _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
 
     ini_i = -1;
     mult = 0;
-    for (slong i = 0; i < sum->dop_len - 1; i++)
+    for (slong i = 0; i < sum->group->nshifts; i++)
     {
         /* flint_printf("i=%wd shift=%wd mult=%wd\n", i, sum->group->shifts[i].n, sum->group->shifts[i].mult); */
         if (sum->group->shifts[i].n == n)
@@ -188,8 +203,8 @@ _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
         /* XXX when rewriting with a better data structure, pass n0 - n instead
            of (n0, n) and an rhs pointer/offset separate from the sum
            pointer/offset */
-        next_coeff(sol, sum->n0, n, sol->series, sol->nlogs, mult, ini_i,
-                   ind_n, sum->flags & ACB_ODE_APPROX, sum->wp);
+        next_coeff(sol, sum->n0, n, sol->series, sol->nlogs, sum->group, mult,
+                   ini_i, ind_n, sum->flags & ACB_ODE_APPROX, sum->wp);
         next_sums(sol, sum->n0, n, sum->pows, sum->shifted_sums, sum->npts,
                   sum->binom_n, sum->nder, sum->sum_wp);
 
@@ -208,14 +223,15 @@ _acb_ode_sum_forward_1(acb_ode_sum_struct * sum)
     /* compute the next power of each evaluation point */
     /* XXX wasteful near the end */
 
-    for (slong j = 0; j < sum->npts; j++)
-    {
-        slong prec = FLINT_MIN(sum->wp, sum->sum_wp);
-        acb_mul(sum->pows + ((n + 1) % sum->nder) * sum->npts + j,
-                sum->pows + (n       % sum->nder) * sum->npts + j,
-                sum->pts + j,
-                prec);
-    }
+    if (sum->nder > 0)
+        for (slong j = 0; j < sum->npts; j++)
+        {
+            slong prec = FLINT_MIN(sum->wp, sum->sum_wp);
+            acb_mul(sum->pows + ((n + 1) % sum->nder) * sum->npts + j,
+                    sum->pows + (n       % sum->nder) * sum->npts + j,
+                    sum->pts + j,
+                    prec);
+        }
 
     mag_mul(sum->magpow, sum->magpow, sum->mag);
 

@@ -35,7 +35,7 @@ acb_ode_choose_prec(slong * rec_prec, const acb_poly_struct * dop, slong dop_len
     {
         mag_div_lower(ratio, cvrad, rad);
         nterms = prec / mag_get_d_log2_approx(ratio);
-        flint_printf("choose_prec: rad=%{mag} cvrad=%{mag} prec0=%ld nterms=%f\n", rad, cvrad, prec0, nterms);
+        // flint_printf("choose_prec: rad=%{mag} cvrad=%{mag} prec0=%ld nterms=%f\n", rad, cvrad, prec0, nterms);
     }
     else
     {
@@ -46,34 +46,34 @@ acb_ode_choose_prec(slong * rec_prec, const acb_poly_struct * dop, slong dop_len
         mag_init(base);
 
         _acb_ode_solution_growth(order, base, dop, dop_len);
-        flint_printf("order=%{mag} base=%{mag}\n", order, base);
-        if (mag_is_zero(order))
-            nterms = 1;
-        else
-        {
-            /* mag so we don't have to worry about overflows */
-            mag_mul(base, base, rad);
+        // flint_printf("rad=%{mag} order=%{mag} base=%{mag}\n", rad, order, base);
 
-            double base_d = mag_get_d(base);
-            double order_d = mag_get_d(order);
+        /* mag so we don't have to worry about overflows */
+        mag_mul(base, base, rad);
 
-            double hump = exp(log(base_d) * order_d + 1.);
-            /* cap the cancellation we'll attempt to absorb */
-            hump = FLINT_MIN(hump, 100. + prec * log2(prec));
-            double den = log2(prec) / order_d;
-            if (base_d < 1.)
-                den = FLINT_MAX(den, - log2(base_d));
-            nterms = hump + prec / den;
-            lgmag = FLINT_MAX(0., order_d * hump * log2(hump));
+        double base_d = mag_get_d(base);
+        double order_d = mag_get_d(order);
 
-            flint_printf("prec0=%ld lgmag=%f nterms=%f base_d=%f hump=%f\n", prec0, lgmag, nterms, base_d, hump);
-        }
+        double hump = exp(log(base_d) * order_d + 1.);
+        /* cap the cancellation we'll attempt to absorb */
+        hump = FLINT_MIN(hump, 100. + prec * log2(prec));
+        double den = log2(prec) / order_d;
+        if (base_d < 1.)
+            den = FLINT_MAX(den, - log2(base_d));
+        nterms = hump + prec / den;
+        lgmag = FLINT_MAX(0., order_d * hump * log2(hump));
+
+        // flint_printf("prec0=%ld lgmag=%f nterms=%f base_d=%f hump=%f\n", prec0, lgmag, nterms, base_d, hump);
     }
 
-    sum_prec = 8 + 1.125 * (prec0 + 2 * lgmag + log2(nterms));
+    double prec1 = 2 * lgmag + log2(nterms);
+    if (!(fabs(prec1) <= prec0))
+        prec1 = 0.;
+
+    sum_prec = 8 + 1.125 * (prec0 + prec1);
     prec = FLINT_MAX(prec, sum_prec);
 
-    flint_printf("initial prec=%ld sum_prec=%ld\n", prec, sum_prec);
+    // flint_printf("initial prec=%ld sum_prec=%ld\n", prec, sum_prec);
 
     mag_clear(ratio);
 

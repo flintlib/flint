@@ -23,7 +23,7 @@ _acb_ode_solution_growth(mag_t order, mag_t base,
     for (slong i = 0; i < dop_len; i++)
         for (slong j = 0; j < dop[i].length; j++)
             if (!acb_is_zero(dop[i].coeffs + j))
-                if (i > i0 || i == i0 && j > j0)
+                if (i > i0 || (i == i0 && j > j0))
                     i0 = i, j0 = j;
 
     slong p = -1, q = 0;

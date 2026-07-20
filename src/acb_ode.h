@@ -175,7 +175,7 @@ void acb_ode_group_bound_precompute(acb_ode_group_bound_t gbound,
 
 void acb_ode_bound_precompute_integrand(arb_poly_t itg_pol, arb_poly_t itg_num,
         const acb_ode_group_t group, const acb_ode_bound_t bound,
-        const acb_ode_group_bound_t gbound, slong n0, slong ord, slong prec);
+        const acb_ode_group_bound_t gbound, slong n0, slong nlogs, slong prec);
 void acb_ode_tail_bound_jet_precomp(arb_poly_t res,
         const acb_ode_bound_t bound, slong n,
         const arb_poly_t itg_pol, const arb_poly_t itg_num,
@@ -191,6 +191,8 @@ void acb_ode_ind_lbound_init(acb_ode_ind_lbound_t ind_lbound);
 void acb_ode_ind_lbound_clear(acb_ode_ind_lbound_t ind_lbound);
 void acb_ode_ind_lbound_precompute(acb_ode_ind_lbound_t ind_lbound,
         const acb_ode_exponents_t expos, slong grp, slong prec);
+void acb_ode_ind_lbound_eval(mag_t res, const acb_ode_ind_lbound_t ind_lbound,
+        slong n, slong prec);
 
 void acb_ode_stairs_init(acb_ode_stairs_t stairs);
 void acb_ode_stairs_clear(acb_ode_stairs_t stairs);
@@ -239,8 +241,14 @@ void acb_ode_cvest_update(acb_ode_cvest_t cvest, const acb_ode_cvest_t old, mag_
 
 typedef struct
 {
-    /* vector of polynomials in x, entries = coefficients of log(x)^k/k! of
-     * a slice of solution and/or rhs; polynomials not always normalized */
+    /* Vector of polynomials in x, not necessarily normalized (used as buffers).
+       The polynomial of index k corresponds to the series in front of
+       log(x)^k/k! in the solution. Its coefficients 0..n-n0-1 are the
+       coefficients of x^n0 to x^{n-1} in the series. FIXME: Generally speaking,
+       the coefficients of index >= n0 are used to store the coefficients of
+       x^n, x^{n+1}, ... in the *residual* of the sum truncated at order n, but
+       this is currently not a properly maintained invariant. The values of n0
+       and n are provided by the associated sum object.  */
     acb_poly_struct * series;
 
     /* coefficients of Taylor expansions (jets) of the partial sums
@@ -261,8 +269,9 @@ typedef struct
     /* convergence estimates */
     acb_ode_cvest_t cvest;
 
-    slong alloc_logs;
-    slong nlogs;
+    slong alloc_logs;   /* vector size, >= #logs in full series */
+    slong nlogs;        /* length in log of current partial sum */
+    slong future_logs;  /* >= #additional logs in future partial sums */
     slong npts;
     slong nder;
 
@@ -295,7 +304,7 @@ acb_ode_sol_set_ini(acb_ode_sol_t sol, acb_srcptr ini,
                     const acb_ode_shift_t shifts);  // unused
 
 void _acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, acb_srcptr sums, slong stride, mag_srcptr tb, const acb_t pt, slong nlogs, slong ord, slong nfrobshifts, slong prec);
-void acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, const acb_ode_sol_t sol, slong j, const acb_t pt, slong nder, slong nfrobshifts, slong prec);
+void acb_ode_sol_jet(acb_poly_struct * val, const acb_t expo, const acb_ode_sol_t sol, slong p, const acb_t pt, slong ord, slong nfrobshifts, slong prec);
 
 slong
 acb_ode_sol_estimate_terms(mag_t est,
@@ -365,6 +374,9 @@ typedef acb_ode_sum_struct acb_ode_sum_t[1];
 void acb_ode_sum_init(acb_ode_sum_t sum, slong dop_len, slong npts, slong nsols, slong nder);
 void acb_ode_sum_clear(acb_ode_sum_t sum);
 
+void acb_ode_sum_fit_length(acb_ode_sum_t sum, slong len);
+void acb_ode_sum_discard_head(acb_ode_sum_struct * sum, slong n0);
+
 void acb_ode_sum_set_diffop(acb_ode_sum_t sum, const acb_poly_struct * dop, slong dop_len, const mag_t cvrad);
 
 void acb_ode_sum_set_group(acb_ode_sum_t sum, const acb_ode_group_t grp);
@@ -382,10 +394,12 @@ void acb_ode_sum_precompute(acb_ode_sum_t sum);
 
 void _acb_ode_sum_forward_1(acb_ode_sum_struct * sum);
 int _acb_ode_sum_forward_divconquer(acb_ode_sum_struct * sum, slong high, slong block_len, slong stride, acb_ode_bound_t bound, acb_ode_group_bound_t gbound, slong prec);
-int acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
-                     acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
-                     slong prec);
+void _acb_ode_sum_update_residuals(acb_ode_sum_struct * sum, slong low, slong mid, slong high);
 void _acb_ode_sum_fix(acb_ode_sum_struct * sum);
+
+int _acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
+                      acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
+                      slong prec);
 
 void acb_ode_sum_divconquer(acb_ode_sum_t sum, slong nterms,
                             acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
@@ -485,12 +499,6 @@ void acb_ode_apply_diffop_polmul(
 void _acb_ode_solution_growth(mag_t order, mag_t base, const acb_poly_struct * dop, slong dop_len);
 slong acb_ode_choose_prec(slong * rec_prec, const acb_poly_struct * dop, slong dop_len, mag_srcptr rad, mag_srcptr cvrad, slong tgt_prec);
 
-/* utilities probably to be moved to gr_ore_poly */
-
-int gr_ore_poly_ctx_over_gr_poly_base_ptrs(gr_ctx_struct ** Scalars, gr_ctx_struct ** Pol, const gr_ctx_t Ore);
-int _gr_ore_poly_indicial_polynomial_euler_derivative(gr_ptr ind, gr_srcptr op, slong len, gr_ctx_t Ore);
-int _gr_ore_poly_indicial_polynomial(gr_ptr ind, gr_srcptr op, slong len, gr_ctx_t Ore);
-int gr_ore_poly_indicial_polynomial(gr_poly_t ind, const gr_ore_poly_t op, gr_ctx_t Ore);
 
 // #ifdef __cplusplus
 // }

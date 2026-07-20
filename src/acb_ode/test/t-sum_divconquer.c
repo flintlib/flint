@@ -53,7 +53,7 @@ TEST_FUNCTION_START(acb_ode_sum_divconquer, state)
         if (prec <= 12)
             goto cleanup;
 
-        if (nterms >= prec)  /* todo: test rigorous version */
+        if (nterms >= prec)  /* todo: test rigorous version, including with nterms == -1 */
         {
             for (slong i = 0; i < sum->npts; i++)
             {
@@ -87,7 +87,10 @@ TEST_FUNCTION_START(acb_ode_sum_divconquer, state)
         if (sum->flags & ACB_ODE_WANT_SERIES)
         {
             if (sum->npts == 0 && sum->n != nterms)
+            {
                 flint_printf("FAIL (wrong number of terms)\n");
+                flint_abort();
+            }
 
             acb_poly_zero(ref + 1);
             acb_poly_set_coeff_si(ref + 1, 1, 1);

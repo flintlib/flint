@@ -19,7 +19,7 @@ acb_ode_bound_rat_exceptional_vec(mag_ptr res, slong len,
 }
 
 /* [M19], Algorithm 7.4, steps 2 to 4, with the slight refinement that
- * τ(n₀) = ord can differ from sum(m(k), k=0..n₀). */
+   τ(n₀) = ord can differ from sum(m(k), k=0..n₀). */
 
 void
 acb_ode_bound_rat_vec(mag_ptr res,
@@ -29,9 +29,9 @@ acb_ode_bound_rat_vec(mag_ptr res,
                       const acb_ode_stairs_t stairs,
                       slong n0, slong ord, slong prec)
 {
-    /* Bound at indices >= (smallest exceptional index > n0, if any). This term
-     * does not depend on ord (possible values are precomputed in stairs using
-     * worst-case bounds for the degrees in log(x) of the solutions). */
+    /* Bound at indices >= (smallest exceptional index >= n0, if any). This term
+       does not depend on ord. Possible values are precomputed in stairs using
+       worst-case bounds for the degrees in log(x) of the solutions. */
     acb_ode_bound_rat_exceptional_vec(res, len, group, stairs, n0);
 
     for (slong s = 0; s < group->nshifts; s++)
@@ -40,8 +40,8 @@ acb_ode_bound_rat_vec(mag_ptr res,
 
     mag_ptr ordinary = _mag_vec_init(len);
 
-    /* Bound at indices up < (smallest exceptional index > n0, if any).
-     * Past the last exceptional index, this is the only contribution. */
+    /* Bound at indices < (smallest exceptional index > n0, if any).
+       Past the last exceptional index, this is the only contribution. */
     acb_ode_bound_rat_ordinary_vec(ordinary, num, len, ind, ind_lbound, n0, ord,
                                    prec);
 

@@ -20,6 +20,13 @@ acb_ode_ind_lbound_clear(acb_ode_ind_lbound_t ind_lbound)
     flint_free(ind_lbound->r);
 }
 
+/* Computes
+   - an integer n_min past which |1-rt/n| is nondecreasing, and
+   - a lower bound on |1-rt/n|^mult valid for all n > 0 except possibly the
+     shifts of group.
+   The group argument may be NULL if there are no excluded indices. The intended
+   usage is that group is non-NULL only when rt is an integer, and then rt is
+   among the shifts. */
 static void
 find_min(slong * n_min, mag_ptr lb, const acb_ode_group_t group,
          const acb_t rt, slong mult, slong prec)
@@ -39,13 +46,14 @@ find_min(slong * n_min, mag_ptr lb, const acb_ode_group_t group,
     arb_addmul(crit_n, acb_imagref(rt), acb_imagref(rt), prec);
     arb_div(crit_n, crit_n, acb_realref(rt), prec);
 
-    if (mag_cmp_2exp_si(arb_radref(crit_n), 3) > 0)
+    if (mag_cmp_2exp_si(arb_radref(crit_n), 3) > 0
+        || arf_cmp_si(arb_midref(crit_n), WORD_MAX - 8) > 0)
     {
         * n_min = WORD_MAX;
         /* Lower bound valid for all real n > 0 */
         arb_get_mag_lower(lb, acb_imagref(rt));
         acb_get_mag(tmpmag, rt);
-        mag_div(lb, lb, tmpmag);
+        mag_div_lower(lb, lb, tmpmag);
     }
     else
     {
@@ -54,16 +62,17 @@ find_min(slong * n_min, mag_ptr lb, const acb_ode_group_t group,
         slong n1 = arf_get_si(x1, ARF_RND_UP);
 
         /* Extend the interval so that the endpoints are ordinary indices */
-        for (slong s = 0; s < group->nshifts;)
-        {
-            slong exn = group->shifts[s].n;
-            if (exn == n0)
-                n0--, s = FLINT_MAX(0, s-1);
-            else if (exn == n1)
-                n1++, s++;
-            else
-                s++;
-        }
+        if (group != NULL)
+            for (slong s = 0; s < group->nshifts;)
+            {
+                slong exn = group->shifts[s].n;
+                if (exn == n0)
+                    n0--, s = FLINT_MAX(0, s-1);
+                else if (exn == n1)
+                    n1++, s++;
+                else
+                    s++;
+            }
 
         n0 = FLINT_MAX(n0, 1);
         * n_min = n1;
@@ -71,12 +80,15 @@ find_min(slong * n_min, mag_ptr lb, const acb_ode_group_t group,
         mag_one(lb);
         for (slong n = n0, s = 0; n <= n1; n++)
         {
-            /* Skip exceptional indices (which would lead to lb = 0 and will be
-             * handled separately) */
-            while (s + 1 < group->nshifts && group->shifts[s].n < n)
-                s++;
-            if (n == group->shifts[s].n)
-                continue;
+            /* Skip exceptional indices (which would lead to lb = 0 in one of
+               the calls and will be handled separately) */
+            if (group != NULL)
+            {
+                while (s + 1 < group->nshifts && group->shifts[s].n < n)
+                    s++;
+                if (n == group->shifts[s].n)
+                    continue;
+            }
 
             /* Evaluate |1-rt/n| */
             acb_div_si(tmpacb, rt, n, prec);
@@ -143,8 +155,10 @@ acb_ode_ind_lbound_precompute(acb_ode_ind_lbound_t ind_lbound,
             acb_set(ind_lbound->r[i].root, rt);
             ind_lbound->r[i].mult = expos->groups[g].shifts[s].mult;
 
+            acb_ode_group_struct * exn_group = (g == grp) ? expos->groups + g
+                                                          : NULL;
             find_min(&ind_lbound->r[i].n_min, ind_lbound->r[i].global_lbound,
-                     expos->groups + g, rt, ind_lbound->r[i].mult, prec);
+                     exn_group, rt, ind_lbound->r[i].mult, prec);
 
             /* flint_printf("mult=%ld n_min=%ld lbound=%{mag}\n",
                          ind_lbound->r[i].mult, ind_lbound->r[i].n_min,
@@ -158,3 +172,46 @@ acb_ode_ind_lbound_precompute(acb_ode_ind_lbound_t ind_lbound,
     acb_clear(rt);
     acb_clear(leader);
 }
+
+void
+acb_ode_ind_lbound_eval(mag_t res, const acb_ode_ind_lbound_t ind_lbound,
+                        slong n, slong prec)
+{
+    acb_t a;
+    mag_t m;
+
+    if (n == 0)
+    {
+        mag_zero(res);
+        return;
+    }
+
+    acb_init(a);
+    mag_init(m);
+
+    mag_one(res);
+    for (slong i = 0; i < ind_lbound->length; i++)
+    {
+        if (n < ind_lbound->r[i].n_min)
+        {
+            mag_mul_lower(res, res, ind_lbound->r[i].global_lbound);
+        }
+        else
+        {
+            acb_div_si(a, ind_lbound->r[i].root, n, prec);
+            acb_sub_si(a, a, 1, prec);
+            acb_get_mag_lower(m, a);
+            mag_pow_ui_lower(m, m, ind_lbound->r[i].mult);
+
+            mag_mul_lower(res, res, m);
+        }
+
+        /* flint_printf("root=%{acb} n=%ld n_min=%ld lb=%{mag} res=%{mag}\n",
+                     ind_lbound->r[i].root, n, ind_lbound->r[i].n_min,
+                     ind_lbound->r[i].global_lbound, res); */
+    }
+
+    mag_clear(m);
+    acb_clear(a);
+}
+

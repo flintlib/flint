@@ -54,6 +54,7 @@ int main(void)
 
     gr_ctx_clear(Dop);
     gr_ctx_clear(Pol);
+    gr_ctx_clear(ZZ);
 
     flint_cleanup_master();
 

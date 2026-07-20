@@ -15,9 +15,10 @@ acb_ode_sol_init(acb_ode_sol_t sol, slong nshifts,
     acb_ode_cvest_init(sol->cvest);
 
     sol->alloc_logs = nlogs;
-    sol->nlogs = 0;
     sol->npts = npts;
     sol->nder = nder;
+
+    acb_ode_sol_zero(sol);
 }
 
 
@@ -63,42 +64,14 @@ void
 acb_ode_sol_zero(acb_ode_sol_t sol)
 {
     for (slong k = 0; k < sol->alloc_logs; k++)
-        acb_poly_zero(sol->series + k);
+        _acb_poly_set_length(sol->series + k, 0);
+
+    sol->nlogs = 0;
+    sol->future_logs = sol->alloc_logs;
 
     _acb_vec_zero(sol->sums, sol->npts * sol->alloc_logs * sol->nder);
 
     for (slong i = 0; i < sol->nder; i++)
         mag_inf(sol->tb + i);  /* XXX right place to do this? */
     sol->done = 0;
-}
-
-
-
-slong
-acb_ode_sum_max_nlogs(acb_ode_sum_struct * sum)
-{
-    slong nlogs = 0;
-    for (slong m = 0; m < sum->nsols; m++)
-        nlogs = FLINT_MAX(nlogs, sum->sol[m].nlogs);
-    return nlogs;
-}
-
-
-/* max degree in log at offset off in any of the solutions */
-slong
-acb_ode_sum_max_nlogs_xn(acb_ode_sum_struct * sum, slong off)
-{
-    for (slong nlogs = acb_ode_sum_max_nlogs(sum); nlogs > 0; nlogs--)
-    {
-        for (slong m = 0; m < sum->nsols; m++)
-        {
-            if (nlogs <= sum->sol[m].nlogs)
-            {
-                acb_poly_struct * p = sum->sol[m].series + nlogs - 1;
-                if (off < p->length && !acb_is_zero(p->coeffs + off))
-                    return nlogs;
-            }
-        }
-    }
-    return 0;
 }

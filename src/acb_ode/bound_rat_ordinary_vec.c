@@ -5,53 +5,10 @@
 #include "arb_poly.h"
 
 
-/* A lower bound on prod[ind(α) = 0](|1-α/k|), where ind is the shifted indicial
- * polynomial, valid for all k ≥ n with n, k ∈ ℕ ∖ exponents.
- * Cf. [M19], Lemma 7.2 */
+/* [M19], Algorithm 7.1.
 
-static void
-ind_lbound_eval(mag_t res, const acb_ode_ind_lbound_t ind_lbound, slong n,
-                slong prec)
-{
-    acb_t a;
-    mag_t m;
-
-    if (n == 0)
-    {
-        mag_zero(res);
-        return;
-    }
-
-    acb_init(a);
-    mag_init(m);
-
-    mag_one(res);
-    for (slong i = 0; i < ind_lbound->length; i++)
-    {
-        if (n < ind_lbound->r[i].n_min)
-        {
-            mag_mul_lower(res, res, ind_lbound->r[i].global_lbound);
-        }
-        else
-        {
-            acb_div_si(a, ind_lbound->r[i].root, n, prec);
-            acb_sub_si(a, a, 1, prec);
-            acb_get_mag_lower(m, a);
-            mag_pow_ui_lower(m, m, ind_lbound->r[i].mult);
-
-            mag_mul_lower(res, res, m);
-        }
-
-        /* flint_printf("root=%{acb} n=%ld n_min=%ld lb=%{mag} res=%{mag}\n",
-                     ind_lbound->r[i].root, n, ind_lbound->r[i].n_min,
-                     ind_lbound->r[i].global_lbound, res); */
-    }
-
-    mag_clear(m);
-    acb_clear(a);
-}
-
-/* [M19], Algorithm 7.1 */
+   This is quite wasteful for large n, where the high-order coefficients
+   contribute very little. */
 
 void
 acb_ode_bound_rat_ordinary_vec(mag_ptr res,
@@ -118,7 +75,11 @@ acb_ode_bound_rat_ordinary_vec(mag_ptr res,
 
     /* flint_printf("ind_jet=%{acb_poly}\n0", ind_jet); */
 
-    ind_lbound_eval(invcstmag, ind_lbound, n0, prec);
+    /* A lower bound on |ind(k)|/k^deg(ind), where ind is the shifted indicial
+       polynomial, valid for all k ≥ n with n, k ∈ ℕ ∖ exponents.
+       Cf. [M19], Lemma 7.2 */
+    acb_ode_ind_lbound_eval(invcstmag, ind_lbound, n0, prec);
+
     mag_inv(invcstmag, invcstmag);
     acb_add_error_mag(invcst, invcstmag);  /* XXX overkill? */
     _acb_vec_scalar_mul(ind_jet->coeffs + 1, ind_jet->coeffs + 1,
@@ -137,7 +98,7 @@ acb_ode_bound_rat_ordinary_vec(mag_ptr res,
         _acb_poly_reverse(rat_jet->coeffs, (num + i)->coeffs,
                           FLINT_MIN(ind->length - 1, (num + i)->length),
                           ind->length - 1);
-        _acb_poly_set_length(rat_jet, ind->length);
+        _acb_poly_set_length(rat_jet, ind->length - 1);
         _acb_poly_normalise(rat_jet);
         /* flint_printf("i=%ld rcpqnum=%{acb_poly} range_tail_acb=%{acb_poly}\n0", i, rat_jet, range_tail_acb); */
         _acb_poly_taylor_shift(rat_jet->coeffs, range_acb,

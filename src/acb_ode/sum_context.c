@@ -76,6 +76,35 @@ acb_ode_sum_clear(acb_ode_sum_t sum)
     _fmpz_vec_clear(sum->binom_n, sum->nder);
 }
 
+void
+acb_ode_sum_fit_length(acb_ode_sum_t sum, slong len)
+{
+    for (slong m = 0; m < sum->nsols; m++)
+        acb_ode_sol_fit_length(sum->sol + m, len);
+}
+
+void
+acb_ode_sum_discard_head(acb_ode_sum_struct * sum, slong n0)
+{
+    slong len = n0 - sum->n0;
+
+    if (len <= 0)
+        return;
+
+    for (slong m = 0; m < sum->nsols; m++)
+    {
+        for (slong k = 0; k < sum->sol[m].nlogs; k++)
+        {
+            acb_poly_struct * f = sum->sol[m].series + k;
+            /* the sage version uses slightly different sizes near max_terms */
+            _acb_poly_shift_right(f->coeffs, f->coeffs, f->length, len);
+            _acb_vec_zero(f->coeffs + f->length - len, len);
+        }
+    }
+
+    sum->n0 = n0;
+}
+
 /* Operator */
 
 void
@@ -114,11 +143,11 @@ static void
 acb_ode_sol_unit_ini(acb_ode_sol_t sol, slong i0,
                      const acb_ode_shift_struct * shifts, slong nshifts)
 {
-    for (slong i = 0, j = 0; j < nshifts; j++)
+    for (slong i = 0, s = 0; s < nshifts; s++)
     {
-        slong mult = shifts ? shifts[j].mult : 1;
-        for (slong k = 0; k < mult; k++, i++)
-            acb_set_si(acb_mat_entry(sol->extini, j, k), i == i0 ? 1 : 0);
+        slong mult = shifts ? shifts[s].mult : 1;
+        for (slong k = mult - 1; k >= 0; k--, i++)
+            acb_set_si(acb_mat_entry(sol->extini, s, k), i == i0 ? 1 : 0);
     }
 }
 
@@ -126,7 +155,7 @@ acb_ode_sol_unit_ini(acb_ode_sol_t sol, slong i0,
 void
 acb_ode_sum_set_ini_echelon(acb_ode_sum_t sum)
 {
-    for (int m = 0; m < sum->nsols; m++)
+    for (slong m = 0; m < sum->nsols; m++)
         acb_ode_sol_unit_ini(sum->sol + m, m, sum->group->shifts,
                              sum->group->nshifts);
 }
@@ -135,7 +164,7 @@ acb_ode_sum_set_ini_echelon(acb_ode_sum_t sum)
 void
 acb_ode_sum_set_ini_highest(acb_ode_sum_t sum)
 {
-    for (int m = 0; m < sum->nsols; m++)
+    for (slong m = 0; m < sum->nsols; m++)
     {
         acb_mat_zero(sum->sol[m].extini);
         acb_one(acb_mat_entry(sum->sol[m].extini, m,
@@ -150,6 +179,8 @@ acb_ode_sum_set_points(acb_ode_sum_t sum, acb_srcptr pts, slong npts)
 {
     _acb_vec_set(sum->pts, pts, npts);
 }
+
+/* Main precomputation function */
 
 void
 acb_ode_sum_precompute(acb_ode_sum_t sum)
@@ -180,4 +211,34 @@ acb_ode_sum_precompute(acb_ode_sum_t sum)
     FLINT_ASSERT(mag_cmp(sum->mag, sum->cvrad) <= 0);
 
     sum->have_precomputed = 1;
+}
+
+/* Misc */
+
+slong
+acb_ode_sum_max_nlogs(acb_ode_sum_struct * sum)
+{
+    slong nlogs = 0;
+    for (slong m = 0; m < sum->nsols; m++)
+        nlogs = FLINT_MAX(nlogs, sum->sol[m].nlogs);
+    return nlogs;
+}
+
+/* max degree in log at offset off in any of the solutions */
+slong
+acb_ode_sum_max_nlogs_xn(acb_ode_sum_struct * sum, slong off)
+{
+    for (slong nlogs = acb_ode_sum_max_nlogs(sum); nlogs > 0; nlogs--)
+    {
+        for (slong m = 0; m < sum->nsols; m++)
+        {
+            if (nlogs <= sum->sol[m].nlogs)
+            {
+                acb_poly_struct * p = sum->sol[m].series + nlogs - 1;
+                if (off < p->length && !acb_is_zero(p->coeffs + off))
+                    return nlogs;
+            }
+        }
+    }
+    return 0;
 }

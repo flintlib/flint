@@ -49,19 +49,23 @@ fix_column_echelon(acb_mat_struct * mat,
 
     for (slong s1 = s + 1; s1 < grp->nshifts; s1++)
     {
-        slong j1 = col(grp, s1, 0);
         slong mult1 =  grp->shifts[s1].mult;
-        for (slong k1 = FLINT_MAX(0, mult1 - delta); k1 < mult1; k1++)
+        /* At most the topmost (highest k) delta elements of the echelonized
+           basis associated to the shift s1 have a nonzero coefficient in the
+           decomposition on that basis of the Frobenius shift by delta of the
+           solution we computed in full. */
+        slong k1_0 = FLINT_MAX(0, mult1 - delta);
+        slong j1 = col(grp, s1, k1_0);
+        for (slong k1 = k1_0; k1 < mult1; k1++)
         {
+            FLINT_ASSERT(j1 == col(grp, s1, k1));
+            /* Get the coefficient by 'undoing' the Frobenius shift */
             acb_ptr cc = acb_mat_entry(extini, s1, k1 + delta);
-            /* flint_printf("fix: s=%wd k=%wd s1=%wd k1=%wd j=%wd j1=%d cc=%{acb}\n", s, k, s1, k1, j, j1, cc); */
             for (slong i = 0; i < acb_mat_nrows(mat); i++)
             {
                 acb_ptr a  = acb_mat_entry(mat, i, j);
                 acb_ptr a1 = acb_mat_entry(mat, i, j1);
-                /* flint_printf("i=%wd %{acb} - %{acb}", i, a, a1); */
                 acb_submul(a, cc, a1, prec);
-                /* flint_printf(" = %{acb}\n", a); */
             }
             j1--;
         }
@@ -84,7 +88,7 @@ fill_group(acb_mat_t mat, const acb_ode_sum_t sum,
 
         acb_ode_sol_jet(val, sum->group->leader, sol, p, sum->pts + p,
                         acb_mat_nrows(mat), mult, prec);
-        flint_printf("s=%wd mult=%wd cst.acc=%ld val=%{acb_poly}\n", s, mult, val->length > 0 ? acb_rel_accuracy_bits(val->coeffs + 0) : ARF_PREC_EXACT, val);
+        // flint_printf("s=%wd mult=%wd cst.acc=%ld val=%{acb_poly}\n", s, mult, val->length > 0 ? acb_rel_accuracy_bits(val->coeffs + 0) : ARF_PREC_EXACT, val);
 
         for (slong k = 0; k < mult; k++)
         {
@@ -127,9 +131,6 @@ _acb_ode_fundamental_matrix_vec(
 {
     mag_t cvrad, mag;
 
-    mag_init(cvrad);
-    mag_init(mag);
-
     slong nder = 0;
     for (slong p = 0; p < npts; p++)
         nder = FLINT_MAX(nder, acb_mat_nrows(mat + p));
@@ -137,12 +138,15 @@ _acb_ode_fundamental_matrix_vec(
     if (nder == 0)
         return;
 
+    mag_init(cvrad);
+    mag_init(mag);
+
     _acb_vec_get_mag_lower(cvrad, lcrt, dop[dop_len - 1].length - 1);
 
     /* XXX maybe not the best place to test this;
        redundant with sum_set_points */
     _acb_vec_get_mag(mag, pts, npts);
-    flint_printf("fundamental_matrix: mag=%{mag} cvrad=%{mag}\n", mag, cvrad);
+    // flint_printf("fundamental_matrix: mag=%{mag} cvrad=%{mag}\n", mag, cvrad);
     if (mag_cmp(mag, cvrad) >= 0)
     {
         for (slong p = 0; p < npts; p++)
@@ -158,8 +162,8 @@ _acb_ode_fundamental_matrix_vec(
         acb_ode_group_struct * group = expos->groups + g;
         slong glen = acb_ode_group_length(expos->groups + g);
 
-        flint_printf("GROUP #%ld leader=%{acb} shifts+muls=%{slong*} glen=%ld\n",
-                     g, group->leader, group->shifts, 2*group->nshifts, glen);
+        // flint_printf("GROUP #%ld leader=%{acb} shifts+muls=%{slong*} glen=%ld\n",
+        //              g, group->leader, group->shifts, 2*group->nshifts, glen);
 
         acb_ode_group_bound_init(gbound);
         acb_ode_group_bound_precompute(gbound, dop, dop_len, expos, g, bound, bound->prec);
@@ -219,6 +223,17 @@ x_valuation(const gr_ore_poly_t dop, gr_ctx_t Cst)
 }
 
 
+static int
+_acb_poly_vec_is_exact(const acb_poly_struct * vec, slong len)
+{
+   for (slong i = 0; i < len; i++)
+       for (slong j = 0; j < (vec + i)->length; j++)
+           if (!acb_is_exact((vec + i)->coeffs + j))
+               return 0;
+   return 1;
+}
+
+
 int
 acb_ode_fundamental_matrix_vec(
         acb_mat_struct * mat,
@@ -266,7 +281,8 @@ acb_ode_fundamental_matrix_vec(
     slong xval = x_valuation(dop, Scalars);
 
     int is_regular = xval < lc->length
-        && truth_not(gr_is_zero(gr_poly_coeff_ptr(lc, xval, Scalars), Scalars));
+        ? truth_not(gr_is_zero(gr_poly_coeff_ptr(lc, xval, Scalars), Scalars))
+        : T_FALSE;
     if (is_regular != T_TRUE)
         return gr_check(is_regular);
     if (gr_is_zero(lc->coeffs, Scalars) != T_FALSE)
@@ -286,28 +302,6 @@ acb_ode_fundamental_matrix_vec(
     gr_ore_poly_ctx_init(CCxT, CCx, 0, ORE_ALGEBRA_EULER_DERIVATIVE);
 
     GR_TMP_INIT(_dop, CCxT);
-
-    char * gen = NULL;
-    status |= gr_ctx_gen_name(&gen, 0, Pol);
-    status |= gr_ctx_set_gen_name(CCx, gen);
-    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
-    flint_free(gen);
-
-    status |= gr_ctx_set_gen_name(CCxT, GR_ORE_POLY_CTX(Dop)->var);
-    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
-
-    /* XXX reorganize to do this at the *working* precision */
-    /* todo: use gr_set_other once its gr_ore_poly version is powerful enough */
-    status |= gr_poly_set_gr_poly_other((gr_ptr) _dop, (gr_ptr) dop, Pol, CCx);
-    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
-
-    if (expos == NULL)
-    {
-        acb_ode_exponents_init(_expos);
-        status |= acb_ode_exponents(_expos, dop, Dop, CC);
-        if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
-        expos = _expos;
-    }
 
     if (lcrt == NULL)
     {
@@ -331,6 +325,56 @@ acb_ode_fundamental_matrix_vec(
         lcrt = _lcrt;
 
         fmpz_vec_clear(sing_mult);
+    }
+
+    char * gen = NULL;
+    status |= gr_ctx_gen_name(&gen, 0, Pol);
+    status |= gr_ctx_set_gen_name(CCx, gen);
+    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+    flint_free(gen);
+
+    status |= gr_ctx_set_gen_name(CCxT, GR_ORE_POLY_CTX(Dop)->var);
+    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+
+    /* todo: use gr_set_other once its gr_ore_poly version is powerful enough */
+    status |= gr_poly_set_gr_poly_other((gr_ptr) _dop, (gr_ptr) dop, Pol, CCx);
+    if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+
+    /* When starting with an operator over an exact domain, try to ensure that
+       the precision of the operator with ball coefficients we pass downstream
+       is not the limiting factor for the computation of the coefficients. */
+    if (gr_ctx_is_exact(Pol) && !_acb_poly_vec_is_exact(_dop->coeffs, dop->length))
+    {
+        slong wp;
+        mag_t cvrad, mag;
+        gr_ctx_t CCxwp;
+        mag_init(cvrad);
+        mag_init(mag);
+
+        /* XXX Redundant with work done in _acb_ode_fundamental_matrix_vec and
+           acb_ode_sum_precompute. */
+        acb_poly_struct * lc = gr_ore_poly_coeff_ptr(_dop, _dop->length - 1, Dop);
+        _acb_vec_get_mag_lower(cvrad, lcrt, lc->length - 1);
+        _acb_vec_get_mag(mag, pts, npts);
+        acb_ode_choose_prec(&wp, _dop->coeffs, _dop->length, mag, cvrad, prec);
+
+        gr_ctx_init_complex_acb(CCxwp, wp);
+
+        status |= gr_poly_set_gr_poly_other((gr_ptr) _dop, (gr_ptr) dop, Pol, CCx);
+        if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+
+        gr_ctx_clear(CCxwp);
+
+        mag_clear(cvrad);
+        mag_clear(mag);
+    }
+
+    if (expos == NULL)
+    {
+        acb_ode_exponents_init(_expos);
+        status |= acb_ode_exponents(_expos, dop, Dop, CC);
+        if(status) flint_printf("%s:%d status=%d\n", __FILE__, __LINE__, status);
+        expos = _expos;
     }
 
     if (status != GR_SUCCESS)

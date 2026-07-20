@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "acb_types.h"
 #include "acb.h"
 #include "acb_mat.h"
@@ -22,17 +24,6 @@ _mag_vec_inf(mag_ptr mag, slong len)
     for (slong i = 0; i < len; i++)
         mag_inf(mag + i);
 }
-
-void
-acb_ode_cvest_println(const acb_ode_cvest_t cvest)
-{
-    flint_printf("neglogterm=%f cvg_rate=%f terms_wanted=%f accuracy=%ld "
-                 "loss_rate=%f terms_full_prec=%f prec_wanted=%ld\n",
-                 cvest->neglogterm, cvest->cvg_rate, cvest->terms_wanted,
-                 cvest->accuracy, cvest->loss_rate, cvest->terms_full_prec,
-                 cvest->prec_wanted);
-}
-
 
 /* todo: support the case when only part of the residual is known */
 static void
@@ -67,21 +58,18 @@ bound_normalized_residuals(arb_poly_struct * nres_maj,
         slong n = sum->n;
 
         /* Multiplicity of λ+n+d as an indicial root */
+        while (s < sum->group->nshifts && sum->group->shifts[s].n < n + d)
+            s++;
         slong mult = 0;
-        for (; s < sum->dop_len - 1; s++) {
-            if (sum->group->shifts[s].n == n)
-            {
-                mult = sum->group->shifts[s].mult;
-                break;
-            }
-        }
+        if (s < sum->group->nshifts && sum->group->shifts[s].n == n + d)
+            mult =  sum->group->shifts[s].mult;
 
         /* ind_nd/cst = jet of monic indicial polynomial at λ+n+d */
         // XXX change acb_ode_sum_max_nlogs to take k (=n+d here) or k - n instead of k - n0
         slong nlogs_d = acb_ode_sum_max_nlogs_xn(sum, n - sum->n0 + d);
 
         acb_ode_poly_taylor_shift_aps_trunc(ind_nd, sum->ind, sum->group->leader,
-                                            n, nlogs_d + mult, prec);
+                                            n + d, nlogs_d + mult, prec);
         acb_set_round(cst, dop_lc->coeffs, prec);
         acb_neg(cst, cst);
 
@@ -123,13 +111,14 @@ bound_normalized_residuals(arb_poly_struct * nres_maj,
 }
 
 
-static void
+static double
 update_tail_bounds(acb_ode_sum_struct * sum,
                    acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
                    slong prec)
 {
     arb_t rad;
     arb_poly_t jet_tb;
+    mag_t tb1;
     TMP_INIT;
     TMP_START;
 
@@ -138,14 +127,17 @@ update_tail_bounds(acb_ode_sum_struct * sum,
     arb_poly_struct * nres_maj = TMP_ALLOC(sizeof(arb_poly_t) * sum->nsols);
     for (slong m = 0; m < sum->nsols; m++)
         arb_poly_init(nres_maj + m);
+    mag_init(tb1);
 
     /* ore_algebra uses a bound on nlogs:
     slong nlogs = acb_ode_group_nlogs(sum->group, sum->n);
     */
 
-    // TODO Only call precompute_integrand if the current bounds are not tight
-    // enough or nlogs has changed. (We can also use the larger nlogs from the
-    // start, but this leads to worse bounds before nlogs increases.)
+    /* todo: Only call precompute_integrand if the current bounds are not tight
+       enough or nlogs has changed. (We can also use the larger nlogs from the
+       start, but this leads to worse bounds before nlogs increases.) In fact,
+       for large n, the result will barely depend on n at all... */
+
     acb_ode_bound_precompute_integrand(sum->itg_pol, sum->itg_num, sum->group,
                                        bound, gbound, sum->n,
                                        acb_ode_sum_max_nlogs(sum), MAG_BITS);
@@ -165,42 +157,61 @@ update_tail_bounds(acb_ode_sum_struct * sum,
     _arb_poly_normalise(nres_maj);
     */
 
+    double progress = 0.;
+
     for (slong m = 0; m < sum->nsols; m++)
     {
         slong i;
+        mag_ptr tb = (sum->sol + m)->tb;
+
+        if (sum->sol[m].done)
+            continue;
 
         /* tail_bound_jet only yields a bound for n past the nonzero initial
            values of the solution */
         if (sol_has_ini_past(sum->sol + m, sum->n, sum->group))
         {
-            _mag_vec_inf((sum->sol + m)->tb, sum->nder);
+            _mag_vec_inf(tb, sum->nder);
             continue;
         }
 
         arf_set_mag(arb_midref(rad), sum->mag);
-        flint_printf("n=%ld m=%ld nres_maj=%{arb_poly}\n", sum->n, m, nres_maj + m);
+        // flint_printf("n=%ld m=%ld nres_maj=%{arb_poly}\n", sum->n, m, nres_maj + m);
         acb_ode_tail_bound_jet_precomp(jet_tb, bound, sum->n, sum->itg_pol,
                                        sum->itg_num, nres_maj + m, rad,
                                        sum->nder, MAG_BITS);
         for (i = 0; i < jet_tb->length; i++)
-            arb_get_mag((sum->sol + m)->tb + i, jet_tb->coeffs + i);
+        {
+            arb_get_mag(tb1, jet_tb->coeffs + i);
+            if (i == 0)
+            {
+                double om0 = mag_get_d_log2_approx(tb + i);
+                double om1 = mag_get_d_log2_approx(tb1);
+                progress += om0 - om1;
+                // flint_printf("m=%ld om0=%f om1=%f progress=%f\n", m, om0, om1, progress);
+            }
+            mag_min(tb + i, tb + i, tb1);
+        }
         for (; i < sum->nder; i++)
-            mag_zero((sum->sol + m)->tb + i);
+            mag_zero(tb + i);
     }
 
+    mag_clear(tb1);
     arb_poly_clear(jet_tb);
     arb_clear(rad);
     for (slong m = 0; m < sum->nsols; m++)
         arb_poly_clear(nres_maj + m);
     TMP_END;
+
+    return progress;
 }
 
 /* stride = terms since last check */
 int
-acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
-                 /* in the future sum_done may refine bound, gbound */
-                 acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
-                 slong prec)
+_acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
+                  /* in the future sum_done may refine bound, gbound */
+                  acb_ode_bound_t bound, acb_ode_group_bound_t gbound,
+                  slong prec)
 {
     mag_t eps, est, sum_mag, sum_rad;
     mag_init(eps);
@@ -208,17 +219,21 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
     mag_init(sum_mag);
     mag_init(sum_rad);
 
-    int stop = 1;
-    int have_tail_bounds = 0;
-
     slong deg = sum->dop_clen - 1;
-    FLINT_ASSERT(sum->n >= sum->n0 + deg);  /* todo: raise this limitation */
+    FLINT_ASSERT(sum->n >= sum->n0 + deg);  /* todo: lift this limitation */
 
     /* detect solutions that have converged or will not improve */
 
-    for (slong m = 0; m < sum->nsols; m++)
+    double progress = NAN;
+    int have_tail_bounds = 0;
+
+    int stop = 1;
+    for (slong m = 0; m < sum->nsols; stop = sum->sol[m++].done && stop)
     {
         acb_ode_sol_struct * sol = sum->sol + m;
+
+        if (sol->done)
+            continue;
 
         /* todo: non-rigorous check with less than deg terms?
            (maybe using known terms from the previous residuals in addition to
@@ -235,10 +250,8 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
            entire functions with a large hump to climb). XXX Not sure if this
            belongs here; maybe find a better criterion. */
         if (mag_cmp_2exp_si(sum_rad, 4 * prec) >= 0
-            && (sum_accuracy < 0 || sum->n > prec * FLINT_BIT_COUNT(prec)))
-        {
+                && (sum_accuracy < 0 || sum->n > prec * FLINT_BIT_COUNT(prec)))
             mag_inf(eps);
-        }
         /* sum_accuracy may be <= 0 and still have a chance to improve,
            typically when the terms are still increasing.
 
@@ -255,30 +268,30 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
             mag_mul_2exp_si(eps, eps, -8);
         }
         else
-        {
             /* todo: The point about the bound having a chance to improve still
                holds. A better heuristic (maybe based on the rate at which the
                tail bounds are improving?) should improve evaluations on wide
                intervals (typically containing 0). */
             mag_inf(eps);
-        }
 
-        // flint_printf("n=%ld ", sum->n); acb_ode_cvest_println(sol->cvest);
-        // // if (sum->n % (10 * stride) == 0)
+        // flint_printf("n=%ld ", sum->n);
+        // flint_printf("neglogterm=%f cvg_rate=%f terms_wanted=%f accuracy=%ld "
+        //              "loss_rate=%f terms_full_prec=%f prec_wanted=%ld\n",
+        //              sol->cvest->neglogterm, sol->cvest->cvg_rate, sol->cvest->terms_wanted,
+        //              sol->cvest->accuracy, sol->cvest->loss_rate, sol->cvest->terms_full_prec,
+        //              sol->cvest->prec_wanted);
+        // if (sum->n % (10 * stride) == 0)
         //     flint_printf("n=%ld prec=%ld m=%ld est=%{mag} accuracy=%ld sum_mag=%{mag} sum_rad=%{mag} sum_accuracy=%ld eps=%{mag}\n", sum->n, prec, m, est, accuracy, sum_mag, sum_rad, sum_accuracy, eps);
 
         /* quick non-rigorous check */
-        if (mag_cmp(est, eps) > 0 && accuracy >= 0)
+        if (accuracy >= 0 && mag_cmp(est, eps) > 0)
         {
-            stop = 0;
-            // flint_printf("cont\n");
+            sol->done = 0;
             continue;
         }
-
-        if (sum->flags & ACB_ODE_APPROX)
+        else if (sum->flags & ACB_ODE_APPROX)
         {
-            sol->done = 1;
-            // flint_printf("done (approx)\n");
+            sol->done = 16;
             continue;
         }
 
@@ -286,22 +299,18 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
         if (!have_tail_bounds)
         {
             // XXX wasteful when only some sols have converged
-            update_tail_bounds(sum, bound, gbound, MAG_BITS);
+            progress = update_tail_bounds(sum, bound, gbound, MAG_BITS);
             have_tail_bounds = 1;
         }
 
         slong max_shift = sum->group->shifts[sum->group->nshifts - 1].n;
 
-        // XXX also check derivatives?
         if (sum->nder > 0 && mag_cmp(sol->tb + 0, eps) <= 0)
-        {
-            // flint_printf("done\n");
-            sol->done = 1;  // XXX currently unused
-        }
+            sol->done = 1;
         else if (sum_accuracy == -ARF_PREC_EXACT)
-        {
-            sol->done = 1;  // XXX currently unused
-        }
+            sol->done = 2;
+        else if (progress < 0.)  /* bounds are worsening */
+            sol->done = 3;
         /* Crude heuristic to detect situations where the tail bound might as
            well be infinite. XXX Should somehow take into account the rate at
            which the bounds improve, and maybe also indicial roots from other
@@ -309,17 +318,12 @@ acb_ode_sum_done(acb_ode_sum_struct * sum, slong stride,
         else if (sum->n > max_shift + sum->dop_clen
                  && mag_get_d_log2_approx(sol->tb + 0)
                         > mag_get_d_log2_approx(eps) + prec)
-        {
-            sol->done = 1;  // XXX currently unused
-        }
+            sol->done = 4;
         else
-        {
-            // flint_printf("cont\n");
-            stop = 0;
-        }
+            sol->done = 0;
 
-        // if (stop || sum->n % (10 * stride) == 0)
-            flint_printf("n=%ld m=%ld tb=%{mag*}\n", sum->n, m, sol->tb, sol->nder);
+        // if (sol->done || sum->n % (10 * stride) == 0)
+        //     flint_printf("n=%ld m=%ld tb=%{mag*}\n", sum->n, m, sol->tb, sol->nder);
     }
 
     mag_clear(eps);
