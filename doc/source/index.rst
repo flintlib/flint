@@ -211,6 +211,7 @@ Real and complex numbers
    acb_modular.rst
    acb_theta.rst
    acb_dirichlet.rst
+   acb_ode.rst
    bernoulli.rst
    hypgeom.rst
    partitions.rst
