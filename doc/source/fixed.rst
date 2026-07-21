@@ -18,6 +18,62 @@ This module is mainly optimized for 64-bit systems. With 32-bit limbs, some
 generated straight-line and register implementations are disabled and
 evaluation goes through generic and fallback code paths.
 
+Arithmetic
+-------------------------------------------------------------------------------
+
+Newton-based division and square root
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: void fixed_inv_newton_basecase(nn_ptr q, nn_srcptr a, slong an, slong n)
+              void fixed_inv_newton(nn_ptr q, nn_srcptr a, slong an, slong n)
+
+    Given `(a, an)` with `a_{an-1} \ne 0` representing a fixed-point number
+    `a \in [1/B, 1)` with `an` fraction limbs, sets `(q, n+2)` to an
+    approximation of `1/a \in (1, B]` with `n` fraction limbs and two
+    integral limbs (the highest limb may be zero). The absolute error is
+    bounded by `4 B^{-n} / a`. The *newton* suffix flags that the result
+    is not ulp-accurate. The basecase divides by ``mpn_tdiv_qr``; the
+    main function runs a Newton iteration on middle products, ported
+    from :func:`radix_inv_approx`.
+
+.. function:: void fixed_div_newton_invmul(nn_ptr q, nn_srcptr b, slong bn, nn_srcptr a, slong an, slong n)
+              void fixed_div_newton(nn_ptr q, nn_srcptr b, slong bn, nn_srcptr a, slong an, slong n)
+
+    Given a numerator `(b, bn)` with `bn \ge 1` fraction limbs representing
+    `b \in [0, 1)` and a denominator `(a, an)` with `a_{an-1} \ne 0`
+    representing `a \in [1/B, 1)`, sets `(q, n+2)` to an approximation of
+    `b/a` with `n` fraction limbs and two integral limbs. The absolute
+    error is bounded by `4 B^{-n} / a`. The *invmul* variant multiplies
+    the numerator by :func:`fixed_inv_newton`; the main function performs
+    a Karp-Markstein iteration, ported from :func:`radix_div_approx`.
+
+.. function:: void fixed_rsqrt_ui_newton_basecase(nn_ptr res, ulong a, slong n)
+              void fixed_rsqrt_ui_newton(nn_ptr res, ulong a, slong n)
+
+    Sets `(res, n)` to the fraction limbs of an approximation of
+    `1/\sqrt{a}`, requiring `2 \le a < B`. The error is bounded by
+    `2 B^{-n}`. Ported from :func:`radix_rsqrt_1_approx`.
+
+.. function:: void fixed_rsqrt_newton_basecase(nn_ptr q, nn_srcptr a, slong an, slong n)
+              void fixed_rsqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n)
+
+    Given `(a, an)` representing `a \in [B^{-2}, 1)` with `an` fraction
+    limbs (at least one of the two highest limbs must be nonzero), sets
+    `(q, n+2)` to an approximation of `1/\sqrt{a} \in (1, B]` with `n`
+    fraction limbs and two integral limbs. The absolute error is bounded
+    by `4 B^{-n} / \sqrt{a}`. Ported from :func:`radix_rsqrt_approx`;
+    the basecase combines ``mpn_sqrtrem`` and ``mpn_tdiv_qr``.
+
+.. function:: void fixed_sqrt_newton_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n)
+              void fixed_sqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n)
+
+    Input as for :func:`fixed_rsqrt_newton`; sets `(q, n+2)` to an
+    approximation of `\sqrt{a} \in [1/B, 1)` (the computed value can
+    round up to 1) with absolute error bounded by `4 B^{-n} / \sqrt{a}`.
+    Note that the error is proportional to `1/\sqrt{a}` rather than to
+    the output. The main function performs a Karp-Markstein iteration,
+    ported from :func:`radix_sqrt_approx`.
+
 Elementary functions
 -------------------------------------------------------------------------------
 
@@ -97,6 +153,29 @@ On 32-bit systems, it is assumes that `n \ge 2`.
     all work happens at the output precision; callers wanting sub-ulp
     accuracy should pad the precision by one limb themselves.
 
+.. function:: void fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn, flint_bitcnt_t r, int alg)
+
+    Sets `(y, wn + 1)` (``wn`` fraction limbs and a units limb) to an
+    approximation of `\exp(t)` for a reduced argument `(t, wn)` with
+    `t < 2^{-r}`, `r \ge 16`, independent of any particular argument
+    reduction (algorithms 1 and 2 additionally require
+    `r \ge 32`).  The error is at most ``FIXED_EXP_REDUCED_MAX_ERR``
+    ulps.  *alg* selects the internal method: 0 the tuned automatic
+    choice, 1 the direct rectangular-splitting series, 2 the sinh
+    series plus a square root, 3 one bit-burst step (the leading
+    slice of *t*, on limb boundaries, evaluated by binary splitting
+    and the remainder by the sinh series at the doubled rate), 4 the
+    full bit-burst algorithm with slice lengths doubling, which is
+    asymptotically quasi-optimal for very large ``wn``.  The burst
+    machinery works at limb granularity throughout -- slice
+    boundaries, splitting-tree truncation frames and quotient
+    placements are all limb counts, with no bit shifts on the path
+    -- and dead low limbs of a slice fold into its frame, so sparse
+    arguments (a few significant limbs over a deep frame, the shape
+    of a double-precision input at high precision) shrink the whole
+    computation.  The automatic thresholds can be recalibrated with
+    ``tune/tune-exp-reduced``.
+
 .. function:: void fixed_exp_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
 
     Sets `(res, n + 1)` to an approximation of `\exp((x, n))` for any
@@ -172,6 +251,143 @@ On 32-bit systems, it is assumes that `n \ge 2`.
     accepted factor), so the per-factor work starts out at a single
     limb and `P` is only ever truncated once its exact length exceeds
     `n` limbs.
+
+.. macro:: FIXED_SIN_COS_REDUCED_MAX_ERR
+
+    Bound, in ulp, for the error of each output of
+    :func:`fixed_sin_cos_reduced`, currently 96 -- a constant, like
+    ``FIXED_EXP_REDUCED_MAX_ERR``, because the internal working
+    precision carries guard limbs.
+
+.. function:: void fixed_sin_cos_reduced(nn_ptr ysin, nn_ptr yg, nn_srcptr t, slong wn, flint_bitcnt_t r, int alg)
+
+    Sets `(ysin, wn)` and `(yg, wn)` to approximations of `\sin(t)`
+    and `g = 1 - \cos(t)` for a reduced argument `(t, wn)` with
+    `t < 2^{-r}`, `r \ge 16`, independent of any particular argument
+    reduction (algorithms 1 and 2 additionally require
+    `r \ge 32`).  Both results are pure fractions
+    (`\sin t < 2^{-r}`, `g < 2^{-2r-1}`), but both buffers must have
+    room for `wn + 1` limbs, the top limb being scratch.  The error
+    of each output is at most ``FIXED_SIN_COS_REDUCED_MAX_ERR``
+    ulps.  Returning `g` rather than `\cos` preserves the
+    information near the top: the tangent half-angle reconstruction
+    of :func:`fixed_sin_cos_bitwise_rs` and
+    :func:`fixed_tan_bitwise_rs` consumes exactly this pair, with
+    `\cos t` never formed explicitly.
+
+    *alg* selects the internal method: 0 the tuned automatic choice,
+    1 the direct sine and cosine rectangular-splitting series, 2 the
+    sine series plus a squaring and a square root
+    (`g = 1 - \sqrt{1 - \sin^2 t}`, half the series terms), 3 one
+    bit-burst step (the leading slice of *t*, on limb boundaries,
+    evaluated as a complex exponential by Gaussian binary splitting
+    and the remainder by the tuned series at the raised rate), 4 the
+    full bit-burst algorithm with slice lengths tripling, which is
+    asymptotically quasi-optimal for very large ``wn``.
+
+    The burst evaluates each slice factor
+    `\exp(i x_k) = (\cos x_k + i \sin x_k)` by a JOINT truncated
+    binary splitting of the sine and `1 - \cos` series over one
+    shared exact denominator per slice
+    (``_fixed_sin_cos_sum_bs_powtab``), accumulates the complex
+    numerator by windowed middle products (a Karatsuba 3-product
+    update when the imaginary content dominates the window slack, a
+    borrow-safe direct sum of nonnegative windows otherwise) and the
+    real denominator by middle products in ping-pong buffers, and
+    finishes with two balanced Newton divisions against the single
+    accumulated denominator -- where the classical per-slice scheme
+    spends a full-precision square root per slice.  Past a per-slice
+    term threshold the cosine track is dropped from the tree and
+    recovered from the slice's own denominator by one square root,
+    `\cos_k Q = \sqrt{(Q B^{Q_e})^2 - (\sin_k Q B^{Q_e})^2}`.  As
+    in :func:`fixed_exp_reduced`, everything is limb-granular and
+    dead low limbs of a slice fold into its frame, so sparse
+    arguments shrink the whole computation (including the internal
+    power tables, whose entries strip their dead low limbs into
+    per-entry exponents).  The automatic thresholds can be
+    recalibrated with the tuner alongside the exp ones.
+
+.. macro:: FIXED_EXP_NOTAB_MAX_ERR
+
+    Bound, in ulp, for the error of :func:`fixed_exp_notab`,
+    currently 128.
+
+.. function:: void fixed_exp_notab(nn_ptr y, nn_srcptr x, slong n)
+
+    Sets `(y, n + 1)` (`n` fraction limbs and a unit limb) to an
+    approximation of `\exp(x)` for any `(x, n)` in `[0, 1)`,
+    without table-based argument reduction: the number of leading
+    zero bits `z` of `x` is inspected, the argument is halved
+    `h = \max(0, r(n) - z)` times (an exact shift inside the
+    internal guard limbs), :func:`fixed_exp_reduced` runs on the
+    halved argument at depth `z + h`, and the result is squared `h`
+    times, each squaring one ``sqrhigh`` at the working precision.
+    All intermediate values lie in `[1, e)`.  Relative errors double
+    per squaring, so `h + \log_2 n + 8` guard bits (rounded up to
+    limbs) keep the amplified component below one output ulp; the
+    error is at most ``FIXED_EXP_NOTAB_MAX_ERR`` ulps.
+
+    The reduction depth `r(n)` comes from a tuned table: `r = 32`
+    and `r = 16` alternate in windows through the
+    rectangular-splitting range (the 16-windows are where the
+    automatic dispatch inside :func:`fixed_exp_reduced` switches to
+    the bit-burst path early and beats the series), and `r = 32`
+    carries the whole bit-burst regime -- unlike arb's bit-burst
+    exponential (16 squarings below `\sim 10^8` bits), the deeper
+    reduction measured consistently ahead on the development
+    machine, the shrunken first-level splitting trees outweighing
+    the extra squarings.  The internal worker
+    ``_fixed_exp_notab_r(y, x, n, r)`` takes the depth explicitly,
+    for tuning; ``profile/p-fixed exp_notab [nmax]`` compares
+    against :func:`arb_exp` without stopping while arb is ahead
+    (the interesting regime is the asymptotic one: arb's table-based
+    reduction wins below roughly `2^{19}` bits, after which the
+    table-free path here measured `1.1\text{--}1.4\times` faster
+    than arb's bit-burst exponential up to `8 \times 10^6` bits).
+
+.. macro:: FIXED_SIN_COS_NOTAB_MAX_ERR
+
+    Bound, in ulp, for the error of each output of
+    :func:`fixed_sin_cos_notab`, currently 128.
+
+.. function:: void fixed_sin_cos_notab(nn_ptr ysin, nn_ptr ycos, nn_srcptr x, slong n)
+
+    Sets `(ysin, n + 1)` and `(ycos, n + 1)` (`n` fraction limbs
+    and a unit limb each) to approximations of `\sin(x)` and
+    `\cos(x)` for any `(x, n)` in `[0, 1)`, without table-based
+    argument reduction.  As in :func:`fixed_exp_notab` the argument
+    is halved `h = \max(0, r(n) - z)` times and
+    :func:`fixed_sin_cos_reduced` runs at depth `z + h`; the angle
+    is then doubled back on the cosine alone, working with
+    `g = 1 - \cos` throughout:
+
+    .. math::
+
+        g(2\theta) = 2 g (2 - g),
+
+    one ``sqrhigh`` per doubling with every intermediate a pure
+    fraction (the chain ends at `g(x) \le 1 - \cos 1 < 0.46`, so
+    its inputs stay below `g(1/2) < 0.13`).  The final sine comes
+    from one square root, `\sin x = \sqrt{2g - g^2}`, through
+    ``mpn_sqrtrem`` at small sizes and :func:`fixed_sqrt_newton`
+    above a cutoff, the input taken at a limb position of matching
+    parity so that the root placement is a limb copy.  The absolute
+    error of `g` multiplies by at most 4 per doubling and the
+    square root divides it by `2 \sin x`; since any path that
+    doubles at all has `x \ge 2^{-z-1}`, the total amplification is
+    bounded by `2^{2 r - z + 2}`, and `2h + z + \log_2 n + 8` guard
+    bits keep the amplified component below one output ulp.  The
+    error of each output is at most
+    ``FIXED_SIN_COS_NOTAB_MAX_ERR`` ulps.
+
+    The tuned depth is `r = 32` across the rectangular-splitting
+    range and `r = 24` in the bit-burst regime (matching arb's
+    bit-burst sine/cosine); the internal worker
+    ``_fixed_sin_cos_notab_r`` takes it explicitly, and
+    ``profile/p-fixed sin_cos_notab [nmax]`` compares against
+    :func:`arb_sin_cos` (measured `1.2\text{--}1.8\times` faster
+    from `6 \times 10^4` through `8 \times 10^6` bits on the
+    development machine).
 
 .. macro:: FIXED_SIN_COS_BITWISE_RS_MAX_ERR(n, r)
 
@@ -325,7 +541,36 @@ On 32-bit systems, it is assumes that `n \ge 2`.
         D = w_x - w_x g - w_y \sin t',
 
     four small multiplications, and `\cos t'` cancels in every ratio
-    just as `|W|` does.
+    just as `|W|` does.  The pair `(\sin t', g)` itself comes from
+    :func:`fixed_sin_cos_reduced`, which owns the tuned choice
+    between the direct series, the sine-plus-square-root variant and
+    the bit-burst modes for large `n / r`.
+
+.. function:: void fixed_log1p_2mexp_ui_bs(nn_ptr res, ulong i, slong n)
+              void fixed_atan_2mexp_ui_bs(nn_ptr res, ulong i, slong n)
+
+    Sets `(res, n)` to a one-sided fixed-point approximation of
+    `\log(1 + 2^{-i})` resp. `\operatorname{atan}(2^{-i})`, `i \ge 1`:
+    at most the true value, short by no more than a couple of ulps.
+    These build the entries of the cached reduction tables (which call
+    them with one guard limb) by binary splitting in mpn arithmetic:
+    the split products are carried as truncated mantissas with
+    limb-radix exponents, an iterative basecase accumulates blocks of
+    terms with shifts and single-limb multiplications, and every
+    truncation rounds numerators down and denominators up so that the
+    final truncating division stays one-sided.  The logarithm sums
+    `2\operatorname{atanh}(1/(2^{i+1}+1))`, carrying one `q^2` factor
+    per TERM in the materialized denominator so that ranges compose
+    without any `q`-power at the merges; the `q^2` multiplications
+    all happen at the leaves, each a single ``mpn_mul_1`` whenever
+    `q^2` fits in a limb.  At high precision the direct `\log(1+x)`
+    series takes over, its larger term count offset by purely dyadic
+    merges.
+
+    The smallest indices of the tables (`i \le 6` for the logarithms,
+    `i \le 3` for the angles) are instead combined from
+    `\log 2, \log 3, \ldots` resp. Gauss-machin style atans, computed
+    by generic binary splitting.
 
 
 The reduction parameter selected by `r = 0` is tuned in two tiers.
@@ -381,3 +626,88 @@ size is called once before timing so that table precomputation stays
 out of the measurement, and the timing loop cycles over an array of
 random inputs so that the branchy reductions pay their real
 misprediction costs.
+
+Verified constants
+-------------------------------------------------------------------------------
+
+.. function:: void fixed_const_pi_div_4(nn_ptr y, slong n)
+              void fixed_const_log2(nn_ptr y, slong n)
+
+    Set `(y, n)` to EXACTLY `\lfloor c \, B^n \rfloor` for
+    `c = \pi/4` respectively `c = \log 2` -- a verified correct
+    floor truncation, not merely an approximation within some ulp
+    budget, in the same sense as the cached
+    `\log(1 + 2^{-i})` and `\operatorname{atan}(2^{-i})` table
+    entries.  Computed limbs are cached per thread and extended on
+    demand: the cache stores the floor at the largest size requested
+    so far (rounded up geometrically), and since floors nest, any
+    shorter request is served as the top limbs of the cached entry.
+    Each extension evaluates the constant through binary splitting
+    in ``fball`` ball arithmetic (the Chudnovsky series for `\pi`,
+    the hypergeometric `\log 2` series of [Zun2025]_ with `11.9`
+    bits per term, the fastest known)
+    with increasing guard precision until the ball's rigorous radius
+    determines the floor uniquely, converted directly from the fball
+    representation (limb-aligned mantissa split at the output grid,
+    the radius checked to fit strictly inside the tail on both
+    sides) without passing through arb.  The reconstruction scalars
+    -- `D = 640320^2/12` with the extra `1/4` for `\pi/4`, and the
+    denominator `2160` for `\log 2` -- are baked into `q(0)` at the
+    leftmost leaf of the splitting tree, which scales the root `Q`
+    while leaving `T` invariant, so no final scalar multiplication
+    or bit shift remains.  The caches can be freed
+    explicitly with ``_fixed_const_pi_div_4_clear`` /
+    ``_fixed_const_log2_clear`` and are released by
+    :func:`flint_cleanup`.
+
+fball: semi-private ball arithmetic
+-------------------------------------------------------------------------------
+
+``fball`` is an internal mpf-like floating-point type with arb-like
+ball semantics in the radix `B = 2^{\mathrm{FLINT\_BITS}}`,
+intended as a backend for algorithms on scaled or growing numbers
+(binary splitting summation, AGM iterations) where all cheap
+operations should stay in mpn arithmetic and exponents are
+limb-aligned so that shifts are limb copies.  It is DOCUMENTED BUT
+SEMI-PRIVATE: the interface lives in ``fixed.h`` for use inside
+FLINT and by expert callers, but makes no stability promises across
+releases -- the representation, the error-normalization policy and
+the set of operations are all subject to future revision.
+
+A ball is `(-1)^{\mathrm{negative}} (d, \mathrm{size})
+B^{\mathrm{exp} - \mathrm{size}}` with a top-normalized mantissa
+(``size == 0`` encodes zero), plus a rigorous radius of ``err`` ulps
+at the anchor `B^{\mathrm{exp} - \mathrm{size} + \mathrm{erra}}`:
+the anchor offset ``erra`` keeps `1 \le \mathrm{err} < 2^{128}`
+whenever nonzero, so radii far below one mantissa ulp (balls like
+`1 - \epsilon`) neither underflow the double nor get flattened to a
+whole ulp.  All bound composition rounds up, anchored pairs
+`v \, B^a` absorb the exponent ranges a plain double cannot, every
+compound bound is multiplied by a fudge factor covering the bound
+arithmetic's own rounding, and normalization truncates low mantissa
+limbs once the radius exceeds a threshold sitting a couple of limbs
+above one ulp, so mantissa length tracks the number of accurate
+limbs (with content deliberately retained slightly below the noise
+floor, since interval radii over correlated errors grow faster than
+true errors).
+
+Operations take a precision `n` in limbs, the caller supplying 2--4
+guard limbs; outputs are truncated to about `n` limbs and less when
+an operand is accurate to fewer.  Division and the square roots
+require operand balls of relative radius below `2^{-30}` (checked,
+not assumed: wider divisors are a usage error whose mantissa would
+be pure noise).  ``fball_get_fixed`` writes a ball known to lie in
+`[0, 1)` as a truncated fixed-point fraction and returns a rigorous
+bound in output ulps; ``fball_get_fixed_floor`` is its
+verified-floor sibling, writing `\lfloor x B^n \rfloor` when the
+radius determines that floor uniquely and reporting failure
+otherwise; ``fball_get_arb`` converts losslessly to an arb ball.  ``fball_const_pi_chudnovsky`` and ``fball_const_log2``
+evaluate the constants by binary splitting over exact-then-truncated
+fballs: blocks of terms accumulate iteratively over exact mpn
+integers with a backward recurrence (whole-limb factors on every
+word size), the tree keeps exact integers until they outgrow the
+target precision and balls afterwards, and the right spine skips
+its unused `P` products.  A factored-`Q` variant of the `\pi`
+splitting (powers of the constant `C` kept implicit) was measured
+11--17% slower at every size and has been dropped.  See ``fixed.h``
+for the full interface and per-function contracts.

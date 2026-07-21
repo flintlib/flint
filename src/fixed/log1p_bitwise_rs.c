@@ -12,7 +12,15 @@
 #include "flint.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
+
+/* quotient length from which the argument-reduction division runs
+   through fixed_div_newton instead of mpn_tdiv_qr; set from
+   in-context measurements (tight-loop benchmarks favor Newton much
+   earlier, but embedded in the evaluation it loses until the FFT
+   range, see dev/notes) */
+#ifndef FIXED_RED_DIV_NEWTON_CUTOFF
+#define FIXED_RED_DIV_NEWTON_CUTOFF 60
+#endif
 
 /* log(1 + x) by the dual of the bitwise exp reduction (the L-mode
    BKM recurrence): greedily multiply P (starting from 1) by factors
@@ -58,7 +66,7 @@
    <= 30 ulp.  Total < 3 (r + 2) + 40, bounded by
    FIXED_LOG1P_BITWISE_RS_MAX_ERR(n, r) = 3 r + 64. */
 
-#define LOGS_L(i) (_fixed_exp_logs + (i) * _fixed_exp_logs_n)
+#define LOGS_L(i) (tab + (i) * nc)
 
 #if FLINT_BITS == 64
 
@@ -141,8 +149,8 @@ fixed_log1p_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
 
     wn = n + 1;
 
-    _fixed_exp_logs_ensure(n, r);
-    nc = _fixed_exp_logs_n;
+    nn_srcptr tab;
+    tab = _fixed_exp_logs_tab(n, r, &nc);
 
     TMP_START;
     P = TMP_ALLOC((wn + wn + n + n + n + 2 * n + 2) * sizeof(ulong));
@@ -305,7 +313,25 @@ fixed_log1p_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r)
             flint_mpn_zero(nd, n);
             flint_mpn_copyi(nd + n, D, n - qr);
             /* quotient has ds - wn + 1 = n - qr limbs */
+            if (ds - wn + 1 < FIXED_RED_DIV_NEWTON_CUTOFF)
+        {
             mpn_tdiv_qr(t, nd, 0, nd, ds, sh, wn);
+        }
+        else
+        {
+            /* Same quotient by Karp-Markstein division: numerator
+               and divisor read as fractions (the numerator's n low
+               limbs are zero, so pass only its significant top
+               part), quotient computed with k + 1 fraction limbs, k
+               the quotient length.  Truncating the two guard limbs
+               leaves t within 1 + eps ulps of the floored quotient
+               (eps = 4 B^(-1) / a' < 2^-62), which the series
+               argument budget absorbs like the tdiv floor. */
+            slong k = ds - wn + 1;
+            nn_ptr q = TMP_ALLOC((k + 4) * sizeof(ulong));
+            fixed_div_newton(q, nd + n, ds - n, sh, wn, k + 1);
+            flint_mpn_copyi(t, q + 2, k);
+        }
         }
     }
 
