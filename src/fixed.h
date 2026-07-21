@@ -442,6 +442,158 @@ void _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q,
     slong * qn, slong * QE, nn_srcptr xp, slong xn, slong D,
     slong N);
 
+/* fball: SEMI-PRIVATE ball arithmetic (subject to future revision).
+   The interface below is documented for use inside FLINT and by
+   expert callers, but makes no stability promises across releases:
+   the representation, the error-normalization policy and the set of
+   operations may all change.
+
+   Internal mpf-like floating-point numbers with arb-like ball
+   semantics, in radix B = 2^FLINT_BITS, intended as a backend for
+   algorithms on scaled or growing numbers (AGM iterations, binary
+   splitting summation) where all cheap operations should stay in mpn
+   arithmetic and exponents are limb-aligned so that shifts are limb
+   copies.
+
+   Representation:
+
+       value = (-1)^negative * (d, size) * B^(exp - size)
+
+   with the mantissa (d, size) an unsigned little-endian integer whose
+   top limb is nonzero, so B^(exp-1) <= |value| < B^exp; size == 0
+   encodes the value 0 (negative == 0 then).  The number represents a
+   ball: the true quantity lies within err ulps of the point value,
+   one ulp being B^(exp - size) (for size == 0, B^exp).  Low zero
+   limbs are also stripped when err == 0.0, moving them into exp, so
+   exact small integers stay small.
+
+   err is a rigorous bound maintained through every operation.  All
+   error propagation is done in double arithmetic ROUNDING UP: every
+   compound bound is multiplied by FBALL_EPS to absorb the
+   round-to-nearest errors of the bound computation itself, exponent
+   scalings are exact powers of two with explicit underflow/overflow
+   handling (bignum exponents can far exceed the double range), and
+   normalization truncates low mantissa limbs whenever
+   err > 2^(FLINT_BITS + 5), so that err stays small and mantissa
+   length tracks the number of accurate limbs.
+
+   Arithmetic functions take a precision n in limbs (the caller
+   includes 2-4 guard limbs); mantissas are truncated to about n
+   limbs, and less when an operand is accurate to fewer limbs: the
+   product of an n/2-accurate and an n/3-accurate ball only ever
+   computes ~n/3 limbs. */
+
+typedef struct
+{
+    nn_ptr d;       /* mantissa limbs */
+    slong alloc;    /* allocated limbs */
+    slong size;     /* size of mantissa */
+    int negative;   /* sign bit */
+    slong exp;      /* radix 2^FLINT_BITS exponent */
+    double err;     /* error bound: err ulps at the anchor
+                       B^(exp - size + erra) */
+    slong erra;     /* anchor offset of the error, in limbs below
+                       (or, rarely, above) the mantissa bottom; kept
+                       so that 1 <= err < 2^128 whenever err != 0 --
+                       a plain double at the mantissa bottom cannot
+                       represent radii more than ~1000 bits below
+                       one ulp (they underflow), which matters for
+                       balls like 1 - epsilon with epsilon ~ 2^-2r */
+}
+fball_struct;
+
+typedef fball_struct fball_t[1];
+
+/* fudge factor: absorbs the rounding of the (much shorter) error
+   bound computations themselves */
+#define FBALL_EPS (1.0 + 1e-6)
+
+/* normalization threshold: low limbs are truncated away once the
+   bound exceeds this many ulps of the mantissa bottom.  The
+   threshold deliberately sits ~2 limbs above one ulp so that
+   mantissa content is retained a couple of limbs BELOW an
+   accumulated noise floor: interval radii are worst-case bounds
+   over correlated errors (a Karatsuba complex multiply triples the
+   radius of the small component while the true error barely
+   grows), and truncating right at the radius would throw away
+   limbs that are in fact accurate. */
+#define FBALL_ERR_MAX_EXP 197
+#define FBALL_ERR_MAX 0x1p197
+
+void fball_init(fball_t x);
+void fball_clear(fball_t x);
+void fball_fit(fball_t x, slong k);
+
+void fball_zero(fball_t x);
+void fball_set_ui(fball_t x, ulong c);
+void fball_set_si(fball_t x, slong c);
+void fball_set(fball_t res, const fball_t x);
+void fball_swap(fball_t x, fball_t y);
+FLINT_FORCE_INLINE void fball_neg(fball_t x) { if (x->size) x->negative ^= 1; }
+
+int fball_is_zero_exact(const fball_t x);
+
+/* res = a * b, a * c, a + b, a - b at precision n limbs (res may
+   alias operands) */
+void fball_mul(fball_t res, const fball_t a, const fball_t b, slong n);
+void fball_mul_ui(fball_t res, const fball_t a, ulong c, slong n);
+void fball_add(fball_t res, const fball_t a, const fball_t b, slong n);
+void fball_sub(fball_t res, const fball_t a, const fball_t b, slong n);
+
+/* res = a / b resp. 1/sqrt(c) with ~n accurate limbs, by Newton
+   iteration (fixed_div_newton / fixed_rsqrt_ui_newton); b must be
+   nonzero with small relative error, 2 <= c < B */
+void fball_div(fball_t res, const fball_t a, const fball_t b, slong n);
+void fball_rsqrt_ui(fball_t res, ulong c, slong n);
+void fball_rsqrt(fball_t res, const fball_t x, slong n);
+void fball_sqrt(fball_t res, const fball_t x, slong n);
+void fball_mul_2exp_si(fball_t x, slong e);
+
+/* add extra ulps (at the current anchor) to the radius */
+void fball_add_error_ulps(fball_t x, double e);
+/* add v ulps at the explicit anchor B^anc: use when the intended
+   scale is a frame the mantissa may have been normalized away from
+   (an exact import strips low zero limbs, so "ulps at the current
+   anchor" can silently mean a much coarser frame) */
+void fball_add_error(fball_t x, double v, slong anc);
+/* enclose also value * t for |t| <= 2^e2 (relative perturbation) */
+void fball_add_error_2exp_rel(fball_t x, slong e2);
+
+/* x = (p, len) 2^ebits exactly (p unsigned; len may include zero
+   top limbs); the bit part of ebits costs one mpn shift, after
+   which all exponent handling is limb-aligned */
+void fball_set_mpn_2exp(fball_t x, nn_srcptr p, slong len,
+    slong ebits);
+
+/* write a ball known to lie in [0, 1) as a wn-limb fixed-point
+   fraction (truncating), returning a rigorous error bound in
+   output ulps (2^(-FLINT_BITS wn)); a negative point value within
+   the radius is clamped to zero and absorbed into the bound */
+double fball_get_fixed(nn_ptr y, slong wn, const fball_t x);
+
+/* write y = floor(x B^n) for a ball known to lie in [0, 1) IF the
+   radius determines that floor uniquely, returning 1; returns 0
+   otherwise (caller retries at higher precision).  The direct
+   verified-floor sibling of fball_get_fixed */
+int fball_get_fixed_floor(nn_ptr y, slong n, const fball_t x);
+
+void fball_get_arb(arb_t res, const fball_t x);
+void fball_print(const fball_t x);
+
+/* pi to about n limbs (n includes the caller's guard limbs) by
+   binary splitting of the Chudnovsky series in fball arithmetic */
+void fball_const_pi_chudnovsky(fball_t pi, slong n);
+void fball_const_log2(fball_t res, slong n);
+
+/* verified floor-truncated cached constants: y receives n limbs,
+   exactly floor(c B^n) for c = pi/4 resp. log(2); computed limbs
+   are cached per thread and extended on demand (floors nest, so a
+   prefix of a longer cached floor is itself the floor) */
+void fixed_const_pi_div_4(nn_ptr y, slong n);
+void fixed_const_log2(nn_ptr y, slong n);
+void _fixed_const_pi_div_4_clear(void);
+void _fixed_const_log2_clear(void);
+
 /* internal: exact-floor entry helpers (tab_exact.c) */
 int _fixed_tab_store_floor(nn_ptr e, const arb_t x, slong nc, slong prec);
 void _fixed_tab_entry_exact(nn_ptr e, int which, ulong i, slong nc);

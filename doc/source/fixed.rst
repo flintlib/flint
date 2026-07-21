@@ -627,3 +627,87 @@ out of the measurement, and the timing loop cycles over an array of
 random inputs so that the branchy reductions pay their real
 misprediction costs.
 
+Verified constants
+-------------------------------------------------------------------------------
+
+.. function:: void fixed_const_pi_div_4(nn_ptr y, slong n)
+              void fixed_const_log2(nn_ptr y, slong n)
+
+    Set `(y, n)` to EXACTLY `\lfloor c \, B^n \rfloor` for
+    `c = \pi/4` respectively `c = \log 2` -- a verified correct
+    floor truncation, not merely an approximation within some ulp
+    budget, in the same sense as the cached
+    `\log(1 + 2^{-i})` and `\operatorname{atan}(2^{-i})` table
+    entries.  Computed limbs are cached per thread and extended on
+    demand: the cache stores the floor at the largest size requested
+    so far (rounded up geometrically), and since floors nest, any
+    shorter request is served as the top limbs of the cached entry.
+    Each extension evaluates the constant through binary splitting
+    in ``fball`` ball arithmetic (the Chudnovsky series for `\pi`,
+    the hypergeometric `\log 2` series of [Zun2025]_ with `11.9`
+    bits per term, the fastest known)
+    with increasing guard precision until the ball's rigorous radius
+    determines the floor uniquely, converted directly from the fball
+    representation (limb-aligned mantissa split at the output grid,
+    the radius checked to fit strictly inside the tail on both
+    sides) without passing through arb.  The reconstruction scalars
+    -- `D = 640320^2/12` with the extra `1/4` for `\pi/4`, and the
+    denominator `2160` for `\log 2` -- are baked into `q(0)` at the
+    leftmost leaf of the splitting tree, which scales the root `Q`
+    while leaving `T` invariant, so no final scalar multiplication
+    or bit shift remains.  The caches can be freed
+    explicitly with ``_fixed_const_pi_div_4_clear`` /
+    ``_fixed_const_log2_clear`` and are released by
+    :func:`flint_cleanup`.
+
+fball: semi-private ball arithmetic
+-------------------------------------------------------------------------------
+
+``fball`` is an internal mpf-like floating-point type with arb-like
+ball semantics in the radix `B = 2^{\mathrm{FLINT\_BITS}}`,
+intended as a backend for algorithms on scaled or growing numbers
+(binary splitting summation, AGM iterations) where all cheap
+operations should stay in mpn arithmetic and exponents are
+limb-aligned so that shifts are limb copies.  It is DOCUMENTED BUT
+SEMI-PRIVATE: the interface lives in ``fixed.h`` for use inside
+FLINT and by expert callers, but makes no stability promises across
+releases -- the representation, the error-normalization policy and
+the set of operations are all subject to future revision.
+
+A ball is `(-1)^{\mathrm{negative}} (d, \mathrm{size})
+B^{\mathrm{exp} - \mathrm{size}}` with a top-normalized mantissa
+(``size == 0`` encodes zero), plus a rigorous radius of ``err`` ulps
+at the anchor `B^{\mathrm{exp} - \mathrm{size} + \mathrm{erra}}`:
+the anchor offset ``erra`` keeps `1 \le \mathrm{err} < 2^{128}`
+whenever nonzero, so radii far below one mantissa ulp (balls like
+`1 - \epsilon`) neither underflow the double nor get flattened to a
+whole ulp.  All bound composition rounds up, anchored pairs
+`v \, B^a` absorb the exponent ranges a plain double cannot, every
+compound bound is multiplied by a fudge factor covering the bound
+arithmetic's own rounding, and normalization truncates low mantissa
+limbs once the radius exceeds a threshold sitting a couple of limbs
+above one ulp, so mantissa length tracks the number of accurate
+limbs (with content deliberately retained slightly below the noise
+floor, since interval radii over correlated errors grow faster than
+true errors).
+
+Operations take a precision `n` in limbs, the caller supplying 2--4
+guard limbs; outputs are truncated to about `n` limbs and less when
+an operand is accurate to fewer.  Division and the square roots
+require operand balls of relative radius below `2^{-30}` (checked,
+not assumed: wider divisors are a usage error whose mantissa would
+be pure noise).  ``fball_get_fixed`` writes a ball known to lie in
+`[0, 1)` as a truncated fixed-point fraction and returns a rigorous
+bound in output ulps; ``fball_get_fixed_floor`` is its
+verified-floor sibling, writing `\lfloor x B^n \rfloor` when the
+radius determines that floor uniquely and reporting failure
+otherwise; ``fball_get_arb`` converts losslessly to an arb ball.  ``fball_const_pi_chudnovsky`` and ``fball_const_log2``
+evaluate the constants by binary splitting over exact-then-truncated
+fballs: blocks of terms accumulate iteratively over exact mpn
+integers with a backward recurrence (whole-limb factors on every
+word size), the tree keeps exact integers until they outgrow the
+target precision and balls afterwards, and the right spine skips
+its unused `P` products.  A factored-`Q` variant of the `\pi`
+splitting (powers of the constant `C` kept implicit) was measured
+11--17% slower at every size and has been dropped.  See ``fixed.h``
+for the full interface and per-function contracts.
