@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -77,17 +78,62 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 #if FLINT_BITS == 64
                 slong bits = fmpz_bits(n2);
 
-                if (bits <= 76)
+                if (bits <= 2 * FLINT_BITS)
+                {
+                    ulong nhi, nlo, rfac[2];
+                    ulong rho_iters;
+                    int found;
+
+                    if (bits <= 72)
+                        rho_iters = 2048;
+                    else
+                        rho_iters = 8192;
+
+                    fmpz_get_uiui(&nhi, &nlo, n2);
+
+                    found = n_ll_factor_rho(rfac, nhi, nlo, 1, rho_iters);
+
+                    /* Rho only reaches factors of around 25 bits. Above
+                       ~118 bits the sieve is expensive enough that a few
+                       ECM curves pay for themselves on any cofactor whose
+                       smallest factor is in the 26-45 bit range. */
+                    if (!found && bits >= 118)
+                    {
+                        flint_rand_t state;
+                        flint_rand_init(state);
+                        found = n_ll_factor_ecm(rfac, nhi, nlo, 4,
+                                                1000, 100000, state);
+                        flint_rand_clear(state);
+                    }
+
+                    if (found)
+                    {
+                        fmpz_t t, f;
+                        ulong expf;
+
+                        fmpz_init(t);
+                        fmpz_init(f);
+                        fmpz_set_uiui(f, rfac[1], rfac[0]);
+                        expf = fmpz_remove(t, n2, f);
+                        FLINT_ASSERT(expf >= 1);
+                        _fmpz_factor_append(fac, f, expf);
+                        if (!fmpz_is_one(t))
+                            _fmpz_factor_append(fac, t, 1);
+                        fmpz_clear(t);
+                        fmpz_clear(f);
+                        goto factored;
+                    }
+                }
+
+                if (bits <= 72)
                 {
                     slong squfof_iters;
                     ulong nhi, nlo, f1 = 0;
 
                     if (bits <= 69)
                         squfof_iters = 50000;
-                    else if (bits <= 72)
-                        squfof_iters = 150000;
                     else
-                        squfof_iters = 200000;
+                        squfof_iters = 150000;
 
                     fmpz_get_uiui(&nhi, &nlo, n2);
 
@@ -117,6 +163,8 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
                 {
                     qsieve_factor(fac, n2);
                 }
+
+factored: ;
 #else
                 qsieve_factor(fac, n2);
 #endif

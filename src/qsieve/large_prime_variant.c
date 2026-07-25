@@ -19,7 +19,7 @@
 #include "qsieve.h"
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
-#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))
+#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> qs_inf->hash_shift))
 
 /******************************************************************************
  *
@@ -546,7 +546,7 @@ int qsieve_process_relation(qs_t qs_inf)
        zeroing the full 2^20-entry (8 MB) table.  table[1..vertices] holds
        exactly the primes inserted, each in bucket HASH(prime). */
     {
-        // instead of memset(hash_table, 0, (1 << 20) * sizeof(ulong));
+        // instead of memset(hash_table, 0, qs_inf->hash_size * sizeof(ulong));
         slong _v;
         for (_v = 1; _v <= (slong) qs_inf->vertices; _v++)
             hash_table[HASH(qs_inf->table[_v].prime)] = 0;

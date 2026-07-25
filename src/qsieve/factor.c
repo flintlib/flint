@@ -64,7 +64,7 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
     uint64_t * nullrows = NULL;
     uint64_t mask;
     flint_rand_t state;
-    fmpz_t temp, temp2, X, Y;
+    fmpz_t temp, temp2, X, Y, cof;
     slong num_facs;
     fmpz * facs;
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
@@ -365,6 +365,7 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
 
                     facs = _fmpz_vec_init(100);
                     num_facs = 0;
+                    fmpz_init(cof);
 
                     for (i = 0; i < 64; i++)
                     {
@@ -376,10 +377,30 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
                             fmpz_gcd(X, X, qs_inf->n);
 
                             if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
+                            {
                                 fmpz_set(facs + num_facs++, X);
+
+                                /*
+                                   Each square root costs one modular
+                                   exponentiation per factor base prime, so
+                                   this loop is expensive, and it used to run
+                                   over every nullspace vector even once n was
+                                   completely split.  Stop as soon as the
+                                   factor just found splits n into two primes,
+                                   which is the common case and the one where
+                                   the cost matters most.  Anything less
+                                   definite falls through to the old behaviour
+                                   of collecting from all the vectors.
+                                */
+                                fmpz_divexact(cof, qs_inf->n, X);
+
+                                if (fmpz_is_probabprime(X) && fmpz_is_probabprime(cof))
+                                    break;
+                            }
                         }
                     }
 
+                    fmpz_clear(cof);
                     flint_free(nullrows);
 
                     if (num_facs > 0)
