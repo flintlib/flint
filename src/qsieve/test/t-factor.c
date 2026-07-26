@@ -247,6 +247,55 @@ TEST_FUNCTION_START(qsieve_factor, state)
       fmpz_factor_clear(factors);
    }
 
+   /*
+      Cover the path that grows the factor base.  A sieve threshold above the
+      tuned value means no sieve entry is ever accepted as a candidate, so the
+      polynomials run out with too few relations and qsieve has to increase the
+      factor base and redo the linear algebra setup.  qsieve_linalg_realloc,
+      and with it the resizing of the large prime hash table, is reached only
+      this way, and nothing else in the suite takes that path.
+   */
+   for (i = 0; i < 3 * flint_test_multiplier(); i++)
+   {
+      fmpz_t prod, pw;
+      slong k;
+
+      randprime(x, state, 45);
+      do {
+         randprime(y, state, 45);
+      } while (fmpz_equal(x, y));
+
+      fmpz_mul(n, x, y);
+
+      fmpz_factor_init(factors);
+
+      flint_set_num_threads(1);
+
+      qsieve_factor_with_tune(factors, n, 30, 200, 5, 8000, 60);
+
+      fmpz_init_set_ui(prod, 1);
+      fmpz_init(pw);
+
+      for (k = 0; k < factors->num; k++)
+      {
+         fmpz_pow_ui(pw, factors->p + k, factors->exp[k]);
+         fmpz_mul(prod, prod, pw);
+      }
+
+      if (factors->num < 2 || !fmpz_equal(prod, n))
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("Factor base growth\ni = %wd\n", i);
+         flint_printf("%wd factors found\n", factors->num);
+         fflush(stdout);
+         flint_abort();
+      }
+
+      fmpz_clear(prod);
+      fmpz_clear(pw);
+      fmpz_factor_clear(factors);
+   }
+
    /* Test random n, small factors */
    for (i = 0; i < tmul*flint_test_multiplier(); i++)
    {

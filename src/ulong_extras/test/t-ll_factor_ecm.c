@@ -71,6 +71,60 @@ TEST_FUNCTION_START(n_ll_factor_ecm, state)
         fmpz_clear(t);
     }
 
+    /* arguments outside the supported range are rejected */
+    {
+        ulong fac[2];
+
+        if (n_ll_factor_ecm(fac, 0, UWORD(101), 4, 1000, 100000, state))
+            TEST_FUNCTION_FAIL("accepted a one limb argument\n");
+
+        if (n_ll_factor_ecm(fac, 1, UWORD(0), 4, 1000, 100000, state))
+            TEST_FUNCTION_FAIL("accepted an even argument\n");
+
+        if (n_ll_factor_ecm(fac, 1, UWORD(101), 4, 1, 100000, state))
+            TEST_FUNCTION_FAIL("accepted a stage one bound below two\n");
+    }
+
+    /*
+       A stage two bound below the stage one bound is replaced by a default,
+       and a modulus sharing a factor with Suyama's denominator makes the
+       curve degenerate, which yields a factor during setup.
+    */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        fmpz_t p, n, f, t;
+        ulong nhi, nlo, fac[2];
+
+        fmpz_init(p);
+        fmpz_init(n);
+        fmpz_init(f);
+        fmpz_init(t);
+
+        fmpz_randprime(p, state, 66, 0);
+        fmpz_mul_ui(n, p, 15);          /* small factors force degenerate curves */
+
+        if (fmpz_bits(n) <= 128 && fmpz_is_odd(n))
+        {
+            fmpz_get_uiui(&nhi, &nlo, n);
+
+            /* B2 smaller than B1 asks for the default */
+            if (n_ll_factor_ecm(fac, nhi, nlo, 4, 1000, 0, state))
+            {
+                fmpz_set_uiui(f, fac[1], fac[0]);
+                fmpz_mod(t, n, f);
+
+                if (!fmpz_is_zero(t) || fmpz_is_one(f) || fmpz_equal(f, n))
+                    TEST_FUNCTION_FAIL("bad factor with a defaulted B2\n"
+                                       "n = %{fmpz}\nf = %{fmpz}\n", n, f);
+            }
+        }
+
+        fmpz_clear(p);
+        fmpz_clear(n);
+        fmpz_clear(f);
+        fmpz_clear(t);
+    }
+
     if (trials > 20 && count < trials / 5)
         TEST_FUNCTION_FAIL("only %wu of %wu numbers factored\n", count, trials);
 

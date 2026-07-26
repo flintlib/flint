@@ -130,14 +130,15 @@ n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries,
                 }
                 else
                 {
-                    if (!(gvec[0] == n0 && gvec[1] == n1))
-                    {
-                        factor[0] = gvec[0];
-                        factor[1] = gvec[1];
-                        return 1;
-                    }
-                    /* gcd == n: the batch swallowed all factors, retry */
-                    goto next_try;
+                    /*
+                       q is a nonzero residue modulo n here, the zero case
+                       having been taken above, so the gcd divides q and is
+                       strictly smaller than n.  It is therefore a proper
+                       factor and there is no need to test for gcd == n.
+                    */
+                    factor[0] = gvec[0];
+                    factor[1] = gvec[1];
+                    return 1;
                 }
             }
         }

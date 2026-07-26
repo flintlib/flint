@@ -71,6 +71,104 @@ TEST_FUNCTION_START(n_ll_factor_rho, state)
         fmpz_clear(t);
     }
 
+    /* arguments outside the supported range are rejected */
+    {
+        ulong fac[2];
+
+        if (n_ll_factor_rho(fac, 0, UWORD(101), 1, 1024))
+            TEST_FUNCTION_FAIL("accepted a one limb argument\n");
+
+        if (n_ll_factor_rho(fac, 1, UWORD(0), 1, 1024))
+            TEST_FUNCTION_FAIL("accepted an even argument\n");
+    }
+
+    /*
+       A small modulus with a large budget makes the batched product run into
+       every factor at once, so the gcd comes back equal to n and the attempt
+       has to be restarted with a different constant.
+    */
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        fmpz_t p, q, n, f, t;
+        ulong nhi, nlo, fac[2];
+
+        fmpz_init(p);
+        fmpz_init(q);
+        fmpz_init(n);
+        fmpz_init(f);
+        fmpz_init(t);
+
+        fmpz_randprime(p, state, 33, 0);
+        fmpz_randprime(q, state, 33, 0);
+        fmpz_mul(n, p, q);
+
+        if (fmpz_bits(n) > 64 && fmpz_is_odd(n))
+        {
+            fmpz_get_uiui(&nhi, &nlo, n);
+
+            if (n_ll_factor_rho(fac, nhi, nlo, 4, 65536))
+            {
+                fmpz_set_uiui(f, fac[1], fac[0]);
+                fmpz_mod(t, n, f);
+
+                if (!fmpz_is_zero(t) || fmpz_is_one(f) || fmpz_equal(f, n))
+                    TEST_FUNCTION_FAIL("bad factor with a large budget\n"
+                                       "n = %{fmpz}\nf = %{fmpz}\n", n, f);
+            }
+        }
+
+        fmpz_clear(p);
+        fmpz_clear(q);
+        fmpz_clear(n);
+        fmpz_clear(f);
+        fmpz_clear(t);
+    }
+
+    /*
+       Three factors, two of which multiply to more than one limb, so the
+       batched gcd can return a factor that needs both limbs.
+    */
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    {
+        fmpz_t p, q, r, n, f, t;
+        ulong nhi, nlo, fac[2];
+
+        fmpz_init(p);
+        fmpz_init(q);
+        fmpz_init(r);
+        fmpz_init(n);
+        fmpz_init(f);
+        fmpz_init(t);
+
+        fmpz_randprime(p, state, 34, 0);
+        fmpz_randprime(q, state, 34, 0);
+        fmpz_randprime(r, state, 20, 0);
+        fmpz_mul(n, p, q);
+        fmpz_mul(n, n, r);
+
+        if (fmpz_bits(n) > 64 && fmpz_bits(n) <= 128 && fmpz_is_odd(n))
+        {
+            fmpz_get_uiui(&nhi, &nlo, n);
+
+            if (n_ll_factor_rho(fac, nhi, nlo, 3, 8192))
+            {
+                fmpz_set_uiui(f, fac[1], fac[0]);
+                fmpz_mod(t, n, f);
+
+                if (!fmpz_is_zero(t) || fmpz_is_one(f) || fmpz_equal(f, n))
+                    TEST_FUNCTION_FAIL("bad factor for a three factor input\n"
+                                       "n = %{fmpz}\nf = %{fmpz}\n", n, f);
+            }
+        }
+
+        fmpz_clear(p);
+        fmpz_clear(q);
+        fmpz_clear(r);
+        fmpz_clear(n);
+        fmpz_clear(f);
+        fmpz_clear(t);
+    }
+
     /* the map should succeed on a decent fraction of these */
     if (trials > 100 && count < trials / 4)
         TEST_FUNCTION_FAIL("only %wu of %wu numbers factored\n", count, trials);
