@@ -595,6 +595,8 @@ ulong n_factor_one_line(ulong n, ulong iters);
 ulong n_factor_lehman(ulong n);
 
 ulong n_ll_factor_SQUFOF(ulong nhi, ulong nlo, ulong iters);
+int n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries, ulong max_iters);
+int n_ll_factor_ecm(nn_ptr factor, ulong nhi, ulong nlo, ulong curves, ulong B1, ulong B2, flint_rand_t state);
 ulong n_factor_SQUFOF(ulong n, ulong iters);
 
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);

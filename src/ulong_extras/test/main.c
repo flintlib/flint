@@ -63,6 +63,8 @@
 #include "t-jacobi.c"
 #include "t-ll_is_prime.c"
 #include "t-lll_mod_preinv.c"
+#include "t-ll_factor_ecm.c"
+#include "t-ll_factor_rho.c"
 #include "t-ll_mod_preinv.c"
 #include "t-ll_small_powmod.c"
 #include "t-mod2_precomp.c"
@@ -165,6 +167,8 @@ test_struct tests[] =
     TEST_FUNCTION(n_jacobi),
     TEST_FUNCTION(n_ll_is_prime),
     TEST_FUNCTION(n_lll_mod_preinv),
+    TEST_FUNCTION(n_ll_factor_ecm),
+    TEST_FUNCTION(n_ll_factor_rho),
     TEST_FUNCTION(n_ll_mod_preinv),
     TEST_FUNCTION(n_ll_small_powmod),
     TEST_FUNCTION(n_mod2_precomp),

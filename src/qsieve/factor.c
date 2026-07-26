@@ -38,6 +38,77 @@
 # include <windows.h>
 #endif
 
+/*
+   Refine n by the factors found so far, so that every entry of the result is a
+   product of prime powers of n and their product is n.  Each factor is taken
+   against *every* entry, not just the last: a factor splitting an earlier
+   entry would otherwise be dropped and n would come back incompletely
+   factored.  Exponents are multiplied through a split so repeated factors stay
+   correct.
+
+   Both the decision to stop taking square roots and the factor list finally
+   returned come from this one routine, so the two cannot disagree.
+*/
+static void
+qsieve_refine(fmpz_factor_t factors, const fmpz_t n, fmpz * facs, slong num_facs)
+{
+   fmpz_t temp, temp2;
+   slong i, k;
+
+   fmpz_init(temp);
+   fmpz_init(temp2);
+
+   _fmpz_factor_set_length(factors, 0);
+   _fmpz_factor_append(factors, n, 1);
+
+   for (i = 0; i < num_facs; i++)
+   {
+      for (k = 0; k < factors->num; k++)
+      {
+         fmpz_gcd(temp, factors->p + k, facs + i);
+
+         if (!fmpz_is_one(temp) && !fmpz_equal(temp, factors->p + k))
+         {
+            slong mult = factors->exp[k];
+            slong e = fmpz_remove(temp2, factors->p + k, temp);
+
+            fmpz_set(factors->p + k, temp);
+            factors->exp[k] = e * mult;
+
+            if (!fmpz_is_one(temp2))
+               _fmpz_factor_append(factors, temp2, mult);
+         }
+      }
+   }
+
+   fmpz_clear(temp);
+   fmpz_clear(temp2);
+}
+
+/* is every entry of the refinement prime? */
+static int
+qsieve_refine_is_complete(const fmpz_t n, fmpz * facs, slong num_facs)
+{
+   fmpz_factor_t trial;
+   slong k;
+   int complete = 1;
+
+   fmpz_factor_init(trial);
+   qsieve_refine(trial, n, facs, num_facs);
+
+   for (k = 0; k < trial->num; k++)
+   {
+      if (!fmpz_is_probabprime(trial->p + k))
+      {
+         complete = 0;
+         break;
+      }
+   }
+
+   fmpz_factor_clear(trial);
+   return complete;
+}
+
 static int compare_facs(const void * a, const void * b)
 {
    fmpz * x = (fmpz *) a;
@@ -376,7 +447,21 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
                             fmpz_gcd(X, X, qs_inf->n);
 
                             if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
+                            {
                                 fmpz_set(facs + num_facs++, X);
+
+                                /*
+                                   Every square root costs a pass over the
+                                   relations and a modular exponentiation per
+                                   factor base prime, so this loop is
+                                   expensive; it used to run over all 64
+                                   nullspace vectors even once n was completely
+                                   split.  Stop as soon as refining n by the
+                                   factors collected so far leaves only primes.
+                                */
+                                if (qsieve_refine_is_complete(qs_inf->n, facs, num_facs))
+                                   break;
+                            }
                         }
                     }
 
@@ -384,24 +469,7 @@ void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
 
                     if (num_facs > 0)
                     {
-                        _fmpz_factor_append(factors, qs_inf->n, 1);
-
-                        qsort((void *) facs, num_facs, sizeof(fmpz), compare_facs);
-
-                        for (i = 0; i < num_facs; i++)
-                        {
-                            fmpz_gcd(temp, factors->p + factors->num - 1, facs + i);
-                            if (!fmpz_is_one(temp))
-                            {
-                                factors->exp[factors->num - 1] = fmpz_remove(temp2, factors->p + factors->num - 1, temp);
-                                fmpz_set(factors->p + factors->num - 1, temp);
-
-                                if (fmpz_is_one(temp2))
-                                   break;
-                                else
-                                   _fmpz_factor_append(factors, temp2, 1);
-                             }
-                        }
+                        qsieve_refine(factors, qs_inf->n, facs, num_facs);
 
                         _fmpz_vec_clear(facs, 100);
 

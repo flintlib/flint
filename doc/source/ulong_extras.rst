@@ -1578,6 +1578,44 @@ Factorisation
     is successful. In such a case, 1 is returned. Otherwise, 0 is returned. Factor
     discovered is not necessarily prime.
 
+.. function:: int n_ll_factor_rho(nn_ptr factor, ulong nhi, ulong nlo, ulong max_tries, ulong max_iters)
+
+    Pollard rho with Brent's cycle detection for a double-limb integer `n`
+    represented by low part ``nlo`` and high part ``nhi``. The high part must be
+    nonzero and `n` must be odd; 0 is returned otherwise.
+
+    If a nontrivial factor of `n` is found it is written to ``factor`` as two
+    limbs and 1 is returned, otherwise 0 is returned. The factor found is not
+    necessarily prime.
+
+    ``max_iters`` bounds Brent's outer doubling parameter, so about
+    `2 \cdot \mathrm{max\_iters}` iterations of the map are performed per
+    attempt, placing factors up to roughly
+    `(2 \cdot \mathrm{max\_iters})^2` within reach. If an attempt fails,
+    another is made with a different constant, up to ``max_tries`` times.
+
+    The inner loop uses Montgomery arithmetic on two limbs, which is several
+    times faster than :func:`fmpz_factor_pollard_brent` for `n` of this size.
+
+.. function:: int n_ll_factor_ecm(nn_ptr factor, ulong nhi, ulong nlo, ulong curves, ulong B1, ulong B2, flint_rand_t state)
+
+    The elliptic curve method for a double-limb integer `n` represented by low
+    part ``nlo`` and high part ``nhi``. The high part must be nonzero and `n`
+    must be odd; 0 is returned otherwise.
+
+    Up to ``curves`` curves are tried, using Suyama's parametrisation with stage
+    one bound ``B1`` and stage two bound ``B2``. If ``B2`` is smaller than
+    ``B1`` it is replaced by `100 \cdot B1`.
+
+    If a nontrivial factor of `n` is found it is written to ``factor`` as two
+    limbs and 1 is returned, otherwise 0 is returned. The factor found is not
+    necessarily prime.
+
+    Curve selection is done with ``mpn`` arithmetic, whose cost is negligible
+    beside the two stages; both stages run in Montgomery arithmetic on two
+    limbs, which is roughly twice as fast as :func:`fmpz_factor_ecm` at equal
+    parameters for `n` of this size.
+
 
 Arithmetic functions
 --------------------------------------------------------------------------------

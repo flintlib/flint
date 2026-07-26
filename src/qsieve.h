@@ -33,6 +33,21 @@ extern "C" {
 
 #define BLOCK_SIZE (4*65536) /* size of sieving cache block */
 
+/*
+   The large prime hash table is chained, so it only has to be big enough to
+   keep the chains short.  The number of distinct large primes that enter it
+   grows with the factor base: roughly 11000 for a 128 bit input with 350
+   factor base primes, but a few million for the 140000 prime factor base of
+   the largest tuning row.
+
+   Sizing it from the factor base gives a load factor of well under one
+   throughout.  It used to be fixed at 2^20, whose 8MB of zeroed memory cost
+   more than an entire 96 bit factorisation; the cap keeps the old size for
+   the very largest inputs, where it is what is wanted anyway.
+*/
+#define QS_HASH_BITS_MIN 12
+#define QS_HASH_BITS_MAX 20
+
 typedef struct
 {
    ulong pinv;     /* precomputed inverse */
@@ -189,6 +204,8 @@ typedef struct
    slong table_size;      /* size of table */
    hash_t * table;        /* store 'prime' occurring in partial */
    ulong * hash_table;  /* to keep track of location of primes in 'table' */
+   slong hash_size;     /* number of buckets in hash_table, a power of two */
+   unsigned int hash_shift; /* 32 - log2(hash_size), for the hash function */
 
    slong extra_rels;      /* number of extra relations beyond num_primes */
    slong max_factors;     /* maximum number of factors a relation can have */
@@ -244,24 +261,24 @@ static const ulong qsieve_tune[][6] =
     {65,  26,    110, 19,   13000,  28},  /* 19 digits, 1.86 ms/semiprime */
     {70,  26,    180,  3,   12000,  43},  /* 21 digits, 2.26 ms/semiprime */
     {75,  26,    190,  4,   12000,  45},  /* 22 digits, 2.61 ms/semiprime */
-    {80,  27,    190,  5,   12000,  45},  /* 24 digits, 3.16 ms/semiprime */
+    {80,  27,    240,  5,   12000,  48},  /* 24 digits, 3.16 ms/semiprime */
     {85,  28,    150,  5,   10000,  45},  /* 25 digits, 2.34 ms/semiprime */
-    {90,  34,    150,  5,   10000,  45},  /* 27 digits, 2.68 ms/semiprime */
+    {90,  34,    200,  5,   10000,  48},  /* 27 digits, 2.68 ms/semiprime */
     {100, 40,    210,  6,   14000,  48},  /* 30 digits, 4.20 ms/semiprime */
-    {110, 46,    220,  7,   13000,  48},  /* 33 digits, 6.50 ms/semiprime */
-    {120, 50,    250,  7,   13000,  50},  /* 36 digits, 11.58 ms/semiprime */
+    {110, 46,    400,  7,   13000,  51},  /* 33 digits, 6.50 ms/semiprime */
+    {120, 50,    300,  7,   13000,  50},  /* 36 digits, 11.58 ms/semiprime */
     {130, 47,    310,  9,   16000,  50},  /* 39 digits, 19.37 ms/semiprime */
     {135, 39,    450, 10,   20000,  53},  /* 40 digits, 25.39 ms/semiprime */
     {140, 47,    580,  8,   17000,  56},  /* 41 digits, 33.47 ms/semiprime */
     {145, 47,    610,  9,   16000,  56},  /* 43 digits, 46.47 ms/semiprime */
     {150, 45,    610,  8,   17000,  59},  /* 45 digits, 59.05 ms/semiprime */
     {155, 43,    860, 10,   21000,  59},  /* 46 digits, 92.20 ms/semiprime */
-    /* Legacy tuning values that seem reasonable */
-    {160, 150,  2000, 11,   4 *  65536, 73}, /* 49 digit */
-    {170, 150,  2000, 12,   4 *  65536, 75}, /* 52 digits */
-    {180, 150,  3000, 12,   4 *  65536, 76}, /* 55 digits */
-    {190, 150,  3000, 13,   4 *  65536, 78}, /* 58 digit */
-    {200, 200,  4500, 14,   4 *  65536, 81}, /* 61 digits */
+    {160, 150,  2000, 11,   65536, 67}, /* 49 digit */
+    {170, 150,  2000, 12,   65536, 69}, /* 52 digits */
+    {180, 150,  3000, 12,   65536, 70}, /* 55 digits */
+    {190, 150,  3000, 13,   65536, 72}, /* 58 digit */
+    {200, 200,  4500, 14,   65536, 75}, /* 61 digits */
+    /* Legacy tuning values that may need improvement */
     {210, 100,  8000, 14,   12 *  65536, 84}, /* 64 digits */
     {220, 300, 10000, 15,   12 *  65536, 88}, /* 67 digits */
     {230, 400, 20000, 17,   20 *  65536, 90}, /* 70 digits */
