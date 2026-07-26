@@ -230,6 +230,9 @@ int _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_s
 int _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
+slong _mpn_mod_poly_mul_unreduced_slimbs(slong len, gr_ctx_t ctx);
+void _mpn_mod_poly_mul_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, gr_ctx_t ctx);
+void _mpn_mod_poly_sqr_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 
 int _mpn_mod_poly_inv_series(nn_ptr Q, nn_srcptr B, slong lenB, slong len, gr_ctx_t ctx);

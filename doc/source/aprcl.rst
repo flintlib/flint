@@ -39,6 +39,17 @@ Primality test functions
     To handle this condition, the :func:`_aprcl_is_prime_jacobi` function
     can be used.
 
+.. function:: int _aprcl_is_prime_jacobi_check_pk_mpn(slong * h, const unity_zp j, const fmpz_t u, ulong v)
+              int _aprcl_is_prime_jacobi_check_22_mpn(slong * h, const unity_zp j, const fmpz_t u, ulong v, ulong q)
+              int _aprcl_is_prime_jacobi_check_2k_mpn(slong * h, const unity_zp j, const unity_zp j2_1, const unity_zp j2_2, const fmpz_t u, ulong v)
+
+    Versions of the corresponding Jacobi sum condition checks performed
+    with :type:`unity_zp_mpn` arithmetic. They return 0 without computing
+    anything if the modulus of `j` is not supported by ``mpn_mod``
+    (fewer than 2 or more than 16 limbs), in which case the caller falls
+    back to the :type:`unity_zp` implementation; otherwise they return 1
+    and store the resulting root of unity exponent (or -1) in *h*.
+
 .. function:: int aprcl_is_prime_gauss(const fmpz_t n)
 
     If `n` is prime returns 1; otherwise returns 0.
@@ -129,6 +140,14 @@ Types
 
     Represents an element of `\mathbb{Z}[\zeta_{p^{exp}}]/(n)` as an
     :type:`fmpz_mod_poly_t` reduced modulo a cyclotomic polynomial.
+
+.. type:: _unity_zp_mpn
+
+.. type:: unity_zp_mpn
+
+    Represents an element of `\mathbb{Z}[\zeta_{p^{exp}}]/(n)` as a dense
+    vector of `\varphi(p^{exp})` fixed-size ``mpn_mod`` residues, always
+    kept reduced by the cyclotomic polynomial `\Phi_{p^{exp}}`.
 
 .. type:: _unity_zpq
 
@@ -301,6 +320,82 @@ Automorphism and inverse
     Sets `f = \sigma_x^{-1}(g)`, so `\sigma_x(f) = g`.
     `g` must be reduced by `\Phi_{p^{exp}}`.
     `f` and `g` must be initialized with the same `p`, `exp` and `n`.
+
+Cyclotomic arithmetic with fixed-size coefficients
+................................................................................
+
+The :type:`unity_zp_mpn` type is a dense analogue of :type:`unity_zp` with
+coefficients in an ``mpn_mod`` ring, used by :func:`aprcl_is_prime_jacobi`
+for moduli of 2 to 16 limbs. Elements are vectors of
+`d = \varphi(p^{exp})` fixed-size residues, kept reduced by the cyclotomic
+polynomial `\Phi_{p^{exp}}` at all times, and products are computed with
+delayed reduction (a single modular reduction per output coefficient) on
+top of :func:`_mpn_mod_poly_mul_unreduced` and
+:func:`_mpn_mod_poly_sqr_unreduced`.
+
+.. function:: void unity_zp_mpn_init(unity_zp_mpn f, ulong p, ulong exp, gr_ctx_t ctx)
+
+    Initializes `f` as the zero element of
+    `\mathbb{Z}[\zeta_{p^{exp}}]/(n)`, where *ctx* is an ``mpn_mod``
+    context with modulus `n`. The context is borrowed and must outlive `f`.
+
+.. function:: void unity_zp_mpn_clear(unity_zp_mpn f)
+
+    Clears the given element.
+
+.. function:: void unity_zp_mpn_set_zero(unity_zp_mpn f)
+
+    Sets `f` to zero.
+
+.. function:: void unity_zp_mpn_swap(unity_zp_mpn f, unity_zp_mpn g)
+
+    Swaps `f` and `g` efficiently. Both must be initialized with the same
+    `p`, `exp` and context.
+
+.. function:: void unity_zp_mpn_copy(unity_zp_mpn f, const unity_zp_mpn g)
+
+    Sets `f` to `g`. Both must be initialized with the same `p`, `exp`
+    and context.
+
+.. function:: void unity_zp_mpn_coeff_set_ui(unity_zp_mpn f, ulong ind, ulong x)
+
+    Sets the coefficient of `\zeta_{p^{exp}}^{ind}` to `x`.
+    *ind* may be any exponent below `p^{exp}`; exponents at or above
+    `\varphi(p^{exp})` are folded using the cyclotomic relation.
+
+.. function:: void unity_zp_mpn_set_unity_zp(unity_zp_mpn f, const unity_zp g)
+
+    Sets `f` to the value of the :type:`unity_zp` element `g`, which must
+    be defined modulo the same `n` with the same `p` and `exp`.
+
+.. function:: void unity_zp_mpn_mul(unity_zp_mpn f, const unity_zp_mpn g, const unity_zp_mpn h)
+
+    Sets `f` to `g \cdot h`. Aliasing of `f` with `g` or `h` is allowed.
+
+.. function:: void unity_zp_mpn_sqr(unity_zp_mpn f, const unity_zp_mpn g)
+
+    Sets `f` to `g \cdot g`. Aliasing of `f` with `g` is allowed.
+
+.. function:: void unity_zp_mpn_mul_scalar_ui(unity_zp_mpn f, const unity_zp_mpn g, ulong s)
+
+    Sets `f` to `s \cdot g`.
+
+.. function:: void unity_zp_mpn_pow_ui(unity_zp_mpn f, const unity_zp_mpn g, ulong pow)
+              void unity_zp_mpn_pow_sliding_fmpz(unity_zp_mpn f, const unity_zp_mpn g, const fmpz_t pow)
+
+    Sets `f` to `g^{pow}`, in the second form using sliding window
+    exponentiation. Aliasing of `f` with `g` is allowed.
+
+.. function:: void unity_zp_mpn_aut_inv(unity_zp_mpn f, const unity_zp_mpn g, ulong x)
+
+    Sets `f = \sigma_x^{-1}(g)` for the automorphism
+    `\sigma_x(\zeta) = \zeta^x`; see :func:`unity_zp_aut_inv`.
+    `f` and `g` must not be aliased.
+
+.. function:: slong unity_zp_mpn_is_unity(const unity_zp_mpn f)
+
+    If `f = \zeta_{p^{exp}}^h` for some `h` returns this `h`; otherwise
+    returns -1.
 
 Jacobi sum
 ................................................................................
