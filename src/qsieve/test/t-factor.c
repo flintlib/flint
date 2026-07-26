@@ -177,6 +177,44 @@ TEST_FUNCTION_START(qsieve_factor, state)
       fmpz_factor_clear(factors);
    }
 
+   /*
+      Regression: n must be split completely when the collected factors allow
+      it.  The refinement of n by those factors has to be applied to every
+      entry of the output rather than only the last, or a factor splitting an
+      earlier entry is dropped.  These three products of three 40-bit primes
+      each came back as two factors while that was wrong.
+   */
+   {
+      const char * strs[3] = {
+         "510351044738189044795649562843011021",
+         "364780511359625600767798259905079621",
+         "938825737845414913824362581154338591"
+      };
+      slong c;
+
+      for (c = 0; c < 3; c++)
+      {
+         fmpz_set_str(n, strs[c], 10);
+
+         fmpz_factor_init(factors);
+
+         flint_set_num_threads(1);
+
+         qsieve_factor(factors, n);
+
+         if (factors->num < 3)
+         {
+            flint_printf("FAIL:\n");
+            flint_printf("Regression, three factors expected\nc = %wd\n", c);
+            flint_printf("%wd factors found\n", factors->num);
+            fflush(stdout);
+            flint_abort();
+         }
+
+         fmpz_factor_clear(factors);
+      }
+   }
+
    /* Test random n, three factors */
    for (i = 0; i < tmul*flint_test_multiplier(); i++)
    {

@@ -108,20 +108,43 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 
                     if (found)
                     {
-                        fmpz_t t, f;
+                        fmpz_t t, f, g;
                         ulong expf;
 
                         fmpz_init(t);
                         fmpz_init(f);
+                        fmpz_init(g);
                         fmpz_set_uiui(f, rfac[1], rfac[0]);
                         expf = fmpz_remove(t, n2, f);
                         FLINT_ASSERT(expf >= 1);
-                        _fmpz_factor_append(fac, f, expf);
-                        if (!fmpz_is_one(t))
-                            _fmpz_factor_append(fac, t, 1);
+
+                        /*
+                           The parts handed to the recursion below have to be
+                           pairwise coprime, since _fmpz_factor_concat appends
+                           without merging equal primes.  A composite factor
+                           can share a prime with its cofactor even after
+                           fmpz_remove has taken out every power of it, for
+                           instance f = 21 and t = 35 for n2 = 735.  Give up on
+                           the split in that case and let the sieve handle n2.
+                        */
+                        fmpz_gcd(g, f, t);
+
+                        if (fmpz_is_one(g))
+                        {
+                            _fmpz_factor_append(fac, f, expf);
+                            if (!fmpz_is_one(t))
+                                _fmpz_factor_append(fac, t, 1);
+                            found = 1;
+                        }
+                        else
+                            found = 0;
+
+                        fmpz_clear(g);
                         fmpz_clear(t);
                         fmpz_clear(f);
-                        goto factored;
+
+                        if (found)
+                            goto factored;
                     }
                 }
 
@@ -147,14 +170,26 @@ fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
                     }
                     else
                     {
-                        fmpz_t t, f;
+                        fmpz_t t, f, g;
                         ulong expf;
                         fmpz_init(t);
+                        fmpz_init(g);
                         fmpz_init_set_ui(f, f1);
                         expf = fmpz_remove(t, n2, f);
                         FLINT_ASSERT(expf >= 1);
-                        _fmpz_factor_append(fac, f, expf);
-                        _fmpz_factor_append(fac, t, 1);
+
+                        /* the two parts must be coprime; see the note above */
+                        fmpz_gcd(g, f, t);
+
+                        if (fmpz_is_one(g))
+                        {
+                            _fmpz_factor_append(fac, f, expf);
+                            _fmpz_factor_append(fac, t, 1);
+                        }
+                        else
+                            qsieve_factor(fac, n2);
+
+                        fmpz_clear(g);
                         fmpz_clear(t);
                         fmpz_clear(f);
                     }
