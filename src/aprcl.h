@@ -15,6 +15,7 @@
 #include "limb_types.h"
 #include "fmpz_types.h"
 #include "fmpz_mod_types.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,6 +56,26 @@ typedef struct
 } _unity_zp;
 
 typedef _unity_zp unity_zp[1];
+
+/*
+    Z[unity_root]/(n) with mpn_mod arithmetic, for moduli in range for the
+    mpn_mod module. Elements are dense coefficient vectors of length
+    d = (p - 1) * p^(exp - 1), always reduced modulo the cyclotomic
+    polynomial Phi_{p^exp}, with each coefficient a reduced mpn_mod
+    residue. The context pointer is borrowed, not owned.
+*/
+typedef struct
+{
+    nn_ptr coeffs;
+    ulong p;
+    ulong exp;
+    ulong pk;               /* p^exp */
+    ulong pk1;              /* p^(exp - 1) */
+    ulong d;                /* (p - 1) * p^(exp - 1) */
+    gr_ctx_struct * ctx;    /* mpn_mod context (borrowed) */
+} _unity_zp_mpn;
+
+typedef _unity_zp_mpn unity_zp_mpn[1];
 
 /* Primality test status */
 typedef enum
@@ -109,6 +130,35 @@ slong _aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v,
 slong _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1, const unity_zp j2_2, const fmpz_t u, ulong v);
 
 int _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
+
+/* mpn_mod based versions of the Jacobi sum checks; return 1 and set *h if
+   the modulus is in range for mpn_mod, otherwise return 0 */
+int _aprcl_is_prime_jacobi_check_pk_mpn(slong * h, const unity_zp j, const fmpz_t u, ulong v);
+int _aprcl_is_prime_jacobi_check_22_mpn(slong * h, const unity_zp j, const fmpz_t u, ulong v, ulong q);
+int _aprcl_is_prime_jacobi_check_2k_mpn(slong * h, const unity_zp j, const unity_zp j2_1, const unity_zp j2_2, const fmpz_t u, ulong v);
+
+/* Z[unity_root]/(n) mpn_mod operations **************************************/
+
+void unity_zp_mpn_init(unity_zp_mpn f, ulong p, ulong exp, gr_ctx_t ctx);
+void unity_zp_mpn_clear(unity_zp_mpn f);
+
+void unity_zp_mpn_set_zero(unity_zp_mpn f);
+void unity_zp_mpn_swap(unity_zp_mpn f, unity_zp_mpn g);
+void unity_zp_mpn_copy(unity_zp_mpn f, const unity_zp_mpn g);
+
+void unity_zp_mpn_coeff_set_ui(unity_zp_mpn f, ulong ind, ulong x);
+void unity_zp_mpn_set_unity_zp(unity_zp_mpn f, const unity_zp g);
+
+void unity_zp_mpn_mul(unity_zp_mpn f, const unity_zp_mpn g, const unity_zp_mpn h);
+void unity_zp_mpn_sqr(unity_zp_mpn f, const unity_zp_mpn g);
+void unity_zp_mpn_mul_scalar_ui(unity_zp_mpn f, const unity_zp_mpn g, ulong s);
+
+void unity_zp_mpn_pow_ui(unity_zp_mpn f, const unity_zp_mpn g, ulong pow);
+void unity_zp_mpn_pow_sliding_fmpz(unity_zp_mpn f, const unity_zp_mpn g, const fmpz_t pow);
+
+void unity_zp_mpn_aut_inv(unity_zp_mpn f, const unity_zp_mpn g, ulong x);
+
+slong unity_zp_mpn_is_unity(const unity_zp_mpn f);
 
 /* Final division function */
 int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);

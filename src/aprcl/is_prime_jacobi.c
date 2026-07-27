@@ -92,6 +92,10 @@ _aprcl_is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v)
     ulong i, r;
     unity_zp j0, jv, temp, aut;
 
+    /* use mpn_mod arithmetic whenever the modulus is in range */
+    if (_aprcl_is_prime_jacobi_check_pk_mpn(&h, j, u, v))
+        return h;
+
     /* initialization */
     r = n_pow(j->p, j->exp);            /* r = p^k */
     unity_zp_init(j0, j->p, j->exp, fmpz_mod_ctx_modulus(j->ctx));
@@ -220,6 +224,10 @@ _aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong
     slong h;
     unity_zp j0, jv, j_pow;
 
+    /* use mpn_mod arithmetic whenever the modulus is in range */
+    if (_aprcl_is_prime_jacobi_check_22_mpn(&h, j, u, v, q))
+        return h;
+
     /* initialization */
     unity_zp_init(j_pow, 2, 2, fmpz_mod_ctx_modulus(j->ctx));
     unity_zp_init(j0, 2, 2, fmpz_mod_ctx_modulus(j->ctx));
@@ -280,6 +288,10 @@ _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1,
     slong h;
     ulong i, r;
     unity_zp j_j0, j0, jv, temp, aut;
+
+    /* use mpn_mod arithmetic whenever the modulus is in range */
+    if (_aprcl_is_prime_jacobi_check_2k_mpn(&h, j, j2_1, j2_2, u, v))
+        return h;
 
     /* initialization */
     r = n_pow(j->p, j->exp);
