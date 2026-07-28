@@ -29,13 +29,21 @@ _set_signed(fmpz_t f, nn_srcptr a, slong n, int s)
         fmpz_neg(f, f);
 }
 
-/* the high variants return limbs [n, 2n] of the exact result, with at
-   most four units of error in the lowest returned limb (each high
-   product is exact or one unit low, and the discarded low halves can
-   carry); returns 0 on success, 1 if the magnitude is off, 2 if the
-   sign is wrong */
+/* Error bound of the high variants, measured against the exact value:
+   one flint_mpn_mulhigh_n read as n limbs errs by (-1 - eps, +eps) ulp
+   of its lowest limb, eps = (n + 4)/2^64 -- the floor drop of its
+   returned limb is one-sided in [0, 1) and the documented n + 2 ulp of
+   that limb contributes eps either way. Composing: two products per
+   output classically gives |error| < 2 + 2 eps; the Karatsuba mulhigh
+   combination c3 - (c1 + c2) gives < 2 + 3 eps; the transformed path
+   errs within (-1.5, +0.5). Since the outputs are integers they differ
+   from the floor of the exact value by at most 3 in the lowest returned
+   limb, which is what is asserted here (observed worst case: 2).
+   Returns 0 on success, 1 if the magnitude is off by more than tol,
+   2 if the sign is wrong. */
 static int
-_check_high(const fmpz_t ref, nn_srcptr z, slong n, int sgn, slong nn)
+_check_high(const fmpz_t ref, nn_srcptr z, slong n, int sgn, slong nn,
+            slong tol)
 {
     fmpz_t want, got, diff;
     int res = 0;
@@ -50,7 +58,7 @@ _check_high(const fmpz_t ref, nn_srcptr z, slong n, int sgn, slong nn)
     fmpz_sub(diff, got, want);
     fmpz_abs(diff, diff);
 
-    if (fmpz_cmp_ui(diff, 4) > 0)
+    if (fmpz_cmp_ui(diff, tol) > 0)
         res = 1;
     else if (!fmpz_is_zero(want) && !fmpz_is_zero(got) &&
                 sgn != (fmpz_sgn(ref) < 0))
@@ -213,9 +221,9 @@ TEST_FUNCTION_START(flint_mpn_mul_complex, state)
 
         flint_mpn_mulhigh_n_complex(hr, &shr, hi, &shi, ar, sar, ai, sai,
                                     br, sbr, bi, sbi, n);
-        if (_check_high(refr, hr, n + 1, shr, n))
+        if (_check_high(refr, hr, n + 1, shr, n, 3))
             TEST_FUNCTION_FAIL("mulhigh: real part wrong (n = %wd)\n", n);
-        if (_check_high(refi, hi, n + 1, shi, n))
+        if (_check_high(refi, hi, n + 1, shi, n, 3))
             TEST_FUNCTION_FAIL("mulhigh: imaginary part wrong (n = %wd)\n", n);
 
         /* (ar + i ai)^2, per-part lengths */
@@ -258,9 +266,9 @@ TEST_FUNCTION_START(flint_mpn_mul_complex, state)
         fmpz_mul_2exp(refi, refi, 1);
 
         flint_mpn_sqrhigh_n_complex(hr, &shr, hi, &shi, ar, sar, ai, sai, n);
-        if (_check_high(refr, hr, n + 1, shr, n))
+        if (_check_high(refr, hr, n + 1, shr, n, 3))
             TEST_FUNCTION_FAIL("sqrhigh: real part wrong (n = %wd)\n", n);
-        if (_check_high(refi, hi, n + 1, shi, n))
+        if (_check_high(refi, hi, n + 1, shi, n, 3))
             TEST_FUNCTION_FAIL("sqrhigh: imaginary part wrong (n = %wd)\n", n);
 
         flint_free(ar);

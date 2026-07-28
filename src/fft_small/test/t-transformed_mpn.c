@@ -459,5 +459,102 @@ cleanup:
 
     flint_set_num_threads(1);
 
+    /* the truncated get is documented to differ from the floor-truncated
+       value by at most 1 in the lowest returned limb; drive it with
+       carry-adversarial operands (all-ones, near-cancellation) as well
+       as random ones */
+    {
+        slong iter2;
+
+        for (iter2 = 0; iter2 < 60 * flint_test_multiplier(); iter2++)
+        {
+            slong n = 32 + n_randint(state, 300);
+            gr_ctx_t tctx;
+            gr_ptr E;
+            nn_ptr a, b, c, d, z;
+            fmpz_t fa, fb, fc, fd, X, Q, G;
+            slong lo, zn, zl, j, e;
+            int sg, sb, adv = iter2 % 3;
+
+            if (gr_ctx_init_transformed_mpn(tctx, 128 * n + 8, 2, 1)
+                    != GR_SUCCESS)
+                continue;
+
+            E = flint_malloc(5 * tctx->sizeof_elem);
+#define E2_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
+            for (j = 0; j < 5; j++)
+                gr_init(E2_(j), tctx);
+
+            a = flint_malloc(n * sizeof(ulong));
+            b = flint_malloc(n * sizeof(ulong));
+            c = flint_malloc(n * sizeof(ulong));
+            d = flint_malloc(n * sizeof(ulong));
+            for (j = 0; j < n; j++)
+            {
+                a[j] = n_randlimb(state);
+                b[j] = n_randlimb(state);
+                c[j] = n_randlimb(state);
+                d[j] = n_randlimb(state);
+            }
+            if (adv == 1)
+                for (j = 0; j < n; j++)
+                    a[j] = c[j] = ~UWORD(0);
+            if (adv == 2)
+            {
+                flint_mpn_copyi(b, a, n);
+                flint_mpn_copyi(d, c, n);
+                d[0] ^= 1;
+            }
+
+            GR_MUST_SUCCEED(gr_transformed_mpn_set(E2_(0), a, n, 0, tctx));
+            sb = (int) n_randint(state, 2);
+            GR_MUST_SUCCEED(gr_transformed_mpn_set(E2_(1), b, n, sb, tctx));
+            GR_MUST_SUCCEED(gr_transformed_mpn_set(E2_(2), c, n, 0, tctx));
+            GR_MUST_SUCCEED(gr_transformed_mpn_set(E2_(3), d, n, 1, tctx));
+            GR_MUST_SUCCEED(gr_mul(E2_(4), E2_(0), E2_(2), tctx));
+            GR_MUST_SUCCEED(gr_addmul(E2_(4), E2_(1), E2_(3), tctx));
+
+            lo = n / 2 + n_randint(state, n);
+            zn = gr_transformed_mpn_get_limbs_trunc(tctx, E2_(4), lo);
+            z = flint_malloc(FLINT_MAX(zn, 1) * sizeof(ulong));
+            GR_MUST_SUCCEED(gr_transformed_mpn_get_trunc(z, zn, &zl, &sg,
+                    lo, E2_(4), tctx));
+
+            fmpz_init(fa); fmpz_init(fb); fmpz_init(fc); fmpz_init(fd);
+            fmpz_init(X); fmpz_init(Q); fmpz_init(G);
+            fmpz_set_ui_array(fa, a, n);
+            fmpz_set_ui_array(fb, b, n);
+            if (sb)
+                fmpz_neg(fb, fb);
+            fmpz_set_ui_array(fc, c, n);
+            fmpz_set_ui_array(fd, d, n);
+            fmpz_mul(X, fa, fc);
+            fmpz_submul(X, fb, fd);
+            fmpz_fdiv_q_2exp(Q, X, FLINT_BITS * lo);
+
+            if (zl == 0)
+                fmpz_zero(G);
+            else
+                fmpz_set_ui_array(G, z, FLINT_ABS(zl));
+            if (sg)
+                fmpz_neg(G, G);
+            fmpz_sub(G, G, Q);
+            e = fmpz_get_si(G);
+            if (FLINT_ABS(e) > 1)
+                TEST_FUNCTION_FAIL("get_trunc: error %wd exceeds the "
+                        "documented 1 ulp (n = %wd, lo = %wd, adv = %d)\n",
+                        e, n, lo, adv);
+
+            flint_free(a); flint_free(b); flint_free(c); flint_free(d);
+            flint_free(z);
+            fmpz_clear(fa); fmpz_clear(fb); fmpz_clear(fc); fmpz_clear(fd);
+            fmpz_clear(X); fmpz_clear(Q); fmpz_clear(G);
+            for (j = 0; j < 5; j++)
+                gr_clear(E2_(j), tctx);
+            flint_free(E);
+            gr_ctx_clear(tctx);
+        }
+    }
+
     TEST_FUNCTION_END(state);
 }

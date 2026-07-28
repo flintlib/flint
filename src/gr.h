@@ -1466,8 +1466,14 @@ void _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fmod_ctx);
    sign bit; mixed-sign accumulations switch the pointwise additions and
    subtractions, and the sign of a mixed result is resolved at conversion
    out. Conversions in and out are by limb arrays with an explicit sign;
-   gr_transformed_mpn_get_trunc returns the limbs above a given position,
-   with at most one unit of error in the lowest returned limb. */
+   gr_transformed_mpn_get_trunc returns the limbs of the value starting
+   at a given position, with an error against the exact value within
+   (-1.5, +0.5) ulp of the lowest returned limb -- equivalently, at most
+   1 from the floor-truncated value: the export includes every CRT slot
+   whose coefficient span can reach the first returned limb and
+   propagates their carries, so the error is the truncation itself
+   (one-sided, below 1) plus the wholly dropped slots' total mass
+   (under half an ulp either way). */
 int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
                     slong terms_bound, int is_signed);
 int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,

@@ -609,8 +609,14 @@ between output and input arrays.
 
     High products: all parts share the length `n`, and each output
     receives exactly `n + 1` limbs, zero padded, plus a sign -- the limbs
-    `[n, 2n]` of the exact result, with an error of at most a few units
-    in the lowest returned limb.
+    `[n, 2n]` of the exact result. Relative to the exact value the error
+    is below `2 + 3(n + 4)/2^{64}` ulp of the lowest returned limb for
+    the product and below `2 + 2(n + 4)/2^{64}` for the square -- each
+    underlying :func:`flint_mpn_mulhigh_n`, read as `n` limbs, errs by
+    `(-1 - \varepsilon, +\varepsilon)` ulp against the exact value with
+    `\varepsilon = (n + 4)/2^{64}`, and each output combines at most
+    three -- so below 3 ulp for any practical `n`. The transformed path
+    stays within `(-1.5, +0.5)` ulp.
 
 .. var:: slong flint_mpn_mul_complex_fft_cutoff
          slong flint_mpn_sqr_complex_fft_cutoff

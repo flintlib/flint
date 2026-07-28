@@ -1554,3 +1554,16 @@ Modified LLL
     See "Faster Algorithms for Integer Lattice Basis Reduction." Technical
     Report 249. Zurich, Switzerland: Department Informatik, ETH. July 30,
     1996.
+
+
+.. function:: int fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+              int fmpz_mat_mul_fft_small_trunc(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, slong lo)
+
+    Matrix multiplication with the entries in transformed (fft_small)
+    representation: each entry of the product is an accumulation of
+    pointwise products, converted out once. The *trunc* variant stores
+    in each entry of *C* the limbs of the exact entry starting at limb
+    *lo* (with its sign), with an error against the exact value within
+    `(-1.5, +0.5)` ulp of the lowest returned limb -- equivalently, at
+    most 1 from the floor-truncated value. Returns 0 without touching *C*
+    when the method is unavailable or unprofitable for the given shapes.

@@ -1114,8 +1114,12 @@ FLINT_DLL extern slong flint_mpn_sqr_complex_fft_cutoff;
 
    The high variants take a single length n for all four parts and
    receive exactly n + 1 limbs, zero padded, with a sign: they are the
-   limbs [n, 2n] of the exact result, with at most a few units of error
-   in the lowest returned limb. */
+   limbs [n, 2n] of the exact result. Relative to the exact value the
+   error is below 2 + 3 (n + 4)/2^64 ulp of the lowest returned limb
+   (below 2 + 2 (n + 4)/2^64 for the square) -- each underlying high
+   product errs by (-1 - eps, +eps) ulp against the exact value, and
+   each output combines at most three -- so below 3 ulp for any
+   practical n; the transformed path stays within (-1.5, +0.5). */
 void flint_mpn_mul_complex(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     nn_srcptr ar, mp_size_t arn, int ar_sgn,
     nn_srcptr ai, mp_size_t ain, int ai_sgn,

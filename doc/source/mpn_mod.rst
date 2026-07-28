@@ -329,3 +329,10 @@ GCD
 
     Polynomial extended GCD with automatic selection between basecase
     and HGCD algorithms.
+
+
+.. function:: int _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Truncated polynomial product over ``mpn_mod`` contexts via the
+    transformed representation. Returns ``GR_UNABLE`` when the modulus
+    or lengths are unsuitable.
