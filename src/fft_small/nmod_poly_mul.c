@@ -962,7 +962,7 @@ static void _nmod_poly_mul_mod_xpnm1_naive(
     const ulong* b, ulong bn,
     ulong lgN,
     nmod_t mod,
-    mpn_ctx_t FLINT_UNUSED(R))
+    mpn_ctx_t R)
 {
     ulong N = n_pow2(lgN);
     FLINT_ASSERT(zn <= N);
@@ -1067,7 +1067,7 @@ int _nmod_poly_mul_mid_precomp(
     const ulong* a, ulong an,
     mul_precomp_struct* M,
     nmod_t mod,
-    mpn_ctx_t R)
+    mpn_ctx_t FLINT_UNUSED(R))
 {
     ulong bn = M->bn;
     ulong zn = an + bn - 1;
@@ -1128,7 +1128,7 @@ static void _nmod_poly_mul_mod_xpnm1_precomp(
     const ulong* a, ulong an,
     mul_precomp_struct* M,
     nmod_t mod,
-    mpn_ctx_t R)
+    mpn_ctx_t FLINT_UNUSED(R))
 {
     fft_small_conv_arg_struct A;
 

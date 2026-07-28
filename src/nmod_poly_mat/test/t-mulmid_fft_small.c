@@ -118,11 +118,11 @@ TEST_FUNCTION_START(nmod_poly_mat_mulmid_fft_small, state)
         nmod_poly_mat_clear(D);
         nmod_poly_clear(t);
     }
-#endif
-
-    /* the mixed sizes and moduli must exercise the engaged path */
+    /* the mixed sizes and moduli must exercise the engaged path; without
+       fft_small the driver never runs and there is nothing to require */
     if (n_engaged == 0)
         TEST_FUNCTION_FAIL("driver never engaged (%wd refusals)\n", n_refused);
+#endif
 
     TEST_FUNCTION_END(state);
 }

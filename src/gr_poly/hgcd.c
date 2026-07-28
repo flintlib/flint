@@ -296,7 +296,7 @@ static void _hgcd_mm_phase2(void * varg)
 static int
 _gr_poly_hgcd_mat_mul_transformed(gr_ptr * C, slong * lenC,
         gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB,
-        gr_ptr T0, gr_ptr T1, gr_ctx_t ctx)
+        gr_ptr FLINT_UNUSED(T0), gr_ptr FLINT_UNUSED(T1), gr_ctx_t ctx)
 {
 #if FLINT_HAVE_FFT_SMALL
     slong i;
