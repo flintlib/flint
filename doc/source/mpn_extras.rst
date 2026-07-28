@@ -568,3 +568,52 @@ Random Number Generation
     it on ``rp``. The number it generates will tend to have
     long strings of zeros and ones in the binary representation.
 
+
+
+Complex multiplication
+--------------------------------------------------------------------------------
+
+Multiplication of Gaussian integers represented as pairs of limb arrays
+with separate sign bits (0 meaning nonnegative). No aliasing is permitted
+between output and input arrays.
+
+.. function:: void flint_mpn_mul_complex(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_sqr_complex(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+
+    Sets `zr + zi i = (ar + ai i)(br + bi i)` (respectively the square of
+    `ar + ai i`). Each part takes an independent length, at least 1 limb
+    and not necessarily normalized. A *signed length* is written for each
+    output: the magnitude occupies ``|*zr_len|`` limbs and a negative
+    value means the result is negative; nothing above ``|*zr_len|`` limbs
+    is written. The outputs must have room for
+    ``max(arn, ain) + max(brn, bin) + 1`` limbs (``2 max(arn, ain) + 1``
+    for the square). The algorithm is selected from the shape: schoolbook
+    when a part is much shorter than its partner, Karatsuba when the
+    parts are internally balanced, and a transformed (fft_small) method
+    for large balanced operands.
+
+.. function:: void flint_mpn_mul_complex_classical(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_mul_complex_karatsuba(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              int flint_mpn_mul_complex_fft_small(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn, nn_srcptr br, mp_size_t brn, int br_sgn, nn_srcptr bi, mp_size_t bin, int bi_sgn)
+              void flint_mpn_sqr_complex_classical(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+              void flint_mpn_sqr_complex_karatsuba(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+              int flint_mpn_sqr_complex_fft_small(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len, nn_srcptr ar, mp_size_t arn, int ar_sgn, nn_srcptr ai, mp_size_t ain, int ai_sgn)
+
+    The individual algorithms behind the general functions, exposed for
+    comparison and tuning. All accept any shape. The *fft_small* variants
+    return 0, leaving the outputs untouched, when the method is
+    unavailable or refuses the operands.
+
+.. function:: void flint_mpn_mulhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn, nn_srcptr ar, int ar_sgn, nn_srcptr ai, int ai_sgn, nn_srcptr br, int br_sgn, nn_srcptr bi, int bi_sgn, mp_size_t n)
+              void flint_mpn_sqrhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn, nn_srcptr ar, int ar_sgn, nn_srcptr ai, int ai_sgn, mp_size_t n)
+
+    High products: all parts share the length `n`, and each output
+    receives exactly `n + 1` limbs, zero padded, plus a sign -- the limbs
+    `[n, 2n]` of the exact result, with an error of at most a few units
+    in the lowest returned limb.
+
+.. var:: slong flint_mpn_mul_complex_fft_cutoff
+         slong flint_mpn_sqr_complex_fft_cutoff
+
+    Sizes in limbs from which the general functions use the transformed
+    path. Machine dependent; writable for tuning.

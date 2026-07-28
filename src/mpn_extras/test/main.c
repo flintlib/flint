@@ -23,6 +23,7 @@
 #include "t-mod_preinvn.c"
 #include "t-mul.c"
 #include "t-mul_n.c"
+#include "t-mul_complex.c"
 #include "t-mul_toom22.c"
 #include "t-mullow_n.c"
 #include "t-mulhigh_n.c"
@@ -58,6 +59,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mod_preinvn),
     TEST_FUNCTION(flint_mpn_mul),
     TEST_FUNCTION(flint_mpn_mul_n),
+    TEST_FUNCTION(flint_mpn_mul_complex),
     TEST_FUNCTION(flint_mpn_mul_toom22),
     TEST_FUNCTION(flint_mpn_mullow_n),
     TEST_FUNCTION(flint_mpn_mulhigh_n_tab),
