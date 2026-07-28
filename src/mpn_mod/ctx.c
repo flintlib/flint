@@ -130,7 +130,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _mpn_mod_poly_mullow},
     {GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
-                                (gr_funcptr) _gr_mpn_mod_ctx_init_transformed_poly_repr},
+                                (gr_funcptr) (void (*)(void)) _gr_mpn_mod_ctx_init_transformed_poly_repr},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _mpn_mod_poly_mulmid},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _mpn_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _mpn_mod_poly_div_series},

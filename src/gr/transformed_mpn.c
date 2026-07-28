@@ -156,19 +156,19 @@ gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
 }
 
 static void
-tmpn_clear(gr_ptr x, gr_ctx_t ctx)
+tmpn_clear(gr_ptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     fft_small_op_clear(&TMPN(x)->op);
 }
 
 static void
-tmpn_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx)
+tmpn_swap(gr_ptr x, gr_ptr y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(tmpn_struct, *TMPN(x), *TMPN(y));
 }
 
 static int
-tmpn_zero(gr_ptr x, gr_ctx_t ctx)
+tmpn_zero(gr_ptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     TMPN(x)->nchunks = 0;
     TMPN(x)->terms = 0;
@@ -200,13 +200,13 @@ tmpn_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 static truth_t
-tmpn_is_zero(gr_srcptr x, gr_ctx_t ctx)
+tmpn_is_zero(gr_srcptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (TMPN(x)->nchunks == 0) ? T_TRUE : T_UNKNOWN;
 }
 
 static truth_t
-tmpn_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+tmpn_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (TMPN(x)->nchunks == 0 && TMPN(y)->nchunks == 0)
         return T_TRUE;
@@ -661,22 +661,22 @@ static int __tmpn_methods_initialized = 0;
 
 static gr_method_tab_input __tmpn_methods_input[] =
 {
-    {GR_METHOD_CTX_WRITE,       (gr_funcptr) tmpn_ctx_write},
-    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) tmpn_ctx_clear},
-    {GR_METHOD_INIT,            (gr_funcptr) tmpn_init},
-    {GR_METHOD_CLEAR,           (gr_funcptr) tmpn_clear},
-    {GR_METHOD_SWAP,            (gr_funcptr) tmpn_swap},
-    {GR_METHOD_SET,             (gr_funcptr) tmpn_set},
-    {GR_METHOD_ZERO,            (gr_funcptr) tmpn_zero},
-    {GR_METHOD_IS_ZERO,         (gr_funcptr) tmpn_is_zero},
-    {GR_METHOD_EQUAL,           (gr_funcptr) tmpn_equal},
-    {GR_METHOD_NEG,             (gr_funcptr) tmpn_neg},
-    {GR_METHOD_ADD,             (gr_funcptr) tmpn_add},
-    {GR_METHOD_SUB,             (gr_funcptr) tmpn_sub},
-    {GR_METHOD_MUL,             (gr_funcptr) tmpn_mul},
-    {GR_METHOD_ADDMUL,          (gr_funcptr) tmpn_addmul},
-    {GR_METHOD_SUBMUL,          (gr_funcptr) tmpn_submul},
-    {0,                         (gr_funcptr) NULL},
+    {GR_METHOD_CTX_WRITE,       (gr_funcptr) (void (*)(void)) tmpn_ctx_write},
+    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) (void (*)(void)) tmpn_ctx_clear},
+    {GR_METHOD_INIT,            (gr_funcptr) (void (*)(void)) tmpn_init},
+    {GR_METHOD_CLEAR,           (gr_funcptr) (void (*)(void)) tmpn_clear},
+    {GR_METHOD_SWAP,            (gr_funcptr) (void (*)(void)) tmpn_swap},
+    {GR_METHOD_SET,             (gr_funcptr) (void (*)(void)) tmpn_set},
+    {GR_METHOD_ZERO,            (gr_funcptr) (void (*)(void)) tmpn_zero},
+    {GR_METHOD_IS_ZERO,         (gr_funcptr) (void (*)(void)) tmpn_is_zero},
+    {GR_METHOD_EQUAL,           (gr_funcptr) (void (*)(void)) tmpn_equal},
+    {GR_METHOD_NEG,             (gr_funcptr) (void (*)(void)) tmpn_neg},
+    {GR_METHOD_ADD,             (gr_funcptr) (void (*)(void)) tmpn_add},
+    {GR_METHOD_SUB,             (gr_funcptr) (void (*)(void)) tmpn_sub},
+    {GR_METHOD_MUL,             (gr_funcptr) (void (*)(void)) tmpn_mul},
+    {GR_METHOD_ADDMUL,          (gr_funcptr) (void (*)(void)) tmpn_addmul},
+    {GR_METHOD_SUBMUL,          (gr_funcptr) (void (*)(void)) tmpn_submul},
+    {0,                         (gr_funcptr) (void (*)(void)) NULL},
 };
 
 int
@@ -784,67 +784,67 @@ gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out,
    neutral answer for its type. */
 
 int
-gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
-                            slong terms_bound, int is_signed)
+gr_ctx_init_transformed_mpn(gr_ctx_t FLINT_UNUSED(ctx), slong FLINT_UNUSED(bits_bound),
+                            slong FLINT_UNUSED(terms_bound), int FLINT_UNUSED(is_signed))
 {
     return GR_UNABLE;
 }
 
 int
-gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
-                       gr_ctx_t ctx)
+gr_transformed_mpn_set(gr_ptr FLINT_UNUSED(res), nn_srcptr FLINT_UNUSED(a), slong FLINT_UNUSED(an), int FLINT_UNUSED(sign),
+                       gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }
 
 int
-gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
-                       gr_srcptr x, gr_ctx_t ctx)
+gr_transformed_mpn_get(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zn), slong * FLINT_UNUSED(zn_out), int * FLINT_UNUSED(sign),
+                       gr_srcptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }
 
 int
-gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out,
-                                   int * sign, gr_ptr x, gr_ctx_t ctx)
+gr_transformed_mpn_get_destructive(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zn), slong * FLINT_UNUSED(zn_out),
+                                   int * FLINT_UNUSED(sign), gr_ptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }
 
 int
-gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
-                             slong lo, gr_srcptr x, gr_ctx_t ctx)
+gr_transformed_mpn_get_trunc(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zn), slong * FLINT_UNUSED(zn_out), int * FLINT_UNUSED(sign),
+                             slong FLINT_UNUSED(lo), gr_srcptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }
 
 int
-gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out,
-                                         int * sign, slong lo, gr_ptr x,
-                                         gr_ctx_t ctx)
+gr_transformed_mpn_get_trunc_destructive(nn_ptr FLINT_UNUSED(z), slong FLINT_UNUSED(zn), slong * FLINT_UNUSED(zn_out),
+                                         int * FLINT_UNUSED(sign), slong FLINT_UNUSED(lo), gr_ptr FLINT_UNUSED(x),
+                                         gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }
 
 slong
-gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x)
+gr_transformed_mpn_get_limbs(gr_ctx_t FLINT_UNUSED(ctx), gr_srcptr FLINT_UNUSED(x))
 {
     return 0;
 }
 
 slong
-gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x, slong lo)
+gr_transformed_mpn_get_limbs_trunc(gr_ctx_t FLINT_UNUSED(ctx), gr_srcptr FLINT_UNUSED(x), slong FLINT_UNUSED(lo))
 {
     return 0;
 }
 
 void
-gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx)
+gr_transformed_mpn_init_borrowed(gr_ptr FLINT_UNUSED(x), double * FLINT_UNUSED(data), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 ulong
-gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
+gr_transformed_mpn_sizeof_data(gr_ctx_t FLINT_UNUSED(ctx))
 {
     return 0;
 }

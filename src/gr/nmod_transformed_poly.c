@@ -172,19 +172,19 @@ tpoly_init(gr_ptr x, gr_ctx_t ctx)
 }
 
 static void
-tpoly_clear(gr_ptr x, gr_ctx_t ctx)
+tpoly_clear(gr_ptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     fft_small_op_clear(&TPOLY(x)->op);
 }
 
 static void
-tpoly_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx)
+tpoly_swap(gr_ptr x, gr_ptr y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(tpoly_struct, *TPOLY(x), *TPOLY(y));
 }
 
 static int
-tpoly_zero(gr_ptr x, gr_ctx_t ctx)
+tpoly_zero(gr_ptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     TPOLY(x)->len = 0;
     TPOLY(x)->terms = 0;
@@ -214,13 +214,13 @@ tpoly_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 static truth_t
-tpoly_is_zero(gr_srcptr x, gr_ctx_t ctx)
+tpoly_is_zero(gr_srcptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (TPOLY(x)->len == 0) ? T_TRUE : T_UNKNOWN;
 }
 
 static truth_t
-tpoly_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+tpoly_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (TPOLY(x)->len == 0 && TPOLY(y)->len == 0)
         return T_TRUE;
@@ -549,26 +549,26 @@ static int __tpoly_methods_initialized = 0;
 
 static gr_method_tab_input __tpoly_methods_input[] =
 {
-    {GR_METHOD_CTX_WRITE,       (gr_funcptr) tpoly_ctx_write},
-    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) tpoly_ctx_clear},
-    {GR_METHOD_INIT,            (gr_funcptr) tpoly_init},
-    {GR_METHOD_CLEAR,           (gr_funcptr) tpoly_clear},
-    {GR_METHOD_SWAP,            (gr_funcptr) tpoly_swap},
-    {GR_METHOD_SET,             (gr_funcptr) tpoly_set},
-    {GR_METHOD_ZERO,            (gr_funcptr) tpoly_zero},
-    {GR_METHOD_ONE,             (gr_funcptr) tpoly_one},
-    {GR_METHOD_IS_ZERO,         (gr_funcptr) tpoly_is_zero},
-    {GR_METHOD_EQUAL,           (gr_funcptr) tpoly_equal},
-    {GR_METHOD_NEG,             (gr_funcptr) tpoly_neg},
-    {GR_METHOD_ADD,             (gr_funcptr) tpoly_add},
-    {GR_METHOD_SUB,             (gr_funcptr) tpoly_sub},
-    {GR_METHOD_MUL,             (gr_funcptr) tpoly_mul},
-    {GR_METHOD_ADDMUL,          (gr_funcptr) tpoly_addmul},
-    {GR_METHOD_SUBMUL,          (gr_funcptr) tpoly_submul},
-    {GR_METHOD_SET_GR_POLY,     (gr_funcptr) tpoly_set_gr_poly},
-    {GR_METHOD_GET_GR_POLY,     (gr_funcptr) tpoly_get_gr_poly},
-    {GR_METHOD_GET_GR_POLY_WINDOW, (gr_funcptr) tpoly_get_gr_poly_window},
-    {0,                         (gr_funcptr) NULL},
+    {GR_METHOD_CTX_WRITE,       (gr_funcptr) (void (*)(void)) tpoly_ctx_write},
+    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) (void (*)(void)) tpoly_ctx_clear},
+    {GR_METHOD_INIT,            (gr_funcptr) (void (*)(void)) tpoly_init},
+    {GR_METHOD_CLEAR,           (gr_funcptr) (void (*)(void)) tpoly_clear},
+    {GR_METHOD_SWAP,            (gr_funcptr) (void (*)(void)) tpoly_swap},
+    {GR_METHOD_SET,             (gr_funcptr) (void (*)(void)) tpoly_set},
+    {GR_METHOD_ZERO,            (gr_funcptr) (void (*)(void)) tpoly_zero},
+    {GR_METHOD_ONE,             (gr_funcptr) (void (*)(void)) tpoly_one},
+    {GR_METHOD_IS_ZERO,         (gr_funcptr) (void (*)(void)) tpoly_is_zero},
+    {GR_METHOD_EQUAL,           (gr_funcptr) (void (*)(void)) tpoly_equal},
+    {GR_METHOD_NEG,             (gr_funcptr) (void (*)(void)) tpoly_neg},
+    {GR_METHOD_ADD,             (gr_funcptr) (void (*)(void)) tpoly_add},
+    {GR_METHOD_SUB,             (gr_funcptr) (void (*)(void)) tpoly_sub},
+    {GR_METHOD_MUL,             (gr_funcptr) (void (*)(void)) tpoly_mul},
+    {GR_METHOD_ADDMUL,          (gr_funcptr) (void (*)(void)) tpoly_addmul},
+    {GR_METHOD_SUBMUL,          (gr_funcptr) (void (*)(void)) tpoly_submul},
+    {GR_METHOD_SET_GR_POLY,     (gr_funcptr) (void (*)(void)) tpoly_set_gr_poly},
+    {GR_METHOD_GET_GR_POLY,     (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly},
+    {GR_METHOD_GET_GR_POLY_WINDOW, (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly_window},
+    {0,                         (gr_funcptr) (void (*)(void)) NULL},
 };
 
 /* the nmod overload of gr_ctx_init_gr_poly_transformed_repr */
@@ -750,8 +750,10 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
 #else /* FLINT_HAVE_FFT_SMALL */
 
 int
-_gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
-                                        slong len_bound, slong terms_bound)
+_gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t FLINT_UNUSED(ctx),
+        gr_ctx_t FLINT_UNUSED(base), slong FLINT_UNUSED(len_bound),
+        slong FLINT_UNUSED(terms_bound),
+        const gr_transformed_poly_workload_struct * FLINT_UNUSED(workload))
 {
     return GR_UNABLE;
 }
