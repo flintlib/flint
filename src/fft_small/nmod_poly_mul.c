@@ -802,6 +802,49 @@ static void _op_export_worker_func(void* varg)
               P->crts + P->offset, P->bound_c, NULL, &W->mod);
 }
 
+void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
+                    ulong zl, ulong zh, nmod_t mod, const fft_small_plan_t P)
+{
+    ulong i, o;
+    thread_pool_handle* handles = NULL;
+    slong nworkers = 0;
+    ulong nthreads;
+    _op_export_worker_struct args[8];
+
+    FLINT_ASSERT(P->zl <= zl && zh <= P->zh);
+
+    if (zl >= zh)
+        return;
+
+    if (P->np*(zh - zl) > 10000)
+        nworkers = flint_request_threads(&handles, 8);
+    nthreads = nworkers + 1;
+
+    o = zl;
+    for (i = 0; i < nthreads; i++)
+    {
+        _op_export_worker_struct* W = args + i;
+        W->z = z - (zl - P->zl);   /* worker offsets by P->zl */
+        W->X = X;
+        W->mod = mod;
+        W->P = P;
+        W->crt_fn = _nmod_crt_fn(P->np);
+        W->start_zi = o;
+        ulong newo = n_round_down(zl + (i+1)*(zh - zl)/nthreads, BLK_SZ);
+        o = i+1 < nthreads ? FLINT_MAX(o, newo) : zh;
+        W->stop_zi = o;
+    }
+
+    for (i = nworkers; i > 0; i--)
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                         _op_export_worker_func, args + i);
+    _op_export_worker_func(args + 0);
+    for (i = nworkers; i > 0; i--)
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
+
+    flint_give_back_threads(handles, nworkers);
+}
+
 void fft_small_export_nmod(ulong* z, const fft_small_op_t X, nmod_t mod,
                     const fft_small_plan_t P)
 {

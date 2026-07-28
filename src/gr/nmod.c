@@ -20,6 +20,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
+#include "thread_pool.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
 
@@ -975,72 +976,15 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
 }
 
 
+/* implemented in gr/nmod_transformed_poly.c */
+int _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
+                                        slong len_bound, slong terms_bound,
+                                        const gr_transformed_poly_workload_struct * workload);
+
 /* 2x2 matrix products inside hgcd: from this entry length on, reusing the
    fft_small transforms of the 8 inputs beats Strassen (single-threaded
    tuning; the transform and export stages also thread internally when
    the pool has workers) */
-#define NMOD_POLY_HGCD_MAT_MUL_FFT_CUTOFF 128
-
-static int
-_gr_nmod_poly_hgcd_mat_mul(gr_ptr * C, slong * lenC,
-        gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB,
-        gr_ptr T0, gr_ptr T1, gr_ctx_t ctx)
-{
-#if FLINT_HAVE_FFT_SMALL
-    slong i;
-    slong minlen = lenA[0];
-    slong amax = 0, bmax = 0;
-
-    for (i = 0; i < 4; i++)
-    {
-        minlen = FLINT_MIN(minlen, FLINT_MIN(lenA[i], lenB[i]));
-        amax = FLINT_MAX(amax, lenA[i]);
-        bmax = FLINT_MAX(bmax, lenB[i]);
-    }
-
-    if (minlen >= NMOD_POLY_HGCD_MAT_MUL_FFT_CUTOFF)
-    {
-        /* wrap the raw vectors in borrowed-coefficient polynomial
-           matrices; the outputs go through freshly allocated buffers of
-           the full window length zn, since the caller's C buffers are
-           only guaranteed to hold each entry's own products */
-        nmod_poly_struct Ae[4], Be[4], Ce[4];
-        nmod_poly_mat_struct Am, Bm, Cm;
-        nmod_t mod = NMOD_CTX(ctx);
-        slong zn = amax + bmax - 1;
-        nn_ptr tmp = flint_malloc(4 * zn * sizeof(ulong));
-
-        for (i = 0; i < 4; i++)
-        {
-            Ae[i].coeffs = A[i]; Ae[i].length = lenA[i];
-            Ae[i].alloc = lenA[i]; Ae[i].mod = mod;
-            Be[i].coeffs = B[i]; Be[i].length = lenB[i];
-            Be[i].alloc = lenB[i]; Be[i].mod = mod;
-            Ce[i].coeffs = tmp + i * zn; Ce[i].length = 0;
-            Ce[i].alloc = zn; Ce[i].mod = mod;
-        }
-        Am.entries = Ae; Am.r = 2; Am.c = 2; Am.stride = 2; Am.modulus = mod.n;
-        Bm.entries = Be; Bm.r = 2; Bm.c = 2; Bm.stride = 2; Bm.modulus = mod.n;
-        Cm.entries = Ce; Cm.r = 2; Cm.c = 2; Cm.stride = 2; Cm.modulus = mod.n;
-
-        if (nmod_poly_mat_mulmid_fft_small(&Cm, &Am, &Bm, 0, zn))
-        {
-            for (i = 0; i < 4; i++)
-            {
-                FLINT_ASSERT(Ce[i].coeffs == tmp + i * zn);
-                lenC[i] = Ce[i].length;
-                flint_mpn_copyi(C[i], Ce[i].coeffs, lenC[i]);
-            }
-            flint_free(tmp);
-            return GR_SUCCESS;
-        }
-
-        flint_free(tmp);
-    }
-#endif
-
-    return _gr_poly_hgcd_mat_mul_generic(C, lenC, A, lenA, B, lenB, T0, T1, ctx);
-}
 
 static int
 _gr_nmod_poly_mullow(ulong * res,
@@ -1569,7 +1513,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) __gr_nmod_vec_dot_strided},
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
-    {GR_METHOD_POLY_HGCD_MAT_MUL, (gr_funcptr) _gr_nmod_poly_hgcd_mat_mul},
+    {GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
+                                (gr_funcptr) _gr_nmod_ctx_init_transformed_poly_repr},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_nmod_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_nmod_poly_divrem},
     {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_nmod_poly_divexact},

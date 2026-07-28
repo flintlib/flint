@@ -665,6 +665,10 @@ typedef enum
     GR_METHOD_POLY_MULLOW,
     GR_METHOD_POLY_MULMID,
     GR_METHOD_POLY_HGCD_MAT_MUL,
+    GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
+    GR_METHOD_SET_GR_POLY,
+    GR_METHOD_GET_GR_POLY,
+    GR_METHOD_GET_GR_POLY_WINDOW,
     GR_METHOD_POLY_DIV,
     GR_METHOD_POLY_DIVREM,
     GR_METHOD_POLY_DIVEXACT,
@@ -734,6 +738,7 @@ typedef enum
     GR_CTX_NFLOAT, GR_CTX_NFLOAT_COMPLEX,
     GR_CTX_MPF,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
+    GR_CTX_GR_TRANSFORMED_POLY,
     GR_CTX_FMPZ_MPOLY, GR_CTX_FMPQ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
     GR_CTX_FMPZ_MOD_MPOLY_Q,
@@ -861,6 +866,35 @@ typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcp
 /* 2x2 polynomial matrix product for hgcd: C, A, B are arrays of 4 entries
    with lengths lenC, lenA, lenB; T0, T1 are scratch for any single product */
 typedef int ((*gr_method_poly_hgcd_mat_mul_op)(gr_ptr *, slong *, gr_ptr *, slong *, gr_ptr *, slong *, gr_ptr, gr_ptr, gr_ctx_ptr));
+/* estimated workload for a transformed polynomial ring: how many operands
+   will be converted in (forward transforms), how many pointwise
+   multiplications performed, and how many results converted out (inverse
+   transforms). Advisory: used to decide whether the representation is
+   worth switching to and to bound its memory use (mem_limit in bytes,
+   0 for the implementation default). */
+typedef struct gr_transformed_poly_workload_struct
+{
+    slong num_inputs;
+    slong num_muls;
+    slong num_outputs;
+    slong mem_limit;
+}
+gr_transformed_poly_workload_struct;
+
+typedef gr_transformed_poly_workload_struct gr_transformed_poly_workload_t[1];
+
+/* construct a ring of transformed polynomials over a base ring, with the
+   given length and accumulated-terms capacities, for the estimated
+   workload (may be NULL, though implementations will then usually judge
+   the switch unprofitable) */
+typedef int ((*gr_method_ctx_init_transformed_poly_repr_op)(gr_ctx_ptr, gr_ctx_ptr, slong, slong, const gr_transformed_poly_workload_struct *));
+/* conversions between coefficient vectors over the base ring and elements
+   of a transformed polynomial ring */
+typedef int ((*gr_method_set_gr_poly_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_get_gr_poly_op)(gr_ptr, slong *, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
+/* windowed conversion out: writes the coefficients [zl, zh) of the
+   represented polynomial (zeros beyond its length) */
+typedef int ((*gr_method_get_gr_poly_window_op)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc2_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_gcd_op)(gr_ptr, slong *, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_xgcd_op)(slong *, gr_ptr, gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
@@ -966,6 +1000,10 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_HGCD_MAT_MUL_OP(ctx, NAME) (((gr_method_poly_hgcd_mat_mul_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_INIT_TRANSFORMED_POLY_REPR_OP(ctx, NAME) (((gr_method_ctx_init_transformed_poly_repr_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_SET_GR_POLY_OP(ctx, NAME) (((gr_method_set_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_GET_GR_POLY_OP(ctx, NAME) (((gr_method_get_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_GET_GR_POLY_WINDOW_OP(ctx, NAME) (((gr_method_get_gr_poly_window_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC2_OP(ctx, NAME) (((gr_method_poly_binary_trunc2_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_GCD_OP(ctx, NAME) (((gr_method_poly_gcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_XGCD_OP(ctx, NAME) (((gr_method_poly_xgcd_op *) ctx->methods)[GR_METHOD_ ## NAME])

@@ -575,6 +575,10 @@ void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
    window [P->zl, P->zh) */
 void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
                     const fft_small_plan_t P);
+/* chinese remaindering restricted to the window [zl, zh), which must lie
+   inside [P->zl, P->zh); z receives zh - zl coefficients */
+void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
+                    ulong zl, ulong zh, nmod_t mod, const fft_small_plan_t P);
 
 /* Write the low zn limbs of the accumulated integer to z. The true value
    is reduced mod 2^(FLINT_BITS*zn) if it does not fit. */

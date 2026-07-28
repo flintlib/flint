@@ -155,6 +155,51 @@ int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
     FLINT_ASSERT(bn_max > 0);
     FLINT_ASSERT(len_bound > 0);
 
+    /* prefer (np, bits) pairs with a vectorized packing profile: the
+       operand conversions otherwise fall back to the scalar packing
+       path, which costs more than the transforms it feeds */
+    {
+        ulong i;
+        for (i = 0; i < R->profiles_size; i++)
+        {
+            ulong bits = R->profiles[i].bits;
+            ulong pnp = R->profiles[i].np;
+            const crt_data_struct* C = R->crts + pnp - 1;
+            ulong t, thi, alen, blen, zlen, ztrunc, depth;
+            double score;
+
+            if (pnp < 4)
+                continue;
+
+            umul_ppmm(thi, t, len_bound, n_cdiv(FLINT_BITS*min_bn, bits));
+            if (thi != 0 ||
+                flint_mpn_cmp_ui_2exp(crt_data_prod_primes(C),
+                                      C->coeff_len, t, 2*bits) < 0)
+                continue;
+
+            alen = n_cdiv(FLINT_BITS*an_max, bits);
+            blen = n_cdiv(FLINT_BITS*bn_max, bits);
+            zlen = alen + blen - 1;
+            ztrunc = n_round_up(zlen, BLK_SZ);
+            depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
+
+            {
+                double ratio = (double) ztrunc / (double) n_pow2(depth);
+                score = (1 - 0.25*ratio) * (double) pnp * (double) depth
+                                         * (double) ztrunc;
+            }
+            if (best_np == 0 || score < best_score)
+            {
+                best_np = pnp;
+                best_bits = bits;
+                best_score = score;
+            }
+        }
+
+        if (best_np != 0)
+            goto have_choice;
+    }
+
     for (np = 4; np <= MPN_CTX_NCRTS; np++)
     {
         const crt_data_struct* C = R->crts + np - 1;
@@ -205,6 +250,7 @@ int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
     if (best_np == 0)
         return 0;
 
+have_choice:
     {
         ulong bits = best_bits;
         ulong alen = n_cdiv(FLINT_BITS*an_max, bits);
