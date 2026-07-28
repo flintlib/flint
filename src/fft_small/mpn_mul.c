@@ -2089,6 +2089,11 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
        stage with lo = c_lo = 0 (so there is no bottom band) */
     E1 = ((zn >= n + 1) ? zn - (n + 1) : UWORD(0))*FLINT_BITS/bits;
     E1 &= -BLK_SZ;
+    /* never run the easy interval past the coefficients that were
+       actually produced: slots beyond c_hi were not computed by the
+       truncated inverse transform, and zn may be generous */
+    if (E1 > c_hi)
+        E1 = c_hi & -(ulong) BLK_SZ;
 
     /* the threshold corresponds to the multiplication driver enabling
        threads from a product of ~2048 limbs up */
@@ -2098,10 +2103,13 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
 
     if (nthreads == 1)
     {
-        /* serial reconstruction of limbs [0, zn), as the multiplication
-           driver's small-window branch */
+        /* serial reconstruction of limbs [0, zn). The easy interval must
+           be passed here as well: with start_easy = stop_easy = 0 every
+           coefficient takes the hard tail, converting residues one at a
+           time with scalar reductions instead of block-converting them
+           with _convert_block -- measured about 3x slower overall. */
         tab[P->np - 4](z, 0, zn, 0, c_hi, P->R->ffts, X->data, X->stride,
-                       P->R->crts, bits, 0, 0, NULL, NULL);
+                       P->R->crts, bits, 0, E1, NULL, NULL);
     }
     else
     {

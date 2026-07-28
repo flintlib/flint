@@ -27,6 +27,27 @@ void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P)
                  n_round_up(P->np*P->stride*sizeof(double), 4096));
 }
 
+/* as fft_small_op_init, with caller-provided storage: 'data' must hold
+   fft_small_op_sizeof_data(P) bytes, 4096-aligned, and outlive the op;
+   clear will not free it */
+void fft_small_op_init_borrowed(fft_small_op_t X, const fft_small_plan_t P,
+                                double * data)
+{
+    X->stride = P->stride;
+    X->np = P->np;
+    X->offset = P->offset;
+    X->depth = P->depth;
+    X->itrunc = 0;
+    X->domain = FFT_SMALL_OP_PRIMAL;
+    X->owns_data = 0;
+    X->data = data;
+}
+
+ulong fft_small_op_sizeof_data(const fft_small_plan_t P)
+{
+    return n_round_up(P->np * P->stride * sizeof(double), 4096);
+}
+
 void fft_small_op_clear(fft_small_op_t X)
 {
     if (X->owns_data)

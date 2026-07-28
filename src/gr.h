@@ -739,6 +739,7 @@ typedef enum
     GR_CTX_MPF,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_GR_TRANSFORMED_POLY,
+    GR_CTX_GR_TRANSFORMED_MPN,
     GR_CTX_FMPZ_MPOLY, GR_CTX_FMPQ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
     GR_CTX_FMPZ_MOD_MPOLY_Q,
@@ -1458,6 +1459,33 @@ void gr_ctx_init_fmpzi(gr_ctx_t ctx);
 
 void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n);
 void _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fmod_ctx);
+
+/* Transformed big integers: bilinear expressions over Z with results
+   below 2^bits_bound in absolute value, at most terms_bound accumulated
+   elementary products and multiplicative depth two. Elements carry a
+   sign bit; mixed-sign accumulations switch the pointwise additions and
+   subtractions, and the sign of a mixed result is resolved at conversion
+   out. Conversions in and out are by limb arrays with an explicit sign;
+   gr_transformed_mpn_get_trunc returns the limbs above a given position,
+   with at most one unit of error in the lowest returned limb. */
+int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
+                    slong terms_bound, int is_signed);
+int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
+                    gr_ctx_t ctx);
+int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
+                    gr_srcptr x, gr_ctx_t ctx);
+int gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out,
+                    int * sign, gr_ptr x, gr_ctx_t ctx);
+int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn,
+                    slong * zn_out, int * sign, slong lo, gr_ptr x,
+                    gr_ctx_t ctx);
+void gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx);
+ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx);
+slong gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x);
+slong gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x,
+                    slong lo);
+int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out,
+                    int * sign, slong lo, gr_srcptr x, gr_ctx_t ctx);
 
 int gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);

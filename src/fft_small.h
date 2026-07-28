@@ -544,6 +544,9 @@ typedef struct
 typedef fft_small_op_struct fft_small_op_t[1];
 
 void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P);
+void fft_small_op_init_borrowed(fft_small_op_t X, const fft_small_plan_t P,
+                    double * data);
+ulong fft_small_op_sizeof_data(const fft_small_plan_t P);
 void fft_small_op_clear(fft_small_op_t X);
 
 /* pointwise operations; Z may alias A (and B where it makes sense) */
@@ -582,6 +585,12 @@ void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
 
 /* Write the low zn limbs of the accumulated integer to z. The true value
    is reduced mod 2^(FLINT_BITS*zn) if it does not fit. */
+void fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
+                    const fft_small_op_t X, ulong nslots,
+                    const fft_small_plan_t P);
+void fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
+                    const fft_small_op_t X, ulong nslots, ulong lo_limbs,
+                    const fft_small_plan_t P);
 void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
                     const fft_small_plan_t P);
 
