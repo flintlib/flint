@@ -1008,7 +1008,7 @@ middle products) run substantially faster in such a representation.
     the implementation default). Implementations use it to judge whether
     switching representation is profitable and to size their tables.
 
-.. function:: int gr_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base, slong len_bound, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+.. function:: int gr_ctx_init_gr_poly_transformed_repr(gr_ctx_t ctx, gr_ctx_t base, slong len_bound, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
 
     Constructs a ring of transformed polynomials over *base* admitting
     lengths up to *len_bound* and up to *terms_bound* accumulated

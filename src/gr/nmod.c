@@ -957,7 +957,7 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    if (mod.n <= len || mod.n % 2 == 0)
+    if (mod.n <= (ulong) len || mod.n % 2 == 0)
         return GR_DOMAIN;
 
     res[0] = 1;
@@ -977,10 +977,6 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
 
 
 /* implemented in gr/nmod_transformed_poly.c */
-int _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
-                                        slong len_bound, slong terms_bound,
-                                        const gr_transformed_poly_workload_struct * workload);
-
 /* 2x2 matrix products inside hgcd: from this entry length on, reusing the
    fft_small transforms of the 8 inputs beats Strassen (single-threaded
    tuning; the transform and export stages also thread internally when

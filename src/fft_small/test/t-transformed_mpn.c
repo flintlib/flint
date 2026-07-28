@@ -174,7 +174,7 @@ TEST_FUNCTION_START(gr_transformed_mpn, state)
         {
             slong small = n_randint(state, need);
             if (gr_transformed_mpn_get(z, small, &zn_out, &sign, acc, ctx)
-                    != GR_DOMAIN && fmpz_size(ref) > (ulong) small)
+                    != GR_DOMAIN && fmpz_size(ref) > small)
                 TEST_FUNCTION_FAIL("undersized buffer not refused\n"
                     "need = %wd, given = %wd\n", need, small);
         }

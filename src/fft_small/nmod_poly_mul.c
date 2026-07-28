@@ -547,6 +547,7 @@ static void _crt_3(
     /* Bound coefficients before modular reduction. */
     umul_ppmm(hi, lo, mod.n - 1, mod.n - 1);
     FLINT_MPN_MUL_2X1(u2, u1, u0, hi, lo, min_an_bn);
+    (void) u0;
     two_limbs = (u2 == 0);
 
     /* For moduli close to 2^63, we can avoid the high word reduction

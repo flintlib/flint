@@ -744,36 +744,6 @@ gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
     return GR_SUCCESS;
 }
 
-#else /* FLINT_HAVE_FFT_SMALL */
-
-int
-gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
-                            slong terms_bound, int is_signed)
-{
-    return GR_UNABLE;
-}
-
-int
-gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
-                       gr_ctx_t ctx)
-{
-    return GR_UNABLE;
-}
-
-int
-gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
-                       gr_srcptr x, gr_ctx_t ctx)
-{
-    return GR_UNABLE;
-}
-
-slong
-gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x)
-{
-    return 0;
-}
-
-#endif
 
 int
 gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
@@ -804,3 +774,79 @@ gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out,
 {
     return _tmpn_get_trunc(z, zn, zn_out, sign, lo, x, 1, ctx);
 }
+
+#else /* FLINT_HAVE_FFT_SMALL */
+
+/* Without fft_small the transformed representation does not exist: the
+   constructor reports GR_UNABLE and callers fall through to their plain
+   code paths. The remaining functions are unreachable then, but the
+   full public surface is defined so the library links; each returns the
+   neutral answer for its type. */
+
+int
+gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
+                            slong terms_bound, int is_signed)
+{
+    return GR_UNABLE;
+}
+
+int
+gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
+                       gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
+int
+gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
+                       gr_srcptr x, gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
+int
+gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out,
+                                   int * sign, gr_ptr x, gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
+int
+gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
+                             slong lo, gr_srcptr x, gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
+int
+gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out,
+                                         int * sign, slong lo, gr_ptr x,
+                                         gr_ctx_t ctx)
+{
+    return GR_UNABLE;
+}
+
+slong
+gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x)
+{
+    return 0;
+}
+
+slong
+gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x, slong lo)
+{
+    return 0;
+}
+
+void
+gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx)
+{
+}
+
+ulong
+gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
+{
+    return 0;
+}
+
+#endif

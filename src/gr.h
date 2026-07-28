@@ -884,6 +884,12 @@ gr_transformed_poly_workload_struct;
 
 typedef gr_transformed_poly_workload_struct gr_transformed_poly_workload_t[1];
 
+/* implementation of the transformed-polynomial constructor for nmod base
+   rings, installed in their method table */
+int _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
+                    slong len_bound, slong terms_bound,
+                    const gr_transformed_poly_workload_struct * workload);
+
 /* construct a ring of transformed polynomials over a base ring, with the
    given length and accumulated-terms capacities, for the estimated
    workload (may be NULL, though implementations will then usually judge

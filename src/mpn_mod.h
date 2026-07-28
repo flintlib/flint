@@ -260,6 +260,7 @@ void fft_small_export_mpn_mod_range(nn_ptr z, const fft_small_op_t X,
         ulong zl, ulong zh, gr_ctx_t ctx, const fft_small_plan_t P);
 #endif
 
+struct gr_transformed_poly_workload_struct;
 int _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
         slong len_bound, slong terms_bound,
         const struct gr_transformed_poly_workload_struct * workload);

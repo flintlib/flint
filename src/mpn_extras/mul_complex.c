@@ -112,43 +112,6 @@ slong flint_mpn_sqr_complex_fft_cutoff = 4096;
 #define MULHIGH_COMPLEX_KARATSUBA_CUTOFF 12
 #define SQRHIGH_COMPLEX_KARATSUBA_CUTOFF 20
 
-/* z (m+1 limbs), *zs: (-1)^xs x + (-1)^ys y with x, y of m limbs */
-static void
-_signed_add(nn_ptr z, int * zs, nn_srcptr x, int xs, nn_srcptr y, int ys,
-            mp_size_t m)
-{
-    if (xs == ys)
-    {
-        z[m] = mpn_add_n(z, x, y, m);
-        *zs = xs;
-    }
-    else
-    {
-        int c = mpn_cmp(x, y, m);
-        z[m] = 0;
-        if (c >= 0)
-        {
-            mpn_sub_n(z, x, y, m);
-            *zs = (c == 0) ? 0 : xs;
-        }
-        else
-        {
-            mpn_sub_n(z, y, x, m);
-            *zs = ys;
-        }
-    }
-}
-
-static int
-_mpn_is_zero(nn_srcptr x, mp_size_t n)
-{
-    mp_size_t i;
-    for (i = 0; i < n; i++)
-        if (x[i] != 0)
-            return 0;
-    return 1;
-}
-
 #if FLINT_HAVE_FFT_SMALL
 
 /* convert an accumulated element out into (z, zlimbs) starting at limb
@@ -316,6 +279,18 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     gr_ctx_clear(tctx);
 #undef E_
     return ok;
+}
+
+/* the high variants promise exactly zlimbs limbs, zero padded, plus a
+   sign; the shared fft path hands back a signed length */
+static void
+_high_pad(nn_ptr z, int * zsgn, slong len, mp_size_t zlimbs)
+{
+    mp_size_t rn = FLINT_ABS(len);
+
+    if (rn < zlimbs)
+        flint_mpn_zero(z + rn, zlimbs - rn);
+    *zsgn = (len < 0);
 }
 
 #endif /* FLINT_HAVE_FFT_SMALL */
@@ -707,18 +682,6 @@ _sqr_complex_general(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     else
         flint_mpn_sqr_complex_classical(zr, zr_len, zi, zi_len,
                 ar, arn, ar_sgn, ai, ain, ai_sgn);
-}
-
-/* the high variants promise exactly zlimbs limbs, zero padded, plus a
-   sign; the shared fft path hands back a signed length */
-static void
-_high_pad(nn_ptr z, int * zsgn, slong len, mp_size_t zlimbs)
-{
-    mp_size_t rn = FLINT_ABS(len);
-
-    if (rn < zlimbs)
-        flint_mpn_zero(z + rn, zlimbs - rn);
-    *zsgn = (len < 0);
 }
 
 /* z (n + 1 limbs) = (-1)^xs |x| + (-1)^ys |y| for n-limb magnitudes;

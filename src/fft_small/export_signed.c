@@ -252,7 +252,7 @@ _sig_segment(sig_seg_struct * S)
         if (klast + wlive > wlen)
         {
             ulong e = (W[wlen - 1] >> (FLINT_BITS - 1)) ? ~UWORD(0) : 0;
-            ulong L = A / FLINT_BITS, i2;
+            ulong i2;
             ulong s0 = (slot * bits) / FLINT_BITS - A;
 
 
