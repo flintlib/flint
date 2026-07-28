@@ -270,6 +270,54 @@ _mtpoly_scratch_alloc(const mtpoly_ctx_struct * T)
             n_round_up(T->P->np * T->P->stride * sizeof(double), 4096));
 }
 
+/* the GET_GR_POLY_DESTRUCTIVE method: the inverse transforms, scaling
+   and bias run on the element's own evaluations, so no scratch is
+   allocated and no transform copy is made; the element may only be
+   cleared or fully overwritten afterwards */
+static int
+mtpoly_get_gr_poly_destructive(gr_ptr c, slong * len, gr_ptr x,
+                               gr_ctx_t base_ctx, gr_ctx_t ctx)
+{
+    mtpoly_ctx_struct * T = MTPOLY_CTX(ctx);
+    const fft_small_plan_struct * P = T->P;
+    nn_ptr cc = (nn_ptr) c;
+    slong xlen = MTPOLY(x)->len;
+    ulong itr = n_round_up((ulong) xlen, BLK_SZ);
+    slong i;
+
+    if (!_mtpoly_base_ok(base_ctx, T))
+        return GR_DOMAIN;
+
+    if (xlen == 0)
+    {
+        *len = 0;
+        return GR_SUCCESS;
+    }
+
+    for (i = 0; i < (slong) P->np; i++)
+    {
+        sd_fft_ctx_struct * Q = P->ffts + P->offset + i;
+        double * d = MTPOLY(x)->op.data + P->stride * i;
+        double b = MTPOLY(x)->negs ? (double) T->bias_res[i] : 0.0;
+
+        sd_ifft_trunc(Q, d, P->depth, itr);
+        _mtpoly_scale_bias(Q, d, T->m_orig[i], b, itr / BLK_SZ);
+    }
+    fft_small_export_mpn_mod_range(cc, &MTPOLY(x)->op, 0, (ulong) xlen,
+                                   T->base, P);
+    if (MTPOLY(x)->negs)
+        for (i = 0; i < xlen; i++)
+            mpn_mod_sub(cc + i * T->nlimbs, cc + i * T->nlimbs,
+                        T->bias_mod_n, T->base);
+    MTPOLY(x)->len = 0;
+
+    while (xlen > 0 &&
+           flint_mpn_zero_p(cc + (xlen - 1) * T->nlimbs, T->nlimbs))
+        xlen--;
+    *len = xlen;
+    return GR_SUCCESS;
+}
+
 static int
 mtpoly_get_gr_poly(gr_ptr c, slong * len, gr_srcptr x,
                    gr_ctx_t base_ctx, gr_ctx_t ctx)
@@ -533,6 +581,8 @@ static gr_method_tab_input __mtpoly_methods_input[] =
     {GR_METHOD_SUBMUL,          (gr_funcptr) (void (*)(void)) mtpoly_submul},
     {GR_METHOD_SET_GR_POLY,     (gr_funcptr) (void (*)(void)) mtpoly_set_gr_poly},
     {GR_METHOD_GET_GR_POLY,     (gr_funcptr) (void (*)(void)) mtpoly_get_gr_poly},
+    {GR_METHOD_GET_GR_POLY_DESTRUCTIVE,
+                                (gr_funcptr) (void (*)(void)) mtpoly_get_gr_poly_destructive},
     {GR_METHOD_GET_GR_POLY_WINDOW, (gr_funcptr) (void (*)(void)) mtpoly_get_gr_poly_window},
     {0,                         (gr_funcptr) (void (*)(void)) NULL},
 };

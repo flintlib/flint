@@ -1019,6 +1019,12 @@ middle products) run substantially faster in such a representation.
     ``GET_GR_POLY_WINDOW`` methods of the constructed context; the
     window variant writes the coefficients `[zl, zh)` of the represented
     polynomial, with zeros beyond its length.
+    ``_gr_get_gr_poly_destructive`` converts out through the
+    ``GET_GR_POLY_DESTRUCTIVE`` method where the representation provides
+    it: the inverse transforms run on the element's own storage, skipping
+    the transform-sized copy, and the element may only be cleared or
+    fully overwritten afterwards; representations without the method fall
+    back to the copying conversion.
 
 .. function:: int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed)
 

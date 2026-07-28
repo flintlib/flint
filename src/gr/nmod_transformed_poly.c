@@ -295,6 +295,97 @@ _tpoly_export(tpoly_ctx_struct * T, gr_srcptr x, slong zl, slong ub,
             z[i] = nmod_sub(z[i], T->bias_mod_n, T->mod);
 }
 
+/* Destructive counterpart of the windowed conversion: the inverse
+   transforms, scaling and bias run directly on the element's own
+   evaluations, so no scratch is allocated and no transform-sized copy is
+   made. The element is consumed -- afterwards it may only be cleared or
+   fully overwritten as the destination of a set or a multiplication.
+   Safe under the drivers' threading, since each thread owns the
+   accumulator it converts. */
+/* invert, scale and bias the element's own evaluations in place */
+static void
+_tpoly_invert_in_place(tpoly_ctx_struct * T, gr_ptr x)
+{
+    const fft_small_plan_struct * P = T->P;
+    ulong itr = n_round_up((ulong) TPOLY(x)->len, BLK_SZ);
+    slong i;
+
+    for (i = 0; i < (slong) P->np; i++)
+    {
+        sd_fft_ctx_struct * Q = P->ffts + P->offset + i;
+        double * d = TPOLY(x)->op.data + P->stride * i;
+        double b = TPOLY(x)->negs ? (double) T->bias_res[i] : 0.0;
+
+        sd_ifft_trunc(Q, d, P->depth, itr);
+        _tpoly_scale_bias(Q, d, T->m_orig[i], b, itr / BLK_SZ);
+    }
+}
+
+int
+_gr_nmod_tpoly_get_gr_poly_window_destructive(nn_ptr cc, gr_ptr x,
+        slong zl, slong zh, gr_ctx_t ctx)
+{
+    tpoly_ctx_struct * T = TPOLY_CTX(ctx);
+    slong xlen = TPOLY(x)->len;
+    slong ub, i;
+
+    if (zl < 0 || zh < zl || zh > T->N)
+        return GR_DOMAIN;
+
+    ub = FLINT_MIN(zh, xlen);
+    if (ub > zl)
+    {
+        _tpoly_invert_in_place(T, x);
+        fft_small_export_nmod_range(cc, &TPOLY(x)->op, (ulong) zl,
+                                    (ulong) ub, T->mod, T->P);
+
+        if (TPOLY(x)->negs)
+            for (i = 0; i < ub - zl; i++)
+                cc[i] = nmod_sub(cc[i], T->bias_mod_n, T->mod);
+    }
+    else
+        ub = zl;
+    memset(cc + (ub - zl), 0, (zh - ub) * sizeof(ulong));
+
+    TPOLY(x)->len = 0;
+    return GR_SUCCESS;
+}
+
+/* the GET_GR_POLY_DESTRUCTIVE method: full-length conversion out on the
+   element's own storage */
+static int
+tpoly_get_gr_poly_destructive(gr_ptr c, slong * len, gr_ptr x,
+                              gr_ctx_t base_ctx, gr_ctx_t ctx)
+{
+    tpoly_ctx_struct * T = TPOLY_CTX(ctx);
+    nn_ptr cc = (nn_ptr) c;
+    slong xlen = TPOLY(x)->len;
+    slong i;
+
+    if (base_ctx->which_ring != GR_CTX_NMOD ||
+            NMOD_CTX(base_ctx).n != T->mod.n)
+        return GR_DOMAIN;
+
+    if (xlen == 0)
+    {
+        *len = 0;
+        return GR_SUCCESS;
+    }
+
+    _tpoly_invert_in_place(T, x);
+    fft_small_export_nmod_range(cc, &TPOLY(x)->op, 0, (ulong) xlen,
+                                T->mod, T->P);
+    if (TPOLY(x)->negs)
+        for (i = 0; i < xlen; i++)
+            cc[i] = nmod_sub(cc[i], T->bias_mod_n, T->mod);
+    TPOLY(x)->len = 0;
+
+    while (xlen > 0 && cc[xlen - 1] == 0)
+        xlen--;
+    *len = xlen;
+    return GR_SUCCESS;
+}
+
 /* per-call temporary for the inverse-transform copy */
 static double *
 _tpoly_scratch_alloc(const tpoly_ctx_struct * T)
@@ -567,6 +658,8 @@ static gr_method_tab_input __tpoly_methods_input[] =
     {GR_METHOD_SUBMUL,          (gr_funcptr) (void (*)(void)) tpoly_submul},
     {GR_METHOD_SET_GR_POLY,     (gr_funcptr) (void (*)(void)) tpoly_set_gr_poly},
     {GR_METHOD_GET_GR_POLY,     (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly},
+    {GR_METHOD_GET_GR_POLY_DESTRUCTIVE,
+                                (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly_destructive},
     {GR_METHOD_GET_GR_POLY_WINDOW, (gr_funcptr) (void (*)(void)) tpoly_get_gr_poly_window},
     {0,                         (gr_funcptr) (void (*)(void)) NULL},
 };

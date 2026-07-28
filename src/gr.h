@@ -668,6 +668,7 @@ typedef enum
     GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
     GR_METHOD_SET_GR_POLY,
     GR_METHOD_GET_GR_POLY,
+    GR_METHOD_GET_GR_POLY_DESTRUCTIVE,
     GR_METHOD_GET_GR_POLY_WINDOW,
     GR_METHOD_POLY_DIV,
     GR_METHOD_POLY_DIVREM,
@@ -889,6 +890,11 @@ typedef gr_transformed_poly_workload_struct gr_transformed_poly_workload_t[1];
 int _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
                     slong len_bound, slong terms_bound,
                     const gr_transformed_poly_workload_struct * workload);
+/* windowed conversion out that consumes the element in place of copying
+   its transform; the element may only be cleared or fully overwritten
+   afterwards */
+int _gr_nmod_tpoly_get_gr_poly_window_destructive(nn_ptr cc, gr_ptr x,
+                    slong zl, slong zh, gr_ctx_t ctx);
 
 /* construct a ring of transformed polynomials over a base ring, with the
    given length and accumulated-terms capacities, for the estimated
@@ -899,6 +905,7 @@ typedef int ((*gr_method_ctx_init_transformed_poly_repr_op)(gr_ctx_ptr, gr_ctx_p
    of a transformed polynomial ring */
 typedef int ((*gr_method_set_gr_poly_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_get_gr_poly_op)(gr_ptr, slong *, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_get_gr_poly_destructive_op)(gr_ptr, slong *, gr_ptr, gr_ctx_ptr, gr_ctx_ptr));
 /* windowed conversion out: writes the coefficients [zl, zh) of the
    represented polynomial (zeros beyond its length) */
 typedef int ((*gr_method_get_gr_poly_window_op)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr, gr_ctx_ptr));
@@ -1010,6 +1017,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_CTX_INIT_TRANSFORMED_POLY_REPR_OP(ctx, NAME) (((gr_method_ctx_init_transformed_poly_repr_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SET_GR_POLY_OP(ctx, NAME) (((gr_method_set_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_GET_GR_POLY_OP(ctx, NAME) (((gr_method_get_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_GET_GR_POLY_DESTRUCTIVE_OP(ctx, NAME) (((gr_method_get_gr_poly_destructive_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_GET_GR_POLY_WINDOW_OP(ctx, NAME) (((gr_method_get_gr_poly_window_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC2_OP(ctx, NAME) (((gr_method_poly_binary_trunc2_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_GCD_OP(ctx, NAME) (((gr_method_poly_gcd_op *) ctx->methods)[GR_METHOD_ ## NAME])

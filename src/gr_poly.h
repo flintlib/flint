@@ -200,6 +200,19 @@ GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly(gr_ptr c, slong * len, gr_
     return GR_GET_GR_POLY_OP(tctx, GET_GR_POLY)(c, len, x, base_ctx, tctx);
 }
 
+/* Conversion out that may consume the element -- implementations run the
+   inverse transforms on its own storage, skipping the transform copy;
+   afterwards the element may only be cleared or fully overwritten as the
+   destination of a set or a multiplication. Falls back to the copying
+   conversion where the representation does not provide it. */
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly_destructive(gr_ptr c, slong * len, gr_ptr x, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    int status = GR_GET_GR_POLY_DESTRUCTIVE_OP(tctx, GET_GR_POLY_DESTRUCTIVE)(c, len, x, base_ctx, tctx);
+    if (status == GR_UNABLE)
+        status = GR_GET_GR_POLY_OP(tctx, GET_GR_POLY)(c, len, x, base_ctx, tctx);
+    return status;
+}
+
 GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly_window(gr_ptr c, gr_srcptr x, slong zl, slong zh, gr_ctx_t base_ctx, gr_ctx_t tctx)
 {
     return GR_GET_GR_POLY_WINDOW_OP(tctx, GET_GR_POLY_WINDOW)(c, x, zl, zh, base_ctx, tctx);

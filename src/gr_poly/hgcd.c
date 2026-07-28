@@ -287,7 +287,11 @@ static void _hgcd_mm_phase2(void * varg)
         slong r = 2 * (i / 2), c = i % 2;
         a->status |= gr_mul(acc, _HGCD_TE(a, r), _HGCD_TE(a, 4 + c), a->tctx);
         a->status |= gr_addmul(acc, _HGCD_TE(a, r + 1), _HGCD_TE(a, 6 + c), a->tctx);
-        a->status |= _gr_get_gr_poly(a->C[i], &a->lenC[i], acc, a->ctx, a->tctx);
+        /* acc is this thread's own and dead after the entry: convert it
+           out on its own storage, skipping the transform copy; the next
+           entry's gr_mul rebuilds it as a full-write destination */
+        a->status |= _gr_get_gr_poly_destructive(a->C[i], &a->lenC[i], acc,
+                                                 a->ctx, a->tctx);
     }
 }
 

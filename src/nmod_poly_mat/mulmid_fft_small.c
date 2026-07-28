@@ -90,8 +90,12 @@ static void _mm_phase2(void * varg)
                                    _MM_TE(a, a->nA + l * a->bc + j), a->tctx);
 
         nmod_poly_fit_length(entry, a->wlen);
-        a->status |= _gr_get_gr_poly_window(entry->coeffs, acc,
-                                            a->zl, a->hi, a->ctx, a->tctx);
+        /* the accumulator is this thread's own and dead after the
+           entry: convert it out in place, skipping the transform copy
+           and the scratch allocation; the next entry's gr_mul rebuilds
+           it as a full-write destination */
+        a->status |= _gr_nmod_tpoly_get_gr_poly_window_destructive(
+                entry->coeffs, acc, a->zl, a->hi, a->tctx);
         if (a->wlen > a->hi - a->zl)
             _nmod_vec_zero(entry->coeffs + (a->hi - a->zl),
                            a->wlen - (a->hi - a->zl));

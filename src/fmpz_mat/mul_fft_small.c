@@ -52,6 +52,7 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     slong i, j, l;
     gr_ctx_t tctx;
     gr_ptr E, acc;
+    double * acc_data;
     nn_ptr t;
     slong tn_max;
     int ok = 1;
@@ -78,7 +79,13 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     E = flint_malloc((ar * k + k * bc) * tctx->sizeof_elem);
     for (i = 0; i < ar * k + k * bc; i++)
         gr_init(E_(i), tctx);
-    acc = gr_heap_init(tctx);
+    /* the accumulator is converted out destructively -- skipping the
+       multi-megabyte transform copy per entry -- and re-initialized in
+       place, which borrowed storage makes free */
+    acc_data = flint_aligned_alloc(4096, n_round_up(
+            gr_transformed_mpn_sizeof_data(tctx), 4096));
+    acc = flint_malloc(tctx->sizeof_elem);
+    gr_transformed_mpn_init_borrowed(acc, acc_data, tctx);
 
     tn_max = (abits + bbits + 128) / FLINT_BITS + 4 + k;
     t = flint_malloc(tn_max * sizeof(ulong));
@@ -127,11 +134,17 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
                 tn_max = need;
             }
             if (lo_limbs == 0)
-                ok = ok && gr_transformed_mpn_get(t, need, &zn, &sg, acc,
-                        tctx) == GR_SUCCESS;
+                ok = ok && gr_transformed_mpn_get_destructive(t, need,
+                        &zn, &sg, acc, tctx) == GR_SUCCESS;
             else
-                ok = ok && gr_transformed_mpn_get_trunc(t, need, &zn, &sg,
-                        lo_limbs, acc, tctx) == GR_SUCCESS;
+                ok = ok && gr_transformed_mpn_get_trunc_destructive(t,
+                        need, &zn, &sg, lo_limbs, acc, tctx) == GR_SUCCESS;
+
+            /* the destructive get consumed acc: bring it back for the
+               next entry, free on borrowed storage */
+            gr_clear(acc, tctx);
+            gr_transformed_mpn_init_borrowed(acc, acc_data, tctx);
+
             if (ok)
             {
                 fmpz * e = fmpz_mat_entry(C, i, j);
@@ -149,7 +162,9 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     for (i = 0; i < ar * k + k * bc; i++)
         gr_clear(E_(i), tctx);
     flint_free(E);
-    gr_heap_clear(acc, tctx);
+    gr_clear(acc, tctx);
+    flint_free(acc);
+    flint_aligned_free(acc_data);
     flint_free(t);
     gr_ctx_clear(tctx);
 #undef E_
