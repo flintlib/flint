@@ -17,6 +17,8 @@
 #include "t-mul.c"
 #include "t-nmod_poly_divrem.c"
 #include "t-nmod_poly_mul.c"
+#include "t-op_mpn.c"
+#include "t-op_nmod.c"
 #include "t-sd_fft.c"
 
 /* Array of test functions ***************************************************/
@@ -29,6 +31,8 @@ test_struct tests[] =
     TEST_FUNCTION(mpn_ctx_mpn_mul),
     TEST_FUNCTION(_nmod_poly_divrem_mpn_ctx),
     TEST_FUNCTION(_nmod_poly_mul_mid_mpn_ctx),
+    TEST_FUNCTION(fft_small_op_mpn),
+    TEST_FUNCTION(fft_small_op_nmod),
     TEST_FUNCTION(sd_fft)
 };
 

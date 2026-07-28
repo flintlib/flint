@@ -1890,3 +1890,286 @@ void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulon
 {
     _mpn_ctx_mpn_mul_range(R, z, 0, an + bn, a, an, b, bn);
 }
+
+/* ------------------------------------------------------------------------ */
+/* transforms of mpn operands for the plan/op interface                     */
+/* ------------------------------------------------------------------------ */
+
+typedef struct {
+    const fft_small_plan_struct* P;
+    fft_small_op_struct* X;
+    const ulong* a;
+    ulong an;
+    ulong atrunc;
+    to_ffts_func to_ffts;
+    ulong start_easy;
+    ulong stop_easy;
+    ulong start_hard;
+    ulong stop_hard;
+    ulong start_pi;      /* prime range for the fft (or fused slow) stage */
+    ulong stop_pi;
+} _op_mpn_fft_worker_struct;
+
+static void _op_mpn_pack_worker_func(void* varg)
+{
+    _op_mpn_fft_worker_struct* W = (_op_mpn_fft_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
+    mpn_ctx_struct* R = P->R;
+
+    W->to_ffts(R->ffts, W->X->data, P->stride, W->a, W->an, W->atrunc,
+               R->vec_two_pow_tab[n_cdiv(P->np, VEC_SZ) - 1],
+               W->start_easy, W->stop_easy, W->start_hard, W->stop_hard);
+}
+
+static void _op_mpn_fft_worker_func(void* varg)
+{
+    _op_mpn_fft_worker_struct* W = (_op_mpn_fft_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
+
+    for (ulong l = W->start_pi; l < W->stop_pi; l++)
+        sd_fft_trunc(P->R->ffts + l, W->X->data + l*P->stride, P->depth,
+                     W->atrunc, P->ztrunc);
+}
+
+static void _op_mpn_slow_worker_func(void* varg)
+{
+    _op_mpn_fft_worker_struct* W = (_op_mpn_fft_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
+    mpn_ctx_struct* R = P->R;
+
+    for (ulong l = W->start_pi; l < W->stop_pi; l++)
+    {
+        slow_mpn_to_fft(R->ffts + l, W->X->data + l*P->stride, W->atrunc,
+                        W->a, W->an, P->bits, R->slow_two_pow_tab[l]);
+        sd_fft_trunc(R->ffts + l, W->X->data + l*P->stride, P->depth,
+                     W->atrunc, P->ztrunc);
+    }
+}
+
+void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
+                    const fft_small_plan_t P)
+{
+    mpn_ctx_struct* R = P->R;
+    ulong bits = P->bits;
+    ulong np = P->np;
+    ulong alen = n_cdiv(FLINT_BITS*an, bits);
+    ulong atrunc = n_round_up(alen, BLK_SZ);
+    to_ffts_func to_ffts = NULL;
+    ulong i;
+    thread_pool_handle* handles = NULL;
+    slong nworkers = 0;
+    ulong nthreads;
+    _op_mpn_fft_worker_struct args[MPN_CTX_NCRTS];
+
+    FLINT_ASSERT(an > 0);
+    FLINT_ASSERT(bits > 64);
+    FLINT_ASSERT(P->offset == 0);
+    FLINT_ASSERT(X->np == np && X->offset == P->offset &&
+                 X->depth == P->depth && X->stride == P->stride);
+    FLINT_ASSERT(atrunc <= P->ztrunc);
+
+    /* look for a vectorized packing profile matching (np, bits); the
+       profile's bn_bound concerns the multiplication drivers' product
+       bound and is irrelevant to the packing itself */
+    for (i = 0; i < R->profiles_size; i++)
+    {
+        if (R->profiles[i].np == np && R->profiles[i].bits == bits)
+        {
+            to_ffts = R->profiles[i].to_ffts;
+            break;
+        }
+    }
+
+    /* the threshold corresponds to the multiplication driver enabling
+       threads from a product of ~2048 limbs up */
+    if (an >= 1024)
+        nworkers = flint_request_threads(&handles, np);
+    nthreads = FLINT_MIN((ulong)(nworkers + 1), np);
+
+    if (to_ffts != NULL)
+    {
+        /* packing stage: split the easy coefficient range over the
+           threads, the last thread taking the hard tail, exactly as the
+           multiplication driver's mod workers do */
+        ulong a_stop_easy = n_min(atrunc, (FLINT_BITS*an - 33)/bits);
+        ulong a_stop_hard = n_min(atrunc, (FLINT_BITS*an + bits - 1)/bits);
+        ulong rounding = (bits%8 == 0) ? 4 : (bits%4 == 0) ? 8 : 16;
+
+        a_stop_easy &= -rounding;
+
+        for (i = 0; i < nthreads; i++)
+        {
+            _op_mpn_fft_worker_struct* W = args + i;
+            W->P = P;
+            W->X = X;
+            W->a = a;
+            W->an = an;
+            W->atrunc = atrunc;
+            W->to_ffts = to_ffts;
+            W->start_easy = n_round_up((i+0)*a_stop_easy/nthreads, rounding);
+            W->stop_easy  = n_round_up((i+1)*a_stop_easy/nthreads, rounding);
+            W->start_hard = (i + 1 == nthreads) ? a_stop_easy : atrunc;
+            W->stop_hard  = (i + 1 == nthreads) ? a_stop_hard : atrunc;
+        }
+
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             _op_mpn_pack_worker_func, args + i);
+        _op_mpn_pack_worker_func(args + 0);
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
+
+        /* fft stage: split the primes */
+        for (i = 0; i < nthreads; i++)
+        {
+            args[i].start_pi = (i+0)*np/nthreads;
+            args[i].stop_pi  = (i+1)*np/nthreads;
+        }
+
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             _op_mpn_fft_worker_func, args + i);
+        _op_mpn_fft_worker_func(args + 0);
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+    else
+    {
+        /* slow packing is per prime anyway: fuse pack + fft per prime */
+        for (i = 0; i < nthreads; i++)
+        {
+            _op_mpn_fft_worker_struct* W = args + i;
+            W->P = P;
+            W->X = X;
+            W->a = a;
+            W->an = an;
+            W->atrunc = atrunc;
+            W->start_pi = (i+0)*np/nthreads;
+            W->stop_pi  = (i+1)*np/nthreads;
+        }
+
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             _op_mpn_slow_worker_func, args + i);
+        _op_mpn_slow_worker_func(args + 0);
+        for (i = nthreads - 1; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
+    }
+
+    flint_give_back_threads(handles, nworkers);
+
+    X->itrunc = atrunc;
+    X->domain = FFT_SMALL_OP_PRIMAL;
+}
+
+void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
+                    const fft_small_plan_t P)
+{
+    ulong bits = P->bits;
+    ulong c_hi = n_min(P->zn, n_cdiv(zn*FLINT_BITS, bits));
+    static from_ffts_func tab[8-4+1] = {_mpn_from_ffts_4,
+                                        _mpn_from_ffts_5,
+                                        _mpn_from_ffts_6,
+                                        _mpn_from_ffts_7,
+                                        _mpn_from_ffts_8};
+
+    ulong n = P->R->crts[P->np - 1].coeff_len;
+    ulong E1;
+    thread_pool_handle* handles = NULL;
+    slong nworkers = 0;
+    ulong nthreads;
+
+    FLINT_ASSERT(zn > 0);
+    FLINT_ASSERT(4 <= P->np && P->np <= 8);
+    FLINT_ASSERT(P->offset == 0);
+    FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
+
+    /* BLK_SZ-aligned easy interval [0, E1) of coefficients whose whole
+       span lies inside [0, zn), as in the multiplication driver's crt
+       stage with lo = c_lo = 0 (so there is no bottom band) */
+    E1 = ((zn >= n + 1) ? zn - (n + 1) : UWORD(0))*FLINT_BITS/bits;
+    E1 &= -BLK_SZ;
+
+    /* the threshold corresponds to the multiplication driver enabling
+       threads from a product of ~2048 limbs up */
+    if (E1 > 0 && zn >= 2048)
+        nworkers = flint_request_threads(&handles, 8);
+    nthreads = nworkers + 1;
+
+    if (nthreads == 1)
+    {
+        /* serial reconstruction of limbs [0, zn), as the multiplication
+           driver's small-window branch */
+        tab[P->np - 4](z, 0, zn, 0, c_hi, P->R->ffts, X->data, X->stride,
+                       P->R->crts, bits, 0, 0, NULL, NULL);
+    }
+    else
+    {
+        /* the multiplication driver's threaded crt stage: per-range
+           reconstruction with overhang buffers, then a serial stitch of
+           the carries across the range boundaries */
+        crt_worker_struct w[8];
+        ulong span = E1;
+        ulong l;
+
+        for (l = 0; l < nthreads; l++)
+        {
+            crt_worker_struct* W = w + l;
+            W->from_ffts = tab[P->np - 4];
+            W->z = z;
+            W->lo = 0;
+            W->hi = zn;
+            W->c_lo = 0;
+            W->clen = c_hi;
+            W->fctxs = P->R->ffts;
+            W->abuf = X->data;
+            W->stride = X->stride;
+            W->crts = P->R->crts;
+            W->bits = bits;
+            W->start_easy = n_round_up((l+0)*span/nthreads, BLK_SZ);
+            W->stop_easy  = n_round_up((l+1)*span/nthreads, BLK_SZ);
+            W->overhang = (l + 1 == nthreads) ? NULL : W->overhang_buffer;
+            W->boundbuf = NULL;
+        }
+
+        for (slong i = nworkers; i > 0; i--)
+            thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                             crt_worker_func, w + i);
+        crt_worker_func(w + 0);
+        for (slong i = nworkers; i > 0; i--)
+            thread_pool_wait(global_thread_pool, handles[i - 1]);
+
+        /* stitch the per-segment overhangs (carries across boundaries) */
+        {
+            unsigned char cf = 0;
+            for (slong i = 1; i <= nworkers; i++)
+            {
+                ulong start = w[i].start_easy*bits/FLINT_BITS;
+                if (i == nworkers)
+                {
+                    cf = flint_mpn_add_inplace_c(z + start, zn - start,
+                                              w[i - 1].overhang_buffer, n, cf);
+                }
+                else
+                {
+                    ulong stop = w[i].stop_easy*bits/FLINT_BITS;
+                    if (stop > start)
+                    {
+                        cf = flint_mpn_add_inplace_c(z + start, stop - start,
+                                              w[i - 1].overhang_buffer, n, cf);
+                    }
+                    else
+                    {
+                        for (ulong k = 0; k < n; k++)
+                        {
+                            FLINT_ASSERT(w[i].overhang_buffer[k] == 0);
+                            w[i].overhang_buffer[k] = w[i - 1].overhang_buffer[k];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    flint_give_back_threads(handles, nworkers);
+}

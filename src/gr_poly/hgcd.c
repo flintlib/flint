@@ -229,8 +229,8 @@ __mat_mul_strassen(gr_ptr * C, slong * lenC,
     polynomial products involved.
  */
 
-static int
-__mat_mul(gr_ptr * C, slong * lenC,
+int
+_gr_poly_hgcd_mat_mul_generic(gr_ptr * C, slong * lenC,
           gr_ptr * A, slong * lenA,
           gr_ptr * B, slong * lenB,
           gr_ptr T0, gr_ptr T1,
@@ -642,7 +642,7 @@ static int _gr_poly_hgcd_recursive(
                 __mul(T0, lenT0, S[3], lenS[3], q, lenq);
                 __add(S[1], lenS[1], S[1], lenS[1], T0, lenT0);
 
-                __mat_mul(M, lenM, R, lenR, S, lenS, a2, b2, ctx);
+                status |= _gr_poly_hgcd_mat_mul(M, lenM, R, lenR, S, lenS, a2, b2, ctx);
             }
 
             *ans_sgn = -(sgnR * sgnS);

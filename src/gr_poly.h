@@ -168,6 +168,18 @@ GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mullow(gr_ptr res, gr_srcptr poly
     return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx);
 }
 
+/* 2x2 polynomial matrix product C = A*B used by hgcd. C, A, B point to 4
+   entries each (row-major), with lengths in lenC, lenA, lenB; the output
+   lengths are normalized. Aliasing is not supported. T0 and T1 must have
+   room for any single polynomial product of an entry of A by an entry
+   of B. */
+WARN_UNUSED_RESULT int _gr_poly_hgcd_mat_mul_generic(gr_ptr * C, slong * lenC, gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB, gr_ptr T0, gr_ptr T1, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_hgcd_mat_mul(gr_ptr * C, slong * lenC, gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB, gr_ptr T0, gr_ptr T1, gr_ctx_t ctx)
+{
+    return GR_POLY_HGCD_MAT_MUL_OP(ctx, POLY_HGCD_MAT_MUL)(C, lenC, A, lenA, B, lenB, T0, T1, ctx);
+}
+
 WARN_UNUSED_RESULT int _gr_poly_mullow_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 

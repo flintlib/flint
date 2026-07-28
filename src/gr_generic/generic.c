@@ -3143,6 +3143,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_SET_POWERS,          (gr_funcptr) gr_generic_vec_set_powers},
 
     {GR_METHOD_POLY_MULLOW,             (gr_funcptr) _gr_poly_mullow_generic},
+    {GR_METHOD_POLY_HGCD_MAT_MUL,       (gr_funcptr) _gr_poly_hgcd_mat_mul_generic},
     {GR_METHOD_POLY_MULMID,             (gr_funcptr) _gr_poly_mulmid_generic},
     {GR_METHOD_POLY_DIV,                (gr_funcptr) _gr_poly_div_generic},
     {GR_METHOD_POLY_DIVREM,             (gr_funcptr) _gr_poly_divrem_generic},

@@ -399,6 +399,267 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn);
 void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi, const ulong* a, ulong an, const ulong* b, ulong bn);
 
+/* ------------------------------------------------------------------------ */
+/* FFT plans and transformed operands                                       */
+/* ------------------------------------------------------------------------ */
+
+/*
+    A plan fixes everything two operands must agree on in order to be
+    combined pointwise in transform space: the set of CRT primes
+    (np primes starting at index offset, or a direct single-prime FFT
+    modulo a user prime), the transform depth 2^depth, and the coefficient
+    bound the parameters were selected for. It also carries the output
+    window [zl, zh) of a length zn convolution for the operation currently
+    being performed, where ztrunc is the fft truncation length (equal to
+    2^depth when the wraparound trick computes a cyclic convolution).
+
+    The output coefficients (including any pointwise accumulation done in
+    transform space) must be bounded by bound_c * 2^bound_e; np is selected
+    such that the product of the primes exceeds this bound.
+
+    Forward transforms are unnormalized; the normalization factors
+    m[i] = (cop_i * 2^depth)^-1 mod p_i are folded in exactly once per
+    pointwise product, as sd_fft_ctx_point_mul does today.
+*/
+typedef struct
+{
+    mpn_ctx_struct * R;
+
+    /* CRT configuration */
+    ulong np;
+    ulong offset;
+    sd_fft_ctx_struct * ffts;   /* R->ffts, or direct_fft below */
+    crt_data_struct * crts;     /* R->crts */
+    sd_fft_ctx_struct direct_fft[1];
+    int use_direct_fft;
+
+    /* transform geometry */
+    ulong depth;
+    ulong stride;               /* n_round_up(2^depth, 128) */
+
+    /* window of the current operation */
+    ulong zl;
+    ulong zh;
+    ulong zn;
+    ulong ztrunc;
+
+    /* output coefficient bound bound_c * 2^bound_e */
+    ulong bound_c;
+    ulong bound_e;
+    ulong bits;     /* mpn plans: chunk size of the bit packing; 0 otherwise */
+    int sign;
+
+    /* normalization factors, indexed 0 <= i < np */
+    ulong m[MPN_CTX_NCRTS];
+} fft_small_plan_struct;
+
+typedef fft_small_plan_struct fft_small_plan_t[1];
+
+/* Select np and offset such that prod_primes(np) >= c * 2^e, considering
+   only the primes ffts[i] for i < np_max. Returns 0 on failure. */
+int _fft_small_plan_set_bound(fft_small_plan_t P, ulong c, ulong e, ulong np_max);
+
+/* Choose depth and ztrunc for the output window [zl, zh) of a length zn
+   convolution whose operand truncation lengths are at most xtrunc_max. */
+void _fft_small_plan_set_window(fft_small_plan_t P,
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max);
+
+/* Same, but with the depth of P fixed. Returns 0 if the window needs a
+   transform longer than 2^depth. */
+int _fft_small_plan_fit_window(fft_small_plan_t P,
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max);
+
+/* Compute stride and the normalization factors m[]. Requires the CRT
+   configuration and the depth to be set. */
+void _fft_small_plan_set_normalizers(fft_small_plan_t P);
+
+/*
+    Plan for computing the window [zl, zh) of a convolution of length zn
+    over Z/mod.n, where at most len_bound coefficient products, each of
+    absolute value less than 2^prod_bits, accumulate onto a single output
+    coefficient before reduction mod mod.n. For an ordinary multiplication
+    of lengths an and bn this means len_bound = min(an, bn) (any upper
+    bound such as bn works) and prod_bits = 2*modbits; a bilinear
+    accumulation of K products computed in transform space (e.g. matrix
+    multiplication with inner dimension K) passes len_bound = K*min(an, bn),
+    and unreduced inputs can be accounted for through prod_bits.
+
+    xtrunc_max is an upper bound for the operand truncation lengths
+    (n_round_up(max operand length, BLK_SZ)) and direct_len gates the
+    direct FFT branch (pass the length that should be compared against the
+    direct FFT cutoff, or 0 to disable the branch, e.g. when the plan will
+    be reused enough that the caller wants to force it with
+    fft_small_plan_force_direct_fft below).
+*/
+int fft_small_plan_init_nmod(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max,
+                    ulong len_bound, ulong prod_bits, nmod_t mod,
+                    ulong direct_len);
+
+/* Plan for cyclic convolutions modulo x^N - 1, N = 2^depth, writing the
+   output coefficients [0, zh). len_bound/prod_bits as above (a full
+   cyclic convolution accumulates up to N products, so an ordinary
+   multiplication passes len_bound = N). */
+/* Plan for transforms of nonnegative integers of at most an_max and
+   bn_max limbs, with prod_of_primes large enough for len_bound
+   accumulated products in transform space. Returns 0 if no admissible
+   prime count and chunk size exist. */
+int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong an_max, ulong bn_max, ulong len_bound);
+
+int fft_small_plan_init_nmod_cyclic(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong depth, ulong zh,
+                    ulong len_bound, ulong prod_bits, nmod_t mod);
+
+void fft_small_plan_clear(fft_small_plan_t P);
+
+/*
+    A transformed operand: the forward transforms of one operand modulo
+    each of the np primes of a plan, stored in the same layout as the
+    scratch buffers of the fused multiplication drivers (np per-prime
+    buffers of stride doubles each, in sd_fft block order).
+
+    An operand is only compatible with plans agreeing with the
+    np/offset/depth/stride fields it was created with, which is checked
+    with asserts. domain distinguishes unnormalized forward transforms
+    (PRIMAL) from pointwise products carrying one normalization factor
+    (PRODUCT); the two must not be mixed linearly.
+*/
+
+#define FFT_SMALL_OP_PRIMAL 0
+#define FFT_SMALL_OP_PRODUCT 1
+
+typedef struct
+{
+    double * data;
+    ulong stride;
+    ulong np;
+    ulong offset;
+    ulong depth;
+    ulong itrunc;
+    int domain;
+    int owns_data;
+} fft_small_op_struct;
+
+typedef fft_small_op_struct fft_small_op_t[1];
+
+void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P);
+void fft_small_op_clear(fft_small_op_t X);
+
+/* pointwise operations; Z may alias A (and B where it makes sense) */
+void fft_small_op_mul(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_op_t B, const fft_small_plan_t P);
+void fft_small_op_sqr(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_plan_t P);
+void fft_small_op_addmul(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_op_t B, const fft_small_plan_t P);
+void fft_small_op_submul(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_op_t B, const fft_small_plan_t P);
+void fft_small_op_add(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_op_t B, const fft_small_plan_t P);
+void fft_small_op_sub(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_op_t B, const fft_small_plan_t P);
+void fft_small_op_neg(fft_small_op_t Z, const fft_small_op_t A,
+                    const fft_small_plan_t P);
+
+/* inverse transform in place (normalization was already applied by the
+   pointwise stage) */
+void fft_small_ifft(fft_small_op_t X, const fft_small_plan_t P);
+
+/* forward transform of (a, an) reading it zero-padded to length itrunc,
+   with fft truncation P->ztrunc */
+void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong itrunc, nmod_t mod, const fft_small_plan_t P);
+
+/* chinese remaindering of an inverse-transformed operand into the output
+   window [P->zl, P->zh) */
+void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
+                    const fft_small_plan_t P);
+
+/* Write the low zn limbs of the accumulated integer to z. The true value
+   is reduced mod 2^(FLINT_BITS*zn) if it does not fit. */
+void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
+                    const fft_small_plan_t P);
+
+void fft_small_export_nmod(ulong* z, const fft_small_op_t X, nmod_t mod,
+                    const fft_small_plan_t P);
+
+/* ------------------------------------------------------------------------ */
+/* Generic two-stage convolution engine                                     */
+/* ------------------------------------------------------------------------ */
+
+/*
+    The engine runs the fused per-prime pipeline shared by the fft_small
+    multiplication drivers: for each prime, convert and forward-transform
+    the operands, multiply pointwise with the normalization factor folded
+    in, and inverse-transform (stage 1, parallelized over the primes, with
+    an optional nested worker transforming b concurrently with a); then
+    chinese remainder blocks of output coefficients into the destination
+    (stage 2, parallelized over output ranges).
+
+    The coefficient-type specific parts enter through mod_fn (conversion
+    of an operand into a per-prime double buffer), crt_fn (chinese
+    remaindering of an output range, called once per range so that np can
+    be specialized at compile time by the callers), and a tuning table of
+    threshold predicates, so that each type keeps its separately tuned
+    thresholds.
+*/
+
+typedef void (*fft_small_mod_func)(double* xbuf, ulong xtrunc,
+    const void* x, ulong xn, slong xaux,
+    const sd_fft_ctx_struct* fft, const void* params);
+
+/* Per-range output slots for crt_fn (e.g. carries of a digit
+   representation), consumed by an optional serial pass after stage 2. */
+#define FFT_SMALL_CRT_LOCAL 4
+
+typedef struct
+{
+    ulong stop_zi;
+    ulong local[FFT_SMALL_CRT_LOCAL];
+} fft_small_crt_range_struct;
+
+typedef void (*fft_small_crt_func)(void* z, ulong zl,
+    ulong zi_start, ulong zi_stop,
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
+    crt_data_struct* Rcrts, ulong min_an_bn, ulong* local,
+    const void* params);
+
+typedef void (*fft_small_s2_finish_func)(void* z, ulong zl, ulong zh,
+    fft_small_crt_range_struct* ranges, ulong nranges, const void* params);
+
+typedef struct
+{
+    ulong (*s1_threads)(ulong np, ulong tune_n);
+    int (*s1_b_worker)(ulong np, ulong tune_n, int squaring);
+    int (*s2_rethread)(ulong np, ulong zn);   /* may be NULL */
+} fft_small_conv_tuning;
+
+typedef struct
+{
+    const void* a; ulong an; slong aaux; ulong atrunc;
+    const void* b; ulong bn; slong baux; ulong btrunc;
+    const double* bfft;         /* if != NULL, b is already transformed
+                                   (np buffers of stride bfft_stride) and
+                                   b/bn/baux/btrunc are ignored */
+    ulong bfft_stride;
+    int squaring;
+    ulong tune_n;               /* size fed to the tuning predicates */
+    ulong min_an_bn;            /* bound on the number of products
+                                   accumulating on one output coefficient */
+    fft_small_mod_func mod_fn;
+    fft_small_crt_func crt_fn;
+    fft_small_s2_finish_func s2_finish;   /* may be NULL; called serially
+                                             after stage 2 with the range
+                                             boundaries and crt_fn's
+                                             per-range local outputs */
+    const void* params;
+    const fft_small_conv_tuning* tuning;
+} fft_small_conv_arg_struct;
+
+void _fft_small_conv(void* z, const fft_small_plan_t P,
+                    const fft_small_conv_arg_struct* A);
+
 void _nmod_poly_mul_mid_mpn_ctx(
     ulong* z, ulong zl, ulong zh,
     const ulong* a, ulong an,
@@ -427,14 +688,10 @@ void _nmod_poly_mul_mid(
     nmod_t mod);
 
 typedef struct {
-    ulong depth;
-    ulong N;
-    ulong offset;
-    ulong np;
-    ulong stride;
+    fft_small_plan_struct P[1];
+    fft_small_op_struct bfft[1];
     ulong bn;
     ulong btrunc;
-    double* bbuf;
 } mul_precomp_struct;
 
 void _mul_precomp_init(
@@ -446,7 +703,8 @@ void _mul_precomp_init(
 
 FLINT_FORCE_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 {
-    flint_aligned_free(M->bbuf);
+    fft_small_op_clear(M->bfft);
+    fft_small_plan_clear(M->P);
 }
 
 int _nmod_poly_mul_mid_precomp(

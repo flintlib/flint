@@ -221,75 +221,33 @@ FLINT_ASSERT(i+j < atrunc);
 
 
 
-#define DEFINE_IT(NP, N, M) \
-static void CAT(_crt, NP)( \
-    ulong* z, ulong zl, ulong zi_start, ulong zi_stop, \
-    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
-    crt_data_struct* Rcrts, ulong min_an_bn,\
-    nmod_t mod) \
-{ \
-    ulong np = NP; \
-    ulong n = N; \
-    ulong m = M; \
- \
-    FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
-    FLINT_ASSERT(1 <= N && N <= 3); \
- \
-    if (n == m + 1) \
+/* _crt_1, _crt_2, _crt_3 are special-cased below; the generic template
+   handles four or more primes, with a fast path while the reconstructed
+   values stay below 2^192 */
+#define CRT_FN(NP) CAT3(_crt, NP, fn)
+#define CRT_Z_TYPE ulong*
+#define CRT_HEAD nmod_t mod = *(const nmod_t*) params;
+#define CRT_EMIT(zi, r, NP, N, M) \
+    if (N == 3 || (N == 4 && r[3] == 0)) \
     { \
-        for (ulong l = 0; l < np; l++) { \
-            FLINT_ASSERT(crt_data_co_prime(Rcrts + np - 1, l)[m] == 0); \
-        } \
+        NMOD_RED3(z[zi], r[2], r[1], r[0], mod); \
     } \
     else \
     { \
-        FLINT_ASSERT(n == m); \
-    } \
- \
-    ulong Xs[BLK_SZ*NP]; \
- \
-    (void) min_an_bn; \
- \
-    for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ) \
-    { \
-        _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ); \
- \
-        ulong jstart = (i < zi_start) ? zi_start - i : 0; \
-        ulong jstop = FLINT_MIN(BLK_SZ, zi_stop - i); \
-        for (ulong j = jstart; j < jstop; j += 1) \
-        { \
-            ulong r[N]; \
-            ulong t[N]; \
-            ulong l = 0; \
- \
-            CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
-            for (l++; l < np; l++) \
-                CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
- \
-            CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
- \
-            if (N == 1) \
-            { \
-                NMOD_RED(z[i+j-zl], r[0], mod); \
-            } \
-            else if (N == 2) \
-            { \
-                NMOD2_RED2(z[i+j-zl], r[1], r[0], mod); \
-            } \
-            else \
-            { \
-                FLINT_ASSERT(N < 4 || r[3] == 0); \
-                NMOD_RED3(z[i+j-zl], r[2], r[1], r[0], mod); \
-            } \
-        } \
-    } \
-}
-
-// DEFINE_IT(1, 1, 1) -- special-cased below
-// DEFINE_IT(2, 2, 1) -- special-cased below
-// DEFINE_IT(3, 3, 2) -- special-cased below
-DEFINE_IT(4, 4, 3)
-#undef DEFINE_IT
+        z[zi] = mpn_mod_1(r, N, mod.n); \
+    }
+#define CRT_TAIL
+CRT_DEFINE(4, 4, 3)  /* 200 bits */
+CRT_DEFINE(5, 4, 4)  /* 250 bits */
+CRT_DEFINE(6, 5, 4)  /* 300 bits */
+CRT_DEFINE(7, 6, 5)  /* 350 bits */
+CRT_DEFINE(8, 7, 6)  /* 400 bits */
+#undef CRT_FN
+#undef CRT_Z_TYPE
+#undef CRT_HEAD
+#undef CRT_EMIT
+#undef CRT_TAIL
+#undef CRT_DEFINE
 
 
 FLINT_FORCE_INLINE
@@ -688,159 +646,204 @@ static void _crt_3(
 }
 
 
-typedef struct {
-    ulong np;
-    ulong start_pi;
-    ulong stop_pi;
-    ulong offset;
-    double* abuf;
-    double* bbuf;
-    ulong depth;
-    ulong stride;
-    ulong atrunc;
-    ulong btrunc;
-    ulong ztrunc;
-    const ulong* a;
-    ulong an;
-    const ulong* b;
-    ulong bn;
-    sd_fft_ctx_struct* ffts;
-    crt_data_struct* crts;
-    nmod_t mod;
-    ulong ioff;
-    int squaring;
-} s1worker_struct;
 
+/* ------------------------------------------------------------------------ */
+/* glue for the generic convolution engine                                  */
+/* ------------------------------------------------------------------------ */
 
-/* Reduce `const ulong* b` into `bbuf` and FFT-transform it in place.
-   Used as a helper for `s1worker_func` in order to process
-   `bbuf` and `abuf` in parallel, assuming `!squaring`.  */
-static void extra_func(void* varg)
+static void _mod_fn(double* xbuf, ulong xtrunc,
+    const void* x, ulong xn, slong FLINT_UNUSED(xaux),
+    const sd_fft_ctx_struct* fft, const void* params)
 {
-    s1worker_struct* X = (s1worker_struct*) varg;
-    sd_fft_ctx_struct* Q = X->ffts + X->ioff;
-
-    _mod(X->bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
-    sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+    _mod(xbuf, xtrunc, (const ulong*) x, xn, fft, *(const nmod_t*) params);
 }
 
-/* compute convolutions modulo the selected precomputed FFT primes.
-   Specifically, for each `start_pi <= i < stop_pi`, reduce
-   `a + stride*i` into `abuf + stride*i`, and multiply it by `b`,
-   modulo `ffts[i + X->offset].p`. The output is written in-place to
-   `abuf + stride*i`.
-   If `squaring` is true, `abuf` is squared, and `bbuf` is not used.
-   If `flint_request_threads` returns the requested number of threads,
-   then each `s1worker_func` processes exactly one prime.  */
-static void s1worker_func(void* varg)
+#define DEFINE_IT(NP) \
+static void CAT3(_crt, NP, fn)(void* z, ulong zl, \
+    ulong zi_start, ulong zi_stop, \
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
+    crt_data_struct* Rcrts, ulong min_an_bn, ulong* FLINT_UNUSED(local), \
+    const void* params) \
+{ \
+    CAT(_crt, NP)((ulong*) z, zl, zi_start, zi_stop, Rffts, d, dstride, \
+                  Rcrts, min_an_bn, *(const nmod_t*) params); \
+}
+DEFINE_IT(1)
+DEFINE_IT(2)
+DEFINE_IT(3)
+#undef DEFINE_IT
+
+static fft_small_crt_func _nmod_crt_fn(ulong np)
 {
-    s1worker_struct* X = (s1worker_struct*) varg;
-    ulong i, m;
+    return np == 1 ? _crt_1_fn :
+           np == 2 ? _crt_2_fn :
+           np == 3 ? _crt_3_fn :
+           np == 4 ? _crt_4_fn :
+           np == 5 ? _crt_5_fn :
+           np == 6 ? _crt_6_fn :
+           np == 7 ? _crt_7_fn :
+                     _crt_8_fn;
+}
+
+/* todo: even with np == 1, we may want threads for the conversion to fft */
+static ulong _nmod_conv_s1_threads(ulong np, ulong tune_n)
+{
+    return tune_n < 1500 ? 1 : np;
+}
+
+static int _nmod_conv_s1_b_worker(ulong FLINT_UNUSED(np), ulong tune_n,
+                                  int squaring)
+{
+    return tune_n > 5000 && !squaring;
+}
+
+static int _nmod_conv_s2_rethread(ulong np, ulong zn)
+{
+    return np*zn > 10000;
+}
+
+static const fft_small_conv_tuning _nmod_conv_tuning =
+    { _nmod_conv_s1_threads, _nmod_conv_s1_b_worker, _nmod_conv_s2_rethread };
+
+/* the cyclic and precomputed-operand drivers historically do not
+   re-request threads for stage 2 */
+static const fft_small_conv_tuning _nmod_conv_tuning_no_rethread =
+    { _nmod_conv_s1_threads, _nmod_conv_s1_b_worker, NULL };
+
+typedef struct {
+    fft_small_op_struct* X;
+    const ulong* a;
+    ulong an;
+    ulong itrunc;
+    nmod_t mod;
+    const fft_small_plan_struct* P;
+    ulong start_pi;
+    ulong stop_pi;
+} _op_fft_worker_struct;
+
+static void _op_fft_worker_func(void* varg)
+{
+    _op_fft_worker_struct* W = (_op_fft_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
+
+    for (ulong i = W->start_pi; i < W->stop_pi; i++)
+    {
+        sd_fft_ctx_struct* Q = P->ffts + P->offset + i;
+        double* xbuf = W->X->data + P->stride*i;
+
+        _mod(xbuf, W->itrunc, W->a, W->an, Q, W->mod);
+        sd_fft_trunc(Q, xbuf, P->depth, W->itrunc, P->ztrunc);
+    }
+}
+
+void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
+                    ulong itrunc, nmod_t mod, const fft_small_plan_t P)
+{
+    ulong i;
     thread_pool_handle* handles = NULL;
     slong nworkers = 0;
+    ulong nthreads;
+    _op_fft_worker_struct args[MPN_CTX_NCRTS];
 
-    if (X->bn > 5000 && !X->squaring)
-        nworkers = flint_request_threads(&handles, 2);
+    FLINT_ASSERT(X->np == P->np && X->offset == P->offset &&
+                 X->depth == P->depth && X->stride == P->stride);
+    FLINT_ASSERT(itrunc % BLK_SZ == 0);
+    FLINT_ASSERT(itrunc <= P->ztrunc);
 
-    for (i = X->start_pi; i < X->stop_pi; i++)
+    /* thread over the primes; the threshold mirrors the fused drivers'
+       stage 1 gate */
+    if (P->np >= 2 && an >= 1500)
+        nworkers = flint_request_threads(&handles, P->np);
+    nthreads = FLINT_MIN((ulong)(nworkers + 1), P->np);
+
+    for (i = 0; i < nthreads; i++)
     {
-        ulong ioff = i + X->offset;
-        double* abuf = X->abuf + X->stride*i;
-        double* bbuf = X->bbuf;
-        sd_fft_ctx_struct* Q = X->ffts + ioff;
-
-        if (nworkers > 0)
-        {
-            X->ioff = ioff; // read by extra_func on the worker thread
-            thread_pool_wake(global_thread_pool, handles[0], 0, extra_func, X);
-        }
-        else if (!X->squaring)
-        {
-            _mod(bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
-            sd_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
-        }
-
-        _mod(abuf, X->atrunc, X->a, X->an, Q, X->mod);
-        sd_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
-
-        if (nworkers > 0)
-            thread_pool_wait(global_thread_pool, handles[0]);
-
-        ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
-        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, Q->mod);
-        m = nmod_inv(m, Q->mod);
-
-        if (X->squaring)
-            sd_fft_ctx_point_sqr(Q, abuf, m, X->depth);
-        else
-            sd_fft_ctx_point_mul(Q, abuf, bbuf, m, X->depth);
-
-        sd_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
+        _op_fft_worker_struct* W = args + i;
+        W->X = X;
+        W->a = a;
+        W->an = an;
+        W->itrunc = itrunc;
+        W->mod = mod;
+        W->P = P;
+        W->start_pi = (i+0)*P->np/nthreads;
+        W->stop_pi  = (i+1)*P->np/nthreads;
     }
 
+    for (i = nthreads - 1; i > 0; i--)
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                         _op_fft_worker_func, args + i);
+    _op_fft_worker_func(args + 0);
+    for (i = nthreads - 1; i > 0; i--)
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
+
     flint_give_back_threads(handles, nworkers);
+
+    X->itrunc = itrunc;
+    X->domain = FFT_SMALL_OP_PRIMAL;
 }
 
 typedef struct {
     ulong* z;
-    ulong zl;
+    const fft_small_op_struct* X;
+    nmod_t mod;
+    const fft_small_plan_struct* P;
+    fft_small_crt_func crt_fn;
     ulong start_zi;
     ulong stop_zi;
-    double* buf;
-    ulong offset;
-    ulong stride;
-    sd_fft_ctx_struct* ffts;
-    crt_data_struct* crts;
-    nmod_t mod;
-    ulong min_an_bn;  /* for precise output bounds */
-    void (*f)(
-        ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
-        sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-        crt_data_struct* Rcrts, ulong min_an_bn,
-        nmod_t mod);  /* f = _crt_{np} for 1 <= np <= 4 */
-} s2worker_struct;
+} _op_export_worker_struct;
 
-/* Computes CRT for an output range, writing to `z[zi - zl]` for
-   `start_zi <= zi < stop_zi`.  */
-static void s2worker_func(void* varg)
+static void _op_export_worker_func(void* varg)
 {
-    s2worker_struct* X = (s2worker_struct*) varg;
+    _op_export_worker_struct* W = (_op_export_worker_struct*) varg;
+    const fft_small_plan_struct* P = W->P;
 
-    X->f(X->z, X->zl, X->start_zi, X->stop_zi, X->ffts + X->offset, X->buf,
-         X->stride, X->crts + X->offset, X->min_an_bn, X->mod);
+    W->crt_fn((void*) W->z, P->zl, W->start_zi, W->stop_zi,
+              P->ffts + P->offset, W->X->data, P->stride,
+              P->crts + P->offset, P->bound_c, NULL, &W->mod);
 }
 
-/* Return whether to compute the FFT directly modulo `mod`, rather than
-   modulo precomputed FFT primes followed by CRT reconstruction.
-   Direct computation requires `mod.n` to be prime and `mod.n - 1`
-   to have sufficiently high 2-valuation.
-   This is usually faster when CRT would need multiple primes, but it pays
-   the setup cost of initializing and clearing a temporary `sd_fft_ctx_t`.  */
-static int
-_nmod_poly_should_directly_fft(ulong bn, ulong depth, nmod_t mod)
+void fft_small_export_nmod(ulong* z, const fft_small_op_t X, nmod_t mod,
+                    const fft_small_plan_t P)
 {
-    if (bn < 1500)
-        return 0;
+    ulong i, o;
+    thread_pool_handle* handles = NULL;
+    slong nworkers = 0;
+    ulong nthreads;
+    _op_export_worker_struct args[8];
 
-    if (mod.n <= 2 || mod.n > (UWORD(1) << 50))
-        return 0;
+    /* the number of products accumulated onto one output coefficient is
+       bounded by the len_bound the plan was created with; thread over
+       BLK_SZ-aligned output ranges as the engine's stage 2 does, with
+       the same rethread heuristic */
+    if (P->np*(P->zh - P->zl) > 10000)
+        nworkers = flint_request_threads(&handles, 8);
+    nthreads = nworkers + 1;
 
-    if (NMOD_BITS(mod) < 20)
-        return 0;
+    o = P->zl;
+    for (i = 0; i < nthreads; i++)
+    {
+        _op_export_worker_struct* W = args + i;
+        W->z = z;
+        W->X = X;
+        W->mod = mod;
+        W->P = P;
+        W->crt_fn = _nmod_crt_fn(P->np);
+        W->start_zi = o;
+        ulong newo = n_round_down(P->zl + (i+1)*(P->zh - P->zl)/nthreads, BLK_SZ);
+        o = i+1 < nthreads ? FLINT_MAX(o, newo) : P->zh;
+        W->stop_zi = o;
+    }
 
-    if (!fft_small_mulmod_satisfies_bounds(mod.n))
-        /* should be implied by the 50-bit bound, but just in case */
-        return 0;
+    for (i = nworkers; i > 0; i--)
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                         _op_export_worker_func, args + i);
+    _op_export_worker_func(args + 0);
+    for (i = nworkers; i > 0; i--)
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
 
-    if (depth > SD_FFT_CTX_W2TAB_SIZE)
-        /* unlikely, the convolution length would have to be massive */
-        return 0;
-
-    if (n_trailing_zeros(mod.n - 1) < depth)
-        return 0;
-
-    return n_is_prime(mod.n); /* check the most expensive condition last */
+    flint_give_back_threads(handles, nworkers);
 }
+
 
 void _nmod_poly_mul_mid_mpn_ctx(
     ulong* z, ulong zl, ulong zh,
@@ -850,15 +853,11 @@ void _nmod_poly_mul_mid_mpn_ctx(
     mpn_ctx_t R)
 {
     ulong modbits = FLINT_BITS - mod.norm;
-    ulong offset = 0;
     ulong zn = an + bn - 1;
-    ulong atrunc, btrunc, ztrunc;
-    ulong i, np, depth, stride;
-    double* buf;
-    sd_fft_ctx_t direct_fft;  // initialized with mod.n in direct mode
-    int squaring;
-
-    direct_fft->w2tab[0] = NULL;  // use direct_fft branch iff this is not NULL
+    ulong atrunc, btrunc;
+    int squaring, success;
+    fft_small_plan_t P;
+    fft_small_conv_arg_struct A;
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
@@ -878,154 +877,39 @@ void _nmod_poly_mul_mid_mpn_ctx(
         zh = zn;
     }
 
-    squaring = (a == b) && (an == bn);
-
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
+    squaring = (a == b) && (an == bn);
+
     atrunc = n_round_up(an, BLK_SZ);
     btrunc = n_round_up(bn, BLK_SZ);
-    ztrunc = n_round_up(zn, BLK_SZ);
-    /*
-        if there is a power of two 2^d between zh and zn with good wrap around
-            i.e. max(an, bn, zh) <= 2^d <= zn with zn - 2^d <= zl
-        then use d as the depth, otherwise the usual with no wrap around
-    */
-    depth = n_flog2(zn);
-    i = n_pow2(depth);
-    if (atrunc <= i && btrunc <= i && zh <= i && i <= zn && zn <= zl + i)
-    {
-        ztrunc = i;
-    }
-    else
-    {
-        depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
-    }
 
-    /* first see if mod.n is one of R->ffts[i].mod.n */
-    if (modbits == 50)
-    {
-        for (i = 0; i < MPN_CTX_NCRTS; i++)
-        {
-            if (mod.n == R->ffts[i].mod.n)
-            {
-                offset = i;
-                np = 1;
-                goto got_np_and_offset;
-            }
-        }
-    }
+    /* at most min(an, bn) <= bn products, each < 2^(2*modbits), accumulate
+       onto one output coefficient */
+    success = fft_small_plan_init_nmod(P, R, zl, zh, zn,
+                        n_max(atrunc, btrunc), bn, 2*modbits, mod, bn);
+    FLINT_ASSERT(success);
+    (void) success;
 
-    if (_nmod_poly_should_directly_fft(bn, depth, mod))
-    {
-        sd_fft_ctx_init_prime(direct_fft, mod.n);
-        offset = 0;
-        np = 1;
-        goto got_np_and_offset;
-    }
+    A.a = a; A.an = an; A.aaux = 0; A.atrunc = atrunc;
+    A.b = b; A.bn = bn; A.baux = 0; A.btrunc = btrunc;
+    A.bfft = NULL;
+    A.bfft_stride = 0;
+    A.squaring = squaring;
+    A.tune_n = bn;
+    A.min_an_bn = FLINT_MIN(an, bn);
+    A.mod_fn = _mod_fn;
+    A.s2_finish = NULL;
+    A.crt_fn = _nmod_crt_fn(P->np);
+    A.params = &mod;
+    A.tuning = &_nmod_conv_tuning;
 
-    /* need prod_of_primes >= blen * 4^modbits */
-    for (np = 1; np < 4; np++)
-    {
-        if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
-              R->crts[np - 1].coeff_len, bn, 2*modbits) >= 0)
-        {
-            break;
-        }
-    }
+    _fft_small_conv(z, P, &A);
 
-    FLINT_ASSERT(0 <= flint_mpn_cmp_ui_2exp(
-                                  crt_data_prod_primes(R->crts + np - 1),
-                                  R->crts[np - 1].coeff_len, bn, 2*modbits));
-
-
-got_np_and_offset:
-
-    stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
-
-    ulong want_threads;
-
-    if (bn < 1500)
-        want_threads = 1;
-    else
-        want_threads = np;
-
-    thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, want_threads);
-    ulong nthreads = nworkers + 1;
-
-    buf = (double*) mpn_ctx_fit_buffer(R, (np+nthreads)*stride*sizeof(double));
-
-    s1worker_struct s1args[4];
-    for (i = 0; i < nthreads; i++)
-    {
-        s1worker_struct* X = s1args + i;
-        X->np = np;
-        X->start_pi = (i+0)*np/nthreads;
-        X->stop_pi  = (i+1)*np/nthreads;
-        X->offset = offset;
-        X->abuf = buf;
-        X->bbuf = buf + (np+i)*stride;
-        X->depth = depth;
-        X->stride = stride;
-        X->atrunc = atrunc;
-        X->btrunc = btrunc;
-        X->ztrunc = ztrunc;
-        X->a = a;
-        X->an = an;
-        X->b = b;
-        X->bn = bn;
-        X->ffts = direct_fft->w2tab[0] != NULL ? direct_fft : R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->squaring = squaring;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s1worker_func, s1args + i);
-    s1worker_func(s1args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    if (np*zn > 10000)
-    {
-        flint_give_back_threads(handles, nworkers);
-        nworkers = flint_request_threads(&handles, 8);
-        nthreads = nworkers + 1;
-    }
-
-    s2worker_struct s2args[8];
-    ulong o = zl;
-    for (i = 0; i < nthreads; i++)
-    {
-        s2worker_struct* X = s2args + i;
-        X->z = z;
-        X->zl = zl;
-        X->start_zi = o;
-        ulong newo = n_round_down(zl + (i+1)*(zh-zl)/nthreads, BLK_SZ);
-        o = i+1 < nthreads ? FLINT_MAX(o, newo) : zh;
-        X->stop_zi = o;
-        X->buf = buf;
-        X->offset = offset;
-        X->stride = stride;
-        X->ffts = direct_fft->w2tab[0] != NULL ? direct_fft : R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->min_an_bn = FLINT_MIN(an, bn);
-        X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s2worker_func, s2args + i);
-    s2worker_func(s2args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    flint_give_back_threads(handles, nworkers);
-
-    if (direct_fft->w2tab[0] != NULL)
-        sd_fft_ctx_clear(direct_fft);
+    fft_small_plan_clear(P);
 }
+
 
 #if 0
 static void _nmod_poly_mul_mod_xpnm1_naive(
@@ -1072,167 +956,39 @@ static void _nmod_poly_mul_mod_xpnm1(
 {
     ulong N = n_pow2(depth);
     ulong modbits = FLINT_BITS - mod.norm;
-    ulong offset = 0;
-    ulong i, np, stride;
-    double* buf;
+    fft_small_plan_t P;
+    fft_small_conv_arg_struct A;
+    int success;
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
     FLINT_ASSERT(ztrunc <= N);
 
-    /* first see if mod.n is one of R->ffts[i].mod.n */
-    if (modbits == 50)
-    {
-        for (i = 0; i < MPN_CTX_NCRTS; i++)
-        {
-            if (mod.n == R->ffts[i].mod.n)
-            {
-                offset = i;
-                np = 1;
-                goto got_np_and_offset;
-            }
-        }
-    }
+    /* a cyclic convolution accumulates up to N products onto one output
+       coefficient */
+    success = fft_small_plan_init_nmod_cyclic(P, R, depth, ztrunc, N,
+                                              2*modbits, mod);
+    FLINT_ASSERT(success);
+    (void) success;
 
-    /* need prod_of_primes >= N * 4^modbits */
-    for (np = 1; np < 4; np++)
-    {
-        if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
-              R->crts[np - 1].coeff_len, N, 2*modbits) >= 0)
-        {
-            break;
-        }
-    }
+    A.a = a; A.an = an; A.aaux = 0; A.atrunc = N;
+    A.b = b; A.bn = bn; A.baux = 0; A.btrunc = N;
+    A.bfft = NULL;
+    A.bfft_stride = 0;
+    A.squaring = 0;
+    A.tune_n = bn;
+    A.min_an_bn = FLINT_MIN(an, bn);
+    A.mod_fn = _mod_fn;
+    A.s2_finish = NULL;
+    A.crt_fn = _nmod_crt_fn(P->np);
+    A.params = &mod;
+    A.tuning = &_nmod_conv_tuning_no_rethread;
 
-    FLINT_ASSERT(0 <= flint_mpn_cmp_ui_2exp(
-                                  crt_data_prod_primes(R->crts + np - 1),
-                                  R->crts[np - 1].coeff_len, N, 2*modbits));
+    _fft_small_conv(z, P, &A);
 
-
-got_np_and_offset:
-
-    stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
-
-    ulong want_threads;
-
-    if (bn < 1500)
-        want_threads = 1;
-    else
-        want_threads = np;
-
-    thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, want_threads);
-    ulong nthreads = nworkers + 1;
-
-    buf = (double*) mpn_ctx_fit_buffer(R, (np+nthreads)*stride*sizeof(double));
-
-    s1worker_struct s1args[4];
-    for (i = 0; i < nthreads; i++)
-    {
-        s1worker_struct* X = s1args + i;
-        X->np = np;
-        X->start_pi = (i+0)*np/nthreads;
-        X->stop_pi  = (i+1)*np/nthreads;
-        X->offset = offset;
-        X->abuf = buf;
-        X->bbuf = buf + (np+i)*stride;
-        X->depth = depth;
-        X->stride = stride;
-        X->atrunc = N;
-        X->btrunc = N;
-        X->ztrunc = N;
-        X->a = a;
-        X->an = an;
-        X->b = b;
-        X->bn = bn;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->squaring = 0;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s1worker_func, s1args + i);
-    s1worker_func(s1args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    s2worker_struct s2args[8];
-    ulong zl = 0;
-    ulong zh = ztrunc;
-    ulong o = zl;
-    for (i = 0; i < nthreads; i++)
-    {
-        s2worker_struct* X = s2args + i;
-        X->z = z;
-        X->zl = zl;
-        X->start_zi = o;
-        ulong newo = n_round_down(zl + (i+1)*(zh-zl)/nthreads, BLK_SZ);
-        o = i+1 < nthreads ? FLINT_MAX(o, newo) : zh;
-        X->stop_zi = o;
-        X->buf = buf;
-        X->offset = offset;
-        X->stride = stride;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->min_an_bn = FLINT_MIN(an, bn);
-        X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s2worker_func, s2args + i);
-    s2worker_func(s2args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    flint_give_back_threads(handles, nworkers);
+    fft_small_plan_clear(P);
 }
 
-
-typedef struct {
-    ulong np;
-    ulong start_pi;
-    ulong stop_pi;
-    ulong offset;
-    double* abuf;
-    double* bbuf;
-    ulong depth;
-    ulong stride;
-    ulong atrunc;
-    ulong ztrunc;
-    const ulong* a;
-    ulong an;
-    sd_fft_ctx_struct* ffts;
-    crt_data_struct* crts;
-    nmod_t mod;
-} s1pworker_struct;
-
-/* similar to `s1worker_func`, but assume `bbuf` is already FFT-transformed.
-   If `flint_request_threads` returns the requested number of threads,
-   then each `s1pworker_func` processes exactly one prime.  */
-static void s1pworker_func(void* varg)
-{
-    s1pworker_struct* X = (s1pworker_struct*) varg;
-    ulong i, m;
-
-    for (i = X->start_pi; i < X->stop_pi; i++)
-    {
-        ulong ioff = i + X->offset;
-        double* abuf = X->abuf + X->stride*i;
-        sd_fft_ctx_struct* Q = X->ffts + ioff;
-
-        _mod(abuf, X->atrunc, X->a, X->an, Q, X->mod);
-        sd_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
-
-        ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
-        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, Q->mod);
-        m = nmod_inv(m, Q->mod);
-        sd_fft_ctx_point_mul(Q, abuf, X->bbuf + X->stride*i, m, X->depth);
-
-        sd_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
-    }
-}
 
 void _mul_precomp_init(
     mul_precomp_struct* M,
@@ -1241,65 +997,24 @@ void _mul_precomp_init(
     nmod_t mod,
     mpn_ctx_t R)
 {
-    ulong N = n_pow2(depth);
     ulong modbits = FLINT_BITS - mod.norm;
-    ulong offset = 0;
-    ulong i, np, stride;
+    ulong N = n_pow2(depth);
+    int success;
 
     btrunc = n_round_up(btrunc, BLK_SZ);
 
-    FLINT_ASSERT(bn > 0);
+    /* the transform may be used for cyclic convolutions, which accumulate
+       up to N products onto one output coefficient */
+    success = fft_small_plan_init_nmod_cyclic(M->P, R, depth, N, N,
+                                              2*modbits, mod);
+    FLINT_ASSERT(success);
+    (void) success;
 
-    /* first see if mod.n is one of R->ffts[i].mod.n */
-    if (modbits == 50)
-    {
-        for (i = 0; i < MPN_CTX_NCRTS; i++)
-        {
-            if (mod.n == R->ffts[i].mod.n)
-            {
-                offset = i;
-                np = 1;
-                goto got_np_and_offset;
-            }
-        }
-    }
-
-    /* need prod_of_primes >= N * 4^modbits */
-    for (np = 1; np < 4; np++)
-    {
-        if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
-              R->crts[np - 1].coeff_len, N, 2*modbits) >= 0)
-        {
-            break;
-        }
-    }
-
-    FLINT_ASSERT(0 <= flint_mpn_cmp_ui_2exp(
-                                  crt_data_prod_primes(R->crts + np - 1),
-                                  R->crts[np - 1].coeff_len, N, 2*modbits));
-
-got_np_and_offset:
-
-    stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
-
-    M->depth = depth;
-    M->N = N;
-    M->offset = offset;
-    M->np = np;
-    M->stride = stride;
     M->bn = bn;
     M->btrunc = btrunc;
-    M->bbuf = flint_aligned_alloc(4096, n_round_up(np*stride*sizeof(double), 4096));
 
-    for (i = 0; i < np; i++)
-    {
-        ulong ioff = i + offset;
-        double* bbuf = M->bbuf + stride*i;
-        sd_fft_ctx_struct* Q = R->ffts + ioff;
-
-        _mod(bbuf, N, b, bn, Q, mod);
-        sd_fft_trunc(Q, bbuf, depth, N, N);
-    }
+    fft_small_op_init(M->bfft, M->P);
+    fft_small_fft_nmod(M->bfft, b, bn, N, mod, M->P);
 }
 
 
@@ -1312,15 +1027,13 @@ int _nmod_poly_mul_mid_precomp(
 {
     ulong bn = M->bn;
     ulong zn = an + bn - 1;
-    ulong atrunc, ztrunc;
-    ulong depth = M->depth;
-    ulong N = n_pow2(depth);
-    ulong i, np = M->np;
-    double* buf;
+    ulong atrunc;
+    fft_small_conv_arg_struct A;
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
-    FLINT_ASSERT(M->btrunc <= N);
+    FLINT_ASSERT(M->btrunc <= n_pow2(M->P->depth));
+    FLINT_ASSERT(R == M->P->R);
 
     if (zl >= zh)
         return 1;
@@ -1341,91 +1054,30 @@ int _nmod_poly_mul_mid_precomp(
     FLINT_ASSERT(zh <= zn);
 
     atrunc = n_round_up(an, BLK_SZ);
-    ztrunc = n_round_up(zn, BLK_SZ);
 
-    if (atrunc <= N && zh <= N && N <= zn && zn <= zl + N)
-    {
-        ztrunc = N;
-    }
-    else if (ztrunc <= N)
-    {
-    }
-    else
-    {
+    /* note: adjusting the window in M means concurrent calls on the same M
+       race, but they already race on the scratch buffer in R */
+    if (!_fft_small_plan_fit_window(M->P, zl, zh, zn, atrunc))
         return 0;
-    }
 
-    ulong want_threads;
+    A.a = a; A.an = an; A.aaux = 0; A.atrunc = atrunc;
+    A.b = NULL; A.bn = bn; A.baux = 0; A.btrunc = 0;
+    A.bfft = M->bfft->data;
+    A.bfft_stride = M->bfft->stride;
+    A.squaring = 0;
+    A.tune_n = bn;
+    A.min_an_bn = FLINT_MIN(an, bn);
+    A.mod_fn = _mod_fn;
+    A.s2_finish = NULL;
+    A.crt_fn = _nmod_crt_fn(M->P->np);
+    A.params = &mod;
+    A.tuning = &_nmod_conv_tuning_no_rethread;
 
-    /* todo: even with np == 1, we may want threads for the conversion to fft */
-    if (bn < 1500)
-        want_threads = 1;
-    else
-        want_threads = np;
+    _fft_small_conv(z, M->P, &A);
 
-    thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, want_threads);
-    ulong nthreads = nworkers + 1;
-
-    buf = (double*) mpn_ctx_fit_buffer(R, np*M->stride*sizeof(double));
-
-    s1pworker_struct s1pargs[4];
-    for (i = 0; i < nthreads; i++)
-    {
-        s1pworker_struct* X = s1pargs + i;
-        X->np = np;
-        X->start_pi = (i+0)*np/nthreads;
-        X->stop_pi  = (i+1)*np/nthreads;
-        X->offset = M->offset;
-        X->abuf = buf;
-        X->bbuf = M->bbuf;
-        X->depth = depth;
-        X->stride = M->stride;
-        X->atrunc = atrunc;
-        X->ztrunc = ztrunc;
-        X->a = a;
-        X->an = an;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s1pworker_func, s1pargs + i);
-    s1pworker_func(s1pargs + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    s2worker_struct s2args[8];
-    ulong o = zl;
-    for (i = 0; i < nthreads; i++)
-    {
-        s2worker_struct* X = s2args + i;
-        X->z = z;
-        X->zl = zl;
-        X->start_zi = o;
-        ulong newo = n_round_down(zl + (i+1)*(zh-zl)/nthreads, BLK_SZ);
-        o = i+1 < nthreads ? FLINT_MAX(o, newo) : zh;
-        X->stop_zi = o;
-        X->buf = buf;
-        X->offset = M->offset;
-        X->stride = M->stride;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->min_an_bn = FLINT_MIN(an, bn);
-        X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s2worker_func, s2args + i);
-    s2worker_func(s2args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    flint_give_back_threads(handles, nworkers);
     return 1;
 }
+
 
 static void _nmod_poly_mul_mod_xpnm1_precomp(
     ulong* z, ulong ztrunc,
@@ -1434,84 +1086,36 @@ static void _nmod_poly_mul_mod_xpnm1_precomp(
     nmod_t mod,
     mpn_ctx_t R)
 {
-    ulong depth = M->depth;
-    ulong i, np = M->np;
-    double* buf;
+    fft_small_conv_arg_struct A;
 
     FLINT_ASSERT(an > 0);
+    FLINT_ASSERT(R == M->P->R);
+    FLINT_ASSERT(ztrunc <= M->btrunc);
 
-    ulong want_threads;
+    /* output window [0, ztrunc) of a cyclic convolution, with the ffts
+       truncated at M->btrunc as the precomputed transform was */
+    M->P->zl = 0;
+    M->P->zh = ztrunc;
+    M->P->zn = n_pow2(M->P->depth);
+    M->P->ztrunc = M->btrunc;
 
-    if (an < 1500)
-        want_threads = 1;
-    else
-        want_threads = np;
+    A.a = a; A.an = an; A.aaux = 0; A.atrunc = M->btrunc;
+    A.b = NULL; A.bn = 0; A.baux = 0; A.btrunc = 0;
+    A.bfft = M->bfft->data;
+    A.bfft_stride = M->bfft->stride;
+    A.squaring = 0;
+    A.tune_n = an;
+    A.min_an_bn = an;  /* Todo: we might want to store bn and min by this here,
+                          in case this is much smaller than an. */
+    A.mod_fn = _mod_fn;
+    A.s2_finish = NULL;
+    A.crt_fn = _nmod_crt_fn(M->P->np);
+    A.params = &mod;
+    A.tuning = &_nmod_conv_tuning_no_rethread;
 
-    thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, want_threads);
-    ulong nthreads = nworkers + 1;
-
-    buf = (double*) mpn_ctx_fit_buffer(R, np*M->stride*sizeof(double));
-
-    s1pworker_struct s1pargs[4];
-    for (i = 0; i < nthreads; i++)
-    {
-        s1pworker_struct* X = s1pargs + i;
-        X->np = np;
-        X->start_pi = (i+0)*np/nthreads;
-        X->stop_pi  = (i+1)*np/nthreads;
-        X->offset = M->offset;
-        X->abuf = buf;
-        X->bbuf = M->bbuf;
-        X->depth = depth;
-        X->stride = M->stride;
-        X->atrunc = M->btrunc;
-        X->ztrunc = M->btrunc;
-        X->a = a;
-        X->an = an;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s1pworker_func, s1pargs + i);
-    s1pworker_func(s1pargs + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    s2worker_struct s2args[8];
-    ulong zl = 0;
-    ulong zh = ztrunc;
-    ulong o = zl;
-    for (i = 0; i < nthreads; i++)
-    {
-        s2worker_struct* X = s2args + i;
-        X->z = z;
-        X->zl = zl;
-        X->start_zi = o;
-        ulong newo = n_round_down(zl + (i+1)*(zh-zl)/nthreads, BLK_SZ);
-        o = i+1 < nthreads ? FLINT_MAX(o, newo) : zh;
-        X->stop_zi = o;
-        X->buf = buf;
-        X->offset = M->offset;
-        X->stride = M->stride;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->min_an_bn = an;  /* Todo: we might want to store bn and min by this here,
-                               in case this is much smaller than an. */
-        X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s2worker_func, s2args + i);
-    s2worker_func(s2args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    flint_give_back_threads(handles, nworkers);
+    _fft_small_conv(z, M->P, &A);
 }
+
 
 
 /* z -= a mod x^N-1, write coeffs [0,ztrunc) */
@@ -1645,7 +1249,7 @@ int _nmod_poly_divrem_precomp(
     if (!_nmod_poly_mul_mid_precomp(q, Bn-1, Bn-1+qn, a+an-qn, qn, M->quo_maker, mod, R))
         return 0;
     _nmod_poly_mul_mod_xpnm1_precomp(r, bn-1, q, qn, M->rem_maker, mod, R);
-    _nmod_poly_sub_mod_xpNm1(r, bn-1, a, an, M->rem_maker->N, mod);
+    _nmod_poly_sub_mod_xpNm1(r, bn-1, a, an, n_pow2(M->rem_maker->P->depth), mod);
     return 1;
 }
 
