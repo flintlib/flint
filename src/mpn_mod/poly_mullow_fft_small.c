@@ -163,6 +163,103 @@ static void _crt_1(
 }
 
 
+/* standalone forward transform of a coefficient vector into an operand,
+   for the transformed polynomial representation */
+void fft_small_fft_mpn_mod(fft_small_op_t X, nn_srcptr a, ulong an,
+                    ulong itrunc, gr_ctx_t ctx, const fft_small_plan_t P)
+{
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    ulong i;
+
+    FLINT_ASSERT(itrunc <= P->ztrunc);
+
+    for (i = 0; i < P->np; i++)
+    {
+        sd_fft_ctx_struct * Q = P->ffts + P->offset + i;
+        double * d = X->data + P->stride * i;
+
+        _mod(d, itrunc, a, an, nlimbs, Q);
+        sd_fft_trunc(Q, d, P->depth, itrunc, P->ztrunc);
+    }
+
+    X->itrunc = itrunc;
+    X->domain = FFT_SMALL_OP_PRIMAL;
+}
+
+/* chinese remaindering of an inverse-transformed operand restricted to the
+   window [zl, zh) inside [P->zl, P->zh); z receives zh - zl coefficients */
+
+static fft_small_crt_func _mpn_mod_crt_fn(ulong np);
+
+typedef struct {
+    nn_ptr z;
+    const fft_small_op_struct * X;
+    _conv_params_struct * par;
+    const fft_small_plan_struct * P;
+    fft_small_crt_func crt_fn;
+    ulong start_zi;
+    ulong stop_zi;
+} _op_export_mpn_mod_worker_struct;
+
+static void _op_export_mpn_mod_worker_func(void * varg)
+{
+    _op_export_mpn_mod_worker_struct * W =
+        (_op_export_mpn_mod_worker_struct *) varg;
+    const fft_small_plan_struct * P = W->P;
+
+    W->crt_fn((void *) W->z, P->zl, W->start_zi, W->stop_zi,
+              P->ffts + P->offset, W->X->data, P->stride,
+              P->crts + P->offset, P->bound_c, NULL, W->par);
+}
+
+void fft_small_export_mpn_mod_range(nn_ptr z, const fft_small_op_t X,
+                    ulong zl, ulong zh, gr_ctx_t ctx, const fft_small_plan_t P)
+{
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    ulong i, o;
+    thread_pool_handle * handles = NULL;
+    slong nworkers = 0;
+    ulong nthreads;
+    _conv_params_struct par;
+    _op_export_mpn_mod_worker_struct args[8];
+
+    FLINT_ASSERT(P->zl <= zl && zh <= P->zh);
+
+    if (zl >= zh)
+        return;
+
+    par.nlimbs = nlimbs;
+    par.ctx = ctx;
+
+    if (P->np * (zh - zl) > 10000)
+        nworkers = flint_request_threads(&handles, 8);
+    nthreads = nworkers + 1;
+
+    o = zl;
+    for (i = 0; i < nthreads; i++)
+    {
+        _op_export_mpn_mod_worker_struct * W = args + i;
+        W->z = z - (zl - P->zl) * nlimbs;   /* worker offsets by P->zl */
+        W->X = X;
+        W->par = &par;
+        W->P = P;
+        W->crt_fn = _mpn_mod_crt_fn(P->np);
+        W->start_zi = o;
+        ulong newo = n_round_down(zl + (i + 1) * (zh - zl) / nthreads, BLK_SZ);
+        o = i + 1 < nthreads ? FLINT_MAX(o, newo) : zh;
+        W->stop_zi = o;
+    }
+
+    for (i = nworkers; i > 0; i--)
+        thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                         _op_export_mpn_mod_worker_func, args + i);
+    _op_export_mpn_mod_worker_func(args + 0);
+    for (i = nworkers; i > 0; i--)
+        thread_pool_wait(global_thread_pool, handles[i - 1]);
+
+    flint_give_back_threads(handles, nworkers);
+}
+
 /* ------------------------------------------------------------------------ */
 /* glue for the generic convolution engine                                  */
 /* ------------------------------------------------------------------------ */
