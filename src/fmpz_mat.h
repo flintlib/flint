@@ -478,6 +478,16 @@ int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit);
 
 int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P, fmpz_mat_t col, slong exp, slong U_exp);
 
+/* transformed-integer matrix product (fft_small); returns 0 without
+   touching C when unavailable or unprofitable, so callers can fall back */
+int fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A,
+                           const fmpz_mat_t B);
+/* each entry receives the limbs of its magnitude above limb lo_limbs,
+   with the entry's sign; at most one unit of error in the lowest
+   returned limb of each entry (lo_limbs = 0 is exact) */
+int fmpz_mat_mul_fft_small_trunc(fmpz_mat_t C, const fmpz_mat_t A,
+                           const fmpz_mat_t B, slong lo_limbs);
+
 #ifdef __cplusplus
 }
 #endif

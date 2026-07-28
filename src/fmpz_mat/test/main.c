@@ -78,6 +78,7 @@
 #include "t-mul_blas.c"
 #include "t-mul.c"
 #include "t-mul_classical.c"
+#include "t-mul_fft_small.c"
 #include "t-mul_double_word.c"
 #include "t-mul_fft.c"
 #include "t-mul_fmpz_vec.c"
@@ -184,6 +185,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_mul_blas),
     TEST_FUNCTION(fmpz_mat_mul),
     TEST_FUNCTION(fmpz_mat_mul_classical),
+    TEST_FUNCTION(fmpz_mat_mul_fft_small),
     TEST_FUNCTION(fmpz_mat_mul_double_word),
     TEST_FUNCTION(fmpz_mat_mul_fft),
     TEST_FUNCTION(fmpz_mat_mul_fmpz_vec),
