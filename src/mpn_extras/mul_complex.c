@@ -179,7 +179,7 @@ _mul_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
 
     if (gr_ctx_init_transformed_mpn(tctx,
             FLINT_BITS * (slong) (FLINT_MAX(arn, ain) + FLINT_MAX(brn, bin))
-            + 8, 2, 1) != GR_SUCCESS)
+            + 8, 2, 1, 6) != GR_SUCCESS)
         return 0;
 
     {
@@ -248,7 +248,7 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
         ar * ar - ai * ai keeps the same geometry as the complex product.
     */
     if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)) + 8, 2, 1)
+            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)) + 8, 2, 1, 4)
             != GR_SUCCESS)
         return 0;
 

@@ -1064,3 +1064,10 @@ middle products) run substantially faster in such a representation.
     Element on caller-provided storage of
     ``gr_transformed_mpn_sizeof_data`` bytes, 4096-aligned, outliving
     the element; ``gr_clear`` will not free it.
+
+    The transformed-mpn context constructor takes a *num_live*
+    declaration of the elements expected alive simultaneously, and
+    declines when their combined transform storage would exceed
+    ``flint_fft_small_max_transformed_ring_size``; the transformed
+    polynomial workload structure carries the same declaration in its
+    ``num_live`` field (zero derives a conservative count).

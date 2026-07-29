@@ -20,6 +20,17 @@
 # include <stdatomic.h>
 #endif
 
+/* alignment for transform data buffers */
+#define FLINT_FFT_SMALL_ALIGNMENT 4096
+
+/* Upper bound, in bytes, on the transform storage a single transformed
+   ring or context may plan for (its expected number of simultaneously
+   live elements times the per-element data size). Constructors decline
+   above the bound so drivers fall back to slower algorithms rather than
+   exhaust memory; mutable for tuning. A future FLINT-wide project may
+   replace this with allocation-failure interception. */
+FLINT_DLL extern ulong flint_fft_small_max_transformed_ring_size;
+
 #define LG_BLK_SZ 8
 #define BLK_SZ 256
 

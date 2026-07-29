@@ -108,7 +108,7 @@ TEST_FUNCTION_START(gr_transformed_mpn, state)
         int as, bs, sign, status;
 
         if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound,
-                                        is_signed) != GR_SUCCESS)
+                                        is_signed, 16) != GR_SUCCESS)
             continue;
 
         acc = gr_heap_init(ctx);
@@ -303,7 +303,7 @@ cleanup:
         slong j, need, zn_out;
         int sign;
 
-        if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound, 1)
+        if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound, 1, 16)
                 != GR_SUCCESS)
             continue;
 
@@ -401,7 +401,7 @@ cleanup:
         slong zn_out;
         int sign;
 
-        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 1) == GR_SUCCESS)
+        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 1, 16) == GR_SUCCESS)
         {
             acc = gr_heap_init(ctx);
             x = gr_heap_init(ctx);
@@ -428,7 +428,7 @@ cleanup:
             gr_ctx_clear(ctx);
         }
 
-        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 0) == GR_SUCCESS)
+        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 0, 16) == GR_SUCCESS)
         {
             acc = gr_heap_init(ctx);
             x = gr_heap_init(ctx);
@@ -476,7 +476,7 @@ cleanup:
             slong lo, zn, zl, j, e;
             int sg, sb, adv = iter2 % 3;
 
-            if (gr_ctx_init_transformed_mpn(tctx, 128 * n + 8, 2, 1)
+            if (gr_ctx_init_transformed_mpn(tctx, 128 * n + 8, 2, 1, 16)
                     != GR_SUCCESS)
                 continue;
 

@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fft_small.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
@@ -27,7 +28,8 @@ TEST_FUNCTION_START(nmod_poly_mat_mulmid_fft_small, state)
         ulong maxlen, zn_max;
         slong zl, zh;
         int large = n_randint(state, 10) == 0;
-        int alias, success;
+        int square, alias, success;
+        ulong save_limit = flint_fft_small_max_transformed_ring_size;
 
         flint_set_num_threads(1 + n_randint(state, 8));
 
@@ -37,6 +39,12 @@ TEST_FUNCTION_START(nmod_poly_mat_mulmid_fft_small, state)
         ar = n_randint(state, large ? 3 : 5);
         k  = n_randint(state, large ? 3 : 5);
         bc = n_randint(state, large ? 3 : 5);
+        square = (iter % 5 == 0);
+        if (square)
+        { k = ar; bc = ar; }
+        /* a starved storage budget forces the blocked wrapper */
+        if (iter % 4 == 3)
+            flint_fft_small_max_transformed_ring_size = UWORD(1) << 18;
         maxlen = large ? 1500 + n_randint(state, 3000)
                        : 1 + n_randint(state, 300);
 
@@ -69,12 +77,14 @@ TEST_FUNCTION_START(nmod_poly_mat_mulmid_fft_small, state)
            the reference must be computed before the operand is clobbered */
         alias = (k == bc) && n_randint(state, 8) == 0;
 
-        nmod_poly_mat_mul(D, A, B);
+        nmod_poly_mat_mul(D, A, square ? A : B);
 
         if (alias)
-            success = nmod_poly_mat_mulmid_fft_small(A, A, B, zl, zh);
+            success = nmod_poly_mat_mulmid_fft_small(A, A,
+                    square ? A : B, zl, zh);
         else
-            success = nmod_poly_mat_mulmid_fft_small(C, A, B, zl, zh);
+            success = nmod_poly_mat_mulmid_fft_small(C, A,
+                    square ? A : B, zl, zh);
 
         if (!success)
         {
@@ -84,6 +94,7 @@ TEST_FUNCTION_START(nmod_poly_mat_mulmid_fft_small, state)
                dispatcher falls back to other algorithms then, so a
                refusal leaves nothing to verify here */
             n_refused++;
+            flint_fft_small_max_transformed_ring_size = save_limit;
             nmod_poly_mat_clear(A); nmod_poly_mat_clear(B);
             nmod_poly_mat_clear(C); nmod_poly_mat_clear(D);
             nmod_poly_clear(t);
@@ -112,6 +123,7 @@ TEST_FUNCTION_START(nmod_poly_mat_mulmid_fft_small, state)
             }
         }
 
+        flint_fft_small_max_transformed_ring_size = save_limit;
         nmod_poly_mat_clear(A);
         nmod_poly_mat_clear(B);
         nmod_poly_mat_clear(C);

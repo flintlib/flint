@@ -1567,3 +1567,16 @@ Modified LLL
     `(-1.5, +0.5)` ulp of the lowest returned limb -- equivalently, at
     most 1 from the floor-truncated value. Returns 0 without touching *C*
     when the method is unavailable or unprofitable for the given shapes.
+
+    The driver budgets its transform storage against
+    ``flint_fft_small_max_transformed_ring_size``. When the whole
+    product does not fit, it multiplies in blocks -- one side resident
+    and the other streamed for rectangular shapes, both sides blocked,
+    or as a last resort the inner dimension split with the entries
+    accumulated across the pieces (the truncated variant refuses that
+    last regime, whose one-unit error contract does not survive summing
+    truncated pieces). Squaring, detected as ``B == A``, keeps a single
+    transform pool when everything is resident. Small inputs are
+    accepted; whether the transformed representation is worth using is
+    the caller's tuning decision.
+

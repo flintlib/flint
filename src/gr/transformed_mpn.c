@@ -323,8 +323,8 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
     }
     else
     {
-        sdata = flint_aligned_alloc(4096,
-                n_round_up(P->np * P->stride * sizeof(double), 4096));
+        sdata = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
+                n_round_up(P->np * P->stride * sizeof(double), FLINT_FFT_SMALL_ALIGNMENT));
         tmp = TMPN(x)->op;
         tmp.data = sdata;
         memcpy(sdata, TMPN(x)->op.data,
@@ -439,8 +439,8 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
     }
     else
     {
-        sdata = flint_aligned_alloc(4096,
-                n_round_up(P->np * P->stride * sizeof(double), 4096));
+        sdata = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
+                n_round_up(P->np * P->stride * sizeof(double), FLINT_FFT_SMALL_ALIGNMENT));
         tmp = TMPN(x)->op;
         tmp.data = sdata;
         memcpy(sdata, TMPN(x)->op.data,
@@ -681,10 +681,13 @@ static gr_method_tab_input __tmpn_methods_input[] =
 
 int
 gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
-                            slong terms_bound, int is_signed)
+                            slong terms_bound, int is_signed, slong num_live)
 {
     tmpn_ctx_struct * T;
     ulong opn;
+
+    if (num_live < 1)
+        num_live = 4;
 
     if (bits_bound < FLINT_BITS || terms_bound < 1 ||
             (ulong) terms_bound > UWORD_MAX / 8)
@@ -708,6 +711,20 @@ gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
     {
         flint_free(T);
         return GR_UNABLE;
+    }
+
+    /* decline when the declared number of simultaneously live elements
+       would exceed the transform-storage budget, so callers fall back to
+       slower algorithms instead of exhausting memory */
+    {
+        ulong per = n_round_up(T->P->np * T->P->stride * sizeof(double),
+                               FLINT_FFT_SMALL_ALIGNMENT);
+        if (per > flint_fft_small_max_transformed_ring_size / (ulong) num_live)
+        {
+            fft_small_plan_clear(T->P);
+            flint_free(T);
+            return GR_UNABLE;
+        }
     }
 
     T->zcap = (slong) T->P->zn;
@@ -785,7 +802,7 @@ gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out,
 
 int
 gr_ctx_init_transformed_mpn(gr_ctx_t FLINT_UNUSED(ctx), slong FLINT_UNUSED(bits_bound),
-                            slong FLINT_UNUSED(terms_bound), int FLINT_UNUSED(is_signed))
+                            slong FLINT_UNUSED(terms_bound), int FLINT_UNUSED(is_signed), slong FLINT_UNUSED(num_live))
 {
     return GR_UNABLE;
 }

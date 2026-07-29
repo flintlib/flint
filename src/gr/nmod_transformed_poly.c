@@ -390,8 +390,8 @@ tpoly_get_gr_poly_destructive(gr_ptr c, slong * len, gr_ptr x,
 static double *
 _tpoly_scratch_alloc(const tpoly_ctx_struct * T)
 {
-    return flint_aligned_alloc(4096,
-            n_round_up(T->P->np * T->P->stride * sizeof(double), 4096));
+    return flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
+            n_round_up(T->P->np * T->P->stride * sizeof(double), FLINT_FFT_SMALL_ALIGNMENT));
 }
 
 /* conversion to coefficients: the GET_GR_POLY method; c must have room
@@ -718,7 +718,7 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
        Constants are calibrated against gcd measurements on this class of
        hardware; the model errs conservative. */
     {
-        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0 };
+        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0, 0 };
         const gr_transformed_poly_workload_struct * wl =
             workload ? workload : &def;
         double L = (double) n_round_up(N, BLK_SZ);
@@ -760,9 +760,16 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
         /* low-reuse workloads whose live elements far exceed cache go
            memory bound at one or two primes (measured); high-reuse
            workloads amortize the streaming */
-        bytes = (ni + 3.0) * np *
-                (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
-        limit = wl->mem_limit > 0 ? (double) wl->mem_limit : 4.0 * 1073741824.0;
+        /* live elements as declared by the driver; a zero declaration
+           derives a conservative count from the workload shape */
+        {
+            double nlive = wl->num_live > 0 ? (double) wl->num_live
+                                            : (ni + no + 2.0);
+            bytes = nlive * np *
+                    (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
+        }
+        limit = wl->mem_limit > 0 ? (double) wl->mem_limit
+                    : (double) flint_fft_small_max_transformed_ring_size;
 
         if (rep >= margin * fuse
             || (T->P->np <= 2 && nm < 4.0 * ni && bytes > 32.0 * 1048576.0)

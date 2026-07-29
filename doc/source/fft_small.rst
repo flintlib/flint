@@ -138,3 +138,17 @@ Transform plans and operands
     Chinese remaindering restricted to the coefficient window
     `[zl, zh)`, which must lie inside the plan's window; *z* receives
     `zh - zl` reduced coefficients. Used for polynomial middle products.
+
+.. macro:: FLINT_FFT_SMALL_ALIGNMENT
+
+    Alignment, in bytes, of transform data buffers.
+
+.. var:: ulong flint_fft_small_max_transformed_ring_size
+
+    Upper bound, in bytes, on the transform storage a single transformed
+    ring or context may plan for: its expected number of simultaneously
+    live elements times the per-element data size. Constructors decline
+    above the bound, so drivers fall back to slower algorithms rather
+    than exhaust memory; the matrix multiplication drivers respond by
+    multiplying in blocks instead. Mutable for tuning; the default is
+    4 GiB on 64-bit machines.

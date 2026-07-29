@@ -266,8 +266,8 @@ _mtpoly_export(mtpoly_ctx_struct * T, gr_srcptr x, slong zl, slong ub,
 static double *
 _mtpoly_scratch_alloc(const mtpoly_ctx_struct * T)
 {
-    return flint_aligned_alloc(4096,
-            n_round_up(T->P->np * T->P->stride * sizeof(double), 4096));
+    return flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
+            n_round_up(T->P->np * T->P->stride * sizeof(double), FLINT_FFT_SMALL_ALIGNMENT));
 }
 
 /* the GET_GR_POLY_DESTRUCTIVE method: the inverse transforms, scaling
@@ -632,7 +632,7 @@ _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
        side always uses the same transform sizes with its own (usually
        equal) prime count */
     {
-        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0 };
+        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0, 0 };
         const gr_transformed_poly_workload_struct * wl =
             workload ? workload : &def;
         double L = (double) n_round_up((ulong) N, BLK_SZ);
@@ -651,9 +651,16 @@ _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
         fuse = nm * (npf * L * (3.0 * lg + 4.0 * nlimbs + 2.0)
                      + npf * L * 3.0);
 
-        bytes = (ni + 3.0) * np *
-                (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
-        limit = wl->mem_limit > 0 ? (double) wl->mem_limit : 4.0 * 1073741824.0;
+        /* live elements as declared by the driver; a zero declaration
+           derives a conservative count from the workload shape */
+        {
+            double nlive = wl->num_live > 0 ? (double) wl->num_live
+                                            : (ni + no + 2.0);
+            bytes = nlive * np *
+                    (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
+        }
+        limit = wl->mem_limit > 0 ? (double) wl->mem_limit
+                    : (double) flint_fft_small_max_transformed_ring_size;
 
         if (rep >= 0.865 * fuse || bytes > limit)
         {

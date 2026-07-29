@@ -11,12 +11,15 @@
 
 #include "test_helpers.h"
 #include "fmpz.h"
+#include "fft_small.h"
 #include "fmpz_mat.h"
 
 /* Transformed-integer matrix product against the default algorithm. The
    function returns 0 when the representation is unavailable or judged
-   unprofitable; entries are drawn dense (fmpz_mat_randtest is sparse
-   enough to fall below the gate) with both signs. */
+   unprofitable; entries are drawn dense (fmpz_mat_randtest's sparse
+   entries make degenerate shapes) with both signs; every fourth
+   iteration squares (B aliased to A), and a rotating storage budget
+   forces each blocking tier of the driver. */
 TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
 {
     for (slong iter = 0; iter < 10 * flint_test_multiplier(); iter++)
@@ -24,6 +27,17 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
         slong r = 1 + n_randint(state, 4);
         slong k = 1 + n_randint(state, 4);
         slong c = 1 + n_randint(state, 4);
+        ulong save_limit = flint_fft_small_max_transformed_ring_size;
+        int square = (iter % 4 == 1);
+
+        if (square)
+        { k = r; c = r; }
+        /* rotate the budget to force the resident, streamed, doubly
+           blocked and inner-blocked strategies in turn */
+        if (iter % 4 == 2)
+            flint_fft_small_max_transformed_ring_size = UWORD(1) << 20;
+        else if (iter % 4 == 3)
+            flint_fft_small_max_transformed_ring_size = UWORD(1) << 18;
         slong bits = 8192 + n_randint(state, 8192);
         fmpz_mat_t A, B, C, D, A0, B0;
         slong i, j;
@@ -37,6 +51,12 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
             for (j = 0; j < k; j++)
             {
                 fmpz_randbits(fmpz_mat_entry(A, i, j), state, bits);
+                /* every third iteration keeps everything nonnegative to
+                   exercise the unsigned-context fast path, which signed
+                   entries almost never select by chance */
+                if (iter % 3 == 0)
+                    fmpz_abs(fmpz_mat_entry(A, i, j),
+                             fmpz_mat_entry(A, i, j));
                 if (n_randint(state, 8) == 0)
                     fmpz_zero(fmpz_mat_entry(A, i, j));
             }
@@ -44,6 +64,9 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
             for (j = 0; j < c; j++)
             {
                 fmpz_randbits(fmpz_mat_entry(B, i, j), state, bits);
+                if (iter % 3 == 0)
+                    fmpz_abs(fmpz_mat_entry(B, i, j),
+                             fmpz_mat_entry(B, i, j));
                 if (n_randint(state, 8) == 0)
                     fmpz_zero(fmpz_mat_entry(B, i, j));
             }
@@ -51,9 +74,9 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
         fmpz_mat_init_set(A0, A);
         fmpz_mat_init_set(B0, B);
 
-        fmpz_mat_mul(D, A, B);
+        fmpz_mat_mul(D, A, square ? A : B);
 
-        if (fmpz_mat_mul_fft_small(C, A, B))
+        if (fmpz_mat_mul_fft_small(C, A, square ? A : B))
         {
             if (!fmpz_mat_equal(C, D))
                 TEST_FUNCTION_FAIL(
@@ -74,7 +97,7 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
             fmpz_mat_t E;
 
             fmpz_mat_init(E, r, c);
-            if (fmpz_mat_mul_fft_small_trunc(E, A, B, lo))
+            if (fmpz_mat_mul_fft_small_trunc(E, A, square ? A : B, lo))
             {
                 for (i = 0; i < r; i++)
                     for (j = 0; j < c; j++)
@@ -111,6 +134,7 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
             fmpz_mat_clear(E);
         }
 
+        flint_fft_small_max_transformed_ring_size = save_limit;
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);

@@ -879,6 +879,8 @@ typedef struct gr_transformed_poly_workload_struct
     slong num_inputs;
     slong num_muls;
     slong num_outputs;
+    slong num_live;     /* expected simultaneously live elements;
+                           0 derives num_inputs + num_outputs + 2 */
     slong mem_limit;
 }
 gr_transformed_poly_workload_struct;
@@ -1489,7 +1491,7 @@ void _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fmod_ctx);
    (one-sided, below 1) plus the wholly dropped slots' total mass
    (under half an ulp either way). */
 int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
-                    slong terms_bound, int is_signed);
+                    slong terms_bound, int is_signed, slong num_live);
 int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
                     gr_ctx_t ctx);
 int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,

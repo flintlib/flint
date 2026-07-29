@@ -14,6 +14,12 @@
 #include "fft_small.h"
 #include "machine_vectors.h"
 
+#if FLINT_BITS == 64
+ulong flint_fft_small_max_transformed_ring_size = UWORD(4) << 30;
+#else
+ulong flint_fft_small_max_transformed_ring_size = UWORD(1) << 30;
+#endif
+
 void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P)
 {
     X->stride = P->stride;
@@ -23,8 +29,8 @@ void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P)
     X->itrunc = 0;
     X->domain = FFT_SMALL_OP_PRIMAL;
     X->owns_data = 1;
-    X->data = flint_aligned_alloc(4096,
-                 n_round_up(P->np*P->stride*sizeof(double), 4096));
+    X->data = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
+                 n_round_up(P->np*P->stride*sizeof(double), FLINT_FFT_SMALL_ALIGNMENT));
 }
 
 /* as fft_small_op_init, with caller-provided storage: 'data' must hold
@@ -45,7 +51,7 @@ void fft_small_op_init_borrowed(fft_small_op_t X, const fft_small_plan_t P,
 
 ulong fft_small_op_sizeof_data(const fft_small_plan_t P)
 {
-    return n_round_up(P->np * P->stride * sizeof(double), 4096);
+    return n_round_up(P->np * P->stride * sizeof(double), FLINT_FFT_SMALL_ALIGNMENT);
 }
 
 void fft_small_op_clear(fft_small_op_t X)
