@@ -14,12 +14,6 @@
 #include "fft_small.h"
 #include "machine_vectors.h"
 
-#if FLINT_BITS == 64
-ulong flint_fft_small_max_transformed_ring_size = UWORD(4) << 30;
-#else
-ulong flint_fft_small_max_transformed_ring_size = UWORD(1) << 30;
-#endif
-
 void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P)
 {
     X->stride = P->stride;

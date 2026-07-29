@@ -13,12 +13,6 @@
 #define FFT_SMALL_H
 
 #include "longlong.h"
-#include "machine_vectors.h"
-
-#if FLINT_USES_PTHREAD
-# include <pthread.h>
-# include <stdatomic.h>
-#endif
 
 /* alignment for transform data buffers */
 #define FLINT_FFT_SMALL_ALIGNMENT 4096
@@ -30,6 +24,15 @@
    exhaust memory; mutable for tuning. A future FLINT-wide project may
    replace this with allocation-failure interception. */
 FLINT_DLL extern ulong flint_fft_small_max_transformed_ring_size;
+
+#if FLINT_HAVE_FFT_SMALL
+
+#include "machine_vectors.h"
+
+#if FLINT_USES_PTHREAD
+# include <pthread.h>
+# include <stdatomic.h>
+#endif
 
 #define LG_BLK_SZ 8
 #define BLK_SZ 256
@@ -785,5 +788,7 @@ int _fmpz_poly_mul_mid_default_mpn_ctx(
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* FLINT_HAVE_FFT_SMALL */
 
 #endif

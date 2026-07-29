@@ -55,58 +55,19 @@
 
     */
 
-/* Measured crossover on an AVX2 machine at -O1: the transformed path
-   wins from ~896 limbs (1.3x at 896, 1.4x at 1280), and the two are
-   within noise between 640 and 768. Re-tune per platform. */
-/* Measured crossover on an AVX2 machine at -O1: the transformed path
-   wins from ~896 limbs (1.3x at 896, 1.4x at 1280), and the two are
-   within noise between 640 and 768. Re-tune per platform; the Karatsuba
-   and mulhigh classical paths moved this point, so it was re-swept. */
-/*
-    Sizes (in limbs) from which the complex functions use the
-    transformed path; separate for products and squares because their
-    classical competitors differ (a squaring's high path is two cheap
-    high products, so its crossover sits higher).
-
-    Measured on one AVX2 machine at -O1 with assembly disabled, after
-    the reconstruction fix and with the per-thread element scratch
-    below: products and high products cross at ~1024 limbs (1.1-1.3x
-    from there through 65536). Squares, full and high alike, are a wash
-    at 2048 and win 1.1-1.2x from 4096 -- their classical competitors
-    are only two real (high) multiplications, so the transform saving
-    is thinner. On a build with the mulhigh assembly enabled the
-    classical side speeds up and these crossovers move upward; re-tune
-    per platform. The variables stay writable so the tests can drive
-    both paths and callers can adjust.
-*/
 slong flint_mpn_mul_complex_fft_cutoff = 700;
 slong flint_mpn_sqr_complex_fft_cutoff = 3000000;
 
-/*
-    The elements live in the multiplication context's cached per-thread
-    buffer (mpn_ctx_fit_buffer) -- the same storage the standard
-    multiplication amortizes its setup with; allocating fresh element
-    buffers per call was dominated by first-touch page faults.
+/* Defined here rather than in the fft_small module, which unsupported
+   platforms exclude from the build entirely: the budget must be
+   settable everywhere, since the drivers' fallback logic references it
+   unconditionally. */
+#if FLINT_BITS == 64
+ulong flint_fft_small_max_transformed_ring_size = UWORD(4) << 30;
+#else
+ulong flint_fft_small_max_transformed_ring_size = UWORD(1) << 30;
+#endif
 
-    Safety invariant: nothing between the conversions in and out may
-    touch that buffer. Its only other users are _mpn_ctx_mpn_mul_range
-    and the nmod conv engine, and the element set / pointwise / get
-    paths reach neither. If they ever start multiplying integers, the
-    buffer would be reallocated under live elements and this must revert
-    to a private cache.
-*/
-
-
-
-/* Measured with the split entry points on the streamlined (v24) code --
-   the old value of 32 was tuned against the accumulator version, which
-   taxed Karatsuba's extra additions. Products: a tie at 8 limbs and
-   1.1-1.3x from 10 up. Squares: a clear loss at 4-6 limbs, ties through
-   14, small gains above -- their classical form is two cheap squarings,
-   so the crossover sits higher. The high thresholds are taken from the
-   nfloat complex code (12 for products, 20 for squares); mulhigh has no
-   small basecases in this assembly-less build, so they cannot be
-   re-measured here and await tuning on a normal build. */
 #define MUL_COMPLEX_KARATSUBA_CUTOFF 8
 #define SQR_COMPLEX_KARATSUBA_CUTOFF 16
 #define MULHIGH_COMPLEX_KARATSUBA_CUTOFF 12
