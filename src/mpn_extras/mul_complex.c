@@ -79,8 +79,8 @@
     per platform. The variables stay writable so the tests can drive
     both paths and callers can adjust.
 */
-slong flint_mpn_mul_complex_fft_cutoff = 1024;
-slong flint_mpn_sqr_complex_fft_cutoff = 4096;
+slong flint_mpn_mul_complex_fft_cutoff = 700;
+slong flint_mpn_sqr_complex_fft_cutoff = 3000000;
 
 /*
     The elements live in the multiplication context's cached per-thread
@@ -236,8 +236,19 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     int ok = 1;
 #define E_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
 
+    /*
+        terms_bound is 2, not 4: an earlier version formed
+        (ar + ai)(ar - ai) on sums of transforms, whose slot values need
+        four products' capacity -- the profile then packs fewer bits per
+        slot, and since the conversions dominate (their cost is
+        proportional to the slot count), both directions inflated by more
+        than the two forward transforms the method saves over the
+        two-multiplication Karatsuba square. The identity buys nothing
+        where multiplications are pointwise; the direct
+        ar * ar - ai * ai keeps the same geometry as the complex product.
+    */
     if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)) + 8, 4, 1)
+            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)) + 8, 2, 1)
             != GR_SUCCESS)
         return 0;
 
@@ -245,22 +256,30 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
         ulong esz = gr_transformed_mpn_sizeof_data(tctx);
 
         base = (double *) mpn_ctx_fit_buffer(get_default_mpn_ctx(),
-                    6 * esz + 6 * tctx->sizeof_elem);
-        E = (gr_ptr) (base + 6 * (esz / sizeof(double)));
-        { slong i; for (i = 0; i < 6; i++)
+                    4 * esz + 4 * tctx->sizeof_elem);
+        E = (gr_ptr) (base + 4 * (esz / sizeof(double)));
+        { slong i; for (i = 0; i < 4; i++)
             gr_transformed_mpn_init_borrowed(E_(i),
                     base + i * (esz / sizeof(double)), tctx); }
     }
 
-    ok = ok && gr_transformed_mpn_set(E_(0), ar, arn, ar_sgn, tctx) == GR_SUCCESS;
-    ok = ok && gr_transformed_mpn_set(E_(1), ai, ain, ai_sgn, tctx) == GR_SUCCESS;
+    /* the operands enter as magnitudes: the squares are sign free and
+       2 ar ai has the known sign ar_sgn ^ ai_sgn, applied below -- so
+       the imaginary part keeps a nonnegative element and takes the
+       cheaper unsigned reconstruction, which lacks the bias and
+       two's-complement sign-resolution passes of the signed one; only
+       the real part, whose sign genuinely depends on the values, pays
+       for the signed export */
+    ok = ok && gr_transformed_mpn_set(E_(0), ar, arn, 0, tctx) == GR_SUCCESS;
+    ok = ok && gr_transformed_mpn_set(E_(1), ai, ain, 0, tctx) == GR_SUCCESS;
 
-    /* zr = (ar + ai)(ar - ai), zi = 2 ar ai */
-    ok = ok && gr_add(E_(2), E_(0), E_(1), tctx) == GR_SUCCESS;
-    ok = ok && gr_sub(E_(3), E_(0), E_(1), tctx) == GR_SUCCESS;
-    ok = ok && gr_mul(E_(4), E_(2), E_(3), tctx) == GR_SUCCESS;
-    ok = ok && gr_mul(E_(5), E_(0), E_(1), tctx) == GR_SUCCESS;
-    ok = ok && gr_addmul(E_(5), E_(0), E_(1), tctx) == GR_SUCCESS;
+    /* zr = ar ar - ai ai; zi = ar ai doubled by a pointwise addition,
+       which costs a pass over the evaluations against a full pointwise
+       multiplication */
+    ok = ok && gr_mul(E_(2), E_(0), E_(0), tctx) == GR_SUCCESS;
+    ok = ok && gr_submul(E_(2), E_(1), E_(1), tctx) == GR_SUCCESS;
+    ok = ok && gr_mul(E_(3), E_(0), E_(1), tctx) == GR_SUCCESS;
+    ok = ok && gr_add(E_(3), E_(3), E_(3), tctx) == GR_SUCCESS;
 
     /* operands dead after the pointwise stage; their slices stage the
        exports */
@@ -268,14 +287,18 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
         ulong esz = gr_transformed_mpn_sizeof_data(tctx);
         ulong tmax = esz / sizeof(ulong);
 
-        ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(4), shift,
+        ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(2), shift,
                              (nn_ptr) base, tmax, tctx);
-        ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(5), shift,
+        ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(3), shift,
                              (nn_ptr) (base + esz / sizeof(double)), tmax,
                              tctx);
+
+        /* attach the known sign of 2 ar ai */
+        if (ok && (ar_sgn ^ ai_sgn))
+            *zi_len = -*zi_len;
     }
 
-    { slong i; for (i = 0; i < 6; i++) gr_clear(E_(i), tctx); }
+    { slong i; for (i = 0; i < 4; i++) gr_clear(E_(i), tctx); }
     gr_ctx_clear(tctx);
 #undef E_
     return ok;
