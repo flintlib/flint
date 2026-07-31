@@ -328,12 +328,119 @@ _cmp_trim(nn_srcptr x, mp_size_t * xn, nn_srcptr y, mp_size_t * yn)
     return (*xn == 0) ? 0 : mpn_cmp(x, y, *xn);
 }
 
+/* z == x permitted (y must be distinct). The manual's blanket rule for
+   the mpn layer allows in-place operation "where source and destination
+   are the same" and forbids partial overlap; for a source shorter than
+   the destination but sharing its starting address -- which is what the
+   swap branches of the general routine would pass as the second source
+   of mpn_add/mpn_sub -- the text does not say which case applies. All
+   implementations process low to high, so it is safe in practice; this
+   variant expresses the aliasing through the equal-length primitives,
+   whose in-place behavior is unambiguous, rather than relying on a
+   reading of the rule. */
+static slong
+_signed_add_normalise_zx(nn_ptr z, mp_size_t xn, int xs,
+                         nn_srcptr y, mp_size_t yn, int ys)
+{
+    mp_size_t rn;
+    int rs;
+    nn_srcptr x = z;
+
+    /* the lengths are bounds: trim before treating an operand as
+       absent, and never hand a zero length to the mpn primitives */
+    while (xn > 0 && z[xn - 1] == 0)
+        xn--;
+    while (yn > 0 && y[yn - 1] == 0)
+        yn--;
+    if (xn == 0)
+    {
+        if (yn > 0)
+            flint_mpn_copyi(z, y, yn);
+        return ys ? -yn : yn;
+    }
+    if (yn == 0)
+        return xs ? -xn : xn;
+
+    if (xs == ys)
+    {
+        ulong cy;
+
+        if (xn >= yn)
+            cy = mpn_add(z, x, xn, y, yn);
+        else
+        {
+            cy = mpn_add_n(z, x, y, xn);
+            cy = mpn_add_1(z + xn, y + xn, yn - xn, cy);
+        }
+        rn = FLINT_MAX(xn, yn);
+        if (cy != 0)
+        {
+            z[rn] = cy;
+            rn++;
+        }
+        else
+        {
+            while (rn > 0 && z[rn - 1] == 0)
+                rn--;
+        }
+        rs = xs;
+    }
+    else
+    {
+        int c = _cmp_trim(x, &xn, y, &yn);
+
+        if (c == 0)
+            return 0;
+
+        if (c > 0)
+        {
+            mpn_sub(z, x, xn, y, yn);
+            rn = xn;
+            rs = xs;
+        }
+        else
+        {
+            ulong bw;
+
+            bw = mpn_sub_n(z, y, x, xn);
+            if (yn > xn)
+                mpn_sub_1(z + xn, y + xn, yn - xn, bw);
+            rn = yn;
+            rs = ys;
+        }
+
+        while (rn > 0 && z[rn - 1] == 0)
+            rn--;
+        if (rn == 0)
+            return 0;
+    }
+
+    return rs ? -rn : rn;
+}
+
 static slong
 _signed_add_normalise(nn_ptr z, nn_srcptr x, mp_size_t xn, int xs,
                       nn_srcptr y, mp_size_t yn, int ys)
 {
     mp_size_t rn;
     int rs;
+
+    while (xn > 0 && x[xn - 1] == 0)
+        xn--;
+    while (yn > 0 && y[yn - 1] == 0)
+        yn--;
+    if (xn == 0)
+    {
+        if (yn > 0)
+            flint_mpn_copyi(z, y, yn);
+        return ys ? -yn : yn;
+    }
+    if (yn == 0)
+    {
+        if (z != x)
+            flint_mpn_copyi(z, x, xn);
+        return xs ? -xn : xn;
+    }
 
     if (xs == ys)
     {
@@ -350,8 +457,20 @@ _signed_add_normalise(nn_ptr z, nn_srcptr x, mp_size_t xn, int xs,
             rn = yn;
         }
 
-        z[rn] = cy;
-        rn += (cy != 0);
+        if (cy != 0)
+        {
+            z[rn] = cy;
+            rn++;
+        }
+        else
+        {
+            /* the input lengths are bounds, not normalized: a product
+               of trimmed operands may still carry a zero top limb, and
+               the returned length must not include it (callers install
+               it directly as an mpz size) */
+            while (rn > 0 && z[rn - 1] == 0)
+                rn--;
+        }
         rs = xs;
     }
     else
@@ -439,13 +558,13 @@ flint_mpn_mul_complex_classical(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi
 
     _mul_any_order(zr, ar, arn, br, brn);
     _mul_any_order(t, ai, ain, bi, bin);
-    *zr_len = _signed_add_normalise(zr, zr, arn + brn, ar_sgn ^ br_sgn,
-                                    t, ain + bin, ai_sgn ^ bi_sgn ^ 1);
+    *zr_len = _signed_add_normalise_zx(zr, arn + brn, ar_sgn ^ br_sgn,
+                                       t, ain + bin, ai_sgn ^ bi_sgn ^ 1);
 
     _mul_any_order(zi, ar, arn, bi, bin);
     _mul_any_order(t, ai, ain, br, brn);
-    *zi_len = _signed_add_normalise(zi, zi, arn + bin, ar_sgn ^ bi_sgn,
-                                    t, ain + brn, ai_sgn ^ br_sgn);
+    *zi_len = _signed_add_normalise_zx(zi, arn + bin, ar_sgn ^ bi_sgn,
+                                       t, ain + brn, ai_sgn ^ br_sgn);
 
     TMP_END;
 }
@@ -467,10 +586,10 @@ flint_mpn_mul_complex_karatsuba(nn_ptr zr, slong * zr_len,
     nn_srcptr bi, mp_size_t bin, int bi_sgn)
 {
     mp_size_t maxa = FLINT_MAX(arn, ain), maxb = FLINT_MAX(brn, bin);
-    nn_ptr t1, t2, t3, p, u, v, zt;
-    mp_size_t un0 = maxa + 1, vn0 = maxb + 1, pw = maxa + maxb + 2;
-    slong ul, vl, pl, il;
-    int s1, s2;
+    nn_ptr t2, t3, u, v;
+    mp_size_t un0 = maxa + 1, vn0 = maxb + 1;
+    slong ul, vl, il;
+    int s1, s2, s3;
     TMP_INIT;
 
     arn = _norm(ar, arn);
@@ -478,37 +597,44 @@ flint_mpn_mul_complex_karatsuba(nn_ptr zr, slong * zr_len,
     brn = _norm(br, brn);
     bin = _norm(bi, bin);
 
+    /*
+        The layout matters at large sizes, where fresh pages are a
+        dominant linear cost: ar br is written straight into the
+        caller's zr and both outputs are combined in place with the
+        aliasing-tolerant variant above, so the scratch holds one
+        product (ai bi), the product of the two operand sums, and the
+        sums themselves -- about half the previous footprint -- and
+        nothing is copied at the end. All combination values fit the
+        caller's maxa + maxb + 1 window: the products are below
+        2^(64(maxa+maxb)), the sum product below 2^(64(maxa+maxb)+2),
+        and every intermediate below 2^(64(maxa+maxb)+3).
+    */
     TMP_START;
-    t1 = TMP_ALLOC(((arn + brn) + (ain + bin) + (un0 + vn0) + pw
-                    + un0 + vn0 + (pw + 2)) * sizeof(ulong));
-    t2 = t1 + arn + brn;
+    t2 = TMP_ALLOC((ain + bin + un0 + vn0 + un0 + vn0) * sizeof(ulong));
     t3 = t2 + ain + bin;
-    p = t3 + un0 + vn0;
-    u = p + pw;
+    u = t3 + un0 + vn0;
     v = u + un0;
-    zt = v + vn0;
 
-    _mul_any_order(t1, ar, arn, br, brn);
-    _mul_any_order(t2, ai, ain, bi, bin);
     s1 = ar_sgn ^ br_sgn;
     s2 = ai_sgn ^ bi_sgn;
 
     ul = _signed_add_normalise(u, ar, arn, ar_sgn, ai, ain, ai_sgn);
     vl = _signed_add_normalise(v, br, brn, br_sgn, bi, bin, bi_sgn);
     _mul_any_order(t3, u, FLINT_ABS(ul), v, FLINT_ABS(vl));
+    s3 = (ul < 0) ^ (vl < 0);
 
-    *zr_len = _signed_add_normalise(zr, t1, arn + brn, s1,
-                                    t2, ain + bin, s2 ^ 1);
+    _mul_any_order(t2, ai, ain, bi, bin);
+    _mul_any_order(zr, ar, arn, br, brn);       /* t1, in place */
 
-    pl = _signed_add_normalise(p, t1, arn + brn, s1, t2, ain + bin, s2);
+    /* zi = (t3 - t1) - t2; the first combination reads t1 from zr and
+       aliases nothing, the second and the zr combination run in place */
+    il = _signed_add_normalise(zi, t3, FLINT_ABS(ul) + FLINT_ABS(vl), s3,
+                               zr, arn + brn, s1 ^ 1);
+    *zi_len = _signed_add_normalise_zx(zi, FLINT_ABS(il), il < 0,
+                                       t2, ain + bin, s2 ^ 1);
 
-    /* t3 can reach maxa + maxb + 2 limbs, one past the caller's window,
-       so this one combination is formed in scratch */
-    il = _signed_add_normalise(zt, t3, FLINT_ABS(ul) + FLINT_ABS(vl),
-                               (ul < 0) ^ (vl < 0),
-                               p, FLINT_ABS(pl), (pl < 0) ^ 1);
-    flint_mpn_copyi(zi, zt, FLINT_ABS(il));
-    *zi_len = il;
+    *zr_len = _signed_add_normalise_zx(zr, arn + brn, s1,
+                                       t2, ain + bin, s2 ^ 1);
 
     TMP_END;
 }
@@ -608,7 +734,7 @@ flint_mpn_sqr_complex_classical(nn_ptr zr, slong * zr_len,
 
     flint_mpn_sqr(zr, ar, arn);
     flint_mpn_sqr(t1, ai, ain);
-    *zr_len = _signed_add_normalise(zr, zr, 2 * arn, 0, t1, 2 * ain, 1);
+    *zr_len = _signed_add_normalise_zx(zr, 2 * arn, 0, t1, 2 * ain, 1);
 
     *zi_len = _sqr_zi_double(zi, ar, arn, ar_sgn, ai, ain, ai_sgn);
 
@@ -625,20 +751,23 @@ flint_mpn_sqr_complex_karatsuba(nn_ptr zr, slong * zr_len,
        form uses two squarings, so the inputs are normalized first */
     mp_size_t maxa = FLINT_MAX(arn, ain), rn;
     mp_size_t an = _norm(ar, arn), bn = _norm(ai, ain);
-    nn_ptr u, v, t1;
+    nn_ptr u, v;
     slong ul, vl;
     TMP_INIT;
 
     TMP_START;
-    u = TMP_ALLOC((2 * (maxa + 1) + 2 * (maxa + 2)) * sizeof(ulong));
+    u = TMP_ALLOC(2 * (maxa + 1) * sizeof(ulong));
     v = u + maxa + 1;
-    t1 = v + maxa + 1;
 
+    /* exactly one of the two combinations is a magnitude sum (at most
+       maxa + 1 limbs) and the other a magnitude difference (at most
+       maxa), so their product spans at most 2 maxa + 1 limbs and is
+       written straight into the caller's window; the scratch holds only
+       the sums, and nothing is copied */
     ul = _signed_add_normalise(u, ar, an, ar_sgn, ai, bn, ai_sgn);
     vl = _signed_add_normalise(v, ar, an, ar_sgn, ai, bn, ai_sgn ^ 1);
-    _mul_any_order(t1, u, FLINT_ABS(ul), v, FLINT_ABS(vl));
-    rn = _norm(t1, FLINT_ABS(ul) + FLINT_ABS(vl));
-    flint_mpn_copyi(zr, t1, rn);
+    _mul_any_order(zr, u, FLINT_ABS(ul), v, FLINT_ABS(vl));
+    rn = _norm(zr, FLINT_ABS(ul) + FLINT_ABS(vl));
     *zr_len = (rn == 0 || !((ul < 0) ^ (vl < 0))) ? rn : -rn;
 
     *zi_len = _sqr_zi_double(zi, ar, arn, ar_sgn, ai, ain, ai_sgn);
@@ -732,17 +861,17 @@ _mul_complex_high(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn,
 
     if (n < MULHIGH_COMPLEX_KARATSUBA_CUTOFF)
     {
-        nn_ptr h1 = TMP_ALLOC(4 * n * sizeof(ulong));
-        nn_ptr h2 = h1 + n, h3 = h2 + n, h4 = h3 + n;
+        nn_ptr h2 = TMP_ALLOC(2 * n * sizeof(ulong));
+        nn_ptr h4 = h2 + n;
 
-        flint_mpn_mulhigh_n(h1, ar, br, n);
+        flint_mpn_mulhigh_n(zr, ar, br, n);
         flint_mpn_mulhigh_n(h2, ai, bi, n);
-        flint_mpn_mulhigh_n(h3, ar, bi, n);
+        flint_mpn_mulhigh_n(zi, ar, bi, n);
         flint_mpn_mulhigh_n(h4, ai, br, n);
 
-        _high_combine(zr, zr_sgn, h1, ar_sgn ^ br_sgn,
+        _high_combine(zr, zr_sgn, zr, ar_sgn ^ br_sgn,
                       h2, ai_sgn ^ bi_sgn ^ 1, n);
-        _high_combine(zi, zi_sgn, h3, ar_sgn ^ bi_sgn,
+        _high_combine(zi, zi_sgn, zi, ar_sgn ^ bi_sgn,
                       h4, ai_sgn ^ br_sgn, n);
     }
     else
@@ -820,11 +949,11 @@ _sqr_complex_high(nn_ptr zr, int * zr_sgn, nn_ptr zi, int * zi_sgn,
         su = _signed_add_n1(U + 1, ar, ar_sgn, ai, ai_sgn, n);
         sv = _signed_add_n1(V + 1, ar, ar_sgn, ai, ai_sgn ^ 1, n);
         flint_mpn_mulhigh_n(h1, U, V, n + 2);
-        flint_mpn_mulhigh_n(h2, ar, ai, n);
+        flint_mpn_mulhigh_n(zi, ar, ai, n);
 
         flint_mpn_copyi(zr, h1, n + 1);
         *zr_sgn = su ^ sv;
-        zi[n] = mpn_lshift(zi, h2, n, 1);
+        zi[n] = mpn_lshift(zi, zi, n, 1);
         *zi_sgn = ar_sgn ^ ai_sgn;
     }
 

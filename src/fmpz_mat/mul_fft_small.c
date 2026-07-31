@@ -154,27 +154,23 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     if (C == A || C == B)
         return 0;
 
-    abits = FLINT_ABS(fmpz_mat_max_bits(A));
-    bbits = FLINT_ABS(fmpz_mat_max_bits(B));
+    /* fmpz_mat_max_bits encodes "any negative entry" in its sign, so
+       the nonnegativity scan comes free with the bounds (and the calls
+       are made once: FLINT_ABS would evaluate its argument twice) */
+    {
+        slong amax = fmpz_mat_max_bits(A);
+        slong bmax = fmpz_mat_max_bits(B);
+
+        abits = FLINT_ABS(amax);
+        bbits = FLINT_ABS(bmax);
+        signed_needed = (amax < 0 || bmax < 0);
+    }
     if (abits == 0 || bbits == 0)
         return 0;
 
     share = (A == B);
 
     bits_bound = abits + bbits + FLINT_BIT_COUNT((ulong) k) + 2;
-
-    signed_needed = 0;
-    {
-        slong ii, jj;
-        for (ii = 0; ii < ar && !signed_needed; ii++)
-            for (jj = 0; jj < k; jj++)
-                if (fmpz_sgn(fmpz_mat_entry(A, ii, jj)) < 0)
-                { signed_needed = 1; break; }
-        for (ii = 0; ii < k && !share && !signed_needed; ii++)
-            for (jj = 0; jj < bc; jj++)
-                if (fmpz_sgn(fmpz_mat_entry(B, ii, jj)) < 0)
-                { signed_needed = 1; break; }
-    }
 
     /* the driver manages its own storage budget through the blocking
        below, so the context is created with a minimal live count; the
