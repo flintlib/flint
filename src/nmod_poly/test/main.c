@@ -13,6 +13,7 @@
 
 #include "t-add.c"
 #include "t-add_series.c"
+#include "t-add_ui.c"
 #include "t-asinh_series.c"
 #include "t-asin_series.c"
 #include "t-atanh_series.c"
@@ -131,6 +132,7 @@
 #include "t-sqrt_series.c"
 #include "t-sub.c"
 #include "t-sub_series.c"
+#include "t-sub_ui.c"
 #include "t-tanh_series.c"
 #include "t-tan_series.c"
 #include "t-taylor_shift.c"
@@ -145,6 +147,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(nmod_poly_add),
+    TEST_FUNCTION(nmod_poly_add_ui),
     TEST_FUNCTION(nmod_poly_add_series),
     TEST_FUNCTION(nmod_poly_asinh_series),
     TEST_FUNCTION(nmod_poly_asin_series),
@@ -264,6 +267,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_sqrt),
     TEST_FUNCTION(nmod_poly_sqrt_series),
     TEST_FUNCTION(nmod_poly_sub),
+    TEST_FUNCTION(nmod_poly_sub_ui),
     TEST_FUNCTION(nmod_poly_sub_series),
     TEST_FUNCTION(nmod_poly_tanh_series),
     TEST_FUNCTION(nmod_poly_tan_series),
