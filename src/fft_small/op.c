@@ -73,9 +73,14 @@ FLINT_FORCE_INLINE int _op_compatible(const fft_small_op_struct* X,
     further pointwise operations and to sd_ifft_trunc.
 */
 
-/* z = a*b*m */
-static void _point_mul(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, const double* b, ulong m_, ulong depth)
+/* z = a*b*m; the containment step (see the range comment above) is a
+   mulmod by the reduced m, or a plain reduction when the normalizer is
+   deferred (m == 1). The worker takes the choice as a constant so every
+   optimization level emits branch-free loops -- GCC only unswitches
+   such loops at -O3, and only for some of these kernels. */
+FLINT_FORCE_INLINE void _point_mul_impl(const sd_fft_ctx_struct* Q,
+    double* z, const double* a, const double* b, ulong m_, ulong depth,
+    int m_is_one)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
@@ -92,8 +97,16 @@ static void _point_mul(const sd_fft_ctx_struct* Q,
             x1 = vec8d_load(ax+j+8);
             b0 = vec8d_load(bx+j+0);
             b1 = vec8d_load(bx+j+8);
-            x0 = vec8d_mulmod(x0, m, n, ninv);
-            x1 = vec8d_mulmod(x1, m, n, ninv);
+            if (m_is_one)
+            {
+                x0 = vec8d_reduce_to_pm1n(x0, n, ninv);
+                x1 = vec8d_reduce_to_pm1n(x1, n, ninv);
+            }
+            else
+            {
+                x0 = vec8d_mulmod(x0, m, n, ninv);
+                x1 = vec8d_mulmod(x1, m, n, ninv);
+            }
             x0 = vec8d_mulmod(x0, b0, n, ninv);
             x1 = vec8d_mulmod(x1, b1, n, ninv);
             vec8d_store(zx+j+0, x0);
@@ -102,9 +115,20 @@ static void _point_mul(const sd_fft_ctx_struct* Q,
     }
 }
 
-/* z = a*a*m */
-static void _point_sqr(const sd_fft_ctx_struct* Q,
-    double* z, const double* a, ulong m_, ulong depth)
+static void _point_mul(const sd_fft_ctx_struct* Q,
+    double* z, const double* a, const double* b, ulong m_, ulong depth)
+{
+    if (m_ == 1)
+        _point_mul_impl(Q, z, a, b, m_, depth, 1);
+    else
+        _point_mul_impl(Q, z, a, b, m_, depth, 0);
+}
+
+/* z = a*a*m; by-m-first (or reduce-first with the normalizer deferred)
+   exactly as _point_mul, for the same range containment; constant
+   specialization for the same branch-free loops. */
+FLINT_FORCE_INLINE void _point_sqr_impl(const sd_fft_ctx_struct* Q,
+    double* z, const double* a, ulong m_, ulong depth, int m_is_one)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
@@ -115,15 +139,19 @@ static void _point_sqr(const sd_fft_ctx_struct* Q,
         double* zx = z + sd_fft_ctx_blk_offset(I);
         const double* ax = a + sd_fft_ctx_blk_offset(I);
         ulong j = 0; do {
-            vec8d x0, x1;
+            vec8d x0, x1, t0, t1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
-            vec8d t0, t1;
-            /* by m first, exactly as _point_mul: squaring two raw
-               transform entries (each in (-4n, 4n)) first would exceed
-               the chained mulmod input bound */
-            t0 = vec8d_mulmod(x0, m, n, ninv);
-            t1 = vec8d_mulmod(x1, m, n, ninv);
+            if (m_is_one)
+            {
+                t0 = vec8d_reduce_to_pm1n(x0, n, ninv);
+                t1 = vec8d_reduce_to_pm1n(x1, n, ninv);
+            }
+            else
+            {
+                t0 = vec8d_mulmod(x0, m, n, ninv);
+                t1 = vec8d_mulmod(x1, m, n, ninv);
+            }
             x0 = vec8d_mulmod(t0, x0, n, ninv);
             x1 = vec8d_mulmod(t1, x1, n, ninv);
             vec8d_store(zx+j+0, x0);
@@ -132,10 +160,19 @@ static void _point_sqr(const sd_fft_ctx_struct* Q,
     }
 }
 
+static void _point_sqr(const sd_fft_ctx_struct* Q,
+    double* z, const double* a, ulong m_, ulong depth)
+{
+    if (m_ == 1)
+        _point_sqr_impl(Q, z, a, m_, depth, 1);
+    else
+        _point_sqr_impl(Q, z, a, m_, depth, 0);
+}
+
 /* z = z +/- a*b*m */
-static void _point_addmul(const sd_fft_ctx_struct* Q,
+FLINT_FORCE_INLINE void _point_addmul_impl(const sd_fft_ctx_struct* Q,
     double* z, const double* a, const double* b, ulong m_, int subtract,
-    ulong depth)
+    ulong depth, int m_is_one)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
@@ -154,8 +191,16 @@ static void _point_addmul(const sd_fft_ctx_struct* Q,
             b1 = vec8d_load(bx+j+8);
             z0 = vec8d_load(zx+j+0);
             z1 = vec8d_load(zx+j+8);
-            x0 = vec8d_mulmod(x0, m, n, ninv);
-            x1 = vec8d_mulmod(x1, m, n, ninv);
+            if (m_is_one)
+            {
+                x0 = vec8d_reduce_to_pm1n(x0, n, ninv);
+                x1 = vec8d_reduce_to_pm1n(x1, n, ninv);
+            }
+            else
+            {
+                x0 = vec8d_mulmod(x0, m, n, ninv);
+                x1 = vec8d_mulmod(x1, m, n, ninv);
+            }
             x0 = vec8d_mulmod(x0, b0, n, ninv);
             x1 = vec8d_mulmod(x1, b1, n, ninv);
             if (subtract)
@@ -174,6 +219,16 @@ static void _point_addmul(const sd_fft_ctx_struct* Q,
             vec8d_store(zx+j+8, z1);
         } while (j += 16, j < BLK_SZ);
     }
+}
+
+static void _point_addmul(const sd_fft_ctx_struct* Q,
+    double* z, const double* a, const double* b, ulong m_, int subtract,
+    ulong depth)
+{
+    if (m_ == 1)
+        _point_addmul_impl(Q, z, a, b, m_, subtract, depth, 1);
+    else
+        _point_addmul_impl(Q, z, a, b, m_, subtract, depth, 0);
 }
 
 /* z = a +/- b, or z = -a for b == NULL */
