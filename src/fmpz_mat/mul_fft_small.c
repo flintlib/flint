@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "gr.h"
@@ -64,18 +65,23 @@
 */
 
 static int
-_set_entry(gr_ptr elem, const fmpz * e, nn_ptr t, gr_ctx_t tctx)
+_set_entry(gr_ptr elem, const fmpz * e, gr_ctx_t tctx)
 {
-    slong en = fmpz_size(e);
-    int ok;
-    fmpz_t ea;
-    fmpz_init(ea);
-    fmpz_abs(ea, e);
-    fmpz_get_ui_array(t, FLINT_MAX(en, 1), ea);
-    ok = gr_transformed_mpn_set(elem, t, en, fmpz_sgn(e) < 0, tctx)
-            == GR_SUCCESS;
-    fmpz_clear(ea);
-    return ok;
+    fmpz c = *e;
+
+    if (!COEFF_IS_MPZ(c))
+    {
+        ulong v = FLINT_ABS(c);
+        return gr_transformed_mpn_set(elem, &v, c != 0, c < 0, tctx)
+                == GR_SUCCESS;
+    }
+    else
+    {
+        mpz_srcptr m = COEFF_TO_PTR(c);
+        return gr_transformed_mpn_set(elem, m->_mp_d,
+                FLINT_ABS(m->_mp_size), m->_mp_size < 0, tctx)
+                == GR_SUCCESS;
+    }
 }
 
 /* convert the accumulator out into e (add_into: accumulate); consumes
@@ -170,7 +176,12 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
 
     share = (A == B);
 
-    bits_bound = abits + bbits + FLINT_BIT_COUNT((ulong) k) + 2;
+    /* the bound describes one product's magnitude: the context
+       provisions the k-fold accumulation from terms_bound and the sign
+       from is_signed itself (an earlier revision added
+       FLINT_BIT_COUNT(k) + 2 here, duplicating headroom the
+       representation owns) */
+    bits_bound = abits + bbits;
 
     /* the driver manages its own storage budget through the blocking
        below, so the context is created with a minimal live count; the
@@ -254,7 +265,9 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     acc = flint_malloc(tctx->sizeof_elem);
     gr_transformed_mpn_init_borrowed(acc, acc_data, tctx);
 
-    tn_max = (abits + bbits + 128) / FLINT_BITS + 4 + k;
+    /* conversion staging sized by the ring's own bound rather than a
+       reconstruction of its limb requirements here */
+    tn_max = gr_transformed_mpn_get_limbs_bound(tctx);
     t = flint_malloc(tn_max * sizeof(ulong));
 
     for (L = 0; ok && L < k; L += kb)
@@ -269,7 +282,7 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
             for (i = 0; ok && i < ml; i++)
                 for (l = 0; ok && l < kl; l++)
                     ok = _set_entry(EA_(i * kb + l),
-                            fmpz_mat_entry(A, I + i, L + l), t, tctx);
+                            fmpz_mat_entry(A, I + i, L + l), tctx);
 
             for (J = 0; ok && J < bc; J += nb)
             {
@@ -285,7 +298,7 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
                     for (l = 0; ok && l < kl; l++)
                         for (j = 0; ok && j < nl; j++)
                             ok = _set_entry(EB_(l * nb + j),
-                                    fmpz_mat_entry(B, L + l, J + j), t, tctx);
+                                    fmpz_mat_entry(B, L + l, J + j), tctx);
 
                 for (i = 0; ok && i < ml; i++)
                     for (j = 0; ok && j < nl; j++)

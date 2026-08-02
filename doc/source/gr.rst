@@ -1071,3 +1071,13 @@ middle products) run substantially faster in such a representation.
     ``flint_fft_small_max_transformed_ring_size``; the transformed
     polynomial workload structure carries the same declaration in its
     ``num_live`` field (zero derives a conservative count).
+
+    For the transformed-mpn context, *bits_bound* bounds the magnitude
+    of any single represented product; the representation provisions the
+    accumulation capacity from *terms_bound* and the sign headroom from
+    *is_signed* itself, so callers must not add either to the bound.
+    ``gr_transformed_mpn_get_limbs_bound(ctx)`` returns an upper bound,
+    over every element of the context, on what
+    ``gr_transformed_mpn_get_limbs`` can return -- conversion staging
+    should be sized from it rather than from a reconstruction of the
+    representation's limb requirements.

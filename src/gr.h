@@ -1504,6 +1504,7 @@ int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn,
 void gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx);
 ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx);
 slong gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x);
+slong gr_transformed_mpn_get_limbs_bound(gr_ctx_t ctx);
 slong gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x,
                     slong lo);
 int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out,

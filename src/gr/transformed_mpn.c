@@ -391,6 +391,16 @@ gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x)
                               TMPN(x)->negs);
 }
 
+/* an upper bound over every element of the ring: what
+   gr_transformed_mpn_get_limbs can return at the context's full chunk
+   capacity -- callers size conversion staging from this instead of
+   reconstructing the representation's limb requirements themselves */
+slong
+gr_transformed_mpn_get_limbs_bound(gr_ctx_t ctx)
+{
+    return _tmpn_export_limbs(TMPN_CTX(ctx), TMPN_CTX(ctx)->zcap, 1);
+}
+
 /* limbs required for a truncated conversion returning the limbs of the
    value starting at limb lo */
 slong
@@ -845,6 +855,12 @@ gr_transformed_mpn_get_trunc_destructive(nn_ptr FLINT_UNUSED(z), slong FLINT_UNU
 
 slong
 gr_transformed_mpn_get_limbs(gr_ctx_t FLINT_UNUSED(ctx), gr_srcptr FLINT_UNUSED(x))
+{
+    return 0;
+}
+
+slong
+gr_transformed_mpn_get_limbs_bound(gr_ctx_t FLINT_UNUSED(ctx))
 {
     return 0;
 }

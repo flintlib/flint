@@ -138,9 +138,11 @@ _mul_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     int ok = 1;
 #define E_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
 
+    /* the bound is one product's magnitude; the two-term accumulation
+       and the sign are the context's own provisioning */
     if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (FLINT_MAX(arn, ain) + FLINT_MAX(brn, bin))
-            + 8, 2, 1, 6) != GR_SUCCESS)
+            FLINT_BITS * (slong) (FLINT_MAX(arn, ain) + FLINT_MAX(brn, bin)),
+            2, 1, 6) != GR_SUCCESS)
         return 0;
 
     {
@@ -209,7 +211,7 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
         ar * ar - ai * ai keeps the same geometry as the complex product.
     */
     if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)) + 8, 2, 1, 4)
+            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)), 2, 1, 4)
             != GR_SUCCESS)
         return 0;
 
