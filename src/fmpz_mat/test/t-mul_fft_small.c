@@ -27,6 +27,16 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
         slong r = 1 + n_randint(state, 4);
         slong k = 1 + n_randint(state, 4);
         slong c = 1 + n_randint(state, 4);
+
+        /* asymmetric shapes reach the one-side-resident streaming tiers
+           in both orientations, and a large inner dimension with a
+           starved budget reaches the inner-blocked accumulation tier */
+        if (iter % 8 == 5)
+        { r = 1 + n_randint(state, 2); c = 5 + n_randint(state, 4); }
+        else if (iter % 8 == 6)
+        { r = 5 + n_randint(state, 4); c = 1 + n_randint(state, 2); }
+        else if (iter % 8 == 7)
+        { r = 1; c = 1; k = 8 + n_randint(state, 5); }
         ulong save_limit = flint_fft_small_max_transformed_ring_size;
         int square = (iter % 4 == 1);
 
@@ -37,7 +47,8 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
         if (iter % 4 == 2)
             flint_fft_small_max_transformed_ring_size = UWORD(1) << 20;
         else if (iter % 4 == 3)
-            flint_fft_small_max_transformed_ring_size = UWORD(1) << 18;
+            flint_fft_small_max_transformed_ring_size =
+                UWORD(1) << (13 + n_randint(state, 8));
         slong bits = 8192 + n_randint(state, 8192);
         fmpz_mat_t A, B, C, D, A0, B0;
         slong i, j;

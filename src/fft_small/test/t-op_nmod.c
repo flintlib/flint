@@ -39,7 +39,12 @@ TEST_FUNCTION_START(fft_small_op_nmod, state)
                          : 1 + n_randint(state, 700);
         ulong bn = large ? 1500 + n_randint(state, 3500)
                          : 1 + n_randint(state, 700);
-        ulong zn = an + bn - 1;
+        ulong zn;
+        /* equal lengths every few iterations so the square op actually
+           runs; this must precede every use of bn */
+        if (iter % 3 == 0)
+            bn = an;
+        zn = an + bn - 1;
         ulong zl = n_randint(state, zn);
         ulong zh = zl + 1 + n_randint(state, zn - zl);
         ulong atrunc = n_round_up(an, BLK_SZ);
@@ -72,7 +77,7 @@ TEST_FUNCTION_START(fft_small_op_nmod, state)
         t = FLINT_ARRAY_ALLOC(zn, ulong);
         ta = FLINT_ARRAY_ALLOC(an, ulong);
 
-        use_sqr = (an == bn) && n_randint(state, 4) == 0;
+        use_sqr = (an == bn) && n_randint(state, 2) == 0;
         /* an extra pair with subtracted product keeps the true
            coefficients nonnegative, which the unsigned nmod export
            requires */

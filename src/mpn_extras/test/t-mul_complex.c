@@ -76,8 +76,56 @@ _check_high(const fmpz_t ref, nn_srcptr z, slong n, int sgn, slong nn,
    the internal cutoff, and zero components exercise the canonical zero. */
 TEST_FUNCTION_START(flint_mpn_mul_complex, state)
 {
+    /* some iterations force the transformed paths regardless of size,
+       covering the square pointwise ops and the signed exports */
+    slong save_mul_cutoff = flint_mpn_mul_complex_fft_cutoff;
+    slong save_sqr_cutoff = flint_mpn_sqr_complex_fft_cutoff;
+
     for (slong iter = 0; iter < 40 * flint_test_multiplier(); iter++)
     {
+        if (iter % 3 == 1)
+        {
+            flint_mpn_mul_complex_fft_cutoff = 1;
+            flint_mpn_sqr_complex_fft_cutoff = 1;
+        }
+        else
+        {
+            flint_mpn_mul_complex_fft_cutoff = save_mul_cutoff;
+            flint_mpn_sqr_complex_fft_cutoff = save_sqr_cutoff;
+        }
+
+        /* the square path: under the forced cutoff this reaches the
+           transformed square ops and their signed exports; the
+           Karatsuba square is the reference */
+        if (iter % 3 == 1)
+        {
+            slong sn = 1 + n_randint(state, 300);
+            nn_ptr sa = flint_malloc(sn * sizeof(ulong));
+            nn_ptr sb = flint_malloc(sn * sizeof(ulong));
+            nn_ptr z1 = flint_malloc((2 * sn + 2) * sizeof(ulong));
+            nn_ptr z2 = flint_malloc((2 * sn + 2) * sizeof(ulong));
+            nn_ptr z3 = flint_malloc((2 * sn + 2) * sizeof(ulong));
+            nn_ptr z4 = flint_malloc((2 * sn + 2) * sizeof(ulong));
+            slong l1, l2, l3, l4, q;
+            int s1 = (int) n_randint(state, 2), s2 = (int) n_randint(state, 2);
+            for (q = 0; q < sn; q++)
+            { sa[q] = n_randtest(state); sb[q] = n_randtest(state); }
+            if (flint_mpn_sqr_complex_fft_small(z1, &l1, z2, &l2,
+                    sa, sn, s1, sb, sn, s2))
+            {
+                flint_mpn_sqr_complex_karatsuba(z3, &l3, z4, &l4,
+                        sa, sn, s1, sb, sn, s2);
+                if (l1 != l3 || l2 != l4
+                    || (l1 != 0 && mpn_cmp(z1, z3, FLINT_ABS(l1)) != 0)
+                    || (l2 != 0 && mpn_cmp(z2, z4, FLINT_ABS(l2)) != 0))
+                    TEST_FUNCTION_FAIL("transformed square vs karatsuba: "
+                            "sn=%wd s=%d%d\n", sn, s1, s2);
+            }
+            flint_free(sa); flint_free(sb);
+            flint_free(z1); flint_free(z2); flint_free(z3); flint_free(z4);
+        }
+
+
         /* the transformed path is off by default, so drive it explicitly
            on some iterations; sizes straddle the Karatsuba threshold */
         int fftpath = (iter % 4 == 0);
@@ -291,5 +339,7 @@ TEST_FUNCTION_START(flint_mpn_mul_complex, state)
     flint_mpn_mul_complex_fft_cutoff = 1024;
     flint_mpn_sqr_complex_fft_cutoff = 4096;
 
+    flint_mpn_mul_complex_fft_cutoff = save_mul_cutoff;
+    flint_mpn_sqr_complex_fft_cutoff = save_sqr_cutoff;
     TEST_FUNCTION_END(state);
 }

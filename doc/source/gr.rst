@@ -1070,7 +1070,10 @@ middle products) run substantially faster in such a representation.
     declines when their combined transform storage would exceed
     ``flint_fft_small_max_transformed_ring_size``; the transformed
     polynomial workload structure carries the same declaration in its
-    ``num_live`` field (zero derives a conservative count).
+    ``num_live`` field (zero derives a conservative count). Its ``force``
+    field skips the profitability model and the storage budget entirely,
+    declining only on implementation bounds: for tests, where small
+    unprofitable sizes catch bugs most easily.
 
     For the transformed-mpn context, *bits_bound* bounds the magnitude
     of any single represented product; the representation provisions the

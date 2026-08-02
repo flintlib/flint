@@ -33,7 +33,14 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
                          : 1 + n_randint(state, 150);
         ulong bn = large ? 1100 + n_randint(state, 2000)
                          : 1 + n_randint(state, 150);
-        ulong zn = an + bn;
+        ulong zn;
+
+        /* equal lengths every few iterations so the square op actually
+           runs (independent draws almost never coincide); this must
+           precede every use of bn: the sizes, the plan and the buffers */
+        if (iter % 3 == 0)
+            bn = an;
+        zn = an + bn;
         /* weighted toward large inflations, where the transform-cost
            score starts preferring more primes with larger chunks */
         ulong inflate = n_randint(state, 2) ? n_randint(state, 60)
@@ -65,7 +72,7 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
         ref = FLINT_ARRAY_ALLOC(zn, ulong);
         t = FLINT_ARRAY_ALLOC(zn, ulong);
 
-        use_sqr = (an == bn) && n_randint(state, 4) == 0;
+        use_sqr = (an == bn) && n_randint(state, 2) == 0;
         use_sub = (K >= 2) && n_randint(state, 3) == 0;
 
         for (k = 0; k < K; k++)

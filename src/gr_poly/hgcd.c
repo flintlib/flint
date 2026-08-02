@@ -318,7 +318,7 @@ _gr_poly_hgcd_mat_mul_transformed(gr_ptr * C, slong * lenC,
     {
         gr_ctx_t tctx;
         gr_transformed_poly_workload_t wl =
-            {{ 8, 8, 4, 8 + 4, 0 }};   /* 8 inputs live + up to 4
+            {{ 8, 8, 4, 8 + 4, 0, 0 }};   /* 8 inputs live + up to 4
                                           per-thread accumulators */
 
         if (gr_ctx_init_gr_poly_transformed_repr(tctx, ctx,

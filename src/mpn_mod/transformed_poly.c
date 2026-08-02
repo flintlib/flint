@@ -510,6 +510,22 @@ mtpoly_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int sub, gr_ctx_t ctx)
     if (MTPOLY(x)->len == 0 || MTPOLY(y)->len == 0)
         return GR_SUCCESS;
 
+    /* with res aliasing an operand, the per-call domain bookkeeping
+       below cannot mark the same struct as both input and accumulator;
+       route through the ring's own guarded multiply and add */
+    if (res == x || res == y)
+    {
+        gr_ptr t;
+        int status;
+        GR_TMP_INIT(t, ctx);
+        status = mtpoly_mul(t, x, y, ctx);
+        if (status == GR_SUCCESS)
+            status = sub ? mtpoly_sub(res, res, t, ctx)
+                         : mtpoly_add(res, res, t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+
     if (MTPOLY(res)->len == 0)
     {
         int status = mtpoly_mul(res, x, y, ctx);
@@ -561,6 +577,68 @@ mtpoly_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 static gr_funcptr __mtpoly_methods[GR_METHOD_TAB_SIZE];
 static int __mtpoly_methods_initialized = 0;
 
+/* random depth-1 elements and a value writer, via the stored base
+   context: gr_test_ring compliance at conversion cost only */
+static int
+mtpoly_randtest(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
+{
+    mtpoly_ctx_struct * T = MTPOLY_CTX(ctx);
+    slong nl = T->nlimbs;
+    slong i, j, len = n_randint(state, T->N + 1);
+    nn_ptr c;
+    nn_srcptr m = MPN_MOD_CTX_MODULUS(T->base);
+    int status;
+
+    if (len == 0 || n_randint(state, 8) == 0)
+        return gr_zero(res, ctx);
+
+    c = flint_malloc(len * nl * sizeof(ulong));
+    for (i = 0; i < len; i++)
+    {
+        nn_ptr ci = c + i * nl;
+        for (j = 0; j < nl; j++)
+            ci[j] = n_randtest(state);
+        /* keep the value below the modulus: top limb strictly below
+           the modulus's top limb */
+        ci[nl - 1] = (m[nl - 1] > 0) ? n_randint(state, m[nl - 1]) : 0;
+    }
+    status = mtpoly_set_gr_poly(res, c, len, T->base, ctx);
+    flint_free(c);
+    return status;
+}
+
+static int
+mtpoly_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
+{
+    mtpoly_ctx_struct * T = MTPOLY_CTX(ctx);
+    slong nl = T->nlimbs;
+    nn_ptr c;
+    slong i, len = 0;
+    int status;
+    fmpz_t v;
+
+    /* every element's polynomial length is bounded by the ring's N
+       (products beyond it are declined at the operation) */
+    c = flint_malloc(FLINT_MAX(T->N, 1) * nl * sizeof(ulong));
+    status = mtpoly_get_gr_poly(c, &len, x, T->base, ctx);
+    if (status == GR_SUCCESS)
+    {
+        fmpz_init(v);
+        status |= gr_stream_write(out, "[");
+        for (i = 0; i < len; i++)
+        {
+            if (i > 0)
+                status |= gr_stream_write(out, ", ");
+            fmpz_set_ui_array(v, c + i * nl, nl);
+            status |= gr_stream_write_fmpz(out, v);
+        }
+        status |= gr_stream_write(out, "]");
+        fmpz_clear(v);
+    }
+    flint_free(c);
+    return status;
+}
+
 static gr_method_tab_input __mtpoly_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) (void (*)(void)) mtpoly_ctx_write},
@@ -571,6 +649,8 @@ static gr_method_tab_input __mtpoly_methods_input[] =
     {GR_METHOD_SET,             (gr_funcptr) (void (*)(void)) mtpoly_set},
     {GR_METHOD_ZERO,            (gr_funcptr) (void (*)(void)) mtpoly_zero},
     {GR_METHOD_ONE,             (gr_funcptr) (void (*)(void)) mtpoly_one},
+    {GR_METHOD_WRITE,           (gr_funcptr) (void (*)(void)) mtpoly_write},
+    {GR_METHOD_RANDTEST,        (gr_funcptr) (void (*)(void)) mtpoly_randtest},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) (void (*)(void)) mtpoly_is_zero},
     {GR_METHOD_EQUAL,           (gr_funcptr) (void (*)(void)) mtpoly_equal},
     {GR_METHOD_NEG,             (gr_funcptr) (void (*)(void)) mtpoly_neg},
@@ -632,42 +712,49 @@ _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
        side always uses the same transform sizes with its own (usually
        equal) prime count */
     {
-        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0, 0 };
+        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0, 0, 0 };
         const gr_transformed_poly_workload_struct * wl =
             workload ? workload : &def;
-        double L = (double) n_round_up((ulong) N, BLK_SZ);
-        double lg = (double) FLINT_BIT_COUNT((ulong) L);
-        double np = (double) T->P->np;
-        double ni = (double) wl->num_inputs;
-        double nm = (double) wl->num_muls;
-        double no = (double) wl->num_outputs;
-        double npf, rep, fuse, bytes, limit;
 
-        /* per-coefficient conversions cost ~nlimbs here */
-        rep = np * L * ((ni + no) * (lg + 2.0 * nlimbs) + nm * 2.0)
-                + no * np * L * 3.0 + 5e4;
-        npf = (double) ((2 * nbits + FLINT_BIT_COUNT((ulong) L) + 49) / 50);
-        npf = FLINT_MAX(npf, 1.0);
-        fuse = nm * (npf * L * (3.0 * lg + 4.0 * nlimbs + 2.0)
-                     + npf * L * 3.0);
+    /* forced initialization (tests): only implementation
+       bounds below decline; the profitability model and the
+       storage budget are policy and are skipped */
+    if (!wl->force)
+    {
+            double L = (double) n_round_up((ulong) N, BLK_SZ);
+            double lg = (double) FLINT_BIT_COUNT((ulong) L);
+            double np = (double) T->P->np;
+            double ni = (double) wl->num_inputs;
+            double nm = (double) wl->num_muls;
+            double no = (double) wl->num_outputs;
+            double npf, rep, fuse, bytes, limit;
 
-        /* live elements as declared by the driver; a zero declaration
-           derives a conservative count from the workload shape */
-        {
-            double nlive = wl->num_live > 0 ? (double) wl->num_live
-                                            : (ni + no + 2.0);
-            bytes = nlive * np *
-                    (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
-        }
-        limit = wl->mem_limit > 0 ? (double) wl->mem_limit
-                    : (double) flint_fft_small_max_transformed_ring_size;
+            /* per-coefficient conversions cost ~nlimbs here */
+            rep = np * L * ((ni + no) * (lg + 2.0 * nlimbs) + nm * 2.0)
+                    + no * np * L * 3.0 + 5e4;
+            npf = (double) ((2 * nbits + FLINT_BIT_COUNT((ulong) L) + 49) / 50);
+            npf = FLINT_MAX(npf, 1.0);
+            fuse = nm * (npf * L * (3.0 * lg + 4.0 * nlimbs + 2.0)
+                         + npf * L * 3.0);
 
-        if (rep >= 0.865 * fuse || bytes > limit)
-        {
-            fft_small_plan_clear(T->P);
-            flint_free(T);
-            return GR_UNABLE;
-        }
+            /* live elements as declared by the driver; a zero declaration
+               derives a conservative count from the workload shape */
+            {
+                double nlive = wl->num_live > 0 ? (double) wl->num_live
+                                                : (ni + no + 2.0);
+                bytes = nlive * np *
+                        (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
+            }
+            limit = wl->mem_limit > 0 ? (double) wl->mem_limit
+                        : (double) flint_fft_small_max_transformed_ring_size;
+
+            if (rep >= 0.865 * fuse || bytes > limit)
+            {
+                fft_small_plan_clear(T->P);
+                flint_free(T);
+                return GR_UNABLE;
+            }
+    }
     }
 
     for (i = 0; i < T->P->np; i++)

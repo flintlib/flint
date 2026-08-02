@@ -882,6 +882,10 @@ typedef struct gr_transformed_poly_workload_struct
     slong num_live;     /* expected simultaneously live elements;
                            0 derives num_inputs + num_outputs + 2 */
     slong mem_limit;
+    int force;          /* skip the profitability model and the storage
+                           budget, declining only on implementation
+                           bounds: for tests, where small unprofitable
+                           sizes catch bugs most easily */
 }
 gr_transformed_poly_workload_struct;
 

@@ -188,6 +188,7 @@ static int _mulmid_fft_small_direct(nmod_poly_mat_t C,
        single pool), plus one accumulator per thread */
     wl->num_live = ar * k + nB + flint_get_num_available_threads();
     wl->mem_limit = 0;
+    wl->force = 0;
 
     if (gr_ctx_init_gr_poly_transformed_repr(tctx, ctx, (slong) zn,
                 (slong) terms, wl) != GR_SUCCESS)

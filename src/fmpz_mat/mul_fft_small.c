@@ -88,7 +88,7 @@ _set_entry(gr_ptr elem, const fmpz * e, gr_ctx_t tctx)
    acc, which the caller re-initializes */
 static int
 _export_entry(fmpz * e, gr_ptr acc, slong lo_limbs, int add_into,
-              nn_ptr * t, slong * tn_max, gr_ctx_t tctx)
+              nn_ptr t, slong tn_max, gr_ctx_t tctx)
 {
     slong need, zn;
     int sg, ok;
@@ -96,16 +96,15 @@ _export_entry(fmpz * e, gr_ptr acc, slong lo_limbs, int add_into,
     need = (lo_limbs == 0)
             ? gr_transformed_mpn_get_limbs(tctx, acc)
             : gr_transformed_mpn_get_limbs_trunc(tctx, acc, lo_limbs);
-    if (need > *tn_max)
-    {
-        *t = flint_realloc(*t, need * sizeof(ulong));
-        *tn_max = need;
-    }
+    /* the buffer was sized from gr_transformed_mpn_get_limbs_bound, of
+       which need is a per-element instance */
+    FLINT_ASSERT(need <= tn_max);
+    (void) tn_max;
     if (lo_limbs == 0)
-        ok = gr_transformed_mpn_get_destructive(*t, need, &zn, &sg, acc,
+        ok = gr_transformed_mpn_get_destructive(t, need, &zn, &sg, acc,
                 tctx) == GR_SUCCESS;
     else
-        ok = gr_transformed_mpn_get_trunc_destructive(*t, need, &zn, &sg,
+        ok = gr_transformed_mpn_get_trunc_destructive(t, need, &zn, &sg,
                 lo_limbs, acc, tctx) == GR_SUCCESS;
     if (!ok)
         return 0;
@@ -116,7 +115,7 @@ _export_entry(fmpz * e, gr_ptr acc, slong lo_limbs, int add_into,
             fmpz_zero(e);
         else
         {
-            fmpz_set_ui_array(e, *t, zn);
+            fmpz_set_ui_array(e, t, zn);
             if (sg)
                 fmpz_neg(e, e);
         }
@@ -125,7 +124,7 @@ _export_entry(fmpz * e, gr_ptr acc, slong lo_limbs, int add_into,
     {
         fmpz_t p;
         fmpz_init(p);
-        fmpz_set_ui_array(p, *t, zn);
+        fmpz_set_ui_array(p, t, zn);
         if (sg)
             fmpz_sub(e, e, p);
         else
@@ -320,7 +319,7 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
 
                         if (ok)
                             ok = _export_entry(fmpz_mat_entry(C, I + i, J + j),
-                                    acc, lo_limbs, L > 0, &t, &tn_max, tctx);
+                                    acc, lo_limbs, L > 0, t, tn_max, tctx);
 
                         gr_clear(acc, tctx);
                         gr_transformed_mpn_init_borrowed(acc, acc_data, tctx);

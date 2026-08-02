@@ -590,6 +590,22 @@ tpoly_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int sub, gr_ctx_t ctx)
     if (TPOLY(x)->len == 0 || TPOLY(y)->len == 0)
         return GR_SUCCESS;
 
+    /* with res aliasing an operand, the per-call domain bookkeeping
+       below cannot mark the same struct as both input and accumulator;
+       route through the ring's own guarded multiply and add */
+    if (res == x || res == y)
+    {
+        gr_ptr t;
+        int status;
+        GR_TMP_INIT(t, ctx);
+        status = tpoly_mul(t, x, y, ctx);
+        if (status == GR_SUCCESS)
+            status = sub ? tpoly_sub(res, res, t, ctx)
+                         : tpoly_add(res, res, t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+
     if (TPOLY(res)->len == 0)
     {
         int status = tpoly_mul(res, x, y, ctx);
@@ -638,6 +654,62 @@ tpoly_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 static gr_funcptr __tpoly_methods[GR_METHOD_TAB_SIZE];
 static int __tpoly_methods_initialized = 0;
 
+/* random depth-1 elements within the length capacity, and a value
+   writer via the nondestructive conversion out: what gr_test_ring and
+   diagnostics need, at conversion cost only they pay */
+static int
+tpoly_randtest(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
+{
+    tpoly_ctx_struct * T = TPOLY_CTX(ctx);
+    gr_ctx_t base;
+    slong i, len = n_randint(state, T->N + 1);
+    nn_ptr c;
+    int status;
+
+    if (len == 0 || n_randint(state, 8) == 0)
+        return gr_zero(res, ctx);
+
+    gr_ctx_init_nmod(base, T->mod.n);
+    c = flint_malloc(len * sizeof(ulong));
+    for (i = 0; i < len; i++)
+        c[i] = n_randint(state, T->mod.n);
+    c[len - 1] += (c[len - 1] == 0 && T->mod.n > 1);
+    status = tpoly_set_gr_poly(res, c, len, base, ctx);
+    flint_free(c);
+    gr_ctx_clear(base);
+    return status;
+}
+
+static int
+tpoly_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
+{
+    tpoly_ctx_struct * T = TPOLY_CTX(ctx);
+    gr_ctx_t base;
+    nn_ptr c;
+    slong i, len = 0;
+    int status;
+
+    gr_ctx_init_nmod(base, T->mod.n);
+    /* every element's polynomial length is bounded by the ring's N
+       (products beyond it are declined at the operation) */
+    c = flint_malloc(FLINT_MAX(T->N, 1) * sizeof(ulong));
+    status = tpoly_get_gr_poly(c, &len, x, base, ctx);
+    if (status == GR_SUCCESS)
+    {
+        status |= gr_stream_write(out, "[");
+        for (i = 0; i < len; i++)
+        {
+            if (i > 0)
+                status |= gr_stream_write(out, ", ");
+            status |= gr_stream_write_ui(out, c[i]);
+        }
+        status |= gr_stream_write(out, "]");
+    }
+    flint_free(c);
+    gr_ctx_clear(base);
+    return status;
+}
+
 static gr_method_tab_input __tpoly_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) (void (*)(void)) tpoly_ctx_write},
@@ -648,6 +720,8 @@ static gr_method_tab_input __tpoly_methods_input[] =
     {GR_METHOD_SET,             (gr_funcptr) (void (*)(void)) tpoly_set},
     {GR_METHOD_ZERO,            (gr_funcptr) (void (*)(void)) tpoly_zero},
     {GR_METHOD_ONE,             (gr_funcptr) (void (*)(void)) tpoly_one},
+    {GR_METHOD_WRITE,           (gr_funcptr) (void (*)(void)) tpoly_write},
+    {GR_METHOD_RANDTEST,        (gr_funcptr) (void (*)(void)) tpoly_randtest},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) (void (*)(void)) tpoly_is_zero},
     {GR_METHOD_EQUAL,           (gr_funcptr) (void (*)(void)) tpoly_equal},
     {GR_METHOD_NEG,             (gr_funcptr) (void (*)(void)) tpoly_neg},
@@ -718,67 +792,74 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
        Constants are calibrated against gcd measurements on this class of
        hardware; the model errs conservative. */
     {
-        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0, 0 };
+        const gr_transformed_poly_workload_struct def = { 2, 1, 1, 0, 0, 0 };
         const gr_transformed_poly_workload_struct * wl =
             workload ? workload : &def;
-        double L = (double) n_round_up(N, BLK_SZ);
-        double lg = (double) FLINT_BIT_COUNT((ulong) L);
-        double np = (double) T->P->np;
-        double ni = (double) wl->num_inputs;
-        double nm = (double) wl->num_muls;
-        double no = (double) wl->num_outputs;
-        double npf, Lf, lgf, rep, fuse, margin, bytes, limit;
 
-        rep = np * L * ((ni + no) * (lg + 2.0) + nm * 2.0)
-                + no * np * L * 3.0 + 5e4;
+    /* forced initialization (tests): only implementation
+       bounds below decline; the profitability model and the
+       storage budget are policy and are skipped */
+    if (!wl->force)
+    {
+            double L = (double) n_round_up(N, BLK_SZ);
+            double lg = (double) FLINT_BIT_COUNT((ulong) L);
+            double np = (double) T->P->np;
+            double ni = (double) wl->num_inputs;
+            double nm = (double) wl->num_muls;
+            double no = (double) wl->num_outputs;
+            double npf, Lf, lgf, rep, fuse, margin, bytes, limit;
 
-        if (mod.n <= TPOLY_MAX_REPACK)
-        {
-            npf = 1.0;
-            Lf = L / 2;
-        }
-        else
-        {
-            npf = (double) ((2 * modbits + FLINT_BIT_COUNT((ulong) L) + 49)
-                            / 50);
-            npf = FLINT_MAX(npf, 1.0);
-            Lf = L;
-        }
-        lgf = (double) FLINT_BIT_COUNT((ulong) Lf);
-        /* homogeneous workloads (batched operands of comparable length,
-           as in matrix products) face fused alternatives at the same
-           transform sizes; heterogeneous whole-algorithm batching proved
-           unprofitable (operands transformed at the shared upper-bound
-           length lose the reuse advantage) and is not attempted */
-        fuse = nm * (npf * Lf * (3.0 * lgf + 6.0) + npf * Lf * 3.0);
+            rep = np * L * ((ni + no) * (lg + 2.0) + nm * 2.0)
+                    + no * np * L * 3.0 + 5e4;
 
-        /* single-prime transforms leave little to deduplicate relative to
-           the surrounding fixed and conversion costs (measured), so
-           require a decisive advantage there */
-        margin = (T->P->np == 1) ? 0.6 : 0.865;
+            if (mod.n <= TPOLY_MAX_REPACK)
+            {
+                npf = 1.0;
+                Lf = L / 2;
+            }
+            else
+            {
+                npf = (double) ((2 * modbits + FLINT_BIT_COUNT((ulong) L) + 49)
+                                / 50);
+                npf = FLINT_MAX(npf, 1.0);
+                Lf = L;
+            }
+            lgf = (double) FLINT_BIT_COUNT((ulong) Lf);
+            /* homogeneous workloads (batched operands of comparable length,
+               as in matrix products) face fused alternatives at the same
+               transform sizes; heterogeneous whole-algorithm batching proved
+               unprofitable (operands transformed at the shared upper-bound
+               length lose the reuse advantage) and is not attempted */
+            fuse = nm * (npf * Lf * (3.0 * lgf + 6.0) + npf * Lf * 3.0);
 
-        /* low-reuse workloads whose live elements far exceed cache go
-           memory bound at one or two primes (measured); high-reuse
-           workloads amortize the streaming */
-        /* live elements as declared by the driver; a zero declaration
-           derives a conservative count from the workload shape */
-        {
-            double nlive = wl->num_live > 0 ? (double) wl->num_live
-                                            : (ni + no + 2.0);
-            bytes = nlive * np *
-                    (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
-        }
-        limit = wl->mem_limit > 0 ? (double) wl->mem_limit
-                    : (double) flint_fft_small_max_transformed_ring_size;
+            /* single-prime transforms leave little to deduplicate relative to
+               the surrounding fixed and conversion costs (measured), so
+               require a decisive advantage there */
+            margin = (T->P->np == 1) ? 0.6 : 0.865;
 
-        if (rep >= margin * fuse
-            || (T->P->np <= 2 && nm < 4.0 * ni && bytes > 32.0 * 1048576.0)
-            || bytes > limit)
-        {
-            fft_small_plan_clear(T->P);
-            flint_free(T);
-            return GR_UNABLE;
-        }
+            /* low-reuse workloads whose live elements far exceed cache go
+               memory bound at one or two primes (measured); high-reuse
+               workloads amortize the streaming */
+            /* live elements as declared by the driver; a zero declaration
+               derives a conservative count from the workload shape */
+            {
+                double nlive = wl->num_live > 0 ? (double) wl->num_live
+                                                : (ni + no + 2.0);
+                bytes = nlive * np *
+                        (double) sd_fft_ctx_data_size(T->P->depth) * 8.0;
+            }
+            limit = wl->mem_limit > 0 ? (double) wl->mem_limit
+                        : (double) flint_fft_small_max_transformed_ring_size;
+
+            if (rep >= margin * fuse
+                || (T->P->np <= 2 && nm < 4.0 * ni && bytes > 32.0 * 1048576.0)
+                || bytes > limit)
+            {
+                fft_small_plan_clear(T->P);
+                flint_free(T);
+                return GR_UNABLE;
+            }
+    }
     }
 
     if (exact)

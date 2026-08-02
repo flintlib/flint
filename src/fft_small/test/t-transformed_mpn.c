@@ -556,5 +556,41 @@ cleanup:
         }
     }
 
+        /* randomized ring-compliance testing: operations outside the
+       representation's provisioning (depth, accumulated terms, chunk
+       capacity) answer GR_UNABLE, which the framework accepts */
+    {
+        gr_ctx_t ctx;
+        slong it;
+        for (it = 0; it < 6; it++)
+        {
+            slong bits = 128 << n_randint(state, 6);
+            slong terms = 1 + n_randint(state, 6);
+            int sgn = (int) n_randint(state, 2);
+            if (gr_ctx_init_transformed_mpn(ctx, bits, terms, sgn, 8)
+                    == GR_SUCCESS)
+            {
+                {
+                    /* aliased accumulation through the internal
+                       temporary */
+                    gr_ptr u, v;
+                    ulong lu = 7, lv = 9;
+                    u = gr_heap_init(ctx); v = gr_heap_init(ctx);
+                    if (gr_transformed_mpn_set(u, &lu, 1, 0, ctx)
+                            == GR_SUCCESS &&
+                        gr_transformed_mpn_set(v, &lv, 1, sgn, ctx)
+                            == GR_SUCCESS)
+                    {
+                        (void) gr_addmul(u, u, v, ctx);
+                        (void) gr_submul(u, v, u, ctx);
+                    }
+                    gr_heap_clear(u, ctx); gr_heap_clear(v, ctx);
+                }
+                gr_test_ring(ctx, 25, 0);
+                gr_ctx_clear(ctx);
+            }
+        }
+    }
+
     TEST_FUNCTION_END(state);
 }

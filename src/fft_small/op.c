@@ -118,10 +118,14 @@ static void _point_sqr(const sd_fft_ctx_struct* Q,
             vec8d x0, x1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
-            x0 = vec8d_mulmod(x0, x0, n, ninv);
-            x1 = vec8d_mulmod(x1, x1, n, ninv);
-            x0 = vec8d_mulmod(x0, m, n, ninv);
-            x1 = vec8d_mulmod(x1, m, n, ninv);
+            vec8d t0, t1;
+            /* by m first, exactly as _point_mul: squaring two raw
+               transform entries (each in (-4n, 4n)) first would exceed
+               the chained mulmod input bound */
+            t0 = vec8d_mulmod(x0, m, n, ninv);
+            t1 = vec8d_mulmod(x1, m, n, ninv);
+            x0 = vec8d_mulmod(t0, x0, n, ninv);
+            x1 = vec8d_mulmod(t1, x1, n, ninv);
             vec8d_store(zx+j+0, x0);
             vec8d_store(zx+j+8, x1);
         } while (j += 16, j < BLK_SZ);

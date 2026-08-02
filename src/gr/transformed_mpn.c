@@ -167,6 +167,74 @@ tmpn_swap(gr_ptr x, gr_ptr y, gr_ctx_t FLINT_UNUSED(ctx))
     FLINT_SWAP(tmpn_struct, *TMPN(x), *TMPN(y));
 }
 
+/* writes the represented value (reconstructed nondestructively);
+   costs an inverse transform, which only diagnostics and the test
+   framework pay */
+static int
+tmpn_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx)
+{
+    slong need = gr_transformed_mpn_get_limbs(ctx, x);
+    nn_ptr t;
+    slong zn;
+    int sgn, status;
+    fmpz_t v;
+
+    if (need <= 0)
+    {
+        return gr_stream_write(out, "0");
+    }
+    t = flint_malloc(need * sizeof(ulong));
+    status = gr_transformed_mpn_get(t, need, &zn, &sgn, x, ctx);
+    if (status == GR_SUCCESS)
+    {
+        fmpz_init(v);
+        if (zn == 0)
+            fmpz_zero(v);
+        else
+        {
+            fmpz_set_ui_array(v, t, zn);
+            if (sgn)
+                fmpz_neg(v, v);
+        }
+        status |= gr_stream_write_fmpz(out, v);
+        fmpz_clear(v);
+    }
+    flint_free(t);
+    return status;
+}
+
+static int
+tmpn_one(gr_ptr res, gr_ctx_t ctx)
+{
+    ulong v = 1;
+    return gr_transformed_mpn_set(res, &v, 1, 0, ctx);
+}
+
+/* random depth-1 elements within the context's operand capacity;
+   gr_test_ring drives the ring through these */
+static int
+tmpn_randtest(gr_ptr res, flint_rand_t state, gr_ctx_t ctx)
+{
+    tmpn_ctx_struct * T = TMPN_CTX(ctx);
+    slong maxn = FLINT_MAX(1, (slong) (T->bits_bound / (2 * FLINT_BITS)));
+    slong n = n_randint(state, maxn + 1);
+    int sgn = T->is_signed ? (int) n_randint(state, 2) : 0;
+    nn_ptr t;
+    slong i;
+    int status;
+
+    if (n == 0 || n_randint(state, 8) == 0)
+        return gr_zero(res, ctx);
+
+    t = flint_malloc(n * sizeof(ulong));
+    for (i = 0; i < n; i++)
+        t[i] = n_randtest(state);
+    t[n - 1] += (t[n - 1] == 0);
+    status = gr_transformed_mpn_set(res, t, n, sgn, ctx);
+    flint_free(t);
+    return status;
+}
+
 static int
 tmpn_zero(gr_ptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
@@ -604,6 +672,22 @@ _tmpn_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int subflip,
     if (TMPN(x)->nchunks == 0 || TMPN(y)->nchunks == 0)
         return GR_SUCCESS;
 
+    /* with res aliasing an operand, the per-call domain bookkeeping
+       below cannot mark the same struct as both input and accumulator;
+       route through the ring's own guarded multiply and add */
+    if (res == x || res == y)
+    {
+        gr_ptr t;
+        int status;
+        GR_TMP_INIT(t, ctx);
+        status = tmpn_mul(t, x, y, ctx);
+        if (status == GR_SUCCESS)
+            status = subflip ? tmpn_sub(res, res, t, ctx)
+                             : tmpn_add(res, res, t, ctx);
+        GR_TMP_CLEAR(t, ctx);
+        return status;
+    }
+
     if (TMPN(res)->nchunks == 0)
     {
         int status = tmpn_mul(res, x, y, ctx);
@@ -678,6 +762,9 @@ static gr_method_tab_input __tmpn_methods_input[] =
     {GR_METHOD_SWAP,            (gr_funcptr) (void (*)(void)) tmpn_swap},
     {GR_METHOD_SET,             (gr_funcptr) (void (*)(void)) tmpn_set},
     {GR_METHOD_ZERO,            (gr_funcptr) (void (*)(void)) tmpn_zero},
+    {GR_METHOD_WRITE,           (gr_funcptr) (void (*)(void)) tmpn_write},
+    {GR_METHOD_ONE,             (gr_funcptr) (void (*)(void)) tmpn_one},
+    {GR_METHOD_RANDTEST,        (gr_funcptr) (void (*)(void)) tmpn_randtest},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) (void (*)(void)) tmpn_is_zero},
     {GR_METHOD_EQUAL,           (gr_funcptr) (void (*)(void)) tmpn_equal},
     {GR_METHOD_NEG,             (gr_funcptr) (void (*)(void)) tmpn_neg},
