@@ -17,7 +17,6 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
 #include "hand_mulhi.inc"
 
 #if FLINT_BITS == 64
@@ -39,14 +38,14 @@ fixed_log1p_opt_1(nn_ptr res, nn_srcptr x)
     int k;
 
 
-    _fixed_exp_logs_ensure(1, r);
-    nc = _fixed_exp_logs_n;
+    nn_srcptr tab;
+    tab = _fixed_exp_logs_tab(1, r, &nc);
 
     for (i = 1; i <= r + 1; i++)
     {
         slong ii = FLINT_MIN(i, (slong) r);
         ulong v = MPN_RIGHT_SHIFT_LOW(UWORD(1), p0, (int) ii);
-        ulong lt = _fixed_exp_logs[ii * nc + (nc - 1)];
+        ulong lt = tab[ii * nc + (nc - 1)];
         ulong m = -(ulong) (v <= d0);
 
         d0 -= v & m;

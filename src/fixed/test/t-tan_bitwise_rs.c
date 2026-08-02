@@ -23,11 +23,12 @@ TEST_FUNCTION_START(fixed_tan_bitwise_rs, state)
         /* the specialized sizes take r = 0; larger ones divide sin by
            cos and so accept any legal r */
         slong nmin = (FLINT_BITS == 64) ? 1 : 2;
-        slong n = nmin + n_randint(state, (iter % 5 == 0) ? 40 : 9);
+        slong n = nmin + n_randint(state, (iter % 97 == 1) ? 1800
+            : (iter % 5 == 0) ? 40 : 9);
         int r = (iter % 3 == 0) ? 0
               : (iter % 3 == 1) ? 32 + (int) n_randint(state, 200)
                                 : 32 + (int) n_randint(state, 17);
-        ulong x[64], res[66];
+        nn_ptr x, res;
         arb_t xa, e, va, d;
         fmpz_t f;
         mag_t mb;
@@ -37,7 +38,10 @@ TEST_FUNCTION_START(fixed_tan_bitwise_rs, state)
         if (n > 40)
             n = 40;
 
-        flint_mpn_rrandom(x, state, n);
+x = flint_malloc((n + 2) * sizeof(ulong));
+        res = flint_malloc((n + 2) * sizeof(ulong));
+
+                flint_mpn_rrandom(x, state, n);
         if (iter % 13 == 3)
             flint_mpn_zero(x, n);
         if (iter % 7 == 1)
@@ -74,7 +78,37 @@ TEST_FUNCTION_START(fixed_tan_bitwise_rs, state)
         arb_clear(d);
         fmpz_clear(f);
         mag_clear(mb);
+        flint_free(x);
+        flint_free(res);
     }
+
+#if FLINT_BITS == 64
+    /* the public per-size wrappers fixed_tan_opt_<n> route to the
+       same specialized bodies as the r = 0 dispatch, so the two
+       must agree bit for bit */
+    {
+        static void (* const tab[])(nn_ptr, nn_srcptr) = {
+            NULL,
+            fixed_tan_opt_1, fixed_tan_opt_2, fixed_tan_opt_3,
+            fixed_tan_opt_4, fixed_tan_opt_5, fixed_tan_opt_6,
+            fixed_tan_opt_7, fixed_tan_opt_8, fixed_tan_opt_9,
+            fixed_tan_opt_10, fixed_tan_opt_11, fixed_tan_opt_12
+        };
+        slong n;
+
+        for (n = 1; n <= 12; n++)
+        {
+            ulong x[12], t1[13], t2[13];
+
+            flint_mpn_rrandom(x, state, n);
+            tab[n](t1, x);
+            fixed_tan_bitwise_rs(t2, x, n, 0);
+            if (mpn_cmp(t1, t2, n + 1) != 0)
+                TEST_FUNCTION_FAIL("opt wrapper mismatch: "
+                    "n = %wd\n", n);
+        }
+    }
+#endif
 
     TEST_FUNCTION_END(state);
 }

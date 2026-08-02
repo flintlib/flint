@@ -55,9 +55,18 @@ TEST_FUNCTION_START(fixed_trig_rs, state)
 
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
-        slong n = 1 + n_randint(state, (iter % 5 == 0) ? 120 : 24);
-        int zbits = (iter % 2) ? 64 : 32;
-        int alt = (iter % 4) < 2;
+        /* the first 144 iterations sweep (n, zbits, family)
+           deterministically so that every per-term-count
+           specialization slot of the four series families gets hit
+           (the rs32 tables for arguments in [2^-64, 2^-32) and the
+           rs tables below 2^-64, both up to their largest
+           specialized size); the rest sample randomly */
+        int det = (iter < 144);
+        slong n = det ? 1 + (iter % 36)
+            : 1 + n_randint(state, (iter % 5 == 0) ? 120 : 24);
+        int zbits = det ? (((iter / 36) & 1) ? 64 : 32)
+            : ((iter % 2) ? 64 : 32);
+        int alt = det ? ((iter / 72) & 1) : ((iter % 4) < 2);
         ulong x[130], xr[131];
         ulong s1[132], c1[132], s2[132], c2[132], refs[133], refc[133];
         ulong a1[131], refa[132];
@@ -65,6 +74,15 @@ TEST_FUNCTION_START(fixed_trig_rs, state)
 
         flint_mpn_rrandom(x, state, n);
         mask_top2(x, n, zbits);
+        /* pin the effective geometry on the deterministic sweep:
+           rrandom's blocky patterns can zero whole limbs, silently
+           shifting which specialization the dispatch selects.  The
+           pinned bit goes in the first limb wholly below the mask
+           (bit 16 sits under the partial 32-bit mask on 64-bit
+           machines), so the arguments keep the promised zbits
+           leading zeros on every limb size */
+        if (det && n - 1 - zbits / FLINT_BITS >= 0)
+            x[n - 1 - zbits / FLINT_BITS] |= UWORD(1) << 16;
 
         xr[0] = 0;
         flint_mpn_copyi(xr + 1, x, n);

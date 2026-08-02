@@ -17,7 +17,6 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
 #include "hand_mulhi.inc"
 
 #if FLINT_BITS == 64
@@ -156,8 +155,8 @@ fixed_exp_opt_6(nn_ptr res, nn_srcptr x)
     slong used[6 * FLINT_BITS + 2];
 
 
-    _fixed_exp_logs_ensure(6, r);
-    nc = _fixed_exp_logs_n;
+    nn_srcptr tab;
+    tab = _fixed_exp_logs_tab(6, r, &nc);
 
     t0 = x[0];
     t1 = x[1];
@@ -169,7 +168,7 @@ fixed_exp_opt_6(nn_ptr res, nn_srcptr x)
 /* exact compare-subtract of L_ii, recording the index */
 #define STEP(ii) \
     do { \
-        nn_srcptr Lq = _fixed_exp_logs + (ii) * nc + (nc - 6); \
+        nn_srcptr Lq = tab + (ii) * nc + (nc - 6); \
         sub_dddddddmmmmmmmsssssss(bw, d5, d4, d3, d2, d1, d0, \
             UWORD(0), t5, t4, t3, t2, t1, t0, \
             UWORD(0), Lq[5], Lq[4], Lq[3], Lq[2], Lq[1], Lq[0]); \
@@ -187,7 +186,7 @@ fixed_exp_opt_6(nn_ptr res, nn_srcptr x)
 #define FLUSH() \
     for (; bj < num; bj++) \
     { \
-        nn_srcptr Lq = _fixed_exp_logs + used[bj] * nc + (nc - 6); \
+        nn_srcptr Lq = tab + used[bj] * nc + (nc - 6); \
         sub_ddddddmmmmmmssssss(t5, t4, t3, t2, t1, t0, \
             t5, t4, t3, t2, t1, t0, \
             Lq[5], Lq[4], Lq[3], Lq[2], Lq[1], Lq[0]); \
@@ -210,7 +209,7 @@ fixed_exp_opt_6(nn_ptr res, nn_srcptr x)
             bj = num; \
             h = hreg; \
             e = 0; \
-            lp = _fixed_exp_logs + (FLINT_BITS * (cc) + 1) * nc \
+            lp = tab + (FLINT_BITS * (cc) + 1) * nc \
                 + (nc - 1 - (cc)); \
             for (i = FLINT_BITS * (cc) + 1; i <= i1; i++, lp += nc) \
             { \

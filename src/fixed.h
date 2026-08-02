@@ -13,6 +13,7 @@
 #define FIXED_H
 
 #include "flint.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,6 +68,56 @@ void fixed_exp_rs(nn_ptr res, nn_srcptr x, slong n);
    the output precision, so the error bound grows linearly with r;
    callers wanting sub-ulp accuracy should pad the precision by one
    limb themselves. */
+/* exp(t) of a reduced argument t < 2^-r, r >= 32, into
+   (y, wn + 1): wn fraction limbs and a units limb.  alg: 0 = tuned
+   automatic choice, 1 = direct rectangular-splitting series,
+   2 = sinh series + square root, 3 = one bit-burst step + sinh,
+   4 = full bit-burst.  Error at most FIXED_EXP_REDUCED_MAX_ERR
+   ulps. */
+#define FIXED_EXP_REDUCED_MAX_ERR 96
+void fixed_exp_reduced(nn_ptr y, nn_srcptr t, slong wn,
+    flint_bitcnt_t r, int alg);
+
+/* sin(t) and g = 1 - cos(t) of a reduced argument t < 2^-r,
+   r >= 16 (the series algorithms 1 and 2 require r >= 32), into
+   (ysin, wn) and (yg, wn); the trigonometric analogue of
+   fixed_exp_reduced.  alg: 0 = tuned automatic choice, 1 = direct
+   sine + cosine rectangular-splitting series, 2 = sine series plus
+   a squaring and a square root, 3 = one bit-burst step + series,
+   4 = full bit-burst.  Error at most FIXED_SIN_COS_REDUCED_MAX_ERR
+   ulps on each output. */
+#define FIXED_SIN_COS_REDUCED_MAX_ERR 96
+void fixed_sin_cos_reduced(nn_ptr ysin, nn_ptr yg, nn_srcptr t,
+    slong wn, flint_bitcnt_t r, int alg);
+
+/* exp, sine and cosine on [0, 1) without table-based argument
+   reduction: leading-zero inspection, repeated halving to a tuned
+   depth r(n), fixed_*_reduced, and squarings back (for the
+   trigonometric pair, cosine doublings and one final square root
+   for the sine), with internal guard limbs keeping the doubling
+   amplification below one output ulp.  Outputs carry n fraction
+   limbs and a unit limb.  Errors at most the *_MAX_ERR ulps. */
+#define FIXED_EXP_NOTAB_MAX_ERR 128
+void fixed_exp_notab(nn_ptr y, nn_srcptr x, slong n);
+#define FIXED_SIN_COS_NOTAB_MAX_ERR 128
+void fixed_sin_cos_notab(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
+    slong n);
+
+/* internal forced-depth workers (the public entry points choose r
+   from tuned tables; these take it explicitly, for tuning) */
+void _fixed_exp_notab_r(nn_ptr y, nn_srcptr x, slong n, int r);
+void _fixed_sin_cos_notab_r(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
+    slong n, int r);
+
+/* notab tuning: the trigonometric bit-burst boundary and the sine
+   square root's Newton cutoff */
+#ifndef FIXED_SIN_COS_NOTAB_BURST_CUTOFF
+#define FIXED_SIN_COS_NOTAB_BURST_CUTOFF 1200
+#endif
+#ifndef FIXED_SIN_COS_NOTAB_SQRT_NEWTON_CUTOFF
+#define FIXED_SIN_COS_NOTAB_SQRT_NEWTON_CUTOFF 2000
+#endif
+
 void fixed_exp_bitwise_rs(nn_ptr res, nn_srcptr x, slong n, int r);
 
 /* fully specialized per-size implementations (default dispatch;
@@ -237,6 +288,7 @@ void _fixed_exp_rs_fallback(nn_ptr res, nn_srcptr x, slong n);
    this thread. */
 void _fixed_exp_logs_ensure(slong nv, slong rc);
 nn_srcptr _fixed_exp_logs_entry(slong i, slong n);
+void _fixed_exp_logs_clear(void);
 slong _fixed_exp_logs_max_index(void);
 
 /* Internal: number of slots the used array of _fixed_bitwise_reduce
@@ -261,7 +313,49 @@ slong _fixed_bitwise_reduce(nn_ptr t, slong wn, int r, slong istart,
    fixed_tan_bitwise_rs and fixed_atan_bitwise_rs.  Storage and
    accessors work exactly as for the logarithm table above. */
 void _fixed_atans_ensure(slong nv, slong rc);
+
+/* Internal: n-limb one-sided fixed-point approximations of the table
+   values by mpn binary splitting (at most the true value, short by a
+   couple of ulps); i >= 1. */
+void fixed_atan_2mexp_ui_bs(nn_ptr res, ulong i, slong n);
+void fixed_log1p_2mexp_ui_bs(nn_ptr res, ulong i, slong n);
+
+/* Approximate (not ulp-accurate) fixed-point inversion,
+   division and square roots by Newton / Karp-Markstein iteration on
+   middle products; ports of the radix_*_approx functions.  Writing
+   B = 2^64:
+
+   fixed_inv_newton: given (a, an), a_{an-1} != 0, representing
+   a in [1/B, 1) with an fraction limbs, sets (q, n+2) to 1/a in
+   (1, B] with n fraction limbs and two integral limbs (the top limb
+   may be zero); |error| <= 4 B^-n / a.
+
+   fixed_div_newton: numerator (b, bn) in [0, 1), denominator
+   (a, an) in [1/B, 1) with a_{an-1} != 0; sets (q, n+2) to b/a with
+   n fraction limbs and two integral limbs; |error| <= 4 B^-n / a.
+
+   fixed_rsqrt_ui_newton: 2 <= a < B; sets (res, n) to the fraction
+   limbs of 1/sqrt(a); |error| <= 2 B^-n.
+
+   fixed_rsqrt_newton: (a, an) in [B^-2, 1), one of the two top limbs
+   nonzero; sets (q, n+2) to 1/sqrt(a) in (1, B] with n fraction
+   limbs and two integral limbs; |error| <= 4 B^-n / sqrt(a).
+
+   fixed_sqrt_newton: input as for fixed_rsqrt_newton; sets (q, n+2)
+   to sqrt(a) in [1/B, 1) (the value can round up to 1);
+   |error| <= 4 B^-n / sqrt(a). */
+void fixed_inv_newton_basecase(nn_ptr q, nn_srcptr a, slong an, slong n);
+void fixed_inv_newton(nn_ptr q, nn_srcptr a, slong an, slong n);
+void fixed_div_newton_invmul(nn_ptr q, nn_srcptr b, slong bn, nn_srcptr a, slong an, slong n);
+void fixed_div_newton(nn_ptr q, nn_srcptr b, slong bn, nn_srcptr a, slong an, slong n);
+void fixed_rsqrt_ui_newton_basecase(nn_ptr res, ulong a, slong n);
+void fixed_rsqrt_ui_newton(nn_ptr res, ulong a, slong n);
+void fixed_rsqrt_newton_basecase(nn_ptr q, nn_srcptr a, slong an, slong n);
+void fixed_rsqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n);
+void fixed_sqrt_newton_rsqrtmul(nn_ptr q, nn_srcptr a, slong an, slong n);
+void fixed_sqrt_newton(nn_ptr q, nn_srcptr a, slong an, slong n);
 nn_srcptr _fixed_atans_entry(slong i, slong n);
+void _fixed_atans_clear(void);
 slong _fixed_atans_max_index(void);
 void _fixed_sin_cos_rs_fallback(nn_ptr ysin, nn_ptr ycos, nn_srcptr x,
     slong n, int alternating);
@@ -288,6 +382,263 @@ void _fixed_atan_rs_fallback(nn_ptr res, nn_srcptr x, slong n,
    n <= 12, each built for the reduction parameter hardcoded alongside
    it in tan_bitwise_rs.c. */
 #endif
+
+
+/* -------------------------------------------------------------- */
+/* Internal declarations (formerly fixed/impl.h), placed here so
+   that the test, tune and profile subdirectories build without
+   extra include paths. */
+
+/* Library-internal view of the cached reduction tables.
+
+   These thread-local objects are shared across the translation units
+   of the module (the dispatch files, the reduction, and the
+   specialized per-size implementations) but are deliberately NOT
+   declared in fixed.h: Windows DLLs cannot export thread-local data,
+   so external consumers -- the test suite -- go through the
+   _fixed_exp_logs_entry / _fixed_atans_entry accessors instead.
+
+   Each entry occupies _fixed_{exp_logs,atans}_n limbs: the value
+   limbs with one guard limb below them.  Consumers wanting the top n
+   limbs of entry i read tab + i * stride + (stride - n). */
+
+#define FIXED_STATIC_TAB_INLINE static inline
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern FLINT_TLS_PREFIX nn_ptr _fixed_exp_logs;
+extern FLINT_TLS_PREFIX slong _fixed_exp_logs_n;
+extern FLINT_TLS_PREFIX slong _fixed_exp_logs_r;
+
+extern FLINT_TLS_PREFIX nn_ptr _fixed_atans;
+extern FLINT_TLS_PREFIX slong _fixed_atans_n;
+extern FLINT_TLS_PREFIX slong _fixed_atans_r;
+
+/* Static prefixes of the two tables covering all reductions with
+   r <= FIXED_STATIC_TAB_R whose per-entry reads fit in
+   FIXED_STATIC_TAB_N limbs.  Unlike the dynamic tables, whose
+   bottom limb is a guard used for in-place generation, every stored
+   limb here is a value limb (the entries are the top limbs of a
+   dynamic table built one limb deeper).  The accessors below hand
+   out the static data when it suffices -- avoiding the
+   precomputation, the TLS lookup, and the wide entry stride of a
+   high-precision dynamic table -- and fall back to ensuring the
+   dynamic one. */
+
+#define FIXED_STATIC_TAB_N 12
+#define FIXED_STATIC_TAB_R 32
+
+/* internal: mpn binary splitting for sum_{k=1}^N x^k / (k! 2^(rk))
+   (exp_sum_bs.c); T needs (N (r + 128))/64 + 4 limbs, Q needs
+   (N bits(N+1))/64 + 3 */
+slong _fixed_exp_bs_num_terms(flint_bitcnt_t r, slong prec);
+void _fixed_sin_cos_sum_bs_powtab(nn_ptr A, slong * an, slong * ae,
+    nn_ptr B, slong * bn, slong * be, nn_ptr Q, slong * qn,
+    slong * QE, nn_srcptr xp, slong xn, slong D, slong N,
+    slong lmax);
+void _fixed_exp_sum_bs_powtab(nn_ptr T, slong * tn, nn_ptr Q,
+    slong * qn, slong * QE, nn_srcptr xp, slong xn, slong D,
+    slong N);
+
+/* fball: SEMI-PRIVATE ball arithmetic (subject to future revision).
+   The interface below is documented for use inside FLINT and by
+   expert callers, but makes no stability promises across releases:
+   the representation, the error-normalization policy and the set of
+   operations may all change.
+
+   Internal mpf-like floating-point numbers with arb-like ball
+   semantics, in radix B = 2^FLINT_BITS, intended as a backend for
+   algorithms on scaled or growing numbers (AGM iterations, binary
+   splitting summation) where all cheap operations should stay in mpn
+   arithmetic and exponents are limb-aligned so that shifts are limb
+   copies.
+
+   Representation:
+
+       value = (-1)^negative * (d, size) * B^(exp - size)
+
+   with the mantissa (d, size) an unsigned little-endian integer whose
+   top limb is nonzero, so B^(exp-1) <= |value| < B^exp; size == 0
+   encodes the value 0 (negative == 0 then).  The number represents a
+   ball: the true quantity lies within err ulps of the point value,
+   one ulp being B^(exp - size) (for size == 0, B^exp).  Low zero
+   limbs are also stripped when err == 0.0, moving them into exp, so
+   exact small integers stay small.
+
+   err is a rigorous bound maintained through every operation.  All
+   error propagation is done in double arithmetic ROUNDING UP: every
+   compound bound is multiplied by FBALL_EPS to absorb the
+   round-to-nearest errors of the bound computation itself, exponent
+   scalings are exact powers of two with explicit underflow/overflow
+   handling (bignum exponents can far exceed the double range), and
+   normalization truncates low mantissa limbs whenever
+   err > 2^(FLINT_BITS + 5), so that err stays small and mantissa
+   length tracks the number of accurate limbs.
+
+   Arithmetic functions take a precision n in limbs (the caller
+   includes 2-4 guard limbs); mantissas are truncated to about n
+   limbs, and less when an operand is accurate to fewer limbs: the
+   product of an n/2-accurate and an n/3-accurate ball only ever
+   computes ~n/3 limbs. */
+
+typedef struct
+{
+    nn_ptr d;       /* mantissa limbs */
+    slong alloc;    /* allocated limbs */
+    slong size;     /* size of mantissa */
+    int negative;   /* sign bit */
+    slong exp;      /* radix 2^FLINT_BITS exponent */
+    double err;     /* error bound: err ulps at the anchor
+                       B^(exp - size + erra) */
+    slong erra;     /* anchor offset of the error, in limbs below
+                       (or, rarely, above) the mantissa bottom; kept
+                       so that 1 <= err < 2^128 whenever err != 0 --
+                       a plain double at the mantissa bottom cannot
+                       represent radii more than ~1000 bits below
+                       one ulp (they underflow), which matters for
+                       balls like 1 - epsilon with epsilon ~ 2^-2r */
+}
+fball_struct;
+
+typedef fball_struct fball_t[1];
+
+/* fudge factor: absorbs the rounding of the (much shorter) error
+   bound computations themselves */
+#define FBALL_EPS (1.0 + 1e-6)
+
+/* normalization threshold: low limbs are truncated away once the
+   bound exceeds this many ulps of the mantissa bottom.  The
+   threshold deliberately sits ~2 limbs above one ulp so that
+   mantissa content is retained a couple of limbs BELOW an
+   accumulated noise floor: interval radii are worst-case bounds
+   over correlated errors (a Karatsuba complex multiply triples the
+   radius of the small component while the true error barely
+   grows), and truncating right at the radius would throw away
+   limbs that are in fact accurate. */
+#define FBALL_ERR_MAX_EXP 197
+#define FBALL_ERR_MAX 0x1p197
+
+void fball_init(fball_t x);
+void fball_clear(fball_t x);
+void fball_fit(fball_t x, slong k);
+
+void fball_zero(fball_t x);
+void fball_set_ui(fball_t x, ulong c);
+void fball_set_si(fball_t x, slong c);
+void fball_set(fball_t res, const fball_t x);
+void fball_swap(fball_t x, fball_t y);
+FLINT_FORCE_INLINE void fball_neg(fball_t x) { if (x->size) x->negative ^= 1; }
+
+int fball_is_zero_exact(const fball_t x);
+
+/* res = a * b, a * c, a + b, a - b at precision n limbs (res may
+   alias operands) */
+void fball_mul(fball_t res, const fball_t a, const fball_t b, slong n);
+void fball_mul_ui(fball_t res, const fball_t a, ulong c, slong n);
+void fball_add(fball_t res, const fball_t a, const fball_t b, slong n);
+void fball_sub(fball_t res, const fball_t a, const fball_t b, slong n);
+
+/* res = a / b resp. 1/sqrt(c) with ~n accurate limbs, by Newton
+   iteration (fixed_div_newton / fixed_rsqrt_ui_newton); b must be
+   nonzero with small relative error, 2 <= c < B */
+void fball_div(fball_t res, const fball_t a, const fball_t b, slong n);
+void fball_rsqrt_ui(fball_t res, ulong c, slong n);
+void fball_rsqrt(fball_t res, const fball_t x, slong n);
+void fball_sqrt(fball_t res, const fball_t x, slong n);
+void fball_mul_2exp_si(fball_t x, slong e);
+
+/* add extra ulps (at the current anchor) to the radius */
+void fball_add_error_ulps(fball_t x, double e);
+/* add v ulps at the explicit anchor B^anc: use when the intended
+   scale is a frame the mantissa may have been normalized away from
+   (an exact import strips low zero limbs, so "ulps at the current
+   anchor" can silently mean a much coarser frame) */
+void fball_add_error(fball_t x, double v, slong anc);
+/* enclose also value * t for |t| <= 2^e2 (relative perturbation) */
+void fball_add_error_2exp_rel(fball_t x, slong e2);
+
+/* x = (p, len) 2^ebits exactly (p unsigned; len may include zero
+   top limbs); the bit part of ebits costs one mpn shift, after
+   which all exponent handling is limb-aligned */
+void fball_set_mpn_2exp(fball_t x, nn_srcptr p, slong len,
+    slong ebits);
+
+/* write a ball known to lie in [0, 1) as a wn-limb fixed-point
+   fraction (truncating), returning a rigorous error bound in
+   output ulps (2^(-FLINT_BITS wn)); a negative point value within
+   the radius is clamped to zero and absorbed into the bound */
+double fball_get_fixed(nn_ptr y, slong wn, const fball_t x);
+
+/* write y = floor(x B^n) for a ball known to lie in [0, 1) IF the
+   radius determines that floor uniquely, returning 1; returns 0
+   otherwise (caller retries at higher precision).  The direct
+   verified-floor sibling of fball_get_fixed */
+int fball_get_fixed_floor(nn_ptr y, slong n, const fball_t x);
+
+void fball_get_arb(arb_t res, const fball_t x);
+void fball_print(const fball_t x);
+
+/* pi to about n limbs (n includes the caller's guard limbs) by
+   binary splitting of the Chudnovsky series in fball arithmetic */
+void fball_const_pi_chudnovsky(fball_t pi, slong n);
+void fball_const_log2(fball_t res, slong n);
+
+/* verified floor-truncated cached constants: y receives n limbs,
+   exactly floor(c B^n) for c = pi/4 resp. log(2); computed limbs
+   are cached per thread and extended on demand (floors nest, so a
+   prefix of a longer cached floor is itself the floor) */
+void fixed_const_pi_div_4(nn_ptr y, slong n);
+void fixed_const_log2(nn_ptr y, slong n);
+void _fixed_const_pi_div_4_clear(void);
+void _fixed_const_log2_clear(void);
+
+/* internal: exact-floor entry helpers (tab_exact.c) */
+int _fixed_tab_store_floor(nn_ptr e, const arb_t x, slong nc, slong prec);
+void _fixed_tab_entry_exact(nn_ptr e, int which, ulong i, slong nc);
+
+/* fast-path entries sit at most a few guard ulps below the truth;
+   a guard limb this close to wrapping means the deficit may have
+   borrowed into the value limbs, so the entry is recomputed exactly */
+#define FIXED_TAB_GUARD_SLACK UWORD(1024)
+
+FLINT_DLL extern const ulong _fixed_exp_logs_static[(FIXED_STATIC_TAB_R + 1) * FIXED_STATIC_TAB_N];
+FLINT_DLL extern const ulong _fixed_atans_static[(FIXED_STATIC_TAB_R + 1) * FIXED_STATIC_TAB_N];
+
+/* NOTE: the two inline _tab accessors below dereference the
+   thread-local table data and are therefore usable only from
+   translation units compiled INTO the library.  Code linking
+   against a Windows DLL (tests, tuning and profiling programs)
+   must use the exported _fixed_*_entry / _fixed_*_ensure /
+   _fixed_*_clear functions instead: thread-local data cannot be
+   DLL-exported, so direct references fail to link there. */
+
+FIXED_STATIC_TAB_INLINE nn_srcptr
+_fixed_exp_logs_tab(slong nv, slong rc, slong * nc)
+{
+    if (rc <= FIXED_STATIC_TAB_R && nv + 1 <= FIXED_STATIC_TAB_N)
+    {
+        *nc = FIXED_STATIC_TAB_N;
+        return _fixed_exp_logs_static;
+    }
+    _fixed_exp_logs_ensure(nv, rc);
+    *nc = _fixed_exp_logs_n;
+    return _fixed_exp_logs;
+}
+
+FIXED_STATIC_TAB_INLINE nn_srcptr
+_fixed_atans_tab(slong nv, slong rc, slong * nc)
+{
+    if (rc <= FIXED_STATIC_TAB_R && nv + 1 <= FIXED_STATIC_TAB_N)
+    {
+        *nc = FIXED_STATIC_TAB_N;
+        return _fixed_atans_static;
+    }
+    _fixed_atans_ensure(nv, rc);
+    *nc = _fixed_atans_n;
+    return _fixed_atans;
+}
 
 #ifdef __cplusplus
 }

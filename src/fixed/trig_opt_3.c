@@ -17,7 +17,6 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
 #include "hand_mulhi.inc"
 #include "tan_rotate.inc"
 
@@ -103,8 +102,8 @@ _fixed_trig_opt_3(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     slong * used;
     TMP_INIT;
 
-    _fixed_atans_ensure(3, r);
-    nc = _fixed_atans_n;
+    nn_srcptr tab;
+    tab = _fixed_atans_tab(3, r, &nc);
 
     TMP_START;
     used = TMP_ALLOC(FIXED_BITWISE_REDUCE_USED_ALLOC(r) * sizeof(slong));
@@ -112,7 +111,7 @@ _fixed_trig_opt_3(nn_ptr ysin, nn_ptr ycos, nn_ptr ytan,
     t[0] = (x[0] >> 1) | (x[1] << (FLINT_BITS - 1));
     t[1] = (x[1] >> 1) | (x[2] << (FLINT_BITS - 1));
     t[2] = x[2] >> 1;
-    num = _fixed_bitwise_reduce(t, 3, r, 1, _fixed_atans, nc, used);
+    num = _fixed_bitwise_reduce(t, 3, r, 1, tab, nc, used);
     _fixed_tan_rotate_3(wx, wy, used, num);
     _fixed_tan_series_3(u, t);          /* u = tan(t') */
 

@@ -17,7 +17,6 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 #include "fixed.h"
-#include "impl.h"
 #include "hand_mulhi.inc"
 
 #if FLINT_BITS == 64
@@ -69,8 +68,8 @@ fixed_atan_opt_3(nn_ptr res, nn_srcptr x)
     int nz;
 
 
-    _fixed_atans_ensure(3, r);
-    nc = _fixed_atans_n;
+    nn_srcptr tab;
+    tab = _fixed_atans_tab(3, r, &nc);
 
     x0 = 0;
     x1 = 0;
@@ -82,7 +81,7 @@ fixed_atan_opt_3(nn_ptr res, nn_srcptr x)
     a1 = 0;
     a2 = 0;
 
-#define AP(ii) (_fixed_atans + (ii) * nc + (nc - 3))
+#define AP(ii) (tab + (ii) * nc + (nc - 3))
 
     /* window 0 */
     {
