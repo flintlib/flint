@@ -15,9 +15,12 @@
 #include "nmod_poly.h"
 #include "nmod_poly/impl.h"
 #include "nmod_mat.h"
+#include "mpn_extras.h"
+#include "nmod_poly_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
+#include "thread_pool.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
 
@@ -954,7 +957,7 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    if (mod.n <= len || mod.n % 2 == 0)
+    if (mod.n <= (ulong) len || mod.n % 2 == 0)
         return GR_DOMAIN;
 
     res[0] = 1;
@@ -971,6 +974,13 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
 
     return GR_SUCCESS;
 }
+
+
+/* implemented in gr/nmod_transformed_poly.c */
+/* 2x2 matrix products inside hgcd: from this entry length on, reusing the
+   fft_small transforms of the 8 inputs beats Strassen (single-threaded
+   tuning; the transform and export stages also thread internally when
+   the pool has workers) */
 
 static int
 _gr_nmod_poly_mullow(ulong * res,
@@ -1499,6 +1509,8 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) __gr_nmod_vec_dot_strided},
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
+    {GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
+                                (gr_funcptr) (void (*)(void)) _gr_nmod_ctx_init_transformed_poly_repr},
     {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_nmod_poly_mulmid},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_nmod_poly_divrem},
     {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_nmod_poly_divexact},

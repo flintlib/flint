@@ -168,6 +168,56 @@ GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mullow(gr_ptr res, gr_srcptr poly
     return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx);
 }
 
+/* 2x2 polynomial matrix product C = A*B used by hgcd. C, A, B point to 4
+   entries each (row-major), with lengths in lenC, lenA, lenB; the output
+   lengths are normalized. Aliasing is not supported. T0 and T1 must have
+   room for any single polynomial product of an entry of A by an entry
+   of B. */
+WARN_UNUSED_RESULT int _gr_poly_hgcd_mat_mul_generic(gr_ptr * C, slong * lenC, gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB, gr_ptr T0, gr_ptr T1, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_hgcd_mat_mul(gr_ptr * C, slong * lenC, gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB, gr_ptr T0, gr_ptr T1, gr_ctx_t ctx)
+{
+    return GR_POLY_HGCD_MAT_MUL_OP(ctx, POLY_HGCD_MAT_MUL)(C, lenC, A, lenA, B, lenB, T0, T1, ctx);
+}
+
+/* Construct a ring of transformed polynomials of length at most len_bound
+   over the base ring ctx, supporting expressions accumulating at most
+   terms_bound elementary coefficient products, or return GR_UNABLE if no
+   such representation is available. Elements support the standard ring
+   operations; conversions go through _gr_set_gr_poly / _gr_get_gr_poly. */
+GR_POLY_INLINE WARN_UNUSED_RESULT int gr_ctx_init_gr_poly_transformed_repr(gr_ctx_t out, gr_ctx_t base_ctx, slong len_bound, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+{
+    return GR_CTX_INIT_TRANSFORMED_POLY_REPR_OP(base_ctx, CTX_INIT_TRANSFORMED_POLY_REPR)(out, base_ctx, len_bound, terms_bound, workload);
+}
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_set_gr_poly(gr_ptr res, gr_srcptr a, slong len, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    return GR_SET_GR_POLY_OP(tctx, SET_GR_POLY)(res, a, len, base_ctx, tctx);
+}
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly(gr_ptr c, slong * len, gr_srcptr x, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    return GR_GET_GR_POLY_OP(tctx, GET_GR_POLY)(c, len, x, base_ctx, tctx);
+}
+
+/* Conversion out that may consume the element -- implementations run the
+   inverse transforms on its own storage, skipping the transform copy;
+   afterwards the element may only be cleared or fully overwritten as the
+   destination of a set or a multiplication. Falls back to the copying
+   conversion where the representation does not provide it. */
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly_destructive(gr_ptr c, slong * len, gr_ptr x, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    int status = GR_GET_GR_POLY_DESTRUCTIVE_OP(tctx, GET_GR_POLY_DESTRUCTIVE)(c, len, x, base_ctx, tctx);
+    if (status == GR_UNABLE)
+        status = GR_GET_GR_POLY_OP(tctx, GET_GR_POLY)(c, len, x, base_ctx, tctx);
+    return status;
+}
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly_window(gr_ptr c, gr_srcptr x, slong zl, slong zh, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    return GR_GET_GR_POLY_WINDOW_OP(tctx, GET_GR_POLY_WINDOW)(c, x, zl, zh, base_ctx, tctx);
+}
+
 WARN_UNUSED_RESULT int _gr_poly_mullow_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 

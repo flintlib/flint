@@ -547,3 +547,19 @@ Solving
     The decomposition ``FFLU`` and permutation ``perm`` are assumed to come
     from :func:`nmod_poly_mat_fflu` applied to a nonsingular square matrix;
     this is not checked.
+
+
+.. function:: int nmod_poly_mat_mulmid_fft_small(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B, slong zl, slong zh)
+
+    Sets the entries of *C* to the coefficient windows `[zl, zh)` of the
+    entries of `A B`, computed with pointwise products on shared
+    fft_small transforms and windowed reconstruction. Returns 0 without
+    touching *C* if the method is unavailable for the modulus or shape.
+
+    When the full middle product exceeds the transform-storage budget
+    (``flint_fft_small_max_transformed_ring_size``),
+    ``nmod_poly_mat_mulmid_fft_small`` retries in row and column blocks
+    over matrix windows, halving the block size until it fits; the
+    window of a middle product is linear in the operands, so blocks
+    compose exactly. Squaring, detected as ``B == A``, keeps a single
+    transform pool.

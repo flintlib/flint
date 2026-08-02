@@ -986,3 +986,101 @@ Finite field methods
 .. raw:: latex
 
     \newpage
+
+
+Transformed representations
+--------------------------------------------------------------------------------
+
+A *transformed representation* holds ring elements in a form in which
+multiplications are cheap pointwise operations, at the price of
+conversions in and out -- e.g. polynomials as pointwise evaluations
+under a number-theoretic transform. Algorithms performing many
+multiplications between few conversions (matrix products, half-gcd,
+middle products) run substantially faster in such a representation.
+
+.. type:: gr_transformed_poly_workload_struct
+          gr_transformed_poly_workload_t
+
+    An advisory estimate of the intended workload: how many operands
+    will be converted in (*num_inputs*), how many pointwise
+    multiplications performed (*num_muls*), how many results converted
+    out (*num_outputs*), and a memory bound in bytes (*mem_limit*, 0 for
+    the implementation default). Implementations use it to judge whether
+    switching representation is profitable and to size their tables.
+
+.. function:: int gr_ctx_init_gr_poly_transformed_repr(gr_ctx_t ctx, gr_ctx_t base, slong len_bound, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+
+    Constructs a ring of transformed polynomials over *base* admitting
+    lengths up to *len_bound* and up to *terms_bound* accumulated
+    elementary products per element, for the estimated workload. Returns
+    ``GR_UNABLE`` if the base ring provides no transformed
+    representation or judges the switch unprofitable. Conversions are
+    performed by the ``SET_GR_POLY`` / ``GET_GR_POLY`` /
+    ``GET_GR_POLY_WINDOW`` methods of the constructed context; the
+    window variant writes the coefficients `[zl, zh)` of the represented
+    polynomial, with zeros beyond its length.
+    ``_gr_get_gr_poly_destructive`` converts out through the
+    ``GET_GR_POLY_DESTRUCTIVE`` method where the representation provides
+    it: the inverse transforms run on the element's own storage, skipping
+    the transform-sized copy, and the element may only be cleared or
+    fully overwritten afterwards; representations without the method fall
+    back to the copying conversion.
+
+.. function:: int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed)
+
+    Constructs the ring of transformed big integers: bilinear
+    expressions over `\mathbb{Z}` with results below ``2^bits_bound``
+    in absolute value, at most *terms_bound* accumulated elementary
+    products and multiplicative depth two. Elements carry a sign bit;
+    mixed-sign accumulations switch the pointwise additions and
+    subtractions, and the sign of a mixed result is resolved at
+    conversion out.
+
+.. function:: int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign, gr_ctx_t ctx)
+              int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out, int * sign, gr_ptr x, gr_ctx_t ctx)
+              slong gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x)
+
+    Conversions by limb arrays with an explicit sign. The *destructive*
+    get may consume the element, skipping a copy of the transform;
+    *get_limbs* returns the number of limbs the conversion needs.
+
+.. function:: int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign, slong lo, gr_srcptr x, gr_ctx_t ctx)
+              int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn, slong * zn_out, int * sign, slong lo, gr_ptr x, gr_ctx_t ctx)
+              slong gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x, slong lo)
+
+    Truncated conversion out: the limbs of the value starting at limb
+    *lo*, with an error against the exact value within `(-1.5, +0.5)`
+    ulp of the lowest returned limb -- equivalently, at most 1 from the
+    floor-truncated value. The export includes every CRT slot whose
+    coefficient span can reach the first returned limb, with carries
+    propagated, so the error is the truncation itself (one-sided, below
+    1 ulp) plus the wholly dropped slots' total mass, under half an ulp
+    either way.
+
+.. function:: void gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx)
+              ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
+
+    Element on caller-provided storage of
+    ``gr_transformed_mpn_sizeof_data`` bytes, 4096-aligned, outliving
+    the element; ``gr_clear`` will not free it.
+
+    The transformed-mpn context constructor takes a *num_live*
+    declaration of the elements expected alive simultaneously, and
+    declines when their combined transform storage would exceed
+    ``flint_fft_small_max_transformed_ring_size``; the transformed
+    polynomial workload structure carries the same declaration in its
+    ``num_live`` field (zero derives a conservative count). Its ``force``
+    field skips the profitability model and the storage budget entirely,
+    declining only on implementation bounds: for tests, where small
+    unprofitable sizes catch bugs most easily.
+
+    For the transformed-mpn context, *bits_bound* bounds the magnitude
+    of any single represented product; the representation provisions the
+    accumulation capacity from *terms_bound* and the sign headroom from
+    *is_signed* itself, so callers must not add either to the bound.
+    ``gr_transformed_mpn_get_limbs_bound(ctx)`` returns an upper bound,
+    over every element of the context, on what
+    ``gr_transformed_mpn_get_limbs`` can return -- conversion staging
+    should be sized from it rather than from a reconstruction of the
+    representation's limb requirements.

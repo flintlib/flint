@@ -1089,6 +1089,89 @@ t##quotient_found:                                                          \
 } while (0)
 
 
+/* Sizes in limbs from which the complex functions below use the
+   transformed (fft_small) path (products and squares separately). See
+   the comment in mpn_extras/mul_complex.c for measured defaults. */
+FLINT_DLL extern slong flint_mpn_mul_complex_fft_cutoff;
+FLINT_DLL extern slong flint_mpn_sqr_complex_fft_cutoff;
+
+/* Complex multiplication with separate sign bits (0 = nonnegative):
+   zr + i zi = (ar + i ai) (br + i bi), outputs being exact magnitudes
+   and signs.
+
+   The full products take an independent length (>= 1 limb) for every
+   part, which need not be normalized, and report a *signed length* for
+   each output: the magnitude occupies |len| limbs and len < 0 means
+   negative. Nothing above |len| is written, so an fmpz caller can use
+   the value as an mpz size directly. zr and zi must each have room for
+   max(arn, ain) + max(brn, bin) + 1 limbs (2 max(arn, ain) + 1 for the
+   square) -- one bound for both, covering either product plus the carry
+   of the sum. The algorithm is chosen per shape: schoolbook when any
+   part is much shorter than its partner, Karatsuba when the parts are
+   internally balanced within each operand, and the transformed
+   fft_small path when they are balanced and large. The two operands
+   need not resemble each other in size.
+
+   The high variants take a single length n for all four parts and
+   receive exactly n + 1 limbs, zero padded, with a sign: they are the
+   limbs [n, 2n] of the exact result. Relative to the exact value the
+   error is below 2 + 3 (n + 4)/2^64 ulp of the lowest returned limb
+   (below 2 + 2 (n + 4)/2^64 for the square) -- each underlying high
+   product errs by (-1 - eps, +eps) ulp against the exact value, and
+   each output combines at most three -- so below 3 ulp for any
+   practical n; the transformed path stays within (-1.5, +0.5). */
+void flint_mpn_mul_complex(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_sqr_complex(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+
+/* the individual algorithms behind the two functions above, exposed for
+   comparison and tuning: classical (schoolbook), Karatsuba (three
+   products for a multiplication, one for the real part of a square) and
+   the transformed fft_small path, which returns 0 without touching the
+   outputs when it is unavailable or the plan is inadmissible. All accept
+   any shape; the dispatchers choose between them by shape and size. */
+void flint_mpn_mul_complex_classical(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_mul_complex_karatsuba(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+int flint_mpn_mul_complex_fft_small(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn,
+    nn_srcptr br, mp_size_t brn, int br_sgn,
+    nn_srcptr bi, mp_size_t bin, int bi_sgn);
+void flint_mpn_sqr_complex_classical(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+void flint_mpn_sqr_complex_karatsuba(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+int flint_mpn_sqr_complex_fft_small(nn_ptr zr, slong * zr_len,
+    nn_ptr zi, slong * zi_len,
+    nn_srcptr ar, mp_size_t arn, int ar_sgn,
+    nn_srcptr ai, mp_size_t ain, int ai_sgn);
+void flint_mpn_mulhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi,
+    int * zi_sgn, nn_srcptr ar, int ar_sgn, nn_srcptr ai, int ai_sgn,
+    nn_srcptr br, int br_sgn, nn_srcptr bi, int bi_sgn, mp_size_t n);
+void flint_mpn_sqrhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi,
+    int * zi_sgn, nn_srcptr ar, int ar_sgn, nn_srcptr ai, int ai_sgn,
+    mp_size_t n);
+
 #ifdef __cplusplus
 }
 #endif

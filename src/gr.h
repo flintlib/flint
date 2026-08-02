@@ -664,6 +664,12 @@ typedef enum
     /* Polynomial methods (todo: rename -> GR_POLY) */
     GR_METHOD_POLY_MULLOW,
     GR_METHOD_POLY_MULMID,
+    GR_METHOD_POLY_HGCD_MAT_MUL,
+    GR_METHOD_CTX_INIT_TRANSFORMED_POLY_REPR,
+    GR_METHOD_SET_GR_POLY,
+    GR_METHOD_GET_GR_POLY,
+    GR_METHOD_GET_GR_POLY_DESTRUCTIVE,
+    GR_METHOD_GET_GR_POLY_WINDOW,
     GR_METHOD_POLY_DIV,
     GR_METHOD_POLY_DIVREM,
     GR_METHOD_POLY_DIVEXACT,
@@ -733,6 +739,8 @@ typedef enum
     GR_CTX_NFLOAT, GR_CTX_NFLOAT_COMPLEX,
     GR_CTX_MPF,
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
+    GR_CTX_GR_TRANSFORMED_POLY,
+    GR_CTX_GR_TRANSFORMED_MPN,
     GR_CTX_FMPZ_MPOLY, GR_CTX_FMPQ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
     GR_CTX_FMPZ_MOD_MPOLY_Q,
@@ -857,6 +865,56 @@ typedef int ((*gr_method_poly_unary_trunc_op)(gr_ptr, gr_srcptr, slong, slong, g
 typedef int ((*gr_method_poly_binary_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
+/* 2x2 polynomial matrix product for hgcd: C, A, B are arrays of 4 entries
+   with lengths lenC, lenA, lenB; T0, T1 are scratch for any single product */
+typedef int ((*gr_method_poly_hgcd_mat_mul_op)(gr_ptr *, slong *, gr_ptr *, slong *, gr_ptr *, slong *, gr_ptr, gr_ptr, gr_ctx_ptr));
+/* estimated workload for a transformed polynomial ring: how many operands
+   will be converted in (forward transforms), how many pointwise
+   multiplications performed, and how many results converted out (inverse
+   transforms). Advisory: used to decide whether the representation is
+   worth switching to and to bound its memory use (mem_limit in bytes,
+   0 for the implementation default). */
+typedef struct gr_transformed_poly_workload_struct
+{
+    slong num_inputs;
+    slong num_muls;
+    slong num_outputs;
+    slong num_live;     /* expected simultaneously live elements;
+                           0 derives num_inputs + num_outputs + 2 */
+    slong mem_limit;
+    int force;          /* skip the profitability model and the storage
+                           budget, declining only on implementation
+                           bounds: for tests, where small unprofitable
+                           sizes catch bugs most easily */
+}
+gr_transformed_poly_workload_struct;
+
+typedef gr_transformed_poly_workload_struct gr_transformed_poly_workload_t[1];
+
+/* implementation of the transformed-polynomial constructor for nmod base
+   rings, installed in their method table */
+int _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
+                    slong len_bound, slong terms_bound,
+                    const gr_transformed_poly_workload_struct * workload);
+/* windowed conversion out that consumes the element in place of copying
+   its transform; the element may only be cleared or fully overwritten
+   afterwards */
+int _gr_nmod_tpoly_get_gr_poly_window_destructive(nn_ptr cc, gr_ptr x,
+                    slong zl, slong zh, gr_ctx_t ctx);
+
+/* construct a ring of transformed polynomials over a base ring, with the
+   given length and accumulated-terms capacities, for the estimated
+   workload (may be NULL, though implementations will then usually judge
+   the switch unprofitable) */
+typedef int ((*gr_method_ctx_init_transformed_poly_repr_op)(gr_ctx_ptr, gr_ctx_ptr, slong, slong, const gr_transformed_poly_workload_struct *));
+/* conversions between coefficient vectors over the base ring and elements
+   of a transformed polynomial ring */
+typedef int ((*gr_method_set_gr_poly_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_get_gr_poly_op)(gr_ptr, slong *, gr_srcptr, gr_ctx_ptr, gr_ctx_ptr));
+typedef int ((*gr_method_get_gr_poly_destructive_op)(gr_ptr, slong *, gr_ptr, gr_ctx_ptr, gr_ctx_ptr));
+/* windowed conversion out: writes the coefficients [zl, zh) of the
+   represented polynomial (zeros beyond its length) */
+typedef int ((*gr_method_get_gr_poly_window_op)(gr_ptr, gr_srcptr, slong, slong, gr_ctx_ptr, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc2_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_gcd_op)(gr_ptr, slong *, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_xgcd_op)(slong *, gr_ptr, gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
@@ -961,6 +1019,12 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_POLY_UNARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_unary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_POLY_HGCD_MAT_MUL_OP(ctx, NAME) (((gr_method_poly_hgcd_mat_mul_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_CTX_INIT_TRANSFORMED_POLY_REPR_OP(ctx, NAME) (((gr_method_ctx_init_transformed_poly_repr_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_SET_GR_POLY_OP(ctx, NAME) (((gr_method_set_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_GET_GR_POLY_OP(ctx, NAME) (((gr_method_get_gr_poly_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_GET_GR_POLY_DESTRUCTIVE_OP(ctx, NAME) (((gr_method_get_gr_poly_destructive_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_GET_GR_POLY_WINDOW_OP(ctx, NAME) (((gr_method_get_gr_poly_window_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC2_OP(ctx, NAME) (((gr_method_poly_binary_trunc2_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_GCD_OP(ctx, NAME) (((gr_method_poly_gcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_XGCD_OP(ctx, NAME) (((gr_method_poly_xgcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -1415,6 +1479,40 @@ void gr_ctx_init_fmpzi(gr_ctx_t ctx);
 
 void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n);
 void _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fmod_ctx);
+
+/* Transformed big integers: bilinear expressions over Z with results
+   below 2^bits_bound in absolute value, at most terms_bound accumulated
+   elementary products and multiplicative depth two. Elements carry a
+   sign bit; mixed-sign accumulations switch the pointwise additions and
+   subtractions, and the sign of a mixed result is resolved at conversion
+   out. Conversions in and out are by limb arrays with an explicit sign;
+   gr_transformed_mpn_get_trunc returns the limbs of the value starting
+   at a given position, with an error against the exact value within
+   (-1.5, +0.5) ulp of the lowest returned limb -- equivalently, at most
+   1 from the floor-truncated value: the export includes every CRT slot
+   whose coefficient span can reach the first returned limb and
+   propagates their carries, so the error is the truncation itself
+   (one-sided, below 1) plus the wholly dropped slots' total mass
+   (under half an ulp either way). */
+int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
+                    slong terms_bound, int is_signed, slong num_live);
+int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
+                    gr_ctx_t ctx);
+int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
+                    gr_srcptr x, gr_ctx_t ctx);
+int gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out,
+                    int * sign, gr_ptr x, gr_ctx_t ctx);
+int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn,
+                    slong * zn_out, int * sign, slong lo, gr_ptr x,
+                    gr_ctx_t ctx);
+void gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx);
+ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx);
+slong gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x);
+slong gr_transformed_mpn_get_limbs_bound(gr_ctx_t ctx);
+slong gr_transformed_mpn_get_limbs_trunc(gr_ctx_t ctx, gr_srcptr x,
+                    slong lo);
+int gr_transformed_mpn_get_trunc(nn_ptr z, slong zn, slong * zn_out,
+                    int * sign, slong lo, gr_srcptr x, gr_ctx_t ctx);
 
 int gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);

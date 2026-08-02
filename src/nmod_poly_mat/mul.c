@@ -17,6 +17,9 @@
 #define INTERPOLATE_MIN_DIM 60
 #define KS_MAX_LENGTH 128
 
+#define FFT_MIN_LENGTH 128
+#define FFT_MIN_LENGTH_BIG_MOD 64
+
 void
 nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B)
@@ -29,6 +32,22 @@ nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     bc = B->c;
 
     dim = FLINT_MIN(FLINT_MIN(ar, br), bc);
+
+    if (dim >= 2)
+    {
+        slong Alen = nmod_poly_mat_max_length(A);
+        slong Blen = nmod_poly_mat_max_length(B);
+        slong minlen = FLINT_MIN(Alen, Blen);
+
+        slong cutoff = (FLINT_BIT_COUNT(nmod_poly_mat_modulus(A)) > 40)
+                        ? FFT_MIN_LENGTH_BIG_MOD : FFT_MIN_LENGTH;
+
+        /* returns 0 when fft_small is unavailable or no plan exists, in
+           which case we fall through to the other algorithms */
+        if (minlen >= cutoff && minlen >= 2 * (slong) dim &&
+                nmod_poly_mat_mulmid_fft_small(C, A, B, 0, Alen + Blen - 1))
+            return;
+    }
 
     if (dim < KS_MIN_DIM)
     {

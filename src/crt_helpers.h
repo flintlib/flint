@@ -458,6 +458,99 @@ DEFINE_IT(6, 5)
 DEFINE_IT(7, 6)
 #undef DEFINE_IT
 
+/*
+    Template for the chinese remaindering stage of the fft_small
+    convolution engine. CRT_DEFINE(NP, N, M) defines a function with the
+    fft_small_crt_func signature reconstructing output coefficients from
+    NP prime images, where N is the coefficient length of the product of
+    the primes and M the length of the reduced cofactors (as in
+    crt_helpers.h).
+
+    Before instantiating, the including file defines:
+
+    CRT_FN(NP)             the function name, e.g. CAT3(_crt, NP, fn)
+    CRT_Z_TYPE             pointer type of the output
+    CRT_HEAD               declarations run once; may unpack `params` and
+                           `local` and use `min_an_bn`
+    CRT_EMIT(zi, r, NP, N, M)
+                           emit output coefficient `zi` (an index into
+                           `z`, `zl` already subtracted) from the
+                           reconstructed value `r` of N words; NP, N, M
+                           are compile-time constants usable for token
+                           pasting. The half product of the primes is
+                           available as `Mhalf` for signed emits.
+    CRT_TAIL               statements run once at the end; may write
+                           per-range outputs to `local`
+
+    and afterwards #undefs all of them and CRT_DEFINE.
+
+    The in-scope names np, n, m hold NP, N, M at runtime, and Rffts,
+    Rcrts, zl are the corresponding arguments.
+*/
+
+#define CRT_DEFINE(NP, N, M) \
+static void CRT_FN(NP)(void* zv, ulong zl, \
+    ulong zi_start, ulong zi_stop, \
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
+    crt_data_struct* Rcrts, ulong min_an_bn, ulong* local, \
+    const void* params) \
+{ \
+    CRT_Z_TYPE z = (CRT_Z_TYPE) zv; \
+    ulong np = NP; \
+    ulong n = N; \
+    ulong m = M; \
+ \
+    CRT_HEAD \
+ \
+    FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
+    FLINT_ASSERT(1 <= N && N <= 7); \
+ \
+    if (n == m + 1) \
+    { \
+        for (ulong l = 0; l < np; l++) { \
+            FLINT_ASSERT(crt_data_co_prime(Rcrts + np - 1, l)[m] == 0); \
+        } \
+    } \
+    else \
+    { \
+        FLINT_ASSERT(n == m); \
+    } \
+ \
+    ulong Mhalf[N]; \
+    mpn_rshift(Mhalf, crt_data_prod_primes(Rcrts + np - 1), N, 1); \
+ \
+    ulong Xs[BLK_SZ*NP]; \
+ \
+    (void) min_an_bn; \
+    (void) local; \
+    (void) params; \
+    (void) Mhalf; \
+ \
+    for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ) \
+    { \
+        _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ); \
+ \
+        ulong jstart = (i < zi_start) ? zi_start - i : 0; \
+        ulong jstop = FLINT_MIN(BLK_SZ, zi_stop - i); \
+        for (ulong j = jstart; j < jstop; j += 1) \
+        { \
+            ulong r[N]; \
+            ulong t[N]; \
+            ulong l = 0; \
+ \
+            CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+            for (l++; l < np; l++) \
+                CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
+ \
+            CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
+ \
+            CRT_EMIT(i + j - zl, r, NP, N, M) \
+        } \
+    } \
+ \
+    CRT_TAIL \
+}
+
 #ifdef __cplusplus
 }
 #endif

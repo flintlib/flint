@@ -151,80 +151,50 @@ FLINT_ASSERT(i+j < atrunc);
         abuf[i] = 0;
 }
 
-#define DEFINE_IT(NP, N, M) \
-static void CAT(_crt, NP)( \
-    ulong* z, ulong zl, ulong zi_start, ulong zi_stop, \
-    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
-    crt_data_struct* Rcrts, ulong * carry_out, \
-    nmod_t mod) \
-{ \
-    ulong np = NP; \
-    ulong n = N; \
-    ulong m = M; \
-    ulong cy[3] = { 0, 0, 0 }; \
- \
-    FLINT_ASSERT(n == Rcrts[np-1].coeff_len); \
-    FLINT_ASSERT(1 <= N && N <= 4); \
- \
-    if (n == m + 1) \
+typedef struct {
+    nmod_t mod;
+    int write_carry_out;
+} _conv_params_struct;
+
+/* the reconstructed coefficients are digits in a chain: each range keeps
+   a running carry that is divided out coefficient by coefficient, with
+   the final carry exported through `local` for the serial fixup pass */
+#define CRT_FN(NP) CAT3(_crt, NP, fn)
+#define CRT_Z_TYPE ulong*
+#define CRT_HEAD \
+    nmod_t mod = ((const _conv_params_struct*) params)->mod; \
+    ulong cy[3] = { 0, 0, 0 };
+#define CRT_EMIT(zi, r, NP, N, M) \
+    if (N == 2) \
     { \
-        for (ulong l = 0; l < np; l++) { \
-            FLINT_ASSERT(crt_data_co_prime(Rcrts + np - 1, l)[m] == 0); \
-        } \
+        add_ssaaaa(r[1], r[0], r[1], r[0], cy[1], cy[0]); \
+        if (mod.norm == 0) \
+            z[zi] = flint_mpn_divrem_2_1_preinv_norm(cy, r, mod.n, mod.ninv); \
+        else \
+            z[zi] = flint_mpn_divrem_2_1_preinv_unnorm(cy, r, mod.n, mod.ninv, mod.norm); \
     } \
     else \
     { \
-        FLINT_ASSERT(n == m); \
-    } \
- \
-    ulong Xs[BLK_SZ*NP]; \
- \
-    for (ulong i = n_round_down(zi_start, BLK_SZ); i < zi_stop; i += BLK_SZ) \
-    { \
-        _convert_block(Xs, Rffts, d, dstride, np, i/BLK_SZ); \
- \
-        ulong jstart = (i < zi_start) ? zi_start - i : 0; \
-        ulong jstop = FLINT_MIN(BLK_SZ, zi_stop - i); \
-        for (ulong j = jstart; j < jstop; j += 1) \
-        { \
-            ulong r[N]; \
-            ulong t[N]; \
-            ulong l = 0; \
- \
-            CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
-            for (l++; l < np; l++) \
-                CAT3(_big_addmul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
- \
-            CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
- \
-            if (N == 2) \
-            { \
-                add_ssaaaa(r[1], r[0], r[1], r[0], cy[1], cy[0]); \
-                if (mod.norm == 0) \
-                    z[i+j-zl] = flint_mpn_divrem_2_1_preinv_norm(cy, r, mod.n, mod.ninv); \
-                else \
-                    z[i+j-zl] = flint_mpn_divrem_2_1_preinv_unnorm(cy, r, mod.n, mod.ninv, mod.norm); \
-            } \
-            else \
-            { \
-                FLINT_ASSERT(N < 4 || r[3] == 0); \
-                add_sssaaaaaa(r[2], r[1], r[0], r[2], r[1], r[0], cy[2], cy[1], cy[0]); \
-                if (mod.norm == 0) \
-                    z[i+j-zl] = flint_mpn_divrem_3_1_preinv_norm(cy, r, mod.n, mod.ninv); \
-                else \
-                    z[i+j-zl] = flint_mpn_divrem_3_1_preinv_unnorm(cy, r, mod.n, mod.ninv, mod.norm); \
-            } \
-        } \
-    } \
-    carry_out[0] = cy[0]; \
-    carry_out[1] = cy[1]; \
-    carry_out[2] = cy[2]; \
-}
-
-DEFINE_IT(2, 2, 1)
-DEFINE_IT(3, 3, 2)
-DEFINE_IT(4, 4, 3)
-#undef DEFINE_IT
+        FLINT_ASSERT(N < 4 || r[3] == 0); \
+        add_sssaaaaaa(r[2], r[1], r[0], r[2], r[1], r[0], cy[2], cy[1], cy[0]); \
+        if (mod.norm == 0) \
+            z[zi] = flint_mpn_divrem_3_1_preinv_norm(cy, r, mod.n, mod.ninv); \
+        else \
+            z[zi] = flint_mpn_divrem_3_1_preinv_unnorm(cy, r, mod.n, mod.ninv, mod.norm); \
+    }
+#define CRT_TAIL \
+    local[0] = cy[0]; \
+    local[1] = cy[1]; \
+    local[2] = cy[2];
+CRT_DEFINE(2, 2, 1)
+CRT_DEFINE(3, 3, 2)
+CRT_DEFINE(4, 4, 3)
+#undef CRT_FN
+#undef CRT_Z_TYPE
+#undef CRT_HEAD
+#undef CRT_EMIT
+#undef CRT_TAIL
+#undef CRT_DEFINE
 
 static void _crt_1(
     ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
@@ -257,119 +227,120 @@ static void _crt_1(
     carry_out[2] = 0;
 }
 
-typedef struct {
-    ulong np;
-    ulong start_pi;
-    ulong stop_pi;
-    ulong offset;
-    double* abuf;
-    double* bbuf;
-    ulong depth;
-    ulong stride;
-    ulong atrunc;
-    ulong btrunc;
-    ulong ztrunc;
-    const ulong* a;
-    ulong an;
-    const ulong* b;
-    ulong bn;
-    sd_fft_ctx_struct* ffts;
-    crt_data_struct* crts;
-    nmod_t mod;
-    ulong ioff;
-    int squaring;
-} s1worker_struct;
 
+/* ------------------------------------------------------------------------ */
+/* glue for the generic convolution engine                                  */
+/* ------------------------------------------------------------------------ */
 
-static void extra_func(void* varg)
+static void _mod_fn(double* xbuf, ulong xtrunc,
+    const void* x, ulong xn, slong FLINT_UNUSED(xaux),
+    const sd_fft_ctx_struct* fft, const void* params)
 {
-    s1worker_struct* X = (s1worker_struct*) varg;
-    sd_fft_ctx_struct* Q = X->ffts + X->ioff;
+    const _conv_params_struct* par = (const _conv_params_struct*) params;
 
-    _mod(X->bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
-    sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+    _mod(xbuf, xtrunc, (const ulong*) x, xn, fft, par->mod);
 }
 
-static void s1worker_func(void* varg)
+#define DEFINE_IT(NP) \
+static void CAT3(_crt, NP, fn)(void* z, ulong zl, \
+    ulong zi_start, ulong zi_stop, \
+    sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
+    crt_data_struct* Rcrts, ulong FLINT_UNUSED(min_an_bn), \
+    ulong* local, const void* params) \
+{ \
+    const _conv_params_struct* par = (const _conv_params_struct*) params; \
+ \
+    CAT(_crt, NP)((ulong*) z, zl, zi_start, zi_stop, Rffts, d, dstride, \
+                  Rcrts, local, par->mod); \
+}
+DEFINE_IT(1)
+#undef DEFINE_IT
+
+static fft_small_crt_func _radix_crt_fn(ulong np)
 {
-    s1worker_struct* X = (s1worker_struct*) varg;
-    ulong i, m;
-    thread_pool_handle* handles = NULL;
-    slong nworkers = 0;
+    return np == 1 ? _crt_1_fn :
+           np == 2 ? _crt_2_fn :
+           np == 3 ? _crt_3_fn : _crt_4_fn;
+}
 
-    if (X->bn > 5000 && !X->squaring)
-        nworkers = flint_request_threads(&handles, 2);
+static ulong _radix_conv_s1_threads(ulong np, ulong tune_n)
+{
+    return (tune_n < 1500 || radix_mulmid_force_threading) ? 1 : np;
+}
 
-    for (i = X->start_pi; i < X->stop_pi; i++)
+static int _radix_conv_s1_b_worker(ulong FLINT_UNUSED(np), ulong tune_n,
+                                   int squaring)
+{
+    return tune_n > 5000 && !squaring;
+}
+
+static int _radix_conv_s2_rethread(ulong np, ulong zn)
+{
+    return np*zn > 10000 || radix_mulmid_force_threading;
+}
+
+static const fft_small_conv_tuning _radix_conv_tuning =
+    { _radix_conv_s1_threads, _radix_conv_s1_b_worker,
+      _radix_conv_s2_rethread };
+
+/* Serial pass over the stage 2 ranges: reduce each range's carries into
+   the following coefficients and write the top carry of the full product
+   if requested. */
+static void _radix_s2_finish(void* zv, ulong zl, ulong FLINT_UNUSED(zh),
+    fft_small_crt_range_struct* ranges, ulong nranges, const void* params)
+{
+    ulong* z = (ulong*) zv;
+    const _conv_params_struct* par = (const _conv_params_struct*) params;
+    nmod_t mod = par->mod;
+    ulong i;
+
+    for (i = 0; i < nranges; i++)
     {
-        ulong ioff = i + X->offset;
-        double* abuf = X->abuf + X->stride*i;
-        double* bbuf = X->bbuf;
-        sd_fft_ctx_struct* Q = X->ffts + ioff;
+        slong stop = ranges[i].stop_zi;
 
-        if (!X->squaring)
+        /* Final segment */
+        if (i == nranges - 1)
         {
-            if (nworkers > 0)
+            /* Write carry to the top limb of the full product. */
+            if (par->write_carry_out)
             {
-                X->ioff = ioff;
-                thread_pool_wake(global_thread_pool, handles[0], 0, extra_func, X);
+                z[stop - zl] = ranges[i].local[0];
+
+                FLINT_ASSERT(ranges[i].local[1] == 0 && ranges[i].local[2] == 0);
             }
-            else
-            {
-                _mod(bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
-                sd_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
-            }
+            /* Otherwise, the product was truncated. */
         }
-
-        _mod(abuf, X->atrunc, X->a, X->an, Q, X->mod);
-        sd_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
-
-        if (!X->squaring)
-        {
-            if (nworkers > 0)
-                thread_pool_wait(global_thread_pool, handles[0]);
-        }
-
-        ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
-        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, Q->mod);
-        m = nmod_inv(m, Q->mod);
-
-        if (X->squaring)
-            sd_fft_ctx_point_sqr(Q, abuf, m, X->depth);
         else
-            sd_fft_ctx_point_mul(Q, abuf, bbuf, m, X->depth);
+        {
+            /* Propagate carries from the previous segment */
+            slong stop2 = ranges[i + 1].stop_zi;
 
-        sd_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
+            ulong cy[3];
+            slong j;
+
+            cy[0] = ranges[i].local[0];
+            cy[1] = ranges[i].local[1];
+            cy[2] = ranges[i].local[2];
+
+            for (j = stop; j < stop2; j++)
+            {
+                add_sssaaaaaa(cy[2], cy[1], cy[0], cy[2], cy[1], cy[0], 0, 0, z[j - zl]);
+
+                if (mod.norm == 0)
+                    z[j - zl] = flint_mpn_divrem_3_1_preinv_norm(cy, cy, mod.n, mod.ninv);
+                else
+                    z[j - zl] = flint_mpn_divrem_3_1_preinv_unnorm(cy, cy, mod.n, mod.ninv, mod.norm);
+
+                if (cy[0] == 0 && cy[1] == 0 && cy[2] == 0)
+                    break;
+            }
+
+            /* Propagate carry to next segment */
+            add_sssaaaaaa(ranges[i + 1].local[2], ranges[i + 1].local[1], ranges[i + 1].local[0],
+                          ranges[i + 1].local[2], ranges[i + 1].local[1], ranges[i + 1].local[0],
+                          cy[2], cy[1], cy[0]);
+        }
     }
-
-    flint_give_back_threads(handles, nworkers);
-}
-
-typedef struct {
-    ulong* z;
-    ulong zl;
-    ulong start_zi;
-    ulong stop_zi;
-    double* buf;
-    ulong offset;
-    ulong stride;
-    sd_fft_ctx_struct* ffts;
-    crt_data_struct* crts;
-    nmod_t mod;
-    void (*f)(
-        ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
-        sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-        crt_data_struct* Rcrts, ulong * carry_out,
-        nmod_t mod);
-    ulong carry_out[3];
-} s2worker_struct;
-
-static void s2worker_func(void* varg)
-{
-    s2worker_struct* X = (s2worker_struct*) varg;
-
-    X->f(X->z, X->zl, X->start_zi, X->stop_zi, X->ffts + X->offset, X->buf,
-         X->stride, X->crts + X->offset, X->carry_out, X->mod);
 }
 
 static void _radix_mul_mpn_ctx(
@@ -380,18 +351,16 @@ static void _radix_mul_mpn_ctx(
     mpn_ctx_t R)
 {
     ulong modbits = FLINT_BITS - mod.norm;
-    ulong offset = 0;
     ulong zn = an + bn - 1;
-    ulong atrunc, btrunc, ztrunc;
-    ulong i, np, depth, stride;
-    double* buf;
-    int squaring;
+    ulong atrunc, btrunc;
+    int squaring, success;
     int write_carry_out = 0;
+    fft_small_plan_t P;
+    fft_small_conv_arg_struct A;
+    _conv_params_struct par;
 
     an = FLINT_MIN(an, zh);
     bn = FLINT_MIN(bn, zh);
-
-//    flint_printf("have a = %{ulong*} b = %{ulong*} mod %wu\n", a, an, b, bn, mod.n);
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
@@ -419,173 +388,43 @@ static void _radix_mul_mpn_ctx(
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
-    /* need prod_of_primes >= blen * 4^modbits */
-    for (np = 1; np < 4; np++)
-    {
-        if (flint_mpn_cmp_ui_2exp(crt_data_prod_primes(R->crts + np - 1),
-              R->crts[np - 1].coeff_len, bn, 2*modbits) >= 0)
-        {
-            break;
-        }
-    }
-
-    FLINT_ASSERT(0 <= flint_mpn_cmp_ui_2exp(
-                                  crt_data_prod_primes(R->crts + np - 1),
-                                  R->crts[np - 1].coeff_len, bn, 2*modbits));
-
-
     atrunc = n_round_up(an, BLK_SZ);
     btrunc = n_round_up(bn, BLK_SZ);
-    ztrunc = n_round_up(zn, BLK_SZ);
-    /*
-        if there is a power of two 2^d between zh and zn with good wrap around
-            i.e. max(an, bn, zh) <= 2^d <= zn with zn - 2^d <= zl
-        then use d as the depth, otherwise the usual with no wrap around
-    */
-    depth = n_flog2(zn);
-    i = n_pow2(depth);
-    if (atrunc <= i && btrunc <= i && zh <= i && i <= zn && zn <= zl + i)
-    {
-        ztrunc = i;
-    }
-    else
-    {
-        depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
-    }
 
-    stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
+    P->R = R;
+    P->sign = 0;
 
-    ulong want_threads;
+    _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc));
 
-    if (bn < 1500 || radix_mulmid_force_threading)
-        want_threads = 1;
-    else
-        want_threads = np;
+    /* need prod_of_primes >= bn * 4^modbits; the radix chinese
+       remaindering handles at most 4 primes */
+    success = _fft_small_plan_set_bound(P, bn, 2*modbits, 4);
+    FLINT_ASSERT(success);
+    (void) success;
 
-    thread_pool_handle* handles;
-    slong nworkers = flint_request_threads(&handles, want_threads);
-    ulong nthreads = nworkers + 1;
+    _fft_small_plan_set_normalizers(P);
 
-    buf = (double*) mpn_ctx_fit_buffer(R, (np+nthreads)*stride*sizeof(double));
+    par.mod = mod;
+    par.write_carry_out = write_carry_out;
 
-    s1worker_struct s1args[4];
-    for (i = 0; i < nthreads; i++)
-    {
-        s1worker_struct* X = s1args + i;
-        X->np = np;
-        X->start_pi = (i+0)*np/nthreads;
-        X->stop_pi  = (i+1)*np/nthreads;
-        X->offset = offset;
-        X->abuf = buf;
-        X->bbuf = buf + (np+i)*stride;
-        X->depth = depth;
-        X->stride = stride;
-        X->atrunc = atrunc;
-        X->btrunc = btrunc;
-        X->ztrunc = ztrunc;
-        X->a = a;
-        X->an = an;
-        X->b = b;
-        X->bn = bn;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->squaring = squaring;
-    }
+    A.a = a; A.an = an; A.aaux = 0; A.atrunc = atrunc;
+    A.b = b; A.bn = bn; A.baux = 0; A.btrunc = btrunc;
+    A.bfft = NULL;
+    A.bfft_stride = 0;
+    A.squaring = squaring;
+    A.tune_n = bn;
+    A.min_an_bn = FLINT_MIN(an, bn);
+    A.mod_fn = _mod_fn;
+    A.s2_finish = _radix_s2_finish;
+    A.crt_fn = _radix_crt_fn(P->np);
+    A.params = &par;
+    A.tuning = &_radix_conv_tuning;
 
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s1worker_func, s1args + i);
-    s1worker_func(s1args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
+    _fft_small_conv(z, P, &A);
 
-    if (np*zn > 10000 || radix_mulmid_force_threading)
-    {
-        flint_give_back_threads(handles, nworkers);
-        nworkers = flint_request_threads(&handles, 8);
-        nthreads = nworkers + 1;
-    }
-
-    s2worker_struct s2args[8];
-    ulong o = zl;
-    for (i = 0; i < nthreads; i++)
-    {
-        s2worker_struct* X = s2args + i;
-        X->z = z;
-        X->zl = zl;
-        X->start_zi = o;
-        ulong newo = n_round_down(zl + (i+1)*(zh-zl)/nthreads, BLK_SZ);
-        o = i+1 < nthreads ? FLINT_MAX(o, newo) : zh;
-        X->stop_zi = o;
-        X->buf = buf;
-        X->offset = offset;
-        X->stride = stride;
-        X->ffts = R->ffts;
-        X->crts = R->crts;
-        X->mod = mod;
-        X->f = np == 1 ? _crt_1 : np == 2 ? _crt_2 : np == 3 ? _crt_3 : _crt_4;
-    }
-
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wake(global_thread_pool, handles[i - 1], 0, s2worker_func, s2args + i);
-    s2worker_func(s2args + 0);
-    for (i = nworkers; i > 0; i--)
-        thread_pool_wait(global_thread_pool, handles[i - 1]);
-
-    flint_give_back_threads(handles, nworkers);
-
-    for (i = 0; i < nthreads; i++)
-    {
-        slong stop = s2args[i].stop_zi;
-
-        /* Final segment */
-        if (i == nthreads - 1)
-        {
-            /* Write carry to the top limb of the full product. */
-            if (write_carry_out)
-            {
-                z[stop - zl] = s2args[i].carry_out[0];
-
-                FLINT_ASSERT(s2args[i].carry_out[1] == 0 && s2args[i].carry_out[2] == 0);
-            }
-            /* Otherwise, the product was truncated. */
-        }
-        else
-        {
-            /* Propagate carries from the previous segment */
-            slong stop2 = s2args[i + 1].stop_zi;
-
-            // flint_printf("overhang %wd / %wd: stop = %wd  stop2 = %wd,  zh = %wd\n", i, nthreads, stop, stop2, zh);
-
-            ulong cy[3];
-            slong j;
-
-            cy[0] = s2args[i].carry_out[0];
-            cy[1] = s2args[i].carry_out[1];
-            cy[2] = s2args[i].carry_out[2];
-
-            for (j = stop; j < stop2; j++)
-            {
-                add_sssaaaaaa(cy[2], cy[1], cy[0], cy[2], cy[1], cy[0], 0, 0, z[j - zl]);
-
-                if (mod.norm == 0)
-                    z[j - zl] = flint_mpn_divrem_3_1_preinv_norm(cy, cy, mod.n, mod.ninv);
-                else
-                    z[j - zl] = flint_mpn_divrem_3_1_preinv_unnorm(cy, cy, mod.n, mod.ninv, mod.norm);
-
-                if (cy[0] == 0 && cy[1] == 0 && cy[2] == 0)
-                    break;
-            }
-
-            /* Propagate carry to next segment */
-            add_sssaaaaaa(s2args[i + 1].carry_out[2], s2args[i + 1].carry_out[1], s2args[i + 1].carry_out[0],
-                          s2args[i + 1].carry_out[2], s2args[i + 1].carry_out[1], s2args[i + 1].carry_out[0],
-                          cy[2], cy[1], cy[0]);
-
-            // flint_printf("next: %wu %wu %wu\n", s2args[i + 1].carry_out[2], s2args[i + 1].carry_out[1], s2args[i + 1].carry_out[0]);
-        }
-    }
+    fft_small_plan_clear(P);
 }
+
 
 void
 radix_mulmid_fft_small(nn_ptr res, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zlo, slong zhi, const radix_t radix)

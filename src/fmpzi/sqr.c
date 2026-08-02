@@ -11,12 +11,12 @@
 
 #include <gmp.h>
 #include "longlong.h"
+#include "mpn_extras.h"
 #include "fmpzi.h"
 
 void
 fmpzi_sqr(fmpzi_t res, const fmpzi_t x)
 {
-    slong asize, bsize;
     fmpzi_struct * rp;
     fmpzi_t tmp;
     fmpz * t;
@@ -73,33 +73,25 @@ fmpzi_sqr(fmpzi_t res, const fmpzi_t x)
 
     if (COEFF_IS_MPZ(ca) && COEFF_IS_MPZ(cb))
     {
-        asize = COEFF_TO_PTR(ca)->_mp_size;
-        asize = FLINT_ABS(asize);
+        mpz_srcptr ma = COEFF_TO_PTR(ca), mb = COEFF_TO_PTR(cb);
+        slong an = FLINT_ABS(ma->_mp_size), bn = FLINT_ABS(mb->_mp_size);
+        slong w = 2 * FLINT_MAX(an, bn) + 1;
+        slong lzr, lzi;
+        mpz_ptr mt, mu;
 
-        if (asize >= 16)
-        {
-            bsize = COEFF_TO_PTR(cb)->_mp_size;
-            bsize = FLINT_ABS(bsize);
+        mt = _fmpz_promote(t);
+        mu = _fmpz_promote(u);
 
-            if (FLINT_ABS(asize - bsize) <= 2)
-            {
-                fmpz_t v;
-                fmpz_init(v);
+        flint_mpn_sqr_complex(FLINT_MPZ_REALLOC(mt, w), &lzr,
+                              FLINT_MPZ_REALLOC(mu, w), &lzi,
+                              ma->_mp_d, an, ma->_mp_size < 0,
+                              mb->_mp_d, bn, mb->_mp_size < 0);
 
-                /* a^2-b^2, (a+b)^2-a^2-b^2 */
-                fmpz_add(v, a, b);
-                fmpz_mul(u, v, v);
-                fmpz_mul(t, a, a);
-                fmpz_sub(u, u, t);
-                fmpz_mul(v, b, b);
-                fmpz_sub(t, t, v);
-                fmpz_sub(u, u, v);
-
-                fmpz_clear(v);
-
-                goto cleanup;
-            }
-        }
+        mt->_mp_size = lzr;
+        mu->_mp_size = lzi;
+        _fmpz_demote_val(t);
+        _fmpz_demote_val(u);
+        goto cleanup;
     }
 
     fmpz_mul(t, a, a);

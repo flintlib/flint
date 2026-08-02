@@ -10,12 +10,12 @@
 */
 
 #include "longlong.h"
+#include "mpn_extras.h"
 #include "fmpzi.h"
 
 void
 fmpzi_mul(fmpzi_t res, const fmpzi_t x, const fmpzi_t y)
 {
-    slong asize, bsize, csize, dsize;
     fmpzi_struct * rp;
     fmpzi_t tmp;
     fmpz * t;
@@ -73,34 +73,32 @@ fmpzi_mul(fmpzi_t res, const fmpzi_t x, const fmpzi_t y)
     t = fmpzi_realref(rp);
     u = fmpzi_imagref(rp);
 
-    if (!xsmall && !ysmall)
+    if (COEFF_IS_MPZ(ca) && COEFF_IS_MPZ(cb) &&
+        COEFF_IS_MPZ(cc) && COEFF_IS_MPZ(cd))
     {
-        asize = fmpz_size(a);
+        mpz_srcptr ma = COEFF_TO_PTR(ca), mb = COEFF_TO_PTR(cb);
+        mpz_srcptr mc = COEFF_TO_PTR(cc), md = COEFF_TO_PTR(cd);
+        slong an = FLINT_ABS(ma->_mp_size), bn = FLINT_ABS(mb->_mp_size);
+        slong cn = FLINT_ABS(mc->_mp_size), dn = FLINT_ABS(md->_mp_size);
+        slong w = FLINT_MAX(an, bn) + FLINT_MAX(cn, dn) + 1;
+        slong lzr, lzi;
+        mpz_ptr mt, mu;
 
-        if (asize >= 13)
-        {
-            bsize = fmpz_size(b);
-            csize = fmpz_size(c);
-            dsize = fmpz_size(d);
+        mt = _fmpz_promote(t);
+        mu = _fmpz_promote(u);
 
-            if (csize >= 13 && FLINT_ABS(asize - bsize) <= 2 && FLINT_ABS(csize - dsize) <= 2)
-            {
-                fmpz_t v;
+        flint_mpn_mul_complex(FLINT_MPZ_REALLOC(mt, w), &lzr,
+                              FLINT_MPZ_REALLOC(mu, w), &lzi,
+                              ma->_mp_d, an, ma->_mp_size < 0,
+                              mb->_mp_d, bn, mb->_mp_size < 0,
+                              mc->_mp_d, cn, mc->_mp_size < 0,
+                              md->_mp_d, dn, md->_mp_size < 0);
 
-                fmpz_init(v);
-                fmpz_add(t, a, b);
-                fmpz_add(v, c, d);
-                fmpz_mul(u, t, v);
-                fmpz_mul(t, a, c);
-                fmpz_mul(v, b, d);
-                fmpz_sub(u, u, t);
-                fmpz_sub(u, u, v);
-                fmpz_sub(t, t, v);
-                fmpz_clear(v);
-
-                goto cleanup;
-            }
-        }
+        mt->_mp_size = lzr;
+        mu->_mp_size = lzi;
+        _fmpz_demote_val(t);
+        _fmpz_demote_val(u);
+        goto cleanup;
     }
 
     fmpz_mul(t, a, c);
