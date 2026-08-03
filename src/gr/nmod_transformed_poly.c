@@ -23,6 +23,17 @@
 #include "machine_vectors.h"
 #include "fft_small.h"
 
+/* truncation granularity follows the plan's depth: whole blocks at
+   block depths, the full (short) transform length below one block */
+
+/* the anticipated granularity for a length before any plan exists */
+#define _len_trunc(x) \
+    ((n_clog2(x) < LG_BLK_SZ) ? n_pow2(n_max((ulong) 4, n_clog2(x))) \
+                              : n_round_up((x), BLK_SZ))
+#define _op_trunc(x, Pln) \
+    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
+                                : n_round_up((x), BLK_SZ))
+
 /*
     Ring of nmod polynomials of bounded length in fft_small transformed
     representation (prototype).
@@ -108,34 +119,33 @@ typedef struct
 #define TPOLY_CTX(ctx) ((tpoly_ctx_struct *) GR_CTX_DATA_AS_PTR(ctx))
 #define TPOLY(x) ((tpoly_struct *) (x))
 
-/* d = m*d + b over the first nblk blocks: applies the saved normalizer
+/* d = m*d + b over the element's truncation: applies the saved normalizer
    (and, for values that may be negative, the reconstruction bias) to the
    inverse-transformed coefficients; scaling commutes with the linear
    inverse transform, and applying it afterwards touches only the
    element's virtual length instead of the full transform */
 static void
 _tpoly_scale_bias(const sd_fft_ctx_struct * Q, double * d,
-                  ulong m_, double b, ulong nblk)
+                  ulong m_, double b, ulong npts)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong) m_, Q->p));
     vec8d bb = vec8d_set_d(b);
     vec8d n = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    ulong I;
 
-    for (I = 0; I < nblk; I++)
-    {
-        double * dx = d + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
-            vec8d x0, x1;
-            x0 = vec8d_load(dx + j + 0);
-            x1 = vec8d_load(dx + j + 8);
-            x0 = vec8d_add(vec8d_mulmod(x0, m, n, ninv), bb);
-            x1 = vec8d_add(vec8d_mulmod(x1, m, n, ninv), bb);
-            vec8d_store(dx + j + 0, x0);
-            vec8d_store(dx + j + 8, x1);
-        } while (j += 16, j < BLK_SZ);
-    }
+    /* flat over the element's truncation: sub-block transforms are
+       simply fewer iterations (a block-count parameter here rounded a
+       sub-block truncation down to zero passes, silently skipping the
+       normalizer) */
+    ulong j = 0; do {
+        vec8d x0, x1;
+        x0 = vec8d_load(d + j + 0);
+        x1 = vec8d_load(d + j + 8);
+        x0 = vec8d_add(vec8d_mulmod(x0, m, n, ninv), bb);
+        x1 = vec8d_add(vec8d_mulmod(x1, m, n, ninv), bb);
+        vec8d_store(d + j + 0, x0);
+        vec8d_store(d + j + 8, x1);
+    } while (j += 16, j < npts);
 }
 
 static int
@@ -249,7 +259,7 @@ tpoly_set_gr_poly(gr_ptr res, gr_srcptr a, slong len,
         return tpoly_zero(res, ctx);
 
     fft_small_fft_nmod(&TPOLY(res)->op, ac, len,
-                       n_round_up(len, BLK_SZ), T->mod, T->P);
+                       _op_trunc(len, T->P), T->mod, T->P);
     TPOLY(res)->len = len;
     TPOLY(res)->terms = 1;
     TPOLY(res)->depth = 1;
@@ -267,7 +277,7 @@ _tpoly_export(tpoly_ctx_struct * T, gr_srcptr x, slong zl, slong ub,
     const fft_small_plan_struct * P = T->P;
     slong xlen = TPOLY(x)->len;
     fft_small_op_struct tmp;
-    ulong itr = n_round_up((ulong) xlen, BLK_SZ);
+    ulong itr = _op_trunc((ulong) xlen, P);
     slong i;
 
     tmp = TPOLY(x)->op;
@@ -286,7 +296,7 @@ _tpoly_export(tpoly_ctx_struct * T, gr_srcptr x, slong zl, slong ub,
         double b = TPOLY(x)->negs ? (double) T->bias_res[i] : 0.0;
 
         sd_ifft_trunc(Q, d, P->depth, itr);
-        _tpoly_scale_bias(Q, d, T->m_orig[i], b, itr / BLK_SZ);
+        _tpoly_scale_bias(Q, d, T->m_orig[i], b, itr);
     }
     fft_small_export_nmod_range(z, &tmp, (ulong) zl, (ulong) ub, T->mod, P);
 
@@ -307,7 +317,7 @@ static void
 _tpoly_invert_in_place(tpoly_ctx_struct * T, gr_ptr x)
 {
     const fft_small_plan_struct * P = T->P;
-    ulong itr = n_round_up((ulong) TPOLY(x)->len, BLK_SZ);
+    ulong itr = _op_trunc((ulong) TPOLY(x)->len, P);
     slong i;
 
     for (i = 0; i < (slong) P->np; i++)
@@ -317,7 +327,7 @@ _tpoly_invert_in_place(tpoly_ctx_struct * T, gr_ptr x)
         double b = TPOLY(x)->negs ? (double) T->bias_res[i] : 0.0;
 
         sd_ifft_trunc(Q, d, P->depth, itr);
-        _tpoly_scale_bias(Q, d, T->m_orig[i], b, itr / BLK_SZ);
+        _tpoly_scale_bias(Q, d, T->m_orig[i], b, itr);
     }
 }
 
@@ -462,7 +472,7 @@ tpoly_one(gr_ptr x, gr_ctx_t ctx)
     tpoly_ctx_struct * T = TPOLY_CTX(ctx);
     ulong c = 1;
 
-    fft_small_fft_nmod(&TPOLY(x)->op, &c, 1, BLK_SZ, T->mod, T->P);
+    fft_small_fft_nmod(&TPOLY(x)->op, &c, 1, _op_trunc(1, T->P), T->mod, T->P);
     TPOLY(x)->len = 1;
     TPOLY(x)->terms = 1;
     TPOLY(x)->depth = 1;
@@ -767,7 +777,7 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
        reduction handles three limbs, which bounds the total */
     if (2 * modbits + 1 + FLINT_BIT_COUNT((ulong) terms_bound) > 3 * FLINT_BITS
         || !fft_small_plan_init_nmod(T->P, get_default_mpn_ctx(),
-            0, N, N, n_round_up(N, BLK_SZ), 2 * (ulong) terms_bound,
+            0, N, N, _len_trunc(N), 2 * (ulong) terms_bound,
             2 * modbits, mod, N))
     {
         flint_free(T);
@@ -801,7 +811,7 @@ _gr_nmod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
        storage budget are policy and are skipped */
     if (!wl->force)
     {
-            double L = (double) n_round_up(N, BLK_SZ);
+            double L = (double) _len_trunc(N);
             double lg = (double) FLINT_BIT_COUNT((ulong) L);
             double np = (double) T->P->np;
             double ni = (double) wl->num_inputs;

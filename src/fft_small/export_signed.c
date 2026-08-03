@@ -118,6 +118,7 @@ static void CAT(_sig_block, NP)(ulong * W, ulong wlen, ulong A, ulong bits, \
     } \
 }
 
+DEFINE_SIG_BLOCK(3, 3, 2)
 DEFINE_SIG_BLOCK(4, 4, 3)
 DEFINE_SIG_BLOCK(5, 4, 4)
 DEFINE_SIG_BLOCK(6, 5, 4)
@@ -126,8 +127,9 @@ DEFINE_SIG_BLOCK(8, 7, 6)
 
 #undef DEFINE_SIG_BLOCK
 
-static const sig_block_func _sig_block_tab[8 - 4 + 1] = {
-    _sig_block_4, _sig_block_5, _sig_block_6, _sig_block_7, _sig_block_8
+static const sig_block_func _sig_block_tab[8 - 3 + 1] = {
+    _sig_block_3, _sig_block_4, _sig_block_5, _sig_block_6, _sig_block_7,
+    _sig_block_8
 };
 
 /*
@@ -218,7 +220,7 @@ _sig_segment(sig_seg_struct * S)
     ulong wlen = wlive + n_cdiv((ulong) BLK_SZ * bits, FLINT_BITS) + 8;
     ulong A = S->Lbase;
     ulong slot, k, idx;
-    sig_block_func sig_block = _sig_block_tab[np - 4];
+    sig_block_func sig_block = _sig_block_tab[np - 3];
 
     mpn_rshift(prodh, prod, n, 1);
     W = flint_malloc(wlen * sizeof(ulong));
@@ -373,14 +375,14 @@ fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
     slong nworkers = 0;
     ulong nthreads, l;
 
-    FLINT_ASSERT(4 <= P->np && P->np <= 8);
+    FLINT_ASSERT(3 <= P->np && P->np <= 8);
     FLINT_ASSERT(P->offset == 0);
     FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
     FLINT_ASSERT(FLINT_BITS * (lo_limbs + zn)
                  >= nslots * bits + FLINT_BITS * n + 2);
     {
-        static const ulong _clen_of_np[8 - 4 + 1] = {4, 4, 5, 6, 7};
-        FLINT_ASSERT(n == _clen_of_np[P->np - 4]);
+        static const ulong _clen_of_np[8 - 3 + 1] = {3, 4, 4, 5, 6, 7};
+        FLINT_ASSERT(n == _clen_of_np[P->np - 3]);
         (void) _clen_of_np;
     }
 

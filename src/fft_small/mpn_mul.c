@@ -722,6 +722,7 @@ FLINT_FORCE_INLINE void CAT(_add_to_answer_hard, n)(ulong z[], ulong r[], ulong 
     mpn_add_n(z + toff, z + toff, r, zn - toff); \
 }
 
+DEFINE_IT(3, 4)
 DEFINE_IT(4, 5)
 DEFINE_IT(5, 6)
 DEFINE_IT(6, 7)
@@ -967,6 +968,7 @@ static void CAT(_mpn_from_ffts, NP)( \
     } \
 }
 
+DEFINE_IT(3, 3, 2)
 DEFINE_IT(4, 4, 3)
 DEFINE_IT(5, 4, 4)
 DEFINE_IT(6, 5, 4)
@@ -1321,12 +1323,14 @@ void sd_fft_ctx_point_mul(
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
+    /* flat over the whole transform: below one block the data is
+       simply shorter, the addressing is unchanged */
+    FLINT_ASSERT(depth >= 4);
     {
-        double* ax = a + sd_fft_ctx_blk_offset(I);
-        const double* bx = b + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* ax = a;
+    const double* bx = b;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1, b0, b1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -1338,7 +1342,7 @@ void sd_fft_ctx_point_mul(
             x1 = vec8d_mulmod(x1, b1, n, ninv);
             vec8d_store(ax+j+0, x0);
             vec8d_store(ax+j+8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -1351,12 +1355,13 @@ void sd_fft_ctx_point_sqr(
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
+    /* flat, as above */
+    FLINT_ASSERT(depth >= 4);
 
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
     {
-        double* ax = a + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* ax = a;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -1366,7 +1371,7 @@ void sd_fft_ctx_point_sqr(
             x1 = vec8d_mulmod(x1, m, n, ninv);
             vec8d_store(ax+j+0, x0);
             vec8d_store(ax+j+8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -1777,7 +1782,8 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
         /* this is how much space was statically allocated in each struct */
         FLINT_ASSERT(n <= MPN_CTX_NCRTS);
         FLINT_ASSERT(4 <= P.np && P.np <= 8);
-        static from_ffts_func tab[8-4+1] = {_mpn_from_ffts_4,
+        static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,
+                                            _mpn_from_ffts_4,
                                             _mpn_from_ffts_5,
                                             _mpn_from_ffts_6,
                                             _mpn_from_ffts_7,
@@ -1795,7 +1801,7 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
             ulong tlen = hi - L0;
             ulong* tmp = FLINT_ARRAY_ALLOC(tlen, ulong);
 
-            tab[P.np - 4](tmp, L0, hi, c_lo, c_hi, R->ffts, abuf, stride,
+            tab[P.np - 3](tmp, L0, hi, c_lo, c_hi, R->ffts, abuf, stride,
                           R->crts, bits, c_lo, c_lo, NULL, NULL);
 
             flint_mpn_copyi(z, tmp + (lo - L0), hi - lo);
@@ -1815,7 +1821,7 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
             for (ulong l = 0; l < nthreads; l++)
             {
                 crt_worker_struct* X = w + l;
-                X->from_ffts = tab[P.np - 4];
+                X->from_ffts = tab[P.np - 3];
                 X->z = z;
                 X->lo = lo;
                 X->hi = hi;
@@ -1928,7 +1934,7 @@ static void _op_mpn_fft_worker_func(void* varg)
 
     for (ulong l = W->start_pi; l < W->stop_pi; l++)
         sd_fft_trunc(P->R->ffts + l, W->X->data + l*P->stride, P->depth,
-                     W->atrunc, P->ztrunc);
+                     n_min(W->atrunc, P->ztrunc), P->ztrunc);
 }
 
 static void _op_mpn_slow_worker_func(void* varg)
@@ -1942,7 +1948,7 @@ static void _op_mpn_slow_worker_func(void* varg)
         slow_mpn_to_fft(R->ffts + l, W->X->data + l*P->stride, W->atrunc,
                         W->a, W->an, P->bits, R->slow_two_pow_tab[l]);
         sd_fft_trunc(R->ffts + l, W->X->data + l*P->stride, P->depth,
-                     W->atrunc, P->ztrunc);
+                     n_min(W->atrunc, P->ztrunc), P->ztrunc);
     }
 }
 
@@ -1953,6 +1959,9 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
     ulong bits = P->bits;
     ulong np = P->np;
     ulong alen = n_cdiv(FLINT_BITS*an, bits);
+    /* the packing passes work in whole blocks; for sub-block
+       transforms the excess lands in the zeroed slab padding and the
+       transform itself runs at the plan's truncation */
     ulong atrunc = n_round_up(alen, BLK_SZ);
     to_ffts_func to_ffts = NULL;
     ulong i;
@@ -1966,7 +1975,10 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
     FLINT_ASSERT(P->offset == 0);
     FLINT_ASSERT(X->np == np && X->offset == P->offset &&
                  X->depth == P->depth && X->stride == P->stride);
-    FLINT_ASSERT(atrunc <= P->ztrunc);
+    /* atrunc is the packing extent: whole blocks, whose excess over a
+       sub-block transform lands in the zeroed slab padding; the
+       transforms themselves run capped at the plan's truncation */
+    FLINT_ASSERT(atrunc <= P->stride);
 
     /* look for a vectorized packing profile matching (np, bits); the
        profile's bn_bound concerns the multiplication drivers' product
@@ -2067,7 +2079,8 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
 {
     ulong bits = P->bits;
     ulong c_hi = n_min(P->zn, n_cdiv(zn*FLINT_BITS, bits));
-    static from_ffts_func tab[8-4+1] = {_mpn_from_ffts_4,
+    static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,
+                                        _mpn_from_ffts_4,
                                         _mpn_from_ffts_5,
                                         _mpn_from_ffts_6,
                                         _mpn_from_ffts_7,
@@ -2080,7 +2093,7 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
     ulong nthreads;
 
     FLINT_ASSERT(zn > 0);
-    FLINT_ASSERT(4 <= P->np && P->np <= 8);
+    FLINT_ASSERT(3 <= P->np && P->np <= 8);
     FLINT_ASSERT(P->offset == 0);
     FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
 
@@ -2108,7 +2121,7 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
            coefficient takes the hard tail, converting residues one at a
            time with scalar reductions instead of block-converting them
            with _convert_block -- measured about 3x slower overall. */
-        tab[P->np - 4](z, 0, zn, 0, c_hi, P->R->ffts, X->data, X->stride,
+        tab[P->np - 3](z, 0, zn, 0, c_hi, P->R->ffts, X->data, X->stride,
                        P->R->crts, bits, 0, E1, NULL, NULL);
     }
     else
@@ -2123,7 +2136,7 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
         for (l = 0; l < nthreads; l++)
         {
             crt_worker_struct* W = w + l;
-            W->from_ffts = tab[P->np - 4];
+            W->from_ffts = tab[P->np - 3];
             W->z = z;
             W->lo = 0;
             W->hi = zn;

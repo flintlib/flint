@@ -475,13 +475,16 @@ int _fft_small_plan_set_bound(fft_small_plan_t P, ulong c, ulong e, ulong np_max
 
 /* Choose depth and ztrunc for the output window [zl, zh) of a length zn
    convolution whose operand truncation lengths are at most xtrunc_max. */
+/* min_depth: LG_BLK_SZ for plans whose conversions are block
+   structured (the chunked mpn import and export), 4 where the
+   conversions handle short transforms (the nmod paths) */
 void _fft_small_plan_set_window(fft_small_plan_t P,
-                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max);
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max, ulong min_depth);
 
 /* Same, but with the depth of P fixed. Returns 0 if the window needs a
    transform longer than 2^depth. */
 int _fft_small_plan_fit_window(fft_small_plan_t P,
-                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max);
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max, ulong min_depth);
 
 /* Compute stride and the normalization factors m[]. Requires the CRT
    configuration and the depth to be set. */

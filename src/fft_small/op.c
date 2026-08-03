@@ -11,6 +11,7 @@
 
 #include "thread_pool.h"
 #include "thread_support.h"
+#include <string.h>
 #include "fft_small.h"
 #include "machine_vectors.h"
 
@@ -25,6 +26,17 @@ void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P)
     X->owns_data = 1;
     X->data = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
                  n_round_up(P->np*P->stride*sizeof(double), FLINT_FFT_SMALL_ALIGNMENT));
+    /* zero the block padding of sub-block transforms (see plan.c) */
+    if (P->stride > sd_fft_ctx_data_size(P->depth))
+    {
+        ulong pi;
+        for (pi = 0; pi < P->np; pi++)
+            memset(X->data + pi * P->stride
+                       + sd_fft_ctx_data_size(P->depth), 0,
+                   (P->stride - sd_fft_ctx_data_size(P->depth))
+                       * sizeof(double));
+    }
+
 }
 
 /* as fft_small_op_init, with caller-provided storage: 'data' must hold
@@ -85,13 +97,15 @@ FLINT_FORCE_INLINE void _point_mul_impl(const sd_fft_ctx_struct* Q,
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
+    /* flat over the whole transform: below one block the
+       data is simply shorter, the addressing is unchanged */
+    FLINT_ASSERT(depth >= 4);
     {
-        double* zx = z + sd_fft_ctx_blk_offset(I);
-        const double* ax = a + sd_fft_ctx_blk_offset(I);
-        const double* bx = b + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* zx = z;
+    const double* ax = a;
+    const double* bx = b;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1, b0, b1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -111,7 +125,7 @@ FLINT_FORCE_INLINE void _point_mul_impl(const sd_fft_ctx_struct* Q,
             x1 = vec8d_mulmod(x1, b1, n, ninv);
             vec8d_store(zx+j+0, x0);
             vec8d_store(zx+j+8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -133,12 +147,14 @@ FLINT_FORCE_INLINE void _point_sqr_impl(const sd_fft_ctx_struct* Q,
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
+    /* flat over the whole transform: below one block the
+       data is simply shorter, the addressing is unchanged */
+    FLINT_ASSERT(depth >= 4);
     {
-        double* zx = z + sd_fft_ctx_blk_offset(I);
-        const double* ax = a + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* zx = z;
+    const double* ax = a;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1, t0, t1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -156,7 +172,7 @@ FLINT_FORCE_INLINE void _point_sqr_impl(const sd_fft_ctx_struct* Q,
             x1 = vec8d_mulmod(t1, x1, n, ninv);
             vec8d_store(zx+j+0, x0);
             vec8d_store(zx+j+8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -177,13 +193,15 @@ FLINT_FORCE_INLINE void _point_addmul_impl(const sd_fft_ctx_struct* Q,
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong)m_, Q->p));
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
+    /* flat over the whole transform: below one block the
+       data is simply shorter, the addressing is unchanged */
+    FLINT_ASSERT(depth >= 4);
     {
-        double* zx = z + sd_fft_ctx_blk_offset(I);
-        const double* ax = a + sd_fft_ctx_blk_offset(I);
-        const double* bx = b + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* zx = z;
+    const double* ax = a;
+    const double* bx = b;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1, b0, b1, z0, z1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -217,7 +235,7 @@ FLINT_FORCE_INLINE void _point_addmul_impl(const sd_fft_ctx_struct* Q,
             z1 = vec8d_reduce_to_pm1n(z1, n, ninv);
             vec8d_store(zx+j+0, z0);
             vec8d_store(zx+j+8, z1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -237,13 +255,15 @@ static void _point_add(const sd_fft_ctx_struct* Q,
 {
     vec8d n    = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    for (ulong I = 0; I < n_pow2(depth - LG_BLK_SZ); I++)
+/* flat over the whole transform: below one block the
+       data is simply shorter, the addressing is unchanged */
+    FLINT_ASSERT(depth >= 4);
     {
-        double* zx = z + sd_fft_ctx_blk_offset(I);
-        const double* ax = a + sd_fft_ctx_blk_offset(I);
-        const double* bx = (b == NULL) ? NULL : b + sd_fft_ctx_blk_offset(I);
-        ulong j = 0; do {
+    double* zx = z;
+    const double* ax = a;
+    const double* bx = b;
+    ulong npts = n_pow2(depth);
+    ulong j = 0; do {
             vec8d x0, x1;
             x0 = vec8d_load(ax+j+0);
             x1 = vec8d_load(ax+j+8);
@@ -268,7 +288,7 @@ static void _point_add(const sd_fft_ctx_struct* Q,
             }
             vec8d_store(zx+j+0, x0);
             vec8d_store(zx+j+8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 

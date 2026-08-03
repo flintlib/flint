@@ -371,7 +371,8 @@ int _fmpz_poly_mul_mid_mpn_ctx(
     P->R = R;
     P->sign = sign;
 
-    _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc));
+    _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc),
+                               LG_BLK_SZ);
 
     /* need prod_of_primes >= bn * 2^modbits */
     if (!_fft_small_plan_set_bound(P, bn, modbits, MPN_CTX_NCRTS))

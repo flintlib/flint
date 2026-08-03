@@ -20,6 +20,12 @@
 #include "machine_vectors.h"
 #include "fft_small.h"
 
+/* truncation granularity follows the plan's depth: whole blocks at
+   block depths, the full (short) transform length below one block */
+#define _op_trunc(x, Pln) \
+    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
+                                : n_round_up((x), BLK_SZ))
+
 /*
     Transformed big integers (fft_small), for bilinear expressions such as
     complex multiplications and matrix products over Z.
@@ -76,18 +82,16 @@ typedef struct
 #define TMPN_CTX(ctx) ((tmpn_ctx_struct *) GR_CTX_DATA_AS_PTR(ctx))
 #define TMPN(x) ((tmpn_struct *) (x))
 
-/* d = m*d + b over the first nblk blocks (see the polynomial rings) */
+/* d = m*d over the element's truncation (see the polynomial rings);
+   flat so that sub-block transforms are simply fewer iterations */
 static void
-_tmpn_scale(const sd_fft_ctx_struct * Q, double * d, ulong m_, ulong nblk)
+_tmpn_scale(const sd_fft_ctx_struct * Q, double * d, ulong m_, ulong npts)
 {
     vec8d m = vec8d_set_d(vec1d_reduce_0n_to_pmhn((slong) m_, Q->p));
     vec8d n = vec8d_set_d(Q->p);
     vec8d ninv = vec8d_set_d(Q->pinv);
-    ulong I;
-
-    for (I = 0; I < nblk; I++)
     {
-        double * dx = d + sd_fft_ctx_blk_offset(I);
+        double * dx = d;
         ulong j = 0; do {
             vec8d x0, x1;
             x0 = vec8d_load(dx + j + 0);
@@ -96,7 +100,7 @@ _tmpn_scale(const sd_fft_ctx_struct * Q, double * d, ulong m_, ulong nblk)
             x1 = vec8d_mulmod(x1, m, n, ninv);
             vec8d_store(dx + j + 0, x0);
             vec8d_store(dx + j + 8, x1);
-        } while (j += 16, j < BLK_SZ);
+        } while (j += 16, j < npts);
     }
 }
 
@@ -345,7 +349,7 @@ _tmpn_export_limbs(const tmpn_ctx_struct * T, slong m, int negs)
                 + FLINT_BITS * clen + 2 + (FLINT_BITS - 1), FLINT_BITS);
     }
     return _tmpn_export_limbs_raw(T->P, T->terms_bound,
-            n_min(n_round_up((ulong) m, BLK_SZ), T->P->zn));
+            n_min(_op_trunc((ulong) m, T->P), T->P->zn));
 }
 
 /* conversion out: z receives the magnitude (zn limbs allocated by the
@@ -398,7 +402,7 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
         memcpy(sdata, TMPN(x)->op.data,
                P->np * P->stride * sizeof(double));
     }
-    itr = n_round_up((ulong) m, BLK_SZ);
+    itr = _op_trunc((ulong) m, P);
 
     for (i = 0; i < (slong) P->np; i++)
     {
@@ -406,7 +410,7 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
         double * d = tmp.data + P->stride * i;
 
         sd_ifft_trunc(Q, d, P->depth, itr);
-        _tmpn_scale(Q, d, T->m_orig[i], itr / BLK_SZ);
+        _tmpn_scale(Q, d, T->m_orig[i], itr);
 
         /* the unsigned reconstruction reads whole chunks up to the
            requested limb count; slots beyond the inverse transform's
@@ -415,12 +419,9 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
         if (!negs)
         {
             ulong chi = n_min(n_pow2(P->depth),
-                              n_round_up(n_cdiv((ulong) need * FLINT_BITS,
-                                                P->bits), BLK_SZ));
-            ulong I;
-            for (I = itr / BLK_SZ; I < chi / BLK_SZ; I++)
-                memset(d + sd_fft_ctx_blk_offset(I), 0,
-                       BLK_SZ * sizeof(double));
+                              n_cdiv((ulong) need * FLINT_BITS, P->bits));
+            if (chi > itr)
+                memset(d + itr, 0, (chi - itr) * sizeof(double));
         }
     }
     tmp.domain = FFT_SMALL_OP_PRODUCT;
@@ -508,7 +509,7 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
     if (lo + zn < needf)
         return GR_DOMAIN;
 
-    itr = n_round_up((ulong) m, BLK_SZ);
+    itr = _op_trunc((ulong) m, P);
 
     if (destroy)
     {
@@ -531,7 +532,7 @@ _tmpn_get_trunc(nn_ptr z, slong zn, slong * zn_out, int * sign,
         double * d = tmp.data + P->stride * i;
 
         sd_ifft_trunc(Q, d, P->depth, itr);
-        _tmpn_scale(Q, d, T->m_orig[i], itr / BLK_SZ);
+        _tmpn_scale(Q, d, T->m_orig[i], itr);
     }
     tmp.domain = FFT_SMALL_OP_PRODUCT;
     fft_small_export_mpn_signed_trunc(z, (ulong) zn, &esign, &tmp,

@@ -13,6 +13,7 @@
 #include "thread_pool.h"
 
 #include <string.h>
+#include <stdio.h>
 #include "thread_pool.h"
 #include "nmod.h"
 #include "nmod_vec.h"
