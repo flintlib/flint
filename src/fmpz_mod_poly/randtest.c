@@ -110,7 +110,7 @@ fmpz_mod_poly_randtest_monic_sparse(fmpz_mod_poly_t poly, flint_rand_t state,
     for (i = 1; i < nonzero; i++) {
        ulong random_idx = n_randint(state, len - 1);
        fmpz_randtest_unsigned(poly->coeffs + random_idx + 1, state, fmpz_bits(fmpz_mod_ctx_modulus(ctx)));
-       fmpz_mod(poly->coeffs + random_idx + 1, poly->coeffs + random_idx + 1, fmpz_bits(fmpz_mod_ctx_modulus(ctx)));
+       fmpz_mod(poly->coeffs + random_idx + 1, poly->coeffs + random_idx + 1, fmpz_mod_ctx_modulus(ctx));
     }
     fmpz_set_ui(poly->coeffs + len - 1, 1);
     _fmpz_mod_poly_set_length(poly, len);
