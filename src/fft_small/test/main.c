@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-fmpz_poly_mul.c"
+#include "t-gr_transformed_nmod_poly.c"
 #include "t-mpn_add_inplace_c.c"
 #include "t-mpn_mulmid.c"
 #include "t-mul.c"
@@ -27,6 +28,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(_fmpz_poly_mul_mid_mpn_ctx),
+    TEST_FUNCTION(gr_transformed_nmod_poly),
     TEST_FUNCTION(flint_mpn_add_inplace_c),
     TEST_FUNCTION(_mpn_ctx_mpn_mul_range),
     TEST_FUNCTION(mpn_ctx_mpn_mul),

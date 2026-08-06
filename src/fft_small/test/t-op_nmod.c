@@ -15,6 +15,11 @@
 #include "nmod_poly.h"
 #include "fft_small.h"
 
+/* truncation granularity follows the plan's depth */
+#define _op_trunc(x, Pln) \
+    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
+                                : n_round_up((x), BLK_SZ))
+
 /* Accumulate K products in transform space (as a bilinear application
    like matrix multiplication would) and compare the exported window
    against classical multiplications. Inflating prod_bits beyond the
@@ -47,6 +52,9 @@ TEST_FUNCTION_START(fft_small_op_nmod, state)
         zn = an + bn - 1;
         ulong zl = n_randint(state, zn);
         ulong zh = zl + 1 + n_randint(state, zn - zl);
+        /* the block-rounded lengths serve as conservative pre-plan
+           bounds; the operative truncations are re-derived from the
+           plan's granularity right after init */
         ulong atrunc = n_round_up(an, BLK_SZ);
         ulong btrunc = n_round_up(bn, BLK_SZ);
         ulong extra_bits = n_randint(state, 300);
@@ -69,6 +77,9 @@ TEST_FUNCTION_START(fft_small_op_nmod, state)
         {
             continue;   /* bound needs more than MPN_CTX_NCRTS primes */
         }
+
+        atrunc = _op_trunc(an, P);
+        btrunc = _op_trunc(bn, P);
 
         a = FLINT_ARRAY_ALLOC(K*an, ulong);
         b = FLINT_ARRAY_ALLOC(K*bn, ulong);

@@ -375,7 +375,8 @@ static int _mpn_mod_poly_mulmid_fft_small_internal(nn_ptr z, ulong zl, ulong zh,
     P->R = R;
     P->sign = 0;
 
-    _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc));
+    _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc),
+                               LG_BLK_SZ);
 
     /* need prod_of_primes >= bn * 2^modbits */
     if (!_fft_small_plan_set_bound(P, bn, modbits, MPN_CTX_NCRTS))

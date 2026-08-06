@@ -45,28 +45,39 @@ int _fft_small_plan_set_bound(fft_small_plan_t P, ulong c, ulong e, ulong np_max
 }
 
 void _fft_small_plan_set_window(fft_small_plan_t P,
-                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max)
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max,
+                    ulong min_depth)
 {
     ulong ztrunc, depth, i;
 
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
-    ztrunc = n_round_up(zn, BLK_SZ);
     /*
         if there is a power of two 2^d between zh and zn with good wrap around
             i.e. max(operand lengths, zh) <= 2^d <= zn with zn - 2^d <= zl
-        then use d as the depth, otherwise the usual with no wrap around
-    */
+        then use d as the depth, otherwise the usual with no wrap around.
+        Truncation granularity is one block at block depths and the
+        transform length itself below one block, where sd_fft_trunc
+        dispatches to the register basecases. */
     depth = n_flog2(zn);
     i = n_pow2(depth);
     if (xtrunc_max <= i && zh <= i && i <= zn && zn <= zl + i)
     {
-        ztrunc = i;
+        depth = n_max(depth, min_depth);
+        /* if the floor raised the depth, the transform length grows
+           with it; the wraparound conditions are monotone in i, so
+           they continue to hold */
+        ztrunc = n_pow2(depth);
     }
     else
     {
-        depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
+        /* the small headroom above zn covers the signed
+           representation's bias digits, which span a few chunks past
+           the product and were absorbed by block rounding before */
+        depth = n_max(min_depth, n_clog2(zn + 4));
+        ztrunc = (depth < LG_BLK_SZ) ? n_pow2(depth)
+                                     : n_round_up(zn, BLK_SZ);
     }
 
     P->zl = zl;
@@ -78,7 +89,8 @@ void _fft_small_plan_set_window(fft_small_plan_t P,
 }
 
 int _fft_small_plan_fit_window(fft_small_plan_t P,
-                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max)
+                    ulong zl, ulong zh, ulong zn, ulong xtrunc_max,
+                    ulong min_depth)
 {
     ulong N = n_pow2(P->depth);
     ulong ztrunc;
@@ -86,7 +98,11 @@ int _fft_small_plan_fit_window(fft_small_plan_t P,
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
-    ztrunc = n_round_up(zn, BLK_SZ);
+    /* a fixed depth below the conversions' floor cannot serve */
+    if (P->depth < min_depth)
+        return 0;
+
+    ztrunc = (P->depth < LG_BLK_SZ) ? N : n_round_up(zn, BLK_SZ);
 
     if (xtrunc_max <= N && zh <= N && N <= zn && zn <= zl + N)
     {
@@ -114,7 +130,10 @@ void _fft_small_plan_set_normalizers(fft_small_plan_t P)
     ulong np = P->np;
     ulong depth = P->depth;
 
-    P->stride = n_round_up(sd_fft_ctx_data_size(depth), 128);
+    /* slabs padded to whole blocks: block-granular readers read a
+       full block and discard beyond the emitted range; op init zeroes
+       the pad. No cost at block depths. */
+    P->stride = n_round_up(sd_fft_ctx_data_size(depth), BLK_SZ);
 
     for (i = 0; i < np; i++)
     {
@@ -180,6 +199,14 @@ int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
             alen = n_cdiv(FLINT_BITS*an_max, bits);
             blen = n_cdiv(FLINT_BITS*bn_max, bits);
             zlen = alen + blen - 1;
+            /* the (np, bits) selection deliberately scores at block
+               granularity even though set_window will shorten the
+               chosen plan: scoring short-aware makes the model trade
+               prime count for depth (e.g. np 7 at depth 5 over np 4
+               at depth 6), which measures slower -- the crt and
+               conversion costs it underweights dominate at these
+               sizes. Block scoring keeps the minimal-np narrow-chunk
+               choices that measure best. */
             ztrunc = n_round_up(zlen, BLK_SZ);
             depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
 
@@ -200,7 +227,10 @@ int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
             goto have_choice;
     }
 
-    for (np = 4; np <= MPN_CTX_NCRTS; np++)
+    /* np = 3 has no vectorized packing profile: its imports take the
+       slow per-coefficient path, which the narrow chunks (65..69 bits
+       against the 3-prime product) keep affordable at small sizes */
+    for (np = 3; np <= MPN_CTX_NCRTS; np++)
     {
         const crt_data_struct* C = R->crts + np - 1;
         ulong bits, alen, blen, zlen, ztrunc, depth;
@@ -231,7 +261,7 @@ int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
         alen = n_cdiv(FLINT_BITS*an_max, bits);
         blen = n_cdiv(FLINT_BITS*bn_max, bits);
         zlen = alen + blen - 1;
-        ztrunc = n_round_up(zlen, BLK_SZ);
+        ztrunc = n_round_up(zlen, BLK_SZ);   /* scored at block, as above */
         depth = n_max(LG_BLK_SZ, n_clog2(ztrunc));
 
         {
@@ -260,8 +290,12 @@ have_choice:
         P->R = R;
         P->sign = 0;
 
+        /* the block-rounded operand bound keeps the wraparound branch
+           off for mpn plans, whose chunked conversions assume linear
+           transforms; short depths come from the non-wrap branch */
         _fft_small_plan_set_window(P, 0, zlen, zlen,
-                    n_max(n_round_up(alen, BLK_SZ), n_round_up(blen, BLK_SZ)));
+                    n_max(n_round_up(alen, BLK_SZ), n_round_up(blen, BLK_SZ)),
+                    (ulong) 4);
 
         P->bits = bits;
         P->bound_c = len_bound;
@@ -367,7 +401,9 @@ int fft_small_plan_init_nmod(fft_small_plan_t P, mpn_ctx_t R,
     P->R = R;
     P->sign = 0;
 
-    _fft_small_plan_set_window(P, zl, zh, zn, xtrunc_max);
+    /* the nmod conversions are per-coefficient and handle short
+       transforms; the register basecases serve depths from 4 */
+    _fft_small_plan_set_window(P, zl, zh, zn, xtrunc_max, (ulong) 4);
 
     if (!_fft_small_plan_set_bound_nmod(P, len_bound, prod_bits, mod, direct_len))
         return 0;
@@ -382,7 +418,7 @@ int fft_small_plan_init_nmod_cyclic(fft_small_plan_t P, mpn_ctx_t R,
 {
     ulong N = n_pow2(depth);
 
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
+    FLINT_ASSERT(depth >= 4);
     FLINT_ASSERT(zh <= N);
 
     P->R = R;

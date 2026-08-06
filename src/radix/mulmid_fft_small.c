@@ -394,7 +394,8 @@ static void _radix_mul_mpn_ctx(
     P->R = R;
     P->sign = 0;
 
-    _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc));
+    _fft_small_plan_set_window(P, zl, zh, zn, n_max(atrunc, btrunc),
+                               (ulong) 4);
 
     /* need prod_of_primes >= bn * 4^modbits; the radix chinese
        remaindering handles at most 4 primes */
@@ -403,6 +404,12 @@ static void _radix_mul_mpn_ctx(
     (void) success;
 
     _fft_small_plan_set_normalizers(P);
+
+    /* the block rounding above can exceed a short plan's capacity;
+       cap at the transform actually chosen (a no-op at block depths,
+       where ztrunc dominates both roundings) */
+    atrunc = n_min(atrunc, P->ztrunc);
+    btrunc = n_min(btrunc, P->ztrunc);
 
     par.mod = mod;
     par.write_carry_out = write_carry_out;

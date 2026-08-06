@@ -19,6 +19,17 @@
 #include "crt_helpers.h"
 #include "fft_small.h"
 
+/* truncation granularity follows the plan's depth: whole blocks at
+   block depths, the full (short) transform length below one block */
+
+/* the anticipated granularity for a length before any plan exists */
+#define _len_trunc(x) \
+    ((n_clog2(x) < LG_BLK_SZ) ? n_pow2(n_max((ulong) 4, n_clog2(x))) \
+                              : n_round_up((x), BLK_SZ))
+#define _op_trunc(x, Pln) \
+    (((Pln)->depth < LG_BLK_SZ) ? n_pow2((Pln)->depth) \
+                                : n_round_up((x), BLK_SZ))
+
 static void _mod_red(
     double* abuf, ulong atrunc,
     const ulong* a, ulong an,
@@ -26,10 +37,12 @@ static void _mod_red(
     nmod_t mod)
 {
     double* aI;
-    ulong i, j;
+    ulong j;
 
     FLINT_ASSERT(atrunc < an);
-    FLINT_ASSERT(atrunc%BLK_SZ == 0);
+    /* flat over the transform: short lengths are simply fewer
+       iterations, the addressing is unchanged */
+    FLINT_ASSERT(atrunc % 8 == 0);
 
 #if 1
 
@@ -37,19 +50,18 @@ static void _mod_red(
 
 #define UNROLL 8
 
-    for (i = 0; i < atrunc; i += BLK_SZ)
     {
-        aI = sd_fft_ctx_blk_index(abuf, i/BLK_SZ);
+        aI = abuf;
 
         vec8n nn = vec8n_set_n(mod.n);
         vec8d n = vec8d_set_d(fft->p);
         vec8d ninv = vec8d_set_d(fft->pinv);
 
-        for (j = 0; j < BLK_SZ; j += UNROLL)
+        for (j = 0; j < atrunc; j += UNROLL)
         {
-            if (i+j+UNROLL <= tt || i+j >= tt)
+            if (j+UNROLL <= tt || j >= tt)
             {
-                ulong k = i+j;
+                ulong k = j;
                 FLINT_ASSERT(k+UNROLL-1 < an);
                 vec8n t = vec8n_load_unaligned(a + k);
 
@@ -69,7 +81,7 @@ static void _mod_red(
             {
                 for (ulong l = 0; l < UNROLL; l++)
                 {
-                    ulong k = i+j+l;
+                    ulong k = j+l;
                     ulong c = a[k];
                     for (k += atrunc; k < an; k += atrunc)
                         c = nmod_add(c, a[k], mod);
@@ -748,7 +760,7 @@ void fft_small_fft_nmod(fft_small_op_t X, const ulong* a, ulong an,
 
     FLINT_ASSERT(X->np == P->np && X->offset == P->offset &&
                  X->depth == P->depth && X->stride == P->stride);
-    FLINT_ASSERT(itrunc % BLK_SZ == 0);
+    FLINT_ASSERT(itrunc % 8 == 0);
     FLINT_ASSERT(itrunc <= P->ztrunc);
 
     /* thread over the primes; the threshold mirrors the fused drivers'
@@ -926,8 +938,8 @@ void _nmod_poly_mul_mid_mpn_ctx(
 
     squaring = (a == b) && (an == bn);
 
-    atrunc = n_round_up(an, BLK_SZ);
-    btrunc = n_round_up(bn, BLK_SZ);
+    atrunc = _len_trunc(an);
+    btrunc = _len_trunc(bn);
 
     /* at most min(an, bn) <= bn products, each < 2^(2*modbits), accumulate
        onto one output coefficient */
@@ -935,6 +947,11 @@ void _nmod_poly_mul_mid_mpn_ctx(
                         n_max(atrunc, btrunc), bn, 2*modbits, mod, bn);
     FLINT_ASSERT(success);
     (void) success;
+
+    /* operand truncations are capped by the plan's transform: the
+       wraparound importer folds any excess length */
+    atrunc = n_min(atrunc, P->ztrunc);
+    btrunc = n_min(btrunc, P->ztrunc);
 
     A.a = a; A.an = an; A.aaux = 0; A.atrunc = atrunc;
     A.b = b; A.bn = bn; A.baux = 0; A.btrunc = btrunc;
@@ -1045,7 +1062,7 @@ void _mul_precomp_init(
     ulong N = n_pow2(depth);
     int success;
 
-    btrunc = n_round_up(btrunc, BLK_SZ);
+    btrunc = _len_trunc(btrunc);
 
     /* the transform may be used for cyclic convolutions, which accumulate
        up to N products onto one output coefficient */
@@ -1097,12 +1114,17 @@ int _nmod_poly_mul_mid_precomp(
     FLINT_ASSERT(zl < zh);
     FLINT_ASSERT(zh <= zn);
 
-    atrunc = n_round_up(an, BLK_SZ);
+    atrunc = n_min(_len_trunc(an), n_pow2(M->P->depth));
 
     /* note: adjusting the window in M means concurrent calls on the same M
        race, but they already race on the scratch buffer in R */
-    if (!_fft_small_plan_fit_window(M->P, zl, zh, zn, atrunc))
+    if (!_fft_small_plan_fit_window(M->P, zl, zh, zn, atrunc, (ulong) 4))
         return 0;
+
+    /* cap AFTER the window is fitted: fitting recomputes ztrunc, which
+       can shrink on a reused plan, and coefficients past it cannot
+       reach a linear window */
+    atrunc = n_min(atrunc, M->P->ztrunc);
 
     A.a = a; A.an = an; A.aaux = 0; A.atrunc = atrunc;
     A.b = NULL; A.bn = bn; A.baux = 0; A.btrunc = 0;
