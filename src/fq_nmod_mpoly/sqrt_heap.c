@@ -183,10 +183,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
     _n_fq_add(t2, Qcoeffs + d*0, Qcoeffs + d*0, d, fqctx->mod);
     _n_fq_inv(lc_inv, t2, fqctx, t);
 
-    if (bits <= FLINT_BITS)
-        halves = mpoly_monomial_halves(Qexps + 0, Aexps + 0, N, mask);
-    else
-        halves = mpoly_monomial_halves_mp(Qexps + 0, Aexps + 0, N, bits);
+    halves = mpoly_monomial_halves_any_bits(Qexps + 0, Aexps + 0, N, mask, bits);
 
     if (!halves)
         goto not_sqrt; /* exponent is not square */
@@ -196,18 +193,12 @@ static int _fq_nmod_mpoly_sqrt_heap(
         if (!n_fq_sqrt(t, Acoeffs + d*(Alen - 1), fqctx))
             goto not_sqrt;
 
-        if (bits <= FLINT_BITS)
-            halves = mpoly_monomial_halves(exp3, Aexps + (Alen - 1)*N, N, mask);
-        else
-            halves = mpoly_monomial_halves_mp(exp3, Aexps + (Alen - 1)*N, N, bits);
+                    halves = mpoly_monomial_halves_any_bits(exp3, Aexps + (Alen - 1)*N, N, mask, bits);
 
         if (!halves)
             goto not_sqrt; /* exponent is not square */
 
-        if (bits <= FLINT_BITS)
-            mpoly_monomial_add(exp3, exp3, Qexps + 0, N);
-        else
-            mpoly_monomial_add_mp(exp3, exp3, Qexps + 0, N);
+                    mpoly_monomial_add_any_bits(exp3, exp3, Qexps + 0, N, bits);
     }
 
     while (heap_len > 1 || Ai < Alen)
@@ -230,8 +221,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
             mpoly_monomial_set(exp, heap[1].exp, N);
             _n_fq_zero(Qcoeffs + d*Qlen, d);
 
-            if (bits <= FLINT_BITS ? mpoly_monomial_overflows(exp, N, mask)
-                                   : mpoly_monomial_overflows_mp(exp, N, bits))
+            if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
                 goto not_sqrt;
         }
         else
@@ -283,12 +273,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
                 x->j = j + 1;
                 x->next = NULL;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Qexps + N*x->i,
-                                                            Qexps + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Qexps + N*x->i,
-                                                            Qexps + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Qexps + N*x->i, Qexps + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -300,12 +285,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
 
     skip_heap:
 
-        if (bits <= FLINT_BITS)
-            lt_divides = mpoly_monomial_divides(Qexps + N*Qlen,
-                                                exp, Qexps + N*0, N, mask);
-        else
-            lt_divides = mpoly_monomial_divides_mp(Qexps + N*Qlen,
-                                                exp, Qexps + N*0, N, bits);
+                    lt_divides = mpoly_monomial_divides_any_bits(Qexps + N*Qlen, exp, Qexps + N*0, N, mask, bits);
         if (!lt_divides)
             goto not_sqrt;
 
@@ -343,12 +323,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
         x->j = 1;
         x->next = NULL;
 
-        if (bits <= FLINT_BITS)
-            mpoly_monomial_add(exp_list[exp_next], Qexps + x->i*N,
-                                                      Qexps + x->j*N, N);
-        else
-            mpoly_monomial_add_mp(exp_list[exp_next], Qexps + x->i*N,
-                                                         Qexps + x->j*N, N);
+        mpoly_monomial_add_any_bits(exp_list[exp_next], Qexps + x->i*N, Qexps + x->j*N, N, bits);
 
         exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                          &next_loc, &heap_len, N, cmpmask);

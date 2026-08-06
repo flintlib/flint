@@ -10,12 +10,13 @@
 */
 
 #include "fmpz.h"
-#include "gr_poly.h"
+#include "gr_generic.h"
 #include "gr_vec.h"
+#include "gr_poly.h"
 
 int
 gr_generic_poly_factor_roots(
-        gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt, int flags,
+        gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt, int flags,
         gr_ctx_t ctx)
 {
     gr_ctx_t pctx;
@@ -75,4 +76,3 @@ cleanup:
 
     return status;
 }
-

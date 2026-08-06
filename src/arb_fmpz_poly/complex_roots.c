@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "profiler.h"
 #include "fmpz_poly.h"
 #include "acb_poly.h"
@@ -62,7 +63,7 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
     if (fmpz_poly_degree(poly) < 1)
         return;
 
-    initial_prec = 32;
+    initial_prec = 53;
 
     fmpz_poly_init(poly_deflated);
     acb_poly_init(cpoly);
@@ -91,22 +92,27 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
 
     for (prec = initial_prec; ; prec *= 2)
     {
+        if (prec == 106)
+            prec = 128;
         acb_poly_set_fmpz_poly(cpoly_deflated, poly_deflated, prec);
         maxiter = FLINT_MIN(4 * deg_deflated + 64, prec);
 
+        /* don't reuse the roots computed with double in case of failure */
+        int new_initial = (prec == initial_prec) || (prec  == 128);
+
         if (flags & ARB_FMPZ_POLY_ROOTS_VERBOSE)
         {
-            TIMEIT_ONCE_START
+            TIMEIT_ONCE_START;
             flint_printf("prec=%wd: ", prec);
             isolated = acb_poly_find_roots(roots_deflated, cpoly_deflated,
-                prec == initial_prec ? NULL : roots_deflated, maxiter, prec);
+                new_initial ? NULL : roots_deflated, maxiter, prec);
             flint_printf("%wd isolated roots | ", isolated);
-            TIMEIT_ONCE_STOP
+            TIMEIT_ONCE_STOP;
         }
         else
         {
             isolated = acb_poly_find_roots(roots_deflated, cpoly_deflated,
-                prec == initial_prec ? NULL : roots_deflated, maxiter, prec);
+                new_initial ? NULL : roots_deflated, maxiter, prec);
         }
 
         if (isolated == deg_deflated)

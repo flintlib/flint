@@ -19,7 +19,7 @@
 #define MINN 10
 #define MAXN 320
 
-int main()
+int main(void)
 {
     slong n, i, prec, i1, i2, i3;
     acb_ptr x;
@@ -70,7 +70,7 @@ int main()
         i2 = n / 2;
         i3 = (3 * n) / 4;
 
-        TIMEIT_START
+        TIMEIT_START;
         for (prec = 64; ; prec *= 2)
         {
             for (i = 0; i < n; i++)

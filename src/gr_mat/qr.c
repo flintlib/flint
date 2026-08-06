@@ -184,7 +184,7 @@ gr_mat_qr(gr_mat_t Q, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
     {
         GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(QT, Q, ctx);
 
-        status = gr_mat_lq_gso(R, QT, QT, ctx);
+        status = gr_mat_lq(R, QT, QT, ctx);
 
         status |= gr_mat_transpose(R, R, ctx);
         GR_MAT_SHALLOW_TRANSPOSE(Q, QT, ctx);
@@ -195,7 +195,7 @@ gr_mat_qr(gr_mat_t Q, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
         GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(AT, A, ctx);
         GR_MAT_TMP_INIT_SHALLOW_TRANSPOSE(QT, Q, ctx);
 
-        status = gr_mat_lq_gso(R, QT, AT, ctx);
+        status = gr_mat_lq(R, QT, AT, ctx);
 
         status |= gr_mat_transpose(R, R, ctx);
         GR_MAT_SHALLOW_TRANSPOSE(Q, QT, ctx);

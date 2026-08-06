@@ -3,7 +3,10 @@ import ctypes.util
 import sys
 import functools
 
-libflint = ctypes.CDLL("libflint.so")
+if sys.platform == "darwin":
+    libflint = ctypes.CDLL("libflint.dylib")
+else:
+    libflint = ctypes.CDLL("libflint.so")
 libcalcium = libarb = libgr = libflint
 
 T_TRUE = 0
@@ -114,6 +117,11 @@ libflint.flint_rand_init(ctypes.byref(_flint_rand))
 class fmpz_struct(ctypes.Structure):
     _fields_ = [('val', c_slong)]
 
+class radix_integer_struct(ctypes.Structure):
+    _fields_ = [('d', ctypes.c_void_p),
+                ('alloc', c_slong),
+                ('size', c_slong)]
+
 class fmpq_struct(ctypes.Structure):
     _fields_ = [('num', c_slong),
                 ('den', c_slong)]
@@ -140,10 +148,19 @@ class fmpz_mpoly_struct(ctypes.Structure):
                 ('length', c_slong),
                 ('bits', c_slong)]
 
+class fmpq_mpoly_struct(ctypes.Structure):
+    _fields_ = [('content', fmpq_struct),
+                ('zpoly', fmpz_mpoly_struct)]
+
 class fmpz_mpoly_q_struct(ctypes.Structure):
     _fields_ = [('num', fmpz_mpoly_struct),
                 ('den', fmpz_mpoly_struct)]
 
+
+class padic_radix_struct(ctypes.Structure):
+    _fields_ = [('u', radix_integer_struct),
+                ('v', c_slong),
+                ('N', c_slong)]
 
 # todo: actually a union
 class nf_elem_struct(ctypes.Structure):
@@ -273,6 +290,7 @@ libflint.flint_free.argtypes = (ctypes.c_void_p,)
 libflint.fmpz_set_str.argtypes = ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int
 libflint.fmpz_get_str.argtypes = ctypes.c_char_p, ctypes.c_int, ctypes.POINTER(fmpz_struct)
 libflint.fmpz_get_str.restype = ctypes.c_void_p
+libflint.n_is_prime.argtypes = (c_ulong,)
 
 libgr.gr_heap_init.argtypes = (ctypes.POINTER(gr_ctx_struct),)
 libgr.gr_heap_init.restype = ctypes.c_void_p
@@ -286,6 +304,7 @@ libgr.gr_sub_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.PO
 libgr.gr_mul_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_div_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 libgr.gr_pow_si.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
+libgr.gr_derivative_gen.argtypes = (ctypes.c_void_p, ctypes.c_void_p, c_slong, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_set_d.argtypes = (ctypes.c_void_p, ctypes.c_double, ctypes.POINTER(gr_ctx_struct))
 
@@ -299,6 +318,7 @@ libgr.gr_heap_clear.argtypes = (ctypes.c_void_p, ctypes.POINTER(gr_ctx_struct))
 
 libgr.gr_ctx_init_nmod.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
 libgr.gr_ctx_init_dirichlet_group.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong)
+libgr.gr_ctx_init_padic_radix.argtypes = (ctypes.POINTER(gr_ctx_struct), c_ulong, c_slong, c_slong, ctypes.c_int)
 
 _add_methods = [libgr.gr_add, libgr.gr_add_si, libgr.gr_add_fmpz, libgr.gr_add_other, libgr.gr_other_add]
 _sub_methods = [libgr.gr_sub, libgr.gr_sub_si, libgr.gr_sub_fmpz, libgr.gr_sub_other, libgr.gr_other_sub]
@@ -390,6 +410,7 @@ class gr_ctx:
     def __init__(self):
         self._data = gr_ctx_struct()
         self._ref = ctypes.byref(self._data)
+        libgr.gr_ctx_uninitialized(self._ref)
         self._str = None
         self._refcount = 1
 
@@ -1057,6 +1078,28 @@ class gr_ctx:
         else:
             return ctx._op_vec_ctx(libgr.gr_gens, "gens")
 
+    def O(ctx, x, exp):
+        """
+        Create a big-O error term. The base must be a generator in
+        a power series ring or the base of a p-adic ring.
+
+            >>> ZZser
+            Power series over Integer ring (fmpz) with precision O(x^6)
+            >>> x = ZZser.gen()
+            >>> ZZser.O(x, 4)
+            0 + O(x^4)
+            >>> 3*x + 5*x**4 + ZZser.O(x, 3)
+            3*x + O(x^3)
+            >>> QQser("1/3 + x/5 - O(x^2)")
+            (1/3) + (1/5)*x + O(x^2)
+            >>> (2**32 - 1) * (1 + Qp_padic_radix(2).O(2, 8))
+            255 + O(2^8)
+
+        Constant input is ambiguous. Use the two-argument version instead:
+
+        """
+        return ctx._binary_op_fmpz(x, exp, libgr.gr_big_o_base_fmpz, "big_o($x, $y)")
+
     def zero(ctx):
         """
         The zero element of this domain.
@@ -1272,7 +1315,7 @@ class gr_ctx:
             >>> QQ.max(QQ(1)/3, QQ(1)/4)
             1/3
             >>> RR.max(3, RR.pi())
-            [3.141592653589793 +/- 5.61e-16]
+            [3.141592653589793 +/- 3.39e-16]
             >>> RR.max(RR("10 +/- 1"), RR("9 +/- 3"))
             [1e+1 +/- 2.01]
             >>> CC.max(2, 3)
@@ -1540,7 +1583,7 @@ class gr_ctx:
             >>> CC.tan(1+1j)
             ([0.2717525853195117 +/- 9.11e-17] + [1.083923327338694 +/- 5.77e-16]*I)
             >>> x = RRser.gen(); RRser.tan(x)
-            x + [0.333333333333333 +/- 3.99e-16]*x^3 + [0.1333333333333333 +/- 8.32e-17]*x^5 + O(x^6)
+            x + [0.3333333333333333 +/- 7.04e-17]*x^3 + [0.1333333333333333 +/- 5.37e-17]*x^5 + O(x^6)
         """
         return ctx._unary_op(x, libgr.gr_tan, "tan($x)")
 
@@ -2959,12 +3002,12 @@ class gr_ctx:
             [1, -1/2, 1/6, 0, -1/30, 0, 1/42, 0, -1/30, 0, 5/66, 0]
             >>> CC_ca.bernoulli_vec(5)
             [1, -0.500000 {-1/2}, 0.166667 {1/6}, 0, -0.0333333 {-1/30}]
-            >>> sum(RR.bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(RR.bernoulli_vec(100)).nprint(16)
+            1.127124216595034e+76
             >>> sum(RF.bernoulli_vec(100))
             1.127124216595034e+76
-            >>> sum(CC.bernoulli_vec(100))
-            [1.127124216595034e+76 +/- 6.74e+60]
+            >>> sum(CC.bernoulli_vec(100)).nprint(16)
+            1.127124216595034e+76
 
         """
         return ctx._op_vec_len(length, libgr.gr_bernoulli_vec, "bernoulli_vec($length)")
@@ -3908,6 +3951,16 @@ class gr_elem:
         return res
 
     @staticmethod
+    def _binary_op_si(self, other, op, rstr):
+        other = int(other)
+        elem_type = type(self)
+        res = elem_type(context=self._ctx_python)
+        status = op(res._ref, self._ref, other, self._ctx)
+        if status:
+            _handle_error(self.parent(), status, rstr, self, other)
+        return res
+
+    @staticmethod
     def _constant(self, op, rstr):
         elem_type = type(self)
         res = elem_type(context=self._ctx_python)
@@ -3915,6 +3968,12 @@ class gr_elem:
         if status:
             _handle_error(self.parent(), status, rstr)
         return res
+
+    def overlaps(self, other):
+        self, other = gr_elem._binary_coercion(self, other)
+        truth = libgr.gr_equal(self._ref, other._ref, self._ctx)
+        if truth == T_FALSE: return False
+        return True
 
     def __eq__(self, other):
         return self._binary_predicate(self, other, libgr.gr_equal, "x == y")
@@ -4002,6 +4061,48 @@ class gr_elem:
 
     def is_neg_one(self):
         return self._unary_predicate(self, libgr.gr_is_neg_one, "is_neg_one")
+
+    def derivative_gen(self, i):
+        """
+        Derivative with respect to ith generator.
+
+            >>> ZZx("3*x^2").derivative_gen(0)
+            6*x
+            >>> ZZx("3*x^2").derivative_gen(1)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+            >>> RRx("x^3/3").derivative_gen(0)
+            [1.00000000000000 +/- 3.89e-16]*x^2
+            >>> RRx("x").derivative_gen(1)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+            >>> x, y = PolynomialRing_fmpz_mpoly(2, ["x", "y"]).gens()
+            >>> ((3*x + 5*y)**2).derivative_gen(0)
+            18*x+30*y
+            >>> ((3*x + 5*y)**2).derivative_gen(1)
+            30*x+50*y
+            >>> x.derivative_gen(2)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+            >>> x, y = PolynomialRing_fmpq_mpoly(2, ["x", "y"]).gens()
+            >>> ((3*x + 5*y/2)**2).derivative_gen(0)
+            18*x + 15*y
+            >>> ((3*x + 5*y/2)**2).derivative_gen(1)
+            15*x + 25/2*y
+            >>> x.derivative_gen(2)
+            Traceback (most recent call last):
+              ...
+            FlintDomainError: ...
+
+        """
+        return self._binary_op_si(self, i, libgr.gr_derivative_gen, "derivative_gen")
+
 
     def divexact(self, other):
         """
@@ -4686,6 +4787,34 @@ class IntegerRing_fmpz(gr_ctx):
         libgr.gr_ctx_init_fmpz(self._ref)
         self._elem_type = fmpz
 
+class IntegerRing_radix_integer(gr_ctx):
+    """
+        >>> ZZdec = IntegerRing_radix_integer(10)
+        >>> ZZ(5)**100 + 123
+        7888609052210118054117285652827862296732064351090230047702789306640748
+        >>> ZZdec(5)**100 + 123
+        7888609052210118054117285652827862296732064351090230047702789306640748
+        >>> (ZZdec(10) // 3, ZZdec(10) % 3, ZZdec(-10) // 3, ZZdec(-10) % 3)
+        (3, 1, -4, 2)
+
+        >>> ZZ7 = IntegerRing_radix_integer(7, 10)
+        >>> ZZ7
+        Integers in radix 7^10 (radix_integer)
+        >>> ZZ7(5**100) + 123
+        194 * 7^80 + 171307382 * 7^70 + 127454085 * 7^60 + 241336803 * 7^50 + 220718973 * 7^40 + 16449109 * 7^30 + 123134395 * 7^20 + 38207260 * 7^10 + 51613155
+        >>> ZZ7(str(_)) == ZZ(str(_))
+        True
+
+    """
+
+    def __init__(self, base, exp=0):
+        assert base >= 2 and base <= UWORD_MAX
+        assert exp >= 0 and exp <= FLINT_BITS
+        assert base**exp <= UWORD_MAX
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_radix_integer(self._ref, base, exp)
+        self._elem_type = radix_integer
+
 class RationalField_fmpq(gr_ctx):
     def __init__(self):
         gr_ctx.__init__(self)
@@ -4821,6 +4950,131 @@ class ComplexExtended_ca(gr_ctx_ca):
         self._set_options(kwargs)
 
 
+
+
+PADIC_RADIX_SIGNED = 1     # allow signed units for exact elements
+PADIC_RADIX_DECIMAL = 4    # print the unit as a plain decimal integer
+PADIC_RADIX_PREC_INF = WORD_MAX    # context precision sentinel for "infinite"
+
+class Qp_padic_radix(gr_ctx):
+    r"""
+    The field of p-adic numbers Q_p, implemented with radix arithmetic
+    arithmetic (padic_radix). A nonzero element is stored canonically as
+    u * p^v + O(p^N): the unit u has p-adic valuation 0, v is the valuation,
+    and N is the absolute precision (N == +inf marks an exactly represented
+    element, printed with no error term).
+
+        >>> Q7 = Qp_padic_radix(7, rel_prec=30)
+        >>> d1 = Mat(Q7, 20, 20)().hilbert().det()
+        >>> d2 = Q7(Mat(QQ, 20, 20)().hilbert().det())
+        >>> d1
+        (5138346895024451929101583) * 7^-19 + O(7^11)
+        >>> d2
+        (5138346895024451929101583) * 7^-19 + O(7^11)
+        >>> d1 - d2
+        0 + O(7^11)
+        >>> d1.overlaps(d2)
+        True
+
+    The relative precision ``rel_prec`` bounds N - v and the absolute precision
+    ``abs_prec`` bounds N; either may be left infinite. With both infinite the
+    structure holds only exactly representable numbers, so an inexact result
+    such as 1/3 is reported as not computable rather than silently truncated.
+    ``p`` must be a word-size prime.
+
+        >>> Q7 = Qp_padic_radix(7, rel_prec=None)
+        >>> Q7
+        Radix 7-adic numbers (rel prec inf, abs prec inf)
+        >>> Q7(0)
+        0
+        >>> Q7(5)
+        5
+        >>> Q7(14)            # 14 = 2 * 7
+        (2) * 7^1
+        >>> Q7(98)            # 98 = 2 * 7^2
+        (2) * 7^2
+        >>> Q7(-1)
+        -1
+
+    Arithmetic on exactly representable elements stays exact:
+
+        >>> Q7(2) + Q7(3)
+        5
+        >>> Q7(3) * Q7(7)
+        (3) * 7^1
+        >>> Q7(7) * Q7(7)
+        (1) * 7^2
+        >>> Q7(2) - Q7(2)
+        0
+        >>> Q7(6) / Q7(2)
+        3
+        >>> Q7(1) / Q7(7)     # 7^-1 is exact
+        (1) * 7^-1
+
+    A non-unit denominator gives an infinite expansion, which an exact ring
+    cannot represent:
+
+        >>> Q7(1) / Q7(3)
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: ...
+
+    A finite relative precision truncates such expansions to N - v digits,
+    recording the error term O(p^N):
+
+        >>> Q7r = Qp_padic_radix(7, rel_prec=8)
+        >>> Q7r
+        Radix 7-adic numbers (rel prec 8, abs prec inf)
+        >>> Q7r(1) / Q7r(2)               # 2^-1 (mod 7^8)
+        2882401 + O(7^8)
+        >>> Q7r(1) / Q7r(3)               # 3^-1 (mod 7^8)
+        3843201 + O(7^8)
+        >>> Q7r(1) / Q7r(14)              # (2*7)^-1: valuation -1, 8 digits
+        (2882401) * 7^-1 + O(7^7)
+
+    Exactly representable elements stay exact even in a finite-precision ring,
+    and a finite *relative* precision does not bound the valuation:
+
+        >>> Q7r(5)
+        5
+        >>> Q7r(7**10)
+        (1) * 7^10
+        >>> Q7r(1) / Q7r(7)
+        (1) * 7^-1
+
+    A finite *absolute* precision instead bounds N directly: anything at or
+    below the horizon p^abs_prec collapses to zero:
+
+        >>> Q7a = Qp_padic_radix(7, rel_prec=None, abs_prec=5)
+        >>> Q7a
+        Radix 7-adic numbers (rel prec inf, abs prec 5)
+        >>> Q7a(7**3)                     # valuation 3 < 5: still exact
+        (1) * 7^3
+        >>> Q7a(7**5)                     # at the horizon
+        0 + O(7^5)
+        >>> Q7a(7**10)
+        0 + O(7^5)
+        >>> Q7a(1) / Q7a(3)               # 3^-1 (mod 7^5)
+        11205 + O(7^5)
+
+    """
+
+    def __init__(self, p, rel_prec=10, abs_prec=None, signed=True, decimal=True):
+        gr_ctx.__init__(self)
+        prec_rel = PADIC_RADIX_PREC_INF if rel_prec is None else int(rel_prec)
+        prec_abs = PADIC_RADIX_PREC_INF if abs_prec is None else int(abs_prec)
+        flags = 0
+        if signed:
+            flags |= PADIC_RADIX_SIGNED
+        if decimal:
+            flags |= PADIC_RADIX_DECIMAL
+        p = int(p)
+        if p < 0 or p > UWORD_MAX or not libflint.n_is_prime(p):
+            raise FlintUnableError("p must be a word-size prime")
+        libgr.gr_ctx_init_padic_radix(self._ref, p, prec_rel, prec_abs, flags)
+        self._elem_type = padic_radix
+
+
 class PolynomialRing_gr_poly(gr_ctx):
     def __init__(self, coefficient_ring, var=None):
         assert isinstance(coefficient_ring, gr_ctx)
@@ -4902,6 +5156,34 @@ class fmpz(gr_elem):
 
     def is_prime(self):
         return bool(libflint.fmpz_is_prime(self._ref))
+
+
+class radix_integer(gr_elem):
+
+    _struct_type = radix_integer_struct
+
+    def size_limbs(self):
+        """
+            >>> Z = IntegerRing_radix_integer(10, 6)
+            >>> Z(10**20).size_limbs()
+            4
+        """
+        libflint.radix_integer_size_limbs.argtypes = (ctypes.c_void_p, ctypes.c_void_p)
+        libflint.radix_integer_size_limbs.restype = c_slong
+        return libflint.radix_integer_size_limbs(self._ref, libgr.gr_ctx_data_as_ptr(self._ctx))
+
+    def size_digits(self):
+        """
+            >>> Z = IntegerRing_radix_integer(10, 6)
+            >>> Z(10**20).size_digits()
+            21
+            >>> Z(10**20-1).size_digits()
+            20
+
+        """
+        libflint.radix_integer_size_digits.argtypes = (ctypes.c_void_p, ctypes.c_void_p)
+        libflint.radix_integer_size_digits.restype = c_slong
+        return libflint.radix_integer_size_digits(self._ref, libgr.gr_ctx_data_as_ptr(self._ctx))
 
 class fmpq(gr_elem):
     _struct_type = fmpq_struct
@@ -5021,6 +5303,46 @@ class acb(gr_elem):
     def _default_context():
         return CC_acb
 
+    def secondary_zeta(self):
+        """
+        Secondary zeta function (ad-hoc wrapper for testing).
+
+            >>> CC(0.5+10j).secondary_zeta()
+            ([0.1725005546943535 +/- 4.73e-17] + [-0.1680692210280708 +/- 4.12e-17]*I)
+            >>> CC(2).secondary_zeta()
+            [0.02310499311541897 +/- 3.75e-18]
+            >>> CC("-20.001").secondary_zeta()
+            [1.32e+18 +/- 6.41e+15]
+            >>> ComplexField_acb(prec=128)("-20.001").secondary_zeta()
+            [1.31697271383159e+18 +/- 8.21e+3]
+            >>> [raises(lambda: CC(s).secondary_zeta(), FlintUnableError)
+            ...     for s in [1, -1, -3, "1 +/- 0.001", "-5 +/- 0.001"]]
+            [True, True, True, True, True]
+
+        Dyadic values:
+
+            >>> for n in range(10):
+            ...     print(CC(-2*n).secondary_zeta())
+            ... 
+            0.8750000000000000
+            -0.2812500000000000
+            0.02343750000000000
+            -0.1347656250000000
+            -0.6723632812500000
+            -6.168090820312500
+            [-82.48159790039063 +/- 5.00e-15]
+            [-1521.003639221191 +/- 4.07e-13]
+            [-36986.37416267395 +/- 1.96e-13]
+            [-1146735.990261555 +/- 2.82e-10]
+        """
+        C = self.parent()
+        prec = C.prec
+        res = C()
+        libflint.acb_dirichlet_secondary_zeta(res._ref, self._ref, prec)
+        if not libflint.acb_is_finite(res._ref):
+            raise FlintUnableError("unable")
+        return res
+
 class gr_arf_ctx(gr_ctx):
     pass
 
@@ -5077,9 +5399,20 @@ def get_nfloat_class(prec):
     return _nfloat_class
 
 class RealFloat_nfloat(gr_ctx):
+    """
+        >>> RealFloat_nfloat(128)
+        Floating-point numbers with prec = 128 (nfloat)
+        >>> RealFloat_nfloat(128).pi()
+        3.14159265358979323846264338327950288420
+        >>> RealFloat_nfloat(10000)
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: precision out of range for nfloat
+    """
     def __init__(self, prec=128):
         gr_ctx.__init__(self)
-        libflint.nfloat_ctx_init(self._ref, prec, 0)
+        if libflint.nfloat_ctx_init(self._ref, prec, 0) != GR_SUCCESS:
+            raise FlintUnableError("precision out of range for nfloat")
         self._elem_type = get_nfloat_class(prec)
 
 @functools.cache
@@ -5104,9 +5437,20 @@ def get_nfloat_complex_class(prec):
     return _nfloat_complex_class
 
 class ComplexFloat_nfloat_complex(gr_ctx):
+    """
+        >>> ComplexFloat_nfloat_complex(128)
+        Complex floating-point numbers with prec = 128 (nfloat_complex)
+        >>> ComplexFloat_nfloat_complex(128).i()
+        1.00000000000000000000000000000000000000*I
+        >>> ComplexFloat_nfloat_complex(10000)
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: precision out of range for nfloat_complex
+    """
     def __init__(self, prec=128):
         gr_ctx.__init__(self)
-        libflint.nfloat_complex_ctx_init(self._ref, prec, 0)
+        if libflint.nfloat_complex_ctx_init(self._ref, prec, 0) != GR_SUCCESS:
+            raise FlintUnableError("precision out of range for nfloat_complex")
         self._elem_type = get_nfloat_complex_class(prec)
 
 
@@ -5127,12 +5471,21 @@ class nmod(gr_elem):
 
 
 class IntegersMod_mpn_mod(gr_ctx):
+    """
+
+        >>> IntegersMod_mpn_mod(10**20 + 1)
+        Integers mod 100000000000000000001 (mpn)
+        >>> IntegersMod_mpn_mod(10**1000)
+        Traceback (most recent call last):
+          ...
+        FlintUnableError: n is not in range for the mpn_mod implementation
+
+    """
     def __init__(self, n, n_is_prime=None):
         n = self._as_fmpz(n)
-        # todo: error handling (must handle cleanup when ctx has not been initialized
-        assert n >= (1 << FLINT_BITS) and n < (1 << (8 * FLINT_BITS))
         gr_ctx.__init__(self)
-        libgr.gr_ctx_init_mpn_mod(self._ref, n._ref)
+        if libgr.gr_ctx_init_mpn_mod(self._ref, n._ref) != GR_SUCCESS:
+            raise FlintUnableError("n is not in range for the mpn_mod implementation")
         self._elem_type = mpn_mod
         if n_is_prime is not None:
             libgr.gr_ctx_set_is_field(self, T_TRUE if n_is_prime else T_FALSE)
@@ -5188,6 +5541,16 @@ class FiniteField_base(gr_ctx):
 
 
 class FiniteField_fq(FiniteField_base):
+    """
+    Finite field (fq representation).
+
+        >>> K = FiniteField_fq(5, 3)
+        >>> K
+        GF(5^3) (fq)
+        >>> (1 + K.gen()) ** 10
+        4*a^2+2
+    """
+
     def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
         p = ZZ(p)
@@ -5200,6 +5563,16 @@ class FiniteField_fq(FiniteField_base):
         self._elem_type = fq
 
 class FiniteField_fq_nmod(FiniteField_base):
+    """
+    Finite field (fq_nmod representation).
+
+        >>> K = FiniteField_fq_nmod(5, 3)
+        >>> K
+        GF(5^3) (fq_nmod)
+        >>> (1 + K.gen()) ** 10
+        4*a^2+2
+    """
+
     def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
         p = self._as_ui(p)
@@ -5212,6 +5585,16 @@ class FiniteField_fq_nmod(FiniteField_base):
         self._elem_type = fq_nmod
 
 class FiniteField_fq_zech(FiniteField_base):
+    """
+    Finite field (Zech logarithm representation).
+
+        >>> K = FiniteField_fq_zech(5, 3)
+        >>> K
+        GF(5^3) (fq_zech)
+        >>> (1 + K.gen()) ** 10
+        a^92
+    """
+
     def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
         p = self._as_ui(p)
@@ -5292,7 +5675,6 @@ class gr_poly(gr_elem):
         return self._data.length
 
     def __getitem__(self, i):
-        n = len(self)
         R = self.parent()._coefficient_ring
         c = R()
         status = libgr.gr_poly_get_coeff_scalar(c._ref, self._ref, i, R._ref)
@@ -5388,6 +5770,101 @@ class gr_poly(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return res
 
+    def resultant(self, other, algorithm=None):
+        """
+            >>> I, x = PolynomialRing(ZZi, "x").gens(recursive=True)
+            >>> f = ((2+3*I) + x)**3
+            >>> g = ((3+4*I) + x)**3
+            >>> f.resultant(g)
+            (16+16*I)
+            >>> g.resultant(f)
+            (-16-16*I)
+            >>> (f * (x + 1)).resultant(g * (x + 1))
+            0
+            >>> f.resultant(g, algorithm="subresultant")
+            (16+16*I)
+            >>> f.resultant(g, algorithm="sylvester")
+            (16+16*I)
+            >>> f.resultant(g, algorithm="euclidean")
+            Traceback (most recent call last):
+              ...
+            ValueError
+            >>> Kx = PolynomialRing(Fraction_gr_fraction(ZZi), "x")
+            >>> Kx(f).resultant(g, algorithm="euclidean")
+            ((16+16*I)) / (1)
+
+        """
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        # fixme:
+        other = Rx(other)
+        res = R()
+        if algorithm is None:
+            status = libgr.gr_poly_resultant(res._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "euclidean":
+            status = libgr.gr_poly_resultant_euclidean(res._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "subresultant":
+            status = libgr.gr_poly_resultant_subresultant(res._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "sylvester":
+            status = libgr.gr_poly_resultant_sylvester(res._ref, self._ref, other._ref, R._ref)
+        else:
+            raise ValueError
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    # todo: want gr_xgcd for generic elements
+    def xgcd(self, other, algorithm=None):
+        """
+            >>> x = ZZx.gen()
+            >>> f = (x+1)**2; g = (x-1)**3
+            >>> G, S, T = f.xgcd(g)
+            >>> (G, S, T); G == S*f + T*g
+            (64, 12*x^2-40*x+44, -12*x-20)
+            True
+            >>> f = (x**2 + 2) * (x+1)**3; g = (x**2 + 2) * (x-1)**2
+            >>> f.gcd(g)
+            x^2+2
+            >>> G, S, T = f.xgcd(g)
+            >>> G
+            64*x^2+128
+            >>> S
+            -12*x+20
+            >>> T
+            12*x^2+40*x+44
+            >>> G == S*f + T*g
+            True
+            >>> f.xgcd(g, algorithm="subresultant")
+            (64*x^2+128, -12*x+20, 12*x^2+40*x+44)
+            >>> f.xgcd(g, algorithm="euclidean")
+            Traceback (most recent call last):
+              ...
+            ValueError
+            >>> Kx = PolynomialRing_gr_poly(QQ, "x")
+            >>> Kx(f).xgcd(g, algorithm="euclidean")
+            (2 + x^2, (5/16) + (-3/16)*x, (11/16) + (5/8)*x + (3/16)*x^2)
+        """
+        Rx = self.parent()
+        R = Rx._coefficient_ring
+        # fixme:
+        other = Rx(other)
+        G = Rx()
+        S = Rx()
+        T = Rx()
+        if algorithm is None:
+            status = libgr.gr_poly_xgcd(G._ref, S._ref, T._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "euclidean":
+            status = libgr.gr_poly_xgcd_euclidean(G._ref, S._ref, T._ref, self._ref, other._ref, R._ref)
+        elif algorithm == "subresultant":
+            status = libgr.gr_poly_xgcd_subresultant(G._ref, S._ref, T._ref, self._ref, other._ref, R._ref)
+        else:
+            raise ValueError
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (G, S, T)
+
     def roots(self, domain=None):
         """
         Computes the roots in the coefficient ring of this polynomial,
@@ -5422,9 +5899,9 @@ class gr_poly(gr_elem):
             >>> f.roots(domain=QQbar)     # complex algebraic roots
             ([Root a = 1.00000*I of a^2+1, Root a = -1.00000*I of a^2+1, Root a = 1.41421 of a^2-2, Root a = -1.41421 of a^2-2, -3/2], [1, 1, 1, 1, 2])
             >>> f.roots(domain=RR)      # real ball roots
-            ([[-1.414213562373095 +/- 4.89e-17], [1.414213562373095 +/- 4.89e-17], -1.500000000000000], [1, 1, 2])
+            ([[-1.414213562373095 +/- 6.23e-17], [1.414213562373095 +/- 6.23e-17], -1.500000000000000], [1, 1, 2])
             >>> f.roots(domain=CC)      # complex ball roots
-            ([[-1.414213562373095 +/- 4.89e-17], [1.414213562373095 +/- 4.89e-17], ([+/- 1.45e-19] + [1.000000000000000 +/- 2.7e-19]*I), ([+/- 1.45e-19] + [-1.000000000000000 +/- 2.7e-19]*I), -1.500000000000000], [1, 1, 1, 1, 2])
+            ([[-1.414213562373095 +/- 4.89e-17], [1.414213562373095 +/- 4.89e-17], 1.000000000000000*I, -1.000000000000000*I, -1.500000000000000], [1, 1, 1, 1, 2])
             >>> f.roots(RF)     # real floating-point roots
             ([-1.414213562373095, 1.414213562373095, -1.500000000000000], [1, 1, 2])
             >>> f.roots(CF)     # complex floating-point roots
@@ -5578,6 +6055,20 @@ class gr_poly(gr_elem):
 
 
 class gr_series(gr_elem):
+    """
+
+        >>> f = QQser("exp(x)")
+        >>> f
+        1 + x + (1/2)*x^2 + (1/6)*x^3 + (1/24)*x^4 + (1/120)*x^5 + O(x^6)
+        >>> f[5]
+        1/120
+        >>> f[6]
+        Traceback (most recent call last):
+            ...
+        Undecidable: coefficient is not known
+
+    """
+
     _struct_type = gr_series_struct
 
     def __init__(self, val=None, error=None, context=None, random=False):
@@ -5643,6 +6134,18 @@ class gr_series(gr_elem):
         else:
             libgr._gr_series_set_error(self._ref, n, self.parent()._ref)
 
+    def __getitem__(self, i):
+        assert i >= 0
+        error = self._error()
+        if error is not None and i >= error:
+            raise Undecidable("coefficient is not known")
+        R = self.parent()._coefficient_ring
+        c = R()
+        # XXX: hack; want a gr_series method
+        status = libgr.gr_poly_get_coeff_scalar(c._ref, self._ref, i, R._ref)
+        if status:
+            raise NotImplementedError
+        return c
 
 
 class ModularGroup_psl2z(gr_ctx_ca):
@@ -5677,6 +6180,12 @@ class DirichletGroup_dirichlet_char(gr_ctx_ca):
         4
         >>> [G(i) for i in [1,3,7,9]]
         [chi_10(1, .), chi_10(3, .), chi_10(7, .), chi_10(9, .)]
+
+        >>> DirichletGroup(10**16+61)
+        Traceback (most recent call last):
+          ...
+        NotImplementedError: modulus with prime factor p > 10^16 is not currently supported
+
     """
 
     def __init__(self, q, **kwargs):
@@ -5756,6 +6265,23 @@ class Mat(gr_ctx):
         [[5, 0],
         [0, 5]]
 
+    Construction from strings:
+
+        >>> Mat(QQ)("[[1, 1/2], [1/3, 1/4]]")
+        [[1, 1/2],
+        [1/3, 1/4]]
+        >>> Mat(QQ)("[[0, 0, 0], [0, 0, 0]]")
+        [[0, 0, 0],
+        [0, 0, 0]]
+        >>> Mat(QQ, 2, 3)("[[0, 0, 0], [0, 0, 0]]")
+        [[0, 0, 0],
+        [0, 0, 0]]
+        >>> Mat(QQ, 2, 3)("[[0, 0], [0, 0]]")  # input does not match shape
+        Traceback (most recent call last):
+          ...
+        ValueError
+
+
     """
 
     def __init__(self, element_domain, nrows=None, ncols=None):
@@ -5790,6 +6316,7 @@ class gr_mat(gr_elem):
     _struct_type = gr_mat_struct
 
     def __init__(self, *args, **kwargs):
+
         context = kwargs['context']
         gr_elem.__init__(self, None, context)
         element_ring = context._element_ring
@@ -5819,6 +6346,8 @@ class gr_mat(gr_elem):
                                 x = element_ring(row[j])
                                 ijptr = libgr.gr_mat_entry_ptr(self._ref, i, j, x._ctx)
                                 status |= libgr.gr_set(ijptr, x._ref, x._ctx)
+                elif isinstance(val, str):
+                    status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
                 elif libgr.gr_ctx_matrix_is_fixed_size(self._ctx) == T_TRUE:
                     if not isinstance(val, gr_elem):
                         val = element_ring(val)
@@ -6444,7 +6973,7 @@ class gr_mat(gr_elem):
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=QQbar)
             ([Root a = 5.37228 of a^2-5*a-2, Root a = -0.372281 of a^2-5*a-2], [1, 1])
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=RR)
-            ([[-0.3722813232690143 +/- 3.01e-17], [5.372281323269014 +/- 3.32e-16]], [1, 1])
+            ([[-0.3722813232690143 +/- 3.00e-17], [5.372281323269014 +/- 3.31e-16]], [1, 1])
             >>> Mat(QQbar)([[1, 0, QQbar.i()], [0, 0, 1], [1, 1, 1]]).eigenvalues()
             ([Root a = 1.94721 + 0.604643*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = 0.654260 - 0.430857*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = -0.601467 - 0.173786*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1], [1, 1, 1])
             >>> Mat(ZZi)([[1, 0, ZZi.i()], [0, 0, 1], [1, 1, 1]]).eigenvalues(domain=QQbar)
@@ -6550,6 +7079,80 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return (D, L, R)
 
+    def qr(self):
+        """
+        QR decomposition.
+
+            >>> A = Mat(RF)([[1,2,3],[0,0,1],[0,1,0],[2,2,1]])
+            >>> Q, R = A.qr()
+            >>> Q
+            [[0.4472135954999579, 0.5962847939999439, 0.5716619504750294],
+            [0, 0, 0.5144957554275265],
+            [0, 0.7453559924999299, -0.5716619504750294],
+            [0.8944271909999159, -0.2981423969999719, -0.2858309752375147]]
+            >>> R
+            [[2.236067977499790, 2.683281572999748, 2.236067977499790],
+            [0, 1.341640786499874, 1.490711984999860],
+            [0, 0, 1.943650631615100]]
+            >>> (Q * R - A).norm_max() < 1e-15
+            True
+
+            >>> A = Mat(QQbar)([[1,2,3],[0,0,1],[0,1,0],[2,2,1]])
+            >>> Q, R = A.qr()
+            >>> Q[1,2]
+            Root a = 0.514496 of 34*a^2-9
+            >>> Q * R - A
+            [[0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]]
+
+            >>> A = Mat(RF, 100, 100)([[i+j+i//(1+j) for i in range(100)] for j in range(100)])
+            >>> Q, R = A.qr()
+            >>> (Q * R - A).norm_max() < 1e-13
+            True
+
+        """
+        Cmat = self.parent()
+        C = Cmat._element_ring
+        m = self.nrows()
+        n = self.ncols()
+        Q = gr_mat(m, n, context=self.parent())
+        R = gr_mat(n, n, context=self.parent())
+        status = libgr.gr_mat_qr(Q._ref, R._ref, self._ref, C._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (Q, R)
+
+    def lq(self):
+        """
+        LQ decomposition.
+
+            >>> A = Mat(RF)([[1,2,3],[0,0,1],[0,1,0],[2,2,1]]).transpose()
+            >>> L, Q = A.lq()
+            >>> L
+            [[2.236067977499790, 0, 0],
+            [2.683281572999748, 1.341640786499874, 0],
+            [2.236067977499790, 1.490711984999860, 1.943650631615100]]
+            >>> Q
+            [[0.4472135954999579, 0, 0, 0.8944271909999159],
+            [0.5962847939999439, 0, 0.7453559924999299, -0.2981423969999719],
+            [0.5716619504750294, 0.5144957554275265, -0.5716619504750294, -0.2858309752375147]]
+            >>> (L * Q - A).norm_max() < 1e-15
+            True
+        """
+        Cmat = self.parent()
+        C = Cmat._element_ring
+        m = self.nrows()
+        n = self.ncols()
+        L = gr_mat(m, m, context=self.parent())
+        Q = gr_mat(m, n, context=self.parent())
+        status = libgr.gr_mat_lq(L._ref, Q._ref, self._ref, C._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return (L, Q)
 
     #def __getitem__(self, i):
     #    pass
@@ -6566,6 +7169,36 @@ libgr.gr_vec_entry_ptr.restype = ctypes.POINTER(ctypes.c_char)
 class Vec(gr_ctx):
     """
     Parent class for vector domains.
+
+        >>> Vec(ZZ)
+        Vectors (any length) over Integer ring (fmpz)
+        >>> Vec(ZZ, 5)
+        Space of length 5 vectors over Integer ring (fmpz)
+        >>> VecZZ([0, 5, 10])
+        [0, 5, 10]
+        >>> VecZZ(range(3, 20, 3))
+        [3, 6, 9, 12, 15, 18]
+
+    Construction of vectors from strings:
+
+        >>> Vec(QQ)("[1/3, 1/5]")
+        [1/3, 1/5]
+        >>> Vec(ZZ, 3)("[1, 2, 3]")
+        [1, 2, 3]
+        >>> Vec(ZZ, 3)("[1, 2]")     # input does not match size
+        Traceback (most recent call last):
+          ...
+        ValueError
+        >>> Vec(RR)("[1, 1/3, 1/3 +/- exp(-10)]")
+        [1, [0.3333333333333333 +/- 7.04e-17], [0.3333 +/- 7.88e-5]]
+        >>> v = Vec(Mat(QQ, 2, 2))("[[[1,0],[0,1]], [[0,1],[-1,0]]]")
+        >>> v[0]
+        [[1, 0],
+        [0, 1]]
+        >>> v[1]
+        [[0, 1],
+        [-1, 0]]
+
     """
 
     def __init__(self, element_domain, n=None):
@@ -6594,6 +7227,7 @@ class gr_vec(gr_elem):
             >>> VecZZ(range(3, 20, 3))
             [3, 6, 9, 12, 15, 18]
         """
+
         context = kwargs['context']
         gr_elem.__init__(self, None, context)
         element_ring = context._element_ring
@@ -6615,6 +7249,8 @@ class gr_vec(gr_elem):
                             status |= libgr.gr_set(iptr, x._ref, x._ctx)
                 elif isinstance(val, gr_elem):
                     status = libgr.gr_set_other(self._ref, val._ref, val._ctx, self._ctx)
+                elif isinstance(val, str):
+                    status = libgr.gr_set_str(self._ref, ctypes.c_char_p(str(val).encode('ascii')), self._ctx)
                 elif isinstance(val, range):
                     start = val.start
                     step = val.step
@@ -6790,6 +7426,25 @@ class PolynomialRing_fmpz_mpoly(gr_ctx):
         return ZZ
 
 
+class fmpq_mpoly(gr_elem):
+    _struct_type = fmpq_mpoly_struct
+
+class PolynomialRing_fmpq_mpoly(gr_ctx):
+
+    def __init__(self, nvars, vars=None):
+        gr_ctx.__init__(self)
+        nvars = gr_ctx._as_si(nvars)
+        assert nvars >= 0
+        libgr.gr_ctx_init_fmpq_mpoly(self._ref, nvars, 0)
+        self._elem_type = fmpq_mpoly
+        if vars is not None:
+            assert len(vars) == nvars
+            self._set_gen_names(vars)
+
+    @property
+    def _coefficient_ring(self):
+        return QQ
+
 
 class gr_mpoly(gr_elem):
     _struct_type = gr_mpoly_struct
@@ -6799,7 +7454,6 @@ class PolynomialRing_gr_mpoly(gr_ctx):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
 
-        gr_ctx.__init__(self)
         nvars = gr_ctx._as_si(nvars)
         assert nvars >= 0
         libgr.gr_ctx_init_gr_mpoly(self._ref, coefficient_ring._ref, nvars, 0)
@@ -6841,9 +7495,177 @@ class FractionField_fmpz_mpoly_q(gr_ctx):
 
 
 
+class Fraction_gr_fraction(gr_ctx):
+    """
+    Fractions with GCD reduction:
+
+        >>> Q = Fraction_gr_fraction(ZZi)
+        >>> Q(ZZi.i())
+        (I) / (1)
+        >>> Q(Fraction_gr_fraction(QQbar).i())
+        (I) / (1)
+        >>> I, = Q.gens(recursive=True)
+        >>> s = sum(1/(1+j*I) for j in range(10))
+        >>> s
+        ((32798-28121*I)) / ((14651+1807*I))
+
+    Fractions without GCD reduction
+
+        >>> Q2 = Fraction_gr_fraction(ZZi, reduction=False)
+        >>> I2, = Q2.gens(recursive=True)
+        >>> s2 = sum(1/(1+j*I2) for j in range(10))
+        >>> s2
+        ((-468880-1874340*I)) / ((365300-549900*I))
+        >>> Q2(s)
+        ((32798-28121*I)) / ((14651+1807*I))
+        >>> Q2(s) == s2
+        True
+        >>> s - s2
+        (0) / (1)
+        >>> s2 - s
+        (0) / ((6345679600-7396487800*I))
+        >>> s2 - s == 0
+        True
+
+    """
+
+    def __init__(self, base_ring, reduction=True, strongly_canonical=False):
+        assert isinstance(base_ring, gr_ctx)
+        gr_ctx.__init__(self)
+
+        flags = 0
+        if not reduction:
+            flags |= 1
+        if strongly_canonical:
+            flags |= 2
+
+        libgr.gr_ctx_init_gr_fraction(self._ref, base_ring, flags)
+
+        class _gr_fraction_struct(ctypes.Structure):
+            _fields_ = [('data', ctypes.c_ubyte * libgr.gr_ctx_sizeof_elem(self._ref))]
+
+        class gr_fraction(gr_elem):
+            _struct_type = _gr_fraction_struct
+
+        self._elem_type = gr_fraction
+
+        base_ring._refcount += 1
+        self._base_ring = base_ring
+        self._elem_type = gr_fraction
+
+    def __del__(self):
+        self._base_ring._decrement_refcount()
 
 
 
+class Complex_gr_complex(gr_ctx):
+    """
+        >>> C = Complex_gr_complex(QQ)
+        >>> C
+        Complex algebra over Rational field (fmpq)
+        >>> x = C("2+3*I"); x
+        (2) + (3) * I
+        >>> x / 5
+        (2/5) + (3/5) * I
+        >>> 1 / (1 / x)
+        (2) + (3) * I
+        >>> x.re(); x.im(); x.conj()
+        (2) + (0) * I
+        (3) + (0) * I
+        (2) + (-3) * I
+
+        >>> C = Complex_gr_complex(ZZx)
+        >>> x, I = C.gens(recursive=True)
+        >>> (2+x*I)**5
+        (10*x^4-80*x^2+32) + (x^5-40*x^3+80*x) * I
+
+        >>> A = RealAlgebraicField_qqbar()
+        >>> C = Complex_gr_complex(A)
+        >>> C("2+3*I")
+        (2) + (3) * I
+        >>> C(A(2).sqrt())
+        (Root a = 1.41421 of a^2-2) + (0) * I
+        >>> C(2 + Complex_gr_complex(QQ).i()/5)
+        (2) + (1/5) * I
+        >>> abs(C("2+3*I"))
+        (Root a = 3.60555 of a^2-13) + (0) * I
+        >>> C(QQbar(-1) ** (QQ(1) / 5))
+        (Root a = 0.809017 of 4*a^2-2*a-1) + (Root a = 0.587785 of 16*a^4-20*a^2+5) * I
+        >>> _**5
+        (-1) + (0) * I
+
+        >>> C = Complex_gr_complex(RealFloat_nfloat(64))
+        >>> (C.pi() + C.i())**2
+        (8.8696044010893586177) + (6.2831853071795864766) * I
+    """
+
+    def __init__(self, real_ctx):
+        assert isinstance(real_ctx, gr_ctx)
+        gr_ctx.__init__(self)
+
+        libgr.gr_ctx_init_gr_complex(self._ref, real_ctx)
+
+        class _gr_complex_struct(ctypes.Structure):
+            _fields_ = [('data', ctypes.c_ubyte * libgr.gr_ctx_sizeof_elem(self._ref))]
+
+        class gr_complex(gr_elem):
+            _struct_type = _gr_complex_struct
+
+        self._elem_type = gr_complex
+
+        real_ctx._refcount += 1
+        self._real_ctx = real_ctx
+        self._elem_type = gr_complex
+
+    def __del__(self):
+        self._real_ctx._decrement_refcount()
+
+
+class padic_radix(gr_elem):
+
+    _struct_type = padic_radix_struct
+
+    def valuation(self):
+        """
+        The p-adic valuation v of this element (the exponent of the leading
+        power of p). The valuation of zero is reported as ``None``.
+
+            >>> Q7 = Qp_padic_radix(7)
+            >>> Q7(14).valuation()
+            1
+            >>> Q7(98).valuation()
+            2
+            >>> (Q7(1) / Q7(7)).valuation()
+            -1
+            >>> Q7(5).valuation()
+            0
+            >>> Q7(0).valuation() is None
+            True
+        """
+        if self._data.u.size == 0:
+            return None
+        return int(self._data.v)
+
+    def precision(self):
+        """
+        The absolute precision N: the element is known modulo p^N. An exactly
+        represented element returns ``None`` (infinite precision).
+
+            >>> Q7r = Qp_padic_radix(7, rel_prec=8)
+            >>> (Q7r(1) / Q7r(2)).precision()
+            8
+            >>> (Q7r(1) / Q7r(14)).precision()
+            7
+            >>> Q7r(5).precision() is None        # exact
+            True
+            >>> Q7r(1) / Q7r(7)                    # 7^-1 is exact
+            (1) * 7^-1
+            >>> (Q7r(1) / Q7r(7)).precision() is None
+            True
+        """
+        if int(self._data.N) == PADIC_RADIX_PREC_INF:
+            return None
+        return int(self._data.N)
 
 
 class fexpr(gr_elem):
@@ -8473,7 +9295,36 @@ def test_series():
 
     assert CCser(1+ZZser.gen()) == 1 + RRser.gen()
 
-    
+    # Test that trigonometric and hyperbolic functions use numerically
+    # stable formulas for large arguments
+    S = PowerSeriesRing(RR,  4)
+    x = S.gen()
+    c = RR(10)
+    v = c + x + x**2
+    d = 14
+    assert S.tanh(v)[3].nstr(d) == '-1.0992819274357e-8'
+    assert S.tanh(-v)[3].nstr(d) == '1.0992819274357e-8'
+    assert S.coth(v)[3].nstr(d) == '1.0992819364988e-8'
+    assert S.coth(-v)[3].nstr(d) == '-1.0992819364988e-8'
+    S = PowerSeriesRing(CC,  3)
+    x = S.gen()
+    c = CC(0.25+10j)
+    v = c + x + x**2
+    d = 14
+    assert S.tan(v)[2].nstr(d) == '(3.2826512022173e-9 + 1.1188008582726e-8*I)'
+    assert S.tan(-v)[2].nstr(d) == '(-3.2826512022173e-9 - 1.1188008582726e-8*I)'
+    assert S.cot(v)[2].nstr(d) == '(3.2826511245479e-9 + 1.1188008713377e-8*I)'
+    assert S.cot(-v)[2].nstr(d) == '(-3.2826511245479e-9 - 1.1188008713377e-8*I)'
+    assert S.tan_pi(v)[2].nstr(d) == '(-2.0362573263061e-26 + 6.4816083777740e-27*I)'
+    assert S.tan_pi(-v)[2].nstr(d) == '(2.0362573263061e-26 - 6.4816083777740e-27*I)'
+    assert S.cot_pi(v)[2].nstr(d) == '(-2.0362573263061e-26 + 6.4816083777740e-27*I)'
+    assert S.cot_pi(-v)[2].nstr(d) == '(2.0362573263061e-26 - 6.4816083777740e-27*I)'
+    v *= CC(1j)
+    assert S.tanh(v)[2].nstr(d) == '(-1.1188008582726e-8 + 3.2826512022173e-9*I)'
+    assert S.tanh(-v)[2].nstr(d) == '(1.1188008582726e-8 - 3.2826512022173e-9*I)'
+    assert S.coth(v)[2].nstr(d) == '(1.1188008713377e-8 - 3.2826511245479e-9*I)'
+    assert S.coth(-v)[2].nstr(d) == '(-1.1188008713377e-8 + 3.2826511245479e-9*I)'
+
 
 def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)
@@ -8605,6 +9456,35 @@ def test_mpoly():
     assert raises(lambda: RA(RB.gens()[0]), NotImplementedError)
     assert raises(lambda: RB(RA.gens()[0]), NotImplementedError)
 
+    x, y, z = PolynomialRing_gr_mpoly(QQbar, 3, ["x", "y", "z"]).gens()
+    I = QQbar.i()
+    assert ((x+I)*(x-I)*(y+I)*(y-I)) / ((x+I)*(y-I)) == (x-I)*(y+I)
+    assert raises(lambda: ((x+I)*(x-I)*(y+I)*(y-I)) / ((x+I)*(z+I)), FlintDomainError)
+
+    x, y, z = PolynomialRing_gr_mpoly(RR, 3, ["x", "y", "z"]).gens()
+    assert raises(lambda: x / (x**0 - y**0), FlintDomainError)
+    assert raises(lambda: (x**4 * y**3) / (RR("0 +/- 0.1")*(x**3 * y**2)), FlintUnableError)
+
+    R = PolynomialRing_gr_mpoly(QQx, 1, "y");
+    f = R("(x/3 + x^2/5)*y^2")
+    assert f == R(str(f))
+
+
+def test_fmpq_mpoly():
+    QQxyz = PolynomialRing_fmpq_mpoly(3)
+    x, y, z = QQxyz.gens()
+    f = (-72 * (1+x)**2 * (y+z+1)) / 5
+    assert f.numerator() == (-72 * (1+x)**2 * (y+z+1))
+    assert f.denominator() == 5
+    assert x.denominator() == 1
+    assert (x * 0).numerator() == 0
+    assert (x * 0).denominator() == 1
+    c, fac, exp = f.factor()
+    assert c == QQ(-72) / 5
+    assert ((fac, exp) == ([1+x, y+z+1], [2, 1])) or ((fac, exp) == ([y+z+1, 1+x], [1, 2]))
+    assert f.gcd((-100-100*x) / 17) == (1+1*x)
+    assert str(QQxyz.gens()) == '[x1, x2, x3]'
+    assert str(PolynomialRing_fmpq_mpoly(2, ["a", "b"]).gens()[1]) == "b"
 
 def test_mpoly_q():
     assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'
@@ -8899,6 +9779,13 @@ def test_gr_series():
 
     assert raises(lambda: x / 0, FlintDomainError)
 
+    # regression test
+    assert CCser(1).cos_pi() == -1
+    assert str(CCser(1).cos()) == "[0.540302305868140 +/- 4.59e-16]"
+    assert CCser(1).sin_pi() == 0
+    assert str(CCser(1).sin()) == "[0.841470984807897 +/- 6.08e-16]"
+
+
 def test_integers_mod():
     R = IntegersMod_mpn_mod(10**20 + 1)
     c = ZZ(2) ** 4321
@@ -8994,6 +9881,92 @@ def test_is_vector_space():
         assert R.is_real_vector_space()
         assert R.is_complex_vector_space()
 
+def test_padic():
+    Q7 = Qp_padic_radix(7, rel_prec=10)
+    Q2 = Qp_padic_radix(2, rel_prec=10)
+
+    assert str(Q7(7) * Q7(7)) == "(1) * 7^2"
+    assert Q7(0).sqrt() == 0
+    assert Q7(1).sqrt() == 1
+    assert Q7(4).sqrt() == 2
+    assert str(Q7(2).sqrt()) == "266983762 + O(7^10)"
+    assert str((1/(1/Q7(4))).sqrt()) == "2 + O(7^10)"
+    assert raises(Q7(3).sqrt, FlintDomainError)
+    assert raises(Q7(5).sqrt, FlintDomainError)
+    assert raises(Q7(6).sqrt, FlintDomainError)
+
+    assert Q7(0).exp() == 1
+    assert str(Q7(7).exp()) == "182289612 + O(7^10)"
+    assert str(Q7("7 + O(7^11)").exp()) == "182289612 + O(7^10)"
+    assert str(Q7("7 + O(7^9)").exp()) == "20875184 + O(7^9)"
+    assert str(Q7("0 + O(7^2)").exp()) == "1 + O(7^2)"
+    assert str(Q7("0 + O(7^1)").exp()) == "1 + O(7^1)"
+    assert raises(Q7("0 + O(7^0)").exp, FlintUnableError)
+    assert raises(Q7("0 + O(7^-1)").exp, FlintUnableError)
+    assert raises((Q7(7)**(-5) + Q7("O(7^-2)")).exp, FlintDomainError)
+
+    assert Q7(1).log() == 0
+    assert str(Q7("1 + O(7^5)").log()) == "0 + O(7^5)"
+    assert str(Q7(1000 * 7).exp().log()) == "(1000) * 7^1 + O(7^10)"
+    assert raises(Q7(2).log, FlintDomainError)
+    assert raises(Q7(0).log, FlintDomainError)
+    assert str(Q7("1 + O(7)").log()) == "0 + O(7^1)"
+    assert raises(Q7("O(7)").log, FlintDomainError)
+    assert raises(Q7("0 + O(7^0)").log, FlintUnableError)
+    assert raises(Q7("0 + O(7^-1)").log, FlintUnableError)
+    assert raises(Q7("7^-5 + O(7^-2)").log, FlintDomainError)
+
+    assert Q2(0).exp() == 1
+    assert str(Q2(4).exp()) == "333 + O(2^10)"
+    assert str(Q2("4 + O(2^12)").exp()) == "333 + O(2^10)"
+    assert str(Q2("4 + O(2^8)").exp()) == "77 + O(2^8)"
+    assert str(Q2("0 + O(2^2)").exp()) == "1 + O(2^2)"
+    assert raises(Q2("0 + O(2^1)").exp, FlintUnableError)
+    assert raises(Q2("0 + O(2^0)").exp, FlintUnableError)
+    assert raises(Q2("0 + O(2^1)").exp, FlintUnableError)
+
+    assert Q2(1).log() == 0
+    assert str(Q2("1 + O(2^5)").log()) == "0 + O(2^5)"
+    assert str(Q2("1 + 2 * 3").log()) == "(59) * 2^3 + O(2^10)"
+    assert str(Q2(123 * 4).exp().log()) == "(123) * 2^2 + O(2^10)"
+    assert raises(Q2(2).log, FlintDomainError)
+    assert raises(Q2(0).log, FlintDomainError)
+    assert str(Q2("1 + O(2)").log()) == "0 + O(2^1)"
+    assert raises(Q2("O(2)").log, FlintDomainError)
+    assert raises(Q2("0 + O(2^0)").log, FlintUnableError)
+    assert raises(Q2("0 + O(2^-1)").log, FlintUnableError)
+    assert raises(Q2("2^-5 + O(2^-2)").log, FlintDomainError)
+
+    Q5 = Qp_padic_radix(5, rel_prec=10)
+    f = PowerSeriesRing(Q5)("5 * 1234 + x")
+    ef = f.exp()
+    stref = "(1779246 + O(5^10)) + (1779246 + O(5^10))*x + (889623 + O(5^10))*x^2 + (296541 + O(5^10))*x^3 + (7398354 + O(5^10))*x^4 + ((7398354) * 5^-1 + O(5^9))*x^5 + O(x^6)"
+    assert str(ef) == stref
+    assert str((PowerSeriesRing(Q5))(stref)) == stref
+    assert str(f.exp() * (-f).exp()) == "(1 + O(5^10)) + (0 + O(5^10))*x + (0 + O(5^10))*x^2 + (0 + O(5^10))*x^3 + (0 + O(5^10))*x^4 + (0 + O(5^9))*x^5 + O(x^6)"
+
+
+def test_big_o():
+    Q = Qp_padic_radix(7, rel_prec=3)
+    assert raises(lambda: Q("O(5^3)"), FlintUnableError)
+    assert str(Q("O(7^-3)")) == "0 + O(7^-3)"
+    # should saturate the precision limit
+    assert str(Q("O(7^100000000000000000000000000000000000000)")) == str(Q(7) ** (10**100))
+    assert raises(lambda: Q("O(7^-100000000000000000000000000000000000000)"), FlintUnableError)
+    Qx = PolynomialRing(Q, "x")
+    Qxy = PowerSeriesRing(Qx, 2, "y")
+    Qxyz = PolynomialRing(Qxy, "z")
+    Qxyzt = PowerSeriesRing(Qxyz, 3, "t")
+    f = Qxyzt("(3 + O(7^2))*t + (2 + O(y^2))*t + (5 + O(7^1))*t^2")
+    assert str(f) == "((5 + O(7^2)) + O(y^2))*t + (5 + O(7^1))*t^2"
+    for e in range(8):
+        f = Qxyzt("3+x+y+z+t")**e
+        fs = str(f)
+        assert str(Qxyzt(fs)) == fs
+    assert raises(lambda: Q("O(5^3)"), FlintUnableError)
+    assert raises(lambda: Qxy("O(y^-2)"), FlintUnableError)
+    assert str(Qxy("O(y^0)")) == "0 + O(y^0)"
+    assert str(Qxy("O(y)")) == "0 + O(y^1)"
 
 if __name__ == "__main__":
     from time import time

@@ -12,7 +12,7 @@
 
 #include "fmpz_poly.h"
 
-void _fmpz_poly_hensel_lift(fmpz *G, fmpz *H, fmpz *A, fmpz *B,
+static void _fmpz_poly_hensel_lift(fmpz *G, fmpz *H, fmpz *A, fmpz *B,
     const fmpz *f, slong lenF,
     const fmpz *g, slong lenG, const fmpz *h, slong lenH,
     const fmpz *a, slong lenA, const fmpz *b, slong lenB,

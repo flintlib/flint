@@ -13,8 +13,6 @@
 #include "gr_poly.h"
 #include "gr_mat.h"
 
-int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m, gr_ctx_t ctx);
-
 int
 gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx)
 {

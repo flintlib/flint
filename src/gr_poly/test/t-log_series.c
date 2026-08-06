@@ -58,7 +58,14 @@ test_log_series(flint_rand_t state)
         status |= gr_poly_set_coeff_si(fab, 0, 0, ctx);
         status |= gr_poly_set_coeff_si(fafb, 0, 0, ctx);
 
-        if (status == GR_SUCCESS && gr_poly_equal(fab, fafb, ctx) == T_FALSE)
+        /* The identity log(a*b) = log(a) + log(b) only holds when a and b
+           commute as polynomials, i.e. when the coefficient ring is
+           commutative.  Skip the check for non-commutative rings (e.g.
+           matrix rings) where the BCH commutator terms make the two sides
+           differ in general. */
+        if (status == GR_SUCCESS
+                && gr_ctx_is_commutative_ring(ctx) == T_TRUE
+                && gr_poly_equal(fab, fafb, ctx) == T_FALSE)
         {
             flint_printf("FAIL\n\n");
             gr_ctx_println(ctx);

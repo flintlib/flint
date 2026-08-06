@@ -13,6 +13,7 @@
 
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_poly/impl.h"
 
 int
 _gr_poly_divrem_divconquer_recursive(gr_ptr Q, gr_ptr BQ, gr_ptr W,

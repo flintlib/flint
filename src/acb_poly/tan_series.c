@@ -12,17 +12,12 @@
 #include "acb_poly.h"
 #include "gr_poly.h"
 
-#define TAN_NEWTON_CUTOFF 20
-
 void
 _acb_poly_tan_series(acb_ptr res, acb_srcptr h, slong hlen, slong len, slong prec)
 {
     gr_ctx_t ctx;
     gr_ctx_init_complex_acb(ctx, prec);
-
-    hlen = FLINT_MIN(hlen, len);
-
-    if (_gr_poly_tan_series_newton(res, h, hlen, len, TAN_NEWTON_CUTOFF, ctx) != GR_SUCCESS)
+    if (_gr_poly_tan_series(res, h, hlen, len, ctx) != GR_SUCCESS)
         _acb_vec_indeterminate(res, len);
 }
 

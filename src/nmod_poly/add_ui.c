@@ -16,6 +16,9 @@
 void nmod_poly_add_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
 {
 
+    if (c >= poly->mod.n)
+        NMOD_RED(c, c, poly->mod);
+
     if (poly->length == 0)
     {
         if (c == 0)
@@ -29,9 +32,6 @@ void nmod_poly_add_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
     }
     else
     {
-        if (c >= poly->mod.n)
-            NMOD_RED(c, c, poly->mod);
-
         nmod_poly_set(res, poly);
 
         nmod_poly_set_coeff_ui(res, 0, nmod_add(res->coeffs[0], c, poly->mod));

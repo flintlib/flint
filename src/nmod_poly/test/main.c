@@ -13,6 +13,7 @@
 
 #include "t-add.c"
 #include "t-add_series.c"
+#include "t-add_ui.c"
 #include "t-asinh_series.c"
 #include "t-asin_series.c"
 #include "t-atanh_series.c"
@@ -52,11 +53,14 @@
 #include "t-evaluate_mat_paterson_stockmeyer.c"
 #include "t-evaluate_nmod.c"
 #include "t-evaluate_nmod_vec_fast.c"
+#include "t-evaluate_geometric_nmod_vec_fast.c"
 #include "t-exp_series.c"
+#include "t-extrapolate_geometric.c"
 #include "t-find_distinct_nonzero_roots.c"
 #include "t-fread_print.c"
 #include "t-gcd.c"
 #include "t-gcd_euclidean.c"
+#include "t-gcd_euclidean_redc_fast.c"
 #include "t-gcd_hgcd.c"
 #include "t-gcdinv.c"
 #include "t-get_set_coeff_ui.c"
@@ -68,6 +72,7 @@
 #include "t-interpolate_nmod_vec_barycentric.c"
 #include "t-interpolate_nmod_vec.c"
 #include "t-interpolate_nmod_vec_fast.c"
+#include "t-interpolate_geometric_nmod_vec_fast.c"
 #include "t-interpolate_nmod_vec_newton.c"
 #include "t-invmod.c"
 #include "t-inv_series_basecase.c"
@@ -85,7 +90,11 @@
 #include "t-mul_KS.c"
 #include "t-mullow.c"
 #include "t-mullow_classical.c"
+#include "t-mullow_fft_small_repack.c"
 #include "t-mullow_KS.c"
+#include "t-mulmid.c"
+#include "t-mulmid_classical.c"
+#include "t-mulmid_KS.c"
 #include "t-mulmod.c"
 #include "t-mulmod_precond.c"
 #include "t-mulmod_preinv.c"
@@ -123,6 +132,7 @@
 #include "t-sqrt_series.c"
 #include "t-sub.c"
 #include "t-sub_series.c"
+#include "t-sub_ui.c"
 #include "t-tanh_series.c"
 #include "t-tan_series.c"
 #include "t-taylor_shift.c"
@@ -137,6 +147,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(nmod_poly_add),
+    TEST_FUNCTION(nmod_poly_add_ui),
     TEST_FUNCTION(nmod_poly_add_series),
     TEST_FUNCTION(nmod_poly_asinh_series),
     TEST_FUNCTION(nmod_poly_asin_series),
@@ -178,11 +189,14 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_evaluate_mat_paterson_stockmeyer),
     TEST_FUNCTION(nmod_poly_evaluate_nmod),
     TEST_FUNCTION(nmod_poly_evaluate_nmod_vec_fast),
+    TEST_FUNCTION(nmod_poly_evaluate_geometric_nmod_vec_fast),
     TEST_FUNCTION(nmod_poly_exp_series),
+    TEST_FUNCTION(nmod_poly_extrapolate_geometric),
     TEST_FUNCTION(nmod_poly_find_distinct_nonzero_roots),
     TEST_FUNCTION(nmod_poly_fread_print),
     TEST_FUNCTION(nmod_poly_gcd),
     TEST_FUNCTION(nmod_poly_gcd_euclidean),
+    TEST_FUNCTION(nmod_poly_gcd_euclidean_redc_fast),
     TEST_FUNCTION(nmod_poly_gcd_hgcd),
     TEST_FUNCTION(nmod_poly_gcdinv),
     TEST_FUNCTION(nmod_poly_get_set_coeff_ui),
@@ -194,6 +208,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_barycentric),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_fast),
+    TEST_FUNCTION(nmod_poly_interpolate_geometric_nmod_vec_fast),
     TEST_FUNCTION(nmod_poly_interpolate_nmod_vec_newton),
     TEST_FUNCTION(nmod_poly_invmod),
     TEST_FUNCTION(nmod_poly_inv_series_basecase),
@@ -211,7 +226,11 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_mul_KS),
     TEST_FUNCTION(nmod_poly_mullow),
     TEST_FUNCTION(nmod_poly_mullow_classical),
+    TEST_FUNCTION(nmod_poly_mullow_fft_small_repack),
     TEST_FUNCTION(nmod_poly_mullow_KS),
+    TEST_FUNCTION(nmod_poly_mulmid),
+    TEST_FUNCTION(nmod_poly_mulmid_classical),
+    TEST_FUNCTION(nmod_poly_mulmid_KS),
     TEST_FUNCTION(nmod_poly_mulmod),
     TEST_FUNCTION(nmod_poly_mulmod_precond),
     TEST_FUNCTION(nmod_poly_mulmod_preinv),
@@ -248,6 +267,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_sqrt),
     TEST_FUNCTION(nmod_poly_sqrt_series),
     TEST_FUNCTION(nmod_poly_sub),
+    TEST_FUNCTION(nmod_poly_sub_ui),
     TEST_FUNCTION(nmod_poly_sub_series),
     TEST_FUNCTION(nmod_poly_tanh_series),
     TEST_FUNCTION(nmod_poly_tan_series),

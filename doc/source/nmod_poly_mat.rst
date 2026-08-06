@@ -124,6 +124,37 @@ Basic assignment and manipulation
     the contents of the structs.
 
 
+Window
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_poly_mat_window_init(nmod_poly_mat_t window, const nmod_poly_mat_t mat, slong r1, slong c1, slong r2, slong c2)
+
+    Initializes the matrix ``window`` to be an ``r2 - r1`` by
+    ``c2 - c1`` submatrix of ``mat`` whose ``(0,0)`` entry
+    is the ``(r1, c1)`` entry of ``mat``. The memory for the
+    elements of ``window`` is shared with ``mat``.
+
+.. function:: void nmod_poly_mat_window_clear(nmod_poly_mat_t window)
+
+    Clears the matrix ``window`` and releases any memory that it
+    uses. Note that the memory of the underlying matrix that
+    ``window`` points to is not freed.
+
+
+Concatenate
+--------------------------------------------------------------------------------
+
+
+.. function:: void nmod_poly_mat_concat_vertical(nmod_poly_mat_t res, const nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2)
+
+    Sets ``res`` to vertical concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `k \times n`, ``res`` : `(m + k) \times n`.
+
+.. function:: void nmod_poly_mat_concat_horizontal(nmod_poly_mat_t res, const nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2)
+
+    Sets ``res`` to horizontal concatenation of (``mat1``, ``mat2``) in that order. Matrix dimensions : ``mat1`` : `m \times n`, ``mat2`` : `m \times k`, ``res``  : `m \times (n + k)`.
+
+
 Input and output
 --------------------------------------------------------------------------------
 
@@ -408,7 +439,8 @@ Trace
 .. function:: void nmod_poly_mat_trace(nmod_poly_t trace, const nmod_poly_mat_t mat)
 
     Computes the trace of the matrix, i.e. the sum of the entries on
-    the main diagonal. The matrix is required to be square.
+    the main diagonal. The matrix is required to be square, which is not
+    checked.
 
 
 Determinant and rank
@@ -453,6 +485,7 @@ Inverse
 
     Sets (``Ainv``, ``den``) to the inverse matrix of ``A``.
     Returns 1 if ``A`` is nonsingular and 0 if ``A`` is singular.
+    ``A`` must be a square matrix, which is not checked.
     Aliasing of ``Ainv`` and ``A`` is allowed.
 
     More precisely, ``det`` will be set to the determinant of ``A``
@@ -492,6 +525,7 @@ Solving
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    ``A`` is assumed to be square; this is not checked.
     Returns 1 if `A` is nonsingular and 0 if `A` is singular.
     The computed denominator will not generally be minimal.
 
@@ -502,6 +536,7 @@ Solving
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}`.
+    ``A`` is assumed to be square; this is not checked.
     Returns 1 if `A` is nonsingular and 0 if `A` is singular.
     The computed denominator will not generally be minimal.
 
@@ -512,3 +547,22 @@ Solving
 
     Performs fraction-free forward and back substitution given a precomputed
     fraction-free LU decomposition and corresponding permutation.
+    The decomposition ``FFLU`` and permutation ``perm`` are assumed to come
+    from :func:`nmod_poly_mat_fflu` applied to a nonsingular square matrix;
+    this is not checked.
+
+
+.. function:: int nmod_poly_mat_mulmid_fft_small(nmod_poly_mat_t C, const nmod_poly_mat_t A, const nmod_poly_mat_t B, slong zl, slong zh)
+
+    Sets the entries of *C* to the coefficient windows `[zl, zh)` of the
+    entries of `A B`, computed with pointwise products on shared
+    fft_small transforms and windowed reconstruction. Returns 0 without
+    touching *C* if the method is unavailable for the modulus or shape.
+
+    When the full middle product exceeds the transform-storage budget
+    (``flint_fft_small_max_transformed_ring_size``),
+    ``nmod_poly_mat_mulmid_fft_small`` retries in row and column blocks
+    over matrix windows, halving the block size until it fits; the
+    window of a middle product is linear in the operands, so blocks
+    compose exactly. Squaring, detected as ``B == A``, keeps a single
+    transform pool.

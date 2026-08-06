@@ -11,7 +11,7 @@
 
 #include "arb.h"
 
-void
+static void
 _arb_sinc_derivative_bound(mag_t d, const arb_t x)
 {
     /* |f'(x)| < min(arb_get_mag(x), 1) / 2 */
@@ -26,7 +26,7 @@ _arb_sinc_derivative_bound(mag_t d, const arb_t x)
     mag_clear(one);
 }
 
-void
+static void
 _arb_sinc_direct(arb_t z, const arb_t x, slong prec)
 {
     /* z = sin(x) / x */

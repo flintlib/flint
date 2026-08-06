@@ -43,18 +43,23 @@ _gr_random_base_ring(flint_rand_t state)
     return _gr_some_base_rings + n_randint(state, sizeof(_gr_some_base_rings) / sizeof(gr_ctx_struct));
 }
 
-void
+static void
 gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
 {
     gr_ctx_struct * base_ring = _gr_random_base_ring(state);
 
-    switch (n_randint(state, 5))
+    switch (n_randint(state, 10))
     {
         case 0:
             gr_ctx_init_gr_poly(ctx, base_ring);
             break;
         case 1:
-            gr_ctx_init_gr_mpoly(ctx, base_ring, n_randint(state, 3), mpoly_ordering_randtest(state));
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                slong nvars = n_randint(state, 3);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_gr_mpoly(ctx, base_ring, nvars, ord);
+            }
             break;
         case 2:
             gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
@@ -65,17 +70,24 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
         case 4:
             gr_ctx_init_vector_space_gr_vec(ctx, base_ring, n_randint(state, 4));
             break;
-/*
-    this will break tests that currently assume commutativity
-
         case 5:
+            {
+                int flags = 0;
+                flags |= n_randint(state, 2) ? GR_DEBUG_WRAP : 0;
+                /* flags |= GR_DEBUG_VERBOSE; */
+                double unable_probability = n_randint(state, 2) ? 0 : 0.1;
+                gr_ctx_init_debug(ctx, base_ring, flags, unable_probability);
+            }
+            break;
+        /* generate with slightly higher probability, because this is currently
+           the only way we generate noncommutative test rings */
+        default:
             gr_ctx_init_matrix_ring(ctx, base_ring, n_randint(state, 4));
             break;
-*/
     }
 }
 
-void
+static void
 gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t t;
@@ -112,31 +124,79 @@ gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
 }
 
 void
-gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
+gr_ctx_init_random_finite_field(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t t;
     fmpz_init(t);
 
-    switch (n_randint(state, 3))
+    switch (n_randint(state, 9))
     {
-        case 0:
-            gr_ctx_init_fq_nmod(ctx, n_randtest_prime(state, 0), 1 + n_randint(state, 4), NULL);
+        case 0: gr_ctx_init_nmod8(ctx, 2); break;
+        case 1: gr_ctx_init_nmod8(ctx, 3); break;
+        case 2: gr_ctx_init_nmod8(ctx, 5); break;
+
+        case 3:
+            {
+                ulong p = n_randtest_prime(state, 0);
+                gr_ctx_init_nmod(ctx, p);
+                GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+            }
             break;
 
-        case 1:
-            gr_ctx_init_fq_zech(ctx, n_randprime(state, 4, 0), 1 + n_randint(state, 3), NULL);
+        case 4:
+            {
+                flint_bitcnt_t bits = 2 + n_randint(state, 70);
+                fmpz_randprime(t, state, bits, 0);
+                gr_ctx_init_fmpz_mod(ctx, t);
+                GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+            }
             break;
 
-        case 2:
-            fmpz_randprime(t, state, 2 + n_randint(state, 100), 0);
-            gr_ctx_init_fq(ctx, t, 1 + n_randint(state, 4), NULL);
+        case 5:
+            /* gr_ctx_init_mpn_mod_randtest is cheap and
+               generates primes with high probability */
+            while (1)
+            {
+                gr_ctx_init_mpn_mod_randtest(ctx, state);
+                if (gr_ctx_is_field(ctx) == T_TRUE)
+                    break;
+                else
+                    gr_ctx_clear(ctx);
+            } 
+            break;
+
+        case 6:
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                ulong p = n_randtest_prime(state, 0);
+                slong d = 1 + n_randint(state, 4);
+                gr_ctx_init_fq_nmod(ctx, p, d, NULL);
+            }
+            break;
+
+        case 7:
+            {
+                ulong p = n_randprime(state, 4, 0);
+                slong d = 1 + n_randint(state, 3);
+                gr_ctx_init_fq_zech(ctx, p, d, NULL);
+            }
+            break;
+
+        default:
+            {
+                flint_bitcnt_t bits = 2 + n_randint(state, 70);
+                slong d;
+                fmpz_randprime(t, state, bits, 0);
+                d = 1 + n_randint(state, 4);
+                gr_ctx_init_fq(ctx, t, d, NULL);
+            }
             break;
     }
 
     fmpz_clear(t);
 }
 
-void
+static void
 gr_ctx_init_random_ring_number_field(gr_ctx_t ctx, flint_rand_t state)
 {
     fmpz_poly_t g;
@@ -147,7 +207,16 @@ gr_ctx_init_random_ring_number_field(gr_ctx_t ctx, flint_rand_t state)
 
     do
     {
-        fmpz_poly_randtest_irreducible(g, state, 2 + n_randint(state, 5), 1 + n_randint(state, 10));
+        slong len;
+        flint_bitcnt_t bits;
+
+        /* The two n_randint calls below have side effects on `state`; we
+           split them into separate statements so the order of consumption
+           is the same on every architecture (C does not specify the order
+           in which function arguments are evaluated). */
+        len = 2 + n_randint(state, 5);
+        bits = 1 + n_randint(state, 10);
+        fmpz_poly_randtest_irreducible(g, state, len, bits);
     } while (g->length < 2);
 
     fmpq_poly_set_fmpz_poly(f, g);
@@ -159,7 +228,7 @@ gr_ctx_init_random_ring_number_field(gr_ctx_t ctx, flint_rand_t state)
     fmpq_poly_clear(f);
 }
 
-void
+static void
 gr_ctx_init_random_ring_real_complex_ball(gr_ctx_t ctx, flint_rand_t state)
 {
     if (n_randint(state, 2))
@@ -168,7 +237,7 @@ gr_ctx_init_random_ring_real_complex_ball(gr_ctx_t ctx, flint_rand_t state)
         gr_ctx_init_complex_acb(ctx, 2 + n_randint(state, 200));
 }
 
-void
+static void
 gr_ctx_init_random_ring_real_complex_exact(gr_ctx_t ctx, flint_rand_t state)
 {
     switch (n_randint(state, 4))
@@ -197,7 +266,7 @@ gr_ctx_init_random_ring_real_complex_exact(gr_ctx_t ctx, flint_rand_t state)
     }
 }
 
-void
+static void
 gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
 {
 
@@ -210,10 +279,19 @@ gr_ctx_init_random_ring_builtin_poly(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_fmpq_poly(ctx);
             break;
         case 2:
-            gr_ctx_init_fmpz_mpoly(ctx, n_randint(state, 3), mpoly_ordering_randtest(state));
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                slong nvars = n_randint(state, 3);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly(ctx, nvars, ord);
+            }
             break;
         case 3:
-            gr_ctx_init_fmpz_mpoly_q(ctx, n_randint(state, 2), mpoly_ordering_randtest(state));
+            {
+                slong nvars = n_randint(state, 2);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly_q(ctx, nvars, ord);
+            }
             break;
     }
 }
@@ -244,7 +322,7 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
             gr_ctx_init_random_ring_integers_mod(ctx, state);
             break;
         case 6:
-            gr_ctx_init_random_ring_finite_field(ctx, state);
+            gr_ctx_init_random_finite_field(ctx, state);
             break;
         case 7:
             gr_ctx_init_random_ring_number_field(ctx, state);
@@ -267,4 +345,84 @@ void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
     flint_printf("  ");
     gr_ctx_println(ctx);
 */
+}
+
+void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state)
+{
+    while (1)
+    {
+        gr_ctx_init_random(ctx, state);
+        if (gr_ctx_is_commutative_ring(ctx) == T_TRUE)
+            break;
+        gr_ctx_clear(ctx);
+    }
+}
+
+void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state)
+{
+    while (1)
+    {
+        gr_ctx_init_random(ctx, state);
+        if (gr_ctx_is_field(ctx) == T_TRUE)
+            break;
+        gr_ctx_clear(ctx);
+    }
+}
+
+void
+gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state)
+{
+    switch (n_randint(state, 8))
+    {
+        case 0:
+            gr_ctx_init_fmpz_poly(ctx);
+            break;
+        case 1:
+            gr_ctx_init_fmpq_poly(ctx);
+            break;
+        default:
+            gr_ctx_init_gr_poly(ctx, _gr_random_base_ring(state));
+            break;
+    }
+}
+
+void
+gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state)
+{
+    ordering_t ordering = mpoly_ordering_randtest(state);
+
+    switch (n_randint(state, 2))
+    {
+        case 0:
+            {
+                /* Split state-mutating calls so consumption order is architecture-independent. */
+                gr_ctx_struct * base = _gr_random_base_ring(state);
+                slong nvars = n_randint(state, 3);
+                gr_ctx_init_gr_mpoly(ctx, base, nvars, ordering);
+            }
+            break;
+        case 1:
+            {
+                slong nvars = n_randint(state, 3);
+                ordering_t ord = mpoly_ordering_randtest(state);
+                gr_ctx_init_fmpz_mpoly(ctx, nvars, ord);
+            }
+            break;
+    }
+}
+
+void
+gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
+{
+    gr_ctx_struct * base_ring = _gr_random_base_ring(state);
+
+    switch (n_randint(state, 2))
+    {
+        case 0:
+            gr_series_ctx_init(ctx, base_ring, n_randint(state, 6));
+            break;
+        case 1:
+            gr_series_mod_ctx_init(ctx, base_ring, n_randint(state, 6));
+            break;
+    }
 }

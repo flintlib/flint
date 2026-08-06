@@ -23,7 +23,7 @@ TEST_FUNCTION_START(gr_poly_divrem_newton, state)
         gr_ctx_t ctx;
         gr_poly_t A, B, Q, R, QBR;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         gr_poly_init(A, ctx);
         gr_poly_init(B, ctx);

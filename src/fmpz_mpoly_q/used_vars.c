@@ -13,7 +13,7 @@
 #include "fmpz_mpoly_q.h"
 
 /* ANDs used without zeroing */
-void
+static void
 _fmpz_mpoly_used_vars(int * used, const fmpz_mpoly_t f, const fmpz_mpoly_ctx_t ctx)
 {
     slong i, n;

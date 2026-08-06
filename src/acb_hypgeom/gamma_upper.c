@@ -12,10 +12,7 @@
 #include "acb.h"
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
-
-int
-acb_hypgeom_u_asymp_determine_region(const mag_t r,
-    const mag_t zlo, const acb_t z);
+#include "acb_hypgeom/impl.h"
 
 void
 acb_hypgeom_gamma_upper_asymp(acb_t res, const acb_t s,
@@ -391,7 +388,7 @@ _acb_is_nonnegative_real(const acb_t z)
     return arb_is_zero(acb_imagref(z)) && arb_is_nonnegative(acb_realref(z));
 }
 
-void
+static void
 acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 {
     if (!acb_is_finite(s) || !acb_is_finite(z))

@@ -22,7 +22,7 @@
 
 #define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
 
-void
+static void
 fmpz_mat_set_perm(fmpz_mat_t X, const slong * perm, const fmpz_mat_t B)
 {
     if (X == B)

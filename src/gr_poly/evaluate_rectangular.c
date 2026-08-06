@@ -22,15 +22,7 @@ _gr_poly_evaluate_rectangular(gr_ptr y, gr_srcptr poly,
 
     if (len <= 2)
     {
-        if (len == 0)
-            return gr_zero(y, ctx);
-
-        if (len == 1)
-            return gr_set(y, poly, ctx);
-
-        status |= gr_mul(y, x, GR_ENTRY(poly, 1, sz), ctx);
-        status |= gr_add(y, y, GR_ENTRY(poly, 0, sz), ctx);
-        return status;
+        return _gr_poly_evaluate_horner(y, poly, len, x, ctx);
     }
     else
     {
@@ -45,13 +37,15 @@ _gr_poly_evaluate_rectangular(gr_ptr y, gr_srcptr poly,
         GR_TMP_INIT3(s, t, c, ctx);
 
         status |= _gr_vec_set_powers(xs, x, m + 1, ctx);
-        status |= _gr_vec_dot(y, GR_ENTRY(poly, (r - 1) * m, sz), 0, GR_ENTRY(xs, 1, sz),
-            GR_ENTRY(poly, (r - 1) * m + 1, sz), len - (r - 1) * m - 1, ctx);
+        status |= _gr_vec_dot(y, GR_ENTRY(poly, (r - 1) * m, sz), 0,
+            GR_ENTRY(poly, (r - 1) * m + 1, sz),
+            GR_ENTRY(xs, 1, sz), len - (r - 1) * m - 1, ctx);
 
         for (i = r - 2; i >= 0; i--)
         {
-            status |= _gr_vec_dot(s, GR_ENTRY(poly, i * m, sz), 0, GR_ENTRY(xs, 1, sz),
-                GR_ENTRY(poly, i * m + 1, sz), m - 1, ctx);
+            status |= _gr_vec_dot(s, GR_ENTRY(poly, i * m, sz), 0,
+                GR_ENTRY(poly, i * m + 1, sz),
+                GR_ENTRY(xs, 1, sz), m - 1, ctx);
             status |= gr_mul(y, y, GR_ENTRY(xs, m, sz), ctx);
             status |= gr_add(y, y, s, ctx);
         }

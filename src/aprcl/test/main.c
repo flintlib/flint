@@ -28,6 +28,7 @@
 #include "t-unity_zp_mul3.c"
 #include "t-unity_zp_mul5.c"
 #include "t-unity_zp_mul7.c"
+#include "t-unity_zp_mpn.c"
 #include "t-unity_zp_mul.c"
 #include "t-unity_zp_pow_2k.c"
 #include "t-unity_zp_pow.c"
@@ -68,6 +69,7 @@ test_struct tests[] =
     TEST_FUNCTION(aprcl_unity_zp_mul3),
     TEST_FUNCTION(aprcl_unity_zp_mul5),
     TEST_FUNCTION(aprcl_unity_zp_mul7),
+    TEST_FUNCTION(aprcl_unity_zp_mpn),
     TEST_FUNCTION(aprcl_unity_zp_mul),
     TEST_FUNCTION(aprcl_unity_zp_pow_2k),
     TEST_FUNCTION(aprcl_unity_zp_pow),

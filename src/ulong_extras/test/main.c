@@ -12,6 +12,7 @@
 /* Include functions *********************************************************/
 
 #include "t-addmod.c"
+#include "t-binvert.c"
 #include "t-cbrt_binary_search.c"
 #include "t-cbrt.c"
 #include "t-cbrt_chebyshev_approx.c"
@@ -45,8 +46,6 @@
 #include "t-gcd.c"
 #include "t-gcdinv.c"
 #include "t-invmod.c"
-#include "t-is_oddprime_binary.c"
-#include "t-is_oddprime_small.c"
 #include "t-is_perfect_power235.c"
 #include "t-is_perfect_power.c"
 #include "t-is_prime.c"
@@ -62,10 +61,16 @@
 #include "t-is_strong_probabprime2_preinv.c"
 #include "t-is_strong_probabprime_precomp.c"
 #include "t-jacobi.c"
+#include "t-ll_is_prime.c"
 #include "t-lll_mod_preinv.c"
+#include "t-ll_factor_ecm.c"
+#include "t-ll_factor_rho.c"
 #include "t-ll_mod_preinv.c"
+#include "t-ll_small_powmod.c"
 #include "t-mod2_precomp.c"
 #include "t-mod2_preinv.c"
+#include "t-mod_barrett.c"
+#include "t-mod_lemire.c"
 #include "t-mod_precomp.c"
 #include "t-moebius_mu.c"
 #include "t-mulmod2.c"
@@ -75,6 +80,7 @@
 #include "t-mulmod_shoup.c"
 #include "t-mulmod_and_precomp_shoup.c"
 #include "t-nextprime.c"
+#include "t-nonzero_sizeinbase10.c"
 #include "t-nth_prime_bounds.c"
 #include "t-urandint.c"
 #include "t-pow.c"
@@ -110,6 +116,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(n_addmod),
+    TEST_FUNCTION(n_binvert),
     TEST_FUNCTION(n_cbrt_binary_search),
     TEST_FUNCTION(n_cbrt),
     TEST_FUNCTION(n_cbrt_chebyshev_approx),
@@ -143,8 +150,6 @@ test_struct tests[] =
     TEST_FUNCTION(n_gcd),
     TEST_FUNCTION(n_gcdinv),
     TEST_FUNCTION(n_invmod),
-    TEST_FUNCTION(n_is_oddprime_binary),
-    TEST_FUNCTION(n_is_oddprime_small),
     TEST_FUNCTION(n_is_perfect_power235),
     TEST_FUNCTION(n_is_perfect_power),
     TEST_FUNCTION(n_is_prime),
@@ -160,10 +165,16 @@ test_struct tests[] =
     TEST_FUNCTION(n_is_strong_probabprime2_preinv),
     TEST_FUNCTION(n_is_strong_probabprime_precomp),
     TEST_FUNCTION(n_jacobi),
+    TEST_FUNCTION(n_ll_is_prime),
     TEST_FUNCTION(n_lll_mod_preinv),
+    TEST_FUNCTION(n_ll_factor_ecm),
+    TEST_FUNCTION(n_ll_factor_rho),
     TEST_FUNCTION(n_ll_mod_preinv),
+    TEST_FUNCTION(n_ll_small_powmod),
     TEST_FUNCTION(n_mod2_precomp),
     TEST_FUNCTION(n_mod2_preinv),
+    TEST_FUNCTION(n_mod_barrett),
+    TEST_FUNCTION(n_mod_lemire),
     TEST_FUNCTION(n_mod_precomp),
     TEST_FUNCTION(n_moebius_mu),
     TEST_FUNCTION(n_mulmod2),
@@ -173,6 +184,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_mulmod_shoup),
     TEST_FUNCTION(n_mulmod_and_precomp_shoup),
     TEST_FUNCTION(n_nextprime),
+    TEST_FUNCTION(n_nonzero_sizeinbase10),
     TEST_FUNCTION(n_nth_prime_bounds),
     TEST_FUNCTION(n_urandint),
     TEST_FUNCTION(n_pow),

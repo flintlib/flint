@@ -11,7 +11,7 @@
 
 #include "arb.h"
 
-void
+static void
 _arb_const_log_sqrt2pi(arb_t t, slong prec)
 {
     arb_const_pi(t, prec + 2);

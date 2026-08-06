@@ -34,14 +34,14 @@ const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[] =
     flint_mpn_sqrhigh_8
 };
 #else
-mp_limb_t flint_mpn_sqrhigh_1(mp_ptr res, mp_srcptr u)
+static mp_limb_t flint_mpn_sqrhigh_1(mp_ptr res, mp_srcptr u)
 {
     mp_limb_t low;
     umul_ppmm(res[0], low, u[0], u[0]);
     return low;
 }
 
-mp_limb_t flint_mpn_sqrhigh_2(mp_ptr res, mp_srcptr u)
+static mp_limb_t flint_mpn_sqrhigh_2(mp_ptr res, mp_srcptr u)
 {
     mp_limb_t b, low;
     FLINT_MPN_SQR_2X2(res[1], res[0], low, b, u[1], u[0]);

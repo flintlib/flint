@@ -27,6 +27,8 @@
 #include "t-can_solve_fflu.c"
 #include "t-can_solve_multi_mod_den.c"
 #include "t-charpoly_berkowitz.c"
+#include "t-charpoly_bound.c"
+#include "t-charpoly_modular.c"
 #include "t-charpoly.c"
 #include "t-chol_d.c"
 #include "t-col_partition.c"
@@ -40,6 +42,7 @@
 #include "t-det_divisor.c"
 #include "t-det_modular_accelerated.c"
 #include "t-det_modular.c"
+#include "t-elementary_divisors.c"
 #include "t-entry.c"
 #include "t-equal.c"
 #include "t-fmpz_vec_mul.c"
@@ -61,6 +64,7 @@
 #include "t-init_clear.c"
 #include "t-inv.c"
 #include "t-invert_rows_cols.c"
+#include "t-is_diagonal.c"
 #include "t-is_empty.c"
 #include "t-is_one.c"
 #include "t-is_spd.c"
@@ -74,6 +78,7 @@
 #include "t-mul_blas.c"
 #include "t-mul.c"
 #include "t-mul_classical.c"
+#include "t-mul_fft_small.c"
 #include "t-mul_double_word.c"
 #include "t-mul_fft.c"
 #include "t-mul_fmpz_vec.c"
@@ -103,9 +108,11 @@
 #include "t-scalar_mul_si.c"
 #include "t-scalar_mul_ui.c"
 #include "t-scalar_smod.c"
+#include "t-snf.c"
 #include "t-snf_diagonal.c"
 #include "t-snf_iliopoulos.c"
 #include "t-snf_kannan_bachem.c"
+#include "t-snf_transform.c"
 #include "t-solve_bound.c"
 #include "t-solve.c"
 #include "t-solve_cramer.c"
@@ -127,6 +134,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_can_solve_fflu),
     TEST_FUNCTION(fmpz_mat_can_solve_multi_mod_den),
     TEST_FUNCTION(fmpz_mat_charpoly_berkowitz),
+    TEST_FUNCTION(fmpz_mat_charpoly_bound),
+    TEST_FUNCTION(fmpz_mat_charpoly_modular),
     TEST_FUNCTION(fmpz_mat_charpoly),
     TEST_FUNCTION(fmpz_mat_chol_d),
     TEST_FUNCTION(fmpz_mat_col_partition),
@@ -140,6 +149,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_det_divisor),
     TEST_FUNCTION(fmpz_mat_det_modular_accelerated),
     TEST_FUNCTION(fmpz_mat_det_modular),
+    TEST_FUNCTION(fmpz_mat_elementary_divisors),
     TEST_FUNCTION(fmpz_mat_entry),
     TEST_FUNCTION(fmpz_mat_equal),
     TEST_FUNCTION(fmpz_mat_fmpz_vec_mul),
@@ -161,6 +171,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_init_clear),
     TEST_FUNCTION(fmpz_mat_inv),
     TEST_FUNCTION(fmpz_mat_invert_rows_cols),
+    TEST_FUNCTION(fmpz_mat_is_diagonal),
     TEST_FUNCTION(fmpz_mat_is_empty),
     TEST_FUNCTION(fmpz_mat_is_one),
     TEST_FUNCTION(fmpz_mat_is_spd),
@@ -174,6 +185,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_mul_blas),
     TEST_FUNCTION(fmpz_mat_mul),
     TEST_FUNCTION(fmpz_mat_mul_classical),
+    TEST_FUNCTION(fmpz_mat_mul_fft_small),
     TEST_FUNCTION(fmpz_mat_mul_double_word),
     TEST_FUNCTION(fmpz_mat_mul_fft),
     TEST_FUNCTION(fmpz_mat_mul_fmpz_vec),
@@ -203,9 +215,11 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_scalar_mul_si),
     TEST_FUNCTION(fmpz_mat_scalar_mul_ui),
     TEST_FUNCTION(fmpz_mat_scalar_smod),
+    TEST_FUNCTION(fmpz_mat_snf),
     TEST_FUNCTION(fmpz_mat_snf_diagonal),
     TEST_FUNCTION(fmpz_mat_snf_iliopoulos),
     TEST_FUNCTION(fmpz_mat_snf_kannan_bachem),
+    TEST_FUNCTION(fmpz_mat_snf_transform),
     TEST_FUNCTION(fmpz_mat_solve_bound),
     TEST_FUNCTION(fmpz_mat_solve),
     TEST_FUNCTION(fmpz_mat_solve_cramer),

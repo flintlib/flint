@@ -38,8 +38,12 @@
 #include "t-permanent.c"
 #include "t-rref.c"
 #include "t-scalar_div_fmpz.c"
+#include "t-scalar_div_si.c"
+#include "t-scalar_div_ui.c"
 #include "t-scalar_mul_fmpq.c"
 #include "t-scalar_mul_fmpz.c"
+#include "t-scalar_mul_si.c"
+#include "t-scalar_mul_ui.c"
 #include "t-solve.c"
 #include "t-solve_dixon.c"
 #include "t-solve_fmpz_mat.c"
@@ -84,8 +88,12 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_mat_permanent),
     TEST_FUNCTION(fmpq_mat_rref),
     TEST_FUNCTION(fmpq_mat_scalar_div_fmpz),
+    TEST_FUNCTION(fmpq_mat_scalar_div_si),
+    TEST_FUNCTION(fmpq_mat_scalar_div_ui),
     TEST_FUNCTION(fmpq_mat_scalar_mul_fmpq),
     TEST_FUNCTION(fmpq_mat_scalar_mul_fmpz),
+    TEST_FUNCTION(fmpq_mat_scalar_mul_ui),
+    TEST_FUNCTION(fmpq_mat_scalar_mul_si),
     TEST_FUNCTION(fmpq_mat_solve),
     TEST_FUNCTION(fmpq_mat_solve_dixon),
     TEST_FUNCTION(fmpq_mat_solve_fmpz_mat),

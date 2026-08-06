@@ -134,13 +134,13 @@ _flint_mpn_sqrhigh_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_size_t n)
     /* Corrections for precise high product (not needed for the
        original Mulders). */
     {
-        mp_limb_t hi, lo;
+        mp_limb_t hi;
 
         /* Note: if we relax the condition on k, we will need
            a branch for k == l here to avoid double counting. */
         FLINT_ASSERT(k != l);
 
-        umul_ppmm(hi, lo, np[k - 1], np[l - 1]);
+        hi = n_mulhi(np[k - 1], np[l - 1]);
         MPN_INCR_U(rp + n - 1, n + 1, hi);
         MPN_INCR_U(rp + n - 1, n + 1, hi);
     }
@@ -176,6 +176,21 @@ _flint_mpn_sqrhigh_sqr(mp_ptr res, mp_srcptr u, mp_size_t n)
     return bot;
 }
 
+#if FLINT_HAVE_FFT_SMALL
+
+mp_limb_t
+_flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
+{
+    if (n <= FLINT_MPN_SQRHIGH_MULDERS_CUTOFF)
+        return _flint_mpn_sqrhigh_basecase(res, u, n);
+    else if (n <= FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF)
+        return _flint_mpn_sqrhigh_mulders(res, u, n);
+    else
+        return _flint_mpn_mulhigh_n_fft_small(res, u, u, n);
+}
+
+#else
+
 mp_limb_t
 _flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
 {
@@ -186,6 +201,9 @@ _flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
     else
         return _flint_mpn_sqrhigh_sqr(res, u, n);
 }
+
+#endif
+
 
 mp_limb_pair_t _flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 {

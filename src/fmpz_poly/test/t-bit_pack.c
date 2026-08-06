@@ -40,7 +40,7 @@ TEST_FUNCTION_START(fmpz_poly_bit_pack, state)
 
         _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, negate);
         fmpz_poly_fit_length(b, a->length);
-        _fmpz_poly_bit_unpack(b->coeffs, a->length, arr, bits, negate);
+        _fmpz_poly_bit_unpack(b->coeffs, 0, a->length, arr, bits, negate);
         _fmpz_poly_set_length(b, a->length);
 
         result = (fmpz_poly_equal(a, b));
@@ -76,7 +76,7 @@ TEST_FUNCTION_START(fmpz_poly_bit_pack, state)
 
         _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, 0);
         fmpz_poly_fit_length(b, a->length);
-        _fmpz_poly_bit_unpack_unsigned(b->coeffs, a->length, arr, bits);
+        _fmpz_poly_bit_unpack_unsigned(b->coeffs, 0, a->length, arr, bits);
         _fmpz_poly_set_length(b, a->length);
 
         result = (fmpz_poly_equal(a, b));

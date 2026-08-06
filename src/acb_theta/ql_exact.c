@@ -550,9 +550,7 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
     flint_free(easy_steps);
     acb_mat_clear(new_tau);
     if (all)
-    {
         _acb_vec_clear(rts_all, nb * n * n);
-    }
 }
 
 void

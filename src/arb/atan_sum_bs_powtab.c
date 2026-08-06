@@ -12,10 +12,7 @@
 #include "thread_support.h"
 #include "fmpz_vec.h"
 #include "arb.h"
-
-slong _arb_compute_bs_exponents(slong * tab, slong n);
-
-slong _arb_get_exp_pos(const slong * tab, slong step);
+#include "arb/impl.h"
 
 static void
 bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
@@ -88,13 +85,13 @@ atan_bsplit_struct;
 
 typedef atan_bsplit_struct atan_bsplit_t[1];
 
-static void atan_bsplit_init(atan_bsplit_t x, void * args)
+static void atan_bsplit_init(atan_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_init(x->T);
     fmpz_init(x->Q);
 }
 
-static void atan_bsplit_clear(atan_bsplit_t x, void * args)
+static void atan_bsplit_clear(atan_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_clear(x->T);
     fmpz_clear(x->Q);

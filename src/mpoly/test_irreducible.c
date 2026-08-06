@@ -409,7 +409,7 @@ again:
 #endif
 
 /* is A intersect B empty? */
-int point2d_set_disjoint(
+static int point2d_set_disjoint(
     const point2d_set_t A,
     const point2d_set_t B)
 {

@@ -64,6 +64,34 @@ FMPZ_VEC_INLINE fmpz * _fmpz_vec_init(slong len)
 
 void _fmpz_vec_clear(fmpz * vec, slong len);
 
+/* Resizable vector objects */
+
+void fmpz_vec_init(fmpz_vec_t vec, slong len);
+void fmpz_vec_clear(fmpz_vec_t vec);
+void fmpz_vec_set(fmpz_vec_t res, const fmpz_vec_t src);
+void fmpz_vec_fit_length(fmpz_vec_t vec, slong len);
+void fmpz_vec_set_length(fmpz_vec_t vec, slong len);
+void fmpz_vec_append(fmpz_vec_t vec, const fmpz_t f);
+void fmpz_vec_append_ui(fmpz_vec_t vec, ulong f);
+ 
+FMPZ_VEC_INLINE slong
+fmpz_vec_length(const fmpz_vec_t vec)
+{
+    return vec->length;
+}
+ 
+FMPZ_VEC_INLINE fmpz *
+fmpz_vec_entry_ptr(fmpz_vec_t vec, slong i)
+{
+    return vec->entries + i;
+}
+ 
+FMPZ_VEC_INLINE const fmpz *
+fmpz_vec_entry_srcptr(const fmpz_vec_t vec, slong i)
+{
+    return vec->entries + i;
+}
+
 /*  Randomisation  ***********************************************************/
 
 void _fmpz_vec_randtest(fmpz * f, flint_rand_t state, slong len, flint_bitcnt_t bits);
@@ -181,6 +209,8 @@ void _fmpz_ui_vec_prod(fmpz_t res, nn_srcptr vec, slong len);
 
 void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p);
 void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p);
+
+void _fmpz_vec_multi_CRT_ui(fmpz * res, nn_srcptr * residues, slong len, nn_srcptr primes, slong num_primes, int sign);
 
 /*  Gaussian content  ********************************************************/
 

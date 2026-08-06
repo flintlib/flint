@@ -12,8 +12,7 @@
 #include "ulong_extras.h"
 #include "acb.h"
 #include "acb_hypgeom.h"
-
-void acb_hypgeom_mag_chi(mag_t chi, ulong n);
+#include "acb_hypgeom/impl.h"
 
 static int
 arg_lt_2pi3(const acb_t z, const acb_t zeta)
@@ -33,7 +32,7 @@ arg_lt_2pi3(const acb_t z, const acb_t zeta)
 }
 
 /* assuming a >= b >= c >= d, e >= f */
-void
+static void
 _acb_mul4div2_ui(acb_t x, ulong a, ulong b, ulong c, ulong d, ulong e, ulong f, slong prec)
 {
     if (a < (UWORD(1) << (FLINT_BITS / 4)))
@@ -64,7 +63,7 @@ _acb_mul4div2_ui(acb_t x, ulong a, ulong b, ulong c, ulong d, ulong e, ulong f, 
     }
 }
 
-void
+static void
 acb_hypgeom_airy_asymp_sum(acb_t s0even, acb_t s0odd,
         acb_t s1even, acb_t s1odd,
         mag_t t0n, mag_t t1n,
@@ -190,7 +189,7 @@ acb_hypgeom_airy_asymp_sum(acb_t s0even, acb_t s0odd,
     _acb_vec_clear(z2pow, m + 1);
 }
 
-void
+static void
 acb_hypgeom_airy_asymp_bound_factor(mag_t bound, const acb_t z, const acb_t zeta, ulong n)
 {
     mag_t t, u, v;

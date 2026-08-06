@@ -15,17 +15,17 @@
 #include "gr_poly.h"
 
 int
-_gr_poly_mullow_bivariate_KS(gr_ptr res,
+_gr_poly_mulmid_bivariate_KS(gr_ptr res,
     gr_srcptr poly1, slong len1,
-    gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+    gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    slong i, l, max_len1, max_len2, inner_len;
+    slong i, l, max_len1, max_len2, inner_len, n;
     gr_ctx_struct * cctx;
     gr_ctx_t tmp_ctx;
     const gr_poly_struct * ppoly1, * ppoly2;
     gr_poly_struct * pres;
     gr_ptr R, P1, P2, pp, tmp_zero;
-    slong csz;
+    slong sz, csz;
     int status = GR_SUCCESS;
     int squaring;
 
@@ -42,10 +42,36 @@ _gr_poly_mullow_bivariate_KS(gr_ptr res,
     else
         return GR_UNABLE;
 
+    sz = ctx->sizeof_elem;
     csz = cctx->sizeof_elem;
 
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 = GR_ENTRY(poly1, trunc, sz);
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 = GR_ENTRY(poly2, trunc, sz);
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
+    n = nhi - nlo;
 
     squaring = (poly1 == poly2) && (len1 == len2);
     ppoly1 = poly1;
@@ -81,12 +107,12 @@ _gr_poly_mullow_bivariate_KS(gr_ptr res,
 
     GR_TMP_INIT_VEC(R, n * inner_len, cctx);
     GR_TMP_INIT_VEC(tmp_zero, inner_len, cctx);
-    P1 = GR_TMP_ALLOC(len1 * inner_len * cctx->sizeof_elem);
+    P1 = GR_TMP_ALLOC(len1 * inner_len * csz);
 
     if (squaring)
         P2 = P1;
     else
-        P2 = GR_TMP_ALLOC(len2 * inner_len * cctx->sizeof_elem);
+        P2 = GR_TMP_ALLOC(len2 * inner_len * csz);
 
     for (i = 0; i < len1; i++)
     {
@@ -105,7 +131,7 @@ _gr_poly_mullow_bivariate_KS(gr_ptr res,
         }
     }
 
-    status = _gr_poly_mullow(R, P1, len1 * inner_len, P2, len2 * inner_len, n * inner_len, cctx);
+    status = _gr_poly_mulmid(R, P1, len1 * inner_len, P2, len2 * inner_len, nlo * inner_len, nhi * inner_len, cctx);
 
     for (i = 0; i < n; i++)
     {
@@ -120,10 +146,56 @@ _gr_poly_mullow_bivariate_KS(gr_ptr res,
 
     GR_TMP_CLEAR_VEC(R, n * inner_len, cctx);
     GR_TMP_CLEAR_VEC(tmp_zero, inner_len, cctx);
-    GR_TMP_FREE(P1, len1 * inner_len * cctx->sizeof_elem);
+    GR_TMP_FREE(P1, len1 * inner_len * csz);
     if (!squaring)
-        GR_TMP_FREE(P2, len2 * inner_len * cctx->sizeof_elem);
+        GR_TMP_FREE(P2, len2 * inner_len * csz);
 
+    return status;
+}
+
+int
+_gr_poly_mullow_bivariate_KS(gr_ptr res,
+    gr_srcptr poly1, slong len1,
+    gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_poly_mulmid_bivariate_KS(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
+int
+gr_poly_mulmid_bivariate_KS(gr_poly_t res, const gr_poly_t poly1,
+                                            const gr_poly_t poly2,
+                                                slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    int status;
+    slong len;
+
+    FLINT_ASSERT(nlo >= 0);
+    FLINT_ASSERT(nhi >= 0);
+
+    if (len1 == 0 || len2 == 0 || nlo >= FLINT_MIN(nhi, len1 + len2 - 1))
+        return gr_poly_zero(res, ctx);
+
+    nhi = FLINT_MIN(nhi, len1 + len2 - 1);
+    len = nhi - nlo;
+
+    if (res == poly1 || res == poly2)
+    {
+        gr_poly_t t;
+        gr_poly_init2(t, len, ctx);
+        status = _gr_poly_mulmid_bivariate_KS(t->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, nlo, nhi, ctx);
+        gr_poly_swap(res, t, ctx);
+        gr_poly_clear(t, ctx);
+    }
+    else
+    {
+        gr_poly_fit_length(res, len, ctx);
+        status = _gr_poly_mulmid_bivariate_KS(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, nlo, nhi, ctx);
+    }
+
+    _gr_poly_set_length(res, len, ctx);
+    _gr_poly_normalise(res, ctx);
     return status;
 }
 

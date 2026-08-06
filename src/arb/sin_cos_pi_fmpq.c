@@ -12,7 +12,7 @@
 #include "arb.h"
 
 static int
-use_algebraic(const fmpz_t v, const fmpz_t w, slong prec)
+use_algebraic(const fmpz_t FLINT_UNUSED(v), const fmpz_t w, slong prec)
 {
     fmpz q = *w;
     int r;
@@ -38,7 +38,7 @@ use_algebraic(const fmpz_t v, const fmpz_t w, slong prec)
     return 1;
 }
 
-void
+static void
 _arb_sin_cos_pi_fmpq_oct(arb_t s, arb_t c,
             const fmpz_t v, const fmpz_t w, slong prec)
 {
@@ -55,7 +55,7 @@ _arb_sin_cos_pi_fmpq_oct(arb_t s, arb_t c,
     }
 }
 
-void
+static void
 _arb_sin_pi_fmpq_oct(arb_t s, const fmpz_t v, const fmpz_t w, slong prec)
 {
     if (use_algebraic(v, w, prec))
@@ -71,7 +71,7 @@ _arb_sin_pi_fmpq_oct(arb_t s, const fmpz_t v, const fmpz_t w, slong prec)
     }
 }
 
-void
+static void
 _arb_cos_pi_fmpq_oct(arb_t c, const fmpz_t v, const fmpz_t w, slong prec)
 {
     if (use_algebraic(v, w, prec))

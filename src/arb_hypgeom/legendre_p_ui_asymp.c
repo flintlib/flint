@@ -167,7 +167,7 @@ _arb_hypgeom_legendre_p_ui_asymp_error(mag_t res, ulong n, const mag_t y, slong 
     mag_clear(u);
 }
 
-int
+static int
 arb_abs_le_ui(const arb_t x, ulong n)
 {
     arf_struct u[3];
@@ -199,7 +199,7 @@ arb_abs_le_ui(const arb_t x, ulong n)
     return res;
 }
 
-void
+static void
 _arb_hypgeom_legendre_p_ui_asymp(arb_t res, ulong n, const arb_t x,
     const arb_t y, acb_srcptr w4pow, const arb_t binom, slong m, slong K, slong prec)
 {

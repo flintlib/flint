@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
-int _fq_zech_mpoly_equal(const fq_zech_struct * coeff1, const ulong * exp1,
+static int _fq_zech_mpoly_equal(const fq_zech_struct * coeff1, const ulong * exp1,
                          const fq_zech_struct * coeff2, const ulong * exp2,
                              slong len, slong N, const fq_zech_mpoly_ctx_t ctx)
 {

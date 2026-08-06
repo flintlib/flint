@@ -206,6 +206,7 @@ void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N);
 
 void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
+int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N);
 int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 void padic_pow_si(padic_t rop, const padic_t op, slong e, const padic_ctx_t ctx);

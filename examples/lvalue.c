@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     dirichlet_char_init(chi, G);
     dirichlet_char_log(chi, G, n);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     if (zfunction)
         acb_dirichlet_hardy_z(z, s, G, chi, len, prec);
     else
@@ -104,8 +104,8 @@ int main(int argc, char *argv[])
         flint_printf("\n");
     }
 
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     _acb_vec_clear(z, len);
     acb_clear(s);

@@ -22,6 +22,6 @@ dlog_vec_sieve_add(ulong *v, ulong nv, ulong a, ulong va, nmod_t mod, ulong na, 
     /* write in v */
     for (k = 0; k < nv; k++)
         if (v[k] != DLOG_NOT_FOUND)
-            v[k] = nmod_add(v[k], w[k], order);
+            v[k] = nmod_ui_add_ui(v[k], w[k], order);
     flint_free(w);
 }

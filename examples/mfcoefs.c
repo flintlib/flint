@@ -14,24 +14,24 @@
 */
 
 #include <stdlib.h>
-#include <flint.h>
+#include <flint/flint.h>
 
 #if FLINT_HAVE_FFT_SMALL
 
 #include <stdio.h>
 #include <string.h>
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "nmod_mat.h"
-#include "fft_small.h"
-#include "fmpz.h"
-#include "arith.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
-#include "fmpz_mat.h"
-#include "dirichlet.h"
-#include "profiler.h"
+#include <flint/ulong_extras.h>
+#include <flint/nmod_vec.h>
+#include <flint/nmod_poly.h>
+#include <flint/nmod_mat.h>
+#include <flint/fft_small.h>
+#include <flint/fmpz.h>
+#include <flint/arith.h>
+#include <flint/fmpz_poly.h>
+#include <flint/fmpq_poly.h>
+#include <flint/fmpz_mat.h>
+#include <flint/dirichlet.h>
+#include <flint/profiler.h>
 
 /*
  Fast computation of modular forms coefficients via
@@ -395,6 +395,7 @@ _nmod_poly_eisenstein_series(nn_ptr z, slong len, slong k, mf_char_ctx_t psi, co
         for (pe = p, pe1 = 1; pe < len; pe1 = pe, pe *= p)
             z[pe] = nmod_add(nmod_mul(z[pe1], cp, mod), 1, mod);
     }
+    n_primes_clear(iter);
     /* then fill composite */
     for (k = 0; k < size; k++)
         z[tab[k].n] = nmod_mul(z[tab[k].a], z[tab[k].b], mod);
@@ -705,6 +706,7 @@ int main(int argc, char * argv[])
             nmod_mat_clear(a);
         }
     }
+    flint_cleanup_master();
 }
 
 #else

@@ -14,24 +14,6 @@
 #include "acb_dirichlet.h"
 
 void
-acb_zeta_si(acb_t z, slong s, slong prec)
-{
-    if (s >= 0)
-    {
-        arb_zeta_ui(acb_realref(z), s, prec);
-    }
-    else
-    {
-        arb_bernoulli_ui(acb_realref(z), 1-s, prec);
-        arb_div_ui(acb_realref(z), acb_realref(z), 1-s, prec);
-        arb_neg(acb_realref(z), acb_realref(z));
-    }
-
-    arb_zero(acb_imagref(z));
-    return;
-}
-
-void
 acb_hurwitz_zeta(acb_t z, const acb_t s, const acb_t a, slong prec)
 {
     acb_dirichlet_hurwitz(z, s, a, prec);

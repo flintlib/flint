@@ -14,10 +14,11 @@
 void
 arb_poly_set_coeff_arb(arb_poly_t poly, slong n, const arb_t x)
 {
-    arb_poly_fit_length(poly, n + 1);
-
     if (n + 1 > poly->length)
     {
+        if (arb_is_zero(x))
+            return;
+        arb_poly_fit_length(poly, n + 1);
         _arb_vec_zero(poly->coeffs + poly->length, n - poly->length);
         poly->length = n + 1;
     }

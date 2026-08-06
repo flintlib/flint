@@ -36,7 +36,7 @@ fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
     }
 }
 
-void _fmpz_mod_mpoly_mul_johnson1(
+static void _fmpz_mod_mpoly_mul_johnson1(
     fmpz_mod_mpoly_t A,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
     const fmpz * Ccoeffs, const ulong * Cexps, slong Clen,
@@ -465,9 +465,7 @@ void _fmpz_mod_mpoly_mul_johnson_maxfields(
     Abits = FLINT_MAX(Abits, C->bits);
     Abits = mpoly_fix_bits(Abits, ctx->minfo);
 
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, ctx->minfo);
 
     /* ensure input exponents are packed into same sized fields as output */
     if (Abits != B->bits)

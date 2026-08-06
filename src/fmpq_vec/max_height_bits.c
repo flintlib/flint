@@ -10,6 +10,7 @@
 */
 
 #include "fmpq.h"
+#include "fmpq_vec.h"
 
 flint_bitcnt_t
 _fmpq_vec_max_height_bits(const fmpq * vec, slong len)

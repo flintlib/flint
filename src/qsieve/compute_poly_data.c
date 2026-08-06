@@ -123,7 +123,9 @@ int qsieve_init_A(qs_t qs_inf)
             */
             low = factor_bound[i - 1 - (i <= 10)];
             high = factor_bound[i + 1];
-            break;
+            /* If this would re-use the same range as before (which failed to give
+               enough A-values), try a wider range by continuing to smaller i. */
+            if (low != qs_inf->low || high != qs_inf->high) break;
         }
         else if (rem <= num_factors)
         {
@@ -135,7 +137,7 @@ int qsieve_init_A(qs_t qs_inf)
             {
                 low = factor_bound[i - (i <= 9)];
                 high = factor_bound[i + 2];
-                break;
+                if (low != qs_inf->low || high != qs_inf->high) break;
             }
         }
         else if (i - rem <= num_factors)
@@ -151,7 +153,7 @@ int qsieve_init_A(qs_t qs_inf)
                 num_factors++;
                 low = factor_bound[i - 1 - (i <= 10)];
                 high = factor_bound[i + 1];
-                break;
+                if (low != qs_inf->low || high != qs_inf->high) break;
             }
         }
     }
@@ -166,6 +168,10 @@ int qsieve_init_A(qs_t qs_inf)
 
     s = num_factors;
     qs_inf->s = s;
+    /* Save low/high now so that even if init_A fails, the next call knows what
+       parameters were attempted and can try a different (wider) range. */
+    qs_inf->low = low;
+    qs_inf->high = high;
 
 #if QS_DEBUG
     flint_printf("s = %wd\n", s);
@@ -219,6 +225,20 @@ int qsieve_init_A(qs_t qs_inf)
         for (j = 0; j < s - 1; j++) /* first s - 1 allowed primes, indices not 0 mod 4 */
             curr_subset[j] = j;
 
+        /* O(s) pre-check: the initial curr_subset {0,1,...,s-2} gives the smallest
+           possible product.  If even that product times the smallest 0-mod-4 prime
+           exceeds upper_bound, every subsequent (lex-larger) subset also fails.
+           Exit now rather than exhausting O(C(span, s-1)) iterations. */
+        fmpz_set_ui(prod, 1);
+        for (j = 0; j < s - 1; j++)
+            fmpz_mul_ui(prod, prod, factor_base[4*curr_subset[j]/3 + 1 + low].p);
+        fmpz_mul_ui(temp, prod, factor_base[low].p);
+        if (fmpz_cmp(temp, upper_bound) > 0)
+        {
+            ret = 0;
+            goto init_A_cleanup;
+        }
+
         /* search until we find A of the right size, or until we run out of allowed primes */
         while (1)
         {
@@ -268,6 +288,17 @@ int qsieve_init_A(qs_t qs_inf)
 
             /* (s - 1)-tuple failed, step to next (s - 1)-tuple */
             h = (4*(m + h + 1)/3 >= span) ? h + 1 : 1;
+
+            /* h must not exceed s - 1: if it does the index s - h - 1
+               goes negative and we have exhausted all (s-1)-subsets */
+            if (h >= s)
+            {
+                ret = 0;
+                goto init_A_cleanup;
+            }
+
+
+
             m = curr_subset[s - h - 1] + 1;
 
             for (j = 0; j < h; j++)
@@ -445,6 +476,15 @@ int qsieve_next_A(qs_t qs_inf)
             }
 
             h = (4*(m + diff + h + 1)/3 >= span) ? h + 1 : 1;
+
+            /* h must not exceed s - 2: if it does the index s - 2 - h
+               goes negative and we have exhausted all valid (s-1)-subsets */
+            if (h > s - 2)
+            {
+                ret = 0;
+                goto next_A_cleanup;
+            }
+
             m = curr_subset[s - 2 - h] + 1 + ((m%diff) == 0);
             if (h == 2)
                inc_diff = 1;
@@ -549,6 +589,8 @@ void qsieve_init_poly_first(qs_t qs_inf)
     int * soln1 = qs_inf->soln1;
     int * soln2 = qs_inf->soln2;
     ulong p, pinv, temp, temp2;
+    ulong * B_ui = NULL;
+    int small_A, small_B;
 
 #if QS_DEBUG
     qs_inf->poly_count += 1;
@@ -588,12 +630,55 @@ void qsieve_init_poly_first(qs_t qs_inf)
         fmpz_add(qs_inf->B, qs_inf->B, B_terms[i]);
     }
 
-    /* calculate A_inv[k] = A^-1 modulo p_k for p_k in the factor base */
-    for (k = 3; k < qs_inf->num_primes; k++)
+    /*
+       A and the B_terms fit in a single word for inputs up to roughly 160
+       bits.  When they do, reduce them with the precomputed inverse rather
+       than calling fmpz_fdiv_ui: the A_inv2B loop below performs s
+       reductions for every factor base prime, and a multiprecision division
+       there dominates the cost of setting up a polynomial.
+    */
+    small_A = (fmpz_size(qs_inf->A) <= 1);
+    small_B = small_A;
+
+    if (small_B)
     {
-        p = factor_base[k].p;
-        temp = fmpz_fdiv_ui(qs_inf->A, p);
-        A_inv[k] = temp == 0 ? 0 : n_invmod(temp, p);
+        for (i = 0; i < s; i++)
+        {
+            if (fmpz_size(B_terms[i]) > 1)
+            {
+                small_B = 0;
+                break;
+            }
+        }
+    }
+
+    if (small_B)
+    {
+        B_ui = flint_malloc(s*sizeof(ulong));
+        for (i = 0; i < s; i++)
+            B_ui[i] = fmpz_get_ui(B_terms[i]);
+    }
+
+    /* calculate A_inv[k] = A^-1 modulo p_k for p_k in the factor base */
+    if (small_A)
+    {
+        ulong A_ui = fmpz_get_ui(qs_inf->A);
+
+        for (k = 3; k < qs_inf->num_primes; k++)
+        {
+            p = factor_base[k].p;
+            temp = n_mod2_preinv(A_ui, p, factor_base[k].pinv);
+            A_inv[k] = temp == 0 ? 0 : n_invmod(temp, p);
+        }
+    }
+    else
+    {
+        for (k = 3; k < qs_inf->num_primes; k++)
+        {
+            p = factor_base[k].p;
+            temp = fmpz_fdiv_ui(qs_inf->A, p);
+            A_inv[k] = temp == 0 ? 0 : n_invmod(temp, p);
+        }
     }
 
     /*
@@ -607,13 +692,17 @@ void qsieve_init_poly_first(qs_t qs_inf)
 
         for (i = 0; i < s; i++)
         {
-            temp = fmpz_fdiv_ui(B_terms[i], p);
+            temp = small_B ? n_mod2_preinv(B_ui[i], p, pinv)
+                           : fmpz_fdiv_ui(B_terms[i], p);
             temp *= 2;
             if (temp >= p)
                temp -= p;
             A_inv2B[i][k] = n_mulmod2_preinv(temp, A_inv[k], p, pinv);
         }
     }
+
+    if (small_B)
+        flint_free(B_ui);
 
     /*
         compute roots of first polynomial modulo factor base primes

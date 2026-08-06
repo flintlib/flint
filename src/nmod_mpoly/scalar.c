@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-slong _nmod_mpoly_scalar_addmul_ui1(
+static slong _nmod_mpoly_scalar_addmul_ui1(
     ulong * Acoeffs, ulong * Aexps,
     const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     const ulong * Ccoeffs, const ulong * Cexps, slong Clen,
@@ -165,9 +165,7 @@ void nmod_mpoly_scalar_addmul_ui(
 
     TMP_START;
     Abits = FLINT_MAX(B->bits, C->bits);
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, ctx->minfo);
 
     if (Abits != B->bits)
     {
@@ -255,7 +253,7 @@ void nmod_mpoly_scalar_mul_nmod_invertible(
 /*
     c is assumed to be reduced mod n
 */
-void nmod_mpoly_scalar_mul_nmod_general(
+static void nmod_mpoly_scalar_mul_nmod_general(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
     ulong c,

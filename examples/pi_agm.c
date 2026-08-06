@@ -155,11 +155,11 @@ int main(int argc, char *argv[])
     flint_printf("precision = %wd bits...\n", prec);
     fflush(stdout);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_pi_agm(x, prec, 1);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
 
     arb_printn(x, digits, ARB_STR_CONDENSE * condense);
 

@@ -78,7 +78,7 @@ acb_hypgeom_m_asymp(acb_t res, const acb_t a, const acb_t b, const acb_t z, int 
     acb_clear(c);
 }
 
-void
+static void
 _acb_hypgeom_m_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z,
     int regularized, slong prec, slong gamma_prec, int kummer)
 {
@@ -193,7 +193,7 @@ hypotmx(double x, double y)
         return sqrt(x * x + y * y) - x;
 }
 
-void
+static void
 acb_hypgeom_m_choose(int * asymp, int * kummer, slong * wp,
     const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
 {
@@ -298,7 +298,7 @@ acb_hypgeom_m_choose(int * asymp, int * kummer, slong * wp,
     }
 }
 
-void
+static void
 acb_hypgeom_m_nointegration(acb_t res, const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
 {
     int asymp, kummer;

@@ -41,7 +41,7 @@ int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state,
     }
 
     gr_mpoly_sort_terms(A, ctx);
-    status |= gr_mpoly_combine_like_terms(A, ctx);
+    GR_IGNORE(gr_mpoly_combine_like_terms(A, ctx));
 
     for (j = 0; j < nvars; j++)
         fmpz_clear(exp + j);

@@ -63,6 +63,7 @@
 #include "t-mul.c"
 #include "t-mulhigh.c"
 #include "t-mullow.c"
+#include "t-mulmid.c"
 #include "t-mulmod.c"
 #include "t-mulmod_preinv.c"
 #include "t-neg.c"
@@ -139,6 +140,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_poly_mul),
     TEST_FUNCTION(fmpz_mod_poly_mulhigh),
     TEST_FUNCTION(fmpz_mod_poly_mullow),
+    TEST_FUNCTION(fmpz_mod_poly_mulmid),
     TEST_FUNCTION(fmpz_mod_poly_mulmod),
     TEST_FUNCTION(fmpz_mod_poly_mulmod_preinv),
     TEST_FUNCTION(fmpz_mod_poly_neg),

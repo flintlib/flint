@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
@@ -16,7 +17,9 @@
 #include "fmpzi.h"
 #include "fexpr.h"
 #include "qqbar.h"
+#include "qqbar/impl.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
@@ -40,42 +43,44 @@ _gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit)
     QQBAR_CTX(ctx)->bits_limit = (bits_limit >= 0) ? bits_limit : WORD_MAX;
 }
 
-int
+static int
 _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
+
     if (QQBAR_CTX(ctx)->real_only)
-        gr_stream_write(out, "Real algebraic numbers (qqbar)");
+        status |= gr_stream_write(out, "Real algebraic numbers (qqbar)");
     else
-        gr_stream_write(out, "Complex algebraic numbers (qqbar)");
+        status |= gr_stream_write(out, "Complex algebraic numbers (qqbar)");
 
     if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX)
     {
-        gr_stream_write(out, ", deg_limit = ");
-        gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
+        status |= gr_stream_write(out, ", deg_limit = ");
+        status |= gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
     }
 
     if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
     {
-        gr_stream_write(out, ", bits_limit = ");
-        gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
+        status |= gr_stream_write(out, ", bits_limit = ");
+        status |= gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
-void
+static void
 _gr_qqbar_init(qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_init(x);
 }
 
-void
+static void
 _gr_qqbar_clear(qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_clear(x);
 }
 
-void
+static void
 _gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
 {
     qqbar_t t;
@@ -84,14 +89,14 @@ _gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 _gr_qqbar_set_shallow(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
 /* todo: limits */
-int
+static int
 _gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     slong deg_limit, bits_limit;
@@ -126,24 +131,22 @@ _gr_qqbar_randtest(qqbar_t res, flint_rand_t state, const gr_ctx_t ctx)
 /* todo: different styles */
 
 
-void
-qqbar_get_decimal_root_nearest(char ** re_s, char ** im_s, const qqbar_t x, slong default_digits);
-
-int
+static int
 _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
 {
     char *re_s, *im_s;
+    int status = GR_SUCCESS;
 
     if (qqbar_is_rational(x))
     {
         fmpq_t t;
         fmpq_init(t);
         qqbar_get_fmpq(t, x);
-        gr_stream_write_fmpz(out, fmpq_numref(t));
+        status |= gr_stream_write_fmpz(out, fmpq_numref(t));
         if (!fmpz_is_one(fmpq_denref(t)))
         {
-            gr_stream_write(out, "/");
-            gr_stream_write_fmpz(out, fmpq_denref(t));
+            status |= gr_stream_write(out, "/");
+            status |= gr_stream_write_fmpz(out, fmpq_denref(t));
         }
         fmpq_clear(t);
     }
@@ -151,11 +154,11 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
     {
         qqbar_get_decimal_root_nearest(&re_s, &im_s, x, 6);
 
-        gr_stream_write(out, "Root a = ");
+        status |= gr_stream_write(out, "Root a = ");
 
         if (re_s != NULL)
         {
-            gr_stream_write_free(out, re_s);
+            status |= gr_stream_write_free(out, re_s);
         }
 
         if (im_s != NULL)
@@ -164,73 +167,73 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
             {
                 if (im_s[0] == '-')
                 {
-                    gr_stream_write(out, " - ");
-                    gr_stream_write(out, im_s + 1);
+                    status |= gr_stream_write(out, " - ");
+                    status |= gr_stream_write(out, im_s + 1);
                     flint_free(im_s);
                 }
                 else
                 {
-                    gr_stream_write(out, " + ");
-                    gr_stream_write_free(out, im_s);
+                    status |= gr_stream_write(out, " + ");
+                    status |= gr_stream_write_free(out, im_s);
                 }
             }
             else
             {
-                gr_stream_write_free(out, im_s);
+                status |= gr_stream_write_free(out, im_s);
             }
 
-            gr_stream_write(out, "*I");
+            status |= gr_stream_write(out, "*I");
         }
-        gr_stream_write(out, " of ");
-        gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
+        status |= gr_stream_write(out, " of ");
+        status |= gr_stream_write_free(out, fmpz_poly_get_str_pretty(QQBAR_POLY(x), "a"));
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
-int
+static int
 _gr_qqbar_zero(qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_zero(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_one(qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_one(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_set_si(qqbar_t res, slong v, const gr_ctx_t ctx)
 {
     qqbar_set_si(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_set_ui(qqbar_t res, ulong v, const gr_ctx_t ctx)
 {
     qqbar_set_ui(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_set_fmpz(qqbar_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     qqbar_set_fmpz(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_set_fmpq(qqbar_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     qqbar_set_fmpq(res, v);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_set_d(qqbar_t res, double v, const gr_ctx_t ctx)
 {
     if (qqbar_set_d(res, v))
@@ -239,31 +242,31 @@ _gr_qqbar_set_d(qqbar_t res, double v, const gr_ctx_t ctx)
         return GR_DOMAIN;
 }
 
-truth_t
+static truth_t
 _gr_qqbar_is_zero(const qqbar_t x, const gr_ctx_t ctx)
 {
     return qqbar_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_qqbar_is_one(const qqbar_t x, const gr_ctx_t ctx)
 {
     return qqbar_is_one(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_qqbar_is_neg_one(const qqbar_t x, const gr_ctx_t ctx)
 {
     return qqbar_is_neg_one(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_qqbar_equal(const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     return qqbar_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_qqbar_set(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_set(res, x);
@@ -290,7 +293,7 @@ qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x)
     }
 }
 
-int
+static int
 _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -344,7 +347,7 @@ _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     return gr_generic_set_other(res, x, x_ctx, ctx);
 }
 
-int
+static int
 _gr_qqbar_get_fmpz(fmpz_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (!qqbar_is_integer(x))
@@ -354,7 +357,7 @@ _gr_qqbar_get_fmpz(fmpz_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_get_ui(ulong * res, const qqbar_t x, const gr_ctx_t ctx)
 {
     fmpz_t t;
@@ -380,7 +383,7 @@ _gr_qqbar_get_ui(ulong * res, const qqbar_t x, const gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_qqbar_get_si(slong * res, const qqbar_t x, const gr_ctx_t ctx)
 {
     fmpz_t t;
@@ -406,7 +409,7 @@ _gr_qqbar_get_si(slong * res, const qqbar_t x, const gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_qqbar_get_fmpq(fmpq_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (!qqbar_is_rational(x))
@@ -416,7 +419,7 @@ _gr_qqbar_get_fmpq(fmpq_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t ctx)
 {
     arb_t t;
@@ -431,7 +434,7 @@ _gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_get_fexpr(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (!qqbar_get_fexpr_formula(res, x, QQBAR_FORMULA_GAUSSIANS | QQBAR_FORMULA_QUADRATICS))
@@ -439,7 +442,7 @@ _gr_qqbar_get_fexpr(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_get_fexpr_serialize(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_get_fexpr_repr(res, x);
@@ -448,7 +451,7 @@ _gr_qqbar_get_fexpr_serialize(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
 
 
 /* todo */
-int _gr_qqbar_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx)
+static int _gr_qqbar_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx)
 {
     if (qqbar_set_fexpr(res, x))
     {
@@ -463,14 +466,14 @@ int _gr_qqbar_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const 
     }
 }
 
-int
+static int
 _gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_neg(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
@@ -481,35 +484,35 @@ _gr_qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_add_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
 {
     qqbar_add_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_add_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
 {
     qqbar_add_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_add_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     qqbar_add_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     qqbar_add_fmpq(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_sub(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
@@ -520,35 +523,35 @@ _gr_qqbar_sub(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
 {
     qqbar_sub_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
 {
     qqbar_sub_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     qqbar_sub_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     qqbar_sub_fmpq(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
@@ -559,35 +562,35 @@ _gr_qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_mul_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
 {
     qqbar_mul_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_mul_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
 {
     qqbar_mul_ui(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_mul_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     qqbar_mul_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_mul_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     qqbar_mul_fmpq(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_inv(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (qqbar_is_zero(x))
@@ -601,7 +604,7 @@ _gr_qqbar_inv(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     if (qqbar_is_zero(y))
@@ -619,7 +622,7 @@ _gr_qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_qqbar_div_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -633,7 +636,7 @@ _gr_qqbar_div_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
 {
     if (y == 0)
@@ -647,7 +650,7 @@ _gr_qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     if (fmpz_is_zero(y))
@@ -661,7 +664,7 @@ _gr_qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t 
     }
 }
 
-int
+static int
 _gr_qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
 {
     if (fmpq_is_zero(y))
@@ -675,13 +678,13 @@ _gr_qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t 
     }
 }
 
-truth_t
+static truth_t
 _gr_qqbar_is_invertible(const qqbar_t x, const gr_ctx_t ctx)
 {
     return !qqbar_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong exp, const gr_ctx_t ctx)
 {
     if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX && !(exp == 0 || exp == 1))
@@ -714,7 +717,7 @@ _gr_qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong exp, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_pow_si(qqbar_t res, const qqbar_t x, slong exp, const gr_ctx_t ctx)
 {
     if (exp < 0 && qqbar_is_zero(x))
@@ -754,7 +757,7 @@ _gr_qqbar_pow_si(qqbar_t res, const qqbar_t x, slong exp, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t exp, const gr_ctx_t ctx)
 {
     if (fmpz_sgn(exp) < 0 && qqbar_is_zero(x))
@@ -794,7 +797,7 @@ _gr_qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t exp, const gr_ctx_
     }
 }
 
-int
+static int
 _gr_qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t exp, const gr_ctx_t ctx)
 {
     if (fmpq_sgn(exp) < 0 && qqbar_is_zero(x))
@@ -818,7 +821,7 @@ _gr_qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t exp, const gr_ctx_
     }
 }
 
-int
+static int
 _gr_qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t exp, const gr_ctx_t ctx)
 {
     if (qqbar_pow(res, x, exp))
@@ -839,7 +842,7 @@ _gr_qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t exp, const gr_ctx_t ct
     }
 }
 
-truth_t
+static truth_t
 _gr_qqbar_is_square(const qqbar_t x, const gr_ctx_t ctx)
 {
     if (QQBAR_CTX(ctx)->real_only)
@@ -848,7 +851,7 @@ _gr_qqbar_is_square(const qqbar_t x, const gr_ctx_t ctx)
         return T_TRUE;
 }
 
-int
+static int
 _gr_qqbar_sqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (QQBAR_CTX(ctx)->real_only && qqbar_sgn_re(x) < 0)
@@ -862,7 +865,7 @@ _gr_qqbar_sqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_qqbar_rsqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (qqbar_is_zero(x) || (QQBAR_CTX(ctx)->real_only && qqbar_sgn_re(x) < 0))
@@ -876,14 +879,14 @@ _gr_qqbar_rsqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_qqbar_numerator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_numerator(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_denominator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     fmpz_t t;
@@ -895,7 +898,7 @@ _gr_qqbar_denominator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 /* todo: could special-case rationals */
-int
+static int
 _gr_qqbar_floor(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (qqbar_is_integer(x))
@@ -914,7 +917,7 @@ _gr_qqbar_floor(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_ceil(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (qqbar_is_integer(x))
@@ -933,7 +936,7 @@ _gr_qqbar_ceil(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_trunc(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (qqbar_is_integer(x))
@@ -967,7 +970,7 @@ _gr_qqbar_trunc(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 /* todo: fast numerical path */
-int
+static int
 _gr_qqbar_nint(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     if (qqbar_is_integer(x))
@@ -1009,7 +1012,7 @@ _gr_qqbar_nint(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_i(qqbar_t res, const gr_ctx_t ctx)
 {
     if (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR)
@@ -1019,7 +1022,7 @@ _gr_qqbar_i(qqbar_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_abs(res, x);
@@ -1027,7 +1030,7 @@ _gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 /* todo: exploit when we know that the field is real */
-int
+static int
 _gr_qqbar_conj(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_conj(res, x);
@@ -1035,7 +1038,7 @@ _gr_qqbar_conj(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 /* todo: exploit when we know that the field is real */
-int
+static int
 _gr_qqbar_re(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_re(res, x);
@@ -1043,28 +1046,28 @@ _gr_qqbar_re(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 /* todo: exploit when we know that the field is real */
-int
+static int
 _gr_qqbar_im(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_im(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_sgn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_sgn(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_csgn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 {
     qqbar_set_si(res, qqbar_csgn(x));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_cmp(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     if (!qqbar_is_real(x) || !qqbar_is_real(y))
@@ -1074,7 +1077,7 @@ _gr_qqbar_cmp(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_qqbar_cmpabs(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
     *res = qqbar_cmpabs(x, y);
@@ -1084,7 +1087,7 @@ _gr_qqbar_cmpabs(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx
 /* todo: 2 pi reduction for bignum numerators */
 
 #define TRIG(fn, real_check) \
-int \
+static int \
 _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
 { \
     if (!qqbar_is_rational(x)) \
@@ -1108,7 +1111,7 @@ _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
 }
 
 #define TRIG2(fn) \
-int \
+static int \
 _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
 { \
     if (!qqbar_is_rational(x)) \
@@ -1129,7 +1132,7 @@ _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
 }
 
 #define TRIG3(fn) \
-int \
+static int \
 _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
 { \
     fmpq_t t; \
@@ -1163,8 +1166,8 @@ TRIG3(acsc_pi)
 /* todo: exploit when we know that the field is real */
 
 
-int
-_gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
+static int
+_gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt,
                       int flags, gr_ctx_t ctx)
 {
     if (gr_ctx_is_algebraically_closed(ctx) == T_TRUE)
@@ -1173,12 +1176,12 @@ _gr_qqbar_poly_factor(gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt,
 }
 
 /* todo: quickly skip nonreal roots over the real algebraic numbers */
-int
-_gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+static int
+_gr_qqbar_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
 {
     int status;
-    gr_ctx_t ZZ, Rx;
-    gr_vec_t fac, exp;
+    gr_poly_vec_t fac;
+    fmpz_vec_t exp;
     gr_ptr c;
     slong i;
 
@@ -1187,15 +1190,12 @@ _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fl
 
     /* todo: fast numerical check to avoid an exact squarefree factorization */
 
-    gr_ctx_init_fmpz(ZZ);
-    gr_ctx_init_gr_poly(Rx, ctx);
-
     gr_vec_set_length(roots, 0, ctx);
-    gr_vec_set_length(mult, 0, ZZ);
+    fmpz_vec_set_length(mult, 0);
 
     c = gr_heap_init(ctx);
-    gr_vec_init(fac, 0, Rx);
-    gr_vec_init(exp, 0, ZZ);
+    gr_poly_vec_init(fac, 0, ctx);
+    fmpz_vec_init(exp, 0);
 
     status = gr_poly_factor_squarefree(c, fac, exp, poly, ctx);
 
@@ -1208,8 +1208,7 @@ _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fl
 
         for (i = 0; i < fac->length; i++)
         {
-            gr_poly_struct * fac_i = gr_vec_entry_ptr(fac, i, Rx);
-            fmpz * exp_i = gr_vec_entry_ptr(exp, i, ZZ);
+            gr_poly_struct * fac_i = gr_poly_vec_entry_ptr(fac, i, ctx);
 
             deg2 = fac_i->length - 1;
 
@@ -1228,7 +1227,7 @@ _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fl
                     continue;
 
                 GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
-                GR_MUST_SUCCEED(gr_vec_append(mult, exp_i, ZZ));
+                fmpz_vec_append(mult, exp->entries + i);
             }
 
             _qqbar_vec_clear(croots, deg2);
@@ -1237,36 +1236,30 @@ _gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int fl
 
     /* todo: qqbar_cmp_root_order, but must sort exponents as well */
 
-    gr_vec_clear(fac, Rx);
-    gr_vec_clear(exp, ZZ);
+    gr_poly_vec_clear(fac, ctx);
+    fmpz_vec_clear(exp);
     gr_heap_clear(c, ctx);
-
-    gr_ctx_clear(ZZ);
-    gr_ctx_clear(Rx);
 
     return status;
 }
 
 /* todo: quickly skip nonreal roots over the real algebraic numbers */
-int
-_gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+static int
+_gr_qqbar_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
         slong i, j, deg, deg2;
         qqbar_struct * croots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         if (deg != 0)
         {
@@ -1283,13 +1276,11 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, 
 
                 for (j = 0; j < deg2; j++)
                 {
-                    fmpz m2 = fac->exp[i];
-
                     if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(croots + j))
                         continue;
 
                     GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
-                    GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
+                    fmpz_vec_append_ui(mult, fac->exp[i]);
                 }
 
                 _qqbar_vec_clear(croots, deg2);
@@ -1299,8 +1290,6 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, 
         }
 
         /* todo: qqbar_cmp_root_order, but must sort exponents as well */
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }
@@ -1352,13 +1341,13 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, 
     return GR_UNABLE;
 }
 
-truth_t
+static truth_t
 _gr_qqbar_ctx_is_algebraically_closed(gr_ctx_t ctx)
 {
     return (ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_QQBAR) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_qqbar_ctx_is_ordered_ring(gr_ctx_t ctx)
 {
     return (ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR) ? T_TRUE : T_FALSE;

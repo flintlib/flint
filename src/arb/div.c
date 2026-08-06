@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "arb/impl.h"
 
 /* We do Newton iteration in floating-point arithmetic with some
    guard bits. With GUARD_BITS = 32 the result is certainly accurate
@@ -30,7 +31,7 @@
 #define WANT_NEWTON(prec, xbits, ybits) 0
 #endif
 
-void
+static void
 _arf_inv_newton(arf_t res, const arf_t x, slong prec)
 {
     slong wp = prec + GUARD_BITS;
@@ -72,7 +73,7 @@ _arf_inv_newton(arf_t res, const arf_t x, slong prec)
 }
 
 /* Karp-Markstein */
-void
+static void
 _arf_div_newton(arf_t res, const arf_t x, const arf_t y, slong prec)
 {
     arf_t xn, yn, t;

@@ -29,7 +29,7 @@ TEST_GR_FUNCTION_START(gr_mat_lq, state, count_success, count_domain, count_unab
         int method = n_randint(state, 3);
         gr_method_mat_binary_unary_op func;
 
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
 
         if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);

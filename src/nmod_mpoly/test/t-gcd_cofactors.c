@@ -268,6 +268,43 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
     const slong max_threads = 5;
     slong i, j, k, tmul = 3;
 
+    /* issue #2581: the LINZIP scale system in gcds_zippel was generically
+       underdetermined for these inputs and the evaluation-point retry loop
+       effectively never terminated */
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t g, a, b, t;
+        nmod_mpoly_t abar, bbar;
+        const char * vars[] = {"l1", "l2", "l3", "a1", "a2", "a3",
+                               "b1", "b2", "b3", "g1", "g2", "g3"};
+
+        nmod_mpoly_ctx_init(ctx, 12, ORD_LEX, UWORD(2147483647));
+        nmod_mpoly_init(g, ctx);
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_init(b, ctx);
+        nmod_mpoly_init(t, ctx);
+        nmod_mpoly_init(abar, ctx);
+        nmod_mpoly_init(bbar, ctx);
+
+        nmod_mpoly_set_str_pretty(t, "l1*a2-l1*a3-l2*a1+l2*a3+l3*a1-l3*a2", vars, ctx);
+        nmod_mpoly_set_str_pretty(a, "(b1*g2*g3+b2*g1*g3+b3*g1*g2)^2", vars, ctx);
+        nmod_mpoly_set_str_pretty(b, "a1*b1^2*g2^3*g3 + a1*b1^2*g2*g3^3 + 2*a1*b1*b2*g1*g2^2*g3 + 2*a1*b1*b2*g1*g3^3 + 2*a1*b1*b3*g1*g2^3 + 2*a1*b1*b3*g1*g2*g3^2 + a1*b2^2*g1^2*g2*g3 + a1*b2^2*g2*g3^3 + a1*b2*b3*g1^2*g2^2 + a1*b2*b3*g1^2*g3^2 + 2*a1*b2*b3*g2^2*g3^2 + a1*b3^2*g1^2*g2*g3 + a1*b3^2*g2^3*g3 - a2*b1^2*g2*g3^3 - 2*a2*b1*b2*g1*g3^3 - 2*a2*b1*b3*g1*g2*g3^2 - a2*b2^2*g2*g3^3 + a2*b2*b3*g1^2*g2^2 - 2*a2*b2*b3*g1^2*g3^2 - a2*b2*b3*g2^2*g3^2 - a2*b3^2*g1^2*g2*g3 - a3*b1^2*g2^3*g3 - 2*a3*b1*b2*g1*g2^2*g3 - 2*a3*b1*b3*g1*g2^3 - a3*b2^2*g1^2*g2*g3 - 2*a3*b2*b3*g1^2*g2^2 + a3*b2*b3*g1^2*g3^2 - a3*b2*b3*g2^2*g3^2 - a3*b3^2*g2^3*g3", vars, ctx);
+        nmod_mpoly_mul(a, a, t, ctx);
+        nmod_mpoly_mul(a, a, t, ctx);
+        nmod_mpoly_mul(b, b, t, ctx);
+
+        gcd_check(g, abar, bbar, a, b, t, ctx, 0, 0, "issue 2581");
+
+        nmod_mpoly_clear(g, ctx);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_clear(b, ctx);
+        nmod_mpoly_clear(t, ctx);
+        nmod_mpoly_clear(abar, ctx);
+        nmod_mpoly_clear(bbar, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
+
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t g, abar, bbar, a, b, t;

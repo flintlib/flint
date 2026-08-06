@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_sub1(
+static slong _fmpz_mpoly_sub1(
     fmpz * Acoeffs, ulong * Aexps,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
     const fmpz * Ccoeffs, const ulong * Cexps, slong Clen,
@@ -130,7 +130,7 @@ slong _fmpz_mpoly_sub(
     return k;
 }
 
-void fmpz_mpoly_sub_inplace(fmpz_mpoly_t A, const fmpz_mpoly_t B,
+static void fmpz_mpoly_sub_inplace(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, s, new_len, N;
@@ -257,9 +257,7 @@ void fmpz_mpoly_sub(fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
     TMP_START;
     Abits = FLINT_MAX(B->bits, C->bits);
-    N = mpoly_words_per_exp(Abits, ctx->minfo);
-    cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
+    MPOLY_GET_CMPMASK_TMP_ALLOC(cmpmask, N, Abits, ctx->minfo);
 
     if (Abits > B->bits)
     {

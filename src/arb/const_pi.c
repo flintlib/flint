@@ -13,7 +13,7 @@
 #include "arb.h"
 #include "hypgeom.h"
 
-void
+static void
 arb_const_pi_chudnovsky_eval(arb_t s, slong prec)
 {
     hypgeom_t series;
@@ -42,7 +42,7 @@ arb_const_pi_chudnovsky_eval(arb_t s, slong prec)
     arb_clear(u);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_const_pi_chudnovsky, arb_const_pi_chudnovsky_eval)
+_ARB_DEF_CACHED_CONSTANT(static, arb_const_pi_chudnovsky, arb_const_pi_chudnovsky_eval)
 
 void
 arb_const_pi(arb_t res, slong prec)

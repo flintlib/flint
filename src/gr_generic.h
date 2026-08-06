@@ -18,6 +18,7 @@
 #define GR_GENERIC_INLINE static inline
 #endif
 
+#include "fmpz_types.h"
 #include "gr_types.h"
 
 #ifdef __cplusplus
@@ -88,6 +89,8 @@ void gr_generic_ctx_clear(gr_ctx_t ctx);
 
 slong gr_generic_ctx_ngens_0(slong * ngens, gr_ctx_t ctx);
 slong gr_generic_ctx_ngens_1(slong * ngens, gr_ctx_t ctx);
+
+gr_ptr gr_generic_ctx_base(gr_ctx_t ctx);
 
 void gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx);
 
@@ -203,7 +206,7 @@ WARN_UNUSED_RESULT int gr_generic_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr
 WARN_UNUSED_RESULT int gr_generic_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_generic_poly_factor_roots( gr_ptr c, gr_vec_t fac, gr_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_poly_factor_roots(gr_ptr c, gr_vec_t fac, fmpz_vec_t mult, gr_srcptr elt, int flags, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_bernoulli_ui(gr_ptr res, ulong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_bernoulli_fmpz(gr_ptr res, const fmpz_t n, gr_ctx_t ctx);
@@ -228,14 +231,16 @@ WARN_UNUSED_RESULT int gr_generic_vec_neg(gr_ptr res, gr_srcptr src, slong len, 
 WARN_UNUSED_RESULT int gr_generic_vec_normalise(slong * res, gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT slong gr_generic_vec_normalise_weak(gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_mul_scalar_2exp_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_addmul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_submul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_addmul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_submul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_addmul_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_si(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const slong * vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const fmpz * vec2, slong len, gr_ctx_t ctx);

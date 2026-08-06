@@ -19,7 +19,7 @@
     For documentation, see fmpz_poly/mullow_karatsuba_n.c
  */
 
-void _fmpz_poly_sqrlow_kara_recursive(fmpz * out,
+static void _fmpz_poly_sqrlow_kara_recursive(fmpz * out,
                                       const fmpz * pol, fmpz * temp, slong len)
 {
     slong m1 = len / 2;

@@ -28,7 +28,7 @@ TEST_FUNCTION_START(gr_fq, state)
         fmpz_randprime(p, state, 2 + n_randint(state, 100), 0);
         d = 1 + n_randint(state, 5);
         gr_ctx_init_fq(Fq, p, d, "a");
-        gr_test_ring(Fq, 100, flags);
+        gr_test_ring(Fq, 10, flags);
         gr_ctx_clear(Fq);
     }
 

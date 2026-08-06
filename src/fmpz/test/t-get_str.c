@@ -16,8 +16,6 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-char * fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f);
-
 TEST_FUNCTION_START(fmpz_get_str, state)
 {
     int i;
@@ -72,11 +70,7 @@ TEST_FUNCTION_START(fmpz_get_str, state)
 
         fmpz_get_mpz(b, a);
 
-        if (n_randint(state, 2))
-            str1 = fmpz_get_str(NULL, base, a);
-        else
-            str1 = fmpz_get_str_bsplit_threaded(NULL, a);
-
+        str1 = fmpz_get_str(NULL, base, a);
         str2 = mpz_get_str(NULL, base, b);
 
         if (strcmp(str1, str2))

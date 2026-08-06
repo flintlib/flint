@@ -31,7 +31,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
 void
@@ -99,13 +99,13 @@ void tune_fixed_vs_waksman(int * cutoffs)
             nfixed_randmat(A, n, n, state, nlimbs);
             nfixed_randmat(B, n, n, state, nlimbs);
 
-            TIMEIT_START
+            TIMEIT_START;
             _nfixed_mat_mul_classical(C, A, B, n, n, n, nlimbs);
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             _nfixed_mat_mul_waksman(C, A, B, n, n, n, nlimbs);
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_free(A);
             flint_free(B);
@@ -167,13 +167,13 @@ void tune_strassen(int * cutoffs)
                 nfixed_randmat(A, n, n, state, nlimbs);
                 nfixed_randmat(B, n, n, state, nlimbs);
 
-                TIMEIT_START
+                TIMEIT_START;
                 _nfixed_mat_mul_strassen(C, A, B, n, n, n, n + 1, nlimbs);
-                TIMEIT_STOP_VALUES(__, t1)
+                TIMEIT_STOP_VALUES(__, t1);
 
-                TIMEIT_START
+                TIMEIT_START;
                 _nfixed_mat_mul_strassen(C, A, B, n, n, n, n, nlimbs);
-                TIMEIT_STOP_VALUES(__, t2)
+                TIMEIT_STOP_VALUES(__, t2);
 
                 flint_free(A);
                 flint_free(B);
@@ -210,7 +210,7 @@ void tune_strassen(int * cutoffs)
     }
 }
 
-void prof_strassen_1()
+void prof_strassen_1(void)
 {
     nn_ptr A, B, C;
     slong n, nlimbs;
@@ -238,13 +238,13 @@ void prof_strassen_1()
             nfixed_randmat(A, n, n, state, nlimbs);
             nfixed_randmat(B, n, n, state, nlimbs);
 
-            TIMEIT_START
+            TIMEIT_START;
             _nfixed_mat_mul_strassen(C, A, B, n, n, n, n + 1, nlimbs);
-            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_STOP_VALUES(__, t1);
 
-            TIMEIT_START
+            TIMEIT_START;
             _nfixed_mat_mul_strassen(C, A, B, n, n, n, n, nlimbs);
-            TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_STOP_VALUES(__, t2);
 
             flint_free(A);
             flint_free(B);
@@ -257,7 +257,7 @@ void prof_strassen_1()
     }
 }
 
-int main()
+int main(void)
 {
     //int tab_fixed_classical_vs_waksman[TABN];
     //int tab_strassen[TABN];

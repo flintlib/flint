@@ -471,7 +471,7 @@ to consider the Fourier transform on Conrey labels as
    g(a) = \sum_{b\bmod q}\overline{\chi_q(a,b)}f(b)
 
 
-.. function:: void acb_dirichlet_dft_conrey(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
+.. function:: void acb_dirichlet_dft_index(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec)
 
    Compute the DFT of *v* using Conrey indices.
    This function assumes *v* and *w* are vectors
@@ -502,6 +502,12 @@ to consider the Fourier transform on Conrey labels as
    Compute the DFT of *v* using Conrey numbers.
    This function assumes *v* and *w* are vectors of size *G->q*.
    All values at index not coprime to *G->q* are ignored.
+
+   Both functions are thin wrappers around the :doc:`gr_dft <gr_dft>`
+   module (see :func:`gr_dft_dirichlet` and
+   :func:`gr_dft_dirichlet_index`), which computes the product DFT
+   over the Conrey components in fixed-point arithmetic with rigorous
+   error bounds whenever possible.
 
 Dirichlet L-functions
 -------------------------------------------------------------------------------
@@ -581,7 +587,7 @@ Dirichlet L-functions
     Hurwitz zeta function and a discrete Fourier transform.
     The output *res* is assumed to have length *G->phi_q* and values
     are stored by lexicographically ordered
-    Conrey logs. See :func:`acb_dirichlet_dft_conrey`.
+    Conrey logs. See :func:`acb_dirichlet_dft_index`.
 
     If *precomp* is *NULL*, each Hurwitz zeta function value is computed
     directly. If a pre-initialized *precomp* object is provided, this will be
@@ -766,6 +772,20 @@ mpmath [Joh2018b]_ by Juan Arias de Reyna, described in [Ari2012]_.
 .. function:: slong acb_dirichlet_backlund_s_gram(const fmpz_t n)
 
     Compute `S(g_n)` where `g_n` is the *n*-th Gram point. Requires `n \ge -1`.
+
+Functions of zeros
+-------------------------------------------------------------------------------
+
+.. function:: void acb_dirichlet_secondary_zeta(acb_t res, const acb_t s, slong prec)
+
+    Computes the secondary zeta function `Z(s) = \sum_{n=1}^{\infty} 1 / {\alpha^s_n}`
+    where `\rho_n = 1/2 + i \alpha_n` runs through the zeros of `\zeta(s)`
+    with positive imaginary part. The Riemann hypothesis is not presumed.
+    The algorithm follows [Ari2020]_ computing a decomposition
+    `Z(s) = A(s) - P(s) + E(s) - S(s)` where each term implicitly depends
+    on a free parameter `a > 0`. We implement an improved tail bound for the
+    *P* term and rigorous bounds for the *A* and *S* tails
+    replacing the heuristic bounds in [Ari2020]_.
 
 Riemann zeta function zeros (Platt's method)
 -------------------------------------------------------------------------------

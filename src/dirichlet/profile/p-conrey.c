@@ -201,9 +201,9 @@ int main(int argc, char *argv[])
                 flint_printf("{ \"name\": \"%s\", \"qmin\": %d, \"qmax\": %d, \"time\": ",
                         name[l],qmin[i],qmax[i]);
 
-            TIMEIT_ONCE_START
+            TIMEIT_ONCE_START;
                 (func[l])(qmin[i], qmax[i]);
-            TIMEIT_ONCE_STOP
+            TIMEIT_ONCE_STOP;
 
             if (out == JSON)
                 flint_printf("}\n");

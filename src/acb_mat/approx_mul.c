@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "acb_mat.h"
 
-void
+static void
 acb_mat_approx_mul_classical(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong prec)
 {
     slong ar, br, bc, i, j;

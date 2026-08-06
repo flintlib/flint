@@ -25,9 +25,8 @@
     that it works to take the top limb of an inverse computed by
     flint_mpn_preinvn.
 */
-
-void flint_mpn_mod_preinv1(mp_ptr a, mp_size_t m,
-                                 mp_srcptr b, mp_size_t n, mp_limb_t dinv)
+static void flint_mpn_mod_preinv1(mp_ptr a, mp_size_t m,
+                                  mp_srcptr b, mp_size_t n, mp_limb_t dinv)
 {
     mp_size_t i;
     mp_limb_t q;

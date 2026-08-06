@@ -16,6 +16,11 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+ulong n_randlimb(flint_rand_t state)
+{
+    return _n_randlimb(state);
+}
+
 #define l_shift(in, shift) \
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
@@ -27,46 +32,15 @@ ulong n_randbits(flint_rand_t state, unsigned int bits)
        return (UWORD(1) << (bits - 1)) | n_randint(state, l_shift(UWORD(1), bits));
 }
 
+ulong n_randint(flint_rand_t state, ulong limit)
+{
+    return _n_randint(state, limit);
+}
+
 ulong n_urandint(flint_rand_t state, ulong limit)
 {
-    if ((limit & (limit - 1)) == 0)
-    {
-        return n_randlimb(state) & (limit - 1);
-    }
-    else
-    {
-        const ulong rand_max = UWORD_MAX;
-        ulong bucket_size, num_of_buckets, rand_within_range;
-
-        bucket_size = 1 + (rand_max - limit + 1)/limit;
-        num_of_buckets = bucket_size*limit;
-        do
-        {
-            rand_within_range = n_randlimb(state);
-        }
-        while (rand_within_range >= num_of_buckets);
-
-        return rand_within_range/bucket_size;
-    }
+    return _n_randint(state, limit);
 }
-
-#if FLINT64
-ulong n_randlimb(flint_rand_t state)
-{
-    state->__randval = (state->__randval*UWORD(13282407956253574709) + UWORD(286824421));
-    state->__randval2 = (state->__randval2*UWORD(7557322358563246341) + UWORD(286824421));
-
-    return (state->__randval>>32) + ((state->__randval2>>32) << 32);
-}
-#else
-ulong n_randlimb(flint_rand_t state)
-{
-    state->__randval = (state->__randval*UWORD(1543932465) +  UWORD(1626832771));
-    state->__randval2 = (state->__randval2*UWORD(2495927737) +  UWORD(1626832771));
-
-    return (state->__randval>>16) + ((state->__randval2>>16) << 16);
-}
-#endif
 
 ulong n_randtest_bits(flint_rand_t state, int bits)
 {
@@ -136,10 +110,8 @@ ulong n_randprime(flint_rand_t state, ulong bits, int proved)
 
     if (bits == FLINT_BITS)
     {
-        do
-            rand = n_randbits(state, bits);
-        while (rand >= UWORD_MAX_PRIME);
-
+        rand = n_randbits(state, bits);
+        rand = FLINT_MIN(rand, UWORD_MAX_PRIME - 1);
         rand = n_nextprime(rand, proved);
     }
     else if (bits == 2)

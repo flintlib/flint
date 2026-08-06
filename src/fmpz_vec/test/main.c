@@ -27,6 +27,7 @@
 #include "t-lcm.c"
 #include "t-max_bits.c"
 #include "t-max_limbs.c"
+#include "t-multi_CRT_ui.c"
 #include "t-neg.c"
 #include "t-prod.c"
 #include "t-prod_ui.c"
@@ -73,6 +74,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_vec_lcm),
     TEST_FUNCTION(fmpz_vec_max_bits),
     TEST_FUNCTION(fmpz_vec_max_limbs),
+    TEST_FUNCTION(fmpz_vec_multi_CRT_ui),
     TEST_FUNCTION(fmpz_vec_neg),
     TEST_FUNCTION(fmpz_vec_prod),
     TEST_FUNCTION(fmpz_ui_vec_prod),

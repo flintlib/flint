@@ -12,17 +12,17 @@
 #include "fmpz_vec.h"
 #include "padic_poly.h"
 
-int padic_poly_equal(const padic_poly_t f, const padic_poly_t g)
+int padic_poly_equal(const padic_poly_t poly1, const padic_poly_t poly2)
 {
-    if (f == g)
+    if (poly1 == poly2)
     {
         return 1;
     }
 
-    if (f->length != g->length || f->val != g->val)
+    if (poly1->length != poly2->length || poly1->val != poly2->val)
     {
         return 0;
     }
 
-    return _fmpz_vec_equal(f->coeffs, g->coeffs, f->length);
+    return _fmpz_vec_equal(poly1->coeffs, poly2->coeffs, poly1->length);
 }

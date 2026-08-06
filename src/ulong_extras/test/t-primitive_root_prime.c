@@ -17,6 +17,17 @@ TEST_FUNCTION_START(n_primitive_root_prime, state)
 {
     int i, j;
 
+    {
+        ulong n[] = { UWORD(15), UWORD(21), UWORD(33), UWORD(45) };
+
+        for (i = 0; i < 4; i++)
+        {
+            ulong nonresidue = n_quadratic_nonresidue(n[i]);
+            if (n_jacobi_unsigned(nonresidue, n[i]) != -1)
+                TEST_FUNCTION_FAIL("%wu is not a Jacobi nonresidue mod %wu\n", nonresidue, n[i]);
+        }
+    }
+
     for (i = 0; i < 100; i++)
     {
         ulong p = n_randtest_prime(state, 1);
@@ -27,6 +38,13 @@ TEST_FUNCTION_START(n_primitive_root_prime, state)
         n_factor(&factors, p - 1, 1);
 
         ulong root;
+        if (p != 2)
+        {
+            ulong nonresidue = n_quadratic_nonresidue(p);
+            if (n_jacobi_unsigned(nonresidue, p) != -1)
+                TEST_FUNCTION_FAIL("%wu is not a quadratic nonresidue mod %wu\n", nonresidue, p);
+        }
+
         root = n_primitive_root_prime(p);
 
         for (j = 0; j < factors.num; j++)

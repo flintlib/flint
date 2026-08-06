@@ -32,7 +32,7 @@ typedef struct
 #endif
 } fmpz_powers_preinv_arg_t;
 
-void
+static void
 _fmpz_mod_poly_powers_mod_preinv_worker(void * arg_ptr)
 {
     fmpz_powers_preinv_arg_t arg = *((fmpz_powers_preinv_arg_t *) arg_ptr);

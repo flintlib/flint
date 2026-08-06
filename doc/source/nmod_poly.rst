@@ -23,7 +23,7 @@ In reality one never deals directly with the ``struct`` and simply
 deals with objects of type :type:`nmod_poly_t`. For simplicity we will
 think of an :type:`nmod_poly_t` as a ``struct``, though in practice to
 access fields of this ``struct``, one needs to dereference first,
-e.g.\ to access the ``length`` field of an :type:`nmod_poly_t` called
+e.g., to access the ``length`` field of an :type:`nmod_poly_t` called
 ``poly1`` one writes ``poly1->length``.
 
 An :type:`nmod_poly_t` is said to be *normalised* if either ``length``
@@ -36,6 +36,12 @@ reduced modulo `n`.
 It is recommended that users do not access the fields of an
 :type:`nmod_poly_t` or its coefficient data directly, but make use of
 the functions designed for this purpose, detailed below.
+
+Many functions in this module (greatest common divisors, modular
+inverses, division as if over a field, resultants and discriminants,
+factorisation, irreducibility testing, root finding, square roots, and
+the transcendental series) require the modulus to be prime. This is
+assumed and not checked.
 
 Functions in ``nmod_poly`` do all the memory management for the user.
 One does not need to specify the maximum length in advance before
@@ -248,7 +254,7 @@ Randomization
 Construction of irreducible polynomials
 --------------------------------------------------------------------------------
 
-The following functions assume a prime modulus.
+The following functions assume a prime modulus, which is not checked.
 
 .. function:: void nmod_poly_minimal_irreducible(nmod_poly_t res, ulong n)
 
@@ -565,12 +571,12 @@ Bit packing and unpacking
     coefficient of ``poly`` is bigger than ``bits/2`` bits. We
     also assume ``bits < 3 * FLINT_BITS``.
 
-.. function:: void _nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, ulong bits, nmod_t mod)
+.. function:: void _nmod_poly_bit_unpack(nn_ptr res, slong nlo, slong nhi, nn_srcptr mpn, ulong bits, nmod_t mod)
 
-    Unpacks ``len`` coefficients stored in the big integer ``mpn``
-    in bit fields of the given number of bits, reduces them modulo the
-    given modulus, then stores them in the polynomial ``res``.
-    We assume ``len > 0`` and ``3 * FLINT_BITS > bits > 0``.
+    Unpacks ``nhi - nlo`` coefficients stored in the big integer ``mpn``
+    in bit fields of the given number of bits, starting at offset ``nlo``,
+    reduces them modulo the given modulus, then stores them in the polynomial ``res``.
+    We assume ``3 * FLINT_BITS > bits > 0``.
     There are no restrictions on the size of the actual coefficients as
     stored within the bitfields.
 
@@ -690,19 +696,14 @@ Multiplication
     coefficients from ``start`` onwards into the high coefficients of
     ``res``, the remaining coefficients being arbitrary but reduced.
 
-.. function:: void _nmod_poly_mul_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, flint_bitcnt_t bits, nmod_t mod)
+.. function:: void _nmod_poly_mul_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, nmod_t mod)
 
-    Sets ``res`` to the product of ``in1`` and ``in2``
-    assuming the output coefficients are at most the given number of
-    bits wide. If ``bits`` is set to `0` an appropriate value is
-    computed automatically.  Assumes that ``len1 >= len2 > 0``.
+    Sets ``res`` to the product of ``in1`` and ``in2``.
+    Assumes that ``len1 >= len2 > 0``.
 
-.. function:: void nmod_poly_mul_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits)
+.. function:: void nmod_poly_mul_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-    Sets ``res`` to the product of ``poly1`` and ``poly2``
-    assuming the output coefficients are at most the given number of
-    bits wide. If ``bits`` is set to `0` an appropriate value
-    is computed automatically.
+    Sets ``res`` to the product of ``poly1`` and ``poly2``.
 
 .. function:: void _nmod_poly_mul_KS2(nn_ptr res, nn_srcptr op1, slong n1, nn_srcptr op2, slong n2, nmod_t mod)
 
@@ -722,14 +723,14 @@ Multiplication
 
     Sets ``res`` to the product of ``poly1`` and ``poly2``.
 
-.. function:: void _nmod_poly_mullow_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, flint_bitcnt_t bits, slong n, nmod_t mod)
+.. function:: void _nmod_poly_mullow_KS(nn_ptr out, nn_srcptr in1, slong len1, nn_srcptr in2, slong len2, slong n, nmod_t mod)
 
     Sets ``out`` to the low `n` coefficients of ``in1`` of length
     ``len1`` times ``in2`` of length ``len2``. The output must have
     space for ``n`` coefficients. We assume that ``len1 >= len2 > 0``
     and that ``0 < n <= len1 + len2 - 1``.
 
-.. function:: void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, flint_bitcnt_t bits, slong n)
+.. function:: void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 
     Set ``res`` to the low `n` coefficients of ``in1`` of length
     ``len1`` times ``in2`` of length ``len2``.
@@ -757,6 +758,20 @@ Multiplication
     Sets ``res`` to the first ``trunc`` coefficients of the
     product of ``poly1`` and ``poly2``.
 
+.. function:: void _nmod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void nmod_poly_mulmid(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2, slong nlo, slong nhi)
+              void _nmod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void nmod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void _nmod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+              void nmod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, nmod_t mod)
+
+    Sets ``res`` to the first ``nhi - nlo`` middle coefficients of the
+    product of ``poly1`` of length ``len1`` and ``poly2`` of
+    length ``len2`` starting at offset ``nlo``.
+    It is assumed that ``0 <= nlo < nhi <= len1 + len2 - 1``.
+    The function :func:`_nmod_poly_mulmid_classical` does not support
+    aliasing between inputs and outputs, but all others do.
+
 .. function:: void _nmod_poly_mulhigh(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 
     Sets all but the low `n` coefficients of ``res`` to the
@@ -771,6 +786,26 @@ Multiplication
     Sets all but the low `n` coefficients of ``res`` to the
     corresponding coefficients of the product of ``poly1`` and
     ``poly2``, the remaining coefficients being arbitrary.
+
+.. function:: int _nmod_poly_mullow_want_fft_small(slong len1, slong len2, slong n, int squaring, nmod_t mod)
+
+    Estimate whether *fft_small* multiplication should be used instead of
+    other multiplication algorithms, given inputs of length *len1* and *len2*
+    and output truncation to length *n*.
+
+.. function:: int _nmod_poly_mulmid_fft_small_repack(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
+
+    Internal helper function for :func:`_nmod_poly_mullow_fft_small`: if the
+    inputs are small enough to perform a repacked convolution of half the
+    length, multiply and return 1, otherwise do nothing and return 0.
+    The conditions on the arguments are the same as for :func:`_nmod_poly_mulmid_fft_small`.
+
+.. function:: void _nmod_poly_mulmid_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong znlo, slong zn, nmod_t mod)
+              void _nmod_poly_mullow_fft_small(nn_ptr z, nn_srcptr a, slong an, nn_srcptr b, slong bn, slong zn, nmod_t mod)
+
+    Multiplication via the *fft_small* module. Throws an error
+    if *fft_small* is not available. The conditions on the arguments
+    are the same as for :func:`_nmod_poly_mullow`.
 
 .. function:: void _nmod_poly_mulmod(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, nn_srcptr f, slong lenf, nmod_t mod)
 
@@ -1302,13 +1337,15 @@ Derivative and integral
     The constant term of ``x_int`` is set to zero.
     It is assumed that ``len > 0``. The result is only well-defined
     if the modulus is a prime number strictly larger than the degree of
-    ``x``. Supports aliasing between the two polynomials.
+    ``x``; these conditions are not checked. Supports aliasing between
+    the two polynomials.
 
 .. function:: void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
 
     Set ``x_int`` to the indefinite integral of ``x`` with constant
     term zero. The result is only well-defined if the modulus
-    is a prime number strictly larger than the degree of ``x``.
+    is a prime number strictly larger than the degree of ``x``; these
+    conditions are not checked.
 
 
 
@@ -1316,42 +1353,50 @@ Evaluation
 --------------------------------------------------------------------------------
 
 
-.. function:: ulong _nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod)
+.. function:: ulong _nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong n)
 
     Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
-    of ``poly``. The value ``c`` should be reduced modulo the modulus, and the
+    ``modn``. The value ``c`` should be reduced modulo the modulus, and the
     modulus must be less than `2^{\mathtt{FLINT\_BITS} - 1}`. The algorithm
     used is Horner's method, with multiplications done via
     :func:`n_mulmod_shoup` using the precomputed ``c_precomp`` obtained via
     :func:`n_mulmod_precomp_shoup`.
 
-.. function:: ulong _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod)
+.. function:: ulong _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, ulong n)
+
+    Evaluates ``poly`` at the value ``c`` modulo ``n``, with lazy reductions
+    modulo `n`. Precisely, if all coefficients of ``poly`` are less than `m`,
+    the input requirement is `m \le 2^{\mathtt{FLINT\_BITS}} - 2n + 1`, and the
+    output value is in `[0, m+2n-1)` and equal to the sought evaluation modulo
+    `n`. In particular the coefficients of ``poly`` need not be reduced modulo
+    ``n``, and the output may not be either. However, the value ``c`` should be
+    reduced modulo `n`.
+
+    In the case where `m = n` (coefficients of ``poly`` are reduced modulo
+    `n`), then the above leads to the requirement `3n-1 \le
+    2^{\mathtt{FLINT\_BITS}}` (this is `n \le 6148914691236517205` for 64 bits,
+    and `n \le 1431655765` for 32 bits), and reducing the output just amounts
+    to subtracting `n` or `2n`. The algorithm used is Horner's method, with
+    multiplications done as in :func:`n_mulmod_shoup` using the precomputed
+    ``c_precomp`` obtained via :func:`n_mulmod_precomp_shoup`.
+
+.. function:: ulong _nmod_poly_evaluate_nmod_horner(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+              ulong _nmod_poly_evaluate_nmod_rectangular(nn_srcptr poly, slong len, ulong c, nmod_t mod)
+              ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 
     Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
-    of ``poly``. The value ``c`` should be reduced modulo the modulus, and the
-    modulus `n` must satisfy `3n-2 < 2^{\mathtt{FLINT\_BITS}}` (this is `n \le
-    6148914691236517205` for 64 bits, and `n \le 1431655765` for 32 bits). The
-    algorithm used is Horner's method, with multiplications done as in
-    :func:`n_mulmod_shoup` using the precomputed ``c_precomp`` obtained via
-    :func:`n_mulmod_precomp_shoup`. Reductions modulo the modulus are delayed
-    to the very end of the computation.
-
-.. function:: ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
-
-    Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
-    of ``poly``. The value ``c`` should be reduced modulo the modulus. The
-    algorithm used is Horner's method, with multiplications done via
-    :func:`nmod_mul`.
+    of ``poly``. The value ``c`` should be reduced modulo the modulus.
+    The implemented algorithms are Horner's method and rectangular splitting.
+    The default function :func:`_nmod_poly_evaluate_nmod` selects
+    automatically between :func:`_nmod_poly_evaluate_nmod_horner`,
+    :func:`_nmod_poly_evaluate_nmod_rectangular`
+    :func:`_nmod_poly_evaluate_nmod_precomp`, and
+    :func:`_nmod_poly_evaluate_nmod_precomp_lazy`.
 
 .. function:: ulong nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
 
     Evaluates ``poly`` at the value ``c`` and reduces modulo the modulus of
-    ``poly``. The value ``c`` should be reduced modulo the modulus. The
-    algorithm used is Horner's method, with multiplications and additions done
-    differently depending on the modulus ``poly->mod`` and on the degree (calls
-    one of :func:`_nmod_poly_evaluate_nmod`,
-    :func:`_nmod_poly_evaluate_nmod_precomp`,
-    :func:`_nmod_poly_evaluate_nmod_precomp_lazy`).
+    ``poly``. The value ``c`` should be reduced modulo the modulus.
 
 .. function:: void nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
 
@@ -1381,79 +1426,121 @@ Multipoint evaluation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _nmod_poly_evaluate_nmod_vec_iter(nn_ptr ys, nn_srcptr poly, slong len, nn_srcptr xs, slong n, nmod_t mod)
+.. function:: void _nmod_poly_evaluate_nmod_vec_iter(nn_ptr ys, nn_srcptr poly, slong ilen, nn_srcptr xs, slong olen, nmod_t mod)
 
-    Evaluates (``coeffs``, ``len``) at the ``n`` values
+    Evaluates (``coeffs``, ``ilen``) at the ``olen`` values
     given in the vector ``xs``, writing the output values
     to ``ys``. The values in ``xs`` should be reduced
     modulo the modulus.
 
     Uses Horner's method iteratively.
 
-.. function:: void nmod_poly_evaluate_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong n)
+.. function:: void nmod_poly_evaluate_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong olen)
 
-    Evaluates ``poly`` at the ``n`` values given in the vector
+    Evaluates ``poly`` at the ``olen`` values given in the vector
     ``xs``, writing the output values to ``ys``. The values in
     ``xs`` should be reduced modulo the modulus.
 
     Uses Horner's method iteratively.
 
-.. function:: void _nmod_poly_evaluate_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen, const nn_ptr * tree, slong len, nmod_t mod)
+.. function:: void _nmod_poly_evaluate_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong ilen, const nn_ptr * tree, slong olen, nmod_t mod)
 
-    Evaluates (``poly``, ``plen``) at the ``len`` values given
+    Evaluates (``poly``, ``ilen``) at the ``olen`` values given
     by the precomputed subproduct tree ``tree``.
 
-.. function:: void _nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, slong len, nn_srcptr xs, slong n, nmod_t mod)
+.. function:: void _nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, slong ilen, nn_srcptr xs, slong olen, nmod_t mod)
 
-    Evaluates (``coeffs``, ``len``) at the ``n`` values
+    Evaluates (``coeffs``, ``ilen``) at the ``olen`` values
     given in the vector ``xs``, writing the output values
     to ``ys``. The values in ``xs`` should be reduced
     modulo the modulus.
 
     Uses fast multipoint evaluation, building a temporary subproduct tree.
 
-.. function:: void nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong n)
+.. function:: void nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong olen)
 
-    Evaluates ``poly`` at the ``n`` values given in the vector
+    Evaluates ``poly`` at the ``olen`` values given in the vector
     ``xs``, writing the output values to ``ys``. The values in
     ``xs`` should be reduced modulo the modulus.
 
     Uses fast multipoint evaluation, building a temporary subproduct tree.
 
+.. function:: void _nmod_poly_evaluate_nmod_vec(nn_ptr ys, nn_srcptr poly, slong ilen, nn_srcptr xs, slong olen, nmod_t mod)
 
-.. function:: void _nmod_poly_evaluate_nmod_vec(nn_ptr ys, nn_srcptr poly, slong len, nn_srcptr xs, slong n, nmod_t mod)
-
-    Evaluates (``poly``, ``len``) at the ``n`` values
+    Evaluates (``poly``, ``ilen``) at the ``olen`` values
     given in the vector ``xs``, writing the output values
     to ``ys``. The values in ``xs`` should be reduced
     modulo the modulus.
 
-.. function:: void nmod_poly_evaluate_nmod_vec(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong n)
+.. function:: void nmod_poly_evaluate_nmod_vec(nn_ptr ys, const nmod_poly_t poly, nn_srcptr xs, slong olen)
 
-    Evaluates ``poly`` at the ``n`` values given in the vector
+    Evaluates ``poly`` at the ``olen`` values given in the vector
     ``xs``, writing the output values to ``ys``. The values in
     ``xs`` should be reduced modulo the modulus.
 
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong ilen, ulong r, slong olen, nmod_t mod)
+
+    Evaluates (``coeffs``, ``ilen``) at the first ``olen`` powers
+    of the square of ``r``, writing the output values
+    to ``ys``. The value of ``r`` should be reduced
+    modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+.. function:: void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong olen)
+
+    Evaluates ``poly`` at the first ``olen`` powers
+    of the square of ``r``, writing the output values
+    to ``ys``. The value of ``r`` should be reduced
+    modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong ilen, const nmod_geometric_progression_t G, slong olen, nmod_t mod)
+
+    Evaluates (``poly``, ``ilen``) at the first ``olen`` values given by the
+    precomputed geometric progression ``G``, which are the first ``olen`` powers
+    of the square of ``r``. Requires ``olen <= G->len``.
+
+.. function:: void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr coeffs, slong ilen, ulong r, slong olen, nmod_t mod)
+
+    Evaluates (``coeffs``, ``ilen``) at the first ``olen`` powers
+    of the square of ``r``, writing the output values to ``ys``.
+    The value of ``r`` should be reduced modulo the modulus ``mod``
+    and of sufficient multiplicative order such that none of
+    the first ``olen`` powers of `r^2` is one.
+
+    Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
+
+.. function:: void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong olen)
+
+    Evaluates ``poly``  at the first ``olen`` powers
+    of the square of ``r``, writing the output values to ``ys``.
+    The value of ``r`` should be reduced modulo the modulus of the polynomial
+    and of sufficient multiplicative order such that none of
+    the first ``olen`` powers of `r^2` is one.
+
+    Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
 Interpolation
 --------------------------------------------------------------------------------
 
 
-.. function:: void _nmod_poly_interpolate_nmod_vec(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong n, nmod_t mod)
+.. function:: void _nmod_poly_interpolate_nmod_vec(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong len, nmod_t mod)
 
-    Sets ``poly`` to the unique polynomial of length at most ``n``
-    that interpolates the ``n`` given evaluation points ``xs`` and
+    Sets ``poly`` to the unique polynomial of length at most ``len``
+    that interpolates the ``len`` given evaluation points ``xs`` and
     values ``ys``. If the interpolating polynomial is shorter than
-    length ``n``, the leading coefficients are set to zero.
+    length ``len``, the leading coefficients are set to zero.
 
     The values in ``xs`` and ``ys`` should be reduced modulo the
     modulus, and all ``xs`` must be distinct. Aliasing between
     ``poly`` and ``xs`` or ``ys`` is not allowed.
 
-.. function:: void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong n)
+.. function:: void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong len)
 
-    Sets ``poly`` to the unique polynomial of length ``n`` that
-    interpolates the ``n`` given evaluation points ``xs`` and
+    Sets ``poly`` to the unique polynomial of length ``len`` that
+    interpolates the ``len`` given evaluation points ``xs`` and
     values ``ys``. The values in ``xs`` and ``ys`` should be
     reduced modulo the modulus, and all ``xs`` must be distinct.
 
@@ -1472,39 +1559,105 @@ Interpolation
     interpolation weights ``weights`` corresponding to the
     roots.
 
-.. function:: void _nmod_poly_interpolate_nmod_vec_fast(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong n, nmod_t mod)
+.. function:: void _nmod_poly_interpolate_nmod_vec_fast(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong len, nmod_t mod)
 
     Performs interpolation using the fast Lagrange interpolation
     algorithm, generating a temporary subproduct tree.
 
-.. function:: void nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong n)
+.. function:: void nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong len)
 
     Performs interpolation using the fast Lagrange interpolation algorithm,
     generating a temporary subproduct tree.
 
-.. function:: void _nmod_poly_interpolate_nmod_vec_newton(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong n, nmod_t mod)
+.. function:: void _nmod_poly_interpolate_nmod_vec_newton(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong len, nmod_t mod)
 
     Forms the interpolating polynomial in the Newton basis using
     the method of divided differences and then converts it to
     monomial form.
 
-.. function:: void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong n)
+.. function:: void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong len)
 
     Forms the interpolating polynomial in the Newton basis using
     the method of divided differences and then converts it to
     monomial form.
 
-.. function:: void _nmod_poly_interpolate_nmod_vec_barycentric(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong n, nmod_t mod)
+.. function:: void _nmod_poly_interpolate_nmod_vec_barycentric(nn_ptr poly, nn_srcptr xs, nn_srcptr ys, slong len, nmod_t mod)
 
     Forms the interpolating polynomial using a naive implementation
     of the barycentric form of Lagrange interpolation.
 
-.. function:: void nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong n)
+.. function:: void nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly, nn_srcptr xs, nn_srcptr ys, slong len)
 
     Forms the interpolating polynomial using a naive implementation
     of the barycentric form of Lagrange interpolation.
 
+.. function:: void _nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len, nmod_t mod)
+              void nmod_poly_interpolate_geometric_nmod_vec_fast_precomp(nmod_poly_t poly, nn_srcptr v, const nmod_geometric_progression_t G, slong len)
 
+    Performs interpolation using the geometric progression precomputation ``G``.
+
+    Sets ``poly`` to the unique polynomial of length at most ``len`` that
+    interpolates the ``len`` values in ``v`` according to the parameter set of
+    ``G``. Requires ``len <= G->len``.
+
+    Uses fast geometric multipoint interpolation using a supplied geometric progression precomputation.
+
+.. function:: void nmod_poly_interpolate_geometric_nmod_vec_fast(nmod_poly_t poly, ulong r, nn_srcptr ys, slong len)
+
+    Sets ``poly`` to the unique polynomial of length at most ``len``
+    that interpolates the first ``len`` powers of the square of ``r`` and
+    the ``len`` values in ``ys``.
+
+    The values ``ys`` and ``r`` should be reduced modulo the
+    modulus, and ``r`` should be of sufficient order such that
+    none of the first ``len`` powers of `r^2` is one. Aliasing between
+    ``poly`` and ``ys`` is not allowed.
+
+    Uses fast geometric multipoint interpolation, building a temporary geometric progression precomputation.
+
+
+Extrapolation
+--------------------------------------------------------------------------------
+
+.. function:: void nmod_poly_extrapolate_geometric_precomp(nn_ptr oval, slong olen, nn_srcptr ival, slong ilen, slong offset, const nmod_geometric_progression_t G)
+              void nmod_poly_extrapolate_geometric(nn_ptr oval, slong olen, nn_srcptr ival, slong ilen, slong offset, ulong r, nmod_t mod)
+
+    This extrapolates the ``ilen`` input values ``ival`` to compute ``olen``
+    output values ``oval``, based on points that are powers of `r^2` in
+    geometric progression; ``offset`` specifies the output points relative to
+    the input ones.
+
+    More precisely, let `m` stand for ``ilen``, let `n` stand for ``olen``, and
+    let `c` be any integer that is invertible modulo ``mod.n``. In this
+    description we assume `r` has "large enough" order; more details are given
+    below. The input ``ival`` is interpreted as the list of values `(f(c \cdot
+    r^{2(k+i)}))_{0 \le i < m}` of some polynomial `f` of degree less than `m`,
+    evaluated on the subsequence `(c \cdot r^{2(k+i)})_{0 \le i < m}` of the
+    geometric progression, for some given `k \ge 0`. Then the output ``oval``
+    is the list of values `(f(c \cdot r^{2(\ell+j)}))_{0 \le j < n}`, for the
+    starting index `\ell = k + \texttt{offset}`.
+
+    The input constraints are as follows. The algorithm does not need to know
+    about `c`, nor about `k` and `\ell` except for their difference
+    `\texttt{offset} = \ell - k`. The value `r` should be reduced modulo
+    ``mod.n``. There are two situations: forward extrapolation (when `\ell >
+    k`, i.e., ``offset`` is positive) and backward extrapolation (when `\ell <
+    k`, i.e., ``offset`` is negative).
+
+    - In the forward case, `r` should have sufficient multiplicative order so
+      that none of the first ``offset + olen`` powers of `r^2` is one, and
+      one should have ``offset >= ilen``. The latter means that the input and
+      output lists of points are disjoint (since `\ell \ge k+m`).
+
+    - In the backward case, `r` should have sufficient multiplicative order so
+      that none of the first ``ilen - offset`` powers of `r^2` is one, and one
+      should have ``offset + olen <= 0`` (recall that here ``offset`` is
+      negative). The latter means that the input and output lists of points are
+      disjoint (since `\ell+n \le k`).
+
+    The function without ``_precomp`` builds a temporary geometric progression
+    precomputation relative to ``r`` and ``mod``, and calls the version with
+    ``_precomp`` with this additional data.
 
 Composition
 --------------------------------------------------------------------------------
@@ -1570,23 +1723,25 @@ Taylor shift
 
     Performs the Taylor shift composing ``poly`` by `x+c` in-place.
     Writes the composition as a single convolution with cost `O(M(n))`.
-    We require that the modulus is a prime at least as large as the length.
+    We require that the modulus is a prime at least as large as the
+    length (this is not checked).
 
 .. function:: void nmod_poly_taylor_shift_convolution(nmod_poly_t g, const nmod_poly_t f, ulong c)
 
     Performs the Taylor shift composing ``f`` by `x+c`.
     Writes the composition as a single convolution with cost `O(M(n))`.
-    We require that the modulus is a prime at least as large as the length.
+    We require that the modulus is a prime at least as large as the
+    length (this is not checked).
 
 .. function:: void _nmod_poly_taylor_shift(nn_ptr poly, ulong c, slong len, nmod_t mod)
 
     Performs the Taylor shift composing ``poly`` by `x+c` in-place.
-    We require that the modulus is a prime.
+    We require that the modulus is a prime (this is not checked).
 
 .. function:: void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, ulong c)
 
     Performs the Taylor shift composing ``f`` by `x+c`.
-    We require that the modulus is a prime.
+    We require that the modulus is a prime (this is not checked).
 
 
 Modular composition
@@ -1778,6 +1933,13 @@ Greatest common divisor
     defined to be zero, whereas the GCD of the zero polynomial and some other
     polynomial `P` is defined to be `P`. Except in the case where
     the GCD is zero, the GCD `G` is made monic.
+
+.. function:: slong _nmod_poly_gcd_euclidean_redc_half(nn_ptr G, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nmod_t mod)
+              void nmod_poly_gcd_euclidean_redc_half(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
+
+    Analogous to the Euclidean GCD implementations, but uses ``nmod_redc_fast``
+    arithmetic internally. The modulus is required to be in range
+    for ``nmod_redc_fast``, i.e. odd and smaller than `2^{\mathtt{FLINT\_BITS} - 2}`.
 
 .. function:: slong _nmod_poly_hgcd(nn_ptr * M, slong * lenM, nn_ptr A, slong * lenA, nn_ptr B, slong * lenB, nn_srcptr a, slong lena, nn_srcptr b, slong lenb, nmod_t mod)
 
@@ -2053,7 +2215,7 @@ Greatest common divisor
 
     Attempts to set `A` to the inverse of `B` modulo `P` in the polynomial
     ring `(\mathbf{Z}/p\mathbf{Z})[X]`, where we assume that `p` is a prime
-    number.
+    number (this is not checked).
 
     If `\operatorname{len}(P) < 2`, raises an exception.
 
@@ -2152,7 +2314,7 @@ It is assumed that `h` has constant term `1` and that the coefficients
 .. function:: void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     Set `g` to the series expansion of `\sqrt{h}` to order `O(x^n)`.
-    It is assumed that `h` has constant term 1.
+    It is assumed that `h` has constant term 1 (this is not checked).
 
 .. function:: int _nmod_poly_sqrt(nn_ptr s, nn_srcptr p, slong n, nmod_t mod)
 
@@ -2259,6 +2421,8 @@ must therefore be a prime satisfying `p \ge n`. Further, we always
 require that `p > 2` in order to be able to multiply by `1/2` for
 internal purposes.
 If the input does not satisfy all these conditions, results are undefined.
+These conditions on the modulus are not checked (the required constant
+term is checked).
 Except where otherwise noted, functions are implemented with optimal
 (up to constants) complexity `O(M(n))`, where `M(n)` is the cost
 of polynomial multiplication.
@@ -2334,23 +2498,19 @@ of polynomial multiplication.
 
     Set `g = \operatorname{asinh}(h) + O(x^n)`.
 
-.. function:: void _nmod_poly_sin_series(nn_ptr g, nn_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_sin_series(nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set `g = \operatorname{sin}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed. The value is computed using the identity
-    `\sin(x) = 2 \tan(x/2)) / (1 + \tan^2(x/2)).`
+    Set `g = \operatorname{sin}(h) + O(x^n)`. Assumes `n > 0` and `hlen > 0`.
+    Aliasing of `g` and `h` is allowed.
 
 .. function:: void nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     Set `g = \operatorname{sin}(h) + O(x^n)`.
 
-.. function:: void _nmod_poly_cos_series(nn_ptr g, nn_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_cos_series(nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set `g = \operatorname{cos}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    allowed. The value is computed using the identity
-    `\cos(x) = (1-\tan^2(x/2)) / (1 + \tan^2(x/2)).`
+    Set `g = \operatorname{cos}(h) + O(x^n)`. Assumes `n > 0` and `hlen > 0`.
+    Aliasing of `g` and `h` is allowed.`
 
 .. function:: void nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
@@ -2358,9 +2518,7 @@ of polynomial multiplication.
 
 .. function:: void _nmod_poly_tan_series(nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set `g = \operatorname{tan}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Aliasing of `g` and `h` is
-    not allowed. Uses Newton iteration to invert the atan function.
+    Set `g = \operatorname{tan}(h) + O(x^n)`. Assumes `n > 0` and `hlen > 0`.
 
 .. function:: void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
@@ -2387,11 +2545,9 @@ of polynomial multiplication.
 
     Set `g = \operatorname{cosh}(h) + O(x^n)`.
 
-.. function:: void _nmod_poly_tanh_series(nn_ptr g, nn_srcptr h, slong n, nmod_t mod)
+.. function:: void _nmod_poly_tanh_series(nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 
-    Set `g = \operatorname{tanh}(h) + O(x^n)`. Assumes `n > 0` and that `h`
-    is zero-padded as necessary to length `n`. Uses the identity
-    `\tanh(x) = (e^{2x}-1)/(e^{2x}+1)`.
+    Set `g = \operatorname{tanh}(h) + O(x^n)`. Assumes `n > 0` and `hlen > 0`.
 
 .. function:: void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
@@ -2446,7 +2602,7 @@ Products
 .. function:: int nmod_poly_find_distinct_nonzero_roots(ulong * roots, const nmod_poly_t A)
 
     If ``A`` has `\deg(A)` distinct nonzero roots in `\mathbb{F}_p`, write these roots out to ``roots[0]`` to ``roots[deg(A) - 1]`` and return ``1``.
-    Otherwise, return ``0``. It is assumed that ``A`` is nonzero and that the modulus of ``A`` is prime.
+    Otherwise, return ``0``. It is assumed that ``A`` is nonzero and that the modulus of ``A`` is prime (the primality is not checked).
     This function uses Rabin's probabilistic method via gcd's with `(x + \delta)^{\frac{p-1}{2}} - 1`.
 
 
@@ -2482,6 +2638,41 @@ Subproduct trees
     Builds a subproduct tree in the preallocated space from
     the ``len`` monic linear factors `(x-r_i)`. The top level
     product is not computed.
+
+
+
+Geometric progression
+--------------------------------------------------------------------------------
+
+
+.. function:: void _nmod_geometric_progression_init_function(nmod_geometric_progression_t G, ulong r, slong len, nmod_t mod, ulong function)
+              void nmod_geometric_progression_init(nmod_geometric_progression_t G, ulong r, slong len, nmod_t mod)
+
+    Builds a geometric progression multipoint evaluation / interpolation structure.
+
+    The variant with ``function`` variant builds precomputation for specific
+    functionalities: currently, one should set ``function`` to `1` for
+    evaluation only, to `2` for interpolation only, and to `3` for both
+    evaluation and interpolation. The variant without ``function`` precomputes
+    for both.
+
+    The set of points used will be `1, r^2, r^4, \ldots, r^{2(len-1)}`.
+
+    The value of ``r`` should be reduced modulo the modulus ``mod``
+    and of sufficient multiplicative order such that none of
+    the powers `r^2, r^4, \ldots, r^{2(len-1)}` is one.
+
+    The value of ``len`` should be both greater than or equal to the number of evaluation points to be
+    considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.
+    This allocates vectors and polynomials for a total space of `6 len - 1` coefficients.
+
+    If the modulus is not prime, this function will work under the additional
+    assumption that all the used points `r^{2k}` as well as the auxiliary
+    values `r^{2k} - 1` are invertible.
+
+.. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
+
+    Clears the allocated polynomials and vectors used in the geometric progression precomputation ``G``.
 
 
 Inflation and deflation

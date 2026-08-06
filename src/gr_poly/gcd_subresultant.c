@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 
 /* todo: make this public and tested */
-int
+static int
 _gr_poly_pseudo_rem_cohen(gr_ptr R, gr_srcptr A, slong lenA,
                             gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
@@ -64,8 +64,9 @@ cleanup:
     return status;
 }
 
+#if 0
 /* todo: check leading coeff? */
-int
+static int
 gr_poly_pseudo_rem_cohen(gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 {
     slong lenr;
@@ -96,9 +97,10 @@ gr_poly_pseudo_rem_cohen(gr_poly_t R, const gr_poly_t A, const gr_poly_t B, gr_c
     _gr_poly_normalise(R, ctx);
     return status;
 }
+#endif
 
 /* todo: before making this public, when len == 1, call canonical_associate */
-int
+static int
 _gr_vec_content(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 {
     gr_method_binary_op gcd = GR_BINARY_OP(ctx, GCD);

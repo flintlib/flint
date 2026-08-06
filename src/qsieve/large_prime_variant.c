@@ -19,79 +19,13 @@
 #include "qsieve.h"
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
-#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))
+#define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> qs_inf->hash_shift))
 
 /******************************************************************************
  *
  *  Some helper function, used for debugging
  *
  *****************************************************************************/
-
-/*
-    Display a relation for debugging purposes
-*/
-void qsieve_display_relation(qs_t qs_inf, relation_t a)
-{
-    slong i;
-
-    flint_printf("%wu ", a.lp);
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-        flint_printf("%wd ", a.small[i]);
-
-    flint_printf("%wd ", a.num_factors);
-
-    for (i = 0; i < a.num_factors; i++)
-        flint_printf("%wd %wu ", a.factor[i].ind, a.factor[i].exp);
-
-    fmpz_print(a.Y);
-    flint_printf("\n");
-}
-
-/*
-    Check a relation is valid (debugging)
-*/
-int qsieve_is_relation(qs_t qs_inf, relation_t a)
-{
-    slong i;
-    fmpz_t temp, temp2;
-    fmpz_init(temp);
-    fmpz_init_set_ui(temp2, 1);
-
-    for (i = 0; i < qs_inf->small_primes; i++)
-    {
-        fmpz_set_si(temp, qs_inf->factor_base[i].p);
-        fmpz_pow_ui(temp, temp, a.small[i]);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    if (a.num_factors > qs_inf->max_factors)
-    {
-        return 0;
-    }
-
-    for (i = 0; i < a.num_factors; i++)
-    {
-        fmpz_set_ui(temp, qs_inf->factor_base[a.factor[i].ind].p);
-        fmpz_pow_ui(temp, temp, a.factor[i].exp);
-        fmpz_mul(temp2, temp2, temp);
-    }
-
-    fmpz_mul_ui(temp2, temp2, a.lp);
-    fmpz_pow_ui(temp, a.Y, UWORD(2));
-    fmpz_mod(temp, temp, qs_inf->kn);
-    fmpz_mod(temp2, temp2, qs_inf->kn);
-
-    if (fmpz_cmp(temp, temp2) != 0)
-    {
-        return 0;
-    }
-
-    fmpz_clear(temp);
-    fmpz_clear(temp2);
-
-    return 1;
-}
 
 /*
     Write partial or full relation to file
@@ -607,7 +541,17 @@ int qsieve_process_relation(qs_t qs_inf)
 #endif
 
     rlist = flint_malloc(num_relations * sizeof(relation_t));
-    memset(hash_table, 0, (1 << 20) * sizeof(ulong));
+
+    /* Clear only the hash buckets touched during the read loop, rather than
+       zeroing the full 2^20-entry (8 MB) table.  table[1..vertices] holds
+       exactly the primes inserted, each in bucket HASH(prime). */
+    {
+        // instead of memset(hash_table, 0, qs_inf->hash_size * sizeof(ulong));
+        slong _v;
+        for (_v = 1; _v <= (slong) qs_inf->vertices; _v++)
+            hash_table[HASH(qs_inf->table[_v].prime)] = 0;
+    }
+
     qs_inf->vertices = 0;
 
     rlist_length = 0;

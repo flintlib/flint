@@ -192,7 +192,7 @@ int _mpn_mod_poly_divrem_q1_preinv1_karatsuba(nn_ptr Q, nn_ptr R,
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
 slong parameters[] = { 2, 3, 4, 6, 8, 10, 12, 14, 16, 20, 24, 32, 48, 64, 96, 128, 0 };
@@ -255,24 +255,24 @@ best_table(flint_rand_t state, int comparison, gr_ctx_t ctx)
         randvec(B, state, lenB, ctx);
         GR_MUST_SUCCEED(mpn_mod_inv(invL, GR_ENTRY(B, lenB - 1, ctx->sizeof_elem), ctx));
 
-        TIMEIT_START
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_divrem_q1_preinv1_old(Q, R, A, lenA, B, lenB, invL, ctx));
-        TIMEIT_STOP_VALUES(__, times[0])
-        TIMEIT_START
+        TIMEIT_STOP_VALUES(__, times[0]);
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_divrem_q1_preinv1_fmma(Q, R, A, lenA, B, lenB, invL, ctx));
-        TIMEIT_STOP_VALUES(__, times[1])
-        TIMEIT_START
+        TIMEIT_STOP_VALUES(__, times[1]);
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_divrem_q1_preinv1_fmma_precond(Q, R, A, lenA, B, lenB, invL, ctx));
-        TIMEIT_STOP_VALUES(__, times[2])
-        TIMEIT_START
+        TIMEIT_STOP_VALUES(__, times[2]);
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_divrem_q1_preinv1_karatsuba(Q, R, A, lenA, B, lenB, invL, ctx));
-        TIMEIT_STOP_VALUES(__, times[3])
-        TIMEIT_START
+        TIMEIT_STOP_VALUES(__, times[3]);
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_divrem_q1_preinv1_karatsuba_precond(Q, R, A, lenA, B, lenB, invL, ctx));
-        TIMEIT_STOP_VALUES(__, times[4])
-        TIMEIT_START
+        TIMEIT_STOP_VALUES(__, times[4]);
+        TIMEIT_START;
         GR_MUST_SUCCEED(_mpn_mod_poly_divrem_q1_preinv1(Q, R, A, lenA, B, lenB, invL, ctx));
-        TIMEIT_STOP_VALUES(__, times[5])
+        TIMEIT_STOP_VALUES(__, times[5]);
 
         best = 0;
         for (i = 1; i < 5; i++)
@@ -305,7 +305,7 @@ best_table(flint_rand_t state, int comparison, gr_ctx_t ctx)
     }
 }
 
-int main()
+int main(void)
 {
     fmpz_t p;
     gr_ctx_t ctx;

@@ -33,7 +33,7 @@ int main(void)
         flint_printf("%wd x %wd bits:   ", reps[b], bits[b]);
         fmpz_one(n);
         fmpz_mul_2exp(n, n, bits[b] - 1);
-        TIMEIT_ONCE_START
+        TIMEIT_ONCE_START;
         for (i = 0; i < reps[b]; i++)
         {
             fmpz_add_ui(n, n, 1);
@@ -47,7 +47,7 @@ int main(void)
             }
 */
         }
-        TIMEIT_ONCE_STOP
+        TIMEIT_ONCE_STOP;
     }
 
     fmpz_factor_clear(fac);

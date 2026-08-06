@@ -12,16 +12,16 @@
 #include "fmpz_vec.h"
 #include "padic_poly.h"
 
-void padic_poly_set_fmpz_poly(padic_poly_t f, const fmpz_poly_t g,
+void padic_poly_set_fmpz_poly(padic_poly_t rop, const fmpz_poly_t op,
                               const padic_ctx_t ctx)
 {
-    const slong len = g->length;
+    const slong len = op->length;
 
-    padic_poly_fit_length(f, len);
-    _padic_poly_set_length(f, len);
-    _fmpz_vec_set(f->coeffs, g->coeffs, len);
-    f->val = 0;
+    padic_poly_fit_length(rop, len);
+    _padic_poly_set_length(rop, len);
+    _fmpz_vec_set(rop->coeffs, op->coeffs, len);
+    rop->val = 0;
 
-    padic_poly_canonicalise(f, ctx->p);
-    padic_poly_reduce(f, ctx);
+    padic_poly_canonicalise(rop, ctx->p);
+    padic_poly_reduce(rop, ctx);
 }

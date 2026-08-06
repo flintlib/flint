@@ -55,7 +55,7 @@ const ulong ULONG_PRIMORIALS[] =
 
 #define PROD_LIMBS_DIRECT_CUTOFF 50
 
-slong mpn_prod_limbs_direct(ulong * result, const ulong * factors,
+static slong mpn_prod_limbs_direct(ulong * result, const ulong * factors,
     slong n)
 {
     slong k, len;
@@ -79,7 +79,7 @@ slong mpn_prod_limbs_direct(ulong * result, const ulong * factors,
     return len;
 }
 
-slong mpn_prod_limbs_balanced(ulong * result, ulong * scratch,
+static slong mpn_prod_limbs_balanced(ulong * result, ulong * scratch,
                              const ulong * factors, slong n, ulong bits)
 {
     slong an, bn, alen, blen, len;
@@ -112,7 +112,7 @@ slong mpn_prod_limbs_balanced(ulong * result, ulong * scratch,
     bits must be set to some bound on the bit size of the entries
     in factors. If no bound is known, simply use FLINT_BITS.
 */
-slong mpn_prod_limbs(ulong * result, const ulong * factors,
+static slong mpn_prod_limbs(ulong * result, const ulong * factors,
     slong n, ulong bits)
 {
     slong len, limbs;

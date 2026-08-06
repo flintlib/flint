@@ -28,7 +28,8 @@ Random functions
 
 .. function:: void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 
-    Sets ``vec`` to a vector of the given length with entries picked uniformly at random in `[0, mod.n)`.
+    Sets ``vec`` to a vector of the given length with entries picked uniformly
+    at random in ``[0, mod.n)``.
 
 
 Basic manipulation and comparison
@@ -112,25 +113,67 @@ Arithmetic operations
 
     Sets each entry of ``(res, len)`` to the modular inverse of the
     corresponding entry in ``(vec, len)``. Assumes all entries in
-    ``vec`` are invertible modulo `mod.n`. Aliasing of ``res`` and ``vec`` is
-    allowed.
+    ``vec`` are invertible modulo `mod.n`; this is not checked. Aliasing
+    of ``res`` and ``vec`` is allowed.
 
 .. function:: void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c`. The element
-    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``.
+    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``
+    (this is not checked).
 
 .. function:: void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
     :func:`n_mulmod_shoup`. ``mod.n`` should be less than
-    `2^{\mathtt{FLINT\_BITS} - 1}`, and `c` should be less than ``mod.n``.
-    There is no constraint on elements of ``vec``.
+    `2^{\mathtt{FLINT\_BITS} - 1}`, and `c` should be less than ``mod.n``
+    (this is not checked). There is no constraint on elements of ``vec``.
+
+.. function:: void _nmod_vec_scalar_mul_nmod_redc(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
+
+    Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
+    Montgomery multiplication. Requires that ``mod.n`` is odd.
+    The element `c` and all elements of ``vec`` are assumed to be less
+    than ``mod.n`` (this is not checked).
 
 .. function:: void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Adds ``(vec, len)`` times `c` to the vector ``(res, len)``. The element
-    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``.
+    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``
+    (this is not checked).
+
+
+Arithmetic operations without reduction
+--------------------------------------------------------------------------------
+
+The following functions set `r_i \gets r_i + v_i \cdot c`,
+`0 \le i < len`, with `r` given by ``res`` and `v` given by ``vec``,
+without performing modular reduction,
+with specific limitations on the inputs.
+
+.. function:: void _nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    Assumes that `v_i` and `c` are half-limb values and that
+    `r_i + v_i \cdot c` does not overflow a limb.
+
+.. function:: void _nmod_vec_nored_ll_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    The array ``res`` contains ``2 len`` limbs, representing double-limb
+    integers contiguously.
+    Assumes that `v_i` and `c` are half-limb values and that
+    `r_i + v_i \cdot c` does not overflow two limbs.
+
+.. function:: void _nmod_vec_nored_ll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    The array ``res`` contains ``2 len`` limbs, representing double-limb
+    integers contiguously.
+    Assumes that `r_i + v_i \cdot c` does not overflow two limbs.
+
+.. function:: void _nmod_vec_nored_lll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+
+    The array ``res`` contains ``3 len`` limbs, representing triple-limb
+    integers contiguously.
+    Assumes that `r_i + v_i \cdot c` does not overflow three limbs.
 
 
 Dot products
@@ -192,18 +235,25 @@ performed at the very end of the computation.
     Returns the dot product of (``vec1``, ``len``) and (``vec2``, ``len``). The
     input ``params`` has type ``dot_params_t`` and must have been computed via
     ``_nmod_vec_dot_params`` with the specified ``mod`` and with a length
-    greater than or equal to ``len``.
+    greater than or equal to ``len`` (this is not checked).
 
 .. function:: ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 
     The same as ``_nmod_vec_dot``, but reverses ``vec2``.
+
+.. function:: ulong _nmod_vec_dot_strided(nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, nmod_t mod, dot_params_t params)
+
+    The same as ``_nmod_vec_dot``, but reads entries at index `i \cdot stride1`
+    of ``vec1`` and `i \cdot stride2` of ``vec2``.
+    The strides may be negative.
 
 .. function:: ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
 
     Returns the dot product of (``vec1``, ``len``) and the values at
     ``vec2[i][offset]``. The input ``params`` has type ``dot_params_t`` and
     must have been computed via ``_nmod_vec_dot_params`` with the specified
-    ``mod`` and with a length greater than or equal to ``len``.
+    ``mod`` and with a length greater than or equal to ``len`` (this is not
+    checked).
 
 .. macro:: NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)
 
@@ -216,7 +266,7 @@ performed at the very end of the computation.
     but with the arithmetic performed modulo ``mod``. The input ``params`` has
     type ``dot_params_t`` and must have been computed via
     ``_nmod_vec_dot_params`` with the specified ``mod`` and with a length
-    greater than or equal to ``len``.
+    greater than or equal to ``len`` (this is not checked).
 
     ``nmod.h`` has to be included in order for this macro to work (order of
     inclusions does not matter).

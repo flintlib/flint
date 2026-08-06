@@ -20,7 +20,7 @@ void fmpz_mod_mpoly_deflate(
     const fmpz * stride,
     const fmpz_mod_mpoly_ctx_t ctx)
 {
-    slong bits = B->bits;
+    flint_bitcnt_t bits = B->bits;
     slong NA = mpoly_words_per_exp(bits, ctx->minfo);
 
     if (fmpz_mod_mpoly_is_zero(B, ctx))

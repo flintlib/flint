@@ -16,7 +16,7 @@
 
 /* todo: other algorithms; specializations */
 
-int
+static int
 gr_rising_ui_forward(gr_ptr res, gr_srcptr x, ulong n, gr_ctx_t ctx)
 {
     gr_ptr t;

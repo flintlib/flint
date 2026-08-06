@@ -40,7 +40,7 @@ fmpz_mat_move_row(fmpz_mat_t A, slong i, slong j)
     type == 2 indicates early size reductions and removals are desired
 */
 
-int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl, int heuristic, int type, int nff_cutoff)
+static int _fmpz_lll_d(fmpz_mat_t B, fmpz_mat_t U, const fmpz_t gs_B, const fmpz_lll_t fl, int heuristic, int type, int nff_cutoff)
 {
     int newd = 0;
     int ok = 1;

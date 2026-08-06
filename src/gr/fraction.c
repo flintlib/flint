@@ -39,51 +39,53 @@ typedef gr_fraction_ctx_struct gr_fraction_ctx_t[1];
 
 
 
-int
+static int
 _gr_fraction_ctx_write(gr_stream_t out, gr_fraction_ctx_t ctx)
 {
-    gr_stream_write(out, "Fraction field over ");
-    gr_ctx_write(out, GR_FRACTION_DOMAIN_CTX(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Fraction field over ");
+    status |= gr_ctx_write(out, GR_FRACTION_DOMAIN_CTX(ctx));
+    return status;
 }
 
-void
+static void
 _gr_fraction_ctx_clear(gr_ctx_t ctx)
 {
 }
 
 /* Normally the domain is assumed to be an integral domain, but it could
    be something inexact like polynomials with floating-point coefficients. */
-truth_t _gr_fraction_ctx_is_certainly_field_else_unknown(gr_fraction_ctx_t ctx)
+static truth_t _gr_fraction_ctx_is_certainly_field_else_unknown(gr_fraction_ctx_t ctx)
 {
     return gr_ctx_is_integral_domain(GR_FRACTION_DOMAIN_CTX(ctx)) == T_TRUE ? T_TRUE : T_UNKNOWN;
 }
 
-truth_t _gr_fraction_ctx_is_rational_vector_space(gr_fraction_ctx_t ctx)
+static truth_t _gr_fraction_ctx_is_rational_vector_space(gr_fraction_ctx_t ctx)
 {
     return truth_and(_gr_fraction_ctx_is_certainly_field_else_unknown(ctx),
                 truth_not(gr_ctx_is_finite_characteristic(GR_FRACTION_DOMAIN_CTX(ctx))));
 }
 
-truth_t _gr_fraction_ctx_is_real_vector_space(gr_fraction_ctx_t ctx)
+static truth_t _gr_fraction_ctx_is_real_vector_space(gr_fraction_ctx_t ctx)
 {
     return truth_and(_gr_fraction_ctx_is_certainly_field_else_unknown(ctx),
             gr_ctx_is_real_vector_space(GR_FRACTION_DOMAIN_CTX(ctx)));
 }
 
-truth_t _gr_fraction_ctx_is_complex_vector_space(gr_fraction_ctx_t ctx)
+static truth_t _gr_fraction_ctx_is_complex_vector_space(gr_fraction_ctx_t ctx)
 {
     return truth_and(_gr_fraction_ctx_is_certainly_field_else_unknown(ctx),
             gr_ctx_is_complex_vector_space(GR_FRACTION_DOMAIN_CTX(ctx)));
 }
 
-truth_t _gr_fraction_ctx_is_threadsafe(gr_ctx_t ctx) { return gr_ctx_is_threadsafe(GR_FRACTION_DOMAIN_CTX(ctx)); }
-truth_t _gr_fraction_ctx_is_finite(gr_ctx_t ctx) { return gr_ctx_is_finite(GR_FRACTION_DOMAIN_CTX(ctx)); }
-truth_t _gr_fraction_ctx_is_finite_characteristic(gr_ctx_t ctx) { return gr_ctx_is_finite_characteristic(GR_FRACTION_DOMAIN_CTX(ctx)); }
-truth_t _gr_fraction_ctx_is_exact(gr_ctx_t ctx) { return gr_ctx_is_exact(GR_FRACTION_DOMAIN_CTX(ctx)); }
+static truth_t _gr_fraction_ctx_is_threadsafe(gr_ctx_t ctx) { return gr_ctx_is_threadsafe(GR_FRACTION_DOMAIN_CTX(ctx)); }
+static truth_t _gr_fraction_ctx_is_finite(gr_ctx_t ctx) { return gr_ctx_is_finite(GR_FRACTION_DOMAIN_CTX(ctx)); }
+static truth_t _gr_fraction_ctx_is_finite_characteristic(gr_ctx_t ctx) { return gr_ctx_is_finite_characteristic(GR_FRACTION_DOMAIN_CTX(ctx)); }
+static truth_t _gr_fraction_ctx_is_exact(gr_ctx_t ctx) { return gr_ctx_is_exact(GR_FRACTION_DOMAIN_CTX(ctx)); }
 
+static gr_ptr _gr_fraction_ctx_base(gr_ctx_t ctx) { return GR_FRACTION_DOMAIN_CTX(ctx); }
 
-void
+static void
 _gr_fraction_init(gr_ptr x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -94,7 +96,7 @@ _gr_fraction_init(gr_ptr x, gr_fraction_ctx_t ctx)
     GR_MUST_SUCCEED(gr_one(b, domain_ctx));
 }
 
-void
+static void
 _gr_fraction_clear(gr_ptr x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -104,8 +106,8 @@ _gr_fraction_clear(gr_ptr x, gr_fraction_ctx_t ctx)
     gr_clear(b, domain_ctx);
 }
 
-int
-_gr_fraction_write(gr_stream_t out, gr_ptr x, gr_fraction_ctx_t ctx)
+static int
+_gr_fraction_write(gr_stream_t out, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
     gr_ctx_struct * domain_ctx = DOMAIN(ctx);
@@ -117,10 +119,10 @@ _gr_fraction_write(gr_stream_t out, gr_ptr x, gr_fraction_ctx_t ctx)
     status |= gr_write(out, b, domain_ctx);
     status |= gr_stream_write(out, ")");
 
-    return GR_SUCCESS;
+    return status;
 }
 
-void
+static void
 _gr_fraction_set_shallow(gr_ptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -131,7 +133,7 @@ _gr_fraction_set_shallow(gr_ptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
     gr_set_shallow(b, d, domain_ctx);
 }
 
-void
+static void
 _gr_fraction_swap(gr_ptr x, gr_ptr y, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -197,7 +199,7 @@ gr_fraction_canonicalise_unit(gr_ptr x, gr_fraction_ctx_t ctx)
 }
 
 
-int
+static int
 _gr_fraction_randtest(gr_ptr x, flint_rand_t state, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -219,7 +221,7 @@ _gr_fraction_randtest(gr_ptr x, flint_rand_t state, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_zero(gr_ptr x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -231,7 +233,7 @@ _gr_fraction_zero(gr_ptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_one(gr_ptr x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -243,7 +245,7 @@ _gr_fraction_one(gr_ptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_neg_one(gr_ptr x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -255,7 +257,7 @@ _gr_fraction_neg_one(gr_ptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_set(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(res, ctx), b = DENOM(res, ctx);
@@ -268,7 +270,7 @@ _gr_fraction_set(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_set_si(gr_ptr res, slong x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(res, ctx), b = DENOM(res, ctx);
@@ -280,7 +282,7 @@ _gr_fraction_set_si(gr_ptr res, slong x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_set_ui(gr_ptr res, ulong x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(res, ctx), b = DENOM(res, ctx);
@@ -292,7 +294,7 @@ _gr_fraction_set_ui(gr_ptr res, ulong x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_set_fmpz(gr_ptr res, const fmpz_t x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(res, ctx), b = DENOM(res, ctx);
@@ -304,7 +306,7 @@ _gr_fraction_set_fmpz(gr_ptr res, const fmpz_t x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(res, ctx), b = DENOM(res, ctx);
@@ -367,7 +369,7 @@ _gr_fraction_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_fraction_ctx_
     return status;
 }
 
-int
+static int
 _gr_fraction_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
 {
     int status;
@@ -397,7 +399,7 @@ _gr_fraction_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
-truth_t
+static truth_t
 _gr_fraction_equal(gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a, b, c, d;
@@ -440,13 +442,13 @@ _gr_fraction_equal(gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
     }
 }
 
-truth_t
+static truth_t
 _gr_fraction_is_zero(gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     return gr_is_zero(NUMER(x, ctx), DOMAIN(ctx));
 }
 
-truth_t
+static truth_t
 _gr_fraction_is_one(gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -471,7 +473,7 @@ _gr_fraction_is_one(gr_srcptr x, gr_fraction_ctx_t ctx)
     }
 }
 
-truth_t
+static truth_t
 _gr_fraction_is_neg_one(gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -506,7 +508,7 @@ _gr_fraction_is_neg_one(gr_srcptr x, gr_fraction_ctx_t ctx)
 }
 
 
-int
+static int
 _gr_fraction_neg(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     gr_ptr a = NUMER(res, ctx), b = DENOM(res, ctx);
@@ -519,7 +521,7 @@ _gr_fraction_neg(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_add_early_reduction(gr_ptr res_num, gr_ptr res_den,
                 gr_srcptr x_num, gr_srcptr x_den,
                 gr_srcptr y_num, gr_srcptr y_den, int subtract, gr_ctx_t ctx)
@@ -685,7 +687,7 @@ _gr_fraction_add_early_reduction(gr_ptr res_num, gr_ptr res_den,
     }
 }
 
-int
+static int
 _gr_fraction_mul_early_reduction(gr_ptr res_num, gr_ptr res_den,
                 gr_srcptr x_num, gr_srcptr x_den,
                 gr_srcptr y_num, gr_srcptr y_den, gr_ctx_t ctx)
@@ -827,7 +829,7 @@ _gr_fraction_mul_early_reduction(gr_ptr res_num, gr_ptr res_den,
     }
 }
 
-int
+static int
 _gr_fraction_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -856,7 +858,7 @@ _gr_fraction_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -885,7 +887,7 @@ _gr_fraction_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -908,7 +910,7 @@ _gr_fraction_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -965,7 +967,7 @@ _gr_fraction_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_inv(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -997,13 +999,13 @@ _gr_fraction_inv(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-truth_t
+static truth_t
 _gr_fraction_is_invertible(gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     return truth_not(gr_is_zero(NUMER(x, ctx), DOMAIN(ctx)));
 }
 
-int
+static int
 _gr_fraction_sqrt(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -1026,7 +1028,7 @@ _gr_fraction_sqrt(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -1040,7 +1042,7 @@ _gr_fraction_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_fraction_ctx_t ctx)
 {
     gr_srcptr a = NUMER(x, ctx), b = DENOM(x, ctx);
@@ -1077,7 +1079,7 @@ _gr_fraction_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_fraction_ctx_t
     return status;
 }
 
-int
+static int
 _gr_fraction_numerator(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -1088,7 +1090,7 @@ _gr_fraction_numerator(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_denominator(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -1099,7 +1101,7 @@ _gr_fraction_denominator(gr_ptr res, gr_srcptr x, gr_fraction_ctx_t ctx)
     return status;
 }
 
-int
+static int
 _gr_fraction_i(gr_ptr res, gr_fraction_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -1111,7 +1113,7 @@ _gr_fraction_i(gr_ptr res, gr_fraction_ctx_t ctx)
     return (status == GR_SUCCESS) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
+static int
 _gr_fraction_pi(gr_ptr res, gr_fraction_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -1146,6 +1148,7 @@ gr_method_tab_input _gr_fraction_methods_input[] =
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,    (gr_funcptr) _gr_fraction_ctx_is_finite_characteristic},
 
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) _gr_fraction_ctx_is_exact},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_fraction_ctx_base},
 
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fraction_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fraction_clear},

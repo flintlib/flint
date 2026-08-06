@@ -33,11 +33,11 @@ int main(int argc, char *argv[])
 
     fmpq_init(x);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     bernoulli_fmpq_ui(x, n);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
 
     if (n <= 100)
     {

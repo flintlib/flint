@@ -27,23 +27,24 @@ _gr_fmpz_mod_mpoly_ctx_t;
 #define MPOLYNOMIAL_CTX(ring_ctx) ((_gr_fmpz_mod_mpoly_ctx_t *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 #define MPOLYNOMIAL_MCTX(ring_ctx) (MPOLYNOMIAL_CTX(ring_ctx)->mctx)
 
-int _gr_fmpz_mod_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+static int _gr_fmpz_mod_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Fraction field of multivariate polynomials over finite field (fmpz_mod) mod ");
-    gr_stream_write_fmpz(out, MPOLYNOMIAL_MCTX(ctx)->ffinfo->n);
-    gr_stream_write(out, " in ");
-    gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
-    gr_stream_write(out, " variables");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Fraction field of multivariate polynomials over finite field (fmpz_mod) mod ");
+    status |= gr_stream_write_fmpz(out, MPOLYNOMIAL_MCTX(ctx)->ffinfo->n);
+    status |= gr_stream_write(out, " in ");
+    status |= gr_stream_write_si(out, MPOLYNOMIAL_MCTX(ctx)->minfo->nvars);
+    status |= gr_stream_write(out, " variables");
     if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_LEX)
-        gr_stream_write(out, ", lex order");
+        status |= gr_stream_write(out, ", lex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGLEX)
-        gr_stream_write(out, ", deglex order");
+        status |= gr_stream_write(out, ", deglex order");
     else if (MPOLYNOMIAL_MCTX(ctx)->minfo->ord == ORD_DEGREVLEX)
-        gr_stream_write(out, ", degrevlex order");
-    return GR_SUCCESS;
+        status |= gr_stream_write(out, ", degrevlex order");
+    return status;
 }
 
-void _gr_fmpz_mod_mpoly_q_ctx_clear(gr_ctx_t ctx)
+static void _gr_fmpz_mod_mpoly_q_ctx_clear(gr_ctx_t ctx)
 {
     if (MPOLYNOMIAL_CTX(ctx)->vars != NULL)
     {
@@ -57,7 +58,7 @@ void _gr_fmpz_mod_mpoly_q_ctx_clear(gr_ctx_t ctx)
     flint_free(GR_CTX_DATA_AS_PTR(ctx));  
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 {
     slong i, nvars, len;
@@ -86,14 +87,14 @@ _gr_fmpz_mod_mpoly_q_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return GR_SUCCESS;
 }
 
-slong
+static slong
 _gr_fmpz_mod_mpoly_q_ctx_ngens(slong * ngens, gr_ctx_t ctx)
 {
     * ngens = MPOLYNOMIAL_MCTX(ctx)->minfo->nvars;
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
 {
     if (i < 0 || i >= MPOLYNOMIAL_MCTX(ctx)->minfo->nvars)
@@ -112,109 +113,126 @@ _gr_fmpz_mod_mpoly_q_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-void
+static void
 _gr_fmpz_mod_mpoly_q_init(fmpz_mod_mpoly_q_t res, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_init(res, MPOLYNOMIAL_MCTX(ctx));
 }
 
-void
+static void
 _gr_fmpz_mod_mpoly_q_clear(fmpz_mod_mpoly_q_t res, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_clear(res, MPOLYNOMIAL_MCTX(ctx));
 }
 
-void
+static void
 _gr_fmpz_mod_mpoly_q_swap(fmpz_mod_mpoly_q_t poly1, fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_swap(poly1, poly2, MPOLYNOMIAL_MCTX(ctx));
 }
 
-void
+static void
 _gr_fmpz_mod_mpoly_q_set_shallow(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly, gr_ctx_t ctx)
 {
     *res = *poly;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_randtest(fmpz_mod_mpoly_q_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    fmpz_mod_mpoly_q_randtest(res, state, n_randint(state, 5), 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
+    slong length;
+    flint_bitcnt_t exp_bits;
+
+    /* Split state-mutating calls so consumption order is architecture-independent. */
+    length = n_randint(state, 5);
+    exp_bits = 1 + n_randint(state, 3);
+    fmpz_mod_mpoly_q_randtest(res, state, length, exp_bits, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_randtest_small(fmpz_mod_mpoly_q_t res, flint_rand_t state, gr_ctx_t ctx)
 {
-    fmpz_mod_mpoly_q_randtest(res, state, n_randint(state, 3), 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
+    slong length;
+    flint_bitcnt_t exp_bits;
+
+    length = n_randint(state, 3);
+    exp_bits = 1 + n_randint(state, 3);
+    fmpz_mod_mpoly_q_randtest(res, state, length, exp_bits, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-slong
+static slong
 _gr_fmpz_mod_mpoly_q_length(const fmpz_mod_mpoly_q_t x, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_numref(x)->length + fmpz_mod_mpoly_q_denref(x)->length;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_write(gr_stream_t out, fmpz_mod_mpoly_q_t f, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
     if (fmpz_mod_mpoly_is_one(fmpz_mod_mpoly_q_denref(f), MPOLYNOMIAL_MCTX(ctx)))
     {
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
     }
     else if (fmpz_mod_mpoly_is_fmpz(fmpz_mod_mpoly_q_denref(f), MPOLYNOMIAL_MCTX(ctx)))
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-        gr_stream_write(out, ")/");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, ")/");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
     }
     else
     {
-        gr_stream_write(out, "(");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-        gr_stream_write(out, ")/(");
-        gr_stream_write_free(out, fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
-        gr_stream_write(out, ")");
+        status |= gr_stream_write(out, "(");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, ")/(");
+        status |= gr_stream_write_free(out,
+            fmpz_mod_mpoly_get_str_pretty(fmpz_mod_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
+        status |= gr_stream_write(out, ")");
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_mod_mpoly_q_equal(const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_equal(poly1, poly2, MPOLYNOMIAL_MCTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_mod_mpoly_q_is_zero(const fmpz_mod_mpoly_q_t poly, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_is_zero(poly, MPOLYNOMIAL_MCTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_mod_mpoly_q_is_one(const fmpz_mod_mpoly_q_t poly, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_is_one(poly, MPOLYNOMIAL_MCTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_zero(fmpz_mod_mpoly_q_t res, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_zero(res, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_one(fmpz_mod_mpoly_q_t res, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_one(res, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_gens(gr_vec_t res, gr_ctx_t ctx)
 {
     slong i, n;
@@ -228,21 +246,21 @@ _gr_fmpz_mod_mpoly_q_gens(gr_vec_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_set(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t mat, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_set(res, mat, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_set_si(fmpz_mod_mpoly_q_t res, slong v, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_set_si(res, v, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_set_ui(fmpz_mod_mpoly_q_t res, ulong v, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_set_ui(fmpz_mod_mpoly_q_numref(res), v, MPOLYNOMIAL_MCTX(ctx));
@@ -250,34 +268,34 @@ _gr_fmpz_mod_mpoly_q_set_ui(fmpz_mod_mpoly_q_t res, ulong v, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_set_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_t v, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_set_fmpz(res, v, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_set_fmpq(fmpz_mod_mpoly_q_t res, const fmpq_t v, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_set_fmpq(res, v, MPOLYNOMIAL_MCTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_neg(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t mat, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_neg(res, mat, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_add(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_add(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_add_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_add_si(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
@@ -286,74 +304,74 @@ _gr_fmpz_mod_mpoly_q_add_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t pol
 
 
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_add_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_add_fmpz(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_add_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpq_t c, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_add_fmpq(res, poly1, c, MPOLYNOMIAL_MCTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_sub(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_sub(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_sub_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_sub_si(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_sub_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_sub_fmpz(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_sub_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpq_t c, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_sub_fmpq(res, poly1, c, MPOLYNOMIAL_MCTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_mul(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_mul(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_mul_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_mul_si(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_mul_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_q_mul_fmpz(res, poly1, c, MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_mul_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpq_t c, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_mul_fmpq(res, poly1, c, MPOLYNOMIAL_MCTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_mod_mpoly_q_t poly2, gr_ctx_t ctx)
 {
     if (fmpz_mod_mpoly_q_is_zero(poly2, MPOLYNOMIAL_MCTX(ctx)))
@@ -363,31 +381,31 @@ _gr_fmpz_mod_mpoly_q_div(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1,
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_div_si(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, slong c, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_div_si(res, poly1, c, MPOLYNOMIAL_MCTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_div_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_div_fmpz(res, poly1, c, MPOLYNOMIAL_MCTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_div_fmpq(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpq_t c, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_div_fmpq(res, poly1, c, MPOLYNOMIAL_MCTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
-truth_t
+static truth_t
 _gr_fmpz_mod_mpoly_q_is_invertible(const fmpz_mod_mpoly_q_t c, gr_ctx_t ctx)
 {
     return fmpz_mod_mpoly_q_is_zero(c, MPOLYNOMIAL_MCTX(ctx)) ? T_FALSE : T_TRUE;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t c, gr_ctx_t ctx)
 {
     if (!fmpz_mod_mpoly_q_is_zero(c, MPOLYNOMIAL_MCTX(ctx)))
@@ -399,7 +417,7 @@ _gr_fmpz_mod_mpoly_q_inv(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t c, gr_
     return GR_DOMAIN;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_pow_ui(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, ulong c, gr_ctx_t ctx)
 {
     if (fmpz_mod_mpoly_pow_ui(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(poly1), c, MPOLYNOMIAL_MCTX(ctx)) &&
@@ -409,7 +427,7 @@ _gr_fmpz_mod_mpoly_q_pow_ui(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t pol
         return GR_UNABLE;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_pow_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t poly1, const fmpz_t c, gr_ctx_t ctx)
 {
     if (fmpz_sgn(c) < 0)
@@ -438,7 +456,7 @@ _gr_fmpz_mod_mpoly_q_pow_fmpz(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t p
 
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_numerator(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_set(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_numref(x), MPOLYNOMIAL_MCTX(ctx));
@@ -446,7 +464,7 @@ _gr_fmpz_mod_mpoly_q_numerator(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t 
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_fmpz_mod_mpoly_q_denominator(fmpz_mod_mpoly_q_t res, const fmpz_mod_mpoly_q_t x, const gr_ctx_t ctx)
 {
     fmpz_mod_mpoly_set(fmpz_mod_mpoly_q_numref(res), fmpz_mod_mpoly_q_denref(x), MPOLYNOMIAL_MCTX(ctx));

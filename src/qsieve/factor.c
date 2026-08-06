@@ -38,7 +38,78 @@
 # include <windows.h>
 #endif
 
-int compare_facs(const void * a, const void * b)
+/*
+   Refine n by the factors found so far, so that every entry of the result is a
+   product of prime powers of n and their product is n.  Each factor is taken
+   against *every* entry, not just the last: a factor splitting an earlier
+   entry would otherwise be dropped and n would come back incompletely
+   factored.  Exponents are multiplied through a split so repeated factors stay
+   correct.
+
+   Both the decision to stop taking square roots and the factor list finally
+   returned come from this one routine, so the two cannot disagree.
+*/
+static void
+qsieve_refine(fmpz_factor_t factors, const fmpz_t n, fmpz * facs, slong num_facs)
+{
+   fmpz_t temp, temp2;
+   slong i, k;
+
+   fmpz_init(temp);
+   fmpz_init(temp2);
+
+   _fmpz_factor_set_length(factors, 0);
+   _fmpz_factor_append(factors, n, 1);
+
+   for (i = 0; i < num_facs; i++)
+   {
+      for (k = 0; k < factors->num; k++)
+      {
+         fmpz_gcd(temp, factors->p + k, facs + i);
+
+         if (!fmpz_is_one(temp) && !fmpz_equal(temp, factors->p + k))
+         {
+            slong mult = factors->exp[k];
+            slong e = fmpz_remove(temp2, factors->p + k, temp);
+
+            fmpz_set(factors->p + k, temp);
+            factors->exp[k] = e * mult;
+
+            if (!fmpz_is_one(temp2))
+               _fmpz_factor_append(factors, temp2, mult);
+         }
+      }
+   }
+
+   fmpz_clear(temp);
+   fmpz_clear(temp2);
+}
+
+/* is every entry of the refinement prime? */
+static int
+qsieve_refine_is_complete(const fmpz_t n, fmpz * facs, slong num_facs)
+{
+   fmpz_factor_t trial;
+   slong k;
+   int complete = 1;
+
+   fmpz_factor_init(trial);
+   qsieve_refine(trial, n, facs, num_facs);
+
+   for (k = 0; k < trial->num; k++)
+   {
+      if (!fmpz_is_probabprime(trial->p + k))
+      {
+         complete = 0;
+         break;
+      }
+   }
+
+   fmpz_factor_clear(trial);
+   return complete;
+}
+
+static int compare_facs(const void * a, const void * b)
 {
    fmpz * x = (fmpz *) a;
    fmpz * y = (fmpz *) b;
@@ -48,10 +119,13 @@ int compare_facs(const void * a, const void * b)
 
 /*
    Finds at least one nontrivial factor of n using the self initialising
-   multiple polynomial quadratic sieve with single large prime variation.
+   multiple polynomial quadratic sieve with single large prime variation,
+   using the supplied tuning parameters instead of the qsieve_tune defaults.
    Assumes n is not prime and not a perfect power.
 */
-void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
+void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n,
+        ulong ks_primes, slong fb_primes, slong small_primes,
+        slong sieve_size, ulong sieve_bits)
 {
     qs_t qs_inf;
     ulong small_factor, delta;
@@ -79,7 +153,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
        factors->sign *= -1;
 
-       qsieve_factor(factors, n2);
+       qsieve_factor_with_tune(factors, n2, ks_primes, fb_primes,
+                               small_primes, sieve_size, sieve_bits);
 
        fmpz_clear(n2);
 
@@ -95,7 +170,8 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     flint_printf("\nstart\n");
 #endif
 
-    qsieve_init(qs_inf, n);
+    qsieve_init_with_tune(qs_inf, n, ks_primes, fb_primes, small_primes,
+                          sieve_size, sieve_bits);
 
 #if QS_DEBUG
     flint_printf("factoring ");
@@ -371,7 +447,21 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                             fmpz_gcd(X, X, qs_inf->n);
 
                             if (fmpz_cmp(X, qs_inf->n) != 0 && fmpz_cmp_ui(X, 1) != 0) /* have a factor */
+                            {
                                 fmpz_set(facs + num_facs++, X);
+
+                                /*
+                                   Every square root costs a pass over the
+                                   relations and a modular exponentiation per
+                                   factor base prime, so this loop is
+                                   expensive; it used to run over all 64
+                                   nullspace vectors even once n was completely
+                                   split.  Stop as soon as refining n by the
+                                   factors collected so far leaves only primes.
+                                */
+                                if (qsieve_refine_is_complete(qs_inf->n, facs, num_facs))
+                                   break;
+                            }
                         }
                     }
 
@@ -379,24 +469,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
                     if (num_facs > 0)
                     {
-                        _fmpz_factor_append(factors, qs_inf->n, 1);
-
-                        qsort((void *) facs, num_facs, sizeof(fmpz), compare_facs);
-
-                        for (i = 0; i < num_facs; i++)
-                        {
-                            fmpz_gcd(temp, factors->p + factors->num - 1, facs + i);
-                            if (!fmpz_is_one(temp))
-                            {
-                                factors->exp[factors->num - 1] = fmpz_remove(temp2, factors->p + factors->num - 1, temp);
-                                fmpz_set(factors->p + factors->num - 1, temp);
-
-                                if (fmpz_is_one(temp2))
-                                   break;
-                                else
-                                   _fmpz_factor_append(factors, temp2, 1);
-                             }
-                        }
+                        qsieve_refine(factors, qs_inf->n, facs, num_facs);
 
                         _fmpz_vec_clear(facs, 100);
 
@@ -498,3 +571,31 @@ cleanup:
     fmpz_clear(temp);
     fmpz_clear(temp2);
 }
+
+/*
+   Finds at least one nontrivial factor of n using the self initialising
+   multiple polynomial quadratic sieve with single large prime variation.
+   Assumes n is not prime and not a perfect power.
+*/
+void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
+{
+    slong i;
+    flint_bitcnt_t bits = fmpz_bits(n);
+
+    /* determine which index in the tuning table n corresponds to */
+    for (i = 1; i < QS_TUNE_SIZE; i++)
+    {
+        if (qsieve_tune[i][0] > bits)
+            break;
+    }
+    i--;
+
+    /* factor with the default tuning parameters for this bit-size */
+    qsieve_factor_with_tune(factors, n,
+        qsieve_tune[i][1],  /* ks_primes    */
+        qsieve_tune[i][2],  /* fb_primes    */
+        qsieve_tune[i][3],  /* small_primes */
+        qsieve_tune[i][4],  /* sieve_size   */
+        qsieve_tune[i][5]); /* sieve_bits   */
+}
+

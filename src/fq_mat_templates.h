@@ -216,6 +216,26 @@ void TEMPLATE(T, mat_submul)(TEMPLATE(T, mat_t) D,
 
 /* Scalar operations */
 
+void TEMPLATE(T, mat_scalar_mul)(TEMPLATE(T, mat_t) B,
+                          const TEMPLATE(T, mat_t) A,
+                          const TEMPLATE(T, t) c,
+                          const TEMPLATE(T, ctx_t) ctx);
+
+void TEMPLATE(T, mat_scalar_mul_fmpz)(TEMPLATE(T, mat_t) B,
+                          const TEMPLATE(T, mat_t) A,
+                          const fmpz_t c,
+                          const TEMPLATE(T, ctx_t) ctx);
+
+void TEMPLATE(T, mat_scalar_mul_si)(TEMPLATE(T, mat_t) B,
+                          const TEMPLATE(T, mat_t) A,
+                          const slong c,
+                          const TEMPLATE(T, ctx_t) ctx);
+
+void TEMPLATE(T, mat_scalar_mul_ui)(TEMPLATE(T, mat_t) B,
+                          const TEMPLATE(T, mat_t) A,
+                          const ulong c,
+                          const TEMPLATE(T, ctx_t) ctx);
+
 /* Multiplication */
 
 void TEMPLATE(T, mat_mul)(TEMPLATE(T, mat_t) C,

@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int deflation)
+static void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int deflation)
 {
     const slong lenG = G->length;
     fmpz_poly_t g;

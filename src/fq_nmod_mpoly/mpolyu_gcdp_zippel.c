@@ -18,6 +18,7 @@
 #include "n_poly.h"
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
+#include "fq_nmod_mpoly/impl.h"
 
 int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
 {
@@ -281,7 +282,7 @@ void fq_nmod_poly_product_roots(fq_nmod_poly_t P, fq_nmod_struct * r,
 
     for x
 */
-int fq_nmod_vandsolve(ulong * X, ulong * A, fq_nmod_struct * b,
+static int fq_nmod_vandsolve(ulong * X, ulong * A, fq_nmod_struct * b,
                                             slong n, const fq_nmod_ctx_t fqctx)
 {
     slong d = fq_nmod_ctx_degree(fqctx);
@@ -383,6 +384,7 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     int eval_points_tried;
+    slong l_growths = 0;
     nmod_gcds_ret_t success;
     fq_nmod_mpolyu_t Aevalsk1, Bevalsk1, fevalsk1, Aevalski, Bevalski, fevalski;
     fq_nmod_poly_t Aeval, Beval, Geval;
@@ -503,10 +505,21 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(
     for (i = 0; i < (f->coeffs + tlen[f->length - 1])->length; i++)
         fq_nmod_init(b + i, ctx->fqctx);
 
-    fq_nmod_mat_init(MF, 0, l, ctx->fqctx);
+    /* compute how many masks are needed */
+    entries = f->bits * var;
+    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    powers = (fq_nmod_struct *) TMP_ALLOC(entries*sizeof(fq_nmod_struct));
+    for (i = 0; i < entries; i++)
+        fq_nmod_init(powers + i, ctx->fqctx);
 
     M = (fq_nmod_mat_struct *) TMP_ALLOC(f->length*sizeof(fq_nmod_mat_struct));
     ML_is_initialized = (int *) TMP_ALLOC(f->length*sizeof(int));
+
+alloc_images:
+
+    fq_nmod_mat_init(MF, 0, l, ctx->fqctx);
+
     for (i = 0; i < f->length; i++)
     {
         fq_nmod_mat_init(M + i, l, (f->coeffs + i)->length, ctx->fqctx);
@@ -519,14 +532,6 @@ nmod_gcds_ret_t fq_nmod_mpolyu_gcds_zippel(
 
 
     fq_nmod_mat_init(Msol, l, 1, ctx->fqctx);
-
-    /* compute how many masks are needed */
-    entries = f->bits * var;
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (fq_nmod_struct *) TMP_ALLOC(entries*sizeof(fq_nmod_struct));
-    for (i = 0; i < entries; i++)
-        fq_nmod_init(powers + i, ctx->fqctx);
 
 
     /***** evaluation loop head *******/
@@ -739,6 +744,25 @@ pick_evaluation_point:
         if (underdeterminedcount < 2)
             goto pick_evaluation_point;
 
+        /* see nmod version: structural underdetermination, use more images */
+        if (++l_growths <= 4)
+        {
+            for (i = 0; i < l*f->length; i++)
+                fq_nmod_clear(W + i, ctx->fqctx);
+            flint_free(W);
+            fq_nmod_mat_clear(MF, ctx->fqctx);
+            fq_nmod_mat_clear(Msol, ctx->fqctx);
+            for (i = 0; i < f->length; i++)
+            {
+                fq_nmod_mat_clear(M + i, ctx->fqctx);
+                if (ML_is_initialized[i])
+                    fq_nmod_mat_clear(ML + i, ctx->fqctx);
+            }
+            l += 1 + l/2;
+            underdeterminedcount = 0;
+            goto alloc_images;
+        }
+
         success = nmod_gcds_scales_not_found;
         goto finished;
     }
@@ -844,7 +868,7 @@ finished:
 
 
 /* setform copies the exponents and zeros the coefficients */
-void fq_nmod_mpoly_setform_mpolyn(
+static void fq_nmod_mpoly_setform_mpolyn(
     fq_nmod_mpoly_t A,
     fq_nmod_mpolyn_t B,
     const fq_nmod_mpoly_ctx_t ctx)
@@ -865,7 +889,7 @@ void fq_nmod_mpoly_setform_mpolyn(
     A->length = B->length;
 }
 
-void fq_nmod_mpolyu_setform_mpolyun(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t B,
+static void fq_nmod_mpolyu_setform_mpolyun(fq_nmod_mpolyu_t A, fq_nmod_mpolyun_t B,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -940,7 +964,7 @@ int fq_nmod_mpolyu_gcdp_zippel_univar_no_cofactors(
 }
 
 
-int fq_nmod_mpolyu_gcdp_zippel_bivar(
+static int fq_nmod_mpolyu_gcdp_zippel_bivar(
     fq_nmod_mpolyu_t G,
     fq_nmod_mpolyu_t Abar,
     fq_nmod_mpolyu_t Bbar,

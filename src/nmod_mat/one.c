@@ -17,8 +17,9 @@ void
 nmod_mat_one(nmod_mat_t mat)
 {
     slong i,j;
+    ulong one = mat->mod.n != 1;
     for(i = 0; i < mat->r; i++)
         for(j = 0; j < mat->c; j++)
-            if(i==j) nmod_mat_entry(mat, i, j) = 1;
+            if(i==j) nmod_mat_entry(mat, i, j) = one;
             else nmod_mat_entry(mat, i, j) = 0;
 }

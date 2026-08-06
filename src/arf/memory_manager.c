@@ -20,7 +20,7 @@ FLINT_TLS_PREFIX ulong arf_free_num = 0;
 FLINT_TLS_PREFIX ulong arf_free_alloc = 0;
 FLINT_TLS_PREFIX int arf_have_registered_cleanup = 0;
 
-void _arf_cleanup(void)
+static void _arf_cleanup(void)
 {
     slong i;
     for (i = 0; i < arf_free_num; i++)

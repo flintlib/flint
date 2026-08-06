@@ -15,6 +15,7 @@
 #include "arb.h"
 #include "arith.h"
 #include "partitions.h"
+#include "partitions/impl.h"
 
 #define VERBOSE 0
 
@@ -85,7 +86,7 @@ static ulong primorial_tab[] = {
 static inline int
 bound_primes(ulong k)
 {
-    int i;
+    unsigned int i;
 
     for (i = 0; i < sizeof(primorial_tab) / sizeof(ulong); i++)
         if (k <= primorial_tab[i])
@@ -267,7 +268,7 @@ worker(slong i, work_t * work)
 }
 
 void
-partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubles)
+partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int FLINT_UNUSED(use_doubles))
 {
     arb_t C, t, exp1;
     fmpz_t n24;
@@ -305,9 +306,9 @@ partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubl
 
     /* C = (pi/6) sqrt(24n-1) */
 #if VERBOSE
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_const_pi(C, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 #else
     arb_const_pi(C, prec);
 #endif
@@ -321,9 +322,9 @@ partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubl
 
     /* exp1 = exp(C) */
 #if VERBOSE
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_exp(exp1, C, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 #else
     arb_exp(exp1, C, prec);
 #endif

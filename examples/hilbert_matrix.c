@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     arb_mat_init(A, n, n);
     arb_init(det);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     for (prec = 20; ; prec *= 2)
     {
@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
 
     arb_mat_clear(A);
     arb_clear(det);

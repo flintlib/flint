@@ -41,6 +41,7 @@
 #include "t-exp_series_basecase.c"
 #include "t-exp_series.c"
 #include "t-find_roots.c"
+#include "t-find_roots_cd_poly.c"
 #include "t-gamma_series.c"
 #include "t-get_coeff_ptr.c"
 #include "t-get_set_coeff_acb.c"
@@ -58,6 +59,9 @@
 #include "t-mullow_classical.c"
 #include "t-mullow_transpose.c"
 #include "t-mullow_transpose_gauss.c"
+#include "t-mulmid.c"
+#include "t-mulmid_classical.c"
+#include "t-mulmid_transpose.c"
 #include "t-polylog_cpx.c"
 #include "t-polylog_series.c"
 #include "t-pow_acb_series.c"
@@ -72,6 +76,7 @@
 #include "t-rising_ui_series.c"
 #include "t-root_bound_fujiwara.c"
 #include "t-rsqrt_series.c"
+#include "t-scalar_mul_si.c"
 #include "t-set_trunc_round.c"
 #include "t-shift_left_right.c"
 #include "t-sin_cos_pi_series.c"
@@ -86,6 +91,7 @@
 #include "t-sub_series.c"
 #include "t-tan_series.c"
 #include "t-taylor_shift.c"
+#include "t-wrapped_series.c"
 #include "t-zeta_cpx_series.c"
 #include "t-zeta_em_tail_bsplit.c"
 #include "t-zeta_series.c"
@@ -124,6 +130,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_exp_series_basecase),
     TEST_FUNCTION(acb_poly_exp_series),
     TEST_FUNCTION(acb_poly_find_roots),
+    TEST_FUNCTION(acb_poly_find_roots_double),
     TEST_FUNCTION(acb_poly_gamma_series),
     TEST_FUNCTION(acb_poly_get_coeff_ptr),
     TEST_FUNCTION(acb_poly_get_set_coeff_acb),
@@ -141,6 +148,9 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_mullow_classical),
     TEST_FUNCTION(acb_poly_mullow_transpose),
     TEST_FUNCTION(acb_poly_mullow_transpose_gauss),
+    TEST_FUNCTION(acb_poly_mulmid),
+    TEST_FUNCTION(acb_poly_mulmid_classical),
+    TEST_FUNCTION(acb_poly_mulmid_transpose),
     TEST_FUNCTION(acb_poly_polylog_cpx),
     TEST_FUNCTION(acb_poly_polylog_series),
     TEST_FUNCTION(acb_poly_pow_acb_series),
@@ -155,6 +165,7 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_rising_ui_series),
     TEST_FUNCTION(acb_poly_root_bound_fujiwara),
     TEST_FUNCTION(acb_poly_rsqrt_series),
+    TEST_FUNCTION(acb_poly_scalar_mul_si),
     TEST_FUNCTION(acb_poly_set_trunc_round),
     TEST_FUNCTION(acb_poly_shift_left_right),
     TEST_FUNCTION(acb_poly_sin_cos_pi_series),
@@ -169,9 +180,11 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_sub_series),
     TEST_FUNCTION(acb_poly_tan_series),
     TEST_FUNCTION(acb_poly_taylor_shift),
+    TEST_FUNCTION(acb_poly_wrapped_series),
     TEST_FUNCTION(acb_poly_zeta_cpx_series),
     TEST_FUNCTION(acb_poly_zeta_em_tail_bsplit),
-    TEST_FUNCTION(acb_poly_zeta_series)
+    TEST_FUNCTION(acb_poly_zeta_series),
+    TEST_FUNCTION(cd_poly_refine_roots)
 };
 
 /* main function *************************************************************/

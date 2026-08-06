@@ -204,6 +204,7 @@ int _mpn_mod_vec_addmul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, 
 int _mpn_mod_vec_submul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx);
 int _mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_dot_rev(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx);
+int _mpn_mod_vec_dot_strided(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, slong stride1, nn_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx);
 
 /* Matrix algorithms */
 
@@ -221,10 +222,19 @@ int mpn_mod_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slo
 
 /* Polynomial algorithms */
 
+int _mpn_mod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _mpn_mod_poly_mulmid_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, slong cutoff, gr_ctx_t ctx);
+int _mpn_mod_poly_mulmid_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _mpn_mod_poly_mulmid_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+int _mpn_mod_poly_mulmid(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+
 int _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
+slong _mpn_mod_poly_mul_unreduced_slimbs(slong len, gr_ctx_t ctx);
+void _mpn_mod_poly_mul_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, gr_ctx_t ctx);
+void _mpn_mod_poly_sqr_unreduced(nn_ptr res, slong slimbs, nn_srcptr poly, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 
 int _mpn_mod_poly_inv_series(nn_ptr Q, nn_srcptr B, slong lenB, slong len, gr_ctx_t ctx);
@@ -242,6 +252,20 @@ int _mpn_mod_poly_div(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB
 
 int _mpn_mod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx);
 int _mpn_mod_poly_xgcd(slong * lenG, nn_ptr G, nn_ptr S, nn_ptr T, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx);
+
+#if FLINT_HAVE_FFT_SMALL
+#include "fft_small.h"
+/* transformed polynomial representation support */
+void fft_small_fft_mpn_mod(fft_small_op_t X, nn_srcptr a,
+        ulong an, ulong itrunc, gr_ctx_t ctx, const fft_small_plan_t P);
+void fft_small_export_mpn_mod_range(nn_ptr z, const fft_small_op_t X,
+        ulong zl, ulong zh, gr_ctx_t ctx, const fft_small_plan_t P);
+#endif
+
+struct gr_transformed_poly_workload_struct;
+int _gr_mpn_mod_ctx_init_transformed_poly_repr(gr_ctx_t ctx, gr_ctx_t base,
+        slong len_bound, slong terms_bound,
+        const struct gr_transformed_poly_workload_struct * workload);
 
 #ifdef __cplusplus
 }

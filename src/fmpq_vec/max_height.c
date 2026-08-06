@@ -16,12 +16,18 @@
 void
 _fmpq_vec_max_height(fmpz_t height, const fmpq * vec, slong len)
 {
+    fmpz_t h;
     slong i;
-    fmpz * Lheights;
-    Lheights = _fmpz_vec_init(len);
+
+    fmpz_init(h);
+    fmpz_zero(height);
 
     for (i = 0; i < len; i++)
-        fmpq_height(Lheights + i, vec + i);
+    {
+        fmpq_height(h, vec + i);
+        if (fmpz_cmpabs(h, height) > 0)
+            fmpz_swap(height, h);
+    }
 
-    _fmpz_vec_height(height, Lheights, len);
+    fmpz_clear(h);
 }

@@ -56,8 +56,8 @@ _arb_poly_rsqrt_series(arb_ptr g,
         tlen = FLINT_MIN(2 * m - 1, n);
         _arb_poly_mullow(t, g, m, g, m, tlen, prec);
         _arb_poly_mullow(u, g, m, t, tlen, n, prec);
-        _arb_poly_mullow(t, u, n, h, hlen, n, prec);
-        _arb_vec_scalar_mul_2exp_si(g + m, t + m, n - m, -1);
+        _arb_poly_mulmid(g + m, u, n, h, hlen, m, n, prec);
+        _arb_vec_scalar_mul_2exp_si(g + m, g + m, n - m, -1);
         _arb_vec_neg(g + m, g + m, n - m);
         NEWTON_END_LOOP
 

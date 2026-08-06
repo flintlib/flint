@@ -549,7 +549,7 @@ void fq_zech_bpoly_make_primitive(
 }
 
 
-void _fq_zech_poly_taylor_shift_horner(
+static void _fq_zech_poly_taylor_shift_horner(
     fq_zech_struct * poly,
     const fq_zech_t c,
     slong n,

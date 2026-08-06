@@ -64,7 +64,7 @@ bsplit(acb_t A, acb_t B, acb_t C, acb_t D,
     }
 }
 
-void
+static void
 acb_hypgeom_u_si_rec(acb_t res, slong a, const acb_t b, const acb_t z, slong prec)
 {
     slong k;
@@ -290,7 +290,7 @@ acb_hypgeom_u_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong 
     }
 }
 
-void
+static void
 acb_hypgeom_u_choose(int * asymp, slong * wp,
     const acb_t a, const acb_t b, const acb_t z, slong prec)
 {
@@ -366,7 +366,7 @@ acb_hypgeom_u_choose(int * asymp, slong * wp,
     }
 }
 
-void
+static void
 acb_hypgeom_u_nointegration(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec)
 {
     acb_t t;

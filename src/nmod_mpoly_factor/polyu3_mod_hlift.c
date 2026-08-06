@@ -142,7 +142,7 @@ static void n_polyu_mod_mul(
 #endif
 
 
-void n_poly_fill_powers(
+static void n_poly_fill_powers(
     n_poly_t alphapow,
     slong target,
     nmod_t mod)
@@ -163,7 +163,7 @@ void n_poly_fill_powers(
 }
 
 
-void n_polyu3_mod_interp_reduce_2sm_bpoly(
+static void n_polyu3_mod_interp_reduce_2sm_bpoly(
     n_bpoly_t Ap,
     n_bpoly_t Am,
     const n_polyu_t A,
@@ -247,7 +247,7 @@ void n_polyu3_mod_interp_reduce_2sm_bpoly(
         T(x0, x1, x2) == B(x0, x1) mod (x2 + alpha)
 */
 
-void n_polyu3n_mod_interp_lift_2sm_bpoly(
+static void n_polyu3n_mod_interp_lift_2sm_bpoly(
     slong * lastdeg,
     n_polyun_t T,
     const n_bpoly_t A,
@@ -376,7 +376,7 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
 }
 
 
-int n_polyu3n_mod_interp_crt_2sm_bpoly(
+static int n_polyu3n_mod_interp_crt_2sm_bpoly(
     slong * lastdeg,
     n_polyun_t F,
     n_polyun_t T,
@@ -574,7 +574,7 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
         0: lift of B0*B1 to true factors is impossible
         1: successfully lifted B0*B1 to true factors BB0*BB1 without changing lc_x
 */
-int n_polyu3_mod_hlift2(
+static int n_polyu3_mod_hlift2(
     n_polyun_t BB0,
     n_polyun_t BB1,
     n_polyu_t A,

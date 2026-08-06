@@ -433,11 +433,11 @@ Modular reduction and reconstruction
     with entries satisfying `-mn/2 <= c < mn/2` (if sign = 1)
     or `0 <= c < mn` (if sign = 0).
 
-.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
+.. function:: void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, const fmpz_mat_t mat, const fmpz_comb_t comb)
 
     Sets each of the ``nres`` matrices in ``residues`` to ``mat`` reduced modulo
-    the modulus of the respective matrix, given precomputed ``comb`` and
-    ``comb_temp`` structures.
+    the modulus of the respective matrix, given a precomputed ``comb``
+    structure.
 
     Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
     this function to be declared.
@@ -451,10 +451,10 @@ Modular reduction and reconstruction
     For reducing or reconstructing multiple integer matrices over the same
     set of moduli, it is faster to use ``fmpz_mat_multi_mod_precomp``.
 
-.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
+.. function:: void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues, slong nres, const fmpz_comb_t comb, int sign)
 
     Reconstructs ``mat`` from its images modulo the ``nres`` matrices in
-    ``residues``, given precomputed ``comb`` and ``comb_temp`` structures.
+    ``residues``, given a precomputed ``comb`` structure.
 
     Note: ``fmpz.h`` must be included **before** ``fmpz_mat.h`` in order for
     this function to be declared.
@@ -780,23 +780,28 @@ Determinant
 
 .. function:: void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A, const fmpz_t d, int proved)
 
-    Given a positive divisor `d` of `\det(A)`, sets ``det`` to the
+    Given a positive divisor `d` of `\det(A)` (this is not checked), sets
+    ``det`` to the
     determinant of the square matrix `A` (if ``proved`` = 1), or a
     probabilistic value for the determinant (``proved`` = 0), computed
     using a multimodular algorithm.
 
 .. function:: void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 
-    Sets ``bound`` to a nonnegative integer `B` such that
-    `|\det(A)| \le B`. Assumes `A` to be a square matrix.
-    The bound is computed from the Hadamard inequality
-    `|\det(A)| \le \prod \|a_i\|_2` where the product is taken
-    over the rows `a_i` of `A`.
+    Assuming that `A` is a square matrix, sets ``bound`` to a nonnegative
+    integer `B` such that `|\det(A)| \le B`. The bound is computed from the
+    Hadamard inequality `|\det(A)| \le \prod \|a_i\|_2` where the product is
+    taken over the rows `a_i` of `A`. The same bound is also computed
+    columnwise and the minimum of the two bounds is returned.
 
-.. function:: void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+.. function:: void fmpz_mat_det_bound_submatrix(fmpz_t bound, const fmpz_mat_t A)
 
-    As per ``fmpz_mat_det_bound()`` but excludes zero columns. For use with
-    non-square matrices.
+    Given an arbitrary matrix `A`, returns a bound for the
+    determinant of any square submatrix of `A` obtained by removing any
+    number of rows and/or columns. This uses the same algorithm as
+    :func:`fmpz_mat_det_bound`, but excludes row and column norms which are zero.
+    The bound may be suboptimal if the number of rows is significantly larger
+    or smaller than the number of columns.
 
 .. function:: void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
@@ -816,8 +821,9 @@ Permanent
 
 .. function:: int fmpz_mat_permanent(fmpz_t res, const fmpz_mat_t A)
 
-    Sets ``res`` to the permanent of the square matrix *A*, returning 1
-    on success. If the matrix is too large, returns 0.
+    Sets ``res`` to the permanent of the square matrix *A* (squareness is
+    not checked), returning 1 on success. If the matrix is too large,
+    returns 0.
 
 
 Transforms
@@ -827,6 +833,8 @@ Transforms
 .. function:: void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d)
 
     Applies a similarity transform to the `n\times n` matrix `M` in-place.
+    The matrix is assumed to be square and ``r`` to satisfy `0 \le r < n`;
+    this is not checked.
 
     If `P` is the `n\times n` identity matrix the zero entries of whose row
     `r` (`0`-indexed) have been replaced by `d`, this transform is equivalent
@@ -839,39 +847,51 @@ Transforms
 Characteristic polynomial
 --------------------------------------------------------------------------------
 
+.. function:: void fmpz_mat_charpoly_bound(fmpz_t bound, const fmpz_mat_t A)
+
+    Compute a bound for the absolute value of the coefficients `c_k` of the
+    characteristic polynomial of `A` which is required to be an `n \times n`
+    (square) matrix, which is not checked. We use the fact that
+
+    .. math ::
+
+        c_{n-k} = (-1)^k \sum_{\substack{S \subseteq \{1,\ldots,n\} \\ |S|=k}} \det(A_S)
+
+    where `A_S` is the `k \times k` principal submatrix of `A` with rows
+    and columns indexed by `S`. Counting the number of terms and applying
+    Hadamard's bound to the determinants gives
+
+    .. math ::
+
+        |c_{n-k}| \le \binom{n}{k} \max_{\substack{S \subseteq \{1,\ldots,n\} \\ |S|=k}}
+           \prod_{i \in S} \|r_i\|_2
+           = \binom{n}{k} \prod_{i=1}^{k} \|r_i\|_2
+
+    where `r_1, \ldots, r_n` are the rows of `A` indexed in order of decreasing
+    Euclidean norm. We compute the maximum of these bounds for all `k`.
+    The same computation is done both rowwise and columnwise and the minimum
+    of these bounds is returned.
 
 .. function:: void _fmpz_mat_charpoly_berkowitz(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
+              void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
+              void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
+    Compute the characteristic polynomial of an `n \times n` square matrix.
+    The underscore methods write `n + 1` coefficients. The *berkowitz* and
+    *modular* methods assume the matrix is square and do not check it;
+    ``fmpz_mat_charpoly`` itself raises an exception on a non-square matrix.
 
-.. function:: void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses an `O(n^4)` algorithm based on the
-    method of Berkowitz.
-
-.. function:: void _fmpz_mat_charpoly_modular(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix. Uses a modular method based on an `O(n^3)`
-    method over `\mathbb{Z}/n\mathbb{Z}`.
-
-.. function:: void _fmpz_mat_charpoly(fmpz * cp, const fmpz_mat_t mat)
-
-    Sets ``(cp, n+1)`` to the characteristic polynomial of
-    an `n \times n` square matrix.
-
-.. function:: void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
-
-    Computes the characteristic polynomial of length `n + 1` of
-    an `n \times n` square matrix.
-
+    The *berkowitz* algorithm is a wrapper of :func:`gr_mat_charpoly_berkowitz`.
+    The *modular* algorithm computes the characteristic polynomial modulo
+    several primes and combines them using CRT, using the bound
+    returned by :func:`fmpz_mat_charpoly_bound` to guarantee that sufficiently
+    many primes are chosen. This algorithm supports multithreading.
+    The default algorithm handles various special cases and otherwise
+    delegates to the *berkowitz* or *modular* algorithms depending on the
+    size of the input.
 
 Minimal polynomial
 --------------------------------------------------------------------------------
@@ -885,6 +905,7 @@ Minimal polynomial
 .. function:: void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat)
 
     Computes the minimal polynomial of an `n \times n` square matrix.
+    Squareness is assumed and not checked.
     Uses a modular method based on an average time `O(n^3)`, worst case
     `O(n^4)` method over `\mathbb{Z}/n\mathbb{Z}`.
 
@@ -966,7 +987,9 @@ allowed between arguments.
 .. function:: int fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm, const fmpz_mat_t FFLU, const fmpz_mat_t B)
 
     Performs fraction-free forward and back substitution given a precomputed
-    fraction-free LU decomposition and corresponding permutation. If no
+    fraction-free LU decomposition and corresponding permutation. ``FFLU`` and
+    ``perm`` are assumed to be the output of :func:`fmpz_mat_fflu` for the
+    system matrix; this is not checked. If no
     impossible division is encountered, the function returns `1`. This does not
     mean the system has a solution, however a return value of `0` can only
     occur if the system is insoluble.
@@ -1144,18 +1167,44 @@ Row reduction
     and returns the rank of ``A``. Aliasing of ``A`` and ``B``
     is allowed.
 
-    The algorithm works by computing the reduced row echelon form of ``A``
-    modulo a prime `p` using ``nmod_mat_rref``. The pivot columns and rows
+    The algorithm works by computing an echelon form of ``A``
+    modulo a prime `p`. The pivot columns and rows
     of this matrix will then define a non-singular submatrix of ``A``,
     nonsingular solving and matrix multiplication can then be used to determine
     the reduced row echelon form of the whole of ``A``. This procedure is
-    described in [Stein2007]_.
+    described in [Stein2007]_. The certification
+    step itself is implemented by :func:`fmpz_mat_compressed_rref_given_mod_p_structure`.
 
 .. function:: int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank)
 
     Checks that the matrix `A/den` is in reduced row echelon form of rank
     ``rank``, returns 1 if so and 0 otherwise.
 
+.. function:: int fmpz_mat_rref_upper_certify_lu_mod_p(fmpz_mat_t E, fmpz_t den, const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs)
+
+    Given the echelon structure for the `m \times n` matrix *A* computed
+    modulo some prime `p`, attempt to compute a certified RREF of *A* over
+    `\mathbb{Z}`.
+
+    The user supplies the following data from an LU factorization as computed by
+    :func:`nmod_mat_lu_with_pivots` (or an equivalent procedure):
+    the mod-`p` *rank*, row permutations *P*, and an array *pivs*
+    containing the the *rank* pivot column positions followed by the `n - rank`
+    non-pivot column positions.
+    The output matrix *E* is *rank* by *n*, must be zero-initialized by the caller,
+    and must not be aliased with *A*.
+
+    Returns 1 if the rank is certified: *E* will then hold the top *rank* rows
+    of the RREF of *A* with common denominator *den*.
+
+    Returns 0 if the prime was unlucky (the mod-`p` rank is below the true rank,
+    or the remaining rows are not in the row span); the contents of *E* and *den*
+    are then unspecified and the caller should try another prime.
+
+.. function:: int fmpz_mat_rank_certify_lu_mod_p(const fmpz_mat_t A, slong rank, const slong * P, const slong * pivs)
+
+    As :func:`fmpz_mat_rref_upper_certify_lu_mod_p`, certifying the
+    rank without storing the echelon form.
 
 Strong echelon form and Howell form
 --------------------------------------------------------------------------------
@@ -1197,30 +1246,6 @@ Nullspace
     the pivot entries in `B` will generally differ from unity.
     `B` must be allocated with sufficient space to represent the result
     (at most `n \times n` where `n` is the number of columns of `A`).
-
-
-
-Echelon form
---------------------------------------------------------------------------------
-
-
-.. function:: slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
-
-    Computes an integer matrix ``B`` and an integer ``den`` such that
-    ``B / den`` is the unique row reduced echelon form (RREF) of ``A``
-    and returns the rank, i.e. the number of nonzero rows in ``B``.
-
-    Aliasing of ``B`` and ``A`` is allowed, with an in-place
-    computation being more efficient. The size of ``B`` must be
-    the same as that of ``A``.
-
-    The permutation order will be written to ``perm`` unless this
-    argument is ``NULL``. That is, row ``i`` of the output matrix will
-    correspond to row ``perm[i]`` of the input matrix.
-
-    The denominator will always be a divisor of the determinant of (some
-    submatrix of) `A`, but is not guaranteed to be minimal or canonical in
-    any other sense.
 
 
 Hermite normal form
@@ -1272,7 +1297,8 @@ Hermite normal form
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
     assumed to be of rank `n` and ``D`` is known to be a positive multiple of
-    the determinant of the non-zero rows of ``H``. The algorithm used here is
+    the determinant of the non-zero rows of ``H``. Neither assumption is
+    checked. The algorithm used here is
     due to Domich, Kannan and Trotter [DomKanTro1987]_ and is also described
     in [Algorithm 2.4.8] [Coh1996]_.
 
@@ -1283,16 +1309,17 @@ Hermite normal form
 
     Transforms the `m\times n` matrix ``A`` into Hermite normal form,
     where ``A`` is assumed to be of rank `n` and ``D`` is known to be a
-    positive multiple of the largest elementary divisor of ``A``.
+    positive multiple of the largest elementary divisor of ``A``. Neither
+    assumption is checked.
     The algorithm used here is described in [FieHof2014]_.
 
 .. function:: void fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
 
     Computes an integer matrix ``H`` such that ``H`` is the unique (row)
     Hermite normal form of the `m\times n` matrix ``A``, where ``A`` is
-    assumed to be of rank `n`. The algorithm used here is due to Kannan and
-    Bachem [KanBac1979]_ and takes the principal minors to Hermite normal
-    form in turn.
+    assumed to be of rank `n`, which is not checked. The algorithm used here
+    is due to Kannan and Bachem [KanBac1979]_ and takes the principal minors
+    to Hermite normal form in turn.
 
     Aliasing of ``H`` and ``A`` is allowed. The size of ``H`` must be
     the same as that of ``A``.
@@ -1319,9 +1346,10 @@ Smith normal form
 .. function:: void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of ``A``. The algorithm used is selected from the
-    implementations in FLINT to be the one most likely to be optimal, based on
-    the characteristics of the input matrix.
+    normal form of ``A``.  Uses :func:`fmpz_mat_snf_diagonal` when ``A``
+    is already diagonal; otherwise uses the iterative Hermite normal form
+    algorithm, the same as :func:`fmpz_mat_snf_transform` but without
+    tracking the unimodular transforms.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1329,8 +1357,10 @@ Smith normal form
 .. function:: void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of the diagonal matrix ``A``. The algorithm used simply takes
-    gcds of pairs on the diagonal in turn until the Smith form is obtained.
+    normal form of the diagonal matrix ``A``. Only the diagonal entries of
+    ``A`` affect the result; that ``A`` is diagonal is assumed and not
+    checked. The algorithm used simply takes gcds of pairs on the diagonal
+    in turn until the Smith form is obtained.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1347,8 +1377,11 @@ Smith normal form
 .. function:: void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith
-    normal form of the nonsingular `n\times n` matrix ``A``. The algorithm
-    used is due to Iliopoulos [Iliopoulos1989]_.
+    normal form of the nonsingular `n\times n` matrix ``A``. It is assumed
+    that ``A`` is nonsingular and that ``mod`` is a positive multiple of the
+    largest elementary divisor of ``A`` (for example a multiple of
+    `\det(A)`); this is not checked. The algorithm used is due to Iliopoulos
+    [Iliopoulos1989]_.
 
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
@@ -1357,6 +1390,45 @@ Smith normal form
 
     Checks that the given matrix is in Smith normal form, returns 1 if so and 0
     otherwise.
+
+.. function:: int fmpz_mat_is_diagonal(const fmpz_mat_t A)
+
+    Returns 1 if all off-diagonal entries of ``A`` are zero, and 0 otherwise.
+    An empty matrix is considered diagonal.
+
+.. function:: void fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_t A)
+
+    Computes the Smith normal form `S = U A V` of the `m \times n` matrix
+    ``A``, where ``U`` is an `m \times m` unimodular matrix and ``V`` is an
+    `n \times n` unimodular matrix.
+
+    Either ``U`` or ``V`` (or both) may be ``NULL``, in which case the
+    corresponding transformation matrix is not computed.
+
+    The algorithm alternates row and column Hermite normal form computations
+    until the matrix is diagonal, fixes the divisibility chain using extended
+    gcd operations, and then negates rows of ``U`` to make the diagonal of
+    ``S`` non-negative.
+
+    Aliasing of ``S`` and ``A`` is allowed.  When non-``NULL``, ``U`` and
+    ``V`` must be distinct from ``A``, from ``S``, and from each other.
+
+.. function:: slong fmpz_mat_elementary_divisors(fmpz * ed, const fmpz_mat_t A)
+
+    Computes the elementary divisors `d_1 \mid d_2 \mid \cdots \mid d_r` of
+    the `m \times n` matrix ``A``, where `r` is the rank. The vector ``ed``
+    must have space for at least `\min(m, n)` entries; on return, the first
+    `r` entries contain the elementary divisors, and the return value is
+    `r`.
+
+    Uses Luebeck's algorithm: compute the Hermite normal form, factor the
+    pivots individually to collect the set of prime factors, then determine
+    `p`-adic valuations for each prime via iterated nullspace computations
+    modulo `p`.  Pivots are factored with :func:`fmpz_factor_smooth` using a
+    ``FLINT_BITS``-bit bound.  Falls back to full Smith normal form for any
+    pivot that exceeds ``2 * FLINT_BITS`` bits, that leaves a composite
+    cofactor within that bound, or that has a prime factor too large to fit
+    in a ``ulong`` -- all regimes where per-pivot factoring is impractical.
 
 
 Special matrices
@@ -1414,7 +1486,8 @@ Cholesky Decomposition
 .. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
 
     Computes ``R``, the Cholesky factor of a symmetric, positive definite
-    matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
+    matrix ``A`` (this property is assumed and not checked) using the Cholesky
+    decomposition process. (Sets ``R``
     such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
 
 .. note::
@@ -1481,3 +1554,29 @@ Modified LLL
     See "Faster Algorithms for Integer Lattice Basis Reduction." Technical
     Report 249. Zurich, Switzerland: Department Informatik, ETH. July 30,
     1996.
+
+
+.. function:: int fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+              int fmpz_mat_mul_fft_small_trunc(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, slong lo)
+
+    Matrix multiplication with the entries in transformed (fft_small)
+    representation: each entry of the product is an accumulation of
+    pointwise products, converted out once. The *trunc* variant stores
+    in each entry of *C* the limbs of the exact entry starting at limb
+    *lo* (with its sign), with an error against the exact value within
+    `(-1.5, +0.5)` ulp of the lowest returned limb -- equivalently, at
+    most 1 from the floor-truncated value. Returns 0 without touching *C*
+    when the method is unavailable or unprofitable for the given shapes.
+
+    The driver budgets its transform storage against
+    ``flint_fft_small_max_transformed_ring_size``. When the whole
+    product does not fit, it multiplies in blocks -- one side resident
+    and the other streamed for rectangular shapes, both sides blocked,
+    or as a last resort the inner dimension split with the entries
+    accumulated across the pieces (the truncated variant refuses that
+    last regime, whose one-unit error contract does not survive summing
+    truncated pieces). Squaring, detected as ``B == A``, keeps a single
+    transform pool when everything is resident. Small inputs are
+    accepted; whether the transformed representation is worth using is
+    the caller's tuning decision.
+

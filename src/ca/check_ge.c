@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca/impl.h"
 
 #define CMP_UNDEFINED -2
 #define CMP_UNKNOWN -3

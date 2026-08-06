@@ -252,12 +252,12 @@ void ca_randtest_special(ca_t res, flint_rand_t state, slong depth, slong bits, 
 
 /* Representation properties */
 
-CA_INLINE int ca_is_special(const ca_t x, ca_ctx_t ctx)
+CA_INLINE int ca_is_special(const ca_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     return CA_IS_SPECIAL(x);
 }
 
-CA_INLINE int ca_is_unknown(const ca_t x, ca_ctx_t ctx)
+CA_INLINE int ca_is_unknown(const ca_t x, ca_ctx_t FLINT_UNUSED(ctx))
 {
     return CA_IS_UNKNOWN(x);
 }

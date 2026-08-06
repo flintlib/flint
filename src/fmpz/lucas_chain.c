@@ -18,7 +18,7 @@
 #include "gr.h"
 #include "mpn_mod.h"
 
-int _gr_lucas_chain(gr_ptr Vm, gr_ptr Vm1, gr_srcptr A, const fmpz_t m, gr_ctx_t ctx)
+static int _gr_lucas_chain(gr_ptr Vm, gr_ptr Vm1, gr_srcptr A, const fmpz_t m, gr_ctx_t ctx)
 {
     gr_ptr t;
     slong i, B, mn;

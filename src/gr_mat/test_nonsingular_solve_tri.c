@@ -80,19 +80,11 @@ static void _gr_mat_test_nonsingular_solve_tri(gr_method_mat_binary_op_with_flag
 
             /* Check Y = A^(-1) * (A * X) = X */
             if (n_randint(state, 2))
-            {
-                if (upper)
-                    status |= gr_mat_nonsingular_solve_triu(Y, A, B, unit, ctx);
-                else
-                    status |= gr_mat_nonsingular_solve_tril(Y, A, B, unit, ctx);
-            }
+                status |= solve_impl(Y, A, B, unit, ctx);
             else
             {
                 status |= gr_mat_set(Y, B, ctx);
-                if (upper)
-                    status |= gr_mat_nonsingular_solve_triu(Y, A, Y, unit, ctx);
-                else
-                    status |= gr_mat_nonsingular_solve_tril(Y, A, Y, unit, ctx);
+                status |= solve_impl(Y, A, Y, unit, ctx);
             }
 
             if (status == GR_SUCCESS && gr_mat_equal(Y, X, ctx) == T_FALSE)

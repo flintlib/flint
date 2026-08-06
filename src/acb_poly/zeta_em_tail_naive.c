@@ -12,8 +12,6 @@
 #include "acb_poly.h"
 #include "bernoulli.h"
 
-void _acb_poly_mullow_cpx(acb_ptr res, acb_srcptr src, slong len, const acb_t c, slong trunc, slong prec);
-
 void
 _acb_poly_zeta_em_tail_naive(acb_ptr sum, const acb_t s, const acb_t Na, acb_srcptr Nasx, slong M, slong d, slong prec)
 {

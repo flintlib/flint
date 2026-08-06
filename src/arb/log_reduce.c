@@ -12,6 +12,7 @@
 #include <math.h>
 #include "fmpz_vec.h"
 #include "arb.h"
+#include "arb/impl.h"
 
 #define TERMINATOR -32768
 
@@ -222,7 +223,7 @@ static const double log_rel_epsilon_inv[] = {
     -1.11266647552533214e+55,
 };
 
-void
+static void
 _arb_log_reduce_fixed(slong * rel, const short * d, const double * epsilon, const double * epsilon_inv,
     const fmpz * alpha, const float * weights,
     slong num_alpha, const fmpz_t x, slong prec, double max_weight)
@@ -346,7 +347,7 @@ rel_product(fmpz_t p, fmpz_t q, const short * primes, const slong * rel, slong l
 }
 
 /* todo: error propagation */
-void
+static void
 _arb_exp_arf_precomp(arb_t res, const arf_t x, slong prec, int minus_one,
     slong num_logs, arb_srcptr logs, const short * primes,
     const float * weights,
@@ -429,8 +430,6 @@ _arb_exp_arf_precomp(arb_t res, const arf_t x, slong prec, int minus_one,
     fmpz_clear(q);
     arb_clear(t);
 }
-
-void arb_exp_arf_huge(arb_t z, const arf_t x, slong mag, slong prec, int minus_one);
 
 void
 arb_exp_arf_log_reduction(arb_t res, const arf_t x, slong prec, int minus_one)
@@ -782,7 +781,7 @@ gaussian_rel_product(fmpzi_t p, fmpzi_t q, const char * primes, const slong * re
     }
 }
 
-void
+static void
 _arb_sin_cos_arf_precomp(arb_t res1, arb_t res2, const arf_t x, slong prec,
     slong num_logs, arb_srcptr logs, const char * primes,
     const float * weights,

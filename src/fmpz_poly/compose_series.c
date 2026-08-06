@@ -15,6 +15,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_poly.h"
+#include "gr.h"
+#include "gr_poly.h"
 
 void
 _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, slong len1,
@@ -22,8 +24,14 @@ _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, slong len1,
 {
     if (len1 <= 10)
         _fmpz_poly_compose_series_horner(res, poly1, len1, poly2, len2, n);
-    else
+    else if (n < 500)
         _fmpz_poly_compose_series_brent_kung(res, poly1, len1, poly2, len2, n);
+    else
+    {
+        gr_ctx_t ctx;
+        gr_ctx_init_fmpz(ctx);
+        GR_MUST_SUCCEED(_gr_poly_compose_series_kinoshita_li(res, poly1, len1, poly2, len2, n, ctx));
+    }
 }
 
 void

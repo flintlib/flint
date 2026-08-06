@@ -42,7 +42,7 @@ typedef struct
 }
 compose_vec_arg_t;
 
-void
+static void
 _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 {
     compose_vec_arg_t arg = *((compose_vec_arg_t *) arg_ptr);

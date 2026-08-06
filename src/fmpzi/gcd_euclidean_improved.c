@@ -11,6 +11,7 @@
 
 #include <math.h>
 #include "fmpzi.h"
+#include "fmpzi/impl.h"
 
 #if FLINT_BITS == 64
 #define GCD_MAX_D WORD(1125899906842623)

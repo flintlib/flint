@@ -351,7 +351,7 @@ int nmod_mpoly_gcd_get_use_new(
     return use;
 }
 
-ulong n_poly_mod_eval_step_sep(
+static ulong n_poly_mod_eval_step_sep(
     n_poly_t cur,
     const n_poly_t inc,
     const nmod_mpoly_t A,

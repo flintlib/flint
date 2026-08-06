@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2015 Kushagra Singh
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,43 +11,52 @@
 */
 
 #include "ulong_extras.h"
+#include "nmod.h"
 
-ulong
-n_sqr_and_add_a(ulong y, ulong a, ulong n, ulong ninv,
-              ulong normbits)
+static ulong
+n_sqr_and_add_a_fast(ulong y, ulong a, nmod_redc_ctx_t ctx)
 {
-    ulong hi, lo;
-
-    y = n_mulmod_preinv(y, y, n, ninv, normbits);
-    add_ssaaaa(hi, lo, UWORD(0), y, UWORD(0), a);
-
-    if (hi == 0)
-    {
-        y = lo;
-        if (y > n)
-            y -= n;
-    }
-    else
-        sub_ddmmss(hi, y, hi, lo, 0, n);
-
+    y = nmod_redc_fast_mul(y, y, ctx);
+    /* Has a negligible chance of not being reduced, which is fine. */
+    y += a;
     return y;
 }
 
-int
-n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv,
-                              ulong ai, ulong xi, ulong normbits,
-                              ulong max_iters)
+static ulong
+n_sqr_and_add_a(ulong y, ulong a, nmod_redc_ctx_t ctx)
 {
-    ulong iter, i, k, j, minval, m, one_shift_norm, x, y, a, q, ys, subval;
-    int ret;
+    y = nmod_redc_mul(y, y, ctx);
+    /* Has a negligible chance of not being reduced, which is fine. */
+    y += a;
+    return y;
+}
 
-    if (n < 4)
+static ulong
+n_absdiff(ulong x, ulong y)
+{
+    if (x > y)
+        return x - y;
+    else
+        return y - x;
+}
+
+int
+n_factor_pollard_brent_single(ulong *factor, ulong n,
+                              ulong ai, ulong xi, ulong max_iters)
+{
+    ulong iter, i, k, j, minval, m, x, y, a, q, ys;
+    int ret;
+    int fast;
+
+    if (n < 4 || n % 2 == 0)
         return 0;
 
-    /* one shifted by normbits, used for comparisons */
-    one_shift_norm = UWORD(1) << normbits;
-    q = one_shift_norm;
-    (*factor) = one_shift_norm;
+    nmod_redc_ctx_t ctx;
+    nmod_redc_ctx_init_ui(ctx, n);
+    fast = nmod_redc_can_use_fast(ctx);
+
+    q = 1;
+    (*factor) = 1;
 
     y = xi;
     a = ai;
@@ -57,8 +67,16 @@ n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv,
         x = y;
         k = 0;
 
-        for (i = 0; i < iter; i++)
-            y = n_sqr_and_add_a(y, a, n, ninv, normbits);
+        if (fast)
+        {
+            for (i = 0; i < iter; i++)
+                y = n_sqr_and_add_a_fast(y, a, ctx);
+        }
+        else
+        {
+            for (i = 0; i < iter; i++)
+                y = n_sqr_and_add_a(y, a, ctx);
+        }
 
         do {
             minval = iter - k;
@@ -67,14 +85,21 @@ n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv,
 
             ys = y;
 
-            for (i = 0; i < minval; i++)
+            if (fast)
             {
-                y = n_sqr_and_add_a(y, a, n, ninv, normbits);
-                if (x > y)
-                    subval = x - y;
-                else
-                    subval = y - x;
-                q = n_mulmod_preinv(q, subval, n, ninv, normbits);
+                for (i = 0; i < minval; i++)
+                {
+                    y = n_sqr_and_add_a_fast(y, a, ctx);
+                    q = nmod_redc_fast_mul(q, n_absdiff(x, y), ctx);
+                }
+            }
+            else
+            {
+                for (i = 0; i < minval; i++)
+                {
+                    y = n_sqr_and_add_a(y, a, ctx);
+                    q = nmod_redc_mul(q, n_absdiff(x, y), ctx);
+                }
             }
 
             if (q == 0)
@@ -83,7 +108,7 @@ n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv,
                 (*factor) = n_gcd(q, n);
 
             k += m;
-            j = ((*factor) == one_shift_norm);
+            j = ((*factor) == 1);
         } while ((k < iter) && (j));
 
         if (iter > max_iters)
@@ -93,25 +118,33 @@ n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv,
 
     if ((*factor) == n)
     {
-        do {
-            ys = n_sqr_and_add_a(ys, a, n, ninv, normbits);
-            if (x > ys)
-                subval = x - ys;
-            else
-                subval = ys - x;
-
-            if (q == 0)
-                (*factor) = n;
-            else
-                (*factor) = n_gcd(q, n);
-
-            (*factor) = n_gcd(subval, n);
-        } while ((*factor) == one_shift_norm);   /* gcd == 1 */
+        if (fast)
+        {
+            do {
+                ys = n_sqr_and_add_a_fast(ys, a, ctx);
+                if (q == 0)
+                    (*factor) = n;
+                else
+                    (*factor) = n_gcd(q, n);
+                (*factor) = n_gcd(n_absdiff(x, ys), n);
+            } while ((*factor) == 1);   /* gcd == 1 */
+        }
+        else
+        {
+            do {
+                ys = n_sqr_and_add_a(ys, a, ctx);
+                if (q == 0)
+                    (*factor) = n;
+                else
+                    (*factor) = n_gcd(q, n);
+                (*factor) = n_gcd(n_absdiff(x, ys), n);
+            } while ((*factor) == 1);   /* gcd == 1 */
+        }
     }
 
     ret = 1;
 
-    if ((*factor) == one_shift_norm) /* gcd == 1 */
+    if ((*factor) == 1) /* gcd == 1 */
         ret = 0;
     else if ((*factor) == n) /* gcd == n*/
         ret = 0;
@@ -120,39 +153,25 @@ n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv,
 }
 
 int
-n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in,
+n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n,
                         ulong max_tries, ulong max_iters)
 {
-    ulong normbits, a, x, n, ninv, max;
-    int ret;
-
-    ret = 0;
-    max = n_in -3;    /* 1 <= a <= n - 3 */
-
-    normbits = flint_clz(n_in);
-    n = n_in;
-    n <<= normbits;
-    ninv = n_preinvert_limb(n);
+    ulong a, x;
+    int ret = 0;
 
     while (max_tries--)
     {
-        a = n_randint(state, max);
-        a += 1;
-        max += 1;   /* 1 <= x <= n - 1 */
-        x = n_randint(state, max);
-        x += 1;
+        /* Keep a small so that additions without reduction have a high
+           chance of remaining valid. */
+        a = n_randint(state, FLINT_MIN(n - 4, 1024)) + 1;  /* 1 <= a <= n - 3 */
+        x = n_randint(state, n - 2) + 1;  /* 1 <= a <= n - 3 */
 
-        a <<= normbits;
-        x <<= normbits;
-
-        ret = n_factor_pollard_brent_single(factor, n, ninv, a, x, normbits, max_iters);
+        ret = n_factor_pollard_brent_single(factor, n, a, x, max_iters);
 
         if (ret == 1)
-        {
-            if (normbits)
-                (*factor) >>= normbits;
             return 1;
-        }
+
+        a += 1;
     }
 
     return ret;

@@ -1242,7 +1242,7 @@ int nmod_mpolyn_interp_crt_2sm_mpolyn(
 /*****************************************************************************/
 
 /* evaluate A at lastvar = alpha */
-void nmod_mpolyn_interp_reduce_sm_mpoly(
+static void nmod_mpolyn_interp_reduce_sm_mpoly(
     nmod_mpoly_t B,
     nmod_mpolyn_t A,
     ulong alpha,

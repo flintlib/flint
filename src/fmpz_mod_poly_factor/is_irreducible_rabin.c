@@ -17,25 +17,6 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 
-void
-fmpz_mod_poly_powpowmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t pol,
-                        const fmpz_t exp, ulong exp2, const fmpz_mod_poly_t f,
-                                                      const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mod_poly_t pow;
-    ulong i;
-
-    fmpz_mod_poly_init(pow, ctx);
-    fmpz_mod_poly_powmod_fmpz_binexp(pow, pol, exp, f, ctx);
-    fmpz_mod_poly_set(res, pow, ctx);
-
-    if (!fmpz_mod_poly_equal(pow, pol, ctx))
-        for (i = 1; i < exp2; i++)
-            fmpz_mod_poly_powmod_fmpz_binexp(res, res, exp, f, ctx);
-
-    fmpz_mod_poly_clear(pow, ctx);
-}
-
 int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f,
                                                       const fmpz_mod_ctx_t ctx)
 {

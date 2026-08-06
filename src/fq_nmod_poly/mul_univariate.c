@@ -15,7 +15,7 @@
 #include "fq_nmod_vec.h"
 #include "fq_nmod_poly.h"
 
-void
+static void
 _fq_nmod_poly_mul_univariate_no_pad (fq_nmod_struct * rop,
                         const fq_nmod_struct * op1, slong len1,
                         const fq_nmod_struct * op2, slong len2,

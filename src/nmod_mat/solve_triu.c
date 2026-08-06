@@ -48,7 +48,7 @@ nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t
                               tmp + j + 1, n - j - 1, mod, params);
             s = nmod_sub(nmod_mat_entry(B, j, i), s, mod);
             if (!unit)
-                s = n_mulmod2_preinv(s, inv[j], mod.n, mod.ninv);
+                s = nmod_mul(s, inv[j], mod);
             tmp[j] = s;
         }
 

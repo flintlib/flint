@@ -12,7 +12,7 @@
 #include "fmpq.h"
 
 
-void _fmpq_set_cfrac_divconquer(_fmpz_mat22_t M, const fmpz * c, slong n)
+static void _fmpq_set_cfrac_divconquer(_fmpz_mat22_t M, const fmpz * c, slong n)
 {
     _fmpz_mat22_one(M);
     if (n < 32)

@@ -33,7 +33,7 @@ dlog_vec_sieve_precomp(ulong *v, ulong nv, dlog_precomp_t pre,  ulong a, ulong v
     dlog_vec_fill(v, nv, DLOG_NOT_FOUND);
     v[1] = 0;
 
-    logm1 = (na % 2) ? 0 : nmod_mul(na / 2, va, order);
+    logm1 = (na % 2) ? 0 : nmod_ui_mul_ui(na / 2, va, order);
 
     /* discrete log on first primes, then sieve */
     pmax = (nv < mod.n) ? nv : mod.n;
@@ -54,7 +54,7 @@ dlog_vec_sieve_precomp(ulong *v, ulong nv, dlog_precomp_t pre,  ulong a, ulong v
     /* take big power of gen */
     X = n_nextprime(3 * na / 2, 0) % na;
     aX = nmod_pow_ui(a, X, mod);
-    vaX = nmod_mul(va, X % order.n, order);
+    vaX = nmod_ui_mul_ui(va, X % order.n, order);
 
     n_primes_init(iter);
     while ((p = n_primes_next(iter)) < pmax)
@@ -79,7 +79,7 @@ dlog_vec_sieve_precomp(ulong *v, ulong nv, dlog_precomp_t pre,  ulong a, ulong v
                 missed++;
             logcount++;
 #endif
-            vp = nmod_mul(dlog_precomp(pre, p), va, order);
+            vp = nmod_ui_mul_ui(dlog_precomp(pre, p), va, order);
         }
         for (k = p, m = 1; k < nv; k += p, m++)
         {

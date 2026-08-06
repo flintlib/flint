@@ -51,7 +51,7 @@ TEST_FUNCTION_START(gr_generic_poly_factor, state)
             status |= gr_poly_mul(pol, pol, f, ctx);
         }
 
-        status |= gr_generic_poly_factor_roots(c, fac, mult, pol, 0, ctx);
+        status |= gr_generic_poly_factor_roots(c, fac, (fmpz_vec_struct *) mult, pol, 0, ctx);
 
         if (status != GR_SUCCESS)
             goto cleanup;
@@ -71,6 +71,10 @@ TEST_FUNCTION_START(gr_generic_poly_factor, state)
 
 cleanup:
 
+        count_success += (status == GR_SUCCESS);
+        count_domain += ((status & GR_DOMAIN) != 0);
+        count_unable += ((status & GR_UNABLE) != 0);
+
         gr_heap_clear(c, pctx);
         gr_vec_clear(fac, pctx);
         gr_vec_clear(mult, ZZ);
@@ -79,6 +83,6 @@ cleanup:
         gr_ctx_clear(ctx);
     }
 
-    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
+    TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable);
 }
 

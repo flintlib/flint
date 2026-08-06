@@ -240,7 +240,7 @@ not_exact_division:
 }
 
 
-int _fmpz_mod_mpoly_divides_monagan_pearce(
+static int _fmpz_mod_mpoly_divides_monagan_pearce(
     fmpz_mod_mpoly_t Q,
     const fmpz * Acoeffs, const ulong * Aexps, slong Alen,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
@@ -329,22 +329,9 @@ int _fmpz_mod_mpoly_divides_monagan_pearce(
 
         mpoly_monomial_set(exp, heap[1].exp, N);
 
-        if (bits <= FLINT_BITS)
-        {
-            if (mpoly_monomial_overflows(exp, N, mask))
-                goto not_exact_division;
-
-            lt_divides = mpoly_monomial_divides(Qexps + Qlen*N, exp, Bexps,
-                                                                      N, mask);
-        }
-        else
-        {
-            if (mpoly_monomial_overflows_mp(exp, N, bits))
-                goto not_exact_division;
-
-            lt_divides = mpoly_monomial_divides_mp(Qexps + Qlen*N, exp, Bexps,
-                                                                      N, bits);
-        }
+        if (mpoly_monomial_overflows_any_bits(exp, N, mask, bits))
+            goto not_exact_division;
+        lt_divides = mpoly_monomial_divides_any_bits(Qexps + Qlen*N, exp, Bexps, N, mask, bits);
 
         mpz_set_ui(acc, 0);
         acc_sm[2] = acc_sm[1] = acc_sm[0] = 0;

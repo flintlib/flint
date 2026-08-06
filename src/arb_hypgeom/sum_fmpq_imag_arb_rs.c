@@ -14,6 +14,7 @@
 #include "fmpz_vec.h"
 #include "arb.h"
 #include "arb_hypgeom.h"
+#include "arb_hypgeom/impl.h"
 
 static double
 d_log2_fac(double n)
@@ -42,9 +43,6 @@ tail_precision(slong k, double min_k, slong alen, slong blen, double log2z, doub
 
     return new_prec;
 }
-
-/* Return approximation of log2(|x|), clambed between COEFF_MIN and COEFF_MAX. */
-double arf_get_d_log2_abs_approx_clamped(const arf_t x);
 
 void
 arb_hypgeom_sum_fmpq_imag_arb_rs(arb_t res_real, arb_t res_imag, const fmpq * a, slong alen, const fmpq * b, slong blen, const arb_t z, int reciprocal, slong N, slong prec)

@@ -12,7 +12,7 @@
 #include "mpn_extras.h"
 
 /* adapted from flint_mpn_divrem_preinvn */
-mp_limb_t flint_mpn_div_preinvn_4_2(mp_ptr qp, mp_srcptr ap,
+static mp_limb_t flint_mpn_div_preinvn_4_2(mp_ptr qp, mp_srcptr ap,
                           mp_srcptr d, mp_srcptr dinv)
 {
     mp_limb_t cy, hi = 0;

@@ -42,7 +42,7 @@ truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx)
     return T_FALSE;
 }
 
-truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
 {
     gr_ptr t;
     int status;
@@ -71,7 +71,7 @@ truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
     return res;
 }
 
-truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
 {
     if (gr_ctx_is_finite_characteristic(ctx) == T_TRUE)
         return gr_ctx_is_zero_ring(ctx);
@@ -79,16 +79,21 @@ truth_t gr_generic_ctx_is_rational_vector_space(gr_ctx_t ctx)
         return T_UNKNOWN;
 }
 
-truth_t gr_generic_ctx_is_real_vector_space(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_real_vector_space(gr_ctx_t ctx)
 {
     /* currently this does the same thing */
     return gr_generic_ctx_is_rational_vector_space(ctx);
 }
 
-truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_complex_vector_space(gr_ctx_t ctx)
 {
     /* currently this does the same thing */
     return gr_generic_ctx_is_rational_vector_space(ctx);
+}
+
+static truth_t gr_generic_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    return (gr_ctx_is_commutative_ring(ctx) == T_TRUE) ? T_TRUE : T_UNKNOWN;
 }
 
 slong
@@ -103,6 +108,11 @@ gr_generic_ctx_ngens_1(slong * ngens, gr_ctx_t ctx)
 {
     * ngens = 1;
     return GR_SUCCESS;
+}
+
+gr_ptr gr_generic_ctx_base(gr_ctx_t ctx)
+{
+    return NULL;
 }
 
 void
@@ -150,7 +160,7 @@ int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int gr_generic_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
+static int gr_generic_randtest_invertible(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
 {
     slong i;
     truth_t is_invertible;
@@ -196,10 +206,13 @@ int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     if (status != GR_SUCCESS)
         status = gr_set_si(x, -3 + (slong) n_randint(state, 7), ctx);
 
+    if (status != GR_SUCCESS)
+        return gr_zero(x, ctx);
+
     return status;
 }
 
-slong _gr_generic_length(gr_srcptr x, gr_ctx_t ctx)
+static slong _gr_generic_length(gr_srcptr x, gr_ctx_t ctx)
 {
     return 0;
 }
@@ -962,7 +975,7 @@ int gr_generic_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, g
     }
 }
 
-int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
+static int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
 {
     return gr_get_fexpr(res, x, ctx);
 }
@@ -1105,7 +1118,7 @@ int gr_generic_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return gr_div(res, x, y, ctx);
 }
 
-truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+static truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     truth_t zero;
     int status;
@@ -1132,7 +1145,7 @@ truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t 
     return GR_UNABLE;
 }
 
-truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+static truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     gr_ptr t;
     truth_t zero;
@@ -1326,7 +1339,7 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int
+static int
 gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
 {
     if (gr_ctx_is_field(ctx) == T_TRUE)
@@ -1353,7 +1366,7 @@ gr_generic_canonical_associate(gr_ptr ux, gr_ptr u, gr_srcptr x, gr_ctx_t ctx)
     return GR_UNABLE;
 }
 
-int
+static int
 gr_generic_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     if (gr_ctx_is_field(ctx) == T_TRUE)
@@ -1424,7 +1437,7 @@ gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_
     return status;
 }
 
-int
+static int
 gr_generic_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     int cmp;
@@ -1438,7 +1451,7 @@ gr_generic_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
         return gr_set(res, y, ctx);
 }
 
-int
+static int
 gr_generic_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     int cmp;
@@ -1601,8 +1614,6 @@ gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
         return status;
     }
 }
-
-void arb_fmpz_euler_number_ui(fmpz_t res, ulong n);
 
 int
 gr_generic_eulernum_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
@@ -2210,8 +2221,9 @@ gr_generic_vec_mul_scalar_2exp_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong 
     return status;
 }
 
+/* todo: when to use ring addmul? */
 int
-gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
+gr_generic_vec_addmul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
@@ -2234,8 +2246,9 @@ gr_generic_vec_scalar_addmul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
     return status;
 }
 
+/* todo: when to use ring submul? */
 int
-gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
+gr_generic_vec_submul_scalar(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
@@ -2258,8 +2271,9 @@ gr_generic_vec_scalar_submul(gr_ptr vec1, gr_srcptr vec2, slong len, gr_srcptr c
     return status;
 }
 
+/* todo: when to use ring addmul_si? */
 int
-gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
+gr_generic_vec_addmul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
     gr_method_binary_op_si mul_si = GR_BINARY_OP_SI(ctx, MUL_SI);
     gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
@@ -2282,8 +2296,9 @@ gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     return status;
 }
 
+/* todo: when to use ring submul_si? */
 int
-gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
+gr_generic_vec_submul_scalar_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx)
 {
     gr_method_binary_op_si mul_si = GR_BINARY_OP_SI(ctx, MUL_SI);
     gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
@@ -2300,6 +2315,31 @@ gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c,
     {
         status |= mul_si(t, GR_ENTRY(vec2, i, sz), c, ctx);
         status |= sub(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
+    }
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+/* todo: when to use ring addmul_fmpz? */
+int
+gr_generic_vec_addmul_scalar_fmpz(gr_ptr vec1, gr_srcptr vec2, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    gr_method_binary_op_fmpz mul_fmpz = GR_BINARY_OP_FMPZ(ctx, MUL_FMPZ);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    int status;
+    slong i, sz;
+    gr_ptr t;
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    GR_TMP_INIT(t, ctx);
+
+    for (i = 0; i < len; i++)
+    {
+        status |= mul_fmpz(t, GR_ENTRY(vec2, i, sz), c, ctx);
+        status |= add(GR_ENTRY(vec1, i, sz), GR_ENTRY(vec1, i, sz), t, ctx);
     }
 
     GR_TMP_CLEAR(t, ctx);
@@ -2458,6 +2498,88 @@ gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr ve
 }
 
 int
+gr_generic_vec_dot_strided(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, slong stride1, gr_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_binary_op add = GR_BINARY_OP(ctx, ADD);
+    int status;
+    slong i, sz;
+    gr_ptr t;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            return gr_zero(res, ctx);
+        else
+            return gr_set(res, initial, ctx);
+    }
+
+    sz = ctx->sizeof_elem;
+    status = GR_SUCCESS;
+
+    /* Currently many rings define a good dot product but not
+       a strided one. */
+    if (len >= 2 && (GR_VEC_DOT_OP(ctx, VEC_DOT) != (gr_method_vec_dot_op) gr_generic_vec_dot))
+    {
+        gr_ptr tmp1, tmp2;
+        gr_srcptr v1 = vec1, v2 = vec2;
+
+        if (stride1 != 1)
+        {
+            v1 = tmp1 = GR_TMP_ALLOC(len * sz);
+            for (i = 0; i < len; i++)
+                memcpy(GR_ENTRY(tmp1, i, sz), GR_ENTRY(vec1, i * stride1, sz), sz);
+        }
+
+        if (stride2 != 1)
+        {
+            v2 = tmp2 = GR_TMP_ALLOC(len * sz);
+            for (i = 0; i < len; i++)
+                memcpy(GR_ENTRY(tmp2, i, sz), GR_ENTRY(vec2, i * stride2, sz), sz);
+        }
+
+        status = _gr_vec_dot(res, initial, subtract, v1, v2, len, ctx);
+
+        if (stride1 != 1)
+            GR_TMP_FREE(tmp1, len * sz);
+        if (stride2 != 1)
+            GR_TMP_FREE(tmp2, len * sz);
+
+        return status;
+    }
+
+    GR_TMP_INIT(t, ctx);
+
+    if (initial == NULL)
+    {
+        status |= mul(res, vec1, vec2, ctx);
+    }
+    else
+    {
+        if (subtract)
+            status |= gr_neg(res, initial, ctx);
+        else
+            status |= gr_set(res, initial, ctx);
+
+        status |= mul(t, vec1, vec2, ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    for (i = 1; i < len; i++)
+    {
+        status |= mul(t, GR_ENTRY(vec1, i * stride1, sz), GR_ENTRY(vec2, i * stride2, sz), ctx);
+        status |= add(res, res, t, ctx);
+    }
+
+    if (subtract)
+        status |= gr_neg(res, res, ctx);
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
+
+
+int
 gr_generic_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
 {
     gr_method_binary_op_ui mul_ui = GR_BINARY_OP_UI(ctx, MUL_UI);
@@ -2611,23 +2733,32 @@ gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr v
 int
 gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx)
 {
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+    if (len <= 0) return status;
+    status |= gr_one(GR_ENTRY(res, 0, sz), ctx);
+    if (len <= 1) return status;
+    status |= gr_set(GR_ENTRY(res, 1, sz), x, ctx);
+    if (len <= 2) return status;
+
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
     gr_method_unary_op sqr = GR_UNARY_OP(ctx, SQR);
-    int status = GR_SUCCESS;
     slong i;
-    slong sz = ctx->sizeof_elem;;
 
-    for (i = 0; i < len; i++)
+    /* Prefer squaring for powers? */
+    if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_has_real_prec(ctx) == T_TRUE)
     {
-        if (i == 0)
-            status |= gr_one(GR_ENTRY(res, i, sz), ctx);
-        else if (i == 1)
-            status |= gr_set(GR_ENTRY(res, i, sz), x, ctx);
-        else if (i % 2 == 0)
-            status |= sqr(GR_ENTRY(res, i, sz), GR_ENTRY(res, i / 2, sz), ctx);
-        else
-            status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - 1, sz), x, ctx);
+        for (i = 2; i < len; i++)
+        {
+            if (i % 2 == 0)
+                status |= sqr(GR_ENTRY(res, i, sz), GR_ENTRY(res, i / 2, sz), ctx);
+            else
+                status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, (i + 1) / 2, sz), GR_ENTRY(res, i / 2, sz), ctx);
+        }
     }
+    else
+        for (i = 2; i < len; i++)
+            status |= mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i - 1, sz), x, ctx);
 
     return status;
 }
@@ -2665,8 +2796,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE,            (gr_funcptr) gr_generic_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE,         (gr_funcptr) gr_generic_ctx_is_complex_vector_space},
-
     {GR_METHOD_CTX_IS_ORDERED_RING,     (gr_funcptr) gr_generic_ctx_predicate},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING,      (gr_funcptr) gr_generic_ctx_is_approx_commutative_ring},
 
     /* should be true for most rings */
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -2675,6 +2806,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CTX_IS_CANONICAL,        (gr_funcptr) gr_generic_ctx_predicate},
 
     {GR_METHOD_CTX_NGENS,               (gr_funcptr) gr_generic_ctx_ngens_0},
+    {GR_METHOD_CTX_BASE,                (gr_funcptr) gr_generic_ctx_base},
 
     {GR_METHOD_INIT,                    (gr_funcptr) gr_generic_init},
     {GR_METHOD_CLEAR,                   (gr_funcptr) gr_generic_clear},
@@ -2824,6 +2956,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_COS,                     (gr_funcptr) gr_generic_cos},
     {GR_METHOD_SIN_COS,                 (gr_funcptr) gr_generic_sin_cos},
     {GR_METHOD_TAN,                     (gr_funcptr) gr_generic_tan},
+    {GR_METHOD_TANH,                    (gr_funcptr) gr_generic_tanh},
     {GR_METHOD_ASIN,                    (gr_funcptr) gr_generic_asin},
     {GR_METHOD_ATAN,                    (gr_funcptr) gr_generic_atan},
     {GR_METHOD_ASINH,                   (gr_funcptr) gr_generic_asinh},
@@ -2987,10 +3120,11 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,       (gr_funcptr) gr_generic_vec_mul_scalar_2exp_si},
 
-    {GR_METHOD_VEC_ADDMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_addmul},
-    {GR_METHOD_VEC_SUBMUL_SCALAR,       (gr_funcptr) gr_generic_vec_scalar_submul},
-    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_scalar_addmul_si},
-    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_scalar_submul_si},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,       (gr_funcptr) gr_generic_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,       (gr_funcptr) gr_generic_vec_submul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_addmul_scalar_si},
+    {GR_METHOD_VEC_SUBMUL_SCALAR_SI,    (gr_funcptr) gr_generic_vec_submul_scalar_si},
+    {GR_METHOD_VEC_ADDMUL_SCALAR_FMPZ,  (gr_funcptr) gr_generic_vec_addmul_scalar_fmpz},
 
     {GR_METHOD_VEC_EQUAL,               (gr_funcptr) gr_generic_vec_equal},
     {GR_METHOD_VEC_IS_ZERO,             (gr_funcptr) gr_generic_vec_is_zero},
@@ -3000,6 +3134,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_VEC_DOT,                 (gr_funcptr) gr_generic_vec_dot},
     {GR_METHOD_VEC_DOT_REV,             (gr_funcptr) gr_generic_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED,         (gr_funcptr) gr_generic_vec_dot_strided},
     {GR_METHOD_VEC_DOT_UI,              (gr_funcptr) gr_generic_vec_dot_ui},
     {GR_METHOD_VEC_DOT_SI,              (gr_funcptr) gr_generic_vec_dot_si},
     {GR_METHOD_VEC_DOT_FMPZ,            (gr_funcptr) gr_generic_vec_dot_fmpz},
@@ -3008,6 +3143,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_VEC_SET_POWERS,          (gr_funcptr) gr_generic_vec_set_powers},
 
     {GR_METHOD_POLY_MULLOW,             (gr_funcptr) _gr_poly_mullow_generic},
+    {GR_METHOD_POLY_HGCD_MAT_MUL,       (gr_funcptr) _gr_poly_hgcd_mat_mul_generic},
+    {GR_METHOD_POLY_MULMID,             (gr_funcptr) _gr_poly_mulmid_generic},
     {GR_METHOD_POLY_DIV,                (gr_funcptr) _gr_poly_div_generic},
     {GR_METHOD_POLY_DIVREM,             (gr_funcptr) _gr_poly_divrem_generic},
     {GR_METHOD_POLY_DIVEXACT,           (gr_funcptr) _gr_poly_divexact_generic},
@@ -3076,3 +3213,21 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
 
     memcpy(methods, tmp, sizeof(gr_static_method_table));
 }
+
+void
+gr_method_tab_extend(gr_funcptr * methods, gr_method_tab_input * tab)
+{
+    slong i;
+
+    for (i = 0; ; i++)
+    {
+        if (tab[i].function == NULL)
+            break;
+
+        if (tab[i].index >= GR_METHOD_TAB_SIZE)
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
+
+        methods[tab[i].index] = tab[i].function;
+    }
+}
+

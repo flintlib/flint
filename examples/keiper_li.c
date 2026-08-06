@@ -16,35 +16,35 @@ keiper_li_series(arb_ptr z, slong len, slong prec)
     u = _arb_vec_init(len);
     v = _arb_vec_init(len);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     /* -zeta(s) */
     flint_printf("zeta: ");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_zero(t + 0);
     arb_one(t + 1);
     arb_one(u);
     _arb_poly_zeta_series(v, t, 2, u, 0, len, prec);
     _arb_vec_neg(v, v, len);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
 
     /* logarithm */
     flint_printf("log: ");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     _arb_poly_log_series(t, v, len, len, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     /* add log(gamma(1+s/2)) */
     flint_printf("gamma: ");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_one(u);
     arb_one(u + 1);
     arb_mul_2exp_si(u + 1, u + 1, -1);
     _arb_poly_lgamma_series(v, u, 2, len, prec);
     _arb_vec_add(t, t, v, len, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     /* subtract 0.5 s log(pi) */
     arb_const_pi(u, prec);
@@ -60,14 +60,14 @@ keiper_li_series(arb_ptr z, slong len, slong prec)
 
     /* binomial transform */
     flint_printf("binomial transform: ");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     arb_set(z, t);
     _arb_vec_neg(t + 1, t + 1, len - 1);
     _arb_poly_binomial_transform(z + 1, t + 1, len - 1, len - 1, prec);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     flint_printf("total: ");
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     _arb_vec_clear(t, len);
     _arb_vec_clear(u, len);
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
 
     if (out_file != NULL)
     {

@@ -24,7 +24,6 @@ TEST_FUNCTION_START(gr_poly_mullow_bivariate_KS, state)
         gr_poly_t A, B, C, D;
         int status = GR_SUCCESS;
         int aliasing = n_randint(state, 5);
-        int karatsuba = n_randint(state, 2);
 
         while (1)
         {
@@ -90,7 +89,7 @@ TEST_FUNCTION_START(gr_poly_mullow_bivariate_KS, state)
             if (status == GR_SUCCESS && gr_poly_equal(C, D, ctx) == T_FALSE)
             {
                 flint_printf("FAIL\n\n");
-                flint_printf("aliasing = %d, n = %wd, karatsuba = %d\n\n", aliasing, n, karatsuba);
+                flint_printf("aliasing = %d, n = %wd\n\n", aliasing, n);
                 gr_ctx_println(ctx);
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n\n");
                 flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n\n");

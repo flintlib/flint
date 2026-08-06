@@ -17,7 +17,7 @@
    into n prime powers whose maximum values are stored in exp,
    storing the values at the current iteration in pows.
 */
-int pow_incr(int * pows, int * exp, int n)
+static int pow_incr(int * pows, int * exp, int n)
 {
     int i;
 

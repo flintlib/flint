@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ca_mat/impl.h"
 #include "ca_poly.h"
 
 static const fmpz * _nf_denref(const nf_elem_t a, const nf_t nf)
@@ -55,9 +56,6 @@ get_lcm(fmpz_t Aden, ca_srcptr A, slong Alen, ca_field_t K, slong bits_limit, ca
 
     return 1;
 }
-
-void
-_ca_set_nf_fmpz_poly_den(ca_t res, const fmpz_poly_t poly, const fmpz_t den, ca_field_t K, ca_ctx_t ctx);
 
 void
 _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, slong len, ca_field_t K, ca_ctx_t ctx)

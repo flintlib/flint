@@ -45,7 +45,7 @@ TEST_FUNCTION_START(gr_poly_rem, state)
         }
 
         /* test aliasing */
-        switch (n_randint(state, 4))
+        switch (n_randint(state, 5))
         {
             case 0:
                 status |= gr_poly_set(R, A, ctx);

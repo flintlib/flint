@@ -11,8 +11,9 @@
 
 #include "calcium.h"
 #include "ca.h"
+#include "ca/impl.h"
 
-truth_t
+static truth_t
 _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
 {
     qqbar_t t;
@@ -27,9 +28,6 @@ _ca_check_is_zero_qqbar(const ca_t x, ca_ctx_t ctx)
     qqbar_clear(t);
     return res;
 }
-
-void
-ca_rewrite_complex_normal_form(ca_t res, const ca_t x, int deep, ca_ctx_t ctx);
 
 truth_t
 ca_is_zero_check_fast(const ca_t x, ca_ctx_t ctx)
@@ -73,13 +71,13 @@ ca_is_zero_check_fast(const ca_t x, ca_ctx_t ctx)
     return T_UNKNOWN;
 }
 
-int
+static int
 _ca_generic_has_nontrivial_denominator(const ca_t x, ca_ctx_t ctx)
 {
     return !fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), CA_FIELD_MCTX(CA_FIELD(x, ctx), ctx));
 }
 
-truth_t
+static truth_t
 ca_check_is_zero_no_factoring(const ca_t x, ca_ctx_t ctx)
 {
     acb_t v;

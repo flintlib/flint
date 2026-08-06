@@ -137,27 +137,30 @@ TEST_FUNCTION_START(fmpz_mpoly_factor_wang, state)
         expbound = 2 + 25/nfacs/n;
         powbound = 1 + n_randint(state, 3);
 
-        lower = 0;
-        fmpz_mpoly_one(a, ctx);
-        for (j = 0; j < nfacs; j++)
+        do
         {
-            do {
-                len = 2 + n_randint(state, 10);
-                coeff_bits = 100 + n_randint(state, 300)/nfacs;
-                fmpz_mpoly_randtest_bound(t, state, len, coeff_bits, expbound, ctx);
-            } while (t->length == 0);
-            pow = 1 + n_randint(state, powbound);
-
-            fmpz_mpoly_pow_ui(t, t, pow, ctx);
-            fmpz_mpoly_mul(at, a, t, ctx);
-
-            if (t->length < 200)
+            lower = 0;
+            fmpz_mpoly_one(a, ctx);
+            for (j = 0; j < nfacs; j++)
             {
-                fmpz_mpoly_swap(a, at, ctx);
-                if (!fmpz_mpoly_is_fmpz(t, ctx))
-                    lower += pow;
+                do {
+                    len = 2 + n_randint(state, 10);
+                    coeff_bits = 100 + n_randint(state, 300)/nfacs;
+                    fmpz_mpoly_randtest_bound(t, state, len, coeff_bits, expbound, ctx);
+                } while (t->length == 0);
+                pow = 1 + n_randint(state, powbound);
+
+                fmpz_mpoly_pow_ui(t, t, pow, ctx);
+                fmpz_mpoly_mul(at, a, t, ctx);
+
+                if (t->length < 200)
+                {
+                    fmpz_mpoly_swap(a, at, ctx);
+                    if (!fmpz_mpoly_is_fmpz(t, ctx))
+                        lower += pow;
+                }
             }
-        }
+        } while (a->length > 2500);
 
         check_omega(lower, WORD_MAX, a, ctx, fmpz_mpoly_factor_wang);
 

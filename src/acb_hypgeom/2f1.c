@@ -32,7 +32,7 @@ _acb_hypgeom_2f1r_reduced(acb_t res,
     return;
 }
 
-void
+static void
 acb_hypgeom_2f1_nointegration(acb_t res, const acb_t a, const acb_t b,
         const acb_t c, const acb_t z, int flags, slong prec)
 {

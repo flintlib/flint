@@ -17,7 +17,7 @@
 #include "fq_nmod.h"
 #include "fq_nmod_mat.h"
 
-slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
+static slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
                                          slong m, const fq_nmod_ctx_t ctx)
 {
    slong n = A->c, i, j, r, bits, res = -WORD(1);

@@ -17,14 +17,14 @@ void p_is_prime_repeat(fmpz_t * ns, int len)
 {
     int i;
 
-    TIMEIT_START
+    TIMEIT_START;
     for (i = 0; i < len; i++)
             if (aprcl_is_prime(ns[i]) == 0)
             {
                 flint_printf("Primality test failed\n");
                 flint_abort();
             }
-    TIMEIT_STOP
+    TIMEIT_STOP;
 }
 
 int main(void)

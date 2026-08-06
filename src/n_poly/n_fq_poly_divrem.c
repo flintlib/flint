@@ -20,7 +20,7 @@
     FLINT_MAX(FLINT_MAX(4, N_FQ_MUL_ITCH), 2 + (N_FQ_REDUCE_ITCH))
 
 void _n_fq_poly_rem_basecase_(
-    ulong * Q,
+    ulong * FLINT_UNUSED(Q),
     ulong * A,
     const ulong * AA, slong Alen,
     const ulong * B, slong Blen,
@@ -78,7 +78,6 @@ void _n_fq_poly_rem_basecase_(
 
     n_poly_stack_vec_clear(St);
 }
-
 
 void _n_fq_poly_divrem_basecase_(
     ulong * Q,
@@ -145,7 +144,7 @@ void _n_fq_poly_divrem_basecase_(
     n_poly_stack_vec_clear(St);
 }
 
-void _n_fq_poly_divrem_divconquer_recursive_(
+static void _n_fq_poly_divrem_divconquer_recursive_(
     ulong * Q,
     ulong * BQ,
     ulong * W,
@@ -259,7 +258,7 @@ static void __n_fq_poly_divrem_divconquer_(
 }
 
 
-void _n_fq_poly_divrem_divconquer_(
+static void _n_fq_poly_divrem_divconquer_(
     ulong * Q,
     ulong * R,
     ulong * A, slong lenA,

@@ -12,7 +12,7 @@
 #include "arb.h"
 #include "arb_mat.h"
 
-void
+static void
 arb_mat_approx_mul_classical(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec)
 {
     slong ar, br, bc, i, j, k;

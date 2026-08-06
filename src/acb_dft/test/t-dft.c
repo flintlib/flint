@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2016 Pascal Molin
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,185 +11,108 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
+#include "acb.h"
 #include "acb_dft.h"
 
-/* Defined in t-convol.c and t-dft.c. */
-#ifndef acb_vec_printd_index
-# define acb_vec_printd_index acb_vec_printd_index
-static void acb_vec_printd_index(acb_srcptr vec, slong len, slong digits)
+/* The module is a thin wrapper around gr_dft, whose test suite
+   stress-tests the algorithms; here we verify that every public
+   function behaves as documented (definition, inverse, plan reuse,
+   aliasing, trivial lengths). */
+
+/* naive X_k = sum_j v_j e(-jk/n) directly from the definition */
+static void
+_dft_naive(acb_ptr w, acb_srcptr v, slong n, slong prec)
 {
-    slong i;
-    for (i = 0; i < len; i++)
+    slong j, k;
+    acb_ptr roots;
+    acb_t t;
+
+    roots = _acb_vec_init(n);
+    acb_init(t);
+    for (j = 0; j < n; j++)
     {
-        flint_printf("[%wd] ", i);
-        acb_printd(vec + i, digits);
-        flint_printf("\n");
+        arb_set_si(acb_realref(t), -2 * j);
+        arb_div_ui(acb_realref(t), acb_realref(t), n, prec + 10);
+        arb_zero(acb_imagref(t));
+        acb_exp_pi_i(roots + j, t, prec + 10);
     }
-}
-#endif
 
-/* Both of these are defined in t-convol.c and t-dft.c. However, do_f is not the
- * same. */
-#define do_f rajtantajtan
-typedef void (*do_f) (acb_ptr w, acb_srcptr v, slong len, slong prec);
-
-#ifndef check_vec_eq_prec
-#define check_vec_eq_prec check_vec_eq_prec
-void
-check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong digits, ulong q, char d[], char f1[], char f2[])
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
+    for (k = 0; k < n; k++)
     {
-        if (!acb_overlaps(w1 + i, w2 + i))
-        {
-            flint_printf("FAIL\n\n");
-            flint_printf("q = %wu, size = %wd\n", q, len);
-            flint_printf("\nDFT %sdiffer from index %wd / %wd \n", d, i, len);
-            flint_printf("\n%s =\n", f1);
-            acb_vec_printd_index(w1, len, digits);
-            flint_printf("\n%s =\n", f2);
-            acb_vec_printd_index(w2, len, digits);
-            flint_printf("\n\n");
-            flint_abort();
-        }
-        else if (!acb_is_zero(w1+i) && (acb_rel_accuracy_bits(w1 + i) < 30
-                || acb_rel_accuracy_bits(w2 + i) < 30))
-        {
-            flint_printf("FAIL\n\n");
-            flint_printf("q = %wu\n", q);
-            flint_printf("\nDFT inaccurate from index %wd / %wd \n", i, len);
-            flint_printf("\n%s =\n", f1);
-            acb_printd(w1 + i, digits);
-            flint_printf("\n%s =\n", f2);
-            acb_printd(w2 + i, digits);
-            flint_printf("\nerrors %wd & %wd [prec = %wd]\n",
-                    acb_rel_accuracy_bits(w1 + i),
-                    acb_rel_accuracy_bits(w2 + i), prec);
-            flint_abort();
-        }
+        acb_zero(w + k);
+        for (j = 0; j < n; j++)
+            acb_addmul(w + k, roots + (j * k) % n, v + j, prec);
     }
+
+    _acb_vec_clear(roots, n);
+    acb_clear(t);
 }
-#endif
 
 TEST_FUNCTION_START(acb_dft, state)
 {
     slong k;
-    slong prec = 100, digits = 30;
-    slong nq = 19;
-    ulong q[19] = { 0, 1, 2, 3, 4, 5, 6, 23, 10, 15, 16, 30, 59, 125, 308, 335, 525, 961, 1225};
-    slong nr = 5;
+    slong lens[9] = { 1, 2, 3, 4, 6, 8, 12, 30, 59 };
 
-    slong f, nf = 5;
-    do_f func[5] = { acb_dft_naive, acb_dft_cyc, acb_dft_crt, acb_dft_bluestein, acb_dft };
-    char * name[5] = { "naive", "cyc", "crt", "bluestein", "default" };
-
-    /* cyclic dft */
-    for (k = 0; k < nq + nr; k++)
+    for (k = 0; k < 9; k++)
     {
-        slong i, len, f0;
-        acb_ptr v, w1, w2, w3;
-
-        if (k < nq)
-            len = q[k];
-        else
-            len = n_randint(state, 1000);
+        slong len = lens[k], i;
+        slong prec = 64 + n_randint(state, 128);
+        acb_ptr v, w1, w2;
+        acb_dft_pre_t pre;
 
         v = _acb_vec_init(len);
         w1 = _acb_vec_init(len);
         w2 = _acb_vec_init(len);
-        w3 = _acb_vec_init(len);
 
         for (i = 0; i < len; i++)
-            acb_set_si_si(v + i, i, 3 - i);
+            acb_randtest_precise(v + i, state, prec, 0);
 
-        /* avoid naive for long transforms */
-        f0 = (len > 50);
+        /* the one-shot transform computes the DFT */
+        _dft_naive(w1, v, len, prec);
+        acb_dft(w2, v, len, prec);
+        for (i = 0; i < len; i++)
+            if (!acb_overlaps(w1 + i, w2 + i))
+                TEST_FUNCTION_FAIL("dft vs definition, len = %wd i = %wd\n",
+                        len, i);
 
-        for (f = f0; f < nf; f++)
-        {
+        /* inverse roundtrip, aliased */
+        _acb_vec_set(w2, v, len);
+        acb_dft(w2, w2, len, prec);
+        acb_dft_inverse(w2, w2, len, prec);
+        for (i = 0; i < len; i++)
+            if (!acb_overlaps(w2 + i, v + i))
+                TEST_FUNCTION_FAIL("roundtrip, len = %wd i = %wd\n", len, i);
 
-            acb_ptr w = (f == f0) ? w1 : w2;
-
-            if (DFT_VERB)
-                flint_printf("\n%s %wu\n", name[f], len);
-
-            /* compute DFT */
-            func[f](w, v, len, prec);
-
-            if (len < 500)
-            {
-                /* check aliasing */
-                _acb_vec_set(w3, v, len);
-                func[f](w3, w3, len, prec);
-
-                check_vec_eq_prec(w1, w3, len, prec, digits, len, "alias ", name[0], name[f]);
-            }
-
-            if (f > f0)
-            {
-                /* check non aliased */
-                check_vec_eq_prec(w1, w2, len, prec, digits, len, "no alias ", name[0], name[f]);
-            }
-            else
-            {
-                /* check inverse */
-                acb_dft_inverse(w2, w1, len, prec);
-                check_vec_eq_prec(v, w2, len, prec, digits, len, "inverse ", "original", "inverse");
-            }
-        }
+        /* the plan interface agrees with the one-shots and is
+           reusable */
+        acb_dft_precomp_init(pre, len, prec);
+        acb_dft_precomp(w2, v, pre, prec);
+        for (i = 0; i < len; i++)
+            if (!acb_overlaps(w1 + i, w2 + i))
+                TEST_FUNCTION_FAIL("precomp, len = %wd i = %wd\n", len, i);
+        acb_dft_inverse_precomp(w2, w2, pre, prec);
+        for (i = 0; i < len; i++)
+            if (!acb_overlaps(w2 + i, v + i))
+                TEST_FUNCTION_FAIL("precomp roundtrip, len = %wd i = %wd\n",
+                        len, i);
+        acb_dft_precomp_clear(pre);
 
         _acb_vec_clear(v, len);
         _acb_vec_clear(w1, len);
         _acb_vec_clear(w2, len);
-        _acb_vec_clear(w3, len);
     }
 
-    /* radix2 dft */
-    for (k = 0; k < 11; k++)
+    /* len = 0 is a no-op for every entry point */
     {
-        slong n = 1 << k, j;
-        acb_ptr v, w1, w2;
-        v = w2 = _acb_vec_init(n);
-        w1 = _acb_vec_init(n);
-
-        for (j = 0; j < n; j++)
-            acb_set_si_si(v + j, j, j + 2);
-
-        acb_dft_cyc(w1, v, n, prec);
-        acb_dft_rad2_inplace(w2, k, prec);
-
-        check_vec_eq_prec(w1, w2, n, prec, digits, n, "rad2 ", "cyc", "rad2");
-
-        _acb_vec_clear(v, n);
-        _acb_vec_clear(w1, n);
-
-    }
-
-    /* multi-threaded radix2 dft */
-    for (k = 0; k < 11; k++)
-    {
-        slong n = 1 << k, j;
-        acb_ptr v, w1, w2;
-        v = w2 = _acb_vec_init(n);
-        w1 = _acb_vec_init(n);
-
-        flint_set_num_threads(k % 5 + 1);
-
-        for (j = 0; j < n; j++)
-            acb_set_si_si(v + j, j, j + 2);
-
-        acb_dft_cyc(w1, v, n, prec);
-        acb_dft_rad2_inplace_threaded(w2, k, prec);
-
-        check_vec_eq_prec(w1, w2, n, prec, digits, n, "rad2 ", "cyc", "rad2");
-
-        _acb_vec_clear(v, n);
-        _acb_vec_clear(w1, n);
-
+        acb_dft_pre_t pre;
+        acb_dft(NULL, NULL, 0, 64);
+        acb_dft_inverse(NULL, NULL, 0, 64);
+        acb_dft_precomp_init(pre, 0, 64);
+        acb_dft_precomp(NULL, NULL, pre, 64);
+        acb_dft_inverse_precomp(NULL, NULL, pre, 64);
+        acb_dft_precomp_clear(pre);
     }
 
     TEST_FUNCTION_END(state);
 }
-#undef do_f

@@ -149,6 +149,23 @@ then
 elif test "$1" = "functions_benchmark";
 then
     echo "functions_benchmark....SKIPPED"
+elif test "$1" = "groebner";
+then
+    echo -n "groebner...."
+    res=$($2/groebner cyclic4/drl)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/gb:OK red:OK.*\|G\| =  10/) { $found=1; last } END { exit !$found }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0
 elif test "$1" = "hilbert_matrix";
 then
     echo -n "hilbert_matrix...."
@@ -223,7 +240,7 @@ then
     echo "machin....SKIPPED"
 elif test "$1" = "mfcoefs";
 then
-    echo "mfcoefs...."
+    echo -n "mfcoefs...."
     res=$($2/mfcoefs --tail 2 --raw 23 1000000)
     if test "$?" != "0";
     then
@@ -280,7 +297,7 @@ then
         echo "FAIL"
         exit 1
     fi
-    echo "$res" | perl -0ne 'if (/\n10 roots with multiplicity 1\nsearching for 10 roots, 5 deflated\nprec=32: 5 isolated roots/) { $found=1; last } END { exit !$found }'
+    echo "$res" | perl -0ne 'if (/\nsearching for 10 roots, 5 deflated\nprec=53: 5 isolated roots/) { $found=1; last } END { exit !$found }'
     if test "$?" != "0";
     then
         echo "FAIL"

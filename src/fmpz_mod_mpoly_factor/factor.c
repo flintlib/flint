@@ -485,7 +485,7 @@ cleanup_less:
     Assume each factor in f is sep.
     Replace f by an irreducible factorization.
 */
-int fmpz_mod_mpoly_factor_irred(
+static int fmpz_mod_mpoly_factor_irred(
     fmpz_mod_mpoly_factor_t f,
     const fmpz_mod_mpoly_ctx_t ctx,
     unsigned int algo)

@@ -52,16 +52,6 @@ gr_mat_rref_lu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
         for (j = 0; j < FLINT_MIN(i, rank); j++)
             status |= gr_zero(GR_MAT_ENTRY(R, i, j, sz), ctx);
 
-    /* We now reorder U to proper upper triangular form U | V
-       with U full-rank triangular, set V = U^(-1) V, and then
-       put the column back in the original order.
-
-       An improvement for some matrices would be to compress V by
-       discarding columns containing nothing but zeros. */
-
-    gr_mat_init(U, rank, rank, ctx);
-    gr_mat_init(V, rank, n - rank, ctx);
-
     pivots = flint_malloc(sizeof(slong) * rank);
     nonpivots = flint_malloc(sizeof(slong) * (n - rank));
 
@@ -100,20 +90,41 @@ gr_mat_rref_lu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
         j++;
     }
 
-    for (i = 0; i < rank; i++)
-        for (j = 0; j <= i; j++)
-            status |= gr_set(GR_MAT_ENTRY(U, j, i, sz), GR_MAT_ENTRY(R, j, pivots[i], sz), ctx);
+    if (rank != n)
+    {
+        /* We now reorder U to proper upper triangular form U | V
+           with U full-rank triangular, set V = U^(-1) V, and then
+           put the column back in the original order.
 
-    for (i = 0; i < n - rank; i++)
+           An improvement for some matrices would be to compress V by
+           discarding columns containing nothing but zeros. */
+
+        gr_mat_init(U, rank, rank, ctx);
+        gr_mat_init(V, rank, n - rank, ctx);
+
         for (j = 0; j < rank; j++)
-            status |= gr_set(GR_MAT_ENTRY(V, j, i, sz), GR_MAT_ENTRY(R, j, nonpivots[i], sz), ctx);
+            for (i = j; i < rank; i++)
+                status |= gr_set(GR_MAT_ENTRY(U, j, i, sz), GR_MAT_ENTRY(R, j, pivots[i], sz), ctx);
 
-    status |= gr_mat_nonsingular_solve_triu(V, U, V, 0, ctx);
+        for (j = 0; j < rank; j++)
+            for (i = 0; i < n - rank; i++)
+                status |= gr_set(GR_MAT_ENTRY(V, j, i, sz), GR_MAT_ENTRY(R, j, nonpivots[i], sz), ctx);
+
+        status |= gr_mat_nonsingular_solve_triu(V, U, V, 0, ctx);
+
+        /* Write back the actual content */
+        for (j = 0; j < rank; j++)
+            for (i = 0; i < n - rank; i++)
+                status |= gr_set(GR_MAT_ENTRY(R, j, nonpivots[i], sz), GR_MAT_ENTRY(V, j, i, sz), ctx);
+
+        gr_mat_clear(U, ctx);
+        gr_mat_clear(V, ctx);
+    }
 
     /* Clear pivot columns */
-    for (i = 0; i < rank; i++)
+    for (j = 0; j < rank; j++)
     {
-        for (j = 0; j <= i; j++)
+        for (i = j; i < rank; i++)
         {
             if (i == j)
                 status |= gr_one(GR_MAT_ENTRY(R, j, pivots[i], sz), ctx);
@@ -122,14 +133,7 @@ gr_mat_rref_lu(slong * res_rank, gr_mat_t R, const gr_mat_t A, gr_ctx_t ctx)
         }
     }
 
-    /* Write back the actual content */
-    for (i = 0; i < n - rank; i++)
-        for (j = 0; j < rank; j++)
-            status |= gr_set(GR_MAT_ENTRY(R, j, nonpivots[i], sz), GR_MAT_ENTRY(V, j, i, sz), ctx);
-
 cleanup1:
-    gr_mat_clear(U, ctx);
-    gr_mat_clear(V, ctx);
 
     flint_free(pivots);
     flint_free(nonpivots);

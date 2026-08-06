@@ -9,12 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "arb_poly.h"
 #include "acb.h"
 #include "arb_fmpz_poly.h"
 #include "gr.h"
+#include "gr/impl.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
@@ -30,7 +32,7 @@ gr_arf_ctx;
 #define ARF_CTX_PREC(ring_ctx) (((gr_arf_ctx *)((ring_ctx)))->prec)
 #define ARF_CTX_RND(ring_ctx) (((gr_arf_ctx *)((ring_ctx)))->rnd)
 
-int _gr_arf_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
+static int _gr_arf_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
     prec = FLINT_MAX(prec, 2);
     prec = FLINT_MIN(prec, WORD_MAX / 8);
@@ -39,34 +41,35 @@ int _gr_arf_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
     return GR_SUCCESS;
 }
 
-int _gr_arf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
+static int _gr_arf_ctx_get_real_prec(slong * res, gr_ctx_t ctx)
 {
     *res = ARF_CTX_PREC(ctx);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Floating-point numbers (arf, prec = ");
-    gr_stream_write_si(out, ARF_CTX_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Floating-point numbers (arf, prec = ");
+    status |= gr_stream_write_si(out, ARF_CTX_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
-void
+static void
 _gr_arf_init(arf_t x, const gr_ctx_t ctx)
 {
     arf_init(x);
 }
 
-void
+static void
 _gr_arf_clear(arf_t x, const gr_ctx_t ctx)
 {
     arf_clear(x);
 }
 
-void
+static void
 _gr_arf_swap(arf_t x, arf_t y, const gr_ctx_t ctx)
 {
     arf_t t;
@@ -75,14 +78,14 @@ _gr_arf_swap(arf_t x, arf_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 _gr_arf_set_shallow(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
 /* todo: limits */
-int
+static int
 _gr_arf_randtest(arf_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     arf_randtest(res, state, ARF_CTX_PREC(ctx), 10);
@@ -90,56 +93,55 @@ _gr_arf_randtest(arf_t res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 /* todo */
-int
+static int
 _gr_arf_write(gr_stream_t out, const arf_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, arf_get_str(x, ARF_CTX_PREC(ctx) * 0.30102999566398 + 1));
-    return GR_SUCCESS;
+    return gr_stream_write_free(out, arf_get_str(x, ARF_CTX_PREC(ctx) * 0.30102999566398 + 1));
 }
 
-int
+static int
 _gr_arf_zero(arf_t x, const gr_ctx_t ctx)
 {
     arf_zero(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_one(arf_t x, const gr_ctx_t ctx)
 {
     arf_one(x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_set_si(arf_t res, slong v, const gr_ctx_t ctx)
 {
     arf_set_round_si(res, v, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_set_ui(arf_t res, ulong v, const gr_ctx_t ctx)
 {
     arf_set_round_ui(res, v, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_set_fmpz(arf_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     arf_set_round_fmpz(res, v, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_set_fmpq(arf_t res, const fmpq_t v, const gr_ctx_t ctx)
 {
     arf_set_fmpq(res, v, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_set_d(arf_t res, double x, const gr_ctx_t ctx)
 {
     arf_set_d(res, x);
@@ -147,14 +149,14 @@ _gr_arf_set_d(arf_t res, double x, const gr_ctx_t ctx)
 }
 
 /* todo: set_round? */
-int
+static int
 _gr_arf_set(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_set(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_set_str(arf_t res, const char * x, gr_ctx_t ctx)
 {
     int status;
@@ -177,7 +179,7 @@ _gr_arf_set_str(arf_t res, const char * x, gr_ctx_t ctx)
 }
 
 
-int
+static int
 _gr_arf_set_other(arf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 {
     switch (x_ctx->which_ring)
@@ -276,14 +278,14 @@ _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_get_d(double * res, const arf_t x, const gr_ctx_t ctx)
 {
     *res = arf_get_d(x, ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_get_d_2exp_si(double * res, slong * exp, const arf_t x, const gr_ctx_t ctx)
 {
     if (ARF_IS_SPECIAL(x))
@@ -318,7 +320,7 @@ _gr_arf_get_d_2exp_si(double * res, slong * exp, const arf_t x, const gr_ctx_t c
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_get_fmpq(fmpq_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (!arf_is_finite(x))
@@ -332,25 +334,25 @@ _gr_arf_get_fmpq(fmpq_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 
-truth_t
+static truth_t
 _gr_arf_is_zero(const arf_t x, const gr_ctx_t ctx)
 {
     return arf_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_arf_is_one(const arf_t x, const gr_ctx_t ctx)
 {
     return arf_is_one(x) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_arf_is_neg_one(const arf_t x, const gr_ctx_t ctx)
 {
      return arf_equal_si(x, -1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 _gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(x) || arf_is_nan(y))
@@ -360,147 +362,147 @@ _gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t ctx)
 }
 
 /* todo: neg_round? */
-int
+static int
 _gr_arf_neg(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_neg(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_add(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     arf_add(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_add_si(arf_t res, const arf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_add_si(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_add_ui(arf_t res, const arf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_add_ui(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_add_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_add_fmpz(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_sub(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     arf_sub(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_sub_si(arf_t res, const arf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_sub_si(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_sub_ui(arf_t res, const arf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_sub_ui(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_sub_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_sub_fmpz(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_mul(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     arf_mul(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_mul_si(arf_t res, const arf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_mul_si(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_mul_ui(arf_t res, const arf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_mul_ui(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_mul_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_mul_fmpz(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_addmul(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     arf_addmul(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_submul(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     arf_submul(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_mul_two(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_mul_2exp_si(res, x, 1);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_sqr(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_mul(res, x, x, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_mul_2exp_si(arf_t res, const arf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_mul_2exp_si(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_mul_2exp_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_mul_2exp_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_set_fmpz_2exp_fmpz(arf_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_set_fmpz_2exp(res, x, y);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const arf_t x, const gr_ctx_t ctx)
 {
     if (!arf_is_finite(x))
@@ -510,7 +512,7 @@ _gr_arf_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const arf_t x, const gr_ctx
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_inv(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     /* todo */
@@ -518,77 +520,77 @@ _gr_arf_inv(arf_t res, const arf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_div(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     arf_div(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_div_si(arf_t res, const arf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_div_si(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_div_ui(arf_t res, const arf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_div_ui(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_div_fmpz(arf_t res, const arf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_div_fmpz(res, x, y, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_sqrt(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_sqrt(res, x, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_pos_inf(arf_t res, const gr_ctx_t ctx)
 {
     arf_pos_inf(res);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_neg_inf(arf_t res, const gr_ctx_t ctx)
 {
     arf_neg_inf(res);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_nan(arf_t res, const gr_ctx_t ctx)
 {
     arf_nan(res);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_abs(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_abs(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_conj(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_set(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_im(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_zero(res);
@@ -596,35 +598,35 @@ _gr_arf_im(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 /* todo: sign of nan? */
-int
+static int
 _gr_arf_sgn(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_set_si(res, arf_sgn(x));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_rsqrt(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_rsqrt(res, x, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_floor(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_floor(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_ceil(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     arf_ceil(res, x);
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_trunc(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_int(x) || arf_is_special(x))
@@ -643,7 +645,7 @@ _gr_arf_trunc(arf_t res, const arf_t x, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_nint(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_int(x) || arf_is_special(x))
@@ -663,7 +665,7 @@ _gr_arf_nint(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 /* todo: handling nan */
-int
+static int
 _gr_arf_cmp(int * res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     *res = arf_cmp(x, y);
@@ -734,7 +736,7 @@ _gr_arf_cmpabs(int * res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
     return status; \
 
 /* todo: lots of special cases */
-int
+static int
 _gr_arf_pow(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     if (!arf_is_finite(x) || !arf_is_finite(y)
@@ -750,7 +752,7 @@ _gr_arf_pow(arf_t res, const arf_t x, const arf_t y, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_pi(arf_t res, const gr_ctx_t ctx)
 {
     arb_t t;
@@ -761,7 +763,7 @@ _gr_arf_pi(arf_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_exp(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -782,7 +784,7 @@ _gr_arf_exp(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_expm1(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -803,7 +805,7 @@ _gr_arf_expm1(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_log(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -827,7 +829,7 @@ _gr_arf_log(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_log1p(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     int cmp;
@@ -862,7 +864,7 @@ _gr_arf_log1p(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_sin(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -879,7 +881,7 @@ _gr_arf_sin(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_cos(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -896,7 +898,7 @@ _gr_arf_cos(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_tan(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -913,7 +915,7 @@ _gr_arf_tan(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_atan(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -945,7 +947,7 @@ _gr_arf_atan(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_sinh(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -964,7 +966,7 @@ _gr_arf_sinh(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_cosh(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -983,7 +985,7 @@ _gr_arf_cosh(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_tanh(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -1004,7 +1006,7 @@ _gr_arf_tanh(arf_t res, const arf_t x, const gr_ctx_t ctx)
 
 /* todo: configurable function to return pole */
 
-int
+static int
 _gr_arf_gamma(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (arf_is_special(x))
@@ -1028,7 +1030,7 @@ _gr_arf_gamma(arf_t res, const arf_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_arf_zeta(arf_t res, const arf_t x, const gr_ctx_t ctx)
 {
     if (!arf_is_finite(x))
@@ -1053,7 +1055,7 @@ _gr_arf_zeta(arf_t res, const arf_t x, const gr_ctx_t ctx)
 /*
 for benchmarking
 
-int
+static int
 _gr_arf_vec_add(arf_ptr res, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -1066,7 +1068,7 @@ _gr_arf_vec_add(arf_ptr res, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_vec_sub(arf_ptr res, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
@@ -1081,41 +1083,70 @@ _gr_arf_vec_sub(arf_ptr res, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx
 */
 
 
-int
+static int
 _gr_arf_vec_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     arf_approx_dot(res, initial, subtract, vec1, 1, vec2, 1, len, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 _gr_arf_vec_dot_rev(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, arf_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     arf_approx_dot(res, initial, subtract, vec1, 1, vec2 + len - 1, -1, len, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
+static int
+_gr_arf_vec_dot_strided(arf_t res, const arf_t initial, int subtract, arf_srcptr vec1, slong stride1, arf_srcptr vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    arf_approx_dot(res, initial, subtract, vec1, stride1, vec2, stride2, len, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
+    return GR_SUCCESS;
+}
+
 #include "gr_poly.h"
 #include "acb_poly.h"
 
-/* todo: test */
-int
-_gr_arf_poly_mullow(arf_ptr res,
+static int
+_gr_arf_poly_mulmid(arf_ptr res,
     arf_srcptr poly1, slong len1,
-    arf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+    arf_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
 
     /* todo: tuning */
-    if (len1 <= 10 || len2 <= 10)
+    if (len1 <= 10 || len2 <= 10 || 2 * (nhi - nlo) <= 10)
     {
-        return _gr_poly_mullow_classical(res, poly1, len1, poly2, len2, n, ctx);
+        return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
     }
     else
     {
         arb_ptr tmp, t1, t2, t3;
-        slong i;
+        slong i, n = nhi - nlo;
         int squaring = (poly1 == poly2 && len1 == len2);
 
         if (!squaring)
@@ -1154,7 +1185,7 @@ _gr_arf_poly_mullow(arf_ptr res,
             mag_init(arb_radref(t3 + i));
         }
 
-        _arb_poly_mullow(t3, t1, len1, t2, len2, n, ARF_CTX_PREC(ctx));
+        _arb_poly_mulmid(t3, t1, len1, t2, len2, nlo, nhi, ARF_CTX_PREC(ctx));
 
         for (i = 0; i < n; i++)
         {
@@ -1168,26 +1199,32 @@ _gr_arf_poly_mullow(arf_ptr res,
     }
 }
 
+static int
+_gr_arf_poly_mullow(arf_ptr res,
+    arf_srcptr poly1, slong len1,
+    arf_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_arf_poly_mulmid(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
+
 /* todo: real-only roots in arb */
-int
-_gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
+static int
+_gr_arf_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
         return GR_DOMAIN;
 
     if (other_ctx->which_ring == GR_CTX_FMPZ)
     {
-        gr_ctx_t ZZ;
-        slong i, j, deg, deg2;
-        acb_ptr croots;
+        slong i, j, deg, deg2, num;
+        arb_ptr rroots;
         int status = GR_SUCCESS;
 
         deg = poly->length - 1;
 
-        gr_ctx_init_fmpz(ZZ);
-
         gr_vec_set_length(roots, 0, ctx);
-        gr_vec_set_length(mult, 0, ZZ);
+        fmpz_vec_set_length(mult, 0);
 
         if (deg != 0)
         {
@@ -1199,26 +1236,20 @@ _gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
             {
                 deg2 = fmpz_poly_degree(fac->p + i);
 
-                croots = _acb_vec_init(deg2);
-                arb_fmpz_poly_complex_roots(croots, fac->p + i, 0, ARF_CTX_PREC(ctx));
+                rroots = _arb_vec_init(deg2);
+                num = arb_fmpz_poly_real_roots(rroots, fac->p + i, 0, ARF_CTX_PREC(ctx));
 
-                for (j = 0; j < deg2; j++)
+                for (j = 0; j < num; j++)
                 {
-                    if (acb_is_real(croots + j))
-                    {
-                        fmpz m2 = fac->exp[i];
-                        GR_MUST_SUCCEED(gr_vec_append(roots, arb_midref(acb_realref(croots + j)), ctx));
-                        GR_MUST_SUCCEED(gr_vec_append(mult, &m2, ZZ));
-                    }
+                    GR_MUST_SUCCEED(gr_vec_append(roots, arb_midref(rroots + j), ctx));
+                    fmpz_vec_append_ui(mult, fac->exp[i]);
                 }
 
-                _acb_vec_clear(croots, deg2);
+                _arb_vec_clear(rroots, deg2);
             }
 
             fmpz_poly_factor_clear(fac);
         }
-
-        gr_ctx_clear(ZZ);
 
         return status;
     }
@@ -1232,7 +1263,7 @@ _gr_arf_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr
 #define ARF_MAT_ENTRY(mat, ii, jj) (((arf_ptr) (mat)->entries) + (ii) * (mat)->stride + (jj))
 
 /* todo: test */
-int
+static int
 _gr_arf_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     slong prec;
@@ -1317,6 +1348,7 @@ gr_method_tab_input _arf_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
@@ -1438,7 +1470,9 @@ gr_method_tab_input _arf_methods_input[] =
 
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_arf_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_arf_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _gr_arf_vec_dot_strided},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_arf_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _gr_arf_poly_mulmid},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) _gr_arf_poly_roots_other},
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_arf_mat_mul},

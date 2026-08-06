@@ -63,6 +63,7 @@ typedef int ((*gr_method_mat_reduce_row_op)(slong *, gr_mat_t, slong *, slong *,
 void gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);
 void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
+int _gr_mat_check_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
 gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t FLINT_UNUSED(ctx))
@@ -70,10 +71,16 @@ gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t FLINT_UNUSED(ctx))
     FLINT_SWAP(gr_mat_struct, *mat1, *mat2);
 }
 
+void _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_invert_rows(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_permute_rows(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_permute_rows_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+void _gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_swap_cols(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_permute_cols(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_permute_cols_inv(gr_mat_t mat, slong * perm_store, const slong * perm_act, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx);
 
@@ -133,6 +140,8 @@ WARN_UNUSED_RESULT int gr_mat_concat_vertical(gr_mat_t res, const gr_mat_t mat1,
 
 int gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx);
 int gr_mat_print(const gr_mat_t mat, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_set_str(gr_mat_t mat, const char * s, int resize, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong count, gr_ctx_t ctx);
@@ -367,10 +376,10 @@ int gr_mat_reduce_row(slong * column, gr_mat_t A, slong * P, slong * L, slong m,
 int gr_mat_apply_row_similarity(gr_mat_t A, slong r, gr_ptr d, gr_ctx_t ctx);
 int gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_eigenvalues_other(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_eigenvalues(gr_vec_t lambda, fmpz_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_eigenvalues_other(gr_vec_t lambda, fmpz_vec_t mult, const gr_mat_t mat, gr_ctx_t mat_ctx, int flags, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const gr_vec_t mult, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const fmpz_vec_t mult, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_diagonalization_generic(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_diagonalization(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx);
 

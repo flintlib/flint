@@ -14,7 +14,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
+static slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
                          const fmpz * coeff2, const ulong * exp2, slong len2,
                                  slong var, slong bits, const mpoly_ctx_t mctx)
 {

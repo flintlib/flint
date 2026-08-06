@@ -113,10 +113,10 @@
     
     Add 'prime' to the hast table.
 
-.. function:: relation_t qsieve_parse_relation(qs_t qs_inf, char * str)
+.. function:: relation_t qsieve_parse_relation(qs_t qs_inf)
 
-    Given a string representation of relation from the file, parse it to obtain
-    all the parameters of relation.
+    Read a relation from the file associated with *qs_inf* and parse it to
+    obtain all the parameters of the relation.
 
 .. function:: relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b)
 
@@ -149,5 +149,8 @@
     prime and not a perfect power. There is no guarantee that the factors found will
     be prime, or distinct.
 
+.. function:: void qsieve_factor_with_tune(fmpz_factor_t factors, const fmpz_t n, ulong ks_primes, slong fb_primes, slong small_primes, slong sieve_size, ulong sieve_bits)
 
- 
+    As :func:`qsieve_factor`, but with the provided tuning parameters
+    instead of default values.
+

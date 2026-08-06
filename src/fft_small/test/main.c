@@ -12,22 +12,32 @@
 /* Include functions *********************************************************/
 
 #include "t-fmpz_poly_mul.c"
+#include "t-gr_transformed_nmod_poly.c"
 #include "t-mpn_add_inplace_c.c"
+#include "t-mpn_mulmid.c"
 #include "t-mul.c"
 #include "t-nmod_poly_divrem.c"
 #include "t-nmod_poly_mul.c"
+#include "t-op_mpn.c"
+#include "t-op_nmod.c"
 #include "t-sd_fft.c"
+#include "t-transformed_mpn.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
     TEST_FUNCTION(_fmpz_poly_mul_mid_mpn_ctx),
+    TEST_FUNCTION(gr_transformed_nmod_poly),
     TEST_FUNCTION(flint_mpn_add_inplace_c),
+    TEST_FUNCTION(_mpn_ctx_mpn_mul_range),
     TEST_FUNCTION(mpn_ctx_mpn_mul),
     TEST_FUNCTION(_nmod_poly_divrem_mpn_ctx),
     TEST_FUNCTION(_nmod_poly_mul_mid_mpn_ctx),
-    TEST_FUNCTION(sd_fft)
+    TEST_FUNCTION(fft_small_op_mpn),
+    TEST_FUNCTION(fft_small_op_nmod),
+    TEST_FUNCTION(sd_fft),
+    TEST_FUNCTION(gr_transformed_mpn)
 };
 
 /* main function *************************************************************/

@@ -12,8 +12,9 @@
 #include "arb_poly.h"
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
+#include "acb_hypgeom/impl.h"
 
-void
+static void
 _acb_poly_reciprocal_majorant(arb_ptr res, acb_srcptr vec, slong len, slong prec)
 {
     slong i;
@@ -75,7 +76,7 @@ arb_poly_geometric_sum(arb_poly_t F, const arb_poly_t U, slong len, slong prec)
        product of (1 / (|B[0] - |B[1:]|))
        * |Z|
 */
-void
+static void
 acb_hypgeom_pfq_series_bound_factor(arb_poly_t F,
     const acb_poly_struct * a, slong p,
     const acb_poly_struct * b, slong q,

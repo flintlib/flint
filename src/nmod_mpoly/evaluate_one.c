@@ -16,7 +16,7 @@
 #include "nmod_mpoly.h"
 
 /* exponents of B are not multiprecision */
-void _nmod_mpoly_evaluate_one_ui_sp(
+static void _nmod_mpoly_evaluate_one_ui_sp(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
     slong var,

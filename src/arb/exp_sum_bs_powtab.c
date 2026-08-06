@@ -12,14 +12,14 @@
 #include "thread_support.h"
 #include "fmpz_vec.h"
 #include "arb.h"
+#include "arb/impl.h"
 
 /* When splitting [a,b) into [a,m), [m,b), we need the power x^(m-a).
    This function computes all the exponents (m-a) that can appear when
    doing binary splitting with the top-level interval [0,n),
    assuming that we always choose m = a + floor((b-a)/2), and that
    the case b-a = 2 is inlined. */
-slong
-_arb_compute_bs_exponents(slong * tab, slong n)
+slong _arb_compute_bs_exponents(slong * tab, slong n)
 {
     slong a, b, aa, /* ab, */ ba, bb, length;
 
@@ -107,8 +107,7 @@ _arb_compute_bs_exponents(slong * tab, slong n)
 }
 
 /* just do a linear search */
-slong
-_arb_get_exp_pos(const slong * tab, slong step)
+slong _arb_get_exp_pos(const slong * tab, slong step)
 {
     slong i;
 
@@ -194,13 +193,13 @@ exp_bsplit_struct;
 
 typedef exp_bsplit_struct exp_bsplit_t[1];
 
-static void exp_bsplit_init(exp_bsplit_t x, void * args)
+static void exp_bsplit_init(exp_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_init(x->T);
     fmpz_init(x->Q);
 }
 
-static void exp_bsplit_clear(exp_bsplit_t x, void * args)
+static void exp_bsplit_clear(exp_bsplit_t x, void * FLINT_UNUSED(args))
 {
     fmpz_clear(x->T);
     fmpz_clear(x->Q);

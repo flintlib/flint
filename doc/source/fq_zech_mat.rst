@@ -263,6 +263,21 @@ Addition and subtraction
     Sets `B = -A`. Dimensions must be identical.
 
 
+Matrix-scalar arithmetic
+--------------------------------------------------------------------------------
+
+
+.. function:: void fq_zech_mat_scalar_mul(fq_zech_mat_t B, const fq_zech_mat_t A, const fq_zech_t c, const fq_zech_ctx_t ctx)
+              void fq_zech_mat_scalar_mul_fmpz(fq_zech_mat_t B, const fq_zech_mat_t A, const fmpz_t c, const fq_zech_ctx_t ctx)
+              void fq_zech_mat_scalar_mul_si(fq_zech_mat_t B, const fq_zech_mat_t A, const slong c, const fq_zech_ctx_t ctx)
+              void fq_zech_mat_scalar_mul_ui(fq_zech_mat_t B, const fq_zech_mat_t A, const ulong c, const fq_zech_ctx_t ctx)
+
+    Set ``B = A*c`` where ``A`` is an ``fq_zech_mat_t`` and ``c``
+    is a scalar respectively of type ``fq_zech_t``, ``fmpz_t``, ``slong``,
+    or ``ulong``. The dimensions of ``A`` and ``B`` must
+    be compatible.
+
+
 Matrix multiplication
 --------------------------------------------------------------------------------
 
@@ -353,7 +368,9 @@ Triangular solving
 
     Sets `X = L^{-1} B` where `L` is a full rank lower triangular
     square matrix. If ``unit`` = 1, `L` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
+    its main diagonal, and the main diagonal will not be read.  It is
+    assumed that `L` is lower triangular with invertible diagonal (or
+    unit diagonal when ``unit`` = 1); this is not checked.  `X`
     and `B` are allowed to be the same matrix, but no other aliasing
     is allowed. Automatically chooses between the classical and
     recursive algorithms.
@@ -362,7 +379,9 @@ Triangular solving
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular
     square matrix. If ``unit`` = 1, `U` is assumed to have ones on
-    its main diagonal, and the main diagonal will not be read.  `X`
+    its main diagonal, and the main diagonal will not be read.  It is
+    assumed that `U` is upper triangular with invertible diagonal (or
+    unit diagonal when ``unit`` = 1); this is not checked.  `X`
     and `B` are allowed to be the same matrix, but no other aliasing
     is allowed. Automatically chooses between the classical and
     recursive algorithms.

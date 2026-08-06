@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     arb_init(s);
     arb_init(t);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     for (prec = 64; ; prec *= 2)
     {
         flint_printf("Trying prec=%wd bits...", prec);
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     flint_printf("x_%wd = ", n);
     arb_printn(x, digits, 0);

@@ -15,7 +15,7 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 #include "gr_series.h"
-
+#include "gr_series/impl.h"
 
 static const char * default_var = "x";
 
@@ -27,13 +27,14 @@ void gr_series_mod_ctx_clear(gr_ctx_t ctx)
 
 int gr_series_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Power series over ");
-    gr_ctx_write(out, GR_SERIES_MOD_ELEM_CTX(ctx));
-    gr_stream_write(out, " mod ");
-    gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
-    gr_stream_write(out, "^");
-    gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Power series over ");
+    status |= gr_ctx_write(out, GR_SERIES_MOD_ELEM_CTX(ctx));
+    status |= gr_stream_write(out, " mod ");
+    status |= gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
+    return status;
 }
 
 truth_t
@@ -99,6 +100,16 @@ gr_series_mod_ctx_is_field(gr_ctx_t ctx)
     return gr_ctx_is_field(GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
+truth_t
+gr_series_mod_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    /* Zero ring */
+    if (GR_SERIES_MOD_N(ctx) == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_finite_characteristic(GR_SERIES_MOD_ELEM_CTX(ctx));
+}
+
 int gr_series_mod_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
@@ -118,7 +129,6 @@ int gr_series_mod_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 }
 
 
-int _gr_series_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx);
 #define _gr_series_mod_ctx_gen_name _gr_series_ctx_gen_name
 
 int
@@ -148,6 +158,35 @@ gr_series_mod_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     return status;
 }
 
+static int
+gr_series_mod_big_o_base_fmpz(gr_poly_t res, const gr_poly_t base, const fmpz_t exp, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_SERIES_MOD_ELEM_CTX(ctx);
+    int status;
+
+    /* base is a constant: build O(base^exp) in the coefficient ring */
+    if (gr_poly_length(base, cctx) == 1)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, cctx);
+
+        status = gr_big_o_base_fmpz(t, base->coeffs, exp, cctx);
+
+        if (status == GR_SUCCESS)
+            status = (GR_SERIES_MOD_N(ctx) == 0) ? GR_SUCCESS
+                                                 : gr_poly_set_scalar(res, t, cctx);
+
+        GR_TMP_CLEAR(t, cctx);
+        return status;
+    }
+
+    /* we don't support inexact elements with respect to the generator */
+    return GR_UNABLE;
+}
+
+static gr_ptr _gr_series_mod_ctx_base(gr_ctx_t ctx) { return GR_SERIES_MOD_ELEM_CTX(ctx); }
+
+
 void gr_series_mod_init(gr_poly_t res, gr_ctx_t ctx)
 {
     gr_poly_init(res, GR_SERIES_MOD_ELEM_CTX(ctx));
@@ -172,11 +211,11 @@ int gr_series_mod_write(gr_stream_t out, const gr_poly_t x, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     status |= gr_poly_write(out, x, GR_SERIES_MOD_CTX(ctx)->var, GR_SERIES_MOD_ELEM_CTX(ctx));
-    gr_stream_write(out, " (mod ");
-    gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
-    gr_stream_write(out, "^");
-    gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
-    gr_stream_write(out, ")");
+    status |= gr_stream_write(out, " (mod ");
+    status |= gr_stream_write(out, GR_SERIES_MOD_CTX(ctx)->var);
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, GR_SERIES_MOD_N(ctx));
+    status |= gr_stream_write(out, ")");
     return status;
 }
 
@@ -262,11 +301,17 @@ int gr_series_mod_mul(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ct
 
 int gr_series_mod_inv(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 {
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     return gr_poly_inv_series(res, x, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
 int gr_series_mod_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, gr_ctx_t ctx)
 {
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     return gr_poly_div_series(res, x, y, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx));
 }
 
@@ -277,16 +322,35 @@ gr_series_mod_ ## func(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx) \
     return gr_poly_ ## func ## _series(res, x, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx)); \
 } \
 
+#define BINARY_UNARY_POLY_WRAPPER(func) \
+int \
+gr_series_mod_ ## func(gr_poly_t res1, gr_poly_t res2, const gr_poly_t x, gr_ctx_t ctx) \
+{ \
+    return gr_poly_ ## func ## _series(res1, res2, x, GR_SERIES_MOD_N(ctx), GR_SERIES_MOD_ELEM_CTX(ctx)); \
+} \
+
 UNARY_POLY_WRAPPER(exp)
 UNARY_POLY_WRAPPER(log)
 UNARY_POLY_WRAPPER(rsqrt)
+UNARY_POLY_WRAPPER(sin)
+UNARY_POLY_WRAPPER(cos)
+UNARY_POLY_WRAPPER(sin_pi)
+UNARY_POLY_WRAPPER(cos_pi)
 UNARY_POLY_WRAPPER(tan)
+UNARY_POLY_WRAPPER(tanh)
+UNARY_POLY_WRAPPER(cot)
+UNARY_POLY_WRAPPER(coth)
+UNARY_POLY_WRAPPER(tan_pi)
+UNARY_POLY_WRAPPER(cot_pi)
 UNARY_POLY_WRAPPER(asin)
 UNARY_POLY_WRAPPER(acos)
 UNARY_POLY_WRAPPER(atan)
 UNARY_POLY_WRAPPER(asinh)
 UNARY_POLY_WRAPPER(acosh)
 UNARY_POLY_WRAPPER(atanh)
+
+BINARY_UNARY_POLY_WRAPPER(sin_cos)
+BINARY_UNARY_POLY_WRAPPER(sin_cos_pi)
 
 
 /* fixme: gr_poly_sqrt_series does not deal with leading zeros */
@@ -307,7 +371,7 @@ int gr_series_mod_sqrt(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
 }
 
 
-int
+static int
 _set_truncate_poly(gr_poly_t res, const gr_poly_t x, gr_ctx_t x_elem_ctx, slong n, gr_ctx_t elem_ctx)
 {
     if (x_elem_ctx == elem_ctx)
@@ -339,7 +403,7 @@ gr_series_mod_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx
 {
     if (x_ctx == ctx)
     {
-        return gr_poly_set(res, x, ctx);
+        return gr_series_mod_set(res, x, ctx);
     }
     else if (x_ctx == GR_SERIES_MOD_ELEM_CTX(ctx))
     {
@@ -407,6 +471,8 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_mod_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_series_mod_ctx_is_finite_characteristic},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_series_mod_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_mod_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_mod_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_series_mod_swap},
@@ -421,6 +487,7 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_GEN,         (gr_funcptr) gr_series_mod_gen},
     {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE,  (gr_funcptr) gr_series_mod_gens_recursive},
+    {GR_METHOD_BIG_O_BASE_FMPZ, (gr_funcptr) gr_series_mod_big_o_base_fmpz},
     {GR_METHOD_SET,         (gr_funcptr) gr_series_mod_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) gr_series_mod_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) gr_series_mod_set_si},
@@ -438,7 +505,18 @@ gr_method_tab_input _gr_series_mod_methods_input[] =
     {GR_METHOD_RSQRT,       (gr_funcptr) gr_series_mod_rsqrt},
     {GR_METHOD_EXP,         (gr_funcptr) gr_series_mod_exp},
     {GR_METHOD_LOG,         (gr_funcptr) gr_series_mod_log},
+    {GR_METHOD_SIN,         (gr_funcptr) gr_series_mod_sin},
+    {GR_METHOD_COS,         (gr_funcptr) gr_series_mod_cos},
+    {GR_METHOD_SIN_PI,      (gr_funcptr) gr_series_mod_sin_pi},
+    {GR_METHOD_COS_PI,      (gr_funcptr) gr_series_mod_cos_pi},
+    {GR_METHOD_SIN_COS,     (gr_funcptr) gr_series_mod_sin_cos},
+    {GR_METHOD_SIN_COS_PI,  (gr_funcptr) gr_series_mod_sin_cos_pi},
     {GR_METHOD_TAN,         (gr_funcptr) gr_series_mod_tan},
+    {GR_METHOD_TANH,        (gr_funcptr) gr_series_mod_tanh},
+    {GR_METHOD_COT,         (gr_funcptr) gr_series_mod_cot},
+    {GR_METHOD_COTH,        (gr_funcptr) gr_series_mod_coth},
+    {GR_METHOD_TAN_PI,      (gr_funcptr) gr_series_mod_tan_pi},
+    {GR_METHOD_COT_PI,      (gr_funcptr) gr_series_mod_cot_pi},
     {GR_METHOD_ASIN,        (gr_funcptr) gr_series_mod_asin},
     {GR_METHOD_ACOS,        (gr_funcptr) gr_series_mod_acos},
     {GR_METHOD_ATAN,        (gr_funcptr) gr_series_mod_atan},

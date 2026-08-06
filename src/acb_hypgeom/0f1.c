@@ -100,7 +100,7 @@ acb_hypgeom_0f1_direct(acb_t res, const acb_t a, const acb_t z, int regularized,
     }
 }
 
-int
+static int
 acb_hypgeom_0f1_use_asymp(const acb_t z, slong prec)
 {
     double x, y, c;

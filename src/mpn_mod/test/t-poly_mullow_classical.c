@@ -18,7 +18,14 @@ TEST_FUNCTION_START(mpn_mod_poly_mullow_classical, state)
     gr_ctx_t ctx;
     slong iter;
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_init_mpn_mod_randtest(ctx, state);
+        _gr_poly_test_mulmid((gr_method_poly_binary_trunc2_op) _mpn_mod_poly_mulmid_classical, NULL, state, 10, 20, ctx);
+        gr_ctx_clear(ctx);
+    }
+
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
         _gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_classical, NULL, state, 10, 20, ctx);

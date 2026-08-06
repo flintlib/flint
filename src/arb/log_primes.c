@@ -14,6 +14,7 @@
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "arb.h"
+#include "arb/impl.h"
 
 #define HAVE_64_BIT (FLINT_BITS == 64)
 
@@ -468,7 +469,7 @@ arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 FLINT_TLS_PREFIX arb_struct _arb_log_p_cache[ARB_LOG_PRIME_CACHE_NUM];
 FLINT_TLS_PREFIX slong _arb_log_p_cache_prec = 0;
 
-void _arb_log_p_cleanup(void)
+static void _arb_log_p_cleanup(void)
 {
     slong i;
     for (i = 0; i < ARB_LOG_PRIME_CACHE_NUM; i++)
@@ -689,7 +690,7 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 FLINT_TLS_PREFIX arb_struct _arb_atan_gauss_p_cache[ARB_ATAN_GAUSS_PRIME_CACHE_NUM];
 FLINT_TLS_PREFIX slong _arb_atan_gauss_p_cache_prec = 0;
 
-void _arb_atan_gauss_p_cleanup(void)
+static void _arb_atan_gauss_p_cleanup(void)
 {
     slong i;
     for (i = 0; i < ARB_ATAN_GAUSS_PRIME_CACHE_NUM; i++)

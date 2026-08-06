@@ -16,7 +16,7 @@ FLINT_TLS_PREFIX int default_mpn_ctx_initialized = 0;
 
 #define DEFAULT_PRIME UWORD(0x0003f00000000001)
 
-void
+static void
 mpn_ctx_cleanup(void)
 {
     if (default_mpn_ctx_initialized)

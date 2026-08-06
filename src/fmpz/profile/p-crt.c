@@ -138,30 +138,30 @@ benchmark(slong num_primes, slong prime_bits)
         residues[k] = n_randint(state, primes[k]);
 
     printf("simple tree:   ");
-    TIMEIT_START
+    TIMEIT_START;
     fmpz_t tmp;
     fmpz_init(tmp);
     tree_crt(res, tmp, residues, primes, num_primes);
     fmpz_clear(tmp);
-    TIMEIT_STOP
+    TIMEIT_STOP;
     fmpz_print1(res);
 
     printf("multi CRT:     ");
-    TIMEIT_START
+    TIMEIT_START;
     fmpz_comb_init(comb, primes, num_primes);
     fmpz_comb_temp_init(temp, comb);
     fmpz_multi_CRT_ui(res, residues, comb, temp, 0);
     fmpz_comb_clear(comb);
     fmpz_comb_temp_clear(temp);
-    TIMEIT_STOP
+    TIMEIT_STOP;
     fmpz_print1(res);
 
     printf("multi precomp: ");
     fmpz_comb_init(comb, primes, num_primes);
     fmpz_comb_temp_init(temp, comb);
-    TIMEIT_START
+    TIMEIT_START;
     fmpz_multi_CRT_ui(res, residues, comb, temp, 0);
-    TIMEIT_STOP
+    TIMEIT_STOP;
     fmpz_comb_clear(comb);
     fmpz_comb_temp_clear(temp);
     fmpz_print1(res);

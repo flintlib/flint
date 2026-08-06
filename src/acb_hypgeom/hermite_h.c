@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "acb_hypgeom.h"
 
-void
+static void
 acb_hypgeom_hermite_h_ui_recurrence(acb_t res, ulong n, const acb_t z, slong prec)
 {
     acb_t t, u, v;

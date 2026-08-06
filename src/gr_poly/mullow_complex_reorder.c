@@ -18,9 +18,9 @@
 #define IM(xx) (GR_ENTRY(xx, 1, real_sz))
 
 int
-_gr_poly_mullow_complex_reorder(gr_ptr res,
+_gr_poly_mulmid_complex_reorder(gr_ptr res,
     gr_srcptr poly1, slong len1,
-    gr_srcptr poly2, slong len2, slong n,
+    gr_srcptr poly2, slong len2, slong nlo, slong nhi,
     int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
 {
     gr_ptr a, b, c, d, e, f, w;
@@ -28,11 +28,35 @@ _gr_poly_mullow_complex_reorder(gr_ptr res,
     slong i, alloc;
     slong sz = ctx->sizeof_elem;
     slong real_sz = real_ctx->sizeof_elem;
+    slong n = nhi - nlo;
     int status = GR_SUCCESS;
     int squaring;
 
-    len1 = FLINT_MIN(len1, n);
-    len2 = FLINT_MIN(len2, n);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            poly1 = GR_ENTRY(poly1, trunc, sz);
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            poly2 = GR_ENTRY(poly2, trunc, sz);
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
 
     squaring = (poly1 == poly2) && (len1 == len2);
 
@@ -62,37 +86,39 @@ _gr_poly_mullow_complex_reorder(gr_ptr res,
     {
         if (_gr_vec_is_zero(b, len1, real_ctx) == T_TRUE)
         {
-            status |= _gr_poly_mullow(e, a, len1, a, len1, n, real_ctx);
+            status |= _gr_poly_mulmid(e, a, len1, a, len1, nlo, nhi, real_ctx);
             status |= _gr_vec_zero(f, n, real_ctx);
         }
         else if (_gr_vec_is_zero(a, len1, real_ctx) == T_TRUE)
         {
-            status |= _gr_poly_mullow(e, b, len1, b, len1, n, real_ctx);
+            status |= _gr_poly_mulmid(e, b, len1, b, len1, nlo, nhi, real_ctx);
             status |= _gr_vec_neg(e, e, n, real_ctx);
             status |= _gr_vec_zero(f, n, real_ctx);
         }
         else if (karatsuba)
         {
-            GR_TMP_INIT_VEC(t, 3 * n, real_ctx);
-            u = GR_ENTRY(t, n, real_sz);
-            v = GR_ENTRY(u, n, real_sz);
+            slong tn = FLINT_MAX(len1, n);
+
+            GR_TMP_INIT_VEC(t, 3 * tn, real_ctx);
+            u = GR_ENTRY(t, tn, real_sz);
+            v = GR_ENTRY(u, tn, real_sz);
 
             status |= _gr_vec_add(t, a, b, len1, real_ctx);
-            status |= _gr_poly_mullow(v, t, len1, t, len1, n, real_ctx);
-            status |= _gr_poly_mullow(t, a, len1, a, len1, n, real_ctx);
-            status |= _gr_poly_mullow(u, b, len1, b, len1, n, real_ctx);
+            status |= _gr_poly_mulmid(v, t, len1, t, len1, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(t, a, len1, a, len1, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(u, b, len1, b, len1, nlo, nhi, real_ctx);
             status |= _gr_vec_sub(e, t, u, n, real_ctx);
             status |= _gr_vec_sub(f, v, t, n, real_ctx);
             status |= _gr_vec_sub(f, f, u, n, real_ctx);
 
-            GR_TMP_CLEAR_VEC(t, 3 * n, real_ctx);
+            GR_TMP_CLEAR_VEC(t, 3 * tn, real_ctx);
         }
         else
         {
-            status |= _gr_poly_mullow(e, a, len1, a, len1, n, real_ctx);
-            status |= _gr_poly_mullow(f, b, len1, b, len1, n, real_ctx);
+            status |= _gr_poly_mulmid(e, a, len1, a, len1, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(f, b, len1, b, len1, nlo, nhi, real_ctx);
             status |= _gr_vec_sub(e, e, f, n, real_ctx);
-            status |= _gr_poly_mullow(f, a, len1, b, len1, n, real_ctx);
+            status |= _gr_poly_mulmid(f, a, len1, b, len1, nlo, nhi, real_ctx);
             status |= _gr_vec_mul_scalar_2exp_si(f, f, n, 1, real_ctx);
         }
     }
@@ -109,12 +135,12 @@ _gr_poly_mullow_complex_reorder(gr_ptr res,
             if (_gr_vec_is_zero(d, len2, real_ctx) == T_TRUE)
                 status |= _gr_vec_zero(f, n, real_ctx);
             else
-                status |= _gr_poly_mullow(f, a, len1, d, len2, n, real_ctx);
+                status |= _gr_poly_mulmid(f, a, len1, d, len2, nlo, nhi, real_ctx);
 
             if (_gr_vec_is_zero(c, len2, real_ctx) == T_TRUE)
                 status |= _gr_vec_zero(e, n, real_ctx);
             else
-                status |= _gr_poly_mullow(e, a, len1, c, len2, n, real_ctx);
+                status |= _gr_poly_mulmid(e, a, len1, c, len2, nlo, nhi, real_ctx);
         }
         else if (_gr_vec_is_zero(a, len1, real_ctx) == T_TRUE)
         {
@@ -122,52 +148,54 @@ _gr_poly_mullow_complex_reorder(gr_ptr res,
                 status |= _gr_vec_zero(e, n, real_ctx);
             else
             {
-                status |= _gr_poly_mullow(e, b, len1, d, len2, n, real_ctx);
+                status |= _gr_poly_mulmid(e, b, len1, d, len2, nlo, nhi, real_ctx);
                 status |= _gr_vec_neg(e, e, n, real_ctx);
             }
 
             if (_gr_vec_is_zero(c, len2, real_ctx) == T_TRUE)
                 status |= _gr_vec_zero(f, n, real_ctx);
             else
-                status |= _gr_poly_mullow(f, b, len1, c, len2, n, real_ctx);
+                status |= _gr_poly_mulmid(f, b, len1, c, len2, nlo, nhi, real_ctx);
         }
         else if (_gr_vec_is_zero(d, len2, real_ctx) == T_TRUE)
         {
-            status |= _gr_poly_mullow(e, a, len1, c, len2, n, real_ctx);
-            status |= _gr_poly_mullow(f, b, len1, c, len2, n, real_ctx);
+            status |= _gr_poly_mulmid(e, a, len1, c, len2, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(f, b, len1, c, len2, nlo, nhi, real_ctx);
         }
         else if (_gr_vec_is_zero(c, len2, real_ctx) == T_TRUE)
         {
-            status |= _gr_poly_mullow(e, b, len1, d, len2, n, real_ctx);
+            status |= _gr_poly_mulmid(e, b, len1, d, len2, nlo, nhi, real_ctx);
             status |= _gr_vec_neg(e, e, n, real_ctx);
-            status |= _gr_poly_mullow(f, a, len1, d, len2, n, real_ctx);
+            status |= _gr_poly_mulmid(f, a, len1, d, len2, nlo, nhi, real_ctx);
         }
         else if (karatsuba)
         {
-            GR_TMP_INIT_VEC(t, 3 * n, real_ctx);
-            u = GR_ENTRY(t, n, real_sz);
-            v = GR_ENTRY(u, n, real_sz);
+            slong tn = FLINT_MAX(FLINT_MAX(len1, len2), n);
+
+            GR_TMP_INIT_VEC(t, 3 * tn, real_ctx);
+            u = GR_ENTRY(t, tn, real_sz);
+            v = GR_ENTRY(u, tn, real_sz);
 
             status |= _gr_vec_add(t, a, b, len1, real_ctx);
             status |= _gr_vec_add(u, c, d, len2, real_ctx);
-            status |= _gr_poly_mullow(v, t, len1, u, len2, n, real_ctx);
-            status |= _gr_poly_mullow(t, a, len1, c, len2, n, real_ctx);
-            status |= _gr_poly_mullow(u, b, len1, d, len2, n, real_ctx);
+            status |= _gr_poly_mulmid(v, t, len1, u, len2, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(t, a, len1, c, len2, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(u, b, len1, d, len2, nlo, nhi, real_ctx);
             status |= _gr_vec_sub(e, t, u, n, real_ctx);
             status |= _gr_vec_sub(f, v, t, n, real_ctx);
             status |= _gr_vec_sub(f, f, u, n, real_ctx);
 
-            GR_TMP_CLEAR_VEC(t, 3 * n, real_ctx);
+            GR_TMP_CLEAR_VEC(t, 3 * tn, real_ctx);
         }
         else
         {
             GR_TMP_INIT_VEC(t, n, real_ctx);
 
-            status |= _gr_poly_mullow(e, a, len1, c, len2, n, real_ctx);
-            status |= _gr_poly_mullow(t, b, len1, d, len2, n, real_ctx);
+            status |= _gr_poly_mulmid(e, a, len1, c, len2, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(t, b, len1, d, len2, nlo, nhi, real_ctx);
             status |= _gr_vec_sub(e, e, t, n, real_ctx);
-            status |= _gr_poly_mullow(f, a, len1, d, len2, n, real_ctx);
-            status |= _gr_poly_mullow(t, b, len1, c, len2, n, real_ctx);
+            status |= _gr_poly_mulmid(f, a, len1, d, len2, nlo, nhi, real_ctx);
+            status |= _gr_poly_mulmid(t, b, len1, c, len2, nlo, nhi, real_ctx);
             status |= _gr_vec_add(f, f, t, n, real_ctx);
 
             GR_TMP_CLEAR_VEC(t, n, real_ctx);
@@ -182,6 +210,54 @@ _gr_poly_mullow_complex_reorder(gr_ptr res,
 
     GR_TMP_FREE(w, alloc * real_sz);
 
+    return status;
+}
+
+int
+_gr_poly_mullow_complex_reorder(gr_ptr res,
+    gr_srcptr poly1, slong len1,
+    gr_srcptr poly2, slong len2, slong n,
+    int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
+{
+    return _gr_poly_mulmid_complex_reorder(res, poly1, len1, poly2, len2, 0, n,
+        karatsuba, ctx, real_ctx);
+}
+
+int
+gr_poly_mulmid_complex_reorder(gr_poly_t res, const gr_poly_t poly1,
+                                            const gr_poly_t poly2,
+                                                slong nlo, slong nhi, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx)
+{
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    int status;
+    slong len;
+
+    FLINT_ASSERT(nlo >= 0);
+    FLINT_ASSERT(nhi >= 0);
+
+    if (len1 == 0 || len2 == 0 || nlo >= FLINT_MIN(nhi, len1 + len2 - 1))
+        return gr_poly_zero(res, ctx);
+
+    nhi = FLINT_MIN(nhi, len1 + len2 - 1);
+    len = nhi - nlo;
+
+    if (res == poly1 || res == poly2)
+    {
+        gr_poly_t t;
+        gr_poly_init2(t, len, ctx);
+        status = _gr_poly_mulmid_complex_reorder(t->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, nlo, nhi, karatsuba, ctx, real_ctx);
+        gr_poly_swap(res, t, ctx);
+        gr_poly_clear(t, ctx);
+    }
+    else
+    {
+        gr_poly_fit_length(res, len, ctx);
+        status = _gr_poly_mulmid_complex_reorder(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, nlo, nhi, karatsuba, ctx, real_ctx);
+    }
+
+    _gr_poly_set_length(res, len, ctx);
+    _gr_poly_normalise(res, ctx);
     return status;
 }
 

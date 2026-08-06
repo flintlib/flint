@@ -114,6 +114,27 @@ TEST_FUNCTION_START(nmod_mpoly_factor_zassenhaus, state)
 {
     slong i, j, tmul = 30;
 
+    /* test some specific examples known to enter the recombination */
+    {
+        nmod_mpoly_ctx_t ctx;
+        nmod_mpoly_t a;
+        const char * vars[] = {"x1", "x2", "x3", "x4", "x5"};
+
+        nmod_mpoly_ctx_init(ctx, 5, ORD_LEX, UWORD(7));
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_set_str_pretty(a, "x1^5*x2^5*x3^3*x4^2*x5+3*x1^5*x2^2*x3*x4^2*x5^3+5*x1^4*x2^3*x3^3*x4^2*x5+4*x1^4*x2^2*x3^3*x4+6*x1^3*x2^5*x3^4*x4^5*x5^4+4*x1^3*x2^3*x3^2*x5^3+4*x1^3*x2^2*x3^2*x4^5*x5^6+5*x1^2*x2^5*x3^5*x4^5*x5^2+4*x1^2*x2^5*x3^5*x4^3*x5+2*x1^2*x2^4*x3^2*x4^2*x5^2+2*x1^2*x2^3*x3^5*x4^2*x5^4+2*x1^2*x2^3*x3^4*x4^5*x5^4+3*x1^2*x2^2*x3^4*x4^4*x5^3+x1^2*x2^2*x3^3*x4^5*x5^4+5*x1^2*x2^2*x3^3*x4^3*x5^3+6*x1^2*x2*x4^2*x5^4+6*x1^2*x3^3*x4^2*x5^6+4*x1*x2^3*x3^5*x4^5*x5^2+6*x1*x2^3*x3^5*x4^3*x5+3*x1*x2^3*x3^3*x4^3*x5^6+6*x1*x2^2*x3^5*x4^4*x5+2*x1*x2^2*x3^5*x4^2+3*x1*x2^2*x3^2*x4^2*x5^2+3*x1*x2*x3^5*x4^2*x5^4+x1*x2*x3^2*x4*x5+x1*x3^5*x4*x5^3+6*x2^3*x3^4*x4^3*x5^4+2*x2^3*x3^4*x4*x5^3+x2^2*x3*x5^4+x2*x3^4*x5^6", vars, ctx);
+        check_omega(2, 2, a, ctx, nmod_mpoly_factor_zassenhaus);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+
+        nmod_mpoly_ctx_init(ctx, 4, ORD_LEX, UWORD(5));
+        nmod_mpoly_init(a, ctx);
+        nmod_mpoly_set_str_pretty(a, "x1^5*x2^3*x3^2*x4^3+2*x1^5*x2^2*x3^3*x4^4+x1^5*x2^2*x3^2*x4^4+2*x1^5*x2*x3^3*x4^5+x1^4*x2^5*x3*x4^3+3*x1^4*x2^5*x4^2+x1^4*x2^4*x3*x4^4+3*x1^4*x2^4*x4^3+2*x1^4*x2^3*x3^3*x4^2+x1^4*x2^3*x4^4+2*x1^4*x2^2*x3^3*x4^3+2*x1^4*x2^2*x3^3*x4+x1^4*x2^2*x4^5+4*x1^4*x2*x3^4*x4^2+x1^4*x2*x3^2*x4^2+2*x1^4*x3^3*x4^3+3*x1^3*x2^5*x3^3*x4^2+3*x1^3*x2^4*x3^3*x4^3+2*x1^3*x2^4*x3^2*x4+x1^3*x2^4*x3+x1^3*x2^3*x3*x4^2+3*x1^3*x2^3*x4+4*x1^3*x2^2*x3^4+3*x1^3*x2^2*x3*x4^3+2*x1^3*x2^2*x3*x4^2+3*x1^3*x2*x3^5*x4^3+2*x1^3*x2*x3^3*x4+3*x1^3*x2*x3*x4^4+x1^3*x2*x4^3+x1^3*x3^6*x4^4+x1^2*x2^4*x3^4+3*x1^2*x2^3*x3^4*x4^3+4*x1^2*x2^3*x3^3*x4^5+4*x1^2*x2^3*x3^3*x4^2+3*x1^2*x2^3*x3^3*x4+4*x1^2*x2^2*x3^3*x4^6+x1^2*x2*x3^6*x4^2+3*x1^2*x2*x3^3*x4^4+x1^2*x2*x3^2*x4+3*x1^2*x3*x4^2+4*x1*x2^3*x3^6*x4^2+3*x1*x2^2*x3^4*x4^3+4*x1*x2*x3^3*x4^4+4*x1*x3^4*x4^3+2*x2*x3^6*x4^5", vars, ctx);
+        check_omega(2, 2, a, ctx, nmod_mpoly_factor_zassenhaus);
+        nmod_mpoly_clear(a, ctx);
+        nmod_mpoly_ctx_clear(ctx);
+    }
+
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         slong lower;

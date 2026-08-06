@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-slong _nmod_mpoly_sub1(ulong * coeff1,       ulong * exp1,
+static slong _nmod_mpoly_sub1(ulong * coeff1,       ulong * exp1,
                  const ulong * coeff2, const ulong * exp2, slong len2,
                  const ulong * coeff3, const ulong * exp3, slong len3,
                                           ulong maskhi, nmod_t fctx)

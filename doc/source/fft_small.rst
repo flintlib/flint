@@ -6,6 +6,9 @@
 This module currently requires building FLINT with support for
 AVX2 or NEON instructions.
 
+The truncated FFT routines used internally by this module follow the
+approach described by van der Hoeven in [vdH2004]_.
+
 Integer multiplication
 --------------------------------------------------------------------------------
 
@@ -19,6 +22,7 @@ Integer multiplication
 .. function:: void mpn_ctx_init(mpn_ctx_t R, ulong p)
 
     Initialize multiplication context object with initial prime ``p``.
+    Usually ``p`` is a constant provided by :func:`get_default_mpn_ctx`.
 
 .. function:: void mpn_ctx_clear(mpn_ctx_t R)
 
@@ -85,3 +89,66 @@ Preconditioned polynomial arithmetic
 
     Polynomial multiplication given a precomputed transform ``M``.
     Returns 1 if successful, 0 if the precomputed transform is too short.
+
+
+Transform plans and operands
+--------------------------------------------------------------------------------
+
+.. type:: fft_small_plan_struct
+          fft_small_plan_t
+
+    Describes one convolution shape: the primes used, transform depth,
+    truncation lengths and coefficient windows. A plan is computed once
+    and reused for any number of transforms of that shape.
+
+.. type:: fft_small_op_struct
+          fft_small_op_t
+
+    One operand in transformed representation: a buffer of evaluations
+    for each prime, together with the plan parameters it was built for
+    and its current domain (primal data or pointwise products).
+
+.. function:: void fft_small_op_init(fft_small_op_t X, const fft_small_plan_t P)
+              void fft_small_op_init_borrowed(fft_small_op_t X, const fft_small_plan_t P, double * data)
+              ulong fft_small_op_sizeof_data(const fft_small_plan_t P)
+              void fft_small_op_clear(fft_small_op_t X)
+
+    Operand storage management. The *borrowed* variant places the
+    operand on caller-provided storage of ``fft_small_op_sizeof_data``
+    bytes, 4096-aligned, which must outlive the operand and is not freed
+    by *clear*.
+
+.. function:: void fft_small_export_mpn_signed(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
+              void fft_small_export_mpn_signed_trunc(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
+
+    Chinese-remainder reconstruction of a signed integer result: the
+    value is assembled in two's complement and the sign resolved from
+    the top limb, with the magnitude written to *z*. The *trunc* variant
+    writes the limbs of the value starting at limb *lo_limbs*, with an error against the
+    exact value within `(-1.5, +0.5)` ulp of the lowest returned limb --
+    equivalently, at most 1 from the floor-truncated value: every slot
+    whose coefficient span can reach the first returned limb is included
+    with carries propagated, so the error is the truncation itself
+    (one-sided, below 1 ulp) plus the total mass of the wholly dropped
+    slots, under half an ulp either way. With ``lo_limbs = 0`` the
+    export is exact.
+
+.. function:: void fft_small_export_nmod_range(ulong * z, const fft_small_op_t X, ulong zl, ulong zh, nmod_t mod, const fft_small_plan_t P)
+
+    Chinese remaindering restricted to the coefficient window
+    `[zl, zh)`, which must lie inside the plan's window; *z* receives
+    `zh - zl` reduced coefficients. Used for polynomial middle products.
+
+.. macro:: FLINT_FFT_SMALL_ALIGNMENT
+
+    Alignment, in bytes, of transform data buffers.
+
+.. var:: ulong flint_fft_small_max_transformed_ring_size
+
+    Upper bound, in bytes, on the transform storage a single transformed
+    ring or context may plan for: its expected number of simultaneously
+    live elements times the per-element data size. Constructors decline
+    above the bound, so drivers fall back to slower algorithms rather
+    than exhaust memory; the matrix multiplication drivers respond by
+    multiplying in blocks instead. Mutable for tuning; the default is
+    4 GiB on 64-bit machines.

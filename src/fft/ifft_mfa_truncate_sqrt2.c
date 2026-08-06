@@ -267,7 +267,7 @@ typedef struct
 }
 ifft_outer_arg_t;
 
-void
+static void
 _ifft_outer1_worker(void * arg_ptr)
 {
     ifft_outer_arg_t arg = *((ifft_outer_arg_t *) arg_ptr);
@@ -311,7 +311,7 @@ _ifft_outer1_worker(void * arg_ptr)
     }
 }
 
-void
+static void
 _ifft_outer2_worker(void * arg_ptr)
 {
     ifft_outer_arg_t arg = *((ifft_outer_arg_t *) arg_ptr);

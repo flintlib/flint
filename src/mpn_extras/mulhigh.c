@@ -161,15 +161,15 @@ _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp
     /* Corrections for precise high product (not needed for the
        original Mulders). */
     {
-        mp_limb_t hi, lo;
+        mp_limb_t hi;
 
         /* Note: if we relax the condition on k, we will need
            a branch for k == l here to avoid double counting. */
         FLINT_ASSERT(k != l);
 
-        umul_ppmm(hi, lo, np[k - 1], mp[l - 1]);
+        hi = n_mulhi(np[k - 1], mp[l - 1]);
         MPN_INCR_U(rp + n - 1, n + 1, hi);
-        umul_ppmm(hi, lo, np[l - 1], mp[k - 1]);
+        hi = n_mulhi(np[l - 1], mp[k - 1]);
         MPN_INCR_U(rp + n - 1, n + 1, hi);
     }
 }
@@ -204,6 +204,34 @@ _flint_mpn_mulhigh_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
     return bot;
 }
 
+#if FLINT_HAVE_FFT_SMALL
+
+mp_limb_t
+_flint_mpn_mulhigh_n_fft_small(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    mp_ptr tmp;
+    mp_limb_t bot;
+    tmp = flint_malloc(sizeof(mp_limb_t) * (n + 2));
+    flint_mpn_mulmid_fft_small(tmp, u, n, v, n, n - 2, 2 * n);
+    memcpy(res, tmp + 2, sizeof(mp_limb_t) * n);
+    bot = tmp[1];
+    flint_free(tmp);
+    return bot;
+}
+
+mp_limb_t
+_flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    if (n <= FLINT_MPN_MULHIGH_MULDERS_CUTOFF)
+        return _flint_mpn_mulhigh_n_basecase2(res, u, v, n);
+    else if (n <= FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF)
+        return _flint_mpn_mulhigh_n_mulders(res, u, v, n);
+    else
+        return _flint_mpn_mulhigh_n_fft_small(res, u, v, n);
+}
+
+#else
+
 mp_limb_t
 _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
@@ -214,6 +242,8 @@ _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
     else
         return _flint_mpn_mulhigh_n_mul(res, u, v, n);
 }
+
+#endif
 
 mp_limb_pair_t _flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {

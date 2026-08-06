@@ -12,6 +12,7 @@
 
 #include <string.h>
 #include "fmpz.h"
+#include "longlong.h"
 #include "qsieve.h"
 
 void qsieve_linalg_init(qs_t qs_inf)
@@ -52,7 +53,19 @@ void qsieve_linalg_init(qs_t qs_inf)
     qs_inf->num_cycles = 0;
 
     qs_inf->table_size = 10000;
-    qs_inf->hash_table = flint_calloc((1 << 20), sizeof(ulong));
+
+    /* about 64 buckets per factor base prime, within the bounds above */
+    {
+        unsigned int b = (FLINT_BITS - flint_clz((ulong) qs_inf->num_primes)) + 6;
+
+        if (b < QS_HASH_BITS_MIN) b = QS_HASH_BITS_MIN;
+        if (b > QS_HASH_BITS_MAX) b = QS_HASH_BITS_MAX;
+
+        qs_inf->hash_size = WORD(1) << b;
+        qs_inf->hash_shift = 32 - b;
+    }
+
+    qs_inf->hash_table = flint_calloc(qs_inf->hash_size, sizeof(ulong));
     qs_inf->table = flint_malloc(qs_inf->table_size * sizeof(hash_t));
 }
 
@@ -106,7 +119,23 @@ void qsieve_linalg_realloc(qs_t qs_inf)
     qs_inf->components = 1;
     qs_inf->num_cycles = 0;
 
-    memset(qs_inf->hash_table, 0, (1 << 20)*sizeof(ulong));
+    /* the factor base has grown, so the table may want to be bigger */
+    {
+        unsigned int b = (FLINT_BITS - flint_clz((ulong) qs_inf->num_primes)) + 6;
+
+        if (b < QS_HASH_BITS_MIN) b = QS_HASH_BITS_MIN;
+        if (b > QS_HASH_BITS_MAX) b = QS_HASH_BITS_MAX;
+
+        if ((WORD(1) << b) != qs_inf->hash_size)
+        {
+            qs_inf->hash_size = WORD(1) << b;
+            qs_inf->hash_shift = 32 - b;
+            qs_inf->hash_table = flint_realloc(qs_inf->hash_table,
+                                               qs_inf->hash_size*sizeof(ulong));
+        }
+    }
+
+    memset(qs_inf->hash_table, 0, qs_inf->hash_size*sizeof(ulong));
 }
 
 void qsieve_linalg_clear(qs_t qs_inf)

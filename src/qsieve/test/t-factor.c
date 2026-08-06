@@ -16,6 +16,69 @@
 #include "fmpz_factor.h"
 #include "qsieve.h"
 
+/* Input for which qsieve_factor would take forever -- see #2250 */
+static const char *qsieve_hang_input[] = {
+    "2" "100838095593318077623227274510379021",
+    /* the next two examples have moved up to the front of the list
+        because they hit the rare "O(s) pre-check" branch */
+    "2" "1000000000000000000000000000000000000000420217",
+    "4" "8312897460409825844798204414148551477617523587847",
+    "2" "311998636618373748658605151670132867",
+    "2" "126582278481012658227848101265822806309",
+    "2" "322580645161290322580645161290322654733",
+    "2" "555555555555555555555555555555555693427",
+    "2" "561482313307130825379000561482313307499",
+    "2" "720461095100864553314121037463976947183",
+    "2" "1628664495114006514657980456026058632341",
+    "2" "1650516364044491319109183307997907145251",
+    "3" "1666666666666666666666666666666666845161",
+    "2" "1666666666666666666666666666666666979801",
+    "2" "1672240802675585284280936454849498335537",
+    "2" "64874887389308019117684712840688961808594013",
+    "2" "95662720772928579912788805098723834088195937",
+    "2" "97349439977949650929026562827088794528412033",
+    "2" "111111111111111111111111111111111111111135749",
+    "2" "277315585135884636716583471991125901275651731",
+    "3" "333333333333333333333333333333333333333382979",
+    "2" "500000000000000000000000000000000000000017711",
+    "2" "500000000000000000000000000000000000000031439",
+    "2" "500000000000000000000000000000000000000085101",
+    "2" "500000000000000000000000000000000000000126443",
+    "2" "500000000000000000000000000000000000000178139",
+    "3" "571755288736420811892510005717552887364208149",
+    "3" "633713561470215462610899873257287705956907549",
+    "2" "970931288163667945383173178217350736305742379",
+    "3" "1000000000000000000000000000000000000000035422",
+    "2" "1000000000000000000000000000000000000000042223",
+    "3" "1000000000000000000000000000000000000000062878",
+    "2" "1000000000000000000000000000000000000000078147",
+    "4" "1000000000000000000000000000000000000000148937",
+    "2" "1000000000000000000000000000000000000000169537",
+    "3" "1000000000000000000000000000000000000000170202",
+    "2" "1000000000000000000000000000000000000000186843",
+    "3" "1000000000000000000000000000000000000000221741",
+    "3" "1000000000000000000000000000000000000000252886",
+    "2" "1000000000000000000000000000000000000000253483",
+    "3" "1000000000000000000000000000000000000000280147",
+    "3" "1000000000000000000000000000000000000000287517",
+    "2" "1000000000000000000000000000000000000000322347",
+    "3" "1000000000000000000000000000000000000000356278",
+    "6" "1000000000000000000000000000000000000000368621",
+    "2" "1000000000000000000000000000000000000000414187",
+    "2" "1000000000000000000000000000000000000000415947",
+    "2" "1000000000000000000000000000000000000000449343",
+    "2" "1000000000000000000000000000000000000000484747",
+    "2" "1000000000000000000000000000000000000000489307",
+    "2" "1000000000000000000000000000000000000000496267",
+    "2" "1030927835051546391752577319587628865979381499",
+    "2" "1441266465979343215563261116966752565379363587",
+    "2" "1537794372287715175877542358545984665114519547",
+    "5" "73644707908281013635796769783360384546398094566",
+    "3" "12195121951219512195121951219512195121951219512199",
+    "3" "23809523809523809523809523809523809523809523811539",
+    NULL,
+};
+
 void randprime(fmpz_t p, flint_rand_t state, slong bits)
 {
     fmpz_randbits(p, state, bits);
@@ -58,13 +121,31 @@ TEST_FUNCTION_START(qsieve_factor, state)
       {
          flint_printf("FAIL:\n");
          flint_printf("Test n with large prime factor\n");
-         flint_printf("%ld factors found\n", factors->num);
+         flint_printf("%wd factors found\n", factors->num);
          fflush(stdout);
          flint_abort();
       }
 
       fmpz_factor_clear(factors);
    }
+
+    for (i = 0; i < 1 + flint_test_multiplier() && qsieve_hang_input[i] != NULL; i++)
+    {
+        fmpz_factor_init(factors);
+        fmpz_set_str(n, qsieve_hang_input[i] + 1, 0);
+        slong mult = qsieve_hang_input[i][0] - '0';
+        /* qsieve_factor is tested indirectly */
+        fmpz_factor(factors, n);
+        if (mult != factors->num)
+        {
+             flint_printf("FAIL:\n");
+             flint_printf("Table entry %{fmpz}, \n%wd factors,\n", n, mult);
+             flint_printf("%wd factors found\n", factors->num);
+             fflush(stdout);
+             flint_abort();
+        }
+        fmpz_factor_clear(factors);
+    }
 
    /* Test random n, two factors */
    for (i = 0; i < tmul*flint_test_multiplier(); i++)
@@ -88,12 +169,50 @@ TEST_FUNCTION_START(qsieve_factor, state)
       {
          flint_printf("FAIL:\n");
          flint_printf("Test random n, two factors\ni = %wd\n", i);
-         flint_printf("%ld factors found\n", factors->num);
+         flint_printf("%wd factors found\n", factors->num);
          fflush(stdout);
          flint_abort();
       }
 
       fmpz_factor_clear(factors);
+   }
+
+   /*
+      Regression: n must be split completely when the collected factors allow
+      it.  The refinement of n by those factors has to be applied to every
+      entry of the output rather than only the last, or a factor splitting an
+      earlier entry is dropped.  These three products of three 40-bit primes
+      each came back as two factors while that was wrong.
+   */
+   {
+      const char * strs[3] = {
+         "510351044738189044795649562843011021",
+         "364780511359625600767798259905079621",
+         "938825737845414913824362581154338591"
+      };
+      slong c;
+
+      for (c = 0; c < 3; c++)
+      {
+         fmpz_set_str(n, strs[c], 10);
+
+         fmpz_factor_init(factors);
+
+         flint_set_num_threads(1);
+
+         qsieve_factor(factors, n);
+
+         if (factors->num < 3)
+         {
+            flint_printf("FAIL:\n");
+            flint_printf("Regression, three factors expected\nc = %wd\n", c);
+            flint_printf("%wd factors found\n", factors->num);
+            fflush(stdout);
+            flint_abort();
+         }
+
+         fmpz_factor_clear(factors);
+      }
    }
 
    /* Test random n, three factors */
@@ -120,11 +239,60 @@ TEST_FUNCTION_START(qsieve_factor, state)
       {
          flint_printf("FAIL:\n");
          flint_printf("Test random n, three factors\ni = %wd\n", i);
-         flint_printf("%ld factors found\n", factors->num);
+         flint_printf("%wd factors found\n", factors->num);
          fflush(stdout);
          flint_abort();
       }
 
+      fmpz_factor_clear(factors);
+   }
+
+   /*
+      Cover the path that grows the factor base.  A sieve threshold above the
+      tuned value means no sieve entry is ever accepted as a candidate, so the
+      polynomials run out with too few relations and qsieve has to increase the
+      factor base and redo the linear algebra setup.  qsieve_linalg_realloc,
+      and with it the resizing of the large prime hash table, is reached only
+      this way, and nothing else in the suite takes that path.
+   */
+   for (i = 0; i < 3 * flint_test_multiplier(); i++)
+   {
+      fmpz_t prod, pw;
+      slong k;
+
+      randprime(x, state, 45);
+      do {
+         randprime(y, state, 45);
+      } while (fmpz_equal(x, y));
+
+      fmpz_mul(n, x, y);
+
+      fmpz_factor_init(factors);
+
+      flint_set_num_threads(1);
+
+      qsieve_factor_with_tune(factors, n, 30, 200, 5, 8000, 60);
+
+      fmpz_init_set_ui(prod, 1);
+      fmpz_init(pw);
+
+      for (k = 0; k < factors->num; k++)
+      {
+         fmpz_pow_ui(pw, factors->p + k, factors->exp[k]);
+         fmpz_mul(prod, prod, pw);
+      }
+
+      if (factors->num < 2 || !fmpz_equal(prod, n))
+      {
+         flint_printf("FAIL:\n");
+         flint_printf("Factor base growth\ni = %wd\n", i);
+         flint_printf("%wd factors found\n", factors->num);
+         fflush(stdout);
+         flint_abort();
+      }
+
+      fmpz_clear(prod);
+      fmpz_clear(pw);
       fmpz_factor_clear(factors);
    }
 
@@ -150,7 +318,7 @@ TEST_FUNCTION_START(qsieve_factor, state)
       {
          flint_printf("FAIL:\n");
          flint_printf("Test random n, small factors\ni = %wd\n", i);
-         flint_printf("%ld factors found\n", factors->num);
+         flint_printf("%wd factors found\n", factors->num);
          fflush(stdout);
          flint_abort();
       }

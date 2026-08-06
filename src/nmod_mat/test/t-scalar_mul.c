@@ -37,7 +37,7 @@ TEST_FUNCTION_START(nmod_mat_scalar_mul, state)
         nmod_mat_randtest(B, state);
 
         nmod_mat_scalar_mul(C, A, c);
-        nmod_mat_scalar_mul(D, A, nmod_sub(c, UWORD(1), A->mod));
+        nmod_mat_scalar_mul(D, A, nmod_sub(c, nmod_set_ui(1, A->mod), A->mod));
 
         /* c*A - (c-1)*A == A */
         nmod_mat_sub(D, C, D);

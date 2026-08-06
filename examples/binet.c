@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     fmpz_init(n);
     fmpz_set_str(n, argv[argc-1], 10);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     ca_ctx_init(ctx);
 
     if (argc == 4)
@@ -56,8 +56,8 @@ int main(int argc, char *argv[])
 
     fmpz_clear(n);
     flint_printf("\n");
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     flint_cleanup();
     return 0;

@@ -41,7 +41,7 @@ mag_zeta1p(mag_t res, const mag_t s)
 }
 
 /* |zeta(s)| <= (2pi)^sigma |gamma(1-s)| exp(pi|t|/2) zeta(1-sigma) / pi */
-void
+static void
 acb_dirichlet_zeta_bound_functional_equation(mag_t res, const acb_t s)
 {
     slong prec, p;
@@ -115,7 +115,7 @@ Assume -eta <= sigma <= 1 + eta where 0 < eta <= 1/2. Then:
 where e = (1+eta-sigma)/2. Inside the strip, we use this formula with
 eta = 0.1 (this could be improved).
 */
-void
+static void
 acb_dirichlet_zeta_bound_strip(mag_t res, const acb_t s)
 {
     arf_t eta, a;

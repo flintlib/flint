@@ -56,17 +56,17 @@ int main(void)
 
         mpn_random2(xp, n);
 
-        TIMEIT_START
+        TIMEIT_START;
         flint_mpn_sqrhigh(rf, xp, n);
-        TIMEIT_STOP_VALUES(__, t1)
+        TIMEIT_STOP_VALUES(__, t1);
 
-        TIMEIT_START
+        TIMEIT_START;
         flint_mpn_sqr(rg, xp, n);
-        TIMEIT_STOP_VALUES(__, t2)
+        TIMEIT_STOP_VALUES(__, t2);
 
-        TIMEIT_START
+        TIMEIT_START;
         mpfr_sqrhigh_n(rm, xp, n);
-        TIMEIT_STOP_VALUES(__, t3)
+        TIMEIT_STOP_VALUES(__, t3);
 
         flint_printf("   %7.3fx      ||  %7.3f\n", t2 / t1, t3 / t1);
     }

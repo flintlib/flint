@@ -282,6 +282,8 @@ Arithmetic
 
 .. function:: void acb_poly_scalar_mul(acb_poly_t C, const acb_poly_t A, const acb_t c, slong prec)
 
+.. function:: void acb_poly_scalar_mul_si(acb_poly_t C, const acb_poly_t A, slong c, slong prec)
+
     Sets *C* to *A* multiplied by *c*.
 
 .. function:: void acb_poly_scalar_div(acb_poly_t C, const acb_poly_t A, const acb_t c, slong prec)
@@ -346,6 +348,16 @@ Arithmetic
     Sets *C* to the product of *A* and *B*.
     If the same variable is passed for *A* and *B*, sets *C* to
     the square of *A*.
+
+.. function:: void _acb_poly_mulmid_transpose(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void acb_poly_mulmid_transpose(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _acb_poly_mulmid_classical(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void acb_poly_mulmid_classical(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _acb_poly_mulmid(acb_ptr z, acb_srcptr x, slong xlen, acb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void acb_poly_mulmid(acb_poly_t res, const acb_poly_t poly1, const acb_poly_t poly2, slong nlo, slong nhi, slong prec)
+
+    Analogous to *mullow* functions, but compute the product truncated
+    at length *nhi* and right-shifted by *nlo*.
 
 .. function:: void _acb_poly_inv_series(acb_ptr Qinv, acb_srcptr Q, slong Qlen, slong len, slong prec)
 
@@ -734,6 +746,34 @@ Elementary functions
     The underscore method supports aliasing of the input and output
     arrays. It requires that *flen* and *n* are greater than zero.
 
+.. function:: void _acb_poly_asin_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_asin_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_acos_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_acos_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_atanh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_atanh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_asinh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_asinh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+.. function:: void _acb_poly_acosh_series(acb_ptr res, acb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void acb_poly_acosh_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
+
+    Sets *res* respectively to the power series inverse trigonometric
+    and hyperbolic functions of *f*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *flen* and *n* are greater than zero.
+
 .. function:: void _acb_poly_exp_series_basecase(acb_ptr f, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_exp_series_basecase(acb_poly_t f, const acb_poly_t h, slong n, slong prec)
@@ -795,6 +835,17 @@ Elementary functions
     The underscore version does not support aliasing, and requires
     the lengths to be nonzero.
 
+.. function:: void _acb_poly_cot_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_cot_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+    Sets *g* to the power series cotangent of *h*.*
+
+    Wraps :func: `_gr_poly_cot_series`.
+
+    The underscore method supports aliasing of the input and output
+    arrays. It require that *flen* and *n* are greater than zero.
+
 .. function:: void _acb_poly_sin_cos_pi_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_sin_cos_pi_series(acb_poly_t s, acb_poly_t c, const acb_poly_t h, slong n, slong prec)
@@ -806,6 +857,10 @@ Elementary functions
 .. function:: void _acb_poly_cos_pi_series(acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void acb_poly_cos_pi_series(acb_poly_t c, const acb_poly_t h, slong n, slong prec)
+
+.. function:: void _acb_poly_tan_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_tan_pi_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 
 .. function:: void _acb_poly_cot_pi_series(acb_ptr c, acb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -840,6 +895,22 @@ Elementary functions
     The implementations mirror those for sine and cosine, except that
     the *exponential* version computes both functions using the exponential
     function instead of the hyperbolic tangent.
+
+.. function:: void _acb_poly_tanh_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_tanh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+.. function:: void _acb_poly_coth_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void acb_poly_coth_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
+
+    Sets *g* respectively to the power series cotangent and hyperbolic
+    cotangent of *h*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *hlen* and *n* are greater than zero.
 
 .. function:: void _acb_poly_sinc_series(acb_ptr s, acb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -1143,6 +1214,42 @@ Root-finding
     The polynomial is assumed to be squarefree. If there are repeated
     roots, the iteration is likely to find them (with low numerical accuracy),
     but the error bounds will not converge as the precision increases.
+
+.. function:: double _acb_poly_find_roots_double(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec)
+
+   Attempts to compute all the complex root approximations of the input
+   polynomial, using double precision floating-point arithmetic. In
+   particular, the radii of the entries in *roots* are set to zero.
+
+   The implementation is based on the Durand-Kerner method, with a special
+   attention to overflow issues. The precision *prec* is used
+   only below `53` for early termination if the estimated accuracy is below
+   the working precision.
+
+   The function returns the last *correction*, that is the maximal step
+   size computed at the last iteration. In particular, if there was no
+   overflow, and up to rounding errors, the Gershgorin circle theorem
+   ensures that the roots of the input polynomial are included in the union
+   of the disks centered at the entries `z_k` of *roots* and of radius
+   `(len-2) |z_k|` *correction*.
+
+.. function:: double cd_poly_find_roots(double * roots, const double * poly, const double * initial, slong len, slong maxiter, double reltol)
+
+   Attempts to compute all the root approximations as above. The array *roots* should be
+   preallocated with the size of `2 len` *double*. The *poly* array
+   is an array of size `2 len` *double*, where the entries at indices `2 k`
+   and `2 k + 1` represent the real and the imaginary parts of the
+   coefficient of degree `k`. Similarly, *initial* can be *NULL* or an
+   array of size `2 (len-1)` *double*, where the real and imaginary parts of
+   the initial points are stored contiguously.
+
+.. function:: double cd_poly_refine_roots(double * z, const double * poly, slong len, double stepsize_bound)
+
+.. function:: double cd_poly_refine_roots_with_pivot(double * z, const double * poly, slong len, double stepsize_bound)
+
+   Updates the array of `len - 1` complex numbers in *z* with one step of the
+   Durand-Kerner method. The variant with pivot reorders the intermediate
+   operations to reduce the risk of overflow.
 
 .. function:: int _acb_poly_validate_real_roots(acb_srcptr roots, acb_srcptr poly, slong len, slong prec)
 

@@ -35,7 +35,7 @@ acb_approx_div(acb_t z, const acb_t x, const acb_t y, acb_t t, slong prec)
     acb_approx_mul(z, x, t, prec);
 }
 
-void
+static void
 acb_mat_approx_solve_tril_classical(acb_mat_t X,
         const acb_mat_t L, const acb_mat_t B, int unit, slong prec)
 {
@@ -74,7 +74,7 @@ acb_mat_approx_solve_tril_classical(acb_mat_t X,
     acb_clear(t);
 }
 
-void
+static void
 acb_mat_approx_solve_tril_recursive(acb_mat_t X,
         const acb_mat_t L, const acb_mat_t B, int unit, slong prec)
 {

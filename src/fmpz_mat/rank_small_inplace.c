@@ -15,7 +15,7 @@
 
 #define E(j,k) fmpz_mat_entry(B,j,k)
 
-slong _fmpz_mat_rank_overflow(fmpz_mat_t B, slong pivot_row, slong pivot_col)
+static slong _fmpz_mat_rank_overflow(fmpz_mat_t B, slong pivot_row, slong pivot_col)
 {
     fmpz_t den;
     fmpz_mat_t window;

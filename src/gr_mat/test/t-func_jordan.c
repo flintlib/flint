@@ -52,13 +52,7 @@ TEST_GR_FUNCTION_START(gr_mat_func_jordan, state, count_success, count_domain, c
         gr_poly_t f;
         int status = GR_SUCCESS;
 
-        while (1)
-        {
-            gr_ctx_init_random(ctx, state);
-            if (gr_ctx_is_field(ctx) == T_TRUE)
-                break;
-            gr_ctx_clear(ctx);
-        }
+        gr_ctx_init_random_field(ctx, state);
 
         if (ctx->methods == _ca_methods)
             n = n_randint(state, 3);

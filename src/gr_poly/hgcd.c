@@ -11,7 +11,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_support.h"
 #include "longlong.h"
+#include "thread_pool.h"
 #include "gr_poly.h"
 #include "gr_vec.h"
 
@@ -229,13 +231,170 @@ __mat_mul_strassen(gr_ptr * C, slong * lenC,
     polynomial products involved.
  */
 
+#define HGCD_MAT_MUL_TRANSFORMED_CUTOFF 128
+#define HGCD_MAT_MUL_TRANSFORMED_THREAD_CUTOFF 1024
+
+#if FLINT_HAVE_FFT_SMALL
+
+/* 2x2 polynomial matrix product in a transformed polynomial ring: each of
+   the eight entries is transformed once and reused across the four
+   accumulated products (8 forward + 4 inverse transforms instead of 16 + 8
+   for fused multiplications). The batch is homogeneous -- all entries have
+   comparable lengths -- so the shared transform size is tight. Works for
+   any base ring whose transformed-representation constructor engages (it
+   returns GR_UNABLE otherwise, falling through to the plain code below).
+   The ring is thread safe, so for large entries the eight conversions in
+   and the four output entries are distributed over the global thread
+   pool. */
+
+typedef struct
+{
+    gr_ctx_struct * ctx;
+    gr_ctx_struct * tctx;
+    gr_ptr TE;
+    gr_ptr * A; slong * lenA;
+    gr_ptr * B; slong * lenB;
+    gr_ptr * C; slong * lenC;
+    slong tid, nthreads;
+    int status;
+}
+_hgcd_mm_arg;
+
+#define _HGCD_TE(a, i) GR_ENTRY((a)->TE, i, (a)->tctx->sizeof_elem)
+
+static void _hgcd_mm_phase1(void * varg)
+{
+    _hgcd_mm_arg * a = (_hgcd_mm_arg *) varg;
+    slong i;
+    for (i = a->tid; i < 8; i += a->nthreads)
+    {
+        if (i < 4)
+            a->status |= _gr_set_gr_poly(_HGCD_TE(a, i),
+                    a->A[i], a->lenA[i], a->ctx, a->tctx);
+        else
+            a->status |= _gr_set_gr_poly(_HGCD_TE(a, i),
+                    a->B[i - 4], a->lenB[i - 4], a->ctx, a->tctx);
+    }
+}
+
+static void _hgcd_mm_phase2(void * varg)
+{
+    _hgcd_mm_arg * a = (_hgcd_mm_arg *) varg;
+    gr_ptr acc = _HGCD_TE(a, 8 + a->tid);
+    slong i;
+    for (i = a->tid; i < 4; i += a->nthreads)
+    {
+        slong r = 2 * (i / 2), c = i % 2;
+        a->status |= gr_mul(acc, _HGCD_TE(a, r), _HGCD_TE(a, 4 + c), a->tctx);
+        a->status |= gr_addmul(acc, _HGCD_TE(a, r + 1), _HGCD_TE(a, 6 + c), a->tctx);
+        /* acc is this thread's own and dead after the entry: convert it
+           out on its own storage, skipping the transform copy; the next
+           entry's gr_mul rebuilds it as a full-write destination */
+        a->status |= _gr_get_gr_poly_destructive(a->C[i], &a->lenC[i], acc,
+                                                 a->ctx, a->tctx);
+    }
+}
+
+#endif
+
 static int
-__mat_mul(gr_ptr * C, slong * lenC,
+_gr_poly_hgcd_mat_mul_transformed(gr_ptr * C, slong * lenC,
+        gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB,
+        gr_ptr FLINT_UNUSED(T0), gr_ptr FLINT_UNUSED(T1), gr_ctx_t ctx)
+{
+#if FLINT_HAVE_FFT_SMALL
+    slong i;
+    slong minlen = lenA[0];
+    slong amax = 0, bmax = 0;
+
+    for (i = 0; i < 4; i++)
+    {
+        minlen = FLINT_MIN(minlen, FLINT_MIN(lenA[i], lenB[i]));
+        amax = FLINT_MAX(amax, lenA[i]);
+        bmax = FLINT_MAX(bmax, lenB[i]);
+    }
+
+    if (minlen >= HGCD_MAT_MUL_TRANSFORMED_CUTOFF)
+    {
+        gr_ctx_t tctx;
+        gr_transformed_poly_workload_t wl =
+            {{ 8, 8, 4, 8 + 4, 0, 0 }};   /* 8 inputs live + up to 4
+                                          per-thread accumulators */
+
+        if (gr_ctx_init_gr_poly_transformed_repr(tctx, ctx,
+                amax + bmax - 1, 2 * FLINT_MIN(amax, bmax) + 2,
+                wl) == GR_SUCCESS)
+        {
+            gr_ptr TE;
+            thread_pool_handle * handles = NULL;
+            slong nworkers = 0, nthreads;
+            _hgcd_mm_arg args[4];
+            int status = GR_SUCCESS;
+
+            if (FLINT_MIN(amax, bmax) >= HGCD_MAT_MUL_TRANSFORMED_THREAD_CUTOFF)
+                nworkers = flint_request_threads(&handles, 4);
+            nthreads = nworkers + 1;
+
+            GR_TMP_INIT_VEC(TE, 8 + nthreads, tctx);
+
+            for (i = 0; i < nthreads; i++)
+            {
+                args[i].ctx = ctx; args[i].tctx = tctx; args[i].TE = TE;
+                args[i].A = A; args[i].lenA = lenA;
+                args[i].B = B; args[i].lenB = lenB;
+                args[i].C = C; args[i].lenC = lenC;
+                args[i].tid = i; args[i].nthreads = nthreads;
+                args[i].status = GR_SUCCESS;
+            }
+
+            for (i = nworkers; i > 0; i--)
+                thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                                 _hgcd_mm_phase1, args + i);
+            _hgcd_mm_phase1(args + 0);
+            for (i = nworkers; i > 0; i--)
+                thread_pool_wait(global_thread_pool, handles[i - 1]);
+
+            for (i = nworkers; i > 0; i--)
+                thread_pool_wake(global_thread_pool, handles[i - 1], 0,
+                                 _hgcd_mm_phase2, args + i);
+            _hgcd_mm_phase2(args + 0);
+            for (i = nworkers; i > 0; i--)
+                thread_pool_wait(global_thread_pool, handles[i - 1]);
+
+            flint_give_back_threads(handles, nworkers);
+
+            for (i = 0; i < nthreads; i++)
+                status |= args[i].status;
+
+            GR_TMP_CLEAR_VEC(TE, 8 + nthreads, tctx);
+            gr_ctx_clear(tctx);
+
+            if (status == GR_SUCCESS)
+                return GR_SUCCESS;
+            /* A and B are untouched; fall through and recompute */
+        }
+    }
+
+#endif
+
+    return -1;   /* not handled; the caller runs the plain code */
+}
+
+
+int
+_gr_poly_hgcd_mat_mul_generic(gr_ptr * C, slong * lenC,
           gr_ptr * A, slong * lenA,
           gr_ptr * B, slong * lenB,
           gr_ptr T0, gr_ptr T1,
           gr_ctx_t ctx)
 {
+    {
+        int tstatus = _gr_poly_hgcd_mat_mul_transformed(C, lenC, A, lenA,
+                                                        B, lenB, T0, T1, ctx);
+        if (tstatus != -1)
+            return tstatus;
+    }
+
     slong min = lenA[0];
 
     min = FLINT_MIN(min, lenA[1]);
@@ -276,7 +435,7 @@ __mat_mul(gr_ptr * C, slong * lenC,
  */
 
 
-int
+static int
 _gr_poly_hgcd_recursive_iter(
     slong * ans_sgn,
     gr_ptr * M, slong * lenM,
@@ -374,7 +533,7 @@ _gr_poly_hgcd_recursive_iter(
     the first two arguments are allowed to be NULL.
  */
 
-int _gr_poly_hgcd_recursive(
+static int _gr_poly_hgcd_recursive(
     slong * ans_sgn,
     gr_ptr * M, slong * lenM,
     gr_ptr A, slong * lenA,
@@ -642,7 +801,7 @@ int _gr_poly_hgcd_recursive(
                 __mul(T0, lenT0, S[3], lenS[3], q, lenq);
                 __add(S[1], lenS[1], S[1], lenS[1], T0, lenT0);
 
-                __mat_mul(M, lenM, R, lenR, S, lenS, a2, b2, ctx);
+                status |= _gr_poly_hgcd_mat_mul(M, lenM, R, lenR, S, lenS, a2, b2, ctx);
             }
 
             *ans_sgn = -(sgnR * sgnS);

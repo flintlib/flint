@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "arb/impl.h"
 
 /* With parameter n, the error is bounded by 3/(3+sqrt(8))^n */
 #define ERROR_A 1.5849625007211561815 /* log2(3) */
@@ -124,8 +125,7 @@ zeta_bsplit(zeta_bsplit_t L, slong a, slong b,
 }
 
 /* The error for eta(s) is bounded by 3/(3+sqrt(8))^n */
-void
-mag_borwein_error(mag_t err, slong n)
+void mag_borwein_error(mag_t err, slong n)
 {
     /* upper bound for 1/(3+sqrt(8)) */
     mag_set_ui_2exp_si(err, 736899889, -32);

@@ -11,13 +11,9 @@
 
 #include <math.h>
 #include "acb.h"
-#include "acb_hypgeom.h"
 #include "arb_hypgeom.h"
-
-void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const acb_t z, int use_reflect, int digamma, slong prec);
-
-void acb_hypgeom_gamma_stirling_inner(acb_t s, const acb_t z, slong N, slong prec);
+#include "acb_hypgeom.h"
+#include "acb_hypgeom/impl.h"
 
 static double
 want_taylor(double x, double y, slong prec)
@@ -60,16 +56,16 @@ static const double Btab[] = {
     -0.62578331900739100617,
 };
 
-void
+static void
 _arb_const_log_pi(arb_t t, slong prec)
 {
     arb_const_pi(t, prec + 2);
     arb_log(t, t, prec);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_const_log_pi, _arb_const_log_pi)
+_ARB_DEF_CACHED_CONSTANT(static, arb_const_log_pi, _arb_const_log_pi)
 
-int
+static int
 acb_hypgeom_lgamma_taylor(acb_t res, const acb_t z, slong prec)
 {
     double x, y, acc;

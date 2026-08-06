@@ -13,6 +13,7 @@
 #include "double_extras.h"
 #include "fmpzi.h"
 
+#if 0
 double
 fmpzi_norm_approx_d_2exp(slong * exp, const fmpzi_t x)
 {
@@ -45,8 +46,9 @@ fmpzi_norm_approx_d_2exp(slong * exp, const fmpzi_t x)
     *exp = aexp;
     return a;
 }
+#endif
 
-double
+static double
 fmpzi_norm_approx_d(const fmpzi_t x)
 {
     double a, b;

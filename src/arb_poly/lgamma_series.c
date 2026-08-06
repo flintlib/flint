@@ -10,16 +10,9 @@
 */
 
 #include "arb_poly.h"
+#include "arb_poly/impl.h"
 #include "arb_hypgeom.h"
-
-slong arf_get_si(const arf_t x, arf_rnd_t rnd);
-
-void _arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec);
-
-void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
-    const arb_t x, int use_reflect, int digamma, slong prec);
-
-void _arb_poly_gamma_stirling_eval(arb_ptr res, const arb_t z, slong n, slong num, slong prec);
+#include "arb_hypgeom/impl.h"
 
 static inline void
 _log_rising_ui_series(arb_ptr t, const arb_t x, slong r, slong len, slong prec)

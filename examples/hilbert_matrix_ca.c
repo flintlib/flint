@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     if (qqbar)
     {
@@ -152,8 +152,8 @@ int main(int argc, char *argv[])
     }
 
     flint_printf("\n");
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     flint_cleanup();
     return 0;

@@ -170,7 +170,7 @@ void dlog_rho_init(dlog_rho_t t, ulong a, ulong mod, ulong n);
 ulong dlog_once(ulong b, ulong a, const nmod_t mod, ulong n);
 
 DLOG_INLINE void
-dlog_order23_clear(dlog_order23_t t)
+dlog_order23_clear(dlog_order23_t FLINT_UNUSED(t))
 {
     return;
 }
@@ -205,7 +205,7 @@ dlog_bsgs_clear(dlog_bsgs_t t)
 }
 
 DLOG_INLINE void
-dlog_rho_clear(dlog_rho_t t)
+dlog_rho_clear(dlog_rho_t FLINT_UNUSED(t))
 {
     return;
 }

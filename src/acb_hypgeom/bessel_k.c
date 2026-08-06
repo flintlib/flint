@@ -207,7 +207,7 @@ acb_hypgeom_bessel_k_0f1(acb_t res, const acb_t nu, const acb_t z, int scaled, s
     }
 }
 
-void
+static void
 acb_hypgeom_bessel_k_nointegration(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
 {
     mag_t zmag;
@@ -224,7 +224,7 @@ acb_hypgeom_bessel_k_nointegration(acb_t res, const acb_t nu, const acb_t z, int
     mag_clear(zmag);
 }
 
-void
+static void
 _acb_hypgeom_bessel_k(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
 {
     acb_t res2;

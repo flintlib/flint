@@ -94,8 +94,10 @@ TEST_FUNCTION_START(_nmod_poly_divrem_mpn_ctx, state)
             flint_free(b);
             flint_free(q1);
             flint_free(q2);
+            flint_free(q3);
             flint_free(r1);
             flint_free(r2);
+            flint_free(r3);
         }
     }
 

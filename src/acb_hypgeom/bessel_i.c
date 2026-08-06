@@ -13,7 +13,7 @@
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
 
-void
+static void
 acb_hypgeom_bessel_i_asymp_prefactors(acb_t A, acb_t B, acb_t C,
     const acb_t nu, const acb_t z, int scaled, slong prec)
 {
@@ -201,7 +201,7 @@ acb_hypgeom_bessel_i_0f1(acb_t res, const acb_t nu, const acb_t z, int scaled, s
     acb_clear(t);
 }
 
-void
+static void
 acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
 {
     mag_t zmag;
@@ -218,7 +218,7 @@ acb_hypgeom_bessel_i_nointegration(acb_t res, const acb_t nu, const acb_t z, int
     mag_clear(zmag);
 }
 
-void
+static void
 _acb_hypgeom_bessel_i(acb_t res, const acb_t nu, const acb_t z, int scaled, slong prec)
 {
     acb_t res2;

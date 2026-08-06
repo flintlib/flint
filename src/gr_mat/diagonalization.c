@@ -9,11 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
 
 int
-gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const gr_vec_t mult, gr_ctx_t ctx)
+gr_mat_diagonalization_precomp(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, const gr_vec_t eigenvalues, const fmpz_vec_t mult, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     gr_mat_t AIe, b;
@@ -100,15 +101,14 @@ int
 gr_mat_diagonalization_generic(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_t A, int flags, gr_ctx_t ctx)
 {
     int status;
-    gr_ctx_t ZZ;
-    gr_vec_t eigenvalues, mult;
+    gr_vec_t eigenvalues;
+    fmpz_vec_t mult;
 
     if (gr_mat_is_square(A, ctx) != T_TRUE)
         return GR_DOMAIN;
 
-    gr_ctx_init_fmpz(ZZ);
     gr_vec_init(eigenvalues, 0, ctx);
-    gr_vec_init(mult, 0, ZZ);
+    fmpz_vec_init(mult, 0);
 
     if (gr_mat_eigenvalues(eigenvalues, mult, A, flags, ctx) == GR_SUCCESS)
     {
@@ -120,8 +120,7 @@ gr_mat_diagonalization_generic(gr_vec_t D, gr_mat_t L, gr_mat_t R, const gr_mat_
     }
 
     gr_vec_clear(eigenvalues, ctx);
-    gr_vec_clear(mult, ZZ);
-    gr_ctx_clear(ZZ);
+    fmpz_vec_clear(mult);
 
     return status;
 }

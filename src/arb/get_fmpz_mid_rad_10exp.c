@@ -12,7 +12,7 @@
 #include "arb.h"
 
 /* todo: make arb_pow_fmpz automatic */
-void
+static void
 _arb_10_pow_fmpz(arb_t res, const fmpz_t m, slong prec)
 {
     slong bits = fmpz_bits(m);

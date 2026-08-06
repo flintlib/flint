@@ -17,7 +17,7 @@
 #include "profiler.h"
 #include "fmpz_poly.h"
 
-int main()
+int main(void)
 {
     gr_poly_t f, g, u, v, c, d, e;
     gr_ctx_t R, Rx, Rxy, R1;
@@ -117,12 +117,12 @@ int main()
                     }
                 }
 
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(gr_poly_mullow_classical(u, f, g, WORD_MAX, Rx));
-                TIMEIT_STOP_VALUES(tt, t1)
-                TIMEIT_START
+                TIMEIT_STOP_VALUES(tt, t1);
+                TIMEIT_START;
                 GR_MUST_SUCCEED(gr_poly_mullow(v, f, g, WORD_MAX, Rx));
-                TIMEIT_STOP_VALUES(tt, t2)
+                TIMEIT_STOP_VALUES(tt, t2);
 
                 flint_printf("%8.3fx  ", t1 / t2);
                 fflush(stdout);

@@ -13,6 +13,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "arith.h"
+#include "arith/impl.h"
 
 ulong nmod_inv_check(ulong x, nmod_t mod)
 {
@@ -56,7 +57,7 @@ arith_bell_number_nmod_vec_series(nn_ptr res, slong n, nmod_t mod)
         for (k = n - 1; k > 0; k--)
         {
             tmp[k] = c;
-            c = nmod_mul(c, k, mod);
+            c = nmod_ui_mul_ui(c, k, mod);
         }
     }
 

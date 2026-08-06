@@ -14,6 +14,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 #include "gr_poly.h"
 
 void

@@ -42,6 +42,9 @@
 /* Define if system has mpn_modexact_1_odd */
 #undef FLINT_HAVE_NATIVE_mpn_modexact_1_odd
 
+/* Define if GMP has mpn_mulmid_n */
+#undef FLINT_HAVE_NATIVE_mpn_mulmid_n
+
 /* Define if GMP has mpn_rsh1add_n */
 #undef FLINT_HAVE_NATIVE_mpn_rsh1add_n
 
@@ -83,6 +86,9 @@
 
 /* Define to enable use of GMP internals. */
 #undef FLINT_WANT_GMP_INTERNALS
+
+/* Define to enable inline assembly. */
+#undef FLINT_WANT_ASSEMBLY
 
 /* Define to enable pretty printing for tests. */
 #undef FLINT_WANT_PRETTY_TESTS

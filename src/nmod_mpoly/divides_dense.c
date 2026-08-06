@@ -18,7 +18,7 @@
     Convert B to A if the degrees of A are <= expected_deg
     If not, return 0 and set A to 0.
 */
-int nmod_mpoly_convert_from_nmod_mpolyd_degbound(
+static int nmod_mpoly_convert_from_nmod_mpolyd_degbound(
                                   nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx,
                            const nmod_mpolyd_t B, const nmod_mpolyd_ctx_t dctx,
                                                             slong * expect_deg)

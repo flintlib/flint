@@ -76,7 +76,7 @@ acb_theta_sum_0b_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     acb_clear(sub);
 }
 
-void
+static void
 acb_theta_sum_0x(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distance, int all_b, slong prec)
 {

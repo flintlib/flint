@@ -10,28 +10,9 @@
 */
 
 #include "acb.h"
-#include "fmpz_mpoly.h"
 #include "fmpz_mpoly_q.h"
 #include "gr.h"
 #include "gr_generic.h"
-
-void
-fmpz_mpoly_evaluate_acb(acb_t res, const fmpz_mpoly_t pol, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx)
-{
-    gr_ctx_t CC;
-    gr_ctx_init_complex_acb(CC, prec);
-
-    if (pol->length <= 6 && pol->bits <= FLINT_BITS)
-    {
-        if (gr_fmpz_mpoly_evaluate_iter(res, pol, x, ctx, CC) != GR_SUCCESS)
-            acb_indeterminate(res);
-    }
-    else
-    {
-        if (gr_fmpz_mpoly_evaluate_horner(res, pol, x, ctx, CC) != GR_SUCCESS)
-            acb_indeterminate(res);
-    }
-}
 
 void
 fmpz_mpoly_q_evaluate_acb(acb_t res, const fmpz_mpoly_q_t f, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx)

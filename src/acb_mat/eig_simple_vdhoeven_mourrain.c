@@ -13,7 +13,7 @@
 #include "acb_mat.h"
 
 /* todo: move out */
-void
+static void
 acb_mat_inf_norm(arb_t res, const acb_mat_t A, slong prec)
 {
     slong i, j, m, n;

@@ -372,8 +372,9 @@ HornerFormReturn:
     TMP_END;
 }
 
+#if 0
 /* todo: accept fmpz exponents */
-void
+static void
 ca_evaluate_fmpz_mpoly_iter(ca_t res, const fmpz_mpoly_t pol, ca_srcptr x, const fmpz_mpoly_ctx_t ctx, ca_ctx_t cactx)
 {
     slong i, j, len, nvars;
@@ -432,6 +433,7 @@ ca_evaluate_fmpz_mpoly_iter(ca_t res, const fmpz_mpoly_t pol, ca_srcptr x, const
     ca_clear(t, cactx);
     ca_clear(u, cactx);
 }
+#endif
 
 void
 ca_fmpz_mpoly_evaluate(ca_t res, const fmpz_mpoly_t f, ca_srcptr x, const fmpz_mpoly_ctx_t ctx, ca_ctx_t cactx)

@@ -24,7 +24,7 @@ test_revert_series(flint_rand_t state, int which)
     int status = GR_SUCCESS;
 
     if (n_randint(state, 4) == 0)
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
     else
         gr_ctx_init_fmpz(ctx);
 
@@ -43,10 +43,10 @@ test_revert_series(flint_rand_t state, int which)
     GR_MUST_SUCCEED(gr_poly_randtest(C, state, 1 + n_randint(state, 20), ctx));
 
     if (n_randint(state, 10) != 0)
-        GR_MUST_SUCCEED(gr_poly_set_coeff_si(A, 0, 0, ctx));
+        status |= gr_poly_set_coeff_si(A, 0, 0, ctx);
 
     if (n_randint(state, 2))
-        GR_MUST_SUCCEED(gr_poly_set_coeff_si(A, 1, 1, ctx));
+        status |= gr_poly_set_coeff_si(A, 1, 1, ctx);
 
 
     switch (which)

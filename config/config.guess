@@ -866,7 +866,7 @@ main ()
   const char *modelstr;
   int cpu_64bit = 0, cpu_avx = 0;
   int cpu_avx_fma = 0, cpu_avx512f_avx512dq = 0;
-  int cpuid_64bit, cpuid_avx, cpuid_osxsave;
+  int cpuid_64bit, cpuid_avx, cpuid_osxsave, cpuid_avx512f;
 
   CPUID (vendor_string, 0);
   vendor_string[12] = 0;
@@ -878,6 +878,9 @@ main ()
 
   cpuid_avx     = (feature_string[11] >> 4) & 1;
   cpuid_osxsave = (feature_string[11] >> 3) & 1;
+
+  CPUID (feature_string, 7);
+  cpuid_avx512f = (feature_string[ 2] >> 0) & 1;
 
   modelstr = "$guess_cpu";
 
@@ -1014,11 +1017,11 @@ main ()
           if (model <= 1)
             modelstr = "bulldozer";
           else if (model < 0x20)        /* really 2, [0x10-0x20) */
-            modelstr = "piledriver";
+            modelstr = "bd2";
           else if (model < 0x40)        /* really [0x30-0x40) */
-            modelstr = "steamroller";
+            modelstr = "bd3";
           else                                /* really [0x60-0x70) */
-            modelstr = "excavator";
+            modelstr = "bd4";
           break;
         case 22:                /* Jaguar, an improved bobcat */
           cpu_64bit = 1, cpu_avx = 1, modelstr = "jaguar";
@@ -1061,7 +1064,7 @@ main ()
               break;
             case 0x10:
             default:
-              modelstr = "zen4";
+              modelstr = cpuid_avx512f ? "zen4" : "zen3";
               break;
           }
           break;

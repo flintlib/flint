@@ -272,7 +272,7 @@ Powers
 .. function:: void ca_mat_pow_ui_binexp(ca_mat_t B, const ca_mat_t A, ulong exp, ca_ctx_t ctx)
 
     Sets *B* to *A* raised to the power *exp*, evaluated using
-    binary exponentiation.
+    binary exponentiation. Requires (not checked) that *A* is a square matrix.
 
 
 Polynomial evaluation
@@ -390,7 +390,8 @@ Solving and inverse
               void ca_mat_solve_triu(ca_mat_t X, const ca_mat_t U, const ca_mat_t B, int unit, ca_ctx_t ctx)
 
     Solves the lower triangular system `LX = B` or the upper triangular system
-    `UX = B`, respectively. It is assumed (not checked) that the diagonal
+    `UX = B`, respectively. It is assumed (not checked) that *L* is lower
+    triangular (respectively *U* upper triangular) and that the diagonal
     entries are nonzero. If *unit* is set, the main diagonal of *L* or *U*
     is taken to consist of all ones, and in that case the actual entries on
     the diagonal are not read at all and can contain other data.
@@ -404,7 +405,8 @@ Solving and inverse
               void ca_mat_solve_lu_precomp(ca_mat_t X, const slong * P, const ca_mat_t LU, const ca_mat_t B, ca_ctx_t ctx)
 
     Solves `AX = B` given the precomputed nonsingular LU decomposition `A = PLU`
-    or fraction-free LU decomposition with denominator *den*.
+    or fraction-free LU decomposition with denominator *den*, which are assumed
+    (not checked) to be valid factorization data.
     The matrices `X` and `B` are allowed to be aliased with each other,
     but `X` is not allowed to be aliased with `LU`.
 

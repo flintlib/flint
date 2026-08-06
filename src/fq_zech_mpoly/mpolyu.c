@@ -143,6 +143,7 @@ void fq_zech_mpolyu_one(fq_zech_mpolyu_t A, const fq_zech_mpoly_ctx_t uctx)
     A->length = 1;
 }
 
+#if 0
 /* if the coefficient doesn't exist, a new one is created (and set to zero) */
 fq_zech_mpoly_struct * _fq_zech_mpolyu_get_coeff(fq_zech_mpolyu_t A,
                                      ulong pow, const fq_zech_mpoly_ctx_t uctx)
@@ -174,3 +175,4 @@ fq_zech_mpoly_struct * _fq_zech_mpolyu_get_coeff(fq_zech_mpolyu_t A,
 
     return xk;
 }
+#endif

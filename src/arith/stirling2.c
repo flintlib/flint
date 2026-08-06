@@ -131,7 +131,7 @@ triangular_2(nn_ptr c, slong n, slong klen)
     }
 }
 
-void
+static void
 arith_stirling_number_2_vec_triangular(fmpz * row, slong n, slong klen)
 {
     ulong c[2 * MAX_N_2LIMB + 2];
@@ -174,7 +174,7 @@ arith_stirling_number_2_vec_triangular(fmpz * row, slong n, slong klen)
         fmpz_set_ui(row + k, k == n);
 }
 
-void
+static void
 arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
 {
     slong k, kodd, len;
@@ -296,7 +296,7 @@ arith_stirling_number_2_nmod_vec(nn_ptr res, const unsigned int * divtab, ulong 
 
 #define CRT_MAX_RESOLUTION 16
 
-void
+static void
 arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];

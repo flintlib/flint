@@ -17,7 +17,7 @@
 #include "nmod_mpoly.h"
 
 /* store in each coefficient the evaluation of the corresponding monomial */
-void nmod_mpoly_evalsk(nmod_mpoly_t A, nmod_mpoly_t B,
+static void nmod_mpoly_evalsk(nmod_mpoly_t A, nmod_mpoly_t B,
            slong entries, slong * offs, ulong * masks, ulong * powers,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -45,7 +45,7 @@ void nmod_mpoly_evalsk(nmod_mpoly_t A, nmod_mpoly_t B,
     A->length = B->length;
 }
 
-void nmod_mpolyu_evalsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
+static void nmod_mpolyu_evalsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
               slong entries, slong * offs, ulong * masks, ulong * powers,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -62,7 +62,7 @@ void nmod_mpolyu_evalsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
 }
 
 /* multiply the coefficients of A pointwise by those of B */
-void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
+static void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -87,7 +87,7 @@ void nmod_mpolyu_mulsk(nmod_mpolyu_t A, nmod_mpolyu_t B,
     return 0 if the leading coeff of A vanishes
     else return 1
 */
-int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
+static int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
                                   nmod_mpolyu_t SK, const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -129,7 +129,7 @@ int nmod_mpolyu_evalfromsk(nmod_poly_t e, nmod_mpolyu_t A,
 
     for x
 */
-int nmod_vandsolve(ulong * x, ulong * a, ulong * b,
+static int nmod_vandsolve(ulong * x, ulong * a, ulong * b,
                                                            slong n, nmod_t mod)
 {
     int success = 0;
@@ -194,6 +194,7 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
           const nmod_mpoly_ctx_t ctx, flint_rand_t randstate, slong * degbound)
 {
     int eval_points_tried;
+    slong l_growths = 0;
     nmod_gcds_ret_t success;
     nmod_mpolyu_t Aevalsk1, Bevalsk1, fevalsk1, Aevalski, Bevalski, fevalski;
     nmod_poly_t Aeval, Beval, Geval;
@@ -303,10 +304,19 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     b = (ulong *) TMP_ALLOC((f->coeffs + d[f->length - 1])->length
                                                            *sizeof(ulong));
 
-    nmod_mat_init(MF, 0, l, ctx->mod.n);
+    /* compute how many masks are needed */
+    entries = f->bits * var;
+    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
+    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
+    powers = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
 
     M = (nmod_mat_struct *) TMP_ALLOC(f->length*sizeof(nmod_mat_struct));
     ML_is_initialized = (int *) TMP_ALLOC(f->length*sizeof(int));
+
+alloc_images:
+
+    nmod_mat_init(MF, 0, l, ctx->mod.n);
+
     for (i = 0; i < f->length; i++)
     {
         nmod_mat_init(M + i, l, (f->coeffs + i)->length, ctx->mod.n);
@@ -316,12 +326,6 @@ nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
     W = (ulong *) flint_malloc(l*f->length*sizeof(ulong));
 
     nmod_mat_init(Msol, l, 1, ctx->mod.n);
-
-    /* compute how many masks are needed */
-    entries = f->bits * var;
-    offs = (slong *) TMP_ALLOC(entries*sizeof(slong));
-    masks = (ulong *) TMP_ALLOC(entries*sizeof(slong));
-    powers = (ulong *) TMP_ALLOC(entries*sizeof(ulong));
 
 
     /***** evaluation loop head *******/
@@ -527,6 +531,29 @@ pick_evaluation_point:
         if (underdeterminedcount < 2)
             goto pick_evaluation_point;
 
+        /*
+            The failure is likely structural: with this form the scale
+            system is generically underdetermined for this number of
+            images. Retry with more images instead of giving up, which
+            would otherwise send the caller into a near-infinite loop
+            of new evaluation points that can never succeed.
+        */
+        if (++l_growths <= 4)
+        {
+            flint_free(W);
+            nmod_mat_clear(MF);
+            nmod_mat_clear(Msol);
+            for (i = 0; i < f->length; i++)
+            {
+                nmod_mat_clear(M + i);
+                if (ML_is_initialized[i])
+                    nmod_mat_clear(ML + i);
+            }
+            l += 1 + l/2;
+            underdeterminedcount = 0;
+            goto alloc_images;
+        }
+
         success = nmod_gcds_scales_not_found;
         goto finished;
     }
@@ -663,7 +690,7 @@ static int nmod_mpolyu_gcdp_zippel_univar_no_cofactors(
 }
 
 
-int nmod_mpolyu_gcdp_zippel_bivar(
+static int nmod_mpolyu_gcdp_zippel_bivar(
     nmod_mpolyu_t G,
     nmod_mpolyu_t Abar,
     nmod_mpolyu_t Bbar,

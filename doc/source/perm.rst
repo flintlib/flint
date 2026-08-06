@@ -35,6 +35,20 @@ Assignment
     Allows aliasing of ``res`` and ``vec``.
 
 
+Comparison
+--------------------------------------------------------------------------------
+
+
+.. function:: slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
+
+    Returns 1 if the two permutations are equal, 0 otherwise.
+
+
+.. function:: slong _perm_is_one(const slong *vec, slong n)
+
+    Returns 1 if the permutation is the identity permutation, 0 otherwise.
+
+
 Composition
 --------------------------------------------------------------------------------
 
@@ -44,6 +58,22 @@ Composition
     Forms the composition `\pi_1 \circ \pi_2` of two permutations 
     `\pi_1` and `\pi_2`.  Here, `\pi_2` is applied first, that is, 
     `(\pi_1 \circ \pi_2)(i) = \pi_1(\pi_2(i))`.
+
+    Allows aliasing of ``res``, ``vec1`` and ``vec2``.
+
+.. function:: void _perm_compose_inv1(slong * res, const slong * vec1, const slong * vec2, slong n)
+
+    Forms the composition `(\pi_1^{-1}) \circ \pi_2` of two permutations 
+    `\pi_1` and `\pi_2`.  Here, `\pi_2` is applied first, that is, 
+    `((\pi_1^{-1}) \circ \pi_2)(i) = \pi_1^{-1}(\pi_2(i))`.
+
+    Allows aliasing of ``res``, ``vec1`` and ``vec2``.
+
+.. function:: void _perm_compose_inv2(slong * res, const slong * vec1, const slong * vec2, slong n)
+
+    Forms the composition `\pi_1 \circ (\pi_2^{-1})` of two permutations 
+    `\pi_1` and `\pi_2`.  Here, `\pi_2^{-1}` is applied first, that is, 
+    `(\pi_1 \circ (\pi_2^{-1}))(i) = \pi_1(\pi_2^{-1}(i))`.
 
     Allows aliasing of ``res``, ``vec1`` and ``vec2``.
 
@@ -69,3 +99,24 @@ Randomisation
 
     This function uses the Knuth shuffle algorithm to generate a uniformly 
     random permutation without retries.
+
+
+Iteration
+--------------------------------------------------------------------------------
+
+.. function:: int _perm_next_lex(slong * res, slong n)
+
+    Sets ``res`` to the next permutation after the input ``res``, with
+    respect to the lexicographic ordering, if possible. Returns 1 on success,
+    i.e. if the input ``res`` was not the lexicographically last permutation,
+    and returns 0 otherwise (in that case ``res`` is not modified).
+
+.. function:: int _perm_next_heap(slong * res, slong n, slong * stack)
+
+    Sets ``res`` to the next permutation after the input ``res``, according to
+    an iterative version of B.R. Heap's algorithm, if possible. The
+    implementation uses a vector ``stack`` of size ``n`` to keep track of
+    iteration counters. The standard way to use this function is to call it
+    first with ``res`` set to the identity permutation and ``stack`` set to a
+    vector of zeros; each call will try to update ``res`` and ``stack`` in
+    place. Returns 1 on success, i.e. if ``res`` was updated, and 0 otherwise.

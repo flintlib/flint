@@ -10,16 +10,9 @@
 */
 
 #include "mpn_mod.h"
+#include "mpn_mod/impl.h"
 
 /* currently defined in poly_mullow_karatsuba.c */
-void _mpn_dot_rev_2x2_3(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
-void _mpn_dot_rev_2x2_4(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
-void _mpn_dot_rev_2x2_5(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
-void _mpn_dot_rev_3x3_5(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
-void _mpn_dot_rev_nxn_2n(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs);
-void _mpn_dot_rev_nxn_2nm1(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs);
-void _mpn_dot_rev_nxn_2np1(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs);
-
 static void
 mpn_mod_set_mpn2(nn_ptr res, nn_srcptr s, slong l, gr_ctx_t ctx)
 {
@@ -28,7 +21,7 @@ mpn_mod_set_mpn2(nn_ptr res, nn_srcptr s, slong l, gr_ctx_t ctx)
 }
 
 int
-_mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mulmid_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
 {
     slong i, top1, top2;
     slong nlimbs, slimbs;
@@ -36,29 +29,29 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
     ulong s[2 * MPN_MOD_MAX_LIMBS + 1];
     int squaring;
 
-    if (len == 1)
+    if (nhi == 1)
         return mpn_mod_mul(res, poly1, poly2, ctx);
 
-    len1 = FLINT_MIN(len1, len);
-    len2 = FLINT_MIN(len2, len);
-
-    if (len1 == 1)
-        return _mpn_mod_vec_mul_scalar(res, poly2, len, poly1, ctx);
-
-    if (len2 == 1)
-        return _mpn_mod_vec_mul_scalar(res, poly1, len, poly2, ctx);
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
 
     nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
 
-    mpn_mod_mul(res, poly1, poly2, ctx);
+    if (len1 == 1)
+        return _mpn_mod_vec_mul_scalar(res, poly2 + nlo * nlimbs, nhi - nlo, poly1, ctx);
 
-    if (len == len1 + len2 - 1)
-    {
+    if (len2 == 1)
+        return _mpn_mod_vec_mul_scalar(res, poly1 + nlo * nlimbs, nhi - nlo, poly2, ctx);
+
+    if (nlo == 0)
+        mpn_mod_mul(res, poly1, poly2, ctx);
+
+    res -= nlo * nlimbs;
+
+    if (nhi == len1 + len2 - 1)
         mpn_mod_mul(res + (len1 + len2 - 2) * nlimbs, poly1 + (len1 - 1) * nlimbs, poly2 + (len2 - 1) * nlimbs, ctx);
-        len--;
-    }
 
-    if (len <= 1)
+    if (nhi <= 1 || nlo >= len1 + len2 - 2)
         return GR_SUCCESS;
 
     squaring = (poly1 == poly2) && (len1 == len2);
@@ -75,7 +68,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
 
         if (slimbs == 2 * nlimbs - 1)
         {
-            for (i = 1; i < FLINT_MIN(len, 2 * len1 - 2); i++)
+            for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
             {
                 start = FLINT_MAX(0, i - len1 + 1);
                 stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -99,7 +92,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
         }
         else if (slimbs == 2 * nlimbs)
         {
-            for (i = 1; i < FLINT_MIN(len, 2 * len1 - 2); i++)
+            for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
             {
                 start = FLINT_MAX(0, i - len1 + 1);
                 stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -121,7 +114,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
         }
         else
         {
-            for (i = 1; i < FLINT_MIN(len, 2 * len1 - 2); i++)
+            for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, 2 * len1 - 2); i++)
             {
                 start = FLINT_MAX(0, i - len1 + 1);
                 stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
@@ -148,7 +141,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
     {
         if (slimbs == 3)
         {
-            for (i = 1; i < len; i++)
+            for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, len1 + len2 - 1); i++)
             {
                 top1 = FLINT_MIN(len1 - 1, i);
                 top2 = FLINT_MIN(len2 - 1, i);
@@ -158,7 +151,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
         }
         else if (slimbs == 4)
         {
-            for (i = 1; i < len; i++)
+            for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, len1 + len2 - 1); i++)
             {
                 top1 = FLINT_MIN(len1 - 1, i);
                 top2 = FLINT_MIN(len2 - 1, i);
@@ -168,7 +161,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
         }
         else
         {
-            for (i = 1; i < len; i++)
+            for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, len1 + len2 - 1); i++)
             {
                 top1 = FLINT_MIN(len1 - 1, i);
                 top2 = FLINT_MIN(len2 - 1, i);
@@ -179,7 +172,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
     }
     else if (nlimbs == 3 && slimbs == 5)
     {
-        for (i = 1; i < len; i++)
+        for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, len1 + len2 - 1); i++)
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
@@ -189,7 +182,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
     }
     else if (slimbs == 2 * nlimbs)
     {
-        for (i = 1; i < len; i++)
+        for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, len1 + len2 - 1); i++)
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
@@ -199,7 +192,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
     }
     else if (slimbs == 2 * nlimbs + 1)
     {
-        for (i = 1; i < len; i++)
+        for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, len1 + len2 - 1); i++)
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
@@ -209,7 +202,7 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
     }
     else if (slimbs == 2 * nlimbs - 1)
     {
-        for (i = 1; i < len; i++)
+        for (i = FLINT_MAX(nlo, 1); i < FLINT_MIN(nhi, len1 + len2 - 1); i++)
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
@@ -220,3 +213,10 @@ _mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcpt
 
     return GR_SUCCESS;
 }
+
+int
+_mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+{
+    return _mpn_mod_poly_mulmid_classical(res, poly1, len1, poly2, len2, 0, len, ctx);
+}
+

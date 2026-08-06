@@ -1070,7 +1070,7 @@ _isolate_hardy_z_zeros(arf_interval_ptr res, const fmpz_t n, slong len)
 }
 
 /* Isolate len zeros, starting from the nth zero. */
-void
+static void
 acb_dirichlet_isolate_hardy_z_zeros(arf_interval_ptr res, const fmpz_t n, slong len)
 {
     if (len <= 0)

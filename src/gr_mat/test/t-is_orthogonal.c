@@ -19,20 +19,24 @@ gr_mat_is_orthogonal_naive(const gr_mat_t A, gr_ctx_t ctx)
     gr_mat_t T, U;
     slong n = A->r;
     truth_t res, res2;
+    int status = GR_SUCCESS;
 
     gr_mat_init(T, n, n, ctx);
     gr_mat_init(U, n, n, ctx);
 
-    GR_MUST_SUCCEED(gr_mat_transpose(T, A, ctx));
-    GR_MUST_SUCCEED(gr_mat_mul(U, A, T, ctx));
+    status |= gr_mat_transpose(T, A, ctx);
+    status |= gr_mat_mul(U, A, T, ctx);
     res = gr_mat_is_one(U, ctx);
 
-    GR_MUST_SUCCEED(gr_mat_mul(U, T, A, ctx));
+    status |= gr_mat_mul(U, T, A, ctx);
     res2 = gr_mat_is_one(U, ctx);
     res = truth_and(res, res2);
 
     gr_mat_clear(T, ctx);
     gr_mat_clear(U, ctx);
+
+    if (status != GR_SUCCESS)
+        res = T_UNKNOWN;
 
     return res;
 }
@@ -44,18 +48,20 @@ gr_mat_is_orthogonal2_naive(const gr_mat_t A, int cols, int unit, gr_ctx_t ctx)
     slong r = A->r;
     slong c = A->c;
     truth_t res;
+    int status = GR_SUCCESS;
+
     gr_mat_init(AT, c, r, ctx);
-    GR_MUST_SUCCEED(gr_mat_transpose(AT, A, ctx));
+    status |= gr_mat_transpose(AT, A, ctx);
 
     if (cols)
     {
         gr_mat_init(P, c, c, ctx);
-        GR_MUST_SUCCEED(gr_mat_mul(P, AT, A, ctx));
+        status |= gr_mat_mul(P, AT, A, ctx);
     }
     else
     {
         gr_mat_init(P, r, r, ctx);
-        GR_MUST_SUCCEED(gr_mat_mul(P, A, AT, ctx));
+        status |= gr_mat_mul(P, A, AT, ctx);
     }
 
     if (unit)
@@ -65,6 +71,10 @@ gr_mat_is_orthogonal2_naive(const gr_mat_t A, int cols, int unit, gr_ctx_t ctx)
 
     gr_mat_clear(AT, ctx);
     gr_mat_clear(P, ctx);
+
+    if (status != GR_SUCCESS)
+        res = T_UNKNOWN;
+
     return res;
 }
 

@@ -11,7 +11,7 @@
 
 #include "ca.h"
 
-ca_ext_ptr
+static ca_ext_ptr
 ca_is_gen_pow_fmpz_as_ext(fmpz_t exp, const ca_t x, ca_ctx_t ctx)
 {
     ca_field_ptr K;
@@ -102,7 +102,7 @@ ca_is_gen_pow_fmpz_as_ext(fmpz_t exp, const ca_t x, ca_ctx_t ctx)
 
 
 /* log(exp(z)) -- https://fungrim.org/entry/a3a253/ */
-void
+static void
 ca_log_exp(ca_t res, const ca_t z, ca_ctx_t ctx)
 {
     ca_t t, pi;
@@ -145,7 +145,7 @@ ca_log_exp(ca_t res, const ca_t z, ca_ctx_t ctx)
 }
 
 /* log(z^a), assuming z != 0 */
-void
+static void
 ca_log_pow(ca_t res, const ca_t z, const ca_t a, ca_ctx_t ctx)
 {
     ca_t t, u, pi;

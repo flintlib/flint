@@ -37,6 +37,13 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
         return;
     }
 
+    if (acb_is_real(zin))
+    {
+        arb_fmpz_poly_refine_root_arb(acb_realref(res), poly, acb_realref(zin), prec);
+        arb_zero(acb_imagref(res));
+        return;
+    }
+
     orig_prec = prec;
 
     acc = acb_rel_accuracy_bits(zin);

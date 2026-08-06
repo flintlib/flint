@@ -15,19 +15,6 @@
 void
 gr_mpoly_fit_bits(gr_mpoly_t A, flint_bitcnt_t bits, gr_mpoly_ctx_t ctx)
 {
-    if (A->bits < bits)
-    {
-        if (A->exps_alloc != 0)
-        {
-            mpoly_ctx_struct * mctx = GR_MPOLY_MCTX(ctx);
-            slong N = mpoly_words_per_exp(bits, mctx);
-            ulong * t = (ulong *) flint_malloc(N*A->exps_alloc*sizeof(ulong));
-            mpoly_repack_monomials(t, bits, A->exps, A->bits, A->length, mctx);
-            flint_free(A->exps);
-            A->exps = t;
-            A->exps_alloc = N*A->exps_alloc;
-        }
-
-        A->bits = bits;
-    }
+    gr_mpoly_fit_length_fit_bits(A, A->coeffs_alloc, bits, ctx);
 }
+

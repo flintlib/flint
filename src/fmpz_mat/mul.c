@@ -184,6 +184,14 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     cbits = abits + bbits + FLINT_BIT_COUNT(br);
 
+    /* FFT deals efficiently with huge entries. Todo: retune for squaring,
+       and possibly for BLAS. */
+    if (FLINT_MIN(abits, bbits) >= ((dim <= 5) ? 10000 : 7000 + 0.15 * dim * dim))
+    {
+        if (fmpz_mat_mul_fft_small(C, A, B))
+            return;
+    }
+
 #if FLINT_USES_BLAS && FLINT_BITS == 64
     if (dim > 50)
     {

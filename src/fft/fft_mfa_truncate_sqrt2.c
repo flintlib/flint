@@ -238,7 +238,7 @@ typedef struct
 }
 fft_outer_arg_t;
 
-void
+static void
 _fft_outer1_worker(void * arg_ptr)
 {
     fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);
@@ -322,7 +322,7 @@ _fft_outer1_worker(void * arg_ptr)
     }
 }
 
-void
+static void
 _fft_outer2_worker(void * arg_ptr)
 {
     fft_outer_arg_t arg = *((fft_outer_arg_t *) arg_ptr);

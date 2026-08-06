@@ -263,6 +263,8 @@ Arithmetic
 
 .. function:: void arb_poly_scalar_mul(arb_poly_t C, const arb_poly_t A, const arb_t c, slong prec)
 
+.. function:: void arb_poly_scalar_mul_si(arb_poly_t C, const arb_poly_t A, slong c, slong prec)
+
     Sets *C* to *A* multiplied by *c*.
 
 .. function:: void arb_poly_scalar_div(arb_poly_t C, const arb_poly_t A, const arb_t c, slong prec)
@@ -301,7 +303,7 @@ Arithmetic
     .. math::
 
         c = \left\lfloor
-            \frac{(e_2 - e_1) + (f_2 + f_1)}{(a_2 - a_1) + (b_2 - b_1)}
+            \frac{(e_2 - e_1) + (f_2 - f_1)}{(a_2 - a_1) + (b_2 - b_1)}
             + \frac{1}{2}
             \right \rfloor.
 
@@ -342,6 +344,16 @@ Arithmetic
     Sets *C* to the product of *A* and *B*.
     If the same variable is passed for *A* and *B*, sets *C* to the
     square of *A*.
+
+.. function:: void _arb_poly_mulmid_block(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void arb_poly_mulmid_block(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _arb_poly_mulmid_classical(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void arb_poly_mulmid_classical(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec)
+              void _arb_poly_mulmid(arb_ptr z, arb_srcptr x, slong xlen, arb_srcptr y, slong ylen, slong nlo, slong nhi, slong prec)
+              void arb_poly_mulmid(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong nlo, slong nhi, slong prec)
+
+    Analogous to *mullow* functions, but compute the product truncated
+    at length *nhi* and right-shifted by *nlo*.
 
 .. function:: void _arb_poly_inv_series(arb_ptr Q, arb_srcptr A, slong Alen, slong len, slong prec)
 
@@ -817,6 +829,27 @@ Powers and elementary functions
     The underscore methods supports aliasing of the input and output
     arrays. They require that *flen* and *n* are greater than zero.
 
+.. function:: void _arb_poly_atanh_series(arb_ptr res, arb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void arb_poly_atanh_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
+
+.. function:: void _arb_poly_asinh_series(arb_ptr res, arb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void arb_poly_asinh_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
+
+.. function:: void _arb_poly_acosh_series(arb_ptr res, arb_srcptr f, slong flen, slong n, slong prec)
+
+.. function:: void arb_poly_acosh_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
+
+    Sets *res* respectively to the power series inverse hyperbolic
+    tangent, inverse hyperbolic sine and inverse hyperbolic cosine of
+    *f*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *flen* and *n* are greater than zero.
+
 .. function:: void _arb_poly_exp_series_basecase(arb_ptr f, arb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void arb_poly_exp_series_basecase(arb_poly_t f, const arb_poly_t h, slong n, slong prec)
@@ -870,6 +903,17 @@ Powers and elementary functions
     The underscore version does not support aliasing, and requires
     the lengths to be nonzero.
 
+.. function:: void _arb_poly_cot_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_cot_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+
+    Sets *g* to the power series cotangent of *h*.*
+
+    Wraps :func: `_gr_poly_cot_series`.
+
+    The underscore method supports aliasing of the input and output
+    arrays. It require that *flen* and *n* are greater than zero.
+
 .. function:: void _arb_poly_sin_cos_pi_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void arb_poly_sin_cos_pi_series(arb_poly_t s, arb_poly_t c, const arb_poly_t h, slong n, slong prec)
@@ -881,6 +925,10 @@ Powers and elementary functions
 .. function:: void _arb_poly_cos_pi_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)
 
 .. function:: void arb_poly_cos_pi_series(arb_poly_t c, const arb_poly_t h, slong n, slong prec)
+
+.. function:: void _arb_poly_tan_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_tan_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
 
 .. function:: void _arb_poly_cot_pi_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -915,6 +963,22 @@ Powers and elementary functions
     The implementations mirror those for sine and cosine, except that
     the *exponential* version computes both functions using the exponential
     function instead of the hyperbolic tangent.
+
+.. function:: void _arb_poly_tanh_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_tanh_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+
+.. function:: void _arb_poly_coth_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec)
+
+.. function:: void arb_poly_coth_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
+
+    Sets *g* respectively to the power series cotangent and hyperbolic
+    cotangent of *h*, truncated to length *n*.
+
+    Wraps the associated functions in the `gr_poly` module.
+
+    The underscore methods support aliasing of the input and output
+    arrays. They require that *hlen* and *n* are greater than zero.
 
 .. function:: void _arb_poly_sinc_series(arb_ptr s, arb_srcptr h, slong hlen, slong n, slong prec)
 
@@ -1119,4 +1183,3 @@ Other special polynomials
     The underscore version accepts an additional *trunc* parameter. Even
     when computing a truncated polynomial, the array *poly* must have room for
     `2^n + 1` coefficients, used as temporary space.
-

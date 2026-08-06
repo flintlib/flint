@@ -60,25 +60,6 @@ Stirling numbers
     To compute a full row, this function can be called with
     ``klen = n+1``. It is assumed that ``klen`` is at most `n + 1`.
 
-.. function:: void arith_stirling_number_1u_vec_next(fmpz * row, const fmpz * prev, slong n, slong klen)
-
-.. function:: void arith_stirling_number_1_vec_next(fmpz * row, const fmpz * prev, slong n, slong klen)
-
-.. function:: void arith_stirling_number_2_vec_next(fmpz * row, const fmpz * prev, slong n, slong klen)
-
-    Given the vector ``prev`` containing a row of Stirling numbers
-    ``S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-1)``, computes
-    and stores in the row argument
-    ``S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)``.
-
-    If ``klen`` is greater than ``n``, the output ends with
-    ``S(n,n) = 1`` followed by ``S(n,n+1) = S(n,n+2) = ... = 0``.
-    In this case, the input only needs to have length ``n-1``;
-    only the input entries up to ``S(n-1,n-2)`` are read.
-
-    The ``row`` and ``prev`` arguments are permitted to be the
-    same, meaning that the row will be updated in-place.
-
 .. function:: void arith_stirling_matrix_1u(fmpz_mat_t mat)
 
 .. function:: void arith_stirling_matrix_1(fmpz_mat_t mat)

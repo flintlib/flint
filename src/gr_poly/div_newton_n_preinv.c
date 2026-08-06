@@ -14,9 +14,7 @@
 
 #include "gr_vec.h"
 #include "gr_poly.h"
-
-void
-_gr_vec_reverse_shallow(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx);
+#include "gr_poly/impl.h"
 
 int
 _gr_poly_div_newton_n_preinv(gr_ptr Q, gr_srcptr A, slong lenA, gr_srcptr FLINT_UNUSED(B), slong lenB, gr_srcptr Binv, slong lenBinv, gr_ctx_t ctx)

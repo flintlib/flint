@@ -27,10 +27,21 @@ TEST_FUNCTION_START(nmod_poly_mat_mul, state)
         slong m, n, k, deg;
 
         mod = n_randtest_prime(state, 0);
-        m = n_randint(state, 20);
-        n = n_randint(state, 20);
-        k = n_randint(state, 20);
-        deg = 1 + n_randint(state, 10);
+        if (n_randint(state, 4) == 0)
+        {
+            /* degrees crossing the fft dispatch cutoffs */
+            m = n_randint(state, 6);
+            n = n_randint(state, 6);
+            k = n_randint(state, 6);
+            deg = 64 + n_randint(state, 400);
+        }
+        else
+        {
+            m = n_randint(state, 20);
+            n = n_randint(state, 20);
+            k = n_randint(state, 20);
+            deg = 1 + n_randint(state, 10);
+        }
 
         nmod_poly_mat_init(A, m, n, mod);
         nmod_poly_mat_init(B, n, k, mod);

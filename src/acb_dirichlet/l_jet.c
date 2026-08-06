@@ -13,10 +13,6 @@
 #include "acb_dirichlet.h"
 #include "acb_poly.h"
 
-/* todo: move implementation to the acb_dirichlet module */
-void _acb_poly_zeta_cpx_reflect(acb_ptr t, const acb_t h,
-    const acb_t a, int deflate, slong len, slong prec);
-
 void
 acb_dirichlet_l_jet(acb_ptr res, const acb_t s,
     const dirichlet_group_t G, const dirichlet_char_t chi,

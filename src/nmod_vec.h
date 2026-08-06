@@ -120,12 +120,38 @@ void _nmod_vec_sub(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod);
 
 void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+void _nmod_vec_scalar_mul_nmod_redc(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_mul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 
 void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod);
+
+#if FLINT_BITS == 64 && defined(__AVX2__)
+void _nmod_vec_nored_scalar_addmul_halflimb_avx2(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+#endif
+
+NMOD_VEC_INLINE void
+_nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c)
+{
+#if FLINT_BITS == 64 && defined(__AVX2__)
+    if (len >= 16)
+    {
+        _nmod_vec_nored_scalar_addmul_halflimb_avx2(res, vec, len, c);
+        return;
+    }
+#endif
+
+    slong i;
+    for (i = 0; i < len; i++)
+        res[i] += vec[i] * c;
+}
+
+void _nmod_vec_nored_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+void _nmod_vec_nored_ll_scalar_addmul_halflimb(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+void _nmod_vec_nored_ll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c);
+void _nmod_vec_nored_lll_scalar_addmul(nn_ptr res, nn_srcptr vec, slong len, ulong c);
 
 /* invert each coefficient */
 void _nmod_vec_invert(nn_ptr res, nn_srcptr vec, ulong len, nmod_t mod);
@@ -213,8 +239,7 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
     {
         const ulong t0 = (mod.n - 1) * (mod.n - 1);
-        ulong u1, u0;
-        umul_ppmm(u1, u0, t0, len);
+        ulong u1 = n_mulhi(t0, len);
         if (u1 == 0)  // 1 limb
         {
             dot_params_t params = {_DOT1, UWORD(0)};
@@ -244,10 +269,10 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     // from here on, mod.n > 2**(FLINT_BITS / 2)
     // --> unreduced dot cannot fit in 1 limb
 
-    ulong t2, t1, t0, u1, u0;
+    ulong t2, t1, t0, u1;
     umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
     umul_ppmm(t2, t1, t1, len);
-    umul_ppmm(u1, u0, t0, len);
+    u1 = n_mulhi(t0, len);
     add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
 
     if (t2 == 0) // 2 limbs
@@ -769,6 +794,16 @@ do                                                                    \
 
 #endif  // FLINT_BITS == 64
 
+/* Note: if de-inlining this, consider specializing for the common use
+   case of stride1 == 1 or stride2 == 1. */
+NMOD_VEC_INLINE ulong _nmod_vec_dot_strided(nn_srcptr vec1, slong stride1,
+    nn_srcptr vec2, slong stride2, slong len, nmod_t mod, dot_params_t params)
+{
+    slong i;
+    ulong r;
+    NMOD_VEC_DOT(r, i, len, vec1[i * stride1], vec2[i * stride2], mod, params)
+    return r;
+}
 
 #ifdef __cplusplus
 }

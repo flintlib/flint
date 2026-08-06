@@ -14,7 +14,7 @@
 
 TEST_FUNCTION_START(fmpz_mod_mpoly_sqrt, state)
 {
-    slong i, j, tmul = 10;
+    slong i, j, tmul = 20;
 
     /* Check sqrt(f^2) = +-f */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)

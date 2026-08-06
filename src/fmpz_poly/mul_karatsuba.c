@@ -13,6 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 
 /*
    Implements karatsuba multiplication. There is no basecase crossover, so
@@ -40,27 +41,18 @@
    term to the left.
 */
 
-void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
-                                   fmpz * temp, slong bits);
-
-/*
-   Switches the coefficients of poly in of length len into a
-   poly out of length 2^bits.
- */
-void
-revbin1(fmpz * out, const fmpz * in, slong len, slong bits)
+/* Switches the coefficients of poly in of length len into a
+   poly out of length 2^bits. */
+void revbin1(fmpz * out, const fmpz * in, slong len, slong bits)
 {
     slong i;
     for (i = 0; i < len; i++)
         out[n_revbin(i, bits)] = in[i];
 }
 
-/*
-   Switches the coefficients of poly in of length 2^bits into a
-   poly out of length len.
- */
-void
-revbin2(fmpz * out, const fmpz * in, slong len, slong bits)
+/* Switches the coefficients of poly in of length 2^bits into a
+   poly out of length len. */
+void revbin2(fmpz * out, const fmpz * in, slong len, slong bits)
 {
     slong i;
     for (i = 0; i < len; i++)
@@ -68,8 +60,7 @@ revbin2(fmpz * out, const fmpz * in, slong len, slong bits)
 }
 
 /* in1 += x*in2 assuming both in1 and in2 are revbin'd. */
-void
-_fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits)
+void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits)
 {
     slong i;
     for (i = 0; i < (WORD(1) << bits) - 1; i++)
@@ -85,7 +76,7 @@ _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits)
    Assumes rev1 and rev2 are both of length 2^bits and that temp has
    space for 2^bits coefficients.
  */
-void
+static void
 _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
                               fmpz * temp, slong bits)
 {

@@ -1,0 +1,82 @@
+/*
+    Copyright (C) 2023 Albin Ahlbäck
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+/* Include functions *********************************************************/
+
+#include "t-add.c"
+#include "t-digit_size.c"
+#include "t-div_approx.c"
+#include "t-divmod_bn.c"
+#include "t-divmod_bn_1.c"
+#include "t-divmod_bn_classical.c"
+#include "t-divmod_bn_karp_markstein.c"
+#include "t-divrem.c"
+#include "t-divrem_1.c"
+#include "t-get_mpn.c"
+#include "t-integer.c"
+#include "t-inv_approx.c"
+#include "t-invmod_bn.c"
+#include "t-lshift.c"
+#include "t-mul_1.c"
+#include "t-mulmid_classical.c"
+#include "t-mulmid_fft_small.c"
+#include "t-mulmid_KS.c"
+#include "t-n_divrem.c"
+#include "t-neg.c"
+#include "t-rshift.c"
+#include "t-rsqrt_1_approx.c"
+#include "t-rsqrt_approx.c"
+#include "t-rsqrtmod_bn.c"
+#include "t-set_mpn.c"
+#include "t-sqrt.c"
+#include "t-sqrt_approx.c"
+#include "t-sqrtmod_bn.c"
+#include "t-sqrtrem.c"
+#include "t-sub.c"
+
+/* Array of test functions ***************************************************/
+
+test_struct tests[] =
+{
+    TEST_FUNCTION(radix_add),
+    TEST_FUNCTION(radix_digit_size),
+    TEST_FUNCTION(radix_div_approx),
+    TEST_FUNCTION(radix_divrem),
+    TEST_FUNCTION(radix_divrem_1),
+    TEST_FUNCTION(radix_divmod_bn),
+    TEST_FUNCTION(radix_divmod_bn_1),
+    TEST_FUNCTION(radix_divmod_bn_classical),
+    TEST_FUNCTION(radix_divmod_bn_karp_markstein),
+    TEST_FUNCTION(radix_get_mpn),
+    TEST_FUNCTION(radix_integer),
+    TEST_FUNCTION(radix_inv_approx),
+    TEST_FUNCTION(radix_invmod_bn),
+    TEST_FUNCTION(radix_lshift),
+    TEST_FUNCTION(radix_mul_1),
+    TEST_FUNCTION(radix_mulmid_classical),
+    TEST_FUNCTION(radix_mulmid_fft_small),
+    TEST_FUNCTION(radix_mulmid_KS),
+    TEST_FUNCTION(radix_n_divrem),
+    TEST_FUNCTION(radix_neg),
+    TEST_FUNCTION(radix_rshift),
+    TEST_FUNCTION(radix_rsqrt_1_approx),
+    TEST_FUNCTION(radix_rsqrt_approx),
+    TEST_FUNCTION(radix_rsqrtmod_bn),
+    TEST_FUNCTION(radix_set_mpn),
+    TEST_FUNCTION(radix_sqrt),
+    TEST_FUNCTION(radix_sqrtmod_bn),
+    TEST_FUNCTION(radix_sqrtrem),
+    TEST_FUNCTION(radix_sub),
+};
+
+/* main function *************************************************************/
+
+TEST_MAIN(tests)

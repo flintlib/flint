@@ -3,41 +3,67 @@
 **profiler.h** -- performance profiling
 ===============================================================================
 
+Most of this module is only usable on certain platforms, while ``timeit``
+functions is available on all platforms.  The only platforms that can access
+the whole module is x86-64 and ARM64 on Unix type systems.
 
-Timer based on the cycle counter
+Timer based on clock
 --------------------------------------------------------------------------------
-
 
 .. function:: void timeit_start(timeit_t t)
               void timeit_stop(timeit_t t)
+              void timeit_print(timeit_t t, ulong reps)
 
     Gives wall and user time - useful for parallel programming.
 
     Example usage::
 
         timeit_t t0;
-        
-        // ...
-        
         timeit_start(t0);
-        
         // do stuff, take some time
-        
         timeit_stop(t0);
-        
-        flint_printf("cpu = %wd ms  wall = %wd ms\n", t0->cpu, t0->wall);
+        timeit_print(t0, 1); // only one repetition was done
 
-.. function:: void start_clock(int n)
+.. macro:: TIMEIT_REPEAT(timer, reps)
+           TIMEIT_END_REPEAT(timer, reps)
 
-.. function:: void stop_clock(int n)
+    Repeatedly runs the code between the ``TIMEIT_REPEAT`` and the
+    ``TIMEIT_END_REPEAT`` markers, automatically increasing the number of
+    repetitions until the elapsed time exceeds the timer resolution. The macro
+    takes as input a predefined ``timeit_t`` object and an integer variable to
+    hold the number of repetitions.
 
-.. function:: double get_clock(int n)
+.. macro:: TIMEIT_START
+           TIMEIT_STOP
+
+    Repeatedly runs the code between the ``TIMEIT_START`` and the
+    ``TIMEIT_STOP`` markers, automatically increasing the number of repetitions
+    until the elapsed time exceeds the timer resolution, and then prints the
+    average elapsed cpu and wall time for a single repetition.
+
+.. macro:: TIMEIT_ONCE_START
+           TIMEIT_ONCE_STOP
+
+    Runs the code between the ``TIMEIT_ONCE_START`` and the
+    ``TIMEIT_ONCE_STOP`` markers exactly once and then prints the elapsed cpu
+    and wall time. This does not give a precise measurement if the elapsed time
+    is short compared to the timer resolution.
+
+
+Timer based on cycle counter
+--------------------------------------------------------------------------------
+
+.. function:: void init_clock(int n)
+              void init_all_clocks(void)
+              void start_clock(int n)
+              void stop_clock(int n)
+              double get_clock(int n)
 
     Gives time based on cycle counter.
 
-    First one must ensure the processor speed in cycles per second
-    is set correctly in ``profiler.h``, in the macro definition 
-    ``#define FLINT_CLOCKSPEED``.
+    First one must ensure the processor speed in cycles per second is set
+    correctly in ``profiler.h``, in the macro definition ``#define
+    FLINT_CLOCKSPEED``.
 
     One can access the cycle counter directly by :func:`get_cycle_counter`
     which returns the current cycle counter as a ``double``.
@@ -45,23 +71,14 @@ Timer based on the cycle counter
     A sample usage of clocks is::
 
         init_all_clocks();
-        
         start_clock(n);
-        
         // do something
-        
         stop_clock(n);
-        
         flint_printf("Time in seconds is %f.3\n", get_clock(n));
 
     where ``n`` is a clock number (from 0-19 by default). The number of 
     clocks can be changed by altering ``FLINT_NUM_CLOCKS``. One can also 
     initialise an individual clock with ``init_clock(n)``.
-
-
-Framework for repeatedly sampling a single target
---------------------------------------------------------------------------------
-
 
 .. function:: void prof_repeat(double * min, double * max, profile_target_t target, void * arg)
 
@@ -73,10 +90,7 @@ Framework for repeatedly sampling a single target
 
     One creates a struct for passing arguments to our function::
 
-        typedef struct 
-        {
-            ulong a, b;
-        } myfunc_t;
+        typedef struct { ulong a, b; } myfunc_t;
 
     a sample function::
 
@@ -119,52 +133,7 @@ Framework for repeatedly sampling a single target
 Memory usage
 --------------------------------------------------------------------------------
 
-
-.. function:: void get_memory_usage(meminfo_t meminfo)
+.. function:: void fprint_memory_usage(FILE * fs)
+              void print_memory_usage(void)
 
     Obtains information about the memory usage of the current process.
-    The meminfo object contains the slots ``size`` (virtual memory size),
-    ``peak`` (peak virtual memory size), ``rss`` (resident set size),
-    ``hwm`` (peak resident set size). The values are stored in kilobytes
-    (1024 bytes). This function currently only works on Linux.
-
-
-Simple profiling macros
---------------------------------------------------------------------------------
-
-
-.. macro:: TIMEIT_REPEAT(timer, reps)
-
-.. macro:: TIMEIT_END_REPEAT(timer, reps)
-
-    Repeatedly runs the code between the ``TIMEIT_REPEAT`` and the
-    ``TIMEIT_END_REPEAT`` markers, automatically increasing the number of
-    repetitions until the elapsed time exceeds the timer resolution.
-    The macro takes as input a predefined ``timeit_t`` object
-    and an integer variable to hold the number of repetitions.
-
-.. macro:: TIMEIT_START
-
-.. macro:: TIMEIT_STOP
-
-    Repeatedly runs the code between the ``TIMEIT_START`` and the
-    ``TIMEIT_STOP``
-    markers, automatically increasing the number of repetitions until the
-    elapsed time exceeds the timer resolution, and then prints the average
-    elapsed cpu and wall time for a single repetition.
-
-.. macro:: TIMEIT_ONCE_START
-
-.. macro:: TIMEIT_ONCE_STOP
-
-    Runs the code between the ``TIMEIT_ONCE_START`` and the
-    ``TIMEIT_ONCE_STOP``
-    markers exactly once and then prints the elapsed cpu and wall time.
-    This does not give a precise measurement if the elapsed time is short
-    compared to the timer resolution.
-
-.. macro:: SHOW_MEMORY_USAGE
-
-    Retrieves memory usage information via ``get_memory_usage``
-    and prints the results.
-

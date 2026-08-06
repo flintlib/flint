@@ -13,7 +13,7 @@
 #include "gr_vec.h"
 #include "gr_mat.h"
 
-int
+static int
 _gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_op jet_func1, gr_method_vec_scalar_op jet_func2, gr_srcptr func2_param, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -30,6 +30,9 @@ _gr_mat_func_jordan(gr_mat_t res, const gr_mat_t A, gr_method_vec_op jet_func1, 
 
     if (n == 0)
         return GR_SUCCESS;
+
+    if (gr_ctx_is_field(ctx) != T_TRUE && gr_ctx_has_real_prec(ctx) != T_TRUE)
+        return GR_UNABLE;
 
     gr_mat_init(P, n, n, ctx);
     gr_mat_init(Q, n, n, ctx);

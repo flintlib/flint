@@ -13,6 +13,8 @@
 
 #include <string.h>
 #include "thread_pool.h"
+#include <gmp.h>
+#include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"
@@ -199,6 +201,111 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
     }
 }
 
+
+/*
+    Remove all powers of p from the two-word value {hi,lo}, returning the
+    exponent.  Sieve residues fit in two words for inputs up to roughly 200
+    bits, where this is about twice as fast as fmpz_remove.
+
+    For odd p the quotient comes from exact division: p divides exactly, so
+    one multiplication by p^(-1) mod 2^FLINT_BITS per limb suffices.  p = 2 is
+    a shift.  The multiplier held in factor_base[0] may be even and composite,
+    which neither case covers, so that falls back to mpn.
+*/
+static ulong
+qsieve_ll_remove(ulong * hip, ulong * lop, ulong p, ulong pinv)
+{
+    ulong exp = 0, hi = *hip, lo = *lop;
+
+    if ((hi | lo) == 0)
+        return 0;
+
+    if (p == 2)
+    {
+        if (lo == 0)
+        {
+            exp = FLINT_BITS + flint_ctz(hi);
+            lo = hi >> flint_ctz(hi);
+            hi = 0;
+        }
+        else
+        {
+            exp = flint_ctz(lo);
+            if (exp)
+            {
+                lo = (lo >> exp) | (hi << (FLINT_BITS - exp));
+                hi >>= exp;
+            }
+        }
+    }
+    else if (p & 1)
+    {
+        ulong pbinv = n_binvert(p);
+
+        while (1)
+        {
+            if (hi == 0)
+            {
+                ulong q = lo / p;
+
+                if (q * p != lo)
+                    break;
+
+                lo = q;
+                exp++;
+
+                if (lo == 1)
+                    break;
+            }
+            else
+            {
+                ulong q0, c;
+
+                if (n_ll_mod_preinv(hi, lo, p, pinv) != 0)
+                    break;
+
+                q0 = lo * pbinv;
+                c = n_mulhi(q0, p);
+                lo = q0;
+                hi = (hi - c) * pbinv;
+                exp++;
+            }
+        }
+    }
+    else
+    {
+        ulong t[2];
+
+        while (1)
+        {
+            slong n = hi ? 2 : 1;
+
+            t[0] = lo;
+            t[1] = hi;
+
+            if (mpn_mod_1(t, n, p) != 0)
+                break;
+
+            mpn_divexact_1(t, t, n, p);
+            lo = t[0];
+            hi = (n == 2) ? t[1] : 0;
+            exp++;
+
+            if (hi == 0 && lo == 1)
+                break;
+        }
+    }
+
+    *hip = hi;
+    *lop = lo;
+    return exp;
+}
+
+/* remove p from the residue, whichever representation is in use */
+#define QS_REMOVE(prime_, preinv_)                                          \
+    (use_ll ? qsieve_ll_remove(&rhi, &rlo, (prime_), (preinv_))             \
+            : (fmpz_set_ui(p, (prime_)), fmpz_remove(res, res, p)))
+
 /*
     check position i in sieve array for smoothness
 */
@@ -219,6 +326,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    slong j, k;
 
    fmpz_t X, Y, C, res, p;
+   ulong rhi = 0, rlo = 0;
+   int use_ll, neg = 0;
 
    fmpz_init(X);
    fmpz_init(Y);
@@ -249,10 +358,35 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    bits -= BITS_ADJUST; /* adjust for log approximations */
    extra_bits = 0; /* bits for mult. and small primes we didn't sieve with */
 
+   /*
+      Work in two words when the polynomial value fits, which it does for all
+      but the largest inputs.  The sign is taken out here and put back in
+      small[2] below, exactly as the fmpz path does at the end.
+   */
+   /*
+      Only worth it when the value really needs two words.  Below about 100
+      bits the polynomial values fit in one, where fmpz_remove already stays
+      on its own single limb fast path and this would just add a branch.
+   */
+   use_ll = 0;
+
+   if (COEFF_IS_MPZ(*res))
+   {
+      mpz_ptr z = COEFF_TO_PTR(*res);
+      slong sz = z->_mp_size;
+
+      if (FLINT_ABS(sz) == 2)
+      {
+         use_ll = 1;
+         neg = (sz < 0);
+         rlo = z->_mp_d[0];
+         rhi = z->_mp_d[1];
+      }
+   }
+
    if (factor_base[0].p != 1) /* divide out powers of the multiplier */
    {
-      fmpz_set_ui(p, factor_base[0].p);
-      exp = fmpz_remove(res, res, p);
+      exp = QS_REMOVE(factor_base[0].p, factor_base[0].pinv);
       if (exp)
           extra_bits += exp*qs_inf->factor_base[0].size;
       small[0] = exp;
@@ -266,8 +400,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
        small[0] = 0;
    }
 
-   fmpz_set_ui(p, 2); /* divide out by powers of 2 */
-   exp = fmpz_remove(res, res, p);
+   exp = QS_REMOVE(UWORD(2), factor_base[1].pinv); /* divide out powers of 2 */
 #if QS_DEBUG & 128
    if (exp)
        flint_printf("%ld^%ld ", 2, exp);
@@ -279,13 +412,13 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    for (j = 3; j < qs_inf->small_primes; j++) /* pull out small primes */
    {
       prime = factor_base[j].p;
-      pinv = factor_base[j].pinv;
-      modp = n_mod2_preinv(i, prime, pinv);
+      pinv = factor_base[j].pinv2;
+      FLINT_ASSERT(prime < UWORD(1) << (FLINT_BITS / 2));
+      modp = n_mod_lemire(i, prime, pinv);
 
       if (modp == soln1[j] || modp == soln2[j])
       {
-         fmpz_set_ui(p, prime);
-         exp = fmpz_remove(res, res, p);
+         exp = QS_REMOVE(prime, factor_base[j].pinv);
          if (exp)
              extra_bits += qs_inf->factor_base[j].size;
          small[j] = exp;
@@ -310,52 +443,88 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
           we stop once we have reached the same number of bits as indicated in
           the sieve entry
       */
-      for (j = qs_inf->small_primes; j < num_primes && extra_bits < sieve[i]; j++)
-      {
-         prime = factor_base[j].p;
-         pinv = factor_base[j].pinv;
-         modp = n_mod2_preinv(i, prime, pinv);
 
-         if (soln2[j] != 0) /* not a prime dividing A */
+      /* can use fast remainder */
+      if (factor_base[num_primes - 1].p < UWORD(1) << (FLINT_BITS / 2))
+      {
+         for (j = qs_inf->small_primes; j < num_primes && extra_bits < sieve[i]; j++)
          {
-            if (modp == soln1[j] || modp == soln2[j])
+            prime = factor_base[j].p;
+            pinv = factor_base[j].pinv2;
+            modp = n_mod_lemire(i, prime, pinv);
+
+            if (soln2[j] != 0) /* not a prime dividing A */
             {
-               fmpz_set_ui(p, prime);
-               exp = fmpz_remove(res, res, p);
-               extra_bits += qs_inf->factor_base[j].size;
-               factor[num_factors].ind = j;
-               factor[num_factors++].exp = exp;
+               if (modp == soln1[j] || modp == soln2[j])
+               {
+                  exp = QS_REMOVE(prime, factor_base[j].pinv);
+                  extra_bits += qs_inf->factor_base[j].size;
+                  factor[num_factors].ind = j;
+                  factor[num_factors++].exp = exp;
 #if QS_DEBUG & 128
+                     flint_printf("%ld^%ld ", prime, exp);
+#endif
+               }
+            } else /* prime dividing A */
+            {
+               exp = QS_REMOVE(prime, factor_base[j].pinv);
+               factor[num_factors].ind = j;
+               factor[num_factors++].exp = exp + 1; /* really factoring A*f(i) */
+#if QS_DEBUG & 128
+               if (exp)
                   flint_printf("%ld^%ld ", prime, exp);
 #endif
-
             }
-         } else /* prime dividing A */
-         {
-            fmpz_set_ui(p, prime);
-            exp = fmpz_remove(res, res, p);
-            factor[num_factors].ind = j;
-            factor[num_factors++].exp = exp + 1; /* really factoring A*f(i) */
-#if QS_DEBUG & 128
-            if (exp)
-               flint_printf("%ld^%ld ", prime, exp);
-#endif
-
          }
-      }
+    }
+    else
+    {
+         for (j = qs_inf->small_primes; j < num_primes && extra_bits < sieve[i]; j++)
+         {
+            prime = factor_base[j].p;
+            pinv = factor_base[j].pinv;
+            modp = n_mod2_preinv(i, prime, pinv);
+
+            if (soln2[j] != 0) /* not a prime dividing A */
+            {
+               if (modp == soln1[j] || modp == soln2[j])
+               {
+                  exp = QS_REMOVE(prime, factor_base[j].pinv);
+                  extra_bits += qs_inf->factor_base[j].size;
+                  factor[num_factors].ind = j;
+                  factor[num_factors++].exp = exp;
+#if QS_DEBUG & 128
+                     flint_printf("%ld^%ld ", prime, exp);
+#endif
+               }
+            } else /* prime dividing A */
+            {
+               exp = QS_REMOVE(prime, factor_base[j].pinv);
+               factor[num_factors].ind = j;
+               factor[num_factors++].exp = exp + 1; /* really factoring A*f(i) */
+#if QS_DEBUG & 128
+               if (exp)
+                  flint_printf("%ld^%ld ", prime, exp);
+#endif
+            }
+         }
+    }
 
 #if QS_DEBUG & 128
       if (num_factors > 0)
          flint_printf("\n");
 #endif
-      if (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0) /* We've found a relation */
+      if (use_ll ? (rhi == 0 && rlo == 1)
+                 : (fmpz_cmp_ui(res, 1) == 0 || fmpz_cmp_si(res, -1) == 0)) /* We've found a relation */
       {
 #if QS_DEBUG
          if (qs_inf->full_relation % 100 == 0)
             flint_printf("%ld relations\n", qs_inf->full_relation);
 #endif
          /* set sign amongst small factors */
-         if (fmpz_cmp_si(res, -1) == 0)
+         if (use_ll)
+            small[2] = neg;
+         else if (fmpz_cmp_si(res, -1) == 0)
             small[2] = 1;
          else
             small[2] = 0;
@@ -385,7 +554,9 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
       } else /* not a relation, perhaps a partial? */
       {
           /* set sign */
-          if (fmpz_sgn(res) < 0)
+          if (use_ll)
+              small[2] = neg;
+          else if (fmpz_sgn(res) < 0)
           {
               fmpz_neg(res, res);
               small[2] = 1;
@@ -393,9 +564,10 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
               small[2] = 0;
 
           /* if we have a small cofactor (at most 30 bits) */
-          if (fmpz_bits(res) <= 30)
+          if (use_ll ? (rhi == 0 && rlo < (UWORD(1) << 30))
+                     : (fmpz_bits(res) <= 30))
           {
-              prime = fmpz_get_ui(res);
+              prime = use_ll ? rlo : fmpz_get_ui(res);
 
               /*
                  a large prime is taken heuristically to be < 60 times largest

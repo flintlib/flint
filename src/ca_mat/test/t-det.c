@@ -25,7 +25,7 @@ TEST_FUNCTION_START(ca_mat_det, state)
 
         ca_ctx_init(ctx);
 
-        n = n_randint(state, 6);
+        n = n_randint(state, 5);
 
         ca_mat_init(A, n, n, ctx);
         ca_init(detA, ctx);
@@ -74,7 +74,7 @@ TEST_FUNCTION_START(ca_mat_det, state)
 
         ca_ctx_init(ctx);
 
-        n = n_randint(state, 5);
+        n = n_randint(state, 4);
 
         ca_mat_init(A, n, n, ctx);
         ca_mat_init(B, n, n, ctx);

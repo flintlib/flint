@@ -12,6 +12,8 @@
 #include <gmp.h>
 #include "flint.h"
 
+/* NOTE: The following functions are deprecated, and only exists for
+   backwards-compatibility. */
 void _flint_rand_init_gmp_state(flint_rand_t state)
 {
     FLINT_ASSERT(state->__gmp_state == NULL);
@@ -26,8 +28,6 @@ void _flint_rand_clear_gmp_state(flint_rand_t state)
     flint_free(state->__gmp_state);
 }
 
-/* NOTE: The following functions are deprecated, and only exists for
-   backwards-compatibility. */
 void flint_randinit(flint_rand_t state)
 {
     flint_rand_init(state);
@@ -46,12 +46,6 @@ void flint_randseed(flint_rand_t state, ulong s0, ulong s1)
 void flint_get_randseed(ulong * s0, ulong * s1, flint_rand_t state)
 {
     flint_rand_get_seed(s0, s1, state);
-}
-
-void _flint_rand_init_gmp(flint_rand_t state)
-{
-    if (state->__gmp_state == NULL)
-        _flint_rand_init_gmp_state(state);
 }
 
 flint_rand_struct * flint_rand_alloc(void)

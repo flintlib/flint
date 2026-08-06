@@ -16,13 +16,14 @@
 #include "gr_generic.h"
 #include "gr_special.h"
 #include "gr_series.h"
+#include "gr_series/impl.h"
 
 
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */
 
 static const char * default_var = "x";
 
-int
+static int
 gr_poly_add_series(gr_poly_t res, const gr_poly_t poly1,
               const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 {
@@ -43,7 +44,7 @@ gr_poly_add_series(gr_poly_t res, const gr_poly_t poly1,
     return status;
 }
 
-int
+static int
 gr_poly_sub_series(gr_poly_t res, const gr_poly_t poly1,
               const gr_poly_t poly2, slong n, gr_ctx_t ctx)
 {
@@ -152,19 +153,20 @@ int
 gr_series_write(gr_stream_t out, const gr_series_t x, gr_ctx_t ctx)
 {
     const char * var = GR_SERIES_CTX(ctx)->var;
+    int status = GR_SUCCESS;
 
-    gr_poly_write(out, GR_SERIES_POLY(x), var, GR_SERIES_ELEM_CTX(ctx));
+    status |= gr_poly_write(out, GR_SERIES_POLY(x), var, GR_SERIES_ELEM_CTX(ctx));
 
     if (GR_SERIES_ERROR(x) != GR_SERIES_ERR_EXACT)
     {
-        gr_stream_write(out, " + O(");
-        gr_stream_write(out, var);
-        gr_stream_write(out, "^");
-        gr_stream_write_si(out, GR_SERIES_ERROR(x));
-        gr_stream_write(out, ")");
+        status |= gr_stream_write(out, " + O(");
+        status |= gr_stream_write(out, var);
+        status |= gr_stream_write(out, "^");
+        status |= gr_stream_write_si(out, GR_SERIES_ERROR(x));
+        status |= gr_stream_write(out, ")");
     }
 
-    return GR_SUCCESS;
+    return status;
 }
 
 int
@@ -371,7 +373,7 @@ gr_series_is_zero(const gr_series_t x, gr_ctx_t ctx)
     return T_UNKNOWN;
 }
 
-truth_t
+static truth_t
 _gr_poly_equal2(gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
 {
     truth_t eq, eq2;
@@ -567,6 +569,9 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
     if (xlen == 0 || xerr == 0)
         return GR_UNABLE;
 
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
+
     len = FLINT_MIN(GR_SERIES_PREC(ctx), err);
     err = len;
 
@@ -592,13 +597,16 @@ gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_ctx_t ctx)
 
 /* Todo: optimizations for len == 1 denominator */
 /* Todo: user gr_poly_series_divexact when there is one (currently only basecase) */
-int
+static int
 _gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, int divexact, gr_ctx_t ctx)
 {
     slong len, xlen, ylen, xerr, yerr, err;
     int status = GR_SUCCESS;
     truth_t is_zero;
     slong val;
+
+    if (gr_ctx_is_approx_commutative_ring(ctx) != T_TRUE)
+        return GR_UNABLE;
 
     xlen = GR_SERIES_POLY(x)->length;
     ylen = GR_SERIES_POLY(y)->length;
@@ -962,7 +970,7 @@ gr_series_rsqrt(gr_series_t res, const gr_series_t x, gr_ctx_t ctx)
 }
 
 
-int
+static int
 gr_series_i(gr_series_t res, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -975,7 +983,7 @@ gr_series_i(gr_series_t res, gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 gr_series_pi(gr_series_t res, gr_ctx_t ctx)
 {
     gr_ptr t;
@@ -1016,9 +1024,78 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) \
     return status; \
 } \
 
+#define UNARY_PARAM_POLY_WRAPPER(func) \
+int \
+gr_series_ ## func(gr_series_t res, gr_srcptr p, const gr_series_t x, gr_ctx_t ctx) \
+{ \
+    slong len, xlen, xerr, err; \
+    int status = GR_SUCCESS; \
+ \
+    if (gr_ctx_is_rational_vector_space(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE) \
+        return GR_UNABLE; \
+\
+    xlen = GR_SERIES_POLY(x)->length; \
+    xerr = GR_SERIES_ERROR(x); \
+    err = xerr; \
+ \
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err); \
+    err = len; \
+ \
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT) \
+    { \
+        len = FLINT_MIN(len, 1); \
+        err = GR_SERIES_ERR_EXACT; \
+    } \
+ \
+    GR_SERIES_ERROR(res) = err; \
+    status |= gr_poly_ ## func ## _series(GR_SERIES_POLY(res), p, GR_SERIES_POLY(x), len, GR_SERIES_ELEM_CTX(ctx)); \
+    return status; \
+} \
+
+#define BINARY_UNARY_POLY_WRAPPER(func) \
+int \
+gr_series_ ## func(gr_series_t res1, gr_series_t res2, const gr_series_t x, gr_ctx_t ctx) \
+{ \
+    slong len, xlen, xerr, err; \
+    int status = GR_SUCCESS; \
+ \
+    if (gr_ctx_is_rational_vector_space(GR_SERIES_ELEM_CTX(ctx)) != T_TRUE) \
+        return GR_UNABLE; \
+\
+    xlen = GR_SERIES_POLY(x)->length; \
+    xerr = GR_SERIES_ERROR(x); \
+    err = xerr; \
+ \
+    len = FLINT_MIN(GR_SERIES_PREC(ctx), err); \
+    err = len; \
+ \
+    if (xlen <= 1 && xerr == GR_SERIES_ERR_EXACT) \
+    { \
+        len = FLINT_MIN(len, 1); \
+        err = GR_SERIES_ERR_EXACT; \
+    } \
+ \
+    GR_SERIES_ERROR(res1) = err; \
+    GR_SERIES_ERROR(res1) = err; \
+    status |= gr_poly_ ## func ## _series(GR_SERIES_POLY(res1), GR_SERIES_POLY(res2), GR_SERIES_POLY(x), len, GR_SERIES_ELEM_CTX(ctx)); \
+    return status; \
+} \
+
 UNARY_POLY_WRAPPER(exp)
 UNARY_POLY_WRAPPER(log)
+UNARY_POLY_WRAPPER(sin)
+UNARY_POLY_WRAPPER(cos)
+UNARY_POLY_WRAPPER(sin_pi)
+UNARY_POLY_WRAPPER(cos_pi)
 UNARY_POLY_WRAPPER(tan)
+UNARY_POLY_WRAPPER(tanh)
+UNARY_POLY_WRAPPER(cot)
+UNARY_POLY_WRAPPER(coth)
+UNARY_POLY_WRAPPER(tan_pi)
+UNARY_POLY_WRAPPER(cot_pi)
+
+BINARY_UNARY_POLY_WRAPPER(sin_cos)
+BINARY_UNARY_POLY_WRAPPER(sin_cos_pi)
 
 UNARY_POLY_WRAPPER(asin)
 UNARY_POLY_WRAPPER(acos)
@@ -1026,6 +1103,8 @@ UNARY_POLY_WRAPPER(atan)
 UNARY_POLY_WRAPPER(asinh)
 UNARY_POLY_WRAPPER(acosh)
 UNARY_POLY_WRAPPER(atanh)
+
+UNARY_PARAM_POLY_WRAPPER(bessel_j)
 
 
 #include "arb_poly.h"
@@ -1068,7 +1147,7 @@ static int check_acb(int status, gr_poly_t res)
     return status;
 }
 
-int
+static int
 _gr_series_arb_wrapper1(gr_series_t res, const gr_series_t x, gr_ctx_t ctx, _arb_func_1 arb_func, _acb_func_1 acb_func)
 {
     slong xlen, len, xerr, err;
@@ -1109,7 +1188,7 @@ _gr_series_arb_wrapper1(gr_series_t res, const gr_series_t x, gr_ctx_t ctx, _arb
     return status;
 }
 
-int
+static int
 _gr_series_arb_wrapper_c2_flag(gr_series_t res, const gr_series_t s, const gr_series_t x, int regularized, gr_ctx_t ctx, _arb_func_c2_flag func1, _acb_func_c2_flag func2)
 {
     slong xlen, len, xerr, err;
@@ -1519,7 +1598,7 @@ gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z
     return status;
 }
 
-int
+static int
 _gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const gr_series_t x, gr_ctx_t ctx, int function)
 {
     slong xlen, len, xerr, err;
@@ -1862,15 +1941,16 @@ void gr_series_ctx_clear(gr_ctx_t ctx)
 
 int gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Power series over ");
-    gr_ctx_write(out, GR_SERIES_ELEM_CTX(ctx));
-    gr_stream_write(out, " with precision ");
-    gr_stream_write(out, "O(");
-    gr_stream_write(out, GR_SERIES_CTX(ctx)->var);
-    gr_stream_write(out, "^");
-    gr_stream_write_si(out, GR_SERIES_PREC(ctx));
-    gr_stream_write(out, ")");
-    return GR_SUCCESS;
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Power series over ");
+    status |= gr_ctx_write(out, GR_SERIES_ELEM_CTX(ctx));
+    status |= gr_stream_write(out, " with precision ");
+    status |= gr_stream_write(out, "O(");
+    status |= gr_stream_write(out, GR_SERIES_CTX(ctx)->var);
+    status |= gr_stream_write(out, "^");
+    status |= gr_stream_write_si(out, GR_SERIES_PREC(ctx));
+    status |= gr_stream_write(out, ")");
+    return status;
 }
 
 truth_t
@@ -1909,6 +1989,12 @@ gr_series_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_ctx_is_complex_vector_space(GR_SERIES_ELEM_CTX(ctx));
 }
 
+truth_t
+gr_series_ctx_is_finite_characteristic(gr_ctx_t ctx)
+{
+    return gr_ctx_is_finite_characteristic(GR_SERIES_ELEM_CTX(ctx));
+}
+
 int gr_series_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
 {
     slong len;
@@ -1943,6 +2029,9 @@ _gr_series_ctx_gen_name(char ** name, slong i, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+static gr_ptr _gr_series_ctx_base(gr_ctx_t ctx) { return GR_SERIES_ELEM_CTX(ctx); }
+
+
 int
 gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
 {
@@ -1967,6 +2056,60 @@ gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
     gr_vec_clear(vec1, GR_SERIES_ELEM_CTX(ctx));
 
     return status;
+}
+
+static int
+gr_series_big_o_base_fmpz(gr_series_t res, const gr_series_t base, const fmpz_t exp, gr_ctx_t ctx)
+{
+    gr_ctx_struct * cctx = GR_SERIES_ELEM_CTX(ctx);
+    gr_series_t gen;
+    truth_t is_gen;
+    int status;
+
+    /* Is base the generator of this ring? */
+    gr_series_init(gen, ctx);
+    status = gr_series_gen(gen, ctx);
+    is_gen = gr_series_equal(base, gen, ctx);
+    gr_series_clear(gen, ctx);
+
+    if (status != GR_SUCCESS)
+        return status;
+
+    /* O(y^exp): an inexact zero carrying an outer error of exp. */
+    if (is_gen == T_TRUE)
+    {
+        slong n;
+
+        if (fmpz_sgn(exp) < 0)
+            return GR_UNABLE;
+
+        if (fmpz_cmp_si(exp, GR_SERIES_ERR_MAX) >= 0)
+            n = GR_SERIES_ERR_MAX;
+        else
+            n = fmpz_get_si(exp);   /* todo: should this cap */
+
+        status = gr_series_zero(res, ctx);
+        GR_SERIES_ERROR(res) = n;
+        return status;
+    }
+
+    /* base is a constant of S[[y]] (a coefficient-ring generator promoted via
+       set_scalar): build O(base^exp) in S and lift it back as a constant.
+       The resulting inexact constant lands in the y^0 coefficient only. */
+    if (GR_SERIES_ERROR(base) == GR_SERIES_ERR_EXACT && GR_SERIES_POLY(base)->length == 1)
+    {
+        gr_ptr t;
+        GR_TMP_INIT(t, cctx);
+
+        status |= gr_big_o_base_fmpz(t, GR_SERIES_POLY(base)->coeffs, exp, cctx);
+        if (status == GR_SUCCESS)
+            status = gr_series_set_scalar(res, t, ctx);
+
+        GR_TMP_CLEAR(t, cctx);
+        return status;
+    }
+
+    return GR_UNABLE;
 }
 
 int
@@ -2047,6 +2190,8 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) gr_series_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC, (gr_funcptr) gr_series_ctx_is_finite_characteristic},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) _gr_series_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) gr_series_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) gr_series_swap},
@@ -2061,6 +2206,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_GEN,         (gr_funcptr) gr_series_gen},
     {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_GENS_RECURSIVE,  (gr_funcptr) gr_series_gens_recursive},
+    {GR_METHOD_BIG_O_BASE_FMPZ, (gr_funcptr) gr_series_big_o_base_fmpz},
     {GR_METHOD_SET,         (gr_funcptr) gr_series_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) gr_series_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) gr_series_set_si},
@@ -2081,7 +2227,18 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_I,           (gr_funcptr) gr_series_i},
     {GR_METHOD_EXP,         (gr_funcptr) gr_series_exp},
     {GR_METHOD_LOG,         (gr_funcptr) gr_series_log},
+    {GR_METHOD_SIN,         (gr_funcptr) gr_series_sin},
+    {GR_METHOD_COS,         (gr_funcptr) gr_series_cos},
+    {GR_METHOD_SIN_PI,      (gr_funcptr) gr_series_sin_pi},
+    {GR_METHOD_COS_PI,      (gr_funcptr) gr_series_cos_pi},
+    {GR_METHOD_SIN_COS,     (gr_funcptr) gr_series_sin_cos},
+    {GR_METHOD_SIN_COS_PI,  (gr_funcptr) gr_series_sin_cos_pi},
     {GR_METHOD_TAN,         (gr_funcptr) gr_series_tan},
+    {GR_METHOD_TANH,        (gr_funcptr) gr_series_tanh},
+    {GR_METHOD_COT,         (gr_funcptr) gr_series_cot},
+    {GR_METHOD_COTH,        (gr_funcptr) gr_series_coth},
+    {GR_METHOD_TAN_PI,      (gr_funcptr) gr_series_tan_pi},
+    {GR_METHOD_COT_PI,      (gr_funcptr) gr_series_cot_pi},
     {GR_METHOD_ASIN,        (gr_funcptr) gr_series_asin},
     {GR_METHOD_ACOS,        (gr_funcptr) gr_series_acos},
     {GR_METHOD_ATAN,        (gr_funcptr) gr_series_atan},

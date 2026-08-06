@@ -470,24 +470,24 @@ void doit(gr_ctx_t ctx)
     GR_TMP_INIT3(N, M, E, ctx);
 
     flint_printf("Evaluating N...\n");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     GR_MUST_SUCCEED(gr_set_str(N, EXPR_N, ctx));
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     flint_printf("Evaluating M...\n");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     GR_MUST_SUCCEED(gr_set_str(M, EXPR_M, ctx));
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     flint_printf("Evaluating E = -(1-|M|^2)^2...\n");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     GR_MUST_SUCCEED(gr_abs(E, M, ctx));
     GR_MUST_SUCCEED(gr_pow_ui(E, E, 2, ctx));
     GR_MUST_SUCCEED(gr_sub_si(E, E, 1, ctx));
     GR_MUST_SUCCEED(gr_neg(E, E, ctx));
     GR_MUST_SUCCEED(gr_pow_ui(E, E, 2, ctx));
     GR_MUST_SUCCEED(gr_neg(E, E, ctx));
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     if (status != GR_SUCCESS)
     {
@@ -499,9 +499,9 @@ void doit(gr_ctx_t ctx)
     flint_printf("E ~ "); gr_println(E, ctx);
 
     flint_printf("Testing E = N...\n");
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
     equal = gr_equal(E, N, ctx);
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     flint_printf("\nEqual = ");
     truth_print(equal);
@@ -512,7 +512,7 @@ void doit(gr_ctx_t ctx)
 
 int main(int argc, char *argv[])
 {
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     if (argc >= 2 && strcmp(argv[1], "-ca") == 0)
     {
@@ -532,8 +532,8 @@ int main(int argc, char *argv[])
 
     flint_printf("\n");
     flint_printf("Total: ");
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     flint_cleanup_master();
     return 0;

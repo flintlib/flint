@@ -103,7 +103,7 @@ typedef struct
 bsplit_args_t;
 
 static void
-bsplit_init(bsplit_res_t * x, void * args)
+bsplit_init(bsplit_res_t * x, void * FLINT_UNUSED(args))
 {
     arb_init(&x->P);
     arb_init(&x->Q);
@@ -112,7 +112,7 @@ bsplit_init(bsplit_res_t * x, void * args)
 }
 
 static void
-bsplit_clear(bsplit_res_t * x, void * args)
+bsplit_clear(bsplit_res_t * x, void * FLINT_UNUSED(args))
 {
     arb_clear(&x->P);
     arb_clear(&x->Q);

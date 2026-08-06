@@ -25,13 +25,32 @@ _mpn_mod_poly_mullow_karatsuba_shallow(nn_ptr res, nn_srcptr poly1, slong len1, 
     return _mpn_mod_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, len, FLINT_MIN(len1, len2), ctx);
 }
 
+static int
+_mpn_mod_poly_mulmid_karatsuba_deep(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    return _mpn_mod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, nlo, nhi, 2, ctx);
+}
+
+static int
+_mpn_mod_poly_mulmid_karatsuba_shallow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    return _mpn_mod_poly_mulmid_karatsuba(res, poly1, len1, poly2, len2, nlo, nhi, FLINT_MIN(len1, len2), ctx);
+}
 
 TEST_FUNCTION_START(mpn_mod_poly_mullow_karatsuba, state)
 {
     gr_ctx_t ctx;
     slong iter;
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
+    {
+        gr_ctx_init_mpn_mod_randtest(ctx, state);
+        _gr_poly_test_mulmid((gr_method_poly_binary_trunc2_op) _mpn_mod_poly_mulmid_karatsuba_deep, NULL, state, 10, 40, ctx);
+        _gr_poly_test_mulmid((gr_method_poly_binary_trunc2_op) _mpn_mod_poly_mulmid_karatsuba_shallow, NULL, state, 10, 40, ctx);
+        gr_ctx_clear(ctx);
+    }
+
+    for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
         _gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_karatsuba_deep, NULL, state, 10, 40, ctx);

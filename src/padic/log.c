@@ -14,14 +14,13 @@
 #include "ulong_extras.h"
 
 /*
-    Assumes that $1 \leq v$ or $2 \leq v$ as $p$ is even
-    or odd, respectively, and that $v < N < 2^{f-2}$ where
-    $f$ is \code{FLINT_BITS}.
+    Assumes that $1 \leq v < N < 2^{f-2}$ where $f$ is \code{FLINT_BITS}.
+    (The series $\sum_{i \geq 1} \pm y^i / i$ converges for $v \geq 1$ for every
+    prime $p$, since $i v - \ord_p(i) \geq i - \log_p i \to \infty$.)
 
-    Under the assumption that $1 \leq v < N$, or $2 \leq v < N$,
-    one can easily prove that with $c = N - \floor{\log_p v}$
-    the number $b = \ceil{(c + \ceil{\log_p c} + 1) / b}$ is such
-    that for all $i \geq b$, $i v - \ord_p(i) \geq N$.
+    Under the assumption that $1 \leq v < N$, one can easily prove that with
+    $c = N - \floor{\log_p v}$ the number $b = \ceil{(c + \ceil{\log_p c} + 1) / b}$
+    is such that for all $i \geq b$, $i v - \ord_p(i) \geq N$.
 
     Under the additional condition that $N < 2^{f-2}$ one can
     show that the code branch for primes that fit into a
@@ -118,7 +117,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             v = fmpz_remove(t, x, p);
             fmpz_clear(t);
 
-            if (v >= 2 || (!fmpz_equal_ui(p, 2) && v >= 1))
+            if (v >= 1)
             {
                 if (v >= N)
                 {

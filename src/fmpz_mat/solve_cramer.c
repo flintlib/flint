@@ -17,7 +17,7 @@
 #define BB(i,j) fmpz_mat_entry(B, i, j)
 #define XX(i,j) fmpz_mat_entry(X, i, j)
 
-int
+static int
 _fmpz_mat_solve_cramer_3x3(fmpz_mat_t X, fmpz_t den,
     const fmpz_mat_t A, const fmpz_mat_t B)
 {

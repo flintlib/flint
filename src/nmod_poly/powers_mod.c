@@ -32,7 +32,7 @@ typedef struct
 #endif
 } powers_preinv_arg_t;
 
-void
+static void
 _nmod_poly_powers_mod_preinv_worker(void * arg_ptr)
 {
     powers_preinv_arg_t arg = *((powers_preinv_arg_t *) arg_ptr);

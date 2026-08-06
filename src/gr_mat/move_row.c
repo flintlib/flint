@@ -16,7 +16,7 @@
 int gr_mat_move_row(gr_mat_t A, slong i, slong new_i, gr_ctx_t ctx)
 {
     gr_ptr tmp;
-    slong c = A->c, r = A->c;
+    slong c = A->c, r = A->r;
     slong sz = ctx->sizeof_elem;
     slong j;
 

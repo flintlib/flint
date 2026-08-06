@@ -230,7 +230,7 @@ Assignment, swap, negation
 .. function:: void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x)
 
     Sets ``poly`` to the rational `x`, which is assumed to be
-    given in lowest terms.
+    given in lowest terms, which is not checked.
 
 .. function:: void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
 
@@ -247,14 +247,15 @@ Assignment, swap, negation
     Sets the coefficients of ``rop`` to the coefficients in the denominator of ``op``,
     reduced by the modulus of ``rop``. The result is multiplied by the inverse of the
     denominator of ``op``. It is assumed that the reduction of the denominator of ``op``
-    is invertible.
+    is invertible, which is not checked.
 
 .. function:: void fmpq_poly_get_nmod_poly_den(nmod_poly_t rop, const fmpq_poly_t op, int den)
 
     Sets the coefficients of ``rop`` to the coefficients in the denominator
     of ``op``, reduced by the modulus of ``rop``. If ``den == 1``, the result is
     multiplied by the inverse of the denominator of ``op``. In this case it is
-    assumed that the reduction of the denominator of ``op`` is invertible.
+    assumed that the reduction of the denominator of ``op`` is invertible,
+    which is not checked.
 
 .. function:: int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)
 
@@ -866,14 +867,15 @@ Power series division
 
     The result is produced in canonical form.
 
-    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term.
+    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term;
+    this is not checked.
     Does not support aliasing.
 
 .. function:: void fmpq_poly_inv_series_newton(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     Computes the first `n` terms of the inverse power series
     of ``poly`` using Newton iteration, assuming that ``poly``
-    has non-zero constant term and `n \geq 1`.
+    has non-zero constant term and `n \geq 1`; this is not checked.
 
 .. function:: void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong den_len, slong n)
 
@@ -882,19 +884,21 @@ Power series division
 
     The result is produced in canonical form.
 
-    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term.
+    Assumes that `n \geq 1` and that ``poly`` has non-zero constant term;
+    this is not checked.
     Does not support aliasing.
 
 .. function:: void fmpq_poly_inv_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     Computes the first `n` terms of the inverse power series of ``poly``,
-    assuming that ``poly`` has non-zero constant term and `n \geq 1`.
+    assuming that ``poly`` has non-zero constant term and `n \geq 1`;
+    this is not checked.
 
 .. function:: void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, const fmpz * A, const fmpz_t denA, slong lenA, const fmpz * B, const fmpz_t denB, slong lenB, slong n)
 
     Divides ``(A, denA, lenA)`` by ``(B, denB, lenB)`` as power series
     over `\mathbb{Q}`, assuming `B` has non-zero constant term and that
-    all lengths are positive.
+    all lengths are positive. The constant term is not checked.
 
     Aliasing is not supported.
 
@@ -906,7 +910,7 @@ Power series division
     Performs power series division in `\mathbb{Q}[[x]] / (x^n)`.  The function
     considers the polynomials `A` and `B` as power series of length `n`
     starting with the constant terms.  The function assumes that `B` has
-    non-zero constant term and `n \geq 1`.
+    non-zero constant term and `n \geq 1`. The constant term is not checked.
 
 
 Greatest common divisor
@@ -1063,6 +1067,14 @@ Derivative and integral
     term is set to zero. In particular, the integral of the zero
     polynomial is the zero polynomial.
 
+.. function:: void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len, slong m)
+
+    Sets ``(rpoly, rden, len)`` to the offset integral of
+    ``(poly, den, len1)`` mapping $c_k$ to $c_k / (k + m)$.
+    Assumes ``len >= 0``.
+    Supports aliasing between the two polynomials.
+    The output will be in canonical form if the input is
+    in canonical form.
 
 Square roots
 --------------------------------------------------------------------------------
@@ -1317,6 +1329,11 @@ Transcendental functions
     Sets ``res`` to the series expansion of the hyperbolic tangent of
     ``f`` to order ``n > 0``. Requires ``f`` to have constant term 0.
 
+.. function:: void _fmpq_poly_sin_cos_series_basecase(fmpz * S, fmpz_t Sden, fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n)
+              void _fmpq_poly_sin_cos_series_newton(fmpz * S, fmpz_t Sden, fmpz * C, fmpz_t Cden, const fmpz * h, const fmpz_t hden, slong hlen, slong cutoff, slong n)
+
+    Alternative algorithms implementing :func:`_fmpq_poly_sin_cos_series`.
+
 
 Orthogonal polynomials
 --------------------------------------------------------------------------------
@@ -1516,8 +1533,6 @@ Power series composition
     of the inputs and the output.
 
     This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
-    The default ``fmpz_poly`` composition algorithm is automatically
-    used when the composition can be performed over the integers.
 
 .. function:: void fmpq_poly_compose_series_brent_kung(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
@@ -1526,8 +1541,25 @@ Power series composition
     to be zero.
 
     This implementation uses Brent-Kung algorithm 2.1 [BrentKung1978]_.
-    The default ``fmpz_poly`` composition algorithm is automatically
-    used when the composition can be performed over the integers.
+
+.. function:: void _fmpq_poly_compose_series_kinoshita_li(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
+
+    Sets ``(res, den, n)`` to the composition of
+    ``(poly1, den1, len1)`` and ``(poly2, den2, len2)`` modulo `x^n`,
+    where the constant term of ``poly2`` is required to be zero.
+
+    Assumes that ``len1, len2, n > 0``, that ``len1, len2 <= n``,
+    and that ``res`` has space for ``n`` coefficients.
+
+    This implementation uses the Kinoshita-Li algorithm [KL2024]_.
+
+.. function:: void fmpq_poly_compose_series_kinoshita_li(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
+
+    Sets ``res`` to the composition of ``poly1`` and ``poly2``
+    modulo `x^n`, where the constant term of ``poly2`` is required
+    to be zero.
+
+    This implementation uses the Kinoshita-Li algorithm [KL2024]_.
 
 .. function:: void _fmpq_poly_compose_series(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2, slong n)
 
@@ -1540,10 +1572,10 @@ Power series composition
     space for ``n`` coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation automatically switches between the Horner scheme
-    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
-    The default ``fmpz_poly`` composition algorithm is automatically
-    used when the composition can be performed over the integers.
+    This implementation automatically switches between the Horner scheme,
+    Brent-Kung algorithm 2.1 and the Kinoshita-Li algorithm depending on the
+    size of the inputs. The default ``fmpz_poly`` composition algorithm is
+    automatically used when the composition can be performed over the integers.
 
 .. function:: void fmpq_poly_compose_series(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 
@@ -1641,7 +1673,8 @@ Power series reversion
     the linear term is required to be nonzero. Assumes that `n > 0`.
     Does not support aliasing between any of the inputs and the output.
 
-    This implementation defaults to using Newton iteration.
+    This implementation chooses between fast Lagrange inversion and
+    Newton iteration depending on the inputs.
     The default ``fmpz_poly`` reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
@@ -1651,7 +1684,8 @@ Power series reversion
     The constant term of ``poly2`` is required to be zero and
     the linear term is required to be nonzero.
 
-    This implementation defaults to using Newton iteration.
+    This implementation chooses between fast Lagrange inversion and
+    Newton iteration depending on the inputs.
     The default ``fmpz_poly`` reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 

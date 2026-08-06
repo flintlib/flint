@@ -678,6 +678,7 @@ void fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
         const fmpz_mod_mpoly_t A, fmpz_mod_mpoly_struct * const * B, slong len,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
+
 /* Square root ***************************************************************/
 
 int fmpz_mod_mpoly_sqrt_heap(fmpz_mod_mpoly_t Q,
@@ -710,6 +711,9 @@ int fmpz_mod_mpoly_quadratic_root(fmpz_mod_mpoly_t Q,
 
 void fmpz_mod_mpoly_term_content(fmpz_mod_mpoly_t M,
                      const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_monic_part(fmpz_mod_mpoly_t res, 
+    const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx);
 
 int fmpz_mod_mpoly_content_vars(fmpz_mod_mpoly_t g,
                     const fmpz_mod_mpoly_t A, slong * vars, slong vars_length,
@@ -945,6 +949,67 @@ void fmpz_mod_mpoly_from_mpolyl_perm_inflate(fmpz_mod_mpoly_t A,
                 flint_bitcnt_t Abits, const fmpz_mod_mpoly_ctx_t ctx,
                 const fmpz_mod_mpoly_t B, const fmpz_mod_mpoly_ctx_t lctx,
                 const slong * perm, const ulong * shift, const ulong * stride);
+
+
+/* Vectors of multivariate polynomials */
+
+typedef struct
+{
+    fmpz_mod_mpoly_struct * p;
+    slong alloc;
+    slong length;
+}
+fmpz_mod_mpoly_vec_struct;
+
+typedef fmpz_mod_mpoly_vec_struct fmpz_mod_mpoly_vec_t[1];
+
+#define fmpz_mod_mpoly_vec_entry(vec, i) ((vec)->p + (i))
+
+void fmpz_mod_mpoly_vec_init(fmpz_mod_mpoly_vec_t vec, slong len, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_vec_print(const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_vec_swap(fmpz_mod_mpoly_vec_t x, fmpz_mod_mpoly_vec_t y, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mod_mpoly_vec_fit_length(fmpz_mod_mpoly_vec_t vec, slong len, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_vec_clear(fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_vec_set(fmpz_mod_mpoly_vec_t dest, const fmpz_mod_mpoly_vec_t src, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_vec_append(fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx);
+slong fmpz_mod_mpoly_vec_insert_unique(fmpz_mod_mpoly_vec_t vec, const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_vec_set_length(fmpz_mod_mpoly_vec_t vec, slong len, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_vec_randtest_not_zero(fmpz_mod_mpoly_vec_t vec, flint_rand_t state, slong len, slong poly_len, ulong exp_bound, fmpz_mod_mpoly_ctx_t ctx);
+
+
+/* Ideals and Groenber bases */
+
+void fmpz_mod_mpoly_spoly(fmpz_mod_mpoly_t res, 
+    const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_t g, const fmpz_mod_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_reduction_monic_part(fmpz_mod_mpoly_t res, 
+    const fmpz_mod_mpoly_t f, const fmpz_mod_mpoly_vec_t Iv, const fmpz_mod_mpoly_ctx_t ctx);
+
+int fmpz_mod_mpoly_vec_is_groebner(const fmpz_mod_mpoly_vec_t G, 
+    const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_vec_set_monic_unique(fmpz_mod_mpoly_vec_t G, 
+    const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx);
+
+int fmpz_mod_mpoly_buchberger_naive_with_limits(fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_vec_t F,
+    slong ideal_len_limit, slong poly_len_limit, const fmpz_mod_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_buchberger_naive(fmpz_mod_mpoly_vec_t G, 
+    const fmpz_mod_mpoly_vec_t F, const fmpz_mod_mpoly_ctx_t ctx);
+
+int fmpz_mod_mpoly_vec_is_autoreduced(const fmpz_mod_mpoly_vec_t G, 
+    const fmpz_mod_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_vec_autoreduction_groebner(fmpz_mod_mpoly_vec_t H, 
+    const fmpz_mod_mpoly_vec_t G, const fmpz_mod_mpoly_ctx_t ctx);
+
+/* Convert to/from fmpz_mpoly */
+
+void fmpz_mod_mpoly_set_fmpz_mpoly(fmpz_mod_mpoly_t res, 
+    const fmpz_mpoly_t f, fmpz_mod_mpoly_ctx_t ctxm, fmpz_mpoly_ctx_t ctx);
+
+void fmpz_mod_mpoly_get_fmpz_mpoly(fmpz_mpoly_t res, 
+    const fmpz_mod_mpoly_t f, fmpz_mpoly_ctx_t ctx);
 
 
 /******************************************************************************

@@ -82,7 +82,7 @@ the interfaces might change in a future version.
 
 .. function:: void flint_parallel_do(do_func_t f, void * args, slong n, int thread_limit, int flags)
 
-    Evaluate ``f(i, args)`` for `0 \le i < n - 1` in parallel using
+    Evaluate ``f(i, args)`` for `0 \le i < n` in parallel using
     up to ``thread_limits`` threads (including the master thread).
     If *thread_limit* is nonpositive, the number of threads defaults to
     ``flint_get_num_threads()``.

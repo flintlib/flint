@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mag.h"
 #include "acb_poly.h"
+#include "acb_poly/impl.h"
 
 void
 _acb_sinc_jet_zero(acb_ptr res, const acb_t z, slong len, slong prec)

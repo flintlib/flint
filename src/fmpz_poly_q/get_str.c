@@ -20,7 +20,7 @@
  */
 char * fmpz_poly_q_get_str(const fmpz_poly_q_t op)
 {
-    int i, j;
+    size_t i, j;
     char * str;
     char * numstr;
     char * denstr;

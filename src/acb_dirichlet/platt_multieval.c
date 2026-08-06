@@ -10,9 +10,19 @@
 */
 
 #include "fmpz_vec.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
+#include "acb_dirichlet/impl.h"
 #include "arb_hypgeom.h"
 #include "acb_dft.h"
+
+FLINT_FORCE_INLINE void
+_acb_vec_kronecker_mul(acb_ptr z, acb_srcptr x, acb_srcptr y, slong len, slong prec)
+{
+    slong k;
+    for (k = 0; k < len; k++)
+        acb_mul(z + k, x + k, y + k, prec);
+}
 
 static void
 _acb_dot_arb(acb_t res, const acb_t initial, int subtract,
@@ -207,8 +217,7 @@ _acb_vec_scalar_add_error_arb_mag(acb_ptr res, slong len, const arb_t x)
  * For each integer m in [0, A*B) find the smallest integer j such that
  * log(j*sqrt(pi))/(2*pi) >= m/B - 1/(2*B)
  */
-void
-get_smk_points(fmpz * res, slong A, slong B)
+void get_smk_points(fmpz * res, slong A, slong B)
 {
     slong m, N, prec;
     arb_t x, u, v;
@@ -253,8 +262,7 @@ get_smk_points(fmpz * res, slong A, slong B)
     fmpz_clear(z);
 }
 
-slong
-platt_get_smk_index(slong B, const fmpz_t j, slong prec)
+slong platt_get_smk_index(slong B, const fmpz_t j, slong prec)
 {
     slong m;
     arb_t pi, x;

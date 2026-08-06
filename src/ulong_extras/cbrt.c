@@ -249,7 +249,7 @@ n_cbrt_estimate(double a)
     } uni;
 
     uni alias;
-    ulong n, hi, lo;
+    ulong n;
 
 #ifdef FLINT64
     const ulong mul_factor = UWORD(6148914691236517205);
@@ -262,8 +262,7 @@ n_cbrt_estimate(double a)
     alias.double_val = a;
     n = alias.uword_val;
     n -= s;
-    umul_ppmm(hi, lo, n, mul_factor);
-    n = hi;
+    n = n_mulhi(n, mul_factor);
     n += s;
     alias.uword_val = n;
     return alias.double_val;

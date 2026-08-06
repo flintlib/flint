@@ -57,8 +57,10 @@ _nmod_mat_scalar_addmul_ui_precomp(nmod_mat_t C, const nmod_mat_t A, const nmod_
 
 void
 nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
-                          const ulong c)
+                          ulong c)
 {
+    c = nmod_set_ui(c, C->mod);
+
     if (c == UWORD(0))
         nmod_mat_set(C, A);
     else if (c == UWORD(1))

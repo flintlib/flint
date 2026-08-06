@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
     fmpz_set(n, nstart);
     fmpz_zero(count);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     /* This is the low height method. */
     if (noplatt)
@@ -280,8 +280,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     _arb_vec_clear(p, buffersize);
     fmpz_clear(nstart);

@@ -127,46 +127,6 @@ _fmpz_vec_scalar_addmul_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
 }
 
 void
-_fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
-                               slong len2, const fmpz_t x)
-{
-    fmpz c = *x;
-
-    if (!COEFF_IS_MPZ(c))
-    {
-        if (c == 1)
-            _fmpz_vec_set(vec1, vec2, len2);
-        else if (c == -1)
-            _fmpz_vec_neg(vec1, vec2, len2);
-        else
-            _fmpz_vec_scalar_divexact_si(vec1, vec2, len2, c);
-    }
-    else
-    {
-        slong i;
-        for (i = 0; i < len2; i++)
-            fmpz_divexact(vec1 + i, vec2 + i, x);
-    }
-}
-
-void
-_fmpz_vec_scalar_divexact_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
-{
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_divexact_si(vec1 + i, vec2 + i, c);
-}
-
-void
-_fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2,
-                             slong len2, ulong c)
-{
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_divexact_ui(vec1 + i, vec2 + i, c);
-}
-
-void
 _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, slong len2,
                              ulong exp)
 {
@@ -209,6 +169,8 @@ _fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, const fmpz * vec2, slong len2,
         fmpz_fdiv_r_2exp(vec1 + i, vec2 + i, exp);
 }
 
+/* todo: preinvert p when appropriate; or better, make sure we don't
+   call this function in places where we have an fmpz_mod */
 void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
 {
     slong i;
@@ -267,6 +229,7 @@ _fmpz_vec_scalar_mul_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
         fmpz_mul_ui(vec1 + i, vec2 + i, c);
 }
 
+/* todo: preinvert p when appropriate */
 void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz_t p)
 {
     slong i;

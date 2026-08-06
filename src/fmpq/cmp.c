@@ -115,7 +115,6 @@ _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c)
 {
     int s1, s2, res;
     flint_bitcnt_t bp, bq, bc;
-    slong d;
     fmpz_t u;
 
     if (fmpz_is_one(q))
@@ -138,7 +137,7 @@ _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c)
     }
 
     s1 = fmpz_sgn(p);
-    s2 = c > 0 ? 1 : (c < 0 ? -1 : 0);
+    s2 = FLINT_SGN(c);
 
     if (s1 != s2)
         return s1 < s2 ? -1 : 1;
@@ -148,21 +147,13 @@ _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c)
 
     bp = fmpz_bits(p);
     bq = fmpz_bits(q);
+    bc = FLINT_BIT_COUNT(FLINT_UABS(c));
 
-    d = -c;
+    if (bp + 2 < bc + bq)
+        return -s1;
 
-    if (c != d) /* check for SLONG_MIN */
-    {
-        d = c < 0 ? -c : c;
-
-        bc = FLINT_BIT_COUNT(d);
-
-        if (bp + 2 < bc + bq)
-            return -s1;
-
-        if (bp > bc + bq)
-            return s1;
-    }
+    if (bp > bc + bq)
+        return s1;
 
     fmpz_init(u);
 

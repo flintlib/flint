@@ -51,7 +51,7 @@ _nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t
     nf_elem_canonicalise(res, nf);
 }
 
-void
+static void
 _nf_elem_mod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den, int sign)
 {
     if (!den || nf_elem_den_is_one(a, nf))
@@ -135,7 +135,7 @@ _fmpz_ppio(fmpz_t ppi, fmpz_t ppo, const fmpz_t a, const fmpz_t b)
     fmpz_clear(g);
 }
 
-void
+static void
 _nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int sign)
 {
     if (nf_elem_is_zero(a, nf))

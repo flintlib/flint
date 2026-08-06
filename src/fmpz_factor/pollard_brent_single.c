@@ -170,7 +170,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
 {
     nn_ptr a, y, n, ninv, temp;
     ulong n_size, normbits, ans, size, cy;
-    ulong al, yl, val, valinv;
+    ulong al, yl, val;
     mpz_ptr fac, mptr;
     int ret;
 
@@ -187,17 +187,9 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     if (n_size == 1)
     {
         val = fmpz_get_ui(n_in);
-        normbits = flint_clz(val);
-        val <<= normbits;
-        valinv = n_preinvert_limb(val);
-
         al = fmpz_get_ui(ai);
         yl = fmpz_get_ui(yi);
-        al <<= normbits;
-        yl <<= normbits;
-
-        ret = n_factor_pollard_brent_single(&ans, val, valinv, al, yl, normbits, max_iters);
-        ans >>= normbits;
+        ret = n_factor_pollard_brent_single(&ans, val, al, yl, max_iters);
         fmpz_set_ui(p_factor, ans);
         return ret;
     }

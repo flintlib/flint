@@ -17,7 +17,7 @@
 #include "fmpz_mod_poly.h"
 #include "fq.h"
 
-void
+static void
 _fq_inv(fmpz * rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 {
     const slong d = fq_ctx_degree(ctx);

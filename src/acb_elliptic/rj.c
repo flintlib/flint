@@ -57,7 +57,7 @@ static inline slong rj_fdiv(slong x, slong y)
         return x / y;
 }
 
-void
+static void
 acb_elliptic_rj_taylor_sum(acb_t res, const acb_t E2, const acb_t E3,
                 const acb_t E4, const acb_t E5, slong nterms, slong prec)
 {

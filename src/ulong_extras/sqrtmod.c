@@ -83,11 +83,7 @@ ulong n_sqrtmod(ulong a, ulong p)
 
     b = n_powmod2_ui_preinv(a, p1, p, pinv);
 
-    for (k = 3; ; k+=2) /* 2 is a quadratic residue mod p = 8k + 1 */
-    {
-        if (n_jacobi_unsigned(k, p) == -1) break;
-    }
-
+    k = n_quadratic_nonresidue(p);
     g = n_powmod2_ui_preinv(k, p1, p, pinv);
     res = n_powmod2_ui_preinv(a, (p1 + 1) / 2, p, pinv);
 

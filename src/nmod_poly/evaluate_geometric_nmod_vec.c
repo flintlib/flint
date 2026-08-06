@@ -1,0 +1,138 @@
+/*
+    Copyright (C) 2025, Vincent Neiger, Éric Schost
+    Copyright (C) 2025, Mael Hostettler
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#include "nmod.h"
+#include "nmod_poly.h"
+#include "nmod_vec.h"
+#if FLINT_HAVE_FFT_SMALL
+#  include "fft_small.h"
+#endif
+
+void _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly, slong plen,
+                                                         const nmod_geometric_progression_t G, slong len,
+                                                         nmod_t mod)
+{
+    FLINT_ASSERT(G->function & 1);
+    FLINT_ASSERT(len <= G->len);
+
+    /* val = valuation of poly */
+    slong val = 0;
+    for ( ; val < plen; val++)
+    {
+        if (poly[val] != 0)
+        {
+            break;
+        }
+    }
+
+    if (val == plen) /* covers the case plen == 0 */
+    {
+        _nmod_vec_zero(vs, len);
+        return;
+    }
+
+    /** Formula, based on Bluestein's trick:
+     * poly(q**j) = sum_{i=0}^{n-1} poly[i] q**{i*j}  is the coefficient x**{n+j-1} of the product
+     *     (sum_{i=0}^{len-1} poly[i] * q**(-i*i / 2) x**{len-i-1}) * (sum_{i=0}^{2*len-2} q**{i*i/2} x**i)
+     * -> the right-hand polynomial is G->ev_f truncated at precision 2*len - 1
+     * -> the inverses q**(-i*i / 2) are the first len values stored in G->ev_s
+     * 
+     * Thus, goal is to compute [rev(p) * G->ev_f]_{plen - 1}^{len}, where p is poly scaled by G->ev_s
+     * (the bracket notation means coefficients [plen - 1, plen - 1 + len))
+     * If p has valuation val, define a = p / x**val of length alen = plen - val, and this becomes
+     * [rev(a) * (G->ev_f >> x**val)]_{alen - 1}^{len}  (that is, coeffs [alen - 1, alen - 1 + len))
+     */
+
+    /* below are 2 different versions (one requiring fft_small) */
+    /* TODO some optimization needed in mulmid: */
+    /* mulmid is often excellent, but fft_small variant still useful */
+
+    const slong alen = plen - val;
+
+    /* this uses a middle product to compute [rev(p) * G->ev_f]_{plen - 1}^{len}  (i.e. coeffs [plen - 1, plen - 1 + len)) */
+#if FLINT_HAVE_FFT_SMALL
+    if (2 * (plen - val) - 2 + len > 192)
+    {
+        /* uses fft_small directly */
+        /* 2025-12-04: fastest in medium and large lengths, like 100 and more */
+        /* 2026-05-03: still useful for some short range where mulmid is not yet good */
+        nn_ptr b = _nmod_vec_init(alen + len - 1);
+
+        for (slong i = val; i < plen; i++)
+            b[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
+
+        _nmod_poly_mul_mid_default_mpn_ctx(b, alen - 1, alen - 1 + len, G->ev_f->coeffs + val, alen - 1 + len, b, alen, mod);
+
+        for (slong i = 0; i < len; i++)
+            vs[i] = nmod_mul(G->ev_s[i], b[i], mod);
+
+        _nmod_vec_clear(b);
+    }
+    else
+#endif
+    {
+        /* uses nmod_poly_mulmid */
+        /* 2025-12-04: disabled: nmod_poly_mulhigh/mulmid not yet optimized */
+        /* 2026-05-03: best method, much better than fft_small for small parameters, */
+        /*             but also sometimes quite slower for some parameter ranges    */
+        nn_ptr a = _nmod_vec_init(alen);
+        nn_ptr b = _nmod_vec_init(alen - 1 + len);
+
+        for (slong i = val; i < plen; i++)
+            a[plen - 1 - i] = nmod_mul(G->ev_s[i], poly[i], mod);
+
+        _nmod_poly_mulmid(b, G->ev_f->coeffs + val, alen - 1 + len, a, alen, alen - 1, alen - 1 + len, mod);
+
+        for (slong i = 0; i < len; i++)
+            vs[i] = nmod_mul(G->ev_s[i], b[i], mod);
+
+        _nmod_vec_clear(a);
+        _nmod_vec_clear(b);
+    }
+}
+
+void _nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, slong plen, ulong r, slong n, nmod_t mod)
+{
+    if (n == 0)
+        return;
+
+    nmod_geometric_progression_t G;
+    _nmod_geometric_progression_init_function(G, r, FLINT_MAX(n, plen), mod, UWORD(1));
+    _nmod_poly_evaluate_geometric_nmod_vec_fast_precomp(ys, poly, plen, G, n, mod);
+    nmod_geometric_progression_clear(G);
+}
+
+void nmod_poly_evaluate_geometric_nmod_vec_fast(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
+{
+    _nmod_poly_evaluate_geometric_nmod_vec_fast(ys, poly->coeffs,
+                                                poly->length, r, n, poly->mod);
+}
+
+void _nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len, ulong r, slong n, nmod_t mod)
+{
+    slong i;
+    ulong rpow = 1;
+
+    ulong r2 = nmod_mul(r, r, mod);
+
+    for (i = 0; i < n; i++)
+    {
+        ys[i] = _nmod_poly_evaluate_nmod(coeffs, len, rpow, mod);
+        rpow = nmod_mul(rpow, r2, mod);
+    }
+}
+
+void nmod_poly_evaluate_geometric_nmod_vec_iter(nn_ptr ys, const nmod_poly_t poly, ulong r, slong n)
+{
+    _nmod_poly_evaluate_geometric_nmod_vec_iter(ys, poly->coeffs,
+                                        poly->length, r, n, poly->mod);
+}

@@ -13,39 +13,39 @@
 #include "padic.h"
 #include "padic_poly.h"
 
-void padic_poly_set_fmpq_poly(padic_poly_t f,
-                              const fmpq_poly_t g, const padic_ctx_t ctx)
+void padic_poly_set_fmpq_poly(padic_poly_t rop,
+                              const fmpq_poly_t op, const padic_ctx_t ctx)
 {
-    const slong len = g->length;
+    const slong len = op->length;
 
     if (len == 0)
     {
-        padic_poly_zero(f);
+        padic_poly_zero(rop);
     }
     else
     {
-        const slong N = padic_poly_prec(f);
+        const slong N = padic_poly_prec(rop);
         fmpz_t t;
 
         fmpz_init(t);
 
-        f->val = - fmpz_remove(t, g->den, ctx->p);
+        rop->val = - fmpz_remove(t, op->den, ctx->p);
 
-        if (f->val < N)
+        if (rop->val < N)
         {
-            padic_poly_fit_length(f, len);
-            _padic_poly_set_length(f, len);
+            padic_poly_fit_length(rop, len);
+            _padic_poly_set_length(rop, len);
 
-            _padic_inv(t, t, ctx->p, N - f->val);
-            _fmpz_vec_scalar_mul_fmpz(f->coeffs, g->coeffs, len, t);
-            if (f->val == 0)
-                padic_poly_canonicalise(f, ctx->p);
+            _padic_inv(t, t, ctx->p, N - rop->val);
+            _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, len, t);
+            if (rop->val == 0)
+                padic_poly_canonicalise(rop, ctx->p);
 
-            padic_poly_reduce(f, ctx);
+            padic_poly_reduce(rop, ctx);
         }
         else
         {
-            padic_poly_zero(f);
+            padic_poly_zero(rop);
         }
 
         fmpz_clear(t);

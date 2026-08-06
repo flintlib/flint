@@ -14,7 +14,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** polyq,
+static slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                      ulong * const * exp3, slong len, slong bits,
@@ -298,7 +298,7 @@ exp_overflow:
 
 
 
-slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** polyq,
+static slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                      ulong * const * exp3, slong len, slong N, slong bits,
@@ -497,10 +497,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
         {
             int divides;
 
-            if (bits <= FLINT_BITS)
-                divides = mpoly_monomial_divides(texp, exp, exp3[w] + N*0, N, mask);
-            else
-                divides = mpoly_monomial_divides_mp(texp, exp, exp3[w] + N*0, N, bits);
+            divides = mpoly_monomial_divides_any_bits(texp, exp, exp3[w] + N*0, N, mask, bits);
 
             if (divides)
             {
@@ -670,9 +667,7 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
 
     exp_bits = mpoly_fix_bits(exp_bits, ctx->minfo);
 
-    N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, exp_bits, ctx->minfo);
 
     /* ensure input exponents packed to same size as output exponents */
     exp2 = poly2->exps;
@@ -746,13 +741,10 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
         if (lenr >= 0) /* check if division was successful */
             break;
 
-        exp_bits = mpoly_fix_bits(exp_bits + 1, ctx->minfo);
-        N = mpoly_words_per_exp(exp_bits, ctx->minfo);
-        cmpmask = (ulong *) flint_realloc(cmpmask, N*sizeof(ulong));
-        mpoly_get_cmpmask(cmpmask, N, exp_bits, ctx->minfo);
-
-        exp2 = (ulong *) flint_malloc(N*poly2->length*sizeof(ulong));
-        mpoly_repack_monomials(exp2, exp_bits, old_exp2, old_exp_bits,
+        exp2 = mpoly_monomials_repack_wider_cmpmask(&exp_bits,
+                                                    &N, &cmpmask, old_exp2,
+                                                    old_exp_bits,
+                                                    poly2->length,
                                                     poly2->length, ctx->minfo);
 
         if (free2)

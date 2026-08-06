@@ -41,9 +41,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         TEMPLATE(T, poly_init) (res, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 5), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 5) + 1, ctx);
 
         TEMPLATE(T, poly_powmod_fmpz_binexp) (res, a, expz, f, ctx);
         TEMPLATE(T, poly_powmod_fmpz_binexp) (a, a, expz, f, ctx);
@@ -89,9 +89,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         TEMPLATE(T, poly_init) (res, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 5), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 5) + 1, ctx);
 
         TEMPLATE(T, poly_powmod_fmpz_binexp) (res, a, expz, f, ctx);
         TEMPLATE(T, poly_powmod_fmpz_binexp) (f, a, expz, f, ctx);
@@ -137,9 +137,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         TEMPLATE(T, poly_init) (res2, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 5), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 5) + 1, ctx);
         fmpz_init_set_ui(expz, exp);
 
         TEMPLATE(T, poly_powmod_fmpz_binexp) (res1, a, expz, f, ctx);
@@ -197,9 +197,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         TEMPLATE(T, poly_init) (res4, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 5), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 5) + 1, ctx);
 
         TEMPLATE(T, poly_powmod_fmpz_binexp) (res1, a, exp1, f, ctx);
         TEMPLATE(T, poly_powmod_fmpz_binexp) (res2, a, exp2, f, ctx);

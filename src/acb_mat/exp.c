@@ -13,10 +13,9 @@
 #include "fmpz_mat.h"
 #include "bool_mat.h"
 #include "arb_mat.h"
+#include "arb_mat/impl.h"
 #include "acb.h"
 #include "acb_mat.h"
-
-slong _arb_mat_exp_choose_N(const mag_t norm, slong prec);
 
 static slong
 _acb_mat_count_is_zero(const acb_mat_t A)
@@ -128,7 +127,10 @@ acb_mat_exp(acb_mat_t B, const acb_mat_t A, slong prec)
         q = pow(wp, 0.25);  /* wanted magnitude */
 
         if (mag_cmp_2exp_si(norm, 2 * wp) > 0) /* too big */
-            r = 2 * wp;
+        {
+            acb_mat_indeterminate(B);
+            goto cleanup;
+        }
         else if (mag_cmp_2exp_si(norm, -q) < 0) /* tiny, no need to reduce */
             r = 0;
         else
@@ -186,6 +188,7 @@ acb_mat_exp(acb_mat_t B, const acb_mat_t A, slong prec)
                 acb_set_round(acb_mat_entry(B, i, j),
                     acb_mat_entry(B, i, j), prec);
 
+cleanup:
         mag_clear(norm);
         mag_clear(err);
         acb_mat_clear(T);

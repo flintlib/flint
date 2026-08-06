@@ -37,7 +37,10 @@ TEST_FUNCTION_START(acb_dirichlet_hurwitz_precomp, state)
         acb_init(z1);
         acb_init(z2);
 
-        acb_randtest(s, state, 1 + n_randint(state, 200), 2);
+        if (n_randint(state, 4))
+            acb_randtest_precise(s, state, 1 + n_randint(state, 200), 2);
+        else
+            acb_randtest(s, state, 1 + n_randint(state, 200), 2);
 
         acb_dirichlet_hurwitz_precomp_init(pre, s, deflate, A, K, N, prec1);
 

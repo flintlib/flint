@@ -154,7 +154,7 @@ gr_generic_pow_ui_sliding(gr_ptr f, gr_srcptr g, ulong pow, gr_ctx_t ctx)
 }
 
 /* Assumes exp >= 2; res and tmp not not aliased with x. */
-int
+static int
 _gr_generic_pow_ui_binexp(gr_ptr res, gr_ptr tmp, gr_srcptr x, ulong exp, gr_ctx_t ctx)
 {
     gr_ptr R, S, T;

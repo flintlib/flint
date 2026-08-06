@@ -88,31 +88,31 @@ main(int argc, char * argv[])
             }
 
             flint_printf("%wd  %wd  default ", len, bits);
-            TIMEIT_START
+            TIMEIT_START;
             fmpz_poly_taylor_shift(g, f, d);
-            TIMEIT_STOP
+            TIMEIT_STOP;
 
             /*
             flint_printf("%wd  %wd  compose ", len, bits);
-            TIMEIT_START
+            TIMEIT_START;
             fmpz_poly_one(h);
             fmpz_poly_set_coeff_si(h, 1, 1);
             fmpz_poly_compose_divconquer(h, f, h);
-            TIMEIT_STOP
+            TIMEIT_STOP;
             */
 
             flint_printf("%wd  %wd  horner  ", len, bits);
-            TIMEIT_START
+            TIMEIT_START;
             fmpz_poly_taylor_shift_horner(g, f, d);
-            TIMEIT_STOP
+            TIMEIT_STOP;
 
             for (k = 1; k <= nthreads; k *= 2)
             {
                 flint_printf("%wd  %wd  dc%wd     ", len, bits, k);
                 flint_set_num_threads(k);
-                TIMEIT_START
+                TIMEIT_START;
                 fmpz_poly_taylor_shift_divconquer(g, f, d);
-                TIMEIT_STOP
+                TIMEIT_STOP;
                 flint_set_num_threads(1);
             }
 
@@ -120,9 +120,9 @@ main(int argc, char * argv[])
             {
                 flint_printf("%wd  %wd  mm%wd     ", len, bits, k);
                 flint_set_num_threads(k);
-                TIMEIT_START
+                TIMEIT_START;
                 fmpz_poly_taylor_shift_multi_mod(g, f, d);
-                TIMEIT_STOP
+                TIMEIT_STOP;
                 flint_set_num_threads(1);
             }
 

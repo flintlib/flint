@@ -13,6 +13,7 @@
 #include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
+#if 0
 int fq_zech_mpoly_repack_bits(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                               flint_bitcnt_t Abits, const fq_zech_mpoly_ctx_t ctx)
 {
@@ -55,6 +56,7 @@ int fq_zech_mpoly_repack_bits(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
 
     return success;
 }
+#endif
 
 int fq_zech_mpoly_repack_bits_inplace(
     fq_zech_mpoly_t A,

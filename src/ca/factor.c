@@ -15,7 +15,7 @@
 
 #define HAVE_MPOLY_FAC 1
 
-void
+static void
 _ca_factor_fmpz(ca_factor_t res, const fmpz_t x, int inv, ulong flags, ca_ctx_t ctx)
 {
     slong i;
@@ -62,7 +62,7 @@ _ca_factor_fmpz(ca_factor_t res, const fmpz_t x, int inv, ulong flags, ca_ctx_t 
     ca_clear(e, ctx);
 }
 
-void
+static void
 _ca_factor_fmpq(ca_factor_t res, const fmpq_t x, ulong flags, ca_ctx_t ctx)
 {
     if (flags & (CA_FACTOR_ZZ_SMOOTH | CA_FACTOR_ZZ_FULL))

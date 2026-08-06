@@ -102,5 +102,12 @@ TEST_FUNCTION_START(sd_fft, state)
         sd_fft_ctx_clear(Q);
     }
 
+    {
+        sd_fft_ctx_t Q;
+        sd_fft_ctx_init_prime(Q, UWORD(257));
+        test_sd_fft_trunc(Q, 0, 8, 5, state);
+        sd_fft_ctx_clear(Q);
+    }
+
     TEST_FUNCTION_END(state);
 }

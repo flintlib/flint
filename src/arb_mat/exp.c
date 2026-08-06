@@ -14,11 +14,11 @@
 #include "bool_mat.h"
 #include "arb.h"
 #include "arb_mat.h"
+#include "arb_mat/impl.h"
 
 #define LOG2_OVER_E 0.25499459743395350926
 
-slong
-_arb_mat_exp_choose_N(const mag_t norm, slong prec)
+slong _arb_mat_exp_choose_N(const mag_t norm, slong prec)
 {
     if (mag_is_special(norm) || mag_cmp_2exp_si(norm, 30) > 0)
     {
@@ -129,7 +129,10 @@ arb_mat_exp(arb_mat_t B, const arb_mat_t A, slong prec)
         q = pow(wp, 0.25);  /* wanted magnitude */
 
         if (mag_cmp_2exp_si(norm, 2 * wp) > 0) /* too big */
-            r = 2 * wp;
+        {
+            arb_mat_indeterminate(B);
+            goto cleanup;
+        }
         else if (mag_cmp_2exp_si(norm, -q) < 0) /* tiny, no need to reduce */
             r = 0;
         else
@@ -189,6 +192,7 @@ arb_mat_exp(arb_mat_t B, const arb_mat_t A, slong prec)
                 arb_set_round(arb_mat_entry(B, i, j),
                     arb_mat_entry(B, i, j), prec);
 
+cleanup:
         mag_clear(norm);
         mag_clear(err);
         arb_mat_clear(T);

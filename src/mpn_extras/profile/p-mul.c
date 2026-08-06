@@ -46,13 +46,13 @@ static void measure(mp_ptr rpg, mp_ptr rpf, mp_ptr xp, mp_ptr yp, slong m, slong
         mpn_random2(ap, mt);
         mpn_random2(bp, nt);
 
-        TIMEIT_START
+        TIMEIT_START;
         mpn_mul(rpg, ap, mt, bp, nt);
-        TIMEIT_STOP_VALUES(__, t1)
+        TIMEIT_STOP_VALUES(__, t1);
 
-        TIMEIT_START
+        TIMEIT_START;
         flint_mpn_mul(rpf, ap, mt, bp, nt);
-        TIMEIT_STOP_VALUES(__, t2)
+        TIMEIT_STOP_VALUES(__, t2);
 
         flint_printf(" %.2f", t1 / t2);
     }

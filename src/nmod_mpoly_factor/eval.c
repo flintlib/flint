@@ -235,10 +235,7 @@ void _nmod_mpoly_set_n_bpoly_var1_zero(
 
         FLINT_ASSERT(Alen < A->coeffs_alloc);
         A->coeffs[Alen] = c;
-        if (Abits <= FLINT_BITS)
-            mpoly_monomial_mul_ui(A->exps + N*Alen, genexp, N, i);
-        else
-            mpoly_monomial_mul_ui_mp(A->exps + N*Alen, genexp, N, i);
+        mpoly_monomial_mul_ui_any_bits(A->exps + N*Alen, genexp, N, i, Abits);
         Alen++;
     }
     A->length = Alen;

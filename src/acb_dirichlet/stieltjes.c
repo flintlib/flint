@@ -12,6 +12,7 @@
 #include <math.h>
 #include "acb_poly.h"
 #include "acb_dirichlet.h"
+#include "acb_dirichlet/impl.h"
 #include "acb_calc.h"
 
 /* Bound the quadratic Taylor error term. */
@@ -290,7 +291,7 @@ stieltjes_mag_approx(arb_t C, mag_t tol, const fmpz_t n1, const acb_t alpha)
     acb_clear(q);
 }
 
-int
+static int
 _f_stieltjes(acb_ptr res, const acb_t x, void * param, slong order, slong prec)
 {
     const fmpz * n1;
@@ -478,7 +479,7 @@ stieltjes_tail_bound(mag_t bound, const arb_t N, const fmpz_t n1, const acb_t al
     mag_clear(u);
 }
 
-void
+static void
 _acb_dirichlet_stieltjes_integral2(acb_t res, const fmpz_t n, const acb_t alpha, slong prec)
 {
     double gamma_mag, max_mag, cancellation, xa;
@@ -613,7 +614,7 @@ _acb_dirichlet_stieltjes_integral2(acb_t res, const fmpz_t n, const acb_t alpha,
     arb_clear(C);
 }
 
-void
+static void
 _acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slong prec)
 {
     acb_t alpha;

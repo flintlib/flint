@@ -27,9 +27,6 @@ Todo:
 */
 
 static int
-_gr_mat_permanent_cofactor_recursive(gr_ptr, const gr_mat_t, slong *, slong, gr_ctx_t);
-
-static int
 _gr_mat_permanent_cofactor_recursive(gr_ptr res, const gr_mat_t A, slong * rows, slong col, gr_ctx_t ctx)
 {
     slong n = A->r - col;

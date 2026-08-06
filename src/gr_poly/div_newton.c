@@ -12,6 +12,7 @@
 
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_poly/impl.h"
 
 /* todo: public vec function */
 void

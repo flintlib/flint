@@ -120,7 +120,7 @@ void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  nn_srcptr diag, slong n);
-void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
+void nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank);
 void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
@@ -165,10 +165,13 @@ void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 
 /* Matrix-scalar arithmetic */
 
+void _nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c);
+void _nmod_mat_scalar_mul_precomp(nmod_mat_t B, const nmod_mat_t A, ulong c, ulong c_pr);
 void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c);
 void nmod_mat_scalar_mul_fmpz(nmod_mat_t B, const nmod_mat_t A, const fmpz_t c);
-void nmod_mat_scalar_addmul_ui(nmod_mat_t C,
-                       const nmod_mat_t A, const nmod_mat_t B, const ulong c);
+void _nmod_mat_scalar_addmul_ui_generic(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c);
+void _nmod_mat_scalar_addmul_ui_precomp(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c, const ulong c_pr);
+void nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, const ulong c);
 
 /* Matrix multiplication */
 
@@ -316,6 +319,8 @@ slong nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check);
 slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 
+slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A);
+
 /* Nonsingular solving */
 
 int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
@@ -343,6 +348,7 @@ slong nmod_mat_reduce_row(nmod_mat_t M, slong * P, slong * L, slong m);
 /* Nullspace */
 
 slong nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
+slong nmod_mat_left_nullspace(nmod_mat_t X, const nmod_mat_t A);
 
 /* Howell form */
 
@@ -358,7 +364,7 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* The following prototype actually lives in nmod_poly.h
  *
- * void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
+ * int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M);
  *
  * void nmod_mat_minpoly(nmod_poly_t p, const nmod_mat_t M);
 */

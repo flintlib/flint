@@ -13,7 +13,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void
+static void
 _nmod_poly_mod_matrix_rows_evaluate_horner(nn_ptr res, const nmod_mat_t A, nn_srcptr h, slong n, nn_srcptr poly3, slong len3,
     nn_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
@@ -34,7 +34,7 @@ _nmod_poly_mod_matrix_rows_evaluate_horner(nn_ptr res, const nmod_mat_t A, nn_sr
     _nmod_vec_clear(t);
 }
 
-void
+static void
 _nmod_poly_mod_matrix_rows_evaluate_rectangular(nn_ptr res, const nmod_mat_t A, nn_srcptr h, slong n, nn_srcptr poly3, slong len3,
     nn_srcptr poly3inv, slong len3inv, nmod_t mod)
 {

@@ -52,7 +52,8 @@ Manipulating factors
 
     Adds the primitive polynomial `p^e` to the factorisation ``fac``.
 
-    Assumes that `\deg(p) \geq 2` and `e \neq 0`.
+    Assumes that `\deg(p) \geq 2` and `e \neq 0`. These conditions are not
+    checked.
 
 .. function:: void fmpz_poly_factor_concat(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
 
@@ -119,7 +120,8 @@ Factoring algorithms
 
     Assumes that the constant coefficient of `f` is non-zero.  Note that
     this can be easily achieved by taking out factors of the form `x^k`
-    before calling this routine.
+    before calling this routine.  Neither the primitivity of `f` nor the
+    non-zero constant coefficient is checked.
 
     If the final flag is set, the function will use the van Hoeij factorisation
     algorithm with gradual feeding and mod `2^k` data truncation to find
@@ -138,7 +140,8 @@ Factoring algorithms
 
     Inserts the factorisation of the quadratic (resp. cubic) polynomial *f* into *fac* with
     multiplicity *exp*. This function requires that the content of *f* has
-    been removed, and does not update the content of *fac*.
+    been removed (this is not checked), and does not update the content of
+    *fac*.
     The factorization is calculated over `\mathbb{R}` or `\mathbb{Q}_2` and then tested over `\mathbb{Z}`.
 
 .. function:: void fmpz_poly_factor(fmpz_poly_factor_t final_fac, const fmpz_poly_t F)

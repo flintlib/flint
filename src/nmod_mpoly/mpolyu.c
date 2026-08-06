@@ -807,7 +807,7 @@ void nmod_mpolyu_set(nmod_mpolyu_t A, const nmod_mpolyu_t B,
 
 
 
-void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
+static void nmod_mpoly_cvtfrom_poly_notmain(nmod_mpoly_t A, nmod_poly_t a,
                                          slong var, const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -901,7 +901,7 @@ void nmod_mpolyu_cvtfrom_poly(nmod_mpolyu_t A, nmod_poly_t a,
     A->length = k;
 }
 
-
+#if 0
 void nmod_mpolyu_msub(nmod_mpolyu_t R, nmod_mpolyu_t A, nmod_mpolyu_t B,
                            nmod_mpoly_t c, slong e, const nmod_mpoly_ctx_t ctx)
 {
@@ -949,7 +949,7 @@ void nmod_mpolyu_msub(nmod_mpolyu_t R, nmod_mpolyu_t A, nmod_mpolyu_t B,
     nmod_mpoly_clear(T, ctx);
     R->length = k;
 }
-
+#endif
 
 void nmod_mpolyu_divexact_mpoly_inplace(nmod_mpolyu_t A, nmod_mpoly_t c,
                                                     const nmod_mpoly_ctx_t ctx)

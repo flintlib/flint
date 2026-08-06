@@ -9,47 +9,51 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdint.h>
 #include "fmpz.h"
 //#include "fmpq.h"
 #include "nmod.h"
 #include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "gr.h"
+#include "gr_poly.h"
 #include "gr_mat.h"
 
 #define NMOD8_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD8_CTX(ring_ctx) (*NMOD8_CTX_REF(ring_ctx))
 
-typedef unsigned char nmod8_struct;
-typedef nmod8_struct nmod8_t[1];
+typedef uint8_t nmod8_t[1];
 
-void
+static int
 nmod8_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Integers mod ");
-    gr_stream_write_ui(out, NMOD8_CTX(ctx).n);
-    gr_stream_write(out, " (nmod8)");
+    int status = GR_SUCCESS;
+    status |= gr_stream_write(out, "Integers mod ");
+    status |= gr_stream_write_ui(out, NMOD8_CTX(ctx).n);
+    status |= gr_stream_write(out, " (nmod8)");
+    return status;
 }
 
 /* todo: n_is_prime is fast, but this should still be cached
    or use a fixed table lookup */
-truth_t
+static truth_t
 nmod8_ctx_is_field(const gr_ctx_t ctx)
 {
     return n_is_prime(NMOD8_CTX(ctx).n) ? T_TRUE : T_FALSE;
 }
 
-void
+static void
 nmod8_init(nmod8_t x, const gr_ctx_t ctx)
 {
     x[0] = 0;
 }
 
-void
+static void
 nmod8_clear(nmod8_t x, const gr_ctx_t ctx)
 {
 }
 
-void
+static void
 nmod8_swap(nmod8_t x, nmod8_t y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -58,41 +62,40 @@ nmod8_swap(nmod8_t x, nmod8_t y, const gr_ctx_t ctx)
     *y = *t;
 }
 
-void
+static void
 nmod8_set_shallow(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
 {
     *res = *x;
 }
 
-int
+static int
 nmod8_randtest(nmod8_t res, flint_rand_t state, const gr_ctx_t ctx)
 {
     res[0] = n_randtest(state) % NMOD8_CTX(ctx).n;
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_write(gr_stream_t out, const nmod8_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_ui(out, x[0]);
-    return GR_SUCCESS;
+    return gr_stream_write_ui(out, x[0]);
 }
 
-int
+static int
 nmod8_zero(nmod8_t x, const gr_ctx_t ctx)
 {
     x[0] = 0;
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_one(nmod8_t x, const gr_ctx_t ctx)
 {
     x[0] = (NMOD8_CTX(ctx).n != 1);
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_set_si(nmod8_t res, slong v, const gr_ctx_t ctx)
 {
     ulong t;
@@ -105,7 +108,7 @@ nmod8_set_si(nmod8_t res, slong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_set_ui(nmod8_t res, ulong v, const gr_ctx_t ctx)
 {
     ulong t;
@@ -115,7 +118,7 @@ nmod8_set_ui(nmod8_t res, ulong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_set_fmpz(nmod8_t res, const fmpz_t v, const gr_ctx_t ctx)
 {
     nmod_t mod = NMOD8_CTX(ctx);
@@ -123,52 +126,52 @@ nmod8_set_fmpz(nmod8_t res, const fmpz_t v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+static truth_t
 nmod8_is_zero(const nmod8_t x, const gr_ctx_t ctx)
 {
     return (x[0] == 0) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod8_is_one(const nmod8_t x, const gr_ctx_t ctx)
 {
     return (x[0] == (NMOD8_CTX(ctx).n != 1)) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod8_is_neg_one(const nmod8_t x, const gr_ctx_t ctx)
 {
     return (x[0] == NMOD8_CTX(ctx).n - 1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod8_equal(const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     return (x[0] == y[0]) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 nmod8_set(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
 {
     res[0] = x[0];
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_neg(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
 {
     res[0] = nmod_neg(x[0], NMOD8_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_add(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     res[0] = nmod_add(x[0], y[0], NMOD8_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_add_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -176,21 +179,21 @@ nmod8_add_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
     return nmod8_add(res, x, t, ctx);
 }
 
-int
+static int
 nmod8_sub(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     res[0] = nmod_sub(x[0], y[0], NMOD8_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_mul(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     res[0] = nmod_mul(x[0], y[0], NMOD8_CTX(ctx));
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_mul_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -198,7 +201,7 @@ nmod8_mul_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
     return nmod8_mul(res, x, t, ctx);
 }
 
-int
+static int
 nmod8_addmul(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     ulong r = res[0];
@@ -207,7 +210,7 @@ nmod8_addmul(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_submul(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     ulong r = res[0];
@@ -217,19 +220,19 @@ nmod8_submul(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-int
+static int
 nmod8_mul_two(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
 {
     return nmod8_add(res, x, x, ctx);
 }
 
-int
+static int
 nmod8_sqr(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
 {
     return nmod8_mul(res, x, x, ctx);
 }
 
-int
+static int
 nmod8_inv(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
@@ -254,7 +257,7 @@ nmod8_inv(nmod8_t res, const nmod8_t x, const gr_ctx_t ctx)
     }
 }
 
-int
+static int
 nmod8_div(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -268,7 +271,7 @@ nmod8_div(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
     return status;
 }
 
-int
+static int
 nmod8_div_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -276,7 +279,7 @@ nmod8_div_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
     return nmod8_div(res, x, t, ctx);
 }
 
-int
+static int
 nmod8_div_ui(nmod8_t res, const nmod8_t x, ulong y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -284,7 +287,7 @@ nmod8_div_ui(nmod8_t res, const nmod8_t x, ulong y, const gr_ctx_t ctx)
     return nmod8_div(res, x, t, ctx);
 }
 
-int
+static int
 nmod8_div_fmpz(nmod8_t res, const nmod8_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -292,7 +295,7 @@ nmod8_div_fmpz(nmod8_t res, const nmod8_t x, const fmpz_t y, const gr_ctx_t ctx)
     return nmod8_div(res, x, t, ctx);
 }
 
-truth_t
+static truth_t
 nmod8_is_invertible(const nmod8_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
@@ -300,14 +303,14 @@ nmod8_is_invertible(const nmod8_t x, const gr_ctx_t ctx)
     return (g == 1) ? T_TRUE : T_FALSE;
 }
 
-truth_t
+static truth_t
 nmod8_divides(const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     ulong t;
     return nmod_divides(&t, y[0], x[0], NMOD8_CTX(ctx)) ? T_TRUE : T_FALSE;
 }
 
-int
+static int
 nmod8_div_nonunique(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
 {
     nmod8_t t;
@@ -329,8 +332,15 @@ nmod8_div_nonunique(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_
     return status;
 }
 
-void
-_nmod8_vec_init(nmod8_struct * res, slong len, gr_ctx_t ctx)
+static int
+nmod8_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, NMOD8_CTX(ctx).n);
+    return GR_SUCCESS;
+}
+
+static void
+_nmod8_vec_init(uint8_t * res, slong len, gr_ctx_t ctx)
 {
     slong i;
 
@@ -338,13 +348,24 @@ _nmod8_vec_init(nmod8_struct * res, slong len, gr_ctx_t ctx)
         res[i] = 0;
 }
 
-void
-_nmod8_vec_clear(nmod8_struct * res, slong len, gr_ctx_t ctx)
+static void
+_nmod8_vec_clear(uint8_t * res, slong len, gr_ctx_t ctx)
 {
 }
 
-int
-_nmod8_vec_set(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t ctx)
+static int
+_nmod8_vec_zero(uint8_t * res, slong len, gr_ctx_t ctx)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        res[i] = 0;
+
+    return GR_SUCCESS;
+}
+
+static int
+_nmod8_vec_set(uint8_t * res, const uint8_t * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
 
@@ -354,45 +375,92 @@ _nmod8_vec_set(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t
     return GR_SUCCESS;
 }
 
-int
-_nmod8_vec_neg(nmod8_struct * res, const nmod8_struct * vec, slong len, gr_ctx_t ctx)
+static uint8_t _nmod8_add(uint8_t a, uint8_t b, uint8_t n)
+{
+   const uint8_t sum = a + b;
+   return sum - n + ((((int8_t)(sum - n))>>7) & n);
+}
+
+static uint8_t _nmod8_sub(uint8_t a, uint8_t b, uint8_t n)
+{
+   const uint8_t diff = a - b;
+   return  ((((int8_t)diff)>>7) & n) + diff;
+}
+
+static uint16_t _nmod16_add(uint16_t a, uint16_t b, uint16_t n)
+{
+   const uint16_t sum = a + b;
+   return sum - n + ((((int16_t)(sum - n))>>15) & n);
+}
+
+static uint16_t _nmod16_sub(uint16_t a, uint16_t b, uint16_t n)
+{
+   const uint16_t diff = a - b;
+   return  ((((int16_t)diff)>>15) & n) + diff;
+}
+
+static int
+_nmod8_vec_neg(uint8_t * res, const uint8_t * vec, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD8_CTX(ctx);
 
-    for (i = 0; i < len; i++)
-        res[i] = nmod_neg(vec[i], mod);
+    if (NMOD_BITS(mod) == 8)
+    {
+        for (i = 0; i < len; i++)
+            res[i] = _nmod16_sub(0, vec[i], mod.n);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = _nmod8_sub(0, vec[i], mod.n);
+    }
 
     return GR_SUCCESS;
 }
 
-int
-_nmod8_vec_add(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+static int
+_nmod8_vec_add(uint8_t * res, const uint8_t * vec1, const uint8_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD8_CTX(ctx);
 
-    for (i = 0; i < len; i++)
-        res[i] = _nmod_add(vec1[i], vec2[i], mod);
+    if (NMOD_BITS(mod) == 8)
+    {
+        for (i = 0; i < len; i++)
+            res[i] = _nmod16_add(vec1[i], vec2[i], mod.n);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = _nmod8_add(vec1[i], vec2[i], mod.n);
+    }
 
     return GR_SUCCESS;
 }
 
-
-int
-_nmod8_vec_sub(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+static int
+_nmod8_vec_sub(uint8_t * res, const uint8_t * vec1, const uint8_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD8_CTX(ctx);
 
-    for (i = 0; i < len; i++)
-        res[i] = nmod_sub(vec1[i], vec2[i], mod);
+    if (NMOD_BITS(mod) == 8)
+    {
+        for (i = 0; i < len; i++)
+            res[i] = _nmod16_sub(vec1[i], vec2[i], mod.n);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = _nmod8_sub(vec1[i], vec2[i], mod.n);
+    }
 
     return GR_SUCCESS;
 }
 
-int
-_nmod8_vec_mul(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+static int
+_nmod8_vec_mul(uint8_t * res, const uint8_t * vec1, const uint8_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     nmod_t mod = NMOD8_CTX(ctx);
@@ -403,8 +471,8 @@ _nmod8_vec_mul(nmod8_struct * res, const nmod8_struct * vec1, const nmod8_struct
     return GR_SUCCESS;
 }
 
-int
-_nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+static int
+_nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const uint8_t * vec1, const uint8_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     ulong n, s;
@@ -438,14 +506,14 @@ _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_str
 
         for (i = 0; i + 4 < len; i += 4)
         {
-            s += (unsigned int) vec1[i + 0] * (unsigned int) vec2[i + 0];
-            s += (unsigned int) vec1[i + 1] * (unsigned int) vec2[i + 1];
-            s += (unsigned int) vec1[i + 2] * (unsigned int) vec2[i + 2];
-            s += (unsigned int) vec1[i + 3] * (unsigned int) vec2[i + 3];
+            ss += (unsigned int) vec1[i + 0] * (unsigned int) vec2[i + 0];
+            ss += (unsigned int) vec1[i + 1] * (unsigned int) vec2[i + 1];
+            ss += (unsigned int) vec1[i + 2] * (unsigned int) vec2[i + 2];
+            ss += (unsigned int) vec1[i + 3] * (unsigned int) vec2[i + 3];
         }
 
         for ( ; i < len; i++)
-            s += (unsigned int) vec1[i] * (unsigned int) vec2[i];
+            ss += (unsigned int) vec1[i] * (unsigned int) vec2[i];
 
         s += ss;
     }
@@ -466,8 +534,8 @@ _nmod8_vec_dot(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_str
     return GR_SUCCESS;
 }
 
-int
-_nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8_struct * vec1, const nmod8_struct * vec2, slong len, gr_ctx_t ctx)
+static int
+_nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const uint8_t * vec1, const uint8_t * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
     ulong n, s;
@@ -501,14 +569,14 @@ _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8
 
         for (i = 0; i + 4 < len; i += 4)
         {
-            s += (unsigned int) vec1[i + 0] * (unsigned int) vec2[len - 1 - i - 0];
-            s += (unsigned int) vec1[i + 1] * (unsigned int) vec2[len - 1 - i - 1];
-            s += (unsigned int) vec1[i + 2] * (unsigned int) vec2[len - 1 - i - 2];
-            s += (unsigned int) vec1[i + 3] * (unsigned int) vec2[len - 1 - i - 3];
+            ss += (unsigned int) vec1[i + 0] * (unsigned int) vec2[len - 1 - i - 0];
+            ss += (unsigned int) vec1[i + 1] * (unsigned int) vec2[len - 1 - i - 1];
+            ss += (unsigned int) vec1[i + 2] * (unsigned int) vec2[len - 1 - i - 2];
+            ss += (unsigned int) vec1[i + 3] * (unsigned int) vec2[len - 1 - i - 3];
         }
 
         for ( ; i < len; i++)
-            s += (unsigned int) vec1[i] * (unsigned int) vec2[len - 1 - i];
+            ss += (unsigned int) vec1[i] * (unsigned int) vec2[len - 1 - i];
 
         s += ss;
     }
@@ -529,8 +597,219 @@ _nmod8_vec_dot_rev(nmod8_t res, const nmod8_t initial, int subtract, const nmod8
     return GR_SUCCESS;
 }
 
+static int
+_nmod8_vec_dot_strided(nmod8_t res, const nmod8_t initial, int subtract, const uint8_t * vec1, slong stride1, const uint8_t * vec2, slong stride2, slong len, gr_ctx_t ctx)
+{
+    slong i;
+    ulong n, s;
+
+    if (len <= 0)
+    {
+        if (initial == NULL)
+            nmod8_zero(res, ctx);
+        else
+            nmod8_set(res, initial, ctx);
+        return GR_SUCCESS;
+    }
+
+    n = NMOD8_CTX(ctx).n;
+
+    if (initial == NULL)
+    {
+        s = 0;
+    }
+    else
+    {
+        if (subtract)
+            s = n_negmod(initial[0], n);
+        else
+            s = initial[0];
+    }
+
+    if (len < 65536)
+    {
+        unsigned int ss = 0;
+
+        for (i = 0; i + 4 < len; i += 4)
+        {
+            ss += (unsigned int) vec1[(i + 0) * stride1] * (unsigned int) vec2[(i + 0) * stride2];
+            ss += (unsigned int) vec1[(i + 1) * stride1] * (unsigned int) vec2[(i + 1) * stride2];
+            ss += (unsigned int) vec1[(i + 2) * stride1] * (unsigned int) vec2[(i + 2) * stride2];
+            ss += (unsigned int) vec1[(i + 3) * stride1] * (unsigned int) vec2[(i + 3) * stride2];
+        }
+
+        for ( ; i < len; i++)
+            ss += (unsigned int) vec1[i * stride1] * (unsigned int) vec2[i * stride2];
+
+        s += ss;
+    }
+    else
+    {
+        ulong ss;
+
+        const dot_params_t params = _nmod_vec_dot_params(len, NMOD8_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i * stride1], (ulong) vec2[i * stride2], NMOD8_CTX(ctx), params);
+        s = n_addmod(s, ss, n);
+    }
+
+    nmod8_set_ui(res, s, ctx);
+
+    if (subtract && res[0] != 0)
+        res[0] = (n - res[0]);
+
+    return GR_SUCCESS;
+}
+
+static uint32_t _mod1_preinvert(uint32_t n)
+{
+    return (~((uint32_t) 0)) / n + 1;
+}
+
+static uint32_t _mod1(uint32_t x, uint32_t n, uint32_t ninv)
+{
+    uint32_t l = ninv * x;
+    return (((uint64_t) l) * n) >> 32;
+}
+
+static uint32_t _mulmod1(uint32_t a, uint32_t b, uint32_t n, uint32_t ninv)
+{
+    return _mod1(a * b, n, ninv);
+}
+
+static uint32_t _addmulmod1(uint32_t s, uint32_t a, uint32_t b, uint32_t n, uint32_t ninv)
+{
+    return _mod1(s + a * b, n, ninv);
+}
+
+static int
+_nmod8_vec_mul_scalar(uint8_t * res, const uint8_t * vec, slong len, const uint8_t * c, gr_ctx_t ctx)
+{
+    ulong d = *c;
+    slong i;
+
+    if (len > 5)
+    {
+        uint32_t n = NMOD8_CTX(ctx).n, ninv = _mod1_preinvert(NMOD8_CTX(ctx).n);
+
+        for (i = 0; i < len; i++)
+            res[i] = _mulmod1(vec[i], d, n, ninv);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = nmod_mul(vec[i], d, NMOD8_CTX(ctx));
+    }
+
+    return GR_SUCCESS;
+}
+
+static int
+_nmod8_vec_addmul_scalar(uint8_t * res, const uint8_t * vec, slong len, const uint8_t * c, gr_ctx_t ctx)
+{
+    ulong d = *c;
+    slong i;
+
+    if (len > 5)
+    {
+        uint32_t n = NMOD8_CTX(ctx).n, ninv = _mod1_preinvert(NMOD8_CTX(ctx).n);
+
+        for (i = 0; i < len; i++)
+            res[i] = _addmulmod1(res[i], vec[i], d, n, ninv);
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = nmod_addmul(res[i], vec[i], d, NMOD8_CTX(ctx));
+    }
+
+    return GR_SUCCESS;
+}
+
+static int
+_nmod8_vec_submul_scalar(uint8_t * res, const uint8_t * vec, slong len, const uint8_t * c, gr_ctx_t ctx)
+{
+    uint8_t d;
+    d = nmod_neg(*c, NMOD8_CTX(ctx));
+    return _nmod8_vec_addmul_scalar(res, vec, len, &d, ctx);
+}
+
+static int
+_nmod8_poly_mulmid(uint8_t * res, const uint8_t * A, slong Alen, const uint8_t * B, slong Blen, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    nn_ptr TR, TA, TB;
+    slong i, alloc, len;
+    int squaring;
+
+    Alen = FLINT_MIN(Alen, nhi);
+    Blen = FLINT_MIN(Blen, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (Alen + Blen - 1) - nlo;
+
+        if (Alen > nlo2)
+        {
+            slong trunc = Alen - nlo2;
+            A += trunc;
+            Alen -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (Blen > nlo2)
+        {
+            slong trunc = Blen - nlo2;
+            B += trunc;
+            Blen -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
+    len = nhi - nlo;
+
+    /* todo: tune this */
+    if (Alen < 10 || Blen < 10 || len < 10)
+        return _gr_poly_mulmid_classical(res, A, Alen, B, Blen, nlo, nhi, ctx);
+
+    squaring = (A == B) && (Alen == Blen);
+
+    alloc = squaring ? (Alen + len) : (Alen + Blen + len);
+    alloc *= sizeof(ulong);
+    TR = GR_TMP_ALLOC(alloc);
+    TA = TR + len;
+    TB = TA + Alen;
+
+    for (i = 0; i < Alen; i++)
+        TA[i] = A[i];
+
+    if (squaring)
+    {
+        _nmod_poly_mulmid(TR, TA, Alen, TA, Alen, nlo, nhi, NMOD8_CTX(ctx));
+    }
+    else
+    {
+        for (i = 0; i < Blen; i++)
+            TB[i] = B[i];
+
+        _nmod_poly_mulmid(TR, TA, Alen, TB, Blen, nlo, nhi, NMOD8_CTX(ctx));
+    }
+
+    for (i = 0; i < len; i++)
+        res[i] = TR[i];
+
+    GR_TMP_FREE(TR, alloc);
+    return GR_SUCCESS;
+}
+
+static int
+_nmod8_poly_mullow(uint8_t * res, const uint8_t * A, slong Alen, const uint8_t * B, slong Blen, slong len, gr_ctx_t ctx)
+{
+    return _nmod8_poly_mulmid(res, A, Alen, B, Blen, 0, len, ctx);
+}
+
 /* todo: tuning for rectangular matrices */
-int
+static int
 _nmod8_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     if (A->r >= 256 && A->c >= 256 && B->c >= 256)
@@ -539,6 +818,19 @@ _nmod8_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
         return gr_mat_mul_classical(C, A, B, ctx);
 }
 
+static int
+_nmod8_mat_charpoly(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    slong n = mat->r;
+
+    /* Danilevsky has a high chance of failing over small non-fields, so
+       only use it over fields */
+    /* todo: tune cutoff */
+    if (n > 8 && nmod8_ctx_is_field(ctx) == T_TRUE)
+        return _gr_mat_charpoly_danilevsky(res, mat, ctx);
+
+    return _gr_mat_charpoly_berkowitz(res, mat, ctx);
+}
 
 int _nmod8_methods_initialized = 0;
 
@@ -592,24 +884,40 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) nmod8_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod8_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
+    {GR_METHOD_FQ_PTH_ROOT,     (gr_funcptr) nmod8_set},
+    {GR_METHOD_CTX_FQ_PRIME,    (gr_funcptr) nmod8_ctx_fq_prime},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod8_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nmod8_vec_clear},
     {GR_METHOD_VEC_SET,         (gr_funcptr) _nmod8_vec_set},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _nmod8_vec_zero},
     {GR_METHOD_VEC_NEG,         (gr_funcptr) _nmod8_vec_neg},
     {GR_METHOD_VEC_ADD,         (gr_funcptr) _nmod8_vec_add},
     {GR_METHOD_VEC_SUB,         (gr_funcptr) _nmod8_vec_sub},
     {GR_METHOD_VEC_MUL,         (gr_funcptr) _nmod8_vec_mul},
+    {GR_METHOD_VEC_MUL_SCALAR,     (gr_funcptr) _nmod8_vec_mul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,  (gr_funcptr) _nmod8_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,  (gr_funcptr) _nmod8_vec_submul_scalar},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nmod8_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nmod8_vec_dot_rev},
+    {GR_METHOD_VEC_DOT_STRIDED, (gr_funcptr) _nmod8_vec_dot_strided},
+    {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _nmod8_poly_mullow},
+    {GR_METHOD_POLY_MULMID,     (gr_funcptr) _nmod8_poly_mulmid},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _nmod8_mat_mul},
+    {GR_METHOD_MAT_CHARPOLY,    (gr_funcptr) _nmod8_mat_charpoly},
     {0,                         (gr_funcptr) NULL},
 };
 
-void
-gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
+int
+gr_ctx_init_nmod8(gr_ctx_t ctx, ulong n)
 {
+    if (n == 0)
+        return GR_DOMAIN;
+
+    if (n > 255)
+        return GR_UNABLE;
+
     ctx->which_ring = GR_CTX_NMOD8;
-    ctx->sizeof_elem = sizeof(nmod8_struct);
+    ctx->sizeof_elem = sizeof(uint8_t);
     ctx->size_limit = WORD_MAX;
 
     nmod_init(NMOD8_CTX_REF(ctx), n);
@@ -621,4 +929,6 @@ gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
         gr_method_tab_init(_nmod8_methods, _nmod8_methods_input);
         _nmod8_methods_initialized = 1;
     }
+
+    return GR_SUCCESS;
 }

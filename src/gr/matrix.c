@@ -19,7 +19,7 @@
 /* todo: for matrix "ring", verify that element domain is a ring */
 
 /* todo: recycle storage? */
-void
+static void
 _gr_mat_resize(gr_mat_t mat, slong r, slong c, gr_ctx_t ctx)
 {
     gr_mat_clear(mat, ctx);
@@ -56,28 +56,29 @@ static int
 matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_ctx_ptr elem_ctx = MATRIX_CTX(ctx)->base_ring;
+    int status = GR_SUCCESS;
 
     if (MATRIX_CTX(ctx)->all_sizes)
     {
-        gr_stream_write(out, "Matrices (any shape) over ");
+        status |= gr_stream_write(out, "Matrices (any shape) over ");
     }
     else
     {
         if (gr_ctx_is_ring(ctx) == T_TRUE)
-            gr_stream_write(out, "Ring of ");
+            status |= gr_stream_write(out, "Ring of ");
         else
-            gr_stream_write(out, "Space of ");
+            status |= gr_stream_write(out, "Space of ");
 
-        gr_stream_write_si(out, MATRIX_CTX(ctx)->nrows);
-        gr_stream_write(out, " x ");
-        gr_stream_write_si(out, MATRIX_CTX(ctx)->ncols);
-        gr_stream_write(out, " ");
+        status |= gr_stream_write_si(out, MATRIX_CTX(ctx)->nrows);
+        status |= gr_stream_write(out, " x ");
+        status |= gr_stream_write_si(out, MATRIX_CTX(ctx)->ncols);
+        status |= gr_stream_write(out, " ");
 
-        gr_stream_write(out, "matrices over ");
+        status |= gr_stream_write(out, "matrices over ");
     }
 
-    gr_ctx_write(out, elem_ctx);
-    return GR_SUCCESS;
+    status |= gr_ctx_write(out, elem_ctx);
+    return status;
 }
 
 static truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
@@ -136,6 +137,25 @@ static truth_t matrix_ctx_is_complex_vector_space(gr_ctx_t ctx)
     return gr_ctx_is_complex_vector_space(MATRIX_CTX(ctx)->base_ring);
 }
 
+static truth_t matrix_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+{
+    int shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols);
+
+    if (!shape_ok)
+        return T_FALSE;
+
+    if (MATRIX_CTX(ctx)->nrows == 0)
+        return T_TRUE;
+
+    if (MATRIX_CTX(ctx)->nrows == 1)
+        return gr_ctx_is_approx_commutative_ring(MATRIX_CTX(ctx)->base_ring);
+
+    if (gr_ctx_is_zero_ring(MATRIX_CTX(ctx)->base_ring) == T_TRUE)
+        return T_TRUE;
+
+    return T_UNKNOWN;
+}
+
 /* todo: public */
 truth_t gr_ctx_matrix_is_fixed_size(gr_ctx_t ctx)
 {
@@ -147,6 +167,9 @@ matrix_ctx_is_threadsafe(gr_ctx_t ctx)
 {
     return gr_ctx_is_threadsafe(MATRIX_CTX(ctx)->base_ring);
 }
+
+static gr_ptr matrix_ctx_base(gr_ctx_t ctx) { return MATRIX_CTX(ctx)->base_ring; }
+
 
 static void
 matrix_clear(gr_mat_t res, gr_ctx_t ctx)
@@ -173,10 +196,24 @@ matrix_write(gr_stream_t out, gr_mat_t mat, gr_ctx_t ctx)
 }
 
 static int
+matrix_set_str(gr_mat_t res, const char * s, gr_ctx_t ctx)
+{
+    if (MATRIX_CTX(ctx)->all_sizes)
+        return gr_mat_set_str(res, s, 1, MATRIX_CTX(ctx)->base_ring);
+    else
+        return gr_mat_set_str(res, s, 0, MATRIX_CTX(ctx)->base_ring);
+}
+
+static int
 matrix_randtest(gr_mat_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     if (MATRIX_CTX(ctx)->all_sizes)
-        _gr_mat_resize(res, n_randint(state, 7), n_randint(state, 7), MATRIX_CTX(ctx)->base_ring);
+    {
+        /* Split state-mutating calls so consumption order is architecture-independent. */
+        slong r = n_randint(state, 7);
+        slong c = n_randint(state, 7);
+        _gr_mat_resize(res, r, c, MATRIX_CTX(ctx)->base_ring);
+    }
 
     return gr_mat_randtest(res, state, MATRIX_CTX(ctx)->base_ring);
 }
@@ -580,12 +617,15 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_CTX_IS_RATIONAL_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_rational_vector_space},
     {GR_METHOD_CTX_IS_REAL_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_real_vector_space},
     {GR_METHOD_CTX_IS_COMPLEX_VECTOR_SPACE, (gr_funcptr) matrix_ctx_is_complex_vector_space},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING, (gr_funcptr) matrix_ctx_is_approx_commutative_ring},
+    {GR_METHOD_CTX_BASE,    (gr_funcptr) matrix_ctx_base},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) matrix_swap},
     {GR_METHOD_SET_SHALLOW, (gr_funcptr) matrix_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) matrix_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) matrix_write},
+    {GR_METHOD_SET_STR,     (gr_funcptr) matrix_set_str},
     {GR_METHOD_ZERO,        (gr_funcptr) matrix_zero},
     {GR_METHOD_ONE,         (gr_funcptr) matrix_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) matrix_is_zero},
@@ -638,7 +678,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-void
+static void
 _gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong nrows, slong ncols)
 {
     ctx->which_ring = GR_CTX_GR_MAT;

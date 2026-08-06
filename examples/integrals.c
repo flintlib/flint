@@ -957,7 +957,7 @@ int main(int argc, char *argv[])
 
         for (i = 0; i < 1 + twice; i++)
         {
-            TIMEIT_ONCE_START
+            TIMEIT_ONCE_START;
             switch (integral)
             {
             case 0:
@@ -1324,7 +1324,7 @@ int main(int argc, char *argv[])
                 abort();
             }
 
-            TIMEIT_ONCE_STOP
+            TIMEIT_ONCE_STOP;
         }
         flint_printf("I%d = ", integral);
         acb_printn(s, 3.333 * prec, 0);

@@ -14,7 +14,7 @@
 #include "fmpz_mod_mpoly.h"
 
 /* exponents of B are not multiprecision */
-void _fmpz_mod_mpoly_evaluate_one_fmpz_mod_sp(
+static void _fmpz_mod_mpoly_evaluate_one_fmpz_mod_sp(
     fmpz_mod_mpoly_t A,
     const fmpz_mod_mpoly_t B,
     slong var,

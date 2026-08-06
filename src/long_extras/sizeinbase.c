@@ -11,6 +11,7 @@
 
 #include <limits.h>
 #include "long_extras.h"
+#include "ulong_extras.h"
 
 size_t z_sizeinbase(slong n, int b)
 {
@@ -20,6 +21,9 @@ size_t z_sizeinbase(slong n, int b)
     {
         return 1;
     }
+
+    if (b == 10)
+        return (size_t) n_nonzero_sizeinbase10((n < 0) ? -(ulong) n : (ulong) n);
 
     if (n <= 0)
     {

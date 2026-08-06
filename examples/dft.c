@@ -254,32 +254,32 @@ int main(int argc, char *argv[])
 
         if (timing == 0)
         {
-            TIMEIT_ONCE_START
+            TIMEIT_ONCE_START;
             ca_ctx_init(ctx);
             benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
             ca_ctx_clear(ctx);
-            TIMEIT_ONCE_STOP
+            TIMEIT_ONCE_STOP;
         }
         else if (timing == 1)
         {
-            TIMEIT_START
+            TIMEIT_START;
             ca_ctx_init(ctx);
             benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
             ca_ctx_clear(ctx);
-            TIMEIT_STOP
+            TIMEIT_STOP;
         }
         else
         {
             ca_ctx_init(ctx);
             benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
-            TIMEIT_START
+            TIMEIT_START;
             benchmark_DFT(N, input, verbose, qqbar_limit, gb, ctx);
-            TIMEIT_STOP
+            TIMEIT_STOP;
             ca_ctx_clear(ctx);
         }
     }
 
-    SHOW_MEMORY_USAGE
+    print_memory_usage();
     flint_cleanup();
     return 0;
 }

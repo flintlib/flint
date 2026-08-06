@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-void _fq_nmod_mpoly_evaluate_one_fq_nmod_sp(
+static void _fq_nmod_mpoly_evaluate_one_fq_nmod_sp(
     fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_t B,
     slong var,

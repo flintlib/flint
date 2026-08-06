@@ -663,7 +663,7 @@ int main(int argc, char *argv[])
 
     flint_set_num_threads(num_threads);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     for (y = ynum - 1; y >= 0; y--)
     {
@@ -686,7 +686,7 @@ int main(int argc, char *argv[])
         flint_parallel_do((do_func_t) worker, &work, xnum, num_threads, FLINT_PARALLEL_STRIDED);
     }
 
-    TIMEIT_ONCE_STOP
+    TIMEIT_ONCE_STOP;
 
     fp = fopen("arbplot.ppm", "w");
     fprintf(fp, "P6\n%ld %ld 255\n", xnum, ynum);

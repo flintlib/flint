@@ -12,6 +12,18 @@
 
 #include "ulong_extras.h"
 
+ulong n_quadratic_nonresidue(ulong n)
+{
+    if ((n & UWORD(7)) == 3 || (n & UWORD(7)) == 5)
+        return 2;
+
+    for (ulong a = 3; ; a += 2)
+    {
+        if (n_jacobi_unsigned(a, n) == -1)
+            return a;
+    }
+}
+
 ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 {
     if (p == 2)

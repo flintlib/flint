@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
     flint_printf("maxdepth = %wd, maxeval = %wd, maxfound = %wd, low_prec = %wd\n",
         maxdepth, maxeval, maxfound, low_prec);
 
-    TIMEIT_ONCE_START
+    TIMEIT_ONCE_START;
 
     num = arb_calc_isolate_roots(&blocks, &info, function,
         params, interval, maxdepth, maxeval, maxfound, low_prec);
@@ -395,8 +395,8 @@ int main(int argc, char *argv[])
     flint_printf("Subintervals possibly containing undetected roots: %wd\n", found_unknown);
     flint_printf("Function evaluations: %wd\n", eval_count);
 
-    TIMEIT_ONCE_STOP
-    SHOW_MEMORY_USAGE
+    TIMEIT_ONCE_STOP;
+    print_memory_usage();
 
     for (i = 0; i < num; i++)
         arf_interval_clear(blocks + i);

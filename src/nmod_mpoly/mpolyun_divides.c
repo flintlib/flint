@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-int _nmod_mpolyn_divides(
+static int _nmod_mpolyn_divides(
     nmod_mpolyn_t Q,
     const nmod_mpolyn_t A,
     const nmod_mpolyn_t B,
@@ -258,7 +258,7 @@ int nmod_mpolyn_divides(
 
 /* The following functions are currently untested and unused. */
 
-void _nmod_mpolyn_add(
+static void _nmod_mpolyn_add(
     nmod_mpolyn_t A,
     const nmod_mpolyn_t B,
     const nmod_mpolyn_t C,
@@ -322,7 +322,7 @@ void _nmod_mpolyn_add(
 
 
 /* A = D - B*C, D may be modified if saveD == 0 */
-void _nmod_mpolyn_mulsub(
+static void _nmod_mpolyn_mulsub(
     nmod_mpolyn_t A,
     const nmod_mpolyn_t D, int saveD,
     const nmod_mpolyn_t B,
@@ -466,12 +466,7 @@ void _nmod_mpolyn_mulsub(
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -490,12 +485,7 @@ void _nmod_mpolyn_mulsub(
 
                 hind[x->i] = 2*(x->j+1) + 0;
 
-                if (bits <= FLINT_BITS)
-                    mpoly_monomial_add(exp_list[exp_next], Bexp + N*x->i,
-                                                           Cexp + N*x->j, N);
-                else
-                    mpoly_monomial_add_mp(exp_list[exp_next], Bexp + N*x->i,
-                                                              Cexp + N*x->j, N);
+                mpoly_monomial_add_any_bits(exp_list[exp_next], Bexp + N*x->i, Cexp + N*x->j, N, bits);
 
                 exp_next += _mpoly_heap_insert(heap, exp_list[exp_next], x,
                                              &next_loc, &heap_len, N, cmpmask);
@@ -562,9 +552,7 @@ int nmod_mpolyun_divides(
     FLINT_ASSERT(bits == B->bits);
     FLINT_ASSERT(bits == Q->bits);
 
-    N = mpoly_words_per_exp(bits, ctx->minfo);
-    cmpmask = (ulong *) flint_malloc(N*sizeof(ulong));
-    mpoly_get_cmpmask(cmpmask, N, bits, ctx->minfo);
+    MPOLY_GET_CMPMASK_FLINT_MALLOC(cmpmask, N, bits, ctx->minfo);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */

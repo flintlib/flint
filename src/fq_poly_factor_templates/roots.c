@@ -15,7 +15,7 @@
 
 
 /* split f assuming that f has degree(f) distinct nonzero roots in Fq */
-void _TEMPLATE(T, poly_split_rabin)(
+static void _TEMPLATE(T, poly_split_rabin)(
     TEMPLATE(T, poly_t) a,
     TEMPLATE(T, poly_t) b,
     const TEMPLATE(T, poly_t) f,

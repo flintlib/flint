@@ -122,27 +122,30 @@ Factorisation
     placed in factor and 1 is returned, otherwise 0 is returned and
     the value of factor is undetermined.
 
-    Requires that ``pol`` be monic, non-constant and squarefree.
+    Requires that ``pol`` be monic, non-constant and squarefree (this
+    is not checked).
 
 .. function:: void fq_zech_poly_factor_equal_deg(fq_zech_poly_factor_t factors, const fq_zech_poly_t pol, slong d, const fq_zech_ctx_t ctx)
 
     Assuming ``pol`` is a product of irreducible factors all of
     degree ``d``, finds all those factors and places them in
     factors.  Requires that ``pol`` be monic, non-constant and
-    squarefree.
+    squarefree (this is not checked).
 
 .. function:: void fq_zech_poly_factor_split_single(fq_zech_poly_t linfactor, const fq_zech_poly_t input, const fq_zech_ctx_t ctx)
 
     Assuming ``input`` is a product of factors all of degree 1, finds a single
     linear factor of ``input`` and places it in ``linfactor``.
-    Requires that ``input`` be monic and non-constant.
+    Requires that ``input`` be monic and non-constant (this is not
+    checked).
 
 .. function:: void fq_zech_poly_factor_distinct_deg(fq_zech_poly_factor_t res, const fq_zech_poly_t poly, slong * const * degs, const fq_zech_ctx_t ctx)
 
     Factorises a monic non-constant squarefree polynomial ``poly``
     of degree `n` into factors `f[d]` such that for `1 \leq d \leq n`
     `f[d]` is the product of the monic irreducible factors of
-    ``poly`` of degree `d`. Factors are stored in ``res``,
+    ``poly`` of degree `d` (squarefreeness is assumed and not
+    checked). Factors are stored in ``res``,
     associated powers of irreducible polynomials are stored in
     ``degs`` in the same order as factors.
 

@@ -19,7 +19,7 @@
 # include "fft_small.h"
 #endif
 
-void
+static void
 _fmpz_poly_mul_tiny1(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
@@ -39,7 +39,7 @@ _fmpz_poly_mul_tiny1(fmpz * res, const fmpz * poly1,
     }
 }
 
-void
+static void
 _fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {

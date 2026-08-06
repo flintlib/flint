@@ -17,7 +17,7 @@
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 
-void
+static void
 _qqbar_sqr_undeflatable(qqbar_t res, const qqbar_t x)
 {
     fmpz_poly_t A, B;

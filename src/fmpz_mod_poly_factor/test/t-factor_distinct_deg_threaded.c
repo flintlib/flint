@@ -22,7 +22,7 @@
 #include "fmpz_mod_poly_factor.h"
 
 /* Defined in t-factor_distinct_deg.c and t-factor_distinct_deg_threaded.c */
-#define MAX_DEG 9
+#define MAX_DEG 10
 
 TEST_FUNCTION_START(fmpz_mod_poly_factor_distinct_deg_threaded, state)
 {

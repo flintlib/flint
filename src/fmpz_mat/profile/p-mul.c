@@ -51,7 +51,7 @@ double timing(flint_rand_t state, slong n, slong m, slong k, slong bits1, slong 
         fmpz_mat_randbits(B, state, bits2);
     }
 
-    TIMEIT_START
+    TIMEIT_START;
     if (algorithm == DEFAULT)
         fmpz_mat_mul(C, A, B);
     else if (algorithm == CLASSICAL)
@@ -62,7 +62,7 @@ double timing(flint_rand_t state, slong n, slong m, slong k, slong bits1, slong 
         fmpz_mat_mul_multi_mod(C, A, B);
     else if (algorithm == STRASSEN)
 	    fmpz_mat_mul_strassen(C, A, B);
-    TIMEIT_STOP_VALUES(tcpu, twall)
+    TIMEIT_STOP_VALUES(tcpu, twall);
 
     fmpz_mat_clear(A);
     fmpz_mat_clear(B);

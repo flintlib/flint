@@ -35,6 +35,23 @@ Domain properties
     mathematical property.
     The result can be ``T_UNKNOWN``.
 
+.. function:: truth_t gr_ctx_is_approx_commutative_ring(gr_ctx_t ctx)
+
+    Returns whether the structure `\tilde R` implemented by ``ctx`` is assumed
+    to represent an approximate version of a structure `R` with the
+    respective mathematical property.
+    The usual axioms need not hold exactly as long as they hold
+    within a small perturbation, i.e. an axiom of the type `a = b` in `R` is
+    replaced by an axiom of the type
+    `|\tilde a - \tilde b| < \varepsilon` in `\tilde R`.
+    For example, polynomials with floating-point coefficients are
+    considered an approximate commutative ring, but two by two matrices
+    with floating-point coefficients are not.
+
+    The exact structure is trivially considered an approximate version of
+    itself; for example, every commutative ring is considered to be an
+    approximate commutative ring.
+
 .. function:: truth_t gr_ctx_is_exact(gr_ctx_t ctx)
 
     Returns whether the representation of elements is always exact.
@@ -54,6 +71,31 @@ Domain properties
               int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx)
 
     Sets or retrieves the floating-point precision in bits.
+
+Debugging
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_debug(gr_ctx_t ctx, gr_ctx_t elem_ctx, int flags, double unable_probability)
+
+    Initialize *ctx* to a wrapper around *elem_ctx* for debugging.
+    This will execute supported methods (currently only a handful
+    of methods are supported, e.g. ``gr_add``) as if one is computing
+    directly over *elem_ctx*, but with added debugging features.
+
+    If *unable_probability* is positive, some methods will randomly return
+    ``GR_UNABLE`` and predicates will randomly return ``T_UNKNOWN``.
+
+    The following flags are supported:
+
+    * ``GR_DEBUG_WRAP`` - wrap elements in a box with a pointer. This allows
+      performing extra checks such as whether a variable is being cleared
+      twice or whether the wrong context object is passed as input. It can
+      also help catch some bugs that are not revealed when entries are
+      stored shallowly.
+
+    * ``GR_DEBUG_VERBOSE`` - print debugging information for each operation.
+
+    * ``GR_DEBUG_TIMING`` - print elapsed time for each operation.
 
 
 Groups
@@ -84,6 +126,9 @@ Basic rings and fields
 -------------------------------------------------------------------------------
 
 .. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_commutative_ring(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_field(gr_ctx_t ctx, flint_rand_t state)
+              void gr_ctx_init_random_finite_field(gr_ctx_t ctx, flint_rand_t state)
 
     Initializes *ctx* to a random ring. This will currently
     only generate base rings and composite rings over certain
@@ -115,26 +160,13 @@ Residue rings and finite fields
     enable some functions to complete that otherwise would
     return ``GR_UNABLE``.
 
-.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+See:
 
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`ulong`. We require `n \ne 0`.
-
-.. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
-              void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
-
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`uint8` or :type:`uint32`. The modulus must be
-    nonzero.
-
-    .. note ::
-
-        Presently, many operations for these types are not as optimized
-        as those for full-word ``nmods``. It is currently recommended
-        to use :func:`gr_ctx_init_nmod` for best performance unless
-        one specifically wants to minimize memory usage.
+* :func:`gr_ctx_init_nmod`
+  :func:`gr_ctx_init_nmod8`
+  :func:`gr_ctx_init_nmod32`
+  :func:`gr_ctx_init_nmod_redc`
+  :func:`gr_ctx_init_nmod_redc_fast`
 
 .. function:: void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 
@@ -215,6 +247,21 @@ Real and complex numbers
               slong gr_ctx_ca_get_option(gr_ctx_t ctx, slong option)
 
     Sets or retrieves options of a Calcium context object.
+
+.. function:: void gr_ctx_init_gr_complex(gr_ctx_t ctx, gr_ctx_t real_ctx)
+
+    Initializes *ctx* to a generic implementation of the complex algebra `R[i]`
+    where `R` is represented by *real_ctx*.
+    Elements `a + bi` are represented as pairs `(a, b)` of elements of `R`
+    stored contiguously in memory.
+
+    Typically `R` will be an implementation of the real numbers or a subring
+    of the real numbers in which case this creates the complex numbers or
+    a subring of the complex numbers. This construction
+    also makes sense e.g. over real vector spaces and even general rings
+    (where `i` will just be a formal element satisfying `i^2 = -1`),
+    but in that case operations beyond basic arithmetic (e.g. absolute value)
+    may not make sense.
 
 Extended number sets
 -------------------------------------------------------------------------------
@@ -304,12 +351,23 @@ Polynomial rings
     over the given *base_ring*.
     Elements have type :type:`gr_poly_struct`.
 
+.. function:: void gr_ctx_init_random_poly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random univariate polynomial ring.
+
 .. function:: void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
 
     Initializes *ctx* to a ring of sparsely represented multivariate
     polynomials in *nvars* variables over the integers,
     with monomial ordering *ord*.
     Elements have type :type:`fmpz_mpoly_struct`.
+
+.. function:: void gr_ctx_init_fmpq_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
+
+    Initializes *ctx* to a ring of sparsely represented multivariate
+    polynomials in *nvars* variables over the rationals,
+    with monomial ordering *ord*.
+    Elements have type :type:`fmpq_mpoly_struct`.
 
 .. function:: void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord)
 
@@ -318,11 +376,30 @@ Polynomial rings
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
 
+.. function:: void gr_ctx_init_random_mpoly(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random multivariate polynomial ring.
+
+Ore polynomials
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_gr_ore_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong base_var, const ore_algebra_t which_algebra)
+
+    Initializes *ctx* to a ring of densely represented Ore polynomials over the
+    given *base_ring*, with the choice of Ore algebra structure given by
+    *which_algebra*. The Ore algebra structure may refer to a distinguished
+    generator of *base_ring*; this will be the generator of index *base_var*.
+    Elements have type :type:`gr_ore_poly_struct`.
+
 Power series
 -------------------------------------------------------------------------------
 
 See :func:`gr_series_ctx_init` and :func:`gr_series_mod_ctx_init`
 in :ref:`gr-series`.
+
+.. function:: void gr_ctx_init_random_series(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a random power series ring.
 
 Fraction fields
 -------------------------------------------------------------------------------

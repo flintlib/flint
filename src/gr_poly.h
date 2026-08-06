@@ -68,6 +68,35 @@ void gr_poly_fit_length(gr_poly_t poly, slong len, gr_ctx_t ctx);
 void _gr_poly_set_length(gr_poly_t poly, slong len, gr_ctx_t ctx);
 void _gr_poly_normalise(gr_poly_t poly, gr_ctx_t ctx);
 
+/* Vector of gr_poly objects (gr_poly_vec_t).
+   The ctx argument refers to the coefficient ring of the polynomials. */
+ 
+void gr_poly_vec_init(gr_poly_vec_t vec, slong len, gr_ctx_t ctx);
+void gr_poly_vec_clear(gr_poly_vec_t vec, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_vec_set(gr_poly_vec_t res, const gr_poly_vec_t src, gr_ctx_t ctx);
+void gr_poly_vec_fit_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx);
+void gr_poly_vec_set_length(gr_poly_vec_t vec, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_vec_append(gr_poly_vec_t vec, const gr_poly_t f, gr_ctx_t ctx);
+ 
+GR_POLY_INLINE slong
+gr_poly_vec_length(const gr_poly_vec_t vec, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    return vec->length;
+}
+ 
+GR_POLY_INLINE gr_poly_struct *
+gr_poly_vec_entry_ptr(gr_poly_vec_t vec, slong i, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    return vec->entries + i;
+}
+ 
+GR_POLY_INLINE const gr_poly_struct *
+gr_poly_vec_entry_srcptr(const gr_poly_vec_t vec, slong i, gr_ctx_t FLINT_UNUSED(ctx))
+{
+    return vec->entries + i;
+}
+
+
 WARN_UNUSED_RESULT int gr_poly_set(gr_poly_t res, const gr_poly_t src, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_reverse(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx);
@@ -134,18 +163,96 @@ WARN_UNUSED_RESULT int gr_poly_sub(gr_poly_t res, const gr_poly_t poly1, const g
 WARN_UNUSED_RESULT int _gr_poly_mul(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
 
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+{
+    return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx);
+}
+
+/* 2x2 polynomial matrix product C = A*B used by hgcd. C, A, B point to 4
+   entries each (row-major), with lengths in lenC, lenA, lenB; the output
+   lengths are normalized. Aliasing is not supported. T0 and T1 must have
+   room for any single polynomial product of an entry of A by an entry
+   of B. */
+WARN_UNUSED_RESULT int _gr_poly_hgcd_mat_mul_generic(gr_ptr * C, slong * lenC, gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB, gr_ptr T0, gr_ptr T1, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_hgcd_mat_mul(gr_ptr * C, slong * lenC, gr_ptr * A, slong * lenA, gr_ptr * B, slong * lenB, gr_ptr T0, gr_ptr T1, gr_ctx_t ctx)
+{
+    return GR_POLY_HGCD_MAT_MUL_OP(ctx, POLY_HGCD_MAT_MUL)(C, lenC, A, lenA, B, lenB, T0, T1, ctx);
+}
+
+/* Construct a ring of transformed polynomials of length at most len_bound
+   over the base ring ctx, supporting expressions accumulating at most
+   terms_bound elementary coefficient products, or return GR_UNABLE if no
+   such representation is available. Elements support the standard ring
+   operations; conversions go through _gr_set_gr_poly / _gr_get_gr_poly. */
+GR_POLY_INLINE WARN_UNUSED_RESULT int gr_ctx_init_gr_poly_transformed_repr(gr_ctx_t out, gr_ctx_t base_ctx, slong len_bound, slong terms_bound, const gr_transformed_poly_workload_struct * workload)
+{
+    return GR_CTX_INIT_TRANSFORMED_POLY_REPR_OP(base_ctx, CTX_INIT_TRANSFORMED_POLY_REPR)(out, base_ctx, len_bound, terms_bound, workload);
+}
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_set_gr_poly(gr_ptr res, gr_srcptr a, slong len, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    return GR_SET_GR_POLY_OP(tctx, SET_GR_POLY)(res, a, len, base_ctx, tctx);
+}
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly(gr_ptr c, slong * len, gr_srcptr x, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    return GR_GET_GR_POLY_OP(tctx, GET_GR_POLY)(c, len, x, base_ctx, tctx);
+}
+
+/* Conversion out that may consume the element -- implementations run the
+   inverse transforms on its own storage, skipping the transform copy;
+   afterwards the element may only be cleared or fully overwritten as the
+   destination of a set or a multiplication. Falls back to the copying
+   conversion where the representation does not provide it. */
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly_destructive(gr_ptr c, slong * len, gr_ptr x, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    int status = GR_GET_GR_POLY_DESTRUCTIVE_OP(tctx, GET_GR_POLY_DESTRUCTIVE)(c, len, x, base_ctx, tctx);
+    if (status == GR_UNABLE)
+        status = GR_GET_GR_POLY_OP(tctx, GET_GR_POLY)(c, len, x, base_ctx, tctx);
+    return status;
+}
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_get_gr_poly_window(gr_ptr c, gr_srcptr x, slong zl, slong zh, gr_ctx_t base_ctx, gr_ctx_t tctx)
+{
+    return GR_GET_GR_POLY_WINDOW_OP(tctx, GET_GR_POLY_WINDOW)(c, x, zl, zh, base_ctx, tctx);
+}
+
 WARN_UNUSED_RESULT int _gr_poly_mullow_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
-GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx) { return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx); }
 WARN_UNUSED_RESULT int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_mullow_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_mullow_classical(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
-
+WARN_UNUSED_RESULT int _gr_poly_mulmid_complex_reorder(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx);
+WARN_UNUSED_RESULT int gr_poly_mulmid_complex_reorder(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong nlo, slong nhi, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx);
 WARN_UNUSED_RESULT int _gr_poly_mullow_complex_reorder(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx);
 WARN_UNUSED_RESULT int gr_poly_mullow_complex_reorder(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, int karatsuba, gr_ctx_t ctx, gr_ctx_t real_ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_mullow_bivariate_KS(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mullow_bivariate_KS(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_mullow_toom_serial(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong trunc, slong num_points, slong splitting_degree, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_mullow_toom_serial(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, slong num_points, slong splitting_degree, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mulmid(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx)
+{
+    return GR_POLY_BINARY_TRUNC2_OP(ctx, POLY_MULMID)(res, poly1, len1, poly2, len2, nlo, nhi, ctx);
+}
+
+WARN_UNUSED_RESULT int _gr_poly_mulmid_generic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_mulmid(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong nlo, slong nhi, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_mulmid_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_mulmid_classical(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong nlo, slong nhi, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_mulmid_bivariate_KS(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong nlo, slong nhi, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_mulmid_bivariate_KS(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong nlo, slong nhi, gr_ctx_t ctx);
+
+GR_POLY_INLINE WARN_UNUSED_RESULT int
+_gr_poly_mullow_classical(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx)
+{
+    return _gr_poly_mulmid_classical(res, poly1, len1, poly2, len2, 0, n, ctx);
+}
+
+WARN_UNUSED_RESULT int gr_poly_mullow_classical(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
@@ -203,6 +310,7 @@ WARN_UNUSED_RESULT int gr_poly_shift_right(gr_poly_t res, const gr_poly_t poly, 
 /* division */
 
 WARN_UNUSED_RESULT int gr_poly_div_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_divexact_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_inv(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
 
@@ -263,9 +371,9 @@ GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_inv_series(gr_ptr res, gr_srcptr 
 WARN_UNUSED_RESULT int _gr_poly_inv_series_generic(gr_ptr Qinv, gr_srcptr Q, slong Qlen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_inv_series(gr_poly_t Qinv, const gr_poly_t Q, slong len, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_div_series_newton(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_div_series_newton(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, slong cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_div_series_newton(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_poly_div_series_divconquer(gr_ptr res, gr_srcptr B, slong Blen, gr_srcptr A, slong Alen, slong len, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_div_series_divconquer(gr_ptr res, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, slong cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_div_series_divconquer(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, slong cutoff, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_div_series_basecase_generic(gr_ptr Q, gr_srcptr A, slong Alen, gr_srcptr B, slong Blen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_div_series_basecase(gr_poly_t Q, const gr_poly_t A, const gr_poly_t B, slong len, gr_ctx_t ctx);
@@ -360,6 +468,8 @@ WARN_UNUSED_RESULT int _gr_poly_compose_series_brent_kung(gr_ptr res, gr_srcptr 
 WARN_UNUSED_RESULT int gr_poly_compose_series_brent_kung(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_compose_series_divconquer(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_compose_series_divconquer(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_compose_series_kinoshita_li(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_compose_series_kinoshita_li(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_compose_series(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_compose_series(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 
@@ -405,15 +515,25 @@ GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_gcd(gr_ptr G, slong * lenG, gr_sr
 WARN_UNUSED_RESULT int gr_poly_gcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_gcd_wrapper(gr_method_poly_gcd_op gcd_impl, int canonicalise_unit, gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_xgcd_euclidean(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T,
+    gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T,
+    const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A,
+    slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
+    const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_xgcd_subresultant(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A,
+    slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_xgcd_subresultant(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
+    const gr_poly_t B, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx);
-
-GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_xgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx) { return GR_POLY_XGCD_OP(ctx, POLY_XGCD)(Glen, G, S, T, A, lenA, B, lenB, ctx); }
-WARN_UNUSED_RESULT int _gr_poly_xgcd_generic(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
+GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_xgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T,
+    gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx) { return GR_POLY_XGCD_OP(ctx, POLY_XGCD)(Glen, G, S, T, A, lenA, B, lenB, ctx); }
+WARN_UNUSED_RESULT int _gr_poly_xgcd_generic(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T,
+    gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, gr_poly_t T,
+    const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_xgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
@@ -424,6 +544,9 @@ WARN_UNUSED_RESULT int gr_poly_resultant_hgcd(gr_ptr r, const gr_poly_t f, const
 
 WARN_UNUSED_RESULT int _gr_poly_resultant_sylvester(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_resultant_sylvester(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_resultant_subresultant(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_resultant_subresultant(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int _gr_poly_resultant_small(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_resultant_small(gr_ptr r, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
@@ -478,7 +601,7 @@ WARN_UNUSED_RESULT int gr_poly_interpolate(gr_poly_t poly, const gr_vec_t xs, co
 
 /* Squarefree factorization */
 
-WARN_UNUSED_RESULT int gr_poly_factor_squarefree(gr_ptr c, gr_vec_t fac, gr_vec_t exp, const gr_poly_t F, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_factor_squarefree(gr_ptr c, gr_poly_vec_t fac, fmpz_vec_t exp, const gr_poly_t F, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_squarefree_part(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
 
 /* Shift factorization */
@@ -488,27 +611,27 @@ WARN_UNUSED_RESULT int gr_poly_leading_taylor_shift(gr_ptr shift, const gr_poly_
 truth_t gr_poly_shift_equivalent(fmpz_t shift, const gr_poly_t p, const gr_poly_t q, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_dispersion_resultant(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_vec_t ffac, const gr_vec_t gfac, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_dispersion_from_factors(fmpz_t disp, gr_vec_t disp_set, const gr_poly_vec_t ffac, const gr_poly_vec_t gfac, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_dispersion_factor(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_dispersion(fmpz_t disp, gr_vec_t disp_set, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition_from_factors(gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_vec_t fac, const gr_vec_t mult, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition(gr_ptr c, gr_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_shiftless_decomposition_from_factors(gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_vec_t fac, const fmpz_vec_t mult, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition_from_factors(gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_vec_t fac, const fmpz_vec_t mult, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition_factor(gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_shiftless_decomposition(gr_ptr c, gr_poly_vec_t slfac, gr_vec_t slshifts, gr_vec_t slmult, const gr_poly_t pol, gr_ctx_t ctx);
 
 /* Roots */
 
 WARN_UNUSED_RESULT int _gr_poly_refine_roots_aberth(gr_ptr w, gr_srcptr f, gr_srcptr f_prime, slong deg, gr_srcptr z, int progressive, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_refine_roots_wdk(gr_ptr w, gr_srcptr f, slong deg, gr_srcptr z, int progressive, gr_ctx_t ctx);
 
-typedef int ((*gr_poly_roots_op)(gr_vec_t, gr_vec_t, const gr_poly_t, int, gr_ctx_ptr));
+typedef int ((*gr_poly_roots_op)(gr_vec_t, fmpz_vec_t, const gr_poly_t, int, gr_ctx_ptr));
 #define GR_POLY_ROOTS_OP(ctx, NAME) (((gr_poly_roots_op *) ctx->methods)[GR_METHOD_ ## NAME])
-GR_POLY_INLINE WARN_UNUSED_RESULT int gr_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx) { return GR_POLY_ROOTS_OP(ctx, POLY_ROOTS)(roots, mult, poly, flags, ctx); }
+GR_POLY_INLINE WARN_UNUSED_RESULT int gr_poly_roots(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx) { return GR_POLY_ROOTS_OP(ctx, POLY_ROOTS)(roots, mult, poly, flags, ctx); }
 
-typedef int ((*gr_poly_roots_op_other)(gr_vec_t, gr_vec_t, const gr_poly_t, gr_ctx_ptr, int, gr_ctx_ptr));
+typedef int ((*gr_poly_roots_op_other)(gr_vec_t, fmpz_vec_t, const gr_poly_t, gr_ctx_ptr, int, gr_ctx_ptr));
 #define GR_POLY_ROOTS_OP_OTHER(ctx, NAME) (((gr_poly_roots_op_other *) ctx->methods)[GR_METHOD_ ## NAME])
-GR_POLY_INLINE WARN_UNUSED_RESULT int gr_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx) { return GR_POLY_ROOTS_OP_OTHER(ctx, POLY_ROOTS_OTHER)(roots, mult, poly, poly_ctx, flags, ctx); }
+GR_POLY_INLINE WARN_UNUSED_RESULT int gr_poly_roots_other(gr_vec_t roots, fmpz_vec_t mult, const gr_poly_t poly, gr_ctx_t poly_ctx, int flags, gr_ctx_t ctx) { return GR_POLY_ROOTS_OP_OTHER(ctx, POLY_ROOTS_OTHER)(roots, mult, poly, poly_ctx, flags, ctx); }
 
 WARN_UNUSED_RESULT int _gr_poly_asin_series(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_asin_series(gr_poly_t res, const gr_poly_t f, slong len, gr_ctx_t ctx);
@@ -542,13 +665,46 @@ WARN_UNUSED_RESULT int _gr_poly_sin_cos_series_basecase(gr_ptr s, gr_ptr c, gr_s
 WARN_UNUSED_RESULT int gr_poly_sin_cos_series_basecase(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, int times_pi, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int _gr_poly_sin_cos_series_tangent(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, int times_pi, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_sin_cos_series_tangent(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, int times_pi, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_sin_cos_series_newton(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, slong cutoff, int times_pi, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sin_cos_series_newton(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, slong cutoff, int times_pi, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int _gr_poly_tan_series_basecase(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_tan_series_basecase(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int _gr_poly_tan_series_newton(gr_ptr f, gr_srcptr h, slong hlen, slong n, slong cutoff, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_poly_tan_series_newton(gr_poly_t f, const gr_poly_t h, slong n, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_sin_cos_series(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_sin_cos_pi_series(gr_ptr s, gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_sin_series(gr_ptr s, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_sin_pi_series(gr_ptr s, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_cos_series(gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_cos_pi_series(gr_ptr c, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sin_cos_series(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sin_cos_pi_series(gr_poly_t s, gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sin_series(gr_poly_t s, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_sin_pi_series(gr_poly_t s, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_cos_series(gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_cos_pi_series(gr_poly_t c, const gr_poly_t h, slong n, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_tan_series_basecase(gr_ptr f, gr_srcptr h, slong hlen, slong n, int func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_tan_series_basecase(gr_poly_t f, const gr_poly_t h, slong n, int func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_tan_series_newton(gr_ptr f, gr_srcptr h, slong hlen, slong n, slong cutoff, int func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_tan_series_newton(gr_poly_t f, const gr_poly_t h, slong n, slong cutoff, int func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_tan_series_sine_cosine(gr_ptr f, gr_srcptr h, slong hlen, slong n, int func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_tan_series_sine_cosine(gr_poly_t res, const gr_poly_t h, slong len, int func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_tan_series_exponential(gr_ptr f, gr_srcptr h, slong hlen, slong n, int func, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_tan_series_exponential(gr_poly_t res, const gr_poly_t h, slong len, int func, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int _gr_poly_tan_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_tanh_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_cot_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_coth_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_tan_pi_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int _gr_poly_cot_pi_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_tanh_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_cot_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_coth_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_tan_pi_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_cot_pi_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_bessel_j_series(gr_ptr res, gr_srcptr nu, gr_srcptr z, slong zlen, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_bessel_j_series(gr_poly_t res, gr_srcptr nu, const gr_poly_t z, slong len, gr_ctx_t ctx);
 
 /* Modular arithmetic and composition */
 
@@ -600,13 +756,16 @@ WARN_UNUSED_RESULT int gr_poly_compose_mod_brent_kung_precomp_preinv(gr_poly_t r
 /* Test functions */
 
 void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void _gr_poly_test_mulmid(gr_method_poly_binary_trunc2_op mulmid_impl, gr_method_poly_binary_trunc2_op mulmid_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void _gr_poly_test_approx_mulmid_pos_entrywise_accurate(gr_method_poly_binary_trunc2_op mulmid_impl, gr_method_poly_binary_trunc2_op mulmid_ref,
+    gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_div(gr_method_poly_binary_op div_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_div_series(gr_method_poly_binary_trunc_op div_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_gcd_field(gr_method_poly_gcd_op gcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_gcd_ufd(gr_method_poly_gcd_op gcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
-void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, int flags, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

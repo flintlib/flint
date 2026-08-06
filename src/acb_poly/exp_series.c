@@ -49,16 +49,16 @@ _acb_poly_exp_series_newton(acb_ptr f, acb_ptr g,
     slong l = m - 1; /* shifted for derivative */
 
     /* g := exp(-h) + O(x^m) */
-    _acb_poly_mullow(T, f, m, g, m2, m, prec);
-    _acb_poly_mullow(g + m2, g, m2, T + m2, m - m2, m - m2, prec);
+    _acb_poly_mulmid(T, f, m, g, m2, m2, m, prec);
+    _acb_poly_mullow(g + m2, g, m2, T, m - m2, m - m2, prec);
     _acb_vec_neg(g + m2, g + m2, m - m2);
 
     /* U := h' + g (f' - f h') + O(x^(n-1))
         Note: should replace h' by h' mod x^(m-1) */
     _acb_vec_zero(f + m, n - m);
-    _acb_poly_mullow(T, f, n, hprime, n, n, prec); /* should be mulmid */
+    _acb_poly_mulmid(T, f, n, hprime, n, l, n, prec);
     _acb_poly_derivative(U, f, n, prec); acb_zero(U + n - 1); /* should skip low terms */
-    _acb_vec_sub(U + l, U + l, T + l, n - l, prec);
+    _acb_vec_sub(U + l, U + l, T, n - l, prec);
     _acb_poly_mullow(T + l, g, n - m, U + l, n - m, n - m, prec);
     _acb_vec_add(U + l, hprime + l, T + l, n - m, prec);
 
@@ -71,8 +71,8 @@ _acb_poly_exp_series_newton(acb_ptr f, acb_ptr g,
     /* not needed if we only want exp(x) */
     if (n == len && inverse)
     {
-        _acb_poly_mullow(T, f, n, g, m, n, prec);
-        _acb_poly_mullow(g + m, g, m, T + m, n - m, n - m, prec);
+        _acb_poly_mulmid(T, f, n, g, m, m, n, prec);
+        _acb_poly_mullow(g + m, g, m, T, n - m, n - m, prec);
         _acb_vec_neg(g + m, g + m, n - m);
     }
 

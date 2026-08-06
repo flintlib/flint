@@ -10,6 +10,7 @@
 */
 
 #include "ca.h"
+#include "ca/impl.h"
 #include "ca_ext.h"
 #include "ca_field.h"
 #include "ca_vec.h"
@@ -37,9 +38,6 @@ ca_conj_shallow(ca_t res, const ca_t x, ca_ctx_t ctx)
     }
 }
 
-/* todo */
-ca_field_ptr ca_ctx_get_field_qqbar(ca_ctx_t ctx, const qqbar_t x);
-
 /* Set res to the generator of Q(ext). */
 void
 ca_set_ext(ca_t res, ca_ext_srcptr ext, ca_ctx_t ctx)
@@ -66,7 +64,7 @@ ca_set_ext(ca_t res, ca_ext_srcptr ext, ca_ctx_t ctx)
     }
 }
 
-void
+static void
 ca_conj_ext(ca_t res, ca_ext_ptr ext, ca_ctx_t ctx)
 {
     slong p;
@@ -220,7 +218,7 @@ ca_conj_ext(ca_t res, ca_ext_ptr ext, ca_ctx_t ctx)
 }
 
 /* Complex conjugate assuming that the generator is pure imaginary. */
-void nf_elem_conj_imag(nf_elem_t a, const nf_elem_t b, const nf_t nf)
+static void nf_elem_conj_imag(nf_elem_t a, const nf_elem_t b, const nf_t nf)
 {
     nf_elem_set(a, b, nf);
 

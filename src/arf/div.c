@@ -14,7 +14,7 @@
 
 void __gmpn_div_q(nn_ptr, nn_srcptr, slong, nn_srcptr, slong, nn_ptr);
 
-void
+static void
 arf_div_special(arf_t z, const arf_t x, const arf_t y)
 {
     if ((arf_is_zero(x) && !arf_is_zero(y) && !arf_is_nan(y)) ||

@@ -15,7 +15,7 @@
 #include "fq_nmod_mpoly.h"
 
 /* setform copies the exponents and zeros the coefficients */
-void fq_nmod_mpoly_setform(fq_nmod_mpoly_t A, fq_nmod_mpoly_t B,
+static void fq_nmod_mpoly_setform(fq_nmod_mpoly_t A, fq_nmod_mpoly_t B,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);

@@ -490,6 +490,12 @@ Bessel functions
     Computes the Bessel function of the first kind `J_{\nu}(z)` using
     an automatic algorithm choice.
 
+.. function:: void _acb_hypgeom_bessel_j_series(acb_ptr res, const acb_t nu, acb_srcptr z, slong zlen, slong len, slong prec)
+              void acb_hypgeom_bessel_j_series(acb_poly_t res, const acb_t nu, const acb_poly_t z, slong len, slong prec)
+
+    Computes the Bessel function of the first kind `J_{\nu}(z)` evaluated
+    at the power series *z*, truncated to length *len*.
+
 .. function:: void acb_hypgeom_bessel_y(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
     Computes the Bessel function of the second kind `Y_{\nu}(z)` from the

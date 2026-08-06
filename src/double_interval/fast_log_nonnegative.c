@@ -12,9 +12,6 @@
 #include "double_interval.h"
 #include "mag.h"
 
-double mag_d_log_lower_bound(double x);
-double mag_d_log_upper_bound(double x);
-
 di_t di_fast_log_nonnegative(di_t x)
 {
     di_t res;

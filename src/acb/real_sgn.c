@@ -12,7 +12,7 @@
 #include "acb.h"
 
 void
-acb_real_sgn(acb_t res, const acb_t z, int analytic, slong prec)
+acb_real_sgn(acb_t res, const acb_t z, int analytic, slong FLINT_UNUSED(prec))
 {
     if (!acb_is_finite(z) || (analytic && arb_contains_zero(acb_realref(z))))
     {

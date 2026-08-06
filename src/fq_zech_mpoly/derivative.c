@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
-slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,
+static slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,
                  const fq_zech_struct * Bcoeff, const ulong * Bexp, slong Blen,
           flint_bitcnt_t bits, slong N, slong offset, slong shift, ulong * oneexp,
                                                      const fq_zech_ctx_t fqctx)
@@ -43,7 +43,7 @@ slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,
 }
 
 
-slong _fq_zech_mpoly_derivative_mp(fq_zech_struct * Acoeff,       ulong * Aexp,
+static slong _fq_zech_mpoly_derivative_mp(fq_zech_struct * Acoeff,       ulong * Aexp,
                  const fq_zech_struct * Bcoeff, const ulong * Bexp, slong Blen,
           flint_bitcnt_t bits, slong N, slong offset,              ulong * oneexp,
                                                      const fq_zech_ctx_t fqctx)

@@ -60,7 +60,9 @@ Generic rings
    gr_mat.rst
    gr_poly.rst
    gr_mpoly.rst
+   gr_ore_poly.rst
    gr_series.rst
+   gr_dft.rst
 
 .. only:: not latex
 
@@ -89,11 +91,13 @@ Integers
    long_extras.rst
    longlong.rst
    mpn_extras.rst
+   fixed.rst
    aprcl.rst
    arith.rst
    fft.rst
    fft_small.rst
    qsieve.rst
+   radix.rst
 
 
 .. only:: not latex
@@ -296,6 +300,7 @@ p-adic numbers
    padic_poly.rst
    padic_mat.rst
    qadic.rst
+   padic_radix.rst
 
 Floating-point support code
 -----------------------------------

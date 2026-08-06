@@ -11,9 +11,10 @@
 
 #include "acb.h"
 #include "acb_hypgeom.h"
+#include "acb_hypgeom/impl.h"
 
 /* invalid in (-1,0) */
-int
+static int
 _acb_hypgeom_legendre_q_single_valid(const acb_t z)
 {
     arb_t t;

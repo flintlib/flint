@@ -11,7 +11,7 @@
 
 #include "ca.h"
 
-void
+static void
 ca_asin_special(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     if (ca_check_is_signed_inf(x, ctx) == T_TRUE)

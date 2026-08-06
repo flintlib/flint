@@ -134,9 +134,9 @@ def fmpz_bench():
 def fmpz_poly_bench():
     s = run("build/fmpz_poly_factor/profile/p-factor_hard")
     for line in s.splitlines():
-        if " ms" in line:
+        if "factors" in line:
             poly = line.split()[0]
-            time = float(line.split()[-2]) * 0.001
+            time = float(line.split()[-2])
             add_result(["fmpz_poly", "factor", poly], time)
 
 def fmpz_mpoly_bench():

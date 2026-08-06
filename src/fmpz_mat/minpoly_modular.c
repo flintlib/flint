@@ -20,7 +20,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 
-slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
+static slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
 {
     slong len = 0;
 
@@ -39,10 +39,10 @@ slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
     return len;
 }
 
-void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
+static void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
 {
    slong n = op->r, i, j;
-   fmpz * v1;
+   fmpz * v1, * v2;
    fmpz_t t, q, r1, r2;
 
    fmpz_init(t);
@@ -51,6 +51,7 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
    fmpz_init(r2);
 
    v1 = _fmpz_vec_init(n);
+   v2 = _fmpz_vec_init(n);
 
    /* |A| [1,1,...,1]^T */
    for (i = 0; i < n; i++)
@@ -63,13 +64,27 @@ void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
             fmpz_sub(v1 + i, v1 + i, fmpz_mat_entry(op, i, j));
       }
    }
+   /* |A|^t * |A| * [1,1,...,1]^T */
+   for (i = 0; i < n; i++)
+   {
+      for (j = 0; j < n; j++)
+      {
+         if (fmpz_sgn(fmpz_mat_entry(op, j, i)) >= 0)
+            fmpz_addmul(v2 + i, v1 + j, fmpz_mat_entry(op, j, i));
+         else
+            fmpz_submul(v2 + i, v1 + j, fmpz_mat_entry(op, j, i));
+      }
+   }
+
+   _fmpz_vec_clear(v1, n);
+   v1 = v2;
 
    for (i = 0; i < n; i++)
    {
       fmpz_zero(t);
-
       /* q_i */
-      fmpz_abs(t, fmpz_mat_entry(op, i, i));
+      for (j = 1; j < n; j++)
+         fmpz_addmul(t, fmpz_mat_entry(op, i, j), fmpz_mat_entry(op, i, j));
 
       if (fmpz_cmp(t, q) > 0)
          fmpz_set(q, t);
@@ -117,7 +132,7 @@ static inline double _log2e(const double x, slong exp)
     See Lemma 3.1 in Dumas, "Bounds on the coefficients of the
     characteristic and minimal polynomials", 2007.
 */
-slong
+static slong
 _fmpz_mat_minpoly_bound_bits(const fmpz_mat_t op)
 {
     const slong n = op->r;

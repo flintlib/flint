@@ -27,7 +27,7 @@ int fq_zech_next(fq_zech_t x, const fq_zech_ctx_t FLINT_UNUSED(ctx))
     return 1;
 }
 
-void fq_zech_bpoly_eval_var1(
+static void fq_zech_bpoly_eval_var1(
     fq_zech_poly_t E,
     const fq_zech_bpoly_t A,
     const fq_zech_t alpha,
@@ -41,7 +41,7 @@ void fq_zech_bpoly_eval_var1(
     _fq_zech_poly_normalise(E, ctx);
 }
 
-void fq_zech_bpoly_make_monic_series(
+static void fq_zech_bpoly_make_monic_series(
     fq_zech_bpoly_t A,
     const fq_zech_bpoly_t B,
     slong order,

@@ -43,7 +43,7 @@ _acb_dirichlet_definite_hardy_z(arb_t res, const arf_t t, slong *pprec)
     return msign;
 }
 
-void
+static void
 _refine_hardy_z_zero_illinois(arb_t res, const arf_t ra, const arf_t rb, slong prec)
 {
     arf_t a, b, fa, fb, c, fc, t;
@@ -143,7 +143,7 @@ _refine_hardy_z_zero_illinois(arb_t res, const arf_t ra, const arf_t rb, slong p
     arb_clear(z);
 }
 
-void
+static void
 _refine_hardy_z_zero_newton(arb_t res, const arf_t ra, const arf_t rb, slong prec)
 {
     acb_t z, zstart;

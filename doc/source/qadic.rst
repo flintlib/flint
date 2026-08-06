@@ -80,6 +80,30 @@ elements.
     arithmetic in `\mathbf{Q}_p / (p^N)` such as powers of `p` close 
     to `p^N`.
 
+.. function:: void qadic_ctx_init_modulus(qadic_ctx_t ctx, const fmpz_t p, const fmpz_mod_poly_t modulus, slong min, slong max, const char *var, enum padic_print_mode mode)
+              void qadic_ctx_init_modulus_nmod(qadic_ctx_t ctx, ulong p, const nmod_poly_t modulus, slong min, slong max, const char *var, enum padic_print_mode mode)
+
+    Initialises the context ``ctx`` with prime `p`, given defining polynomial ``modulus``, variable name ``var``
+    and printing mode ``mode``.
+
+    Stores powers of `p` with exponents between ``min`` (inclusive) and
+    ``max`` exclusive.  Assumes that ``min`` is at most ``max``.
+
+    Assumes that `p` is a prime.
+
+    Assumes that ``modulus`` is a monic irreducible polynomial over
+    `\mathbf{F}_{p}`.
+
+    Assumes that the string ``var`` is a null-terminated string
+    of length at least one.
+
+    Assumes that the printing mode is one of ``PADIC_TERSE``,
+    ``PADIC_SERIES``, or ``PADIC_VAL_UNIT``.
+
+    This function also carries out some relevant precomputation for
+    arithmetic in `\mathbf{Q}_p / (p^N)` such as powers of `p` close
+    to `p^N`.
+
 .. function:: void qadic_ctx_clear(qadic_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
@@ -307,6 +331,16 @@ Square root
 
     Return ``1`` if the input is a square (to input precision). If so, set
     ``rop`` to a square root (truncated to output precision).
+
+.. function:: struct qadic2_sqrt_precomp *_qadic_char2_sqrt_precomp_init(const qadic_ctx_t ctx)
+.. function:: int _qadic_char2_sqrt_with_precomp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx, const struct qadic2_sqrt_precomp *data)
+.. function:: void _qadic_char2_sqrt_precomp_clear(struct qadic2_sqrt_precomp *data)
+
+    To compute a qadic square root in characteristic 2, we need to solve the Artin-Schreier equation to get
+    the initial square root approximation. The data needed to solve it can be precomputed once, since it
+    depends only on the extension itself.
+
+    Note that ``struct qadic2_sqrt_precomp *`` is an opaque pointer; the definition of the struct is not provided.
 
 
 Special functions

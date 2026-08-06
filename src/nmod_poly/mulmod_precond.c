@@ -11,6 +11,7 @@
 
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "nmod_poly/impl.h"
 
 /* This should match _nmod_poly_divrem_try_sparse. Todo:
    implement a sparse method in this file instead of relying on
@@ -142,9 +143,6 @@ _nmod_poly_mulmod_precond_shoup(nn_ptr res, nn_srcptr a, slong alen, nn_srcptr a
 
     TMP_END;
 }
-
-void _nmod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
-                          nn_srcptr A, nn_srcptr B, slong lenA, ulong invL, nmod_t mod);
 
 static void
 _nmod_poly_mulmod_precond_precompute_matrix(nn_ptr res, nn_srcptr a, slong alen, slong n, nn_srcptr d, ulong dinv, int packing, nmod_t mod)

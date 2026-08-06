@@ -21,9 +21,11 @@ _nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
 {
     ulong invB;
 
-    if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||
-            (NMOD_BITS(mod) <= 61 && lenA <= 40) ||
-            (NMOD_BITS(mod) <= 29 && lenA <= 70))
+#if FLINT_BITS == 64 && defined(__AVX2__)
+    if (lenA - lenB < 80 || lenB < ((NMOD_BITS(mod) <= 27) ? 400 : 80))
+#else
+    if (lenA - lenB < 80 || lenB < ((NMOD_BITS(mod) <= 27) ? 200 : 80))
+#endif
     {
         invB = (B[lenB - 1] == 1) ? 1 : n_invmod(B[lenB - 1], mod.n);
 

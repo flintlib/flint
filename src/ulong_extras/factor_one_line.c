@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2009 Thomas Boothby
+    Copyright (C) 2025 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,7 +11,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
+
+static int n_is_square_and_get_sqrt(ulong * s, ulong x)
+{
+    ulong sq = sqrt((double) x) + 0.5;
+
+    *s = sq;
+    return x == sq * sq;
+}
 
 #define FLINT_ONE_LINE_MULTIPLIER 480
 
@@ -27,9 +37,8 @@ ulong n_factor_one_line(ulong n, ulong iters)
         sqrti++;
         square = sqrti*sqrti;
         mod = square - in;
-        if (n_is_square(mod))
+        if (n_is_square_and_get_sqrt(&factor, mod))
         {
-            factor = n_sqrt(mod);
             sqrti -= factor;
             factor = n_gcd(orig_n, sqrti);
             if (factor != UWORD(1))

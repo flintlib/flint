@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-ulong
+static ulong
 z_gcdinv(ulong * inv, slong a, ulong b)
 {
     ulong g, ua = FLINT_ABS(a);

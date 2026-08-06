@@ -11,6 +11,8 @@ References
 
 .. [Ari2012] \J. Arias de Reyna, "Programs for Riemann's zeta function", (J. A. J. van Vonderen, Ed.) *Leven met getallen : liber amicorum ter gelegenheid van de pensionering van Herman te Riele* CWI (2012) 102-112, https://ir.cwi.nl/pub/19724
 
+.. [Ari2020] \J. Arias de Reyna, "Computation of the secondary zeta function", https://arxiv.org/abs/2006.04869
+
 .. [Arn2010] \J. Arndt, *Matters Computational*, Springer (2010), https://www.jjj.de/fxt/#fxtbook
 
 .. [Arn2012] \J. Arndt, "On computing the generalized Lambert series", https://arxiv.org/abs/1202.6525
@@ -69,6 +71,8 @@ References
 
 .. [BuhlerCrandallSompolski1992] \Buhler, J.P. and Crandall, R.E. and Sompolski, R.W. : Irregular primes to one million : Math. Comp. 59:2000 (1992) 717--722
 
+.. [BW1993] \T. Becker and V. Weispfenning, *Gröbner Bases: A Computational Approach to Commutative Algebra*, Graduate Texts in Mathematics 141, Springer-Verlag (1993). https://doi.org/10.1007/978-1-4612-0913-3
+
 .. [CFG2017] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and vector-valued Siegel modular forms of genus two", Math. Ann. 369 (2017), 1649--1669. https://doi.org/10.1007/s00208-016-1510-2
 
 .. [CFG2019] \F. Cléry, C. Faber, and G. van der Geer. "Covariants of binary sextics and modular forms of degree 2 with character", Math. Comp. 88 (2019), 2423--2441. https://doi.org/10.1090/mcom/3412
@@ -111,11 +115,15 @@ References
 
 .. [EK2025] \N. D. Elkies and J. Kieffer, "A uniform quasi-linear time algorithm for evaluating theta functions in any dimension", in preparation.
 
+.. [FeiGal2013] \J. Feitsma and W. Galway, "Tables of pseudoprimes and related data", http://www.cecm.sfu.ca/Pseudoprimes/index-2-to-64.html
+
 .. [Fie2007] \C. Fieker, "Sparse representation for cyclotomic fields". Experiment. Math. Volume 16, Issue 4 (2007), 493-500. https://doi.org/10.1080/10586458.2007.10129012
 
 .. [FieHof2014] \Fieker C. and Hofmann T.: "Computing in quotients of rings of integers" LMS Journal of Computation and Mathematics, 17(A), 349-365
 
 .. [Fil1992] \S. Fillebrown, "Faster Computation of Bernoulli Numbers", Journal of Algorithms 13 (1992) 431-445
+
+.. [ForJan2015] M. Forisek and J. Jancina, "Fast Primality Testing for Integers That Fit into a Machine Word", SOFSEM 2015, https://ceur-ws.org/Vol-1326/020-Forisek.pdf
 
 .. [GCL1992] \K. O. Geddes, S. R. Czapor and G. Labahn. *Algorithms for computer algebra*. Springer, 1992. https://doi.org/10.1007/b102438
 
@@ -138,6 +146,10 @@ References
 .. [GraMol2010] \Torbjörn Granlund and Niels Möller : Improved Division by Invariant Integers, https://gmplib.org/~tege/division-paper.pdf
 
 .. [GraMon1994] \Törbjorn Granlund and Peter L. Montgomery : Division by Invariant Integers using Multiplication https://gmplib.org/~tege/divcnst-pldi94.pdf
+
+.. [HJ2024] \J. van der Hoeven and F. Johansson, "Fast multiple precision exp(x) with precomputations", 2024 IEEE 31st Symposium on Computer Arithmetic (ARITH) (2024), https://hal.science/hal-04454093
+
+.. [Zun2025] \J. Zuniga, "Fast Ramanujan-type Series for Logarithms. Part I", 2025, https://arxiv.org/abs/2506.08245
 
 .. [HM2017] \J. van der Hoeven and B. Mourrain. "Efficient certification of numeric solutions to eigenproblems", MACIS 2017, 81-94, (2017), https://hal.archives-ouvertes.fr/hal-01579079
 
@@ -187,7 +199,7 @@ References
 
 .. [Joh2014b] \F. Johansson, "Evaluating parametric holonomic sequences using rectangular splitting", ISSAC 2014, 256-263. https://doi.org/10.1145/2608628.2608629
 
-.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", https://arxiv.org/abs/1410.7176
+.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", 22nd IEEE Symposium on Computer Arithmetic (ARITH 22), 83-89 (2015), https://arxiv.org/abs/1410.7176
 
 .. [Joh2015] \F. Johansson, "Computing Bell numbers", https://fredrikj.net/blog/2015/08/computing-bell-numbers/
 
@@ -212,6 +224,8 @@ References
 .. [KanBac1979] \Kannan, R. and Bachem, A. : Polynomial algorithms for computing and the Smith and Hermite normal forms of an integer matrix, SIAM J. Computation vol. 9 (1979) 499--507
 
 .. [Kar1998] \E. A. Karatsuba, "Fast evaluation of the Hurwitz zeta function and Dirichlet L-series", Problems of Information Transmission 34:4 (1998), 342-353, http://www.mathnet.ru/php/archive.phtml?wshow=paper&jrnid=ppi&paperid=425&option_lang=eng
+
+.. [KL2024] \Y. Kinoshita and B. Li, "Power series composition in near-linear time", 2024, https://arxiv.org/abs/2404.05177
 
 .. [Knu1997] \Knuth, D. E. The Art of Computer Programming, volume 2: Seminumerical algorithms, 1997
 
@@ -350,6 +364,8 @@ References
 .. [vHP2012] \M. van Hoeij and V. Pal. "Isomorphisms of algebraic number fields". Journal de Théorie des Nombres de Bordeaux, Vol. 24, No. 2 (2012), pp. 293-305. https://doi.org/10.2307/43973105
 
 .. [vdH1995] \J. van der Hoeven, "Automatic numerical expansions". Proc. of the conference Real numbers and computers (1995), 261-274. https://www.texmacs.org/joris/ane/ane-abs.html
+
+.. [vdH2004] \J. van der Hoeven, "Truncated FFTs", ISSAC 2004 notes, https://www.texmacs.org/joris/issac04/issac04.html
 
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 

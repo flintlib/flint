@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void _fmpz_mat_window_with_perm_init(fmpz_mat_t Ap, slong * perm,
+static void _fmpz_mat_window_with_perm_init(fmpz_mat_t Ap, slong * perm,
 		                               const fmpz_mat_t A, slong start)
 {
     slong i, n = A->r;
@@ -30,7 +30,7 @@ void _fmpz_mat_window_with_perm_init(fmpz_mat_t Ap, slong * perm,
     Ap->c = A->c;
 }
 
-void _fmpz_mat_window_with_perm_clear(fmpz_mat_t Ap)
+static void _fmpz_mat_window_with_perm_clear(fmpz_mat_t Ap)
 {
     flint_free(Ap->entries);
 }

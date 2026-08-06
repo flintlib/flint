@@ -60,7 +60,7 @@ FLINT_DLL extern int global_thread_pool_initialized;
 
 void * thread_pool_idle_loop(void * varg);
 
-void thread_pool_init(thread_pool_t T, slong l);
+void thread_pool_init(thread_pool_t T, slong size);
 
 int thread_pool_set_affinity(thread_pool_t T,
                                                      int * cpus, slong length);

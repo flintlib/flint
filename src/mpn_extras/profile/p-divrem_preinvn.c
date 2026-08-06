@@ -23,7 +23,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
 void
@@ -51,7 +51,7 @@ mpn_tdiv_qr_preinvn(mp_ptr q, mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr dno
     }
 }
 
-int main()
+int main(void)
 {
     double t0, t1, tt;
     mp_size_t rn, qn, xn;
@@ -97,13 +97,13 @@ int main()
 
             flint_mpn_preinvn(Dinv, Dnormed, rn);
 
-            TIMEIT_START
+            TIMEIT_START;
             mpn_tdiv_qr(Q1, R1, 0, X, xn, D, rn);
-            TIMEIT_STOP_VALUES(tt, t0)
+            TIMEIT_STOP_VALUES(tt, t0);
 
-            TIMEIT_START
+            TIMEIT_START;
             mpn_tdiv_qr_preinvn(Q2, R2, X, xn, Dnormed, rn, Dinv, norm);
-            TIMEIT_STOP_VALUES(tt, t1)
+            TIMEIT_STOP_VALUES(tt, t1);
 
             if (mpn_cmp(Q1, Q2, qn) || mpn_cmp(R1, R2, rn))
             {

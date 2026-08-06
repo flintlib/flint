@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <gmp.h>
 #include "ulong_extras.h"
 #include "bernoulli.h"
+#include "bernoulli/impl.h"
 
 #define DEBUG 0
 #define TIMING 1
@@ -229,7 +230,7 @@ expander_expand(nn_ptr res, expander_t * this, ulong s, ulong n)
 #error Number of bits in a ulong must be divisible by TABLE_LG_SIZE
 #endif
 
-ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
+static ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
 {
     slong i, m;
     ulong g_to_km1, two_to_km1, B_to_km1, s_jump;
@@ -518,7 +519,7 @@ static ulong PrepRedc(ulong n)
    (See bernsum_pow2() for code comments; we only add comments here where
    something is different from bernsum_pow2())
 */
-ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
+static ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
 {
     ulong pinv2 = PrepRedc(p);
     ulong F = (UWORD(1) << (FLINT_BITS/2)) % p;
@@ -829,7 +830,7 @@ ulong _bernoulli_mod_p_harvey_pow2(ulong p, ulong pinv, ulong k)
       2 <= k <= p-3, k even
       pinv = PrepMulMod(p)
 */
-ulong _bernoulli_mod_p_harvey(ulong p, ulong pinv, ulong k)
+static ulong _bernoulli_mod_p_harvey(ulong p, ulong pinv, ulong k)
 {
     if (n_powmod2_preinv(2, k, p, pinv) != 1)
     {

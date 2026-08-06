@@ -331,23 +331,13 @@ void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k);
 
 /*  Bit packing  *************************************************************/
 
-void _fmpz_poly_bit_pack(nn_ptr arr, const fmpz * poly,
-                                slong len, flint_bitcnt_t bit_size, int negate);
+void _fmpz_poly_bit_pack(nn_ptr arr, const fmpz * poly, slong len, flint_bitcnt_t bit_size, int negate);
+void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly, flint_bitcnt_t bit_size);
 
-int _fmpz_poly_bit_unpack(fmpz * poly, slong len,
-                           nn_srcptr arr, flint_bitcnt_t bit_size, int negate);
-
-void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len,
-                                       nn_srcptr arr, flint_bitcnt_t bit_size);
-
-void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
-        flint_bitcnt_t bit_size);
-
-void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f,
-        flint_bitcnt_t bit_size);
-
-void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
-        flint_bitcnt_t bit_size);
+int _fmpz_poly_bit_unpack(fmpz * poly, slong nlo, slong nhi, nn_srcptr arr, flint_bitcnt_t bit_size, int negate);
+void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong nlo, slong nhi, nn_srcptr arr, flint_bitcnt_t bit_size);
+void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size);
+void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size);
 
 
 /*  Multiplication  **********************************************************/
@@ -370,11 +360,14 @@ void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1,
 void fmpz_poly_mulhigh_classical(fmpz_poly_t res,
               const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong start);
 
-void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1,
-                                  slong len1, const fmpz * poly2, slong len2);
-
-void fmpz_poly_mulmid_classical(fmpz_poly_t res,
-                          const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);
+void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi);
+void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);
+void fmpz_poly_mulmid_SS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi);
+void _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);
+void fmpz_poly_mulmid_KS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi);
+void _fmpz_poly_mulmid(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);
+void fmpz_poly_mulmid(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi);
 
 void fmpz_poly_mul_karatsuba(fmpz_poly_t res,
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
@@ -409,14 +402,14 @@ void _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, slong len1,
 void fmpz_poly_mullow_KS(fmpz_poly_t res, const fmpz_poly_t poly1,
                                            const fmpz_poly_t poly2, slong n);
 
-void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, slong length1,
-                                         const fmpz * input2, slong length2);
+void _fmpz_poly_mul_SS(fmpz * res, const fmpz * poly1, slong len1,
+                                         const fmpz * poly2, slong len2);
 
 void fmpz_poly_mul_SS(fmpz_poly_t res,
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
-void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong length1,
-                                 const fmpz * input2, slong length2, slong n);
+void _fmpz_poly_mullow_SS(fmpz * res, const fmpz * poly1, slong len1,
+                                     const fmpz * poly2, slong len2, slong n);
 
 void fmpz_poly_mullow_SS(fmpz_poly_t res,
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n);
@@ -625,6 +618,8 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
 {
     fmpz_poly_xgcd_modular(r, s, t, poly1, poly2);
 }
+
+void fmpz_poly_squarefree_part(fmpz_poly_t res, const fmpz_poly_t poly);
 
 /*  Discriminant  ********************************************************/
 
@@ -1208,16 +1203,36 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
 /* Roots */
 
 void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, slong len);
-
 void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 
 void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len);
-
 slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t poly);
-
+slong _fmpz_poly_num_real_roots_vca(const fmpz * pol, slong len);
+slong fmpz_poly_num_real_roots_vca(const fmpz_poly_t pol);
 slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len);
-
 slong fmpz_poly_num_real_roots(const fmpz_poly_t poly);
+
+slong fmpz_poly_num_real_roots_upper_bound(const fmpz_poly_t pol);
+slong _fmpz_poly_descartes_bound_0_1(const fmpz * p, slong len, slong bound);
+
+int _fmpz_poly_has_real_root(const fmpz * p, slong len);
+int fmpz_poly_has_real_root(const fmpz_poly_t pol);
+
+slong fmpz_poly_num_real_roots_0_1_sturm(const fmpz_poly_t pol);
+slong fmpz_poly_num_real_roots_0_1_vca(const fmpz_poly_t pol);
+slong fmpz_poly_num_real_roots_0_1(const fmpz_poly_t pol);
+
+slong _fmpz_poly_positive_root_upper_bound_2exp_local_max(const fmpz * pol, slong len);
+slong _fmpz_poly_positive_root_upper_bound_2exp(const fmpz * pol, slong len);
+slong fmpz_poly_positive_root_upper_bound_2exp(const fmpz_poly_t pol);
+
+void _fmpz_poly_isolate_real_roots_0_1_vca(fmpq * exact_roots, slong * n_exact,
+        fmpz * c_array, slong * k_array, slong * n_intervals,
+        const fmpz * pol, slong len);
+void fmpz_poly_isolate_real_roots(fmpq * exact_roots, slong * n_exact,
+    fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol);
+void fmpz_poly_isolate_positive_roots(fmpq * exact_roots, slong * n_exact,
+    fmpz * c_array, slong * k_array, slong * n_interval, const fmpz_poly_t pol);
 
 /* CLD bounds */
 

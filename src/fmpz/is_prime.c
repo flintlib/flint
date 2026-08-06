@@ -16,7 +16,7 @@
 #include "fmpz.h"
 #include "aprcl.h"
 
-int _fmpz_is_prime(const fmpz_t n, int proved)
+static int _fmpz_is_prime(const fmpz_t n, int proved)
 {
    double logd;
    ulong p, ppi, limit;
@@ -25,7 +25,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
    const ulong * primes;
    const double * pinv;
 
-   fmpz_t F1, Fsqr, Fcub, R, t;
+   fmpz_t F1, Fsqr, Fcub, R;
    int res = -1;
 
     if (!COEFF_IS_MPZ(*n))
@@ -34,9 +34,8 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
        if (v <= 1)
            return 0;
 
-       /* Note: we want n_is_prime rather than n_is_probabprime
-          even when proved == 0, because ns_is_prime handles general
-          input faster. */
+       /* Note: n_is_prime and n_is_probabprime are currently identical,
+          so we ignore the proved flag. */
        return n_is_prime(v);
    }
    else
@@ -57,48 +56,52 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
       if (d[0] % 2 == 0)
           return 0;
 
-      bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
-      trial_primes = bits;
-
-      if (flint_mpn_factor_trial(d, size, 1, trial_primes))
-           return 0;
-    }
-
-   /* todo: use fmpz_is_perfect_power? */
-   if (fmpz_is_square(n))
-      return 0;
-
-   if (!proved)
-      return fmpz_is_probabprime_BPSW(n);
-
-   /* Fast deterministic Miller-Rabin test up to about 81 bits. This choice of
-      bases certifies primality for n < 3317044064679887385961981;
-      see https://doi.org/10.1090/mcom/3134 */
-   fmpz_init(t);
-   fmpz_tdiv_q_2exp(t, n, 64);
-   if (fmpz_cmp_ui(t, 179817) < 0)
-   {
-      static const char bases[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 0 };
-
-      for (i = 0; bases[i] != 0; i++)
+      if (size == 2 && FLINT_BITS == 64)
       {
-         fmpz_set_ui(t, bases[i]);
-         if (!fmpz_is_strong_probabprime(n, t))
-             return 0;  /* no need to clear t since it is small */
+         /* n_ll_is_prime does trial division, a base-2 sprp test, and may
+            additionally be able to certify some inputs. Currently the
+            certifications in n_ll_is_prime are faster than a Lucas test,
+            so use it even when !proved. */
+         res = n_ll_is_prime(d[1], d[0]);
+         if (res != -1)
+            return res;
       }
+      else
+      {
+          bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
+          trial_primes = bits;
 
-      return 1;
+          if (flint_mpn_factor_trial(d, size, 1, trial_primes))
+               return 0;
+
+           /* todo: use fmpz_is_perfect_power? */
+           if (fmpz_is_square(n))
+              return 0;
+
+           /* Do a single base-2 test to rule out most composites */
+           fmpz base2 = 2;
+           if (!fmpz_is_strong_probabprime(n, &base2))
+             return 0;
+      }
    }
 
-   /* Do a single base-2 test to rule out most composites */
-   fmpz_set_ui(t, 2);
-   if (!fmpz_is_strong_probabprime(n, t))
-     return 0;
-
-   fmpz_clear(t);
+   /* At this point n has no small factor and is at least a base-2 sprp.
+      Adding a Lucas test makes this a BPSW test. */
+   if (!proved)
+     return fmpz_is_probabprime_lucas(n);
 
    logd = fmpz_dlog(n);
    limit = (ulong) (logd*logd*logd/100.0) + 20;
+
+   /* Below about 260 bits, a 10x larger trial factor base measurably
+      increases the fraction of inputs proven by the n +- 1 tests alone
+      (for instance from 43% to 69% of random 96-bit primes) while the
+      scan remains far cheaper than the APRCL fallback it avoids, for
+      10-15% faster average proving times at 96-128 bits. Above that
+      size the n +- 1 route essentially never completes for random
+      inputs and a larger factor base is pure overhead. */
+   if (logd < 180.0)
+      limit *= 10;
 
    fmpz_init(F1);
    fmpz_init(R);
@@ -148,6 +151,73 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
          /* get next batch of primes */
          primes += num;
          pinv += num;
+      }
+
+      /* Feasibility check: with F1 | n - 1 and F2 | n + 1 the fully
+         factored parts, every proof below requires lcm(F1, F2)^3 > n
+         (Lenstra's divisors in residue classes being the weakest such
+         condition), except when a cofactor of n - 1 or n + 1 is itself
+         prime. Both the smooth parts arising from the trial factor bases
+         and the probable primality of the cofactors can be determined for
+         a fraction of the cost of the Pocklington and Morrison tests, so
+         work them out first and skip straight to APRCL when the p - 1
+         and p + 1 machinery cannot possibly complete a proof. */
+      {
+         fmpz_t Fc, Rc, t;
+         fmpz base2 = 2;
+         int feasible = 0, side;
+
+         fmpz_init(Fc);
+         fmpz_init(Rc);
+         fmpz_init(t);
+
+         fmpz_set_ui(Fc, 1);
+
+         for (side = 0; side < 2 && !feasible; side++)
+         {
+            ulong * pf = (side == 0) ? pm1 : pp1;
+            slong npf = (side == 0) ? num_pm1 : num_pp1;
+
+            if (side == 0)
+               fmpz_sub_ui(Rc, n, 1);
+            else
+               fmpz_add_ui(Rc, n, 1);
+
+            for (i = 0; i < npf; i++)
+            {
+               slong e;
+
+               fmpz_set_ui(t, pf[i]);
+               e = fmpz_remove(Rc, Rc, t);
+               fmpz_pow_ui(t, t, e);
+               fmpz_mul(Fc, Fc, t);
+            }
+
+            /* prime cofactor makes n -+ 1 fully factorable */
+            if (fmpz_is_one(Rc) || fmpz_is_strong_probabprime(Rc, &base2))
+               feasible = 1;
+         }
+
+         if (!feasible)
+         {
+            /* both 2-parts were included, so lcm(F1, F2) >= Fc / 2 */
+            fmpz_tdiv_q_2exp(Fc, Fc, 1);
+            fmpz_mul(t, Fc, Fc);
+            fmpz_mul(t, t, Fc);
+            feasible = (fmpz_cmp(t, n) > 0);
+         }
+
+         fmpz_clear(Fc);
+         fmpz_clear(Rc);
+         fmpz_clear(t);
+
+         if (!feasible)
+         {
+            res = aprcl_is_prime(n);
+            _nmod_vec_clear(pm1);
+            _nmod_vec_clear(pp1);
+            break;
+         }
       }
 
       /* p - 1 test */

@@ -104,6 +104,7 @@ TEST_FUNCTION_START(fmpz_poly_print_read_pretty, state)
             for (i = 0; i < n; ++i)
                 fmpz_poly_clear(a[i]);
             flint_free(a);
+            flint_cleanup_master();
             exit(0);
         }
         else  /* Parent process */
@@ -214,6 +215,7 @@ TEST_FUNCTION_START(fmpz_poly_print_read_pretty, state)
             }
 
             fclose(out);
+            flint_cleanup_master();
             exit(0);
         }
         else  /* Parent process */

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010 William Hart
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,35 +12,54 @@
 */
 
 #include "mpn_extras.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_mul_KS(nn_ptr out, nn_srcptr in1, slong len1,
-                  nn_srcptr in2, slong len2, flint_bitcnt_t bits, nmod_t mod)
+_nmod_poly_mulmid_KS(nn_ptr out, nn_srcptr in1, slong len1,
+            nn_srcptr in2, slong len2, slong nlo, slong nhi, nmod_t mod)
 {
-    slong len_out = len1 + len2 - 1, limbs1, limbs2;
+    slong limbs1, limbs2, dlen;
     nn_ptr tmp, mpn1, mpn2, res;
+    ulong bits;
     int squaring;
     TMP_INIT;
 
+    len1 = FLINT_MIN(len1, nhi);
+    len2 = FLINT_MIN(len2, nhi);
+
+    if (nlo != 0)
+    {
+        slong nlo2 = (len1 + len2 - 1) - nlo;
+
+        if (len1 > nlo2)
+        {
+            slong trunc = len1 - nlo2;
+            in1 += trunc;
+            len1 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+
+        if (len2 > nlo2)
+        {
+            slong trunc = len2 - nlo2;
+            in2 += trunc;
+            len2 -= trunc;
+            nlo -= trunc;
+            nhi -= trunc;
+        }
+    }
+
     squaring = (in1 == in2 && len1 == len2);
 
-    if (bits == 0)
+    dlen = FLINT_MIN(len1, len2);
+    bits = 2 * NMOD_BITS(mod) + FLINT_BIT_COUNT(dlen);
+    if (bits <= FLINT_BITS)
     {
-        flint_bitcnt_t bits1, bits2, loglen;
-
-        /* Look at the actual bits of the input? This slows down the generic
-        case. Are there situations where we care enough about special input? */
-#if 0
-        bits1  = _nmod_vec_max_bits2(in1, len1);
-        bits2  = squaring ? bits1 : _nmod_vec_max_bits2(in2, len2);
-#else
-        bits1 = FLINT_BITS - (slong) mod.norm;
-        bits2 = bits1;
-#endif
-
-        loglen = FLINT_BIT_COUNT(len2);
-        bits = bits1 + bits2 + loglen;
+        ulong m = (mod.n - 1) * (mod.n - 1) * dlen;
+        bits = FLINT_BIT_COUNT(m);
+        bits = FLINT_MAX(bits, 1);
     }
 
     limbs1 = (len1 * bits - 1) / FLINT_BITS + 1;
@@ -57,57 +77,95 @@ _nmod_poly_mul_KS(nn_ptr out, nn_srcptr in1, slong len1,
 
     if (squaring)
         flint_mpn_sqr(res, mpn1, limbs1);
-    else
+    else if (limbs1 >= limbs2)
         flint_mpn_mul(res, mpn1, limbs1, mpn2, limbs2);
+    else
+        flint_mpn_mul(res, mpn2, limbs2, mpn1, limbs1);
 
-    _nmod_poly_bit_unpack(out, len_out, res, bits, mod);
+    _nmod_poly_bit_unpack(out, nlo, nhi, res, bits, mod);
 
     TMP_END;
 }
 
 void
-nmod_poly_mul_KS(nmod_poly_t res,
-                 const nmod_poly_t poly1, const nmod_poly_t poly2,
-                 flint_bitcnt_t bits)
+_nmod_poly_mullow_KS(nn_ptr out, nn_srcptr in1, slong len1,
+                  nn_srcptr in2, slong len2, slong n, nmod_t mod)
 {
-    slong len_out;
+    _nmod_poly_mulmid_KS(out, in1, len1, in2, len2, 0, n, mod);
+}
 
-    if ((poly1->length == 0) || (poly2->length == 0))
+void
+_nmod_poly_mul_KS(nn_ptr out, nn_srcptr in1, slong len1,
+                  nn_srcptr in2, slong len2, nmod_t mod)
+{
+    _nmod_poly_mulmid_KS(out, in1, len1, in2, len2, 0, len1 + len2 - 1, mod);
+}
+
+void
+nmod_poly_mulmid_KS(nmod_poly_t res,
+    const nmod_poly_t poly1, const nmod_poly_t poly2, slong nlo, slong nhi)
+{
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong len;
+
+    if (len1 == 0 || len2 == 0 || nlo >= FLINT_MIN(nhi, len1 + len2 - 1))
     {
         nmod_poly_zero(res);
         return;
     }
 
-    len_out = poly1->length + poly2->length - 1;
+    nhi = FLINT_MIN(nhi, len1 + len2 - 1);
+    len = nhi - nlo;
 
-    if (res == poly1 || res == poly2)
-    {
-        nmod_poly_t temp;
-        nmod_poly_init2_preinv(temp, poly1->mod.n, poly1->mod.ninv, len_out);
-        if (poly1->length >= poly2->length)
-            _nmod_poly_mul_KS(temp->coeffs, poly1->coeffs, poly1->length,
-                              poly2->coeffs, poly2->length, bits,
-                              poly1->mod);
-        else
-            _nmod_poly_mul_KS(temp->coeffs, poly2->coeffs, poly2->length,
-                              poly1->coeffs, poly1->length, bits,
-                              poly1->mod);
-        nmod_poly_swap(res, temp);
-        nmod_poly_clear(temp);
-    }
-    else
-    {
-        nmod_poly_fit_length(res, len_out);
-        if (poly1->length >= poly2->length)
-            _nmod_poly_mul_KS(res->coeffs, poly1->coeffs, poly1->length,
-                              poly2->coeffs, poly2->length, bits,
-                              poly1->mod);
-        else
-            _nmod_poly_mul_KS(res->coeffs, poly2->coeffs, poly2->length,
-                              poly1->coeffs, poly1->length, bits,
-                              poly1->mod);
-    }
-
-    res->length = len_out;
+    nmod_poly_fit_length(res, len);
+    _nmod_poly_mulmid_KS(res->coeffs, poly1->coeffs, len1,
+        poly2->coeffs, len2, nlo, nhi, poly1->mod);
+    res->length = len;
     _nmod_poly_normalise(res);
 }
+
+void
+nmod_poly_mullow_KS(nmod_poly_t res,
+    const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
+{
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong len;
+
+    if (len1 == 0 || len2 == 0 || n == 0)
+    {
+        nmod_poly_zero(res);
+        return;
+    }
+
+    len = FLINT_MIN(n, len1 + len2 - 1);
+    nmod_poly_fit_length(res, len);
+    _nmod_poly_mullow_KS(res->coeffs, poly1->coeffs, len1,
+        poly2->coeffs, len2, len, poly1->mod);
+    res->length = len;
+    _nmod_poly_normalise(res);
+}
+
+void
+nmod_poly_mul_KS(nmod_poly_t res,
+    const nmod_poly_t poly1, const nmod_poly_t poly2)
+{
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong len;
+
+    if (len1 == 0 || len2 == 0)
+    {
+        nmod_poly_zero(res);
+        return;
+    }
+
+    len = len1 + len2 - 1;
+
+    nmod_poly_fit_length(res, len);
+    _nmod_poly_mul_KS(res->coeffs, poly1->coeffs, len1, poly2->coeffs, len2, poly1->mod);
+    res->length = len;
+    _nmod_poly_normalise(res);
+}
+

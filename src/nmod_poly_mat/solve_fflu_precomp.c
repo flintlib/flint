@@ -17,7 +17,7 @@
 #define BB(ii,jj) nmod_poly_mat_entry(B,(ii),(jj))
 #define LU(ii,jj) nmod_poly_mat_entry(FFLU,(ii),(jj))
 
-void
+static void
 nmod_poly_mat_set_perm(nmod_poly_mat_t X, const slong * perm,
     const nmod_poly_mat_t B)
 {

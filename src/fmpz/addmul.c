@@ -14,6 +14,7 @@
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
+#include "fmpz/impl.h"
 
 /* Will not get called with x or y small. */
 void

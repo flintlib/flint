@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,38 +11,66 @@
 
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "mag.h"
 
 static void
-fmpz_mat_det_bound_inner(fmpz_t bound, const fmpz_mat_t A, int zero_cols)
+fmpz_mat_det_bound_inner(fmpz_t bound, const fmpz_mat_t A, int include_zero_norms)
 {
-    fmpz_t p, s, t;
+    slong r = fmpz_mat_nrows(A);
+    slong c = fmpz_mat_ncols(A);
     slong i, j;
+    mag_t t, rbound, cbound;
+    mag_struct *rnorms, *cnorms;
 
-    fmpz_init(p);
-    fmpz_init(s);
-    fmpz_init(t);
-    fmpz_one(p);
-
-    for (i = 0; i < A->r; i++)
+    if (r == 0 || c == 0)
     {
-        fmpz_zero(s);
-
-        for (j = 0; j < A->c; j++)
-            fmpz_addmul(s, fmpz_mat_entry(A, i, j), fmpz_mat_entry(A, i, j));
-
-        fmpz_sqrtrem(s, t, s);
-        if (!fmpz_is_zero(t))
-            fmpz_add_ui(s, s, UWORD(1));
-
-        if (zero_cols || !fmpz_is_zero(s))
-            fmpz_mul(p, p, s);
+        fmpz_one(bound);
+        return;
     }
 
-    fmpz_set(bound, p);
-    fmpz_clear(p);
-    fmpz_clear(s);
-    fmpz_clear(t);
+    rnorms = _mag_vec_init(r + c);
+    cnorms = rnorms + r;
+
+    mag_init(t);
+    mag_init(rbound);
+    mag_init(cbound);
+
+    for (i = 0; i < r; i++)
+    {
+        for (j = 0; j < c; j++)
+        {
+            mag_set_fmpz(t, fmpz_mat_entry(A, i, j));
+            mag_fast_addmul(rnorms + i, t, t);
+            mag_fast_addmul(cnorms + j, t, t);
+        }
+    }
+
+    mag_one(rbound);
+    mag_one(cbound);
+
+    for (i = 0; i < r; i++)
+    {
+        if (include_zero_norms || !mag_is_zero(rnorms + i))
+            mag_mul(rbound, rbound, rnorms + i);
+    }
+
+    for (i = 0; i < c; i++)
+    {
+        if (include_zero_norms || !mag_is_zero(cnorms + i))
+            mag_mul(cbound, cbound, cnorms + i);
+    }
+
+    mag_min(t, rbound, cbound);
+    mag_sqrt(t, t);
+    mag_get_fmpz(bound, t);
+
+    _mag_vec_clear(rnorms, r + c);
+
+    mag_clear(t);
+    mag_clear(rbound);
+    mag_clear(cbound);
 }
+
 
 void
 fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
@@ -51,7 +79,8 @@ fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 }
 
 void
-fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A)
+fmpz_mat_det_bound_submatrix(fmpz_t bound, const fmpz_mat_t A)
 {
     fmpz_mat_det_bound_inner(bound, A, 0);
 }
+

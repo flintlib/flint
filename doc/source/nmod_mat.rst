@@ -29,7 +29,8 @@ modulus. The modulus is assumed to be a prime number in functions that
 perform some kind of division, solving, or Gaussian elimination
 (including computation of rank and determinant), but can be composite
 in functions that only perform basic manipulation and ring operations
-(e.g. transpose and matrix multiplication).
+(e.g. transpose and matrix multiplication). None of these primality
+assumptions are checked.
 
 Unless indicated, functions may assume that the stored values are in the range `[0, n)`. The user can manipulate matrix entries directly, but must assume responsibility for normalising all values to the range `[0, n)`.
 
@@ -126,6 +127,7 @@ Basic properties and manipulation
 
     Returns `1` if all entries of the matrix ``mat`` are zero.
 
+
 Window
 --------------------------------------------------------------------------------
 
@@ -140,9 +142,8 @@ Window
 .. function:: void nmod_mat_window_clear(nmod_mat_t window)
 
     Clears the matrix ``window`` and releases any memory that it
-    uses. Note that the memory to the underlying matrix that
+    uses. Note that the memory of the underlying matrix that
     ``window`` points to is not freed.
-
 
 
 Concatenate
@@ -311,7 +312,7 @@ Addition and subtraction
 
     Computes `C = A - B`. Dimensions must be identical.
 
-.. function:: void nmod_mat_neg(nmod_mat_t A, const nmod_mat_t B)
+.. function:: void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A)
 
     Sets `B = -A`. Dimensions must be identical.
 
@@ -446,7 +447,8 @@ Determinant and rank
 
 .. function:: slong nmod_mat_rank(const nmod_mat_t A)
 
-    Returns the rank of `A`. The modulus of `A` must be a prime number.
+    Returns the rank of `A`. The modulus of `A` must be a prime number;
+    this is not checked.
 
 
 
@@ -461,7 +463,7 @@ Inverse
     `B` to undefined values.
 
     `A` and `B` must be square matrices with the same dimensions
-    and modulus. The modulus must be prime.
+    and modulus. The modulus must be prime; this is not checked.
 
 
 
@@ -478,6 +480,9 @@ Triangular solving
     aliasing is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 
     Sets `X = L^{-1} B` where `L` is a full rank lower triangular square
@@ -485,6 +490,9 @@ Triangular solving
     main diagonal, and the main diagonal will not be read.
     `X` and `B` are allowed to be the same matrix, but no other
     aliasing is allowed. Uses forward substitution.
+
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
 
 .. function:: void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 
@@ -505,6 +513,9 @@ Triangular solving
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular square
@@ -514,6 +525,9 @@ Triangular solving
     aliasing is allowed. Automatically chooses between the classical and
     recursive algorithms.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 .. function:: void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
     Sets `X = U^{-1} B` where `U` is a full rank upper triangular square
@@ -521,6 +535,9 @@ Triangular solving
     main diagonal, and the main diagonal will not be read.
     `X` and `B` are allowed to be the same matrix, but no other
     aliasing is allowed. Uses forward substitution.
+
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
 
 .. function:: void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit)
 
@@ -541,6 +558,9 @@ Triangular solving
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
 
+    The triangular shape is assumed and not checked. A non-invertible
+    diagonal entry (when ``unit`` is 0) raises an exception.
+
 
 
 Nonsingular square solving
@@ -550,8 +570,8 @@ Nonsingular square solving
 .. function:: int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
-    should have the same moduli.
+    is the modulus of `X` which must be a prime number; this is not
+    checked. `X`, `A`, and `B` should have the same moduli.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `X` to undefined values.
@@ -572,8 +592,8 @@ Nonsingular square solving
 .. function:: int nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     Solves the matrix-matrix equation `AX = B` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `X` which must be a prime number. `X`, `A`, and `B`
-    should have the same moduli.
+    is the modulus of `X` which must be a prime number; this is not
+    checked. `X`, `A`, and `B` should have the same moduli.
 
     Returns `1` if a solution exists; otherwise returns `0` and sets the
     elements of `X` to zero. If more than one solution exists, one of the
@@ -584,11 +604,11 @@ Nonsingular square solving
 .. function:: int nmod_mat_solve_vec(nn_ptr x, const nmod_mat_t A, nn_srcptr b)
 
     Solves the matrix-vector equation `Ax = b` over `\mathbb{Z} / p \mathbb{Z}` where `p`
-    is the modulus of `A` which must be a prime number.
+    is the modulus of `A` which must be a prime number; this is not
+    checked.
 
     Returns `1` if `A` has full rank; otherwise returns `0` and sets the
     elements of `x` to undefined values.
-
 
 
 LU decomposition
@@ -622,7 +642,11 @@ LU decomposition
     The *recursive* version uses block recursive decomposition.
     The default function chooses an algorithm automatically.
 
+.. function:: slong nmod_mat_lu_with_pivots(slong * P, slong * pivots_nonpivots, nmod_mat_t A)
 
+    Like :func:`nmod_mat_lu` with ``rank_check`` 0, but additionally
+    writes to ``pivots_nonpivots`` the indices of the pivot columns in order,
+    followed by the indices of the nonpivot columns in order.
 
 Reduced row echelon form
 --------------------------------------------------------------------------------
@@ -669,6 +693,27 @@ Nullspace
     This function computes the reduced row echelon form and then reads
     off the basis vectors.
 
+.. function:: slong nmod_mat_left_nullspace(nmod_mat_t X, const nmod_mat_t A)
+
+    Computes the left nullspace of `A` and returns the nullity.
+
+    More precisely, this function sets the first ``nullity`` rows of
+    `X` to a basis of the left nullspace of `A`, so that each such
+    row `v` satisfies `v A = 0`. Remaining rows of `X` are set to
+    zero. The return value is the nullity.
+
+    `X` must have sufficient space to store all basis vectors in the
+    left nullspace, i.e. it must have at least ``nullity`` rows and
+    `m` columns where `m` is the number of rows of `A`. In particular
+    an `m \times m` allocation is always sufficient.
+
+    This function is implemented via :func:`nmod_mat_nullspace` applied
+    to the transpose of `A`, transposing the resulting basis columns to
+    rows.  The returned rows inherit the structure produced by
+    :func:`nmod_mat_nullspace`: each row has a `1` at a unique
+    free-variable column and `0` at every other row's free-variable
+    column.
+
 
 Transforms
 --------------------------------------------------------------------------------
@@ -693,13 +738,14 @@ Characteristic polynomial
 --------------------------------------------------------------------------------
 
 .. function:: void nmod_mat_charpoly_berkowitz(nmod_poly_t p, const nmod_mat_t M)
-              void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
+              int nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
               void nmod_mat_charpoly(nmod_poly_t p, const nmod_mat_t M)
 
     Compute the characteristic polynomial `p` of the matrix `M`. The matrix
     is required to be square, otherwise an exception is raised.
-    The *danilevsky* algorithm assumes that the modulus is prime.
-
+    The *danilevsky* algorithm returns 1 on success and 0 indicating failure
+    if it encounters an impossible inverse; it is guaranteed to succeed if
+    the modulus is prime.
 
 Minimal polynomial
 --------------------------------------------------------------------------------

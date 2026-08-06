@@ -12,6 +12,7 @@
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "bernoulli.h"
+#include "bernoulli/impl.h"
 #include "arb.h"
 
 #define TIMING 0
@@ -93,7 +94,7 @@ crt_basecase(crt_res_t * res, slong a, slong b, crt_args_t * args)
     }
 }
 
-/* todo: optimize basecase and move to flint */
+/* TODO: optimize basecase  */
 void
 _arb_tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len)
 {

@@ -20,12 +20,12 @@ typedef int(*__compar_fn_t) (__const void *, __const void *);
 #endif
 #endif
 
-int arb_cmp_mid(const arb_t a, const arb_t b)
+static int arb_cmp_mid(const arb_t a, const arb_t b)
 {
     return arf_cmp(arb_midref(a), arb_midref(b));
 }
 
-void _arb_vec_sort_mid(arb_ptr vec, slong len)
+static void _arb_vec_sort_mid(arb_ptr vec, slong len)
 {
     qsort(vec, len, sizeof(arb_struct), (__compar_fn_t) arb_cmp_mid);
 }

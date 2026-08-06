@@ -70,10 +70,10 @@ main(int argc, char * argv[])
 
     if (timing)
     {
-        TIMEIT_START
+        TIMEIT_START;
         fmpz_mpoly_factor(fac, f, mctx);
-        TIMEIT_STOP
-        SHOW_MEMORY_USAGE
+        TIMEIT_STOP;
+        print_memory_usage();
     }
     else
     {

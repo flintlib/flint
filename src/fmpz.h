@@ -37,7 +37,7 @@ void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);
 void fmpz_init_set_readonly(fmpz_t f, const mpz_t z);
 
 void flint_mpz_clear_readonly(mpz_t z);
-void _fmpz_clear_readonly_mpz(mpz_t);
+void _fmpz_clear_readonly_mpz(mpz_t z);
 #endif
 
 void _fmpz_clear_mpz(fmpz f);

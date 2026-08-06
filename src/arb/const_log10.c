@@ -36,7 +36,7 @@ atanh_bsplit(arb_t s, ulong c, slong a, slong prec)
     hypgeom_clear(series);
 }
 
-void
+static void
 arb_const_log10_eval(arb_t s, slong prec)
 {
     arb_t t;

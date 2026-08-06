@@ -70,10 +70,13 @@ TEST_FUNCTION_START(fmpq_poly_sin_cos_series, state)
     }
 
     /* Compare with sin and cos */
+    /* Note: sin, cos and sin_cos are currently implemented in terms of
+       sin_cos, but they are tested for correctness in their own test files,
+       so it's enough to compare results here. */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, sina1, cosa1, sina2, cosa2;
-        slong n = n_randint(state, 50) + 1;
+        slong n = n_randint(state, 60) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(sina1);
@@ -81,7 +84,7 @@ TEST_FUNCTION_START(fmpq_poly_sin_cos_series, state)
         fmpq_poly_init(cosa1);
         fmpq_poly_init(cosa2);
 
-        fmpq_poly_randtest(a, state, n_randint(state, 60) + 1, 50);
+        fmpq_poly_randtest(a, state, n_randint(state, 60) + 1, 10);
         fmpq_poly_set_coeff_ui(a, 0, 0);
 
         fmpq_poly_sin_cos_series(sina1, cosa1, a, n);

@@ -16,6 +16,16 @@ arb_max(arb_t z, const arb_t x, const arb_t y, slong prec)
 {
     arf_t left, right, t, xr, yr;
 
+    if (!arb_overlaps(x, y))
+    {
+        if (arf_cmp(arb_midref(x), arb_midref(y)) < 0) {
+            arb_set(z, y);
+        } else {
+            arb_set(z, x);
+        }
+        return;
+    }
+
     if (arf_is_nan(arb_midref(x)) || arf_is_nan(arb_midref(y)))
     {
         arb_indeterminate(z);

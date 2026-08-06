@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
-void _fq_zech_mpoly_neg(fq_zech_struct * Acoeff, ulong * Aexp,
+static void _fq_zech_mpoly_neg(fq_zech_struct * Acoeff, ulong * Aexp,
                   const fq_zech_struct * Bcoeff, const ulong * Bexp, slong Blen,
                                             slong N, const fq_zech_ctx_t fqctx)
 {

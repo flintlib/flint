@@ -10,21 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
-#include "longlong.h"
-#include "flint.h"
-#include "fmpz.h"
+#include "fmpz/impl.h"
 #include "fmpq.h"
 #include "fmpz_vec.h"
 #include "fmpq_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly/impl.h"
 #include "fmpq_poly.h"
 #include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
-#include "gr.h"
-#include "gr_poly.h"
-
 
 static int
 _fmpq_poly_check_interpolant(const fmpz * poly, const fmpz_t den,
@@ -53,14 +46,6 @@ _fmpq_poly_check_interpolant(const fmpz * poly, const fmpz_t den,
 
     return ok;
 }
-
-/* _nmod_poly_interpolate_nmod_vec currently lacks error handling */
-int
-_checked_nmod_poly_interpolate(nn_ptr r, nn_srcptr x, nn_srcptr y, slong n, nmod_t mod);
-
-void
-_fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2,
-                   const fmpz_t m2, const fmpz_t m1m2, fmpz_t c, int sign);
 
 void
 _fmpq_poly_interpolate_multi_mod(fmpz * poly, fmpz_t den,

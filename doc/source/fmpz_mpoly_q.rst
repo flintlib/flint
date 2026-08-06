@@ -9,6 +9,9 @@ multivariate polynomials (:type:`fmpz_mpoly_t`).
 Instances are always kept in canonical form by ensuring that the GCD
 of numerator and denominator is 1 and that the coefficient
 of the leading term of the denominator is positive.
+All functions assume their inputs are in canonical form and produce
+canonical output; this is not checked. Use
+:func:`fmpz_mpoly_q_canonicalise` on any directly constructed value.
 
 The user must create a multivariate polynomial context
 (:type:`fmpz_mpoly_ctx_t`) specifying the number of variables *n* and

@@ -22,7 +22,7 @@ arb_si_pow_ui(arb_t res, slong b, ulong e, slong prec)
         arb_neg(res, res);
 }
 
-void
+static void
 arb_set_round_ui(arb_t res, ulong lo, slong prec)
 {
     if (lo == 0)
@@ -42,7 +42,7 @@ arb_set_round_ui(arb_t res, ulong lo, slong prec)
     }
 }
 
-void
+static void
 arb_set_round_uiui(arb_t res, ulong hi, ulong lo, slong prec)
 {
     if (hi == 0 && lo == 0)

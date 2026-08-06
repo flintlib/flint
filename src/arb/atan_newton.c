@@ -21,7 +21,7 @@ static const fmpz atan_coeffs[] =
 
 static const ulong atan_den = 334639305;
 
-void
+static void
 _arb_atan_taylor(arb_t res, const arb_t x, slong prec)
 {
     slong mag;

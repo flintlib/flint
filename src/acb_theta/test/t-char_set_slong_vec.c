@@ -45,6 +45,8 @@ TEST_FUNCTION_START(acb_theta_char_set_slong_vec, state)
                 g, test, a, b, ta, tb);
             flint_abort();
         }
+
+        flint_free(vec);
     }
 
     TEST_FUNCTION_END(state);

@@ -23,13 +23,13 @@ mp_limb_t flint_mpn_mulhigh_7(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_8(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_9(mp_ptr, mp_srcptr, mp_srcptr);
 
-mp_limb_t flint_mpn_mulhigh_10(nn_ptr r, nn_srcptr x, nn_srcptr y)
+static mp_limb_t flint_mpn_mulhigh_10(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
-    mp_limb_t w0, w1, lo, w2, cy;
+    mp_limb_t w0, w1, w2, cy;
 
     w0 = flint_mpn_mulhigh_9(r, x + 1, y);
     r[9] = mpn_addmul_1(r, x + 1, 9, y[9]);
-    umul_ppmm(w1, lo, x[0], y[8]);
+    w1 = n_mulhi(x[0], y[8]);
     umul_ppmm(cy, w2, x[0], y[9]);
     add_ssaaaa(cy, w0, cy, w0, 0, w1);
     add_ssaaaa(cy, w0, cy, w0, 0, w2);
@@ -38,16 +38,16 @@ mp_limb_t flint_mpn_mulhigh_10(nn_ptr r, nn_srcptr x, nn_srcptr y)
     return w0;
 }
 
-mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
+static mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
-    mp_limb_t w0, w1, lo, w2, cy;
+    mp_limb_t w0, w1, w2, cy;
 
 #if 0
     w0 = flint_mpn_mulhigh_10(r, x + 1, y);
 #else
     w0 = flint_mpn_mulhigh_9(r, x + 2, y);
     r[9] = mpn_addmul_1(r, x + 2, 9, y[9]);
-    umul_ppmm(w1, lo, x[1], y[8]);
+    w1 = n_mulhi(x[1], y[8]);
     umul_ppmm(cy, w2, x[1], y[9]);
     add_ssaaaa(cy, w0, cy, w0, 0, w1);
     add_ssaaaa(cy, w0, cy, w0, 0, w2);
@@ -55,7 +55,7 @@ mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
 #endif
 
     r[10] = mpn_addmul_1(r, x + 1, 10, y[10]);
-    umul_ppmm(w1, lo, x[0], y[9]);
+    w1 = n_mulhi(x[0], y[9]);
     umul_ppmm(cy, w2, x[0], y[10]);
     add_ssaaaa(cy, w0, cy, w0, 0, w1);
     add_ssaaaa(cy, w0, cy, w0, 0, w2);
@@ -66,23 +66,23 @@ mp_limb_t flint_mpn_mulhigh_11(nn_ptr r, nn_srcptr x, nn_srcptr y)
     return w0;
 }
 
-mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
+static mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
-    mp_limb_t w0, w1, lo, w2, cy;
+    mp_limb_t w0, w1, w2, cy;
 
 #if 0
     w0 = flint_mpn_mulhigh_11(r, x + 1, y);
 #else
     w0 = flint_mpn_mulhigh_9(r, x + 3, y);
     r[9] = mpn_addmul_1(r, x + 3, 9, y[9]);
-    umul_ppmm(w1, lo, x[2], y[8]);
+    w1 = n_mulhi(x[2], y[8]);
     umul_ppmm(cy, w2, x[2], y[9]);
     add_ssaaaa(cy, w0, cy, w0, 0, w1);
     add_ssaaaa(cy, w0, cy, w0, 0, w2);
     MPN_INCR_U(r, 10, cy);
 
     r[10] = mpn_addmul_1(r, x + 2, 10, y[10]);
-    umul_ppmm(w1, lo, x[1], y[9]);
+    w1 = n_mulhi(x[1], y[9]);
     umul_ppmm(cy, w2, x[1], y[10]);
     add_ssaaaa(cy, w0, cy, w0, 0, w1);
     add_ssaaaa(cy, w0, cy, w0, 0, w2);
@@ -90,7 +90,7 @@ mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
 #endif
 
     r[11] = mpn_addmul_1(r, x + 1, 11, y[11]);
-    umul_ppmm(w1, lo, x[0], y[10]);
+    w1 = n_mulhi(x[0], y[10]);
     umul_ppmm(cy, w2, x[0], y[11]);
     add_ssaaaa(cy, w0, cy, w0, 0, w1);
     add_ssaaaa(cy, w0, cy, w0, 0, w2);
@@ -99,13 +99,13 @@ mp_limb_t flint_mpn_mulhigh_12(nn_ptr r, nn_srcptr x, nn_srcptr y)
     return w0;
 }
 
-mp_limb_t flint_mpn_mulhigh_13(nn_ptr r, nn_srcptr x, nn_srcptr y)
+static mp_limb_t flint_mpn_mulhigh_13(nn_ptr r, nn_srcptr x, nn_srcptr y)
 {
-    mp_limb_t w0, w1, lo, w2, cy;
+    mp_limb_t w0, w1, w2, cy;
 
     w0 = flint_mpn_mulhigh_12(r, x + 1, y);
     r[12] = mpn_addmul_1(r, x + 1, 12, y[12]);
-    umul_ppmm(w1, lo, x[0], y[11]);
+    w1 = n_mulhi(x[0], y[11]);
     umul_ppmm(cy, w2, x[0], y[12]);
     add_ssaaaa(cy, w0, cy, w0, 0, w1);
     add_ssaaaa(cy, w0, cy, w0, 0, w2);
@@ -207,21 +207,22 @@ mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_s
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t low;
     umul_ppmm(res[0], low, u[0], v[0]);
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_2(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, low;
     FLINT_MPN_MUL_2X2(res[1], res[0], low, b, u[1], u[0], v[1], v[0]);
+    (void) b;
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_3(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 2);
@@ -231,7 +232,7 @@ mp_limb_t flint_mpn_mulhigh_3(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_4(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 3);
@@ -242,7 +243,7 @@ mp_limb_t flint_mpn_mulhigh_4(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_5(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_5(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 4);
@@ -254,7 +255,7 @@ mp_limb_t flint_mpn_mulhigh_5(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_6(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_6(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 5);
@@ -267,7 +268,7 @@ mp_limb_t flint_mpn_mulhigh_6(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_7(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_7(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 6);
@@ -281,7 +282,7 @@ mp_limb_t flint_mpn_mulhigh_7(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_8(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_8(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 7);
@@ -296,7 +297,7 @@ mp_limb_t flint_mpn_mulhigh_8(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 8);
@@ -312,7 +313,7 @@ mp_limb_t flint_mpn_mulhigh_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 9);
@@ -329,7 +330,7 @@ mp_limb_t flint_mpn_mulhigh_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 10);
@@ -347,7 +348,7 @@ mp_limb_t flint_mpn_mulhigh_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 11);
@@ -366,7 +367,7 @@ mp_limb_t flint_mpn_mulhigh_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_13(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_13(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 12);
@@ -386,7 +387,7 @@ mp_limb_t flint_mpn_mulhigh_13(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_14(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_14(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 13);
@@ -407,7 +408,7 @@ mp_limb_t flint_mpn_mulhigh_14(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 14);
@@ -429,7 +430,7 @@ mp_limb_t flint_mpn_mulhigh_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return low;
 }
 
-mp_limb_t flint_mpn_mulhigh_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mulhigh_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a, low;
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, 15);

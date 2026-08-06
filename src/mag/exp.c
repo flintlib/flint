@@ -11,6 +11,7 @@
 
 #include "double_extras.h"
 #include "mag.h"
+#include "mag/impl.h"
 
 static const double inverse_factorials[] = {
     1.0,
@@ -32,8 +33,7 @@ static const double inverse_factorials[] = {
 };
 
 /* warning: requires |x| < 2^24 or thereabout */
-void
-_mag_exp_d(mag_t res, double x, int roundup)
+void _mag_exp_d(mag_t res, double x, int roundup)
 {
     double u, nlog2, eps, eps2;
     slong n;
@@ -74,8 +74,7 @@ _mag_exp_d(mag_t res, double x, int roundup)
     MAG_EXP(res) += n;  /* assumes x not too large */
 }
 
-void
-mag_exp_huge(mag_t res, const mag_t x)
+void mag_exp_huge(mag_t res, const mag_t x)
 {
     if (mag_cmp_2exp_si(x, 128) <= 0)
     {
@@ -93,8 +92,7 @@ mag_exp_huge(mag_t res, const mag_t x)
     }
 }
 
-void
-mag_exp_huge_lower(mag_t res, const mag_t x)
+void mag_exp_huge_lower(mag_t res, const mag_t x)
 {
     fmpz_t t;
     fmpz_init(t);

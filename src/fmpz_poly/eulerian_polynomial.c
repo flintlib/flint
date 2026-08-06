@@ -51,7 +51,7 @@ _fmpz_vec_binomials(fmpz * res, ulong n, slong len)
     }
 }
 
-void
+static void
 _fmpz_poly_eulerian_polynomial_series(fmpz * res, ulong n)
 {
     slong ix, m;
@@ -67,7 +67,7 @@ _fmpz_poly_eulerian_polynomial_series(fmpz * res, ulong n)
     _fmpz_vec_clear(tmp, 2 * m + 1);
 }
 
-void
+static void
 _fmpz_poly_eulerian_polynomial_rec(fmpz * res, ulong n)
 {
     slong jx;
@@ -99,7 +99,7 @@ _fmpz_poly_eulerian_polynomial_rec(fmpz * res, ulong n)
     }
 }
 
-void
+static void
 _fmpz_poly_eulerian_polynomial(fmpz * res, ulong n)
 {
     ulong ix;

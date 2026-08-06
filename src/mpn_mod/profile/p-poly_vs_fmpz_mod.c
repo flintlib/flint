@@ -26,7 +26,7 @@
                 break; \
             __reps *= 10; \
         } \
-    } while (0);
+    } while (0)
 #endif
 
 void
@@ -45,7 +45,7 @@ randvec(gr_ptr vec, flint_rand_t state, slong len, slong bits, gr_ctx_t ctx)
     fmpz_clear(t);
 }
 
-int main()
+int main(void)
 {
     fmpz_t p;
     gr_ctx_t ctx, ctx2;
@@ -100,55 +100,55 @@ int main()
             GR_MUST_SUCCEED(_gr_poly_mullow(C, A, lenA, B, lenB, lenA + lenB - 1, ctx));
             GR_MUST_SUCCEED(_gr_poly_mullow(C2, A2, lenA, B2, lenB, lenA + lenB - 1, ctx2));
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C, A, lenA, B, lenB, lenA + lenB - 1, ctx));
-            TIMEIT_STOP_VALUES(t1, __)
-            TIMEIT_START
+            TIMEIT_STOP_VALUES(t1, __);
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C2, A2, lenA, B2, lenB, lenA + lenB - 1, ctx2));
-            TIMEIT_STOP_VALUES(t2, __)
+            TIMEIT_STOP_VALUES(t2, __);
             speedup_mul = t2 / t1;
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_divrem(Q, R, C, lenC, B, lenB, ctx));
-            TIMEIT_STOP_VALUES(t1, __)
-            TIMEIT_START
+            TIMEIT_STOP_VALUES(t1, __);
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_divrem(Q2, R2, C2, lenC, B2, lenB, ctx2));
-            TIMEIT_STOP_VALUES(t2, __)
+            TIMEIT_STOP_VALUES(t2, __);
             speedup_divrem = t2 / t1;
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C, A, lenA, A, lenA, lenA + lenB - 1, ctx));
-            TIMEIT_STOP_VALUES(t1, __)
-            TIMEIT_START
+            TIMEIT_STOP_VALUES(t1, __);
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C2, A2, lenA, A2, lenA, lenA + lenB - 1, ctx2));
-            TIMEIT_STOP_VALUES(t2, __)
+            TIMEIT_STOP_VALUES(t2, __);
             speedup_sqr = t2 / t1;
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C, A, lenA, B, lenB, n, ctx));
-            TIMEIT_STOP_VALUES(t1, __)
-            TIMEIT_START
+            TIMEIT_STOP_VALUES(t1, __);
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C2, A2, lenA, B2, lenB, n, ctx2));
-            TIMEIT_STOP_VALUES(t2, __)
+            TIMEIT_STOP_VALUES(t2, __);
             speedup_mullow = t2 / t1;
 
-            TIMEIT_START
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C, A, lenA, A, lenA, n, ctx));
-            TIMEIT_STOP_VALUES(t1, __)
-            TIMEIT_START
+            TIMEIT_STOP_VALUES(t1, __);
+            TIMEIT_START;
             GR_MUST_SUCCEED(_gr_poly_mullow(C2, A2, lenA, A2, lenA, n, ctx2));
-            TIMEIT_STOP_VALUES(t2, __)
+            TIMEIT_STOP_VALUES(t2, __);
             speedup_sqrlow = t2 / t1;
 
             if (1)
             {
                 slong lenG;
-                TIMEIT_START
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_poly_gcd(Q, &lenG, A, lenA, B, lenB, ctx));
-                TIMEIT_STOP_VALUES(t1, __)
-                TIMEIT_START
+                TIMEIT_STOP_VALUES(t1, __);
+                TIMEIT_START;
                 GR_MUST_SUCCEED(_gr_poly_gcd(Q2, &lenG, A2, lenA, B2, lenB, ctx2));
-                TIMEIT_STOP_VALUES(t2, __)
+                TIMEIT_STOP_VALUES(t2, __);
                 speedup_gcd = t2 / t1;
             }
 

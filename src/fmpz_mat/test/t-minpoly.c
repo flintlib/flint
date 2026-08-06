@@ -52,7 +52,7 @@ TEST_FUNCTION_START(fmpz_mat_minpoly, state)
         fmpz_poly_init(r);
 
         if (n_randint(state, 50) == 0)
-            fmpz_mat_randtest(A, state, 1000);
+            fmpz_mat_randtest(A, state, 10000);
         else
             fmpz_mat_randtest(A, state, 10);
 

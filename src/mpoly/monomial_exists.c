@@ -11,7 +11,7 @@
 
 #include "mpoly.h"
 
-int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
+static int mpoly_monomial_exists1(slong * index, const ulong * poly_exps,
                                       const ulong exp, slong len, ulong maskhi)
 {
    slong n = len;

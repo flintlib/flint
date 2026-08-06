@@ -45,7 +45,7 @@ __euler_number_vec_mod_p(nn_ptr res, nn_ptr tmp, slong m, nmod_t mod)
 
 #define CRT_MAX_RESOLUTION 16
 
-void __euler_number_vec_multi_mod(fmpz * res, slong n)
+static void __euler_number_vec_multi_mod(fmpz * res, slong n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];

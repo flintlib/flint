@@ -24,7 +24,7 @@ test_compose_mod_precomp_preinv(flint_rand_t state, int which)
 
     while (1)
     {
-        gr_ctx_init_random(ctx, state);
+        gr_ctx_init_random_commutative_ring(ctx, state);
         if (gr_ctx_is_finite(ctx) == T_TRUE || gr_ctx_has_real_prec(ctx) == T_TRUE)
             break;
         gr_ctx_clear(ctx);

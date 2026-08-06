@@ -57,6 +57,9 @@
 #include "t-mullow_block.c"
 #include "t-mullow.c"
 #include "t-mullow_classical.c"
+#include "t-mulmid.c"
+#include "t-mulmid_block.c"
+#include "t-mulmid_classical.c"
 #include "t-pow_arb_series.c"
 #include "t-pow_series.c"
 #include "t-pow_ui.c"
@@ -70,6 +73,7 @@
 #include "t-rising_ui_series.c"
 #include "t-root_bound_fujiwara.c"
 #include "t-rsqrt_series.c"
+#include "t-scalar_mul_si.c"
 #include "t-set_trunc_round.c"
 #include "t-shift_left_right.c"
 #include "t-sin_cos_pi_series.c"
@@ -85,6 +89,7 @@
 #include "t-swinnerton_dyer_ui.c"
 #include "t-tan_series.c"
 #include "t-taylor_shift.c"
+#include "t-wrapped_series.c"
 #include "t-zeta_series.c"
 
 /* Array of test functions ***************************************************/
@@ -137,6 +142,9 @@ test_struct tests[] =
     TEST_FUNCTION(arb_poly_mullow_block),
     TEST_FUNCTION(arb_poly_mullow),
     TEST_FUNCTION(arb_poly_mullow_classical),
+    TEST_FUNCTION(arb_poly_mulmid),
+    TEST_FUNCTION(arb_poly_mulmid_block),
+    TEST_FUNCTION(arb_poly_mulmid_classical),
     TEST_FUNCTION(arb_poly_pow_arb_series),
     TEST_FUNCTION(arb_poly_pow_series),
     TEST_FUNCTION(arb_poly_pow_ui),
@@ -150,6 +158,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_poly_rising_ui_series),
     TEST_FUNCTION(arb_poly_root_bound_fujiwara),
     TEST_FUNCTION(arb_poly_rsqrt_series),
+    TEST_FUNCTION(arb_poly_scalar_mul_si),
     TEST_FUNCTION(arb_poly_set_trunc_round),
     TEST_FUNCTION(arb_poly_shift_left_right),
     TEST_FUNCTION(arb_poly_sin_cos_pi_series),
@@ -165,6 +174,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_poly_swinnerton_dyer_ui),
     TEST_FUNCTION(arb_poly_tan_series),
     TEST_FUNCTION(arb_poly_taylor_shift),
+    TEST_FUNCTION(arb_poly_wrapped_series),
     TEST_FUNCTION(arb_poly_zeta_series)
 };
 

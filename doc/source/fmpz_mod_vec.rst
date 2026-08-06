@@ -11,6 +11,13 @@ Conversions
     Set the `fmpz_mod_vec` `(A, len)` to the `fmpz_vec` `(B, len)` after
     reduction of each entry modulo the modulus..
 
+.. function:: void _fmpz_mod_vec_get_fmpz_vec_smod(fmpz * res, const fmpz * vec, slong len, const fmpz_mod_ctx_t ctx)
+
+    Given `(vec, len)` of residues in `[0, n)`, set `(res, len)` to the symmetric
+    residues in `(-n/2, n/2]`. This is equivalent to applying
+    :func:`_fmpz_vec_scalar_smod_fmpz` but optimized for the case where
+    the input vector is known to be reduced mod `n` ahead of time.
+
 Arithmetic
 --------------------------------------------------------------------------------
 

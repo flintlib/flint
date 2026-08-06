@@ -1446,7 +1446,7 @@ nfloat_complex_div(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
     return status;
 }
 
-int
+static int
 nfloat_complex_sqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     nfloat_srcptr a, b;
@@ -1533,7 +1533,7 @@ nfloat_complex_sqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ct
     return status;
 }
 
-int
+static int
 nfloat_complex_rsqrt(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx)
 {
     nfloat_srcptr a, b;
@@ -1827,7 +1827,7 @@ _nfloat_complex_vec_init(nfloat_complex_ptr res, slong len, gr_ctx_t ctx)
 }
 
 void
-_nfloat_complex_vec_clear(nfloat_complex_ptr res, slong len, gr_ctx_t ctx)
+_nfloat_complex_vec_clear(nfloat_complex_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return;
 }
@@ -1878,6 +1878,7 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_ORDERED_RING,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},
+    {GR_METHOD_CTX_IS_APPROX_COMMUTATIVE_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_false},

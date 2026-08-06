@@ -14,10 +14,10 @@
 #include "padic.h"
 #include "padic_poly.h"
 
-void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
+void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t c,
                                 const padic_ctx_t ctx)
 {
-    if (padic_is_zero(x) || padic_val(x) >= padic_poly_prec(poly))
+    if (padic_is_zero(c) || padic_val(c) >= padic_poly_prec(poly))
     {
         if (n < poly->length)
         {
@@ -35,41 +35,41 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
         poly->length = n + 1;
     }
 
-    if (padic_val(x) == poly->val)
+    if (padic_val(c) == poly->val)
     {
-        fmpz_set(poly->coeffs + n, padic_unit(x));
+        fmpz_set(poly->coeffs + n, padic_unit(c));
     }
-    else if (poly->val < padic_val(x))
+    else if (poly->val < padic_val(c))
     {
         fmpz_t y;
 
         fmpz_init(y);
-        fmpz_pow_ui(y, ctx->p, padic_val(x) - poly->val);
-        fmpz_mul(poly->coeffs + n, padic_unit(x), y);
+        fmpz_pow_ui(y, ctx->p, padic_val(c) - poly->val);
+        fmpz_mul(poly->coeffs + n, padic_unit(c), y);
         fmpz_clear(y);
         padic_poly_canonicalise(poly, ctx->p);
     }
-    else  /* poly->val > x->val */
+    else  /* poly->val > c->val */
     {
         fmpz_t pow;
 
         fmpz_init(pow);
-        fmpz_pow_ui(pow, ctx->p, poly->val - padic_val(x));
+        fmpz_pow_ui(pow, ctx->p, poly->val - padic_val(c));
         _fmpz_vec_scalar_mul_fmpz(poly->coeffs,
                                   poly->coeffs, poly->length, pow);
-        fmpz_set(poly->coeffs + n, padic_unit(x));
+        fmpz_set(poly->coeffs + n, padic_unit(c));
         fmpz_clear(pow);
-        poly->val = padic_val(x);
+        poly->val = padic_val(c);
     }
 
-    if (padic_poly_prec(poly) < padic_prec(x))  /* Reduction? */
+    if (padic_poly_prec(poly) < padic_prec(c))  /* Reduction? */
     {
-        int c;
+        int alloc;
         fmpz_t pow;
 
-        c = _padic_ctx_pow_ui(pow, padic_poly_prec(poly) - padic_poly_val(poly), ctx);
+        alloc = _padic_ctx_pow_ui(pow, padic_poly_prec(poly) - padic_poly_val(poly), ctx);
         fmpz_mod(poly->coeffs + n, poly->coeffs + n, pow);
-        if (c)
+        if (alloc)
             fmpz_clear(pow);
     }
 

@@ -12,7 +12,7 @@
 #include "acb_dirichlet.h"
 #include "acb_poly.h"
 
-void
+static void
 _acb_dirichlet_theta_arb_smallorder(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const arb_t xt, slong len, slong prec)
 {
     ulong order;
@@ -48,7 +48,7 @@ _acb_dirichlet_theta_arb_series(acb_t res, const dirichlet_group_t G, const diri
     _acb_vec_clear(a, len);
 }
 
-void
+static void
 _acb_dirichlet_theta_arb_naive(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, const arb_t xt, slong len, slong prec)
 {
     ulong order, * a;
