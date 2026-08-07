@@ -15,6 +15,8 @@
 #include "t-gr_transformed_nmod_poly.c"
 #include "t-mpn_add_inplace_c.c"
 #include "t-mpn_mulmid.c"
+#include "t-mpn_ctx_to_from_ffts.c"
+#include "t-sd_fft_mpn_mulmod_2expp1.c"
 #include "t-mul.c"
 #include "t-nmod_poly_divrem.c"
 #include "t-nmod_poly_mul.c"
@@ -32,6 +34,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_add_inplace_c),
     TEST_FUNCTION(_mpn_ctx_mpn_mul_range),
     TEST_FUNCTION(mpn_ctx_mpn_mul),
+    TEST_FUNCTION(mpn_ctx_to_from_ffts),
+    TEST_FUNCTION(sd_fft_mpn_mulmod_2expp1),
     TEST_FUNCTION(_nmod_poly_divrem_mpn_ctx),
     TEST_FUNCTION(_nmod_poly_mul_mid_mpn_ctx),
     TEST_FUNCTION(fft_small_op_mpn),

@@ -153,7 +153,8 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
            only wins in a specific medium-size region and for
            huge products when using many threads. */
         ((len2 >= 8 && len2 <= 75 && bits1 + bits2 >= 800 && bits1 + bits2 <= 4000) ||
-            (len1 + len2 >= 5000 && bits1 + bits2 >= 5000 + (len1 + len2) / 10 && flint_get_num_threads() >= 4))
+            (len1 + len2 >= 5000 && bits1 + bits2 >= 5000 + (len1 + len2) / 10 && flint_get_num_threads() >= 4) ||
+            (bits1 + bits2 >= 80000 && (len1 + len2) * (bits1 + bits2) > 4e9))
         _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2);
     else
         _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
