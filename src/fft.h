@@ -228,6 +228,13 @@ void _fft_pointwise_rows_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdc
                    mp_limb_t ** ii, mp_limb_t ** jj, slong base,
                    slong srt, slong nrows, slong rvbits, slong limbs);
 
+void _fft_pointwise_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong j0, slong j1,
+                   slong limbs);
+void _fft_pointwise_rows_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong base,
+                   slong srt, slong nrows, slong rvbits, slong limbs);
+
 void fft_convolution_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
                           mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
                           slong limbs, slong trunc, mp_limb_t ** t1,

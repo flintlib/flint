@@ -161,6 +161,7 @@ typedef struct
     slong limbs;
     sd_fft_mpn_mulmod_2expp1_scratch_struct * scr;
     int rows;
+    int normjj;
 }
 _sd_fft_pw_arg_struct;
 
@@ -168,7 +169,7 @@ static void
 _sd_fft_pw_one(_sd_fft_pw_arg_struct * X, slong j)
 {
     mpn_normmod_2expp1(X->ii[j], X->limbs);
-    if (X->ii != X->jj)
+    if (X->normjj && X->ii != X->jj)
         mpn_normmod_2expp1(X->jj[j], X->limbs);
     sd_fft_mpn_mulmod_2expp1(X->C, X->ii[j], X->ii[j], X->jj[j], X->scr);
 }
@@ -255,7 +256,18 @@ _fft_pointwise_sd_fft(sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx, mp_limb_t ** 
                       mp_limb_t ** jj, slong j0, slong j1, slong limbs)
 {
     _sd_fft_pw_arg_struct X = { sdctx, ii, jj, j0, j1,
-                                0, 0, 0, limbs, NULL, 0 };
+                                0, 0, 0, limbs, NULL, 0, 1 };
+    _sd_fft_pw_run(&X, j1 - j0);
+}
+
+/* as above with the second operand read-only, for the precached
+   convolutions whose transformed operand must not be modified */
+void
+_fft_pointwise_sd_fft_ro(sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx, mp_limb_t ** ii,
+                      mp_limb_t ** jj, slong j0, slong j1, slong limbs)
+{
+    _sd_fft_pw_arg_struct X = { sdctx, ii, jj, j0, j1,
+                                0, 0, 0, limbs, NULL, 0, 0 };
     _sd_fft_pw_run(&X, j1 - j0);
 }
 
@@ -265,7 +277,17 @@ _fft_pointwise_rows_sd_fft(sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
                       slong srt, slong nrows, slong rvbits, slong limbs)
 {
     _sd_fft_pw_arg_struct X = { sdctx, ii, jj, 0, nrows,
-                                base, srt, rvbits, limbs, NULL, 1 };
+                                base, srt, rvbits, limbs, NULL, 1, 1 };
+    _sd_fft_pw_run(&X, nrows);
+}
+
+void
+_fft_pointwise_rows_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                      mp_limb_t ** ii, mp_limb_t ** jj, slong base,
+                      slong srt, slong nrows, slong rvbits, slong limbs)
+{
+    _sd_fft_pw_arg_struct X = { sdctx, ii, jj, 0, nrows,
+                                base, srt, rvbits, limbs, NULL, 1, 0 };
     _sd_fft_pw_run(&X, nrows);
 }
 #else
@@ -289,6 +311,23 @@ _fft_pointwise_rows_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
     FLINT_ASSERT(sdctx == NULL);
     (void) sdctx; (void) ii; (void) jj; (void) base;
     (void) srt; (void) nrows; (void) rvbits; (void) limbs;
+}
+
+void
+_fft_pointwise_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                      mp_limb_t ** ii, mp_limb_t ** jj, slong j0,
+                      slong j1, slong limbs)
+{
+    _fft_pointwise_sd_fft(sdctx, ii, jj, j0, j1, limbs);
+}
+
+void
+_fft_pointwise_rows_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                      mp_limb_t ** ii, mp_limb_t ** jj, slong base,
+                      slong srt, slong nrows, slong rvbits, slong limbs)
+{
+    _fft_pointwise_rows_sd_fft(sdctx, ii, jj, base, srt, nrows,
+                               rvbits, limbs);
 }
 #endif
 

@@ -141,7 +141,7 @@ void fft_convolution_precache_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct 
       fft_truncate_sqrt2(ii, n, w, t1, t2, s1, trunc);
 
       if (sdctx != NULL)
-         _fft_pointwise_sd_fft(sdctx, ii, jj, 0, trunc, limbs);
+         _fft_pointwise_sd_fft_ro(sdctx, ii, jj, 0, trunc, limbs);
       else for (j = 0; j < trunc; j++)
       {
          mpn_normmod_2expp1(ii[j], limbs);
@@ -163,7 +163,7 @@ void fft_convolution_precache_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct 
       fft_mfa_truncate_sqrt2(ii, n, w, t1, t2, s1, sqrt, trunc);
 
       if (sdctx != NULL)
-         _fft_pointwise_sd_fft(sdctx, ii, jj, 0, 2*n, limbs);
+         _fft_pointwise_sd_fft_ro(sdctx, ii, jj, 0, 2*n, limbs);
       else for (j = 0; j < 2*n; j++)
       {
          mpn_normmod_2expp1(ii[j], limbs);
@@ -174,7 +174,7 @@ void fft_convolution_precache_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct 
       trunc2 = (trunc - 2*n)/sqrt;
 
       if (sdctx != NULL)
-         _fft_pointwise_rows_sd_fft(sdctx, ii, jj, 2*n, sqrt, trunc2,
+         _fft_pointwise_rows_sd_fft_ro(sdctx, ii, jj, 2*n, sqrt, trunc2,
                                     depth - depth/2 + 1, limbs);
       else for (s = 0; s < trunc2; s++)
       {

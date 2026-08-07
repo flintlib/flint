@@ -25,7 +25,6 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     slong negm;
     slong i, len_out, loglen2;
     slong output_bits, size;
-    ulong size1, size2;
     ulong * ptr;
     ulong ** t1, ** t2, ** s1;
     int N;
@@ -38,17 +37,17 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     pre->loglen  = FLINT_CLOG2(len_out);
     loglen2 = FLINT_CLOG2(FLINT_MIN(len1, pre->len2));
     pre->n = (WORD(1) << (pre->loglen - 2));
-    size1 = FLINT_ABS(bits1);
-    size1 = (size1 + FLINT_BITS - 1)/FLINT_BITS;
-    size2 = (pre->bits2 + FLINT_BITS - 1)/FLINT_BITS;
 
-    /* Start with an upper bound on the number of bits needed */
-    output_bits = FLINT_BITS*(size1 + size2) + loglen2 + 1;
+    /* The transform ring is fixed once, up front: the output bit
+       bound uses the actual bit counts (both available here), and
+       ring selection happens before any allocation so that the
+       buffers, the packed operand, the transforms and the optional
+       sd_fft pointwise context all live in the same ring. */
+    output_bits = bits1 + pre->bits2 + loglen2 + 1;
 
     /* round up for sqrt2 trick */
     output_bits = (((output_bits - 1) >> (pre->loglen - 2)) + 1) << (pre->loglen - 2);
 
-    /* final ring selection happens before any allocation */
     pre->limbs = (output_bits - 1) / FLINT_BITS + 1;
     pre->limbs = fft_adjust_limbs_sd_fft(pre->limbs, pre->n, &negm);
     pre->sdctx = NULL;
@@ -91,13 +90,6 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     for (i = pre->len2; i < 4*pre->n; i++)
         flint_mpn_zero(pre->jj[i], size);
 
-    /* Recompute the number of bits/limbs now that we know how large everything is */
-    output_bits = bits1 + pre->bits2 + loglen2 + 1;
-
-    /* round up output bits for sqrt2 */
-    output_bits = (((output_bits - 1) >> (pre->loglen - 2)) + 1) << (pre->loglen - 2);
-
-    pre->limbs = (output_bits - 1) / FLINT_BITS + 1;
     fft_precache(pre->jj, pre->loglen - 2, pre->limbs, len_out, t1, t2, s1);
 
     fmpz_poly_init(pre->poly2);

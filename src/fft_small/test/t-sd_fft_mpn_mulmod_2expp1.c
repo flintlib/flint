@@ -209,5 +209,69 @@ TEST_FUNCTION_START(sd_fft_mpn_mulmod_2expp1, state)
         }
     }
 
+    /* fold carry cascades: products at the wrap boundary, where
+       the final subtraction borrows or the final addition carries
+       all the way into a 2^N result */
+    {
+        static const slong cfg3[][2] = { { 64, 16 }, { 92, 32 },
+                                         { 64, 64 } };
+        slong ci;
+        for (ci = 0; ci < 3; ci++)
+        {
+            slong b = cfg3[ci][0], m = cfg3[ci][1];
+            slong N = m * b, n = N / FLINT_BITS, cs;
+            sd_fft_mpn_mulmod_2expp1_ctx_t C;
+            sd_fft_mpn_mulmod_2expp1_scratch_t S;
+            nn_ptr x, y, z, r;
+
+            if (N % (2 * FLINT_BITS) != 0)
+                continue;
+
+            sd_fft_mpn_mulmod_2expp1_ctx_init(C, get_default_mpn_ctx(),
+                                              N, m);
+            sd_fft_mpn_mulmod_2expp1_scratch_init(S, C);
+            x = flint_calloc(n + 1, sizeof(ulong));
+            y = flint_calloc(n + 1, sizeof(ulong));
+            z = flint_calloc(n + 1, sizeof(ulong));
+            r = flint_calloc(n + 1, sizeof(ulong));
+
+            for (cs = 0; cs < 4; cs++)
+            {
+                memset(x, 0, (n + 1) * sizeof(ulong));
+                memset(y, 0, (n + 1) * sizeof(ulong));
+                switch (cs)
+                {
+                    case 0:  /* (2^(N/2))^2 = 2^N */
+                        x[n/2] = y[n/2] = 1;
+                        break;
+                    case 1:  /* (2^N)^2 = 1 */
+                        x[n] = y[n] = 1;
+                        break;
+                    case 2:  /* (2^(N/2)+1)(2^(N/2)-1) = 2^N - 1 */
+                        x[n/2] = 1; x[0] = 1;
+                        y[n/2] = 1;
+                        mpn_sub_1(y, y, n, 1);
+                        break;
+                    case 3:  /* 2^N * 2^(N/2) = -2^(N/2) */
+                        x[n] = 1;
+                        y[n/2] = 1;
+                        break;
+                }
+                negmul_ref(r, x, y, n);
+                sd_fft_mpn_mulmod_2expp1(C, z, x, y, S);
+                if (z[n] != r[n] || mpn_cmp(z, r, n) != 0)
+                    TEST_FUNCTION_FAIL("wrap case %wd: b = %wd, "
+                                       "m = %wd\n", cs, b, m);
+            }
+
+            flint_free(x);
+            flint_free(y);
+            flint_free(z);
+            flint_free(r);
+            sd_fft_mpn_mulmod_2expp1_scratch_clear(S);
+            sd_fft_mpn_mulmod_2expp1_ctx_clear(C);
+        }
+    }
+
     TEST_FUNCTION_END(state);
 }
