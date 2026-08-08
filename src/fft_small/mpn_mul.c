@@ -1,6 +1,9 @@
 /*
     Copyright (C) 2022 Daniel Schultz
     Copyright (C) 2024 Fredrik Johansson
+    Copyright (C) 2026 Fredrik Johansson
+
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -543,6 +546,7 @@ FLINT_STATIC_NOINLINE void CAT(mpn_to_ffts_hard, NP)( \
             (d + l*dstride)[i] = 0.0; \
 }
 
+DEFINE_IT(3)
 DEFINE_IT(4)
 DEFINE_IT(5)
 DEFINE_IT(6)
@@ -656,18 +660,36 @@ static void CAT3(mpn_to_ffts, NP, BITS)( \
                               start_hard, stop_hard, bits); \
 }
 
+DEFINE_IT(3, 64)
+DEFINE_IT(4, 64)
 DEFINE_IT(4, 84)
 DEFINE_IT(4, 88)
 DEFINE_IT(4, 92)
+DEFINE_IT(5, 84)
+DEFINE_IT(5, 88)
+DEFINE_IT(5, 92)
 DEFINE_IT(5,112)
 DEFINE_IT(5,116)
 DEFINE_IT(5,120)
+DEFINE_IT(6,112)
+DEFINE_IT(6,116)
+DEFINE_IT(6,120)
+DEFINE_IT(6,126)
+DEFINE_IT(6,128)
 DEFINE_IT(6,136)
 DEFINE_IT(6,140)
 DEFINE_IT(6,144)
+DEFINE_IT(7,126)
+DEFINE_IT(7,128)
+DEFINE_IT(7,136)
+DEFINE_IT(7,140)
+DEFINE_IT(7,144)
 DEFINE_IT(7,160)
 DEFINE_IT(7,164)
 DEFINE_IT(7,168)
+DEFINE_IT(8,160)
+DEFINE_IT(8,164)
+DEFINE_IT(8,168)
 DEFINE_IT(8,184)
 DEFINE_IT(8,188)
 DEFINE_IT(8,192)
@@ -729,13 +751,7 @@ DEFINE_IT(6, 7)
 DEFINE_IT(7, 8)
 #undef DEFINE_IT
 
-typedef void (*from_ffts_func)(
-    ulong* z, ulong lo, ulong hi, ulong c_lo, ulong clen,
-    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-    crt_data_struct* Rcrts,
-    ulong bits,
-    ulong start_easy, ulong stop_easy,
-    ulong* overhang, ulong* boundbuf);
+/* from_ffts_func typedef now in fft_small.h */
 
 /*
     The "n" here is the limb count Rcrts[np-1].coeff_len, which is big enough
@@ -2193,4 +2209,30 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
     }
 
     flint_give_back_threads(handles, nworkers);
+}
+
+/* exported dispatch for the negacyclic engine (negacyclic.c) */
+to_ffts_func _mpn_ctx_to_ffts_func(ulong np, ulong bits)
+{
+#define P(NP, B) if (np == NP && bits == B) return CAT3(mpn_to_ffts, NP, B);
+    P(3, 64) P(4, 64) P(4, 84) P(4, 88) P(4, 92)
+    P(5, 84) P(5, 88) P(5, 92)
+    P(5, 112) P(5, 116) P(5, 120)
+    P(6, 112) P(6, 116) P(6, 120)
+    P(6, 126) P(6, 128) P(6, 136) P(6, 140) P(6, 144)
+    P(7, 126) P(7, 128) P(7, 136) P(7, 140) P(7, 144)
+    P(7, 160) P(7, 164) P(7, 168)
+    P(8, 160) P(8, 164) P(8, 168)
+    P(8, 184) P(8, 188) P(8, 192)
+#undef P
+    return NULL;
+}
+
+from_ffts_func _mpn_ctx_from_ffts_func(ulong np)
+{
+    static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,
+        _mpn_from_ffts_4, _mpn_from_ffts_5, _mpn_from_ffts_6,
+        _mpn_from_ffts_7, _mpn_from_ffts_8};
+    FLINT_ASSERT(3 <= np && np <= 8);
+    return tab[np - 3];
 }

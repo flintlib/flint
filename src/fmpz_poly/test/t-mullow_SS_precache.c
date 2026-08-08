@@ -102,5 +102,48 @@ TEST_FUNCTION_START(fmpz_poly_mullow_SS_precache, state)
         fmpz_poly_clear(d);
     }
 
+    /* engine-triggering coefficient sizes across thread counts:
+       exercises the sd_fft context in the precache structure and
+       the mfa branch of the precached convolution */
+    {
+        slong iter2;
+        slong save_threads = flint_get_num_threads();
+        for (iter2 = 0; iter2 < 4; iter2++)
+        {
+            fmpz_poly_t a, b, c, d;
+            fmpz_poly_mul_precache_t pre;
+            slong len1 = 100 + n_randint(state, 220);
+            slong len2 = 100 + n_randint(state, 220);
+            slong bits = 14000 + n_randint(state, 12000);
+            slong tr;
+
+            flint_set_num_threads(1 + n_randint(state, 3));
+
+            fmpz_poly_init(a);
+            fmpz_poly_init(b);
+            fmpz_poly_init(c);
+            fmpz_poly_init(d);
+            fmpz_poly_randtest(a, state, len1, bits);
+            fmpz_poly_randtest(b, state, len2, bits);
+            if (b->length == 0)
+                fmpz_poly_set_ui(b, 1);
+
+            fmpz_poly_mul_SS_precache_init(pre, len1, bits + 1, b);
+            tr = a->length + b->length - 1;
+            fmpz_poly_mullow_SS_precache(c, a, pre, tr);
+            fmpz_poly_mul(d, a, b);
+            if (!fmpz_poly_equal(c, d))
+                TEST_FUNCTION_FAIL("precache sd_fft: len1 = %wd, "
+                    "len2 = %wd, bits = %wd\n", len1, len2, bits);
+
+            fmpz_poly_mul_precache_clear(pre);
+            fmpz_poly_clear(a);
+            fmpz_poly_clear(b);
+            fmpz_poly_clear(c);
+            fmpz_poly_clear(d);
+        }
+        flint_set_num_threads(save_threads);
+    }
+
     TEST_FUNCTION_END(state);
 }

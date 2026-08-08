@@ -183,6 +183,12 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj,
             mp_size_t n, flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                 mp_limb_t ** FLINT_UNUSED(temp), mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt);
 
+struct sd_fft_mpn_mulmod_2expp1_ctx_struct;
+void fft_mfa_truncate_sqrt2_inner_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
+                   flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1,
+                                mp_size_t sqrt, mp_size_t trunc, mp_limb_t ** tt);
+
 void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
                         flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                                 mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc);
@@ -211,6 +217,29 @@ void fft_convolution_basic(mp_limb_t ** ii, mp_limb_t ** jj,
 		     slong depth, slong limbs, slong trunc, mp_limb_t ** t1,
                             mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
 
+struct sd_fft_mpn_mulmod_2expp1_ctx_struct;
+#define FLINT_FFT_SD_FFT_MIN_RING 16384  /* bits */
+slong fft_adjust_limbs_sd_fft(slong tight, slong n_outer, slong * m_out);
+void _fft_pointwise_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong j0, slong j1,
+                   slong limbs);
+
+void _fft_pointwise_rows_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong base,
+                   slong srt, slong nrows, slong rvbits, slong limbs);
+
+void _fft_pointwise_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong j0, slong j1,
+                   slong limbs);
+void _fft_pointwise_rows_sd_fft_ro(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                   mp_limb_t ** ii, mp_limb_t ** jj, slong base,
+                   slong srt, slong nrows, slong rvbits, slong limbs);
+
+void fft_convolution_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                          mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
+                          slong limbs, slong trunc, mp_limb_t ** t1,
+                          mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+
 void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
                                     slong limbs, slong trunc, mp_limb_t ** t1,
                             mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
@@ -223,6 +252,10 @@ void fft_precache(mp_limb_t ** jj, slong depth, slong limbs,
 void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj,
                slong depth, slong limbs, slong trunc, mp_limb_t ** t1,
 	                    mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
+void fft_convolution_precache_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx,
+                          mp_limb_t ** ii, mp_limb_t ** jj, slong depth,
+                          slong limbs, slong trunc, mp_limb_t ** t1,
+                          mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t ** tt);
 
 #ifdef __cplusplus
 }

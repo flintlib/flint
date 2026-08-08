@@ -51,9 +51,12 @@ typedef struct
    slong bits2;
    slong limbs;
    fmpz_poly_t poly2;
+   struct sd_fft_mpn_mulmod_2expp1_ctx_struct * sdctx; /* negacyclic pointwise, or NULL */
 } fmpz_poly_mul_precache_struct;
 
 typedef fmpz_poly_mul_precache_struct fmpz_poly_mul_precache_t[1];
+
+struct sd_fft_mpn_mulmod_2expp1_ctx_struct;
 
 /*  Memory management ********************************************************/
 
