@@ -26,11 +26,11 @@ TEST_FUNCTION_START(fft_convolution_precache_sd_fft, state)
 {
 #if FLINT_HAVE_FFT_SMALL
     slong depth, ti, iter;
-    static const int threads[] = { 1, 2, 4 };
+    static const int threads[] = { 1, 2, 4, 10 };
     slong save_threads = flint_get_num_threads();
 
     for (depth = 3; depth <= 8; depth++)
-    for (ti = 0; ti < 3; ti++)
+    for (ti = 0; ti < 4; ti++)
     for (iter = 0; iter < 2; iter++)
     {
         mp_size_t n = (UWORD(1) << depth);
@@ -126,8 +126,12 @@ TEST_FUNCTION_START(fft_convolution_precache_sd_fft, state)
         }
         jj2 = jj;
 
-        fft_convolution_precache_sd_fft(C, ii, jj, depth, limbs, trunc,
-                               t1, t2, s1, tt);
+        if (n_randint(state, 4) == 0)   /* NULL context = classic */
+            fft_convolution_precache_sd_fft(NULL, ii, jj, depth, limbs,
+                                            trunc, t1, t2, s1, tt);
+        else
+            fft_convolution_precache_sd_fft(C, ii, jj, depth, limbs,
+                                            trunc, t1, t2, s1, tt);
         fft_convolution_precache(ii2, jj2, depth, limbs, trunc,
                         t1, t2, s1, tt);
 

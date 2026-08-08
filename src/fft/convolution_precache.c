@@ -134,6 +134,10 @@ void fft_convolution_precache_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_struct 
    slong w = (limbs*FLINT_BITS)/n;
    slong sqrt = (WORD(1)<<(depth/2));
 
+   #if FLINT_HAVE_FFT_SMALL
+   FLINT_ASSERT(sdctx == NULL || sdctx->N == FLINT_BITS*limbs);
+#endif
+
    if (depth <= 6)
    {
       trunc = 2*((trunc + 1)/2);

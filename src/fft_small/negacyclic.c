@@ -420,7 +420,7 @@ sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_s
                 {
                     if (mpn_add_1(z, z, n, 1))
                     {
-                        memset(z, 0, n * sizeof(ulong));
+                        flint_mpn_zero(z, n);
                         z[n] = 1;
                     }
                 }
@@ -431,11 +431,15 @@ sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_s
                 {
                     if (mpn_sub_1(z, z, n, 1))
                     {
-                        memset(z, 0, n * sizeof(ulong));
+                        flint_mpn_zero(z, n);
                         z[n] = 1;
                     }
                 }
             }
+            /* result is fully reduced: the unique representative in
+               [0, 2^N], top limb set only for 2^N itself */
+            FLINT_ASSERT(z[n] == 0
+                         || (z[n] == 1 && flint_mpn_zero_p(z, n)));
         }
     }
 }

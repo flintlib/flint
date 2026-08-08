@@ -27,11 +27,11 @@ TEST_FUNCTION_START(fft_convolution_sd_fft, state)
 {
 #if FLINT_HAVE_FFT_SMALL
     slong depth, ti, iter;
-    static const int threads[] = { 1, 2, 4 };
+    static const int threads[] = { 1, 2, 4, 10 };
     slong save_threads = flint_get_num_threads();
 
     for (depth = 3; depth <= 8; depth++)
-    for (ti = 0; ti < 3; ti++)
+    for (ti = 0; ti < 4; ti++)
     for (iter = 0; iter < 2; iter++)
     {
         mp_size_t n = (UWORD(1) << depth);
@@ -137,8 +137,12 @@ TEST_FUNCTION_START(fft_convolution_sd_fft, state)
             }
         }
 
-        fft_convolution_sd_fft(C, ii, jj, depth, limbs, trunc,
-                               t1, t2, s1, tt);
+        if (n_randint(state, 4) == 0)   /* NULL context = classic */
+            fft_convolution_sd_fft(NULL, ii, jj, depth, limbs, trunc,
+                                   t1, t2, s1, tt);
+        else
+            fft_convolution_sd_fft(C, ii, jj, depth, limbs, trunc,
+                                   t1, t2, s1, tt);
         fft_convolution(ii2, jj2, depth, limbs, trunc,
                         t1, t2, s1, tt);
 
@@ -163,6 +167,22 @@ TEST_FUNCTION_START(fft_convolution_sd_fft, state)
     }
 
     flint_set_num_threads(save_threads);
+
+    /* chooser edges: a huge tight size walks the lattice through
+       divisibility/parity skips and capacity-infeasible digit
+       sizes (np < 0) before settling; the result must be a valid
+       ring at least as large as the request */
+    {
+        slong mo, r;
+        r = fft_adjust_limbs_sd_fft(1000000, 16, &mo);
+        if (r < 1000000 || (mo != 0 && (64*r) % mo != 0))
+            TEST_FUNCTION_FAIL("chooser edge: r = %wd, m = %wd\n",
+                               r, mo);
+        r = fft_adjust_limbs_sd_fft(300, 1024, &mo);  /* divisibility
+                                skips at a large outer length */
+        if (r < 300)
+            TEST_FUNCTION_FAIL("chooser edge 2: r = %wd\n", r);
+    }
 #endif
 
     TEST_FUNCTION_END(state);

@@ -235,7 +235,7 @@ TEST_FUNCTION_START(sd_fft_mpn_mulmod_2expp1, state)
             z = flint_calloc(n + 1, sizeof(ulong));
             r = flint_calloc(n + 1, sizeof(ulong));
 
-            for (cs = 0; cs < 4; cs++)
+            for (cs = 0; cs < 6; cs++)
             {
                 memset(x, 0, (n + 1) * sizeof(ulong));
                 memset(y, 0, (n + 1) * sizeof(ulong));
@@ -256,6 +256,14 @@ TEST_FUNCTION_START(sd_fft_mpn_mulmod_2expp1, state)
                         x[n] = 1;
                         y[n/2] = 1;
                         break;
+                    case 4:  /* 2^N * 1 = 2^N */
+                        x[n] = 1;
+                        y[0] = 1;
+                        break;
+                    case 5:  /* 2^N * 3 = 2^N - 2 */
+                        x[n] = 1;
+                        y[0] = 3;
+                        break;
                 }
                 negmul_ref(r, x, y, n);
                 sd_fft_mpn_mulmod_2expp1(C, z, x, y, S);
@@ -272,6 +280,17 @@ TEST_FUNCTION_START(sd_fft_mpn_mulmod_2expp1, state)
             sd_fft_mpn_mulmod_2expp1_ctx_clear(C);
         }
     }
+
+    /* capacity edges of the prime-count chooser: the np = 8 digit
+       sizes admit no larger count to grow into, so sufficiently
+       deep transforms are infeasible and the chooser reports so */
+    if (sd_fft_mpn_mulmod_2expp1_choose_np(get_default_mpn_ctx(),
+                                           192, 13) != -1
+        || sd_fft_mpn_mulmod_2expp1_choose_np(get_default_mpn_ctx(),
+                                              188, 21) != -1
+        || sd_fft_mpn_mulmod_2expp1_choose_np(get_default_mpn_ctx(),
+                                              64, 20) < 3)
+        TEST_FUNCTION_FAIL("choose_np capacity edges\n");
 
     TEST_FUNCTION_END(state);
 }

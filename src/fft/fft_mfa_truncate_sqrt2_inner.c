@@ -300,6 +300,10 @@ void fft_mfa_truncate_sqrt2_inner_sd_fft(struct sd_fft_mpn_mulmod_2expp1_ctx_str
                    flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** s1,
                                 mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt)
 {
+#if FLINT_HAVE_FFT_SMALL
+    /* the pointwise ring is 2^(n*w) + 1 */
+    FLINT_ASSERT(sdctx == NULL || sdctx->N == (slong)(n*w));
+#endif
     _fft_mfa_truncate_sqrt2_inner_impl(sdctx, ii, jj, n, w, t1, t2, s1,
                                        n1, trunc, tt);
 }
