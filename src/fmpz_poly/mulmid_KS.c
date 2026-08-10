@@ -15,6 +15,31 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "flint-mparam.h"
+
+#define GUARD_LIMBS 3
+
+#if FLINT_WANT_ASSERT
+
+/* the value of an fmpz modulo 2^FLINT_BITS, as an unsigned limb */
+static ulong
+_fmpz_low_limb(const fmpz * f)
+{
+    ulong u;
+    if (!COEFF_IS_MPZ(*f))
+        return (ulong) (slong) *f;
+    {
+        mpz_srcptr z = COEFF_TO_PTR(*f);
+        u = z->_mp_d[0];
+        if (z->_mp_size < 0)
+            u = -u;
+    }
+    return u;
+}
+
+#endif
+
+
 
 void
 _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1,
@@ -26,6 +51,12 @@ _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1,
     ulong *arr1, *arr2, *arr3;
     slong sign = 0;
     slong zero_high = 0;
+    int squaring = (poly1 == poly2) && (len1 == len2);
+
+#if FLINT_WANT_ASSERT
+    ulong m_ref = 0;
+    int check_m_ref = 0;
+#endif
 
     FLINT_ASSERT(len1 != 0);
     FLINT_ASSERT(len2 != 0);
@@ -126,20 +157,81 @@ _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1,
         _fmpz_poly_bit_pack(arr2, poly2, len2, bits, neg2);
     }
 
-    arr3 = (nn_ptr) flint_malloc((limbs1 + limbs2) * sizeof(ulong));
+    {
+        slong flimbs = limbs1 + limbs2;
+        slong want_bit = nlo * bits;
+        slong exact_bit = FLINT_MAX(0, want_bit - (sign != 0));
+        slong elimb = exact_bit / FLINT_BITS;
+        slong zhi = FLINT_MIN(flimbs, (nhi * bits + FLINT_BITS - 1) / FLINT_BITS + 1);
+        slong zlo = FLINT_MAX(0, elimb - GUARD_LIMBS);
+        int windowed;
 
-    /* todo: mpn middle products */
-    if (arr1 == arr2 && limbs1 == limbs2)
-        flint_mpn_sqr(arr3, arr1, limbs1);
-    else if (limbs1 > limbs2)
-        flint_mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
-    else
-        flint_mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
+        windowed = (zlo > 0 || zhi < flimbs);
+
+        /* mulmid is currently missing good sub-fft sqrlow code */
+#if FLINT_HAVE_FFT_SMALL
+        windowed = windowed && !squaring;
+#else
+        windowed = windowed && (!squaring || FLINT_MIN(limbs1, limbs2) >= FLINT_FFT_SMALL_SQR_THRESHOLD);
+#endif
+
+        arr3 = (nn_ptr) flint_malloc((windowed ? zhi : flimbs) * sizeof(ulong));
+
+        if (windowed)
+        {
+            /* In general, flint_mpn_mulmid computes a window which may be 1 ulp
+               too small. However, all mulmid algorithms used in practice include
+               the contribution of all limbs in the middle window without
+               introducing any artificial borrows, so for unsigned coefficients
+               the result is actually guaranteed to be exact.
+
+               In the signed case, the result from flint_mpn_mulmid may be 1 ulp
+               too small, but the unpacked low coefficient will still be
+               correct for two nontrivial reasons. First, note that artificial borrows
+               are harmless, as _fmpz_poly_bit_unpack effectively self-corrects
+               (a real borrow and an artificial borrow get detected and corrected
+               all the same). Second, an artificial borrow cannot erase a genuinely
+               set sign bit due to slack in the KS packing: the slack in
+               min(len1,len2) < 2^loglen leaves plenty of room to absorb a
+               borrow with the number of guard limbs used. */
+            flint_mpn_mulmid(arr3 + zlo, arr1, limbs1, arr2, limbs2, zlo, zhi);
+
+            /* Do a sanity check mod 2^FLINT_BITS to verify that
+               flint_mpn_mulmid isn't doing anything weird. */
+#if FLINT_WANT_ASSERT
+            if (zlo > 0)
+            {
+                slong i;
+                check_m_ref = 1;
+                for (i = FLINT_MAX(0, nlo - (len2 - 1)); i <= FLINT_MIN(nlo, len1 - 1); i++)
+                    m_ref += _fmpz_low_limb(poly1 + i) * _fmpz_low_limb(poly2 + (nlo - i));
+            }
+#endif
+        }
+        else
+        {
+            if (arr1 == arr2 && limbs1 == limbs2)
+                flint_mpn_sqr(arr3, arr1, limbs1);
+            else if (limbs1 > limbs2)
+                flint_mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
+            else
+                flint_mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
+        }
+    }
 
     if (sign)
         _fmpz_poly_bit_unpack(res, nlo, nhi, arr3, bits, neg1 ^ neg2);
     else
         _fmpz_poly_bit_unpack_unsigned(res, nlo, nhi, arr3, bits);
+
+#if FLINT_WANT_ASSERT
+    if (check_m_ref)
+    {
+        if (m_ref != _fmpz_low_limb(res))
+            flint_abort();
+        FLINT_ASSERT(m_ref == _fmpz_low_limb(res));
+    }
+#endif
 
     if (zero_high != 0)
         _fmpz_vec_zero(res + nhi - nlo, zero_high);
