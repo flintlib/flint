@@ -54,7 +54,10 @@ static ulong fft_combine_bits_signed(
         ulong s;
         ulong halflimb = UWORD(1) << (FLINT_BITS - 1);
 
-        if (a[i][limbs] | (a[i][limbs - 1] > halflimb))
+        /* negative iff the ring value strictly exceeds 2^(N-1) */
+        if (a[i][limbs] || (a[i][limbs - 1] > halflimb)
+            || (a[i][limbs - 1] == halflimb
+                && !flint_mpn_zero_p(a[i], limbs - 1)))
         {
             mpn_sub_1(t, a[i], limbs, UWORD(1));
             s = 1;

@@ -65,6 +65,61 @@ TEST_FUNCTION_START(fmpz_vec_get_set_fft, state)
         _fmpz_vec_clear(b, len);
     }
 
+    /* directed boundary cases: values within a limb of +-2^(N-1),
+       whose ring representatives have top limb exactly halflimb --
+       the band a formerly strict sign test misclassified */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    {
+        fmpz * a, * b;
+        slong limbs = 1 + n_randint(state, 8);
+        ulong * ii[1], * ptr;
+        slong bt;
+        int result2;
+
+        ptr = flint_malloc((limbs + 1) * sizeof(ulong));
+        ii[0] = ptr;
+
+        a = _fmpz_vec_init(1);
+        b = _fmpz_vec_init(1);
+
+        fmpz_one(a + 0);
+        fmpz_mul_2exp(a + 0, a + 0, FLINT_BITS * limbs - 1);
+        switch (n_randint(state, 4))
+        {
+            case 0: break;                        /* +2^(N-1) */
+            case 1:                               /* +2^(N-1) - small */
+                fmpz_sub_ui(a + 0, a + 0,
+                            1 + n_randint(state, 1000));
+                break;
+            case 2:                               /* -2^(N-1) */
+                fmpz_neg(a + 0, a + 0);
+                break;
+            default:                              /* -(2^(N-1) - small) */
+                fmpz_sub_ui(a + 0, a + 0,
+                            1 + n_randint(state, 1000));
+                fmpz_neg(a + 0, a + 0);
+        }
+
+        _fmpz_vec_get_fft(ii, a, limbs, 1);
+        bt = _fmpz_vec_max_bits(a, 1);
+        mpn_normmod_2expp1(ii[0], limbs);
+        _fmpz_vec_set_fft(b, 1, (const nn_ptr *) ii, limbs, bt < 0);
+
+        result2 = _fmpz_vec_equal(a, b, 1);
+        if (!result2)
+        {
+            flint_printf("FAIL (boundary):\n");
+            _fmpz_vec_print(a, 1), flint_printf("\n");
+            _fmpz_vec_print(b, 1), flint_printf("\n");
+            fflush(stdout);
+            flint_abort();
+        }
+
+        flint_free(ptr);
+        _fmpz_vec_clear(a, 1);
+        _fmpz_vec_clear(b, 1);
+    }
+
      /* convert back and forth unsigned and compare */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
