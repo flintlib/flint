@@ -12,17 +12,6 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
-/*
-    flint_mpn_mulmid returns the window [zlo, zhi) of a*b as a lower
-    approximation: computed = exact - D, where the deficit D is a single carry
-    from the products dropped below zlo, bounded by min(an,bn,zlo)*2^64 (a couple
-    of backends, e.g. via_mulhigh, use a different but comparably small D).  Since
-    D is subtracted modulo 2^(64*zn), a narrow window can wrap so that the result
-    exceeds the exact window numerically -- that is allowed.  What we can check is
-    that the deficit d = (exact - computed) mod 2^(64*zn) is confined to the low
-    two limbs (it fits there whenever the window has room), and that with
-    zlo == 0, where nothing is dropped, the window is exact.
-*/
 TEST_FUNCTION_START(flint_mpn_mulmid, state)
 {
     slong ix;
@@ -52,7 +41,7 @@ TEST_FUNCTION_START(flint_mpn_mulmid, state)
 
         flint_mpn_rrandom(a, state, an);
         flint_mpn_rrandom(b, state, bn);
-        flint_mpn_rrandom(z, state, zn);        /* poison */
+        flint_mpn_rrandom(z, state, zn);
 
         flint_mpn_mulmid(z, a, an, b, bn, zlo, zhi);
 

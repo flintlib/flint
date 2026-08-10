@@ -13,59 +13,6 @@
 
 #if FLINT_HAVE_NATIVE_mpn_mulmid_n
 
-/*
-    Set (z, zhi - zlo) to the limb window [zlo, zhi) of the integer product
-    a * b, as a lower approximation: partial products a[p] * b[q] whose low
-    limb lies below limb zlo (i.e. p + q < zlo) are dropped, so the carry they
-    would propagate into limb zlo is not recovered.  This matches the contract
-    of radix_mulmid_classical with radix B = 2^64 (and the schoolbook
-    flint_mpn_mulmid_classical).  Equivalently
-
-        z = ( sum_{p+q >= zlo} a[p]*b[q] * B^(p+q-zlo) ) mod B^(zhi-zlo).
-
-    Requires an >= 1, bn >= 1 and 0 <= zlo < zhi <= an + bn.
-
-    Implementation: reduce the window to a single *balanced* middle product and
-    hand it to flint_mpn_mulmid_n (Karatsuba/Toom-42).  flint_mpn_mulmid_n
-    computes, for inputs {A, 2n-1} and {B, n}, the band n-1 <= p'+q' < 2n-1 of
-    A*B shifted down by n-1, dropping all products with p'+q' < n-1 -- which is
-    exactly the same "drop everything below the floor" rule as our window's
-    lower-approximation, so the deficits coincide and the result is the *same*
-    value the schoolbook would produce (it is not merely another approximation).
-
-    To map the window onto that shape we:
-
-      (1) clamp an, bn to zhi (limbs at/above zhi cannot reach the window);
-
-      (2) slice off the low limbs that can never contribute: a[p] with
-          p + (bn-1) < zlo, and b[q] with q + (an-1) < zlo.  Every product
-          removed here has p+q < zlo (already dropped) or low limb >= zhi
-          (outside the window), so slicing changes nothing.  This also keeps
-          the balanced size from being tied to the full an;
-
-      (3) place the (longer) sliced operand of length La in the 2n-1 slot at
-          offset alpha and the shorter one of length Lb in the n slot at the
-          top (offset beta = n - Lb), with alpha + beta = n - 1 - zlo2 so that
-          output limb k lands exactly at product position zlo + k.  Here zlo2
-          is the window floor in sliced coordinates; one shows zlo2 <= Lb - 1,
-          hence alpha = (Lb-1) - zlo2 >= 0.
-
-    We choose the smallest n that fits both operands and covers the window:
-
-        n = max( zn, Lb, ceil((La + Lb - zlo2) / 2) ).
-
-    NOTE ON THE ALTERNATIVE.  This is the "generous n + zero-pad" route: one
-    balanced call, no fix-up.  It is a good fit when the window is wide (zn
-    comparable to Lb), i.e. exactly the regime where Karatsuba/Toom pays off.
-    It is *not* a good fit for a narrow window sitting in a tall, skewed region:
-    there n is forced up to ~Lb (B must hold all of b), so the balanced call
-    costs ~O(Lb^2) while the window only depends on ~zn diagonals and plain
-    schoolbook (flint_mpn_mulmid_classical) costs ~O(zn * Lb).  A
-    production dispatcher should therefore fall back to schoolbook for narrow
-    windows, or chunk the region the way the GMP-derived general middle product
-    (flint_mpn_mulmid_unbalanced, mulmid_gmp.c) does with MULMID_CHUNK, and only enter this
-    balanced reduction once a chunk is square enough to benefit.
-*/
 void
 flint_mpn_mulmid_via_n_padded(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn,
                  mp_size_t zlo, mp_size_t zhi)

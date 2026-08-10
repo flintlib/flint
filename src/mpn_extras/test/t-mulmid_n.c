@@ -13,13 +13,6 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 
-/*
-    flint_mpn_mulmid_n(rp, a, b, n) is the balanced exact middle product of
-    {a, 2n-1} and {b, n}, writing n + 2 limbs.  It is the sum of the diagonals
-    n-1 <= p+q < 2n-1 shifted down by n-1; the high n limbs (rp[2..n+2)) are
-    exact and the low two are guard limbs.  Reference: accumulate exactly that
-    band and compare the high n limbs.
-*/
 TEST_FUNCTION_START(flint_mpn_mulmid_n, state)
 {
     slong ix;

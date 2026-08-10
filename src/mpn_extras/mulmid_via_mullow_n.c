@@ -11,15 +11,6 @@
 
 #include "mpn_extras.h"
 
-/*
-    Windowed middle product via a balanced low product.  The low zhi limbs of
-    a * b are (a mod B^zhi) * (b mod B^zhi) mod B^zhi, computed exactly by
-    flint_mpn_mullow_n on operands zero-padded / truncated to n = zhi limbs; the
-    window [zlo, zhi) is then the top zn of those.  Correct for any input; the
-    result is the *exact* window (with carry-in from below zlo), a zero-deficit
-    instance of the contract.  Cheapest when zhi is small (a low or nearly-low
-    window); for large zhi it computes an almost full n x n product.
-*/
 void
 flint_mpn_mulmid_via_mullow_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, mp_size_t bn,
                               mp_size_t zlo, mp_size_t zhi)
@@ -63,3 +54,4 @@ flint_mpn_mulmid_via_mullow_n(mp_ptr z, mp_srcptr a, mp_size_t an, mp_srcptr b, 
     flint_mpn_copyi(z, rp + zlo, zn);
     TMP_END;
 }
+
