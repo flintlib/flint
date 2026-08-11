@@ -349,6 +349,10 @@ Special values
     Sets *res* to Euler's constant `\gamma`. This creates an element
     of the (transcendental?) number field `\mathbb{Q}(\gamma)`.
 
+.. function:: void ca_phi(ca_t res, ca_ctx_t ctx)
+
+    Sets *res* to the golden ratio `\varphi`.
+
 .. function:: void ca_unknown(ca_t res, ca_ctx_t ctx)
 
     Sets *res* to the meta-value *Unknown*.

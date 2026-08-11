@@ -75,9 +75,7 @@ _ca_set_fexpr(ca_t res, fexpr_vec_t inputs, ca_vec_t outputs, const fexpr_t expr
                 ca_euler(res, ctx);
                 return 1;
             case FEXPR_GoldenRatio:
-                ca_sqrt_ui(res, 5, ctx);
-                ca_add_ui(res, res, 1, ctx);
-                ca_div_ui(res, res, 2, ctx);
+                ca_phi(res, ctx);
                 return 1;
             case FEXPR_Infinity:
                 ca_pos_inf(res, ctx);
