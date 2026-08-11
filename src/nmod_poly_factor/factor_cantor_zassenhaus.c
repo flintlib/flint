@@ -31,6 +31,8 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
 
     nmod_poly_make_monic(v, f);
 
+    res->num = 0;
+
     i = 0;
     do
     {
