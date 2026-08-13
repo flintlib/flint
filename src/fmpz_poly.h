@@ -365,6 +365,9 @@ void fmpz_poly_mulhigh_classical(fmpz_poly_t res,
 
 void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);
 void fmpz_poly_mulmid_classical(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi);
+
+int _fmpz_poly_mulmid_classical_fft_small(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);
+int fmpz_poly_mulmid_classical_fft_small(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi);
 void _fmpz_poly_mulmid_SS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);
 void fmpz_poly_mulmid_SS(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi);
 void _fmpz_poly_mulmid_KS(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi);

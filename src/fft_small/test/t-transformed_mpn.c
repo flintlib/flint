@@ -397,7 +397,8 @@ cleanup:
     {
         gr_ctx_t ctx;
         gr_ptr acc, x, y;
-        ulong a[1], b[1], z[8];
+        ulong a[1], b[1];
+        nn_ptr z;
         slong zn_out;
         int sign;
 
@@ -414,6 +415,9 @@ cleanup:
             GR_MUST_SUCCEED(gr_transformed_mpn_set(y, b, 1, 0, ctx));
             GR_MUST_SUCCEED(gr_mul(acc, x, x, ctx));
             GR_MUST_SUCCEED(gr_submul(acc, x, y, ctx));
+            z = flint_malloc(FLINT_MAX(
+                    gr_transformed_mpn_get_limbs(ctx, acc), 1)
+                    * sizeof(ulong));
             GR_MUST_SUCCEED(gr_transformed_mpn_get(z,
                     gr_transformed_mpn_get_limbs(ctx, acc),
                     &zn_out, &sign, acc, ctx));
@@ -421,6 +425,7 @@ cleanup:
             if (zn_out != 1 || sign != 1 || z[0] != 1)
                 TEST_FUNCTION_FAIL("1*1 - 1*2 != -1: "
                     "zn = %wd, sign = %d, z0 = %wu\n", zn_out, sign, z[0]);
+            flint_free(z);
 
             gr_heap_clear(acc, ctx);
             gr_heap_clear(x, ctx);
@@ -590,6 +595,137 @@ cleanup:
                 gr_ctx_clear(ctx);
             }
         }
+    }
+
+    /* trivial coefficients 0 and +-1: conversion keeps them in the
+       small side, products against them become additions or integer
+       bookkeeping, and the small side folds into reconstruction --
+       referee the whole algebra against fmpz over mixed chains */
+    {
+    slong iter2;
+    for (iter2 = 0; iter2 < 60 * flint_test_multiplier(); iter2++)
+    {
+        gr_ctx_t ctx;
+        gr_ptr acc, e[6];
+        fmpz_t facc, fe[6], t1;
+        slong bits = 700 + n_randint(state, 3000);
+        slong nterms = 1 + n_randint(state, 6), i, j;
+        int signed_ctx = n_randint(state, 4) != 0;
+        int status = GR_SUCCESS;
+
+        if (gr_ctx_init_transformed_mpn(ctx, 2*bits + 4, 16,
+                                        signed_ctx, 8) != GR_SUCCESS)
+            continue;
+
+        acc = flint_malloc(6 * ctx->sizeof_elem);
+        for (i = 0; i < 6; i++)
+        {
+            e[i] = GR_ENTRY(acc, i, ctx->sizeof_elem);
+            gr_init(e[i], ctx);
+            fmpz_init(fe[i]);
+        }
+        fmpz_init(facc);
+        fmpz_init(t1);
+
+        /* a mix of 0, +-1 and full-size values */
+        for (i = 0; i < 6; i++)
+        {
+            switch (n_randint(state, 5))
+            {
+                case 0: fmpz_zero(fe[i]); break;
+                case 1: fmpz_one(fe[i]); break;
+                case 2: fmpz_set_si(fe[i], signed_ctx ? -1 : 1); break;
+                default:
+                    fmpz_randtest_unsigned(fe[i], state, bits);
+                    if (signed_ctx && n_randint(state, 2))
+                        fmpz_neg(fe[i], fe[i]);
+            }
+            {
+                slong an = fmpz_size(fe[i]);
+                int sgn = fmpz_sgn(fe[i]) < 0;
+                {
+                    fmpz_t ab;
+                    fmpz_init(ab);
+                    fmpz_abs(ab, fe[i]);
+                    if (an == 0)
+                        status |= gr_transformed_mpn_set(e[i], NULL, 0,
+                                                         0, ctx);
+                    else
+                    {
+                        nn_ptr tmp = flint_malloc(an * sizeof(ulong));
+                        fmpz_get_ui_array(tmp, an, ab);
+                        status |= gr_transformed_mpn_set(e[i], tmp, an,
+                                                         sgn, ctx);
+                        flint_free(tmp);
+                    }
+                    fmpz_clear(ab);
+                }
+                (void) j;
+            }
+        }
+
+        /* accumulate: acc = sum of pairwise products with random
+           add/sub, refereed in fmpz */
+        {
+            gr_ptr a2 = e[0];
+            fmpz_zero(facc);
+            status |= gr_zero(a2, ctx);
+            for (j = 0; j < nterms && status == GR_SUCCESS; j++)
+            {
+                slong u = 1 + n_randint(state, 5);
+                slong v = 1 + n_randint(state, 5);
+                int sub = signed_ctx && n_randint(state, 2);
+                if (sub)
+                {
+                    status |= gr_submul(a2, e[u], e[v], ctx);
+                    fmpz_submul(facc, fe[u], fe[v]);
+                }
+                else
+                {
+                    status |= gr_addmul(a2, e[u], e[v], ctx);
+                    fmpz_addmul(facc, fe[u], fe[v]);
+                }
+            }
+            if (status == GR_SUCCESS)
+            {
+                {
+                    slong need = FLINT_MAX(
+                        gr_transformed_mpn_get_limbs(ctx, a2), 1);
+                    nn_ptr zz = flint_malloc(need * sizeof(ulong));
+                    slong zn2;
+                    int sg2;
+                    status |= gr_transformed_mpn_get(zz, need, &zn2,
+                                                     &sg2, a2, ctx);
+                    if (status == GR_SUCCESS)
+                    {
+                        if (zn2 == 0)
+                            fmpz_zero(t1);
+                        else
+                            fmpz_set_ui_array(t1, zz, zn2);
+                        if (sg2)
+                            fmpz_neg(t1, t1);
+                    }
+                    flint_free(zz);
+                }
+                if (status == GR_SUCCESS && !fmpz_equal(t1, facc))
+                    TEST_FUNCTION_FAIL("trivial-mix chain: bits = %wd, "
+                        "signed = %d, terms = %wd\n",
+                        bits, signed_ctx, nterms);
+            }
+            /* GR_UNABLE is acceptable (caps, unsigned-domain refusals);
+               wrong answers are not */
+        }
+
+        for (i = 0; i < 6; i++)
+        {
+            gr_clear(e[i], ctx);
+            fmpz_clear(fe[i]);
+        }
+        fmpz_clear(facc);
+        fmpz_clear(t1);
+        flint_free(acc);
+        gr_ctx_clear(ctx);
+    }
     }
 
     TEST_FUNCTION_END(state);

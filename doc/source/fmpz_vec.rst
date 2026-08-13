@@ -90,6 +90,11 @@ Bit sizes and norms
     coefficient of ``vec``, then if any coefficient of ``vec`` is
     negative, `-b` is returned, else `b` is returned.
 
+.. function:: slong _fmpz_vec_weight_bits(const fmpz * vec, slong len)
+
+    Returns the sum of :func:`fmpz_bits` over the entries of
+    ``(vec, len)``.
+
 .. function:: slong _fmpz_vec_max_bits_ref(const fmpz * vec, slong len)
 
     If `b` is the maximum number of bits of the absolute value of any

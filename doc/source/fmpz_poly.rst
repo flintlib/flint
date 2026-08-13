@@ -692,6 +692,26 @@ Multiplication
     in the product of ``poly1`` and ``poly2``. Equivalently, compute
     `[(poly1 \cdot poly2) \bmod x^{nhi}] / x^{nlo}`.
 
+.. function:: int _fmpz_poly_mulmid_classical_fft_small(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+
+    As :func:`_fmpz_poly_mulmid_classical`, computing the coefficients
+    `[\mathtt{nlo}, \mathtt{nhi})` of the product, but with the
+    coefficient arithmetic done pointwise on fft_small transforms: the
+    shorter operand's coefficients are transformed once and kept, the
+    longer operand rolls through a window of transform slots, and each
+    output coefficient is an accumulation of pointwise products
+    reconstructed once. When both operands are the same array, the
+    square shares transforms and pairs symmetric terms. The lengths may
+    be given in either order. Returns 1 on success and 0 when the
+    transformed representation is unavailable (small coefficients, or a
+    build without fft_small support), in which case nothing is written
+    and the caller should fall back to the classical routine.
+
+.. function:: int fmpz_poly_mulmid_classical_fft_small(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
+
+    Wrapper handling aliasing, zero operands and normalization, with
+    the same return convention.
+
 .. function:: void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``

@@ -150,3 +150,20 @@ Primality testing
 .. function:: int fmpzi_is_probabprime(const fmpzi_t n)
 
     Check whether `n` is a probable Gaussian prime.
+
+.. function:: int _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi)
+
+    Computes the coefficients `[\mathtt{nlo}, \mathtt{nhi})` of the
+    product of the Gaussian integer polynomials ``(poly1, len1)`` and
+    ``(poly2, len2)``, with the coefficient arithmetic done pointwise
+    on fft_small transforms: two transforms per coefficient (real and
+    imaginary parts) and four pointwise operations per complex
+    product, the shorter operand's transforms kept and the longer
+    rolling as in :func:`_fmpz_poly_mulmid_classical_fft_small`.
+    Squaring shares transforms, pairs symmetric terms and computes
+    diagonal squares with three multiplications. The lengths may be
+    given in either order. Returns 1 on success and 0 when the
+    transformed representation is unavailable or unprofitable in which
+    case nothing is written and the caller should fall back to a
+    different routine.
+
