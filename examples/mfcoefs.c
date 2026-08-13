@@ -707,14 +707,17 @@ int main(int argc, char * argv[])
         }
     }
     flint_cleanup_master();
+    return 0;
 }
 
 #else
 
 int main(int argc, char * argv[])
 {
-    flint_printf("mfcoefs requires the fft_small module.\n");
-    return EXIT_FAILURE;
+    /* Failing silently as to not upset the CI whenever fft_small is
+     * unavailable. */
+    flint_printf("mfcoefs requires the fft_small module.  Failing silently.\n");
+    return 0;
 }
 
 #endif
