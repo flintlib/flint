@@ -87,6 +87,10 @@ typedef enum
     CA_Erfi,
     CA_RiemannZeta,
     CA_HurwitzZeta,
+    /* Complete elliptic integrals */
+    CA_EllipticK,
+    CA_EllipticE,
+    CA_EllipticPi,
     CA_FUNC_CODE_LENGTH
 } calcium_func_code;
 
