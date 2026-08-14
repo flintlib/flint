@@ -186,6 +186,38 @@ then
 elif test "$1" = "hilbert_matrix_ca";
 then
     echo "hilbert_matrix_ca....SKIPPED"
+elif test "$1" = "ode_exponents";
+then
+    echo -n "ode_exponents..."
+    res=$("$2/ode_exponents")
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/(?s)Apery.*8\.4787.*-4\.3282.*1\.1047.*266\.40.*Multiple.*-1\.5692.*1\.9907.*0\.3132.*1\.5268.*1\.9228.*7\.9900.*Whittaker.*1\.9999.*1\.960.*-0\.3823.*1\.3572.*/) { $found=1; last } END { exit !$found }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+elif test "$1" = "ode_fundamental_matrix";
+then
+    echo -n "ode_fundamental_matrix..."
+    res=$("$2/ode_fundamental_matrix")
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/\[\(1.000000000000* \+ 0j\)  \+\/-  \(0, 0j\), \(0.28345575247050[0-9]* - 0.08505998507745[0-9]*j\)  \+\/-  \(.*\)\]\n\[\(0 \+ 0j\)  \+\/-  \(0, 0j\), \(0.92789989021449[0-9]* \+ 0.045900355479322[0-9]*j\)  \+\/-  \(.*\)\]/) { $found=1; last } END { exit !$found }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
 elif test "$1" = "huge_expr";
 then
     echo "huge_expr....SKIPPED"

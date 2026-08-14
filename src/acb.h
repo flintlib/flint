@@ -918,6 +918,8 @@ int _acb_vec_is_finite(acb_srcptr vec, slong len);
 int _acb_vec_equal(acb_srcptr vec1, acb_srcptr vec2, slong len);
 int _acb_vec_overlaps(acb_srcptr vec1, acb_srcptr vec2, slong len);
 int _acb_vec_contains(acb_srcptr vec1, acb_srcptr vec2, slong len);
+void _acb_vec_get_mag(mag_t bound, acb_srcptr vec, slong len);
+void _acb_vec_get_mag_lower(mag_t bound, acb_srcptr vec, slong len);
 void _acb_vec_get_real(arb_ptr re, acb_srcptr vec, slong len);
 void _acb_vec_get_imag(arb_ptr im, acb_srcptr vec, slong len);
 void _acb_vec_set_real_imag(acb_ptr vec, arb_srcptr re, arb_srcptr im, slong len);
