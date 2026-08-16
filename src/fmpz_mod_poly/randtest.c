@@ -53,7 +53,7 @@ void fmpz_mod_poly_rand_irreducible(fmpz_mod_poly_t f, flint_rand_t state,
 {
     if (len == 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_rand_irreducible). len == 0.\n");
     }
 
     do {

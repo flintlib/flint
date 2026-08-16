@@ -90,8 +90,8 @@ fmpz_randm_not_zero(fmpz_t f, flint_rand_t state, const fmpz_t m)
     fmpz_t mMinusOne;
     fmpz_sub_ui(mMinusOne, m, 1);
 
-    fmpz_randm(f, state, mMinusOne); // 0..m-2
-    fmpz_add_ui(f, f, 1); // 1..m-1
+    fmpz_randm(f, state, mMinusOne); /* 0..m-2 */
+    fmpz_add_ui(f, f, 1); /* 1..m-1 */
 }
 
 void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)

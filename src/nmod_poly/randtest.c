@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
-// Rand functions -> random dense polynomials with high probability
+/* rand functions -> coefficients generated uniformly */
 void
 nmod_poly_rand(nmod_poly_t poly, flint_rand_t state, slong len)
 {
