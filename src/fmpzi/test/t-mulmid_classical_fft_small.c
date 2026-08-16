@@ -126,5 +126,71 @@ next:
         flint_free(r2);
     }
 
+    /* deterministic coverage: a zero operand yields a zero window;
+       and a shared-pointer call with DIFFERENT lengths exercises the
+       squaring loop's unpaired terms (partners falling outside the
+       kept range) */
+#if FLINT_HAVE_FFT_SMALL
+    {
+        fmpzi_struct a[6], r[5];
+        slong i, j;
+        int ok;
+
+        for (i = 0; i < 6; i++)
+            fmpzi_init(a + i);
+        for (i = 0; i < 5; i++)
+            fmpzi_init(r + i);
+
+        for (i = 0; i < 6; i++)
+        {
+            fmpz_randbits(fmpzi_realref(a + i), state, 12000);
+            fmpz_randbits(fmpzi_imagref(a + i), state, 12000);
+        }
+
+        {
+            fmpzi_struct zb[2];
+            fmpzi_init(zb + 0);
+            fmpzi_init(zb + 1);
+            fmpz_one(fmpzi_realref(r + 0));
+            ok = _fmpzi_poly_mulmid_classical_fft_small(r, a, 6,
+                                                        zb, 2, 1, 4);
+            if (!ok || !fmpzi_is_zero(r + 0) || !fmpzi_is_zero(r + 1)
+                || !fmpzi_is_zero(r + 2))
+                TEST_FUNCTION_FAIL("fmpzi zero operand window\n");
+            fmpzi_clear(zb + 0);
+            fmpzi_clear(zb + 1);
+        }
+
+        ok = _fmpzi_poly_mulmid_classical_fft_small(r, a, 6, a, 3,
+                                                    2, 7);
+        if (ok)
+        {
+            fmpzi_t t, s;
+            fmpzi_init(t);
+            fmpzi_init(s);
+            for (i = 2; i < 7; i++)
+            {
+                fmpzi_zero(s);
+                for (j = FLINT_MAX(0, i - 5); j <= FLINT_MIN(i, 2);
+                     j++)
+                {
+                    fmpzi_mul(t, a + (i - j), a + j);
+                    fmpzi_add(s, s, t);
+                }
+                if (!fmpzi_equal(r + i - 2, s))
+                    TEST_FUNCTION_FAIL("shared unequal lengths: "
+                        "coeff %wd\n", i);
+            }
+            fmpzi_clear(t);
+            fmpzi_clear(s);
+        }
+
+        for (i = 0; i < 6; i++)
+            fmpzi_clear(a + i);
+        for (i = 0; i < 5; i++)
+            fmpzi_clear(r + i);
+    }
+#endif
+
     TEST_FUNCTION_END(state);
 }

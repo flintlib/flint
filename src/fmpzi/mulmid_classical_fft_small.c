@@ -247,15 +247,13 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
     } while (0)
 
     /* one complex product accumulated into the (re, im) target pair */
-#define CPROD(tr, ti, trused, tiused, ar, ai, br, bi) \
+/* the freshly re-initialized accumulators are the ring's zero and
+   the ring's addmul handles empty accumulators itself */
+#define CPROD(tr, ti, ar, ai, br, bi) \
     do { \
-        status |= (trused) ? gr_addmul(tr, ar, br, ctx) \
-                           : gr_mul(tr, ar, br, ctx); \
-        (trused) = 1; \
+        status |= gr_addmul(tr, ar, br, ctx); \
         status |= gr_submul(tr, ai, bi, ctx); \
-        status |= (tiused) ? gr_addmul(ti, ar, bi, ctx) \
-                           : gr_mul(ti, ar, bi, ctx); \
-        (tiused) = 1; \
+        status |= gr_addmul(ti, ar, bi, ctx); \
         status |= gr_addmul(ti, ai, br, ctx); \
     } while (0)
 
@@ -263,7 +261,6 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
     {
         slong jlo = FLINT_MAX(0, i - len1 + 1);
         slong jhi = FLINT_MIN(i, k - 1);
-        int r1u = 0, i1u = 0, r2u = 0, i2u = 0;
         gr_ptr ar, ai, br, bi;
 
         if (!share)
@@ -275,7 +272,7 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
                 bi = GR_ENTRY(B, 2 * j + 1, sz);
                 if (status != GR_SUCCESS)
                     break;
-                CPROD(accR, accI, r1u, i1u, ar, ai, br, bi);
+                CPROD(accR, accI, ar, ai, br, bi);
             }
         }
         else
@@ -294,65 +291,36 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
                     break;
 
                 if (paired && j < jp)
-                    CPROD(accR2, accI2, r2u, i2u, ar, ai, br, bi);
+                    CPROD(accR2, accI2, ar, ai, br, bi);
                 else if (paired)
                 {
                     /* the diagonal square: r^2 - i^2 into the single
                        accumulator, r i into the doubled one */
-                    status |= r1u ? gr_addmul(accR, ar, ar, ctx)
-                                  : gr_mul(accR, ar, ar, ctx);
-                    r1u = 1;
+                    status |= gr_addmul(accR, ar, ar, ctx);
                     status |= gr_submul(accR, ai, ai, ctx);
-                    status |= i2u ? gr_addmul(accI2, ar, ai, ctx)
-                                  : gr_mul(accI2, ar, ai, ctx);
-                    i2u = 1;
+                    status |= gr_addmul(accI2, ar, ai, ctx);
                 }
                 else
-                    CPROD(accR, accI, r1u, i1u, ar, ai, br, bi);
+                    CPROD(accR, accI, ar, ai, br, bi);
             }
         }
 
-        if (status == GR_SUCCESS && r2u)
+        /* fold the paired sums in twice; zero paired accumulators
+           reduce to short-circuited bookkeeping */
+        if (status == GR_SUCCESS)
         {
-            if (!r1u)
-            {
-                status |= gr_set(accR, accR2, ctx);
-                status |= gr_add(accR, accR, accR2, ctx);
-            }
-            else
-            {
-                status |= gr_add(accR, accR, accR2, ctx);
-                status |= gr_add(accR, accR, accR2, ctx);
-            }
-            r1u = 1;
-        }
-        if (status == GR_SUCCESS && i2u)
-        {
-            if (!i1u)
-            {
-                status |= gr_set(accI, accI2, ctx);
-                status |= gr_add(accI, accI, accI2, ctx);
-            }
-            else
-            {
-                status |= gr_add(accI, accI, accI2, ctx);
-                status |= gr_add(accI, accI, accI2, ctx);
-            }
-            i1u = 1;
+            status |= gr_add(accR, accR, accR2, ctx);
+            status |= gr_add(accR, accR, accR2, ctx);
+            status |= gr_add(accI, accI, accI2, ctx);
+            status |= gr_add(accI, accI, accI2, ctx);
         }
 
         if (status == GR_SUCCESS)
         {
-            if (r1u)
-                status |= _get_coeff(fmpzi_realref(res + i - nlo),
-                                     accR, ctx);
-            else
-                fmpz_zero(fmpzi_realref(res + i - nlo));
-            if (i1u)
-                status |= _get_coeff(fmpzi_imagref(res + i - nlo),
-                                     accI, ctx);
-            else
-                fmpz_zero(fmpzi_imagref(res + i - nlo));
+            status |= _get_coeff(fmpzi_realref(res + i - nlo),
+                                 accR, ctx);
+            status |= _get_coeff(fmpzi_imagref(res + i - nlo),
+                                 accI, ctx);
             /* borrowed storage: re-initialization is free */
             gr_transformed_mpn_init_borrowed(accR, accd[0], ctx);
             gr_transformed_mpn_init_borrowed(accI, accd[1], ctx);

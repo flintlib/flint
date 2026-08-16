@@ -214,5 +214,27 @@ sparse_next:
         fmpz_poly_clear(d);
     }
 
+    /* a zero operand yields a zero window and succeeds (deterministic
+       coverage of the zero-operand branch) */
+#if FLINT_HAVE_FFT_SMALL
+    {
+        fmpz * a = _fmpz_vec_init(5);
+        fmpz * b = _fmpz_vec_init(3);
+        fmpz * r = _fmpz_vec_init(4);
+        slong i;
+        int ok;
+        for (i = 0; i < 5; i++)
+            fmpz_randbits(a + i, state, 15000);
+        fmpz_one(r + 0);   /* stale content must be overwritten */
+        ok = _fmpz_poly_mulmid_classical_fft_small(r, a, 5, b, 3,
+                                                   2, 6);
+        if (!ok || !_fmpz_vec_is_zero(r, 4))
+            TEST_FUNCTION_FAIL("zero operand window\n");
+        _fmpz_vec_clear(a, 5);
+        _fmpz_vec_clear(b, 3);
+        _fmpz_vec_clear(r, 4);
+    }
+#endif
+
     TEST_FUNCTION_END(state);
 }

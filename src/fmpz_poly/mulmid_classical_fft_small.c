@@ -205,7 +205,6 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
     {
         slong jlo = FLINT_MAX(0, i - len1 + 1);
         slong jhi = FLINT_MIN(i, k - 1);
-        int acc_used = 0, acc2_used = 0;
         gr_ptr ea, eb;
 
         if (!share)
@@ -216,9 +215,7 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
                 eb = GR_ENTRY(B, j, sz);
                 if (status != GR_SUCCESS)
                     break;
-                status |= acc_used ? gr_addmul(acc, ea, eb, ctx)
-                                   : gr_mul(acc, ea, eb, ctx);
-                acc_used = 1;
+                status |= gr_addmul(acc, ea, eb, ctx);
             }
         }
         else
@@ -242,47 +239,31 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
 
                 if (paired && j < jp)
                 {
-                    status |= acc2_used ? gr_addmul(acc2, ea, eb, ctx)
-                                        : gr_mul(acc2, ea, eb, ctx);
-                    acc2_used = 1;
+                    status |= gr_addmul(acc2, ea, eb, ctx);
                 }
                 else
                 {
-                    status |= acc_used ? gr_addmul(acc, ea, eb, ctx)
-                                       : gr_mul(acc, ea, eb, ctx);
-                    acc_used = 1;
+                    status |= gr_addmul(acc, ea, eb, ctx);
                 }
             }
 
-            if (status == GR_SUCCESS && acc2_used)
-            {
-                if (!acc_used)
-                {
-                    status |= gr_set(acc, acc2, ctx);
-                    status |= gr_add(acc, acc, acc2, ctx);
-                }
-                else
-                {
-                    status |= gr_add(acc, acc, acc2, ctx);
-                    status |= gr_add(acc, acc, acc2, ctx);
-                }
-                acc_used = 1;
-            }
+            /* fold the paired sum in twice; when nothing paired,
+            acc2 is the ring's zero and the additions are
+            short-circuited bookkeeping */
+            status |= gr_add(acc, acc, acc2, ctx);
+            status |= gr_add(acc, acc, acc2, ctx);
         }
 
         if (status != GR_SUCCESS)
             break;
 
-        if (!acc_used)
-            fmpz_zero(res + (i - nlo));
-        else
-        {
-            status |= _get_coeff(res + (i - nlo), acc, ctx);
+        status |= _get_coeff(res + (i - nlo), acc, ctx);
             /* the destructive get consumed acc: bring it back for the
                next output; on borrowed storage this costs nothing */
-            gr_clear(acc, ctx);
-            gr_transformed_mpn_init_borrowed(acc, acc_data, ctx);
-        }
+        gr_clear(acc, ctx);
+        gr_transformed_mpn_init_borrowed(acc, acc_data, ctx);
+        gr_clear(acc2, ctx);
+        gr_transformed_mpn_init_borrowed(acc2, acc2_data, ctx);
     }
 
 #undef A_ELEM
