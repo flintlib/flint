@@ -289,7 +289,7 @@ Randomisation
 
     Sets `f` to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. The coefficients
-    are random numbers in `[1, n)`.
+    are signed randomly.
 
 .. function:: void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
