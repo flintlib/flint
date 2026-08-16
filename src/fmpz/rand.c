@@ -83,9 +83,9 @@ fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
 void
 fmpz_randm_not_zero(fmpz_t f, flint_rand_t state, const fmpz_t m)
 {
-    if (fmpz_cmp_ui(m, 2) <= 0)
+    if (fmpz_cmp_ui(m, 2) < 0)
     {
-        flint_throw(FLINT_ERROR, "Exception (fmpz_randm_not_zero). m <= 2.\n");
+        flint_throw(FLINT_ERROR, "Exception (fmpz_randm_not_zero). m < 2.\n");
     }
     fmpz_t mMinusOne;
     fmpz_sub_ui(mMinusOne, m, 1);
