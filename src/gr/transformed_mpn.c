@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -77,6 +78,16 @@ typedef struct
     ulong depth;
     int sign;                       /* 0 or 1: (-1)^sign */
     int negs;                       /* chunk values may be signed */
+    slong small;                    /* small side value: the element
+                                       represents (-1)^sign * T + small,
+                                       with T = 0 when nchunks == 0.
+                                       Coefficients 0 and +-1 are held
+                                       here without any transform, and
+                                       products of such coefficients
+                                       accumulate here as integer
+                                       additions, folded into the
+                                       reconstruction at conversion
+                                       out. */
 } tmpn_struct;
 
 #define TMPN_CTX(ctx) ((tmpn_ctx_struct *) GR_CTX_DATA_AS_PTR(ctx))
@@ -132,6 +143,7 @@ tmpn_init(gr_ptr x, gr_ctx_t ctx)
 {
     fft_small_op_init(&TMPN(x)->op, TMPN_CTX(ctx)->P);
     TMPN(x)->nchunks = 0;
+    TMPN(x)->small = 0;
     TMPN(x)->terms = 0;
     TMPN(x)->depth = 0;
     TMPN(x)->sign = 0;
@@ -146,6 +158,7 @@ gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx)
 {
     fft_small_op_init_borrowed(&TMPN(x)->op, TMPN_CTX(ctx)->P, data);
     TMPN(x)->nchunks = 0;
+    TMPN(x)->small = 0;
     TMPN(x)->terms = 0;
     TMPN(x)->depth = 0;
     TMPN(x)->sign = 0;
@@ -247,6 +260,7 @@ tmpn_zero(gr_ptr x, gr_ctx_t FLINT_UNUSED(ctx))
     TMPN(x)->depth = 0;
     TMPN(x)->sign = 0;
     TMPN(x)->negs = 0;
+    TMPN(x)->small = 0;
     return GR_SUCCESS;
 }
 
@@ -268,20 +282,23 @@ tmpn_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     TMPN(res)->depth = TMPN(x)->depth;
     TMPN(res)->sign = TMPN(x)->sign;
     TMPN(res)->negs = TMPN(x)->negs;
+    TMPN(res)->small = TMPN(x)->small;
     return GR_SUCCESS;
 }
 
 static truth_t
 tmpn_is_zero(gr_srcptr x, gr_ctx_t FLINT_UNUSED(ctx))
 {
-    return (TMPN(x)->nchunks == 0) ? T_TRUE : T_UNKNOWN;
+    if (TMPN(x)->nchunks == 0)
+        return (TMPN(x)->small == 0) ? T_TRUE : T_FALSE;
+    return T_UNKNOWN;
 }
 
 static truth_t
 tmpn_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (TMPN(x)->nchunks == 0 && TMPN(y)->nchunks == 0)
-        return T_TRUE;
+        return (TMPN(x)->small == TMPN(y)->small) ? T_TRUE : T_FALSE;
     return T_UNKNOWN;
 }
 
@@ -289,12 +306,14 @@ static int
 tmpn_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 {
     int status = tmpn_set(res, x, ctx);
-    if (status == GR_SUCCESS && TMPN(res)->nchunks > 0)
-    {
-        if (!TMPN_CTX(ctx)->is_signed)
-            return GR_UNABLE;
+    if (status != GR_SUCCESS)
+        return status;
+    if (!TMPN_CTX(ctx)->is_signed
+        && (TMPN(res)->nchunks > 0 || TMPN(res)->small > 0))
+        return GR_UNABLE;
+    if (TMPN(res)->nchunks > 0)
         TMPN(res)->sign ^= 1;
-    }
+    TMPN(res)->small = -TMPN(res)->small;
     return status;
 }
 
@@ -313,6 +332,17 @@ gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
 
     if (sign && !T->is_signed)
         return GR_DOMAIN;
+
+    if (an == 1 && a[0] == 1)
+    {
+        /* the coefficient stays in the small side: conversion costs
+           nothing, and pointwise operations against it degenerate to
+           additions or integer bookkeeping */
+        tmpn_zero(res, ctx);
+        TMPN(res)->small = sign ? -1 : 1;
+        TMPN(res)->terms = 1;
+        return GR_SUCCESS;
+    }
     if ((ulong) an * FLINT_BITS > (ulong) T->zcap * T->P->bits)
         return GR_DOMAIN;
 
@@ -322,6 +352,7 @@ gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
     TMPN(res)->depth = 1;
     TMPN(res)->sign = sign ? 1 : 0;
     TMPN(res)->negs = 0;
+    TMPN(res)->small = 0;
     return GR_SUCCESS;
 }
 
@@ -380,8 +411,18 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
 
     if (m == 0)
     {
-        *zn_out = 0;
-        *sign = 0;
+        slong sv = TMPN(x)->small;
+        if (sv == 0)
+        {
+            *zn_out = 0;
+            *sign = 0;
+            return GR_SUCCESS;
+        }
+        if (zn < 1)
+            return GR_DOMAIN;
+        z[0] = (ulong) FLINT_ABS(sv);
+        *zn_out = 1;
+        *sign = sv < 0;
         return GR_SUCCESS;
     }
 
@@ -448,6 +489,47 @@ _tmpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
     i = need;
     while (i > 0 && z[i - 1] == 0)
         i--;
+
+    /* fold the small side value in: the element represents
+       (-1)^sign * T + small, and the export just produced T */
+    if (TMPN(x)->small != 0)
+    {
+        slong sv = TMPN(x)->small;
+        ulong av = (ulong) FLINT_ABS(sv);
+        int ssign = sv < 0;
+
+        if (i == 0)
+        {
+            z[0] = av;
+            i = 1;
+            *sign = ssign;
+        }
+        else if (*sign == ssign)
+        {
+            /* the export bound's terms headroom guarantees room:
+               |T| + terms_bound < 2^(64 need) */
+            ulong cy = mpn_add_1(z, z, i, av);
+            if (cy != 0)
+            {
+                FLINT_ASSERT(i < need);
+                z[i++] = cy;
+            }
+        }
+        else if (i > 1 || z[0] > av)
+        {
+            mpn_sub_1(z, z, i, av);
+            while (i > 0 && z[i - 1] == 0)
+                i--;
+        }
+        else
+        {
+            /* |T| <= |small|: the sign crosses */
+            z[0] = av - z[0];
+            i = (z[0] != 0);
+            *sign = ssign;
+        }
+    }
+
     *zn_out = i;
     if (i == 0)
         *sign = 0;
@@ -563,18 +645,43 @@ _tmpn_addsub(gr_ptr res, gr_srcptr x, gr_srcptr y, int ysign_flip,
     ulong terms;
 
     if (TMPN(y)->nchunks == 0)
-        return tmpn_set(res, x, ctx);
+    {
+        /* y is a pure small value */
+        slong sy_small = ysign_flip ? -TMPN(y)->small : TMPN(y)->small;
+        ulong t = TMPN(x)->terms + TMPN(y)->terms;
+        int status;
+        if (t < TMPN(x)->terms || t > T->terms_bound)
+            return GR_UNABLE;
+        status = tmpn_set(res, x, ctx);
+        if (status != GR_SUCCESS)
+            return status;
+        TMPN(res)->small += sy_small;
+        TMPN(res)->terms = t;
+        if (!T->is_signed && TMPN(res)->nchunks == 0
+            && TMPN(res)->small < 0)
+            return GR_UNABLE;
+        return GR_SUCCESS;
+    }
     if (TMPN(x)->nchunks == 0)
     {
-        int status = tmpn_set(res, y, ctx);
-        if (status == GR_SUCCESS && (TMPN(res)->sign ^ ysign_flip) !=
-                TMPN(res)->sign)
+        ulong t = TMPN(x)->terms + TMPN(y)->terms;
+        int status;
+        slong sx_small = TMPN(x)->small;
+        if (t < TMPN(x)->terms || t > T->terms_bound)
+            return GR_UNABLE;
+        status = tmpn_set(res, y, ctx);
+        if (status != GR_SUCCESS)
+            return status;
+        if (ysign_flip)
         {
             if (!T->is_signed)
                 return GR_UNABLE;
-            TMPN(res)->sign ^= ysign_flip;
+            TMPN(res)->sign ^= 1;
+            TMPN(res)->small = -TMPN(res)->small;
         }
-        return status;
+        TMPN(res)->small += sx_small;
+        TMPN(res)->terms = t;
+        return GR_SUCCESS;
     }
 
     terms = TMPN(x)->terms + TMPN(y)->terms;
@@ -602,6 +709,8 @@ _tmpn_addsub(gr_ptr res, gr_srcptr x, gr_srcptr y, int ysign_flip,
     TMPN(res)->nchunks = FLINT_MAX(TMPN(x)->nchunks, TMPN(y)->nchunks);
     TMPN(res)->terms = terms;
     TMPN(res)->depth = FLINT_MAX(TMPN(x)->depth, TMPN(y)->depth);
+    TMPN(res)->small = TMPN(x)->small
+        + (ysign_flip ? -TMPN(y)->small : TMPN(y)->small);
     return GR_SUCCESS;
 }
 
@@ -641,7 +750,41 @@ tmpn_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     ulong terms;
 
     if (TMPN(x)->nchunks == 0 || TMPN(y)->nchunks == 0)
-        return tmpn_zero(res, ctx);
+    {
+        /* a pure small factor: zero annihilates; +-1 copies the other
+           operand with a sign adjustment; larger smalls (sums of
+           trivial coefficients) are left to the caller */
+        gr_srcptr sm = (TMPN(x)->nchunks == 0) ? x : y;
+        gr_srcptr ot = (sm == x) ? y : x;
+        slong sv = TMPN(sm)->small;
+        int status;
+
+        if (sv == 0)
+            return tmpn_zero(res, ctx);
+        if (sv != 1 && sv != -1)
+            return GR_UNABLE;
+        if (!_tmpn_mul_terms(&terms, TMPN(x), TMPN(y), T->terms_bound))
+            return GR_UNABLE;
+        status = tmpn_set(res, ot, ctx);
+        if (status != GR_SUCCESS)
+            return status;
+        if (sv == -1)
+        {
+            if (!T->is_signed)
+                return GR_UNABLE;
+            if (TMPN(res)->nchunks > 0)
+                TMPN(res)->sign ^= 1;
+            TMPN(res)->small = -TMPN(res)->small;
+        }
+        TMPN(res)->terms = terms;
+        return GR_SUCCESS;
+    }
+
+    /* a transformed operand carrying a small side value cannot enter a
+       pointwise product without materializing it; the drivers only
+       multiply freshly converted operands, whose small side is zero */
+    if (TMPN(x)->small != 0 || TMPN(y)->small != 0)
+        return GR_UNABLE;
 
     m = TMPN(x)->nchunks + TMPN(y)->nchunks - 1;
     if (m > T->zcap ||
@@ -658,6 +801,7 @@ tmpn_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     TMPN(res)->depth = TMPN(x)->depth + TMPN(y)->depth;
     TMPN(res)->sign = TMPN(x)->sign ^ TMPN(y)->sign;
     TMPN(res)->negs = TMPN(x)->negs | TMPN(y)->negs;
+    TMPN(res)->small = 0;
     return GR_SUCCESS;
 }
 
@@ -670,8 +814,43 @@ _tmpn_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int subflip,
     slong m;
     ulong terms, t2;
 
+    if ((TMPN(x)->nchunks == 0 && TMPN(x)->small == 0)
+        || (TMPN(y)->nchunks == 0 && TMPN(y)->small == 0))
+        return GR_SUCCESS;   /* a zero factor: nothing to accumulate */
+
     if (TMPN(x)->nchunks == 0 || TMPN(y)->nchunks == 0)
-        return GR_SUCCESS;
+    {
+        /* a pure small +-1 factor: the accumulated product is the
+           other operand up to sign, so the pointwise multiplication
+           becomes an addition or subtraction (or pure integer
+           bookkeeping when the other operand is small too) */
+        gr_srcptr sm = (TMPN(x)->nchunks == 0) ? x : y;
+        gr_srcptr ot = (sm == x) ? y : x;
+        slong sv = TMPN(sm)->small;
+        int psub;
+
+        if (sv != 1 && sv != -1)
+            return GR_UNABLE;
+        psub = subflip ^ (sv < 0);
+        if (TMPN(ot)->nchunks == 0)
+        {
+            ulong t = TMPN(res)->terms + TMPN(ot)->terms;
+            if (t < TMPN(res)->terms || t > T->terms_bound)
+                return GR_UNABLE;
+            TMPN(res)->small += psub ? -TMPN(ot)->small
+                                     : TMPN(ot)->small;
+            TMPN(res)->terms = t;
+            if (!T->is_signed && TMPN(res)->nchunks == 0
+                && TMPN(res)->small < 0)
+                return GR_UNABLE;
+            return GR_SUCCESS;
+        }
+        return psub ? tmpn_sub(res, res, ot, ctx)
+                    : tmpn_add(res, res, ot, ctx);
+    }
+
+    if (TMPN(x)->small != 0 || TMPN(y)->small != 0)
+        return GR_UNABLE;
 
     /* with res aliasing an operand, the per-call domain bookkeeping
        below cannot mark the same struct as both input and accumulator;
@@ -691,12 +870,32 @@ _tmpn_addsubmul(gr_ptr res, gr_srcptr x, gr_srcptr y, int subflip,
 
     if (TMPN(res)->nchunks == 0)
     {
+        /* the accumulator has no transform data, but it may hold an
+           accumulated small side value, which must survive the
+           product being written over it */
+        slong rs = TMPN(res)->small;
+        ulong rt = TMPN(res)->terms;
         int status = tmpn_mul(res, x, y, ctx);
-        if (status == GR_SUCCESS && subflip && TMPN(res)->nchunks > 0)
+        if (status != GR_SUCCESS)
+            return status;
+        if (subflip)
         {
             if (!T->is_signed)
                 return GR_UNABLE;
-            TMPN(res)->sign ^= 1;
+            if (TMPN(res)->nchunks > 0)
+                TMPN(res)->sign ^= 1;
+            TMPN(res)->small = -TMPN(res)->small;
+        }
+        if (rs != 0)
+        {
+            ulong t = rt + TMPN(res)->terms;
+            if (t < rt || t > T->terms_bound)
+                return GR_UNABLE;
+            TMPN(res)->small += rs;
+            TMPN(res)->terms = t;
+            if (!T->is_signed && TMPN(res)->nchunks == 0
+                && TMPN(res)->small < 0)
+                return GR_UNABLE;
         }
         return status;
     }

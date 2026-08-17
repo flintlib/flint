@@ -100,6 +100,7 @@ void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, slong len, flint_
 /*  Norms  *******************************************************************/
 
 slong _fmpz_vec_max_bits(const fmpz * vec, slong len);
+slong _fmpz_vec_weight_bits(const fmpz * vec, slong len);
 slong _fmpz_vec_max_bits_ref(const fmpz * vec, slong len);
 
 void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs, const fmpz * coeffs, slong length);

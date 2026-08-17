@@ -154,5 +154,45 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft_small, state)
         fmpz_mat_clear(B0);
     }
 
+        /* structured matrices: entries from {0, +1, -1, big} */
+    for (slong it2 = 0; it2 < 10 * flint_test_multiplier(); it2++)
+    {
+        slong r = 1 + n_randint(state, 6), c = 1 + n_randint(state, 6),
+              k = 1 + n_randint(state, 6);
+        slong bits = 11000 + n_randint(state, 6000);
+        fmpz_mat_t A, B, C, D;
+        fmpz_mat_init(A, r, k); fmpz_mat_init(B, k, c);
+        fmpz_mat_init(C, r, c); fmpz_mat_init(D, r, c);
+        for (slong i2 = 0; i2 < r; i2++)
+            for (slong j2 = 0; j2 < k; j2++)
+                switch (n_randint(state, 4))
+                {
+                    case 0: break;
+                    case 1: fmpz_set_si(fmpz_mat_entry(A, i2, j2),
+                                n_randint(state, 2) ? 1 : -1); break;
+                    default: fmpz_randtest(fmpz_mat_entry(A, i2, j2),
+                                           state, bits);
+                }
+        for (slong i2 = 0; i2 < k; i2++)
+            for (slong j2 = 0; j2 < c; j2++)
+                switch (n_randint(state, 4))
+                {
+                    case 0: break;
+                    case 1: fmpz_set_si(fmpz_mat_entry(B, i2, j2),
+                                n_randint(state, 2) ? 1 : -1); break;
+                    default: fmpz_randtest(fmpz_mat_entry(B, i2, j2),
+                                           state, bits);
+                }
+        if (fmpz_mat_mul_fft_small(C, A, B))
+        {
+            fmpz_mat_mul_classical(D, A, B);
+            if (!fmpz_mat_equal(C, D))
+                TEST_FUNCTION_FAIL("structured matrix mismatch: "
+                    "%wd x %wd x %wd, bits = %wd\n", r, k, c, bits);
+        }
+        fmpz_mat_clear(A); fmpz_mat_clear(B);
+        fmpz_mat_clear(C); fmpz_mat_clear(D);
+    }
+
     TEST_FUNCTION_END(state);
 }

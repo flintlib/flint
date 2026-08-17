@@ -188,6 +188,8 @@ void fmpzi_gcd(fmpzi_t g, const fmpzi_t x, const fmpzi_t y);
 int fmpzi_is_prime(const fmpzi_t n);
 int fmpzi_is_probabprime(const fmpzi_t n);
 
+int _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res, const fmpzi_struct * poly1, slong len1, const fmpzi_struct * poly2, slong len2, slong nlo, slong nhi);
+
 #ifdef __cplusplus
 }
 #endif
