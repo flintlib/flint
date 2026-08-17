@@ -163,7 +163,11 @@ void _fft_small_plan_set_normalizers(fft_small_plan_t P)
     maximal operand lengths; zl/zh/zn are in coefficient units and are
     not consulted by fft_small_export_mpn, which windows in limbs.
 */
-int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
+static int _plan_init_mpn_np2(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong an_max, ulong bn_max, ulong len_bound);
+
+static int
+_plan_init_mpn_wide(fft_small_plan_t P, mpn_ctx_t R,
                     ulong an_max, ulong bn_max, ulong len_bound)
 {
     ulong np, best_np = 0, best_bits = 0;
@@ -433,6 +437,212 @@ int fft_small_plan_init_nmod_cyclic(fft_small_plan_t P, mpn_ctx_t R,
         return 0;
 
     _fft_small_plan_set_normalizers(P);
+    return 1;
+}
+
+int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong an_max, ulong bn_max, ulong len_bound)
+{
+    if (len_bound <= 2
+        && FLINT_MIN(an_max, bn_max) >= FLINT_MPN_MUL_NP2_MIN_BN
+        && FLINT_MAX(an_max, bn_max) <= FLINT_MPN_MUL_NP2_MAX_AN
+        && _plan_init_mpn_np2(P, R, an_max, bn_max, len_bound))
+        return 1;
+
+    return _plan_init_mpn_wide(P, R, an_max, bn_max, len_bound);
+}
+
+static int _plan_init_mpn_np2(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong an_max, ulong bn_max, ulong len_bound)
+{
+    ulong bits, depth, alen, blen, zlen;
+
+    if (!_fft_small_np2_choose(R, an_max, bn_max, len_bound,
+                               &bits, &depth))
+        return 0;
+
+    if (!_plan_init_mpn_wide(P, R, an_max, bn_max, len_bound))
+        return 0;
+    alen = n_cdiv(FLINT_BITS * an_max, bits);
+    blen = n_cdiv(FLINT_BITS * bn_max, bits);
+    zlen = alen + blen - 1;
+
+    P->np = 2;
+    P->offset = 0;
+    P->bits = bits;
+    P->depth = depth;
+    P->stride = sd_fft_ctx_data_size(depth);
+    P->zl = 0;
+    P->zh = zlen;
+    P->zn = zlen;
+    P->ztrunc = n_round_up(zlen, BLK_SZ);
+    P->m[0] = 1;
+    P->m[1] = 1;
+    return 1;
+}
+
+int fft_small_plan_init_mpn_np(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong an_max, ulong bn_max, ulong len_bound, ulong np)
+{
+    if (np == 0)
+        return fft_small_plan_init_mpn(P, R, an_max, bn_max, len_bound);
+    if (np == 2)
+        return _plan_init_mpn_np2(P, R, an_max, bn_max, len_bound);
+    return _plan_init_mpn_wide(P, R, an_max, bn_max, len_bound);
+}
+
+/*
+    Plan for cyclic integer convolutions: products of nonnegative operands
+    of at most *nn limbs, reduced mod 2^(FLINT_BITS * *nn) - 1. Chooses a
+    packing profile (np, bits) and a depth with
+
+        bits * 2^depth == FLINT_BITS * nn,
+
+    rounding *nn up to the nearest admissible length (written back): the
+    operands then split into exactly 2^depth chunks, and the coefficient
+    convolution's wrap mod x^(2^depth) - 1 is the integer wrap mod
+    B^nn - 1. Operands longer than nn limbs are not folded by the packing
+    and must be reduced by the caller.
+
+    A full cyclic convolution accumulates up to 2^depth chunk products on
+    one coefficient, so capacity is checked for len_bound * 2^depth
+    products of 2*bits-bit values; as in the linear plans, len_bound > 1
+    accounts for bilinear accumulation done in transform space.
+
+    fft_small_export_mpn returns a nonnegative representative
+    sum(c_i 2^(bits i)) < len_bound * 2^(FLINT_BITS*nn + 2*bits + depth),
+    exported exactly by any zn with
+
+        FLINT_BITS*zn >= FLINT_BITS*nn + 2*bits + depth
+                         + FLINT_BIT_COUNT(len_bound);
+
+    the caller folds the zn - nn top limbs back around to reduce.
+
+    Among the admissible profiles the plan takes the least padded length,
+    then the fewest primes: the narrow-chunk minimal-np choices are the
+    ones the linear driver's measurements favor at equal transform cost
+    (see fft_small_plan_init_mpn).
+*/
+int fft_small_plan_init_mpn_cyclic(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong * nn, ulong len_bound)
+{
+    ulong best_np = 0, best_bits = 0, best_depth = 0, best_nn = 0;
+    ulong i;
+
+    FLINT_ASSERT(*nn > 0);
+    FLINT_ASSERT(len_bound > 0);
+
+    for (i = 0; i < R->profiles_size; i++)
+    {
+        ulong bits = R->profiles[i].bits;
+        ulong pnp = R->profiles[i].np;
+        const crt_data_struct* C = R->crts + pnp - 1;
+        ulong depth, nn1, t, thi;
+
+        if (pnp < 4)
+            continue;
+
+        /* smallest depth >= LG_BLK_SZ with bits * 2^depth >=
+           FLINT_BITS * nn; bits divisible by 4 and 2^depth >= 16 keep
+           bits * 2^depth divisible by FLINT_BITS, so nn1 is exact */
+        depth = n_max(LG_BLK_SZ,
+                      n_clog2(n_cdiv(FLINT_BITS * (*nn), bits)));
+        if (bits >> (FLINT_BITS - depth) != 0)
+            continue;
+        nn1 = (bits << depth) / FLINT_BITS;
+
+        /* room for len_bound * 2^depth products of 2*bits-bit chunks */
+        umul_ppmm(thi, t, len_bound, n_pow2(depth));
+        if (thi != 0 ||
+            flint_mpn_cmp_ui_2exp(crt_data_prod_primes(C),
+                                  C->coeff_len, t, 2*bits) < 0)
+            continue;
+
+        /* least padded length first, but np <= 4 stays in the
+           single-vector packing/crt regime and measures ~10% faster
+           per limb, so it is allowed ~6% extra padding (fold + linear
+           pipeline timings across 83k-1M bit moduli) */
+        {
+            ulong score = nn1 * (pnp <= 4 ? 16 : 17);
+            ulong best_score = best_nn * (best_np <= 4 ? 16 : 17);
+
+            if (best_np == 0 || score < best_score ||
+                (score == best_score && pnp < best_np))
+            {
+                best_np = pnp;
+                best_bits = bits;
+                best_depth = depth;
+                best_nn = nn1;
+            }
+        }
+    }
+
+    /* two-prime candidate: nn1 = bits 2^depth / 64 minimal subject to
+       len_bound 2^depth 2^(2 bits) <= p1 p2; cheaper conversions and
+       Garner-only crt outweigh the longer transforms (per-shape op
+       profiling), which the score constant 13 against the wide 16/17
+       reflects */
+    {
+        ulong d, b;
+        int stop = 0;
+
+        for (d = n_max(LG_BLK_SZ, 6); d <= 26 && !stop; d++)
+        {
+            for (b = 45; b >= 40; b--)
+            {
+                ulong nn1 = (b << d) >> 6;
+                if (nn1 < *nn)
+                    continue;
+                if (2*b + d + FLINT_BIT_COUNT(len_bound) > R->np2_prodbits)
+                    continue;
+                if (best_np == 0 ||
+                    13 * nn1 < (best_np <= 4 ? 16 : 17) * best_nn)
+                {
+                    best_np = 2;
+                    best_bits = b;
+                    best_depth = d;
+                    best_nn = nn1;
+                }
+                stop = 1;   /* larger d only pads more */
+                break;
+            }
+        }
+    }
+
+    if (best_np == 0)
+        return 0;
+
+    *nn = best_nn;
+
+    P->R = R;
+    P->sign = 0;
+    P->depth = best_depth;
+    P->zl = 0;
+    P->zh = n_pow2(best_depth);
+    P->zn = n_pow2(best_depth);
+    P->ztrunc = n_pow2(best_depth);
+    P->bits = best_bits;
+    /* stored as in fft_small_plan_init_mpn: the convolution-length
+       factor entered the capacity check above but is not folded into
+       bound_c */
+    P->bound_c = len_bound;
+    P->bound_e = 2*best_bits;
+    P->np = best_np;
+    P->offset = 0;
+    P->ffts = R->ffts;
+    P->crts = R->crts;
+    P->use_direct_fft = 0;
+
+    _fft_small_plan_set_normalizers(P);
+
+    /* the two-prime export applies its own normalization and Garner
+       constants; the pointwise stays unscaled */
+    if (P->np == 2)
+    {
+        P->m[0] = 1;
+        P->m[1] = 1;
+    }
+
     return 1;
 }
 

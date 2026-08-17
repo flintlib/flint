@@ -12,8 +12,8 @@
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
 
-#define FLINT_FFT_SMALL_MUL_THRESHOLD            400
-#define FLINT_FFT_SMALL_SQR_THRESHOLD            800
+#define FLINT_FFT_SMALL_MUL_THRESHOLD            240
+#define FLINT_FFT_SMALL_SQR_THRESHOLD            400
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000
@@ -35,5 +35,9 @@
 /*    nmod_vec's p-scalar_mul, p-scalar_addmul         */
 /*    nmod_mat's p-nmod_vec_mul                        */
 #define FLINT_MULMOD_SHOUP_THRESHOLD 10
+
+#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 300
+
+#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 470
 
 #endif

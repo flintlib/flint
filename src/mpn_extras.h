@@ -24,6 +24,7 @@
 #include <gmp.h>
 #include "longlong.h"
 #include "ulong_extras.h"
+#include "flint-mparam.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -666,11 +667,9 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 #define FLINT_MPN_MULLOW_MULDERS_CUTOFF 50
 #define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 40
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
-#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 1300
 #define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
 
 #define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90
-#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 1500
 #define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
 #define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
 

@@ -1192,6 +1192,21 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
     PUSH_PROFILE(8,192, 7,6);
 
     FLINT_ASSERT(R->profiles_size <= MAX_NPROFILES);
+    /* two-prime pipeline constants */
+    {
+        ulong p1 = (ulong) R->ffts[0].p, p2 = (ulong) R->ffts[1].p;
+        ulong hi, lo, d;
+        R->np2_ip1 = n_invmod(p1 % p2, p2);
+        umul_ppmm(hi, lo, p1, p2);
+        R->np2_prodbits = 64 + FLINT_BIT_COUNT(hi) - 1;
+        (void) lo;
+        for (d = 0; d < 32; d++)
+        {
+            R->np2_s1[d] = n_invmod(n_powmod2(2, d, p1), p1);
+            R->np2_s2[d] = n_invmod(n_powmod2(2, d, p2), p2);
+        }
+    }
+
 }
 
 #define VEC_SZ 4
@@ -1583,6 +1598,16 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
         }
         flint_mpn_zero(z + (zn - lo), hi - zn);
         hi = zn;
+    }
+
+    if (FLINT_MIN(an, bn) >= FLINT_MPN_MUL_NP2_MIN_BN
+        && FLINT_MAX(an, bn) <= FLINT_MPN_MUL_NP2_MAX_AN)
+    {
+        if (an >= bn)
+            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, a, an, b, bn);
+        else
+            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, b, bn, a, an);
+        return;
     }
 
     mpn_ctx_best_profile(R, &P, an, bn);
@@ -1987,8 +2012,22 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
     _op_mpn_fft_worker_struct args[MPN_CTX_NCRTS];
 
     FLINT_ASSERT(an > 0);
-    FLINT_ASSERT(bits > 64);
     FLINT_ASSERT(P->offset == 0);
+
+    if (np == 2 && bits <= 57)
+    {
+        FLINT_ASSERT(atrunc <= P->stride);
+        _fft_small_np2_pack(X->data, X->data + P->stride, a, an,
+                            alen, atrunc, bits);
+        sd_fft_trunc(R->ffts + 0, X->data, P->depth, atrunc, P->ztrunc);
+        sd_fft_trunc(R->ffts + 1, X->data + P->stride, P->depth,
+                     atrunc, P->ztrunc);
+        X->itrunc = atrunc;
+        X->domain = FFT_SMALL_OP_PRIMAL;
+        return;
+    }
+
+    FLINT_ASSERT(bits > 64);
     FLINT_ASSERT(X->np == np && X->offset == P->offset &&
                  X->depth == P->depth && X->stride == P->stride);
     /* atrunc is the packing extent: whole blocks, whose excess over a
@@ -2093,6 +2132,22 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
 void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
                     const fft_small_plan_t P)
 {
+    if (P->np == 2 && P->bits <= 57)
+    {
+        mpn_ctx_struct* R2 = P->R;
+        ulong ztr = P->ztrunc;
+        double * g = mpn_ctx_fit_buffer(R2, 2 * ztr * sizeof(double));
+
+        FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
+
+        /* the op is const; Garner consumes its lanes, so copy */
+        memcpy(g, X->data, ztr * sizeof(double));
+        memcpy(g + ztr, X->data + P->stride, ztr * sizeof(double));
+        _fft_small_np2_crt_recompose(R2, z, 0, zn, g, g + ztr,
+                                     P->zn, ztr, P->bits, P->depth);
+        return;
+    }
+
     ulong bits = P->bits;
     ulong c_hi = n_min(P->zn, n_cdiv(zn*FLINT_BITS, bits));
     static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,

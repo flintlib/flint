@@ -118,6 +118,23 @@ Transform plans and operands
     bytes, 4096-aligned, which must outlive the operand and is not freed
     by *clear*.
 
+.. function:: int fft_small_plan_init_mpn_cyclic(fft_small_plan_t P, mpn_ctx_t R, ulong * nn, ulong len_bound)
+
+    Plan for products of nonnegative integers of at most ``*nn`` limbs
+    reduced modulo `B^{nn} - 1` where `B = 2^{\mathrm{FLINT\_BITS}}`,
+    rounding ``*nn`` up to the nearest length admitting an exact chunk
+    splitting `\mathrm{bits} \cdot 2^{\mathrm{depth}} =
+    \mathrm{FLINT\_BITS} \cdot nn` (the chosen value is written back).
+    Returns 0 if no admissible geometry exists. Operands longer than
+    ``nn`` limbs are not folded by the packing and must be reduced by
+    the caller. As in the linear plans, ``len_bound`` accounts for
+    bilinear accumulation performed in transform space.
+
+    :func:`fft_small_export_mpn` yields a nonnegative representative of
+    the wrapped product; see the source for its size bound and the
+    caller-side fold. The geometry selection was tuned with
+    ``profile/p-mpn_cyclic_tuning``.
+
 .. function:: void fft_small_export_mpn_signed(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
               void fft_small_export_mpn_signed_trunc(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
 

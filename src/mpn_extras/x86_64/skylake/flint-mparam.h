@@ -12,8 +12,8 @@
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
 
-#define FLINT_FFT_SMALL_MUL_THRESHOLD           1540
-#define FLINT_FFT_SMALL_SQR_THRESHOLD           3080
+#define FLINT_FFT_SMALL_MUL_THRESHOLD           500
+#define FLINT_FFT_SMALL_SQR_THRESHOLD           500
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000
@@ -31,5 +31,9 @@
 
 /* verified on Xeon(R) Gold 6244 (cascade lake) */
 #define FLINT_MULMOD_SHOUP_THRESHOLD 23
+
+#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
+
+#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 580
 
 #endif
