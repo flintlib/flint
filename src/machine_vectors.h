@@ -985,7 +985,13 @@ FLINT_FORCE_INLINE vec1d vec1d_reduce_pm1n_to_pmhn(vec1d a, vec1d n) {
 /* vec2d -- NEON/ARM64 *********************************************/
 
 FLINT_FORCE_INLINE double vec2d_get_index(vec2d a, int i) {
+#ifdef _MSC_VER
+    double as[2];
+    vst1q_f64(as, a);
+    return as[i];
+#else
     return a[i];
+#endif
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_set_d2(double a0, double a1)
@@ -1101,11 +1107,11 @@ FLINT_FORCE_INLINE vec2d vec2d_fnmadd(vec2d a, vec2d b, vec2d c) {
 
 /* these two might be slow due to the extra negation */
 FLINT_FORCE_INLINE vec2d vec2d_fmsub(vec2d a, vec2d b, vec2d c) {
-    return -vfmsq_f64(c, a, b);
+    return vnegq_f64(vfmsq_f64(c, a, b));
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_fnmsub(vec2d a, vec2d b, vec2d c) {
-    return -vfmaq_f64(c, a, b);
+    return vnegq_f64(vfmaq_f64(c, a, b));
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_div(vec2d a, vec2d b)
@@ -1431,7 +1437,14 @@ EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
 
 
 FLINT_FORCE_INLINE int vec2d_same(vec2d a, vec2d b) {
+#ifdef _MSC_VER
+    double as[2], bs[2];
+    vst1q_f64(as, a);
+    vst1q_f64(bs, b);
+    return as[0] == bs[0] && as[1] == bs[1];
+#else
     return a[0] == b[0] && a[1] == b[1];
+#endif
 }
 
 
