@@ -441,15 +441,18 @@ int fft_small_plan_init_nmod_cyclic(fft_small_plan_t P, mpn_ctx_t R,
 }
 
 int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
-                    ulong an_max, ulong bn_max, ulong len_bound)
+                    ulong an_max, ulong bn_max, ulong len_bound,
+                    int is_signed)
 {
+    ulong len_bound_with_sign = is_signed ? 2 * len_bound : len_bound;
+
     if (len_bound <= 2
         && FLINT_MIN(an_max, bn_max) >= FLINT_MPN_MUL_NP2_MIN_BN
         && FLINT_MAX(an_max, bn_max) <= FLINT_MPN_MUL_NP2_MAX_AN
-        && _plan_init_mpn_np2(P, R, an_max, bn_max, len_bound))
+        && _plan_init_mpn_np2(P, R, an_max, bn_max, len_bound_with_sign))
         return 1;
 
-    return _plan_init_mpn_wide(P, R, an_max, bn_max, len_bound);
+    return _plan_init_mpn_wide(P, R, an_max, bn_max, len_bound_with_sign);
 }
 
 static int _plan_init_mpn_np2(fft_small_plan_t P, mpn_ctx_t R,
@@ -482,13 +485,18 @@ static int _plan_init_mpn_np2(fft_small_plan_t P, mpn_ctx_t R,
 }
 
 int fft_small_plan_init_mpn_np(fft_small_plan_t P, mpn_ctx_t R,
-                    ulong an_max, ulong bn_max, ulong len_bound, ulong np)
+                    ulong an_max, ulong bn_max, ulong len_bound,
+                    int is_signed, ulong np)
 {
+    ulong len_bound_with_sign = is_signed ? 2 * len_bound : len_bound;
+
     if (np == 0)
-        return fft_small_plan_init_mpn(P, R, an_max, bn_max, len_bound);
+        return fft_small_plan_init_mpn(P, R, an_max, bn_max,
+                                       len_bound, is_signed);
     if (np == 2)
-        return _plan_init_mpn_np2(P, R, an_max, bn_max, len_bound);
-    return _plan_init_mpn_wide(P, R, an_max, bn_max, len_bound);
+        return _plan_init_mpn_np2(P, R, an_max, bn_max, len_bound_with_sign);
+
+    return _plan_init_mpn_wide(P, R, an_max, bn_max, len_bound_with_sign);
 }
 
 /*

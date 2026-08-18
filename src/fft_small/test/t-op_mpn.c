@@ -61,7 +61,7 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
         else
             len_bound = K << inflate;
 
-        if (!fft_small_plan_init_mpn(P, R, an, bn, len_bound))
+        if (!fft_small_plan_init_mpn(P, R, an, bn, len_bound, 0))
         {
             continue;
         }
@@ -185,7 +185,7 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
             /* len_bound 2: the signed export below needs slot values
                in the centered range, one spare factor of two against
                the unsigned exactness bound */
-            if (fft_small_plan_init_mpn_np(P2, R, an, bn, 2, 2))
+            if (fft_small_plan_init_mpn_np(P2, R, an, bn, 1, 1, 2))
             {
                 fft_small_op_init(A2, P2);
                 fft_small_op_init(B2, P2);

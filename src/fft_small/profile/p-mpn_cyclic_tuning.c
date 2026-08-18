@@ -53,7 +53,7 @@ static void run(mp_size_t mn, flint_rand_t state)
         P->ffts = R->ffts; P->crts = R->crts; P->use_direct_fft = 0;
         _fft_small_plan_set_normalizers(P);
 
-        if (!fft_small_plan_init_mpn(PL, R, nn, nn, 1))
+        if (!fft_small_plan_init_mpn(PL, R, nn, nn, 1, 0))
             continue;
 
         zc = nn + (2*bits + depth)/64 + 2;

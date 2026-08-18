@@ -1004,7 +1004,7 @@ gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
        integer, whose per-chunk constant spans several chunks */
     opn = n_cdiv((ulong) bits_bound, 2 * FLINT_BITS) + 1;
     if (!fft_small_plan_init_mpn(T->P, get_default_mpn_ctx(), opn, opn,
-            (is_signed ? 2 : 1) * (ulong) terms_bound))
+            (ulong) terms_bound, is_signed))
     {
         flint_free(T);
         return GR_UNABLE;

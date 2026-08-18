@@ -562,8 +562,14 @@ int fft_small_plan_init_nmod(fft_small_plan_t P, mpn_ctx_t R,
    bn_max limbs, with prod_of_primes large enough for len_bound
    accumulated products in transform space. Returns 0 if no admissible
    prime count and chunk size exist. */
+/* len_bound counts accumulated elementary products; is_signed adds
+   the spare factor of two the centered signed exports require, after
+   the pipeline dispatch has keyed on the accumulation count alone,
+   so a two-term signed dot product (complex multiplication, 2 x 2
+   matrix multiplication) reaches the two-prime plans. */
 int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
-                    ulong an_max, ulong bn_max, ulong len_bound);
+                    ulong an_max, ulong bn_max, ulong len_bound,
+                    int is_signed);
 
 /* plan constructor with a selectable prime regime, for profiling and
    test code: np = 0 makes the automatic choice (the same as
@@ -571,7 +577,8 @@ int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
    (failing when its exactness bound or size range cannot be met),
    and any other value forces the wide selection */
 int fft_small_plan_init_mpn_np(fft_small_plan_t P, mpn_ctx_t R,
-                    ulong an_max, ulong bn_max, ulong len_bound, ulong np);
+                    ulong an_max, ulong bn_max, ulong len_bound,
+                    int is_signed, ulong np);
 
 int fft_small_plan_init_nmod_cyclic(fft_small_plan_t P, mpn_ctx_t R,
                     ulong depth, ulong zh,
