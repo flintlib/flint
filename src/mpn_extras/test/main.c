@@ -36,7 +36,10 @@
 #include "t-mulmod_precond_matrix.c"
 #include "t-mulmod_precond_shoup.c"
 #include "t-mulmod_preinv1.c"
+#include "t-mulmod_bnm1.c"
 #include "t-mulmod_preinvn.c"
+#include "t-powm.c"
+#include "t-redc_n.c"
 #include "t-remove_2exp.c"
 #include "t-remove_power.c"
 #include "t-sqr.c"
@@ -72,7 +75,10 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mulmod_precond_matrix),
     TEST_FUNCTION(flint_mpn_mulmod_precond_shoup),
     TEST_FUNCTION(flint_mpn_mulmod_preinv1),
+    TEST_FUNCTION(flint_mpn_mulmod_bnm1),
     TEST_FUNCTION(flint_mpn_mulmod_preinvn),
+    TEST_FUNCTION(flint_mpn_powm),
+    TEST_FUNCTION(flint_mpn_redc_n),
     TEST_FUNCTION(flint_mpn_remove_2exp),
     TEST_FUNCTION(flint_mpn_remove_power),
     TEST_FUNCTION(flint_mpn_sqr),

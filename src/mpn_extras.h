@@ -876,6 +876,36 @@ mp_limb_t mpn_invert_limb(mp_limb_t);
 mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
+/* r = a*b mod (B^rn - 1) as a representative < B^rn, for rn from
+   next_size and an, bn <= rn; tp: itch(rn) limbs; no aliasing */
+mp_size_t flint_mpn_mulmod_bnm1_next_size(mp_size_t n);
+mp_size_t flint_mpn_mulmod_bnm1_itch(mp_size_t rn);
+void flint_mpn_mulmod_bnm1(nn_ptr rp, mp_size_t rn, nn_srcptr ap,
+                    mp_size_t an, nn_srcptr bp, mp_size_t bn, nn_ptr tp);
+
+/* Hensel inverse mod B^n: v = m^(-1) mod B^n for odd m, no aliasing */
+void _flint_mpn_binvert(nn_ptr v, nn_srcptr m, mp_size_t n);
+
+/* Montgomery reduction t = X * B^(-n) mod m in [0, m) for odd m,
+   0 <= X < m * B^n, minv = -m^(-1) mod B^n; scratch: 2n limbs;
+   t must not alias X, m, minv; X is preserved */
+void _flint_mpn_redc_n(nn_ptr t, nn_srcptr X, nn_srcptr m, nn_srcptr minv,
+                    mp_size_t n, nn_ptr scratch);
+
+/* r = b^e mod m; r, b, m: mn limbs, m normalized, b < m; e: en limbs;
+   r must not alias b, e or m */
+void flint_mpn_powm(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en,
+                    nn_srcptr m, mp_size_t mn);
+/* as flint_mpn_powm, with dinv = flint_mpn_preinvn of m << norm,
+   norm = clz(m[mn-1]); no per-call setup for small exponents */
+void flint_mpn_powm_preinvn(nn_ptr r, nn_srcptr b, nn_srcptr e,
+                    mp_size_t en, nn_srcptr m, mp_size_t mn,
+                    nn_srcptr dinv, flint_bitcnt_t norm);
+void _flint_mpn_powm_basecase(nn_ptr r, nn_srcptr b, nn_srcptr e,
+                    mp_size_t en, nn_srcptr m, mp_size_t mn);
+void _flint_mpn_powm_redc(nn_ptr r, nn_srcptr b, nn_srcptr e,
+                    mp_size_t en, nn_srcptr m, mp_size_t mn);
+
 #if defined(mpn_modexact_1_odd)
 MPN_EXTRAS_INLINE
 int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)

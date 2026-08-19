@@ -14,8 +14,46 @@
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "gr.h"
-#include "gr_generic.h"
+#include "mpn_extras.h"
+
+/* res = x^e mod m for positive multiprecision m and a positive
+   exponent given by (ep, en); alias-safe via temporaries */
+static void
+_fmpz_powm_mpn(fmpz_t res, const fmpz_t x, nn_srcptr ep, mp_size_t en,
+               const fmpz_t m)
+{
+    mpz_ptr zm = COEFF_TO_PTR(*m);
+    mp_size_t mn = zm->_mp_size, c;
+    fmpz_t xr;
+    nn_ptr bp, rp;
+    TMP_INIT;
+
+    fmpz_init(xr);
+    fmpz_fdiv_r(xr, x, m);
+
+    TMP_START;
+    bp = TMP_ALLOC(2 * mn * sizeof(ulong));
+    rp = bp + mn;
+
+    if (!COEFF_IS_MPZ(*xr))
+    {
+        bp[0] = *xr;
+        flint_mpn_zero(bp + 1, mn - 1);
+    }
+    else
+    {
+        mpz_ptr zx = COEFF_TO_PTR(*xr);
+        c = zx->_mp_size;
+        flint_mpn_copyi(bp, zx->_mp_d, c);
+        flint_mpn_zero(bp + c, mn - c);
+    }
+
+    flint_mpn_powm(rp, bp, ep, en, zm->_mp_d, mn);
+    fmpz_set_ui_array(res, rp, mn);
+
+    fmpz_clear(xr);
+    TMP_END;
+}
 
 /* assumes e is large */
 static void
@@ -47,27 +85,12 @@ _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
     {
         fmpz_set(res, x);
     }
-#if FLINT_HAVE_FFT_SMALL
-    else if (fmpz_bits(m) >= 70000)
+    else if (COEFF_TO_PTR(*e)->_mp_size > 0)
     {
-        gr_ctx_t gctx;
-        fmpz_t t;
-
-        gr_ctx_init_fmpz_mod(gctx, m);
-        fmpz_init(t);
-
-        /* fmpz_mod input must be reduced */
-        GR_MUST_SUCCEED(gr_set_fmpz(t, x, gctx));
-
-        if (!COEFF_IS_MPZ(*x))
-            GR_MUST_SUCCEED(gr_generic_pow_fmpz_binexp(res, t, e, gctx));
-        else
-            GR_MUST_SUCCEED(gr_generic_pow_fmpz_sliding(res, t, e, gctx));
-
-        fmpz_clear(t);
-        gr_ctx_clear(gctx);
+        mpz_ptr ze = COEFF_TO_PTR(*e);
+        _fmpz_powm_mpn(res, x, ze->_mp_d, ze->_mp_size, m);
     }
-#endif
+    /* negative multiprecision exponent: mpz_powm inverts */
     else
     {
         if (!COEFF_IS_MPZ(*x))  /* x is small */
@@ -176,53 +199,12 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
     {
         fmpz_set(res, x);
     }
-#if FLINT_HAVE_FFT_SMALL
-    else if (fmpz_bits(m) >= 70000)
-    {
-        gr_ctx_t gctx;
-        fmpz_t t;
-
-        gr_ctx_init_fmpz_mod(gctx, m);
-        fmpz_init(t);
-
-        /* fmpz_mod input must be reduced */
-        GR_MUST_SUCCEED(gr_set_fmpz(t, x, gctx));
-
-        if (!COEFF_IS_MPZ(*x) || FLINT_BIT_COUNT(e) < 20)
-            GR_MUST_SUCCEED(gr_generic_pow_ui_binexp(res, t, e, gctx));
-        else
-            GR_MUST_SUCCEED(gr_generic_pow_ui_sliding(res, t, e, gctx));
-
-        fmpz_clear(t);
-        gr_ctx_clear(gctx);
-    }
-#endif
     else
     {
-        if (!COEFF_IS_MPZ(*x))  /* x is small */
-        {
-            mpz_t zx;
-            mpz_ptr zres;
-            ulong c1;
-
-            c1 = FLINT_ABS(*x);
-
-            zx->_mp_d = &c1;
-            zx->_mp_size = (*x == 0) ? 0 : ((*x > 0) ? 1 : -1);
-            zx->_mp_alloc = 1;
-
-            zres = _fmpz_promote(res);
-            flint_mpz_powm_ui(zres, zx, e, COEFF_TO_PTR(*m));
-            _fmpz_demote_val(res);
-        }
-        else  /* x is large */
-        {
-            mpz_ptr zres = _fmpz_promote(res);
-            flint_mpz_powm_ui(zres, COEFF_TO_PTR(*x), e, COEFF_TO_PTR(*m));
-            _fmpz_demote_val(res);
-        }
+        _fmpz_powm_mpn(res, x, &e, 1, m);
     }
 }
+
 
 void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 {

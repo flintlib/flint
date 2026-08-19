@@ -449,6 +449,95 @@ Division and modular arithmetic with precomputed inverses
     provided by ``flint_mpn_preinvn``, computes `a_1 b_1 + a_2 b_2 \pmod{d}`. We require
     all operands to be reduced modulo `d`.
 
+Montgomery reduction and modular exponentiation
+--------------------------------------------------------------------------------
+
+.. function:: mp_size_t flint_mpn_mulmod_bnm1_next_size(mp_size_t n)
+              mp_size_t flint_mpn_mulmod_bnm1_itch(mp_size_t rn)
+              void flint_mpn_mulmod_bnm1(nn_ptr rp, mp_size_t rn, nn_srcptr ap, mp_size_t an, nn_srcptr bp, mp_size_t bn, nn_ptr tp)
+
+    Sets `r` to a representative below `B^{rn}` of `a b \bmod
+    (B^{rn} - 1)`, for ``rn`` obtained from ``next_size`` and operands
+    of at most ``rn`` limbs, using ``itch(rn)`` limbs of scratch space.
+    No aliasing is permitted.
+
+    For even ``rn`` the computation splits by CRT into products modulo
+    `B^{h} - 1` (recursively) and `B^{h} + 1`
+    (:func:`flint_mpn_mulmod_2expp1_basecase`) with `h = rn/2`,
+    stopping at odd or small sizes with a plain multiplication; the
+    cost is about `0.6` multiplications of size ``rn``.
+
+
+.. function:: void _flint_mpn_binvert(nn_ptr v, nn_srcptr m, mp_size_t n)
+
+    Sets `v = m^{-1} \bmod B^n` for odd `m` of `n` limbs, by Hensel
+    lifting. No aliasing is permitted.
+
+.. function:: void _flint_mpn_redc_n(nn_ptr t, nn_srcptr X, nn_srcptr m, nn_srcptr minv, mp_size_t n, nn_ptr scratch)
+
+    Montgomery reduction: sets `t = X B^{-n} \bmod m`, canonical in
+    `[0, m)`, for odd `m` of `n` limbs and `0 \le X < m B^n` (`2n` limbs),
+    where ``minv`` is `-m^{-1} \bmod B^n` (the negation of the output of
+    :func:`_flint_mpn_binvert`). Requires `2n` limbs of scratch space.
+    `t` must not alias `X`, `m` or ``minv``; `X` is preserved.
+
+    With `q = X_{lo} \cdot minv \bmod B^n` one has `X + q m = t B^n`
+    exactly. The high product `\lfloor q m / B^n \rfloor` is obtained
+    from :func:`flint_mpn_mulhigh_n`, whose rounding is resolved in
+    constant time by comparing the returned guard limb against the top
+    limb of the exactly known low half `B^n - X_{lo}`; see the source
+    for the argument and [KimZim2024]_ for sharper error bounds.
+
+.. function:: void flint_mpn_powm_preinvn(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en, nn_srcptr m, mp_size_t mn, nn_srcptr dinv, flint_bitcnt_t norm)
+
+    As :func:`flint_mpn_powm`, taking the precomputed inverse ``dinv``
+    of `m 2^{norm}` from :func:`flint_mpn_preinvn` with
+    ``norm = clz(m[mn-1])``, as stored for instance in an
+    ``fmpz_preinvn_t``. Exponents of at most a few dozen bits are
+    computed on the supplied inverse with no per-call precomputation,
+    which is several times faster than ``mpz_powm`` for exponents like
+    `2` or `3`; larger exponents fall through to the Montgomery
+    machinery of :func:`flint_mpn_powm`, whose setup then amortizes.
+
+.. function:: void flint_mpn_powm(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en, nn_srcptr m, mp_size_t mn)
+
+    Sets `r = b^e \bmod m`. The modulus `m` has ``mn`` limbs and must be
+    normalised (nonzero top limb); `b` must be reduced modulo `m` and
+    occupies ``mn`` limbs; the exponent `e` has ``en`` limbs (``en`` may
+    be zero, denoting `e = 0`, in which case `r = 1 \bmod m`). No
+    aliasing of `r` with the inputs is permitted.
+
+    Even moduli are handled by CRT between the odd part and the power
+    of two; the odd part is computed by the *redc* stage below. Single-limb moduli
+    use plain ``nmod`` arithmetic.
+
+.. function:: void _flint_mpn_powm_basecase(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en, nn_srcptr m, mp_size_t mn)
+              void _flint_mpn_powm_redc(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en, nn_srcptr m, mp_size_t mn)
+
+    Stage implementations of :func:`flint_mpn_powm`, requiring `m > 1`
+    normalised, `b < m` and `e` nonzero with nonzero top limb. Both use
+    sliding window exponentiation with single-limb bases handled by
+    scalar window multipliers and `O(n)` reductions.
+
+    The *basecase* version works on residues shifted left by the norm
+    of `m` via :func:`flint_mpn_mulmod_preinvn` and accepts any `m > 1`.
+
+    The *redc* version requires `m` odd and uses Montgomery
+    multiplication. Below a threshold the reduction is
+    :func:`_flint_mpn_redc_n`. Above it (with ``FLINT_HAVE_FFT_SMALL``),
+    the reduction follows the structure of GMP's ``redc_n``: since the
+    low half of `q m` is exactly `B^{mn} - X_{lo}`, the high half
+    `H < m` is recovered from the wraparound product
+    `q m \bmod (B^{nnc} - 1)`, computed as a cyclic convolution against
+    a cached transform of `m` (see
+    :func:`fft_small_plan_init_mpn_cyclic`) followed by a limb
+    rotation. At still larger sizes the quotient
+    `q = X_{lo} \cdot (-m^{-1}) \bmod B^{mn}` also runs in the
+    transform domain against a cached transform of the inverse. The
+    Montgomery radix stays `B^{mn}` throughout, so the multiplications
+    themselves are unpadded calls to ``flint_mpn_sqr``,
+    ``flint_mpn_mul_n`` and ``flint_mpn_mullow_n``.
+
 Preconditioned modular multiplication
 --------------------------------------------------------------------------------
 
