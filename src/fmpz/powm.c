@@ -1,7 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
     Copyright (C) 2011 Sebastian Pancratz
-    Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2023, 2026 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,6 +15,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "mpn_extras.h"
+#include "nmod.h"
 
 /* res = x^e mod m for positive multiprecision m and a positive
    exponent given by (ep, en); alias-safe via temporaries */
@@ -125,28 +126,36 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
         flint_throw(FLINT_ERROR, "Exception in fmpz_powm: "
                                                   "Modulus is less than 1.\n");
     }
-    else if (!COEFF_IS_MPZ(*e))  /* e is small */
+    else if (fmpz_sgn(e) < 0)
     {
-        if (*e >= 0)
+        fmpz_t g_inv;
+        fmpz_init(g_inv);
+
+        if (!fmpz_invmod(g_inv, g, m))
         {
-            fmpz_powm_ui(f, g, *e, m);
+            fmpz_clear(g_inv);
+            flint_throw(FLINT_ERROR, "Exception in fmpz_powm: "
+                                             "Base is not invertible.\n");
+        }
+
+        if (!COEFF_IS_MPZ(*e))
+        {
+            fmpz_powm_ui(f, g_inv, -*e, m);
         }
         else
         {
-            fmpz_t g_inv;
-            fmpz_init(g_inv);
-            if (!fmpz_invmod(g_inv, g, m))
-            {
-                fmpz_clear(g_inv);
-                flint_throw(FLINT_ERROR, "Exception in fmpz_powm: "
-                                                 "Base is not invertible.\n");
-            }
-            else
-            {
-                fmpz_powm_ui(f, g_inv, -*e, m);
-                fmpz_clear(g_inv);
-            }
+            fmpz_t t;
+            fmpz_init(t);
+            fmpz_neg(t, e);
+            _fmpz_powm(f, g_inv, t, m);
+            fmpz_clear(t);
         }
+
+        fmpz_clear(g_inv);
+    }
+    else if (!COEFF_IS_MPZ(*e))  /* e is small */
+    {
+        fmpz_powm_ui(f, g, *e, m);
     }
     else  /* e is large */
     {
@@ -230,19 +239,18 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
         {
             if (!COEFF_IS_MPZ(g2))  /* g is small */
             {
-                ulong minv = n_preinvert_limb(m2);
+                nmod_t mod;
+                nmod_init(&mod, m2);
 
                 _fmpz_demote(f);
 
                 if (g2 >= 0)
                 {
-                    g2 = n_mod2_preinv(g2, m2, minv);
-                    *f = n_powmod2_ui_preinv(g2, e, m2, minv);
+                    *f = nmod_pow_ui(nmod_set_ui(g2, mod), e, mod);
                 }
                 else
                 {
-                    g2 = n_mod2_preinv(-g2, m2, minv);
-                    *f = n_powmod2_ui_preinv(g2, e, m2, minv);
+                    *f = nmod_pow_ui(nmod_set_ui(-g2, mod), e, mod);
                     if ((e & UWORD(1)))
                         *f = n_negmod(*f, m2);
                 }
