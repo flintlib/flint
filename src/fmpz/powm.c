@@ -17,6 +17,10 @@
 #include "mpn_extras.h"
 #include "nmod.h"
 
+/* flint_mpn_powm just wraps mpz_powm at some sizes; don't bother
+   with the setup and just call mpz_powm directly */
+#define USE_MPN_CUTOFF 128
+
 /* res = x^e mod m for positive multiprecision m and a positive
    exponent given by (ep, en); alias-safe via temporaries */
 static void
@@ -56,7 +60,7 @@ _fmpz_powm_mpn(fmpz_t res, const fmpz_t x, nn_srcptr ep, mp_size_t en,
     TMP_END;
 }
 
-/* assumes e is large */
+/* assumes e > 0 is large */
 static void
 _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
 {
@@ -86,13 +90,7 @@ _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
     {
         fmpz_set(res, x);
     }
-    else if (COEFF_TO_PTR(*e)->_mp_size > 0)
-    {
-        mpz_ptr ze = COEFF_TO_PTR(*e);
-        _fmpz_powm_mpn(res, x, ze->_mp_d, ze->_mp_size, m);
-    }
-    /* negative multiprecision exponent: mpz_powm inverts */
-    else
+    else if (fmpz_size(m) <= USE_MPN_CUTOFF)
     {
         if (!COEFF_IS_MPZ(*x))  /* x is small */
         {
@@ -116,6 +114,11 @@ _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
             mpz_powm(zres, COEFF_TO_PTR(*x), COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
             _fmpz_demote_val(res);
         }
+    }
+    else
+    {
+        mpz_ptr ze = COEFF_TO_PTR(*e);
+        _fmpz_powm_mpn(res, x, ze->_mp_d, ze->_mp_size, m);
     }
 }
 
@@ -207,6 +210,37 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
     else if (fmpz_is_zero(x) || fmpz_is_one(x))
     {
         fmpz_set(res, x);
+    }
+    else if (fmpz_size(m) <= USE_MPN_CUTOFF)
+    {
+        if (!COEFF_IS_MPZ(*x))  /* x is small */
+        {
+            mpz_t zx;
+            mpz_ptr zres;
+            ulong c1;
+
+            c1 = FLINT_ABS(*x);
+
+            zx->_mp_d = &c1;
+            zx->_mp_size = (*x == 0) ? 0 : ((*x > 0) ? 1 : -1);
+            zx->_mp_alloc = 1;
+
+            zres = _fmpz_promote(res);
+            flint_mpz_powm_ui(zres, zx, e, COEFF_TO_PTR(*m));
+            _fmpz_demote_val(res);
+        }
+        else  /* x is large */
+        {
+            mpz_ptr zres = _fmpz_promote(res);
+            flint_mpz_powm_ui(zres, COEFF_TO_PTR(*x), e, COEFF_TO_PTR(*m));
+            _fmpz_demote_val(res);
+        }
+    }
+    else if (res != m && e <= (fmpz_bits(m) - 1) / fmpz_bits(x))
+    {
+        fmpz_pow_ui(res, x, e);
+        if (fmpz_sgn(res) < 0)
+            fmpz_add(res, res, m);
     }
     else
     {

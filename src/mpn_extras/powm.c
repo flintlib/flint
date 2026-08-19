@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
@@ -24,7 +25,7 @@
 
 /* above this, the quotient q = X_lo * minv mod B^mn also runs in the
    transform domain against a cached transform of minv */
-#define FLINT_MPN_POWM_REDC_QSTEP_FFT_THRESHOLD 480  /* re-tuned on the merged two-prime pipeline */
+#define FLINT_MPN_POWM_REDC_QSTEP_FFT_THRESHOLD 480
 
 /* moduli below the fold tiers with large exponents go to mpz_powm
    for now: there the reduction is plain mulhigh + mullow against
@@ -144,6 +145,7 @@ mulmod_preinvn_fold(nn_ptr r, nn_srcptr a, nn_srcptr b, mp_size_t n,
         flint_mpn_sqr(X, a, n);
     else
         flint_mpn_mul_n(X, a, b, n);
+
     if (norm)
         mpn_rshift(X, X, 2 * n, norm);
 
@@ -161,14 +163,17 @@ mulmod_preinvn_fold(nn_ptr r, nn_srcptr a, nn_srcptr b, mp_size_t n,
         c = FLINT_MIN(vn, rn);
         flint_mpn_copyi(FX, v, c);
         flint_mpn_zero(FX + c, rn - c);
-        v += c; vn -= c;
+        v += c;
+        vn -= c;
+
         while (vn > 0)
         {
             c = FLINT_MIN(vn, rn);
             cy = mpn_add(FX, FX, rn, v, c);
             while (cy)
                 cy = mpn_add_1(FX, FX, rn, cy);
-            v += c; vn -= c;
+            v += c;
+            vn -= c;
         }
     }
 
@@ -181,8 +186,10 @@ mulmod_preinvn_fold(nn_ptr r, nn_srcptr a, nn_srcptr b, mp_size_t n,
 
     while (FX[n] != 0)
         FX[n] -= mpn_sub_n(FX, FX, d, n);
+
     if (mpn_cmp(FX, d, n) >= 0)
         mpn_sub_n(FX, FX, d, n);
+
     flint_mpn_copyi(r, FX, n);
 }
 #endif
@@ -304,8 +311,17 @@ mul_scalar_mod(nn_ptr acc, nn_srcptr s, int sl, nn_srcptr m, mp_size_t n,
     if (sl == 2 && s[1] == 0)
         sl = 1;
 
-    mpn_mul(scratch, acc, n, s, sl);
-    mpn_tdiv_qr(q, acc, 0, scratch, n + sl, m, n);
+    if (sl == 1 && s[0] == 2)
+    {
+        ulong cy = mpn_lshift(acc, acc, n, 1);
+        if (cy != 0 || mpn_cmp(acc, m, n) >= 0)
+            mpn_sub_n(acc, acc, m, n);
+    }
+    else
+    {
+        flint_mpn_mul(scratch, acc, n, s, sl);
+        mpn_tdiv_qr(q, acc, 0, scratch, n + sl, m, n);
+    }
 }
 
 #if FLINT_HAVE_FFT_SMALL
@@ -409,9 +425,9 @@ chain_mul(powm_chain_struct * H, slong lev, nn_ptr S, nn_srcptr x,
             return;
         }
         if (xs >= s)
-            mpn_mul(work, x, xs, H->mbase, s);
+            flint_mpn_mul(work, x, xs, H->mbase, s);
         else
-            mpn_mul(work, H->mbase, s, x, xs);
+            flint_mpn_mul(work, H->mbase, s, x, xs);
         chain_res_m1(S, work, xs + s, s);
         return;
     }
@@ -659,10 +675,15 @@ redc_fold(nn_ptr t, nn_srcptr X, nn_srcptr m, nn_srcptr minv, mp_size_t mn,
         for (i = 0; i < nnc; i++)
             if (V[i] != UWORD_MAX)
                 break;
+
         if (i == nnc)
+        {
             flint_mpn_zero(V, nnc);  /* H = 0 */
+        }
         else
+        {
             FLINT_ASSERT(nnc == mn); /* a genuine H with huge top limb */
+        }
     }
 
     cy = mpn_add_n(t, X + mn, V, mn);
@@ -951,6 +972,7 @@ powm_2exp(nn_ptr x, nn_srcptr b2, nn_srcptr e, mp_size_t en,
 
     for (i = ebits - 1; i >= 0; i--)
     {
+        /* TODO: flint_mpn_sqrlow */
         flint_mpn_mullow_n(scratch, x, x, t2l);
         flint_mpn_copyi(x, scratch, t2l);
         if (TSTBIT(e, i))
@@ -992,10 +1014,27 @@ flint_mpn_powm(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en,
         return;
     }
 
-    if (flint_mpn_zero_p(b, mn))
+    if (flint_mpn_zero_p(b + 1, mn - 1))
     {
-        flint_mpn_zero(r, mn);
-        return;
+        ulong b0 = b[0];
+        /* TODO: when there is an flint_mpn_pow, more small powers could
+           be special-cased here. More ambitiously, certain we could split
+           powers with a small base and a relatively small exponent into
+           a plain integer power followed by modular powering. */
+
+        if (b0 == 0 || b0 == 1)
+        {
+            flint_mpn_zero(r, mn);
+            r[0] = b0;
+            return;
+        }
+        else if (b0 == 2 && en == 1 &&
+            e[0] < (mn - 1) * FLINT_BITS + FLINT_BIT_COUNT(m[mn - 1]) - 1)
+        {
+            flint_mpn_zero(r, mn);
+            r[e[0] / FLINT_BITS] = UWORD(1) << (e[0] % FLINT_BITS);
+            return;
+        }
     }
 
     if (en == 1 && e[0] == 1)
@@ -1146,9 +1185,9 @@ flint_mpn_powm(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en,
             ulong cy;
 
             if (on >= t2l)
-                mpn_mul(prod, modd, on, u, t2l);
+                flint_mpn_mul(prod, modd, on, u, t2l);
             else
-                mpn_mul(prod, u, t2l, modd, on);
+                flint_mpn_mul(prod, u, t2l, modd, on);
             cy = mpn_add(prod, prod, on + t2l, z, on);
             (void) cy;
             FLINT_ASSERT(cy == 0);
@@ -1214,3 +1253,4 @@ flint_mpn_powm_preinvn(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en,
     else
         flint_mpn_powm(r, b, e, en, m, mn);
 }
+

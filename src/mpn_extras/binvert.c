@@ -12,8 +12,7 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
-/* v = m^(-1) mod B^n for odd m, by Hensel lifting v <- v*(2 - m*v).
-   No aliasing. About 2/3 the cost of two full-size mullows. */
+/* v = m^(-1) mod B^n for odd m, no aliasing. Not optimized. */
 void
 _flint_mpn_binvert(nn_ptr v, nn_srcptr m, mp_size_t n)
 {
@@ -45,8 +44,7 @@ _flint_mpn_binvert(nn_ptr v, nn_srcptr m, mp_size_t n)
         mpn_neg(u, u, k2);
         mpn_add_1(u, u, k2, 2);
 
-        /* v = v*u mod B^k2; low k limbs are unchanged by construction,
-           but recomputing them costs nothing extra with mullow */
+        /* v = v*u mod B^k2 */
         flint_mpn_mullow_n(w, v, u, k2);
         flint_mpn_copyi(v, w, k2);
     }
