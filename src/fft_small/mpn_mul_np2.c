@@ -16,6 +16,7 @@
 #include "mpn_extras.h"
 #include "longlong.h"
 #include "fft_small.h"
+
 #include "machine_vectors.h"
 
 /*
@@ -318,6 +319,13 @@ _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl, ulong zh,
    negacyclic path, whose untwist folds the normalization). Shared by
    the multiplication window, the op export and the negacyclic
    reconstruction; the signed export keeps its own centered variant. */
+/* Garner reconstruction of the two-prime lanes into the limb window
+   [zl, zh) of z. Destructive: the lane arrays d0, d1 are consumed as
+   scratch by the vectorized sweep. Callers hold either the product
+   buffers of a multiplication in progress or a transform already
+   sacrificed to a destructive conversion; non-destructive conversions
+   copy first and call the fast destructive code, the default
+   semantics of output conversion throughout fft_small. */
 void
 _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
     ulong zl, ulong zh, double * d0, double * d1, ulong nchunks,
@@ -430,6 +438,7 @@ _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
         }
     }
 }
+
 void
 _mpn_ctx_mpn_mullow_np2(mpn_ctx_t R, nn_ptr z, ulong zh, nn_srcptr a,
                         ulong an, nn_srcptr b, ulong bn)

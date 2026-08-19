@@ -1075,6 +1075,8 @@ static void fill_vec_two_pow_tab(
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p)
 {
+    R->reserved_head = 0;
+    R->reserved_tail = 0;
     ulong i;
 
     R->buffer = NULL;
@@ -1333,6 +1335,16 @@ find_next:
 
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
 {
+    /* while a reservation is live, every scratch request must fit
+       the reserved head: growing here would move the reserved tail.
+       The reserving caller is responsible for bounding all scratch
+       used during the reservation's lifetime, so exceeding the head
+       is a hard error, which also serves as the audit that the
+       bound is right. */
+    if (R->reserved_tail != 0 && n > R->reserved_head)
+        flint_throw(FLINT_ERROR, "mpn_ctx_fit_buffer: request of %wu "
+            "bytes exceeds the reserved head of %wu bytes\n",
+            n, R->reserved_head);
     if (n > R->buffer_alloc)
     {
         flint_aligned_free(R->buffer);
@@ -1342,6 +1354,33 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
     }
     return R->buffer;
 }
+
+void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail)
+{
+    ulong total = n_round_up(head, FLINT_FFT_SMALL_ALIGNMENT)
+                  + n_round_up(tail, FLINT_FFT_SMALL_ALIGNMENT);
+
+    /* one reservation at a time: a second requester (a nested ring
+       context) gets NULL and falls back to plain allocation */
+    if (R->reserved_tail != 0)
+        return NULL;
+    if (total > R->buffer_alloc)
+    {
+        flint_aligned_free(R->buffer);
+        R->buffer = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT, total);
+        R->buffer_alloc = total;
+    }
+    R->reserved_head = n_round_up(head, FLINT_FFT_SMALL_ALIGNMENT);
+    R->reserved_tail = n_round_up(tail, FLINT_FFT_SMALL_ALIGNMENT);
+    return (void *) ((char *) R->buffer + R->reserved_head);
+}
+
+void mpn_ctx_fit_buffer_release(mpn_ctx_t R)
+{
+    R->reserved_head = 0;
+    R->reserved_tail = 0;
+}
+
 
 /* pointwise mul of a with b and m */
 void sd_fft_ctx_point_mul(
@@ -2135,16 +2174,15 @@ void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
     if (P->np == 2 && P->bits <= 57)
     {
         mpn_ctx_struct* R2 = P->R;
-        ulong ztr = P->ztrunc;
-        double * g = mpn_ctx_fit_buffer(R2, 2 * ztr * sizeof(double));
-
         FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
 
-        /* the op is const; Garner consumes its lanes, so copy */
-        memcpy(g, X->data, ztr * sizeof(double));
-        memcpy(g + ztr, X->data + P->stride, ztr * sizeof(double));
-        _fft_small_np2_crt_recompose(R2, z, 0, zn, g, g + ztr,
-                                     P->zn, ztr, P->bits, P->depth);
+        /* destructive: the reconstruction consumes the lanes; a
+           caller needing the transform afterwards copies first, as
+           the non-destructive ring conversions do */
+        _fft_small_np2_crt_recompose(R2, z, 0, zn, X->data,
+                                     X->data + P->stride,
+                                     P->zn, P->ztrunc, P->bits,
+                                     P->depth);
         return;
     }
 

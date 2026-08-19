@@ -90,7 +90,6 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
 #else
     gr_ctx_t ctx;
     gr_ptr B, X, acc, acc2, E;
-    double * acc_data, * acc2_data;
     slong * xidx;                 /* which poly1 index each X slot holds */
     slong k = len2, i, j, abits = 0, bbits = 0, sz;
     int share = (poly1 == poly2);
@@ -149,7 +148,8 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
     /* one product's magnitude; the k-term accumulation and the sign
        are the context's own provisioning */
     if (gr_ctx_init_transformed_mpn(ctx,
-            abits + bbits, k, signed_needed, 2 * k + 2) != GR_SUCCESS)
+            abits + bbits, k, signed_needed, 2 * k + 2,
+            GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER) != GR_SUCCESS)
         return 0;
 
     sz = ctx->sizeof_elem;
@@ -158,22 +158,11 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
        kept range (all indices when not sharing); the accumulators live on
        borrowed slabs so they can be converted out destructively and
        re-initialized for free */
-    E = flint_malloc((2 * k + 2) * sz);
+    GR_TMP_INIT_VEC(E, 2 * k + 2, ctx);
     B = E;
     X = GR_ENTRY(E, k, sz);
     acc = GR_ENTRY(E, 2 * k, sz);
     acc2 = GR_ENTRY(E, 2 * k + 1, sz);
-
-    for (i = 0; i < 2 * k; i++)
-        gr_init(GR_ENTRY(E, i, sz), ctx);
-    {
-        ulong slab = n_round_up(gr_transformed_mpn_sizeof_data(ctx),
-                                FLINT_FFT_SMALL_ALIGNMENT);
-        acc_data = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT, slab);
-        acc2_data = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT, slab);
-        gr_transformed_mpn_init_borrowed(acc, acc_data, ctx);
-        gr_transformed_mpn_init_borrowed(acc2, acc2_data, ctx);
-    }
 
     xidx = flint_malloc(k * sizeof(slong));
     for (i = 0; i < k; i++)
@@ -259,20 +248,17 @@ _fmpz_poly_mulmid_classical_fft_small(fmpz * res,
 
         status |= _get_coeff(res + (i - nlo), acc, ctx);
             /* the destructive get consumed acc: bring it back for the
-               next output; on borrowed storage this costs nothing */
+               next output; under the fit_buffer strategy this is a
+               slab-pool round trip */
         gr_clear(acc, ctx);
-        gr_transformed_mpn_init_borrowed(acc, acc_data, ctx);
+        gr_init(acc, ctx);
         gr_clear(acc2, ctx);
-        gr_transformed_mpn_init_borrowed(acc2, acc2_data, ctx);
+        gr_init(acc2, ctx);
     }
 
 #undef A_ELEM
 
-    for (i = 0; i < 2 * k + 2; i++)
-        gr_clear(GR_ENTRY(E, i, sz), ctx);
-    flint_free(E);
-    flint_aligned_free(acc_data);
-    flint_aligned_free(acc2_data);
+    GR_TMP_CLEAR_VEC(E, 2 * k + 2, ctx);
     flint_free(xidx);
     gr_ctx_clear(ctx);
 

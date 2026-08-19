@@ -517,7 +517,9 @@ int fft_small_plan_init_mpn_np(fft_small_plan_t P, mpn_ctx_t R,
     products of 2*bits-bit values; as in the linear plans, len_bound > 1
     accounts for bilinear accumulation done in transform space.
 
-    fft_small_export_mpn returns a nonnegative representative
+    fft_small_export_mpn is destructive on the transform data, as
+    output conversion is throughout fft_small; it returns a
+    nonnegative representative
     sum(c_i 2^(bits i)) < len_bound * 2^(FLINT_BITS*nn + 2*bits + depth),
     exported exactly by any zn with
 

@@ -1494,8 +1494,21 @@ void _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fmod_ctx);
    propagates their carries, so the error is the truncation itself
    (one-sided, below 1) plus the wholly dropped slots' total mass
    (under half an ulp either way). */
+/* Operand allocation strategies for the transformed ring: plain
+   aligned allocation per element, or a pool of num_live slabs in a
+   stable reserved tail of the thread's fft_small scratch buffer.
+   The latter costs no allocation once the thread's buffer is warm
+   and shares its memory with the fft scratch, but requires the
+   caller to be the exclusive user of the thread's fft_small context
+   until the ring context is destroyed (no interleaved fft_small
+   operations outside this ring); elements past num_live fall back
+   to plain allocation. */
+#define GR_TRANSFORMED_MPN_ALLOC_MALLOC 0
+#define GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER 1
+
 int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound,
-                    slong terms_bound, int is_signed, slong num_live);
+                    slong terms_bound, int is_signed, slong num_live,
+                    int alloc_strategy);
 int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign,
                     gr_ctx_t ctx);
 int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign,
@@ -1505,7 +1518,7 @@ int gr_transformed_mpn_get_destructive(nn_ptr z, slong zn, slong * zn_out,
 int gr_transformed_mpn_get_trunc_destructive(nn_ptr z, slong zn,
                     slong * zn_out, int * sign, slong lo, gr_ptr x,
                     gr_ctx_t ctx);
-void gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx);
+int gr_transformed_mpn_use_fit_buffer(gr_ctx_t ctx, slong num_live);
 ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx);
 slong gr_transformed_mpn_get_limbs(gr_ctx_t ctx, gr_srcptr x);
 slong gr_transformed_mpn_get_limbs_bound(gr_ctx_t ctx);

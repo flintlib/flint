@@ -108,7 +108,10 @@ TEST_FUNCTION_START(gr_transformed_mpn, state)
         int as, bs, sign, status;
 
         if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound,
-                                        is_signed, 16) != GR_SUCCESS)
+                is_signed, 16,
+                n_randint(state, 2) ? GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER
+                                    : GR_TRANSFORMED_MPN_ALLOC_MALLOC)
+                != GR_SUCCESS)
             continue;
 
         acc = gr_heap_init(ctx);
@@ -303,7 +306,8 @@ cleanup:
         slong j, need, zn_out;
         int sign;
 
-        if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound, 1, 16)
+        if (gr_ctx_init_transformed_mpn(ctx, bits_bound, terms_bound, 1, 16,
+                GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
                 != GR_SUCCESS)
             continue;
 
@@ -402,7 +406,8 @@ cleanup:
         slong zn_out;
         int sign;
 
-        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 1, 16) == GR_SUCCESS)
+        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 1, 16,
+                GR_TRANSFORMED_MPN_ALLOC_MALLOC) == GR_SUCCESS)
         {
             acc = gr_heap_init(ctx);
             x = gr_heap_init(ctx);
@@ -433,7 +438,8 @@ cleanup:
             gr_ctx_clear(ctx);
         }
 
-        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 0, 16) == GR_SUCCESS)
+        if (gr_ctx_init_transformed_mpn(ctx, 4096, 4, 0, 16,
+                GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER) == GR_SUCCESS)
         {
             acc = gr_heap_init(ctx);
             x = gr_heap_init(ctx);
@@ -481,7 +487,8 @@ cleanup:
             slong lo, zn, zl, j, e;
             int sg, sb, adv = iter2 % 3;
 
-            if (gr_ctx_init_transformed_mpn(tctx, 128 * n + 8, 2, 1, 16)
+            if (gr_ctx_init_transformed_mpn(tctx, 128 * n + 8, 2, 1, 16,
+                    GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
                     != GR_SUCCESS)
                 continue;
 
@@ -572,7 +579,8 @@ cleanup:
             slong bits = 128 << n_randint(state, 6);
             slong terms = 1 + n_randint(state, 6);
             int sgn = (int) n_randint(state, 2);
-            if (gr_ctx_init_transformed_mpn(ctx, bits, terms, sgn, 8)
+            if (gr_ctx_init_transformed_mpn(ctx, bits, terms, sgn, 8,
+                    GR_TRANSFORMED_MPN_ALLOC_MALLOC)
                     == GR_SUCCESS)
             {
                 {
@@ -614,7 +622,8 @@ cleanup:
         int status = GR_SUCCESS;
 
         if (gr_ctx_init_transformed_mpn(ctx, 2*bits + 4, 16,
-                                        signed_ctx, 8) != GR_SUCCESS)
+                signed_ctx, 8,
+                GR_TRANSFORMED_MPN_ALLOC_MALLOC) != GR_SUCCESS)
             continue;
 
         acc = flint_malloc(6 * ctx->sizeof_elem);

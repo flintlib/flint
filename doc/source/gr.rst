@@ -1026,7 +1026,7 @@ middle products) run substantially faster in such a representation.
     fully overwritten afterwards; representations without the method fall
     back to the copying conversion.
 
-.. function:: int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed)
+.. function:: int gr_ctx_init_transformed_mpn(gr_ctx_t ctx, slong bits_bound, slong terms_bound, int want_signed, slong num_live, int alloc_strategy)
 
     Constructs the ring of transformed big integers: bilinear
     expressions over `\mathbb{Z}` with results below ``2^bits_bound``
@@ -1035,6 +1035,33 @@ middle products) run substantially faster in such a representation.
     mixed-sign accumulations switch the pointwise additions and
     subtractions, and the sign of a mixed result is resolved at
     conversion out.
+
+    *alloc_strategy* selects how element storage is obtained.
+    ``GR_TRANSFORMED_MPN_ALLOC_MALLOC`` allocates each element
+    separately. ``GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER`` reserves a
+    stable region of the thread's fft_small scratch buffer holding
+    *num_live* element slabs, from which ``gr_init`` draws and to
+    which ``gr_clear`` returns; initializations beyond *num_live*
+    simultaneously live elements fall back to separate allocation.
+    The reservation makes repeated context creation cheap (the
+    region persists in the thread's scratch buffer across contexts)
+    and requires that ring operations request no scratch from the
+    fft_small context while it is live: a violating request is a
+    hard error. If another reservation is already live, for
+    instance from an enclosing context, the context degrades to
+    separate allocation. Elements should be initialized with
+    ``gr_init`` or ``GR_TMP_INIT_VEC`` in every strategy.
+
+.. function:: int gr_transformed_mpn_use_fit_buffer(gr_ctx_t ctx, slong num_live)
+
+    Switches a context created with
+    ``GR_TRANSFORMED_MPN_ALLOC_MALLOC`` to the reserved-slab
+    strategy for *num_live* simultaneously live elements, as if it
+    had been created that way. This is for callers whose live count
+    depends on quantities derived from the constructed context, such
+    as a blocking decision based on the element size. Returns
+    ``GR_UNABLE``, leaving separate allocation in place, if the
+    reservation cannot be made.
 
 .. function:: int gr_transformed_mpn_set(gr_ptr res, nn_srcptr a, slong an, int sign, gr_ctx_t ctx)
               int gr_transformed_mpn_get(nn_ptr z, slong zn, slong * zn_out, int * sign, gr_srcptr x, gr_ctx_t ctx)
@@ -1058,12 +1085,10 @@ middle products) run substantially faster in such a representation.
     1 ulp) plus the wholly dropped slots' total mass, under half an ulp
     either way.
 
-.. function:: void gr_transformed_mpn_init_borrowed(gr_ptr x, double * data, gr_ctx_t ctx)
-              ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
+.. function:: ulong gr_transformed_mpn_sizeof_data(gr_ctx_t ctx)
 
-    Element on caller-provided storage of
-    ``gr_transformed_mpn_sizeof_data`` bytes, 4096-aligned, outliving
-    the element; ``gr_clear`` will not free it.
+    Size in bytes of one element's transform storage in this
+    context.
 
     The transformed-mpn context constructor takes a *num_live*
     declaration of the elements expected alive simultaneously, and

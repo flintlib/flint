@@ -153,6 +153,10 @@ Transform plans and operands
     the caller. As in the linear plans, ``len_bound`` accounts for
     bilinear accumulation performed in transform space.
 
+    Exports are destructive on the transform data, the default
+    semantics of output conversion throughout fft_small; a caller
+    needing the transform afterwards copies it first, as the
+    non-destructive ring conversions do.
     :func:`fft_small_export_mpn` yields a nonnegative representative of
     the wrapped product; see the source for its size bound and the
     caller-side fold. The geometry selection was tuned with

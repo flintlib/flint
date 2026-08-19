@@ -134,7 +134,6 @@ _mul_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
 {
     gr_ctx_t tctx;
     gr_ptr E;
-    double * base;
     int ok = 1;
 #define E_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
 
@@ -142,19 +141,16 @@ _mul_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
        and the sign are the context's own provisioning */
     if (gr_ctx_init_transformed_mpn(tctx,
             FLINT_BITS * (slong) (FLINT_MAX(arn, ain) + FLINT_MAX(brn, bin)),
-            2, 1, 6) != GR_SUCCESS)
+            2, 1, 6, GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
+            != GR_SUCCESS)
         return 0;
 
-    {
-        ulong esz = gr_transformed_mpn_sizeof_data(tctx);
-
-        base = (double *) mpn_ctx_fit_buffer(get_default_mpn_ctx(),
-                    6 * esz + 6 * tctx->sizeof_elem);
-        E = (gr_ptr) (base + 6 * (esz / sizeof(double)));
-        { slong i; for (i = 0; i < 6; i++)
-            gr_transformed_mpn_init_borrowed(E_(i),
-                    base + i * (esz / sizeof(double)), tctx); }
-    }
+    /* elements come from the slab cache through plain gr_init: the
+       previous carving from the context fit_buffer, which every
+       two-prime export reuses mid-operation, was correct only
+       because the exports run after the last operand use and their
+       scratch stayed below the output elements' offsets */
+    GR_TMP_INIT_VEC(E, 6, tctx);
 
     ok = ok && gr_transformed_mpn_set(E_(0), ar, arn, ar_sgn, tctx) == GR_SUCCESS;
     ok = ok && gr_transformed_mpn_set(E_(1), ai, ain, ai_sgn, tctx) == GR_SUCCESS;
@@ -167,21 +163,19 @@ _mul_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     ok = ok && gr_mul(E_(5), E_(0), E_(3), tctx) == GR_SUCCESS;
     ok = ok && gr_addmul(E_(5), E_(1), E_(2), tctx) == GR_SUCCESS;
 
-    /* the operands are dead once the pointwise stage is done: their
-       storage (the first two scratch slices) doubles as the export
-       staging buffers */
     {
-        ulong esz = gr_transformed_mpn_sizeof_data(tctx);
-        ulong tmax = esz / sizeof(ulong);
+        ulong tmax = gr_transformed_mpn_sizeof_data(tctx)
+                     / sizeof(ulong);
+        nn_ptr tstage = flint_malloc(tmax * sizeof(ulong));
 
         ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(4), shift,
-                             (nn_ptr) base, tmax, tctx);
+                             tstage, tmax, tctx);
         ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(5), shift,
-                             (nn_ptr) (base + esz / sizeof(double)), tmax,
-                             tctx);
+                             tstage, tmax, tctx);
+        flint_free(tstage);
     }
 
-    { slong i; for (i = 0; i < 6; i++) gr_clear(E_(i), tctx); }
+    GR_TMP_CLEAR_VEC(E, 6, tctx);
     gr_ctx_clear(tctx);
 #undef E_
     return ok;
@@ -195,7 +189,6 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
 {
     gr_ctx_t tctx;
     gr_ptr E;
-    double * base;
     int ok = 1;
 #define E_(i) GR_ENTRY(E, i, tctx->sizeof_elem)
 
@@ -211,20 +204,11 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
         ar * ar - ai * ai keeps the same geometry as the complex product.
     */
     if (gr_ctx_init_transformed_mpn(tctx,
-            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)), 2, 1, 4)
+            FLINT_BITS * (slong) (2 * FLINT_MAX(arn, ain)), 2, 1, 4, GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER)
             != GR_SUCCESS)
         return 0;
 
-    {
-        ulong esz = gr_transformed_mpn_sizeof_data(tctx);
-
-        base = (double *) mpn_ctx_fit_buffer(get_default_mpn_ctx(),
-                    4 * esz + 4 * tctx->sizeof_elem);
-        E = (gr_ptr) (base + 4 * (esz / sizeof(double)));
-        { slong i; for (i = 0; i < 4; i++)
-            gr_transformed_mpn_init_borrowed(E_(i),
-                    base + i * (esz / sizeof(double)), tctx); }
-    }
+    GR_TMP_INIT_VEC(E, 4, tctx);
 
     /* the operands enter as magnitudes: the squares are sign free and
        2 ar ai has the known sign ar_sgn ^ ai_sgn, applied below -- so
@@ -244,24 +228,23 @@ _sqr_complex_fft(nn_ptr zr, slong * zr_len, nn_ptr zi, slong * zi_len,
     ok = ok && gr_mul(E_(3), E_(0), E_(1), tctx) == GR_SUCCESS;
     ok = ok && gr_add(E_(3), E_(3), E_(3), tctx) == GR_SUCCESS;
 
-    /* operands dead after the pointwise stage; their slices stage the
-       exports */
     {
-        ulong esz = gr_transformed_mpn_sizeof_data(tctx);
-        ulong tmax = esz / sizeof(ulong);
+        ulong tmax = gr_transformed_mpn_sizeof_data(tctx)
+                     / sizeof(ulong);
+        nn_ptr tstage = flint_malloc(tmax * sizeof(ulong));
 
         ok = ok && _tmpn_out(zr, zlimbs, zr_len, E_(2), shift,
-                             (nn_ptr) base, tmax, tctx);
+                             tstage, tmax, tctx);
         ok = ok && _tmpn_out(zi, zlimbs, zi_len, E_(3), shift,
-                             (nn_ptr) (base + esz / sizeof(double)), tmax,
-                             tctx);
+                             tstage, tmax, tctx);
+        flint_free(tstage);
 
         /* attach the known sign of 2 ar ai */
         if (ok && (ar_sgn ^ ai_sgn))
             *zi_len = -*zi_len;
     }
 
-    { slong i; for (i = 0; i < 4; i++) gr_clear(E_(i), tctx); }
+    GR_TMP_CLEAR_VEC(E, 4, tctx);
     gr_ctx_clear(tctx);
 #undef E_
     return ok;

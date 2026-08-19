@@ -395,6 +395,10 @@ typedef struct {
     profile_entry_struct profiles[MAX_NPROFILES];
     ulong profiles_size;
     void* buffer;
+    /* reservation of a stable tail of the scratch buffer (see
+       mpn_ctx_fit_buffer_reserve); zero when none is live */
+    ulong reserved_head;
+    ulong reserved_tail;
     ulong buffer_alloc;
 
     /* constants of the two-prime pipeline: inv(p1) mod p2 with 2^-d
@@ -418,6 +422,14 @@ unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, un
 void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
+/* Reserve a stable tail region of the scratch buffer: the buffer is
+   grown once to hold head + tail bytes and the returned tail region
+   then stays at a fixed address for as long as the reservation is
+   live, provided every interleaved mpn_ctx_fit_buffer request stays
+   within head bytes - the caller's exclusivity contract, asserted in
+   debug builds. One reservation at a time. */
+void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail);
+void mpn_ctx_fit_buffer_release(mpn_ctx_t R);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn);
 /* Size range in which the two-prime pipeline is preferred: it beats
    the wide pipeline at every measured size from 16 limbs (where the
@@ -444,9 +456,11 @@ void _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl,
 /* Garner + register-window recomposition of two-prime lanes; see the
    definition for the contract. depth == UWORD_MAX means the lanes are
    already plain residues. */
+/* destructive on d0, d1 */
 void _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
                     ulong zl, ulong zh, double * d0, double * d1,
-                    ulong nchunks, ulong navail8, ulong bits, ulong depth);
+                    ulong nchunks, ulong navail8, ulong bits,
+                    ulong depth);
 int _fft_small_np2_choose(const mpn_ctx_struct * R, ulong an, ulong bn,
                     ulong len_bound, ulong * bits, ulong * depth);
 void _fft_small_np2_pack(double * d, double * d2, nn_srcptr x, ulong xn,

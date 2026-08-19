@@ -399,7 +399,12 @@ fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
         ulong p1u = (ulong) Q0->p, p2u = (ulong) Q1->p;
         ulong p12hi, p12lo, h12hi, h12lo;
         ulong ns8 = n_round_up(FLINT_MAX(nslots, 1), 8);
-        double * g;
+        /* destructive: the Garner sweep consumes the lanes in place
+           (output conversion is destructive by default throughout
+           fft_small; non-destructive conversions copy first), one
+           full vectorized sweep then one scalar window sweep, the
+           shape that store-forwarding rewards */
+        double * g0 = X->data, * g1 = X->data + P->stride;
         vec8d P1 = vec8d_set_d(Q0->p), P1i = vec8d_set_d(Q0->pinv);
         vec8d P2 = vec8d_set_d(Q1->p), P2i = vec8d_set_d(Q1->pinv);
         vec8d S1 = vec8d_set_d((double) R->np2_s1[P->depth]);
@@ -423,25 +428,23 @@ fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
         FLINT_ASSERT(lo_limbs - base < 8);
 
         jg0 = j0 & ~(ulong) 7;
-        g = mpn_ctx_fit_buffer(R, 2 * ns8 * sizeof(double));
         for (j = jg0; j < ns8; j += 8)
         {
-            vec8d r1 = vec8d_mulmod(vec8d_load(X->data + j), S1, P1, P1i);
-            vec8d r2 = vec8d_mulmod(vec8d_load(X->data + P->stride + j),
-                                    S2, P2, P2i);
+            vec8d r1 = vec8d_mulmod(vec8d_load(g0 + j), S1, P1, P1i);
+            vec8d r2 = vec8d_mulmod(vec8d_load(g1 + j), S2, P2, P2i);
             vec8d t;
             r1 = vec8d_reduce_to_0n(r1, P1, P1i);
             r2 = vec8d_reduce_to_0n(r2, P2, P2i);
             t = vec8d_mulmod(vec8d_add(vec8d_sub(r2, r1), P2), C, P2, P2i);
             t = vec8d_reduce_to_0n(t, P2, P2i);
-            vec8d_store(g + j, r1);
-            vec8d_store(g + ns8 + j, t);
+            vec8d_store(g0 + j, r1);
+            vec8d_store(g1 + j, t);
         }
 
         w0 = base;
         for (j = j0; j < nslots; j++)
         {
-            ulong r1 = (ulong) g[j], tt = (ulong) g[ns8 + j];
+            ulong r1 = (ulong) g0[j], tt = (ulong) g1[j];
             ulong vhi, vlo, x0, x1, x2, x3;
             ulong pos = j * bits, w = pos >> 6, sh = pos & 63;
 

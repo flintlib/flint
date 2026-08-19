@@ -151,6 +151,18 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
         {
             ulong zn2 = 1 + n_randint(state, zn - 1);
             flint_mpn_rrandom(t, state, zn);
+            /* exports are destructive: rebuild Z's product for the
+               truncated export */
+            fft_small_fft_mpn(A, a + (K-1)*an, an, P);
+            fft_small_fft_mpn(B, b + (K-1)*bn, bn, P);
+            fft_small_op_mul(Z, A, B, P);
+            for (k = 0; k + 1 < (slong) K; k++)
+            {
+                fft_small_fft_mpn(A, a + k*an, an, P);
+                fft_small_fft_mpn(B, b + k*bn, bn, P);
+                fft_small_op_addmul(Z, A, B, P);
+            }
+            fft_small_ifft(Z, P);
             fft_small_export_mpn(t, zn2, Z, P);
             if (mpn_cmp(t, ref, zn2) != 0)
                 TEST_FUNCTION_FAIL("truncated export: an = %wu, bn = %wu, "
@@ -203,9 +215,14 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
                                        "zn = %wd\n", an, bn, zn);
                 /* the signed export must agree on the same product;
                    the window must contain the value top plus the
-                   slot slack per the export's precondition */
+                   slot slack per the export's precondition. Exports
+                   are destructive, so rebuild the product first. */
                 {
                     int esign = -1;
+                    fft_small_fft_mpn(A2, a, an, P2);
+                    fft_small_fft_mpn(B2, b, bn, P2);
+                    fft_small_op_mul(A2, A2, B2, P2);
+                    fft_small_ifft(A2, P2);
                     fft_small_export_mpn_signed(z3, zn + 3, &esign, A2,
                         n_cdiv(FLINT_BITS * an, P2->bits)
                         + n_cdiv(FLINT_BITS * bn, P2->bits) - 1, P2);

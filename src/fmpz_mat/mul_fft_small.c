@@ -147,7 +147,6 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     slong i, j, l, I, J, L;
     gr_ctx_t tctx;
     gr_ptr EA, EB, acc;
-    double * acc_data;
     nn_ptr t;
     slong tn_max, budget, mb, nb, kb;
     int ok = 1;
@@ -182,10 +181,12 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
        representation owns) */
     bits_bound = abits + bbits;
 
-    /* the driver manages its own storage budget through the blocking
-       below, so the context is created with a minimal live count; the
-       context-level gate protects callers without such a strategy */
-    if (gr_ctx_init_transformed_mpn(tctx, bits_bound, k, signed_needed, 4)
+    /* the exact live count depends on the blocking decision below,
+       which in turn needs the context's element size: create the
+       context with plain allocation and switch to the pooled
+       strategy once the count is known */
+    if (gr_ctx_init_transformed_mpn(tctx, bits_bound, k, signed_needed,
+            0, GR_TRANSFORMED_MPN_ALLOC_MALLOC)
             != GR_SUCCESS)
         return 0;
 
@@ -248,6 +249,13 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
         share = 0;
     }
 
+    /* every element the blocking keeps live at once: the resident A
+       block, the resident B block unless shared, and the accumulator;
+       a refusal (a nested reservation) simply leaves plain
+       allocation in place */
+    (void) gr_transformed_mpn_use_fit_buffer(tctx,
+        mb * kb + (share ? 0 : kb * nb) + 1);
+
     EA = flint_malloc((mb * kb) * tctx->sizeof_elem);
     for (i = 0; i < mb * kb; i++)
         gr_init(EA_(i), tctx);
@@ -259,10 +267,8 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
         for (i = 0; i < kb * nb; i++)
             gr_init(EB_(i), tctx);
     }
-    acc_data = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT, n_round_up(
-            gr_transformed_mpn_sizeof_data(tctx), FLINT_FFT_SMALL_ALIGNMENT));
     acc = flint_malloc(tctx->sizeof_elem);
-    gr_transformed_mpn_init_borrowed(acc, acc_data, tctx);
+    gr_init(acc, tctx);
 
     /* conversion staging sized by the ring's own bound rather than a
        reconstruction of its limb requirements here */
@@ -322,7 +328,7 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
                                     acc, lo_limbs, L > 0, t, tn_max, tctx);
 
                         gr_clear(acc, tctx);
-                        gr_transformed_mpn_init_borrowed(acc, acc_data, tctx);
+                        gr_init(acc, tctx);
                     }
             }
         }
@@ -339,7 +345,6 @@ _fmpz_mat_mul_fft_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     }
     gr_clear(acc, tctx);
     flint_free(acc);
-    flint_aligned_free(acc_data);
     flint_free(t);
     gr_ctx_clear(tctx);
 #undef EA_
