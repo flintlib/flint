@@ -395,7 +395,19 @@ typedef struct {
     profile_entry_struct profiles[MAX_NPROFILES];
     ulong profiles_size;
     void* buffer;
+    /* reservation of a stable tail of the scratch buffer (see
+       mpn_ctx_fit_buffer_reserve); zero when none is live */
+    ulong reserved_head;
+    ulong reserved_tail;
     ulong buffer_alloc;
+
+    /* constants of the two-prime pipeline: inv(p1) mod p2 with 2^-d
+       folded in per depth, 2^-d mod p1, and the exact bit size of
+       p1*p2 for the chunk-size bound */
+    ulong np2_s1[32];       /* 2^-d mod p1 */
+    ulong np2_s2[32];       /* 2^-d mod p2 */
+    ulong np2_ip1;          /* inv(p1) mod p2 */
+    ulong np2_prodbits;     /* floor(log2(p1*p2)) */
 } mpn_ctx_struct;
 
 typedef mpn_ctx_struct mpn_ctx_t[1];
@@ -410,7 +422,43 @@ unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, un
 void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
+/* Reserve a stable tail region of the scratch buffer: the buffer is
+   grown once to hold head + tail bytes and the returned tail region
+   then stays at a fixed address for as long as the reservation is
+   live, provided every interleaved mpn_ctx_fit_buffer request stays
+   within head bytes - the caller's exclusivity contract, asserted in
+   debug builds. One reservation at a time. */
+void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail);
+void mpn_ctx_fit_buffer_release(mpn_ctx_t R);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn);
+
+/* The two-prime version is preferred below this threshold.
+   Note: this is accurate for high products on Zen 3; it could be doubled
+   for full products. */
+#define FLINT_MPN_MUL_NP2_MAX_AN 40000
+
+/* two-prime pipeline for the Toom boundary; an >= bn >= 1 */
+void _mpn_ctx_mpn_mul_np2(mpn_ctx_t R, nn_ptr z, nn_srcptr a, ulong an,
+                    nn_srcptr b, ulong bn);
+/* low zh limbs of a*b, exact */
+void _mpn_ctx_mpn_mullow_np2(mpn_ctx_t R, nn_ptr z, ulong zh,
+                    nn_srcptr a, ulong an, nn_srcptr b, ulong bn);
+/* limbs [zl, zh): exact for zl = 0, lower approximation otherwise */
+void _mpn_ctx_mpn_mul_window_np2(mpn_ctx_t R, nn_ptr z, ulong zl,
+                    ulong zh, nn_srcptr a, ulong an, nn_srcptr b, ulong bn);
+/* Garner + register-window recomposition of two-prime lanes; see the
+   definition for the contract. depth == UWORD_MAX means the lanes are
+   already plain residues. */
+/* destructive on d0, d1 */
+void _fft_small_np2_crt_recompose(const mpn_ctx_struct * R, nn_ptr z,
+                    ulong zl, ulong zh, double * d0, double * d1,
+                    ulong nchunks, ulong navail8, ulong bits,
+                    ulong depth);
+int _fft_small_np2_choose(const mpn_ctx_struct * R, ulong an, ulong bn,
+                    ulong len_bound, ulong * bits, ulong * depth);
+void _fft_small_np2_pack(double * d, double * d2, nn_srcptr x, ulong xn,
+                    ulong len, ulong itrunc, ulong bits);
+
 void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi, const ulong* a, ulong an, const ulong* b, ulong bn);
 
 /* ------------------------------------------------------------------------ */
@@ -521,12 +569,35 @@ int fft_small_plan_init_nmod(fft_small_plan_t P, mpn_ctx_t R,
    bn_max limbs, with prod_of_primes large enough for len_bound
    accumulated products in transform space. Returns 0 if no admissible
    prime count and chunk size exist. */
+/* len_bound counts accumulated elementary products; is_signed adds
+   the spare factor of two the centered signed exports require, after
+   the pipeline dispatch has keyed on the accumulation count alone,
+   so a two-term signed dot product (complex multiplication, 2 x 2
+   matrix multiplication) reaches the two-prime plans. */
 int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
-                    ulong an_max, ulong bn_max, ulong len_bound);
+                    ulong an_max, ulong bn_max, ulong len_bound,
+                    int is_signed);
+
+/* plan constructor with a selectable prime regime, for profiling and
+   test code: np = 0 makes the automatic choice (the same as
+   fft_small_plan_init_mpn), np = 2 forces the two-prime geometry
+   (failing when its exactness bound or size range cannot be met),
+   and any other value forces the wide selection */
+int fft_small_plan_init_mpn_np(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong an_max, ulong bn_max, ulong len_bound,
+                    int is_signed, ulong np);
 
 int fft_small_plan_init_nmod_cyclic(fft_small_plan_t P, mpn_ctx_t R,
                     ulong depth, ulong zh,
                     ulong len_bound, ulong prod_bits, nmod_t mod);
+
+/* Plan for products of nonnegative integers of at most *nn limbs reduced
+   mod 2^(FLINT_BITS * *nn) - 1, rounding *nn up to the nearest length
+   admitting an exact chunk splitting (written back). Returns 0 if none
+   exists. fft_small_export_mpn yields a nonnegative representative;
+   see plan.c for its size bound and the caller-side fold. */
+int fft_small_plan_init_mpn_cyclic(fft_small_plan_t P, mpn_ctx_t R,
+                    ulong * nn, ulong len_bound);
 
 void fft_small_plan_clear(fft_small_plan_t P);
 
@@ -602,6 +673,11 @@ void fft_small_export_nmod_range(ulong* z, const fft_small_op_t X,
 
 /* Write the low zn limbs of the accumulated integer to z. The true value
    is reduced mod 2^(FLINT_BITS*zn) if it does not fit. */
+/* The signed exports reconstruct slot values centered to
+   (-P/2, P/2] for the product P of the plan's primes: callers must
+   keep true slot values inside that range, one spare factor of two
+   against the unsigned exactness bound, e.g. by doubling len_bound
+   at plan creation. */
 void fft_small_export_mpn_signed(ulong* z, ulong zn, int * sign,
                     const fft_small_op_t X, ulong nslots,
                     const fft_small_plan_t P);
@@ -834,6 +910,18 @@ void sd_fft_mpn_mulmod_2expp1_ctx_init(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
 void sd_fft_mpn_mulmod_2expp1_ctx_clear(sd_fft_mpn_mulmod_2expp1_ctx_struct * C);
 void sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_srcptr x,
             nn_srcptr y, sd_fft_mpn_mulmod_2expp1_scratch_struct * S);
+/* staged variant: F (transformed_size doubles) caches one operand's
+   transform for reuse across mul_cached calls; the cached operand
+   corresponds to y of the one-shot function */
+slong sd_fft_mpn_mulmod_2expp1_transformed_size(
+            const sd_fft_mpn_mulmod_2expp1_ctx_struct * C);
+void sd_fft_mpn_mulmod_2expp1_transform(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
+            double * F, nn_srcptr y,
+            sd_fft_mpn_mulmod_2expp1_scratch_struct * S);
+void sd_fft_mpn_mulmod_2expp1_mul_cached(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
+            nn_ptr z, nn_srcptr x, const double * F,
+            sd_fft_mpn_mulmod_2expp1_scratch_struct * S);
+
 void sd_fft_mpn_mulmod_2expp1_scratch_init(sd_fft_mpn_mulmod_2expp1_scratch_struct * S,
             const sd_fft_mpn_mulmod_2expp1_ctx_struct * C);
 void sd_fft_mpn_mulmod_2expp1_scratch_clear(sd_fft_mpn_mulmod_2expp1_scratch_struct * S);

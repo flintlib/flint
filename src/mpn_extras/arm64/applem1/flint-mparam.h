@@ -36,4 +36,8 @@
 /*    nmod_mat's p-nmod_vec_mul                        */
 #define FLINT_MULMOD_SHOUP_THRESHOLD 10
 
+#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
+
+#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 580
+
 #endif

@@ -15,8 +15,8 @@
 #define FLINT_MPARAM_H
 
 /* TODO these were taken directly from zen3 flint-mparam.h  ----> */
-#define FLINT_FFT_SMALL_MUL_THRESHOLD            400
-#define FLINT_FFT_SMALL_SQR_THRESHOLD            800
+#define FLINT_FFT_SMALL_MUL_THRESHOLD            240
+#define FLINT_FFT_SMALL_SQR_THRESHOLD            400
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000
@@ -34,5 +34,9 @@
 #define FLINT_PREINVERT_LIMB_USE_NATIVE 1
 
 #define FLINT_MULMOD_SHOUP_THRESHOLD 0
+
+#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 300
+
+#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 470
 
 #endif

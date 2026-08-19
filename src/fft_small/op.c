@@ -53,6 +53,19 @@ void fft_small_op_init_borrowed(fft_small_op_t X, const fft_small_plan_t P,
     X->domain = FFT_SMALL_OP_PRIMAL;
     X->owns_data = 0;
     X->data = data;
+    /* the block padding of sub-block transforms must be zero (see
+       plan.c), a requirement of the storage layout rather than of
+       how the storage was obtained; recycled or uninitialized
+       caller storage would otherwise feed garbage to the kernels */
+    if (P->stride > sd_fft_ctx_data_size(P->depth))
+    {
+        ulong pi;
+        for (pi = 0; pi < P->np; pi++)
+            memset(X->data + pi * P->stride
+                       + sd_fft_ctx_data_size(P->depth), 0,
+                   (P->stride - sd_fft_ctx_data_size(P->depth))
+                       * sizeof(double));
+    }
 }
 
 ulong fft_small_op_sizeof_data(const fft_small_plan_t P)

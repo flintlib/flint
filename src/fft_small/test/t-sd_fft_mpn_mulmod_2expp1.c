@@ -141,6 +141,21 @@ TEST_FUNCTION_START(sd_fft_mpn_mulmod_2expp1, state)
         negmul_ref(r, x, y, n);
         sd_fft_mpn_mulmod_2expp1(C, z, x, y, S);
 
+        /* staged variant: transform y once, multiply against it */
+        {
+            double * F = flint_aligned_alloc(4096,
+                n_round_up(sd_fft_mpn_mulmod_2expp1_transformed_size(C)
+                           * sizeof(double), 4096));
+            nn_ptr z2 = flint_malloc((C->N/FLINT_BITS + 1) * sizeof(ulong));
+            sd_fft_mpn_mulmod_2expp1_transform(C, F, y, S);
+            sd_fft_mpn_mulmod_2expp1_mul_cached(C, z2, x, F, S);
+            if (mpn_cmp(z2, z, C->N/FLINT_BITS + 1) != 0)
+                TEST_FUNCTION_FAIL("mul_cached vs one-shot: N = %wd\n",
+                                   C->N);
+            flint_aligned_free(F);
+            flint_free(z2);
+        }
+
         if (z[n] != r[n] || mpn_cmp(z, r, n) != 0)
             TEST_FUNCTION_FAIL("b = %wd, m = %wd, N = %wd, np = %wd\n",
                                b, m, N, C->np);

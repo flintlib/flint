@@ -13,6 +13,7 @@
 #include <gmp.h>
 #include "mpn_extras.h"
 #include "fft_small.h"
+#include "longlong.h"
 #include "machine_vectors.h"
 #include "crt_helpers.h"
 #include "thread_pool.h"
@@ -375,11 +376,127 @@ fft_small_export_mpn_signed_trunc(ulong* z, ulong zn, int * sign,
     slong nworkers = 0;
     ulong nthreads, l;
 
-    FLINT_ASSERT(3 <= P->np && P->np <= 8);
+    FLINT_ASSERT(2 <= P->np && P->np <= 8);
     FLINT_ASSERT(P->offset == 0);
     FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
     FLINT_ASSERT(FLINT_BITS * (lo_limbs + zn)
                  >= nslots * bits + FLINT_BITS * n + 2);
+
+    if (P->np == 2)
+    {
+        /* Two-prime path. Only slots reaching bit 64 lo_limbs and up
+           are consumed (the same exclusion set as the wide engine's
+           j0, without its block rounding): Garner on that subrange,
+           then a sign-extended register-window recomposition
+           streaming straight into z. The few words between the first
+           consumed slot's base and lo_limbs land in a small prefix,
+           which supplies the exact negation borrow - |W| = ~W + 1
+           carries into the window iff the prefix of W is zero - so
+           nothing below the window is materialized. The sign lives
+           inside the window by the size assertion above. */
+        mpn_ctx_struct * R = P->R;
+        sd_fft_ctx_struct * Q0 = R->ffts + 0, * Q1 = R->ffts + 1;
+        ulong p1u = (ulong) Q0->p, p2u = (ulong) Q1->p;
+        ulong p12hi, p12lo, h12hi, h12lo;
+        ulong ns8 = n_round_up(FLINT_MAX(nslots, 1), 8);
+        /* destructive: the Garner sweep consumes the lanes in place
+           (output conversion is destructive by default throughout
+           fft_small; non-destructive conversions copy first), one
+           full vectorized sweep then one scalar window sweep, the
+           shape that store-forwarding rewards */
+        double * g0 = X->data, * g1 = X->data + P->stride;
+        vec8d P1 = vec8d_set_d(Q0->p), P1i = vec8d_set_d(Q0->pinv);
+        vec8d P2 = vec8d_set_d(Q1->p), P2i = vec8d_set_d(Q1->pinv);
+        vec8d S1 = vec8d_set_d((double) R->np2_s1[P->depth]);
+        vec8d S2 = vec8d_set_d((double) R->np2_s2[P->depth]);
+        vec8d C = vec8d_set_d((double) R->np2_ip1);
+        ulong acc0 = 0, acc1 = 0, acc2 = 0, acc3 = 0;
+        ulong j, jg0, base, w0, k;
+        ulong pre[8] = {0};
+        int neg, allz;
+
+        umul_ppmm(p12hi, p12lo, p1u, p2u);
+        h12lo = (p12lo >> 1) | (p12hi << 63);
+        h12hi = p12hi >> 1;
+
+        j0 = 0;
+        if (FLINT_BITS * lo_limbs > FLINT_BITS * n + 1)
+            j0 = (FLINT_BITS * lo_limbs - FLINT_BITS * n - 1 + bits - 1)
+                 / bits;
+        j0 = n_min(j0, nslots);
+        base = (j0 * bits) / FLINT_BITS;
+        FLINT_ASSERT(lo_limbs - base < 8);
+
+        jg0 = j0 & ~(ulong) 7;
+        for (j = jg0; j < ns8; j += 8)
+        {
+            vec8d r1 = vec8d_mulmod(vec8d_load(g0 + j), S1, P1, P1i);
+            vec8d r2 = vec8d_mulmod(vec8d_load(g1 + j), S2, P2, P2i);
+            vec8d t;
+            r1 = vec8d_reduce_to_0n(r1, P1, P1i);
+            r2 = vec8d_reduce_to_0n(r2, P2, P2i);
+            t = vec8d_mulmod(vec8d_add(vec8d_sub(r2, r1), P2), C, P2, P2i);
+            t = vec8d_reduce_to_0n(t, P2, P2i);
+            vec8d_store(g0 + j, r1);
+            vec8d_store(g1 + j, t);
+        }
+
+        w0 = base;
+        for (j = j0; j < nslots; j++)
+        {
+            ulong r1 = (ulong) g0[j], tt = (ulong) g1[j];
+            ulong vhi, vlo, x0, x1, x2, x3;
+            ulong pos = j * bits, w = pos >> 6, sh = pos & 63;
+
+            while (w0 < w)
+            {
+                if (w0 < lo_limbs)
+                    pre[w0 - base] = acc0;
+                else if (w0 - lo_limbs < zn)
+                    z[w0 - lo_limbs] = acc0;
+                w0++;
+                acc0 = acc1; acc1 = acc2; acc2 = acc3;
+                acc3 = (ulong)((slong) acc3 >> (FLINT_BITS - 1));
+            }
+
+            umul_ppmm(vhi, vlo, p1u, tt);
+            add_ssaaaa(vhi, vlo, vhi, vlo, 0, r1);
+            /* center to (-p1p2/2, p1p2/2] */
+            if (vhi > h12hi || (vhi == h12hi && vlo > h12lo))
+                sub_ddmmss(vhi, vlo, vhi, vlo, p12hi, p12lo);
+
+            x0 = vlo << sh;
+            x1 = ((vlo >> (63 - sh)) >> 1) | (vhi << sh);
+            x2 = (ulong)((((slong) vhi) >> (63 - sh)) >> 1);
+            x3 = (ulong)(((slong) vhi) >> (FLINT_BITS - 1));
+
+            add_ssssaaaaaaaa(acc3, acc2, acc1, acc0,
+                             acc3, acc2, acc1, acc0, x3, x2, x1, x0);
+        }
+        while (w0 < lo_limbs + zn)
+        {
+            if (w0 < lo_limbs)
+                pre[w0 - base] = acc0;
+            else
+                z[w0 - lo_limbs] = acc0;
+            w0++;
+            acc0 = acc1; acc1 = acc2; acc2 = acc3;
+            acc3 = (ulong)((slong) acc3 >> (FLINT_BITS - 1));
+        }
+
+        neg = (zn > 0) && (((slong) z[zn - 1]) < 0);
+        *sign = neg;
+        if (neg)
+        {
+            allz = 1;
+            for (k = base; k < lo_limbs; k++)
+                allz = allz && (pre[k - base] == 0);
+            mpn_com(z, z, zn);
+            if (allz)
+                mpn_add_1(z, z, zn, 1);
+        }
+        return;
+    }
     {
         static const ulong _clen_of_np[8 - 3 + 1] = {3, 4, 4, 5, 6, 7};
         FLINT_ASSERT(n == _clen_of_np[P->np - 3]);

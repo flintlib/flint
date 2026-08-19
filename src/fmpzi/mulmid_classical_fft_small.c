@@ -104,7 +104,6 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
 {
     gr_ctx_t ctx;
     gr_ptr E, B, X, accR, accI, accR2, accI2;
-    double * accd[4];
     slong i, j, k, sz, abits, bbits;
     slong * xidx;
     int share = (poly1 == poly2);
@@ -182,32 +181,20 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
     /* each output component accumulates at most 2 k product
        magnitudes of one product's size */
     if (gr_ctx_init_transformed_mpn(ctx,
-            abits + bbits, 2 * k, 1, 4 * k + 4) != GR_SUCCESS)
+            abits + bbits, 2 * k, 1, 4 * k + 4,
+            GR_TRANSFORMED_MPN_ALLOC_FIT_BUFFER) != GR_SUCCESS)
         return 0;
 
     sz = ctx->sizeof_elem;
     /* 2k kept transforms (re, im interleaved), 2k rolling slots, and
        four accumulators on borrowed slabs */
-    E = flint_malloc((4 * k + 4) * sz);
+    GR_TMP_INIT_VEC(E, 4 * k + 4, ctx);
     B = E;
     X = GR_ENTRY(E, 2 * k, sz);
     accR = GR_ENTRY(E, 4 * k, sz);
     accI = GR_ENTRY(E, 4 * k + 1, sz);
     accR2 = GR_ENTRY(E, 4 * k + 2, sz);
     accI2 = GR_ENTRY(E, 4 * k + 3, sz);
-    for (i = 0; i < 4 * k; i++)
-        gr_init(GR_ENTRY(E, i, sz), ctx);
-    {
-        ulong slab = n_round_up(gr_transformed_mpn_sizeof_data(ctx),
-                                FLINT_FFT_SMALL_ALIGNMENT);
-        for (i = 0; i < 4; i++)
-            accd[i] = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT,
-                                          slab);
-        gr_transformed_mpn_init_borrowed(accR, accd[0], ctx);
-        gr_transformed_mpn_init_borrowed(accI, accd[1], ctx);
-        gr_transformed_mpn_init_borrowed(accR2, accd[2], ctx);
-        gr_transformed_mpn_init_borrowed(accI2, accd[3], ctx);
-    }
     xidx = flint_malloc(k * sizeof(slong));
     for (i = 0; i < k; i++)
         xidx[i] = -1;
@@ -321,11 +308,17 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
                                  accR, ctx);
             status |= _get_coeff(fmpzi_imagref(res + i - nlo),
                                  accI, ctx);
-            /* borrowed storage: re-initialization is free */
-            gr_transformed_mpn_init_borrowed(accR, accd[0], ctx);
-            gr_transformed_mpn_init_borrowed(accI, accd[1], ctx);
-            gr_transformed_mpn_init_borrowed(accR2, accd[2], ctx);
-            gr_transformed_mpn_init_borrowed(accI2, accd[3], ctx);
+            /* the destructive gets consumed the accumulators: bring
+               them back for the next output; under the fit_buffer
+               strategy this is a slab-pool round trip */
+            gr_clear(accR, ctx);
+            gr_init(accR, ctx);
+            gr_clear(accI, ctx);
+            gr_init(accI, ctx);
+            gr_clear(accR2, ctx);
+            gr_init(accR2, ctx);
+            gr_clear(accI2, ctx);
+            gr_init(accI2, ctx);
         }
     }
 
@@ -333,11 +326,7 @@ _fmpzi_poly_mulmid_classical_fft_small(fmpzi_struct * res,
 #undef CPROD
 
     ok = (status == GR_SUCCESS);
-    for (i = 0; i < 4 * k; i++)
-        gr_clear(GR_ENTRY(E, i, sz), ctx);
-    flint_free(E);
-    for (i = 0; i < 4; i++)
-        flint_free(accd[i]);
+    GR_TMP_CLEAR_VEC(E, 4 * k + 4, ctx);
     flint_free(xidx);
     gr_ctx_clear(ctx);
     return ok;

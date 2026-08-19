@@ -1075,6 +1075,8 @@ static void fill_vec_two_pow_tab(
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p)
 {
+    R->reserved_head = 0;
+    R->reserved_tail = 0;
     ulong i;
 
     R->buffer = NULL;
@@ -1192,6 +1194,27 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
     PUSH_PROFILE(8,192, 7,6);
 
     FLINT_ASSERT(R->profiles_size <= MAX_NPROFILES);
+    /* two-prime pipeline constants */
+    {
+        ulong p1 = (ulong) R->ffts[0].p, p2 = (ulong) R->ffts[1].p;
+        ulong hi, lo, d;
+        R->np2_ip1 = n_invmod(p1 % p2, p2);
+        umul_ppmm(hi, lo, p1, p2);
+        R->np2_prodbits = 64 + FLINT_BIT_COUNT(hi) - 1;
+        (void) lo;
+
+        nmod_t mod1, mod2;
+        nmod_init(&mod1, p1);
+        nmod_init(&mod2, p2);
+        R->np2_s1[0] = 1;
+        R->np2_s2[0] = 1;
+        for (d = 1; d < 32; d++)
+        {
+            R->np2_s1[d] = nmod_mul(R->np2_s1[d - 1], (p1 + 1) / 2, mod1);
+            R->np2_s2[d] = nmod_mul(R->np2_s2[d - 1], (p2 + 1) / 2, mod2);
+        }
+    }
+
 }
 
 #define VEC_SZ 4
@@ -1318,6 +1341,16 @@ find_next:
 
 void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
 {
+    /* while a reservation is live, every scratch request must fit
+       the reserved head: growing here would move the reserved tail.
+       The reserving caller is responsible for bounding all scratch
+       used during the reservation's lifetime, so exceeding the head
+       is a hard error, which also serves as the audit that the
+       bound is right. */
+    if (R->reserved_tail != 0 && n > R->reserved_head)
+        flint_throw(FLINT_ERROR, "mpn_ctx_fit_buffer: request of %wu "
+            "bytes exceeds the reserved head of %wu bytes\n",
+            n, R->reserved_head);
     if (n > R->buffer_alloc)
     {
         flint_aligned_free(R->buffer);
@@ -1327,6 +1360,33 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
     }
     return R->buffer;
 }
+
+void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail)
+{
+    ulong total = n_round_up(head, FLINT_FFT_SMALL_ALIGNMENT)
+                  + n_round_up(tail, FLINT_FFT_SMALL_ALIGNMENT);
+
+    /* one reservation at a time: a second requester (a nested ring
+       context) gets NULL and falls back to plain allocation */
+    if (R->reserved_tail != 0)
+        return NULL;
+    if (total > R->buffer_alloc)
+    {
+        flint_aligned_free(R->buffer);
+        R->buffer = flint_aligned_alloc(FLINT_FFT_SMALL_ALIGNMENT, total);
+        R->buffer_alloc = total;
+    }
+    R->reserved_head = n_round_up(head, FLINT_FFT_SMALL_ALIGNMENT);
+    R->reserved_tail = n_round_up(tail, FLINT_FFT_SMALL_ALIGNMENT);
+    return (void *) ((char *) R->buffer + R->reserved_head);
+}
+
+void mpn_ctx_fit_buffer_release(mpn_ctx_t R)
+{
+    R->reserved_head = 0;
+    R->reserved_tail = 0;
+}
+
 
 /* pointwise mul of a with b and m */
 void sd_fft_ctx_point_mul(
@@ -1583,6 +1643,15 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
         }
         flint_mpn_zero(z + (zn - lo), hi - zn);
         hi = zn;
+    }
+
+    if (FLINT_MAX(an, bn) <= FLINT_MPN_MUL_NP2_MAX_AN)
+    {
+        if (an >= bn)
+            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, a, an, b, bn);
+        else
+            _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, b, bn, a, an);
+        return;
     }
 
     mpn_ctx_best_profile(R, &P, an, bn);
@@ -1987,8 +2056,22 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
     _op_mpn_fft_worker_struct args[MPN_CTX_NCRTS];
 
     FLINT_ASSERT(an > 0);
-    FLINT_ASSERT(bits > 64);
     FLINT_ASSERT(P->offset == 0);
+
+    if (np == 2 && bits <= 57)
+    {
+        FLINT_ASSERT(atrunc <= P->stride);
+        _fft_small_np2_pack(X->data, X->data + P->stride, a, an,
+                            alen, atrunc, bits);
+        sd_fft_trunc(R->ffts + 0, X->data, P->depth, atrunc, P->ztrunc);
+        sd_fft_trunc(R->ffts + 1, X->data + P->stride, P->depth,
+                     atrunc, P->ztrunc);
+        X->itrunc = atrunc;
+        X->domain = FFT_SMALL_OP_PRIMAL;
+        return;
+    }
+
+    FLINT_ASSERT(bits > 64);
     FLINT_ASSERT(X->np == np && X->offset == P->offset &&
                  X->depth == P->depth && X->stride == P->stride);
     /* atrunc is the packing extent: whole blocks, whose excess over a
@@ -2093,6 +2176,21 @@ void fft_small_fft_mpn(fft_small_op_t X, const ulong* a, ulong an,
 void fft_small_export_mpn(ulong* z, ulong zn, const fft_small_op_t X,
                     const fft_small_plan_t P)
 {
+    if (P->np == 2 && P->bits <= 57)
+    {
+        mpn_ctx_struct* R2 = P->R;
+        FLINT_ASSERT(X->domain == FFT_SMALL_OP_PRODUCT);
+
+        /* destructive: the reconstruction consumes the lanes; a
+           caller needing the transform afterwards copies first, as
+           the non-destructive ring conversions do */
+        _fft_small_np2_crt_recompose(R2, z, 0, zn, X->data,
+                                     X->data + P->stride,
+                                     P->zn, P->ztrunc, P->bits,
+                                     P->depth);
+        return;
+    }
+
     ulong bits = P->bits;
     ulong c_hi = n_min(P->zn, n_cdiv(zn*FLINT_BITS, bits));
     static from_ffts_func tab[8-3+1] = {_mpn_from_ffts_3,

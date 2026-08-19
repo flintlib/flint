@@ -118,6 +118,50 @@ Transform plans and operands
     bytes, 4096-aligned, which must outlive the operand and is not freed
     by *clear*.
 
+.. function:: int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R, ulong an_max, ulong bn_max, ulong len_bound, int is_signed)
+
+    Plan for products of operands of at most *an_max* and *bn_max*
+    limbs through the op interface, selecting the pipeline (two-prime
+    or wide) automatically. The bound *len_bound* counts accumulated
+    elementary products; slot values must stay below
+    `\mathrm{len\_bound} \cdot 2^{2 \cdot \mathrm{bits}}` for
+    exactness. When *is_signed* is nonzero the spare factor of two
+    required by the centered signed exports is applied to the
+    internal capacity, after the pipeline choice has been made from
+    the plain accumulation count, so that short signed dot products
+    (complex multiplication, small matrix multiplication) still reach
+    the two-prime geometry; callers must not double the bound
+    themselves. Returns 1 on success.
+
+.. function:: int fft_small_plan_init_mpn_np(fft_small_plan_t P, mpn_ctx_t R, ulong an_max, ulong bn_max, ulong len_bound, int is_signed, ulong np)
+
+    As :func:`fft_small_plan_init_mpn` with the prime regime
+    selectable, for profiling and test code: ``np == 0`` makes the
+    automatic choice, ``np == 2`` forces the two-prime geometry
+    (failing when its exactness bound cannot be met), and any other
+    value forces the wide selection.
+
+.. function:: int fft_small_plan_init_mpn_cyclic(fft_small_plan_t P, mpn_ctx_t R, ulong * nn, ulong len_bound)
+
+    Plan for products of nonnegative integers of at most ``*nn`` limbs
+    reduced modulo `B^{nn} - 1` where `B = 2^{\mathrm{FLINT\_BITS}}`,
+    rounding ``*nn`` up to the nearest length admitting an exact chunk
+    splitting `\mathrm{bits} \cdot 2^{\mathrm{depth}} =
+    \mathrm{FLINT\_BITS} \cdot nn` (the chosen value is written back).
+    Returns 0 if no admissible geometry exists. Operands longer than
+    ``nn`` limbs are not folded by the packing and must be reduced by
+    the caller. As in the linear plans, ``len_bound`` accounts for
+    bilinear accumulation performed in transform space.
+
+    Exports are destructive on the transform data, the default
+    semantics of output conversion throughout fft_small; a caller
+    needing the transform afterwards copies it first, as the
+    non-destructive ring conversions do.
+    :func:`fft_small_export_mpn` yields a nonnegative representative of
+    the wrapped product; see the source for its size bound and the
+    caller-side fold. The geometry selection was tuned with
+    ``profile/p-mpn_cyclic_tuning``.
+
 .. function:: void fft_small_export_mpn_signed(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, const fft_small_plan_t P)
               void fft_small_export_mpn_signed_trunc(ulong * z, ulong zn, int * sign, const fft_small_op_t X, ulong nslots, ulong lo_limbs, const fft_small_plan_t P)
 

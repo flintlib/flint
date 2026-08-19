@@ -26,6 +26,7 @@
 #include "mpn_extras.h"
 #include "fft_small.h"
 #include "crt_helpers.h"
+#include "longlong.h"
 
 #define LG_BLK 7   /* LG_BLK_SZ */
 
@@ -45,8 +46,7 @@ sd_fft_mpn_mulmod_2expp1_choose_np(mpn_ctx_struct * R, slong b, slong depth)
     slong np, need = 2 * b + depth + 1;
 
     fmpz_init_set_ui(P, R->ffts[0].p);
-    fmpz_mul_ui(P, P, R->ffts[1].p);
-    for (np = 3; np <= 8; np++)
+    for (np = 2; np <= 8; np++)
     {
         fmpz_mul_ui(P, P, R->ffts[np - 1].p);
         if ((slong) fmpz_bits(P) - 1 >= need
@@ -107,8 +107,12 @@ sd_fft_mpn_mulmod_2expp1_ctx_init(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, mpn_c
         ulong minv = nmod_inv(m, C->mod[k]);
         /* the from_ffts contract (determined empirically with a
            planted-coefficient probe): stored residues carry the
-           inverse of the reduced crt cofactor */
-        minv = nmod_mul(minv, nmod_inv(
+           inverse of the reduced crt cofactor. The two-prime
+           reconstruction is a plain Garner step instead, so its
+           untwist stays cofactor-free and the export saves the
+           corresponding multiplications. */
+        if (C->np != 2)
+            minv = nmod_mul(minv, nmod_inv(
                 *crt_data_co_prime_red(C->R->crts + C->np - 1, k) % C->p[k],
                 C->mod[k]), C->mod[k]);
         ulong winv = nmod_inv(w, C->mod[k]);
@@ -144,7 +148,8 @@ sd_fft_mpn_mulmod_2expp1_ctx_init(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, mpn_c
         for (slong k = 0; k < np; k++)
         {
             ulong r = nmod_pow_ui(2, (ulong) Bexp, C->mod[k]);
-            r = nmod_mul(r, nmod_inv(
+            if (np != 2)
+                r = nmod_mul(r, nmod_inv(
                 *crt_data_co_prime_red(C->R->crts + np - 1, k) % C->p[k],
                 C->mod[k]), C->mod[k]);
             C->biasres[k] = r;
@@ -171,27 +176,38 @@ sd_fft_mpn_mulmod_2expp1_ctx_init(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, mpn_c
 static slong
 _mulmod_2expp1_choose_m(mpn_ctx_struct * R, slong N)
 {
-    static const slong bs[] = { 64, 84, 88, 92, 112, 116, 120, 126,
-                                128, 136, 140, 144, 160, 164, 168,
-                                184, 188, 192 };
-    slong ii, bestm = 0;
+    /* Chunk sizes come from N's divisor lattice: every b = N / m for
+       a power-of-two m is a candidate, admissible when the digit
+       path covers it (b <= 50) or a vectorized conversion is
+       instantiated. The score carries measured per-prime-count
+       weights on top of the butterfly-and-conversion estimate:
+       raced over the admissible geometries of six
+       Schoenhage-Strassen ring sizes from 47104 to 2752512, per-unit
+       costs sit at 0.80-0.93 for np <= 7 with a small two-prime
+       credit, while np = 8 cliffs to 1.08-1.28 (its seven-word crt
+       chains); the weights below reproduce the measured winner at
+       every size raced, including the two-prime b = 42 geometry
+       (16% over the previous choice) and the escape from the np = 8
+       tops of the m-octaves (up to 37%). */
+    static const slong npw[9] = { 0, 0, 13, 14, 14, 14, 14, 14, 19 };
+    slong m, bestm = 0;
     double bestc = 0.0;
 
-    for (ii = 0; ii < (slong) (sizeof(bs) / sizeof(bs[0])); ii++)
+    for (m = 16; m <= N / 20; m *= 2)
     {
-        slong b = bs[ii], m, depth, np;
+        slong b, depth, np;
         double cost;
 
-        if (N % b != 0)
+        if (N % m != 0)
             continue;
-        m = N / b;
-        if (m < 16 || (m & (m - 1)) != 0)
+        b = N / m;
+        if (b < 20 || b > 200)
             continue;
         depth = FLINT_BIT_COUNT(m) - 1;
         np = sd_fft_mpn_mulmod_2expp1_choose_np(R, b, depth);
         if (np < 0)
             continue;
-        cost = (double) np * (double) m
+        cost = (double) npw[np] * (double) np * (double) m
                * ((double) depth + 4.0 + (double) b / 16.0);
         if (bestm == 0 || cost < bestc)
         {
@@ -267,85 +283,100 @@ digits_of_d(double * dig, nn_srcptr x, slong n, slong b,
 
 /* z = x*y mod 2^N+1; x, y in [0, 2^N] (top limb 0 or the value 2^N),
    all n = N/64 limbs + 1 top limb; z likewise */
-void
-sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_srcptr x,
-            nn_srcptr y, sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
+/* transform one operand (n limbs plus a 0/1 top limb) into np data
+   blocks of dsz doubles: input pass, twist by w^i, forward transform.
+   The result depends only on the operand and the context and may be
+   cached across sd_fft_mpn_mulmod_2expp1_mul_cached calls. */
+static void
+_mulmod_2expp1_transform_op(const sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
+            double * F, nn_srcptr x,
+            sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
 {
     slong m = C->m, b = C->b, n = C->N / 64, np = C->np;
-
-        slong dsz = (slong) sd_fft_ctx_data_size(C->depth);
-    double * abuf = S->buf, * bbuf = S->buf + np * dsz;
+    slong dsz = C->dsz;
     ulong bits = (ulong) b;
+
     if (b > 50)
     {
-        /* the templated wide-field input pass for the instantiated
-           (np, bits) pairs; two_pow table by vector-group count */
         ulong stop_easy = n_min((ulong) m, (FLINT_BITS*(ulong)n - 33)/bits);
-        /* easy-pass alignment contract of the templated input
-           passes: 4, 8 or 16 coefficients per unrolled iteration
-           for bits divisible by 8, 4 or 2 respectively */
-        stop_easy &= -(ulong) (bits % 8 == 0 ? 4 : bits % 4 == 0 ? 8
-                                                                 : 16);
+        stop_easy &= -(ulong) (bits % 8 == 0 ? 4 : bits % 4 == 0 ? 8 : 16);
         ulong stop_hard = n_min((ulong) m,
                                 (FLINT_BITS*(ulong)n + bits - 1)/bits);
         const vec4d * tp = C->R->vec_two_pow_tab[(np + 3)/4 - 1];
         to_ffts_func tf = _mpn_ctx_to_ffts_func((ulong) np, bits);
-        FLINT_ASSERT(tf != NULL);   /* guaranteed by ctx_init */
-        tf(C->R->ffts, abuf, dsz, x, n, (ulong) m, tp,
-           0, stop_easy, stop_easy, stop_hard);
-        tf(C->R->ffts, bbuf, dsz, y, n, (ulong) m, tp,
+        FLINT_ASSERT(tf != NULL);
+        tf(C->R->ffts, F, dsz, x, n, (ulong) m, tp,
            0, stop_easy, stop_easy, stop_hard);
     }
     else
     {
-        /* fields fit doubles: the vectorized extraction, shared
-           across primes, twist folded in below */
         digits_of_d(S->digs, x, n, b, m);
         S->digs[0] -= (double)(x[n] != 0);
-        digits_of_d(S->digs + m, y, n, b, m);
-        S->digs[m] -= (double)(y[n] != 0);
     }
+
     for (slong k = 0; k < np; k++)
     {
         sd_fft_ctx_struct * Q = C->R->ffts + k;
-        double * X = abuf + k * dsz, * Y = bbuf + k * dsz;
+        double * X = F + k * dsz;
         vec1d pd = Q->p, pinv = Q->pinv;
+        vec8d n8 = vec8d_set_d(pd), ninv8 = vec8d_set_d(pinv);
+
+        if (b > 50)
         {
-            vec8d n8 = vec8d_set_d(pd), ninv8 = vec8d_set_d(pinv);
-            if (b > 50)
+            if (x[n]) X[0] -= 1.0;
+            for (slong i = 0; i + 8 <= m; i += 8)
             {
-                /* wide fields arrived per prime; top bit folds as
-                   -1 into digit zero */
-                if (x[n]) X[0] -= 1.0;
-                if (y[n]) Y[0] -= 1.0;
-                for (slong i = 0; i + 8 <= m; i += 8)
-                {
-                    vec8d tw8 = vec8d_load(C->tw[k] + i);
-                    vec8d_store(X + i,
-                        vec8d_mulmod(vec8d_load(X + i), tw8,
-                                     n8, ninv8));
-                    vec8d_store(Y + i,
-                        vec8d_mulmod(vec8d_load(Y + i), tw8,
-                                     n8, ninv8));
-                }
+                vec8d tw8 = vec8d_load(C->tw[k] + i);
+                vec8d_store(X + i,
+                    vec8d_mulmod(vec8d_load(X + i), tw8, n8, ninv8));
             }
-            else
+        }
+        else
+        {
+            const double * dx = S->digs;
+            for (slong i = 0; i + 8 <= m; i += 8)
             {
-                const double * dx = S->digs, * dy = S->digs + m;
-                for (slong i = 0; i + 8 <= m; i += 8)
-                {
-                    vec8d tw8 = vec8d_load(C->tw[k] + i);
-                    vec8d_store(X + i,
-                        vec8d_mulmod(vec8d_load(dx + i), tw8,
-                                     n8, ninv8));
-                    vec8d_store(Y + i,
-                        vec8d_mulmod(vec8d_load(dy + i), tw8,
-                                     n8, ninv8));
-                }
+                vec8d tw8 = vec8d_load(C->tw[k] + i);
+                vec8d_store(X + i,
+                    vec8d_mulmod(vec8d_load(dx + i), tw8, n8, ninv8));
             }
         }
         sd_fft_trunc(Q, X, C->depth, m, m);
-        sd_fft_trunc(Q, Y, C->depth, m, m);
+    }
+}
+
+slong
+sd_fft_mpn_mulmod_2expp1_transformed_size(
+            const sd_fft_mpn_mulmod_2expp1_ctx_struct * C)
+{
+    return C->np * C->dsz;
+}
+
+void
+sd_fft_mpn_mulmod_2expp1_transform(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
+            double * F, nn_srcptr y,
+            sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
+{
+    _mulmod_2expp1_transform_op(C, F, y, S);
+}
+
+void
+sd_fft_mpn_mulmod_2expp1_mul_cached(sd_fft_mpn_mulmod_2expp1_ctx_struct * C,
+            nn_ptr z, nn_srcptr x, const double * F,
+            sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
+{
+    slong m = C->m, n = C->N / 64, np = C->np;
+    slong dsz = C->dsz;
+    double * abuf = S->buf;
+
+    _mulmod_2expp1_transform_op(C, abuf, x, S);
+
+    for (slong k = 0; k < np; k++)
+    {
+        sd_fft_ctx_struct * Q = C->R->ffts + k;
+        double * X = abuf + k * dsz;
+        const double * Y = F + k * dsz;
+        vec1d pd = Q->p, pinv = Q->pinv;
         {
             vec8d n8 = vec8d_set_d(pd), ninv8 = vec8d_set_d(pinv);
             for (slong i = 0; i + 8 <= m; i += 8)
@@ -375,20 +406,32 @@ sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_s
             }
         }
     }
+
     {
         nn_ptr w = S->w;
         slong ncoef = (slong) C->R->crts[np - 1].coeff_len;
         ulong E0 = 0;
         ulong E1 = (((ulong) C->whi >= (ulong) ncoef + 1)
                     ? (ulong) C->whi - ((ulong) ncoef + 1) : UWORD(0))
-                   * FLINT_BITS / (ulong) b;
+                   * FLINT_BITS / (ulong) C->b;
         E1 &= -(ulong) BLK_SZ;
         if (E1 > (ulong) m) E1 = (ulong) m & -(ulong) BLK_SZ;
         /* from_ffts zeroes its own window */
+        if (np == 2)
+        {
+            /* no vectorized from_ffts instance exists for two primes;
+               the shared Garner recomposition serves, on the plain
+               residues of the cofactor-free untwist */
+            _fft_small_np2_crt_recompose(C->R, w, 0, (ulong) C->whi,
+                abuf, abuf + dsz, (ulong) m, (ulong) m, (ulong) C->b,
+                UWORD_MAX);
+            (void) E0; (void) E1;
+        }
+        else
         {
             /* CRT recomposition via mpn_mul.c instances */
             _mpn_ctx_from_ffts_func((ulong) np)(w, 0, (ulong) C->whi, 0, (ulong) m,
-                C->R->ffts, abuf, dsz, C->R->crts, (ulong) b,
+                C->R->ffts, abuf, dsz, C->R->crts, (ulong) C->b,
                 E0, E1, NULL, NULL);
         }
         mpn_sub_n(w, w, C->biaspoly, C->whi);
@@ -442,6 +485,16 @@ sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_s
                          || (z[n] == 1 && flint_mpn_zero_p(z, n)));
         }
     }
+}
+
+void
+sd_fft_mpn_mulmod_2expp1(sd_fft_mpn_mulmod_2expp1_ctx_struct * C, nn_ptr z, nn_srcptr x,
+            nn_srcptr y, sd_fft_mpn_mulmod_2expp1_scratch_struct * S)
+{
+    double * bbuf = S->buf + C->np * C->dsz;
+
+    _mulmod_2expp1_transform_op(C, bbuf, y, S);
+    sd_fft_mpn_mulmod_2expp1_mul_cached(C, z, x, bbuf, S);
 }
 
 /* per-thread mutable state for sd_fft_mpn_mulmod_2expp1; the context itself is

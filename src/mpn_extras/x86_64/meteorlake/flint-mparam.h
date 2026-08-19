@@ -15,8 +15,8 @@
 #define FLINT_MPARAM_H
 
 /* TODO these were taken directly from skylake flint-mparam.h  ----> */
-#define FLINT_FFT_SMALL_MUL_THRESHOLD           1540
-#define FLINT_FFT_SMALL_SQR_THRESHOLD           3080
+#define FLINT_FFT_SMALL_MUL_THRESHOLD           500
+#define FLINT_FFT_SMALL_SQR_THRESHOLD           500
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000
@@ -34,5 +34,9 @@
 #define FLINT_PREINVERT_LIMB_USE_NATIVE 1
 
 #define FLINT_MULMOD_SHOUP_THRESHOLD 0
+
+#define FLINT_MPN_MULHIGH_FFT_SMALL_CUTOFF 500
+
+#define FLINT_MPN_SQRHIGH_FFT_SMALL_CUTOFF 580
 
 #endif

@@ -61,7 +61,7 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
         else
             len_bound = K << inflate;
 
-        if (!fft_small_plan_init_mpn(P, R, an, bn, len_bound))
+        if (!fft_small_plan_init_mpn(P, R, an, bn, len_bound, 0))
         {
             continue;
         }
@@ -146,6 +146,29 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
             FLINT_ASSERT(i == 0);
         }
 
+        /* the powm pipeline relies on truncated exports being exact
+           mod 2^(FLINT_BITS*zn'), i.e. mullow semantics */
+        {
+            ulong zn2 = 1 + n_randint(state, zn - 1);
+            flint_mpn_rrandom(t, state, zn);
+            /* exports are destructive: rebuild Z's product for the
+               truncated export */
+            fft_small_fft_mpn(A, a + (K-1)*an, an, P);
+            fft_small_fft_mpn(B, b + (K-1)*bn, bn, P);
+            fft_small_op_mul(Z, A, B, P);
+            for (k = 0; k + 1 < (slong) K; k++)
+            {
+                fft_small_fft_mpn(A, a + k*an, an, P);
+                fft_small_fft_mpn(B, b + k*bn, bn, P);
+                fft_small_op_addmul(Z, A, B, P);
+            }
+            fft_small_ifft(Z, P);
+            fft_small_export_mpn(t, zn2, Z, P);
+            if (mpn_cmp(t, ref, zn2) != 0)
+                TEST_FUNCTION_FAIL("truncated export: an = %wu, bn = %wu, "
+                                   "zn2 = %wu\n", an, bn, zn2);
+        }
+
         for (i = 0; i < zn; i++)
         {
             if (z[i] != ref[i])
@@ -161,6 +184,59 @@ TEST_FUNCTION_START(fft_small_op_mpn, state)
                         use_sqr, use_sub,
                         z[i], ref[i]);
             }
+        }
+
+        /* the two-prime plan must agree with a single product
+           (the accumulated reference above uses K operands) */
+        {
+            fft_small_plan_t P2;
+            fft_small_op_t A2, B2;
+            nn_ptr z3 = FLINT_ARRAY_ALLOC(zn + 3, ulong);
+            nn_ptr r3 = FLINT_ARRAY_ALLOC(zn, ulong);
+
+            /* len_bound 2: the signed export below needs slot values
+               in the centered range, one spare factor of two against
+               the unsigned exactness bound */
+            if (fft_small_plan_init_mpn_np(P2, R, an, bn, 1, 1, 2))
+            {
+                fft_small_op_init(A2, P2);
+                fft_small_op_init(B2, P2);
+                fft_small_fft_mpn(A2, a, an, P2);
+                fft_small_fft_mpn(B2, b, bn, P2);
+                fft_small_op_mul(A2, A2, B2, P2);
+                fft_small_ifft(A2, P2);
+                fft_small_export_mpn(z3, zn, A2, P2);
+                if (an >= bn)
+                    mpn_mul(r3, a, an, b, bn);
+                else
+                    mpn_mul(r3, b, bn, a, an);
+                if (mpn_cmp(z3, r3, zn) != 0)
+                    TEST_FUNCTION_FAIL("np2 plan: an = %wd, bn = %wd, "
+                                       "zn = %wd\n", an, bn, zn);
+                /* the signed export must agree on the same product;
+                   the window must contain the value top plus the
+                   slot slack per the export's precondition. Exports
+                   are destructive, so rebuild the product first. */
+                {
+                    int esign = -1;
+                    fft_small_fft_mpn(A2, a, an, P2);
+                    fft_small_fft_mpn(B2, b, bn, P2);
+                    fft_small_op_mul(A2, A2, B2, P2);
+                    fft_small_ifft(A2, P2);
+                    fft_small_export_mpn_signed(z3, zn + 3, &esign, A2,
+                        n_cdiv(FLINT_BITS * an, P2->bits)
+                        + n_cdiv(FLINT_BITS * bn, P2->bits) - 1, P2);
+                    if (esign != 0 || mpn_cmp(z3, r3, zn) != 0
+                        || z3[zn] || z3[zn + 1] || z3[zn + 2])
+                        TEST_FUNCTION_FAIL("np2 signed: an = %wd, "
+                                           "bn = %wd\n", an, bn);
+                }
+                fft_small_op_clear(A2);
+                fft_small_op_clear(B2);
+                fft_small_plan_clear(P2);
+            }
+            flint_free(z3);
+            flint_free(r3);
         }
 
         fft_small_op_clear(A);
