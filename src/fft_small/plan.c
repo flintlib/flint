@@ -447,7 +447,6 @@ int fft_small_plan_init_mpn(fft_small_plan_t P, mpn_ctx_t R,
     ulong len_bound_with_sign = is_signed ? 2 * len_bound : len_bound;
 
     if (len_bound <= 2
-        && FLINT_MIN(an_max, bn_max) >= FLINT_MPN_MUL_NP2_MIN_BN
         && FLINT_MAX(an_max, bn_max) <= FLINT_MPN_MUL_NP2_MAX_AN
         && _plan_init_mpn_np2(P, R, an_max, bn_max, len_bound_with_sign))
         return 1;

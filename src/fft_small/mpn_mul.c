@@ -1202,10 +1202,16 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
         umul_ppmm(hi, lo, p1, p2);
         R->np2_prodbits = 64 + FLINT_BIT_COUNT(hi) - 1;
         (void) lo;
-        for (d = 0; d < 32; d++)
+
+        nmod_t mod1, mod2;
+        nmod_init(&mod1, p1);
+        nmod_init(&mod2, p2);
+        R->np2_s1[0] = 1;
+        R->np2_s2[0] = 1;
+        for (d = 1; d < 32; d++)
         {
-            R->np2_s1[d] = n_invmod(n_powmod2(2, d, p1), p1);
-            R->np2_s2[d] = n_invmod(n_powmod2(2, d, p2), p2);
+            R->np2_s1[d] = nmod_mul(R->np2_s1[d - 1], (p1 + 1) / 2, mod1);
+            R->np2_s2[d] = nmod_mul(R->np2_s2[d - 1], (p2 + 1) / 2, mod2);
         }
     }
 
@@ -1639,8 +1645,7 @@ void _mpn_ctx_mpn_mul_range(mpn_ctx_t R, ulong* z, ulong lo, ulong hi,
         hi = zn;
     }
 
-    if (FLINT_MIN(an, bn) >= FLINT_MPN_MUL_NP2_MIN_BN
-        && FLINT_MAX(an, bn) <= FLINT_MPN_MUL_NP2_MAX_AN)
+    if (FLINT_MAX(an, bn) <= FLINT_MPN_MUL_NP2_MAX_AN)
     {
         if (an >= bn)
             _mpn_ctx_mpn_mul_window_np2(R, z, lo, hi, a, an, b, bn);

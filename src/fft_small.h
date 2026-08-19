@@ -431,18 +431,11 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
 void * mpn_ctx_fit_buffer_reserve(mpn_ctx_t R, ulong head, ulong tail);
 void mpn_ctx_fit_buffer_release(mpn_ctx_t R);
 void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong* z, const ulong* a, ulong an, const ulong* b, ulong bn);
-/* Size range in which the two-prime pipeline is preferred: it beats
-   the wide pipeline at every measured size from 16 limbs (where the
-   wide conversions cost 2.2x while the two-prime transforms sit on
-   their depth-8 padding floor) through 12000; the lower bound is 1
-   since nothing below 16 changes structurally and the test suite
-   covers single-limb operands, and the upper bound is measured (no
-   crossover back to the wide geometry was found up to 12000, with
-   the exactness bound enforcing its own independent limit). These
-   are the single home for the constants used by the multiplication
-   dispatch, the range dispatch and the plan gate. */
-#define FLINT_MPN_MUL_NP2_MIN_BN 1
-#define FLINT_MPN_MUL_NP2_MAX_AN 12000
+
+/* The two-prime version is preferred below this threshold.
+   Note: this is accurate for high products on Zen 3; it could be doubled
+   for full products. */
+#define FLINT_MPN_MUL_NP2_MAX_AN 40000
 
 /* two-prime pipeline for the Toom boundary; an >= bn >= 1 */
 void _mpn_ctx_mpn_mul_np2(mpn_ctx_t R, nn_ptr z, nn_srcptr a, ulong an,
