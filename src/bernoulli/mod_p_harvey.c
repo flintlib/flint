@@ -519,6 +519,50 @@ static ulong PrepRedc(ulong n)
    (See bernsum_pow2() for code comments; we only add comments here where
    something is different from bernsum_pow2())
 */
+/* Accumulate x into the NUM_TABLES table slots selected by the digits of y.
+   Factored out of the phase 1 loop body so that several scatters can be
+   issued between consecutive REDC steps. */
+#if NUM_TABLES != 8 && NUM_TABLES != 4
+#define BERNSUM_SCATTER(yy, xx) \
+    do { \
+        ulong _y = (yy), _x = (xx); \
+        slong _h; \
+        for (_h = 0; _h < NUM_TABLES; _h++) \
+        { \
+            tables[_h][_y & TABLE_MASK] += _x; \
+            _y >>= TABLE_LG_SIZE; \
+        } \
+    } while (0)
+#elif NUM_TABLES == 8
+#define BERNSUM_SCATTER(yy, xx) \
+    do { \
+        ulong _y = (yy), _x = (xx); \
+        tables[0][ _y                       & TABLE_MASK] += _x; \
+        tables[1][(_y >>    TABLE_LG_SIZE ) & TABLE_MASK] += _x; \
+        tables[2][(_y >> (2*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+        tables[3][(_y >> (3*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+        tables[4][(_y >> (4*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+        tables[5][(_y >> (5*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+        tables[6][(_y >> (6*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+        tables[7][(_y >> (7*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+    } while (0)
+#else
+#define BERNSUM_SCATTER(yy, xx) \
+    do { \
+        ulong _y = (yy), _x = (xx); \
+        tables[0][ _y                       & TABLE_MASK] += _x; \
+        tables[1][(_y >>    TABLE_LG_SIZE ) & TABLE_MASK] += _x; \
+        tables[2][(_y >> (2*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+        tables[3][(_y >> (3*TABLE_LG_SIZE)) & TABLE_MASK] += _x; \
+    } while (0)
+#endif
+
+/* Number of independent x-chains run in parallel through the phase 1 loop.
+   The loop-carried RedcFast() chain is ~9 cycles deep, while the table
+   updates it overlaps with only need ~6 cycles, so the single-chain loop is
+   latency bound. */
+#define BERNSUM_CHAINS 4
+
 static ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
 {
     ulong pinv2 = PrepRedc(p);
@@ -532,12 +576,14 @@ static ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
     ulong g_to_km1;
     ulong two_to_km1;
     ulong B_to_km1;
+    ulong B_to_km1_pow;
     ulong s_jump;
 
     ulong g_redc;
     ulong g_to_km1_redc;
     ulong two_to_km1_redc;
     ulong B_to_km1_redc;
+    ulong B_to_km1_pow_redc;
     ulong s_jump_redc;
 
     ulong g_to_km1_to_i;
@@ -567,6 +613,10 @@ static ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
     two_to_km1_redc = n_mulmod2_preinv(two_to_km1, F, p, pinv);
     B_to_km1_redc = n_mulmod2_preinv(B_to_km1, F, p, pinv);
     s_jump_redc = n_mulmod2_preinv(s_jump, F, p, pinv);
+
+    /* B^BERNSUM_CHAINS, the step for each of the interleaved chains */
+    B_to_km1_pow = n_powmod2_preinv(B_to_km1, BERNSUM_CHAINS, p, pinv);
+    B_to_km1_pow_redc = n_mulmod2_preinv(B_to_km1_pow, F, p, pinv);
 
     g_to_km1_to_i = 1;    /* always in [0, 2p)  */
     g_to_i = 1;           /* always in [0, 2p)  */
@@ -611,36 +661,42 @@ static ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
             expander_expand(s_over_p, &expander, s, words);
             next = s_over_p + words;
 
+            /* Run BERNSUM_CHAINS independent x-chains so that the table
+               updates of one chain can be retired while the REDC of the
+               next is still in flight.  Chain c handles the words at
+               offsets c, c + CHAINS, c + 2*CHAINS, ... and steps by
+               B^CHAINS; the multiset of (slot, addend) pairs written to
+               the tables is therefore exactly the same as before. */
+            if (bits >= BERNSUM_CHAINS * FLINT_BITS)
+            {
+                ulong xc[BERNSUM_CHAINS];
+                slong c;
+
+                xc[0] = x;
+                for (c = 1; c < BERNSUM_CHAINS; c++)
+                    xc[c] = RedcFast(xc[c - 1] * B_to_km1_redc, p, pinv2);
+
+                for (; bits >= BERNSUM_CHAINS * FLINT_BITS;
+                       bits -= BERNSUM_CHAINS * FLINT_BITS,
+                       next -= BERNSUM_CHAINS)
+                {
+                    /* note: we add the values into tables *without*
+                       reduction mod p */
+                    for (c = 0; c < BERNSUM_CHAINS; c++)
+                        BERNSUM_SCATTER(next[-c], xc[c]);
+
+                    for (c = 0; c < BERNSUM_CHAINS; c++)
+                        xc[c] = RedcFast(xc[c] * B_to_km1_pow_redc, p, pinv2);
+                }
+
+                x = xc[0];
+            }
+
             for (; bits >= FLINT_BITS; bits -= FLINT_BITS, next--)
             {
                 y = *next;
 
-#if DEBUG
-                printf("i = %lu  nn = %lu  words = %lu  bits = %lu  y = %lu\n", i, nn, words, bits, y);
-#endif
-
-                /* note: we add the values into tables *without* reduction mod p */
-
-#if NUM_TABLES != 8 && NUM_TABLES != 4
-                /* generic version */
-                for (h = 0; h < NUM_TABLES; h++)
-                {
-                    tables[h][y & TABLE_MASK] += x;
-                    y >>= TABLE_LG_SIZE;
-                }
-#else
-                /* unrolled versions for 32-bit/64-bit machines */
-                tables[0][ y                       & TABLE_MASK] += x;
-                tables[1][(y >>    TABLE_LG_SIZE ) & TABLE_MASK] += x;
-                tables[2][(y >> (2*TABLE_LG_SIZE)) & TABLE_MASK] += x;
-                tables[3][(y >> (3*TABLE_LG_SIZE)) & TABLE_MASK] += x;
-#if NUM_TABLES == 8
-                tables[4][(y >> (4*TABLE_LG_SIZE)) & TABLE_MASK] += x;
-                tables[5][(y >> (5*TABLE_LG_SIZE)) & TABLE_MASK] += x;
-                tables[6][(y >> (6*TABLE_LG_SIZE)) & TABLE_MASK] += x;
-                tables[7][(y >> (7*TABLE_LG_SIZE)) & TABLE_MASK] += x;
-#endif
-#endif
+                BERNSUM_SCATTER(y, x);
 
                 x = RedcFast(x * B_to_km1_redc, p, pinv2);
             }
