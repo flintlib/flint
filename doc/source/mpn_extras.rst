@@ -486,7 +486,9 @@ Montgomery reduction and modular exponentiation
     from :func:`flint_mpn_mulhigh_n`, whose rounding is resolved in
     constant time by comparing the returned guard limb against the top
     limb of the exactly known low half `B^n - X_{lo}`; see the source
-    for the argument and [KimZim2024]_ for sharper error bounds.
+    for the argument, [Mul2000]_ and [HanZim2004b]_ for the analysis
+    of short products, and [DEGR2024]_ for truncated multiplication
+    in the Montgomery setting.
 
 .. function:: void flint_mpn_powm_preinvn(nn_ptr r, nn_srcptr b, nn_srcptr e, mp_size_t en, nn_srcptr m, mp_size_t mn, nn_srcptr dinv, flint_bitcnt_t norm)
 
