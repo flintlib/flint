@@ -101,6 +101,8 @@ References
 
 .. [DYF1999] \A. Dzieciol, S. Yngve and P. O. Fröman, "Coulomb wave functions with complex values of the variable and the parameters", J. Math. Phys. 40, 6145 (1999), https://doi.org/10.1063/1.533083
 
+.. [DEGR2024] \L.-S. Didier, N. El Mrabet, L. Glandus and J.-M. Robert, "Truncated multiplication and batch software SIMD AVX512 implementation for faster Montgomery multiplications and modular exponentiation". IACR Communications in Cryptology, Vol. 1, No. 3 (2024). https://doi.org/10.62056/a3txl86bm
+
 .. [DelegliseNicolasZimmermann2009] \Deleglise, Marc and Niclas, Jean-Louis and Zimmermann, Paul : Landau's function for one million billions, J. Théor. Nombres Bordeaux 20:3 (2009) 625--671
 
 .. [DomKanTro1987] \Domich, P. D. and Kannan, R. and Trotter, L. E. Jr. : Hermite Normal Form Computation Using Modulo Determinant Arithmetic, Math. Operations Res. (12) 1987 50-59
@@ -158,6 +160,8 @@ References
 .. [HZ2004] \G. Hanrot and P. Zimmermann, "Newton Iteration Revisited" (2004), http://www.loria.fr/~zimmerma/papers/fastnewton.ps.gz
 
 .. [HanZim2004] \Guillaume Hanrot and Paul Zimmermann : Newton Iteration Revisited (2004) https://www.loria.fr/~zimmerma/papers/fastnewton.ps.gz
+
+.. [HanZim2004b] \G. Hanrot and P. Zimmermann, "A long note on Mulders' short product". Journal of Symbolic Computation, Vol. 37, No. 3 (2004), pp. 391-401. https://doi.org/10.1016/j.jsc.2003.03.001 (corrigendum: Vol. 66 (2015), pp. 111-112)
 
 .. [Har2010] \D. Harvey,  "A multimodular algorithm for computing Bernoulli numbers" (2010), Mathematics of Computation 79.272: 2361-2370
 
@@ -369,14 +373,14 @@ References
 
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 
-All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [Arn2012]_, [ArnoldMonagan2011]_,
+All referenced works: [DEGR2024]_, [HanZim2004b]_, [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [Arn2012]_, [ArnoldMonagan2011]_,
 [BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BCOSSS2007]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_,
 [Bin1996]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bol1887]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_,
 [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_,
 [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_,
 [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2025]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_,
 [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [Gly2010]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_,
-[HanZim2004]_, [Har2010]_, [HZ2011]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_,
+[HanZim2004]_, [HanZim2004b]_, [Har2010]_, [HZ2011]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_,
 [Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_,
 [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_,
 [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_,

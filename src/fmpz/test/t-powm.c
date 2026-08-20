@@ -25,6 +25,7 @@ TEST_FUNCTION_START(fmpz_powm, state)
         mpz_t d, e, f, m;
         fmpz_t x;
         mpz_t y;
+        slong mbits, ebits;
         int aliasing;
 
         fmpz_init(a);
@@ -38,13 +39,16 @@ TEST_FUNCTION_START(fmpz_powm, state)
         mpz_init(m);
         mpz_init(y);
 
-        fmpz_randtest(a, state, 200);
-        fmpz_randtest_not_zero(c, state, 200);
+        mbits = n_randint(state, 1000) ? 200 : 20000;
+        ebits = n_randint(state, 10) ? 20 : 200;
+
+        fmpz_randtest(a, state, mbits);
+        fmpz_randtest_not_zero(c, state, mbits);
         fmpz_abs(c, c);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(m, c);
-        fmpz_randtest_unsigned(x, state, 20);
+        fmpz_randtest_unsigned(x, state, ebits);
         fmpz_get_mpz(y, x);
 
         aliasing = n_randint(state, 5);
