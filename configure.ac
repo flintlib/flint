@@ -1219,7 +1219,7 @@ if test "$enable_lto" = "yes";
 then AC_SUBST(WANT_LTO,1)
 else AC_SUBST(WANT_LTO,0) fi
 
-if test "$ac_abs_confdir" = "`pwd`";
+if test "`cd "$ac_abs_confdir" && pwd -P`" = "`pwd -P`";
 then AC_SUBST(IS_OUT_OF_TREE,0)
 else AC_SUBST(IS_OUT_OF_TREE,1) fi
 
