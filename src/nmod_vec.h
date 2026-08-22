@@ -46,7 +46,6 @@ void _nmod_vec_clear(nn_ptr vec)
 }
 
 void _nmod_vec_randtest(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod);
-
 void _nmod_vec_rand(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 
 NMOD_VEC_INLINE

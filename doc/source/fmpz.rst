@@ -266,6 +266,11 @@ should call :func:`flint_rand_clear` to clean up.
 
     Generates a random integer in the range `0` to `m - 1` inclusive.
 
+.. function:: void fmpz_randm_not_zero(fmpz_t f, flint_rand_t state, const fmpz_t m)
+
+    Generates a random integer in the range `1` to `m - 1` inclusive. Requires
+    `m \geq 2`, otherwise an exception is thrown.
+
 .. function:: void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
     Generates a random integer in the range `0` to `m - 1` inclusive, with an

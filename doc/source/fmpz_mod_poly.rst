@@ -218,6 +218,18 @@ Randomisation
     set to a random monic irreducible polynomial.
 
 
+.. function:: void fmpz_mod_poly_rand(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Generates a random polynomial with length up to `len`, with uniformly chosen coefficients.
+
+.. function:: void fmpz_mod_poly_rand_monic(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Generates a random monic polynomial with length `len`, with uniformly chosen coefficients.
+
+.. function:: void fmpz_mod_poly_rand_irreducible(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx)
+
+    Generates a random irreducible polynomial with up to the given length and where the coefficients
+    are generated uniformly.
 
 Attributes
 --------------------------------------------------------------------------------

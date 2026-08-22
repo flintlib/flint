@@ -141,6 +141,7 @@ void nmod_poly_mat_one(nmod_poly_mat_t mat);
 
 /* Random matrices ***********************************************************/
 
+void nmod_poly_mat_rand(nmod_poly_mat_t A, flint_rand_t state, slong len);
 void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state,
                                 slong len);
 
