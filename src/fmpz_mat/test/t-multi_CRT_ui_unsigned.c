@@ -35,8 +35,9 @@ TEST_FUNCTION_START(fmpz_mat_multi_CRT_ui_unsigned, state)
         else
             bits = n_randint(state, 500) + 1;
 
-        primes = flint_malloc(bits * sizeof(ulong));
-        Amod = flint_malloc(bits * sizeof(nmod_mat_struct));
+        /* the number of primes can slightly exceed bits for tiny primes */
+        primes = flint_malloc((bits + 4) * sizeof(ulong));
+        Amod = flint_malloc((bits + 4) * sizeof(nmod_mat_struct));
 
         rows = n_randint(state, 10);
         cols = n_randint(state, 10);
@@ -47,6 +48,17 @@ TEST_FUNCTION_START(fmpz_mat_multi_CRT_ui_unsigned, state)
         fmpz_mat_init(C, rows, cols);
 
         fmpz_mat_randtest_unsigned(A, state, bits);
+
+        /* dense entries of full size */
+        if (n_randint(state, 2))
+        {
+            slong ii;
+            for (ii = 0; ii < rows * cols; ii++)
+            {
+                fmpz_randbits(A->entries + ii, state, bits);
+                fmpz_abs(A->entries + ii, A->entries + ii);
+            }
+        }
 
         fmpz_init(mod);
         num_primes = 0;

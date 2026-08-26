@@ -636,39 +636,24 @@ void fmpz_multi_mod_precomp(fmpz * outputs, const fmpz_multi_mod_t P, const fmpz
 
 /* multi mod/multi CRT ui ****************************************************/
 
-typedef struct {
-    nmod_t mod;
-    ulong i0, i1, i2;
-} crt_lut_entry;
+/*
+    fmpz_comb_t is a thin wrapper around flint_mpn_crt_t (see mpn_extras.h),
+    which does all the work with mpn arithmetic.
+*/
+
+struct flint_mpn_crt_struct;
 
 typedef struct {
-    nmod_t mod;
-    nmod_t mod0, mod1, mod2;
-} mod_lut_entry;
-
-typedef struct {
-    fmpz_multi_CRT_t crt_P;
-    fmpz_multi_mod_t mod_P;
-    ulong * packed_multipliers;
-    slong * step;
-    slong * crt_offsets;
-    slong crt_offsets_alloc;
-    slong * mod_offsets;
-    slong mod_offsets_alloc;
-    crt_lut_entry * crt_lu;
-    slong crt_lu_alloc;
-    slong crt_klen;
-    mod_lut_entry * mod_lu;
-    slong mod_lu_alloc;
-    slong mod_klen;
+    struct flint_mpn_crt_struct * crt;
     slong num_primes;
+    nn_ptr primes;
 } fmpz_comb_struct;
 
 typedef fmpz_comb_struct fmpz_comb_t[1];
 
 typedef struct {
-    slong Alen, Tlen;
-    fmpz * A, * T;
+    nn_ptr tmp;     /* workspace for flint_mpn_multi_mod / flint_mpn_multi_crt */
+    nn_ptr out;     /* prod_len limbs for the CRT output */
 } fmpz_comb_temp_struct;
 
 typedef fmpz_comb_temp_struct fmpz_comb_temp_t[1];
@@ -676,11 +661,20 @@ typedef fmpz_comb_temp_struct fmpz_comb_temp_t[1];
 void fmpz_comb_temp_init(fmpz_comb_temp_t CT, const fmpz_comb_t C);
 void fmpz_comb_temp_clear(fmpz_comb_temp_t CT);
 
+/* same values as FLINT_MPN_CRT_MOD, FLINT_MPN_CRT_CRT */
+#define FMPZ_COMB_MOD 1
+#define FMPZ_COMB_CRT 2
+
 void fmpz_comb_init(fmpz_comb_t C, nn_srcptr primes, slong num_primes);
+void fmpz_comb_init2(fmpz_comb_t C, nn_srcptr primes, slong num_primes, int flags);
 void fmpz_comb_clear(fmpz_comb_t C);
 
 void fmpz_multi_mod_ui(ulong * out, const fmpz_t in, const fmpz_comb_t C, fmpz_comb_temp_t CT);
 void fmpz_multi_CRT_ui(fmpz_t output, nn_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
+
+/* one-shot versions (no comb) */
+void fmpz_multi_mod_ui_once(ulong * out, const fmpz_t in, nn_srcptr primes, slong num_primes);
+void fmpz_multi_CRT_ui_once(fmpz_t output, fmpz_t prod, nn_srcptr residues, nn_srcptr primes, slong num_primes, int sign);
 
 /*****************************************************************************/
 

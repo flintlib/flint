@@ -16,8 +16,6 @@
 /* For FMPZ_MAT_CRT_MIN_WORK_PER_THREAD */
 #include "fmpz_mat.h"
 
-/* To do: implement optimizations currently used in the fmpz_mat version */
-
 typedef struct
 {
     fmpz *res;
@@ -81,7 +79,7 @@ void _fmpz_vec_multi_CRT_ui(fmpz * res, nn_srcptr * residues, slong len,
         thread_limit = FLINT_MIN(thread_limit, flint_get_num_threads());
 
     fmpz_comb_t comb;
-    fmpz_comb_init(comb, primes, num_primes);
+    fmpz_comb_init2(comb, primes, num_primes, FMPZ_COMB_CRT);
 
     if (thread_limit <= 1)
     {

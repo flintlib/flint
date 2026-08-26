@@ -623,3 +623,152 @@ between output and input arrays.
 
     Sizes in limbs from which the general functions use the transformed
     path. Machine dependent; writable for tuning.
+
+Multimodular reduction and Chinese remaindering
+--------------------------------------------------------------------------------
+
+The following functions perform simultaneous reduction of a multiprecision
+integer modulo a fixed list of single-limb moduli (multi mod) and the
+inverse reconstruction (multi CRT). All the work is done with
+mpn arithmetic and precomputed data stored in a :type:`flint_mpn_crt_t`.
+The :type:`fmpz_comb_t` in the ``fmpz`` module is a thin wrapper around
+this structure.
+
+The moduli must be nonzero and (for Chinese remaindering) pairwise
+coprime, but need not be prime.
+
+.. type:: flint_mpn_crt_struct
+
+.. type:: flint_mpn_crt_t
+
+    Precomputed data for multi mod / multi CRT with respect to a list of
+    single-limb moduli `m_0, \ldots, m_{n-1}` with product `P`.
+
+    Internally, consecutive tiny moduli are batched into single-limb
+    products (leaves), which are grouped into chunks whose products are
+    the leaves of a balanced subproduct tree. Each level of the tree is
+    stored as a contiguously packed array, and each node above a
+    threshold is accompanied by a precomputed inverse for fast division.
+    Modular reduction descends the tree using :func:`flint_mpn_mod_preinvn`
+    and finishes with a basecase using dot products with precomputed powers
+    of `2^{\mathtt{FLINT\_BITS}}` modulo the leaves; Chinese remaindering
+    starts with a basecase using :func:`mpn_addmul_1` with precomputed
+    multipliers (with the fractional cofactors of the tree folded in),
+    ascends the tree without intermediate reductions, and performs a single
+    reduction modulo `P` at the end. Values that are much smaller than `P`
+    are detected early (by reconstructing modulo the product of the first
+    few moduli and verifying against all residues) and returned without
+    traversing the tree. When the whole product is small, the
+    fixed-length templates from ``crt_helpers.h`` are used.
+
+    Precomputation costs `O(M(N) \log N)` operations for `N` total bits,
+    using a remainder tree for the cofactors (no large modular inverses),
+    and `O(N \log N)` memory.
+
+    The following fields are public: ``num_primes``, ``primes``
+    (a copy of the moduli), ``prod`` and ``prod_len`` (the product `P` as an
+    mpn integer), and ``tmp_limbs`` (the size of the workspace required
+    by the conversion functions).
+
+.. macro:: FLINT_MPN_CRT_MOD
+           FLINT_MPN_CRT_CRT
+
+    Flags selecting the operations to precompute for.
+
+.. function:: void flint_mpn_crt_init(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes)
+              void flint_mpn_crt_init2(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes, int flags)
+
+    Initialises *C* for the given moduli. The version with *flags*
+    (a bitwise or of ``FLINT_MPN_CRT_MOD`` and ``FLINT_MPN_CRT_CRT``) only
+    performs the precomputations needed for the selected operations,
+    which saves time and memory when only one direction is needed;
+    :func:`flint_mpn_crt_init` selects both.
+    Throws an exception if the moduli are zero, or if Chinese
+    remaindering is selected and the moduli are not pairwise coprime.
+
+.. function:: void flint_mpn_crt_init_tuned(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes, int flags, slong crt_chunk_bits, slong mod_base_bits, slong preinv_cutoff)
+
+    Like :func:`flint_mpn_crt_init2`, but with explicit tuning parameters:
+    the approximate number of bits in a CRT basecase chunk, the number of
+    bits at which modular reduction switches to the basecase, and the
+    number of limbs above which precomputed inverses are used for
+    division. This is mainly intended for profiling.
+
+.. function:: void flint_mpn_crt_clear(flint_mpn_crt_t C)
+
+    Frees the memory allocated by *C*.
+
+.. function:: void flint_mpn_multi_mod(nn_ptr out, nn_srcptr x, slong xn, const flint_mpn_crt_t C, nn_ptr tmp)
+
+    Reduces the nonnegative integer `(x, xn)` modulo all the moduli,
+    writing the residues to ``out[0], ..., out[num_primes - 1]``.
+    The input may have any size, including zero limbs and non-normalised
+    top limbs. The workspace *tmp* must have space for ``C->tmp_limbs``
+    limbs; alternatively, *tmp* may be *NULL*, in which case the
+    workspace is allocated internally.
+
+.. function:: int flint_mpn_multi_crt(nn_ptr out, nn_srcptr res, const flint_mpn_crt_t C, int sign, nn_ptr tmp)
+
+    Reconstructs the integer `x` from the residues
+    ``res[0], ..., res[num_primes - 1]``, each of which must be reduced
+    modulo the corresponding modulus. The result is written as
+    ``C->prod_len`` limbs (zero padded) to *out*.
+
+    If *sign* is zero, the result is the unique `x` with `0 \le x < P`,
+    and the return value is zero.
+    If *sign* is nonzero, the result is the unique `x` with `-P < 2x \le P`;
+    its absolute value is written to *out* and the return value indicates
+    whether `x` is negative.
+
+    The workspace *tmp* is as for :func:`flint_mpn_multi_mod`.
+
+.. function:: void flint_mpn_multi_mod_vec(nn_ptr out, slong out_stride, nn_srcptr x, slong xn, slong len, const flint_mpn_crt_t C, nn_ptr tmp)
+              void flint_mpn_multi_crt_vec(nn_ptr out, slong out_stride, int * negative, nn_srcptr res, slong res_stride, slong len, const flint_mpn_crt_t C, int sign, nn_ptr tmp)
+
+    Vector versions. In the mod version, *x* is a packed array of *len*
+    nonnegative integers of *xn* limbs each and the residue of entry `i`
+    modulo modulus `l` is written to ``out[l * out_stride + i]``
+    (so *out_stride* must be at least *len*). In the CRT version, the
+    residue of entry `i` modulo modulus `l` is read from
+    ``res[l * res_stride + i]``, entry `i` of the output is written to
+    ``out + i * out_stride`` (with ``out_stride >= C->prod_len``), and if
+    *sign* is nonzero the sign flags are written to ``negative[i]``
+    (*negative* may be *NULL* when *sign* is zero).
+
+    These are equivalent to looping over the entries but faster when the
+    entries are small compared to the product, since the precomputed
+    tables are then traversed once per block of entries instead of once
+    per entry.
+
+.. function:: void flint_mpn_multi_mod_once(nn_ptr out, nn_srcptr x, slong xn, nn_srcptr primes, slong num_primes)
+              int flint_mpn_multi_crt_once(nn_ptr out, slong * outn, nn_ptr prod, nn_srcptr res, nn_srcptr primes, slong num_primes, int sign)
+
+    One-shot versions of :func:`flint_mpn_multi_mod` and
+    :func:`flint_mpn_multi_crt` which do not require a precomputed
+    structure. The mod version creates one internally (with mod-only
+    data). The CRT version instead traverses the subproduct tree depth
+    first, computing subproducts and cofactors on the fly and freeing
+    them as soon as possible, so that the memory usage is a small
+    constant multiple of the size of the product `P` rather than
+    `O(N \log N)`; this matters for very large reconstructions (e.g.
+    Bernoulli numbers with billions of bits). It is also somewhat faster
+    than initialising a full structure for a single use.
+    In the CRT version, *out* must have space
+    for *num_primes* limbs; the actual length of the product of the
+    moduli is written to *outn*, and if *prod* is not *NULL*, the product
+    itself is written there (*prod* must also have space for *num_primes*
+    limbs). The return value is as for :func:`flint_mpn_multi_crt`.
+
+    Large instances are parallelised over the nodes of the subproduct
+    tree (both in precomputation and in the conversions) when several
+    threads are available.
+
+.. function:: ulong flint_mpn_crt_mod_leaf(nn_srcptr a, slong an, const flint_mpn_crt_t C, slong j)
+
+    Reduces the nonnegative integer `(a, an)` modulo the `j`-th leaf
+    modulus of *C* (the product of one or more consecutive batched
+    moduli; leaf `j` is modulus `j` when all moduli exceed 32 bits).
+    Requires ``an <= C->mod_pow_limbs``. This exposes the basecase of
+    :func:`flint_mpn_multi_mod` and is useful with a single modulus, as
+    a faster replacement for :func:`mpn_mod_1` when many reductions with
+    the same modulus are needed.

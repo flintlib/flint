@@ -1171,6 +1171,211 @@ void flint_mpn_sqrhigh_n_complex(nn_ptr zr, int * zr_sgn, nn_ptr zi,
     int * zi_sgn, nn_srcptr ar, int ar_sgn, nn_srcptr ai, int ai_sgn,
     mp_size_t n);
 
+/* multi mod / multi CRT ******************************************************/
+
+#include "nmod_types.h"
+
+/*
+    Precomputed data for simultaneous reduction of a multiprecision
+    integer modulo a fixed list of single-limb moduli ("multi mod") and
+    for the inverse operation ("multi CRT").
+
+    Terminology
+    -----------
+
+    prime   one of the user-supplied single-limb moduli m_0, ..., m_{n-1}
+            (pairwise coprime, not necessarily prime).
+
+    leaf    a product l_j of one or more consecutive primes fitting in a
+            single limb. Tiny primes are batched: e.g. 32-bit primes are
+            grouped in pairs and 20-bit primes in triples. All work above the
+            leaf level is done modulo the leaf products, and single-limb code
+            splits/combines the individual primes below.
+
+    chunk   a group of consecutive leaves whose product M_i has at most
+            crt_chunk_limbs limbs. Chunks are the leaves of the subproduct
+            tree. Within a chunk, CRT is done with a linear (basecase)
+            algorithm: mpn_addmul_1 of precomputed multipliers.
+
+    level   level 0 of the tree consists of the chunk products, level k
+            consists of products of pairs of consecutive level k-1 nodes.
+            The top level consists of a single node, the product P of all
+            primes.
+
+    All nodes at level k are stored contiguously in a packed array
+    with a fixed slot size level_limbs[k] (the size of the largest node).
+
+    Modular reduction descends the tree from the top down to level
+    mod_base_level (>= 0), and then reduces each level-mod_base_level node
+    residue directly modulo all leaves below it using a dot product with
+    precomputed powers 2^(FLINT_BITS k) mod l_j. This is the mod basecase.
+
+    CRT ascends from the level-0 chunks. The chunk values are computed as
+    y_i = sum_j ((r_j c_{ij}) mod l_j) (M_i / l_j) where the precomputed
+    c_{ij} include the inverse cofactors (M_i/l_j)^-1 mod l_j and the
+    fractional cofactor w_i of the chunk in the tree, so that
+    y_i = x w_i mod M_i (unreduced, y_i < b_i M_i where b_i is the number of
+    leaves in the chunk). Nodes are combined as A = B*v_c + C*v_b without
+    any intermediate reductions (the values grow by at most one bit per
+    level); a single reduction modulo P is done at the end.
+*/
+
+typedef struct
+{
+    nmod_t mod;
+    ulong r64;      /* 2^64 mod n */
+    ulong r128;     /* 2^128 mod n */
+    ulong qhi;      /* floor(2^128 / n), used for n < 2^63 */
+    ulong qlo;
+    ulong npre;     /* Barrett precomputation for n */
+}
+flint_mpn_crt_leaf_struct;
+
+typedef struct flint_mpn_crt_struct
+{
+    slong num_primes;
+    nn_ptr primes;
+    nmod_t * prime_mod;         /* per prime */
+
+    /* leaves */
+    slong num_leaves;
+    slong * leaf_start;         /* index of first prime of leaf, length num_leaves + 1 */
+    flint_mpn_crt_leaf_struct * leaf;   /* leaf moduli with reduction data */
+    nn_ptr prime_barrett;       /* Barrett precomputation for each prime */
+    int all_single;             /* all leaves consist of a single prime */
+
+    /* chunks (CRT basecase) */
+    slong num_chunks;
+    slong * chunk_start;        /* index of first leaf of chunk, length num_chunks + 1 */
+    slong crt_chunk_limbs;      /* max limb size of chunk products (= level_limbs[0]) */
+    nn_ptr crt_mult;            /* (all_single only) per prime: crt_chunk_limbs limbs,
+                                   (M_i/p_t) ((M_i/p_t)^-1 mod p_t) w_i mod M_i, zero padded */
+    nn_ptr crt_leaf_mult;       /* (batched leaves or fixed-length path) per leaf:
+                                   crt_chunk_limbs limbs, M_i / l_j, zero padded */
+    nn_ptr prime_crt_coeff;     /* per prime: coefficient for combining the residues of
+                                   a leaf into u_j = x (M_i/l_j)^-1 w_i mod l_j */
+    nn_ptr prime_crt_shoup;     /* per prime: Shoup precomputation for prime_crt_coeff
+                                   (fixed-length path with single-prime leaves only) */
+    int crt_use_shoup;
+
+    /* fixed-length CRT (single chunk, small product) */
+    int crt_fixed;              /* whether the fixed-length path applies */
+    int crt_fixed_m;            /* number of limbs of the fixed-length cofactors */
+
+    /* small-value shortcut: CRT structure for the first few primes, used
+       to detect and verify reconstructions that are much smaller than P */
+    struct flint_mpn_crt_struct * crt_small;
+
+    /* subproduct tree */
+    slong num_levels;
+    slong * level_count;        /* number of nodes per level */
+    slong * level_limbs;        /* slot size per level */
+    nn_ptr * level_prod;        /* packed node products */
+    slong ** level_len;         /* actual limb counts of node products */
+
+    /* division data for modular reduction of parent residue to child */
+    int * level_use_preinv;     /* whether to use a precomputed inverse when
+                                   reducing to this level */
+    nn_ptr * level_prod_norm;   /* normalised (shifted) node products */
+    nn_ptr * level_inv;         /* precomputed inverses */
+    ulong ** level_norm;        /* shift counts */
+
+    /* mod basecase */
+    slong mod_base_level;       /* level at which to switch to the basecase */
+    slong mod_base_limbs;       /* limb size of the mod basecase slots (= level_limbs[mod_base_level]) */
+    slong mod_pow_limbs;        /* length of the power tables (>= mod_base_limbs; larger when
+                                   the basecase is at the top level so that inputs
+                                   somewhat larger than P can be reduced directly) */
+    nn_ptr mod_pow;             /* per leaf: mod_pow_limbs limbs, 2^(64k) mod l_j */
+    int mod_pow_slack;          /* whether mod_base_limbs * l_j < 2^64 for all leaves (2-limb accumulator suffices) */
+
+
+    /* misc */
+    int flags;                  /* which operations are supported */
+    nn_ptr prod;                /* product of all primes (points into top level) */
+    slong prod_len;
+    nn_ptr prod_half;           /* floor(P/2) for symmetric representation */
+
+    slong work_level_limbs;     /* size of one ping-pong level buffer */
+    slong work_max_count;       /* max number of nodes on a level */
+    slong tmp_limbs;            /* workspace required by multi_mod / multi_crt */
+}
+flint_mpn_crt_struct;
+
+typedef flint_mpn_crt_struct flint_mpn_crt_t[1];
+
+/* flags selecting which operations to precompute for */
+#define FLINT_MPN_CRT_MOD 1
+#define FLINT_MPN_CRT_CRT 2
+
+void flint_mpn_crt_init(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes);
+void flint_mpn_crt_init2(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes, int flags);
+void flint_mpn_crt_clear(flint_mpn_crt_t C);
+
+/*
+    Tunable: functions to override the automatically chosen tuning
+    parameters (mainly intended for profiling).
+*/
+void flint_mpn_crt_init_tuned(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes,
+        int flags, slong crt_chunk_bits, slong mod_base_bits, slong preinv_cutoff);
+
+/*
+    Reduce the nonnegative integer (x, xn) modulo all primes, writing the
+    residues to out[0], out[1], ..., out[num_primes - 1]. xn may be zero.
+    tmp must have space for C->tmp_limbs limbs (or NULL to allocate
+    internally).
+*/
+void flint_mpn_multi_mod(nn_ptr out, nn_srcptr x, slong xn, const flint_mpn_crt_t C, nn_ptr tmp);
+
+/*
+    Reconstruct the integer x from residues res[0], ..., res[num_primes - 1]
+    (each reduced modulo the corresponding prime). The result is written to
+    the C->prod_len limbs of out (zero-padded), with 0 <= x < P if sign == 0.
+    If sign != 0, the result is taken in the symmetric range -P/2 <= x < P/2
+    and the absolute value is written to out; the return value is then 1
+    if x is negative and 0 otherwise. Returns 0 when sign == 0.
+    tmp must have space for C->tmp_limbs limbs (or NULL to allocate
+    internally).
+*/
+int flint_mpn_multi_crt(nn_ptr out, nn_srcptr res, const flint_mpn_crt_t C, int sign, nn_ptr tmp);
+
+/*
+    Reduce (a, an) modulo the modulus of leaf j (a product of one or more
+    consecutive moduli fitting in a limb; leaf j is prime j when all moduli
+    exceed 32 bits). Requires an <= C->mod_pow_limbs.
+    This is the basecase of flint_mpn_multi_mod, exposed for the
+    single-modulus case.
+*/
+ulong flint_mpn_crt_mod_leaf(nn_srcptr a, slong an, const flint_mpn_crt_t C, slong j);
+
+/*
+    Vector versions. In flint_mpn_multi_mod_vec, x is a packed array of
+    len integers of xn limbs each, and the residue of entry i modulo
+    prime l is written to out[l * out_stride + i]. In
+    flint_mpn_multi_crt_vec, the residue of entry i modulo prime l is read
+    from res[l * res_stride + i], entry i of the output is written to
+    out + i * out_stride (out_stride >= C->prod_len), and if sign is
+    nonzero the sign flags are written to negative[i] (negative may be
+    NULL when sign is zero). These functions are faster than looping over
+    the entries when the entries are small compared to the product (the
+    precomputed tables are then traversed once per block of entries
+    instead of once per entry), and equivalent otherwise.
+*/
+void flint_mpn_multi_mod_vec(nn_ptr out, slong out_stride, nn_srcptr x, slong xn, slong len, const flint_mpn_crt_t C, nn_ptr tmp);
+void flint_mpn_multi_crt_vec(nn_ptr out, slong out_stride, int * negative, nn_srcptr res, slong res_stride, slong len, const flint_mpn_crt_t C, int sign, nn_ptr tmp);
+
+/*
+    One-shot versions which do not require an initialised structure.
+    In flint_mpn_multi_crt_once, out must have space for num_primes limbs;
+    the length of the product of the moduli is written to *outn and out is
+    zero-padded to this length. Optionally (if prod != NULL) the product
+    itself is written to prod, which must also have space for num_primes
+    limbs.
+*/
+void flint_mpn_multi_mod_once(nn_ptr out, nn_srcptr x, slong xn, nn_srcptr primes, slong num_primes);
+int flint_mpn_multi_crt_once(nn_ptr out, slong * outn, nn_ptr prod, nn_srcptr res, nn_srcptr primes, slong num_primes, int sign);
+
+
 #ifdef __cplusplus
 }
 #endif

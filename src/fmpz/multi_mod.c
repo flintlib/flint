@@ -12,6 +12,7 @@
 */
 
 #include "nmod.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
@@ -346,61 +347,28 @@ void fmpz_multi_mod_ui(
     const fmpz_comb_t C,
     fmpz_comb_temp_t CT)
 {
-    slong i, k, l;
-    slong stride = 1;
-    fmpz * A = CT->A;
-    mod_lut_entry * lu;
-    slong * offsets;
-    slong klen = C->mod_klen;
-    fmpz_t ttt;
+    fmpz v = *input;
+    int negative;
 
-    /* high level split */
-    if (klen == 1)
+    if (!COEFF_IS_MPZ(v))
     {
-        *ttt = A[0];
-        A[0] = *input;
+        ulong x = FLINT_UABS(v);
+        negative = (v < 0);
+        flint_mpn_multi_mod(out, &x, 1, C->crt, CT->tmp);
     }
     else
     {
-        _fmpz_multi_mod_precomp(A, C->mod_P, input, -1, CT->T);
+        mpz_srcptr z = COEFF_TO_PTR(v);
+        negative = (z->_mp_size < 0);
+        flint_mpn_multi_mod(out, z->_mp_d, FLINT_ABS(z->_mp_size), C->crt, CT->tmp);
     }
 
-    offsets = C->mod_offsets;
-    lu = C->mod_lu;
-
-    for (k = 0, i = 0, l = 0; k < klen; k++)
+    if (negative)
     {
-        slong j = offsets[k];
+        slong i, n = C->num_primes;
+        nn_srcptr p = C->primes;
 
-        for ( ; i < j; i++)
-        {
-            /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
-            ulong t = fmpz_get_nmod(A + k, lu[i].mod);
-
-            /* low level split: 1, 2, or 3 small primes */
-            if (lu[i].mod2.n != 0)
-            {
-                FLINT_ASSERT(l + 3 <= C->num_primes);
-                NMOD_RED(out[l*stride], t, lu[i].mod0); l++;
-                NMOD_RED(out[l*stride], t, lu[i].mod1); l++;
-                NMOD_RED(out[l*stride], t, lu[i].mod2); l++;
-            }
-            else if (lu[i].mod1.n != 0)
-            {
-                FLINT_ASSERT(l + 2 <= C->num_primes);
-                NMOD_RED(out[l*stride], t, lu[i].mod0); l++;
-                NMOD_RED(out[l*stride], t, lu[i].mod1); l++;
-            }
-            else
-            {
-                FLINT_ASSERT(l + 1 <= C->num_primes);
-                out[l*stride] = t; l++;
-            }
-        }
+        for (i = 0; i < n; i++)
+            out[i] = (out[i] == 0) ? 0 : p[i] - out[i];
     }
-
-    FLINT_ASSERT(l == C->num_primes);
-
-    if (klen == 1)
-        A[0] = *ttt;
 }

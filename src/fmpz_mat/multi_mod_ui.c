@@ -35,6 +35,7 @@ typedef struct {
     slong num_primes;
 } _mod_worker_arg;
 
+
 static void _mod_worker(void * varg)
 {
     _mod_worker_arg * arg = (_mod_worker_arg *) varg;
@@ -54,11 +55,13 @@ static void _mod_worker(void * varg)
     slong num_primes   = arg->num_primes;
     const fmpz_comb_struct * comb = arg->comb;
 
-    if (comb != NULL)
     {
         ulong * residues;
         fmpz_comb_temp_t comb_temp;
 
+        /* entry by entry; measured to be as fast as the vector reduction
+           for matrix rows (which are short), including for entries of
+           very different sizes, since each entry is reduced at its own size */
         residues = FLINT_ARRAY_ALLOC(num_primes, ulong);
         fmpz_comb_temp_init(comb_temp, comb);
 
@@ -82,21 +85,6 @@ static void _mod_worker(void * varg)
         flint_free(residues);
         fmpz_comb_temp_clear(comb_temp);
     }
-    else
-    {
-        for (i = Astartrow; i < Astoprow; i++)
-            for (j = 0; j < ncols_A; j++)
-                for (l = 0; l < num_primes; l++)
-                    nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(
-                        Aentries + i * Astride + j, mod_A[l]->mod);
-
-        if (mod_B != NULL)
-            for (i = Bstartrow; i < Bstoprow; i++)
-                for (j = 0; j < ncols_B; j++)
-                    for (l = 0; l < num_primes; l++)
-                        nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(
-                            Bentries + i * Bstride + j, mod_B[l]->mod);
-    }
 }
 
 static void _fmpz_mat_multi_mod_ui_internal(
@@ -114,6 +102,19 @@ static void _fmpz_mat_multi_mod_ui_internal(
     slong num_workers, thread_limit;
     thread_pool_handle * handles;
     _mod_worker_arg mainarg, * args;
+    fmpz_comb_t comb_local;
+    int own_comb = 0;
+
+    if (comb == NULL)
+    {
+        nn_ptr primes = FLINT_ARRAY_ALLOC(num_primes, ulong);
+        for (i = 0; i < num_primes; i++)
+            primes[i] = residues[i]->mod.n;
+        fmpz_comb_init2(comb_local, primes, num_primes, FMPZ_COMB_MOD);
+        flint_free(primes);
+        comb = comb_local;
+        own_comb = 1;
+    }
 
     mainarg.ncols_A   = k;
     mainarg.ncols_B   = kB;
@@ -136,7 +137,7 @@ single:
         mainarg.Bstartrow = 0;
         mainarg.Bstoprow  = (B != NULL) ? B->r : 0;
         _mod_worker(&mainarg);
-        return;
+        goto cleanup;
     }
 
     num_workers = flint_request_threads(&handles, thread_limit);
@@ -170,6 +171,10 @@ single:
 
     flint_give_back_threads(handles, num_workers);
     flint_free(args);
+
+cleanup:
+    if (own_comb)
+        fmpz_comb_clear(comb_local);
 }
 
 void fmpz_mat_multi_mod_ui_precomp(
@@ -190,24 +195,5 @@ void fmpz_mat_multi_mod_2_ui_precomp(
 
 void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres, const fmpz_mat_t A)
 {
-    if (nres > FMPZ_MAT_MOD_PRIMES_COMB_CUTOFF)
-    {
-        fmpz_comb_t comb;
-        slong i;
-        nn_ptr primes;
-        primes = _nmod_vec_init(nres);
-        for (i = 0; i < nres; i++)
-            primes[i] = residues[i]->mod.n;
-        fmpz_comb_init(comb, primes, nres);
-        _nmod_vec_clear(primes);
-
-        fmpz_mat_multi_mod_ui_precomp(residues, nres, A, comb);
-
-        fmpz_comb_clear(comb);
-    }
-    else
-    {
-        fmpz_mat_multi_mod_ui_precomp(residues, nres, A, NULL);
-    }
+    fmpz_mat_multi_mod_ui_precomp(residues, nres, A, NULL);
 }
-

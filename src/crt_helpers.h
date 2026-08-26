@@ -18,6 +18,7 @@
 # include <intrin.h>
 #endif
 
+#include "gmpcompat.h"
 #include "longlong.h"
 #include "templates.h"
 
@@ -82,22 +83,19 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
 #endif
 
 
-#if 1
-
-#if defined(__GNUC__) && defined(__AVX2__)
-
-
-#elif defined(__GNUC__) && defined(__ARM_NEON)
-
-
-
-#elif defined(_MSC_VER) && (defined(__AVX2__) || defined(_M_ARM64))
-
-
-
+/*
+    Fixed-length additions and subtractions. On x86-64 and ARM64 the
+    multi-limb macros from longlong.h expand to good carry chains; elsewhere
+    (including 32-bit platforms) we use the macros up to 3 limbs and mpn
+    calls beyond, which is what the generic macros would amount to anyway.
+*/
+#if defined(__AVX2__) || defined(__ARM_NEON) || (defined(_MSC_VER) && defined(_M_ARM64))
+# define CRT_HELPERS_UNROLLED_ADD 1
 #else
-# error crt_helpers.h requires AVX2 or Neon instructions
+# define CRT_HELPERS_UNROLLED_ADD 0
 #endif
+
+#if CRT_HELPERS_UNROLLED_ADD
 
 FLINT_FORCE_INLINE void multi_add_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[]))
 {
@@ -275,47 +273,40 @@ FLINT_FORCE_INLINE void multi_rsub_8(ulong z[], const ulong a[])
 
 #else
 
+FLINT_FORCE_INLINE void multi_add_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[])) { }
+FLINT_FORCE_INLINE void multi_add_1(ulong z[], const ulong a[]) { z[0] += a[0]; }
+FLINT_FORCE_INLINE void multi_add_2(ulong z[], const ulong a[]) { add_ssaaaa(z[1],z[0], z[1],z[0], a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_add_3(ulong z[], const ulong a[]) { add_sssaaaaaa(z[2],z[1],z[0], z[2],z[1],z[0], a[2],a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_add_4(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 4); }
+FLINT_FORCE_INLINE void multi_add_5(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 5); }
+FLINT_FORCE_INLINE void multi_add_6(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 6); }
+FLINT_FORCE_INLINE void multi_add_7(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 7); }
+FLINT_FORCE_INLINE void multi_add_8(ulong z[], const ulong a[]) { mpn_add_n(z, z, a, 8); }
 
-#define DEFINE_IT(n) \
-FLINT_FORCE_INLINE void CAT(multi_add, n)(ulong z[], const ulong a[]) \
-{ \
-    unsigned char cf = 0; \
-    for (ulong i = 0; i < n; i++) \
-        cf = _addcarry_ulong(cf, z[i], a[i], &z[i]); \
-}
+FLINT_FORCE_INLINE void multi_sub_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[])) { }
+FLINT_FORCE_INLINE void multi_sub_1(ulong z[], const ulong a[]) { z[0] -= a[0]; }
+FLINT_FORCE_INLINE void multi_sub_2(ulong z[], const ulong a[]) { sub_ddmmss(z[1],z[0], z[1],z[0], a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_sub_3(ulong z[], const ulong a[]) { sub_dddmmmsss(z[2],z[1],z[0], z[2],z[1],z[0], a[2],a[1],a[0]); }
+FLINT_FORCE_INLINE void multi_sub_4(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 4); }
+FLINT_FORCE_INLINE void multi_sub_5(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 5); }
+FLINT_FORCE_INLINE void multi_sub_6(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 6); }
+FLINT_FORCE_INLINE void multi_sub_7(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 7); }
+FLINT_FORCE_INLINE void multi_sub_8(ulong z[], const ulong a[]) { mpn_sub_n(z, z, a, 8); }
 
-DEFINE_IT(0)
-DEFINE_IT(1)
-DEFINE_IT(2)
-DEFINE_IT(3)
-DEFINE_IT(4)
-DEFINE_IT(5)
-DEFINE_IT(6)
-DEFINE_IT(7)
-DEFINE_IT(8)
-#undef DEFINE_IT
-
-#define DEFINE_IT(n) \
-FLINT_FORCE_INLINE void CAT(multi_sub, n)(ulong z[], const ulong a[]) \
-{ \
-    unsigned char cf = 0; \
-    for (ulong i = 0; i < n; i++) \
-        cf = _subborrow_ulong(cf, z[i], a[i], &z[i]); \
-}
-
-DEFINE_IT(0)
-DEFINE_IT(1)
-DEFINE_IT(2)
-DEFINE_IT(3)
-DEFINE_IT(4)
-DEFINE_IT(5)
-DEFINE_IT(6)
-DEFINE_IT(7)
-#undef DEFINE_IT
+/* z = a - z */
+FLINT_FORCE_INLINE void multi_rsub_0(ulong FLINT_UNUSED(z[]), const ulong FLINT_UNUSED(a[])) { }
+FLINT_FORCE_INLINE void multi_rsub_1(ulong z[], const ulong a[]) { z[0] = a[0] - z[0]; }
+FLINT_FORCE_INLINE void multi_rsub_2(ulong z[], const ulong a[]) { sub_ddmmss(z[1],z[0], a[1],a[0], z[1],z[0]); }
+FLINT_FORCE_INLINE void multi_rsub_3(ulong z[], const ulong a[]) { sub_dddmmmsss(z[2],z[1],z[0], a[2],a[1],a[0], z[2],z[1],z[0]); }
+FLINT_FORCE_INLINE void multi_rsub_4(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 4); }
+FLINT_FORCE_INLINE void multi_rsub_5(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 5); }
+FLINT_FORCE_INLINE void multi_rsub_6(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 6); }
+FLINT_FORCE_INLINE void multi_rsub_7(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 7); }
+FLINT_FORCE_INLINE void multi_rsub_8(ulong z[], const ulong a[]) { mpn_sub_n(z, a, z, 8); }
 
 #endif
 
-#ifdef __GNUC__
+#if defined(__GNUC__) && defined(__SIZEOF_INT128__) && FLINT_BITS == 64
 FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
 {
     __uint128_t p = ((__uint128_t) x) * ((__uint128_t) y);
@@ -419,13 +410,21 @@ FLINT_FORCE_INLINE void CAT3(_big_addmul, n, m)(ulong r[], ulong t[], ulong C[],
     } \
 }
 
+DEFINE_IT(1, 1)
 DEFINE_IT(2, 1)
+DEFINE_IT(2, 2)
 DEFINE_IT(3, 2)
+DEFINE_IT(3, 3)
 DEFINE_IT(4, 3)
 DEFINE_IT(4, 4)
 DEFINE_IT(5, 4)
+DEFINE_IT(5, 5)
 DEFINE_IT(6, 5)
+DEFINE_IT(6, 6)
 DEFINE_IT(7, 6)
+DEFINE_IT(7, 7)
+DEFINE_IT(8, 7)
+DEFINE_IT(8, 8)
 #undef DEFINE_IT
 
 
@@ -456,6 +455,7 @@ DEFINE_IT(4, 3)
 DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
 DEFINE_IT(7, 6)
+DEFINE_IT(8, 7)
 #undef DEFINE_IT
 
 /*

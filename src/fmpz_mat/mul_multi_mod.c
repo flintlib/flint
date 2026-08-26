@@ -26,7 +26,6 @@ void _fmpz_mat_mul_multi_mod(
     slong m, k, n;
     flint_bitcnt_t primes_bits;
     fmpz_comb_t comb;
-    fmpz_comb_struct * comb_ptr;
     ulong first_prime;
     int squaring = (A == B);
     nmod_mat_t * mod_A, * mod_B, * mod_C;
@@ -80,29 +79,18 @@ void _fmpz_mat_mul_multi_mod(
         nmod_mat_init(mod_C[i], C->r, C->c, primes[i]);
     }
 
-    if (num_primes > FMPZ_MAT_MOD_PRIMES_COMB_CUTOFF ||
-        num_primes > FMPZ_MAT_CRT_PRIMES_COMB_CUTOFF)
-    {
-        fmpz_comb_init(comb, primes, num_primes);
-        comb_ptr = comb;
-    }
-    else
-    {
-        comb_ptr = NULL;
-    }
+    fmpz_comb_init(comb, primes, num_primes);
 
     fmpz_mat_multi_mod_2_ui_precomp(mod_A, squaring ? NULL : mod_B, num_primes,
-            A, squaring ? NULL : B, num_primes > FMPZ_MAT_MOD_PRIMES_COMB_CUTOFF ? comb_ptr : NULL);
+            A, squaring ? NULL : B, comb);
 
     for (i = 0; i < num_primes; i++)
         nmod_mat_mul(mod_C[i], mod_A[i], squaring ? mod_A[i] : mod_B[i]);
 
-    fmpz_mat_multi_CRT_ui_precomp(C, mod_C, num_primes,
-            num_primes > FMPZ_MAT_CRT_PRIMES_COMB_CUTOFF ? comb_ptr : NULL, sign);
+    fmpz_mat_multi_CRT_ui_precomp(C, mod_C, num_primes, comb, sign);
 
     /* Cleanup */
-    if (comb_ptr != NULL)
-        fmpz_comb_clear(comb);
+    fmpz_comb_clear(comb);
 
     for (i = 0; i < num_primes; i++)
     {

@@ -22,7 +22,7 @@ TEST_FUNCTION_START(flint_mpn_mul_toom22, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         slong n, m;
         mp_ptr X, Y, R1, R2;

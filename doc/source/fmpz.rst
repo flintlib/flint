@@ -1358,14 +1358,34 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     space which must be provided by :func:`fmpz_comb_temp_init` and
     cleared by :func:`fmpz_comb_temp_clear`.
 
+.. function:: void fmpz_multi_mod_ui_once(ulong * out, const fmpz_t in, nn_srcptr primes, slong num_primes)
+              void fmpz_multi_CRT_ui_once(fmpz_t output, fmpz_t prod, nn_srcptr residues, nn_srcptr primes, slong num_primes, int sign)
+
+    One-shot versions of :func:`fmpz_multi_mod_ui` and
+    :func:`fmpz_multi_CRT_ui` which do not require a ``comb``; these
+    are appropriate when a single conversion is needed. In the CRT
+    version, the product of the primes is written to *prod* if it is
+    not *NULL*.
+
 .. function:: void fmpz_comb_init(fmpz_comb_t comb, nn_srcptr primes, slong num_primes)
+              void fmpz_comb_init2(fmpz_comb_t comb, nn_srcptr primes, slong num_primes, int flags)
 
     Initialises a ``comb`` structure for multimodular reduction and
-    recombination.  The array ``primes`` is assumed to contain
-    ``num_primes`` primes each of ``FLINT_BITS - 1`` bits. Modular
-    reductions and recombinations will be done modulo this list of primes.
-    The ``primes`` array must not be ``free``'d until the ``comb``
-    structure is no longer required and must be cleared by the user.
+    recombination.  The array ``primes`` must contain ``num_primes``
+    nonzero, pairwise coprime moduli of at most ``FLINT_BITS`` bits
+    (they need not be prime, and moduli of any size are batched
+    efficiently). Modular reductions and recombinations will be done
+    modulo this list of moduli. The ``primes`` array is copied and may
+    be freed after this call.
+
+    The version with *flags* (a bitwise or of ``FMPZ_COMB_MOD`` and
+    ``FMPZ_COMB_CRT``) only precomputes data for the selected operations,
+    which is cheaper when only :func:`fmpz_multi_mod_ui` or only
+    :func:`fmpz_multi_CRT_ui` will be used.
+
+    The ``comb`` structure is a thin wrapper around :type:`flint_mpn_crt_t`
+    (see :func:`flint_mpn_crt_init`), which does all the work using mpn
+    arithmetic.
 
 .. function:: void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 

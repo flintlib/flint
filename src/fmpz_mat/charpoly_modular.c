@@ -91,8 +91,7 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
     args.primes = primes;
     args.coeffs = coeff_buf;
 
-    /* Want asymptotically fast multimodular reduction */
-    if (num_primes > FMPZ_MAT_MOD_PRIMES_COMB_CUTOFF)
+    /* multimodular reduction */
     {
         nmod_mat_struct * Amod;
 
@@ -108,11 +107,6 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
         for (slong i = 0; i < num_primes; i++)
             nmod_mat_clear(Amod + i);
         flint_free(Amod);
-    }
-    else
-    {
-        /* Just do the mod p reductions inline with the mod p charpolys */
-        flint_parallel_do(_charpoly_mod_worker, &args, num_primes, 0, FLINT_PARALLEL_UNIFORM);
     }
 
     nn_srcptr *residues = flint_malloc(num_primes * sizeof(nn_srcptr));

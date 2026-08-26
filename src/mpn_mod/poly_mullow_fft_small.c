@@ -19,34 +19,9 @@
 #include "nmod.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "mpn_extras.h"
 #include "crt_helpers.h"
 #include "fft_small.h"
-
-static ulong
-nmod_set_mpn_2(nn_srcptr ad, nmod_t mod)
-{
-    ulong r = 0;
-    NMOD_RED2(r, r, ad[1], mod);
-    NMOD_RED2(r, r, ad[0], mod);
-    return r;
-}
-
-static ulong
-nmod_set_mpn_3(nn_srcptr ad, nmod_t mod)
-{
-    ulong r = 0;
-    NMOD_RED2(r, r, ad[2], mod);
-    NMOD_RED2(r, r, ad[1], mod);
-    NMOD_RED2(r, r, ad[0], mod);
-    return r;
-}
-
-/* todo: precomputed inverse */
-static ulong
-nmod_set_mpn(nn_srcptr ad, slong an, nmod_t mod)
-{
-    return mpn_mod_1(ad, an, mod.n);
-}
 
 static void _mod(
     double* abuf, ulong atrunc,
@@ -56,12 +31,15 @@ static void _mod(
 {
     double* aI;
     ulong i, j;
-    nmod_t mod = fft->mod;
+    flint_mpn_crt_t C;
 
     if (atrunc < an)
     {
         flint_throw(FLINT_ERROR, "fft _mod: atrunc < an not handled\n");
     }
+
+    /* single-modulus reduction with precomputed powers of 2^FLINT_BITS */
+    flint_mpn_crt_init(C, &fft->mod.n, 1);
 
     for (i = 0; i + BLK_SZ <= an; i += BLK_SZ)
     {
@@ -69,43 +47,13 @@ static void _mod(
         for (j = 0; j < BLK_SZ; j += 8)
         {
             ulong aa[8];
+            slong l;
 
             FLINT_ASSERT(i+j < atrunc);
 
             /* todo: vectorize */
-            if (nlimbs == 2)
-            {
-                aa[0] = nmod_set_mpn_2(a + (i + j + 0) * nlimbs, mod);
-                aa[1] = nmod_set_mpn_2(a + (i + j + 1) * nlimbs, mod);
-                aa[2] = nmod_set_mpn_2(a + (i + j + 2) * nlimbs, mod);
-                aa[3] = nmod_set_mpn_2(a + (i + j + 3) * nlimbs, mod);
-                aa[4] = nmod_set_mpn_2(a + (i + j + 4) * nlimbs, mod);
-                aa[5] = nmod_set_mpn_2(a + (i + j + 5) * nlimbs, mod);
-                aa[6] = nmod_set_mpn_2(a + (i + j + 6) * nlimbs, mod);
-                aa[7] = nmod_set_mpn_2(a + (i + j + 7) * nlimbs, mod);
-            }
-            else if (nlimbs == 3)
-            {
-                aa[0] = nmod_set_mpn_3(a + (i + j + 0) * nlimbs, mod);
-                aa[1] = nmod_set_mpn_3(a + (i + j + 1) * nlimbs, mod);
-                aa[2] = nmod_set_mpn_3(a + (i + j + 2) * nlimbs, mod);
-                aa[3] = nmod_set_mpn_3(a + (i + j + 3) * nlimbs, mod);
-                aa[4] = nmod_set_mpn_3(a + (i + j + 4) * nlimbs, mod);
-                aa[5] = nmod_set_mpn_3(a + (i + j + 5) * nlimbs, mod);
-                aa[6] = nmod_set_mpn_3(a + (i + j + 6) * nlimbs, mod);
-                aa[7] = nmod_set_mpn_3(a + (i + j + 7) * nlimbs, mod);
-            }
-            else
-            {
-                aa[0] = nmod_set_mpn(a + (i + j + 0) * nlimbs, nlimbs, mod);
-                aa[1] = nmod_set_mpn(a + (i + j + 1) * nlimbs, nlimbs, mod);
-                aa[2] = nmod_set_mpn(a + (i + j + 2) * nlimbs, nlimbs, mod);
-                aa[3] = nmod_set_mpn(a + (i + j + 3) * nlimbs, nlimbs, mod);
-                aa[4] = nmod_set_mpn(a + (i + j + 4) * nlimbs, nlimbs, mod);
-                aa[5] = nmod_set_mpn(a + (i + j + 5) * nlimbs, nlimbs, mod);
-                aa[6] = nmod_set_mpn(a + (i + j + 6) * nlimbs, nlimbs, mod);
-                aa[7] = nmod_set_mpn(a + (i + j + 7) * nlimbs, nlimbs, mod);
-            }
+            for (l = 0; l < 8; l++)
+                aa[l] = flint_mpn_crt_mod_leaf(a + (i + j + l) * nlimbs, nlimbs, C, 0);
 
             vec8n t = vec8n_load_unaligned(aa);
             vec8d_store_aligned(aI + j, vec8n_convert_limited_vec8d(t));
@@ -114,10 +62,14 @@ static void _mod(
 
     aI = sd_fft_ctx_blk_index(abuf, i/BLK_SZ);
     for (j = 0; j < an - i; j++)
-        aI[j] = (double) nmod_set_mpn(a + (i + j) * nlimbs, nlimbs, mod);
+    {
+        aI[j] = (double) flint_mpn_crt_mod_leaf(a + (i + j) * nlimbs, nlimbs, C, 0);
+    }
 
     for (i = an; i < atrunc; i++)
         abuf[i] = 0;
+
+    flint_mpn_crt_clear(C);
 }
 
 typedef struct {
