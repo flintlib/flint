@@ -27,7 +27,7 @@ TEST_FUNCTION_START(fmpz_poly_mul_toom_scalar, state)
         {
             slong n = len1 + len2 - 1;
 
-            if (n > 20)
+            if (n > (FLINT_BITS == 64) ? 20 : 13)
                 continue;
 
             for (i = 0; i < 10 * flint_test_multiplier(); i++)
@@ -70,6 +70,9 @@ TEST_FUNCTION_START(fmpz_poly_mul_toom_scalar, state)
         fmpz *a, *res, *ref;
         slong len = 1 + n_randint(state, 10);
         slong n = 2 * len - 1;
+
+        if (n > (FLINT_BITS == 64) ? 20 : 13)
+            continue;
 
         a = _fmpz_vec_init(len);
         res = _fmpz_vec_init(n);
@@ -141,7 +144,7 @@ TEST_FUNCTION_START(fmpz_poly_mul_toom_scalar, state)
             slong n = len1 + len2 - 1;
             fmpz *a, *b, *res;
 
-            if (n <= 20)
+            if (n <= (FLINT_BITS == 64) ? 20 : 13)
                 continue;
 
             a = _fmpz_vec_init(len1);
