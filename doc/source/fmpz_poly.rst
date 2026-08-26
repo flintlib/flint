@@ -712,6 +712,82 @@ Multiplication
     Wrapper handling aliasing, zero operands and normalization, with
     the same return convention.
 
+.. function:: int _fmpz_poly_mul_toom_scalar(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
+
+    Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)`` and
+    ``(poly2, len2)`` using one level of Toom-Cook multiplication in the
+    polynomial variable, with the pointwise products done as scalar
+    integer multiplications.
+
+    Evaluation is at the points `0, \pm 1, \ldots, \pm p`, one further
+    point when the output length is odd, and infinity, giving exactly
+    `len1 + len2 - 1` coefficient multiplications instead of the
+    `len1 \cdot len2` of the classical algorithm. This is optimal for the
+    output length: no algorithm computes a full product of these lengths
+    with fewer nonscalar multiplications.
+
+    The interpolation is table driven and runs entirely in the output
+    array, with no temporary allocation and one exact division by a
+    single word per row. Since the saving is in the number of coefficient
+    multiplications while the linear work grows, the routine is intended
+    for short polynomials with large coefficients.
+
+    Assumes ``len1 >= len2 > 0``. Allows zero-padding of the two input
+    polynomials. No aliasing of inputs with outputs is allowed. When
+    ``poly1`` and ``poly2`` are the same array of the same length, the
+    evaluations are shared and the pointwise products are squarings.
+
+    Returns 1 on success and 0, leaving ``res`` untouched, when
+    ``len1 + len2 - 1`` exceeds the largest output length supported,
+    which is 20 on 64-bit machines and 13 on 32-bit machines. The bound
+    is where the precomputed interpolation constants cease to fit in a
+    word, not a limitation of the method.
+
+.. function:: int fmpz_poly_mul_toom_scalar(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Sets ``res`` to the product of ``poly1`` and ``poly2``, with the same
+    return convention as above. Aliasing of the output with either input
+    is permitted.
+
+.. function:: int _fmpz_poly_mulmid_toom_scalar(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong nlo, slong nhi)
+
+    Sets ``(res, nhi - nlo)`` to the coefficients at indices
+    `[nlo, nhi)` in the full product of ``(poly1, len1)`` and
+    ``(poly2, len2)``, as :func:`_fmpz_poly_mulmid`.
+
+    Coefficients of the inputs that cannot contribute to the requested
+    window are trimmed away first. Writing `(m, n, w)` for the two
+    trimmed lengths and the window length, the routine then computes the
+    window with
+
+    .. math::
+
+        (\text{sum of the two smallest of } m, n, w) - 1
+
+    coefficient multiplications, by running either a full product of the
+    trimmed operands or, transposed, a middle product of the window
+    against the shorter operand, whichever is cheaper. The count is
+    symmetric in the three parameters, as transposition invariance
+    requires, and is optimal whenever the window touches an end of the
+    product. Windows cut away from both ends can admit lower rank
+    decompositions, which are not used here.
+
+    Assumes that ``len1`` and ``len2`` are positive and that
+    `0 \le nlo < nhi \le len1 + len2 - 1`. The lengths may be given in
+    either order. No aliasing of inputs with outputs is allowed.
+
+    Returns 1 on success and 0, leaving ``res`` untouched, when both
+    routes exceed the length bound of :func:`_fmpz_poly_mul_toom_scalar`.
+    Note that a narrow window may be supported even when the full product
+    is not: a window of four coefficients of a `16 \times 16` product
+    needs 19 multiplications where the full product would need 31.
+
+.. function:: int fmpz_poly_mulmid_toom_scalar(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong nlo, slong nhi)
+
+    Sets ``res`` to the polynomial formed by the coefficients at indices
+    `[nlo, nhi)` in the product of ``poly1`` and ``poly2``, with the same
+    return convention as above.
+
 .. function:: void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2)
 
     Sets ``(res, len1 + len2 - 1)`` to the product of ``(poly1, len1)``

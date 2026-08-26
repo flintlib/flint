@@ -128,8 +128,10 @@
 #include "t-mulmid_classical_fft_small.c"
 #include "t-mulmid_KS.c"
 #include "t-mulmid_SS.c"
+#include "t-mulmid_toom_scalar.c"
 #include "t-mul_SS.c"
 #include "t-mul_SS_precache.c"
+#include "t-mul_toom_scalar.c"
 #include "t-neg.c"
 #include "t-newton_to_monomial.c"
 #include "t-nth_derivative.c"
@@ -320,8 +322,10 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_mulmid_classical_fft_small),
     TEST_FUNCTION(fmpz_poly_mulmid_KS),
     TEST_FUNCTION(fmpz_poly_mulmid_SS),
+    TEST_FUNCTION(fmpz_poly_mulmid_toom_scalar),
     TEST_FUNCTION(fmpz_poly_mul_SS),
     TEST_FUNCTION(fmpz_poly_mul_SS_precache),
+    TEST_FUNCTION(fmpz_poly_mul_toom_scalar),
     TEST_FUNCTION(fmpz_poly_neg),
     TEST_FUNCTION(fmpz_poly_newton_to_monomial),
     TEST_FUNCTION(fmpz_poly_nth_derivative),
