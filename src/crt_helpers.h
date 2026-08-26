@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-#if defined(__AVX2__)
+#if defined(__AVX2__) && (FLINT_BITS == 64)
 
 FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
 {
@@ -87,7 +87,7 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
     Fixed-length additions and subtractions. On x86-64 and ARM64 the
     multi-limb macros from longlong.h expand to good carry chains; elsewhere
     (including 32-bit platforms) we use the macros up to 3 limbs and mpn
-    calls beyond, which is what the generic macros would amount to anyway.
+    calls beyond.
 */
 #if defined(__AVX2__) || defined(__ARM_NEON) || (defined(_MSC_VER) && defined(_M_ARM64))
 # define CRT_HELPERS_UNROLLED_ADD 1
