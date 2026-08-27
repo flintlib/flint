@@ -1312,66 +1312,18 @@ void flint_mpn_crt_init(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes);
 void flint_mpn_crt_init2(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes, int flags);
 void flint_mpn_crt_clear(flint_mpn_crt_t C);
 
-/*
-    Tunable: functions to override the automatically chosen tuning
-    parameters (mainly intended for profiling).
-*/
 void flint_mpn_crt_init_tuned(flint_mpn_crt_t C, nn_srcptr primes, slong num_primes,
         int flags, slong crt_chunk_bits, slong mod_base_bits, slong preinv_cutoff);
 
-/*
-    Reduce the nonnegative integer (x, xn) modulo all primes, writing the
-    residues to out[0], out[1], ..., out[num_primes - 1]. xn may be zero.
-    tmp must have space for C->tmp_limbs limbs (or NULL to allocate
-    internally).
-*/
 void flint_mpn_multi_mod(nn_ptr out, nn_srcptr x, slong xn, const flint_mpn_crt_t C, nn_ptr tmp);
 
-/*
-    Reconstruct the integer x from residues res[0], ..., res[num_primes - 1]
-    (each reduced modulo the corresponding prime). The result is written to
-    the C->prod_len limbs of out (zero-padded), with 0 <= x < P if sign == 0.
-    If sign != 0, the result is taken in the symmetric range -P/2 <= x < P/2
-    and the absolute value is written to out; the return value is then 1
-    if x is negative and 0 otherwise. Returns 0 when sign == 0.
-    tmp must have space for C->tmp_limbs limbs (or NULL to allocate
-    internally).
-*/
 int flint_mpn_multi_crt(nn_ptr out, nn_srcptr res, const flint_mpn_crt_t C, int sign, nn_ptr tmp);
 
-/*
-    Reduce (a, an) modulo the modulus of leaf j (a product of one or more
-    consecutive moduli fitting in a limb; leaf j is prime j when all moduli
-    exceed 32 bits). Requires an <= C->mod_pow_limbs.
-    This is the basecase of flint_mpn_multi_mod, exposed for the
-    single-modulus case.
-*/
 ulong flint_mpn_crt_mod_leaf(nn_srcptr a, slong an, const flint_mpn_crt_t C, slong j);
 
-/*
-    Vector versions. In flint_mpn_multi_mod_vec, x is a packed array of
-    len integers of xn limbs each, and the residue of entry i modulo
-    prime l is written to out[l * out_stride + i]. In
-    flint_mpn_multi_crt_vec, the residue of entry i modulo prime l is read
-    from res[l * res_stride + i], entry i of the output is written to
-    out + i * out_stride (out_stride >= C->prod_len), and if sign is
-    nonzero the sign flags are written to negative[i] (negative may be
-    NULL when sign is zero). These functions are faster than looping over
-    the entries when the entries are small compared to the product (the
-    precomputed tables are then traversed once per block of entries
-    instead of once per entry), and equivalent otherwise.
-*/
 void flint_mpn_multi_mod_vec(nn_ptr out, slong out_stride, nn_srcptr x, slong xn, slong len, const flint_mpn_crt_t C, nn_ptr tmp);
 void flint_mpn_multi_crt_vec(nn_ptr out, slong out_stride, int * negative, nn_srcptr res, slong res_stride, slong len, const flint_mpn_crt_t C, int sign, nn_ptr tmp);
 
-/*
-    One-shot versions which do not require an initialised structure.
-    In flint_mpn_multi_crt_once, out must have space for num_primes limbs;
-    the length of the product of the moduli is written to *outn and out is
-    zero-padded to this length. Optionally (if prod != NULL) the product
-    itself is written to prod, which must also have space for num_primes
-    limbs.
-*/
 void flint_mpn_multi_mod_once(nn_ptr out, nn_srcptr x, slong xn, nn_srcptr primes, slong num_primes);
 int flint_mpn_multi_crt_once(nn_ptr out, slong * outn, nn_ptr prod, nn_srcptr res, nn_srcptr primes, slong num_primes, int sign);
 
