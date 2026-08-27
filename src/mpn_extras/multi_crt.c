@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2026 Fredrik Johansson
+    Developed using Claude Fable 5
 
     This file is part of FLINT.
 
