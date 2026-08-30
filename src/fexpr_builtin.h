@@ -431,6 +431,7 @@ typedef enum
     FEXPR_SymmetricPolynomial,
     FEXPR_Tan,
     FEXPR_Tanh,
+    FEXPR_TetranacciConstant,
     FEXPR_Theta,
     FEXPR_Theta_,
     FEXPR_True,
