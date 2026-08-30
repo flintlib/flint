@@ -13,7 +13,8 @@
 
 #define PADIC_RANDTEST_TRIES  10
 
-void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
+void
+padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 {
     const slong N = padic_prec(rop);
 
@@ -23,7 +24,7 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 
     if (N > 0)
     {
-        min = - ((N + 9) / 10);
+        min = -((N + 9) / 10);
         max = N;
     }
     else if (N < 0)
@@ -46,15 +47,17 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
         fmpz_clear(pow);
 }
 
-void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
-                             const padic_ctx_t ctx)
+void
+padic_randtest_not_zero(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 {
-    slong i;
+    slong i = 1;
 
-    padic_randtest(rop, state, ctx);
-
-    for (i = 1; !padic_is_zero(rop) && i < PADIC_RANDTEST_TRIES; i++)
+    do
+    {
         padic_randtest(rop, state, ctx);
+        i++;
+    }
+    while (padic_is_zero(rop) && i < PADIC_RANDTEST_TRIES);
 
     if (padic_is_zero(rop))
     {
@@ -63,8 +66,8 @@ void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
     }
 }
 
-void padic_randtest_int(padic_t rop, flint_rand_t state,
-                        const padic_ctx_t ctx)
+void
+padic_randtest_int(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 {
     const slong N = padic_prec(rop);
 
