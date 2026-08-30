@@ -3,11 +3,6 @@
 **gr_ore_poly.h** -- dense univariate Ore polynomials over generic rings
 ===============================================================================
 
-.. note::
-
-    This module is under construction. Functionality is currently limited to
-    memory management, additive arithmetic, and multiplication.
-
 A :type:`gr_ore_poly_t` represents a univariate Ore polynomial `L \in R[D]`
 implemented as a dense array of coefficients in a generic ring *R*.
 The choice of Ore algebra structure (e.g. with `D` being the standard
@@ -28,15 +23,15 @@ Ore algebra types
 
     Represents one of the following supported Ore algebra types:
 
-    .. macro:: ORE_ALGEBRA_CUSTOM
+    .. enumerator:: ORE_ALGEBRA_CUSTOM
 
         Custom Ore polynomials.
 
-    .. macro:: ORE_ALGEBRA_COMMUTATIVE
+    .. enumerator:: ORE_ALGEBRA_COMMUTATIVE
 
         Standard polynomials.
 
-    .. macro:: ORE_ALGEBRA_DERIVATIVE
+    .. enumerator:: ORE_ALGEBRA_DERIVATIVE
 
         Linear differential operators in the standard derivative.
 
@@ -44,7 +39,7 @@ Ore algebra types
         `\delta` is the derivative `\frac{d}{dx}` with respect to a generator
         `x` of the base ring.
 
-    .. macro:: ORE_ALGEBRA_EULER_DERIVATIVE
+    .. enumerator:: ORE_ALGEBRA_EULER_DERIVATIVE
 
         Linear differential operators in the Euler derivative.
 
@@ -52,7 +47,7 @@ Ore algebra types
         `\delta` is the Euler derivative `x\cdot\frac{d}{dx}` with respect to a
         generator `x` of the base ring.
 
-    .. macro:: ORE_ALGEBRA_FORWARD_SHIFT
+    .. enumerator:: ORE_ALGEBRA_FORWARD_SHIFT
 
         Linear difference operators in the standard forward shift.
 
@@ -60,31 +55,31 @@ Ore algebra types
         to a generator `x` of the base ring, and the `\sigma`-derivation
         `\delta` is the zero map.
 
-    .. macro:: ORE_ALGEBRA_FORWARD_DIFFERENCE
+    .. enumerator:: ORE_ALGEBRA_FORWARD_DIFFERENCE
 
-        Linear difference operator in the forward finite difference operator.
+        Linear difference operators in the forward finite difference.
 
         The endomorphism `\sigma` is the shift `x \mapsto x + 1` with respect
         to a generator `x` of the base ring, and the `\sigma`-derivation
         `\delta` maps `x \mapsto 1`.
 
-    .. macro:: ORE_ALGEBRA_BACKWARD_SHIFT
+    .. enumerator:: ORE_ALGEBRA_BACKWARD_SHIFT
 
         Linear difference operators in the standard backward shift.
 
-    .. macro:: ORE_ALGEBRA_BACKWARD_DIFFERENCE
+    .. enumerator:: ORE_ALGEBRA_BACKWARD_DIFFERENCE
 
-        Linear difference operator in the backward finite difference operator.
+        Linear difference operators in the backward finite difference.
 
-    .. macro:: ORE_ALGEBRA_Q_SHIFT
+    .. enumerator:: ORE_ALGEBRA_Q_SHIFT
 
         Linear q-difference operators.
 
-    .. macro:: ORE_ALGEBRA_MAHLER
+    .. enumerator:: ORE_ALGEBRA_MAHLER
 
         Linear Mahler operators.
 
-    .. macro:: ORE_ALGEBRA_FROBENIUS
+    .. enumerator:: ORE_ALGEBRA_FROBENIUS
 
         Ore polynomials over a field twisted by the Frobenius endomorphism.
 
@@ -141,8 +136,7 @@ Context object methods
     specific initialization function is listed below.
 
 .. function:: int gr_ore_poly_ctx_init_q_shift(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, gr_srcptr q)
-              int gr_ore_poly_ctx_init_q_difference(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, gr_srcptr q)
-              int gr_ore_poly_ctx_init_mahler(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, long mahler_base)
+              int gr_ore_poly_ctx_init_mahler(gr_ore_poly_ctx_t ctx, gr_ctx_t base_ring, slong base_var, slong mahler_base)
 
     Like :func:`gr_ore_poly_ctx_init` for predefined Ore polynomial types where
     `\sigma` and `\delta` depend on parameters.
@@ -266,6 +260,113 @@ Action
 
     A pointer to a function with the same specification as
     :func:`gr_ore_poly_sigma_delta`.
+
+.. function:: int gr_ore_poly_apply(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_ore_poly_ctx_t ctx)
+
+    Sets *res* to the result of applying *P* to the base ring element *f* under
+    the standard interpretation of *P* as an operator acting on the base ring
+    (derivative operators differentiate, shift operators shift, etc.).
+
+.. function:: int gr_ore_poly_apply_custom(gr_ptr res, const gr_ore_poly_t P, gr_srcptr f, gr_srcptr d1, gr_ore_poly_ctx_t ctx)
+
+    Sets *res* to the result of applying *P* to the base ring element *f*, where
+    the generator `D` acts by `g \mapsto \sigma(g) \cdot d1 + \delta(g)` for the
+    given value *d1* of `D(1)`. Any *d1* defines a valid action.
+
+Conversions
+-------------------------------------------------------------------------------
+
+The following functions convert between expressions of a linear differential
+or difference operator in different bases, represented as Ore polynomials in
+different Ore polynomial rings over the same base ring.
+
+.. function:: int _gr_ore_poly_euler_to_ddx(gr_ptr res, gr_srcptr op, slong len, slong var, gr_ctx_t ctx)
+
+    Rewrites an Ore polynomial *op* of type :enumerator:`ORE_ALGEBRA_EULER_DERIVATIVE`
+    as an Ore polynomial of type :enumerator:`ORE_ALGEBRA_DERIVATIVE`.
+    The context *ctx* is the common base ring and *var* is the index of the
+    generator of *ctx* on which the derivations act.
+    The output vector *res* has the same length *len* as *op* and must not
+    alias it.
+
+.. function:: int _gr_ore_poly_ddx_to_euler(gr_ptr res, gr_srcptr op, slong len, slong var, gr_ctx_t ctx)
+
+    Rewrites an Ore polynomial *op* of type :enumerator:`ORE_ALGEBRA_DERIVATIVE`
+    as an Ore polynomial *res* of type
+    :enumerator:`ORE_ALGEBRA_EULER_DERIVATIVE` such that
+    `\mathit{res} = x^{len-1} \cdot \mathit{op}`,
+    where `x` is the generator of index *var* of the base ring *ctx*.
+    The output vector *res* has the same length *len* as *op* and must not
+    alias it.
+
+.. function:: int _gr_ore_poly_shift_convert(gr_ptr res, slong * p, gr_srcptr op, slong len, ore_algebra_t src_alg, ore_algebra_t dst_alg, slong var, gr_ctx_t ctx)
+
+    Rewrites an operator *op* from *src_alg* to *dst_alg* where *src_alg* and
+    *dst_alg* are among the builtin shift and difference algebras (corresponding
+    to operators written in terms of the forward and backward shifts `S`,
+    `S^{-1}` and the forward and backward differences `S-1`, `1-S^{-1}`).
+    The context *ctx* is the common base ring and *var* is the index of the
+    generator of *ctx* on which `S` acts. Conversions that cross between the
+    forward side `S`, `S-1` and the backward side `S^{-1}`, `1-S^{-1}`
+    currently require a generic univariate polynomial base ring and otherwise
+    return ``GR_UNABLE``.
+    The result satisfies
+    `S^{\textit{p}} \cdot \textit{res} = \textit{op}`.
+    The output vector *res* has the same length *len* as *op* and must not
+    alias it.
+    This function returns an error status when the source or destination algebra
+    is not of the required type.
+
+.. function:: int _gr_ore_poly_shift_convert_difference(gr_ptr res, slong * p, gr_srcptr op, slong len, int to_backward, slong var, gr_ctx_t ctx)
+
+    Specialized version of :func:`_gr_ore_poly_shift_convert` for converting
+    between :enumerator:`ORE_ALGEBRA_FORWARD_DIFFERENCE` and
+    :enumerator:`ORE_ALGEBRA_BACKWARD_DIFFERENCE` or back. The *to_backward*
+    flag indicates the direction of the conversion.
+
+.. function:: int gr_ore_poly_convert(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx)
+
+    Convert *op* from *op_ctx* to *res_ctx*.
+    The meaning of the output parameter *p* is algebra-dependent.
+    For a conversion within the differential family one has
+    `x^{p} \cdot \textit{res} = \textit{op}`
+    where `x` is the generator of the base ring specified in the source context.
+    For a conversion within the shift/difference family, one has
+    `S^{p} \cdot \textit{res} = \textit{op}` (a power of the forward shift `S`).
+    No attempt is currently made to minimize *p* or its absolute value.
+
+For `f = \sum_n a_n x^n`, the Euler derivative `\theta = x d/dx` acts on
+`(a_n)` as multiplication by `n` and `x` acts as the backward shift `S^{-1}`.
+The following functions convert between differential and difference operators in
+a way compatible with this action, mapping `x d/dx \mapsto n`,
+`x \mapsto S^{-1}` and inversely.
+
+.. function:: int _gr_ore_poly_euler_to_backshift_univar(gr_ptr res, slong reslen, gr_srcptr op, slong len, gr_ctx_t ctx)
+              int _gr_ore_poly_backshift_to_euler_univar(gr_ptr res, slong reslen, gr_srcptr op, slong len, gr_ctx_t ctx)
+
+    The two inverse rewritings of the isomorphism between the Euler operator and
+    the backward shift `S^{-1}`.
+    The common base ring *ctx* must be a univariate polynomial ring.
+    The caller allocates *res* to *reslen*, one more than the largest
+    coefficient degree of *op*.
+
+.. function:: int gr_ore_poly_differential_to_shift(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx)
+
+    Given a differential operator *op* represented as an element of *op_ctx*,
+    computes a shift/difference operator *res* in *res_ctx* and an integer *p*
+    such that the above correspondence maps *op* to `S^p \cdot \textit{res}`.
+    The generators of the base rings specified in the source and
+    destination contexts play the role of `x` and `n`.
+    No attempt is currently made to minimize *p* or its absolute value.
+
+.. function:: int gr_ore_poly_shift_to_differential(gr_ore_poly_t res, slong * p, const gr_ore_poly_t op, gr_ore_poly_ctx_t res_ctx, gr_ore_poly_ctx_t op_ctx)
+
+    Given a shift/difference operator *op* represented as an element of *op_ctx*,
+    computes a differential operator *res* in *res_ctx* and an integer *p*
+    such that the above correspondence maps *op* to `x^p \cdot \textit{res}`.
+    The generators of the base rings specified in the source and
+    destination contexts play the role of `n` and `x`.
+    No attempt is currently made to minimize *p* or its absolute value.
 
 Arithmetic
 -------------------------------------------------------------------------------
