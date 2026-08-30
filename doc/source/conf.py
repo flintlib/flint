@@ -82,6 +82,7 @@ latex_preamble = r"""
 \setcounter{tocdepth}{2}
 """
 
+latex_logo = "../logos/flint-logo-day-transparent.pdf"
 
 primary_domain = 'c'
 
@@ -114,6 +115,8 @@ html_theme_options = {
     'footerbgcolor': '#333',
     'headbgcolor': '#fff',
 }
+
+html_logo = "../logos/flint-logo-night-transparent.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
