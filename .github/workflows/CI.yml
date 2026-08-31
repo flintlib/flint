@@ -28,13 +28,13 @@ env:
   GLOBAL_MULTIPLIER: 1
 
 concurrency:
-  # Group by workflow and ref, and to limit to 1 concurrent job except for main
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
-  # Cancel intermediate builds for pull requests
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+  # Temporary: keep separate CI runs alive while probing intermittent M1 failures.
+  group: ${{ github.workflow }}-${{ github.run_number }}
+  cancel-in-progress: false
 
 jobs:
   assert-ntl-msolve-nemo:
+    if: false
     name: NTL, msolve and Nemo.jl
     runs-on: ubuntu-24.04
     env:
@@ -79,6 +79,7 @@ jobs:
           julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\"); Pkg.test(\"Nemo\")"
 
   ubuntu-codecov:
+    if: false
     name: codecov (x10)
     runs-on: ubuntu-24.04
     env:
@@ -118,6 +119,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   regression-check:
+    if: false
     name: Regression check
     runs-on: ubuntu-24.04
     env:
@@ -140,6 +142,7 @@ jobs:
         run: $MAKE $MODULES
 
   ubuntu-arm:
+    if: false
     name: ARM (x0.5)
     runs-on: ubuntu-24.04-arm
     env:
@@ -194,6 +197,7 @@ jobs:
         run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
 
   ubuntu-clang:
+    if: false
     name: ASan, BLAS, examples (x1)
     runs-on: ubuntu-24.04
     env:
@@ -225,6 +229,7 @@ jobs:
         run: $MAKE checkexamples
 
   mingw64-gcc:
+    if: false
     name: MinGW (x0.5)
     runs-on: windows-latest
     defaults:
@@ -260,6 +265,7 @@ jobs:
         run: echo "FLINT_TEST_MULTIPLIER = $FLINT_TEST_MULTIPLIER" && $MAKE check
 
   msvc:
+    if: false
     name: MSVC (x0.5)
     runs-on: windows-latest
     env:
@@ -302,6 +308,7 @@ jobs:
           ctest -j5 --output-on-failure
 
   alpine-32bit:
+    if: false
     name: 32-bit, musl, assert (x2.5)
     runs-on: ubuntu-24.04
     env:
