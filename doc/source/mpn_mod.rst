@@ -188,6 +188,27 @@ used by higher-level generic routines.
     Reduces matrix multiplication to several ``nmod_mat`` matrix multiplications
     followed by CRT reconstruction. Supports multithreading.
 
+.. function:: int mpn_mod_mat_mul_batched_mont(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+
+    Multiplies two `4 \times 4` matrices using a batched AVX2 Montgomery kernel.
+    Each number is held as 31-bit limbs across the four SIMD lanes (one output
+    column per lane), and the four products of a dot product are summed into a
+    wide accumulator before a single lazy Montgomery reduction. Requires AVX2,
+    an odd modulus, and `n < 2^{246}`; otherwise, and for any other size, it
+    falls back to :func:`gr_mat_mul_classical`. A single call pays the cost of
+    converting `A`, `B` into and `C` out of Montgomery form, so it is primarily
+    useful as the building block of :func:`mpn_mod_mat_pow_ui_batched_mont`,
+    where that conversion is amortized over many multiplications.
+
+.. function:: int mpn_mod_mat_pow_ui_batched_mont(gr_mat_t res, const gr_mat_t A, ulong exp, gr_ctx_t ctx)
+
+    Computes ``res = A^exp`` for a `4 \times 4` matrix `A` using the batched
+    Montgomery kernel. `A` is converted to Montgomery form once, the whole
+    square-and-multiply chain runs in the batched representation, and the result
+    is converted back once, so the conversion overhead is amortized. Requires
+    AVX2, an odd modulus, and `n < 2^{246}`; otherwise it falls back to
+    :func:`gr_mat_pow_ui`.
+
 .. function:: int mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
     Dispatches among classical, Waksman and multimodular

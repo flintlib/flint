@@ -208,6 +208,9 @@ int _mpn_mod_vec_dot_strided(nn_ptr res, nn_srcptr initial, int subtract, nn_src
 
 int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+int mpn_mod_mat_pow_ui_batched_mont(gr_mat_t res, const gr_mat_t A, ulong exp, gr_ctx_t ctx);
+
+int mpn_mod_mat_mul_batched_mont(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 int mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
 int mpn_mod_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
