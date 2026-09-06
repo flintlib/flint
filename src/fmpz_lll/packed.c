@@ -413,12 +413,8 @@ fmpz_lll_packed_row_submul_fmpz(fmpz_lll_packed_t P, slong i, slong j, const fmp
     a = P->rows[i];
     b = P->rows[j];
 
-    if (m == 1)
-    {
-        for (k = 0; k < n; k++)
-            a[k] -= b[k] * xl[0];
-    }
-    else if (m == 2)
+    /* m == 1 cannot occur here: |x| >= 2^(FLINT_BITS-1) forces at least two limbs */
+    if (m == 2)
     {
         for (k = 0; k < n; k++)
         {
