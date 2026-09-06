@@ -3,6 +3,93 @@
 **fmpz_lll.h** -- LLL reduction
 ==================================================================================================
 
+Packed basis matrix
+--------------------------------------------------------------------------------
+
+The floating-point LLL variants operate internally on a packed copy of the
+basis matrix, stored as a :type:`fmpz_lll_packed_t`, in which every entry
+occupies a fixed number of limbs in two's complement and the entries of a
+row are contiguous. Row operations are performed slot-wise modulo
+a power of two, which is exact by virtue of an upper bound on the bit length
+of the entries of each row which is maintained by all operations; the number
+of limbs is grown or shrunk as needed. This representation is much cheaper
+to update than a matrix of ``fmpz`` entries for the small (one to a few limbs)
+entries typical of lattice reduction, and Gram matrix entries can be computed
+exactly with fixed-size dot product kernels.
+
+.. type:: fmpz_lll_packed_struct
+
+.. type:: fmpz_lll_packed_t
+
+.. function:: slong fmpz_lll_packed_limbs(const fmpz_mat_t B)
+
+    Returns the number of limbs per entry to use for packing ``B``,
+    including some headroom. This is determined by the largest entry of
+    ``B``; since all entries use the same number of limbs, packing is
+    only used by the LLL functions when this number is small
+    (``FMPZ_LLL_PACKED_MAX_LIMBS``, respectively
+    ``FMPZ_LLL_PACKED_MAX_LIMBS_MPF`` in the multiprecision LLL where
+    the Gram matrix entries are computed exactly) and the packed matrix
+    is not too large (``FMPZ_LLL_PACKED_MAX_SIZE`` limbs). Slots are
+    shrunk during the reduction once all entries have become smaller.
+
+.. function:: void fmpz_lll_packed_init(fmpz_lll_packed_t P, slong d, slong n, slong m)
+              void fmpz_lll_packed_clear(fmpz_lll_packed_t P)
+
+    Initialises resp. clears a packed matrix with `d` rows, `n` columns
+    and `m` limbs per entry.
+
+.. function:: void fmpz_lll_packed_set_fmpz_mat(fmpz_lll_packed_t P, const fmpz_mat_t B)
+              void fmpz_lll_packed_get_fmpz_mat(fmpz_mat_t B, const fmpz_lll_packed_t P)
+
+    Packs ``B`` (whose entries must fit) into ``P``, resp. unpacks ``P``
+    into ``B``.
+
+.. function:: void fmpz_lll_packed_tighten(fmpz_lll_packed_t P, slong i)
+              void fmpz_lll_packed_grow(fmpz_lll_packed_t P)
+              void fmpz_lll_packed_maybe_shrink(fmpz_lll_packed_t P)
+
+    Recomputes the exact bit bound of row `i`; increases the number of
+    limbs per entry by one; decreases the number of limbs per entry by one
+    if all rows comfortably fit.
+
+.. function:: void fmpz_lll_packed_move_row(fmpz_lll_packed_t P, slong i, slong j)
+
+    Moves row `i` to position `j`, shifting the rows in between.
+
+.. function:: void fmpz_lll_packed_row_sub(fmpz_lll_packed_t P, slong i, slong j)
+              void fmpz_lll_packed_row_add(fmpz_lll_packed_t P, slong i, slong j)
+              void fmpz_lll_packed_row_submul_si(fmpz_lll_packed_t P, slong i, slong j, slong x)
+              void fmpz_lll_packed_row_submul_fmpz(fmpz_lll_packed_t P, slong i, slong j, const fmpz_t x)
+              void fmpz_lll_packed_row_submul_si_2exp(fmpz_lll_packed_t P, slong i, slong j, slong x, ulong e)
+
+    Sets row `i` to row `i` minus (or plus) row `j`, respectively minus
+    `x` (times `2^e`) times row `j`. The results are exact.
+
+.. function:: slong fmpz_lll_packed_get_d_vec_2exp(double * appv, fmpz_lll_packed_t P, slong i)
+
+    Equivalent to :func:`_fmpz_vec_get_d_vec_2exp` applied to row `i`.
+    Also sets the bit bound of the row to its exact value.
+
+.. function:: void fmpz_lll_packed_dot(fmpz_t res, const fmpz_lll_packed_t P, slong i, slong j, slong len)
+
+    Sets ``res`` to the exact dot product of the first ``len`` entries of
+    rows `i` and `j`.
+
+.. function:: double fmpz_lll_packed_heuristic_dot(const double * vec1, const double * vec2, slong len2, const fmpz_lll_packed_t P, slong k, slong j, slong exp_adj)
+
+    Equivalent to :func:`fmpz_lll_heuristic_dot` for a packed matrix.
+
+.. function:: int fmpz_lll_check_babai_packed(int kappa, fmpz_lll_packed_t P, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl, int heuristic)
+              int fmpz_lll_advance_check_babai_packed(int cur_kappa, int kappa, fmpz_lll_packed_t P, fmpz_mat_t U, d_mat_t mu, d_mat_t r, double *s, d_mat_t appB, int *expo, fmpz_gram_t A, int a, int zeros, int kappamax, int n, const fmpz_lll_t fl, int heuristic)
+              int fmpz_lll_check_babai_heuristic_packed(int kappa, fmpz_lll_packed_t P, fmpz_mat_t U, gr_mat_t mu, gr_mat_t r, gr_ptr s, fmpz_gram_t A, int a, int zeros, int kappamax, int n, gr_ptr tmp, gr_ptr rtmp, gr_ctx_t ctx, const fmpz_lll_t fl)
+
+    Versions of :func:`fmpz_lll_check_babai`, :func:`fmpz_lll_advance_check_babai`
+    and :func:`fmpz_lll_check_babai_heuristic` operating on a packed basis
+    matrix (``heuristic`` selects the heuristic variant). In the
+    multiprecision version the Gram matrix entries are computed exactly.
+
+
 Parameter manipulation
 --------------------------------------------------------------------------------
 
