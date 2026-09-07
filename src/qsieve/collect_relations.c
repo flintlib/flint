@@ -543,7 +543,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 #if FLINT_USES_PTHREAD
          pthread_mutex_lock(&qs_inf->mutex);
 #endif
-	 qsieve_write_to_file(qs_inf, 1, Y, poly);
+         qsieve_add_relation(qs_inf, 1, Y, poly);
 
          qs_inf->full_relation++;
 
@@ -590,9 +590,8 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 #if FLINT_USES_PTHREAD
                   pthread_mutex_lock(&qs_inf->mutex);
 #endif
-                  /* store this partial in file */
-
-                  qsieve_write_to_file(qs_inf, prime, Y, poly);
+                  /* store this partial */
+                  qsieve_add_relation(qs_inf, prime, Y, poly);
 
                   qs_inf->edges++;
 
