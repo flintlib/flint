@@ -132,6 +132,9 @@ int mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx);
 
 int mpn_mod_get_fmpz(fmpz_t res, nn_srcptr x, gr_ctx_t ctx);
 
+int mpn_mod_pow_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t e, gr_ctx_t ctx);
+int mpn_mod_pow_ui(nn_ptr res, nn_srcptr x, ulong e, gr_ctx_t ctx);
+
 MPN_MOD_INLINE truth_t
 mpn_mod_is_zero(nn_srcptr x, gr_ctx_t ctx)
 {

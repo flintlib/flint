@@ -23,14 +23,14 @@ void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
 {
     const slong lenQ = lenA - lenB + 1;
     fmpz * Arev;
-
-    Arev = _fmpz_vec_init(lenQ);
-
-    _fmpz_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
+    slong i;
+ 
+    Arev = flint_malloc(lenQ * sizeof(fmpz));
+    for (i = 0; i < lenQ; i++)
+        Arev[i] = A[lenA - 1 - i];
     _fmpz_mod_poly_mullow(Q, Arev, lenQ, Binv, FLINT_MIN(lenQ, lenBinv), lenQ, ctx);
     _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
-
-    _fmpz_vec_clear(Arev, lenQ);
+    flint_free(Arev);
 }
 
 

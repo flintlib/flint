@@ -192,7 +192,7 @@ HEADER_DIRS	:=	\
 		fft			@FFT_SMALL@								\
 		fmpz_lll											\
 		arith												\
-		qsieve		aprcl									\
+		qsieve		aprcl		ecpp							\
 															\
 		fq_default		fq_default_mat	fq_default_poly		\
 		fq_nmod_embed	fq_zech_embed	fq_embed			\

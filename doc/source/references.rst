@@ -117,6 +117,22 @@ References
 
 .. [EHJ2016] \A. Enge, W. Hart and F. Johansson, "Short addition sequences for theta functions", preprint (2016), https://arxiv.org/abs/1608.06810
 
+.. [Enge2024] \A. Enge, "FastECPP over MPI", Mathematical Software - ICMS 2024: 8th International Conference, Durham, UK, July 22-25, 2024, Proceedings, Springer-Verlag, Berlin, Heidelberg, 36-45. https://doi.org/10.1007/978-3-031-64529-7_4
+
+.. [EngeCM] \A. Enge, CM - a library for the computation of class polynomials and elliptic curve primality proving, https://www.multiprecision.org/cm/
+
+.. [EngeMorain2003] \A. Enge and F. Morain, "Fast decomposition of polynomials with known Galois group", Applied Algebra, Algebraic Algorithms and Error-Correcting Codes (AAECC-15), LNCS 2643, Springer (2003), 254-264
+
+.. [FKMW2004] \J. Franke, T. Kleinjung, F. Morain and T. Wirth, "Proving the primality of very large numbers with fastECPP", Algorithmic Number Theory (ANTS-VI), LNCS 3076, Springer (2004), 194-207
+
+.. [Morain2007] \F. Morain, "Implementing the asymptotically fast version of the elliptic curve primality proving algorithm", Mathematics of Computation 76 (2007), 493-505
+
+.. [PARI] \The PARI Group, PARI/GP, https://pari.math.u-bordeaux.fr/ ; the ``primecert`` implementation of FastECPP is by Jared Asuncion
+
+.. [Schertz2002] \R. Schertz, "Weber's class invariants revisited", Journal de Theorie des Nombres de Bordeaux 14 (2002), 325-343
+
+.. [YuiZagier1997] \N. Yui and D. Zagier, "On the singular values of Weber modular functions", Mathematics of Computation 66 (1997), 1645-1662
+
 .. [EM2004] \O. Espinosa and V. Moll, "A generalized polygamma function", Integral Transforms and Special Functions (2004), 101-115.
 
 .. [EK2025] \N. D. Elkies and J. Kieffer, "A uniform quasi-linear time algorithm for evaluating theta functions in any dimension", in preparation.

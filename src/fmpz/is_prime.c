@@ -14,7 +14,41 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "fmpz.h"
+#include "thread_support.h"
 #include "aprcl.h"
+#include "ecpp.h"
+
+/*
+    ECPP versus APRCL for the final proof: single-threaded, ECPP is the
+    faster from about 250 bits on (means over random primes); APRCL parallelises better (its
+    Jacobi sums are independent), ECPP's chain is largely serial, so the
+    crossover moves up with the number of threads (measured on random
+    primes: 250 bits with one thread, 550 with two, 1000 with three, 2000
+    with four).
+*/
+static slong
+_fmpz_is_prime_ecpp_bits(void)
+{
+    slong t = flint_get_num_available_threads();
+    if (t <= 1) return 250;
+    if (t == 2) return 550;
+    if (t == 3) return 1000;
+    if (t == 4) return 2000;
+    if (t <= 8) return 8000;
+    return 12000;   /* heuristic, neither APRCL nor ECPP is currently tuned for larger bit sizes */
+}
+
+static int
+_fmpz_is_prime_proof(const fmpz_t n)
+{
+    if ((slong) fmpz_bits(n) >= _fmpz_is_prime_ecpp_bits())
+    {
+        int r = ecpp_is_prime(n);
+        if (r >= 0)
+            return r;
+    }
+    return aprcl_is_prime(n);
+}
 
 static int _fmpz_is_prime(const fmpz_t n, int proved)
 {
@@ -213,7 +247,7 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
 
          if (!feasible)
          {
-            res = aprcl_is_prime(n);
+            res = _fmpz_is_prime_proof(n);
             _nmod_vec_clear(pm1);
             _nmod_vec_clear(pp1);
             break;
@@ -354,7 +388,7 @@ static int _fmpz_is_prime(const fmpz_t n, int proved)
                               fmpz_clear(r);
                            } else /* apr-cl primality test */
                            {
-                              res = aprcl_is_prime(n);
+                              res = _fmpz_is_prime_proof(n);
                            }
 
                            fmpz_clear(d);
