@@ -14,6 +14,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod.h"
+#include "ulong_extras.h"
 
 TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
 {
@@ -24,19 +25,38 @@ TEST_FUNCTION_START(nmod_poly_evaluate_geometric_nmod_vec_fast, state)
         nmod_poly_t P;
         nn_ptr y, z;
         ulong mod, r;
-        slong n, npoints;
+        ulong n, npoints;
 
-        npoints = (i < 10) ? i : n_randint(state, 500);
+        /* will do a few tests with repeated points */
+        int repeated_points = (i % 10 == 5);
+
+        /* number of points */
+        npoints = (i < 20) ? i : n_randint(state, 500);
+
+        /* poly length */
         n = n_randint(state, 1000);
-        do 
-        { 
-            mod = n_randtest_prime(state, 1); 
-        }
-        while (mod <= 2*FLINT_MAX(npoints, n) + 1); // minimum limit for maximum order r
 
+        /* modulus and geometric progression */
+        if (repeated_points) 
+        {
+            mod = 2 + n_randint(state, 5);
+            do
+            {
+                r = n_randint(state, mod);
+            }
+            while (n_gcd(r, mod) != 1);
+        }
+        else
+        {
+            do 
+            { 
+                mod = n_randtest_prime(state, 1); 
+            }
+            while (mod <= 2*FLINT_MAX(npoints, n) + 1);
+            r = n_primitive_root_prime(mod);
+        }
 
         nmod_poly_init(P, mod);
-        r = n_primitive_root_prime(mod);
         y = _nmod_vec_init(npoints);
         z = _nmod_vec_init(npoints);
 
