@@ -1507,8 +1507,7 @@ Multipoint evaluation
     Evaluates (``coeffs``, ``ilen``) at the first ``olen`` powers
     of the square of ``r``, writing the output values to ``ys``.
     The value of ``r`` should be reduced modulo the modulus ``mod``
-    and of sufficient multiplicative order such that none of
-    the first ``olen`` powers of `r^2` is one.
+    and coprime with ``mod``.
 
     Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
@@ -1517,8 +1516,7 @@ Multipoint evaluation
     Evaluates ``poly``  at the first ``olen`` powers
     of the square of ``r``, writing the output values to ``ys``.
     The value of ``r`` should be reduced modulo the modulus of the polynomial
-    and of sufficient multiplicative order such that none of
-    the first ``olen`` powers of `r^2` is one.
+    and coprime with this modulus.
 
     Uses fast geometric multipoint evaluation, building a temporary geometric progression precomputation.
 
@@ -2651,24 +2649,27 @@ Geometric progression
     Builds a geometric progression multipoint evaluation / interpolation structure.
 
     The variant with ``function`` variant builds precomputation for specific
-    functionalities: currently, one should set ``function`` to `1` for
-    evaluation only, to `2` for interpolation only, and to `3` for both
-    evaluation and interpolation. The variant without ``function`` precomputes
-    for both.
+    functionalities. The lowest 3 bits of ``function`` act as a mask for the
+    three functionalities: bit 0 for evaluation, bit 1 for interpolation, and
+    bit 2 for extrapolation. For example, setting ``function`` to `1` prepares
+    precomputation for evaluation only, setting it to `3` prepares for both
+    evaluation and interpolation, and setting it to `5` prepares for evaluation
+    and extrapolation. The variant without ``function`` precomputes for all
+    three functionalities.
 
     The set of points used will be `1, r^2, r^4, \ldots, r^{2(len-1)}`.
 
-    The value of ``r`` should be reduced modulo the modulus ``mod``
-    and of sufficient multiplicative order such that none of
-    the powers `r^2, r^4, \ldots, r^{2(len-1)}` is one.
+    The value of ``r`` should be reduced modulo the modulus ``mod`` and should
+    be coprime with ``mod``. If ``function`` is `1` (evaluation only), there is
+    no other constraint. For any value of ``function`` other than `1`, this `r`
+    should also have sufficient multiplicative order such that none of the
+    powers `r^2, r^4, \ldots, r^{2(len-1)}` is one; additionally, if ``mod`` is
+    not prime then `r` should be such that the auxiliary values `r^{2k} - 1`
+    are invertible modulo ``mod``.
 
     The value of ``len`` should be both greater than or equal to the number of evaluation points to be
     considered, and greater than or equal to the length of the polynomials to be evaluated / interpolated.
-    This allocates vectors and polynomials for a total space of `6 len - 1` coefficients.
-
-    If the modulus is not prime, this function will work under the additional
-    assumption that all the used points `r^{2k}` as well as the auxiliary
-    values `r^{2k} - 1` are invertible.
+    This allocates vectors and polynomials for a total space of ``11*len`` coefficients at most (evaluation alone takes ``3*len``; interpolation takes ``3*len``; extrapolation takes ``6*len`` but with ``1*len`` shared with interpolation).
 
 .. function:: void nmod_geometric_progression_clear(nmod_geometric_progression_t G)
 
