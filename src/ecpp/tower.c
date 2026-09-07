@@ -886,22 +886,31 @@ _acb_poly_get_fmpz_poly(fmpz_poly_t r, const acb_poly_t p)
     (k = 3 if 3 | D, else 1), and j = (F - 16)^3 / F for m odd,
     j = (F + 16)^3 / F for m even (F = f^24 resp. f1^24).
 */
+
+/*
+    The residue class computations on D below use |D| = -D (a positive
+    number) and shifts and masks rather than the division and remainder of
+    a negative slong: the 32-bit build with gcc 15.2 on Alpine took the
+    Weber path for D = -4047 with the latter (D % 4 != 0 being false),
+    which no sanitizer or other compiler reproduces.
+*/
 static int
 _weber_ok(slong D)
 {
-    slong m;
-    if (D % 4 != 0)
+    ulong m;
+    if (D >= 0 || (((ulong) (-D)) & 3) != 0)
         return 0;
-    m = -D / 4;
-    return (m % 8 == 1 || m % 8 == 2 || m % 8 == 3 || m % 8 == 5 || m % 8 == 6 || m % 8 == 7);
+    m = (((ulong) (-D)) >> 2) & 7;
+    return (m == 1 || m == 2 || m == 3 || m == 5 || m == 6 || m == 7);
 }
 
 /* the height factor 72 / e */
 static double
 _weber_factor(slong D)
 {
-    slong m = -D / 4, e = (m % 8 == 5) ? 4 : (m % 8 == 3 || m % 8 == 7) ? 1 : 2;
-    if (D % 3 == 0)
+    ulong m8 = (((ulong) (-D)) >> 2) & 7;
+    slong e = (m8 == 5) ? 4 : (m8 == 3 || m8 == 7) ? 1 : 2;
+    if (((ulong) (-D)) % 3 == 0)
         e *= 3;
     return 72.0 / e;
 }
@@ -975,7 +984,7 @@ _nsystem_entry(slong * a, slong * b, slong N, slong b0, slong D)
 static void
 _weber_value(acb_t g, slong a0, slong b0, slong D, slong prec)
 {
-    slong a = a0, b = b0, m = -D / 4;
+    slong a = a0, b = b0, m = (slong) (((ulong) (-D)) >> 2);
     acb_t tau, t, e1, e2;
     arb_t s2;
 
@@ -1038,7 +1047,7 @@ _weber_value(acb_t g, slong a0, slong b0, slong D, slong prec)
             acb_mul_2exp_si(g, g, -1);
         }
     }
-    if (D % 3 == 0)
+    if (((ulong) (-D)) % 3 == 0)
     {
         acb_mul(t, g, g, prec);
         acb_mul(g, g, t, prec);
@@ -1054,10 +1063,10 @@ _weber_value(acb_t g, slong a0, slong b0, slong D, slong prec)
 static void
 _weber_to_j(fmpz_t j, const fmpz_t g, slong D, const fmpz_mod_ctx_t ctx)
 {
-    slong m = -D / 4;
+    slong m = (slong) (((ulong) (-D)) >> 2);
     fmpz_t F, t;
     fmpz_init(F); fmpz_init(t);
-    fmpz_mod_pow_ui(F, g, (D % 3 == 0) ? 2 : 6, ctx);
+    fmpz_mod_pow_ui(F, g, ((((ulong) (-D)) % 3) == 0) ? 2 : 6, ctx);
     if (m % 8 == 5)
         fmpz_mod_mul_ui(F, F, 64, ctx);
     else if (m % 8 == 3)
@@ -1106,6 +1115,9 @@ _ecpp_class_poly_tower(fmpz_t j, slong D, int flags, flint_rand_t state,
     double lgh;
     int success = 0, kummer_retries = 0;
     int weber = _weber_ok(D) && !(flags & ECPP_TOWER_J);
+    /* the invariant is only a class invariant for D = 0 mod 4 */
+    if (weber && (((ulong) (-D)) & 3) != 0)
+        weber = 0;
     /* the Kummer data (and its retries) only pay when a powering of a
        degree-p polynomial is expensive, i.e. for large n; the cost model
        in disc.c prices the descents accordingly */

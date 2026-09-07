@@ -77,7 +77,8 @@ ecpp_disc_cost_n(const ecpp_disc_struct * d, int veven, const ulong * nmodp, slo
     double numfac = pow(4000.0 / FLINT_MAX(bits, 200), 2.6);
     numfac = FLINT_MIN(numfac, 500.0);
     numfac = FLINT_MAX(numfac, 1.0);
-    slong h = d->h, p, m = -d->D / 4;
+    slong h = d->h, p;
+    ulong absD = (ulong) (-d->D), m = absD >> 2;
     /*
         Weber's function: even D directly; odd D through the order of
         conductor 2 (discriminant 4D) when the v of 4n = t^2 + |D| v^2 is
@@ -88,8 +89,8 @@ ecpp_disc_cost_n(const ecpp_disc_struct * d, int veven, const ulong * nmodp, slo
         D = 5 mod 8 the class number is three times that of D and v is
         even half of the time.
     */
-    int weber = ((d->D % 4 == 0) && (m % 8 != 4 && m % 8 != 0))
-                || (d->D % 2 != 0 && veven);
+    int weber = (((absD & 3) == 0) && ((m & 7) != 4 && (m & 7) != 0))
+                || (((absD & 1) != 0) && veven);
     double cost = 1.5, genus;
 
     /* the twists are tried in turn: 6 for D = -3, 4 for D = -4, 2 else */
@@ -99,7 +100,7 @@ ecpp_disc_cost_n(const ecpp_disc_struct * d, int veven, const ulong * nmodp, slo
         cost = 1.0 + 2.5;
     if (h == 1)
         return cost;
-    if (weber && d->D % 2 != 0 && (-d->D) % 8 == 3)
+    if (weber && (absD & 1) != 0 && (absD & 7) == 3)
         h *= 3;
     /* the alternative: a root of the factor of H_D over the genus field,
        of degree o (by radicals up to 4) */
@@ -150,10 +151,10 @@ ecpp_disc_cost(const ecpp_disc_struct * d)
 int
 ecpp_disc_use_tower(const ecpp_disc_struct * d, int veven, slong * Dt)
 {
-    slong m = -d->D / 4;
-    int weber = ((d->D % 4 == 0) && (m % 8 != 4 && m % 8 != 0))
-                || (d->D % 2 != 0 && veven);
-    *Dt = (d->D % 2 != 0 && veven) ? 4 * d->D : d->D;
+    ulong absD = (ulong) (-d->D), m = absD >> 2;
+    int weber = (((absD & 3) == 0) && ((m & 7) != 4 && (m & 7) != 0))
+                || (((absD & 1) != 0) && veven);
+    *Dt = (((absD & 1) != 0) && veven) ? 4 * d->D : d->D;
     return d->h >= 2 && (weber || d->h <= 48);
 }
 
