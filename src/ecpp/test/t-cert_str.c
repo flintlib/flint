@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <string.h>
 #include "test_helpers.h"
 #include "fmpz.h"
@@ -59,6 +60,17 @@ TEST_FUNCTION_START(ecpp_cert_str, state)
                 }
         }
         flint_free(str);
+
+        /* printing (to a temporary file) in both formats */
+        {
+            FILE * tmp = tmpfile();
+            if (tmp != NULL)
+            {
+                ecpp_cert_fprint(tmp, cert, ECPP_CERT_FORMAT_FLINT);
+                ecpp_cert_fprint(tmp, cert, ECPP_CERT_FORMAT_PARI);
+                fclose(tmp);
+            }
+        }
 
         /* garbage is rejected */
         if (ecpp_cert_set_str(cert2, "[[12, 3, 4") || ecpp_cert_set_str(cert2, "ecpp certificate, 1 steps\n[0] n = x"))

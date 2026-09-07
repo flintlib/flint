@@ -155,6 +155,15 @@ int ecpp_root_radicals(fmpz_t x, const fmpz_mod_poly_t f, flint_rand_t state,
 int ecpp_poly_root(fmpz_t x, const fmpz_mod_poly_t f, flint_rand_t state,
                                                         const fmpz_mod_ctx_t ctx);
 
+/* options of _ecpp_class_poly_tower: compute the Kummer data (done by
+   ecpp_class_poly_tower from ECPP_KUMMER_BITS), use j rather than the Weber
+   invariant */
+#define ECPP_TOWER_KUMMER 1
+#define ECPP_TOWER_J 2
+
+int _ecpp_class_poly_tower(fmpz_t j, slong D, int flags, flint_rand_t state,
+                                                        const fmpz_mod_ctx_t ctx);
+
 int ecpp_class_poly_tower(fmpz_t j, slong D, flint_rand_t state,
                                                         const fmpz_mod_ctx_t ctx);
 

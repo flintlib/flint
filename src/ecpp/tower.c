@@ -150,41 +150,60 @@ _classgroup_series(slong * perm, slong * degs, const qfb * forms, slong h, slong
     {
         slong ord, p, cnt;
 
-        /* an element x outside the subgroup, of prime order p modulo it */
-        for (idx = 0; idx < h && in[idx]; idx++) ;
-        qfb_set(x, (qfb *) forms + idx);
-        /* order of x modulo the subgroup: smallest k with x^k in it */
-        qfb_set(t, x);
-        ord = 1;
-        while (_form_index(table, h, t) < 0 || !in[_form_index(table, h, t)])
+        /*
+            An element x outside the subgroup of prime order p modulo it,
+            with p the largest prime factor of the order of x modulo the
+            subgroup, among the first few candidates: the large primes are
+            then the top levels of the tower (where the Kummer descent
+            applies) and 2 and 3 the bottom (radicals).
+        */
         {
-            qfb_nucomp(t, t, x, Df, L);
-            qfb_reduce(t, t, Df);
-            ord++;
-            if (ord > h)
+            slong cand, ncand = 0, best_p = 0, best_idx = -1, best_ord = 0;
+            for (cand = 0; cand < h && ncand < 16 && ok; cand++)
+            {
+                slong q, rest, pc;
+                if (in[cand])
+                    continue;
+                ncand++;
+                qfb_set(x, (qfb *) forms + cand);
+                qfb_set(t, x);
+                ord = 1;
+                while (_form_index(table, h, t) < 0 || !in[_form_index(table, h, t)])
+                {
+                    qfb_nucomp(t, t, x, Df, L);
+                    qfb_reduce(t, t, Df);
+                    ord++;
+                    if (ord > h)
+                    {
+                        ok = 0;
+                        break;
+                    }
+                }
+                if (!ok)
+                    break;
+                for (q = 2, rest = ord, pc = 1; rest > 1; q++)
+                    if (rest % q == 0)
+                    {
+                        pc = q;
+                        while (rest % q == 0)
+                            rest /= q;
+                    }
+                if (pc > best_p)
+                {
+                    best_p = pc;
+                    best_idx = cand;
+                    best_ord = ord;
+                }
+            }
+            if (!ok || best_idx < 0)
             {
                 ok = 0;
                 break;
             }
-        }
-        if (!ok)
-            break;
-        {
-            /* largest prime factor of ord: the large primes are then the
-               top levels of the tower (where the Kummer descent applies)
-               and 2 and 3 the bottom (radicals) */
-            slong q = 2, rest = ord;
-            p = 1;
-            while (rest > 1)
-            {
-                if (rest % q == 0)
-                {
-                    p = q;
-                    while (rest % q == 0)
-                        rest /= q;
-                }
-                q++;
-            }
+            idx = best_idx;
+            p = best_p;
+            ord = best_ord;
+            qfb_set(x, (qfb *) forms + idx);
         }
         if (ord != p)
         {
@@ -1066,6 +1085,16 @@ _weber_to_j(fmpz_t j, const fmpz_t g, slong D, const fmpz_mod_ctx_t ctx)
 int
 ecpp_class_poly_tower(fmpz_t j, slong D, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 {
+    int flags = 0;
+    if (fmpz_bits(fmpz_mod_ctx_modulus(ctx)) >= ECPP_KUMMER_BITS)
+        flags |= ECPP_TOWER_KUMMER;
+    return _ecpp_class_poly_tower(j, D, flags, state, ctx);
+}
+
+int
+_ecpp_class_poly_tower(fmpz_t j, slong D, int flags, flint_rand_t state,
+                                                        const fmpz_mod_ctx_t ctx)
+{
     qfb * forms;
     slong h, levels, i, k, lev, prec;
     slong * perm, * degs;
@@ -1076,11 +1105,11 @@ ecpp_class_poly_tower(fmpz_t j, slong D, flint_rand_t state, const fmpz_mod_ctx_
     acb_t z;
     double lgh;
     int success = 0, kummer_retries = 0;
-    int weber = _weber_ok(D);
+    int weber = _weber_ok(D) && !(flags & ECPP_TOWER_J);
     /* the Kummer data (and its retries) only pay when a powering of a
        degree-p polynomial is expensive, i.e. for large n; the cost model
        in disc.c prices the descents accordingly */
-    int want_kummer = fmpz_bits(fmpz_mod_ctx_modulus(ctx)) >= ECPP_KUMMER_BITS;
+    int want_kummer = (flags & ECPP_TOWER_KUMMER) != 0;
 
     h = qfb_reduced_forms(&forms, D);
     if (h <= 0)

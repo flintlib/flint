@@ -83,8 +83,10 @@ ecpp_disc_cost_n(const ecpp_disc_struct * d, int veven, const ulong * nmodp, slo
         conductor 2 (discriminant 4D) when the v of 4n = t^2 + |D| v^2 is
         even, since then a curve with that endomorphism ring and the right
         order exists (any curve of the right order serves the proof). For
-        D = 1 mod 8 the order has the same class number, for D = 5 mod 8
-        three times it.
+        D = 1 mod 8 the order has the same class number and v is always
+        even (t^2 + |D| v^2 = 4n with |D| = 7 mod 8 forces t, v even); for
+        D = 5 mod 8 the class number is three times that of D and v is
+        even half of the time.
     */
     int weber = ((d->D % 4 == 0) && (m % 8 != 4 && m % 8 != 0))
                 || (d->D % 2 != 0 && veven);

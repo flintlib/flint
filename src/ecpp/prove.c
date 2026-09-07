@@ -18,7 +18,6 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "fmpz_mod_poly_factor.h"
 #include "thread_support.h"
 #include "thread_pool.h"
 #include "acb_modular.h"
@@ -1275,23 +1274,13 @@ _ecpp_find_point(fmpz_t x, fmpz_t y, const fmpz_t a, const fmpz_t b,
 static int
 _ecpp_class_poly_root(fmpz_t j, const ecpp_cand_struct * c, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 {
-    const fmpz * n = fmpz_mod_ctx_modulus(ctx);
     slong D = c->D;
     fmpz_poly_t H;
-    fmpz_mod_poly_t f, g, base, pw, finv;
-    fmpz_t e, r, t;
-    slong tries = 0;
+    fmpz_mod_poly_t f;
     int found = 0;
 
     fmpz_poly_init(H);
     fmpz_mod_poly_init(f, ctx);
-    fmpz_mod_poly_init(g, ctx);
-    fmpz_mod_poly_init(base, ctx);
-    fmpz_mod_poly_init(pw, ctx);
-    fmpz_mod_poly_init(finv, ctx);
-    fmpz_init(e);
-    fmpz_init(r);
-    fmpz_init(t);
 
     {
         PROF_START(t0);
@@ -1323,94 +1312,16 @@ _ecpp_class_poly_root(fmpz_t j, const ecpp_cand_struct * c, flint_rand_t state, 
         PROF_ADD(prof_hilbert, t0);
     }
 
-    fmpz_sub_ui(e, n, 1);
-    fmpz_fdiv_q_2exp(e, e, 1);          /* e = (n - 1) / 2 */
-
     {
-    PROF_START(t1);
-    /* degrees 2, 3, 4 by radicals when possible (a few square and cube roots) */
-    if (fmpz_mod_poly_degree(f, ctx) >= 2 && fmpz_mod_poly_degree(f, ctx) <= 4
-            && ecpp_root_radicals(j, f, state, ctx))
-        found = 1;
-    while (!found && fmpz_mod_poly_degree(f, ctx) > 1 && tries < 20)
-    {
-        slong d = fmpz_mod_poly_degree(f, ctx);
-
-        if (d == 2)
-        {
-            /* x^2 + c1 x + c0: root = (-c1 +- sqrt(c1^2 - 4 c0)) / 2 */
-            fmpz_t c0, c1;
-            fmpz_init(c0);
-            fmpz_init(c1);
-            fmpz_mod_poly_get_coeff_fmpz(c0, f, 0, ctx);
-            fmpz_mod_poly_get_coeff_fmpz(c1, f, 1, ctx);
-            fmpz_mod_mul(t, c1, c1, ctx);
-            fmpz_mod_mul_ui(r, c0, 4, ctx);
-            fmpz_mod_sub(t, t, r, ctx);
-            if (fmpz_sqrtmod(r, t, n))
-            {
-                fmpz_mod_sub(r, r, c1, ctx);
-                fmpz_set_ui(t, 2);
-                fmpz_mod_inv(t, t, ctx);
-                fmpz_mod_mul(j, r, t, ctx);
-                found = 1;
-            }
-            fmpz_clear(c0);
-            fmpz_clear(c1);
-            break;
-        }
-
-        /* g = gcd((x + r)^e - 1, f), with a precomputed inverse of rev(f) */
-        tries++;
-        fmpz_randm(r, state, n);
-        fmpz_mod_poly_zero(base, ctx);
-        fmpz_mod_poly_set_coeff_fmpz(base, 0, r, ctx);
-        fmpz_mod_poly_set_coeff_ui(base, 1, 1, ctx);
-        if (d >= 12)
-        {
-            fmpz_mod_poly_reverse(finv, f, d + 1, ctx);
-            fmpz_mod_poly_inv_series(finv, finv, d + 1, ctx);
-            fmpz_mod_poly_powmod_fmpz_binexp_preinv(pw, base, e, f, finv, ctx);
-        }
-        else
-            fmpz_mod_poly_powmod_fmpz_binexp(pw, base, e, f, ctx);
-        fmpz_mod_poly_get_coeff_fmpz(t, pw, 0, ctx);
-        fmpz_sub_ui(t, t, 1);
-        fmpz_mod_poly_set_coeff_fmpz(pw, 0, t, ctx);
-        if (fmpz_mod_poly_is_zero(pw, ctx))
-            continue;
-        fmpz_mod_poly_gcd(g, pw, f, ctx);
-
-        {
-            slong dg = fmpz_mod_poly_degree(g, ctx);
-            if (dg <= 0 || dg >= d)
-                continue;
-            /* keep the smaller of g and f / g */
-            if (2 * dg > d)
-                fmpz_mod_poly_divrem(g, pw, f, g, ctx);
-            fmpz_mod_poly_swap(f, g, ctx);
-        }
-    }
-    PROF_ADD(prof_roots, t1);
-    }
-
-    if (!found && fmpz_mod_poly_degree(f, ctx) == 1)
-    {
-        fmpz_mod_poly_get_coeff_fmpz(j, f, 0, ctx);
-        fmpz_mod_neg(j, j, ctx);
-        found = 1;
+        PROF_START(t1);
+        /* a root of f: by radicals up to degree 4, else by random splitting */
+        found = ecpp_poly_root(j, f, state, ctx);
+        PROF_ADD(prof_roots, t1);
     }
 
 cleanup:
     fmpz_mod_poly_clear(f, ctx);
-    fmpz_mod_poly_clear(g, ctx);
-    fmpz_mod_poly_clear(base, ctx);
-    fmpz_mod_poly_clear(pw, ctx);
-    fmpz_mod_poly_clear(finv, ctx);
     fmpz_poly_clear(H);
-    fmpz_clear(e);
-    fmpz_clear(r);
-    fmpz_clear(t);
 
     return found;
 }
@@ -1711,8 +1622,10 @@ _pending_start(ecpp_ctx_struct * ctx, const fmpz_t n, const ecpp_cand_struct * c
     fmpz_mod_ctx_init(ctx->pending.mctx, n);
     flint_rand_set_seed(ctx->pending.state, n_randlimb(ctx->state), n_randlimb(ctx->state));
 
+    /* one worker (the argument of flint_request_threads is a limit on the
+       number of threads including the caller) */
     if (ctx->use_threads)
-        got = flint_request_threads(&handles, 1);
+        got = flint_request_threads(&handles, 2);
     if (got == 1)
     {
         ctx->pending.threaded = 1;
@@ -1973,7 +1886,7 @@ ecpp_prove(ecpp_cert_t cert, const fmpz_t n)
     flint_rand_init(ctx.state);
     ctx.pending.active = 0;
     ctx.pending.cert_index = -1;
-    ctx.results_alloc = 64;
+    ctx.results_alloc = 8;
     ctx.results = flint_calloc(ctx.results_alloc, sizeof(int));
     _step_init(&ctx.pending.step);
     _cand_init(&ctx.pending.cand);

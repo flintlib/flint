@@ -82,6 +82,38 @@ TEST_FUNCTION_START(ecpp_prove, state)
         fmpz_clear(b);
     }
 
+    /*
+        The threaded paths (parallel square roots, Cornacchia, tests and
+        primorial reduction, the realisation of a step pipelined with the
+        search for the next) are only used from 1000 bits: one proof each
+        with two and four threads, verified.
+    */
+    {
+        fmpz_t n;
+        ecpp_cert_t cert;
+        int t;
+        fmpz_init(n);
+        ecpp_cert_init(cert);
+        for (t = 2; t <= 4; t += 2)
+        {
+            flint_set_num_threads(t);
+            fmpz_randprime(n, state, 1040, 0);
+            if (ecpp_prove(cert, n) != 1 || !ecpp_verify(cert, n))
+            {
+                flint_printf("FAIL: threaded proof (%d threads)\n", t);
+                flint_abort();
+            }
+        }
+        flint_set_num_threads(1);
+        if (ecpp_is_prime(n) != 1)
+        {
+            flint_printf("FAIL: ecpp_is_prime\n");
+            flint_abort();
+        }
+        ecpp_cert_clear(cert);
+        fmpz_clear(n);
+    }
+
     /* an n = 7 mod 8 with few usable discriminants and, by chance, no
        prime cofactor among them at the default pool: the prover must
        enlarge the pool rather than give up (about 10 s, so only with a
