@@ -13,22 +13,9 @@
 #include "fmpz.h"
 #include "qsieve.h"
 
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-#include <windows.h>
-#endif
-
 void qsieve_init_with_tune(qs_t qs_inf, const fmpz_t n, ulong ks_primes,
         slong fb_primes, slong small_primes, slong sieve_size, ulong sieve_bits)
 {
-    size_t fname_alloc_size;
-
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-    fname_alloc_size = MAX_PATH;
-#else
-    fname_alloc_size = 20;
-#endif
-    qs_inf->fname = (char *) flint_malloc(fname_alloc_size); /* space for filename */
-
     /* store n in struct */
     fmpz_init_set(qs_inf->n, n);
 
@@ -74,6 +61,8 @@ void qsieve_init_with_tune(qs_t qs_inf, const fmpz_t n, ulong ks_primes,
     qs_inf->s = 0;
     qs_inf->low = 0;
     qs_inf->high = 0;
+
+    qsieve_relations_init(qs_inf); /* space to hold the relations we find */
 }
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n)
